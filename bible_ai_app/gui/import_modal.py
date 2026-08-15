@@ -134,11 +134,18 @@ class ImportTab(ctk.CTkScrollableFrame):
         # Modèle d'Embedding (Vectorisation IA)
         lbl_embed = ctk.CTkLabel(left_card, text="Modèle d'embedding vectoriel (Recherche IA) :", font=ctk.CTkFont(weight="bold"))
         lbl_embed.pack(padx=20, pady=(4, 2), anchor="w")
-        self.embed_var = ctk.StringVar(value=self.edit_meta.get("embedding_model", "study_library"))
+        self.embed_var = ctk.StringVar(value=self.edit_meta.get("embedding_model", "bge_multilingual_gemma2 (Infomaniak)"))
         self.embed_menu = ctk.CTkOptionMenu(
             left_card, 
             variable=self.embed_var, 
-            values=["study_library", "gemini-embedding-2", "gemini-embedding-1", "mistral-embed"],
+            values=[
+                "bge_multilingual_gemma2 (Infomaniak)",
+                "mini_lm_l12_v2 (Infomaniak)",
+                "gemini-embedding-2",
+                "gemini-embedding-1",
+                "study_library",
+                "mistral-embed"
+            ],
             height=34
         )
         self.embed_menu.pack(fill="x", padx=20, pady=(0, 16))

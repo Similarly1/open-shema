@@ -28,7 +28,7 @@
   },
   {
     "id": "theologie_systematiq",
-    "name": "Théologie Systématique (John MacArthur & Richard Mayhue)",
+    "name": "Théologie Systématique",
     "type": "custom",
     "enabled": true,
     "priority": 4,

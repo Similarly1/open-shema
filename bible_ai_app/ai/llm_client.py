@@ -24,9 +24,10 @@ class GeminiClient:
     def __init__(self, api_key, model="gemini-3.7-flash"):
         self.api_key = api_key
         self.model = model
+        self.last_used_model = model
         self.base_url = "https://generativelanguage.googleapis.com/v1beta/models"
 
-    def chat(self, messages, system_prompt=None, fallback=True):
+    def chat(self, messages, system_prompt=None, fallback=True, thinking_budget=None):
         # Définir l'ordre d'essai : le modèle configuré en premier, puis la cascade
         models_to_try = [self.model]
         if fallback:
@@ -61,17 +62,25 @@ class GeminiClient:
         if system_prompt:
             payload["system_instruction"] = {"parts": [{"text": system_prompt}]}
 
+        if thinking_budget is not None:
+            payload["generationConfig"] = {
+                "thinkingConfig": {
+                    "thinkingBudget": thinking_budget
+                }
+            }
+
         last_error = None
         for current_model in models_to_try:
             url = f"{self.base_url}/{current_model}:generateContent?key={self.api_key}"
             try:
-                response = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=60)
+                response = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=90)
                 if response.status_code == 429:
                     last_error = f"Quota 429 atteint pour {current_model}"
                     continue
                 response.raise_for_status()
                 data = response.json()
                 try:
+                    self.last_used_model = current_model
                     return data["candidates"][0]["content"]["parts"][0]["text"]
                 except (KeyError, IndexError):
                     return "Erreur lors de la lecture de la réponse Gemini."
@@ -142,20 +151,58 @@ class GeminiClient:
 
         return all_embeddings
 
+class InfomaniakClient:
+    def __init__(self, token, product_id="251"):
+        self.token = token
+        self.product_id = product_id or "251"
+        self.base_url = f"https://api.infomaniak.com/1/ai/{self.product_id}/openai/v1"
+        self.headers = {
+            "Authorization": f"Bearer {self.token}",
+            "Content-Type": "application/json"
+        }
+
+    def embeddings(self, texts, model="bge_multilingual_gemma2"):
+        sub_batch_size = 32
+        all_embeddings = []
+        clean_model = model.replace("infomaniak/", "").replace(" (Infomaniak)", "").strip()
+        if not clean_model:
+            clean_model = "bge_multilingual_gemma2"
+            
+        url = f"{self.base_url}/embeddings"
+        for i in range(0, len(texts), sub_batch_size):
+            batch = texts[i:i + sub_batch_size]
+            payload = {
+                "model": clean_model,
+                "input": batch
+            }
+            try:
+                response = requests.post(url, headers=self.headers, json=payload, timeout=60)
+                response.raise_for_status()
+                data = response.json()
+                embs = [item["embedding"] for item in data.get("data", [])]
+                all_embeddings.extend(embs)
+            except Exception as e:
+                raise Exception(f"Erreur d'embedding Infomaniak ({clean_model}) : {str(e)}")
+                
+        return all_embeddings
+
 class LLMClient:
-    def __init__(self, api_key, model="gemini-3.7-flash", provider="gemini"):
+    def __init__(self, api_key, model="gemini-3.7-flash", provider="gemini", product_id=None):
         self.api_key = api_key
         self.model = model
         self.provider = provider
+        self.product_id = product_id or "251"
         
         if self.provider == "mistral":
             self.client = MistralClient(api_key=self.api_key) if self.api_key else None
         elif self.provider == "gemini":
             self.client = GeminiClient(api_key=self.api_key, model=self.model) if self.api_key else None
+        elif self.provider == "infomaniak":
+            self.client = InfomaniakClient(token=self.api_key, product_id=self.product_id) if self.api_key else None
         else:
             self.client = None
             
-    def ask_question(self, context, question, system_prompt=None):
+    def ask_question(self, context, question, system_prompt=None, thinking_budget=None):
         if not self.client:
             return f"Erreur : Clé API manquante pour {self.provider}."
             
@@ -184,7 +231,7 @@ class LLMClient:
         elif self.provider == "gemini":
             messages = [{"role": "user", "content": user_prompt}]
             try:
-                return self.client.chat(messages, system_prompt=system_prompt)
+                return self.client.chat(messages, system_prompt=system_prompt, thinking_budget=thinking_budget)
             except Exception as e:
                 return f"Erreur de communication avec l'API Gemini : {str(e)}"
 
@@ -210,6 +257,12 @@ class LLMClient:
                 return self.client.embeddings(texts, model=model or "gemini-embedding-2")
             except Exception as e:
                 raise Exception(f"Erreur d'embedding Gemini : {str(e)}")
+                
+        elif self.provider == "infomaniak":
+            try:
+                return self.client.embeddings(texts, model=model or "bge_multilingual_gemma2")
+            except Exception as e:
+                raise Exception(f"Erreur d'embedding Infomaniak : {str(e)}")
 
 
     def analyze_image_ocr(self, image_path, prompt=None):

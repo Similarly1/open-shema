@@ -265,6 +265,21 @@ class SettingsTab(ctk.CTkScrollableFrame):
         if self.config.get("gemini_api_key"):
             self.gemini_key_entry.insert(0, self.config["gemini_api_key"])
             
+        # Token & Product ID Infomaniak AI
+        self.infomaniak_token_label = ctk.CTkLabel(self, text="Token API Infomaniak AI (Embeddings / RAG) :")
+        self.infomaniak_token_label.pack(anchor="w", padx=20, pady=(4, 0))
+        self.infomaniak_token_entry = ctk.CTkEntry(self, show="*")
+        self.infomaniak_token_entry.pack(fill="x", padx=20, pady=5)
+        if self.config.get("infomaniak_token"):
+            self.infomaniak_token_entry.insert(0, self.config["infomaniak_token"])
+            
+        self.infomaniak_pid_label = ctk.CTkLabel(self, text="Product ID Infomaniak (ex: 251) :")
+        self.infomaniak_pid_label.pack(anchor="w", padx=20, pady=(4, 0))
+        self.infomaniak_pid_entry = ctk.CTkEntry(self, placeholder_text="251")
+        self.infomaniak_pid_entry.pack(fill="x", padx=20, pady=5)
+        if self.config.get("infomaniak_product_id"):
+            self.infomaniak_pid_entry.insert(0, str(self.config["infomaniak_product_id"]))
+            
         # Prompt système de l'assistant
         self.prompt_label = ctk.CTkLabel(self, text="Prompt Système de l'Assistant IA :")
         self.prompt_label.pack(anchor="w", padx=20, pady=(8, 0))
@@ -459,6 +474,8 @@ class SettingsTab(ctk.CTkScrollableFrame):
         
         self.config["mistral_api_key"] = self.api_key_entry.get().strip()
         self.config["gemini_api_key"] = self.gemini_key_entry.get().strip()
+        self.config["infomaniak_token"] = self.infomaniak_token_entry.get().strip()
+        self.config["infomaniak_product_id"] = self.infomaniak_pid_entry.get().strip() or "251"
         self.config["chat_model"] = self.chat_model_var.get()
         self.config["show_diff_percentage"] = self.show_diff_pct_var.get()
         self.config["show_diff_highlights"] = self.show_diff_colors_var.get()

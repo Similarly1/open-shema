@@ -18,7 +18,9 @@ class VectorDB:
                 name="study_library",
                 metadata={"hnsw:space": "cosine"}
             )
-        collection_name = f"bible_study_{embedding_model.replace('-', '_')}"
+        clean_name = re.sub(r'[^a-zA-Z0-9_-]', '_', embedding_model.strip())
+        clean_name = re.sub(r'_+', '_', clean_name).strip('_')[:45]
+        collection_name = f"bible_study_{clean_name}"
         return self.client.get_or_create_collection(
             name=collection_name,
             metadata={"hnsw:space": "cosine"}
@@ -54,12 +56,23 @@ class VectorDB:
                     progress_callback(int((end / total) * 100))
             return
             
-        provider = "gemini" if "gemini" in embedding_model else "mistral"
-        key = self.api_keys.get(provider)
+        if "infomaniak" in embedding_model or "bge" in embedding_model or "mini_lm" in embedding_model:
+            provider = "infomaniak"
+            key = self.api_keys.get("infomaniak") or self.api_keys.get("infomaniak_token")
+            product_id = self.api_keys.get("infomaniak_product_id", "251")
+        elif "gemini" in embedding_model:
+            provider = "gemini"
+            key = self.api_keys.get("gemini") or self.api_keys.get("gemini_api_key")
+            product_id = None
+        else:
+            provider = "mistral"
+            key = self.api_keys.get("mistral") or self.api_keys.get("mistral_api_key")
+            product_id = None
+
         if not key:
-            raise Exception(f"Clé API manquante pour {provider}")
+            raise Exception(f"Clé/Token API manquant pour {provider}")
             
-        llm = LLMClient(api_key=key, provider=provider)
+        llm = LLMClient(api_key=key, provider=provider, product_id=product_id)
         
         for i in range(0, total, batch_size):
             end = min(i + batch_size, total)
@@ -231,12 +244,23 @@ class VectorDB:
 
     def search_semantic(self, query, n_results=5, doc_type=None, embedding_model="gemini-embedding-2"):
         collection = self.get_collection(embedding_model)
-        provider = "gemini" if "gemini" in embedding_model else "mistral"
-        key = self.api_keys.get(provider)
+        if "infomaniak" in embedding_model or "bge" in embedding_model or "mini_lm" in embedding_model:
+            provider = "infomaniak"
+            key = self.api_keys.get("infomaniak") or self.api_keys.get("infomaniak_token")
+            product_id = self.api_keys.get("infomaniak_product_id", "251")
+        elif "gemini" in embedding_model:
+            provider = "gemini"
+            key = self.api_keys.get("gemini") or self.api_keys.get("gemini_api_key")
+            product_id = None
+        else:
+            provider = "mistral"
+            key = self.api_keys.get("mistral") or self.api_keys.get("mistral_api_key")
+            product_id = None
+
         if not key:
-            raise Exception(f"Clé API manquante pour {provider}")
+            raise Exception(f"Clé/Token API manquant pour {provider}")
             
-        llm = LLMClient(api_key=key, provider=provider)
+        llm = LLMClient(api_key=key, provider=provider, product_id=product_id)
         query_embedding = llm.get_embeddings([query], model=embedding_model)[0]
         
         where = None

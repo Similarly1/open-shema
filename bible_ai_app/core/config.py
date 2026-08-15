@@ -8,6 +8,8 @@ def load_config():
         return {
             "mistral_api_key": "",
             "gemini_api_key": "",
+            "infomaniak_token": "",
+            "infomaniak_product_id": "251",
             "embedding_provider": "local",
             "chat_model": "gemini-3.7-flash",
             "theme": "dark",

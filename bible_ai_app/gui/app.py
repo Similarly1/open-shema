@@ -34,7 +34,10 @@ class App(ctk.CTk):
         
         self.db.api_keys = {
             "mistral": self.config.get("mistral_api_key", ""),
-            "gemini": self.config.get("gemini_api_key", "")
+            "gemini": self.config.get("gemini_api_key", ""),
+            "infomaniak": self.config.get("infomaniak_token", ""),
+            "infomaniak_token": self.config.get("infomaniak_token", ""),
+            "infomaniak_product_id": self.config.get("infomaniak_product_id", "251")
         }
         
         self.active_sources = []
@@ -179,7 +182,10 @@ class App(ctk.CTk):
         
         self.db.api_keys = {
             "mistral": self.config.get("mistral_api_key", ""),
-            "gemini": self.config.get("gemini_api_key", "")
+            "gemini": self.config.get("gemini_api_key", ""),
+            "infomaniak": self.config.get("infomaniak_token", ""),
+            "infomaniak_token": self.config.get("infomaniak_token", ""),
+            "infomaniak_product_id": self.config.get("infomaniak_product_id", "251")
         }
         self.center_panel.config = new_config
         self.center_panel.font_family = new_config.get("font_family", "Georgia")
@@ -218,24 +224,32 @@ class App(ctk.CTk):
             return
             
         self.progress_overlay.place(relx=0.98, rely=0.98, anchor="se")
-        self.progress_overlay.add_or_update_task(doc_name, 0, "Analyse...")
-        self.update_idletasks()
+        self.progress_overlay.add_or_update_task(doc_name, 0, "Préparation...")
         
         def progress_cb(pct):
-            self.progress_overlay.add_or_update_task(doc_name, pct, "Importation...")
-            self.update_idletasks()
+            self.after(0, lambda: self.progress_overlay.add_or_update_task(doc_name, pct, f"Indexation {pct}%..."))
             
-        try:
-            self.db.add_chunks(chunks, embedding_model=metadata.get("embedding_model", "study_library"), progress_callback=progress_cb)
-            self.progress_overlay.add_or_update_task(doc_name, 100, "Terminé")
-            self.update_idletasks()
-            
-            messagebox.showinfo("Import terminé", f"Importation terminée pour '{doc_name}'.\n{len(chunks)} versets traités.", parent=self)
-            self.progress_overlay.remove_task(doc_name)
-            self.on_library_update()
-        except Exception as e:
-            messagebox.showerror("Erreur d'import", f"Erreur lors de l'importation : {str(e)}", parent=self)
-            self.progress_overlay.remove_task(doc_name)
+        def _async_import_worker():
+            import threading
+            try:
+                self.db.add_chunks(chunks, embedding_model=metadata.get("embedding_model", "study_library"), progress_callback=progress_cb)
+                
+                def _on_success():
+                    self.progress_overlay.add_or_update_task(doc_name, 100, "Terminé")
+                    self.on_library_update()
+                    messagebox.showinfo("Import terminé", f"Importation terminée pour '{doc_name}'.\n{len(chunks)} unités indexées avec succès !", parent=self)
+                    self.progress_overlay.remove_task(doc_name)
+                    
+                self.after(0, _on_success)
+            except Exception as e:
+                err_msg = str(e)
+                def _on_error():
+                    messagebox.showerror("Erreur d'import", f"Erreur lors de l'importation de '{doc_name}' :\n{err_msg}", parent=self)
+                    self.progress_overlay.remove_task(doc_name)
+                self.after(0, _on_error)
+                
+        import threading
+        threading.Thread(target=_async_import_worker, daemon=True).start()
 
     def on_edit_document(self, doc_name, chunks, metadata, edit_mode=True, old_name=None):
         from gui.library_utils import load_books_metadata, save_books_metadata
@@ -279,24 +293,32 @@ class App(ctk.CTk):
         
         if chunks:
             self.progress_overlay.place(relx=0.98, rely=0.98, anchor="se")
-            self.progress_overlay.add_or_update_task(doc_name, 0, "Analyse...")
-            self.update_idletasks()
+            self.progress_overlay.add_or_update_task(doc_name, 0, "Préparation...")
             
             def progress_cb(pct):
-                self.progress_overlay.add_or_update_task(doc_name, pct, "Mise à jour...")
-                self.update_idletasks()
+                self.after(0, lambda: self.progress_overlay.add_or_update_task(doc_name, pct, f"Mise à jour {pct}%..."))
                 
-            try:
-                self.db.add_chunks(chunks, embedding_model=embedding_model, progress_callback=progress_cb)
-                self.progress_overlay.add_or_update_task(doc_name, 100, "Terminé")
-                self.update_idletasks()
-                
-                messagebox.showinfo("Édition terminée", f"Mise à jour terminée pour '{doc_name}'.", parent=self)
-                self.progress_overlay.remove_task(doc_name)
-            except Exception as e:
-                messagebox.showerror("Erreur", f"Erreur lors de la mise à jour : {str(e)}", parent=self)
-                self.progress_overlay.remove_task(doc_name)
-        self.on_library_update()
+            def _async_edit_worker():
+                import threading
+                try:
+                    self.db.add_chunks(chunks, embedding_model=embedding_model, progress_callback=progress_cb)
+                    def _on_success():
+                        self.progress_overlay.add_or_update_task(doc_name, 100, "Terminé")
+                        self.on_library_update()
+                        messagebox.showinfo("Édition terminée", f"Mise à jour terminée pour '{doc_name}'.", parent=self)
+                        self.progress_overlay.remove_task(doc_name)
+                    self.after(0, _on_success)
+                except Exception as e:
+                    err_msg = str(e)
+                    def _on_error():
+                        messagebox.showerror("Erreur", f"Erreur lors de la mise à jour : {err_msg}", parent=self)
+                        self.progress_overlay.remove_task(doc_name)
+                    self.after(0, _on_error)
+                    
+            import threading
+            threading.Thread(target=_async_edit_worker, daemon=True).start()
+        else:
+            self.on_library_update()
 
     def toggle_fullscreen(self, event=None):
         """Active ou désactive le mode plein écran immersif total sur l'application."""

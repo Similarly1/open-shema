@@ -74,11 +74,75 @@ class RightPanel(ctk.CTkFrame):
         
         # Titre
         self.title_label = ctk.CTkLabel(self, text="Assistant IA", font=ctk.CTkFont(size=20, weight="bold"))
-        self.title_label.pack(pady=(10, 15), padx=10)
+        self.title_label.pack(pady=(10, 4), padx=10)
+        
+        # Barre de contrôle du modèle & réflexion
+        self.control_bar = ctk.CTkFrame(self, fg_color=("#F1F5F9", "#1E293B"), corner_radius=8)
+        self.control_bar.pack(fill="x", padx=10, pady=(0, 6))
+        
+        # Ligne 1 : Sélecteur de modèle
+        model_row = ctk.CTkFrame(self.control_bar, fg_color="transparent")
+        model_row.pack(fill="x", padx=8, pady=(5, 2))
+        
+        lbl_mod = ctk.CTkLabel(model_row, text="Modèle :", font=ctk.CTkFont(size=11, weight="bold"))
+        lbl_mod.pack(side="left", padx=(0, 4))
+        
+        self.chat_model_var = ctk.StringVar(value=self.config.get("chat_model", "gemini-3.7-flash"))
+        self.model_menu = ctk.CTkOptionMenu(
+            model_row,
+            variable=self.chat_model_var,
+            values=[
+                "gemini-3.7-flash",
+                "gemini-3.6-flash",
+                "gemini-3.5-flash",
+                "gemini-3.5-flash-lite",
+                "gemini-3.1-flash-lite",
+                "gemini-3-flash",
+                "gemini-2.5-flash",
+                "gemini-2.5-flash-lite",
+                "mistral-small-latest",
+                "mistral-large-latest"
+            ],
+            command=self.on_model_changed,
+            height=26,
+            font=ctk.CTkFont(size=11)
+        )
+        self.model_menu.pack(side="right", fill="x", expand=True)
+        
+        # Ligne 2 : Mode Réflexion & Niveau (Bas, Moyen, Maximum)
+        thinking_row = ctk.CTkFrame(self.control_bar, fg_color="transparent")
+        thinking_row.pack(fill="x", padx=8, pady=(2, 5))
+        
+        self.thinking_enabled_var = ctk.BooleanVar(value=self.config.get("thinking_enabled", True))
+        self.thinking_switch = ctk.CTkSwitch(
+            thinking_row,
+            text="🧠 Réflexion",
+            variable=self.thinking_enabled_var,
+            command=self.on_thinking_changed,
+            font=ctk.CTkFont(size=11, weight="bold"),
+            width=36,
+            height=18
+        )
+        self.thinking_switch.pack(side="left")
+        
+        self.thinking_level_var = ctk.StringVar(value=self.config.get("thinking_level", "Moyen"))
+        self.thinking_level_menu = ctk.CTkOptionMenu(
+            thinking_row,
+            variable=self.thinking_level_var,
+            values=["Bas", "Moyen", "Maximum"],
+            command=self.on_thinking_changed,
+            width=85,
+            height=22,
+            font=ctk.CTkFont(size=11)
+        )
+        self.thinking_level_menu.pack(side="right")
+        
+        if not self.thinking_enabled_var.get():
+            self.thinking_level_menu.configure(state="disabled")
         
         # Zone de chat
         self.chat_history = ctk.CTkTextbox(self, wrap="word")
-        self.chat_history.pack(pady=10, padx=10, fill="both", expand=True)
+        self.chat_history.pack(pady=6, padx=10, fill="both", expand=True)
         self.chat_history.configure(state="disabled")
         
         # Appliquer la police initiale depuis la config
@@ -112,9 +176,24 @@ class RightPanel(ctk.CTkFrame):
         self.send_btn = ctk.CTkButton(self.input_frame, text="Envoyer", width=60, command=self.send_message)
         self.send_btn.pack(side="right")
         
+    def on_model_changed(self, choice):
+        self.config["chat_model"] = choice
+        from core.config import save_config
+        save_config(self.config)
+        self.update_config(self.config)
+        
+    def on_thinking_changed(self, *args):
+        is_enabled = self.thinking_enabled_var.get()
+        self.thinking_level_menu.configure(state="normal" if is_enabled else "disabled")
+        self.config["thinking_enabled"] = is_enabled
+        self.config["thinking_level"] = self.thinking_level_var.get()
+        from core.config import save_config
+        save_config(self.config)
+
     def update_config(self, new_config):
         self.config = new_config
-        chat_model = self.config.get("chat_model", "mistral-small-latest")
+        chat_model = self.config.get("chat_model", "gemini-3.7-flash")
+        self.chat_model_var.set(chat_model)
         provider = "gemini" if "gemini" in chat_model.lower() else "mistral"
         api_key = self.config.get("gemini_api_key" if provider == "gemini" else "mistral_api_key")
         self.llm = LLMClient(api_key=api_key, model=chat_model, provider=provider)
@@ -138,21 +217,38 @@ class RightPanel(ctk.CTkFrame):
         self.send_btn.configure(state="disabled")
         self.copy_btn.pack_forget() # Masquer le bouton de copie pendant le chargement
         
+        # Calculer le budget de réflexion
+        thinking_budget = None
+        current_model = self.config.get("chat_model", "gemini-3.7-flash")
+        if "gemini" in current_model.lower():
+            if self.thinking_enabled_var.get():
+                lvl = self.thinking_level_var.get()
+                if lvl == "Bas":
+                    thinking_budget = 1024
+                elif lvl == "Moyen":
+                    thinking_budget = 4096
+                elif lvl == "Maximum":
+                    thinking_budget = 16384
+                else:
+                    thinking_budget = 4096
+            else:
+                thinking_budget = 0
+
         # Démarrer le loader animé
         self.start_loader()
         
         sys_prompt = self.config.get("chat_system_prompt")
         def run_ai():
-            answer = self.llm.ask_question(context, user_text, system_prompt=sys_prompt)
+            answer = self.llm.ask_question(context, user_text, system_prompt=sys_prompt, thinking_budget=thinking_budget)
             self.after(0, self.display_answer, answer)
             
         threading.Thread(target=run_ai, daemon=True).start()
         
     def send_custom_prompt(self, prompt_text):
         """Injecte une question pré-remplie et lance l'analyse IA immédiatement"""
-        self.input_entry.delete("0.0", "end")
-        self.input_entry.insert("0.0", prompt_text)
-        self.on_send()
+        self.entry.delete(0, "end")
+        self.entry.insert(0, prompt_text)
+        self.send_message()
         
     def start_loader(self):
         if getattr(self, 'loader_after_id', None):
@@ -167,8 +263,18 @@ class RightPanel(ctk.CTkFrame):
         ]
         self.loader_index = 0
         
+        used_model = getattr(getattr(self.llm, "client", None), "last_used_model", self.config.get("chat_model", "gemini-3.7-flash"))
+        thinking_badge = ""
+        if "gemini" in str(used_model).lower():
+            if self.thinking_enabled_var.get():
+                thinking_badge = f" ({used_model} • 🧠 {self.thinking_level_var.get()})"
+            else:
+                thinking_badge = f" ({used_model} • ⚡ Direct)"
+        else:
+            thinking_badge = f" ({used_model})"
+        
         self.chat_history.configure(state="normal")
-        self.chat_history.insert("end", "IA : ", "ai_header")
+        self.chat_history.insert("end", f"Assistant{thinking_badge} : ", "ai_header")
         self.chat_history.insert("end", "Réflexion en cours...\n\n", ("loader", "italic"))
         self.chat_history.insert("end", "\n".join(self.skeleton_lines) + "\n\n", "skeleton")
         self.chat_history.configure(state="disabled")
