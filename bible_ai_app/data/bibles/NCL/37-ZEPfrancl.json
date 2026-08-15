@@ -1,0 +1,465 @@
+{
+    "general": {
+        "about_translation": {
+            "language_name_in_english": "français",
+            "language_name_local_language": "French",
+            "translation_name_in_english": "French néo-Crampon Libre",
+            "translation_name_in_local_language": "Sainte Bible néo-Crampon Libre",
+            "real_kind": "Bible with Deuterocanon",
+            "found": "https://ebible.org/details.php?id=francl",
+            "written_from_left_to_right": true,
+            "translation_abbr": "FRANCL",
+            "ebible": {
+                "last_updated": "2025-09-10",
+                "region": "France",
+                "usfm_link": "https://eBible.org/Scriptures/francl_usfm.zip",
+                "copyright_link": "https://gitlab.com/crosswire-bible-society/neo-crampon-libre",
+                "copyright_text": "Copyright © 2022 Fraternité de Tibériade",
+                "contributor": "???",
+                "translation_by": ""
+            }
+        },
+        "about_book": {
+            "ident": "francl",
+            "is_apocryphal": false,
+            "bookname_in_english": "Zephaniah",
+            "bookname_in_local_language": "Sophonie \n",
+            "book_code": "ZEP",
+            "book_code_content": "N/A",
+            "before_source": []
+        },
+        "ident": "francl",
+        "editor_comments": "I ASSUME the contributor is the same as the copyright owner"
+    },
+    "special_elems": [],
+    "verses": [
+        {
+            "global_locator": "ZEP 1:1",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "1",
+            "text": "<dictionary_word>La</dictionary_word> <dictionary_word>parole</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>qui</dictionary_word> <dictionary_word>fut</dictionary_word> <dictionary_word>adressée</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>Sophonie</dictionary_word>, <dictionary_word>fils</dictionary_word> <dictionary_word>de</dictionary_word> Chusi, <dictionary_word>fils</dictionary_word> <dictionary_word>de</dictionary_word> Godolias, <dictionary_word>fils</dictionary_word> d’Amarias, <dictionary_word>fils</dictionary_word> d’<dictionary_word>Ezéchias</dictionary_word>, <dictionary_word>dans</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>jours</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Josias</dictionary_word>, <dictionary_word>fils</dictionary_word> d’Amon, <dictionary_word>roi</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Juda</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 1:2",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "2",
+            "text": "<dictionary_word>J</dictionary_word>’enlèverai <dictionary_word>tout</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>dessus</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>face</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>terre</dictionary_word>, — <dictionary_word>oracle</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> ;",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 1:3",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "3",
+            "text": "<dictionary_word>j</dictionary_word>’<dictionary_word>enlèverai</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>hommes</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>bêtes</dictionary_word>, <dictionary_word>j</dictionary_word>’<dictionary_word>enlèverai</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>oiseaux</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>ciel</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>poissons</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>mer</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>les</dictionary_word> scandales <dictionary_word>avec</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>impies</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>j</dictionary_word>’<dictionary_word>exterminerai</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>homme</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>dessus</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>face</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>terre</dictionary_word>, — <dictionary_word>oracle</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 1:4",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "4",
+            "text": "<dictionary_word>Et</dictionary_word> j’<dictionary_word>étendrai</dictionary_word> <dictionary_word>ma</dictionary_word> <dictionary_word>main</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>Juda</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>tous</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>habitants</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Jérusalem</dictionary_word>, <dictionary_word>et</dictionary_word> j’<dictionary_word>exterminerai</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>lieu</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>reste</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Baal</dictionary_word>, <dictionary_word>le</dictionary_word> <dictionary_word>nom</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>ses</dictionary_word> <dictionary_word>ministres</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>même</dictionary_word> <dictionary_word>temps</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>prêtres</dictionary_word> ;",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 1:5",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "5",
+            "text": "<dictionary_word>et</dictionary_word> <dictionary_word>ceux</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>prosternent</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>toits</dictionary_word>, <dictionary_word>devant</dictionary_word> l’<dictionary_word>armée</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>cieux</dictionary_word> ; <dictionary_word>et</dictionary_word> <dictionary_word>ceux</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>prosternent</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>faisant</dictionary_word> <dictionary_word>serment</dictionary_word> <dictionary_word>à</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>tout</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>jurant</dictionary_word> <dictionary_word>par</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>roi</dictionary_word> ;",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 1:6",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "6",
+            "text": "<dictionary_word>et</dictionary_word> <dictionary_word>ceux</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>détournent</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>qui</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>cherchent</dictionary_word> <dictionary_word>pas</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>et</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>se</dictionary_word> soucient <dictionary_word>pas</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>lui</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 1:7",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "7",
+            "text": "<dictionary_word>Silence</dictionary_word> <dictionary_word>devant</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>Seigneur</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> ! <dictionary_word>Car</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>est</dictionary_word> <dictionary_word>proche</dictionary_word> ; <dictionary_word>car</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>a</dictionary_word> <dictionary_word>préparé</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>sacrifice</dictionary_word>, <dictionary_word>il</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>consacré</dictionary_word> <dictionary_word>ses</dictionary_word> <dictionary_word>invités</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 1:8",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "8",
+            "text": "<dictionary_word>Et</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>arrivera</dictionary_word> : <dictionary_word>Au</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>sacrifice</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>je</dictionary_word> <dictionary_word>châtierai</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>princes</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>fils</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>roi</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>tous</dictionary_word> <dictionary_word>ceux</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>revêtent</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>vêtements</dictionary_word> <dictionary_word>étrangers</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 1:9",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "9",
+            "text": "<dictionary_word>Et</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>châtierai</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>jour-là</dictionary_word> <dictionary_word>tous</dictionary_word> <dictionary_word>ceux</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>sautent</dictionary_word> <dictionary_word>par-dessus</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>seuil</dictionary_word>, <dictionary_word>qui</dictionary_word> <dictionary_word>remplissent</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>violence</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>fraude</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>maison</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>maître</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 1:10",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "10",
+            "text": "<dictionary_word>Et</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>arrivera</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>jour-là</dictionary_word>, — <dictionary_word>oracle</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> : <dictionary_word>De</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>porte</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>poissons</dictionary_word> <dictionary_word>retentiront</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>cris</dictionary_word>, <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>seconde</dictionary_word> <dictionary_word>ville</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>gémissements</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>collines</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>grand</dictionary_word> <dictionary_word>fracas</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 1:11",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "11",
+            "text": "<dictionary_word>Gémissez</dictionary_word>, <dictionary_word>habitants</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>Mortier</dictionary_word>, <dictionary_word>car</dictionary_word> <dictionary_word>tout</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>peuple</dictionary_word> chananéen <dictionary_word>est</dictionary_word> <dictionary_word>anéanti</dictionary_word>, <dictionary_word>tous</dictionary_word> <dictionary_word>ceux</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>chargés</dictionary_word> d’<dictionary_word>argent</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>exterminés</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 1:12",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "12",
+            "text": "<dictionary_word>Et</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>arrivera</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>temps-là</dictionary_word> : <dictionary_word>Je</dictionary_word> <dictionary_word>fouillerai</dictionary_word> <dictionary_word>Jérusalem</dictionary_word> <dictionary_word>avec</dictionary_word> <dictionary_word>des</dictionary_word> lanternes, <dictionary_word>et</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>châtierai</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>hommes</dictionary_word> figés <dictionary_word>sur</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>lie</dictionary_word>, <dictionary_word>qui</dictionary_word> <dictionary_word>disent</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>cœur</dictionary_word> : « <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>ne</dictionary_word> <dictionary_word>fait</dictionary_word> <dictionary_word>ni</dictionary_word> <dictionary_word>bien</dictionary_word> <dictionary_word>ni</dictionary_word> <dictionary_word>mal</dictionary_word> ! »",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 1:13",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "13",
+            "text": "<dictionary_word>Leurs</dictionary_word> <dictionary_word>biens</dictionary_word> <dictionary_word>seront</dictionary_word> <dictionary_word>livrés</dictionary_word> <dictionary_word>au</dictionary_word> <dictionary_word>pillage</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>leurs</dictionary_word> <dictionary_word>maisons</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>dévastation</dictionary_word> ; <dictionary_word>ils</dictionary_word> <dictionary_word>bâtiront</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>maisons</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>ils</dictionary_word> n’<dictionary_word>y</dictionary_word> <dictionary_word>habiteront</dictionary_word> <dictionary_word>point</dictionary_word> ; <dictionary_word>ils</dictionary_word> <dictionary_word>planteront</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>vignes</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>ils</dictionary_word> n’<dictionary_word>en</dictionary_word> <dictionary_word>boiront</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>vin</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 1:14",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "14",
+            "text": "<dictionary_word>Il</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>proche</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>grand</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>il</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>proche</dictionary_word>, <dictionary_word>il</dictionary_word> <dictionary_word>vient</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>toute</dictionary_word> <dictionary_word>hâte</dictionary_word> ! <dictionary_word>On</dictionary_word> l’<dictionary_word>entend</dictionary_word> <dictionary_word>venir</dictionary_word>, <dictionary_word>le</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> ! <dictionary_word>L</dictionary_word>’<dictionary_word>homme</dictionary_word> <dictionary_word>brave</dictionary_word> <dictionary_word>y</dictionary_word> <dictionary_word>poussera</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>cris</dictionary_word> <dictionary_word>amers</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 1:15",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "15",
+            "text": "<dictionary_word>C</dictionary_word>’<dictionary_word>est</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>fureur</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>jour-là</dictionary_word>, <dictionary_word>un</dictionary_word> <dictionary_word>jour</dictionary_word> d’<dictionary_word>angoisse</dictionary_word> <dictionary_word>et</dictionary_word> d’<dictionary_word>affliction</dictionary_word>, <dictionary_word>un</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>désolation</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>ruine</dictionary_word>, <dictionary_word>un</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>ténèbres</dictionary_word> <dictionary_word>et</dictionary_word> d’<dictionary_word>obscurité</dictionary_word>, <dictionary_word>un</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>nuages</dictionary_word> <dictionary_word>et</dictionary_word> d’épais <dictionary_word>brouillards</dictionary_word>,",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 1:16",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "16",
+            "text": "<dictionary_word>un</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>trompette</dictionary_word> <dictionary_word>et</dictionary_word> d’alarme, <dictionary_word>sur</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>villes</dictionary_word> <dictionary_word>fortes</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>créneaux</dictionary_word> <dictionary_word>élevés</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 1:17",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "17",
+            "text": "<dictionary_word>Je</dictionary_word> <dictionary_word>mettrai</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>hommes</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>détresse</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>ils</dictionary_word> <dictionary_word>marcheront</dictionary_word> <dictionary_word>comme</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>aveugles</dictionary_word>, <dictionary_word>parce</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>ils</dictionary_word> <dictionary_word>ont</dictionary_word> <dictionary_word>péché</dictionary_word> <dictionary_word>contre</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> ; <dictionary_word>leur</dictionary_word> <dictionary_word>sang</dictionary_word> <dictionary_word>sera</dictionary_word> <dictionary_word>répandu</dictionary_word> <dictionary_word>comme</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>poussière</dictionary_word> ; <dictionary_word>et</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>chair</dictionary_word> <dictionary_word>comme</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>fumier</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 1:18",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "18",
+            "text": "<dictionary_word>Ni</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>argent</dictionary_word>, <dictionary_word>ni</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>or</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>pourront</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>délivrer</dictionary_word> ; <dictionary_word>au</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>fureur</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> ; <dictionary_word>par</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>feu</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>sa</dictionary_word> <dictionary_word>jalousie</dictionary_word>, <dictionary_word>toute</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>terre</dictionary_word> <dictionary_word>sera</dictionary_word> <dictionary_word>dévorée</dictionary_word> ; <dictionary_word>car</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>fera</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>destruction</dictionary_word> totale, <dictionary_word>une</dictionary_word> <dictionary_word>ruine</dictionary_word> <dictionary_word>soudaine</dictionary_word>, <dictionary_word>de</dictionary_word> <dictionary_word>tous</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>habitants</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>terre</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 2:1",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "1",
+            "text": "Recueillez-vous, <dictionary_word>rentrez</dictionary_word> <dictionary_word>en</dictionary_word> vous-mêmes, <dictionary_word>race</dictionary_word> <dictionary_word>sans</dictionary_word> <dictionary_word>pudeur</dictionary_word>,",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 2:2",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "2",
+            "text": "<dictionary_word>avant</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>décret</dictionary_word> <dictionary_word>ait</dictionary_word> <dictionary_word>enfanté</dictionary_word>, <dictionary_word>que</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>ait</dictionary_word> <dictionary_word>passé</dictionary_word> <dictionary_word>comme</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>paille</dictionary_word> ; <dictionary_word>avant</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>vienne</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>vous</dictionary_word> l’<dictionary_word>ardeur</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>colère</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>avant</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>vienne</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>colère</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 2:3",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "3",
+            "text": "<dictionary_word>Cherchez</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>vous</dictionary_word> <dictionary_word>tous</dictionary_word> <dictionary_word>humbles</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>pays</dictionary_word>, <dictionary_word>qui</dictionary_word> <dictionary_word>avez</dictionary_word> <dictionary_word>pratiqué</dictionary_word> <dictionary_word>sa</dictionary_word> <dictionary_word>loi</dictionary_word> ; <dictionary_word>recherchez</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>justice</dictionary_word>, <dictionary_word>recherchez</dictionary_word> l’<dictionary_word>humilité</dictionary_word>. Peut-être <dictionary_word>serez-vous</dictionary_word> <dictionary_word>à</dictionary_word> l’<dictionary_word>abri</dictionary_word> <dictionary_word>au</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>colère</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> !...",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 2:4",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "4",
+            "text": "<dictionary_word>Car</dictionary_word> <dictionary_word>Gaza</dictionary_word> <dictionary_word>sera</dictionary_word> <dictionary_word>abandonnée</dictionary_word>, <dictionary_word>et</dictionary_word> Ascalon <dictionary_word>réduite</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>désert</dictionary_word> ; <dictionary_word>on</dictionary_word> <dictionary_word>chassera</dictionary_word> Azot <dictionary_word>en</dictionary_word> <dictionary_word>plein</dictionary_word> <dictionary_word>midi</dictionary_word>, <dictionary_word>et</dictionary_word> Accaron <dictionary_word>sera</dictionary_word> <dictionary_word>déracinée</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 2:5",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "5",
+            "text": "<dictionary_word>Malheur</dictionary_word> <dictionary_word>aux</dictionary_word> <dictionary_word>habitants</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> région <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>mer</dictionary_word>, <dictionary_word>à</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>nation</dictionary_word> <dictionary_word>des</dictionary_word> Crétois ! <dictionary_word>La</dictionary_word> <dictionary_word>parole</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>est</dictionary_word> <dictionary_word>prononcée</dictionary_word> <dictionary_word>contre</dictionary_word> <dictionary_word>vous</dictionary_word>, <dictionary_word>Canaan</dictionary_word>, <dictionary_word>terre</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>Philistins</dictionary_word> : « <dictionary_word>Et</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>te</dictionary_word> <dictionary_word>détruirai</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>sorte</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>il</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>te</dictionary_word> <dictionary_word>reste</dictionary_word> <dictionary_word>plus</dictionary_word> d’<dictionary_word>habitants</dictionary_word>. »",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 2:6",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "6",
+            "text": "<dictionary_word>La</dictionary_word> région <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>mer</dictionary_word> <dictionary_word>deviendra</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>pâturages</dictionary_word>, <dictionary_word>des</dictionary_word> grottes <dictionary_word>de</dictionary_word> <dictionary_word>bergers</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>parcs</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>moutons</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 2:7",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "7",
+            "text": "<dictionary_word>Ce</dictionary_word> <dictionary_word>sera</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>territoire</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>reste</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>maison</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Juda</dictionary_word>, <dictionary_word>ils</dictionary_word> <dictionary_word>y</dictionary_word> <dictionary_word>paîtront</dictionary_word> <dictionary_word>leurs</dictionary_word> <dictionary_word>troupeaux</dictionary_word> ; <dictionary_word>le</dictionary_word> <dictionary_word>soir</dictionary_word>, <dictionary_word>ils</dictionary_word> <dictionary_word>prendront</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>gîte</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>maisons</dictionary_word> d’Ascalon, <dictionary_word>car</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>leur</dictionary_word> <dictionary_word>Dieu</dictionary_word>, <dictionary_word>les</dictionary_word> <dictionary_word>visitera</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>rétablira</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 2:8",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "8",
+            "text": "<dictionary_word>J</dictionary_word>’<dictionary_word>ai</dictionary_word> <dictionary_word>entendu</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>insultes</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Moab</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>outrages</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>fils</dictionary_word> d’<dictionary_word>Ammon</dictionary_word>, <dictionary_word>qui</dictionary_word> <dictionary_word>insultaient</dictionary_word> <dictionary_word>mon</dictionary_word> <dictionary_word>peuple</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>s</dictionary_word>’agrandissaient <dictionary_word>aux</dictionary_word> dépens <dictionary_word>de</dictionary_word> <dictionary_word>ses</dictionary_word> <dictionary_word>frontières</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 2:9",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "9",
+            "text": "C’<dictionary_word>est</dictionary_word> <dictionary_word>pourquoi</dictionary_word>, <dictionary_word>je</dictionary_word> <dictionary_word>suis</dictionary_word> <dictionary_word>vivant</dictionary_word>, — <dictionary_word>oracle</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>des</dictionary_word> <dictionary_word>armées</dictionary_word>, <dictionary_word>le</dictionary_word> <dictionary_word>Dieu</dictionary_word> d’<dictionary_word>Israël</dictionary_word> : <dictionary_word>Moab</dictionary_word> <dictionary_word>sera</dictionary_word> <dictionary_word>comme</dictionary_word> <dictionary_word>Sodome</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>fils</dictionary_word> d’<dictionary_word>Ammon</dictionary_word> <dictionary_word>comme</dictionary_word> <dictionary_word>Gomorrhe</dictionary_word> : <dictionary_word>un</dictionary_word> <dictionary_word>lieu</dictionary_word> <dictionary_word>livré</dictionary_word> <dictionary_word>aux</dictionary_word> orties, <dictionary_word>une</dictionary_word> <dictionary_word>carrière</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>sel</dictionary_word>, <dictionary_word>un</dictionary_word> <dictionary_word>désert</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>jamais</dictionary_word>. <dictionary_word>Le</dictionary_word> <dictionary_word>reste</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>mon</dictionary_word> <dictionary_word>peuple</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>pillera</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>demeurera</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>ma</dictionary_word> <dictionary_word>nation</dictionary_word>, <dictionary_word>les</dictionary_word> <dictionary_word>aura</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>héritage</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 2:10",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "10",
+            "text": "<dictionary_word>Cela</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>arrivera</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>orgueil</dictionary_word>, <dictionary_word>parce</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>ils</dictionary_word> <dictionary_word>ont</dictionary_word> <dictionary_word>été</dictionary_word> méprisants <dictionary_word>et</dictionary_word> insolents, <dictionary_word>contre</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>peuple</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>des</dictionary_word> <dictionary_word>armées</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 2:11",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "11",
+            "text": "<name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>sera</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>objet</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>terreur</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>eux</dictionary_word>, <dictionary_word>car</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>anéantira</dictionary_word> <dictionary_word>tous</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>dieux</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>terre</dictionary_word> ; <dictionary_word>et</dictionary_word> <dictionary_word>devant</dictionary_word> <dictionary_word>lui</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>prosterneront</dictionary_word>, <dictionary_word>chacun</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>lieu</dictionary_word>, <dictionary_word>les</dictionary_word> <dictionary_word>habitants</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>toutes</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>îles</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>nations</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 2:12",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "12",
+            "text": "<dictionary_word>Vous</dictionary_word> <dictionary_word>aussi</dictionary_word>, <dictionary_word>Ethiopiens</dictionary_word> !... <dictionary_word>Ils</dictionary_word> <dictionary_word>seront</dictionary_word> transpercés <dictionary_word>par</dictionary_word> <dictionary_word>mon</dictionary_word> <dictionary_word>épée</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 2:13",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "13",
+            "text": "<dictionary_word>Il</dictionary_word> <dictionary_word>étendra</dictionary_word> <dictionary_word>aussi</dictionary_word> <dictionary_word>sa</dictionary_word> <dictionary_word>main</dictionary_word> <dictionary_word>contre</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>nord</dictionary_word>, <dictionary_word>il</dictionary_word> <dictionary_word>détruira</dictionary_word> <dictionary_word>Assur</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>fera</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Ninive</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>solitude</dictionary_word>, <dictionary_word>aride</dictionary_word> <dictionary_word>comme</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>désert</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 2:14",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "14",
+            "text": "<dictionary_word>Au</dictionary_word> <dictionary_word>milieu</dictionary_word> d’<dictionary_word>elle</dictionary_word> <dictionary_word>prendront</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>gîte</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>troupeaux</dictionary_word>, <dictionary_word>des</dictionary_word> <dictionary_word>animaux</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>toute</dictionary_word> <dictionary_word>espèce</dictionary_word> ; <dictionary_word>même</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>pélican</dictionary_word>, <dictionary_word>même</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>hérisson</dictionary_word> <dictionary_word>se</dictionary_word> logeront <dictionary_word>sur</dictionary_word> <dictionary_word>ses</dictionary_word> <dictionary_word>chapiteaux</dictionary_word> ; <dictionary_word>on</dictionary_word> <dictionary_word>entendra</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>chants</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>fenêtres</dictionary_word>, <dictionary_word>la</dictionary_word> <dictionary_word>désolation</dictionary_word> <dictionary_word>sera</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>seuil</dictionary_word>, <dictionary_word>car</dictionary_word> <dictionary_word>on</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>mis</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>nu</dictionary_word> <dictionary_word>les</dictionary_word> boiseries <dictionary_word>de</dictionary_word> <dictionary_word>cèdres</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 2:15",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "15",
+            "text": "C’<dictionary_word>est</dictionary_word> <dictionary_word>là</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>ville</dictionary_word> <dictionary_word>joyeuse</dictionary_word>, <dictionary_word>assise</dictionary_word> <dictionary_word>avec</dictionary_word> <dictionary_word>assurance</dictionary_word>, <dictionary_word>qui</dictionary_word> <dictionary_word>disait</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>cœur</dictionary_word> : « <dictionary_word>Moi</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>rien</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>moi</dictionary_word> ! » <dictionary_word>Comment</dictionary_word> <dictionary_word>est-elle</dictionary_word> <dictionary_word>devenue</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>désert</dictionary_word>, <dictionary_word>une</dictionary_word> <dictionary_word>demeure</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>bêtes</dictionary_word> ? <dictionary_word>Quiconque</dictionary_word> <dictionary_word>passera</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>elle</dictionary_word> <dictionary_word>sifflera</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>agitera</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>main</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 3:1",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "1",
+            "text": "<dictionary_word>Malheur</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>rebelle</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>souillée</dictionary_word>, <dictionary_word>à</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>ville</dictionary_word> d’oppression !",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 3:2",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "2",
+            "text": "<dictionary_word>Elle</dictionary_word> n’<dictionary_word>a</dictionary_word> <dictionary_word>écouté</dictionary_word> <dictionary_word>aucune</dictionary_word> <dictionary_word>voix</dictionary_word>, <dictionary_word>elle</dictionary_word> n’<dictionary_word>a</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>accepté</dictionary_word> d’avertissement ; <dictionary_word>elle</dictionary_word> <dictionary_word>ne</dictionary_word> s’<dictionary_word>est</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>confiée</dictionary_word> <dictionary_word>en</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>elle</dictionary_word> <dictionary_word>ne</dictionary_word> s’<dictionary_word>est</dictionary_word> <dictionary_word>pas</dictionary_word> approchée <dictionary_word>de</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>Dieu</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 3:3",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "3",
+            "text": "<dictionary_word>Ses</dictionary_word> <dictionary_word>princes</dictionary_word> <dictionary_word>au</dictionary_word> <dictionary_word>milieu</dictionary_word> d’<dictionary_word>elle</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>lions</dictionary_word> <dictionary_word>rugissants</dictionary_word>, <dictionary_word>ses</dictionary_word> <dictionary_word>juges</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>loups</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>soir</dictionary_word>, <dictionary_word>qui</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>gardent</dictionary_word> <dictionary_word>rien</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>matin</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 3:4",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "4",
+            "text": "<dictionary_word>Ses</dictionary_word> <dictionary_word>prophètes</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>des</dictionary_word> fanfarons, <dictionary_word>des</dictionary_word> <dictionary_word>hommes</dictionary_word> <dictionary_word>perfides</dictionary_word> ; <dictionary_word>ses</dictionary_word> <dictionary_word>prêtres</dictionary_word> <dictionary_word>profanent</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>choses</dictionary_word> <dictionary_word>saintes</dictionary_word>, <dictionary_word>ils</dictionary_word> <dictionary_word>violent</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>loi</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 3:5",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "5",
+            "text": "<name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>est</dictionary_word> <dictionary_word>juste</dictionary_word> <dictionary_word>au</dictionary_word> <dictionary_word>milieu</dictionary_word> d’<dictionary_word>elle</dictionary_word>, <dictionary_word>il</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>fait</dictionary_word> <dictionary_word>rien</dictionary_word> d’<dictionary_word>inique</dictionary_word> ; <dictionary_word>chaque</dictionary_word> <dictionary_word>matin</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>produit</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>jugement</dictionary_word>, <dictionary_word>pour</dictionary_word> <dictionary_word>donner</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>lumière</dictionary_word>, <dictionary_word>sans</dictionary_word> <dictionary_word>jamais</dictionary_word> <dictionary_word>y</dictionary_word> <dictionary_word>manquer</dictionary_word> ; <dictionary_word>mais</dictionary_word> l’<dictionary_word>impie</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>connaît</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>honte</dictionary_word> !",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 3:6",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "6",
+            "text": "<dictionary_word>J</dictionary_word>’<dictionary_word>ai</dictionary_word> <dictionary_word>exterminé</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>nations</dictionary_word> ; <dictionary_word>leurs</dictionary_word> <dictionary_word>tours</dictionary_word> <dictionary_word>ont</dictionary_word> <dictionary_word>été</dictionary_word> <dictionary_word>détruites</dictionary_word> ; j’<dictionary_word>ai</dictionary_word> <dictionary_word>désolé</dictionary_word> <dictionary_word>leurs</dictionary_word> <dictionary_word>rues</dictionary_word>, <dictionary_word>si</dictionary_word> <dictionary_word>bien</dictionary_word> qu’<dictionary_word>on</dictionary_word> n’<dictionary_word>y</dictionary_word> <dictionary_word>passe</dictionary_word> <dictionary_word>plus</dictionary_word> ; <dictionary_word>leurs</dictionary_word> <dictionary_word>villes</dictionary_word> <dictionary_word>ont</dictionary_word> <dictionary_word>été</dictionary_word> <dictionary_word>dévastées</dictionary_word>, <dictionary_word>si</dictionary_word> <dictionary_word>bien</dictionary_word> qu’<dictionary_word>il</dictionary_word> n’<dictionary_word>y</dictionary_word> <dictionary_word>reste</dictionary_word> <dictionary_word>personne</dictionary_word>, <dictionary_word>aucun</dictionary_word> <dictionary_word>habitant</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 3:7",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "7",
+            "text": "<dictionary_word>Je</dictionary_word> <dictionary_word>disais</dictionary_word> : « <dictionary_word>Au</dictionary_word> <dictionary_word>moins</dictionary_word> <dictionary_word>tu</dictionary_word> <dictionary_word>me</dictionary_word> <dictionary_word>craindras</dictionary_word>, <dictionary_word>tu</dictionary_word> <dictionary_word>accepteras</dictionary_word> l’avertissement ; <dictionary_word>et</dictionary_word> <dictionary_word>sa</dictionary_word> <dictionary_word>demeure</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>sera</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>détruite</dictionary_word>, <dictionary_word>selon</dictionary_word> <dictionary_word>tout</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>que</dictionary_word> j’<dictionary_word>ai</dictionary_word> <dictionary_word>décidé</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>égard</dictionary_word>. » <dictionary_word>Mais</dictionary_word> <dictionary_word>ils</dictionary_word> n’ont <dictionary_word>été</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>plus</dictionary_word> empressés <dictionary_word>à</dictionary_word> <dictionary_word>pervertir</dictionary_word> <dictionary_word>toutes</dictionary_word> <dictionary_word>leurs</dictionary_word> <dictionary_word>actions</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 3:8",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "8",
+            "text": "C’<dictionary_word>est</dictionary_word> <dictionary_word>pourquoi</dictionary_word> attendez-moi, — <dictionary_word>oracle</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>pour</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>où</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>me</dictionary_word> <dictionary_word>lèverai</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>butin</dictionary_word> ! <dictionary_word>Car</dictionary_word> <dictionary_word>mon</dictionary_word> arrêt <dictionary_word>est</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>j</dictionary_word>’<dictionary_word>assemble</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>nations</dictionary_word>, <dictionary_word>que</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>rassemble</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>royaumes</dictionary_word>, <dictionary_word>pour</dictionary_word> <dictionary_word>verser</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>eux</dictionary_word> <dictionary_word>ma</dictionary_word> <dictionary_word>fureur</dictionary_word>, <dictionary_word>toute</dictionary_word> l’<dictionary_word>ardeur</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>ma</dictionary_word> <dictionary_word>colère</dictionary_word>. <dictionary_word>Car</dictionary_word> <dictionary_word>par</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>feu</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>ma</dictionary_word> <dictionary_word>jalousie</dictionary_word>, <dictionary_word>toute</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>terre</dictionary_word> <dictionary_word>sera</dictionary_word> <dictionary_word>dévorée</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 3:9",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "9",
+            "text": "<dictionary_word>Car</dictionary_word> <dictionary_word>alors</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>donnerai</dictionary_word> <dictionary_word>aux</dictionary_word> <dictionary_word>peuples</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>lèvres</dictionary_word> <dictionary_word>pures</dictionary_word>, <dictionary_word>afin</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>ils</dictionary_word> <dictionary_word>invoquent</dictionary_word> <dictionary_word>tous</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>nom</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>et</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>servent</dictionary_word> d’<dictionary_word>un</dictionary_word> <dictionary_word>commun</dictionary_word> <dictionary_word>accord</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 3:10",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "10",
+            "text": "<dictionary_word>D</dictionary_word>’<dictionary_word>au</dictionary_word> <dictionary_word>delà</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>fleuves</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>Ethiopie</dictionary_word>, <dictionary_word>mes</dictionary_word> <dictionary_word>adorateurs</dictionary_word>, <dictionary_word>mes</dictionary_word> <dictionary_word>dispersés</dictionary_word>, <dictionary_word>apporteront</dictionary_word> <dictionary_word>mon</dictionary_word> <dictionary_word>offrande</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 3:11",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "11",
+            "text": "<dictionary_word>En</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>jour-là</dictionary_word>, <dictionary_word>tu</dictionary_word> n’<dictionary_word>auras</dictionary_word> <dictionary_word>plus</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>rougir</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>toutes</dictionary_word> <dictionary_word>tes</dictionary_word> <dictionary_word>actions</dictionary_word> <dictionary_word>par</dictionary_word> <dictionary_word>lesquelles</dictionary_word> <dictionary_word>tu</dictionary_word> <dictionary_word>as</dictionary_word> <dictionary_word>péché</dictionary_word> <dictionary_word>contre</dictionary_word> <dictionary_word>moi</dictionary_word> ; <dictionary_word>car</dictionary_word> <dictionary_word>alors</dictionary_word> j’<dictionary_word>ôterai</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>milieu</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>toi</dictionary_word> <dictionary_word>ceux</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>réjouissaient</dictionary_word> <dictionary_word>avec</dictionary_word> <dictionary_word>arrogance</dictionary_word> ; <dictionary_word>et</dictionary_word> <dictionary_word>tu</dictionary_word> <dictionary_word>ne</dictionary_word> t’<dictionary_word>enorgueilliras</dictionary_word> <dictionary_word>plus</dictionary_word> désormais, <dictionary_word>sur</dictionary_word> <dictionary_word>ma</dictionary_word> <dictionary_word>montagne</dictionary_word> <dictionary_word>sainte</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 3:12",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "12",
+            "text": "<dictionary_word>je</dictionary_word> <dictionary_word>laisserai</dictionary_word> <dictionary_word>au</dictionary_word> <dictionary_word>milieu</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>toi</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>peuple</dictionary_word> <dictionary_word>humble</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>petit</dictionary_word>, <dictionary_word>qui</dictionary_word> <dictionary_word>se</dictionary_word> confiera <dictionary_word>au</dictionary_word> <dictionary_word>nom</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 3:13",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "13",
+            "text": "<dictionary_word>Le</dictionary_word> <dictionary_word>reste</dictionary_word> <dictionary_word>d</dictionary_word>’<dictionary_word>Israël</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>commettra</dictionary_word> <dictionary_word>pas</dictionary_word> l’<dictionary_word>iniquité</dictionary_word>, <dictionary_word>il</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>dira</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>mensonge</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>trouvera</dictionary_word> <dictionary_word>plus</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>bouche</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>langue</dictionary_word> <dictionary_word>trompeuse</dictionary_word>. <dictionary_word>Car</dictionary_word> <dictionary_word>ils</dictionary_word> <dictionary_word>paîtront</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>reposeront</dictionary_word>, <dictionary_word>sans</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>personne</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>trouble</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 3:14",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "14",
+            "text": "<dictionary_word>Pousse</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>cris</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>joie</dictionary_word>, <dictionary_word>fille</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Sion</dictionary_word> ! <dictionary_word>Pousse</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>cris</dictionary_word> d’<dictionary_word>allégresse</dictionary_word>, <dictionary_word>Israël</dictionary_word> ! Réjouis-toi <dictionary_word>et</dictionary_word> <dictionary_word>triomphe</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>tout</dictionary_word> <dictionary_word>ton</dictionary_word> <dictionary_word>cœur</dictionary_word>, <dictionary_word>fille</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Jérusalem</dictionary_word> !",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 3:15",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "15",
+            "text": "<name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>a</dictionary_word> <dictionary_word>retiré</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>jugements</dictionary_word> <dictionary_word>portés</dictionary_word> <dictionary_word>contre</dictionary_word> <dictionary_word>toi</dictionary_word>, <dictionary_word>il</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>détourné</dictionary_word> <dictionary_word>ton</dictionary_word> <dictionary_word>ennemi</dictionary_word>. <dictionary_word>Le</dictionary_word> <dictionary_word>roi</dictionary_word> d’<dictionary_word>Israël</dictionary_word>, <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>est</dictionary_word> <dictionary_word>au</dictionary_word> <dictionary_word>milieu</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>toi</dictionary_word> ; <dictionary_word>tu</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>verras</dictionary_word> <dictionary_word>plus</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>malheur</dictionary_word> !",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 3:16",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "16",
+            "text": "<dictionary_word>En</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>jour-là</dictionary_word>, <dictionary_word>on</dictionary_word> <dictionary_word>dira</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>Jérusalem</dictionary_word> : <dictionary_word>Ne</dictionary_word> <dictionary_word>crains</dictionary_word> <dictionary_word>point</dictionary_word>, <dictionary_word>Sion</dictionary_word>, <dictionary_word>que</dictionary_word> <dictionary_word>tes</dictionary_word> <dictionary_word>mains</dictionary_word> <dictionary_word>ne</dictionary_word> s’affaissent <dictionary_word>point</dictionary_word> !",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 3:17",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "17",
+            "text": "<name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>ton</dictionary_word> <dictionary_word>Dieu</dictionary_word>, <dictionary_word>est</dictionary_word> <dictionary_word>au</dictionary_word> <dictionary_word>milieu</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>toi</dictionary_word>, <dictionary_word>un</dictionary_word> <dictionary_word>vaillant</dictionary_word> <dictionary_word>sauveur</dictionary_word> ! <dictionary_word>Il</dictionary_word> <dictionary_word>fera</dictionary_word> <dictionary_word>éclater</dictionary_word> <dictionary_word>sa</dictionary_word> <dictionary_word>joie</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>cause</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>toi</dictionary_word> ; <dictionary_word>il</dictionary_word> <dictionary_word>se</dictionary_word> taira <dictionary_word>dans</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>amour</dictionary_word> ; <dictionary_word>il</dictionary_word> tressaillera <dictionary_word>à</dictionary_word> <dictionary_word>cause</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>toi</dictionary_word> <dictionary_word>avec</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>cris</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>joie</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 3:18",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "18",
+            "text": "<dictionary_word>Je</dictionary_word> <dictionary_word>rassemblerai</dictionary_word> <dictionary_word>ceux</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>tristesse</dictionary_word>, <dictionary_word>privés</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>fêtes</dictionary_word> <dictionary_word>solennelles</dictionary_word> ; <dictionary_word>car</dictionary_word> <dictionary_word>ils</dictionary_word> <dictionary_word>étaient</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>tiens</dictionary_word>, l’<dictionary_word>opprobre</dictionary_word> <dictionary_word>pèse</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>eux</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 3:19",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "19",
+            "text": "<dictionary_word>Voici</dictionary_word> <dictionary_word>que</dictionary_word> j’<dictionary_word>en</dictionary_word> finirai, <dictionary_word>en</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>temps-là</dictionary_word>, <dictionary_word>avec</dictionary_word> <dictionary_word>tous</dictionary_word> <dictionary_word>tes</dictionary_word> <dictionary_word>oppresseurs</dictionary_word> ; <dictionary_word>je</dictionary_word> <dictionary_word>sauverai</dictionary_word> <dictionary_word>celle</dictionary_word> <dictionary_word>qui</dictionary_word> boite, <dictionary_word>et</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>recueillerai</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>rejetée</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>ferai</dictionary_word> <dictionary_word>glorieux</dictionary_word> <dictionary_word>et</dictionary_word> renommés <dictionary_word>dans</dictionary_word> <dictionary_word>tous</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>pays</dictionary_word> <dictionary_word>où</dictionary_word> <dictionary_word>ils</dictionary_word> <dictionary_word>ont</dictionary_word> <dictionary_word>été</dictionary_word> honnis.",
+            "position": "left"
+        },
+        {
+            "global_locator": "ZEP 3:20",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "20",
+            "text": "<dictionary_word>En</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>temps-là</dictionary_word>, <dictionary_word>je</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>ramènerai</dictionary_word> ; <dictionary_word>et</dictionary_word>, <dictionary_word>au</dictionary_word> <dictionary_word>temps</dictionary_word> <dictionary_word>où</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>rassemblerai</dictionary_word>, <dictionary_word>je</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>ferai</dictionary_word> renommés <dictionary_word>et</dictionary_word> <dictionary_word>glorieux</dictionary_word>, <dictionary_word>chez</dictionary_word> <dictionary_word>tous</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>peuples</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>terre</dictionary_word>, <dictionary_word>quand</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>ferai</dictionary_word> <dictionary_word>cesser</dictionary_word> <dictionary_word>votre</dictionary_word> <dictionary_word>captivité</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>vos</dictionary_word> <dictionary_word>yeux</dictionary_word>, <dictionary_word>dit</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>.",
+            "position": "left"
+        }
+    ],
+    "titles": [],
+    "footnotes": [],
+    "cross_references": [],
+    "tables": []
+}

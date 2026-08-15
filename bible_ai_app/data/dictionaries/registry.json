@@ -1,0 +1,38 @@
+[
+  {
+    "id": "strong",
+    "name": "Lexique Hébreu & Grec Strong",
+    "type": "strong",
+    "enabled": true,
+    "priority": 1,
+    "count": 14024,
+    "file": "data/strong_lexicon.json"
+  },
+  {
+    "id": "calmet",
+    "name": "Dictionnaire Historique et Critique Dom Calmet (1728)",
+    "type": "custom",
+    "enabled": true,
+    "priority": 2,
+    "count": 5369,
+    "file": "data/calmet_dict.json"
+  },
+  {
+    "id": "bailly",
+    "name": "Dictionnaire Grec-Français Anatole Bailly (1901)",
+    "type": "greek",
+    "enabled": true,
+    "priority": 3,
+    "count": 14642,
+    "file": "data/bailly_lexicon.json"
+  },
+  {
+    "id": "theologie_systematiq",
+    "name": "Théologie Systématique (MacArthur)",
+    "type": "custom",
+    "enabled": true,
+    "priority": 4,
+    "count": 280,
+    "file": "dictionaries\\theologie_systematiq.json"
+  }
+]

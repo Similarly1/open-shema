@@ -1,0 +1,1126 @@
+{
+  "id": 60,
+  "code": "1PE",
+  "name": "1 Pierre",
+  "version": "JXLFR",
+  "version_fullname": "Nouveau Testament juxtalinéaire en français 2026 (Xenizo)",
+  "total_chapters": 5,
+  "chapters": {
+    "1": {
+      "13": {
+        "grec": "διὸ ἀναζωσάμενοι τὰς ὀσφύας τῆς διανοίας ὑμῶν νήφοντες ἐλπίσατε τελείως ἐπὶ τὴν χάριν φερομένην ὑμῖν ἐν ἀποκαλύψει Ἰησοῦ Χριστοῦ ὡς τέκνα ὑπακοῆς",
+        "francais": "C’est pourquoi vous étant ceints les reins de-l’ intelligence de-vous, étant sobres, espérez complètement sur la grâce étant-portée à-vous dans la révélation de-Jésus Christ. Comme des-enfants d’obéissance,",
+        "alignements": [
+          {
+            "grec": "διὸ",
+            "francais": "C’est pourquoi"
+          },
+          {
+            "grec": "ἀναζωσάμενοι",
+            "francais": "vous étant ceints"
+          },
+          {
+            "grec": "τὰς ὀσφύας τῆς διανοίας ὑμῶν",
+            "francais": "les reins de-l’ intelligence de-vous,"
+          },
+          {
+            "grec": "νήφοντες",
+            "francais": "étant sobres,"
+          },
+          {
+            "grec": "ἐλπίσατε",
+            "francais": "espérez"
+          },
+          {
+            "grec": "τελείως",
+            "francais": "complètement"
+          },
+          {
+            "grec": "ἐπὶ τὴν χάριν",
+            "francais": "sur la grâce"
+          },
+          {
+            "grec": "φερομένην ὑμῖν",
+            "francais": "étant-portée à-vous"
+          },
+          {
+            "grec": "ἐν ἀποκαλύψει Ἰησοῦ Χριστοῦ",
+            "francais": "dans la révélation de-Jésus Christ."
+          },
+          {
+            "grec": "ὡς τέκνα ὑπακοῆς",
+            "francais": "Comme des-enfants d’obéissance,"
+          }
+        ]
+      },
+      "22": {
+        "grec": "ἡγνικότες τὰς ψυχὰς ὑμῶν ἐν τῇ ὑπακοῇ τῆς ἀληθείας εἰς φιλαδελφίαν ἀνυπόκριτον ἐκ καρδίας καθαρᾶς ἀγαπήσατε ἀλλήλους ἐκτενῶς",
+        "francais": "Ayant purifié les âmes de-vous dans l’ obéissance de-la vérité en-vue-d’ un-amour-fraternel sans-hypocrisie d’ un-cœur pur, aimez-vous les-uns-les-autres avec ardeur.",
+        "alignements": [
+          {
+            "grec": "ἡγνικότες",
+            "francais": "Ayant purifié"
+          },
+          {
+            "grec": "τὰς ψυχὰς ὑμῶν",
+            "francais": "les âmes de-vous"
+          },
+          {
+            "grec": "ἐν τῇ ὑπακοῇ τῆς ἀληθείας",
+            "francais": "dans l’ obéissance de-la vérité"
+          },
+          {
+            "grec": "εἰς φιλαδελφίαν ἀνυπόκριτον",
+            "francais": "en-vue-d’ un-amour-fraternel sans-hypocrisie"
+          },
+          {
+            "grec": "ἐκ καρδίας καθαρᾶς",
+            "francais": "d’ un-cœur pur,"
+          },
+          {
+            "grec": "ἀγαπήσατε ἀλλήλους",
+            "francais": "aimez-vous les-uns-les-autres"
+          },
+          {
+            "grec": "ἐκτενῶς",
+            "francais": "avec ardeur."
+          }
+        ]
+      },
+      "23": {
+        "grec": "ἀναγεγεννημένοι οὐκ ἐκ σπορᾶς φθαρτῆς ἀλλὰ ἀφθάρτου διὰ λόγου ζῶντος καὶ μένοντος Θεοῦ διότι",
+        "francais": "Ayant été régénérés, non d’ une-semence corruptible, mais incorruptible, à-travers la parole vivante et demeurante de Dieu. C’est pourquoi,",
+        "alignements": [
+          {
+            "grec": "ἀναγεγεννημένοι",
+            "francais": "Ayant été régénérés,"
+          },
+          {
+            "grec": "οὐκ ἐκ σπορᾶς φθαρτῆς",
+            "francais": "non d’ une-semence corruptible,"
+          },
+          {
+            "grec": "ἀλλὰ ἀφθάρτου",
+            "francais": "mais incorruptible,"
+          },
+          {
+            "grec": "διὰ λόγου ζῶντος",
+            "francais": "à-travers la parole vivante"
+          },
+          {
+            "grec": "καὶ μένοντος",
+            "francais": "et demeurante"
+          },
+          {
+            "grec": "Θεοῦ",
+            "francais": "de Dieu."
+          },
+          {
+            "grec": "διότι",
+            "francais": "C’est pourquoi,"
+          }
+        ]
+      }
+    },
+    "2": {
+      "6": {
+        "grec": "διότι περιέχει ἐν Γραφῇ ἰδοὺ τίθημι ἐν Σιὼν λίθον ἀκρογωνιαῖον ἐκλεκτὸν ἔντιμον καὶ ὁ πιστεύων ἐπ’ αὐτῷ οὐ μὴ καταισχυνθῇ ἡ τιμὴ",
+        "francais": "C’est pourquoi il-est-contenu dans l’ Écriture: «Voici, je-place dans Sion, une-pierre angulaire élue, précieuse, et celui croyant sur elle ne sera pas déshonoré.» L’ honneur",
+        "alignements": [
+          {
+            "grec": "διότι",
+            "francais": "C’est pourquoi"
+          },
+          {
+            "grec": "περιέχει ἐν Γραφῇ",
+            "francais": "il-est-contenu dans l’ Écriture :"
+          },
+          {
+            "grec": "ἰδοὺ",
+            "francais": "« Voici,"
+          },
+          {
+            "grec": "τίθημι ἐν Σιὼν",
+            "francais": "je-place dans Sion,"
+          },
+          {
+            "grec": "λίθον ἀκρογωνιαῖον",
+            "francais": "une-pierre angulaire"
+          },
+          {
+            "grec": "ἐκλεκτὸν",
+            "francais": "élue,"
+          },
+          {
+            "grec": "ἔντιμον",
+            "francais": "précieuse,"
+          },
+          {
+            "grec": "καὶ ὁ πιστεύων",
+            "francais": "et celui croyant"
+          },
+          {
+            "grec": "ἐπ’ αὐτῷ",
+            "francais": "sur elle"
+          },
+          {
+            "grec": "οὐ μὴ καταισχυνθῇ",
+            "francais": "ne sera pas déshonoré. »"
+          },
+          {
+            "grec": "ἡ τιμὴ",
+            "francais": "L’ honneur"
+          }
+        ]
+      },
+      "17": {
+        "grec": "τιμήσατε πάντας ἀγαπᾶτε τὴν ἀδελφότητα φοβεῖσθε τὸν Θεὸν τιμᾶτε τὸν βασιλέα",
+        "francais": "Honorez tous: aimez la réunion-de-frères, craignez Dieu, honorez le roi.",
+        "alignements": [
+          {
+            "grec": "τιμήσατε πάντας",
+            "francais": "Honorez tous :"
+          },
+          {
+            "grec": "ἀγαπᾶτε τὴν ἀδελφότητα",
+            "francais": "aimez la réunion-de-frères,"
+          },
+          {
+            "grec": "φοβεῖσθε τὸν Θεὸν",
+            "francais": "craignez Dieu,"
+          },
+          {
+            "grec": "τιμᾶτε τὸν βασιλέα",
+            "francais": "honorez le roi."
+          }
+        ]
+      },
+      "18": {
+        "grec": "οἱ οἰκέται ὑποτασσόμενοι ἐν παντὶ φόβῳ τοῖς δεσπόταις οὐ μόνον τοῖς ἀγαθοῖς καὶ ἐπιεικέσιν ἀλλὰ καὶ τοῖς σκολιοῖς",
+        "francais": "Les domestiques, étant soumis en toute crainte aux maîtres-de-maison, non seulement aux bons et doux, mais aussi aux tortueux.",
+        "alignements": [
+          {
+            "grec": "οἱ οἰκέται",
+            "francais": "Les domestiques,"
+          },
+          {
+            "grec": "ὑποτασσόμενοι",
+            "francais": "étant soumis"
+          },
+          {
+            "grec": "ἐν παντὶ φόβῳ",
+            "francais": "en toute crainte"
+          },
+          {
+            "grec": "τοῖς δεσπόταις",
+            "francais": "aux maîtres-de-maison,"
+          },
+          {
+            "grec": "οὐ μόνον",
+            "francais": "non seulement"
+          },
+          {
+            "grec": "τοῖς ἀγαθοῖς καὶ ἐπιεικέσιν",
+            "francais": "aux bons et doux,"
+          },
+          {
+            "grec": "ἀλλὰ καὶ",
+            "francais": "mais aussi"
+          },
+          {
+            "grec": "τοῖς σκολιοῖς",
+            "francais": "aux tortueux."
+          }
+        ]
+      },
+      "19": {
+        "grec": "γὰρ τοῦτο χάρις εἰ διὰ συνείδησιν Θεοῦ τις ὑποφέρει λύπας πάσχων ἀδίκως",
+        "francais": "Car ceci est une-grâce, si à-cause-de la conscience de-Dieu, quelqu’un supporte des afflictions souffrant injustement.",
+        "alignements": [
+          {
+            "grec": "γὰρ τοῦτο χάρις",
+            "francais": "Car ceci est une-grâce,"
+          },
+          {
+            "grec": "εἰ διὰ συνείδησιν Θεοῦ",
+            "francais": "si à-cause-de la conscience de-Dieu,"
+          },
+          {
+            "grec": "τις ὑποφέρει",
+            "francais": "quelqu’un supporte"
+          },
+          {
+            "grec": "λύπας",
+            "francais": "des afflictions"
+          },
+          {
+            "grec": "πάσχων ἀδίκως",
+            "francais": "souffrant injustement."
+          }
+        ]
+      },
+      "20": {
+        "grec": "γὰρ ποῖον κλέος εἰ ἁμαρτάνοντες καὶ ὑπομενεῖτε κολαφιζόμενοι ἀλλ’ εἰ ὑπομενεῖτε ἀγαθοποιοῦντες καὶ πάσχοντες τοῦτο χάρις παρὰ Θεῷ γὰρ ἐκλήθητε",
+        "francais": "Car quelle bonne-renommée, si péchant et vous-supportez étant souffletés? Mais si vous-supportez pratiquant le bien et souffrant, ceci est une-grâce de-la-part de-Dieu. Car vous-avez-été-appelés",
+        "alignements": [
+          {
+            "grec": "γὰρ ποῖον κλέος",
+            "francais": "Car quelle bonne-renommée,"
+          },
+          {
+            "grec": "εἰ ἁμαρτάνοντες",
+            "francais": "si péchant"
+          },
+          {
+            "grec": "καὶ ὑπομενεῖτε",
+            "francais": "et vous-supportez"
+          },
+          {
+            "grec": "κολαφιζόμενοι",
+            "francais": "étant souffletés ?"
+          },
+          {
+            "grec": "ἀλλ’ εἰ ὑπομενεῖτε",
+            "francais": "Mais si vous-supportez"
+          },
+          {
+            "grec": "ἀγαθοποιοῦντες",
+            "francais": "pratiquant le bien"
+          },
+          {
+            "grec": "καὶ πάσχοντες",
+            "francais": "et souffrant,"
+          },
+          {
+            "grec": "τοῦτο χάρις",
+            "francais": "ceci est une-grâce"
+          },
+          {
+            "grec": "παρὰ Θεῷ",
+            "francais": "de-la-part de-Dieu."
+          },
+          {
+            "grec": "γὰρ ἐκλήθητε",
+            "francais": "Car vous-avez-été-appelés"
+          }
+        ]
+      },
+      "25": {
+        "grec": "γὰρ ἦτε ὡς πρόβατα πλανώμενοι ἀλλ’ νῦν ἐπεστράφητε ἐπὶ τὸν ποιμένα καὶ ἐπίσκοπον τῶν ψυχῶν ὑμῶν",
+        "francais": "Car vous-étiez comme des-brebis étant-égarées, mais maintenant vous êtes revenus auprès du berger et surveillant des âmes de-vous.",
+        "alignements": [
+          {
+            "grec": "γὰρ ἦτε",
+            "francais": "Car vous-étiez"
+          },
+          {
+            "grec": "ὡς πρόβατα πλανώμενοι",
+            "francais": "comme des-brebis étant-égarées,"
+          },
+          {
+            "grec": "ἀλλ’ νῦν",
+            "francais": "mais maintenant"
+          },
+          {
+            "grec": "ἐπεστράφητε",
+            "francais": "vous êtes revenus"
+          },
+          {
+            "grec": "ἐπὶ τὸν ποιμένα",
+            "francais": "auprès du berger"
+          },
+          {
+            "grec": "καὶ ἐπίσκοπον τῶν ψυχῶν ὑμῶν",
+            "francais": "et surveillant des âmes de-vous."
+          }
+        ]
+      }
+    },
+    "3": {
+      "7": {
+        "grec": "οἱ ἄνδρες ὁμοίως συνοικοῦντες κατὰ γνῶσιν ὡς σκεύει ἀσθενεστέρῳ τῷ γυναικείῳ ἀπονέμοντες τιμήν ὡς καὶ συνκληρονόμοις χάριτος ζωῆς εἰς τὸ τὰς προσευχὰς ὑμῶν μὴ ἐνκόπτεσθαι δὲ τὸ τέλος",
+        "francais": "Les hommes, pareillement, cohabitant selon la connaissance comme par-un-vase plus-faible pour-le féminin, partageant un-honneur, comme aussi à-des cohéritiers de-la-grâce de-la-vie, en-vue-de cela, les prières de-vous ne-pas être-barrées. Enfin,",
+        "alignements": [
+          {
+            "grec": "οἱ ἄνδρες",
+            "francais": "Les hommes,"
+          },
+          {
+            "grec": "ὁμοίως",
+            "francais": "pareillement,"
+          },
+          {
+            "grec": "συνοικοῦντες",
+            "francais": "cohabitant"
+          },
+          {
+            "grec": "κατὰ γνῶσιν",
+            "francais": "selon la connaissance"
+          },
+          {
+            "grec": "ὡς",
+            "francais": "comme"
+          },
+          {
+            "grec": "σκεύει ἀσθενεστέρῳ",
+            "francais": "par-un-vase plus-faible"
+          },
+          {
+            "grec": "τῷ γυναικείῳ",
+            "francais": "pour-le féminin,"
+          },
+          {
+            "grec": "ἀπονέμοντες τιμήν",
+            "francais": "partageant un-honneur,"
+          },
+          {
+            "grec": "ὡς καὶ συνκληρονόμοις χάριτος ζωῆς",
+            "francais": "comme aussi à-des cohéritiers de-la-grâce de-la-vie,"
+          },
+          {
+            "grec": "εἰς τὸ",
+            "francais": "en-vue-de cela,"
+          },
+          {
+            "grec": "τὰς προσευχὰς ὑμῶν",
+            "francais": "les prières de-vous"
+          },
+          {
+            "grec": "μὴ ἐνκόπτεσθαι",
+            "francais": "ne-pas être-barrées."
+          },
+          {
+            "grec": "δὲ τὸ τέλος",
+            "francais": "Enfin,"
+          }
+        ]
+      },
+      "10": {
+        "grec": "γὰρ ὁ θέλων ἀγαπᾶν ζωὴν καὶ ἰδεῖν ἀγαθὰς ἡμέρας παυσάτω τὴν γλῶσσαν ἀπὸ κακοῦ καὶ χείλη μὴ λαλῆσαι τοῦ δόλον",
+        "francais": "Car celui voulant aimer la vie et voir de-bons jours, qu’ il détourne la langue du mauvais, et les lèvres ne-pas dire de piège.",
+        "alignements": [
+          {
+            "grec": "γὰρ ὁ θέλων",
+            "francais": "Car celui voulant"
+          },
+          {
+            "grec": "ἀγαπᾶν ζωὴν",
+            "francais": "aimer la vie"
+          },
+          {
+            "grec": "καὶ ἰδεῖν",
+            "francais": "et voir"
+          },
+          {
+            "grec": "ἀγαθὰς ἡμέρας",
+            "francais": "de-bons jours,"
+          },
+          {
+            "grec": "παυσάτω",
+            "francais": "qu’ il détourne"
+          },
+          {
+            "grec": "τὴν γλῶσσαν",
+            "francais": "la langue"
+          },
+          {
+            "grec": "ἀπὸ κακοῦ",
+            "francais": "du mauvais,"
+          },
+          {
+            "grec": "καὶ χείλη",
+            "francais": "et les lèvres"
+          },
+          {
+            "grec": "μὴ λαλῆσαι",
+            "francais": "ne-pas dire"
+          },
+          {
+            "grec": "τοῦ δόλον",
+            "francais": "de piège."
+          }
+        ]
+      },
+      "11": {
+        "grec": "δὲ ἐκκλινάτω ἀπὸ κακοῦ καὶ ποιησάτω ἀγαθόν ζητησάτω εἰρήνην καὶ διωξάτω αὐτήν",
+        "francais": "Mais qu’ il-se-détourne du mal, et qu’ il-fasse le bien; qu’ il-cherche la paix et qu’ il-poursuive elle.",
+        "alignements": [
+          {
+            "grec": "δὲ ἐκκλινάτω",
+            "francais": "Mais qu’ il-se-détourne"
+          },
+          {
+            "grec": "ἀπὸ κακοῦ",
+            "francais": "du mal,"
+          },
+          {
+            "grec": "καὶ ποιησάτω",
+            "francais": "et qu’ il-fasse"
+          },
+          {
+            "grec": "ἀγαθόν",
+            "francais": "le bien ;"
+          },
+          {
+            "grec": "ζητησάτω εἰρήνην",
+            "francais": "qu’ il-cherche la paix"
+          },
+          {
+            "grec": "καὶ διωξάτω αὐτήν",
+            "francais": "et qu’ il-poursuive elle."
+          }
+        ]
+      },
+      "12": {
+        "grec": "ὅτι ὀφθαλμοὶ Κυρίου ἐπὶ δικαίους καὶ ὦτα αὐτοῦ εἰς δέησιν αὐτῶν δὲ πρόσωπον Κυρίου ἐπὶ ποιοῦντας κακά",
+        "francais": "Parce que les yeux du-Seigneur sont sur les justes, et les oreilles de-lui vers la demande d’eux; mais le visage du-Seigneur est sur ceux pratiquant de-mauvaises choses.",
+        "alignements": [
+          {
+            "grec": "ὅτι",
+            "francais": "Parce que"
+          },
+          {
+            "grec": "ὀφθαλμοὶ Κυρίου",
+            "francais": "les yeux du-Seigneur"
+          },
+          {
+            "grec": "ἐπὶ δικαίους",
+            "francais": "sont sur les justes,"
+          },
+          {
+            "grec": "καὶ ὦτα αὐτοῦ",
+            "francais": "et les oreilles de-lui"
+          },
+          {
+            "grec": "εἰς δέησιν αὐτῶν",
+            "francais": "vers la demande d’eux ;"
+          },
+          {
+            "grec": "δὲ πρόσωπον Κυρίου",
+            "francais": "mais le visage du-Seigneur"
+          },
+          {
+            "grec": "ἐπὶ ποιοῦντας κακά",
+            "francais": "est sur ceux pratiquant de-mauvaises choses."
+          }
+        ]
+      },
+      "13": {
+        "grec": "καὶ τίς ὁ κακώσων ὑμᾶς ἐὰν γένησθε ζηλωταὶ τοῦ ἀγαθοῦ ἀλλ’ καὶ εἰ",
+        "francais": "Et qui est celui maltraitant vous, si vous-devenez zélés du bien? Mais même si",
+        "alignements": [
+          {
+            "grec": "καὶ τίς",
+            "francais": "Et qui est"
+          },
+          {
+            "grec": "ὁ κακώσων ὑμᾶς",
+            "francais": "celui maltraitant vous,"
+          },
+          {
+            "grec": "ἐὰν γένησθε",
+            "francais": "si vous-devenez"
+          },
+          {
+            "grec": "ζηλωταὶ τοῦ ἀγαθοῦ",
+            "francais": "zélés du bien ?"
+          },
+          {
+            "grec": "ἀλλ’ καὶ εἰ",
+            "francais": "Mais même si"
+          }
+        ]
+      },
+      "17": {
+        "grec": "γὰρ κρεῖττον πάσχειν ἀγαθοποιοῦντας εἰ τὸ θέλημα τοῦ Θεοῦ θέλοι ἢ κακοποιοῦντας ὅτι",
+        "francais": "Car il est meilleur de souffrir pratiquant le bien si la volonté de Dieu le voudrait, que pratiquant-le-mal. Parce que",
+        "alignements": [
+          {
+            "grec": "γὰρ κρεῖττον πάσχειν",
+            "francais": "Car il est meilleur de souffrir"
+          },
+          {
+            "grec": "ἀγαθοποιοῦντας",
+            "francais": "pratiquant le bien"
+          },
+          {
+            "grec": "εἰ τὸ θέλημα τοῦ Θεοῦ",
+            "francais": "si la volonté de Dieu"
+          },
+          {
+            "grec": "θέλοι",
+            "francais": "le voudrait,"
+          },
+          {
+            "grec": "ἢ κακοποιοῦντας",
+            "francais": "que pratiquant-le-mal."
+          },
+          {
+            "grec": "ὅτι",
+            "francais": "Parce que"
+          }
+        ]
+      }
+    },
+    "4": {
+      "3": {
+        "grec": "γὰρ ἀρκετὸς ὁ χρόνος παρεληλυθὼς τὸ κατειργάσθαι βούλημα τῶν ἐθνῶν πεπορευμένους ἐν ἀσελγείαις ἐπιθυμίαις οἰνοφλυγίαις κώμοις πότοις καὶ εἰδωλολατρίαις ἀθεμίτοις ἐν ᾧ",
+        "francais": "Car il est suffisant le temps étant-passé, le fait d’ accomplir l’ intention des nations, étant allé dans des-impudences, des convoitises, des ivrogneries, des excès, des beuveries, et des-idolâtries illicites. Dans lesquels",
+        "alignements": [
+          {
+            "grec": "γὰρ ἀρκετὸς",
+            "francais": "Car il est suffisant"
+          },
+          {
+            "grec": "ὁ χρόνος παρεληλυθὼς",
+            "francais": "le temps étant-passé,"
+          },
+          {
+            "grec": "τὸ κατειργάσθαι",
+            "francais": "le fait d’ accomplir"
+          },
+          {
+            "grec": "βούλημα τῶν ἐθνῶν",
+            "francais": "l’ intention des nations,"
+          },
+          {
+            "grec": "πεπορευμένους",
+            "francais": "étant allé"
+          },
+          {
+            "grec": "ἐν ἀσελγείαις",
+            "francais": "dans des-impudences,"
+          },
+          {
+            "grec": "ἐπιθυμίαις",
+            "francais": "des convoitises,"
+          },
+          {
+            "grec": "οἰνοφλυγίαις",
+            "francais": "des ivrogneries,"
+          },
+          {
+            "grec": "κώμοις",
+            "francais": "des excès,"
+          },
+          {
+            "grec": "πότοις",
+            "francais": "des beuveries,"
+          },
+          {
+            "grec": "καὶ εἰδωλολατρίαις ἀθεμίτοις",
+            "francais": "et des-idolâtries illicites."
+          },
+          {
+            "grec": "ἐν ᾧ",
+            "francais": "Dans lesquels"
+          }
+        ]
+      },
+      "6": {
+        "grec": "γὰρ εἰς τοῦτο εὐηγγελίσθη νεκροῖς καὶ ἵνα κριθῶσι μὲν σαρκὶ κατὰ ἀνθρώπους δὲ ζῶσι κατὰ Θεὸν πνεύματι δὲ τὸ τέλος πάντων",
+        "francais": "Car en-vue-de cela, il fut évangélisé aux-morts aussi, afin-qu’ ils-soient-jugés dans la chair selon des-hommes, et qu’ ils-vivent selon Dieu par l’ esprit. Et la fin de-toutes choses",
+        "alignements": [
+          {
+            "grec": "γὰρ εἰς τοῦτο",
+            "francais": "Car en-vue-de cela,"
+          },
+          {
+            "grec": "εὐηγγελίσθη",
+            "francais": "il fut évangélisé"
+          },
+          {
+            "grec": "νεκροῖς καὶ",
+            "francais": "aux-morts aussi,"
+          },
+          {
+            "grec": "ἵνα κριθῶσι μὲν",
+            "francais": "afin-qu’ ils-soient-jugés"
+          },
+          {
+            "grec": "σαρκὶ",
+            "francais": "dans la chair"
+          },
+          {
+            "grec": "κατὰ ἀνθρώπους",
+            "francais": "selon des-hommes,"
+          },
+          {
+            "grec": "δὲ ζῶσι",
+            "francais": "et qu’ ils-vivent"
+          },
+          {
+            "grec": "κατὰ Θεὸν",
+            "francais": "selon Dieu"
+          },
+          {
+            "grec": "πνεύματι",
+            "francais": "par l’ esprit."
+          },
+          {
+            "grec": "δὲ τὸ τέλος πάντων",
+            "francais": "Et la fin de-toutes choses"
+          }
+        ]
+      },
+      "11": {
+        "grec": "εἴ τις λαλεῖ ὡς λόγια Θεοῦ εἴ τις διακονεῖ ὡς ἐξ ἰσχύος ἧς ὁ Θεός χορηγεῖ ἵνα ὁ Θεὸς δοξάζηται ἐν πᾶσιν διὰ Ἰησοῦ Χριστοῦ ᾧ ἐστιν ἡ δόξα καὶ τὸ κράτος εἰς τοὺς αἰῶνας τῶν αἰώνων ἀμήν ἀγαπητοί",
+        "francais": "Si quelqu’un parle, comme des-oracles de-Dieu; si quelqu’un sert, comme d’ une-force que Dieu équipe, afin-que Dieu soit-glorifié en toutes choses à-travers Jésus-Christ, à-qui est la gloire et la domination pour les siècles des siècles. Amen! Bien-aimés,",
+        "alignements": [
+          {
+            "grec": "εἴ τις λαλεῖ",
+            "francais": "Si quelqu’un parle,"
+          },
+          {
+            "grec": "ὡς λόγια Θεοῦ",
+            "francais": "comme des-oracles de-Dieu ;"
+          },
+          {
+            "grec": "εἴ τις διακονεῖ",
+            "francais": "si quelqu’un sert,"
+          },
+          {
+            "grec": "ὡς ἐξ ἰσχύος ἧς",
+            "francais": "comme d’ une-force que"
+          },
+          {
+            "grec": "ὁ Θεός χορηγεῖ",
+            "francais": "Dieu équipe,"
+          },
+          {
+            "grec": "ἵνα ὁ Θεὸς δοξάζηται",
+            "francais": "afin-que Dieu soit-glorifié"
+          },
+          {
+            "grec": "ἐν πᾶσιν",
+            "francais": "en toutes choses"
+          },
+          {
+            "grec": "διὰ Ἰησοῦ Χριστοῦ",
+            "francais": "à-travers Jésus-Christ,"
+          },
+          {
+            "grec": "ᾧ ἐστιν",
+            "francais": "à-qui est"
+          },
+          {
+            "grec": "ἡ δόξα",
+            "francais": "la gloire"
+          },
+          {
+            "grec": "καὶ τὸ κράτος",
+            "francais": "et la domination"
+          },
+          {
+            "grec": "εἰς τοὺς αἰῶνας τῶν αἰώνων",
+            "francais": "pour les siècles des siècles."
+          },
+          {
+            "grec": "ἀμήν",
+            "francais": "Amen !"
+          },
+          {
+            "grec": "ἀγαπητοί",
+            "francais": "Bien-aimés,"
+          }
+        ]
+      },
+      "14": {
+        "grec": "εἰ ὀνειδίζεσθε ἐν ὀνόματι Χριστοῦ μακάριοι ὅτι τὸ τῆς δόξης καὶ τὸ Πνεῦμα τοῦ Θεοῦ ἀναπαύεται ἐφ’ ὑμᾶς γάρ τις ὑμῶν",
+        "francais": "Si vous-êtes-injuriés au nom de-Christ, vous êtes bienheureux, parce que l’ Esprit de gloire et l’ Esprit de Dieu repose sur vous. Car quelqu’un de-vous,",
+        "alignements": [
+          {
+            "grec": "εἰ ὀνειδίζεσθε",
+            "francais": "Si vous-êtes-injuriés"
+          },
+          {
+            "grec": "ἐν ὀνόματι Χριστοῦ",
+            "francais": "au nom de-Christ,"
+          },
+          {
+            "grec": "μακάριοι",
+            "francais": "vous êtes bienheureux,"
+          },
+          {
+            "grec": "ὅτι",
+            "francais": "parce que"
+          },
+          {
+            "grec": "τὸ τῆς δόξης",
+            "francais": "l’ Esprit de gloire"
+          },
+          {
+            "grec": "καὶ τὸ Πνεῦμα τοῦ Θεοῦ",
+            "francais": "et l’ Esprit de Dieu"
+          },
+          {
+            "grec": "ἀναπαύεται",
+            "francais": "repose"
+          },
+          {
+            "grec": "ἐφ’ ὑμᾶς",
+            "francais": "sur vous."
+          },
+          {
+            "grec": "γάρ τις ὑμῶν",
+            "francais": "Car quelqu’un de-vous,"
+          }
+        ]
+      },
+      "17": {
+        "grec": "ὅτι ὁ καιρὸς τοῦ ἄρξασθαι τὸ κρίμα ἀπὸ τοῦ οἴκου τοῦ Θεοῦ δὲ εἰ πρῶτον ἀφ’ ἡμῶν τί τὸ τέλος τῶν ἀπειθούντων τῷ εὐαγγελίῳ τοῦ Θεοῦ",
+        "francais": "Parce que c’est le moment de commencer le jugement depuis la maison de Dieu; mais si premièrement depuis nous, quelle est la fin de-ceux ne-se-laissant-persuader par-l’ évangile de Dieu?",
+        "alignements": [
+          {
+            "grec": "ὅτι",
+            "francais": "Parce que c’est"
+          },
+          {
+            "grec": "ὁ καιρὸς τοῦ ἄρξασθαι",
+            "francais": "le moment de commencer"
+          },
+          {
+            "grec": "τὸ κρίμα",
+            "francais": "le jugement"
+          },
+          {
+            "grec": "ἀπὸ τοῦ οἴκου τοῦ Θεοῦ",
+            "francais": "depuis la maison de Dieu ;"
+          },
+          {
+            "grec": "δὲ εἰ πρῶτον",
+            "francais": "mais si premièrement"
+          },
+          {
+            "grec": "ἀφ’ ἡμῶν",
+            "francais": "depuis nous,"
+          },
+          {
+            "grec": "τί",
+            "francais": "quelle est"
+          },
+          {
+            "grec": "τὸ τέλος τῶν ἀπειθούντων",
+            "francais": "la fin de-ceux ne-se-laissant-persuader"
+          },
+          {
+            "grec": "τῷ εὐαγγελίῳ τοῦ Θεοῦ",
+            "francais": "par-l’ évangile de Dieu ?"
+          }
+        ]
+      },
+      "18": {
+        "grec": "καὶ εἰ ὁ δίκαιος σῴζεται μόλις ποῦ φανεῖται ὁ ἀσεβὴς καὶ ἁμαρτωλὸς",
+        "francais": "Et si le juste est sauvé avec peine, comment se-montrera l’ impie et pécheur?",
+        "alignements": [
+          {
+            "grec": "καὶ εἰ",
+            "francais": "Et si"
+          },
+          {
+            "grec": "ὁ δίκαιος",
+            "francais": "le juste"
+          },
+          {
+            "grec": "σῴζεται",
+            "francais": "est sauvé"
+          },
+          {
+            "grec": "μόλις",
+            "francais": "avec peine,"
+          },
+          {
+            "grec": "ποῦ φανεῖται",
+            "francais": "comment se-montrera"
+          },
+          {
+            "grec": "ὁ ἀσεβὴς καὶ ἁμαρτωλὸς",
+            "francais": "l’ impie et pécheur ?"
+          }
+        ]
+      },
+      "19": {
+        "grec": "ὥστε οἱ πάσχοντες καὶ κατὰ τὸ θέλημα τοῦ Θεοῦ παρατιθέσθωσαν τὰς ψυχὰς αὐτῶν Κτίστῃ πιστῷ ἐν ἀγαθοποιΐᾳ",
+        "francais": "De sorte que ceux souffrant aussi selon la volonté de Dieu, qu’ ils confient les âmes d’eux au-Créateur fidèle par une-bonne-œuvre.",
+        "alignements": [
+          {
+            "grec": "ὥστε",
+            "francais": "De sorte que"
+          },
+          {
+            "grec": "οἱ πάσχοντες καὶ",
+            "francais": "ceux souffrant aussi"
+          },
+          {
+            "grec": "κατὰ τὸ θέλημα τοῦ Θεοῦ",
+            "francais": "selon la volonté de Dieu,"
+          },
+          {
+            "grec": "παρατιθέσθωσαν",
+            "francais": "qu’ ils confient"
+          },
+          {
+            "grec": "τὰς ψυχὰς αὐτῶν",
+            "francais": "les âmes d’eux"
+          },
+          {
+            "grec": "Κτίστῃ πιστῷ",
+            "francais": "au-Créateur fidèle"
+          },
+          {
+            "grec": "ἐν ἀγαθοποιΐᾳ",
+            "francais": "par une-bonne-œuvre."
+          }
+        ]
+      }
+    },
+    "5": {
+      "4": {
+        "grec": "καὶ τοῦ ἀρχιποίμενος φανερωθέντος κομιεῖσθε τὸν στέφανον ἀμαράντινον τῆς δόξης",
+        "francais": "Et le chef-des-bergers étant apparu, vous obtiendrez la couronne immortelle de-la gloire.",
+        "alignements": [
+          {
+            "grec": "καὶ τοῦ ἀρχιποίμενος",
+            "francais": "Et le chef-des-bergers"
+          },
+          {
+            "grec": "φανερωθέντος",
+            "francais": "étant apparu,"
+          },
+          {
+            "grec": "κομιεῖσθε",
+            "francais": "vous obtiendrez"
+          },
+          {
+            "grec": "τὸν στέφανον ἀμαράντινον τῆς δόξης",
+            "francais": "la couronne immortelle de-la gloire."
+          }
+        ]
+      },
+      "5": {
+        "grec": "ὁμοίως νεώτεροι ὑποτάγητε πρεσβυτέροις δὲ πάντες ἐγκομβώσασθε τὴν ταπεινοφροσύνην ἀλλήλοις ὅτι ὁ Θεὸς ἀντιτάσσεται ὑπερηφάνοις δὲ δίδωσιν χάριν ταπεινοῖς ταπεινώθητε οὖν",
+        "francais": "De même, les plus jeunes soumettez-vous aux-anciens. Et tous, soyez enveloppés de l’ humilité les uns envers les autres, parce que Dieu s’oppose aux-orgueilleux, mais il-donne la grâce aux humbles. Soyez donc humiliés",
+        "alignements": [
+          {
+            "grec": "ὁμοίως",
+            "francais": "De même,"
+          },
+          {
+            "grec": "νεώτεροι",
+            "francais": "les plus jeunes"
+          },
+          {
+            "grec": "ὑποτάγητε πρεσβυτέροις",
+            "francais": "soumettez-vous aux-anciens."
+          },
+          {
+            "grec": "δὲ πάντες",
+            "francais": "Et tous,"
+          },
+          {
+            "grec": "ἐγκομβώσασθε",
+            "francais": "soyez enveloppés de"
+          },
+          {
+            "grec": "τὴν ταπεινοφροσύνην",
+            "francais": "l’ humilité"
+          },
+          {
+            "grec": "ἀλλήλοις",
+            "francais": "les uns envers les autres,"
+          },
+          {
+            "grec": "ὅτι",
+            "francais": "parce que"
+          },
+          {
+            "grec": "ὁ Θεὸς",
+            "francais": "Dieu"
+          },
+          {
+            "grec": "ἀντιτάσσεται ὑπερηφάνοις",
+            "francais": "s’oppose aux-orgueilleux,"
+          },
+          {
+            "grec": "δὲ δίδωσιν χάριν",
+            "francais": "mais il-donne la grâce"
+          },
+          {
+            "grec": "ταπεινοῖς",
+            "francais": "aux humbles."
+          },
+          {
+            "grec": "ταπεινώθητε οὖν",
+            "francais": "Soyez donc humiliés"
+          }
+        ]
+      },
+      "10": {
+        "grec": "δὲ ὁ Θεὸς πάσης χάριτος ὁ καλέσας ὑμᾶς εἰς τὴν δόξαν αἰώνιον αὐτοῦ ἐν Χριστῷ παθόντας ὀλίγον αὐτὸς καταρτίσει στηρίξει σθενώσει θεμελιώσει",
+        "francais": "Mais le Dieu de-toute grâce, celui ayant-appelé vous en-vue-de la gloire éternelle de-lui en Christ, ayant-souffert un-peu de temps, lui vous purifiera, affermira, fortifiera, rendra inébranlables.",
+        "alignements": [
+          {
+            "grec": "δὲ ὁ Θεὸς πάσης χάριτος",
+            "francais": "Mais le Dieu de-toute grâce,"
+          },
+          {
+            "grec": "ὁ καλέσας ὑμᾶς",
+            "francais": "celui ayant-appelé vous"
+          },
+          {
+            "grec": "εἰς τὴν δόξαν αἰώνιον αὐτοῦ",
+            "francais": "en-vue-de la gloire éternelle de-lui"
+          },
+          {
+            "grec": "ἐν Χριστῷ",
+            "francais": "en Christ,"
+          },
+          {
+            "grec": "παθόντας ὀλίγον",
+            "francais": "ayant-souffert un-peu de temps,"
+          },
+          {
+            "grec": "αὐτὸς καταρτίσει",
+            "francais": "lui vous purifiera,"
+          },
+          {
+            "grec": "στηρίξει",
+            "francais": "affermira,"
+          },
+          {
+            "grec": "σθενώσει",
+            "francais": "fortifiera,"
+          },
+          {
+            "grec": "θεμελιώσει",
+            "francais": "rendra inébranlables."
+          }
+        ]
+      },
+      "11": {
+        "grec": "αὐτῷ τὸ κράτος εἰς τοὺς αἰῶνας ἀμήν",
+        "francais": "À lui la domination pour les siècles. Amen!",
+        "alignements": [
+          {
+            "grec": "αὐτῷ",
+            "francais": "À lui"
+          },
+          {
+            "grec": "τὸ κράτος",
+            "francais": "la domination"
+          },
+          {
+            "grec": "εἰς τοὺς αἰῶνας",
+            "francais": "pour les siècles."
+          },
+          {
+            "grec": "ἀμήν",
+            "francais": "Amen !"
+          }
+        ]
+      },
+      "12": {
+        "grec": "διὰ Σιλουανοῦ λογίζομαι ὡς τοῦ ἀδελφοῦ πιστοῦ ἔγραψα ὑμῖν δι’ ὀλίγων παρακαλῶν καὶ ἐπιμαρτυρῶν ταύτην εἶναι ἀληθῆ χάριν τοῦ Θεοῦ εἰς ἣν στῆτε",
+        "francais": "À-travers Silvain, que je compte comme le frère fidèle, j’ai-écrit à-vous à-travers peu de choses, exhortant et ayant-attesté que celle-ci être la vraie grâce de Dieu en-vue-de laquelle, demeurez.",
+        "alignements": [
+          {
+            "grec": "διὰ Σιλουανοῦ",
+            "francais": "À-travers Silvain,"
+          },
+          {
+            "grec": "λογίζομαι",
+            "francais": "que je compte"
+          },
+          {
+            "grec": "ὡς τοῦ ἀδελφοῦ πιστοῦ",
+            "francais": "comme le frère fidèle,"
+          },
+          {
+            "grec": "ἔγραψα ὑμῖν",
+            "francais": "j’ai-écrit à-vous"
+          },
+          {
+            "grec": "δι’ ὀλίγων",
+            "francais": "à-travers peu de choses,"
+          },
+          {
+            "grec": "παρακαλῶν",
+            "francais": "exhortant"
+          },
+          {
+            "grec": "καὶ ἐπιμαρτυρῶν",
+            "francais": "et ayant-attesté que"
+          },
+          {
+            "grec": "ταύτην εἶναι",
+            "francais": "celle-ci être"
+          },
+          {
+            "grec": "ἀληθῆ χάριν τοῦ Θεοῦ",
+            "francais": "la vraie grâce de Dieu"
+          },
+          {
+            "grec": "εἰς ἣν",
+            "francais": "en-vue-de laquelle,"
+          },
+          {
+            "grec": "στῆτε",
+            "francais": "demeurez."
+          }
+        ]
+      },
+      "13": {
+        "grec": "ἡ συνεκλεκτὴ ἐν Βαβυλῶνι καὶ ὁ Μᾶρκος υἱός μου ἀσπάζεται ὑμᾶς",
+        "francais": "La co-élue à Babylone, et Marc, le fils de-moi, saluent vous.",
+        "alignements": [
+          {
+            "grec": "ἡ συνεκλεκτὴ",
+            "francais": "La co-élue"
+          },
+          {
+            "grec": "ἐν Βαβυλῶνι",
+            "francais": "à Babylone,"
+          },
+          {
+            "grec": "καὶ ὁ Μᾶρκος",
+            "francais": "et Marc,"
+          },
+          {
+            "grec": "υἱός μου",
+            "francais": "le fils de-moi,"
+          },
+          {
+            "grec": "ἀσπάζεται ὑμᾶς",
+            "francais": "saluent vous."
+          }
+        ]
+      },
+      "14": {
+        "grec": "ἀσπάσασθε ἀλλήλους ἐν φιλήματι ἀγάπης εἰρήνη ὑμῖν πᾶσιν τοῖς ἐν Χριστῷ",
+        "francais": "Saluez-vous les-uns-les-autres par un-baiser d’amour. Paix à-vous tous, ceux qui sont en Christ.",
+        "alignements": [
+          {
+            "grec": "ἀσπάσασθε ἀλλήλους",
+            "francais": "Saluez-vous les-uns-les-autres"
+          },
+          {
+            "grec": "ἐν φιλήματι ἀγάπης",
+            "francais": "par un-baiser d’amour."
+          },
+          {
+            "grec": "εἰρήνη",
+            "francais": "Paix"
+          },
+          {
+            "grec": "ὑμῖν πᾶσιν",
+            "francais": "à-vous tous,"
+          },
+          {
+            "grec": "τοῖς ἐν Χριστῷ",
+            "francais": "ceux qui sont en Christ."
+          }
+        ]
+      }
+    }
+  }
+}

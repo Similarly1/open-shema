@@ -1,0 +1,625 @@
+{
+    "general": {
+        "about_translation": {
+            "language_name_in_english": "français",
+            "language_name_local_language": "French",
+            "translation_name_in_english": "French néo-Crampon Libre",
+            "translation_name_in_local_language": "Sainte Bible néo-Crampon Libre",
+            "real_kind": "Bible with Deuterocanon",
+            "found": "https://ebible.org/details.php?id=francl",
+            "written_from_left_to_right": true,
+            "translation_abbr": "FRANCL",
+            "ebible": {
+                "last_updated": "2025-09-10",
+                "region": "France",
+                "usfm_link": "https://eBible.org/Scriptures/francl_usfm.zip",
+                "copyright_link": "https://gitlab.com/crosswire-bible-society/neo-crampon-libre",
+                "copyright_text": "Copyright © 2022 Fraternité de Tibériade",
+                "contributor": "???",
+                "translation_by": ""
+            }
+        },
+        "about_book": {
+            "ident": "francl",
+            "is_apocryphal": false,
+            "bookname_in_english": "Joel",
+            "bookname_in_local_language": "Joël \n",
+            "book_code": "JOL",
+            "book_code_content": "N/A",
+            "before_source": []
+        },
+        "ident": "francl",
+        "editor_comments": "I ASSUME the contributor is the same as the copyright owner"
+    },
+    "special_elems": [],
+    "verses": [
+        {
+            "global_locator": "JOL 1:1",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "1",
+            "text": "<dictionary_word>Parole</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>qui</dictionary_word> <dictionary_word>fut</dictionary_word> <dictionary_word>adressée</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>Joël</dictionary_word>, <dictionary_word>fils</dictionary_word> <dictionary_word>de</dictionary_word> Phatuel.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 1:2",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "2",
+            "text": "<dictionary_word>Écoutez</dictionary_word> <dictionary_word>ceci</dictionary_word>, <dictionary_word>vieillards</dictionary_word> ; <dictionary_word>prêtez</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>oreille</dictionary_word>, <dictionary_word>vous</dictionary_word> <dictionary_word>tous</dictionary_word> <dictionary_word>habitants</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>pays</dictionary_word> ! <dictionary_word>Pareille</dictionary_word> <dictionary_word>chose</dictionary_word> <dictionary_word>est-elle</dictionary_word> <dictionary_word>arrivée</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>vos</dictionary_word> <dictionary_word>jours</dictionary_word>, <dictionary_word>ou</dictionary_word> <dictionary_word>bien</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>jours</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>vos</dictionary_word> <dictionary_word>pères</dictionary_word> ?",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 1:3",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "3",
+            "text": "Faites-en <dictionary_word>le</dictionary_word> <dictionary_word>récit</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>vos</dictionary_word> <dictionary_word>enfants</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>vos</dictionary_word> <dictionary_word>enfants</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>leurs</dictionary_word> <dictionary_word>enfants</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>leurs</dictionary_word> <dictionary_word>enfants</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>autre</dictionary_word> <dictionary_word>génération</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 1:4",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "4",
+            "text": "<dictionary_word>Ce</dictionary_word> qu’<dictionary_word>a</dictionary_word> <dictionary_word>laissé</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>gazam</dictionary_word>, <dictionary_word>la</dictionary_word> <dictionary_word>sauterelle</dictionary_word> l’<dictionary_word>a</dictionary_word> <dictionary_word>dévoré</dictionary_word> ; <dictionary_word>ce</dictionary_word> qu’<dictionary_word>a</dictionary_word> <dictionary_word>laissé</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>sauterelle</dictionary_word>, <dictionary_word>le</dictionary_word> yéleq l’<dictionary_word>a</dictionary_word> <dictionary_word>dévoré</dictionary_word> ; <dictionary_word>ce</dictionary_word> qu’<dictionary_word>a</dictionary_word> <dictionary_word>laissé</dictionary_word> <dictionary_word>le</dictionary_word> yéleq, <dictionary_word>le</dictionary_word> chasil l’<dictionary_word>a</dictionary_word> <dictionary_word>dévoré</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 1:5",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "5",
+            "text": "Réveillez-vous, <dictionary_word>ivrognes</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>pleurez</dictionary_word> ; <dictionary_word>vous</dictionary_word> <dictionary_word>tous</dictionary_word>, <dictionary_word>buveurs</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>vin</dictionary_word>, lamentez-vous, <dictionary_word>à</dictionary_word> <dictionary_word>cause</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>vin</dictionary_word> <dictionary_word>nouveau</dictionary_word> ; <dictionary_word>car</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>retiré</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>bouche</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 1:6",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "6",
+            "text": "<dictionary_word>Car</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>peuple</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>monté</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>mon</dictionary_word> <dictionary_word>pays</dictionary_word>, <dictionary_word>puissant</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>innombrable</dictionary_word> ; <dictionary_word>ses</dictionary_word> <dictionary_word>dents</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>dents</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>lion</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>mâchoires</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>lionne</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 1:7",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "7",
+            "text": "<dictionary_word>Il</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>dévasté</dictionary_word> <dictionary_word>ma</dictionary_word> <dictionary_word>vigne</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>mis</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>morceaux</dictionary_word> <dictionary_word>mon</dictionary_word> <dictionary_word>figuier</dictionary_word> ; <dictionary_word>il</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>a</dictionary_word> pelés <dictionary_word>complètement</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>abattus</dictionary_word> ; <dictionary_word>les</dictionary_word> <dictionary_word>rameaux</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>devenus</dictionary_word> <dictionary_word>tout</dictionary_word> <dictionary_word>blancs</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 1:8",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "8",
+            "text": "Désole-toi <dictionary_word>comme</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>vierge</dictionary_word> <dictionary_word>revêtue</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>sac</dictionary_word>, <dictionary_word>pour</dictionary_word> <dictionary_word>pleurer</dictionary_word> l’époux <dictionary_word>de</dictionary_word> <dictionary_word>sa</dictionary_word> <dictionary_word>jeunesse</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 1:9",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "9",
+            "text": "<dictionary_word>Offrandes</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>libations</dictionary_word> <dictionary_word>ont</dictionary_word> <dictionary_word>été</dictionary_word> retranchées <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>maison</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> ; <dictionary_word>ils</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>deuil</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>prêtres</dictionary_word>, <dictionary_word>ministres</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> !",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 1:10",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "10",
+            "text": "<dictionary_word>Les</dictionary_word> <dictionary_word>champs</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>ravagés</dictionary_word>, <dictionary_word>le</dictionary_word> <dictionary_word>sol</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>deuil</dictionary_word> ; <dictionary_word>car</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>blé</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>détruit</dictionary_word>, <dictionary_word>le</dictionary_word> <dictionary_word>vin</dictionary_word> <dictionary_word>nouveau</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>confusion</dictionary_word>, l’<dictionary_word>huile</dictionary_word> <dictionary_word>languit</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 1:11",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "11",
+            "text": "<dictionary_word>Soyez</dictionary_word> <dictionary_word>confus</dictionary_word>, <dictionary_word>laboureurs</dictionary_word>, lamentez-vous, <dictionary_word>vignerons</dictionary_word>, <dictionary_word>à</dictionary_word> <dictionary_word>cause</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>froment</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>de</dictionary_word> l’<dictionary_word>orge</dictionary_word> ; <dictionary_word>car</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>moisson</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>champs</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>anéantie</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 1:12",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "12",
+            "text": "<dictionary_word>La</dictionary_word> <dictionary_word>vigne</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>confusion</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>figuiers</dictionary_word> <dictionary_word>languissent</dictionary_word> ; <dictionary_word>le</dictionary_word> <dictionary_word>grenadier</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>aussi</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>palmier</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>pommier</dictionary_word>, <dictionary_word>tous</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>arbres</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>champs</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>desséchés</dictionary_word> ; <dictionary_word>la</dictionary_word> <dictionary_word>joie</dictionary_word> s’<dictionary_word>est</dictionary_word> <dictionary_word>retirée</dictionary_word> <dictionary_word>confuse</dictionary_word>, <dictionary_word>loin</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>enfants</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>hommes</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 1:13",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "13",
+            "text": "<dictionary_word>Prêtres</dictionary_word>, ceignez-vous <dictionary_word>et</dictionary_word> <dictionary_word>poussez</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>plaintes</dictionary_word> ; lamentez-vous, <dictionary_word>ministres</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>autel</dictionary_word> ! <dictionary_word>Venez</dictionary_word>, <dictionary_word>passez</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>nuit</dictionary_word> <dictionary_word>vêtus</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>sac</dictionary_word>, <dictionary_word>ministres</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>mon</dictionary_word> <dictionary_word>Dieu</dictionary_word> ; <dictionary_word>car</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>offrande</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>libation</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>retenues</dictionary_word> <dictionary_word>loin</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>maison</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>votre</dictionary_word> <dictionary_word>Dieu</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 1:14",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "14",
+            "text": "<dictionary_word>Publiez</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>jeûne</dictionary_word>, <dictionary_word>convoquez</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>assemblée</dictionary_word> ; <dictionary_word>réunissez</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>anciens</dictionary_word>, <dictionary_word>tous</dictionary_word> <dictionary_word>ceux</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>habitent</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>pays</dictionary_word>, <dictionary_word>dans</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>maison</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>votre</dictionary_word> <dictionary_word>Dieu</dictionary_word>,",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 1:15",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "15",
+            "text": "<dictionary_word>et</dictionary_word> <dictionary_word>criez</dictionary_word> <dictionary_word>à</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> : « <dictionary_word>Ah</dictionary_word> ! <dictionary_word>quel</dictionary_word> <dictionary_word>jour</dictionary_word> !... » \n<dictionary_word>Car</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>est</dictionary_word> <dictionary_word>proche</dictionary_word> ! <dictionary_word>Il</dictionary_word> <dictionary_word>vient</dictionary_word> <dictionary_word>comme</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>ravage</dictionary_word>, <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>part</dictionary_word> <dictionary_word>du</dictionary_word> Tout-Puissant !",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 1:16",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "16",
+            "text": "<dictionary_word>La</dictionary_word> <dictionary_word>nourriture</dictionary_word> n’a-t-elle <dictionary_word>pas</dictionary_word> <dictionary_word>été</dictionary_word> <dictionary_word>retranchée</dictionary_word> <dictionary_word>sous</dictionary_word> <dictionary_word>nos</dictionary_word> <dictionary_word>yeux</dictionary_word>, <dictionary_word>ainsi</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>joie</dictionary_word> <dictionary_word>et</dictionary_word> l’<dictionary_word>allégresse</dictionary_word>, <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>maison</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>notre</dictionary_word> <dictionary_word>Dieu</dictionary_word> ?",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 1:17",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "17",
+            "text": "<dictionary_word>Les</dictionary_word> <dictionary_word>semences</dictionary_word> <dictionary_word>ont</dictionary_word> <dictionary_word>séché</dictionary_word> <dictionary_word>sous</dictionary_word> <dictionary_word>leurs</dictionary_word> <dictionary_word>mottes</dictionary_word> ; <dictionary_word>les</dictionary_word> <dictionary_word>greniers</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>vides</dictionary_word>, <dictionary_word>les</dictionary_word> <dictionary_word>magasins</dictionary_word> <dictionary_word>tombent</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>ruines</dictionary_word>, <dictionary_word>parce</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>blé</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>confusion</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 1:18",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "18",
+            "text": "<dictionary_word>Comme</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>bêtes</dictionary_word> <dictionary_word>gémissent</dictionary_word> ! <dictionary_word>Les</dictionary_word> <dictionary_word>troupeaux</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>bœufs</dictionary_word> <dictionary_word>sont</dictionary_word> effarés, <dictionary_word>parce</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>ils</dictionary_word> n’<dictionary_word>ont</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>pâture</dictionary_word> ; <dictionary_word>même</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>troupeaux</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>brebis</dictionary_word> pâtissent.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 1:19",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "19",
+            "text": "<dictionary_word>Je</dictionary_word> <dictionary_word>crie</dictionary_word> <dictionary_word>vers</dictionary_word> <dictionary_word>vous</dictionary_word>, <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> ; <dictionary_word>car</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>feu</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>dévoré</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>pâturages</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>désert</dictionary_word>, <dictionary_word>la</dictionary_word> <dictionary_word>flamme</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>brûlé</dictionary_word> <dictionary_word>tous</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>arbres</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>champs</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 1:20",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "20",
+            "text": "<dictionary_word>Les</dictionary_word> <dictionary_word>bêtes</dictionary_word> <dictionary_word>sauvages</dictionary_word> <dictionary_word>mêmes</dictionary_word> brament <dictionary_word>après</dictionary_word> <dictionary_word>vous</dictionary_word>, <dictionary_word>parce</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>courants</dictionary_word> d’<dictionary_word>eau</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>sec</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>feu</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>dévoré</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>pâturages</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>désert</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:1",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "1",
+            "text": "<dictionary_word>Sonnez</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>cor</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>Sion</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>sonnez</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>trompette</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>ma</dictionary_word> <dictionary_word>sainte</dictionary_word> <dictionary_word>montagne</dictionary_word> ! <dictionary_word>Que</dictionary_word> <dictionary_word>tous</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>habitants</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>pays</dictionary_word> <dictionary_word>tremblent</dictionary_word>, <dictionary_word>car</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>vient</dictionary_word>, <dictionary_word>car</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>proche</dictionary_word> !",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:2",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "2",
+            "text": "<dictionary_word>Jour</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>ténèbres</dictionary_word> <dictionary_word>et</dictionary_word> d’<dictionary_word>obscurité</dictionary_word>, <dictionary_word>jour</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>nuages</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>sombre</dictionary_word> <dictionary_word>nuée</dictionary_word> ! <dictionary_word>Comme</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>aurore</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>s</dictionary_word>’<dictionary_word>étend</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>montagnes</dictionary_word>, <dictionary_word>un</dictionary_word> <dictionary_word>peuple</dictionary_word> <dictionary_word>vient</dictionary_word>, <dictionary_word>nombreux</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>fort</dictionary_word>, <dictionary_word>tel</dictionary_word> qu’<dictionary_word>il</dictionary_word> n’<dictionary_word>y</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>jamais</dictionary_word> <dictionary_word>eu</dictionary_word> <dictionary_word>depuis</dictionary_word> <dictionary_word>l</dictionary_word>’origine, <dictionary_word>et</dictionary_word> qu’<dictionary_word>il</dictionary_word> n’<dictionary_word>y</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>aura</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>après</dictionary_word> <dictionary_word>lui</dictionary_word>, jusqu’<dictionary_word>aux</dictionary_word> <dictionary_word>années</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>âges</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>plus</dictionary_word> <dictionary_word>lointains</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:3",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "3",
+            "text": "<dictionary_word>Devant</dictionary_word> <dictionary_word>lui</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>feu</dictionary_word> <dictionary_word>dévore</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>derrière</dictionary_word> <dictionary_word>lui</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>flamme</dictionary_word> <dictionary_word>brûle</dictionary_word>. <dictionary_word>Le</dictionary_word> <dictionary_word>pays</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>comme</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>jardin</dictionary_word> <dictionary_word>d</dictionary_word>’<dictionary_word>Éden</dictionary_word> <dictionary_word>devant</dictionary_word> <dictionary_word>lui</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>derrière</dictionary_word> <dictionary_word>lui</dictionary_word>, c’<dictionary_word>est</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>désert</dictionary_word> <dictionary_word>dévasté</dictionary_word> ; <dictionary_word>rien</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>lui</dictionary_word> <dictionary_word>échappe</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:4",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "4",
+            "text": "<dictionary_word>Son</dictionary_word> <dictionary_word>aspect</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>comme</dictionary_word> l’<dictionary_word>aspect</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>chevaux</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>ils</dictionary_word> <dictionary_word>courent</dictionary_word> <dictionary_word>comme</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>cavaliers</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:5",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "5",
+            "text": "<dictionary_word>On</dictionary_word> <dictionary_word>entend</dictionary_word> <dictionary_word>comme</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>bruit</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>chars</dictionary_word>, <dictionary_word>qui</dictionary_word> bondiraient <dictionary_word>sur</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>sommets</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>montagnes</dictionary_word> ! c’<dictionary_word>est</dictionary_word> <dictionary_word>comme</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>bruit</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>flamme</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>feu</dictionary_word>, <dictionary_word>qui</dictionary_word> <dictionary_word>dévore</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>chaume</dictionary_word> ; c’<dictionary_word>est</dictionary_word> <dictionary_word>comme</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>peuple</dictionary_word> <dictionary_word>robuste</dictionary_word>, rangé <dictionary_word>en</dictionary_word> <dictionary_word>bataille</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:6",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "6",
+            "text": "<dictionary_word>Devant</dictionary_word> <dictionary_word>lui</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>peuples</dictionary_word> <dictionary_word>tremblent</dictionary_word> <dictionary_word>d</dictionary_word>’effroi, <dictionary_word>tous</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>visages</dictionary_word> <dictionary_word>pâlissent</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:7",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "7",
+            "text": "<dictionary_word>Ils</dictionary_word> <dictionary_word>courent</dictionary_word> <dictionary_word>comme</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>héros</dictionary_word> ; <dictionary_word>ils</dictionary_word> <dictionary_word>escaladent</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>muraille</dictionary_word> <dictionary_word>comme</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>hommes</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>guerre</dictionary_word> ; <dictionary_word>ils</dictionary_word> <dictionary_word>marchent</dictionary_word> <dictionary_word>chacun</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>leurs</dictionary_word> <dictionary_word>sentiers</dictionary_word>, <dictionary_word>ils</dictionary_word> <dictionary_word>ne</dictionary_word> confondent <dictionary_word>pas</dictionary_word> <dictionary_word>leurs</dictionary_word> <dictionary_word>routes</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:8",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "8",
+            "text": "<dictionary_word>Ils</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>poussent</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>uns</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>autres</dictionary_word>, <dictionary_word>chacun</dictionary_word> <dictionary_word>va</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>chemin</dictionary_word> ; <dictionary_word>ils</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>précipitent</dictionary_word> <dictionary_word>au</dictionary_word> <dictionary_word>travers</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>traits</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>ils</dictionary_word> <dictionary_word>ne</dictionary_word> rompent <dictionary_word>pas</dictionary_word> <dictionary_word>leurs</dictionary_word> <dictionary_word>rangs</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:9",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "9",
+            "text": "<dictionary_word>Ils</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>répandent</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>ville</dictionary_word>, <dictionary_word>ils</dictionary_word> <dictionary_word>courent</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>mur</dictionary_word>, <dictionary_word>ils</dictionary_word> <dictionary_word>montent</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>maisons</dictionary_word> ; <dictionary_word>ils</dictionary_word> <dictionary_word>entrent</dictionary_word> <dictionary_word>par</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>fenêtres</dictionary_word>, <dictionary_word>comme</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>voleur</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:10",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "10",
+            "text": "<dictionary_word>Devant</dictionary_word> <dictionary_word>lui</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>terre</dictionary_word> <dictionary_word>tremble</dictionary_word>, <dictionary_word>les</dictionary_word> <dictionary_word>cieux</dictionary_word> s’<dictionary_word>ébranlent</dictionary_word>, <dictionary_word>le</dictionary_word> <dictionary_word>soleil</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>lune</dictionary_word> s’<dictionary_word>obscurcissent</dictionary_word>, <dictionary_word>les</dictionary_word> <dictionary_word>étoiles</dictionary_word> <dictionary_word>perdent</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>éclat</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:11",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "11",
+            "text": "<name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>fait</dictionary_word> <dictionary_word>entendre</dictionary_word> <dictionary_word>sa</dictionary_word> <dictionary_word>voix</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>tête</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>armée</dictionary_word> ; <dictionary_word>car</dictionary_word> <dictionary_word>immense</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>camp</dictionary_word>, <dictionary_word>car</dictionary_word> <dictionary_word>puissant</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>exécuteur</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>sa</dictionary_word> <dictionary_word>parole</dictionary_word>. <dictionary_word>Car</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>est</dictionary_word> <dictionary_word>grand</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>très</dictionary_word> <dictionary_word>redoutable</dictionary_word> ; <dictionary_word>et</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>pourrait</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>soutenir</dictionary_word> ?",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:12",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "12",
+            "text": "<dictionary_word>Mais</dictionary_word> <dictionary_word>maintenant</dictionary_word> <dictionary_word>encore</dictionary_word> – <dictionary_word>oracle</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>revenez</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>moi</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>tout</dictionary_word> <dictionary_word>votre</dictionary_word> <dictionary_word>cœur</dictionary_word>, <dictionary_word>avec</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>jeûnes</dictionary_word>, <dictionary_word>avec</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>larmes</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>lamentations</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:13",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "13",
+            "text": "<dictionary_word>Déchirez</dictionary_word> <dictionary_word>vos</dictionary_word> <dictionary_word>cœurs</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>non</dictionary_word> <dictionary_word>vos</dictionary_word> <dictionary_word>vêtements</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>revenez</dictionary_word> <dictionary_word>à</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>votre</dictionary_word> <dictionary_word>Dieu</dictionary_word> ; <dictionary_word>car</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>miséricordieux</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>compatissant</dictionary_word>, <dictionary_word>lent</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>colère</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>riche</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>bonté</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>il</dictionary_word> s’afflige <dictionary_word>du</dictionary_word> <dictionary_word>mal</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>il</dictionary_word> <dictionary_word>envoie</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:14",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "14",
+            "text": "<dictionary_word>Qui</dictionary_word> <dictionary_word>sait</dictionary_word> s’<dictionary_word>il</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>reviendra</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>repentira</dictionary_word> <dictionary_word>pas</dictionary_word>, <dictionary_word>et</dictionary_word> s’<dictionary_word>il</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>laissera</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>après</dictionary_word> <dictionary_word>lui</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>bénédiction</dictionary_word>, <dictionary_word>l</dictionary_word>’<dictionary_word>offrande</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>libation</dictionary_word> <dictionary_word>pour</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>notre</dictionary_word> <dictionary_word>Dieu</dictionary_word> ?",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:15",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "15",
+            "text": "<dictionary_word>Sonnez</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>trompette</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>Sion</dictionary_word>, <dictionary_word>publiez</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>jeûne</dictionary_word>, <dictionary_word>convoquez</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>assemblée</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:16",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "16",
+            "text": "<dictionary_word>Assemblez</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>peuple</dictionary_word>, <dictionary_word>publiez</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>sainte</dictionary_word> <dictionary_word>réunion</dictionary_word>, <dictionary_word>rassemblez</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>vieillards</dictionary_word>, <dictionary_word>réunissez</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>enfants</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>nourrissons</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>mamelle</dictionary_word>. <dictionary_word>Que</dictionary_word> <dictionary_word>le</dictionary_word> nouvel <dictionary_word>époux</dictionary_word> <dictionary_word>quitte</dictionary_word> <dictionary_word>sa</dictionary_word> <dictionary_word>chambre</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>épouse</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>pavillon</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:17",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "17",
+            "text": "<dictionary_word>Qu</dictionary_word>’<dictionary_word>entre</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>portique</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>autel</dictionary_word>, <dictionary_word>les</dictionary_word> <dictionary_word>prêtres</dictionary_word>, <dictionary_word>ministres</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>pleurent</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>ils</dictionary_word> <dictionary_word>disent</dictionary_word> : « <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>épargnez</dictionary_word> <dictionary_word>votre</dictionary_word> <dictionary_word>peuple</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>livrez</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>votre</dictionary_word> <dictionary_word>héritage</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>opprobre</dictionary_word>, <dictionary_word>pour</dictionary_word> <dictionary_word>être</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>objet</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>moqueries</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>nations</dictionary_word>. <dictionary_word>Pourquoi</dictionary_word> dirait-on <dictionary_word>parmi</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>peuples</dictionary_word> : <dictionary_word>Où</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>Dieu</dictionary_word> ? »",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:18",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "18",
+            "text": "<name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>a</dictionary_word> <dictionary_word>été</dictionary_word> <dictionary_word>ému</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>jalousie</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>pays</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>eu</dictionary_word> <dictionary_word>pitié</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>peuple</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:19",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "19",
+            "text": "<name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>a</dictionary_word> <dictionary_word>répondu</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>dit</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>peuple</dictionary_word> : <dictionary_word>Voici</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>vais</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>envoyer</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>blé</dictionary_word>, <dictionary_word>le</dictionary_word> <dictionary_word>vin</dictionary_word> <dictionary_word>nouveau</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>huile</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>serez</dictionary_word> <dictionary_word>rassasiés</dictionary_word> ; <dictionary_word>et</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>ferai</dictionary_word> <dictionary_word>plus</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>sujet</dictionary_word> d’<dictionary_word>opprobre</dictionary_word> <dictionary_word>parmi</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>nations</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:20",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "20",
+            "text": "<dictionary_word>Celui</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>vient</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>septentrion</dictionary_word>, <dictionary_word>je</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>éloignerai</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>vous</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>chasserai</dictionary_word> <dictionary_word>vers</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>terre</dictionary_word> <dictionary_word>aride</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>déserte</dictionary_word>, <dictionary_word>l</dictionary_word>’<dictionary_word>avant</dictionary_word> <dictionary_word>garde</dictionary_word> <dictionary_word>vers</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>mer</dictionary_word> <dictionary_word>Orientale</dictionary_word>, <dictionary_word>l</dictionary_word>’<dictionary_word>arrière-garde</dictionary_word> <dictionary_word>vers</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>mer</dictionary_word> <dictionary_word>occidentale</dictionary_word> ; <dictionary_word>il</dictionary_word> s’<dictionary_word>en</dictionary_word> <dictionary_word>élèvera</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>infection</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>sa</dictionary_word> <dictionary_word>puanteur</dictionary_word> <dictionary_word>montera</dictionary_word>, <dictionary_word>car</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>fait</dictionary_word> <dictionary_word>grand</dictionary_word> !",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:21",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "21",
+            "text": "<dictionary_word>Terre</dictionary_word>, <dictionary_word>ne</dictionary_word> <dictionary_word>crains</dictionary_word> <dictionary_word>pas</dictionary_word>, <dictionary_word>sois</dictionary_word> <dictionary_word>dans</dictionary_word> l’<dictionary_word>allégresse</dictionary_word> <dictionary_word>et</dictionary_word> réjouis-toi ; <dictionary_word>car</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>a</dictionary_word> <dictionary_word>fait</dictionary_word> <dictionary_word>grand</dictionary_word> !",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:22",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "22",
+            "text": "<dictionary_word>Ne</dictionary_word> <dictionary_word>craignez</dictionary_word> <dictionary_word>point</dictionary_word>, <dictionary_word>bêtes</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>champs</dictionary_word>, <dictionary_word>car</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>pâturages</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>désert</dictionary_word> <dictionary_word>ont</dictionary_word> reverdi, <dictionary_word>car</dictionary_word> l’<dictionary_word>arbre</dictionary_word> <dictionary_word>porte</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>fruit</dictionary_word>, <dictionary_word>le</dictionary_word> <dictionary_word>figuier</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>vigne</dictionary_word> <dictionary_word>donnent</dictionary_word> <dictionary_word>leurs</dictionary_word> <dictionary_word>richesses</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:23",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "23",
+            "text": "<dictionary_word>Et</dictionary_word> <dictionary_word>vous</dictionary_word>, <dictionary_word>enfants</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Sion</dictionary_word>, <dictionary_word>soyez</dictionary_word> <dictionary_word>dans</dictionary_word> l’<dictionary_word>allégresse</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>réjouissez-vous</dictionary_word> <dictionary_word>en</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>votre</dictionary_word> <dictionary_word>Dieu</dictionary_word> ; <dictionary_word>car</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>donné</dictionary_word> <dictionary_word>le</dictionary_word> docteur <dictionary_word>pour</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>enseigner</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>justice</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>fait</dictionary_word> <dictionary_word>descendre</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>vous</dictionary_word> l’ondée, <dictionary_word>pluie</dictionary_word> d’automne <dictionary_word>et</dictionary_word> <dictionary_word>pluie</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>printemps</dictionary_word>, <dictionary_word>comme</dictionary_word> <dictionary_word>autrefois</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:24",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "24",
+            "text": "<dictionary_word>Vos</dictionary_word> <dictionary_word>aires</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>rempliront</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>froment</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>cuves</dictionary_word> <dictionary_word>regorgeront</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>vin</dictionary_word> <dictionary_word>nouveau</dictionary_word> <dictionary_word>et</dictionary_word> d’<dictionary_word>huile</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:25",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "25",
+            "text": "<dictionary_word>Je</dictionary_word> <dictionary_word>vous</dictionary_word> compenserai <dictionary_word>les</dictionary_word> <dictionary_word>années</dictionary_word> qu’ont <dictionary_word>dévorées</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>sauterelle</dictionary_word>, <dictionary_word>le</dictionary_word> yélek, <dictionary_word>le</dictionary_word> chasil <dictionary_word>et</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>gazam</dictionary_word>, <dictionary_word>ma</dictionary_word> <dictionary_word>grande</dictionary_word> <dictionary_word>armée</dictionary_word>, <dictionary_word>que</dictionary_word> j’avais <dictionary_word>envoyée</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>vous</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:26",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "26",
+            "text": "<dictionary_word>Vous</dictionary_word> <dictionary_word>mangerez</dictionary_word> <dictionary_word>abondamment</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>serez</dictionary_word> <dictionary_word>rassasiés</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>vous</dictionary_word> louerez <dictionary_word>le</dictionary_word> <dictionary_word>nom</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>votre</dictionary_word> <dictionary_word>Dieu</dictionary_word>, <dictionary_word>qui</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>fait</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>merveilles</dictionary_word> ; <dictionary_word>et</dictionary_word> <dictionary_word>mon</dictionary_word> <dictionary_word>peuple</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>sera</dictionary_word> <dictionary_word>plus</dictionary_word> <dictionary_word>jamais</dictionary_word> <dictionary_word>confus</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 2:27",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "27",
+            "text": "<dictionary_word>Et</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>saurez</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>suis</dictionary_word> <dictionary_word>au</dictionary_word> <dictionary_word>milieu</dictionary_word> d’<dictionary_word>Israël</dictionary_word> ! <dictionary_word>Moi</dictionary_word>, <dictionary_word>je</dictionary_word> <dictionary_word>suis</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>votre</dictionary_word> <dictionary_word>Dieu</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>il</dictionary_word> n’<dictionary_word>y</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>pas</dictionary_word> d’<dictionary_word>autre</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>mon</dictionary_word> <dictionary_word>peuple</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>sera</dictionary_word> <dictionary_word>plus</dictionary_word> <dictionary_word>jamais</dictionary_word> <dictionary_word>confus</dictionary_word> !",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 3:1",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "1",
+            "text": "<dictionary_word>Et</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>arrivera</dictionary_word> <dictionary_word>après</dictionary_word> <dictionary_word>cela</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>répandrai</dictionary_word> <dictionary_word>mon</dictionary_word> <dictionary_word>Esprit</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>toute</dictionary_word> <dictionary_word>chair</dictionary_word>. <dictionary_word>Et</dictionary_word> <dictionary_word>vos</dictionary_word> <dictionary_word>fils</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>vos</dictionary_word> <dictionary_word>filles</dictionary_word> <dictionary_word>prophétiseront</dictionary_word>, <dictionary_word>vos</dictionary_word> <dictionary_word>vieillards</dictionary_word> <dictionary_word>auront</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>songes</dictionary_word>, <dictionary_word>vos</dictionary_word> <dictionary_word>jeunes</dictionary_word> <dictionary_word>gens</dictionary_word> <dictionary_word>verront</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>visions</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 3:2",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "2",
+            "text": "<dictionary_word>Même</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>serviteurs</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>servantes</dictionary_word>, <dictionary_word>en</dictionary_word> <dictionary_word>ces</dictionary_word> jours-là <dictionary_word>je</dictionary_word> <dictionary_word>répandrai</dictionary_word> <dictionary_word>mon</dictionary_word> <dictionary_word>esprit</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 3:3",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "3",
+            "text": "<dictionary_word>Je</dictionary_word> <dictionary_word>ferai</dictionary_word> <dictionary_word>paraître</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>prodiges</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>cieux</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>terre</dictionary_word>, <dictionary_word>du</dictionary_word> <dictionary_word>sang</dictionary_word>, <dictionary_word>du</dictionary_word> <dictionary_word>feu</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>colonnes</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>fumée</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 3:4",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "4",
+            "text": "<dictionary_word>Le</dictionary_word> <dictionary_word>soleil</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>changera</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>ténèbres</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>lune</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>sang</dictionary_word>, <dictionary_word>avant</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>vienne</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>grand</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>terrible</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 3:5",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "5",
+            "text": "<dictionary_word>Et</dictionary_word> <dictionary_word>quiconque</dictionary_word> <dictionary_word>invoquera</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>nom</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>sera</dictionary_word> <dictionary_word>sauvé</dictionary_word> ; <dictionary_word>car</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>montagne</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Sion</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Jérusalem</dictionary_word>, <dictionary_word>il</dictionary_word> <dictionary_word>y</dictionary_word> <dictionary_word>aura</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>réunion</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>sauvés</dictionary_word>, <dictionary_word>comme</dictionary_word> l’<dictionary_word>a</dictionary_word> <dictionary_word>dit</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>et</dictionary_word> <dictionary_word>parmi</dictionary_word> <dictionary_word>les</dictionary_word> survivants <dictionary_word>que</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>appelle</dictionary_word> !",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 4:1",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "1",
+            "text": "<dictionary_word>Car</dictionary_word> <dictionary_word>voici</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>en</dictionary_word> <dictionary_word>ces</dictionary_word> jours-là <dictionary_word>et</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>temps-là</dictionary_word>, <dictionary_word>où</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>ramènerai</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>captifs</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Juda</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Jérusalem</dictionary_word>,",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 4:2",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "2",
+            "text": "j’assemblerai <dictionary_word>toutes</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>nations</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>ferai</dictionary_word> <dictionary_word>descendre</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>vallée</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Josaphat</dictionary_word> ; <dictionary_word>et</dictionary_word> <dictionary_word>là</dictionary_word> j’entrerai <dictionary_word>en</dictionary_word> <dictionary_word>jugement</dictionary_word> <dictionary_word>avec</dictionary_word> <dictionary_word>elles</dictionary_word>, <dictionary_word>au</dictionary_word> <dictionary_word>sujet</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>mon</dictionary_word> <dictionary_word>peuple</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>mon</dictionary_word> <dictionary_word>héritage</dictionary_word> d’<dictionary_word>Israël</dictionary_word>, qu’<dictionary_word>elles</dictionary_word> <dictionary_word>ont</dictionary_word> <dictionary_word>dispersé</dictionary_word> <dictionary_word>parmi</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>nations</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>mon</dictionary_word> <dictionary_word>pays</dictionary_word> qu’<dictionary_word>elles</dictionary_word> <dictionary_word>ont</dictionary_word> <dictionary_word>partagé</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 4:3",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "3",
+            "text": "<dictionary_word>Car</dictionary_word> <dictionary_word>ils</dictionary_word> <dictionary_word>ont</dictionary_word> <dictionary_word>jeté</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>sort</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>mon</dictionary_word> <dictionary_word>peuple</dictionary_word>, <dictionary_word>ils</dictionary_word> <dictionary_word>ont</dictionary_word> <dictionary_word>donné</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>jeune</dictionary_word> <dictionary_word>garçon</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>une</dictionary_word> courtisane, <dictionary_word>et</dictionary_word> <dictionary_word>ils</dictionary_word> <dictionary_word>ont</dictionary_word> <dictionary_word>vendu</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>jeune</dictionary_word> <dictionary_word>fille</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>vin</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>ils</dictionary_word> <dictionary_word>ont</dictionary_word> <dictionary_word>bu</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 4:4",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "4",
+            "text": "<dictionary_word>Et</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>aussi</dictionary_word>, <dictionary_word>qu</dictionary_word>’<dictionary_word>êtes-vous</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>moi</dictionary_word>, <dictionary_word>Tyr</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>Sidon</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>tous</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>districts</dictionary_word> <dictionary_word>de</dictionary_word> Philistie ? <dictionary_word>Est-ce</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>vous</dictionary_word> tireriez <dictionary_word>de</dictionary_word> <dictionary_word>moi</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>vengeance</dictionary_word> ? <dictionary_word>Que</dictionary_word> <dictionary_word>si</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>me</dictionary_word> provoquez, <dictionary_word>je</dictionary_word> <dictionary_word>ferai</dictionary_word> <dictionary_word>vite</dictionary_word>, <dictionary_word>promptement</dictionary_word> <dictionary_word>retomber</dictionary_word> <dictionary_word>votre</dictionary_word> provocation <dictionary_word>sur</dictionary_word> <dictionary_word>votre</dictionary_word> <dictionary_word>tête</dictionary_word> ;",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 4:5",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "5",
+            "text": "<dictionary_word>vous</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>avez</dictionary_word> <dictionary_word>pris</dictionary_word> <dictionary_word>mon</dictionary_word> <dictionary_word>argent</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>mon</dictionary_word> <dictionary_word>or</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>avez</dictionary_word> <dictionary_word>emporté</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>vos</dictionary_word> <dictionary_word>temples</dictionary_word> <dictionary_word>mes</dictionary_word> <dictionary_word>joyaux</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>plus</dictionary_word> <dictionary_word>précieux</dictionary_word> ;",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 4:6",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "6",
+            "text": "<dictionary_word>vous</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>avez</dictionary_word> <dictionary_word>vendu</dictionary_word> <dictionary_word>aux</dictionary_word> <dictionary_word>fils</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Javan</dictionary_word>, <dictionary_word>les</dictionary_word> <dictionary_word>fils</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Juda</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>fils</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Jérusalem</dictionary_word>, <dictionary_word>pour</dictionary_word> qu’<dictionary_word>on</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>éloigne</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>pays</dictionary_word> !",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 4:7",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "7",
+            "text": "<dictionary_word>Voici</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>vais</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>faire</dictionary_word> <dictionary_word>lever</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>lieu</dictionary_word> <dictionary_word>où</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>avez</dictionary_word> <dictionary_word>vendus</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>ferai</dictionary_word> <dictionary_word>retomber</dictionary_word> <dictionary_word>votre</dictionary_word> provocation <dictionary_word>sur</dictionary_word> <dictionary_word>votre</dictionary_word> <dictionary_word>tête</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 4:8",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "8",
+            "text": "<dictionary_word>Je</dictionary_word> <dictionary_word>vendrai</dictionary_word> <dictionary_word>vos</dictionary_word> <dictionary_word>fils</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>vos</dictionary_word> <dictionary_word>filles</dictionary_word> <dictionary_word>aux</dictionary_word> <dictionary_word>mains</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>enfants</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Juda</dictionary_word>, <dictionary_word>qui</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>vendront</dictionary_word> <dictionary_word>aux</dictionary_word> <dictionary_word>Sabéens</dictionary_word>, <dictionary_word>à</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>peuple</dictionary_word> <dictionary_word>lointain</dictionary_word> ; <dictionary_word>car</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>a</dictionary_word> <dictionary_word>parlé</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 4:9",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "9",
+            "text": "<dictionary_word>Publiez</dictionary_word> <dictionary_word>ceci</dictionary_word> <dictionary_word>parmi</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>nations</dictionary_word> : <dictionary_word>Préparez</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>guerre</dictionary_word> ! <dictionary_word>Faites</dictionary_word> <dictionary_word>lever</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>vaillants</dictionary_word> ! Qu’<dictionary_word>ils</dictionary_word> s’<dictionary_word>approchent</dictionary_word>, qu’<dictionary_word>ils</dictionary_word> <dictionary_word>montent</dictionary_word>, <dictionary_word>tous</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>hommes</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>guerre</dictionary_word> !",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 4:10",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "10",
+            "text": "<dictionary_word>De</dictionary_word> <dictionary_word>vos</dictionary_word> socs <dictionary_word>forgez</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>épées</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>vos</dictionary_word> <dictionary_word>serpes</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>lances</dictionary_word> ; <dictionary_word>que</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>faible</dictionary_word> <dictionary_word>dise</dictionary_word> : « <dictionary_word>Je</dictionary_word> <dictionary_word>suis</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>brave</dictionary_word> ! »",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 4:11",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "11",
+            "text": "Hâtez-vous <dictionary_word>et</dictionary_word> <dictionary_word>venez</dictionary_word>, <dictionary_word>vous</dictionary_word> <dictionary_word>toutes</dictionary_word>, <dictionary_word>nations</dictionary_word> d’<dictionary_word>alentour</dictionary_word>, <dictionary_word>et</dictionary_word> rassemblez-vous ! <dictionary_word>Là</dictionary_word> <dictionary_word>même</dictionary_word>, <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>faites</dictionary_word> <dictionary_word>descendre</dictionary_word> <dictionary_word>vos</dictionary_word> <dictionary_word>braves</dictionary_word> !",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 4:12",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "12",
+            "text": "<dictionary_word>Que</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>nations</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>lèvent</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>elles</dictionary_word> <dictionary_word>montent</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>vallée</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Josaphat</dictionary_word> ! <dictionary_word>Car</dictionary_word> c’<dictionary_word>est</dictionary_word> <dictionary_word>là</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>siégerai</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>juger</dictionary_word> <dictionary_word>toutes</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>nations</dictionary_word> d’<dictionary_word>alentour</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 4:13",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "13",
+            "text": "<dictionary_word>Mettez</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>faucille</dictionary_word>, <dictionary_word>car</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>moisson</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>mûre</dictionary_word> ; <dictionary_word>venez</dictionary_word>, <dictionary_word>foulez</dictionary_word>, <dictionary_word>car</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>pressoir</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>rempli</dictionary_word> ; <dictionary_word>les</dictionary_word> <dictionary_word>cuves</dictionary_word> <dictionary_word>regorgent</dictionary_word>, <dictionary_word>car</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>méchanceté</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>grande</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 4:14",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "14",
+            "text": "<dictionary_word>Des</dictionary_word> <dictionary_word>foules</dictionary_word>, <dictionary_word>des</dictionary_word> <dictionary_word>foules</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>vallée</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>décision</dictionary_word> !",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 4:15",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "15",
+            "text": "<dictionary_word>Le</dictionary_word> <dictionary_word>soleil</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>lune</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>obscurcis</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>étoiles</dictionary_word> <dictionary_word>ont</dictionary_word> <dictionary_word>perdu</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>éclat</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 4:16",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "16",
+            "text": "<dictionary_word>De</dictionary_word> <dictionary_word>Sion</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>rugira</dictionary_word>, <dictionary_word>de</dictionary_word> <dictionary_word>Jérusalem</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>fera</dictionary_word> <dictionary_word>entendre</dictionary_word> <dictionary_word>sa</dictionary_word> <dictionary_word>voix</dictionary_word> ; <dictionary_word>les</dictionary_word> <dictionary_word>cieux</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>terre</dictionary_word> <dictionary_word>trembleront</dictionary_word>. <dictionary_word>Mais</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>sera</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>refuge</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>peuple</dictionary_word>, <dictionary_word>une</dictionary_word> <dictionary_word>retraite</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>enfants</dictionary_word> d’<dictionary_word>Israël</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 4:17",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "17",
+            "text": "<dictionary_word>Et</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>saurez</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>suis</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>votre</dictionary_word> <dictionary_word>Dieu</dictionary_word>, <dictionary_word>qui</dictionary_word> <dictionary_word>habite</dictionary_word> <dictionary_word>Sion</dictionary_word>, <dictionary_word>ma</dictionary_word> <dictionary_word>montagne</dictionary_word> <dictionary_word>sainte</dictionary_word> ; <dictionary_word>Jérusalem</dictionary_word> <dictionary_word>sera</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>sanctuaire</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>étrangers</dictionary_word> n’<dictionary_word>y</dictionary_word> <dictionary_word>passeront</dictionary_word> <dictionary_word>plus</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 4:18",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "18",
+            "text": "<dictionary_word>En</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>jour-là</dictionary_word>, <dictionary_word>les</dictionary_word> <dictionary_word>montagnes</dictionary_word> dégoutteront <dictionary_word>de</dictionary_word> <dictionary_word>vin</dictionary_word> <dictionary_word>nouveau</dictionary_word>, <dictionary_word>les</dictionary_word> <dictionary_word>collines</dictionary_word> ruisselleront <dictionary_word>de</dictionary_word> <dictionary_word>lait</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>tous</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>torrents</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Juda</dictionary_word> ruisselleront d’<dictionary_word>eau</dictionary_word>. <dictionary_word>Une</dictionary_word> <dictionary_word>source</dictionary_word> <dictionary_word>sortira</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>maison</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>et</dictionary_word> <dictionary_word>elle</dictionary_word> <dictionary_word>arrosera</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>vallée</dictionary_word> <dictionary_word>des</dictionary_word> Acacias.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 4:19",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "19",
+            "text": "<dictionary_word>L</dictionary_word>’<dictionary_word>Égypte</dictionary_word> <dictionary_word>deviendra</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>terre</dictionary_word> <dictionary_word>dévastée</dictionary_word>, <dictionary_word>Edom</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>désert</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>dévastation</dictionary_word>, <dictionary_word>à</dictionary_word> <dictionary_word>cause</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>violences</dictionary_word> <dictionary_word>commises</dictionary_word> <dictionary_word>contre</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>enfants</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Juda</dictionary_word>, <dictionary_word>parce</dictionary_word> qu’<dictionary_word>ils</dictionary_word> <dictionary_word>ont</dictionary_word> <dictionary_word>répandu</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>pays</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>sang</dictionary_word> <dictionary_word>innocent</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 4:20",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "20",
+            "text": "<dictionary_word>Mais</dictionary_word> <dictionary_word>Juda</dictionary_word> <dictionary_word>sera</dictionary_word> <dictionary_word>habité</dictionary_word> <dictionary_word>éternellement</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>Jérusalem</dictionary_word> d’<dictionary_word>âge</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>âge</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JOL 4:21",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "21",
+            "text": "<dictionary_word>Et</dictionary_word> <dictionary_word>je</dictionary_word> laverai <dictionary_word>leur</dictionary_word> <dictionary_word>sang</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>je</dictionary_word> n’<dictionary_word>avais</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>encore</dictionary_word> <dictionary_word>lavé</dictionary_word>. <dictionary_word>Et</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>habitera</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>Sion</dictionary_word>.",
+            "position": "left"
+        }
+    ],
+    "titles": [],
+    "footnotes": [],
+    "cross_references": [],
+    "tables": []
+}

@@ -1,0 +1,479 @@
+{
+    "general": {
+        "about_translation": {
+            "language_name_in_english": "français",
+            "language_name_local_language": "French",
+            "translation_name_in_english": "French néo-Crampon Libre",
+            "translation_name_in_local_language": "Sainte Bible néo-Crampon Libre",
+            "real_kind": "Bible with Deuterocanon",
+            "found": "https://ebible.org/details.php?id=francl",
+            "written_from_left_to_right": true,
+            "translation_abbr": "FRANCL",
+            "ebible": {
+                "last_updated": "2025-09-10",
+                "region": "France",
+                "usfm_link": "https://eBible.org/Scriptures/francl_usfm.zip",
+                "copyright_link": "https://gitlab.com/crosswire-bible-society/neo-crampon-libre",
+                "copyright_text": "Copyright © 2022 Fraternité de Tibériade",
+                "contributor": "???",
+                "translation_by": ""
+            }
+        },
+        "about_book": {
+            "ident": "francl",
+            "is_apocryphal": false,
+            "bookname_in_english": "Haggai",
+            "bookname_in_local_language": "Aggée \n",
+            "book_code": "HAG",
+            "book_code_content": "N/A",
+            "before_source": []
+        },
+        "ident": "francl",
+        "editor_comments": "I ASSUME the contributor is the same as the copyright owner"
+    },
+    "special_elems": [],
+    "verses": [
+        {
+            "global_locator": "HAG 1:1",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "1",
+            "text": "<dictionary_word>La</dictionary_word> <dictionary_word>deuxième</dictionary_word> <dictionary_word>année</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>roi</dictionary_word> <dictionary_word>Darius</dictionary_word>, <dictionary_word>au</dictionary_word> <dictionary_word>sixième</dictionary_word> <dictionary_word>mois</dictionary_word>, <dictionary_word>le</dictionary_word> <dictionary_word>premier</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>mois</dictionary_word>, <dictionary_word>la</dictionary_word> <dictionary_word>parole</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>fut</dictionary_word> <dictionary_word>adressée</dictionary_word>, <dictionary_word>par</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>intermédiaire</dictionary_word> d’<dictionary_word>Aggée</dictionary_word>, <dictionary_word>le</dictionary_word> <dictionary_word>prophète</dictionary_word>, <dictionary_word>à</dictionary_word> <dictionary_word>Zorobabel</dictionary_word>, <dictionary_word>fils</dictionary_word> <dictionary_word>de</dictionary_word> Salathiel, <dictionary_word>gouverneur</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Juda</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>à</dictionary_word> Jésus, <dictionary_word>fils</dictionary_word> <dictionary_word>de</dictionary_word> Josédec, <dictionary_word>le</dictionary_word> <dictionary_word>grand</dictionary_word> <dictionary_word>prêtre</dictionary_word>, <dictionary_word>en</dictionary_word> <dictionary_word>ces</dictionary_word> <dictionary_word>termes</dictionary_word> <insert_footnote /> :",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 1:2",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "2",
+            "text": "<dictionary_word>Ainsi</dictionary_word> <dictionary_word>parle</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>des</dictionary_word> <dictionary_word>armées</dictionary_word> : <dictionary_word>Ce</dictionary_word> <dictionary_word>peuple</dictionary_word> <dictionary_word>dit</dictionary_word> : « <dictionary_word>Le</dictionary_word> <dictionary_word>temps</dictionary_word> n’<dictionary_word>est</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>venu</dictionary_word> <insert_footnote />, <dictionary_word>le</dictionary_word> <dictionary_word>temps</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>maison</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> d’<dictionary_word>être</dictionary_word> <dictionary_word>rebâtie</dictionary_word>. »",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 1:3",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "3",
+            "text": "<dictionary_word>Et</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>parole</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>se</dictionary_word> <dictionary_word>fit</dictionary_word> <dictionary_word>entendre</dictionary_word> <dictionary_word>par</dictionary_word> l’<dictionary_word>intermédiaire</dictionary_word> d’<dictionary_word>Aggée</dictionary_word>, <dictionary_word>le</dictionary_word> <dictionary_word>prophète</dictionary_word>, <dictionary_word>en</dictionary_word> <dictionary_word>ces</dictionary_word> <dictionary_word>termes</dictionary_word> :",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 1:4",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "4",
+            "text": "<dictionary_word>Est-il</dictionary_word> <dictionary_word>temps</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>autres</dictionary_word> d’<dictionary_word>habiter</dictionary_word> <dictionary_word>vos</dictionary_word> <dictionary_word>maisons</dictionary_word> <dictionary_word>lambrissées</dictionary_word>, <dictionary_word>quand</dictionary_word> <dictionary_word>cette</dictionary_word> maison-là <dictionary_word>est</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>ruines</dictionary_word> ?",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 1:5",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "5",
+            "text": "<dictionary_word>Et</dictionary_word> <dictionary_word>maintenant</dictionary_word> <dictionary_word>ainsi</dictionary_word> <dictionary_word>parle</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>des</dictionary_word> <dictionary_word>armées</dictionary_word> : <dictionary_word>Considérez</dictionary_word> <dictionary_word>attentivement</dictionary_word> <insert_footnote /> <dictionary_word>vos</dictionary_word> <dictionary_word>voies</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 1:6",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "6",
+            "text": "<dictionary_word>Vous</dictionary_word> <dictionary_word>avez</dictionary_word> <dictionary_word>semé</dictionary_word> <dictionary_word>beaucoup</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>recueilli</dictionary_word> <dictionary_word>peu</dictionary_word> <insert_footnote /> ; <dictionary_word>vous</dictionary_word> <dictionary_word>mangez</dictionary_word>, <dictionary_word>mais</dictionary_word> <dictionary_word>non</dictionary_word> jusqu’<dictionary_word>à</dictionary_word> <dictionary_word>être</dictionary_word> <dictionary_word>rassasiés</dictionary_word> ; <dictionary_word>vous</dictionary_word> <dictionary_word>buvez</dictionary_word>, <dictionary_word>mais</dictionary_word> <dictionary_word>non</dictionary_word> jusqu’<dictionary_word>à</dictionary_word> <dictionary_word>votre</dictionary_word> soûl ; <dictionary_word>vous</dictionary_word> êtes <dictionary_word>vêtus</dictionary_word>, <dictionary_word>mais</dictionary_word> <dictionary_word>non</dictionary_word> jusqu’<dictionary_word>à</dictionary_word> <dictionary_word>être</dictionary_word> réchauffés ; <dictionary_word>et</dictionary_word> <dictionary_word>le</dictionary_word> salarié <dictionary_word>gagne</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>salaire</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>bourse</dictionary_word> trouée.",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 1:7",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "7",
+            "text": "<dictionary_word>Ainsi</dictionary_word> <dictionary_word>parle</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>des</dictionary_word> <dictionary_word>armées</dictionary_word> : <dictionary_word>Considérez</dictionary_word> <dictionary_word>attentivement</dictionary_word> <dictionary_word>vos</dictionary_word> <dictionary_word>voies</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 1:8",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "8",
+            "text": "<dictionary_word>Allez</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>montagne</dictionary_word>, <dictionary_word>apportez</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>bois</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>bâtissez</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>maison</dictionary_word> ; <dictionary_word>j</dictionary_word>’<dictionary_word>en</dictionary_word> <dictionary_word>aurai</dictionary_word> <dictionary_word>plaisir</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>gloire</dictionary_word>, <dictionary_word>dit</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 1:9",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "9",
+            "text": "<dictionary_word>Vous</dictionary_word> <dictionary_word>comptiez</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>beaucoup</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>voici</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>cela</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>réduit</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>peu</dictionary_word> ; <dictionary_word>vous</dictionary_word> <dictionary_word>aviez</dictionary_word> <dictionary_word>rentré</dictionary_word> <dictionary_word>vos</dictionary_word> <dictionary_word>récoltes</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>j</dictionary_word>’<dictionary_word>ai</dictionary_word> <dictionary_word>soufflé</dictionary_word> <dictionary_word>dessus</dictionary_word>. <dictionary_word>A</dictionary_word> <dictionary_word>cause</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>quoi</dictionary_word> — <dictionary_word>oracle</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>des</dictionary_word> <dictionary_word>armées</dictionary_word> ? <dictionary_word>A</dictionary_word> <dictionary_word>cause</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>ma</dictionary_word> <dictionary_word>maison</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>ruines</dictionary_word>, <dictionary_word>tandis</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>empressez</dictionary_word> <dictionary_word>chacun</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>votre</dictionary_word> <dictionary_word>maison</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 1:10",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "10",
+            "text": "C’<dictionary_word>est</dictionary_word> <dictionary_word>pourquoi</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>cieux</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>ont</dictionary_word> <dictionary_word>retenu</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>rosée</dictionary_word> <insert_footnote />, <dictionary_word>et</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>terre</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>retenu</dictionary_word> <dictionary_word>ses</dictionary_word> <dictionary_word>fruits</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 1:11",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "11",
+            "text": "<dictionary_word>J</dictionary_word>’<dictionary_word>ai</dictionary_word> <dictionary_word>appelé</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>sécheresse</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>terre</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>montagnes</dictionary_word>, <dictionary_word>sur</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>blé</dictionary_word>, <dictionary_word>sur</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>vin</dictionary_word> <dictionary_word>nouveau</dictionary_word>, <dictionary_word>sur</dictionary_word> l’<dictionary_word>huile</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>peut</dictionary_word> <dictionary_word>produire</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>sol</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>sur</dictionary_word> l’<dictionary_word>homme</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>bêtes</dictionary_word> ; <dictionary_word>et</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>tout</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>travail</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>mains</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 1:12",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "12",
+            "text": "<dictionary_word>Alors</dictionary_word> <dictionary_word>Zorobabel</dictionary_word>, <dictionary_word>fils</dictionary_word> <dictionary_word>de</dictionary_word> Salathiel, <dictionary_word>et</dictionary_word> Jésus, <dictionary_word>fils</dictionary_word> <dictionary_word>de</dictionary_word> Josédec, <dictionary_word>le</dictionary_word> <dictionary_word>grand</dictionary_word> <dictionary_word>prêtre</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>tout</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>reste</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>peuple</dictionary_word>, <dictionary_word>écoutèrent</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>voix</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>leur</dictionary_word> <dictionary_word>Dieu</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>paroles</dictionary_word> <dictionary_word>d</dictionary_word>’<dictionary_word>Aggée</dictionary_word>, <dictionary_word>le</dictionary_word> <dictionary_word>prophète</dictionary_word>, <dictionary_word>selon</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>mission</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>il</dictionary_word> <dictionary_word>avait</dictionary_word> <dictionary_word>reçue</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>leur</dictionary_word> <dictionary_word>Dieu</dictionary_word> ; <dictionary_word>et</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>peuple</dictionary_word> <dictionary_word>craignit</dictionary_word> <dictionary_word>devant</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 1:13",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "13",
+            "text": "<dictionary_word>Et</dictionary_word> <dictionary_word>Aggée</dictionary_word>, <dictionary_word>envoyé</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>sur</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>ordre</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>parla</dictionary_word> <dictionary_word>au</dictionary_word> <dictionary_word>peuple</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>ces</dictionary_word> <dictionary_word>termes</dictionary_word> : « <dictionary_word>Je</dictionary_word> <dictionary_word>suis</dictionary_word> <dictionary_word>avec</dictionary_word> <dictionary_word>vous</dictionary_word>, — <dictionary_word>oracle</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>. »",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 1:14",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "14",
+            "text": "<dictionary_word>Et</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>réveilla</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>esprit</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Zorobabel</dictionary_word>, <dictionary_word>fils</dictionary_word> <dictionary_word>de</dictionary_word> Salathiel, <dictionary_word>gouverneur</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Juda</dictionary_word>, <dictionary_word>l</dictionary_word>’<dictionary_word>esprit</dictionary_word> <dictionary_word>de</dictionary_word> Jésus, <dictionary_word>fils</dictionary_word> <dictionary_word>de</dictionary_word> Josédec, <dictionary_word>le</dictionary_word> <dictionary_word>grand</dictionary_word> <dictionary_word>prêtre</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>esprit</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>tout</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>reste</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>peuple</dictionary_word> ; <dictionary_word>et</dictionary_word> <dictionary_word>ils</dictionary_word> <dictionary_word>vinrent</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>travaillèrent</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>maison</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>des</dictionary_word> <dictionary_word>armées</dictionary_word>, <dictionary_word>leur</dictionary_word> <dictionary_word>Dieu</dictionary_word>,",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 1:15",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "15",
+            "text": "<dictionary_word>le</dictionary_word> <dictionary_word>vingt-quatrième</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>sixième</dictionary_word> <dictionary_word>mois</dictionary_word>, <dictionary_word>la</dictionary_word> <dictionary_word>deuxième</dictionary_word> <dictionary_word>année</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>roi</dictionary_word> <dictionary_word>Darius</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 2:1",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "1",
+            "text": "<dictionary_word>Au</dictionary_word> <dictionary_word>septième</dictionary_word> <dictionary_word>mois</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>vingt</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>mois</dictionary_word> <insert_footnote />, <dictionary_word>la</dictionary_word> <dictionary_word>parole</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>se</dictionary_word> <dictionary_word>fit</dictionary_word> <dictionary_word>entendre</dictionary_word> <dictionary_word>par</dictionary_word> l’<dictionary_word>intermédiaire</dictionary_word> d’<dictionary_word>Aggée</dictionary_word>, <dictionary_word>le</dictionary_word> <dictionary_word>prophète</dictionary_word>, <dictionary_word>en</dictionary_word> <dictionary_word>ces</dictionary_word> <dictionary_word>termes</dictionary_word> :",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 2:2",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "2",
+            "text": "<dictionary_word>Parle</dictionary_word> <dictionary_word>donc</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>Zorobabel</dictionary_word>, <dictionary_word>fils</dictionary_word> <dictionary_word>de</dictionary_word> Salathiel, <dictionary_word>gouverneur</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Juda</dictionary_word>, <dictionary_word>à</dictionary_word> Jésus, <dictionary_word>fils</dictionary_word> <dictionary_word>de</dictionary_word> Josédec, <dictionary_word>le</dictionary_word> <dictionary_word>grand</dictionary_word> <dictionary_word>prêtre</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>au</dictionary_word> <dictionary_word>reste</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>peuple</dictionary_word>, <dictionary_word>en</dictionary_word> <dictionary_word>ces</dictionary_word> <dictionary_word>termes</dictionary_word> :",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 2:3",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "3",
+            "text": "<dictionary_word>Quel</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>parmi</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>survivant</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>vu</dictionary_word> <dictionary_word>cette</dictionary_word> <dictionary_word>maison</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>sa</dictionary_word> <dictionary_word>gloire</dictionary_word> <dictionary_word>première</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>quel</dictionary_word> <dictionary_word>état</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>voyez-vous</dictionary_word> <dictionary_word>maintenant</dictionary_word> ? <dictionary_word>Ne</dictionary_word> <dictionary_word>paraît-elle</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>vos</dictionary_word> <dictionary_word>yeux</dictionary_word> <dictionary_word>comme</dictionary_word> <dictionary_word>rien</dictionary_word> ? <insert_footnote />",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 2:4",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "4",
+            "text": "<dictionary_word>Et</dictionary_word> <dictionary_word>maintenant</dictionary_word>, <dictionary_word>courage</dictionary_word> <dictionary_word>Zorobabel</dictionary_word> ! — <dictionary_word>oracle</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>. <dictionary_word>Courage</dictionary_word>, Jésus <dictionary_word>fils</dictionary_word> <dictionary_word>de</dictionary_word> Josédec, <dictionary_word>grand</dictionary_word> <dictionary_word>prêtre</dictionary_word> ! <dictionary_word>Courage</dictionary_word>, <dictionary_word>tout</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>peuple</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>pays</dictionary_word>, — <dictionary_word>oracle</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, — <dictionary_word>et</dictionary_word> <dictionary_word>agissez</dictionary_word> ! <dictionary_word>Car</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>suis</dictionary_word> <dictionary_word>avec</dictionary_word> <dictionary_word>vous</dictionary_word>, — <dictionary_word>oracle</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>des</dictionary_word> <dictionary_word>armées</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 2:5",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "5",
+            "text": "<dictionary_word>Il</dictionary_word> <dictionary_word>y</dictionary_word> <dictionary_word>a</dictionary_word> l’engagement<insert_footnote /> <dictionary_word>que</dictionary_word> j’<dictionary_word>ai</dictionary_word> <dictionary_word>pris</dictionary_word> <dictionary_word>que</dictionary_word> j’<dictionary_word>ai</dictionary_word> <dictionary_word>pris</dictionary_word> <dictionary_word>avec</dictionary_word> <dictionary_word>vous</dictionary_word>, <dictionary_word>quand</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>êtes</dictionary_word> <dictionary_word>sortis</dictionary_word> d’<dictionary_word>Égypte</dictionary_word> ; <dictionary_word>et</dictionary_word> <dictionary_word>mon</dictionary_word> <dictionary_word>Esprit</dictionary_word> <dictionary_word>demeure</dictionary_word> <dictionary_word>au</dictionary_word> <dictionary_word>milieu</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>vous</dictionary_word> : <dictionary_word>ne</dictionary_word> <dictionary_word>craignez</dictionary_word> <dictionary_word>rien</dictionary_word> !",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 2:6",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "6",
+            "text": "<dictionary_word>Car</dictionary_word> <dictionary_word>ainsi</dictionary_word> <dictionary_word>parle</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>des</dictionary_word> <dictionary_word>armées</dictionary_word> : <dictionary_word>Une</dictionary_word> <dictionary_word>fois</dictionary_word> <dictionary_word>encore</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>sera</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>peu</dictionary_word>, <dictionary_word>j</dictionary_word>’<dictionary_word>ébranlerai</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>cieux</dictionary_word> <insert_footnote /> <dictionary_word>et</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>terre</dictionary_word>, <dictionary_word>la</dictionary_word> <dictionary_word>mer</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>le</dictionary_word> continent.",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 2:7",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "7",
+            "text": "<dictionary_word>J</dictionary_word>’<dictionary_word>ébranlerai</dictionary_word> <dictionary_word>toutes</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>nations</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>trésors</dictionary_word> <insert_footnote /> <dictionary_word>de</dictionary_word> <dictionary_word>toutes</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>nations</dictionary_word> <dictionary_word>viendront</dictionary_word> ; <dictionary_word>et</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>remplirai</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>gloire</dictionary_word> <dictionary_word>cette</dictionary_word> <dictionary_word>maison</dictionary_word>, <dictionary_word>dit</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>des</dictionary_word> <dictionary_word>armées</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 2:8",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "8",
+            "text": "<dictionary_word>A</dictionary_word> <dictionary_word>moi</dictionary_word> l’<dictionary_word>argent</dictionary_word>, <dictionary_word>à</dictionary_word> <dictionary_word>moi</dictionary_word> l’<dictionary_word>or</dictionary_word>, — <dictionary_word>oracle</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>des</dictionary_word> <dictionary_word>armées</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 2:9",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "9",
+            "text": "<dictionary_word>Grande</dictionary_word> <dictionary_word>sera</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>gloire</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>cette</dictionary_word> <dictionary_word>maison</dictionary_word> ; <dictionary_word>la</dictionary_word> <dictionary_word>dernière</dictionary_word> <dictionary_word>plus</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>première</dictionary_word> <insert_footnote /> ; <dictionary_word>et</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>lieu</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>mettrai</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>paix</dictionary_word>, — <dictionary_word>oracle</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>des</dictionary_word> <dictionary_word>armées</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 2:10",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "10",
+            "text": "<dictionary_word>Le</dictionary_word> <dictionary_word>vingt-quatrième</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>neuvième</dictionary_word> <dictionary_word>mois</dictionary_word> <insert_footnote />, <dictionary_word>la</dictionary_word> <dictionary_word>deuxième</dictionary_word> <dictionary_word>année</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Darius</dictionary_word>, <dictionary_word>la</dictionary_word> <dictionary_word>parole</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>se</dictionary_word> <dictionary_word>fit</dictionary_word> <dictionary_word>entendre</dictionary_word> <dictionary_word>par</dictionary_word> <dictionary_word>l</dictionary_word>’intermédiaire d’<dictionary_word>Aggée</dictionary_word>, <dictionary_word>le</dictionary_word> <dictionary_word>prophète</dictionary_word>, <dictionary_word>en</dictionary_word> <dictionary_word>ces</dictionary_word> <dictionary_word>termes</dictionary_word> :",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 2:11",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "11",
+            "text": "<dictionary_word>Ainsi</dictionary_word> <dictionary_word>parle</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>des</dictionary_word> <dictionary_word>armées</dictionary_word> : <dictionary_word>Demande</dictionary_word> <dictionary_word>aux</dictionary_word> <dictionary_word>prêtres</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>décision</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>ces</dictionary_word> <dictionary_word>termes</dictionary_word> :",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 2:12",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "12",
+            "text": "<dictionary_word>Voici</dictionary_word> qu’<dictionary_word>un</dictionary_word> <dictionary_word>homme</dictionary_word> <dictionary_word>porte</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>pan</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>vêtement</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>viande</dictionary_word> <dictionary_word>consacrée</dictionary_word> ; <dictionary_word>il</dictionary_word> <dictionary_word>touche</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>pan</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>pain</dictionary_word>, <dictionary_word>un</dictionary_word> <dictionary_word>mets</dictionary_word> <dictionary_word>bouilli</dictionary_word>, <dictionary_word>du</dictionary_word> <dictionary_word>vin</dictionary_word>, <dictionary_word>de</dictionary_word> l’<dictionary_word>huile</dictionary_word>, <dictionary_word>ou</dictionary_word> <dictionary_word>tout</dictionary_word> <dictionary_word>autre</dictionary_word> <dictionary_word>aliment</dictionary_word> : sera-ce <dictionary_word>consacré</dictionary_word> ? <dictionary_word>Les</dictionary_word> <dictionary_word>prêtres</dictionary_word> <dictionary_word>répondirent</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>dirent</dictionary_word> : <dictionary_word>Non</dictionary_word> <insert_footnote />.",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 2:13",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "13",
+            "text": "— <dictionary_word>Et</dictionary_word> <dictionary_word>Aggée</dictionary_word> <dictionary_word>dit</dictionary_word> : <dictionary_word>si</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>homme</dictionary_word> <dictionary_word>souillé</dictionary_word> <dictionary_word>par</dictionary_word> <dictionary_word>le</dictionary_word> contact d’<dictionary_word>un</dictionary_word> <dictionary_word>mort</dictionary_word> <insert_footnote /> <dictionary_word>touche</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>toutes</dictionary_word> <dictionary_word>ces</dictionary_word> <dictionary_word>choses</dictionary_word>, seront-elles <dictionary_word>souillées</dictionary_word> ? <dictionary_word>Les</dictionary_word> <dictionary_word>prêtres</dictionary_word> <dictionary_word>répondirent</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>dirent</dictionary_word> : <dictionary_word>elles</dictionary_word> <dictionary_word>seront</dictionary_word> <dictionary_word>souillées</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 2:14",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "14",
+            "text": "— <dictionary_word>Alors</dictionary_word> <dictionary_word>Aggée</dictionary_word>, <dictionary_word>reprenant</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>parole</dictionary_word>, <dictionary_word>dit</dictionary_word> : \n<dictionary_word>Tel</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>peuple</dictionary_word>, <dictionary_word>telle</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>cette</dictionary_word> <dictionary_word>nation</dictionary_word> <dictionary_word>devant</dictionary_word> <dictionary_word>moi</dictionary_word>, — <dictionary_word>oracle</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> ; telles <dictionary_word>sont</dictionary_word> <dictionary_word>toutes</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>œuvres</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>leurs</dictionary_word> <dictionary_word>mains</dictionary_word> : <dictionary_word>ce</dictionary_word> qu’<dictionary_word>ils</dictionary_word> <dictionary_word>offrent</dictionary_word> <dictionary_word>là</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>souillé</dictionary_word>. <insert_footnote />",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 2:15",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "15",
+            "text": "<dictionary_word>Et</dictionary_word> <dictionary_word>maintenant</dictionary_word>, <dictionary_word>portez</dictionary_word> <dictionary_word>votre</dictionary_word> <dictionary_word>attention</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>ce</dictionary_word> jour-ci <dictionary_word>en</dictionary_word> <dictionary_word>arrière</dictionary_word>, <dictionary_word>avant</dictionary_word> qu’<dictionary_word>on</dictionary_word> n’<dictionary_word>eut</dictionary_word> <dictionary_word>encore</dictionary_word> <dictionary_word>mis</dictionary_word> <dictionary_word>pierre</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>pierre</dictionary_word>, <dictionary_word>au</dictionary_word> <dictionary_word>temple</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>. <insert_footnote />",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 2:16",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "16",
+            "text": "<dictionary_word>Alors</dictionary_word> <insert_footnote />, <dictionary_word>quand</dictionary_word> <dictionary_word>on</dictionary_word> <dictionary_word>venait</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>tas</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>vingt</dictionary_word> <dictionary_word>mesures</dictionary_word>, <dictionary_word>il</dictionary_word> n’<dictionary_word>y</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>avait</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>dix</dictionary_word> ; <dictionary_word>quand</dictionary_word> <dictionary_word>on</dictionary_word> <dictionary_word>venait</dictionary_word> <dictionary_word>au</dictionary_word> <dictionary_word>pressoir</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>y</dictionary_word> <dictionary_word>puiser</dictionary_word> <dictionary_word>cinquante</dictionary_word> <dictionary_word>mesures</dictionary_word>, <dictionary_word>il</dictionary_word> n’<dictionary_word>y</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>avait</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>vingt</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 2:17",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "17",
+            "text": "<dictionary_word>Je</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>ai</dictionary_word> <dictionary_word>frappés</dictionary_word> <dictionary_word>par</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>rouille</dictionary_word>, <dictionary_word>la</dictionary_word> <dictionary_word>nielle</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>grêle</dictionary_word>, <dictionary_word>j</dictionary_word>’<dictionary_word>ai</dictionary_word> <dictionary_word>frappé</dictionary_word> <dictionary_word>tout</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>travail</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>vos</dictionary_word> <dictionary_word>mains</dictionary_word> ; <dictionary_word>et</dictionary_word> <dictionary_word>vous</dictionary_word> n’<dictionary_word>êtes</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>revenus</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>moi</dictionary_word>, — <dictionary_word>oracle</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 2:18",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "18",
+            "text": "<dictionary_word>Portez</dictionary_word> <dictionary_word>donc</dictionary_word> <dictionary_word>votre</dictionary_word> <dictionary_word>attention</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>ce</dictionary_word> jour-ci <dictionary_word>en</dictionary_word> <dictionary_word>arrière</dictionary_word> ; <dictionary_word>depuis</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>vingt-quatrième</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>neuvième</dictionary_word> <dictionary_word>mois</dictionary_word> jusqu’<dictionary_word>à</dictionary_word> <dictionary_word>partir</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>où</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>été</dictionary_word> <dictionary_word>fondé</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>temple</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>portez</dictionary_word> <dictionary_word>votre</dictionary_word> <dictionary_word>attention</dictionary_word> !",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 2:19",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "19",
+            "text": "<dictionary_word>La</dictionary_word> <dictionary_word>semence</dictionary_word> était-elle <dictionary_word>encore</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>le</dictionary_word> grenier ? <dictionary_word>Même</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>vigne</dictionary_word>, <dictionary_word>le</dictionary_word> <dictionary_word>figuier</dictionary_word>, <dictionary_word>le</dictionary_word> <dictionary_word>grenadier</dictionary_word> <dictionary_word>et</dictionary_word> l’<dictionary_word>olivier</dictionary_word> n’<dictionary_word>ont</dictionary_word> <dictionary_word>rien</dictionary_word> <dictionary_word>produit</dictionary_word> : <dictionary_word>mais</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>partir</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>jour</dictionary_word>, <dictionary_word>je</dictionary_word> <dictionary_word>bénirai</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 2:20",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "20",
+            "text": "<dictionary_word>La</dictionary_word> <dictionary_word>parole</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>fut</dictionary_word> <dictionary_word>adressée</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>seconde</dictionary_word> <dictionary_word>fois</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>Aggée</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>vingt-quatrième</dictionary_word> <dictionary_word>jour</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>mois</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>ces</dictionary_word> <dictionary_word>termes</dictionary_word> :",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 2:21",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "21",
+            "text": "<dictionary_word>Parle</dictionary_word> <dictionary_word>ainsi</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>Zorobabel</dictionary_word>, <dictionary_word>gouverneur</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Juda</dictionary_word> : \n<dictionary_word>J</dictionary_word>’<dictionary_word>ébranlerai</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>cieux</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>terre</dictionary_word> ;",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 2:22",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "22",
+            "text": "<dictionary_word>je</dictionary_word> <dictionary_word>renverserai</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>trône</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>royaumes</dictionary_word>, <dictionary_word>je</dictionary_word> <dictionary_word>détruirai</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>puissance</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>royaumes</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>nations</dictionary_word> ; <dictionary_word>je</dictionary_word> <dictionary_word>renverserai</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>chars</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>ceux</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>montent</dictionary_word> ; <dictionary_word>les</dictionary_word> <dictionary_word>chevaux</dictionary_word> <dictionary_word>avec</dictionary_word> <dictionary_word>leurs</dictionary_word> <dictionary_word>cavaliers</dictionary_word> <dictionary_word>tomberont</dictionary_word>, <dictionary_word>par</dictionary_word> l’<dictionary_word>épée</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>uns</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>autres</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "HAG 2:23",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "23",
+            "text": "<dictionary_word>En</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>jour-là</dictionary_word>, — <dictionary_word>oracle</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>des</dictionary_word> <dictionary_word>armées</dictionary_word>, <dictionary_word>je</dictionary_word> <dictionary_word>te</dictionary_word> <dictionary_word>prendrai</dictionary_word>, <dictionary_word>Zorobabel</dictionary_word>, <dictionary_word>fils</dictionary_word> <dictionary_word>de</dictionary_word> Salathiel, <dictionary_word>mon</dictionary_word> <dictionary_word>serviteur</dictionary_word>, — <dictionary_word>oracle</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity>, <dictionary_word>et</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>ferai</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>toi</dictionary_word> <dictionary_word>comme</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>cachet</dictionary_word> <insert_footnote /> ; <dictionary_word>car</dictionary_word> <dictionary_word>je</dictionary_word> t’<dictionary_word>ai</dictionary_word> <dictionary_word>élu</dictionary_word>, — <dictionary_word>oracle</dictionary_word> <dictionary_word>de</dictionary_word> <name_of_deity><dictionary_word>Yahweh</dictionary_word></name_of_deity> <dictionary_word>des</dictionary_word> <dictionary_word>armées</dictionary_word>.",
+            "position": "left"
+        }
+    ],
+    "titles": [
+        {
+            "content": "1. <small_caps>Chap, i, 1-15 : Premier discours : exhortation a reprendre les travaux du temple. <small_caps> — Date et occasion du discours (i, 1-3). Le discours : les délais dans la construction du Temple expliquent les maux qui ont atteint le peuple (i, 4-11). Résultats obtenus : reprise des travaux (i, 12-15).",
+            "kind": "title3",
+            "chapter": "1",
+            "last_verse": "0"
+        },
+        {
+            "content": "2. <small_caps>Chap. ii, 1-9 : Deuxième discours : la gloire du nouveau temple. <small_caps> — Date (ii, 1). Humbles apparences (ii, 2, 3). Courage à tous (ii, 4, 5) ! La gloire du nouveau temple sera plus grande que celle de l’ancien (ii, 6-9).",
+            "kind": "title3",
+            "chapter": "2",
+            "last_verse": "0"
+        },
+        {
+            "content": "<small_caps>3. Chap. ii, 10-19. Troisième discours : causes des calamités récentes, promesse de bénédiction. <small_caps> — Le peuple impur (ii, 10-14) ; rien ne lui réussit (ii, 15-17). Les travaux du temple amèneront un changement (ii, 18, 19).",
+            "kind": "title3",
+            "chapter": "2",
+            "last_verse": "9"
+        },
+        {
+            "content": "<small_caps>4. Chap. ii, 20-23 : Quatrième discours : Protection divine assurée a Zorobabel. <small_caps>",
+            "kind": "title3",
+            "chapter": "2",
+            "last_verse": "19"
+        }
+    ],
+    "footnotes": [
+        {
+            "references": "1:1 ",
+            "references_chapter": "1",
+            "references_verse": "1",
+            "text": "I, 1. <italic>Darius</italic>, 521 à 486 av. J.-C. — <italic>Au sixième mois</italic> de l’année juive, nommé <italic>’élul</italic> (août-sept.). — <italic>Zorobabel</italic>, de la race royale de David, nommé <italic>pachah</italic>, c.-à-d. préfet ou <italic>gouverneur de Juda</italic> par le roi de Babylone. — <italic>Jésus</italic>, en hébr. <italic>Jehoschua, fils de Josédec</italic>, était le chef religieux de la petite colonie juive, comme Zorobabel en était le chef politique."
+        },
+        {
+            "references": "1:2 ",
+            "references_chapter": "1",
+            "references_verse": "2",
+            "text": "2. <italic>Le temps n’est pas venu</italic>, trop d’obstacles s’y opposent."
+        },
+        {
+            "references": "1:5 ",
+            "references_chapter": "1",
+            "references_verse": "5",
+            "text": "5. <italic>Considérez attentivement</italic> ; m. à m., <italic>appliquez votre cœur</italic>."
+        },
+        {
+            "references": "1:6 ",
+            "references_chapter": "1",
+            "references_verse": "6",
+            "text": "6. <italic>Recueilli peu</italic>. Au sixième mois, la récolte était faite, et l’on avait pu constater son insuffisance. — <italic>Le salarié</italic>… Locution proverbiale signifiant : Vous avez travaillé en vain, vous avez perdu votre peine."
+        },
+        {
+            "references": "1:10 ",
+            "references_chapter": "1",
+            "references_verse": "10",
+            "text": "10. <italic>C’est pourquoi les cieux vous ont retenu la rosée</italic> ; m. à m., <italic>c’est pourquoi sur vous les cieux se sont contenus sans rosée</italic>."
+        },
+        {
+            "references": "2:1 ",
+            "references_chapter": "2",
+            "references_verse": "1",
+            "text": "Le 21 du septième mois ( <italic>tischri</italic> ; avant l’exil, <italic>’étanîm</italic>) était le septième et dernier jour de la fête des Tabernacles (Lev 23,34 sv.)."
+        },
+        {
+            "references": "2:3 ",
+            "references_chapter": "2",
+            "references_verse": "3",
+            "text": "3. Dans l’état actuel des choses, il était impossible de donner au nouveau temple la magnificence du premier. De là sans doute le sentiment de tristesse et de découragement qui s’était répandu dans une grande partie de la communauté : comp. Esd 3,10 sv. Pour le dissiper, Dieu donne au peuple l’assurance que lui-même saura revêtir le nouveau sanctuaire d’une splendeur supérieure à celle de l’ancien. — <italic>Le survivant</italic> etc. ; il pouvait encore en rester, mais en fort petit nombre, le premier temple ayant été détruit l’an 588, plus de soixante-sept ans auparavant."
+        },
+        {
+            "references": "2:5 ",
+            "references_chapter": "2",
+            "references_verse": "5",
+            "text": "5. <italic>L’engagement</italic> de faire de vous mon peuple : particulier (Exo 19,5 sv.)."
+        },
+        {
+            "references": "2:6 ",
+            "references_chapter": "2",
+            "references_verse": "6",
+            "text": "<italic>Une fois encore j’ébranlerai</italic> : allusion à l’ébranlement qui eut lieu sur le Sinaï."
+        },
+        {
+            "references": "2:7 ",
+            "references_chapter": "2",
+            "references_verse": "7",
+            "text": "<italic>Les trésors</italic> (hébr. <italic>chémdàh</italic>), etc. ; les Gentils, à mesure qu’ils se convertiront, consacreront leurs richesses au vrai Dieu. Les LXX : τὰ ἐκλεκτὰ τῶν ἐθνῶν, ce que les Pères grecs entendent des païens dont les meilleurs viendront, se convertiront à Yahweh (S. Cyr. d’Alex.). Vulg. : <italic>le Désiré des nations</italic>, le Messie, viendra, entrera dans ce temple."
+        },
+        {
+            "references": "2:9 ",
+            "references_chapter": "2",
+            "references_verse": "9",
+            "text": "9. <italic>La dernière</italic> gloire sera <italic>plus grande</italic> que la première : c’est ainsi que traduisent les LXX."
+        },
+        {
+            "references": "2:10 ",
+            "references_chapter": "2",
+            "references_verse": "10",
+            "text": "10. <italic>Du neuvième mois</italic>, nommé <italic>Casleu</italic> (novembre-décembre)."
+        },
+        {
+            "references": "2:12 ",
+            "references_chapter": "2",
+            "references_verse": "12",
+            "text": "12. <italic>Non</italic> : comp. Lev 6,20 sv. Un fruit sain ne peut assainir les fruits gâtés qui l’entourent."
+        },
+        {
+            "references": "2:13 ",
+            "references_chapter": "2",
+            "references_verse": "13",
+            "text": "13. <italic>Le contact d’un mort</italic> entraînait une souillure légale des plus graves (Lev 22, 4 ; Nom 19,22 sv.). — <italic>Elles seront souillées</italic> : un fruit gâté corrompt tous ceux qui sont en contact avec lui."
+        },
+        {
+            "references": "2:14 ",
+            "references_chapter": "2",
+            "references_verse": "14",
+            "text": "14. Application. Le peuple est semblable à l’homme devenu impur par l’attouchement d’un cadavre ; tout ce qu’il fait est souillé."
+        },
+        {
+            "references": "2:15 ",
+            "references_chapter": "2",
+            "references_verse": "15",
+            "text": "15. Ce vers. nous reporte avant le premier discours d’Aggée. —<italic>En arrière</italic> ; litt., et plus haut."
+        },
+        {
+            "references": "2:16 ",
+            "references_chapter": "2",
+            "references_verse": "16",
+            "text": "16. <italic>Alors</italic> etc. ; m. à m., <italic>depuis qu’il leur arrive que, venant</italic> etc."
+        },
+        {
+            "references": "2:23 ",
+            "references_chapter": "2",
+            "references_verse": "23",
+            "text": "23. <italic>Comme un cachet</italic> : le cachet ou sceau a une grande importance chez les Orientaux : il atteste le droit du possesseur et certifie ses volontés. Dieu aura soin de Zorobabel comme d’une chose de grand prix ; il en fera l’instrument de ses volontés, l’agent fidèle de ses décrets envers son peuple et envers le monde entier, il s’appropriera comme son œuvre privilégiée l’œuvre de son serviteur."
+        }
+    ],
+    "cross_references": [],
+    "tables": []
+}

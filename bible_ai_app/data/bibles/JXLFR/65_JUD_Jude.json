@@ -1,0 +1,434 @@
+{
+  "id": 65,
+  "code": "JUD",
+  "name": "Jude",
+  "version": "JXLFR",
+  "version_fullname": "Nouveau Testament juxtalinéaire en français 2026 (Xenizo)",
+  "total_chapters": 1,
+  "chapters": {
+    "1": {
+      "3": {
+        "grec": "ἀγαπητοί ποιούμενος πᾶσαν σπουδὴν γράφειν ὑμῖν περὶ τῆς σωτηρίας κοινῆς ἡμῶν ἔσχον ἀνάγκην γράψαι ὑμῖν παρακαλῶν ἐπαγωνίζεσθαι τῇ πίστει παραδοθείσῃ ἅπαξ τοῖς ἁγίοις",
+        "francais": "Bien-aimés, ayant toute ardeur d’ écrire à-vous à-propos du salut commun de-nous, j’ai-eu une-nécessité d’écrire à-vous, vous exhortant à-combattre pour la foi ayant-été-transmise une-fois aux saints.",
+        "alignements": [
+          {
+            "grec": "ἀγαπητοί",
+            "francais": "Bien-aimés,"
+          },
+          {
+            "grec": "ποιούμενος πᾶσαν σπουδὴν",
+            "francais": "ayant toute ardeur"
+          },
+          {
+            "grec": "γράφειν ὑμῖν",
+            "francais": "d’ écrire à-vous"
+          },
+          {
+            "grec": "περὶ τῆς σωτηρίας κοινῆς ἡμῶν",
+            "francais": "à-propos du salut commun de-nous,"
+          },
+          {
+            "grec": "ἔσχον ἀνάγκην γράψαι ὑμῖν",
+            "francais": "j’ai-eu une-nécessité d’écrire à-vous,"
+          },
+          {
+            "grec": "παρακαλῶν ἐπαγωνίζεσθαι",
+            "francais": "vous exhortant à-combattre"
+          },
+          {
+            "grec": "τῇ πίστει",
+            "francais": "pour la foi"
+          },
+          {
+            "grec": "παραδοθείσῃ ἅπαξ",
+            "francais": "ayant-été-transmise une-fois"
+          },
+          {
+            "grec": "τοῖς ἁγίοις",
+            "francais": "aux saints."
+          }
+        ]
+      },
+      "4": {
+        "grec": "γάρ τινες ἄνθρωποι παρεισέδυσαν οἱ προγεγραμμένοι πάλαι εἰς τοῦτο τὸ κρίμα ἀσεβεῖς μετατιθέντες τὴν χάριτα τοῦ Θεοῦ ἡμῶν εἰς ἀσέλγειαν καὶ ἀρνούμενοι τὸν μόνον Δεσπότην καὶ Κύριον ἡμῶν Ἰησοῦν Χριστὸν",
+        "francais": "Car certains hommes se sont introduits discrètement des gens ayant-été-assignés depuis-longtemps pour ce jugement, impies, changeant la grâce du Dieu de-nous en dissolution, et reniant le seul Maître et Seigneur de-nous, Jésus Christ.",
+        "alignements": [
+          {
+            "grec": "γάρ τινες ἄνθρωποι",
+            "francais": "Car certains hommes"
+          },
+          {
+            "grec": "παρεισέδυσαν",
+            "francais": "se sont introduits discrètement"
+          },
+          {
+            "grec": "οἱ προγεγραμμένοι πάλαι",
+            "francais": "des gens ayant-été-assignés depuis-longtemps"
+          },
+          {
+            "grec": "εἰς τοῦτο τὸ κρίμα",
+            "francais": "pour ce jugement,"
+          },
+          {
+            "grec": "ἀσεβεῖς",
+            "francais": "impies,"
+          },
+          {
+            "grec": "μετατιθέντες",
+            "francais": "changeant"
+          },
+          {
+            "grec": "τὴν χάριτα τοῦ Θεοῦ ἡμῶν",
+            "francais": "la grâce du Dieu de-nous"
+          },
+          {
+            "grec": "εἰς ἀσέλγειαν",
+            "francais": "en dissolution,"
+          },
+          {
+            "grec": "καὶ ἀρνούμενοι",
+            "francais": "et reniant"
+          },
+          {
+            "grec": "τὸν μόνον Δεσπότην",
+            "francais": "le seul Maître"
+          },
+          {
+            "grec": "καὶ Κύριον ἡμῶν",
+            "francais": "et Seigneur de-nous,"
+          },
+          {
+            "grec": "Ἰησοῦν Χριστὸν",
+            "francais": "Jésus Christ."
+          }
+        ]
+      },
+      "5": {
+        "grec": "δὲ βούλομαι ὑμᾶς ὑπομνῆσαι ὑμᾶς εἰδότας ἅπαξ πάντα ὅτι Ἰησοῦς σώσας λαὸν ἐκ γῆς Αἰγύπτου ἀπώλεσεν τὸ δεύτερον τοὺς μὴ πιστεύσαντας τε",
+        "francais": "Et je-veux vous vous-souvenir, vous ayant-connu une-fois toutes-choses, que Jésus ayant-sauvé un-peuple hors-de la terre d’Égypte, détruisit la seconde-fois les humains n’ayant pas cru. Et je veux que vous vous souveniez",
+        "alignements": [
+          {
+            "grec": "δὲ βούλομαι ὑμᾶς ὑπομνῆσαι",
+            "francais": "Et je-veux vous vous-souvenir,"
+          },
+          {
+            "grec": "ὑμᾶς εἰδότας ἅπαξ πάντα",
+            "francais": "vous ayant-connu une-fois toutes-choses,"
+          },
+          {
+            "grec": "ὅτι Ἰησοῦς",
+            "francais": "que Jésus"
+          },
+          {
+            "grec": "σώσας λαὸν",
+            "francais": "ayant-sauvé un-peuple"
+          },
+          {
+            "grec": "ἐκ γῆς Αἰγύπτου",
+            "francais": "hors-de la terre d’Égypte,"
+          },
+          {
+            "grec": "ἀπώλεσεν τὸ δεύτερον",
+            "francais": "détruisit la seconde-fois"
+          },
+          {
+            "grec": "τοὺς",
+            "francais": "les humains"
+          },
+          {
+            "grec": "μὴ πιστεύσαντας",
+            "francais": "n’ayant pas cru."
+          },
+          {
+            "grec": "τε",
+            "francais": "Et je veux que vous vous souveniez"
+          }
+        ]
+      },
+      "8": {
+        "grec": "οὗτοι καὶ ἐνυπνιαζόμενοι ὁμοίως μέντοι μὲν μιαίνουσιν σάρκα δὲ ἀθετοῦσιν κυριότητα δὲ βλασφημοῦσιν δόξας",
+        "francais": "Ceux-ci aussi rêvant de-la-même-manière pourtant non-seulement entachent la chair, et rejettent toute seigneurie, et blasphèment les gloires.",
+        "alignements": [
+          {
+            "grec": "οὗτοι καὶ ἐνυπνιαζόμενοι",
+            "francais": "Ceux-ci aussi rêvant"
+          },
+          {
+            "grec": "ὁμοίως μέντοι",
+            "francais": "de-la-même-manière pourtant"
+          },
+          {
+            "grec": "μὲν μιαίνουσιν σάρκα",
+            "francais": "non-seulement entachent la chair,"
+          },
+          {
+            "grec": "δὲ ἀθετοῦσιν κυριότητα",
+            "francais": "et rejettent toute seigneurie,"
+          },
+          {
+            "grec": "δὲ βλασφημοῦσιν δόξας",
+            "francais": "et blasphèment les gloires."
+          }
+        ]
+      },
+      "9": {
+        "grec": "δὲ ὁ Μιχαὴλ ὁ ἀρχάγγελος ὅτε διακρινόμενος τῷ διαβόλῳ διελέγετο περὶ τοῦ σώματος Μωϋσέως οὐκ ἐτόλμησεν ἐπενεγκεῖν κρίσιν βλασφημίας ἀλλὰ εἶπεν Κύριος ἐπιτιμήσαι σοι",
+        "francais": "Et Mikaël l’ archange, quand contestant-avec le diable, discutait à-propos du corps de-Moïse, n’a pas osé porter un-jugement de-blasphème mais a-dit: «Que le Seigneur veuille-blâmer toi!»",
+        "alignements": [
+          {
+            "grec": "δὲ",
+            "francais": "Et"
+          },
+          {
+            "grec": "ὁ Μιχαὴλ ὁ ἀρχάγγελος",
+            "francais": "Mikaël l’ archange,"
+          },
+          {
+            "grec": "ὅτε διακρινόμενος τῷ διαβόλῳ",
+            "francais": "quand contestant-avec le diable,"
+          },
+          {
+            "grec": "διελέγετο",
+            "francais": "discutait"
+          },
+          {
+            "grec": "περὶ τοῦ σώματος Μωϋσέως",
+            "francais": "à-propos du corps de-Moïse,"
+          },
+          {
+            "grec": "οὐκ ἐτόλμησεν",
+            "francais": "n’a pas osé"
+          },
+          {
+            "grec": "ἐπενεγκεῖν κρίσιν βλασφημίας",
+            "francais": "porter un-jugement de-blasphème"
+          },
+          {
+            "grec": "ἀλλὰ εἶπεν",
+            "francais": "mais a-dit :"
+          },
+          {
+            "grec": "Κύριος",
+            "francais": "« Que le Seigneur"
+          },
+          {
+            "grec": "ἐπιτιμήσαι σοι",
+            "francais": "veuille-blâmer toi ! »"
+          }
+        ]
+      },
+      "10": {
+        "grec": "δὲ οὗτοι μὲν βλασφημοῦσιν ὅσα οὐκ οἴδασιν δὲ ὅσα ἐπίστανται φυσικῶς ὡς τὰ ζῷα ἄλογα φθείρονται ἐν τούτοις",
+        "francais": "Mais ceux-là d’un-côté blasphèment ce que ils ne savent pas, de-l’autre-côté ce-qu’ ils-connaissent naturellement comme les animaux n’ayant-pas-de-raison, ils sont ruinés dans ces-choses.",
+        "alignements": [
+          {
+            "grec": "δὲ οὗτοι",
+            "francais": "Mais ceux-là"
+          },
+          {
+            "grec": "μὲν βλασφημοῦσιν",
+            "francais": "d’un-côté blasphèment"
+          },
+          {
+            "grec": "ὅσα",
+            "francais": "ce que"
+          },
+          {
+            "grec": "οὐκ οἴδασιν",
+            "francais": "ils ne savent pas,"
+          },
+          {
+            "grec": "δὲ ὅσα ἐπίστανται",
+            "francais": "de-l’autre-côté ce-qu’ ils-connaissent"
+          },
+          {
+            "grec": "φυσικῶς",
+            "francais": "naturellement"
+          },
+          {
+            "grec": "ὡς τὰ ζῷα ἄλογα",
+            "francais": "comme les animaux n’ayant-pas-de-raison,"
+          },
+          {
+            "grec": "φθείρονται",
+            "francais": "ils sont ruinés"
+          },
+          {
+            "grec": "ἐν τούτοις",
+            "francais": "dans ces-choses."
+          }
+        ]
+      },
+      "11": {
+        "grec": "οὐαὶ αὐτοῖς ὅτι ἐπορεύθησαν τῇ ὁδῷ τοῦ Κάϊν καὶ ἐξεχύθησαν μισθοῦ τῇ πλάνῃ τοῦ Βαλαὰμ καὶ ἀπώλοντο τῇ ἀντιλογίᾳ τοῦ Κόρε οὗτοί εἰσιν",
+        "francais": "Hélas pour eux! Parce-qu’ ils-ont-avancé sur-la route de Caïn, et se-sont-livrés pour-un-salaire dans-l’ erreur de Balaam, et se-sont-ruinés dans-la révolte de Koré. Ceux-ci sont",
+        "alignements": [
+          {
+            "grec": "οὐαὶ",
+            "francais": "Hélas"
+          },
+          {
+            "grec": "αὐτοῖς",
+            "francais": "pour eux !"
+          },
+          {
+            "grec": "ὅτι ἐπορεύθησαν",
+            "francais": "Parce-qu’ ils-ont-avancé"
+          },
+          {
+            "grec": "τῇ ὁδῷ τοῦ Κάϊν",
+            "francais": "sur-la route de Caïn,"
+          },
+          {
+            "grec": "καὶ ἐξεχύθησαν μισθοῦ",
+            "francais": "et se-sont-livrés pour-un-salaire"
+          },
+          {
+            "grec": "τῇ πλάνῃ τοῦ Βαλαὰμ",
+            "francais": "dans-l’ erreur de Balaam,"
+          },
+          {
+            "grec": "καὶ ἀπώλοντο",
+            "francais": "et se-sont-ruinés"
+          },
+          {
+            "grec": "τῇ ἀντιλογίᾳ τοῦ Κόρε",
+            "francais": "dans-la révolte de Koré."
+          },
+          {
+            "grec": "οὗτοί εἰσιν",
+            "francais": "Ceux-ci sont"
+          }
+        ]
+      },
+      "16": {
+        "grec": "οὗτοί εἰσιν γογγυσταί μεμψίμοιροι πορευόμενοι κατὰ τὰς ἐπιθυμίας αὐτῶν καὶ τὸ στόμα αὐτῶν λαλεῖ ὑπέρογκα θαυμάζοντες πρόσωπα χάριν ὠφελίας δέ ὑμεῖς",
+        "francais": "Ceux-ci sont des-gens-qui-murmurent gémisseurs marchant selon les désirs d’eux et la bouche d’eux dit des-choses-excessives, des-gens-honorant des-personnes pour-raison de-profit. Mais vous,",
+        "alignements": [
+          {
+            "grec": "οὗτοί εἰσιν",
+            "francais": "Ceux-ci sont"
+          },
+          {
+            "grec": "γογγυσταί μεμψίμοιροι",
+            "francais": "des-gens-qui-murmurent gémisseurs"
+          },
+          {
+            "grec": "πορευόμενοι",
+            "francais": "marchant"
+          },
+          {
+            "grec": "κατὰ τὰς ἐπιθυμίας αὐτῶν",
+            "francais": "selon les désirs d’eux"
+          },
+          {
+            "grec": "καὶ τὸ στόμα αὐτῶν",
+            "francais": "et la bouche d’eux"
+          },
+          {
+            "grec": "λαλεῖ ὑπέρογκα",
+            "francais": "dit des-choses-excessives,"
+          },
+          {
+            "grec": "θαυμάζοντες πρόσωπα",
+            "francais": "des-gens-honorant des-personnes"
+          },
+          {
+            "grec": "χάριν ὠφελίας",
+            "francais": "pour-raison de-profit."
+          },
+          {
+            "grec": "δέ ὑμεῖς",
+            "francais": "Mais vous,"
+          }
+        ]
+      },
+      "19": {
+        "grec": "οὗτοί εἰσιν οἱ ἀποδιορίζοντες ψυχικοί μὴ ἔχοντες Πνεῦμα",
+        "francais": "Ceux-ci sont les gens-qui-divisent, sensuels, n’ayant pas l’ Esprit.",
+        "alignements": [
+          {
+            "grec": "οὗτοί εἰσιν",
+            "francais": "Ceux-ci sont"
+          },
+          {
+            "grec": "οἱ ἀποδιορίζοντες",
+            "francais": "les gens-qui-divisent,"
+          },
+          {
+            "grec": "ψυχικοί",
+            "francais": "sensuels,"
+          },
+          {
+            "grec": "μὴ ἔχοντες",
+            "francais": "n’ayant pas"
+          },
+          {
+            "grec": "Πνεῦμα",
+            "francais": "l’ Esprit."
+          }
+        ]
+      },
+      "20": {
+        "grec": "δέ ὑμεῖς ἀγαπητοί ἐποικοδομοῦντες ἑαυτοὺς τῇ πίστει ἁγιωτάτῃ ὑμῶν προσευχόμενοι ἐν Πνεύματι Ἁγίῳ",
+        "francais": "Mais vous, bien-aimés, édifiant vous-mêmes sur-la foi très-sainte de-vous, priant dans l’ Esprit Saint.",
+        "alignements": [
+          {
+            "grec": "δέ ὑμεῖς",
+            "francais": "Mais vous,"
+          },
+          {
+            "grec": "ἀγαπητοί",
+            "francais": "bien-aimés,"
+          },
+          {
+            "grec": "ἐποικοδομοῦντες ἑαυτοὺς",
+            "francais": "édifiant vous-mêmes"
+          },
+          {
+            "grec": "τῇ πίστει ἁγιωτάτῃ ὑμῶν",
+            "francais": "sur-la foi très-sainte de-vous,"
+          },
+          {
+            "grec": "προσευχόμενοι ἐν Πνεύματι Ἁγίῳ",
+            "francais": "priant dans l’ Esprit Saint."
+          }
+        ]
+      },
+      "21": {
+        "grec": "τηρήσατε ἑαυτοὺς ἐν ἀγάπῃ Θεοῦ προσδεχόμενοι τὸ ἔλεος τοῦ Κυρίου ἡμῶν Ἰησοῦ Χριστοῦ εἰς ζωὴν αἰώνιον καὶ ἐλεᾶτε",
+        "francais": "Gardez vous-mêmes dans l’amour de-Dieu, attendant la miséricorde du Seigneur de-nous Jésus Christ pour la-vie éternelle. Et soyez-miséricordieux-envers",
+        "alignements": [
+          {
+            "grec": "τηρήσατε ἑαυτοὺς",
+            "francais": "Gardez vous-mêmes"
+          },
+          {
+            "grec": "ἐν ἀγάπῃ Θεοῦ",
+            "francais": "dans l’amour de-Dieu,"
+          },
+          {
+            "grec": "προσδεχόμενοι",
+            "francais": "attendant"
+          },
+          {
+            "grec": "τὸ ἔλεος τοῦ Κυρίου ἡμῶν",
+            "francais": "la miséricorde du Seigneur de-nous"
+          },
+          {
+            "grec": "Ἰησοῦ Χριστοῦ",
+            "francais": "Jésus Christ"
+          },
+          {
+            "grec": "εἰς ζωὴν αἰώνιον",
+            "francais": "pour la-vie éternelle."
+          },
+          {
+            "grec": "καὶ ἐλεᾶτε",
+            "francais": "Et soyez-miséricordieux-envers"
+          }
+        ]
+      }
+    }
+  }
+}

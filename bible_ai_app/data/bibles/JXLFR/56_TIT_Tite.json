@@ -1,0 +1,458 @@
+{
+  "id": 56,
+  "code": "TIT",
+  "name": "Tite",
+  "version": "JXLFR",
+  "version_fullname": "Nouveau Testament juxtalinéaire en français 2026 (Xenizo)",
+  "total_chapters": 3,
+  "chapters": {
+    "1": {
+      "12": {
+        "grec": "τις ἐξ αὐτῶν προφήτης ἴδιος αὐτῶν εἶπέν Κρῆτες ἀεὶ ψεῦσται κακὰ θηρία γαστέρες ἀργαί αὕτη ἡ μαρτυρία",
+        "francais": "Un parmi eux, prophète particulier d’eux, a dit: «Crétois toujours menteurs, méchantes bêtes, ventres paresseux». Ce témoignage",
+        "alignements": [
+          {
+            "grec": "τις ἐξ αὐτῶν",
+            "francais": "Un parmi eux,"
+          },
+          {
+            "grec": "προφήτης ἴδιος αὐτῶν",
+            "francais": "prophète particulier d’eux,"
+          },
+          {
+            "grec": "εἶπέν",
+            "francais": "a dit :"
+          },
+          {
+            "grec": "Κρῆτες ἀεὶ ψεῦσται",
+            "francais": "« Crétois toujours menteurs,"
+          },
+          {
+            "grec": "κακὰ θηρία",
+            "francais": "méchantes bêtes,"
+          },
+          {
+            "grec": "γαστέρες ἀργαί",
+            "francais": "ventres paresseux »."
+          },
+          {
+            "grec": "αὕτη ἡ μαρτυρία",
+            "francais": "Ce témoignage"
+          }
+        ]
+      },
+      "15": {
+        "grec": "πάντα καθαρὰ τοῖς καθαροῖς δὲ τοῖς μεμιαμμένοις καὶ ἀπίστοις οὐδὲν καθαρόν ἀλλὰ καὶ ὁ νοῦς καὶ ἡ συνείδησις αὐτῶν μεμίανται",
+        "francais": "Toutes-choses sont pures pour-les personnes pures, mais pour-les personnes souillées et infidèles, rien n’est pur; mais et l’ esprit et la conscience d’eux sont souillés.",
+        "alignements": [
+          {
+            "grec": "πάντα καθαρὰ",
+            "francais": "Toutes-choses sont pures"
+          },
+          {
+            "grec": "τοῖς καθαροῖς",
+            "francais": "pour-les personnes pures,"
+          },
+          {
+            "grec": "δὲ τοῖς μεμιαμμένοις καὶ ἀπίστοις",
+            "francais": "mais pour-les personnes souillées et infidèles,"
+          },
+          {
+            "grec": "οὐδὲν καθαρόν",
+            "francais": "rien n’est pur ;"
+          },
+          {
+            "grec": "ἀλλὰ",
+            "francais": "mais"
+          },
+          {
+            "grec": "καὶ ὁ νοῦς",
+            "francais": "et l’ esprit"
+          },
+          {
+            "grec": "καὶ ἡ συνείδησις αὐτῶν",
+            "francais": "et la conscience d’eux"
+          },
+          {
+            "grec": "μεμίανται",
+            "francais": "sont souillés."
+          }
+        ]
+      },
+      "16": {
+        "grec": "ὁμολογοῦσιν εἰδέναι Θεὸν δὲ ἀρνοῦνται τοῖς ἔργοις ὄντες βδελυκτοὶ καὶ ἀπειθεῖς καὶ ἀδόκιμοι πρὸς πᾶν ἔργον ἀγαθὸν",
+        "francais": "Ils-confessent connaître Dieu mais ils-renient Dieu par-leurs œuvres étant odieux et rebelles, et disqualifiés pour toute œuvre bonne.",
+        "alignements": [
+          {
+            "grec": "ὁμολογοῦσιν εἰδέναι Θεὸν",
+            "francais": "Ils-confessent connaître Dieu"
+          },
+          {
+            "grec": "δὲ ἀρνοῦνται τοῖς ἔργοις",
+            "francais": "mais ils-renient Dieu par-leurs œuvres"
+          },
+          {
+            "grec": "ὄντες βδελυκτοὶ καὶ ἀπειθεῖς",
+            "francais": "étant odieux et rebelles,"
+          },
+          {
+            "grec": "καὶ ἀδόκιμοι πρὸς πᾶν ἔργον ἀγαθὸν",
+            "francais": "et disqualifiés pour toute œuvre bonne."
+          }
+        ]
+      }
+    },
+    "2": {
+      "1": {
+        "grec": "δὲ σὺ λάλει ἃ πρέπει τῇ διδασκαλίᾳ ὑγιαινούσῃ",
+        "francais": "Or toi dis ce-qui convient à-l’ enseignement étant-sain.",
+        "alignements": [
+          {
+            "grec": "δὲ σὺ",
+            "francais": "Or toi"
+          },
+          {
+            "grec": "λάλει ἃ πρέπει",
+            "francais": "dis ce-qui convient"
+          },
+          {
+            "grec": "τῇ διδασκαλίᾳ ὑγιαινούσῃ",
+            "francais": "à-l’ enseignement étant-sain."
+          }
+        ]
+      },
+      "2": {
+        "grec": "πρεσβύτας εἶναι νηφαλίους σεμνούς σώφρονας ὑγιαίνοντας τῇ πίστει τῇ ἀγάπῃ τῇ ὑπομονῇ πρεσβύτιδας",
+        "francais": "Dis aux anciens d’ être sobres, sérieux, modérés, étant-sains dans-la foi, dans-l’ amour, dans-la patience. Dis aux femmes-âgées",
+        "alignements": [
+          {
+            "grec": "πρεσβύτας εἶναι",
+            "francais": "Dis aux anciens d’ être"
+          },
+          {
+            "grec": "νηφαλίους",
+            "francais": "sobres,"
+          },
+          {
+            "grec": "σεμνούς",
+            "francais": "sérieux,"
+          },
+          {
+            "grec": "σώφρονας",
+            "francais": "modérés,"
+          },
+          {
+            "grec": "ὑγιαίνοντας τῇ πίστει",
+            "francais": "étant-sains dans-la foi,"
+          },
+          {
+            "grec": "τῇ ἀγάπῃ",
+            "francais": "dans-l’ amour,"
+          },
+          {
+            "grec": "τῇ ὑπομονῇ",
+            "francais": "dans-la patience."
+          },
+          {
+            "grec": "πρεσβύτιδας",
+            "francais": "Dis aux femmes-âgées"
+          }
+        ]
+      },
+      "15": {
+        "grec": "λάλει ταῦτα καὶ παρακάλει καὶ ἔλεγχε μετὰ πάσης ἐπιταγῆς μηδείς περιφρονείτω σου",
+        "francais": "Dis ces-choses, et exhorte, et réfute, avec toute autorité. Que personne ne méprise toi.",
+        "alignements": [
+          {
+            "grec": "λάλει ταῦτα",
+            "francais": "Dis ces-choses,"
+          },
+          {
+            "grec": "καὶ παρακάλει",
+            "francais": "et exhorte,"
+          },
+          {
+            "grec": "καὶ ἔλεγχε",
+            "francais": "et réfute,"
+          },
+          {
+            "grec": "μετὰ πάσης ἐπιταγῆς",
+            "francais": "avec toute autorité."
+          },
+          {
+            "grec": "μηδείς περιφρονείτω",
+            "francais": "Que personne ne méprise"
+          },
+          {
+            "grec": "σου",
+            "francais": "toi."
+          }
+        ]
+      }
+    },
+    "3": {
+      "3": {
+        "grec": "γάρ ἡμεῖς καὶ ποτε ἦμεν ἀνόητοι ἀπειθεῖς πλανώμενοι δουλεύοντες ἐπιθυμίαις καὶ ἡδοναῖς ποικίλαις διάγοντες ἐν κακίᾳ καὶ φθόνῳ στυγητοί μισοῦντες ἀλλήλους δὲ ὅτε",
+        "francais": "Car nous aussi autrefois nous-étions insensés, désobéissants, perdus, étant-esclaves de-désirs et de-plaisirs variés, nous-comportant dans la-méchanceté et l’envie, odieux, haïssant les-uns-les-autres. Mais quand",
+        "alignements": [
+          {
+            "grec": "γάρ ἡμεῖς καὶ",
+            "francais": "Car nous aussi"
+          },
+          {
+            "grec": "ποτε ἦμεν",
+            "francais": "autrefois nous-étions"
+          },
+          {
+            "grec": "ἀνόητοι",
+            "francais": "insensés,"
+          },
+          {
+            "grec": "ἀπειθεῖς",
+            "francais": "désobéissants,"
+          },
+          {
+            "grec": "πλανώμενοι",
+            "francais": "perdus,"
+          },
+          {
+            "grec": "δουλεύοντες ἐπιθυμίαις καὶ ἡδοναῖς ποικίλαις",
+            "francais": "étant-esclaves de-désirs et de-plaisirs variés,"
+          },
+          {
+            "grec": "διάγοντες ἐν κακίᾳ καὶ φθόνῳ",
+            "francais": "nous-comportant dans la-méchanceté et l’envie,"
+          },
+          {
+            "grec": "στυγητοί",
+            "francais": "odieux,"
+          },
+          {
+            "grec": "μισοῦντες ἀλλήλους",
+            "francais": "haïssant les-uns-les-autres."
+          },
+          {
+            "grec": "δὲ ὅτε",
+            "francais": "Mais quand"
+          }
+        ]
+      },
+      "8": {
+        "grec": "ὁ λόγος πιστὸς καὶ βούλομαί σε διαβεβαιοῦσθαι περὶ τούτων ἵνα οἱ πεπιστευκότες Θεῷ φροντίζωσιν προΐστασθαι ἔργων καλῶν ταῦτά ἐστιν καλὰ καὶ ὠφέλιμα τοῖς ἀνθρώποις",
+        "francais": "La parole est fiable, et je-veux toi être-nettement-affirmatif à-propos-de ces-choses afin que les humains ayant-mis-leur-confiance en-Dieu se préoccupent d’exceller-en œuvres bonnes. Ces-choses sont belles et utiles aux hommes.",
+        "alignements": [
+          {
+            "grec": "ὁ λόγος πιστὸς",
+            "francais": "La parole est fiable,"
+          },
+          {
+            "grec": "καὶ βούλομαί σε διαβεβαιοῦσθαι",
+            "francais": "et je-veux toi être-nettement-affirmatif"
+          },
+          {
+            "grec": "περὶ τούτων",
+            "francais": "à-propos-de ces-choses"
+          },
+          {
+            "grec": "ἵνα",
+            "francais": "afin que"
+          },
+          {
+            "grec": "οἱ πεπιστευκότες Θεῷ",
+            "francais": "les humains ayant-mis-leur-confiance en-Dieu"
+          },
+          {
+            "grec": "φροντίζωσιν",
+            "francais": "se préoccupent"
+          },
+          {
+            "grec": "προΐστασθαι ἔργων καλῶν",
+            "francais": "d’exceller-en œuvres bonnes."
+          },
+          {
+            "grec": "ταῦτά ἐστιν καλὰ",
+            "francais": "Ces-choses sont belles"
+          },
+          {
+            "grec": "καὶ ὠφέλιμα τοῖς ἀνθρώποις",
+            "francais": "et utiles aux hommes."
+          }
+        ]
+      },
+      "9": {
+        "grec": "δὲ περιΐστασο ζητήσεις μωρὰς καὶ γενεαλογίας καὶ ἔρεις καὶ μάχας νομικὰς γὰρ εἰσὶν ἀνωφελεῖς καὶ μάταιοι παραιτοῦ ἄνθρωπον αἱρετικὸν",
+        "francais": "Mais détourne-toi des-recherches folles, et des-généalogies, et des-querelles, et des-disputes à-propos-de-la-loi, car elles-sont inutiles et creuses. Congédie l’homme sectaire",
+        "alignements": [
+          {
+            "grec": "δὲ περιΐστασο",
+            "francais": "Mais détourne-toi"
+          },
+          {
+            "grec": "ζητήσεις μωρὰς",
+            "francais": "des-recherches folles,"
+          },
+          {
+            "grec": "καὶ γενεαλογίας",
+            "francais": "et des-généalogies,"
+          },
+          {
+            "grec": "καὶ ἔρεις",
+            "francais": "et des-querelles,"
+          },
+          {
+            "grec": "καὶ μάχας νομικὰς",
+            "francais": "et des-disputes à-propos-de-la-loi,"
+          },
+          {
+            "grec": "γὰρ εἰσὶν ἀνωφελεῖς καὶ μάταιοι",
+            "francais": "car elles-sont inutiles et creuses."
+          },
+          {
+            "grec": "παραιτοῦ ἄνθρωπον αἱρετικὸν",
+            "francais": "Congédie l’homme sectaire"
+          }
+        ]
+      },
+      "12": {
+        "grec": "ὅταν πέμψω Ἀρτεμᾶν ἢ Τυχικόν πρὸς σὲ σπούδασον ἐλθεῖν πρός με εἰς Νικόπολιν γὰρ κέκρικα παραχειμάσαι ἐκεῖ",
+        "francais": "Quand j’enverrai Artémas ou Tychique vers toi, hâte-toi de-venir vers moi à Nicopolis; car j’ai-décidé de-passer-l’hiver là.",
+        "alignements": [
+          {
+            "grec": "ὅταν πέμψω",
+            "francais": "Quand j’enverrai"
+          },
+          {
+            "grec": "Ἀρτεμᾶν ἢ Τυχικόν",
+            "francais": "Artémas ou Tychique"
+          },
+          {
+            "grec": "πρὸς σὲ",
+            "francais": "vers toi,"
+          },
+          {
+            "grec": "σπούδασον ἐλθεῖν",
+            "francais": "hâte-toi de-venir"
+          },
+          {
+            "grec": "πρός με",
+            "francais": "vers moi"
+          },
+          {
+            "grec": "εἰς Νικόπολιν",
+            "francais": "à Nicopolis ;"
+          },
+          {
+            "grec": "γὰρ κέκρικα",
+            "francais": "car j’ai-décidé"
+          },
+          {
+            "grec": "παραχειμάσαι ἐκεῖ",
+            "francais": "de-passer-l’hiver là."
+          }
+        ]
+      },
+      "13": {
+        "grec": "πρόπεμψον σπουδαίως Ζηνᾶν τὸν νομικὸν καὶ Ἀπολλῶν ἵνα μηδὲν λείπῃ αὐτοῖς",
+        "francais": "Équipe-pour-son-voyage soigneusement Sénas le spécialiste-de-la-loi et Apollos, afin que rien ne manque à eux.",
+        "alignements": [
+          {
+            "grec": "πρόπεμψον σπουδαίως",
+            "francais": "Équipe-pour-son-voyage soigneusement"
+          },
+          {
+            "grec": "Ζηνᾶν τὸν νομικὸν",
+            "francais": "Sénas le spécialiste-de-la-loi"
+          },
+          {
+            "grec": "καὶ Ἀπολλῶν",
+            "francais": "et Apollos,"
+          },
+          {
+            "grec": "ἵνα",
+            "francais": "afin que"
+          },
+          {
+            "grec": "μηδὲν λείπῃ",
+            "francais": "rien ne manque"
+          },
+          {
+            "grec": "αὐτοῖς",
+            "francais": "à eux."
+          }
+        ]
+      },
+      "14": {
+        "grec": "δὲ οἱ ἡμέτεροι καὶ μανθανέτωσαν προΐστασθαι ἔργων καλῶν εἰς τὰς χρείας ἀναγκαίας ἵνα μὴ ὦσιν ἄκαρποι",
+        "francais": "Et les nôtres aussi qu’ils-apprennent à-exceller-en œuvres bonnes pour les besoins nécessaires, afin que ils ne soient pas sans porter du fruit.",
+        "alignements": [
+          {
+            "grec": "δὲ",
+            "francais": "Et"
+          },
+          {
+            "grec": "οἱ ἡμέτεροι καὶ",
+            "francais": "les nôtres aussi"
+          },
+          {
+            "grec": "μανθανέτωσαν",
+            "francais": "qu’ils-apprennent"
+          },
+          {
+            "grec": "προΐστασθαι ἔργων καλῶν",
+            "francais": "à-exceller-en œuvres bonnes"
+          },
+          {
+            "grec": "εἰς τὰς χρείας ἀναγκαίας",
+            "francais": "pour les besoins nécessaires,"
+          },
+          {
+            "grec": "ἵνα",
+            "francais": "afin que"
+          },
+          {
+            "grec": "μὴ ὦσιν",
+            "francais": "ils ne soient pas"
+          },
+          {
+            "grec": "ἄκαρποι",
+            "francais": "sans porter du fruit."
+          }
+        ]
+      },
+      "15": {
+        "grec": "πάντες οἱ μετ’ ἐμοῦ ἀσπάζονταί σε ἄσπασαι τοὺς φιλοῦντας ἡμᾶς ἐν πίστει ἡ χάρις μετὰ ὑμῶν πάντων",
+        "francais": "Tous les frères et sœurs étant avec moi embrassent toi. Embrasse les frères et sœurs aimant nous dans la-foi. La grâce soit avec vous tous.",
+        "alignements": [
+          {
+            "grec": "πάντες οἱ μετ’ ἐμοῦ",
+            "francais": "Tous les frères et sœurs étant avec moi"
+          },
+          {
+            "grec": "ἀσπάζονταί σε",
+            "francais": "embrassent toi."
+          },
+          {
+            "grec": "ἄσπασαι",
+            "francais": "Embrasse"
+          },
+          {
+            "grec": "τοὺς φιλοῦντας ἡμᾶς",
+            "francais": "les frères et sœurs aimant nous"
+          },
+          {
+            "grec": "ἐν πίστει",
+            "francais": "dans la-foi."
+          },
+          {
+            "grec": "ἡ χάρις",
+            "francais": "La grâce soit"
+          },
+          {
+            "grec": "μετὰ ὑμῶν πάντων",
+            "francais": "avec vous tous."
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,1454 @@
+{
+  "id": 50,
+  "code": "PHP",
+  "name": "Philippiens",
+  "version": "JXLFR",
+  "version_fullname": "Nouveau Testament juxtalinéaire en français 2026 (Xenizo)",
+  "total_chapters": 4,
+  "chapters": {
+    "1": {
+      "8": {
+        "grec": "γάρ ὁ Θεός μάρτυς μου ὡς ἐπιποθῶ ὑμᾶς πάντας ἐν σπλάγχνοις Χριστοῦ Ἰησοῦ καὶ προσεύχομαι τοῦτο",
+        "francais": "Car Dieu est témoin de-moi, que j’aime grandement vous tous dans les entrailles du-Christ Jésus. Et je-prie cela,",
+        "alignements": [
+          {
+            "grec": "γάρ ὁ Θεός",
+            "francais": "Car Dieu"
+          },
+          {
+            "grec": "μάρτυς μου",
+            "francais": "est témoin de-moi,"
+          },
+          {
+            "grec": "ὡς",
+            "francais": "que"
+          },
+          {
+            "grec": "ἐπιποθῶ",
+            "francais": "j’aime grandement"
+          },
+          {
+            "grec": "ὑμᾶς πάντας",
+            "francais": "vous tous"
+          },
+          {
+            "grec": "ἐν σπλάγχνοις",
+            "francais": "dans les entrailles"
+          },
+          {
+            "grec": "Χριστοῦ Ἰησοῦ",
+            "francais": "du-Christ Jésus."
+          },
+          {
+            "grec": "καὶ προσεύχομαι τοῦτο",
+            "francais": "Et je-prie cela,"
+          }
+        ]
+      },
+      "15": {
+        "grec": "καὶ τινὲς μὲν κηρύσσουσιν τὸν Χριστὸν διὰ φθόνον καὶ ἔριν καὶ τινὲς δὲ δι’ εὐδοκίαν οἱ μὲν",
+        "francais": "Et plusieurs certes proclament le Christ par jalousie et rivalité, et d’autres pourtant par bonne-intention. Les premiers certes",
+        "alignements": [
+          {
+            "grec": "καὶ τινὲς μὲν",
+            "francais": "Et plusieurs certes"
+          },
+          {
+            "grec": "κηρύσσουσιν τὸν Χριστὸν",
+            "francais": "proclament le Christ"
+          },
+          {
+            "grec": "διὰ φθόνον καὶ ἔριν",
+            "francais": "par jalousie et rivalité,"
+          },
+          {
+            "grec": "καὶ τινὲς δὲ",
+            "francais": "et d’autres pourtant"
+          },
+          {
+            "grec": "δι’ εὐδοκίαν",
+            "francais": "par bonne-intention."
+          },
+          {
+            "grec": "οἱ μὲν",
+            "francais": "Les premiers certes"
+          }
+        ]
+      },
+      "18": {
+        "grec": "τί γάρ πλὴν ὅτι παντὶ τρόπῳ εἴτε προφάσει εἴτε ἀληθείᾳ Χριστὸς καταγγέλλεται καὶ ἐν τούτῳ χαίρω ἀλλὰ καὶ χαρήσομαι γὰρ οἶδα ὅτι",
+        "francais": "Quoi en-effet? Seulement, que de-toute manière, soit par-prétexte, soit par-vérité, Christ est-proclamé-ouvertement et en cela je-me-réjouis, mais encore je me réjouirai. Car je-sais que",
+        "alignements": [
+          {
+            "grec": "τί γάρ",
+            "francais": "Quoi en-effet ?"
+          },
+          {
+            "grec": "πλὴν ὅτι",
+            "francais": "Seulement, que"
+          },
+          {
+            "grec": "παντὶ τρόπῳ",
+            "francais": "de-toute manière,"
+          },
+          {
+            "grec": "εἴτε προφάσει εἴτε ἀληθείᾳ",
+            "francais": "soit par-prétexte, soit par-vérité,"
+          },
+          {
+            "grec": "Χριστὸς καταγγέλλεται",
+            "francais": "Christ est-proclamé-ouvertement"
+          },
+          {
+            "grec": "καὶ ἐν τούτῳ χαίρω",
+            "francais": "et en cela je-me-réjouis,"
+          },
+          {
+            "grec": "ἀλλὰ καὶ",
+            "francais": "mais encore"
+          },
+          {
+            "grec": "χαρήσομαι",
+            "francais": "je me réjouirai."
+          },
+          {
+            "grec": "γὰρ οἶδα ὅτι",
+            "francais": "Car je-sais que"
+          }
+        ]
+      },
+      "21": {
+        "grec": "γὰρ ἐμοὶ τὸ ζῆν Χριστὸς καὶ τὸ ἀποθανεῖν κέρδος",
+        "francais": "Car pour-moi le fait-de-vivre c’est Christ, et le fait-de-mourir c’est un-gain.",
+        "alignements": [
+          {
+            "grec": "γὰρ ἐμοὶ",
+            "francais": "Car pour-moi"
+          },
+          {
+            "grec": "τὸ ζῆν Χριστὸς",
+            "francais": "le fait-de-vivre c’est Christ,"
+          },
+          {
+            "grec": "καὶ τὸ ἀποθανεῖν κέρδος",
+            "francais": "et le fait-de-mourir c’est un-gain."
+          }
+        ]
+      },
+      "22": {
+        "grec": "δὲ εἰ τὸ ζῆν ἐν σαρκί τοῦτό μοι καρπὸς ἔργου καὶ τί αἱρήσομαι οὐ γνωρίζω δὲ",
+        "francais": "Cependant si le fait-de-vivre dans la-chair, alors cela sera pour-moi du fruit du travail. Et ce-que je-préfèrerai je ne sais pas. En fait,",
+        "alignements": [
+          {
+            "grec": "δὲ",
+            "francais": "Cependant"
+          },
+          {
+            "grec": "εἰ",
+            "francais": "si"
+          },
+          {
+            "grec": "τὸ ζῆν ἐν σαρκί",
+            "francais": "le fait-de-vivre dans la-chair,"
+          },
+          {
+            "grec": "τοῦτό μοι",
+            "francais": "alors cela sera pour-moi"
+          },
+          {
+            "grec": "καρπὸς ἔργου",
+            "francais": "du fruit du travail."
+          },
+          {
+            "grec": "καὶ τί αἱρήσομαι",
+            "francais": "Et ce-que je-préfèrerai"
+          },
+          {
+            "grec": "οὐ γνωρίζω",
+            "francais": "je ne sais pas."
+          },
+          {
+            "grec": "δὲ",
+            "francais": "En fait,"
+          }
+        ]
+      }
+    },
+    "2": {
+      "12": {
+        "grec": "ὥστε ἀγαπητοί μου καθὼς ὑπηκούσατε πάντοτε κατεργάζεσθε τὴν σωτηρίαν ἑαυτῶν μετὰ φόβου καὶ τρόμου μὴ μόνον ὡς ἐν τῇ παρουσίᾳ μου ἀλλὰ νῦν πολλῷ μᾶλλον ἐν τῇ ἀπουσίᾳ μου",
+        "francais": "Ainsi, bien-aimés de-moi, comme vous-avez-obéi toujours, continuez-à-travailler le salut de-vous-mêmes, avec crainte et tremblement, non seulement comme en la présence de-moi, mais maintenant beaucoup plus en l’ absence de-moi.",
+        "alignements": [
+          {
+            "grec": "ὥστε",
+            "francais": "Ainsi,"
+          },
+          {
+            "grec": "ἀγαπητοί μου",
+            "francais": "bien-aimés de-moi,"
+          },
+          {
+            "grec": "καθὼς ὑπηκούσατε πάντοτε",
+            "francais": "comme vous-avez-obéi toujours,"
+          },
+          {
+            "grec": "κατεργάζεσθε",
+            "francais": "continuez-à-travailler"
+          },
+          {
+            "grec": "τὴν σωτηρίαν ἑαυτῶν",
+            "francais": "le salut de-vous-mêmes,"
+          },
+          {
+            "grec": "μετὰ φόβου καὶ τρόμου",
+            "francais": "avec crainte et tremblement,"
+          },
+          {
+            "grec": "μὴ μόνον",
+            "francais": "non seulement"
+          },
+          {
+            "grec": "ὡς ἐν τῇ παρουσίᾳ μου",
+            "francais": "comme en la présence de-moi,"
+          },
+          {
+            "grec": "ἀλλὰ νῦν",
+            "francais": "mais maintenant"
+          },
+          {
+            "grec": "πολλῷ μᾶλλον",
+            "francais": "beaucoup plus"
+          },
+          {
+            "grec": "ἐν τῇ ἀπουσίᾳ μου",
+            "francais": "en l’ absence de-moi."
+          }
+        ]
+      },
+      "13": {
+        "grec": "γάρ Θεὸς ἐστιν ὁ ἐνεργῶν καὶ τὸ θέλειν καὶ τὸ ἐνεργεῖν ἐν ὑμῖν ὑπὲρ τῆς εὐδοκίας ποιεῖτε πάντα",
+        "francais": "Car Dieu est celui mettant-en-œuvre et le fait-de-vouloir, et le fait-d’être-à-l’œuvre, en vous, selon le plaisir de lui. Faites toutes-choses",
+        "alignements": [
+          {
+            "grec": "γάρ Θεὸς ἐστιν",
+            "francais": "Car Dieu est"
+          },
+          {
+            "grec": "ὁ ἐνεργῶν",
+            "francais": "celui mettant-en-œuvre"
+          },
+          {
+            "grec": "καὶ τὸ θέλειν",
+            "francais": "et le fait-de-vouloir,"
+          },
+          {
+            "grec": "καὶ τὸ ἐνεργεῖν",
+            "francais": "et le fait-d’être-à-l’œuvre,"
+          },
+          {
+            "grec": "ἐν ὑμῖν",
+            "francais": "en vous,"
+          },
+          {
+            "grec": "ὑπὲρ τῆς εὐδοκίας",
+            "francais": "selon le plaisir de lui."
+          },
+          {
+            "grec": "ποιεῖτε πάντα",
+            "francais": "Faites toutes-choses"
+          }
+        ]
+      },
+      "18": {
+        "grec": "δὲ ὑμεῖς καὶ χαίρετε τὸ αὐτὸ καὶ συνχαίρετέ μοι",
+        "francais": "Et vous aussi réjouissez-vous de-la même-manière et réjouissez-vous-avec moi.",
+        "alignements": [
+          {
+            "grec": "δὲ",
+            "francais": "Et"
+          },
+          {
+            "grec": "ὑμεῖς καὶ",
+            "francais": "vous aussi"
+          },
+          {
+            "grec": "χαίρετε τὸ αὐτὸ",
+            "francais": "réjouissez-vous de-la même-manière"
+          },
+          {
+            "grec": "καὶ συνχαίρετέ μοι",
+            "francais": "et réjouissez-vous-avec moi."
+          }
+        ]
+      },
+      "19": {
+        "grec": "δὲ ἐλπίζω ἐν Κυρίῳ Ἰησοῦ πέμψαι ταχέως ὑμῖν Τιμόθεον ἵνα κἀγὼ εὐψυχῶ γνοὺς τὰ περὶ ὑμῶν",
+        "francais": "Et j’espère dans le-Seigneur Jésus, envoyer bientôt à-vous Timothée, afin que moi aussi je sois rassuré apprenant les nouvelles au-sujet-de vous.",
+        "alignements": [
+          {
+            "grec": "δὲ ἐλπίζω",
+            "francais": "Et j’espère"
+          },
+          {
+            "grec": "ἐν Κυρίῳ Ἰησοῦ",
+            "francais": "dans le-Seigneur Jésus,"
+          },
+          {
+            "grec": "πέμψαι ταχέως ὑμῖν Τιμόθεον",
+            "francais": "envoyer bientôt à-vous Timothée,"
+          },
+          {
+            "grec": "ἵνα",
+            "francais": "afin que"
+          },
+          {
+            "grec": "κἀγὼ",
+            "francais": "moi aussi"
+          },
+          {
+            "grec": "εὐψυχῶ",
+            "francais": "je sois rassuré"
+          },
+          {
+            "grec": "γνοὺς",
+            "francais": "apprenant"
+          },
+          {
+            "grec": "τὰ περὶ ὑμῶν",
+            "francais": "les nouvelles au-sujet-de vous."
+          }
+        ]
+      },
+      "20": {
+        "grec": "γὰρ ἔχω οὐδένα ἰσόψυχον ὅστις μεριμνήσει γνησίως τὰ περὶ ὑμῶν",
+        "francais": "Car je n’ai personne ayant les mêmes sentiments, qui s’inquiétera fidèlement des nouvelles au-sujet-de vous.",
+        "alignements": [
+          {
+            "grec": "γὰρ",
+            "francais": "Car"
+          },
+          {
+            "grec": "ἔχω οὐδένα",
+            "francais": "je n’ai personne"
+          },
+          {
+            "grec": "ἰσόψυχον",
+            "francais": "ayant les mêmes sentiments,"
+          },
+          {
+            "grec": "ὅστις",
+            "francais": "qui"
+          },
+          {
+            "grec": "μεριμνήσει γνησίως",
+            "francais": "s’inquiétera fidèlement"
+          },
+          {
+            "grec": "τὰ περὶ ὑμῶν",
+            "francais": "des nouvelles au-sujet-de vous."
+          }
+        ]
+      },
+      "21": {
+        "grec": "γὰρ οἱ πάντες ζητοῦσιν τὰ ἑαυτῶν οὐ τὰ Ἰησοῦ Χριστοῦ",
+        "francais": "En effet les tous recherchent les-choses d’eux-mêmes, non les-choses de-Jésus Christ.",
+        "alignements": [
+          {
+            "grec": "γὰρ",
+            "francais": "En effet"
+          },
+          {
+            "grec": "οἱ πάντες",
+            "francais": "les tous"
+          },
+          {
+            "grec": "ζητοῦσιν τὰ ἑαυτῶν",
+            "francais": "recherchent les-choses d’eux-mêmes,"
+          },
+          {
+            "grec": "οὐ τὰ Ἰησοῦ Χριστοῦ",
+            "francais": "non les-choses de-Jésus Christ."
+          }
+        ]
+      },
+      "22": {
+        "grec": "δὲ γινώσκετε τὴν δοκιμὴν αὐτοῦ ὅτι ἐδούλευσεν εἰς τὸ εὐαγγέλιον σὺν ἐμοὶ ὡς τέκνον πατρὶ μὲν",
+        "francais": "Et vous-connaissez la foi-éprouvée de-lui parce-qu’ il-a-servi pour l’ évangile avec moi, comme un-enfant avec son père. D’un côté,",
+        "alignements": [
+          {
+            "grec": "δὲ γινώσκετε",
+            "francais": "Et vous-connaissez"
+          },
+          {
+            "grec": "τὴν δοκιμὴν αὐτοῦ",
+            "francais": "la foi-éprouvée de-lui"
+          },
+          {
+            "grec": "ὅτι ἐδούλευσεν εἰς τὸ εὐαγγέλιον",
+            "francais": "parce-qu’ il-a-servi pour l’ évangile"
+          },
+          {
+            "grec": "σὺν ἐμοὶ",
+            "francais": "avec moi,"
+          },
+          {
+            "grec": "ὡς τέκνον πατρὶ",
+            "francais": "comme un-enfant avec son père."
+          },
+          {
+            "grec": "μὲν",
+            "francais": "D’un côté,"
+          }
+        ]
+      },
+      "27": {
+        "grec": "καὶ γὰρ ἠσθένησεν παραπλήσιον θανάτῳ ἀλλὰ ὁ Θεὸς ἠλέησεν αὐτόν δὲ οὐκ μόνον αὐτὸν ἀλλὰ καὶ ἐμέ ἵνα μὴ σχῶ λύπην ἐπὶ λύπην",
+        "francais": "Et en-effet il-a-été-malade proche de-la-mort, mais Dieu a-eu-pitié de-lui, et non seulement de-lui, mais aussi de-moi, afin que je n’aie pas tristesse sur tristesse.",
+        "alignements": [
+          {
+            "grec": "καὶ γὰρ ἠσθένησεν",
+            "francais": "Et en-effet il-a-été-malade"
+          },
+          {
+            "grec": "παραπλήσιον θανάτῳ",
+            "francais": "proche de-la-mort,"
+          },
+          {
+            "grec": "ἀλλὰ ὁ Θεὸς",
+            "francais": "mais Dieu"
+          },
+          {
+            "grec": "ἠλέησεν αὐτόν",
+            "francais": "a-eu-pitié de-lui,"
+          },
+          {
+            "grec": "δὲ οὐκ μόνον",
+            "francais": "et non seulement"
+          },
+          {
+            "grec": "αὐτὸν",
+            "francais": "de-lui,"
+          },
+          {
+            "grec": "ἀλλὰ καὶ ἐμέ",
+            "francais": "mais aussi de-moi,"
+          },
+          {
+            "grec": "ἵνα",
+            "francais": "afin que"
+          },
+          {
+            "grec": "μὴ σχῶ",
+            "francais": "je n’aie pas"
+          },
+          {
+            "grec": "λύπην ἐπὶ λύπην",
+            "francais": "tristesse sur tristesse."
+          }
+        ]
+      },
+      "28": {
+        "grec": "οὖν ἔπεμψα αὐτὸν σπουδαιοτέρως ἵνα χαρῆτε ἰδόντες πάλιν αὐτὸν κἀγὼ ὦ ἀλυπότερος οὖν",
+        "francais": "Donc j’ai-envoyé lui avec plus d’empressement afin-que vous-vous-réjouissiez voyant à-nouveau lui, et que moi je-sois moins-triste. Donc",
+        "alignements": [
+          {
+            "grec": "οὖν",
+            "francais": "Donc"
+          },
+          {
+            "grec": "ἔπεμψα αὐτὸν",
+            "francais": "j’ai-envoyé lui"
+          },
+          {
+            "grec": "σπουδαιοτέρως",
+            "francais": "avec plus d’empressement"
+          },
+          {
+            "grec": "ἵνα χαρῆτε",
+            "francais": "afin-que vous-vous-réjouissiez"
+          },
+          {
+            "grec": "ἰδόντες πάλιν",
+            "francais": "voyant à-nouveau"
+          },
+          {
+            "grec": "αὐτὸν",
+            "francais": "lui,"
+          },
+          {
+            "grec": "κἀγὼ",
+            "francais": "et que moi"
+          },
+          {
+            "grec": "ὦ ἀλυπότερος",
+            "francais": "je-sois moins-triste."
+          },
+          {
+            "grec": "οὖν",
+            "francais": "Donc"
+          }
+        ]
+      }
+    },
+    "3": {
+      "1": {
+        "grec": "τὸ λοιπόν ἀδελφοί μου χαίρετε ἐν Κυρίῳ γράφειν ὑμῖν τὰ αὐτὰ οὐκ ὀκνηρόν ἐμοὶ μὲν ὑμῖν δὲ ἀσφαλές",
+        "francais": "Au reste, frères de-moi, réjouissez-vous dans le Seigneur. Écrire à-vous les mêmes choses, n’est pas lassant pour-moi d’un-côté, pour-vous de-l’autre c’est une sûreté.",
+        "alignements": [
+          {
+            "grec": "τὸ λοιπόν",
+            "francais": "Au reste,"
+          },
+          {
+            "grec": "ἀδελφοί μου",
+            "francais": "frères de-moi,"
+          },
+          {
+            "grec": "χαίρετε ἐν Κυρίῳ",
+            "francais": "réjouissez-vous dans le Seigneur."
+          },
+          {
+            "grec": "γράφειν ὑμῖν",
+            "francais": "Écrire à-vous"
+          },
+          {
+            "grec": "τὰ αὐτὰ",
+            "francais": "les mêmes choses,"
+          },
+          {
+            "grec": "οὐκ ὀκνηρόν",
+            "francais": "n’est pas lassant"
+          },
+          {
+            "grec": "ἐμοὶ μὲν",
+            "francais": "pour-moi d’un-côté,"
+          },
+          {
+            "grec": "ὑμῖν δὲ",
+            "francais": "pour-vous de-l’autre"
+          },
+          {
+            "grec": "ἀσφαλές",
+            "francais": "c’est une sûreté."
+          }
+        ]
+      },
+      "2": {
+        "grec": "βλέπετε τοὺς κύνας βλέπετε τοὺς κακοὺς ἐργάτας βλέπετε τὴν κατατομήν γάρ",
+        "francais": "Prenez-garde aux chiens; prenez-garde aux mauvais ouvriers; prenez-garde à-la mutilation. Car",
+        "alignements": [
+          {
+            "grec": "βλέπετε τοὺς κύνας",
+            "francais": "Prenez-garde aux chiens ;"
+          },
+          {
+            "grec": "βλέπετε τοὺς κακοὺς ἐργάτας",
+            "francais": "prenez-garde aux mauvais ouvriers ;"
+          },
+          {
+            "grec": "βλέπετε τὴν κατατομήν",
+            "francais": "prenez-garde à-la mutilation."
+          },
+          {
+            "grec": "γάρ",
+            "francais": "Car"
+          }
+        ]
+      },
+      "7": {
+        "grec": "ἅτινα ἦν μοι κέρδη ἥγημαι ταῦτα ζημίαν διὰ τὸν Χριστὸν ἀλλὰ μενοῦνγε",
+        "francais": "Les choses qui étaient pour-moi un gain, j’ai pensé ces choses être une-perte à-cause du Christ. Mais en-plus",
+        "alignements": [
+          {
+            "grec": "ἅτινα",
+            "francais": "Les choses qui"
+          },
+          {
+            "grec": "ἦν μοι",
+            "francais": "étaient pour-moi"
+          },
+          {
+            "grec": "κέρδη",
+            "francais": "un gain,"
+          },
+          {
+            "grec": "ἥγημαι",
+            "francais": "j’ai pensé"
+          },
+          {
+            "grec": "ταῦτα ζημίαν",
+            "francais": "ces choses être une-perte"
+          },
+          {
+            "grec": "διὰ τὸν Χριστὸν",
+            "francais": "à-cause du Christ."
+          },
+          {
+            "grec": "ἀλλὰ μενοῦνγε",
+            "francais": "Mais en-plus"
+          }
+        ]
+      },
+      "12": {
+        "grec": "οὐχ ὅτι ἔλαβον ἤδη ἢ τετελείωμαι ἤδη δὲ διώκω εἰ καταλάβω καὶ ἐφ’ ᾧ κατελήμφθην καὶ ὑπὸ Χριστοῦ Ἰησοῦ ἀδελφοί",
+        "francais": "Je ne dis pas que j’ai-attrapé tout cela déjà, ou que j’ai-atteint-la-perfection déjà; mais je-poursuis-la-course, si j’obtiens aussi, ce pour quoi j’ai-été-saisi moi aussi par Christ Jésus. Frères,",
+        "alignements": [
+          {
+            "grec": "οὐχ",
+            "francais": "Je ne dis pas"
+          },
+          {
+            "grec": "ὅτι ἔλαβον ἤδη",
+            "francais": "que j’ai-attrapé tout cela déjà,"
+          },
+          {
+            "grec": "ἢ τετελείωμαι ἤδη",
+            "francais": "ou que j’ai-atteint-la-perfection déjà ;"
+          },
+          {
+            "grec": "δὲ διώκω",
+            "francais": "mais je-poursuis-la-course,"
+          },
+          {
+            "grec": "εἰ καταλάβω καὶ",
+            "francais": "si j’obtiens aussi,"
+          },
+          {
+            "grec": "ἐφ’ ᾧ",
+            "francais": "ce pour quoi"
+          },
+          {
+            "grec": "κατελήμφθην καὶ",
+            "francais": "j’ai-été-saisi moi aussi"
+          },
+          {
+            "grec": "ὑπὸ Χριστοῦ Ἰησοῦ",
+            "francais": "par Christ Jésus."
+          },
+          {
+            "grec": "ἀδελφοί",
+            "francais": "Frères,"
+          }
+        ]
+      },
+      "15": {
+        "grec": "οὖν ὅσοι τέλειοι φρονῶμεν τοῦτο καὶ εἴ φρονεῖτε τι ἑτέρως ὁ Θεὸς ἀποκαλύψει τοῦτο καὶ ὑμῖν",
+        "francais": "Donc, autant-que nous sommes accomplis, pensons cela: et si vous pensez quelque-chose différemment, Dieu révèlera cela aussi à vous.",
+        "alignements": [
+          {
+            "grec": "οὖν",
+            "francais": "Donc,"
+          },
+          {
+            "grec": "ὅσοι τέλειοι",
+            "francais": "autant-que nous sommes accomplis,"
+          },
+          {
+            "grec": "φρονῶμεν τοῦτο",
+            "francais": "pensons cela :"
+          },
+          {
+            "grec": "καὶ εἴ",
+            "francais": "et si"
+          },
+          {
+            "grec": "φρονεῖτε",
+            "francais": "vous pensez"
+          },
+          {
+            "grec": "τι ἑτέρως",
+            "francais": "quelque-chose différemment,"
+          },
+          {
+            "grec": "ὁ Θεὸς",
+            "francais": "Dieu"
+          },
+          {
+            "grec": "ἀποκαλύψει",
+            "francais": "révèlera"
+          },
+          {
+            "grec": "τοῦτο καὶ",
+            "francais": "cela aussi"
+          },
+          {
+            "grec": "ὑμῖν",
+            "francais": "à vous."
+          }
+        ]
+      },
+      "16": {
+        "grec": "πλὴν εἰς ὃ ἐφθάσαμεν στοιχεῖν τῷ αὐτῷ",
+        "francais": "Seulement vers le point où nous sommes déjà arrivés, marchons ensemble dans-la même direction.",
+        "alignements": [
+          {
+            "grec": "πλὴν",
+            "francais": "Seulement"
+          },
+          {
+            "grec": "εἰς ὃ",
+            "francais": "vers le point où"
+          },
+          {
+            "grec": "ἐφθάσαμεν",
+            "francais": "nous sommes déjà arrivés,"
+          },
+          {
+            "grec": "στοιχεῖν",
+            "francais": "marchons ensemble"
+          },
+          {
+            "grec": "τῷ αὐτῷ",
+            "francais": "dans-la même direction."
+          }
+        ]
+      },
+      "17": {
+        "grec": "γίνεσθε συνμιμηταί μου ἀδελφοί καὶ σκοπεῖτε τοὺς περιπατοῦντας οὕτω καθὼς ἔχετε ἡμᾶς τύπον γὰρ",
+        "francais": "Devenez imitateurs de-moi, frères, et considérez les personnes marchant ainsi que vous avez nous comme modèle. Car",
+        "alignements": [
+          {
+            "grec": "γίνεσθε",
+            "francais": "Devenez"
+          },
+          {
+            "grec": "συνμιμηταί μου",
+            "francais": "imitateurs de-moi,"
+          },
+          {
+            "grec": "ἀδελφοί",
+            "francais": "frères,"
+          },
+          {
+            "grec": "καὶ σκοπεῖτε",
+            "francais": "et considérez"
+          },
+          {
+            "grec": "τοὺς περιπατοῦντας",
+            "francais": "les personnes marchant"
+          },
+          {
+            "grec": "οὕτω καθὼς",
+            "francais": "ainsi que"
+          },
+          {
+            "grec": "ἔχετε",
+            "francais": "vous avez"
+          },
+          {
+            "grec": "ἡμᾶς",
+            "francais": "nous"
+          },
+          {
+            "grec": "τύπον",
+            "francais": "comme modèle."
+          },
+          {
+            "grec": "γὰρ",
+            "francais": "Car"
+          }
+        ]
+      }
+    },
+    "4": {
+      "1": {
+        "grec": "ὥστε ἀδελφοί μου ἀγαπητοὶ καὶ ἐπιπόθητοι χαρὰ καὶ στέφανός μου οὕτως στήκετε ἐν Κυρίῳ ἀγαπητοί",
+        "francais": "Ainsi, frères de-moi bien-aimés et désirés, joie et couronne de-moi, de-cette-manière tenez-ferme dans le Seigneur, bien-aimés.",
+        "alignements": [
+          {
+            "grec": "ὥστε",
+            "francais": "Ainsi,"
+          },
+          {
+            "grec": "ἀδελφοί μου",
+            "francais": "frères de-moi"
+          },
+          {
+            "grec": "ἀγαπητοὶ καὶ ἐπιπόθητοι",
+            "francais": "bien-aimés et désirés,"
+          },
+          {
+            "grec": "χαρὰ καὶ στέφανός μου",
+            "francais": "joie et couronne de-moi,"
+          },
+          {
+            "grec": "οὕτως στήκετε",
+            "francais": "de-cette-manière tenez-ferme"
+          },
+          {
+            "grec": "ἐν Κυρίῳ ἀγαπητοί",
+            "francais": "dans le Seigneur, bien-aimés."
+          }
+        ]
+      },
+      "2": {
+        "grec": "παρακαλῶ Εὐοδίαν καὶ παρακαλῶ Συντύχην φρονεῖν τὸ αὐτὸ ἐν Κυρίῳ",
+        "francais": "J’exhorte Évodie et j’exhorte Syntyche, à penser la même chose dans le Seigneur.",
+        "alignements": [
+          {
+            "grec": "παρακαλῶ Εὐοδίαν",
+            "francais": "J’exhorte Évodie"
+          },
+          {
+            "grec": "καὶ παρακαλῶ Συντύχην",
+            "francais": "et j’exhorte Syntyche,"
+          },
+          {
+            "grec": "φρονεῖν τὸ αὐτὸ",
+            "francais": "à penser la même chose"
+          },
+          {
+            "grec": "ἐν Κυρίῳ",
+            "francais": "dans le Seigneur."
+          }
+        ]
+      },
+      "3": {
+        "grec": "ναὶ ἐρωτῶ σέ καὶ γνήσιε σύνζυγε συνλαμβάνου αὐταῖς αἵτινες συνήθλησάν μοι ἐν τῷ εὐαγγελίῳ μετὰ καὶ Κλήμεντος καὶ τῶν συνεργῶν λοιπῶν μου ὧν τὰ ὀνόματα ἐν βίβλῳ ζωῆς",
+        "francais": "Oui, je-demande à-toi aussi, sincère collègue, aide elles, elles-qui ont-combattu avec-moi dans l’ évangile avec aussi Clément et les collaborateurs restants de-moi, desquels les noms sont dans le livre de-vie.",
+        "alignements": [
+          {
+            "grec": "ναὶ",
+            "francais": "Oui,"
+          },
+          {
+            "grec": "ἐρωτῶ σέ καὶ",
+            "francais": "je-demande à-toi aussi,"
+          },
+          {
+            "grec": "γνήσιε σύνζυγε",
+            "francais": "sincère collègue,"
+          },
+          {
+            "grec": "συνλαμβάνου αὐταῖς",
+            "francais": "aide elles,"
+          },
+          {
+            "grec": "αἵτινες συνήθλησάν μοι",
+            "francais": "elles-qui ont-combattu avec-moi"
+          },
+          {
+            "grec": "ἐν τῷ εὐαγγελίῳ",
+            "francais": "dans l’ évangile"
+          },
+          {
+            "grec": "μετὰ καὶ Κλήμεντος",
+            "francais": "avec aussi Clément"
+          },
+          {
+            "grec": "καὶ τῶν συνεργῶν λοιπῶν μου",
+            "francais": "et les collaborateurs restants de-moi,"
+          },
+          {
+            "grec": "ὧν τὰ ὀνόματα",
+            "francais": "desquels les noms"
+          },
+          {
+            "grec": "ἐν βίβλῳ ζωῆς",
+            "francais": "sont dans le livre de-vie."
+          }
+        ]
+      },
+      "4": {
+        "grec": "χαίρετε ἐν Κυρίῳ πάντοτε ἐρῶ πάλιν χαίρετε",
+        "francais": "Réjouissez-vous dans le Seigneur, toujours, je-dirai à-nouveau, réjouissez-vous!",
+        "alignements": [
+          {
+            "grec": "χαίρετε ἐν Κυρίῳ",
+            "francais": "Réjouissez-vous dans le Seigneur,"
+          },
+          {
+            "grec": "πάντοτε",
+            "francais": "toujours,"
+          },
+          {
+            "grec": "ἐρῶ πάλιν",
+            "francais": "je-dirai à-nouveau,"
+          },
+          {
+            "grec": "χαίρετε",
+            "francais": "réjouissez-vous !"
+          }
+        ]
+      },
+      "5": {
+        "grec": "τὸ ἐπιεικὲς ὑμῶν γνωσθήτω πᾶσιν ἀνθρώποις ὁ Κύριος ἐγγύς",
+        "francais": "La modération de-vous qu’elle soit connue par-tous les hommes. Le Seigneur est proche.",
+        "alignements": [
+          {
+            "grec": "τὸ ἐπιεικὲς ὑμῶν",
+            "francais": "La modération de-vous"
+          },
+          {
+            "grec": "γνωσθήτω",
+            "francais": "qu’elle soit connue"
+          },
+          {
+            "grec": "πᾶσιν ἀνθρώποις",
+            "francais": "par-tous les hommes."
+          },
+          {
+            "grec": "ὁ Κύριος",
+            "francais": "Le Seigneur"
+          },
+          {
+            "grec": "ἐγγύς",
+            "francais": "est proche."
+          }
+        ]
+      },
+      "6": {
+        "grec": "μεριμνᾶτε μηδὲν ἀλλ’ ἐν παντὶ τὰ αἰτήματα ὑμῶν γνωριζέσθω πρὸς τὸν Θεόν τῇ προσευχῇ καὶ τῇ δεήσει μετὰ εὐχαριστίας",
+        "francais": "Souciez-vous à propos de-rien, mais en tout, les demandes de-vous qu’elles soient connues pour Dieu, par-la prière et la supplication avec gratitude.",
+        "alignements": [
+          {
+            "grec": "μεριμνᾶτε μηδὲν",
+            "francais": "Souciez-vous à propos de-rien,"
+          },
+          {
+            "grec": "ἀλλ’ ἐν παντὶ",
+            "francais": "mais en tout,"
+          },
+          {
+            "grec": "τὰ αἰτήματα ὑμῶν",
+            "francais": "les demandes de-vous"
+          },
+          {
+            "grec": "γνωριζέσθω",
+            "francais": "qu’elles soient connues"
+          },
+          {
+            "grec": "πρὸς τὸν Θεόν",
+            "francais": "pour Dieu,"
+          },
+          {
+            "grec": "τῇ προσευχῇ καὶ τῇ δεήσει",
+            "francais": "par-la prière et la supplication"
+          },
+          {
+            "grec": "μετὰ εὐχαριστίας",
+            "francais": "avec gratitude."
+          }
+        ]
+      },
+      "7": {
+        "grec": "καὶ ἡ εἰρήνη τοῦ Θεοῦ ἡ ὑπερέχουσα πάντα νοῦν φρουρήσει τὰς καρδίας ὑμῶν καὶ τὰ νοήματα ὑμῶν ἐν Χριστῷ Ἰησοῦ",
+        "francais": "Et la paix de Dieu la paix dépassant toute compréhension, protégera les cœurs de-vous et les pensées de-vous en Christ Jésus.",
+        "alignements": [
+          {
+            "grec": "καὶ ἡ εἰρήνη τοῦ Θεοῦ",
+            "francais": "Et la paix de Dieu"
+          },
+          {
+            "grec": "ἡ ὑπερέχουσα",
+            "francais": "la paix dépassant"
+          },
+          {
+            "grec": "πάντα νοῦν",
+            "francais": "toute compréhension,"
+          },
+          {
+            "grec": "φρουρήσει τὰς καρδίας ὑμῶν",
+            "francais": "protégera les cœurs de-vous"
+          },
+          {
+            "grec": "καὶ τὰ νοήματα ὑμῶν",
+            "francais": "et les pensées de-vous"
+          },
+          {
+            "grec": "ἐν Χριστῷ Ἰησοῦ",
+            "francais": "en Christ Jésus."
+          }
+        ]
+      },
+      "8": {
+        "grec": "τὸ λοιπόν ἀδελφοί ὅσα ἐστὶν ἀληθῆ ὅσα σεμνά ὅσα δίκαια ὅσα ἁγνά ὅσα προσφιλῆ ὅσα εὔφημα εἴ τις ἀρετὴ καὶ εἴ τις ἔπαινος λογίζεσθε ταῦτα",
+        "francais": "Au reste, frères, tout-ce-qui est vrai, tout-ce-qui est honorable, tout-ce-qui est juste, tout-ce-qui est pur, tout-ce-qui est aimable, tout-ce-qui est recommandable, s’ il y a quelque vertu et s’ il y a quelque louange, considérez ces choses.",
+        "alignements": [
+          {
+            "grec": "τὸ λοιπόν",
+            "francais": "Au reste,"
+          },
+          {
+            "grec": "ἀδελφοί",
+            "francais": "frères,"
+          },
+          {
+            "grec": "ὅσα ἐστὶν ἀληθῆ",
+            "francais": "tout-ce-qui est vrai,"
+          },
+          {
+            "grec": "ὅσα σεμνά",
+            "francais": "tout-ce-qui est honorable,"
+          },
+          {
+            "grec": "ὅσα δίκαια",
+            "francais": "tout-ce-qui est juste,"
+          },
+          {
+            "grec": "ὅσα ἁγνά",
+            "francais": "tout-ce-qui est pur,"
+          },
+          {
+            "grec": "ὅσα προσφιλῆ",
+            "francais": "tout-ce-qui est aimable,"
+          },
+          {
+            "grec": "ὅσα εὔφημα",
+            "francais": "tout-ce-qui est recommandable,"
+          },
+          {
+            "grec": "εἴ τις ἀρετὴ",
+            "francais": "s’ il y a quelque vertu"
+          },
+          {
+            "grec": "καὶ εἴ τις ἔπαινος",
+            "francais": "et s’ il y a quelque louange,"
+          },
+          {
+            "grec": "λογίζεσθε ταῦτα",
+            "francais": "considérez ces choses."
+          }
+        ]
+      },
+      "9": {
+        "grec": "ἃ καὶ ἐμάθετε καὶ παρελάβετε καὶ ἠκούσατε καὶ εἴδετε ἐν ἐμοί πράσσετε ταῦτα καὶ ὁ Θεὸς τῆς εἰρήνης ἔσται μεθ’ ὑμῶν",
+        "francais": "Ce que et vous-avez-appris et vous-avez-reçu, et vous-avez-entendu et vous-avez-vu, en moi, pratiquez ces choses et le Dieu de-la paix sera avec vous.",
+        "alignements": [
+          {
+            "grec": "ἃ",
+            "francais": "Ce que"
+          },
+          {
+            "grec": "καὶ ἐμάθετε",
+            "francais": "et vous-avez-appris"
+          },
+          {
+            "grec": "καὶ παρελάβετε",
+            "francais": "et vous-avez-reçu,"
+          },
+          {
+            "grec": "καὶ ἠκούσατε",
+            "francais": "et vous-avez-entendu"
+          },
+          {
+            "grec": "καὶ εἴδετε",
+            "francais": "et vous-avez-vu,"
+          },
+          {
+            "grec": "ἐν ἐμοί",
+            "francais": "en moi,"
+          },
+          {
+            "grec": "πράσσετε ταῦτα",
+            "francais": "pratiquez ces choses"
+          },
+          {
+            "grec": "καὶ ὁ Θεὸς τῆς εἰρήνης",
+            "francais": "et le Dieu de-la paix"
+          },
+          {
+            "grec": "ἔσται μεθ’ ὑμῶν",
+            "francais": "sera avec vous."
+          }
+        ]
+      },
+      "10": {
+        "grec": "δὲ ἐχάρην μεγάλως ἐν Κυρίῳ ὅτι ἤδη ποτὲ ἀνεθάλετε τὸ φρονεῖν ὑπὲρ ἐμοῦ ἐφ’ ᾧ ἐφρονεῖτε καὶ δέ ἠκαιρεῖσθε",
+        "francais": "Et je-me-suis-réjoui grandement dans le Seigneur; parce que déjà enfin vous avez refleuri le sentiment de vous envers moi; pour qui vous-pensiez aussi, mais vous-n’aviez-pas-l’occasion.",
+        "alignements": [
+          {
+            "grec": "δὲ ἐχάρην μεγάλως",
+            "francais": "Et je-me-suis-réjoui grandement"
+          },
+          {
+            "grec": "ἐν Κυρίῳ",
+            "francais": "dans le Seigneur ;"
+          },
+          {
+            "grec": "ὅτι",
+            "francais": "parce que"
+          },
+          {
+            "grec": "ἤδη ποτὲ",
+            "francais": "déjà enfin"
+          },
+          {
+            "grec": "ἀνεθάλετε",
+            "francais": "vous avez refleuri"
+          },
+          {
+            "grec": "τὸ φρονεῖν ὑπὲρ ἐμοῦ",
+            "francais": "le sentiment de vous envers moi ;"
+          },
+          {
+            "grec": "ἐφ’ ᾧ",
+            "francais": "pour qui"
+          },
+          {
+            "grec": "ἐφρονεῖτε καὶ",
+            "francais": "vous-pensiez aussi,"
+          },
+          {
+            "grec": "δέ ἠκαιρεῖσθε",
+            "francais": "mais vous-n’aviez-pas-l’occasion."
+          }
+        ]
+      },
+      "11": {
+        "grec": "οὐχ ὅτι λέγω καθ’ ὑστέρησιν ἐγὼ γὰρ ἔμαθον εἶναι αὐτάρκης ἐν οἷς εἰμι",
+        "francais": "Je ne dis pas que je-parle selon mes besoins; moi en-effet j’ai appris à être me satisfaisant, dans les situations dans lesquelles je-suis.",
+        "alignements": [
+          {
+            "grec": "οὐχ",
+            "francais": "Je ne dis pas"
+          },
+          {
+            "grec": "ὅτι λέγω",
+            "francais": "que je-parle"
+          },
+          {
+            "grec": "καθ’ ὑστέρησιν",
+            "francais": "selon mes besoins ;"
+          },
+          {
+            "grec": "ἐγὼ γὰρ",
+            "francais": "moi en-effet"
+          },
+          {
+            "grec": "ἔμαθον",
+            "francais": "j’ai appris"
+          },
+          {
+            "grec": "εἶναι",
+            "francais": "à être"
+          },
+          {
+            "grec": "αὐτάρκης",
+            "francais": "me satisfaisant,"
+          },
+          {
+            "grec": "ἐν οἷς εἰμι",
+            "francais": "dans les situations dans lesquelles je-suis."
+          }
+        ]
+      },
+      "12": {
+        "grec": "καὶ οἶδα ταπεινοῦσθαι καὶ οἶδα περισσεύειν ἐν παντὶ καὶ ἐν πᾶσιν μεμύημαι καὶ χορτάζεσθαι καὶ πεινᾶν καὶ περισσεύειν καὶ ὑστερεῖσθαι",
+        "francais": "Et je-sais être-humilié, et je-sais être-dans-l’abondance. En toute circonstance et dans toutes les circonstances j’ai été initié, et à être-rassasié et à avoir-faim, et à être-dans-l’abondance, et à être-dans-le-besoin.",
+        "alignements": [
+          {
+            "grec": "καὶ οἶδα ταπεινοῦσθαι",
+            "francais": "Et je-sais être-humilié,"
+          },
+          {
+            "grec": "καὶ οἶδα περισσεύειν",
+            "francais": "et je-sais être-dans-l’abondance."
+          },
+          {
+            "grec": "ἐν παντὶ",
+            "francais": "En toute circonstance"
+          },
+          {
+            "grec": "καὶ ἐν πᾶσιν",
+            "francais": "et dans toutes les circonstances"
+          },
+          {
+            "grec": "μεμύημαι",
+            "francais": "j’ai été initié,"
+          },
+          {
+            "grec": "καὶ χορτάζεσθαι",
+            "francais": "et à être-rassasié"
+          },
+          {
+            "grec": "καὶ πεινᾶν",
+            "francais": "et à avoir-faim,"
+          },
+          {
+            "grec": "καὶ περισσεύειν",
+            "francais": "et à être-dans-l’abondance,"
+          },
+          {
+            "grec": "καὶ ὑστερεῖσθαι",
+            "francais": "et à être-dans-le-besoin."
+          }
+        ]
+      },
+      "13": {
+        "grec": "ἰσχύω πάντα ἐν τῷ ἐνδυναμοῦντί με",
+        "francais": "J’ai-la-force pour tout en celui rendant-capable moi.",
+        "alignements": [
+          {
+            "grec": "ἰσχύω πάντα",
+            "francais": "J’ai-la-force pour tout"
+          },
+          {
+            "grec": "ἐν τῷ ἐνδυναμοῦντί",
+            "francais": "en celui rendant-capable"
+          },
+          {
+            "grec": "με",
+            "francais": "moi."
+          }
+        ]
+      },
+      "14": {
+        "grec": "πλὴν ἐποιήσατε καλῶς συνκοινωνήσαντές τῇ θλίψει μου",
+        "francais": "Mais vous-avez-agi bellement, ayant pris votre part à-la tribulation de-moi.",
+        "alignements": [
+          {
+            "grec": "πλὴν",
+            "francais": "Mais"
+          },
+          {
+            "grec": "ἐποιήσατε καλῶς",
+            "francais": "vous-avez-agi bellement,"
+          },
+          {
+            "grec": "συνκοινωνήσαντές",
+            "francais": "ayant pris votre part"
+          },
+          {
+            "grec": "τῇ θλίψει μου",
+            "francais": "à-la tribulation de-moi."
+          }
+        ]
+      },
+      "15": {
+        "grec": "δὲ ὑμεῖς καὶ Φιλιππήσιοι οἴδατε ὅτι ἐν ἀρχῇ τοῦ εὐαγγελίου ὅτε ἐξῆλθον ἀπὸ Μακεδονίας οὐδεμία ἐκκλησία ἐκοινώνησεν μοι εἰς λόγον δόσεως καὶ λήμψεως εἰ μὴ ὑμεῖς μόνοι",
+        "francais": "Et vous aussi, Philippiens, vous-savez que au commencement de-l’ évangile, quand je-suis-parti hors-de Macédoine, aucune église n’a-contribué pour-moi pour un-compte de-don et de-réception si non vous seuls.",
+        "alignements": [
+          {
+            "grec": "δὲ ὑμεῖς καὶ",
+            "francais": "Et vous aussi,"
+          },
+          {
+            "grec": "Φιλιππήσιοι",
+            "francais": "Philippiens,"
+          },
+          {
+            "grec": "οἴδατε ὅτι",
+            "francais": "vous-savez que"
+          },
+          {
+            "grec": "ἐν ἀρχῇ",
+            "francais": "au commencement"
+          },
+          {
+            "grec": "τοῦ εὐαγγελίου",
+            "francais": "de-l’ évangile,"
+          },
+          {
+            "grec": "ὅτε ἐξῆλθον",
+            "francais": "quand je-suis-parti"
+          },
+          {
+            "grec": "ἀπὸ Μακεδονίας",
+            "francais": "hors-de Macédoine,"
+          },
+          {
+            "grec": "οὐδεμία ἐκκλησία",
+            "francais": "aucune église"
+          },
+          {
+            "grec": "ἐκοινώνησεν μοι",
+            "francais": "n’a-contribué pour-moi"
+          },
+          {
+            "grec": "εἰς λόγον δόσεως",
+            "francais": "pour un-compte de-don"
+          },
+          {
+            "grec": "καὶ λήμψεως",
+            "francais": "et de-réception"
+          },
+          {
+            "grec": "εἰ μὴ",
+            "francais": "si non"
+          },
+          {
+            "grec": "ὑμεῖς μόνοι",
+            "francais": "vous seuls."
+          }
+        ]
+      },
+      "16": {
+        "grec": "ὅτι καὶ ἐν Θεσσαλονίκῃ καὶ ἅπαξ καὶ δὶς ἐπέμψατε μοι εἰς τὴν χρείαν",
+        "francais": "Parce-que aussi à Thessalonique, et une-fois et deux-fois, vous-avez-envoyé à-moi pour le besoin de moi.",
+        "alignements": [
+          {
+            "grec": "ὅτι καὶ",
+            "francais": "Parce-que aussi"
+          },
+          {
+            "grec": "ἐν Θεσσαλονίκῃ",
+            "francais": "à Thessalonique,"
+          },
+          {
+            "grec": "καὶ ἅπαξ καὶ δὶς",
+            "francais": "et une-fois et deux-fois,"
+          },
+          {
+            "grec": "ἐπέμψατε μοι",
+            "francais": "vous-avez-envoyé à-moi"
+          },
+          {
+            "grec": "εἰς τὴν χρείαν",
+            "francais": "pour le besoin de moi."
+          }
+        ]
+      },
+      "17": {
+        "grec": "οὐχ ὅτι ἐπιζητῶ τὸ δόμα ἀλλὰ ἐπιζητῶ τὸν καρπὸν τὸν πλεονάζοντα εἰς λόγον ὑμῶν",
+        "francais": "Je ne dis pas que je-recherche le don, mais je-recherche le fruit celui croissant pour le-compte de-vous.",
+        "alignements": [
+          {
+            "grec": "οὐχ",
+            "francais": "Je ne dis pas"
+          },
+          {
+            "grec": "ὅτι ἐπιζητῶ τὸ δόμα",
+            "francais": "que je-recherche le don,"
+          },
+          {
+            "grec": "ἀλλὰ ἐπιζητῶ",
+            "francais": "mais je-recherche"
+          },
+          {
+            "grec": "τὸν καρπὸν",
+            "francais": "le fruit"
+          },
+          {
+            "grec": "τὸν πλεονάζοντα",
+            "francais": "celui croissant"
+          },
+          {
+            "grec": "εἰς λόγον ὑμῶν",
+            "francais": "pour le-compte de-vous."
+          }
+        ]
+      },
+      "18": {
+        "grec": "δὲ ἀπέχω πάντα καὶ περισσεύω πεπλήρωμαι δεξάμενος τὰ παρ’ ὑμῶν παρὰ Ἐπαφροδίτου ὀσμὴν εὐωδίας θυσίαν δεκτήν εὐάρεστον τῷ Θεῷ",
+        "francais": "Et je-reçois tout, et je-suis-dans-l’abondance, et je-suis-comblé, ayant reçu les choses de chez vous de-la-main-d’ Épaphrodite, un-parfum de-bonne-odeur, un-sacrifice plaisant, agréable pour Dieu.",
+        "alignements": [
+          {
+            "grec": "δὲ ἀπέχω πάντα",
+            "francais": "Et je-reçois tout,"
+          },
+          {
+            "grec": "καὶ περισσεύω",
+            "francais": "et je-suis-dans-l’abondance,"
+          },
+          {
+            "grec": "πεπλήρωμαι",
+            "francais": "et je-suis-comblé,"
+          },
+          {
+            "grec": "δεξάμενος",
+            "francais": "ayant reçu"
+          },
+          {
+            "grec": "τὰ παρ’ ὑμῶν",
+            "francais": "les choses de chez vous"
+          },
+          {
+            "grec": "παρὰ Ἐπαφροδίτου",
+            "francais": "de-la-main-d’ Épaphrodite,"
+          },
+          {
+            "grec": "ὀσμὴν εὐωδίας",
+            "francais": "un-parfum de-bonne-odeur,"
+          },
+          {
+            "grec": "θυσίαν δεκτήν",
+            "francais": "un-sacrifice plaisant,"
+          },
+          {
+            "grec": "εὐάρεστον τῷ Θεῷ",
+            "francais": "agréable pour Dieu."
+          }
+        ]
+      },
+      "19": {
+        "grec": "δὲ ὁ Θεός μου πληρώσει πᾶσαν χρείαν ὑμῶν κατὰ τὸ πλοῦτος αὐτοῦ ἐν δόξῃ ἐν Χριστῷ Ἰησοῦ",
+        "francais": "Et le Dieu de-moi comblera tout besoin de-vous, conformément-à la richesse de-lui dans la gloire en Christ Jésus.",
+        "alignements": [
+          {
+            "grec": "δὲ ὁ Θεός μου",
+            "francais": "Et le Dieu de-moi"
+          },
+          {
+            "grec": "πληρώσει πᾶσαν χρείαν ὑμῶν",
+            "francais": "comblera tout besoin de-vous,"
+          },
+          {
+            "grec": "κατὰ τὸ πλοῦτος αὐτοῦ",
+            "francais": "conformément-à la richesse de-lui"
+          },
+          {
+            "grec": "ἐν δόξῃ",
+            "francais": "dans la gloire"
+          },
+          {
+            "grec": "ἐν Χριστῷ Ἰησοῦ",
+            "francais": "en Christ Jésus."
+          }
+        ]
+      },
+      "20": {
+        "grec": "δὲ τῷ Θεῷ καὶ Πατρὶ ἡμῶν ἡ δόξα εἰς τοὺς αἰῶνας τῶν αἰώνων ἀμήν ἀσπάσασθε",
+        "francais": "Et à Dieu et au Père de-nous soit la gloire pour les siècles des siècles. Amen! Saluez",
+        "alignements": [
+          {
+            "grec": "δὲ",
+            "francais": "Et"
+          },
+          {
+            "grec": "τῷ Θεῷ καὶ Πατρὶ ἡμῶν",
+            "francais": "à Dieu et au Père de-nous"
+          },
+          {
+            "grec": "ἡ δόξα",
+            "francais": "soit la gloire"
+          },
+          {
+            "grec": "εἰς τοὺς αἰῶνας τῶν αἰώνων",
+            "francais": "pour les siècles des siècles."
+          },
+          {
+            "grec": "ἀμήν",
+            "francais": "Amen !"
+          },
+          {
+            "grec": "ἀσπάσασθε",
+            "francais": "Saluez"
+          }
+        ]
+      },
+      "23": {
+        "grec": "ἡ χάρις τοῦ Κυρίου Ἰησοῦ Χριστοῦ μετὰ τοῦ πνεύματος ὑμῶν ἀμήν",
+        "francais": "La grâce du Seigneur Jésus Christ soit avec l’ esprit de-vous. Amen!",
+        "alignements": [
+          {
+            "grec": "ἡ χάρις",
+            "francais": "La grâce"
+          },
+          {
+            "grec": "τοῦ Κυρίου Ἰησοῦ Χριστοῦ",
+            "francais": "du Seigneur Jésus Christ"
+          },
+          {
+            "grec": "μετὰ τοῦ πνεύματος ὑμῶν",
+            "francais": "soit avec l’ esprit de-vous."
+          },
+          {
+            "grec": "ἀμήν",
+            "francais": "Amen !"
+          }
+        ]
+      }
+    }
+  }
+}

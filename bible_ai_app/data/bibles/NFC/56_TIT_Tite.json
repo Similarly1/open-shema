@@ -1,0 +1,62 @@
+{
+  "id": 56,
+  "code": "TIT",
+  "name": "Tite",
+  "version": "NFC",
+  "version_fullname": "Nouvelle Français courant (Société biblique française, 2019)",
+  "total_chapters": 3,
+  "chapters": {
+    "1": {
+      "1": "De la part de Paul, qui est au service de Dieu et apôtre de Jésus Christ pour amener à la foi ceux que Dieu a choisis et leur faire connaître la vérité qui mène à s'attacher à Dieu.",
+      "2": "Si je suis apôtre, c'est aussi pour qu'ils possèdent l'espérance de la vie éternelle. Dieu, qui ne ment pas, nous a promis cette vie de toute éternité;",
+      "3": "aux moments qui lui appartiennent, il a révélé sa parole par la proclamation qui m'a été confiée sur ordre de Dieu notre sauveur.",
+      "4": "Je t'adresse cette lettre, Tite, mon véritable enfant dans la foi qui nous est commune. Que Dieu le Père et Jésus Christ notre sauveur, te donnent la grâce et la paix!",
+      "5": "Je t'ai laissé en Crète afin que tu achèves d'organiser ce qui doit l'être encore, et que tu établisses des anciens dans chaque ville, selon les instructions que je t'ai données.",
+      "6": "Un ancien doit être irréprochable, un mari fidèle à sa femme; il faut que ses enfants soient dignes de confiance, et qu'on ne puisse les accuser ni de comportement malfaisant ni de rébellion.",
+      "7": "En effet, un responsable d'Église doit être irréprochable, puisqu'il s'occupe des affaires de Dieu: qu'il ne soit ni arrogant, ni coléreux, ni buveur ni agressif, qu'il ne recherche pas les gains malhonnêtes.",
+      "8": "Au contraire, il doit être hospitalier et ami du bien. Il faut qu'il soit équilibré, juste, attaché à Dieu et maître de lui.",
+      "9": "Il doit être fermement attaché à la parole qui est digne de confiance, celle qui est en accord avec ce qui lui a été enseigné. Ainsi, il sera capable d'encourager les autres par le véritable enseignement et de démontrer leur erreur aux personnes qui le contredisent.",
+      "10": "En effet, il y en a beaucoup, surtout parmi les gens qui viennent du judaïsme, qui sont révoltés, qui disent n'importe quoi et trompent les autres.",
+      "11": "Il faut leur fermer la bouche, car ils bouleversent des familles entières en enseignant ce qu'il ne faut pas, et cela pour des gains malhonnêtes.",
+      "12": "C'est l'un d'eux, leur propre prophète, qui a dit: «Les Crétois ont toujours été des menteurs, des bêtes méchantes, des paresseux qui ne pensent qu'à manger.»",
+      "13": "Ce témoignage est la pure vérité. Adresse-leur donc de sévères reproches, afin qu'ils aient une foi véritable.",
+      "14": "Qu'ils ne s'attachent plus à des légendes juives, ni à des commandements purement humains donnés par des personnes qui se sont détournées de la vérité.",
+      "15": "Tout est pur pour ceux qui sont purs; mais rien n'est pur pour ceux qui sont impurs et qui ne croient pas, car leur intelligence et leur conscience sont marquées par l'impureté.",
+      "16": "Ils prétendent connaître Dieu, mais leurs actions prouvent le contraire. Ils font horreur à Dieu, ils sont rebelles et incapables de bien agir."
+    },
+    "2": {
+      "1": "Toi, au contraire, enseigne ce qui est conforme à l'enseignement véritable.",
+      "2": "Dis aux hommes âgés de faire preuve de modération, d'être respectables, et de vivre de façon équilibrée et véritable dans la foi, l'amour et la persévérance.",
+      "3": "De même, dis aux femmes âgées d'avoir un comportement qui honore Dieu. Elles ne doivent pas être médisantes, ni esclaves des excès du vin. Qu'elles enseignent ce qui est droit;",
+      "4": "voici ce qu'elles peuvent apprendre aux jeunes femmes: «Aimez votre mari et vos enfants»,",
+      "5": "«soyez raisonnables et pures», «prenez soin de votre foyer», «soyez pleines de bonté et soumises à votre mari». Ainsi personne ne se moquera de la parole de Dieu.",
+      "6": "De même, encourage les jeunes gens à être raisonnables.",
+      "7": "Toi-même, sois un modèle par ta façon de bien agir à tous égards. Dans ton enseignement, fais preuve d'intégrité et de dignité.",
+      "8": "Que tes propos soient équilibrés et inattaquables, afin que tes adversaires soient tout honteux de n'avoir aucun mal à dire de nous.",
+      "9": "Que les esclaves soient soumis à leurs maîtres en toutes choses, qu'ils leur soient agréables. Qu'ils évitent de les contredire",
+      "10": "ou de leur voler quoi que ce soit. Qu'ils se montrent toujours parfaitement dignes de confiance, afin de rendre attrayant à tous égards l'enseignement de Dieu notre sauveur.",
+      "11": "En effet la grâce de Dieu, source de salut pour tous les humains, a été révélée.",
+      "12": "Elle nous enseigne à refuser de mépriser Dieu et à refuser les désirs terrestres, pour mener plutôt dans le temps présent une vie raisonnable, juste et digne de Dieu.",
+      "13": "C'est ainsi que nous attendons le bonheur que nous espérons: le jour où se manifestera la gloire de notre grand Dieu et sauveur Jésus Christ.",
+      "14": "Il s'est donné lui-même pour nous, pour nous délivrer de tout mal et faire de nous un peuple purifié qui lui appartienne, zélé pour accomplir ce qui est bien.",
+      "15": "Voilà ce que tu dois transmettre, en usant de toute ton autorité pour encourager tes auditeurs ou leur adresser des reproches. Que personne ne te méprise!"
+    },
+    "3": {
+      "1": "Rappelle à tous de se soumettre aux dirigeants et aux autorités, de leur obéir, en étant prêts à bien agir à tous égards.",
+      "2": "Qu'ils ne disent du mal de personne, qu'ils aient une attitude paisible et bienveillante, et qu'ils fassent continuellement preuve de douceur envers tous les autres.",
+      "3": "Car nous aussi, nous étions autrefois insensés, rebelles, égarés. Nous étions esclaves de toutes sortes de désirs et de plaisirs. Nous vivions dans la méchanceté et l'envie; nous nous rendions détestables et nous nous haïssions les uns les autres.",
+      "4": "Mais lorsque la bonté de Dieu notre sauveur et son amour pour l'humanité ont été révélés,",
+      "5": "il nous a sauvés, non pas parce que nous aurions accompli des actions justes, mais parce qu'il a eu compassion de nous. Il nous a sauvés par le bain de la nouvelle naissance et le renouvellement opéré par l'Esprit saint.",
+      "6": "Cet Esprit saint, Dieu l'a en effet répandu avec abondance sur nous par Jésus Christ notre sauveur;",
+      "7": "il l'a fait pour que, déclarés justes par sa grâce, nous devenions héritiers de la vie éternelle que nous espérons.",
+      "8": "C'est là une parole digne de confiance, et je veux que tu insistes avec force sur ces points-là, afin que ceux qui mettent leur foi en Dieu aient à cœur d'être les premiers à faire ce qui est bien. Voilà qui est bon et utile à tous.",
+      "9": "Mais les folles discussions et disputes sur les généalogies, les rivalités ainsi que les querelles au sujet de la Loi, évite-les! Elles sont inutiles et ne mènent à rien.",
+      "10": "Donne un premier avertissement, puis un second, à toute personne qui cause des divisions; ensuite, écarte-la.",
+      "11": "Tu sais, en effet, qu'une telle personne s'est détournée du droit chemin et qu'en persistant ainsi dans le péché, elle se condamne elle-même.",
+      "12": "Dès que je t'aurai envoyé Artémas ou Tychique, efforce-toi de venir me rejoindre à Nicopolis, car j'ai décidé d'y passer l'hiver.",
+      "13": "Aie soin de fournir à Zénas, le spécialiste de la loi, et à Apollos, ce dont ils ont besoin pour poursuivre leur voyage, de sorte qu'ils ne manquent de rien.",
+      "14": "Il faut que les nôtres aussi apprennent à être les premiers à faire ce qui est bien, afin de répondre aux nécessités urgentes et de ne pas mener une vie inutile.",
+      "15": "Tous ceux qui sont avec moi t'adressent leurs salutations. Salue nos amis dans la foi. Que la grâce de Dieu soit avec vous tous!"
+    }
+  }
+}

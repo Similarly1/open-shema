@@ -1,0 +1,881 @@
+{
+    "general": {
+        "about_translation": {
+            "language_name_in_english": "français",
+            "language_name_local_language": "French",
+            "translation_name_in_english": "French néo-Crampon Libre",
+            "translation_name_in_local_language": "Sainte Bible néo-Crampon Libre",
+            "real_kind": "Bible with Deuterocanon",
+            "found": "https://ebible.org/details.php?id=francl",
+            "written_from_left_to_right": true,
+            "translation_abbr": "FRANCL",
+            "ebible": {
+                "last_updated": "2025-09-10",
+                "region": "France",
+                "usfm_link": "https://eBible.org/Scriptures/francl_usfm.zip",
+                "copyright_link": "https://gitlab.com/crosswire-bible-society/neo-crampon-libre",
+                "copyright_text": "Copyright © 2022 Fraternité de Tibériade",
+                "contributor": "???",
+                "translation_by": ""
+            }
+        },
+        "about_book": {
+            "ident": "francl",
+            "is_apocryphal": false,
+            "bookname_in_english": "2 Timothy",
+            "bookname_in_local_language": "2 Timothée \n",
+            "book_code": "2TI",
+            "book_code_content": "N/A",
+            "before_source": []
+        },
+        "ident": "francl",
+        "editor_comments": "I ASSUME the contributor is the same as the copyright owner"
+    },
+    "special_elems": [],
+    "verses": [
+        {
+            "global_locator": "2TI 1:1",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "1",
+            "text": "<publishing_chapter_number>1<publishing_chapter_number><dictionary_word>Paul</dictionary_word>, apôtre <dictionary_word>de</dictionary_word> <dictionary_word>Jésus-Christ</dictionary_word> <dictionary_word>par</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>volonté</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Dieu</dictionary_word>, <dictionary_word>pour</dictionary_word> <dictionary_word>annoncer</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>promesse</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>vie</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>Christ</dictionary_word> <dictionary_word>Jésus</dictionary_word>,",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 1:2",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "2",
+            "text": "<dictionary_word>à</dictionary_word> <dictionary_word>Timothée</dictionary_word>, <dictionary_word>mon</dictionary_word> <dictionary_word>enfant</dictionary_word> <dictionary_word>bien-aimé</dictionary_word> : <dictionary_word>grâce</dictionary_word>, <dictionary_word>miséricorde</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>paix</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>part</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Dieu</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>Père</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Jésus-Christ</dictionary_word> <dictionary_word>notre</dictionary_word> <dictionary_word>Seigneur</dictionary_word> !",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 1:3",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "3",
+            "text": "<dictionary_word>Je</dictionary_word> <dictionary_word>rends</dictionary_word> <dictionary_word>grâces</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>Dieu</dictionary_word>, <dictionary_word>que</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>sers</dictionary_word> <dictionary_word>ainsi</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>mes</dictionary_word> pères, <dictionary_word>avec</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>conscience</dictionary_word> <dictionary_word>pure</dictionary_word>, <dictionary_word>comme</dictionary_word> <dictionary_word>aussi</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>fais</dictionary_word> <dictionary_word>continuellement</dictionary_word> <dictionary_word>mention</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>toi</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>mes</dictionary_word> <dictionary_word>prières</dictionary_word>, <dictionary_word>nuit</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>jour</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 1:4",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "4",
+            "text": "<dictionary_word>Je</dictionary_word> <dictionary_word>me</dictionary_word> rappelle <dictionary_word>tes</dictionary_word> <dictionary_word>larmes</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>désire</dictionary_word> <dictionary_word>te</dictionary_word> <dictionary_word>voir</dictionary_word>, <dictionary_word>afin</dictionary_word> <dictionary_word>d</dictionary_word>’<dictionary_word>être</dictionary_word> <dictionary_word>rempli</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>joie</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 1:5",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "5",
+            "text": "<dictionary_word>Je</dictionary_word> <dictionary_word>me</dictionary_word> souviens <dictionary_word>aussi</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>foi</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>toi</dictionary_word> <dictionary_word>si</dictionary_word> <dictionary_word>sincère</dictionary_word> ; <dictionary_word>et</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>été</dictionary_word> constante <dictionary_word>d</dictionary_word>’<dictionary_word>abord</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>ton</dictionary_word> <dictionary_word>aïeule</dictionary_word> <dictionary_word>Loïs</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>ta</dictionary_word> <dictionary_word>mère</dictionary_word> <dictionary_word>Eunice</dictionary_word> ; <dictionary_word>et</dictionary_word>, <dictionary_word>j</dictionary_word>’<dictionary_word>en</dictionary_word> <dictionary_word>suis</dictionary_word> <dictionary_word>sûr</dictionary_word>, <dictionary_word>elle</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>même</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>toi</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 1:6",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "6",
+            "text": "<dictionary_word>C</dictionary_word>’<dictionary_word>est</dictionary_word> <dictionary_word>pourquoi</dictionary_word> <dictionary_word>je</dictionary_word> t’avertis <dictionary_word>de</dictionary_word> <dictionary_word>ranimer</dictionary_word> <insert_footnote /> <dictionary_word>la</dictionary_word> <dictionary_word>grâce</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Dieu</dictionary_word>, <dictionary_word>que</dictionary_word> <dictionary_word>tu</dictionary_word> <dictionary_word>as</dictionary_word> reçue <dictionary_word>par</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>imposition</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>mes</dictionary_word> <dictionary_word>mains</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 1:7",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "7",
+            "text": "<dictionary_word>Car</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>n</dictionary_word>’<dictionary_word>est</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>esprit</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>timidité</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>Dieu</dictionary_word> <dictionary_word>nous</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>donné</dictionary_word>, <dictionary_word>mais</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>esprit</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>force</dictionary_word>, <dictionary_word>d</dictionary_word>’<dictionary_word>amour</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>de</dictionary_word> modération.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 1:8",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "8",
+            "text": "<dictionary_word>Ne</dictionary_word> rougis <dictionary_word>donc</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>témoignage</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>rendre</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>notre</dictionary_word> <dictionary_word>Seigneur</dictionary_word>, <dictionary_word>ni</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>moi</dictionary_word>, <dictionary_word>son</dictionary_word> <dictionary_word>prisonnier</dictionary_word> ; <dictionary_word>mais</dictionary_word> <dictionary_word>souffre</dictionary_word> <insert_footnote /> <dictionary_word>avec</dictionary_word> <dictionary_word>moi</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>Évangile</dictionary_word>, appuyé <dictionary_word>sur</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>force</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Dieu</dictionary_word>,",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 1:9",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "9",
+            "text": "<dictionary_word>qui</dictionary_word> <dictionary_word>nous</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>sauvés</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>nous</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>appelés</dictionary_word> <dictionary_word>par</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>vocation</dictionary_word> <dictionary_word>sainte</dictionary_word>, <dictionary_word>non</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>cause</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>nos</dictionary_word> <dictionary_word>œuvres</dictionary_word>, <dictionary_word>mais</dictionary_word> <dictionary_word>selon</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>propre</dictionary_word> décret <dictionary_word>et</dictionary_word> <dictionary_word>selon</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>grâce</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>nous</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>été</dictionary_word> <dictionary_word>donnée</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>Jésus-Christ</dictionary_word> <dictionary_word>avant</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>commencement</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>siècles</dictionary_word>,",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 1:10",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "10",
+            "text": "<dictionary_word>et</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>été</dictionary_word> <dictionary_word>manifestée</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>présent</dictionary_word> <dictionary_word>par</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>apparition</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>notre</dictionary_word> <dictionary_word>Sauveur</dictionary_word> <dictionary_word>Jésus-Christ</dictionary_word>, <dictionary_word>qui</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>détruit</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>mort</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>mis</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>lumière</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>vie</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>l</dictionary_word>’immortalité <dictionary_word>par</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>Évangile</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 1:11",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "11",
+            "text": "<dictionary_word>C</dictionary_word>’<dictionary_word>est</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>cela</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>j</dictionary_word>’<dictionary_word>ai</dictionary_word> <dictionary_word>été</dictionary_word> <dictionary_word>établi</dictionary_word> <dictionary_word>prédicateur</dictionary_word>, <dictionary_word>apôtre</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>docteur</dictionary_word> <dictionary_word>des</dictionary_word> Gentils ;",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 1:12",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "12",
+            "text": "<dictionary_word>c</dictionary_word>’<dictionary_word>est</dictionary_word> <dictionary_word>aussi</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>cette</dictionary_word> <dictionary_word>raison</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>j</dictionary_word>’endure <dictionary_word>les</dictionary_word> souffrances présentes. <dictionary_word>Mais</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>n</dictionary_word>’<dictionary_word>en</dictionary_word> <dictionary_word>ai</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>honte</dictionary_word>, <dictionary_word>car</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>sais</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>j</dictionary_word>’<dictionary_word>ai</dictionary_word> <dictionary_word>mis</dictionary_word> <dictionary_word>ma</dictionary_word> <dictionary_word>confiance</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>j</dictionary_word>’<dictionary_word>ai</dictionary_word> <dictionary_word>la</dictionary_word> conviction <dictionary_word>qu</dictionary_word>’<dictionary_word>il</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>pouvoir</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>garder</dictionary_word> <dictionary_word>mon</dictionary_word> <dictionary_word>dépôt</dictionary_word> <dictionary_word>jusqu</dictionary_word>’<dictionary_word>à</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>jour-là</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 1:13",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "13",
+            "text": "Conserve <dictionary_word>le</dictionary_word> <dictionary_word>souvenir</dictionary_word> <dictionary_word>fidèle</dictionary_word> <insert_footnote /> <dictionary_word>des</dictionary_word> <dictionary_word>saines</dictionary_word> <dictionary_word>instructions</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>tu</dictionary_word> <dictionary_word>as</dictionary_word> <dictionary_word>reçues</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>moi</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>foi</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>charité</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>Jésus-Christ</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 1:14",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "14",
+            "text": "<dictionary_word>Garde</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>bon</dictionary_word> <dictionary_word>dépôt</dictionary_word>, <insert_footnote /> <dictionary_word>par</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>Saint-Esprit</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>habite</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>nous</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 1:15",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "15",
+            "text": "<dictionary_word>Tu</dictionary_word> <dictionary_word>sais</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>tous</dictionary_word> <dictionary_word>ceux</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>en</dictionary_word> Asie <dictionary_word>m</dictionary_word>’<dictionary_word>ont</dictionary_word> <dictionary_word>abandonné</dictionary_word>, <dictionary_word>entre</dictionary_word> <dictionary_word>autres</dictionary_word> <dictionary_word>Phygelle</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>Hermogène</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 1:16",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "16",
+            "text": "<dictionary_word>Que</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>Seigneur</dictionary_word> <dictionary_word>répande</dictionary_word> <dictionary_word>sa</dictionary_word> <dictionary_word>miséricorde</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>maison</dictionary_word> <dictionary_word>d</dictionary_word>’<dictionary_word>Onésiphore</dictionary_word> ; <dictionary_word>car</dictionary_word> <dictionary_word>souvent</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>m</dictionary_word>’<dictionary_word>a</dictionary_word> réconforté, <dictionary_word>et</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>n</dictionary_word>’<dictionary_word>a</dictionary_word> <dictionary_word>pas</dictionary_word> rougi <dictionary_word>de</dictionary_word> <dictionary_word>mes</dictionary_word> fers.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 1:17",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "17",
+            "text": "<dictionary_word>Au</dictionary_word> contraire, <dictionary_word>dès</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>arrivée</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>Rome</dictionary_word>, <dictionary_word>il</dictionary_word> <dictionary_word>m</dictionary_word>’<dictionary_word>a</dictionary_word> <dictionary_word>cherché</dictionary_word> <dictionary_word>avec</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>grand</dictionary_word> empressement, <dictionary_word>et</dictionary_word> <dictionary_word>m</dictionary_word>’<dictionary_word>a</dictionary_word> <dictionary_word>trouvé</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 1:18",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "18",
+            "text": "<dictionary_word>Que</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>Seigneur</dictionary_word> <dictionary_word>lui</dictionary_word> <dictionary_word>donne</dictionary_word> <dictionary_word>d</dictionary_word>’<dictionary_word>obtenir</dictionary_word> <dictionary_word>miséricorde</dictionary_word> <dictionary_word>auprès</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>Seigneur</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>jour-là</dictionary_word> ! <dictionary_word>Tu</dictionary_word> <dictionary_word>sais</dictionary_word> <dictionary_word>mieux</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>personne</dictionary_word> <dictionary_word>tous</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>services</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>il</dictionary_word> <dictionary_word>m</dictionary_word>’<dictionary_word>a</dictionary_word> <dictionary_word>rendus</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>Éphèse</dictionary_word>. \n<publishing_chapter_number>2<publishing_chapter_number>",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:1",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "1",
+            "text": "<dictionary_word>Pour</dictionary_word> <dictionary_word>toi</dictionary_word> <dictionary_word>donc</dictionary_word>, <dictionary_word>mon</dictionary_word> <dictionary_word>enfant</dictionary_word>, affermis-toi <dictionary_word>dans</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>grâce</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>Christ</dictionary_word> <dictionary_word>Jésus</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:2",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "2",
+            "text": "<dictionary_word>Et</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>enseignements</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>tu</dictionary_word> <dictionary_word>as</dictionary_word> <dictionary_word>reçus</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>moi</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>présence</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>nombreux</dictionary_word> <dictionary_word>témoins</dictionary_word>, confie-les <dictionary_word>à</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>hommes</dictionary_word> sûrs, <dictionary_word>qui</dictionary_word> <dictionary_word>soient</dictionary_word> <dictionary_word>capables</dictionary_word> <dictionary_word>d</dictionary_word>’<dictionary_word>en</dictionary_word> instruire <dictionary_word>d</dictionary_word>’<dictionary_word>autres</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:3",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "3",
+            "text": "Prends <dictionary_word>ta</dictionary_word> part <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> peine <dictionary_word>comme</dictionary_word> <dictionary_word>un</dictionary_word> brave <dictionary_word>soldat</dictionary_word> <insert_footnote /> <dictionary_word>du</dictionary_word> <dictionary_word>Christ</dictionary_word> <dictionary_word>Jésus</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:4",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "4",
+            "text": "<dictionary_word>Dans</dictionary_word> <dictionary_word>le</dictionary_word> métier <dictionary_word>des</dictionary_word> armes, <insert_footnote /> <dictionary_word>nul</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>s</dictionary_word>’<dictionary_word>embarrasse</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>affaires</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> vie, <dictionary_word>s</dictionary_word>’<dictionary_word>il</dictionary_word> veut <dictionary_word>plaire</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>celui</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>a</dictionary_word> <dictionary_word>enrôlé</dictionary_word> ;",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:5",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "5",
+            "text": "<dictionary_word>et</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>athlète</dictionary_word> <dictionary_word>n</dictionary_word>’obtient <dictionary_word>la</dictionary_word> <dictionary_word>couronne</dictionary_word>, <dictionary_word>que</dictionary_word> <dictionary_word>s</dictionary_word>’<dictionary_word>il</dictionary_word> <dictionary_word>a</dictionary_word> lutté <dictionary_word>selon</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>règles</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:6",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "6",
+            "text": "<dictionary_word>Il</dictionary_word> <dictionary_word>faut</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>laboureur</dictionary_word> <dictionary_word>travaille</dictionary_word> d’<dictionary_word>abord</dictionary_word> <dictionary_word>avant</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>recueillir</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>fruits</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:7",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "7",
+            "text": "Réfléchis <dictionary_word>à</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>je</dictionary_word> \n<dictionary_word>te</dictionary_word> <dictionary_word>dis</dictionary_word>, <dictionary_word>car</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>Seigneur</dictionary_word> <dictionary_word>te</dictionary_word> <dictionary_word>donnera</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>intelligence</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>toutes</dictionary_word> <dictionary_word>choses</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:8",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "8",
+            "text": "Souviens-toi <dictionary_word>que</dictionary_word> <dictionary_word>Jésus-Christ</dictionary_word>, issu <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> race <dictionary_word>de</dictionary_word> <dictionary_word>David</dictionary_word>, <dictionary_word>est</dictionary_word> <dictionary_word>ressuscité</dictionary_word> <dictionary_word>d</dictionary_word>’<dictionary_word>entre</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>morts</dictionary_word>, <dictionary_word>d</dictionary_word>’<dictionary_word>après</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>Évangile</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>prêche</dictionary_word>,",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:9",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "9",
+            "text": "<dictionary_word>et</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>lequel</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>souffre</dictionary_word> jusqu’<dictionary_word>à</dictionary_word> <dictionary_word>être</dictionary_word> enchaîné <dictionary_word>comme</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>malfaiteur</dictionary_word> ; <dictionary_word>mais</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>parole</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Dieu</dictionary_word> <dictionary_word>n</dictionary_word>’<dictionary_word>est</dictionary_word> <dictionary_word>pas</dictionary_word> enchaînée.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:10",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "10",
+            "text": "<dictionary_word>C</dictionary_word>’<dictionary_word>est</dictionary_word> <dictionary_word>pourquoi</dictionary_word> <dictionary_word>je</dictionary_word> <dictionary_word>supporte</dictionary_word> <dictionary_word>tout</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>cause</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>élus</dictionary_word>, <dictionary_word>afin</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>eux</dictionary_word> <dictionary_word>aussi</dictionary_word> <dictionary_word>obtiennent</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>salut</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>Christ</dictionary_word> <dictionary_word>Jésus</dictionary_word>, <dictionary_word>avec</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>gloire</dictionary_word> éternelle<insert_footnote />.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:11",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "11",
+            "text": "<dictionary_word>C</dictionary_word>’<dictionary_word>est</dictionary_word> <dictionary_word>là</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>parole</dictionary_word> <dictionary_word>certaine</dictionary_word> : <dictionary_word>si</dictionary_word> <dictionary_word>nous</dictionary_word> <dictionary_word>mourons</dictionary_word> <dictionary_word>avec</dictionary_word> <dictionary_word>lui</dictionary_word>, <dictionary_word>nous</dictionary_word> <dictionary_word>vivrons</dictionary_word> <dictionary_word>aussi</dictionary_word> <dictionary_word>avec</dictionary_word> <dictionary_word>lui</dictionary_word> ;",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:12",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "12",
+            "text": "<dictionary_word>si</dictionary_word> <dictionary_word>nous</dictionary_word> <dictionary_word>persévérons</dictionary_word> <translators_addition>dans l’épreuve<translators_addition>, <dictionary_word>nous</dictionary_word> <dictionary_word>régnerons</dictionary_word> <dictionary_word>avec</dictionary_word> <dictionary_word>lui</dictionary_word> ; <dictionary_word>si</dictionary_word> <dictionary_word>nous</dictionary_word> <dictionary_word>le</dictionary_word> renions, <dictionary_word>lui</dictionary_word> <dictionary_word>aussi</dictionary_word> <dictionary_word>nous</dictionary_word> <dictionary_word>reniera</dictionary_word> ;",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:13",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "13",
+            "text": "<dictionary_word>si</dictionary_word> <dictionary_word>nous</dictionary_word> <dictionary_word>sommes</dictionary_word> infidèles, <dictionary_word>lui</dictionary_word> <dictionary_word>reste</dictionary_word> <dictionary_word>fidèle</dictionary_word>, <dictionary_word>car</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>peut</dictionary_word> <dictionary_word>se</dictionary_word> démentir.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:14",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "14",
+            "text": "Voilà <dictionary_word>ce</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>tu</dictionary_word> dois <dictionary_word>rappeler</dictionary_word>, <dictionary_word>en</dictionary_word> <dictionary_word>conjurant</dictionary_word> <dictionary_word>devant</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>Seigneur</dictionary_word> <dictionary_word>d</dictionary_word>’éviter <dictionary_word>ces</dictionary_word> <dictionary_word>disputes</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>mots</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>servent</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>rien</dictionary_word>, si <dictionary_word>ce</dictionary_word> <dictionary_word>n</dictionary_word>’<dictionary_word>est</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>ruine</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>ceux</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>entendent</dictionary_word>. <insert_footnote />",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:15",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "15",
+            "text": "Efforce-toi <dictionary_word>de</dictionary_word> <dictionary_word>te</dictionary_word> montrer <dictionary_word>dans</dictionary_word> <dictionary_word>le</dictionary_word> service <dictionary_word>de</dictionary_word> <dictionary_word>Dieu</dictionary_word> <dictionary_word>comme</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>homme</dictionary_word> <dictionary_word>éprouvé</dictionary_word>, <dictionary_word>un</dictionary_word> <dictionary_word>ouvrier</dictionary_word> <dictionary_word>qui</dictionary_word> n’<dictionary_word>a</dictionary_word> pas <dictionary_word>à</dictionary_word> rougir, dispensant avec droiture <dictionary_word>la</dictionary_word> <dictionary_word>parole</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> vérité.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:16",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "16",
+            "text": "Fuis <dictionary_word>les</dictionary_word> <dictionary_word>discours</dictionary_word> profanes <dictionary_word>et</dictionary_word> <dictionary_word>vains</dictionary_word> ; <dictionary_word>car</dictionary_word> <dictionary_word>leurs</dictionary_word> auteurs <dictionary_word>iront</dictionary_word> <dictionary_word>toujours</dictionary_word> <dictionary_word>plus</dictionary_word> avant <dictionary_word>dans</dictionary_word> <dictionary_word>l</dictionary_word>’impiété,",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:17",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "17",
+            "text": "<dictionary_word>et</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>parole</dictionary_word> <dictionary_word>fera</dictionary_word> <dictionary_word>des</dictionary_word> ravages <dictionary_word>comme</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>gangrène</dictionary_word>. <dictionary_word>De</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>nombre</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>Hyménée</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>Philète</dictionary_word>,",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:18",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "18",
+            "text": "<dictionary_word>qui</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>sont</dictionary_word> éloignés <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>vérité</dictionary_word>, <dictionary_word>en</dictionary_word> <dictionary_word>disant</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>résurrection</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>déjà</dictionary_word> <dictionary_word>eu</dictionary_word> <dictionary_word>lieu</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>renversent</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>foi</dictionary_word> <dictionary_word>de</dictionary_word> plusieurs.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:19",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "19",
+            "text": "<dictionary_word>Mais</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>solide</dictionary_word> <dictionary_word>fondement</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Dieu</dictionary_word> <dictionary_word>demeure</dictionary_word> <dictionary_word>ferme</dictionary_word>, <dictionary_word>avec</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>sceau</dictionary_word> : <insert_footnote /> « <dictionary_word>Le</dictionary_word> <dictionary_word>Seigneur</dictionary_word> <dictionary_word>connaît</dictionary_word> <dictionary_word>ceux</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>lui</dictionary_word> » ; <dictionary_word>et</dictionary_word> : « <dictionary_word>Qu</dictionary_word>’<dictionary_word>il</dictionary_word> <dictionary_word>s</dictionary_word>’éloigne <dictionary_word>de</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>iniquité</dictionary_word>, <dictionary_word>celui</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>prononce</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>nom</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>Seigneur</dictionary_word>. »",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:20",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "20",
+            "text": "<dictionary_word>Dans</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>grande</dictionary_word> <dictionary_word>maison</dictionary_word>, <dictionary_word>il</dictionary_word> <dictionary_word>n</dictionary_word>’<dictionary_word>y</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>seulement</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>vases</dictionary_word> <dictionary_word>d</dictionary_word>’<dictionary_word>or</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>d</dictionary_word>’<dictionary_word>argent</dictionary_word>, <dictionary_word>mais</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>y</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>aussi</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>bois</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>terre</dictionary_word> ; <dictionary_word>les</dictionary_word> <dictionary_word>uns</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>des</dictionary_word> usages <dictionary_word>honorables</dictionary_word>, <dictionary_word>les</dictionary_word> <dictionary_word>autres</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>des</dictionary_word> usages vils.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:21",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "21",
+            "text": "<dictionary_word>Si</dictionary_word> <dictionary_word>donc</dictionary_word> quelqu’<dictionary_word>un</dictionary_word> <dictionary_word>s</dictionary_word>’<dictionary_word>est</dictionary_word> <dictionary_word>gardé</dictionary_word> <dictionary_word>pur</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>ces</dictionary_word> choses-là<insert_footnote />, <dictionary_word>il</dictionary_word> <dictionary_word>sera</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>vase</dictionary_word> <dictionary_word>d</dictionary_word>’<dictionary_word>honneur</dictionary_word>, <dictionary_word>sanctifié</dictionary_word>, <dictionary_word>utile</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>maître</dictionary_word>, <dictionary_word>propre</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>toute</dictionary_word> <dictionary_word>bonne</dictionary_word> <dictionary_word>œuvre</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:22",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "22",
+            "text": "<dictionary_word>Fuis</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>passions</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>jeunesse</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>recherche</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>justice</dictionary_word>, <dictionary_word>la</dictionary_word> <dictionary_word>foi</dictionary_word>, <dictionary_word>la</dictionary_word> <dictionary_word>charité</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>paix</dictionary_word>, <dictionary_word>avec</dictionary_word> <dictionary_word>ceux</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>invoquent</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>Seigneur</dictionary_word> <dictionary_word>d</dictionary_word>’<dictionary_word>un</dictionary_word> <dictionary_word>cœur</dictionary_word> <dictionary_word>pur</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:23",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "23",
+            "text": "<dictionary_word>Rejette</dictionary_word> <dictionary_word>les</dictionary_word> questions <dictionary_word>folles</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>inutiles</dictionary_word> ; <dictionary_word>tu</dictionary_word> <dictionary_word>sais</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>elles</dictionary_word> engendrent <dictionary_word>des</dictionary_word> <dictionary_word>disputes</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:24",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "24",
+            "text": "<dictionary_word>Or</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>faut</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>un</dictionary_word> <dictionary_word>serviteur</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>Seigneur</dictionary_word> conteste ; <dictionary_word>il</dictionary_word> <dictionary_word>doit</dictionary_word>, <dictionary_word>au</dictionary_word> <dictionary_word>contraire</dictionary_word>, <dictionary_word>avoir</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>condescendance</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>tous</dictionary_word>, <dictionary_word>savoir</dictionary_word> instruire <dictionary_word>et</dictionary_word> supporter,",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:25",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "25",
+            "text": "redressant <dictionary_word>avec</dictionary_word> <dictionary_word>douceur</dictionary_word> <dictionary_word>les</dictionary_word> opposants, <dictionary_word>dans</dictionary_word> <dictionary_word>l</dictionary_word>’espoir <dictionary_word>que</dictionary_word> <dictionary_word>Dieu</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>donnera</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>se</dictionary_word> convertir <dictionary_word>à</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>connaissance</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>vérité</dictionary_word>,",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 2:26",
+            "chapter": "2",
+            "alternate_verse_number": "",
+            "verse_number": "26",
+            "text": "<dictionary_word>et</dictionary_word> <dictionary_word>que</dictionary_word>, revenus <dictionary_word>au</dictionary_word> <dictionary_word>bon</dictionary_word> <dictionary_word>sens</dictionary_word>, <dictionary_word>ils</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>dégageront</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>pièges</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>diable</dictionary_word>, <dictionary_word>qui</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>tient</dictionary_word> <dictionary_word>captifs</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>les</dictionary_word> asservit <dictionary_word>à</dictionary_word> <dictionary_word>ses</dictionary_word> <dictionary_word>volontés</dictionary_word>. \n<publishing_chapter_number>3<publishing_chapter_number>",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 3:1",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "1",
+            "text": "<dictionary_word>Sache</dictionary_word> <dictionary_word>que</dictionary_word>, <dictionary_word>dans</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>derniers</dictionary_word> <dictionary_word>jours</dictionary_word>, <dictionary_word>il</dictionary_word> viendra <dictionary_word>des</dictionary_word> <dictionary_word>temps</dictionary_word> <dictionary_word>difficiles</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 3:2",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "2",
+            "text": "<dictionary_word>Car</dictionary_word> <dictionary_word>les</dictionary_word> hommes <dictionary_word>seront</dictionary_word> <dictionary_word>égoïstes</dictionary_word>, cupides, fanfarons, superbes, blasphémateurs, <dictionary_word>rebelles</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>leurs</dictionary_word> <dictionary_word>parents</dictionary_word>, ingrats, impies,",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 3:3",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "3",
+            "text": "sans affection, sans loyauté, <dictionary_word>calomniateurs</dictionary_word>, intempérants, cruels, ennemis des gens de bien,",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 3:4",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "4",
+            "text": "<dictionary_word>traîtres</dictionary_word>, insolents, enflés d’<dictionary_word>orgueil</dictionary_word>, amis <dictionary_word>des</dictionary_word> voluptés <dictionary_word>plus</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Dieu</dictionary_word>,",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 3:5",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "5",
+            "text": "<dictionary_word>ayant</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>dehors</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>piété</dictionary_word> <dictionary_word>sans</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>avoir</dictionary_word> <dictionary_word>la</dictionary_word> réalité : éloigne-toi <dictionary_word>de</dictionary_word> <dictionary_word>cette</dictionary_word> <dictionary_word>sorte</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>gens</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 3:6",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "6",
+            "text": "<dictionary_word>Tels</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>ceux</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>s</dictionary_word>’insinuent <dictionary_word>dans</dictionary_word> <dictionary_word>les</dictionary_word> familles <dictionary_word>pour</dictionary_word> captiver <dictionary_word>des</dictionary_word> femmelettes <dictionary_word>chargées</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>péchés</dictionary_word>, travaillées <dictionary_word>de</dictionary_word> <dictionary_word>passions</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>toute</dictionary_word> <dictionary_word>espèce</dictionary_word>,",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 3:7",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "7",
+            "text": "<dictionary_word>qui</dictionary_word> <dictionary_word>toujours</dictionary_word> <dictionary_word>apprennent</dictionary_word> <dictionary_word>sans</dictionary_word> <dictionary_word>pouvoir</dictionary_word> <dictionary_word>jamais</dictionary_word> parvenir <dictionary_word>à</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>connaissance</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>vérité</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 3:8",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "8",
+            "text": "Pareils <dictionary_word>à</dictionary_word> <dictionary_word>Jannès</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>Jambrès</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>s</dictionary_word>’opposèrent <dictionary_word>à</dictionary_word> <dictionary_word>Moïse</dictionary_word>, <dictionary_word>de</dictionary_word> <dictionary_word>même</dictionary_word> <dictionary_word>ces</dictionary_word> <dictionary_word>hommes</dictionary_word>, viciés <dictionary_word>d</dictionary_word>’<dictionary_word>esprit</dictionary_word> <dictionary_word>et</dictionary_word> pervertis <dictionary_word>dans</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>foi</dictionary_word>, <dictionary_word>s</dictionary_word>’opposent <dictionary_word>à</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>vérité</dictionary_word>. <insert_footnote />",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 3:9",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "9",
+            "text": "<dictionary_word>Mais</dictionary_word> <dictionary_word>ils</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>feront</dictionary_word> <dictionary_word>plus</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>progrès</dictionary_word> ; <dictionary_word>car</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>folie</dictionary_word> éclatera <dictionary_word>aux</dictionary_word> <dictionary_word>yeux</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>tous</dictionary_word>, <dictionary_word>comme</dictionary_word> <dictionary_word>celle</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>ces</dictionary_word> <dictionary_word>deux</dictionary_word> <dictionary_word>hommes-là</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 3:10",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "10",
+            "text": "<dictionary_word>Pour</dictionary_word> <dictionary_word>toi</dictionary_word>, <dictionary_word>tu</dictionary_word> <dictionary_word>m</dictionary_word>’<dictionary_word>as</dictionary_word> <dictionary_word>suivi</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>ma</dictionary_word> <dictionary_word>doctrine</dictionary_word>, <dictionary_word>dans</dictionary_word> <dictionary_word>ma</dictionary_word> conduite, <dictionary_word>dans</dictionary_word> <dictionary_word>mes</dictionary_word> projets, <dictionary_word>dans</dictionary_word> <dictionary_word>ma</dictionary_word> <dictionary_word>foi</dictionary_word>, <dictionary_word>dans</dictionary_word> <dictionary_word>ma</dictionary_word> <dictionary_word>longanimité</dictionary_word>, <dictionary_word>dans</dictionary_word> <dictionary_word>ma</dictionary_word> <dictionary_word>charité</dictionary_word>, <dictionary_word>dans</dictionary_word> <dictionary_word>ma</dictionary_word> <dictionary_word>constance</dictionary_word>,",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 3:11",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "11",
+            "text": "<dictionary_word>dans</dictionary_word> <dictionary_word>mes</dictionary_word> <dictionary_word>persécutions</dictionary_word>, <dictionary_word>dans</dictionary_word> <dictionary_word>mes</dictionary_word> <dictionary_word>souffrances</dictionary_word>, <dictionary_word>telles</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>il</dictionary_word> <dictionary_word>m</dictionary_word>’<dictionary_word>en</dictionary_word> <dictionary_word>est</dictionary_word> survenu <dictionary_word>à</dictionary_word> Antioche, <dictionary_word>à</dictionary_word> Iconium, <dictionary_word>à</dictionary_word> Lystres. <dictionary_word>Elles</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>sans</dictionary_word> <dictionary_word>nombre</dictionary_word>, <insert_footnote /> <dictionary_word>les</dictionary_word> <dictionary_word>persécutions</dictionary_word> \n<dictionary_word>que</dictionary_word> <dictionary_word>j</dictionary_word>’<dictionary_word>ai</dictionary_word> endurées, <dictionary_word>et</dictionary_word> <dictionary_word>chaque</dictionary_word> <dictionary_word>fois</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>Seigneur</dictionary_word> <dictionary_word>m</dictionary_word>’<dictionary_word>en</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>délivré</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 3:12",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "12",
+            "text": "<dictionary_word>Aussi</dictionary_word> <dictionary_word>bien</dictionary_word>, <dictionary_word>tous</dictionary_word> <dictionary_word>ceux</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>veulent</dictionary_word> <dictionary_word>vivre</dictionary_word> <dictionary_word>avec</dictionary_word> <dictionary_word>piété</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>Christ</dictionary_word> <dictionary_word>Jésus</dictionary_word> <dictionary_word>auront</dictionary_word> <dictionary_word>à</dictionary_word> souffrir persécution.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 3:13",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "13",
+            "text": "Quant <dictionary_word>aux</dictionary_word> <dictionary_word>méchants</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>aux</dictionary_word> <dictionary_word>imposteurs</dictionary_word>, <dictionary_word>ils</dictionary_word> <dictionary_word>iront</dictionary_word> <dictionary_word>toujours</dictionary_word> <dictionary_word>plus</dictionary_word> avant <dictionary_word>dans</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>mal</dictionary_word>, <dictionary_word>égarant</dictionary_word> <translators_addition>les autres<translators_addition> <dictionary_word>et</dictionary_word> <dictionary_word>égarés</dictionary_word> <translators_addition>eux-mêmes<translators_addition>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 3:14",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "14",
+            "text": "<dictionary_word>Pour</dictionary_word> <dictionary_word>toi</dictionary_word>, <dictionary_word>demeure</dictionary_word> <dictionary_word>ferme</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>tu</dictionary_word> <dictionary_word>as</dictionary_word> <dictionary_word>appris</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>dont</dictionary_word> <dictionary_word>tu</dictionary_word> <dictionary_word>as</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>certitude</dictionary_word>, <dictionary_word>sachant</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>tu</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>tiens</dictionary_word>,",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 3:15",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "15",
+            "text": "<dictionary_word>et</dictionary_word> <dictionary_word>que</dictionary_word>, <dictionary_word>dès</dictionary_word> <dictionary_word>ton</dictionary_word> <dictionary_word>enfance</dictionary_word>, <dictionary_word>tu</dictionary_word> <dictionary_word>as</dictionary_word> <dictionary_word>connu</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>saintes</dictionary_word> <dictionary_word>lettres</dictionary_word>, <dictionary_word>qui</dictionary_word> <dictionary_word>peuvent</dictionary_word> <dictionary_word>te</dictionary_word> <dictionary_word>donner</dictionary_word> <dictionary_word>la</dictionary_word> sagesse <dictionary_word>qui</dictionary_word> <dictionary_word>conduit</dictionary_word> <dictionary_word>au</dictionary_word> <dictionary_word>salut</dictionary_word> <dictionary_word>par</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>foi</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>Jésus-Christ</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 3:16",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "16",
+            "text": "<dictionary_word>Toute</dictionary_word> <dictionary_word>Écriture</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>divinement</dictionary_word> <dictionary_word>inspirée</dictionary_word>, <insert_footnote /> <dictionary_word>et</dictionary_word> <dictionary_word>utile</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>enseigner</dictionary_word>, <dictionary_word>pour</dictionary_word> <dictionary_word>convaincre</dictionary_word>, <dictionary_word>pour</dictionary_word> <dictionary_word>corriger</dictionary_word>, <dictionary_word>pour</dictionary_word> <dictionary_word>former</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>justice</dictionary_word>,",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 3:17",
+            "chapter": "3",
+            "alternate_verse_number": "",
+            "verse_number": "17",
+            "text": "<dictionary_word>afin</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>homme</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Dieu</dictionary_word> <dictionary_word>soit</dictionary_word> parfait, apte <dictionary_word>à</dictionary_word> <dictionary_word>toute</dictionary_word> <dictionary_word>bonne</dictionary_word> <dictionary_word>œuvre</dictionary_word>. \n<publishing_chapter_number>4<publishing_chapter_number>",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 4:1",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "1",
+            "text": "<dictionary_word>Je</dictionary_word> t’adjure <dictionary_word>devant</dictionary_word> <dictionary_word>Dieu</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>devant</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>Christ</dictionary_word> <dictionary_word>Jésus</dictionary_word>, <dictionary_word>qui</dictionary_word> <dictionary_word>doit</dictionary_word> <dictionary_word>juger</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>vivants</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>morts</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>par</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>apparition</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>règne</dictionary_word>,",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 4:2",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "2",
+            "text": "<dictionary_word>prêche</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>parole</dictionary_word>, <dictionary_word>insiste</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>temps</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>à</dictionary_word> contretemps, <dictionary_word>reprends</dictionary_word>, <dictionary_word>menace</dictionary_word>, <dictionary_word>exhorte</dictionary_word>, <dictionary_word>avec</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>entière</dictionary_word> <dictionary_word>patience</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>toujours</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>instruisant</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 4:3",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "3",
+            "text": "<dictionary_word>Car</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>temps</dictionary_word> <dictionary_word>viendra</dictionary_word> <dictionary_word>où</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>hommes</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>supporteront</dictionary_word> <dictionary_word>plus</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>saine</dictionary_word> <dictionary_word>doctrine</dictionary_word> ; <dictionary_word>mais</dictionary_word> <dictionary_word>ils</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>donneront</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>foule</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>docteurs</dictionary_word>, <dictionary_word>suivant</dictionary_word> <dictionary_word>leurs</dictionary_word> <dictionary_word>convoitises</dictionary_word> <dictionary_word>et</dictionary_word> avides <dictionary_word>de</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>peut</dictionary_word> chatouiller <dictionary_word>leurs</dictionary_word> oreilles ; <insert_footnote />",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 4:4",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "4",
+            "text": "<dictionary_word>ils</dictionary_word> <dictionary_word>les</dictionary_word> fermeront <dictionary_word>à</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>vérité</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>ouvrir</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>fables</dictionary_word>. <insert_footnote />",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 4:5",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "5",
+            "text": "<dictionary_word>Mais</dictionary_word> <dictionary_word>toi</dictionary_word>, <dictionary_word>sois</dictionary_word> circonspect <dictionary_word>en</dictionary_word> <dictionary_word>toutes</dictionary_word> <dictionary_word>choses</dictionary_word>, endure <dictionary_word>la</dictionary_word> <dictionary_word>souffrance</dictionary_word> <insert_footnote />, <dictionary_word>fais</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>œuvre</dictionary_word> <dictionary_word>d</dictionary_word>’<dictionary_word>un</dictionary_word> <dictionary_word>prédicateur</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>Évangile</dictionary_word>, <dictionary_word>sois</dictionary_word> <dictionary_word>tout</dictionary_word> <dictionary_word>entier</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>ton</dictionary_word> <dictionary_word>ministère</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 4:6",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "6",
+            "text": "<dictionary_word>Car</dictionary_word>, <dictionary_word>pour</dictionary_word> <dictionary_word>moi</dictionary_word>, <dictionary_word>je</dictionary_word> <dictionary_word>sers</dictionary_word> <dictionary_word>déjà</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>libation</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>moment</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>mon</dictionary_word> <dictionary_word>départ</dictionary_word> <dictionary_word>est</dictionary_word> proche. <insert_footnote />",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 4:7",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "7",
+            "text": "J’<dictionary_word>ai</dictionary_word> combattu <dictionary_word>le</dictionary_word> <dictionary_word>bon</dictionary_word> <dictionary_word>combat</dictionary_word>, j’<dictionary_word>ai</dictionary_word> <dictionary_word>achevé</dictionary_word> <dictionary_word>ma</dictionary_word> <dictionary_word>course</dictionary_word>, j’<dictionary_word>ai</dictionary_word> <dictionary_word>gardé</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>foi</dictionary_word> ;",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 4:8",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "8",
+            "text": "<dictionary_word>il</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>me</dictionary_word> <dictionary_word>reste</dictionary_word> <dictionary_word>plus</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>à</dictionary_word> <dictionary_word>recevoir</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>couronne</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>justice</dictionary_word>, <dictionary_word>que</dictionary_word> <dictionary_word>me</dictionary_word> <dictionary_word>donnera</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>jour-là</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>Seigneur</dictionary_word>, <dictionary_word>le</dictionary_word> <dictionary_word>juste</dictionary_word> <dictionary_word>Juge</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>non</dictionary_word> <dictionary_word>seulement</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>moi</dictionary_word>, <dictionary_word>mais</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>tous</dictionary_word> <dictionary_word>ceux</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>auront</dictionary_word> <dictionary_word>aimé</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>avènement</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 4:9",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "9",
+            "text": "<dictionary_word>Tâche</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>me</dictionary_word> <dictionary_word>rejoindre</dictionary_word> <dictionary_word>au</dictionary_word> <dictionary_word>plus</dictionary_word> <dictionary_word>tôt</dictionary_word> ; car Démas, <dictionary_word>m</dictionary_word>’<dictionary_word>a</dictionary_word> quitté <dictionary_word>par</dictionary_word> amour <dictionary_word>pour</dictionary_word> <dictionary_word>le</dictionary_word> siècle présent, <dictionary_word>et</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>est</dictionary_word> parti <dictionary_word>pour</dictionary_word> Thessalonique ; <insert_footnote />",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 4:10",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "10",
+            "text": "Crescent <dictionary_word>est</dictionary_word> <dictionary_word>allé</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>Galatie</dictionary_word>, <dictionary_word>Tite</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>Dalmatie</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 4:11",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "11",
+            "text": "<dictionary_word>Luc</dictionary_word> <dictionary_word>seul</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>avec</dictionary_word> <dictionary_word>moi</dictionary_word>. <dictionary_word>Prends</dictionary_word> <dictionary_word>Marc</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>amène-le</dictionary_word> <dictionary_word>avec</dictionary_word> <dictionary_word>toi</dictionary_word>, <dictionary_word>car</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>m</dictionary_word>’<dictionary_word>est</dictionary_word> <dictionary_word>d</dictionary_word>’<dictionary_word>un</dictionary_word> grand <dictionary_word>secours</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>ministère</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 4:12",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "12",
+            "text": "<dictionary_word>J</dictionary_word>’<dictionary_word>ai</dictionary_word> <dictionary_word>envoyé</dictionary_word> <dictionary_word>Tychique</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>Éphèse</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 4:13",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "13",
+            "text": "<dictionary_word>En</dictionary_word> <dictionary_word>venant</dictionary_word>, <dictionary_word>apporte</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>manteau</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>j</dictionary_word>’<dictionary_word>ai</dictionary_word> <dictionary_word>laissé</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>Troas</dictionary_word> <dictionary_word>chez</dictionary_word> <dictionary_word>Carpus</dictionary_word>, <dictionary_word>ainsi</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>livres</dictionary_word>, <dictionary_word>surtout</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>parchemins</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 4:14",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "14",
+            "text": "Alexandre, <dictionary_word>le</dictionary_word> fondeur, <dictionary_word>m</dictionary_word>’<dictionary_word>a</dictionary_word> <dictionary_word>fait</dictionary_word> <dictionary_word>bien</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>mal</dictionary_word> : <dictionary_word>le</dictionary_word> <dictionary_word>Seigneur</dictionary_word> <dictionary_word>lui</dictionary_word> <dictionary_word>rendra</dictionary_word> <dictionary_word>selon</dictionary_word> <dictionary_word>ses</dictionary_word> <dictionary_word>œuvres</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 4:15",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "15",
+            "text": "<dictionary_word>Toi</dictionary_word> <dictionary_word>aussi</dictionary_word>, <dictionary_word>tiens-toi</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>garde</dictionary_word> <dictionary_word>contre</dictionary_word> <dictionary_word>lui</dictionary_word>, <dictionary_word>car</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>fait</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>forte</dictionary_word> opposition <dictionary_word>à</dictionary_word> <dictionary_word>notre</dictionary_word> <dictionary_word>prédication</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 4:16",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "16",
+            "text": "<dictionary_word>Personne</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>m</dictionary_word>’<dictionary_word>a</dictionary_word> assisté <dictionary_word>dans</dictionary_word> <dictionary_word>ma</dictionary_word> <dictionary_word>première</dictionary_word> <dictionary_word>défense</dictionary_word> ; <dictionary_word>tous</dictionary_word> <dictionary_word>m</dictionary_word>’<dictionary_word>ont</dictionary_word> <dictionary_word>abandonné</dictionary_word> : <dictionary_word>que</dictionary_word> <dictionary_word>cela</dictionary_word> <dictionary_word>ne</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>soit</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>imputé</dictionary_word> !",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 4:17",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "17",
+            "text": "<dictionary_word>Cependant</dictionary_word>, <dictionary_word>le</dictionary_word> <dictionary_word>Seigneur</dictionary_word> <dictionary_word>m</dictionary_word>’<dictionary_word>a</dictionary_word> <dictionary_word>assisté</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>m</dictionary_word>’<dictionary_word>a</dictionary_word> <dictionary_word>fortifié</dictionary_word> <dictionary_word>afin</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>la</dictionary_word> parole <dictionary_word>fût</dictionary_word> <dictionary_word>pleinement</dictionary_word> annoncée <dictionary_word>par</dictionary_word> <dictionary_word>moi</dictionary_word> <dictionary_word>et</dictionary_word> entendue <dictionary_word>de</dictionary_word> <dictionary_word>toutes</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>nations</dictionary_word> ; <dictionary_word>et</dictionary_word> <dictionary_word>j</dictionary_word>’<dictionary_word>ai</dictionary_word> <dictionary_word>été</dictionary_word> <dictionary_word>délivré</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>gueule</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>lion</dictionary_word>. <insert_footnote />",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 4:18",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "18",
+            "text": "<dictionary_word>Le</dictionary_word> <dictionary_word>Seigneur</dictionary_word> <dictionary_word>me</dictionary_word> <dictionary_word>délivrera</dictionary_word> <insert_footnote /> <dictionary_word>de</dictionary_word> <dictionary_word>toute</dictionary_word> <dictionary_word>œuvre</dictionary_word> <dictionary_word>mauvaise</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>me</dictionary_word> <dictionary_word>sauvera</dictionary_word> <translators_addition>en me faisant entrer<translators_addition> <dictionary_word>dans</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>royaume</dictionary_word> <dictionary_word>céleste</dictionary_word>. <dictionary_word>À</dictionary_word> <dictionary_word>lui</dictionary_word> <dictionary_word>soit</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>gloire</dictionary_word> <dictionary_word>aux</dictionary_word> <dictionary_word>siècles</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>siècles</dictionary_word> ! Amen !",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 4:19",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "19",
+            "text": "<dictionary_word>Salue</dictionary_word> <dictionary_word>Prisca</dictionary_word> <dictionary_word>et</dictionary_word> Aquila, <insert_footnote /> <dictionary_word>et</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>famille</dictionary_word> <dictionary_word>d</dictionary_word>’<dictionary_word>Onésiphore</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 4:20",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "20",
+            "text": "<dictionary_word>Eraste</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>resté</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>Corinthe</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>j</dictionary_word>’ai laissé <dictionary_word>Trophime</dictionary_word> <dictionary_word>malade</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>Milet</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 4:21",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "21",
+            "text": "Hâte-toi <dictionary_word>de</dictionary_word> <dictionary_word>venir</dictionary_word> <dictionary_word>avant</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>hiver</dictionary_word>. Eubule <dictionary_word>te</dictionary_word> <dictionary_word>salue</dictionary_word>, <dictionary_word>ainsi</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>Pudens</dictionary_word>, <dictionary_word>Linus</dictionary_word>, <dictionary_word>Claudia</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>tous</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>frères</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "2TI 4:22",
+            "chapter": "4",
+            "alternate_verse_number": "",
+            "verse_number": "22",
+            "text": "<dictionary_word>Que</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>Seigneur</dictionary_word> <dictionary_word>Jésus-Christ</dictionary_word> <dictionary_word>soit</dictionary_word> <dictionary_word>avec</dictionary_word> <dictionary_word>ton</dictionary_word> <dictionary_word>esprit</dictionary_word> ! <dictionary_word>Que</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>grâce</dictionary_word> <dictionary_word>soit</dictionary_word> <dictionary_word>avec</dictionary_word> <dictionary_word>vous</dictionary_word> ! Amen !",
+            "position": "left"
+        }
+    ],
+    "titles": [
+        {
+            "content": "PRÉAMBULE.",
+            "kind": "major_section",
+            "chapter": "1",
+            "last_verse": "0"
+        },
+        {
+            "content": "Adresse et salutation (i, 1-2). — Action de grâce (3-5).",
+            "kind": "title2",
+            "chapter": "1",
+            "last_verse": "0"
+        },
+        {
+            "content": "I. LA PRÉDICATION DE L’ÉVANGILE. [I, 6 — IV, 18.]",
+            "kind": "major_section",
+            "chapter": "1",
+            "last_verse": "5"
+        },
+        {
+            "content": "Chap. i, 6 — ii, 13. Une vertu nécessaire à Timothée : la force d’âme dans l’exercice de ses fonctions. Motifs : la grâce de son ordination (6-8), la sainteté de sa vocation (9-10), le propre exemple de l’Apôtre (11-18), la qualité de soldat de Jésus-Christ (ii, 1-7), la récompense promise aux vaillants (8-13).",
+            "kind": "title2",
+            "chapter": "1",
+            "last_verse": "5"
+        },
+        {
+            "content": "II. DÉFENSE DE L’ÉGLISE CONTRE L’HÉRÉSIE.",
+            "kind": "major_section",
+            "chapter": "2",
+            "last_verse": "13"
+        },
+        {
+            "content": "2. Chap. ii, 14 — iv, 8 : Comment il doit se conduire à l’égard des hérésies présentes et futures. — a) Fuir les vaines disputes, les passions de la jeunesse, les questions oiseuses (14-24). Lutter avec douceur, mais décision (25-26). — b) Crise d’impiété qui signalera les derniers temps ; faux docteurs (iii, 1-9). Être ferme dans la défense de la vérité (10-13), sachant sur quel fondement elle s’appuie (14-17). — Adjuration finale (iv, 1-8).",
+            "kind": "title2",
+            "chapter": "2",
+            "last_verse": "13"
+        },
+        {
+            "content": "ÉPILOGUE. [IV, 9 — 22.]",
+            "kind": "major_section",
+            "chapter": "4",
+            "last_verse": "8"
+        },
+        {
+            "content": "Chap. iv, 9-22. Il invite son disciple à le rejoindre (9-13). Informations sur diverses personnes (14-18). Salutations (19-22).",
+            "kind": "title2",
+            "chapter": "4",
+            "last_verse": "8"
+        }
+    ],
+    "footnotes": [
+        {
+            "references": "1:6 ",
+            "references_chapter": "1",
+            "references_verse": "6",
+            "text": "I, 6. <footnote_quote>À ranimer</footnote_quote>, Vulg., "
+        },
+        {
+            "references": "1:8 ",
+            "references_chapter": "1",
+            "references_verse": "8",
+            "text": "8. <footnote_quote>Souffre</footnote_quote> ; Vulg. "
+        },
+        {
+            "references": "1:13 ",
+            "references_chapter": "1",
+            "references_verse": "13",
+            "text": "13. <footnote_quote>Le souvenir fidèle</footnote_quote>, m. à m. le modèle."
+        },
+        {
+            "references": "1:14 ",
+            "references_chapter": "1",
+            "references_verse": "14",
+            "text": "14. <footnote_quote>Le bon dépôt</footnote_quote>de la doctrine chrétienne."
+        },
+        {
+            "references": "2:3 ",
+            "references_chapter": "2",
+            "references_verse": "3",
+            "text": "II, 3. <footnote_quote>Soldat de J.-C. </footnote_quote>Comp. Ephés. vi, 14 sv. ; Hébr. ii, 10 ; xii, 2 ; II Tim. iv, 8."
+        },
+        {
+            "references": "2:4 ",
+            "references_chapter": "2",
+            "references_verse": "4",
+            "text": "4. <footnote_quote>Le métier des armes</footnote_quote>, litt. "
+        },
+        {
+            "references": "2:10 ",
+            "references_chapter": "2",
+            "references_verse": "10",
+            "text": "10. <footnote_quote>Éternelle</footnote_quote> ; Vulg. "
+        },
+        {
+            "references": "2:14 ",
+            "references_chapter": "2",
+            "references_verse": "14",
+            "text": "14. Vulg. : … <footnote_quote>devant le Seigneur</footnote_quote>. "
+        },
+        {
+            "references": "2:19 ",
+            "references_chapter": "2",
+            "references_verse": "19",
+            "text": "19. <footnote_quote>Avec ce sceau</footnote_quote>, c’est-à-dire, portant comme sceau ces paroles."
+        },
+        {
+            "references": "2:21 ",
+            "references_chapter": "2",
+            "references_verse": "21",
+            "text": "21. <footnote_quote>De ces choses-là</footnote_quote>, c’est à-dire de l’iniquité et des erreurs, vers. 16, 17, 19."
+        },
+        {
+            "references": "3:8 ",
+            "references_chapter": "3",
+            "references_verse": "8",
+            "text": "III, 8. <footnote_quote>Jannès et Jambrès</footnote_quote>(Vulg. "
+        },
+        {
+            "references": "3:11 ",
+            "references_chapter": "3",
+            "references_verse": "11",
+            "text": "11. Act. xiii, 14, 50 ; xiv, 1 sv."
+        },
+        {
+            "references": "3:16 ",
+            "references_chapter": "3",
+            "references_verse": "16",
+            "text": "16. <footnote_quote>Inspirée</footnote_quote> : comp. II Pier. i, 21. D’autres : "
+        },
+        {
+            "references": "4:3 ",
+            "references_chapter": "4",
+            "references_verse": "3",
+            "text": "IV, 3. <footnote_quote>Chatouiller</footnote_quote>, etc. ; litt. "
+        },
+        {
+            "references": "4:4 ",
+            "references_chapter": "4",
+            "references_verse": "4",
+            "text": "4. <footnote_quote>Des fables</footnote_quote>, des spéculations gnostiques sur les puissances célestes."
+        },
+        {
+            "references": "4:5 ",
+            "references_chapter": "4",
+            "references_verse": "5",
+            "text": "5. <footnote_quote>Endure la souffrance</footnote_quote> : le "
+        },
+        {
+            "references": "4:6 ",
+            "references_chapter": "4",
+            "references_verse": "6",
+            "text": "6. La pensée : Je suis près de mourir, est exprimée sous deux images différentes : d’abord sous la figure d’un sacrifice, ou plutôt d’une libation, à cause de son sang qui va être versé (comp. Phil. ii, 17) ; puis sous celle d’un navire dont on détache les amarres pour sortir du port. Au lieu de <footnote_quote>mon départ</footnote_quote>, la Vulgate traduit, "
+        },
+        {
+            "references": "4:9 ",
+            "references_chapter": "4",
+            "references_verse": "9",
+            "text": "9. Col. iv, 14 ; Philém. 24."
+        },
+        {
+            "references": "4:17 ",
+            "references_chapter": "4",
+            "references_verse": "17",
+            "text": "17. <footnote_quote>De la gueule du lion</footnote_quote>, expression figurée pour désigner un danger de mort. Comp. Dan. vi, 21-23 ; I Cor. xv, 31 sv."
+        },
+        {
+            "references": "4:18 ",
+            "references_chapter": "4",
+            "references_verse": "18",
+            "text": "18. <footnote_quote>Me délivrera</footnote_quote> ; Vulg. "
+        },
+        {
+            "references": "4:19 ",
+            "references_chapter": "4",
+            "references_verse": "19",
+            "text": "19. <footnote_quote>Prisca et Aquila</footnote_quote> : voy. Rom. xvi, 3 ; ils étaient sans doute retournés à Éphèse."
+        }
+    ],
+    "cross_references": [],
+    "tables": []
+}

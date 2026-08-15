@@ -1,0 +1,369 @@
+{
+    "general": {
+        "about_translation": {
+            "language_name_in_english": "français",
+            "language_name_local_language": "French",
+            "translation_name_in_english": "French néo-Crampon Libre",
+            "translation_name_in_local_language": "Sainte Bible néo-Crampon Libre",
+            "real_kind": "Bible with Deuterocanon",
+            "found": "https://ebible.org/details.php?id=francl",
+            "written_from_left_to_right": true,
+            "translation_abbr": "FRANCL",
+            "ebible": {
+                "last_updated": "2025-09-10",
+                "region": "France",
+                "usfm_link": "https://eBible.org/Scriptures/francl_usfm.zip",
+                "copyright_link": "https://gitlab.com/crosswire-bible-society/neo-crampon-libre",
+                "copyright_text": "Copyright © 2022 Fraternité de Tibériade",
+                "contributor": "???",
+                "translation_by": ""
+            }
+        },
+        "about_book": {
+            "ident": "francl",
+            "is_apocryphal": false,
+            "bookname_in_english": "Jude",
+            "bookname_in_local_language": "Jude \n",
+            "book_code": "JUD",
+            "book_code_content": "N/A",
+            "before_source": []
+        },
+        "ident": "francl",
+        "editor_comments": "I ASSUME the contributor is the same as the copyright owner"
+    },
+    "special_elems": [],
+    "verses": [
+        {
+            "global_locator": "JUD 1:1",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "1",
+            "text": "<publishing_chapter_number>1<publishing_chapter_number><dictionary_word>Jude</dictionary_word> <dictionary_word>serviteur</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Jésus-Christ</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>frère</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Jacques</dictionary_word>, <dictionary_word>aux</dictionary_word> <dictionary_word>élus</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>ont</dictionary_word> <dictionary_word>été</dictionary_word> <dictionary_word>aimés</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>Dieu</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>Père</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>gardés</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>Jésus-Christ</dictionary_word> :",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:2",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "2",
+            "text": "<dictionary_word>la</dictionary_word> <dictionary_word>miséricorde</dictionary_word>, <dictionary_word>la</dictionary_word> <dictionary_word>paix</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>amour</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>soient</dictionary_word> <dictionary_word>donnés</dictionary_word> <dictionary_word>pleinement</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:3",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "3",
+            "text": "<dictionary_word>Bien-aimés</dictionary_word>, comme <dictionary_word>je</dictionary_word> mettais <dictionary_word>tout</dictionary_word> <dictionary_word>mon</dictionary_word> <dictionary_word>zèle</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>écrire</dictionary_word> <dictionary_word>au</dictionary_word> <dictionary_word>sujet</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>notre</dictionary_word> <dictionary_word>salut</dictionary_word> <dictionary_word>commun</dictionary_word>, <dictionary_word>je</dictionary_word> <dictionary_word>me</dictionary_word> <dictionary_word>suis</dictionary_word> <dictionary_word>vu</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>la</dictionary_word> nécessité <dictionary_word>de</dictionary_word> <dictionary_word>vous</dictionary_word> adresser <dictionary_word>cette</dictionary_word> <dictionary_word>lettre</dictionary_word>, <dictionary_word>pour</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>exhorter</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>combattre</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>foi</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>été</dictionary_word> <dictionary_word>transmise</dictionary_word> <dictionary_word>aux</dictionary_word> <dictionary_word>saints</dictionary_word> <dictionary_word>une</dictionary_word> <dictionary_word>fois</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>toutes</dictionary_word>. <insert_footnote />",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:4",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "4",
+            "text": "<dictionary_word>Car</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>s</dictionary_word>’<dictionary_word>est</dictionary_word> <dictionary_word>glissé</dictionary_word> <dictionary_word>parmi</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>certains</dictionary_word> <dictionary_word>hommes</dictionary_word>, <dictionary_word>dont</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>été</dictionary_word> écrit <dictionary_word>depuis</dictionary_word> <dictionary_word>longtemps</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>ils</dictionary_word> encouraient <dictionary_word>cette</dictionary_word> <dictionary_word>condamnation</dictionary_word>, <dictionary_word>hommes</dictionary_word> <dictionary_word>impies</dictionary_word>, <dictionary_word>qui</dictionary_word> <dictionary_word>changent</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>grâce</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>notre</dictionary_word> <dictionary_word>Dieu</dictionary_word> <dictionary_word>en</dictionary_word> licence, <dictionary_word>et</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>renient</dictionary_word> <dictionary_word>notre</dictionary_word> <dictionary_word>seul</dictionary_word> <dictionary_word>Maître</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>Seigneur</dictionary_word> <dictionary_word>Jésus-Christ</dictionary_word>. <insert_footnote />",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:5",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "5",
+            "text": "<dictionary_word>Je</dictionary_word> <dictionary_word>veux</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>rappeler</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>avez</dictionary_word> autrefois <dictionary_word>appris</dictionary_word>, <dictionary_word>que</dictionary_word> <dictionary_word>Jésus</dictionary_word> <insert_footnote />, <dictionary_word>après</dictionary_word> <dictionary_word>avoir</dictionary_word> <dictionary_word>sauvé</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>peuple</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>terre</dictionary_word> <dictionary_word>d</dictionary_word>’Égypte, <dictionary_word>fit</dictionary_word> <dictionary_word>périr</dictionary_word> <dictionary_word>ensuite</dictionary_word> <dictionary_word>ceux</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>furent</dictionary_word> <dictionary_word>incrédules</dictionary_word> ;",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:6",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "6",
+            "text": "<dictionary_word>et</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>il</dictionary_word> retint <dictionary_word>pour</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>jugement</dictionary_word> <dictionary_word>du</dictionary_word> <dictionary_word>grand</dictionary_word> <dictionary_word>jour</dictionary_word>, liés <dictionary_word>de</dictionary_word> <dictionary_word>chaînes</dictionary_word> éternelles, <dictionary_word>au</dictionary_word> sein <dictionary_word>des</dictionary_word> <dictionary_word>ténèbres</dictionary_word>, <dictionary_word>les</dictionary_word> <dictionary_word>anges</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>n</dictionary_word>’<dictionary_word>ont</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>conservé</dictionary_word> <dictionary_word>leur</dictionary_word> principauté, mais <dictionary_word>qui</dictionary_word> <dictionary_word>ont</dictionary_word> <dictionary_word>abandonné</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>propre</dictionary_word> <dictionary_word>demeure</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:7",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "7",
+            "text": "<dictionary_word>De</dictionary_word> <dictionary_word>même</dictionary_word> <dictionary_word>Sodome</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>Gomorrhe</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>villes</dictionary_word> <dictionary_word>voisines</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>livrèrent</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>même</dictionary_word> sorte <dictionary_word>d</dictionary_word>’<dictionary_word>impudicité</dictionary_word> <dictionary_word>et</dictionary_word> abusèrent <dictionary_word>d</dictionary_word>’<dictionary_word>une</dictionary_word> <dictionary_word>chair</dictionary_word> étrangère, gisent <dictionary_word>là</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>exemple</dictionary_word>, <dictionary_word>subissant</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>peine</dictionary_word> <dictionary_word>d</dictionary_word>’<dictionary_word>un</dictionary_word> <dictionary_word>feu</dictionary_word> éternel. <insert_footnote />",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:8",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "8",
+            "text": "<dictionary_word>Cependant</dictionary_word>, <dictionary_word>ces</dictionary_word> <dictionary_word>hommes</dictionary_word> <dictionary_word>eux</dictionary_word> <dictionary_word>aussi</dictionary_word>, <dictionary_word>dans</dictionary_word> <dictionary_word>leur</dictionary_word> délire<insert_footnote />, <dictionary_word>souillent</dictionary_word> <dictionary_word>pareillement</dictionary_word> <dictionary_word>leur</dictionary_word> <dictionary_word>chair</dictionary_word>, méprisent <dictionary_word>la</dictionary_word> souveraineté <dictionary_word>et</dictionary_word> <dictionary_word>injurient</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>gloires</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:9",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "9",
+            "text": "<dictionary_word>L</dictionary_word>’archange <dictionary_word>Michel</dictionary_word> <dictionary_word>lui-même</dictionary_word>, <dictionary_word>lorsqu</dictionary_word>’<dictionary_word>il</dictionary_word> <dictionary_word>contestait</dictionary_word> <dictionary_word>avec</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>diable</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>lui</dictionary_word> <dictionary_word>disputait</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>corps</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Moïse</dictionary_word>, <insert_footnote /> <dictionary_word>n</dictionary_word>’<dictionary_word>osa</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>porter</dictionary_word> <dictionary_word>contre</dictionary_word> <dictionary_word>lui</dictionary_word> <dictionary_word>une</dictionary_word> \nsentence <dictionary_word>d</dictionary_word>’exécration, <dictionary_word>mais</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>se</dictionary_word> contenta <dictionary_word>de</dictionary_word> <dictionary_word>dire</dictionary_word> : « <dictionary_word>Que</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>Seigneur</dictionary_word> <dictionary_word>te</dictionary_word> punisse ! »",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:10",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "10",
+            "text": "<dictionary_word>Mais</dictionary_word> <dictionary_word>ceux-ci</dictionary_word>, <dictionary_word>ils</dictionary_word> blasphèment <dictionary_word>tout</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>ils</dictionary_word> <dictionary_word>ignorent</dictionary_word>, <dictionary_word>et</dictionary_word> quant <dictionary_word>à</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>ils</dictionary_word> <dictionary_word>connaissent</dictionary_word> <dictionary_word>naturellement</dictionary_word>, <dictionary_word>comme</dictionary_word> <dictionary_word>les</dictionary_word> bêtes <dictionary_word>sans</dictionary_word> raison, <dictionary_word>ils</dictionary_word> <dictionary_word>s</dictionary_word>’<dictionary_word>y</dictionary_word> <dictionary_word>corrompent</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:11",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "11",
+            "text": "<dictionary_word>Malheur</dictionary_word> <dictionary_word>à</dictionary_word> <dictionary_word>eux</dictionary_word> ! <dictionary_word>car</dictionary_word> <dictionary_word>ils</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>entrés</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>voie</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Caïn</dictionary_word>, <dictionary_word>ils</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>jetés</dictionary_word> <dictionary_word>pour</dictionary_word> <dictionary_word>un</dictionary_word> <dictionary_word>salaire</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>égarement</dictionary_word> <dictionary_word>de</dictionary_word> Balaam, <dictionary_word>ils</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>perdus</dictionary_word> <dictionary_word>par</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>révolte</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Coré</dictionary_word> ?",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:12",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "12",
+            "text": "<dictionary_word>Ils</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>écueils</dictionary_word> <insert_footnote /> <dictionary_word>dans</dictionary_word> <dictionary_word>vos</dictionary_word> agapes, <dictionary_word>où</dictionary_word> <dictionary_word>ils</dictionary_word> <dictionary_word>font</dictionary_word> impudemment <dictionary_word>bonne</dictionary_word> <dictionary_word>chère</dictionary_word>, <dictionary_word>ne</dictionary_word> songeant <dictionary_word>qu</dictionary_word>’<dictionary_word>à</dictionary_word> <dictionary_word>se</dictionary_word> repaître <dictionary_word>eux-mêmes</dictionary_word> ; <dictionary_word>nuées</dictionary_word> <dictionary_word>sans</dictionary_word> eau, emportées <dictionary_word>au</dictionary_word> hasard <dictionary_word>par</dictionary_word> <dictionary_word>les</dictionary_word> vents ; <dictionary_word>arbres</dictionary_word> <dictionary_word>d</dictionary_word>’<dictionary_word>automne</dictionary_word> <dictionary_word>sans</dictionary_word> fruits, deux <dictionary_word>fois</dictionary_word> <dictionary_word>morts</dictionary_word>, <dictionary_word>déracinés</dictionary_word> ;",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:13",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "13",
+            "text": "<dictionary_word>vagues</dictionary_word> <dictionary_word>furieuses</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>mer</dictionary_word> ; jetant <dictionary_word>l</dictionary_word>’<dictionary_word>écume</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>leurs</dictionary_word> hontes ; <dictionary_word>astres</dictionary_word> <dictionary_word>errants</dictionary_word>, <dictionary_word>auxquels</dictionary_word> <dictionary_word>d</dictionary_word>’épaisses <dictionary_word>ténèbres</dictionary_word> <dictionary_word>sont</dictionary_word> réservées <dictionary_word>pour</dictionary_word> <dictionary_word>l</dictionary_word>’éternité.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:14",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "14",
+            "text": "<dictionary_word>C</dictionary_word>’<dictionary_word>est</dictionary_word> <dictionary_word>d</dictionary_word>’<dictionary_word>eux</dictionary_word> <dictionary_word>aussi</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>Énoch</dictionary_word>, <insert_footnote /> <dictionary_word>le</dictionary_word> <dictionary_word>septième</dictionary_word> <translators_addition>patriarche<translators_addition> <dictionary_word>depuis</dictionary_word> Adam, <dictionary_word>a</dictionary_word> <dictionary_word>prophétisé</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>ces</dictionary_word> <dictionary_word>termes</dictionary_word> : « <dictionary_word>Voici</dictionary_word> <dictionary_word>que</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>Seigneur</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>venu</dictionary_word> <dictionary_word>avec</dictionary_word> <dictionary_word>la</dictionary_word> multitude innombrable <dictionary_word>de</dictionary_word> <dictionary_word>ses</dictionary_word> <dictionary_word>saints</dictionary_word>,",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:15",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "15",
+            "text": "<dictionary_word>pour</dictionary_word> <dictionary_word>exécuter</dictionary_word> <dictionary_word>son</dictionary_word> <dictionary_word>jugement</dictionary_word> <dictionary_word>sur</dictionary_word> <dictionary_word>tous</dictionary_word>, <dictionary_word>et</dictionary_word> convaincre <dictionary_word>tous</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>impies</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>toutes</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>œuvres</dictionary_word> <dictionary_word>d</dictionary_word>’<dictionary_word>impiété</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>ils</dictionary_word> <dictionary_word>ont</dictionary_word> <dictionary_word>commises</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>toutes</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>paroles</dictionary_word> criminelles <dictionary_word>qu</dictionary_word>’<dictionary_word>eux</dictionary_word>, <dictionary_word>pécheurs</dictionary_word> <dictionary_word>impies</dictionary_word>, <dictionary_word>ont</dictionary_word> <dictionary_word>proférées</dictionary_word> <dictionary_word>contre</dictionary_word> <dictionary_word>lui</dictionary_word>. »",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:16",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "16",
+            "text": "<dictionary_word>Ce</dictionary_word> <dictionary_word>sont</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>gens</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>murmurent</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>plaignent</dictionary_word> <dictionary_word>sans</dictionary_word> <dictionary_word>cesse</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>leur</dictionary_word> sort, <dictionary_word>qui</dictionary_word> <dictionary_word>vivent</dictionary_word> <dictionary_word>au</dictionary_word> gré <dictionary_word>de</dictionary_word> <dictionary_word>leurs</dictionary_word> <dictionary_word>convoitises</dictionary_word>, <dictionary_word>ont</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>bouche</dictionary_word> remplie <dictionary_word>de</dictionary_word> <dictionary_word>paroles</dictionary_word> pompeuses, <dictionary_word>et</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>par</dictionary_word> <dictionary_word>intérêt</dictionary_word> <dictionary_word>se</dictionary_word> <dictionary_word>font</dictionary_word> admirateurs <dictionary_word>d</dictionary_word>’autrui.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:17",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "17",
+            "text": "<dictionary_word>Pour</dictionary_word> <dictionary_word>vous</dictionary_word>, <dictionary_word>bien-aimés</dictionary_word>, <dictionary_word>souvenez-vous</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>ce</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>été</dictionary_word> <dictionary_word>annoncé</dictionary_word> <dictionary_word>d</dictionary_word>’<dictionary_word>avance</dictionary_word> <dictionary_word>par</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>Apôtres</dictionary_word> <dictionary_word>de</dictionary_word> Notre-Seigneur <dictionary_word>Jésus-Christ</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:18",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "18",
+            "text": "<dictionary_word>Ils</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>disaient</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>au</dictionary_word> <dictionary_word>dernier</dictionary_word> <dictionary_word>temps</dictionary_word> <dictionary_word>il</dictionary_word> <dictionary_word>y</dictionary_word> <dictionary_word>aurait</dictionary_word> <dictionary_word>des</dictionary_word> <dictionary_word>hommes</dictionary_word> <dictionary_word>moqueurs</dictionary_word>, <insert_footnote /> vivant <dictionary_word>au</dictionary_word> gré <dictionary_word>de</dictionary_word> <dictionary_word>leurs</dictionary_word> <dictionary_word>convoitises</dictionary_word> impies,",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:19",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "19",
+            "text": "<dictionary_word>gens</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>provoquent</dictionary_word> <dictionary_word>des</dictionary_word> divisions, <dictionary_word>hommes</dictionary_word> <dictionary_word>sensuels</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>n</dictionary_word>’<dictionary_word>ont</dictionary_word> <dictionary_word>pas</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>esprit</dictionary_word>. <insert_footnote />",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:20",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "20",
+            "text": "<dictionary_word>Pour</dictionary_word> <dictionary_word>vous</dictionary_word>, <dictionary_word>bien-aimés</dictionary_word>, <dictionary_word>vous</dictionary_word> <dictionary_word>édifiant</dictionary_word> vous-même <dictionary_word>sur</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>fondement</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>votre</dictionary_word> très <dictionary_word>sainte</dictionary_word> <dictionary_word>foi</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>priant</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>Saint-Esprit</dictionary_word>,",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:21",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "21",
+            "text": "conservez-vous <dictionary_word>dans</dictionary_word> <dictionary_word>l</dictionary_word>’<dictionary_word>amour</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>Dieu</dictionary_word>, <dictionary_word>attendant</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>miséricorde</dictionary_word> <dictionary_word>de</dictionary_word> Notre-Seigneur <dictionary_word>Jésus-Christ</dictionary_word>, <dictionary_word>pour</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>vie</dictionary_word> <dictionary_word>éternelle</dictionary_word>.",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:22",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "22",
+            "text": "<dictionary_word>Il</dictionary_word> <dictionary_word>en</dictionary_word> <dictionary_word>est</dictionary_word> <dictionary_word>qu</dictionary_word>’<dictionary_word>il</dictionary_word> <dictionary_word>faut</dictionary_word> confondre <translators_addition>comme déjà<translators_addition> séparés <translators_addition>de vous<translators_addition> ; <insert_footnote />",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:23",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "23",
+            "text": "<dictionary_word>d</dictionary_word>’<dictionary_word>autres</dictionary_word>, sauvez-les <dictionary_word>en</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>arrachant</dictionary_word> <dictionary_word>au</dictionary_word> <dictionary_word>feu</dictionary_word> ; <dictionary_word>pour</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>autres</dictionary_word>, ayez-en <dictionary_word>pitié</dictionary_word>, <dictionary_word>mais</dictionary_word> <dictionary_word>avec</dictionary_word> <dictionary_word>crainte</dictionary_word>, <dictionary_word>haïssant</dictionary_word> jusqu’<dictionary_word>à</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>tunique</dictionary_word> <dictionary_word>souillée</dictionary_word> <dictionary_word>par</dictionary_word> <dictionary_word>la</dictionary_word> <dictionary_word>chair</dictionary_word>. <insert_footnote />",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:24",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "24",
+            "text": "<dictionary_word>À</dictionary_word> <dictionary_word>celui</dictionary_word> <dictionary_word>qui</dictionary_word> <dictionary_word>a</dictionary_word> <dictionary_word>le</dictionary_word> <dictionary_word>pouvoir</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>préserver</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>toute</dictionary_word> <dictionary_word>chute</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>de</dictionary_word> <dictionary_word>vous</dictionary_word> <dictionary_word>faire</dictionary_word> <dictionary_word>paraître</dictionary_word> <dictionary_word>irrépréhensibles</dictionary_word> <dictionary_word>et</dictionary_word> <dictionary_word>pleins</dictionary_word> <dictionary_word>d</dictionary_word>’allégresse <dictionary_word>devant</dictionary_word> <dictionary_word>le</dictionary_word> trône <dictionary_word>de</dictionary_word> <dictionary_word>sa</dictionary_word> <dictionary_word>gloire</dictionary_word>, <insert_footnote />",
+            "position": "left"
+        },
+        {
+            "global_locator": "JUD 1:25",
+            "chapter": "1",
+            "alternate_verse_number": "",
+            "verse_number": "25",
+            "text": "<dictionary_word>au</dictionary_word> <dictionary_word>seul</dictionary_word> <dictionary_word>Dieu</dictionary_word> <dictionary_word>notre</dictionary_word> <dictionary_word>Sauveur</dictionary_word>, <dictionary_word>par</dictionary_word> <dictionary_word>Jésus-Christ</dictionary_word>, Notre-Seigneur, <dictionary_word>soient</dictionary_word> <dictionary_word>gloire</dictionary_word>, <dictionary_word>majesté</dictionary_word>, <dictionary_word>force</dictionary_word> <dictionary_word>et</dictionary_word> empire <dictionary_word>dès</dictionary_word> <dictionary_word>avant</dictionary_word> <dictionary_word>tous</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>temps</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>maintenant</dictionary_word>, <dictionary_word>et</dictionary_word> <dictionary_word>dans</dictionary_word> <dictionary_word>tous</dictionary_word> <dictionary_word>les</dictionary_word> <dictionary_word>siècles</dictionary_word> ! Amen ! <insert_footnote />",
+            "position": "left"
+        }
+    ],
+    "titles": [
+        {
+            "content": "PRÉAMBULE.",
+            "kind": "major_section",
+            "chapter": "1",
+            "last_verse": "0"
+        },
+        {
+            "content": "Adresse, salutation ; exorde : but et occasion de la lettre (1-4).",
+            "kind": "title2",
+            "chapter": "1",
+            "last_verse": "0"
+        },
+        {
+            "content": "I. — DES FAUX DOCTEURS. [5. — 16.]",
+            "kind": "major_section",
+            "chapter": "1",
+            "last_verse": "4"
+        },
+        {
+            "content": "Les ancêtres de ces hérétiques dans l’Ancien Testament (5-7). Leur orgueil (8-10). Châtiment qui les attend (11-13), annoncé dès longtemps par Hénoch (14-16).",
+            "kind": "title2",
+            "chapter": "1",
+            "last_verse": "4"
+        },
+        {
+            "content": "II. — EXHORTATION AUX FIDÈLES. [17 — 23.]",
+            "kind": "major_section",
+            "chapter": "1",
+            "last_verse": "16"
+        },
+        {
+            "content": "Demeurer fidèles à l’enseignement des Apôtres 17-21). — Conduite à tenir à l’égard de trois sortes de chrétiens (22-23).",
+            "kind": "title2",
+            "chapter": "1",
+            "last_verse": "16"
+        },
+        {
+            "content": "CONCLUSION. [24 — 25.]",
+            "kind": "major_section",
+            "chapter": "1",
+            "last_verse": "23"
+        }
+    ],
+    "footnotes": [
+        {
+            "references": "1:3 ",
+            "references_chapter": "1",
+            "references_verse": "3",
+            "text": "3. Ou bien : <footnote_quote>J’avais fort à cœur de vous écrire au sujet de notre salut commun, et je me vois</footnote_quote>maintenant dans l’obligation de le faire, afin de, etc."
+        },
+        {
+            "references": "1:4 ",
+            "references_chapter": "1",
+            "references_verse": "4",
+            "text": "4. Comp. Jean, x, 9 sv. ; Gal. ii, 4 ; II Pier. ii. Les vers. 5-7 sont parallèles avec II Pier. ii, 4-6."
+        },
+        {
+            "references": "1:5 ",
+            "references_chapter": "1",
+            "references_verse": "5",
+            "text": "5. <footnote_quote>Jésus</footnote_quote> : pour un fait de l’Ancien Testament, on attendrait plutôt "
+        },
+        {
+            "references": "1:7 ",
+            "references_chapter": "1",
+            "references_verse": "7",
+            "text": "7. (Sag. x, 7). D’autres : <footnote_quote>offrent une image du feu éternel, en subissant leur peine</footnote_quote>. Le grec porte τὸν ὅμοιον ⸂τρόπον τούτοις⸃ au lieu de ταύτοις qu’on attendait. Le pronom se rapporte aux deux villes nommées dans ce verset même. L’accord grammatical demanderait τούτοις ; mais le masculin τούτοις répond mieux à la pensée de l’écrivain. D’autres rapportent τούτοις à ces hommes dont il est question vers. 4 et qui sont l’objet principal de cette lettre où ils sont désignés constamment par le même pronom démonstratif, vers. 8, 11, 12, 14. 16, 19."
+        },
+        {
+            "references": "1:8 ",
+            "references_chapter": "1",
+            "references_verse": "8",
+            "text": "8. <footnote_quote>Dans leur délire</footnote_quote>, grec ἐνυπνιαζόμενοι, hypnotisés par les fantômes que se forge leur esprit. La Vulg. a omis ce mot. — "
+        },
+        {
+            "references": "1:9 ",
+            "references_chapter": "1",
+            "references_verse": "9",
+            "text": "9. Allusion à une ancienne tradition juive, se rattachant à Deut. xxxiv, 5 sv., où il est dit que Yahweh déposa le corps de Moïse dans une vallée du pays de Moab, et que nul ne connaît son tombeau. — <footnote_quote>Que Dieu te punisse</footnote_quote>, Vulgate : "
+        },
+        {
+            "references": "1:12 ",
+            "references_chapter": "1",
+            "references_verse": "12",
+            "text": "12. <footnote_quote>Écueils</footnote_quote>, selon le sens le plus ordinaire du mot grec. Vulgate, "
+        },
+        {
+            "references": "1:14 ",
+            "references_chapter": "1",
+            "references_verse": "14",
+            "text": "14. Enlevé par Dieu, comme Élie (comp. Hébr. xi, 5), Hénoch demeurait l’un des personnages les plus vénérés de l’Ancien Testament, l’un de ceux par l’entremise desquels on s’attendait à voir, à entendre l’Éternel se manifester.Les paroles rapportées par saint Jude se lisent à peu près textuellement dans la version éthiopienne du Livre d’Hénoch, i, 9."
+        },
+        {
+            "references": "1:18 ",
+            "references_chapter": "1",
+            "references_verse": "18",
+            "text": "18. <footnote_quote>Moqueurs</footnote_quote>, le grec ἐμπαῖκται, qui appartient à la basse grécité, ne se lit qu’ici et II Pier. iii, 3. Il répond à l’hébreu "
+        },
+        {
+            "references": "1:19 ",
+            "references_chapter": "1",
+            "references_verse": "19",
+            "text": "19. Quelques manuscrits ajoutent le pronom ἑαυτους : <footnote_quote>ils se séparent eux-mêmes</footnote_quote>, ils font schisme."
+        },
+        {
+            "references": "1:22 ",
+            "references_chapter": "1",
+            "references_verse": "22",
+            "text": "22. Beaucoup traduisent le vers. 22 : <footnote_quote>Convainquez</footnote_quote>, ramenez à la foi par des raisonnements, "
+        },
+        {
+            "references": "1:23 ",
+            "references_chapter": "1",
+            "references_verse": "23",
+            "text": "23. <footnote_quote>Laissant la tunique souillée</footnote_quote>c.‑à-d. même les apparences extérieures de la souillure ; ou craignez même l’habit de ceux qui sont engagés, dans la corruption."
+        },
+        {
+            "references": "1:24 ",
+            "references_chapter": "1",
+            "references_verse": "24",
+            "text": "24. La Vulgate ajoute : <footnote_quote>à l’avènement de Notre-Seigneur Jésus-Christ</footnote_quote> : ces mots manquent au grec et dans les meilleurs manuscrits latins."
+        },
+        {
+            "references": "1:25 ",
+            "references_chapter": "1",
+            "references_verse": "25",
+            "text": "25. <footnote_quote>Dieu</footnote_quote>est aussi appelé Sauveur dans les épîtres pastorales (I Tim. i, 2, 3 ; Tit. i, 3) : en lui est la raison dernière de notre salut ; il est notre Sauveur "
+        }
+    ],
+    "cross_references": [],
+    "tables": []
+}
