@@ -88,6 +88,8 @@ class CenterPanel(ctk.CTkFrame):
         self.show_chapter_numbers = self.config.get("show_chapter_numbers", True)
         self.verse_per_line = self.config.get("verse_per_line", False)
         self.show_reverse_interlinear = self.config.get("show_reverse_interlinear", False)
+        self.bible_full_width = bool(self.config.get("bible_full_width", False))
+        self.is_immersive_mode = False
         
         # Options de typographie et couches interlinéaire
         self.line_spacing = self.config.get("line_spacing", 6)
@@ -113,7 +115,7 @@ class CenterPanel(ctk.CTkFrame):
         
         # Fil d'Ariane Interactif (ComboBox et OptionMenus)
         self.breadcrumb_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.breadcrumb_frame.grid(row=0, column=0, columnspan=2, pady=(10, 5), sticky="w", padx=15)
+        self.breadcrumb_frame.grid(row=0, column=0, columnspan=2, pady=(10, 5), sticky="ew", padx=15)
         
         # Sélecteur de livre sous forme de CTkComboBox éditable
         self.book_var = ctk.StringVar(value="Jean")
@@ -196,6 +198,43 @@ class CenterPanel(ctk.CTkFrame):
         )
         self.btn_ref_bible.pack(side="left", padx=5)
         
+        # Zone des Modes de Vue (Plein Écran & Pleine Largeur) - TOUJOURS VISIBLE À DROITE
+        self.view_modes_frame = ctk.CTkFrame(self.breadcrumb_frame, fg_color="transparent")
+        self.view_modes_frame.pack(side="right", padx=(10, 0))
+        
+        # Bouton Plein Écran Immersif Total (F11)
+        self.btn_fullscreen = ctk.CTkButton(
+            self.view_modes_frame,
+            text="⛶ Plein écran",
+            width=110,
+            height=28,
+            font=ctk.CTkFont(size=12, weight="bold"),
+            fg_color=("#3B82F6", "#2563EB"),
+            hover_color=("#2563EB", "#1D4ED8"),
+            text_color="#FFFFFF",
+            corner_radius=6,
+            command=self.toggle_fullscreen_reading
+        )
+        self.btn_fullscreen.pack(side="right", padx=(4, 0))
+        
+        # Bouton Pleine Largeur (Volet unique vs 2 volets)
+        wide_btn_txt = "🗗 2 Volets" if self.bible_full_width else "🗖 Pleine largeur"
+        self.btn_toggle_wide = ctk.CTkButton(
+            self.view_modes_frame,
+            text=wide_btn_txt,
+            width=120,
+            height=28,
+            font=ctk.CTkFont(size=12, weight="bold"),
+            fg_color=("#E2E8F0", "#1E293B"),
+            hover_color=("#CBD5E1", "#334155"),
+            text_color=("#0F172A", "#F8FAFC"),
+            border_width=1,
+            border_color=("#94A3B8", "#475569"),
+            corner_radius=6,
+            command=self.toggle_bible_full_width
+        )
+        self.btn_toggle_wide.pack(side="right", padx=4)
+        
         # Progress Frame (masqué par défaut, s'affiche à droite du fil d'Ariane)
         self.progress_frame = ctk.CTkFrame(self, fg_color="transparent")
         
@@ -206,8 +245,8 @@ class CenterPanel(ctk.CTkFrame):
         self.progress_bar.set(0)
         self.progress_bar.pack(side="left", padx=5)
         
-        # Colonne Gauche (Onglets Principaux / Bible)
-        self.main_tabs = ctk.CTkTabview(self)
+        # Colonne Gauche / Pleine Largeur (Onglets Principaux / Bible / Modales)
+        self.main_tabs = ctk.CTkTabview(self, command=self.on_main_tab_changed)
         self.main_tabs.grid(row=1, column=0, sticky="nsew", padx=(10, 5), pady=(0, 10))
         
         self.tab_lecture = self.main_tabs.add("📖 Lecture")
@@ -310,6 +349,21 @@ class CenterPanel(ctk.CTkFrame):
         self.bible_textbox.pack(fill="both", expand=True)
         self.bible_textbox.configure(state="disabled")
         
+        # Bouton flottant pour quitter le mode plein écran immersif
+        self.btn_exit_fullscreen = ctk.CTkButton(
+            self.tab_lecture,
+            text="✕ Quitter le plein écran (Échap / F11)",
+            fg_color=("#0F172A", "#0F172A"),
+            hover_color="#1E293B",
+            text_color="#38BDF8",
+            border_width=1.5,
+            border_color="#38BDF8",
+            corner_radius=18,
+            font=ctk.CTkFont(size=12, weight="bold"),
+            height=34,
+            command=self.toggle_fullscreen_reading
+        )
+        
         # Brancher la surveillance de défilement continu sur le composant Bible
         self._orig_yscroll = self.bible_textbox._y_scrollbar.set
         def _on_bible_yscroll(*args):
@@ -366,6 +420,8 @@ class CenterPanel(ctk.CTkFrame):
         self.current_results = None
         
         self.update_tags()
+        if self.bible_full_width:
+            self.set_full_width_mode(True)
         self.display_welcome()
         
     def get_bible_full_name(self, source_name):
@@ -1113,29 +1169,85 @@ class CenterPanel(ctk.CTkFrame):
         v_num = int(verse) if verse and str(verse).isdigit() else 1
         self.sync_commentary_to_verse(chapter, v_num)
 
+    def toggle_bible_full_width(self):
+        """Bascule le texte biblique entre le mode 2 volets (étude) et le mode pleine largeur (volet unique)."""
+        self.bible_full_width = not self.bible_full_width
+        self.config["bible_full_width"] = self.bible_full_width
+        save_config(self.config)
+        
+        btn_txt = "🗗 2 Volets" if self.bible_full_width else "🗖 Pleine largeur"
+        self.btn_toggle_wide.configure(text=btn_txt)
+        
+        if not self.is_immersive_mode and self.main_tabs.get() == "📖 Lecture":
+            self.set_full_width_mode(self.bible_full_width)
+
+    def toggle_fullscreen_reading(self):
+        """Déclenche le mode plein écran total immersif (F11 / Échap)."""
+        if hasattr(self.master, 'toggle_fullscreen'):
+            self.master.toggle_fullscreen()
+
+    def enable_immersive_mode(self, enable=True):
+        """Active ou désactive le mode plein écran immersif total dédié au texte biblique."""
+        self.is_immersive_mode = enable
+        if enable:
+            self.breadcrumb_frame.grid_remove()
+            self.right_tabs.grid_remove()
+            self.main_tabs.grid(row=0, column=0, columnspan=2, rowspan=2, sticky="nsew", padx=0, pady=0)
+            self.main_tabs.set("📖 Lecture")
+            self.btn_exit_fullscreen.place(relx=0.98, rely=0.015, anchor="ne")
+        else:
+            self.btn_exit_fullscreen.place_forget()
+            self.breadcrumb_frame.grid(row=0, column=0, columnspan=2, pady=(10, 5), sticky="w", padx=15)
+            cur = self.main_tabs.get()
+            if cur == "📖 Lecture":
+                self.set_full_width_mode(self.bible_full_width)
+            else:
+                self.set_full_width_mode(True)
+
+    def on_main_tab_changed(self):
+        if self.is_immersive_mode:
+            return
+        current = self.main_tabs.get()
+        if current == "📖 Lecture":
+            self.set_full_width_mode(self.bible_full_width)
+        else:
+            self.set_full_width_mode(True)
+
+    def set_full_width_mode(self, full_width=True):
+        if full_width:
+            self.right_tabs.grid_remove()
+            self.main_tabs.grid(row=1, column=0, columnspan=2, sticky="nsew", padx=10, pady=(0, 10))
+        else:
+            self.main_tabs.grid(row=1, column=0, columnspan=1, sticky="nsew", padx=(10, 5), pady=(0, 10))
+            self.right_tabs.grid(row=1, column=1, sticky="nsew", padx=(5, 10), pady=(0, 10))
+
     def open_closable_tab(self, tab_name, TabContentClass, **kwargs):
         try:
             self.main_tabs.tab(tab_name)
             self.main_tabs.set(tab_name)
+            self.set_full_width_mode(True)
             return
         except ValueError:
             pass
             
         new_tab = self.main_tabs.add(tab_name)
         self.main_tabs.set(tab_name)
+        self.set_full_width_mode(True)
         
         header_frame = ctk.CTkFrame(new_tab, fg_color="transparent")
-        header_frame.pack(fill="x", pady=(0, 10))
+        header_frame.pack(fill="x", pady=(0, 6))
         
         btn_close = ctk.CTkButton(
             header_frame, 
             text="❌ Fermer l'onglet", 
             fg_color="#EF4444", 
             hover_color="#DC2626", 
-            width=120,
+            width=130,
+            height=28,
+            font=ctk.CTkFont(size=12, weight="bold"),
             command=lambda: self.close_tab(tab_name)
         )
-        btn_close.pack(side="right")
+        btn_close.pack(side="right", padx=10)
         
         content = TabContentClass(new_tab, close_callback=lambda: self.close_tab(tab_name), **kwargs)
         content.pack(fill="both", expand=True)
@@ -1145,6 +1257,11 @@ class CenterPanel(ctk.CTkFrame):
             self.main_tabs.delete(tab_name)
         except ValueError:
             pass
+        if self.is_immersive_mode:
+            return
+        cur = self.main_tabs.get()
+        if cur == "📖 Lecture":
+            self.set_full_width_mode(self.bible_full_width)
 
     def show_progress(self, message, percentage=0):
         if not self.progress_frame.winfo_ismapped():

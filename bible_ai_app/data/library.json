@@ -253,5 +253,15 @@
     "total_books": 66,
     "embedding_model": "study_library",
     "active": true
+  },
+  "TSM": {
+    "title": "Théologie Systématique (John MacArthur & Richard Mayhue)",
+    "author": "John MacArthur & Richard Mayhue",
+    "description": "",
+    "year": "2018",
+    "cover_path": null,
+    "type": "Théologie",
+    "embedding_model": "gemini-embedding-2",
+    "active": true
   }
 }

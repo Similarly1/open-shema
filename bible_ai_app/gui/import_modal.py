@@ -8,9 +8,13 @@ import json
 from PIL import Image
 from core.bible_json_loader import BibleJsonLoader
 
-class ImportTab(ctk.CTkFrame):
+class ImportTab(ctk.CTkScrollableFrame):
+    """
+    Interface plein écran pour l'importation et l'édition d'ouvrages,
+    avec agencement spacieux en 2 colonnes, défilement fluide et design soigné.
+    """
     def __init__(self, master, close_callback=None, on_import_callback=None, edit_mode=False, edit_meta=None, **kwargs):
-        super().__init__(master, **kwargs)
+        super().__init__(master, fg_color="transparent", **kwargs)
         
         self.close_callback = close_callback
         self.on_import_callback = on_import_callback
@@ -21,122 +25,252 @@ class ImportTab(ctk.CTkFrame):
         self.folder_path = None
         self.cover_path = self.edit_meta.get("cover_path", None)
         
-        # BOTTOM FRAME: File & Submit
-        bottom_frame = ctk.CTkFrame(self, fg_color="transparent")
-        bottom_frame.pack(side="bottom", fill="x", padx=20, pady=(0,10))
+        # 1. EN-TÊTE PRINCIPAL
+        header_frame = ctk.CTkFrame(self, fg_color="transparent")
+        header_frame.pack(fill="x", padx=20, pady=(10, 15))
         
-        # TOP FRAME: Contains left and right columns
-        top_frame = ctk.CTkFrame(self, fg_color="transparent")
-        top_frame.pack(fill="both", expand=True)
+        title_text = "✏️ Modifier les Métadonnées de l'Ouvrage" if self.edit_mode else "📥 Importer un Nouvel Ouvrage dans la Bibliothèque"
+        lbl_main_title = ctk.CTkLabel(
+            header_frame, 
+            text=title_text, 
+            font=ctk.CTkFont(size=20, weight="bold"),
+            anchor="w"
+        )
+        lbl_main_title.pack(fill="x", anchor="w")
         
-        # LEFT FRAME: Fields
-        left_frame = ctk.CTkFrame(top_frame, fg_color="transparent")
-        left_frame.pack(side="left", fill="both", expand=True, padx=20, pady=20)
+        lbl_subtitle = ctk.CTkLabel(
+            header_frame,
+            text="Renseignez les métadonnées, associez une image de couverture et sélectionnez votre fichier source (.docx, .json, .csv ou dossier complet de Bible).",
+            font=ctk.CTkFont(size=12),
+            text_color=("#64748B", "#94A3B8"),
+            anchor="w"
+        )
+        lbl_subtitle.pack(fill="x", anchor="w", pady=(2, 0))
+
+        # 2. CONTENEUR PRINCIPAL EN 2 COLONNES SPACIEUSES
+        columns_frame = ctk.CTkFrame(self, fg_color="transparent")
+        columns_frame.pack(fill="both", expand=True, padx=20, pady=5)
+        columns_frame.grid_columnconfigure(0, weight=3, uniform="cols")
+        columns_frame.grid_columnconfigure(1, weight=2, uniform="cols")
         
-        lbl = ctk.CTkLabel(left_frame, text="Titre court (Identifiant) :")
-        lbl.pack(pady=(5,0), anchor="w")
-        self.name_entry = ctk.CTkEntry(left_frame, width=300)
-        self.name_entry.pack(pady=5, anchor="w")
+        # ==========================================
+        # COLONNE GAUCHE : MÉTADONNÉES & CLASSIFICATION
+        # ==========================================
+        left_card = ctk.CTkFrame(
+            columns_frame, 
+            fg_color=("#F8FAFC", "#1E293B"), 
+            border_color=("#CBD5E1", "#334155"), 
+            border_width=1, 
+            corner_radius=12
+        )
+        left_card.grid(row=0, column=0, sticky="nsew", padx=(0, 12), pady=0)
         
-        lbl_title = ctk.CTkLabel(left_frame, text="Titre complet :")
-        lbl_title.pack(pady=(5,0), anchor="w")
-        self.title_entry = ctk.CTkEntry(left_frame, width=300)
-        self.title_entry.pack(pady=5, anchor="w")
+        card_left_title = ctk.CTkLabel(
+            left_card, 
+            text="📋 Informations & Classification", 
+            font=ctk.CTkFont(size=15, weight="bold"), 
+            text_color=("#2563EB", "#38BDF8")
+        )
+        card_left_title.pack(anchor="w", padx=20, pady=(16, 12))
+        
+        # Champ Identifiant (Titre court)
+        lbl_id = ctk.CTkLabel(left_card, text="Titre court / Identifiant unique (ex: S21, BDS, Calmet) :", font=ctk.CTkFont(weight="bold"))
+        lbl_id.pack(padx=20, pady=(4, 2), anchor="w")
+        self.name_entry = ctk.CTkEntry(left_card, placeholder_text="Ex: Segond 21, TOB, Calmet...", height=34)
+        self.name_entry.pack(fill="x", padx=20, pady=(0, 8))
+        if self.edit_mode:
+            self.name_entry.insert(0, self.edit_meta.get("name", ""))
+        
+        # Champ Titre complet
+        lbl_title = ctk.CTkLabel(left_card, text="Titre complet de l'ouvrage :", font=ctk.CTkFont(weight="bold"))
+        lbl_title.pack(padx=20, pady=(4, 2), anchor="w")
+        self.title_entry = ctk.CTkEntry(left_card, placeholder_text="Ex: La Bible Segond 21 avec notes d'étude...", height=34)
+        self.title_entry.pack(fill="x", padx=20, pady=(0, 8))
         self.title_entry.insert(0, self.edit_meta.get("title", ""))
         
-        lbl_author = ctk.CTkLabel(left_frame, text="Auteur :")
-        lbl_author.pack(pady=(5,0), anchor="w")
-        self.author_entry = ctk.CTkEntry(left_frame, width=300)
-        self.author_entry.pack(pady=5, anchor="w")
+        # Champ Auteur / Traducteur
+        lbl_author = ctk.CTkLabel(left_card, text="Auteur / Traducteur / Éditeur :", font=ctk.CTkFont(weight="bold"))
+        lbl_author.pack(padx=20, pady=(4, 2), anchor="w")
+        self.author_entry = ctk.CTkEntry(left_card, placeholder_text="Ex: Société Biblique de Genève, Alfred Kuen...", height=34)
+        self.author_entry.pack(fill="x", padx=20, pady=(0, 8))
         self.author_entry.insert(0, self.edit_meta.get("author", ""))
         
-        lbl_desc = ctk.CTkLabel(left_frame, text="Description :")
-        lbl_desc.pack(pady=(5,0), anchor="w")
-        self.desc_entry = ctk.CTkTextbox(left_frame, width=300, height=80)
-        self.desc_entry.pack(pady=5, anchor="w")
+        # Champ Description
+        lbl_desc = ctk.CTkLabel(left_card, text="Description & Notes d'étude :", font=ctk.CTkFont(weight="bold"))
+        lbl_desc.pack(padx=20, pady=(4, 2), anchor="w")
+        self.desc_entry = ctk.CTkTextbox(left_card, height=80, corner_radius=8)
+        self.desc_entry.pack(fill="x", padx=20, pady=(0, 8))
         self.desc_entry.insert("1.0", self.edit_meta.get("description", ""))
         
-        lbl_year = ctk.CTkLabel(left_frame, text="Année :")
-        lbl_year.pack(pady=(5,0), anchor="w")
-        self.year_entry = ctk.CTkEntry(left_frame, width=150)
-        self.year_entry.pack(pady=5, anchor="w")
-        self.year_entry.insert(0, self.edit_meta.get("year", ""))
+        # Ligne Année & Type d'ouvrage
+        row_type_year = ctk.CTkFrame(left_card, fg_color="transparent")
+        row_type_year.pack(fill="x", padx=20, pady=(4, 8))
+        row_type_year.grid_columnconfigure(0, weight=1)
+        row_type_year.grid_columnconfigure(1, weight=1)
         
-        lbl_type = ctk.CTkLabel(left_frame, text="Type d'ouvrage :")
-        lbl_type.pack(pady=(10,0), anchor="w")
-        self.type_var = ctk.StringVar(value=self.edit_meta.get("type", "Théologie"))
+        # Type
+        frame_type = ctk.CTkFrame(row_type_year, fg_color="transparent")
+        frame_type.grid(row=0, column=0, sticky="nsew", padx=(0, 8))
+        lbl_type = ctk.CTkLabel(frame_type, text="Type d'ouvrage :", font=ctk.CTkFont(weight="bold"))
+        lbl_type.pack(anchor="w", pady=(0, 2))
+        self.type_var = ctk.StringVar(value=self.edit_meta.get("type", "Bible" if not self.edit_mode else "Théologie"))
         self.type_menu = ctk.CTkOptionMenu(
-            left_frame, 
+            frame_type, 
             variable=self.type_var, 
-            values=["Bible", "Théologie", "Commentaire", "Dictionnaire", "Livre / Autre"]
+            values=["Bible", "Théologie", "Commentaire", "Dictionnaire", "Livre / Autre"],
+            height=34
         )
-        self.type_menu.pack(pady=5, anchor="w")
+        self.type_menu.pack(fill="x")
         
-        lbl_embed = ctk.CTkLabel(left_frame, text="Modèle d'embedding (Recherche IA) :")
-        lbl_embed.pack(pady=(10,0), anchor="w")
+        # Année
+        frame_year = ctk.CTkFrame(row_type_year, fg_color="transparent")
+        frame_year.grid(row=0, column=1, sticky="nsew", padx=(8, 0))
+        lbl_year = ctk.CTkLabel(frame_year, text="Année d'édition :", font=ctk.CTkFont(weight="bold"))
+        lbl_year.pack(anchor="w", pady=(0, 2))
+        self.year_entry = ctk.CTkEntry(frame_year, placeholder_text="Ex: 2007", height=34)
+        self.year_entry.pack(fill="x")
+        self.year_entry.insert(0, str(self.edit_meta.get("year", "")))
+        
+        # Modèle d'Embedding (Vectorisation IA)
+        lbl_embed = ctk.CTkLabel(left_card, text="Modèle d'embedding vectoriel (Recherche IA) :", font=ctk.CTkFont(weight="bold"))
+        lbl_embed.pack(padx=20, pady=(4, 2), anchor="w")
         self.embed_var = ctk.StringVar(value=self.edit_meta.get("embedding_model", "study_library"))
-        self.embed_menu = ctk.CTkOptionMenu(left_frame, variable=self.embed_var, values=["study_library", "gemini-embedding-2", "gemini-embedding-1", "mistral-embed"])
-        self.embed_menu.pack(pady=5, anchor="w")
+        self.embed_menu = ctk.CTkOptionMenu(
+            left_card, 
+            variable=self.embed_var, 
+            values=["study_library", "gemini-embedding-2", "gemini-embedding-1", "mistral-embed"],
+            height=34
+        )
+        self.embed_menu.pack(fill="x", padx=20, pady=(0, 16))
+
+        # ==========================================
+        # COLONNE DROITE : COUVERTURE & SOURCE
+        # ==========================================
+        right_card = ctk.CTkFrame(
+            columns_frame, 
+            fg_color=("#F8FAFC", "#1E293B"), 
+            border_color=("#CBD5E1", "#334155"), 
+            border_width=1, 
+            corner_radius=12
+        )
+        right_card.grid(row=0, column=1, sticky="nsew", padx=(12, 0), pady=0)
         
-        # Populate identifiant
-        name_val = self.edit_meta.get("name", "") if self.edit_mode else ""
-        self.name_entry.insert(0, name_val)
+        card_right_title = ctk.CTkLabel(
+            right_card, 
+            text="🖼️ Couverture & Source de Données", 
+            font=ctk.CTkFont(size=15, weight="bold"), 
+            text_color=("#2563EB", "#38BDF8")
+        )
+        card_right_title.pack(anchor="w", padx=20, pady=(16, 12))
         
-        # RIGHT FRAME: Cover & OCR
-        right_frame = ctk.CTkFrame(top_frame)
-        right_frame.pack(side="right", fill="y", padx=20, pady=20)
+        # Zone Image de Couverture
+        cover_container = ctk.CTkFrame(right_card, fg_color="transparent")
+        cover_container.pack(fill="x", padx=20, pady=(0, 10))
         
-        lbl_cover = ctk.CTkLabel(right_frame, text="Image de couverture", font=ctk.CTkFont(weight="bold"))
-        lbl_cover.pack(pady=10)
+        self.cover_lbl = ctk.CTkLabel(
+            cover_container, 
+            text="Aucune image\n(Générée automatiquement)", 
+            width=180, 
+            height=240, 
+            fg_color=("#E2E8F0", "#0F172A"), 
+            corner_radius=8,
+            font=ctk.CTkFont(size=12, slant="italic")
+        )
+        self.cover_lbl.pack(pady=(0, 10))
         
-        self.cover_lbl = ctk.CTkLabel(right_frame, text="Aucune image\n(Générée automatiquement)", width=200, height=300, fg_color="gray20", corner_radius=8)
-        self.cover_lbl.pack(pady=10)
+        cover_btns_row = ctk.CTkFrame(cover_container, fg_color="transparent")
+        cover_btns_row.pack(fill="x")
+        cover_btns_row.grid_columnconfigure(0, weight=1)
+        cover_btns_row.grid_columnconfigure(1, weight=1)
         
-        btn_choose_cover = ctk.CTkButton(right_frame, text="Choisir une image", command=self.choose_cover)
-        btn_choose_cover.pack(pady=5)
+        btn_choose_cover = ctk.CTkButton(
+            cover_btns_row, 
+            text="🖼️ Choisir image", 
+            command=self.choose_cover,
+            height=32
+        )
+        btn_choose_cover.grid(row=0, column=0, sticky="ew", padx=(0, 4))
         
-        btn_ocr = ctk.CTkButton(right_frame, text="✨ Auto-remplir (Gemini OCR)", command=self.do_ocr, fg_color="#4285F4")
-        btn_ocr.pack(pady=20)
-          # Selection boutons fichiers/dossiers
+        btn_ocr = ctk.CTkButton(
+            cover_btns_row, 
+            text="✨ Gemini OCR", 
+            command=self.do_ocr, 
+            fg_color="#3B82F6",
+            hover_color="#2563EB",
+            height=32
+        )
+        btn_ocr.grid(row=0, column=1, sticky="ew", padx=(4, 0))
+        
+        # Séparateur subtil
+        sep = ctk.CTkLabel(right_card, text="─" * 40, text_color=("#CBD5E1", "#334155"))
+        sep.pack(pady=4)
+        
+        # Zone Fichier Source (si nouveau import)
         if not self.edit_mode:
-            buttons_row = ctk.CTkFrame(bottom_frame, fg_color="transparent")
-            buttons_row.pack(pady=5)
+            lbl_src_title = ctk.CTkLabel(right_card, text="Source du document à importer :", font=ctk.CTkFont(weight="bold"))
+            lbl_src_title.pack(anchor="w", padx=20, pady=(2, 4))
+            
+            src_btns_row = ctk.CTkFrame(right_card, fg_color="transparent")
+            src_btns_row.pack(fill="x", padx=20, pady=(0, 6))
+            src_btns_row.grid_columnconfigure(0, weight=1)
+            src_btns_row.grid_columnconfigure(1, weight=1)
             
             self.btn_file = ctk.CTkButton(
-                buttons_row, 
-                text="📂 Choisir un document (.docx, .json)", 
+                src_btns_row, 
+                text="📂 Document (.docx, .json, .csv)", 
                 command=self.choose_file,
                 fg_color="#4F46E5",
                 hover_color="#4338CA",
                 height=36,
                 font=ctk.CTkFont(weight="bold")
             )
-            self.btn_file.pack(side="left", padx=5)
+            self.btn_file.grid(row=0, column=0, sticky="ew", padx=(0, 4))
 
             self.btn_folder = ctk.CTkButton(
-                buttons_row, 
-                text="📁 Ou dossier (66 JSON)", 
+                src_btns_row, 
+                text="📁 Dossier (66 JSON)", 
                 command=self.choose_folder,
-                fg_color="gray30",
-                hover_color="gray40",
+                fg_color=("#64748B", "#334155"),
+                hover_color=("#475569", "#475569"),
                 height=36
             )
-            self.btn_folder.pack(side="left", padx=5)
+            self.btn_folder.grid(row=0, column=1, sticky="ew", padx=(4, 0))
             
-            self.file_lbl = ctk.CTkLabel(bottom_frame, text="Aucune source sélectionnée", font=ctk.CTkFont(slant="italic"))
-            self.file_lbl.pack(pady=2)
-            
-        btn_text = "Mettre à jour les métadonnées" if self.edit_mode else "Lancer l'import"
-        self.btn_import = ctk.CTkButton(bottom_frame, text=btn_text, command=self.save, fg_color="#34A853", hover_color="#2E9247", height=40)
-        self.btn_import.pack(pady=5)
+            self.file_lbl = ctk.CTkLabel(
+                right_card, 
+                text="Aucune source sélectionnée", 
+                font=ctk.CTkFont(size=11, slant="italic"),
+                text_color=("#64748B", "#94A3B8")
+            )
+            self.file_lbl.pack(padx=20, pady=(0, 16), anchor="w")
+
+        # 3. BARRE D'ACTIONS INFÉRIEURE
+        action_frame = ctk.CTkFrame(self, fg_color="transparent")
+        action_frame.pack(fill="x", padx=20, pady=(15, 20))
+        
+        btn_text = "💾 Enregistrer les Modifications" if self.edit_mode else "🚀 Lancer l'Importation & l'Indexation"
+        self.btn_import = ctk.CTkButton(
+            action_frame, 
+            text=btn_text, 
+            command=self.save, 
+            fg_color="#10B981", 
+            hover_color="#059669", 
+            height=44,
+            font=ctk.CTkFont(size=14, weight="bold"),
+            corner_radius=8
+        )
+        self.btn_import.pack(fill="x")
         
         self.load_cover_preview()
         
     def load_cover_preview(self):
         if self.cover_path and os.path.exists(self.cover_path):
-            img = Image.open(self.cover_path)
-            ctk_img = ctk.CTkImage(img, size=(200, 300))
-            self.cover_lbl.configure(image=ctk_img, text="")
+            try:
+                img = Image.open(self.cover_path)
+                ctk_img = ctk.CTkImage(img, size=(180, 240))
+                self.cover_lbl.configure(image=ctk_img, text="")
+            except Exception:
+                pass
             
     def choose_cover(self):
         def _open():
@@ -161,14 +295,14 @@ class ImportTab(ctk.CTkFrame):
         from core.config import load_config
         
         config = load_config()
-        if not config.get("mistral_api_key"):
-            messagebox.showerror("Erreur", "Veuillez configurer la clé API Mistral dans les Paramètres pour utiliser l'OCR.")
+        if not config.get("mistral_api_key") and not config.get("gemini_api_key"):
+            messagebox.showerror("Erreur", "Veuillez configurer votre clé API dans les Paramètres pour utiliser l'OCR.")
             return
             
         def run_ocr():
             try:
                 self.after(0, lambda: self.name_entry.delete(0, "end"))
-                self.after(0, lambda: self.name_entry.insert(0, "Analyse en cours..."))
+                self.after(0, lambda: self.name_entry.insert(0, "Analyse OCR en cours..."))
                 
                 res = analyze_image_ocr(self.cover_path, config)
                 

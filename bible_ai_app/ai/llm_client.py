@@ -16,8 +16,9 @@ class GeminiClient:
     ]
     
     EMBEDDING_MODELS = [
+        "gemini-embedding-2-preview",
         "gemini-embedding-2",
-        "gemini-embedding-1"
+        "gemini-embedding-001"
     ]
 
     def __init__(self, api_key, model="gemini-3.7-flash"):
@@ -66,7 +67,6 @@ class GeminiClient:
             try:
                 response = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=60)
                 if response.status_code == 429:
-                    # Quota temporairement atteint pour ce modèle, bascule vers le modèle suivant
                     last_error = f"Quota 429 atteint pour {current_model}"
                     continue
                 response.raise_for_status()
@@ -86,11 +86,19 @@ class GeminiClient:
         return f"Erreur Gemini (tous les modèles ont échoué ou quotas journaliers épuisés) : {last_error}"
 
     def embeddings(self, texts, model="gemini-embedding-2"):
-        # Découpage en sous-lots de 25 pour respecter la limite de 30k TPM
-        sub_batch_size = 25
+        import time
+        # Découpage en sous-lots de 20 pour respecter la limite de 30k TPM
+        sub_batch_size = 20
         all_embeddings = []
         
-        models_to_try = [model]
+        # Résolution du nom réel du modèle Gemini
+        clean_model = model
+        if model in ["gemini-embedding-1", "gemini-embedding-001"]:
+            clean_model = "gemini-embedding-001"
+        elif model in ["gemini-embedding-2", "gemini-embedding-2-preview"]:
+            clean_model = "gemini-embedding-2-preview"
+            
+        models_to_try = [clean_model]
         for em in self.EMBEDDING_MODELS:
             if em not in models_to_try:
                 models_to_try.append(em)
@@ -104,22 +112,33 @@ class GeminiClient:
                 url = f"{self.base_url}/{current_model}:batchEmbedContents?key={self.api_key}"
                 requests_list = [{"model": f"models/{current_model}", "content": {"parts": [{"text": t}]}} for t in batch]
                 payload = {"requests": requests_list}
-                try:
-                    response = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=60)
-                    if response.status_code == 429:
-                        last_err = f"Quota 429 sur {current_model}"
-                        continue
-                    response.raise_for_status()
-                    data = response.json()
-                    embs = [emb["values"] for emb in data.get("embeddings", [])]
-                    all_embeddings.extend(embs)
-                    batch_success = True
+                
+                # Tentatives avec pause progressive en cas de limitation TPM temporaire
+                for attempt in range(3):
+                    try:
+                        response = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=60)
+                        if response.status_code == 429:
+                            last_err = f"Quota 429 sur {current_model} (attente 3s...)"
+                            time.sleep(3 * (attempt + 1))
+                            continue
+                        response.raise_for_status()
+                        data = response.json()
+                        embs = [emb["values"] for emb in data.get("embeddings", [])]
+                        all_embeddings.extend(embs)
+                        batch_success = True
+                        break
+                    except Exception as e:
+                        last_err = str(e)
+                        time.sleep(2)
+                
+                if batch_success:
                     break
-                except Exception as e:
-                    last_err = str(e)
 
             if not batch_success:
-                raise Exception(f"Erreur d'embedding Gemini (quotas épuisés) : {last_err}")
+                raise Exception(f"Erreur d'embedding Gemini : {last_err}")
+                
+            # Courte pause entre les lots pour fluidifier le débit TPM
+            time.sleep(0.2)
 
         return all_embeddings
 

@@ -63,6 +63,11 @@ class App(ctk.CTk):
         
         self.progress_overlay = ProgressOverlay(self)
         
+        # Mode Plein Écran Immersif Total
+        self.is_fullscreen = False
+        self.bind("<F11>", self.toggle_fullscreen)
+        self.bind("<Escape>", self.exit_fullscreen)
+        
         # Load active books
         self.after(100, self.init_sources_and_load_default)
 
@@ -131,7 +136,11 @@ class App(ctk.CTk):
                 results = None
             finally:
                 self._current_searching_ref = None
-                self.after(0, self.finish_search, reference, results)
+                try:
+                    if hasattr(self, 'winfo_exists') and self.winfo_exists():
+                        self.after(0, self.finish_search, reference, results)
+                except Exception:
+                    pass
             
         import threading
         threading.Thread(target=do_search, daemon=True).start()
@@ -287,7 +296,20 @@ class App(ctk.CTk):
             except Exception as e:
                 messagebox.showerror("Erreur", f"Erreur lors de la mise à jour : {str(e)}", parent=self)
                 self.progress_overlay.remove_task(doc_name)
-        else:
-            messagebox.showinfo("Édition terminée", f"Métadonnées mises à jour pour '{doc_name}'.", parent=self)
-            
         self.on_library_update()
+
+    def toggle_fullscreen(self, event=None):
+        """Active ou désactive le mode plein écran immersif total sur l'application."""
+        self.is_fullscreen = not self.is_fullscreen
+        self.attributes("-fullscreen", self.is_fullscreen)
+        if self.is_fullscreen:
+            self.left_panel.grid_remove()
+            self.center_panel.enable_immersive_mode(True)
+        else:
+            self.left_panel.grid(row=0, column=0, sticky="nsew")
+            self.center_panel.enable_immersive_mode(False)
+
+    def exit_fullscreen(self, event=None):
+        """Quitte proprement le mode plein écran s'il est actif."""
+        if self.is_fullscreen:
+            self.toggle_fullscreen()

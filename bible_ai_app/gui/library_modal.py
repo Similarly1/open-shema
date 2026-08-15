@@ -22,10 +22,10 @@ class LibraryTab(ctk.CTkFrame):
         self.scroll_frame = ctk.CTkScrollableFrame(self)
         self.scroll_frame.grid(row=1, column=0, padx=20, pady=10, sticky="nsew")
         
-        # Grid parameters
-        self.columns_count = 4
+        # Grid parameters (adapté au plein écran)
+        self.columns_count = 5
         for i in range(self.columns_count):
-            self.scroll_frame.grid_columnconfigure(i, weight=0)
+            self.scroll_frame.grid_columnconfigure(i, weight=1)
             
         self.refresh_library()
         
