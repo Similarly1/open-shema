@@ -644,10 +644,38 @@ class CenterPanel(ctk.CTkFrame):
         )
         self.right_panel.pack(fill="both", expand=True)
         
-        # Lexique Strong (inside tab_lex)
+        # Lexique & Dictionnaires (inside tab_lex)
+        self.lex_top_bar = ctk.CTkFrame(self.tab_lex, fg_color=("gray92", "#1E293B"), corner_radius=6, height=34)
+        self.lex_top_bar.pack(fill="x", padx=2, pady=(2, 6))
+        
+        lbl_lex_dict = ctk.CTkLabel(self.lex_top_bar, text="Dictionnaire :", font=ctk.CTkFont(size=11, weight="bold"))
+        lbl_lex_dict.pack(side="left", padx=(8, 4))
+        
+        self.selected_lex_dict_var = ctk.StringVar(value="")
+        self.lex_dict_menu = ctk.CTkOptionMenu(
+            self.lex_top_bar,
+            variable=self.selected_lex_dict_var,
+            values=["Aucun dictionnaire"],
+            command=self.on_lex_dict_changed,
+            height=26,
+            font=ctk.CTkFont(size=11)
+        )
+        self.lex_dict_menu.pack(side="left", fill="x", expand=True, padx=(0, 4))
+        
+        self.lbl_lex_count_badge = ctk.CTkLabel(
+            self.lex_top_bar, 
+            text="0 dico", 
+            font=ctk.CTkFont(size=10, weight="bold"), 
+            width=52
+        )
+        self.lbl_lex_count_badge.pack(side="right", padx=(0, 8))
+        
         self.lex_textbox = ctk.CTkTextbox(self.tab_lex, wrap="word", fg_color=("#FAFAFA", "#1E1E1E"), text_color=("#1A1A1A", "#E2E8F0"))
         self.lex_textbox.pack(fill="both", expand=True, padx=2, pady=(2, 5))
         self.lex_textbox.configure(state="disabled")
+        
+        self.current_dict_matches = {}
+        self.current_dict_match_obj = None
         
         self.lex_action_frame = ctk.CTkFrame(self.tab_lex, fg_color="transparent")
         self.lex_action_frame.pack(fill="x", padx=2, pady=(0, 2))
@@ -890,80 +918,135 @@ class CenterPanel(ctk.CTkFrame):
     def on_bible_mouse_leave(self, event=None):
         self._clear_hover()
 
+    def on_lex_dict_changed(self, choice):
+        """Met à jour instantanément la vue du dictionnaire sélectionné."""
+        self.render_selected_dictionary_view()
+
     def display_dictionary_entry(self, match):
-        """Affiche la notice complète de tous les dictionnaires correspondants dans le volet droit."""
+        """Met à jour la liste des dictionnaires disponibles pour ce mot et affiche le premier selon la priorité."""
         if not match:
             return
             
         self.right_tabs.set("🔍 Lexique & Dictionnaires")
-        self.lex_textbox.configure(state="normal")
-        self.lex_textbox.delete("0.0", "end")
+        self.current_dict_match_obj = match
         
         matches = match.get("matches", [])
         if not matches:
             # Fallback rétro-compatible
             matches = []
             if match.get("strong"):
-                matches.append({"dict_id": "strong", "dict_name": "Strong", "badge": "■ Strong", "title": match.get("word", ""), "entry": match["strong"]})
+                matches.append({"dict_id": "strong", "dict_name": "Lexique Hébreu & Grec Strong", "badge": "■ Strong", "title": match.get("word", ""), "entry": match["strong"]})
             if match.get("calmet"):
-                matches.append({"dict_id": "calmet", "dict_name": "Calmet", "badge": "📖 Dom Calmet", "title": match["calmet"].get("title", ""), "art": match["calmet"], "full_text": match["calmet"].get("text", "")})
+                matches.append({"dict_id": "calmet", "dict_name": "Dictionnaire Dom Calmet", "badge": "📖 Dom Calmet", "title": match["calmet"].get("title", ""), "art": match["calmet"], "full_text": match["calmet"].get("text", "")})
+            if match.get("vigouroux"):
+                matches.append({"dict_id": "vigouroux", "dict_name": "Dictionnaire F. Vigouroux", "badge": "📖 Vigouroux", "title": match["vigouroux"].get("title", ""), "art": match["vigouroux"], "full_text": match["vigouroux"].get("text", "")})
+            if match.get("bailly"):
+                matches.append({"dict_id": "bailly", "dict_name": "Dictionnaire Bailly", "badge": "📖 Bailly", "title": match.get("word", ""), "entries": match.get("bailly", [])})
 
-        for idx, m in enumerate(matches):
-            if idx > 0:
-                self.lex_textbox.insert("end", "\n" + "─" * 32 + "\n\n", "chapter_divider")
-                
-            dict_id = m.get("dict_id")
-            badge = m.get("badge", m.get("dict_name", "Dictionnaire"))
-            title = m.get("title", "")
+        self.current_dict_matches = {}
+        dict_names = []
+        for m in matches:
+            name = m.get("dict_name") or m.get("badge") or m.get("dict_id") or "Dictionnaire"
+            key = name
+            c = 2
+            while key in self.current_dict_matches:
+                key = f"{name} ({c})"
+                c += 1
+            self.current_dict_matches[key] = m
+            dict_names.append(key)
             
-            self.lex_textbox.insert("end", f"{badge}\n", "source_name")
-            if title and dict_id != "strong":
-                self.lex_textbox.insert("end", f"{title}\n\n", "book_title")
+        if not dict_names:
+            self.selected_lex_dict_var.set("Aucun dictionnaire")
+            self.lex_dict_menu.configure(values=["Aucun dictionnaire"])
+            self.lbl_lex_count_badge.configure(text="0 dico")
+            self.lex_textbox.configure(state="normal")
+            self.lex_textbox.delete("0.0", "end")
+            self.lex_textbox.insert("end", "Aucune notice de dictionnaire trouvée pour ce terme.", "body")
+            self.lex_textbox.configure(state="disabled")
+            self.lex_ai_btn.configure(state="disabled")
+            return
+            
+        self.lex_dict_menu.configure(values=dict_names)
+        self.lbl_lex_count_badge.configure(text=f"{len(dict_names)} dico{'s' if len(dict_names) > 1 else ''}")
+        
+        cur_sel = self.selected_lex_dict_var.get()
+        if cur_sel in dict_names:
+            chosen = cur_sel
+        else:
+            chosen = dict_names[0]
+            self.selected_lex_dict_var.set(chosen)
+            
+        self.render_selected_dictionary_view()
+
+    def render_selected_dictionary_view(self):
+        """Affiche instantanément uniquement la notice du dictionnaire sélectionné dans le menu déroulant."""
+        self.lex_textbox.configure(state="normal")
+        self.lex_textbox.delete("0.0", "end")
+        
+        selected_dict_name = self.selected_lex_dict_var.get()
+        if not selected_dict_name or selected_dict_name not in self.current_dict_matches:
+            if self.current_dict_matches:
+                selected_dict_name = list(self.current_dict_matches.keys())[0]
+                self.selected_lex_dict_var.set(selected_dict_name)
+            else:
+                self.lex_textbox.insert("end", "Aucune notice sélectionnée.", "body")
+                self.lex_textbox.configure(state="disabled")
+                return
                 
-            if dict_id == "strong":
-                strong_entry = m.get("entry", {})
-                code = strong_entry.get("short_code", strong_entry.get("code", ""))
-                lang = "Hébreu biblique" if strong_entry.get("lang") == "hebrew" else "Grec koinè"
-                lemma = strong_entry.get("lemma", "")
-                definition = strong_entry.get("definition", "")
-                details = strong_entry.get("details", [])
+        m = self.current_dict_matches[selected_dict_name]
+        dict_id = m.get("dict_id")
+        badge = m.get("badge", m.get("dict_name", "Dictionnaire"))
+        title = m.get("title", "")
+        
+        self.lex_textbox.insert("end", f"{badge}\n", "source_name")
+        if title and dict_id != "strong":
+            self.lex_textbox.insert("end", f"{title}\n\n", "book_title")
+            
+        if dict_id == "strong":
+            strong_entry = m.get("entry", {})
+            code = strong_entry.get("short_code", strong_entry.get("code", ""))
+            lang = "Hébreu biblique" if strong_entry.get("lang") == "hebrew" else "Grec koinè"
+            lemma = strong_entry.get("lemma", "")
+            definition = strong_entry.get("definition", "")
+            details = strong_entry.get("details", [])
+            
+            self.lex_textbox.insert("end", f"{lemma}\n\n", "lex_lemma")
+            self.lex_textbox.insert("end", f"Définition :\n{definition}\n\n", "body")
+            
+            clean_det = [re.sub(r'\[\[@Headword:.*?\]\]', '', d).strip() for d in details if d.strip()]
+            if clean_det:
+                self.lex_textbox.insert("end", "Détails & Concordance :\n", "source_name")
+                det_text = "\n".join(clean_det[:4])
+                self.lex_textbox.insert("end", f"{det_text}\n\n", "lex_details")
                 
-                self.lex_textbox.insert("end", f"{lemma}\n\n", "lex_lemma")
-                self.lex_textbox.insert("end", f"Définition :\n{definition}\n\n", "body")
-                
-                clean_det = [re.sub(r'\[\[@Headword:.*?\]\]', '', d).strip() for d in details if d.strip()]
-                if clean_det:
-                    self.lex_textbox.insert("end", "Détails & Concordance :\n", "source_name")
-                    det_text = "\n".join(clean_det[:4])
-                    self.lex_textbox.insert("end", f"{det_text}\n\n", "lex_details")
-                    
-                bailly_entries = strong_entry.get("bailly", [])
-                if bailly_entries:
-                    self.lex_textbox.insert("end", "🏛️ Dictionnaire Grec-Français Bailly (1901) :\n", "bailly_header")
-                    for b_art in bailly_entries[:3]:
-                        hw = b_art.get("headword", "")
-                        b_txt = b_art.get("full_text", "")
-                        if hw and not b_txt.startswith(hw):
-                            self.lex_textbox.insert("end", f"• {hw}\n", "bailly_headword")
-                        self.lex_textbox.insert("end", f"{b_txt}\n\n", "body")
-                        
-            elif dict_id == "bailly":
-                b_entries = m.get("entries", [])
-                for b_art in b_entries:
+            bailly_entries = strong_entry.get("bailly", [])
+            if bailly_entries:
+                self.lex_textbox.insert("end", "🏛️ Dictionnaire Grec-Français Bailly (1901) :\n", "bailly_header")
+                for b_art in bailly_entries[:3]:
                     hw = b_art.get("headword", "")
                     b_txt = b_art.get("full_text", "")
                     if hw and not b_txt.startswith(hw):
                         self.lex_textbox.insert("end", f"• {hw}\n", "bailly_headword")
                     self.lex_textbox.insert("end", f"{b_txt}\n\n", "body")
-            else:
-                full_t = m.get("full_text", "")
-                self.lex_textbox.insert("end", f"{full_t}\n\n", "body")
-                
+                    
+        elif dict_id == "bailly":
+            b_entries = m.get("entries", [])
+            for b_art in b_entries:
+                hw = b_art.get("headword", "")
+                b_txt = b_art.get("full_text", "")
+                if hw and not b_txt.startswith(hw):
+                    self.lex_textbox.insert("end", f"• {hw}\n", "bailly_headword")
+                self.lex_textbox.insert("end", f"{b_txt}\n\n", "body")
+        else:
+            full_t = m.get("full_text", "")
+            self.lex_textbox.insert("end", f"{full_t}\n\n", "body")
+            
         self.lex_textbox.configure(state="disabled")
         
         # Configurer le bouton d'analyse IA
-        first_title = match.get("word") or match.get("title")
-        self.last_selected_strong = (match.get("strong") or match, match.get("word"))
+        match_obj = getattr(self, 'current_dict_match_obj', m)
+        first_title = (match_obj.get("word") if isinstance(match_obj, dict) else None) or title or selected_dict_name
+        self.last_selected_strong = (m.get("entry") or m, first_title)
         self.lex_ai_btn.configure(state="normal", text=f"🤖 Analyser « {first_title} » avec l'IA")
 
     def on_strong_clicked(self, strong_codes_str, clicked_word=None):
