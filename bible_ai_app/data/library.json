@@ -274,7 +274,8 @@
     "format": "commentary_sqlite",
     "commentary_id": "1",
     "embedding_model": "study_library",
-    "active": true
+    "active": true,
+    "chunks_count": 23505
   },
   "Commentaire Biblique de Matthew Henry": {
     "title": "Commentaire Biblique de Matthew Henry",
@@ -286,7 +287,8 @@
     "format": "commentary_sqlite",
     "commentary_id": "2",
     "embedding_model": "study_library",
-    "active": true
+    "active": true,
+    "chunks_count": 4443
   },
   "Trésor de la connaissance des Écritures (TSK)": {
     "title": "Trésor de la connaissance des Écritures (TSK)",
@@ -298,7 +300,8 @@
     "format": "commentary_sqlite",
     "commentary_id": "201",
     "embedding_model": "study_library",
-    "active": true
+    "active": true,
+    "chunks_count": 66
   },
   "Commentaire Biblique de Jean Calvin": {
     "title": "Commentaire Biblique de Jean Calvin",
@@ -310,7 +313,8 @@
     "format": "commentary_sqlite",
     "commentary_id": "3",
     "embedding_model": "study_library",
-    "active": true
+    "active": true,
+    "chunks_count": 13439
   },
   "Commentaire Biblique par Albert Barnes": {
     "title": "Commentaire Biblique par Albert Barnes",
@@ -322,7 +326,8 @@
     "format": "commentary_sqlite",
     "commentary_id": "4",
     "embedding_model": "study_library",
-    "active": true
+    "active": true,
+    "chunks_count": 19364
   },
   "Commentaire Biblique de Scofield": {
     "title": "Commentaire Biblique de Scofield",
@@ -334,7 +339,8 @@
     "format": "commentary_sqlite",
     "commentary_id": "6",
     "embedding_model": "study_library",
-    "active": true
+    "active": true,
+    "chunks_count": 2900
   },
   "Commentaire Biblique de Adam Clarke": {
     "title": "Commentaire Biblique de Adam Clarke",
@@ -346,7 +352,8 @@
     "format": "commentary_sqlite",
     "commentary_id": "7",
     "embedding_model": "study_library",
-    "active": true
+    "active": true,
+    "chunks_count": 21214
   },
   "Commentaire Biblique de John Gill": {
     "title": "Commentaire Biblique de John Gill",
@@ -358,7 +365,8 @@
     "format": "commentary_sqlite",
     "commentary_id": "8",
     "embedding_model": "study_library",
-    "active": true
+    "active": true,
+    "chunks_count": 31785
   },
   "Commentaire de la Bible d'étude de Genève (1560)": {
     "title": "Commentaire de la Bible d'étude de Genève (1560)",
@@ -370,7 +378,8 @@
     "format": "commentary_sqlite",
     "commentary_id": "87",
     "embedding_model": "study_library",
-    "active": true
+    "active": true,
+    "chunks_count": 14844
   },
   "Commentaire Biblique de Charles Spurgeon": {
     "title": "Commentaire Biblique de Charles Spurgeon",
@@ -381,6 +390,137 @@
     "type": "Commentaire",
     "format": "commentary_sqlite",
     "commentary_id": "9",
+    "embedding_model": "study_library",
+    "active": true,
+    "chunks_count": 1165
+  },
+  "Commentaire de Frederick Brotherton Meyer": {
+    "title": "Commentaire de Frederick Brotherton Meyer",
+    "author": "Frederick Brotherton Meyer",
+    "description": "Commentaire biblique (2009 passages indexés)",
+    "year": "",
+    "cover_path": null,
+    "type": "Commentaire",
+    "format": "sqlite",
+    "commentary_id": "123",
+    "chunks_count": 2009,
+    "embedding_model": "study_library",
+    "active": true
+  },
+  "Commentaire d'Arthur Peake sur la Bible": {
+    "title": "Commentaire d'Arthur Peake sur la Bible",
+    "author": "d'Arthur Peake sur la Bible",
+    "description": "Commentaire biblique (3103 passages indexés)",
+    "year": "",
+    "cover_path": null,
+    "type": "Commentaire",
+    "format": "sqlite",
+    "commentary_id": "147",
+    "chunks_count": 3103,
+    "embedding_model": "study_library",
+    "active": true
+  },
+  "Commentaire de la Bible du sermon": {
+    "title": "Commentaire de la Bible du sermon",
+    "author": "la Bible du sermon",
+    "description": "Commentaire biblique (4039 passages indexés)",
+    "year": "",
+    "cover_path": null,
+    "type": "Commentaire",
+    "format": "sqlite",
+    "commentary_id": "165",
+    "chunks_count": 4039,
+    "embedding_model": "study_library",
+    "active": true
+  },
+  "Commentaire complet de John Trapp": {
+    "title": "Commentaire complet de John Trapp",
+    "author": "complet de John Trapp",
+    "description": "Commentaire biblique (27585 passages indexés)",
+    "year": "",
+    "cover_path": null,
+    "type": "Commentaire",
+    "format": "sqlite",
+    "commentary_id": "195",
+    "chunks_count": 27585,
+    "embedding_model": "study_library",
+    "active": true
+  },
+  "Commentaire Biblique de la chaire (Pulpit)": {
+    "title": "Commentaire Biblique de la chaire (Pulpit)",
+    "author": "la chaire (Pulpit)",
+    "description": "Commentaire biblique (1515 passages indexés)",
+    "year": "",
+    "cover_path": null,
+    "type": "Commentaire",
+    "format": "sqlite",
+    "commentary_id": "5",
+    "chunks_count": 1515,
+    "embedding_model": "study_library",
+    "active": true
+  },
+  "Commentaire de Dummelow sur la Bible": {
+    "title": "Commentaire de Dummelow sur la Bible",
+    "author": "Dummelow sur la Bible",
+    "description": "Commentaire biblique (14694 passages indexés)",
+    "year": "",
+    "cover_path": null,
+    "type": "Commentaire",
+    "format": "sqlite",
+    "commentary_id": "56",
+    "chunks_count": 14694,
+    "embedding_model": "study_library",
+    "active": true
+  },
+  "Commentaire de Joseph Benson (AT & NT)": {
+    "title": "Commentaire de Joseph Benson (AT & NT)",
+    "author": "Joseph Benson (AT & NT)",
+    "description": "Commentaire biblique (15343 passages indexés)",
+    "year": "",
+    "cover_path": null,
+    "type": "Commentaire",
+    "format": "sqlite",
+    "commentary_id": "59",
+    "chunks_count": 15343,
+    "embedding_model": "study_library",
+    "active": true
+  },
+  "Commentaire de Coke sur la Sainte Bible": {
+    "title": "Commentaire de Coke sur la Sainte Bible",
+    "author": "Coke sur la Sainte Bible",
+    "description": "Commentaire biblique (14349 passages indexés)",
+    "year": "",
+    "cover_path": null,
+    "type": "Commentaire",
+    "format": "sqlite",
+    "commentary_id": "65",
+    "chunks_count": 14349,
+    "embedding_model": "study_library",
+    "active": true
+  },
+  "Commentaire biblique de l'exposant (Nicoll)": {
+    "title": "Commentaire biblique de l'exposant (Nicoll)",
+    "author": "biblique de l'exposant (Nicoll)",
+    "description": "Commentaire biblique (2101 passages indexés)",
+    "year": "",
+    "cover_path": null,
+    "type": "Commentaire",
+    "format": "sqlite",
+    "commentary_id": "75",
+    "chunks_count": 2101,
+    "embedding_model": "study_library",
+    "active": true
+  },
+  "Bible annotée par A.C. Gaebelein": {
+    "title": "Bible annotée par A.C. Gaebelein",
+    "author": "Bible annotée par A.C. Gaebelein",
+    "description": "Commentaire biblique (1347 passages indexés)",
+    "year": "",
+    "cover_path": null,
+    "type": "Commentaire",
+    "format": "sqlite",
+    "commentary_id": "81",
+    "chunks_count": 1347,
     "embedding_model": "study_library",
     "active": true
   }
