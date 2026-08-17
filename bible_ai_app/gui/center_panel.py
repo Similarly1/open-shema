@@ -393,9 +393,14 @@ class CenterPanel(ctk.CTkFrame):
         self.comm_textbox.pack(fill="both", expand=True)
         self.comm_textbox.configure(state="disabled")
         
-        # Assistant IA (RightPanel inside tab_chat)
         from gui.right_panel import RightPanel
-        self.right_panel = RightPanel(self.tab_chat, self.get_text_content, self.config)
+        self.right_panel = RightPanel(
+            self.tab_chat, 
+            self.get_text_content, 
+            self.config,
+            db_callback=lambda: getattr(self.master, 'db', None),
+            sources_callback=lambda: getattr(self.master, 'active_sources', [])
+        )
         self.right_panel.pack(fill="both", expand=True)
         
         # Lexique Strong (inside tab_lex)

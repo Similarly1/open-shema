@@ -160,9 +160,11 @@ class InfomaniakClient:
             "Authorization": f"Bearer {self.token}",
             "Content-Type": "application/json"
         }
+        self.session = requests.Session()
 
     def embeddings(self, texts, model="bge_multilingual_gemma2"):
-        sub_batch_size = 32
+        import time
+        sub_batch_size = 20
         all_embeddings = []
         clean_model = model.replace("infomaniak/", "").replace(" (Infomaniak)", "").strip()
         if not clean_model:
@@ -175,14 +177,32 @@ class InfomaniakClient:
                 "model": clean_model,
                 "input": batch
             }
-            try:
-                response = requests.post(url, headers=self.headers, json=payload, timeout=60)
-                response.raise_for_status()
-                data = response.json()
-                embs = [item["embedding"] for item in data.get("data", [])]
-                all_embeddings.extend(embs)
-            except Exception as e:
-                raise Exception(f"Erreur d'embedding Infomaniak ({clean_model}) : {str(e)}")
+            
+            success = False
+            last_err = None
+            for attempt in range(5):
+                try:
+                    response = self.session.post(url, headers=self.headers, json=payload, timeout=60)
+                    response.raise_for_status()
+                    data = response.json()
+                    embs = [item["embedding"] for item in data.get("data", [])]
+                    all_embeddings.extend(embs)
+                    success = True
+                    break
+                except Exception as e:
+                    last_err = str(e)
+                    time.sleep(1.5 * (attempt + 1))
+                    # Réinitialiser la session HTTP en cas de socket interrompu
+                    try:
+                        self.session.close()
+                    except Exception:
+                        pass
+                    self.session = requests.Session()
+                    
+            if not success:
+                raise Exception(f"Erreur d'embedding Infomaniak ({clean_model}) après 5 tentatives : {last_err}")
+                
+            time.sleep(0.1)
                 
         return all_embeddings
 

@@ -1,55 +1,47 @@
 import customtkinter as ctk
 import threading
-import re
 from ai.llm_client import LLMClient
+from core.rag_pipeline import RAGPipeline
 
-def insert_markdown_content(textbox, text):
-    """Parse et insère du texte formaté Markdown dans un CTkTextbox"""
-    tb = textbox._textbox
-    
-    # Configuration des tags de style déjà définie dynamiquement dans apply_font()
-    
+def insert_markdown_content(tb, text):
+    """Insère du texte Markdown basique avec styles personnalisés dans un CTkTextbox."""
+    import re
     lines = text.split("\n")
-    for line in lines:
-        line_strip = line.strip()
-        
-        # Titres
-        if line_strip.startswith("### "):
-            clean_line = line_strip[4:]
-            insert_inline_styles(tb, clean_line, "h3")
+    for i, line in enumerate(lines):
+        if line.startswith("# "):
+            tb.insert("end", line[2:] + "\n", "h1")
+        elif line.startswith("## "):
+            tb.insert("end", line[3:] + "\n", "h2")
+        elif line.startswith("### "):
+            tb.insert("end", line[4:] + "\n", "h3")
+        elif line.strip().startswith("- ") or line.strip().startswith("* "):
+            content = line.strip()[2:]
+            tb.insert("end", "• ", "bullet")
+            _insert_inline_formatted(tb, content, "normal")
             tb.insert("end", "\n")
-        elif line_strip.startswith("## "):
-            clean_line = line_strip[3:]
-            insert_inline_styles(tb, clean_line, "h2")
+        elif re.match(r'^\d+\.\s', line.strip()):
+            m = re.match(r'^(\d+\.\s)(.*)', line.strip())
+            tb.insert("end", m.group(1), "bullet")
+            _insert_inline_formatted(tb, m.group(2), "normal")
             tb.insert("end", "\n")
-        elif line_strip.startswith("# "):
-            clean_line = line_strip[2:]
-            insert_inline_styles(tb, clean_line, "h1")
-            tb.insert("end", "\n")
-        # Listes à puces
-        elif line_strip.startswith("- ") or line_strip.startswith("* "):
-            clean_line = "• " + line_strip[2:]
-            insert_inline_styles(tb, clean_line, "bullet")
-            tb.insert("end", "\n")
-        # Séparateurs
-        elif line_strip == "---":
-            tb.insert("end", "─" * 35 + "\n", "normal")
-        # Tableaux (police monospacée)
-        elif line_strip.startswith("|") and line_strip.endswith("|"):
-            insert_inline_styles(tb, line, "code")
-            tb.insert("end", "\n")
-        # Ligne normale
         else:
-            insert_inline_styles(tb, line, "normal")
+            _insert_inline_formatted(tb, line, "normal")
             tb.insert("end", "\n")
 
-def insert_inline_styles(tb, line_text, base_tag):
-    """Regex pour appliquer le gras et l'italique inline à l'intérieur d'une ligne"""
-    pattern = re.compile(r'(\*\*\*.*?\*\*\*|\*\*.*?\*\*|\*.*?\*)')
-    parts = pattern.split(line_text)
-    
+def _insert_inline_formatted(tb, text, base_tag):
+    import re
+    # Match bold-italic, bold, italic, code, brackets references
+    pattern = r'(\*\*\*.*?\*\*\*|\*\*.*?\*\*|\*.*?\*|`.*?`|\[.*?\])'
+    parts = re.split(pattern, text)
     for part in parts:
-        if part.startswith("***") and part.endswith("***"):
+        if not part:
+            continue
+        if part.startswith("`") and part.endswith("`"):
+            tb.insert("end", part[1:-1], "code")
+        elif part.startswith("[") and part.endswith("]") and len(part) > 2:
+            # Références bibliques / théologiques en gras coloré
+            tb.insert("end", part, ("ref_citation", "bold"))
+        elif part.startswith("***") and part.endswith("***"):
             tb.insert("end", part[3:-3], ("bold_italic", base_tag))
         elif part.startswith("**") and part.endswith("**"):
             tb.insert("end", part[2:-2], ("bold", base_tag))
@@ -59,12 +51,15 @@ def insert_inline_styles(tb, line_text, base_tag):
             tb.insert("end", part, base_tag)
 
 class RightPanel(ctk.CTkFrame):
-    def __init__(self, master, get_context_callback, config):
+    def __init__(self, master, get_context_callback, config, db_callback=None, sources_callback=None):
         super().__init__(master)
         
         self.get_context = get_context_callback
+        self.db_callback = db_callback
+        self.sources_callback = sources_callback
         self.config = config
-        chat_model = self.config.get("chat_model", "mistral-small-latest")
+        
+        chat_model = self.config.get("chat_model", "gemini-3.7-flash")
         provider = "gemini" if "gemini" in chat_model.lower() else "mistral"
         api_key = self.config.get("gemini_api_key" if provider == "gemini" else "mistral_api_key")
         self.llm = LLMClient(api_key=api_key, model=chat_model, provider=provider)
@@ -76,7 +71,7 @@ class RightPanel(ctk.CTkFrame):
         self.title_label = ctk.CTkLabel(self, text="Assistant IA", font=ctk.CTkFont(size=20, weight="bold"))
         self.title_label.pack(pady=(10, 4), padx=10)
         
-        # Barre de contrôle du modèle & réflexion
+        # Barre de contrôle du modèle, réflexion et RAG
         self.control_bar = ctk.CTkFrame(self, fg_color=("#F1F5F9", "#1E293B"), corner_radius=8)
         self.control_bar.pack(fill="x", padx=10, pady=(0, 6))
         
@@ -111,7 +106,7 @@ class RightPanel(ctk.CTkFrame):
         
         # Ligne 2 : Mode Réflexion & Niveau (Bas, Moyen, Maximum)
         thinking_row = ctk.CTkFrame(self.control_bar, fg_color="transparent")
-        thinking_row.pack(fill="x", padx=8, pady=(2, 5))
+        thinking_row.pack(fill="x", padx=8, pady=(2, 2))
         
         self.thinking_enabled_var = ctk.BooleanVar(value=self.config.get("thinking_enabled", True))
         self.thinking_switch = ctk.CTkSwitch(
@@ -139,6 +134,50 @@ class RightPanel(ctk.CTkFrame):
         
         if not self.thinking_enabled_var.get():
             self.thinking_level_menu.configure(state="disabled")
+
+        # Ligne 3 : Mode de recherche RAG & Options
+        rag_row = ctk.CTkFrame(self.control_bar, fg_color="transparent")
+        rag_row.pack(fill="x", padx=8, pady=(2, 2))
+        
+        self.rag_mode_var = ctk.StringVar(value=self.config.get("rag_mode", "🌐 Bibliothèque (RAG)"))
+        self.rag_mode_menu = ctk.CTkOptionMenu(
+            rag_row,
+            variable=self.rag_mode_var,
+            values=["🌐 Bibliothèque (RAG)", "📖 Écran seul"],
+            command=self.on_rag_mode_changed,
+            width=135,
+            height=22,
+            font=ctk.CTkFont(size=11)
+        )
+        self.rag_mode_menu.pack(side="left")
+        
+        self.rerank_enabled_var = ctk.BooleanVar(value=self.config.get("rerank_enabled", True))
+        self.rerank_switch = ctk.CTkSwitch(
+            rag_row,
+            text="🎯 Rerank",
+            variable=self.rerank_enabled_var,
+            command=self.on_rerank_changed,
+            font=ctk.CTkFont(size=11, weight="bold"),
+            width=36,
+            height=18
+        )
+        self.rerank_switch.pack(side="right")
+        
+        # Ligne 4 : Switch pour inclure ou exclure le passage ouvert à l'écran
+        screen_row = ctk.CTkFrame(self.control_bar, fg_color="transparent")
+        screen_row.pack(fill="x", padx=8, pady=(2, 5))
+        
+        self.include_screen_var = ctk.BooleanVar(value=self.config.get("include_screen_context", True))
+        self.include_screen_switch = ctk.CTkSwitch(
+            screen_row,
+            text="📌 Inclure passage à l'écran",
+            variable=self.include_screen_var,
+            command=self.on_include_screen_changed,
+            font=ctk.CTkFont(size=11),
+            width=36,
+            height=18
+        )
+        self.include_screen_switch.pack(side="left")
         
         # Zone de chat
         self.chat_history = ctk.CTkTextbox(self, wrap="word")
@@ -169,7 +208,7 @@ class RightPanel(ctk.CTkFrame):
         self.input_frame = ctk.CTkFrame(self)
         self.input_frame.pack(fill="x", padx=10, pady=10)
         
-        self.entry = ctk.CTkEntry(self.input_frame, placeholder_text="Posez une question sur le texte...")
+        self.entry = ctk.CTkEntry(self.input_frame, placeholder_text="Posez une question sur vos textes ou toute la bibliothèque...")
         self.entry.pack(side="left", fill="x", expand=True, padx=(0, 10))
         self.entry.bind("<Return>", self.send_message)
         
@@ -187,6 +226,23 @@ class RightPanel(ctk.CTkFrame):
         self.thinking_level_menu.configure(state="normal" if is_enabled else "disabled")
         self.config["thinking_enabled"] = is_enabled
         self.config["thinking_level"] = self.thinking_level_var.get()
+        from core.config import save_config
+        save_config(self.config)
+
+    def on_rag_mode_changed(self, choice):
+        self.config["rag_mode"] = choice
+        is_rag = "Bibliothèque" in choice
+        self.include_screen_switch.configure(state="normal" if is_rag else "disabled")
+        from core.config import save_config
+        save_config(self.config)
+
+    def on_rerank_changed(self, *args):
+        self.config["rerank_enabled"] = self.rerank_enabled_var.get()
+        from core.config import save_config
+        save_config(self.config)
+
+    def on_include_screen_changed(self, *args):
+        self.config["include_screen_context"] = self.include_screen_var.get()
         from core.config import save_config
         save_config(self.config)
 
@@ -212,10 +268,10 @@ class RightPanel(ctk.CTkFrame):
         self.chat_history.configure(state="disabled")
         self.chat_history.yview("end")
         
-        context = self.get_context()
+        context = self.get_context() if self.get_context else ""
         
         self.send_btn.configure(state="disabled")
-        self.copy_btn.pack_forget() # Masquer le bouton de copie pendant le chargement
+        self.copy_btn.pack_forget()
         
         # Calculer le budget de réflexion
         thinking_budget = None
@@ -238,9 +294,36 @@ class RightPanel(ctk.CTkFrame):
         self.start_loader()
         
         sys_prompt = self.config.get("chat_system_prompt")
+        is_rag = "Bibliothèque" in self.rag_mode_var.get()
+        db = self.db_callback() if self.db_callback else None
+        active_sources = self.sources_callback() if self.sources_callback else None
+        enable_rerank = self.rerank_enabled_var.get()
+        
+        # Déterminer le contexte écran effectif selon le mode et l'interrupteur
+        if is_rag:
+            effective_screen_context = context if self.include_screen_var.get() else None
+        else:
+            effective_screen_context = context
+
         def run_ai():
-            answer = self.llm.ask_question(context, user_text, system_prompt=sys_prompt, thinking_budget=thinking_budget)
-            self.after(0, self.display_answer, answer)
+            if is_rag and db:
+                pipeline = RAGPipeline(db=db, config=self.config)
+                result = pipeline.execute(
+                    query=user_text,
+                    active_sources=active_sources,
+                    screen_context=effective_screen_context,
+                    top_k_raw=int(self.config.get("rag_top_k_raw", 25)),
+                    top_k_final=int(self.config.get("rag_top_k_final", 7)),
+                    enable_rerank=enable_rerank,
+                    enable_curation=bool(self.config.get("rag_enable_curation", False)),
+                    chat_model=current_model,
+                    thinking_budget=thinking_budget,
+                    system_prompt=sys_prompt
+                )
+                self.after(0, self.display_rag_result, result)
+            else:
+                answer = self.llm.ask_question(effective_screen_context or "", user_text, system_prompt=sys_prompt, thinking_budget=thinking_budget)
+                self.after(0, self.display_answer, answer)
             
         threading.Thread(target=run_ai, daemon=True).start()
         
@@ -273,9 +356,11 @@ class RightPanel(ctk.CTkFrame):
         else:
             thinking_badge = f" ({used_model})"
         
+        mode_badge = " [🌐 RAG]" if "Bibliothèque" in self.rag_mode_var.get() else ""
+        
         self.chat_history.configure(state="normal")
-        self.chat_history.insert("end", f"Assistant{thinking_badge} : ", "ai_header")
-        self.chat_history.insert("end", "Réflexion en cours...\n\n", ("loader", "italic"))
+        self.chat_history.insert("end", f"Assistant{thinking_badge}{mode_badge} : ", "ai_header")
+        self.chat_history.insert("end", "Recherche & Réflexion en cours...\n\n", ("loader", "italic"))
         self.chat_history.insert("end", "\n".join(self.skeleton_lines) + "\n\n", "skeleton")
         self.chat_history.configure(state="disabled")
         self.chat_history.yview("end")
@@ -298,14 +383,14 @@ class RightPanel(ctk.CTkFrame):
             for line_idx, line_len in enumerate([36, 28, 32]):
                 p = (self.loader_index - line_idx * 6) % (line_len + 15) - 5
                 new_line = ""
-                for i in range(line_len):
-                    if p <= i <= p + 4:
-                        new_line += "░"
+                for char_idx in range(line_len):
+                    if 0 <= char_idx - p < 6:
+                        new_line += "▓"
                     else:
-                        new_line += "█"
+                        new_line += "░"
                 frame_lines.append(new_line)
                 
-            self.chat_history._textbox.insert(start, "\n".join(frame_lines) + "\n\n", "skeleton")
+            self.chat_history.insert(start, "\n".join(frame_lines) + "\n\n", "skeleton")
             
         self.chat_history.configure(state="disabled")
         self.loader_after_id = self.after(50, self.animate_loader)
@@ -330,19 +415,63 @@ class RightPanel(ctk.CTkFrame):
             
         self.chat_history.configure(state="disabled")
         
-    def display_answer(self, answer):
+    def display_rag_result(self, result):
+        """Affiche le résultat enrichi du pipeline RAG avec sources et métriques."""
         self.stop_loader()
         
+        answer = result.get("answer", "")
         self.last_answer = answer
+        sources = result.get("sources", [])
+        timings = result.get("timings", {})
         
-        # Afficher la réponse formatee
         self.chat_history.configure(state="normal")
         insert_markdown_content(self.chat_history, answer)
         self.chat_history.insert("end", "\n")
+        
+        # Bloc récapitulatif des sources retenues par le Reranker
+        if sources:
+            self.chat_history.insert("end", "📚 Sources retenues par le Reranking :\n", ("bold", "h3"))
+            for s in sources:
+                meta = s.get("metadata", {})
+                source_name = meta.get("name") or meta.get("source") or "Document"
+                book = meta.get("book", "")
+                chap = meta.get("chapter", "")
+                verse = meta.get("verse", "")
+                ref_parts = []
+                if book: ref_parts.append(str(book))
+                if chap: ref_parts.append(f"{chap}:{verse}" if verse else f"Ch. {chap}")
+                ref_str = f" ({' '.join(ref_parts)})" if ref_parts else ""
+                
+                score_val = s.get("rerank_score")
+                score_txt = f" • Pertinence {int(score_val * 100)}%" if score_val is not None else ""
+                
+                self.chat_history.insert("end", f"  • {source_name}{ref_str}{score_txt}\n", "bullet")
+            self.chat_history.insert("end", "\n")
+
+        # Ligne de métriques temporelles discrète
+        if timings:
+            tot = timings.get("total_ms", 0) / 1000.0
+            rerank_ms = timings.get("rerank_ms", 0)
+            llm_ms = timings.get("llm_ms", 0)
+            stats_str = f"⏱️ Réponse en {tot:.1f}s (Rerank CPU: {rerank_ms:.0f}ms • IA: {llm_ms/1000.0:.1f}s)\n\n"
+            self.chat_history.insert("end", stats_str, "loader")
+            
         self.chat_history.yview("end")
         self.chat_history.configure(state="disabled")
         
-        # Réactiver les contrôles et afficher le bouton de copie
+        self.send_btn.configure(state="normal")
+        self.copy_btn.pack(side="right", padx=10)
+
+    def display_answer(self, answer):
+        self.stop_loader()
+        self.last_answer = answer
+        
+        self.chat_history.configure(state="normal")
+        insert_markdown_content(self.chat_history, answer)
+        self.chat_history.insert("end", "\n\n")
+        self.chat_history.yview("end")
+        self.chat_history.configure(state="disabled")
+        
         self.send_btn.configure(state="normal")
         self.copy_btn.pack(side="right", padx=10)
         
@@ -352,7 +481,6 @@ class RightPanel(ctk.CTkFrame):
             self.clipboard_append(self.last_answer)
             self.update()
             
-            # Effet visuel temporaire sur le bouton
             self.copy_btn.configure(text="✓ Copié !", fg_color=["#10B981", "#059669"], text_color="white")
             self.after(1500, self.reset_copy_btn)
             
@@ -360,10 +488,7 @@ class RightPanel(ctk.CTkFrame):
         self.copy_btn.configure(text="📋 Copier", fg_color="transparent", text_color=("black", "white"))
         
     def apply_font(self, font_family, font_size):
-        # Ajuster la police globale de la zone de chat
         self.chat_history.configure(font=(font_family, font_size))
-        
-        # Mettre à jour tous les tags de style du textbox pour suivre la taille
         tb = self.chat_history._textbox
         tb.tag_configure("bold", font=(font_family, font_size, "bold"))
         tb.tag_configure("italic", font=(font_family, font_size, "italic"))
@@ -376,5 +501,6 @@ class RightPanel(ctk.CTkFrame):
         tb.tag_configure("code", font=("Courier New", font_size - 2), background="#F0F0F0")
         tb.tag_configure("user_header", font=(font_family, font_size, "bold"), foreground="#3B82F6", spacing1=10)
         tb.tag_configure("ai_header", font=(font_family, font_size, "bold"), foreground="#10B981", spacing1=10)
-        tb.tag_configure("loader", font=(font_family, font_size, "italic"), foreground="#888888")
+        tb.tag_configure("ref_citation", font=(font_family, font_size, "bold"), foreground="#6366F1")
+        tb.tag_configure("loader", font=(font_family, font_size - 2, "italic"), foreground="#888888")
         tb.tag_configure("skeleton", font=(font_family, font_size), foreground="#D1D5DB", spacing1=4)

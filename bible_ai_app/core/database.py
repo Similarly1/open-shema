@@ -31,17 +31,40 @@ class VectorDB:
             return
             
         collection = self.get_collection(embedding_model)
-        texts = [c["text"] for c in chunks]
-        metadatas = [c["metadata"] for c in chunks]
-        ids = [c["id"] for c in chunks]
         
-        batch_size = 25 if "gemini" in embedding_model else 50
-        total = len(texts)
+        # Détection des fragments déjà indexés pour reprise instantanée sans recalculer
+        existing_ids = set()
+        try:
+            doc_name = chunks[0]["metadata"].get("name") if chunks else None
+            if doc_name:
+                existing_data = collection.get(where={"name": doc_name}, include=[])
+                if existing_data and existing_data.get("ids"):
+                    existing_ids = set(existing_data["ids"])
+        except Exception:
+            existing_ids = set()
+
+        chunks_to_process = [c for c in chunks if c["id"] not in existing_ids]
+        total_all = len(chunks)
+        already_done = total_all - len(chunks_to_process)
+        
+        if progress_callback and already_done > 0:
+            progress_callback(int((already_done / total_all) * 100))
+            
+        if not chunks_to_process:
+            if progress_callback:
+                progress_callback(100)
+            return
+
+        texts = [c["text"] for c in chunks_to_process]
+        metadatas = [c["metadata"] for c in chunks_to_process]
+        ids = [c["id"] for c in chunks_to_process]
+        
+        batch_size = 20 if ("gemini" in embedding_model or "infomaniak" in embedding_model or "bge" in embedding_model) else 50
+        total_remaining = len(texts)
         
         if embedding_model == "study_library":
-            # Pour study_library local sans API externe obligatoire, on fournit des embeddings neutres
-            for i in range(0, total, batch_size):
-                end = min(i + batch_size, total)
+            for i in range(0, total_remaining, batch_size):
+                end = min(i + batch_size, total_remaining)
                 batch_texts = texts[i:end]
                 batch_ids = ids[i:end]
                 batch_metas = metadatas[i:end]
@@ -53,7 +76,8 @@ class VectorDB:
                     ids=batch_ids
                 )
                 if progress_callback:
-                    progress_callback(int((end / total) * 100))
+                    current_done = already_done + end
+                    progress_callback(int((current_done / total_all) * 100))
             return
             
         if "infomaniak" in embedding_model or "bge" in embedding_model or "mini_lm" in embedding_model:
@@ -74,8 +98,8 @@ class VectorDB:
             
         llm = LLMClient(api_key=key, provider=provider, product_id=product_id)
         
-        for i in range(0, total, batch_size):
-            end = min(i + batch_size, total)
+        for i in range(0, total_remaining, batch_size):
+            end = min(i + batch_size, total_remaining)
             batch_texts = texts[i:end]
             
             embeddings = llm.get_embeddings(batch_texts, model=embedding_model)
@@ -86,7 +110,8 @@ class VectorDB:
                 ids=ids[i:end]
             )
             if progress_callback:
-                progress_callback(int((end / total) * 100))
+                current_done = already_done + end
+                progress_callback(int((current_done / total_all) * 100))
 
     def get_by_reference(self, reference, active_sources=None):
         if not active_sources:

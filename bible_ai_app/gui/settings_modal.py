@@ -297,6 +297,37 @@ class SettingsTab(ctk.CTkScrollableFrame):
         )
         self.prompt_text.insert("0.0", self.config.get("chat_system_prompt", default_prompt))
         
+        # Configuration RAG & Reranking Local
+        self.sect_rag = ctk.CTkLabel(self, text="🧠 Pipeline RAG & Reranking Local", font=ctk.CTkFont(size=14, weight="bold"), text_color="#3B82F6")
+        self.sect_rag.pack(anchor="w", padx=20, pady=(12, 4))
+        
+        rag_cfg_frame = ctk.CTkFrame(self, fg_color=("#F8FAFC", "#1E293B"), corner_radius=8)
+        rag_cfg_frame.pack(fill="x", padx=20, pady=4)
+        
+        k_row = ctk.CTkFrame(rag_cfg_frame, fg_color="transparent")
+        k_row.pack(fill="x", padx=12, pady=6)
+        
+        lbl_k_raw = ctk.CTkLabel(k_row, text="Extraits bruts (Top-K Initial) :", font=ctk.CTkFont(size=12))
+        lbl_k_raw.pack(side="left")
+        self.top_k_raw_entry = ctk.CTkEntry(k_row, width=50)
+        self.top_k_raw_entry.pack(side="left", padx=(6, 16))
+        self.top_k_raw_entry.insert(0, str(self.config.get("rag_top_k_raw", 25)))
+        
+        lbl_k_final = ctk.CTkLabel(k_row, text="Extraits retenus (Top-K Reranker) :", font=ctk.CTkFont(size=12))
+        lbl_k_final.pack(side="left")
+        self.top_k_final_entry = ctk.CTkEntry(k_row, width=50)
+        self.top_k_final_entry.pack(side="left", padx=(6, 0))
+        self.top_k_final_entry.insert(0, str(self.config.get("rag_top_k_final", 7)))
+        
+        self.curation_var = ctk.BooleanVar(value=self.config.get("rag_enable_curation", False))
+        self.curation_switch = ctk.CTkSwitch(
+            rag_cfg_frame,
+            text="Épuration / Curation automatique du contexte (Étape 3)",
+            variable=self.curation_var,
+            font=ctk.CTkFont(size=12)
+        )
+        self.curation_switch.pack(anchor="w", padx=12, pady=(2, 8))
+        
         # ==========================================
         # 4. SAUVEGARDE DE LA BASE VECTORIELLE
         # ==========================================
@@ -481,6 +512,18 @@ class SettingsTab(ctk.CTkScrollableFrame):
         self.config["show_diff_highlights"] = self.show_diff_colors_var.get()
         self.config["reference_bible"] = self.ref_bible_var.get()
         self.config["chat_system_prompt"] = self.prompt_text.get("0.0", "end-1c").strip()
+        
+        try:
+            self.config["rag_top_k_raw"] = int(self.top_k_raw_entry.get().strip())
+        except ValueError:
+            self.config["rag_top_k_raw"] = 25
+            
+        try:
+            self.config["rag_top_k_final"] = int(self.top_k_final_entry.get().strip())
+        except ValueError:
+            self.config["rag_top_k_final"] = 7
+            
+        self.config["rag_enable_curation"] = bool(self.curation_var.get())
         
         save_config(self.config)
         

@@ -258,10 +258,10 @@
     "title": "Théologie Systématique",
     "author": "",
     "description": "",
-    "year": "2018",
+    "year": "",
     "cover_path": null,
     "type": "Théologie",
-    "embedding_model": "gemini-embedding-2",
+    "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
     "active": true
   }
 }

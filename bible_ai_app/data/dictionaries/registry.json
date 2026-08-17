@@ -32,7 +32,7 @@
     "type": "custom",
     "enabled": true,
     "priority": 4,
-    "count": 280,
+    "count": 99,
     "file": "dictionaries\\theologie_systematiq.json"
   }
 ]
