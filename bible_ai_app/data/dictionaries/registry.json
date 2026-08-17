@@ -18,11 +18,20 @@
     "file": "data/calmet_dict.json"
   },
   {
+    "id": "vigouroux",
+    "name": "Dictionnaire de la Bible - F. Vigouroux (1912)",
+    "type": "custom",
+    "enabled": true,
+    "priority": 3,
+    "count": 8449,
+    "file": "data/vigouroux_dict.json"
+  },
+  {
     "id": "bailly",
     "name": "Dictionnaire Grec-Français Anatole Bailly (1901)",
     "type": "greek",
     "enabled": true,
-    "priority": 3,
+    "priority": 4,
     "count": 14642,
     "file": "data/bailly_lexicon.json"
   },
@@ -31,8 +40,8 @@
     "name": "Théologie Systématique",
     "type": "custom",
     "enabled": true,
-    "priority": 4,
+    "priority": 5,
     "count": 99,
-    "file": "dictionaries\\theologie_systematiq.json"
+    "file": "dictionaries/theologie_systematiq.json"
   }
 ]

@@ -788,10 +788,17 @@ class CenterPanel(ctk.CTkFrame):
         self.refresh_current_view_position()
 
     def on_bible_mouse_motion(self, event):
-        """Détecte dynamiquement et instantanément le mot sous le curseur (<0.01ms)."""
+        """Détecte dynamiquement le mot sous le curseur avec debounce fluide et 0 surcharge CPU."""
         tb = self.bible_textbox._textbox
         try:
             pos = tb.index(f"@{event.x},{event.y}")
+            start_idx = tb.index(f"{pos} wordstart")
+            end_idx = tb.index(f"{pos} wordend")
+            
+            # Si le curseur est toujours sur le même mot déjà actif, on ne recalcule rien
+            if self._hover_match and self._hover_match[1] == start_idx and self._hover_match[2] == end_idx:
+                return
+                
             # Vérifier si ce caractère possède un tag Strong
             tags = tb.tag_names(pos)
             strong_code = None
@@ -801,7 +808,7 @@ class CenterPanel(ctk.CTkFrame):
                     strong_code, strong_word = self._strong_tag_map[tag]
                     break
                     
-            word = tb.get(f"{pos} wordstart", f"{pos} wordend").strip(" ,:;.!?()«»[]\"'’\n\r\t")
+            word = tb.get(start_idx, end_idx).strip(" ,:;.!?()«»[]\"'’\n\r\t")
             if not word and not strong_word:
                 self._clear_hover()
                 return
@@ -810,39 +817,52 @@ class CenterPanel(ctk.CTkFrame):
             match = DictionaryManager.lookup(query_w, strong_code)
             
             if match:
-                start_idx = f"{pos} wordstart"
-                end_idx = f"{pos} wordend"
-                if not self._hover_match or self._hover_match[0] != match:
-                    tb.tag_remove("hover_dict_highlight", "1.0", "end")
-                    tb.tag_add("hover_dict_highlight", start_idx, end_idx)
-                    tb.configure(cursor="hand2")
-                    bb = tb.bbox(start_idx)
-                    if bb:
-                        bx, by, bw, bh = bb
-                        root_x = tb.winfo_rootx() + bx
-                        root_y = tb.winfo_rooty() + by
-                        target_rect = (root_x, root_y, bw, bh)
-                    else:
-                        target_rect = (event.x_root, event.y_root, 20, 20)
-                        
-                    if self.tooltip._after_id:
-                        try:
-                            self.after_cancel(self.tooltip._after_id)
-                        except Exception:
-                            pass
-                    self.tooltip._after_id = self.after(140, lambda x=event.x_root, y=event.y_root, m=match, tr=target_rect: self.tooltip.show(x, y, m, target_rect=tr))
+                self._hover_match = (match, start_idx, end_idx)
+                tb.tag_remove("hover_dict_highlight", "1.0", "end")
+                tb.tag_add("hover_dict_highlight", start_idx, end_idx)
+                tb.configure(cursor="hand2")
+                
+                bb = tb.bbox(start_idx)
+                if bb:
+                    bx, by, bw, bh = bb
+                    root_x = tb.winfo_rootx() + bx
+                    root_y = tb.winfo_rooty() + by
+                    target_rect = (root_x, root_y, bw, bh)
+                else:
+                    target_rect = (event.x_root, event.y_root, 20, 20)
+                    
+                if self.tooltip._after_id:
+                    try:
+                        self.after_cancel(self.tooltip._after_id)
+                    except Exception:
+                        pass
+                self.tooltip._after_id = self.after(100, lambda rx=target_rect[0], ry=target_rect[1], m=match, tr=target_rect: self.tooltip.show(rx, ry, m, target_rect=tr))
             else:
                 self._clear_hover()
         except Exception:
-            pass
+            self._clear_hover()
 
     def _clear_hover(self):
-        if self._hover_match:
+        """Nettoie instantanément le survol et masque l'infobulle."""
+        if hasattr(self, 'tooltip') and self.tooltip._after_id:
+            try:
+                self.after_cancel(self.tooltip._after_id)
+            except Exception:
+                pass
+            self.tooltip._after_id = None
+            
+        if hasattr(self, 'bible_textbox') and self.bible_textbox._textbox.winfo_exists():
             tb = self.bible_textbox._textbox
-            tb.tag_remove("hover_dict_highlight", "1.0", "end")
-            tb.configure(cursor="")
+            try:
+                tb.tag_remove("hover_dict_highlight", "1.0", "end")
+                tb.configure(cursor="")
+            except Exception:
+                pass
+                
+        if hasattr(self, 'tooltip'):
             self.tooltip.hide()
-            self._hover_match = None
+            
+        self._hover_match = None
 
     def on_bible_mouse_click(self, event):
         """Ouvre l'article complet dans le volet droit au clic sur un mot reconnu et synchronise le commentaire sur le verset cliqué."""
@@ -864,7 +884,7 @@ class CenterPanel(ctk.CTkFrame):
         # 2. Ouvrir le dictionnaire si un mot survolé a été cliqué
         if self._hover_match:
             match, _, _ = self._hover_match
-            self.tooltip.hide()
+            self._clear_hover()
             self.display_dictionary_entry(match)
 
     def on_bible_mouse_leave(self, event=None):
@@ -947,19 +967,23 @@ class CenterPanel(ctk.CTkFrame):
         self.lex_ai_btn.configure(state="normal", text=f"🤖 Analyser « {first_title} » avec l'IA")
 
     def on_strong_clicked(self, strong_codes_str, clicked_word=None):
-        """Affiche la fiche lexicale complète Strong dans l'onglet dédié à droite."""
+        """Affiche la fiche lexicale complète Strong et les dictionnaires associés dans l'onglet dédié à droite."""
         entries = StrongLexicon.get_multiple(strong_codes_str)
         if not entries:
             return
             
         first_entry = entries[0]
-        match = {
-            "word": clicked_word,
-            "title": clicked_word or first_entry.get("lemma", ""),
-            "strong": first_entry,
-            "calmet": DictionaryManager.lookup_calmet(clicked_word) if clicked_word else None
-        }
-        self.display_dictionary_entry(match)
+        code = first_entry.get("short_code", first_entry.get("code", ""))
+        lookup_res = DictionaryManager.lookup(clicked_word, code) if (clicked_word or code) else None
+        if lookup_res:
+            self.display_dictionary_entry(lookup_res)
+        else:
+            match = {
+                "word": clicked_word,
+                "title": clicked_word or first_entry.get("lemma", ""),
+                "strong": first_entry
+            }
+            self.display_dictionary_entry(match)
 
     def on_analyze_strong_with_ai(self):
         """Envoie une requête exégétique ciblée à l'Assistant IA sur le mot ou sujet sélectionné."""

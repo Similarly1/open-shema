@@ -216,15 +216,21 @@ class DictionaryManager:
             "art": art
         }
 
+    _lookup_cache = {}
+
     @classmethod
     def lookup(cls, word, strong_code=None):
         """
         Recherche globale dans tous les dictionnaires activés, ordonnée par priorité utilisateur.
-        Retourne une synthèse hiérarchisée pour l'info-bulle et le panneau complet.
+        Retourne une synthèse hiérarchisée pour l'info-bulle et le panneau complet avec cache mémoire instantané.
         """
         clean_w = word.strip(" ,:;.!?()«»[]\"'’\n\r\t") if word else ""
         if not clean_w and not strong_code:
             return None
+            
+        cache_key = (clean_w.lower(), strong_code or "")
+        if cache_key in cls._lookup_cache:
+            return cls._lookup_cache[cache_key]
             
         registry = cls.load_registry()
         # Trier par priorité
@@ -237,6 +243,7 @@ class DictionaryManager:
                 matches.append(res)
                 
         if not matches:
+            cls._lookup_cache[cache_key] = None
             return None
             
         # 1er dictionnaire = Priorité Principale
@@ -258,12 +265,14 @@ class DictionaryManager:
             other_names = [m['dict_name'] for m in matches[1:]]
             preview_lines.append(f"📚 Aussi disponible dans : {', '.join(other_names)}")
             
-        return {
+        result = {
             "title": global_title,
             "badge": global_badge,
             "preview": "\n\n".join(preview_lines),
             "matches": matches
         }
+        cls._lookup_cache[cache_key] = result
+        return result
 
     @classmethod
     def search_all_entries(cls, query: str, limit: int = 50) -> list:
