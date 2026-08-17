@@ -8,8 +8,91 @@ import threading
 from ai.llm_client import LLMClient
 from core.rag_pipeline import RAGPipeline
 
-def insert_markdown_content(tb, text):
-    """Insère du texte Markdown basique avec styles soignés et typographie aérée."""
+active_citation_tooltips = []
+
+def _find_matching_source(citation_text, sources):
+    """Retrouve l'extrait le plus pertinent correspondant à une citation textuelle."""
+    if not sources:
+        return None
+    c_lower = citation_text.lower()
+    for s in sources:
+        meta = s.get("metadata", {})
+        name = (meta.get("name") or meta.get("source") or "").lower()
+        book = (meta.get("book") or "").lower()
+        chap = str(meta.get("chapter") or "").lower()
+        
+        if (name and name in c_lower) or (book and book in c_lower):
+            if chap and chap in c_lower:
+                return s
+    for s in sources:
+        meta = s.get("metadata", {})
+        name = (meta.get("name") or meta.get("source") or "").lower()
+        book = (meta.get("book") or "").lower()
+        if (name and name in c_lower) or (book and book in c_lower):
+            return s
+    return sources[0] if sources else None
+
+def _bind_citation_tooltip(tb, tag_name, citation_text, doc):
+    """Attache une infobulle flottante au survol d'une citation dans le texte."""
+    def on_enter(event):
+        try:
+            # Fermer les anciennes infobulles
+            for tw in list(active_citation_tooltips):
+                try: tw.destroy()
+                except Exception: pass
+            active_citation_tooltips.clear()
+            
+            x = tb.winfo_rootx() + event.x + 10
+            y = tb.winfo_rooty() + event.y - 125
+            
+            tw = tk.Toplevel(tb)
+            tw.wm_overrideredirect(True)
+            tw.wm_attributes("-topmost", True)
+            tw.geometry(f"+{max(10, x)}+{max(10, y)}")
+            
+            is_dark = (ctk.get_appearance_mode() == "Dark")
+            bg_color = "#0F172A" if is_dark else "#FFFFFF"
+            border_color = "#6366F1" if is_dark else "#4F46E5"
+            text_color = "#F8FAFC" if is_dark else "#0F172A"
+            
+            frame = tk.Frame(tw, bg=bg_color, highlightbackground=border_color, highlightthickness=1.5, padx=12, pady=10)
+            frame.pack(fill="both", expand=True)
+            
+            header_title = citation_text
+            score_txt = ""
+            snippet = "Extrait indexé dans votre bibliothèque."
+            if doc:
+                meta = doc.get("metadata", {})
+                t = meta.get("name") or meta.get("source")
+                score = doc.get("rerank_score")
+                if score is not None:
+                    score_txt = f" • Pertinence {int(score * 100)}%"
+                snippet = doc.get("text", "")
+                if len(snippet) > 300:
+                    snippet = snippet[:300].strip() + "..."
+                    
+            lbl_h = tk.Label(frame, text=f"📖 {header_title}{score_txt}", font=("Segoe UI", 10, "bold"), fg="#6366F1", bg=bg_color, anchor="w")
+            lbl_h.pack(fill="x", pady=(0, 4))
+            
+            lbl_b = tk.Label(frame, text=snippet, font=("Segoe UI", 9), fg=text_color, bg=bg_color, wraplength=420, justify="left")
+            lbl_b.pack(fill="x")
+            
+            active_citation_tooltips.append(tw)
+        except Exception:
+            pass
+            
+    def on_leave(event):
+        for tw in list(active_citation_tooltips):
+            try: tw.destroy()
+            except Exception: pass
+        active_citation_tooltips.clear()
+
+    inner_tb = tb._textbox if hasattr(tb, '_textbox') else tb
+    inner_tb.tag_bind(tag_name, "<Enter>", on_enter)
+    inner_tb.tag_bind(tag_name, "<Leave>", on_leave)
+
+def insert_markdown_content(tb, text, sources=None):
+    """Insère du texte Markdown avec liens de citations interactifs."""
     lines = text.split("\n")
     for i, line in enumerate(lines):
         if line.startswith("# "):
@@ -21,18 +104,18 @@ def insert_markdown_content(tb, text):
         elif line.strip().startswith("- ") or line.strip().startswith("* "):
             content = line.strip()[2:]
             tb.insert("end", "  • ", "bullet")
-            _insert_inline_formatted(tb, content, "normal")
+            _insert_inline_formatted(tb, content, "normal", sources=sources)
             tb.insert("end", "\n")
         elif re.match(r'^\d+\.\s', line.strip()):
             m = re.match(r'^(\d+\.\s)(.*)', line.strip())
             tb.insert("end", f"  {m.group(1)}", "bullet")
-            _insert_inline_formatted(tb, m.group(2), "normal")
+            _insert_inline_formatted(tb, m.group(2), "normal", sources=sources)
             tb.insert("end", "\n")
         else:
-            _insert_inline_formatted(tb, line, "normal")
+            _insert_inline_formatted(tb, line, "normal", sources=sources)
             tb.insert("end", "\n")
 
-def _insert_inline_formatted(tb, text, base_tag):
+def _insert_inline_formatted(tb, text, base_tag, sources=None):
     pattern = r'(\*\*\*.*?\*\*\*|\*\*.*?\*\*|\*.*?\*|`.*?`|\[.*?\])'
     parts = re.split(pattern, text)
     for part in parts:
@@ -41,7 +124,12 @@ def _insert_inline_formatted(tb, text, base_tag):
         if part.startswith("`") and part.endswith("`"):
             tb.insert("end", part[1:-1], "code")
         elif part.startswith("[") and part.endswith("]") and len(part) > 2:
-            tb.insert("end", part, ("ref_citation", "bold"))
+            citation_content = part[1:-1].strip()
+            # Créer un tag unique pour la citation
+            tag_name = f"cite_tag_{abs(hash(part))}_{time.time_ns()}"
+            tb.insert("end", part, (tag_name, "ref_citation", "bold"))
+            matched_doc = _find_matching_source(citation_content, sources)
+            _bind_citation_tooltip(tb, tag_name, citation_content, matched_doc)
         elif part.startswith("***") and part.endswith("***"):
             tb.insert("end", part[3:-3], ("bold_italic", base_tag))
         elif part.startswith("**") and part.endswith("**"):
@@ -53,7 +141,7 @@ def _insert_inline_formatted(tb, text, base_tag):
 
 
 class SourceTooltip:
-    """Infobulle flottante légère affichant l'extrait et la source au survol d'un badge."""
+    """Infobulle flottante légère affichant l'extrait et la source au survol d'un badge de pied de page."""
     def __init__(self, widget, source_data):
         self.widget = widget
         self.data = source_data
@@ -138,7 +226,6 @@ class MessageFooterFrame(ctk.CTkFrame):
         # 2. Badges des sources retenues (chips interactifs)
         sources = self.result_dict.get("sources", []) if isinstance(self.result_dict, dict) else []
         if sources:
-            # Afficher jusqu'à 3-4 badges maximum pour ne pas saturer l'espace
             for s in sources[:4]:
                 meta = s.get("metadata", {})
                 source_name = meta.get("name") or meta.get("source") or "Ouvrage"
@@ -161,7 +248,6 @@ class MessageFooterFrame(ctk.CTkFrame):
                     corner_radius=12
                 )
                 chip.pack(side="left", padx=(0, 4), pady=2)
-                # Attacher l'infobulle au survol
                 SourceTooltip(chip, s)
                 
             if len(sources) > 4:
@@ -222,7 +308,6 @@ class RightPanel(ctk.CTkFrame):
         
         self.last_answer = ""
         self.step_tracker_active = False
-        self.step_labels = {}
         
         # En-tête sobre
         self.title_label = ctk.CTkLabel(self, text="Assistant IA", font=ctk.CTkFont(size=18, weight="bold"))
@@ -253,7 +338,8 @@ class RightPanel(ctk.CTkFrame):
                 "gemini-2.5-flash",
                 "gemini-2.5-flash-lite",
                 "mistral-small-latest",
-                "mistral-large-latest"
+                "mistral-large-latest",
+                "Qwen/Qwen3.5-397B-A17B-FP8"
             ],
             command=self.on_model_changed,
             height=24,
@@ -391,9 +477,10 @@ class RightPanel(ctk.CTkFrame):
         self.config = new_config
         chat_model = self.config.get("chat_model", "gemini-3.7-flash")
         self.chat_model_var.set(chat_model)
-        provider = "gemini" if "gemini" in chat_model.lower() else "mistral"
-        api_key = self.config.get("gemini_api_key" if provider == "gemini" else "mistral_api_key")
-        self.llm = LLMClient(api_key=api_key, model=chat_model, provider=provider)
+        provider = "infomaniak" if ("infomaniak" in chat_model.lower() or "ministral" in chat_model.lower() or "qwen" in chat_model.lower()) else ("mistral" if "mistral" in chat_model else "gemini")
+        api_key = self.config.get(f"{provider}_api_key" if provider != "infomaniak" else "infomaniak_token", "")
+        product_id = self.config.get("infomaniak_product_id", "251") if provider == "infomaniak" else None
+        self.llm = LLMClient(api_key=api_key, model=chat_model, provider=provider, product_id=product_id)
         
     def send_message(self, event=None):
         user_text = self.entry.get()
@@ -426,11 +513,13 @@ class RightPanel(ctk.CTkFrame):
         db = self.db_callback() if self.db_callback else None
         active_sources = self.sources_callback() if self.sources_callback else None
         enable_rerank = self.rerank_enabled_var.get()
+        enable_curation = bool(self.config.get("rag_enable_curation", False))
+        curation_model = self.config.get("rag_curation_model", "mistralai/Ministral-3-14B-Instruct-2512")
         
         effective_screen_context = context if (self.include_screen_var.get() or not is_rag) else None
 
         # Démarrer le tracker d'étapes sobre
-        self.start_step_tracker(is_rag=is_rag)
+        self.start_step_tracker(is_rag=is_rag, has_curation=enable_curation)
         
         sys_prompt = self.config.get("chat_system_prompt")
 
@@ -444,7 +533,8 @@ class RightPanel(ctk.CTkFrame):
                     top_k_raw=int(self.config.get("rag_top_k_raw", 25)),
                     top_k_final=int(self.config.get("rag_top_k_final", 7)),
                     enable_rerank=enable_rerank,
-                    enable_curation=bool(self.config.get("rag_enable_curation", False)),
+                    enable_curation=enable_curation,
+                    curation_model=curation_model,
                     chat_model=current_model,
                     thinking_budget=thinking_budget,
                     system_prompt=sys_prompt,
@@ -452,21 +542,22 @@ class RightPanel(ctk.CTkFrame):
                 )
                 self.after(0, self.display_final_result, result)
             else:
-                self.after(0, self.update_step_tracker, "writing", "Rédaction en cours...", "running")
+                self.after(0, self.update_step_tracker, "writing", "Rédaction de l'exégèse en cours...", "running")
                 answer = self.llm.ask_question(effective_screen_context or "", user_text, system_prompt=sys_prompt, thinking_budget=thinking_budget)
                 self.after(0, self.display_final_result, {"answer": answer, "sources": [], "model_used": current_model, "timings": {}})
 
         threading.Thread(target=run_ai, daemon=True).start()
 
-    def start_step_tracker(self, is_rag=True):
+    def start_step_tracker(self, is_rag=True, has_curation=False):
         """Initialise le suivi sobre d'étapes dans la zone de chat."""
         self.chat_history.configure(state="normal")
         self.chat_history.insert("end", "Assistant IA : \n", "ai_header")
         
-        self.tracker_start_idx = self.chat_history.index("end-1c")
-        
         if is_rag:
-            init_text = "  ⏳ 1. Recherche dans la bibliothèque...\n  ⏳ 2. Tri de pertinence croisée (Reranker)...\n  ⏳ 3. Rédaction de l'exégèse...\n\n"
+            if has_curation:
+                init_text = "  ⏳ 1. Recherche dans la bibliothèque...\n  ⏳ 2. Tri de pertinence croisée (Reranker)...\n  ⏳ 3. Curation du contexte (Mistral 14B)...\n  ⏳ 4. Rédaction de l'exégèse...\n\n"
+            else:
+                init_text = "  ⏳ 1. Recherche dans la bibliothèque...\n  ⏳ 2. Tri de pertinence croisée (Reranker)...\n  ⏳ 3. Rédaction de l'exégèse...\n\n"
         else:
             init_text = "  ⏳ Rédaction de l'exégèse en cours...\n\n"
             
@@ -482,7 +573,6 @@ class RightPanel(ctk.CTkFrame):
             start, end = ranges[0], ranges[1]
             self.chat_history._textbox.delete(start, end)
             
-            # Recomposer les étapes
             icon = "✓" if status == "done" else "⏳"
             step_text = f"  {icon} {label}\n\n"
             self.chat_history.insert(start, step_text, "tracker")
@@ -502,9 +592,10 @@ class RightPanel(ctk.CTkFrame):
             
         answer = result.get("answer", "")
         self.last_answer = answer
+        sources = result.get("sources", [])
         
-        # Insérer la réponse formatée
-        insert_markdown_content(self.chat_history, answer)
+        # Insérer la réponse formatée avec infobulles sur chaque citation
+        insert_markdown_content(self.chat_history, answer, sources=sources)
         self.chat_history.insert("end", "\n")
         
         # Insérer le composant interactif de pied de message (⋯, badges de sources, heure, copier)
@@ -525,22 +616,21 @@ class RightPanel(ctk.CTkFrame):
         """Affiche un popover moderne et épuré avec toutes les métadonnées techniques."""
         pop = ctk.CTkToplevel(self)
         pop.title("Détails de l'analyse")
-        pop.geometry("380x320")
+        pop.geometry("400x360")
         pop.resizable(False, False)
         pop.attributes("-topmost", True)
         pop.grab_set()
         
-        # Centrage sur l'écran
         pop.update_idletasks()
-        x = self.winfo_rootx() + (self.winfo_width() // 2) - 190
-        y = self.winfo_rooty() + (self.winfo_height() // 2) - 160
+        x = self.winfo_rootx() + (self.winfo_width() // 2) - 200
+        y = self.winfo_rooty() + (self.winfo_height() // 2) - 180
         pop.geometry(f"+{x}+{y}")
         
         card = ctk.CTkFrame(pop, fg_color=("#F8FAFC", "#0F172A"), corner_radius=10)
         card.pack(fill="both", expand=True, padx=12, pady=12)
         
         lbl_t = ctk.CTkLabel(card, text="⚙️ Métadonnées & Exécution", font=ctk.CTkFont(size=14, weight="bold"))
-        lbl_t.pack(pady=(10, 10))
+        lbl_t.pack(pady=(10, 8))
         
         model_used = result_dict.get("model_used", self.config.get("chat_model", "gemini-3.7-flash"))
         budget = result_dict.get("thinking_budget")
@@ -549,14 +639,19 @@ class RightPanel(ctk.CTkFrame):
         timings = result_dict.get("timings", {})
         total_s = timings.get("total_ms", 0) / 1000.0
         rerank_ms = timings.get("rerank_ms", 0)
+        curation_ms = timings.get("curation_ms", 0)
         llm_s = timings.get("llm_ms", 0) / 1000.0
         retrieval_ms = timings.get("retrieval_ms", 0)
+        
+        curation_model = result_dict.get("curation_model")
+        curation_label = f"{curation_model.split('/')[-1]} ({curation_ms:.0f} ms)" if curation_model else "Désactivée"
         
         details = [
             ("🤖 Modèle IA", f"{model_used}"),
             ("🧠 Mode Réflexion", f"Budget {budget} tokens" if budget else "Direct (sans réflexion)"),
             ("🌐 Mode de Recherche", f"{mode_str}"),
             ("🎯 Reranker Local", "BAAI/bge-reranker-v2-m3 (CPU)"),
+            ("✨ Curation IA", curation_label),
             ("📚 Extraits Filtrés", f"{result_dict.get('raw_count', 0)} bruts ➔ {result_dict.get('final_count', 0)} retenus"),
             ("⏱️ Temps Total", f"{total_s:.2f} s"),
             ("  • Rerank CPU", f"{rerank_ms:.0f} ms"),
@@ -572,10 +667,9 @@ class RightPanel(ctk.CTkFrame):
             val_lbl.pack(side="right")
             
         btn_close = ctk.CTkButton(card, text="Fermer", height=28, width=90, command=pop.destroy)
-        btn_close.pack(pady=(14, 8))
+        btn_close.pack(pady=(12, 6))
 
     def apply_font(self, font_family, font_size):
-        # Calibrage typographique harmonisé
         base_size = 15
         self.chat_history.configure(font=(font_family, base_size))
         tb = self.chat_history._textbox
@@ -590,5 +684,5 @@ class RightPanel(ctk.CTkFrame):
         tb.tag_configure("code", font=("Courier New", base_size - 2), background="#F0F0F0")
         tb.tag_configure("user_header", font=(font_family, base_size, "bold"), foreground="#3B82F6", spacing1=10)
         tb.tag_configure("ai_header", font=(font_family, base_size, "bold"), foreground="#10B981", spacing1=10)
-        tb.tag_configure("ref_citation", font=(font_family, base_size, "bold"), foreground="#6366F1")
+        tb.tag_configure("ref_citation", font=(font_family, base_size, "bold"), foreground="#6366F1", underline=True)
         tb.tag_configure("tracker", font=(font_family, base_size - 1, "italic"), foreground="#888888", spacing1=2)

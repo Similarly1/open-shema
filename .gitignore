@@ -32,9 +32,14 @@ venv.bak/
 
 # Databases / Vector DB / Large archives
 **/chroma_db/
+*.db
+*.sqlite
+*.sqlite3
 *.zip
 *.tar.gz
 *.rar
+**/commentaires/**/*.json
+**/commentaires/*.db
 
 # Configuration and API Keys
 **/data/config.json

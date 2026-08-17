@@ -76,24 +76,70 @@ class RAGPipeline:
 
         return self.reranker.rerank(query=query, documents=candidates, top_k=top_k)
 
-    def curate_context(self, documents: list, enable_curation: bool = False) -> list:
+    def curate_context(self, query: str, documents: list, curation_model: str = None) -> list:
         """
-        Étape 3 : Curation et épuration du contexte (nettoyage des gloses, suppression du bruit).
+        Étape 3 : Curation et synthèse sémantique du contexte par un LLM intermédiaire
+        (par exemple mistralai/Ministral-3-14B-Instruct-2512 sur Infomaniak ou mistral-small ou gemini-flash-lite).
         """
-        if not enable_curation or not documents:
+        if not documents:
             return documents
             
-        # Nettoyage textuel léger des balises parasites et lignes vides excessives
-        curated = []
-        for doc in documents:
-            clean_text = doc["text"]
-            # Suppression des sauts de ligne multiples
-            clean_text = "\n".join([line.strip() for line in clean_text.splitlines() if line.strip()])
-            doc_copy = dict(doc)
-            doc_copy["text"] = clean_text
-            curated.append(doc_copy)
+        curation_model = curation_model or self.config.get("rag_curation_model", "mistralai/Ministral-3-14B-Instruct-2512")
+        
+        # Résolution du provider et de la clé
+        if "infomaniak" in curation_model.lower() or "ministral" in curation_model.lower() or "qwen" in curation_model.lower() or "bge" in curation_model.lower():
+            provider = "infomaniak"
+            api_key = self.config.get("infomaniak_token", "")
+            product_id = self.config.get("infomaniak_product_id", "251")
+        elif "mistral" in curation_model.lower():
+            provider = "mistral"
+            api_key = self.config.get("mistral_api_key", "")
+            product_id = None
+        else:
+            provider = "gemini"
+            api_key = self.config.get("gemini_api_key", "")
+            product_id = None
+
+        if not api_key:
+            return documents
+
+        try:
+            llm = LLMClient(api_key=api_key, model=curation_model, provider=provider, product_id=product_id)
             
-        return curated
+            raw_excerpts = []
+            for i, doc in enumerate(documents, 1):
+                meta = doc.get("metadata", {})
+                title = meta.get("name") or meta.get("source") or f"Doc {i}"
+                raw_excerpts.append(f"[{title}]\n{doc['text']}")
+            
+            combined_text = "\n\n".join(raw_excerpts)
+            
+            sys_prompt = (
+                "Vous êtes un assistant expert en épuration et synthèse théologique.\n"
+                "Votre rôle est d'analyser ces extraits bruts et de produire pour chacun une synthèse ultra-dense et précise "
+                "en conservant fidèlement toutes les définitions théologiques, arguments et références bibliques, "
+                "tout en supprimant les bavardages et informations redondantes."
+            )
+            
+            curated_output = llm.ask_question(
+                context=combined_text, 
+                question=f"Synthétise et épure les points clés utiles pour répondre à : '{query}'", 
+                system_prompt=sys_prompt
+            )
+            
+            if curated_output and not str(curated_output).startswith("Erreur"):
+                curated_docs = [dict(d) for d in documents]
+                curated_docs.insert(0, {
+                    "id": "curated_summary",
+                    "text": f"--- SYNTHÈSE ÉPURÉE PAR LE MODÈLE INTERMÉDIAIRE ({curation_model.split('/')[-1]}) ---\n{curated_output}",
+                    "metadata": {"name": f"Synthèse Curée ({curation_model.split('/')[-1]})"},
+                    "rerank_score": 1.0
+                })
+                return curated_docs
+        except Exception as e:
+            print(f"[RAGPipeline] Erreur lors de la curation IA : {e}")
+            
+        return documents
 
     def build_structured_context(self, documents: list, screen_context: str = None) -> str:
         """
@@ -132,6 +178,7 @@ class RAGPipeline:
                 top_k_final: int = 7, 
                 enable_rerank: bool = True, 
                 enable_curation: bool = False, 
+                curation_model: str = None,
                 embedding_model: str = None,
                 chat_model: str = None,
                 thinking_budget: int = None,
@@ -159,7 +206,6 @@ class RAGPipeline:
             active_sources=active_sources
         )
         t_retrieval_ms = (time.time() - t_retrieval_0) * 1000
-        # Tempo minimale pour laisser le temps à l'utilisateur de voir l'étape
         if t_retrieval_ms < 500:
             time.sleep((500 - t_retrieval_ms) / 1000.0)
         _notify("retrieval", f"Recherche terminée ({len(raw_candidates)} extraits trouvés)", "done")
@@ -182,12 +228,17 @@ class RAGPipeline:
             reranked_docs = raw_candidates[:top_k_final]
             t_rerank_ms = 0.0
 
-        # 3. Curation de contexte
-        if enable_curation:
-            _notify("curation", "Curation et normalisation du contexte...", "running")
-            final_docs = self.curate_context(reranked_docs, enable_curation=True)
-            time.sleep(0.4)
-            _notify("curation", "Curation terminée", "done")
+        # 3. Curation de contexte par LLM intermédiaire
+        curation_model_used = curation_model or self.config.get("rag_curation_model", "mistralai/Ministral-3-14B-Instruct-2512")
+        t_curation_ms = 0.0
+        if enable_curation and reranked_docs:
+            _notify("curation", f"Curation du contexte ({curation_model_used.split('/')[-1]})...", "running")
+            t_cur_0 = time.time()
+            final_docs = self.curate_context(query=query, documents=reranked_docs, curation_model=curation_model_used)
+            t_curation_ms = (time.time() - t_cur_0) * 1000
+            if t_curation_ms < 600:
+                time.sleep((600 - t_curation_ms) / 1000.0)
+            _notify("curation", "Curation terminée avec succès", "done")
         else:
             final_docs = reranked_docs
 
@@ -196,10 +247,11 @@ class RAGPipeline:
         structured_context = self.build_structured_context(final_docs, screen_context=screen_context)
         
         selected_model = chat_model or self.config.get("chat_model", "gemini-3.7-flash")
-        provider = "mistral" if "mistral" in selected_model else "gemini"
-        api_key = self.config.get(f"{provider}_api_key", "")
+        provider = "infomaniak" if ("infomaniak" in selected_model.lower() or "ministral" in selected_model.lower() or "qwen" in selected_model.lower()) else ("mistral" if "mistral" in selected_model else "gemini")
+        api_key = self.config.get(f"{provider}_api_key" if provider != "infomaniak" else "infomaniak_token", "")
+        product_id = self.config.get("infomaniak_product_id", "251") if provider == "infomaniak" else None
         
-        llm = LLMClient(api_key=api_key, model=selected_model, provider=provider)
+        llm = LLMClient(api_key=api_key, model=selected_model, provider=provider, product_id=product_id)
         
         t_llm_0 = time.time()
         answer = llm.ask_question(
@@ -219,10 +271,13 @@ class RAGPipeline:
             "final_count": len(final_docs),
             "model_used": getattr(llm.client, 'last_used_model', selected_model) if hasattr(llm, 'client') else selected_model,
             "provider": provider,
+            "curation_used": enable_curation,
+            "curation_model": curation_model_used if enable_curation else None,
             "thinking_budget": thinking_budget,
             "timings": {
                 "retrieval_ms": round(t_retrieval_ms, 1),
                 "rerank_ms": round(t_rerank_ms, 1),
+                "curation_ms": round(t_curation_ms, 1),
                 "llm_ms": round(t_llm_ms, 1),
                 "total_ms": round(total_time_ms, 1)
             }

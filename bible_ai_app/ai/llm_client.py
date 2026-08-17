@@ -155,12 +155,33 @@ class InfomaniakClient:
     def __init__(self, token, product_id="251"):
         self.token = token
         self.product_id = product_id or "251"
-        self.base_url = f"https://api.infomaniak.com/1/ai/{self.product_id}/openai/v1"
+        self.base_url = f"https://api.infomaniak.com/2/ai/{self.product_id}/openai/v1"
         self.headers = {
             "Authorization": f"Bearer {self.token}",
             "Content-Type": "application/json"
         }
         self.session = requests.Session()
+
+    def chat(self, messages, system_prompt=None, model="mistralai/Ministral-3-14B-Instruct-2512"):
+        url = f"{self.base_url}/chat/completions"
+        all_messages = []
+        if system_prompt:
+            all_messages.append({"role": "system", "content": system_prompt})
+        for m in messages:
+            all_messages.append({"role": m.get("role", "user"), "content": m.get("content", "")})
+            
+        clean_model = model.replace("infomaniak/", "").replace(" (Infomaniak)", "").strip()
+        payload = {
+            "model": clean_model or "mistralai/Ministral-3-14B-Instruct-2512",
+            "messages": all_messages
+        }
+        try:
+            response = self.session.post(url, headers=self.headers, json=payload, timeout=60)
+            response.raise_for_status()
+            data = response.json()
+            return data["choices"][0]["message"]["content"]
+        except Exception as e:
+            raise Exception(f"Erreur de communication avec l'API Infomaniak ({clean_model}) : {str(e)}")
 
     def embeddings(self, texts, model="bge_multilingual_gemma2"):
         import time
@@ -254,6 +275,13 @@ class LLMClient:
                 return self.client.chat(messages, system_prompt=system_prompt, thinking_budget=thinking_budget)
             except Exception as e:
                 return f"Erreur de communication avec l'API Gemini : {str(e)}"
+
+        elif self.provider == "infomaniak":
+            messages = [{"role": "user", "content": user_prompt}]
+            try:
+                return self.client.chat(messages, system_prompt=system_prompt, model=self.model)
+            except Exception as e:
+                return f"Erreur de communication avec l'API Infomaniak : {str(e)}"
 
     def get_embeddings(self, texts, model=None):
         if not self.client:

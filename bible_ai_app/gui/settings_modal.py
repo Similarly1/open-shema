@@ -326,7 +326,30 @@ class SettingsTab(ctk.CTkScrollableFrame):
             variable=self.curation_var,
             font=ctk.CTkFont(size=12)
         )
-        self.curation_switch.pack(anchor="w", padx=12, pady=(2, 8))
+        self.curation_switch.pack(anchor="w", padx=12, pady=(2, 4))
+        
+        # Sélecteur de modèle curateur
+        cur_row = ctk.CTkFrame(rag_cfg_frame, fg_color="transparent")
+        cur_row.pack(fill="x", padx=12, pady=(2, 8))
+        
+        lbl_cur_mod = ctk.CTkLabel(cur_row, text="Modèle Curateur :", font=ctk.CTkFont(size=11))
+        lbl_cur_mod.pack(side="left", padx=(0, 6))
+        
+        self.curation_model_var = ctk.StringVar(value=self.config.get("rag_curation_model", "mistralai/Ministral-3-14B-Instruct-2512"))
+        self.curation_model_menu = ctk.CTkOptionMenu(
+            cur_row,
+            variable=self.curation_model_var,
+            values=[
+                "mistralai/Ministral-3-14B-Instruct-2512",
+                "mistral-small-latest",
+                "gemini-3.1-flash-lite",
+                "gemini-3.5-flash-lite",
+                "Qwen/Qwen3.5-122B-A10B-FP8"
+            ],
+            height=24,
+            font=ctk.CTkFont(size=11)
+        )
+        self.curation_model_menu.pack(side="right", fill="x", expand=True)
         
         # ==========================================
         # 4. SAUVEGARDE DE LA BASE VECTORIELLE
@@ -524,6 +547,7 @@ class SettingsTab(ctk.CTkScrollableFrame):
             self.config["rag_top_k_final"] = 7
             
         self.config["rag_enable_curation"] = bool(self.curation_var.get())
+        self.config["rag_curation_model"] = self.curation_model_var.get()
         
         save_config(self.config)
         
