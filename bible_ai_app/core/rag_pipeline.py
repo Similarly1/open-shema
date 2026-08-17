@@ -174,6 +174,7 @@ class RAGPipeline:
     def execute(self, query: str, 
                 active_sources: list = None, 
                 screen_context: str = None, 
+                active_location: dict = None,
                 top_k_raw: int = 25, 
                 top_k_final: int = 7, 
                 enable_rerank: bool = True, 
@@ -196,7 +197,7 @@ class RAGPipeline:
                 except Exception:
                     pass
 
-        # 1. Récupération vectorielle
+        # 1a. Récupération vectorielle
         _notify("retrieval", "Recherche dans la bibliothèque...", "running")
         t_retrieval_0 = time.time()
         raw_candidates = self.retrieve_candidates(
@@ -205,6 +206,48 @@ class RAGPipeline:
             embedding_model=embedding_model,
             active_sources=active_sources
         )
+
+        # 1b. Récupération Relationnelle Exacte (SQLite)
+        if active_location:
+            book = active_location.get("book")
+            ch = active_location.get("chapter")
+            v = active_location.get("verse")
+            if book:
+                from core.commentary_loader import CommentaryLoader
+                from core.reference_parser import get_standard_book_code
+                b_code = get_standard_book_code(book)
+                
+                # Récupérer l'introduction (chapitre 0)
+                intro_results = CommentaryLoader.get_all_comments_for_passage(b_code, 0, 0)
+                if intro_results and intro_results.get("documents"):
+                    for i, doc in enumerate(intro_results["documents"]):
+                        # Filtrer si on a des active_sources
+                        meta = intro_results["metadatas"][i]
+                        if active_sources and meta.get("name") not in active_sources:
+                            continue
+                        raw_candidates.append({
+                            "id": intro_results["ids"][i],
+                            "text": doc,
+                            "metadata": meta,
+                            "vector_score": 1.0  # Max score pour forcer le Reranker à l'évaluer en priorité
+                        })
+                        
+                # Récupérer les commentaires du verset exact
+                if ch is not None:
+                    v_num = int(v) if v and str(v) != "Tous" and str(v).isdigit() else None
+                    exact_results = CommentaryLoader.get_all_comments_for_passage(b_code, ch, v_num)
+                    if exact_results and exact_results.get("documents"):
+                        for i, doc in enumerate(exact_results["documents"]):
+                            meta = exact_results["metadatas"][i]
+                            if active_sources and meta.get("name") not in active_sources:
+                                continue
+                            raw_candidates.append({
+                                "id": exact_results["ids"][i],
+                                "text": doc,
+                                "metadata": meta,
+                                "vector_score": 1.0
+                            })
+
         t_retrieval_ms = (time.time() - t_retrieval_0) * 1000
         if t_retrieval_ms < 500:
             time.sleep((500 - t_retrieval_ms) / 1000.0)

@@ -517,6 +517,15 @@ class RightPanel(ctk.CTkFrame):
         curation_model = self.config.get("rag_curation_model", "mistralai/Ministral-3-14B-Instruct-2512")
         
         effective_screen_context = context if (self.include_screen_var.get() or not is_rag) else None
+        
+        active_location = None
+        if hasattr(self.master, 'center_panel') and effective_screen_context:
+            cp = self.master.center_panel
+            active_location = {
+                "book": cp.book_var.get(),
+                "chapter": cp.current_active_chapter,
+                "verse": cp.current_active_verse
+            }
 
         # Démarrer le tracker d'étapes sobre
         self.start_step_tracker(is_rag=is_rag, has_curation=enable_curation)
@@ -530,6 +539,7 @@ class RightPanel(ctk.CTkFrame):
                     query=user_text,
                     active_sources=active_sources,
                     screen_context=effective_screen_context,
+                    active_location=active_location,
                     top_k_raw=int(self.config.get("rag_top_k_raw", 25)),
                     top_k_final=int(self.config.get("rag_top_k_final", 7)),
                     enable_rerank=enable_rerank,

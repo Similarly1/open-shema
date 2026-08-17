@@ -123,6 +123,57 @@ class CommentaryLoader:
                 "book": b_name,
                 "book_code": book_code,
                 "chapter": ch,
+                "verse_start": v_start,
+                "verse_end": v_end,
+                "reference": ref
+            })
+            
+        return {"ids": ids, "documents": docs, "metadatas": metas}
+
+    @classmethod
+    def get_all_comments_for_passage(cls, book_code: str, chapter: int, verse: Optional[int] = None) -> Dict[str, Any]:
+        """
+        Récupère instantanément les commentaires de TOUTES les sources pour un passage spécifique.
+        """
+        db_path = cls.get_db_path()
+        if not os.path.exists(db_path):
+            return {"ids": [], "documents": [], "metadatas": []}
+            
+        conn = sqlite3.connect(db_path)
+        cur = conn.cursor()
+        
+        query = "SELECT id, commentary_name, book_name, chapter, verse_start, verse_end, reference, text, commentary_id FROM commentaries WHERE book_code = ?"
+        params = [book_code]
+        
+        if chapter is not None:
+            query += " AND chapter = ?"
+            params.append(chapter)
+            
+        if verse is not None:
+            query += " AND verse_start <= ? AND verse_end >= ?"
+            params.extend([verse, verse])
+            
+        query += " ORDER BY commentary_name ASC"
+        
+        cur.execute(query, params)
+        rows = cur.fetchall()
+        conn.close()
+        
+        docs = []
+        metas = []
+        ids = []
+        
+        for r in rows:
+            row_id, c_name, b_name, ch, v_start, v_end, ref, txt, cid = r
+            doc_id = f"comm_{cid}_{book_code}_{ch}_{v_start}_{v_end}_{row_id}"
+            ids.append(doc_id)
+            docs.append(txt)
+            metas.append({
+                "name": c_name,
+                "type": "Commentaire",
+                "book": b_name,
+                "book_code": book_code,
+                "chapter": ch,
                 "verse": v_start,
                 "verse_end": v_end,
                 "reference": ref
