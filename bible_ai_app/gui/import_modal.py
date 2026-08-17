@@ -7,6 +7,7 @@ import shutil
 import json
 from PIL import Image
 from core.bible_json_loader import BibleJsonLoader
+from gui.google_books_picker import BookMetadataPickerModal
 
 class ImportTab(ctk.CTkScrollableFrame):
     """
@@ -65,13 +66,29 @@ class ImportTab(ctk.CTkScrollableFrame):
         )
         left_card.grid(row=0, column=0, sticky="nsew", padx=(0, 12), pady=0)
         
+        # En-tête de la carte gauche : Titre & Bouton de Recherche Google Books
+        card_left_header = ctk.CTkFrame(left_card, fg_color="transparent")
+        card_left_header.pack(fill="x", padx=20, pady=(16, 10))
+        card_left_header.grid_columnconfigure(0, weight=1)
+        
         card_left_title = ctk.CTkLabel(
-            left_card, 
+            card_left_header, 
             text="📋 Informations & Classification", 
             font=ctk.CTkFont(size=15, weight="bold"), 
             text_color=("#2563EB", "#38BDF8")
         )
-        card_left_title.pack(anchor="w", padx=20, pady=(16, 12))
+        card_left_title.grid(row=0, column=0, sticky="w")
+        
+        self.btn_search_meta = ctk.CTkButton(
+            card_left_header,
+            text="🔍 Rechercher métadonnées",
+            command=self.open_metadata_search,
+            fg_color="#0284C7",
+            hover_color="#0369A1",
+            height=30,
+            font=ctk.CTkFont(size=12, weight="bold")
+        )
+        self.btn_search_meta.grid(row=0, column=1, sticky="e")
         
         # Champ Identifiant (Titre court)
         lbl_id = ctk.CTkLabel(left_card, text="Titre court / Identifiant unique (ex: S21, BDS, Calmet) :", font=ctk.CTkFont(weight="bold"))
@@ -208,6 +225,17 @@ class ImportTab(ctk.CTkScrollableFrame):
         )
         btn_ocr.grid(row=0, column=1, sticky="ew", padx=(4, 0))
         
+        btn_find_cover = ctk.CTkButton(
+            cover_container,
+            text="🔍 Rechercher en ligne (Google Books)",
+            command=self.open_metadata_search,
+            fg_color="#0284C7",
+            hover_color="#0369A1",
+            height=30,
+            font=ctk.CTkFont(size=12, weight="bold")
+        )
+        btn_find_cover.pack(fill="x", pady=(6, 0))
+        
         # Séparateur subtil
         sep = ctk.CTkLabel(right_card, text="─" * 40, text_color=("#CBD5E1", "#334155"))
         sep.pack(pady=4)
@@ -320,6 +348,63 @@ class ImportTab(ctk.CTkScrollableFrame):
                 
         threading.Thread(target=run_ocr, daemon=True).start()
         
+    def open_metadata_search(self):
+        """Ouvre la modale de recherche de métadonnées Google Books & Open Library."""
+        # Récupérer les données initiales
+        initial_title = self.title_entry.get().strip() or self.name_entry.get().strip()
+        initial_author = self.author_entry.get().strip()
+        
+        # Si aucun titre ni auteur n'est saisi mais qu'un fichier est sélectionné, utiliser son nom
+        if not initial_title and not initial_author and self.file_path:
+            base = os.path.splitext(os.path.basename(self.file_path))[0]
+            initial_title = base.replace("_", " ").replace("-", " ")
+            
+        current_data = {
+            "name": self.name_entry.get().strip(),
+            "title": self.title_entry.get().strip(),
+            "author": self.author_entry.get().strip(),
+            "year": self.year_entry.get().strip(),
+            "description": self.desc_entry.get("1.0", "end-1c").strip(),
+            "cover_path": self.cover_path
+        }
+        
+        BookMetadataPickerModal(
+            self,
+            initial_query=initial_title,
+            initial_author=initial_author,
+            current_data=current_data,
+            on_apply_callback=self.apply_metadata_diff
+        )
+
+    def apply_metadata_diff(self, applied_data):
+        """Applique les métadonnées sélectionnées depuis le comparatif."""
+        if not applied_data:
+            return
+            
+        if "name" in applied_data and applied_data["name"]:
+            self.name_entry.delete(0, "end")
+            self.name_entry.insert(0, applied_data["name"])
+            
+        if "title" in applied_data and applied_data["title"]:
+            self.title_entry.delete(0, "end")
+            self.title_entry.insert(0, applied_data["title"])
+            
+        if "author" in applied_data and applied_data["author"]:
+            self.author_entry.delete(0, "end")
+            self.author_entry.insert(0, applied_data["author"])
+            
+        if "year" in applied_data and applied_data["year"]:
+            self.year_entry.delete(0, "end")
+            self.year_entry.insert(0, str(applied_data["year"]))
+            
+        if "description" in applied_data and applied_data["description"]:
+            self.desc_entry.delete("1.0", "end")
+            self.desc_entry.insert("1.0", applied_data["description"])
+            
+        if "cover_path" in applied_data and applied_data["cover_path"]:
+            self.cover_path = applied_data["cover_path"]
+            self.load_cover_preview()
+            
     def fill_ocr_results(self, res):
         self.name_entry.delete(0, "end")
         self.name_entry.insert(0, res.get("id", ""))

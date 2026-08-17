@@ -23,6 +23,7 @@ DEFAULTS = {
     "interlinear_show_lemma": True,
     "interlinear_show_translit": True,
     "interlinear_show_strong": True,
+    "google_books_api_key": "",
 }
 
 def load_config():
