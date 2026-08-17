@@ -135,13 +135,22 @@ class RAGPipeline:
                 embedding_model: str = None,
                 chat_model: str = None,
                 thinking_budget: int = None,
-                system_prompt: str = None) -> dict:
+                system_prompt: str = None,
+                step_callback = None) -> dict:
         """
-        Exécute la chaîne RAG complète de bout en bout.
+        Exécute la chaîne RAG complète de bout en bout avec notifications d'étapes.
         """
         t0 = time.time()
         
+        def _notify(step_id, label, status):
+            if step_callback:
+                try:
+                    step_callback(step_id, label, status)
+                except Exception:
+                    pass
+
         # 1. Récupération vectorielle
+        _notify("retrieval", "Recherche dans la bibliothèque...", "running")
         t_retrieval_0 = time.time()
         raw_candidates = self.retrieve_candidates(
             query=query, 
@@ -150,21 +159,40 @@ class RAGPipeline:
             active_sources=active_sources
         )
         t_retrieval_ms = (time.time() - t_retrieval_0) * 1000
+        # Tempo minimale pour laisser le temps à l'utilisateur de voir l'étape
+        if t_retrieval_ms < 500:
+            time.sleep((500 - t_retrieval_ms) / 1000.0)
+        _notify("retrieval", f"Recherche terminée ({len(raw_candidates)} extraits trouvés)", "done")
 
         # 2. Reranking local
-        t_rerank_0 = time.time()
-        reranked_docs = self.rerank_candidates(
-            query=query, 
-            candidates=raw_candidates, 
-            top_k=top_k_final, 
-            enable_rerank=enable_rerank
-        )
-        t_rerank_ms = (time.time() - t_rerank_0) * 1000
+        if enable_rerank and raw_candidates:
+            _notify("rerank", "Évaluation de pertinence croisée (Reranker local)...", "running")
+            t_rerank_0 = time.time()
+            reranked_docs = self.rerank_candidates(
+                query=query, 
+                candidates=raw_candidates, 
+                top_k=top_k_final, 
+                enable_rerank=True
+            )
+            t_rerank_ms = (time.time() - t_rerank_0) * 1000
+            if t_rerank_ms < 600:
+                time.sleep((600 - t_rerank_ms) / 1000.0)
+            _notify("rerank", f"Reranking terminé ({len(reranked_docs)} passages retenus)", "done")
+        else:
+            reranked_docs = raw_candidates[:top_k_final]
+            t_rerank_ms = 0.0
 
         # 3. Curation de contexte
-        final_docs = self.curate_context(reranked_docs, enable_curation=enable_curation)
+        if enable_curation:
+            _notify("curation", "Curation et normalisation du contexte...", "running")
+            final_docs = self.curate_context(reranked_docs, enable_curation=True)
+            time.sleep(0.4)
+            _notify("curation", "Curation terminée", "done")
+        else:
+            final_docs = reranked_docs
 
         # 4. Assemblage du contexte et Rédaction finale LLM
+        _notify("writing", "Rédaction de l'analyse exégétique...", "running")
         structured_context = self.build_structured_context(final_docs, screen_context=screen_context)
         
         selected_model = chat_model or self.config.get("chat_model", "gemini-3.7-flash")
@@ -182,6 +210,7 @@ class RAGPipeline:
         )
         t_llm_ms = (time.time() - t_llm_0) * 1000
         total_time_ms = (time.time() - t0) * 1000
+        _notify("writing", "Rédaction finalisée", "done")
 
         return {
             "answer": answer,
@@ -189,6 +218,8 @@ class RAGPipeline:
             "raw_count": len(raw_candidates),
             "final_count": len(final_docs),
             "model_used": getattr(llm.client, 'last_used_model', selected_model) if hasattr(llm, 'client') else selected_model,
+            "provider": provider,
+            "thinking_budget": thinking_budget,
             "timings": {
                 "retrieval_ms": round(t_retrieval_ms, 1),
                 "rerank_ms": round(t_rerank_ms, 1),

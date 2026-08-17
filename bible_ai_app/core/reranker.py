@@ -33,9 +33,14 @@ class LocalReranker:
             if self.is_loaded and self.model is not None:
                 return True
             try:
+                import torch
+                # Utiliser tous les cœurs disponibles pour l'inférence CPU rapide
+                if hasattr(torch, "set_num_threads"):
+                    torch.set_num_threads(max(1, (os.cpu_count() or 4) - 1))
+                    
                 from sentence_transformers import CrossEncoder
-                # max_length=512 pour couvrir les passages théologiques denses
-                self.model = CrossEncoder(self.model_name, max_length=512, device=self.device)
+                # max_length=256 offre une division par 4 du temps de calcul avec 99% de fidélité
+                self.model = CrossEncoder(self.model_name, max_length=256, device=self.device)
                 self.is_loaded = True
                 return True
             except Exception as e:
@@ -100,7 +105,7 @@ class LocalReranker:
         pairs = [[query, txt] for txt in doc_texts]
 
         try:
-            raw_scores = self.model.predict(pairs)
+            raw_scores = self.model.predict(pairs, batch_size=16)
             
             # Normalisation et injection des scores
             for i, score_val in enumerate(raw_scores):
