@@ -295,6 +295,14 @@ class SettingsTab(ctk.CTkScrollableFrame):
         self.infomaniak_pid_entry.pack(fill="x", padx=20, pady=5)
         if self.config.get("infomaniak_product_id"):
             self.infomaniak_pid_entry.insert(0, str(self.config["infomaniak_product_id"]))
+
+        # Clé API Google Books (Optionnelle)
+        self.google_books_key_label = ctk.CTkLabel(self, text="Clé API Google Books (Optionnelle pour recherche de métadonnées) :")
+        self.google_books_key_label.pack(anchor="w", padx=20, pady=(4, 0))
+        self.google_books_key_entry = ctk.CTkEntry(self, show="*", placeholder_text="Laisser vide pour mode public & Open Library")
+        self.google_books_key_entry.pack(fill="x", padx=20, pady=5)
+        if self.config.get("google_books_api_key"):
+            self.google_books_key_entry.insert(0, self.config["google_books_api_key"])
             
         # Prompt système de l'assistant
         self.prompt_label = ctk.CTkLabel(self, text="Prompt Système de l'Assistant IA :")
@@ -578,6 +586,7 @@ class SettingsTab(ctk.CTkScrollableFrame):
         self.config["gemini_api_key"] = self.gemini_key_entry.get().strip()
         self.config["infomaniak_token"] = self.infomaniak_token_entry.get().strip()
         self.config["infomaniak_product_id"] = self.infomaniak_pid_entry.get().strip() or "251"
+        self.config["google_books_api_key"] = self.google_books_key_entry.get().strip()
         self.config["chat_model"] = self.chat_model_var.get()
         self.config["show_diff_percentage"] = self.show_diff_pct_var.get()
         self.config["show_diff_highlights"] = self.show_diff_colors_var.get()

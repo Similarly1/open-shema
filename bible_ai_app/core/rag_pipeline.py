@@ -247,6 +247,16 @@ class RAGPipeline:
                                 "metadata": meta,
                                 "vector_score": 1.0
                             })
+                            
+                    # Récupérer le lexique Strong (Hébreu / Grec) pour le verset
+                    if v_num is not None:
+                        try:
+                            from core.strong_helper import StrongLexiconHelper
+                            strong_entry = StrongLexiconHelper.get_verse_lexicon_block(b_code, ch, v_num)
+                            if strong_entry:
+                                raw_candidates.append(strong_entry)
+                        except Exception as e:
+                            print(f"[RAGPipeline] Erreur récupération lexique Strong : {e}")
 
         t_retrieval_ms = (time.time() - t_retrieval_0) * 1000
         if t_retrieval_ms < 500:
