@@ -1,10 +1,26 @@
 import customtkinter as ctk
 import shutil
 import os
+import json
+import threading
+import zipfile
+import datetime
 from tkinter import messagebox
 from gui import native_dialog as filedialog
 from core.config import load_config, save_config
 from core.dictionary_manager import DictionaryManager
+
+# Composants inclus dans la sauvegarde complète
+_BACKUP_MANIFEST_VERSION = "1.0"
+_BACKUP_COMPONENTS = [
+    ("chroma_db",      "📦 Vecteurs ChromaDB"),
+    ("commentaires",   "📝 Commentaires bibliques"),
+    ("bibles",         "📖 Bibles JSON"),
+    ("covers",         "🖼️ Couvertures"),
+    ("dictionaries",   "📚 Dictionnaires"),
+    ("library.json",   "🗂️ Registre (library.json)"),
+    ("config.json",    "⚙️ Paramètres (config.json)"),
+]
 
 FONTS_PRESETS = [
     ("Georgia (Serif - Classique)", "Georgia"),
@@ -352,19 +368,51 @@ class SettingsTab(ctk.CTkScrollableFrame):
         self.curation_model_menu.pack(side="right", fill="x", expand=True)
         
         # ==========================================
-        # 4. SAUVEGARDE DE LA BASE VECTORIELLE
+        # 4. SAUVEGARDE COMPLÈTE
         # ==========================================
-        self.sect_db = ctk.CTkLabel(self, text="💾 Sauvegarde Base Vectorielle", font=ctk.CTkFont(size=14, weight="bold"), text_color="#3B82F6")
-        self.sect_db.pack(anchor="w", padx=20, pady=(15, 5))
-        
+        self.sect_db = ctk.CTkLabel(
+            self, text="💾 Sauvegarde & Restauration Complète",
+            font=ctk.CTkFont(size=14, weight="bold"), text_color="#3B82F6"
+        )
+        self.sect_db.pack(anchor="w", padx=20, pady=(15, 3))
+
+        # Description des éléments inclus
+        included_txt = "  ".join(label for _, label in _BACKUP_COMPONENTS)
+        lbl_included = ctk.CTkLabel(
+            self, text=f"Inclus : {included_txt}",
+            font=ctk.CTkFont(size=10), text_color=("#64748B", "#94A3B8"),
+            wraplength=560, justify="left", anchor="w"
+        )
+        lbl_included.pack(fill="x", padx=20, pady=(0, 6))
+
         self.backup_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.backup_frame.pack(fill="x", padx=20, pady=5)
-        
-        self.export_btn = ctk.CTkButton(self.backup_frame, text="Exporter (ZIP)", command=self.export_db)
+        self.backup_frame.pack(fill="x", padx=20, pady=(0, 4))
+
+        self.export_btn = ctk.CTkButton(
+            self.backup_frame, text="📤 Exporter tout (ZIP)",
+            width=160, command=self.export_db,
+            fg_color=("#2563EB", "#1D4ED8"), hover_color=("#1D4ED8", "#1E40AF"),
+            text_color="#FFFFFF", font=ctk.CTkFont(size=12, weight="bold")
+        )
         self.export_btn.pack(side="left", padx=(0, 10))
-        
-        self.import_btn = ctk.CTkButton(self.backup_frame, text="Importer (ZIP)", command=self.import_db)
+
+        self.import_btn = ctk.CTkButton(
+            self.backup_frame, text="📥 Restaurer depuis ZIP",
+            width=160, command=self.import_db,
+            fg_color=("#E2E8F0", "#1E293B"),
+            hover_color=("#CBD5E1", "#334155"),
+            text_color=("#0F172A", "#F8FAFC"),
+            border_width=1, border_color=("#94A3B8", "#475569"),
+            font=ctk.CTkFont(size=12, weight="bold")
+        )
         self.import_btn.pack(side="left")
+
+        # Label de statut (affiché pendant l'opération)
+        self.backup_status_label = ctk.CTkLabel(
+            self, text="", font=ctk.CTkFont(size=11),
+            text_color=("#64748B", "#94A3B8")
+        )
+        self.backup_status_label.pack(anchor="w", padx=20)
         
         # Bouton Enregistrer
         self.save_btn = ctk.CTkButton(self, text="💾 Enregistrer les Paramètres", font=ctk.CTkFont(size=14, weight="bold"), height=36, command=self.save_settings)
@@ -557,40 +605,219 @@ class SettingsTab(ctk.CTkScrollableFrame):
         if self.close_callback:
             self.close_callback()
         
+    # ------------------------------------------------------------------
+    # Sauvegarde complète (export)
+    # ------------------------------------------------------------------
+
+    def _set_backup_status(self, text, color="#64748B"):
+        """Met à jour le label de statut depuis n'importe quel thread."""
+        self.after(0, lambda: self.backup_status_label.configure(
+            text=text, text_color=color
+        ))
+
+    def _set_backup_buttons(self, enabled: bool):
+        state = "normal" if enabled else "disabled"
+        self.after(0, lambda: [
+            self.export_btn.configure(state=state),
+            self.import_btn.configure(state=state)
+        ])
+
     def export_db(self):
-        def _export():
+        def _pick_and_export():
             save_path = filedialog.asksaveasfilename(
                 defaultextension=".zip",
                 filetypes=[("Archive ZIP", "*.zip")],
-                title="Exporter la base de données"
+                initialfile=f"backup_bible_ai_{datetime.datetime.now().strftime('%Y%m%d_%H%M')}.zip",
+                title="Choisir l'emplacement de la sauvegarde complète"
             )
-            if save_path:
-                try:
-                    db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "chroma_db")
-                    if not os.path.exists(db_path) or not os.listdir(db_path):
-                        messagebox.showinfo("Export", "La base de données est vide. Rien à exporter.")
-                        return
-                    shutil.make_archive(save_path.replace(".zip", ""), 'zip', db_path)
-                    messagebox.showinfo("Export", "Sauvegarde effectuée avec succès !")
-                except Exception as e:
-                    messagebox.showerror("Erreur", f"Une erreur est survenue : {str(e)}")
-        self.after(100, _export)
-                
+            if not save_path:
+                return
+            threading.Thread(target=self._do_export, args=(save_path,), daemon=True).start()
+
+        self.after(100, _pick_and_export)
+
+    def _do_export(self, save_path: str):
+        """Construit le ZIP complet en arrière-plan."""
+        self._set_backup_buttons(False)
+        data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
+        tmp_zip = save_path + ".tmp"
+
+        try:
+            manifest = {
+                "version": _BACKUP_MANIFEST_VERSION,
+                "created_at": datetime.datetime.now().isoformat(),
+                "components": []
+            }
+
+            with zipfile.ZipFile(tmp_zip, "w", compression=zipfile.ZIP_DEFLATED,
+                                 allowZip64=True) as zf:
+
+                for folder_or_file, label in _BACKUP_COMPONENTS:
+                    src = os.path.join(data_dir, folder_or_file)
+                    if not os.path.exists(src):
+                        continue
+
+                    self._set_backup_status(f"⏳ Compression : {label}…")
+
+                    if os.path.isfile(src):
+                        arcname = os.path.join("data", folder_or_file)
+                        zf.write(src, arcname)
+                        manifest["components"].append(folder_or_file)
+                    else:
+                        # Dossier : parcourir récursivement
+                        for root, _, files in os.walk(src):
+                            for fname in files:
+                                full = os.path.join(root, fname)
+                                rel  = os.path.relpath(full, data_dir)
+                                zf.write(full, os.path.join("data", rel))
+                        manifest["components"].append(folder_or_file)
+
+                # Ajouter le manifeste en dernier
+                zf.writestr("backup_manifest.json", json.dumps(manifest, ensure_ascii=False, indent=2))
+
+            # Renommer le fichier temporaire en destination finale
+            if os.path.exists(save_path):
+                os.remove(save_path)
+            os.rename(tmp_zip, save_path)
+
+            size_mb = os.path.getsize(save_path) / (1024 * 1024)
+            self._set_backup_status(
+                f"✅ Sauvegarde terminée ({size_mb:.0f} Mo) — {os.path.basename(save_path)}",
+                color="#10B981"
+            )
+            self.after(0, lambda: messagebox.showinfo(
+                "Sauvegarde complète",
+                f"Sauvegarde effectuée avec succès !\n\n"
+                f"Fichier : {save_path}\n"
+                f"Taille  : {size_mb:.0f} Mo\n\n"
+                f"Ce fichier contient vos vecteurs, commentaires, bibles, "
+                f"dictionnaires, couvertures et paramètres.\n"
+                f"Conservez-le en lieu sûr."
+            ))
+
+        except Exception as e:
+            # Nettoyer le fichier temporaire en cas d'erreur
+            if os.path.exists(tmp_zip):
+                try: os.remove(tmp_zip)
+                except OSError: pass
+            self._set_backup_status(f"❌ Erreur : {e}", color="#EF4444")
+            self.after(0, lambda: messagebox.showerror(
+                "Erreur d'export",
+                f"La sauvegarde a échoué :\n{e}"
+            ))
+        finally:
+            self._set_backup_buttons(True)
+
+    # ------------------------------------------------------------------
+    # Restauration complète (import)
+    # ------------------------------------------------------------------
+
     def import_db(self):
-        def _import():
+        def _pick_and_import():
             zip_path = filedialog.askopenfilename(
-                filetypes=[("Base ChromaDB", "*.zip")],
-                title="Importer une base de données"
+                filetypes=[("Sauvegarde Bible AI", "*.zip"), ("Tous les fichiers", "*.*")],
+                title="Sélectionner la sauvegarde à restaurer"
             )
-            if zip_path:
-                if messagebox.askyesno("Attention", "L'importation remplacera votre base de données actuelle. Vous devrez redémarrer l'application. Continuer ?"):
-                    try:
-                        db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "chroma_db")
-                        if os.path.exists(db_path):
-                            shutil.rmtree(db_path, ignore_errors=True)
-                        os.makedirs(db_path, exist_ok=True)
-                        shutil.unpack_archive(zip_path, db_path, "zip")
-                        messagebox.showinfo("Import", "Restauration effectuée avec succès ! Veuillez fermer et relancer l'application pour charger les données.")
-                    except Exception as e:
-                        messagebox.showerror("Erreur", f"Impossible d'importer la base. Fermez l'application principale si elle bloque le fichier, puis réessayez. Détails : {str(e)}")
-        self.after(100, _import)
+            if not zip_path:
+                return
+
+            # Vérifier que c'est bien une sauvegarde Bible AI
+            try:
+                with zipfile.ZipFile(zip_path, "r") as zf:
+                    names = zf.namelist()
+                    has_manifest = "backup_manifest.json" in names
+                    has_data = any(n.startswith("data/") for n in names)
+                    if not has_manifest or not has_data:
+                        messagebox.showerror(
+                            "Fichier invalide",
+                            "Ce fichier ZIP ne semble pas être une sauvegarde Bible AI valide.\n"
+                            "Assurez-vous d'utiliser un fichier créé par la fonction \"Exporter tout\"."
+                        )
+                        return
+                    # Lire le manifeste pour informer l'utilisateur
+                    manifest = json.loads(zf.read("backup_manifest.json"))
+                    created = manifest.get("created_at", "inconnue")[:19].replace("T", " ")
+                    components = manifest.get("components", [])
+                    comp_str = ", ".join(components)
+            except zipfile.BadZipFile:
+                messagebox.showerror("Fichier invalide", "Impossible d'ouvrir ce fichier ZIP.")
+                return
+            except Exception as e:
+                messagebox.showerror("Erreur", f"Lecture du fichier impossible : {e}")
+                return
+
+            confirmed = messagebox.askyesno(
+                "Confirmer la restauration",
+                f"Sauvegarde du : {created}\n"
+                f"Composants   : {comp_str}\n\n"
+                "⚠️  Cette opération REMPLACERA toutes vos données actuelles "
+                "(vecteurs, bibles, commentaires, paramètres) par ceux de la sauvegarde.\n\n"
+                "L'application devra être redémarrée après la restauration.\n\n"
+                "Continuer ?"
+            )
+            if confirmed:
+                threading.Thread(
+                    target=self._do_import, args=(zip_path,), daemon=True
+                ).start()
+
+        self.after(100, _pick_and_import)
+
+    def _do_import(self, zip_path: str):
+        """Restaure le ZIP complet en arrière-plan."""
+        self._set_backup_buttons(False)
+        data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
+
+        try:
+            with zipfile.ZipFile(zip_path, "r") as zf:
+                manifest = json.loads(zf.read("backup_manifest.json"))
+                components = manifest.get("components", [])
+
+                for component in components:
+                    label = next(
+                        (lbl for key, lbl in _BACKUP_COMPONENTS if key == component),
+                        component
+                    )
+                    self._set_backup_status(f"⏳ Restauration : {label}…")
+
+                    dest = os.path.join(data_dir, component)
+
+                    if os.path.isdir(dest):
+                        shutil.rmtree(dest, ignore_errors=True)
+                    elif os.path.isfile(dest):
+                        os.remove(dest)
+
+                    # Extraire uniquement les entrées de ce composant
+                    prefix = f"data/{component}"
+                    entries = [n for n in zf.namelist() if n.startswith(prefix)]
+                    for entry in entries:
+                        target = os.path.join(
+                            data_dir,
+                            os.path.relpath(entry, "data")
+                        )
+                        if entry.endswith("/"):
+                            os.makedirs(target, exist_ok=True)
+                        else:
+                            os.makedirs(os.path.dirname(target), exist_ok=True)
+                            with zf.open(entry) as src_f, open(target, "wb") as dst_f:
+                                shutil.copyfileobj(src_f, dst_f)
+
+            self._set_backup_status(
+                "✅ Restauration terminée — redémarrez l'application.",
+                color="#10B981"
+            )
+            self.after(0, lambda: messagebox.showinfo(
+                "Restauration terminée",
+                "Toutes vos données ont été restaurées avec succès !\n\n"
+                "Fermez et relancez l'application pour charger la configuration restaurée."
+            ))
+
+        except Exception as e:
+            self._set_backup_status(f"❌ Erreur de restauration : {e}", color="#EF4444")
+            self.after(0, lambda: messagebox.showerror(
+                "Erreur de restauration",
+                f"La restauration a échoué :\n{e}\n\n"
+                "Vos données actuelles peuvent être dans un état partiel. "
+                "Vérifiez le dossier data/ manuellement."
+            ))
+        finally:
+            self._set_backup_buttons(True)

@@ -147,15 +147,21 @@ class VectorDB:
         all_documents = []
         all_ids = []
         
-        # Séparer les sources JSON locales des sources ChromaDB
+        # Séparer les sources JSON locales, commentaires SQLite et sources ChromaDB
         json_sources = []
+        commentary_sources = []
         chroma_sources = []
+        
+        from core.commentary_loader import CommentaryLoader
         
         for src in active_sources:
             src_name = src["name"] if isinstance(src, dict) else src
             src_meta = registry.get(src_name, {})
+            # Vérifier si c'est un Commentaire local
+            if src_meta.get("format") == "commentary_sqlite" or (src_meta.get("type") == "Commentaire" and CommentaryLoader.is_commentary_source(src_name)) or CommentaryLoader.is_commentary_source(src_name):
+                commentary_sources.append(src_name)
             # Vérifier si c'est une Bible JSON disponible sur disque
-            if src_meta.get("format") == "json" or BibleJsonLoader.find_bible_dir_by_name(src_name) is not None:
+            elif src_meta.get("format") == "json" or BibleJsonLoader.find_bible_dir_by_name(src_name) is not None:
                 json_sources.append(src_name)
             else:
                 chroma_sources.append(src)
@@ -169,7 +175,16 @@ class VectorDB:
                     all_documents.extend(res_json["documents"])
                     all_metadatas.extend(res_json["metadatas"])
 
-        # 2. Récupération depuis ChromaDB pour les autres sources (Docx, Commentaires, etc.)
+        # 2. Récupération ultra-rapide (<1ms) depuis les Commentaires locaux
+        if book:
+            for c_name in commentary_sources:
+                res_comm = CommentaryLoader.get_comments(c_name, book, chapter, verse)
+                if res_comm and res_comm.get("ids"):
+                    all_ids.extend(res_comm["ids"])
+                    all_documents.extend(res_comm["documents"])
+                    all_metadatas.extend(res_comm["metadatas"])
+
+        # 3. Récupération depuis ChromaDB pour les autres sources (Docx, Livres externes, etc.)
         if chroma_sources:
             sources_by_model = {}
             for src in chroma_sources:

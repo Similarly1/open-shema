@@ -94,9 +94,10 @@ class BibleTooltip:
             body_lbl.pack(fill="x", anchor="w", pady=(0, 10))
             
         # Pied : Indication de clic
+        hint_text = data.get("hint", "🖱️ Cliquer pour voir tout l'article dans le volet droit")
         hint_lbl = tk.Label(
             container, 
-            text="🖱️ Cliquer pour voir tout l'article dans le volet droit", 
+            text=hint_text, 
             font=("Segoe UI", f_hint, "italic"), 
             fg=hint_color, 
             bg=bg_color,

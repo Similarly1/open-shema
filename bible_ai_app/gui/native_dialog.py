@@ -43,7 +43,7 @@ def askopenfilename(title="Ouvrir", filetypes=None):
     except Exception:
         return ""
 
-def asksaveasfilename(title="Enregistrer sous", defaultextension="", filetypes=None):
+def asksaveasfilename(title="Enregistrer sous", defaultextension="", filetypes=None, initialfile=""):
     """Ouvre une boite de dialogue de sauvegarde de fichier via un processus PowerShell séparé avec encodage Base64 UTF-8."""
     filters = []
     if filetypes:
@@ -52,12 +52,17 @@ def asksaveasfilename(title="Enregistrer sous", defaultextension="", filetypes=N
             filters.append(f"{name} ({ext})|{ext_ps}")
     filter_str = "|".join(filters) if filters else "Tous les fichiers (*.*)|*.*"
     
+    # Échapper les backslashes pour PowerShell
+    safe_initialfile = (initialfile or "").replace("\\", "\\\\")
+
     ps_script = f'''
     Add-Type -AssemblyName System.Windows.Forms
     $f = New-Object System.Windows.Forms.SaveFileDialog
     $f.Title = "{title}"
     $f.Filter = "{filter_str}"
-    $f.DefaultExt = "{defaultextension}"
+    $f.DefaultExt = "{defaultextension.lstrip('.')}"
+    $f.FileName = "{safe_initialfile}"
+    $f.TopMost = $true
     if ($f.ShowDialog() -eq 'OK') {{
         $bytes = [System.Text.Encoding]::UTF8.GetBytes($f.FileName)
         [System.Convert]::ToBase64String($bytes)
@@ -78,10 +83,14 @@ def asksaveasfilename(title="Enregistrer sous", defaultextension="", filetypes=N
     # Fallback tkinter
     try:
         from tkinter import filedialog as tk_filedialog
-        return tk_filedialog.asksaveasfilename(title=title, defaultextension=defaultextension, filetypes=filetypes or [("Tous les fichiers", "*.*")])
+        return tk_filedialog.asksaveasfilename(
+            title=title,
+            defaultextension=defaultextension,
+            initialfile=initialfile,
+            filetypes=filetypes or [("Tous les fichiers", "*.*")]
+        )
     except Exception:
         return ""
-
 def askdirectory(title="Sélectionner un dossier"):
     """Ouvre une boite de dialogue de sélection de dossier via PowerShell avec encodage Base64 UTF-8 ou fallback tkinter."""
     ps_script = f'''

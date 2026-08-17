@@ -2,7 +2,7 @@ import customtkinter as ctk
 import re
 import difflib
 from core.config import save_config
-from core.reference_parser import get_french_book_name, parse_smart_book_input, resolve_book_input, strip_accents, normalize_reference
+from core.reference_parser import get_french_book_name, parse_smart_book_input, resolve_book_input, strip_accents, normalize_reference, REVERSE_BOOK_MAPPING
 from core.strong_lexicon import StrongLexicon
 from core.dictionary_manager import DictionaryManager
 from gui.tooltip import BibleTooltip
@@ -41,6 +41,80 @@ ALL_BOOKS = BOOKS_OT + BOOKS_NT + BOOKS_DEUTERO
 FRENCH_TO_CODE = {b[0]: b[1] for b in ALL_BOOKS}
 CODE_TO_FRENCH = {b[1]: b[0] for b in ALL_BOOKS}
 CODE_TO_CH_COUNT = {b[1]: b[2] for b in ALL_BOOKS}
+
+def clean_and_reflow_commentary_paragraphs(text):
+    """
+    Nettoie et reconstitue intelligemment le flux typographique d'un commentaire :
+    - Préserve les listes à puces (- ..., • ...)
+    - Isole proprement les titres et sous-titres (CHAPITRE I, etc.)
+    - Raccorde les phrases coupées en plein milieu par les sauts de ligne OCR
+    - Sépare proprement les vrais paragraphes
+    """
+    if not text:
+        return []
+    if not isinstance(text, str):
+        text = str(text)
+        
+    clean = re.sub(r'<[^>]+>', '', text)
+    clean = re.sub(r'\{\{field-on:.*?\}\}', '', clean)
+    clean = re.sub(r'\{\{field-off:.*?\}\}', '', clean)
+    clean = clean.replace('\xa0', ' ').replace('\u202f', ' ').replace('\u200b', '')
+    
+    raw_lines = [l.strip() for l in clean.split('\n') if l.strip()]
+    
+    paragraphs = []
+    current_para = []
+    
+    for line in raw_lines:
+        # 1. Si la ligne est une puce (- ou • ou *)
+        if line.startswith(('-', '•', '*')):
+            if current_para:
+                paragraphs.append(" ".join(current_para))
+                current_para = []
+            paragraphs.append(line)
+            continue
+            
+        # 2. Si la ligne est un titre autonome (ex: CHAPITRE I, LE PREMIER LIVRE..., NOTES SUR LE CHAPITRE...)
+        if (line.isupper() and len(line) < 80) or line.startswith(('CHAPITRE ', 'NOTES SUR LE CHAPITRE', 'NOTES SUR LE CHAPITRE.')):
+            if current_para:
+                paragraphs.append(" ".join(current_para))
+                current_para = []
+            paragraphs.append(line)
+            continue
+            
+        # 3. Si la ligne commence par un sous-titre de travail ou marqueur de verset
+        if line.startswith(('Travail du premier jour', 'Travail du deuxième jour', 'Travail du troisième jour', 'Travail du quatrième jour', 'Travail du cinquième jour', 'Travail du sixième jour', 'Cinquième jour', 'Sixième jour', 'De la lumière et', 'Verset ')):
+            if current_para:
+                paragraphs.append(" ".join(current_para))
+                current_para = []
+            current_para.append(line)
+            continue
+            
+        # 4. Fusion intelligente si la ligne continue une phrase en cours
+        if not current_para:
+            current_para.append(line)
+        else:
+            prev_line = current_para[-1]
+            prev_ends_no_punct = not prev_line.endswith(('.', '!', '?', ':', '»', '"', ';'))
+            starts_lowercase = line[0].islower() or line.startswith((',', ';', ')', ']'))
+            
+            if prev_ends_no_punct or starts_lowercase:
+                current_para.append(line)
+            else:
+                paragraphs.append(" ".join(current_para))
+                current_para = [line]
+                
+    if current_para:
+        paragraphs.append(" ".join(current_para))
+        
+    formatted_paras = []
+    for p in paragraphs:
+        p = re.sub(r'[ \t]+([,.;:!?»\)])', r'\1', p)
+        p = re.sub(r'([«\(])[ \t]+', r'\1', p)
+        p = re.sub(r'[ \t]+', ' ', p)
+        formatted_paras.append(p.strip())
+        
+    return formatted_paras
 
 def format_bible_text(text, show_headings=True):
     if not text:
@@ -113,12 +187,56 @@ class CenterPanel(ctk.CTkFrame):
         self.grid_rowconfigure(0, weight=0)
         self.grid_rowconfigure(1, weight=1)
         
-        # Fil d'Ariane Interactif (ComboBox et OptionMenus)
+        # Fil d'Ariane Interactif (Boutons Historique, ComboBox et OptionMenus)
         self.breadcrumb_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.breadcrumb_frame.grid(row=0, column=0, columnspan=2, pady=(10, 5), sticky="ew", padx=15)
         
+        # Piles d'Historique de Navigation
+        self.history_back = []
+        self.history_forward = []
+        self._is_navigating_history = False
+        self.last_pushed_ref = None
+        
+        self.history_frame = ctk.CTkFrame(self.breadcrumb_frame, fg_color="transparent")
+        self.history_frame.pack(side="left", padx=(0, 6))
+        
+        self.btn_history_back = ctk.CTkButton(
+            self.history_frame,
+            text="◀",
+            width=28,
+            height=28,
+            font=ctk.CTkFont(size=12, weight="bold"),
+            fg_color=("#E2E8F0", "#1E293B"),
+            hover_color=("#CBD5E1", "#334155"),
+            text_color=("#94A3B8", "#64748B"),
+            state="disabled",
+            command=self.navigate_history_back
+        )
+        self.btn_history_back.pack(side="left", padx=1)
+        
+        self.btn_history_forward = ctk.CTkButton(
+            self.history_frame,
+            text="▶",
+            width=28,
+            height=28,
+            font=ctk.CTkFont(size=12, weight="bold"),
+            fg_color=("#E2E8F0", "#1E293B"),
+            hover_color=("#CBD5E1", "#334155"),
+            text_color=("#94A3B8", "#64748B"),
+            state="disabled",
+            command=self.navigate_history_forward
+        )
+        self.btn_history_forward.pack(side="left", padx=1)
+        
+        # Raccourcis clavier pour l'historique
+        try:
+            self.master.bind("<Alt-Left>", self.navigate_history_back)
+            self.master.bind("<Alt-Right>", self.navigate_history_forward)
+        except Exception:
+            pass
+        
         # Sélecteur de livre sous forme de CTkComboBox éditable
-        self.book_var = ctk.StringVar(value="Jean")
+        self.book_var = ctk.StringVar(value="Genèse")
         self.book_menu = ctk.CTkComboBox(
             self.breadcrumb_frame, 
             variable=self.book_var, 
@@ -374,6 +492,7 @@ class CenterPanel(ctk.CTkFrame):
         # Tooltip et détection dynamique au survol
         self.tooltip = BibleTooltip(self)
         self._hover_match = None
+        self._hover_comm_ref = None
         self._strong_tag_map = {}
         
         self.bible_textbox._textbox.bind("<Motion>", self.on_bible_mouse_motion)
@@ -388,10 +507,78 @@ class CenterPanel(ctk.CTkFrame):
         self.tab_chat = self.right_tabs.add("🤖 Assistant IA")
         self.tab_lex = self.right_tabs.add("🔍 Lexique & Dictionnaires")
         
+        # Barre d'outils du panneau des commentaires (sélecteur d'auteur + synchronisation + navigation)
+        self.comm_top_bar = ctk.CTkFrame(self.tab_comm, fg_color=("gray92", "#1E293B"), corner_radius=6, height=34)
+        self.comm_top_bar.pack(fill="x", padx=2, pady=(2, 6))
+        
+        lbl_comm_author = ctk.CTkLabel(self.comm_top_bar, text="Auteur :", font=ctk.CTkFont(size=11, weight="bold"))
+        lbl_comm_author.pack(side="left", padx=(8, 4))
+        
+        self.selected_comm_author_var = ctk.StringVar(value="")
+        self.comm_author_menu = ctk.CTkOptionMenu(
+            self.comm_top_bar,
+            variable=self.selected_comm_author_var,
+            values=["Aucun commentaire"],
+            command=self.on_comm_author_changed,
+            height=26,
+            font=ctk.CTkFont(size=11)
+        )
+        self.comm_author_menu.pack(side="left", fill="x", expand=True, padx=(0, 4))
+        
+        # Bouton de synchronisation / verrouillage (🔗 Lié vs 🔓 Libre)
+        self.is_commentary_locked = True
+        self.btn_sync_lock = ctk.CTkButton(
+            self.comm_top_bar,
+            text="🔗 Lié",
+            width=58,
+            height=26,
+            font=ctk.CTkFont(size=11, weight="bold"),
+            fg_color=("#E0F2FE", "#0F2B48"),
+            hover_color=("#BAE6FD", "#1E3A8A"),
+            text_color=("#0284C7", "#38BDF8"),
+            command=self.toggle_sync_lock
+        )
+        self.btn_sync_lock.pack(side="left", padx=(0, 4))
+        
+        # Navigation rapide de verset dans le commentaire
+        self.comm_nav_frame = ctk.CTkFrame(self.comm_top_bar, fg_color="transparent")
+        self.comm_nav_frame.pack(side="right", padx=(0, 6))
+        
+        self.btn_comm_intro = ctk.CTkButton(
+            self.comm_nav_frame,
+            text="📖 Intro",
+            width=52,
+            height=24,
+            font=ctk.CTkFont(size=10, weight="bold"),
+            fg_color="transparent",
+            hover_color=("#E2E8F0", "#334155"),
+            text_color=("#64748B", "#94A3B8"),
+            command=self.on_toggle_intro_view
+        )
+        self.btn_comm_intro.pack(side="left", padx=(0, 3))
+        
+        self.btn_comm_prev = ctk.CTkButton(self.comm_nav_frame, text="◀", width=26, height=24, font=ctk.CTkFont(size=10), command=self.on_prev_comm_verse)
+        self.btn_comm_prev.pack(side="left", padx=1)
+        
+        self.lbl_comm_verse_badge = ctk.CTkLabel(self.comm_nav_frame, text="V. 1", font=ctk.CTkFont(size=11, weight="bold"), width=44)
+        self.lbl_comm_verse_badge.pack(side="left", padx=2)
+        
+        self.btn_comm_next = ctk.CTkButton(self.comm_nav_frame, text="▶", width=26, height=24, font=ctk.CTkFont(size=10), command=self.on_next_comm_verse)
+        self.btn_comm_next.pack(side="left", padx=1)
+        
         # Commentaires Textbox (inside tab_comm)
         self.comm_textbox = ctk.CTkTextbox(self.tab_comm, wrap="word", fg_color=("#FAFAFA", "#1E1E1E"), text_color=("#1A1A1A", "#E2E8F0"))
         self.comm_textbox.pack(fill="both", expand=True)
         self.comm_textbox.configure(state="disabled")
+        
+        self.comm_textbox._textbox.bind("<Motion>", self.on_comm_mouse_motion)
+        self.comm_textbox._textbox.bind("<Leave>", self.on_comm_mouse_leave)
+        self.comm_textbox._textbox.bind("<Button-1>", self.on_comm_mouse_click, add="+")
+        
+        self.current_comms_grouped = {}
+        self.current_french_book = ""
+        self.current_active_chapter = 1
+        self.current_active_verse = 1
         
         from gui.right_panel import RightPanel
         self.right_panel = RightPanel(
@@ -539,7 +726,23 @@ class CenterPanel(ctk.CTkFrame):
             self._hover_match = None
 
     def on_bible_mouse_click(self, event):
-        """Ouvre l'article complet dans le volet droit au clic sur un mot reconnu."""
+        """Ouvre l'article complet dans le volet droit au clic sur un mot reconnu et synchronise le commentaire sur le verset cliqué."""
+        # 1. Détecter le verset cliqué pour synchroniser le commentaire
+        try:
+            click_idx = self.bible_textbox._textbox.index(f"@{event.x},{event.y}")
+            tags = self.bible_textbox._textbox.tag_names(click_idx)
+            ref_tags = [t for t in tags if t.startswith("ref_")]
+            if ref_tags:
+                parts = ref_tags[0].split("_")
+                if len(parts) >= 3 and parts[1].isdigit() and parts[2].isdigit():
+                    ch = int(parts[1])
+                    v = int(parts[2])
+                    if getattr(self, 'is_commentary_locked', True):
+                        self.sync_commentary_to_verse(ch, v)
+        except Exception:
+            pass
+
+        # 2. Ouvrir le dictionnaire si un mot survolé a été cliqué
         if self._hover_match:
             match, _, _ = self._hover_match
             self.tooltip.hide()
@@ -1017,7 +1220,75 @@ class CenterPanel(ctk.CTkFrame):
             self.book_var.set(self.current_valid_book)
         self.book_menu.configure(values=self.all_book_names)
 
+    def push_history(self, book, chapter, verse=None):
+        """Mémorise un changement de passage dans la pile d'historique de navigation."""
+        if self._is_navigating_history:
+            return
+        v = verse if verse and str(verse) != "Tous" else None
+        state = (book, int(chapter) if str(chapter).isdigit() else 1, int(v) if v and str(v).isdigit() else None)
+        
+        if self.last_pushed_ref == state:
+            return
+            
+        if self.last_pushed_ref is not None:
+            self.history_back.append(self.last_pushed_ref)
+            self.history_forward.clear()
+            if len(self.history_back) > 50:
+                self.history_back.pop(0)
+                
+        self.last_pushed_ref = state
+        self.update_history_buttons()
+
+    def navigate_history_back(self, event=None):
+        """Revient au passage biblique précédent dans l'historique (Alt + Flèche Gauche)."""
+        if not self.history_back:
+            return "break"
+        target = self.history_back.pop()
+        if self.last_pushed_ref:
+            self.history_forward.append(self.last_pushed_ref)
+        self.last_pushed_ref = target
+        
+        self._is_navigating_history = True
+        try:
+            b, c, v = target
+            self.apply_book_selection(b, chapter=c, verse=v)
+        finally:
+            self._is_navigating_history = False
+        self.update_history_buttons()
+        return "break"
+
+    def navigate_history_forward(self, event=None):
+        """Avance au passage biblique suivant dans l'historique (Alt + Flèche Droite)."""
+        if not self.history_forward:
+            return "break"
+        target = self.history_forward.pop()
+        if self.last_pushed_ref:
+            self.history_back.append(self.last_pushed_ref)
+        self.last_pushed_ref = target
+        
+        self._is_navigating_history = True
+        try:
+            b, c, v = target
+            self.apply_book_selection(b, chapter=c, verse=v)
+        finally:
+            self._is_navigating_history = False
+        self.update_history_buttons()
+        return "break"
+
+    def update_history_buttons(self):
+        """Active ou grise dynamiquement les boutons d'historique ◀ et ▶."""
+        if hasattr(self, 'btn_history_back'):
+            state_b = "normal" if self.history_back else "disabled"
+            txt_b = ("#0F172A", "#F8FAFC") if self.history_back else ("#94A3B8", "#64748B")
+            self.btn_history_back.configure(state=state_b, text_color=txt_b)
+            
+        if hasattr(self, 'btn_history_forward'):
+            state_f = "normal" if self.history_forward else "disabled"
+            txt_f = ("#0F172A", "#F8FAFC") if self.history_forward else ("#94A3B8", "#64748B")
+            self.btn_history_forward.configure(state=state_f, text_color=txt_f)
+
     def apply_book_selection(self, book_name, chapter=None, verse=None):
+        self.push_history(book_name, chapter or 1, verse)
         self.current_valid_book = book_name
         self.book_var.set(book_name)
         self.book_menu.configure(values=self.all_book_names)
@@ -1126,31 +1397,85 @@ class CenterPanel(ctk.CTkFrame):
                 finally:
                     self.is_updating_breadcrumb = False
                     
-                self.sync_commentary_to_verse(cur_ch, cur_v or 1)
+                if self.is_commentary_locked:
+                    self.sync_commentary_to_verse(cur_ch, cur_v or 1)
+
+    def toggle_sync_lock(self):
+        """Active ou désactive la synchronisation automatique entre la Bible et le commentaire."""
+        self.is_commentary_locked = not self.is_commentary_locked
+        if self.is_commentary_locked:
+            self.btn_sync_lock.configure(
+                text="🔗 Lié", 
+                fg_color=("#E0F2FE", "#0F2B48"), 
+                text_color=("#0284C7", "#38BDF8"),
+                hover_color=("#BAE6FD", "#1E3A8A")
+            )
+            self.sync_commentary_to_verse(self.current_active_chapter, self.current_active_verse)
+        else:
+            self.btn_sync_lock.configure(
+                text="🔓 Libre", 
+                fg_color=("#FEF3C7", "#3B2506"), 
+                text_color=("#D97706", "#FBBF24"),
+                hover_color=("#FDE68A", "#451A03")
+            )
+
+    def on_toggle_intro_view(self):
+        """Bascule directement entre l'introduction du livre et le commentaire de verset."""
+        ch = getattr(self, 'current_active_chapter', 1)
+        if getattr(self, 'current_active_verse', 1) == 0:
+            if self.is_commentary_locked:
+                self.scroll_to_ref(ch, 1)
+            else:
+                self.sync_commentary_to_verse(ch, 1)
+        else:
+            self.sync_commentary_to_verse(ch, 0)
+
+    def on_prev_comm_verse(self):
+        """Passe au verset précédent (ou à l'Introduction si verset 1)."""
+        cur_v = getattr(self, 'current_active_verse', 1)
+        ch = getattr(self, 'current_active_chapter', 1)
+        
+        target_v = max(0, cur_v - 1)
+        if target_v == cur_v:
+            return
+            
+        if self.is_commentary_locked and target_v >= 1:
+            self.scroll_to_ref(ch, target_v)
+        else:
+            self.sync_commentary_to_verse(ch, target_v)
+        
+    def on_next_comm_verse(self):
+        """Passe au verset suivant."""
+        cur_v = getattr(self, 'current_active_verse', 1)
+        ch = getattr(self, 'current_active_chapter', 1)
+        
+        target_v = cur_v + 1
+        if self.is_commentary_locked:
+            self.scroll_to_ref(ch, target_v)
+        else:
+            self.sync_commentary_to_verse(ch, target_v)
 
     def sync_commentary_to_verse(self, chapter, verse):
-        """Fait défiler le panneau des commentaires vers la note correspondant au verset visible tout en haut."""
-        if not self.comm_textbox._textbox.winfo_exists():
-            return
+        """Met à jour instantanément le panneau des commentaires pour n'afficher strictement que le verset ou l'introduction actif."""
+        ch = int(chapter) if str(chapter).isdigit() else 1
+        v = int(verse) if str(verse).isdigit() else (0 if str(verse) == "0" else 1)
+        
+        self.current_active_chapter = ch
+        self.current_active_verse = v
+        
+        if hasattr(self, 'lbl_comm_verse_badge'):
+            if v == 0:
+                self.lbl_comm_verse_badge.configure(text="Intro")
+            else:
+                self.lbl_comm_verse_badge.configure(text=f"V. {v}")
+                
+        if hasattr(self, 'btn_comm_intro'):
+            if v == 0:
+                self.btn_comm_intro.configure(text="📖 Verset 1", fg_color=("#E0F2FE", "#0F2B48"), text_color=("#0284C7", "#38BDF8"))
+            else:
+                self.btn_comm_intro.configure(text="📖 Intro", fg_color="transparent", text_color=("#64748B", "#94A3B8"))
             
-        tag_exact = f"comm_ref_{chapter}_{verse}"
-        pos = self.comm_textbox._textbox.tag_ranges(tag_exact)
-        if pos:
-            self.comm_textbox._textbox.yview(pos[0])
-            return
-            
-        if isinstance(verse, int) and verse > 1:
-            for prev_v in range(verse - 1, 0, -1):
-                p_tag = f"comm_ref_{chapter}_{prev_v}"
-                p_pos = self.comm_textbox._textbox.tag_ranges(p_tag)
-                if p_pos:
-                    self.comm_textbox._textbox.yview(p_pos[0])
-                    return
-                    
-        chap_tag = f"comm_chap_{chapter}"
-        c_pos = self.comm_textbox._textbox.tag_ranges(chap_tag)
-        if c_pos:
-            self.comm_textbox._textbox.yview(c_pos[0])
+        self.render_commentaries_view()
 
     def scroll_to_ref(self, chapter, verse=None):
         """Positionne instantanément le défilement de la Bible TOUT EN HAUT de la fenêtre sur le verset ou chapitre demandé."""
@@ -1172,7 +1497,8 @@ class CenterPanel(ctk.CTkFrame):
             self.bible_textbox._textbox.yview(pos[0])
             
         v_num = int(verse) if verse and str(verse).isdigit() else 1
-        self.sync_commentary_to_verse(chapter, v_num)
+        if self.is_commentary_locked:
+            self.sync_commentary_to_verse(chapter, v_num)
 
     def toggle_bible_full_width(self):
         """Bascule le texte biblique entre le mode 2 volets (étude) et le mode pleine largeur (volet unique)."""
@@ -1357,6 +1683,13 @@ class CenterPanel(ctk.CTkFrame):
             box._textbox.tag_configure("logos_lemma", font=(self.font_family, max(10, self.font_size - 3)), foreground="#60A5FA" if is_dark else "#2563EB", spacing1=1, spacing2=1)
             box._textbox.tag_configure("logos_translit", font=(self.font_family, max(9, self.font_size - 4), "italic"), foreground="#94A3B8" if is_dark else "#64748B", spacing1=1, spacing2=1)
             box._textbox.tag_configure("logos_strong", font=(self.font_family, max(9, self.font_size - 5), "bold"), foreground="#F59E0B" if is_dark else "#D97706", spacing1=1, spacing2=4)
+            
+            # Tags typographiques riches pour les Commentaires Bibliques
+            box._textbox.tag_configure("comm_section_title", font=(self.font_family, self.font_size + 1, "bold"), foreground="#38BDF8" if is_dark else "#0284C7", spacing1=14, spacing3=6)
+            box._textbox.tag_configure("comm_list_item", font=(self.font_family, self.font_size), foreground=text_col, lmargin1=16, lmargin2=28, spacing1=3, spacing3=3)
+            box._textbox.tag_configure("comm_verse_lead", font=(self.font_family, self.font_size, "bold"), foreground="#F59E0B" if is_dark else "#D97706")
+            box._textbox.tag_configure("comm_body", font=(self.font_family, self.font_size), foreground=text_col, spacing1=3, spacing2=sp2, spacing3=8)
+            box._textbox.tag_configure("bible_ref_link", foreground="#38BDF8" if is_dark else "#0284C7", underline=True, font=(self.font_family, self.font_size, "bold"))
             
         # Tags de comparaison et d'interaction sur la zone Bible
         self.bible_textbox._textbox.tag_configure("verse_header", font=(self.font_family, self.font_size, "bold"), foreground=verse_hdr_col, spacing1=12, spacing3=4)
@@ -1767,48 +2100,372 @@ class CenterPanel(ctk.CTkFrame):
                     self.bible_textbox._textbox.tag_add(f"ref_{cur_ch_num}_{cur_v_num}", start_vr, end_vr)
                     self.bible_textbox._textbox.tag_add(f"chap_{cur_ch_num}", start_vr, end_vr)
                         
-        # --- AFFICHER LES COMMENTAIRES STRUCTURÉS PAR CHAPITRE ET VERSET ---
-        if not comms_grouped:
-            self.comm_textbox.insert("end", "Aucun commentaire lié à ce passage.", "welcome")
-        else:
-            comms_by_chap = {}
-            for source, items in comms_grouped.items():
-                for doc, meta in items:
-                    ch = meta.get('chapter', 1)
-                    if ch not in comms_by_chap:
-                        comms_by_chap[ch] = []
-                    comms_by_chap[ch].append((source, doc, meta))
-                    
-            sorted_comm_chaps = sorted(comms_by_chap.keys(), key=lambda x: int(x) if str(x).isdigit() else 999)
+        # --- INITIALISER LE COMMENTAIRE POUR LE VERSET ACTIF ---
+        self.current_french_book = french_book
+        self.current_comms_grouped = comms_grouped
+        self.current_active_chapter = target_chapter
+        self.current_active_verse = target_verse if target_verse else 1
+        self.push_history(french_book, target_chapter, target_verse)
+        
+        # Mettre à jour la liste déroulante des auteurs de commentaires disponibles
+        if comms_grouped:
+            available_authors = sorted(list(comms_grouped.keys()))
+            self.comm_author_menu.configure(values=available_authors)
+            current_choice = self.selected_comm_author_var.get()
             
-            for ch_idx, cur_ch in enumerate(sorted_comm_chaps):
-                chap_comm_tag = f"comm_chap_{cur_ch}"
-                if ch_idx == 0:
-                    self.comm_textbox.insert("end", f"───  Commentaires pour {french_book} {cur_ch}  ───\n\n", ("chapter_divider", chap_comm_tag))
-                else:
-                    self.comm_textbox.insert("end", f"\n\n───  Commentaires pour {french_book} {cur_ch}  ───\n\n", ("chapter_divider", chap_comm_tag))
-                    
-                for source, doc, meta in comms_by_chap[cur_ch]:
-                    ref = meta.get('reference', '')
-                    v_num = ref.split(":")[-1] if ":" in ref else str(meta.get('verse', ''))
-                    clean_doc = format_bible_text(doc, self.show_headings)
-                    
-                    start_c = self.comm_textbox.index("end-1c")
-                    self.comm_textbox.insert("end", f"■ {source}", "source_name")
-                    if v_num:
-                        self.comm_textbox.insert("end", f" (Verset {v_num})", "verse_num")
-                    self.comm_textbox.insert("end", f"\n{clean_doc}\n\n", "body")
-                    end_c = self.comm_textbox.index("end-1c")
-                    
-                    if v_num and v_num.isdigit():
-                        self.comm_textbox._textbox.tag_add(f"comm_ref_{cur_ch}_{v_num}", start_c, end_c)
-                    self.comm_textbox._textbox.tag_add(f"comm_chap_{cur_ch}", start_c, end_c)
-                    
+            if current_choice not in available_authors:
+                matched = None
+                if current_choice:
+                    for a in available_authors:
+                        if current_choice.lower() in a.lower() or a.lower() in current_choice.lower():
+                            matched = a
+                            break
+                self.selected_comm_author_var.set(matched if matched else available_authors[0])
+        else:
+            self.comm_author_menu.configure(values=["Aucun commentaire"])
+            self.selected_comm_author_var.set("Aucun commentaire")
+            
+        if hasattr(self, 'lbl_comm_verse_badge'):
+            self.lbl_comm_verse_badge.configure(text=f"V. {self.current_active_verse}")
+            
+        self.render_commentaries_view()
+        
         for box in [self.bible_textbox, self.comm_textbox]:
             box.configure(state="disabled")
             
         # 3. Positionner immédiatement le défilement continu TOUT EN HAUT sur le chapitre et verset demandés
         self.after(50, lambda: self.scroll_to_ref(target_chapter, target_verse))
+
+    def on_comm_author_changed(self, choice):
+        """Met à jour instantanément l'affichage lors du changement d'auteur dans la liste déroulante."""
+        self.render_commentaries_view()
+
+    def render_commentaries_view(self):
+        """Affiche instantanément uniquement le commentaire du verset actif (0 latence)."""
+        self.comm_textbox.configure(state="normal")
+        self.comm_textbox.delete("0.0", "end")
+        
+        if not hasattr(self, 'current_comms_grouped') or not self.current_comms_grouped:
+            self.comm_textbox.insert("end", "Aucun commentaire lié à ce passage.", "welcome")
+            self.comm_textbox.configure(state="disabled")
+            return
+            
+        selected_author = self.selected_comm_author_var.get()
+        french_book = getattr(self, 'current_french_book', "Ce livre")
+        cur_ch = getattr(self, 'current_active_chapter', 1)
+        cur_v = getattr(self, 'current_active_verse', 1)
+        
+        # Filtrer pour l'auteur sélectionné
+        author_items = []
+        if selected_author in self.current_comms_grouped:
+            author_items = self.current_comms_grouped[selected_author]
+        else:
+            for k, v in self.current_comms_grouped.items():
+                if selected_author.lower() in k.lower() or k.lower() in selected_author.lower():
+                    author_items = v
+                    selected_author = k
+                    self.selected_comm_author_var.set(k)
+                    break
+            if not author_items and self.current_comms_grouped:
+                first_key = sorted(list(self.current_comms_grouped.keys()))[0]
+                author_items = self.current_comms_grouped[first_key]
+                selected_author = first_key
+                self.selected_comm_author_var.set(first_key)
+                
+        # Trouver les notes couvrant le verset actif ou l'introduction (cur_v == 0)
+        matched_comments = []
+        has_intro = False
+        
+        for doc, meta in author_items:
+            ch = meta.get('chapter', 1)
+            v_start = meta.get('verse')
+            v_end = meta.get('verse_end', v_start)
+            ref = meta.get('reference', '')
+            
+            if ch == 0 or v_start == 0 or 'Intro' in ref or 'Préface' in ref:
+                has_intro = True
+                if cur_v == 0:
+                    matched_comments.append((doc, meta))
+                    continue
+                    
+            if cur_v == 0:
+                continue
+                
+            if ch != cur_ch:
+                continue
+            
+            is_match = False
+            if v_start is not None:
+                if str(v_start).isdigit():
+                    v_s_num = int(v_start)
+                    v_e_num = int(v_end) if str(v_end).isdigit() else v_s_num
+                    if v_s_num <= cur_v <= v_e_num:
+                        is_match = True
+                elif isinstance(v_start, str) and "-" in v_start:
+                    parts = v_start.split("-")
+                    if parts[0].isdigit() and parts[1].isdigit():
+                        if int(parts[0]) <= cur_v <= int(parts[1]):
+                            is_match = True
+                            
+            if not is_match:
+                if f":{cur_v}" in ref:
+                    is_match = True
+                    
+            if is_match:
+                matched_comments.append((doc, meta))
+                
+        # Option B : Si on est sur le Verset 1 et qu'une introduction existe, afficher un bandeau cliquable
+        if cur_v == 1 and has_intro:
+            self.comm_textbox.insert("end", "📘 ", "comm_verse_lead")
+            self.comm_textbox.insert("end", f"Lire l'introduction générale de {french_book} ({selected_author})\n\n", ("comm_body", "bible_ref_link", f"cmd_intro_{french_book}"))
+            self.comm_textbox.insert("end", "─" * 28 + "\n\n", "chapter_divider")
+                
+        if matched_comments:
+            for idx, (doc, meta) in enumerate(matched_comments):
+                if cur_v == 0:
+                    ref = f"{french_book} - Introduction générale"
+                else:
+                    ref = meta.get('reference', f"{french_book} {cur_ch}:{cur_v}")
+                
+                if idx > 0:
+                    self.comm_textbox.insert("end", "\n" + "─" * 28 + "\n\n", "chapter_divider")
+                elif cur_v != 1 or not has_intro:
+                    self.comm_textbox.insert("end", f"───  {selected_author}  ───\n\n", "chapter_divider")
+                    
+                self.comm_textbox.insert("end", f"📍 {ref}\n\n", "book_title")
+                
+                # Mise en page riche et aérée (paragraphes continus, listes à puces, titres avec liens bibliques)
+                paras = clean_and_reflow_commentary_paragraphs(doc)
+                
+                for p in paras:
+                    if not p:
+                        continue
+                        
+                    # Ligne de puce (- ou • ou *)
+                    if p.startswith(('-', '•', '*')):
+                        self.insert_text_with_bible_links(p, "comm_list_item", end_newline="\n")
+                        continue
+                        
+                    # Titre de section ou sous-chapitre autonome
+                    if (p.isupper() and len(p) < 80) or p.startswith(('CHAPITRE ', 'NOTES SUR LE CHAPITRE', 'NOTES SUR LE CHAPITRE.')):
+                        self.comm_textbox.insert("end", f"{p}\n\n", "comm_section_title")
+                        continue
+                        
+                    # Sous-titres avec préfixe (ex: Travail du sixième jour - ...)
+                    if p.startswith(('Travail du', 'Cinquième jour', 'Sixième jour', 'De la lumière et')):
+                        if ' - ' in p or '- ' in p:
+                            parts = re.split(r'\s*-\s*', p, maxsplit=1)
+                            self.comm_textbox.insert("end", f"• {parts[0]} : ", "comm_verse_lead")
+                            if len(parts) > 1:
+                                self.insert_text_with_bible_links(parts[1], "comm_body", end_newline="\n\n")
+                            else:
+                                self.comm_textbox.insert("end", "\n\n")
+                        else:
+                            self.insert_text_with_bible_links(p, "comm_body", end_newline="\n\n")
+                        continue
+                        
+                    # Paragraphe commençant par un numéro ou mention de verset
+                    match_lead = re.match(r'^(Verset\s+[\w\s\.:\d]+[\.:]?|\d+[\.,]\s*|\d+-\d+[\.,]\s*)(.*)$', p, re.DOTALL)
+                    if match_lead:
+                        lead = match_lead.group(1)
+                        rest = match_lead.group(2)
+                        self.comm_textbox.insert("end", lead, "comm_verse_lead")
+                        self.insert_text_with_bible_links(rest, "comm_body", end_newline="\n\n")
+                        continue
+                        
+                    # Corps de paragraphe standard avec détection de liens bibliques interactifs
+                    self.insert_text_with_bible_links(p, "comm_body", end_newline="\n\n")
+        else:
+            self.comm_textbox.insert("end", f"───  {selected_author}  ───\n\n", "chapter_divider")
+            self.comm_textbox.insert("end", f"📍 {french_book} {cur_ch}:{cur_v}\n\n", "book_title")
+            self.comm_textbox.insert("end", "(Aucun commentaire spécifique pour ce verset chez cet auteur)\n\n", "welcome")
+            
+            # Trouver les autres auteurs qui ont commenté ce verset précis
+            other_authors = []
+            for a_name, items in self.current_comms_grouped.items():
+                if a_name == selected_author:
+                    continue
+                for doc, meta in items:
+                    ch = meta.get('chapter', 1)
+                    if cur_v == 0:
+                        if ch == 0 or meta.get('verse') == 0 or 'Intro' in meta.get('reference', '') or 'Préface' in meta.get('reference', ''):
+                            other_authors.append((a_name, "Introduction générale"))
+                            break
+                    else:
+                        if ch != cur_ch:
+                            continue
+                        v_start = meta.get('verse')
+                        v_end = meta.get('verse_end', v_start)
+                        is_m = False
+                        if v_start is not None:
+                            if str(v_start).isdigit():
+                                v_s = int(v_start)
+                                v_e = int(v_end) if str(v_end).isdigit() else v_s
+                                if v_s <= cur_v <= v_e:
+                                    is_m = True
+                            elif isinstance(v_start, str) and "-" in v_start:
+                                parts = v_start.split("-")
+                                if parts[0].isdigit() and parts[1].isdigit():
+                                    if int(parts[0]) <= cur_v <= int(parts[1]):
+                                        is_m = True
+                        if not is_m and f":{cur_v}" in meta.get('reference', ''):
+                            is_m = True
+                            
+                        if is_m:
+                            ref_str = meta.get('reference', '')
+                            other_authors.append((a_name, ref_str))
+                            break
+                            
+            if other_authors:
+                self.comm_textbox.insert("end", "💡 D'autres auteurs ont commenté ce passage :\n\n", "comm_section_title")
+                for a_name, ref_note in other_authors:
+                    clean_ref = f" ({ref_note})" if ref_note and ref_note != f"{french_book} {cur_ch}:{cur_v}" and ref_note != "Introduction générale" else ""
+                    self.comm_textbox.insert("end", "   • 📝 ", "comm_list_item")
+                    author_tag = f"cmd_switch_author_{a_name}"
+                    self.comm_textbox.insert("end", f"{a_name}{clean_ref}\n", ("comm_list_item", "bible_ref_link", author_tag))
+                self.comm_textbox.insert("end", "\n")
+            
+        self.comm_textbox.configure(state="disabled")
+
+    def insert_text_with_bible_links(self, text, base_tag, end_newline="\n\n"):
+        """Insère du texte dans comm_textbox en transformant automatiquement chaque référence biblique en lien cliquable avec infobulle."""
+        from core.bible_reference_detector import find_bible_references
+        refs = find_bible_references(text)
+        
+        if not refs:
+            self.comm_textbox.insert("end", f"{text}{end_newline}", base_tag)
+            return
+            
+        last_idx = 0
+        for r in refs:
+            s = r["start"]
+            e = r["end"]
+            
+            # Insérer le texte avant la référence
+            if s > last_idx:
+                self.comm_textbox.insert("end", text[last_idx:s], base_tag)
+                
+            # Insérer la référence stylisée en lien interactif
+            v_val = r["verse"] if r["verse"] else "0"
+            ref_tag = f"bref_{r['book_code']}_{r['chapter']}_{v_val}"
+            tags = (base_tag, "bible_ref_link", ref_tag) if base_tag else ("bible_ref_link", ref_tag)
+            self.comm_textbox.insert("end", r["raw"], tags)
+            
+            last_idx = e
+            
+        # Insérer le reste du texte
+        if last_idx < len(text):
+            self.comm_textbox.insert("end", text[last_idx:], base_tag)
+            
+        if end_newline:
+            self.comm_textbox.insert("end", end_newline, base_tag)
+
+    def on_comm_mouse_motion(self, event):
+        """Affiche une infobulle (tooltip) au survol d'un lien de verset biblique dans les commentaires."""
+        try:
+            idx = self.comm_textbox._textbox.index(f"@{event.x},{event.y}")
+            tags = self.comm_textbox._textbox.tag_names(idx)
+            
+            if any(t.startswith("cmd_intro_") or t.startswith("cmd_switch_author_") for t in tags):
+                self.comm_textbox._textbox.config(cursor="hand2")
+                return
+                
+            bref_tags = [t for t in tags if t.startswith("bref_")]
+            
+            if bref_tags:
+                self.comm_textbox._textbox.config(cursor="hand2")
+                tag_name = bref_tags[0]
+                
+                if getattr(self, '_hover_comm_ref', None) == tag_name and getattr(self.tooltip, 'tw', None):
+                    return
+                self._hover_comm_ref = tag_name
+                
+                parts = tag_name.split("_")
+                b_code = parts[1]
+                ch = int(parts[2]) if parts[2].isdigit() else 1
+                v_str = parts[3] if len(parts) > 3 and parts[3] != '0' else None
+                
+                ref_bible = self.config.get("reference_bible", "Segond 21")
+                from core.bible_reference_detector import get_bible_passage_preview
+                ref_title, preview_txt = get_bible_passage_preview(ref_bible, b_code, ch, v_str)
+                
+                x = self.comm_textbox._textbox.winfo_rootx() + event.x + 10
+                y = self.comm_textbox._textbox.winfo_rooty() + event.y + 10
+                
+                tooltip_data = {
+                    "word": tag_name,
+                    "source": f"📖 {ref_bible}",
+                    "title": ref_title,
+                    "preview": preview_txt,
+                    "hint": "🖱️ Cliquer pour naviguer vers ce passage dans la Bible"
+                }
+                self.tooltip.show(x, y, tooltip_data)
+            else:
+                if getattr(self, '_hover_comm_ref', None):
+                    self._hover_comm_ref = None
+                    self.comm_textbox._textbox.config(cursor="")
+                    if self.tooltip:
+                        self.tooltip.hide()
+        except Exception:
+            pass
+
+    def on_comm_mouse_leave(self, event=None):
+        """Masque l'infobulle lorsque le curseur quitte la zone de commentaire."""
+        self._hover_comm_ref = None
+        try:
+            self.comm_textbox._textbox.config(cursor="")
+        except Exception:
+            pass
+        if self.tooltip:
+            self.tooltip.hide()
+
+    def on_comm_mouse_click(self, event):
+        """Au clic sur un lien de verset biblique, d'intro ou d'auteur suggéré, exécute l'action."""
+        try:
+            idx = self.comm_textbox._textbox.index(f"@{event.x},{event.y}")
+            tags = self.comm_textbox._textbox.tag_names(idx)
+            
+            # Clic sur le bandeau d'introduction générale
+            if any(t.startswith("cmd_intro_") for t in tags):
+                self.sync_commentary_to_verse(1, 0)
+                return
+                
+            # Clic sur un auteur suggéré
+            for t in tags:
+                if t.startswith("cmd_switch_author_"):
+                    target_author = t.replace("cmd_switch_author_", "")
+                    if target_author in self.current_comms_grouped:
+                        self.selected_comm_author_var.set(target_author)
+                        self.render_commentaries_view()
+                        return
+                
+            bref_tags = [t for t in tags if t.startswith("bref_")]
+            
+            # Fallback si l'index direct est imprécis mais qu'on était en survol sur ce tag
+            if not bref_tags and getattr(self, '_hover_comm_ref', None):
+                bref_tags = [self._hover_comm_ref]
+                
+            if bref_tags:
+                parts = bref_tags[0].split("_")
+                b_code = parts[1]
+                ch = int(parts[2]) if parts[2].isdigit() else 1
+                v_str = parts[3] if len(parts) > 3 and parts[3] != '0' else None
+                v_num = int(v_str.split("-")[0]) if v_str and v_str.split("-")[0].isdigit() else (int(v_str) if v_str and v_str.isdigit() else None)
+                
+                if self.tooltip:
+                    self.tooltip.hide()
+                self._hover_comm_ref = None
+                
+                fr_book = REVERSE_BOOK_MAPPING.get(b_code, b_code)
+                
+                # Basculer l'onglet principal vers la lecture si on était dans la recherche
+                if self.main_tabs.get() != "📖 Lecture":
+                    self.main_tabs.set("📖 Lecture")
+                    
+                # Appliquer la navigation proprement vers le livre, chapitre et verset cibles
+                self.apply_book_selection(fr_book, chapter=ch, verse=v_num)
+        except Exception as e:
+            print(f"Erreur clic lien commentaire : {e}")
 
     def display_error(self, message):
         self.loaded_book_code = None

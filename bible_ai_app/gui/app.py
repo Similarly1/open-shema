@@ -198,8 +198,8 @@ class App(ctk.CTk):
         self.center_panel.interlinear_show_strong = new_config.get("interlinear_show_strong", True)
         self.center_panel.save_and_apply_font()
         self.center_panel.refresh_current_view_position()
-        self.right_panel.update_config(new_config)
-        self.right_panel.apply_font(new_config.get("font_family", "Georgia"), new_config.get("font_size", 18))
+        self.center_panel.right_panel.update_config(new_config)
+        self.center_panel.right_panel.apply_font(new_config.get("font_family", "Georgia"), new_config.get("font_size", 18))
 
     def on_import_document(self, doc_name, chunks, metadata, edit_mode=False):
         from gui.library_utils import load_books_metadata, save_books_metadata
