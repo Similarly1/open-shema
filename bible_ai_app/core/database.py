@@ -282,7 +282,7 @@ class VectorDB:
             "metadatas": [item[2] for item in combined]
         }
 
-    def search_semantic(self, query, n_results=5, doc_type=None, embedding_model="gemini-embedding-2"):
+    def search_semantic(self, query, n_results=5, doc_type=None, where_clause=None, embedding_model="gemini-embedding-2"):
         collection = self.get_collection(embedding_model)
         if "infomaniak" in embedding_model or "bge" in embedding_model or "mini_lm" in embedding_model:
             provider = "infomaniak"
@@ -303,8 +303,8 @@ class VectorDB:
         llm = LLMClient(api_key=key, provider=provider, product_id=product_id)
         query_embedding = llm.get_embeddings([query], model=embedding_model)[0]
         
-        where = None
-        if doc_type:
+        where = where_clause
+        if not where and doc_type:
             where = {"type": doc_type}
             
         return collection.query(

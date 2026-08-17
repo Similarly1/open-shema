@@ -169,20 +169,6 @@
     "embedding_model": "study_library",
     "active": true
   },
-  "TOB": {
-    "title": "TOB 2010",
-    "author": "Société Biblique Française / Cerf",
-    "description": "Traduction Œcuménique de la Bible (TOB 2010)",
-    "year": "2010",
-    "cover_path": null,
-    "type": "Bible",
-    "format": "json",
-    "folder_name": "TOB",
-    "version_code": "TOB",
-    "total_books": 82,
-    "embedding_model": "study_library",
-    "active": true
-  },
   "JXLFR": {
     "title": "Juxtalinéaire FR (Xenizo)",
     "author": "Xenizo",
@@ -521,6 +507,20 @@
     "format": "sqlite",
     "commentary_id": "81",
     "chunks_count": 1347,
+    "embedding_model": "study_library",
+    "active": true
+  },
+  "TOB": {
+    "title": "TOB 2010",
+    "author": "Bible. Français. TOB. 1994, Société biblique française",
+    "description": "Traduction Œcuménique de la Bible (TOB 2010)",
+    "year": "1988",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\cover.jpg",
+    "type": "Bible",
+    "format": "json",
+    "folder_name": "TOB",
+    "version_code": "TOB",
+    "total_books": 82,
     "embedding_model": "study_library",
     "active": true
   }

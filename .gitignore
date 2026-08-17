@@ -40,6 +40,8 @@ venv.bak/
 *.rar
 **/commentaires/**/*.json
 **/commentaires/*.db
+**/data/stepbible_raw/
+scratch_*.py
 
 # Configuration and API Keys
 **/data/config.json

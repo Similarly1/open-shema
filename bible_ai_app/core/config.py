@@ -24,6 +24,8 @@ DEFAULTS = {
     "interlinear_show_translit": True,
     "interlinear_show_strong": True,
     "google_books_api_key": "",
+    "metadata_classifier_model": "gemini-2.5-flash-lite",
+    "max_original_verses_for_llm": 10,
 }
 
 def load_config():

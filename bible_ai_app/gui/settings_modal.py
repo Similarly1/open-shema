@@ -378,6 +378,67 @@ class SettingsTab(ctk.CTkScrollableFrame):
         # ==========================================
         # 4. SAUVEGARDE COMPLÈTE
         # ==========================================
+        # 4. LANGUES ORIGINALES & EXÉGÈSE
+        # ==========================================
+        self.sect_orig = ctk.CTkLabel(self, text="📜 Langues Originales & Exégèse (STEPBible)", font=ctk.CTkFont(size=14, weight="bold"), text_color="#3B82F6")
+        self.sect_orig.pack(anchor="w", padx=20, pady=(15, 4))
+        
+        orig_cfg_frame = ctk.CTkFrame(self, fg_color=("#F8FAFC", "#1E293B"), corner_radius=8)
+        orig_cfg_frame.pack(fill="x", padx=20, pady=4)
+        
+        v_orig_row = ctk.CTkFrame(orig_cfg_frame, fg_color="transparent")
+        v_orig_row.pack(fill="x", padx=12, pady=(8, 4))
+        
+        self.lbl_max_orig_v = ctk.CTkLabel(
+            v_orig_row, 
+            text=f"Nombre max de versets originaux envoyés au LLM : {self.config.get('max_original_verses_for_llm', 10)}", 
+            font=ctk.CTkFont(size=12)
+        )
+        self.lbl_max_orig_v.pack(side="left")
+        
+        self.max_orig_verses_var = ctk.IntVar(value=self.config.get("max_original_verses_for_llm", 10))
+        def on_max_orig_change(val):
+            v_int = int(val)
+            self.lbl_max_orig_v.configure(text=f"Nombre max de versets originaux envoyés au LLM : {v_int}")
+            
+        self.max_orig_slider = ctk.CTkSlider(
+            orig_cfg_frame,
+            from_=1,
+            to=30,
+            number_of_steps=29,
+            variable=self.max_orig_verses_var,
+            command=on_max_orig_change
+        )
+        self.max_orig_slider.pack(fill="x", padx=12, pady=(2, 6))
+        
+        from core.original_languages_manager import OriginalLanguagesManager
+        orig_stats = OriginalLanguagesManager.get_instance().get_stats()
+        
+        status_txt = f"✅ Base installée : {orig_stats['total_words']:,} mots (AT Hébreu : {orig_stats['ot_words']:,}, NT Grec : {orig_stats['nt_words']:,})".replace(",", " ") if orig_stats["installed"] else "⚠️ Base non installée"
+        status_col = "#10B981" if orig_stats["installed"] else "#F59E0B"
+        
+        self.lbl_orig_db_status = ctk.CTkLabel(
+            orig_cfg_frame,
+            text=status_txt,
+            font=ctk.CTkFont(size=11, weight="bold"),
+            text_color=status_col
+        )
+        self.lbl_orig_db_status.pack(anchor="w", padx=12, pady=(2, 6))
+        
+        self.btn_download_orig = ctk.CTkButton(
+            orig_cfg_frame,
+            text="📥 Réindexer / Mettre à jour les données STEPBible",
+            font=ctk.CTkFont(size=11, weight="bold"),
+            fg_color=("#0284C7", "#0369A1"),
+            hover_color=("#0369A1", "#075985"),
+            height=28,
+            command=self.on_reindex_orig_db
+        )
+        self.btn_download_orig.pack(anchor="w", padx=12, pady=(0, 8))
+
+        # ==========================================
+        # 5. SAUVEGARDE & RESTAURATION COMPLÈTE
+        # ==========================================
         self.sect_db = ctk.CTkLabel(
             self, text="💾 Sauvegarde & Restauration Complète",
             font=ctk.CTkFont(size=14, weight="bold"), text_color="#3B82F6"
@@ -605,6 +666,8 @@ class SettingsTab(ctk.CTkScrollableFrame):
             
         self.config["rag_enable_curation"] = bool(self.curation_var.get())
         self.config["rag_curation_model"] = self.curation_model_var.get()
+        if hasattr(self, 'max_orig_verses_var'):
+            self.config["max_original_verses_for_llm"] = int(self.max_orig_verses_var.get())
         
         save_config(self.config)
         
@@ -613,6 +676,34 @@ class SettingsTab(ctk.CTkScrollableFrame):
             
         if self.close_callback:
             self.close_callback()
+
+    def on_reindex_orig_db(self):
+        """Lance l'indexation des langues originales en arrière-plan."""
+        self.btn_download_orig.configure(state="disabled", text="⏳ Indexation en cours...")
+        
+        def _task():
+            from core.original_languages_manager import OriginalLanguagesManager
+            mgr = OriginalLanguagesManager.get_instance()
+            
+            def _cb(msg, frac):
+                self.after(0, lambda: self.lbl_orig_db_status.configure(text=f"⏳ [{int(frac*100)}%] {msg}", text_color="#38BDF8"))
+                
+            success = mgr.download_and_import(progress_callback=_cb)
+            if success:
+                st = mgr.get_stats()
+                txt = f"✅ Base installée : {st['total_words']:,} mots (AT : {st['ot_words']:,}, NT : {st['nt_words']:,})".replace(",", " ")
+                self.after(0, lambda: [
+                    self.lbl_orig_db_status.configure(text=txt, text_color="#10B981"),
+                    self.btn_download_orig.configure(state="normal", text="📥 Réindexer / Mettre à jour les données STEPBible"),
+                    messagebox.showinfo("Succès", "La base de données des textes originaux (Hébreu & Grec STEPBible) a été indexée avec succès !")
+                ])
+            else:
+                self.after(0, lambda: [
+                    self.lbl_orig_db_status.configure(text="❌ Erreur lors de l'indexation", text_color="#EF4444"),
+                    self.btn_download_orig.configure(state="normal", text="📥 Réindexer / Mettre à jour les données STEPBible")
+                ])
+                
+        threading.Thread(target=_task, daemon=True).start()
         
     # ------------------------------------------------------------------
     # Sauvegarde complète (export)

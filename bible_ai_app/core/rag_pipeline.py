@@ -15,7 +15,7 @@ class RAGPipeline:
         self.config = config or {}
         self.reranker = LocalReranker.get_instance()
 
-    def retrieve_candidates(self, query: str, top_k: int = 25, embedding_model: str = None, active_sources: list = None) -> list:
+    def retrieve_candidates(self, query: str, top_k: int = 25, embedding_model: str = None, active_sources: list = None, where_clause: dict = None) -> list:
         """
         Étape 1 : Recherche vectorielle dense dans ChromaDB.
         """
@@ -26,6 +26,7 @@ class RAGPipeline:
             results = self.db.search_semantic(
                 query=query, 
                 n_results=top_k, 
+                where_clause=where_clause,
                 embedding_model=embedding_model
             )
         except Exception as e:
@@ -141,11 +142,15 @@ class RAGPipeline:
             
         return documents
 
-    def build_structured_context(self, documents: list, screen_context: str = None) -> str:
+    def build_structured_context(self, documents: list, screen_context: str = None, exegetical_context: str = None) -> str:
         """
-        Formate le contexte extrait de manière hautement structurée avec étiquettes de citation exactes.
+        Formate le contexte extrait de manière hautement structurée avec étiquettes de citation exactes
+        et injection prioritaire du triple bloc exégétique (Texte original, Interlinéaire, Version affichée).
         """
         sections = []
+        
+        if exegetical_context and exegetical_context.strip():
+            sections.append(f"{exegetical_context.strip()}\n")
         
         if screen_context and screen_context.strip():
             sections.append(f"=== CONTEXTE ACTUELLEMENT OUVERT À L'ÉCRAN ===\n{screen_context.strip()}\n")
@@ -197,56 +202,72 @@ class RAGPipeline:
                 except Exception:
                     pass
 
-        # 1a. Récupération vectorielle
-        _notify("retrieval", "Recherche dans la bibliothèque...", "running")
+        # 1a. Détection du contexte et scope vectoriel (Le "Tri-Flux")
+        where_clause = None
+        b_code = None
+        if active_location:
+            book = active_location.get("book")
+            if book:
+                from core.reference_parser import get_standard_book_code
+                from core.search_engine import CORPUS_DEFINITIONS
+                b_code = get_standard_book_code(book)
+                
+                # Déduire le corpus (NT ou OT) pour le filtrage thématique (Flux 3)
+                corpus_scope = "GLOBAL"
+                for scope, (desc, books) in CORPUS_DEFINITIONS.items():
+                    if scope in ["OT", "NT"] and b_code in books:
+                        corpus_scope = scope
+                        break
+                where_clause = {"corpus_scope": {"$in": [corpus_scope, "GLOBAL", "BOTH"]}}
+
+        _notify("retrieval", "Recherche hybride dans la bibliothèque...", "running")
         t_retrieval_0 = time.time()
+        
+        # Flux 3 (Thématique / Vectoriel Filtré)
         raw_candidates = self.retrieve_candidates(
             query=query, 
             top_k=top_k_raw, 
             embedding_model=embedding_model,
-            active_sources=active_sources
+            active_sources=active_sources,
+            where_clause=where_clause
         )
 
-        # 1b. Récupération Relationnelle Exacte (SQLite)
-        if active_location:
-            book = active_location.get("book")
+        # 1b. Récupération Relationnelle Exacte & Intro (Flux 1 & 2)
+        if active_location and b_code:
             ch = active_location.get("chapter")
             v = active_location.get("verse")
-            if book:
-                from core.commentary_loader import CommentaryLoader
-                from core.reference_parser import get_standard_book_code
-                b_code = get_standard_book_code(book)
-                
-                # Récupérer l'introduction (chapitre 0)
-                intro_results = CommentaryLoader.get_all_comments_for_passage(b_code, 0, 0)
-                if intro_results and intro_results.get("documents"):
-                    for i, doc in enumerate(intro_results["documents"]):
-                        # Filtrer si on a des active_sources
-                        meta = intro_results["metadatas"][i]
+            from core.commentary_loader import CommentaryLoader
+            
+            # Récupérer l'introduction (chapitre 0)
+            intro_results = CommentaryLoader.get_all_comments_for_passage(b_code, 0, 0)
+            if intro_results and intro_results.get("documents"):
+                for i, doc in enumerate(intro_results["documents"]):
+                    # Filtrer si on a des active_sources
+                    meta = intro_results["metadatas"][i]
+                    if active_sources and meta.get("name") not in active_sources:
+                        continue
+                    raw_candidates.append({
+                        "id": intro_results["ids"][i],
+                        "text": doc,
+                        "metadata": meta,
+                        "vector_score": 1.0  # Max score pour forcer le Reranker à l'évaluer en priorité
+                    })
+                    
+            # Récupérer les commentaires du verset exact
+            if ch is not None:
+                v_num = int(v) if v and str(v) != "Tous" and str(v).isdigit() else None
+                exact_results = CommentaryLoader.get_all_comments_for_passage(b_code, ch, v_num)
+                if exact_results and exact_results.get("documents"):
+                    for i, doc in enumerate(exact_results["documents"]):
+                        meta = exact_results["metadatas"][i]
                         if active_sources and meta.get("name") not in active_sources:
                             continue
                         raw_candidates.append({
-                            "id": intro_results["ids"][i],
+                            "id": exact_results["ids"][i],
                             "text": doc,
                             "metadata": meta,
-                            "vector_score": 1.0  # Max score pour forcer le Reranker à l'évaluer en priorité
+                            "vector_score": 1.0
                         })
-                        
-                # Récupérer les commentaires du verset exact
-                if ch is not None:
-                    v_num = int(v) if v and str(v) != "Tous" and str(v).isdigit() else None
-                    exact_results = CommentaryLoader.get_all_comments_for_passage(b_code, ch, v_num)
-                    if exact_results and exact_results.get("documents"):
-                        for i, doc in enumerate(exact_results["documents"]):
-                            meta = exact_results["metadatas"][i]
-                            if active_sources and meta.get("name") not in active_sources:
-                                continue
-                            raw_candidates.append({
-                                "id": exact_results["ids"][i],
-                                "text": doc,
-                                "metadata": meta,
-                                "vector_score": 1.0
-                            })
                             
                     # Récupérer le lexique Strong (Hébreu / Grec) pour le verset
                     if v_num is not None:
@@ -297,7 +318,70 @@ class RAGPipeline:
 
         # 4. Assemblage du contexte et Rédaction finale LLM
         _notify("writing", "Rédaction de l'analyse exégétique...", "running")
-        structured_context = self.build_structured_context(final_docs, screen_context=screen_context)
+        
+        # Construction du contexte exégétique (Langues originales + Interlinéaire inversé + Version affichée)
+        exegetical_context = ""
+        try:
+            from core.original_languages_manager import OriginalLanguagesManager
+            orig_mgr = OriginalLanguagesManager.get_instance()
+            if orig_mgr.is_installed():
+                max_orig_verses = int(self.config.get("max_original_verses_for_llm", 10))
+                
+                target_book = None
+                target_chap = None
+                target_v_start = 1
+                target_v_end = 1
+                
+                if active_location and b_code:
+                    target_book = b_code
+                    target_chap = active_location.get("chapter", 1)
+                    v_val = active_location.get("verse")
+                    if v_val and str(v_val) != "Tous" and str(v_val).isdigit():
+                        target_v_start = int(v_val)
+                        target_v_end = int(v_val)
+                    else:
+                        target_v_start = 1
+                        target_v_end = max_orig_verses
+                else:
+                    from core.reference_parser import parse_references
+                    detected_refs = parse_references(query)
+                    if detected_refs:
+                        ref_info = detected_refs[0]
+                        target_book = ref_info.get("book_code")
+                        target_chap = ref_info.get("chapter", 1)
+                        v_s = ref_info.get("verse_start")
+                        v_e = ref_info.get("verse_end")
+                        target_v_start = v_s if v_s else 1
+                        target_v_end = v_e if v_e else (v_s if v_s else max_orig_verses)
+                        
+                if target_book and target_chap:
+                    displayed_ver_name = self.config.get("bible_version", "Version affichée")
+                    exegetical_context = orig_mgr.get_passage_original_block(
+                        book_code=target_book,
+                        chapter=target_chap,
+                        start_verse=target_v_start,
+                        end_verse=target_v_end,
+                        max_verses=max_orig_verses,
+                        displayed_version_name=displayed_ver_name
+                    )
+        except Exception as e:
+            print(f"[RAGPipeline] Erreur construction contexte exégétique original : {e}")
+
+        structured_context = self.build_structured_context(
+            final_docs, 
+            screen_context=screen_context, 
+            exegetical_context=exegetical_context
+        )
+        
+        if not system_prompt:
+            system_prompt = (
+                "Vous êtes un assistant théologique et exégète biblique expert de haut niveau.\n"
+                "Pour vos analyses, appuyez-vous rigoureusement sur les informations fournies dans le contexte :\n"
+                "- Exploitez le texte original (Hébreu pour l'Ancien Testament, Grec pour le Nouveau Testament), les lemmes, les racines et la morphologie grammaticale (aspects verbaux, voix, modes, temps, cas) pour expliciter les nuances théologiques et littérales.\n"
+                "- Reliez ces nuances à la traduction française et à l'interlinéaire inversé Segond 1910.\n"
+                "- Citez les sources théologiques de la bibliothèque lorsque pertinent.\n"
+                "- Répondez avec clarté, profondeur et rigueur académique."
+            )
         
         selected_model = chat_model or self.config.get("chat_model", "gemini-3.7-flash")
         provider = "infomaniak" if ("infomaniak" in selected_model.lower() or "ministral" in selected_model.lower() or "qwen" in selected_model.lower()) else ("mistral" if "mistral" in selected_model else "gemini")

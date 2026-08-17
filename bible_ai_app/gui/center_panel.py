@@ -1,11 +1,12 @@
 import customtkinter as ctk
 import re
 import difflib
+from typing import Optional, Dict, Any, List
 from core.config import save_config
 from core.reference_parser import get_french_book_name, parse_smart_book_input, resolve_book_input, strip_accents, normalize_reference, REVERSE_BOOK_MAPPING
 from core.strong_lexicon import StrongLexicon
 from core.dictionary_manager import DictionaryManager
-from gui.tooltip import BibleTooltip
+from gui.tooltip import BibleTooltip, WidgetTooltip
 from gui.bible_picker_popover import BiblePickerPopover, get_bible_cover_image, BIBLE_STYLE_MAP
 
 BOOKS_OT = [
@@ -279,8 +280,43 @@ class CenterPanel(ctk.CTkFrame):
         )
         self.verse_menu.pack(side="left", padx=2)
         
+        # Boutons Verset Précédent / Verset Suivant
+        self.btn_prev_verse = ctk.CTkButton(
+            self.breadcrumb_frame,
+            text="▲",
+            width=26,
+            height=28,
+            font=ctk.CTkFont(size=11, weight="bold"),
+            fg_color=("#E2E8F0", "#1E293B"),
+            hover_color=("#CBD5E1", "#334155"),
+            text_color=("#0F172A", "#F8FAFC"),
+            border_width=1,
+            border_color=("#94A3B8", "#475569"),
+            corner_radius=6,
+            command=self.nav_prev_verse
+        )
+        self.btn_prev_verse.pack(side="left", padx=(3, 1))
+        WidgetTooltip(self.btn_prev_verse, "Verset précédent (Flèche ↑)")
+        
+        self.btn_next_verse = ctk.CTkButton(
+            self.breadcrumb_frame,
+            text="▼",
+            width=26,
+            height=28,
+            font=ctk.CTkFont(size=11, weight="bold"),
+            fg_color=("#E2E8F0", "#1E293B"),
+            hover_color=("#CBD5E1", "#334155"),
+            text_color=("#0F172A", "#F8FAFC"),
+            border_width=1,
+            border_color=("#94A3B8", "#475569"),
+            corner_radius=6,
+            command=self.nav_next_verse
+        )
+        self.btn_next_verse.pack(side="left", padx=(1, 5))
+        WidgetTooltip(self.btn_next_verse, "Verset suivant (Flèche ↓)")
+        
         self.sep3 = ctk.CTkLabel(self.breadcrumb_frame, text=" | ", text_color="#888888")
-        self.sep3.pack(side="left", padx=10)
+        self.sep3.pack(side="left", padx=6)
         
         self.compare_switch = ctk.CTkSwitch(
             self.breadcrumb_frame, 
@@ -315,6 +351,24 @@ class CenterPanel(ctk.CTkFrame):
             corner_radius=6
         )
         self.btn_ref_bible.pack(side="left", padx=5)
+        
+        # Bouton Loupe (🔍) pour afficher/masquer l'espace de recherche (Ctrl+F)
+        self.btn_search_toggle = ctk.CTkButton(
+            self.breadcrumb_frame,
+            text="🔍",
+            width=32,
+            height=28,
+            font=ctk.CTkFont(size=13),
+            fg_color=("#E2E8F0", "#1E293B"),
+            hover_color=("#CBD5E1", "#334155"),
+            text_color=("#0F172A", "#F8FAFC"),
+            border_width=1,
+            border_color=("#94A3B8", "#475569"),
+            corner_radius=6,
+            command=self.toggle_search_tab
+        )
+        self.btn_search_toggle.pack(side="left", padx=3)
+        WidgetTooltip(self.btn_search_toggle, "Rechercher dans la Bible & Bibliothèque (Ctrl+F)")
         
         # Zone des Modes de Vue (Plein Écran & Pleine Largeur) - TOUJOURS VISIBLE À DROITE
         self.view_modes_frame = ctk.CTkFrame(self.breadcrumb_frame, fg_color="transparent")
@@ -608,6 +662,64 @@ class CenterPanel(ctk.CTkFrame):
         )
         self.lex_ai_btn.pack(fill="x")
         
+        # 4. Langues Originales (inside tab_orig)
+        self.tab_orig = self.right_tabs.add("📜 Langues Originales")
+        
+        self.orig_top_bar = ctk.CTkFrame(self.tab_orig, fg_color=("gray92", "#1E293B"), corner_radius=6, height=34)
+        self.orig_top_bar.pack(fill="x", padx=2, pady=(2, 6))
+        
+        self.lbl_orig_title = ctk.CTkLabel(
+            self.orig_top_bar, 
+            text="📜 Texte Original & Interlinéaire", 
+            font=ctk.CTkFont(size=12, weight="bold"),
+            text_color=("#4F46E5", "#818CF8")
+        )
+        self.lbl_orig_title.pack(side="left", padx=(8, 4))
+        
+        self.lbl_orig_verse_badge = ctk.CTkLabel(
+            self.orig_top_bar, 
+            text="V. 1", 
+            font=ctk.CTkFont(size=11, weight="bold"), 
+            width=50
+        )
+        self.lbl_orig_verse_badge.pack(side="right", padx=(0, 8))
+        
+        self.orig_textbox = ctk.CTkTextbox(
+            self.tab_orig, 
+            wrap="word", 
+            fg_color=("#FAFAFA", "#1E1E1E"), 
+            text_color=("#1A1A1A", "#E2E8F0")
+        )
+        self.orig_textbox.pack(fill="both", expand=True, padx=2, pady=(2, 5))
+        self.orig_textbox.configure(state="disabled")
+        
+        self.orig_textbox._textbox.bind("<Motion>", self.on_orig_mouse_motion)
+        self.orig_textbox._textbox.bind("<Leave>", self.on_orig_mouse_leave)
+        self.orig_textbox._textbox.bind("<Button-1>", self.on_orig_mouse_click, add="+")
+        
+        self.orig_action_frame = ctk.CTkFrame(self.tab_orig, fg_color="transparent")
+        self.orig_action_frame.pack(fill="x", padx=2, pady=(0, 2))
+        
+        self.orig_ai_btn = ctk.CTkButton(
+            self.orig_action_frame, 
+            text="🤖 Analyser ce verset original avec l'IA", 
+            command=self.on_analyze_orig_with_ai, 
+            height=32,
+            font=ctk.CTkFont(size=12, weight="bold")
+        )
+        self.orig_ai_btn.pack(fill="x")
+        
+        self._orig_words_map = {}
+        self._last_orig_hover_tag = None
+        self._orig_tooltip_job = None
+        
+        # Liaison directe des touches de navigation pour tous les textboxes de lecture
+        for tb in [self.bible_textbox._textbox, self.comm_textbox._textbox, self.lex_textbox._textbox, self.orig_textbox._textbox]:
+            tb.bind("<Down>", lambda e: (self.nav_next_verse(), "break")[1])
+            tb.bind("<Up>", lambda e: (self.nav_prev_verse(), "break")[1])
+            tb.bind("<Right>", lambda e: (self.nav_next_chapter(), "break")[1])
+            tb.bind("<Left>", lambda e: (self.nav_prev_chapter(), "break")[1])
+        
         self.current_reference = ""
         self.current_results = None
         
@@ -704,14 +816,21 @@ class CenterPanel(ctk.CTkFrame):
                     tb.tag_remove("hover_dict_highlight", "1.0", "end")
                     tb.tag_add("hover_dict_highlight", start_idx, end_idx)
                     tb.configure(cursor="hand2")
-                    self._hover_match = (match, start_idx, end_idx)
-                    
+                    bb = tb.bbox(start_idx)
+                    if bb:
+                        bx, by, bw, bh = bb
+                        root_x = tb.winfo_rootx() + bx
+                        root_y = tb.winfo_rooty() + by
+                        target_rect = (root_x, root_y, bw, bh)
+                    else:
+                        target_rect = (event.x_root, event.y_root, 20, 20)
+                        
                     if self.tooltip._after_id:
                         try:
                             self.after_cancel(self.tooltip._after_id)
                         except Exception:
                             pass
-                    self.tooltip._after_id = self.after(140, lambda x=event.x_root, y=event.y_root, m=match: self.tooltip.show(x, y, m))
+                    self.tooltip._after_id = self.after(140, lambda x=event.x_root, y=event.y_root, m=match, tr=target_rect: self.tooltip.show(x, y, m, target_rect=tr))
             else:
                 self._clear_hover()
         except Exception:
@@ -877,6 +996,198 @@ class CenterPanel(ctk.CTkFrame):
                 f"« {term} » dans le contexte de {ref_str} ?"
             )
             
+        self.right_tabs.set("🤖 Assistant IA")
+        if hasattr(self, 'right_panel') and hasattr(self.right_panel, 'send_custom_prompt'):
+            self.right_panel.send_custom_prompt(prompt)
+
+    def sync_original_tab_to_verse(self, chapter, verse):
+        """Met à jour le contenu de l'onglet Langues Originales pour le verset actif."""
+        ch = int(chapter) if str(chapter).isdigit() else 1
+        v = int(verse) if str(verse).isdigit() and str(verse) != "0" else 1
+        if hasattr(self, 'lbl_orig_verse_badge'):
+            self.lbl_orig_verse_badge.configure(text=f"V. {v}")
+        self.render_original_languages_view()
+
+    def render_original_languages_view(self):
+        """Rend le texte original (Hébreu/Grec) avec balises interactives et décomposition exégétique."""
+        if not hasattr(self, 'orig_textbox'):
+            return
+            
+        cur_book = self.loaded_french_book or self.current_valid_book or self.book_var.get()
+        if not cur_book:
+            return
+            
+        from core.reference_parser import get_standard_book_code
+        from core.original_languages_manager import OriginalLanguagesManager
+        
+        b_code = get_standard_book_code(cur_book)
+        ch = getattr(self, 'current_active_chapter', 1)
+        v = getattr(self, 'current_active_verse', 1)
+        if v == 0:
+            v = 1
+            
+        orig_mgr = OriginalLanguagesManager.get_instance()
+        words = orig_mgr.get_verse_original_words(b_code, ch, v)
+        rev_interlinear = orig_mgr.get_verse_reverse_interlinear(b_code, ch, v)
+        
+        self.orig_textbox.configure(state="normal")
+        self.orig_textbox.delete("0.0", "end")
+        self._orig_words_map.clear()
+        
+        if not words:
+            self.orig_textbox.insert("end", f"\nDonnées originales non disponibles pour {cur_book} {ch}:{v}.\n", "welcome")
+            if not orig_mgr.is_installed():
+                self.orig_textbox.insert("end", "\nPour installer la base originale (STEPBible), rendez-vous dans les Réglages pour télécharger les données.\n", "body")
+            self.orig_textbox.configure(state="disabled")
+            return
+            
+        is_hebrew = words[0]["lang"] == "hebrew"
+        lang_label = "Hébreu (Ancien Testament - WLC)" if is_hebrew else "Grec (Nouveau Testament - NA28/SBLGNT)"
+        
+        # En-tête
+        self.orig_textbox.insert("end", f"📜 {cur_book} {ch}:{v}\n", "book_title")
+        self.orig_textbox.insert("end", f"Édition : {lang_label}\n\n", "source_name")
+        
+        # Verset complet dans la langue originale avec tags interactifs mot par mot
+        for i, w in enumerate(words):
+            tag_name = f"orig_w_{i}"
+            self._orig_words_map[tag_name] = w
+            self.orig_textbox.insert("end", f"{w['text']} ", (tag_name, "orig_word"))
+        self.orig_textbox.insert("end", "\n\n", "body")
+            
+        # Séparateur
+        self.orig_textbox.insert("end", "─" * 36 + "\n\n", "chapter_divider")
+        
+        # Interlinéaire inversé Segond 1910
+        if rev_interlinear:
+            self.orig_textbox.insert("end", "📖 Segond 1910 (Interlinéaire Inversé) :\n", "comm_section_title")
+            self.orig_textbox.insert("end", f"{rev_interlinear}\n\n", "comm_body")
+            self.orig_textbox.insert("end", "─" * 36 + "\n\n", "chapter_divider")
+            
+        # Décomposition mot-à-mot
+        self.orig_textbox.insert("end", "🔍 Décomposition Mot-à-Mot & Morphologie :\n\n", "comm_section_title")
+        for i, w in enumerate(words, 1):
+            tag_name = f"orig_w_{i-1}"
+            trans = f" ({w['transliteration']})" if w['transliteration'] else ""
+            self.orig_textbox.insert("end", f"• {i}. {w['text']}{trans}\n", "orig_word")
+            
+            lemma_str = f"Lemme : {w['lemma']}" if w['lemma'] else ""
+            strong_str = f"Strong : {w['strong']}" if w['strong'] else ""
+            hdr_parts = [p for p in [lemma_str, strong_str] if p]
+            if hdr_parts:
+                self.orig_textbox.insert("end", f"   {' | '.join(hdr_parts)}\n", "logos_lemma")
+                
+            if w.get('morph_desc_fr') or w.get('morph_code'):
+                morph_txt = w.get('morph_desc_fr') or w.get('morph_code')
+                self.orig_textbox.insert("end", f"   Morphologie : {morph_txt}\n", "orig_morph")
+                
+            if w.get('gloss'):
+                self.orig_textbox.insert("end", f"   Sens littéral : \"{w['gloss']}\"\n", "orig_gloss")
+                
+            if w.get('strong_def_fr'):
+                s_def = w['strong_def_fr']
+                if len(s_def) > 100:
+                    s_def = s_def[:100].strip() + "..."
+                self.orig_textbox.insert("end", f"   Définition : {s_def}\n", "lex_details")
+                
+            self.orig_textbox.insert("end", "\n", "body")
+            
+        self.orig_textbox.configure(state="disabled")
+
+    def on_orig_mouse_motion(self, event):
+        """Gère le survol des mots dans le panneau de langues originales."""
+        try:
+            index_at_mouse = self.orig_textbox._textbox.index(f"@{event.x},{event.y}")
+            tags = self.orig_textbox._textbox.tag_names(index_at_mouse)
+            
+            orig_tag = None
+            for t in tags:
+                if t.startswith("orig_w_") and t in self._orig_words_map:
+                    orig_tag = t
+                    break
+                    
+            if orig_tag:
+                if self._last_orig_hover_tag != orig_tag:
+                    self._last_orig_hover_tag = orig_tag
+                    w = self._orig_words_map[orig_tag]
+                    lang_title = "Hébreu (WLC)" if w["lang"] == "hebrew" else "Grec (NA28)"
+                    
+                    tooltip_data = {
+                        "source": f"📜 {lang_title} • {w.get('strong', '')}",
+                        "title": f"{w.get('text', '')} ({w.get('transliteration', '')})" if w.get('transliteration') else w.get('text', ''),
+                        "preview": (
+                            f"• Lemme : {w.get('lemma', '')}\n"
+                            f"• Morphologie : {w.get('morph_desc_fr') or w.get('morph_code', '')}\n"
+                            f"• Sens : \"{w.get('gloss', '')}\"\n"
+                            f"• Définition Strong : {w.get('strong_def_fr', '')}"
+                        ),
+                        "hint": "🔍 Cliquer pour explorer ce mot dans le lexique"
+                    }
+                    
+                    bb = self.orig_textbox._textbox.bbox(index_at_mouse)
+                    if bb:
+                        bx, by, bw, bh = bb
+                        root_x = self.orig_textbox._textbox.winfo_rootx() + bx
+                        root_y = self.orig_textbox._textbox.winfo_rooty() + by
+                        target_rect = (root_x, root_y, bw, bh)
+                    else:
+                        root_x = self.orig_textbox._textbox.winfo_rootx() + event.x
+                        root_y = self.orig_textbox._textbox.winfo_rooty() + event.y
+                        target_rect = (root_x, root_y, 20, 20)
+                        
+                    if hasattr(self, '_orig_tooltip_job') and self._orig_tooltip_job:
+                        try:
+                            self.after_cancel(self._orig_tooltip_job)
+                        except Exception:
+                            pass
+                    self._orig_tooltip_job = self.after(90, lambda rx=root_x, ry=root_y, td=tooltip_data, tr=target_rect: self.tooltip.show(rx, ry, td, target_rect=tr))
+                    self.orig_textbox._textbox.config(cursor="hand2")
+            else:
+                self.on_orig_mouse_leave()
+        except Exception:
+            pass
+
+    def on_orig_mouse_leave(self, event=None):
+        """Ferme l'infobulle lors de la sortie de la zone originale."""
+        if hasattr(self, '_orig_tooltip_job') and self._orig_tooltip_job:
+            try:
+                self.after_cancel(self._orig_tooltip_job)
+            except Exception:
+                pass
+            self._orig_tooltip_job = None
+        self._last_orig_hover_tag = None
+        if hasattr(self, 'tooltip'):
+            self.tooltip.hide()
+        if hasattr(self, 'orig_textbox') and self.orig_textbox._textbox.winfo_exists():
+            self.orig_textbox._textbox.config(cursor="")
+
+    def on_orig_mouse_click(self, event):
+        """Ouvre le mot Strong cliqué dans l'onglet Lexique."""
+        try:
+            index_at_mouse = self.orig_textbox._textbox.index(f"@{event.x},{event.y}")
+            tags = self.orig_textbox._textbox.tag_names(index_at_mouse)
+            
+            for t in tags:
+                if t.startswith("orig_w_") and t in self._orig_words_map:
+                    w = self._orig_words_map[t]
+                    strong_code = w.get("strong")
+                    if strong_code:
+                        match = {"code": strong_code, "strong": strong_code, "word": w.get("text")}
+                        self.right_tabs.set("🔍 Lexique & Dictionnaires")
+                        self.display_dictionary_entry(match)
+                    break
+        except Exception:
+            pass
+
+    def on_analyze_orig_with_ai(self):
+        """Lance une analyse exégétique ciblée sur le verset original."""
+        cur_book = self.loaded_french_book or self.current_valid_book or self.book_var.get()
+        ch = getattr(self, 'current_active_chapter', 1)
+        v = getattr(self, 'current_active_verse', 1)
+        if v == 0:
+            v = 1
+            
+        prompt = f"Peux-tu faire une analyse exégétique approfondie de {cur_book} {ch}:{v} en t'appuyant sur le texte original (vocabulaire, morphologie et syntaxe) ?"
         self.right_tabs.set("🤖 Assistant IA")
         if hasattr(self, 'right_panel') and hasattr(self.right_panel, 'send_custom_prompt'):
             self.right_panel.send_custom_prompt(prompt)
@@ -1296,16 +1607,18 @@ class CenterPanel(ctk.CTkFrame):
         code = FRENCH_TO_CODE.get(book_name, "Joh")
         ch_count = CODE_TO_CH_COUNT.get(code, 1)
         
+        ch_val = int(chapter) if chapter and str(chapter).isdigit() else 1
+        v_val = int(verse) if verse and str(verse).isdigit() else 1
+        self.current_active_chapter = ch_val
+        self.current_active_verse = v_val
+        
         # Si le même livre est déjà affiché dans le lecteur continu, on scrolle directement
         if self.loaded_book_code == code:
             self.is_updating_breadcrumb = True
             try:
                 ch_values = [str(x) for x in range(1, ch_count + 1)]
                 self.chapter_menu.configure(values=ch_values)
-                if chapter and str(chapter).isdigit() and 1 <= int(chapter) <= ch_count:
-                    self.chapter_var.set(str(chapter))
-                else:
-                    self.chapter_var.set("1")
+                self.chapter_var.set(str(ch_val))
                     
                 if verse:
                     self.verse_var.set(str(verse))
@@ -1314,20 +1627,14 @@ class CenterPanel(ctk.CTkFrame):
             finally:
                 self.is_updating_breadcrumb = False
                 
-            ch_target = int(self.chapter_var.get()) if self.chapter_var.get().isdigit() else 1
-            v_target = int(verse) if verse and str(verse).isdigit() else None
-            self.scroll_to_ref(ch_target, v_target)
+            self.scroll_to_ref(ch_val, v_val if verse else None)
             return
             
         self.is_updating_breadcrumb = True
         try:
             ch_values = [str(x) for x in range(1, ch_count + 1)]
             self.chapter_menu.configure(values=ch_values)
-            
-            if chapter and str(chapter).isdigit() and 1 <= int(chapter) <= ch_count:
-                self.chapter_var.set(str(chapter))
-            else:
-                self.chapter_var.set("1")
+            self.chapter_var.set(str(ch_val))
                 
             if verse:
                 self.verse_menu.configure(values=["Tous", str(verse)])
@@ -1476,6 +1783,8 @@ class CenterPanel(ctk.CTkFrame):
                 self.btn_comm_intro.configure(text="📖 Intro", fg_color="transparent", text_color=("#64748B", "#94A3B8"))
             
         self.render_commentaries_view()
+        if hasattr(self, 'sync_original_tab_to_verse'):
+            self.sync_original_tab_to_verse(ch, v)
 
     def scroll_to_ref(self, chapter, verse=None):
         """Positionne instantanément le défilement de la Bible TOUT EN HAUT de la fenêtre sur le verset ou chapitre demandé."""
@@ -1494,7 +1803,11 @@ class CenterPanel(ctk.CTkFrame):
             
         if pos:
             # Positionne le verset/chapitre TOUT EN HAUT de la fenêtre de lecture
+            self.bible_textbox._textbox.see(pos[0])
             self.bible_textbox._textbox.yview(pos[0])
+            self.bible_textbox._textbox.tag_remove("active_verse_highlight", "1.0", "end")
+            if len(pos) >= 2:
+                self.bible_textbox._textbox.tag_add("active_verse_highlight", pos[0], pos[1])
             
         v_num = int(verse) if verse and str(verse).isdigit() else 1
         if self.is_commentary_locked:
@@ -1553,11 +1866,14 @@ class CenterPanel(ctk.CTkFrame):
             self.right_tabs.grid(row=1, column=1, sticky="nsew", padx=(5, 10), pady=(0, 10))
 
     def open_closable_tab(self, tab_name, TabContentClass, **kwargs):
+        if not hasattr(self, '_open_tab_instances'):
+            self._open_tab_instances = {}
+            
         try:
             self.main_tabs.tab(tab_name)
             self.main_tabs.set(tab_name)
             self.set_full_width_mode(True)
-            return
+            return self._open_tab_instances.get(tab_name)
         except ValueError:
             pass
             
@@ -1582,8 +1898,15 @@ class CenterPanel(ctk.CTkFrame):
         
         content = TabContentClass(new_tab, close_callback=lambda: self.close_tab(tab_name), **kwargs)
         content.pack(fill="both", expand=True)
+        self._open_tab_instances[tab_name] = content
+        return content
         
     def close_tab(self, tab_name):
+        if hasattr(self, '_open_tab_instances') and tab_name in self._open_tab_instances:
+            try:
+                del self._open_tab_instances[tab_name]
+            except Exception:
+                pass
         try:
             self.main_tabs.delete(tab_name)
         except ValueError:
@@ -1593,6 +1916,78 @@ class CenterPanel(ctk.CTkFrame):
         cur = self.main_tabs.get()
         if cur == "📖 Lecture":
             self.set_full_width_mode(self.bible_full_width)
+
+    def toggle_search_tab(self, initial_query=None):
+        """Affiche ou masque l'espace de recherche (Ctrl+F)."""
+        tab_name = "🔍 Recherche"
+        try:
+            cur = self.main_tabs.get()
+        except Exception:
+            cur = ""
+
+        # Si l'onglet recherche est déjà sélectionné, on le ferme et on revient à la lecture
+        if cur == tab_name:
+            self.close_tab(tab_name)
+            try:
+                self.main_tabs.set("📖 Lecture")
+            except Exception:
+                pass
+            return
+
+        from gui.search_tab import SearchTab
+        search_instance = self.open_closable_tab(
+            tab_name,
+            SearchTab,
+            current_bible=self.ref_bible_var.get(),
+            on_navigate_callback=self.navigate_from_search
+        )
+        if search_instance:
+            if initial_query:
+                search_instance.set_query_and_search(initial_query)
+            else:
+                self.after(50, search_instance.focus_search)
+
+    def navigate_from_search(self, book_code: str, chapter: int, verse: Optional[int] = None):
+        """Bascule vers le lecteur biblique et scrolle directement au verset avec surbrillance."""
+        # 1. Revenir à l'onglet Lecture
+        try:
+            self.main_tabs.set("📖 Lecture")
+        except Exception:
+            pass
+        if not self.is_immersive_mode:
+            self.set_full_width_mode(self.bible_full_width)
+
+        fr_name = CODE_TO_FRENCH.get(book_code, book_code)
+        self.apply_book_selection(fr_name, chapter=chapter, verse=verse)
+        self.after(300, lambda: self.flash_verse_highlight(chapter, verse))
+
+    def flash_verse_highlight(self, chapter: int, verse: Optional[int] = None):
+        """Met en valeur visuelle temporaire le verset ciblé (flash doux)."""
+        if verse is None:
+            return
+        try:
+            tb = self.bible_textbox._textbox
+            tag = f"ref_{chapter}_{verse}"
+            ranges = tb.tag_ranges(tag)
+            if not ranges:
+                return
+
+            is_dark = (ctk.get_appearance_mode() == "Dark")
+            flash_bg = "#854D0E" if is_dark else "#FEF08A"
+            flash_fg = "#FEF9C3" if is_dark else "#713F12"
+
+            tb.tag_config("search_flash", background=flash_bg, foreground=flash_fg)
+            tb.tag_add("search_flash", ranges[0], ranges[1])
+
+            def _clear_flash():
+                try:
+                    tb.tag_remove("search_flash", "1.0", "end")
+                except Exception:
+                    pass
+
+            self.after(2500, _clear_flash)
+        except Exception:
+            pass
 
     def show_progress(self, message, percentage=0):
         if not self.progress_frame.winfo_ismapped():
@@ -1657,6 +2052,11 @@ class CenterPanel(ctk.CTkFrame):
         textboxes_to_update = [self.bible_textbox, self.comm_textbox]
         if hasattr(self, 'lex_textbox'):
             textboxes_to_update.append(self.lex_textbox)
+        if hasattr(self, 'orig_textbox'):
+            textboxes_to_update.append(self.orig_textbox)
+            self.orig_textbox._textbox.tag_configure("orig_word", font=(self.font_family, self.font_size + 2, "bold"), foreground="#60A5FA" if is_dark else "#2563EB")
+            self.orig_textbox._textbox.tag_configure("orig_gloss", font=(self.font_family, max(9, self.font_size - 2), "italic"), foreground=verse_num_col)
+            self.orig_textbox._textbox.tag_configure("orig_morph", font=(self.font_family, max(9, self.font_size - 3)), foreground="#10B981" if is_dark else "#059669")
             
         for box in textboxes_to_update:
             box._textbox.tag_configure("title", font=(self.font_family, self.font_size + 4, "bold"), foreground=title_col, justify="center", spacing3=15)
@@ -1703,6 +2103,7 @@ class CenterPanel(ctk.CTkFrame):
         hover_bg = "#1E3A8A" if is_dark else "#E0F2FE"
         hover_fg = "#38BDF8" if is_dark else "#0284C7"
         self.bible_textbox._textbox.tag_configure("hover_dict_highlight", background=hover_bg, foreground=hover_fg, underline=True)
+        self.bible_textbox._textbox.tag_configure("active_verse_highlight", background="#1E293B" if is_dark else "#F1F5F9")
 
     def display_welcome(self):
         textboxes_to_clear = [self.bible_textbox, self.comm_textbox]
@@ -1773,6 +2174,165 @@ class CenterPanel(ctk.CTkFrame):
         else:
             if hasattr(self.master, 'on_reference_change'):
                 self.master.on_reference_change()
+
+    def nav_next_verse(self):
+        """Passe au verset suivant (ou chapitre/livre suivant si fin de chapitre)."""
+        cur_book = self.loaded_french_book or self.current_valid_book or self.book_var.get()
+        if not cur_book:
+            return
+            
+        from core.reference_parser import get_standard_book_code
+        from core.original_languages_manager import OriginalLanguagesManager
+        
+        b_code = get_standard_book_code(cur_book)
+        ch_count = CODE_TO_CH_COUNT.get(b_code, 1)
+        ch = int(self.chapter_var.get()) if self.chapter_var.get().isdigit() else 1
+        
+        v = getattr(self, 'current_active_verse', 1)
+        if self.verse_var.get().isdigit():
+            v = int(self.verse_var.get())
+        if v == 0:
+            v = 1
+            
+        orig_mgr = OriginalLanguagesManager.get_instance()
+        max_v = orig_mgr.get_chapter_verse_count(b_code, ch)
+        
+        target_book = cur_book
+        target_ch = ch
+        target_v = v + 1
+        
+        if target_v > max_v:
+            if ch < ch_count:
+                target_ch = ch + 1
+                target_v = 1
+            else:
+                if cur_book in self.all_book_names:
+                    idx = self.all_book_names.index(cur_book)
+                    if idx + 1 < len(self.all_book_names):
+                        target_book = self.all_book_names[idx + 1]
+                        target_ch = 1
+                        target_v = 1
+                    else:
+                        return
+                        
+        self._navigate_to_passage(target_book, target_ch, target_v)
+
+    def nav_prev_verse(self):
+        """Passe au verset précédent (ou chapitre/livre précédent si verset 1)."""
+        cur_book = self.loaded_french_book or self.current_valid_book or self.book_var.get()
+        if not cur_book:
+            return
+            
+        from core.reference_parser import get_standard_book_code
+        from core.original_languages_manager import OriginalLanguagesManager
+        
+        b_code = get_standard_book_code(cur_book)
+        ch = int(self.chapter_var.get()) if self.chapter_var.get().isdigit() else 1
+        
+        v = getattr(self, 'current_active_verse', 1)
+        if self.verse_var.get().isdigit():
+            v = int(self.verse_var.get())
+        if v == 0:
+            v = 1
+            
+        orig_mgr = OriginalLanguagesManager.get_instance()
+        
+        target_book = cur_book
+        target_ch = ch
+        target_v = v - 1
+        
+        if target_v < 1:
+            if ch > 1:
+                target_ch = ch - 1
+                target_v = orig_mgr.get_chapter_verse_count(b_code, target_ch)
+            else:
+                if cur_book in self.all_book_names:
+                    idx = self.all_book_names.index(cur_book)
+                    if idx > 0:
+                        target_book = self.all_book_names[idx - 1]
+                        prev_b_code = get_standard_book_code(target_book)
+                        target_ch = CODE_TO_CH_COUNT.get(prev_b_code, 1)
+                        target_v = orig_mgr.get_chapter_verse_count(prev_b_code, target_ch)
+                    else:
+                        return
+                        
+        self._navigate_to_passage(target_book, target_ch, target_v)
+
+    def nav_next_chapter(self):
+        """Passe au chapitre suivant (ou livre suivant si dernier chapitre)."""
+        cur_book = self.loaded_french_book or self.current_valid_book or self.book_var.get()
+        if not cur_book:
+            return
+            
+        from core.reference_parser import get_standard_book_code
+        b_code = get_standard_book_code(cur_book)
+        ch_count = CODE_TO_CH_COUNT.get(b_code, 1)
+        ch = int(self.chapter_var.get()) if self.chapter_var.get().isdigit() else 1
+        
+        target_book = cur_book
+        target_ch = ch + 1
+        
+        if target_ch > ch_count:
+            if cur_book in self.all_book_names:
+                idx = self.all_book_names.index(cur_book)
+                if idx + 1 < len(self.all_book_names):
+                    target_book = self.all_book_names[idx + 1]
+                    target_ch = 1
+                else:
+                    return
+                    
+        self._navigate_to_passage(target_book, target_ch, 1)
+
+    def nav_prev_chapter(self):
+        """Passe au chapitre précédent (ou livre précédent si chapitre 1)."""
+        cur_book = self.loaded_french_book or self.current_valid_book or self.book_var.get()
+        if not cur_book:
+            return
+            
+        from core.reference_parser import get_standard_book_code
+        b_code = get_standard_book_code(cur_book)
+        ch = int(self.chapter_var.get()) if self.chapter_var.get().isdigit() else 1
+        
+        target_book = cur_book
+        target_ch = ch - 1
+        
+        if target_ch < 1:
+            if cur_book in self.all_book_names:
+                idx = self.all_book_names.index(cur_book)
+                if idx > 0:
+                    target_book = self.all_book_names[idx - 1]
+                    prev_b_code = get_standard_book_code(target_book)
+                    target_ch = CODE_TO_CH_COUNT.get(prev_b_code, 1)
+                else:
+                    return
+                    
+        self._navigate_to_passage(target_book, target_ch, 1)
+
+    def _navigate_to_passage(self, book_name, chapter, verse):
+        """Navigue fluidement vers un livre, chapitre et verset précis."""
+        from core.reference_parser import get_standard_book_code
+        from core.original_languages_manager import OriginalLanguagesManager
+        
+        b_code = get_standard_book_code(book_name)
+        ch_count = CODE_TO_CH_COUNT.get(b_code, 1)
+        orig_mgr = OriginalLanguagesManager.get_instance()
+        max_v = orig_mgr.get_chapter_verse_count(b_code, chapter)
+        
+        if self.loaded_book_code == b_code:
+            self.is_updating_breadcrumb = True
+            try:
+                self.chapter_menu.configure(values=[str(x) for x in range(1, ch_count + 1)])
+                self.chapter_var.set(str(chapter))
+                self.verse_menu.configure(values=["Tous"] + [str(x) for x in range(1, max_v + 1)])
+                self.verse_var.set(str(verse))
+            finally:
+                self.is_updating_breadcrumb = False
+                
+            self.current_active_chapter = chapter
+            self.current_active_verse = verse
+            self.scroll_to_ref(chapter, verse)
+        else:
+            self.apply_book_selection(book_name, chapter=chapter, verse=verse)
 
     def toggle_compare_mode(self):
         self.compare_mode = bool(self.compare_switch.get())

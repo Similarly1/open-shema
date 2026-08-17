@@ -259,16 +259,78 @@ class DictionaryManager:
             preview_lines.append(f"📚 Aussi disponible dans : {', '.join(other_names)}")
             
         return {
-            "word": clean_w,
             "title": global_title,
-            "source": global_badge,
+            "badge": global_badge,
             "preview": "\n\n".join(preview_lines),
-            "leader": leader,
-            "matches": matches,
-            # Rétro-compatibilité
-            "strong": next((m["entry"] for m in matches if m["dict_id"] == "strong"), None),
-            "calmet": next((m["art"] for m in matches if m["dict_id"] == "calmet"), None)
+            "matches": matches
         }
+
+    @classmethod
+    def search_all_entries(cls, query: str, limit: int = 50) -> list:
+        """
+        Recherche plein-texte dans tous les dictionnaires enregistrés (titres et définitions).
+        """
+        if not query or not query.strip():
+            return []
+            
+        clean_q = query.strip()
+        norm_q = cls.normalize_term(clean_q)
+        if not norm_q:
+            return []
+            
+        registry = cls.load_registry()
+        active_dicts = sorted([d for d in registry if d.get("enabled", True)], key=lambda x: x.get("priority", 99))
+        
+        results = []
+        seen_titles = set()
+        
+        # 1. Recherche par lookup exact ou préfixe direct d'abord
+        direct = cls.lookup(clean_q)
+        if direct and "matches" in direct:
+            for m in direct["matches"]:
+                t = m.get("title", clean_q)
+                if t not in seen_titles:
+                    seen_titles.add(t)
+                    results.append({
+                        "dict_id": m.get("dict_id"),
+                        "dict_name": m.get("dict_name", "Dictionnaire"),
+                        "term": t,
+                        "definition": m.get("full_text", m.get("preview", "")),
+                        "preview": m.get("preview", "")
+                    })
+                    
+        # 2. Parcourir les dictionnaires JSON (Calmet, Théologie systématique, etc.)
+        for d in active_dicts:
+            dict_type = d.get("type", "custom")
+            if dict_type in ("strong", "greek"):
+                continue
+                
+            data = cls.load_dictionary_file(d)
+            if not data:
+                continue
+                
+            articles = data.get("articles", {})
+            for key, art in articles.items():
+                if len(results) >= limit:
+                    break
+                title = art.get("title", key)
+                norm_title = cls.normalize_term(title)
+                text = art.get("text", "")
+                
+                # Match dans le titre ou le début du texte
+                if norm_q in norm_title or (len(norm_q) >= 4 and norm_q in cls.normalize_term(text[:500])):
+                    if title not in seen_titles:
+                        seen_titles.add(title)
+                        snippet = text[:250] + "..." if len(text) > 250 else text
+                        results.append({
+                            "dict_id": d.get("id"),
+                            "dict_name": d.get("name", "Dictionnaire"),
+                            "term": title,
+                            "definition": text,
+                            "preview": snippet
+                        })
+                        
+        return results
 
     @classmethod
     def import_dictionary(cls, file_path, custom_name=None):

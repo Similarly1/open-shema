@@ -55,6 +55,7 @@ class App(ctk.CTk):
         self.center_panel.grid(row=0, column=1, sticky="nsew")
         
         # Bindings left panel
+        self.left_panel.btn_search.configure(command=self.toggle_search)
         self.left_panel.btn_import.configure(command=self.open_import)
         self.left_panel.btn_library.configure(command=self.open_library)
         self.left_panel.btn_settings.configure(command=self.open_settings)
@@ -71,8 +72,61 @@ class App(ctk.CTk):
         self.bind("<F11>", self.toggle_fullscreen)
         self.bind("<Escape>", self.exit_fullscreen)
         
+        # Raccourcis Clavier Universels pour la Recherche (Ctrl+F / Ctrl+K)
+        self.bind_all("<Control-f>", lambda e: self.toggle_search())
+        self.bind_all("<Control-F>", lambda e: self.toggle_search())
+        self.bind_all("<Control-k>", lambda e: self.toggle_search())
+        self.bind_all("<Control-K>", lambda e: self.toggle_search())
+        
+        # Navigation Biblique au Clavier (Haut/Bas: Versets | Gauche/Droite: Chapitres)
+        self.bind_all("<Down>", self._on_key_down)
+        self.bind_all("<Up>", self._on_key_up)
+        self.bind_all("<Right>", self._on_key_right)
+        self.bind_all("<Left>", self._on_key_left)
+        
         # Load active books
         self.after(100, self.init_sources_and_load_default)
+
+    def _is_text_focused(self):
+        """Vérifie si un champ de saisie texte modifiable (Entry, Chat prompt) a le focus."""
+        try:
+            f = self.focus_get()
+            if not f:
+                return False
+            cls = f.__class__.__name__.lower()
+            if "entry" in cls:
+                return True
+            if "text" in cls:
+                try:
+                    state = str(f.cget("state"))
+                    if state == "disabled":
+                        return False
+                    return True
+                except Exception:
+                    pass
+        except Exception:
+            pass
+        return False
+
+    def _on_key_down(self, event):
+        if not self._is_text_focused():
+            self.center_panel.nav_next_verse()
+            return "break"
+
+    def _on_key_up(self, event):
+        if not self._is_text_focused():
+            self.center_panel.nav_prev_verse()
+            return "break"
+
+    def _on_key_right(self, event):
+        if not self._is_text_focused():
+            self.center_panel.nav_next_chapter()
+            return "break"
+
+    def _on_key_left(self, event):
+        if not self._is_text_focused():
+            self.center_panel.nav_prev_chapter()
+            return "break"
 
     def init_sources_and_load_default(self):
         from gui.library_utils import load_books_metadata
@@ -154,6 +208,12 @@ class App(ctk.CTk):
             self.center_panel.display_results(reference, results)
         else:
             self.center_panel.display_error(f"Aucun résultat trouvé pour {reference}")
+
+    def toggle_search(self):
+        self.center_panel.toggle_search_tab()
+
+    def open_search(self, initial_query=None):
+        self.center_panel.toggle_search_tab(initial_query=initial_query)
 
     def open_import(self):
         from gui.import_modal import ImportTab
