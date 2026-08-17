@@ -1,11 +1,14 @@
 import customtkinter as ctk
 import re
 import difflib
+import threading
+import webbrowser
 from typing import Optional, Dict, Any, List
 from core.config import save_config
 from core.reference_parser import get_french_book_name, parse_smart_book_input, resolve_book_input, strip_accents, normalize_reference, REVERSE_BOOK_MAPPING
 from core.strong_lexicon import StrongLexicon
 from core.dictionary_manager import DictionaryManager
+from core.wikipedia_client import WikipediaClient
 from gui.tooltip import BibleTooltip, WidgetTooltip
 from gui.bible_picker_popover import BiblePickerPopover, get_bible_cover_image, BIBLE_STYLE_MAP
 
@@ -675,8 +678,7 @@ class CenterPanel(ctk.CTkFrame):
         self.lex_textbox.configure(state="disabled")
         
         self.current_dict_matches = {}
-        self.current_dict_match_obj = None
-        
+        self.current_wiki_url = None
         self.lex_action_frame = ctk.CTkFrame(self.tab_lex, fg_color="transparent")
         self.lex_action_frame.pack(fill="x", padx=2, pady=(0, 2))
         
@@ -689,6 +691,17 @@ class CenterPanel(ctk.CTkFrame):
             font=ctk.CTkFont(size=12, weight="bold")
         )
         self.lex_ai_btn.pack(fill="x")
+        
+        self.lex_wiki_btn = ctk.CTkButton(
+            self.lex_action_frame,
+            text="🌐 Ouvrir l'article Wikipédia ↗",
+            command=self.on_open_wikipedia_web,
+            height=30,
+            font=ctk.CTkFont(size=11, weight="bold"),
+            fg_color=("#E0F2FE", "#0F2B48"),
+            hover_color=("#BAE6FD", "#1E3A8A"),
+            text_color=("#0284C7", "#38BDF8")
+        )
         
         # 4. Langues Originales (inside tab_orig)
         self.tab_orig = self.right_tabs.add("📜 Langues Originales")
@@ -914,6 +927,21 @@ class CenterPanel(ctk.CTkFrame):
             match, _, _ = self._hover_match
             self._clear_hover()
             self.display_dictionary_entry(match)
+        else:
+            try:
+                tb = self.bible_textbox._textbox
+                click_pos = tb.index(f"@{event.x},{event.y}")
+                start_w = tb.index(f"{click_pos} wordstart")
+                end_w = tb.index(f"{click_pos} wordend")
+                clicked_word = tb.get(start_w, end_w).strip(" ,:;.!?()«»[]\"'’\n\r\t")
+                if clicked_word and len(clicked_word) >= 2 and not clicked_word.isdigit():
+                    lookup_res = DictionaryManager.lookup(clicked_word)
+                    if lookup_res:
+                        self.display_dictionary_entry(lookup_res)
+                    else:
+                        self.display_dictionary_entry({"word": clicked_word, "title": clicked_word})
+            except Exception:
+                pass
 
     def on_bible_mouse_leave(self, event=None):
         self._clear_hover()
@@ -930,7 +958,7 @@ class CenterPanel(ctk.CTkFrame):
         self.right_tabs.set("🔍 Lexique & Dictionnaires")
         self.current_dict_match_obj = match
         
-        matches = match.get("matches", [])
+        matches = list(match.get("matches", []))
         if not matches:
             # Fallback rétro-compatible
             matches = []
@@ -942,6 +970,27 @@ class CenterPanel(ctk.CTkFrame):
                 matches.append({"dict_id": "vigouroux", "dict_name": "Dictionnaire F. Vigouroux", "badge": "📖 Vigouroux", "title": match["vigouroux"].get("title", ""), "art": match["vigouroux"], "full_text": match["vigouroux"].get("text", "")})
             if match.get("bailly"):
                 matches.append({"dict_id": "bailly", "dict_name": "Dictionnaire Bailly", "badge": "📖 Bailly", "title": match.get("word", ""), "entries": match.get("bailly", [])})
+
+        # Extraire le terme de recherche pour Wikipédia
+        search_term = ""
+        if match.get("word"):
+            search_term = match["word"].strip()
+        elif match.get("title"):
+            search_term = match["title"].strip()
+        elif matches:
+            search_term = matches[0].get("title", "").strip()
+
+        clean_search_term = re.sub(r'[\(\[\{].*?[\)\]\}]', '', search_term).strip(" ,:;.!?«»\"'’\n\r\t")
+        if clean_search_term and len(clean_search_term) >= 2:
+            matches.append({
+                "dict_id": "wikipedia",
+                "dict_name": "🌐 Wikipédia (En ligne)",
+                "badge": "🌐 Wikipédia (Encyclopédie)",
+                "title": clean_search_term,
+                "search_term": clean_search_term,
+                "loaded": False,
+                "data": None
+            })
 
         self.current_dict_matches = {}
         dict_names = []
@@ -964,6 +1013,8 @@ class CenterPanel(ctk.CTkFrame):
             self.lex_textbox.insert("end", "Aucune notice de dictionnaire trouvée pour ce terme.", "body")
             self.lex_textbox.configure(state="disabled")
             self.lex_ai_btn.configure(state="disabled")
+            if hasattr(self, 'lex_wiki_btn'):
+                self.lex_wiki_btn.pack_forget()
             return
             
         self.lex_dict_menu.configure(values=dict_names)
@@ -991,6 +1042,8 @@ class CenterPanel(ctk.CTkFrame):
             else:
                 self.lex_textbox.insert("end", "Aucune notice sélectionnée.", "body")
                 self.lex_textbox.configure(state="disabled")
+                if hasattr(self, 'lex_wiki_btn'):
+                    self.lex_wiki_btn.pack_forget()
                 return
                 
         m = self.current_dict_matches[selected_dict_name]
@@ -998,6 +1051,13 @@ class CenterPanel(ctk.CTkFrame):
         badge = m.get("badge", m.get("dict_name", "Dictionnaire"))
         title = m.get("title", "")
         
+        if dict_id == "wikipedia":
+            self._render_wikipedia_entry(m)
+            return
+
+        if hasattr(self, 'lex_wiki_btn'):
+            self.lex_wiki_btn.pack_forget()
+            
         self.lex_textbox.insert("end", f"{badge}\n", "source_name")
         if title and dict_id != "strong":
             self.lex_textbox.insert("end", f"{title}\n\n", "book_title")
@@ -1048,6 +1108,90 @@ class CenterPanel(ctk.CTkFrame):
         first_title = (match_obj.get("word") if isinstance(match_obj, dict) else None) or title or selected_dict_name
         self.last_selected_strong = (m.get("entry") or m, first_title)
         self.lex_ai_btn.configure(state="normal", text=f"🤖 Analyser « {first_title} » avec l'IA")
+
+    def _render_wikipedia_entry(self, m):
+        """Rend l'article Wikipédia sélectionné, en le chargeant en arrière-plan si nécessaire."""
+        search_term = m.get("search_term") or m.get("title", "")
+        self.lex_textbox.insert("end", "🌐 WIKIPÉDIA (ENCYCLOPÉDIE EN LIGNE)\n", "wiki_header")
+        
+        if not m.get("loaded"):
+            self.lex_textbox.insert("end", f"{search_term}\n\n", "book_title")
+            self.lex_textbox.insert("end", "⏳ Recherche de l'article sur Wikipédia en ligne...\n", "wiki_loading")
+            self.lex_textbox.configure(state="disabled")
+            if hasattr(self, 'lex_wiki_btn'):
+                self.lex_wiki_btn.pack_forget()
+            
+            # Lancement asynchrone non bloquant
+            threading.Thread(target=self._fetch_wikipedia_thread, args=(m,), daemon=True).start()
+            return
+            
+        data = m.get("data") or {}
+        if data.get("found"):
+            page_title = data.get("title", search_term)
+            desc = data.get("description", "")
+            extract = data.get("extract", "")
+            url = data.get("url", "")
+            self.current_wiki_url = url
+            
+            self.lex_textbox.insert("end", f"{page_title}\n", "book_title")
+            if desc:
+                self.lex_textbox.insert("end", f"{desc}\n\n", "wiki_desc")
+            else:
+                self.lex_textbox.insert("end", "\n", "body")
+                
+            self.lex_textbox.insert("end", f"{extract}\n\n", "body")
+            
+            if url:
+                self.lex_textbox.insert("end", "🔗 Ouvrir l'article complet dans le navigateur (fr.wikipedia.org) ↗\n", "wiki_link")
+                
+            self.lex_textbox.configure(state="disabled")
+            
+            if hasattr(self, 'lex_wiki_btn'):
+                self.lex_wiki_btn.pack(fill="x", pady=(4, 0))
+                btn_lbl = f"🌐 Ouvrir « {page_title} » sur Wikipédia ↗"
+                if len(btn_lbl) > 40:
+                    btn_lbl = "🌐 Ouvrir l'article Wikipédia ↗"
+                self.lex_wiki_btn.configure(state="normal", text=btn_lbl)
+        else:
+            self.lex_textbox.insert("end", f"{search_term}\n\n", "book_title")
+            err = data.get("error") or f"Aucun article trouvé sur Wikipédia pour « {search_term} »."
+            self.lex_textbox.insert("end", f"{err}\n\n", "body")
+            self.lex_textbox.insert("end", "💡 Conseil : Vous pouvez vérifier l'orthographe du mot ou essayer un terme plus général.\n", "lex_details")
+            self.lex_textbox.configure(state="disabled")
+            if hasattr(self, 'lex_wiki_btn'):
+                self.lex_wiki_btn.pack_forget()
+                
+        # Configurer le bouton d'analyse IA
+        self.last_selected_strong = (m, search_term)
+        self.lex_ai_btn.configure(state="normal", text=f"🤖 Analyser « {search_term} » avec l'IA")
+
+    def _fetch_wikipedia_thread(self, m):
+        """Thread travailleur pour interroger Wikipédia sans ralentir l'UI."""
+        try:
+            term = m.get("search_term") or m.get("title", "")
+            res = WikipediaClient.get_summary(term)
+            m["data"] = res
+            m["loaded"] = True
+        except Exception as e:
+            m["data"] = {"found": False, "error": f"Erreur : {e}"}
+            m["loaded"] = True
+            
+        self.after(0, lambda: self._on_wikipedia_loaded(m))
+
+    def _on_wikipedia_loaded(self, m):
+        """Callback UI après le chargement des données Wikipédia."""
+        current_selection = self.selected_lex_dict_var.get()
+        if current_selection in self.current_dict_matches and self.current_dict_matches[current_selection] is m:
+            self.render_selected_dictionary_view()
+
+    def on_open_wikipedia_web(self):
+        """Ouvre l'URL de l'article Wikipédia courant dans le navigateur par défaut."""
+        url = getattr(self, 'current_wiki_url', None)
+        if url:
+            try:
+                webbrowser.open(url)
+            except Exception as e:
+                print(f"Erreur ouverture navigateur Wikipédia : {e}")
 
     def on_strong_clicked(self, strong_codes_str, clicked_word=None):
         """Affiche la fiche lexicale complète Strong et les dictionnaires associés dans l'onglet dédié à droite."""
@@ -2206,6 +2350,22 @@ class CenterPanel(ctk.CTkFrame):
         self.bible_textbox._textbox.tag_configure("diff_deleted", font=(self.font_family, self.font_size, "bold"), foreground=diff_del_col)
         self.bible_textbox._textbox.tag_configure("diff_replaced", font=(self.font_family, self.font_size), foreground=diff_rep_col, underline=True)
         
+        # Tags spécifiques à Wikipédia
+        wiki_hdr_col = "#38BDF8" if is_dark else "#0284C7"
+        wiki_desc_col = "#94A3B8" if is_dark else "#64748B"
+        wiki_link_col = "#38BDF8" if is_dark else "#0284C7"
+        wiki_loading_col = "#94A3B8" if is_dark else "#64748B"
+        
+        if hasattr(self, 'lex_textbox'):
+            self.lex_textbox._textbox.tag_configure("wiki_header", font=(self.font_family, self.font_size + 1, "bold"), foreground=wiki_hdr_col, spacing1=12, spacing3=6)
+            self.lex_textbox._textbox.tag_configure("wiki_desc", font=(self.font_family, max(10, self.font_size - 2), "italic"), foreground=wiki_desc_col, justify="center", spacing1=2, spacing3=8)
+            self.lex_textbox._textbox.tag_configure("wiki_link", font=(self.font_family, self.font_size, "bold"), foreground=wiki_link_col, underline=True, spacing1=8, spacing3=8)
+            self.lex_textbox._textbox.tag_configure("wiki_loading", font=(self.font_family, self.font_size, "italic"), foreground=wiki_loading_col, spacing1=8)
+            
+            self.lex_textbox._textbox.tag_bind("wiki_link", "<Button-1>", lambda e: self.on_open_wikipedia_web())
+            self.lex_textbox._textbox.tag_bind("wiki_link", "<Enter>", lambda e: self.lex_textbox._textbox.config(cursor="hand2"))
+            self.lex_textbox._textbox.tag_bind("wiki_link", "<Leave>", lambda e: self.lex_textbox._textbox.config(cursor=""))
+            
         # Tag de survol dynamique pour les mots des dictionnaires
         hover_bg = "#1E3A8A" if is_dark else "#E0F2FE"
         hover_fg = "#38BDF8" if is_dark else "#0284C7"
