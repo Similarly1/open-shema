@@ -652,5 +652,33 @@
     "chapters_count": 71,
     "format": "epub",
     "active": true
+  },
+  "Notes d'étude Segond 21": {
+    "id": "s21_notes",
+    "name": "Notes d'étude Segond 21",
+    "title": "Bible Segond 21 avec Notes de Référence",
+    "author": "Société Biblique de Genève",
+    "type": "Commentaire",
+    "format": "commentary_sqlite",
+    "corpus_scope": "GLOBAL",
+    "source_type": "commentary_verse",
+    "year": "2007",
+    "description": "Notes d'étude et de référence verset par verset de la Segond 21.",
+    "active": true
+  },
+  "NIVArchaeo": {
+    "title": "NIV Archaeological Study Bible",
+    "author": "Walter C. Kaiser, Jr.",
+    "description": "Bring the ancient biblical world to life - Readers who desire a more intimate knowledge of the historical context of the Bible will appreciate the NIV Archaeological Study Bible. Full of informative articles and full-color photographs of places and objects from biblical times, this Bible examines the archaeological record surrounding God's Word and brings the biblical world to life. Readers' personal studies will be enriched as they become more informed about the empires, places, and peoples of the ancient world.</p><p><strong>Features:</strong></p><li>Complete text of the accurate, readable, and clear New International Version (NIV)</li><li>Four-color interior throughout</li><li>Bottom-of-page study notes exploring passages that speak on archaeological and cultural facts</li><li>520 articles covering five main categories: Archaeological Sites, Cultural and Historical Notes, Ancient Peoples and Lands, the Reliability of the Bible, and Ancient...",
+    "year": "2010",
+    "cover_path": "C:\\Users\\adrie\\AppData\\Local\\Temp\\bible_ai_covers\\cover_zon-archaeology-cover.jpg",
+    "type": "Théologie",
+    "corpus_scope": "GLOBAL",
+    "source_type": "general",
+    "book_code": "(Aucun",
+    "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
+    "chapters_count": 71,
+    "format": "epub",
+    "active": true
   }
 }

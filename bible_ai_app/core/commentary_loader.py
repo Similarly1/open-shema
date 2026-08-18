@@ -59,9 +59,8 @@ class CommentaryLoader:
         catalog = cls.get_available_commentaries()
         if source_name in catalog:
             return True
-        # Check by id or partial name match
         for k, v in catalog.items():
-            if source_name.lower() in k.lower() or k.lower() in source_name.lower():
+            if str(v["id"]) == source_name or source_name.lower() == k.lower() or k.lower() in source_name.lower():
                 return True
         return False
 
@@ -71,7 +70,7 @@ class CommentaryLoader:
         if source_name in catalog:
             return catalog[source_name]["id"]
         for k, v in catalog.items():
-            if source_name.lower() in k.lower() or k.lower() in source_name.lower():
+            if str(v["id"]) == source_name or source_name.lower() == k.lower() or k.lower() in source_name.lower():
                 return v["id"]
         return None
 
@@ -123,6 +122,7 @@ class CommentaryLoader:
                 "book": b_name,
                 "book_code": book_code,
                 "chapter": ch,
+                "verse": v_start,
                 "verse_start": v_start,
                 "verse_end": v_end,
                 "reference": ref
@@ -175,8 +175,10 @@ class CommentaryLoader:
                 "book_code": book_code,
                 "chapter": ch,
                 "verse": v_start,
+                "verse_start": v_start,
                 "verse_end": v_end,
-                "reference": ref
+                "reference": ref,
+                "commentary_id": cid
             })
             
         return {"ids": ids, "documents": docs, "metadatas": metas}

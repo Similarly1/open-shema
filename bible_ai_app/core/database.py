@@ -172,12 +172,12 @@ class VectorDB:
         for src in active_sources:
             src_name = src["name"] if isinstance(src, dict) else src
             src_meta = registry.get(src_name, {})
-            # Vérifier si c'est un Commentaire local
-            if src_meta.get("format") == "commentary_sqlite" or (src_meta.get("type") == "Commentaire" and CommentaryLoader.is_commentary_source(src_name)) or CommentaryLoader.is_commentary_source(src_name):
-                commentary_sources.append(src_name)
-            # Vérifier si c'est une Bible JSON disponible sur disque
-            elif src_meta.get("format") == "json" or BibleJsonLoader.find_bible_dir_by_name(src_name) is not None:
+            # 1. Vérifier si c'est une Bible JSON disponible sur disque (priorité absolue)
+            if src_meta.get("format") == "json" or src_meta.get("type") == "Bible" or BibleJsonLoader.find_bible_dir_by_name(src_name) is not None:
                 json_sources.append(src_name)
+            # 2. Vérifier si c'est un Commentaire local
+            elif src_meta.get("format") == "commentary_sqlite" or src_meta.get("type") == "Commentaire" or CommentaryLoader.is_commentary_source(src_name):
+                commentary_sources.append(src_name)
             else:
                 chroma_sources.append(src)
 

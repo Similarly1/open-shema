@@ -3196,12 +3196,11 @@ class CenterPanel(ctk.CTkFrame):
         if not hasattr(self, '_open_tab_instances'):
             self._open_tab_instances = {}
             
+        # Si l'onglet est déjà ouvert, on le supprime pour le recréer proprement à jour
         try:
             self.main_tabs.tab(tab_name)
-            self.main_tabs.set(tab_name)
-            self.set_full_width_mode(True)
-            return self._open_tab_instances.get(tab_name)
-        except ValueError:
+            self.close_tab(tab_name)
+        except (ValueError, Exception):
             pass
             
         new_tab = self.main_tabs.add(tab_name)
@@ -4161,7 +4160,7 @@ class CenterPanel(ctk.CTkFrame):
         
         for doc, meta in author_items:
             ch = meta.get('chapter', 1)
-            v_start = meta.get('verse')
+            v_start = meta.get('verse') if meta.get('verse') is not None else meta.get('verse_start')
             v_end = meta.get('verse_end', v_start)
             ref = meta.get('reference', '')
             
@@ -4179,19 +4178,15 @@ class CenterPanel(ctk.CTkFrame):
             
             is_match = False
             if v_start is not None:
-                if str(v_start).isdigit():
+                try:
                     v_s_num = int(v_start)
-                    v_e_num = int(v_end) if str(v_end).isdigit() else v_s_num
+                    v_e_num = int(v_end) if v_end is not None else v_s_num
                     if v_s_num <= cur_v <= v_e_num:
                         is_match = True
-                elif isinstance(v_start, str) and "-" in v_start:
-                    parts = v_start.split("-")
-                    if parts[0].isdigit() and parts[1].isdigit():
-                        if int(parts[0]) <= cur_v <= int(parts[1]):
-                            is_match = True
-                            
-            if not is_match:
-                if f":{cur_v}" in ref:
+                except (ValueError, TypeError):
+                    pass
+            else:
+                if re.search(rf'[:\.]{cur_v}\b', ref):
                     is_match = True
                     
             if is_match:
