@@ -1305,6 +1305,10 @@ class CenterPanel(ctk.CTkFrame):
         RE_BULLET = re.compile(r'^(\s*)[-*•]\s+(.+)$')
         RE_ORDERED = re.compile(r'^(\s*)([0-9]+\.|\([0-9]+\)|[a-z]\))\s+(.+)$')
         RE_QUOTE = re.compile(r'^>\s*(.+)$')
+        RE_VOIR_HEADER = re.compile(
+            r'^(?:#{1,6}\s+)?(?:\*+|_+)?\s*(?:Voir(?:\s+(?:aussi|également))?|Articles?\s+connexes?|Renvois?)\s*(?:\*+|_+)?\s*:?\s*$',
+            re.IGNORECASE
+        )
         
         lines = text.strip().splitlines()
         in_voir_section = False
@@ -1315,10 +1319,13 @@ class CenterPanel(ctk.CTkFrame):
                 self.lex_textbox.insert("end", "\n")
                 continue
                 
-            # Détecter si on entre ou sort d'une section de renvois ("Voir :" ou "Voir aussi :")
-            if re.match(r'^(?:Voir(?:\s+aussi)?)\s*:\s*$', line_s, re.IGNORECASE):
+            # Détecter si on entre ou sort d'une section de renvois ("Voir :", "*Voir aussi* :", "### Articles connexes :", etc.)
+            if RE_VOIR_HEADER.match(line_s):
                 in_voir_section = True
-            elif line_s.startswith('---') or line_s.startswith('#'):
+                clean_header = re.sub(r'[*_#]+', '', line_s).strip()
+                self.lex_textbox.insert("end", f"{clean_header}\n\n", "lex_h3")
+                continue
+            elif line_s.startswith('#') and not RE_VOIR_HEADER.match(line_s):
                 in_voir_section = False
                 
             # Séparateur horizontal
@@ -1517,11 +1524,13 @@ class CenterPanel(ctk.CTkFrame):
             if len(target) >= 2:
                 tokens.append((m.start(1), m.end(1), 'DICT_LINK', target, target))
 
-        # 4. Liste directe dans section Voir (ex: • COLONNE DE NUÉE)
+        # 4. Liste directe dans section Voir (ex: • COLONNE DE NUÉE, • **FEU**, • FEU, • TORCHE)
         if in_voir_section:
-            clean_l = line_text.strip()
-            if re.match(r'^[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\s–-]{2,}$', clean_l):
-                tokens.append((0, len(line_text), 'DICT_LINK', clean_l, clean_l))
+            clean_l = re.sub(r'[*_`#]+', '', line_text).strip()
+            clean_l = re.sub(r'^[-\*•◦\s]+', '', clean_l).strip()
+            target_name = re.sub(r'[\d\.\(\)]+', '', clean_l).strip(" \t\n\r,;:.*«»[]\"'")
+            if len(target_name) >= 2 and target_name.upper() not in ROMAN_NUMS:
+                tokens.append((0, len(line_text), 'DICT_LINK', target_name, target_name))
 
         # 5. Références bibliques anciennes & romaines (ex: Gen., I, 2 ; *Gen.*, I, 1 ; II Cor., VI, 14 ; Ps. CIV (CIII), 20)
         RE_ANCIENT_BIBLE = re.compile(
