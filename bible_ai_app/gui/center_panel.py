@@ -1280,7 +1280,13 @@ class CenterPanel(ctk.CTkFrame):
         print(f"Erreur polissage : {err_msg}")
 
     def on_dictionary_cross_reference_clicked(self, target_word):
-        """Ouvre directement l'article du dictionnaire lié au lien cliqué."""
+        """Ouvre directement l'article du dictionnaire lié au lien cliqué, ou ouvre la recherche web si c'est un ouvrage externe."""
+        try:
+            if self.tooltip:
+                self.tooltip.hide()
+        except Exception:
+            pass
+            
         if not target_word:
             return
             
@@ -1292,12 +1298,25 @@ class CenterPanel(ctk.CTkFrame):
         if results and results.get("matches"):
             self.current_dict_match_obj = results
             self.display_dictionary_entry(results)
-        else:
-            # Essayer avec le mot brut ou normalisé
-            results = DictionaryManager.lookup(target_word.strip())
-            if results and results.get("matches"):
-                self.current_dict_match_obj = results
-                self.display_dictionary_entry(results)
+            return
+            
+        # Essayer avec le mot brut ou normalisé
+        results = DictionaryManager.lookup(target_word.strip())
+        if results and results.get("matches"):
+            self.current_dict_match_obj = results
+            self.display_dictionary_entry(results)
+            return
+            
+        # Si le lien correspond à un ouvrage externe, un traité académique ou une monographie ancienne :
+        # Ouvrir la recherche web sur Google / Google Books dans le navigateur par défaut
+        import urllib.parse
+        search_query = target_word.strip()
+        encoded_query = urllib.parse.quote_plus(search_query)
+        web_url = f"https://www.google.com/search?q={encoded_query}"
+        try:
+            webbrowser.open(web_url)
+        except Exception as e:
+            print(f"[CenterPanel] Erreur ouverture lien externe : {e}")
 
     def _render_dictionary_markdown(self, text, dict_id="custom"):
         """
@@ -1628,8 +1647,8 @@ class CenterPanel(ctk.CTkFrame):
                 self.lex_textbox.insert("end", link_text, (unique_tag, "lex_dict_link_base"))
                 target_word = extra or content
                 self.lex_textbox._textbox.tag_bind(unique_tag, "<Button-1>", lambda e, w=target_word: self.on_dictionary_cross_reference_clicked(w))
-                self.lex_textbox._textbox.tag_bind(unique_tag, "<Enter>", lambda e: self.lex_textbox._textbox.config(cursor="hand2"))
-                self.lex_textbox._textbox.tag_bind(unique_tag, "<Leave>", lambda e: self.lex_textbox._textbox.config(cursor=""))
+                self.lex_textbox._textbox.tag_bind(unique_tag, "<Enter>", lambda e, w=target_word, tg=unique_tag: self._on_hover_dict_link(e, w, tg))
+                self.lex_textbox._textbox.tag_bind(unique_tag, "<Leave>", lambda e: self._on_leave_tooltip(e))
             elif t_type == 'BIBLE_REF':
                 self._link_counter += 1
                 b_code = extra["book_code"]
@@ -1791,6 +1810,44 @@ class CenterPanel(ctk.CTkFrame):
                     self.display_dictionary_entry(results)
         except Exception as e:
             print(f"Erreur consultation mot original lexique : {e}")
+
+    def _on_hover_dict_link(self, event, target_word, tag_name):
+        """Affiche une infobulle élégante indiquant si le lien mène à un article local ou à un ouvrage web."""
+        try:
+            self.lex_textbox._textbox.config(cursor="hand2")
+            if not self.tooltip or not target_word:
+                return
+                
+            clean_word = re.sub(r'[\d\.\(\)]+', '', target_word).strip(" \t\n\r,;:.*«»[]\"'")
+            if not clean_word:
+                clean_word = target_word.strip()
+                
+            results = DictionaryManager.lookup(clean_word) or DictionaryManager.lookup(target_word.strip())
+            is_internal = bool(results and results.get("matches"))
+            
+            x = getattr(event, 'x_root', None) or (self.lex_textbox._textbox.winfo_rootx() + getattr(event, 'x', 0))
+            y = getattr(event, 'y_root', None) or (self.lex_textbox._textbox.winfo_rooty() + getattr(event, 'y', 0))
+            
+            if is_internal:
+                match_count = len(results.get("matches", []))
+                tooltip_data = {
+                    "word": tag_name,
+                    "source": f"📖 Dictionnaire ({match_count} notice{'s' if match_count > 1 else ''})",
+                    "title": f"Article : {clean_word}",
+                    "preview": f"Consulter l'article « {clean_word} » dans vos dictionnaires théologiques locaux.",
+                    "hint": "🖱️ Cliquer pour ouvrir dans l'onglet Lexique"
+                }
+            else:
+                tooltip_data = {
+                    "word": tag_name,
+                    "source": "🌐 Référence Bibliographique & Ouvrage",
+                    "title": target_word[:50] + ("..." if len(target_word) > 50 else ""),
+                    "preview": f"Ouvrage / Traité : {target_word}",
+                    "hint": "🖱️ Cliquer pour rechercher ce livre sur Google & le Web"
+                }
+            self.tooltip.show(x, y, tooltip_data)
+        except Exception:
+            pass
 
     def _on_leave_tooltip(self, event):
         """Masque l'infobulle et réinitialise le curseur."""
