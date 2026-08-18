@@ -1,6 +1,6 @@
 /**
  * Library View Controller
- * Gère l'affichage de la bibliothèque en grille, les filtres, l'activation et l'import.
+ * Gère l'affichage de la bibliothèque en grille, les filtres, l'activation, l'édition et la suppression.
  */
 
 const LibraryView = {
@@ -10,11 +10,16 @@ const LibraryView = {
   typeFilter: null,
   countSubtitle: null,
 
+  // Modal d'édition
+  editModalEl: null,
+  currentEditingBook: null,
+
   init() {
     this.containerEl = document.getElementById('library-cards-grid');
     this.searchInput = document.getElementById('lib-search-input');
     this.typeFilter = document.getElementById('lib-type-filter');
     this.countSubtitle = document.getElementById('lib-count-subtitle');
+    this.editModalEl = document.getElementById('modal-edit-book');
 
     this.searchInput.addEventListener('input', () => this.render());
     this.typeFilter.addEventListener('change', () => this.render());
@@ -22,6 +27,11 @@ const LibraryView = {
     document.getElementById('btn-lib-import').addEventListener('click', () => {
       this.importBook();
     });
+
+    // Événements Modal d'édition
+    document.getElementById('btn-close-edit-modal').addEventListener('click', () => this.closeEditModal());
+    document.getElementById('btn-cancel-edit-modal').addEventListener('click', () => this.closeEditModal());
+    document.getElementById('btn-save-edit-modal').addEventListener('click', () => this.saveEditedBook());
 
     this.loadBooks();
   },
@@ -54,8 +64,8 @@ const LibraryView = {
 
     if (filtered.length === 0) {
       this.containerEl.innerHTML = `
-        <div class="empty-state">
-          <span class="empty-icon">📚</span>
+        <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
+          <span style="font-size: 36px; display: block; margin-bottom: 8px;">📚</span>
           <p>Aucun ouvrage ne correspond à vos critères de recherche.</p>
         </div>
       `;
@@ -94,13 +104,14 @@ const LibraryView = {
             <span class="slider round"></span>
           </label>
           
-          <div class="btn-group-right">
+          <div class="btn-group-right" style="display: flex; gap: 4px; margin-top: 12px;">
+            <button class="lib-btn-icon edit" data-book="${book.name}" title="Modifier les métadonnées">✏️</button>
             <button class="lib-btn-icon delete" data-book="${book.name}" title="Supprimer">🗑️</button>
           </div>
         </div>
       `;
 
-      // Événements
+      // Switch toggle
       const switchEl = card.querySelector('input[type="checkbox"]');
       switchEl.addEventListener('change', async (e) => {
         const isActive = e.target.checked;
@@ -110,6 +121,13 @@ const LibraryView = {
         App.showToast(`« ${book.name} » ${isActive ? 'activé' : 'désactivé'}`);
       });
 
+      // Edit button
+      const editBtn = card.querySelector('.lib-btn-icon.edit');
+      editBtn.addEventListener('click', () => {
+        this.openEditModal(book);
+      });
+
+      // Delete button
       const delBtn = card.querySelector('.lib-btn-icon.delete');
       delBtn.addEventListener('click', async () => {
         if (confirm(`Êtes-vous sûr de vouloir supprimer définitivement « ${book.name} » ?`)) {
@@ -121,6 +139,47 @@ const LibraryView = {
 
       this.containerEl.appendChild(card);
     });
+  },
+
+  openEditModal(book) {
+    this.currentEditingBook = book;
+    document.getElementById('edit-book-id').value = book.name;
+    document.getElementById('edit-book-title').value = book.title || book.name;
+    document.getElementById('edit-book-author').value = book.author || '';
+    document.getElementById('edit-book-type').value = book.type || 'Bible';
+    document.getElementById('edit-book-scope').value = book.corpus_scope || 'Bible complète';
+    document.getElementById('edit-book-vcode').value = book.version_code || '';
+    document.getElementById('edit-book-active').checked = book.active !== false;
+
+    this.editModalEl.classList.remove('hidden');
+  },
+
+  closeEditModal() {
+    this.editModalEl.classList.add('hidden');
+    this.currentEditingBook = null;
+  },
+
+  async saveEditedBook() {
+    if (!this.currentEditingBook) return;
+
+    const bookName = this.currentEditingBook.name;
+    const newMeta = {
+      title: document.getElementById('edit-book-title').value.trim() || bookName,
+      author: document.getElementById('edit-book-author').value.trim(),
+      type: document.getElementById('edit-book-type').value,
+      corpus_scope: document.getElementById('edit-book-scope').value,
+      version_code: document.getElementById('edit-book-vcode').value.trim(),
+      active: document.getElementById('edit-book-active').checked
+    };
+
+    try {
+      await API.call('update_book_metadata', bookName, newMeta);
+      this.closeEditModal();
+      App.showToast('Métadonnées enregistrées avec succès !');
+      this.loadBooks();
+    } catch (e) {
+      alert(`Erreur de modification : ${e}`);
+    }
   },
 
   async importBook() {

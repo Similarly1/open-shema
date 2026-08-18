@@ -680,5 +680,20 @@
     "chapters_count": 71,
     "format": "epub",
     "active": true
+  },
+  "Les trésors de la foi (C. Spurgeon)": {
+    "title": "Les trésors de la foi (C. Spurgeon)",
+    "author": "Charles Haddon Spurgeon",
+    "description": "Recueil de 366 méditations quotidiennes pastorales et édifiantes fondées sur les promesses divines (The Cheque Book of the Bank of Faith).",
+    "year": "1888",
+    "cover_path": null,
+    "type": "Commentaire",
+    "format": "commentary_sqlite",
+    "commentary_id": "spurgeon_tresors",
+    "total_passages": 366,
+    "embedding_model": "study_library",
+    "corpus_scope": "BOTH",
+    "source_type": "devotional",
+    "active": true
   }
 }

@@ -411,7 +411,7 @@
     <!-- ======================================================= -->
     <!-- 3. PANNEAU LATÉRAL DROIT (Commentaires & Assistant IA)  -->
     <!-- ======================================================= -->
-    <aside class="right-drawer" id="right-drawer">
+    <aside class="right-drawer collapsed" id="right-drawer">
       <div class="drawer-tabs">
         <button class="drawer-tab active" data-drawer-tab="commentaries">💬 Commentaires</button>
         <button class="drawer-tab" data-drawer-tab="ai">🤖 Assistant IA</button>
@@ -454,7 +454,7 @@
     </aside>
 
     <!-- ======================================================= -->
-    <!-- 4. POPOVERS FLOTTANTS                                   -->
+    <!-- 4. POPOVERS & MODALES FLOTTANTES                        -->
     <!-- ======================================================= -->
     
     <!-- Popover Sélecteur de Livre/Chapitre -->
@@ -482,6 +482,75 @@
             <span class="sub-ch-count" id="selected-book-total-ch">50 chapitres</span>
           </div>
           <div class="chapters-grid" id="grid-chapters"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODALE ÉDITION DE LIVRE (Style Logos) -->
+    <div class="modal-dialog-container hidden" id="modal-edit-book">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2 class="modal-title">Modifier l'ouvrage</h2>
+          <button class="modal-close-btn" id="btn-close-edit-modal">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Nom d'origine :</label>
+            <input type="text" id="edit-book-id" class="text-field full-w" disabled>
+          </div>
+          
+          <div class="form-group" style="margin-top: 10px;">
+            <label>Titre affiché :</label>
+            <input type="text" id="edit-book-title" class="text-field full-w" placeholder="ex: Bible Segond 21">
+          </div>
+
+          <div class="form-row two-cols" style="margin-top: 10px;">
+            <div class="form-group">
+              <label>Auteur / Traducteur :</label>
+              <input type="text" id="edit-book-author" class="text-field full-w" placeholder="ex: Société Biblique">
+            </div>
+            <div class="form-group">
+              <label>Catégorie :</label>
+              <select id="edit-book-type" class="select-field full-w">
+                <option value="Bible">Bible</option>
+                <option value="Commentaire">Commentaire</option>
+                <option value="Dictionnaire">Dictionnaire</option>
+                <option value="Théologie">Théologie</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row two-cols" style="margin-top: 10px;">
+            <div class="form-group">
+              <label>Portée du corpus :</label>
+              <select id="edit-book-scope" class="select-field full-w">
+                <option value="Bible complète">Bible complète</option>
+                <option value="Ancien Testament">Ancien Testament (AT)</option>
+                <option value="Nouveau Testament">Nouveau Testament (NT)</option>
+                <option value="Évangiles">Évangiles</option>
+                <option value="Épîtres">Épîtres</option>
+                <option value="Pentateuque">Pentateuque</option>
+                <option value="Sagesse">Sagesse & Poésie</option>
+                <option value="Prophètes">Prophètes</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Code de version (Abréviation) :</label>
+              <input type="text" id="edit-book-vcode" class="text-field full-w" placeholder="ex: S21, TOB, BDS">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 14px;">
+            <label class="custom-checkbox">
+              <input type="checkbox" id="edit-book-active" checked>
+              <span>Ouvrage actif dans l'application</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-secondary" id="btn-cancel-edit-modal">Annuler</button>
+          <button class="btn-primary" id="btn-save-edit-modal">💾 Enregistrer</button>
         </div>
       </div>
     </div>

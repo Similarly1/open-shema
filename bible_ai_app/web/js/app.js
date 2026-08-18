@@ -56,9 +56,13 @@ const App = {
       targetEl.classList.add('active');
     }
 
+    const drawerEl = document.getElementById('right-drawer');
+
     if (viewName === 'library') {
+      if (drawerEl) drawerEl.classList.add('collapsed');
       LibraryView.loadBooks();
     } else if (viewName === 'settings') {
+      if (drawerEl) drawerEl.classList.add('collapsed');
       SettingsView.loadData();
     }
   },
