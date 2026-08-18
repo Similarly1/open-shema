@@ -503,15 +503,54 @@
             <h1 class="view-title">ASSISTANT D'ÉTUDE</h1>
             <p class="view-subtitle">Exégèse biblique, analyse contextuelle et théologique par IA.</p>
           </div>
-          <div class="view-actions">
-            <select id="ai-study-mode" class="select-field">
-              <option value="exegesis">Exégèse approfondie</option>
-              <option value="historical">Contexte historique & culturel</option>
-              <option value="sermon">Préparation de prédication / Message</option>
-              <option value="lexical">Analyse lexicale (Grec & Hébreu)</option>
+          <div class="view-actions" style="position: relative; display: flex; align-items: center; gap: 8px;">
+            <select id="ai-study-mode" class="select-field" style="font-weight: 600; cursor: pointer;">
+              <option value="exegesis">🔍 Exégèse approfondie</option>
+              <option value="historical">🏛️ Contexte historique & culturel</option>
+              <option value="sermon">🎙️ Préparation de prédication / Message</option>
+              <option value="lexical">🔤 Analyse lexicale (Grec & Hébreu)</option>
             </select>
+            
+            <button id="btn-ai-mode-info" class="btn-icon" title="Comprendre les modes d'étude" style="border: 1px solid var(--border-color); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: var(--bg-card); cursor: pointer; color: var(--accent-blue); font-size: 14px; font-weight: bold; transition: var(--transition-fast);">
+              ℹ️
+            </button>
+
+            <!-- Infobulle / Popover explicatif de chaque mode -->
+            <div id="ai-mode-popover" class="comm-sources-popover hidden" style="position: absolute; top: 44px; right: 0; width: 390px; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.35); border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); background: var(--bg-card);">
+              <div class="comm-popover-title" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg-subtle); border-bottom: 1px solid var(--border-color);">
+                <span style="font-weight: 700; font-size: 12px; color: var(--text-primary);">📚 Guide des Modes d'Analyse</span>
+                <span id="btn-close-ai-mode-info" style="cursor: pointer; font-size: 14px; color: var(--text-muted); padding: 2px 6px;">✕</span>
+              </div>
+              <div style="padding: 14px; display: flex; flex-direction: column; gap: 12px; font-size: 12px; line-height: 1.5; max-height: 420px; overflow-y: auto;">
+                <div style="border-left: 3px solid #0284C7; padding-left: 10px; background: var(--bg-subtle); padding: 8px 10px; border-radius: 0 6px 6px 0;">
+                  <div style="font-weight: 700; color: #0284C7; margin-bottom: 2px;">🔍 Exégèse approfondie</div>
+                  <div style="color: var(--text-secondary);">Analyse minutieuse verset par verset, structure littéraire (chiasmes, parallélismes, syntaxe), théologie de l'Alliance et cohérence canonique.</div>
+                </div>
+                <div style="border-left: 3px solid #D97706; padding-left: 10px; background: var(--bg-subtle); padding: 8px 10px; border-radius: 0 6px 6px 0;">
+                  <div style="font-weight: 700; color: #D97706; margin-bottom: 2px;">🏛️ Contexte historique & culturel</div>
+                  <div style="color: var(--text-secondary);">Arrière-plan historique, auteur, destinataires, cadre socio-politique de l'Antiquité (Proche-Orient ancien ou monde gréco-romain), coutumes et géographie.</div>
+                </div>
+                <div style="border-left: 3px solid #7C3AED; padding-left: 10px; background: var(--bg-subtle); padding: 8px 10px; border-radius: 0 6px 6px 0;">
+                  <div style="font-weight: 700; color: #7C3AED; margin-bottom: 2px;">🎙️ Préparation de prédication / Message</div>
+                  <div style="color: var(--text-secondary);">Plan homilétique structuré avec Idée Maîtresse (Big Idea), 2 ou 3 points d'exposition illustrés et applications pastorales concrètes pour la vie chrétienne.</div>
+                </div>
+                <div style="border-left: 3px solid #059669; padding-left: 10px; background: var(--bg-subtle); padding: 8px 10px; border-radius: 0 6px 6px 0;">
+                  <div style="font-weight: 700; color: #059669; margin-bottom: 2px;">🔤 Analyse lexicale (Grec & Hébreu)</div>
+                  <div style="color: var(--text-secondary);">Étude détaillée des racines hébraïques/araméennes/grecques, codes Strong, nuances morphologiques, sens dans la Septante (LXX) et théologie des mots.</div>
+                </div>
+              </div>
+            </div>
           </div>
         </header>
+
+        <!-- Bandeau d'information dynamique sur le mode sélectionné -->
+        <div id="ai-mode-description-banner" style="padding: 10px 24px; background: var(--bg-subtle); border-bottom: 1px solid var(--border-color); font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; justify-content: space-between; transition: all 0.2s ease;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span id="ai-mode-desc-icon" style="font-size: 16px;">🔍</span>
+            <span id="ai-mode-desc-text"><strong>Exégèse approfondie :</strong> Analyse structurelle et théologique verset par verset, syntaxe et cohérence biblique.</span>
+          </div>
+          <span style="font-size: 11px; opacity: 0.75; font-style: italic;">Mode d'étude IA actif</span>
+        </div>
 
         <div class="view-content ai-study-container">
           <div class="ai-study-chat-flow" id="ai-study-chat-flow">

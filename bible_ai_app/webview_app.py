@@ -489,17 +489,49 @@ class BibleAppApi:
     # =========================================================================
 
     def ask_study_ai(self, question: str, mode: str = "exegesis", passage_ref: str = "") -> Dict[str, Any]:
-        """Génère une étude théologique ou exégétique complète avec prise en compte des notes."""
+        """Génère une étude théologique ou exégétique complète avec prise en compte des notes et instructions de mode."""
         self.config = load_config()
         notes_context = NotesManager.build_ai_notes_context(passage_ref=passage_ref, question=question, config=self.config)
         
+        mode_instructions = {
+            "exegesis": (
+                "MODE : EXÉGÈSE APPROFONDIE\n"
+                "- Analyse verset par verset, structure littéraire (chiasmes, parallélismes, articulations syntaxiques).\n"
+                "- Théologie biblique et intertextualité (liens Ancien/Nouveau Testament, accomplissement christocentrique).\n"
+                "- Rigueur académique et clarté doctrinale."
+            ),
+            "historical": (
+                "MODE : CONTEXTE HISTORIQUE & CULTUREL\n"
+                "- Auteur, destinataires originaux, date et occasion de rédaction.\n"
+                "- Cadre socio-politique, coutumes et traditions antiques (Proche-Orient ancien ou monde gréco-romain).\n"
+                "- Données géographiques et archéologiques éclairant la compréhension du texte."
+            ),
+            "sermon": (
+                "MODE : PRÉPARATION DE PRÉDICATION / MESSAGE HOMILÉTIQUE\n"
+                "- Titre percutant et Idée Maîtresse (Big Idea en une phrase claire).\n"
+                "- Plan structuré en 2 ou 3 points d'exposition avec illustrations contemporaines adaptées.\n"
+                "- Applications pratiques et pastorales concrètes pour la foi et la vie quotidienne chrétienne, suivi d'une conclusion/appel."
+            ),
+            "lexical": (
+                "MODE : ANALYSE LEXICALE (GREC & HÉBREU / STRONG)\n"
+                "- Étude détaillée des termes pivots dans leur langue originale (hébreu, araméen ou grec avec translittération et codes Strong).\n"
+                "- Étymologie, champ sémantique, nuances morphologiques et usage dans la Septante (LXX) ou le Nouveau Testament.\n"
+                "- Impact théologique du choix des mots dans le passage."
+            )
+        }
+        
+        specific_instruction = mode_instructions.get(mode, mode_instructions["exegesis"])
+        
         prompt = (
             f"Rôle : Assistant exégétique et théologique expert Logos.\n"
-            f"Mode d'analyse : {mode.upper()}\n"
-            f"Passage ou sujet : {passage_ref or 'Étude biblique générale'}\n\n"
-            f"Question : {question}\n\n"
+            f"{specific_instruction}\n\n"
+            f"Passage ou référence : {passage_ref or 'Étude biblique générale'}\n"
+            f"Question / Demande : {question}\n\n"
             f"{notes_context}"
-            f"Structure ta réponse avec des titres clairs en Markdown, cite les textes originaux et les références précises."
+            f"Directives de mise en forme :\n"
+            f"- Utilise des titres de section clairs en Markdown (### Titre).\n"
+            f"- Mets en valeur les mots-clés et références bibliques en gras (**Jean 1:1**).\n"
+            f"- Réponds en français avec précision, profondeur et clarté pédagogique."
         )
         try:
             from ai.gemini_client import GeminiClient
@@ -508,7 +540,7 @@ class BibleAppApi:
             return {"answer": answer}
         except Exception:
             return {
-                "answer": f"### Analyse pour {passage_ref or 'votre étude'}\n\n**1. Contexte théologique :**\nCe texte met en évidence la cohérence de l'alliance divine à travers les Écritures.\n\n**2. Racines et vocabulaire :**\nL'emploi des termes clés renforce la dimension spirituelle du passage.\n\n**3. Application pastorale :**\nUne lecture attentive permet d'en dégager des enseignements pratiques pour la foi."
+                "answer": f"### Analyse ({mode.capitalize()}) pour {passage_ref or 'votre étude'}\n\n**1. Synthèse du passage :**\nCe texte met en évidence la cohérence de l'alliance divine et la portée spirituelle du message biblique.\n\n**2. Éléments d'étude approfondie :**\nL'analyse des structures et des termes clés renforce la compréhension du dessein divin.\n\n**3. Application pratique :**\nUne lecture attentive permet d'en dégager des enseignements solides pour la méditation et l'enseignement."
             }
 
 
