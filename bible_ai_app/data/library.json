@@ -523,5 +523,19 @@
     "total_books": 82,
     "embedding_model": "study_library",
     "active": true
+  },
+  "BDJ": {
+    "title": "Bible de Jérusalem",
+    "author": "École biblique et archéologique française de Jérusalem",
+    "description": "La Sainte Bible traduite en français sous la direction de l'École biblique de Jérusalem (Cerf)",
+    "year": "1998",
+    "cover_path": null,
+    "type": "Bible",
+    "format": "json",
+    "folder_name": "BDJ",
+    "version_code": "BDJ",
+    "total_books": 73,
+    "embedding_model": "study_library",
+    "active": true
   }
 }

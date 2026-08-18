@@ -73,8 +73,8 @@ class BibleTooltip:
         except Exception:
             pass
 
-    def show(self, x, y, data, target_rect=None):
-        """Affiche l'info-bulle directement au-dessus ou au-dessous du mot survolé."""
+    def show(self, x, y, data, target_rect=None, prefer_side=None):
+        """Affiche l'info-bulle directement à côté ou au-dessus/au-dessous du mot/lien survolé."""
         if not data:
             self.hide()
             return
@@ -98,17 +98,23 @@ class BibleTooltip:
         wrap_w = max(340, min(420, int(base_size * 20)))
         
         # Mettre à jour les couleurs et textes
-        self.container.configure(bg=bg_color, highlightbackground=border_color)
+        self.container.configure(
+            bg=bg_color,
+            highlightbackground=border_color,
+            highlightcolor=border_color
+        )
         
+        source_text = data.get("source", "📖 Notice Théologique")
         self.source_lbl.configure(
-            text=data.get("source", ""),
+            text=source_text,
             font=("Segoe UI", f_badge, "bold"),
             fg=badge_color,
             bg=bg_color
         )
         
+        title_text = data.get("title", word)
         self.title_lbl.configure(
-            text=data.get("title", ""),
+            text=title_text,
             font=("Segoe UI", f_title, "bold"),
             fg=text_color,
             bg=bg_color,
@@ -147,22 +153,47 @@ class BibleTooltip:
         if target_rect:
             t_left, t_top, t_w, t_h = target_rect
             t_bottom = t_top + t_h
+            t_right = t_left + t_w
             t_center_x = t_left + (t_w / 2.0)
         else:
             t_left = x
             t_top = y
             t_bottom = y + 20
+            t_right = x + 40
             t_center_x = x
             
-        # Position horizontale centrée sur le mot
-        pos_x = int(t_center_x - (w / 2.0))
-        pos_x = max(10, min(pos_x, screen_w - w - 10))
-        
-        # Position verticale : en priorité DESSOUS du mot, sinon DESSUS
-        pos_y = int(max(t_bottom + 6, y + 16))
-        if pos_y + h > screen_h - 10:
-            pos_y = int(min(t_top - h - 6, y - h - 16))
+        # Positionnement selon la préférence
+        if prefer_side in ("left", "right", "auto_side") and target_rect:
+            side = prefer_side
+            if side == "auto_side":
+                side = "left" if t_left > screen_w * 0.5 else "right"
+                
+            if side == "left":
+                pos_x = int(t_left - w - 10)
+                pos_y = int(max(10, min(t_top - 4, screen_h - h - 10)))
+                if pos_x < 10:
+                    pos_x = int(max(10, min(t_left, screen_w - w - 10)))
+                    pos_y = int(t_bottom + 6)
+                    if pos_y + h > screen_h - 10:
+                        pos_y = int(t_top - h - 6)
+            else: # right
+                pos_x = int(t_right + 10)
+                pos_y = int(max(10, min(t_top - 4, screen_h - h - 10)))
+                if pos_x + w > screen_w - 10:
+                    pos_x = int(max(10, min(t_left, screen_w - w - 10)))
+                    pos_y = int(t_bottom + 6)
+                    if pos_y + h > screen_h - 10:
+                        pos_y = int(t_top - h - 6)
+        else:
+            # Position horizontale centrée sur le mot
+            pos_x = int(t_center_x - (w / 2.0))
+            pos_x = max(10, min(pos_x, screen_w - w - 10))
             
+            # Position verticale : en priorité DESSOUS du mot, sinon DESSUS
+            pos_y = int(max(t_bottom + 6, y + 16))
+            if pos_y + h > screen_h - 10:
+                pos_y = int(min(t_top - h - 6, y - h - 16))
+                
         if pos_y < 10:
             pos_y = max(10, min(pos_y, screen_h - h - 10))
             

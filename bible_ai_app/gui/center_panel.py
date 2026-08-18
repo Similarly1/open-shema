@@ -1724,7 +1724,7 @@ class CenterPanel(ctk.CTkFrame):
                 "preview": preview_txt,
                 "hint": "🖱️ Cliquer pour ouvrir ce passage dans la Bible"
             }
-            self.tooltip.show(x, y, tooltip_data, target_rect=target_rect)
+            self.tooltip.show(x, y, tooltip_data, target_rect=target_rect, prefer_side="auto_side")
         except Exception:
             pass
 
@@ -1787,7 +1787,7 @@ class CenterPanel(ctk.CTkFrame):
                 "preview": definition,
                 "hint": "🖱️ Cliquer pour ouvrir la fiche complète dans le Lexique"
             }
-            self.tooltip.show(x, y, tooltip_data)
+            self.tooltip.show(x, y, tooltip_data, target_rect=target_rect, prefer_side="auto_side")
         except Exception:
             pass
 
@@ -1825,8 +1825,25 @@ class CenterPanel(ctk.CTkFrame):
             results = DictionaryManager.lookup(clean_word) or DictionaryManager.lookup(target_word.strip())
             is_internal = bool(results and results.get("matches"))
             
-            x = getattr(event, 'x_root', None) or (self.lex_textbox._textbox.winfo_rootx() + getattr(event, 'x', 0))
-            y = getattr(event, 'y_root', None) or (self.lex_textbox._textbox.winfo_rooty() + getattr(event, 'y', 0))
+            target_rect = None
+            try:
+                ranges = self.lex_textbox._textbox.tag_ranges(tag_name)
+                if ranges and len(ranges) >= 2:
+                    bbox = self.lex_textbox._textbox.bbox(ranges[0])
+                    if bbox:
+                        bx, by, bw, bh = bbox
+                        rx = self.lex_textbox._textbox.winfo_rootx() + bx
+                        ry = self.lex_textbox._textbox.winfo_rooty() + by
+                        target_rect = (rx, ry, bw, bh)
+            except Exception:
+                target_rect = None
+                
+            if target_rect:
+                x, y = target_rect[0], target_rect[1]
+            else:
+                x = getattr(event, 'x_root', None) or (self.lex_textbox._textbox.winfo_rootx() + getattr(event, 'x', 0))
+                y = getattr(event, 'y_root', None) or (self.lex_textbox._textbox.winfo_rooty() + getattr(event, 'y', 0))
+                target_rect = (x, y, 40, 20)
             
             if is_internal:
                 match_count = len(results.get("matches", []))
@@ -1845,7 +1862,7 @@ class CenterPanel(ctk.CTkFrame):
                     "preview": f"Ouvrage / Traité : {target_word}",
                     "hint": "🖱️ Cliquer pour rechercher ce livre sur Google & le Web"
                 }
-            self.tooltip.show(x, y, tooltip_data)
+            self.tooltip.show(x, y, tooltip_data, target_rect=target_rect, prefer_side="auto_side")
         except Exception:
             pass
 
