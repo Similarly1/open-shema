@@ -7,7 +7,10 @@ import shutil
 import zipfile
 import datetime
 import threading
-import webview
+try:
+    import webview
+except ImportError:
+    webview = None
 from typing import Dict, List, Any, Optional
 
 # Ajouter le répertoire racine au PYTHONPATH
@@ -30,6 +33,7 @@ from core.commentary_loader import CommentaryLoader
 from core.dictionary_manager import DictionaryManager
 from core.original_languages_manager import OriginalLanguagesManager
 from core.config import load_config, save_config
+from core.notes_manager import NotesManager
 from gui.library_utils import load_books_metadata, save_books_metadata
 
 
@@ -349,17 +353,22 @@ class BibleAppApi:
         return {"book": "Gen", "book_french": "Genèse", "chapter": 1}
 
     def ask_ai(self, question: str, book: str, chapter: int, verse: int) -> Dict[str, Any]:
-        """Interroge l'assistant IA."""
+        """Interroge l'assistant IA en injectant le contexte biblique, les commentaires et les notes personnelles."""
+        self.config = load_config()
         french = get_french_book_name(book)
         ref = f"{french} {chapter}:{verse}"
         comms = self.get_commentaries(book, chapter, verse)
         comm_context = "\n".join([f"- [{c['author']}] {c['text'][:200]}..." for c in comms[:2]])
         
+        # Contexte des notes personnelles
+        notes_context = NotesManager.build_ai_notes_context(passage_ref=ref, question=question, config=self.config)
+        
         prompt = (
             f"Passage d'étude : **{ref}**\n\n"
             f"Question de l'utilisateur : {question}\n\n"
-            f"Contexte des commentaires disponibles :\n{comm_context or 'Aucun commentaire textuel direct.'}\n\n"
-            f"Analyse exégétique synthétique :"
+            f"Contexte des commentaires disponibles :\n{comm_context or 'Aucun commentaire textuel direct.'}\n"
+            f"{notes_context}"
+            f"\nAnalyse exégétique synthétique :"
         )
 
         try:
@@ -421,62 +430,75 @@ class BibleAppApi:
             return {"success": False, "error": result}
 
     # =========================================================================
-    # GESTION DES NOTES PERSONNELLES
+    # GESTION DES NOTES PERSONNELLES (Markdown .md)
     # =========================================================================
 
     def get_notes_list(self) -> List[Dict[str, Any]]:
-        """Charge toutes les notes personnelles."""
-        notes_file = os.path.join(current_dir, "data", "notes.json")
-        if os.path.exists(notes_file):
-            try:
-                with open(notes_file, "r", encoding="utf-8") as f:
-                    return json.load(f)
-            except Exception:
-                return []
-        return []
+        """Charge toutes les notes personnelles sous forme de fichiers Markdown (.md)."""
+        self.config = load_config()
+        return NotesManager.list_notes(self.config)
 
-    def save_note(self, note: Dict[str, Any]) -> bool:
-        """Enregistre ou met à jour une note."""
-        notes = self.get_notes_list()
-        note_id = note.get("id") or datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-        note["id"] = note_id
-        note["updated_at"] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
-        
-        found = False
-        for i, n in enumerate(notes):
-            if n.get("id") == note_id:
-                notes[i] = note
-                found = True
-                break
-        if not found:
-            notes.insert(0, note)
-            
-        notes_file = os.path.join(current_dir, "data", "notes.json")
-        os.makedirs(os.path.dirname(notes_file), exist_ok=True)
-        with open(notes_file, "w", encoding="utf-8") as f:
-            json.dump(notes, f, ensure_ascii=False, indent=2)
-        return True
+    def save_note(self, note: Dict[str, Any]) -> Dict[str, Any]:
+        """Enregistre ou met à jour une note au format Markdown (.md)."""
+        self.config = load_config()
+        target_dir = NotesManager.get_notes_directory(self.config)
+        return NotesManager.save_note_file(note, target_dir)
 
     def delete_note(self, note_id: str) -> bool:
-        """Supprime une note."""
-        notes = self.get_notes_list()
-        notes = [n for n in notes if n.get("id") != note_id]
-        notes_file = os.path.join(current_dir, "data", "notes.json")
-        with open(notes_file, "w", encoding="utf-8") as f:
-            json.dump(notes, f, ensure_ascii=False, indent=2)
-        return True
+        """Supprime le fichier Markdown (.md) d'une note."""
+        self.config = load_config()
+        target_dir = NotesManager.get_notes_directory(self.config)
+        return NotesManager.delete_note_file(note_id, target_dir)
+
+    def get_notes_for_passage(self, book: str, chapter: int, verse: Optional[int] = None) -> List[Dict[str, Any]]:
+        """Retourne les notes personnelles associées à un passage biblique."""
+        self.config = load_config()
+        french = get_french_book_name(book)
+        return NotesManager.get_notes_for_passage(french, chapter, verse, config=self.config)
+
+    def pick_notes_folder(self) -> Dict[str, Any]:
+        """Ouvre un dialogue natif Windows pour choisir le dossier des notes Markdown."""
+        win = get_active_window()
+        if not win:
+            return {"success": False, "error": "Fenêtre introuvable"}
+        result = win.create_file_dialog(webview.FOLDER_DIALOG)
+        if not result or len(result) == 0:
+            return {"cancelled": True}
+        folder_path = result[0]
+        return {"success": True, "path": folder_path}
+
+    def open_notes_folder(self) -> Dict[str, Any]:
+        """Ouvre le dossier des notes dans l'explorateur de fichiers de l'ordinateur."""
+        self.config = load_config()
+        notes_dir = NotesManager.get_notes_directory(self.config)
+        try:
+            if os.name == 'nt':
+                os.startfile(notes_dir)
+            elif sys.platform == 'darwin':
+                import subprocess
+                subprocess.Popen(['open', notes_dir])
+            else:
+                import subprocess
+                subprocess.Popen(['xdg-open', notes_dir])
+            return {"success": True, "path": notes_dir}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
 
     # =========================================================================
     # ASSISTANT D'ÉTUDE AVANCÉ
     # =========================================================================
 
     def ask_study_ai(self, question: str, mode: str = "exegesis", passage_ref: str = "") -> Dict[str, Any]:
-        """Génère une étude théologique ou exégétique complète."""
+        """Génère une étude théologique ou exégétique complète avec prise en compte des notes."""
+        self.config = load_config()
+        notes_context = NotesManager.build_ai_notes_context(passage_ref=passage_ref, question=question, config=self.config)
+        
         prompt = (
             f"Rôle : Assistant exégétique et théologique expert Logos.\n"
             f"Mode d'analyse : {mode.upper()}\n"
             f"Passage ou sujet : {passage_ref or 'Étude biblique générale'}\n\n"
             f"Question : {question}\n\n"
+            f"{notes_context}"
             f"Structure ta réponse avec des titres clairs en Markdown, cite les textes originaux et les références précises."
         )
         try:

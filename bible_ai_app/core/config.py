@@ -29,6 +29,8 @@ DEFAULTS = {
     "translation_model": "gemini-3.5-flash-lite",
     "max_original_verses_for_llm": 10,
     "show_section_titles": True,
+    "notes_directory": "",
+    "include_notes_in_ai": True,
 }
 
 def load_config():

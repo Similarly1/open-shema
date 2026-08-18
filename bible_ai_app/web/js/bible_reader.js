@@ -448,18 +448,20 @@ const InterlinearMenu = {
 const CommentaryViewer = {
   currentComments: [],
   activeIndex: 0,
+  preferredAuthor: null, // Auteur/ouvrage mémorisé pour rester constant lors de la navigation
+  currentVerseRef: '',
 
   init() {
     const btn = document.getElementById('btn-select-comm-source');
     const popover = document.getElementById('comm-sources-popover');
 
-    btn.addEventListener('click', (e) => {
+    btn?.addEventListener('click', (e) => {
       e.stopPropagation();
-      popover.classList.toggle('hidden');
+      popover?.classList.toggle('hidden');
     });
 
     document.addEventListener('click', (e) => {
-      if (!popover.contains(e.target) && e.target !== btn) {
+      if (popover && !popover.contains(e.target) && e.target !== btn) {
         popover.classList.add('hidden');
       }
     });
@@ -467,7 +469,7 @@ const CommentaryViewer = {
 
   setComments(comments, verseRef) {
     this.currentComments = comments || [];
-    this.activeIndex = 0;
+    this.currentVerseRef = verseRef || '';
 
     const countEl = document.getElementById('comm-popover-count');
     const listEl = document.getElementById('comm-sources-list');
@@ -477,29 +479,44 @@ const CommentaryViewer = {
     if (countEl) countEl.textContent = this.currentComments.length;
     if (listEl) listEl.innerHTML = '';
 
-    if (this.currentComments.length === 0) {
-      document.getElementById('lbl-active-comm-source').textContent = 'Aucun commentaire';
-      document.getElementById('commentary-single-view').innerHTML = `
-        <div class="empty-hint" style="padding: 20px; color: var(--text-muted);">
-          Aucun commentaire disponible pour ce verset.
-        </div>
-      `;
-      return;
+    // Si aucun auteur préféré n'a encore été choisi, initialiser avec le premier disponible
+    if (!this.preferredAuthor && this.currentComments.length > 0) {
+      this.preferredAuthor = this.currentComments[0].author || this.currentComments[0].source;
     }
 
-    this.currentComments.forEach((c, idx) => {
-      const authorName = c.author || c.source || `Commentaire ${idx + 1}`;
-      const item = document.createElement('button');
-      item.className = `comm-source-item ${idx === 0 ? 'active' : ''}`;
-      item.innerHTML = `<span>📖 ${authorName}</span>`;
-      item.addEventListener('click', () => {
-        this.selectCommentary(idx);
-        document.getElementById('comm-sources-popover').classList.add('hidden');
+    // Peupler le popover de sélection de source
+    if (this.currentComments.length > 0) {
+      this.currentComments.forEach((c, idx) => {
+        const authorName = c.author || c.source || `Commentaire ${idx + 1}`;
+        const isMatch = this.preferredAuthor && authorName.toLowerCase() === this.preferredAuthor.toLowerCase();
+        const item = document.createElement('button');
+        item.className = `comm-source-item ${isMatch ? 'active' : ''}`;
+        item.innerHTML = `<span>📖 ${authorName}</span>`;
+        item.addEventListener('click', () => {
+          this.preferredAuthor = authorName;
+          this.selectCommentary(idx);
+          document.getElementById('comm-sources-popover')?.classList.add('hidden');
+        });
+        listEl?.appendChild(item);
       });
-      listEl.appendChild(item);
-    });
+    }
 
-    this.selectCommentary(0);
+    // 1. Chercher si l'auteur préféré est présent pour ce verset
+    let targetIndex = -1;
+    if (this.preferredAuthor && this.currentComments.length > 0) {
+      targetIndex = this.currentComments.findIndex(c => {
+        const aName = c.author || c.source || '';
+        return aName.toLowerCase() === this.preferredAuthor.toLowerCase();
+      });
+    }
+
+    if (targetIndex !== -1) {
+      // L'auteur préféré commente ce verset -> afficher directement son analyse
+      this.selectCommentary(targetIndex);
+    } else {
+      // L'auteur préféré n'a pas de note sur ce verset -> afficher la vue sobre avec suggestions
+      this.renderAbsentPreferredAuthor();
+    }
   },
 
   selectCommentary(index) {
@@ -508,22 +525,285 @@ const CommentaryViewer = {
 
     const comm = this.currentComments[index];
     const authorName = comm.author || comm.source || 'Commentaire';
+    this.preferredAuthor = authorName;
 
-    document.getElementById('lbl-active-comm-source').textContent = authorName;
+    const lbl = document.getElementById('lbl-active-comm-source');
+    if (lbl) lbl.textContent = authorName;
 
     document.querySelectorAll('.comm-source-item').forEach((item, idx) => {
       item.classList.toggle('active', idx === index);
     });
 
     const container = document.getElementById('commentary-single-view');
+    if (!container) return;
+
     container.innerHTML = `
       <div class="comm-single-author-header">
         <span class="comm-single-author-badge">📖 ${authorName}</span>
       </div>
       <div class="comm-single-body">
-        ${comm.text.replace(/\n\n/g, '<br><br>')}
+        ${(comm.text || '').replace(/\n\n/g, '<br><br>')}
       </div>
     `;
+  },
+
+  renderAbsentPreferredAuthor() {
+    const authorName = this.preferredAuthor || 'Commentaire';
+    const lbl = document.getElementById('lbl-active-comm-source');
+    if (lbl) lbl.textContent = `${authorName}`;
+
+    document.querySelectorAll('.comm-source-item').forEach(item => {
+      item.classList.remove('active');
+    });
+
+    const container = document.getElementById('commentary-single-view');
+    if (!container) return;
+
+    const hasOtherComments = this.currentComments && this.currentComments.length > 0;
+
+    let suggestionsHtml = '';
+    if (hasOtherComments) {
+      suggestionsHtml = `
+        <div class="comm-suggestions-box" style="margin-top: 20px; background: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; text-align: left;">
+          <div style="font-size: 11px; font-weight: 700; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+            <span>✨ Autres commentaires pour ce verset :</span>
+            <span style="background: rgba(2, 132, 199, 0.15); color: var(--accent-blue); padding: 1px 7px; border-radius: 10px; font-size: 10px; font-weight: 700;">${this.currentComments.length}</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            ${this.currentComments.map((c, idx) => `
+              <button class="comm-suggestion-btn" data-idx="${idx}" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 9px 12px; font-size: 12px; text-align: left; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.15s ease;">
+                <span style="font-weight: 600; color: var(--text-primary);">📖 ${c.author || c.source}</span>
+                <span style="font-size: 11px; color: var(--accent-blue); font-weight: 600;">Consulter ➔</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    } else {
+      suggestionsHtml = `
+        <div style="font-size: 12px; color: var(--text-muted); background: var(--bg-subtle); border-radius: 6px; padding: 12px; border: 1px dashed var(--border-color); margin-top: 16px;">
+          Aucun autre ouvrage de commentaire n'est disponible pour ce verset.
+        </div>
+      `;
+    }
+
+    container.innerHTML = `
+      <div class="comm-absent-view" style="padding: 16px 8px; text-align: center;">
+        <div style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: var(--bg-subtle); color: var(--text-secondary); font-size: 20px; margin-bottom: 12px; border: 1px solid var(--border-color);">
+          📖
+        </div>
+        <div style="font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">
+          ${authorName}
+        </div>
+        <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; max-width: 320px; margin: 0 auto;">
+          Cet ouvrage ne comporte pas de note directe pour le verset <strong>${this.currentVerseRef || ''}</strong>.
+        </div>
+        ${suggestionsHtml}
+      </div>
+    `;
+
+    // Écouteurs sur les suggestions rapides
+    container.querySelectorAll('.comm-suggestion-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.idx);
+        this.selectCommentary(idx);
+      });
+      btn.addEventListener('mouseenter', () => {
+        btn.style.borderColor = 'var(--accent-blue)';
+        btn.style.transform = 'translateX(2px)';
+      });
+      btn.addEventListener('mouseleave', () => {
+        btn.style.borderColor = 'var(--border-color)';
+        btn.style.transform = 'translateX(0)';
+      });
+    });
+  }
+};
+
+
+// 4bis. GESTIONNAIRE DE NOTES DU VOLET DROIT (Bible à gauche, Notes à droite)
+const DrawerNotesViewer = {
+  currentBook: 'Gen',
+  currentChapter: 1,
+  currentVerse: null,
+  currentNotes: [],
+  editingNoteId: null,
+
+  init() {
+    // Bouton + Note en haut de l'onglet
+    document.getElementById('btn-drawer-new-note')?.addEventListener('click', () => {
+      this.openComposer();
+    });
+
+    // Bouton Plein écran
+    document.getElementById('btn-drawer-full-notes')?.addEventListener('click', () => {
+      App.switchView('notes');
+      const bInfo = getBookInfo(this.currentBook);
+      const refStr = `${bInfo.name} ${this.currentChapter}${this.currentVerse ? `:${this.currentVerse}` : ''}`;
+      NotesView.createNewNote(refStr);
+    });
+
+    // Enregistrer note rapide
+    document.getElementById('btn-drawer-save-note')?.addEventListener('click', () => {
+      this.saveQuickNote();
+    });
+  },
+
+  async load(bookCode, chapterNum, verseNum = null) {
+    this.currentBook = bookCode || BibleReader.currentBook || 'Gen';
+    this.currentChapter = chapterNum || BibleReader.currentChapter || 1;
+    this.currentVerse = verseNum || BibleReader.selectedVerse || null;
+
+    const bInfo = getBookInfo(this.currentBook);
+    const refStr = `${bInfo.name} ${this.currentChapter}${this.currentVerse ? `:${this.currentVerse}` : ''}`;
+
+    const badgeEl = document.getElementById('notes-drawer-passage-badge');
+    const composerRefEl = document.getElementById('drawer-composer-ref');
+    if (badgeEl) badgeEl.textContent = refStr;
+    if (composerRefEl) composerRefEl.textContent = refStr;
+
+    const listEl = document.getElementById('drawer-notes-list');
+    if (listEl) {
+      listEl.innerHTML = `<div style="padding: 12px; color: var(--text-muted); font-size: 12px; text-align: center;">Chargement des notes...</div>`;
+    }
+
+    try {
+      this.currentNotes = await API.call('get_notes_for_passage', this.currentBook, this.currentChapter, this.currentVerse) || [];
+      this.renderList();
+    } catch (e) {
+      console.error('Erreur chargement notes volet droit:', e);
+      if (listEl) listEl.innerHTML = `<div style="color: var(--accent-red); font-size: 12px; padding: 10px;">Erreur chargement notes.</div>`;
+    }
+  },
+
+  renderList() {
+    const listEl = document.getElementById('drawer-notes-list');
+    if (!listEl) return;
+    listEl.innerHTML = '';
+
+    if (this.currentNotes.length === 0) {
+      listEl.innerHTML = `
+        <div style="padding: 16px 12px; text-align: center; color: var(--text-muted); font-size: 12px; background: var(--bg-subtle); border-radius: 6px; border: 1px dashed var(--border-color);">
+          <span style="font-size: 22px; display: block; margin-bottom: 4px;">📝</span>
+          Aucune note pour ce passage.<br>
+          <span style="font-size: 11px;">Rédigez une réflexion ci-dessous.</span>
+        </div>
+      `;
+      return;
+    }
+
+    this.currentNotes.forEach((n) => {
+      const card = document.createElement('div');
+      card.className = 'drawer-note-card';
+      card.style.cssText = 'background: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; margin-bottom: 8px; cursor: pointer;';
+      
+      const aiBadge = n.include_in_ai !== false ? '<span title="Prise en compte par l\'IA" style="font-size: 11px;">🤖 IA</span>' : '<span title="Non transmise à l\'IA" style="font-size: 10px; color: var(--text-muted);">🔒 Privée</span>';
+      
+      card.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+          <strong style="font-size: 13px; color: var(--text-primary);">${n.title || 'Note sans titre'}</strong>
+          <div style="display: flex; gap: 6px; align-items: center;">
+            <span style="font-size: 10px; font-weight: 600; color: var(--accent-blue); background: var(--bg-hover); padding: 2px 6px; border-radius: 4px;">${n.reference || ''}</span>
+            ${aiBadge}
+          </div>
+        </div>
+        <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.4; max-height: 60px; overflow: hidden; text-overflow: ellipsis; margin-bottom: 6px;">
+          ${(n.content || '').replace(/#+\s/g, '').slice(0, 140)}...
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--text-muted);">
+          <span>Modifié : ${n.updated_at || ''}</span>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-link btn-open-full" style="color: var(--accent-blue); font-size: 11px; background: none; border: none; cursor: pointer; text-decoration: underline;">Ouvrir ↗</button>
+            <button class="btn-link btn-del-drawer" style="color: var(--accent-red); font-size: 11px; background: none; border: none; cursor: pointer;">🗑️</button>
+          </div>
+        </div>
+      `;
+
+      card.querySelector('.btn-open-full')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        App.switchView('notes');
+        NotesView.selectNote(n);
+      });
+
+      card.querySelector('.btn-del-drawer')?.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (confirm(`Supprimer la note « ${n.title} » ?`)) {
+          await API.call('delete_note', n.id);
+          App.showToast('Note supprimée');
+          this.load(this.currentBook, this.currentChapter, this.currentVerse);
+          NotesView.loadNotes();
+        }
+      });
+
+      card.addEventListener('click', () => {
+        this.populateComposerWithNote(n);
+      });
+
+      listEl.appendChild(card);
+    });
+  },
+
+  openComposer(initialTitle = '', initialContent = '') {
+    const titleInp = document.getElementById('drawer-note-title-input');
+    const contentInp = document.getElementById('drawer-note-content-input');
+    const bInfo = getBookInfo(this.currentBook);
+    const refStr = `${bInfo.name} ${this.currentChapter}${this.currentVerse ? `:${this.currentVerse}` : ''}`;
+    
+    this.editingNoteId = null;
+    const titleHeader = document.getElementById('drawer-composer-title');
+    if (titleHeader) titleHeader.textContent = '✍️ Rédiger une note';
+
+    if (titleInp) {
+      titleInp.value = initialTitle || `Note sur ${refStr}`;
+      titleInp.focus();
+    }
+    if (contentInp) contentInp.value = initialContent || '';
+  },
+
+  populateComposerWithNote(note) {
+    const titleInp = document.getElementById('drawer-note-title-input');
+    const contentInp = document.getElementById('drawer-note-content-input');
+    const aiToggle = document.getElementById('drawer-note-ai-toggle');
+    const titleHeader = document.getElementById('drawer-composer-title');
+
+    if (titleInp) titleInp.value = note.title || '';
+    if (contentInp) contentInp.value = note.content || '';
+    if (aiToggle) aiToggle.checked = note.include_in_ai !== false;
+    if (titleHeader) titleHeader.textContent = '✏️ Modifier la note';
+    this.editingNoteId = note.id;
+  },
+
+  async saveQuickNote() {
+    const titleInp = document.getElementById('drawer-note-title-input');
+    const contentInp = document.getElementById('drawer-note-content-input');
+    const aiToggle = document.getElementById('drawer-note-ai-toggle');
+
+    const bInfo = getBookInfo(this.currentBook);
+    const refStr = `${bInfo.name} ${this.currentChapter}${this.currentVerse ? `:${this.currentVerse}` : ''}`;
+
+    const noteToSave = {
+      id: this.editingNoteId || null,
+      title: titleInp?.value.trim() || `Note sur ${refStr}`,
+      reference: refStr,
+      tags: '',
+      include_in_ai: aiToggle?.checked !== false,
+      content: contentInp?.value || ''
+    };
+
+    try {
+      await API.call('save_note', noteToSave);
+      App.showToast('Note enregistrée en Markdown (.md) !');
+      this.editingNoteId = null;
+      if (titleInp) titleInp.value = '';
+      if (contentInp) contentInp.value = '';
+      const titleHeader = document.getElementById('drawer-composer-title');
+      if (titleHeader) titleHeader.textContent = '✍️ Rédiger une note';
+      
+      this.load(this.currentBook, this.currentChapter, this.currentVerse);
+      NotesView.loadNotes();
+    } catch (e) {
+      alert(`Erreur sauvegarde note : ${e}`);
+    }
   }
 };
 
@@ -714,12 +994,11 @@ const ContextMenuManager = {
 
     document.getElementById('ctx-act-v-note').addEventListener('click', () => {
       this.hide();
-      App.switchView('notes');
-      NotesView.createNewNote();
-      const refInput = document.getElementById('note-edit-ref');
-      const titleInput = document.getElementById('note-edit-title');
-      if (refInput) refInput.value = refStr;
-      if (titleInput) titleInput.value = `Méditation sur ${refStr}`;
+      const drawer = document.getElementById('right-drawer');
+      drawer?.classList.remove('collapsed');
+      document.querySelector('.drawer-tab[data-drawer-tab="notes"]')?.click();
+      DrawerNotesViewer.load(bookCode, chapterNum, verseNum);
+      DrawerNotesViewer.openComposer(`Note sur ${refStr}`, '');
     });
 
     document.getElementById('ctx-act-v-split').addEventListener('click', () => {
@@ -988,6 +1267,7 @@ const BibleReader = {
     DisplayOptions.init();
     InterlinearMenu.init();
     CommentaryViewer.init();
+    DrawerNotesViewer.init();
     ContextMenuManager.init();
     
     BookPicker.init((bookCode, chNum) => {
@@ -1052,6 +1332,26 @@ const BibleReader = {
     document.getElementById('btn-history-forward')?.addEventListener('click', () => {
       const next = getNextChapterCoord(this.currentBook, this.currentChapter);
       if (next) this.navigateTo(next.book, next.chapter);
+    });
+
+    // Liens rapides de la barre d'outils du lecteur
+    document.getElementById('mode-notes-inline')?.addEventListener('click', () => {
+      const drawer = document.getElementById('right-drawer');
+      const notesTab = document.querySelector('.drawer-tab[data-drawer-tab="notes"]');
+      const isNotesOpen = !drawer?.classList.contains('collapsed') && notesTab?.classList.contains('active');
+      if (isNotesOpen) {
+        drawer?.classList.add('collapsed');
+        document.getElementById('btn-toggle-right-drawer')?.classList.remove('active');
+      } else {
+        drawer?.classList.remove('collapsed');
+        document.getElementById('btn-toggle-right-drawer')?.classList.add('active');
+        notesTab?.click();
+        DrawerNotesViewer.load(this.currentBook, this.currentChapter, this.selectedVerse || 1);
+      }
+    });
+
+    document.getElementById('mode-search-inline')?.addEventListener('click', () => {
+      App.switchView('search');
     });
 
     document.getElementById('btn-toggle-split')?.addEventListener('click', () => {
@@ -1707,6 +2007,7 @@ const BibleReader = {
   },
 
   async loadCommentariesForVerse(verseNum, bookCode = null, chapterNum = null) {
+    this.selectedVerse = verseNum;
     const book = bookCode || this.currentBook;
     const ch = chapterNum || this.currentChapter;
     const bookInfo = getBookInfo(book);
@@ -1717,6 +2018,13 @@ const BibleReader = {
       CommentaryViewer.setComments(comms, refStr);
     } catch (e) {
       console.error('Erreur commentaires:', e);
+    }
+
+    // Synchronisation automatique des notes dans le volet latéral
+    try {
+      DrawerNotesViewer.load(book, ch, verseNum);
+    } catch (e) {
+      console.error('Erreur sync DrawerNotesViewer:', e);
     }
   },
 

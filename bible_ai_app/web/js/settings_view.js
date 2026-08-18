@@ -64,6 +64,37 @@ const SettingsView = {
       App.applyFontFamily(e.target.value);
     });
 
+    // Notes & Dossier Markdown
+    document.getElementById('btn-browse-notes-dir')?.addEventListener('click', async () => {
+      try {
+        const res = await API.call('pick_notes_folder');
+        if (res && res.success && res.path) {
+          document.getElementById('cfg-notes-dir').value = res.path;
+          App.showToast(`Dossier sélectionné : ${res.path}`);
+        }
+      } catch (e) {
+        alert(`Erreur sélection dossier : ${e}`);
+      }
+    });
+
+    document.getElementById('btn-open-notes-dir-cfg')?.addEventListener('click', async () => {
+      try {
+        const res = await API.call('open_notes_folder');
+        if (res && res.success) {
+          App.showToast(`Dossier ouvert : ${res.path}`);
+        } else {
+          alert(`Erreur : ${res?.error || 'Impossible d\'ouvrir le dossier'}`);
+        }
+      } catch (e) {
+        alert(`Erreur : ${e}`);
+      }
+    });
+
+    document.getElementById('btn-reset-notes-dir')?.addEventListener('click', () => {
+      document.getElementById('cfg-notes-dir').value = '';
+      App.showToast('Dossier réinitialisé par défaut (data/notes/)');
+    });
+
     document.getElementById('btn-save-settings-top').addEventListener('click', () => {
       this.save();
     });
@@ -171,6 +202,11 @@ const SettingsView = {
       document.getElementById('lbl-max-orig-val').textContent = `${c.max_original_verses_for_llm} vers.`;
     }
 
+    if (c.notes_directory !== undefined) {
+      document.getElementById('cfg-notes-dir').value = c.notes_directory || '';
+    }
+    document.getElementById('cfg-include-notes-ai').checked = c.include_notes_in_ai !== false;
+
     if (c.chat_model) document.getElementById('cfg-chat-model').value = c.chat_model;
     if (c.gemini_api_key) document.getElementById('cfg-gemini-key').value = c.gemini_api_key;
     if (c.mistral_api_key) document.getElementById('cfg-mistral-key').value = c.mistral_api_key;
@@ -259,6 +295,9 @@ const SettingsView = {
     newCfg.interlinear_show_strong = document.getElementById('cfg-inter-strong').checked;
 
     newCfg.max_original_verses_for_llm = parseInt(document.getElementById('cfg-max-orig-verses').value);
+    newCfg.notes_directory = document.getElementById('cfg-notes-dir').value.trim();
+    newCfg.include_notes_in_ai = document.getElementById('cfg-include-notes-ai').checked;
+
     newCfg.chat_model = document.getElementById('cfg-chat-model').value;
     newCfg.gemini_api_key = document.getElementById('cfg-gemini-key').value.trim();
     newCfg.mistral_api_key = document.getElementById('cfg-mistral-key').value.trim();

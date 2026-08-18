@@ -256,6 +256,7 @@
         <div class="settings-nav-tabs">
           <button class="settings-tab active" data-sec="apparence">🎨 Apparence</button>
           <button class="settings-tab" data-sec="lecture">📖 Options de Lecture</button>
+          <button class="settings-tab" data-sec="notes">📝 Notes & Dossier</button>
           <button class="settings-tab" data-sec="stepbible">📜 STEPBible (Grec/Hébreu)</button>
           <button class="settings-tab" data-sec="dict">📚 Dictionnaires</button>
           <button class="settings-tab" data-sec="ai">🤖 Assistant IA & Clés</button>
@@ -332,6 +333,37 @@
                   <label class="custom-checkbox"><input type="checkbox" id="cfg-inter-translit" checked> <span>Translittération phonétique</span></label>
                   <label class="custom-checkbox"><input type="checkbox" id="cfg-inter-strong" checked> <span>Numéro Strong (H... / G...)</span></label>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2bis : Notes & Dossier Markdown -->
+          <div class="settings-section" id="sec-notes">
+            <div class="settings-card">
+              <div class="card-title">Dossier de Stockage des Notes Personnelles (.md)</div>
+              <p class="card-desc">Chaque note est stockée en fichier <code>.md</code> indépendant et en clair sur votre ordinateur. Vous pouvez y accéder directement, y copier/coller des fichiers ou les synchroniser avec Obsidian, Logseq, etc.</p>
+              
+              <div class="form-group">
+                <label>Emplacement actuel du dossier de notes :</label>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <input type="text" id="cfg-notes-dir" class="text-field" style="flex: 1;" placeholder="Dossier par défaut (data/notes/)" readonly>
+                  <button class="btn-primary" id="btn-browse-notes-dir" title="Choisir un dossier sur votre PC">📂 Parcourir...</button>
+                  <button class="btn-secondary" id="btn-open-notes-dir-cfg" title="Ouvrir dans l'explorateur de fichiers">📁 Ouvrir</button>
+                  <button class="btn-secondary" id="btn-reset-notes-dir" title="Revenir au dossier par défaut du programme">↺ Par défaut</button>
+                </div>
+              </div>
+
+              <div class="form-divider"></div>
+
+              <div class="card-title">Intégration dans les Réponses de l'Assistant IA</div>
+              <div class="checkbox-group">
+                <label class="custom-checkbox">
+                  <input type="checkbox" id="cfg-include-notes-ai" checked>
+                  <span>Inclure les notes personnelles dans le contexte de l'assistant IA</span>
+                </label>
+                <p style="font-size: 11px; color: var(--text-muted); margin-left: 24px; margin-top: 4px;">
+                  Si activé, l'IA consultera vos notes associées au passage ou au sujet étudié pour enrichir ses réponses. Vous pouvez aussi désactiver des notes individuellement.
+                </p>
               </div>
             </div>
           </div>
@@ -510,6 +542,7 @@
             <div class="notes-sidebar-header">
               <input type="text" id="notes-search-input" class="search-field full-w" placeholder="🔍 Filtrer les notes...">
               <button class="btn-primary full-w" id="btn-new-note" style="margin-top: 8px;">+ Nouvelle Note</button>
+              <button class="btn-secondary full-w" id="btn-open-notes-folder" style="margin-top: 6px; font-size: 11px;">📂 Ouvrir le dossier (.md)</button>
             </div>
             <div class="notes-list-items" id="notes-list-items">
               <!-- Liste des notes injectée dynamiquement -->
@@ -520,17 +553,29 @@
           <section class="notes-editor-pane">
             <div class="notes-editor-header">
               <input type="text" id="note-edit-title" class="note-title-input" placeholder="Titre de la note...">
-              <div class="note-actions">
+              <div class="note-actions" style="display: flex; align-items: center; gap: 10px;">
+                <label style="font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" id="note-edit-ai-toggle" checked>
+                  <span>🤖 Inclure dans l'IA</span>
+                </label>
+                <button class="btn-secondary" id="btn-toggle-note-preview" title="Basculer entre Mode Édition et Prévisualisation Markdown">👁️ Aperçu</button>
                 <button class="btn-secondary" id="btn-delete-current-note">🗑️ Supprimer</button>
                 <button class="btn-primary" id="btn-save-current-note">💾 Enregistrer</button>
               </div>
             </div>
             <div class="notes-editor-subbar">
-              <input type="text" id="note-edit-ref" class="text-field" style="width: 200px;" placeholder="Passage lié (ex: Jean 3:16)">
+              <input type="text" id="note-edit-ref" class="text-field" style="width: 220px;" placeholder="Passage lié (ex: Jean 3:16)">
               <input type="text" id="note-edit-tags" class="text-field" style="flex: 1;" placeholder="Tags (séparés par virgules)...">
+              <div class="notes-quick-tools" style="display: flex; gap: 4px;">
+                <button class="btn-secondary" id="btn-md-bold" title="Gras (**texte**)" style="padding: 0 8px; font-size: 11px; font-weight: 700;">B</button>
+                <button class="btn-secondary" id="btn-md-italic" title="Italique (*texte*)" style="padding: 0 8px; font-size: 11px; font-style: italic;">I</button>
+                <button class="btn-secondary" id="btn-md-quote" title="Citation (> texte)" style="padding: 0 8px; font-size: 11px;">”</button>
+                <button class="btn-secondary" id="btn-md-list" title="Liste à puces (- item)" style="padding: 0 8px; font-size: 11px;">•</button>
+              </div>
             </div>
             <div class="notes-editor-body">
-              <textarea id="note-edit-content" placeholder="Écrivez vos réflexions, méditations et notes exégétiques..."></textarea>
+              <textarea id="note-edit-content" placeholder="Écrivez vos réflexions, méditations et notes exégétiques en Markdown..."></textarea>
+              <div id="note-preview-content" class="note-preview-content hidden" style="flex: 1; overflow-y: auto; padding: 20px; font-family: var(--font-bible); font-size: 16px; line-height: 1.7; color: var(--text-primary);"></div>
             </div>
           </section>
         </div>
@@ -562,13 +607,14 @@
     </main>
 
     <!-- ======================================================= -->
-    <!-- 3. PANNEAU LATÉRAL DROIT (Commentaires & Assistant IA)  -->
+    <!-- 3. PANNEAU LATÉRAL DROIT (Commentaires & Assistant IA & Notes) -->
     <!-- ======================================================= -->
     <aside class="right-drawer collapsed" id="right-drawer">
       <div class="drawer-tabs">
         <button class="drawer-tab active" data-drawer-tab="commentaries">💬 Commentaires</button>
         <button class="drawer-tab" data-drawer-tab="ai">🤖 Assistant IA</button>
         <button class="drawer-tab" data-drawer-tab="lexicon">📜 Lexique</button>
+        <button class="drawer-tab" data-drawer-tab="notes">📝 Notes</button>
         <button class="drawer-close-btn" id="btn-collapse-drawer" title="Replier le volet d'étude">✕</button>
       </div>
 
@@ -600,7 +646,7 @@
             <div class="chat-message assistant">
               <div class="msg-avatar">🤖</div>
               <div class="msg-content">
-                Bonjour ! Posez-moi une question sur le passage en cours de lecture. Je m'appuierai sur vos Bibles et vos commentaires.
+                Bonjour ! Posez-moi une question sur le passage en cours de lecture. Je m'appuierai sur vos Bibles, vos commentaires et vos notes.
               </div>
             </div>
           </div>
@@ -614,6 +660,35 @@
         <div class="drawer-content" id="drawer-tab-lexicon">
           <div class="lexicon-details" id="lexicon-details">
             <p class="empty-hint">Cliquez sur un mot dans le texte biblique pour analyser sa racine hébraïque/grecque.</p>
+          </div>
+        </div>
+
+        <!-- Onglet 4: Notes Personnelles (Liées au passage ou au verset) -->
+        <div class="drawer-content" id="drawer-tab-notes">
+          <div class="drawer-section-header" style="flex-wrap: wrap; gap: 8px;">
+            <span class="selected-verse-badge" id="notes-drawer-passage-badge">Genèse 1:1</span>
+            <div style="display: flex; gap: 6px; margin-left: auto;">
+              <button class="btn-primary" id="btn-drawer-new-note" style="font-size: 11px; padding: 3px 8px;">+ Note</button>
+              <button class="btn-secondary" id="btn-drawer-full-notes" title="Ouvrir la vue Notes complète" style="font-size: 11px; padding: 3px 8px;">↗ Plein écran</button>
+            </div>
+          </div>
+          <div class="drawer-notes-scroll" id="drawer-notes-scroll" style="flex: 1; overflow-y: auto; padding: 14px;">
+            <div id="drawer-notes-list"></div>
+            
+            <div class="drawer-note-composer" id="drawer-note-composer" style="margin-top: 14px; background: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                <span style="font-size: 12px; font-weight: 700; color: var(--accent-blue);" id="drawer-composer-title">✍️ Rédiger une note</span>
+                <span style="font-size: 10px; font-weight: 600; color: var(--text-muted);" id="drawer-composer-ref">Genèse 1:1</span>
+              </div>
+              <input type="text" id="drawer-note-title-input" class="text-field full-w" placeholder="Titre de la note..." style="margin-bottom: 6px; font-size: 12px;">
+              <textarea id="drawer-note-content-input" class="text-field full-w" placeholder="Écrivez votre note en Markdown..." style="height: 90px; resize: vertical; margin-bottom: 8px; font-family: var(--font-bible); font-size: 14px;"></textarea>
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <label style="font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; cursor: pointer;">
+                  <input type="checkbox" id="drawer-note-ai-toggle" checked> <span>🤖 IA</span>
+                </label>
+                <button class="btn-primary" id="btn-drawer-save-note" style="font-size: 11px; padding: 4px 12px;">💾 Enregistrer</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
