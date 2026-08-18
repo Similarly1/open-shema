@@ -254,7 +254,17 @@ class SettingsTab(ctk.CTkScrollableFrame):
                 "gemini-2.5-flash",
                 "gemini-2.5-flash-lite",
                 "mistral-small-latest",
-                "mistral-large-latest"
+                "mistral-large-latest",
+                "open-mistral-nemo",
+                "codestral-latest",
+                "mistralai/Ministral-3-14B-Instruct-2512",
+                "mistralai/Mistral-Small-4-119B-2603",
+                "swiss-ai/Apertus-v1.5-70B",
+                "google/gemma-4-31B-it",
+                "moonshotai/Kimi-K2.6",
+                "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8",
+                "Qwen/Qwen3.5-122B-A10B-FP8",
+                "Qwen/Qwen3.5-397B-A17B-FP8"
             ]
         )
         self.chat_model_menu.pack(fill="x", padx=20, pady=5)

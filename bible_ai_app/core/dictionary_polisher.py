@@ -42,12 +42,15 @@ AVAILABLE_POLISH_MODELS = [
     ("open-mistral-nemo", "🇫🇷 Mistral Nemo (Mistral AI)"),
     ("codestral-latest", "🇫🇷 Codestral (Mistral AI)"),
     
-    # Infomaniak Swiss AI
-    ("mistralai/Ministral-3-14B-Instruct-2512", "🇨🇭 Ministral 14B (Infomaniak)"),
-    ("mistralai/Mistral-Small-24B-Instruct-2501", "🇨🇭 Mistral Small 24B (Infomaniak)"),
-    ("meta-llama/Llama-3.3-70B-Instruct", "🇨🇭 Llama 3.3 70B (Infomaniak)"),
-    ("meta-llama/Llama-3.1-8B-Instruct", "🇨🇭 Llama 3.1 8B (Infomaniak)"),
-    ("Qwen/Qwen2.5-72B-Instruct", "🇨🇭 Qwen 2.5 72B (Infomaniak)")
+    # Infomaniak Swiss AI (Vérifiés en direct sur l'API Infomaniak)
+    ("mistralai/Ministral-3-14B-Instruct-2512", "🇨🇭 Ministral 3 14B (Infomaniak)"),
+    ("mistralai/Mistral-Small-4-119B-2603", "🇨🇭 Mistral Small 4 119B (Infomaniak)"),
+    ("swiss-ai/Apertus-v1.5-70B", "🇨🇭 Swiss AI Apertus 1.5 70B (Infomaniak)"),
+    ("google/gemma-4-31B-it", "🇨🇭 Gemma 4 31B (Infomaniak)"),
+    ("moonshotai/Kimi-K2.6", "🇨🇭 Kimi K2.6 (Infomaniak)"),
+    ("nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8", "🇨🇭 Nemotron 3 Nano 30B (Infomaniak)"),
+    ("Qwen/Qwen3.5-122B-A10B-FP8", "🇨🇭 Qwen 3.5 122B (Infomaniak)"),
+    ("Qwen/Qwen3.5-397B-A17B-FP8", "🇨🇭 Qwen 3.5 397B (Infomaniak)")
 ]
 
 class DictionaryPolisher:

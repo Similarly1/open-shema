@@ -710,7 +710,7 @@ class CenterPanel(ctk.CTkFrame):
             values=polish_model_names,
             command=self.on_polish_model_changed,
             height=30,
-            width=140,
+            width=175,
             font=ctk.CTkFont(size=10, weight="bold")
         )
         self.lex_polish_model_menu.pack(side="right")
