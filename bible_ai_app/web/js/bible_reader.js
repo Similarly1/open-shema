@@ -270,16 +270,83 @@ const DisplayOptions = {
     document.getElementById('opt-font-serif').addEventListener('change', (e) => {
       workspace.classList.toggle('font-sans', !e.target.checked);
     });
+  }
+};
 
-    const interVersionSelect = document.getElementById('opt-interlinear-version');
-    if (interVersionSelect) {
-      interVersionSelect.addEventListener('change', (e) => {
+
+// 3b. MENU OPTIONS INTERLINÉAIRE INVERSÉ (Style Logos)
+const InterlinearMenu = {
+  init() {
+    const btn = document.getElementById('btn-toggle-interlinear');
+    const popover = document.getElementById('interlinear-options-popover');
+    const masterSwitch = document.getElementById('interlinear-master-switch');
+    const closeBtn = document.getElementById('btn-close-interlinear-popover');
+    const radioLSG = document.getElementById('lbl-inter-lsg');
+    const radioDarby = document.getElementById('lbl-inter-darby');
+
+    if (!btn || !popover) return;
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      popover.classList.toggle('hidden');
+    });
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        popover.classList.add('hidden');
+      });
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!popover.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+        popover.classList.add('hidden');
+      }
+    });
+
+    if (masterSwitch) {
+      masterSwitch.addEventListener('change', (e) => {
+        BibleReader.isInterlinear = e.target.checked;
+        btn.classList.toggle('active', BibleReader.isInterlinear);
+        BibleReader.updatePaneHeader(1);
+        if (BibleReader.isSplitView) BibleReader.updatePaneHeader(2);
+        BibleReader.reloadCurrentChapters();
+      });
+    }
+
+    document.querySelectorAll('input[name="interlinear-version-radio"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
         BibleReader.interlinearVersion = e.target.value;
+        if (radioLSG) radioLSG.classList.toggle('active', e.target.value === 'LSG');
+        if (radioDarby) radioDarby.classList.toggle('active', e.target.value === 'DARBY');
         if (BibleReader.isInterlinear) {
+          BibleReader.updatePaneHeader(1);
+          if (BibleReader.isSplitView) BibleReader.updatePaneHeader(2);
           BibleReader.reloadCurrentChapters();
         }
       });
-    }
+    });
+
+    const layerSurface = document.getElementById('inter-layer-surface');
+    const layerOrig = document.getElementById('inter-layer-orig');
+    const layerTranslit = document.getElementById('inter-layer-translit');
+    const layerStrong = document.getElementById('inter-layer-strong');
+
+    const onLayerChanged = () => {
+      BibleReader.interlinearLayers = {
+        surface: layerSurface ? layerSurface.checked : true,
+        orig: layerOrig ? layerOrig.checked : true,
+        translit: layerTranslit ? layerTranslit.checked : true,
+        strong: layerStrong ? layerStrong.checked : true
+      };
+      if (BibleReader.isInterlinear) {
+        BibleReader.reloadCurrentChapters();
+      }
+    };
+
+    if (layerSurface) layerSurface.addEventListener('change', onLayerChanged);
+    if (layerOrig) layerOrig.addEventListener('change', onLayerChanged);
+    if (layerTranslit) layerTranslit.addEventListener('change', onLayerChanged);
+    if (layerStrong) layerStrong.addEventListener('change', onLayerChanged);
   }
 };
 
@@ -793,6 +860,7 @@ const BibleReader = {
   isSplitView: false,
   isInterlinear: false,
   interlinearVersion: 'LSG',
+  interlinearLayers: { surface: true, orig: true, translit: true, strong: true },
   zoomPercent: 100,
 
   installedBibles: [],
@@ -805,6 +873,7 @@ const BibleReader = {
     this.bindEvents();
     TabsManager.init();
     DisplayOptions.init();
+    InterlinearMenu.init();
     CommentaryViewer.init();
     ContextMenuManager.init();
     
@@ -843,18 +912,8 @@ const BibleReader = {
       if (next) this.navigateTo(next.book, next.chapter);
     });
 
-    document.getElementById('btn-toggle-interlinear').addEventListener('click', () => {
-      this.isInterlinear = !this.isInterlinear;
-      document.getElementById('btn-toggle-interlinear').classList.toggle('active', this.isInterlinear);
-      this.reloadCurrentChapters();
-    });
-
     document.getElementById('btn-toggle-split').addEventListener('click', () => {
       this.toggleSplitView();
-    });
-
-    document.getElementById('btn-close-pane-2').addEventListener('click', () => {
-      this.toggleSplitView(false);
     });
 
     document.getElementById('pane-1-select-bible').addEventListener('click', (e) => {
@@ -881,69 +940,129 @@ const BibleReader = {
     document.getElementById('btn-zoom-in').addEventListener('click', () => {
       this.setZoom(this.zoomPercent + 10);
     });
+
     document.getElementById('btn-zoom-out').addEventListener('click', () => {
       this.setZoom(this.zoomPercent - 10);
     });
 
     document.getElementById('btn-toggle-right-drawer').addEventListener('click', () => {
-      document.getElementById('right-drawer').classList.toggle('collapsed');
+      const drawer = document.getElementById('right-drawer');
+      drawer.classList.toggle('collapsed');
     });
 
-    document.getElementById('quick-passage-input').addEventListener('keydown', async (e) => {
-      if (e.key === 'Enter') {
-        const query = e.target.value.trim();
-        if (query) {
-          const parsed = await API.parseReference(query);
-          if (parsed && parsed.book) {
-            this.navigateTo(parsed.book, parsed.chapter || 1);
-            e.target.value = '';
+    // Filtre de recherche dans le sélecteur de Bible
+    document.getElementById('bible-picker-search').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase();
+      document.querySelectorAll('#version-list-items .version-row-btn').forEach(btn => {
+        const txt = btn.textContent.toLowerCase();
+        btn.style.display = txt.includes(q) ? 'flex' : 'none';
+      });
+    });
+
+    const quickPassage = document.getElementById('quick-passage-input');
+    if (quickPassage) {
+      quickPassage.addEventListener('keydown', async (e) => {
+        if (e.key === 'Enter') {
+          const query = e.target.value.trim();
+          if (query) {
+            const parsed = await API.parseReference(query);
+            if (parsed && parsed.book) {
+              this.navigateTo(parsed.book, parsed.chapter || 1);
+              e.target.value = '';
+            }
           }
         }
+      });
+    }
+  },
+
+  updatePaneHeader(paneNum) {
+    if (paneNum === 1) {
+      if (this.isInterlinear) {
+        const interLabel = this.interlinearVersion === 'DARBY' ? 'Darby (Interlinéaire)' : 'LSG 1910 (Interlinéaire)';
+        document.getElementById('pane-1-bible-name').textContent = interLabel;
+      } else {
+        document.getElementById('pane-1-bible-name').textContent = this.currentBible1;
       }
-    });
+    } else if (paneNum === 2) {
+      if (this.isInterlinear) {
+        const interLabel = this.interlinearVersion === 'DARBY' ? 'Darby (Interlinéaire)' : 'LSG 1910 (Interlinéaire)';
+        document.getElementById('pane-2-bible-name').textContent = interLabel;
+      } else {
+        document.getElementById('pane-2-bible-name').textContent = this.currentBible2;
+      }
+    }
+  },
+
+  setZoom(percent) {
+    this.zoomPercent = Math.min(Math.max(70, percent), 180);
+    document.getElementById('lbl-zoom-level').textContent = `${this.zoomPercent}%`;
+    document.getElementById('pane-1-content').style.fontSize = `${this.zoomPercent}%`;
+    document.getElementById('pane-2-content').style.fontSize = `${this.zoomPercent}%`;
+  },
+
+  toggleSplitView(forceState) {
+    this.isSplitView = forceState !== undefined ? forceState : !this.isSplitView;
+    const workspace = document.getElementById('reader-workspace');
+    workspace.classList.toggle('split-view', this.isSplitView);
+    document.getElementById('btn-toggle-split').classList.toggle('active', this.isSplitView);
+
+    if (this.isSplitView) {
+      this.updatePaneHeader(2);
+      this.reloadPane2();
+    }
+  },
+
+  async reloadPane2() {
+    if (!this.isSplitView) return;
+    const pane2Container = document.getElementById('pane-2-verses');
+    pane2Container.innerHTML = '';
+    const data2 = await API.getChapterData(this.currentBible2, this.currentBook, this.currentChapter, this.interlinearVersion);
+    const block2 = this.createChapterBlockElement(2, data2, this.currentBible2);
+    pane2Container.appendChild(block2);
   },
 
   setupInfiniteScroll() {
-    const pane1Scroll = document.getElementById('pane-1-content');
-    if (!pane1Scroll) return;
+    const pane1 = document.getElementById('pane-1-content');
+    if (!pane1) return;
+    
+    pane1.addEventListener('scroll', () => {
+      if (this.isLoadingMore) return;
+      const { scrollTop, scrollHeight, clientHeight } = pane1;
 
-    pane1Scroll.addEventListener('scroll', () => {
-      this.detectActiveVisibleChapter(pane1Scroll);
-
-      if (pane1Scroll.scrollTop + pane1Scroll.clientHeight >= pane1Scroll.scrollHeight - 300) {
+      // Défilement vers le bas -> charger le chapitre suivant
+      if (scrollTop + clientHeight >= scrollHeight - 250) {
         this.loadNextChapterContinuous();
       }
 
-      if (pane1Scroll.scrollTop <= 50) {
-        this.loadPrevChapterContinuous(pane1Scroll);
+      // Défilement vers le haut -> charger le chapitre précédent
+      if (scrollTop <= 50) {
+        this.loadPrevChapterContinuous(pane1);
       }
+
+      // Détection du chapitre actuellement visible pour mettre à jour la pilule
+      this.updateCurrentlyVisibleHeader(pane1);
     });
   },
 
-  detectActiveVisibleChapter(scrollEl) {
-    const blocks = scrollEl.querySelectorAll('.chapter-block');
-    let bestBlock = null;
-    let minDistance = 999999;
+  updateCurrentlyVisibleHeader(container) {
+    const blocks = container.querySelectorAll('.chapter-block');
+    const containerTop = container.getBoundingClientRect().top;
 
-    blocks.forEach(block => {
+    for (const block of blocks) {
       const rect = block.getBoundingClientRect();
-      const dist = Math.abs(rect.top - 120);
-      if (dist < minDistance) {
-        minDistance = dist;
-        bestBlock = block;
-      }
-    });
-
-    if (bestBlock) {
-      const bCode = bestBlock.dataset.book;
-      const ch = parseInt(bestBlock.dataset.chapter);
-      if (bCode !== this.currentBook || ch !== this.currentChapter) {
-        this.currentBook = bCode;
-        this.currentChapter = ch;
-        const info = getBookInfo(bCode);
-        document.getElementById('pill-reference-text').textContent = `${info.name} ${ch}`;
-        document.getElementById('pane-1-breadcrumb').textContent = `${info.name.toUpperCase()} > Chapitre ${ch}`;
-        TabsManager.updateActiveTab(null, bCode, ch);
+      if (rect.bottom > containerTop + 60) {
+        const bCode = block.dataset.book;
+        const ch = block.dataset.chapter;
+        if (bCode && ch && (this.currentBook !== bCode || this.currentChapter !== parseInt(ch))) {
+          this.currentBook = bCode;
+          this.currentChapter = parseInt(ch);
+          const info = getBookInfo(bCode);
+          document.getElementById('pill-reference-text').textContent = `${info.name} ${ch}`;
+          document.getElementById('pane-1-breadcrumb').textContent = `${info.name.toUpperCase()} > Chapitre ${ch}`;
+          TabsManager.updateActiveTab(null, bCode, ch);
+        }
+        break;
       }
     }
   },
@@ -956,7 +1075,7 @@ const BibleReader = {
     const info = getBookInfo(bookCode);
     document.getElementById('pill-reference-text').textContent = `${info.name} ${chapterNum}`;
     document.getElementById('pane-1-breadcrumb').textContent = `${info.name.toUpperCase()} > Chapitre ${chapterNum}`;
-    document.getElementById('pane-1-bible-name').textContent = this.currentBible1;
+    this.updatePaneHeader(1);
 
     const pane1Container = document.getElementById('pane-1-verses');
     pane1Container.innerHTML = '';
@@ -968,6 +1087,7 @@ const BibleReader = {
     if (this.isSplitView) {
       const pane2Container = document.getElementById('pane-2-verses');
       pane2Container.innerHTML = '';
+      this.updatePaneHeader(2);
       const data2 = await API.getChapterData(this.currentBible2, bookCode, chapterNum, this.interlinearVersion);
       const block2 = this.createChapterBlockElement(2, data2, this.currentBible2);
       pane2Container.appendChild(block2);
@@ -1071,16 +1191,21 @@ const BibleReader = {
           vSpan.className = 'verse-item interlinear-mode';
           let wordsHtml = '';
           v.words.forEach(w => {
+            const showSurf = this.interlinearLayers.surface;
+            const showOrig = this.interlinearLayers.orig && w.orig && w.orig !== w.surface;
+            const showTrans = this.interlinearLayers.translit && w.translit;
+            const showStrong = this.interlinearLayers.strong && w.strong;
+
             wordsHtml += `
               <div class="interlinear-block" data-strong="${w.strong || ''}" data-word="${w.orig || w.surface}" data-surface="${w.surface}" title="${w.morph || ''}">
-                <span class="interlinear-surface">${w.surface}</span>
-                ${w.orig && w.orig !== w.surface ? `<span class="interlinear-lemma">${w.orig}</span>` : ''}
-                ${w.translit ? `<span class="interlinear-translit">${w.translit}</span>` : ''}
-                ${w.strong ? `<span class="interlinear-strong">${w.strong}</span>` : ''}
+                ${showSurf ? `<span class="interlinear-surface">${w.surface}</span>` : ''}
+                ${showOrig ? `<span class="interlinear-lemma">${w.orig}</span>` : ''}
+                ${showTrans ? `<span class="interlinear-translit">${w.translit}</span>` : ''}
+                ${showStrong ? `<span class="interlinear-strong">${w.strong}</span>` : ''}
               </div>
             `;
           });
-          const badgeText = this.interlinearVersion === 'DARBY' ? 'Darby (Interlinéaire Inversé)' : 'Segond 1910 (Interlinéaire Inversé)';
+          const badgeText = this.interlinearVersion === 'DARBY' ? 'Bible Darby (Interlinéaire Inversé)' : 'Louis Segond 1910 (Interlinéaire Inversé)';
           vSpan.innerHTML = `
             <div class="verse-interlinear-header">
               <sup class="verse-num">${v.verse}</sup>
@@ -1090,17 +1215,14 @@ const BibleReader = {
           `;
 
           vSpan.querySelectorAll('.interlinear-block').forEach(b => {
-            // Clic gauche -> lexique
             b.addEventListener('click', (e) => {
               e.stopPropagation();
               this.lookupWordInLexicon(b.dataset.word, b.dataset.strong);
             });
-            // Double clic -> menu contextuel
             b.addEventListener('dblclick', (e) => {
               e.stopPropagation();
               ContextMenuManager.showForWord(b.dataset.surface || b.dataset.word, b.dataset.strong, v.verse, data.book, data.chapter, e.clientX, e.clientY);
             });
-            // Clic droit -> menu contextuel
             b.addEventListener('contextmenu', (e) => {
               e.preventDefault();
               e.stopPropagation();

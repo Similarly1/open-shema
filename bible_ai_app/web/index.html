@@ -616,7 +616,7 @@
     <!-- 4. POPOVERS & MODALES FLOTTANTES                        -->
     <!-- ======================================================= -->
     
-    <!-- Popover Options d'Affichage (Titres, chapitres, versets, police, interlinéaire) -->
+    <!-- Popover Options d'Affichage (Titres, chapitres, versets, police) -->
     <div class="display-options-popover hidden" id="display-options-popover">
       <div class="display-opt-header">Options de lecture</div>
       <div class="display-opt-list">
@@ -640,13 +640,75 @@
           <span>Police avec empattement (Serif)</span>
           <input type="checkbox" id="opt-font-serif" checked>
         </label>
+      </div>
+    </div>
 
-        <div style="height: 1px; background: var(--border-subtle); margin: 6px 0;"></div>
-        <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Version Interlinéaire Inversé :</div>
-        <select id="opt-interlinear-version" class="select-field full-w" style="font-size: 11px; padding: 4px 6px;">
-          <option value="LSG">📜 Louis Segond 1910 (Strong)</option>
-          <option value="DARBY">📜 Bible J.N. Darby (Strong)</option>
-        </select>
+    <!-- Popover Dédié Menu Interlinéaire Inversé (Style Logos) -->
+    <div class="interlinear-options-popover hidden" id="interlinear-options-popover">
+      <div class="interlinear-pop-header">
+        <div class="interlinear-pop-title">
+          <span>🔤</span>
+          <span>Interlinéaire Inversé</span>
+        </div>
+        <button class="context-close-btn" id="btn-close-interlinear-popover">✕</button>
+      </div>
+
+      <div class="interlinear-pop-body">
+        <!-- Switch Activation Rapide -->
+        <div class="interlinear-toggle-row">
+          <div class="toggle-text-block">
+            <span class="toggle-title">Activer l'Interlinéaire</span>
+            <span class="toggle-desc">Ruban mot à mot avec textes originaux</span>
+          </div>
+          <label class="switch-toggle">
+            <input type="checkbox" id="interlinear-master-switch">
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <div class="pop-divider"></div>
+
+        <!-- Choix de la version source avec Strong -->
+        <div class="pop-section-label">Version française de référence :</div>
+        <div class="interlinear-version-selector-group">
+          <label class="interlinear-radio-item active" id="lbl-inter-lsg">
+            <input type="radio" name="interlinear-version-radio" value="LSG" checked>
+            <div class="radio-details">
+              <span class="radio-name">Louis Segond 1910</span>
+              <span class="radio-tag">Balises Strong, Hébreu & Grec</span>
+            </div>
+          </label>
+          <label class="interlinear-radio-item" id="lbl-inter-darby">
+            <input type="radio" name="interlinear-version-radio" value="DARBY">
+            <div class="radio-details">
+              <span class="radio-name">Bible J.N. Darby</span>
+              <span class="radio-tag">Traduction littérale avec Strong</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="pop-divider"></div>
+
+        <!-- Couches d'affichage -->
+        <div class="pop-section-label">Lignes affichées :</div>
+        <div class="interlinear-layers-grid">
+          <label class="display-opt-item">
+            <span>Texte français</span>
+            <input type="checkbox" id="inter-layer-surface" checked>
+          </label>
+          <label class="display-opt-item">
+            <span>Texte original (Héb./Gr.)</span>
+            <input type="checkbox" id="inter-layer-orig" checked>
+          </label>
+          <label class="display-opt-item">
+            <span>Translittération</span>
+            <input type="checkbox" id="inter-layer-translit" checked>
+          </label>
+          <label class="display-opt-item">
+            <span>Code Strong (H/G)</span>
+            <input type="checkbox" id="inter-layer-strong" checked>
+          </label>
+        </div>
       </div>
     </div>
 
