@@ -139,5 +139,33 @@
       "13": "<p><w strong=\"H3427\">Habitante</w> des <w strong=\"H1588\">jardins</w>, les <w strong=\"H2270\">compagnons</w> sont <w strong=\"H7181\">attentifs</w> à ta <w strong=\"H6963\">voix</w> ! Fais que je l’<w strong=\"H8085\">entende</w> !</p>",
       "14": "<p><w strong=\"H1272\">Fuis</w>, mon <w strong=\"H1730\">bien-aimé</w>, et sois <w strong=\"H1819\">semblable</w> à une <w strong=\"H6643\">gazelle</w> <w strong=\"H0176\">ou</w> au <w strong=\"H6082\">faon</w> des <w strong=\"H0354\">biches</w>, <w strong=\"H5921\">sur</w> les <w strong=\"H2022\">montagnes</w> des <w strong=\"H1314\">aromates</w>.<note n=\"e\"><i>En général, dans ce livre, les alinéas marquent la succession des interlocuteurs.</i></note></p>"
     }
-  }
+  },
+  "paragraphs": [
+    "1:1",
+    "1:2",
+    "1:7",
+    "1:12",
+    "2:1",
+    "2:3",
+    "2:8",
+    "2:14",
+    "3:1",
+    "3:6",
+    "3:7",
+    "4:1",
+    "4:8",
+    "4:15",
+    "5:1",
+    "5:2",
+    "5:9",
+    "6:1",
+    "6:4",
+    "6:11",
+    "7:1",
+    "7:10",
+    "8:1",
+    "8:5",
+    "8:8",
+    "8:13"
+  ]
 }

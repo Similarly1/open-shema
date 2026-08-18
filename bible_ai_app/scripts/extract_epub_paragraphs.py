@@ -37,31 +37,23 @@ PREFIX_TO_USFM = {
     "3Macc": "3MA", "4Macc": "4MA", "1Esd": "1ES", "2Esd": "2ES", "PrMan": "MAN"
 }
 
-PV_NT_BOOKS = [
-    ("MAT", "Matthieu"), ("MRK", "Marc"), ("LUK", "Luc"), ("JHN", "Jean"),
-    ("ACT", "Actes"), ("ROM", "Romains"), ("1CO", "1 Corinthiens"), ("2CO", "2 Corinthiens"),
-    ("GAL", "Galates"), ("EPH", "Éphésiens"), ("PHP", "Philippiens"), ("COL", "Colossiens"),
-    ("1TH", "1 Thessaloniciens"), ("2TH", "2 Thessaloniciens"), ("1TI", "1 Timothée"),
-    ("2TI", "2 Timothée"), ("TIT", "Tite"), ("PHM", "Philémon"), ("HEB", "Hébreux"),
-    ("JAS", "Jacques"), ("1PE", "1 Pierre"), ("2PE", "2 Pierre"), ("1JN", "1 Jean"),
-    ("2JN", "2 Jean"), ("3JN", "3 Jean"), ("JUD", "Jude"), ("REV", "Apocalypse")
-]
-
-OST_NAME_MAP = {
-    "GEN_SE": "GEN", "EXODE": "EXO", "L_VITIQUE": "LEV", "NOMBRES": "NUM", "DEUT_RONOME": "DEU",
-    "JOSU_": "JOS", "JUGES": "JDG", "RUTH": "RUT", "1_SAMUEL": "1SA", "2_SAMUEL": "2SA",
-    "1_ROIS": "1KI", "2_ROIS": "2KI", "1_CHRONIQUES": "1CH", "2_CHRONIQUES": "2CH",
-    "ESDRAS": "EZR", "N_H_MIE": "NEH", "ESTHER": "EST", "JOB": "JOB", "PSAUMES": "PSA",
-    "PROVERBES": "PRO", "ECCL_SIASTE": "ECC", "CANTIQUE": "SNG", "_SA_E": "ISA", "J_R_MIE": "JER",
-    "LAMENTATIONS": "LAM", "_Z_CHIEL": "EZK", "DANIEL": "DAN", "OS_E": "HOS", "JO_L": "JOL",
-    "AMOS": "AMO", "ABDIAS": "OBA", "JONAS": "JON", "MICH_E": "MIC", "NAHUM": "NAM",
-    "HABACUC": "HAB", "SOPHONIE": "ZEP", "AGG_E": "HAG", "ZACHARIE": "ZEC", "MALACHIE": "MAL",
+DARBY_NAME_MAP = {
+    "GENÈSE": "GEN", "EXODE": "EXO", "LÉVITIQUE": "LEV", "NOMBRES": "NUM", "DEUTÉRONOME": "DEU",
+    "JOSUÉ": "JOS", "JUGES": "JDG", "RUTH": "RUT", "1 SAMUEL": "1SA", "2 SAMUEL": "2SA",
+    "1 ROIS": "1KI", "2 ROIS": "2KI", "1 CHRONIQUES": "1CH", "2 CHRONIQUES": "2CH",
+    "ESDRAS": "EZR", "NÉHÉMIE": "NEH", "ESTHER": "EST", "JOB": "JOB", "PSAUMES": "PSA", "PSAUME": "PSA",
+    "PROVERBES": "PRO", "ECCLÉSIASTE": "ECC", "CANTIQUE DES CANTIQUES": "SNG", "CANTIQUE": "SNG",
+    "ÉSAÏE": "ISA", "ESAÏE": "ISA", "JÉRÉMIE": "JER", "LAMENTATIONS": "LAM",
+    "ÉZÉCHIEL": "EZK", "EZÉCHIEL": "EZK", "DANIEL": "DAN", "OSÉE": "HOS", "JOËL": "JOL",
+    "AMOS": "AMO", "ABDIAS": "OBA", "JONAS": "JON", "MICHÉE": "MIC", "NAHUM": "NAM",
+    "HABACUC": "HAB", "HABAKUK": "HAB", "SOPHONIE": "ZEP", "AGGÉE": "HAG", "ZACHARIE": "ZEC", "MALACHIE": "MAL",
     "MATTHIEU": "MAT", "MARC": "MRK", "LUC": "LUK", "JEAN": "JHN", "ACTES": "ACT",
-    "ROMAINS": "ROM", "1_CORINTHIENS": "1CO", "2_CORINTHIENS": "2CO", "GALATES": "GAL",
-    "_PH_SIENS": "EPH", "PHILIPPIENS": "PHP", "COLOSSIENS": "COL", "1_THESSALONICIENS": "1TH",
-    "2_THESSALONICIENS": "2TH", "1_TIMOTH_E": "1TI", "2_TIMOTH_E": "2TI", "TITE": "TIT",
-    "PHIL_MON": "PHM", "H_BREUX": "HEB", "JACQUES": "JAS", "1_PIERRE": "1PE", "2_PIERRE": "2PE",
-    "1_JEAN": "1JN", "2_JEAN": "2JN", "3_JEAN": "3JN", "JUDE": "JUD", "APOCALYPSE": "REV"
+    "ROMAINS": "ROM", "1 CORINTHIENS": "1CO", "2 CORINTHIENS": "2CO", "GALATES": "GAL",
+    "ÉPHÉSIENS": "EPH", "EPHESIENS": "EPH", "PHILIPPIENS": "PHP", "COLOSSIENS": "COL",
+    "1 THESSALONICIENS": "1TH", "2 THESSALONICIENS": "2TH", "1 TIMOTHÉE": "1TI", "2 TIMOTHÉE": "2TI",
+    "TITE": "TIT", "PHILÉMON": "PHM", "HÉBREUX": "HEB", "JACQUES": "JAS",
+    "1 PIERRE": "1PE", "2 PIERRE": "2PE", "1 JEAN": "1JN", "2 JEAN": "2JN", "3 JEAN": "3JN",
+    "JUDE": "JUD", "APOCALYPSE": "REV"
 }
 
 def update_book_json_paragraphs(folder_name: str, usfm_code: str, paragraphs_list: List[str]) -> bool:
@@ -154,11 +146,11 @@ def extract_tob_paragraphs():
                 total_p += len(set(paras))
         print(f"-> TOB : {len(books_data)} livres mis à jour ({total_p} paragraphes)")
 
-# 3. NFC
+# 3. NOUVELLE FRANÇAIS COURANT (NFC) - Parser Corrigé
 def extract_nfc_paragraphs():
     epub_path = os.path.join(EBOOKS_DIR, r"nfc-ebook-sans-deuterocanoniques\nfc_sansDC.epub")
     if not os.path.exists(epub_path): return
-    print("\n--- Extraction Paragraphes : NFC ---")
+    print("\n--- Extraction Paragraphes : NFC (Corrigé) ---")
     with zipfile.ZipFile(epub_path, "r") as z:
         xhtml_files = [f for f in z.namelist() if f.startswith("OEBPS/XHTML/") and f.endswith(".xhtml")]
         total_p = 0
@@ -169,74 +161,79 @@ def extract_nfc_paragraphs():
                 prefix = parts[2]
                 usfm = PREFIX_TO_USFM.get(prefix, prefix)
                 c = z.read(xf).decode("utf-8", errors="ignore")
+                
                 paras = []
-                cur_ch = 1
-                for block in re.split(r'(<div class="c"[^>]*>|<div class="p"[^>]*>|<div class="q[^"]*"[^>]*>|<div class="m"[^>]*>|<div class="b"[^>]*>)', c):
-                    ch_m = re.search(r'<span class="c[^"]*">(\d+)</span>', block)
-                    if ch_m: cur_ch = int(ch_m.group(1))
-                    v_m = re.search(r'<span class="v[^"]*">(\d+)</span>', block)
-                    if v_m: paras.append(f"{cur_ch}:{int(v_m.group(1))}")
+                # Découper par chapitre : <h3 id="chapter_X" class="chapter">
+                ch_blocks = re.split(r'<h3\s+id="chapter_(\d+)"\s+class="chapter">', c)
+                if len(ch_blocks) >= 3:
+                    # ch_blocks[1] = '1', ch_blocks[2] = content of ch 1, ch_blocks[3] = '2', ch_blocks[4] = content of ch 2...
+                    for idx in range(1, len(ch_blocks), 2):
+                        ch_num = int(ch_blocks[idx])
+                        ch_html = ch_blocks[idx + 1]
+                        
+                        # Chaque <div class="p">, <div class="q">, <div class="q1">, <div class="q2">, <div class="m">, <div class="b">, <p>
+                        for p in re.findall(r'<div class="(?:p|q|q1|q2|m|b)"[^>]*>.*?</div>|<p[^>]*>.*?</p>', ch_html, re.DOTALL):
+                            m = re.search(r'<span class="verses">(\d+)</span>|<span class="v">(\d+)</span>', p)
+                            if m:
+                                v = int(m.group(1) or m.group(2))
+                                paras.append(f"{ch_num}:{v}")
+                                
                 if paras:
                     update_book_json_paragraphs("NFC", usfm, paras)
                     total_p += len(set(paras))
                     books_count += 1
         print(f"-> NFC : {books_count} livres mis à jour ({total_p} paragraphes)")
 
-# 4. PAROLE VIVANTE (NT)
-def extract_pv_paragraphs():
-    epub_path = os.path.join(EBOOKS_DIR, "Parole vivante.epub")
-    if not os.path.exists(epub_path): return
-    print("\n--- Extraction Paragraphes : Parole Vivante ---")
-    with zipfile.ZipFile(epub_path, 'r') as z:
-        content = z.read("OEBPS/EPUB.Parole.Vivante.xhtml").decode("utf-8", errors="ignore")
+# 4. DARBY (Authentique avec Découpage Paragraphes)
+def extract_darby_paragraphs():
+    epub_path = os.path.join(EBOOKS_DIR, "La Sainte Bible (Version J.-N. Darby) (z-library.sk, 1lib.sk, z-lib.sk).epub")
+    if not os.path.exists(epub_path):
+        print(f"Introuvable : {epub_path}")
+        return
         
-        # Parcourir chaque paragraphe du livre avec balises <p class="PV-...">
-        # et suivre les changements de livre et de chapitre
-        pattern = re.compile(
-            r'<p[^>]*class="PV-01-Titre-de-livre[^"]*"[^>]*>(.*?)</p>|<p[^>]*class="PV-03-titres-tx-biblique[^"]*"[^>]*>(.*?)</p>|<span[^>]*class="[^"]*_idGenDropcap-1[^"]*">\s*(\d+)&#160;\s*</span>|<span[^>]*class="[^"]*PV-00-exposant-verset[^"]*">\s*(\d+)&#160;\s*</span>|<p[^>]*class="([^"]*PV-01-Texte[^"]*|[^"]*PV-02-Texte[^"]*|[^"]*PV-03-Poesie[^"]*)"[^>]*>(.*?)</p>',
-            re.DOTALL
-        )
-        
-        book_paras = {}
-        cur_book_idx = -1
-        cur_chap = 1
-        
-        # Identifier chaque <p>
-        for p in re.findall(r'<p[^>]*>.*?</p>', content, re.DOTALL):
-            # Détection de titre de livre
-            for b_idx, (b_code, b_name) in enumerate(PV_NT_BOOKS):
-                if f">{b_name}<" in p or f">{b_name.upper()}<" in p or f"Évangile selon {b_name}" in p or f"Lettre de {b_name}" in p:
-                    if b_idx > cur_book_idx:
-                        cur_book_idx = b_idx
-                        cur_chap = 1
-                        book_paras[b_code] = []
-                        break
-                        
-            if cur_book_idx >= 0 and cur_book_idx < len(PV_NT_BOOKS):
-                usfm = PV_NT_BOOKS[cur_book_idx][0]
-                if usfm not in book_paras:
-                    book_paras[usfm] = []
-                    
-                # Détection de chapitre Dropcap
-                ch_m = re.search(r'<span[^>]*class="[^"]*_idGenDropcap-1[^"]*">\s*(\d+)&#160;\s*</span>', p)
-                if ch_m:
-                    cur_chap = int(ch_m.group(1))
-                    book_paras[usfm].append(f"{cur_chap}:1")
-                    
-                # Détection de verset
-                v_m = re.search(r'<span[^>]*class="[^"]*PV-00-exposant-verset[^"]*">\s*(\d+)&#160;\s*</span>', p)
-                if v_m:
-                    v = int(v_m.group(1))
-                    # Si c'est un paragraphe de texte/poésie, c'est un début de paragraphe
-                    if any(c in p for c in ['PV-01-Texte', 'PV-02-Texte', 'PV-03-Poesie', 'PV-01-paragraphe', 'PV-02-paragraphe']):
-                        book_paras[usfm].append(f"{cur_chap}:{v}")
-                        
+    print("\n--- Extraction Paragraphes : Darby ---")
+    with zipfile.ZipFile(epub_path, "r") as z:
         total_p = 0
-        for usfm, paras in book_paras.items():
+        books_count = 0
+        for i in range(5, 71):
+            fname = f"OEBPS/chapter_{i}.xhtml"
+            if fname not in z.namelist():
+                continue
+            c = z.read(fname).decode("utf-8", errors="ignore")
+            
+            m_title = re.search(r'<h1>(.*?)</h1>', c)
+            if not m_title:
+                continue
+                
+            raw_title = m_title.group(1).strip()
+            # Nettoyer ex: '1. Samuel' -> '1 SAMUEL', '.2 Timothée' -> '2 TIMOTHÉE'
+            clean_title = re.sub(r'^\.|\.$|\.', ' ', raw_title)
+            clean_title = re.sub(r'\s+', ' ', clean_title).strip().upper()
+            usfm = DARBY_NAME_MAP.get(clean_title)
+            if not usfm:
+                print(f"Livre Darby inconnu: '{raw_title}' (nettoyé: '{clean_title}')")
+                continue
+                
+            paras = []
+            # Découper par chapitre : <h2 id="chp_...">... (\d+) ...</h2>
+            ch_blocks = re.split(r'<h2\s+id="chp_[^"]*">\s*.*?\s+(\d+)\s*<', c)
+            if len(ch_blocks) >= 3:
+                for idx in range(1, len(ch_blocks), 2):
+                    ch_num = int(ch_blocks[idx])
+                    ch_html = ch_blocks[idx + 1]
+                    
+                    for p in re.findall(r'<p[^>]*>.*?</p>', ch_html, re.DOTALL):
+                        m = re.search(r'<span class="verses">\s*(\d+)\s*</span>', p)
+                        if m:
+                            v = int(m.group(1))
+                            paras.append(f"{ch_num}:{v}")
+                            
             if paras:
-                update_book_json_paragraphs("Parole_Vivante", usfm, paras)
+                update_book_json_paragraphs("DARBY", usfm, paras)
                 total_p += len(set(paras))
-        print(f"-> Parole Vivante : {len(book_paras)} livres mis à jour ({total_p} paragraphes)")
+                books_count += 1
+                
+        print(f"-> Darby : {books_count} livres mis à jour ({total_p} paragraphes)")
 
 # 5. PAROLE DE VIE (PDV)
 def extract_pdv_paragraphs():
@@ -270,51 +267,10 @@ def extract_pdv_paragraphs():
                 total_p += len(set(para_list))
         print(f"-> PDV : {len(books_map)} livres mis à jour ({total_p} paragraphes)")
 
-# 6. OSTERVALD (OST)
-def extract_ostervald_paragraphs():
-    epub_path = os.path.join(EBOOKS_DIR, "2018-11-19 La Bible Ostervald.epub")
-    if not os.path.exists(epub_path):
-        epub_path = os.path.join(EBOOKS_DIR, "Ostervald.epub")
-    if not os.path.exists(epub_path): return
-    print("\n--- Extraction Paragraphes : Ostervald (OST) ---")
-    with zipfile.ZipFile(epub_path, "r") as z:
-        files = [f for f in z.namelist() if f.endswith(".xhtml") and f.startswith("OEBPS/")]
-        books_data = {}
-        for f in files:
-            base = os.path.splitext(os.path.basename(f))[0]
-            # Match clean name
-            cleaned_key = re.sub(r'-\d+$', '', base).upper()
-            usfm = OST_NAME_MAP.get(cleaned_key)
-            if not usfm:
-                continue
-            if usfm not in books_data:
-                books_data[usfm] = []
-                
-            c = z.read(f).decode("utf-8", errors="ignore")
-            # In Ostervald, each <p class="...Paragraphe..."> contains dropcap or verset
-            cur_ch = 1
-            for p in re.findall(r'<p[^>]*>.*?</p>', c, re.DOTALL):
-                ch_m = re.search(r'class="[^"]*Lettrine[^"]*">\s*(\d+)\s*<', p)
-                if ch_m:
-                    cur_ch = int(ch_m.group(1))
-                    books_data[usfm].append(f"{cur_ch}:1")
-                v_m = re.search(r'class="[^"]*Verset[^"]*">\s*(\d+)\s*<', p)
-                if v_m:
-                    v = int(v_m.group(1))
-                    books_data[usfm].append(f"{cur_ch}:{v}")
-                    
-        total_p = 0
-        for usfm, paras in books_data.items():
-            if paras:
-                update_book_json_paragraphs("OST", usfm, paras)
-                total_p += len(set(paras))
-        print(f"-> Ostervald : {len(books_data)} livres mis à jour ({total_p} paragraphes)")
-
 if __name__ == "__main__":
     extract_s21_paragraphs()
     extract_tob_paragraphs()
     extract_nfc_paragraphs()
-    extract_pv_paragraphs()
+    extract_darby_paragraphs()
     extract_pdv_paragraphs()
-    extract_ostervald_paragraphs()
     print("\nExtraction de tous les paragraphes terminée !")

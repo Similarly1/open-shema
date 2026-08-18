@@ -124,5 +124,20 @@
       "19": "<p>Mes <w strong=\"G0080\">frères</w>, <w strong=\"G1437\">si</w> <w strong=\"G5100\">quelqu’</w>un <w strong=\"G1722\">parmi</w> <w strong=\"G5213\">vous</w> s’<w strong=\"G4105\">égare</w> <w strong=\"G0575\">de</w> la <w strong=\"G0225\">vérité</w>, <w strong=\"G2532\">et</w> que <w strong=\"G5100\">quelqu’</w>un <w strong=\"G0846\">le</w> <w strong=\"G1994\">ramène</w>,",
       "20": "qu’il <w strong=\"G1097\">sache</w> <w strong=\"G3754\">que</w> <w strong=\"G3588\">celui</w> qui aura <w strong=\"G1994\">ramené</w> un <w strong=\"G0268\">pécheur</w> <w strong=\"G1537\">de</w> l’<w strong=\"G4106\">égarement</w> de <w strong=\"G0846\">son</w> <w strong=\"G3598\">chemin</w>, <w strong=\"G4982\">sauvera</w> une <w strong=\"G5590\">âme</w> <w strong=\"G1537\">de</w> la <w strong=\"G2288\">mort</w> <w strong=\"G2532\">et</w> <w strong=\"G2572\">couvrira</w> une <w strong=\"G4128\">multitude</w> de <w strong=\"G0266\">péchés</w>.</p>"
     }
-  }
+  },
+  "paragraphs": [
+    "1:1",
+    "1:2",
+    "1:13",
+    "1:19",
+    "2:1",
+    "2:8",
+    "2:14",
+    "3:1",
+    "3:13",
+    "4:1",
+    "4:11",
+    "5:1",
+    "5:12"
+  ]
 }

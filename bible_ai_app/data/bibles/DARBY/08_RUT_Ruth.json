@@ -99,5 +99,19 @@
       "21": "et <w strong=\"H8012\">Salmon</w> <w strong=\"H3205\">engendra</w> <w strong=\"H1162\">Boaz</w> ; et <w strong=\"H1162\">Boaz</w> <w strong=\"H3205\">engendra</w> <w strong=\"H5744\">Obed</w> ;",
       "22": "et <w strong=\"H5744\">Obed</w> <w strong=\"H3205\">engendra</w> <w strong=\"H3448\">Isaï</w> ; et <w strong=\"H3448\">Isaï</w> <w strong=\"H3205\">engendra</w> <w strong=\"H1732\">David</w>.</p>"
     }
-  }
+  },
+  "paragraphs": [
+    "1:1",
+    "1:6",
+    "1:19",
+    "2:1",
+    "2:4",
+    "2:17",
+    "3:1",
+    "3:6",
+    "3:14",
+    "4:1",
+    "4:9",
+    "4:13"
+  ]
 }

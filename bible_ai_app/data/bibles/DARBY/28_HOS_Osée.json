@@ -231,5 +231,40 @@
       "9": "<p><w strong=\"H0669\">Éphraïm</w> [dira] : <w strong=\"H4100\">Qu’</w>ai-je <w strong=\"H5750\">plus</w> à faire avec les <w strong=\"H6091\">idoles</w> ? – <w strong=\"H0589\">Moi</w>, je lui <w strong=\"H6030\">répondrai</w> et je le <w strong=\"H7789\">regarderai</w>. – <w strong=\"H0589\">Moi</w>, je suis comme un <w strong=\"H1265\">cyprès</w> <w strong=\"H7488\">vert</w>. – De <w strong=\"H4480\">moi</w> <w strong=\"H4672\">provient</w> ton <w strong=\"H6529\">fruit</w>.</p>",
       "10": "<p><w strong=\"H4310\">Qui</w> est <w strong=\"H2450\">sage</w> ? il <w strong=\"H0995\">comprendra</w> ces <w strong=\"H0428\">choses</w> ; et <w strong=\"H0995\">intelligent</w> ? il les <w strong=\"H3045\">connaîtra</w> ; <w strong=\"H3588\">car</w> les <w strong=\"H1870\">voies</w> de l’<divineName><w strong=\"H3068\">Éternel</w></divineName> sont <w strong=\"H3477\">droites</w>, et les <w strong=\"H6662\">justes</w> y <w strong=\"H3212\">marcheront</w>, mais les <w strong=\"H6586\">transgresseurs</w> y <w strong=\"H3782\">tomberont</w>.</p>"
     }
-  }
+  },
+  "paragraphs": [
+    "1:1",
+    "1:2",
+    "1:8",
+    "2:1",
+    "2:6",
+    "2:14",
+    "3:1",
+    "4:1",
+    "4:6",
+    "4:12",
+    "5:1",
+    "5:8",
+    "6:1",
+    "6:4",
+    "7:1",
+    "7:8",
+    "8:1",
+    "8:8",
+    "9:1",
+    "9:7",
+    "9:11",
+    "10:1",
+    "10:9",
+    "11:1",
+    "11:8",
+    "12:1",
+    "12:7",
+    "13:1",
+    "13:5",
+    "13:9",
+    "14:1",
+    "14:4",
+    "14:8"
+  ]
 }

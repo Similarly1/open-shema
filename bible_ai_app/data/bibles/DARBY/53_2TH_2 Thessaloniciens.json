@@ -59,5 +59,17 @@
       "17": "<p><w strong=\"G3588\">La</w> <w strong=\"G0783\">salutation</w>, de <w strong=\"G3588\">la</w> <w strong=\"G1699\">propre</w> <w strong=\"G5495\">main</w> de moi, <w strong=\"G3972\">Paul</w> ; <w strong=\"G3739\">ce</w> qui <w strong=\"G1510\">est</w> le <w strong=\"G4592\">signe</w> <w strong=\"G1722\">dans</w> <w strong=\"G3956\">chaque</w> <w strong=\"G1992\">lettre</w> : <w strong=\"G3779\">ainsi</w> j’<w strong=\"G1125\">écris</w>.",
       "18": "Que <w strong=\"G3588\">la</w> <w strong=\"G5485\">grâce</w> de <w strong=\"G3588 G2257\">notre</w> <w strong=\"G2962\">seigneur</w> <w strong=\"G2424\">Jésus</w> <w strong=\"G5547\">Christ</w> soit <w strong=\"G3326\">avec</w> <w strong=\"G5216\">vous</w> <w strong=\"G3956\">tous</w> !<w strong=\"G0281\"></w></p>"
     }
-  }
+  },
+  "paragraphs": [
+    "1:1",
+    "1:5",
+    "1:11",
+    "2:1",
+    "2:3",
+    "2:13",
+    "2:16",
+    "3:1",
+    "3:6",
+    "3:16"
+  ]
 }

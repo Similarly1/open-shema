@@ -306,5 +306,33 @@
       "43": "des <w strong=\"H1121\">fils</w> de <w strong=\"H5015\">Nebo</w>, <w strong=\"H3273\">Jehiel</w>, <w strong=\"H4993\">Matthithia</w>, <w strong=\"H2066\">Zabad</w>, <w strong=\"H2081\">Zebina</w>, <w strong=\"H3035\">Jaddaï</w> et <w strong=\"H3100\">Joël</w>, <w strong=\"H1141\">Benaïa</w>.",
       "44": "<w strong=\"H3605\">Tous</w> <w strong=\"H0428\">ceux-ci</w> avaient <w strong=\"H5375\">pris</w> des <w strong=\"H0802\">femmes</w> <w strong=\"H5237\">étrangères</w>, et il y en avait parmi eux dont les <w strong=\"H0802\">femmes</w> <w strong=\"H3426\">avaient</w> <w strong=\"H7760\">eu</w> des <w strong=\"H1121\">enfants</w>.</p>"
     }
-  }
+  },
+  "paragraphs": [
+    "1:1",
+    "1:5",
+    "2:1",
+    "2:36",
+    "2:64",
+    "3:1",
+    "3:8",
+    "4:1",
+    "4:6",
+    "4:17",
+    "5:1",
+    "5:3",
+    "6:1",
+    "6:13",
+    "7:1",
+    "7:11",
+    "7:27",
+    "8:1",
+    "8:21",
+    "8:24",
+    "8:31",
+    "9:1",
+    "9:5",
+    "10:1",
+    "10:6",
+    "10:15"
+  ]
 }

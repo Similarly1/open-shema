@@ -109,5 +109,24 @@
       "17": "<w strong=\"G2532\">Et</w> <w strong=\"G2036\">dites</w> à <w strong=\"G0751\">Archippe</w> : Prends <w strong=\"G0991\">garde</w> <w strong=\"G3588\">au</w> <w strong=\"G1248\">service</w> <w strong=\"G3739\">que</w> tu as <w strong=\"G3880\">reçu</w> <w strong=\"G1722\">dans</w> le <w strong=\"G2962\">Seigneur</w>, <w strong=\"G2443\">afin</w> que tu <w strong=\"G0846\">l’</w><w strong=\"G4137\">accomplisses</w>.</p>",
       "18": "<p>La <w strong=\"G0783\">salutation</w>, de la <w strong=\"G1699\">propre</w> <w strong=\"G5495\">main</w> de moi, <w strong=\"G3972\">Paul</w>. – <w strong=\"G3421\">Souvenez</w>-vous de <w strong=\"G3450\">mes</w> <w strong=\"G1199\">liens</w>. La <w strong=\"G5485\">grâce</w> soit <w strong=\"G3326\">avec</w> <w strong=\"G5216\">vous</w> !</p>"
     }
-  }
+  },
+  "paragraphs": [
+    "1:1",
+    "1:3",
+    "1:9",
+    "1:12",
+    "2:1",
+    "2:4",
+    "2:13",
+    "2:16",
+    "3:1",
+    "3:5",
+    "3:8",
+    "3:12",
+    "3:18",
+    "4:1",
+    "4:2",
+    "4:5",
+    "4:7"
+  ]
 }
