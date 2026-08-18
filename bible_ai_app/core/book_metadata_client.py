@@ -11,6 +11,18 @@ logger = logging.getLogger(__name__)
 
 COVERS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "covers")
 
+def clean_html_tags(raw_html: str) -> str:
+    """Nettoie les balises HTML et décode les entités d'une description."""
+    if not raw_html:
+        return ""
+    import html
+    text = re.sub(r'<(?:br|p|div|li)[^>]*>', '\n', raw_html, flags=re.I)
+    text = re.sub(r'<[^>]+>', '', text)
+    text = html.unescape(text)
+    text = re.sub(r'\n\s*\n+', '\n\n', text)
+    text = re.sub(r'[ \t]+', ' ', text)
+    return text.strip()
+
 class BookMetadataClient:
     """
     Client de recherche de métadonnées bibliographiques.
@@ -189,7 +201,7 @@ class BookMetadataClient:
                 "publisher": vol.get("publisher", ""),
                 "published_date": pub_date,
                 "year": year,
-                "description": vol.get("description", ""),
+                "description": clean_html_tags(vol.get("description", "")),
                 "isbn": isbn_str,
                 "categories": vol.get("categories", []),
                 "page_count": vol.get("pageCount"),
@@ -304,7 +316,7 @@ class BookMetadataClient:
                     "publisher": doc.get("publisher", ""),
                     "published_date": year,
                     "year": year,
-                    "description": doc.get("description", ""),
+                    "description": clean_html_tags(doc.get("description", "")),
                     "isbn": "",
                     "categories": ["Bible / Théologie"],
                     "page_count": None,

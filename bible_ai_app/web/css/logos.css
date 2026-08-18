@@ -832,6 +832,18 @@ body, html {
   text-align: center;
   flex-shrink: 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  position: relative;
+}
+.lib-cover.has-img {
+  padding: 0;
+  background-color: #0F172A;
+}
+.lib-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 .cover-initials {
   font-size: 18px;
@@ -2002,8 +2014,10 @@ input:checked + .slider.round:before {
 }
 .import-cover-box {
   display: flex;
-  gap: 14px;
+  flex-direction: row;
+  gap: 16px;
   align-items: center;
+  justify-content: flex-start;
   padding: 12px;
   background: #F8FAFC;
   border: 1px solid var(--border-color);
@@ -2020,6 +2034,7 @@ input:checked + .slider.round:before {
   justify-content: center;
   border: 1px solid var(--border-color);
   flex-shrink: 0;
+  margin: 0;
 }
 .import-cover-preview img {
   width: 100%;

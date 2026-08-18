@@ -220,8 +220,12 @@ class RAGPipeline:
                 for scope, (desc, books) in CORPUS_DEFINITIONS.items():
                     if scope in ["OT", "NT"] and b_code in books:
                         corpus_scope = scope
-                        break
-                where_clause = {"corpus_scope": {"$in": [corpus_scope, "GLOBAL", "BOTH"]}}
+                accepted_scopes = [corpus_scope, "GLOBAL", "BOTH", "AT+NT"]
+                if corpus_scope in ["OT", "AT"]:
+                    accepted_scopes.extend(["OT", "AT"])
+                elif corpus_scope == "NT":
+                    accepted_scopes.append("NT")
+                where_clause = {"corpus_scope": {"$in": list(set(accepted_scopes))}}
 
         _notify("retrieval", "Recherche hybride dans la bibliothèque...", "running")
         t_retrieval_0 = time.time()

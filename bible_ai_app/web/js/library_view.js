@@ -76,11 +76,15 @@ const LibraryView = {
       const coverColors = ['#1E293B', '#0F766E', '#1D4ED8', '#6D28D9', '#334155', '#B45309', '#C2410C', '#991B1B'];
       const color = coverColors[Math.abs(this._hashCode(book.name)) % coverColors.length];
 
+      const coverHtml = book.cover_path 
+        ? `<div class="lib-cover has-img"><img src="${book.cover_path}" class="lib-cover-img" alt="${book.name}"></div>`
+        : `<div class="lib-cover" style="background-color: ${color};">
+             <span class="cover-initials">${initials}</span>
+             <span class="cover-title-preview">${(book.title || book.name).slice(0, 22)}</span>
+           </div>`;
+
       card.innerHTML = `
-        <div class="lib-cover" style="background-color: ${color};">
-          <span class="cover-initials">${initials}</span>
-          <span class="cover-title-preview">${(book.title || book.name).slice(0, 22)}</span>
-        </div>
+        ${coverHtml}
         
         <div class="lib-info">
           <div class="lib-title" title="${book.title || book.name}">${book.title || book.name}</div>

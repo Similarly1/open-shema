@@ -1,8 +1,50 @@
 /**
  * Import & Book Metadata Modal Controller (Style Logos)
  * Gère l'importation complète d'ouvrages, la recherche Google Books,
- * la classification IA RAG Tri-Flux et la sélection interactive des chapitres.
+ * la classification IA RAG Tri-Flux, la sélection interactive des chapitres
+ * et la génération automatique du titre court / identifiant unique.
  */
+
+function cleanHtml(rawHtml) {
+  if (!rawHtml) return '';
+  let text = String(rawHtml).replace(/<(?:br|p|div|li)[^>]*>/gi, '\n');
+  text = text.replace(/<[^>]+>/g, '');
+  const txt = document.createElement('textarea');
+  txt.innerHTML = text;
+  text = txt.value;
+  text = text.replace(/\n\s*\n+/g, '\n\n').replace(/[ \t]+/g, ' ');
+  return text.trim();
+}
+
+function generateShortId(title, type = 'Théologie') {
+  if (!title) return '';
+  const cleanTitle = title.trim();
+
+  // Cas 1 : Si c'est une Bible ou si le titre commence par "Bible" / "La Bible" / "Sainte Bible"
+  const isBible = (type && type.toLowerCase() === 'bible') || /^((la|le|sainte|nouvelle)\s+)?bible\b/i.test(cleanTitle);
+  
+  if (isBible) {
+    let versionOnly = cleanTitle
+      .replace(/^(la\s+|le\s+|sainte\s+|nouvelle\s+)?bible(\s+(de|du|des|en|d'))?\s*/i, '')
+      .replace(/\s*\bbible\b\s*/gi, ' ')
+      .trim();
+
+    if (versionOnly) {
+      versionOnly = versionOnly.replace(/^(de|du|des|d')\s+/i, '').trim();
+      return versionOnly.toUpperCase();
+    }
+  }
+
+  // Cas 2 : Première lettre de chaque mot, 5 maximum, TOUT EN MAJUSCULE
+  const stripped = cleanTitle.replace(/[^\w\s\u00C0-\u017F]/g, ' ');
+  const words = stripped.split(/\s+/).filter(w => w.length > 0);
+  
+  if (words.length === 0) return cleanTitle.slice(0, 5).toUpperCase();
+
+  // Prendre la première lettre de chaque mot, 5 maximum
+  const initials = words.slice(0, 5).map(w => w[0].toUpperCase()).join('');
+  return initials;
+}
 
 const ImportModal = {
   modalEl: null,
@@ -14,6 +56,7 @@ const ImportModal = {
   filePath: '',
   coverPath: '',
   chapters: [],
+  userModifiedId: false,
 
   init() {
     this.modalEl = document.getElementById('modal-import-book');
@@ -23,6 +66,27 @@ const ImportModal = {
     document.getElementById('btn-close-import-modal').addEventListener('click', () => this.close());
     document.getElementById('btn-cancel-import-modal').addEventListener('click', () => this.close());
     document.getElementById('btn-submit-import-modal').addEventListener('click', () => this.submit());
+
+    // Génération automatique dynamique du titre court
+    const titleInput = document.getElementById('import-book-title');
+    const typeInput = document.getElementById('import-book-type');
+    const idInput = document.getElementById('import-book-id');
+
+    idInput.addEventListener('input', () => {
+      this.userModifiedId = idInput.value.trim().length > 0;
+    });
+
+    titleInput.addEventListener('input', () => {
+      if (!this.userModifiedId) {
+        idInput.value = generateShortId(titleInput.value, typeInput.value);
+      }
+    });
+
+    typeInput.addEventListener('change', () => {
+      if (!this.userModifiedId) {
+        idInput.value = generateShortId(titleInput.value, typeInput.value);
+      }
+    });
 
     // File & Cover Pickers
     document.getElementById('btn-import-pick-file').addEventListener('click', () => this.pickFile());
@@ -68,6 +132,7 @@ const ImportModal = {
     this.filePath = book ? (book.file_path || '') : '';
     this.coverPath = book ? (book.cover_path || '') : '';
     this.chapters = [];
+    this.userModifiedId = editMode;
 
     const modalTitle = document.getElementById('import-modal-title');
     const submitBtn = document.getElementById('btn-submit-import-modal');
@@ -79,7 +144,7 @@ const ImportModal = {
       document.getElementById('import-book-id').value = book.name || '';
       document.getElementById('import-book-title').value = book.title || book.name || '';
       document.getElementById('import-book-author').value = book.author || '';
-      document.getElementById('import-book-desc').value = book.description || '';
+      document.getElementById('import-book-desc').value = cleanHtml(book.description || '');
       document.getElementById('import-book-type').value = book.type || 'Théologie';
       document.getElementById('import-book-year').value = book.year || '';
 
@@ -133,17 +198,17 @@ const ImportModal = {
 
       // Pré-remplissage avec les informations extraites de l'EPUB ou du fichier
       const info = res.info || {};
-      if (info.title && !document.getElementById('import-book-title').value) {
+      if (info.title) {
         document.getElementById('import-book-title').value = info.title;
-        if (!document.getElementById('import-book-id').value) {
-          document.getElementById('import-book-id').value = info.title.slice(0, 20);
+        if (!this.userModifiedId) {
+          document.getElementById('import-book-id').value = generateShortId(info.title, document.getElementById('import-book-type').value);
         }
       }
       if (info.author && !document.getElementById('import-book-author').value) {
         document.getElementById('import-book-author').value = info.author;
       }
-      if (info.description && !document.getElementById('import-book-desc').value) {
-        document.getElementById('import-book-desc').value = info.description;
+      if (info.description) {
+        document.getElementById('import-book-desc').value = cleanHtml(info.description);
       }
       if (info.year && !document.getElementById('import-book-year').value) {
         document.getElementById('import-book-year').value = info.year;
@@ -339,22 +404,26 @@ const ImportModal = {
           ? `<img src="${res.cover_url}" class="gb-thumb" alt="Cover">`
           : `<div class="gb-thumb" style="display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-muted);">Pas d'image</div>`;
 
+        const cleanDesc = cleanHtml(res.description || '');
+
         card.innerHTML = `
           ${thumbHtml}
           <div class="gb-info">
             <div class="gb-title">${res.title}</div>
             <div class="gb-author">${(res.authors || []).join(', ') || 'Auteur inconnu'} (${res.publishedDate ? res.publishedDate.slice(0, 4) : '—'})</div>
-            <div class="gb-desc">${res.description || 'Aucune description fournie.'}</div>
+            <div class="gb-desc">${cleanDesc || 'Aucune description fournie.'}</div>
           </div>
         `;
 
         card.addEventListener('click', async () => {
           document.getElementById('import-book-title').value = res.title || '';
-          if (!document.getElementById('import-book-id').value) {
-            document.getElementById('import-book-id').value = (res.title || '').slice(0, 20);
+          
+          if (!this.userModifiedId) {
+            document.getElementById('import-book-id').value = generateShortId(res.title, document.getElementById('import-book-type').value);
           }
+          
           document.getElementById('import-book-author').value = (res.authors || []).join(', ');
-          document.getElementById('import-book-desc').value = res.description || '';
+          document.getElementById('import-book-desc').value = cleanDesc;
           if (res.publishedDate) {
             document.getElementById('import-book-year').value = res.publishedDate.slice(0, 4);
           }
@@ -421,7 +490,7 @@ const ImportModal = {
       name: id,
       title: document.getElementById('import-book-title').value.trim() || id,
       author: document.getElementById('import-book-author').value.trim(),
-      description: document.getElementById('import-book-desc').value.trim(),
+      description: cleanHtml(document.getElementById('import-book-desc').value.trim()),
       type: document.getElementById('import-book-type').value,
       year: document.getElementById('import-book-year').value.trim(),
       corpus_scope: document.getElementById('import-rag-scope').value,

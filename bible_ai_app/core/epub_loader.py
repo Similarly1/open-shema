@@ -17,6 +17,18 @@ from core.chunk_enricher import ChunkEnricher
 
 logger = logging.getLogger(__name__)
 
+def clean_html_tags(raw_html: str) -> str:
+    """Nettoie les balises HTML et décode les entités d'une description."""
+    if not raw_html:
+        return ""
+    import html
+    text = re.sub(r'<(?:br|p|div|li)[^>]*>', '\n', raw_html, flags=re.I)
+    text = re.sub(r'<[^>]+>', '', text)
+    text = html.unescape(text)
+    text = re.sub(r'\n\s*\n+', '\n\n', text)
+    text = re.sub(r'[ \t]+', ' ', text)
+    return text.strip()
+
 # Listes de classification canonique
 OT_CODES = {
     "Gen", "Exo", "Lev", "Num", "Deu", "Jos", "Jdg", "Rut", "1Sa", "2Sa",
@@ -36,12 +48,23 @@ APOCRYPHA_CODES = {
     "Lje", "Dag", "1Es", "2Es", "Man", "Ps2"
 }
 
-# Mots-clés pour ignorer les pages annexes / techniques par défaut
+# Mots-clés pour ignorer les pages annexes / techniques / front-matter par défaut
 BOILERPLATE_KEYWORDS = [
+    # Français
     "titre", "avertissement", "copyright", "droits", "preliminaires", 
     "table des matieres", "sommaire", "table of contents", "toc", 
     "questionnaire", "index", "couverture", "cover", "colophon",
-    "remerciements", "dedicace", "bibliographie", "annexe", "credits"
+    "remerciements", "dedicace", "bibliographie", "annexe", "credits",
+    "cartes", "tableaux", "profils", "notes d'etude", "concordance",
+    "references croisees", "plan de lecture", "chronologie",
+    
+    # Anglais
+    "contents", "ebook introduction", "contributors", "publisher",
+    "preface", "foreword", "about the", "acknowledgments", "dedication",
+    "abbreviations", "master index", "charts", "maps", "personality profiles",
+    "profiles", "study notes", "cross-references", "cross references",
+    "concordance", "reading plan", "timeline", "timelines", "features of",
+    "user guide", "how to use", "why the", "what is application"
 ]
 
 class EpubLoader:
@@ -127,8 +150,17 @@ class EpubLoader:
                 # Déterminer si inclus par défaut
                 norm_t = strip_accents(title)
                 is_boilerplate = any(kw in norm_t for kw in BOILERPLATE_KEYWORDS)
-                # Si le fichier est vide (< 50 caractères), on le décoche aussi
-                include_default = not is_boilerplate and size_chars > 50
+                
+                # Règle d'inclusion par défaut :
+                # - Tout livre biblique identifié est coché d'office
+                # - Les annexes/front-matter/boilerplate sont décochés d'office
+                # - Les autres chapitres de contenu (> 50 caractères) sont cochés
+                if classification["book_code"] is not None:
+                    include_default = True
+                elif is_boilerplate or classification["source_type"] == "appendix":
+                    include_default = False
+                else:
+                    include_default = size_chars > 50
 
                 classified_chapters.append({
                     "id": idx + 1,
@@ -195,11 +227,14 @@ class EpubLoader:
             code = BOOK_MAPPING[norm]
         else:
             # Tester si une forme ou sous-chaîne correspond à un livre biblique
-            # On trie les clés par longueur décroissante pour matcher '1 timothee' avant 'timothee'
+            # On trie les clés par longueur décroissante
             for b_name, b_code in sorted(BOOK_MAPPING.items(), key=lambda x: -len(x[0])):
-                # Pour les abréviations très courtes (<= 3 lettres non numériques comme 'mal', 'am', 'na'),
-                # ne matcher que si c'est le mot exact ou titre entier pour éviter les faux positifs (ex: 'mal faire')
-                if len(b_name) <= 3 and not b_name[0].isdigit() and b_name in ["mal", "am", "na", "os", "mi", "so", "za"]:
+                # IMPORTANT : Ne jamais matcher les abréviations courtes de 1 ou 2 lettres dans une phrase (ex: 'is', 'am', 'os', 'in')
+                if len(b_name) <= 2:
+                    continue
+                # Pour les abréviations de 3 lettres ambiguës (ex: 'mal', 'am', 'na', 'act', 'can', 'con'),
+                # ne matcher que si c'est le mot exact
+                if len(b_name) == 3 and not b_name[0].isdigit() and b_name in ["mal", "am", "na", "os", "mi", "so", "za", "act", "can", "con"]:
                     if clean_title == b_name or norm == b_name:
                         code = b_code
                         break
@@ -448,7 +483,7 @@ class EpubLoader:
                     elif tag == "publisher" and not metadata.get("publisher"):
                         metadata["publisher"] = val
                     elif tag == "description" and not metadata.get("description"):
-                        metadata["description"] = val
+                        metadata["description"] = clean_html_tags(val)
                     elif tag == "language" and not metadata.get("language"):
                         metadata["language"] = val
                     elif tag == "meta":
