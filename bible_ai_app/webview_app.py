@@ -44,18 +44,22 @@ _BACKUP_COMPONENTS = [
 ]
 
 
+# Fenêtre native globale (stockée en dehors de la classe API pour éviter les récursions COM/.NET)
+_GLOBAL_WINDOW = None
+
+def get_active_window():
+    global _GLOBAL_WINDOW
+    return _GLOBAL_WINDOW
+
+
 class BibleAppApi:
     """
     API Bridge exposée au Frontend Webview JavaScript.
     Chaque méthode publique est directement invocable via window.pywebview.api.<nom_methode>(...).
     """
 
-    def __init__(self, window_ref=None):
-        self.window = window_ref
+    def __init__(self):
         self.config = load_config()
-
-    def set_window(self, window):
-        self.window = window
 
     # =========================================================================
     # 1. LECTEUR BIBLIQUE
@@ -413,11 +417,12 @@ class BibleAppApi:
 
     def pick_and_import_book(self) -> Dict[str, Any]:
         """Ouvre une boîte de dialogue pour importer un fichier."""
-        if not self.window:
+        win = get_active_window()
+        if not win:
             return {"success": False, "error": "Fenêtre introuvable"}
             
         file_types = ('Documents supportés (*.epub;*.json;*.docx;*.csv)', 'Tous les fichiers (*.*)')
-        result = self.window.create_file_dialog(webview.OPEN_DIALOG, allow_multiple=False, file_types=file_types)
+        result = win.create_file_dialog(webview.OPEN_DIALOG, allow_multiple=False, file_types=file_types)
         
         if not result or len(result) == 0:
             return {"cancelled": True}
@@ -426,11 +431,9 @@ class BibleAppApi:
         ext = os.path.splitext(file_path)[1].lower()
         
         if ext in ['.docx', '.csv']:
-            # Dictionnaire
             res = DictionaryManager.import_dictionary(file_path)
             return res
         elif ext == '.epub':
-            # EPUB
             from core.epub_loader import EpubLoader
             info = EpubLoader.inspect_epub(file_path)
             return {"success": True, "type": "epub", "file_path": file_path, "info": info}
@@ -475,13 +478,14 @@ class BibleAppApi:
 
     def export_backup_zip(self) -> Dict[str, Any]:
         """Exporte l'ensemble des données dans un fichier ZIP sélectionné."""
-        if not self.window:
+        win = get_active_window()
+        if not win:
             return {"success": False, "error": "Fenêtre introuvable"}
             
         now_str = datetime.datetime.now().strftime('%Y%m%d_%H%M')
         default_name = f"backup_bible_ai_{now_str}.zip"
         
-        save_path = self.window.create_file_dialog(
+        save_path = win.create_file_dialog(
             webview.SAVE_FILENAME_DIALOG,
             save_filename=default_name,
             file_types=('Archives ZIP (*.zip)', 'Tous les fichiers (*.*)')
@@ -536,10 +540,11 @@ class BibleAppApi:
 
     def import_backup_zip(self) -> Dict[str, Any]:
         """Restaure les données depuis un fichier ZIP."""
-        if not self.window:
+        win = get_active_window()
+        if not win:
             return {"success": False, "error": "Fenêtre introuvable"}
             
-        pick = self.window.create_file_dialog(
+        pick = win.create_file_dialog(
             webview.OPEN_DIALOG,
             allow_multiple=False,
             file_types=('Archives ZIP (*.zip)', 'Tous les fichiers (*.*)')
@@ -582,20 +587,21 @@ class BibleAppApi:
 
 
 def main():
+    global _GLOBAL_WINDOW
     api = BibleAppApi()
     
     html_path = os.path.join(current_dir, "web", "index.html")
     
-    window = webview.create_window(
+    _GLOBAL_WINDOW = webview.create_window(
         title="Bible AI — Lecteur Biblique & Étude (Logos Edition)",
         url=f"file:///{html_path.replace(os.sep, '/')}",
         js_api=api,
         width=1440,
         height=920,
         min_size=(1050, 680),
-        background_color="#F8FAFC"
+        maximized=True,
+        background_color="#0F172A"
     )
-    api.set_window(window)
     
     # Lancement avec Edge WebView2
     webview.start(debug=False)

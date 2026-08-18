@@ -66,6 +66,23 @@ const App = {
 
     // 5. Raccourcis clavier globaux
     this.bindKeyboardShortcuts();
+
+    // 6. Masquage fluide du Splash Loader dès que l'API est initialisée
+    API.onReady(() => {
+      setTimeout(() => {
+        this.hideSplash();
+      }, 600);
+    });
+  },
+
+  hideSplash() {
+    const splash = document.getElementById('app-splash-loader');
+    if (splash && !splash.classList.contains('fade-out')) {
+      splash.classList.add('fade-out');
+      setTimeout(() => {
+        splash.style.display = 'none';
+      }, 500);
+    }
   },
 
   switchView(viewName) {
