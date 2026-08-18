@@ -134,7 +134,7 @@
             </div>
             
             <div class="nav-mode-links">
-              <button class="mode-link active" id="mode-reading">Affichage</button>
+              <button class="mode-link" id="btn-display-options" title="Options d'affichage (Péricopes, numéros, police)">Affichage ▾</button>
               <button class="mode-link" id="mode-search-inline">Chercher</button>
               <button class="mode-link" id="mode-notes-inline">Notes</button>
             </div>
@@ -566,13 +566,25 @@
       </div>
 
       <div class="drawer-body">
-        <!-- Onglet 1: Commentaires Exégétiques -->
+        <!-- Onglet 1: Commentaires Exégétiques (Un seul commentaire affiché avec sélecteur discret) -->
         <div class="drawer-content active" id="drawer-tab-commentaries">
-          <div class="drawer-section-header">
+          <div class="drawer-section-header" style="flex-wrap: wrap; gap: 8px;">
             <span class="selected-verse-badge" id="comm-selected-verse">Genèse 1:1</span>
-            <span class="comm-count" id="comm-count">Chargement...</span>
+            
+            <div class="comm-source-selector-box">
+              <button class="comm-source-btn" id="btn-select-comm-source" title="Changer d'ouvrage de commentaire">
+                <span id="lbl-active-comm-source">Sélectionner un commentaire</span>
+                <span class="pill-arrow">▾</span>
+              </button>
+              <div class="comm-sources-popover hidden" id="comm-sources-popover">
+                <div class="comm-popover-title">Commentaires pour ce verset (<span id="comm-popover-count">0</span>)</div>
+                <div class="comm-sources-list" id="comm-sources-list"></div>
+              </div>
+            </div>
           </div>
-          <div class="commentary-list" id="commentary-list"></div>
+          <div class="commentary-single-view" id="commentary-single-view">
+            <div class="empty-hint">Cliquez sur un verset pour charger son commentaire exégétique.</div>
+          </div>
         </div>
 
         <!-- Onglet 2: Assistant IA / Chat RAG -->
@@ -604,6 +616,33 @@
     <!-- 4. POPOVERS & MODALES FLOTTANTES                        -->
     <!-- ======================================================= -->
     
+    <!-- Popover Options d'Affichage (Titres, chapitres, versets, police) -->
+    <div class="display-options-popover hidden" id="display-options-popover">
+      <div class="display-opt-header">Options de lecture</div>
+      <div class="display-opt-list">
+        <label class="display-opt-item">
+          <span>Titres de sections (Péricopes)</span>
+          <input type="checkbox" id="opt-show-pericopes" checked>
+        </label>
+        <label class="display-opt-item">
+          <span>Numéros de chapitres</span>
+          <input type="checkbox" id="opt-show-chap-num" checked>
+        </label>
+        <label class="display-opt-item">
+          <span>Numéros de versets</span>
+          <input type="checkbox" id="opt-show-verse-num" checked>
+        </label>
+        <label class="display-opt-item">
+          <span>Saut de ligne par verset</span>
+          <input type="checkbox" id="opt-verse-per-line">
+        </label>
+        <label class="display-opt-item">
+          <span>Police avec empattement (Serif)</span>
+          <input type="checkbox" id="opt-font-serif" checked>
+        </label>
+      </div>
+    </div>
+
     <!-- Popover Sélecteur de Livre/Chapitre -->
     <div class="popover-backdrop hidden" id="popover-backdrop"></div>
     

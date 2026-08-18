@@ -1,8 +1,112 @@
 /**
- * Bible Reader & Multi-Document Tabs Engine
- * Gère l'affichage du texte biblique, les onglets multi-versions, le split-pane, l'interlinéaire et les interactions.
+ * Bible Reader Engine & Logos Experience
+ * Gère le défilement continu pour toute la Bible, les options d'affichage,
+ * les onglets multi-documents et le sélecteur individuel de commentaires.
  */
 
+// 1. LISTE CANONIQUE DES LIVRES & CALCULS DE NAVIGATION
+const CANONICAL_BOOKS = [
+  // Ancien Testament
+  { name: "Genèse", code: "Gen", chapters: 50 },
+  { name: "Exode", code: "Exo", chapters: 40 },
+  { name: "Lévitique", code: "Lev", chapters: 27 },
+  { name: "Nombres", code: "Num", chapters: 36 },
+  { name: "Deutéronome", code: "Deu", chapters: 34 },
+  { name: "Josué", code: "Jos", chapters: 24 },
+  { name: "Juges", code: "Jdg", chapters: 21 },
+  { name: "Ruth", code: "Rut", chapters: 4 },
+  { name: "1 Samuel", code: "1Sa", chapters: 31 },
+  { name: "2 Samuel", code: "2Sa", chapters: 24 },
+  { name: "1 Rois", code: "1Ki", chapters: 22 },
+  { name: "2 Rois", code: "2Ki", chapters: 25 },
+  { name: "1 Chroniques", code: "1Ch", chapters: 29 },
+  { name: "2 Chroniques", code: "2Ch", chapters: 36 },
+  { name: "Esdras", code: "Ezr", chapters: 10 },
+  { name: "Néhémie", code: "Neh", chapters: 13 },
+  { name: "Esther", code: "Est", chapters: 10 },
+  { name: "Job", code: "Job", chapters: 42 },
+  { name: "Psaumes", code: "Psa", chapters: 150 },
+  { name: "Proverbes", code: "Pro", chapters: 31 },
+  { name: "Ecclésiaste", code: "Ecc", chapters: 12 },
+  { name: "Cantique", code: "Sol", chapters: 8 },
+  { name: "Ésaïe", code: "Isa", chapters: 66 },
+  { name: "Jérémie", code: "Jer", chapters: 52 },
+  { name: "Lamentations", code: "Lam", chapters: 5 },
+  { name: "Ézéchiel", code: "Eze", chapters: 48 },
+  { name: "Daniel", code: "Dan", chapters: 12 },
+  { name: "Osée", code: "Hos", chapters: 14 },
+  { name: "Joël", code: "Joe", chapters: 3 },
+  { name: "Amos", code: "Amo", chapters: 9 },
+  { name: "Abdias", code: "Oba", chapters: 1 },
+  { name: "Jonas", code: "Jon", chapters: 4 },
+  { name: "Michée", code: "Mic", chapters: 7 },
+  { name: "Nahum", code: "Nah", chapters: 3 },
+  { name: "Habacuc", code: "Hab", chapters: 3 },
+  { name: "Sophonie", code: "Zep", chapters: 3 },
+  { name: "Aggée", code: "Hag", chapters: 2 },
+  { name: "Zacharie", code: "Zec", chapters: 14 },
+  { name: "Malachie", code: "Mal", chapters: 4 },
+  // Nouveau Testament
+  { name: "Matthieu", code: "Mat", chapters: 28 },
+  { name: "Marc", code: "Mar", chapters: 16 },
+  { name: "Luc", code: "Luk", chapters: 24 },
+  { name: "Jean", code: "Joh", chapters: 21 },
+  { name: "Actes", code: "Act", chapters: 28 },
+  { name: "Romains", code: "Rom", chapters: 16 },
+  { name: "1 Corinthiens", code: "1Co", chapters: 16 },
+  { name: "2 Corinthiens", code: "2Co", chapters: 13 },
+  { name: "Galates", code: "Gal", chapters: 6 },
+  { name: "Éphésiens", code: "Eph", chapters: 6 },
+  { name: "Philippiens", code: "Phi", chapters: 4 },
+  { name: "Colossiens", code: "Col", chapters: 4 },
+  { name: "1 Thessaloniciens", code: "1Th", chapters: 5 },
+  { name: "2 Thessaloniciens", code: "2Th", chapters: 3 },
+  { name: "1 Timothée", code: "1Ti", chapters: 6 },
+  { name: "2 Timothée", code: "2Ti", chapters: 4 },
+  { name: "Tite", code: "Tit", chapters: 3 },
+  { name: "Philémon", code: "Phm", chapters: 1 },
+  { name: "Hébreux", code: "Heb", chapters: 13 },
+  { name: "Jacques", code: "Jam", chapters: 5 },
+  { name: "1 Pierre", code: "1Pe", chapters: 5 },
+  { name: "2 Pierre", code: "2Pe", chapters: 3 },
+  { name: "1 Jean", code: "1Jo", chapters: 5 },
+  { name: "2 Jean", code: "2Jo", chapters: 1 },
+  { name: "3 Jean", code: "3Jo", chapters: 1 },
+  { name: "Jude", code: "Jud", chapters: 1 },
+  { name: "Apocalypse", code: "Rev", chapters: 22 }
+];
+
+function getBookInfo(bookCode) {
+  const b = CANONICAL_BOOKS.find(item => item.code.toLowerCase() === bookCode.toLowerCase());
+  return b || { name: bookCode, code: bookCode, chapters: 50 };
+}
+
+function getNextChapterCoord(bookCode, chNum) {
+  const info = getBookInfo(bookCode);
+  if (chNum < info.chapters) {
+    return { book: info.code, chapter: chNum + 1 };
+  }
+  const idx = CANONICAL_BOOKS.findIndex(item => item.code.toLowerCase() === bookCode.toLowerCase());
+  if (idx !== -1 && idx < CANONICAL_BOOKS.length - 1) {
+    return { book: CANONICAL_BOOKS[idx + 1].code, chapter: 1 };
+  }
+  return null;
+}
+
+function getPrevChapterCoord(bookCode, chNum) {
+  if (chNum > 1) {
+    return { book: bookCode, chapter: chNum - 1 };
+  }
+  const idx = CANONICAL_BOOKS.findIndex(item => item.code.toLowerCase() === bookCode.toLowerCase());
+  if (idx > 0) {
+    const prevBook = CANONICAL_BOOKS[idx - 1];
+    return { book: prevBook.code, chapter: prevBook.chapters };
+  }
+  return null;
+}
+
+
+// 2. GESTIONNAIRE D'ONGLETS MULTI-DOCUMENTS
 const TabsManager = {
   tabs: [],
   activeTabId: null,
@@ -48,7 +152,6 @@ const TabsManager = {
   },
 
   createNewTab() {
-    // Trouver une Bible installée qui n'est pas encore ouverte si possible
     const openNames = this.tabs.map(t => t.bibleName);
     let chosenBible = BibleReader.installedBibles.find(b => !openNames.includes(b.name))?.name;
     if (!chosenBible) {
@@ -65,11 +168,8 @@ const TabsManager = {
 
     this.activeTabId = tabId;
     BibleReader.currentBible1 = target.bibleName;
-    BibleReader.currentBook = target.book;
-    BibleReader.currentChapter = target.chapter;
-
+    BibleReader.navigateTo(target.book, target.chapter);
     this.renderTabs();
-    BibleReader.loadChapter();
   },
 
   closeTab(tabId, e) {
@@ -133,6 +233,138 @@ const TabsManager = {
 };
 
 
+// 3. OPTIONS D'AFFICHAGE (PÉRICOPES, NUMÉROS, POLICE)
+const DisplayOptions = {
+  init() {
+    const btn = document.getElementById('btn-display-options');
+    const popover = document.getElementById('display-options-popover');
+    const workspace = document.getElementById('reader-workspace');
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      popover.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!popover.contains(e.target) && e.target !== btn) {
+        popover.classList.add('hidden');
+      }
+    });
+
+    // Écouteurs de cases à cocher
+    document.getElementById('opt-show-pericopes').addEventListener('change', (e) => {
+      workspace.classList.toggle('hide-pericopes', !e.target.checked);
+    });
+
+    document.getElementById('opt-show-chap-num').addEventListener('change', (e) => {
+      workspace.classList.toggle('hide-chap-num', !e.target.checked);
+    });
+
+    document.getElementById('opt-show-verse-num').addEventListener('change', (e) => {
+      workspace.classList.toggle('hide-verse-num', !e.target.checked);
+    });
+
+    document.getElementById('opt-verse-per-line').addEventListener('change', (e) => {
+      workspace.classList.toggle('verse-per-line', e.target.checked);
+    });
+
+    document.getElementById('opt-font-serif').addEventListener('change', (e) => {
+      workspace.classList.toggle('font-sans', !e.target.checked);
+    });
+  }
+};
+
+
+// 4. GESTIONNAIRE INDIVIDUEL DE COMMENTAIRES (Style Logos)
+const CommentaryViewer = {
+  currentComments: [],
+  activeIndex: 0,
+
+  init() {
+    const btn = document.getElementById('btn-select-comm-source');
+    const popover = document.getElementById('comm-sources-popover');
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      popover.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!popover.contains(e.target) && e.target !== btn) {
+        popover.classList.add('hidden');
+      }
+    });
+  },
+
+  setComments(comments, verseRef) {
+    this.currentComments = comments || [];
+    this.activeIndex = 0;
+
+    const countEl = document.getElementById('comm-popover-count');
+    const listEl = document.getElementById('comm-sources-list');
+    const badgeEl = document.getElementById('comm-selected-verse');
+
+    if (badgeEl) badgeEl.textContent = verseRef;
+    if (countEl) countEl.textContent = this.currentComments.length;
+    if (listEl) listEl.innerHTML = '';
+
+    if (this.currentComments.length === 0) {
+      document.getElementById('lbl-active-comm-source').textContent = 'Aucun commentaire';
+      document.getElementById('commentary-single-view').innerHTML = `
+        <div class="empty-hint" style="padding: 20px; color: var(--text-muted);">
+          Aucun commentaire disponible pour ce verset.
+        </div>
+      `;
+      return;
+    }
+
+    // Remplir le menu déroulant
+    this.currentComments.forEach((c, idx) => {
+      const authorName = c.author || c.source || `Commentaire ${idx + 1}`;
+      const item = document.createElement('button');
+      item.className = `comm-source-item ${idx === 0 ? 'active' : ''}`;
+      item.innerHTML = `
+        <span>📖 ${authorName}</span>
+      `;
+      item.addEventListener('click', () => {
+        this.selectCommentary(idx);
+        document.getElementById('comm-sources-popover').classList.add('hidden');
+      });
+      listEl.appendChild(item);
+    });
+
+    this.selectCommentary(0);
+  },
+
+  selectCommentary(index) {
+    if (!this.currentComments[index]) return;
+    this.activeIndex = index;
+
+    const comm = this.currentComments[index];
+    const authorName = comm.author || comm.source || 'Commentaire';
+
+    document.getElementById('lbl-active-comm-source').textContent = authorName;
+
+    // Mettre à jour l'élément actif dans la liste popover
+    document.querySelectorAll('.comm-source-item').forEach((item, idx) => {
+      item.classList.toggle('active', idx === index);
+    });
+
+    // Afficher le commentaire unique
+    const container = document.getElementById('commentary-single-view');
+    container.innerHTML = `
+      <div class="comm-single-author-header">
+        <span class="comm-single-author-badge">📖 ${authorName}</span>
+      </div>
+      <div class="comm-single-body">
+        ${comm.text.replace(/\n\n/g, '<br><br>')}
+      </div>
+    `;
+  }
+};
+
+
+// 5. MOTEUR PRINCIPAL DU LECTEUR BIBLIQUE (Défilement continu & Split-Pane)
 const BibleReader = {
   currentBook: 'Gen',
   currentChapter: 1,
@@ -143,13 +375,18 @@ const BibleReader = {
   isInterlinear: false,
   zoomPercent: 100,
 
-  selectedVerse: null,
   installedBibles: [],
   targetPaneForPicker: 1,
+
+  // Liste ordonnée des chapitres actuellement chargés dans la vue continue
+  loadedChapters: [],
+  isLoadingMore: false,
 
   async init() {
     this.bindEvents();
     TabsManager.init();
+    DisplayOptions.init();
+    CommentaryViewer.init();
     
     // Initialiser le BookPicker
     BookPicker.init((bookCode, chNum) => {
@@ -166,35 +403,35 @@ const BibleReader = {
         }
         TabsManager.setupInitialTabs(this.installedBibles);
       } else {
-        this.loadChapter();
+        this.navigateTo(this.currentBook, this.currentChapter);
       }
     });
+
+    // Activer l'écouteur de défilement continu
+    this.setupInfiniteScroll();
   },
 
   bindEvents() {
-    // Bouton de la pilule sélecteur
     document.getElementById('book-picker-pill').addEventListener('click', () => {
       BookPicker.toggle(this.currentBook, this.currentChapter);
     });
 
-    // Boutons Historique < >
     document.getElementById('btn-history-back').addEventListener('click', () => {
-      if (this.currentChapter > 1) {
-        this.navigateTo(this.currentBook, this.currentChapter - 1);
-      }
+      const prev = getPrevChapterCoord(this.currentBook, this.currentChapter);
+      if (prev) this.navigateTo(prev.book, prev.chapter);
     });
+    
     document.getElementById('btn-history-forward').addEventListener('click', () => {
-      this.navigateTo(this.currentBook, this.currentChapter + 1);
+      const next = getNextChapterCoord(this.currentBook, this.currentChapter);
+      if (next) this.navigateTo(next.book, next.chapter);
     });
 
-    // Toggle Interlinéaire
     document.getElementById('btn-toggle-interlinear').addEventListener('click', () => {
       this.isInterlinear = !this.isInterlinear;
       document.getElementById('btn-toggle-interlinear').classList.toggle('active', this.isInterlinear);
-      this.loadChapter();
+      this.reloadCurrentChapters();
     });
 
-    // Toggle Double Colonne
     document.getElementById('btn-toggle-split').addEventListener('click', () => {
       this.toggleSplitView();
     });
@@ -203,7 +440,6 @@ const BibleReader = {
       this.toggleSplitView(false);
     });
 
-    // Choix de version biblique (Pane 1 et Pane 2)
     document.getElementById('pane-1-select-bible').addEventListener('click', (e) => {
       e.stopPropagation();
       this.openBiblePicker(1);
@@ -225,7 +461,6 @@ const BibleReader = {
       }
     });
 
-    // Zoom
     document.getElementById('btn-zoom-in').addEventListener('click', () => {
       this.setZoom(this.zoomPercent + 10);
     });
@@ -233,12 +468,10 @@ const BibleReader = {
       this.setZoom(this.zoomPercent - 10);
     });
 
-    // Toggle Right Drawer
     document.getElementById('btn-toggle-right-drawer').addEventListener('click', () => {
       document.getElementById('right-drawer').classList.toggle('collapsed');
     });
 
-    // Champ recherche rapide
     document.getElementById('quick-passage-input').addEventListener('keydown', async (e) => {
       if (e.key === 'Enter') {
         const query = e.target.value.trim();
@@ -251,6 +484,257 @@ const BibleReader = {
         }
       }
     });
+  },
+
+  setupInfiniteScroll() {
+    const pane1Scroll = document.getElementById('pane-1-content');
+    if (!pane1Scroll) return;
+
+    pane1Scroll.addEventListener('scroll', () => {
+      // 1. Détection du chapitre actif visible
+      this.detectActiveVisibleChapter(pane1Scroll);
+
+      // 2. Chargement continu vers le bas
+      if (pane1Scroll.scrollTop + pane1Scroll.clientHeight >= pane1Scroll.scrollHeight - 300) {
+        this.loadNextChapterContinuous();
+      }
+
+      // 3. Chargement continu vers le haut
+      if (pane1Scroll.scrollTop <= 50) {
+        this.loadPrevChapterContinuous(pane1Scroll);
+      }
+    });
+  },
+
+  detectActiveVisibleChapter(scrollEl) {
+    const blocks = scrollEl.querySelectorAll('.chapter-block');
+    let bestBlock = null;
+    let minDistance = 999999;
+
+    blocks.forEach(block => {
+      const rect = block.getBoundingClientRect();
+      const dist = Math.abs(rect.top - 120);
+      if (dist < minDistance) {
+        minDistance = dist;
+        bestBlock = block;
+      }
+    });
+
+    if (bestBlock) {
+      const bCode = bestBlock.dataset.book;
+      const ch = parseInt(bestBlock.dataset.chapter);
+      if (bCode !== this.currentBook || ch !== this.currentChapter) {
+        this.currentBook = bCode;
+        this.currentChapter = ch;
+        const info = getBookInfo(bCode);
+        document.getElementById('pill-reference-text').textContent = `${info.name} ${ch}`;
+        document.getElementById('pane-1-breadcrumb').textContent = `${info.name.toUpperCase()} > Chapitre ${ch}`;
+        TabsManager.updateActiveTab(null, bCode, ch);
+      }
+    }
+  },
+
+  async navigateTo(bookCode, chapterNum) {
+    this.currentBook = bookCode;
+    this.currentChapter = chapterNum;
+    this.loadedChapters = [{ book: bookCode, chapter: chapterNum }];
+
+    const info = getBookInfo(bookCode);
+    document.getElementById('pill-reference-text').textContent = `${info.name} ${chapterNum}`;
+    document.getElementById('pane-1-breadcrumb').textContent = `${info.name.toUpperCase()} > Chapitre ${chapterNum}`;
+    document.getElementById('pane-1-bible-name').textContent = this.currentBible1;
+
+    // Vider le conteneur et insérer le chapitre
+    const pane1Container = document.getElementById('pane-1-verses');
+    pane1Container.innerHTML = '';
+
+    const data1 = await API.getChapterData(this.currentBible1, bookCode, chapterNum);
+    const block1 = this.createChapterBlockElement(1, data1, this.currentBible1);
+    pane1Container.appendChild(block1);
+
+    if (this.isSplitView) {
+      const pane2Container = document.getElementById('pane-2-verses');
+      pane2Container.innerHTML = '';
+      const data2 = await API.getChapterData(this.currentBible2, bookCode, chapterNum);
+      const block2 = this.createChapterBlockElement(2, data2, this.currentBible2);
+      pane2Container.appendChild(block2);
+    }
+
+    // Scroll au début
+    document.getElementById('pane-1-content').scrollTop = 0;
+
+    // Charger les commentaires du verset 1
+    this.loadCommentariesForVerse(1);
+    TabsManager.updateActiveTab(null, bookCode, chapterNum);
+  },
+
+  async reloadCurrentChapters() {
+    const chaptersToReload = [...this.loadedChapters];
+    const pane1Container = document.getElementById('pane-1-verses');
+    pane1Container.innerHTML = '';
+
+    for (const c of chaptersToReload) {
+      const data = await API.getChapterData(this.currentBible1, c.book, c.chapter);
+      const block = this.createChapterBlockElement(1, data, this.currentBible1);
+      pane1Container.appendChild(block);
+    }
+  },
+
+  async loadNextChapterContinuous() {
+    if (this.isLoadingMore || this.loadedChapters.length === 0) return;
+    const last = this.loadedChapters[this.loadedChapters.length - 1];
+    const next = getNextChapterCoord(last.book, last.chapter);
+    if (!next) return;
+
+    this.isLoadingMore = true;
+    this.loadedChapters.push(next);
+
+    const data = await API.getChapterData(this.currentBible1, next.book, next.chapter);
+    const block = this.createChapterBlockElement(1, data, this.currentBible1);
+
+    const divider = document.createElement('div');
+    divider.className = 'chapter-badge-divider';
+    divider.innerHTML = `<span>${data.book_french} — Chapitre ${data.chapter}</span>`;
+
+    const pane1Container = document.getElementById('pane-1-verses');
+    pane1Container.appendChild(divider);
+    pane1Container.appendChild(block);
+
+    this.isLoadingMore = false;
+  },
+
+  async loadPrevChapterContinuous(scrollEl) {
+    if (this.isLoadingMore || this.loadedChapters.length === 0) return;
+    const first = this.loadedChapters[0];
+    const prev = getPrevChapterCoord(first.book, first.chapter);
+    if (!prev) return;
+
+    this.isLoadingMore = true;
+    this.loadedChapters.unshift(prev);
+
+    const data = await API.getChapterData(this.currentBible1, prev.book, prev.chapter);
+    const block = this.createChapterBlockElement(1, data, this.currentBible1);
+
+    const divider = document.createElement('div');
+    divider.className = 'chapter-badge-divider';
+    divider.innerHTML = `<span>${data.book_french} — Chapitre ${data.chapter}</span>`;
+
+    const oldScrollHeight = scrollEl.scrollHeight;
+    const pane1Container = document.getElementById('pane-1-verses');
+    pane1Container.prepend(divider);
+    pane1Container.prepend(block);
+
+    // Ajuster le scroll pour éviter le saut d'écran
+    const diff = scrollEl.scrollHeight - oldScrollHeight;
+    scrollEl.scrollTop += diff;
+
+    this.isLoadingMore = false;
+  },
+
+  createChapterBlockElement(paneNum, data, bibleName) {
+    const block = document.createElement('div');
+    block.className = 'chapter-block';
+    block.dataset.book = data.book;
+    block.dataset.chapter = data.chapter;
+
+    if (data.pericope) {
+      const pericope = document.createElement('h1');
+      pericope.className = 'pericope-title';
+      pericope.textContent = data.pericope;
+      block.appendChild(pericope);
+    }
+
+    const flow = document.createElement('div');
+    flow.className = 'verses-flow';
+
+    if (data.verses && data.verses.length > 0) {
+      data.verses.forEach((v, index) => {
+        const vSpan = document.createElement('span');
+        vSpan.className = 'verse-item';
+        vSpan.dataset.verseNum = v.verse;
+        vSpan.dataset.bookCode = data.book;
+        vSpan.dataset.chapter = data.chapter;
+
+        if (this.isInterlinear && v.words && v.words.length > 0) {
+          let wordsHtml = '';
+          v.words.forEach(w => {
+            wordsHtml += `
+              <div class="interlinear-block" data-strong="${w.strong || ''}" data-word="${w.orig || w.surface}" title="${w.morph || ''}">
+                <span class="interlinear-surface">${w.surface}</span>
+                ${w.orig && w.orig !== w.surface ? `<span class="interlinear-lemma">${w.orig}</span>` : ''}
+                ${w.translit ? `<span class="interlinear-translit">${w.translit}</span>` : ''}
+                ${w.strong ? `<span class="interlinear-strong">${w.strong}</span>` : ''}
+              </div>
+            `;
+          });
+          vSpan.innerHTML = `<sup class="verse-num">${v.verse}</sup> ${wordsHtml}`;
+
+          vSpan.querySelectorAll('.interlinear-block').forEach(b => {
+            b.addEventListener('click', (e) => {
+              e.stopPropagation();
+              this.lookupWordInLexicon(b.dataset.word, b.dataset.strong);
+            });
+          });
+        } else {
+          const isFirst = index === 0;
+          const numHtml = isFirst 
+            ? `<span class="chapter-number-dropcap">${data.chapter}</span><sup class="verse-num">${v.verse}</sup>`
+            : `<sup class="verse-num">${v.verse}</sup>`;
+          vSpan.innerHTML = `${numHtml}${v.text} `;
+        }
+
+        vSpan.addEventListener('click', () => {
+          document.querySelectorAll('.verse-item').forEach(el => el.classList.remove('selected'));
+          vSpan.classList.add('selected');
+          this.loadCommentariesForVerse(v.verse, data.book, data.chapter);
+        });
+
+        flow.appendChild(vSpan);
+      });
+    }
+
+    block.appendChild(flow);
+    return block;
+  },
+
+  async loadCommentariesForVerse(verseNum, bookCode = null, chapterNum = null) {
+    const book = bookCode || this.currentBook;
+    const ch = chapterNum || this.currentChapter;
+    const bookInfo = getBookInfo(book);
+    const refStr = `${bookInfo.name} ${ch}:${verseNum}`;
+
+    try {
+      const comms = await API.getCommentaries(book, ch, verseNum);
+      CommentaryViewer.setComments(comms, refStr);
+    } catch (e) {
+      console.error('Erreur commentaires:', e);
+    }
+  },
+
+  async lookupWordInLexicon(word, strongCode) {
+    const drawer = document.getElementById('right-drawer');
+    drawer.classList.remove('collapsed');
+    document.querySelector('.drawer-tab[data-drawer-tab="lexicon"]').click();
+
+    const container = document.getElementById('lexicon-details');
+    container.innerHTML = `<div style="padding: 20px; color: var(--text-muted);">Recherche lexicale pour « ${word} » (${strongCode || ''})...</div>`;
+
+    try {
+      const entry = await API.call('lookup_dictionary', word, strongCode);
+      if (entry) {
+        container.innerHTML = `
+          <div style="padding: 16px;">
+            <div style="font-size: 18px; font-weight: 800; color: var(--accent-blue); margin-bottom: 4px;">${entry.title}</div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--accent-orange); margin-bottom: 12px;">${entry.badge}</div>
+            <div style="font-family: var(--font-bible); font-size: 15px; line-height: 1.65; color: #334155;">${entry.full_text.replace(/\n\n/g, '<br><br>')}</div>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `<div style="padding: 20px; color: var(--text-muted);">Aucune entrée lexicale trouvée pour ce terme.</div>`;
+      }
+    } catch (e) {
+      container.innerHTML = `<div style="padding: 20px; color: var(--accent-red);">Erreur lors de la consultation.</div>`;
+    }
   },
 
   openBiblePicker(paneNum) {
@@ -285,171 +769,13 @@ const BibleReader = {
     this.closeBiblePicker();
     if (this.targetPaneForPicker === 1) {
       this.currentBible1 = versionName;
+      document.getElementById('pane-1-bible-name').textContent = versionName;
       TabsManager.updateActiveTab(versionName, this.currentBook, this.currentChapter);
     } else {
       this.currentBible2 = versionName;
+      document.getElementById('pane-2-bible-name').textContent = versionName;
     }
-    this.loadChapter();
-  },
-
-  async navigateTo(bookCode, chapterNum) {
-    this.currentBook = bookCode;
-    this.currentChapter = chapterNum;
-    TabsManager.updateActiveTab(null, bookCode, chapterNum);
-    await this.loadChapter();
-  },
-
-  async loadChapter() {
-    // 1. Mettre à jour la pilule
-    document.getElementById('pill-reference-text').textContent = `${this.currentBook} ${this.currentChapter}`;
-
-    // 2. Charger le texte pour la Colonne 1
-    const data1 = await API.getChapterData(this.currentBible1, this.currentBook, this.currentChapter);
-    this.renderPane(1, data1, this.currentBible1);
-
-    // 3. Charger le texte pour la Colonne 2 si active
-    if (this.isSplitView) {
-      const data2 = await API.getChapterData(this.currentBible2, this.currentBook, this.currentChapter);
-      this.renderPane(2, data2, this.currentBible2);
-    }
-
-    // 4. Charger les commentaires du verset 1 par défaut
-    this.loadCommentariesForVerse(1);
-  },
-
-  renderPane(paneNum, data, bibleName) {
-    const breadcrumbEl = document.getElementById(`pane-${paneNum}-breadcrumb`);
-    const bibleNameEl = document.getElementById(`pane-${paneNum}-bible-name`);
-    const pericopeEl = document.getElementById(`pane-${paneNum}-pericope`);
-    const versesEl = document.getElementById(`pane-${paneNum}-verses`);
-
-    if (!data || !data.verses) {
-      versesEl.innerHTML = `<p class="empty-hint">Aucun texte disponible pour ce chapitre.</p>`;
-      return;
-    }
-
-    // Mettre à jour les titres
-    breadcrumbEl.textContent = `${data.book_french.toUpperCase()} > Chapitre ${data.chapter}`;
-    bibleNameEl.textContent = bibleName;
-    pericopeEl.textContent = data.pericope || `CHAPITRE ${data.chapter}`;
-
-    // Générer les versets
-    versesEl.innerHTML = '';
-    
-    data.verses.forEach((v, index) => {
-      const vSpan = document.createElement('span');
-      vSpan.className = 'verse-item';
-      vSpan.dataset.verseNum = v.verse;
-
-      if (this.isInterlinear && v.words && v.words.length > 0) {
-        // Mode Interlinéaire Inversé Logos
-        let wordsHtml = '';
-        v.words.forEach(w => {
-          wordsHtml += `
-            <div class="interlinear-block" data-strong="${w.strong || ''}" data-word="${w.orig || w.surface}" title="${w.morph || ''}">
-              <span class="interlinear-surface">${w.surface}</span>
-              ${w.orig && w.orig !== w.surface ? `<span class="interlinear-lemma">${w.orig}</span>` : ''}
-              ${w.translit ? `<span class="interlinear-translit">${w.translit}</span>` : ''}
-              ${w.strong ? `<span class="interlinear-strong">${w.strong}</span>` : ''}
-            </div>
-          `;
-        });
-        vSpan.innerHTML = `<sup class="verse-num">${v.verse}</sup> ${wordsHtml}`;
-
-        // Clic sur mot interlinéaire -> ouvrir Strong / Lexique
-        vSpan.querySelectorAll('.interlinear-block').forEach(block => {
-          block.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const strongCode = block.dataset.strong;
-            const word = block.dataset.word;
-            this.lookupWordInLexicon(word, strongCode);
-          });
-        });
-
-      } else {
-        // Mode de lecture continue Logos
-        const isFirst = index === 0;
-        const numHtml = isFirst 
-          ? `<span class="chapter-number-dropcap">${data.chapter}</span><sup class="verse-num">${v.verse}</sup>`
-          : `<sup class="verse-num">${v.verse}</sup>`;
-          
-        vSpan.innerHTML = `${numHtml}${v.text} `;
-      }
-
-      // Clic sur un verset pour charger les commentaires
-      vSpan.addEventListener('click', () => {
-        document.querySelectorAll('.verse-item').forEach(el => el.classList.remove('selected'));
-        vSpan.classList.add('selected');
-        this.loadCommentariesForVerse(v.verse);
-      });
-
-      versesEl.appendChild(vSpan);
-    });
-
-    // Appliquer le zoom
-    versesEl.style.fontSize = `${19 * (this.zoomPercent / 100)}px`;
-  },
-
-  async lookupWordInLexicon(word, strongCode) {
-    const drawer = document.getElementById('right-drawer');
-    drawer.classList.remove('collapsed');
-    document.querySelector('.drawer-tab[data-drawer-tab="lexicon"]').click();
-
-    const container = document.getElementById('lexicon-details');
-    container.innerHTML = `<div style="padding: 20px; color: var(--text-muted);">Recherche lexicale pour « ${word} » (${strongCode || ''})...</div>`;
-
-    try {
-      const entry = await API.call('lookup_dictionary', word, strongCode);
-      if (entry) {
-        container.innerHTML = `
-          <div style="padding: 16px;">
-            <div style="font-size: 18px; font-weight: 800; color: var(--accent-blue); margin-bottom: 4px;">${entry.title}</div>
-            <div style="font-size: 11px; font-weight: 700; color: var(--accent-orange); margin-bottom: 12px;">${entry.badge}</div>
-            <div style="font-family: var(--font-bible); font-size: 15px; line-height: 1.65; color: #334155;">${entry.full_text.replace(/\n\n/g, '<br><br>')}</div>
-          </div>
-        `;
-      } else {
-        container.innerHTML = `<div style="padding: 20px; color: var(--text-muted);">Aucune entrée lexicale trouvée pour ce terme.</div>`;
-      }
-    } catch (e) {
-      container.innerHTML = `<div style="padding: 20px; color: var(--accent-red);">Erreur lors de la consultation.</div>`;
-    }
-  },
-
-  async loadCommentariesForVerse(verseNum) {
-    this.selectedVerse = verseNum;
-    const badgeEl = document.getElementById('comm-selected-verse');
-    const countEl = document.getElementById('comm-count');
-    const listEl = document.getElementById('commentary-list');
-
-    badgeEl.textContent = `${this.currentBook} ${this.currentChapter}:${verseNum}`;
-    countEl.textContent = 'Recherche...';
-    listEl.innerHTML = '<p class="empty-hint">Chargement des commentaires...</p>';
-
-    try {
-      const comms = await API.getCommentaries(this.currentBook, this.currentChapter, verseNum);
-      if (!comms || comms.length === 0) {
-        countEl.textContent = '0 commentaire';
-        listEl.innerHTML = '<p class="empty-hint">Aucun commentaire direct disponible pour ce verset.</p>';
-        return;
-      }
-
-      countEl.textContent = `${comms.length} commentaire(s)`;
-      listEl.innerHTML = '';
-
-      comms.forEach(c => {
-        const card = document.createElement('div');
-        card.className = 'commentary-card';
-        card.innerHTML = `
-          <div class="comm-author">📖 ${c.author || c.source}</div>
-          <div class="comm-text">${c.text}</div>
-        `;
-        listEl.appendChild(card);
-      });
-    } catch (e) {
-      console.error('Erreur commentaires:', e);
-      countEl.textContent = 'Erreur';
-    }
+    this.navigateTo(this.currentBook, this.currentChapter);
   },
 
   toggleSplitView(forceState = null) {
@@ -464,7 +790,7 @@ const BibleReader = {
       paneRight.classList.add('hidden');
       btnSplit.classList.remove('active');
     }
-    this.loadChapter();
+    this.navigateTo(this.currentBook, this.currentChapter);
   },
 
   setZoom(percent) {
