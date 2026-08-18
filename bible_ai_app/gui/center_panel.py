@@ -8,6 +8,7 @@ from core.config import save_config
 from core.reference_parser import get_french_book_name, parse_smart_book_input, resolve_book_input, strip_accents, normalize_reference, REVERSE_BOOK_MAPPING
 from core.strong_lexicon import StrongLexicon
 from core.dictionary_manager import DictionaryManager
+from core.dictionary_polisher import DictionaryPolisher, AVAILABLE_POLISH_MODELS
 from core.wikipedia_client import WikipediaClient
 from gui.tooltip import BibleTooltip, WidgetTooltip
 from gui.bible_picker_popover import BiblePickerPopover, get_bible_cover_image, BIBLE_STYLE_MAP
@@ -682,6 +683,38 @@ class CenterPanel(ctk.CTkFrame):
         self.lex_action_frame = ctk.CTkFrame(self.tab_lex, fg_color="transparent")
         self.lex_action_frame.pack(fill="x", padx=2, pady=(0, 2))
         
+        # Frame pour le bouton de polissage IA + sélecteur de modèle
+        self.lex_polish_frame = ctk.CTkFrame(self.lex_action_frame, fg_color="transparent")
+        self.lex_polish_frame.pack(fill="x", pady=(0, 3))
+        
+        self.lex_polish_btn = ctk.CTkButton(
+            self.lex_polish_frame,
+            text="✨ Polir / Restructurer avec l'IA",
+            command=self.on_polish_dictionary_with_ai,
+            height=30,
+            font=ctk.CTkFont(size=11, weight="bold"),
+            fg_color=("#8B5CF6", "#6D28D9"),
+            hover_color=("#7C3AED", "#5B21B6"),
+            text_color="#FFFFFF"
+        )
+        self.lex_polish_btn.pack(side="left", fill="x", expand=True, padx=(0, 4))
+        
+        polish_model_names = [m[0] for m in AVAILABLE_POLISH_MODELS]
+        default_model = self.config.get("dict_polish_model", "gemini-2.5-flash")
+        if default_model not in polish_model_names:
+            default_model = "gemini-2.5-flash"
+        self.lex_polish_model_var = ctk.StringVar(value=default_model)
+        self.lex_polish_model_menu = ctk.CTkOptionMenu(
+            self.lex_polish_frame,
+            variable=self.lex_polish_model_var,
+            values=polish_model_names,
+            command=self.on_polish_model_changed,
+            height=30,
+            width=140,
+            font=ctk.CTkFont(size=10, weight="bold")
+        )
+        self.lex_polish_model_menu.pack(side="right")
+        
         self.lex_ai_btn = ctk.CTkButton(
             self.lex_action_frame, 
             text="🤖 Analyser ce mot avec l'IA", 
@@ -690,7 +723,7 @@ class CenterPanel(ctk.CTkFrame):
             height=32,
             font=ctk.CTkFont(size=12, weight="bold")
         )
-        self.lex_ai_btn.pack(fill="x")
+        self.lex_ai_btn.pack(fill="x", pady=(0, 3))
         
         self.lex_wiki_btn = ctk.CTkButton(
             self.lex_action_frame,
@@ -1044,6 +1077,8 @@ class CenterPanel(ctk.CTkFrame):
                 self.lex_textbox.configure(state="disabled")
                 if hasattr(self, 'lex_wiki_btn'):
                     self.lex_wiki_btn.pack_forget()
+                if hasattr(self, 'lex_polish_frame'):
+                    self.lex_polish_frame.pack_forget()
                 return
                 
         m = self.current_dict_matches[selected_dict_name]
@@ -1052,6 +1087,8 @@ class CenterPanel(ctk.CTkFrame):
         title = m.get("title", "")
         
         if dict_id == "wikipedia":
+            if hasattr(self, 'lex_polish_frame'):
+                self.lex_polish_frame.pack_forget()
             self._render_wikipedia_entry(m)
             return
 
@@ -1063,6 +1100,8 @@ class CenterPanel(ctk.CTkFrame):
             self.lex_textbox.insert("end", f"{title}\n\n", "book_title")
             
         if dict_id == "strong":
+            if hasattr(self, 'lex_polish_frame'):
+                self.lex_polish_frame.pack_forget()
             strong_entry = m.get("entry", {})
             code = strong_entry.get("short_code", strong_entry.get("code", ""))
             lang = "Hébreu biblique" if strong_entry.get("lang") == "hebrew" else "Grec koinè"
@@ -1090,6 +1129,8 @@ class CenterPanel(ctk.CTkFrame):
                     self.lex_textbox.insert("end", f"{b_txt}\n\n", "body")
                     
         elif dict_id == "bailly":
+            if hasattr(self, 'lex_polish_frame'):
+                self.lex_polish_frame.pack_forget()
             b_entries = m.get("entries", [])
             for b_art in b_entries:
                 hw = b_art.get("headword", "")
@@ -1098,8 +1139,24 @@ class CenterPanel(ctk.CTkFrame):
                     self.lex_textbox.insert("end", f"• {hw}\n", "bailly_headword")
                 self.lex_textbox.insert("end", f"{b_txt}\n\n", "body")
         else:
+            # Dictionnaires textuels (Vigouroux, Calmet, etc.)
+            if hasattr(self, 'lex_polish_frame'):
+                self.lex_polish_frame.pack(fill="x", pady=(0, 3), before=self.lex_ai_btn)
+                
             full_t = m.get("full_text", "")
-            self.lex_textbox.insert("end", f"{full_t}\n\n", "body")
+            raw_t = m.get("raw_text") or full_t
+            m["raw_text"] = raw_t
+            
+            # Vérifier si l'article est déjà restauré dans le cache local
+            cached = DictionaryPolisher.get_polished_entry(dict_id, title or m.get("search_term") or "")
+            if cached and cached.get("text"):
+                c_model = cached.get("model", "Gemini")
+                self.lex_textbox.insert("end", f"✨ Notice restaurée & structurée par IA ({c_model})\n\n", "polish_badge")
+                self.lex_textbox.insert("end", f"{cached['text']}\n\n", "body")
+                self.lex_polish_btn.configure(text="🔄 Re-polir avec l'IA", state="normal")
+            else:
+                self.lex_textbox.insert("end", f"{full_t}\n\n", "body")
+                self.lex_polish_btn.configure(text="✨ Polir / Restructurer avec l'IA", state="normal")
             
         self.lex_textbox.configure(state="disabled")
         
@@ -1108,6 +1165,56 @@ class CenterPanel(ctk.CTkFrame):
         first_title = (match_obj.get("word") if isinstance(match_obj, dict) else None) or title or selected_dict_name
         self.last_selected_strong = (m.get("entry") or m, first_title)
         self.lex_ai_btn.configure(state="normal", text=f"🤖 Analyser « {first_title} » avec l'IA")
+
+    def on_polish_model_changed(self, choice):
+        """Sauvegarde le modèle de polissage choisi."""
+        self.config["dict_polish_model"] = choice
+        save_config(self.config)
+
+    def on_polish_dictionary_with_ai(self):
+        """Lance la restauration philologique de l'article de dictionnaire courant via Gemini."""
+        selected_dict_name = self.selected_lex_dict_var.get()
+        if not selected_dict_name or selected_dict_name not in self.current_dict_matches:
+            return
+            
+        m = self.current_dict_matches[selected_dict_name]
+        dict_id = m.get("dict_id", "custom")
+        title = m.get("title", "")
+        raw_text = m.get("raw_text") or m.get("full_text", "")
+        if not raw_text:
+            return
+            
+        model = self.lex_polish_model_var.get() or self.config.get("dict_polish_model", "gemini-2.5-flash")
+        api_key = self.config.get("gemini_api_key", "")
+        
+        if not api_key:
+            from gui.settings_modal import SettingsModal
+            SettingsModal(self, self.config, on_save_callback=self._on_settings_saved)
+            return
+            
+        self.lex_polish_btn.configure(state="disabled", text="⏳ Polissage IA en cours...")
+        threading.Thread(
+            target=self._polish_dictionary_thread,
+            args=(m, dict_id, title, raw_text, model, api_key),
+            daemon=True
+        ).start()
+
+    def _polish_dictionary_thread(self, m, dict_id, title, raw_text, model, api_key):
+        """Thread d'arrière-plan pour restaurer le texte sans bloquer l'interface."""
+        ok, result = DictionaryPolisher.polish_article(raw_text, title=title, model=model, api_key=api_key)
+        if ok:
+            DictionaryPolisher.set_polished_entry(dict_id, title, title, result, model)
+            m["full_text"] = result
+            m["is_polished"] = True
+            m["polished_model"] = model
+            self.after(0, self.render_selected_dictionary_view)
+        else:
+            self.after(0, lambda: self._on_polish_error(result))
+
+    def _on_polish_error(self, err_msg):
+        """Affiche l'état d'erreur sur le bouton."""
+        self.lex_polish_btn.configure(state="normal", text="⚠️ Échec - Réessayer")
+        print(f"Erreur polissage : {err_msg}")
 
     def _render_wikipedia_entry(self, m):
         """Rend l'article Wikipédia sélectionné, en le chargeant en arrière-plan si nécessaire."""
@@ -2361,6 +2468,9 @@ class CenterPanel(ctk.CTkFrame):
             self.lex_textbox._textbox.tag_configure("wiki_desc", font=(self.font_family, max(10, self.font_size - 2), "italic"), foreground=wiki_desc_col, justify="center", spacing1=2, spacing3=8)
             self.lex_textbox._textbox.tag_configure("wiki_link", font=(self.font_family, self.font_size, "bold"), foreground=wiki_link_col, underline=True, spacing1=8, spacing3=8)
             self.lex_textbox._textbox.tag_configure("wiki_loading", font=(self.font_family, self.font_size, "italic"), foreground=wiki_loading_col, spacing1=8)
+            
+            polish_badge_col = "#C084FC" if is_dark else "#7C3AED"
+            self.lex_textbox._textbox.tag_configure("polish_badge", font=(self.font_family, max(9, self.font_size - 3), "bold"), foreground=polish_badge_col, justify="center", spacing1=4, spacing3=10)
             
             self.lex_textbox._textbox.tag_bind("wiki_link", "<Button-1>", lambda e: self.on_open_wikipedia_web())
             self.lex_textbox._textbox.tag_bind("wiki_link", "<Enter>", lambda e: self.lex_textbox._textbox.config(cursor="hand2"))

@@ -266,6 +266,23 @@ class SettingsTab(ctk.CTkScrollableFrame):
         )
         self.model_info_lbl.pack(anchor="w", padx=20, pady=(0, 5))
         
+        # Modèle de Restauration Dictionnaires (Vigouroux / Calmet)
+        self.dict_polish_model_label = ctk.CTkLabel(self, text="Modèle de Restauration Dictionnaires (Vigouroux / Calmet) :")
+        self.dict_polish_model_label.pack(anchor="w", padx=20, pady=(8, 0))
+        self.dict_polish_model_var = ctk.StringVar(value=self.config.get("dict_polish_model", "gemini-2.5-flash"))
+        self.dict_polish_model_menu = ctk.CTkOptionMenu(
+            self,
+            variable=self.dict_polish_model_var,
+            values=[
+                "gemini-2.5-flash",
+                "gemini-2.5-flash-lite",
+                "gemini-3.7-flash",
+                "gemini-3.5-flash",
+                "gemini-3.5-flash-lite"
+            ]
+        )
+        self.dict_polish_model_menu.pack(fill="x", padx=20, pady=5)
+        
         self.api_key_label = ctk.CTkLabel(self, text="Clé API Mistral :")
         self.api_key_label.pack(anchor="w", padx=20, pady=(4, 0))
         self.api_key_entry = ctk.CTkEntry(self, show="*")
@@ -649,6 +666,7 @@ class SettingsTab(ctk.CTkScrollableFrame):
         self.config["infomaniak_product_id"] = self.infomaniak_pid_entry.get().strip() or "251"
         self.config["google_books_api_key"] = self.google_books_key_entry.get().strip()
         self.config["chat_model"] = self.chat_model_var.get()
+        self.config["dict_polish_model"] = self.dict_polish_model_var.get()
         self.config["show_diff_percentage"] = self.show_diff_pct_var.get()
         self.config["show_diff_highlights"] = self.show_diff_colors_var.get()
         self.config["reference_bible"] = self.ref_bible_var.get()
