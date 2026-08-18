@@ -3137,8 +3137,6 @@ class CenterPanel(ctk.CTkFrame):
             self.lex_textbox._textbox.tag_configure("lex_orig_word_hebrew", font=(self.font_family, self.font_size + 1, "bold"), foreground="#60A5FA" if is_dark else "#2563EB", underline=True)
             self.lex_textbox._textbox.tag_configure("lex_orig_word_greek", font=(self.font_family, self.font_size + 1, "bold"), foreground="#10B981" if is_dark else "#059669", underline=True)
             
-            self.lex_textbox._textbox.bind("<Motion>", self.on_lex_mouse_motion)
-            self.lex_textbox._textbox.bind("<Button-1>", self.on_lex_click)
             self.lex_textbox._textbox.bind("<Leave>", lambda e: (self.tooltip.hide() if getattr(self, 'tooltip', None) else None, self.lex_textbox._textbox.config(cursor="")))
             
             self.lex_textbox._textbox.tag_bind("wiki_link", "<Button-1>", lambda e: self.on_open_wikipedia_web())
