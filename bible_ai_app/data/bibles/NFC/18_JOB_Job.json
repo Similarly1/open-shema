@@ -1160,5 +1160,417 @@
       "16": "Après cela, Job vécut encore cent quarante ans, et il put voir ses enfants et ses petits-enfants, jusqu'à la quatrième génération.",
       "17": "Job mourut à un âge avancé, après une vie bien remplie."
     }
-  }
+  },
+  "sections": {
+    "1:1": "La première épreuve de Job",
+    "2:1": "La seconde épreuve de Job",
+    "2:11": "L'arrivée des trois amis de Job",
+    "3:1": "Job se plaint&#160;: à quoi bon vivre encore&#8239;?",
+    "3:11": "Job préférerait mourir",
+    "3:20": "Pourquoi vivre quand on souffre&#8239;?",
+    "4:1": "Le premier discours d'Élifaz&#160;: heureux celui que Dieu corrige&#8239;!",
+    "6:1": "La réplique de Job&#160;: il se plaint de ses amis",
+    "7:1": "La réplique de Job (suite)&#160;: il se plaint de Dieu",
+    "8:1": "Le premier discours de Bildad&#160;: les fautes se paient tôt ou tard",
+    "9:1": "La réplique de Job&#160;: Dieu est trop fort pour moi",
+    "10:1": "La réplique de Job (suite)&#160;: Dieu ne m'a donné la vie que pour me détruire",
+    "11:1": "Le premier discours de Sofar&#160;: reviens à Dieu&#8239;!",
+    "12:1": "La réplique de Job&#160;: Dieu est un tyran implacable",
+    "13:1": "La réplique de Job (suite)&#160;: il veut un libre dialogue avec Dieu",
+    "14:1": "La réplique de Job (fin)&#160;: la triste condition humaine",
+    "15:1": "Le deuxième discours d'Élifaz&#160;: le méchant n'échappera pas",
+    "16:1": "La réplique de Job&#160;: j'ai un témoin dans le ciel",
+    "17:1": "La réplique de Job (suite)&#160;: je n'ai plus d'espoir",
+    "18:1": "Le deuxième discours de Bildad&#160;: un piège pour le méchant",
+    "19:1": "La réplique de Job&#160;: à la fin mon défenseur interviendra",
+    "20:1": "Le deuxième discours de Sofar&#160;: les malheurs des méchants",
+    "21:1": "La réplique de Job&#160;: le bonheur des méchants est un fait",
+    "22:1": "Le troisième discours d'Élifaz&#160;: Job est sûrement coupable",
+    "23:1": "La réplique de Job&#160;: Dieu me refuse le dialogue",
+    "24:1": "La réplique de Job (suite)&#160;: Dieu laisse faire les méchants",
+    "25:1": "Le troisième discours de Bildad&#160;: le pouvoir universel de Dieu",
+    "26:1": "La réplique de Job&#160;: quel triste secours tu m'offres là&#8239;!",
+    "26:5": "La puissance du Dieu créateur69",
+    "27:1": "La réplique de Job (suite)&#160;: un coupable ne ferait pas appel à Dieu",
+    "27:13": "Le succès passager des méchants74",
+    "28:1": "Le mystère de la Sagesse",
+    "29:1": "Le bonheur d'autrefois",
+    "30:1": "Le malheur présent",
+    "31:1": "Jusqu'à la fin, Job se déclare innocent",
+    "32:1": "INTERVENTION D'ÉLIHOU",
+    "32:6": "Élihou explique pourquoi il doit intervenir",
+    "33:1": "L'argument d'Élihou&#160;: Dieu avertit l'être humain",
+    "34:1": "Élihou met Job en accusation",
+    "35:1": "D'après Élihou, Job n'a rien de sérieux à dire",
+    "36:1": "Élihou explique comment Dieu éduque les humains",
+    "36:22": "Dieu est souverain",
+    "38:1": "FINALEMENT, LE SEIGNEUR INTERVIENT",
+    "38:4": "Dieu est le maître du monde inanimé",
+    "38:39": "Dieu est le maître du monde animal",
+    "40:1": "C'est à Job de répondre",
+    "40:6": "Job se prendrait-il pour Dieu&#8239;?",
+    "40:15": "L'énorme bête ou l'hippopotame",
+    "40:25": "Le grand dragon ou le crocodile",
+    "42:1": "Job avoue son impuissance",
+    "42:7": "Le Seigneur rétablit Job"
+  },
+  "pericopes": [
+    {
+      "title": "La première épreuve de Job",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 22
+    },
+    {
+      "title": "La seconde épreuve de Job",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 10
+    },
+    {
+      "title": "L'arrivée des trois amis de Job",
+      "start_ch": 2,
+      "start_v": 11,
+      "end_ch": 2,
+      "end_v": 13
+    },
+    {
+      "title": "Job se plaint&#160;: à quoi bon vivre encore&#8239;?",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 10
+    },
+    {
+      "title": "Job préférerait mourir",
+      "start_ch": 3,
+      "start_v": 11,
+      "end_ch": 3,
+      "end_v": 19
+    },
+    {
+      "title": "Pourquoi vivre quand on souffre&#8239;?",
+      "start_ch": 3,
+      "start_v": 20,
+      "end_ch": 3,
+      "end_v": 26
+    },
+    {
+      "title": "Le premier discours d'Élifaz&#160;: heureux celui que Dieu corrige&#8239;!",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 21
+    },
+    {
+      "title": "La réplique de Job&#160;: il se plaint de ses amis",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 30
+    },
+    {
+      "title": "La réplique de Job (suite)&#160;: il se plaint de Dieu",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 21
+    },
+    {
+      "title": "Le premier discours de Bildad&#160;: les fautes se paient tôt ou tard",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 22
+    },
+    {
+      "title": "La réplique de Job&#160;: Dieu est trop fort pour moi",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 35
+    },
+    {
+      "title": "La réplique de Job (suite)&#160;: Dieu ne m'a donné la vie que pour me détruire",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 22
+    },
+    {
+      "title": "Le premier discours de Sofar&#160;: reviens à Dieu&#8239;!",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 20
+    },
+    {
+      "title": "La réplique de Job&#160;: Dieu est un tyran implacable",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 25
+    },
+    {
+      "title": "La réplique de Job (suite)&#160;: il veut un libre dialogue avec Dieu",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 28
+    },
+    {
+      "title": "La réplique de Job (fin)&#160;: la triste condition humaine",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 22
+    },
+    {
+      "title": "Le deuxième discours d'Élifaz&#160;: le méchant n'échappera pas",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 35
+    },
+    {
+      "title": "La réplique de Job&#160;: j'ai un témoin dans le ciel",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 22
+    },
+    {
+      "title": "La réplique de Job (suite)&#160;: je n'ai plus d'espoir",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 16
+    },
+    {
+      "title": "Le deuxième discours de Bildad&#160;: un piège pour le méchant",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 21
+    },
+    {
+      "title": "La réplique de Job&#160;: à la fin mon défenseur interviendra",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 29
+    },
+    {
+      "title": "Le deuxième discours de Sofar&#160;: les malheurs des méchants",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 29
+    },
+    {
+      "title": "La réplique de Job&#160;: le bonheur des méchants est un fait",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 34
+    },
+    {
+      "title": "Le troisième discours d'Élifaz&#160;: Job est sûrement coupable",
+      "start_ch": 22,
+      "start_v": 1,
+      "end_ch": 22,
+      "end_v": 30
+    },
+    {
+      "title": "La réplique de Job&#160;: Dieu me refuse le dialogue",
+      "start_ch": 23,
+      "start_v": 1,
+      "end_ch": 23,
+      "end_v": 17
+    },
+    {
+      "title": "La réplique de Job (suite)&#160;: Dieu laisse faire les méchants",
+      "start_ch": 24,
+      "start_v": 1,
+      "end_ch": 24,
+      "end_v": 25
+    },
+    {
+      "title": "Le troisième discours de Bildad&#160;: le pouvoir universel de Dieu",
+      "start_ch": 25,
+      "start_v": 1,
+      "end_ch": 25,
+      "end_v": 6
+    },
+    {
+      "title": "La réplique de Job&#160;: quel triste secours tu m'offres là&#8239;!",
+      "start_ch": 26,
+      "start_v": 1,
+      "end_ch": 26,
+      "end_v": 4
+    },
+    {
+      "title": "La puissance du Dieu créateur69",
+      "start_ch": 26,
+      "start_v": 5,
+      "end_ch": 26,
+      "end_v": 14
+    },
+    {
+      "title": "La réplique de Job (suite)&#160;: un coupable ne ferait pas appel à Dieu",
+      "start_ch": 27,
+      "start_v": 1,
+      "end_ch": 27,
+      "end_v": 12
+    },
+    {
+      "title": "Le succès passager des méchants74",
+      "start_ch": 27,
+      "start_v": 13,
+      "end_ch": 27,
+      "end_v": 23
+    },
+    {
+      "title": "Le mystère de la Sagesse",
+      "start_ch": 28,
+      "start_v": 1,
+      "end_ch": 28,
+      "end_v": 28
+    },
+    {
+      "title": "Le bonheur d'autrefois",
+      "start_ch": 29,
+      "start_v": 1,
+      "end_ch": 29,
+      "end_v": 25
+    },
+    {
+      "title": "Le malheur présent",
+      "start_ch": 30,
+      "start_v": 1,
+      "end_ch": 30,
+      "end_v": 31
+    },
+    {
+      "title": "Jusqu'à la fin, Job se déclare innocent",
+      "start_ch": 31,
+      "start_v": 1,
+      "end_ch": 31,
+      "end_v": 40
+    },
+    {
+      "title": "INTERVENTION D'ÉLIHOU",
+      "start_ch": 32,
+      "start_v": 1,
+      "end_ch": 32,
+      "end_v": 5
+    },
+    {
+      "title": "Élihou explique pourquoi il doit intervenir",
+      "start_ch": 32,
+      "start_v": 6,
+      "end_ch": 32,
+      "end_v": 22
+    },
+    {
+      "title": "L'argument d'Élihou&#160;: Dieu avertit l'être humain",
+      "start_ch": 33,
+      "start_v": 1,
+      "end_ch": 33,
+      "end_v": 33
+    },
+    {
+      "title": "Élihou met Job en accusation",
+      "start_ch": 34,
+      "start_v": 1,
+      "end_ch": 34,
+      "end_v": 37
+    },
+    {
+      "title": "D'après Élihou, Job n'a rien de sérieux à dire",
+      "start_ch": 35,
+      "start_v": 1,
+      "end_ch": 35,
+      "end_v": 16
+    },
+    {
+      "title": "Élihou explique comment Dieu éduque les humains",
+      "start_ch": 36,
+      "start_v": 1,
+      "end_ch": 36,
+      "end_v": 21
+    },
+    {
+      "title": "Dieu est souverain",
+      "start_ch": 36,
+      "start_v": 22,
+      "end_ch": 36,
+      "end_v": 33
+    },
+    {
+      "title": "FINALEMENT, LE SEIGNEUR INTERVIENT",
+      "start_ch": 38,
+      "start_v": 1,
+      "end_ch": 38,
+      "end_v": 3
+    },
+    {
+      "title": "Dieu est le maître du monde inanimé",
+      "start_ch": 38,
+      "start_v": 4,
+      "end_ch": 38,
+      "end_v": 38
+    },
+    {
+      "title": "Dieu est le maître du monde animal",
+      "start_ch": 38,
+      "start_v": 39,
+      "end_ch": 38,
+      "end_v": 41
+    },
+    {
+      "title": "C'est à Job de répondre",
+      "start_ch": 40,
+      "start_v": 1,
+      "end_ch": 40,
+      "end_v": 5
+    },
+    {
+      "title": "Job se prendrait-il pour Dieu&#8239;?",
+      "start_ch": 40,
+      "start_v": 6,
+      "end_ch": 40,
+      "end_v": 14
+    },
+    {
+      "title": "L'énorme bête ou l'hippopotame",
+      "start_ch": 40,
+      "start_v": 15,
+      "end_ch": 40,
+      "end_v": 24
+    },
+    {
+      "title": "Le grand dragon ou le crocodile",
+      "start_ch": 40,
+      "start_v": 25,
+      "end_ch": 40,
+      "end_v": 32
+    },
+    {
+      "title": "Job avoue son impuissance",
+      "start_ch": 42,
+      "start_v": 1,
+      "end_ch": 42,
+      "end_v": 6
+    },
+    {
+      "title": "Le Seigneur rétablit Job",
+      "start_ch": 42,
+      "start_v": 7,
+      "end_ch": 42,
+      "end_v": 17
+    }
+  ]
 }

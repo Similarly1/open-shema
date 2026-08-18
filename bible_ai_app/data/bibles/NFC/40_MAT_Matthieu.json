@@ -1133,5 +1133,1241 @@
       "19": "Allez donc auprès des gens de tous les peuples et faites d'eux mes disciples; baptisez-les au nom du Père, du Fils et de l'Esprit saint,",
       "20": "et enseignez-leur à pratiquer tout ce que je vous ai commandé. Et sachez-le: je suis avec vous tous les jours, jusqu'à la fin du monde.»"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Les ancêtres de Jésus",
+    "1:18": "L'annonce à Joseph de la naissance de Jésus",
+    "2:1": "Des savants viennent se prosterner devant Jésus",
+    "2:13": "Joseph et Marie fuient avec Jésus en Égypte",
+    "2:16": "Hérode fait massacrer des enfants",
+    "2:19": "La famille de Jésus s'installe à Nazareth",
+    "3:1": "Jean le baptiste dans le désert",
+    "3:13": "Le baptême de Jésus",
+    "4:1": "Jésus est mis à l'épreuve",
+    "4:12": "Jésus commence sa mission en Galilée",
+    "4:18": "Jésus appelle quatre pêcheurs",
+    "4:23": "Jésus enseigne et guérit",
+    "5:1": "Le discours sur la montagne",
+    "5:3": "(Voir aussi Luc 6.20-23)",
+    "5:13": "(Voir aussi Marc 9.50&#8239;; Luc 14.34-35)",
+    "5:17": "Jésus enseigne au sujet de la loi de Moïse",
+    "5:21": "Au sujet de la réconciliation",
+    "5:27": "Au sujet de l'adultère",
+    "5:31": "(Voir aussi Matt 19.9&#8239;; Marc 10.11-12&#8239;; Luc 16.18)",
+    "5:33": "Au sujet des serments",
+    "5:38": "(Voir aussi Luc 6.29-30)",
+    "5:43": "(Voir aussi Luc 6.27-28,32-36)",
+    "6:1": "Au sujet des dons faits aux pauvres",
+    "6:5": "(Voir aussi Luc 11.2-4)",
+    "6:16": "Comment jeûner&#8239;?",
+    "6:19": "(Voir aussi Luc 12.33-34)",
+    "6:22": "(Voir aussi Luc 11.34-36)",
+    "6:24": "(Voir aussi Luc 16.13)",
+    "6:25": "(Voir aussi Luc 12.22-31)",
+    "7:1": "(Voir aussi Luc 6.37-38,41-42)",
+    "7:7": "(Voir aussi Luc 11.9-13)",
+    "7:13": "(Voir aussi Luc 13.24)",
+    "7:15": "(Voir aussi Luc 6.43-44)",
+    "7:21": "(Voir aussi Luc 13.25-27)",
+    "7:24": "(Voir aussi Luc 6.47-49)",
+    "7:28": "Jésus enseigne avec autorité",
+    "8:1": "Jésus guérit un lépreux",
+    "8:5": "Jésus guérit le serviteur d'un centurion",
+    "8:14": "Jésus guérit la belle-mère de Pierre et d'autres malades",
+    "8:18": "Ceux qui désirent suivre Jésus",
+    "8:23": "Jésus apaise une tempête",
+    "8:28": "Jésus guérit deux hommes possédés par des démons",
+    "9:1": "Jésus guérit une personne paralysée",
+    "9:9": "Jésus appelle Matthieu et mange avec des pécheurs",
+    "9:14": "Jésus et le jeûne",
+    "9:18": "Jésus guérit une femme et ramène à la vie une jeune fille",
+    "9:27": "Jésus guérit deux aveugles",
+    "9:32": "Jésus guérit un homme muet",
+    "9:35": "Jésus est bouleversé par les foules",
+    "10:1": "Les douze apôtres",
+    "10:5": "Jésus donne ses instructions aux disciples qu'il envoie en mission",
+    "10:16": "(Voir aussi Marc 13.9-13&#8239;; Luc 21.12-17)",
+    "10:26": "(Voir aussi Luc 12.2-7)",
+    "10:32": "(Voir aussi Luc 12.8-9)",
+    "10:34": "(Voir aussi Luc 12.51-53&#8239;; 14.26-27)",
+    "10:40": "(Voir aussi Marc 9.41)",
+    "11:1": "Les envoyés de Jean le baptiste",
+    "11:20": "Les villes qui refusent de croire",
+    "11:25": "Venez à moi pour trouver le repos",
+    "12:1": "Jésus et le respect du sabbat",
+    "12:9": "Jésus opère une guérison un jour de sabbat",
+    "12:15": "Le serviteur que Dieu a choisi",
+    "12:22": "Jésus répond à une accusation portée contre lui",
+    "12:33": "L'arbre se reconnaît à ses fruits",
+    "12:38": "La demande d'un signe extraordinaire",
+    "12:43": "Le retour de l'esprit impur",
+    "12:46": "Qui est ma mère, qui sont mes frères&#8239;?",
+    "13:1": "Jésus enseigne en paraboles",
+    "13:10": "(Voir aussi Marc 4.10-12&#8239;; Luc 8.9-10)",
+    "13:18": "(Voir aussi Marc 4.13-20&#8239;; Luc 8.11-15)",
+    "13:24": "La parabole de la mauvaise herbe",
+    "13:31": "(Voir aussi Marc 4.30-32&#8239;; Luc 13.18-19)",
+    "13:33": "(Voir aussi Luc 13.20-21)",
+    "13:34": "(Voir aussi Marc 4.33-34)",
+    "13:36": "Jésus explique la parabole de la mauvaise herbe",
+    "13:44": "Le trésor caché et la perle",
+    "13:47": "La parabole du filet",
+    "13:51": "Des richesses nouvelles et anciennes",
+    "13:53": "Les gens de Nazareth ne croient pas en Jésus",
+    "14:1": "Jean le baptiste est mis à mort",
+    "14:13": "Jésus et ses disciples nourrissent une foule nombreuse",
+    "14:22": "Jésus marche sur l'eau à la rencontre des disciples",
+    "14:34": "Jésus guérit des malades à Génésareth",
+    "15:1": "Discussion sur les traditions pharisiennes",
+    "15:21": "Jésus guérit la fille d'une femme étrangère",
+    "15:29": "Jésus guérit de nombreux malades",
+    "15:32": "Jésus et ses disciples nourrissent 4 000 hommes",
+    "16:1": "Les pharisiens et les sadducéens demandent un signe venant du ciel",
+    "16:5": "Le levain des pharisiens et des sadducéens",
+    "16:13": "Pierre reconnaît en Jésus le Christ",
+    "16:21": "Jésus annonce sa mort, Pierre est réprimandé",
+    "16:24": "Comment suivre Jésus",
+    "17:1": "Moïse et Élie parlent avec Jésus",
+    "17:14": "Jésus guérit un enfant épileptique",
+    "17:22": "Jésus annonce de nouveau sa mort et sa résurrection",
+    "17:24": "Le paiement de l'impôt du temple",
+    "18:1": "Jésus enseigne les disciples",
+    "18:6": "(Voir aussi Marc 9.42-48&#8239;; Luc 17.1-2)",
+    "18:10": "(Voir aussi Luc 15.3-7)",
+    "18:15": "Quand quelqu'un se rend coupable",
+    "18:21": "La parabole du serviteur qui refuse de pardonner",
+    "19:1": "Des pharisiens tendent un piège à Jésus",
+    "19:13": "Jésus bénit des enfants",
+    "19:16": "Richesses et royaume des cieux",
+    "20:1": "Les ouvriers dans la vigne",
+    "20:17": "Jésus annonce une troisième fois sa mort et sa résurrection",
+    "20:20": "La mère de Jacques et de Jean fait une demande à Jésus",
+    "20:29": "Jésus guérit deux aveugles à Jéricho",
+    "21:1": "Jésus entre dans Jérusalem",
+    "21:12": "Jésus chasse les marchands du temple",
+    "21:18": "Le figuier sans figues",
+    "21:23": "D'où vient l'autorité de Jésus&#8239;?",
+    "21:28": "La parabole des deux fils",
+    "21:33": "La parabole des vignerons meurtriers",
+    "22:1": "La parabole du grand repas de mariage",
+    "22:15": "Rendez à César ce qui est à César",
+    "22:23": "Une question sur la résurrection des morts",
+    "22:34": "Quel est le plus grand commandement&#8239;?",
+    "22:41": "Le Christ et David",
+    "23:1": "Jésus critique les spécialistes des Écritures et les pharisiens",
+    "23:13": "Jésus dénonce l'hypocrisie des spécialistes des Écritures et des pharisiens",
+    "23:37": "Jésus se lamente sur Jérusalem",
+    "24:1": "Derniers enseignements de Jésus à ses disciples",
+    "24:3": "(Voir aussi Marc 13.3-13&#8239;; Luc 21.7-19)",
+    "24:15": "(Voir aussi Marc 13.14-23&#8239;; Luc 21.20-24)",
+    "24:29": "(Voir aussi Marc 13.24-27&#8239;; Luc 21.25-28)",
+    "24:32": "(Voir aussi Marc 13.28-31&#8239;; Luc 21.29-33)",
+    "24:36": "(Voir aussi Marc 13.32-37&#8239;; Luc 17.26-30,34-36)",
+    "24:45": "(Voir aussi Luc 12.41-48)",
+    "25:1": "La parabole des dix jeunes filles",
+    "25:14": "(Voir aussi Luc 19.11-27)",
+    "25:31": "Le Fils de l'homme jugera le monde",
+    "26:1": "Les autorités religieuses complotent contre Jésus",
+    "26:6": "Une femme répand du parfum sur la tête de Jésus",
+    "26:14": "Judas cherche comment livrer Jésus aux grands-prêtres",
+    "26:17": "Les disciples préparent le repas de la Pâque",
+    "26:20": "Jésus prend le repas de la Pâque avec ses disciples",
+    "26:31": "Jésus annonce que Pierre le reniera",
+    "26:36": "Jésus prie à Gethsémani",
+    "26:47": "Jésus est arrêté",
+    "26:57": "Jésus devant le conseil suprême",
+    "26:69": "Pierre renie Jésus",
+    "27:1": "Jésus est amené devant Pilate",
+    "27:3": "La mort de Judas",
+    "27:11": "Pilate interroge Jésus",
+    "27:15": "Jésus est condamné à mort",
+    "27:27": "Les soldats se moquent de Jésus",
+    "27:32": "Jésus est crucifié",
+    "27:45": "La mort de Jésus",
+    "27:57": "Jésus est mis dans un tombeau",
+    "27:62": "Le tombeau de Jésus est surveillé",
+    "28:1": "La résurrection de Jésus est annoncée à deux femmes",
+    "28:11": "Le récit des gardes",
+    "28:16": "Jésus envoie ses disciples en mission"
+  },
+  "pericopes": [
+    {
+      "title": "Les ancêtres de Jésus",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 17
+    },
+    {
+      "title": "L'annonce à Joseph de la naissance de Jésus",
+      "start_ch": 1,
+      "start_v": 18,
+      "end_ch": 1,
+      "end_v": 25
+    },
+    {
+      "title": "Des savants viennent se prosterner devant Jésus",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 12
+    },
+    {
+      "title": "Joseph et Marie fuient avec Jésus en Égypte",
+      "start_ch": 2,
+      "start_v": 13,
+      "end_ch": 2,
+      "end_v": 15
+    },
+    {
+      "title": "Hérode fait massacrer des enfants",
+      "start_ch": 2,
+      "start_v": 16,
+      "end_ch": 2,
+      "end_v": 18
+    },
+    {
+      "title": "La famille de Jésus s'installe à Nazareth",
+      "start_ch": 2,
+      "start_v": 19,
+      "end_ch": 2,
+      "end_v": 23
+    },
+    {
+      "title": "Jean le baptiste dans le désert",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 12
+    },
+    {
+      "title": "Le baptême de Jésus",
+      "start_ch": 3,
+      "start_v": 13,
+      "end_ch": 3,
+      "end_v": 17
+    },
+    {
+      "title": "Jésus est mis à l'épreuve",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 11
+    },
+    {
+      "title": "Jésus commence sa mission en Galilée",
+      "start_ch": 4,
+      "start_v": 12,
+      "end_ch": 4,
+      "end_v": 17
+    },
+    {
+      "title": "Jésus appelle quatre pêcheurs",
+      "start_ch": 4,
+      "start_v": 18,
+      "end_ch": 4,
+      "end_v": 22
+    },
+    {
+      "title": "Jésus enseigne et guérit",
+      "start_ch": 4,
+      "start_v": 23,
+      "end_ch": 4,
+      "end_v": 25
+    },
+    {
+      "title": "Le discours sur la montagne",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 2
+    },
+    {
+      "title": "(Voir aussi Luc 6.20-23)",
+      "start_ch": 5,
+      "start_v": 3,
+      "end_ch": 5,
+      "end_v": 12
+    },
+    {
+      "title": "(Voir aussi Marc 9.50&#8239;; Luc 14.34-35)",
+      "start_ch": 5,
+      "start_v": 13,
+      "end_ch": 5,
+      "end_v": 16
+    },
+    {
+      "title": "Jésus enseigne au sujet de la loi de Moïse",
+      "start_ch": 5,
+      "start_v": 17,
+      "end_ch": 5,
+      "end_v": 20
+    },
+    {
+      "title": "Au sujet de la réconciliation",
+      "start_ch": 5,
+      "start_v": 21,
+      "end_ch": 5,
+      "end_v": 26
+    },
+    {
+      "title": "Au sujet de l'adultère",
+      "start_ch": 5,
+      "start_v": 27,
+      "end_ch": 5,
+      "end_v": 30
+    },
+    {
+      "title": "(Voir aussi Matt 19.9&#8239;; Marc 10.11-12&#8239;; Luc 16.18)",
+      "start_ch": 5,
+      "start_v": 31,
+      "end_ch": 5,
+      "end_v": 32
+    },
+    {
+      "title": "Au sujet des serments",
+      "start_ch": 5,
+      "start_v": 33,
+      "end_ch": 5,
+      "end_v": 37
+    },
+    {
+      "title": "(Voir aussi Luc 6.29-30)",
+      "start_ch": 5,
+      "start_v": 38,
+      "end_ch": 5,
+      "end_v": 42
+    },
+    {
+      "title": "(Voir aussi Luc 6.27-28,32-36)",
+      "start_ch": 5,
+      "start_v": 43,
+      "end_ch": 5,
+      "end_v": 48
+    },
+    {
+      "title": "Au sujet des dons faits aux pauvres",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 4
+    },
+    {
+      "title": "(Voir aussi Luc 11.2-4)",
+      "start_ch": 6,
+      "start_v": 5,
+      "end_ch": 6,
+      "end_v": 15
+    },
+    {
+      "title": "Comment jeûner&#8239;?",
+      "start_ch": 6,
+      "start_v": 16,
+      "end_ch": 6,
+      "end_v": 18
+    },
+    {
+      "title": "(Voir aussi Luc 12.33-34)",
+      "start_ch": 6,
+      "start_v": 19,
+      "end_ch": 6,
+      "end_v": 21
+    },
+    {
+      "title": "(Voir aussi Luc 11.34-36)",
+      "start_ch": 6,
+      "start_v": 22,
+      "end_ch": 6,
+      "end_v": 23
+    },
+    {
+      "title": "(Voir aussi Luc 16.13)",
+      "start_ch": 6,
+      "start_v": 24,
+      "end_ch": 6,
+      "end_v": 24
+    },
+    {
+      "title": "(Voir aussi Luc 12.22-31)",
+      "start_ch": 6,
+      "start_v": 25,
+      "end_ch": 6,
+      "end_v": 34
+    },
+    {
+      "title": "(Voir aussi Luc 6.37-38,41-42)",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 6
+    },
+    {
+      "title": "(Voir aussi Luc 11.9-13)",
+      "start_ch": 7,
+      "start_v": 7,
+      "end_ch": 7,
+      "end_v": 12
+    },
+    {
+      "title": "(Voir aussi Luc 13.24)",
+      "start_ch": 7,
+      "start_v": 13,
+      "end_ch": 7,
+      "end_v": 14
+    },
+    {
+      "title": "(Voir aussi Luc 6.43-44)",
+      "start_ch": 7,
+      "start_v": 15,
+      "end_ch": 7,
+      "end_v": 20
+    },
+    {
+      "title": "(Voir aussi Luc 13.25-27)",
+      "start_ch": 7,
+      "start_v": 21,
+      "end_ch": 7,
+      "end_v": 23
+    },
+    {
+      "title": "(Voir aussi Luc 6.47-49)",
+      "start_ch": 7,
+      "start_v": 24,
+      "end_ch": 7,
+      "end_v": 27
+    },
+    {
+      "title": "Jésus enseigne avec autorité",
+      "start_ch": 7,
+      "start_v": 28,
+      "end_ch": 7,
+      "end_v": 29
+    },
+    {
+      "title": "Jésus guérit un lépreux",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 4
+    },
+    {
+      "title": "Jésus guérit le serviteur d'un centurion",
+      "start_ch": 8,
+      "start_v": 5,
+      "end_ch": 8,
+      "end_v": 13
+    },
+    {
+      "title": "Jésus guérit la belle-mère de Pierre et d'autres malades",
+      "start_ch": 8,
+      "start_v": 14,
+      "end_ch": 8,
+      "end_v": 17
+    },
+    {
+      "title": "Ceux qui désirent suivre Jésus",
+      "start_ch": 8,
+      "start_v": 18,
+      "end_ch": 8,
+      "end_v": 22
+    },
+    {
+      "title": "Jésus apaise une tempête",
+      "start_ch": 8,
+      "start_v": 23,
+      "end_ch": 8,
+      "end_v": 27
+    },
+    {
+      "title": "Jésus guérit deux hommes possédés par des démons",
+      "start_ch": 8,
+      "start_v": 28,
+      "end_ch": 8,
+      "end_v": 34
+    },
+    {
+      "title": "Jésus guérit une personne paralysée",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 8
+    },
+    {
+      "title": "Jésus appelle Matthieu et mange avec des pécheurs",
+      "start_ch": 9,
+      "start_v": 9,
+      "end_ch": 9,
+      "end_v": 13
+    },
+    {
+      "title": "Jésus et le jeûne",
+      "start_ch": 9,
+      "start_v": 14,
+      "end_ch": 9,
+      "end_v": 17
+    },
+    {
+      "title": "Jésus guérit une femme et ramène à la vie une jeune fille",
+      "start_ch": 9,
+      "start_v": 18,
+      "end_ch": 9,
+      "end_v": 26
+    },
+    {
+      "title": "Jésus guérit deux aveugles",
+      "start_ch": 9,
+      "start_v": 27,
+      "end_ch": 9,
+      "end_v": 31
+    },
+    {
+      "title": "Jésus guérit un homme muet",
+      "start_ch": 9,
+      "start_v": 32,
+      "end_ch": 9,
+      "end_v": 34
+    },
+    {
+      "title": "Jésus est bouleversé par les foules",
+      "start_ch": 9,
+      "start_v": 35,
+      "end_ch": 9,
+      "end_v": 38
+    },
+    {
+      "title": "Les douze apôtres",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 4
+    },
+    {
+      "title": "Jésus donne ses instructions aux disciples qu'il envoie en mission",
+      "start_ch": 10,
+      "start_v": 5,
+      "end_ch": 10,
+      "end_v": 15
+    },
+    {
+      "title": "(Voir aussi Marc 13.9-13&#8239;; Luc 21.12-17)",
+      "start_ch": 10,
+      "start_v": 16,
+      "end_ch": 10,
+      "end_v": 25
+    },
+    {
+      "title": "(Voir aussi Luc 12.2-7)",
+      "start_ch": 10,
+      "start_v": 26,
+      "end_ch": 10,
+      "end_v": 31
+    },
+    {
+      "title": "(Voir aussi Luc 12.8-9)",
+      "start_ch": 10,
+      "start_v": 32,
+      "end_ch": 10,
+      "end_v": 33
+    },
+    {
+      "title": "(Voir aussi Luc 12.51-53&#8239;; 14.26-27)",
+      "start_ch": 10,
+      "start_v": 34,
+      "end_ch": 10,
+      "end_v": 39
+    },
+    {
+      "title": "(Voir aussi Marc 9.41)",
+      "start_ch": 10,
+      "start_v": 40,
+      "end_ch": 10,
+      "end_v": 42
+    },
+    {
+      "title": "Les envoyés de Jean le baptiste",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 19
+    },
+    {
+      "title": "Les villes qui refusent de croire",
+      "start_ch": 11,
+      "start_v": 20,
+      "end_ch": 11,
+      "end_v": 24
+    },
+    {
+      "title": "Venez à moi pour trouver le repos",
+      "start_ch": 11,
+      "start_v": 25,
+      "end_ch": 11,
+      "end_v": 30
+    },
+    {
+      "title": "Jésus et le respect du sabbat",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 8
+    },
+    {
+      "title": "Jésus opère une guérison un jour de sabbat",
+      "start_ch": 12,
+      "start_v": 9,
+      "end_ch": 12,
+      "end_v": 14
+    },
+    {
+      "title": "Le serviteur que Dieu a choisi",
+      "start_ch": 12,
+      "start_v": 15,
+      "end_ch": 12,
+      "end_v": 21
+    },
+    {
+      "title": "Jésus répond à une accusation portée contre lui",
+      "start_ch": 12,
+      "start_v": 22,
+      "end_ch": 12,
+      "end_v": 32
+    },
+    {
+      "title": "L'arbre se reconnaît à ses fruits",
+      "start_ch": 12,
+      "start_v": 33,
+      "end_ch": 12,
+      "end_v": 37
+    },
+    {
+      "title": "La demande d'un signe extraordinaire",
+      "start_ch": 12,
+      "start_v": 38,
+      "end_ch": 12,
+      "end_v": 42
+    },
+    {
+      "title": "Le retour de l'esprit impur",
+      "start_ch": 12,
+      "start_v": 43,
+      "end_ch": 12,
+      "end_v": 45
+    },
+    {
+      "title": "Qui est ma mère, qui sont mes frères&#8239;?",
+      "start_ch": 12,
+      "start_v": 46,
+      "end_ch": 12,
+      "end_v": 50
+    },
+    {
+      "title": "Jésus enseigne en paraboles",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 9
+    },
+    {
+      "title": "(Voir aussi Marc 4.10-12&#8239;; Luc 8.9-10)",
+      "start_ch": 13,
+      "start_v": 10,
+      "end_ch": 13,
+      "end_v": 17
+    },
+    {
+      "title": "(Voir aussi Marc 4.13-20&#8239;; Luc 8.11-15)",
+      "start_ch": 13,
+      "start_v": 18,
+      "end_ch": 13,
+      "end_v": 23
+    },
+    {
+      "title": "La parabole de la mauvaise herbe",
+      "start_ch": 13,
+      "start_v": 24,
+      "end_ch": 13,
+      "end_v": 30
+    },
+    {
+      "title": "(Voir aussi Marc 4.30-32&#8239;; Luc 13.18-19)",
+      "start_ch": 13,
+      "start_v": 31,
+      "end_ch": 13,
+      "end_v": 32
+    },
+    {
+      "title": "(Voir aussi Luc 13.20-21)",
+      "start_ch": 13,
+      "start_v": 33,
+      "end_ch": 13,
+      "end_v": 33
+    },
+    {
+      "title": "(Voir aussi Marc 4.33-34)",
+      "start_ch": 13,
+      "start_v": 34,
+      "end_ch": 13,
+      "end_v": 35
+    },
+    {
+      "title": "Jésus explique la parabole de la mauvaise herbe",
+      "start_ch": 13,
+      "start_v": 36,
+      "end_ch": 13,
+      "end_v": 43
+    },
+    {
+      "title": "Le trésor caché et la perle",
+      "start_ch": 13,
+      "start_v": 44,
+      "end_ch": 13,
+      "end_v": 46
+    },
+    {
+      "title": "La parabole du filet",
+      "start_ch": 13,
+      "start_v": 47,
+      "end_ch": 13,
+      "end_v": 50
+    },
+    {
+      "title": "Des richesses nouvelles et anciennes",
+      "start_ch": 13,
+      "start_v": 51,
+      "end_ch": 13,
+      "end_v": 52
+    },
+    {
+      "title": "Les gens de Nazareth ne croient pas en Jésus",
+      "start_ch": 13,
+      "start_v": 53,
+      "end_ch": 13,
+      "end_v": 58
+    },
+    {
+      "title": "Jean le baptiste est mis à mort",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 12
+    },
+    {
+      "title": "Jésus et ses disciples nourrissent une foule nombreuse",
+      "start_ch": 14,
+      "start_v": 13,
+      "end_ch": 14,
+      "end_v": 21
+    },
+    {
+      "title": "Jésus marche sur l'eau à la rencontre des disciples",
+      "start_ch": 14,
+      "start_v": 22,
+      "end_ch": 14,
+      "end_v": 33
+    },
+    {
+      "title": "Jésus guérit des malades à Génésareth",
+      "start_ch": 14,
+      "start_v": 34,
+      "end_ch": 14,
+      "end_v": 36
+    },
+    {
+      "title": "Discussion sur les traditions pharisiennes",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 20
+    },
+    {
+      "title": "Jésus guérit la fille d'une femme étrangère",
+      "start_ch": 15,
+      "start_v": 21,
+      "end_ch": 15,
+      "end_v": 28
+    },
+    {
+      "title": "Jésus guérit de nombreux malades",
+      "start_ch": 15,
+      "start_v": 29,
+      "end_ch": 15,
+      "end_v": 31
+    },
+    {
+      "title": "Jésus et ses disciples nourrissent 4 000 hommes",
+      "start_ch": 15,
+      "start_v": 32,
+      "end_ch": 15,
+      "end_v": 39
+    },
+    {
+      "title": "Les pharisiens et les sadducéens demandent un signe venant du ciel",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 4
+    },
+    {
+      "title": "Le levain des pharisiens et des sadducéens",
+      "start_ch": 16,
+      "start_v": 5,
+      "end_ch": 16,
+      "end_v": 12
+    },
+    {
+      "title": "Pierre reconnaît en Jésus le Christ",
+      "start_ch": 16,
+      "start_v": 13,
+      "end_ch": 16,
+      "end_v": 20
+    },
+    {
+      "title": "Jésus annonce sa mort, Pierre est réprimandé",
+      "start_ch": 16,
+      "start_v": 21,
+      "end_ch": 16,
+      "end_v": 23
+    },
+    {
+      "title": "Comment suivre Jésus",
+      "start_ch": 16,
+      "start_v": 24,
+      "end_ch": 16,
+      "end_v": 28
+    },
+    {
+      "title": "Moïse et Élie parlent avec Jésus",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 13
+    },
+    {
+      "title": "Jésus guérit un enfant épileptique",
+      "start_ch": 17,
+      "start_v": 14,
+      "end_ch": 17,
+      "end_v": 21
+    },
+    {
+      "title": "Jésus annonce de nouveau sa mort et sa résurrection",
+      "start_ch": 17,
+      "start_v": 22,
+      "end_ch": 17,
+      "end_v": 23
+    },
+    {
+      "title": "Le paiement de l'impôt du temple",
+      "start_ch": 17,
+      "start_v": 24,
+      "end_ch": 17,
+      "end_v": 27
+    },
+    {
+      "title": "Jésus enseigne les disciples",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 5
+    },
+    {
+      "title": "(Voir aussi Marc 9.42-48&#8239;; Luc 17.1-2)",
+      "start_ch": 18,
+      "start_v": 6,
+      "end_ch": 18,
+      "end_v": 9
+    },
+    {
+      "title": "(Voir aussi Luc 15.3-7)",
+      "start_ch": 18,
+      "start_v": 10,
+      "end_ch": 18,
+      "end_v": 14
+    },
+    {
+      "title": "Quand quelqu'un se rend coupable",
+      "start_ch": 18,
+      "start_v": 15,
+      "end_ch": 18,
+      "end_v": 20
+    },
+    {
+      "title": "La parabole du serviteur qui refuse de pardonner",
+      "start_ch": 18,
+      "start_v": 21,
+      "end_ch": 18,
+      "end_v": 35
+    },
+    {
+      "title": "Des pharisiens tendent un piège à Jésus",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 12
+    },
+    {
+      "title": "Jésus bénit des enfants",
+      "start_ch": 19,
+      "start_v": 13,
+      "end_ch": 19,
+      "end_v": 15
+    },
+    {
+      "title": "Richesses et royaume des cieux",
+      "start_ch": 19,
+      "start_v": 16,
+      "end_ch": 19,
+      "end_v": 30
+    },
+    {
+      "title": "Les ouvriers dans la vigne",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 16
+    },
+    {
+      "title": "Jésus annonce une troisième fois sa mort et sa résurrection",
+      "start_ch": 20,
+      "start_v": 17,
+      "end_ch": 20,
+      "end_v": 19
+    },
+    {
+      "title": "La mère de Jacques et de Jean fait une demande à Jésus",
+      "start_ch": 20,
+      "start_v": 20,
+      "end_ch": 20,
+      "end_v": 28
+    },
+    {
+      "title": "Jésus guérit deux aveugles à Jéricho",
+      "start_ch": 20,
+      "start_v": 29,
+      "end_ch": 20,
+      "end_v": 34
+    },
+    {
+      "title": "Jésus entre dans Jérusalem",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 11
+    },
+    {
+      "title": "Jésus chasse les marchands du temple",
+      "start_ch": 21,
+      "start_v": 12,
+      "end_ch": 21,
+      "end_v": 17
+    },
+    {
+      "title": "Le figuier sans figues",
+      "start_ch": 21,
+      "start_v": 18,
+      "end_ch": 21,
+      "end_v": 22
+    },
+    {
+      "title": "D'où vient l'autorité de Jésus&#8239;?",
+      "start_ch": 21,
+      "start_v": 23,
+      "end_ch": 21,
+      "end_v": 27
+    },
+    {
+      "title": "La parabole des deux fils",
+      "start_ch": 21,
+      "start_v": 28,
+      "end_ch": 21,
+      "end_v": 32
+    },
+    {
+      "title": "La parabole des vignerons meurtriers",
+      "start_ch": 21,
+      "start_v": 33,
+      "end_ch": 21,
+      "end_v": 46
+    },
+    {
+      "title": "La parabole du grand repas de mariage",
+      "start_ch": 22,
+      "start_v": 1,
+      "end_ch": 22,
+      "end_v": 14
+    },
+    {
+      "title": "Rendez à César ce qui est à César",
+      "start_ch": 22,
+      "start_v": 15,
+      "end_ch": 22,
+      "end_v": 22
+    },
+    {
+      "title": "Une question sur la résurrection des morts",
+      "start_ch": 22,
+      "start_v": 23,
+      "end_ch": 22,
+      "end_v": 33
+    },
+    {
+      "title": "Quel est le plus grand commandement&#8239;?",
+      "start_ch": 22,
+      "start_v": 34,
+      "end_ch": 22,
+      "end_v": 40
+    },
+    {
+      "title": "Le Christ et David",
+      "start_ch": 22,
+      "start_v": 41,
+      "end_ch": 22,
+      "end_v": 46
+    },
+    {
+      "title": "Jésus critique les spécialistes des Écritures et les pharisiens",
+      "start_ch": 23,
+      "start_v": 1,
+      "end_ch": 23,
+      "end_v": 12
+    },
+    {
+      "title": "Jésus dénonce l'hypocrisie des spécialistes des Écritures et des pharisiens",
+      "start_ch": 23,
+      "start_v": 13,
+      "end_ch": 23,
+      "end_v": 36
+    },
+    {
+      "title": "Jésus se lamente sur Jérusalem",
+      "start_ch": 23,
+      "start_v": 37,
+      "end_ch": 23,
+      "end_v": 39
+    },
+    {
+      "title": "Derniers enseignements de Jésus à ses disciples",
+      "start_ch": 24,
+      "start_v": 1,
+      "end_ch": 24,
+      "end_v": 2
+    },
+    {
+      "title": "(Voir aussi Marc 13.3-13&#8239;; Luc 21.7-19)",
+      "start_ch": 24,
+      "start_v": 3,
+      "end_ch": 24,
+      "end_v": 14
+    },
+    {
+      "title": "(Voir aussi Marc 13.14-23&#8239;; Luc 21.20-24)",
+      "start_ch": 24,
+      "start_v": 15,
+      "end_ch": 24,
+      "end_v": 28
+    },
+    {
+      "title": "(Voir aussi Marc 13.24-27&#8239;; Luc 21.25-28)",
+      "start_ch": 24,
+      "start_v": 29,
+      "end_ch": 24,
+      "end_v": 31
+    },
+    {
+      "title": "(Voir aussi Marc 13.28-31&#8239;; Luc 21.29-33)",
+      "start_ch": 24,
+      "start_v": 32,
+      "end_ch": 24,
+      "end_v": 35
+    },
+    {
+      "title": "(Voir aussi Marc 13.32-37&#8239;; Luc 17.26-30,34-36)",
+      "start_ch": 24,
+      "start_v": 36,
+      "end_ch": 24,
+      "end_v": 44
+    },
+    {
+      "title": "(Voir aussi Luc 12.41-48)",
+      "start_ch": 24,
+      "start_v": 45,
+      "end_ch": 24,
+      "end_v": 51
+    },
+    {
+      "title": "La parabole des dix jeunes filles",
+      "start_ch": 25,
+      "start_v": 1,
+      "end_ch": 25,
+      "end_v": 13
+    },
+    {
+      "title": "(Voir aussi Luc 19.11-27)",
+      "start_ch": 25,
+      "start_v": 14,
+      "end_ch": 25,
+      "end_v": 30
+    },
+    {
+      "title": "Le Fils de l'homme jugera le monde",
+      "start_ch": 25,
+      "start_v": 31,
+      "end_ch": 25,
+      "end_v": 46
+    },
+    {
+      "title": "Les autorités religieuses complotent contre Jésus",
+      "start_ch": 26,
+      "start_v": 1,
+      "end_ch": 26,
+      "end_v": 5
+    },
+    {
+      "title": "Une femme répand du parfum sur la tête de Jésus",
+      "start_ch": 26,
+      "start_v": 6,
+      "end_ch": 26,
+      "end_v": 13
+    },
+    {
+      "title": "Judas cherche comment livrer Jésus aux grands-prêtres",
+      "start_ch": 26,
+      "start_v": 14,
+      "end_ch": 26,
+      "end_v": 16
+    },
+    {
+      "title": "Les disciples préparent le repas de la Pâque",
+      "start_ch": 26,
+      "start_v": 17,
+      "end_ch": 26,
+      "end_v": 19
+    },
+    {
+      "title": "Jésus prend le repas de la Pâque avec ses disciples",
+      "start_ch": 26,
+      "start_v": 20,
+      "end_ch": 26,
+      "end_v": 30
+    },
+    {
+      "title": "Jésus annonce que Pierre le reniera",
+      "start_ch": 26,
+      "start_v": 31,
+      "end_ch": 26,
+      "end_v": 35
+    },
+    {
+      "title": "Jésus prie à Gethsémani",
+      "start_ch": 26,
+      "start_v": 36,
+      "end_ch": 26,
+      "end_v": 46
+    },
+    {
+      "title": "Jésus est arrêté",
+      "start_ch": 26,
+      "start_v": 47,
+      "end_ch": 26,
+      "end_v": 56
+    },
+    {
+      "title": "Jésus devant le conseil suprême",
+      "start_ch": 26,
+      "start_v": 57,
+      "end_ch": 26,
+      "end_v": 68
+    },
+    {
+      "title": "Pierre renie Jésus",
+      "start_ch": 26,
+      "start_v": 69,
+      "end_ch": 26,
+      "end_v": 75
+    },
+    {
+      "title": "Jésus est amené devant Pilate",
+      "start_ch": 27,
+      "start_v": 1,
+      "end_ch": 27,
+      "end_v": 2
+    },
+    {
+      "title": "La mort de Judas",
+      "start_ch": 27,
+      "start_v": 3,
+      "end_ch": 27,
+      "end_v": 10
+    },
+    {
+      "title": "Pilate interroge Jésus",
+      "start_ch": 27,
+      "start_v": 11,
+      "end_ch": 27,
+      "end_v": 14
+    },
+    {
+      "title": "Jésus est condamné à mort",
+      "start_ch": 27,
+      "start_v": 15,
+      "end_ch": 27,
+      "end_v": 26
+    },
+    {
+      "title": "Les soldats se moquent de Jésus",
+      "start_ch": 27,
+      "start_v": 27,
+      "end_ch": 27,
+      "end_v": 31
+    },
+    {
+      "title": "Jésus est crucifié",
+      "start_ch": 27,
+      "start_v": 32,
+      "end_ch": 27,
+      "end_v": 44
+    },
+    {
+      "title": "La mort de Jésus",
+      "start_ch": 27,
+      "start_v": 45,
+      "end_ch": 27,
+      "end_v": 56
+    },
+    {
+      "title": "Jésus est mis dans un tombeau",
+      "start_ch": 27,
+      "start_v": 57,
+      "end_ch": 27,
+      "end_v": 61
+    },
+    {
+      "title": "Le tombeau de Jésus est surveillé",
+      "start_ch": 27,
+      "start_v": 62,
+      "end_ch": 27,
+      "end_v": 66
+    },
+    {
+      "title": "La résurrection de Jésus est annoncée à deux femmes",
+      "start_ch": 28,
+      "start_v": 1,
+      "end_ch": 28,
+      "end_v": 10
+    },
+    {
+      "title": "Le récit des gardes",
+      "start_ch": 28,
+      "start_v": 11,
+      "end_ch": 28,
+      "end_v": 15
+    },
+    {
+      "title": "Jésus envoie ses disciples en mission",
+      "start_ch": 28,
+      "start_v": 16,
+      "end_ch": 28,
+      "end_v": 20
+    }
+  ]
 }

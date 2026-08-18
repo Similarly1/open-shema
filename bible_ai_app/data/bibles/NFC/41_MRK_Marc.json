@@ -716,5 +716,729 @@
       "19": "Après leur avoir ainsi parlé, le Seigneur Jésus fut enlevé au ciel et s'assit à la droite de Dieu.",
       "20": "Les disciples partirent pour annoncer partout la bonne nouvelle. Le Seigneur agissait avec eux et confirmait la parole par les signes qui l'accompagnaient.]"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Jean le baptiste dans le désert",
+    "1:9": "Après son baptême, Jésus est mis à l'épreuve",
+    "1:14": "Jésus annonce la bonne nouvelle",
+    "1:16": "Jésus appelle quatre pêcheurs",
+    "1:21": "L'homme tourmenté par un esprit impur",
+    "1:29": "Jésus guérit la belle-mère de Simon et d'autres malades",
+    "1:35": "Jésus prie et proclame la bonne nouvelle en Galilée",
+    "1:40": "Jésus purifie un lépreux",
+    "2:1": "Jésus guérit un homme paralysé",
+    "2:13": "Jésus appelle Lévi et mange avec les pécheurs",
+    "2:18": "Jésus et le jeûne",
+    "2:23": "Jésus et le respect du sabbat",
+    "3:1": "Jésus opère une guérison un jour du sabbat",
+    "3:7": "Guérisons au bord du lac",
+    "3:13": "Jésus choisit les douze apôtres",
+    "3:20": "Jésus est accusé d'avoir perdu la tête et d'être possédé",
+    "3:31": "Qui est ma mère, qui sont mes frères&#8239;?",
+    "4:1": "La parabole des grains semés",
+    "4:10": "Pourquoi Jésus utilise des paraboles",
+    "4:13": "Jésus explique la parabole des grains semés",
+    "4:21": "Les paraboles de la lampe et de la mesure",
+    "4:26": "La parabole de la semence qui pousse toute seule",
+    "4:30": "La parabole de la graine de moutarde",
+    "4:35": "Jésus calme une tempête",
+    "5:1": "Jésus guérit un homme possédé par des esprits impurs",
+    "5:21": "Jésus guérit une femme et ramène à la vie la fille de Jaïros",
+    "6:1": "Les gens de Nazareth ne croient pas en Jésus",
+    "6:7": "Jésus envoie en mission les douze disciples",
+    "6:14": "Jean le baptiste est mis à mort",
+    "6:30": "Jésus et ses disciples nourrissent une foule nombreuse",
+    "6:45": "Jésus marche sur l'eau à la rencontre de ses disciples",
+    "6:53": "Jésus guérit des malades à Génésareth",
+    "7:1": "Discussion sur les traditions des pharisiens",
+    "7:24": "Jésus guérit la fille d'une femme étrangère",
+    "7:32": "Jésus guérit un homme sourd qui a de la peine à parler",
+    "8:1": "Jésus et ses disciples nourrissent 4 000 personnes",
+    "8:11": "Les pharisiens demandent un signe venant du ciel",
+    "8:14": "Le levain des pharisiens et d'Hérode",
+    "8:22": "Jésus guérit un aveugle à Bethsaïda",
+    "8:27": "Pierre reconnaît en Jésus le Christ",
+    "8:31": "Jésus annonce sa mort et réprimande Pierre",
+    "8:34": "Comment suivre Jésus",
+    "9:2": "Moïse et Élie avec Jésus sur la montagne",
+    "9:14": "Jésus guérit un enfant possédé par un esprit qui rend muet",
+    "9:30": "Jésus annonce de nouveau sa mort et sa résurrection",
+    "9:33": "Qui est le plus grand&#8239;?",
+    "9:38": "Celui qui n'est pas contre nous est pour nous",
+    "9:42": "Ne détournez pas de Dieu un seul de ces petits",
+    "10:1": "Des pharisiens tendent un piège à Jésus",
+    "10:13": "Jésus bénit des enfants",
+    "10:17": "Richesses et règne de Dieu",
+    "10:32": "Jésus annonce une troisième fois sa mort et sa résurrection",
+    "10:35": "Jacques et Jean font une demande à Jésus",
+    "10:46": "Jésus guérit l'aveugle Bartimée",
+    "11:1": "Jésus entre dans Jérusalem",
+    "11:12": "Le figuier sans figues",
+    "11:15": "Jésus chasse les marchands du temple",
+    "11:20": "Le figuier desséché&#160;: la foi et la prière",
+    "11:27": "D'où vient l'autorité de Jésus&#8239;?",
+    "12:1": "La parabole des vignerons meurtriers",
+    "12:13": "Rendez à César ce qui est à César",
+    "12:18": "Une question sur la résurrection des morts",
+    "12:28": "Quel est le premier de tous les commandements&#8239;?",
+    "12:35": "Le Christ et David",
+    "12:38": "Jésus met en garde contre les spécialistes des Écritures",
+    "12:41": "Une veuve pauvre offre tout ce qu'elle possède",
+    "13:1": "Jésus annonce la destruction du temple",
+    "13:3": "Des malheurs et des persécutions",
+    "13:14": "Une détresse sans pareille",
+    "13:24": "La venue du Fils de l'homme",
+    "13:28": "La leçon du figuier",
+    "13:32": "Dieu seul connaît le moment de la fin",
+    "14:1": "Les autorités religieuses complotent contre Jésus",
+    "14:3": "Une femme répand du parfum sur la tête de Jésus",
+    "14:10": "Judas cherche comment livrer Jésus aux grands-prêtres",
+    "14:12": "Les disciples préparent le repas de la Pâque",
+    "14:17": "Jésus prend le repas de la Pâque avec ses disciples",
+    "14:27": "Jésus annonce que Pierre le reniera",
+    "14:32": "Jésus prie à Gethsémani",
+    "14:43": "Jésus est arrêté",
+    "14:53": "Jésus devant le conseil suprême",
+    "14:66": "Pierre renie Jésus",
+    "15:1": "Jésus comparaît devant Pilate",
+    "15:6": "Jésus est condamné à mort",
+    "15:16": "Les soldats se moquent de Jésus",
+    "15:21": "Jésus est crucifié",
+    "15:33": "La mort de Jésus",
+    "15:42": "Jésus est mis dans un tombeau",
+    "16:1": "La résurrection de Jésus est annoncée aux femmes",
+    "16:9": "Les apparitions de Jésus ressuscité"
+  },
+  "pericopes": [
+    {
+      "title": "Jean le baptiste dans le désert",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 8
+    },
+    {
+      "title": "Après son baptême, Jésus est mis à l'épreuve",
+      "start_ch": 1,
+      "start_v": 9,
+      "end_ch": 1,
+      "end_v": 13
+    },
+    {
+      "title": "Jésus annonce la bonne nouvelle",
+      "start_ch": 1,
+      "start_v": 14,
+      "end_ch": 1,
+      "end_v": 15
+    },
+    {
+      "title": "Jésus appelle quatre pêcheurs",
+      "start_ch": 1,
+      "start_v": 16,
+      "end_ch": 1,
+      "end_v": 20
+    },
+    {
+      "title": "L'homme tourmenté par un esprit impur",
+      "start_ch": 1,
+      "start_v": 21,
+      "end_ch": 1,
+      "end_v": 28
+    },
+    {
+      "title": "Jésus guérit la belle-mère de Simon et d'autres malades",
+      "start_ch": 1,
+      "start_v": 29,
+      "end_ch": 1,
+      "end_v": 34
+    },
+    {
+      "title": "Jésus prie et proclame la bonne nouvelle en Galilée",
+      "start_ch": 1,
+      "start_v": 35,
+      "end_ch": 1,
+      "end_v": 39
+    },
+    {
+      "title": "Jésus purifie un lépreux",
+      "start_ch": 1,
+      "start_v": 40,
+      "end_ch": 1,
+      "end_v": 45
+    },
+    {
+      "title": "Jésus guérit un homme paralysé",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 12
+    },
+    {
+      "title": "Jésus appelle Lévi et mange avec les pécheurs",
+      "start_ch": 2,
+      "start_v": 13,
+      "end_ch": 2,
+      "end_v": 17
+    },
+    {
+      "title": "Jésus et le jeûne",
+      "start_ch": 2,
+      "start_v": 18,
+      "end_ch": 2,
+      "end_v": 22
+    },
+    {
+      "title": "Jésus et le respect du sabbat",
+      "start_ch": 2,
+      "start_v": 23,
+      "end_ch": 2,
+      "end_v": 28
+    },
+    {
+      "title": "Jésus opère une guérison un jour du sabbat",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 6
+    },
+    {
+      "title": "Guérisons au bord du lac",
+      "start_ch": 3,
+      "start_v": 7,
+      "end_ch": 3,
+      "end_v": 12
+    },
+    {
+      "title": "Jésus choisit les douze apôtres",
+      "start_ch": 3,
+      "start_v": 13,
+      "end_ch": 3,
+      "end_v": 19
+    },
+    {
+      "title": "Jésus est accusé d'avoir perdu la tête et d'être possédé",
+      "start_ch": 3,
+      "start_v": 20,
+      "end_ch": 3,
+      "end_v": 30
+    },
+    {
+      "title": "Qui est ma mère, qui sont mes frères&#8239;?",
+      "start_ch": 3,
+      "start_v": 31,
+      "end_ch": 3,
+      "end_v": 35
+    },
+    {
+      "title": "La parabole des grains semés",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 9
+    },
+    {
+      "title": "Pourquoi Jésus utilise des paraboles",
+      "start_ch": 4,
+      "start_v": 10,
+      "end_ch": 4,
+      "end_v": 12
+    },
+    {
+      "title": "Jésus explique la parabole des grains semés",
+      "start_ch": 4,
+      "start_v": 13,
+      "end_ch": 4,
+      "end_v": 20
+    },
+    {
+      "title": "Les paraboles de la lampe et de la mesure",
+      "start_ch": 4,
+      "start_v": 21,
+      "end_ch": 4,
+      "end_v": 25
+    },
+    {
+      "title": "La parabole de la semence qui pousse toute seule",
+      "start_ch": 4,
+      "start_v": 26,
+      "end_ch": 4,
+      "end_v": 29
+    },
+    {
+      "title": "La parabole de la graine de moutarde",
+      "start_ch": 4,
+      "start_v": 30,
+      "end_ch": 4,
+      "end_v": 34
+    },
+    {
+      "title": "Jésus calme une tempête",
+      "start_ch": 4,
+      "start_v": 35,
+      "end_ch": 4,
+      "end_v": 41
+    },
+    {
+      "title": "Jésus guérit un homme possédé par des esprits impurs",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 20
+    },
+    {
+      "title": "Jésus guérit une femme et ramène à la vie la fille de Jaïros",
+      "start_ch": 5,
+      "start_v": 21,
+      "end_ch": 5,
+      "end_v": 43
+    },
+    {
+      "title": "Les gens de Nazareth ne croient pas en Jésus",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 6
+    },
+    {
+      "title": "Jésus envoie en mission les douze disciples",
+      "start_ch": 6,
+      "start_v": 7,
+      "end_ch": 6,
+      "end_v": 13
+    },
+    {
+      "title": "Jean le baptiste est mis à mort",
+      "start_ch": 6,
+      "start_v": 14,
+      "end_ch": 6,
+      "end_v": 29
+    },
+    {
+      "title": "Jésus et ses disciples nourrissent une foule nombreuse",
+      "start_ch": 6,
+      "start_v": 30,
+      "end_ch": 6,
+      "end_v": 44
+    },
+    {
+      "title": "Jésus marche sur l'eau à la rencontre de ses disciples",
+      "start_ch": 6,
+      "start_v": 45,
+      "end_ch": 6,
+      "end_v": 52
+    },
+    {
+      "title": "Jésus guérit des malades à Génésareth",
+      "start_ch": 6,
+      "start_v": 53,
+      "end_ch": 6,
+      "end_v": 56
+    },
+    {
+      "title": "Discussion sur les traditions des pharisiens",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 23
+    },
+    {
+      "title": "Jésus guérit la fille d'une femme étrangère",
+      "start_ch": 7,
+      "start_v": 24,
+      "end_ch": 7,
+      "end_v": 31
+    },
+    {
+      "title": "Jésus guérit un homme sourd qui a de la peine à parler",
+      "start_ch": 7,
+      "start_v": 32,
+      "end_ch": 7,
+      "end_v": 37
+    },
+    {
+      "title": "Jésus et ses disciples nourrissent 4 000 personnes",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 10
+    },
+    {
+      "title": "Les pharisiens demandent un signe venant du ciel",
+      "start_ch": 8,
+      "start_v": 11,
+      "end_ch": 8,
+      "end_v": 13
+    },
+    {
+      "title": "Le levain des pharisiens et d'Hérode",
+      "start_ch": 8,
+      "start_v": 14,
+      "end_ch": 8,
+      "end_v": 21
+    },
+    {
+      "title": "Jésus guérit un aveugle à Bethsaïda",
+      "start_ch": 8,
+      "start_v": 22,
+      "end_ch": 8,
+      "end_v": 26
+    },
+    {
+      "title": "Pierre reconnaît en Jésus le Christ",
+      "start_ch": 8,
+      "start_v": 27,
+      "end_ch": 8,
+      "end_v": 30
+    },
+    {
+      "title": "Jésus annonce sa mort et réprimande Pierre",
+      "start_ch": 8,
+      "start_v": 31,
+      "end_ch": 8,
+      "end_v": 33
+    },
+    {
+      "title": "Comment suivre Jésus",
+      "start_ch": 8,
+      "start_v": 34,
+      "end_ch": 8,
+      "end_v": 38
+    },
+    {
+      "title": "Moïse et Élie avec Jésus sur la montagne",
+      "start_ch": 9,
+      "start_v": 2,
+      "end_ch": 9,
+      "end_v": 13
+    },
+    {
+      "title": "Jésus guérit un enfant possédé par un esprit qui rend muet",
+      "start_ch": 9,
+      "start_v": 14,
+      "end_ch": 9,
+      "end_v": 29
+    },
+    {
+      "title": "Jésus annonce de nouveau sa mort et sa résurrection",
+      "start_ch": 9,
+      "start_v": 30,
+      "end_ch": 9,
+      "end_v": 32
+    },
+    {
+      "title": "Qui est le plus grand&#8239;?",
+      "start_ch": 9,
+      "start_v": 33,
+      "end_ch": 9,
+      "end_v": 37
+    },
+    {
+      "title": "Celui qui n'est pas contre nous est pour nous",
+      "start_ch": 9,
+      "start_v": 38,
+      "end_ch": 9,
+      "end_v": 41
+    },
+    {
+      "title": "Ne détournez pas de Dieu un seul de ces petits",
+      "start_ch": 9,
+      "start_v": 42,
+      "end_ch": 9,
+      "end_v": 50
+    },
+    {
+      "title": "Des pharisiens tendent un piège à Jésus",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 12
+    },
+    {
+      "title": "Jésus bénit des enfants",
+      "start_ch": 10,
+      "start_v": 13,
+      "end_ch": 10,
+      "end_v": 16
+    },
+    {
+      "title": "Richesses et règne de Dieu",
+      "start_ch": 10,
+      "start_v": 17,
+      "end_ch": 10,
+      "end_v": 31
+    },
+    {
+      "title": "Jésus annonce une troisième fois sa mort et sa résurrection",
+      "start_ch": 10,
+      "start_v": 32,
+      "end_ch": 10,
+      "end_v": 34
+    },
+    {
+      "title": "Jacques et Jean font une demande à Jésus",
+      "start_ch": 10,
+      "start_v": 35,
+      "end_ch": 10,
+      "end_v": 45
+    },
+    {
+      "title": "Jésus guérit l'aveugle Bartimée",
+      "start_ch": 10,
+      "start_v": 46,
+      "end_ch": 10,
+      "end_v": 52
+    },
+    {
+      "title": "Jésus entre dans Jérusalem",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 11
+    },
+    {
+      "title": "Le figuier sans figues",
+      "start_ch": 11,
+      "start_v": 12,
+      "end_ch": 11,
+      "end_v": 14
+    },
+    {
+      "title": "Jésus chasse les marchands du temple",
+      "start_ch": 11,
+      "start_v": 15,
+      "end_ch": 11,
+      "end_v": 19
+    },
+    {
+      "title": "Le figuier desséché&#160;: la foi et la prière",
+      "start_ch": 11,
+      "start_v": 20,
+      "end_ch": 11,
+      "end_v": 26
+    },
+    {
+      "title": "D'où vient l'autorité de Jésus&#8239;?",
+      "start_ch": 11,
+      "start_v": 27,
+      "end_ch": 11,
+      "end_v": 33
+    },
+    {
+      "title": "La parabole des vignerons meurtriers",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 12
+    },
+    {
+      "title": "Rendez à César ce qui est à César",
+      "start_ch": 12,
+      "start_v": 13,
+      "end_ch": 12,
+      "end_v": 17
+    },
+    {
+      "title": "Une question sur la résurrection des morts",
+      "start_ch": 12,
+      "start_v": 18,
+      "end_ch": 12,
+      "end_v": 27
+    },
+    {
+      "title": "Quel est le premier de tous les commandements&#8239;?",
+      "start_ch": 12,
+      "start_v": 28,
+      "end_ch": 12,
+      "end_v": 34
+    },
+    {
+      "title": "Le Christ et David",
+      "start_ch": 12,
+      "start_v": 35,
+      "end_ch": 12,
+      "end_v": 37
+    },
+    {
+      "title": "Jésus met en garde contre les spécialistes des Écritures",
+      "start_ch": 12,
+      "start_v": 38,
+      "end_ch": 12,
+      "end_v": 40
+    },
+    {
+      "title": "Une veuve pauvre offre tout ce qu'elle possède",
+      "start_ch": 12,
+      "start_v": 41,
+      "end_ch": 12,
+      "end_v": 44
+    },
+    {
+      "title": "Jésus annonce la destruction du temple",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 2
+    },
+    {
+      "title": "Des malheurs et des persécutions",
+      "start_ch": 13,
+      "start_v": 3,
+      "end_ch": 13,
+      "end_v": 13
+    },
+    {
+      "title": "Une détresse sans pareille",
+      "start_ch": 13,
+      "start_v": 14,
+      "end_ch": 13,
+      "end_v": 23
+    },
+    {
+      "title": "La venue du Fils de l'homme",
+      "start_ch": 13,
+      "start_v": 24,
+      "end_ch": 13,
+      "end_v": 27
+    },
+    {
+      "title": "La leçon du figuier",
+      "start_ch": 13,
+      "start_v": 28,
+      "end_ch": 13,
+      "end_v": 31
+    },
+    {
+      "title": "Dieu seul connaît le moment de la fin",
+      "start_ch": 13,
+      "start_v": 32,
+      "end_ch": 13,
+      "end_v": 37
+    },
+    {
+      "title": "Les autorités religieuses complotent contre Jésus",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 2
+    },
+    {
+      "title": "Une femme répand du parfum sur la tête de Jésus",
+      "start_ch": 14,
+      "start_v": 3,
+      "end_ch": 14,
+      "end_v": 9
+    },
+    {
+      "title": "Judas cherche comment livrer Jésus aux grands-prêtres",
+      "start_ch": 14,
+      "start_v": 10,
+      "end_ch": 14,
+      "end_v": 11
+    },
+    {
+      "title": "Les disciples préparent le repas de la Pâque",
+      "start_ch": 14,
+      "start_v": 12,
+      "end_ch": 14,
+      "end_v": 16
+    },
+    {
+      "title": "Jésus prend le repas de la Pâque avec ses disciples",
+      "start_ch": 14,
+      "start_v": 17,
+      "end_ch": 14,
+      "end_v": 26
+    },
+    {
+      "title": "Jésus annonce que Pierre le reniera",
+      "start_ch": 14,
+      "start_v": 27,
+      "end_ch": 14,
+      "end_v": 31
+    },
+    {
+      "title": "Jésus prie à Gethsémani",
+      "start_ch": 14,
+      "start_v": 32,
+      "end_ch": 14,
+      "end_v": 42
+    },
+    {
+      "title": "Jésus est arrêté",
+      "start_ch": 14,
+      "start_v": 43,
+      "end_ch": 14,
+      "end_v": 52
+    },
+    {
+      "title": "Jésus devant le conseil suprême",
+      "start_ch": 14,
+      "start_v": 53,
+      "end_ch": 14,
+      "end_v": 65
+    },
+    {
+      "title": "Pierre renie Jésus",
+      "start_ch": 14,
+      "start_v": 66,
+      "end_ch": 14,
+      "end_v": 72
+    },
+    {
+      "title": "Jésus comparaît devant Pilate",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 5
+    },
+    {
+      "title": "Jésus est condamné à mort",
+      "start_ch": 15,
+      "start_v": 6,
+      "end_ch": 15,
+      "end_v": 15
+    },
+    {
+      "title": "Les soldats se moquent de Jésus",
+      "start_ch": 15,
+      "start_v": 16,
+      "end_ch": 15,
+      "end_v": 20
+    },
+    {
+      "title": "Jésus est crucifié",
+      "start_ch": 15,
+      "start_v": 21,
+      "end_ch": 15,
+      "end_v": 32
+    },
+    {
+      "title": "La mort de Jésus",
+      "start_ch": 15,
+      "start_v": 33,
+      "end_ch": 15,
+      "end_v": 41
+    },
+    {
+      "title": "Jésus est mis dans un tombeau",
+      "start_ch": 15,
+      "start_v": 42,
+      "end_ch": 15,
+      "end_v": 47
+    },
+    {
+      "title": "La résurrection de Jésus est annoncée aux femmes",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 8
+    },
+    {
+      "title": "Les apparitions de Jésus ressuscité",
+      "start_ch": 16,
+      "start_v": 9,
+      "end_ch": 16,
+      "end_v": 20
+    }
+  ]
 }

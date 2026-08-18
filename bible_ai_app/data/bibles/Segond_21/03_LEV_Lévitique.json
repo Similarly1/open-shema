@@ -919,5 +919,305 @@
       "33": "On n'examinera pas si l'animal est bon ou mauvais et l'on ne fera pas d'échange; si l'on remplace un animal par un autre, ils seront tous les deux saints et ne pourront pas être rachetés.»",
       "34": "Tels sont les commandements que l'Eternel donna à Moïse pour les Israélites sur le mont Sinaï."
     }
-  }
+  },
+  "sections": {
+    "1:1": "L’holocauste",
+    "2:1": "L’offrande végétale",
+    "3:1": "Le sacrifice de communion",
+    "4:1": "Le sacrifice d'expiation",
+    "5:14": "Le sacrifice de culpabilité",
+    "6:1": "Instructions aux prêtres sur les sacrifices",
+    "8:1": "Consécration d'Aaron et de ses fils",
+    "9:1": "Premiers sacrifices offerts par Aaron et ses fils",
+    "10:1": "Faute et mort de Nadab et Abihu",
+    "11:1": "Les animaux purs et impurs",
+    "12:1": "La purification de la femme après l’accouchement",
+    "13:1": "La lèpre",
+    "13:47": "La lèpre des vêtements",
+    "14:1": "La purification de la lèpre",
+    "14:33": "La lèpre des maisons",
+    "15:1": "L’état d’impureté de l'homme et de la femme",
+    "16:1": "Le jour des expiations",
+    "17:1": "La consommation de viande et de sang",
+    "18:1": "Les unions sexuelles interdites",
+    "19:1": "La sainteté du peuple de l’Eternel",
+    "20:1": "Peines contre diverses fautes",
+    "21:1": "Règlements concernant les prêtres",
+    "22:17": "Règlements concernant les victimes",
+    "23:1": "Les rendez-vous fixés par l'Eternel",
+    "23:3": "Le sabbat",
+    "23:4": "La Pâque et la fête des pains sans levain",
+    "23:9": "La fête des prémices et la fête des moissons",
+    "23:23": "La fête des trompettes",
+    "23:26": "Le jour des expiations",
+    "23:33": "La fête des tentes",
+    "24:1": "L'huile et les pains consacrés",
+    "24:10": "Le blasphème et la violence",
+    "25:1": "L'année sabbatique",
+    "25:8": "L'année du jubilé",
+    "25:23": "Le rachat des propriétés et des esclaves",
+    "26:1": "Bénédictions et malédictions",
+    "27:1": "Les vœux et les dîmes"
+  },
+  "pericopes": [
+    {
+      "title": "L’holocauste",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 17
+    },
+    {
+      "title": "L’offrande végétale",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 16
+    },
+    {
+      "title": "Le sacrifice de communion",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 17
+    },
+    {
+      "title": "Le sacrifice d'expiation",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 35
+    },
+    {
+      "title": "Le sacrifice de culpabilité",
+      "start_ch": 5,
+      "start_v": 14,
+      "end_ch": 5,
+      "end_v": 26
+    },
+    {
+      "title": "Instructions aux prêtres sur les sacrifices",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 23
+    },
+    {
+      "title": "Consécration d'Aaron et de ses fils",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 36
+    },
+    {
+      "title": "Premiers sacrifices offerts par Aaron et ses fils",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 24
+    },
+    {
+      "title": "Faute et mort de Nadab et Abihu",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 20
+    },
+    {
+      "title": "Les animaux purs et impurs",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 47
+    },
+    {
+      "title": "La purification de la femme après l’accouchement",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 8
+    },
+    {
+      "title": "La lèpre",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 46
+    },
+    {
+      "title": "La lèpre des vêtements",
+      "start_ch": 13,
+      "start_v": 47,
+      "end_ch": 13,
+      "end_v": 59
+    },
+    {
+      "title": "La purification de la lèpre",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 32
+    },
+    {
+      "title": "La lèpre des maisons",
+      "start_ch": 14,
+      "start_v": 33,
+      "end_ch": 14,
+      "end_v": 57
+    },
+    {
+      "title": "L’état d’impureté de l'homme et de la femme",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 33
+    },
+    {
+      "title": "Le jour des expiations",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 34
+    },
+    {
+      "title": "La consommation de viande et de sang",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 16
+    },
+    {
+      "title": "Les unions sexuelles interdites",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 30
+    },
+    {
+      "title": "La sainteté du peuple de l’Eternel",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 37
+    },
+    {
+      "title": "Peines contre diverses fautes",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 27
+    },
+    {
+      "title": "Règlements concernant les prêtres",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 24
+    },
+    {
+      "title": "Règlements concernant les victimes",
+      "start_ch": 22,
+      "start_v": 17,
+      "end_ch": 22,
+      "end_v": 33
+    },
+    {
+      "title": "Les rendez-vous fixés par l'Eternel",
+      "start_ch": 23,
+      "start_v": 1,
+      "end_ch": 23,
+      "end_v": 2
+    },
+    {
+      "title": "Le sabbat",
+      "start_ch": 23,
+      "start_v": 3,
+      "end_ch": 23,
+      "end_v": 3
+    },
+    {
+      "title": "La Pâque et la fête des pains sans levain",
+      "start_ch": 23,
+      "start_v": 4,
+      "end_ch": 23,
+      "end_v": 8
+    },
+    {
+      "title": "La fête des prémices et la fête des moissons",
+      "start_ch": 23,
+      "start_v": 9,
+      "end_ch": 23,
+      "end_v": 22
+    },
+    {
+      "title": "La fête des trompettes",
+      "start_ch": 23,
+      "start_v": 23,
+      "end_ch": 23,
+      "end_v": 25
+    },
+    {
+      "title": "Le jour des expiations",
+      "start_ch": 23,
+      "start_v": 26,
+      "end_ch": 23,
+      "end_v": 32
+    },
+    {
+      "title": "La fête des tentes",
+      "start_ch": 23,
+      "start_v": 33,
+      "end_ch": 23,
+      "end_v": 44
+    },
+    {
+      "title": "L'huile et les pains consacrés",
+      "start_ch": 24,
+      "start_v": 1,
+      "end_ch": 24,
+      "end_v": 9
+    },
+    {
+      "title": "Le blasphème et la violence",
+      "start_ch": 24,
+      "start_v": 10,
+      "end_ch": 24,
+      "end_v": 23
+    },
+    {
+      "title": "L'année sabbatique",
+      "start_ch": 25,
+      "start_v": 1,
+      "end_ch": 25,
+      "end_v": 7
+    },
+    {
+      "title": "L'année du jubilé",
+      "start_ch": 25,
+      "start_v": 8,
+      "end_ch": 25,
+      "end_v": 22
+    },
+    {
+      "title": "Le rachat des propriétés et des esclaves",
+      "start_ch": 25,
+      "start_v": 23,
+      "end_ch": 25,
+      "end_v": 55
+    },
+    {
+      "title": "Bénédictions et malédictions",
+      "start_ch": 26,
+      "start_v": 1,
+      "end_ch": 26,
+      "end_v": 46
+    },
+    {
+      "title": "Les vœux et les dîmes",
+      "start_ch": 27,
+      "start_v": 1,
+      "end_ch": 27,
+      "end_v": 34
+    }
+  ]
 }

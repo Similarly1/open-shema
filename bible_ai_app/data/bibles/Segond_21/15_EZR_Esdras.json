@@ -306,5 +306,105 @@
       "43": "parmi les descendants de Nebo, Jeïel, Matthithia, Zabad, Zebina, Jaddaï, Joël et Benaja.",
       "44": "Tous ces hommes avaient pris des femmes étrangères, et certains avaient eu des enfants d'elles."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Edit de Cyrus",
+    "2:1": "Liste des Israélites revenus d'exil",
+    "3:1": "Rétablissement de l'autel des sacrifices",
+    "3:8": "Pose des fondations du temple",
+    "4:1": "Interruption des travaux",
+    "5:1": "Reprise de la construction du temple",
+    "6:1": "Edit de Darius",
+    "6:13": "Dédicace du temple",
+    "7:1": "Esdras à Jérusalem",
+    "8:1": "Les compagnons d'Esdras",
+    "9:1": "Consternation et prière d'Esdras",
+    "10:1": "Renvoi des femmes étrangères"
+  },
+  "pericopes": [
+    {
+      "title": "Edit de Cyrus",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 11
+    },
+    {
+      "title": "Liste des Israélites revenus d'exil",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 70
+    },
+    {
+      "title": "Rétablissement de l'autel des sacrifices",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 7
+    },
+    {
+      "title": "Pose des fondations du temple",
+      "start_ch": 3,
+      "start_v": 8,
+      "end_ch": 3,
+      "end_v": 13
+    },
+    {
+      "title": "Interruption des travaux",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 24
+    },
+    {
+      "title": "Reprise de la construction du temple",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 17
+    },
+    {
+      "title": "Edit de Darius",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 12
+    },
+    {
+      "title": "Dédicace du temple",
+      "start_ch": 6,
+      "start_v": 13,
+      "end_ch": 6,
+      "end_v": 22
+    },
+    {
+      "title": "Esdras à Jérusalem",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 28
+    },
+    {
+      "title": "Les compagnons d'Esdras",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 36
+    },
+    {
+      "title": "Consternation et prière d'Esdras",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 15
+    },
+    {
+      "title": "Renvoi des femmes étrangères",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 44
+    }
+  ]
 }

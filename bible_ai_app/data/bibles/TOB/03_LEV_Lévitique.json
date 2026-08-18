@@ -919,5 +919,49 @@
       "33": "on ne recherche pas les bonnes ou les mauvaises et on ne fait pas d’échange; si l’on en vient quand même à faire un échange, la bête échangée et l’autre sont choses saintes: on ne peut les racheter.»",
       "34": "Tels sont les commandements que le SEIGNEUR donna à Moïse pour les fils d’Israël, sur le mont Sinaï."
     }
-  }
+  },
+  "sections": {
+    "1:1": "I. RITUEL DES SACRIFICES",
+    "8:1": "II. RÉCIT DE L’INVESTITURE DES PREMIERS PRÊTRES",
+    "11:1": "III. INSTRUCTIONS SUR LE PUR ET L’IMPUR",
+    "17:1": "IV. LOI DE SAINTETÉ",
+    "27:1": "APPENDICE : TARIFICATION DES VŒUXj"
+  },
+  "pericopes": [
+    {
+      "title": "I. RITUEL DES SACRIFICES",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 17
+    },
+    {
+      "title": "II. RÉCIT DE L’INVESTITURE DES PREMIERS PRÊTRES",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 36
+    },
+    {
+      "title": "III. INSTRUCTIONS SUR LE PUR ET L’IMPUR",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 47
+    },
+    {
+      "title": "IV. LOI DE SAINTETÉ",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 16
+    },
+    {
+      "title": "APPENDICE : TARIFICATION DES VŒUXj",
+      "start_ch": 27,
+      "start_v": 1,
+      "end_ch": 27,
+      "end_v": 34
+    }
+  ]
 }

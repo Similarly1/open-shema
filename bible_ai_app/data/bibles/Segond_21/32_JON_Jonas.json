@@ -62,5 +62,41 @@
       "10": "L'Eternel dit: «Tu as pitié de la plante qui ne t'a coûté aucune peine et que tu n'as pas fait pousser, qui est née une nuit et qui a disparu l'autre nuit,",
       "11": "et moi, je n'aurais pas pitié de Ninive, la grande ville, dans laquelle se trouvent plus de 120'000 êtres humains incapables de distinguer leur droite de leur gauche et un grand nombre d'animaux!»"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Mission et fuite de Jonas",
+    "2:1": "Jonas dans le poisson",
+    "3:1": "Prédication de Jonas à Ninive",
+    "4:1": "Irritation de Jonas et reproches de Dieu"
+  },
+  "pericopes": [
+    {
+      "title": "Mission et fuite de Jonas",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 16
+    },
+    {
+      "title": "Jonas dans le poisson",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 11
+    },
+    {
+      "title": "Prédication de Jonas à Ninive",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 10
+    },
+    {
+      "title": "Irritation de Jonas et reproches de Dieu",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 11
+    }
+  ]
 }

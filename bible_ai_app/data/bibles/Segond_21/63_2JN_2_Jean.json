@@ -21,5 +21,25 @@
       "12": "J'ai beaucoup de choses à vous écrire, mais je n'ai pas voulu le faire avec le papier et l'encre. J'espère venir chez vous et vous parler de vive voix afin que notre joie soit complète.",
       "13": "Les enfants de ta sœur, choisie elle aussi, te saluent."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Salutation et louange",
+    "1:5": "Appel à un amour doublé de vigilance"
+  },
+  "pericopes": [
+    {
+      "title": "Salutation et louange",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 4
+    },
+    {
+      "title": "Appel à un amour doublé de vigilance",
+      "start_ch": 1,
+      "start_v": 5,
+      "end_ch": 1,
+      "end_v": 13
+    }
+  ]
 }

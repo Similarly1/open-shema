@@ -775,5 +775,361 @@
       "29": "Il lui fit changer ses habits de prisonnier et Jojakin mangea à sa table tout le reste de sa vie.",
       "30": "Le roi pourvut constamment à son entretien journalier, durant tout le reste de sa vie."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Maladie et mort d'Achazia, le roi d'Israël",
+    "2:1": "Enlèvement d’Elie",
+    "3:1": "Règne de Joram sur Israël",
+    "4:1": "Miracles accomplis par Elisée",
+    "6:24": "Siège et délivrance de Samarie",
+    "8:1": "Famine annoncée par Elisée",
+    "8:7": "Annonce du règne de Hazaël sur la Syrie",
+    "8:16": "Règne de Joram sur Juda",
+    "8:25": "Règne d’Achazia sur Juda",
+    "9:1": "Accession de Jéhu au trône d’Israël",
+    "10:18": "Politique religieuse de Jéhu",
+    "11:1": "Règne d’Athalie sur Juda",
+    "12:1": "Règne de Joas sur Juda",
+    "13:1": "Règne de Joachaz sur Israël",
+    "13:10": "Règne de Joas sur Israël",
+    "13:14": "Mort d’Elisée",
+    "14:1": "Règne d’Amatsia sur Juda",
+    "14:23": "Règne de Jéroboam II sur Israël",
+    "15:1": "Règne d’Azaria (Ozias) sur Juda",
+    "15:8": "Règne de Zacharie sur Israël",
+    "15:13": "Règne de Shallum sur Israël",
+    "15:17": "Règne de Menahem sur Israël",
+    "15:23": "Règne de Pekachia sur Israël",
+    "15:27": "Règne de Pékach sur Israël",
+    "15:32": "Règne de Jotham sur Juda",
+    "16:1": "Règne d’Achaz sur Juda",
+    "17:1": "Règne d’Osée sur Israël",
+    "17:7": "Les raisons de l’exil d’Israël",
+    "17:24": "Repeuplement de la Samarie",
+    "18:1": "Règne d’Ezéchias sur Juda",
+    "18:13": "Tentative d’invasion assyrienne",
+    "19:1": "Délivrance de Jérusalem",
+    "20:1": "Maladie et guérison d'Ezéchias",
+    "20:12": "Erreur d'Ezéchias",
+    "21:1": "Règne de Manassé sur Juda",
+    "21:19": "Règne d’Amon sur Juda",
+    "22:1": "Règne de Josias sur Juda",
+    "23:31": "Règne de Joachaz sur Juda",
+    "23:36": "Règne de Jojakim sur Juda",
+    "24:8": "Règne de Jojakin sur Juda",
+    "24:18": "Règne de Sédécias sur Juda",
+    "25:8": "Destruction de Jérusalem et du temple",
+    "25:22": "Révolte contre le gouverneur de Juda",
+    "25:27": "Libération de Jojakin"
+  },
+  "pericopes": [
+    {
+      "title": "Maladie et mort d'Achazia, le roi d'Israël",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 18
+    },
+    {
+      "title": "Enlèvement d’Elie",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 25
+    },
+    {
+      "title": "Règne de Joram sur Israël",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 27
+    },
+    {
+      "title": "Miracles accomplis par Elisée",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 44
+    },
+    {
+      "title": "Siège et délivrance de Samarie",
+      "start_ch": 6,
+      "start_v": 24,
+      "end_ch": 6,
+      "end_v": 33
+    },
+    {
+      "title": "Famine annoncée par Elisée",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 6
+    },
+    {
+      "title": "Annonce du règne de Hazaël sur la Syrie",
+      "start_ch": 8,
+      "start_v": 7,
+      "end_ch": 8,
+      "end_v": 15
+    },
+    {
+      "title": "Règne de Joram sur Juda",
+      "start_ch": 8,
+      "start_v": 16,
+      "end_ch": 8,
+      "end_v": 24
+    },
+    {
+      "title": "Règne d’Achazia sur Juda",
+      "start_ch": 8,
+      "start_v": 25,
+      "end_ch": 8,
+      "end_v": 29
+    },
+    {
+      "title": "Accession de Jéhu au trône d’Israël",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 37
+    },
+    {
+      "title": "Politique religieuse de Jéhu",
+      "start_ch": 10,
+      "start_v": 18,
+      "end_ch": 10,
+      "end_v": 36
+    },
+    {
+      "title": "Règne d’Athalie sur Juda",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 20
+    },
+    {
+      "title": "Règne de Joas sur Juda",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 22
+    },
+    {
+      "title": "Règne de Joachaz sur Israël",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 9
+    },
+    {
+      "title": "Règne de Joas sur Israël",
+      "start_ch": 13,
+      "start_v": 10,
+      "end_ch": 13,
+      "end_v": 13
+    },
+    {
+      "title": "Mort d’Elisée",
+      "start_ch": 13,
+      "start_v": 14,
+      "end_ch": 13,
+      "end_v": 25
+    },
+    {
+      "title": "Règne d’Amatsia sur Juda",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 22
+    },
+    {
+      "title": "Règne de Jéroboam II sur Israël",
+      "start_ch": 14,
+      "start_v": 23,
+      "end_ch": 14,
+      "end_v": 29
+    },
+    {
+      "title": "Règne d’Azaria (Ozias) sur Juda",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 7
+    },
+    {
+      "title": "Règne de Zacharie sur Israël",
+      "start_ch": 15,
+      "start_v": 8,
+      "end_ch": 15,
+      "end_v": 12
+    },
+    {
+      "title": "Règne de Shallum sur Israël",
+      "start_ch": 15,
+      "start_v": 13,
+      "end_ch": 15,
+      "end_v": 16
+    },
+    {
+      "title": "Règne de Menahem sur Israël",
+      "start_ch": 15,
+      "start_v": 17,
+      "end_ch": 15,
+      "end_v": 22
+    },
+    {
+      "title": "Règne de Pekachia sur Israël",
+      "start_ch": 15,
+      "start_v": 23,
+      "end_ch": 15,
+      "end_v": 26
+    },
+    {
+      "title": "Règne de Pékach sur Israël",
+      "start_ch": 15,
+      "start_v": 27,
+      "end_ch": 15,
+      "end_v": 31
+    },
+    {
+      "title": "Règne de Jotham sur Juda",
+      "start_ch": 15,
+      "start_v": 32,
+      "end_ch": 15,
+      "end_v": 38
+    },
+    {
+      "title": "Règne d’Achaz sur Juda",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 20
+    },
+    {
+      "title": "Règne d’Osée sur Israël",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 6
+    },
+    {
+      "title": "Les raisons de l’exil d’Israël",
+      "start_ch": 17,
+      "start_v": 7,
+      "end_ch": 17,
+      "end_v": 23
+    },
+    {
+      "title": "Repeuplement de la Samarie",
+      "start_ch": 17,
+      "start_v": 24,
+      "end_ch": 17,
+      "end_v": 41
+    },
+    {
+      "title": "Règne d’Ezéchias sur Juda",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 12
+    },
+    {
+      "title": "Tentative d’invasion assyrienne",
+      "start_ch": 18,
+      "start_v": 13,
+      "end_ch": 18,
+      "end_v": 37
+    },
+    {
+      "title": "Délivrance de Jérusalem",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 37
+    },
+    {
+      "title": "Maladie et guérison d'Ezéchias",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 11
+    },
+    {
+      "title": "Erreur d'Ezéchias",
+      "start_ch": 20,
+      "start_v": 12,
+      "end_ch": 20,
+      "end_v": 21
+    },
+    {
+      "title": "Règne de Manassé sur Juda",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 18
+    },
+    {
+      "title": "Règne d’Amon sur Juda",
+      "start_ch": 21,
+      "start_v": 19,
+      "end_ch": 21,
+      "end_v": 26
+    },
+    {
+      "title": "Règne de Josias sur Juda",
+      "start_ch": 22,
+      "start_v": 1,
+      "end_ch": 22,
+      "end_v": 20
+    },
+    {
+      "title": "Règne de Joachaz sur Juda",
+      "start_ch": 23,
+      "start_v": 31,
+      "end_ch": 23,
+      "end_v": 35
+    },
+    {
+      "title": "Règne de Jojakim sur Juda",
+      "start_ch": 23,
+      "start_v": 36,
+      "end_ch": 23,
+      "end_v": 37
+    },
+    {
+      "title": "Règne de Jojakin sur Juda",
+      "start_ch": 24,
+      "start_v": 8,
+      "end_ch": 24,
+      "end_v": 17
+    },
+    {
+      "title": "Règne de Sédécias sur Juda",
+      "start_ch": 24,
+      "start_v": 18,
+      "end_ch": 24,
+      "end_v": 20
+    },
+    {
+      "title": "Destruction de Jérusalem et du temple",
+      "start_ch": 25,
+      "start_v": 8,
+      "end_ch": 25,
+      "end_v": 21
+    },
+    {
+      "title": "Révolte contre le gouverneur de Juda",
+      "start_ch": 25,
+      "start_v": 22,
+      "end_ch": 25,
+      "end_v": 26
+    },
+    {
+      "title": "Libération de Jojakin",
+      "start_ch": 25,
+      "start_v": 27,
+      "end_ch": 25,
+      "end_v": 30
+    }
+  ]
 }

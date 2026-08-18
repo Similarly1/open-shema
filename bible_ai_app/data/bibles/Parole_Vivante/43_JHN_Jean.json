@@ -926,5 +926,561 @@
       "24": "C’est ce même disciple qui rapporte ces faits parce qu’il en a été témoin, c’est lui qui les a consignés par écrit et chacun parmi nous sait que son témoignage est conforme à la vérité.",
       "25": "Jésus a accompli encore bien d’autres actions. Si on voulait les raconter une à une en détail, je suppose que le monde entier ne suffirait pas pour contenir tous les livres qu’il faudrait écrire."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Aux origines",
+    "1:6": "La lumière du monde",
+    "1:19": "Un vrai témoin",
+    "1:35": "Rencontres inoubliables",
+    "2:1": "Mariage à Cana",
+    "2:12": "Maison de prière ou de commerce ?",
+    "3:1": "Face-à-face avec un théologien en recherche",
+    "3:22": "L’effacement du témoin",
+    "4:1": "Rencontre sur la margelle d’un puits",
+    "4:10": "L’eau vive",
+    "4:27": "Réveil en Samarie",
+    "4:43": "Guérison à distance",
+    "5:1": "Veux-tu être guéri ?",
+    "5:18": "Le Père et le Fils",
+    "5:27": "Pleins pouvoirs",
+    "5:31": "Les quatre témoins de Jésus",
+    "6:1": "Jésus nourrit cinq mille hommes",
+    "6:15": "Jésus marche sur l’eau",
+    "6:22": "Ce que les hommes attendent du Messie",
+    "6:30": "Le pain qui fait vivre",
+    "6:60": "Où les esprits se séparent",
+    "7:1": "Incognito à Jérusalem",
+    "7:14": "Perplexités",
+    "7:37": "Si quelqu’un a soif…",
+    "7:40": "Pour ou contre Jésus ?",
+    "8:1": "On ne lui a pas jeté la pierre",
+    "8:12": "Discussion",
+    "8:30": "La vraie liberté",
+    "8:52": "Fils de Dieu",
+    "9:1": "Un miracle patent",
+    "9:13": "Enquêtes",
+    "9:39": "Les vrais aveugles",
+    "10:1": "Le vrai berger",
+    "10:22": "Es-tu le Messie ?",
+    "11:1": "Comportement énigmatique",
+    "11:20": "Peux-tu croire cela ?",
+    "11:38": "Victoire sur la mort",
+    "11:45": "Le complot contre le Maître de la vie",
+    "12:1": "Gaspillage !",
+    "12:12": "Entrée triomphale à Jérusalem",
+    "12:20": "Nous voudrions voir Jésus",
+    "12:37": "Bilan",
+    "13:1": "Humilité",
+    "13:18": "Trahison",
+    "13:31": "La nouvelle mission",
+    "14:1": "Le chemin, la vérité et la vie",
+    "14:15": "Jamais seuls",
+    "15:1": "Le secret d’une vie fructueuse",
+    "15:9": "Amour et haine",
+    "15:26": "Quand le Conseiller sera venu",
+    "16:16": "Vous me reverrez",
+    "16:23": "Demandez de ma part",
+    "16:29": "Victoire sur le monde",
+    "17:1": "La prière pour l’Église",
+    "17:17": "Que tous soient un",
+    "18:1": "Arrestation",
+    "18:12": "Devant les autorités religieuses",
+    "18:28": "Devant le gouverneur romain",
+    "19:1": "Un cas embarrassant",
+    "19:17": "Golgotha",
+    "19:28": "Tout est accompli",
+    "19:38": "La tombe dans le jardin",
+    "20:1": "Le tombeau vide",
+    "20:10": "Une rencontre bouleversante",
+    "20:19": "Les portes s’ouvrent",
+    "20:24": "Les doutes s’évanouissent",
+    "21:1": "Sur les bords du lac de Tibériade",
+    "21:15": "M’aimes-tu ?",
+    "21:24": "Certifié conforme"
+  },
+  "pericopes": [
+    {
+      "title": "Aux origines",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 5
+    },
+    {
+      "title": "La lumière du monde",
+      "start_ch": 1,
+      "start_v": 6,
+      "end_ch": 1,
+      "end_v": 18
+    },
+    {
+      "title": "Un vrai témoin",
+      "start_ch": 1,
+      "start_v": 19,
+      "end_ch": 1,
+      "end_v": 34
+    },
+    {
+      "title": "Rencontres inoubliables",
+      "start_ch": 1,
+      "start_v": 35,
+      "end_ch": 1,
+      "end_v": 51
+    },
+    {
+      "title": "Mariage à Cana",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 11
+    },
+    {
+      "title": "Maison de prière ou de commerce ?",
+      "start_ch": 2,
+      "start_v": 12,
+      "end_ch": 2,
+      "end_v": 25
+    },
+    {
+      "title": "Face-à-face avec un théologien en recherche",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 21
+    },
+    {
+      "title": "L’effacement du témoin",
+      "start_ch": 3,
+      "start_v": 22,
+      "end_ch": 3,
+      "end_v": 36
+    },
+    {
+      "title": "Rencontre sur la margelle d’un puits",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 9
+    },
+    {
+      "title": "L’eau vive",
+      "start_ch": 4,
+      "start_v": 10,
+      "end_ch": 4,
+      "end_v": 26
+    },
+    {
+      "title": "Réveil en Samarie",
+      "start_ch": 4,
+      "start_v": 27,
+      "end_ch": 4,
+      "end_v": 42
+    },
+    {
+      "title": "Guérison à distance",
+      "start_ch": 4,
+      "start_v": 43,
+      "end_ch": 4,
+      "end_v": 54
+    },
+    {
+      "title": "Veux-tu être guéri ?",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 17
+    },
+    {
+      "title": "Le Père et le Fils",
+      "start_ch": 5,
+      "start_v": 18,
+      "end_ch": 5,
+      "end_v": 26
+    },
+    {
+      "title": "Pleins pouvoirs",
+      "start_ch": 5,
+      "start_v": 27,
+      "end_ch": 5,
+      "end_v": 30
+    },
+    {
+      "title": "Les quatre témoins de Jésus",
+      "start_ch": 5,
+      "start_v": 31,
+      "end_ch": 5,
+      "end_v": 47
+    },
+    {
+      "title": "Jésus nourrit cinq mille hommes",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 14
+    },
+    {
+      "title": "Jésus marche sur l’eau",
+      "start_ch": 6,
+      "start_v": 15,
+      "end_ch": 6,
+      "end_v": 21
+    },
+    {
+      "title": "Ce que les hommes attendent du Messie",
+      "start_ch": 6,
+      "start_v": 22,
+      "end_ch": 6,
+      "end_v": 29
+    },
+    {
+      "title": "Le pain qui fait vivre",
+      "start_ch": 6,
+      "start_v": 30,
+      "end_ch": 6,
+      "end_v": 59
+    },
+    {
+      "title": "Où les esprits se séparent",
+      "start_ch": 6,
+      "start_v": 60,
+      "end_ch": 6,
+      "end_v": 71
+    },
+    {
+      "title": "Incognito à Jérusalem",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 13
+    },
+    {
+      "title": "Perplexités",
+      "start_ch": 7,
+      "start_v": 14,
+      "end_ch": 7,
+      "end_v": 36
+    },
+    {
+      "title": "Si quelqu’un a soif…",
+      "start_ch": 7,
+      "start_v": 37,
+      "end_ch": 7,
+      "end_v": 39
+    },
+    {
+      "title": "Pour ou contre Jésus ?",
+      "start_ch": 7,
+      "start_v": 40,
+      "end_ch": 7,
+      "end_v": 53
+    },
+    {
+      "title": "On ne lui a pas jeté la pierre",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 11
+    },
+    {
+      "title": "Discussion",
+      "start_ch": 8,
+      "start_v": 12,
+      "end_ch": 8,
+      "end_v": 29
+    },
+    {
+      "title": "La vraie liberté",
+      "start_ch": 8,
+      "start_v": 30,
+      "end_ch": 8,
+      "end_v": 51
+    },
+    {
+      "title": "Fils de Dieu",
+      "start_ch": 8,
+      "start_v": 52,
+      "end_ch": 8,
+      "end_v": 59
+    },
+    {
+      "title": "Un miracle patent",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 12
+    },
+    {
+      "title": "Enquêtes",
+      "start_ch": 9,
+      "start_v": 13,
+      "end_ch": 9,
+      "end_v": 38
+    },
+    {
+      "title": "Les vrais aveugles",
+      "start_ch": 9,
+      "start_v": 39,
+      "end_ch": 9,
+      "end_v": 41
+    },
+    {
+      "title": "Le vrai berger",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 21
+    },
+    {
+      "title": "Es-tu le Messie ?",
+      "start_ch": 10,
+      "start_v": 22,
+      "end_ch": 10,
+      "end_v": 42
+    },
+    {
+      "title": "Comportement énigmatique",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 19
+    },
+    {
+      "title": "Peux-tu croire cela ?",
+      "start_ch": 11,
+      "start_v": 20,
+      "end_ch": 11,
+      "end_v": 37
+    },
+    {
+      "title": "Victoire sur la mort",
+      "start_ch": 11,
+      "start_v": 38,
+      "end_ch": 11,
+      "end_v": 44
+    },
+    {
+      "title": "Le complot contre le Maître de la vie",
+      "start_ch": 11,
+      "start_v": 45,
+      "end_ch": 11,
+      "end_v": 57
+    },
+    {
+      "title": "Gaspillage !",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 11
+    },
+    {
+      "title": "Entrée triomphale à Jérusalem",
+      "start_ch": 12,
+      "start_v": 12,
+      "end_ch": 12,
+      "end_v": 19
+    },
+    {
+      "title": "Nous voudrions voir Jésus",
+      "start_ch": 12,
+      "start_v": 20,
+      "end_ch": 12,
+      "end_v": 36
+    },
+    {
+      "title": "Bilan",
+      "start_ch": 12,
+      "start_v": 37,
+      "end_ch": 12,
+      "end_v": 50
+    },
+    {
+      "title": "Humilité",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 17
+    },
+    {
+      "title": "Trahison",
+      "start_ch": 13,
+      "start_v": 18,
+      "end_ch": 13,
+      "end_v": 30
+    },
+    {
+      "title": "La nouvelle mission",
+      "start_ch": 13,
+      "start_v": 31,
+      "end_ch": 13,
+      "end_v": 38
+    },
+    {
+      "title": "Le chemin, la vérité et la vie",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 14
+    },
+    {
+      "title": "Jamais seuls",
+      "start_ch": 14,
+      "start_v": 15,
+      "end_ch": 14,
+      "end_v": 31
+    },
+    {
+      "title": "Le secret d’une vie fructueuse",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 8
+    },
+    {
+      "title": "Amour et haine",
+      "start_ch": 15,
+      "start_v": 9,
+      "end_ch": 15,
+      "end_v": 25
+    },
+    {
+      "title": "Quand le Conseiller sera venu",
+      "start_ch": 15,
+      "start_v": 26,
+      "end_ch": 15,
+      "end_v": 27
+    },
+    {
+      "title": "Vous me reverrez",
+      "start_ch": 16,
+      "start_v": 16,
+      "end_ch": 16,
+      "end_v": 22
+    },
+    {
+      "title": "Demandez de ma part",
+      "start_ch": 16,
+      "start_v": 23,
+      "end_ch": 16,
+      "end_v": 28
+    },
+    {
+      "title": "Victoire sur le monde",
+      "start_ch": 16,
+      "start_v": 29,
+      "end_ch": 16,
+      "end_v": 33
+    },
+    {
+      "title": "La prière pour l’Église",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 16
+    },
+    {
+      "title": "Que tous soient un",
+      "start_ch": 17,
+      "start_v": 17,
+      "end_ch": 17,
+      "end_v": 26
+    },
+    {
+      "title": "Arrestation",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 11
+    },
+    {
+      "title": "Devant les autorités religieuses",
+      "start_ch": 18,
+      "start_v": 12,
+      "end_ch": 18,
+      "end_v": 27
+    },
+    {
+      "title": "Devant le gouverneur romain",
+      "start_ch": 18,
+      "start_v": 28,
+      "end_ch": 18,
+      "end_v": 40
+    },
+    {
+      "title": "Un cas embarrassant",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 16
+    },
+    {
+      "title": "Golgotha",
+      "start_ch": 19,
+      "start_v": 17,
+      "end_ch": 19,
+      "end_v": 27
+    },
+    {
+      "title": "Tout est accompli",
+      "start_ch": 19,
+      "start_v": 28,
+      "end_ch": 19,
+      "end_v": 37
+    },
+    {
+      "title": "La tombe dans le jardin",
+      "start_ch": 19,
+      "start_v": 38,
+      "end_ch": 19,
+      "end_v": 42
+    },
+    {
+      "title": "Le tombeau vide",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 9
+    },
+    {
+      "title": "Une rencontre bouleversante",
+      "start_ch": 20,
+      "start_v": 10,
+      "end_ch": 20,
+      "end_v": 18
+    },
+    {
+      "title": "Les portes s’ouvrent",
+      "start_ch": 20,
+      "start_v": 19,
+      "end_ch": 20,
+      "end_v": 23
+    },
+    {
+      "title": "Les doutes s’évanouissent",
+      "start_ch": 20,
+      "start_v": 24,
+      "end_ch": 20,
+      "end_v": 31
+    },
+    {
+      "title": "Sur les bords du lac de Tibériade",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 14
+    },
+    {
+      "title": "M’aimes-tu ?",
+      "start_ch": 21,
+      "start_v": 15,
+      "end_ch": 21,
+      "end_v": 23
+    },
+    {
+      "title": "Certifié conforme",
+      "start_ch": 21,
+      "start_v": 24,
+      "end_ch": 21,
+      "end_v": 25
+    }
+  ]
 }

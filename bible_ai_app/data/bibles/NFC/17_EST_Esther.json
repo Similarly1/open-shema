@@ -187,5 +187,137 @@
       "2": "Toutes les actions grandes et puissantes du roi, de même que la manière dont il éleva Mardochée à une haute situation, sont racontées dans le livre intitulé: Les actes des rois de Médie et de Perse.",
       "3": "Mardochée, le Juif, devint la personne la plus puissante du royaume, après le roi Xerxès. Il était honoré et aimé par tous les autres Juifs. Il travailla pour le bien, la sécurité et la paix de son peuple."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Les banquets du roi Xerxès",
+    "1:10": "Le roi renvoie la reine Vasti",
+    "2:1": "Esther devient reine",
+    "2:21": "Mardochée découvre un complot",
+    "3:1": "Le conflit entre Haman et Mardochée",
+    "3:8": "Haman prépare l'extermination des Juifs",
+    "4:1": "Mardochée demande à Esther d'intervenir",
+    "5:1": "Esther se rend auprès du roi",
+    "5:9": "Haman prépare une potence pour Mardochée",
+    "6:1": "Haman est obligé d'honorer Mardochée",
+    "6:12": "Haman rentre chez lui et fait part de son humiliation",
+    "7:1": "La mort de Haman",
+    "8:3": "Le décret royal en faveur des Juifs",
+    "9:1": "Les Juifs se défendent",
+    "9:20": "L'institution d'une fête pour se souvenir",
+    "10:1": "Le triomphe final de Mardochée"
+  },
+  "pericopes": [
+    {
+      "title": "Les banquets du roi Xerxès",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 9
+    },
+    {
+      "title": "Le roi renvoie la reine Vasti",
+      "start_ch": 1,
+      "start_v": 10,
+      "end_ch": 1,
+      "end_v": 22
+    },
+    {
+      "title": "Esther devient reine",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 20
+    },
+    {
+      "title": "Mardochée découvre un complot",
+      "start_ch": 2,
+      "start_v": 21,
+      "end_ch": 2,
+      "end_v": 23
+    },
+    {
+      "title": "Le conflit entre Haman et Mardochée",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 7
+    },
+    {
+      "title": "Haman prépare l'extermination des Juifs",
+      "start_ch": 3,
+      "start_v": 8,
+      "end_ch": 3,
+      "end_v": 15
+    },
+    {
+      "title": "Mardochée demande à Esther d'intervenir",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 17
+    },
+    {
+      "title": "Esther se rend auprès du roi",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 8
+    },
+    {
+      "title": "Haman prépare une potence pour Mardochée",
+      "start_ch": 5,
+      "start_v": 9,
+      "end_ch": 5,
+      "end_v": 14
+    },
+    {
+      "title": "Haman est obligé d'honorer Mardochée",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 11
+    },
+    {
+      "title": "Haman rentre chez lui et fait part de son humiliation",
+      "start_ch": 6,
+      "start_v": 12,
+      "end_ch": 6,
+      "end_v": 14
+    },
+    {
+      "title": "La mort de Haman",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 10
+    },
+    {
+      "title": "Le décret royal en faveur des Juifs",
+      "start_ch": 8,
+      "start_v": 3,
+      "end_ch": 8,
+      "end_v": 17
+    },
+    {
+      "title": "Les Juifs se défendent",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 19
+    },
+    {
+      "title": "L'institution d'une fête pour se souvenir",
+      "start_ch": 9,
+      "start_v": 20,
+      "end_ch": 9,
+      "end_v": 32
+    },
+    {
+      "title": "Le triomphe final de Mardochée",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 3
+    }
+  ]
 }

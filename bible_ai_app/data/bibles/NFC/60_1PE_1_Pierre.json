@@ -121,5 +121,113 @@
       "13": "La communauté qui est ici, à Babylone, et que Dieu a choisie comme vous, vous adresse ses salutations, ainsi que Marc, mon enfant.",
       "14": "Saluez-vous les uns les autres avec affection, comme des frères et des sœurs. Que la paix vous soit donnée à vous tous qui appartenez au Christ!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Salutation",
+    "1:3": "Naître à une vie nouvelle pour espérer",
+    "1:13": "De l'espérance à l'amour les uns pour les autres",
+    "2:1": "Se laisser choisir comme pierre vivante",
+    "2:11": "La liberté au service de Dieu",
+    "2:18": "L'exemple des souffrances du Christ",
+    "3:1": "Les relations entre époux&#160;: partager l'héritage de la vie",
+    "3:8": "Se détourner du mal, pratiquer le bien",
+    "4:1": "Des vies transformées",
+    "4:7": "Dieu donne à chacun un don particulier",
+    "4:12": "Le feu de l'épreuve",
+    "5:1": "Prendre soin du troupeau de Dieu",
+    "5:12": "Salutations finales"
+  },
+  "pericopes": [
+    {
+      "title": "Salutation",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 2
+    },
+    {
+      "title": "Naître à une vie nouvelle pour espérer",
+      "start_ch": 1,
+      "start_v": 3,
+      "end_ch": 1,
+      "end_v": 12
+    },
+    {
+      "title": "De l'espérance à l'amour les uns pour les autres",
+      "start_ch": 1,
+      "start_v": 13,
+      "end_ch": 1,
+      "end_v": 25
+    },
+    {
+      "title": "Se laisser choisir comme pierre vivante",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 10
+    },
+    {
+      "title": "La liberté au service de Dieu",
+      "start_ch": 2,
+      "start_v": 11,
+      "end_ch": 2,
+      "end_v": 17
+    },
+    {
+      "title": "L'exemple des souffrances du Christ",
+      "start_ch": 2,
+      "start_v": 18,
+      "end_ch": 2,
+      "end_v": 25
+    },
+    {
+      "title": "Les relations entre époux&#160;: partager l'héritage de la vie",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 7
+    },
+    {
+      "title": "Se détourner du mal, pratiquer le bien",
+      "start_ch": 3,
+      "start_v": 8,
+      "end_ch": 3,
+      "end_v": 22
+    },
+    {
+      "title": "Des vies transformées",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 6
+    },
+    {
+      "title": "Dieu donne à chacun un don particulier",
+      "start_ch": 4,
+      "start_v": 7,
+      "end_ch": 4,
+      "end_v": 11
+    },
+    {
+      "title": "Le feu de l'épreuve",
+      "start_ch": 4,
+      "start_v": 12,
+      "end_ch": 4,
+      "end_v": 19
+    },
+    {
+      "title": "Prendre soin du troupeau de Dieu",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 11
+    },
+    {
+      "title": "Salutations finales",
+      "start_ch": 5,
+      "start_v": 12,
+      "end_ch": 5,
+      "end_v": 14
+    }
+  ]
 }

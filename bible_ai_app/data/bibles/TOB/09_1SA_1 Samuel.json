@@ -879,5 +879,41 @@
       "12": "Les plus vaillants se mirent en route, marchèrent toute la nuit et enlevèrent du rempart de Beth-Shéân les corps de Saül et de ses fils. Revenus à Yavesh, ils les y brûlèrent.",
       "13": "Ils recueillirent leurs ossements et les ensevelirent sous le tamaris de Yavesh, puis ils jeûnèrent sept jours."
     }
-  }
+  },
+  "sections": {
+    "1:1": "SAMUEL, L’ARCHE ET LES PHILISTINS",
+    "8:1": "SAMUEL ET LA ROYAUTÉ",
+    "13:1": "LES GUERRES DE SAÜL",
+    "16:1": "ASCENSION DE DAVID ET DÉCLIN DE SAÜL"
+  },
+  "pericopes": [
+    {
+      "title": "SAMUEL, L’ARCHE ET LES PHILISTINS",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 28
+    },
+    {
+      "title": "SAMUEL ET LA ROYAUTÉ",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 22
+    },
+    {
+      "title": "LES GUERRES DE SAÜL",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 23
+    },
+    {
+      "title": "ASCENSION DE DAVID ET DÉCLIN DE SAÜL",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 23
+    }
+  ]
 }

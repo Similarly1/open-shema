@@ -288,5 +288,121 @@
       "12": "Saluez-vous les uns les autres par un saint baiser. Tous les saints vous saluent.",
       "13": "Que la grâce du Seigneur Jésus-Christ, l'amour de Dieu et la communion du Saint-Esprit soient avec vous tous!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Salutation et louange",
+    "1:12": "Motivations et projets de Paul",
+    "2:14": "Le ministère de la nouvelle alliance",
+    "4:1": "Un ministère parsemé de difficultés",
+    "4:16": "L’espérance du ciel",
+    "5:11": "Un ministère de réconciliation",
+    "6:11": "Appel à la sainteté",
+    "7:2": "Des nouvelles encourageantes",
+    "8:1": "Exemple des Eglises de Macédoine et mission de Tite",
+    "9:1": "Fruits de la générosité",
+    "10:1": "Faiblesse et autorité de Paul",
+    "11:1": "Comparaison entre Paul et les prétendus apôtres",
+    "12:1": "Une nécessaire humilité",
+    "12:14": "Projets de visite et salutations"
+  },
+  "pericopes": [
+    {
+      "title": "Salutation et louange",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 11
+    },
+    {
+      "title": "Motivations et projets de Paul",
+      "start_ch": 1,
+      "start_v": 12,
+      "end_ch": 1,
+      "end_v": 24
+    },
+    {
+      "title": "Le ministère de la nouvelle alliance",
+      "start_ch": 2,
+      "start_v": 14,
+      "end_ch": 2,
+      "end_v": 17
+    },
+    {
+      "title": "Un ministère parsemé de difficultés",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 15
+    },
+    {
+      "title": "L’espérance du ciel",
+      "start_ch": 4,
+      "start_v": 16,
+      "end_ch": 4,
+      "end_v": 18
+    },
+    {
+      "title": "Un ministère de réconciliation",
+      "start_ch": 5,
+      "start_v": 11,
+      "end_ch": 5,
+      "end_v": 21
+    },
+    {
+      "title": "Appel à la sainteté",
+      "start_ch": 6,
+      "start_v": 11,
+      "end_ch": 6,
+      "end_v": 18
+    },
+    {
+      "title": "Des nouvelles encourageantes",
+      "start_ch": 7,
+      "start_v": 2,
+      "end_ch": 7,
+      "end_v": 16
+    },
+    {
+      "title": "Exemple des Eglises de Macédoine et mission de Tite",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 24
+    },
+    {
+      "title": "Fruits de la générosité",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 15
+    },
+    {
+      "title": "Faiblesse et autorité de Paul",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 18
+    },
+    {
+      "title": "Comparaison entre Paul et les prétendus apôtres",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 33
+    },
+    {
+      "title": "Une nécessaire humilité",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 13
+    },
+    {
+      "title": "Projets de visite et salutations",
+      "start_ch": 12,
+      "start_v": 14,
+      "end_ch": 12,
+      "end_v": 21
+    }
+  ]
 }

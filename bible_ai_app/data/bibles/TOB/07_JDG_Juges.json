@@ -666,5 +666,33 @@
       "24": "A ce moment-là, les fils d’Israël se dispersèrent chacun dans sa tribu et dans son clan et, de là, ils repartirent chacun dans son patrimoine.",
       "25": "En ces jours-là, il n’y avait pas de roi en Israël. Chacun faisait ce qui lui plaisait."
     }
-  }
+  },
+  "sections": {
+    "3:7": "HISTOIRE FRAGMENTAIRE DES JUGES",
+    "17:1": "LA TRIBU DE DAN",
+    "19:1": "LA TRIBU DE BENJAMIN"
+  },
+  "pericopes": [
+    {
+      "title": "HISTOIRE FRAGMENTAIRE DES JUGES",
+      "start_ch": 3,
+      "start_v": 7,
+      "end_ch": 3,
+      "end_v": 31
+    },
+    {
+      "title": "LA TRIBU DE DAN",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 13
+    },
+    {
+      "title": "LA TRIBU DE BENJAMIN",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 30
+    }
+  ]
 }

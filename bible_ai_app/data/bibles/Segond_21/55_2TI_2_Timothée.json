@@ -97,5 +97,49 @@
       "21": "Tâche de venir avant l'hiver. Eubulus, Pudens, Linus, Claudia et tous les frères et sœurs te saluent.",
       "22": "Que le Seigneur [Jésus-Christ] soit avec ton esprit! Que la grâce soit avec vous!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Salutation et louange",
+    "1:6": "Encouragement à la fidélité",
+    "2:1": "Conseils pour le service dans l’Eglise",
+    "3:1": "Conseils pour les temps difficiles",
+    "4:9": "Dernières informations et salutations"
+  },
+  "pericopes": [
+    {
+      "title": "Salutation et louange",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 5
+    },
+    {
+      "title": "Encouragement à la fidélité",
+      "start_ch": 1,
+      "start_v": 6,
+      "end_ch": 1,
+      "end_v": 18
+    },
+    {
+      "title": "Conseils pour le service dans l’Eglise",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 26
+    },
+    {
+      "title": "Conseils pour les temps difficiles",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 17
+    },
+    {
+      "title": "Dernières informations et salutations",
+      "start_ch": 4,
+      "start_v": 9,
+      "end_ch": 4,
+      "end_v": 22
+    }
+  ]
 }

@@ -1205,5 +1205,593 @@
       "52": "Quant à eux, après l'avoir adoré, ils retournèrent à Jérusalem remplis d'une grande joie.",
       "53": "Ils étaient constamment dans le temple, [louant et] bénissant Dieu."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Objectif de l’auteur",
+    "1:5": "Annonce de la naissance de Jean-Baptiste",
+    "1:26": "Annonce de la naissance de Jésus",
+    "1:57": "Naissance de Jean-Baptiste",
+    "2:1": "Naissance de Jésus à Bethléhem",
+    "2:21": "Jésus présenté dans le temple",
+    "2:41": "Jésus à 12 ans dans le temple",
+    "3:1": "Ministère de Jean-Baptiste",
+    "3:23": "Généalogie de Jésus",
+    "4:1": "Tentation de Jésus",
+    "4:14": "Jésus à Nazareth",
+    "4:31": "Miracles à Capernaüm",
+    "5:1": "La pêche miraculeuse",
+    "5:12": "Guérison d’un lépreux et d’un paralysé",
+    "5:27": "Réactions face à Jésus",
+    "6:1": "Jésus et le sabbat",
+    "6:12": "Choix des douze apôtres",
+    "6:20": "Sermon sur la montagne",
+    "7:1": "Guérison d’un esclave à Capernaüm",
+    "7:11": "Résurrection à Naïn",
+    "7:18": "Jean-Baptiste vu par Jésus",
+    "7:36": "Une femme verse du parfum sur Jésus",
+    "8:4": "Le semeur et les terrains",
+    "8:22": "Jésus plus fort que la nature et les démons",
+    "8:40": "Guérison d’une femme et résurrection d’une fillette",
+    "9:1": "Mission des douze apôtres",
+    "9:10": "Multiplication des pains pour 5000 hommes",
+    "9:18": "Pierre reconnaît Jésus comme le Messie",
+    "9:28": "La transfiguration",
+    "9:37": "Guérison d'un démoniaque",
+    "9:46": "Petits et grands dans le royaume de Dieu",
+    "9:51": "Jésus en Samarie",
+    "10:1": "Mission des 70 disciples",
+    "10:25": "Parabole du bon Samaritain",
+    "10:38": "Marthe et Marie",
+    "11:1": "Enseignement de Jésus sur la prière",
+    "11:14": "Jésus contesté après un miracle",
+    "11:37": "Jésus condamne les pharisiens et les spécialistes de la loi",
+    "12:13": "Les biens matériels",
+    "12:35": "Appel à être prêts",
+    "13:10": "Guérison de la femme courbée",
+    "13:18": "La graine de moutarde et le levain",
+    "13:22": "L’entrée dans le royaume",
+    "14:1": "L’invitation au festin",
+    "14:25": "Conditions pour être disciple",
+    "15:1": "Paraboles de la brebis et de la pièce perdues",
+    "15:11": "Parabole du fils perdu et de son frère",
+    "16:1": "Parabole de l’intendant infidèle",
+    "16:19": "Histoire de l'homme riche et du pauvre Lazare",
+    "17:1": "Le pardon et la foi",
+    "17:11": "Guérison de dix lépreux",
+    "17:20": "La venue du royaume de Dieu",
+    "18:1": "Parabole de la veuve et du juge",
+    "18:9": "Parabole du pharisien et du collecteur d’impôts",
+    "18:15": "Les petits enfants et l’homme riche",
+    "18:35": "Jésus à Jéricho",
+    "19:11": "Parabole des serviteurs et des récompenses",
+    "19:28": "Entrée triomphale de Jésus à Jérusalem",
+    "19:45": "Jésus dans le temple",
+    "20:9": "Parabole des vignerons",
+    "20:20": "Tentatives de piéger Jésus",
+    "20:41": "Reproches de Jésus aux chefs religieux",
+    "21:5": "Discours sur le mont des Oliviers",
+    "22:1": "Complot contre Jésus",
+    "22:7": "Institution de la cène",
+    "22:39": "Arrestation de Jésus",
+    "22:54": "Jésus devant le conseil juif",
+    "23:1": "Jésus devant le gouverneur romain et le roi Hérode",
+    "23:26": "Crucifixion et mort de Jésus",
+    "23:50": "Mise au tombeau du corps de Jésus",
+    "24:1": "Résurrection de Jésus",
+    "24:13": "Apparitions de Jésus ressuscité",
+    "24:50": "Ascension de Jésus"
+  },
+  "pericopes": [
+    {
+      "title": "Objectif de l’auteur",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 4
+    },
+    {
+      "title": "Annonce de la naissance de Jean-Baptiste",
+      "start_ch": 1,
+      "start_v": 5,
+      "end_ch": 1,
+      "end_v": 25
+    },
+    {
+      "title": "Annonce de la naissance de Jésus",
+      "start_ch": 1,
+      "start_v": 26,
+      "end_ch": 1,
+      "end_v": 56
+    },
+    {
+      "title": "Naissance de Jean-Baptiste",
+      "start_ch": 1,
+      "start_v": 57,
+      "end_ch": 1,
+      "end_v": 80
+    },
+    {
+      "title": "Naissance de Jésus à Bethléhem",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 20
+    },
+    {
+      "title": "Jésus présenté dans le temple",
+      "start_ch": 2,
+      "start_v": 21,
+      "end_ch": 2,
+      "end_v": 40
+    },
+    {
+      "title": "Jésus à 12 ans dans le temple",
+      "start_ch": 2,
+      "start_v": 41,
+      "end_ch": 2,
+      "end_v": 52
+    },
+    {
+      "title": "Ministère de Jean-Baptiste",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 22
+    },
+    {
+      "title": "Généalogie de Jésus",
+      "start_ch": 3,
+      "start_v": 23,
+      "end_ch": 3,
+      "end_v": 38
+    },
+    {
+      "title": "Tentation de Jésus",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 13
+    },
+    {
+      "title": "Jésus à Nazareth",
+      "start_ch": 4,
+      "start_v": 14,
+      "end_ch": 4,
+      "end_v": 30
+    },
+    {
+      "title": "Miracles à Capernaüm",
+      "start_ch": 4,
+      "start_v": 31,
+      "end_ch": 4,
+      "end_v": 44
+    },
+    {
+      "title": "La pêche miraculeuse",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 11
+    },
+    {
+      "title": "Guérison d’un lépreux et d’un paralysé",
+      "start_ch": 5,
+      "start_v": 12,
+      "end_ch": 5,
+      "end_v": 26
+    },
+    {
+      "title": "Réactions face à Jésus",
+      "start_ch": 5,
+      "start_v": 27,
+      "end_ch": 5,
+      "end_v": 39
+    },
+    {
+      "title": "Jésus et le sabbat",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 11
+    },
+    {
+      "title": "Choix des douze apôtres",
+      "start_ch": 6,
+      "start_v": 12,
+      "end_ch": 6,
+      "end_v": 19
+    },
+    {
+      "title": "Sermon sur la montagne",
+      "start_ch": 6,
+      "start_v": 20,
+      "end_ch": 6,
+      "end_v": 49
+    },
+    {
+      "title": "Guérison d’un esclave à Capernaüm",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 10
+    },
+    {
+      "title": "Résurrection à Naïn",
+      "start_ch": 7,
+      "start_v": 11,
+      "end_ch": 7,
+      "end_v": 17
+    },
+    {
+      "title": "Jean-Baptiste vu par Jésus",
+      "start_ch": 7,
+      "start_v": 18,
+      "end_ch": 7,
+      "end_v": 35
+    },
+    {
+      "title": "Une femme verse du parfum sur Jésus",
+      "start_ch": 7,
+      "start_v": 36,
+      "end_ch": 7,
+      "end_v": 50
+    },
+    {
+      "title": "Le semeur et les terrains",
+      "start_ch": 8,
+      "start_v": 4,
+      "end_ch": 8,
+      "end_v": 21
+    },
+    {
+      "title": "Jésus plus fort que la nature et les démons",
+      "start_ch": 8,
+      "start_v": 22,
+      "end_ch": 8,
+      "end_v": 39
+    },
+    {
+      "title": "Guérison d’une femme et résurrection d’une fillette",
+      "start_ch": 8,
+      "start_v": 40,
+      "end_ch": 8,
+      "end_v": 56
+    },
+    {
+      "title": "Mission des douze apôtres",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 9
+    },
+    {
+      "title": "Multiplication des pains pour 5000 hommes",
+      "start_ch": 9,
+      "start_v": 10,
+      "end_ch": 9,
+      "end_v": 17
+    },
+    {
+      "title": "Pierre reconnaît Jésus comme le Messie",
+      "start_ch": 9,
+      "start_v": 18,
+      "end_ch": 9,
+      "end_v": 27
+    },
+    {
+      "title": "La transfiguration",
+      "start_ch": 9,
+      "start_v": 28,
+      "end_ch": 9,
+      "end_v": 36
+    },
+    {
+      "title": "Guérison d'un démoniaque",
+      "start_ch": 9,
+      "start_v": 37,
+      "end_ch": 9,
+      "end_v": 45
+    },
+    {
+      "title": "Petits et grands dans le royaume de Dieu",
+      "start_ch": 9,
+      "start_v": 46,
+      "end_ch": 9,
+      "end_v": 50
+    },
+    {
+      "title": "Jésus en Samarie",
+      "start_ch": 9,
+      "start_v": 51,
+      "end_ch": 9,
+      "end_v": 62
+    },
+    {
+      "title": "Mission des 70 disciples",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 24
+    },
+    {
+      "title": "Parabole du bon Samaritain",
+      "start_ch": 10,
+      "start_v": 25,
+      "end_ch": 10,
+      "end_v": 37
+    },
+    {
+      "title": "Marthe et Marie",
+      "start_ch": 10,
+      "start_v": 38,
+      "end_ch": 10,
+      "end_v": 42
+    },
+    {
+      "title": "Enseignement de Jésus sur la prière",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 13
+    },
+    {
+      "title": "Jésus contesté après un miracle",
+      "start_ch": 11,
+      "start_v": 14,
+      "end_ch": 11,
+      "end_v": 36
+    },
+    {
+      "title": "Jésus condamne les pharisiens et les spécialistes de la loi",
+      "start_ch": 11,
+      "start_v": 37,
+      "end_ch": 11,
+      "end_v": 54
+    },
+    {
+      "title": "Les biens matériels",
+      "start_ch": 12,
+      "start_v": 13,
+      "end_ch": 12,
+      "end_v": 34
+    },
+    {
+      "title": "Appel à être prêts",
+      "start_ch": 12,
+      "start_v": 35,
+      "end_ch": 12,
+      "end_v": 59
+    },
+    {
+      "title": "Guérison de la femme courbée",
+      "start_ch": 13,
+      "start_v": 10,
+      "end_ch": 13,
+      "end_v": 17
+    },
+    {
+      "title": "La graine de moutarde et le levain",
+      "start_ch": 13,
+      "start_v": 18,
+      "end_ch": 13,
+      "end_v": 21
+    },
+    {
+      "title": "L’entrée dans le royaume",
+      "start_ch": 13,
+      "start_v": 22,
+      "end_ch": 13,
+      "end_v": 35
+    },
+    {
+      "title": "L’invitation au festin",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 24
+    },
+    {
+      "title": "Conditions pour être disciple",
+      "start_ch": 14,
+      "start_v": 25,
+      "end_ch": 14,
+      "end_v": 35
+    },
+    {
+      "title": "Paraboles de la brebis et de la pièce perdues",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 10
+    },
+    {
+      "title": "Parabole du fils perdu et de son frère",
+      "start_ch": 15,
+      "start_v": 11,
+      "end_ch": 15,
+      "end_v": 32
+    },
+    {
+      "title": "Parabole de l’intendant infidèle",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 18
+    },
+    {
+      "title": "Histoire de l'homme riche et du pauvre Lazare",
+      "start_ch": 16,
+      "start_v": 19,
+      "end_ch": 16,
+      "end_v": 31
+    },
+    {
+      "title": "Le pardon et la foi",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 10
+    },
+    {
+      "title": "Guérison de dix lépreux",
+      "start_ch": 17,
+      "start_v": 11,
+      "end_ch": 17,
+      "end_v": 19
+    },
+    {
+      "title": "La venue du royaume de Dieu",
+      "start_ch": 17,
+      "start_v": 20,
+      "end_ch": 17,
+      "end_v": 37
+    },
+    {
+      "title": "Parabole de la veuve et du juge",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 8
+    },
+    {
+      "title": "Parabole du pharisien et du collecteur d’impôts",
+      "start_ch": 18,
+      "start_v": 9,
+      "end_ch": 18,
+      "end_v": 14
+    },
+    {
+      "title": "Les petits enfants et l’homme riche",
+      "start_ch": 18,
+      "start_v": 15,
+      "end_ch": 18,
+      "end_v": 34
+    },
+    {
+      "title": "Jésus à Jéricho",
+      "start_ch": 18,
+      "start_v": 35,
+      "end_ch": 18,
+      "end_v": 43
+    },
+    {
+      "title": "Parabole des serviteurs et des récompenses",
+      "start_ch": 19,
+      "start_v": 11,
+      "end_ch": 19,
+      "end_v": 27
+    },
+    {
+      "title": "Entrée triomphale de Jésus à Jérusalem",
+      "start_ch": 19,
+      "start_v": 28,
+      "end_ch": 19,
+      "end_v": 44
+    },
+    {
+      "title": "Jésus dans le temple",
+      "start_ch": 19,
+      "start_v": 45,
+      "end_ch": 19,
+      "end_v": 48
+    },
+    {
+      "title": "Parabole des vignerons",
+      "start_ch": 20,
+      "start_v": 9,
+      "end_ch": 20,
+      "end_v": 19
+    },
+    {
+      "title": "Tentatives de piéger Jésus",
+      "start_ch": 20,
+      "start_v": 20,
+      "end_ch": 20,
+      "end_v": 40
+    },
+    {
+      "title": "Reproches de Jésus aux chefs religieux",
+      "start_ch": 20,
+      "start_v": 41,
+      "end_ch": 20,
+      "end_v": 47
+    },
+    {
+      "title": "Discours sur le mont des Oliviers",
+      "start_ch": 21,
+      "start_v": 5,
+      "end_ch": 21,
+      "end_v": 38
+    },
+    {
+      "title": "Complot contre Jésus",
+      "start_ch": 22,
+      "start_v": 1,
+      "end_ch": 22,
+      "end_v": 6
+    },
+    {
+      "title": "Institution de la cène",
+      "start_ch": 22,
+      "start_v": 7,
+      "end_ch": 22,
+      "end_v": 38
+    },
+    {
+      "title": "Arrestation de Jésus",
+      "start_ch": 22,
+      "start_v": 39,
+      "end_ch": 22,
+      "end_v": 53
+    },
+    {
+      "title": "Jésus devant le conseil juif",
+      "start_ch": 22,
+      "start_v": 54,
+      "end_ch": 22,
+      "end_v": 71
+    },
+    {
+      "title": "Jésus devant le gouverneur romain et le roi Hérode",
+      "start_ch": 23,
+      "start_v": 1,
+      "end_ch": 23,
+      "end_v": 25
+    },
+    {
+      "title": "Crucifixion et mort de Jésus",
+      "start_ch": 23,
+      "start_v": 26,
+      "end_ch": 23,
+      "end_v": 49
+    },
+    {
+      "title": "Mise au tombeau du corps de Jésus",
+      "start_ch": 23,
+      "start_v": 50,
+      "end_ch": 23,
+      "end_v": 56
+    },
+    {
+      "title": "Résurrection de Jésus",
+      "start_ch": 24,
+      "start_v": 1,
+      "end_ch": 24,
+      "end_v": 12
+    },
+    {
+      "title": "Apparitions de Jésus ressuscité",
+      "start_ch": 24,
+      "start_v": 13,
+      "end_ch": 24,
+      "end_v": 49
+    },
+    {
+      "title": "Ascension de Jésus",
+      "start_ch": 24,
+      "start_v": 50,
+      "end_ch": 24,
+      "end_v": 53
+    }
+  ]
 }

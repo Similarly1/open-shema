@@ -749,5 +749,33 @@
       "24": "Mais le roi dit à Arauna: «Non, je tiens à te l’acheter pour son prix, et je ne veux pas offrir au SEIGNEUR, mon Dieu, des holocaustes qui ne coûtent rien.» David acheta donc l’aire et les bœufs pour cinquante sicles d’argent.",
       "25": "Là, David bâtit un autel au SEIGNEUR et il offrit des holocaustes et des sacrifices de paix. Le SEIGNEUR se montra propice au pays, et le fléau fut retenu loin d’Israël."
     }
-  }
+  },
+  "sections": {
+    "6:1": "L’ARCHE, LA DYNASTIE ET LES GUERRES DE DAVID",
+    "9:1": "LA SUCCESSION AU TRÔNE DE DAVID",
+    "21:1": "SUPPLÉMENTS"
+  },
+  "pericopes": [
+    {
+      "title": "L’ARCHE, LA DYNASTIE ET LES GUERRES DE DAVID",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 23
+    },
+    {
+      "title": "LA SUCCESSION AU TRÔNE DE DAVID",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 13
+    },
+    {
+      "title": "SUPPLÉMENTS",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 22
+    }
+  ]
 }

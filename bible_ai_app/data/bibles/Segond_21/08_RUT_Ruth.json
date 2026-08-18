@@ -99,5 +99,33 @@
       "21": "Salmon eut pour fils Boaz, Boaz eut Obed,",
       "22": "Obed eut pour fils Isaï et Isaï eut David."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Attachement de Ruth pour Naomi",
+    "2:1": "Rencontre de Ruth et Boaz",
+    "3:1": "Mariage de Ruth et Boaz"
+  },
+  "pericopes": [
+    {
+      "title": "Attachement de Ruth pour Naomi",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 22
+    },
+    {
+      "title": "Rencontre de Ruth et Boaz",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 23
+    },
+    {
+      "title": "Mariage de Ruth et Boaz",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 18
+    }
+  ]
 }

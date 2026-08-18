@@ -1065,5 +1065,697 @@
       "30": "Paul demeura deux années entières dans le logement qu'il avait loué. Il y recevait toutes les personnes qui venaient le voir.",
       "31": "Il annonçait le règne de Dieu et enseignait ce qui concerne le Seigneur Jésus Christ, avec une pleine assurance et librement."
     }
-  }
+  },
+  "sections": {
+    "1:1": "L'Esprit saint promis aux apôtres",
+    "1:6": "Jésus est élevé au ciel et quitte ses disciples",
+    "1:12": "Matthias remplace Judas",
+    "2:1": "La venue de l'Esprit saint",
+    "2:14": "Le discours de Pierre",
+    "2:42": "La vie de la première Église à Jérusalem",
+    "3:1": "Un homme boiteux est guéri",
+    "3:11": "Pierre enseigne dans le temple",
+    "4:1": "Pierre et Jean devant le conseil suprême",
+    "4:23": "La prière des croyants",
+    "4:32": "Les croyants partagent leurs biens entre eux",
+    "5:1": "Ananias et Saphira",
+    "5:12": "De nombreux prodiges",
+    "5:17": "Les apôtres sont persécutés",
+    "6:1": "Sept hommes sont choisis pour aider les apôtres",
+    "6:8": "Étienne est arrêté",
+    "7:1": "Le discours d'Étienne",
+    "7:54": "Étienne est mis à mort",
+    "8:2": "Saul persécute l'Église",
+    "8:4": "Philippe annonce la bonne nouvelle en Samarie",
+    "8:26": "Philippe baptise un fonctionnaire éthiopien",
+    "9:1": "La conversion de Saul",
+    "9:20": "Saul annonce la bonne nouvelle à Damas",
+    "9:26": "À Jérusalem, Barnabas présente Saul aux apôtres",
+    "9:32": "Énée est guéri de sa paralysie",
+    "9:36": "Dorcas, une femme disciple, est ramenée à la vie",
+    "10:1": "Pierre est appelé chez Corneille",
+    "10:34": "Pierre annonce la bonne nouvelle chez Corneille",
+    "10:44": "Des gens qui ne sont pas Juifs reçoivent l'Esprit saint",
+    "11:1": "Le rapport de Pierre devant l'Église de Jérusalem",
+    "11:19": "À Antioche, les disciples sont appelés chrétiens",
+    "12:1": "Jacques est tué, Pierre est emprisonné",
+    "12:6": "Pierre est délivré par un ange",
+    "12:20": "La mort d'Hérode Agrippa",
+    "13:1": "Barnabas et Saul sont envoyés en mission",
+    "13:4": "Barnabas et Saul à Chypre",
+    "13:13": "Paul et Barnabas à Antioche de Pisidie",
+    "14:1": "Paul et Barnabas à Iconium",
+    "14:8": "Paul et Barnabas à Lystre",
+    "14:21": "Le retour à Antioche de Syrie",
+    "15:1": "L'assemblée de Jérusalem",
+    "15:22": "Une lettre est envoyée aux croyants non juifs",
+    "15:36": "Paul et Barnabas se séparent",
+    "16:1": "Timothée accompagne Paul et Sylvain",
+    "16:6": "À Troas, Paul a une vision",
+    "16:11": "À Philippes, Lydie croit au Seigneur",
+    "16:16": "Dans la prison de Philippes",
+    "17:1": "Paul et Sylvain à Thessalonique",
+    "17:10": "Paul et Sylvain à Bérée",
+    "17:16": "Paul annonce la bonne nouvelle à Athènes",
+    "18:1": "Paul à Corinthe",
+    "18:12": "Paul comparaît devant Gallion",
+    "18:18": "Paul retourne à Antioche",
+    "18:24": "Apollos enseigne à Éphèse et à Corinthe",
+    "19:1": "Paul enseigne à Éphèse",
+    "19:11": "Les fils de Scéva",
+    "19:21": "L'émeute d'Éphèse",
+    "20:1": "Paul revient en Macédoine et en Grèce",
+    "20:7": "La dernière visite de Paul à Troas",
+    "20:13": "Le voyage de Troas à Milet",
+    "20:17": "Paul s'adresse aux anciens d'Éphèse",
+    "21:1": "Paul se rend à Jérusalem",
+    "21:17": "Paul rend visite à Jacques",
+    "21:27": "Paul est arrêté dans le temple",
+    "21:37": "Paul présente sa défense",
+    "22:6": "Paul raconte sa conversion",
+    "22:17": "Paul raconte comment il a été envoyé vers les autres peuples",
+    "22:22": "Paul et le commandant romain",
+    "22:30": "Paul comparaît devant le conseil suprême",
+    "23:12": "Le complot contre la vie de Paul",
+    "23:23": "Paul est envoyé vers le gouverneur Félix",
+    "24:1": "L'accusation portée contre Paul devant le gouverneur Félix",
+    "24:10": "Paul présente sa défense devant le gouverneur Félix",
+    "24:24": "Paul devant Félix et Drusille",
+    "25:1": "Paul fait appel à l'empereur",
+    "25:13": "Paul devant Agrippa et Bérénice",
+    "26:1": "Paul présente sa défense devant Agrippa",
+    "26:12": "Paul raconte sa conversion",
+    "26:19": "Paul parle de son œuvre",
+    "26:24": "Paul appelle Agrippa à croire",
+    "27:1": "Paul est envoyé à Rome",
+    "27:13": "La tempête sur la mer",
+    "27:39": "Le navire fait naufrage",
+    "28:1": "Paul sur l'île de Malte",
+    "28:11": "Paul arrive à Rome",
+    "28:17": "Paul annonce la bonne nouvelle à Rome"
+  },
+  "pericopes": [
+    {
+      "title": "L'Esprit saint promis aux apôtres",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 5
+    },
+    {
+      "title": "Jésus est élevé au ciel et quitte ses disciples",
+      "start_ch": 1,
+      "start_v": 6,
+      "end_ch": 1,
+      "end_v": 11
+    },
+    {
+      "title": "Matthias remplace Judas",
+      "start_ch": 1,
+      "start_v": 12,
+      "end_ch": 1,
+      "end_v": 26
+    },
+    {
+      "title": "La venue de l'Esprit saint",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 13
+    },
+    {
+      "title": "Le discours de Pierre",
+      "start_ch": 2,
+      "start_v": 14,
+      "end_ch": 2,
+      "end_v": 41
+    },
+    {
+      "title": "La vie de la première Église à Jérusalem",
+      "start_ch": 2,
+      "start_v": 42,
+      "end_ch": 2,
+      "end_v": 47
+    },
+    {
+      "title": "Un homme boiteux est guéri",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 10
+    },
+    {
+      "title": "Pierre enseigne dans le temple",
+      "start_ch": 3,
+      "start_v": 11,
+      "end_ch": 3,
+      "end_v": 26
+    },
+    {
+      "title": "Pierre et Jean devant le conseil suprême",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 22
+    },
+    {
+      "title": "La prière des croyants",
+      "start_ch": 4,
+      "start_v": 23,
+      "end_ch": 4,
+      "end_v": 31
+    },
+    {
+      "title": "Les croyants partagent leurs biens entre eux",
+      "start_ch": 4,
+      "start_v": 32,
+      "end_ch": 4,
+      "end_v": 37
+    },
+    {
+      "title": "Ananias et Saphira",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 11
+    },
+    {
+      "title": "De nombreux prodiges",
+      "start_ch": 5,
+      "start_v": 12,
+      "end_ch": 5,
+      "end_v": 16
+    },
+    {
+      "title": "Les apôtres sont persécutés",
+      "start_ch": 5,
+      "start_v": 17,
+      "end_ch": 5,
+      "end_v": 42
+    },
+    {
+      "title": "Sept hommes sont choisis pour aider les apôtres",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 7
+    },
+    {
+      "title": "Étienne est arrêté",
+      "start_ch": 6,
+      "start_v": 8,
+      "end_ch": 6,
+      "end_v": 15
+    },
+    {
+      "title": "Le discours d'Étienne",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 53
+    },
+    {
+      "title": "Étienne est mis à mort",
+      "start_ch": 7,
+      "start_v": 54,
+      "end_ch": 7,
+      "end_v": 60
+    },
+    {
+      "title": "Saul persécute l'Église",
+      "start_ch": 8,
+      "start_v": 2,
+      "end_ch": 8,
+      "end_v": 3
+    },
+    {
+      "title": "Philippe annonce la bonne nouvelle en Samarie",
+      "start_ch": 8,
+      "start_v": 4,
+      "end_ch": 8,
+      "end_v": 25
+    },
+    {
+      "title": "Philippe baptise un fonctionnaire éthiopien",
+      "start_ch": 8,
+      "start_v": 26,
+      "end_ch": 8,
+      "end_v": 40
+    },
+    {
+      "title": "La conversion de Saul",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 19
+    },
+    {
+      "title": "Saul annonce la bonne nouvelle à Damas",
+      "start_ch": 9,
+      "start_v": 20,
+      "end_ch": 9,
+      "end_v": 25
+    },
+    {
+      "title": "À Jérusalem, Barnabas présente Saul aux apôtres",
+      "start_ch": 9,
+      "start_v": 26,
+      "end_ch": 9,
+      "end_v": 31
+    },
+    {
+      "title": "Énée est guéri de sa paralysie",
+      "start_ch": 9,
+      "start_v": 32,
+      "end_ch": 9,
+      "end_v": 35
+    },
+    {
+      "title": "Dorcas, une femme disciple, est ramenée à la vie",
+      "start_ch": 9,
+      "start_v": 36,
+      "end_ch": 9,
+      "end_v": 43
+    },
+    {
+      "title": "Pierre est appelé chez Corneille",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 33
+    },
+    {
+      "title": "Pierre annonce la bonne nouvelle chez Corneille",
+      "start_ch": 10,
+      "start_v": 34,
+      "end_ch": 10,
+      "end_v": 43
+    },
+    {
+      "title": "Des gens qui ne sont pas Juifs reçoivent l'Esprit saint",
+      "start_ch": 10,
+      "start_v": 44,
+      "end_ch": 10,
+      "end_v": 48
+    },
+    {
+      "title": "Le rapport de Pierre devant l'Église de Jérusalem",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 18
+    },
+    {
+      "title": "À Antioche, les disciples sont appelés chrétiens",
+      "start_ch": 11,
+      "start_v": 19,
+      "end_ch": 11,
+      "end_v": 30
+    },
+    {
+      "title": "Jacques est tué, Pierre est emprisonné",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 5
+    },
+    {
+      "title": "Pierre est délivré par un ange",
+      "start_ch": 12,
+      "start_v": 6,
+      "end_ch": 12,
+      "end_v": 19
+    },
+    {
+      "title": "La mort d'Hérode Agrippa",
+      "start_ch": 12,
+      "start_v": 20,
+      "end_ch": 12,
+      "end_v": 25
+    },
+    {
+      "title": "Barnabas et Saul sont envoyés en mission",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 3
+    },
+    {
+      "title": "Barnabas et Saul à Chypre",
+      "start_ch": 13,
+      "start_v": 4,
+      "end_ch": 13,
+      "end_v": 12
+    },
+    {
+      "title": "Paul et Barnabas à Antioche de Pisidie",
+      "start_ch": 13,
+      "start_v": 13,
+      "end_ch": 13,
+      "end_v": 52
+    },
+    {
+      "title": "Paul et Barnabas à Iconium",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 7
+    },
+    {
+      "title": "Paul et Barnabas à Lystre",
+      "start_ch": 14,
+      "start_v": 8,
+      "end_ch": 14,
+      "end_v": 20
+    },
+    {
+      "title": "Le retour à Antioche de Syrie",
+      "start_ch": 14,
+      "start_v": 21,
+      "end_ch": 14,
+      "end_v": 28
+    },
+    {
+      "title": "L'assemblée de Jérusalem",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 21
+    },
+    {
+      "title": "Une lettre est envoyée aux croyants non juifs",
+      "start_ch": 15,
+      "start_v": 22,
+      "end_ch": 15,
+      "end_v": 35
+    },
+    {
+      "title": "Paul et Barnabas se séparent",
+      "start_ch": 15,
+      "start_v": 36,
+      "end_ch": 15,
+      "end_v": 41
+    },
+    {
+      "title": "Timothée accompagne Paul et Sylvain",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 5
+    },
+    {
+      "title": "À Troas, Paul a une vision",
+      "start_ch": 16,
+      "start_v": 6,
+      "end_ch": 16,
+      "end_v": 10
+    },
+    {
+      "title": "À Philippes, Lydie croit au Seigneur",
+      "start_ch": 16,
+      "start_v": 11,
+      "end_ch": 16,
+      "end_v": 15
+    },
+    {
+      "title": "Dans la prison de Philippes",
+      "start_ch": 16,
+      "start_v": 16,
+      "end_ch": 16,
+      "end_v": 40
+    },
+    {
+      "title": "Paul et Sylvain à Thessalonique",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 9
+    },
+    {
+      "title": "Paul et Sylvain à Bérée",
+      "start_ch": 17,
+      "start_v": 10,
+      "end_ch": 17,
+      "end_v": 15
+    },
+    {
+      "title": "Paul annonce la bonne nouvelle à Athènes",
+      "start_ch": 17,
+      "start_v": 16,
+      "end_ch": 17,
+      "end_v": 34
+    },
+    {
+      "title": "Paul à Corinthe",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 11
+    },
+    {
+      "title": "Paul comparaît devant Gallion",
+      "start_ch": 18,
+      "start_v": 12,
+      "end_ch": 18,
+      "end_v": 17
+    },
+    {
+      "title": "Paul retourne à Antioche",
+      "start_ch": 18,
+      "start_v": 18,
+      "end_ch": 18,
+      "end_v": 23
+    },
+    {
+      "title": "Apollos enseigne à Éphèse et à Corinthe",
+      "start_ch": 18,
+      "start_v": 24,
+      "end_ch": 18,
+      "end_v": 28
+    },
+    {
+      "title": "Paul enseigne à Éphèse",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 10
+    },
+    {
+      "title": "Les fils de Scéva",
+      "start_ch": 19,
+      "start_v": 11,
+      "end_ch": 19,
+      "end_v": 20
+    },
+    {
+      "title": "L'émeute d'Éphèse",
+      "start_ch": 19,
+      "start_v": 21,
+      "end_ch": 19,
+      "end_v": 41
+    },
+    {
+      "title": "Paul revient en Macédoine et en Grèce",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 6
+    },
+    {
+      "title": "La dernière visite de Paul à Troas",
+      "start_ch": 20,
+      "start_v": 7,
+      "end_ch": 20,
+      "end_v": 12
+    },
+    {
+      "title": "Le voyage de Troas à Milet",
+      "start_ch": 20,
+      "start_v": 13,
+      "end_ch": 20,
+      "end_v": 16
+    },
+    {
+      "title": "Paul s'adresse aux anciens d'Éphèse",
+      "start_ch": 20,
+      "start_v": 17,
+      "end_ch": 20,
+      "end_v": 38
+    },
+    {
+      "title": "Paul se rend à Jérusalem",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 16
+    },
+    {
+      "title": "Paul rend visite à Jacques",
+      "start_ch": 21,
+      "start_v": 17,
+      "end_ch": 21,
+      "end_v": 26
+    },
+    {
+      "title": "Paul est arrêté dans le temple",
+      "start_ch": 21,
+      "start_v": 27,
+      "end_ch": 21,
+      "end_v": 36
+    },
+    {
+      "title": "Paul présente sa défense",
+      "start_ch": 21,
+      "start_v": 37,
+      "end_ch": 21,
+      "end_v": 40
+    },
+    {
+      "title": "Paul raconte sa conversion",
+      "start_ch": 22,
+      "start_v": 6,
+      "end_ch": 22,
+      "end_v": 16
+    },
+    {
+      "title": "Paul raconte comment il a été envoyé vers les autres peuples",
+      "start_ch": 22,
+      "start_v": 17,
+      "end_ch": 22,
+      "end_v": 21
+    },
+    {
+      "title": "Paul et le commandant romain",
+      "start_ch": 22,
+      "start_v": 22,
+      "end_ch": 22,
+      "end_v": 29
+    },
+    {
+      "title": "Paul comparaît devant le conseil suprême",
+      "start_ch": 22,
+      "start_v": 30,
+      "end_ch": 22,
+      "end_v": 30
+    },
+    {
+      "title": "Le complot contre la vie de Paul",
+      "start_ch": 23,
+      "start_v": 12,
+      "end_ch": 23,
+      "end_v": 22
+    },
+    {
+      "title": "Paul est envoyé vers le gouverneur Félix",
+      "start_ch": 23,
+      "start_v": 23,
+      "end_ch": 23,
+      "end_v": 35
+    },
+    {
+      "title": "L'accusation portée contre Paul devant le gouverneur Félix",
+      "start_ch": 24,
+      "start_v": 1,
+      "end_ch": 24,
+      "end_v": 9
+    },
+    {
+      "title": "Paul présente sa défense devant le gouverneur Félix",
+      "start_ch": 24,
+      "start_v": 10,
+      "end_ch": 24,
+      "end_v": 23
+    },
+    {
+      "title": "Paul devant Félix et Drusille",
+      "start_ch": 24,
+      "start_v": 24,
+      "end_ch": 24,
+      "end_v": 27
+    },
+    {
+      "title": "Paul fait appel à l'empereur",
+      "start_ch": 25,
+      "start_v": 1,
+      "end_ch": 25,
+      "end_v": 12
+    },
+    {
+      "title": "Paul devant Agrippa et Bérénice",
+      "start_ch": 25,
+      "start_v": 13,
+      "end_ch": 25,
+      "end_v": 27
+    },
+    {
+      "title": "Paul présente sa défense devant Agrippa",
+      "start_ch": 26,
+      "start_v": 1,
+      "end_ch": 26,
+      "end_v": 11
+    },
+    {
+      "title": "Paul raconte sa conversion",
+      "start_ch": 26,
+      "start_v": 12,
+      "end_ch": 26,
+      "end_v": 18
+    },
+    {
+      "title": "Paul parle de son œuvre",
+      "start_ch": 26,
+      "start_v": 19,
+      "end_ch": 26,
+      "end_v": 23
+    },
+    {
+      "title": "Paul appelle Agrippa à croire",
+      "start_ch": 26,
+      "start_v": 24,
+      "end_ch": 26,
+      "end_v": 32
+    },
+    {
+      "title": "Paul est envoyé à Rome",
+      "start_ch": 27,
+      "start_v": 1,
+      "end_ch": 27,
+      "end_v": 12
+    },
+    {
+      "title": "La tempête sur la mer",
+      "start_ch": 27,
+      "start_v": 13,
+      "end_ch": 27,
+      "end_v": 38
+    },
+    {
+      "title": "Le navire fait naufrage",
+      "start_ch": 27,
+      "start_v": 39,
+      "end_ch": 27,
+      "end_v": 44
+    },
+    {
+      "title": "Paul sur l'île de Malte",
+      "start_ch": 28,
+      "start_v": 1,
+      "end_ch": 28,
+      "end_v": 10
+    },
+    {
+      "title": "Paul arrive à Rome",
+      "start_ch": 28,
+      "start_v": 11,
+      "end_ch": 28,
+      "end_v": 16
+    },
+    {
+      "title": "Paul annonce la bonne nouvelle à Rome",
+      "start_ch": 28,
+      "start_v": 17,
+      "end_ch": 28,
+      "end_v": 31
+    }
+  ]
 }

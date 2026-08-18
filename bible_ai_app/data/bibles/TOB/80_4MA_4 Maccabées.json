@@ -524,5 +524,41 @@
       "23": "Mais les fils d’Abraham avec leur mère victorieuse sont maintenant rassemblés dans le chœur des pères ayant reçu de Dieu des âmes pures et immortelles.",
       "24": "A lui soit la gloire dans les siècles des siècles. Amen."
     }
-  }
+  },
+  "sections": {
+    "1:1": "EXORDE",
+    "1:13": "PRÉSENTATION DE LA THÈSE",
+    "3:19": "RÉCIT DES MARTYRES",
+    "17:7": "CONCLUSION"
+  },
+  "pericopes": [
+    {
+      "title": "EXORDE",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 12
+    },
+    {
+      "title": "PRÉSENTATION DE LA THÈSE",
+      "start_ch": 1,
+      "start_v": 13,
+      "end_ch": 1,
+      "end_v": 35
+    },
+    {
+      "title": "RÉCIT DES MARTYRES",
+      "start_ch": 3,
+      "start_v": 19,
+      "end_ch": 3,
+      "end_v": 21
+    },
+    {
+      "title": "CONCLUSION",
+      "start_ch": 17,
+      "start_v": 7,
+      "end_ch": 17,
+      "end_v": 24
+    }
+  ]
 }

@@ -248,5 +248,169 @@
       "13": "Et voilà la conclusion de tout ce qui a été dit: reconnais l'autorité de Dieu et obéis à ses ordres, c'est le devoir de tout être humain.",
       "14": "En effet, Dieu demandera des comptes pour toutes les actions, même cachées, qu'elles soient bonnes ou mauvaises."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Rien n'est nouveau sous le soleil",
+    "1:12": "L'expérience du Sage",
+    "2:1": "Le bonheur est décevant",
+    "2:12": "La sagesse est décevante",
+    "2:24": "Le bonheur dépend de Dieu",
+    "3:1": "Il y a un temps pour chaque chose",
+    "3:16": "Tout se termine par la mort",
+    "4:1": "Injustices et anomalies dans la vie sociale",
+    "4:17": "Ne parle pas trop devant Dieu",
+    "5:7": "Les abus du pouvoir",
+    "5:9": "La richesse est inutile",
+    "6:10": "Conseils de sagesse",
+    "8:2": "Mieux vaut obéir au roi",
+    "8:9": "Réflexions sur la condition humaine",
+    "9:7": "Jouis de la vie&#8239;!",
+    "9:11": "La sagesse n'est pas toujours efficace",
+    "10:12": "Autres conseils de sagesse",
+    "11:1": "Savoir prendre des risques",
+    "11:9": "Soyons heureux avant qu'il soit trop tard",
+    "12:9": "Conclusion du Sage"
+  },
+  "pericopes": [
+    {
+      "title": "Rien n'est nouveau sous le soleil",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 11
+    },
+    {
+      "title": "L'expérience du Sage",
+      "start_ch": 1,
+      "start_v": 12,
+      "end_ch": 1,
+      "end_v": 18
+    },
+    {
+      "title": "Le bonheur est décevant",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 11
+    },
+    {
+      "title": "La sagesse est décevante",
+      "start_ch": 2,
+      "start_v": 12,
+      "end_ch": 2,
+      "end_v": 23
+    },
+    {
+      "title": "Le bonheur dépend de Dieu",
+      "start_ch": 2,
+      "start_v": 24,
+      "end_ch": 2,
+      "end_v": 26
+    },
+    {
+      "title": "Il y a un temps pour chaque chose",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 15
+    },
+    {
+      "title": "Tout se termine par la mort",
+      "start_ch": 3,
+      "start_v": 16,
+      "end_ch": 3,
+      "end_v": 22
+    },
+    {
+      "title": "Injustices et anomalies dans la vie sociale",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 16
+    },
+    {
+      "title": "Ne parle pas trop devant Dieu",
+      "start_ch": 4,
+      "start_v": 17,
+      "end_ch": 4,
+      "end_v": 17
+    },
+    {
+      "title": "Les abus du pouvoir",
+      "start_ch": 5,
+      "start_v": 7,
+      "end_ch": 5,
+      "end_v": 8
+    },
+    {
+      "title": "La richesse est inutile",
+      "start_ch": 5,
+      "start_v": 9,
+      "end_ch": 5,
+      "end_v": 19
+    },
+    {
+      "title": "Conseils de sagesse",
+      "start_ch": 6,
+      "start_v": 10,
+      "end_ch": 6,
+      "end_v": 12
+    },
+    {
+      "title": "Mieux vaut obéir au roi",
+      "start_ch": 8,
+      "start_v": 2,
+      "end_ch": 8,
+      "end_v": 8
+    },
+    {
+      "title": "Réflexions sur la condition humaine",
+      "start_ch": 8,
+      "start_v": 9,
+      "end_ch": 8,
+      "end_v": 15
+    },
+    {
+      "title": "Jouis de la vie&#8239;!",
+      "start_ch": 9,
+      "start_v": 7,
+      "end_ch": 9,
+      "end_v": 10
+    },
+    {
+      "title": "La sagesse n'est pas toujours efficace",
+      "start_ch": 9,
+      "start_v": 11,
+      "end_ch": 9,
+      "end_v": 18
+    },
+    {
+      "title": "Autres conseils de sagesse",
+      "start_ch": 10,
+      "start_v": 12,
+      "end_ch": 10,
+      "end_v": 20
+    },
+    {
+      "title": "Savoir prendre des risques",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 8
+    },
+    {
+      "title": "Soyons heureux avant qu'il soit trop tard",
+      "start_ch": 11,
+      "start_v": 9,
+      "end_ch": 11,
+      "end_v": 10
+    },
+    {
+      "title": "Conclusion du Sage",
+      "start_ch": 12,
+      "start_v": 9,
+      "end_ch": 12,
+      "end_v": 14
+    }
+  ]
 }

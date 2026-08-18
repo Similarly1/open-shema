@@ -1368,5 +1368,857 @@
       "34": "À l'ouest enfin, il y aura un mur de même longueur avec également trois portes: la porte de Gad, celle d'Asser et celle de Neftali.",
       "35": "La longueur totale des murs qui entoureront la ville sera de 18 000 mesures. Dès ce jour, on appellera la ville “le-Seigneur-est-là”.»"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Dieu se manifeste à Ézékiel",
+    "2:1": "Dieu envoie Ézékiel auprès des Israélites",
+    "3:16": "Ézékiel sera un guetteur pour le peuple d'Israël",
+    "3:22": "Dieu impose un temps de silence à Ézékiel",
+    "4:1": "Ézékiel annonce le siège de Jérusalem",
+    "5:1": "Dieu interviendra contre Jérusalem",
+    "6:1": "Dieu agira contre ceux qui adorent les idoles",
+    "7:1": "Dieu annonce le désastre final",
+    "7:15": "Personne n'échappera au châtiment",
+    "8:1": "L'idolâtrie est dans le temple de Dieu",
+    "9:1": "Dieu intervient contre Jérusalem",
+    "10:1": "Dieu se manifeste de nouveau à Ézékiel",
+    "10:18": "La gloire du Seigneur quitte le temple",
+    "11:1": "Jérusalem sera jugée pour ses crimes",
+    "11:14": "Dieu rassemblera le peuple dispersé",
+    "11:22": "La gloire du Seigneur quitte Jérusalem",
+    "12:1": "Ézékiel annonce l'exil par un acte symbolique",
+    "12:21": "La parole du Seigneur se réalisera",
+    "13:1": "Contre les faux prophètes",
+    "13:17": "Contre les fausses prophétesses",
+    "14:1": "Les Israélites doivent abandonner les idoles",
+    "14:12": "Personne n'arrêtera le jugement de Dieu",
+    "15:1": "La vigne livrée au feu",
+    "16:1": "Jérusalem était une enfant abandonnée",
+    "16:15": "Jérusalem s'est prostituée",
+    "16:44": "Jérusalem est pire que les autres villes",
+    "17:1": "La parabole des deux aigles et de la vigne",
+    "17:11": "Explication de la parabole",
+    "17:22": "Les promesses du Seigneur",
+    "18:1": "Dieu juge chacun selon sa propre conduite",
+    "18:21": "Le Seigneur demande à chacun de pratiquer le bien",
+    "19:1": "La complainte sur les princes d'Israël",
+    "19:10": "La complainte de la vigne",
+    "20:1": "Dieu a conduit Israël malgré ses révoltes",
+    "20:18": "Israël n'a pas cessé de désobéir à Dieu",
+    "20:27": "Dieu mettra un terme à l'idolâtrie des Israélites",
+    "21:1": "Ézékiel doit annoncer une mauvaise nouvelle",
+    "21:13": "L'épée de la mort",
+    "21:23": "L'assaut contre Jérusalem",
+    "21:33": "L'assaut contre les Ammonites",
+    "22:1": "Jérusalem commet des actions abominables",
+    "23:1": "Samarie s'est prostituée",
+    "23:11": "Jérusalem s'est prostituée",
+    "23:21": "Le châtiment de Jérusalem",
+    "23:36": "Dieu condamne Samarie et Jérusalem",
+    "24:1": "Jérusalem est comparée à une marmite rouillée",
+    "24:15": "L'épouse d'Ézékiel meurt",
+    "25:1": "Menaces contre les Ammonites",
+    "25:8": "Menaces contre les Moabites",
+    "25:12": "Menaces contre les Édomites",
+    "25:15": "Menaces contre les Philistins",
+    "26:1": "Menaces contre la ville de Tyr",
+    "27:1": "Complainte sur la ruine de Tyr",
+    "27:12": "Tyr, capitale du commerce",
+    "27:26": "Suite de la complainte sur Tyr",
+    "28:1": "Menaces contre le roi de Tyr",
+    "28:20": "Menaces contre Sidon",
+    "28:24": "Israël vivra en sécurité",
+    "29:1": "Menaces contre l'Égypte",
+    "29:17": "Le roi Nabucodonosor va conquérir l'Égypte",
+    "30:1": "Le Seigneur manifestera sa colère contre l'Égypte",
+    "30:20": "Le roi de Babylone est l'instrument de Dieu",
+    "31:1": "Le roi d'Égypte est comparé à un cèdre",
+    "31:10": "Comme le cèdre, le roi d'Égypte sera brisé",
+    "32:1": "Complainte sur l'Égypte et sur son roi",
+    "32:17": "Lamentation sur les peuples vaincus",
+    "33:1": "Dieu établit Ézékiel comme guetteur",
+    "33:10": "Le méchant qui revient à Dieu vivra",
+    "33:21": "La ville de Jérusalem est tombée et le pays d'Israël sera dévasté",
+    "34:1": "Contre les dirigeants d'Israël",
+    "34:17": "Les brebis grasses écrasent les brebis maigres",
+    "35:1": "Menaces contre les Édomites",
+    "36:1": "Les Israélites reprendront possession de leur pays",
+    "36:16": "Le Seigneur rassemblera les Israélites",
+    "37:1": "Les ossements desséchés reprennent vie",
+    "37:15": "Le Seigneur va rétablir l'unité",
+    "38:1": "Menaces contre Gog",
+    "39:1": "Nouvelles menaces contre Gog",
+    "39:23": "Résumé du message d'Ézékiel",
+    "40:1": "Introduction",
+    "40:5": "La cour et les portes extérieures",
+    "40:28": "La cour et les portes intérieures",
+    "40:47": "Description du temple",
+    "41:5": "Les bâtiments annexes",
+    "41:16": "L'intérieur du temple",
+    "42:1": "Les salles réservées aux prêtres",
+    "42:15": "Les mesures du mur extérieur",
+    "43:1": "Le Seigneur revient dans le temple de Jérusalem",
+    "43:13": "L'autel et les sacrifices",
+    "44:1": "La porte orientale est réservée au prince",
+    "44:4": "Les conditions d'accès au temple",
+    "44:10": "Les règles pour les lévites",
+    "44:15": "Les règles pour les prêtres",
+    "45:1": "Les territoires réservés",
+    "45:9": "Les droits et les devoirs du prince",
+    "46:1": "Les règles particulières concernant le prince",
+    "46:11": "Les règles concernant les divers sacrifices",
+    "46:16": "L'héritage des fils du prince",
+    "46:19": "Les cuisines du temple",
+    "47:1": "La source du temple",
+    "47:13": "Le Seigneur fixe les frontières d'Israël",
+    "48:1": "Les parts des tribus du nord",
+    "48:8": "La part du Seigneur",
+    "48:15": "Les parts de la ville et du prince",
+    "48:23": "La part des tribus dans le sud",
+    "48:32": "Les douze portes de Jérusalem"
+  },
+  "pericopes": [
+    {
+      "title": "Dieu se manifeste à Ézékiel",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 28
+    },
+    {
+      "title": "Dieu envoie Ézékiel auprès des Israélites",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 10
+    },
+    {
+      "title": "Ézékiel sera un guetteur pour le peuple d'Israël",
+      "start_ch": 3,
+      "start_v": 16,
+      "end_ch": 3,
+      "end_v": 21
+    },
+    {
+      "title": "Dieu impose un temps de silence à Ézékiel",
+      "start_ch": 3,
+      "start_v": 22,
+      "end_ch": 3,
+      "end_v": 27
+    },
+    {
+      "title": "Ézékiel annonce le siège de Jérusalem",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 17
+    },
+    {
+      "title": "Dieu interviendra contre Jérusalem",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 17
+    },
+    {
+      "title": "Dieu agira contre ceux qui adorent les idoles",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 14
+    },
+    {
+      "title": "Dieu annonce le désastre final",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 14
+    },
+    {
+      "title": "Personne n'échappera au châtiment",
+      "start_ch": 7,
+      "start_v": 15,
+      "end_ch": 7,
+      "end_v": 27
+    },
+    {
+      "title": "L'idolâtrie est dans le temple de Dieu",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 18
+    },
+    {
+      "title": "Dieu intervient contre Jérusalem",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 11
+    },
+    {
+      "title": "Dieu se manifeste de nouveau à Ézékiel",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 17
+    },
+    {
+      "title": "La gloire du Seigneur quitte le temple",
+      "start_ch": 10,
+      "start_v": 18,
+      "end_ch": 10,
+      "end_v": 22
+    },
+    {
+      "title": "Jérusalem sera jugée pour ses crimes",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 13
+    },
+    {
+      "title": "Dieu rassemblera le peuple dispersé",
+      "start_ch": 11,
+      "start_v": 14,
+      "end_ch": 11,
+      "end_v": 21
+    },
+    {
+      "title": "La gloire du Seigneur quitte Jérusalem",
+      "start_ch": 11,
+      "start_v": 22,
+      "end_ch": 11,
+      "end_v": 25
+    },
+    {
+      "title": "Ézékiel annonce l'exil par un acte symbolique",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 20
+    },
+    {
+      "title": "La parole du Seigneur se réalisera",
+      "start_ch": 12,
+      "start_v": 21,
+      "end_ch": 12,
+      "end_v": 28
+    },
+    {
+      "title": "Contre les faux prophètes",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 16
+    },
+    {
+      "title": "Contre les fausses prophétesses",
+      "start_ch": 13,
+      "start_v": 17,
+      "end_ch": 13,
+      "end_v": 23
+    },
+    {
+      "title": "Les Israélites doivent abandonner les idoles",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 11
+    },
+    {
+      "title": "Personne n'arrêtera le jugement de Dieu",
+      "start_ch": 14,
+      "start_v": 12,
+      "end_ch": 14,
+      "end_v": 23
+    },
+    {
+      "title": "La vigne livrée au feu",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 8
+    },
+    {
+      "title": "Jérusalem était une enfant abandonnée",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 14
+    },
+    {
+      "title": "Jérusalem s'est prostituée",
+      "start_ch": 16,
+      "start_v": 15,
+      "end_ch": 16,
+      "end_v": 43
+    },
+    {
+      "title": "Jérusalem est pire que les autres villes",
+      "start_ch": 16,
+      "start_v": 44,
+      "end_ch": 16,
+      "end_v": 63
+    },
+    {
+      "title": "La parabole des deux aigles et de la vigne",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 10
+    },
+    {
+      "title": "Explication de la parabole",
+      "start_ch": 17,
+      "start_v": 11,
+      "end_ch": 17,
+      "end_v": 21
+    },
+    {
+      "title": "Les promesses du Seigneur",
+      "start_ch": 17,
+      "start_v": 22,
+      "end_ch": 17,
+      "end_v": 24
+    },
+    {
+      "title": "Dieu juge chacun selon sa propre conduite",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 20
+    },
+    {
+      "title": "Le Seigneur demande à chacun de pratiquer le bien",
+      "start_ch": 18,
+      "start_v": 21,
+      "end_ch": 18,
+      "end_v": 32
+    },
+    {
+      "title": "La complainte sur les princes d'Israël",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 9
+    },
+    {
+      "title": "La complainte de la vigne",
+      "start_ch": 19,
+      "start_v": 10,
+      "end_ch": 19,
+      "end_v": 14
+    },
+    {
+      "title": "Dieu a conduit Israël malgré ses révoltes",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 17
+    },
+    {
+      "title": "Israël n'a pas cessé de désobéir à Dieu",
+      "start_ch": 20,
+      "start_v": 18,
+      "end_ch": 20,
+      "end_v": 26
+    },
+    {
+      "title": "Dieu mettra un terme à l'idolâtrie des Israélites",
+      "start_ch": 20,
+      "start_v": 27,
+      "end_ch": 20,
+      "end_v": 44
+    },
+    {
+      "title": "Ézékiel doit annoncer une mauvaise nouvelle",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 12
+    },
+    {
+      "title": "L'épée de la mort",
+      "start_ch": 21,
+      "start_v": 13,
+      "end_ch": 21,
+      "end_v": 22
+    },
+    {
+      "title": "L'assaut contre Jérusalem",
+      "start_ch": 21,
+      "start_v": 23,
+      "end_ch": 21,
+      "end_v": 32
+    },
+    {
+      "title": "L'assaut contre les Ammonites",
+      "start_ch": 21,
+      "start_v": 33,
+      "end_ch": 21,
+      "end_v": 37
+    },
+    {
+      "title": "Jérusalem commet des actions abominables",
+      "start_ch": 22,
+      "start_v": 1,
+      "end_ch": 22,
+      "end_v": 31
+    },
+    {
+      "title": "Samarie s'est prostituée",
+      "start_ch": 23,
+      "start_v": 1,
+      "end_ch": 23,
+      "end_v": 10
+    },
+    {
+      "title": "Jérusalem s'est prostituée",
+      "start_ch": 23,
+      "start_v": 11,
+      "end_ch": 23,
+      "end_v": 20
+    },
+    {
+      "title": "Le châtiment de Jérusalem",
+      "start_ch": 23,
+      "start_v": 21,
+      "end_ch": 23,
+      "end_v": 35
+    },
+    {
+      "title": "Dieu condamne Samarie et Jérusalem",
+      "start_ch": 23,
+      "start_v": 36,
+      "end_ch": 23,
+      "end_v": 49
+    },
+    {
+      "title": "Jérusalem est comparée à une marmite rouillée",
+      "start_ch": 24,
+      "start_v": 1,
+      "end_ch": 24,
+      "end_v": 14
+    },
+    {
+      "title": "L'épouse d'Ézékiel meurt",
+      "start_ch": 24,
+      "start_v": 15,
+      "end_ch": 24,
+      "end_v": 27
+    },
+    {
+      "title": "Menaces contre les Ammonites",
+      "start_ch": 25,
+      "start_v": 1,
+      "end_ch": 25,
+      "end_v": 7
+    },
+    {
+      "title": "Menaces contre les Moabites",
+      "start_ch": 25,
+      "start_v": 8,
+      "end_ch": 25,
+      "end_v": 11
+    },
+    {
+      "title": "Menaces contre les Édomites",
+      "start_ch": 25,
+      "start_v": 12,
+      "end_ch": 25,
+      "end_v": 14
+    },
+    {
+      "title": "Menaces contre les Philistins",
+      "start_ch": 25,
+      "start_v": 15,
+      "end_ch": 25,
+      "end_v": 17
+    },
+    {
+      "title": "Menaces contre la ville de Tyr",
+      "start_ch": 26,
+      "start_v": 1,
+      "end_ch": 26,
+      "end_v": 21
+    },
+    {
+      "title": "Complainte sur la ruine de Tyr",
+      "start_ch": 27,
+      "start_v": 1,
+      "end_ch": 27,
+      "end_v": 11
+    },
+    {
+      "title": "Tyr, capitale du commerce",
+      "start_ch": 27,
+      "start_v": 12,
+      "end_ch": 27,
+      "end_v": 25
+    },
+    {
+      "title": "Suite de la complainte sur Tyr",
+      "start_ch": 27,
+      "start_v": 26,
+      "end_ch": 27,
+      "end_v": 36
+    },
+    {
+      "title": "Menaces contre le roi de Tyr",
+      "start_ch": 28,
+      "start_v": 1,
+      "end_ch": 28,
+      "end_v": 19
+    },
+    {
+      "title": "Menaces contre Sidon",
+      "start_ch": 28,
+      "start_v": 20,
+      "end_ch": 28,
+      "end_v": 23
+    },
+    {
+      "title": "Israël vivra en sécurité",
+      "start_ch": 28,
+      "start_v": 24,
+      "end_ch": 28,
+      "end_v": 26
+    },
+    {
+      "title": "Menaces contre l'Égypte",
+      "start_ch": 29,
+      "start_v": 1,
+      "end_ch": 29,
+      "end_v": 16
+    },
+    {
+      "title": "Le roi Nabucodonosor va conquérir l'Égypte",
+      "start_ch": 29,
+      "start_v": 17,
+      "end_ch": 29,
+      "end_v": 21
+    },
+    {
+      "title": "Le Seigneur manifestera sa colère contre l'Égypte",
+      "start_ch": 30,
+      "start_v": 1,
+      "end_ch": 30,
+      "end_v": 19
+    },
+    {
+      "title": "Le roi de Babylone est l'instrument de Dieu",
+      "start_ch": 30,
+      "start_v": 20,
+      "end_ch": 30,
+      "end_v": 26
+    },
+    {
+      "title": "Le roi d'Égypte est comparé à un cèdre",
+      "start_ch": 31,
+      "start_v": 1,
+      "end_ch": 31,
+      "end_v": 9
+    },
+    {
+      "title": "Comme le cèdre, le roi d'Égypte sera brisé",
+      "start_ch": 31,
+      "start_v": 10,
+      "end_ch": 31,
+      "end_v": 18
+    },
+    {
+      "title": "Complainte sur l'Égypte et sur son roi",
+      "start_ch": 32,
+      "start_v": 1,
+      "end_ch": 32,
+      "end_v": 16
+    },
+    {
+      "title": "Lamentation sur les peuples vaincus",
+      "start_ch": 32,
+      "start_v": 17,
+      "end_ch": 32,
+      "end_v": 32
+    },
+    {
+      "title": "Dieu établit Ézékiel comme guetteur",
+      "start_ch": 33,
+      "start_v": 1,
+      "end_ch": 33,
+      "end_v": 9
+    },
+    {
+      "title": "Le méchant qui revient à Dieu vivra",
+      "start_ch": 33,
+      "start_v": 10,
+      "end_ch": 33,
+      "end_v": 20
+    },
+    {
+      "title": "La ville de Jérusalem est tombée et le pays d'Israël sera dévasté",
+      "start_ch": 33,
+      "start_v": 21,
+      "end_ch": 33,
+      "end_v": 33
+    },
+    {
+      "title": "Contre les dirigeants d'Israël",
+      "start_ch": 34,
+      "start_v": 1,
+      "end_ch": 34,
+      "end_v": 16
+    },
+    {
+      "title": "Les brebis grasses écrasent les brebis maigres",
+      "start_ch": 34,
+      "start_v": 17,
+      "end_ch": 34,
+      "end_v": 31
+    },
+    {
+      "title": "Menaces contre les Édomites",
+      "start_ch": 35,
+      "start_v": 1,
+      "end_ch": 35,
+      "end_v": 15
+    },
+    {
+      "title": "Les Israélites reprendront possession de leur pays",
+      "start_ch": 36,
+      "start_v": 1,
+      "end_ch": 36,
+      "end_v": 15
+    },
+    {
+      "title": "Le Seigneur rassemblera les Israélites",
+      "start_ch": 36,
+      "start_v": 16,
+      "end_ch": 36,
+      "end_v": 38
+    },
+    {
+      "title": "Les ossements desséchés reprennent vie",
+      "start_ch": 37,
+      "start_v": 1,
+      "end_ch": 37,
+      "end_v": 14
+    },
+    {
+      "title": "Le Seigneur va rétablir l'unité",
+      "start_ch": 37,
+      "start_v": 15,
+      "end_ch": 37,
+      "end_v": 28
+    },
+    {
+      "title": "Menaces contre Gog",
+      "start_ch": 38,
+      "start_v": 1,
+      "end_ch": 38,
+      "end_v": 23
+    },
+    {
+      "title": "Nouvelles menaces contre Gog",
+      "start_ch": 39,
+      "start_v": 1,
+      "end_ch": 39,
+      "end_v": 22
+    },
+    {
+      "title": "Résumé du message d'Ézékiel",
+      "start_ch": 39,
+      "start_v": 23,
+      "end_ch": 39,
+      "end_v": 29
+    },
+    {
+      "title": "Introduction",
+      "start_ch": 40,
+      "start_v": 1,
+      "end_ch": 40,
+      "end_v": 4
+    },
+    {
+      "title": "La cour et les portes extérieures",
+      "start_ch": 40,
+      "start_v": 5,
+      "end_ch": 40,
+      "end_v": 27
+    },
+    {
+      "title": "La cour et les portes intérieures",
+      "start_ch": 40,
+      "start_v": 28,
+      "end_ch": 40,
+      "end_v": 46
+    },
+    {
+      "title": "Description du temple",
+      "start_ch": 40,
+      "start_v": 47,
+      "end_ch": 40,
+      "end_v": 49
+    },
+    {
+      "title": "Les bâtiments annexes",
+      "start_ch": 41,
+      "start_v": 5,
+      "end_ch": 41,
+      "end_v": 15
+    },
+    {
+      "title": "L'intérieur du temple",
+      "start_ch": 41,
+      "start_v": 16,
+      "end_ch": 41,
+      "end_v": 26
+    },
+    {
+      "title": "Les salles réservées aux prêtres",
+      "start_ch": 42,
+      "start_v": 1,
+      "end_ch": 42,
+      "end_v": 14
+    },
+    {
+      "title": "Les mesures du mur extérieur",
+      "start_ch": 42,
+      "start_v": 15,
+      "end_ch": 42,
+      "end_v": 20
+    },
+    {
+      "title": "Le Seigneur revient dans le temple de Jérusalem",
+      "start_ch": 43,
+      "start_v": 1,
+      "end_ch": 43,
+      "end_v": 12
+    },
+    {
+      "title": "L'autel et les sacrifices",
+      "start_ch": 43,
+      "start_v": 13,
+      "end_ch": 43,
+      "end_v": 27
+    },
+    {
+      "title": "La porte orientale est réservée au prince",
+      "start_ch": 44,
+      "start_v": 1,
+      "end_ch": 44,
+      "end_v": 3
+    },
+    {
+      "title": "Les conditions d'accès au temple",
+      "start_ch": 44,
+      "start_v": 4,
+      "end_ch": 44,
+      "end_v": 9
+    },
+    {
+      "title": "Les règles pour les lévites",
+      "start_ch": 44,
+      "start_v": 10,
+      "end_ch": 44,
+      "end_v": 14
+    },
+    {
+      "title": "Les règles pour les prêtres",
+      "start_ch": 44,
+      "start_v": 15,
+      "end_ch": 44,
+      "end_v": 31
+    },
+    {
+      "title": "Les territoires réservés",
+      "start_ch": 45,
+      "start_v": 1,
+      "end_ch": 45,
+      "end_v": 8
+    },
+    {
+      "title": "Les droits et les devoirs du prince",
+      "start_ch": 45,
+      "start_v": 9,
+      "end_ch": 45,
+      "end_v": 25
+    },
+    {
+      "title": "Les règles particulières concernant le prince",
+      "start_ch": 46,
+      "start_v": 1,
+      "end_ch": 46,
+      "end_v": 10
+    },
+    {
+      "title": "Les règles concernant les divers sacrifices",
+      "start_ch": 46,
+      "start_v": 11,
+      "end_ch": 46,
+      "end_v": 15
+    },
+    {
+      "title": "L'héritage des fils du prince",
+      "start_ch": 46,
+      "start_v": 16,
+      "end_ch": 46,
+      "end_v": 18
+    },
+    {
+      "title": "Les cuisines du temple",
+      "start_ch": 46,
+      "start_v": 19,
+      "end_ch": 46,
+      "end_v": 24
+    },
+    {
+      "title": "La source du temple",
+      "start_ch": 47,
+      "start_v": 1,
+      "end_ch": 47,
+      "end_v": 12
+    },
+    {
+      "title": "Le Seigneur fixe les frontières d'Israël",
+      "start_ch": 47,
+      "start_v": 13,
+      "end_ch": 47,
+      "end_v": 23
+    },
+    {
+      "title": "Les parts des tribus du nord",
+      "start_ch": 48,
+      "start_v": 1,
+      "end_ch": 48,
+      "end_v": 7
+    },
+    {
+      "title": "La part du Seigneur",
+      "start_ch": 48,
+      "start_v": 8,
+      "end_ch": 48,
+      "end_v": 14
+    },
+    {
+      "title": "Les parts de la ville et du prince",
+      "start_ch": 48,
+      "start_v": 15,
+      "end_ch": 48,
+      "end_v": 22
+    },
+    {
+      "title": "La part des tribus dans le sud",
+      "start_ch": 48,
+      "start_v": 23,
+      "end_ch": 48,
+      "end_v": 31
+    },
+    {
+      "title": "Les douze portes de Jérusalem",
+      "start_ch": 48,
+      "start_v": 32,
+      "end_ch": 48,
+      "end_v": 35
+    }
+  ]
 }

@@ -121,5 +121,65 @@
       "20": "mais nous savons aussi que le Fils de Dieu est venu et nous a donné l'intelligence pour connaître le vrai Dieu; et nous sommes unis au vrai Dieu si nous sommes unis à son Fils Jésus-Christ. C'est lui qui est le vrai Dieu et la vie éternelle.",
       "21": "Petits enfants, gardez-vous des idoles!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Introduction: la parole de la vie",
+    "1:5": "La vie dans la lumière",
+    "2:18": "Le retour du Seigneur et les antichrists",
+    "3:1": "Caractéristiques des enfants de Dieu",
+    "4:1": "Caractéristiques de l’Esprit de vérité",
+    "4:7": "L’amour de Dieu et l’amour mutuel",
+    "5:1": "La foi en Christ et ses effets"
+  },
+  "pericopes": [
+    {
+      "title": "Introduction: la parole de la vie",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 4
+    },
+    {
+      "title": "La vie dans la lumière",
+      "start_ch": 1,
+      "start_v": 5,
+      "end_ch": 1,
+      "end_v": 10
+    },
+    {
+      "title": "Le retour du Seigneur et les antichrists",
+      "start_ch": 2,
+      "start_v": 18,
+      "end_ch": 2,
+      "end_v": 29
+    },
+    {
+      "title": "Caractéristiques des enfants de Dieu",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 24
+    },
+    {
+      "title": "Caractéristiques de l’Esprit de vérité",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 6
+    },
+    {
+      "title": "L’amour de Dieu et l’amour mutuel",
+      "start_ch": 4,
+      "start_v": 7,
+      "end_ch": 4,
+      "end_v": 21
+    },
+    {
+      "title": "La foi en Christ et ses effets",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 21
+    }
+  ]
 }

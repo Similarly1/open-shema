@@ -335,5 +335,97 @@
       "24": "Saluez tous vos conducteurs ainsi que tous les saints. Ceux d'Italie vous saluent.",
       "25": "Que la grâce soit avec vous tous!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Christ supérieur aux anges",
+    "3:1": "Christ supérieur à Moïse et Josué",
+    "4:14": "Christ supérieur aux grands-prêtres lévitiques",
+    "7:1": "Supériorité de Melchisédek sur les Lévites",
+    "8:1": "Imperfection de l’ancienne alliance",
+    "9:1": "Le sanctuaire de la nouvelle alliance",
+    "10:1": "Le sacrifice de la nouvelle alliance",
+    "10:23": "Persévérer dans l’espérance",
+    "11:1": "Exemples de foi",
+    "12:1": "Persévérer dans la vie chrétienne",
+    "13:1": "Instructions diverses et salutations"
+  },
+  "pericopes": [
+    {
+      "title": "Christ supérieur aux anges",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 14
+    },
+    {
+      "title": "Christ supérieur à Moïse et Josué",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 19
+    },
+    {
+      "title": "Christ supérieur aux grands-prêtres lévitiques",
+      "start_ch": 4,
+      "start_v": 14,
+      "end_ch": 4,
+      "end_v": 16
+    },
+    {
+      "title": "Supériorité de Melchisédek sur les Lévites",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 28
+    },
+    {
+      "title": "Imperfection de l’ancienne alliance",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 13
+    },
+    {
+      "title": "Le sanctuaire de la nouvelle alliance",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 28
+    },
+    {
+      "title": "Le sacrifice de la nouvelle alliance",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 22
+    },
+    {
+      "title": "Persévérer dans l’espérance",
+      "start_ch": 10,
+      "start_v": 23,
+      "end_ch": 10,
+      "end_v": 39
+    },
+    {
+      "title": "Exemples de foi",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 40
+    },
+    {
+      "title": "Persévérer dans la vie chrétienne",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 29
+    },
+    {
+      "title": "Instructions diverses et salutations",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 25
+    }
+  ]
 }

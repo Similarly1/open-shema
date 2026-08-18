@@ -910,5 +910,513 @@
       "33": "Le propriétaire ne fera pas de choix entre les bêtes, bonnes ou mauvaises; s'il remplace tout de même une bête par une autre, les deux seront tenues pour mises à part pour le Seigneur, et il n'aura le droit de racheter ni l'une ni l'autre.»",
       "34": "Tels sont les commandements que le Seigneur a communiqués à Moïse, sur le mont Sinaï, à l'intention des Israélites."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Le sacrifice complet",
+    "2:1": "L'offrande végétale",
+    "3:1": "Le sacrifice de paix",
+    "4:1": "Le sacrifice pour obtenir le pardon",
+    "4:13": "b. Le sacrifice de toute la communauté",
+    "4:22": "c. Le sacrifice d'un chef",
+    "4:27": "d. Le sacrifice d'une seule personne",
+    "5:1": "e. Quelques exemples concrets",
+    "5:7": "f. Le sacrifice des pauvres",
+    "5:14": "Le sacrifice de réparation",
+    "6:1": "Prescriptions pour les prêtres",
+    "6:7": "b. L'offrande végétale",
+    "6:17": "c. Le sacrifice pour obtenir le pardon",
+    "7:1": "d. Le sacrifice de réparation",
+    "7:8": "e. Ce qui revient au prêtre",
+    "7:11": "f. Le sacrifice de paix",
+    "7:22": "Prescriptions à l'usage du peuple",
+    "8:1": "La cérémonie de l'onction pour Aaron et ses fils",
+    "9:1": "L'entrée en fonction d'Aaron et de ses fils",
+    "10:1": "Faute et châtiment de deux fils d'Aaron",
+    "10:8": "Les prêtres ne boivent pas de boissons alcoolisées",
+    "10:12": "Une part des offrandes revient aux prêtres",
+    "11:1": "Les animaux purs et les animaux impurs",
+    "11:24": "Les contacts qui rendent impur",
+    "12:1": "La purification de la femme après un accouchement",
+    "13:1": "Les maladies de la peau",
+    "13:47": "Les moisissures sur les vêtements",
+    "14:1": "La purification d'une personne qui est guérie de la lèpre",
+    "14:21": "La purification d'une personne lépreuse pauvre",
+    "14:33": "Les moisissures sur les murs d'une maison",
+    "15:1": "Les impuretés sexuelles de l'homme",
+    "15:19": "Les impuretés sexuelles de la femme",
+    "16:1": "Le jour du Grand pardon69",
+    "17:1": "Respecter le sang",
+    "18:1": "Respecter l'union conjugale",
+    "19:1": "Comment Dieu veut être servi",
+    "20:1": "Les cultes interdits",
+    "20:8": "Les relations sexuelles interdites",
+    "21:1": "Les prescriptions concernant les prêtres",
+    "21:10": "b. Les règles pour le grand-prêtre",
+    "21:16": "c. Ce qui empêche d'être prêtre",
+    "22:1": "d. La consommation des offrandes faites à Dieu",
+    "22:17": "Les règles pour choisir les animaux à sacrifier",
+    "23:1": "Le calendrier des fêtes d'Israël",
+    "23:5": "La Pâque et la fête des Pains sans levain",
+    "23:9": "La fête de la Première gerbe",
+    "23:15": "La fête des Moissons",
+    "23:23": "Le jour des Cris de joie",
+    "23:26": "Le jour du Grand pardon",
+    "23:33": "La fête des Tentes",
+    "24:1": "Le porte-lampes du sanctuaire",
+    "24:5": "Les pains offerts à Dieu",
+    "24:12": "La punition d'un homme qui a maudit Dieu",
+    "25:1": "L'année de repos pour le sol",
+    "25:8": "L'année de la libération",
+    "25:23": "Le droit de racheter des terres",
+    "25:35": "Les prêts aux pauvres",
+    "25:39": "Le droit de racheter des personnes",
+    "26:1": "Promesses de bénédictions",
+    "26:14": "Menaces de malédictions",
+    "26:40": "Dieu se souviendra de son alliance",
+    "27:1": "Précision pour les vœux",
+    "27:26": "Les diverses offrandes"
+  },
+  "pericopes": [
+    {
+      "title": "Le sacrifice complet",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 17
+    },
+    {
+      "title": "L'offrande végétale",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 16
+    },
+    {
+      "title": "Le sacrifice de paix",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 17
+    },
+    {
+      "title": "Le sacrifice pour obtenir le pardon",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 12
+    },
+    {
+      "title": "b. Le sacrifice de toute la communauté",
+      "start_ch": 4,
+      "start_v": 13,
+      "end_ch": 4,
+      "end_v": 21
+    },
+    {
+      "title": "c. Le sacrifice d'un chef",
+      "start_ch": 4,
+      "start_v": 22,
+      "end_ch": 4,
+      "end_v": 26
+    },
+    {
+      "title": "d. Le sacrifice d'une seule personne",
+      "start_ch": 4,
+      "start_v": 27,
+      "end_ch": 4,
+      "end_v": 35
+    },
+    {
+      "title": "e. Quelques exemples concrets",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 6
+    },
+    {
+      "title": "f. Le sacrifice des pauvres",
+      "start_ch": 5,
+      "start_v": 7,
+      "end_ch": 5,
+      "end_v": 13
+    },
+    {
+      "title": "Le sacrifice de réparation",
+      "start_ch": 5,
+      "start_v": 14,
+      "end_ch": 5,
+      "end_v": 26
+    },
+    {
+      "title": "Prescriptions pour les prêtres",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 6
+    },
+    {
+      "title": "b. L'offrande végétale",
+      "start_ch": 6,
+      "start_v": 7,
+      "end_ch": 6,
+      "end_v": 16
+    },
+    {
+      "title": "c. Le sacrifice pour obtenir le pardon",
+      "start_ch": 6,
+      "start_v": 17,
+      "end_ch": 6,
+      "end_v": 23
+    },
+    {
+      "title": "d. Le sacrifice de réparation",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 7
+    },
+    {
+      "title": "e. Ce qui revient au prêtre",
+      "start_ch": 7,
+      "start_v": 8,
+      "end_ch": 7,
+      "end_v": 10
+    },
+    {
+      "title": "f. Le sacrifice de paix",
+      "start_ch": 7,
+      "start_v": 11,
+      "end_ch": 7,
+      "end_v": 21
+    },
+    {
+      "title": "Prescriptions à l'usage du peuple",
+      "start_ch": 7,
+      "start_v": 22,
+      "end_ch": 7,
+      "end_v": 38
+    },
+    {
+      "title": "La cérémonie de l'onction pour Aaron et ses fils",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 36
+    },
+    {
+      "title": "L'entrée en fonction d'Aaron et de ses fils",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 24
+    },
+    {
+      "title": "Faute et châtiment de deux fils d'Aaron",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 7
+    },
+    {
+      "title": "Les prêtres ne boivent pas de boissons alcoolisées",
+      "start_ch": 10,
+      "start_v": 8,
+      "end_ch": 10,
+      "end_v": 11
+    },
+    {
+      "title": "Une part des offrandes revient aux prêtres",
+      "start_ch": 10,
+      "start_v": 12,
+      "end_ch": 10,
+      "end_v": 20
+    },
+    {
+      "title": "Les animaux purs et les animaux impurs",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 23
+    },
+    {
+      "title": "Les contacts qui rendent impur",
+      "start_ch": 11,
+      "start_v": 24,
+      "end_ch": 11,
+      "end_v": 47
+    },
+    {
+      "title": "La purification de la femme après un accouchement",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 8
+    },
+    {
+      "title": "Les maladies de la peau",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 46
+    },
+    {
+      "title": "Les moisissures sur les vêtements",
+      "start_ch": 13,
+      "start_v": 47,
+      "end_ch": 13,
+      "end_v": 59
+    },
+    {
+      "title": "La purification d'une personne qui est guérie de la lèpre",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 20
+    },
+    {
+      "title": "La purification d'une personne lépreuse pauvre",
+      "start_ch": 14,
+      "start_v": 21,
+      "end_ch": 14,
+      "end_v": 32
+    },
+    {
+      "title": "Les moisissures sur les murs d'une maison",
+      "start_ch": 14,
+      "start_v": 33,
+      "end_ch": 14,
+      "end_v": 57
+    },
+    {
+      "title": "Les impuretés sexuelles de l'homme",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 18
+    },
+    {
+      "title": "Les impuretés sexuelles de la femme",
+      "start_ch": 15,
+      "start_v": 19,
+      "end_ch": 15,
+      "end_v": 33
+    },
+    {
+      "title": "Le jour du Grand pardon69",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 34
+    },
+    {
+      "title": "Respecter le sang",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 16
+    },
+    {
+      "title": "Respecter l'union conjugale",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 30
+    },
+    {
+      "title": "Comment Dieu veut être servi",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 37
+    },
+    {
+      "title": "Les cultes interdits",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 7
+    },
+    {
+      "title": "Les relations sexuelles interdites",
+      "start_ch": 20,
+      "start_v": 8,
+      "end_ch": 20,
+      "end_v": 27
+    },
+    {
+      "title": "Les prescriptions concernant les prêtres",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 9
+    },
+    {
+      "title": "b. Les règles pour le grand-prêtre",
+      "start_ch": 21,
+      "start_v": 10,
+      "end_ch": 21,
+      "end_v": 15
+    },
+    {
+      "title": "c. Ce qui empêche d'être prêtre",
+      "start_ch": 21,
+      "start_v": 16,
+      "end_ch": 21,
+      "end_v": 24
+    },
+    {
+      "title": "d. La consommation des offrandes faites à Dieu",
+      "start_ch": 22,
+      "start_v": 1,
+      "end_ch": 22,
+      "end_v": 16
+    },
+    {
+      "title": "Les règles pour choisir les animaux à sacrifier",
+      "start_ch": 22,
+      "start_v": 17,
+      "end_ch": 22,
+      "end_v": 33
+    },
+    {
+      "title": "Le calendrier des fêtes d'Israël",
+      "start_ch": 23,
+      "start_v": 1,
+      "end_ch": 23,
+      "end_v": 4
+    },
+    {
+      "title": "La Pâque et la fête des Pains sans levain",
+      "start_ch": 23,
+      "start_v": 5,
+      "end_ch": 23,
+      "end_v": 8
+    },
+    {
+      "title": "La fête de la Première gerbe",
+      "start_ch": 23,
+      "start_v": 9,
+      "end_ch": 23,
+      "end_v": 14
+    },
+    {
+      "title": "La fête des Moissons",
+      "start_ch": 23,
+      "start_v": 15,
+      "end_ch": 23,
+      "end_v": 22
+    },
+    {
+      "title": "Le jour des Cris de joie",
+      "start_ch": 23,
+      "start_v": 23,
+      "end_ch": 23,
+      "end_v": 25
+    },
+    {
+      "title": "Le jour du Grand pardon",
+      "start_ch": 23,
+      "start_v": 26,
+      "end_ch": 23,
+      "end_v": 32
+    },
+    {
+      "title": "La fête des Tentes",
+      "start_ch": 23,
+      "start_v": 33,
+      "end_ch": 23,
+      "end_v": 44
+    },
+    {
+      "title": "Le porte-lampes du sanctuaire",
+      "start_ch": 24,
+      "start_v": 1,
+      "end_ch": 24,
+      "end_v": 4
+    },
+    {
+      "title": "Les pains offerts à Dieu",
+      "start_ch": 24,
+      "start_v": 5,
+      "end_ch": 24,
+      "end_v": 11
+    },
+    {
+      "title": "La punition d'un homme qui a maudit Dieu",
+      "start_ch": 24,
+      "start_v": 12,
+      "end_ch": 24,
+      "end_v": 23
+    },
+    {
+      "title": "L'année de repos pour le sol",
+      "start_ch": 25,
+      "start_v": 1,
+      "end_ch": 25,
+      "end_v": 7
+    },
+    {
+      "title": "L'année de la libération",
+      "start_ch": 25,
+      "start_v": 8,
+      "end_ch": 25,
+      "end_v": 22
+    },
+    {
+      "title": "Le droit de racheter des terres",
+      "start_ch": 25,
+      "start_v": 23,
+      "end_ch": 25,
+      "end_v": 34
+    },
+    {
+      "title": "Les prêts aux pauvres",
+      "start_ch": 25,
+      "start_v": 35,
+      "end_ch": 25,
+      "end_v": 38
+    },
+    {
+      "title": "Le droit de racheter des personnes",
+      "start_ch": 25,
+      "start_v": 39,
+      "end_ch": 25,
+      "end_v": 55
+    },
+    {
+      "title": "Promesses de bénédictions",
+      "start_ch": 26,
+      "start_v": 1,
+      "end_ch": 26,
+      "end_v": 13
+    },
+    {
+      "title": "Menaces de malédictions",
+      "start_ch": 26,
+      "start_v": 14,
+      "end_ch": 26,
+      "end_v": 39
+    },
+    {
+      "title": "Dieu se souviendra de son alliance",
+      "start_ch": 26,
+      "start_v": 40,
+      "end_ch": 26,
+      "end_v": 46
+    },
+    {
+      "title": "Précision pour les vœux",
+      "start_ch": 27,
+      "start_v": 1,
+      "end_ch": 27,
+      "end_v": 25
+    },
+    {
+      "title": "Les diverses offrandes",
+      "start_ch": 27,
+      "start_v": 26,
+      "end_ch": 27,
+      "end_v": 34
+    }
+  ]
 }

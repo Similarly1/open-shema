@@ -983,5 +983,89 @@
       "30": "La grâce trompe, la beauté ne dure pas. La femme qui craint le SEIGNEUR, voilà celle qu’on doit louer. Taw",
       "31": "A elle le fruit de son travail et que ses œuvres publient sa louange."
     }
-  }
+  },
+  "sections": {
+    "1:1": "PROPOS DU LIVRE",
+    "1:8": "I. PREMIER LIVRET",
+    "10:1": "II. PREMIER RECUEIL SALOMONIEN",
+    "22:17": "III. PREMIER LIVRET DES SAGES",
+    "24:23": "IV. DEUXIÈME RECUEIL DES SAGES",
+    "25:1": "V. DEUXIÈME RECUEIL SALOMONIEN",
+    "30:1": "VI. PAROLES D’AGOUR",
+    "30:15": "VII. PROVERBES NUMÉRIQUES",
+    "31:1": "VIII. PAROLES DE LEMOUËL",
+    "31:10": "IX. UNE FEMME DE VALEUR"
+  },
+  "pericopes": [
+    {
+      "title": "PROPOS DU LIVRE",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 7
+    },
+    {
+      "title": "I. PREMIER LIVRET",
+      "start_ch": 1,
+      "start_v": 8,
+      "end_ch": 1,
+      "end_v": 33
+    },
+    {
+      "title": "II. PREMIER RECUEIL SALOMONIEN",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 32
+    },
+    {
+      "title": "III. PREMIER LIVRET DES SAGES",
+      "start_ch": 22,
+      "start_v": 17,
+      "end_ch": 22,
+      "end_v": 29
+    },
+    {
+      "title": "IV. DEUXIÈME RECUEIL DES SAGES",
+      "start_ch": 24,
+      "start_v": 23,
+      "end_ch": 24,
+      "end_v": 34
+    },
+    {
+      "title": "V. DEUXIÈME RECUEIL SALOMONIEN",
+      "start_ch": 25,
+      "start_v": 1,
+      "end_ch": 25,
+      "end_v": 28
+    },
+    {
+      "title": "VI. PAROLES D’AGOUR",
+      "start_ch": 30,
+      "start_v": 1,
+      "end_ch": 30,
+      "end_v": 14
+    },
+    {
+      "title": "VII. PROVERBES NUMÉRIQUES",
+      "start_ch": 30,
+      "start_v": 15,
+      "end_ch": 30,
+      "end_v": 33
+    },
+    {
+      "title": "VIII. PAROLES DE LEMOUËL",
+      "start_ch": 31,
+      "start_v": 1,
+      "end_ch": 31,
+      "end_v": 9
+    },
+    {
+      "title": "IX. UNE FEMME DE VALEUR",
+      "start_ch": 31,
+      "start_v": 10,
+      "end_ch": 31,
+      "end_v": 31
+    }
+  ]
 }

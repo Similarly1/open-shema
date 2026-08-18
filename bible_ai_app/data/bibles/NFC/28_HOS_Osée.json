@@ -231,5 +231,193 @@
       "9": "Éfraïm, qu'ai-je de commun avec les idoles? Moi, je réponds à ta prière et je ne te quitte pas des yeux. Je suis comme un cyprès, un arbre toujours vert. C'est moi qui te fournis tes récoltes.»",
       "10": "Qui est assez sage pour comprendre ces paroles? S'il y a quelqu'un d'avisé, il en connaîtra le sens. Le Seigneur, en effet, trace des chemins sans détour. Les personnes qui sont justes y marcheront, mais les rebelles y perdront l'équilibre."
     }
-  }
+  },
+  "sections": {
+    "1:2": "Le surprenant mariage du prophète Osée",
+    "2:1": "L'autre jour de Jizréel",
+    "2:4": "Israël, une prostituée qui se cherche des clients",
+    "2:10": "Israël sera entièrement dépouillée",
+    "2:16": "Israël sera réconciliée avec elle-même et avec Dieu",
+    "3:1": "Nouvelle union, nouvelle promesse",
+    "4:1": "Dieu est en procès contre son peuple",
+    "5:1": "Israël dans une impasse",
+    "5:8": "Éfraïm et Juda sont deux ennemis renvoyés dos à dos",
+    "6:1": "Le prophète encourage son peuple",
+    "6:7": "Le Seigneur dénonce la trahison d'Éfraïm",
+    "7:2": "Témoignage de ce qui se passe en Israël",
+    "8:1": "Ils ont semé le vent, ils récolteront la tempête",
+    "9:1": "L'exil se profile à l'horizon",
+    "9:7": "Celui qui veille, c'est le prophète",
+    "9:10": "Depuis longtemps Israël a déçu le Seigneur",
+    "10:1": "La fin d'un monde",
+    "10:9": "Israël récoltera ce qu'il a semé",
+    "11:1": "L'amour de Dieu est déçu mais victorieux",
+    "12:1": "Trahison d'Israël",
+    "12:4": "Israël a pour ancêtre Jacob le trompeur",
+    "13:1": "Le peuple qui avait oublié son Dieu",
+    "14:2": "Quand Israël reviendra vers son Dieu"
+  },
+  "pericopes": [
+    {
+      "title": "Le surprenant mariage du prophète Osée",
+      "start_ch": 1,
+      "start_v": 2,
+      "end_ch": 1,
+      "end_v": 9
+    },
+    {
+      "title": "L'autre jour de Jizréel",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 3
+    },
+    {
+      "title": "Israël, une prostituée qui se cherche des clients",
+      "start_ch": 2,
+      "start_v": 4,
+      "end_ch": 2,
+      "end_v": 9
+    },
+    {
+      "title": "Israël sera entièrement dépouillée",
+      "start_ch": 2,
+      "start_v": 10,
+      "end_ch": 2,
+      "end_v": 15
+    },
+    {
+      "title": "Israël sera réconciliée avec elle-même et avec Dieu",
+      "start_ch": 2,
+      "start_v": 16,
+      "end_ch": 2,
+      "end_v": 25
+    },
+    {
+      "title": "Nouvelle union, nouvelle promesse",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 5
+    },
+    {
+      "title": "Dieu est en procès contre son peuple",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 19
+    },
+    {
+      "title": "Israël dans une impasse",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 7
+    },
+    {
+      "title": "Éfraïm et Juda sont deux ennemis renvoyés dos à dos",
+      "start_ch": 5,
+      "start_v": 8,
+      "end_ch": 5,
+      "end_v": 15
+    },
+    {
+      "title": "Le prophète encourage son peuple",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 6
+    },
+    {
+      "title": "Le Seigneur dénonce la trahison d'Éfraïm",
+      "start_ch": 6,
+      "start_v": 7,
+      "end_ch": 6,
+      "end_v": 11
+    },
+    {
+      "title": "Témoignage de ce qui se passe en Israël",
+      "start_ch": 7,
+      "start_v": 2,
+      "end_ch": 7,
+      "end_v": 16
+    },
+    {
+      "title": "Ils ont semé le vent, ils récolteront la tempête",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 14
+    },
+    {
+      "title": "L'exil se profile à l'horizon",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 6
+    },
+    {
+      "title": "Celui qui veille, c'est le prophète",
+      "start_ch": 9,
+      "start_v": 7,
+      "end_ch": 9,
+      "end_v": 9
+    },
+    {
+      "title": "Depuis longtemps Israël a déçu le Seigneur",
+      "start_ch": 9,
+      "start_v": 10,
+      "end_ch": 9,
+      "end_v": 17
+    },
+    {
+      "title": "La fin d'un monde",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 8
+    },
+    {
+      "title": "Israël récoltera ce qu'il a semé",
+      "start_ch": 10,
+      "start_v": 9,
+      "end_ch": 10,
+      "end_v": 15
+    },
+    {
+      "title": "L'amour de Dieu est déçu mais victorieux",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 11
+    },
+    {
+      "title": "Trahison d'Israël",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 3
+    },
+    {
+      "title": "Israël a pour ancêtre Jacob le trompeur",
+      "start_ch": 12,
+      "start_v": 4,
+      "end_ch": 12,
+      "end_v": 15
+    },
+    {
+      "title": "Le peuple qui avait oublié son Dieu",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 15
+    },
+    {
+      "title": "Quand Israël reviendra vers son Dieu",
+      "start_ch": 14,
+      "start_v": 2,
+      "end_ch": 14,
+      "end_v": 10
+    }
+  ]
 }

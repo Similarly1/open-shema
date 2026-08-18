@@ -871,5 +871,417 @@
       "12": "Les hommes les plus courageux de la ville se mirent en route et marchèrent durant toute la nuit jusqu'à Beth-Chéan; ils détachèrent le cadavre de Saül et ceux de ses fils de la muraille de la ville, puis ils rentrèrent à Yabech. Là, ils les brûlèrent.",
       "13": "Ils rassemblèrent ensuite leurs ossements, les enterrèrent sous un arbre, le tamaris de Yabech, et ils jeûnèrent pendant sept jours."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Anne demande un fils au Seigneur",
+    "1:20": "La naissance et l'enfance de Samuel",
+    "2:1": "Anne remercie le Seigneur",
+    "2:12": "Les fils d'Héli offensent le Seigneur",
+    "2:19": "Anne a d'autres enfants",
+    "2:22": "Héli adresse des reproches à ses fils",
+    "2:27": "Dieu annonce qu'il punira la famille d'Héli",
+    "3:2": "Dieu établit Samuel comme prophète",
+    "4:2": "Le coffre de l'alliance aux mains des ennemis",
+    "4:12": "Mort du prêtre Héli et de sa belle-fille",
+    "5:1": "Le coffre de l'alliance répand la panique chez les Philistins",
+    "6:1": "Les Philistins renvoient le coffre de l'alliance en Israël",
+    "7:2": "Samuel est chef d'Israël. Les Philistins sont vaincus",
+    "8:1": "Les Israélites demandent un roi",
+    "8:10": "Ce que le roi aura le droit de faire",
+    "9:1": "Saül recherche les ânesses perdues",
+    "9:14": "Saül rencontre Samuel",
+    "9:26": "Samuel choisit Saül comme roi d'Israël",
+    "10:17": "Saül est désigné roi par le tirage au sort",
+    "11:1": "Saül remporte une victoire sur les Ammonites",
+    "12:1": "Dernier discours de Samuel aux Israélites",
+    "13:2": "Saül se révolte contre les Philistins et commet une faute",
+    "14:1": "Jonatan attaque un groupe de Philistins",
+    "14:24": "Les soldats israélites sauvent Jonatan",
+    "14:47": "Les victoires de Saül. Sa famille",
+    "15:1": "Dieu rejette Saül qui a commis une faute",
+    "16:1": "Dieu choisit David comme nouveau roi",
+    "17:1": "David combat Goliath",
+    "17:55": "Jonatan conclut un pacte d'amitié avec David",
+    "18:6": "Saül essaie de tuer David",
+    "18:17": "David épouse Mikal, fille de Saül",
+    "19:1": "Jonatan défend David contre Saül",
+    "19:8": "David est sauvé par Mikal",
+    "19:18": "Saül poursuit David à Nayoth",
+    "20:1": "Jonatan protège David",
+    "21:2": "Ahimélek, le prêtre de Nob, accueille David",
+    "21:11": "David s'enfuit chez les Philistins de Gath",
+    "22:1": "David devient chef de bande",
+    "22:6": "Saül fait massacrer les prêtres de Nob",
+    "23:19": "Saül poursuit David",
+    "24:1": "David refuse de tuer Saül",
+    "25:1": "Nabal refuse d'aider David",
+    "25:14": "Abigaïl, femme de Nabal, aide David",
+    "25:36": "Mort de Nabal. David épouse Abigaïl",
+    "26:1": "David épargne de nouveau Saül",
+    "27:1": "David se réfugie chez les Philistins",
+    "28:3": "Saül consulte la sorcière d'En-Dor",
+    "29:1": "Les Philistins renvoient David",
+    "30:1": "Siclag est pillée. David poursuit les Amalécites",
+    "30:16": "Les Amalécites sont battus par David",
+    "31:1": "La mort du roi Saül"
+  },
+  "pericopes": [
+    {
+      "title": "Anne demande un fils au Seigneur",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 19
+    },
+    {
+      "title": "La naissance et l'enfance de Samuel",
+      "start_ch": 1,
+      "start_v": 20,
+      "end_ch": 1,
+      "end_v": 28
+    },
+    {
+      "title": "Anne remercie le Seigneur",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 11
+    },
+    {
+      "title": "Les fils d'Héli offensent le Seigneur",
+      "start_ch": 2,
+      "start_v": 12,
+      "end_ch": 2,
+      "end_v": 18
+    },
+    {
+      "title": "Anne a d'autres enfants",
+      "start_ch": 2,
+      "start_v": 19,
+      "end_ch": 2,
+      "end_v": 21
+    },
+    {
+      "title": "Héli adresse des reproches à ses fils",
+      "start_ch": 2,
+      "start_v": 22,
+      "end_ch": 2,
+      "end_v": 26
+    },
+    {
+      "title": "Dieu annonce qu'il punira la famille d'Héli",
+      "start_ch": 2,
+      "start_v": 27,
+      "end_ch": 2,
+      "end_v": 36
+    },
+    {
+      "title": "Dieu établit Samuel comme prophète",
+      "start_ch": 3,
+      "start_v": 2,
+      "end_ch": 3,
+      "end_v": 21
+    },
+    {
+      "title": "Le coffre de l'alliance aux mains des ennemis",
+      "start_ch": 4,
+      "start_v": 2,
+      "end_ch": 4,
+      "end_v": 11
+    },
+    {
+      "title": "Mort du prêtre Héli et de sa belle-fille",
+      "start_ch": 4,
+      "start_v": 12,
+      "end_ch": 4,
+      "end_v": 22
+    },
+    {
+      "title": "Le coffre de l'alliance répand la panique chez les Philistins",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 12
+    },
+    {
+      "title": "Les Philistins renvoient le coffre de l'alliance en Israël",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 21
+    },
+    {
+      "title": "Samuel est chef d'Israël. Les Philistins sont vaincus",
+      "start_ch": 7,
+      "start_v": 2,
+      "end_ch": 7,
+      "end_v": 17
+    },
+    {
+      "title": "Les Israélites demandent un roi",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 9
+    },
+    {
+      "title": "Ce que le roi aura le droit de faire",
+      "start_ch": 8,
+      "start_v": 10,
+      "end_ch": 8,
+      "end_v": 22
+    },
+    {
+      "title": "Saül recherche les ânesses perdues",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 13
+    },
+    {
+      "title": "Saül rencontre Samuel",
+      "start_ch": 9,
+      "start_v": 14,
+      "end_ch": 9,
+      "end_v": 25
+    },
+    {
+      "title": "Samuel choisit Saül comme roi d'Israël",
+      "start_ch": 9,
+      "start_v": 26,
+      "end_ch": 9,
+      "end_v": 27
+    },
+    {
+      "title": "Saül est désigné roi par le tirage au sort",
+      "start_ch": 10,
+      "start_v": 17,
+      "end_ch": 10,
+      "end_v": 27
+    },
+    {
+      "title": "Saül remporte une victoire sur les Ammonites",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 15
+    },
+    {
+      "title": "Dernier discours de Samuel aux Israélites",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 25
+    },
+    {
+      "title": "Saül se révolte contre les Philistins et commet une faute",
+      "start_ch": 13,
+      "start_v": 2,
+      "end_ch": 13,
+      "end_v": 23
+    },
+    {
+      "title": "Jonatan attaque un groupe de Philistins",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 23
+    },
+    {
+      "title": "Les soldats israélites sauvent Jonatan",
+      "start_ch": 14,
+      "start_v": 24,
+      "end_ch": 14,
+      "end_v": 46
+    },
+    {
+      "title": "Les victoires de Saül. Sa famille",
+      "start_ch": 14,
+      "start_v": 47,
+      "end_ch": 14,
+      "end_v": 52
+    },
+    {
+      "title": "Dieu rejette Saül qui a commis une faute",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 35
+    },
+    {
+      "title": "Dieu choisit David comme nouveau roi",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 23
+    },
+    {
+      "title": "David combat Goliath",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 54
+    },
+    {
+      "title": "Jonatan conclut un pacte d'amitié avec David",
+      "start_ch": 17,
+      "start_v": 55,
+      "end_ch": 17,
+      "end_v": 58
+    },
+    {
+      "title": "Saül essaie de tuer David",
+      "start_ch": 18,
+      "start_v": 6,
+      "end_ch": 18,
+      "end_v": 16
+    },
+    {
+      "title": "David épouse Mikal, fille de Saül",
+      "start_ch": 18,
+      "start_v": 17,
+      "end_ch": 18,
+      "end_v": 30
+    },
+    {
+      "title": "Jonatan défend David contre Saül",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 7
+    },
+    {
+      "title": "David est sauvé par Mikal",
+      "start_ch": 19,
+      "start_v": 8,
+      "end_ch": 19,
+      "end_v": 17
+    },
+    {
+      "title": "Saül poursuit David à Nayoth",
+      "start_ch": 19,
+      "start_v": 18,
+      "end_ch": 19,
+      "end_v": 24
+    },
+    {
+      "title": "Jonatan protège David",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 42
+    },
+    {
+      "title": "Ahimélek, le prêtre de Nob, accueille David",
+      "start_ch": 21,
+      "start_v": 2,
+      "end_ch": 21,
+      "end_v": 10
+    },
+    {
+      "title": "David s'enfuit chez les Philistins de Gath",
+      "start_ch": 21,
+      "start_v": 11,
+      "end_ch": 21,
+      "end_v": 16
+    },
+    {
+      "title": "David devient chef de bande",
+      "start_ch": 22,
+      "start_v": 1,
+      "end_ch": 22,
+      "end_v": 5
+    },
+    {
+      "title": "Saül fait massacrer les prêtres de Nob",
+      "start_ch": 22,
+      "start_v": 6,
+      "end_ch": 22,
+      "end_v": 23
+    },
+    {
+      "title": "Saül poursuit David",
+      "start_ch": 23,
+      "start_v": 19,
+      "end_ch": 23,
+      "end_v": 28
+    },
+    {
+      "title": "David refuse de tuer Saül",
+      "start_ch": 24,
+      "start_v": 1,
+      "end_ch": 24,
+      "end_v": 23
+    },
+    {
+      "title": "Nabal refuse d'aider David",
+      "start_ch": 25,
+      "start_v": 1,
+      "end_ch": 25,
+      "end_v": 13
+    },
+    {
+      "title": "Abigaïl, femme de Nabal, aide David",
+      "start_ch": 25,
+      "start_v": 14,
+      "end_ch": 25,
+      "end_v": 35
+    },
+    {
+      "title": "Mort de Nabal. David épouse Abigaïl",
+      "start_ch": 25,
+      "start_v": 36,
+      "end_ch": 25,
+      "end_v": 44
+    },
+    {
+      "title": "David épargne de nouveau Saül",
+      "start_ch": 26,
+      "start_v": 1,
+      "end_ch": 26,
+      "end_v": 25
+    },
+    {
+      "title": "David se réfugie chez les Philistins",
+      "start_ch": 27,
+      "start_v": 1,
+      "end_ch": 27,
+      "end_v": 12
+    },
+    {
+      "title": "Saül consulte la sorcière d'En-Dor",
+      "start_ch": 28,
+      "start_v": 3,
+      "end_ch": 28,
+      "end_v": 25
+    },
+    {
+      "title": "Les Philistins renvoient David",
+      "start_ch": 29,
+      "start_v": 1,
+      "end_ch": 29,
+      "end_v": 11
+    },
+    {
+      "title": "Siclag est pillée. David poursuit les Amalécites",
+      "start_ch": 30,
+      "start_v": 1,
+      "end_ch": 30,
+      "end_v": 15
+    },
+    {
+      "title": "Les Amalécites sont battus par David",
+      "start_ch": 30,
+      "start_v": 16,
+      "end_ch": 30,
+      "end_v": 31
+    },
+    {
+      "title": "La mort du roi Saül",
+      "start_ch": 31,
+      "start_v": 1,
+      "end_ch": 31,
+      "end_v": 13
+    }
+  ]
 }

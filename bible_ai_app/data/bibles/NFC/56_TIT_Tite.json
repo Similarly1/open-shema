@@ -58,5 +58,57 @@
       "14": "Il faut que les nôtres aussi apprennent à être les premiers à faire ce qui est bien, afin de répondre aux nécessités urgentes et de ne pas mener une vie inutile.",
       "15": "Tous ceux qui sont avec moi t'adressent leurs salutations. Salue nos amis dans la foi. Que la grâce de Dieu soit avec vous tous!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Salutation",
+    "1:5": "La mission de Tite en Crète",
+    "2:1": "Les conséquences pratiques d'un enseignement véritable",
+    "2:11": "La grâce de Dieu a été révélée",
+    "3:1": "Dieu nous fait naître à une vie nouvelle",
+    "3:12": "Dernières recommandations"
+  },
+  "pericopes": [
+    {
+      "title": "Salutation",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 4
+    },
+    {
+      "title": "La mission de Tite en Crète",
+      "start_ch": 1,
+      "start_v": 5,
+      "end_ch": 1,
+      "end_v": 16
+    },
+    {
+      "title": "Les conséquences pratiques d'un enseignement véritable",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 10
+    },
+    {
+      "title": "La grâce de Dieu a été révélée",
+      "start_ch": 2,
+      "start_v": 11,
+      "end_ch": 2,
+      "end_v": 15
+    },
+    {
+      "title": "Dieu nous fait naître à une vie nouvelle",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 11
+    },
+    {
+      "title": "Dernières recommandations",
+      "start_ch": 3,
+      "start_v": 12,
+      "end_ch": 3,
+      "end_v": 15
+    }
+  ]
 }

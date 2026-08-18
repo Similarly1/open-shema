@@ -125,5 +125,153 @@
       "19": "De nouveau tu nous manifesteras ton amour, tu ne tiendras pas compte de nos fautes, tu jetteras nos péchés au fond de la mer.",
       "20": "Tu manifesteras ta fidélité aux descendants de Jacob et ta bonté aux descendants d'Abraham, comme tu l'as promis autrefois à nos ancêtres."
     }
-  }
+  },
+  "sections": {
+    "1:2": "Le Seigneur accuse son peuple",
+    "1:8": "Le malheur atteint Jérusalem",
+    "2:1": "Ceux qui abusent de leur pouvoir",
+    "2:6": "Ceux qui contestent le message du prophète",
+    "3:1": "Le prophète avertit les dirigeants d'Israël",
+    "3:5": "Le Seigneur avertit les prophètes qui trompent le peuple",
+    "3:9": "Michée annonce la ruine de Jérusalem",
+    "4:1": "Jérusalem sera la capitale de la paix",
+    "4:6": "Le Seigneur, roi à Jérusalem",
+    "4:9": "Épreuves et délivrance de Jérusalem",
+    "5:1": "De Bethléem viendra le roi sauveur",
+    "5:6": "Les survivants d'Israël au milieu d'autres peuples",
+    "5:9": "Le Seigneur supprimera tous les faux appuis",
+    "6:1": "Le Seigneur accuse son peuple",
+    "6:6": "Ce que le Seigneur exige des humains",
+    "6:9": "Le Seigneur punira la fraude et la violence",
+    "7:1": "Le prophète se lamente",
+    "7:8": "Le peuple prie avec espérance"
+  },
+  "pericopes": [
+    {
+      "title": "Le Seigneur accuse son peuple",
+      "start_ch": 1,
+      "start_v": 2,
+      "end_ch": 1,
+      "end_v": 7
+    },
+    {
+      "title": "Le malheur atteint Jérusalem",
+      "start_ch": 1,
+      "start_v": 8,
+      "end_ch": 1,
+      "end_v": 16
+    },
+    {
+      "title": "Ceux qui abusent de leur pouvoir",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 5
+    },
+    {
+      "title": "Ceux qui contestent le message du prophète",
+      "start_ch": 2,
+      "start_v": 6,
+      "end_ch": 2,
+      "end_v": 13
+    },
+    {
+      "title": "Le prophète avertit les dirigeants d'Israël",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 4
+    },
+    {
+      "title": "Le Seigneur avertit les prophètes qui trompent le peuple",
+      "start_ch": 3,
+      "start_v": 5,
+      "end_ch": 3,
+      "end_v": 8
+    },
+    {
+      "title": "Michée annonce la ruine de Jérusalem",
+      "start_ch": 3,
+      "start_v": 9,
+      "end_ch": 3,
+      "end_v": 12
+    },
+    {
+      "title": "Jérusalem sera la capitale de la paix",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 5
+    },
+    {
+      "title": "Le Seigneur, roi à Jérusalem",
+      "start_ch": 4,
+      "start_v": 6,
+      "end_ch": 4,
+      "end_v": 8
+    },
+    {
+      "title": "Épreuves et délivrance de Jérusalem",
+      "start_ch": 4,
+      "start_v": 9,
+      "end_ch": 4,
+      "end_v": 14
+    },
+    {
+      "title": "De Bethléem viendra le roi sauveur",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 5
+    },
+    {
+      "title": "Les survivants d'Israël au milieu d'autres peuples",
+      "start_ch": 5,
+      "start_v": 6,
+      "end_ch": 5,
+      "end_v": 8
+    },
+    {
+      "title": "Le Seigneur supprimera tous les faux appuis",
+      "start_ch": 5,
+      "start_v": 9,
+      "end_ch": 5,
+      "end_v": 14
+    },
+    {
+      "title": "Le Seigneur accuse son peuple",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 5
+    },
+    {
+      "title": "Ce que le Seigneur exige des humains",
+      "start_ch": 6,
+      "start_v": 6,
+      "end_ch": 6,
+      "end_v": 8
+    },
+    {
+      "title": "Le Seigneur punira la fraude et la violence",
+      "start_ch": 6,
+      "start_v": 9,
+      "end_ch": 6,
+      "end_v": 16
+    },
+    {
+      "title": "Le prophète se lamente",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 7
+    },
+    {
+      "title": "Le peuple prie avec espérance",
+      "start_ch": 7,
+      "start_v": 8,
+      "end_ch": 7,
+      "end_v": 20
+    }
+  ]
 }

@@ -383,5 +383,225 @@
       "12": "Heureux celui qui attendra et parviendra à 1 335 jours.",
       "13": "Toi, Daniel, tiens jusqu'à la fin! Alors tu auras du repos, et tu te relèveras pour recevoir ta récompense à la fin des jours.”»"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Daniel et ses compagnons à Babylone",
+    "2:1": "Nabucodonosor fait un premier rêve",
+    "2:14": "Dieu révèle à Daniel le rêve du roi",
+    "2:26": "La statue aux pieds fragiles",
+    "3:1": "Le roi ordonne d'adorer la statue d'or",
+    "3:8": "Les amis de Daniel restent fidèles à Dieu",
+    "3:24": "Les trois amis sont sauvés de la fournaise",
+    "3:31": "Le second rêve du roi&#160;: le grand arbre",
+    "4:16": "Daniel explique le rêve du roi",
+    "4:25": "Le rêve se réalise",
+    "4:31": "Le roi Nabucodonosor guérit",
+    "5:1": "Le banquet du roi Belshassar",
+    "5:10": "Daniel interprète l'inscription mystérieuse",
+    "6:2": "Les ennemis de Daniel lui tendent un piège",
+    "6:11": "Daniel est jeté dans la fosse aux lions",
+    "6:20": "Daniel sort sain et sauf de la fosse aux lions",
+    "7:1": "La première vision de Daniel&#160;: les quatre bêtes",
+    "7:9": "Le jugement de Dieu",
+    "7:15": "L'interprétation de la première vision",
+    "8:1": "La deuxième vision&#160;: le bélier et le bouc",
+    "8:15": "L'interprétation de la deuxième vision",
+    "9:3": "La prière de Daniel",
+    "9:20": "Gabriel explique à Daniel le sens des soixante-dix périodes",
+    "10:1": "La troisième vision&#160;: l'homme vêtu de lin",
+    "11:3": "La guerre entre les rois du Nord et du Sud89",
+    "12:1": "Le temps d'angoisse et le retour à la vie",
+    "12:5": "Encouragement à résister jusqu'au bout"
+  },
+  "pericopes": [
+    {
+      "title": "Daniel et ses compagnons à Babylone",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 21
+    },
+    {
+      "title": "Nabucodonosor fait un premier rêve",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 13
+    },
+    {
+      "title": "Dieu révèle à Daniel le rêve du roi",
+      "start_ch": 2,
+      "start_v": 14,
+      "end_ch": 2,
+      "end_v": 25
+    },
+    {
+      "title": "La statue aux pieds fragiles",
+      "start_ch": 2,
+      "start_v": 26,
+      "end_ch": 2,
+      "end_v": 49
+    },
+    {
+      "title": "Le roi ordonne d'adorer la statue d'or",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 7
+    },
+    {
+      "title": "Les amis de Daniel restent fidèles à Dieu",
+      "start_ch": 3,
+      "start_v": 8,
+      "end_ch": 3,
+      "end_v": 23
+    },
+    {
+      "title": "Les trois amis sont sauvés de la fournaise",
+      "start_ch": 3,
+      "start_v": 24,
+      "end_ch": 3,
+      "end_v": 30
+    },
+    {
+      "title": "Le second rêve du roi&#160;: le grand arbre",
+      "start_ch": 3,
+      "start_v": 31,
+      "end_ch": 3,
+      "end_v": 33
+    },
+    {
+      "title": "Daniel explique le rêve du roi",
+      "start_ch": 4,
+      "start_v": 16,
+      "end_ch": 4,
+      "end_v": 24
+    },
+    {
+      "title": "Le rêve se réalise",
+      "start_ch": 4,
+      "start_v": 25,
+      "end_ch": 4,
+      "end_v": 30
+    },
+    {
+      "title": "Le roi Nabucodonosor guérit",
+      "start_ch": 4,
+      "start_v": 31,
+      "end_ch": 4,
+      "end_v": 34
+    },
+    {
+      "title": "Le banquet du roi Belshassar",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 9
+    },
+    {
+      "title": "Daniel interprète l'inscription mystérieuse",
+      "start_ch": 5,
+      "start_v": 10,
+      "end_ch": 5,
+      "end_v": 30
+    },
+    {
+      "title": "Les ennemis de Daniel lui tendent un piège",
+      "start_ch": 6,
+      "start_v": 2,
+      "end_ch": 6,
+      "end_v": 10
+    },
+    {
+      "title": "Daniel est jeté dans la fosse aux lions",
+      "start_ch": 6,
+      "start_v": 11,
+      "end_ch": 6,
+      "end_v": 19
+    },
+    {
+      "title": "Daniel sort sain et sauf de la fosse aux lions",
+      "start_ch": 6,
+      "start_v": 20,
+      "end_ch": 6,
+      "end_v": 29
+    },
+    {
+      "title": "La première vision de Daniel&#160;: les quatre bêtes",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 8
+    },
+    {
+      "title": "Le jugement de Dieu",
+      "start_ch": 7,
+      "start_v": 9,
+      "end_ch": 7,
+      "end_v": 14
+    },
+    {
+      "title": "L'interprétation de la première vision",
+      "start_ch": 7,
+      "start_v": 15,
+      "end_ch": 7,
+      "end_v": 28
+    },
+    {
+      "title": "La deuxième vision&#160;: le bélier et le bouc",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 14
+    },
+    {
+      "title": "L'interprétation de la deuxième vision",
+      "start_ch": 8,
+      "start_v": 15,
+      "end_ch": 8,
+      "end_v": 27
+    },
+    {
+      "title": "La prière de Daniel",
+      "start_ch": 9,
+      "start_v": 3,
+      "end_ch": 9,
+      "end_v": 19
+    },
+    {
+      "title": "Gabriel explique à Daniel le sens des soixante-dix périodes",
+      "start_ch": 9,
+      "start_v": 20,
+      "end_ch": 9,
+      "end_v": 27
+    },
+    {
+      "title": "La troisième vision&#160;: l'homme vêtu de lin",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 19
+    },
+    {
+      "title": "La guerre entre les rois du Nord et du Sud89",
+      "start_ch": 11,
+      "start_v": 3,
+      "end_ch": 11,
+      "end_v": 45
+    },
+    {
+      "title": "Le temps d'angoisse et le retour à la vie",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 4
+    },
+    {
+      "title": "Encouragement à résister jusqu'au bout",
+      "start_ch": 12,
+      "start_v": 5,
+      "end_ch": 12,
+      "end_v": 13
+    }
+  ]
 }

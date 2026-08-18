@@ -124,5 +124,81 @@
       "19": "Mes frères et sœurs, si quelqu'un parmi vous s'est égaré loin de la vérité et qu'un autre l'y ramène,",
       "20": "sachez que celui qui ramènera un pécheur de la voie où il s'était égaré sauvera une âme de la mort et couvrira une foule de péchés."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Adresse et salutation",
+    "1:2": "La mise à l’épreuve de la foi",
+    "1:12": "Appel à vivre la parole de vérité",
+    "2:1": "L’impartialité de la foi",
+    "2:14": "Les œuvres de la foi",
+    "3:1": "L'usage de la parole",
+    "3:13": "Sagesse et mauvais désirs",
+    "4:13": "Avertissement aux riches",
+    "5:7": "Appel à la patience et à la foi"
+  },
+  "pericopes": [
+    {
+      "title": "Adresse et salutation",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 1
+    },
+    {
+      "title": "La mise à l’épreuve de la foi",
+      "start_ch": 1,
+      "start_v": 2,
+      "end_ch": 1,
+      "end_v": 11
+    },
+    {
+      "title": "Appel à vivre la parole de vérité",
+      "start_ch": 1,
+      "start_v": 12,
+      "end_ch": 1,
+      "end_v": 27
+    },
+    {
+      "title": "L’impartialité de la foi",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 13
+    },
+    {
+      "title": "Les œuvres de la foi",
+      "start_ch": 2,
+      "start_v": 14,
+      "end_ch": 2,
+      "end_v": 26
+    },
+    {
+      "title": "L'usage de la parole",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 12
+    },
+    {
+      "title": "Sagesse et mauvais désirs",
+      "start_ch": 3,
+      "start_v": 13,
+      "end_ch": 3,
+      "end_v": 18
+    },
+    {
+      "title": "Avertissement aux riches",
+      "start_ch": 4,
+      "start_v": 13,
+      "end_ch": 4,
+      "end_v": 17
+    },
+    {
+      "title": "Appel à la patience et à la foi",
+      "start_ch": 5,
+      "start_v": 7,
+      "end_ch": 5,
+      "end_v": 20
+    }
+  ]
 }

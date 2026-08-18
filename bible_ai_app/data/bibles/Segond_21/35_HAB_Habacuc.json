@@ -68,5 +68,49 @@
       "18": "Mais moi, je veux me réjouir en l'Eternel, je veux être dans l'allégresse à cause du Dieu de mon salut.",
       "19": "L'Eternel, le Seigneur, est ma force: il rend mes pieds semblables à ceux des biches et il me fait marcher sur mes hauteurs. Au chef de chœur. Avec instruments à cordes."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Interrogations d'Habakuk",
+    "1:5": "Réponse de Dieu: le jugement de Juda",
+    "1:12": "Réponse d’Habakuk",
+    "2:5": "Causes du jugement de l'oppresseur",
+    "3:1": "Cantique d'Habakuk"
+  },
+  "pericopes": [
+    {
+      "title": "Interrogations d'Habakuk",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 4
+    },
+    {
+      "title": "Réponse de Dieu: le jugement de Juda",
+      "start_ch": 1,
+      "start_v": 5,
+      "end_ch": 1,
+      "end_v": 11
+    },
+    {
+      "title": "Réponse d’Habakuk",
+      "start_ch": 1,
+      "start_v": 12,
+      "end_ch": 1,
+      "end_v": 17
+    },
+    {
+      "title": "Causes du jugement de l'oppresseur",
+      "start_ch": 2,
+      "start_v": 5,
+      "end_ch": 2,
+      "end_v": 20
+    },
+    {
+      "title": "Cantique d'Habakuk",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 19
+    }
+  ]
 }

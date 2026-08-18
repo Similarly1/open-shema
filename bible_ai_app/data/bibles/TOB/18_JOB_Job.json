@@ -1160,5 +1160,49 @@
       "16": "Job vécut encore après cela cent quarante ans, et il vit ses fils et les fils de ses fils jusqu’à la quatrième génération.",
       "17": "Puis Job mourut vieux et rassasié de jours."
     }
-  }
+  },
+  "sections": {
+    "1:1": "PROLOGUE EN PROSE",
+    "3:2": "DIALOGUE ENTRE JOB ET SES AMIS",
+    "32:1": "LA HARANGUE D’ÉLIHOU",
+    "38:1": "LES DÉFIS DU SEIGNEUR",
+    "42:7": "ÉPILOGUE EN PROSE"
+  },
+  "pericopes": [
+    {
+      "title": "PROLOGUE EN PROSE",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 22
+    },
+    {
+      "title": "DIALOGUE ENTRE JOB ET SES AMIS",
+      "start_ch": 3,
+      "start_v": 2,
+      "end_ch": 3,
+      "end_v": 26
+    },
+    {
+      "title": "LA HARANGUE D’ÉLIHOU",
+      "start_ch": 32,
+      "start_v": 1,
+      "end_ch": 32,
+      "end_v": 22
+    },
+    {
+      "title": "LES DÉFIS DU SEIGNEUR",
+      "start_ch": 38,
+      "start_v": 1,
+      "end_ch": 38,
+      "end_v": 41
+    },
+    {
+      "title": "ÉPILOGUE EN PROSE",
+      "start_ch": 42,
+      "start_v": 7,
+      "end_ch": 42,
+      "end_v": 17
+    }
+  ]
 }

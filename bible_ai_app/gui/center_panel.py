@@ -9,6 +9,7 @@ from core.reference_parser import get_french_book_name, parse_smart_book_input, 
 from core.strong_lexicon import StrongLexicon
 from core.dictionary_manager import DictionaryManager
 from core.dictionary_polisher import DictionaryPolisher, AVAILABLE_POLISH_MODELS
+from core.pericope_manager import PericopeManager
 from core.wikipedia_client import WikipediaClient
 from gui.tooltip import BibleTooltip, WidgetTooltip
 from gui.bible_picker_popover import BiblePickerPopover, get_bible_cover_image, BIBLE_STYLE_MAP
@@ -167,6 +168,7 @@ class CenterPanel(ctk.CTkFrame):
         self.show_chapter_numbers = self.config.get("show_chapter_numbers", True)
         self.verse_per_line = self.config.get("verse_per_line", False)
         self.show_reverse_interlinear = self.config.get("show_reverse_interlinear", False)
+        self.show_section_titles = self.config.get("show_section_titles", True)
         self.bible_full_width = bool(self.config.get("bible_full_width", False))
         self.is_immersive_mode = False
         
@@ -495,6 +497,18 @@ class CenterPanel(ctk.CTkFrame):
             checkbox_height=16
         )
         self.cb_verse_line.pack(side="left", padx=5)
+        
+        self.cb_section_titles_var = ctk.BooleanVar(value=self.show_section_titles)
+        self.cb_section_titles = ctk.CTkCheckBox(
+            self.display_settings_frame, 
+            text="📑 Titres", 
+            variable=self.cb_section_titles_var, 
+            command=self.on_toggle_section_titles,
+            font=ctk.CTkFont(size=11), 
+            checkbox_width=16, 
+            checkbox_height=16
+        )
+        self.cb_section_titles.pack(side="left", padx=5)
         
         self.cb_interlinear_var = ctk.BooleanVar(value=self.show_reverse_interlinear)
         self.cb_interlinear = ctk.CTkCheckBox(
@@ -881,6 +895,12 @@ class CenterPanel(ctk.CTkFrame):
     def on_toggle_verse_per_line(self):
         self.verse_per_line = bool(self.cb_verse_line_var.get())
         self.config["verse_per_line"] = self.verse_per_line
+        save_config(self.config)
+        self.refresh_current_view_position()
+
+    def on_toggle_section_titles(self):
+        self.show_section_titles = bool(self.cb_section_titles_var.get())
+        self.config["show_section_titles"] = self.show_section_titles
         save_config(self.config)
         self.refresh_current_view_position()
 
@@ -3119,6 +3139,8 @@ class CenterPanel(ctk.CTkFrame):
             box._textbox.tag_configure("bible_ref_link", foreground="#38BDF8" if is_dark else "#0284C7", underline=True, font=(self.font_family, self.font_size, "bold"))
             
         # Tags de comparaison et d'interaction sur la zone Bible
+        sec_title_col = "#60A5FA" if is_dark else "#1D4ED8"
+        self.bible_textbox._textbox.tag_configure("section_title", font=(self.font_family, self.font_size + 2, "bold"), foreground=sec_title_col, spacing1=18, spacing3=6)
         self.bible_textbox._textbox.tag_configure("verse_header", font=(self.font_family, self.font_size, "bold"), foreground=verse_hdr_col, spacing1=12, spacing3=4)
         self.bible_textbox._textbox.tag_configure("bible_abbr", font=(self.font_family, self.font_size - 3, "bold"), foreground=bible_abbr_col)
         self.bible_textbox._textbox.tag_configure("diff_percent", font=(self.font_family, self.font_size - 4, "italic"), foreground=diff_pct_col)
@@ -3596,6 +3618,15 @@ class CenterPanel(ctk.CTkFrame):
                         for doc, meta in chapters_map[cur_ch]:
                             ref = meta.get('reference', '')
                             v_num = ref.split(":")[-1] if ":" in ref else str(meta.get('verse', ''))
+                            b_code = meta.get('book', '')
+                            
+                            # Afficher le titre de section authentique s'il existe pour ce verset
+                            if self.show_section_titles and v_num and b_code:
+                                sec_title = PericopeManager.get_section_title(
+                                    ref_source, b_code, int(cur_ch) if str(cur_ch).isdigit() else 1, int(v_num) if str(v_num).isdigit() else 1
+                                )
+                                if sec_title:
+                                    self.bible_textbox.insert("end", f"\n\n{sec_title}\n\n", "section_title")
                             
                             # Détecter si le verset marque un nouveau paragraphe (ex: préfixé par * dans Segond 21)
                             is_para_start = False
@@ -3678,6 +3709,17 @@ class CenterPanel(ctk.CTkFrame):
                         last_rendered_chap = cur_ch_num
                         header_tag = f"chap_header_{cur_ch_num}"
                         self.bible_textbox.insert("end", f"\n\n  ───  {fr_book} {cur_ch_num}  ───\n\n", ("chapter_divider", header_tag))
+                        
+                    # Titre de section dans le mode comparaison
+                    if self.show_section_titles and b_code:
+                        bible_sources = list(verses_map[ref_key].keys())
+                        target_ref = ref_source if ref_source in bible_sources else (bible_sources[0] if bible_sources else None)
+                        if target_ref:
+                            sec_title = PericopeManager.get_section_title(
+                                target_ref, b_code, cur_ch_num, cur_v_num
+                            )
+                            if sec_title:
+                                self.bible_textbox.insert("end", f"\n───  {sec_title}  ───\n", "section_title")
                         
                     start_vr = self.bible_textbox.index("end-1c")
                     self.bible_textbox.insert("end", f"\n{fr_book} {ch_v}\n", "verse_header")

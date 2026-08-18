@@ -969,5 +969,345 @@
       "30": "Le charme est trompeur, la beauté est passagère; seule une femme qui reconnaît l'autorité du Seigneur est digne d'éloges.",
       "31": "Que l'on récompense son travail! Que l'on chante ses mérites aux portes de la ville!"
     }
-  }
+  },
+  "sections": {
+    "1:2": "But du livre",
+    "1:8": "Mise en garde contre les mauvais garçons",
+    "1:20": "Appel et avertissement de la Sagesse",
+    "2:1": "La sagesse préserve de mal agir",
+    "3:1": "Sagesse et obéissance à Dieu",
+    "3:13": "Sagesse et bonheur",
+    "3:21": "Le Seigneur protège le sage",
+    "3:27": "Aimer son prochain",
+    "4:1": "Rechercher et garder la sagesse",
+    "4:10": "Éviter la conduite des méchants",
+    "4:20": "Avoir une conduite ferme",
+    "5:1": "Mise en garde contre la femme inconnue",
+    "5:15": "Aimer la femme de sa jeunesse",
+    "6:1": "Éviter de s'engager pour les dettes d'autrui",
+    "6:6": "Éviter d'être paresseux",
+    "6:12": "Portrait du malfaisant",
+    "6:20": "Mise en garde contre l'adultère",
+    "7:1": "Une femme adultère séduit un jeune homme",
+    "8:1": "Nouvel appel de la Sagesse",
+    "8:12": "La Sagesse se présente",
+    "8:32": "Heureux qui écoute la Sagesse",
+    "9:1": "L'invitation de la Sagesse",
+    "9:7": "Le sage et l'orgueilleux",
+    "9:13": "L'invitation de la Sottise",
+    "10:1": "Collection de proverbes sur l'art de bien vivre",
+    "16:1": "Le Seigneur dans la vie quotidienne",
+    "16:10": "À propos des rois",
+    "16:16": "Autre collection de proverbes sur l'art de bien vivre",
+    "22:17": "Recommandations diverses",
+    "23:15": "Conseils d'un père à son enfant",
+    "23:29": "Portrait de l'ivrogne",
+    "24:1": "Le sage et le méchant",
+    "24:23": "Autres conseils des sages",
+    "24:30": "Portrait du paresseux",
+    "25:1": "Autres proverbes de Salomon",
+    "26:1": "À propos des insensés",
+    "26:13": "Portrait du paresseux",
+    "26:17": "Autres proverbes",
+    "30:1": "Paroles d'Agour",
+    "30:17": "Proverbes numériques",
+    "31:1": "Conseils à un roi",
+    "31:10": "Portrait de la femme de valeur"
+  },
+  "pericopes": [
+    {
+      "title": "But du livre",
+      "start_ch": 1,
+      "start_v": 2,
+      "end_ch": 1,
+      "end_v": 7
+    },
+    {
+      "title": "Mise en garde contre les mauvais garçons",
+      "start_ch": 1,
+      "start_v": 8,
+      "end_ch": 1,
+      "end_v": 19
+    },
+    {
+      "title": "Appel et avertissement de la Sagesse",
+      "start_ch": 1,
+      "start_v": 20,
+      "end_ch": 1,
+      "end_v": 33
+    },
+    {
+      "title": "La sagesse préserve de mal agir",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 22
+    },
+    {
+      "title": "Sagesse et obéissance à Dieu",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 12
+    },
+    {
+      "title": "Sagesse et bonheur",
+      "start_ch": 3,
+      "start_v": 13,
+      "end_ch": 3,
+      "end_v": 20
+    },
+    {
+      "title": "Le Seigneur protège le sage",
+      "start_ch": 3,
+      "start_v": 21,
+      "end_ch": 3,
+      "end_v": 26
+    },
+    {
+      "title": "Aimer son prochain",
+      "start_ch": 3,
+      "start_v": 27,
+      "end_ch": 3,
+      "end_v": 35
+    },
+    {
+      "title": "Rechercher et garder la sagesse",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 9
+    },
+    {
+      "title": "Éviter la conduite des méchants",
+      "start_ch": 4,
+      "start_v": 10,
+      "end_ch": 4,
+      "end_v": 19
+    },
+    {
+      "title": "Avoir une conduite ferme",
+      "start_ch": 4,
+      "start_v": 20,
+      "end_ch": 4,
+      "end_v": 27
+    },
+    {
+      "title": "Mise en garde contre la femme inconnue",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 14
+    },
+    {
+      "title": "Aimer la femme de sa jeunesse",
+      "start_ch": 5,
+      "start_v": 15,
+      "end_ch": 5,
+      "end_v": 23
+    },
+    {
+      "title": "Éviter de s'engager pour les dettes d'autrui",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 5
+    },
+    {
+      "title": "Éviter d'être paresseux",
+      "start_ch": 6,
+      "start_v": 6,
+      "end_ch": 6,
+      "end_v": 11
+    },
+    {
+      "title": "Portrait du malfaisant",
+      "start_ch": 6,
+      "start_v": 12,
+      "end_ch": 6,
+      "end_v": 19
+    },
+    {
+      "title": "Mise en garde contre l'adultère",
+      "start_ch": 6,
+      "start_v": 20,
+      "end_ch": 6,
+      "end_v": 35
+    },
+    {
+      "title": "Une femme adultère séduit un jeune homme",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 27
+    },
+    {
+      "title": "Nouvel appel de la Sagesse",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 11
+    },
+    {
+      "title": "La Sagesse se présente",
+      "start_ch": 8,
+      "start_v": 12,
+      "end_ch": 8,
+      "end_v": 31
+    },
+    {
+      "title": "Heureux qui écoute la Sagesse",
+      "start_ch": 8,
+      "start_v": 32,
+      "end_ch": 8,
+      "end_v": 36
+    },
+    {
+      "title": "L'invitation de la Sagesse",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 6
+    },
+    {
+      "title": "Le sage et l'orgueilleux",
+      "start_ch": 9,
+      "start_v": 7,
+      "end_ch": 9,
+      "end_v": 12
+    },
+    {
+      "title": "L'invitation de la Sottise",
+      "start_ch": 9,
+      "start_v": 13,
+      "end_ch": 9,
+      "end_v": 18
+    },
+    {
+      "title": "Collection de proverbes sur l'art de bien vivre",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 32
+    },
+    {
+      "title": "Le Seigneur dans la vie quotidienne",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 9
+    },
+    {
+      "title": "À propos des rois",
+      "start_ch": 16,
+      "start_v": 10,
+      "end_ch": 16,
+      "end_v": 15
+    },
+    {
+      "title": "Autre collection de proverbes sur l'art de bien vivre",
+      "start_ch": 16,
+      "start_v": 16,
+      "end_ch": 16,
+      "end_v": 33
+    },
+    {
+      "title": "Recommandations diverses",
+      "start_ch": 22,
+      "start_v": 17,
+      "end_ch": 22,
+      "end_v": 29
+    },
+    {
+      "title": "Conseils d'un père à son enfant",
+      "start_ch": 23,
+      "start_v": 15,
+      "end_ch": 23,
+      "end_v": 28
+    },
+    {
+      "title": "Portrait de l'ivrogne",
+      "start_ch": 23,
+      "start_v": 29,
+      "end_ch": 23,
+      "end_v": 35
+    },
+    {
+      "title": "Le sage et le méchant",
+      "start_ch": 24,
+      "start_v": 1,
+      "end_ch": 24,
+      "end_v": 22
+    },
+    {
+      "title": "Autres conseils des sages",
+      "start_ch": 24,
+      "start_v": 23,
+      "end_ch": 24,
+      "end_v": 29
+    },
+    {
+      "title": "Portrait du paresseux",
+      "start_ch": 24,
+      "start_v": 30,
+      "end_ch": 24,
+      "end_v": 34
+    },
+    {
+      "title": "Autres proverbes de Salomon",
+      "start_ch": 25,
+      "start_v": 1,
+      "end_ch": 25,
+      "end_v": 28
+    },
+    {
+      "title": "À propos des insensés",
+      "start_ch": 26,
+      "start_v": 1,
+      "end_ch": 26,
+      "end_v": 12
+    },
+    {
+      "title": "Portrait du paresseux",
+      "start_ch": 26,
+      "start_v": 13,
+      "end_ch": 26,
+      "end_v": 16
+    },
+    {
+      "title": "Autres proverbes",
+      "start_ch": 26,
+      "start_v": 17,
+      "end_ch": 26,
+      "end_v": 28
+    },
+    {
+      "title": "Paroles d'Agour",
+      "start_ch": 30,
+      "start_v": 1,
+      "end_ch": 30,
+      "end_v": 16
+    },
+    {
+      "title": "Proverbes numériques",
+      "start_ch": 30,
+      "start_v": 17,
+      "end_ch": 30,
+      "end_v": 33
+    },
+    {
+      "title": "Conseils à un roi",
+      "start_ch": 31,
+      "start_v": 1,
+      "end_ch": 31,
+      "end_v": 9
+    },
+    {
+      "title": "Portrait de la femme de valeur",
+      "start_ch": 31,
+      "start_v": 10,
+      "end_ch": 31,
+      "end_v": 31
+    }
+  ]
 }

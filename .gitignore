@@ -54,5 +54,6 @@ scratch_*.py
 *.swp
 *.swo
 *~
+*.log
 .DS_Store
 Thumbs.db

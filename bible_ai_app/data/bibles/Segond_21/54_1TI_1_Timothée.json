@@ -131,5 +131,57 @@
       "20": "Cher Timothée, garde le dépôt qui t'a été confié, évite les bavardages profanes et les objections de la pseudo-connaissance.",
       "21": "En s'y engageant, certains se sont détournés de la foi. Que la grâce soit avec toi!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Salutation et instructions de Paul",
+    "2:1": "Prière et attitude dans l’Eglise",
+    "3:1": "Qualifications des responsables de l’Eglise",
+    "4:1": "Conseils à propos des fausses doctrines",
+    "5:1": "Conseils à propos des membres de l'Eglise",
+    "6:3": "Les dangers de se détourner de la foi"
+  },
+  "pericopes": [
+    {
+      "title": "Salutation et instructions de Paul",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 20
+    },
+    {
+      "title": "Prière et attitude dans l’Eglise",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 15
+    },
+    {
+      "title": "Qualifications des responsables de l’Eglise",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 16
+    },
+    {
+      "title": "Conseils à propos des fausses doctrines",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 16
+    },
+    {
+      "title": "Conseils à propos des membres de l'Eglise",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 25
+    },
+    {
+      "title": "Les dangers de se détourner de la foi",
+      "start_ch": 6,
+      "start_v": 3,
+      "end_ch": 6,
+      "end_v": 21
+    }
+  ]
 }

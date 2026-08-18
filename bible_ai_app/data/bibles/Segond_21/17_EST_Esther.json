@@ -193,5 +193,97 @@
       "2": "Tout ce qu'il a accompli par sa puissance et sa force, ainsi que les détails sur le rôle important qu'il a accordé à Mardochée, cela est décrit dans les annales des rois des Mèdes et des Perses.",
       "3": "En effet, le Juif Mardochée était l'adjoint du roi Assuérus. Il jouait un rôle important pour les Juifs et était très apprécié de ses nombreux frères. Il recherchait le bonheur de son peuple et contribua par ses paroles au bien-être de toute sa lignée."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Destitution de la reine Vasthi",
+    "2:1": "Choix d’Esther comme reine",
+    "2:19": "Echec d’un complot grâce à Mardochée",
+    "3:1": "Edit d’Haman contre les Juifs",
+    "4:1": "Démarche de Mardochée auprès d'Esther",
+    "5:1": "Démarche d’Esther auprès du roi",
+    "5:9": "Hostilité d’Haman envers Mardochée",
+    "7:1": "Plaidoyer d’Esther",
+    "8:1": "Edit en faveur des Juifs",
+    "9:20": "Institution de la fête des Pourim",
+    "10:1": "Rôle de Mardochée"
+  },
+  "pericopes": [
+    {
+      "title": "Destitution de la reine Vasthi",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 22
+    },
+    {
+      "title": "Choix d’Esther comme reine",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 18
+    },
+    {
+      "title": "Echec d’un complot grâce à Mardochée",
+      "start_ch": 2,
+      "start_v": 19,
+      "end_ch": 2,
+      "end_v": 23
+    },
+    {
+      "title": "Edit d’Haman contre les Juifs",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 15
+    },
+    {
+      "title": "Démarche de Mardochée auprès d'Esther",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 17
+    },
+    {
+      "title": "Démarche d’Esther auprès du roi",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 8
+    },
+    {
+      "title": "Hostilité d’Haman envers Mardochée",
+      "start_ch": 5,
+      "start_v": 9,
+      "end_ch": 5,
+      "end_v": 14
+    },
+    {
+      "title": "Plaidoyer d’Esther",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 10
+    },
+    {
+      "title": "Edit en faveur des Juifs",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 17
+    },
+    {
+      "title": "Institution de la fête des Pourim",
+      "start_ch": 9,
+      "start_v": 20,
+      "end_ch": 9,
+      "end_v": 32
+    },
+    {
+      "title": "Rôle de Mardochée",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 3
+    }
+  ]
 }

@@ -922,5 +922,473 @@
       "24": "C'est ce même disciple qui témoigne de ces faits et qui les a mis par écrit, et nous savons que son témoignage est vrai.",
       "25": "Il y a encore beaucoup d'autres choses que Jésus a faites. Si on racontait chacune d'elles par écrit, je pense que le monde entier ne pourrait pas contenir les livres qu'on écrirait."
     }
-  }
+  },
+  "sections": {
+    "1:1": "La Parole de lumière et de vie vient dans le monde",
+    "1:19": "Le témoignage de Jean le baptiste",
+    "1:35": "L'appel des premiers disciples de Jésus",
+    "2:1": "Le mariage à Cana",
+    "2:13": "Jésus chasse les marchands du temple",
+    "3:1": "Jésus et Nicodème",
+    "3:22": "Le témoignage final de Jean le baptiste",
+    "4:4": "Jésus et la femme de Samarie",
+    "4:43": "Jésus revient à Cana et guérit le fils d'un haut fonctionnaire",
+    "5:1": "Jésus guérit un paralysé",
+    "5:19": "Le Père a donné autorité au Fils",
+    "6:1": "Jésus et ses disciples nourrissent une foule nombreuse",
+    "6:16": "Jésus marche sur l'eau à la rencontre des disciples",
+    "6:25": "Jésus est le pain de vie",
+    "6:60": "Des disciples abandonnent Jésus",
+    "7:1": "Jésus à la fête des Tentes",
+    "7:14": "Jésus enseigne au temple et la foule se demande s'il est le Christ",
+    "7:37": "Jésus enseigne sur les fleuves d'eau vive",
+    "7:53": "Jésus et la femme adultère",
+    "8:12": "Jésus est la lumière du monde",
+    "8:31": "La descendance d'Abraham",
+    "9:1": "Jésus guérit un aveugle de naissance",
+    "10:1": "Jésus enseigne sur le bon berger",
+    "10:22": "Jésus à la fête de la Dédicace",
+    "11:1": "Lazare, un ami de Jésus, est mort",
+    "11:17": "Marthe reconnaît en Jésus le Christ",
+    "11:28": "La résurrection de Lazare",
+    "11:45": "Les autorités religieuses complotent contre Jésus",
+    "12:1": "Marie répand du parfum sur les pieds de Jésus",
+    "12:12": "Jésus entre à Jérusalem",
+    "12:27": "Jésus parle de sa mort",
+    "12:37": "Réaction aux signes extraordinaires et paroles de Jésus",
+    "13:1": "Jésus lave les pieds de ses disciples",
+    "13:21": "Jésus annonce que Judas va le livrer",
+    "13:36": "Jésus annonce que Pierre le reniera",
+    "14:1": "Jésus est le chemin qui conduit au Père",
+    "14:15": "La promesse de l'envoi de l'Esprit saint",
+    "15:1": "Jésus est la vraie vigne",
+    "15:18": "Les gens de ce monde détestent Jésus et ses disciples",
+    "16:5": "L'œuvre de l'Esprit saint",
+    "16:25": "Jésus est vainqueur du monde",
+    "17:1": "Jésus prie pour tous ses disciples",
+    "18:1": "Jésus est arrêté et conduit devant Hanne",
+    "18:15": "Pierre nie être disciple de Jésus",
+    "18:19": "Le grand-prêtre interroge Jésus",
+    "18:25": "Pierre renie de nouveau Jésus",
+    "18:28": "Jésus comparaît devant Pilate",
+    "18:39": "Jésus est condamné à mort",
+    "19:17": "Jésus est crucifié",
+    "19:28": "La mort de Jésus",
+    "19:38": "Jésus est mis dans un tombeau",
+    "20:1": "Le tombeau est vide",
+    "20:11": "Jésus se montre à Marie de Magdala",
+    "20:19": "Jésus se montre à ses disciples",
+    "20:24": "Jésus se montre à Thomas",
+    "21:1": "Jésus se montre à ses disciples au bord du lac de Tibériade",
+    "21:15": "Jésus confie une mission à Pierre",
+    "21:20": "Jésus et le disciple qu'il aimait"
+  },
+  "pericopes": [
+    {
+      "title": "La Parole de lumière et de vie vient dans le monde",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 18
+    },
+    {
+      "title": "Le témoignage de Jean le baptiste",
+      "start_ch": 1,
+      "start_v": 19,
+      "end_ch": 1,
+      "end_v": 34
+    },
+    {
+      "title": "L'appel des premiers disciples de Jésus",
+      "start_ch": 1,
+      "start_v": 35,
+      "end_ch": 1,
+      "end_v": 51
+    },
+    {
+      "title": "Le mariage à Cana",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 12
+    },
+    {
+      "title": "Jésus chasse les marchands du temple",
+      "start_ch": 2,
+      "start_v": 13,
+      "end_ch": 2,
+      "end_v": 25
+    },
+    {
+      "title": "Jésus et Nicodème",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 21
+    },
+    {
+      "title": "Le témoignage final de Jean le baptiste",
+      "start_ch": 3,
+      "start_v": 22,
+      "end_ch": 3,
+      "end_v": 36
+    },
+    {
+      "title": "Jésus et la femme de Samarie",
+      "start_ch": 4,
+      "start_v": 4,
+      "end_ch": 4,
+      "end_v": 42
+    },
+    {
+      "title": "Jésus revient à Cana et guérit le fils d'un haut fonctionnaire",
+      "start_ch": 4,
+      "start_v": 43,
+      "end_ch": 4,
+      "end_v": 54
+    },
+    {
+      "title": "Jésus guérit un paralysé",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 18
+    },
+    {
+      "title": "Le Père a donné autorité au Fils",
+      "start_ch": 5,
+      "start_v": 19,
+      "end_ch": 5,
+      "end_v": 47
+    },
+    {
+      "title": "Jésus et ses disciples nourrissent une foule nombreuse",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 15
+    },
+    {
+      "title": "Jésus marche sur l'eau à la rencontre des disciples",
+      "start_ch": 6,
+      "start_v": 16,
+      "end_ch": 6,
+      "end_v": 24
+    },
+    {
+      "title": "Jésus est le pain de vie",
+      "start_ch": 6,
+      "start_v": 25,
+      "end_ch": 6,
+      "end_v": 59
+    },
+    {
+      "title": "Des disciples abandonnent Jésus",
+      "start_ch": 6,
+      "start_v": 60,
+      "end_ch": 6,
+      "end_v": 71
+    },
+    {
+      "title": "Jésus à la fête des Tentes",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 13
+    },
+    {
+      "title": "Jésus enseigne au temple et la foule se demande s'il est le Christ",
+      "start_ch": 7,
+      "start_v": 14,
+      "end_ch": 7,
+      "end_v": 36
+    },
+    {
+      "title": "Jésus enseigne sur les fleuves d'eau vive",
+      "start_ch": 7,
+      "start_v": 37,
+      "end_ch": 7,
+      "end_v": 52
+    },
+    {
+      "title": "Jésus et la femme adultère",
+      "start_ch": 7,
+      "start_v": 53,
+      "end_ch": 7,
+      "end_v": 53
+    },
+    {
+      "title": "Jésus est la lumière du monde",
+      "start_ch": 8,
+      "start_v": 12,
+      "end_ch": 8,
+      "end_v": 30
+    },
+    {
+      "title": "La descendance d'Abraham",
+      "start_ch": 8,
+      "start_v": 31,
+      "end_ch": 8,
+      "end_v": 59
+    },
+    {
+      "title": "Jésus guérit un aveugle de naissance",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 41
+    },
+    {
+      "title": "Jésus enseigne sur le bon berger",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 21
+    },
+    {
+      "title": "Jésus à la fête de la Dédicace",
+      "start_ch": 10,
+      "start_v": 22,
+      "end_ch": 10,
+      "end_v": 42
+    },
+    {
+      "title": "Lazare, un ami de Jésus, est mort",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 16
+    },
+    {
+      "title": "Marthe reconnaît en Jésus le Christ",
+      "start_ch": 11,
+      "start_v": 17,
+      "end_ch": 11,
+      "end_v": 27
+    },
+    {
+      "title": "La résurrection de Lazare",
+      "start_ch": 11,
+      "start_v": 28,
+      "end_ch": 11,
+      "end_v": 44
+    },
+    {
+      "title": "Les autorités religieuses complotent contre Jésus",
+      "start_ch": 11,
+      "start_v": 45,
+      "end_ch": 11,
+      "end_v": 57
+    },
+    {
+      "title": "Marie répand du parfum sur les pieds de Jésus",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 11
+    },
+    {
+      "title": "Jésus entre à Jérusalem",
+      "start_ch": 12,
+      "start_v": 12,
+      "end_ch": 12,
+      "end_v": 26
+    },
+    {
+      "title": "Jésus parle de sa mort",
+      "start_ch": 12,
+      "start_v": 27,
+      "end_ch": 12,
+      "end_v": 36
+    },
+    {
+      "title": "Réaction aux signes extraordinaires et paroles de Jésus",
+      "start_ch": 12,
+      "start_v": 37,
+      "end_ch": 12,
+      "end_v": 50
+    },
+    {
+      "title": "Jésus lave les pieds de ses disciples",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 20
+    },
+    {
+      "title": "Jésus annonce que Judas va le livrer",
+      "start_ch": 13,
+      "start_v": 21,
+      "end_ch": 13,
+      "end_v": 35
+    },
+    {
+      "title": "Jésus annonce que Pierre le reniera",
+      "start_ch": 13,
+      "start_v": 36,
+      "end_ch": 13,
+      "end_v": 38
+    },
+    {
+      "title": "Jésus est le chemin qui conduit au Père",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 14
+    },
+    {
+      "title": "La promesse de l'envoi de l'Esprit saint",
+      "start_ch": 14,
+      "start_v": 15,
+      "end_ch": 14,
+      "end_v": 31
+    },
+    {
+      "title": "Jésus est la vraie vigne",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 17
+    },
+    {
+      "title": "Les gens de ce monde détestent Jésus et ses disciples",
+      "start_ch": 15,
+      "start_v": 18,
+      "end_ch": 15,
+      "end_v": 27
+    },
+    {
+      "title": "L'œuvre de l'Esprit saint",
+      "start_ch": 16,
+      "start_v": 5,
+      "end_ch": 16,
+      "end_v": 24
+    },
+    {
+      "title": "Jésus est vainqueur du monde",
+      "start_ch": 16,
+      "start_v": 25,
+      "end_ch": 16,
+      "end_v": 33
+    },
+    {
+      "title": "Jésus prie pour tous ses disciples",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 26
+    },
+    {
+      "title": "Jésus est arrêté et conduit devant Hanne",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 14
+    },
+    {
+      "title": "Pierre nie être disciple de Jésus",
+      "start_ch": 18,
+      "start_v": 15,
+      "end_ch": 18,
+      "end_v": 18
+    },
+    {
+      "title": "Le grand-prêtre interroge Jésus",
+      "start_ch": 18,
+      "start_v": 19,
+      "end_ch": 18,
+      "end_v": 24
+    },
+    {
+      "title": "Pierre renie de nouveau Jésus",
+      "start_ch": 18,
+      "start_v": 25,
+      "end_ch": 18,
+      "end_v": 27
+    },
+    {
+      "title": "Jésus comparaît devant Pilate",
+      "start_ch": 18,
+      "start_v": 28,
+      "end_ch": 18,
+      "end_v": 38
+    },
+    {
+      "title": "Jésus est condamné à mort",
+      "start_ch": 18,
+      "start_v": 39,
+      "end_ch": 18,
+      "end_v": 40
+    },
+    {
+      "title": "Jésus est crucifié",
+      "start_ch": 19,
+      "start_v": 17,
+      "end_ch": 19,
+      "end_v": 27
+    },
+    {
+      "title": "La mort de Jésus",
+      "start_ch": 19,
+      "start_v": 28,
+      "end_ch": 19,
+      "end_v": 37
+    },
+    {
+      "title": "Jésus est mis dans un tombeau",
+      "start_ch": 19,
+      "start_v": 38,
+      "end_ch": 19,
+      "end_v": 42
+    },
+    {
+      "title": "Le tombeau est vide",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 10
+    },
+    {
+      "title": "Jésus se montre à Marie de Magdala",
+      "start_ch": 20,
+      "start_v": 11,
+      "end_ch": 20,
+      "end_v": 18
+    },
+    {
+      "title": "Jésus se montre à ses disciples",
+      "start_ch": 20,
+      "start_v": 19,
+      "end_ch": 20,
+      "end_v": 23
+    },
+    {
+      "title": "Jésus se montre à Thomas",
+      "start_ch": 20,
+      "start_v": 24,
+      "end_ch": 20,
+      "end_v": 31
+    },
+    {
+      "title": "Jésus se montre à ses disciples au bord du lac de Tibériade",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 14
+    },
+    {
+      "title": "Jésus confie une mission à Pierre",
+      "start_ch": 21,
+      "start_v": 15,
+      "end_ch": 21,
+      "end_v": 19
+    },
+    {
+      "title": "Jésus et le disciple qu'il aimait",
+      "start_ch": 21,
+      "start_v": 20,
+      "end_ch": 21,
+      "end_v": 25
+    }
+  ]
 }

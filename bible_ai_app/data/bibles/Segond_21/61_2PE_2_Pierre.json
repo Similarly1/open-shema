@@ -73,5 +73,41 @@
       "17": "Bien-aimés, vous voilà avertis. Tenez-vous donc sur vos gardes de peur qu'entraînés par l'égarement des impies vous ne perdiez la ferme position qui est la vôtre.",
       "18": "Mais grandissez dans la grâce et dans la connaissance de notre Seigneur et Sauveur Jésus-Christ. A lui soit la gloire, maintenant et pour l'éternité! Amen!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Adresse et salutation",
+    "1:3": "Les fruits de l’appel de Dieu",
+    "1:12": "Véritable enseignement et prétendus enseignants",
+    "3:1": "Le retour du Seigneur"
+  },
+  "pericopes": [
+    {
+      "title": "Adresse et salutation",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 2
+    },
+    {
+      "title": "Les fruits de l’appel de Dieu",
+      "start_ch": 1,
+      "start_v": 3,
+      "end_ch": 1,
+      "end_v": 11
+    },
+    {
+      "title": "Véritable enseignement et prétendus enseignants",
+      "start_ch": 1,
+      "start_v": 12,
+      "end_ch": 1,
+      "end_v": 21
+    },
+    {
+      "title": "Le retour du Seigneur",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 18
+    }
+  ]
 }

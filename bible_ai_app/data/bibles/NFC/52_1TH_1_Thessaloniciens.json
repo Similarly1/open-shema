@@ -105,5 +105,65 @@
       "27": "Je vous en supplie, au nom du Seigneur: lisez cette lettre à tous les frères et sœurs.",
       "28": "Que la grâce de notre Seigneur Jésus Christ soit avec vous!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Salutation",
+    "1:2": "Paul remercie Dieu pour la foi des Thessaloniciens",
+    "2:1": "L'activité de Paul à Thessalonique",
+    "2:17": "Paul désire revoir les Thessaloniciens",
+    "4:1": "De la vie en Église",
+    "4:13": "La venue du Seigneur",
+    "5:12": "Dernières recommandations et salutations"
+  },
+  "pericopes": [
+    {
+      "title": "Salutation",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 1
+    },
+    {
+      "title": "Paul remercie Dieu pour la foi des Thessaloniciens",
+      "start_ch": 1,
+      "start_v": 2,
+      "end_ch": 1,
+      "end_v": 10
+    },
+    {
+      "title": "L'activité de Paul à Thessalonique",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 16
+    },
+    {
+      "title": "Paul désire revoir les Thessaloniciens",
+      "start_ch": 2,
+      "start_v": 17,
+      "end_ch": 2,
+      "end_v": 20
+    },
+    {
+      "title": "De la vie en Église",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 12
+    },
+    {
+      "title": "La venue du Seigneur",
+      "start_ch": 4,
+      "start_v": 13,
+      "end_ch": 4,
+      "end_v": 18
+    },
+    {
+      "title": "Dernières recommandations et salutations",
+      "start_ch": 5,
+      "start_v": 12,
+      "end_ch": 5,
+      "end_v": 28
+    }
+  ]
 }

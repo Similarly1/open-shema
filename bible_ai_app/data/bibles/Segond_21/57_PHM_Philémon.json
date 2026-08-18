@@ -33,5 +33,33 @@
       "24": "ainsi que Marc, Aristarque, Démas et Luc, mes collaborateurs.",
       "25": "Que la grâce de notre Seigneur Jésus-Christ soit avec votre esprit!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Salutation et louange",
+    "1:8": "Demande de Paul",
+    "1:23": "Salutations"
+  },
+  "pericopes": [
+    {
+      "title": "Salutation et louange",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 7
+    },
+    {
+      "title": "Demande de Paul",
+      "start_ch": 1,
+      "start_v": 8,
+      "end_ch": 1,
+      "end_v": 22
+    },
+    {
+      "title": "Salutations",
+      "start_ch": 1,
+      "start_v": 23,
+      "end_ch": 1,
+      "end_v": 25
+    }
+  ]
 }

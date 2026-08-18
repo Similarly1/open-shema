@@ -118,5 +118,113 @@
       "22": "Tous les chrétiens d’ici, particulièrement ceux de la maison de César, vous adressent leurs salutations.",
       "23": "Que la grâce du Seigneur Jésus-Christ soit avec vous!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "À quoi pense un prisonnier ?",
+    "1:12": "Que fait un chrétien en prison ?",
+    "1:20": "Christ est ma vie",
+    "1:27": "Noblesse oblige",
+    "2:1": "« Que tous soient un »",
+    "2:5": "À l’école de Jésus-Christ",
+    "2:12": "Marchez sur ses traces",
+    "2:19": "Travail en équipe",
+    "3:1": "L’essentiel",
+    "3:9": "Le but de ma vie",
+    "3:15": "Marchons ensemble",
+    "4:1": "Tenez bon",
+    "4:10": "Merci"
+  },
+  "pericopes": [
+    {
+      "title": "À quoi pense un prisonnier ?",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 11
+    },
+    {
+      "title": "Que fait un chrétien en prison ?",
+      "start_ch": 1,
+      "start_v": 12,
+      "end_ch": 1,
+      "end_v": 19
+    },
+    {
+      "title": "Christ est ma vie",
+      "start_ch": 1,
+      "start_v": 20,
+      "end_ch": 1,
+      "end_v": 26
+    },
+    {
+      "title": "Noblesse oblige",
+      "start_ch": 1,
+      "start_v": 27,
+      "end_ch": 1,
+      "end_v": 30
+    },
+    {
+      "title": "« Que tous soient un »",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 4
+    },
+    {
+      "title": "À l’école de Jésus-Christ",
+      "start_ch": 2,
+      "start_v": 5,
+      "end_ch": 2,
+      "end_v": 11
+    },
+    {
+      "title": "Marchez sur ses traces",
+      "start_ch": 2,
+      "start_v": 12,
+      "end_ch": 2,
+      "end_v": 18
+    },
+    {
+      "title": "Travail en équipe",
+      "start_ch": 2,
+      "start_v": 19,
+      "end_ch": 2,
+      "end_v": 30
+    },
+    {
+      "title": "L’essentiel",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 8
+    },
+    {
+      "title": "Le but de ma vie",
+      "start_ch": 3,
+      "start_v": 9,
+      "end_ch": 3,
+      "end_v": 14
+    },
+    {
+      "title": "Marchons ensemble",
+      "start_ch": 3,
+      "start_v": 15,
+      "end_ch": 3,
+      "end_v": 21
+    },
+    {
+      "title": "Tenez bon",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 9
+    },
+    {
+      "title": "Merci",
+      "start_ch": 4,
+      "start_v": 10,
+      "end_ch": 4,
+      "end_v": 23
+    }
+  ]
 }

@@ -1283,5 +1283,849 @@
       "37": "Si la nuée ne bougeait pas, ils ne partaient pas; ils attendaient le jour où elle s'élevait.",
       "38": "Le Seigneur manifesta sa présence aux Israélites par la nuée qui enveloppait la demeure pendant le jour ou par le feu qui y brillait pendant la nuit, et cela tout au long de leur voyage."
     }
-  }
+  },
+  "sections": {
+    "1:5": "Les Israélites sont esclaves en Égypte",
+    "1:15": "Le courage des sages-femmes Chifra et Poua",
+    "2:1": "La naissance et l'enfance de Moïse",
+    "2:11": "Moïse doit fuir au pays de Madian",
+    "2:23": "Dieu choisit Moïse pour libérer Israël",
+    "3:11": "Dieu révèle son nom à Moïse",
+    "4:1": "Dieu révèle sa puissance à Moïse",
+    "4:10": "Dieu désigne Aaron comme porte-parole de Moïse",
+    "4:18": "Moïse retourne auprès de son peuple",
+    "5:1": "Moïse et Aaron vont chez le pharaon",
+    "5:6": "Le pharaon augmente le travail des Israélites",
+    "6:2": "Dieu promet à Moïse de délivrer Israël",
+    "6:14": "Liste des ancêtres de Moïse et Aaron",
+    "6:28": "Dieu renouvelle sa promesse à Moïse",
+    "7:8": "Le pharaon refuse d'écouter Moïse et Aaron",
+    "7:14": "Premier fléau&#160;: l'eau changée en sang",
+    "7:26": "Deuxième fléau&#160;: les grenouilles",
+    "8:12": "Troisième fléau&#160;: les moustiques",
+    "8:16": "Quatrième fléau&#160;: les mouches piquantes",
+    "9:1": "Cinquième fléau&#160;: la peste du bétail",
+    "9:8": "Sixième fléau&#160;: les furoncles",
+    "9:13": "Septième fléau&#160;: la grêle",
+    "10:1": "Huitième fléau&#160;: les sauterelles",
+    "10:21": "Neuvième fléau&#160;: l'obscurité",
+    "11:1": "Annonce du dernier fléau",
+    "12:1": "La fête de la Pâque",
+    "12:15": "La fête des Pains sans levain",
+    "12:21": "La préparation du repas de la Pâque",
+    "12:29": "Le dernier fléau&#160;: les premiers-nés égyptiens meurent",
+    "12:43": "Pour célébrer la Pâque",
+    "13:1": "Autres instructions relatives à la Pâque",
+    "13:17": "Dieu conduit la marche de son peuple",
+    "14:1": "Le pharaon poursuit les Israélites",
+    "14:15": "Dieu ouvre un passage à travers la mer",
+    "15:1": "Le cantique de Moïse, de Miriam et des Israélites",
+    "15:22": "L'eau de Mara est amère",
+    "16:1": "Dieu donne la manne et les cailles",
+    "16:19": "Concernant la manne",
+    "17:1": "L'eau du rocher",
+    "17:8": "Les Amalécites attaquent les Israélites",
+    "18:1": "Moïse et son beau-père Jéthro",
+    "18:13": "Moïse nomme des chefs pour rendre la justice",
+    "19:3": "Dieu propose une alliance à Israël",
+    "19:10": "Dieu rencontre Moïse sur le mont Sinaï",
+    "20:1": "Les dix paroles",
+    "20:22": "L'autel des sacrifices",
+    "21:1": "La loi sur les esclaves hébreux",
+    "21:12": "Les fautes méritant la peine de mort",
+    "21:18": "Les coups et les blessures",
+    "21:37": "Les vols d'animaux",
+    "22:4": "Les atteintes à la propriété",
+    "22:15": "Les lois morales et religieuses diverses",
+    "23:1": "Le respect des faibles",
+    "23:10": "L'année du repos et le jour du repos",
+    "23:14": "Les fêtes à observer en Israël",
+    "23:20": "Promesses et instructions avant le départ",
+    "24:1": "Dieu conclut l'alliance avec Israël",
+    "24:12": "Moïse rencontre Dieu sur la montagne",
+    "25:1": "La contribution des Israélites",
+    "25:10": "Le coffre de l'alliance",
+    "25:31": "Le porte-lampes à sept branches",
+    "26:1": "La fabrication de la demeure",
+    "27:1": "L'autel des sacrifices",
+    "27:9": "Les tentures de la cour",
+    "27:20": "L'huile pour le porte-lampes",
+    "28:1": "Les vêtements des prêtres",
+    "28:6": "L'éfod",
+    "28:15": "Le pectoral",
+    "28:31": "Les autres vêtements des prêtres",
+    "29:1": "Les premiers prêtres sont mis à part pour le Seigneur",
+    "29:38": "Les sacrifices complets de chaque jour",
+    "30:1": "L'autel du parfum",
+    "30:11": "L'impôt pour le sanctuaire",
+    "30:17": "Le bassin pour les purifications",
+    "30:22": "L'huile d'onction",
+    "30:34": "La fabrication du parfum",
+    "31:1": "Les artisans pour le lieu saint",
+    "31:12": "Le respect du sabbat",
+    "32:1": "Les Israélites fabriquent un veau d'or",
+    "32:11": "La prière de Moïse",
+    "32:25": "Dieu punit les Israélites",
+    "32:30": "Moïse supplie Dieu de pardonner à Israël",
+    "33:1": "Dieu donne à Moïse l'ordre de se mettre en route",
+    "33:7": "La tente de la rencontre",
+    "33:12": "Le Seigneur s'entretient avec Moïse",
+    "34:1": "Dieu donne les nouvelles tablettes de la Loi",
+    "34:10": "Dieu renouvelle l'alliance",
+    "34:29": "Moïse redescend au camp",
+    "35:1": "Le sabbat est un jour de repos",
+    "35:4": "Les Israélites apportent leur contribution",
+    "35:30": "Bessalel et Oholiab se mettent au travail",
+    "36:8": "Les artisans fabriquent la demeure",
+    "37:1": "Le coffre de l'alliance",
+    "37:17": "Le porte-lampes à sept branches",
+    "37:25": "L'autel du parfum",
+    "38:1": "L'autel des sacrifices et le bassin des purifications",
+    "38:9": "Les tentures de la cour",
+    "38:21": "Les quantités de métaux utilisés",
+    "39:1": "Les vêtements des prêtres",
+    "39:8": "Le pectoral",
+    "39:22": "Les autres vêtements réservés aux prêtres",
+    "39:32": "On apporte à Moïse le travail terminé",
+    "40:1": "Les instructions pour installer la demeure",
+    "40:16": "Moïse fait installer la demeure",
+    "40:34": "La gloire du Seigneur remplit la demeure"
+  },
+  "pericopes": [
+    {
+      "title": "Les Israélites sont esclaves en Égypte",
+      "start_ch": 1,
+      "start_v": 5,
+      "end_ch": 1,
+      "end_v": 14
+    },
+    {
+      "title": "Le courage des sages-femmes Chifra et Poua",
+      "start_ch": 1,
+      "start_v": 15,
+      "end_ch": 1,
+      "end_v": 22
+    },
+    {
+      "title": "La naissance et l'enfance de Moïse",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 10
+    },
+    {
+      "title": "Moïse doit fuir au pays de Madian",
+      "start_ch": 2,
+      "start_v": 11,
+      "end_ch": 2,
+      "end_v": 22
+    },
+    {
+      "title": "Dieu choisit Moïse pour libérer Israël",
+      "start_ch": 2,
+      "start_v": 23,
+      "end_ch": 2,
+      "end_v": 25
+    },
+    {
+      "title": "Dieu révèle son nom à Moïse",
+      "start_ch": 3,
+      "start_v": 11,
+      "end_ch": 3,
+      "end_v": 22
+    },
+    {
+      "title": "Dieu révèle sa puissance à Moïse",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 9
+    },
+    {
+      "title": "Dieu désigne Aaron comme porte-parole de Moïse",
+      "start_ch": 4,
+      "start_v": 10,
+      "end_ch": 4,
+      "end_v": 17
+    },
+    {
+      "title": "Moïse retourne auprès de son peuple",
+      "start_ch": 4,
+      "start_v": 18,
+      "end_ch": 4,
+      "end_v": 31
+    },
+    {
+      "title": "Moïse et Aaron vont chez le pharaon",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 5
+    },
+    {
+      "title": "Le pharaon augmente le travail des Israélites",
+      "start_ch": 5,
+      "start_v": 6,
+      "end_ch": 5,
+      "end_v": 23
+    },
+    {
+      "title": "Dieu promet à Moïse de délivrer Israël",
+      "start_ch": 6,
+      "start_v": 2,
+      "end_ch": 6,
+      "end_v": 13
+    },
+    {
+      "title": "Liste des ancêtres de Moïse et Aaron",
+      "start_ch": 6,
+      "start_v": 14,
+      "end_ch": 6,
+      "end_v": 27
+    },
+    {
+      "title": "Dieu renouvelle sa promesse à Moïse",
+      "start_ch": 6,
+      "start_v": 28,
+      "end_ch": 6,
+      "end_v": 30
+    },
+    {
+      "title": "Le pharaon refuse d'écouter Moïse et Aaron",
+      "start_ch": 7,
+      "start_v": 8,
+      "end_ch": 7,
+      "end_v": 13
+    },
+    {
+      "title": "Premier fléau&#160;: l'eau changée en sang",
+      "start_ch": 7,
+      "start_v": 14,
+      "end_ch": 7,
+      "end_v": 25
+    },
+    {
+      "title": "Deuxième fléau&#160;: les grenouilles",
+      "start_ch": 7,
+      "start_v": 26,
+      "end_ch": 7,
+      "end_v": 29
+    },
+    {
+      "title": "Troisième fléau&#160;: les moustiques",
+      "start_ch": 8,
+      "start_v": 12,
+      "end_ch": 8,
+      "end_v": 15
+    },
+    {
+      "title": "Quatrième fléau&#160;: les mouches piquantes",
+      "start_ch": 8,
+      "start_v": 16,
+      "end_ch": 8,
+      "end_v": 28
+    },
+    {
+      "title": "Cinquième fléau&#160;: la peste du bétail",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 7
+    },
+    {
+      "title": "Sixième fléau&#160;: les furoncles",
+      "start_ch": 9,
+      "start_v": 8,
+      "end_ch": 9,
+      "end_v": 12
+    },
+    {
+      "title": "Septième fléau&#160;: la grêle",
+      "start_ch": 9,
+      "start_v": 13,
+      "end_ch": 9,
+      "end_v": 35
+    },
+    {
+      "title": "Huitième fléau&#160;: les sauterelles",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 20
+    },
+    {
+      "title": "Neuvième fléau&#160;: l'obscurité",
+      "start_ch": 10,
+      "start_v": 21,
+      "end_ch": 10,
+      "end_v": 29
+    },
+    {
+      "title": "Annonce du dernier fléau",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 10
+    },
+    {
+      "title": "La fête de la Pâque",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 14
+    },
+    {
+      "title": "La fête des Pains sans levain",
+      "start_ch": 12,
+      "start_v": 15,
+      "end_ch": 12,
+      "end_v": 20
+    },
+    {
+      "title": "La préparation du repas de la Pâque",
+      "start_ch": 12,
+      "start_v": 21,
+      "end_ch": 12,
+      "end_v": 28
+    },
+    {
+      "title": "Le dernier fléau&#160;: les premiers-nés égyptiens meurent",
+      "start_ch": 12,
+      "start_v": 29,
+      "end_ch": 12,
+      "end_v": 42
+    },
+    {
+      "title": "Pour célébrer la Pâque",
+      "start_ch": 12,
+      "start_v": 43,
+      "end_ch": 12,
+      "end_v": 51
+    },
+    {
+      "title": "Autres instructions relatives à la Pâque",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 16
+    },
+    {
+      "title": "Dieu conduit la marche de son peuple",
+      "start_ch": 13,
+      "start_v": 17,
+      "end_ch": 13,
+      "end_v": 22
+    },
+    {
+      "title": "Le pharaon poursuit les Israélites",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 14
+    },
+    {
+      "title": "Dieu ouvre un passage à travers la mer",
+      "start_ch": 14,
+      "start_v": 15,
+      "end_ch": 14,
+      "end_v": 31
+    },
+    {
+      "title": "Le cantique de Moïse, de Miriam et des Israélites",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 21
+    },
+    {
+      "title": "L'eau de Mara est amère",
+      "start_ch": 15,
+      "start_v": 22,
+      "end_ch": 15,
+      "end_v": 27
+    },
+    {
+      "title": "Dieu donne la manne et les cailles",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 18
+    },
+    {
+      "title": "Concernant la manne",
+      "start_ch": 16,
+      "start_v": 19,
+      "end_ch": 16,
+      "end_v": 36
+    },
+    {
+      "title": "L'eau du rocher",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 7
+    },
+    {
+      "title": "Les Amalécites attaquent les Israélites",
+      "start_ch": 17,
+      "start_v": 8,
+      "end_ch": 17,
+      "end_v": 16
+    },
+    {
+      "title": "Moïse et son beau-père Jéthro",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 12
+    },
+    {
+      "title": "Moïse nomme des chefs pour rendre la justice",
+      "start_ch": 18,
+      "start_v": 13,
+      "end_ch": 18,
+      "end_v": 27
+    },
+    {
+      "title": "Dieu propose une alliance à Israël",
+      "start_ch": 19,
+      "start_v": 3,
+      "end_ch": 19,
+      "end_v": 9
+    },
+    {
+      "title": "Dieu rencontre Moïse sur le mont Sinaï",
+      "start_ch": 19,
+      "start_v": 10,
+      "end_ch": 19,
+      "end_v": 25
+    },
+    {
+      "title": "Les dix paroles",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 21
+    },
+    {
+      "title": "L'autel des sacrifices",
+      "start_ch": 20,
+      "start_v": 22,
+      "end_ch": 20,
+      "end_v": 26
+    },
+    {
+      "title": "La loi sur les esclaves hébreux",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 11
+    },
+    {
+      "title": "Les fautes méritant la peine de mort",
+      "start_ch": 21,
+      "start_v": 12,
+      "end_ch": 21,
+      "end_v": 17
+    },
+    {
+      "title": "Les coups et les blessures",
+      "start_ch": 21,
+      "start_v": 18,
+      "end_ch": 21,
+      "end_v": 36
+    },
+    {
+      "title": "Les vols d'animaux",
+      "start_ch": 21,
+      "start_v": 37,
+      "end_ch": 21,
+      "end_v": 37
+    },
+    {
+      "title": "Les atteintes à la propriété",
+      "start_ch": 22,
+      "start_v": 4,
+      "end_ch": 22,
+      "end_v": 14
+    },
+    {
+      "title": "Les lois morales et religieuses diverses",
+      "start_ch": 22,
+      "start_v": 15,
+      "end_ch": 22,
+      "end_v": 30
+    },
+    {
+      "title": "Le respect des faibles",
+      "start_ch": 23,
+      "start_v": 1,
+      "end_ch": 23,
+      "end_v": 9
+    },
+    {
+      "title": "L'année du repos et le jour du repos",
+      "start_ch": 23,
+      "start_v": 10,
+      "end_ch": 23,
+      "end_v": 13
+    },
+    {
+      "title": "Les fêtes à observer en Israël",
+      "start_ch": 23,
+      "start_v": 14,
+      "end_ch": 23,
+      "end_v": 19
+    },
+    {
+      "title": "Promesses et instructions avant le départ",
+      "start_ch": 23,
+      "start_v": 20,
+      "end_ch": 23,
+      "end_v": 33
+    },
+    {
+      "title": "Dieu conclut l'alliance avec Israël",
+      "start_ch": 24,
+      "start_v": 1,
+      "end_ch": 24,
+      "end_v": 11
+    },
+    {
+      "title": "Moïse rencontre Dieu sur la montagne",
+      "start_ch": 24,
+      "start_v": 12,
+      "end_ch": 24,
+      "end_v": 18
+    },
+    {
+      "title": "La contribution des Israélites",
+      "start_ch": 25,
+      "start_v": 1,
+      "end_ch": 25,
+      "end_v": 9
+    },
+    {
+      "title": "Le coffre de l'alliance",
+      "start_ch": 25,
+      "start_v": 10,
+      "end_ch": 25,
+      "end_v": 30
+    },
+    {
+      "title": "Le porte-lampes à sept branches",
+      "start_ch": 25,
+      "start_v": 31,
+      "end_ch": 25,
+      "end_v": 40
+    },
+    {
+      "title": "La fabrication de la demeure",
+      "start_ch": 26,
+      "start_v": 1,
+      "end_ch": 26,
+      "end_v": 37
+    },
+    {
+      "title": "L'autel des sacrifices",
+      "start_ch": 27,
+      "start_v": 1,
+      "end_ch": 27,
+      "end_v": 8
+    },
+    {
+      "title": "Les tentures de la cour",
+      "start_ch": 27,
+      "start_v": 9,
+      "end_ch": 27,
+      "end_v": 19
+    },
+    {
+      "title": "L'huile pour le porte-lampes",
+      "start_ch": 27,
+      "start_v": 20,
+      "end_ch": 27,
+      "end_v": 21
+    },
+    {
+      "title": "Les vêtements des prêtres",
+      "start_ch": 28,
+      "start_v": 1,
+      "end_ch": 28,
+      "end_v": 5
+    },
+    {
+      "title": "L'éfod",
+      "start_ch": 28,
+      "start_v": 6,
+      "end_ch": 28,
+      "end_v": 14
+    },
+    {
+      "title": "Le pectoral",
+      "start_ch": 28,
+      "start_v": 15,
+      "end_ch": 28,
+      "end_v": 30
+    },
+    {
+      "title": "Les autres vêtements des prêtres",
+      "start_ch": 28,
+      "start_v": 31,
+      "end_ch": 28,
+      "end_v": 43
+    },
+    {
+      "title": "Les premiers prêtres sont mis à part pour le Seigneur",
+      "start_ch": 29,
+      "start_v": 1,
+      "end_ch": 29,
+      "end_v": 37
+    },
+    {
+      "title": "Les sacrifices complets de chaque jour",
+      "start_ch": 29,
+      "start_v": 38,
+      "end_ch": 29,
+      "end_v": 46
+    },
+    {
+      "title": "L'autel du parfum",
+      "start_ch": 30,
+      "start_v": 1,
+      "end_ch": 30,
+      "end_v": 10
+    },
+    {
+      "title": "L'impôt pour le sanctuaire",
+      "start_ch": 30,
+      "start_v": 11,
+      "end_ch": 30,
+      "end_v": 16
+    },
+    {
+      "title": "Le bassin pour les purifications",
+      "start_ch": 30,
+      "start_v": 17,
+      "end_ch": 30,
+      "end_v": 21
+    },
+    {
+      "title": "L'huile d'onction",
+      "start_ch": 30,
+      "start_v": 22,
+      "end_ch": 30,
+      "end_v": 33
+    },
+    {
+      "title": "La fabrication du parfum",
+      "start_ch": 30,
+      "start_v": 34,
+      "end_ch": 30,
+      "end_v": 38
+    },
+    {
+      "title": "Les artisans pour le lieu saint",
+      "start_ch": 31,
+      "start_v": 1,
+      "end_ch": 31,
+      "end_v": 11
+    },
+    {
+      "title": "Le respect du sabbat",
+      "start_ch": 31,
+      "start_v": 12,
+      "end_ch": 31,
+      "end_v": 18
+    },
+    {
+      "title": "Les Israélites fabriquent un veau d'or",
+      "start_ch": 32,
+      "start_v": 1,
+      "end_ch": 32,
+      "end_v": 10
+    },
+    {
+      "title": "La prière de Moïse",
+      "start_ch": 32,
+      "start_v": 11,
+      "end_ch": 32,
+      "end_v": 24
+    },
+    {
+      "title": "Dieu punit les Israélites",
+      "start_ch": 32,
+      "start_v": 25,
+      "end_ch": 32,
+      "end_v": 29
+    },
+    {
+      "title": "Moïse supplie Dieu de pardonner à Israël",
+      "start_ch": 32,
+      "start_v": 30,
+      "end_ch": 32,
+      "end_v": 35
+    },
+    {
+      "title": "Dieu donne à Moïse l'ordre de se mettre en route",
+      "start_ch": 33,
+      "start_v": 1,
+      "end_ch": 33,
+      "end_v": 6
+    },
+    {
+      "title": "La tente de la rencontre",
+      "start_ch": 33,
+      "start_v": 7,
+      "end_ch": 33,
+      "end_v": 11
+    },
+    {
+      "title": "Le Seigneur s'entretient avec Moïse",
+      "start_ch": 33,
+      "start_v": 12,
+      "end_ch": 33,
+      "end_v": 23
+    },
+    {
+      "title": "Dieu donne les nouvelles tablettes de la Loi",
+      "start_ch": 34,
+      "start_v": 1,
+      "end_ch": 34,
+      "end_v": 9
+    },
+    {
+      "title": "Dieu renouvelle l'alliance",
+      "start_ch": 34,
+      "start_v": 10,
+      "end_ch": 34,
+      "end_v": 28
+    },
+    {
+      "title": "Moïse redescend au camp",
+      "start_ch": 34,
+      "start_v": 29,
+      "end_ch": 34,
+      "end_v": 35
+    },
+    {
+      "title": "Le sabbat est un jour de repos",
+      "start_ch": 35,
+      "start_v": 1,
+      "end_ch": 35,
+      "end_v": 3
+    },
+    {
+      "title": "Les Israélites apportent leur contribution",
+      "start_ch": 35,
+      "start_v": 4,
+      "end_ch": 35,
+      "end_v": 29
+    },
+    {
+      "title": "Bessalel et Oholiab se mettent au travail",
+      "start_ch": 35,
+      "start_v": 30,
+      "end_ch": 35,
+      "end_v": 35
+    },
+    {
+      "title": "Les artisans fabriquent la demeure",
+      "start_ch": 36,
+      "start_v": 8,
+      "end_ch": 36,
+      "end_v": 38
+    },
+    {
+      "title": "Le coffre de l'alliance",
+      "start_ch": 37,
+      "start_v": 1,
+      "end_ch": 37,
+      "end_v": 16
+    },
+    {
+      "title": "Le porte-lampes à sept branches",
+      "start_ch": 37,
+      "start_v": 17,
+      "end_ch": 37,
+      "end_v": 24
+    },
+    {
+      "title": "L'autel du parfum",
+      "start_ch": 37,
+      "start_v": 25,
+      "end_ch": 37,
+      "end_v": 29
+    },
+    {
+      "title": "L'autel des sacrifices et le bassin des purifications",
+      "start_ch": 38,
+      "start_v": 1,
+      "end_ch": 38,
+      "end_v": 8
+    },
+    {
+      "title": "Les tentures de la cour",
+      "start_ch": 38,
+      "start_v": 9,
+      "end_ch": 38,
+      "end_v": 20
+    },
+    {
+      "title": "Les quantités de métaux utilisés",
+      "start_ch": 38,
+      "start_v": 21,
+      "end_ch": 38,
+      "end_v": 31
+    },
+    {
+      "title": "Les vêtements des prêtres",
+      "start_ch": 39,
+      "start_v": 1,
+      "end_ch": 39,
+      "end_v": 7
+    },
+    {
+      "title": "Le pectoral",
+      "start_ch": 39,
+      "start_v": 8,
+      "end_ch": 39,
+      "end_v": 21
+    },
+    {
+      "title": "Les autres vêtements réservés aux prêtres",
+      "start_ch": 39,
+      "start_v": 22,
+      "end_ch": 39,
+      "end_v": 31
+    },
+    {
+      "title": "On apporte à Moïse le travail terminé",
+      "start_ch": 39,
+      "start_v": 32,
+      "end_ch": 39,
+      "end_v": 43
+    },
+    {
+      "title": "Les instructions pour installer la demeure",
+      "start_ch": 40,
+      "start_v": 1,
+      "end_ch": 40,
+      "end_v": 15
+    },
+    {
+      "title": "Moïse fait installer la demeure",
+      "start_ch": 40,
+      "start_v": 16,
+      "end_ch": 40,
+      "end_v": 33
+    },
+    {
+      "title": "La gloire du Seigneur remplit la demeure",
+      "start_ch": 40,
+      "start_v": 34,
+      "end_ch": 40,
+      "end_v": 38
+    }
+  ]
 }

@@ -59,5 +59,33 @@
       "18": "Tes bergers sommeillent, roi d'Assyrie, tes vaillants hommes se reposent, tes troupes sont dispersées sur les montagnes, et personne ne les rassemble.",
       "19": "Il n'y a pas de remède à ta blessure, ta plaie est mortelle. Tous ceux qui entendront parler de toi applaudiront à ton propos. En effet, quel est celui que ta méchanceté n'a pas atteint?"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Description de l’Eternel",
+    "1:9": "Annonce de la destruction de Ninive",
+    "3:1": "Causes de la destruction de Ninive"
+  },
+  "pericopes": [
+    {
+      "title": "Description de l’Eternel",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 8
+    },
+    {
+      "title": "Annonce de la destruction de Ninive",
+      "start_ch": 1,
+      "start_v": 9,
+      "end_ch": 1,
+      "end_v": 14
+    },
+    {
+      "title": "Causes de la destruction de Ninive",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 19
+    }
+  ]
 }

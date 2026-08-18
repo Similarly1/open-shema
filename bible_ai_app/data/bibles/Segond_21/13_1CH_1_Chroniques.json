@@ -1007,5 +1007,353 @@
       "29": "Les actes du roi David, des premiers aux derniers, sont décrits dans les annales de Samuel, le voyant, dans celles du prophète Nathan et dans celles du prophète Gad,",
       "30": "avec tout son règne et tous ses exploits, ainsi que les événements auxquels il a été confronté, de même qu'Israël et tous les royaumes des autres pays."
     }
-  }
+  },
+  "sections": {
+    "1:1": "D'Adam à Noé et ses descendants",
+    "1:24": "De Sem à Abraham et ses descendants",
+    "1:43": "Rois et chefs d'Edom",
+    "2:1": "Les fils de Jacob et la descendance de Juda",
+    "3:1": "Descendance de David",
+    "4:1": "Autres descendants de Juda",
+    "4:24": "Descendance de Siméon",
+    "5:1": "Descendance de Ruben, Gad et Manassé",
+    "5:27": "Descendance de Lévi",
+    "6:39": "Villes des prêtres et des Lévites",
+    "7:1": "Descendance d'Issacar, Benjamin et Nephthali",
+    "7:14": "Descendance de Manassé et Ephraïm",
+    "7:30": "Descendance d’Aser",
+    "8:1": "Descendants de Benjamin établis à Jérusalem",
+    "9:1": "Premiers habitants de Jérusalem après l’exil",
+    "9:35": "Généalogie de Saül et de Jonathan",
+    "10:1": "Mort de Saül",
+    "11:1": "Sacre de David sur Israël",
+    "11:10": "Les vaillants hommes de David",
+    "12:24": "Israélites venus sacrer David à Hébron",
+    "13:1": "Dépôt de l’arche chez Obed-Edom",
+    "14:1": "Prospérité et victoires de David",
+    "15:1": "Transport de l’arche à Jérusalem",
+    "16:1": "Organisation du service du tabernacle",
+    "17:1": "Une maison pour Dieu et pour David",
+    "18:1": "Prospérité de David",
+    "19:1": "Guerre contre les Ammonites et leurs alliés",
+    "20:1": "Prise de Rabba",
+    "20:4": "Exploits contre les Philistins",
+    "21:1": "Dénombrement et peste",
+    "22:1": "Préparatifs pour la construction du temple",
+    "23:1": "Recensement et fonctions des Lévites",
+    "24:1": "Répartition des prêtres en classes",
+    "24:20": "Chefs des Lévites",
+    "25:1": "Liste et fonctions des musiciens",
+    "26:1": "Portiers du temple et intendants",
+    "26:29": "Magistrats et surveillants en Israël",
+    "27:1": "Chefs d'armée de David",
+    "27:16": "Chefs des tribus d'Israël",
+    "27:25": "Administrateurs et conseillers de David",
+    "28:1": "Instructions de David pour la construction du temple",
+    "29:1": "Offrandes volontaires pour le temple",
+    "29:20": "Accession de Salomon au trône"
+  },
+  "pericopes": [
+    {
+      "title": "D'Adam à Noé et ses descendants",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 23
+    },
+    {
+      "title": "De Sem à Abraham et ses descendants",
+      "start_ch": 1,
+      "start_v": 24,
+      "end_ch": 1,
+      "end_v": 42
+    },
+    {
+      "title": "Rois et chefs d'Edom",
+      "start_ch": 1,
+      "start_v": 43,
+      "end_ch": 1,
+      "end_v": 54
+    },
+    {
+      "title": "Les fils de Jacob et la descendance de Juda",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 55
+    },
+    {
+      "title": "Descendance de David",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 24
+    },
+    {
+      "title": "Autres descendants de Juda",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 23
+    },
+    {
+      "title": "Descendance de Siméon",
+      "start_ch": 4,
+      "start_v": 24,
+      "end_ch": 4,
+      "end_v": 43
+    },
+    {
+      "title": "Descendance de Ruben, Gad et Manassé",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 26
+    },
+    {
+      "title": "Descendance de Lévi",
+      "start_ch": 5,
+      "start_v": 27,
+      "end_ch": 5,
+      "end_v": 41
+    },
+    {
+      "title": "Villes des prêtres et des Lévites",
+      "start_ch": 6,
+      "start_v": 39,
+      "end_ch": 6,
+      "end_v": 66
+    },
+    {
+      "title": "Descendance d'Issacar, Benjamin et Nephthali",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 13
+    },
+    {
+      "title": "Descendance de Manassé et Ephraïm",
+      "start_ch": 7,
+      "start_v": 14,
+      "end_ch": 7,
+      "end_v": 29
+    },
+    {
+      "title": "Descendance d’Aser",
+      "start_ch": 7,
+      "start_v": 30,
+      "end_ch": 7,
+      "end_v": 40
+    },
+    {
+      "title": "Descendants de Benjamin établis à Jérusalem",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 40
+    },
+    {
+      "title": "Premiers habitants de Jérusalem après l’exil",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 34
+    },
+    {
+      "title": "Généalogie de Saül et de Jonathan",
+      "start_ch": 9,
+      "start_v": 35,
+      "end_ch": 9,
+      "end_v": 44
+    },
+    {
+      "title": "Mort de Saül",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 14
+    },
+    {
+      "title": "Sacre de David sur Israël",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 9
+    },
+    {
+      "title": "Les vaillants hommes de David",
+      "start_ch": 11,
+      "start_v": 10,
+      "end_ch": 11,
+      "end_v": 47
+    },
+    {
+      "title": "Israélites venus sacrer David à Hébron",
+      "start_ch": 12,
+      "start_v": 24,
+      "end_ch": 12,
+      "end_v": 41
+    },
+    {
+      "title": "Dépôt de l’arche chez Obed-Edom",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 14
+    },
+    {
+      "title": "Prospérité et victoires de David",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 17
+    },
+    {
+      "title": "Transport de l’arche à Jérusalem",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 29
+    },
+    {
+      "title": "Organisation du service du tabernacle",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 43
+    },
+    {
+      "title": "Une maison pour Dieu et pour David",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 27
+    },
+    {
+      "title": "Prospérité de David",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 17
+    },
+    {
+      "title": "Guerre contre les Ammonites et leurs alliés",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 19
+    },
+    {
+      "title": "Prise de Rabba",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 3
+    },
+    {
+      "title": "Exploits contre les Philistins",
+      "start_ch": 20,
+      "start_v": 4,
+      "end_ch": 20,
+      "end_v": 8
+    },
+    {
+      "title": "Dénombrement et peste",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 30
+    },
+    {
+      "title": "Préparatifs pour la construction du temple",
+      "start_ch": 22,
+      "start_v": 1,
+      "end_ch": 22,
+      "end_v": 19
+    },
+    {
+      "title": "Recensement et fonctions des Lévites",
+      "start_ch": 23,
+      "start_v": 1,
+      "end_ch": 23,
+      "end_v": 32
+    },
+    {
+      "title": "Répartition des prêtres en classes",
+      "start_ch": 24,
+      "start_v": 1,
+      "end_ch": 24,
+      "end_v": 19
+    },
+    {
+      "title": "Chefs des Lévites",
+      "start_ch": 24,
+      "start_v": 20,
+      "end_ch": 24,
+      "end_v": 31
+    },
+    {
+      "title": "Liste et fonctions des musiciens",
+      "start_ch": 25,
+      "start_v": 1,
+      "end_ch": 25,
+      "end_v": 31
+    },
+    {
+      "title": "Portiers du temple et intendants",
+      "start_ch": 26,
+      "start_v": 1,
+      "end_ch": 26,
+      "end_v": 28
+    },
+    {
+      "title": "Magistrats et surveillants en Israël",
+      "start_ch": 26,
+      "start_v": 29,
+      "end_ch": 26,
+      "end_v": 32
+    },
+    {
+      "title": "Chefs d'armée de David",
+      "start_ch": 27,
+      "start_v": 1,
+      "end_ch": 27,
+      "end_v": 15
+    },
+    {
+      "title": "Chefs des tribus d'Israël",
+      "start_ch": 27,
+      "start_v": 16,
+      "end_ch": 27,
+      "end_v": 24
+    },
+    {
+      "title": "Administrateurs et conseillers de David",
+      "start_ch": 27,
+      "start_v": 25,
+      "end_ch": 27,
+      "end_v": 34
+    },
+    {
+      "title": "Instructions de David pour la construction du temple",
+      "start_ch": 28,
+      "start_v": 1,
+      "end_ch": 28,
+      "end_v": 21
+    },
+    {
+      "title": "Offrandes volontaires pour le temple",
+      "start_ch": 29,
+      "start_v": 1,
+      "end_ch": 29,
+      "end_v": 19
+    },
+    {
+      "title": "Accession de Salomon au trône",
+      "start_ch": 29,
+      "start_v": 20,
+      "end_ch": 29,
+      "end_v": 30
+    }
+  ]
 }

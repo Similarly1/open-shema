@@ -139,5 +139,289 @@
       "13": "Habitante des jardins, des compagnons prêtent attention à ta voix. Fais-la-moi entendre!",
       "14": "Prends la fuite, mon bien-aimé! Montre-toi pareil à la gazelle ou au jeune cerf sur les montagnes aux aromates!"
     }
-  }
+  },
+  "sections": {
+    "1:2": "La jeune femme",
+    "1:5": "La jeune femme",
+    "1:8": "Les filles de Jérusalem",
+    "1:9": "Le jeune homme",
+    "1:11": "Les filles de Jérusalem",
+    "1:12": "La jeune femme",
+    "1:15": "Le jeune homme",
+    "1:16": "La jeune femme",
+    "2:2": "Le jeune homme",
+    "2:3": "La jeune femme",
+    "2:7": "Le jeune homme",
+    "2:8": "La jeune femme",
+    "3:5": "Le jeune homme",
+    "3:6": "Les filles de Jérusalem",
+    "4:1": "Le jeune homme",
+    "4:16": "La jeune femme",
+    "5:1": "Le jeune homme",
+    "5:2": "La jeune femme",
+    "5:9": "Les filles de Jérusalem",
+    "5:10": "La jeune femme",
+    "6:1": "Les filles de Jérusalem",
+    "6:2": "La jeune femme",
+    "6:4": "Le jeune homme",
+    "6:10": "Les filles de Jérusalem",
+    "6:11": "Le jeune homme",
+    "7:1": "Les filles de Jérusalem",
+    "7:2": "Le jeune homme",
+    "7:11": "La jeune femme",
+    "8:4": "Le jeune homme",
+    "8:5": "Les filles de Jérusalem",
+    "8:6": "La jeune femme",
+    "8:8": "Les frères de la jeune femme",
+    "8:10": "La jeune femme",
+    "8:13": "Le jeune homme",
+    "8:14": "La jeune femme"
+  },
+  "pericopes": [
+    {
+      "title": "La jeune femme",
+      "start_ch": 1,
+      "start_v": 2,
+      "end_ch": 1,
+      "end_v": 4
+    },
+    {
+      "title": "La jeune femme",
+      "start_ch": 1,
+      "start_v": 5,
+      "end_ch": 1,
+      "end_v": 7
+    },
+    {
+      "title": "Les filles de Jérusalem",
+      "start_ch": 1,
+      "start_v": 8,
+      "end_ch": 1,
+      "end_v": 8
+    },
+    {
+      "title": "Le jeune homme",
+      "start_ch": 1,
+      "start_v": 9,
+      "end_ch": 1,
+      "end_v": 10
+    },
+    {
+      "title": "Les filles de Jérusalem",
+      "start_ch": 1,
+      "start_v": 11,
+      "end_ch": 1,
+      "end_v": 11
+    },
+    {
+      "title": "La jeune femme",
+      "start_ch": 1,
+      "start_v": 12,
+      "end_ch": 1,
+      "end_v": 14
+    },
+    {
+      "title": "Le jeune homme",
+      "start_ch": 1,
+      "start_v": 15,
+      "end_ch": 1,
+      "end_v": 15
+    },
+    {
+      "title": "La jeune femme",
+      "start_ch": 1,
+      "start_v": 16,
+      "end_ch": 1,
+      "end_v": 17
+    },
+    {
+      "title": "Le jeune homme",
+      "start_ch": 2,
+      "start_v": 2,
+      "end_ch": 2,
+      "end_v": 2
+    },
+    {
+      "title": "La jeune femme",
+      "start_ch": 2,
+      "start_v": 3,
+      "end_ch": 2,
+      "end_v": 6
+    },
+    {
+      "title": "Le jeune homme",
+      "start_ch": 2,
+      "start_v": 7,
+      "end_ch": 2,
+      "end_v": 7
+    },
+    {
+      "title": "La jeune femme",
+      "start_ch": 2,
+      "start_v": 8,
+      "end_ch": 2,
+      "end_v": 17
+    },
+    {
+      "title": "Le jeune homme",
+      "start_ch": 3,
+      "start_v": 5,
+      "end_ch": 3,
+      "end_v": 5
+    },
+    {
+      "title": "Les filles de Jérusalem",
+      "start_ch": 3,
+      "start_v": 6,
+      "end_ch": 3,
+      "end_v": 11
+    },
+    {
+      "title": "Le jeune homme",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 15
+    },
+    {
+      "title": "La jeune femme",
+      "start_ch": 4,
+      "start_v": 16,
+      "end_ch": 4,
+      "end_v": 16
+    },
+    {
+      "title": "Le jeune homme",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 1
+    },
+    {
+      "title": "La jeune femme",
+      "start_ch": 5,
+      "start_v": 2,
+      "end_ch": 5,
+      "end_v": 8
+    },
+    {
+      "title": "Les filles de Jérusalem",
+      "start_ch": 5,
+      "start_v": 9,
+      "end_ch": 5,
+      "end_v": 9
+    },
+    {
+      "title": "La jeune femme",
+      "start_ch": 5,
+      "start_v": 10,
+      "end_ch": 5,
+      "end_v": 16
+    },
+    {
+      "title": "Les filles de Jérusalem",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 1
+    },
+    {
+      "title": "La jeune femme",
+      "start_ch": 6,
+      "start_v": 2,
+      "end_ch": 6,
+      "end_v": 3
+    },
+    {
+      "title": "Le jeune homme",
+      "start_ch": 6,
+      "start_v": 4,
+      "end_ch": 6,
+      "end_v": 9
+    },
+    {
+      "title": "Les filles de Jérusalem",
+      "start_ch": 6,
+      "start_v": 10,
+      "end_ch": 6,
+      "end_v": 10
+    },
+    {
+      "title": "Le jeune homme",
+      "start_ch": 6,
+      "start_v": 11,
+      "end_ch": 6,
+      "end_v": 12
+    },
+    {
+      "title": "Les filles de Jérusalem",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 1
+    },
+    {
+      "title": "Le jeune homme",
+      "start_ch": 7,
+      "start_v": 2,
+      "end_ch": 7,
+      "end_v": 10
+    },
+    {
+      "title": "La jeune femme",
+      "start_ch": 7,
+      "start_v": 11,
+      "end_ch": 7,
+      "end_v": 14
+    },
+    {
+      "title": "Le jeune homme",
+      "start_ch": 8,
+      "start_v": 4,
+      "end_ch": 8,
+      "end_v": 4
+    },
+    {
+      "title": "Les filles de Jérusalem",
+      "start_ch": 8,
+      "start_v": 5,
+      "end_ch": 8,
+      "end_v": 5
+    },
+    {
+      "title": "La jeune femme",
+      "start_ch": 8,
+      "start_v": 6,
+      "end_ch": 8,
+      "end_v": 7
+    },
+    {
+      "title": "Les frères de la jeune femme",
+      "start_ch": 8,
+      "start_v": 8,
+      "end_ch": 8,
+      "end_v": 9
+    },
+    {
+      "title": "La jeune femme",
+      "start_ch": 8,
+      "start_v": 10,
+      "end_ch": 8,
+      "end_v": 12
+    },
+    {
+      "title": "Le jeune homme",
+      "start_ch": 8,
+      "start_v": 13,
+      "end_ch": 8,
+      "end_v": 13
+    },
+    {
+      "title": "La jeune femme",
+      "start_ch": 8,
+      "start_v": 14,
+      "end_ch": 8,
+      "end_v": 14
+    }
+  ]
 }

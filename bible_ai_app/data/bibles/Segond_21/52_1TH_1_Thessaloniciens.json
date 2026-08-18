@@ -105,5 +105,57 @@
       "27": "Je vous en supplie par le Seigneur: que cette lettre soit lue à tous les frères et sœurs!",
       "28": "Que la grâce de notre Seigneur Jésus-Christ soit avec vous!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Salutation et louange",
+    "2:1": "Ministère de Paul à Thessalonique",
+    "2:17": "Mission de Timothée",
+    "4:1": "Appel à la sainteté",
+    "4:13": "Résurrection des croyants et retour du Seigneur",
+    "5:12": "Dernières recommandations"
+  },
+  "pericopes": [
+    {
+      "title": "Salutation et louange",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 10
+    },
+    {
+      "title": "Ministère de Paul à Thessalonique",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 16
+    },
+    {
+      "title": "Mission de Timothée",
+      "start_ch": 2,
+      "start_v": 17,
+      "end_ch": 2,
+      "end_v": 20
+    },
+    {
+      "title": "Appel à la sainteté",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 12
+    },
+    {
+      "title": "Résurrection des croyants et retour du Seigneur",
+      "start_ch": 4,
+      "start_v": 13,
+      "end_ch": 4,
+      "end_v": 18
+    },
+    {
+      "title": "Dernières recommandations",
+      "start_ch": 5,
+      "start_v": 12,
+      "end_ch": 5,
+      "end_v": 28
+    }
+  ]
 }

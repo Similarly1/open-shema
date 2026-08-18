@@ -1489,5 +1489,73 @@
       "29": "Que votre âme se réjouisse dans la miséricorde du Seigneur et n’ayez pas honte de le louer.",
       "30": "Accomplissez votre œuvre avant le temps fixé et il vous donnera votre récompense en son temps. Louez le Seigneur car il est bon, car éternel est son amour. Louez le Dieu des louanges, car éternel est son amour. Louez le gardien d’Israël, car éternel est son amour. Louez le Créateur de l’univers, car éternel est son amour. Louez le Rédempteur d’Israël, car éternel est son amour. Louez celui qui rassemble les dispersés d’Israël, car éternel est son amour. Louez celui qui bâtit sa ville et son sanctuaire, car éternel est son amour. Louez celui qui fait pousser une corne à la maison de David, car éternel est son amour. Louez celui qui a choisi comme prêtres les fils de Sadoq, car éternel est son amour. Louez le bouclier d’Abraham, car éternel est son amour. Louez le rocher d’Isaac, car éternel est son amour. Louez le puissant de Jacob, car éternel est son amour. Louez celui qui a choisi Sion, car éternel est son amour. Louez le Roi des rois des rois, car éternel est son amour. Et il relèvera la puissance de son peuple, motif de louange pour tous ses fidèles, les fils d’Israël, le peuple qui lui est proche. Alléluia."
     }
-  }
+  },
+  "sections": {
+    "0:1": "PROLOGUE",
+    "1:1": "SECTION A",
+    "16:24": "SECTION B",
+    "24:1": "SECTION C",
+    "32:14": "SECTION D",
+    "42:15": "SECTION E : GRANDEUR ET SAGESSE DE DIEU DANS LA NATURE",
+    "44:1": "ÉLOGE DES PÈRES",
+    "51:1": "APPENDICES"
+  },
+  "pericopes": [
+    {
+      "title": "PROLOGUE",
+      "start_ch": 0,
+      "start_v": 1,
+      "end_ch": 0,
+      "end_v": 35
+    },
+    {
+      "title": "SECTION A",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 30
+    },
+    {
+      "title": "SECTION B",
+      "start_ch": 16,
+      "start_v": 24,
+      "end_ch": 16,
+      "end_v": 30
+    },
+    {
+      "title": "SECTION C",
+      "start_ch": 24,
+      "start_v": 1,
+      "end_ch": 24,
+      "end_v": 34
+    },
+    {
+      "title": "SECTION D",
+      "start_ch": 32,
+      "start_v": 14,
+      "end_ch": 32,
+      "end_v": 24
+    },
+    {
+      "title": "SECTION E : GRANDEUR ET SAGESSE DE DIEU DANS LA NATURE",
+      "start_ch": 42,
+      "start_v": 15,
+      "end_ch": 42,
+      "end_v": 25
+    },
+    {
+      "title": "ÉLOGE DES PÈRES",
+      "start_ch": 44,
+      "start_v": 1,
+      "end_ch": 44,
+      "end_v": 23
+    },
+    {
+      "title": "APPENDICES",
+      "start_ch": 51,
+      "start_v": 1,
+      "end_ch": 51,
+      "end_v": 30
+    }
+  ]
 }

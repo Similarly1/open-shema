@@ -1429,5 +1429,633 @@
       "23": "A chaque début de mois et à chaque sabbat, tout être vivant viendra se prosterner devant moi, dit l'Eternel,",
       "24": "et quand on sortira, on verra les cadavres des hommes qui se sont rebellés contre moi. En effet, *leur ver ne mourra pas et leur feu ne s'éteindra pas, et ils seront pour chacun un objet d'horreur."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Péchés de Juda et punition",
+    "2:1": "Gloire future de Jérusalem",
+    "2:6": "Jugement des idolâtres et des orgueilleux",
+    "3:1": "Jugement des habitants de Jérusalem",
+    "4:2": "Purification et gloire d'Israël",
+    "5:1": "Israël, vigne de l'Eternel",
+    "6:1": "Appel et mission d'Esaïe",
+    "7:1": "Guerre contre Juda",
+    "7:10": "Annonce de la naissance d'Emmanuel",
+    "7:17": "Jugement d'Israël",
+    "8:1": "Ruine des royaumes de Syrie et d'Israël",
+    "8:23": "L’ère messianique",
+    "9:7": "Jugement d'Israël et de Juda",
+    "10:5": "Jugement de l'Assyrie",
+    "11:1": "Le Messie et son règne",
+    "12:1": "Prière de reconnaissance",
+    "13:1": "Prophétie sur Babylone",
+    "14:24": "Prophétie sur l'Assyrie",
+    "14:28": "Prophétie contre les Philistins",
+    "15:1": "Prophétie sur Moab",
+    "17:1": "Prophétie sur la Syrie",
+    "18:1": "Prophétie sur l'Ethiopie",
+    "19:1": "Prophétie sur l'Egypte",
+    "20:1": "Egyptiens et Ethiopiens prisonniers",
+    "21:1": "Prophétie sur la prise de Babylone",
+    "21:11": "Prophétie contre Edom et l'Arabie",
+    "22:1": "Prophétie sur Jérusalem",
+    "23:1": "Prophétie sur Tyr",
+    "24:1": "Jugement universel",
+    "25:1": "Prière de reconnaissance",
+    "26:1": "Cantique à la gloire de Dieu",
+    "27:2": "Annonce du rétablissement d'Israël",
+    "28:1": "Prophétie sur Ephraïm",
+    "28:23": "Parabole du cultivateur",
+    "29:1": "Malédiction sur Jérusalem",
+    "29:17": "Promesses pour Israël",
+    "30:1": "Annonce de la punition de Juda",
+    "30:18": "Promesses pour l'avenir",
+    "30:27": "Jugement des Assyriens",
+    "31:1": "Dieu, seul auteur du salut",
+    "33:1": "Délivrance de Jérusalem",
+    "34:1": "Prophétie sur Edom",
+    "35:1": "Bénédiction future d'Israël",
+    "36:1": "Invasion de Juda par Sanchérib",
+    "37:1": "Délivrance d'Ezéchias et de Juda",
+    "38:1": "Maladie et guérison d'Ezéchias",
+    "39:1": "Délégation de Babylone auprès d'Ezéchias",
+    "40:1": "Venue prochaine du Seigneur",
+    "41:1": "Puissance de Dieu et inconsistance des idoles",
+    "42:1": "Le serviteur de l'Eternel",
+    "43:1": "Dieu, le seul Sauveur",
+    "44:1": "L'Eternel et les idoles",
+    "44:21": "Retour d'Israël chez lui",
+    "45:14": "Bénédictions universelles",
+    "46:1": "Action souveraine de Dieu",
+    "47:1": "Jugement de Babylone",
+    "48:1": "Anciennes et nouvelles prédictions",
+    "48:12": "Appel à écouter Dieu",
+    "49:1": "Le Sauveur d'Israël et des nations",
+    "50:1": "Reproches de l'Eternel à son peuple",
+    "50:4": "Le serviteur de l'Eternel insulté",
+    "51:1": "Promesses de délivrance",
+    "52:1": "Promesse de rétablissement",
+    "52:13": "La personne et l’activité du serviteur de l'Eternel",
+    "54:1": "Prospérité future d'Israël",
+    "55:1": "Le salut pour tous",
+    "56:9": "Reproches aux chefs et aux idolâtres",
+    "57:14": "Promesses de paix et de guérison",
+    "58:1": "Le vrai jeûne",
+    "59:1": "Crimes et jugement de Juda",
+    "60:1": "Gloire future de Jérusalem",
+    "61:1": "Le salut proclamé",
+    "62:1": "Le salut de Jérusalem",
+    "63:1": "Un jour de vengeance",
+    "63:7": "Rappel du passé",
+    "63:15": "Prière du peuple",
+    "65:1": "Réponse de Dieu",
+    "66:1": "Gloire de la Jérusalem future"
+  },
+  "pericopes": [
+    {
+      "title": "Péchés de Juda et punition",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 31
+    },
+    {
+      "title": "Gloire future de Jérusalem",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 5
+    },
+    {
+      "title": "Jugement des idolâtres et des orgueilleux",
+      "start_ch": 2,
+      "start_v": 6,
+      "end_ch": 2,
+      "end_v": 22
+    },
+    {
+      "title": "Jugement des habitants de Jérusalem",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 26
+    },
+    {
+      "title": "Purification et gloire d'Israël",
+      "start_ch": 4,
+      "start_v": 2,
+      "end_ch": 4,
+      "end_v": 6
+    },
+    {
+      "title": "Israël, vigne de l'Eternel",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 30
+    },
+    {
+      "title": "Appel et mission d'Esaïe",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 13
+    },
+    {
+      "title": "Guerre contre Juda",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 9
+    },
+    {
+      "title": "Annonce de la naissance d'Emmanuel",
+      "start_ch": 7,
+      "start_v": 10,
+      "end_ch": 7,
+      "end_v": 16
+    },
+    {
+      "title": "Jugement d'Israël",
+      "start_ch": 7,
+      "start_v": 17,
+      "end_ch": 7,
+      "end_v": 25
+    },
+    {
+      "title": "Ruine des royaumes de Syrie et d'Israël",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 22
+    },
+    {
+      "title": "L’ère messianique",
+      "start_ch": 8,
+      "start_v": 23,
+      "end_ch": 8,
+      "end_v": 23
+    },
+    {
+      "title": "Jugement d'Israël et de Juda",
+      "start_ch": 9,
+      "start_v": 7,
+      "end_ch": 9,
+      "end_v": 20
+    },
+    {
+      "title": "Jugement de l'Assyrie",
+      "start_ch": 10,
+      "start_v": 5,
+      "end_ch": 10,
+      "end_v": 34
+    },
+    {
+      "title": "Le Messie et son règne",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 16
+    },
+    {
+      "title": "Prière de reconnaissance",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 6
+    },
+    {
+      "title": "Prophétie sur Babylone",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 22
+    },
+    {
+      "title": "Prophétie sur l'Assyrie",
+      "start_ch": 14,
+      "start_v": 24,
+      "end_ch": 14,
+      "end_v": 27
+    },
+    {
+      "title": "Prophétie contre les Philistins",
+      "start_ch": 14,
+      "start_v": 28,
+      "end_ch": 14,
+      "end_v": 32
+    },
+    {
+      "title": "Prophétie sur Moab",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 9
+    },
+    {
+      "title": "Prophétie sur la Syrie",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 14
+    },
+    {
+      "title": "Prophétie sur l'Ethiopie",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 7
+    },
+    {
+      "title": "Prophétie sur l'Egypte",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 25
+    },
+    {
+      "title": "Egyptiens et Ethiopiens prisonniers",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 6
+    },
+    {
+      "title": "Prophétie sur la prise de Babylone",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 10
+    },
+    {
+      "title": "Prophétie contre Edom et l'Arabie",
+      "start_ch": 21,
+      "start_v": 11,
+      "end_ch": 21,
+      "end_v": 17
+    },
+    {
+      "title": "Prophétie sur Jérusalem",
+      "start_ch": 22,
+      "start_v": 1,
+      "end_ch": 22,
+      "end_v": 25
+    },
+    {
+      "title": "Prophétie sur Tyr",
+      "start_ch": 23,
+      "start_v": 1,
+      "end_ch": 23,
+      "end_v": 18
+    },
+    {
+      "title": "Jugement universel",
+      "start_ch": 24,
+      "start_v": 1,
+      "end_ch": 24,
+      "end_v": 23
+    },
+    {
+      "title": "Prière de reconnaissance",
+      "start_ch": 25,
+      "start_v": 1,
+      "end_ch": 25,
+      "end_v": 12
+    },
+    {
+      "title": "Cantique à la gloire de Dieu",
+      "start_ch": 26,
+      "start_v": 1,
+      "end_ch": 26,
+      "end_v": 21
+    },
+    {
+      "title": "Annonce du rétablissement d'Israël",
+      "start_ch": 27,
+      "start_v": 2,
+      "end_ch": 27,
+      "end_v": 13
+    },
+    {
+      "title": "Prophétie sur Ephraïm",
+      "start_ch": 28,
+      "start_v": 1,
+      "end_ch": 28,
+      "end_v": 22
+    },
+    {
+      "title": "Parabole du cultivateur",
+      "start_ch": 28,
+      "start_v": 23,
+      "end_ch": 28,
+      "end_v": 29
+    },
+    {
+      "title": "Malédiction sur Jérusalem",
+      "start_ch": 29,
+      "start_v": 1,
+      "end_ch": 29,
+      "end_v": 16
+    },
+    {
+      "title": "Promesses pour Israël",
+      "start_ch": 29,
+      "start_v": 17,
+      "end_ch": 29,
+      "end_v": 24
+    },
+    {
+      "title": "Annonce de la punition de Juda",
+      "start_ch": 30,
+      "start_v": 1,
+      "end_ch": 30,
+      "end_v": 17
+    },
+    {
+      "title": "Promesses pour l'avenir",
+      "start_ch": 30,
+      "start_v": 18,
+      "end_ch": 30,
+      "end_v": 26
+    },
+    {
+      "title": "Jugement des Assyriens",
+      "start_ch": 30,
+      "start_v": 27,
+      "end_ch": 30,
+      "end_v": 33
+    },
+    {
+      "title": "Dieu, seul auteur du salut",
+      "start_ch": 31,
+      "start_v": 1,
+      "end_ch": 31,
+      "end_v": 9
+    },
+    {
+      "title": "Délivrance de Jérusalem",
+      "start_ch": 33,
+      "start_v": 1,
+      "end_ch": 33,
+      "end_v": 24
+    },
+    {
+      "title": "Prophétie sur Edom",
+      "start_ch": 34,
+      "start_v": 1,
+      "end_ch": 34,
+      "end_v": 17
+    },
+    {
+      "title": "Bénédiction future d'Israël",
+      "start_ch": 35,
+      "start_v": 1,
+      "end_ch": 35,
+      "end_v": 10
+    },
+    {
+      "title": "Invasion de Juda par Sanchérib",
+      "start_ch": 36,
+      "start_v": 1,
+      "end_ch": 36,
+      "end_v": 22
+    },
+    {
+      "title": "Délivrance d'Ezéchias et de Juda",
+      "start_ch": 37,
+      "start_v": 1,
+      "end_ch": 37,
+      "end_v": 38
+    },
+    {
+      "title": "Maladie et guérison d'Ezéchias",
+      "start_ch": 38,
+      "start_v": 1,
+      "end_ch": 38,
+      "end_v": 22
+    },
+    {
+      "title": "Délégation de Babylone auprès d'Ezéchias",
+      "start_ch": 39,
+      "start_v": 1,
+      "end_ch": 39,
+      "end_v": 8
+    },
+    {
+      "title": "Venue prochaine du Seigneur",
+      "start_ch": 40,
+      "start_v": 1,
+      "end_ch": 40,
+      "end_v": 31
+    },
+    {
+      "title": "Puissance de Dieu et inconsistance des idoles",
+      "start_ch": 41,
+      "start_v": 1,
+      "end_ch": 41,
+      "end_v": 29
+    },
+    {
+      "title": "Le serviteur de l'Eternel",
+      "start_ch": 42,
+      "start_v": 1,
+      "end_ch": 42,
+      "end_v": 25
+    },
+    {
+      "title": "Dieu, le seul Sauveur",
+      "start_ch": 43,
+      "start_v": 1,
+      "end_ch": 43,
+      "end_v": 28
+    },
+    {
+      "title": "L'Eternel et les idoles",
+      "start_ch": 44,
+      "start_v": 1,
+      "end_ch": 44,
+      "end_v": 20
+    },
+    {
+      "title": "Retour d'Israël chez lui",
+      "start_ch": 44,
+      "start_v": 21,
+      "end_ch": 44,
+      "end_v": 28
+    },
+    {
+      "title": "Bénédictions universelles",
+      "start_ch": 45,
+      "start_v": 14,
+      "end_ch": 45,
+      "end_v": 25
+    },
+    {
+      "title": "Action souveraine de Dieu",
+      "start_ch": 46,
+      "start_v": 1,
+      "end_ch": 46,
+      "end_v": 13
+    },
+    {
+      "title": "Jugement de Babylone",
+      "start_ch": 47,
+      "start_v": 1,
+      "end_ch": 47,
+      "end_v": 15
+    },
+    {
+      "title": "Anciennes et nouvelles prédictions",
+      "start_ch": 48,
+      "start_v": 1,
+      "end_ch": 48,
+      "end_v": 11
+    },
+    {
+      "title": "Appel à écouter Dieu",
+      "start_ch": 48,
+      "start_v": 12,
+      "end_ch": 48,
+      "end_v": 22
+    },
+    {
+      "title": "Le Sauveur d'Israël et des nations",
+      "start_ch": 49,
+      "start_v": 1,
+      "end_ch": 49,
+      "end_v": 26
+    },
+    {
+      "title": "Reproches de l'Eternel à son peuple",
+      "start_ch": 50,
+      "start_v": 1,
+      "end_ch": 50,
+      "end_v": 3
+    },
+    {
+      "title": "Le serviteur de l'Eternel insulté",
+      "start_ch": 50,
+      "start_v": 4,
+      "end_ch": 50,
+      "end_v": 11
+    },
+    {
+      "title": "Promesses de délivrance",
+      "start_ch": 51,
+      "start_v": 1,
+      "end_ch": 51,
+      "end_v": 23
+    },
+    {
+      "title": "Promesse de rétablissement",
+      "start_ch": 52,
+      "start_v": 1,
+      "end_ch": 52,
+      "end_v": 12
+    },
+    {
+      "title": "La personne et l’activité du serviteur de l'Eternel",
+      "start_ch": 52,
+      "start_v": 13,
+      "end_ch": 52,
+      "end_v": 15
+    },
+    {
+      "title": "Prospérité future d'Israël",
+      "start_ch": 54,
+      "start_v": 1,
+      "end_ch": 54,
+      "end_v": 17
+    },
+    {
+      "title": "Le salut pour tous",
+      "start_ch": 55,
+      "start_v": 1,
+      "end_ch": 55,
+      "end_v": 13
+    },
+    {
+      "title": "Reproches aux chefs et aux idolâtres",
+      "start_ch": 56,
+      "start_v": 9,
+      "end_ch": 56,
+      "end_v": 12
+    },
+    {
+      "title": "Promesses de paix et de guérison",
+      "start_ch": 57,
+      "start_v": 14,
+      "end_ch": 57,
+      "end_v": 21
+    },
+    {
+      "title": "Le vrai jeûne",
+      "start_ch": 58,
+      "start_v": 1,
+      "end_ch": 58,
+      "end_v": 14
+    },
+    {
+      "title": "Crimes et jugement de Juda",
+      "start_ch": 59,
+      "start_v": 1,
+      "end_ch": 59,
+      "end_v": 21
+    },
+    {
+      "title": "Gloire future de Jérusalem",
+      "start_ch": 60,
+      "start_v": 1,
+      "end_ch": 60,
+      "end_v": 22
+    },
+    {
+      "title": "Le salut proclamé",
+      "start_ch": 61,
+      "start_v": 1,
+      "end_ch": 61,
+      "end_v": 11
+    },
+    {
+      "title": "Le salut de Jérusalem",
+      "start_ch": 62,
+      "start_v": 1,
+      "end_ch": 62,
+      "end_v": 12
+    },
+    {
+      "title": "Un jour de vengeance",
+      "start_ch": 63,
+      "start_v": 1,
+      "end_ch": 63,
+      "end_v": 6
+    },
+    {
+      "title": "Rappel du passé",
+      "start_ch": 63,
+      "start_v": 7,
+      "end_ch": 63,
+      "end_v": 14
+    },
+    {
+      "title": "Prière du peuple",
+      "start_ch": 63,
+      "start_v": 15,
+      "end_ch": 63,
+      "end_v": 19
+    },
+    {
+      "title": "Réponse de Dieu",
+      "start_ch": 65,
+      "start_v": 1,
+      "end_ch": 65,
+      "end_v": 25
+    },
+    {
+      "title": "Gloire de la Jérusalem future",
+      "start_ch": 66,
+      "start_v": 1,
+      "end_ch": 66,
+      "end_v": 24
+    }
+  ]
 }

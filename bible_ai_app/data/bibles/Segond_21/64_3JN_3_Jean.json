@@ -23,5 +23,25 @@
       "14": "J'espère te voir très bientôt, et nous parlerons de vive voix.",
       "15": "Que la paix soit avec toi! Les amis te saluent. Salue les amis, chacun en particulier."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Salutation et louange",
+    "1:9": "Diotrèphe et Démétrius"
+  },
+  "pericopes": [
+    {
+      "title": "Salutation et louange",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 8
+    },
+    {
+      "title": "Diotrèphe et Démétrius",
+      "start_ch": 1,
+      "start_v": 9,
+      "end_ch": 1,
+      "end_v": 15
+    }
+  ]
 }

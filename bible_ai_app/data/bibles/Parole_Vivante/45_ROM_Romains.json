@@ -471,5 +471,489 @@
       "26": "il est, à présent, dévoilé sur ordre du Dieu éternel, conformément aux prédictions des prophètes, et porté à la connaissance de tous les peuples, afin qu’ils soient amenés à se confier en Dieu et à lui obéir.",
       "27": "À ce Dieu, qui seul possède toute sagesse, soit la gloire, par Jésus-Christ, d’éternité en éternité. Amen!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Salutations",
+    "1:16": "L’Évangile, thème de la lettre",
+    "1:18": "La nature nous fait-elle connaître Dieu ?",
+    "1:24": "Un monde sans Dieu",
+    "2:1": "Toi qui te prétends juste, tiendras-tu devant le jugement de Dieu ?",
+    "2:12": "Les normes de Dieu",
+    "2:17": "Méfiez-vous des fausses assurances",
+    "2:25": "Le rite extérieur n’assure aucune immunité",
+    "3:1": "Dieu manifeste sa justice, même dans nos imperfections",
+    "3:9": "Un verdict implacable",
+    "3:21": "Comment être juste devant Dieu ?",
+    "3:24": "La croix du Christ dans le plan de Dieu",
+    "4:1": "Mérite ou foi ?",
+    "4:9": "Rite extérieur ou attitude intérieure ?",
+    "4:13": "Croire, c’est faire confiance à Dieu",
+    "4:18": "Croire, c’est espérer contre toute espérance",
+    "5:1": "Paix et certitude",
+    "5:3": "Joie dans l’épreuve",
+    "5:6": "L’amour le plus extraordinaire",
+    "5:12": "Un nouveau commencement",
+    "5:15": "Deux règnes",
+    "5:18": "Réactions en chaîne",
+    "6:1": "Le secret de la victoire sur le péché",
+    "6:5": "Morts et ressuscités avec le Christ",
+    "6:11": "Ce que vous avez à faire",
+    "6:16": "Nul ne peut servir deux maîtres",
+    "6:20": "Les deux libertés",
+    "7:1": "Nous sommes dégagés de la loi",
+    "7:7": "La loi, le péché… et moi",
+    "7:14": "Écartelé entre le vouloir et le pouvoir",
+    "8:1": "La libération",
+    "8:10": "Une vie nouvelle",
+    "8:18": "Des lendemains qui chantent",
+    "8:26": "Une présence constante",
+    "8:31": "Une certitude inébranlable",
+    "9:1": "Le plan de Dieu au sujet d’Israël",
+    "9:6": "Dieu faillirait-il à ses promesses ?",
+    "9:14": "Serait-il injuste ?",
+    "9:20": "Dieu est libre… de faire grâce à qui il veut",
+    "9:30": "Pourquoi les Juifs ont-ils été rejetés ?",
+    "10:4": "La loi et la foi",
+    "10:11": "Tous peuvent être sauvés par la foi",
+    "11:1": "Dieu a-t-il rejeté tout le peuple d’Israël ?",
+    "11:11": "L’égarement d’Israël a eu d’heureuses conséquences pour tous les peuples qui ne sont pas juifs d’origine",
+    "11:25": "Le rétablissement futur d’Israël",
+    "12:1": "Vie transformée",
+    "12:3": "Un seul corps en communion avec le Christ",
+    "12:9": "Comment aimer ?",
+    "13:1": "Le chrétien devant l’État",
+    "13:8": "L’importance suprême de l’amour",
+    "14:1": "Si on est d’un autre avis…",
+    "14:13": "Ni critiquer ni mépriser !",
+    "15:1": "Comment surmonter les conflits d’opinion dans l’Église",
+    "15:7": "Prendre exemple sur le Christ",
+    "15:16": "Chargé de mission",
+    "15:23": "Projets de voyage à Rome",
+    "16:1": "Une sainte Église universelle, la communion des saints…",
+    "16:17": "Veillez…",
+    "16:21": "Communauté, communion",
+    "16:25": "À Dieu seul soit la gloire"
+  },
+  "pericopes": [
+    {
+      "title": "Salutations",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 15
+    },
+    {
+      "title": "L’Évangile, thème de la lettre",
+      "start_ch": 1,
+      "start_v": 16,
+      "end_ch": 1,
+      "end_v": 17
+    },
+    {
+      "title": "La nature nous fait-elle connaître Dieu ?",
+      "start_ch": 1,
+      "start_v": 18,
+      "end_ch": 1,
+      "end_v": 23
+    },
+    {
+      "title": "Un monde sans Dieu",
+      "start_ch": 1,
+      "start_v": 24,
+      "end_ch": 1,
+      "end_v": 32
+    },
+    {
+      "title": "Toi qui te prétends juste, tiendras-tu devant le jugement de Dieu ?",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 11
+    },
+    {
+      "title": "Les normes de Dieu",
+      "start_ch": 2,
+      "start_v": 12,
+      "end_ch": 2,
+      "end_v": 16
+    },
+    {
+      "title": "Méfiez-vous des fausses assurances",
+      "start_ch": 2,
+      "start_v": 17,
+      "end_ch": 2,
+      "end_v": 24
+    },
+    {
+      "title": "Le rite extérieur n’assure aucune immunité",
+      "start_ch": 2,
+      "start_v": 25,
+      "end_ch": 2,
+      "end_v": 29
+    },
+    {
+      "title": "Dieu manifeste sa justice, même dans nos imperfections",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 8
+    },
+    {
+      "title": "Un verdict implacable",
+      "start_ch": 3,
+      "start_v": 9,
+      "end_ch": 3,
+      "end_v": 20
+    },
+    {
+      "title": "Comment être juste devant Dieu ?",
+      "start_ch": 3,
+      "start_v": 21,
+      "end_ch": 3,
+      "end_v": 23
+    },
+    {
+      "title": "La croix du Christ dans le plan de Dieu",
+      "start_ch": 3,
+      "start_v": 24,
+      "end_ch": 3,
+      "end_v": 31
+    },
+    {
+      "title": "Mérite ou foi ?",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 8
+    },
+    {
+      "title": "Rite extérieur ou attitude intérieure ?",
+      "start_ch": 4,
+      "start_v": 9,
+      "end_ch": 4,
+      "end_v": 12
+    },
+    {
+      "title": "Croire, c’est faire confiance à Dieu",
+      "start_ch": 4,
+      "start_v": 13,
+      "end_ch": 4,
+      "end_v": 17
+    },
+    {
+      "title": "Croire, c’est espérer contre toute espérance",
+      "start_ch": 4,
+      "start_v": 18,
+      "end_ch": 4,
+      "end_v": 25
+    },
+    {
+      "title": "Paix et certitude",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 2
+    },
+    {
+      "title": "Joie dans l’épreuve",
+      "start_ch": 5,
+      "start_v": 3,
+      "end_ch": 5,
+      "end_v": 5
+    },
+    {
+      "title": "L’amour le plus extraordinaire",
+      "start_ch": 5,
+      "start_v": 6,
+      "end_ch": 5,
+      "end_v": 11
+    },
+    {
+      "title": "Un nouveau commencement",
+      "start_ch": 5,
+      "start_v": 12,
+      "end_ch": 5,
+      "end_v": 14
+    },
+    {
+      "title": "Deux règnes",
+      "start_ch": 5,
+      "start_v": 15,
+      "end_ch": 5,
+      "end_v": 17
+    },
+    {
+      "title": "Réactions en chaîne",
+      "start_ch": 5,
+      "start_v": 18,
+      "end_ch": 5,
+      "end_v": 21
+    },
+    {
+      "title": "Le secret de la victoire sur le péché",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 4
+    },
+    {
+      "title": "Morts et ressuscités avec le Christ",
+      "start_ch": 6,
+      "start_v": 5,
+      "end_ch": 6,
+      "end_v": 10
+    },
+    {
+      "title": "Ce que vous avez à faire",
+      "start_ch": 6,
+      "start_v": 11,
+      "end_ch": 6,
+      "end_v": 15
+    },
+    {
+      "title": "Nul ne peut servir deux maîtres",
+      "start_ch": 6,
+      "start_v": 16,
+      "end_ch": 6,
+      "end_v": 19
+    },
+    {
+      "title": "Les deux libertés",
+      "start_ch": 6,
+      "start_v": 20,
+      "end_ch": 6,
+      "end_v": 23
+    },
+    {
+      "title": "Nous sommes dégagés de la loi",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 6
+    },
+    {
+      "title": "La loi, le péché… et moi",
+      "start_ch": 7,
+      "start_v": 7,
+      "end_ch": 7,
+      "end_v": 13
+    },
+    {
+      "title": "Écartelé entre le vouloir et le pouvoir",
+      "start_ch": 7,
+      "start_v": 14,
+      "end_ch": 7,
+      "end_v": 25
+    },
+    {
+      "title": "La libération",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 9
+    },
+    {
+      "title": "Une vie nouvelle",
+      "start_ch": 8,
+      "start_v": 10,
+      "end_ch": 8,
+      "end_v": 17
+    },
+    {
+      "title": "Des lendemains qui chantent",
+      "start_ch": 8,
+      "start_v": 18,
+      "end_ch": 8,
+      "end_v": 25
+    },
+    {
+      "title": "Une présence constante",
+      "start_ch": 8,
+      "start_v": 26,
+      "end_ch": 8,
+      "end_v": 30
+    },
+    {
+      "title": "Une certitude inébranlable",
+      "start_ch": 8,
+      "start_v": 31,
+      "end_ch": 8,
+      "end_v": 39
+    },
+    {
+      "title": "Le plan de Dieu au sujet d’Israël",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 5
+    },
+    {
+      "title": "Dieu faillirait-il à ses promesses ?",
+      "start_ch": 9,
+      "start_v": 6,
+      "end_ch": 9,
+      "end_v": 13
+    },
+    {
+      "title": "Serait-il injuste ?",
+      "start_ch": 9,
+      "start_v": 14,
+      "end_ch": 9,
+      "end_v": 19
+    },
+    {
+      "title": "Dieu est libre… de faire grâce à qui il veut",
+      "start_ch": 9,
+      "start_v": 20,
+      "end_ch": 9,
+      "end_v": 29
+    },
+    {
+      "title": "Pourquoi les Juifs ont-ils été rejetés ?",
+      "start_ch": 9,
+      "start_v": 30,
+      "end_ch": 9,
+      "end_v": 33
+    },
+    {
+      "title": "La loi et la foi",
+      "start_ch": 10,
+      "start_v": 4,
+      "end_ch": 10,
+      "end_v": 10
+    },
+    {
+      "title": "Tous peuvent être sauvés par la foi",
+      "start_ch": 10,
+      "start_v": 11,
+      "end_ch": 10,
+      "end_v": 21
+    },
+    {
+      "title": "Dieu a-t-il rejeté tout le peuple d’Israël ?",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 10
+    },
+    {
+      "title": "L’égarement d’Israël a eu d’heureuses conséquences pour tous les peuples qui ne sont pas juifs d’origine",
+      "start_ch": 11,
+      "start_v": 11,
+      "end_ch": 11,
+      "end_v": 24
+    },
+    {
+      "title": "Le rétablissement futur d’Israël",
+      "start_ch": 11,
+      "start_v": 25,
+      "end_ch": 11,
+      "end_v": 36
+    },
+    {
+      "title": "Vie transformée",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 2
+    },
+    {
+      "title": "Un seul corps en communion avec le Christ",
+      "start_ch": 12,
+      "start_v": 3,
+      "end_ch": 12,
+      "end_v": 8
+    },
+    {
+      "title": "Comment aimer ?",
+      "start_ch": 12,
+      "start_v": 9,
+      "end_ch": 12,
+      "end_v": 21
+    },
+    {
+      "title": "Le chrétien devant l’État",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 7
+    },
+    {
+      "title": "L’importance suprême de l’amour",
+      "start_ch": 13,
+      "start_v": 8,
+      "end_ch": 13,
+      "end_v": 14
+    },
+    {
+      "title": "Si on est d’un autre avis…",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 12
+    },
+    {
+      "title": "Ni critiquer ni mépriser !",
+      "start_ch": 14,
+      "start_v": 13,
+      "end_ch": 14,
+      "end_v": 23
+    },
+    {
+      "title": "Comment surmonter les conflits d’opinion dans l’Église",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 6
+    },
+    {
+      "title": "Prendre exemple sur le Christ",
+      "start_ch": 15,
+      "start_v": 7,
+      "end_ch": 15,
+      "end_v": 15
+    },
+    {
+      "title": "Chargé de mission",
+      "start_ch": 15,
+      "start_v": 16,
+      "end_ch": 15,
+      "end_v": 22
+    },
+    {
+      "title": "Projets de voyage à Rome",
+      "start_ch": 15,
+      "start_v": 23,
+      "end_ch": 15,
+      "end_v": 33
+    },
+    {
+      "title": "Une sainte Église universelle, la communion des saints…",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 16
+    },
+    {
+      "title": "Veillez…",
+      "start_ch": 16,
+      "start_v": 17,
+      "end_ch": 16,
+      "end_v": 20
+    },
+    {
+      "title": "Communauté, communion",
+      "start_ch": 16,
+      "start_v": 21,
+      "end_ch": 16,
+      "end_v": 24
+    },
+    {
+      "title": "À Dieu seul soit la gloire",
+      "start_ch": 16,
+      "start_v": 25,
+      "end_ch": 16,
+      "end_v": 27
+    }
+  ]
 }

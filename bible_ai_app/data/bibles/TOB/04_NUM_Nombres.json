@@ -1367,5 +1367,33 @@
       "12": "Elles épousèrent donc des hommes appartenant aux familles des fils de Manassé, fils de Joseph. Et leur part d’héritage resta dans la tribu à laquelle appartenait le clan de leur père.",
       "13": "Tels sont les ordres et les règles que le SEIGNEUR prescrivit aux fils d’Israël par l’intermédiaire de Moïse, dans la plaine de Moab, au bord du Jourdain, à la hauteur de Jéricho."
     }
-  }
+  },
+  "sections": {
+    "1:1": "DERNIÈRES DISPOSITIONS AVANT LE DÉPART DU SINAÏ",
+    "10:1": "DU SINAÏ AUX PLAINES DE MOAB",
+    "25:19": "INSTRUCTIONS POUR LE PARTAGE DU PAYS"
+  },
+  "pericopes": [
+    {
+      "title": "DERNIÈRES DISPOSITIONS AVANT LE DÉPART DU SINAÏ",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 54
+    },
+    {
+      "title": "DU SINAÏ AUX PLAINES DE MOAB",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 36
+    },
+    {
+      "title": "INSTRUCTIONS POUR LE PARTAGE DU PAYS",
+      "start_ch": 25,
+      "start_v": 19,
+      "end_ch": 25,
+      "end_v": 19
+    }
+  ]
 }

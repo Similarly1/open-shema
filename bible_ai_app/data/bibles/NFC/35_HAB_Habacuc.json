@@ -68,5 +68,57 @@
       "18": "Mais moi, je trouve ma joie dans le Seigneur, je suis heureux à cause du Dieu qui me sauve.",
       "19": "Le Seigneur Dieu est ma force: il me rend aussi agile que les biches, il me fait marcher sur les hauteurs. Du répertoire du chef de chorale. Accompagnement sur instruments à cordes."
     }
-  }
+  },
+  "sections": {
+    "1:2": "Le prophète appelle Dieu au secours",
+    "1:5": "Dieu répond par l'invasion des Babyloniens",
+    "1:12": "Le prophète appelle Dieu à nouveau",
+    "2:2": "La réponse de Dieu&#160;: le juste et l'oppresseur",
+    "2:7": "Déclarations de malheur",
+    "3:1": "Prière d'Habacuc&#160;: Dieu interviendra"
+  },
+  "pericopes": [
+    {
+      "title": "Le prophète appelle Dieu au secours",
+      "start_ch": 1,
+      "start_v": 2,
+      "end_ch": 1,
+      "end_v": 4
+    },
+    {
+      "title": "Dieu répond par l'invasion des Babyloniens",
+      "start_ch": 1,
+      "start_v": 5,
+      "end_ch": 1,
+      "end_v": 11
+    },
+    {
+      "title": "Le prophète appelle Dieu à nouveau",
+      "start_ch": 1,
+      "start_v": 12,
+      "end_ch": 1,
+      "end_v": 17
+    },
+    {
+      "title": "La réponse de Dieu&#160;: le juste et l'oppresseur",
+      "start_ch": 2,
+      "start_v": 2,
+      "end_ch": 2,
+      "end_v": 6
+    },
+    {
+      "title": "Déclarations de malheur",
+      "start_ch": 2,
+      "start_v": 7,
+      "end_ch": 2,
+      "end_v": 20
+    },
+    {
+      "title": "Prière d'Habacuc&#160;: Dieu interviendra",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 19
+    }
+  ]
 }

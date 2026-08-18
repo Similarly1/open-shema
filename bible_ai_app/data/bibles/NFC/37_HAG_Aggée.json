@@ -48,5 +48,49 @@
       "22": "Je renverserai les rois et je mettrai fin à la puissance des royaumes de la terre; je ferai culbuter les chars et leurs conducteurs, les chevaux mourront et les cavaliers s'entre-tueront.",
       "23": "Mais ce jour-là, Zorobabel, toi qui es mon serviteur, je te prendrai et tu seras pour moi aussi précieux qu'un cachet personnel; car c'est toi que j'ai choisi pour me servir. Voilà ce que j'affirme, moi, le Seigneur de l'univers!»"
     }
-  }
+  },
+  "sections": {
+    "1:1": "C'est le moment de rebâtir le temple",
+    "2:1": "La splendeur du nouveau temple",
+    "2:10": "Le peuple est accusé d'impureté",
+    "2:15": "Soyez attentifs dès aujourd'hui",
+    "2:20": "Promesses à Zorobabel, que le Seigneur a choisi"
+  },
+  "pericopes": [
+    {
+      "title": "C'est le moment de rebâtir le temple",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 15
+    },
+    {
+      "title": "La splendeur du nouveau temple",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 9
+    },
+    {
+      "title": "Le peuple est accusé d'impureté",
+      "start_ch": 2,
+      "start_v": 10,
+      "end_ch": 2,
+      "end_v": 14
+    },
+    {
+      "title": "Soyez attentifs dès aujourd'hui",
+      "start_ch": 2,
+      "start_v": 15,
+      "end_ch": 2,
+      "end_v": 19
+    },
+    {
+      "title": "Promesses à Zorobabel, que le Seigneur a choisi",
+      "start_ch": 2,
+      "start_v": 20,
+      "end_ch": 2,
+      "end_v": 23
+    }
+  ]
 }

@@ -1639,5 +1639,553 @@
       "25": "Joseph fit jurer les fils d'Israël en disant: «Quand Dieu interviendra pour vous, vous ferez remonter mes ossements loin d'ici.»",
       "26": "Joseph mourut à l'âge de 110 ans. On l'embauma et on le mit dans un cercueil en Egypte."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Création du ciel et de la terre",
+    "1:26": "Création de l’être humain et repos",
+    "2:4": "Le jardin d’Eden",
+    "3:1": "La tentation et la chute",
+    "4:1": "Caïn et Abel",
+    "4:16": "Descendance de Caïn",
+    "5:1": "Descendance d'Adam par Seth jusqu'à Noé",
+    "6:1": "Construction de l’arche de Noé",
+    "7:1": "Le déluge",
+    "8:1": "La sortie de l'arche",
+    "9:1": "Noé et ses fils",
+    "10:1": "Descendance des fils de Noé",
+    "11:1": "La tour de Babel",
+    "11:10": "Les ancêtres d'Abram",
+    "12:1": "L'appel d'Abram",
+    "12:10": "Abram en Egypte",
+    "13:1": "Séparation d'avec Lot",
+    "13:14": "Nouvelles promesses à Abram",
+    "14:1": "Abram vainqueur de plusieurs rois",
+    "14:17": "Abram béni par Melchisédek",
+    "15:1": "Renouvellement des promesses à Abram",
+    "16:1": "Naissance d'Ismaël",
+    "17:1": "Alliance de Dieu avec Abraham",
+    "18:1": "Confirmation de la naissance d'Isaac",
+    "18:16": "Intercession d'Abraham en faveur de Sodome",
+    "19:1": "Destruction de Sodome et de Gomorrhe",
+    "19:30": "Descendance de Lot",
+    "20:1": "Séjour d'Abraham à Guérar",
+    "21:1": "Naissance d'Isaac et départ d’Ismaël",
+    "21:22": "Abraham à Beer-Shéba",
+    "22:1": "Mise à l’épreuve d’Abraham",
+    "23:1": "Mort et ensevelissement de Sara",
+    "24:1": "Mariage d’Isaac et Rebecca",
+    "25:1": "Mort d'Abraham",
+    "25:12": "Descendance d'Ismaël",
+    "25:19": "Naissance d’Esaü et Jacob",
+    "26:1": "Isaac à Guérar",
+    "27:1": "Vol de la bénédiction d'Esaü",
+    "27:41": "Fuite de Jacob",
+    "28:10": "Vision d’une échelle",
+    "29:1": "Jacob à Charan",
+    "29:15": "Léa et Rachel",
+    "29:31": "Les enfants de Jacob",
+    "30:25": "Départ de Jacob pour Canaan",
+    "31:22": "Jacob poursuivi par Laban",
+    "32:2": "Préparatifs de la rencontre avec Esaü",
+    "32:25": "Jacob à Peniel",
+    "33:1": "Réconciliation entre Jacob et Esaü",
+    "33:18": "La famille de Jacob à Sichem",
+    "35:1": "Jacob à Béthel",
+    "35:16": "Naissance de Benjamin et mort de Rachel",
+    "36:1": "Origine d’Edom",
+    "37:1": "Joseph vendu par ses frères",
+    "38:1": "Juda et Tamar",
+    "39:1": "Joseph chez Potiphar",
+    "39:21": "Joseph en prison",
+    "41:1": "Joseph devant le pharaon",
+    "41:37": "Joseph gouverneur de l'Egypte",
+    "41:50": "Naissance de Manassé et d'Ephraïm",
+    "42:1": "Les frères de Joseph en Egypte",
+    "43:1": "Deuxième voyage des frères de Joseph en Egypte",
+    "44:1": "Mise à l’épreuve des frères de Joseph",
+    "45:1": "Joseph reconnu par ses frères",
+    "46:1": "Jacob et sa famille en Egypte",
+    "47:1": "La famille de Jacob dans la région de Gosen",
+    "48:1": "Jacob bénit les deux fils de Joseph",
+    "49:1": "Bénédiction et mort de Jacob",
+    "50:22": "Mort de Joseph"
+  },
+  "pericopes": [
+    {
+      "title": "Création du ciel et de la terre",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 25
+    },
+    {
+      "title": "Création de l’être humain et repos",
+      "start_ch": 1,
+      "start_v": 26,
+      "end_ch": 1,
+      "end_v": 31
+    },
+    {
+      "title": "Le jardin d’Eden",
+      "start_ch": 2,
+      "start_v": 4,
+      "end_ch": 2,
+      "end_v": 25
+    },
+    {
+      "title": "La tentation et la chute",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 24
+    },
+    {
+      "title": "Caïn et Abel",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 15
+    },
+    {
+      "title": "Descendance de Caïn",
+      "start_ch": 4,
+      "start_v": 16,
+      "end_ch": 4,
+      "end_v": 26
+    },
+    {
+      "title": "Descendance d'Adam par Seth jusqu'à Noé",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 32
+    },
+    {
+      "title": "Construction de l’arche de Noé",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 22
+    },
+    {
+      "title": "Le déluge",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 24
+    },
+    {
+      "title": "La sortie de l'arche",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 22
+    },
+    {
+      "title": "Noé et ses fils",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 29
+    },
+    {
+      "title": "Descendance des fils de Noé",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 32
+    },
+    {
+      "title": "La tour de Babel",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 9
+    },
+    {
+      "title": "Les ancêtres d'Abram",
+      "start_ch": 11,
+      "start_v": 10,
+      "end_ch": 11,
+      "end_v": 32
+    },
+    {
+      "title": "L'appel d'Abram",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 9
+    },
+    {
+      "title": "Abram en Egypte",
+      "start_ch": 12,
+      "start_v": 10,
+      "end_ch": 12,
+      "end_v": 20
+    },
+    {
+      "title": "Séparation d'avec Lot",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 13
+    },
+    {
+      "title": "Nouvelles promesses à Abram",
+      "start_ch": 13,
+      "start_v": 14,
+      "end_ch": 13,
+      "end_v": 18
+    },
+    {
+      "title": "Abram vainqueur de plusieurs rois",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 16
+    },
+    {
+      "title": "Abram béni par Melchisédek",
+      "start_ch": 14,
+      "start_v": 17,
+      "end_ch": 14,
+      "end_v": 24
+    },
+    {
+      "title": "Renouvellement des promesses à Abram",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 21
+    },
+    {
+      "title": "Naissance d'Ismaël",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 16
+    },
+    {
+      "title": "Alliance de Dieu avec Abraham",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 27
+    },
+    {
+      "title": "Confirmation de la naissance d'Isaac",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 15
+    },
+    {
+      "title": "Intercession d'Abraham en faveur de Sodome",
+      "start_ch": 18,
+      "start_v": 16,
+      "end_ch": 18,
+      "end_v": 33
+    },
+    {
+      "title": "Destruction de Sodome et de Gomorrhe",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 29
+    },
+    {
+      "title": "Descendance de Lot",
+      "start_ch": 19,
+      "start_v": 30,
+      "end_ch": 19,
+      "end_v": 38
+    },
+    {
+      "title": "Séjour d'Abraham à Guérar",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 18
+    },
+    {
+      "title": "Naissance d'Isaac et départ d’Ismaël",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 21
+    },
+    {
+      "title": "Abraham à Beer-Shéba",
+      "start_ch": 21,
+      "start_v": 22,
+      "end_ch": 21,
+      "end_v": 34
+    },
+    {
+      "title": "Mise à l’épreuve d’Abraham",
+      "start_ch": 22,
+      "start_v": 1,
+      "end_ch": 22,
+      "end_v": 24
+    },
+    {
+      "title": "Mort et ensevelissement de Sara",
+      "start_ch": 23,
+      "start_v": 1,
+      "end_ch": 23,
+      "end_v": 20
+    },
+    {
+      "title": "Mariage d’Isaac et Rebecca",
+      "start_ch": 24,
+      "start_v": 1,
+      "end_ch": 24,
+      "end_v": 67
+    },
+    {
+      "title": "Mort d'Abraham",
+      "start_ch": 25,
+      "start_v": 1,
+      "end_ch": 25,
+      "end_v": 11
+    },
+    {
+      "title": "Descendance d'Ismaël",
+      "start_ch": 25,
+      "start_v": 12,
+      "end_ch": 25,
+      "end_v": 18
+    },
+    {
+      "title": "Naissance d’Esaü et Jacob",
+      "start_ch": 25,
+      "start_v": 19,
+      "end_ch": 25,
+      "end_v": 34
+    },
+    {
+      "title": "Isaac à Guérar",
+      "start_ch": 26,
+      "start_v": 1,
+      "end_ch": 26,
+      "end_v": 35
+    },
+    {
+      "title": "Vol de la bénédiction d'Esaü",
+      "start_ch": 27,
+      "start_v": 1,
+      "end_ch": 27,
+      "end_v": 40
+    },
+    {
+      "title": "Fuite de Jacob",
+      "start_ch": 27,
+      "start_v": 41,
+      "end_ch": 27,
+      "end_v": 46
+    },
+    {
+      "title": "Vision d’une échelle",
+      "start_ch": 28,
+      "start_v": 10,
+      "end_ch": 28,
+      "end_v": 22
+    },
+    {
+      "title": "Jacob à Charan",
+      "start_ch": 29,
+      "start_v": 1,
+      "end_ch": 29,
+      "end_v": 14
+    },
+    {
+      "title": "Léa et Rachel",
+      "start_ch": 29,
+      "start_v": 15,
+      "end_ch": 29,
+      "end_v": 30
+    },
+    {
+      "title": "Les enfants de Jacob",
+      "start_ch": 29,
+      "start_v": 31,
+      "end_ch": 29,
+      "end_v": 35
+    },
+    {
+      "title": "Départ de Jacob pour Canaan",
+      "start_ch": 30,
+      "start_v": 25,
+      "end_ch": 30,
+      "end_v": 43
+    },
+    {
+      "title": "Jacob poursuivi par Laban",
+      "start_ch": 31,
+      "start_v": 22,
+      "end_ch": 31,
+      "end_v": 54
+    },
+    {
+      "title": "Préparatifs de la rencontre avec Esaü",
+      "start_ch": 32,
+      "start_v": 2,
+      "end_ch": 32,
+      "end_v": 24
+    },
+    {
+      "title": "Jacob à Peniel",
+      "start_ch": 32,
+      "start_v": 25,
+      "end_ch": 32,
+      "end_v": 33
+    },
+    {
+      "title": "Réconciliation entre Jacob et Esaü",
+      "start_ch": 33,
+      "start_v": 1,
+      "end_ch": 33,
+      "end_v": 17
+    },
+    {
+      "title": "La famille de Jacob à Sichem",
+      "start_ch": 33,
+      "start_v": 18,
+      "end_ch": 33,
+      "end_v": 20
+    },
+    {
+      "title": "Jacob à Béthel",
+      "start_ch": 35,
+      "start_v": 1,
+      "end_ch": 35,
+      "end_v": 15
+    },
+    {
+      "title": "Naissance de Benjamin et mort de Rachel",
+      "start_ch": 35,
+      "start_v": 16,
+      "end_ch": 35,
+      "end_v": 29
+    },
+    {
+      "title": "Origine d’Edom",
+      "start_ch": 36,
+      "start_v": 1,
+      "end_ch": 36,
+      "end_v": 43
+    },
+    {
+      "title": "Joseph vendu par ses frères",
+      "start_ch": 37,
+      "start_v": 1,
+      "end_ch": 37,
+      "end_v": 36
+    },
+    {
+      "title": "Juda et Tamar",
+      "start_ch": 38,
+      "start_v": 1,
+      "end_ch": 38,
+      "end_v": 30
+    },
+    {
+      "title": "Joseph chez Potiphar",
+      "start_ch": 39,
+      "start_v": 1,
+      "end_ch": 39,
+      "end_v": 20
+    },
+    {
+      "title": "Joseph en prison",
+      "start_ch": 39,
+      "start_v": 21,
+      "end_ch": 39,
+      "end_v": 23
+    },
+    {
+      "title": "Joseph devant le pharaon",
+      "start_ch": 41,
+      "start_v": 1,
+      "end_ch": 41,
+      "end_v": 36
+    },
+    {
+      "title": "Joseph gouverneur de l'Egypte",
+      "start_ch": 41,
+      "start_v": 37,
+      "end_ch": 41,
+      "end_v": 49
+    },
+    {
+      "title": "Naissance de Manassé et d'Ephraïm",
+      "start_ch": 41,
+      "start_v": 50,
+      "end_ch": 41,
+      "end_v": 57
+    },
+    {
+      "title": "Les frères de Joseph en Egypte",
+      "start_ch": 42,
+      "start_v": 1,
+      "end_ch": 42,
+      "end_v": 38
+    },
+    {
+      "title": "Deuxième voyage des frères de Joseph en Egypte",
+      "start_ch": 43,
+      "start_v": 1,
+      "end_ch": 43,
+      "end_v": 34
+    },
+    {
+      "title": "Mise à l’épreuve des frères de Joseph",
+      "start_ch": 44,
+      "start_v": 1,
+      "end_ch": 44,
+      "end_v": 34
+    },
+    {
+      "title": "Joseph reconnu par ses frères",
+      "start_ch": 45,
+      "start_v": 1,
+      "end_ch": 45,
+      "end_v": 28
+    },
+    {
+      "title": "Jacob et sa famille en Egypte",
+      "start_ch": 46,
+      "start_v": 1,
+      "end_ch": 46,
+      "end_v": 34
+    },
+    {
+      "title": "La famille de Jacob dans la région de Gosen",
+      "start_ch": 47,
+      "start_v": 1,
+      "end_ch": 47,
+      "end_v": 31
+    },
+    {
+      "title": "Jacob bénit les deux fils de Joseph",
+      "start_ch": 48,
+      "start_v": 1,
+      "end_ch": 48,
+      "end_v": 22
+    },
+    {
+      "title": "Bénédiction et mort de Jacob",
+      "start_ch": 49,
+      "start_v": 1,
+      "end_ch": 49,
+      "end_v": 33
+    },
+    {
+      "title": "Mort de Joseph",
+      "start_ch": 50,
+      "start_v": 22,
+      "end_ch": 50,
+      "end_v": 26
+    }
+  ]
 }

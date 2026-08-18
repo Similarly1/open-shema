@@ -775,5 +775,17 @@
       "29": "Il lui fit quitter ses vêtements de prisonnier et Yoyakîn prit ses repas constamment en présence du roi, tous les jours de sa vie.",
       "30": "Sa subsistance, la subsistance quotidienne, lui fut assurée par le roi chaque jour, tous les jours de sa vie."
     }
-  }
+  },
+  "sections": {
+    "18:1": "DE LA FIN DU ROYAUME D’ISRAËL À LA FIN DU ROYAUME DE JUDA"
+  },
+  "pericopes": [
+    {
+      "title": "DE LA FIN DU ROYAUME D’ISRAËL À LA FIN DU ROYAUME DE JUDA",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 37
+    }
+  ]
 }

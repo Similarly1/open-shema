@@ -1474,5 +1474,49 @@
       "33": "Il lui fit quitter ses vêtements de prisonnier, et Yoyakîn prit habituellement ses repas à la table du roi, tous les jours de sa vie.",
       "34": "Sa subsistance, la subsistance quotidienne, lui fut constamment assurée par le roi de Babylone, selon ses besoins de chaque jour, jusqu’à sa mort, tous les jours de sa vie."
     }
-  }
+  },
+  "sections": {
+    "1:4": "ORACLES CONTRE JUDA",
+    "25:15": "ORACLES CONCERNANT LES NATIONS",
+    "26:1": "ORACLES DE SALUT POUR ISRAËL - JUDA ET SCÈNES DE LA VIE DE JÉRÉMIE",
+    "46:1": "ORACLES CONCERNANT LES NATIONS (suite)",
+    "52:1": "ANNEXE"
+  },
+  "pericopes": [
+    {
+      "title": "ORACLES CONTRE JUDA",
+      "start_ch": 1,
+      "start_v": 4,
+      "end_ch": 1,
+      "end_v": 19
+    },
+    {
+      "title": "ORACLES CONCERNANT LES NATIONS",
+      "start_ch": 25,
+      "start_v": 15,
+      "end_ch": 25,
+      "end_v": 38
+    },
+    {
+      "title": "ORACLES DE SALUT POUR ISRAËL - JUDA ET SCÈNES DE LA VIE DE JÉRÉMIE",
+      "start_ch": 26,
+      "start_v": 1,
+      "end_ch": 26,
+      "end_v": 24
+    },
+    {
+      "title": "ORACLES CONCERNANT LES NATIONS (suite)",
+      "start_ch": 46,
+      "start_v": 1,
+      "end_ch": 46,
+      "end_v": 28
+    },
+    {
+      "title": "ANNEXE",
+      "start_ch": 52,
+      "start_v": 1,
+      "end_ch": 52,
+      "end_v": 34
+    }
+  ]
 }

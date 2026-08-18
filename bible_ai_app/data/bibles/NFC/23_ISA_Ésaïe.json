@@ -1423,5 +1423,1425 @@
       "23": "Ainsi, de mois en mois et de sabbat en sabbat, tout le monde viendra se prosterner devant moi, dit le Seigneur.",
       "24": "Alors on viendra voir les cadavres des gens qui m'ont été rebelles. La vermine qui les ronge n'est pas près de mourir, et le feu qui les dévore ne s'éteindra pas de sitôt. Ils feront ainsi horreur à tous les êtres humains."
     }
-  }
+  },
+  "sections": {
+    "1:1": "PREMIÈRE PARTIE",
+    "1:2": "Dieu ouvre un procès contre son peuple",
+    "1:10": "Les motifs d'accusation",
+    "1:18": "Si vous restez rebelles…",
+    "1:21": "Dieu purifiera Jérusalem",
+    "2:2": "Tous les peuples viendront à Jérusalem",
+    "2:6": "Le jour du Seigneur sera un jour de jugement",
+    "3:1": "L'anarchie au royaume de Juda",
+    "3:13": "Le procès des dirigeants",
+    "3:16": "Les belles dames de Jérusalem",
+    "3:25": "Les veuves de Jérusalem",
+    "4:2": "Les rescapés de Jérusalem",
+    "5:1": "La vigne du Seigneur",
+    "5:8": "Ceux qui provoquent la colère du Seigneur",
+    "5:25": "Le Seigneur est en colère contre son peuple",
+    "6:1": "Ésaïe se met au service du Seigneur",
+    "7:1": "Un message pour le roi Acaz",
+    "7:10": "L'annonce de la naissance d'Emmanuel",
+    "7:18": "Une invasion… et ses conséquences",
+    "8:1": "Vite au butin, fonce au pillage&#8239;!",
+    "8:5": "L'invasion assyrienne",
+    "8:9": "Les vains projets des peuples",
+    "8:11": "Un rocher contre lequel on bute",
+    "8:16": "Ésaïe se tait et attend",
+    "8:21": "Une obscurité oppressante",
+    "9:1": "Un enfant nous est né",
+    "9:7": "Le Seigneur frappe son peuple",
+    "10:1": "Ceux qui provoquent la colère du Seigneur",
+    "10:5": "L'Assyrie a dépassé les bornes",
+    "10:20": "Les survivants d'Israël",
+    "10:24": "N'ayez pas peur de l'Assyrie&#8239;!",
+    "10:28": "L'ennemi approche de Jérusalem",
+    "11:1": "Un nouveau David",
+    "11:11": "Les exilés reviendront",
+    "12:1": "Louange du peuple libéré au Dieu qui sauve",
+    "13:1": "La fin de Babylone",
+    "14:1": "Le retour des exilés",
+    "14:3": "La fin du roi de Babylone",
+    "14:24": "L'Assyrie sera punie",
+    "14:28": "Avertissement aux Philistins",
+    "15:1": "Complainte sur Moab",
+    "16:1": "Moab demande l'aide de Jérusalem",
+    "16:6": "Jérusalem ne peut rien pour Moab",
+    "17:1": "Contre les royaumes de Damas et d'Israël",
+    "17:12": "Le grondement des peuples",
+    "18:1": "Avertissement aux ambassadeurs éthiopiens",
+    "19:1": "Le désarroi des Égyptiens",
+    "19:16": "L'avenir de l'Égypte",
+    "20:1": "Ésaïe se promène sans vêtements ni chaussures",
+    "21:1": "Babylone est tombée",
+    "21:11": "Où en est la nuit&#8239;?",
+    "21:13": "Les fuyards de Dédan et de Quédar",
+    "22:1": "Avertissement à Jérusalem",
+    "22:15": "L'administrateur Chebna doit perdre sa place",
+    "23:1": "La ruine de la Phénicie",
+    "24:1": "La terre entière est dévastée",
+    "24:14": "Les survivants se réjouissent trop tôt",
+    "24:21": "Un jour le Seigneur de l'univers sera roi à Jérusalem",
+    "25:1": "Le Seigneur est le refuge des fidèles",
+    "25:6": "Le Seigneur prépare un festin pour tous les peuples",
+    "25:9": "Joie pour Israël, catastrophe pour Moab",
+    "26:1": "Le Seigneur abat la cité inaccessible",
+    "26:7": "Prière des derniers temps",
+    "26:19": "Résurrection des morts et châtiment des crimes",
+    "27:1": "Victoire sur le dragon des mers",
+    "27:2": "Le Seigneur chante pour sa vigne",
+    "27:6": "Le Seigneur pardonnera au peuple d'Israël",
+    "27:12": "Les exilés reviendront à Jérusalem",
+    "28:1": "Un orage destructeur sur Samarie",
+    "28:7": "Les ivrognes se moquent du prophète",
+    "28:14": "Le Seigneur pose une pierre de fondation",
+    "28:23": "La sagesse du paysan vient de Dieu",
+    "29:1": "Jérusalem, presque perdue, est soudain délivrée",
+    "29:9": "Même les prophètes ne voient rien",
+    "29:13": "Les prodiges vont continuer",
+    "29:15": "Pour qui prenez-vous le Seigneur&#8239;?",
+    "29:17": "Le grand renversement de situation",
+    "30:1": "Ne cherchez pas l'aide de l'Égypte",
+    "30:6": "L'aide de l'Égypte est illusoire",
+    "30:8": "Un avertissement pour l'avenir",
+    "30:12": "Un effondrement irrémédiable",
+    "30:15": "Gardez votre calme et faites-moi confiance",
+    "30:18": "Le Seigneur montrera sa bonté",
+    "30:27": "Le Seigneur vient corriger l'Assyrie",
+    "31:1": "Les Égyptiens ne sont pas des dieux",
+    "31:4": "Le Seigneur protégera Jérusalem",
+    "32:1": "Un roi bienfaisant",
+    "32:9": "Avertissement aux femmes de Jérusalem",
+    "32:15": "Mon peuple habitera une oasis de paix",
+    "33:1": "Le Seigneur domine la situation",
+    "33:7": "Le Seigneur va intervenir",
+    "33:17": "Jérusalem sera délivrée",
+    "34:1": "Le Seigneur juge le peuple d'Édom",
+    "35:1": "Une joie éternelle illuminera leur visage",
+    "36:1": "Le roi d'Assyrie menace Jérusalem",
+    "37:1": "Le roi Ézékias consulte le prophète Ésaïe",
+    "37:8": "Sennakérib fait de nouvelles menaces",
+    "37:14": "La prière d'Ézékias",
+    "37:21": "Ésaïe transmet la réponse du Seigneur",
+    "37:36": "Les Assyriens s'en vont, Sennakérib est tué",
+    "38:1": "Maladie et guérison d'Ézékias",
+    "38:9": "La prière d'Ézékias après sa guérison",
+    "39:1": "Ézékias reçoit les ambassadeurs de Babylone",
+    "40:1": "Réconfortez mon peuple&#8239;!",
+    "40:9": "Une bonne nouvelle à proclamer",
+    "40:12": "Grandeur et sagesse du maître de l'univers",
+    "40:18": "Dieu est incomparable",
+    "40:27": "Le Seigneur renouvelle nos forces",
+    "41:1": "Le Seigneur a suscité un libérateur",
+    "41:8": "N'aie pas peur, car je suis avec toi",
+    "41:14": "Je viens à ton secours",
+    "41:17": "Le désert est changé en une oasis",
+    "41:21": "Les faux dieux sont pris en défaut",
+    "42:1": "Le serviteur du Seigneur (premier poème)",
+    "42:5": "Il est la lumière du monde",
+    "42:10": "Le Seigneur intervient",
+    "42:14": "Le Seigneur réalisera son projet",
+    "42:18": "Ce peuple est aveugle et sourd",
+    "43:8": "Mes témoins, c'est vous",
+    "43:14": "J'envoie quelqu'un pour vous",
+    "43:16": "Un nouveau chemin dans le désert",
+    "43:22": "Le Seigneur fait un procès à son peuple",
+    "44:6": "Un défi aux faux dieux",
+    "44:9": "Les fabricants d'idoles",
+    "44:21": "Tu es mon serviteur, ne l'oublie pas",
+    "44:24": "Le créateur du monde est maître de l'histoire",
+    "45:1": "Cyrus est celui que Dieu a mis à part",
+    "45:9": "L'argile et le maître potier",
+    "45:14": "Israël, Dieu est chez toi",
+    "45:18": "Le salut est annoncé clairement",
+    "45:20": "La conversion du monde",
+    "46:1": "Les faux dieux de Babylone face au vrai Dieu",
+    "46:8": "La délivrance n'est pas loin",
+    "47:1": "La ruine prochaine de Babylone",
+    "48:1": "Le Seigneur annonce des faits nouveaux",
+    "48:12": "Celui qui accomplira le projet du Seigneur",
+    "48:17": "Ah, si tu m'avais écouté&#8239;!",
+    "48:20": "Partez de Babylone",
+    "49:1": "Le serviteur du Seigneur (deuxième poème)",
+    "49:7": "Le grand retour des exilés",
+    "49:14": "Moi, je ne t'oublie pas",
+    "50:1": "Le Seigneur n'a pas le bras trop court pour sauver",
+    "50:4": "Le serviteur du Seigneur (troisième poème)",
+    "50:10": "Écouter le serviteur du Seigneur",
+    "51:1": "Un salut qui n'aura pas de fin",
+    "51:9": "Réveille-toi, Seigneur&#8239;!",
+    "51:12": "Mon peuple, qu'as-tu à craindre&#8239;?",
+    "51:17": "Ressaisis-toi, Jérusalem",
+    "52:1": "Réveille-toi, Jérusalem",
+    "52:7": "Le retour du Seigneur à Jérusalem",
+    "52:11": "Quittez Babylone&#8239;!",
+    "52:13": "Le serviteur du Seigneur (quatrième poème)",
+    "54:1": "Dieu garde sa tendresse pour Jérusalem",
+    "54:11": "La Jérusalem des temps futurs",
+    "55:1": "Venez, même sans argent",
+    "55:6": "La parole du Seigneur atteint son but",
+    "56:1": "Une maison de prière pour tous les peuples",
+    "56:9": "Les responsables du peuple sont indignes",
+    "57:3": "Reproches au peuple idolâtre",
+    "57:14": "Dieu guérira son peuple",
+    "58:1": "Le jeûne qui plaît à Dieu",
+    "58:13": "Le sabbat qui plaît à Dieu",
+    "59:1": "Vos fautes vous séparent de Dieu",
+    "59:9": "Le peuple de Dieu reconnaît ses fautes",
+    "59:16": "Le Seigneur interviendra",
+    "60:1": "Jérusalem attire tous les peuples du monde",
+    "61:1": "La mission de l'envoyé du Seigneur",
+    "61:10": "Un chant de reconnaissance",
+    "62:1": "Jérusalem fait la joie de son Dieu",
+    "63:1": "La terrible vengeance",
+    "63:7": "Un rappel de la bonté du Seigneur",
+    "63:15": "Prière du peuple",
+    "65:1": "Le jugement à venir",
+    "65:17": "Dieu créera des nouveaux cieux et une nouvelle terre",
+    "66:1": "Les exigences du véritable culte",
+    "66:5": "L'intervention finale du Seigneur",
+    "66:18": "Le Seigneur se fera connaître de tous les peuples"
+  },
+  "pericopes": [
+    {
+      "title": "PREMIÈRE PARTIE",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 1
+    },
+    {
+      "title": "Dieu ouvre un procès contre son peuple",
+      "start_ch": 1,
+      "start_v": 2,
+      "end_ch": 1,
+      "end_v": 9
+    },
+    {
+      "title": "Les motifs d'accusation",
+      "start_ch": 1,
+      "start_v": 10,
+      "end_ch": 1,
+      "end_v": 17
+    },
+    {
+      "title": "Si vous restez rebelles…",
+      "start_ch": 1,
+      "start_v": 18,
+      "end_ch": 1,
+      "end_v": 20
+    },
+    {
+      "title": "Dieu purifiera Jérusalem",
+      "start_ch": 1,
+      "start_v": 21,
+      "end_ch": 1,
+      "end_v": 31
+    },
+    {
+      "title": "Tous les peuples viendront à Jérusalem",
+      "start_ch": 2,
+      "start_v": 2,
+      "end_ch": 2,
+      "end_v": 5
+    },
+    {
+      "title": "Le jour du Seigneur sera un jour de jugement",
+      "start_ch": 2,
+      "start_v": 6,
+      "end_ch": 2,
+      "end_v": 22
+    },
+    {
+      "title": "L'anarchie au royaume de Juda",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 12
+    },
+    {
+      "title": "Le procès des dirigeants",
+      "start_ch": 3,
+      "start_v": 13,
+      "end_ch": 3,
+      "end_v": 15
+    },
+    {
+      "title": "Les belles dames de Jérusalem",
+      "start_ch": 3,
+      "start_v": 16,
+      "end_ch": 3,
+      "end_v": 24
+    },
+    {
+      "title": "Les veuves de Jérusalem",
+      "start_ch": 3,
+      "start_v": 25,
+      "end_ch": 3,
+      "end_v": 26
+    },
+    {
+      "title": "Les rescapés de Jérusalem",
+      "start_ch": 4,
+      "start_v": 2,
+      "end_ch": 4,
+      "end_v": 6
+    },
+    {
+      "title": "La vigne du Seigneur",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 7
+    },
+    {
+      "title": "Ceux qui provoquent la colère du Seigneur",
+      "start_ch": 5,
+      "start_v": 8,
+      "end_ch": 5,
+      "end_v": 24
+    },
+    {
+      "title": "Le Seigneur est en colère contre son peuple",
+      "start_ch": 5,
+      "start_v": 25,
+      "end_ch": 5,
+      "end_v": 30
+    },
+    {
+      "title": "Ésaïe se met au service du Seigneur",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 13
+    },
+    {
+      "title": "Un message pour le roi Acaz",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 9
+    },
+    {
+      "title": "L'annonce de la naissance d'Emmanuel",
+      "start_ch": 7,
+      "start_v": 10,
+      "end_ch": 7,
+      "end_v": 17
+    },
+    {
+      "title": "Une invasion… et ses conséquences",
+      "start_ch": 7,
+      "start_v": 18,
+      "end_ch": 7,
+      "end_v": 25
+    },
+    {
+      "title": "Vite au butin, fonce au pillage&#8239;!",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 4
+    },
+    {
+      "title": "L'invasion assyrienne",
+      "start_ch": 8,
+      "start_v": 5,
+      "end_ch": 8,
+      "end_v": 8
+    },
+    {
+      "title": "Les vains projets des peuples",
+      "start_ch": 8,
+      "start_v": 9,
+      "end_ch": 8,
+      "end_v": 10
+    },
+    {
+      "title": "Un rocher contre lequel on bute",
+      "start_ch": 8,
+      "start_v": 11,
+      "end_ch": 8,
+      "end_v": 15
+    },
+    {
+      "title": "Ésaïe se tait et attend",
+      "start_ch": 8,
+      "start_v": 16,
+      "end_ch": 8,
+      "end_v": 20
+    },
+    {
+      "title": "Une obscurité oppressante",
+      "start_ch": 8,
+      "start_v": 21,
+      "end_ch": 8,
+      "end_v": 23
+    },
+    {
+      "title": "Un enfant nous est né",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 6
+    },
+    {
+      "title": "Le Seigneur frappe son peuple",
+      "start_ch": 9,
+      "start_v": 7,
+      "end_ch": 9,
+      "end_v": 20
+    },
+    {
+      "title": "Ceux qui provoquent la colère du Seigneur",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 4
+    },
+    {
+      "title": "L'Assyrie a dépassé les bornes",
+      "start_ch": 10,
+      "start_v": 5,
+      "end_ch": 10,
+      "end_v": 19
+    },
+    {
+      "title": "Les survivants d'Israël",
+      "start_ch": 10,
+      "start_v": 20,
+      "end_ch": 10,
+      "end_v": 23
+    },
+    {
+      "title": "N'ayez pas peur de l'Assyrie&#8239;!",
+      "start_ch": 10,
+      "start_v": 24,
+      "end_ch": 10,
+      "end_v": 27
+    },
+    {
+      "title": "L'ennemi approche de Jérusalem",
+      "start_ch": 10,
+      "start_v": 28,
+      "end_ch": 10,
+      "end_v": 34
+    },
+    {
+      "title": "Un nouveau David",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 10
+    },
+    {
+      "title": "Les exilés reviendront",
+      "start_ch": 11,
+      "start_v": 11,
+      "end_ch": 11,
+      "end_v": 16
+    },
+    {
+      "title": "Louange du peuple libéré au Dieu qui sauve",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 6
+    },
+    {
+      "title": "La fin de Babylone",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 22
+    },
+    {
+      "title": "Le retour des exilés",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 2
+    },
+    {
+      "title": "La fin du roi de Babylone",
+      "start_ch": 14,
+      "start_v": 3,
+      "end_ch": 14,
+      "end_v": 23
+    },
+    {
+      "title": "L'Assyrie sera punie",
+      "start_ch": 14,
+      "start_v": 24,
+      "end_ch": 14,
+      "end_v": 27
+    },
+    {
+      "title": "Avertissement aux Philistins",
+      "start_ch": 14,
+      "start_v": 28,
+      "end_ch": 14,
+      "end_v": 32
+    },
+    {
+      "title": "Complainte sur Moab",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 9
+    },
+    {
+      "title": "Moab demande l'aide de Jérusalem",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 5
+    },
+    {
+      "title": "Jérusalem ne peut rien pour Moab",
+      "start_ch": 16,
+      "start_v": 6,
+      "end_ch": 16,
+      "end_v": 14
+    },
+    {
+      "title": "Contre les royaumes de Damas et d'Israël",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 11
+    },
+    {
+      "title": "Le grondement des peuples",
+      "start_ch": 17,
+      "start_v": 12,
+      "end_ch": 17,
+      "end_v": 14
+    },
+    {
+      "title": "Avertissement aux ambassadeurs éthiopiens",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 7
+    },
+    {
+      "title": "Le désarroi des Égyptiens",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 15
+    },
+    {
+      "title": "L'avenir de l'Égypte",
+      "start_ch": 19,
+      "start_v": 16,
+      "end_ch": 19,
+      "end_v": 25
+    },
+    {
+      "title": "Ésaïe se promène sans vêtements ni chaussures",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 6
+    },
+    {
+      "title": "Babylone est tombée",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 10
+    },
+    {
+      "title": "Où en est la nuit&#8239;?",
+      "start_ch": 21,
+      "start_v": 11,
+      "end_ch": 21,
+      "end_v": 12
+    },
+    {
+      "title": "Les fuyards de Dédan et de Quédar",
+      "start_ch": 21,
+      "start_v": 13,
+      "end_ch": 21,
+      "end_v": 17
+    },
+    {
+      "title": "Avertissement à Jérusalem",
+      "start_ch": 22,
+      "start_v": 1,
+      "end_ch": 22,
+      "end_v": 14
+    },
+    {
+      "title": "L'administrateur Chebna doit perdre sa place",
+      "start_ch": 22,
+      "start_v": 15,
+      "end_ch": 22,
+      "end_v": 25
+    },
+    {
+      "title": "La ruine de la Phénicie",
+      "start_ch": 23,
+      "start_v": 1,
+      "end_ch": 23,
+      "end_v": 18
+    },
+    {
+      "title": "La terre entière est dévastée",
+      "start_ch": 24,
+      "start_v": 1,
+      "end_ch": 24,
+      "end_v": 13
+    },
+    {
+      "title": "Les survivants se réjouissent trop tôt",
+      "start_ch": 24,
+      "start_v": 14,
+      "end_ch": 24,
+      "end_v": 20
+    },
+    {
+      "title": "Un jour le Seigneur de l'univers sera roi à Jérusalem",
+      "start_ch": 24,
+      "start_v": 21,
+      "end_ch": 24,
+      "end_v": 23
+    },
+    {
+      "title": "Le Seigneur est le refuge des fidèles",
+      "start_ch": 25,
+      "start_v": 1,
+      "end_ch": 25,
+      "end_v": 5
+    },
+    {
+      "title": "Le Seigneur prépare un festin pour tous les peuples",
+      "start_ch": 25,
+      "start_v": 6,
+      "end_ch": 25,
+      "end_v": 8
+    },
+    {
+      "title": "Joie pour Israël, catastrophe pour Moab",
+      "start_ch": 25,
+      "start_v": 9,
+      "end_ch": 25,
+      "end_v": 12
+    },
+    {
+      "title": "Le Seigneur abat la cité inaccessible",
+      "start_ch": 26,
+      "start_v": 1,
+      "end_ch": 26,
+      "end_v": 6
+    },
+    {
+      "title": "Prière des derniers temps",
+      "start_ch": 26,
+      "start_v": 7,
+      "end_ch": 26,
+      "end_v": 18
+    },
+    {
+      "title": "Résurrection des morts et châtiment des crimes",
+      "start_ch": 26,
+      "start_v": 19,
+      "end_ch": 26,
+      "end_v": 21
+    },
+    {
+      "title": "Victoire sur le dragon des mers",
+      "start_ch": 27,
+      "start_v": 1,
+      "end_ch": 27,
+      "end_v": 1
+    },
+    {
+      "title": "Le Seigneur chante pour sa vigne",
+      "start_ch": 27,
+      "start_v": 2,
+      "end_ch": 27,
+      "end_v": 5
+    },
+    {
+      "title": "Le Seigneur pardonnera au peuple d'Israël",
+      "start_ch": 27,
+      "start_v": 6,
+      "end_ch": 27,
+      "end_v": 11
+    },
+    {
+      "title": "Les exilés reviendront à Jérusalem",
+      "start_ch": 27,
+      "start_v": 12,
+      "end_ch": 27,
+      "end_v": 13
+    },
+    {
+      "title": "Un orage destructeur sur Samarie",
+      "start_ch": 28,
+      "start_v": 1,
+      "end_ch": 28,
+      "end_v": 6
+    },
+    {
+      "title": "Les ivrognes se moquent du prophète",
+      "start_ch": 28,
+      "start_v": 7,
+      "end_ch": 28,
+      "end_v": 13
+    },
+    {
+      "title": "Le Seigneur pose une pierre de fondation",
+      "start_ch": 28,
+      "start_v": 14,
+      "end_ch": 28,
+      "end_v": 22
+    },
+    {
+      "title": "La sagesse du paysan vient de Dieu",
+      "start_ch": 28,
+      "start_v": 23,
+      "end_ch": 28,
+      "end_v": 29
+    },
+    {
+      "title": "Jérusalem, presque perdue, est soudain délivrée",
+      "start_ch": 29,
+      "start_v": 1,
+      "end_ch": 29,
+      "end_v": 8
+    },
+    {
+      "title": "Même les prophètes ne voient rien",
+      "start_ch": 29,
+      "start_v": 9,
+      "end_ch": 29,
+      "end_v": 12
+    },
+    {
+      "title": "Les prodiges vont continuer",
+      "start_ch": 29,
+      "start_v": 13,
+      "end_ch": 29,
+      "end_v": 14
+    },
+    {
+      "title": "Pour qui prenez-vous le Seigneur&#8239;?",
+      "start_ch": 29,
+      "start_v": 15,
+      "end_ch": 29,
+      "end_v": 16
+    },
+    {
+      "title": "Le grand renversement de situation",
+      "start_ch": 29,
+      "start_v": 17,
+      "end_ch": 29,
+      "end_v": 24
+    },
+    {
+      "title": "Ne cherchez pas l'aide de l'Égypte",
+      "start_ch": 30,
+      "start_v": 1,
+      "end_ch": 30,
+      "end_v": 5
+    },
+    {
+      "title": "L'aide de l'Égypte est illusoire",
+      "start_ch": 30,
+      "start_v": 6,
+      "end_ch": 30,
+      "end_v": 7
+    },
+    {
+      "title": "Un avertissement pour l'avenir",
+      "start_ch": 30,
+      "start_v": 8,
+      "end_ch": 30,
+      "end_v": 11
+    },
+    {
+      "title": "Un effondrement irrémédiable",
+      "start_ch": 30,
+      "start_v": 12,
+      "end_ch": 30,
+      "end_v": 14
+    },
+    {
+      "title": "Gardez votre calme et faites-moi confiance",
+      "start_ch": 30,
+      "start_v": 15,
+      "end_ch": 30,
+      "end_v": 17
+    },
+    {
+      "title": "Le Seigneur montrera sa bonté",
+      "start_ch": 30,
+      "start_v": 18,
+      "end_ch": 30,
+      "end_v": 26
+    },
+    {
+      "title": "Le Seigneur vient corriger l'Assyrie",
+      "start_ch": 30,
+      "start_v": 27,
+      "end_ch": 30,
+      "end_v": 33
+    },
+    {
+      "title": "Les Égyptiens ne sont pas des dieux",
+      "start_ch": 31,
+      "start_v": 1,
+      "end_ch": 31,
+      "end_v": 3
+    },
+    {
+      "title": "Le Seigneur protégera Jérusalem",
+      "start_ch": 31,
+      "start_v": 4,
+      "end_ch": 31,
+      "end_v": 9
+    },
+    {
+      "title": "Un roi bienfaisant",
+      "start_ch": 32,
+      "start_v": 1,
+      "end_ch": 32,
+      "end_v": 8
+    },
+    {
+      "title": "Avertissement aux femmes de Jérusalem",
+      "start_ch": 32,
+      "start_v": 9,
+      "end_ch": 32,
+      "end_v": 14
+    },
+    {
+      "title": "Mon peuple habitera une oasis de paix",
+      "start_ch": 32,
+      "start_v": 15,
+      "end_ch": 32,
+      "end_v": 20
+    },
+    {
+      "title": "Le Seigneur domine la situation",
+      "start_ch": 33,
+      "start_v": 1,
+      "end_ch": 33,
+      "end_v": 6
+    },
+    {
+      "title": "Le Seigneur va intervenir",
+      "start_ch": 33,
+      "start_v": 7,
+      "end_ch": 33,
+      "end_v": 16
+    },
+    {
+      "title": "Jérusalem sera délivrée",
+      "start_ch": 33,
+      "start_v": 17,
+      "end_ch": 33,
+      "end_v": 24
+    },
+    {
+      "title": "Le Seigneur juge le peuple d'Édom",
+      "start_ch": 34,
+      "start_v": 1,
+      "end_ch": 34,
+      "end_v": 17
+    },
+    {
+      "title": "Une joie éternelle illuminera leur visage",
+      "start_ch": 35,
+      "start_v": 1,
+      "end_ch": 35,
+      "end_v": 10
+    },
+    {
+      "title": "Le roi d'Assyrie menace Jérusalem",
+      "start_ch": 36,
+      "start_v": 1,
+      "end_ch": 36,
+      "end_v": 22
+    },
+    {
+      "title": "Le roi Ézékias consulte le prophète Ésaïe",
+      "start_ch": 37,
+      "start_v": 1,
+      "end_ch": 37,
+      "end_v": 7
+    },
+    {
+      "title": "Sennakérib fait de nouvelles menaces",
+      "start_ch": 37,
+      "start_v": 8,
+      "end_ch": 37,
+      "end_v": 13
+    },
+    {
+      "title": "La prière d'Ézékias",
+      "start_ch": 37,
+      "start_v": 14,
+      "end_ch": 37,
+      "end_v": 20
+    },
+    {
+      "title": "Ésaïe transmet la réponse du Seigneur",
+      "start_ch": 37,
+      "start_v": 21,
+      "end_ch": 37,
+      "end_v": 35
+    },
+    {
+      "title": "Les Assyriens s'en vont, Sennakérib est tué",
+      "start_ch": 37,
+      "start_v": 36,
+      "end_ch": 37,
+      "end_v": 38
+    },
+    {
+      "title": "Maladie et guérison d'Ézékias",
+      "start_ch": 38,
+      "start_v": 1,
+      "end_ch": 38,
+      "end_v": 8
+    },
+    {
+      "title": "La prière d'Ézékias après sa guérison",
+      "start_ch": 38,
+      "start_v": 9,
+      "end_ch": 38,
+      "end_v": 22
+    },
+    {
+      "title": "Ézékias reçoit les ambassadeurs de Babylone",
+      "start_ch": 39,
+      "start_v": 1,
+      "end_ch": 39,
+      "end_v": 8
+    },
+    {
+      "title": "Réconfortez mon peuple&#8239;!",
+      "start_ch": 40,
+      "start_v": 1,
+      "end_ch": 40,
+      "end_v": 8
+    },
+    {
+      "title": "Une bonne nouvelle à proclamer",
+      "start_ch": 40,
+      "start_v": 9,
+      "end_ch": 40,
+      "end_v": 11
+    },
+    {
+      "title": "Grandeur et sagesse du maître de l'univers",
+      "start_ch": 40,
+      "start_v": 12,
+      "end_ch": 40,
+      "end_v": 17
+    },
+    {
+      "title": "Dieu est incomparable",
+      "start_ch": 40,
+      "start_v": 18,
+      "end_ch": 40,
+      "end_v": 26
+    },
+    {
+      "title": "Le Seigneur renouvelle nos forces",
+      "start_ch": 40,
+      "start_v": 27,
+      "end_ch": 40,
+      "end_v": 31
+    },
+    {
+      "title": "Le Seigneur a suscité un libérateur",
+      "start_ch": 41,
+      "start_v": 1,
+      "end_ch": 41,
+      "end_v": 7
+    },
+    {
+      "title": "N'aie pas peur, car je suis avec toi",
+      "start_ch": 41,
+      "start_v": 8,
+      "end_ch": 41,
+      "end_v": 13
+    },
+    {
+      "title": "Je viens à ton secours",
+      "start_ch": 41,
+      "start_v": 14,
+      "end_ch": 41,
+      "end_v": 16
+    },
+    {
+      "title": "Le désert est changé en une oasis",
+      "start_ch": 41,
+      "start_v": 17,
+      "end_ch": 41,
+      "end_v": 20
+    },
+    {
+      "title": "Les faux dieux sont pris en défaut",
+      "start_ch": 41,
+      "start_v": 21,
+      "end_ch": 41,
+      "end_v": 29
+    },
+    {
+      "title": "Le serviteur du Seigneur (premier poème)",
+      "start_ch": 42,
+      "start_v": 1,
+      "end_ch": 42,
+      "end_v": 4
+    },
+    {
+      "title": "Il est la lumière du monde",
+      "start_ch": 42,
+      "start_v": 5,
+      "end_ch": 42,
+      "end_v": 9
+    },
+    {
+      "title": "Le Seigneur intervient",
+      "start_ch": 42,
+      "start_v": 10,
+      "end_ch": 42,
+      "end_v": 13
+    },
+    {
+      "title": "Le Seigneur réalisera son projet",
+      "start_ch": 42,
+      "start_v": 14,
+      "end_ch": 42,
+      "end_v": 17
+    },
+    {
+      "title": "Ce peuple est aveugle et sourd",
+      "start_ch": 42,
+      "start_v": 18,
+      "end_ch": 42,
+      "end_v": 25
+    },
+    {
+      "title": "Mes témoins, c'est vous",
+      "start_ch": 43,
+      "start_v": 8,
+      "end_ch": 43,
+      "end_v": 13
+    },
+    {
+      "title": "J'envoie quelqu'un pour vous",
+      "start_ch": 43,
+      "start_v": 14,
+      "end_ch": 43,
+      "end_v": 15
+    },
+    {
+      "title": "Un nouveau chemin dans le désert",
+      "start_ch": 43,
+      "start_v": 16,
+      "end_ch": 43,
+      "end_v": 21
+    },
+    {
+      "title": "Le Seigneur fait un procès à son peuple",
+      "start_ch": 43,
+      "start_v": 22,
+      "end_ch": 43,
+      "end_v": 28
+    },
+    {
+      "title": "Un défi aux faux dieux",
+      "start_ch": 44,
+      "start_v": 6,
+      "end_ch": 44,
+      "end_v": 8
+    },
+    {
+      "title": "Les fabricants d'idoles",
+      "start_ch": 44,
+      "start_v": 9,
+      "end_ch": 44,
+      "end_v": 20
+    },
+    {
+      "title": "Tu es mon serviteur, ne l'oublie pas",
+      "start_ch": 44,
+      "start_v": 21,
+      "end_ch": 44,
+      "end_v": 23
+    },
+    {
+      "title": "Le créateur du monde est maître de l'histoire",
+      "start_ch": 44,
+      "start_v": 24,
+      "end_ch": 44,
+      "end_v": 28
+    },
+    {
+      "title": "Cyrus est celui que Dieu a mis à part",
+      "start_ch": 45,
+      "start_v": 1,
+      "end_ch": 45,
+      "end_v": 8
+    },
+    {
+      "title": "L'argile et le maître potier",
+      "start_ch": 45,
+      "start_v": 9,
+      "end_ch": 45,
+      "end_v": 13
+    },
+    {
+      "title": "Israël, Dieu est chez toi",
+      "start_ch": 45,
+      "start_v": 14,
+      "end_ch": 45,
+      "end_v": 17
+    },
+    {
+      "title": "Le salut est annoncé clairement",
+      "start_ch": 45,
+      "start_v": 18,
+      "end_ch": 45,
+      "end_v": 19
+    },
+    {
+      "title": "La conversion du monde",
+      "start_ch": 45,
+      "start_v": 20,
+      "end_ch": 45,
+      "end_v": 25
+    },
+    {
+      "title": "Les faux dieux de Babylone face au vrai Dieu",
+      "start_ch": 46,
+      "start_v": 1,
+      "end_ch": 46,
+      "end_v": 7
+    },
+    {
+      "title": "La délivrance n'est pas loin",
+      "start_ch": 46,
+      "start_v": 8,
+      "end_ch": 46,
+      "end_v": 13
+    },
+    {
+      "title": "La ruine prochaine de Babylone",
+      "start_ch": 47,
+      "start_v": 1,
+      "end_ch": 47,
+      "end_v": 15
+    },
+    {
+      "title": "Le Seigneur annonce des faits nouveaux",
+      "start_ch": 48,
+      "start_v": 1,
+      "end_ch": 48,
+      "end_v": 11
+    },
+    {
+      "title": "Celui qui accomplira le projet du Seigneur",
+      "start_ch": 48,
+      "start_v": 12,
+      "end_ch": 48,
+      "end_v": 16
+    },
+    {
+      "title": "Ah, si tu m'avais écouté&#8239;!",
+      "start_ch": 48,
+      "start_v": 17,
+      "end_ch": 48,
+      "end_v": 19
+    },
+    {
+      "title": "Partez de Babylone",
+      "start_ch": 48,
+      "start_v": 20,
+      "end_ch": 48,
+      "end_v": 22
+    },
+    {
+      "title": "Le serviteur du Seigneur (deuxième poème)",
+      "start_ch": 49,
+      "start_v": 1,
+      "end_ch": 49,
+      "end_v": 6
+    },
+    {
+      "title": "Le grand retour des exilés",
+      "start_ch": 49,
+      "start_v": 7,
+      "end_ch": 49,
+      "end_v": 13
+    },
+    {
+      "title": "Moi, je ne t'oublie pas",
+      "start_ch": 49,
+      "start_v": 14,
+      "end_ch": 49,
+      "end_v": 26
+    },
+    {
+      "title": "Le Seigneur n'a pas le bras trop court pour sauver",
+      "start_ch": 50,
+      "start_v": 1,
+      "end_ch": 50,
+      "end_v": 3
+    },
+    {
+      "title": "Le serviteur du Seigneur (troisième poème)",
+      "start_ch": 50,
+      "start_v": 4,
+      "end_ch": 50,
+      "end_v": 9
+    },
+    {
+      "title": "Écouter le serviteur du Seigneur",
+      "start_ch": 50,
+      "start_v": 10,
+      "end_ch": 50,
+      "end_v": 11
+    },
+    {
+      "title": "Un salut qui n'aura pas de fin",
+      "start_ch": 51,
+      "start_v": 1,
+      "end_ch": 51,
+      "end_v": 8
+    },
+    {
+      "title": "Réveille-toi, Seigneur&#8239;!",
+      "start_ch": 51,
+      "start_v": 9,
+      "end_ch": 51,
+      "end_v": 11
+    },
+    {
+      "title": "Mon peuple, qu'as-tu à craindre&#8239;?",
+      "start_ch": 51,
+      "start_v": 12,
+      "end_ch": 51,
+      "end_v": 16
+    },
+    {
+      "title": "Ressaisis-toi, Jérusalem",
+      "start_ch": 51,
+      "start_v": 17,
+      "end_ch": 51,
+      "end_v": 23
+    },
+    {
+      "title": "Réveille-toi, Jérusalem",
+      "start_ch": 52,
+      "start_v": 1,
+      "end_ch": 52,
+      "end_v": 6
+    },
+    {
+      "title": "Le retour du Seigneur à Jérusalem",
+      "start_ch": 52,
+      "start_v": 7,
+      "end_ch": 52,
+      "end_v": 10
+    },
+    {
+      "title": "Quittez Babylone&#8239;!",
+      "start_ch": 52,
+      "start_v": 11,
+      "end_ch": 52,
+      "end_v": 12
+    },
+    {
+      "title": "Le serviteur du Seigneur (quatrième poème)",
+      "start_ch": 52,
+      "start_v": 13,
+      "end_ch": 52,
+      "end_v": 15
+    },
+    {
+      "title": "Dieu garde sa tendresse pour Jérusalem",
+      "start_ch": 54,
+      "start_v": 1,
+      "end_ch": 54,
+      "end_v": 10
+    },
+    {
+      "title": "La Jérusalem des temps futurs",
+      "start_ch": 54,
+      "start_v": 11,
+      "end_ch": 54,
+      "end_v": 17
+    },
+    {
+      "title": "Venez, même sans argent",
+      "start_ch": 55,
+      "start_v": 1,
+      "end_ch": 55,
+      "end_v": 5
+    },
+    {
+      "title": "La parole du Seigneur atteint son but",
+      "start_ch": 55,
+      "start_v": 6,
+      "end_ch": 55,
+      "end_v": 13
+    },
+    {
+      "title": "Une maison de prière pour tous les peuples",
+      "start_ch": 56,
+      "start_v": 1,
+      "end_ch": 56,
+      "end_v": 8
+    },
+    {
+      "title": "Les responsables du peuple sont indignes",
+      "start_ch": 56,
+      "start_v": 9,
+      "end_ch": 56,
+      "end_v": 12
+    },
+    {
+      "title": "Reproches au peuple idolâtre",
+      "start_ch": 57,
+      "start_v": 3,
+      "end_ch": 57,
+      "end_v": 13
+    },
+    {
+      "title": "Dieu guérira son peuple",
+      "start_ch": 57,
+      "start_v": 14,
+      "end_ch": 57,
+      "end_v": 21
+    },
+    {
+      "title": "Le jeûne qui plaît à Dieu",
+      "start_ch": 58,
+      "start_v": 1,
+      "end_ch": 58,
+      "end_v": 12
+    },
+    {
+      "title": "Le sabbat qui plaît à Dieu",
+      "start_ch": 58,
+      "start_v": 13,
+      "end_ch": 58,
+      "end_v": 14
+    },
+    {
+      "title": "Vos fautes vous séparent de Dieu",
+      "start_ch": 59,
+      "start_v": 1,
+      "end_ch": 59,
+      "end_v": 8
+    },
+    {
+      "title": "Le peuple de Dieu reconnaît ses fautes",
+      "start_ch": 59,
+      "start_v": 9,
+      "end_ch": 59,
+      "end_v": 15
+    },
+    {
+      "title": "Le Seigneur interviendra",
+      "start_ch": 59,
+      "start_v": 16,
+      "end_ch": 59,
+      "end_v": 21
+    },
+    {
+      "title": "Jérusalem attire tous les peuples du monde",
+      "start_ch": 60,
+      "start_v": 1,
+      "end_ch": 60,
+      "end_v": 22
+    },
+    {
+      "title": "La mission de l'envoyé du Seigneur",
+      "start_ch": 61,
+      "start_v": 1,
+      "end_ch": 61,
+      "end_v": 9
+    },
+    {
+      "title": "Un chant de reconnaissance",
+      "start_ch": 61,
+      "start_v": 10,
+      "end_ch": 61,
+      "end_v": 11
+    },
+    {
+      "title": "Jérusalem fait la joie de son Dieu",
+      "start_ch": 62,
+      "start_v": 1,
+      "end_ch": 62,
+      "end_v": 12
+    },
+    {
+      "title": "La terrible vengeance",
+      "start_ch": 63,
+      "start_v": 1,
+      "end_ch": 63,
+      "end_v": 6
+    },
+    {
+      "title": "Un rappel de la bonté du Seigneur",
+      "start_ch": 63,
+      "start_v": 7,
+      "end_ch": 63,
+      "end_v": 14
+    },
+    {
+      "title": "Prière du peuple",
+      "start_ch": 63,
+      "start_v": 15,
+      "end_ch": 63,
+      "end_v": 19
+    },
+    {
+      "title": "Le jugement à venir",
+      "start_ch": 65,
+      "start_v": 1,
+      "end_ch": 65,
+      "end_v": 16
+    },
+    {
+      "title": "Dieu créera des nouveaux cieux et une nouvelle terre",
+      "start_ch": 65,
+      "start_v": 17,
+      "end_ch": 65,
+      "end_v": 25
+    },
+    {
+      "title": "Les exigences du véritable culte",
+      "start_ch": 66,
+      "start_v": 1,
+      "end_ch": 66,
+      "end_v": 4
+    },
+    {
+      "title": "L'intervention finale du Seigneur",
+      "start_ch": 66,
+      "start_v": 5,
+      "end_ch": 66,
+      "end_v": 17
+    },
+    {
+      "title": "Le Seigneur se fera connaître de tous les peuples",
+      "start_ch": 66,
+      "start_v": 18,
+      "end_ch": 66,
+      "end_v": 24
+    }
+  ]
 }

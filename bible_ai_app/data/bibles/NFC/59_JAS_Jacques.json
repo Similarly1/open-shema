@@ -124,5 +124,121 @@
       "19": "Mes frères et sœurs, si l'un de vous s'est éloigné de la vérité, et qu'un autre l'y ramène,",
       "20": "sachez que ramener un pécheur du chemin où il s'égarait le sauve de la mort et apporte le pardon d'un grand nombre de péchés."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Salutation",
+    "1:2": "Le bonheur de persévérer dans la foi",
+    "1:13": "L'épreuve ne vient pas de Dieu",
+    "1:19": "Écouter et mettre en pratique la parole de Dieu",
+    "2:1": "Ne pas agir avec discrimination",
+    "2:14": "Sans les actes, la foi est morte",
+    "3:1": "La langue&#160;: la meilleure et la pire des choses",
+    "3:13": "Accueillir la sagesse qui vient d'en haut",
+    "4:1": "Approchez-vous de Dieu&#8239;!",
+    "4:11": "Ne pas juger un frère ou une sœur",
+    "4:13": "Renoncer à l'orgueil",
+    "5:1": "Avertissement aux riches",
+    "5:7": "Attendre avec patience la venue du Seigneur",
+    "5:13": "La force de la prière"
+  },
+  "pericopes": [
+    {
+      "title": "Salutation",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 1
+    },
+    {
+      "title": "Le bonheur de persévérer dans la foi",
+      "start_ch": 1,
+      "start_v": 2,
+      "end_ch": 1,
+      "end_v": 12
+    },
+    {
+      "title": "L'épreuve ne vient pas de Dieu",
+      "start_ch": 1,
+      "start_v": 13,
+      "end_ch": 1,
+      "end_v": 18
+    },
+    {
+      "title": "Écouter et mettre en pratique la parole de Dieu",
+      "start_ch": 1,
+      "start_v": 19,
+      "end_ch": 1,
+      "end_v": 27
+    },
+    {
+      "title": "Ne pas agir avec discrimination",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 13
+    },
+    {
+      "title": "Sans les actes, la foi est morte",
+      "start_ch": 2,
+      "start_v": 14,
+      "end_ch": 2,
+      "end_v": 26
+    },
+    {
+      "title": "La langue&#160;: la meilleure et la pire des choses",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 12
+    },
+    {
+      "title": "Accueillir la sagesse qui vient d'en haut",
+      "start_ch": 3,
+      "start_v": 13,
+      "end_ch": 3,
+      "end_v": 18
+    },
+    {
+      "title": "Approchez-vous de Dieu&#8239;!",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 10
+    },
+    {
+      "title": "Ne pas juger un frère ou une sœur",
+      "start_ch": 4,
+      "start_v": 11,
+      "end_ch": 4,
+      "end_v": 12
+    },
+    {
+      "title": "Renoncer à l'orgueil",
+      "start_ch": 4,
+      "start_v": 13,
+      "end_ch": 4,
+      "end_v": 17
+    },
+    {
+      "title": "Avertissement aux riches",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 6
+    },
+    {
+      "title": "Attendre avec patience la venue du Seigneur",
+      "start_ch": 5,
+      "start_v": 7,
+      "end_ch": 5,
+      "end_v": 12
+    },
+    {
+      "title": "La force de la prière",
+      "start_ch": 5,
+      "start_v": 13,
+      "end_ch": 5,
+      "end_v": 20
+    }
+  ]
 }

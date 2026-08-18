@@ -125,5 +125,81 @@
       "19": "Il aura encore compassion de nous, il piétinera nos fautes. Tu jetteras au fond de la mer tous leurs péchés.",
       "20": "Tu témoigneras de la fidélité à Jacob, de la bonté à Abraham, comme tu l'as juré à nos ancêtres autrefois."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Menaces contre Israël et Juda",
+    "2:1": "Péché et jugement d'Israël",
+    "2:12": "Promesse de rassemblement",
+    "3:1": "Reproches aux responsables et aux prophètes",
+    "4:1": "Promesse pour Jérusalem",
+    "4:9": "Déportation et délivrance d'Israël",
+    "5:1": "Naissance et règne du Messie",
+    "6:1": "Procès de l'Eternel avec son peuple",
+    "7:7": "Espérance et promesses pour Israël"
+  },
+  "pericopes": [
+    {
+      "title": "Menaces contre Israël et Juda",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 16
+    },
+    {
+      "title": "Péché et jugement d'Israël",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 11
+    },
+    {
+      "title": "Promesse de rassemblement",
+      "start_ch": 2,
+      "start_v": 12,
+      "end_ch": 2,
+      "end_v": 13
+    },
+    {
+      "title": "Reproches aux responsables et aux prophètes",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 12
+    },
+    {
+      "title": "Promesse pour Jérusalem",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 8
+    },
+    {
+      "title": "Déportation et délivrance d'Israël",
+      "start_ch": 4,
+      "start_v": 9,
+      "end_ch": 4,
+      "end_v": 14
+    },
+    {
+      "title": "Naissance et règne du Messie",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 14
+    },
+    {
+      "title": "Procès de l'Eternel avec son peuple",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 16
+    },
+    {
+      "title": "Espérance et promesses pour Israël",
+      "start_ch": 7,
+      "start_v": 7,
+      "end_ch": 7,
+      "end_v": 20
+    }
+  ]
 }

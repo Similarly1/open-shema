@@ -455,5 +455,417 @@
       "20": "Celui dont j’ai noté les paroles et qui garantit la vérité de ces prophéties l’affirme: — Oui, mon retour est proche. Amen, cela est vrai. — Oh, oui! Viens Seigneur Jésus!",
       "21": "Que Jésus, le Seigneur, accorde sa grâce à tous."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Préface",
+    "1:4": "Jésus revient",
+    "1:10": "Comment ce livre est né",
+    "1:13": "Le véritable auteur du livre",
+    "2:1": "À une Église qui a perdu son premier amour",
+    "2:8": "À une Église dans l’épreuve",
+    "2:12": "À une Église menacée",
+    "2:18": "À une Église activiste",
+    "3:1": "À une Église réputée vivante",
+    "3:7": "À une Église fidèle",
+    "3:14": "À une Église tiède",
+    "4:1": "Devant le trône suprême",
+    "4:9": "Un culte au ciel",
+    "5:1": "Le livre aux sept sceaux",
+    "5:7": "Le Christ prend le destin de l’humanité en main",
+    "6:1": "Les quatre composantes de l’Histoire",
+    "6:9": "L’Église sous la croix",
+    "6:12": "Le grand jour de la colère de Dieu",
+    "7:1": "Le peuple de Dieu dans la grande épreuve",
+    "8:1": "Le silence avant la tempête",
+    "8:6": "La tempête se déchaîne",
+    "9:1": "Les forces de l’abîme déferlent sur la terre",
+    "9:13": "La guerre totale",
+    "10:1": "Tout le plan de Dieu s’accomplira",
+    "11:1": "Témoins du Dieu vivant dans un monde hostile",
+    "11:15": "L’Éternel règne",
+    "12:1": "La femme, le dragon et l’enfant",
+    "12:7": "Victoire dans le ciel",
+    "12:13": "Guerre sur la terre",
+    "13:1": "La bête miraculée",
+    "13:11": "La religion universelle",
+    "14:1": "L’Église triomphante",
+    "14:6": "Suprême avertissement",
+    "14:13": "La moisson est mûre",
+    "15:1": "Le Maître de l’univers",
+    "16:1": "Les sept coupes de la colère divine",
+    "16:12": "La lutte finale",
+    "17:1": "La grande séductrice",
+    "17:9": "Clés pour une symbolique",
+    "18:1": "Une chute qui fera du bruit",
+    "18:9": "Crise mondiale",
+    "19:1": "Alléluia",
+    "19:11": "Le grand vainqueur",
+    "20:1": "Avec lui nous régnerons",
+    "20:7": "Ultime bataille",
+    "20:11": "Jugement dernier",
+    "21:1": "Nouveaux cieux, nouvelle terre",
+    "21:9": "Nouvelle Jérusalem",
+    "22:1": "Vie et lumière",
+    "22:6": "Jésus revient bientôt",
+    "22:17": "Oui, viens, Seigneur Jésus"
+  },
+  "pericopes": [
+    {
+      "title": "Préface",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 3
+    },
+    {
+      "title": "Jésus revient",
+      "start_ch": 1,
+      "start_v": 4,
+      "end_ch": 1,
+      "end_v": 9
+    },
+    {
+      "title": "Comment ce livre est né",
+      "start_ch": 1,
+      "start_v": 10,
+      "end_ch": 1,
+      "end_v": 12
+    },
+    {
+      "title": "Le véritable auteur du livre",
+      "start_ch": 1,
+      "start_v": 13,
+      "end_ch": 1,
+      "end_v": 20
+    },
+    {
+      "title": "À une Église qui a perdu son premier amour",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 7
+    },
+    {
+      "title": "À une Église dans l’épreuve",
+      "start_ch": 2,
+      "start_v": 8,
+      "end_ch": 2,
+      "end_v": 11
+    },
+    {
+      "title": "À une Église menacée",
+      "start_ch": 2,
+      "start_v": 12,
+      "end_ch": 2,
+      "end_v": 17
+    },
+    {
+      "title": "À une Église activiste",
+      "start_ch": 2,
+      "start_v": 18,
+      "end_ch": 2,
+      "end_v": 29
+    },
+    {
+      "title": "À une Église réputée vivante",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 6
+    },
+    {
+      "title": "À une Église fidèle",
+      "start_ch": 3,
+      "start_v": 7,
+      "end_ch": 3,
+      "end_v": 13
+    },
+    {
+      "title": "À une Église tiède",
+      "start_ch": 3,
+      "start_v": 14,
+      "end_ch": 3,
+      "end_v": 22
+    },
+    {
+      "title": "Devant le trône suprême",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 8
+    },
+    {
+      "title": "Un culte au ciel",
+      "start_ch": 4,
+      "start_v": 9,
+      "end_ch": 4,
+      "end_v": 11
+    },
+    {
+      "title": "Le livre aux sept sceaux",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 6
+    },
+    {
+      "title": "Le Christ prend le destin de l’humanité en main",
+      "start_ch": 5,
+      "start_v": 7,
+      "end_ch": 5,
+      "end_v": 14
+    },
+    {
+      "title": "Les quatre composantes de l’Histoire",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 8
+    },
+    {
+      "title": "L’Église sous la croix",
+      "start_ch": 6,
+      "start_v": 9,
+      "end_ch": 6,
+      "end_v": 11
+    },
+    {
+      "title": "Le grand jour de la colère de Dieu",
+      "start_ch": 6,
+      "start_v": 12,
+      "end_ch": 6,
+      "end_v": 17
+    },
+    {
+      "title": "Le peuple de Dieu dans la grande épreuve",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 17
+    },
+    {
+      "title": "Le silence avant la tempête",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 5
+    },
+    {
+      "title": "La tempête se déchaîne",
+      "start_ch": 8,
+      "start_v": 6,
+      "end_ch": 8,
+      "end_v": 13
+    },
+    {
+      "title": "Les forces de l’abîme déferlent sur la terre",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 12
+    },
+    {
+      "title": "La guerre totale",
+      "start_ch": 9,
+      "start_v": 13,
+      "end_ch": 9,
+      "end_v": 21
+    },
+    {
+      "title": "Tout le plan de Dieu s’accomplira",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 11
+    },
+    {
+      "title": "Témoins du Dieu vivant dans un monde hostile",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 14
+    },
+    {
+      "title": "L’Éternel règne",
+      "start_ch": 11,
+      "start_v": 15,
+      "end_ch": 11,
+      "end_v": 19
+    },
+    {
+      "title": "La femme, le dragon et l’enfant",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 6
+    },
+    {
+      "title": "Victoire dans le ciel",
+      "start_ch": 12,
+      "start_v": 7,
+      "end_ch": 12,
+      "end_v": 12
+    },
+    {
+      "title": "Guerre sur la terre",
+      "start_ch": 12,
+      "start_v": 13,
+      "end_ch": 12,
+      "end_v": 18
+    },
+    {
+      "title": "La bête miraculée",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 10
+    },
+    {
+      "title": "La religion universelle",
+      "start_ch": 13,
+      "start_v": 11,
+      "end_ch": 13,
+      "end_v": 18
+    },
+    {
+      "title": "L’Église triomphante",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 5
+    },
+    {
+      "title": "Suprême avertissement",
+      "start_ch": 14,
+      "start_v": 6,
+      "end_ch": 14,
+      "end_v": 12
+    },
+    {
+      "title": "La moisson est mûre",
+      "start_ch": 14,
+      "start_v": 13,
+      "end_ch": 14,
+      "end_v": 20
+    },
+    {
+      "title": "Le Maître de l’univers",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 8
+    },
+    {
+      "title": "Les sept coupes de la colère divine",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 11
+    },
+    {
+      "title": "La lutte finale",
+      "start_ch": 16,
+      "start_v": 12,
+      "end_ch": 16,
+      "end_v": 21
+    },
+    {
+      "title": "La grande séductrice",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 8
+    },
+    {
+      "title": "Clés pour une symbolique",
+      "start_ch": 17,
+      "start_v": 9,
+      "end_ch": 17,
+      "end_v": 18
+    },
+    {
+      "title": "Une chute qui fera du bruit",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 8
+    },
+    {
+      "title": "Crise mondiale",
+      "start_ch": 18,
+      "start_v": 9,
+      "end_ch": 18,
+      "end_v": 24
+    },
+    {
+      "title": "Alléluia",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 10
+    },
+    {
+      "title": "Le grand vainqueur",
+      "start_ch": 19,
+      "start_v": 11,
+      "end_ch": 19,
+      "end_v": 21
+    },
+    {
+      "title": "Avec lui nous régnerons",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 6
+    },
+    {
+      "title": "Ultime bataille",
+      "start_ch": 20,
+      "start_v": 7,
+      "end_ch": 20,
+      "end_v": 10
+    },
+    {
+      "title": "Jugement dernier",
+      "start_ch": 20,
+      "start_v": 11,
+      "end_ch": 20,
+      "end_v": 15
+    },
+    {
+      "title": "Nouveaux cieux, nouvelle terre",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 8
+    },
+    {
+      "title": "Nouvelle Jérusalem",
+      "start_ch": 21,
+      "start_v": 9,
+      "end_ch": 21,
+      "end_v": 27
+    },
+    {
+      "title": "Vie et lumière",
+      "start_ch": 22,
+      "start_v": 1,
+      "end_ch": 22,
+      "end_v": 5
+    },
+    {
+      "title": "Jésus revient bientôt",
+      "start_ch": 22,
+      "start_v": 6,
+      "end_ch": 22,
+      "end_v": 16
+    },
+    {
+      "title": "Oui, viens, Seigneur Jésus",
+      "start_ch": 22,
+      "start_v": 17,
+      "end_ch": 22,
+      "end_v": 21
+    }
+  ]
 }

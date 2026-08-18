@@ -118,5 +118,65 @@
       "22": "Tous les saints vous saluent, en particulier ceux de l'entourage de l'empereur.",
       "23": "Que la grâce du Seigneur Jésus-Christ soit avec vous tous!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Salutation et louange",
+    "1:12": "Nouvelles de Paul",
+    "1:27": "Appel à suivre l’exemple de Christ",
+    "2:19": "Envoi à Philippes de Timothée et d'Epaphrodite",
+    "3:1": "Appel à suivre l’exemple de Paul",
+    "4:2": "Recommandations diverses",
+    "4:10": "Reconnaissance et salutations"
+  },
+  "pericopes": [
+    {
+      "title": "Salutation et louange",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 11
+    },
+    {
+      "title": "Nouvelles de Paul",
+      "start_ch": 1,
+      "start_v": 12,
+      "end_ch": 1,
+      "end_v": 26
+    },
+    {
+      "title": "Appel à suivre l’exemple de Christ",
+      "start_ch": 1,
+      "start_v": 27,
+      "end_ch": 1,
+      "end_v": 30
+    },
+    {
+      "title": "Envoi à Philippes de Timothée et d'Epaphrodite",
+      "start_ch": 2,
+      "start_v": 19,
+      "end_ch": 2,
+      "end_v": 30
+    },
+    {
+      "title": "Appel à suivre l’exemple de Paul",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 21
+    },
+    {
+      "title": "Recommandations diverses",
+      "start_ch": 4,
+      "start_v": 2,
+      "end_ch": 4,
+      "end_v": 9
+    },
+    {
+      "title": "Reconnaissance et salutations",
+      "start_ch": 4,
+      "start_v": 10,
+      "end_ch": 4,
+      "end_v": 23
+    }
+  ]
 }

@@ -170,5 +170,249 @@
       "14": "Je rétablirai mon peuple, Israël: ils reconstruiront les villes dévastées et ils les repeupleront. Ils planteront des vignes, dont ils boiront le vin. Ils cultiveront des jardins dont ils mangeront les produits.",
       "15": "Je replanterai mon peuple sur le sol qui est le sien. Ils ne seront plus chassés du sol que je leur aurai rendu. Voilà ce que j'annonce, moi, le Seigneur votre Dieu.»"
     }
-  }
+  },
+  "sections": {
+    "1:3": "Les reproches du Seigneur à Israël et ses voisins",
+    "1:6": "Les Philistins",
+    "1:9": "Les Phéniciens",
+    "1:11": "Les Édomites",
+    "1:13": "Les Ammonites",
+    "2:1": "Les Moabites",
+    "2:4": "Juda",
+    "2:6": "Israël",
+    "3:1": "Le peuple de Dieu devra rendre des comptes",
+    "3:3": "Quand Dieu parle, le prophète ne peut se taire",
+    "3:9": "Le Seigneur juge Samarie",
+    "3:13": "Avertissements",
+    "4:4": "Une religion illusoire",
+    "4:6": "Des avertissements inutiles",
+    "5:1": "Amos entonne un chant de deuil sur Israël",
+    "5:4": "Appel avant qu'il soit trop tard",
+    "5:18": "Le jour où le Seigneur interviendra",
+    "5:21": "Un culte détestable",
+    "6:1": "Fausse sécurité",
+    "6:8": "Samarie sera détruite",
+    "6:12": "Certaines victoires ne servent à rien",
+    "7:1": "Première vision d'Amos&#160;: les sauterelles",
+    "7:4": "Deuxième vision&#160;: le feu",
+    "7:7": "Troisième vision&#160;: le fil à plomb",
+    "7:10": "Amos est expulsé de Béthel",
+    "8:1": "Quatrième vision&#160;: la corbeille de fruits",
+    "8:4": "Les trafiquants malhonnêtes entraînent la catastrophe",
+    "9:1": "Cinquième vision",
+    "9:7": "Le jugement des coupables",
+    "9:11": "Après le malheur, Dieu relèvera son peuple"
+  },
+  "pericopes": [
+    {
+      "title": "Les reproches du Seigneur à Israël et ses voisins",
+      "start_ch": 1,
+      "start_v": 3,
+      "end_ch": 1,
+      "end_v": 5
+    },
+    {
+      "title": "Les Philistins",
+      "start_ch": 1,
+      "start_v": 6,
+      "end_ch": 1,
+      "end_v": 8
+    },
+    {
+      "title": "Les Phéniciens",
+      "start_ch": 1,
+      "start_v": 9,
+      "end_ch": 1,
+      "end_v": 10
+    },
+    {
+      "title": "Les Édomites",
+      "start_ch": 1,
+      "start_v": 11,
+      "end_ch": 1,
+      "end_v": 12
+    },
+    {
+      "title": "Les Ammonites",
+      "start_ch": 1,
+      "start_v": 13,
+      "end_ch": 1,
+      "end_v": 15
+    },
+    {
+      "title": "Les Moabites",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 3
+    },
+    {
+      "title": "Juda",
+      "start_ch": 2,
+      "start_v": 4,
+      "end_ch": 2,
+      "end_v": 5
+    },
+    {
+      "title": "Israël",
+      "start_ch": 2,
+      "start_v": 6,
+      "end_ch": 2,
+      "end_v": 16
+    },
+    {
+      "title": "Le peuple de Dieu devra rendre des comptes",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 2
+    },
+    {
+      "title": "Quand Dieu parle, le prophète ne peut se taire",
+      "start_ch": 3,
+      "start_v": 3,
+      "end_ch": 3,
+      "end_v": 8
+    },
+    {
+      "title": "Le Seigneur juge Samarie",
+      "start_ch": 3,
+      "start_v": 9,
+      "end_ch": 3,
+      "end_v": 12
+    },
+    {
+      "title": "Avertissements",
+      "start_ch": 3,
+      "start_v": 13,
+      "end_ch": 3,
+      "end_v": 15
+    },
+    {
+      "title": "Une religion illusoire",
+      "start_ch": 4,
+      "start_v": 4,
+      "end_ch": 4,
+      "end_v": 5
+    },
+    {
+      "title": "Des avertissements inutiles",
+      "start_ch": 4,
+      "start_v": 6,
+      "end_ch": 4,
+      "end_v": 13
+    },
+    {
+      "title": "Amos entonne un chant de deuil sur Israël",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 3
+    },
+    {
+      "title": "Appel avant qu'il soit trop tard",
+      "start_ch": 5,
+      "start_v": 4,
+      "end_ch": 5,
+      "end_v": 17
+    },
+    {
+      "title": "Le jour où le Seigneur interviendra",
+      "start_ch": 5,
+      "start_v": 18,
+      "end_ch": 5,
+      "end_v": 20
+    },
+    {
+      "title": "Un culte détestable",
+      "start_ch": 5,
+      "start_v": 21,
+      "end_ch": 5,
+      "end_v": 27
+    },
+    {
+      "title": "Fausse sécurité",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 7
+    },
+    {
+      "title": "Samarie sera détruite",
+      "start_ch": 6,
+      "start_v": 8,
+      "end_ch": 6,
+      "end_v": 11
+    },
+    {
+      "title": "Certaines victoires ne servent à rien",
+      "start_ch": 6,
+      "start_v": 12,
+      "end_ch": 6,
+      "end_v": 14
+    },
+    {
+      "title": "Première vision d'Amos&#160;: les sauterelles",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 3
+    },
+    {
+      "title": "Deuxième vision&#160;: le feu",
+      "start_ch": 7,
+      "start_v": 4,
+      "end_ch": 7,
+      "end_v": 6
+    },
+    {
+      "title": "Troisième vision&#160;: le fil à plomb",
+      "start_ch": 7,
+      "start_v": 7,
+      "end_ch": 7,
+      "end_v": 9
+    },
+    {
+      "title": "Amos est expulsé de Béthel",
+      "start_ch": 7,
+      "start_v": 10,
+      "end_ch": 7,
+      "end_v": 17
+    },
+    {
+      "title": "Quatrième vision&#160;: la corbeille de fruits",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 3
+    },
+    {
+      "title": "Les trafiquants malhonnêtes entraînent la catastrophe",
+      "start_ch": 8,
+      "start_v": 4,
+      "end_ch": 8,
+      "end_v": 14
+    },
+    {
+      "title": "Cinquième vision",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 6
+    },
+    {
+      "title": "Le jugement des coupables",
+      "start_ch": 9,
+      "start_v": 7,
+      "end_ch": 9,
+      "end_v": 10
+    },
+    {
+      "title": "Après le malheur, Dieu relèvera son peuple",
+      "start_ch": 9,
+      "start_v": 11,
+      "end_ch": 9,
+      "end_v": 15
+    }
+  ]
 }

@@ -666,5 +666,185 @@
       "24": "A ce moment-là, les Israélites repartirent de là, chacun dans sa tribu et dans son clan. Ils retournèrent chacun dans son héritage.",
       "25": "A cette époque-là, il n'y avait pas de roi en Israël. Chacun faisait ce qui lui semblait bon."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Victoires de la tribu de Juda",
+    "1:21": "Echecs des diverses tribus",
+    "2:1": "Constat d’échec et mort de Josué",
+    "2:10": "Attitude de la nouvelle génération",
+    "3:7": "Victoire d'Othniel sur le roi de Mésopotamie",
+    "3:12": "Victoire d'Ehud sur les Moabites",
+    "3:31": "Victoire de Shamgar sur les Philistins",
+    "4:1": "Victoire de Débora et Barak sur Sisera",
+    "5:1": "Cantique de Débora",
+    "6:1": "Appel de Gédéon",
+    "7:1": "Victoire de Gédéon sur les Madianites",
+    "8:33": "Violences d’Abimélec",
+    "10:1": "Thola et Jaïr juges en Israël",
+    "10:6": "Intervention de Jephthé",
+    "12:8": "Ibtsan, Elon et Abdon juges en Israël",
+    "13:1": "Naissance de Samson",
+    "14:1": "Mariage de Samson",
+    "15:1": "Exploits de Samson contre les Philistins",
+    "16:1": "Samson prisonnier des Philistins",
+    "16:22": "Mort de Samson",
+    "17:1": "Instauration d’un culte idolâtrique",
+    "19:1": "Viol et guerre fratricide"
+  },
+  "pericopes": [
+    {
+      "title": "Victoires de la tribu de Juda",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 20
+    },
+    {
+      "title": "Echecs des diverses tribus",
+      "start_ch": 1,
+      "start_v": 21,
+      "end_ch": 1,
+      "end_v": 36
+    },
+    {
+      "title": "Constat d’échec et mort de Josué",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 9
+    },
+    {
+      "title": "Attitude de la nouvelle génération",
+      "start_ch": 2,
+      "start_v": 10,
+      "end_ch": 2,
+      "end_v": 23
+    },
+    {
+      "title": "Victoire d'Othniel sur le roi de Mésopotamie",
+      "start_ch": 3,
+      "start_v": 7,
+      "end_ch": 3,
+      "end_v": 11
+    },
+    {
+      "title": "Victoire d'Ehud sur les Moabites",
+      "start_ch": 3,
+      "start_v": 12,
+      "end_ch": 3,
+      "end_v": 30
+    },
+    {
+      "title": "Victoire de Shamgar sur les Philistins",
+      "start_ch": 3,
+      "start_v": 31,
+      "end_ch": 3,
+      "end_v": 31
+    },
+    {
+      "title": "Victoire de Débora et Barak sur Sisera",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 24
+    },
+    {
+      "title": "Cantique de Débora",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 31
+    },
+    {
+      "title": "Appel de Gédéon",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 40
+    },
+    {
+      "title": "Victoire de Gédéon sur les Madianites",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 25
+    },
+    {
+      "title": "Violences d’Abimélec",
+      "start_ch": 8,
+      "start_v": 33,
+      "end_ch": 8,
+      "end_v": 35
+    },
+    {
+      "title": "Thola et Jaïr juges en Israël",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 5
+    },
+    {
+      "title": "Intervention de Jephthé",
+      "start_ch": 10,
+      "start_v": 6,
+      "end_ch": 10,
+      "end_v": 18
+    },
+    {
+      "title": "Ibtsan, Elon et Abdon juges en Israël",
+      "start_ch": 12,
+      "start_v": 8,
+      "end_ch": 12,
+      "end_v": 15
+    },
+    {
+      "title": "Naissance de Samson",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 25
+    },
+    {
+      "title": "Mariage de Samson",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 20
+    },
+    {
+      "title": "Exploits de Samson contre les Philistins",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 20
+    },
+    {
+      "title": "Samson prisonnier des Philistins",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 21
+    },
+    {
+      "title": "Mort de Samson",
+      "start_ch": 16,
+      "start_v": 22,
+      "end_ch": 16,
+      "end_v": 31
+    },
+    {
+      "title": "Instauration d’un culte idolâtrique",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 13
+    },
+    {
+      "title": "Viol et guerre fratricide",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 30
+    }
+  ]
 }

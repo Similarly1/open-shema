@@ -1007,5 +1007,25 @@
       "29": "Les actes du roi David, les premiers comme les derniers, se trouvent écrits dans les Actes de Samuel le voyant, dans ceux du prophète Natan et dans ceux de Gad le voyant,",
       "30": "ainsi que tout son règne et sa puissance, et les épreuves qui se sont abattues sur lui, sur Israël et sur tous les royaumes des pays."
     }
-  }
+  },
+  "sections": {
+    "1:1": "GÉNÉALOGIESa",
+    "10:1": "RÈGNE DE DAVID"
+  },
+  "pericopes": [
+    {
+      "title": "GÉNÉALOGIESa",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 54
+    },
+    {
+      "title": "RÈGNE DE DAVID",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 14
+    }
+  ]
 }

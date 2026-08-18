@@ -65,5 +65,105 @@
       "19": "Voici, c'est moi qui punirai à ce moment-là tous ceux qui vous ont opprimés. Je soignerai vos blessés, je ramènerai les exilés, je changerai en gloire et en renommée le mépris que l'on vous témoignait partout.",
       "20": "À ce moment-là, je vous ramènerai et je vous rassemblerai. Vous le verrez, je rétablirai votre situation; je vous donnerai la gloire et la renommée parmi tous les peuples de la terre.» C'est le Seigneur qui a parlé."
     }
-  }
+  },
+  "sections": {
+    "1:2": "Dieu interviendra contre la terre entière",
+    "1:4": "Dieu interviendra contre Juda et Jérusalem",
+    "1:14": "Le jour du Seigneur approche",
+    "2:1": "Appel aux humbles",
+    "2:4": "Menaces contre les peuples de l'ouest",
+    "2:8": "Menaces contre les peuples de l'est",
+    "2:12": "Menaces contre les peuples du sud",
+    "2:13": "Menaces contre les peuples du nord",
+    "3:1": "Jérusalem n'a pas écouté l'appel de Dieu",
+    "3:9": "Dieu transformera les peuples",
+    "3:11": "Dieu promet la restauration du peuple d'Israël",
+    "3:14": "Jérusalem sera restaurée"
+  },
+  "pericopes": [
+    {
+      "title": "Dieu interviendra contre la terre entière",
+      "start_ch": 1,
+      "start_v": 2,
+      "end_ch": 1,
+      "end_v": 3
+    },
+    {
+      "title": "Dieu interviendra contre Juda et Jérusalem",
+      "start_ch": 1,
+      "start_v": 4,
+      "end_ch": 1,
+      "end_v": 13
+    },
+    {
+      "title": "Le jour du Seigneur approche",
+      "start_ch": 1,
+      "start_v": 14,
+      "end_ch": 1,
+      "end_v": 18
+    },
+    {
+      "title": "Appel aux humbles",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 3
+    },
+    {
+      "title": "Menaces contre les peuples de l'ouest",
+      "start_ch": 2,
+      "start_v": 4,
+      "end_ch": 2,
+      "end_v": 7
+    },
+    {
+      "title": "Menaces contre les peuples de l'est",
+      "start_ch": 2,
+      "start_v": 8,
+      "end_ch": 2,
+      "end_v": 11
+    },
+    {
+      "title": "Menaces contre les peuples du sud",
+      "start_ch": 2,
+      "start_v": 12,
+      "end_ch": 2,
+      "end_v": 12
+    },
+    {
+      "title": "Menaces contre les peuples du nord",
+      "start_ch": 2,
+      "start_v": 13,
+      "end_ch": 2,
+      "end_v": 15
+    },
+    {
+      "title": "Jérusalem n'a pas écouté l'appel de Dieu",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 8
+    },
+    {
+      "title": "Dieu transformera les peuples",
+      "start_ch": 3,
+      "start_v": 9,
+      "end_ch": 3,
+      "end_v": 10
+    },
+    {
+      "title": "Dieu promet la restauration du peuple d'Israël",
+      "start_ch": 3,
+      "start_v": 11,
+      "end_ch": 3,
+      "end_v": 13
+    },
+    {
+      "title": "Jérusalem sera restaurée",
+      "start_ch": 3,
+      "start_v": 14,
+      "end_ch": 3,
+      "end_v": 20
+    }
+  ]
 }

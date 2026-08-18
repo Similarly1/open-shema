@@ -889,5 +889,497 @@
       "29": "L'histoire du roi David, du début à la fin, est écrite dans les livres intitulés Les actes du voyant Samuel, Les actes du prophète Natan et Les actes du prophète Gad;",
       "30": "on y raconte son règne, ses actes de bravoure, ainsi que les événements survenus dans sa vie privée, dans la politique d'Israël et dans celle des autres royaumes."
     }
-  }
+  },
+  "sections": {
+    "1:1": "D'Adam aux descendants d'Ésaü",
+    "1:51": "Les rois et chefs de clans d'Édom",
+    "2:1": "Les descendants de Juda, fils de Jacob",
+    "3:1": "Les descendants de David",
+    "4:1": "Autre liste des descendants de Juda",
+    "4:24": "Les descendants de Siméon",
+    "5:4": "Les descendants de Ruben",
+    "5:11": "Les descendants de Gad",
+    "5:23": "Les descendants de Manassé en Transjordanie",
+    "5:27": "Les descendants de Lévi&#160;: les grands-prêtres",
+    "6:1": "Autres descendants de Lévi",
+    "6:39": "Les villes attribuées aux descendants de Lévi",
+    "7:1": "Les descendants d'Issakar",
+    "7:6": "Les descendants de Benjamin et de Neftali",
+    "7:14": "Les descendants de Manassé en Cisjordanie",
+    "7:20": "Les descendants d'Éfraïm",
+    "7:30": "Les descendants d'Asser",
+    "8:1": "Autre liste des descendants de Benjamin",
+    "8:33": "Les descendants de Saül",
+    "9:2": "Les habitants de Jérusalem",
+    "9:35": "La famille de Saül",
+    "10:1": "La mort du roi Saül",
+    "11:1": "David est choisi comme roi d'Israël",
+    "11:4": "David s'empare de Jérusalem",
+    "11:10": "Les guerriers de David",
+    "12:1": "Les premiers compagnons de David à Siclag",
+    "12:24": "Nombre des partisans de David venus à Hébron",
+    "13:1": "David décide d'amener à Jérusalem le coffre de l'alliance",
+    "14:1": "David à Jérusalem",
+    "14:8": "Victoires de David sur les Philistins",
+    "15:1": "David prépare le transport du coffre de l'alliance",
+    "15:25": "Arrivée du coffre de l'alliance à Jérusalem",
+    "16:4": "Les lévites chantent les louanges du Seigneur",
+    "17:1": "Une promesse de Dieu pour David et ses descendants",
+    "17:16": "Prière de David",
+    "18:1": "Victoires de David sur des pays voisins",
+    "18:14": "Liste des fonctionnaires de David",
+    "19:1": "Les ministres de David déshonorés",
+    "19:6": "Guerre contre les Ammonites et les Syriens",
+    "20:1": "Joab s'empare de la ville de Rabba",
+    "20:4": "Combats contre les Philistins",
+    "21:1": "David fait recenser le peuple d'Israël",
+    "21:7": "Dieu punit la faute de David",
+    "21:18": "David construit un autel pour le Seigneur",
+    "22:2": "David prépare la construction du temple",
+    "22:6": "David charge Salomon de construire le temple",
+    "23:1": "David organise les groupes de lévites",
+    "24:1": "Les groupes de prêtres",
+    "24:20": "Liste complémentaire de lévites",
+    "25:1": "Les groupes de chanteurs",
+    "26:1": "Les groupes de portiers",
+    "26:20": "Tâches spéciales confiées à certains lévites",
+    "27:1": "Organisation militaire du royaume",
+    "27:16": "Organisation civile du royaume&#160;: les chefs de tribus",
+    "27:25": "Les administrateurs des biens royaux",
+    "27:32": "L'entourage privé de David",
+    "28:1": "David présente Salomon comme son successeur",
+    "28:11": "David remet à Salomon les plans du temple",
+    "29:1": "Dons pour la construction du temple",
+    "29:10": "Prière de David",
+    "29:21": "Salomon proclamé roi. Mort de David"
+  },
+  "pericopes": [
+    {
+      "title": "D'Adam aux descendants d'Ésaü",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 50
+    },
+    {
+      "title": "Les rois et chefs de clans d'Édom",
+      "start_ch": 1,
+      "start_v": 51,
+      "end_ch": 1,
+      "end_v": 54
+    },
+    {
+      "title": "Les descendants de Juda, fils de Jacob",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 55
+    },
+    {
+      "title": "Les descendants de David",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 24
+    },
+    {
+      "title": "Autre liste des descendants de Juda",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 23
+    },
+    {
+      "title": "Les descendants de Siméon",
+      "start_ch": 4,
+      "start_v": 24,
+      "end_ch": 4,
+      "end_v": 43
+    },
+    {
+      "title": "Les descendants de Ruben",
+      "start_ch": 5,
+      "start_v": 4,
+      "end_ch": 5,
+      "end_v": 10
+    },
+    {
+      "title": "Les descendants de Gad",
+      "start_ch": 5,
+      "start_v": 11,
+      "end_ch": 5,
+      "end_v": 22
+    },
+    {
+      "title": "Les descendants de Manassé en Transjordanie",
+      "start_ch": 5,
+      "start_v": 23,
+      "end_ch": 5,
+      "end_v": 26
+    },
+    {
+      "title": "Les descendants de Lévi&#160;: les grands-prêtres",
+      "start_ch": 5,
+      "start_v": 27,
+      "end_ch": 5,
+      "end_v": 41
+    },
+    {
+      "title": "Autres descendants de Lévi",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 38
+    },
+    {
+      "title": "Les villes attribuées aux descendants de Lévi",
+      "start_ch": 6,
+      "start_v": 39,
+      "end_ch": 6,
+      "end_v": 50
+    },
+    {
+      "title": "Les descendants d'Issakar",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 5
+    },
+    {
+      "title": "Les descendants de Benjamin et de Neftali",
+      "start_ch": 7,
+      "start_v": 6,
+      "end_ch": 7,
+      "end_v": 13
+    },
+    {
+      "title": "Les descendants de Manassé en Cisjordanie",
+      "start_ch": 7,
+      "start_v": 14,
+      "end_ch": 7,
+      "end_v": 19
+    },
+    {
+      "title": "Les descendants d'Éfraïm",
+      "start_ch": 7,
+      "start_v": 20,
+      "end_ch": 7,
+      "end_v": 29
+    },
+    {
+      "title": "Les descendants d'Asser",
+      "start_ch": 7,
+      "start_v": 30,
+      "end_ch": 7,
+      "end_v": 40
+    },
+    {
+      "title": "Autre liste des descendants de Benjamin",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 32
+    },
+    {
+      "title": "Les descendants de Saül",
+      "start_ch": 8,
+      "start_v": 33,
+      "end_ch": 8,
+      "end_v": 40
+    },
+    {
+      "title": "Les habitants de Jérusalem",
+      "start_ch": 9,
+      "start_v": 2,
+      "end_ch": 9,
+      "end_v": 34
+    },
+    {
+      "title": "La famille de Saül",
+      "start_ch": 9,
+      "start_v": 35,
+      "end_ch": 9,
+      "end_v": 44
+    },
+    {
+      "title": "La mort du roi Saül",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 14
+    },
+    {
+      "title": "David est choisi comme roi d'Israël",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 3
+    },
+    {
+      "title": "David s'empare de Jérusalem",
+      "start_ch": 11,
+      "start_v": 4,
+      "end_ch": 11,
+      "end_v": 9
+    },
+    {
+      "title": "Les guerriers de David",
+      "start_ch": 11,
+      "start_v": 10,
+      "end_ch": 11,
+      "end_v": 47
+    },
+    {
+      "title": "Les premiers compagnons de David à Siclag",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 23
+    },
+    {
+      "title": "Nombre des partisans de David venus à Hébron",
+      "start_ch": 12,
+      "start_v": 24,
+      "end_ch": 12,
+      "end_v": 41
+    },
+    {
+      "title": "David décide d'amener à Jérusalem le coffre de l'alliance",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 14
+    },
+    {
+      "title": "David à Jérusalem",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 7
+    },
+    {
+      "title": "Victoires de David sur les Philistins",
+      "start_ch": 14,
+      "start_v": 8,
+      "end_ch": 14,
+      "end_v": 17
+    },
+    {
+      "title": "David prépare le transport du coffre de l'alliance",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 24
+    },
+    {
+      "title": "Arrivée du coffre de l'alliance à Jérusalem",
+      "start_ch": 15,
+      "start_v": 25,
+      "end_ch": 15,
+      "end_v": 29
+    },
+    {
+      "title": "Les lévites chantent les louanges du Seigneur",
+      "start_ch": 16,
+      "start_v": 4,
+      "end_ch": 16,
+      "end_v": 43
+    },
+    {
+      "title": "Une promesse de Dieu pour David et ses descendants",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 15
+    },
+    {
+      "title": "Prière de David",
+      "start_ch": 17,
+      "start_v": 16,
+      "end_ch": 17,
+      "end_v": 27
+    },
+    {
+      "title": "Victoires de David sur des pays voisins",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 13
+    },
+    {
+      "title": "Liste des fonctionnaires de David",
+      "start_ch": 18,
+      "start_v": 14,
+      "end_ch": 18,
+      "end_v": 17
+    },
+    {
+      "title": "Les ministres de David déshonorés",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 5
+    },
+    {
+      "title": "Guerre contre les Ammonites et les Syriens",
+      "start_ch": 19,
+      "start_v": 6,
+      "end_ch": 19,
+      "end_v": 19
+    },
+    {
+      "title": "Joab s'empare de la ville de Rabba",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 3
+    },
+    {
+      "title": "Combats contre les Philistins",
+      "start_ch": 20,
+      "start_v": 4,
+      "end_ch": 20,
+      "end_v": 8
+    },
+    {
+      "title": "David fait recenser le peuple d'Israël",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 6
+    },
+    {
+      "title": "Dieu punit la faute de David",
+      "start_ch": 21,
+      "start_v": 7,
+      "end_ch": 21,
+      "end_v": 17
+    },
+    {
+      "title": "David construit un autel pour le Seigneur",
+      "start_ch": 21,
+      "start_v": 18,
+      "end_ch": 21,
+      "end_v": 30
+    },
+    {
+      "title": "David prépare la construction du temple",
+      "start_ch": 22,
+      "start_v": 2,
+      "end_ch": 22,
+      "end_v": 5
+    },
+    {
+      "title": "David charge Salomon de construire le temple",
+      "start_ch": 22,
+      "start_v": 6,
+      "end_ch": 22,
+      "end_v": 19
+    },
+    {
+      "title": "David organise les groupes de lévites",
+      "start_ch": 23,
+      "start_v": 1,
+      "end_ch": 23,
+      "end_v": 32
+    },
+    {
+      "title": "Les groupes de prêtres",
+      "start_ch": 24,
+      "start_v": 1,
+      "end_ch": 24,
+      "end_v": 19
+    },
+    {
+      "title": "Liste complémentaire de lévites",
+      "start_ch": 24,
+      "start_v": 20,
+      "end_ch": 24,
+      "end_v": 31
+    },
+    {
+      "title": "Les groupes de chanteurs",
+      "start_ch": 25,
+      "start_v": 1,
+      "end_ch": 25,
+      "end_v": 8
+    },
+    {
+      "title": "Les groupes de portiers",
+      "start_ch": 26,
+      "start_v": 1,
+      "end_ch": 26,
+      "end_v": 19
+    },
+    {
+      "title": "Tâches spéciales confiées à certains lévites",
+      "start_ch": 26,
+      "start_v": 20,
+      "end_ch": 26,
+      "end_v": 32
+    },
+    {
+      "title": "Organisation militaire du royaume",
+      "start_ch": 27,
+      "start_v": 1,
+      "end_ch": 27,
+      "end_v": 15
+    },
+    {
+      "title": "Organisation civile du royaume&#160;: les chefs de tribus",
+      "start_ch": 27,
+      "start_v": 16,
+      "end_ch": 27,
+      "end_v": 24
+    },
+    {
+      "title": "Les administrateurs des biens royaux",
+      "start_ch": 27,
+      "start_v": 25,
+      "end_ch": 27,
+      "end_v": 31
+    },
+    {
+      "title": "L'entourage privé de David",
+      "start_ch": 27,
+      "start_v": 32,
+      "end_ch": 27,
+      "end_v": 34
+    },
+    {
+      "title": "David présente Salomon comme son successeur",
+      "start_ch": 28,
+      "start_v": 1,
+      "end_ch": 28,
+      "end_v": 10
+    },
+    {
+      "title": "David remet à Salomon les plans du temple",
+      "start_ch": 28,
+      "start_v": 11,
+      "end_ch": 28,
+      "end_v": 21
+    },
+    {
+      "title": "Dons pour la construction du temple",
+      "start_ch": 29,
+      "start_v": 1,
+      "end_ch": 29,
+      "end_v": 9
+    },
+    {
+      "title": "Prière de David",
+      "start_ch": 29,
+      "start_v": 10,
+      "end_ch": 29,
+      "end_v": 20
+    },
+    {
+      "title": "Salomon proclamé roi. Mort de David",
+      "start_ch": 29,
+      "start_v": 21,
+      "end_ch": 29,
+      "end_v": 30
+    }
+  ]
 }

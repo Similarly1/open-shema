@@ -252,5 +252,153 @@
       "13": "Ecoutons la conclusion de tout ce discours: «Crains Dieu et respecte ses commandements, car c'est ce que doit faire tout homme.",
       "14": "En effet, Dieu amènera toute œuvre en jugement, et ce jugement portera sur tout ce qui est caché, que ce soit bon ou mauvais.»"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Le cycle de la vie",
+    "1:12": "La sagesse humaine",
+    "2:1": "Les plaisirs, les richesses et le travail",
+    "2:12": "Le même sort pour tous",
+    "3:1": "Un temps pour tout",
+    "3:16": "L’homme et la bête",
+    "4:1": "L'oppression et la solitude",
+    "4:17": "Danger de la langue",
+    "5:7": "Incertitude des richesses",
+    "6:1": "Insatisfaction de l'homme",
+    "7:1": "Les épreuves et la sagesse",
+    "7:23": "La sagesse et les hommes",
+    "8:1": "Réflexions diverses",
+    "9:1": "L'homme et ses problèmes",
+    "10:1": "Réflexions sur la folie",
+    "11:1": "Activité saine et réjouissance",
+    "11:9": "Le moment favorable pour rechercher Dieu",
+    "12:9": "Crainte de Dieu et obéissance"
+  },
+  "pericopes": [
+    {
+      "title": "Le cycle de la vie",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 11
+    },
+    {
+      "title": "La sagesse humaine",
+      "start_ch": 1,
+      "start_v": 12,
+      "end_ch": 1,
+      "end_v": 18
+    },
+    {
+      "title": "Les plaisirs, les richesses et le travail",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 11
+    },
+    {
+      "title": "Le même sort pour tous",
+      "start_ch": 2,
+      "start_v": 12,
+      "end_ch": 2,
+      "end_v": 26
+    },
+    {
+      "title": "Un temps pour tout",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 15
+    },
+    {
+      "title": "L’homme et la bête",
+      "start_ch": 3,
+      "start_v": 16,
+      "end_ch": 3,
+      "end_v": 22
+    },
+    {
+      "title": "L'oppression et la solitude",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 16
+    },
+    {
+      "title": "Danger de la langue",
+      "start_ch": 4,
+      "start_v": 17,
+      "end_ch": 4,
+      "end_v": 17
+    },
+    {
+      "title": "Incertitude des richesses",
+      "start_ch": 5,
+      "start_v": 7,
+      "end_ch": 5,
+      "end_v": 19
+    },
+    {
+      "title": "Insatisfaction de l'homme",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 12
+    },
+    {
+      "title": "Les épreuves et la sagesse",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 22
+    },
+    {
+      "title": "La sagesse et les hommes",
+      "start_ch": 7,
+      "start_v": 23,
+      "end_ch": 7,
+      "end_v": 29
+    },
+    {
+      "title": "Réflexions diverses",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 17
+    },
+    {
+      "title": "L'homme et ses problèmes",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 18
+    },
+    {
+      "title": "Réflexions sur la folie",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 20
+    },
+    {
+      "title": "Activité saine et réjouissance",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 8
+    },
+    {
+      "title": "Le moment favorable pour rechercher Dieu",
+      "start_ch": 11,
+      "start_v": 9,
+      "end_ch": 11,
+      "end_v": 10
+    },
+    {
+      "title": "Crainte de Dieu et obéissance",
+      "start_ch": 12,
+      "start_v": 9,
+      "end_ch": 12,
+      "end_v": 14
+    }
+  ]
 }

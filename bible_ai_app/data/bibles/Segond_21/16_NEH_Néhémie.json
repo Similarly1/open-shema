@@ -437,5 +437,129 @@
       "30": "Ainsi donc, je les ai purifiés de tout étranger, j'ai réinstauré le service des prêtres et des Lévites, chacun dans son activité,",
       "31": "et j'ai rétabli l'offrande de bois aux moments fixés ainsi que celle des premières récoltes. Souviens-toi de moi pour mon bien, mon Dieu!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Tristesse de Néhémie",
+    "2:1": "Envoi de Néhémie à Jérusalem",
+    "3:1": "Répartition du travail",
+    "3:33": "Poursuite des travaux malgré l'opposition",
+    "5:1": "Attitude désintéressée de Néhémie",
+    "6:1": "Achèvement de la muraille",
+    "7:1": "Les Israélites revenus d'exil avec Zorobabel",
+    "8:9": "Célébration de la fête des tentes",
+    "9:1": "Jeûne et confession des péchés",
+    "10:1": "Engagement envers la loi et le culte",
+    "11:1": "Répartition des nouveaux habitants",
+    "12:1": "Recensement des prêtres et des Lévites",
+    "12:27": "Dédicace de la muraille de Jérusalem",
+    "12:44": "Revenus des serviteurs du temple",
+    "13:1": "Dégradation de la situation"
+  },
+  "pericopes": [
+    {
+      "title": "Tristesse de Néhémie",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 11
+    },
+    {
+      "title": "Envoi de Néhémie à Jérusalem",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 20
+    },
+    {
+      "title": "Répartition du travail",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 32
+    },
+    {
+      "title": "Poursuite des travaux malgré l'opposition",
+      "start_ch": 3,
+      "start_v": 33,
+      "end_ch": 3,
+      "end_v": 38
+    },
+    {
+      "title": "Attitude désintéressée de Néhémie",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 19
+    },
+    {
+      "title": "Achèvement de la muraille",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 19
+    },
+    {
+      "title": "Les Israélites revenus d'exil avec Zorobabel",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 72
+    },
+    {
+      "title": "Célébration de la fête des tentes",
+      "start_ch": 8,
+      "start_v": 9,
+      "end_ch": 8,
+      "end_v": 18
+    },
+    {
+      "title": "Jeûne et confession des péchés",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 37
+    },
+    {
+      "title": "Engagement envers la loi et le culte",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 40
+    },
+    {
+      "title": "Répartition des nouveaux habitants",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 36
+    },
+    {
+      "title": "Recensement des prêtres et des Lévites",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 26
+    },
+    {
+      "title": "Dédicace de la muraille de Jérusalem",
+      "start_ch": 12,
+      "start_v": 27,
+      "end_ch": 12,
+      "end_v": 43
+    },
+    {
+      "title": "Revenus des serviteurs du temple",
+      "start_ch": 12,
+      "start_v": 44,
+      "end_ch": 12,
+      "end_v": 47
+    },
+    {
+      "title": "Dégradation de la situation",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 31
+    }
+  ]
 }

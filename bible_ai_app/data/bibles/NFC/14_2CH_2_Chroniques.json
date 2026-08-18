@@ -891,5 +891,625 @@
       "22": "Durant la première année du règne de Cyrus, roi de Perse, le Seigneur décida d'accomplir la parole qu'il avait prononcée par la bouche du prophète Jérémie. Il fit naître dans l'esprit de Cyrus l'idée de publier dans tout son empire, de vive voix et par écrit, le texte suivant:",
       "23": "«Voici ce que proclame Cyrus, roi de Perse: Le Seigneur, le Dieu des cieux, a soumis à mon autorité tous les royaumes de la terre. Il m'a chargé de lui reconstruire un temple à Jérusalem, dans la province de Juda. Tous ceux d'entre vous qui appartiennent à son peuple sont invités à regagner Jérusalem. Que le Seigneur leur Dieu soit avec eux!»"
     }
-  }
+  },
+  "sections": {
+    "1:1": "HISTOIRE DE SALOMON, ROI D'ISRAËL",
+    "1:2": "Salomon demande à Dieu la sagesse pour régner",
+    "1:14": "Puissance et richesse de Salomon",
+    "1:18": "Salomon prépare la construction du temple",
+    "3:1": "Salomon construit le temple du Seigneur",
+    "3:15": "Les colonnes de bronze et l'autel",
+    "4:2": "La grande cuve et les bassins de bronze",
+    "4:7": "Liste des objets en métal du temple",
+    "5:2": "Le coffre de l'alliance est déposé dans le temple",
+    "6:3": "Discours de Salomon pour la consécration du temple",
+    "6:12": "La prière solennelle de Salomon",
+    "7:1": "Les sacrifices offerts au Seigneur",
+    "7:11": "Le Seigneur se montre de nouveau à Salomon",
+    "8:1": "Activités diverses de Salomon",
+    "9:1": "La reine de Saba rend visite à Salomon",
+    "9:13": "La puissance et la richesse de Salomon",
+    "9:29": "La mort de Salomon",
+    "10:1": "L'assemblée de Sichem",
+    "10:16": "Le royaume est divisé. Roboam, roi de Juda",
+    "11:5": "Roboam fortifie différentes villes",
+    "11:13": "Les prêtres et les lévites se rallient à Roboam",
+    "11:18": "La famille de Roboam",
+    "12:1": "Chichac, roi d'Égypte, envahit Juda",
+    "12:13": "Fin du règne de Roboam",
+    "13:1": "Règne d'Abia",
+    "14:1": "Début du règne d'Asa",
+    "15:1": "Asa entreprend des réformes religieuses",
+    "16:1": "Asa en guerre contre Bacha, roi d'Israël",
+    "16:7": "Asa emprisonne le prophète Hanani",
+    "16:11": "Fin du règne d'Asa",
+    "17:1": "Règne de Josaphat. Sa fidélité envers Dieu",
+    "17:10": "La puissance de Josaphat",
+    "18:1": "Josaphat s'allie à Achab, roi d'Israël",
+    "18:4": "Les prophètes de métier prédisent le succès",
+    "18:12": "Le prophète Michée prédit la défaite",
+    "18:28": "Le roi Achab est tué au combat",
+    "19:1": "Josaphat institue des juges en Juda",
+    "20:1": "Le royaume de Juda attaqué. Prière de Josaphat",
+    "20:14": "Le Seigneur donne la victoire à Juda",
+    "20:31": "Fin du règne de Josaphat",
+    "21:2": "Règne de Joram",
+    "22:1": "Règne d'Ahazia",
+    "22:10": "Athalie s'empare du pouvoir",
+    "23:1": "Joas est choisi comme roi",
+    "24:1": "Joas fait réparer le temple",
+    "24:15": "Joas devient infidèle à Dieu",
+    "24:23": "Fin du règne de Joas",
+    "25:1": "Règne d'Amassia",
+    "25:14": "Amassia battu par Joas, roi d'Israël",
+    "25:25": "Fin du règne d'Amassia",
+    "26:1": "Règne d'Ozias",
+    "26:5": "Ozias fidèle, puis infidèle à Dieu",
+    "26:21": "Fin du règne d'Ozias",
+    "27:1": "Règne de Yotam",
+    "28:1": "Début du règne d'Acaz",
+    "28:16": "Acaz demande l'aide de l'Assyrie",
+    "29:1": "Règne d'Ézékias. Purification du temple",
+    "29:20": "Ézékias rétablit le culte et les sacrifices",
+    "30:1": "Ézékias convoque tous les Israélites pour la Pâque",
+    "30:13": "Ézékias célèbre la fête de la Pâque",
+    "31:1": "Ézékias organise le service du temple",
+    "32:1": "Sennakérib envahit le royaume de Juda",
+    "32:9": "Message de Sennakérib aux gens de Jérusalem",
+    "32:17": "Sennakérib insulte le Seigneur",
+    "32:20": "Fuite des Assyriens&#8239;; mort de Sennakérib",
+    "32:24": "Fin du règne d'Ézékias",
+    "33:1": "Règne de Manassé",
+    "33:21": "Règne d'Amon",
+    "34:1": "Règne de Josias. Réforme religieuse",
+    "34:8": "Le grand-prêtre découvre le livre de l'enseignement",
+    "34:19": "Josias fait consulter la prophétesse Houlda",
+    "34:29": "Josias renouvelle l'alliance avec Dieu",
+    "35:1": "Josias célèbre la fête de la Pâque",
+    "35:20": "Fin du règne de Josias",
+    "36:1": "Règnes de Joachaz, Joaquim et Joakin",
+    "36:11": "Règne de Sédécias. Prise de Jérusalem",
+    "36:22": "Cyrus autorise la reconstruction du temple"
+  },
+  "pericopes": [
+    {
+      "title": "HISTOIRE DE SALOMON, ROI D'ISRAËL",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 1
+    },
+    {
+      "title": "Salomon demande à Dieu la sagesse pour régner",
+      "start_ch": 1,
+      "start_v": 2,
+      "end_ch": 1,
+      "end_v": 13
+    },
+    {
+      "title": "Puissance et richesse de Salomon",
+      "start_ch": 1,
+      "start_v": 14,
+      "end_ch": 1,
+      "end_v": 17
+    },
+    {
+      "title": "Salomon prépare la construction du temple",
+      "start_ch": 1,
+      "start_v": 18,
+      "end_ch": 1,
+      "end_v": 18
+    },
+    {
+      "title": "Salomon construit le temple du Seigneur",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 14
+    },
+    {
+      "title": "Les colonnes de bronze et l'autel",
+      "start_ch": 3,
+      "start_v": 15,
+      "end_ch": 3,
+      "end_v": 17
+    },
+    {
+      "title": "La grande cuve et les bassins de bronze",
+      "start_ch": 4,
+      "start_v": 2,
+      "end_ch": 4,
+      "end_v": 6
+    },
+    {
+      "title": "Liste des objets en métal du temple",
+      "start_ch": 4,
+      "start_v": 7,
+      "end_ch": 4,
+      "end_v": 22
+    },
+    {
+      "title": "Le coffre de l'alliance est déposé dans le temple",
+      "start_ch": 5,
+      "start_v": 2,
+      "end_ch": 5,
+      "end_v": 14
+    },
+    {
+      "title": "Discours de Salomon pour la consécration du temple",
+      "start_ch": 6,
+      "start_v": 3,
+      "end_ch": 6,
+      "end_v": 11
+    },
+    {
+      "title": "La prière solennelle de Salomon",
+      "start_ch": 6,
+      "start_v": 12,
+      "end_ch": 6,
+      "end_v": 42
+    },
+    {
+      "title": "Les sacrifices offerts au Seigneur",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 10
+    },
+    {
+      "title": "Le Seigneur se montre de nouveau à Salomon",
+      "start_ch": 7,
+      "start_v": 11,
+      "end_ch": 7,
+      "end_v": 22
+    },
+    {
+      "title": "Activités diverses de Salomon",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 18
+    },
+    {
+      "title": "La reine de Saba rend visite à Salomon",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 12
+    },
+    {
+      "title": "La puissance et la richesse de Salomon",
+      "start_ch": 9,
+      "start_v": 13,
+      "end_ch": 9,
+      "end_v": 28
+    },
+    {
+      "title": "La mort de Salomon",
+      "start_ch": 9,
+      "start_v": 29,
+      "end_ch": 9,
+      "end_v": 31
+    },
+    {
+      "title": "L'assemblée de Sichem",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 15
+    },
+    {
+      "title": "Le royaume est divisé. Roboam, roi de Juda",
+      "start_ch": 10,
+      "start_v": 16,
+      "end_ch": 10,
+      "end_v": 19
+    },
+    {
+      "title": "Roboam fortifie différentes villes",
+      "start_ch": 11,
+      "start_v": 5,
+      "end_ch": 11,
+      "end_v": 12
+    },
+    {
+      "title": "Les prêtres et les lévites se rallient à Roboam",
+      "start_ch": 11,
+      "start_v": 13,
+      "end_ch": 11,
+      "end_v": 17
+    },
+    {
+      "title": "La famille de Roboam",
+      "start_ch": 11,
+      "start_v": 18,
+      "end_ch": 11,
+      "end_v": 23
+    },
+    {
+      "title": "Chichac, roi d'Égypte, envahit Juda",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 12
+    },
+    {
+      "title": "Fin du règne de Roboam",
+      "start_ch": 12,
+      "start_v": 13,
+      "end_ch": 12,
+      "end_v": 16
+    },
+    {
+      "title": "Règne d'Abia",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 23
+    },
+    {
+      "title": "Début du règne d'Asa",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 14
+    },
+    {
+      "title": "Asa entreprend des réformes religieuses",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 19
+    },
+    {
+      "title": "Asa en guerre contre Bacha, roi d'Israël",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 6
+    },
+    {
+      "title": "Asa emprisonne le prophète Hanani",
+      "start_ch": 16,
+      "start_v": 7,
+      "end_ch": 16,
+      "end_v": 10
+    },
+    {
+      "title": "Fin du règne d'Asa",
+      "start_ch": 16,
+      "start_v": 11,
+      "end_ch": 16,
+      "end_v": 14
+    },
+    {
+      "title": "Règne de Josaphat. Sa fidélité envers Dieu",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 9
+    },
+    {
+      "title": "La puissance de Josaphat",
+      "start_ch": 17,
+      "start_v": 10,
+      "end_ch": 17,
+      "end_v": 19
+    },
+    {
+      "title": "Josaphat s'allie à Achab, roi d'Israël",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 3
+    },
+    {
+      "title": "Les prophètes de métier prédisent le succès",
+      "start_ch": 18,
+      "start_v": 4,
+      "end_ch": 18,
+      "end_v": 11
+    },
+    {
+      "title": "Le prophète Michée prédit la défaite",
+      "start_ch": 18,
+      "start_v": 12,
+      "end_ch": 18,
+      "end_v": 27
+    },
+    {
+      "title": "Le roi Achab est tué au combat",
+      "start_ch": 18,
+      "start_v": 28,
+      "end_ch": 18,
+      "end_v": 34
+    },
+    {
+      "title": "Josaphat institue des juges en Juda",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 11
+    },
+    {
+      "title": "Le royaume de Juda attaqué. Prière de Josaphat",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 13
+    },
+    {
+      "title": "Le Seigneur donne la victoire à Juda",
+      "start_ch": 20,
+      "start_v": 14,
+      "end_ch": 20,
+      "end_v": 30
+    },
+    {
+      "title": "Fin du règne de Josaphat",
+      "start_ch": 20,
+      "start_v": 31,
+      "end_ch": 20,
+      "end_v": 37
+    },
+    {
+      "title": "Règne de Joram",
+      "start_ch": 21,
+      "start_v": 2,
+      "end_ch": 21,
+      "end_v": 20
+    },
+    {
+      "title": "Règne d'Ahazia",
+      "start_ch": 22,
+      "start_v": 1,
+      "end_ch": 22,
+      "end_v": 9
+    },
+    {
+      "title": "Athalie s'empare du pouvoir",
+      "start_ch": 22,
+      "start_v": 10,
+      "end_ch": 22,
+      "end_v": 12
+    },
+    {
+      "title": "Joas est choisi comme roi",
+      "start_ch": 23,
+      "start_v": 1,
+      "end_ch": 23,
+      "end_v": 21
+    },
+    {
+      "title": "Joas fait réparer le temple",
+      "start_ch": 24,
+      "start_v": 1,
+      "end_ch": 24,
+      "end_v": 14
+    },
+    {
+      "title": "Joas devient infidèle à Dieu",
+      "start_ch": 24,
+      "start_v": 15,
+      "end_ch": 24,
+      "end_v": 22
+    },
+    {
+      "title": "Fin du règne de Joas",
+      "start_ch": 24,
+      "start_v": 23,
+      "end_ch": 24,
+      "end_v": 27
+    },
+    {
+      "title": "Règne d'Amassia",
+      "start_ch": 25,
+      "start_v": 1,
+      "end_ch": 25,
+      "end_v": 13
+    },
+    {
+      "title": "Amassia battu par Joas, roi d'Israël",
+      "start_ch": 25,
+      "start_v": 14,
+      "end_ch": 25,
+      "end_v": 24
+    },
+    {
+      "title": "Fin du règne d'Amassia",
+      "start_ch": 25,
+      "start_v": 25,
+      "end_ch": 25,
+      "end_v": 28
+    },
+    {
+      "title": "Règne d'Ozias",
+      "start_ch": 26,
+      "start_v": 1,
+      "end_ch": 26,
+      "end_v": 4
+    },
+    {
+      "title": "Ozias fidèle, puis infidèle à Dieu",
+      "start_ch": 26,
+      "start_v": 5,
+      "end_ch": 26,
+      "end_v": 20
+    },
+    {
+      "title": "Fin du règne d'Ozias",
+      "start_ch": 26,
+      "start_v": 21,
+      "end_ch": 26,
+      "end_v": 23
+    },
+    {
+      "title": "Règne de Yotam",
+      "start_ch": 27,
+      "start_v": 1,
+      "end_ch": 27,
+      "end_v": 9
+    },
+    {
+      "title": "Début du règne d'Acaz",
+      "start_ch": 28,
+      "start_v": 1,
+      "end_ch": 28,
+      "end_v": 15
+    },
+    {
+      "title": "Acaz demande l'aide de l'Assyrie",
+      "start_ch": 28,
+      "start_v": 16,
+      "end_ch": 28,
+      "end_v": 27
+    },
+    {
+      "title": "Règne d'Ézékias. Purification du temple",
+      "start_ch": 29,
+      "start_v": 1,
+      "end_ch": 29,
+      "end_v": 19
+    },
+    {
+      "title": "Ézékias rétablit le culte et les sacrifices",
+      "start_ch": 29,
+      "start_v": 20,
+      "end_ch": 29,
+      "end_v": 36
+    },
+    {
+      "title": "Ézékias convoque tous les Israélites pour la Pâque",
+      "start_ch": 30,
+      "start_v": 1,
+      "end_ch": 30,
+      "end_v": 12
+    },
+    {
+      "title": "Ézékias célèbre la fête de la Pâque",
+      "start_ch": 30,
+      "start_v": 13,
+      "end_ch": 30,
+      "end_v": 27
+    },
+    {
+      "title": "Ézékias organise le service du temple",
+      "start_ch": 31,
+      "start_v": 1,
+      "end_ch": 31,
+      "end_v": 21
+    },
+    {
+      "title": "Sennakérib envahit le royaume de Juda",
+      "start_ch": 32,
+      "start_v": 1,
+      "end_ch": 32,
+      "end_v": 8
+    },
+    {
+      "title": "Message de Sennakérib aux gens de Jérusalem",
+      "start_ch": 32,
+      "start_v": 9,
+      "end_ch": 32,
+      "end_v": 16
+    },
+    {
+      "title": "Sennakérib insulte le Seigneur",
+      "start_ch": 32,
+      "start_v": 17,
+      "end_ch": 32,
+      "end_v": 19
+    },
+    {
+      "title": "Fuite des Assyriens&#8239;; mort de Sennakérib",
+      "start_ch": 32,
+      "start_v": 20,
+      "end_ch": 32,
+      "end_v": 23
+    },
+    {
+      "title": "Fin du règne d'Ézékias",
+      "start_ch": 32,
+      "start_v": 24,
+      "end_ch": 32,
+      "end_v": 33
+    },
+    {
+      "title": "Règne de Manassé",
+      "start_ch": 33,
+      "start_v": 1,
+      "end_ch": 33,
+      "end_v": 20
+    },
+    {
+      "title": "Règne d'Amon",
+      "start_ch": 33,
+      "start_v": 21,
+      "end_ch": 33,
+      "end_v": 25
+    },
+    {
+      "title": "Règne de Josias. Réforme religieuse",
+      "start_ch": 34,
+      "start_v": 1,
+      "end_ch": 34,
+      "end_v": 7
+    },
+    {
+      "title": "Le grand-prêtre découvre le livre de l'enseignement",
+      "start_ch": 34,
+      "start_v": 8,
+      "end_ch": 34,
+      "end_v": 18
+    },
+    {
+      "title": "Josias fait consulter la prophétesse Houlda",
+      "start_ch": 34,
+      "start_v": 19,
+      "end_ch": 34,
+      "end_v": 28
+    },
+    {
+      "title": "Josias renouvelle l'alliance avec Dieu",
+      "start_ch": 34,
+      "start_v": 29,
+      "end_ch": 34,
+      "end_v": 33
+    },
+    {
+      "title": "Josias célèbre la fête de la Pâque",
+      "start_ch": 35,
+      "start_v": 1,
+      "end_ch": 35,
+      "end_v": 19
+    },
+    {
+      "title": "Fin du règne de Josias",
+      "start_ch": 35,
+      "start_v": 20,
+      "end_ch": 35,
+      "end_v": 25
+    },
+    {
+      "title": "Règnes de Joachaz, Joaquim et Joakin",
+      "start_ch": 36,
+      "start_v": 1,
+      "end_ch": 36,
+      "end_v": 10
+    },
+    {
+      "title": "Règne de Sédécias. Prise de Jérusalem",
+      "start_ch": 36,
+      "start_v": 11,
+      "end_ch": 36,
+      "end_v": 21
+    },
+    {
+      "title": "Cyrus autorise la reconstruction du temple",
+      "start_ch": 36,
+      "start_v": 22,
+      "end_ch": 36,
+      "end_v": 23
+    }
+  ]
 }

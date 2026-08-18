@@ -981,5 +981,33 @@
       "77": "Vous qui gardez mes commandements et mes préceptes, dit le Seigneur Dieu, ne laissez pas vos péchés prendre l’avantage sur vous, ni vos iniquités prendre le dessus.",
       "78": "Malheur à ceux qui sont envahis par leurs péchés et recouverts par leurs iniquités! C’est comme le champ qui est envahi par la forêt, dont le sentier est couvert d’épines et impraticable à l’homme: on le laisse de côté et on en fait la proie des flammes.» Ici se termine le quatrième livre d’Esdras."
     }
-  }
+  },
+  "sections": {
+    "1:1": "ESDRAS, PROPHÈTE DU PEUPLE QUI VIENT",
+    "3:1": "APOCALYPSE D’ESDRAS",
+    "15:1": "LE PEUPLE DE DIEU ÉPROUVÉ"
+  },
+  "pericopes": [
+    {
+      "title": "ESDRAS, PROPHÈTE DU PEUPLE QUI VIENT",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 40
+    },
+    {
+      "title": "APOCALYPSE D’ESDRAS",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 36
+    },
+    {
+      "title": "LE PEUPLE DE DIEU ÉPROUVÉ",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 63
+    }
+  ]
 }

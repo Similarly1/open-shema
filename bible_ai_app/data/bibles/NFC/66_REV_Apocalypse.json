@@ -455,5 +455,345 @@
       "20": "Celui qui garantit la vérité de tout cela déclare: «Oui, je viens bientôt!» Amen! Viens, Seigneur Jésus!",
       "21": "Que la grâce du Seigneur Jésus soit avec tous."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Heureux celui qui lit ce livre&#8239;!",
+    "1:4": "Salutations aux sept Églises",
+    "1:9": "Jean a une vision du Christ",
+    "2:1": "Le message adressé à l'Église d'Éphèse",
+    "2:8": "Le message adressé à l'Église de Smyrne",
+    "2:12": "Le message adressé à l'Église de Pergame",
+    "2:18": "Le message adressé à l'Église de Thyatire",
+    "3:1": "Le message adressé à l'Église de Sardes",
+    "3:7": "Le message adressé à l'Église de Philadelphie",
+    "3:14": "Le message adressé à l'Église de Laodicée",
+    "4:1": "L'adoration dans les cieux",
+    "5:1": "L'agneau est seul digne d'ouvrir le livre",
+    "6:1": "L'agneau brise les six premières attaches",
+    "7:1": "Les serviteurs de Dieu reçoivent sa marque",
+    "7:9": "La foule immense devant le trône",
+    "8:1": "La septième attache",
+    "8:6": "Les quatre premiers anges sonnent de la trompette",
+    "9:1": "Le cinquième ange sonne de la trompette",
+    "9:12": "Le sixième ange sonne de la trompette",
+    "10:1": "L'ange et le petit livre",
+    "11:1": "Les deux témoins du Dieu vivant",
+    "11:15": "Le septième ange sonne de la trompette",
+    "12:1": "La femme, le dragon et l'enfant",
+    "13:1": "La bête qui sort de la mer",
+    "13:11": "La bête qui sort de la terre",
+    "14:1": "Le chant des rachetés",
+    "14:6": "Les trois anges",
+    "14:14": "La moisson et la vendange de la terre",
+    "15:1": "Les anges et les derniers fléaux",
+    "16:1": "Les sept coupes de la colère de Dieu",
+    "17:1": "La grande prostituée",
+    "18:1": "Babylone est détruite",
+    "19:1": "Une foule immense loue le Seigneur",
+    "19:5": "Heureux les invités aux noces de l'agneau&#8239;!",
+    "19:11": "Le cavalier monté sur le cheval blanc",
+    "20:1": "Les mille années",
+    "20:7": "La défaite de Satan",
+    "20:11": "Le jugement dernier",
+    "21:1": "Le nouveau ciel et la nouvelle terre",
+    "21:9": "La nouvelle Jérusalem",
+    "22:6": "Jésus annonce qu'il vient bientôt",
+    "22:18": "Que la grâce du Seigneur Jésus soit avec vous tous&#8239;!"
+  },
+  "pericopes": [
+    {
+      "title": "Heureux celui qui lit ce livre&#8239;!",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 3
+    },
+    {
+      "title": "Salutations aux sept Églises",
+      "start_ch": 1,
+      "start_v": 4,
+      "end_ch": 1,
+      "end_v": 8
+    },
+    {
+      "title": "Jean a une vision du Christ",
+      "start_ch": 1,
+      "start_v": 9,
+      "end_ch": 1,
+      "end_v": 20
+    },
+    {
+      "title": "Le message adressé à l'Église d'Éphèse",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 7
+    },
+    {
+      "title": "Le message adressé à l'Église de Smyrne",
+      "start_ch": 2,
+      "start_v": 8,
+      "end_ch": 2,
+      "end_v": 11
+    },
+    {
+      "title": "Le message adressé à l'Église de Pergame",
+      "start_ch": 2,
+      "start_v": 12,
+      "end_ch": 2,
+      "end_v": 17
+    },
+    {
+      "title": "Le message adressé à l'Église de Thyatire",
+      "start_ch": 2,
+      "start_v": 18,
+      "end_ch": 2,
+      "end_v": 29
+    },
+    {
+      "title": "Le message adressé à l'Église de Sardes",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 6
+    },
+    {
+      "title": "Le message adressé à l'Église de Philadelphie",
+      "start_ch": 3,
+      "start_v": 7,
+      "end_ch": 3,
+      "end_v": 13
+    },
+    {
+      "title": "Le message adressé à l'Église de Laodicée",
+      "start_ch": 3,
+      "start_v": 14,
+      "end_ch": 3,
+      "end_v": 22
+    },
+    {
+      "title": "L'adoration dans les cieux",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 11
+    },
+    {
+      "title": "L'agneau est seul digne d'ouvrir le livre",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 14
+    },
+    {
+      "title": "L'agneau brise les six premières attaches",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 17
+    },
+    {
+      "title": "Les serviteurs de Dieu reçoivent sa marque",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 8
+    },
+    {
+      "title": "La foule immense devant le trône",
+      "start_ch": 7,
+      "start_v": 9,
+      "end_ch": 7,
+      "end_v": 17
+    },
+    {
+      "title": "La septième attache",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 5
+    },
+    {
+      "title": "Les quatre premiers anges sonnent de la trompette",
+      "start_ch": 8,
+      "start_v": 6,
+      "end_ch": 8,
+      "end_v": 13
+    },
+    {
+      "title": "Le cinquième ange sonne de la trompette",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 11
+    },
+    {
+      "title": "Le sixième ange sonne de la trompette",
+      "start_ch": 9,
+      "start_v": 12,
+      "end_ch": 9,
+      "end_v": 21
+    },
+    {
+      "title": "L'ange et le petit livre",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 11
+    },
+    {
+      "title": "Les deux témoins du Dieu vivant",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 14
+    },
+    {
+      "title": "Le septième ange sonne de la trompette",
+      "start_ch": 11,
+      "start_v": 15,
+      "end_ch": 11,
+      "end_v": 19
+    },
+    {
+      "title": "La femme, le dragon et l'enfant",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 18
+    },
+    {
+      "title": "La bête qui sort de la mer",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 10
+    },
+    {
+      "title": "La bête qui sort de la terre",
+      "start_ch": 13,
+      "start_v": 11,
+      "end_ch": 13,
+      "end_v": 18
+    },
+    {
+      "title": "Le chant des rachetés",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 5
+    },
+    {
+      "title": "Les trois anges",
+      "start_ch": 14,
+      "start_v": 6,
+      "end_ch": 14,
+      "end_v": 13
+    },
+    {
+      "title": "La moisson et la vendange de la terre",
+      "start_ch": 14,
+      "start_v": 14,
+      "end_ch": 14,
+      "end_v": 20
+    },
+    {
+      "title": "Les anges et les derniers fléaux",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 8
+    },
+    {
+      "title": "Les sept coupes de la colère de Dieu",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 21
+    },
+    {
+      "title": "La grande prostituée",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 18
+    },
+    {
+      "title": "Babylone est détruite",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 24
+    },
+    {
+      "title": "Une foule immense loue le Seigneur",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 4
+    },
+    {
+      "title": "Heureux les invités aux noces de l'agneau&#8239;!",
+      "start_ch": 19,
+      "start_v": 5,
+      "end_ch": 19,
+      "end_v": 10
+    },
+    {
+      "title": "Le cavalier monté sur le cheval blanc",
+      "start_ch": 19,
+      "start_v": 11,
+      "end_ch": 19,
+      "end_v": 21
+    },
+    {
+      "title": "Les mille années",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 6
+    },
+    {
+      "title": "La défaite de Satan",
+      "start_ch": 20,
+      "start_v": 7,
+      "end_ch": 20,
+      "end_v": 10
+    },
+    {
+      "title": "Le jugement dernier",
+      "start_ch": 20,
+      "start_v": 11,
+      "end_ch": 20,
+      "end_v": 15
+    },
+    {
+      "title": "Le nouveau ciel et la nouvelle terre",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 8
+    },
+    {
+      "title": "La nouvelle Jérusalem",
+      "start_ch": 21,
+      "start_v": 9,
+      "end_ch": 21,
+      "end_v": 27
+    },
+    {
+      "title": "Jésus annonce qu'il vient bientôt",
+      "start_ch": 22,
+      "start_v": 6,
+      "end_ch": 22,
+      "end_v": 17
+    },
+    {
+      "title": "Que la grâce du Seigneur Jésus soit avec vous tous&#8239;!",
+      "start_ch": 22,
+      "start_v": 18,
+      "end_ch": 22,
+      "end_v": 21
+    }
+  ]
 }

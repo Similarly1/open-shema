@@ -33,5 +33,41 @@
       "24": "ainsi que Marc, Aristarque, Démas et Luc, mes collaborateurs au service du Christ.",
       "25": "Que la grâce du Seigneur Jésus Christ soit avec vous!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Salutation",
+    "1:4": "L'amour et la foi de Philémon",
+    "1:8": "Paul présente une demande en faveur d'Onésime",
+    "1:23": "Salutations finales"
+  },
+  "pericopes": [
+    {
+      "title": "Salutation",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 3
+    },
+    {
+      "title": "L'amour et la foi de Philémon",
+      "start_ch": 1,
+      "start_v": 4,
+      "end_ch": 1,
+      "end_v": 7
+    },
+    {
+      "title": "Paul présente une demande en faveur d'Onésime",
+      "start_ch": 1,
+      "start_v": 8,
+      "end_ch": 1,
+      "end_v": 22
+    },
+    {
+      "title": "Salutations finales",
+      "start_ch": 1,
+      "start_v": 23,
+      "end_ch": 1,
+      "end_v": 25
+    }
+  ]
 }

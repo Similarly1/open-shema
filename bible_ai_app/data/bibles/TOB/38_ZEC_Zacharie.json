@@ -245,5 +245,41 @@
       "20": "En ce jour-là, les clochettes des chevaux porteront l’inscription: «Consacré au SEIGNEUR»; les marmites, dans la Maison du SEIGNEUR, seront comme des coupes à aspersion devant l’autel.",
       "21": "Toute marmite à Jérusalem et en Juda sera consacrée au SEIGNEUR de l’univers. Tous ceux qui viendront présenter un sacrifice s’en serviront pour cuire leur offrande. Il n’y aura plus de marchand dans la Maison du SEIGNEUR de l’univers, en ce jour-là."
     }
-  }
+  },
+  "sections": {
+    "1:7": "LIVRET DES VISIONS",
+    "7:1": "LIVRET DES DISCOURS",
+    "9:1": "ISRAËL PARMI LES PEUPLES",
+    "12:1": "SALUT ET GLOIRE FUTURE DE JÉRUSALEM"
+  },
+  "pericopes": [
+    {
+      "title": "LIVRET DES VISIONS",
+      "start_ch": 1,
+      "start_v": 7,
+      "end_ch": 1,
+      "end_v": 17
+    },
+    {
+      "title": "LIVRET DES DISCOURS",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 14
+    },
+    {
+      "title": "ISRAËL PARMI LES PEUPLES",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 17
+    },
+    {
+      "title": "SALUT ET GLOIRE FUTURE DE JÉRUSALEM",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 14
+    }
+  ]
 }

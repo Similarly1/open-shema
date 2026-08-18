@@ -664,5 +664,369 @@
       "24": "Les autres Israélites quittèrent l'assemblée; chacun rejoignit sa tribu et son clan et regagna sa part de territoire.",
       "25": "À cette époque, il n'y avait pas de roi en Israël et chacun agissait comme il lui semblait bon."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Israël s'installe en Canaan",
+    "2:1": "Le Seigneur fait des reproches à son peuple",
+    "2:6": "La mort de Josué",
+    "2:11": "Les Israélites abandonnent le Seigneur",
+    "2:20": "Le Seigneur met Israël à l'épreuve",
+    "3:7": "Otniel",
+    "3:12": "Éhoud",
+    "3:31": "Chamgar",
+    "4:1": "Débora, juge et prophétesse",
+    "5:1": "Le cantique de Débora",
+    "6:1": "Les Madianites oppriment Israël",
+    "6:11": "Dieu charge Gédéon de délivrer Israël",
+    "6:25": "Gédéon démolit l'autel du dieu Baal",
+    "6:33": "Gédéon demande à Dieu une confirmation",
+    "7:1": "300 soldats restent avec Gédéon",
+    "7:9": "Dieu prévient Gédéon qu'il aura la victoire",
+    "7:16": "Les Madianites sont mis en déroute",
+    "8:1": "Les gens d'Éfraïm sont mécontents",
+    "8:4": "Gédéon poursuit l'ennemi à l'est du Jourdain",
+    "8:22": "Fin de la vie de Gédéon",
+    "9:1": "Abimélek devient roi à Sichem",
+    "9:7": "La fable de Yotam",
+    "9:22": "La révolte de Sichem contre Abimélek",
+    "9:50": "Une femme fracasse le crâne d'Abimélek",
+    "10:1": "D'autres juges&#160;: Tola, Yaïr",
+    "10:6": "Les Ammonites oppriment Israël",
+    "11:1": "Jefté devient chef en Israël",
+    "11:12": "Messages de Jefté aux Ammonites",
+    "11:29": "La promesse de Jefté et le sacrifice de sa fille",
+    "12:1": "Jefté livre bataille aux gens d'Éfraïm",
+    "12:8": "D'autres juges&#160;: Ibsan, Élon et Abdon",
+    "13:1": "L'épouse de Manoa donne naissance à Samson",
+    "14:1": "Samson accomplit ses premiers exploits",
+    "14:10": "Samson propose une devinette aux Philistins",
+    "15:1": "Samson se venge des Philistins",
+    "15:9": "Samson et la mâchoire d'âne",
+    "16:1": "Samson arrache les portes de Gaza",
+    "16:4": "Dalila trahit Samson",
+    "16:23": "Dernier exploit et mort de Samson",
+    "17:1": "Mika et son lieu de culte privé",
+    "18:1": "Les membres de la tribu de Dan changent de territoire",
+    "18:27": "La ville de Dan et sa maison de Dieu",
+    "19:1": "Le crime des gens de Benjamin contre la femme d'un lévite",
+    "20:1": "Israël punit les gens de Benjamin",
+    "21:1": "Comment la tribu de Benjamin renaît"
+  },
+  "pericopes": [
+    {
+      "title": "Israël s'installe en Canaan",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 36
+    },
+    {
+      "title": "Le Seigneur fait des reproches à son peuple",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 5
+    },
+    {
+      "title": "La mort de Josué",
+      "start_ch": 2,
+      "start_v": 6,
+      "end_ch": 2,
+      "end_v": 10
+    },
+    {
+      "title": "Les Israélites abandonnent le Seigneur",
+      "start_ch": 2,
+      "start_v": 11,
+      "end_ch": 2,
+      "end_v": 19
+    },
+    {
+      "title": "Le Seigneur met Israël à l'épreuve",
+      "start_ch": 2,
+      "start_v": 20,
+      "end_ch": 2,
+      "end_v": 23
+    },
+    {
+      "title": "Otniel",
+      "start_ch": 3,
+      "start_v": 7,
+      "end_ch": 3,
+      "end_v": 11
+    },
+    {
+      "title": "Éhoud",
+      "start_ch": 3,
+      "start_v": 12,
+      "end_ch": 3,
+      "end_v": 30
+    },
+    {
+      "title": "Chamgar",
+      "start_ch": 3,
+      "start_v": 31,
+      "end_ch": 3,
+      "end_v": 31
+    },
+    {
+      "title": "Débora, juge et prophétesse",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 24
+    },
+    {
+      "title": "Le cantique de Débora",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 31
+    },
+    {
+      "title": "Les Madianites oppriment Israël",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 10
+    },
+    {
+      "title": "Dieu charge Gédéon de délivrer Israël",
+      "start_ch": 6,
+      "start_v": 11,
+      "end_ch": 6,
+      "end_v": 24
+    },
+    {
+      "title": "Gédéon démolit l'autel du dieu Baal",
+      "start_ch": 6,
+      "start_v": 25,
+      "end_ch": 6,
+      "end_v": 32
+    },
+    {
+      "title": "Gédéon demande à Dieu une confirmation",
+      "start_ch": 6,
+      "start_v": 33,
+      "end_ch": 6,
+      "end_v": 40
+    },
+    {
+      "title": "300 soldats restent avec Gédéon",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 8
+    },
+    {
+      "title": "Dieu prévient Gédéon qu'il aura la victoire",
+      "start_ch": 7,
+      "start_v": 9,
+      "end_ch": 7,
+      "end_v": 15
+    },
+    {
+      "title": "Les Madianites sont mis en déroute",
+      "start_ch": 7,
+      "start_v": 16,
+      "end_ch": 7,
+      "end_v": 25
+    },
+    {
+      "title": "Les gens d'Éfraïm sont mécontents",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 3
+    },
+    {
+      "title": "Gédéon poursuit l'ennemi à l'est du Jourdain",
+      "start_ch": 8,
+      "start_v": 4,
+      "end_ch": 8,
+      "end_v": 21
+    },
+    {
+      "title": "Fin de la vie de Gédéon",
+      "start_ch": 8,
+      "start_v": 22,
+      "end_ch": 8,
+      "end_v": 35
+    },
+    {
+      "title": "Abimélek devient roi à Sichem",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 6
+    },
+    {
+      "title": "La fable de Yotam",
+      "start_ch": 9,
+      "start_v": 7,
+      "end_ch": 9,
+      "end_v": 21
+    },
+    {
+      "title": "La révolte de Sichem contre Abimélek",
+      "start_ch": 9,
+      "start_v": 22,
+      "end_ch": 9,
+      "end_v": 49
+    },
+    {
+      "title": "Une femme fracasse le crâne d'Abimélek",
+      "start_ch": 9,
+      "start_v": 50,
+      "end_ch": 9,
+      "end_v": 57
+    },
+    {
+      "title": "D'autres juges&#160;: Tola, Yaïr",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 5
+    },
+    {
+      "title": "Les Ammonites oppriment Israël",
+      "start_ch": 10,
+      "start_v": 6,
+      "end_ch": 10,
+      "end_v": 18
+    },
+    {
+      "title": "Jefté devient chef en Israël",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 11
+    },
+    {
+      "title": "Messages de Jefté aux Ammonites",
+      "start_ch": 11,
+      "start_v": 12,
+      "end_ch": 11,
+      "end_v": 28
+    },
+    {
+      "title": "La promesse de Jefté et le sacrifice de sa fille",
+      "start_ch": 11,
+      "start_v": 29,
+      "end_ch": 11,
+      "end_v": 40
+    },
+    {
+      "title": "Jefté livre bataille aux gens d'Éfraïm",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 7
+    },
+    {
+      "title": "D'autres juges&#160;: Ibsan, Élon et Abdon",
+      "start_ch": 12,
+      "start_v": 8,
+      "end_ch": 12,
+      "end_v": 15
+    },
+    {
+      "title": "L'épouse de Manoa donne naissance à Samson",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 25
+    },
+    {
+      "title": "Samson accomplit ses premiers exploits",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 9
+    },
+    {
+      "title": "Samson propose une devinette aux Philistins",
+      "start_ch": 14,
+      "start_v": 10,
+      "end_ch": 14,
+      "end_v": 20
+    },
+    {
+      "title": "Samson se venge des Philistins",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 8
+    },
+    {
+      "title": "Samson et la mâchoire d'âne",
+      "start_ch": 15,
+      "start_v": 9,
+      "end_ch": 15,
+      "end_v": 20
+    },
+    {
+      "title": "Samson arrache les portes de Gaza",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 3
+    },
+    {
+      "title": "Dalila trahit Samson",
+      "start_ch": 16,
+      "start_v": 4,
+      "end_ch": 16,
+      "end_v": 22
+    },
+    {
+      "title": "Dernier exploit et mort de Samson",
+      "start_ch": 16,
+      "start_v": 23,
+      "end_ch": 16,
+      "end_v": 31
+    },
+    {
+      "title": "Mika et son lieu de culte privé",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 13
+    },
+    {
+      "title": "Les membres de la tribu de Dan changent de territoire",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 26
+    },
+    {
+      "title": "La ville de Dan et sa maison de Dieu",
+      "start_ch": 18,
+      "start_v": 27,
+      "end_ch": 18,
+      "end_v": 31
+    },
+    {
+      "title": "Le crime des gens de Benjamin contre la femme d'un lévite",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 30
+    },
+    {
+      "title": "Israël punit les gens de Benjamin",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 48
+    },
+    {
+      "title": "Comment la tribu de Benjamin renaît",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 25
+    }
+  ]
 }

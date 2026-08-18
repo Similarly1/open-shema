@@ -1067,5 +1067,729 @@
       "30": "Paul resta deux années entières dans le logement qu’il avait loué. Il pouvait y recevoir tous ceux qui désiraient le voir.",
       "31": "Il annonçait le règne de Dieu et enseignait, avec une pleine assurance et sans aucun obstacle, tout ce qui concerne le Seigneur Jésus-Christ."
     }
-  }
+  },
+  "sections": {
+    "1:4": "Dernières instructions",
+    "1:9": "Ascension",
+    "1:15": "Élection du douzième apôtre",
+    "2:1": "Le don du Saint-Esprit",
+    "2:14": "Première prédication chrétienne",
+    "2:37": "Premières conversions",
+    "2:42": "Vie de la première Église",
+    "3:1": "Guérison d’un infirme",
+    "3:12": "Explications",
+    "4:1": "Arrestation",
+    "4:8": "Défense courageuse",
+    "4:23": "Comment priait l’Église primitive",
+    "4:32": "Fraternité",
+    "5:1": "Faux calculs",
+    "5:12": "Guérisons et expansion",
+    "5:17": "Obéir à Dieu plutôt qu’aux hommes",
+    "5:33": "Prudence ou indécision ?",
+    "6:1": "Partage des responsabilités",
+    "6:8": "Étienne arrêté",
+    "7:1": "L’histoire d’Israël vue par Étienne",
+    "7:20": "Moïse",
+    "7:46": "Le temple",
+    "7:54": "Premier martyr",
+    "8:1": "Persécution et dispersion",
+    "8:5": "L’Évangile en Samarie",
+    "8:26": "Conversion d’un ministre africain",
+    "9:1": "Sur le chemin de Damas",
+    "9:10": "Mission dangereuse",
+    "9:17": "Conversion de Saul",
+    "9:20": "Une prise de position retentissante",
+    "9:32": "Miracles accomplis par Pierre",
+    "10:1": "L’ange et le capitaine",
+    "10:9": "Une vision énigmatique",
+    "10:19": "La vision s’éclaire",
+    "10:24": "Les frontières tombent",
+    "10:34": "Comment Pierre prêchait l’Évangile",
+    "10:44": "La parole agit",
+    "11:1": "Explications",
+    "11:19": "Une tournant décisif",
+    "11:27": "Solidarité chrétienne",
+    "12:1": "Pierre en prison",
+    "12:7": "Libéré",
+    "12:12": "Des croyants incrédules",
+    "12:20": "On ne se moque pas de Dieu",
+    "13:1": "Ordre de mission",
+    "13:6": "À la cour du proconsul",
+    "13:13": "Prédication chrétienne dans une synagogue",
+    "13:44": "Réactions",
+    "14:1": "Deux camps",
+    "14:7": "Encensés ou lapidés ?",
+    "14:21": "Affermissement",
+    "15:1": "Conflits et conférence",
+    "15:22": "Un texte d’accord",
+    "15:36": "Séparation",
+    "16:1": "L’appel de l’Europe",
+    "16:13": "Conversion d’une commerçante",
+    "16:16": "La Bonne Nouvelle contre la bonne aventure",
+    "16:23": "Crois au Seigneur Jésus, et tu seras sauvé",
+    "16:35": "Relâchés",
+    "17:1": "Les chrétiens : des révolutionnaires ?",
+    "17:16": "Évangile et humanisme",
+    "18:1": "L’Évangile dans la grande ville",
+    "18:24": "Apollos",
+    "19:1": "Des disciples de Jean-Baptiste se convertissent",
+    "19:10": "Miracles ou magie ?",
+    "19:23": "Manifestation syndicaliste",
+    "20:1": "Voyages",
+    "20:7": "Émotions",
+    "20:13": "De Troas à Milet",
+    "20:18": "Les joies et les responsabilités du ministère chrétien",
+    "21:1": "En route vers Jérusalem",
+    "21:17": "Paul et Jacques",
+    "21:27": "Fanatisme aveugle",
+    "22:1": "Témoin à Jérusalem",
+    "22:22": "Faut-il toujours se résigner ?",
+    "23:1": "Devant le Grand Conseil",
+    "23:12": "Un complot éventé",
+    "23:23": "Transfert à Césarée",
+    "24:1": "« Vous serez injustement accusés »",
+    "24:10": "« Vous rendrez témoignage devant les gouverneurs »",
+    "25:1": "Appel à l’empereur",
+    "25:13": "Un prisonnier embarrassant",
+    "25:23": "Audience solennelle",
+    "26:1": "« Vous rendrez témoignage devant les rois »",
+    "26:24": "Une décision esquivée",
+    "27:1": "En route pour Rome",
+    "27:9": "Tempête et naufrage",
+    "27:27": "Solidarité dans l’épreuve",
+    "28:1": "Signes de la faveur divine",
+    "28:16": "Au cœur de l’Empire"
+  },
+  "pericopes": [
+    {
+      "title": "Dernières instructions",
+      "start_ch": 1,
+      "start_v": 4,
+      "end_ch": 1,
+      "end_v": 8
+    },
+    {
+      "title": "Ascension",
+      "start_ch": 1,
+      "start_v": 9,
+      "end_ch": 1,
+      "end_v": 14
+    },
+    {
+      "title": "Élection du douzième apôtre",
+      "start_ch": 1,
+      "start_v": 15,
+      "end_ch": 1,
+      "end_v": 26
+    },
+    {
+      "title": "Le don du Saint-Esprit",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 13
+    },
+    {
+      "title": "Première prédication chrétienne",
+      "start_ch": 2,
+      "start_v": 14,
+      "end_ch": 2,
+      "end_v": 36
+    },
+    {
+      "title": "Premières conversions",
+      "start_ch": 2,
+      "start_v": 37,
+      "end_ch": 2,
+      "end_v": 41
+    },
+    {
+      "title": "Vie de la première Église",
+      "start_ch": 2,
+      "start_v": 42,
+      "end_ch": 2,
+      "end_v": 47
+    },
+    {
+      "title": "Guérison d’un infirme",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 11
+    },
+    {
+      "title": "Explications",
+      "start_ch": 3,
+      "start_v": 12,
+      "end_ch": 3,
+      "end_v": 26
+    },
+    {
+      "title": "Arrestation",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 7
+    },
+    {
+      "title": "Défense courageuse",
+      "start_ch": 4,
+      "start_v": 8,
+      "end_ch": 4,
+      "end_v": 22
+    },
+    {
+      "title": "Comment priait l’Église primitive",
+      "start_ch": 4,
+      "start_v": 23,
+      "end_ch": 4,
+      "end_v": 31
+    },
+    {
+      "title": "Fraternité",
+      "start_ch": 4,
+      "start_v": 32,
+      "end_ch": 4,
+      "end_v": 37
+    },
+    {
+      "title": "Faux calculs",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 11
+    },
+    {
+      "title": "Guérisons et expansion",
+      "start_ch": 5,
+      "start_v": 12,
+      "end_ch": 5,
+      "end_v": 16
+    },
+    {
+      "title": "Obéir à Dieu plutôt qu’aux hommes",
+      "start_ch": 5,
+      "start_v": 17,
+      "end_ch": 5,
+      "end_v": 32
+    },
+    {
+      "title": "Prudence ou indécision ?",
+      "start_ch": 5,
+      "start_v": 33,
+      "end_ch": 5,
+      "end_v": 42
+    },
+    {
+      "title": "Partage des responsabilités",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 7
+    },
+    {
+      "title": "Étienne arrêté",
+      "start_ch": 6,
+      "start_v": 8,
+      "end_ch": 6,
+      "end_v": 15
+    },
+    {
+      "title": "L’histoire d’Israël vue par Étienne",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 19
+    },
+    {
+      "title": "Moïse",
+      "start_ch": 7,
+      "start_v": 20,
+      "end_ch": 7,
+      "end_v": 45
+    },
+    {
+      "title": "Le temple",
+      "start_ch": 7,
+      "start_v": 46,
+      "end_ch": 7,
+      "end_v": 53
+    },
+    {
+      "title": "Premier martyr",
+      "start_ch": 7,
+      "start_v": 54,
+      "end_ch": 7,
+      "end_v": 60
+    },
+    {
+      "title": "Persécution et dispersion",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 4
+    },
+    {
+      "title": "L’Évangile en Samarie",
+      "start_ch": 8,
+      "start_v": 5,
+      "end_ch": 8,
+      "end_v": 25
+    },
+    {
+      "title": "Conversion d’un ministre africain",
+      "start_ch": 8,
+      "start_v": 26,
+      "end_ch": 8,
+      "end_v": 40
+    },
+    {
+      "title": "Sur le chemin de Damas",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 9
+    },
+    {
+      "title": "Mission dangereuse",
+      "start_ch": 9,
+      "start_v": 10,
+      "end_ch": 9,
+      "end_v": 16
+    },
+    {
+      "title": "Conversion de Saul",
+      "start_ch": 9,
+      "start_v": 17,
+      "end_ch": 9,
+      "end_v": 19
+    },
+    {
+      "title": "Une prise de position retentissante",
+      "start_ch": 9,
+      "start_v": 20,
+      "end_ch": 9,
+      "end_v": 31
+    },
+    {
+      "title": "Miracles accomplis par Pierre",
+      "start_ch": 9,
+      "start_v": 32,
+      "end_ch": 9,
+      "end_v": 43
+    },
+    {
+      "title": "L’ange et le capitaine",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 8
+    },
+    {
+      "title": "Une vision énigmatique",
+      "start_ch": 10,
+      "start_v": 9,
+      "end_ch": 10,
+      "end_v": 18
+    },
+    {
+      "title": "La vision s’éclaire",
+      "start_ch": 10,
+      "start_v": 19,
+      "end_ch": 10,
+      "end_v": 23
+    },
+    {
+      "title": "Les frontières tombent",
+      "start_ch": 10,
+      "start_v": 24,
+      "end_ch": 10,
+      "end_v": 33
+    },
+    {
+      "title": "Comment Pierre prêchait l’Évangile",
+      "start_ch": 10,
+      "start_v": 34,
+      "end_ch": 10,
+      "end_v": 43
+    },
+    {
+      "title": "La parole agit",
+      "start_ch": 10,
+      "start_v": 44,
+      "end_ch": 10,
+      "end_v": 48
+    },
+    {
+      "title": "Explications",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 18
+    },
+    {
+      "title": "Une tournant décisif",
+      "start_ch": 11,
+      "start_v": 19,
+      "end_ch": 11,
+      "end_v": 26
+    },
+    {
+      "title": "Solidarité chrétienne",
+      "start_ch": 11,
+      "start_v": 27,
+      "end_ch": 11,
+      "end_v": 30
+    },
+    {
+      "title": "Pierre en prison",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 6
+    },
+    {
+      "title": "Libéré",
+      "start_ch": 12,
+      "start_v": 7,
+      "end_ch": 12,
+      "end_v": 11
+    },
+    {
+      "title": "Des croyants incrédules",
+      "start_ch": 12,
+      "start_v": 12,
+      "end_ch": 12,
+      "end_v": 19
+    },
+    {
+      "title": "On ne se moque pas de Dieu",
+      "start_ch": 12,
+      "start_v": 20,
+      "end_ch": 12,
+      "end_v": 25
+    },
+    {
+      "title": "Ordre de mission",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 5
+    },
+    {
+      "title": "À la cour du proconsul",
+      "start_ch": 13,
+      "start_v": 6,
+      "end_ch": 13,
+      "end_v": 12
+    },
+    {
+      "title": "Prédication chrétienne dans une synagogue",
+      "start_ch": 13,
+      "start_v": 13,
+      "end_ch": 13,
+      "end_v": 43
+    },
+    {
+      "title": "Réactions",
+      "start_ch": 13,
+      "start_v": 44,
+      "end_ch": 13,
+      "end_v": 52
+    },
+    {
+      "title": "Deux camps",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 6
+    },
+    {
+      "title": "Encensés ou lapidés ?",
+      "start_ch": 14,
+      "start_v": 7,
+      "end_ch": 14,
+      "end_v": 20
+    },
+    {
+      "title": "Affermissement",
+      "start_ch": 14,
+      "start_v": 21,
+      "end_ch": 14,
+      "end_v": 28
+    },
+    {
+      "title": "Conflits et conférence",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 21
+    },
+    {
+      "title": "Un texte d’accord",
+      "start_ch": 15,
+      "start_v": 22,
+      "end_ch": 15,
+      "end_v": 35
+    },
+    {
+      "title": "Séparation",
+      "start_ch": 15,
+      "start_v": 36,
+      "end_ch": 15,
+      "end_v": 41
+    },
+    {
+      "title": "L’appel de l’Europe",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 12
+    },
+    {
+      "title": "Conversion d’une commerçante",
+      "start_ch": 16,
+      "start_v": 13,
+      "end_ch": 16,
+      "end_v": 15
+    },
+    {
+      "title": "La Bonne Nouvelle contre la bonne aventure",
+      "start_ch": 16,
+      "start_v": 16,
+      "end_ch": 16,
+      "end_v": 22
+    },
+    {
+      "title": "Crois au Seigneur Jésus, et tu seras sauvé",
+      "start_ch": 16,
+      "start_v": 23,
+      "end_ch": 16,
+      "end_v": 34
+    },
+    {
+      "title": "Relâchés",
+      "start_ch": 16,
+      "start_v": 35,
+      "end_ch": 16,
+      "end_v": 40
+    },
+    {
+      "title": "Les chrétiens : des révolutionnaires ?",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 15
+    },
+    {
+      "title": "Évangile et humanisme",
+      "start_ch": 17,
+      "start_v": 16,
+      "end_ch": 17,
+      "end_v": 34
+    },
+    {
+      "title": "L’Évangile dans la grande ville",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 23
+    },
+    {
+      "title": "Apollos",
+      "start_ch": 18,
+      "start_v": 24,
+      "end_ch": 18,
+      "end_v": 28
+    },
+    {
+      "title": "Des disciples de Jean-Baptiste se convertissent",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 9
+    },
+    {
+      "title": "Miracles ou magie ?",
+      "start_ch": 19,
+      "start_v": 10,
+      "end_ch": 19,
+      "end_v": 22
+    },
+    {
+      "title": "Manifestation syndicaliste",
+      "start_ch": 19,
+      "start_v": 23,
+      "end_ch": 19,
+      "end_v": 40
+    },
+    {
+      "title": "Voyages",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 6
+    },
+    {
+      "title": "Émotions",
+      "start_ch": 20,
+      "start_v": 7,
+      "end_ch": 20,
+      "end_v": 12
+    },
+    {
+      "title": "De Troas à Milet",
+      "start_ch": 20,
+      "start_v": 13,
+      "end_ch": 20,
+      "end_v": 17
+    },
+    {
+      "title": "Les joies et les responsabilités du ministère chrétien",
+      "start_ch": 20,
+      "start_v": 18,
+      "end_ch": 20,
+      "end_v": 38
+    },
+    {
+      "title": "En route vers Jérusalem",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 16
+    },
+    {
+      "title": "Paul et Jacques",
+      "start_ch": 21,
+      "start_v": 17,
+      "end_ch": 21,
+      "end_v": 26
+    },
+    {
+      "title": "Fanatisme aveugle",
+      "start_ch": 21,
+      "start_v": 27,
+      "end_ch": 21,
+      "end_v": 40
+    },
+    {
+      "title": "Témoin à Jérusalem",
+      "start_ch": 22,
+      "start_v": 1,
+      "end_ch": 22,
+      "end_v": 21
+    },
+    {
+      "title": "Faut-il toujours se résigner ?",
+      "start_ch": 22,
+      "start_v": 22,
+      "end_ch": 22,
+      "end_v": 30
+    },
+    {
+      "title": "Devant le Grand Conseil",
+      "start_ch": 23,
+      "start_v": 1,
+      "end_ch": 23,
+      "end_v": 11
+    },
+    {
+      "title": "Un complot éventé",
+      "start_ch": 23,
+      "start_v": 12,
+      "end_ch": 23,
+      "end_v": 22
+    },
+    {
+      "title": "Transfert à Césarée",
+      "start_ch": 23,
+      "start_v": 23,
+      "end_ch": 23,
+      "end_v": 35
+    },
+    {
+      "title": "« Vous serez injustement accusés »",
+      "start_ch": 24,
+      "start_v": 1,
+      "end_ch": 24,
+      "end_v": 9
+    },
+    {
+      "title": "« Vous rendrez témoignage devant les gouverneurs »",
+      "start_ch": 24,
+      "start_v": 10,
+      "end_ch": 24,
+      "end_v": 27
+    },
+    {
+      "title": "Appel à l’empereur",
+      "start_ch": 25,
+      "start_v": 1,
+      "end_ch": 25,
+      "end_v": 12
+    },
+    {
+      "title": "Un prisonnier embarrassant",
+      "start_ch": 25,
+      "start_v": 13,
+      "end_ch": 25,
+      "end_v": 22
+    },
+    {
+      "title": "Audience solennelle",
+      "start_ch": 25,
+      "start_v": 23,
+      "end_ch": 25,
+      "end_v": 27
+    },
+    {
+      "title": "« Vous rendrez témoignage devant les rois »",
+      "start_ch": 26,
+      "start_v": 1,
+      "end_ch": 26,
+      "end_v": 23
+    },
+    {
+      "title": "Une décision esquivée",
+      "start_ch": 26,
+      "start_v": 24,
+      "end_ch": 26,
+      "end_v": 32
+    },
+    {
+      "title": "En route pour Rome",
+      "start_ch": 27,
+      "start_v": 1,
+      "end_ch": 27,
+      "end_v": 8
+    },
+    {
+      "title": "Tempête et naufrage",
+      "start_ch": 27,
+      "start_v": 9,
+      "end_ch": 27,
+      "end_v": 26
+    },
+    {
+      "title": "Solidarité dans l’épreuve",
+      "start_ch": 27,
+      "start_v": 27,
+      "end_ch": 27,
+      "end_v": 44
+    },
+    {
+      "title": "Signes de la faveur divine",
+      "start_ch": 28,
+      "start_v": 1,
+      "end_ch": 28,
+      "end_v": 15
+    },
+    {
+      "title": "Au cœur de l’Empire",
+      "start_ch": 28,
+      "start_v": 16,
+      "end_ch": 28,
+      "end_v": 31
+    }
+  ]
 }

@@ -455,5 +455,273 @@
       "20": "Celui qui atteste ces choses dit: «Oui, je viens bientôt.» Amen! Viens, Seigneur Jésus!",
       "21": "Que la grâce du Seigneur Jésus[-Christ] soit avec tous les saints!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Titre et salutation",
+    "1:9": "Vision du Fils de l'homme",
+    "2:1": "Lettre à l'Eglise d'Ephèse",
+    "2:8": "Lettre à l'Eglise de Smyrne",
+    "2:12": "Lettre à l'Eglise de Pergame",
+    "2:18": "Lettre à l'Eglise de Thyatire",
+    "3:1": "Lettre à l'Eglise de Sardes",
+    "3:7": "Lettre à l'Eglise de Philadelphie",
+    "3:14": "Lettre à l'Eglise de Laodicée",
+    "4:1": "Le trône de Dieu",
+    "5:1": "L'Agneau et le livre scellé",
+    "6:1": "Ouverture des six premiers sceaux",
+    "7:1": "Le peuple de Dieu et le septième sceau",
+    "8:1": "Ouverture du septième sceau",
+    "8:6": "Les six premières trompettes",
+    "10:1": "Le petit livre",
+    "11:1": "Les deux témoins",
+    "11:15": "La septième trompette",
+    "12:1": "La femme, le dragon et l'enfant",
+    "13:1": "Les bêtes",
+    "14:1": "L'Agneau et les rachetés",
+    "14:6": "Les trois anges proclamant le jugement",
+    "14:14": "La moisson et la vendange",
+    "15:1": "Les sept fléaux",
+    "16:1": "Les sept coupes versées",
+    "17:1": "La chute de Babylone",
+    "19:1": "Louanges et festin de noces",
+    "19:11": "Victoire sur la bête et le prétendu prophète",
+    "20:1": "Satan enchaîné et relâché",
+    "20:11": "Le jugement dernier",
+    "21:1": "Un nouveau ciel et une nouvelle terre",
+    "21:9": "La nouvelle Jérusalem",
+    "22:6": "Conclusion"
+  },
+  "pericopes": [
+    {
+      "title": "Titre et salutation",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 8
+    },
+    {
+      "title": "Vision du Fils de l'homme",
+      "start_ch": 1,
+      "start_v": 9,
+      "end_ch": 1,
+      "end_v": 20
+    },
+    {
+      "title": "Lettre à l'Eglise d'Ephèse",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 7
+    },
+    {
+      "title": "Lettre à l'Eglise de Smyrne",
+      "start_ch": 2,
+      "start_v": 8,
+      "end_ch": 2,
+      "end_v": 11
+    },
+    {
+      "title": "Lettre à l'Eglise de Pergame",
+      "start_ch": 2,
+      "start_v": 12,
+      "end_ch": 2,
+      "end_v": 17
+    },
+    {
+      "title": "Lettre à l'Eglise de Thyatire",
+      "start_ch": 2,
+      "start_v": 18,
+      "end_ch": 2,
+      "end_v": 29
+    },
+    {
+      "title": "Lettre à l'Eglise de Sardes",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 6
+    },
+    {
+      "title": "Lettre à l'Eglise de Philadelphie",
+      "start_ch": 3,
+      "start_v": 7,
+      "end_ch": 3,
+      "end_v": 13
+    },
+    {
+      "title": "Lettre à l'Eglise de Laodicée",
+      "start_ch": 3,
+      "start_v": 14,
+      "end_ch": 3,
+      "end_v": 22
+    },
+    {
+      "title": "Le trône de Dieu",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 11
+    },
+    {
+      "title": "L'Agneau et le livre scellé",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 14
+    },
+    {
+      "title": "Ouverture des six premiers sceaux",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 17
+    },
+    {
+      "title": "Le peuple de Dieu et le septième sceau",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 17
+    },
+    {
+      "title": "Ouverture du septième sceau",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 5
+    },
+    {
+      "title": "Les six premières trompettes",
+      "start_ch": 8,
+      "start_v": 6,
+      "end_ch": 8,
+      "end_v": 13
+    },
+    {
+      "title": "Le petit livre",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 11
+    },
+    {
+      "title": "Les deux témoins",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 14
+    },
+    {
+      "title": "La septième trompette",
+      "start_ch": 11,
+      "start_v": 15,
+      "end_ch": 11,
+      "end_v": 19
+    },
+    {
+      "title": "La femme, le dragon et l'enfant",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 18
+    },
+    {
+      "title": "Les bêtes",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 18
+    },
+    {
+      "title": "L'Agneau et les rachetés",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 5
+    },
+    {
+      "title": "Les trois anges proclamant le jugement",
+      "start_ch": 14,
+      "start_v": 6,
+      "end_ch": 14,
+      "end_v": 13
+    },
+    {
+      "title": "La moisson et la vendange",
+      "start_ch": 14,
+      "start_v": 14,
+      "end_ch": 14,
+      "end_v": 20
+    },
+    {
+      "title": "Les sept fléaux",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 8
+    },
+    {
+      "title": "Les sept coupes versées",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 21
+    },
+    {
+      "title": "La chute de Babylone",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 18
+    },
+    {
+      "title": "Louanges et festin de noces",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 10
+    },
+    {
+      "title": "Victoire sur la bête et le prétendu prophète",
+      "start_ch": 19,
+      "start_v": 11,
+      "end_ch": 19,
+      "end_v": 21
+    },
+    {
+      "title": "Satan enchaîné et relâché",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 10
+    },
+    {
+      "title": "Le jugement dernier",
+      "start_ch": 20,
+      "start_v": 11,
+      "end_ch": 20,
+      "end_v": 15
+    },
+    {
+      "title": "Un nouveau ciel et une nouvelle terre",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 8
+    },
+    {
+      "title": "La nouvelle Jérusalem",
+      "start_ch": 21,
+      "start_v": 9,
+      "end_ch": 21,
+      "end_v": 27
+    },
+    {
+      "title": "Conclusion",
+      "start_ch": 22,
+      "start_v": 6,
+      "end_ch": 22,
+      "end_v": 21
+    }
+  ]
 }

@@ -67,5 +67,57 @@
       "23": "Je vous enverrai le prophète Elie avant que n'arrive le jour de l'Eternel, ce jour grand et redoutable.",
       "24": "*Il ramènera le cœur des pères vers leurs enfants et le cœur des enfants vers leurs pères, de peur que je ne vienne frapper le pays de destruction."
     }
-  }
+  },
+  "sections": {
+    "1:1": "L’amour de Dieu pour Israël",
+    "1:6": "Le culte",
+    "2:10": "Mariages mixtes et divorces",
+    "2:17": "Justice de Dieu et purification",
+    "3:6": "Les dîmes et les offrandes",
+    "3:13": "La justice de Dieu et le jour du jugement"
+  },
+  "pericopes": [
+    {
+      "title": "L’amour de Dieu pour Israël",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 5
+    },
+    {
+      "title": "Le culte",
+      "start_ch": 1,
+      "start_v": 6,
+      "end_ch": 1,
+      "end_v": 14
+    },
+    {
+      "title": "Mariages mixtes et divorces",
+      "start_ch": 2,
+      "start_v": 10,
+      "end_ch": 2,
+      "end_v": 16
+    },
+    {
+      "title": "Justice de Dieu et purification",
+      "start_ch": 2,
+      "start_v": 17,
+      "end_ch": 2,
+      "end_v": 17
+    },
+    {
+      "title": "Les dîmes et les offrandes",
+      "start_ch": 3,
+      "start_v": 6,
+      "end_ch": 3,
+      "end_v": 12
+    },
+    {
+      "title": "La justice de Dieu et le jour du jugement",
+      "start_ch": 3,
+      "start_v": 13,
+      "end_ch": 3,
+      "end_v": 24
+    }
+  ]
 }

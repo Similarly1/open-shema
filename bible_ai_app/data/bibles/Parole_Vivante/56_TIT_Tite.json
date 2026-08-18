@@ -58,5 +58,57 @@
       "14": "Il faut que les nôtres aussi apprennent à pratiquer le bien; que, par un travail honnête, ils puissent faire face à tout ce dont eux-mêmes ou les autres ont absolument besoin. Ainsi, leurs vies ne resteront pas improductives.",
       "15": "Tous ceux qui sont avec moi te saluent. Salue les croyants qui nous aiment. Que la grâce de Dieu soit avec vous tous!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Adresse",
+    "1:5": "Responsabilité oblige",
+    "1:10": "Le vrai visage des séducteurs",
+    "2:1": "Une foi vécue",
+    "2:11": "La grâce de Dieu",
+    "3:1": "Nés de nouveau"
+  },
+  "pericopes": [
+    {
+      "title": "Adresse",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 4
+    },
+    {
+      "title": "Responsabilité oblige",
+      "start_ch": 1,
+      "start_v": 5,
+      "end_ch": 1,
+      "end_v": 9
+    },
+    {
+      "title": "Le vrai visage des séducteurs",
+      "start_ch": 1,
+      "start_v": 10,
+      "end_ch": 1,
+      "end_v": 16
+    },
+    {
+      "title": "Une foi vécue",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 10
+    },
+    {
+      "title": "La grâce de Dieu",
+      "start_ch": 2,
+      "start_v": 11,
+      "end_ch": 2,
+      "end_v": 15
+    },
+    {
+      "title": "Nés de nouveau",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 15
+    }
+  ]
 }

@@ -105,5 +105,89 @@
       "27": "Je vous en conjure par le Seigneur: veillez à ce que cette lettre soit lue à tous les frères.",
       "28": "Que la grâce de notre Seigneur Jésus-Christ soit avec vous!"
     }
-  }
+  },
+  "sections": {
+    "1:2": "Première rencontre",
+    "2:1": "Comment l’apôtre prêchait l’Évangile",
+    "2:13": "Fidèles dans l’épreuve",
+    "3:1": "Aimer, c’est souffrir",
+    "3:10": "Aimer, c’est désirer la présence",
+    "4:1": "Être chrétien, c’est vivre autrement",
+    "4:9": "Être chrétien, c’est s’aimer les uns les autres",
+    "4:13": "Christ revient",
+    "5:1": "Soyez prêts",
+    "5:12": "Comment vivre ensemble en attendant le Seigneur"
+  },
+  "pericopes": [
+    {
+      "title": "Première rencontre",
+      "start_ch": 1,
+      "start_v": 2,
+      "end_ch": 1,
+      "end_v": 10
+    },
+    {
+      "title": "Comment l’apôtre prêchait l’Évangile",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 12
+    },
+    {
+      "title": "Fidèles dans l’épreuve",
+      "start_ch": 2,
+      "start_v": 13,
+      "end_ch": 2,
+      "end_v": 20
+    },
+    {
+      "title": "Aimer, c’est souffrir",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 9
+    },
+    {
+      "title": "Aimer, c’est désirer la présence",
+      "start_ch": 3,
+      "start_v": 10,
+      "end_ch": 3,
+      "end_v": 13
+    },
+    {
+      "title": "Être chrétien, c’est vivre autrement",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 8
+    },
+    {
+      "title": "Être chrétien, c’est s’aimer les uns les autres",
+      "start_ch": 4,
+      "start_v": 9,
+      "end_ch": 4,
+      "end_v": 12
+    },
+    {
+      "title": "Christ revient",
+      "start_ch": 4,
+      "start_v": 13,
+      "end_ch": 4,
+      "end_v": 18
+    },
+    {
+      "title": "Soyez prêts",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 11
+    },
+    {
+      "title": "Comment vivre ensemble en attendant le Seigneur",
+      "start_ch": 5,
+      "start_v": 12,
+      "end_ch": 5,
+      "end_v": 28
+    }
+  ]
 }

@@ -27,6 +27,7 @@ DEFAULTS = {
     "metadata_classifier_model": "gemini-2.5-flash-lite",
     "dict_polish_model": "mistralai/Mistral-Small-4-119B-2603",
     "max_original_verses_for_llm": 10,
+    "show_section_titles": True,
 }
 
 def load_config():

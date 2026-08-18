@@ -1130,5 +1130,1009 @@
       "19": "allez donc dans le monde entier, faites des disciples parmi tous les peuples, baptisez-les au nom du Père, du Fils et du Saint-Esprit,",
       "20": "et apprenez-leur à observer tout ce que je vous ai prescrit. D’ailleurs, soyez-en persuadés: je suis moi-même avec vous chaque jour, jusqu’à la fin du monde."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Les ancêtres de Jésus",
+    "1:18": "La perplexité de Joseph",
+    "2:1": "Adoré par des étrangers, persécuté par les siens",
+    "2:13": "Réfugiés",
+    "2:16": "La cruauté d’un tyran",
+    "2:19": "Dans un coin perdu",
+    "3:1": "Le message du précurseur",
+    "3:13": "Obéissant en toutes choses",
+    "4:1": "L’épreuve initiale",
+    "4:12": "Débuts de l’activité publique",
+    "5:1": "Le secret du bonheur",
+    "5:17": "La charte du royaume",
+    "5:21": "Nous sommes tous des assassins",
+    "5:27": "L’essaim des rêves malfaisants",
+    "5:33": "Un homme, une parole",
+    "5:38": "Aimer tout le monde",
+    "6:1": "En secret",
+    "6:9": "Notre Père",
+    "6:16": "Le vrai jeûne",
+    "6:19": "Écueils : la richesse",
+    "6:25": "Les soucis",
+    "7:1": "Ne vous posez pas en juges",
+    "7:7": "Demandez",
+    "7:13": "Images",
+    "7:24": "Sur le roc",
+    "8:1": "Guérisons",
+    "8:18": "Vocations vacillantes",
+    "8:23": "Maître des éléments",
+    "8:28": "Maître des esprits",
+    "9:1": "Pleins pouvoirs",
+    "9:9": "En mauvaise compagnie",
+    "9:14": "L’ancien et le nouveau",
+    "9:18": "Puissance de vie",
+    "9:35": "Ambassadeurs du Roi",
+    "10:5": "Ordre de mission",
+    "10:16": "En mission dangereuse",
+    "10:28": "Courage !",
+    "11:1": "Jésus et Jean-Baptiste",
+    "11:16": "Apathiques, même devant Jésus",
+    "11:25": "Heureux les petits et les affligés",
+    "12:1": "De la liberté des enfants de Dieu",
+    "12:9": "La valeur d’un homme",
+    "12:22": "Pleins pouvoirs sur les forces obscures",
+    "12:33": "L’arbre et ses fruits",
+    "12:38": "Le signe de Jonas",
+    "12:43": "L’horreur du vide",
+    "12:46": "La famille de Jésus",
+    "13:1": "Un semeur sortit pour semer",
+    "13:10": "Pourquoi des paraboles ?",
+    "13:18": "Ce que signifie la parabole du semeur",
+    "13:24": "Un coup de l’ennemi",
+    "13:31": "Petites causes, grands effets",
+    "13:36": "Êtes-vous blé ou mauvaise herbe ?",
+    "13:44": "Vendre tout ce qu’on possède ?",
+    "13:47": "Coup de filet",
+    "13:53": "Nul n’est prophète en son pays",
+    "14:1": "Le prix d’une danse",
+    "14:13": "Cinq pains, deux poissons et cinq mille hommes",
+    "14:22": "Rencontre nocturne sur le lac",
+    "15:1": "Dieu ou la tradition ?",
+    "15:10": "Ce qui rend impur",
+    "15:21": "La foi d’une étrangère",
+    "15:29": "Guérisons près du lac",
+    "15:32": "Tous furent rassasiés",
+    "16:1": "Voir pour croire",
+    "16:5": "Mise en garde",
+    "16:13": "« Je bâtirai mon Église »",
+    "16:21": "Porter sa croix",
+    "17:1": "Lumière de Pâques sur le chemin de la croix",
+    "17:10": "Jean-Baptiste, Élie",
+    "17:14": "Puissance de la foi",
+    "17:24": "Faut-il payer l’impôt ?",
+    "18:1": "Qui est le plus grand ?",
+    "18:6": "Tentations",
+    "18:10": "Une brebis égarée",
+    "18:15": "Si ton frère a péché",
+    "18:21": "Combien de fois faut-il pardonner ?",
+    "19:1": "Peut-on divorcer ?",
+    "19:13": "« Laissez venir à moi les petits enfants »",
+    "19:16": "Un riche peut-il être sauvé ?",
+    "20:1": "Le scandale de la grâce",
+    "20:17": "Le Fils de l’homme sera livré",
+    "20:20": "Dominer ou servir ?",
+    "20:29": "La Lumière des aveugles",
+    "21:1": "Entrée triomphale dans la ville sainte",
+    "21:12": "Remue-ménage au temple",
+    "21:18": "Sans fruit",
+    "21:23": "De quel droit ?",
+    "21:28": "La véritable obéissance",
+    "21:33": "L’homme en révolte contre Dieu",
+    "22:1": "Venez, car tout est prêt !",
+    "22:15": "Dieu et César",
+    "22:23": "Certitude de la résurrection",
+    "22:34": "Le plus grand commandement",
+    "22:41": "Le Messie est-il Fils de David ?",
+    "23:1": "Ce qu’ils disent et ce qu’ils font",
+    "23:13": "Malheur à vous !",
+    "23:37": "Ô Jérusalem !",
+    "24:1": "Signes avant-coureurs de la fin du monde",
+    "24:26": "Le grand avènement",
+    "24:36": "Es-tu prêt ?",
+    "24:45": "Qui sera le serviteur fidèle ?",
+    "25:1": "Tiens ta lampe allumée !",
+    "25:14": "Privilèges et responsabilités",
+    "25:31": "Les assises finales",
+    "26:1": "Complot contre Jésus",
+    "26:6": "Don sans réserve",
+    "26:14": "Trahison",
+    "26:17": "Dernière Pâque",
+    "26:26": "Première cène",
+    "26:30": "Même s’il me fallait mourir avec toi…",
+    "26:36": "Seul",
+    "26:47": "Arrestation",
+    "26:57": "Devant le Grand Conseil",
+    "26:69": "« Je ne connais pas cet homme »",
+    "27:1": "Livré entre les mains des étrangers",
+    "27:3": "Trop tard",
+    "27:11": "Un gouverneur embarrassé",
+    "27:27": "Dieu entre les mains des hommes",
+    "27:32": "Le roi des Juifs",
+    "27:45": "« Mon Dieu, pourquoi m’as-tu abandonné ? »",
+    "27:55": "Tout est fini… ?",
+    "28:1": "Il est vivant",
+    "28:11": "Faux-fuyants",
+    "28:16": "Envoi"
+  },
+  "pericopes": [
+    {
+      "title": "Les ancêtres de Jésus",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 17
+    },
+    {
+      "title": "La perplexité de Joseph",
+      "start_ch": 1,
+      "start_v": 18,
+      "end_ch": 1,
+      "end_v": 25
+    },
+    {
+      "title": "Adoré par des étrangers, persécuté par les siens",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 12
+    },
+    {
+      "title": "Réfugiés",
+      "start_ch": 2,
+      "start_v": 13,
+      "end_ch": 2,
+      "end_v": 15
+    },
+    {
+      "title": "La cruauté d’un tyran",
+      "start_ch": 2,
+      "start_v": 16,
+      "end_ch": 2,
+      "end_v": 18
+    },
+    {
+      "title": "Dans un coin perdu",
+      "start_ch": 2,
+      "start_v": 19,
+      "end_ch": 2,
+      "end_v": 23
+    },
+    {
+      "title": "Le message du précurseur",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 12
+    },
+    {
+      "title": "Obéissant en toutes choses",
+      "start_ch": 3,
+      "start_v": 13,
+      "end_ch": 3,
+      "end_v": 17
+    },
+    {
+      "title": "L’épreuve initiale",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 11
+    },
+    {
+      "title": "Débuts de l’activité publique",
+      "start_ch": 4,
+      "start_v": 12,
+      "end_ch": 4,
+      "end_v": 25
+    },
+    {
+      "title": "Le secret du bonheur",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 16
+    },
+    {
+      "title": "La charte du royaume",
+      "start_ch": 5,
+      "start_v": 17,
+      "end_ch": 5,
+      "end_v": 20
+    },
+    {
+      "title": "Nous sommes tous des assassins",
+      "start_ch": 5,
+      "start_v": 21,
+      "end_ch": 5,
+      "end_v": 26
+    },
+    {
+      "title": "L’essaim des rêves malfaisants",
+      "start_ch": 5,
+      "start_v": 27,
+      "end_ch": 5,
+      "end_v": 32
+    },
+    {
+      "title": "Un homme, une parole",
+      "start_ch": 5,
+      "start_v": 33,
+      "end_ch": 5,
+      "end_v": 37
+    },
+    {
+      "title": "Aimer tout le monde",
+      "start_ch": 5,
+      "start_v": 38,
+      "end_ch": 5,
+      "end_v": 48
+    },
+    {
+      "title": "En secret",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 8
+    },
+    {
+      "title": "Notre Père",
+      "start_ch": 6,
+      "start_v": 9,
+      "end_ch": 6,
+      "end_v": 15
+    },
+    {
+      "title": "Le vrai jeûne",
+      "start_ch": 6,
+      "start_v": 16,
+      "end_ch": 6,
+      "end_v": 18
+    },
+    {
+      "title": "Écueils : la richesse",
+      "start_ch": 6,
+      "start_v": 19,
+      "end_ch": 6,
+      "end_v": 24
+    },
+    {
+      "title": "Les soucis",
+      "start_ch": 6,
+      "start_v": 25,
+      "end_ch": 6,
+      "end_v": 34
+    },
+    {
+      "title": "Ne vous posez pas en juges",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 6
+    },
+    {
+      "title": "Demandez",
+      "start_ch": 7,
+      "start_v": 7,
+      "end_ch": 7,
+      "end_v": 12
+    },
+    {
+      "title": "Images",
+      "start_ch": 7,
+      "start_v": 13,
+      "end_ch": 7,
+      "end_v": 23
+    },
+    {
+      "title": "Sur le roc",
+      "start_ch": 7,
+      "start_v": 24,
+      "end_ch": 7,
+      "end_v": 29
+    },
+    {
+      "title": "Guérisons",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 17
+    },
+    {
+      "title": "Vocations vacillantes",
+      "start_ch": 8,
+      "start_v": 18,
+      "end_ch": 8,
+      "end_v": 22
+    },
+    {
+      "title": "Maître des éléments",
+      "start_ch": 8,
+      "start_v": 23,
+      "end_ch": 8,
+      "end_v": 27
+    },
+    {
+      "title": "Maître des esprits",
+      "start_ch": 8,
+      "start_v": 28,
+      "end_ch": 8,
+      "end_v": 33
+    },
+    {
+      "title": "Pleins pouvoirs",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 8
+    },
+    {
+      "title": "En mauvaise compagnie",
+      "start_ch": 9,
+      "start_v": 9,
+      "end_ch": 9,
+      "end_v": 13
+    },
+    {
+      "title": "L’ancien et le nouveau",
+      "start_ch": 9,
+      "start_v": 14,
+      "end_ch": 9,
+      "end_v": 17
+    },
+    {
+      "title": "Puissance de vie",
+      "start_ch": 9,
+      "start_v": 18,
+      "end_ch": 9,
+      "end_v": 34
+    },
+    {
+      "title": "Ambassadeurs du Roi",
+      "start_ch": 9,
+      "start_v": 35,
+      "end_ch": 9,
+      "end_v": 37
+    },
+    {
+      "title": "Ordre de mission",
+      "start_ch": 10,
+      "start_v": 5,
+      "end_ch": 10,
+      "end_v": 15
+    },
+    {
+      "title": "En mission dangereuse",
+      "start_ch": 10,
+      "start_v": 16,
+      "end_ch": 10,
+      "end_v": 27
+    },
+    {
+      "title": "Courage !",
+      "start_ch": 10,
+      "start_v": 28,
+      "end_ch": 10,
+      "end_v": 42
+    },
+    {
+      "title": "Jésus et Jean-Baptiste",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 15
+    },
+    {
+      "title": "Apathiques, même devant Jésus",
+      "start_ch": 11,
+      "start_v": 16,
+      "end_ch": 11,
+      "end_v": 24
+    },
+    {
+      "title": "Heureux les petits et les affligés",
+      "start_ch": 11,
+      "start_v": 25,
+      "end_ch": 11,
+      "end_v": 30
+    },
+    {
+      "title": "De la liberté des enfants de Dieu",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 8
+    },
+    {
+      "title": "La valeur d’un homme",
+      "start_ch": 12,
+      "start_v": 9,
+      "end_ch": 12,
+      "end_v": 21
+    },
+    {
+      "title": "Pleins pouvoirs sur les forces obscures",
+      "start_ch": 12,
+      "start_v": 22,
+      "end_ch": 12,
+      "end_v": 32
+    },
+    {
+      "title": "L’arbre et ses fruits",
+      "start_ch": 12,
+      "start_v": 33,
+      "end_ch": 12,
+      "end_v": 37
+    },
+    {
+      "title": "Le signe de Jonas",
+      "start_ch": 12,
+      "start_v": 38,
+      "end_ch": 12,
+      "end_v": 42
+    },
+    {
+      "title": "L’horreur du vide",
+      "start_ch": 12,
+      "start_v": 43,
+      "end_ch": 12,
+      "end_v": 45
+    },
+    {
+      "title": "La famille de Jésus",
+      "start_ch": 12,
+      "start_v": 46,
+      "end_ch": 12,
+      "end_v": 50
+    },
+    {
+      "title": "Un semeur sortit pour semer",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 9
+    },
+    {
+      "title": "Pourquoi des paraboles ?",
+      "start_ch": 13,
+      "start_v": 10,
+      "end_ch": 13,
+      "end_v": 17
+    },
+    {
+      "title": "Ce que signifie la parabole du semeur",
+      "start_ch": 13,
+      "start_v": 18,
+      "end_ch": 13,
+      "end_v": 23
+    },
+    {
+      "title": "Un coup de l’ennemi",
+      "start_ch": 13,
+      "start_v": 24,
+      "end_ch": 13,
+      "end_v": 30
+    },
+    {
+      "title": "Petites causes, grands effets",
+      "start_ch": 13,
+      "start_v": 31,
+      "end_ch": 13,
+      "end_v": 35
+    },
+    {
+      "title": "Êtes-vous blé ou mauvaise herbe ?",
+      "start_ch": 13,
+      "start_v": 36,
+      "end_ch": 13,
+      "end_v": 43
+    },
+    {
+      "title": "Vendre tout ce qu’on possède ?",
+      "start_ch": 13,
+      "start_v": 44,
+      "end_ch": 13,
+      "end_v": 46
+    },
+    {
+      "title": "Coup de filet",
+      "start_ch": 13,
+      "start_v": 47,
+      "end_ch": 13,
+      "end_v": 52
+    },
+    {
+      "title": "Nul n’est prophète en son pays",
+      "start_ch": 13,
+      "start_v": 53,
+      "end_ch": 13,
+      "end_v": 58
+    },
+    {
+      "title": "Le prix d’une danse",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 12
+    },
+    {
+      "title": "Cinq pains, deux poissons et cinq mille hommes",
+      "start_ch": 14,
+      "start_v": 13,
+      "end_ch": 14,
+      "end_v": 21
+    },
+    {
+      "title": "Rencontre nocturne sur le lac",
+      "start_ch": 14,
+      "start_v": 22,
+      "end_ch": 14,
+      "end_v": 36
+    },
+    {
+      "title": "Dieu ou la tradition ?",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 9
+    },
+    {
+      "title": "Ce qui rend impur",
+      "start_ch": 15,
+      "start_v": 10,
+      "end_ch": 15,
+      "end_v": 20
+    },
+    {
+      "title": "La foi d’une étrangère",
+      "start_ch": 15,
+      "start_v": 21,
+      "end_ch": 15,
+      "end_v": 28
+    },
+    {
+      "title": "Guérisons près du lac",
+      "start_ch": 15,
+      "start_v": 29,
+      "end_ch": 15,
+      "end_v": 31
+    },
+    {
+      "title": "Tous furent rassasiés",
+      "start_ch": 15,
+      "start_v": 32,
+      "end_ch": 15,
+      "end_v": 39
+    },
+    {
+      "title": "Voir pour croire",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 4
+    },
+    {
+      "title": "Mise en garde",
+      "start_ch": 16,
+      "start_v": 5,
+      "end_ch": 16,
+      "end_v": 12
+    },
+    {
+      "title": "« Je bâtirai mon Église »",
+      "start_ch": 16,
+      "start_v": 13,
+      "end_ch": 16,
+      "end_v": 20
+    },
+    {
+      "title": "Porter sa croix",
+      "start_ch": 16,
+      "start_v": 21,
+      "end_ch": 16,
+      "end_v": 28
+    },
+    {
+      "title": "Lumière de Pâques sur le chemin de la croix",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 9
+    },
+    {
+      "title": "Jean-Baptiste, Élie",
+      "start_ch": 17,
+      "start_v": 10,
+      "end_ch": 17,
+      "end_v": 13
+    },
+    {
+      "title": "Puissance de la foi",
+      "start_ch": 17,
+      "start_v": 14,
+      "end_ch": 17,
+      "end_v": 23
+    },
+    {
+      "title": "Faut-il payer l’impôt ?",
+      "start_ch": 17,
+      "start_v": 24,
+      "end_ch": 17,
+      "end_v": 27
+    },
+    {
+      "title": "Qui est le plus grand ?",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 5
+    },
+    {
+      "title": "Tentations",
+      "start_ch": 18,
+      "start_v": 6,
+      "end_ch": 18,
+      "end_v": 9
+    },
+    {
+      "title": "Une brebis égarée",
+      "start_ch": 18,
+      "start_v": 10,
+      "end_ch": 18,
+      "end_v": 14
+    },
+    {
+      "title": "Si ton frère a péché",
+      "start_ch": 18,
+      "start_v": 15,
+      "end_ch": 18,
+      "end_v": 20
+    },
+    {
+      "title": "Combien de fois faut-il pardonner ?",
+      "start_ch": 18,
+      "start_v": 21,
+      "end_ch": 18,
+      "end_v": 35
+    },
+    {
+      "title": "Peut-on divorcer ?",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 12
+    },
+    {
+      "title": "« Laissez venir à moi les petits enfants »",
+      "start_ch": 19,
+      "start_v": 13,
+      "end_ch": 19,
+      "end_v": 15
+    },
+    {
+      "title": "Un riche peut-il être sauvé ?",
+      "start_ch": 19,
+      "start_v": 16,
+      "end_ch": 19,
+      "end_v": 30
+    },
+    {
+      "title": "Le scandale de la grâce",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 16
+    },
+    {
+      "title": "Le Fils de l’homme sera livré",
+      "start_ch": 20,
+      "start_v": 17,
+      "end_ch": 20,
+      "end_v": 19
+    },
+    {
+      "title": "Dominer ou servir ?",
+      "start_ch": 20,
+      "start_v": 20,
+      "end_ch": 20,
+      "end_v": 28
+    },
+    {
+      "title": "La Lumière des aveugles",
+      "start_ch": 20,
+      "start_v": 29,
+      "end_ch": 20,
+      "end_v": 34
+    },
+    {
+      "title": "Entrée triomphale dans la ville sainte",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 11
+    },
+    {
+      "title": "Remue-ménage au temple",
+      "start_ch": 21,
+      "start_v": 12,
+      "end_ch": 21,
+      "end_v": 17
+    },
+    {
+      "title": "Sans fruit",
+      "start_ch": 21,
+      "start_v": 18,
+      "end_ch": 21,
+      "end_v": 22
+    },
+    {
+      "title": "De quel droit ?",
+      "start_ch": 21,
+      "start_v": 23,
+      "end_ch": 21,
+      "end_v": 27
+    },
+    {
+      "title": "La véritable obéissance",
+      "start_ch": 21,
+      "start_v": 28,
+      "end_ch": 21,
+      "end_v": 32
+    },
+    {
+      "title": "L’homme en révolte contre Dieu",
+      "start_ch": 21,
+      "start_v": 33,
+      "end_ch": 21,
+      "end_v": 46
+    },
+    {
+      "title": "Venez, car tout est prêt !",
+      "start_ch": 22,
+      "start_v": 1,
+      "end_ch": 22,
+      "end_v": 14
+    },
+    {
+      "title": "Dieu et César",
+      "start_ch": 22,
+      "start_v": 15,
+      "end_ch": 22,
+      "end_v": 22
+    },
+    {
+      "title": "Certitude de la résurrection",
+      "start_ch": 22,
+      "start_v": 23,
+      "end_ch": 22,
+      "end_v": 33
+    },
+    {
+      "title": "Le plus grand commandement",
+      "start_ch": 22,
+      "start_v": 34,
+      "end_ch": 22,
+      "end_v": 40
+    },
+    {
+      "title": "Le Messie est-il Fils de David ?",
+      "start_ch": 22,
+      "start_v": 41,
+      "end_ch": 22,
+      "end_v": 46
+    },
+    {
+      "title": "Ce qu’ils disent et ce qu’ils font",
+      "start_ch": 23,
+      "start_v": 1,
+      "end_ch": 23,
+      "end_v": 12
+    },
+    {
+      "title": "Malheur à vous !",
+      "start_ch": 23,
+      "start_v": 13,
+      "end_ch": 23,
+      "end_v": 36
+    },
+    {
+      "title": "Ô Jérusalem !",
+      "start_ch": 23,
+      "start_v": 37,
+      "end_ch": 23,
+      "end_v": 39
+    },
+    {
+      "title": "Signes avant-coureurs de la fin du monde",
+      "start_ch": 24,
+      "start_v": 1,
+      "end_ch": 24,
+      "end_v": 25
+    },
+    {
+      "title": "Le grand avènement",
+      "start_ch": 24,
+      "start_v": 26,
+      "end_ch": 24,
+      "end_v": 35
+    },
+    {
+      "title": "Es-tu prêt ?",
+      "start_ch": 24,
+      "start_v": 36,
+      "end_ch": 24,
+      "end_v": 44
+    },
+    {
+      "title": "Qui sera le serviteur fidèle ?",
+      "start_ch": 24,
+      "start_v": 45,
+      "end_ch": 24,
+      "end_v": 51
+    },
+    {
+      "title": "Tiens ta lampe allumée !",
+      "start_ch": 25,
+      "start_v": 1,
+      "end_ch": 25,
+      "end_v": 13
+    },
+    {
+      "title": "Privilèges et responsabilités",
+      "start_ch": 25,
+      "start_v": 14,
+      "end_ch": 25,
+      "end_v": 30
+    },
+    {
+      "title": "Les assises finales",
+      "start_ch": 25,
+      "start_v": 31,
+      "end_ch": 25,
+      "end_v": 46
+    },
+    {
+      "title": "Complot contre Jésus",
+      "start_ch": 26,
+      "start_v": 1,
+      "end_ch": 26,
+      "end_v": 5
+    },
+    {
+      "title": "Don sans réserve",
+      "start_ch": 26,
+      "start_v": 6,
+      "end_ch": 26,
+      "end_v": 13
+    },
+    {
+      "title": "Trahison",
+      "start_ch": 26,
+      "start_v": 14,
+      "end_ch": 26,
+      "end_v": 16
+    },
+    {
+      "title": "Dernière Pâque",
+      "start_ch": 26,
+      "start_v": 17,
+      "end_ch": 26,
+      "end_v": 25
+    },
+    {
+      "title": "Première cène",
+      "start_ch": 26,
+      "start_v": 26,
+      "end_ch": 26,
+      "end_v": 29
+    },
+    {
+      "title": "Même s’il me fallait mourir avec toi…",
+      "start_ch": 26,
+      "start_v": 30,
+      "end_ch": 26,
+      "end_v": 35
+    },
+    {
+      "title": "Seul",
+      "start_ch": 26,
+      "start_v": 36,
+      "end_ch": 26,
+      "end_v": 46
+    },
+    {
+      "title": "Arrestation",
+      "start_ch": 26,
+      "start_v": 47,
+      "end_ch": 26,
+      "end_v": 56
+    },
+    {
+      "title": "Devant le Grand Conseil",
+      "start_ch": 26,
+      "start_v": 57,
+      "end_ch": 26,
+      "end_v": 68
+    },
+    {
+      "title": "« Je ne connais pas cet homme »",
+      "start_ch": 26,
+      "start_v": 69,
+      "end_ch": 26,
+      "end_v": 75
+    },
+    {
+      "title": "Livré entre les mains des étrangers",
+      "start_ch": 27,
+      "start_v": 1,
+      "end_ch": 27,
+      "end_v": 2
+    },
+    {
+      "title": "Trop tard",
+      "start_ch": 27,
+      "start_v": 3,
+      "end_ch": 27,
+      "end_v": 10
+    },
+    {
+      "title": "Un gouverneur embarrassé",
+      "start_ch": 27,
+      "start_v": 11,
+      "end_ch": 27,
+      "end_v": 26
+    },
+    {
+      "title": "Dieu entre les mains des hommes",
+      "start_ch": 27,
+      "start_v": 27,
+      "end_ch": 27,
+      "end_v": 31
+    },
+    {
+      "title": "Le roi des Juifs",
+      "start_ch": 27,
+      "start_v": 32,
+      "end_ch": 27,
+      "end_v": 44
+    },
+    {
+      "title": "« Mon Dieu, pourquoi m’as-tu abandonné ? »",
+      "start_ch": 27,
+      "start_v": 45,
+      "end_ch": 27,
+      "end_v": 54
+    },
+    {
+      "title": "Tout est fini… ?",
+      "start_ch": 27,
+      "start_v": 55,
+      "end_ch": 27,
+      "end_v": 66
+    },
+    {
+      "title": "Il est vivant",
+      "start_ch": 28,
+      "start_v": 1,
+      "end_ch": 28,
+      "end_v": 10
+    },
+    {
+      "title": "Faux-fuyants",
+      "start_ch": 28,
+      "start_v": 11,
+      "end_ch": 28,
+      "end_v": 15
+    },
+    {
+      "title": "Envoi",
+      "start_ch": 28,
+      "start_v": 16,
+      "end_ch": 28,
+      "end_v": 20
+    }
+  ]
 }

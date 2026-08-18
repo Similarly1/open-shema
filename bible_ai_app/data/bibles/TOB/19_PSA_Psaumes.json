@@ -2833,5 +2833,49 @@
       "5": "louez-le avec des cymbales sonores; louez-le avec les cymbales de l’ovation.",
       "6": "Que tout ce qui respire loue le SEIGNEUR! Alléluia!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "PREMIER LIVRE",
+    "42:1": "DEUXIÈME LIVRE",
+    "73:1": "TROISIÈME LIVRE",
+    "90:1": "QUATRIÈME LIVRE",
+    "107:1": "CINQUIÈME LIVRE"
+  },
+  "pericopes": [
+    {
+      "title": "PREMIER LIVRE",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 6
+    },
+    {
+      "title": "DEUXIÈME LIVRE",
+      "start_ch": 42,
+      "start_v": 1,
+      "end_ch": 42,
+      "end_v": 12
+    },
+    {
+      "title": "TROISIÈME LIVRE",
+      "start_ch": 73,
+      "start_v": 1,
+      "end_ch": 73,
+      "end_v": 28
+    },
+    {
+      "title": "QUATRIÈME LIVRE",
+      "start_ch": 90,
+      "start_v": 1,
+      "end_ch": 90,
+      "end_v": 17
+    },
+    {
+      "title": "CINQUIÈME LIVRE",
+      "start_ch": 107,
+      "start_v": 1,
+      "end_ch": 107,
+      "end_v": 43
+    }
+  ]
 }

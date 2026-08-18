@@ -64,5 +64,105 @@
       "4": "Le soleil deviendra obscur et la lune rouge comme du sang, avant que vienne le jour du Seigneur, ce jour grand et redoutable.»",
       "5": "Alors toute personne qui fera appel au Seigneur sera sauvée. Sur la montagne de Sion, à Jérusalem, certains échapperont au désastre, comme le Seigneur l'a promis. Ce seront des survivants que le Seigneur appelle."
     }
-  }
+  },
+  "sections": {
+    "1:2": "Les insectes et la sécheresse arrivent",
+    "1:13": "Le prophète appelle à jeûner et à supplier le Seigneur",
+    "1:15": "Le jour du Seigneur",
+    "1:19": "Prière du prophète",
+    "2:1": "Le jour du Seigneur est proche",
+    "2:12": "C'est le moment de revenir au Seigneur&#8239;!",
+    "2:15": "C'est le moment de jeûner et de supplier Dieu",
+    "2:18": "Le Seigneur répond à son peuple",
+    "3:1": "Le Seigneur répandra son Esprit sur tous",
+    "4:1": "Le procès de Dieu contre les autres peuples",
+    "4:9": "Le combat final et le jugement",
+    "4:18": "Une nouvelle prospérité pour le peuple de Dieu"
+  },
+  "pericopes": [
+    {
+      "title": "Les insectes et la sécheresse arrivent",
+      "start_ch": 1,
+      "start_v": 2,
+      "end_ch": 1,
+      "end_v": 12
+    },
+    {
+      "title": "Le prophète appelle à jeûner et à supplier le Seigneur",
+      "start_ch": 1,
+      "start_v": 13,
+      "end_ch": 1,
+      "end_v": 14
+    },
+    {
+      "title": "Le jour du Seigneur",
+      "start_ch": 1,
+      "start_v": 15,
+      "end_ch": 1,
+      "end_v": 18
+    },
+    {
+      "title": "Prière du prophète",
+      "start_ch": 1,
+      "start_v": 19,
+      "end_ch": 1,
+      "end_v": 20
+    },
+    {
+      "title": "Le jour du Seigneur est proche",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 11
+    },
+    {
+      "title": "C'est le moment de revenir au Seigneur&#8239;!",
+      "start_ch": 2,
+      "start_v": 12,
+      "end_ch": 2,
+      "end_v": 14
+    },
+    {
+      "title": "C'est le moment de jeûner et de supplier Dieu",
+      "start_ch": 2,
+      "start_v": 15,
+      "end_ch": 2,
+      "end_v": 17
+    },
+    {
+      "title": "Le Seigneur répond à son peuple",
+      "start_ch": 2,
+      "start_v": 18,
+      "end_ch": 2,
+      "end_v": 27
+    },
+    {
+      "title": "Le Seigneur répandra son Esprit sur tous",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 5
+    },
+    {
+      "title": "Le procès de Dieu contre les autres peuples",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 8
+    },
+    {
+      "title": "Le combat final et le jugement",
+      "start_ch": 4,
+      "start_v": 9,
+      "end_ch": 4,
+      "end_v": 17
+    },
+    {
+      "title": "Une nouvelle prospérité pour le peuple de Dieu",
+      "start_ch": 4,
+      "start_v": 18,
+      "end_ch": 4,
+      "end_v": 18
+    }
+  ]
 }

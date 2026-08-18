@@ -121,5 +121,113 @@
       "13": "Recevez les salutations de l’Église de Babylone choisie, comme vous, par Dieu. Marc, mon fils, vous salue.",
       "14": "Donnez-vous, les uns aux autres, le baiser fraternel en signe de votre amour mutuel. Paix à vous tous qui vivez dans la communion du Christ!"
     }
-  }
+  },
+  "sections": {
+    "1:3": "Une espérance vivante",
+    "1:13": "Noblesse oblige",
+    "1:18": "Le prix de notre liberté",
+    "2:1": "Pierres vivantes",
+    "2:11": "De passage",
+    "2:18": "Notre modèle",
+    "3:1": "Maris et femmes",
+    "3:8": "Le secret du bonheur",
+    "3:17": "Souffrir pour la justice",
+    "4:1": "Vivre selon la volonté de Dieu",
+    "4:12": "Dans le feu de l’épreuve",
+    "5:1": "Les responsables du troupeau de Dieu",
+    "5:7": "Insouciante vigilance"
+  },
+  "pericopes": [
+    {
+      "title": "Une espérance vivante",
+      "start_ch": 1,
+      "start_v": 3,
+      "end_ch": 1,
+      "end_v": 12
+    },
+    {
+      "title": "Noblesse oblige",
+      "start_ch": 1,
+      "start_v": 13,
+      "end_ch": 1,
+      "end_v": 17
+    },
+    {
+      "title": "Le prix de notre liberté",
+      "start_ch": 1,
+      "start_v": 18,
+      "end_ch": 1,
+      "end_v": 25
+    },
+    {
+      "title": "Pierres vivantes",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 10
+    },
+    {
+      "title": "De passage",
+      "start_ch": 2,
+      "start_v": 11,
+      "end_ch": 2,
+      "end_v": 17
+    },
+    {
+      "title": "Notre modèle",
+      "start_ch": 2,
+      "start_v": 18,
+      "end_ch": 2,
+      "end_v": 25
+    },
+    {
+      "title": "Maris et femmes",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 7
+    },
+    {
+      "title": "Le secret du bonheur",
+      "start_ch": 3,
+      "start_v": 8,
+      "end_ch": 3,
+      "end_v": 16
+    },
+    {
+      "title": "Souffrir pour la justice",
+      "start_ch": 3,
+      "start_v": 17,
+      "end_ch": 3,
+      "end_v": 22
+    },
+    {
+      "title": "Vivre selon la volonté de Dieu",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 11
+    },
+    {
+      "title": "Dans le feu de l’épreuve",
+      "start_ch": 4,
+      "start_v": 12,
+      "end_ch": 4,
+      "end_v": 19
+    },
+    {
+      "title": "Les responsables du troupeau de Dieu",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 6
+    },
+    {
+      "title": "Insouciante vigilance",
+      "start_ch": 5,
+      "start_v": 7,
+      "end_ch": 5,
+      "end_v": 14
+    }
+  ]
 }

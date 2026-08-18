@@ -739,5 +739,521 @@
       "24": "Mais le roi lui dit: «Tu ne me donneras rien! Je veux acheter cela, te le payer. Je ne vais quand même pas offrir au Seigneur mon Dieu des sacrifices qui ne me coûtent rien!» David lui paya cinquante pièces d'argent pour l'aire et pour les bœufs.",
       "25": "Il construisit à cet endroit un autel et il offrit au Seigneur des sacrifices complets et des sacrifices de paix. Alors le Seigneur se montra propice au pays et le fléau qui s'était abattu sur Israël prit fin."
     }
-  }
+  },
+  "sections": {
+    "1:1": "David apprend la mort de Saül et de Jonatan",
+    "1:17": "Complainte de David sur Saül et Jonatan",
+    "2:1": "À Hébron, David est choisi comme roi de Juda",
+    "2:8": "Ichebocheth est désigné roi d'Israël",
+    "2:12": "Bataille entre Juda et Israël à Gabaon",
+    "3:2": "Les fils de David nés à Hébron",
+    "3:6": "Abner se brouille avec Ichebocheth",
+    "3:12": "Abner se rallie à David",
+    "3:22": "Joab, chef de l'armée de David, assassine Abner",
+    "4:1": "Baana et Rékab assassinent Ichebocheth",
+    "5:1": "David est choisi comme roi d'Israël",
+    "5:6": "David s'empare de Jérusalem",
+    "5:13": "Les fils de David nés à Jérusalem",
+    "5:17": "Victoires de David sur les Philistins",
+    "6:1": "David décide d'apporter à Jérusalem le coffre du Seigneur",
+    "6:12": "Le coffre de l'alliance arrive à Jérusalem",
+    "7:1": "Une promesse de Dieu pour David et ses descendants",
+    "7:18": "Prière de David",
+    "8:1": "Victoires de David sur des pays voisins",
+    "8:15": "Liste des fonctionnaires de David",
+    "9:1": "David accueille chez lui Mefibochète, fils de Jonatan",
+    "10:1": "Les ministres de David sont déshonorés",
+    "10:6": "David combat les Ammonites et les Syriens",
+    "11:1": "David prend Batchéba, la femme d'Urie",
+    "11:16": "David fait tuer Urie, le mari de Batchéba",
+    "12:1": "Natan annonce à David la punition de Dieu",
+    "12:16": "L'enfant de Batchéba et de David meurt",
+    "12:24": "Naissance de Salomon",
+    "12:26": "David s'empare de la ville de Rabba",
+    "13:1": "Amnon, fils de David, fait violence à sa demi-sœur Tamar",
+    "13:23": "Absalom fait tuer Amnon et s'enfuit",
+    "14:1": "Le retour d'Absalom à Jérusalem",
+    "14:25": "David se réconcilie avec son fils Absalom",
+    "15:1": "Absalom tente de prendre le pouvoir",
+    "15:13": "David s'enfuit de Jérusalem",
+    "15:30": "David envoie Houchaï espionner Absalom",
+    "16:1": "David rencontre Siba",
+    "16:5": "Chiméi maudit David",
+    "16:15": "Houchaï rejoint Absalom",
+    "16:20": "Absalom et les épouses de David",
+    "17:1": "Houchaï contredit un conseil d'Ahitofel",
+    "17:15": "David passe le Jourdain pour échapper à Absalom",
+    "17:24": "David arrive à Mahanaïm",
+    "18:1": "La défaite des troupes d'Absalom",
+    "18:9": "Joab tue Absalom",
+    "18:19": "David apprend la mort de son fils Absalom",
+    "19:1": "La douleur de David",
+    "19:10": "David prépare son retour à Jérusalem",
+    "19:17": "David épargne Chiméi",
+    "19:25": "David se réconcilie avec Mefibochète",
+    "19:32": "David récompense Barzillaï",
+    "19:42": "Querelle entre les membres de la tribu de Juda et les Israélites",
+    "20:1": "Chéba se révolte contre David",
+    "20:4": "Joab assassine Amassa",
+    "20:11": "Joab fait tuer Chéba",
+    "20:23": "Liste des fonctionnaires de David",
+    "21:1": "Les Gabaonites et les descendants de Saül",
+    "21:15": "Combats contre les Philistins",
+    "22:1": "David remercie Dieu après une victoire",
+    "23:1": "Les dernières déclarations de David",
+    "23:8": "Les guerriers de David",
+    "24:1": "David fait recenser le peuple d'Israël",
+    "24:10": "Dieu punit la faute de David",
+    "24:18": "David construit un autel pour le Seigneur"
+  },
+  "pericopes": [
+    {
+      "title": "David apprend la mort de Saül et de Jonatan",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 16
+    },
+    {
+      "title": "Complainte de David sur Saül et Jonatan",
+      "start_ch": 1,
+      "start_v": 17,
+      "end_ch": 1,
+      "end_v": 27
+    },
+    {
+      "title": "À Hébron, David est choisi comme roi de Juda",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 7
+    },
+    {
+      "title": "Ichebocheth est désigné roi d'Israël",
+      "start_ch": 2,
+      "start_v": 8,
+      "end_ch": 2,
+      "end_v": 11
+    },
+    {
+      "title": "Bataille entre Juda et Israël à Gabaon",
+      "start_ch": 2,
+      "start_v": 12,
+      "end_ch": 2,
+      "end_v": 32
+    },
+    {
+      "title": "Les fils de David nés à Hébron",
+      "start_ch": 3,
+      "start_v": 2,
+      "end_ch": 3,
+      "end_v": 5
+    },
+    {
+      "title": "Abner se brouille avec Ichebocheth",
+      "start_ch": 3,
+      "start_v": 6,
+      "end_ch": 3,
+      "end_v": 11
+    },
+    {
+      "title": "Abner se rallie à David",
+      "start_ch": 3,
+      "start_v": 12,
+      "end_ch": 3,
+      "end_v": 21
+    },
+    {
+      "title": "Joab, chef de l'armée de David, assassine Abner",
+      "start_ch": 3,
+      "start_v": 22,
+      "end_ch": 3,
+      "end_v": 39
+    },
+    {
+      "title": "Baana et Rékab assassinent Ichebocheth",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 12
+    },
+    {
+      "title": "David est choisi comme roi d'Israël",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 5
+    },
+    {
+      "title": "David s'empare de Jérusalem",
+      "start_ch": 5,
+      "start_v": 6,
+      "end_ch": 5,
+      "end_v": 12
+    },
+    {
+      "title": "Les fils de David nés à Jérusalem",
+      "start_ch": 5,
+      "start_v": 13,
+      "end_ch": 5,
+      "end_v": 16
+    },
+    {
+      "title": "Victoires de David sur les Philistins",
+      "start_ch": 5,
+      "start_v": 17,
+      "end_ch": 5,
+      "end_v": 25
+    },
+    {
+      "title": "David décide d'apporter à Jérusalem le coffre du Seigneur",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 11
+    },
+    {
+      "title": "Le coffre de l'alliance arrive à Jérusalem",
+      "start_ch": 6,
+      "start_v": 12,
+      "end_ch": 6,
+      "end_v": 23
+    },
+    {
+      "title": "Une promesse de Dieu pour David et ses descendants",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 17
+    },
+    {
+      "title": "Prière de David",
+      "start_ch": 7,
+      "start_v": 18,
+      "end_ch": 7,
+      "end_v": 29
+    },
+    {
+      "title": "Victoires de David sur des pays voisins",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 14
+    },
+    {
+      "title": "Liste des fonctionnaires de David",
+      "start_ch": 8,
+      "start_v": 15,
+      "end_ch": 8,
+      "end_v": 18
+    },
+    {
+      "title": "David accueille chez lui Mefibochète, fils de Jonatan",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 13
+    },
+    {
+      "title": "Les ministres de David sont déshonorés",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 5
+    },
+    {
+      "title": "David combat les Ammonites et les Syriens",
+      "start_ch": 10,
+      "start_v": 6,
+      "end_ch": 10,
+      "end_v": 19
+    },
+    {
+      "title": "David prend Batchéba, la femme d'Urie",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 15
+    },
+    {
+      "title": "David fait tuer Urie, le mari de Batchéba",
+      "start_ch": 11,
+      "start_v": 16,
+      "end_ch": 11,
+      "end_v": 27
+    },
+    {
+      "title": "Natan annonce à David la punition de Dieu",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 15
+    },
+    {
+      "title": "L'enfant de Batchéba et de David meurt",
+      "start_ch": 12,
+      "start_v": 16,
+      "end_ch": 12,
+      "end_v": 23
+    },
+    {
+      "title": "Naissance de Salomon",
+      "start_ch": 12,
+      "start_v": 24,
+      "end_ch": 12,
+      "end_v": 25
+    },
+    {
+      "title": "David s'empare de la ville de Rabba",
+      "start_ch": 12,
+      "start_v": 26,
+      "end_ch": 12,
+      "end_v": 31
+    },
+    {
+      "title": "Amnon, fils de David, fait violence à sa demi-sœur Tamar",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 22
+    },
+    {
+      "title": "Absalom fait tuer Amnon et s'enfuit",
+      "start_ch": 13,
+      "start_v": 23,
+      "end_ch": 13,
+      "end_v": 39
+    },
+    {
+      "title": "Le retour d'Absalom à Jérusalem",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 24
+    },
+    {
+      "title": "David se réconcilie avec son fils Absalom",
+      "start_ch": 14,
+      "start_v": 25,
+      "end_ch": 14,
+      "end_v": 33
+    },
+    {
+      "title": "Absalom tente de prendre le pouvoir",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 12
+    },
+    {
+      "title": "David s'enfuit de Jérusalem",
+      "start_ch": 15,
+      "start_v": 13,
+      "end_ch": 15,
+      "end_v": 29
+    },
+    {
+      "title": "David envoie Houchaï espionner Absalom",
+      "start_ch": 15,
+      "start_v": 30,
+      "end_ch": 15,
+      "end_v": 37
+    },
+    {
+      "title": "David rencontre Siba",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 4
+    },
+    {
+      "title": "Chiméi maudit David",
+      "start_ch": 16,
+      "start_v": 5,
+      "end_ch": 16,
+      "end_v": 14
+    },
+    {
+      "title": "Houchaï rejoint Absalom",
+      "start_ch": 16,
+      "start_v": 15,
+      "end_ch": 16,
+      "end_v": 19
+    },
+    {
+      "title": "Absalom et les épouses de David",
+      "start_ch": 16,
+      "start_v": 20,
+      "end_ch": 16,
+      "end_v": 23
+    },
+    {
+      "title": "Houchaï contredit un conseil d'Ahitofel",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 14
+    },
+    {
+      "title": "David passe le Jourdain pour échapper à Absalom",
+      "start_ch": 17,
+      "start_v": 15,
+      "end_ch": 17,
+      "end_v": 23
+    },
+    {
+      "title": "David arrive à Mahanaïm",
+      "start_ch": 17,
+      "start_v": 24,
+      "end_ch": 17,
+      "end_v": 27
+    },
+    {
+      "title": "La défaite des troupes d'Absalom",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 8
+    },
+    {
+      "title": "Joab tue Absalom",
+      "start_ch": 18,
+      "start_v": 9,
+      "end_ch": 18,
+      "end_v": 18
+    },
+    {
+      "title": "David apprend la mort de son fils Absalom",
+      "start_ch": 18,
+      "start_v": 19,
+      "end_ch": 18,
+      "end_v": 32
+    },
+    {
+      "title": "La douleur de David",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 9
+    },
+    {
+      "title": "David prépare son retour à Jérusalem",
+      "start_ch": 19,
+      "start_v": 10,
+      "end_ch": 19,
+      "end_v": 16
+    },
+    {
+      "title": "David épargne Chiméi",
+      "start_ch": 19,
+      "start_v": 17,
+      "end_ch": 19,
+      "end_v": 24
+    },
+    {
+      "title": "David se réconcilie avec Mefibochète",
+      "start_ch": 19,
+      "start_v": 25,
+      "end_ch": 19,
+      "end_v": 31
+    },
+    {
+      "title": "David récompense Barzillaï",
+      "start_ch": 19,
+      "start_v": 32,
+      "end_ch": 19,
+      "end_v": 41
+    },
+    {
+      "title": "Querelle entre les membres de la tribu de Juda et les Israélites",
+      "start_ch": 19,
+      "start_v": 42,
+      "end_ch": 19,
+      "end_v": 44
+    },
+    {
+      "title": "Chéba se révolte contre David",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 3
+    },
+    {
+      "title": "Joab assassine Amassa",
+      "start_ch": 20,
+      "start_v": 4,
+      "end_ch": 20,
+      "end_v": 10
+    },
+    {
+      "title": "Joab fait tuer Chéba",
+      "start_ch": 20,
+      "start_v": 11,
+      "end_ch": 20,
+      "end_v": 22
+    },
+    {
+      "title": "Liste des fonctionnaires de David",
+      "start_ch": 20,
+      "start_v": 23,
+      "end_ch": 20,
+      "end_v": 26
+    },
+    {
+      "title": "Les Gabaonites et les descendants de Saül",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 14
+    },
+    {
+      "title": "Combats contre les Philistins",
+      "start_ch": 21,
+      "start_v": 15,
+      "end_ch": 21,
+      "end_v": 22
+    },
+    {
+      "title": "David remercie Dieu après une victoire",
+      "start_ch": 22,
+      "start_v": 1,
+      "end_ch": 22,
+      "end_v": 51
+    },
+    {
+      "title": "Les dernières déclarations de David",
+      "start_ch": 23,
+      "start_v": 1,
+      "end_ch": 23,
+      "end_v": 7
+    },
+    {
+      "title": "Les guerriers de David",
+      "start_ch": 23,
+      "start_v": 8,
+      "end_ch": 23,
+      "end_v": 39
+    },
+    {
+      "title": "David fait recenser le peuple d'Israël",
+      "start_ch": 24,
+      "start_v": 1,
+      "end_ch": 24,
+      "end_v": 9
+    },
+    {
+      "title": "Dieu punit la faute de David",
+      "start_ch": 24,
+      "start_v": 10,
+      "end_ch": 24,
+      "end_v": 17
+    },
+    {
+      "title": "David construit un autel pour le Seigneur",
+      "start_ch": 24,
+      "start_v": 18,
+      "end_ch": 24,
+      "end_v": 25
+    }
+  ]
 }

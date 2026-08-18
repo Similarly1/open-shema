@@ -121,5 +121,113 @@
       "20": "Nous savons que le Fils de Dieu est venu et qu'il nous a donné l'intelligence nous permettant de reconnaître le Dieu véritable. Nous sommes unis au Dieu véritable grâce à son Fils Jésus Christ. C'est lui le Dieu véritable, c'est lui la vie éternelle.",
       "21": "Mes enfants, gardez-vous des faux dieux!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "La parole qui donne la vie",
+    "1:5": "Dieu est lumière",
+    "2:1": "Le Christ vient à notre aide",
+    "2:3": "Dieu nous commande de nous aimer",
+    "2:18": "L'adversaire du Christ",
+    "2:29": "Les enfants de Dieu cessent de pécher",
+    "3:11": "S'aimer les uns les autres",
+    "3:19": "Nous avons de l'assurance devant Dieu",
+    "4:1": "L'Esprit de Dieu et l'esprit de l'adversaire",
+    "4:7": "Dieu est amour",
+    "5:1": "La foi donne la victoire sur le monde",
+    "5:6": "Le témoignage rendu au sujet de Jésus Christ",
+    "5:13": "Nous avons la vie éternelle"
+  },
+  "pericopes": [
+    {
+      "title": "La parole qui donne la vie",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 4
+    },
+    {
+      "title": "Dieu est lumière",
+      "start_ch": 1,
+      "start_v": 5,
+      "end_ch": 1,
+      "end_v": 10
+    },
+    {
+      "title": "Le Christ vient à notre aide",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 2
+    },
+    {
+      "title": "Dieu nous commande de nous aimer",
+      "start_ch": 2,
+      "start_v": 3,
+      "end_ch": 2,
+      "end_v": 17
+    },
+    {
+      "title": "L'adversaire du Christ",
+      "start_ch": 2,
+      "start_v": 18,
+      "end_ch": 2,
+      "end_v": 28
+    },
+    {
+      "title": "Les enfants de Dieu cessent de pécher",
+      "start_ch": 2,
+      "start_v": 29,
+      "end_ch": 2,
+      "end_v": 29
+    },
+    {
+      "title": "S'aimer les uns les autres",
+      "start_ch": 3,
+      "start_v": 11,
+      "end_ch": 3,
+      "end_v": 18
+    },
+    {
+      "title": "Nous avons de l'assurance devant Dieu",
+      "start_ch": 3,
+      "start_v": 19,
+      "end_ch": 3,
+      "end_v": 24
+    },
+    {
+      "title": "L'Esprit de Dieu et l'esprit de l'adversaire",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 6
+    },
+    {
+      "title": "Dieu est amour",
+      "start_ch": 4,
+      "start_v": 7,
+      "end_ch": 4,
+      "end_v": 21
+    },
+    {
+      "title": "La foi donne la victoire sur le monde",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 5
+    },
+    {
+      "title": "Le témoignage rendu au sujet de Jésus Christ",
+      "start_ch": 5,
+      "start_v": 6,
+      "end_ch": 5,
+      "end_v": 12
+    },
+    {
+      "title": "Nous avons la vie éternelle",
+      "start_ch": 5,
+      "start_v": 13,
+      "end_ch": 5,
+      "end_v": 21
+    }
+  ]
 }

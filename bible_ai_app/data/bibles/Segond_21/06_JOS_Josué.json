@@ -712,5 +712,257 @@
       "32": "Les Israélites avaient rapporté d'Egypte les ossements de Joseph. Ils furent enterrés à Sichem, dans la partie de terrain que Jacob avait achetée aux fils de Hamor, le père de Sichem, pour 100 pièces d'argent et qui faisait partie de l'héritage des descendants de Joseph.",
       "33": "Eléazar, le fils d'Aaron, mourut et on l'enterra à Guibeath-Phinées. Cette colline avait été donnée à son fils Phinées et se trouvait dans la région montagneuse d'Ephraïm."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Josué à la tête d'Israël",
+    "2:1": "Exploration à Jéricho",
+    "3:1": "Passage du Jourdain à pied sec",
+    "4:1": "Deux monuments de pierres",
+    "5:2": "Circoncision et célébration de la Pâque",
+    "5:13": "Prise de Jéricho",
+    "7:1": "Faute et punition d'Acan",
+    "8:1": "Prise d'Aï",
+    "8:30": "Lecture des bénédictions et des malédictions",
+    "9:1": "Ruse des Gabaonites",
+    "10:1": "Conquêtes dans le centre et au sud",
+    "11:1": "Conquêtes dans le nord",
+    "12:1": "Liste des rois vaincus",
+    "13:1": "Territoire encore à conquérir",
+    "13:8": "Partage du pays à l'est du Jourdain",
+    "14:1": "Partage du pays à l'ouest du Jourdain",
+    "14:6": "Territoire accordé à Caleb",
+    "15:1": "Territoire accordé à Juda",
+    "16:1": "Territoire accordé à Ephraïm",
+    "17:1": "Territoire accordé à la demi-tribu de Manassé",
+    "18:1": "Plan de partage des territoires non attribués",
+    "18:11": "Territoire accordé à Benjamin",
+    "19:1": "Territoires accordés aux six dernières tribus",
+    "19:49": "Territoire accordé à Josué",
+    "20:1": "Désignation de 6 villes de refuge",
+    "21:1": "Désignation des 48 villes des Lévites",
+    "21:43": "Les promesses divines accomplies",
+    "22:1": "Retour de Ruben, Gad et Manassé chez eux",
+    "23:1": "Encouragements de Josué aux chefs d'Israël",
+    "24:1": "Discours de Josué au peuple d'Israël",
+    "24:29": "Mort de Josué"
+  },
+  "pericopes": [
+    {
+      "title": "Josué à la tête d'Israël",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 18
+    },
+    {
+      "title": "Exploration à Jéricho",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 24
+    },
+    {
+      "title": "Passage du Jourdain à pied sec",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 17
+    },
+    {
+      "title": "Deux monuments de pierres",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 24
+    },
+    {
+      "title": "Circoncision et célébration de la Pâque",
+      "start_ch": 5,
+      "start_v": 2,
+      "end_ch": 5,
+      "end_v": 12
+    },
+    {
+      "title": "Prise de Jéricho",
+      "start_ch": 5,
+      "start_v": 13,
+      "end_ch": 5,
+      "end_v": 15
+    },
+    {
+      "title": "Faute et punition d'Acan",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 26
+    },
+    {
+      "title": "Prise d'Aï",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 29
+    },
+    {
+      "title": "Lecture des bénédictions et des malédictions",
+      "start_ch": 8,
+      "start_v": 30,
+      "end_ch": 8,
+      "end_v": 35
+    },
+    {
+      "title": "Ruse des Gabaonites",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 27
+    },
+    {
+      "title": "Conquêtes dans le centre et au sud",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 43
+    },
+    {
+      "title": "Conquêtes dans le nord",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 23
+    },
+    {
+      "title": "Liste des rois vaincus",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 24
+    },
+    {
+      "title": "Territoire encore à conquérir",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 7
+    },
+    {
+      "title": "Partage du pays à l'est du Jourdain",
+      "start_ch": 13,
+      "start_v": 8,
+      "end_ch": 13,
+      "end_v": 33
+    },
+    {
+      "title": "Partage du pays à l'ouest du Jourdain",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 5
+    },
+    {
+      "title": "Territoire accordé à Caleb",
+      "start_ch": 14,
+      "start_v": 6,
+      "end_ch": 14,
+      "end_v": 15
+    },
+    {
+      "title": "Territoire accordé à Juda",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 63
+    },
+    {
+      "title": "Territoire accordé à Ephraïm",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 10
+    },
+    {
+      "title": "Territoire accordé à la demi-tribu de Manassé",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 18
+    },
+    {
+      "title": "Plan de partage des territoires non attribués",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 10
+    },
+    {
+      "title": "Territoire accordé à Benjamin",
+      "start_ch": 18,
+      "start_v": 11,
+      "end_ch": 18,
+      "end_v": 28
+    },
+    {
+      "title": "Territoires accordés aux six dernières tribus",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 48
+    },
+    {
+      "title": "Territoire accordé à Josué",
+      "start_ch": 19,
+      "start_v": 49,
+      "end_ch": 19,
+      "end_v": 51
+    },
+    {
+      "title": "Désignation de 6 villes de refuge",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 9
+    },
+    {
+      "title": "Désignation des 48 villes des Lévites",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 42
+    },
+    {
+      "title": "Les promesses divines accomplies",
+      "start_ch": 21,
+      "start_v": 43,
+      "end_ch": 21,
+      "end_v": 45
+    },
+    {
+      "title": "Retour de Ruben, Gad et Manassé chez eux",
+      "start_ch": 22,
+      "start_v": 1,
+      "end_ch": 22,
+      "end_v": 34
+    },
+    {
+      "title": "Encouragements de Josué aux chefs d'Israël",
+      "start_ch": 23,
+      "start_v": 1,
+      "end_ch": 23,
+      "end_v": 16
+    },
+    {
+      "title": "Discours de Josué au peuple d'Israël",
+      "start_ch": 24,
+      "start_v": 1,
+      "end_ch": 24,
+      "end_v": 28
+    },
+    {
+      "title": "Mort de Josué",
+      "start_ch": 24,
+      "start_v": 29,
+      "end_ch": 24,
+      "end_v": 33
+    }
+  ]
 }

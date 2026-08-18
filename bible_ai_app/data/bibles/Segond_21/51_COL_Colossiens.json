@@ -109,5 +109,81 @@
       "17": "Dites à Archippe: «Veille sur le service que tu as reçu dans le Seigneur afin de bien l'accomplir.»",
       "18": "Je vous salue, moi Paul, de ma propre main. Souvenez-vous de ma condition de prisonnier. Que la grâce soit avec vous!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Salutation et louange",
+    "1:15": "La prééminence et l’œuvre de Christ",
+    "1:24": "Le combat de Paul pour l’Eglise",
+    "2:8": "L’œuvre de Christ et la liberté qui en découle",
+    "3:1": "La vie nouvelle en Christ",
+    "3:9": "Les relations dans l’Eglise",
+    "3:18": "Les relations à la maison",
+    "4:2": "Dernières instructions",
+    "4:7": "Salutations"
+  },
+  "pericopes": [
+    {
+      "title": "Salutation et louange",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 14
+    },
+    {
+      "title": "La prééminence et l’œuvre de Christ",
+      "start_ch": 1,
+      "start_v": 15,
+      "end_ch": 1,
+      "end_v": 23
+    },
+    {
+      "title": "Le combat de Paul pour l’Eglise",
+      "start_ch": 1,
+      "start_v": 24,
+      "end_ch": 1,
+      "end_v": 29
+    },
+    {
+      "title": "L’œuvre de Christ et la liberté qui en découle",
+      "start_ch": 2,
+      "start_v": 8,
+      "end_ch": 2,
+      "end_v": 23
+    },
+    {
+      "title": "La vie nouvelle en Christ",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 8
+    },
+    {
+      "title": "Les relations dans l’Eglise",
+      "start_ch": 3,
+      "start_v": 9,
+      "end_ch": 3,
+      "end_v": 17
+    },
+    {
+      "title": "Les relations à la maison",
+      "start_ch": 3,
+      "start_v": 18,
+      "end_ch": 3,
+      "end_v": 25
+    },
+    {
+      "title": "Dernières instructions",
+      "start_ch": 4,
+      "start_v": 2,
+      "end_ch": 4,
+      "end_v": 6
+    },
+    {
+      "title": "Salutations",
+      "start_ch": 4,
+      "start_v": 7,
+      "end_ch": 4,
+      "end_v": 18
+    }
+  ]
 }

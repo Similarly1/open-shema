@@ -170,5 +170,49 @@
       "21": "Fais-nous revenir vers toi, Eternel, et nous reviendrons! Donne-nous encore des jours pareils à ceux du passé!",
       "22": "Nous aurais-tu entièrement rejetés? Serais-tu irrité contre nous à l'excès?"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Le malheur de Jérusalem",
+    "2:1": "Le jugement de Jérusalem",
+    "3:1": "Souffrance et consolation",
+    "4:1": "Horreur du siège de Jérusalem",
+    "5:1": "Après la prise de Jérusalem"
+  },
+  "pericopes": [
+    {
+      "title": "Le malheur de Jérusalem",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 22
+    },
+    {
+      "title": "Le jugement de Jérusalem",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 22
+    },
+    {
+      "title": "Souffrance et consolation",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 66
+    },
+    {
+      "title": "Horreur du siège de Jérusalem",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 22
+    },
+    {
+      "title": "Après la prise de Jérusalem",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 22
+    }
+  ]
 }

@@ -124,5 +124,97 @@
       "19": "Mes frères, si l’un de vous s’égare en s’écartant de la vérité, et qu’un autre le ramène sur le bon chemin,",
       "20": "sachez que celui qui parvient à ramener un pécheur de la voie où il se perdait, sauvera son âme de la mort et permettra le pardon d’un grand nombre de péchés."
     }
-  }
+  },
+  "sections": {
+    "1:2": "Épreuves et tentations",
+    "1:19": "Écouter et agir",
+    "2:1": "Des préjugés sociaux dans l’Église ?",
+    "2:14": "La foi et les œuvres",
+    "3:1": "Petite cause, grands effets",
+    "3:13": "La vraie sagesse",
+    "4:1": "Prenez vos distances !",
+    "4:13": "L’avenir est à Dieu",
+    "5:1": "Pauvres riches !",
+    "5:7": "Patience !",
+    "5:12": "Agir en chrétien"
+  },
+  "pericopes": [
+    {
+      "title": "Épreuves et tentations",
+      "start_ch": 1,
+      "start_v": 2,
+      "end_ch": 1,
+      "end_v": 18
+    },
+    {
+      "title": "Écouter et agir",
+      "start_ch": 1,
+      "start_v": 19,
+      "end_ch": 1,
+      "end_v": 27
+    },
+    {
+      "title": "Des préjugés sociaux dans l’Église ?",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 13
+    },
+    {
+      "title": "La foi et les œuvres",
+      "start_ch": 2,
+      "start_v": 14,
+      "end_ch": 2,
+      "end_v": 26
+    },
+    {
+      "title": "Petite cause, grands effets",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 12
+    },
+    {
+      "title": "La vraie sagesse",
+      "start_ch": 3,
+      "start_v": 13,
+      "end_ch": 3,
+      "end_v": 18
+    },
+    {
+      "title": "Prenez vos distances !",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 12
+    },
+    {
+      "title": "L’avenir est à Dieu",
+      "start_ch": 4,
+      "start_v": 13,
+      "end_ch": 4,
+      "end_v": 17
+    },
+    {
+      "title": "Pauvres riches !",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 6
+    },
+    {
+      "title": "Patience !",
+      "start_ch": 5,
+      "start_v": 7,
+      "end_ch": 5,
+      "end_v": 11
+    },
+    {
+      "title": "Agir en chrétien",
+      "start_ch": 5,
+      "start_v": 12,
+      "end_ch": 5,
+      "end_v": 20
+    }
+  ]
 }

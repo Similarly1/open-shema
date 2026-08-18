@@ -29,5 +29,25 @@
       "20": "Les exilés, cette armée d'Israël, posséderont le pays occupé par les Cananéens jusqu'à Sarepta, et les exilés de Jérusalem qui sont à Sepharad posséderont les villes du Néguev.",
       "21": "Des libérateurs monteront sur le mont Sion pour juger la montagne d'Esaü, et à l'Eternel appartiendra le règne."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Le jugement d'Edom et ses causes",
+    "1:15": "Le jour de l’Eternel"
+  },
+  "pericopes": [
+    {
+      "title": "Le jugement d'Edom et ses causes",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 14
+    },
+    {
+      "title": "Le jour de l’Eternel",
+      "start_ch": 1,
+      "start_v": 15,
+      "end_ch": 1,
+      "end_v": 21
+    }
+  ]
 }

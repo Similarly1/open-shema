@@ -62,5 +62,41 @@
       "10": "Le Seigneur reprit: «Écoute, cette plante ne t'a donné aucun travail, ce n'est pas toi qui l'as fait pousser. Elle a grandi en une nuit et elle a disparu la nuit suivante. Pourtant tu en as pitié.",
       "11": "Et tu voudrais que moi, je n'aie pas pitié de Ninive, la grande ville, où il y a plus de 120 000 êtres humains qui ignorent ce qui est bon ou mauvais pour eux, ainsi qu'un grand nombre d'animaux?»"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Jonas essaie de fuir loin du Seigneur",
+    "2:1": "La prière de Jonas",
+    "3:1": "Revirement à Ninive",
+    "4:1": "Jonas est confronté au Dieu bienveillant et plein de tendresse"
+  },
+  "pericopes": [
+    {
+      "title": "Jonas essaie de fuir loin du Seigneur",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 16
+    },
+    {
+      "title": "La prière de Jonas",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 11
+    },
+    {
+      "title": "Revirement à Ninive",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 10
+    },
+    {
+      "title": "Jonas est confronté au Dieu bienveillant et plein de tendresse",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 11
+    }
+  ]
 }

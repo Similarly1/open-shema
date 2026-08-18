@@ -139,5 +139,297 @@
       "13": "Toi qui es assise dans ces jardins, des amis tendent l'oreille à ta voix. Mais c'est à moi que tu dois dire:",
       "14": "«Pars vite d'ici, mon bien-aimé, et semblable à une gazelle ou à un jeune cerf, rends-toi sur les monts parfumés.»"
     }
-  }
+  },
+  "sections": {
+    "1:2": "Elle et lui. Le dialogue des amoureux",
+    "1:8": "Autres",
+    "1:9": "Lui",
+    "1:11": "Autres&#8239;?",
+    "1:12": "Elle",
+    "1:15": "Lui",
+    "1:16": "Elle",
+    "2:2": "Lui",
+    "2:3": "Elle",
+    "2:7": "Elle ou Lui",
+    "2:8": "C'est lui qui arrive",
+    "2:15": "Autres&#8239;?",
+    "2:16": "Elle",
+    "3:1": "Elle rêve qu'elle part à sa recherche",
+    "3:5": "Elle ou Lui",
+    "3:6": "Elle&#8239;?",
+    "4:1": "Lui",
+    "4:16": "Elle",
+    "5:1": "Lui",
+    "5:2": "Elle lui ouvre sa porte, mais trop tard",
+    "5:3": "Elle",
+    "5:9": "Les filles de Jérusalem",
+    "5:10": "Elle",
+    "6:1": "Les filles de Jérusalem",
+    "6:2": "Elle",
+    "6:4": "Portrait de la bien-aimée",
+    "7:1": "Autres",
+    "7:2": "Lui",
+    "7:11": "Elle",
+    "7:12": "Le bonheur d'être aimé",
+    "8:4": "Elle ou Lui",
+    "8:5": "Autres",
+    "8:6": "La force de l'amour",
+    "8:8": "Autres",
+    "8:10": "Elle",
+    "8:11": "Lui"
+  },
+  "pericopes": [
+    {
+      "title": "Elle et lui. Le dialogue des amoureux",
+      "start_ch": 1,
+      "start_v": 2,
+      "end_ch": 1,
+      "end_v": 7
+    },
+    {
+      "title": "Autres",
+      "start_ch": 1,
+      "start_v": 8,
+      "end_ch": 1,
+      "end_v": 8
+    },
+    {
+      "title": "Lui",
+      "start_ch": 1,
+      "start_v": 9,
+      "end_ch": 1,
+      "end_v": 10
+    },
+    {
+      "title": "Autres&#8239;?",
+      "start_ch": 1,
+      "start_v": 11,
+      "end_ch": 1,
+      "end_v": 11
+    },
+    {
+      "title": "Elle",
+      "start_ch": 1,
+      "start_v": 12,
+      "end_ch": 1,
+      "end_v": 14
+    },
+    {
+      "title": "Lui",
+      "start_ch": 1,
+      "start_v": 15,
+      "end_ch": 1,
+      "end_v": 15
+    },
+    {
+      "title": "Elle",
+      "start_ch": 1,
+      "start_v": 16,
+      "end_ch": 1,
+      "end_v": 17
+    },
+    {
+      "title": "Lui",
+      "start_ch": 2,
+      "start_v": 2,
+      "end_ch": 2,
+      "end_v": 2
+    },
+    {
+      "title": "Elle",
+      "start_ch": 2,
+      "start_v": 3,
+      "end_ch": 2,
+      "end_v": 6
+    },
+    {
+      "title": "Elle ou Lui",
+      "start_ch": 2,
+      "start_v": 7,
+      "end_ch": 2,
+      "end_v": 7
+    },
+    {
+      "title": "C'est lui qui arrive",
+      "start_ch": 2,
+      "start_v": 8,
+      "end_ch": 2,
+      "end_v": 14
+    },
+    {
+      "title": "Autres&#8239;?",
+      "start_ch": 2,
+      "start_v": 15,
+      "end_ch": 2,
+      "end_v": 15
+    },
+    {
+      "title": "Elle",
+      "start_ch": 2,
+      "start_v": 16,
+      "end_ch": 2,
+      "end_v": 17
+    },
+    {
+      "title": "Elle rêve qu'elle part à sa recherche",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 4
+    },
+    {
+      "title": "Elle ou Lui",
+      "start_ch": 3,
+      "start_v": 5,
+      "end_ch": 3,
+      "end_v": 5
+    },
+    {
+      "title": "Elle&#8239;?",
+      "start_ch": 3,
+      "start_v": 6,
+      "end_ch": 3,
+      "end_v": 11
+    },
+    {
+      "title": "Lui",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 15
+    },
+    {
+      "title": "Elle",
+      "start_ch": 4,
+      "start_v": 16,
+      "end_ch": 4,
+      "end_v": 16
+    },
+    {
+      "title": "Lui",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 1
+    },
+    {
+      "title": "Elle lui ouvre sa porte, mais trop tard",
+      "start_ch": 5,
+      "start_v": 2,
+      "end_ch": 5,
+      "end_v": 2
+    },
+    {
+      "title": "Elle",
+      "start_ch": 5,
+      "start_v": 3,
+      "end_ch": 5,
+      "end_v": 8
+    },
+    {
+      "title": "Les filles de Jérusalem",
+      "start_ch": 5,
+      "start_v": 9,
+      "end_ch": 5,
+      "end_v": 9
+    },
+    {
+      "title": "Elle",
+      "start_ch": 5,
+      "start_v": 10,
+      "end_ch": 5,
+      "end_v": 16
+    },
+    {
+      "title": "Les filles de Jérusalem",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 1
+    },
+    {
+      "title": "Elle",
+      "start_ch": 6,
+      "start_v": 2,
+      "end_ch": 6,
+      "end_v": 3
+    },
+    {
+      "title": "Portrait de la bien-aimée",
+      "start_ch": 6,
+      "start_v": 4,
+      "end_ch": 6,
+      "end_v": 12
+    },
+    {
+      "title": "Autres",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 1
+    },
+    {
+      "title": "Lui",
+      "start_ch": 7,
+      "start_v": 2,
+      "end_ch": 7,
+      "end_v": 10
+    },
+    {
+      "title": "Elle",
+      "start_ch": 7,
+      "start_v": 11,
+      "end_ch": 7,
+      "end_v": 11
+    },
+    {
+      "title": "Le bonheur d'être aimé",
+      "start_ch": 7,
+      "start_v": 12,
+      "end_ch": 7,
+      "end_v": 14
+    },
+    {
+      "title": "Elle ou Lui",
+      "start_ch": 8,
+      "start_v": 4,
+      "end_ch": 8,
+      "end_v": 4
+    },
+    {
+      "title": "Autres",
+      "start_ch": 8,
+      "start_v": 5,
+      "end_ch": 8,
+      "end_v": 5
+    },
+    {
+      "title": "La force de l'amour",
+      "start_ch": 8,
+      "start_v": 6,
+      "end_ch": 8,
+      "end_v": 7
+    },
+    {
+      "title": "Autres",
+      "start_ch": 8,
+      "start_v": 8,
+      "end_ch": 8,
+      "end_v": 9
+    },
+    {
+      "title": "Elle",
+      "start_ch": 8,
+      "start_v": 10,
+      "end_ch": 8,
+      "end_v": 10
+    },
+    {
+      "title": "Lui",
+      "start_ch": 8,
+      "start_v": 11,
+      "end_ch": 8,
+      "end_v": 14
+    }
+  ]
 }

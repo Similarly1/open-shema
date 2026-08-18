@@ -1160,5 +1160,265 @@
       "16": "Job vécut après cela 140 ans, et il vit ses fils et les descendants de ses fils jusqu'à la quatrième génération.",
       "17": "Puis il mourut, âgé et rassasié de jours."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Présentation de Job",
+    "1:6": "Première série d’épreuves",
+    "2:1": "Deuxième épreuve",
+    "2:11": "Arrivée des amis de Job",
+    "3:1": "Intervention n° 1 de Job",
+    "4:1": "Intervention n° 1 d'Eliphaz",
+    "6:1": "Intervention n° 2 de Job",
+    "8:1": "Intervention n° 1 de Bildad",
+    "9:1": "Intervention n° 3 de Job",
+    "11:1": "Intervention n° 1 de Tsophar",
+    "12:1": "Intervention n° 4 de Job",
+    "15:1": "Intervention n° 2 d’Eliphaz",
+    "16:1": "Intervention n° 5 de Job",
+    "18:1": "Intervention n° 2 de Bildad",
+    "19:1": "Intervention n° 6 de Job",
+    "20:1": "Intervention n° 2 de Tsophar",
+    "21:1": "Intervention n° 7 de Job",
+    "22:1": "Intervention n° 3 d’Eliphaz",
+    "23:1": "Intervention n° 8 de Job",
+    "25:1": "Intervention n° 3 de Bildad",
+    "26:1": "Intervention n° 9 de Job",
+    "27:1": "Conclusion de Job",
+    "32:1": "Reproches à Job et à ses amis",
+    "34:1": "La justice souveraine",
+    "35:1": "Appel à rechercher Dieu",
+    "36:1": "Le sort des justes et des coupables",
+    "38:1": "Description des œuvres divines",
+    "38:39": "Les soins divins pour les animaux",
+    "40:1": "Incapacité de Job à répondre",
+    "40:6": "Les animaux monstrueux",
+    "42:1": "Aveu par Job de son ignorance",
+    "42:7": "Retour de Job à la prospérité"
+  },
+  "pericopes": [
+    {
+      "title": "Présentation de Job",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 5
+    },
+    {
+      "title": "Première série d’épreuves",
+      "start_ch": 1,
+      "start_v": 6,
+      "end_ch": 1,
+      "end_v": 22
+    },
+    {
+      "title": "Deuxième épreuve",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 10
+    },
+    {
+      "title": "Arrivée des amis de Job",
+      "start_ch": 2,
+      "start_v": 11,
+      "end_ch": 2,
+      "end_v": 13
+    },
+    {
+      "title": "Intervention n° 1 de Job",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 26
+    },
+    {
+      "title": "Intervention n° 1 d'Eliphaz",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 21
+    },
+    {
+      "title": "Intervention n° 2 de Job",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 30
+    },
+    {
+      "title": "Intervention n° 1 de Bildad",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 22
+    },
+    {
+      "title": "Intervention n° 3 de Job",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 35
+    },
+    {
+      "title": "Intervention n° 1 de Tsophar",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 20
+    },
+    {
+      "title": "Intervention n° 4 de Job",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 25
+    },
+    {
+      "title": "Intervention n° 2 d’Eliphaz",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 35
+    },
+    {
+      "title": "Intervention n° 5 de Job",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 22
+    },
+    {
+      "title": "Intervention n° 2 de Bildad",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 21
+    },
+    {
+      "title": "Intervention n° 6 de Job",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 29
+    },
+    {
+      "title": "Intervention n° 2 de Tsophar",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 29
+    },
+    {
+      "title": "Intervention n° 7 de Job",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 34
+    },
+    {
+      "title": "Intervention n° 3 d’Eliphaz",
+      "start_ch": 22,
+      "start_v": 1,
+      "end_ch": 22,
+      "end_v": 30
+    },
+    {
+      "title": "Intervention n° 8 de Job",
+      "start_ch": 23,
+      "start_v": 1,
+      "end_ch": 23,
+      "end_v": 17
+    },
+    {
+      "title": "Intervention n° 3 de Bildad",
+      "start_ch": 25,
+      "start_v": 1,
+      "end_ch": 25,
+      "end_v": 6
+    },
+    {
+      "title": "Intervention n° 9 de Job",
+      "start_ch": 26,
+      "start_v": 1,
+      "end_ch": 26,
+      "end_v": 14
+    },
+    {
+      "title": "Conclusion de Job",
+      "start_ch": 27,
+      "start_v": 1,
+      "end_ch": 27,
+      "end_v": 23
+    },
+    {
+      "title": "Reproches à Job et à ses amis",
+      "start_ch": 32,
+      "start_v": 1,
+      "end_ch": 32,
+      "end_v": 22
+    },
+    {
+      "title": "La justice souveraine",
+      "start_ch": 34,
+      "start_v": 1,
+      "end_ch": 34,
+      "end_v": 37
+    },
+    {
+      "title": "Appel à rechercher Dieu",
+      "start_ch": 35,
+      "start_v": 1,
+      "end_ch": 35,
+      "end_v": 16
+    },
+    {
+      "title": "Le sort des justes et des coupables",
+      "start_ch": 36,
+      "start_v": 1,
+      "end_ch": 36,
+      "end_v": 33
+    },
+    {
+      "title": "Description des œuvres divines",
+      "start_ch": 38,
+      "start_v": 1,
+      "end_ch": 38,
+      "end_v": 38
+    },
+    {
+      "title": "Les soins divins pour les animaux",
+      "start_ch": 38,
+      "start_v": 39,
+      "end_ch": 38,
+      "end_v": 41
+    },
+    {
+      "title": "Incapacité de Job à répondre",
+      "start_ch": 40,
+      "start_v": 1,
+      "end_ch": 40,
+      "end_v": 5
+    },
+    {
+      "title": "Les animaux monstrueux",
+      "start_ch": 40,
+      "start_v": 6,
+      "end_ch": 40,
+      "end_v": 32
+    },
+    {
+      "title": "Aveu par Job de son ignorance",
+      "start_ch": 42,
+      "start_v": 1,
+      "end_ch": 42,
+      "end_v": 6
+    },
+    {
+      "title": "Retour de Job à la prospérité",
+      "start_ch": 42,
+      "start_v": 7,
+      "end_ch": 42,
+      "end_v": 17
+    }
+  ]
 }

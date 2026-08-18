@@ -59,5 +59,41 @@
       "17": "Moi Paul, je vous salue de ma propre main. C'est là ma signature dans toutes mes lettres, c'est ainsi que j'écris.",
       "18": "Que la grâce de notre Seigneur Jésus-Christ soit avec vous tous!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Salutation et louange",
+    "2:1": "Retour du Seigneur",
+    "2:13": "Appel à la fermeté, à la prière et au travail",
+    "3:16": "Bénédiction et salutation"
+  },
+  "pericopes": [
+    {
+      "title": "Salutation et louange",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 12
+    },
+    {
+      "title": "Retour du Seigneur",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 12
+    },
+    {
+      "title": "Appel à la fermeté, à la prière et au travail",
+      "start_ch": 2,
+      "start_v": 13,
+      "end_ch": 2,
+      "end_v": 17
+    },
+    {
+      "title": "Bénédiction et salutation",
+      "start_ch": 3,
+      "start_v": 16,
+      "end_ch": 3,
+      "end_v": 18
+    }
+  ]
 }

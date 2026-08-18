@@ -121,5 +121,137 @@
       "20": "Mais nous savons aussi que le Fils de Dieu est venu et qu’il nous a ouvert les yeux, pour que nous apprenions à connaître le Dieu véritable, et pour que nous le connaissions de mieux en mieux. Ainsi, nous sommes en communion avec le vrai Dieu depuis que nous sommes en communion avec son Fils Jésus-Christ. Il est lui-même le Dieu véritable et la vie éternelle.",
       "21": "Mes chers enfants, tenez-vous en garde contre toutes les idoles."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Pourquoi l’auteur écrit",
+    "1:5": "La lumière et les ténèbres",
+    "2:1": "Le critère d’obéissance",
+    "2:7": "Le commandement nouveau",
+    "2:12": "Trois stades dans la vie chrétienne",
+    "2:15": "Le monde et nous",
+    "2:18": "Le temps des décisions",
+    "3:1": "La charte des enfants de Dieu",
+    "3:13": "De la mort à la vie",
+    "3:20": "Dieu et nous",
+    "4:1": "L’Esprit de vérité et les esprits d’erreur",
+    "4:7": "Dieu est amour",
+    "4:11": "Notre réponse à son amour",
+    "5:1": "Amour, obéissance et foi",
+    "5:6": "Un témoignage fiable",
+    "5:12": "Certitudes"
+  },
+  "pericopes": [
+    {
+      "title": "Pourquoi l’auteur écrit",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 4
+    },
+    {
+      "title": "La lumière et les ténèbres",
+      "start_ch": 1,
+      "start_v": 5,
+      "end_ch": 1,
+      "end_v": 10
+    },
+    {
+      "title": "Le critère d’obéissance",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 6
+    },
+    {
+      "title": "Le commandement nouveau",
+      "start_ch": 2,
+      "start_v": 7,
+      "end_ch": 2,
+      "end_v": 11
+    },
+    {
+      "title": "Trois stades dans la vie chrétienne",
+      "start_ch": 2,
+      "start_v": 12,
+      "end_ch": 2,
+      "end_v": 14
+    },
+    {
+      "title": "Le monde et nous",
+      "start_ch": 2,
+      "start_v": 15,
+      "end_ch": 2,
+      "end_v": 17
+    },
+    {
+      "title": "Le temps des décisions",
+      "start_ch": 2,
+      "start_v": 18,
+      "end_ch": 2,
+      "end_v": 29
+    },
+    {
+      "title": "La charte des enfants de Dieu",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 12
+    },
+    {
+      "title": "De la mort à la vie",
+      "start_ch": 3,
+      "start_v": 13,
+      "end_ch": 3,
+      "end_v": 19
+    },
+    {
+      "title": "Dieu et nous",
+      "start_ch": 3,
+      "start_v": 20,
+      "end_ch": 3,
+      "end_v": 24
+    },
+    {
+      "title": "L’Esprit de vérité et les esprits d’erreur",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 6
+    },
+    {
+      "title": "Dieu est amour",
+      "start_ch": 4,
+      "start_v": 7,
+      "end_ch": 4,
+      "end_v": 10
+    },
+    {
+      "title": "Notre réponse à son amour",
+      "start_ch": 4,
+      "start_v": 11,
+      "end_ch": 4,
+      "end_v": 21
+    },
+    {
+      "title": "Amour, obéissance et foi",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 5
+    },
+    {
+      "title": "Un témoignage fiable",
+      "start_ch": 5,
+      "start_v": 6,
+      "end_ch": 5,
+      "end_v": 11
+    },
+    {
+      "title": "Certitudes",
+      "start_ch": 5,
+      "start_v": 12,
+      "end_ch": 5,
+      "end_v": 21
+    }
+  ]
 }

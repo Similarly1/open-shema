@@ -58,5 +58,41 @@
       "14": "Il faut que les nôtres aussi apprennent à pratiquer de belles œuvres pour subvenir aux besoins les plus importants, afin de ne pas rester sans fruits.",
       "15": "Tous ceux qui sont avec moi te saluent. De ton côté, salue ceux qui nous aiment dans la foi. Que la grâce soit avec vous tous!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Adresse et salutation",
+    "1:5": "Mission de Tite",
+    "2:1": "Instructions à transmettre aux chrétiens",
+    "3:12": "Dernières instructions et salutations"
+  },
+  "pericopes": [
+    {
+      "title": "Adresse et salutation",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 4
+    },
+    {
+      "title": "Mission de Tite",
+      "start_ch": 1,
+      "start_v": 5,
+      "end_ch": 1,
+      "end_v": 16
+    },
+    {
+      "title": "Instructions à transmettre aux chrétiens",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 15
+    },
+    {
+      "title": "Dernières instructions et salutations",
+      "start_ch": 3,
+      "start_v": 12,
+      "end_ch": 3,
+      "end_v": 15
+    }
+  ]
 }

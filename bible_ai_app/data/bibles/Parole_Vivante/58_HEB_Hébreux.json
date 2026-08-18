@@ -335,5 +335,233 @@
       "24": "Saluez tous vos conducteurs et tous les chrétiens. Les frères d’Italie vous saluent.",
       "25": "Que la grâce (de Dieu) soit avec vous tous. Amen!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Dieu a parlé par son Fils",
+    "1:4": "Le Christ et les anges",
+    "2:1": "Attention : danger",
+    "2:5": "Fils de l’homme et frère des hommes",
+    "3:1": "Deux chefs et deux maisons",
+    "3:7": "Ne manquez pas l’aujourd’hui de Dieu",
+    "4:1": "Entrez dans le repos de Dieu",
+    "4:14": "Le Fils de Dieu, notre grand-prêtre",
+    "5:11": "En panne",
+    "6:1": "Progressons",
+    "6:13": "Une ancre solide sur un fond stable",
+    "7:1": "Un personnage mystérieux",
+    "8:1": "Nouveau prêtre",
+    "8:8": "Nouvelle alliance",
+    "9:1": "Nouveau culte",
+    "9:11": "Nouveau sacrifice",
+    "9:16": "Nouveau testament",
+    "10:1": "L’ombre et la réalité",
+    "10:19": "Libre accès",
+    "10:26": "Pas de recul",
+    "11:1": "Qu’est-ce que la foi ?",
+    "11:8": "Prendre Dieu au mot",
+    "11:20": "Voir l’invisible",
+    "11:36": "La foi suprême",
+    "12:1": "Tenez bon",
+    "12:12": "Veillez",
+    "12:22": "Privilège oblige",
+    "13:1": "Vivre en chrétien"
+  },
+  "pericopes": [
+    {
+      "title": "Dieu a parlé par son Fils",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 3
+    },
+    {
+      "title": "Le Christ et les anges",
+      "start_ch": 1,
+      "start_v": 4,
+      "end_ch": 1,
+      "end_v": 14
+    },
+    {
+      "title": "Attention : danger",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 4
+    },
+    {
+      "title": "Fils de l’homme et frère des hommes",
+      "start_ch": 2,
+      "start_v": 5,
+      "end_ch": 2,
+      "end_v": 18
+    },
+    {
+      "title": "Deux chefs et deux maisons",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 6
+    },
+    {
+      "title": "Ne manquez pas l’aujourd’hui de Dieu",
+      "start_ch": 3,
+      "start_v": 7,
+      "end_ch": 3,
+      "end_v": 19
+    },
+    {
+      "title": "Entrez dans le repos de Dieu",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 13
+    },
+    {
+      "title": "Le Fils de Dieu, notre grand-prêtre",
+      "start_ch": 4,
+      "start_v": 14,
+      "end_ch": 4,
+      "end_v": 16
+    },
+    {
+      "title": "En panne",
+      "start_ch": 5,
+      "start_v": 11,
+      "end_ch": 5,
+      "end_v": 14
+    },
+    {
+      "title": "Progressons",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 12
+    },
+    {
+      "title": "Une ancre solide sur un fond stable",
+      "start_ch": 6,
+      "start_v": 13,
+      "end_ch": 6,
+      "end_v": 20
+    },
+    {
+      "title": "Un personnage mystérieux",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 28
+    },
+    {
+      "title": "Nouveau prêtre",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 7
+    },
+    {
+      "title": "Nouvelle alliance",
+      "start_ch": 8,
+      "start_v": 8,
+      "end_ch": 8,
+      "end_v": 13
+    },
+    {
+      "title": "Nouveau culte",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 10
+    },
+    {
+      "title": "Nouveau sacrifice",
+      "start_ch": 9,
+      "start_v": 11,
+      "end_ch": 9,
+      "end_v": 15
+    },
+    {
+      "title": "Nouveau testament",
+      "start_ch": 9,
+      "start_v": 16,
+      "end_ch": 9,
+      "end_v": 28
+    },
+    {
+      "title": "L’ombre et la réalité",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 18
+    },
+    {
+      "title": "Libre accès",
+      "start_ch": 10,
+      "start_v": 19,
+      "end_ch": 10,
+      "end_v": 25
+    },
+    {
+      "title": "Pas de recul",
+      "start_ch": 10,
+      "start_v": 26,
+      "end_ch": 10,
+      "end_v": 39
+    },
+    {
+      "title": "Qu’est-ce que la foi ?",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 7
+    },
+    {
+      "title": "Prendre Dieu au mot",
+      "start_ch": 11,
+      "start_v": 8,
+      "end_ch": 11,
+      "end_v": 19
+    },
+    {
+      "title": "Voir l’invisible",
+      "start_ch": 11,
+      "start_v": 20,
+      "end_ch": 11,
+      "end_v": 35
+    },
+    {
+      "title": "La foi suprême",
+      "start_ch": 11,
+      "start_v": 36,
+      "end_ch": 11,
+      "end_v": 40
+    },
+    {
+      "title": "Tenez bon",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 11
+    },
+    {
+      "title": "Veillez",
+      "start_ch": 12,
+      "start_v": 12,
+      "end_ch": 12,
+      "end_v": 21
+    },
+    {
+      "title": "Privilège oblige",
+      "start_ch": 12,
+      "start_v": 22,
+      "end_ch": 12,
+      "end_v": 29
+    },
+    {
+      "title": "Vivre en chrétien",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 25
+    }
+  ]
 }

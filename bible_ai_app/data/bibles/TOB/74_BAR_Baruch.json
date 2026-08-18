@@ -157,5 +157,33 @@
       "8": "Sur son ordre, les forêts aussi, et chaque arbre odoriférant, ont préparé leur ombrage pour Israël.",
       "9": "Car Dieu guidera Israël, dans la joie, à la lumière de sa gloire, accompagné de la miséricorde et de la justice qui sont les siennes. Copie de la lettre que Jérémie envoya à ceux qui allaient être emmenés prisonniers à Babylone par le roi des Babyloniens, pour leur annoncer ce que Dieu lui avait prescrit."
     }
-  }
+  },
+  "sections": {
+    "1:16": "PRIÈRE PÉNITENTIELLE",
+    "3:9": "MÉDITATION SUR LA SAGESSE",
+    "4:5": "EXHORTATION ET CONSOLATION DE JÉRUSALEM"
+  },
+  "pericopes": [
+    {
+      "title": "PRIÈRE PÉNITENTIELLE",
+      "start_ch": 1,
+      "start_v": 16,
+      "end_ch": 1,
+      "end_v": 22
+    },
+    {
+      "title": "MÉDITATION SUR LA SAGESSE",
+      "start_ch": 3,
+      "start_v": 9,
+      "end_ch": 3,
+      "end_v": 38
+    },
+    {
+      "title": "EXHORTATION ET CONSOLATION DE JÉRUSALEM",
+      "start_ch": 4,
+      "start_v": 5,
+      "end_ch": 4,
+      "end_v": 37
+    }
+  ]
 }

@@ -457,5 +457,33 @@
       "54": "Tous partirent manger, boire, manifester leur joie, donner des portions à ceux qui n’en avaient pas et jouir d’une grande joie,",
       "55": "car ils avaient été inspirés par les paroles qu’on leur avait enseignées. Et ils se rassemblèrent."
     }
-  }
+  },
+  "sections": {
+    "1:1": "JOSIAS ET L’ÉCHEC DE SES SUCCESSEURS",
+    "3:1": "LE RÔLE DE ZOROBABEL",
+    "8:1": "LE SUCCÈS DE LA RESTAURATION D’ESDRAS"
+  },
+  "pericopes": [
+    {
+      "title": "JOSIAS ET L’ÉCHEC DE SES SUCCESSEURS",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 55
+    },
+    {
+      "title": "LE RÔLE DE ZOROBABEL",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 24
+    },
+    {
+      "title": "LE SUCCÈS DE LA RESTAURATION D’ESDRAS",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 92
+    }
+  ]
 }

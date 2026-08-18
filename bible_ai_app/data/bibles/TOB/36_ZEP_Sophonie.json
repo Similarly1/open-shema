@@ -65,5 +65,33 @@
       "19": "Je vais agir à l’égard de tous ceux qui te maltraitent – en ce temps-là –, je sauverai les brebis boiteuses, je rassemblerai les égarées. Je vous mettrai à l’honneur et votre renom s’étendra dans tous les pays o vous avez connu la honte.",
       "20": "En ce temps-là, je vous ramènerai, ce sera au temps où je vous rassemblerai; votre renom s’étendra, et je vous mettrai à l’honneur parmi tous les peuples de la terre quand, sous vos yeux, je changerai votre destinée, dit le SEIGNEUR."
     }
-  }
+  },
+  "sections": {
+    "1:2": "LE JOUR DU SEIGNEUR",
+    "2:4": "ORACLES DE MENACES",
+    "3:9": "PROMESSES"
+  },
+  "pericopes": [
+    {
+      "title": "LE JOUR DU SEIGNEUR",
+      "start_ch": 1,
+      "start_v": 2,
+      "end_ch": 1,
+      "end_v": 18
+    },
+    {
+      "title": "ORACLES DE MENACES",
+      "start_ch": 2,
+      "start_v": 4,
+      "end_ch": 2,
+      "end_v": 15
+    },
+    {
+      "title": "PROMESSES",
+      "start_ch": 3,
+      "start_v": 9,
+      "end_ch": 3,
+      "end_v": 20
+    }
+  ]
 }

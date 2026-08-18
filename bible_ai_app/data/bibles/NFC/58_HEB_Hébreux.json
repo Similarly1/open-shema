@@ -332,5 +332,177 @@
       "24": "Saluez tous ceux qui vous dirigent et tous ceux qui appartiennent à Dieu. Les frères et les sœurs d'Italie vous adressent leurs salutations.",
       "25": "Que la grâce de Dieu soit avec vous tous!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Dieu a parlé par son Fils",
+    "1:5": "Le Fils de Dieu est supérieur aux anges",
+    "2:1": "Un si grand salut",
+    "2:5": "Celui qui conduit l'humanité au salut",
+    "3:1": "Jésus est supérieur à Moïse",
+    "3:7": "Dieu offre le repos à ceux qui l'écoutent",
+    "4:14": "Jésus est le grand-prêtre souverain",
+    "5:11": "Il est dangereux d'abandonner la foi",
+    "6:13": "La promesse de Dieu ne peut pas changer",
+    "7:1": "Melkisédec, roi et prêtre",
+    "7:15": "Un autre prêtre semblable à Melkisédec",
+    "8:1": "Jésus est notre grand-prêtre",
+    "9:1": "Le culte terrestre et le culte céleste",
+    "10:11": "Le pardon et la perfection en Christ",
+    "10:19": "Approchons-nous de Dieu",
+    "11:1": "La foi",
+    "12:1": "Dieu notre Père",
+    "12:12": "Recommandations et avertissements",
+    "13:1": "Comment plaire à Dieu",
+    "13:20": "Prière",
+    "13:22": "Conclusions et salutations"
+  },
+  "pericopes": [
+    {
+      "title": "Dieu a parlé par son Fils",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 4
+    },
+    {
+      "title": "Le Fils de Dieu est supérieur aux anges",
+      "start_ch": 1,
+      "start_v": 5,
+      "end_ch": 1,
+      "end_v": 14
+    },
+    {
+      "title": "Un si grand salut",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 4
+    },
+    {
+      "title": "Celui qui conduit l'humanité au salut",
+      "start_ch": 2,
+      "start_v": 5,
+      "end_ch": 2,
+      "end_v": 18
+    },
+    {
+      "title": "Jésus est supérieur à Moïse",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 6
+    },
+    {
+      "title": "Dieu offre le repos à ceux qui l'écoutent",
+      "start_ch": 3,
+      "start_v": 7,
+      "end_ch": 3,
+      "end_v": 19
+    },
+    {
+      "title": "Jésus est le grand-prêtre souverain",
+      "start_ch": 4,
+      "start_v": 14,
+      "end_ch": 4,
+      "end_v": 16
+    },
+    {
+      "title": "Il est dangereux d'abandonner la foi",
+      "start_ch": 5,
+      "start_v": 11,
+      "end_ch": 5,
+      "end_v": 14
+    },
+    {
+      "title": "La promesse de Dieu ne peut pas changer",
+      "start_ch": 6,
+      "start_v": 13,
+      "end_ch": 6,
+      "end_v": 20
+    },
+    {
+      "title": "Melkisédec, roi et prêtre",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 14
+    },
+    {
+      "title": "Un autre prêtre semblable à Melkisédec",
+      "start_ch": 7,
+      "start_v": 15,
+      "end_ch": 7,
+      "end_v": 28
+    },
+    {
+      "title": "Jésus est notre grand-prêtre",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 13
+    },
+    {
+      "title": "Le culte terrestre et le culte céleste",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 28
+    },
+    {
+      "title": "Le pardon et la perfection en Christ",
+      "start_ch": 10,
+      "start_v": 11,
+      "end_ch": 10,
+      "end_v": 18
+    },
+    {
+      "title": "Approchons-nous de Dieu",
+      "start_ch": 10,
+      "start_v": 19,
+      "end_ch": 10,
+      "end_v": 39
+    },
+    {
+      "title": "La foi",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 40
+    },
+    {
+      "title": "Dieu notre Père",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 11
+    },
+    {
+      "title": "Recommandations et avertissements",
+      "start_ch": 12,
+      "start_v": 12,
+      "end_ch": 12,
+      "end_v": 29
+    },
+    {
+      "title": "Comment plaire à Dieu",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 19
+    },
+    {
+      "title": "Prière",
+      "start_ch": 13,
+      "start_v": 20,
+      "end_ch": 13,
+      "end_v": 21
+    },
+    {
+      "title": "Conclusions et salutations",
+      "start_ch": 13,
+      "start_v": 22,
+      "end_ch": 13,
+      "end_v": 25
+    }
+  ]
 }

@@ -231,5 +231,97 @@
       "9": "Ephraïm, qu'ai-je encore à faire avec les idoles? Je lui répondrai, je veillerai sur lui, je serai pour lui comme un cyprès verdoyant. C'est de moi que tu recevras ton fruit.",
       "10": "Qui est sage? Qu'il comprenne ces choses! Que celui qui est intelligent les connaisse! En effet, les voies de l'Eternel sont droites. Les justes y marcheront, mais les rebelles y trébucheront."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Osée et la femme prostituée",
+    "3:1": "Osée et la femme adultère",
+    "4:1": "Reproches contre l’idolâtrie",
+    "5:8": "Punition d’Israël et Juda",
+    "7:1": "Reproches contre les alliances politiques",
+    "8:1": "Punition: destruction et exil",
+    "9:10": "Passé et avenir d’Israël",
+    "11:1": "Les soins de Dieu pour Israël",
+    "12:1": "Israël et son ancêtre Jacob",
+    "13:1": "L’Eternel, seul vrai soutien d’Israël",
+    "14:2": "Appel à revenir à Dieu et promesses"
+  },
+  "pericopes": [
+    {
+      "title": "Osée et la femme prostituée",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 9
+    },
+    {
+      "title": "Osée et la femme adultère",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 5
+    },
+    {
+      "title": "Reproches contre l’idolâtrie",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 19
+    },
+    {
+      "title": "Punition d’Israël et Juda",
+      "start_ch": 5,
+      "start_v": 8,
+      "end_ch": 5,
+      "end_v": 15
+    },
+    {
+      "title": "Reproches contre les alliances politiques",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 16
+    },
+    {
+      "title": "Punition: destruction et exil",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 14
+    },
+    {
+      "title": "Passé et avenir d’Israël",
+      "start_ch": 9,
+      "start_v": 10,
+      "end_ch": 9,
+      "end_v": 17
+    },
+    {
+      "title": "Les soins de Dieu pour Israël",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 11
+    },
+    {
+      "title": "Israël et son ancêtre Jacob",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 15
+    },
+    {
+      "title": "L’Eternel, seul vrai soutien d’Israël",
+      "start_ch": 13,
+      "start_v": 1,
+      "end_ch": 13,
+      "end_v": 15
+    },
+    {
+      "title": "Appel à revenir à Dieu et promesses",
+      "start_ch": 14,
+      "start_v": 2,
+      "end_ch": 14,
+      "end_v": 10
+    }
+  ]
 }

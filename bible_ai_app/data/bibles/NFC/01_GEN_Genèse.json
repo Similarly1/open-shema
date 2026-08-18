@@ -1601,5 +1601,689 @@
       "25": "Jurez-moi donc d'emporter mes ossements avec vous, lorsque Dieu interviendra ainsi pour vous.»",
       "26": "Joseph mourut à l'âge de 110 ans. On l'embauma, et on le déposa dans un cercueil en Égypte."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Dieu crée l'univers et l'humanité",
+    "2:5": "Le jardin d'Éden",
+    "3:1": "L'homme et la femme sont chassés du jardin d'Éden",
+    "4:1": "Caïn tue Abel",
+    "4:17": "Les descendants de Caïn",
+    "5:1": "Liste des descendants d'Adam à Noé",
+    "6:1": "Dieu décide d'en finir avec l'humanité",
+    "6:11": "Dieu décide d'épargner Noé",
+    "7:1": "Noé entre dans l'arche",
+    "7:6": "Le déluge",
+    "7:24": "Noé sort de l'arche",
+    "9:1": "Dieu fait alliance avec Noé",
+    "9:18": "Les trois fils de Noé",
+    "10:1": "Les peuples de la terre",
+    "11:1": "La tour de Babel",
+    "11:10": "Liste des descendants de Sem à Abram",
+    "11:27": "ABRAHAM",
+    "12:1": "Dieu appelle Abram à quitter son pays",
+    "12:6": "Abram et Saraï au pays de Canaan, puis en Égypte",
+    "13:2": "Abram et Loth se séparent",
+    "14:1": "Abram, les rois et Melkisédec",
+    "15:1": "Dieu fait alliance avec Abram",
+    "16:1": "Naissance d'Ismaël",
+    "17:1": "Abram devient Abraham",
+    "18:1": "Dieu annonce que Sara aura un fils",
+    "19:1": "Loth échappe à la destruction de Sodome",
+    "19:30": "Loth et ses filles",
+    "20:1": "Abraham, Sara et Abimélek",
+    "21:1": "La naissance d'Isaac",
+    "21:8": "Abraham renvoie Agar et Ismaël",
+    "21:22": "Abraham fait alliance avec Abimélek",
+    "22:1": "Abraham est prêt à offrir son fils Isaac à Dieu",
+    "23:1": "Abraham achète un tombeau pour Sara",
+    "24:1": "Isaac et Rébecca se marient",
+    "25:1": "La mort d'Abraham. Ses autres descendants",
+    "25:19": "Ésaü et Jacob",
+    "26:1": "Isaac, Rébecca et Abimélek",
+    "26:15": "Isaac fait alliance avec Abimélek",
+    "26:34": "Ésaü se marie",
+    "27:1": "Jacob s'approprie la bénédiction promise à Ésaü",
+    "27:41": "Jacob s'enfuit chez son oncle Laban",
+    "28:10": "Le rêve de Jacob",
+    "29:1": "Jacob rencontre Rachel",
+    "29:15": "Jacob épouse Léa et Rachel",
+    "29:31": "Les enfants de Jacob",
+    "30:25": "Jacob s'enrichit",
+    "30:43": "Jacob s'enfuit de chez Laban",
+    "32:2": "Jacob se prépare à rencontrer son frère",
+    "32:25": "Jacob lutte avec Dieu",
+    "33:1": "Jacob rencontre son frère Ésaü",
+    "33:18": "Jacob s'installe près de Sichem",
+    "34:1": "Dina est violentée, ses frères se vengent",
+    "35:1": "Jacob quitte Sichem pour Béthel",
+    "35:16": "Naissance de Benjamin et mort de Rachel",
+    "36:1": "Ésaü s'installe au pays d'Édom",
+    "36:9": "Les descendants d'Ésaü",
+    "37:1": "Les rêves de Joseph",
+    "37:12": "Joseph est vendu par ses frères",
+    "38:1": "Juda et Tamar",
+    "39:1": "Joseph chez l'Égyptien Potifar",
+    "39:7": "Joseph et la femme de son maître",
+    "39:21": "Joseph est en prison",
+    "40:5": "Joseph interprète les rêves de deux prisonniers",
+    "41:1": "Les rêves du pharaon",
+    "41:14": "Joseph interprète les rêves du pharaon",
+    "41:37": "Joseph devient ministre du pharaon",
+    "42:1": "Jacob envoie ses fils en Égypte",
+    "42:6": "Joseph traite durement ses frères",
+    "42:25": "Les fils de Jacob retournent en Canaan",
+    "43:1": "Jacob laisse partir Benjamin",
+    "43:15": "La seconde entrevue des frères avec Joseph",
+    "44:1": "Joseph met ses frères à l'épreuve",
+    "44:14": "Juda intervient en faveur de Benjamin",
+    "45:1": "Joseph se fait reconnaître",
+    "45:16": "Le pharaon invite Jacob en Égypte",
+    "46:1": "Jacob se rend en Égypte",
+    "46:8": "La famille de Jacob",
+    "46:28": "Jacob retrouve son fils Joseph",
+    "47:13": "La politique de Joseph pendant la famine",
+    "47:27": "Les dernières volontés de Jacob",
+    "48:1": "Jacob bénit les fils de Joseph",
+    "49:1": "Jacob donne sa bénédiction à ses douze fils",
+    "49:29": "Jacob meurt",
+    "50:1": "Jacob est enterré",
+    "50:15": "Après la mort de Jacob"
+  },
+  "pericopes": [
+    {
+      "title": "Dieu crée l'univers et l'humanité",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 31
+    },
+    {
+      "title": "Le jardin d'Éden",
+      "start_ch": 2,
+      "start_v": 5,
+      "end_ch": 2,
+      "end_v": 25
+    },
+    {
+      "title": "L'homme et la femme sont chassés du jardin d'Éden",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 24
+    },
+    {
+      "title": "Caïn tue Abel",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 16
+    },
+    {
+      "title": "Les descendants de Caïn",
+      "start_ch": 4,
+      "start_v": 17,
+      "end_ch": 4,
+      "end_v": 26
+    },
+    {
+      "title": "Liste des descendants d'Adam à Noé",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 32
+    },
+    {
+      "title": "Dieu décide d'en finir avec l'humanité",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 10
+    },
+    {
+      "title": "Dieu décide d'épargner Noé",
+      "start_ch": 6,
+      "start_v": 11,
+      "end_ch": 6,
+      "end_v": 22
+    },
+    {
+      "title": "Noé entre dans l'arche",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 5
+    },
+    {
+      "title": "Le déluge",
+      "start_ch": 7,
+      "start_v": 6,
+      "end_ch": 7,
+      "end_v": 23
+    },
+    {
+      "title": "Noé sort de l'arche",
+      "start_ch": 7,
+      "start_v": 24,
+      "end_ch": 7,
+      "end_v": 24
+    },
+    {
+      "title": "Dieu fait alliance avec Noé",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 17
+    },
+    {
+      "title": "Les trois fils de Noé",
+      "start_ch": 9,
+      "start_v": 18,
+      "end_ch": 9,
+      "end_v": 29
+    },
+    {
+      "title": "Les peuples de la terre",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 32
+    },
+    {
+      "title": "La tour de Babel",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 9
+    },
+    {
+      "title": "Liste des descendants de Sem à Abram",
+      "start_ch": 11,
+      "start_v": 10,
+      "end_ch": 11,
+      "end_v": 26
+    },
+    {
+      "title": "ABRAHAM",
+      "start_ch": 11,
+      "start_v": 27,
+      "end_ch": 11,
+      "end_v": 32
+    },
+    {
+      "title": "Dieu appelle Abram à quitter son pays",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 5
+    },
+    {
+      "title": "Abram et Saraï au pays de Canaan, puis en Égypte",
+      "start_ch": 12,
+      "start_v": 6,
+      "end_ch": 12,
+      "end_v": 20
+    },
+    {
+      "title": "Abram et Loth se séparent",
+      "start_ch": 13,
+      "start_v": 2,
+      "end_ch": 13,
+      "end_v": 18
+    },
+    {
+      "title": "Abram, les rois et Melkisédec",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 24
+    },
+    {
+      "title": "Dieu fait alliance avec Abram",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 21
+    },
+    {
+      "title": "Naissance d'Ismaël",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 16
+    },
+    {
+      "title": "Abram devient Abraham",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 27
+    },
+    {
+      "title": "Dieu annonce que Sara aura un fils",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 33
+    },
+    {
+      "title": "Loth échappe à la destruction de Sodome",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 29
+    },
+    {
+      "title": "Loth et ses filles",
+      "start_ch": 19,
+      "start_v": 30,
+      "end_ch": 19,
+      "end_v": 38
+    },
+    {
+      "title": "Abraham, Sara et Abimélek",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 16
+    },
+    {
+      "title": "La naissance d'Isaac",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 7
+    },
+    {
+      "title": "Abraham renvoie Agar et Ismaël",
+      "start_ch": 21,
+      "start_v": 8,
+      "end_ch": 21,
+      "end_v": 21
+    },
+    {
+      "title": "Abraham fait alliance avec Abimélek",
+      "start_ch": 21,
+      "start_v": 22,
+      "end_ch": 21,
+      "end_v": 34
+    },
+    {
+      "title": "Abraham est prêt à offrir son fils Isaac à Dieu",
+      "start_ch": 22,
+      "start_v": 1,
+      "end_ch": 22,
+      "end_v": 24
+    },
+    {
+      "title": "Abraham achète un tombeau pour Sara",
+      "start_ch": 23,
+      "start_v": 1,
+      "end_ch": 23,
+      "end_v": 20
+    },
+    {
+      "title": "Isaac et Rébecca se marient",
+      "start_ch": 24,
+      "start_v": 1,
+      "end_ch": 24,
+      "end_v": 67
+    },
+    {
+      "title": "La mort d'Abraham. Ses autres descendants",
+      "start_ch": 25,
+      "start_v": 1,
+      "end_ch": 25,
+      "end_v": 18
+    },
+    {
+      "title": "Ésaü et Jacob",
+      "start_ch": 25,
+      "start_v": 19,
+      "end_ch": 25,
+      "end_v": 34
+    },
+    {
+      "title": "Isaac, Rébecca et Abimélek",
+      "start_ch": 26,
+      "start_v": 1,
+      "end_ch": 26,
+      "end_v": 14
+    },
+    {
+      "title": "Isaac fait alliance avec Abimélek",
+      "start_ch": 26,
+      "start_v": 15,
+      "end_ch": 26,
+      "end_v": 33
+    },
+    {
+      "title": "Ésaü se marie",
+      "start_ch": 26,
+      "start_v": 34,
+      "end_ch": 26,
+      "end_v": 35
+    },
+    {
+      "title": "Jacob s'approprie la bénédiction promise à Ésaü",
+      "start_ch": 27,
+      "start_v": 1,
+      "end_ch": 27,
+      "end_v": 40
+    },
+    {
+      "title": "Jacob s'enfuit chez son oncle Laban",
+      "start_ch": 27,
+      "start_v": 41,
+      "end_ch": 27,
+      "end_v": 46
+    },
+    {
+      "title": "Le rêve de Jacob",
+      "start_ch": 28,
+      "start_v": 10,
+      "end_ch": 28,
+      "end_v": 22
+    },
+    {
+      "title": "Jacob rencontre Rachel",
+      "start_ch": 29,
+      "start_v": 1,
+      "end_ch": 29,
+      "end_v": 14
+    },
+    {
+      "title": "Jacob épouse Léa et Rachel",
+      "start_ch": 29,
+      "start_v": 15,
+      "end_ch": 29,
+      "end_v": 30
+    },
+    {
+      "title": "Les enfants de Jacob",
+      "start_ch": 29,
+      "start_v": 31,
+      "end_ch": 29,
+      "end_v": 35
+    },
+    {
+      "title": "Jacob s'enrichit",
+      "start_ch": 30,
+      "start_v": 25,
+      "end_ch": 30,
+      "end_v": 42
+    },
+    {
+      "title": "Jacob s'enfuit de chez Laban",
+      "start_ch": 30,
+      "start_v": 43,
+      "end_ch": 30,
+      "end_v": 43
+    },
+    {
+      "title": "Jacob se prépare à rencontrer son frère",
+      "start_ch": 32,
+      "start_v": 2,
+      "end_ch": 32,
+      "end_v": 24
+    },
+    {
+      "title": "Jacob lutte avec Dieu",
+      "start_ch": 32,
+      "start_v": 25,
+      "end_ch": 32,
+      "end_v": 33
+    },
+    {
+      "title": "Jacob rencontre son frère Ésaü",
+      "start_ch": 33,
+      "start_v": 1,
+      "end_ch": 33,
+      "end_v": 17
+    },
+    {
+      "title": "Jacob s'installe près de Sichem",
+      "start_ch": 33,
+      "start_v": 18,
+      "end_ch": 33,
+      "end_v": 20
+    },
+    {
+      "title": "Dina est violentée, ses frères se vengent",
+      "start_ch": 34,
+      "start_v": 1,
+      "end_ch": 34,
+      "end_v": 31
+    },
+    {
+      "title": "Jacob quitte Sichem pour Béthel",
+      "start_ch": 35,
+      "start_v": 1,
+      "end_ch": 35,
+      "end_v": 15
+    },
+    {
+      "title": "Naissance de Benjamin et mort de Rachel",
+      "start_ch": 35,
+      "start_v": 16,
+      "end_ch": 35,
+      "end_v": 29
+    },
+    {
+      "title": "Ésaü s'installe au pays d'Édom",
+      "start_ch": 36,
+      "start_v": 1,
+      "end_ch": 36,
+      "end_v": 8
+    },
+    {
+      "title": "Les descendants d'Ésaü",
+      "start_ch": 36,
+      "start_v": 9,
+      "end_ch": 36,
+      "end_v": 33
+    },
+    {
+      "title": "Les rêves de Joseph",
+      "start_ch": 37,
+      "start_v": 1,
+      "end_ch": 37,
+      "end_v": 11
+    },
+    {
+      "title": "Joseph est vendu par ses frères",
+      "start_ch": 37,
+      "start_v": 12,
+      "end_ch": 37,
+      "end_v": 36
+    },
+    {
+      "title": "Juda et Tamar",
+      "start_ch": 38,
+      "start_v": 1,
+      "end_ch": 38,
+      "end_v": 30
+    },
+    {
+      "title": "Joseph chez l'Égyptien Potifar",
+      "start_ch": 39,
+      "start_v": 1,
+      "end_ch": 39,
+      "end_v": 6
+    },
+    {
+      "title": "Joseph et la femme de son maître",
+      "start_ch": 39,
+      "start_v": 7,
+      "end_ch": 39,
+      "end_v": 20
+    },
+    {
+      "title": "Joseph est en prison",
+      "start_ch": 39,
+      "start_v": 21,
+      "end_ch": 39,
+      "end_v": 23
+    },
+    {
+      "title": "Joseph interprète les rêves de deux prisonniers",
+      "start_ch": 40,
+      "start_v": 5,
+      "end_ch": 40,
+      "end_v": 23
+    },
+    {
+      "title": "Les rêves du pharaon",
+      "start_ch": 41,
+      "start_v": 1,
+      "end_ch": 41,
+      "end_v": 13
+    },
+    {
+      "title": "Joseph interprète les rêves du pharaon",
+      "start_ch": 41,
+      "start_v": 14,
+      "end_ch": 41,
+      "end_v": 36
+    },
+    {
+      "title": "Joseph devient ministre du pharaon",
+      "start_ch": 41,
+      "start_v": 37,
+      "end_ch": 41,
+      "end_v": 57
+    },
+    {
+      "title": "Jacob envoie ses fils en Égypte",
+      "start_ch": 42,
+      "start_v": 1,
+      "end_ch": 42,
+      "end_v": 5
+    },
+    {
+      "title": "Joseph traite durement ses frères",
+      "start_ch": 42,
+      "start_v": 6,
+      "end_ch": 42,
+      "end_v": 24
+    },
+    {
+      "title": "Les fils de Jacob retournent en Canaan",
+      "start_ch": 42,
+      "start_v": 25,
+      "end_ch": 42,
+      "end_v": 38
+    },
+    {
+      "title": "Jacob laisse partir Benjamin",
+      "start_ch": 43,
+      "start_v": 1,
+      "end_ch": 43,
+      "end_v": 14
+    },
+    {
+      "title": "La seconde entrevue des frères avec Joseph",
+      "start_ch": 43,
+      "start_v": 15,
+      "end_ch": 43,
+      "end_v": 34
+    },
+    {
+      "title": "Joseph met ses frères à l'épreuve",
+      "start_ch": 44,
+      "start_v": 1,
+      "end_ch": 44,
+      "end_v": 13
+    },
+    {
+      "title": "Juda intervient en faveur de Benjamin",
+      "start_ch": 44,
+      "start_v": 14,
+      "end_ch": 44,
+      "end_v": 34
+    },
+    {
+      "title": "Joseph se fait reconnaître",
+      "start_ch": 45,
+      "start_v": 1,
+      "end_ch": 45,
+      "end_v": 15
+    },
+    {
+      "title": "Le pharaon invite Jacob en Égypte",
+      "start_ch": 45,
+      "start_v": 16,
+      "end_ch": 45,
+      "end_v": 28
+    },
+    {
+      "title": "Jacob se rend en Égypte",
+      "start_ch": 46,
+      "start_v": 1,
+      "end_ch": 46,
+      "end_v": 7
+    },
+    {
+      "title": "La famille de Jacob",
+      "start_ch": 46,
+      "start_v": 8,
+      "end_ch": 46,
+      "end_v": 27
+    },
+    {
+      "title": "Jacob retrouve son fils Joseph",
+      "start_ch": 46,
+      "start_v": 28,
+      "end_ch": 46,
+      "end_v": 34
+    },
+    {
+      "title": "La politique de Joseph pendant la famine",
+      "start_ch": 47,
+      "start_v": 13,
+      "end_ch": 47,
+      "end_v": 26
+    },
+    {
+      "title": "Les dernières volontés de Jacob",
+      "start_ch": 47,
+      "start_v": 27,
+      "end_ch": 47,
+      "end_v": 31
+    },
+    {
+      "title": "Jacob bénit les fils de Joseph",
+      "start_ch": 48,
+      "start_v": 1,
+      "end_ch": 48,
+      "end_v": 22
+    },
+    {
+      "title": "Jacob donne sa bénédiction à ses douze fils",
+      "start_ch": 49,
+      "start_v": 1,
+      "end_ch": 49,
+      "end_v": 28
+    },
+    {
+      "title": "Jacob meurt",
+      "start_ch": 49,
+      "start_v": 29,
+      "end_ch": 49,
+      "end_v": 33
+    },
+    {
+      "title": "Jacob est enterré",
+      "start_ch": 50,
+      "start_v": 1,
+      "end_ch": 50,
+      "end_v": 14
+    },
+    {
+      "title": "Après la mort de Jacob",
+      "start_ch": 50,
+      "start_v": 15,
+      "end_ch": 50,
+      "end_v": 26
+    }
+  ]
 }

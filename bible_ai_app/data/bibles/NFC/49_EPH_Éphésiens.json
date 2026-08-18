@@ -173,5 +173,129 @@
       "23": "Que Dieu le Père et le Seigneur Jésus Christ accordent à tous les frères et à toutes les sœurs la paix et l'amour, avec la foi.",
       "24": "Que la grâce de Dieu soit avec tous ceux qui aiment notre Seigneur Jésus Christ d'un amour inaltérable."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Salutation",
+    "1:3": "Les bienfaits que Dieu nous a accordés par le Christ",
+    "1:15": "Prière de Paul",
+    "2:1": "Dieu nous fait passer de la mort à la vie",
+    "2:11": "Un seul peuple en Jésus Christ",
+    "3:1": "La mission de Paul en faveur de ceux qui ne sont pas Juifs",
+    "3:14": "L'amour du Christ",
+    "4:1": "L'unité de l'Église est en Christ",
+    "4:17": "Les chrétiens vivent une vie nouvelle",
+    "5:1": "Vivre dans la lumière",
+    "5:21": "Les relations entre les femmes et les maris",
+    "6:1": "Les relations entre les enfants et les parents",
+    "6:5": "Les relations entre les esclaves et les maîtres",
+    "6:10": "Les armes que Dieu fournit",
+    "6:21": "Salutations finales"
+  },
+  "pericopes": [
+    {
+      "title": "Salutation",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 2
+    },
+    {
+      "title": "Les bienfaits que Dieu nous a accordés par le Christ",
+      "start_ch": 1,
+      "start_v": 3,
+      "end_ch": 1,
+      "end_v": 14
+    },
+    {
+      "title": "Prière de Paul",
+      "start_ch": 1,
+      "start_v": 15,
+      "end_ch": 1,
+      "end_v": 23
+    },
+    {
+      "title": "Dieu nous fait passer de la mort à la vie",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 10
+    },
+    {
+      "title": "Un seul peuple en Jésus Christ",
+      "start_ch": 2,
+      "start_v": 11,
+      "end_ch": 2,
+      "end_v": 22
+    },
+    {
+      "title": "La mission de Paul en faveur de ceux qui ne sont pas Juifs",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 13
+    },
+    {
+      "title": "L'amour du Christ",
+      "start_ch": 3,
+      "start_v": 14,
+      "end_ch": 3,
+      "end_v": 21
+    },
+    {
+      "title": "L'unité de l'Église est en Christ",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 16
+    },
+    {
+      "title": "Les chrétiens vivent une vie nouvelle",
+      "start_ch": 4,
+      "start_v": 17,
+      "end_ch": 4,
+      "end_v": 32
+    },
+    {
+      "title": "Vivre dans la lumière",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 20
+    },
+    {
+      "title": "Les relations entre les femmes et les maris",
+      "start_ch": 5,
+      "start_v": 21,
+      "end_ch": 5,
+      "end_v": 33
+    },
+    {
+      "title": "Les relations entre les enfants et les parents",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 4
+    },
+    {
+      "title": "Les relations entre les esclaves et les maîtres",
+      "start_ch": 6,
+      "start_v": 5,
+      "end_ch": 6,
+      "end_v": 9
+    },
+    {
+      "title": "Les armes que Dieu fournit",
+      "start_ch": 6,
+      "start_v": 10,
+      "end_ch": 6,
+      "end_v": 20
+    },
+    {
+      "title": "Salutations finales",
+      "start_ch": 6,
+      "start_v": 21,
+      "end_ch": 6,
+      "end_v": 24
+    }
+  ]
 }

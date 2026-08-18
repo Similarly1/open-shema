@@ -59,5 +59,89 @@
       "18": "Roi d'Assyrie, tes dirigeants se sont endormis, tes généraux ne bougent plus. Ton peuple est dispersé sur les montagnes et personne ne le rassemble.",
       "19": "Tu as subi un désastre irréparable, tes blessures sont incurables. Tous ceux qui apprennent ton sort applaudissent à ton malheur. En effet, qui n'a pas été victime de ta cruauté incessante?"
     }
-  }
+  },
+  "sections": {
+    "1:2": "Le Seigneur, un Dieu redoutable et bon",
+    "1:9": "Messages successifs pour Juda et pour Ninive",
+    "2:4": "Ninive prise d'assaut et pillée",
+    "2:12": "Ninive est comme un lion vaincu",
+    "3:1": "La ville criminelle est livrée au carnage",
+    "3:4": "Ninive est couverte de honte",
+    "3:8": "Ninive subira le même sort que Thèbes",
+    "3:12": "Ninive est incapable de résister",
+    "3:16": "Toute une population disparaît",
+    "3:18": "Un désastre irréparable"
+  },
+  "pericopes": [
+    {
+      "title": "Le Seigneur, un Dieu redoutable et bon",
+      "start_ch": 1,
+      "start_v": 2,
+      "end_ch": 1,
+      "end_v": 8
+    },
+    {
+      "title": "Messages successifs pour Juda et pour Ninive",
+      "start_ch": 1,
+      "start_v": 9,
+      "end_ch": 1,
+      "end_v": 14
+    },
+    {
+      "title": "Ninive prise d'assaut et pillée",
+      "start_ch": 2,
+      "start_v": 4,
+      "end_ch": 2,
+      "end_v": 11
+    },
+    {
+      "title": "Ninive est comme un lion vaincu",
+      "start_ch": 2,
+      "start_v": 12,
+      "end_ch": 2,
+      "end_v": 14
+    },
+    {
+      "title": "La ville criminelle est livrée au carnage",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 3
+    },
+    {
+      "title": "Ninive est couverte de honte",
+      "start_ch": 3,
+      "start_v": 4,
+      "end_ch": 3,
+      "end_v": 7
+    },
+    {
+      "title": "Ninive subira le même sort que Thèbes",
+      "start_ch": 3,
+      "start_v": 8,
+      "end_ch": 3,
+      "end_v": 11
+    },
+    {
+      "title": "Ninive est incapable de résister",
+      "start_ch": 3,
+      "start_v": 12,
+      "end_ch": 3,
+      "end_v": 15
+    },
+    {
+      "title": "Toute une population disparaît",
+      "start_ch": 3,
+      "start_v": 16,
+      "end_ch": 3,
+      "end_v": 17
+    },
+    {
+      "title": "Un désastre irréparable",
+      "start_ch": 3,
+      "start_v": 18,
+      "end_ch": 3,
+      "end_v": 19
+    }
+  ]
 }

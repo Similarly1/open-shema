@@ -142,13 +142,16 @@ class RAGPipeline:
             
         return documents
 
-    def build_structured_context(self, documents: list, screen_context: str = None, exegetical_context: str = None) -> str:
+    def build_structured_context(self, documents: list, screen_context: str = None, exegetical_context: str = None, pericope_context: str = None) -> str:
         """
         Formate le contexte extrait de manière hautement structurée avec étiquettes de citation exactes
-        et injection prioritaire du triple bloc exégétique (Texte original, Interlinéaire, Version affichée).
+        et injection prioritaire du bloc de péricope littéraire et du triple bloc exégétique (Texte original, Interlinéaire, Version affichée).
         """
         sections = []
         
+        if pericope_context and pericope_context.strip():
+            sections.append(f"{pericope_context.strip()}\n")
+            
         if exegetical_context and exegetical_context.strip():
             sections.append(f"{exegetical_context.strip()}\n")
         
@@ -367,16 +370,43 @@ class RAGPipeline:
         except Exception as e:
             print(f"[RAGPipeline] Erreur construction contexte exégétique original : {e}")
 
+        # Construction du bloc de péricope littéraire (Unité de sens + Péricope précédente/suivante)
+        pericope_context = ""
+        try:
+            from core.pericope_manager import PericopeManager
+            ref_bible = self.config.get("reference_bible", "Segond 21")
+            if target_book and target_chap:
+                p_ctx = PericopeManager.get_pericope_context(ref_bible, target_book, target_chap, target_v_start)
+                if p_ctx and p_ctx.get("has_pericope"):
+                    cur_p = p_ctx.get("current", {})
+                    prev_p = p_ctx.get("prev")
+                    next_p = p_ctx.get("next")
+                    
+                    p_lines = [f"=== CONTEXTE LITTÉRAIRE DE LA PÉRICOPE ({ref_bible}) ==="]
+                    if prev_p:
+                        p_lines.append(f"• Péricope précédente : {prev_p.get('ref_range')} — « {prev_p.get('title')} »")
+                    p_lines.append(f"• PÉRICOPE ACTIVE : {cur_p.get('ref_range')} — « {cur_p.get('title')} »")
+                    if cur_p.get("text"):
+                        p_lines.append(f"  [Texte intégral de la péricope] :\n{cur_p.get('text')}")
+                    if next_p:
+                        p_lines.append(f"• Péricope suivante : {next_p.get('ref_range')} — « {next_p.get('title')} »")
+                    
+                    pericope_context = "\n".join(p_lines) + "\n\n"
+        except Exception as e:
+            print(f"[RAGPipeline] Erreur calcul contexte péricope : {e}")
+
         structured_context = self.build_structured_context(
             final_docs, 
             screen_context=screen_context, 
-            exegetical_context=exegetical_context
+            exegetical_context=exegetical_context,
+            pericope_context=pericope_context
         )
         
         if not system_prompt:
             system_prompt = (
                 "Vous êtes un assistant théologique et exégète biblique expert de haut niveau.\n"
                 "Pour vos analyses, appuyez-vous rigoureusement sur les informations fournies dans le contexte :\n"
+                "- Analysez toujours le passage biblique dans le cadre de sa PÉRICOPE complète (son unité de pensée et de sens) et en tenant compte de la dynamique narrative avec la péricope précédente et suivante, évitant ainsi d'isoler artificiellement un verset de son contexte littéraire.\n"
                 "- Exploitez le texte original (Hébreu pour l'Ancien Testament, Grec pour le Nouveau Testament), les lemmes, les racines et la morphologie grammaticale (aspects verbaux, voix, modes, temps, cas) pour expliciter les nuances théologiques et littérales.\n"
                 "- Reliez ces nuances à la traduction française et à l'interlinéaire inversé Segond 1910.\n"
                 "- Citez les sources théologiques de la bibliothèque lorsque pertinent.\n"

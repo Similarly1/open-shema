@@ -900,5 +900,25 @@
       "22": "Or la première année du roi de Perse Cyrus, pour accomplir la parole du SEIGNEUR, sortie de la bouche de Jérémie, le SEIGNEUR éveilla l’esprit de Cyrus, roi de Perse, afin que dans tout son royaume il fît publier une proclamation, et même un écrit, pour dire:",
       "23": "«Ainsi parle Cyrus, roi de Perse: Tous les royaumes de la terre, le SEIGNEUR, le Dieu des cieux, me les a donnés et il m’a chargé lui-même de lui bâtir une Maison à Jérusalem, qui est en Juda. Lequel d’entre vous provient de tout son peuple? Que le SEIGNEUR son Dieu soit avec lui et qu’il monte...» La deuxième année du règne d’Artaxerxès le Grand, le premier jour de Nisan, Mardochée eut un songe. Descendant de Jaïros, de Séméias, de Kisaïas, issu de la tribu de Benjamin, Mardochée était un Juif résidant à Suse; c’était un personnage important qui servait à la Cour du Roi. Or il faisait partie de ceux que Nabuchodonosor, roi de Babylone, avait déportés de Jérusalem avec Jékhonias, le roi de Judée. Mardochée eut ce songe: Voici clameurs et tumulte, grondements et séisme, bouleversement sur la terre. Voici deux grands dragons, ils s’avancent, prêts tous deux à lutter. Ils poussent un grand cri; à leur cri, chaque nation s’apprête au combat, de façon à faire la guerre à une nation de justes. Voici jour de ténèbres et d’obscurité, détresse et anxiété, oppression et grand bouleversement sur la terre. Elle est bouleversée, la nation juste tout entière, épouvantée de ses malheurs; on s’apprête à être anéanti, on crie vers Dieu. Or, de ce cri, sort, comme d’une petite source, un fleuve large, une eau abondante. Une lumière se lève en plus du soleil. Alors les humbles sont élevés et dévorent les nobles. Une fois éveillé, Mardochée, qui avait vu ce songe et ce que Dieu avait décidé de faire, garda cela dans son cœur et, jusqu’à la nuit, il eut le désir de le comprendre par tous les moyens. Puis Mardochée se tint au repos à la Cour en compagnie de Gabatha et de Tharra, les deux eunuques royaux qui gardaient la cour. Il les entendit alors parler de leurs machinations et chercha à savoir de quoi ils s’occupaient: il apprit qu’ils s’apprêtaient à porter la main sur le roi Artaxerxès. Il les dénonça au roi. Le roi interrogea les deux eunuques qui, après avoir avoué, furent arrêtés. Le roi fit mettre ces faits par écrit pour qu’on en garde mémoire; Mardochée aussi les mit par écrit. Puis le roi donna ordre à Mardochée de rester au service de la Cour, et il le gratifia de cadeaux pour ce qu’il venait d’accomplir. Il y avait aussi Haman le Bougaïos, fils de Hamadathos, noble du roi. Pour l’affaire des deux eunuques royaux, celui-ci chercha à nuire à Mardochée et à son peuple."
     }
-  }
+  },
+  "sections": {
+    "1:1": "RÈGNE DE SALOMON",
+    "10:1": "HISTOIRE DES ROIS DE JUDA"
+  },
+  "pericopes": [
+    {
+      "title": "RÈGNE DE SALOMON",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 18
+    },
+    {
+      "title": "HISTOIRE DES ROIS DE JUDA",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 19
+    }
+  ]
 }

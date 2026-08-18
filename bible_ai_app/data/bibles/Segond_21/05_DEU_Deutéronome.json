@@ -1033,5 +1033,521 @@
       "11": "Personne ne peut lui être comparé pour tous les signes et les miracles que Dieu l'a envoyé faire en Egypte contre le pharaon, contre ses serviteurs et contre tout son pays,",
       "12": "et pour tous les actes terrifiants que Moïse a accomplis avec puissance sous les yeux de tout Israël."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Rappel des paroles de l'Eternel à Horeb",
+    "1:19": "Incrédulité à Kadès-Barnéa",
+    "2:1": "Marches et conflits dans le désert",
+    "2:26": "Conquête du royaume de Sihon",
+    "3:1": "Conquête du royaume d'Og",
+    "3:12": "Attribution des premiers territoires",
+    "3:23": "L’entrée en Canaan refusée à Moïse",
+    "4:1": "Appel à découvrir la sagesse de la loi",
+    "4:44": "Rappel des dix commandements",
+    "6:1": "Données essentielles de la loi",
+    "7:1": "Ordre de détruire les Cananéens et leurs idoles",
+    "8:1": "Terre promise et reconnaissance",
+    "9:1": "Souvenir des rébellions d'Israël",
+    "10:1": "Les nouvelles tables de la loi",
+    "10:12": "Appel à obéir à Dieu",
+    "11:1": "Promesses et menaces",
+    "12:1": "Ordre de servir l'Eternel à l'endroit choisi par lui",
+    "13:2": "Punition des prétendus prophètes et des idolâtres",
+    "14:3": "Lois sur les animaux purs et impurs",
+    "14:22": "Les dîmes",
+    "15:1": "L'année sabbatique",
+    "15:19": "Les premiers-nés des animaux",
+    "16:1": "La Pâque",
+    "16:9": "La fête des semaines",
+    "16:13": "La fête des tentes",
+    "16:18": "Institution des juges",
+    "16:21": "Avertissements contre l'idolâtrie",
+    "17:8": "Les juges",
+    "17:14": "Règles relatives à la royauté",
+    "18:1": "Les droits des Lévites et des prêtres",
+    "18:9": "Les prophètes et non la divination",
+    "19:1": "Les villes de refuge",
+    "19:14": "Respect des limites et nécessité de témoins",
+    "20:1": "Les exemptions du service militaire",
+    "20:10": "Règles pour la conquête de villes",
+    "21:1": "Meurtres dont les auteurs sont inconnus",
+    "21:10": "Règles pour la tenue de la famille",
+    "21:22": "Instructions diverses",
+    "23:2": "Cas d’exclusion de l'assemblée",
+    "23:10": "Règles liées à la pureté",
+    "23:22": "Les vœux",
+    "24:1": "Loi sur le divorce",
+    "24:5": "Ordonnances diverses",
+    "24:19": "Solidarité avec les plus démunis",
+    "25:1": "Les différends",
+    "25:5": "La descendance d'un frère mort",
+    "25:13": "Une mesure juste",
+    "25:17": "Jugement futur d'Amalek",
+    "26:1": "Les premières récoltes",
+    "26:12": "Les dîmes de la troisième année",
+    "27:1": "La loi au mont Ebal",
+    "27:11": "Bénédictions et malédictions",
+    "28:1": "Bénédictions en perspective",
+    "28:15": "Malédictions en perspective",
+    "28:69": "Renouvellement de l'alliance",
+    "29:15": "Conséquences de la désobéissance",
+    "30:1": "Promesses et menaces",
+    "31:1": "Transmission des responsabilités à Josué",
+    "31:9": "Appel à lire régulièrement la loi",
+    "31:14": "Annonce de l'infidélité d'Israël",
+    "31:30": "Cantique de Moïse",
+    "32:48": "Ordre à Moïse de gravir le mont Nebo",
+    "33:1": "Bénédiction de Moïse",
+    "34:1": "Mort de Moïse"
+  },
+  "pericopes": [
+    {
+      "title": "Rappel des paroles de l'Eternel à Horeb",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 18
+    },
+    {
+      "title": "Incrédulité à Kadès-Barnéa",
+      "start_ch": 1,
+      "start_v": 19,
+      "end_ch": 1,
+      "end_v": 46
+    },
+    {
+      "title": "Marches et conflits dans le désert",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 25
+    },
+    {
+      "title": "Conquête du royaume de Sihon",
+      "start_ch": 2,
+      "start_v": 26,
+      "end_ch": 2,
+      "end_v": 37
+    },
+    {
+      "title": "Conquête du royaume d'Og",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 11
+    },
+    {
+      "title": "Attribution des premiers territoires",
+      "start_ch": 3,
+      "start_v": 12,
+      "end_ch": 3,
+      "end_v": 22
+    },
+    {
+      "title": "L’entrée en Canaan refusée à Moïse",
+      "start_ch": 3,
+      "start_v": 23,
+      "end_ch": 3,
+      "end_v": 29
+    },
+    {
+      "title": "Appel à découvrir la sagesse de la loi",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 43
+    },
+    {
+      "title": "Rappel des dix commandements",
+      "start_ch": 4,
+      "start_v": 44,
+      "end_ch": 4,
+      "end_v": 49
+    },
+    {
+      "title": "Données essentielles de la loi",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 25
+    },
+    {
+      "title": "Ordre de détruire les Cananéens et leurs idoles",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 26
+    },
+    {
+      "title": "Terre promise et reconnaissance",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 20
+    },
+    {
+      "title": "Souvenir des rébellions d'Israël",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 29
+    },
+    {
+      "title": "Les nouvelles tables de la loi",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 11
+    },
+    {
+      "title": "Appel à obéir à Dieu",
+      "start_ch": 10,
+      "start_v": 12,
+      "end_ch": 10,
+      "end_v": 22
+    },
+    {
+      "title": "Promesses et menaces",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 32
+    },
+    {
+      "title": "Ordre de servir l'Eternel à l'endroit choisi par lui",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 31
+    },
+    {
+      "title": "Punition des prétendus prophètes et des idolâtres",
+      "start_ch": 13,
+      "start_v": 2,
+      "end_ch": 13,
+      "end_v": 19
+    },
+    {
+      "title": "Lois sur les animaux purs et impurs",
+      "start_ch": 14,
+      "start_v": 3,
+      "end_ch": 14,
+      "end_v": 21
+    },
+    {
+      "title": "Les dîmes",
+      "start_ch": 14,
+      "start_v": 22,
+      "end_ch": 14,
+      "end_v": 29
+    },
+    {
+      "title": "L'année sabbatique",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 18
+    },
+    {
+      "title": "Les premiers-nés des animaux",
+      "start_ch": 15,
+      "start_v": 19,
+      "end_ch": 15,
+      "end_v": 23
+    },
+    {
+      "title": "La Pâque",
+      "start_ch": 16,
+      "start_v": 1,
+      "end_ch": 16,
+      "end_v": 8
+    },
+    {
+      "title": "La fête des semaines",
+      "start_ch": 16,
+      "start_v": 9,
+      "end_ch": 16,
+      "end_v": 12
+    },
+    {
+      "title": "La fête des tentes",
+      "start_ch": 16,
+      "start_v": 13,
+      "end_ch": 16,
+      "end_v": 17
+    },
+    {
+      "title": "Institution des juges",
+      "start_ch": 16,
+      "start_v": 18,
+      "end_ch": 16,
+      "end_v": 20
+    },
+    {
+      "title": "Avertissements contre l'idolâtrie",
+      "start_ch": 16,
+      "start_v": 21,
+      "end_ch": 16,
+      "end_v": 22
+    },
+    {
+      "title": "Les juges",
+      "start_ch": 17,
+      "start_v": 8,
+      "end_ch": 17,
+      "end_v": 13
+    },
+    {
+      "title": "Règles relatives à la royauté",
+      "start_ch": 17,
+      "start_v": 14,
+      "end_ch": 17,
+      "end_v": 20
+    },
+    {
+      "title": "Les droits des Lévites et des prêtres",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 8
+    },
+    {
+      "title": "Les prophètes et non la divination",
+      "start_ch": 18,
+      "start_v": 9,
+      "end_ch": 18,
+      "end_v": 22
+    },
+    {
+      "title": "Les villes de refuge",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 13
+    },
+    {
+      "title": "Respect des limites et nécessité de témoins",
+      "start_ch": 19,
+      "start_v": 14,
+      "end_ch": 19,
+      "end_v": 21
+    },
+    {
+      "title": "Les exemptions du service militaire",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 9
+    },
+    {
+      "title": "Règles pour la conquête de villes",
+      "start_ch": 20,
+      "start_v": 10,
+      "end_ch": 20,
+      "end_v": 20
+    },
+    {
+      "title": "Meurtres dont les auteurs sont inconnus",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 9
+    },
+    {
+      "title": "Règles pour la tenue de la famille",
+      "start_ch": 21,
+      "start_v": 10,
+      "end_ch": 21,
+      "end_v": 21
+    },
+    {
+      "title": "Instructions diverses",
+      "start_ch": 21,
+      "start_v": 22,
+      "end_ch": 21,
+      "end_v": 23
+    },
+    {
+      "title": "Cas d’exclusion de l'assemblée",
+      "start_ch": 23,
+      "start_v": 2,
+      "end_ch": 23,
+      "end_v": 9
+    },
+    {
+      "title": "Règles liées à la pureté",
+      "start_ch": 23,
+      "start_v": 10,
+      "end_ch": 23,
+      "end_v": 21
+    },
+    {
+      "title": "Les vœux",
+      "start_ch": 23,
+      "start_v": 22,
+      "end_ch": 23,
+      "end_v": 26
+    },
+    {
+      "title": "Loi sur le divorce",
+      "start_ch": 24,
+      "start_v": 1,
+      "end_ch": 24,
+      "end_v": 4
+    },
+    {
+      "title": "Ordonnances diverses",
+      "start_ch": 24,
+      "start_v": 5,
+      "end_ch": 24,
+      "end_v": 18
+    },
+    {
+      "title": "Solidarité avec les plus démunis",
+      "start_ch": 24,
+      "start_v": 19,
+      "end_ch": 24,
+      "end_v": 22
+    },
+    {
+      "title": "Les différends",
+      "start_ch": 25,
+      "start_v": 1,
+      "end_ch": 25,
+      "end_v": 4
+    },
+    {
+      "title": "La descendance d'un frère mort",
+      "start_ch": 25,
+      "start_v": 5,
+      "end_ch": 25,
+      "end_v": 12
+    },
+    {
+      "title": "Une mesure juste",
+      "start_ch": 25,
+      "start_v": 13,
+      "end_ch": 25,
+      "end_v": 16
+    },
+    {
+      "title": "Jugement futur d'Amalek",
+      "start_ch": 25,
+      "start_v": 17,
+      "end_ch": 25,
+      "end_v": 19
+    },
+    {
+      "title": "Les premières récoltes",
+      "start_ch": 26,
+      "start_v": 1,
+      "end_ch": 26,
+      "end_v": 11
+    },
+    {
+      "title": "Les dîmes de la troisième année",
+      "start_ch": 26,
+      "start_v": 12,
+      "end_ch": 26,
+      "end_v": 19
+    },
+    {
+      "title": "La loi au mont Ebal",
+      "start_ch": 27,
+      "start_v": 1,
+      "end_ch": 27,
+      "end_v": 10
+    },
+    {
+      "title": "Bénédictions et malédictions",
+      "start_ch": 27,
+      "start_v": 11,
+      "end_ch": 27,
+      "end_v": 26
+    },
+    {
+      "title": "Bénédictions en perspective",
+      "start_ch": 28,
+      "start_v": 1,
+      "end_ch": 28,
+      "end_v": 14
+    },
+    {
+      "title": "Malédictions en perspective",
+      "start_ch": 28,
+      "start_v": 15,
+      "end_ch": 28,
+      "end_v": 68
+    },
+    {
+      "title": "Renouvellement de l'alliance",
+      "start_ch": 28,
+      "start_v": 69,
+      "end_ch": 28,
+      "end_v": 69
+    },
+    {
+      "title": "Conséquences de la désobéissance",
+      "start_ch": 29,
+      "start_v": 15,
+      "end_ch": 29,
+      "end_v": 28
+    },
+    {
+      "title": "Promesses et menaces",
+      "start_ch": 30,
+      "start_v": 1,
+      "end_ch": 30,
+      "end_v": 20
+    },
+    {
+      "title": "Transmission des responsabilités à Josué",
+      "start_ch": 31,
+      "start_v": 1,
+      "end_ch": 31,
+      "end_v": 8
+    },
+    {
+      "title": "Appel à lire régulièrement la loi",
+      "start_ch": 31,
+      "start_v": 9,
+      "end_ch": 31,
+      "end_v": 13
+    },
+    {
+      "title": "Annonce de l'infidélité d'Israël",
+      "start_ch": 31,
+      "start_v": 14,
+      "end_ch": 31,
+      "end_v": 29
+    },
+    {
+      "title": "Cantique de Moïse",
+      "start_ch": 31,
+      "start_v": 30,
+      "end_ch": 31,
+      "end_v": 30
+    },
+    {
+      "title": "Ordre à Moïse de gravir le mont Nebo",
+      "start_ch": 32,
+      "start_v": 48,
+      "end_ch": 32,
+      "end_v": 52
+    },
+    {
+      "title": "Bénédiction de Moïse",
+      "start_ch": 33,
+      "start_v": 1,
+      "end_ch": 33,
+      "end_v": 29
+    },
+    {
+      "title": "Mort de Moïse",
+      "start_ch": 34,
+      "start_v": 1,
+      "end_ch": 34,
+      "end_v": 12
+    }
+  ]
 }

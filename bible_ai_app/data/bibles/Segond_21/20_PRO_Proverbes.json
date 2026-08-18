@@ -983,5 +983,225 @@
       "30": "La grâce est trompeuse et la beauté est illusoire; c'est de la femme qui craint l'Eternel qu'on chantera les louanges.",
       "31": "Donnez-lui du fruit de son travail et qu'aux portes de la ville ses œuvres fassent son éloge!"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Objectif de l’enseignement",
+    "1:10": "Les mauvaises compagnies",
+    "1:20": "L’appel de la sagesse",
+    "2:1": "Les bienfaits de la sagesse",
+    "4:1": "L’acquisition de la sagesse",
+    "5:1": "L'adultère",
+    "6:1": "Le danger de se porter garant",
+    "6:6": "La paresse",
+    "6:12": "L’homme double",
+    "6:20": "Les conséquences de l'adultère",
+    "7:1": "La femme débauchée",
+    "8:1": "L’activité de la sagesse",
+    "9:1": "La sagesse et la folie",
+    "10:1": "Le méchant et le juste",
+    "12:15": "Le fou et le sage",
+    "15:1": "Paroles et attitudes",
+    "22:17": "Attention aux relations",
+    "23:15": "Appels d’un père à son fils",
+    "24:11": "Appel à la justice",
+    "25:1": "Les relations",
+    "26:1": "Les relations avec le stupide",
+    "27:23": "Appel à l’intégrité",
+    "29:1": "Des attitudes opposées",
+    "30:1": "La relation avec Dieu",
+    "30:10": "A propos des catégories",
+    "31:1": "Conseils d’une mère",
+    "31:10": "Une femme de valeur"
+  },
+  "pericopes": [
+    {
+      "title": "Objectif de l’enseignement",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 9
+    },
+    {
+      "title": "Les mauvaises compagnies",
+      "start_ch": 1,
+      "start_v": 10,
+      "end_ch": 1,
+      "end_v": 19
+    },
+    {
+      "title": "L’appel de la sagesse",
+      "start_ch": 1,
+      "start_v": 20,
+      "end_ch": 1,
+      "end_v": 33
+    },
+    {
+      "title": "Les bienfaits de la sagesse",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 22
+    },
+    {
+      "title": "L’acquisition de la sagesse",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 27
+    },
+    {
+      "title": "L'adultère",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 23
+    },
+    {
+      "title": "Le danger de se porter garant",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 5
+    },
+    {
+      "title": "La paresse",
+      "start_ch": 6,
+      "start_v": 6,
+      "end_ch": 6,
+      "end_v": 11
+    },
+    {
+      "title": "L’homme double",
+      "start_ch": 6,
+      "start_v": 12,
+      "end_ch": 6,
+      "end_v": 19
+    },
+    {
+      "title": "Les conséquences de l'adultère",
+      "start_ch": 6,
+      "start_v": 20,
+      "end_ch": 6,
+      "end_v": 35
+    },
+    {
+      "title": "La femme débauchée",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 27
+    },
+    {
+      "title": "L’activité de la sagesse",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 36
+    },
+    {
+      "title": "La sagesse et la folie",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 18
+    },
+    {
+      "title": "Le méchant et le juste",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 32
+    },
+    {
+      "title": "Le fou et le sage",
+      "start_ch": 12,
+      "start_v": 15,
+      "end_ch": 12,
+      "end_v": 28
+    },
+    {
+      "title": "Paroles et attitudes",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 33
+    },
+    {
+      "title": "Attention aux relations",
+      "start_ch": 22,
+      "start_v": 17,
+      "end_ch": 22,
+      "end_v": 29
+    },
+    {
+      "title": "Appels d’un père à son fils",
+      "start_ch": 23,
+      "start_v": 15,
+      "end_ch": 23,
+      "end_v": 35
+    },
+    {
+      "title": "Appel à la justice",
+      "start_ch": 24,
+      "start_v": 11,
+      "end_ch": 24,
+      "end_v": 34
+    },
+    {
+      "title": "Les relations",
+      "start_ch": 25,
+      "start_v": 1,
+      "end_ch": 25,
+      "end_v": 28
+    },
+    {
+      "title": "Les relations avec le stupide",
+      "start_ch": 26,
+      "start_v": 1,
+      "end_ch": 26,
+      "end_v": 28
+    },
+    {
+      "title": "Appel à l’intégrité",
+      "start_ch": 27,
+      "start_v": 23,
+      "end_ch": 27,
+      "end_v": 27
+    },
+    {
+      "title": "Des attitudes opposées",
+      "start_ch": 29,
+      "start_v": 1,
+      "end_ch": 29,
+      "end_v": 27
+    },
+    {
+      "title": "La relation avec Dieu",
+      "start_ch": 30,
+      "start_v": 1,
+      "end_ch": 30,
+      "end_v": 9
+    },
+    {
+      "title": "A propos des catégories",
+      "start_ch": 30,
+      "start_v": 10,
+      "end_ch": 30,
+      "end_v": 33
+    },
+    {
+      "title": "Conseils d’une mère",
+      "start_ch": 31,
+      "start_v": 1,
+      "end_ch": 31,
+      "end_v": 9
+    },
+    {
+      "title": "Une femme de valeur",
+      "start_ch": 31,
+      "start_v": 10,
+      "end_ch": 31,
+      "end_v": 31
+    }
+  ]
 }

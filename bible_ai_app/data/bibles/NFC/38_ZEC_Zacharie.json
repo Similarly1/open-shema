@@ -245,5 +245,233 @@
       "20": "En ce temps-là, même les clochettes des chevaux porteront l'inscription “appartient au Seigneur”. Les marmites ordinaires de la maison du Seigneur seront aussi sacrées que les bols à aspersion placés devant l'autel.",
       "21": "Toutes les marmites qui se trouvent à Jérusalem et en Juda appartiendront au Seigneur de l'univers. Tous ceux qui viendront offrir des sacrifices les utiliseront pour faire cuire la viande. Quand ce temps arrivera, il n'y aura plus aucun marchand dans la maison du Seigneur de l'univers."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Le Seigneur appelle les Israélites à revenir vers lui",
+    "1:7": "Première vision&#160;: les chevaux",
+    "1:14": "Le Seigneur va de nouveau choisir Jérusalem",
+    "2:1": "Deuxième vision&#160;: les cornes et les forgerons",
+    "2:5": "Troisième vision&#160;: le cordeau à mesurer",
+    "2:10": "Le Seigneur rappelle les exilés",
+    "3:1": "Quatrième vision&#160;: le grand-prêtre Yéchoua",
+    "3:8": "Dieu fera venir son serviteur",
+    "4:1": "Cinquième vision&#160;: le porte-lampes et les oliviers",
+    "5:1": "Sixième vision&#160;: le livre de la malédiction",
+    "5:5": "Septième vision&#160;: la femme qui représente la Méchanceté",
+    "6:1": "Huitième vision&#160;: les quatre chars",
+    "6:9": "Le couronnement prophétique de Yéchoua",
+    "7:1": "Le jeûne en souvenir de la ruine de Jérusalem",
+    "8:1": "Promesses de paix et d'abondance",
+    "8:18": "Les jours de jeûne deviendront des jours de fête",
+    "9:1": "Jugement et salut des peuples voisins d'Israël",
+    "9:9": "Le roi qui établira la paix",
+    "9:11": "Le Seigneur libérera les prisonniers",
+    "10:1": "Demander au Seigneur et non aux idoles",
+    "10:3": "Promesses de délivrance",
+    "11:1": "Les grandes puissances sont abattues",
+    "11:4": "Les deux bergers",
+    "12:1": "Jérusalem sera attaquée mais le Seigneur la délivrera",
+    "12:9": "Le deuil sera dans tout le pays",
+    "13:2": "Dieu éliminera les idoles et les faux prophètes",
+    "13:7": "Le peuple reconnaît le Seigneur comme son Dieu",
+    "14:1": "La bataille finale et l'arrivée du Seigneur"
+  },
+  "pericopes": [
+    {
+      "title": "Le Seigneur appelle les Israélites à revenir vers lui",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 6
+    },
+    {
+      "title": "Première vision&#160;: les chevaux",
+      "start_ch": 1,
+      "start_v": 7,
+      "end_ch": 1,
+      "end_v": 13
+    },
+    {
+      "title": "Le Seigneur va de nouveau choisir Jérusalem",
+      "start_ch": 1,
+      "start_v": 14,
+      "end_ch": 1,
+      "end_v": 17
+    },
+    {
+      "title": "Deuxième vision&#160;: les cornes et les forgerons",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 4
+    },
+    {
+      "title": "Troisième vision&#160;: le cordeau à mesurer",
+      "start_ch": 2,
+      "start_v": 5,
+      "end_ch": 2,
+      "end_v": 9
+    },
+    {
+      "title": "Le Seigneur rappelle les exilés",
+      "start_ch": 2,
+      "start_v": 10,
+      "end_ch": 2,
+      "end_v": 17
+    },
+    {
+      "title": "Quatrième vision&#160;: le grand-prêtre Yéchoua",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 7
+    },
+    {
+      "title": "Dieu fera venir son serviteur",
+      "start_ch": 3,
+      "start_v": 8,
+      "end_ch": 3,
+      "end_v": 10
+    },
+    {
+      "title": "Cinquième vision&#160;: le porte-lampes et les oliviers",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 14
+    },
+    {
+      "title": "Sixième vision&#160;: le livre de la malédiction",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 4
+    },
+    {
+      "title": "Septième vision&#160;: la femme qui représente la Méchanceté",
+      "start_ch": 5,
+      "start_v": 5,
+      "end_ch": 5,
+      "end_v": 11
+    },
+    {
+      "title": "Huitième vision&#160;: les quatre chars",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 8
+    },
+    {
+      "title": "Le couronnement prophétique de Yéchoua",
+      "start_ch": 6,
+      "start_v": 9,
+      "end_ch": 6,
+      "end_v": 15
+    },
+    {
+      "title": "Le jeûne en souvenir de la ruine de Jérusalem",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 14
+    },
+    {
+      "title": "Promesses de paix et d'abondance",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 17
+    },
+    {
+      "title": "Les jours de jeûne deviendront des jours de fête",
+      "start_ch": 8,
+      "start_v": 18,
+      "end_ch": 8,
+      "end_v": 23
+    },
+    {
+      "title": "Jugement et salut des peuples voisins d'Israël",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 8
+    },
+    {
+      "title": "Le roi qui établira la paix",
+      "start_ch": 9,
+      "start_v": 9,
+      "end_ch": 9,
+      "end_v": 10
+    },
+    {
+      "title": "Le Seigneur libérera les prisonniers",
+      "start_ch": 9,
+      "start_v": 11,
+      "end_ch": 9,
+      "end_v": 17
+    },
+    {
+      "title": "Demander au Seigneur et non aux idoles",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 2
+    },
+    {
+      "title": "Promesses de délivrance",
+      "start_ch": 10,
+      "start_v": 3,
+      "end_ch": 10,
+      "end_v": 12
+    },
+    {
+      "title": "Les grandes puissances sont abattues",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 3
+    },
+    {
+      "title": "Les deux bergers",
+      "start_ch": 11,
+      "start_v": 4,
+      "end_ch": 11,
+      "end_v": 17
+    },
+    {
+      "title": "Jérusalem sera attaquée mais le Seigneur la délivrera",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 8
+    },
+    {
+      "title": "Le deuil sera dans tout le pays",
+      "start_ch": 12,
+      "start_v": 9,
+      "end_ch": 12,
+      "end_v": 14
+    },
+    {
+      "title": "Dieu éliminera les idoles et les faux prophètes",
+      "start_ch": 13,
+      "start_v": 2,
+      "end_ch": 13,
+      "end_v": 6
+    },
+    {
+      "title": "Le peuple reconnaît le Seigneur comme son Dieu",
+      "start_ch": 13,
+      "start_v": 7,
+      "end_ch": 13,
+      "end_v": 9
+    },
+    {
+      "title": "La bataille finale et l'arrivée du Seigneur",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 21
+    }
+  ]
 }

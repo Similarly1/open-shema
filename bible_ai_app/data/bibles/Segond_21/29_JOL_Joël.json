@@ -64,5 +64,41 @@
       "4": "Le soleil se changera en ténèbres et la lune en sang avant l'arrivée du jour de l'Eternel, de ce jour grand et terrible.",
       "5": "»Alors *toute personne qui fera appel au nom de l'Eternel sera sauvée; *il y aura des rescapés sur le mont Sion et à Jérusalem, comme l'a dit l'Eternel, et parmi les survivants que l'Eternel appellera."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Une invasion dévastatrice",
+    "2:12": "Appel à revenir à Dieu",
+    "3:1": "Annonce de la venue de l’Esprit",
+    "4:1": "Jugement des nations"
+  },
+  "pericopes": [
+    {
+      "title": "Une invasion dévastatrice",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 20
+    },
+    {
+      "title": "Appel à revenir à Dieu",
+      "start_ch": 2,
+      "start_v": 12,
+      "end_ch": 2,
+      "end_v": 27
+    },
+    {
+      "title": "Annonce de la venue de l’Esprit",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 5
+    },
+    {
+      "title": "Jugement des nations",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 1
+    }
+  ]
 }

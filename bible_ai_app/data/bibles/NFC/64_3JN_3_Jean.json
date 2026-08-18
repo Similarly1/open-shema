@@ -23,5 +23,41 @@
       "14": "J'espère te voir bientôt et nous parlerons alors de vive voix.",
       "15": "Que la paix soit avec toi! Tes amis te saluent. Salue nos amis, chacun en particulier."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Salutation",
+    "1:5": "La fidélité de Gaïus",
+    "1:9": "Diotrèphe et Démétrius",
+    "1:13": "Salutations finales"
+  },
+  "pericopes": [
+    {
+      "title": "Salutation",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 4
+    },
+    {
+      "title": "La fidélité de Gaïus",
+      "start_ch": 1,
+      "start_v": 5,
+      "end_ch": 1,
+      "end_v": 8
+    },
+    {
+      "title": "Diotrèphe et Démétrius",
+      "start_ch": 1,
+      "start_v": 9,
+      "end_ch": 1,
+      "end_v": 12
+    },
+    {
+      "title": "Salutations finales",
+      "start_ch": 1,
+      "start_v": 13,
+      "end_ch": 1,
+      "end_v": 15
+    }
+  ]
 }

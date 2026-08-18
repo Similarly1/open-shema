@@ -849,5 +849,633 @@
       "53": "Il fit ce qui est mal aux yeux du Seigneur; il se conduisit comme son père, sa mère, et comme le roi Jéroboam, fils de Nebath, qui avait poussé le peuple d'Israël à pécher.",
       "54": "Il s'inclina devant le dieu Baal pour lui rendre un culte, offensant ainsi le Seigneur, le Dieu d'Israël, tout comme l'avait fait son père."
     }
-  }
+  },
+  "sections": {
+    "1:1": "Adonia voudrait devenir roi",
+    "1:9": "Natan et Batchéba sont partisans de Salomon",
+    "1:28": "David désigne Salomon pour lui succéder",
+    "1:38": "Salomon est choisi comme roi",
+    "1:41": "Salomon pardonne à Adonia",
+    "2:1": "Les dernières instructions de David",
+    "2:10": "David meurt. Salomon lui succède",
+    "2:13": "Salomon se débarrasse d'Adonia",
+    "2:26": "Salomon chasse Abiatar de Jérusalem",
+    "2:28": "Salomon se débarrasse de Joab",
+    "2:36": "Salomon se débarrasse de Chiméi",
+    "3:1": "Salomon épouse une fille du pharaon",
+    "3:4": "Salomon demande à Dieu la sagesse pour régner",
+    "3:16": "Salomon rend la justice avec sagesse",
+    "4:1": "Salomon organise son royaume",
+    "5:9": "Salomon surpasse en sagesse tous les sages",
+    "5:15": "Salomon prépare la construction du temple",
+    "5:27": "Salomon impose les travaux forcés",
+    "6:1": "Salomon construit le temple du Seigneur",
+    "6:14": "La décoration intérieure du temple",
+    "7:1": "Salomon se fait construire un palais royal",
+    "7:15": "Les colonnes de bronze",
+    "7:23": "La grande cuve de bronze",
+    "7:27": "Les chariots de bronze",
+    "7:40": "Liste des objets en métal du temple",
+    "8:1": "Le coffre de l'alliance est déposé dans le temple",
+    "8:14": "Discours de Salomon pour la consécration du temple",
+    "8:22": "La prière solennelle de Salomon",
+    "8:54": "Salomon demande la bénédiction de Dieu sur son peuple",
+    "8:62": "Les sacrifices offerts au Seigneur",
+    "9:1": "Le Seigneur se montre de nouveau à Salomon",
+    "9:12": "Activités diverses de Salomon",
+    "10:1": "La reine de Saba rend visite à Salomon",
+    "10:14": "La puissance et la richesse de Salomon",
+    "11:1": "Salomon est infidèle au Seigneur",
+    "11:14": "Les adversaires de Salomon",
+    "11:26": "La révolte de Jéroboam",
+    "12:1": "L'assemblée de Sichem",
+    "12:16": "Le royaume est divisé",
+    "12:26": "Le péché de Jéroboam",
+    "12:33": "Le culte de Béthel est condamné",
+    "13:11": "Le prophète désobéit",
+    "13:20": "Le prophète est tué par un lion",
+    "14:1": "Suite du règne de Jéroboam Ier",
+    "14:21": "Suite du règne de Roboam, roi de Juda",
+    "15:1": "Abiam, roi de Juda",
+    "15:9": "Asa, roi de Juda",
+    "15:25": "Nadab, roi d'Israël",
+    "15:33": "Bacha, roi d'Israël",
+    "16:8": "Éla, roi d'Israël",
+    "16:15": "Zimri, roi d'Israël",
+    "16:23": "Omri, roi d'Israël",
+    "16:29": "Achab, roi d'Israël",
+    "17:1": "Le prophète Élie annonce une sécheresse",
+    "17:2": "Élie au bord du torrent de Kerith",
+    "17:7": "Élie chez la veuve de Sarepta",
+    "17:17": "Élie rend la vie au fils de la veuve",
+    "18:1": "Élie doit annoncer la fin de la sécheresse",
+    "18:16": "Élie se présente devant Achab",
+    "18:20": "Élie et les prophètes de Baal au mont Carmel",
+    "18:41": "La pluie revient",
+    "19:1": "Élie est découragé",
+    "19:9": "Dieu redonne du courage à Élie",
+    "19:19": "Élie désigne Élisée pour lui succéder",
+    "20:1": "Le roi de Syrie assiège Samarie",
+    "20:13": "Le roi Achab remporte la victoire",
+    "20:23": "Nouvelle victoire du roi Achab",
+    "20:31": "Achab épargne la vie du roi de Syrie",
+    "20:35": "Dieu condamne la faiblesse d'Achab",
+    "21:1": "Le roi Achab laisse assassiner Naboth",
+    "21:17": "Dieu condamne la conduite d'Achab et de Jézabel",
+    "21:27": "Achab s'humilie pour sa faute",
+    "22:1": "Achab veut reprendre la ville de Ramoth",
+    "22:5": "Les prophètes de métier prédisent le succès",
+    "22:13": "Le prophète Michée prédit la défaite",
+    "22:29": "Le roi Achab est tué au combat",
+    "22:41": "Josaphat, roi de Juda",
+    "22:52": "Ahazia, roi d'Israël"
+  },
+  "pericopes": [
+    {
+      "title": "Adonia voudrait devenir roi",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 8
+    },
+    {
+      "title": "Natan et Batchéba sont partisans de Salomon",
+      "start_ch": 1,
+      "start_v": 9,
+      "end_ch": 1,
+      "end_v": 27
+    },
+    {
+      "title": "David désigne Salomon pour lui succéder",
+      "start_ch": 1,
+      "start_v": 28,
+      "end_ch": 1,
+      "end_v": 37
+    },
+    {
+      "title": "Salomon est choisi comme roi",
+      "start_ch": 1,
+      "start_v": 38,
+      "end_ch": 1,
+      "end_v": 40
+    },
+    {
+      "title": "Salomon pardonne à Adonia",
+      "start_ch": 1,
+      "start_v": 41,
+      "end_ch": 1,
+      "end_v": 53
+    },
+    {
+      "title": "Les dernières instructions de David",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 9
+    },
+    {
+      "title": "David meurt. Salomon lui succède",
+      "start_ch": 2,
+      "start_v": 10,
+      "end_ch": 2,
+      "end_v": 12
+    },
+    {
+      "title": "Salomon se débarrasse d'Adonia",
+      "start_ch": 2,
+      "start_v": 13,
+      "end_ch": 2,
+      "end_v": 25
+    },
+    {
+      "title": "Salomon chasse Abiatar de Jérusalem",
+      "start_ch": 2,
+      "start_v": 26,
+      "end_ch": 2,
+      "end_v": 27
+    },
+    {
+      "title": "Salomon se débarrasse de Joab",
+      "start_ch": 2,
+      "start_v": 28,
+      "end_ch": 2,
+      "end_v": 35
+    },
+    {
+      "title": "Salomon se débarrasse de Chiméi",
+      "start_ch": 2,
+      "start_v": 36,
+      "end_ch": 2,
+      "end_v": 46
+    },
+    {
+      "title": "Salomon épouse une fille du pharaon",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 3
+    },
+    {
+      "title": "Salomon demande à Dieu la sagesse pour régner",
+      "start_ch": 3,
+      "start_v": 4,
+      "end_ch": 3,
+      "end_v": 15
+    },
+    {
+      "title": "Salomon rend la justice avec sagesse",
+      "start_ch": 3,
+      "start_v": 16,
+      "end_ch": 3,
+      "end_v": 28
+    },
+    {
+      "title": "Salomon organise son royaume",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 20
+    },
+    {
+      "title": "Salomon surpasse en sagesse tous les sages",
+      "start_ch": 5,
+      "start_v": 9,
+      "end_ch": 5,
+      "end_v": 14
+    },
+    {
+      "title": "Salomon prépare la construction du temple",
+      "start_ch": 5,
+      "start_v": 15,
+      "end_ch": 5,
+      "end_v": 26
+    },
+    {
+      "title": "Salomon impose les travaux forcés",
+      "start_ch": 5,
+      "start_v": 27,
+      "end_ch": 5,
+      "end_v": 32
+    },
+    {
+      "title": "Salomon construit le temple du Seigneur",
+      "start_ch": 6,
+      "start_v": 1,
+      "end_ch": 6,
+      "end_v": 13
+    },
+    {
+      "title": "La décoration intérieure du temple",
+      "start_ch": 6,
+      "start_v": 14,
+      "end_ch": 6,
+      "end_v": 38
+    },
+    {
+      "title": "Salomon se fait construire un palais royal",
+      "start_ch": 7,
+      "start_v": 1,
+      "end_ch": 7,
+      "end_v": 14
+    },
+    {
+      "title": "Les colonnes de bronze",
+      "start_ch": 7,
+      "start_v": 15,
+      "end_ch": 7,
+      "end_v": 22
+    },
+    {
+      "title": "La grande cuve de bronze",
+      "start_ch": 7,
+      "start_v": 23,
+      "end_ch": 7,
+      "end_v": 26
+    },
+    {
+      "title": "Les chariots de bronze",
+      "start_ch": 7,
+      "start_v": 27,
+      "end_ch": 7,
+      "end_v": 39
+    },
+    {
+      "title": "Liste des objets en métal du temple",
+      "start_ch": 7,
+      "start_v": 40,
+      "end_ch": 7,
+      "end_v": 51
+    },
+    {
+      "title": "Le coffre de l'alliance est déposé dans le temple",
+      "start_ch": 8,
+      "start_v": 1,
+      "end_ch": 8,
+      "end_v": 13
+    },
+    {
+      "title": "Discours de Salomon pour la consécration du temple",
+      "start_ch": 8,
+      "start_v": 14,
+      "end_ch": 8,
+      "end_v": 21
+    },
+    {
+      "title": "La prière solennelle de Salomon",
+      "start_ch": 8,
+      "start_v": 22,
+      "end_ch": 8,
+      "end_v": 53
+    },
+    {
+      "title": "Salomon demande la bénédiction de Dieu sur son peuple",
+      "start_ch": 8,
+      "start_v": 54,
+      "end_ch": 8,
+      "end_v": 61
+    },
+    {
+      "title": "Les sacrifices offerts au Seigneur",
+      "start_ch": 8,
+      "start_v": 62,
+      "end_ch": 8,
+      "end_v": 66
+    },
+    {
+      "title": "Le Seigneur se montre de nouveau à Salomon",
+      "start_ch": 9,
+      "start_v": 1,
+      "end_ch": 9,
+      "end_v": 11
+    },
+    {
+      "title": "Activités diverses de Salomon",
+      "start_ch": 9,
+      "start_v": 12,
+      "end_ch": 9,
+      "end_v": 28
+    },
+    {
+      "title": "La reine de Saba rend visite à Salomon",
+      "start_ch": 10,
+      "start_v": 1,
+      "end_ch": 10,
+      "end_v": 13
+    },
+    {
+      "title": "La puissance et la richesse de Salomon",
+      "start_ch": 10,
+      "start_v": 14,
+      "end_ch": 10,
+      "end_v": 29
+    },
+    {
+      "title": "Salomon est infidèle au Seigneur",
+      "start_ch": 11,
+      "start_v": 1,
+      "end_ch": 11,
+      "end_v": 13
+    },
+    {
+      "title": "Les adversaires de Salomon",
+      "start_ch": 11,
+      "start_v": 14,
+      "end_ch": 11,
+      "end_v": 25
+    },
+    {
+      "title": "La révolte de Jéroboam",
+      "start_ch": 11,
+      "start_v": 26,
+      "end_ch": 11,
+      "end_v": 43
+    },
+    {
+      "title": "L'assemblée de Sichem",
+      "start_ch": 12,
+      "start_v": 1,
+      "end_ch": 12,
+      "end_v": 15
+    },
+    {
+      "title": "Le royaume est divisé",
+      "start_ch": 12,
+      "start_v": 16,
+      "end_ch": 12,
+      "end_v": 25
+    },
+    {
+      "title": "Le péché de Jéroboam",
+      "start_ch": 12,
+      "start_v": 26,
+      "end_ch": 12,
+      "end_v": 32
+    },
+    {
+      "title": "Le culte de Béthel est condamné",
+      "start_ch": 12,
+      "start_v": 33,
+      "end_ch": 12,
+      "end_v": 33
+    },
+    {
+      "title": "Le prophète désobéit",
+      "start_ch": 13,
+      "start_v": 11,
+      "end_ch": 13,
+      "end_v": 19
+    },
+    {
+      "title": "Le prophète est tué par un lion",
+      "start_ch": 13,
+      "start_v": 20,
+      "end_ch": 13,
+      "end_v": 34
+    },
+    {
+      "title": "Suite du règne de Jéroboam Ier",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 20
+    },
+    {
+      "title": "Suite du règne de Roboam, roi de Juda",
+      "start_ch": 14,
+      "start_v": 21,
+      "end_ch": 14,
+      "end_v": 31
+    },
+    {
+      "title": "Abiam, roi de Juda",
+      "start_ch": 15,
+      "start_v": 1,
+      "end_ch": 15,
+      "end_v": 8
+    },
+    {
+      "title": "Asa, roi de Juda",
+      "start_ch": 15,
+      "start_v": 9,
+      "end_ch": 15,
+      "end_v": 24
+    },
+    {
+      "title": "Nadab, roi d'Israël",
+      "start_ch": 15,
+      "start_v": 25,
+      "end_ch": 15,
+      "end_v": 32
+    },
+    {
+      "title": "Bacha, roi d'Israël",
+      "start_ch": 15,
+      "start_v": 33,
+      "end_ch": 15,
+      "end_v": 34
+    },
+    {
+      "title": "Éla, roi d'Israël",
+      "start_ch": 16,
+      "start_v": 8,
+      "end_ch": 16,
+      "end_v": 14
+    },
+    {
+      "title": "Zimri, roi d'Israël",
+      "start_ch": 16,
+      "start_v": 15,
+      "end_ch": 16,
+      "end_v": 22
+    },
+    {
+      "title": "Omri, roi d'Israël",
+      "start_ch": 16,
+      "start_v": 23,
+      "end_ch": 16,
+      "end_v": 28
+    },
+    {
+      "title": "Achab, roi d'Israël",
+      "start_ch": 16,
+      "start_v": 29,
+      "end_ch": 16,
+      "end_v": 34
+    },
+    {
+      "title": "Le prophète Élie annonce une sécheresse",
+      "start_ch": 17,
+      "start_v": 1,
+      "end_ch": 17,
+      "end_v": 1
+    },
+    {
+      "title": "Élie au bord du torrent de Kerith",
+      "start_ch": 17,
+      "start_v": 2,
+      "end_ch": 17,
+      "end_v": 6
+    },
+    {
+      "title": "Élie chez la veuve de Sarepta",
+      "start_ch": 17,
+      "start_v": 7,
+      "end_ch": 17,
+      "end_v": 16
+    },
+    {
+      "title": "Élie rend la vie au fils de la veuve",
+      "start_ch": 17,
+      "start_v": 17,
+      "end_ch": 17,
+      "end_v": 24
+    },
+    {
+      "title": "Élie doit annoncer la fin de la sécheresse",
+      "start_ch": 18,
+      "start_v": 1,
+      "end_ch": 18,
+      "end_v": 15
+    },
+    {
+      "title": "Élie se présente devant Achab",
+      "start_ch": 18,
+      "start_v": 16,
+      "end_ch": 18,
+      "end_v": 19
+    },
+    {
+      "title": "Élie et les prophètes de Baal au mont Carmel",
+      "start_ch": 18,
+      "start_v": 20,
+      "end_ch": 18,
+      "end_v": 40
+    },
+    {
+      "title": "La pluie revient",
+      "start_ch": 18,
+      "start_v": 41,
+      "end_ch": 18,
+      "end_v": 46
+    },
+    {
+      "title": "Élie est découragé",
+      "start_ch": 19,
+      "start_v": 1,
+      "end_ch": 19,
+      "end_v": 8
+    },
+    {
+      "title": "Dieu redonne du courage à Élie",
+      "start_ch": 19,
+      "start_v": 9,
+      "end_ch": 19,
+      "end_v": 18
+    },
+    {
+      "title": "Élie désigne Élisée pour lui succéder",
+      "start_ch": 19,
+      "start_v": 19,
+      "end_ch": 19,
+      "end_v": 21
+    },
+    {
+      "title": "Le roi de Syrie assiège Samarie",
+      "start_ch": 20,
+      "start_v": 1,
+      "end_ch": 20,
+      "end_v": 12
+    },
+    {
+      "title": "Le roi Achab remporte la victoire",
+      "start_ch": 20,
+      "start_v": 13,
+      "end_ch": 20,
+      "end_v": 22
+    },
+    {
+      "title": "Nouvelle victoire du roi Achab",
+      "start_ch": 20,
+      "start_v": 23,
+      "end_ch": 20,
+      "end_v": 30
+    },
+    {
+      "title": "Achab épargne la vie du roi de Syrie",
+      "start_ch": 20,
+      "start_v": 31,
+      "end_ch": 20,
+      "end_v": 34
+    },
+    {
+      "title": "Dieu condamne la faiblesse d'Achab",
+      "start_ch": 20,
+      "start_v": 35,
+      "end_ch": 20,
+      "end_v": 43
+    },
+    {
+      "title": "Le roi Achab laisse assassiner Naboth",
+      "start_ch": 21,
+      "start_v": 1,
+      "end_ch": 21,
+      "end_v": 16
+    },
+    {
+      "title": "Dieu condamne la conduite d'Achab et de Jézabel",
+      "start_ch": 21,
+      "start_v": 17,
+      "end_ch": 21,
+      "end_v": 26
+    },
+    {
+      "title": "Achab s'humilie pour sa faute",
+      "start_ch": 21,
+      "start_v": 27,
+      "end_ch": 21,
+      "end_v": 29
+    },
+    {
+      "title": "Achab veut reprendre la ville de Ramoth",
+      "start_ch": 22,
+      "start_v": 1,
+      "end_ch": 22,
+      "end_v": 4
+    },
+    {
+      "title": "Les prophètes de métier prédisent le succès",
+      "start_ch": 22,
+      "start_v": 5,
+      "end_ch": 22,
+      "end_v": 12
+    },
+    {
+      "title": "Le prophète Michée prédit la défaite",
+      "start_ch": 22,
+      "start_v": 13,
+      "end_ch": 22,
+      "end_v": 28
+    },
+    {
+      "title": "Le roi Achab est tué au combat",
+      "start_ch": 22,
+      "start_v": 29,
+      "end_ch": 22,
+      "end_v": 40
+    },
+    {
+      "title": "Josaphat, roi de Juda",
+      "start_ch": 22,
+      "start_v": 41,
+      "end_ch": 22,
+      "end_v": 51
+    },
+    {
+      "title": "Ahazia, roi d'Israël",
+      "start_ch": 22,
+      "start_v": 52,
+      "end_ch": 22,
+      "end_v": 54
+    }
+  ]
 }

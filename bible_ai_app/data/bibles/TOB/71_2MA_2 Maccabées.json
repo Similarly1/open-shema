@@ -591,5 +591,65 @@
       "38": "Si la composition est bonne et réussie, c’est aussi ce que j’ai voulu; si elle a peu de valeur et ne dépasse guère la médiocrité, c’est tout ce que j’ai pu faire.",
       "39": "Car de même qu’il est nuisible de boire du vin pur ou de l’eau pure, alors que le vin mêlé à l’eau est une boisson agréable qui produit une délicieuse jouissance, de même c’est l’art de disposer le récit qui charme l’entendement de ceux qui lisent l’ouvrage. C’est donc ici que je m’arrête."
     }
-  }
+  },
+  "sections": {
+    "1:1": "LETTRES AUX JUIFS D’ÉGYPTE",
+    "2:19": "PRÉFACE DE L’AUTEUR",
+    "3:1": "HISTOIRE D’HÉLIODORE",
+    "4:1": "LA PERSÉCUTION SOUS ANTIOCHUS ÉPIPHANE",
+    "10:9": "LES ÉVÉNEMENTS SOUS ANTIOCHUS EUPATOR",
+    "14:1": "LUTTE CONTRE NIKANOR, GÉNÉRAL DE DÉMÉTRIUS Ier",
+    "15:37": "ÉPILOGUE DE L’ABRÉVIATEUR"
+  },
+  "pericopes": [
+    {
+      "title": "LETTRES AUX JUIFS D’ÉGYPTE",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 36
+    },
+    {
+      "title": "PRÉFACE DE L’AUTEUR",
+      "start_ch": 2,
+      "start_v": 19,
+      "end_ch": 2,
+      "end_v": 32
+    },
+    {
+      "title": "HISTOIRE D’HÉLIODORE",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 40
+    },
+    {
+      "title": "LA PERSÉCUTION SOUS ANTIOCHUS ÉPIPHANE",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 50
+    },
+    {
+      "title": "LES ÉVÉNEMENTS SOUS ANTIOCHUS EUPATOR",
+      "start_ch": 10,
+      "start_v": 9,
+      "end_ch": 10,
+      "end_v": 38
+    },
+    {
+      "title": "LUTTE CONTRE NIKANOR, GÉNÉRAL DE DÉMÉTRIUS Ier",
+      "start_ch": 14,
+      "start_v": 1,
+      "end_ch": 14,
+      "end_v": 46
+    },
+    {
+      "title": "ÉPILOGUE DE L’ABRÉVIATEUR",
+      "start_ch": 15,
+      "start_v": 37,
+      "end_ch": 15,
+      "end_v": 39
+    }
+  ]
 }

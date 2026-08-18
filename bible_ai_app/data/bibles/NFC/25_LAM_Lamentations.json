@@ -170,5 +170,49 @@
       "21": "Fais-nous revenir vers toi, Seigneur, et nous reviendrons à toi. Rends notre vie semblable à celle d'autrefois.",
       "22": "Nous as-tu vraiment rejetés? Es-tu irrité à ce point contre nous?"
     }
-  }
+  },
+  "sections": {
+    "1:1": "Jérusalem est comme une veuve abandonnée",
+    "2:1": "Le Seigneur se conduit en ennemi d'Israël",
+    "3:1": "En pleine détresse une vraie raison d'espérer",
+    "4:1": "Les horreurs du siège de Jérusalem",
+    "5:1": "Fais-nous revenir à toi, Seigneur"
+  },
+  "pericopes": [
+    {
+      "title": "Jérusalem est comme une veuve abandonnée",
+      "start_ch": 1,
+      "start_v": 1,
+      "end_ch": 1,
+      "end_v": 22
+    },
+    {
+      "title": "Le Seigneur se conduit en ennemi d'Israël",
+      "start_ch": 2,
+      "start_v": 1,
+      "end_ch": 2,
+      "end_v": 22
+    },
+    {
+      "title": "En pleine détresse une vraie raison d'espérer",
+      "start_ch": 3,
+      "start_v": 1,
+      "end_ch": 3,
+      "end_v": 66
+    },
+    {
+      "title": "Les horreurs du siège de Jérusalem",
+      "start_ch": 4,
+      "start_v": 1,
+      "end_ch": 4,
+      "end_v": 22
+    },
+    {
+      "title": "Fais-nous revenir à toi, Seigneur",
+      "start_ch": 5,
+      "start_v": 1,
+      "end_ch": 5,
+      "end_v": 22
+    }
+  ]
 }
