@@ -1,7 +1,137 @@
 /**
- * Bible Reader Engine
- * Gère l'affichage du texte biblique, le split-pane, l'interlinéaire, le choix de version et les interactions versets.
+ * Bible Reader & Multi-Document Tabs Engine
+ * Gère l'affichage du texte biblique, les onglets multi-versions, le split-pane, l'interlinéaire et les interactions.
  */
+
+const TabsManager = {
+  tabs: [],
+  activeTabId: null,
+
+  init() {
+    document.getElementById('btn-add-tab').addEventListener('click', () => {
+      this.createNewTab();
+    });
+  },
+
+  setupInitialTabs(bibles) {
+    if (!bibles || bibles.length === 0) return;
+
+    const b1 = bibles[0].name;
+    const b2 = bibles.length > 1 ? bibles[1].name : b1;
+
+    this.createTab(b1, 'Gen', 1, '#EA580C');
+    if (bibles.length > 1) {
+      this.createTab(b2, 'Gen', 1, '#2563EB', false);
+    }
+  },
+
+  createTab(bibleName, book = 'Gen', chapter = 1, forceColor = null, activateNow = true) {
+    const id = 'tab_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+    const colorPalette = ['#EA580C', '#2563EB', '#059669', '#7C3AED', '#DB2777', '#D97706', '#0891B2'];
+    const badgeColor = forceColor || colorPalette[this.tabs.length % colorPalette.length];
+
+    const tab = {
+      id: id,
+      bibleName: bibleName,
+      book: book,
+      chapter: chapter,
+      badgeColor: badgeColor
+    };
+
+    this.tabs.push(tab);
+    this.renderTabs();
+
+    if (activateNow) {
+      this.activateTab(id);
+    }
+    return tab;
+  },
+
+  createNewTab() {
+    // Trouver une Bible installée qui n'est pas encore ouverte si possible
+    const openNames = this.tabs.map(t => t.bibleName);
+    let chosenBible = BibleReader.installedBibles.find(b => !openNames.includes(b.name))?.name;
+    if (!chosenBible) {
+      chosenBible = BibleReader.installedBibles[0]?.name || 'Colombe';
+    }
+
+    const newTab = this.createTab(chosenBible, BibleReader.currentBook, BibleReader.currentChapter, null, true);
+    App.showToast(`Nouvel onglet ouvert : ${chosenBible}`);
+  },
+
+  activateTab(tabId) {
+    const target = this.tabs.find(t => t.id === tabId);
+    if (!target) return;
+
+    this.activeTabId = tabId;
+    BibleReader.currentBible1 = target.bibleName;
+    BibleReader.currentBook = target.book;
+    BibleReader.currentChapter = target.chapter;
+
+    this.renderTabs();
+    BibleReader.loadChapter();
+  },
+
+  closeTab(tabId, e) {
+    if (e) e.stopPropagation();
+    if (this.tabs.length <= 1) {
+      App.showToast('Impossible de fermer le dernier onglet');
+      return;
+    }
+
+    const idx = this.tabs.findIndex(t => t.id === tabId);
+    if (idx === -1) return;
+
+    const wasActive = this.activeTabId === tabId;
+    this.tabs.splice(idx, 1);
+
+    if (wasActive) {
+      const nextTab = this.tabs[Math.max(0, idx - 1)];
+      this.activateTab(nextTab.id);
+    } else {
+      this.renderTabs();
+    }
+  },
+
+  updateActiveTab(bibleName = null, book = null, chapter = null) {
+    const active = this.tabs.find(t => t.id === this.activeTabId);
+    if (active) {
+      if (bibleName) active.bibleName = bibleName;
+      if (book) active.book = book;
+      if (chapter) active.chapter = chapter;
+      this.renderTabs();
+    }
+  },
+
+  renderTabs() {
+    const container = document.getElementById('tabs-list');
+    if (!container) return;
+    container.innerHTML = '';
+
+    this.tabs.forEach(tab => {
+      const tabEl = document.createElement('div');
+      tabEl.className = `tab ${tab.id === this.activeTabId ? 'active' : ''}`;
+      tabEl.dataset.tabId = tab.id;
+
+      tabEl.innerHTML = `
+        <span class="tab-badge-icon" style="background-color: ${tab.badgeColor};">📖</span>
+        <span class="tab-title">${tab.bibleName}</span>
+        <button class="tab-close-btn" title="Fermer cet onglet">✕</button>
+      `;
+
+      tabEl.addEventListener('click', () => {
+        this.activateTab(tab.id);
+      });
+
+      tabEl.querySelector('.tab-close-btn').addEventListener('click', (e) => {
+        this.closeTab(tab.id, e);
+      });
+
+      container.appendChild(tabEl);
+    });
+  }
+};
+
 
 const BibleReader = {
   currentBook: 'Gen',
@@ -19,6 +149,7 @@ const BibleReader = {
 
   async init() {
     this.bindEvents();
+    TabsManager.init();
     
     // Initialiser le BookPicker
     BookPicker.init((bookCode, chNum) => {
@@ -33,8 +164,10 @@ const BibleReader = {
         if (this.installedBibles.length > 1) {
           this.currentBible2 = this.installedBibles[1].name;
         }
+        TabsManager.setupInitialTabs(this.installedBibles);
+      } else {
+        this.loadChapter();
       }
-      this.loadChapter();
     });
   },
 
@@ -152,13 +285,9 @@ const BibleReader = {
     this.closeBiblePicker();
     if (this.targetPaneForPicker === 1) {
       this.currentBible1 = versionName;
-      // Mettre à jour le 1er onglet
-      const tab1 = document.querySelector('.tab[data-tab-id="tab-1"] .tab-title');
-      if (tab1) tab1.textContent = versionName;
+      TabsManager.updateActiveTab(versionName, this.currentBook, this.currentChapter);
     } else {
       this.currentBible2 = versionName;
-      const tab2 = document.querySelector('.tab[data-tab-id="tab-2"] .tab-title');
-      if (tab2) tab2.textContent = versionName;
     }
     this.loadChapter();
   },
@@ -166,6 +295,7 @@ const BibleReader = {
   async navigateTo(bookCode, chapterNum) {
     this.currentBook = bookCode;
     this.currentChapter = chapterNum;
+    TabsManager.updateActiveTab(null, bookCode, chapterNum);
     await this.loadChapter();
   },
 
