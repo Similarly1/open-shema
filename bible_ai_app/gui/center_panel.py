@@ -3140,7 +3140,7 @@ class CenterPanel(ctk.CTkFrame):
             
         # Tags de comparaison et d'interaction sur la zone Bible
         sec_title_col = "#60A5FA" if is_dark else "#1D4ED8"
-        self.bible_textbox._textbox.tag_configure("section_title", font=(self.font_family, self.font_size + 2, "bold"), foreground=sec_title_col, spacing1=18, spacing3=6)
+        self.bible_textbox._textbox.tag_configure("section_title", font=(self.font_family, self.font_size + 2, "bold"), foreground=sec_title_col, justify="center", spacing1=22, spacing3=10)
         self.bible_textbox._textbox.tag_configure("verse_header", font=(self.font_family, self.font_size, "bold"), foreground=verse_hdr_col, spacing1=12, spacing3=4)
         self.bible_textbox._textbox.tag_configure("bible_abbr", font=(self.font_family, self.font_size - 3, "bold"), foreground=bible_abbr_col)
         self.bible_textbox._textbox.tag_configure("diff_percent", font=(self.font_family, self.font_size - 4, "italic"), foreground=diff_pct_col)
@@ -3620,21 +3620,28 @@ class CenterPanel(ctk.CTkFrame):
                             v_num = ref.split(":")[-1] if ":" in ref else str(meta.get('verse', ''))
                             b_code = meta.get('book', '')
                             
-                            # Afficher le titre de section authentique s'il existe pour ce verset
+                            # 1. Afficher le titre de section authentique s'il existe pour ce verset
+                            has_section_title = False
                             if self.show_section_titles and v_num and b_code:
                                 sec_title = PericopeManager.get_section_title(
                                     ref_source, b_code, int(cur_ch) if str(cur_ch).isdigit() else 1, int(v_num) if str(v_num).isdigit() else 1
                                 )
                                 if sec_title:
-                                    self.bible_textbox.insert("end", f"\n\n{sec_title}\n\n", "section_title")
+                                    has_section_title = True
+                                    self.bible_textbox.insert("end", f"\n\n{sec_title.upper()}\n\n", "section_title")
                             
-                            # Détecter si le verset marque un nouveau paragraphe (ex: préfixé par * dans Segond 21)
+                            # 2. Détecter si le verset marque un nouveau paragraphe
                             is_para_start = False
                             if doc.startswith("*") or doc.startswith("¶"):
                                 is_para_start = True
                                 doc = doc[1:].strip()
+                            elif v_num and b_code:
+                                is_para_start = PericopeManager.is_paragraph_start(
+                                    ref_source, b_code, int(cur_ch) if str(cur_ch).isdigit() else 1, int(v_num) if str(v_num).isdigit() else 1
+                                )
                                 
-                            if not self.verse_per_line and is_para_start and str(v_num) != "1":
+                            # Si on est en mode continu (non 1 verset/ligne), insérer un saut de paragraphe si nouveau paragraphe
+                            if not self.verse_per_line and is_para_start and str(v_num) != "1" and not has_section_title:
                                 self.bible_textbox.insert("end", "\n\n")
                                 
                             start_v = self.bible_textbox.index("end-1c")

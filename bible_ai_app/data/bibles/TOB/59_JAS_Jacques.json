@@ -124,5 +124,26 @@
       "19": "Mes frères, si l’un de vous s’est égaré loin de la vérité et qu’on le ramène,",
       "20": "sachez que celui qui ramène un pécheur du chemin où il s’égarait lui sauvera la vie et fera disparaître une foule de péchés."
     }
-  }
+  },
+  "paragraphs": [
+    "1:1",
+    "1:2",
+    "1:5",
+    "1:9",
+    "1:12",
+    "1:13",
+    "1:19",
+    "2:1",
+    "2:14",
+    "3:1",
+    "3:14",
+    "4:1",
+    "4:11",
+    "4:13",
+    "5:1",
+    "5:7",
+    "5:12",
+    "5:13",
+    "5:19"
+  ]
 }

@@ -36,6 +36,31 @@ class PericopeManager:
         return book_data.get("sections", {})
 
     @classmethod
+    def is_paragraph_start(cls, bible_name: str, std_book_code: str, chapter: int, verse: int) -> bool:
+        """
+        Détermine si le verset (chapter, verse) marque le début d'un paragraphe authentique
+        dans la version demandée (ou si c'est un début de section).
+        """
+        book_data = BibleJsonLoader.load_book(bible_name, std_book_code)
+        if not book_data:
+            return int(verse) == 1
+            
+        key = f"{chapter}:{verse}"
+        
+        # 1. Vérification dans la liste dédiée des paragraphes extraits de l'EPUB
+        paragraphs = book_data.get("paragraphs")
+        if paragraphs:
+            return key in paragraphs
+            
+        # 2. Fallback sur les débuts de sections / péricopes
+        sections = book_data.get("sections", {})
+        if key in sections:
+            return True
+            
+        # 3. Le premier verset d'un chapitre marque toujours un début de paragraphe
+        return int(verse) == 1
+
+    @classmethod
     def get_pericope_context(cls, bible_name: str, std_book_code: str, chapter: int, verse: int) -> Dict[str, Any]:
         """
         Calcule la péricope active contenant (chapter, verse), ainsi que la péricope

@@ -100,5 +100,11 @@
       "21": "Salman est le père de Booz. Booz est le père d’Obed.",
       "22": "Obed est le père de Jessé, et Jessé est le père de David."
     }
-  }
+  },
+  "paragraphs": [
+    "1:1",
+    "2:1",
+    "3:1",
+    "4:1"
+  ]
 }
