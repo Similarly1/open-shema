@@ -22,6 +22,8 @@
   --accent-blue-hover: #0369A1;
   --accent-orange: #EA580C;
   --accent-purple: #7C3AED;
+  --accent-green: #10B981;
+  --accent-red: #EF4444;
   
   /* Typographie */
   --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -57,7 +59,7 @@ body, html {
   user-select: none;
 }
 
-/* Scrollbars modernes et discrètes */
+/* Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -73,7 +75,6 @@ body, html {
   background: #94A3B8;
 }
 
-/* Structure principale */
 .app-container {
   display: flex;
   width: 100vw;
@@ -210,7 +211,7 @@ body, html {
 }
 
 /* ==========================================================================
-   2. ZONE PRINCIPALE (Tabs & Toolbar)
+   2. ZONE PRINCIPALE & GESTION MULTI-VUES
    ========================================================================== */
 
 .main-content {
@@ -223,7 +224,121 @@ body, html {
   position: relative;
 }
 
-/* Barre d'onglets */
+.app-view {
+  width: 100%;
+  height: 100%;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+.app-view.active {
+  display: flex;
+}
+
+/* En-tête des vues secondaires (Bibliothèque / Paramètres) */
+.view-header {
+  padding: 16px 24px;
+  background-color: #FFFFFF;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-shrink: 0;
+}
+.view-title {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: var(--text-primary);
+}
+.view-subtitle {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+.view-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-field {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 12px;
+  width: 220px;
+  outline: none;
+}
+.search-field:focus {
+  border-color: var(--accent-blue);
+}
+
+.select-field {
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: #FFFFFF;
+  font-size: 12px;
+  color: var(--text-primary);
+  outline: none;
+  cursor: pointer;
+}
+.select-field.full-w {
+  width: 100%;
+}
+
+.text-field {
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 12px;
+  outline: none;
+}
+.text-field.full-w {
+  width: 100%;
+}
+
+.btn-primary {
+  height: 32px;
+  padding: 0 14px;
+  background-color: var(--accent-blue);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+.btn-primary:hover {
+  background-color: var(--accent-blue-hover);
+}
+
+.btn-secondary {
+  height: 32px;
+  padding: 0 14px;
+  background-color: #FFFFFF;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+.btn-secondary:hover {
+  background-color: var(--bg-hover);
+}
+
+/* ==========================================================================
+   3. VUE LECTEUR BIBLIQUE
+   ========================================================================== */
+
 .tabs-header {
   height: var(--header-height);
   background-color: #E2E8F0;
@@ -233,7 +348,6 @@ body, html {
   border-bottom: 1px solid var(--border-color);
   gap: 4px;
 }
-
 .tabs-list {
   display: flex;
   align-items: flex-end;
@@ -241,7 +355,6 @@ body, html {
   gap: 4px;
   overflow-x: auto;
 }
-
 .tab {
   display: flex;
   align-items: center;
@@ -254,7 +367,6 @@ body, html {
   font-weight: 500;
   color: var(--text-secondary);
   cursor: pointer;
-  position: relative;
   transition: var(--transition-fast);
 }
 .tab:hover {
@@ -266,9 +378,7 @@ body, html {
   color: var(--text-primary);
   font-weight: 600;
   height: 34px;
-  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.03);
 }
-
 .tab-badge-icon {
   width: 18px;
   height: 18px;
@@ -279,43 +389,22 @@ body, html {
   justify-content: center;
   font-size: 10px;
 }
-
 .tab-close-btn {
   background: transparent;
   border: none;
   font-size: 11px;
   color: var(--text-muted);
   cursor: pointer;
-  border-radius: 3px;
-  width: 16px;
-  height: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 2px;
 }
-.tab-close-btn:hover {
-  background-color: #E2E8F0;
-  color: #EF4444;
-}
-
 .btn-new-tab {
   width: 28px;
   height: 28px;
-  border-radius: 4px;
   border: none;
   background: transparent;
   font-size: 16px;
-  color: var(--text-secondary);
   cursor: pointer;
-  margin-bottom: 2px;
-}
-.btn-new-tab:hover {
-  background-color: #CBD5E1;
-  color: var(--text-primary);
 }
 
-/* Barre d'outils du lecteur */
 .reader-toolbar {
   height: var(--toolbar-height);
   background-color: #FFFFFF;
@@ -326,13 +415,11 @@ body, html {
   padding: 0 16px;
   gap: 12px;
 }
-
 .toolbar-left, .toolbar-right {
   display: flex;
   align-items: center;
   gap: 6px;
 }
-
 .tool-btn {
   display: flex;
   align-items: center;
@@ -346,11 +433,9 @@ body, html {
   font-weight: 500;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: var(--transition-fast);
 }
 .tool-btn:hover {
   background-color: var(--bg-hover);
-  color: var(--text-primary);
 }
 .tool-btn.icon-only {
   width: 30px;
@@ -363,7 +448,6 @@ body, html {
   height: 16px;
 }
 
-/* Pilule Sélecteur de Livre / Chapitre (Logos Style) */
 .book-picker-pill {
   display: flex;
   align-items: center;
@@ -374,8 +458,6 @@ body, html {
   background-color: #FFFFFF;
   border-radius: 6px;
   cursor: pointer;
-  transition: var(--transition-fast);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 .book-picker-pill:hover {
   border-color: var(--accent-blue);
@@ -406,9 +488,6 @@ body, html {
   cursor: pointer;
   border-radius: 4px;
 }
-.mode-link:hover {
-  color: var(--text-primary);
-}
 .mode-link.active {
   color: var(--accent-blue);
   font-weight: 600;
@@ -419,7 +498,6 @@ body, html {
   align-items: center;
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  overflow: hidden;
   height: 30px;
 }
 .zoom-btn {
@@ -429,21 +507,12 @@ body, html {
   background-color: #FFFFFF;
   color: var(--text-secondary);
   cursor: pointer;
-  font-size: 14px;
-}
-.zoom-btn:hover {
-  background-color: var(--bg-hover);
 }
 .zoom-level {
   font-size: 11px;
   font-weight: 600;
   padding: 0 6px;
-  color: var(--text-secondary);
 }
-
-/* ==========================================================================
-   3. ZONE DE LECTURE & TYPOGRAPHIE BIBLIQUE (Logos Reader)
-   ========================================================================== */
 
 .reader-workspace {
   flex: 1;
@@ -451,14 +520,12 @@ body, html {
   overflow: hidden;
   background-color: var(--bg-reading);
 }
-
 .reading-pane {
   flex: 1;
   height: 100%;
   display: flex;
   flex-direction: column;
   border-right: 1px solid var(--border-color);
-  position: relative;
   overflow: hidden;
 }
 .reading-pane:last-child {
@@ -474,7 +541,6 @@ body, html {
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
-  background-color: #FFFFFF;
   border-bottom: 1px solid var(--border-subtle);
 }
 .pane-breadcrumb {
@@ -498,10 +564,6 @@ body, html {
   font-size: 12px;
   color: var(--text-muted);
   cursor: pointer;
-  margin-left: 8px;
-}
-.pane-close-btn:hover {
-  color: #EF4444;
 }
 
 .pane-scrollable-content {
@@ -511,13 +573,10 @@ body, html {
   display: flex;
   justify-content: center;
 }
-
 .chapter-container {
   width: 100%;
   max-width: 680px;
 }
-
-/* Titre de Section / Péricope */
 .pericope-title {
   font-family: var(--font-bible);
   font-size: 22px;
@@ -528,41 +587,31 @@ body, html {
   margin: 15px 0 35px 0;
   color: var(--text-primary);
 }
-
-/* Flux de texte des versets */
 .verses-flow {
   font-family: var(--font-bible);
   font-size: 19px;
   line-height: 1.85;
   color: #1E293B;
   text-align: justify;
-  text-justify: inter-word;
 }
-
-/* Verset individuel */
 .verse-item {
   display: inline;
-  transition: background-color var(--transition-fast);
   padding: 2px 0;
   border-radius: 3px;
-  cursor: text;
+  cursor: pointer;
 }
 .verse-item:hover {
-  background-color: rgba(2, 132, 199, 0.06);
+  background-color: rgba(2, 132, 199, 0.08);
 }
 .verse-item.selected {
-  background-color: rgba(2, 132, 199, 0.15);
+  background-color: rgba(2, 132, 199, 0.18);
 }
-
-/* Numéro de verset / chapitre */
 .chapter-number-dropcap {
   font-size: 32px;
   font-weight: 700;
   color: #0F172A;
   margin-right: 4px;
-  line-height: 1;
 }
-
 .verse-num {
   font-family: var(--font-ui);
   font-size: 11px;
@@ -571,61 +620,368 @@ body, html {
   vertical-align: super;
   margin-right: 3px;
   margin-left: 6px;
-  user-select: none;
 }
 .verse-item:first-child .verse-num {
   margin-left: 0;
 }
 
-/* Interlinéaire Inversé (Style Logos) */
-.interlinear-block {
-  display: inline-flex;
+/* ==========================================================================
+   4. VUE BIBLIOTHÈQUE (Grille de Cartes)
+   ========================================================================== */
+
+.library-grid-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  align-content: start;
+}
+
+.library-card {
+  background-color: #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  gap: 12px;
+  position: relative;
+  transition: var(--transition-fast);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+.library-card:hover {
+  border-color: #CBD5E1;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+.library-card.inactive {
+  opacity: 0.55;
+  background-color: #F8FAFC;
+}
+
+.lib-cover {
+  width: 58px;
+  height: 82px;
+  border-radius: 4px;
+  color: white;
+  display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 4px 6px;
-  padding: 4px 6px;
-  background-color: #F8FAFC;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  vertical-align: middle;
-  cursor: pointer;
-  transition: var(--transition-fast);
+  justify-content: center;
+  padding: 4px;
+  text-align: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
-.interlinear-block:hover {
-  border-color: var(--accent-blue);
-  background-color: var(--bg-active);
+.cover-initials {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
 }
-.interlinear-surface {
-  font-family: var(--font-bible);
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-primary);
+.cover-title-preview {
+  font-size: 8px;
+  margin-top: 4px;
+  line-height: 1.1;
+  opacity: 0.85;
 }
-.interlinear-lemma {
-  font-family: 'Times New Roman', serif;
-  font-size: 14px;
+
+.lib-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.lib-title {
+  font-size: 13px;
   font-weight: 700;
-  color: var(--accent-purple);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.interlinear-translit {
-  font-family: var(--font-ui);
-  font-size: 10px;
-  font-style: italic;
-  color: var(--text-muted);
+.lib-author {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.interlinear-strong {
-  font-family: var(--font-ui);
+
+.lib-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+.tag {
   font-size: 9px;
   font-weight: 700;
-  padding: 1px 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.tag-type {
   background-color: #E0F2FE;
   color: var(--accent-blue);
-  border-radius: 3px;
-  margin-top: 2px;
+}
+.tag-scope {
+  background-color: #FEF3C7;
+  color: #B45309;
+}
+.tag-count {
+  background-color: #F1F5F9;
+  color: var(--text-secondary);
+}
+
+.lib-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.lib-btn-icon {
+  background: transparent;
+  border: none;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+}
+.lib-btn-icon:hover {
+  background-color: var(--bg-hover);
+}
+
+/* Switch Toggle */
+.switch-toggle {
+  position: relative;
+  display: inline-block;
+  width: 32px;
+  height: 18px;
+}
+.switch-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider.round {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #CBD5E1;
+  transition: .2s;
+  border-radius: 18px;
+}
+.slider.round:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: .2s;
+  border-radius: 50%;
+}
+input:checked + .slider.round {
+  background-color: var(--accent-blue);
+}
+input:checked + .slider.round:before {
+  transform: translateX(14px);
 }
 
 /* ==========================================================================
-   4. PANNEAU LATÉRAL DROIT (Commentaires & Assistant IA)
+   5. VUE PARAMÈTRES
+   ========================================================================== */
+
+.settings-nav-tabs {
+  height: 38px;
+  background-color: #F1F5F9;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  padding: 0 16px;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.settings-tab {
+  height: 100%;
+  padding: 0 14px;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: var(--transition-fast);
+}
+.settings-tab:hover {
+  color: var(--text-primary);
+}
+.settings-tab.active {
+  color: var(--accent-blue);
+  font-weight: 600;
+  border-bottom-color: var(--accent-blue);
+  background-color: #FFFFFF;
+}
+
+.settings-scroll-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+.settings-section {
+  display: none;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.settings-section.active {
+  display: block;
+}
+
+.settings-card {
+  background-color: #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  margin-bottom: 20px;
+}
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 14px;
+}
+.card-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+}
+
+.form-row.two-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.form-divider {
+  height: 1px;
+  background-color: var(--border-subtle);
+  margin: 16px 0;
+}
+
+.form-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.form-slider-row label {
+  width: 240px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.slider-field {
+  flex: 1;
+}
+.slider-badge {
+  width: 60px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-blue);
+  text-align: right;
+}
+
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+.sub-card {
+  background-color: #F8FAFC;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 12px;
+  margin-top: 14px;
+}
+.sub-card-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.status-box {
+  background-color: #F8FAFC;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0;
+}
+.status-indicator {
+  font-size: 14px;
+}
+
+.dict-item-row {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: #F8FAFC;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  margin-bottom: 6px;
+  gap: 6px;
+}
+.prio-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent-blue);
+  width: 24px;
+}
+.btn-prio-move {
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--border-color);
+  background-color: #FFFFFF;
+  border-radius: 4px;
+  font-size: 9px;
+  cursor: pointer;
+}
+
+.actions-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+.backup-status-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 10px;
+}
+
+/* ==========================================================================
+   6. PANNEAU DROIT (Commentaires & Assistant IA)
    ========================================================================== */
 
 .right-drawer {
@@ -642,7 +998,6 @@ body, html {
 .right-drawer.collapsed {
   margin-right: -380px;
 }
-
 .drawer-tabs {
   height: var(--header-height);
   background-color: #F1F5F9;
@@ -663,21 +1018,16 @@ body, html {
   cursor: pointer;
   border-radius: 6px 6px 0 0;
 }
-.drawer-tab:hover {
-  color: var(--text-primary);
-}
 .drawer-tab.active {
   background-color: #FFFFFF;
   color: var(--accent-blue);
   font-weight: 600;
 }
-
 .drawer-body {
   flex: 1;
   overflow: hidden;
   position: relative;
 }
-
 .drawer-content {
   width: 100%;
   height: 100%;
@@ -688,7 +1038,6 @@ body, html {
 .drawer-content.active {
   display: flex;
 }
-
 .drawer-section-header {
   padding: 12px 16px;
   background-color: #F8FAFC;
@@ -706,7 +1055,6 @@ body, html {
   font-size: 11px;
   color: var(--text-muted);
 }
-
 .commentary-list {
   padding: 16px;
   display: flex;
@@ -733,7 +1081,6 @@ body, html {
   color: #334155;
 }
 
-/* Chat Assistant IA */
 .chat-messages {
   flex: 1;
   overflow-y: auto;
@@ -752,7 +1099,6 @@ body, html {
   background-color: #F1F5F9;
   padding: 10px 14px;
   border-radius: 8px;
-  color: var(--text-primary);
 }
 .chat-message.user {
   justify-content: flex-end;
@@ -763,7 +1109,6 @@ body, html {
   padding: 10px 14px;
   border-radius: 8px;
 }
-
 .chat-input-container {
   padding: 12px 16px;
   border-top: 1px solid var(--border-color);
@@ -793,15 +1138,12 @@ body, html {
 }
 
 /* ==========================================================================
-   5. POPOVERS FLOTTANTS (Sélecteur de livres Logos)
+   7. POPOVERS & TOAST
    ========================================================================== */
 
 .popover-backdrop {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  top: 0; left: 0; width: 100vw; height: 100vh;
   background: rgba(0, 0, 0, 0.15);
   z-index: 99;
 }
@@ -854,7 +1196,6 @@ body, html {
   display: flex;
   overflow: hidden;
 }
-
 .corpus-column {
   flex: 1.2;
   border-right: 1px solid var(--border-color);
@@ -890,7 +1231,6 @@ body, html {
   font-size: 12px;
   color: var(--text-primary);
   cursor: pointer;
-  text-align: left;
 }
 .book-row-btn:hover {
   background-color: var(--bg-hover);
@@ -945,12 +1285,10 @@ body, html {
   border-radius: 4px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-primary);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: var(--transition-fast);
 }
 .ch-btn:hover {
   border-color: var(--accent-blue);
@@ -961,4 +1299,30 @@ body, html {
   background-color: var(--accent-blue);
   color: white;
   border-color: var(--accent-blue);
+}
+
+/* Toast Floating Notification */
+.toast-notification {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background-color: #0F172A;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+.toast-notification.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.toast-notification.hidden {
+  display: none;
 }
