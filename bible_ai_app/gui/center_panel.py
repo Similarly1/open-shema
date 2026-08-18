@@ -1601,16 +1601,28 @@ class CenterPanel(ctk.CTkFrame):
                 self.lex_textbox._textbox.tag_bind(unique_tag, "<Enter>", lambda e: self.lex_textbox._textbox.config(cursor="hand2"))
                 self.lex_textbox._textbox.tag_bind(unique_tag, "<Leave>", lambda e: self.lex_textbox._textbox.config(cursor=""))
             elif t_type == 'BIBLE_REF':
+                self._link_counter += 1
                 b_code = extra["book_code"]
                 ch = extra["chapter"]
                 v_val = extra["verse"] or "0"
-                ref_tag = f"bref_{b_code}_{ch}_{v_val}"
-                self.lex_textbox.insert("end", content, (base_tag, "bible_ref_link", ref_tag))
+                v_num = int(v_val.split("-")[0]) if v_val and v_val.split("-")[0].isdigit() else (int(v_val) if v_val and v_val.isdigit() else None)
+                unique_tag = f"bref_{self._link_counter}_{b_code}_{ch}_{v_val}"
+                self.lex_textbox.insert("end", content, (base_tag, "bible_ref_link", unique_tag))
+                
+                fr_book = extra.get("book_name", b_code)
+                self.lex_textbox._textbox.tag_bind(unique_tag, "<Button-1>", lambda e, bk=fr_book, c=ch, vn=v_num: self._on_click_bref(bk, c, vn))
+                self.lex_textbox._textbox.tag_bind(unique_tag, "<Enter>", lambda e, bc=b_code, c=ch, v=v_val, tg=unique_tag: self._on_hover_bref(e, bc, c, v, tg))
+                self.lex_textbox._textbox.tag_bind(unique_tag, "<Leave>", lambda e: self._on_leave_tooltip(e))
             elif t_type == 'ORIG_WORD':
-                code = extra["code"]
-                orig_tag = f"orig_{code}"
-                lang_tag = "lex_orig_word_hebrew" if extra["lang"] == "hebrew" else "lex_orig_word_greek"
-                self.lex_textbox.insert("end", content, (base_tag, lang_tag, orig_tag))
+                self._link_counter += 1
+                code = extra.get("code", "HEB")
+                lang_tag = "lex_orig_word_hebrew" if extra.get("lang") == "hebrew" else "lex_orig_word_greek"
+                unique_tag = f"orig_{self._link_counter}_{code}"
+                self.lex_textbox.insert("end", content, (base_tag, lang_tag, unique_tag))
+                
+                self.lex_textbox._textbox.tag_bind(unique_tag, "<Button-1>", lambda e, cd=code, lem=content: self._on_click_orig_word(cd, lem))
+                self.lex_textbox._textbox.tag_bind(unique_tag, "<Enter>", lambda e, ext=extra, tg=unique_tag: self._on_hover_orig_word(e, ext, tg))
+                self.lex_textbox._textbox.tag_bind(unique_tag, "<Leave>", lambda e: self._on_leave_tooltip(e))
             elif t_type == 'BOLD':
                 bold_tag = "lex_h1_bold" if "h1" in base_tag else ("lex_h2_bold" if "h2" in base_tag else ("lex_h3_bold" if "h3" in base_tag else "lex_bold"))
                 self.lex_textbox.insert("end", content, (bold_tag, base_tag))
@@ -1624,129 +1636,108 @@ class CenterPanel(ctk.CTkFrame):
         if curr < len(line_text):
             self.lex_textbox.insert("end", line_text[curr:], base_tag)
 
-    def on_lex_mouse_motion(self, event):
-        """Affiche une infobulle (tooltip) au survol d'un verset biblique ou d'un mot en langue originale dans le Lexique."""
+    def _on_hover_bref(self, event, b_code, ch, v_str, tag_name):
+        """Affiche le verset biblique au survol dans le lexique."""
         try:
-            idx = self.lex_textbox._textbox.index(f"@{event.x},{event.y}")
-            tags = self.lex_textbox._textbox.tag_names(idx)
+            self.lex_textbox._textbox.config(cursor="hand2")
+            if getattr(self, '_hover_lex_ref', None) == tag_name and getattr(self.tooltip, 'tw', None):
+                return
+            self._hover_lex_ref = tag_name
             
-            bref_tags = [t for t in tags if t.startswith("bref_")]
-            orig_tags = [t for t in tags if t.startswith("orig_")]
-            dict_tags = [t for t in tags if t.startswith("dict_link_") or t == "wiki_link" or t == "lex_dict_link_base"]
+            ref_bible = self.config.get("reference_bible", "Segond 21")
+            from core.bible_reference_detector import get_bible_passage_preview
+            ref_title, preview_txt = get_bible_passage_preview(ref_bible, b_code, ch, v_str if v_str != "0" else None)
             
-            if bref_tags:
-                self.lex_textbox._textbox.config(cursor="hand2")
-                tag_name = bref_tags[0]
-                if getattr(self, '_hover_lex_ref', None) == tag_name and getattr(self.tooltip, 'tw', None):
-                    return
-                self._hover_lex_ref = tag_name
-                
-                parts = tag_name.split("_")
-                b_code = parts[1]
-                ch = int(parts[2]) if parts[2].isdigit() else 1
-                v_str = parts[3] if len(parts) > 3 and parts[3] != '0' else None
-                
-                ref_bible = self.config.get("reference_bible", "Segond 21")
-                from core.bible_reference_detector import get_bible_passage_preview
-                ref_title, preview_txt = get_bible_passage_preview(ref_bible, b_code, ch, v_str)
-                
-                x = self.lex_textbox._textbox.winfo_rootx() + event.x + 10
-                y = self.lex_textbox._textbox.winfo_rooty() + event.y + 10
-                
-                tooltip_data = {
-                    "word": tag_name,
-                    "source": f"📖 {ref_bible}",
-                    "title": ref_title,
-                    "preview": preview_txt,
-                    "hint": "🖱️ Cliquer pour ouvrir ce passage dans la Bible"
-                }
-                self.tooltip.show(x, y, tooltip_data)
-                
-            elif orig_tags:
-                self.lex_textbox._textbox.config(cursor="hand2")
-                tag_name = orig_tags[0]
-                if getattr(self, '_hover_lex_orig', None) == tag_name and getattr(self.tooltip, 'tw', None):
-                    return
-                self._hover_lex_orig = tag_name
-                
-                code = tag_name.split("_")[1]
-                entry = StrongLexicon.get(code)
-                if entry:
-                    lang_name = "Hébreu" if entry.get("lang") == "hebrew" or code.startswith("H") else "Grec"
-                    lemma = entry.get("lemma", "")
-                    definition = entry.get("definition", "")
-                    
-                    x = self.lex_textbox._textbox.winfo_rootx() + event.x + 10
-                    y = self.lex_textbox._textbox.winfo_rooty() + event.y + 10
-                    
-                    tooltip_data = {
-                        "word": code,
-                        "source": f"📖 Lexique Strong ({lang_name})",
-                        "title": f"[{code}] {lemma}",
-                        "preview": definition,
-                        "hint": "🖱️ Cliquer pour afficher l'article complet dans le Lexique"
-                    }
-                    self.tooltip.show(x, y, tooltip_data)
-            elif dict_tags:
-                self.lex_textbox._textbox.config(cursor="hand2")
-                if getattr(self, '_hover_lex_ref', None) or getattr(self, '_hover_lex_orig', None):
-                    self._hover_lex_ref = None
-                    self._hover_lex_orig = None
-                    if self.tooltip:
-                        self.tooltip.hide()
-            else:
-                if getattr(self, '_hover_lex_ref', None) or getattr(self, '_hover_lex_orig', None):
-                    self._hover_lex_ref = None
-                    self._hover_lex_orig = None
-                    self.lex_textbox._textbox.config(cursor="")
-                    if self.tooltip:
-                        self.tooltip.hide()
+            x = self.lex_textbox._textbox.winfo_rootx() + event.x + 10
+            y = self.lex_textbox._textbox.winfo_rooty() + event.y + 10
+            
+            tooltip_data = {
+                "word": tag_name,
+                "source": f"📖 {ref_bible}",
+                "title": ref_title,
+                "preview": preview_txt,
+                "hint": "🖱️ Cliquer pour ouvrir ce passage dans la Bible"
+            }
+            self.tooltip.show(x, y, tooltip_data)
         except Exception:
             pass
 
-    def on_lex_click(self, event):
-        """Gère le clic sur les versets bibliques ou mots en langue originale dans le Lexique."""
+    def _on_click_bref(self, fr_book, ch, v_num):
+        """Navigue directement vers le verset cliqué."""
         try:
-            idx = self.lex_textbox._textbox.index(f"@{event.x},{event.y}")
-            tags = self.lex_textbox._textbox.tag_names(idx)
-            
-            bref_tags = [t for t in tags if t.startswith("bref_")]
-            if not bref_tags and getattr(self, '_hover_lex_ref', None):
-                bref_tags = [self._hover_lex_ref]
-                
-            if bref_tags:
-                parts = bref_tags[0].split("_")
-                b_code = parts[1]
-                ch = int(parts[2]) if parts[2].isdigit() else 1
-                v_str = parts[3] if len(parts) > 3 and parts[3] != '0' else None
-                v_num = int(v_str.split("-")[0]) if v_str and v_str.split("-")[0].isdigit() else (int(v_str) if v_str and v_str.isdigit() else None)
-                
-                if self.tooltip:
-                    self.tooltip.hide()
-                self._hover_lex_ref = None
-                
-                fr_book = REVERSE_BOOK_MAPPING.get(b_code, b_code)
-                if self.main_tabs.get() != "📖 Lecture":
-                    self.main_tabs.set("📖 Lecture")
-                self.apply_book_selection(fr_book, chapter=ch, verse=v_num)
+            if self.tooltip:
+                self.tooltip.hide()
+            self._hover_lex_ref = None
+            if self.main_tabs.get() != "📖 Lecture":
+                self.main_tabs.set("📖 Lecture")
+            self.apply_book_selection(fr_book, chapter=ch, verse=v_num)
+        except Exception as e:
+            print(f"Erreur navigation verset lexique : {e}")
+
+    def _on_hover_orig_word(self, event, extra, tag_name):
+        """Affiche l'infobulle Strong / Bailly au survol d'un mot en langue originale."""
+        try:
+            self.lex_textbox._textbox.config(cursor="hand2")
+            if getattr(self, '_hover_lex_orig', None) == tag_name and getattr(self.tooltip, 'tw', None):
                 return
-                
-            orig_tags = [t for t in tags if t.startswith("orig_")]
-            if not orig_tags and getattr(self, '_hover_lex_orig', None):
-                orig_tags = [self._hover_lex_orig]
-                
-            if orig_tags:
-                code = orig_tags[0].split("_")[1]
-                if self.tooltip:
-                    self.tooltip.hide()
-                self._hover_lex_orig = None
-                results = DictionaryManager.lookup(code)
+            self._hover_lex_orig = tag_name
+            
+            code = extra.get("code", "")
+            lemma = extra.get("lemma", "")
+            definition = extra.get("definition", "")
+            lang_name = "Hébreu" if extra.get("lang") == "hebrew" else "Grec"
+            
+            if code and code not in {"HEB", "GRK"}:
+                ent = StrongLexicon.get(code)
+                if ent:
+                    lemma = ent.get("lemma", lemma)
+                    definition = ent.get("definition", definition)
+                    
+            x = self.lex_textbox._textbox.winfo_rootx() + event.x + 10
+            y = self.lex_textbox._textbox.winfo_rooty() + event.y + 10
+            
+            title_txt = f"[{code}] {lemma}" if code and code not in {"HEB", "GRK"} else lemma
+            tooltip_data = {
+                "word": tag_name,
+                "source": f"📖 Lexique Strong ({lang_name})",
+                "title": title_txt,
+                "preview": definition,
+                "hint": "🖱️ Cliquer pour ouvrir la fiche complète dans le Lexique"
+            }
+            self.tooltip.show(x, y, tooltip_data)
+        except Exception:
+            pass
+
+    def _on_click_orig_word(self, code, lemma):
+        """Ouvre la fiche Strong ou lexicale au clic sur un mot en langue originale."""
+        try:
+            if self.tooltip:
+                self.tooltip.hide()
+            self._hover_lex_orig = None
+            
+            query = code if code and code not in {"HEB", "GRK"} else lemma
+            results = DictionaryManager.lookup(query)
+            if results and results.get("matches"):
+                self.current_dict_match_obj = results
+                self.display_dictionary_entry(results)
+            else:
+                results = DictionaryManager.lookup(lemma)
                 if results and results.get("matches"):
                     self.current_dict_match_obj = results
                     self.display_dictionary_entry(results)
-                return
         except Exception as e:
-            print(f"Erreur clic lexique : {e}")
+            print(f"Erreur consultation mot original lexique : {e}")
+
+    def _on_leave_tooltip(self, event):
+        """Masque l'infobulle et réinitialise le curseur."""
+        try:
+            self._hover_lex_ref = None
+            self._hover_lex_orig = None
+            self.lex_textbox._textbox.config(cursor="")
+            if self.tooltip:
+                self.tooltip.hide()
+        except Exception:
+            pass
 
     def _render_wikipedia_entry(self, m):
         """Rend l'article Wikipédia sélectionné, en le chargeant en arrière-plan si nécessaire."""

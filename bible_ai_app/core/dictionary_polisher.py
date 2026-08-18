@@ -27,8 +27,10 @@ Règles impératives de restauration :
 4. Renvois et Références Croisées (Voir aussi) :
    - Pour tous les renvois vers d'autres articles du dictionnaire (ex: 'Voir : FEU', 'Voir aussi : TORCHE', 'Voir CIRE'), formate clairement le mot cible en gras comme `*Voir* : **NOM_ARTICLE**` ou `*Voir aussi* : **NOM_ARTICLE**` pour permettre la navigation interactive par clic dans l'application.
 
-5. Intégrité et Fidélité :
-   - Conserve rigoureusement toute la substance exégétique, historique, géographique et théologique de l'auteur d'origine sans supprimer de détails importants.
+5. Intégrité et Fidélité absolue :
+   - N'invente JAMAIS de contenu ni de sections fictives non présentes dans le texte source d'origine.
+   - Conserve rigoureusement toute la substance exégétique, historique, géographique et théologique de l'auteur d'origine sans en altérer le sens ni omettre de paragraphes.
+   - Ne laisse AUCUNE section ou puce vide ou tronquée.
    - Rends directement le texte restauré en Markdown prêt à l'affichage, sans préambule ni méta-commentaires."""
 
 AVAILABLE_POLISH_MODELS = [
@@ -177,7 +179,8 @@ TEXTE BRUT ORIGINAL :
                     {"role": "system", "content": POLISH_SYSTEM_PROMPT},
                     {"role": "user", "content": user_prompt}
                 ],
-                "temperature": 0.2
+                "temperature": 0.2,
+                "max_tokens": 8192
             }
             try:
                 resp = requests.post(url, headers=headers, json=payload, timeout=60)
@@ -210,7 +213,8 @@ TEXTE BRUT ORIGINAL :
                     {"role": "system", "content": POLISH_SYSTEM_PROMPT},
                     {"role": "user", "content": user_prompt}
                 ],
-                "temperature": 0.2
+                "temperature": 0.2,
+                "max_tokens": 8192
             }
             try:
                 resp = requests.post(url, headers=headers, json=payload, timeout=60)
@@ -243,7 +247,8 @@ TEXTE BRUT ORIGINAL :
                 ],
                 "generationConfig": {
                     "temperature": 0.2,
-                    "topP": 0.95
+                    "topP": 0.95,
+                    "maxOutputTokens": 8192
                 }
             }
             

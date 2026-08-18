@@ -163,6 +163,7 @@ class StrongLexicon:
 
     _heb_lemma_idx = None
     _grk_lemma_idx = None
+    _heb_exact_idx = None
 
     @classmethod
     def _ensure_lemma_indices(cls):
@@ -172,10 +173,12 @@ class StrongLexicon:
         lex = cls.load_lexicon()
         cls._heb_lemma_idx = {}
         cls._grk_lemma_idx = {}
+        cls._heb_exact_idx = {}
         
         for code, ent in lex.items():
             lem = ent.get("lemma", "")
             if ent.get("lang") == "hebrew" or code.startswith("H"):
+                cls._heb_exact_idx[lem.strip()] = code
                 nfd = unicodedata.normalize('NFD', lem)
                 h_clean = ''.join(c for c in nfd if '\u0590' <= c <= '\u05ff' and unicodedata.category(c) != 'Mn')
                 if h_clean:
@@ -187,24 +190,62 @@ class StrongLexicon:
 
     @classmethod
     def find_by_original_word(cls, word):
-        """Retourne la fiche Strong correspondante à un mot hébreu ou grec brut."""
+        """Retourne la fiche Strong correspondante à un mot hébreu ou grec brut avec tolérance morphologique."""
         if not word:
             return None
         cls._ensure_lemma_indices()
+        w_str = word.strip()
         
-        # Test hébreu
-        if any('\u0590' <= c <= '\u05ff' for c in word):
-            nfd = unicodedata.normalize('NFD', word)
+        # 1. Test hébreu / araméen
+        if any('\u0590' <= c <= '\u05ff' for c in w_str):
+            # A. Match exact avec points-voyelles
+            if w_str in cls._heb_exact_idx:
+                return cls.get(cls._heb_exact_idx[w_str])
+                
+            # B. Match consonantique nettoyé
+            nfd = unicodedata.normalize('NFD', w_str)
             h_clean = ''.join(c for c in nfd if '\u0590' <= c <= '\u05ff' and unicodedata.category(c) != 'Mn')
             if h_clean in cls._heb_lemma_idx:
-                code = cls._heb_lemma_idx[h_clean][0]
-                return cls.get(code)
+                return cls.get(cls._heb_lemma_idx[h_clean][0])
                 
-        # Test grec
-        if any(('\u0370' <= c <= '\u03ff' or '\u1F00' <= c <= '\u1FFF') for c in word):
-            g_clean = cls.clean_greek_key(word)
+            # C. Suffixes araméens / hébreux courants (א, ה, ים, ות, ת)
+            if len(h_clean) > 3:
+                for suf in ['א', 'ה', 'ים', 'ות', 'ת']:
+                    if h_clean.endswith(suf) and h_clean[:-len(suf)] in cls._heb_lemma_idx:
+                        return cls.get(cls._heb_lemma_idx[h_clean[:-len(suf)]][0])
+                        
+            # D. Préfixes hébreux courants (ו, ב, ל, כ, מ, ש, ה)
+            if len(h_clean) > 3:
+                for pref in ['ו', 'ב', 'ל', 'כ', 'מ', 'ש', 'ה']:
+                    if h_clean.startswith(pref) and h_clean[len(pref):] in cls._heb_lemma_idx:
+                        return cls.get(cls._heb_lemma_idx[h_clean[len(pref):]][0])
+
+            # Fallback : fiche lexicale dynamique pour mot hébreu non indexé
+            return {
+                "code": "HEB",
+                "raw_code": "HEB",
+                "num": 0,
+                "lang": "hebrew",
+                "lemma": w_str,
+                "definition": f"Terme hébreu / araméen : {w_str}",
+                "details": []
+            }
+                
+        # 2. Test grec polytonique ou simple
+        if any(('\u0370' <= c <= '\u03ff' or '\u1F00' <= c <= '\u1FFF') for c in w_str):
+            g_clean = cls.clean_greek_key(w_str)
             if g_clean in cls._grk_lemma_idx:
-                code = cls._grk_lemma_idx[g_clean][0]
-                return cls.get(code)
+                return cls.get(cls._grk_lemma_idx[g_clean][0])
+                
+            # Fallback : fiche lexicale dynamique pour mot grec non indexé
+            return {
+                "code": "GRK",
+                "raw_code": "GRK",
+                "num": 0,
+                "lang": "greek",
+                "lemma": w_str,
+                "definition": f"Terme grec : {w_str}",
+                "details": []
+            }
                 
         return None
