@@ -1282,11 +1282,12 @@ class CenterPanel(ctk.CTkFrame):
     def _render_dictionary_markdown(self, text, dict_id="custom"):
         """
         Rend le texte Markdown de manière riche dans self.lex_textbox :
-        - Titres #, ##, ### avec styles et polices appropriés (sans afficher les dièses)
+        - Tous les niveaux de titres #, ##, ###, ####, #####, ###### (sans afficher les dièses)
         - Séparateurs horizontaux --- avec une ligne esthétique
-        - Listes à puces avec puces stylisées et indentation
+        - Listes à puces avec puces stylisées et indentation multi-niveaux
+        - Citations en bloc >
         - Gras et Italique inline
-        - Liens interactifs cliquables pour les renvois d'articles (*Voir* : **MOT**)
+        - Liens interactifs cliquables pour les renvois d'articles (*Voir* : **MOT**, 🔗 MOT, [[MOT]])
         """
         if not text:
             return
@@ -1297,12 +1298,11 @@ class CenterPanel(ctk.CTkFrame):
             'XXI', 'XXII', 'XXIII', 'XXIV', 'XXV', 'XXVI', 'XXVII', 'XXVIII', 'XXIX', 'XXX'
         }
         
-        RE_H1 = re.compile(r'^#\s+(.+)$')
-        RE_H2 = re.compile(r'^##\s+(.+)$')
-        RE_H3 = re.compile(r'^###\s+(.+)$')
+        RE_HEADER = re.compile(r'^(#{1,6})\s+(.+)$')
         RE_HR = re.compile(r'^[-*_]{3,}\s*$')
-        RE_BULLET = re.compile(r'^\s*[-*•]\s+(.+)$')
-        RE_ORDERED = re.compile(r'^\s*([0-9]+\.|\([0-9]+\)|[a-z]\))\s+(.+)$')
+        RE_BULLET = re.compile(r'^(\s*)[-*•]\s+(.+)$')
+        RE_ORDERED = re.compile(r'^(\s*)([0-9]+\.|\([0-9]+\)|[a-z]\))\s+(.+)$')
+        RE_QUOTE = re.compile(r'^>\s*(.+)$')
         
         lines = text.strip().splitlines()
         for raw_line in lines:
@@ -1316,46 +1316,59 @@ class CenterPanel(ctk.CTkFrame):
                 self.lex_textbox.insert("end", "────────────────────────────────────────\n\n", "lex_hr")
                 continue
                 
-            # Titre H1
-            m_h1 = RE_H1.match(line_s)
-            if m_h1:
-                content = m_h1.group(1).strip()
-                self._insert_markdown_spans(content, base_tag="lex_h1", ROMAN_NUMS=ROMAN_NUMS)
+            # Titres tous niveaux (H1 à H6)
+            m_h = RE_HEADER.match(line_s)
+            if m_h:
+                level = len(m_h.group(1))
+                content = m_h.group(2).strip()
+                tag_name = f"lex_h{min(level, 6)}"
+                if level == 1:
+                    self._insert_markdown_spans(content, base_tag=tag_name, ROMAN_NUMS=ROMAN_NUMS)
+                    self.lex_textbox.insert("end", "\n\n")
+                else:
+                    self._insert_markdown_spans(content, base_tag=tag_name, ROMAN_NUMS=ROMAN_NUMS)
+                    self.lex_textbox.insert("end", "\n\n")
+                continue
+                
+            # Citations en bloc (> texte)
+            m_q = RE_QUOTE.match(line_s)
+            if m_q:
+                content = m_q.group(1).strip()
+                self.lex_textbox.insert("end", "│ ", "lex_quote_bar")
+                self._insert_markdown_spans(content, base_tag="lex_quote", ROMAN_NUMS=ROMAN_NUMS)
                 self.lex_textbox.insert("end", "\n\n")
                 continue
                 
-            # Titre H2
-            m_h2 = RE_H2.match(line_s)
-            if m_h2:
-                content = m_h2.group(1).strip()
-                self._insert_markdown_spans(content, base_tag="lex_h2", ROMAN_NUMS=ROMAN_NUMS)
-                self.lex_textbox.insert("end", "\n\n")
-                continue
-                
-            # Titre H3
-            m_h3 = RE_H3.match(line_s)
-            if m_h3:
-                content = m_h3.group(1).strip()
-                self._insert_markdown_spans(content, base_tag="lex_h3", ROMAN_NUMS=ROMAN_NUMS)
-                self.lex_textbox.insert("end", "\n\n")
-                continue
-                
-            # Puce de liste
-            m_bul = RE_BULLET.match(line_s)
+            # Puce de liste avec détection du niveau d'indentation
+            m_bul = RE_BULLET.match(raw_line)
             if m_bul:
-                content = m_bul.group(1).strip()
-                self.lex_textbox.insert("end", "  •  ", "lex_bullet_dot")
-                self._insert_markdown_spans(content, base_tag="lex_list_item", ROMAN_NUMS=ROMAN_NUMS)
+                indent = len(m_bul.group(1))
+                content = m_bul.group(2).strip()
+                if indent >= 4:
+                    bullet_prefix = "      ◦  "
+                    list_tag = "lex_sub_sub_list_item"
+                elif indent >= 2:
+                    bullet_prefix = "    •  "
+                    list_tag = "lex_sub_list_item"
+                else:
+                    bullet_prefix = "  •  "
+                    list_tag = "lex_list_item"
+                    
+                self.lex_textbox.insert("end", bullet_prefix, "lex_bullet_dot")
+                self._insert_markdown_spans(content, base_tag=list_tag, ROMAN_NUMS=ROMAN_NUMS)
                 self.lex_textbox.insert("end", "\n")
                 continue
                 
             # Numéro ordonné (1. ou a))
-            m_ord = RE_ORDERED.match(line_s)
+            m_ord = RE_ORDERED.match(raw_line)
             if m_ord:
-                lead = m_ord.group(1).strip()
-                content = m_ord.group(2).strip()
-                self.lex_textbox.insert("end", f"  {lead} ", "lex_lead_num")
-                self._insert_markdown_spans(content, base_tag="lex_list_item", ROMAN_NUMS=ROMAN_NUMS)
+                indent = len(m_ord.group(1))
+                lead = m_ord.group(2).strip()
+                content = m_ord.group(3).strip()
+                lead_prefix = f"{' ' * indent}  {lead} "
+                list_tag = "lex_sub_list_item" if indent >= 2 else "lex_list_item"
+                self.lex_textbox.insert("end", lead_prefix, "lex_lead_num")
+                self._insert_markdown_spans(content, base_tag=list_tag, ROMAN_NUMS=ROMAN_NUMS)
                 self.lex_textbox.insert("end", "\n")
                 continue
                 
@@ -1372,6 +1385,13 @@ class CenterPanel(ctk.CTkFrame):
             ROMAN_NUMS = set()
             
         tokens = []
+        
+        # 0. Liens préfixés par emoji 🔗 (ex: 🔗 PHÉNICIENS, 🔗 SCARABÉE)
+        for m in re.finditer(r'🔗\s*([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\s–-]+(?:\s*\([^)]*\))?)', line_text):
+            raw_w = m.group(1).strip()
+            clean_w = re.sub(r'[\(\[\{].*?[\)\]\}]', '', raw_w).strip()
+            if len(clean_w) >= 2:
+                tokens.append((m.start(), m.end(), 'DICT_LINK', raw_w, clean_w))
         
         # 1. [[WORD]] ou [[WORD|LABEL]]
         for m in re.finditer(r'\[\[([^\]|]+)(?:\|([^\]]+))?\]\]', line_text):
@@ -2825,14 +2845,23 @@ class CenterPanel(ctk.CTkFrame):
             self.lex_textbox._textbox.tag_configure("lex_h1", font=(self.font_family, self.font_size + 3, "bold"), foreground=lex_h1_col, justify="center", spacing1=10, spacing3=12)
             self.lex_textbox._textbox.tag_configure("lex_h2", font=(self.font_family, self.font_size + 1, "bold"), foreground=lex_h2_col, spacing1=14, spacing3=6)
             self.lex_textbox._textbox.tag_configure("lex_h3", font=(self.font_family, self.font_size, "bold"), foreground=lex_h3_col, spacing1=10, spacing3=4)
+            self.lex_textbox._textbox.tag_configure("lex_h4", font=(self.font_family, self.font_size, "bold"), foreground="#60A5FA" if is_dark else "#2563EB", spacing1=8, spacing3=3)
+            self.lex_textbox._textbox.tag_configure("lex_h5", font=(self.font_family, max(10, self.font_size - 1), "bold"), foreground="#38BDF8" if is_dark else "#0284C7", spacing1=6, spacing3=2)
+            self.lex_textbox._textbox.tag_configure("lex_h6", font=(self.font_family, max(9, self.font_size - 2), "bold", "italic"), foreground=text_col, spacing1=4, spacing3=2)
             self.lex_textbox._textbox.tag_configure("lex_hr", font=(self.font_family, max(8, self.font_size - 4)), foreground=lex_hr_col, justify="center", spacing1=6, spacing3=6)
             self.lex_textbox._textbox.tag_configure("lex_bullet_dot", font=(self.font_family, self.font_size, "bold"), foreground=lex_bullet_col)
             self.lex_textbox._textbox.tag_configure("lex_lead_num", font=(self.font_family, self.font_size, "bold"), foreground=lex_lead_col)
             self.lex_textbox._textbox.tag_configure("lex_list_item", font=(self.font_family, self.font_size), foreground=text_col, lmargin1=14, lmargin2=26, spacing1=2, spacing3=2)
+            self.lex_textbox._textbox.tag_configure("lex_sub_list_item", font=(self.font_family, self.font_size), foreground=text_col, lmargin1=26, lmargin2=38, spacing1=1, spacing3=1)
+            self.lex_textbox._textbox.tag_configure("lex_sub_sub_list_item", font=(self.font_family, self.font_size), foreground=text_col, lmargin1=38, lmargin2=50, spacing1=1, spacing3=1)
+            self.lex_textbox._textbox.tag_configure("lex_quote", font=(self.font_family, self.font_size, "italic"), foreground="#94A3B8" if is_dark else "#64748B", lmargin1=16, lmargin2=16, spacing1=3, spacing3=3)
+            self.lex_textbox._textbox.tag_configure("lex_quote_bar", font=(self.font_family, self.font_size, "bold"), foreground="#38BDF8" if is_dark else "#0284C7")
             self.lex_textbox._textbox.tag_configure("lex_bold", font=(self.font_family, self.font_size, "bold"), foreground=text_col)
             self.lex_textbox._textbox.tag_configure("lex_h1_bold", font=(self.font_family, self.font_size + 3, "bold"), foreground=lex_h1_col)
             self.lex_textbox._textbox.tag_configure("lex_h2_bold", font=(self.font_family, self.font_size + 1, "bold"), foreground=lex_h2_col)
             self.lex_textbox._textbox.tag_configure("lex_h3_bold", font=(self.font_family, self.font_size, "bold"), foreground=lex_h3_col)
+            self.lex_textbox._textbox.tag_configure("lex_h4_bold", font=(self.font_family, self.font_size, "bold"), foreground="#60A5FA" if is_dark else "#2563EB")
+            self.lex_textbox._textbox.tag_configure("lex_h5_bold", font=(self.font_family, max(10, self.font_size - 1), "bold"), foreground="#38BDF8" if is_dark else "#0284C7")
             self.lex_textbox._textbox.tag_configure("lex_italic", font=(self.font_family, self.font_size, "italic"), foreground=lex_it_col)
             self.lex_textbox._textbox.tag_configure("lex_dict_link_base", font=(self.font_family, self.font_size, "bold"), foreground=lex_link_col, underline=True)
             
