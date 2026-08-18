@@ -24,7 +24,10 @@ Règles impératives de restauration :
    - Rétablis les chiffres romains et versets bibliques corrompus (ex: 'Gen., u, 8' -> 'Gen., II, 8', 'm, 23' -> 'Gen., III, 23', 'xxxvn' -> 'XXXVII', 'xxvn' -> 'XXVII').
    - Mets en *italique* les citations latines (Vulgate, Pères), grecques, ainsi que les titres d'ouvrages et revues historiques (*Keilinschriften*, *Wo lag das Paradies*, etc.).
 
-4. Intégrité et Fidélité :
+4. Renvois et Références Croisées (Voir aussi) :
+   - Pour tous les renvois vers d'autres articles du dictionnaire (ex: 'Voir : FEU', 'Voir aussi : TORCHE', 'Voir CIRE'), formate clairement le mot cible en gras comme `*Voir* : **NOM_ARTICLE**` ou `*Voir aussi* : **NOM_ARTICLE**` pour permettre la navigation interactive par clic dans l'application.
+
+5. Intégrité et Fidélité :
    - Conserve rigoureusement toute la substance exégétique, historique, géographique et théologique de l'auteur d'origine sans supprimer de détails importants.
    - Rends directement le texte restauré en Markdown prêt à l'affichage, sans préambule ni méta-commentaires."""
 

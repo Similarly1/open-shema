@@ -1185,10 +1185,10 @@ class CenterPanel(ctk.CTkFrame):
             if cached and cached.get("text"):
                 c_model = cached.get("model", "Gemini")
                 self.lex_textbox.insert("end", f"✨ Notice restaurée & structurée par IA ({c_model})\n\n", "polish_badge")
-                self.lex_textbox.insert("end", f"{cached['text']}\n\n", "body")
+                self._render_dictionary_markdown(cached['text'], dict_id=dict_id)
                 self.lex_polish_btn.configure(text="🔄 Re-polir avec l'IA", state="normal")
             else:
-                self.lex_textbox.insert("end", f"{full_t}\n\n", "body")
+                self._render_dictionary_markdown(full_t, dict_id=dict_id)
                 self.lex_polish_btn.configure(text="✨ Polir / Restructurer avec l'IA", state="normal")
             
         self.lex_textbox.configure(state="disabled")
@@ -1258,6 +1258,196 @@ class CenterPanel(ctk.CTkFrame):
         """Affiche l'état d'erreur sur le bouton."""
         self.lex_polish_btn.configure(state="normal", text="⚠️ Échec - Réessayer")
         print(f"Erreur polissage : {err_msg}")
+
+    def on_dictionary_cross_reference_clicked(self, target_word):
+        """Ouvre directement l'article du dictionnaire lié au lien cliqué."""
+        if not target_word:
+            return
+            
+        clean_word = re.sub(r'[\d\.\(\)]+', '', target_word).strip(" \t\n\r,;:.*«»[]\"'")
+        if not clean_word:
+            clean_word = target_word.strip()
+            
+        results = DictionaryManager.lookup(clean_word)
+        if results and results.get("matches"):
+            self.current_dict_match_obj = results
+            self.display_dictionary_entry(results)
+        else:
+            # Essayer avec le mot brut ou normalisé
+            results = DictionaryManager.lookup(target_word.strip())
+            if results and results.get("matches"):
+                self.current_dict_match_obj = results
+                self.display_dictionary_entry(results)
+
+    def _render_dictionary_markdown(self, text, dict_id="custom"):
+        """
+        Rend le texte Markdown de manière riche dans self.lex_textbox :
+        - Titres #, ##, ### avec styles et polices appropriés (sans afficher les dièses)
+        - Séparateurs horizontaux --- avec une ligne esthétique
+        - Listes à puces avec puces stylisées et indentation
+        - Gras et Italique inline
+        - Liens interactifs cliquables pour les renvois d'articles (*Voir* : **MOT**)
+        """
+        if not text:
+            return
+            
+        ROMAN_NUMS = {
+            'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X',
+            'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI', 'XVII', 'XVIII', 'XIX', 'XX',
+            'XXI', 'XXII', 'XXIII', 'XXIV', 'XXV', 'XXVI', 'XXVII', 'XXVIII', 'XXIX', 'XXX'
+        }
+        
+        RE_H1 = re.compile(r'^#\s+(.+)$')
+        RE_H2 = re.compile(r'^##\s+(.+)$')
+        RE_H3 = re.compile(r'^###\s+(.+)$')
+        RE_HR = re.compile(r'^[-*_]{3,}\s*$')
+        RE_BULLET = re.compile(r'^\s*[-*•]\s+(.+)$')
+        RE_ORDERED = re.compile(r'^\s*([0-9]+\.|\([0-9]+\)|[a-z]\))\s+(.+)$')
+        
+        lines = text.strip().splitlines()
+        for raw_line in lines:
+            line_s = raw_line.strip()
+            if not line_s:
+                self.lex_textbox.insert("end", "\n")
+                continue
+                
+            # Séparateur horizontal
+            if RE_HR.match(line_s):
+                self.lex_textbox.insert("end", "────────────────────────────────────────\n\n", "lex_hr")
+                continue
+                
+            # Titre H1
+            m_h1 = RE_H1.match(line_s)
+            if m_h1:
+                content = m_h1.group(1).strip()
+                self._insert_markdown_spans(content, base_tag="lex_h1", ROMAN_NUMS=ROMAN_NUMS)
+                self.lex_textbox.insert("end", "\n\n")
+                continue
+                
+            # Titre H2
+            m_h2 = RE_H2.match(line_s)
+            if m_h2:
+                content = m_h2.group(1).strip()
+                self._insert_markdown_spans(content, base_tag="lex_h2", ROMAN_NUMS=ROMAN_NUMS)
+                self.lex_textbox.insert("end", "\n\n")
+                continue
+                
+            # Titre H3
+            m_h3 = RE_H3.match(line_s)
+            if m_h3:
+                content = m_h3.group(1).strip()
+                self._insert_markdown_spans(content, base_tag="lex_h3", ROMAN_NUMS=ROMAN_NUMS)
+                self.lex_textbox.insert("end", "\n\n")
+                continue
+                
+            # Puce de liste
+            m_bul = RE_BULLET.match(line_s)
+            if m_bul:
+                content = m_bul.group(1).strip()
+                self.lex_textbox.insert("end", "  •  ", "lex_bullet_dot")
+                self._insert_markdown_spans(content, base_tag="lex_list_item", ROMAN_NUMS=ROMAN_NUMS)
+                self.lex_textbox.insert("end", "\n")
+                continue
+                
+            # Numéro ordonné (1. ou a))
+            m_ord = RE_ORDERED.match(line_s)
+            if m_ord:
+                lead = m_ord.group(1).strip()
+                content = m_ord.group(2).strip()
+                self.lex_textbox.insert("end", f"  {lead} ", "lex_lead_num")
+                self._insert_markdown_spans(content, base_tag="lex_list_item", ROMAN_NUMS=ROMAN_NUMS)
+                self.lex_textbox.insert("end", "\n")
+                continue
+                
+            # Paragraphe standard
+            self._insert_markdown_spans(line_s, base_tag="body", ROMAN_NUMS=ROMAN_NUMS)
+            self.lex_textbox.insert("end", "\n\n")
+
+    def _insert_markdown_spans(self, line_text, base_tag="body", ROMAN_NUMS=None):
+        """Parse les éléments inline (gras, italique, liens renvois dictionnaire) et les insère dans lex_textbox."""
+        if not line_text:
+            return
+            
+        if ROMAN_NUMS is None:
+            ROMAN_NUMS = set()
+            
+        tokens = []
+        
+        # 1. [[WORD]] ou [[WORD|LABEL]]
+        for m in re.finditer(r'\[\[([^\]|]+)(?:\|([^\]]+))?\]\]', line_text):
+            target = m.group(1).strip()
+            label = (m.group(2) or target).strip()
+            tokens.append((m.start(), m.end(), 'DICT_LINK', label, target))
+            
+        # 2. *Voir* : **WORD** ou Voir : WORD ou *Voir aussi* : ...
+        for m in re.finditer(r'(\*+Voir(?:\s+aussi)?\*+|Voir(?:\s+aussi)?)\s*:\s*([^\n]+)', line_text, re.IGNORECASE):
+            tail_str = m.group(2)
+            tail_start = m.start(2)
+            for wm in re.finditer(r'\*\*([^*]+)\*\*|([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ]{2,}(?:\s+[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ]{2,})*)', tail_str):
+                target = (wm.group(1) or wm.group(2)).strip()
+                if target.upper() in ROMAN_NUMS or target.upper() in {'COL', 'PAGE', 'P', 'T', 'ED', 'EDIT'}:
+                    continue
+                if len(target) >= 2:
+                    w_start = tail_start + wm.start()
+                    w_end = tail_start + wm.end()
+                    tokens.append((w_start, w_end, 'DICT_LINK', target, target))
+
+        # 3. "Voir PARADIS TERRESTRE" (mots majuscules après Voir)
+        for m in re.finditer(r'\bVoir\s+([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ]{2,}(?:\s+[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ]{2,})*(?:\s+[0-9]+)?)', line_text):
+            target = m.group(1).strip()
+            if target.upper() in ROMAN_NUMS or target.lower().startswith('t.') or target.lower().startswith('col.'):
+                continue
+            if len(target) >= 2:
+                tokens.append((m.start(1), m.end(1), 'DICT_LINK', target, target))
+
+        # 4. Gras **texte**
+        for m in re.finditer(r'\*\*([^*]+)\*\*', line_text):
+            tokens.append((m.start(), m.end(), 'BOLD', m.group(1), None))
+            
+        # 5. Italique *texte*
+        for m in re.finditer(r'(?<!\*)\*([^*]+)\*(?!\*)', line_text):
+            tokens.append((m.start(), m.end(), 'ITALIC', m.group(1), None))
+
+        tokens.sort(key=lambda x: (x[0], -(x[1] - x[0])))
+        
+        clean_tokens = []
+        last_end = 0
+        for tok in tokens:
+            start, end, t_type, content, extra = tok
+            if start >= last_end:
+                clean_tokens.append(tok)
+                last_end = end
+                
+        curr = 0
+        if not hasattr(self, '_link_counter'):
+            self._link_counter = 0
+            
+        for tok in clean_tokens:
+            start, end, t_type, content, extra = tok
+            if start > curr:
+                self.lex_textbox.insert("end", line_text[curr:start], base_tag)
+                
+            if t_type == 'DICT_LINK':
+                self._link_counter += 1
+                unique_tag = f"dict_link_{self._link_counter}"
+                link_text = f"🔗 {content}"
+                self.lex_textbox.insert("end", link_text, (unique_tag, "lex_dict_link_base"))
+                target_word = extra or content
+                self.lex_textbox._textbox.tag_bind(unique_tag, "<Button-1>", lambda e, w=target_word: self.on_dictionary_cross_reference_clicked(w))
+                self.lex_textbox._textbox.tag_bind(unique_tag, "<Enter>", lambda e: self.lex_textbox._textbox.config(cursor="hand2"))
+                self.lex_textbox._textbox.tag_bind(unique_tag, "<Leave>", lambda e: self.lex_textbox._textbox.config(cursor=""))
+            elif t_type == 'BOLD':
+                bold_tag = "lex_h1_bold" if "h1" in base_tag else ("lex_h2_bold" if "h2" in base_tag else ("lex_h3_bold" if "h3" in base_tag else "lex_bold"))
+                self.lex_textbox.insert("end", content, (bold_tag, base_tag))
+            elif t_type == 'ITALIC':
+                self.lex_textbox.insert("end", content, ("lex_italic", base_tag))
+            else:
+                self.lex_textbox.insert("end", content, base_tag)
+                
+            curr = end
+            
+        if curr < len(line_text):
+            self.lex_textbox.insert("end", line_text[curr:], base_tag)
 
     def _render_wikipedia_entry(self, m):
         """Rend l'article Wikipédia sélectionné, en le chargeant en arrière-plan si nécessaire."""
@@ -2621,6 +2811,30 @@ class CenterPanel(ctk.CTkFrame):
             
             polish_badge_col = "#C084FC" if is_dark else "#7C3AED"
             self.lex_textbox._textbox.tag_configure("polish_badge", font=(self.font_family, max(9, self.font_size - 3), "bold"), foreground=polish_badge_col, justify="center", spacing1=4, spacing3=10)
+            
+            # Styles riches pour le Markdown du Lexique & Dictionnaires
+            lex_h1_col = title_col
+            lex_h2_col = "#38BDF8" if is_dark else "#0284C7"
+            lex_h3_col = "#F59E0B" if is_dark else "#D97706"
+            lex_link_col = "#38BDF8" if is_dark else "#0284C7"
+            lex_hr_col = "#475569" if is_dark else "#CBD5E1"
+            lex_bullet_col = "#38BDF8" if is_dark else "#0284C7"
+            lex_lead_col = "#F59E0B" if is_dark else "#D97706"
+            lex_it_col = "#94A3B8" if is_dark else "#64748B"
+            
+            self.lex_textbox._textbox.tag_configure("lex_h1", font=(self.font_family, self.font_size + 3, "bold"), foreground=lex_h1_col, justify="center", spacing1=10, spacing3=12)
+            self.lex_textbox._textbox.tag_configure("lex_h2", font=(self.font_family, self.font_size + 1, "bold"), foreground=lex_h2_col, spacing1=14, spacing3=6)
+            self.lex_textbox._textbox.tag_configure("lex_h3", font=(self.font_family, self.font_size, "bold"), foreground=lex_h3_col, spacing1=10, spacing3=4)
+            self.lex_textbox._textbox.tag_configure("lex_hr", font=(self.font_family, max(8, self.font_size - 4)), foreground=lex_hr_col, justify="center", spacing1=6, spacing3=6)
+            self.lex_textbox._textbox.tag_configure("lex_bullet_dot", font=(self.font_family, self.font_size, "bold"), foreground=lex_bullet_col)
+            self.lex_textbox._textbox.tag_configure("lex_lead_num", font=(self.font_family, self.font_size, "bold"), foreground=lex_lead_col)
+            self.lex_textbox._textbox.tag_configure("lex_list_item", font=(self.font_family, self.font_size), foreground=text_col, lmargin1=14, lmargin2=26, spacing1=2, spacing3=2)
+            self.lex_textbox._textbox.tag_configure("lex_bold", font=(self.font_family, self.font_size, "bold"), foreground=text_col)
+            self.lex_textbox._textbox.tag_configure("lex_h1_bold", font=(self.font_family, self.font_size + 3, "bold"), foreground=lex_h1_col)
+            self.lex_textbox._textbox.tag_configure("lex_h2_bold", font=(self.font_family, self.font_size + 1, "bold"), foreground=lex_h2_col)
+            self.lex_textbox._textbox.tag_configure("lex_h3_bold", font=(self.font_family, self.font_size, "bold"), foreground=lex_h3_col)
+            self.lex_textbox._textbox.tag_configure("lex_italic", font=(self.font_family, self.font_size, "italic"), foreground=lex_it_col)
+            self.lex_textbox._textbox.tag_configure("lex_dict_link_base", font=(self.font_family, self.font_size, "bold"), foreground=lex_link_col, underline=True)
             
             self.lex_textbox._textbox.tag_bind("wiki_link", "<Button-1>", lambda e: self.on_open_wikipedia_web())
             self.lex_textbox._textbox.tag_bind("wiki_link", "<Enter>", lambda e: self.lex_textbox._textbox.config(cursor="hand2"))
