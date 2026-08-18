@@ -935,6 +935,35 @@ const BibleReader = {
     });
 
     this.setupInfiniteScroll();
+
+    // Surlignage synchronisé au survol des versets en double vue
+    const workspace = document.getElementById('reader-workspace');
+    if (workspace) {
+      workspace.addEventListener('mouseover', (e) => {
+        if (!this.isSplitView) return;
+        const vItem = e.target.closest('.verse-item');
+        if (!vItem) return;
+        
+        const bCode = vItem.dataset.bookCode;
+        const ch = vItem.dataset.chapter;
+        const vNum = vItem.dataset.verseNum;
+        if (!bCode || !ch || !vNum) return;
+
+        workspace.querySelectorAll(`.verse-item[data-book-code="${bCode}"][data-chapter="${ch}"][data-verse-num="${vNum}"]`).forEach(el => {
+          el.classList.add('synced-hover');
+        });
+      });
+
+      workspace.addEventListener('mouseout', (e) => {
+        if (!this.isSplitView) return;
+        const vItem = e.target.closest('.verse-item');
+        if (!vItem) return;
+        
+        workspace.querySelectorAll('.verse-item.synced-hover').forEach(el => {
+          el.classList.remove('synced-hover');
+        });
+      });
+    }
   },
 
   bindEvents() {
@@ -1057,10 +1086,14 @@ const BibleReader = {
   toggleSplitView(forceState) {
     this.isSplitView = forceState !== undefined ? forceState : !this.isSplitView;
     const workspace = document.getElementById('reader-workspace');
-    workspace?.classList.toggle('split-view', this.isSplitView);
-    document.getElementById('btn-toggle-split')?.classList.toggle('active', this.isSplitView);
-
+    const paneRight = document.getElementById('pane-right');
+    const btnSplit = document.getElementById('btn-toggle-split');
     const btnSync = document.getElementById('btn-toggle-sync-scroll');
+
+    workspace?.classList.toggle('split-view', this.isSplitView);
+    paneRight?.classList.toggle('hidden', !this.isSplitView);
+    btnSplit?.classList.toggle('active', this.isSplitView);
+
     if (this.isSplitView) {
       btnSync?.classList.remove('hidden');
       if (this.isScrollSynced) {
@@ -1526,6 +1559,12 @@ const BibleReader = {
         vSpan.addEventListener('click', () => {
           document.querySelectorAll('.verse-item').forEach(el => el.classList.remove('selected'));
           vSpan.classList.add('selected');
+          if (this.isSplitView) {
+            const workspace = document.getElementById('reader-workspace');
+            workspace?.querySelectorAll(`.verse-item[data-book-code="${data.book}"][data-chapter="${data.chapter}"][data-verse-num="${v.verse}"]`).forEach(el => {
+              el.classList.add('selected');
+            });
+          }
           this.loadCommentariesForVerse(v.verse, data.book, data.chapter);
         });
 
