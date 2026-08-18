@@ -54,6 +54,16 @@ def get_active_window():
     return _GLOBAL_WINDOW
 
 
+def strip_xml_tags(text: str) -> str:
+    """Enlève toutes les balises XML/HTML (comme <w>, <note>, <p>, <divineName>, etc.) et normalise les espaces."""
+    if not text:
+        return ""
+    clean = re.sub(r'<note[^>]*>.*?</note>', '', text, flags=re.I)
+    clean = re.sub(r'<[^>]+>', '', clean)
+    clean = re.sub(r'\s+', ' ', clean).strip()
+    return clean
+
+
 def parse_reverse_interlinear_verse(v_raw: str) -> List[Dict[str, Any]]:
     """
     Parse un verset français balisé avec des codes Strong (<w strong="Hxxxx">mot</w>)
@@ -225,7 +235,7 @@ class BibleAppApi:
 
         for v_str in sorted_verses:
             v_raw = verses_dict[v_str]
-            v_text = extract_verse_text(v_raw)
+            v_text = strip_xml_tags(extract_verse_text(v_raw))
             v_num = int(v_str) if v_str.isdigit() else v_str
 
             words_data = []
@@ -826,7 +836,7 @@ def main():
     
     _GLOBAL_WINDOW = webview.create_window(
         title="Bible AI — Lecteur Biblique & Étude (Logos Edition)",
-        url=f"file:///{html_path.replace(os.sep, '/')}",
+        url=html_path,
         js_api=api,
         width=1440,
         height=920,

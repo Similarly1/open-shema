@@ -1280,7 +1280,8 @@ const BibleReader = {
             : `<sup class="verse-num">${v.verse}</sup>`;
 
           // Découper le texte en tokens pour permettre le clic/clic droit sur chaque mot
-          const tokens = (v.text || '').split(/(\s+)/);
+          const cleanText = (v.text || '').replace(/<[^>]+>/g, '');
+          const tokens = cleanText.split(/(\s+)/);
           let formattedHtml = numHtml;
 
           tokens.forEach(tok => {

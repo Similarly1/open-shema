@@ -10,7 +10,7 @@ const API = {
 
   init() {
     const markReady = () => {
-      if (!this.isReady) {
+      if (!this.isReady && window.pywebview?.api) {
         this.isReady = true;
         console.log('⚡ PyWebView Bridge Connecté !');
         const cbs = [...this._readyCallbacks];
@@ -36,11 +36,19 @@ const API = {
       }
     }, 50);
 
-    // Timeout de secours maximum (5s)
+    // Timeout de secours maximum (6s) pour mode autonome dans navigateur
     setTimeout(() => {
       clearInterval(interval);
-      markReady();
-    }, 5000);
+      if (!this.isReady) {
+        this.isReady = true;
+        console.warn('⚡ PyWebView non détecté, mode autonome actif.');
+        const cbs = [...this._readyCallbacks];
+        this._readyCallbacks = [];
+        cbs.forEach(cb => {
+          try { cb(); } catch (e) { console.error('Erreur callback onReady:', e); }
+        });
+      }
+    }, 6000);
   },
 
   async ensureReady() {
