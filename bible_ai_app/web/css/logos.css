@@ -509,20 +509,31 @@ body, html {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
-  gap: 12px;
+  padding: 0 10px;
+  gap: 8px;
+  overflow: hidden;
 }
-.toolbar-left, .toolbar-right {
+.toolbar-left {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 .tool-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   height: 30px;
-  padding: 0 10px;
+  padding: 0 8px;
   border: 1px solid var(--border-color);
   background-color: #FFFFFF;
   border-radius: 6px;
@@ -530,6 +541,7 @@ body, html {
   font-weight: 500;
   color: var(--text-secondary);
   cursor: pointer;
+  white-space: nowrap;
 }
 .tool-btn:hover {
   background-color: var(--bg-hover);
@@ -542,9 +554,11 @@ body, html {
 }
 .tool-btn.icon-only {
   width: 30px;
+  min-width: 30px;
   padding: 0;
   justify-content: center;
   font-size: 15px;
+  flex-shrink: 0;
 }
 .tool-btn .icon {
   width: 16px;
@@ -1201,13 +1215,13 @@ input:checked + .slider.round:before {
   background-color: #F1F5F9;
   border-bottom: 1px solid var(--border-color);
   display: flex;
-  padding: 0 6px;
-  align-items: flex-end;
-  gap: 2px;
+  padding: 0 8px;
+  align-items: center;
+  gap: 4px;
 }
 .drawer-tab {
   height: 32px;
-  padding: 0 12px;
+  padding: 0 10px;
   border: none;
   background: transparent;
   font-size: 12px;
@@ -1215,11 +1229,32 @@ input:checked + .slider.round:before {
   color: var(--text-secondary);
   cursor: pointer;
   border-radius: 6px 6px 0 0;
+  white-space: nowrap;
 }
 .drawer-tab.active {
   background-color: #FFFFFF;
   color: var(--accent-blue);
   font-weight: 600;
+}
+.drawer-close-btn {
+  margin-left: auto;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+.drawer-close-btn:hover {
+  background-color: #E2E8F0;
+  color: var(--text-primary);
 }
 .drawer-body {
   flex: 1;

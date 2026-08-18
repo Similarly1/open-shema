@@ -1029,7 +1029,16 @@ const BibleReader = {
 
     document.getElementById('btn-toggle-right-drawer')?.addEventListener('click', () => {
       const drawer = document.getElementById('right-drawer');
-      drawer?.classList.toggle('collapsed');
+      if (drawer) {
+        drawer.classList.toggle('collapsed');
+        document.getElementById('btn-toggle-right-drawer')?.classList.toggle('active', !drawer.classList.contains('collapsed'));
+      }
+    });
+
+    document.getElementById('btn-collapse-drawer')?.addEventListener('click', () => {
+      const drawer = document.getElementById('right-drawer');
+      drawer?.classList.add('collapsed');
+      document.getElementById('btn-toggle-right-drawer')?.classList.remove('active');
     });
 
     // Filtre de recherche dans le sélecteur de Bible
