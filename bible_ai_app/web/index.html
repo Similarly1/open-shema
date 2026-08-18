@@ -5,15 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bible AI - Étude Biblique</title>
   
-  <!-- Polices Google : Inter (UI) & Lora / EB Garamond (Texte Biblique) -->
+  <!-- Polices Google : Inter (UI) & Lora / EB Garamond / Literata / Merriweather / Cinzel (Texte Biblique) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400..700;1,400..700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Inter:wght@300;400;500;600;700&family=Literata:ital,opsz,wght@0,7..72,400..700;1,7..72,400..700&family=Lora:ital,wght@0,400..700;1,400..700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
   
   <!-- CSS -->
   <link rel="stylesheet" href="css/logos.css">
 </head>
-<body class="theme-light">
+<body class="theme-dark">
   <!-- SPLASH SCREEN / ANIMATION DE CHARGEMENT INITIALE (Style Logos) -->
   <div id="app-splash-loader" class="splash-loader-overlay">
     <div class="splash-content">
@@ -280,11 +280,14 @@
                 </div>
                 <div class="form-group">
                   <label>Police de lecture :</label>
-                  <select id="cfg-font-family" class="select-field full-w">
-                    <option value="EB Garamond">EB Garamond (Serif Éditorial)</option>
-                    <option value="Lora">Lora (Serif Moderne)</option>
-                    <option value="Georgia">Georgia (Classique)</option>
-                    <option value="Inter">Inter (Sans-Serif Épurée)</option>
+                  <select id="cfg-font-family" class="select-field full-w font-preview-select">
+                    <option value="EB Garamond" style="font-family: 'EB Garamond', serif; font-size: 15px; font-weight: 600;">EB Garamond (Serif Éditorial)</option>
+                    <option value="Lora" style="font-family: 'Lora', serif; font-size: 15px; font-weight: 500;">Lora (Serif Moderne)</option>
+                    <option value="Literata" style="font-family: 'Literata', serif; font-size: 15px; font-weight: 500;">Literata (Édition & Littéraire)</option>
+                    <option value="Merriweather" style="font-family: 'Merriweather', serif; font-size: 14px; font-weight: 400;">Merriweather (Lecture Confort)</option>
+                    <option value="Georgia" style="font-family: Georgia, serif; font-size: 15px;">Georgia (Classique)</option>
+                    <option value="Cinzel" style="font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700;">Cinzel (Épigraphique & Titres)</option>
+                    <option value="Inter" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500;">Inter (Sans-Serif Épurée)</option>
                   </select>
                 </div>
               </div>

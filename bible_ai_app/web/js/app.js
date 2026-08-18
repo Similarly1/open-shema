@@ -7,6 +7,9 @@ const App = {
   activeView: 'bible',
 
   init() {
+    // 0. Initialisation immédiate du thème et de la typographie
+    this.initThemeAndFont();
+
     // 1. Initialiser tous les sous-systèmes de manière résiliente
     const modules = [
       { name: 'BibleReader', init: () => BibleReader.init() },
@@ -92,6 +95,63 @@ const App = {
     setTimeout(() => {
       this.hideSplash();
     }, 1500);
+  },
+
+  initThemeAndFont() {
+    API.onReady(async () => {
+      try {
+        const cfg = await API.getSettings();
+        if (cfg) {
+          if (cfg.theme) this.applyTheme(cfg.theme);
+          if (cfg.font_family) this.applyFontFamily(cfg.font_family);
+        }
+      } catch (e) {
+        console.warn('Impossible de charger les paramètres au démarrage:', e);
+      }
+    });
+
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        const themeVal = document.getElementById('cfg-theme')?.value;
+        if (themeVal === 'system') {
+          this.applyTheme('system');
+        }
+      });
+    }
+  },
+
+  applyTheme(theme) {
+    const body = document.body;
+    body.classList.remove('theme-light', 'theme-dark');
+
+    let effective = theme || 'dark';
+    if (effective === 'system') {
+      effective = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+    }
+
+    if (effective === 'dark') {
+      body.classList.add('theme-dark');
+    } else {
+      body.classList.add('theme-light');
+    }
+  },
+
+  applyFontFamily(fontFamily) {
+    if (!fontFamily) fontFamily = 'EB Garamond';
+    let fontStack = `'${fontFamily}', serif`;
+    if (fontFamily === 'Inter') {
+      fontStack = `'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
+    } else if (fontFamily === 'Georgia') {
+      fontStack = `Georgia, 'Times New Roman', serif`;
+    } else {
+      fontStack = `'${fontFamily}', 'EB Garamond', 'Lora', 'Georgia', serif`;
+    }
+
+    document.documentElement.style.setProperty('--font-bible', fontStack);
+    const selectEl = document.getElementById('cfg-font-family');
+    if (selectEl) {
+      selectEl.style.fontFamily = fontStack;
+    }
   },
 
   hideSplash() {

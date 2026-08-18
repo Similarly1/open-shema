@@ -54,6 +54,16 @@ const SettingsView = {
   },
 
   bindActions() {
+    // Changement de thème en direct
+    document.getElementById('cfg-theme')?.addEventListener('change', (e) => {
+      App.applyTheme(e.target.value);
+    });
+
+    // Changement de police en direct
+    document.getElementById('cfg-font-family')?.addEventListener('change', (e) => {
+      App.applyFontFamily(e.target.value);
+    });
+
     document.getElementById('btn-save-settings-top').addEventListener('click', () => {
       this.save();
     });
@@ -131,8 +141,13 @@ const SettingsView = {
 
   populateForm() {
     const c = this.config;
-    if (c.theme) document.getElementById('cfg-theme').value = c.theme;
-    if (c.font_family) document.getElementById('cfg-font-family').value = c.font_family;
+    const theme = c.theme || 'dark';
+    document.getElementById('cfg-theme').value = theme;
+    App.applyTheme(theme);
+
+    const font = c.font_family || 'EB Garamond';
+    document.getElementById('cfg-font-family').value = font;
+    App.applyFontFamily(font);
     
     if (c.font_size) {
       document.getElementById('cfg-font-size').value = c.font_size;
@@ -253,6 +268,8 @@ const SettingsView = {
     try {
       await API.call('save_settings', newCfg);
       this.config = newCfg;
+      App.applyTheme(newCfg.theme);
+      App.applyFontFamily(newCfg.font_family);
       App.showToast('Paramètres enregistrés avec succès !');
     } catch (e) {
       alert(`Erreur d'enregistrement : ${e}`);

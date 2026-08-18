@@ -854,7 +854,7 @@ const LexiconViewer = {
         <div style="font-size: 20px; font-weight: 800; color: var(--accent-blue); margin-bottom: 4px;">${match.title || this.currentTerm}</div>
         <div style="font-size: 11px; font-weight: 700; color: var(--accent-orange); margin-bottom: 12px;">${match.badge || match.dict_name}</div>
         ${polishBarHtml}
-        <div style="font-family: var(--font-bible); font-size: 15px; line-height: 1.7; color: #334155;" id="match-body-text">${textToRender}</div>
+        <div style="font-family: var(--font-bible); font-size: 15px; line-height: 1.7; color: var(--text-primary);" id="match-body-text" class="dict-entry-body">${textToRender}</div>
       </div>
     `;
 
