@@ -2528,6 +2528,117 @@ input:checked + .slider.round:before {
   display: none;
 }
 
+/* Notification Toast d'Erreur & Avertissement (Bas Droite) */
+.error-toast-card {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  max-width: 400px;
+  min-width: 280px;
+  background-color: #FFFFFF;
+  border-left: 4px solid #EF4444;
+  border-top: 1px solid rgba(239, 68, 68, 0.2);
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.18), 0 8px 10px -6px rgba(15, 23, 42, 0.1);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 10000;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
+}
+.error-toast-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.error-toast-card.hidden {
+  display: none;
+}
+.error-toast-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.error-toast-body {
+  flex: 1;
+  min-width: 0;
+}
+.error-toast-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #DC2626;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.error-toast-msg {
+  font-size: 11.5px;
+  color: var(--text-primary);
+  line-height: 1.35;
+  word-break: break-word;
+  max-height: 34px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.error-toast-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.error-toast-btn-details {
+  background: #FEE2E2;
+  color: #DC2626;
+  border: 1px solid #FECACA;
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+.error-toast-btn-details:hover {
+  background: #FCA5A5;
+  color: #991B1B;
+}
+.error-toast-btn-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+}
+.error-toast-btn-close:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.error-details-pre {
+  background-color: #0F172A;
+  color: #F8FAFC;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  padding: 12px;
+  border-radius: 6px;
+  max-height: 280px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  border: 1px solid #334155;
+}
+
 /* ==========================================================================
    8. VUE RECHERCHE GLOBALE
    ========================================================================== */

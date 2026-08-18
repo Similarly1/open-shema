@@ -956,8 +956,46 @@
       </div>
     </div>
 
-    <!-- Notification Toast Flottante -->
+    <!-- Notification Toast Info / Succès Flottante -->
     <div class="toast-notification hidden" id="toast">Message</div>
+
+    <!-- Notification Toast d'Erreur (Bas Droite) -->
+    <div class="error-toast-card hidden" id="error-toast">
+      <div class="error-toast-icon">⚠️</div>
+      <div class="error-toast-body">
+        <div class="error-toast-title" id="error-toast-title">Erreur</div>
+        <div class="error-toast-msg" id="error-toast-msg">Une erreur inattendue est survenue.</div>
+      </div>
+      <div class="error-toast-actions">
+        <button class="error-toast-btn-details" id="btn-error-toast-details" title="Voir les détails complets de l'erreur">Plus ▾</button>
+        <button class="error-toast-btn-close" id="btn-error-toast-close" title="Fermer">✕</button>
+      </div>
+    </div>
+
+    <!-- Modale Détails Complets de l'Erreur avec Bouton Copier -->
+    <div class="modal-dialog-container hidden" id="error-details-modal">
+      <div class="modal-dialog" style="max-width: 620px; width: 90%;">
+        <div class="modal-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 16px;">⚠️</span>
+            <span class="modal-title" id="error-modal-title">Détails de l'erreur</span>
+          </div>
+          <button class="modal-btn-close" id="btn-close-error-modal">✕</button>
+        </div>
+        <div class="modal-body" style="padding: 16px;">
+          <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;" id="error-modal-summary"></div>
+          <div style="position: relative;">
+            <pre class="error-details-pre" id="error-modal-stack"></pre>
+          </div>
+        </div>
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #F8FAFC; border-top: 1px solid var(--border-color);">
+          <button class="btn-outline" id="btn-copy-error" style="display: flex; align-items: center; gap: 6px;">
+            <span id="btn-copy-error-icon">📋</span> <span id="btn-copy-error-text">Copier l'erreur</span>
+          </button>
+          <button class="btn-primary" id="btn-dismiss-error-modal">Fermer</button>
+        </div>
+      </div>
+    </div>
 
   </div>
 

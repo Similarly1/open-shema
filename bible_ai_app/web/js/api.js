@@ -86,6 +86,17 @@ const API = {
         return await window.pywebview.api[methodName](...args);
       } catch (err) {
         console.error(`Erreur appel API [${methodName}]:`, err);
+        if (typeof App !== 'undefined' && App.showError) {
+          App.showError(
+            `Erreur API [${methodName}]`,
+            err.message || String(err),
+            {
+              method: methodName,
+              arguments: args,
+              error: err.stack || err.message || String(err)
+            }
+          );
+        }
         throw err;
       }
     } else {

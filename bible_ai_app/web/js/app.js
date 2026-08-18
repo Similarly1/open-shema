@@ -78,7 +78,10 @@ const App = {
     // 5. Raccourcis clavier globaux
     this.bindKeyboardShortcuts();
 
-    // 6. Masquage fluide du Splash Loader dès que l'API est initialisée (avec timeout de sécurité)
+    // 6. Gestionnaire d'erreurs global (Toast + Détails)
+    this.bindErrorHandling();
+
+    // 7. Masquage fluide du Splash Loader dès que l'API est initialisée (avec timeout de sécurité)
     API.onReady(() => {
       setTimeout(() => {
         this.hideSplash();
@@ -128,6 +131,7 @@ const App = {
 
   showToast(message, duration = 3000) {
     const toast = document.getElementById('toast');
+    if (!toast) return;
     toast.textContent = message;
     toast.classList.remove('hidden');
     toast.classList.add('visible');
@@ -137,6 +141,139 @@ const App = {
       toast.classList.remove('visible');
       setTimeout(() => toast.classList.add('hidden'), 300);
     }, duration);
+  },
+
+  // Gestionnaire d'Avertissements & Erreurs avec Détails et Copie
+  currentErrorDetails: null,
+
+  bindErrorHandling() {
+    document.getElementById('btn-error-toast-details')?.addEventListener('click', () => {
+      this.showErrorModal();
+    });
+
+    document.getElementById('btn-error-toast-close')?.addEventListener('click', () => {
+      this.hideErrorToast();
+    });
+
+    document.getElementById('btn-close-error-modal')?.addEventListener('click', () => {
+      this.closeErrorModal();
+    });
+
+    document.getElementById('btn-dismiss-error-modal')?.addEventListener('click', () => {
+      this.closeErrorModal();
+    });
+
+    document.getElementById('btn-copy-error')?.addEventListener('click', () => {
+      this.copyErrorToClipboard();
+    });
+
+    // Capture des erreurs JS non gérées
+    window.addEventListener('error', (event) => {
+      // Ignorer les erreurs d'images 404 courantes pour ne pas polluer l'UI
+      if (event.target && (event.target.tagName === 'IMG' || event.target.tagName === 'SCRIPT')) {
+        return;
+      }
+      console.error('⚠️ [Global JS Error]:', event.error || event.message);
+      this.showError('Erreur Interface', event.message || 'Une exception non interceptée est survenue', {
+        message: event.message,
+        filename: event.filename,
+        lineno: event.lineno,
+        colno: event.colno,
+        stack: event.error ? event.error.stack : null
+      });
+    });
+
+    // Capture des promesses asynchrones rejetées
+    window.addEventListener('unhandledrejection', (event) => {
+      console.error('⚠️ [Unhandled Promise Rejection]:', event.reason);
+      const reason = event.reason;
+      const msg = (reason && reason.message) || String(reason);
+      this.showError('Erreur Asynchrone', msg, {
+        message: msg,
+        stack: (reason && reason.stack) ? reason.stack : String(reason)
+      });
+    });
+  },
+
+  showError(title, shortMsg, fullDetails = null) {
+    const errorToast = document.getElementById('error-toast');
+    const titleEl = document.getElementById('error-toast-title');
+    const msgEl = document.getElementById('error-toast-msg');
+
+    if (!errorToast || !titleEl || !msgEl) return;
+
+    titleEl.textContent = title || 'Erreur';
+    msgEl.textContent = shortMsg || 'Une erreur inattendue est survenue.';
+
+    this.currentErrorDetails = {
+      title: title || 'Erreur',
+      message: shortMsg || 'Une erreur inattendue est survenue.',
+      details: fullDetails || shortMsg || 'Aucun détail technique supplémentaire disponible.',
+      timestamp: new Date().toLocaleTimeString('fr-FR')
+    };
+
+    errorToast.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      errorToast.classList.add('visible');
+    });
+
+    if (this._errorToastTimer) clearTimeout(this._errorToastTimer);
+    this._errorToastTimer = setTimeout(() => {
+      this.hideErrorToast();
+    }, 7000);
+  },
+
+  hideErrorToast() {
+    const errorToast = document.getElementById('error-toast');
+    if (!errorToast) return;
+    errorToast.classList.remove('visible');
+    setTimeout(() => errorToast.classList.add('hidden'), 250);
+  },
+
+  showErrorModal() {
+    if (!this.currentErrorDetails) return;
+    const modal = document.getElementById('error-details-modal');
+    const titleEl = document.getElementById('error-modal-title');
+    const sumEl = document.getElementById('error-modal-summary');
+    const stackEl = document.getElementById('error-modal-stack');
+
+    if (!modal) return;
+
+    if (titleEl) titleEl.textContent = `${this.currentErrorDetails.title} (${this.currentErrorDetails.timestamp})`;
+    if (sumEl) sumEl.textContent = this.currentErrorDetails.message;
+    if (stackEl) {
+      stackEl.textContent = typeof this.currentErrorDetails.details === 'object'
+        ? JSON.stringify(this.currentErrorDetails.details, null, 2)
+        : String(this.currentErrorDetails.details);
+    }
+
+    modal.classList.remove('hidden');
+  },
+
+  closeErrorModal() {
+    document.getElementById('error-details-modal')?.classList.add('hidden');
+  },
+
+  copyErrorToClipboard() {
+    if (!this.currentErrorDetails) return;
+    const formattedDetails = typeof this.currentErrorDetails.details === 'object'
+      ? JSON.stringify(this.currentErrorDetails.details, null, 2)
+      : String(this.currentErrorDetails.details);
+
+    const textToCopy = `=== RAPPORT D'ERREUR BIBLE AI ===\nDate: ${new Date().toISOString()}\nTitre: ${this.currentErrorDetails.title}\nMessage: ${this.currentErrorDetails.message}\n\nDétails techniques:\n${formattedDetails}`;
+
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      const btnText = document.getElementById('btn-copy-error-text');
+      const btnIcon = document.getElementById('btn-copy-error-icon');
+      if (btnText) btnText.textContent = 'Copié !';
+      if (btnIcon) btnIcon.textContent = '✓';
+      setTimeout(() => {
+        if (btnText) btnText.textContent = "Copier l'erreur";
+        if (btnIcon) btnIcon.textContent = '📋';
+      }, 2000);
+    }).catch(err => {
+      console.error('Erreur copie presse-papier:', err);
+    });
   },
 
   bindChat() {
