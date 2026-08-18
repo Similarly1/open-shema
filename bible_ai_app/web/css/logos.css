@@ -703,6 +703,22 @@ body, html {
 .verse-item.selected {
   background-color: rgba(2, 132, 199, 0.18);
 }
+
+.word-token {
+  display: inline;
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 1px 2px;
+  margin: 0 -2px;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+.word-token:hover {
+  background-color: rgba(2, 132, 199, 0.18);
+  color: var(--accent-blue);
+  text-decoration: underline;
+  text-decoration-color: rgba(2, 132, 199, 0.4);
+}
+
 .chapter-number-dropcap {
   font-size: 32px;
   font-weight: 700;
@@ -1582,6 +1598,102 @@ input:checked + .slider.round:before {
 .display-opt-item input[type="checkbox"] {
   cursor: pointer;
   accent-color: var(--accent-blue);
+}
+
+/* Menu Contextuel Flottant (Clic droit / Double-clic) */
+.bible-context-menu {
+  position: fixed;
+  z-index: 99999;
+  width: 320px;
+  background-color: #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.18), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: popoverFadeIn 0.14s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.bible-context-menu.hidden {
+  display: none;
+}
+.context-menu-header {
+  padding: 10px 14px;
+  background-color: #F8FAFC;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.context-header-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.context-header-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.context-header-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent-blue);
+  background-color: #E0F2FE;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.context-close-btn {
+  border: none;
+  background: transparent;
+  font-size: 11px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.context-close-btn:hover {
+  color: var(--text-primary);
+}
+.context-menu-preview {
+  padding: 10px 14px;
+  font-family: var(--font-bible);
+  font-size: 13px;
+  line-height: 1.55;
+  color: #334155;
+  background-color: #FAFBFD;
+  max-height: 120px;
+  overflow-y: auto;
+}
+.context-menu-preview:empty {
+  display: none;
+}
+.context-menu-divider {
+  height: 1px;
+  background-color: var(--border-subtle);
+}
+.context-menu-actions {
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.context-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: none;
+  background: transparent;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: var(--transition-fast);
+}
+.context-action-btn:hover {
+  background-color: var(--bg-hover);
+  color: var(--accent-blue);
 }
 
 /* Popover Version Biblique */

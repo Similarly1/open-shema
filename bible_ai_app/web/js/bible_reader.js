@@ -1,7 +1,7 @@
 /**
  * Bible Reader Engine & Logos Experience
  * Gère le défilement continu pour toute la Bible, les options d'affichage,
- * les onglets multi-documents et le sélecteur individuel de commentaires.
+ * les onglets multi-documents, le lexique Strong au clic et le menu contextuel (clic droit / double-clic).
  */
 
 // 1. LISTE CANONIQUE DES LIVRES & CALCULS DE NAVIGATION
@@ -233,7 +233,7 @@ const TabsManager = {
 };
 
 
-// 3. OPTIONS D'AFFICHAGE (PÉRICOPES, NUMÉROS, POLICE)
+// 3. OPTIONS D'AFFICHAGE
 const DisplayOptions = {
   init() {
     const btn = document.getElementById('btn-display-options');
@@ -251,7 +251,6 @@ const DisplayOptions = {
       }
     });
 
-    // Écouteurs de cases à cocher
     document.getElementById('opt-show-pericopes').addEventListener('change', (e) => {
       workspace.classList.toggle('hide-pericopes', !e.target.checked);
     });
@@ -318,14 +317,11 @@ const CommentaryViewer = {
       return;
     }
 
-    // Remplir le menu déroulant
     this.currentComments.forEach((c, idx) => {
       const authorName = c.author || c.source || `Commentaire ${idx + 1}`;
       const item = document.createElement('button');
       item.className = `comm-source-item ${idx === 0 ? 'active' : ''}`;
-      item.innerHTML = `
-        <span>📖 ${authorName}</span>
-      `;
+      item.innerHTML = `<span>📖 ${authorName}</span>`;
       item.addEventListener('click', () => {
         this.selectCommentary(idx);
         document.getElementById('comm-sources-popover').classList.add('hidden');
@@ -345,12 +341,10 @@ const CommentaryViewer = {
 
     document.getElementById('lbl-active-comm-source').textContent = authorName;
 
-    // Mettre à jour l'élément actif dans la liste popover
     document.querySelectorAll('.comm-source-item').forEach((item, idx) => {
       item.classList.toggle('active', idx === index);
     });
 
-    // Afficher le commentaire unique
     const container = document.getElementById('commentary-single-view');
     container.innerHTML = `
       <div class="comm-single-author-header">
@@ -364,7 +358,215 @@ const CommentaryViewer = {
 };
 
 
-// 5. MOTEUR PRINCIPAL DU LECTEUR BIBLIQUE (Défilement continu & Split-Pane)
+// 5. MENU CONTEXTUEL FLOTTANT (Clic droit & Double-clic)
+const ContextMenuManager = {
+  menuEl: null,
+
+  init() {
+    this.menuEl = document.getElementById('bible-context-menu');
+    document.getElementById('btn-close-context-menu').addEventListener('click', () => {
+      this.hide();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (this.menuEl && !this.menuEl.contains(e.target)) {
+        this.hide();
+      }
+    });
+  },
+
+  hide() {
+    if (this.menuEl) this.menuEl.classList.add('hidden');
+  },
+
+  positionMenu(clientX, clientY) {
+    this.menuEl.classList.remove('hidden');
+    const width = 320;
+    const height = this.menuEl.offsetHeight || 250;
+    
+    let left = clientX;
+    let top = clientY;
+
+    if (left + width > window.innerWidth - 20) {
+      left = window.innerWidth - width - 20;
+    }
+    if (top + height > window.innerHeight - 20) {
+      top = window.innerHeight - height - 20;
+    }
+
+    this.menuEl.style.left = `${Math.max(10, left)}px`;
+    this.menuEl.style.top = `${Math.max(10, top)}px`;
+  },
+
+  async showForWord(word, strongCode, verseNum, bookCode, chapterNum, clientX, clientY) {
+    const cleanWord = (word || '').trim();
+    if (!cleanWord) return;
+
+    const headerTitle = document.getElementById('context-header-title');
+    const headerBadge = document.getElementById('context-header-badge');
+    const previewEl = document.getElementById('context-menu-preview');
+    const actionsEl = document.getElementById('context-menu-actions');
+
+    headerTitle.textContent = cleanWord;
+    headerBadge.textContent = strongCode || 'Recherche lexicale';
+    previewEl.innerHTML = `<em>Chargement de la définition lexicale...</em>`;
+
+    this.positionMenu(clientX, clientY);
+
+    // Charger aperçu lexical
+    let dictEntry = null;
+    try {
+      dictEntry = await API.call('lookup_dictionary', cleanWord, strongCode);
+      if (dictEntry) {
+        headerBadge.textContent = dictEntry.badge || strongCode || 'Lexique';
+        const snippet = dictEntry.full_text ? dictEntry.full_text.slice(0, 180) + '...' : '';
+        previewEl.innerHTML = `<strong>${dictEntry.title}</strong><br>${snippet}`;
+      } else {
+        previewEl.innerHTML = `Terme biblique — Cliquez pour rechercher dans les dictionnaires.`;
+      }
+    } catch (e) {
+      previewEl.innerHTML = ``;
+    }
+
+    const bInfo = getBookInfo(bookCode);
+    const refStr = `${bInfo.name} ${chapterNum}:${verseNum}`;
+
+    actionsEl.innerHTML = `
+      <button class="context-action-btn" id="ctx-act-lexicon">
+        <span>📜</span>
+        <span>Voir la définition complète dans le Lexique</span>
+      </button>
+      <button class="context-action-btn" id="ctx-act-search">
+        <span>🔍</span>
+        <span>Rechercher toutes les occurrences de « ${cleanWord} »</span>
+      </button>
+      <button class="context-action-btn" id="ctx-act-ai">
+        <span>🤖</span>
+        <span>Étudier le mot avec l'Assistant IA</span>
+      </button>
+      <button class="context-action-btn" id="ctx-act-copy">
+        <span>📋</span>
+        <span>Copier le mot</span>
+      </button>
+    `;
+
+    document.getElementById('ctx-act-lexicon').addEventListener('click', () => {
+      this.hide();
+      BibleReader.lookupWordInLexicon(cleanWord, strongCode);
+    });
+
+    document.getElementById('ctx-act-search').addEventListener('click', () => {
+      this.hide();
+      App.switchView('search');
+      const sInput = document.getElementById('search-main-input');
+      if (sInput) {
+        sInput.value = cleanWord;
+        SearchView.executeSearch();
+      }
+    });
+
+    document.getElementById('ctx-act-ai').addEventListener('click', () => {
+      this.hide();
+      App.switchView('ai');
+      const aiInput = document.getElementById('ai-study-input');
+      const passRef = document.getElementById('ai-passage-ref');
+      if (passRef) passRef.value = refStr;
+      if (aiInput) {
+        aiInput.value = `Fais une analyse lexicale, théologique et contextuelle approfondie du terme « ${cleanWord} » dans le passage de ${refStr}.`;
+        aiInput.focus();
+      }
+    });
+
+    document.getElementById('ctx-act-copy').addEventListener('click', () => {
+      this.hide();
+      navigator.clipboard.writeText(cleanWord);
+      App.showToast(`« ${cleanWord} » copié dans le presse-papier !`);
+    });
+  },
+
+  showForVerse(verseNum, verseText, bookCode, chapterNum, clientX, clientY) {
+    const bInfo = getBookInfo(bookCode);
+    const refStr = `${bInfo.name} ${chapterNum}:${verseNum}`;
+
+    const headerTitle = document.getElementById('context-header-title');
+    const headerBadge = document.getElementById('context-header-badge');
+    const previewEl = document.getElementById('context-menu-preview');
+    const actionsEl = document.getElementById('context-menu-actions');
+
+    headerTitle.textContent = refStr;
+    headerBadge.textContent = BibleReader.currentBible1;
+    previewEl.innerHTML = `« ${verseText} »`;
+
+    this.positionMenu(clientX, clientY);
+
+    actionsEl.innerHTML = `
+      <button class="context-action-btn" id="ctx-act-v-comm">
+        <span>💬</span>
+        <span>Ouvrir les commentaires exégétiques</span>
+      </button>
+      <button class="context-action-btn" id="ctx-act-v-ai">
+        <span>🤖</span>
+        <span>Étudier ce verset avec l'Assistant IA</span>
+      </button>
+      <button class="context-action-btn" id="ctx-act-v-note">
+        <span>📝</span>
+        <span>Créer une note sur ce verset</span>
+      </button>
+      <button class="context-action-btn" id="ctx-act-v-split">
+        <span>⇄</span>
+        <span>Comparer dans une 2e version</span>
+      </button>
+      <button class="context-action-btn" id="ctx-act-v-copy">
+        <span>📋</span>
+        <span>Copier le verset avec la référence</span>
+      </button>
+    `;
+
+    document.getElementById('ctx-act-v-comm').addEventListener('click', () => {
+      this.hide();
+      const drawer = document.getElementById('right-drawer');
+      drawer.classList.remove('collapsed');
+      document.querySelector('.drawer-tab[data-drawer-tab="commentaries"]')?.click();
+      BibleReader.loadCommentariesForVerse(verseNum, bookCode, chapterNum);
+    });
+
+    document.getElementById('ctx-act-v-ai').addEventListener('click', () => {
+      this.hide();
+      App.switchView('ai');
+      const passRef = document.getElementById('ai-passage-ref');
+      const aiInput = document.getElementById('ai-study-input');
+      if (passRef) passRef.value = refStr;
+      if (aiInput) {
+        aiInput.value = `Donne-moi une analyse exégétique et théologique détaillée du verset ${refStr} : « ${verseText} »`;
+        aiInput.focus();
+      }
+    });
+
+    document.getElementById('ctx-act-v-note').addEventListener('click', () => {
+      this.hide();
+      App.switchView('notes');
+      NotesView.createNewNote();
+      const refInput = document.getElementById('note-edit-ref');
+      const titleInput = document.getElementById('note-edit-title');
+      if (refInput) refInput.value = refStr;
+      if (titleInput) titleInput.value = `Méditation sur ${refStr}`;
+    });
+
+    document.getElementById('ctx-act-v-split').addEventListener('click', () => {
+      this.hide();
+      BibleReader.toggleSplitView(true);
+    });
+
+    document.getElementById('ctx-act-v-copy').addEventListener('click', () => {
+      this.hide();
+      navigator.clipboard.writeText(`${refStr} (${BibleReader.currentBible1}) — ${verseText}`);
+      App.showToast(`Verset ${refStr} copié !`);
+    });
+  }
+};
+
+
+// 6. MOTEUR PRINCIPAL DU LECTEUR BIBLIQUE
 const BibleReader = {
   currentBook: 'Gen',
   currentChapter: 1,
@@ -378,7 +580,6 @@ const BibleReader = {
   installedBibles: [],
   targetPaneForPicker: 1,
 
-  // Liste ordonnée des chapitres actuellement chargés dans la vue continue
   loadedChapters: [],
   isLoadingMore: false,
 
@@ -387,13 +588,12 @@ const BibleReader = {
     TabsManager.init();
     DisplayOptions.init();
     CommentaryViewer.init();
+    ContextMenuManager.init();
     
-    // Initialiser le BookPicker
     BookPicker.init((bookCode, chNum) => {
       this.navigateTo(bookCode, chNum);
     });
 
-    // Charger les Bibles dès que l'API est prête
     API.onReady(async () => {
       this.installedBibles = await API.getInstalledBibles() || [];
       if (this.installedBibles.length > 0) {
@@ -407,7 +607,6 @@ const BibleReader = {
       }
     });
 
-    // Activer l'écouteur de défilement continu
     this.setupInfiniteScroll();
   },
 
@@ -491,15 +690,12 @@ const BibleReader = {
     if (!pane1Scroll) return;
 
     pane1Scroll.addEventListener('scroll', () => {
-      // 1. Détection du chapitre actif visible
       this.detectActiveVisibleChapter(pane1Scroll);
 
-      // 2. Chargement continu vers le bas
       if (pane1Scroll.scrollTop + pane1Scroll.clientHeight >= pane1Scroll.scrollHeight - 300) {
         this.loadNextChapterContinuous();
       }
 
-      // 3. Chargement continu vers le haut
       if (pane1Scroll.scrollTop <= 50) {
         this.loadPrevChapterContinuous(pane1Scroll);
       }
@@ -544,7 +740,6 @@ const BibleReader = {
     document.getElementById('pane-1-breadcrumb').textContent = `${info.name.toUpperCase()} > Chapitre ${chapterNum}`;
     document.getElementById('pane-1-bible-name').textContent = this.currentBible1;
 
-    // Vider le conteneur et insérer le chapitre
     const pane1Container = document.getElementById('pane-1-verses');
     pane1Container.innerHTML = '';
 
@@ -560,10 +755,7 @@ const BibleReader = {
       pane2Container.appendChild(block2);
     }
 
-    // Scroll au début
     document.getElementById('pane-1-content').scrollTop = 0;
-
-    // Charger les commentaires du verset 1
     this.loadCommentariesForVerse(1);
     TabsManager.updateActiveTab(null, bookCode, chapterNum);
   },
@@ -624,7 +816,6 @@ const BibleReader = {
     pane1Container.prepend(divider);
     pane1Container.prepend(block);
 
-    // Ajuster le scroll pour éviter le saut d'écran
     const diff = scrollEl.scrollHeight - oldScrollHeight;
     scrollEl.scrollTop += diff;
 
@@ -659,7 +850,7 @@ const BibleReader = {
           let wordsHtml = '';
           v.words.forEach(w => {
             wordsHtml += `
-              <div class="interlinear-block" data-strong="${w.strong || ''}" data-word="${w.orig || w.surface}" title="${w.morph || ''}">
+              <div class="interlinear-block" data-strong="${w.strong || ''}" data-word="${w.orig || w.surface}" data-surface="${w.surface}" title="${w.morph || ''}">
                 <span class="interlinear-surface">${w.surface}</span>
                 ${w.orig && w.orig !== w.surface ? `<span class="interlinear-lemma">${w.orig}</span>` : ''}
                 ${w.translit ? `<span class="interlinear-translit">${w.translit}</span>` : ''}
@@ -670,23 +861,92 @@ const BibleReader = {
           vSpan.innerHTML = `<sup class="verse-num">${v.verse}</sup> ${wordsHtml}`;
 
           vSpan.querySelectorAll('.interlinear-block').forEach(b => {
+            // Clic gauche -> lexique
             b.addEventListener('click', (e) => {
               e.stopPropagation();
               this.lookupWordInLexicon(b.dataset.word, b.dataset.strong);
             });
+            // Double clic -> menu contextuel
+            b.addEventListener('dblclick', (e) => {
+              e.stopPropagation();
+              ContextMenuManager.showForWord(b.dataset.surface || b.dataset.word, b.dataset.strong, v.verse, data.book, data.chapter, e.clientX, e.clientY);
+            });
+            // Clic droit -> menu contextuel
+            b.addEventListener('contextmenu', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              ContextMenuManager.showForWord(b.dataset.surface || b.dataset.word, b.dataset.strong, v.verse, data.book, data.chapter, e.clientX, e.clientY);
+            });
           });
+
         } else {
+          // Lecture continue avec mots cliquables
           const isFirst = index === 0;
           const numHtml = isFirst 
             ? `<span class="chapter-number-dropcap">${data.chapter}</span><sup class="verse-num">${v.verse}</sup>`
             : `<sup class="verse-num">${v.verse}</sup>`;
-          vSpan.innerHTML = `${numHtml}${v.text} `;
+
+          // Découper le texte en tokens pour permettre le clic/clic droit sur chaque mot
+          const tokens = (v.text || '').split(/(\s+)/);
+          let formattedHtml = numHtml;
+
+          tokens.forEach(tok => {
+            if (!tok || /^\s+$/.test(tok)) {
+              formattedHtml += tok;
+            } else {
+              const cleanWord = tok.replace(/^[«"'(]+|[»"') ,;:!?.…]+$/g, '');
+              formattedHtml += `<span class="word-token" data-word="${cleanWord}" data-verse="${v.verse}">${tok}</span>`;
+            }
+          });
+
+          vSpan.innerHTML = formattedHtml;
+
+          // Écouteurs sur chaque mot
+          vSpan.querySelectorAll('.word-token').forEach(wEl => {
+            const w = wEl.dataset.word;
+            // Clic gauche sur mot -> charger le lexique Strong
+            wEl.addEventListener('click', (e) => {
+              e.stopPropagation();
+              document.querySelectorAll('.verse-item').forEach(el => el.classList.remove('selected'));
+              vSpan.classList.add('selected');
+              this.lookupWordInLexicon(w);
+            });
+
+            // Double clic sur mot -> ouvrir menu contextuel
+            wEl.addEventListener('dblclick', (e) => {
+              e.stopPropagation();
+              ContextMenuManager.showForWord(w, null, v.verse, data.book, data.chapter, e.clientX, e.clientY);
+            });
+
+            // Clic droit sur mot -> ouvrir menu contextuel
+            wEl.addEventListener('contextmenu', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              ContextMenuManager.showForWord(w, null, v.verse, data.book, data.chapter, e.clientX, e.clientY);
+            });
+          });
         }
 
+        // Clic sur le verset (hors mot spécifique ou pour sélectionner) -> charger commentaires
         vSpan.addEventListener('click', () => {
           document.querySelectorAll('.verse-item').forEach(el => el.classList.remove('selected'));
           vSpan.classList.add('selected');
           this.loadCommentariesForVerse(v.verse, data.book, data.chapter);
+        });
+
+        // Double clic sur le verset -> menu contextuel verset
+        vSpan.addEventListener('dblclick', (e) => {
+          if (!e.target.classList.contains('word-token')) {
+            ContextMenuManager.showForVerse(v.verse, v.text, data.book, data.chapter, e.clientX, e.clientY);
+          }
+        });
+
+        // Clic droit sur le verset -> menu contextuel verset
+        vSpan.addEventListener('contextmenu', (e) => {
+          if (!e.target.classList.contains('word-token')) {
+            e.preventDefault();
+            ContextMenuManager.showForVerse(v.verse, v.text, data.book, data.chapter, e.clientX, e.clientY);
+          }
         });
 
         flow.appendChild(vSpan);
@@ -711,13 +971,13 @@ const BibleReader = {
     }
   },
 
-  async lookupWordInLexicon(word, strongCode) {
+  async lookupWordInLexicon(word, strongCode = null) {
     const drawer = document.getElementById('right-drawer');
     drawer.classList.remove('collapsed');
-    document.querySelector('.drawer-tab[data-drawer-tab="lexicon"]').click();
+    document.querySelector('.drawer-tab[data-drawer-tab="lexicon"]')?.click();
 
     const container = document.getElementById('lexicon-details');
-    container.innerHTML = `<div style="padding: 20px; color: var(--text-muted);">Recherche lexicale pour « ${word} » (${strongCode || ''})...</div>`;
+    container.innerHTML = `<div style="padding: 20px; color: var(--text-muted);">Recherche lexicale pour « ${word} » ${strongCode ? `(${strongCode})` : ''}...</div>`;
 
     try {
       const entry = await API.call('lookup_dictionary', word, strongCode);
@@ -730,10 +990,16 @@ const BibleReader = {
           </div>
         `;
       } else {
-        container.innerHTML = `<div style="padding: 20px; color: var(--text-muted);">Aucune entrée lexicale trouvée pour ce terme.</div>`;
+        container.innerHTML = `
+          <div style="padding: 20px; color: var(--text-muted); text-align: center;">
+            <span style="font-size: 32px; display: block; margin-bottom: 10px;">📖</span>
+            Aucune entrée lexicale trouvée pour « <strong>${word}</strong> ».<br>
+            <small style="opacity: 0.8;">Vérifiez vos dictionnaires dans les Paramètres.</small>
+          </div>
+        `;
       }
     } catch (e) {
-      container.innerHTML = `<div style="padding: 20px; color: var(--accent-red);">Erreur lors de la consultation.</div>`;
+      container.innerHTML = `<div style="padding: 20px; color: var(--accent-red);">Erreur lors de la consultation lexicale.</div>`;
     }
   },
 
