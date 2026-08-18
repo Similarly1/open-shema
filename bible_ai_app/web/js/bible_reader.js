@@ -105,14 +105,16 @@ function getPrevChapterCoord(bookCode, chNum) {
   return null;
 }
 
+// =============================================================================
+// 2. GESTIONNAIRE D'ONGLETS MULTI-DOCUMENTS (Style Logos)
+// =============================================================================
 
-// 2. GESTIONNAIRE D'ONGLETS MULTI-DOCUMENTS
 const TabsManager = {
   tabs: [],
   activeTabId: null,
 
   init() {
-    document.getElementById('btn-add-tab').addEventListener('click', () => {
+    document.getElementById('btn-add-tab')?.addEventListener('click', () => {
       this.createNewTab();
     });
   },
@@ -123,13 +125,16 @@ const TabsManager = {
     const b1 = bibles[0].name;
     const b2 = bibles.length > 1 ? bibles[1].name : b1;
 
-    this.createTab(b1, 'Gen', 1, '#EA580C');
+    this.createTab(b1, 'Gen', 1, '#EA580C', false, false, 'LSG');
     if (bibles.length > 1) {
-      this.createTab(b2, 'Gen', 1, '#2563EB', false);
+      this.createTab(b2, 'Gen', 1, '#2563EB', false, false, 'LSG');
+    }
+    if (this.tabs.length > 0) {
+      this.activateTab(this.tabs[0].id);
     }
   },
 
-  createTab(bibleName, book = 'Gen', chapter = 1, forceColor = null, activateNow = true) {
+  createTab(bibleName, book = 'Gen', chapter = 1, forceColor = null, activateNow = true, isInterlinear = false, interlinearVersion = 'LSG') {
     const id = 'tab_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
     const colorPalette = ['#EA580C', '#2563EB', '#059669', '#7C3AED', '#DB2777', '#D97706', '#0891B2'];
     const badgeColor = forceColor || colorPalette[this.tabs.length % colorPalette.length];
@@ -139,7 +144,9 @@ const TabsManager = {
       bibleName: bibleName,
       book: book,
       chapter: chapter,
-      badgeColor: badgeColor
+      badgeColor: badgeColor,
+      isInterlinear: isInterlinear,
+      interlinearVersion: interlinearVersion
     };
 
     this.tabs.push(tab);
@@ -158,7 +165,7 @@ const TabsManager = {
       chosenBible = BibleReader.installedBibles[0]?.name || 'Colombe';
     }
 
-    const newTab = this.createTab(chosenBible, BibleReader.currentBook, BibleReader.currentChapter, null, true);
+    const newTab = this.createTab(chosenBible, BibleReader.currentBook, BibleReader.currentChapter, null, true, false, 'LSG');
     App.showToast(`Nouvel onglet ouvert : ${chosenBible}`);
   },
 
@@ -168,6 +175,27 @@ const TabsManager = {
 
     this.activeTabId = tabId;
     BibleReader.currentBible1 = target.bibleName;
+    BibleReader.currentBook = target.book || 'Gen';
+    BibleReader.currentChapter = target.chapter || 1;
+    BibleReader.isInterlinear = !!target.isInterlinear;
+    BibleReader.interlinearVersion = target.interlinearVersion || 'LSG';
+
+    // Mettre à jour l'état visuel du bouton et du menu Interlinéaire
+    const interBtn = document.getElementById('btn-toggle-interlinear');
+    const masterSwitch = document.getElementById('interlinear-master-switch');
+    if (interBtn) interBtn.classList.toggle('active', BibleReader.isInterlinear);
+    if (masterSwitch) masterSwitch.checked = BibleReader.isInterlinear;
+
+    const radioLSG = document.getElementById('lbl-inter-lsg');
+    const radioDarby = document.getElementById('lbl-inter-darby');
+    const radioInput = document.querySelector(`input[name="interlinear-version-radio"][value="${BibleReader.interlinearVersion}"]`);
+    if (radioInput) radioInput.checked = true;
+    if (radioLSG) radioLSG.classList.toggle('active', BibleReader.interlinearVersion === 'LSG');
+    if (radioDarby) radioDarby.classList.toggle('active', BibleReader.interlinearVersion === 'DARBY');
+
+    BibleReader.updatePaneHeader(1);
+    if (BibleReader.isSplitView) BibleReader.updatePaneHeader(2);
+
     BibleReader.navigateTo(target.book, target.chapter);
     this.renderTabs();
   },
@@ -193,12 +221,14 @@ const TabsManager = {
     }
   },
 
-  updateActiveTab(bibleName = null, book = null, chapter = null) {
+  updateActiveTab(bibleName = null, book = null, chapter = null, isInterlinear = null, interlinearVersion = null) {
     const active = this.tabs.find(t => t.id === this.activeTabId);
     if (active) {
-      if (bibleName) active.bibleName = bibleName;
-      if (book) active.book = book;
-      if (chapter) active.chapter = chapter;
+      if (bibleName !== null) active.bibleName = bibleName;
+      if (book !== null) active.book = book;
+      if (chapter !== null) active.chapter = chapter;
+      if (isInterlinear !== null) active.isInterlinear = isInterlinear;
+      if (interlinearVersion !== null) active.interlinearVersion = interlinearVersion;
       this.renderTabs();
     }
   },
@@ -213,9 +243,13 @@ const TabsManager = {
       tabEl.className = `tab ${tab.id === this.activeTabId ? 'active' : ''}`;
       tabEl.dataset.tabId = tab.id;
 
+      const titleText = tab.isInterlinear 
+        ? `${tab.bibleName} [${tab.interlinearVersion || 'Interl.'}]`
+        : tab.bibleName;
+
       tabEl.innerHTML = `
         <span class="tab-badge-icon" style="background-color: ${tab.badgeColor};">📖</span>
-        <span class="tab-title">${tab.bibleName}</span>
+        <span class="tab-title">${titleText}</span>
         <button class="tab-close-btn" title="Fermer cet onglet">✕</button>
       `;
 
@@ -240,6 +274,8 @@ const DisplayOptions = {
     const popover = document.getElementById('display-options-popover');
     const workspace = document.getElementById('reader-workspace');
 
+    if (!btn || !popover) return;
+
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       popover.classList.toggle('hidden');
@@ -251,24 +287,24 @@ const DisplayOptions = {
       }
     });
 
-    document.getElementById('opt-show-pericopes').addEventListener('change', (e) => {
-      workspace.classList.toggle('hide-pericopes', !e.target.checked);
+    document.getElementById('opt-show-pericopes')?.addEventListener('change', (e) => {
+      workspace?.classList.toggle('hide-pericopes', !e.target.checked);
     });
 
-    document.getElementById('opt-show-chap-num').addEventListener('change', (e) => {
-      workspace.classList.toggle('hide-chap-num', !e.target.checked);
+    document.getElementById('opt-show-chap-num')?.addEventListener('change', (e) => {
+      workspace?.classList.toggle('hide-chap-num', !e.target.checked);
     });
 
-    document.getElementById('opt-show-verse-num').addEventListener('change', (e) => {
-      workspace.classList.toggle('hide-verse-num', !e.target.checked);
+    document.getElementById('opt-show-verse-num')?.addEventListener('change', (e) => {
+      workspace?.classList.toggle('hide-verse-num', !e.target.checked);
     });
 
-    document.getElementById('opt-verse-per-line').addEventListener('change', (e) => {
-      workspace.classList.toggle('verse-per-line', e.target.checked);
+    document.getElementById('opt-verse-per-line')?.addEventListener('change', (e) => {
+      workspace?.classList.toggle('verse-per-line', e.target.checked);
     });
 
-    document.getElementById('opt-font-serif').addEventListener('change', (e) => {
-      workspace.classList.toggle('font-sans', !e.target.checked);
+    document.getElementById('opt-font-serif')?.addEventListener('change', (e) => {
+      workspace?.classList.toggle('font-sans', !e.target.checked);
     });
   }
 };
@@ -307,6 +343,7 @@ const InterlinearMenu = {
       masterSwitch.addEventListener('change', (e) => {
         BibleReader.isInterlinear = e.target.checked;
         btn.classList.toggle('active', BibleReader.isInterlinear);
+        TabsManager.updateActiveTab(null, null, null, BibleReader.isInterlinear, BibleReader.interlinearVersion);
         BibleReader.updatePaneHeader(1);
         if (BibleReader.isSplitView) BibleReader.updatePaneHeader(2);
         BibleReader.reloadCurrentChapters();
@@ -318,6 +355,7 @@ const InterlinearMenu = {
         BibleReader.interlinearVersion = e.target.value;
         if (radioLSG) radioLSG.classList.toggle('active', e.target.value === 'LSG');
         if (radioDarby) radioDarby.classList.toggle('active', e.target.value === 'DARBY');
+        TabsManager.updateActiveTab(null, null, null, BibleReader.isInterlinear, BibleReader.interlinearVersion);
         if (BibleReader.isInterlinear) {
           BibleReader.updatePaneHeader(1);
           if (BibleReader.isSplitView) BibleReader.updatePaneHeader(2);
@@ -1362,11 +1400,22 @@ const BibleReader = {
     this.closeBiblePicker();
     if (this.targetPaneForPicker === 1) {
       this.currentBible1 = versionName;
-      document.getElementById('pane-1-bible-name').textContent = versionName;
-      TabsManager.updateActiveTab(versionName, this.currentBook, this.currentChapter);
+      if (versionName === 'DARBY') {
+        this.interlinearVersion = 'DARBY';
+      } else if (versionName === 'LSG') {
+        this.interlinearVersion = 'LSG';
+      } else {
+        this.isInterlinear = false;
+        const interBtn = document.getElementById('btn-toggle-interlinear');
+        const masterSwitch = document.getElementById('interlinear-master-switch');
+        if (interBtn) interBtn.classList.remove('active');
+        if (masterSwitch) masterSwitch.checked = false;
+      }
+      TabsManager.updateActiveTab(versionName, this.currentBook, this.currentChapter, this.isInterlinear, this.interlinearVersion);
+      this.updatePaneHeader(1);
     } else {
       this.currentBible2 = versionName;
-      document.getElementById('pane-2-bible-name').textContent = versionName;
+      this.updatePaneHeader(2);
     }
     this.navigateTo(this.currentBook, this.currentChapter);
   },
