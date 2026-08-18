@@ -74,8 +74,8 @@ const API = {
     return await this.call('get_books_list');
   },
 
-  async getChapterData(bibleName, bookCode, chapterNum) {
-    return await this.call('get_chapter_data', bibleName, bookCode, parseInt(chapterNum));
+  async getChapterData(bibleName, bookCode, chapterNum, interlinearVersion = "LSG") {
+    return await this.call('get_chapter_data', bibleName, bookCode, parseInt(chapterNum), interlinearVersion);
   },
 
   async getCommentaries(bookCode, chapterNum, verseNum) {

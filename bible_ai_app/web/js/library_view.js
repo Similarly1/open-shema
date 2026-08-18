@@ -92,7 +92,7 @@ const LibraryView = {
           
           <div class="lib-tags">
             ${book.type ? `<span class="tag tag-type">${book.type}</span>` : ''}
-            ${book.corpus_scope ? `<span class="tag tag-scope">${book.corpus_scope}</span>` : ''}
+            ${book.corpus_scope ? `<span class="tag tag-scope">${book.corpus_scope === 'OT' ? 'AT' : (book.corpus_scope === 'BOTH' ? 'AT+NT' : (book.corpus_scope === 'APOCRYPHA' ? 'APO' : book.corpus_scope))}</span>` : ''}
             ${book.chapters_count ? `<span class="tag tag-count">📑 ${book.chapters_count} ch.</span>` : ''}
           </div>
         </div>

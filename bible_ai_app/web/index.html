@@ -616,7 +616,7 @@
     <!-- 4. POPOVERS & MODALES FLOTTANTES                        -->
     <!-- ======================================================= -->
     
-    <!-- Popover Options d'Affichage (Titres, chapitres, versets, police) -->
+    <!-- Popover Options d'Affichage (Titres, chapitres, versets, police, interlinéaire) -->
     <div class="display-options-popover hidden" id="display-options-popover">
       <div class="display-opt-header">Options de lecture</div>
       <div class="display-opt-list">
@@ -640,6 +640,13 @@
           <span>Police avec empattement (Serif)</span>
           <input type="checkbox" id="opt-font-serif" checked>
         </label>
+
+        <div style="height: 1px; background: var(--border-subtle); margin: 6px 0;"></div>
+        <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Version Interlinéaire Inversé :</div>
+        <select id="opt-interlinear-version" class="select-field full-w" style="font-size: 11px; padding: 4px 6px;">
+          <option value="LSG">📜 Louis Segond 1910 (Strong)</option>
+          <option value="DARBY">📜 Bible J.N. Darby (Strong)</option>
+        </select>
       </div>
     </div>
 
@@ -763,11 +770,11 @@
                     <label style="font-size: 11px;">Portée du corpus :</label>
                     <select id="import-rag-scope" class="select-field full-w" style="font-size: 11px;">
                       <option value="GLOBAL">GLOBAL (Toute la Bible / Thème)</option>
-                      <option value="OT">OT (Ancien Testament)</option>
+                      <option value="OT">AT (Ancien Testament)</option>
                       <option value="NT">NT (Nouveau Testament)</option>
-                      <option value="BOTH">BOTH (AT + NT)</option>
+                      <option value="BOTH">AT + NT (Les deux testaments)</option>
                       <option value="INTER">INTER (Intertestamentaire)</option>
-                      <option value="APOCRYPHA">APOCRYPHA (Deutérocanoniques)</option>
+                      <option value="APOCRYPHA">APO (Deutérocanoniques)</option>
                     </select>
                   </div>
                   <div class="form-group">

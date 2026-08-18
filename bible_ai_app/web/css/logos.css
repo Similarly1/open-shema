@@ -1717,6 +1717,127 @@ input:checked + .slider.round:before {
   border-color: var(--accent-blue);
 }
 
+/* ========================================================================= */
+/* INTERLINÉAIRE INVERSÉ (Style Logos Bible Software)                       */
+/* ========================================================================= */
+.verses-flow.interlinear-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 10px 4px;
+}
+
+.verse-item.interlinear-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  background-color: #FAFBFD;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  transition: var(--transition-fast);
+}
+.verse-item.interlinear-mode:hover {
+  border-color: #CBD5E1;
+  background-color: #F8FAFC;
+}
+.verse-item.interlinear-mode.active-verse {
+  background-color: #EFF6FF;
+  border-color: var(--accent-blue);
+}
+
+.verse-interlinear-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.verse-interlinear-header .verse-num {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--accent-blue);
+  position: static;
+  margin-right: 0;
+}
+.verse-interlinear-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.verse-interlinear-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px 10px;
+}
+
+.interlinear-block {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 44px;
+  padding: 6px 8px;
+  background: #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+.interlinear-block:hover {
+  border-color: var(--accent-blue);
+  background-color: var(--bg-hover);
+  box-shadow: 0 3px 6px -1px rgba(37, 99, 235, 0.15);
+  transform: translateY(-2px);
+}
+.interlinear-block.active {
+  border-color: var(--accent-blue);
+  background-color: #EFF6FF;
+}
+
+.interlinear-surface {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  line-height: 1.2;
+}
+.interlinear-lemma {
+  font-family: 'SBL Hebrew', 'SBL Greek', 'Ezra SIL', 'Times New Roman', serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1D4ED8;
+  margin-top: 4px;
+  text-align: center;
+  direction: auto;
+  line-height: 1.2;
+}
+.interlinear-translit {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  text-align: center;
+  line-height: 1.1;
+}
+.interlinear-strong {
+  font-size: 10px;
+  font-weight: 700;
+  color: #7C3AED;
+  background: #FAF5FF;
+  border: 1px solid #E9D5FF;
+  border-radius: 3px;
+  padding: 1px 4px;
+  margin-top: 3px;
+  line-height: 1;
+}
+
 /* Popover Options d'Affichage */
 .display-options-popover {
   position: absolute;

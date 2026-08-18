@@ -270,6 +270,16 @@ const DisplayOptions = {
     document.getElementById('opt-font-serif').addEventListener('change', (e) => {
       workspace.classList.toggle('font-sans', !e.target.checked);
     });
+
+    const interVersionSelect = document.getElementById('opt-interlinear-version');
+    if (interVersionSelect) {
+      interVersionSelect.addEventListener('change', (e) => {
+        BibleReader.interlinearVersion = e.target.value;
+        if (BibleReader.isInterlinear) {
+          BibleReader.reloadCurrentChapters();
+        }
+      });
+    }
   }
 };
 
@@ -782,6 +792,7 @@ const BibleReader = {
   
   isSplitView: false,
   isInterlinear: false,
+  interlinearVersion: 'LSG',
   zoomPercent: 100,
 
   installedBibles: [],
@@ -950,14 +961,14 @@ const BibleReader = {
     const pane1Container = document.getElementById('pane-1-verses');
     pane1Container.innerHTML = '';
 
-    const data1 = await API.getChapterData(this.currentBible1, bookCode, chapterNum);
+    const data1 = await API.getChapterData(this.currentBible1, bookCode, chapterNum, this.interlinearVersion);
     const block1 = this.createChapterBlockElement(1, data1, this.currentBible1);
     pane1Container.appendChild(block1);
 
     if (this.isSplitView) {
       const pane2Container = document.getElementById('pane-2-verses');
       pane2Container.innerHTML = '';
-      const data2 = await API.getChapterData(this.currentBible2, bookCode, chapterNum);
+      const data2 = await API.getChapterData(this.currentBible2, bookCode, chapterNum, this.interlinearVersion);
       const block2 = this.createChapterBlockElement(2, data2, this.currentBible2);
       pane2Container.appendChild(block2);
     }
@@ -973,7 +984,7 @@ const BibleReader = {
     pane1Container.innerHTML = '';
 
     for (const c of chaptersToReload) {
-      const data = await API.getChapterData(this.currentBible1, c.book, c.chapter);
+      const data = await API.getChapterData(this.currentBible1, c.book, c.chapter, this.interlinearVersion);
       const block = this.createChapterBlockElement(1, data, this.currentBible1);
       pane1Container.appendChild(block);
     }
@@ -988,7 +999,7 @@ const BibleReader = {
     this.isLoadingMore = true;
     this.loadedChapters.push(next);
 
-    const data = await API.getChapterData(this.currentBible1, next.book, next.chapter);
+    const data = await API.getChapterData(this.currentBible1, next.book, next.chapter, this.interlinearVersion);
     const block = this.createChapterBlockElement(1, data, this.currentBible1);
 
     const divider = document.createElement('div');
@@ -1011,7 +1022,7 @@ const BibleReader = {
     this.isLoadingMore = true;
     this.loadedChapters.unshift(prev);
 
-    const data = await API.getChapterData(this.currentBible1, prev.book, prev.chapter);
+    const data = await API.getChapterData(this.currentBible1, prev.book, prev.chapter, this.interlinearVersion);
     const block = this.createChapterBlockElement(1, data, this.currentBible1);
 
     const divider = document.createElement('div');
@@ -1044,6 +1055,9 @@ const BibleReader = {
 
     const flow = document.createElement('div');
     flow.className = 'verses-flow';
+    if (this.isInterlinear) {
+      flow.classList.add('interlinear-mode');
+    }
 
     if (data.verses && data.verses.length > 0) {
       data.verses.forEach((v, index) => {
@@ -1054,6 +1068,7 @@ const BibleReader = {
         vSpan.dataset.chapter = data.chapter;
 
         if (this.isInterlinear && v.words && v.words.length > 0) {
+          vSpan.className = 'verse-item interlinear-mode';
           let wordsHtml = '';
           v.words.forEach(w => {
             wordsHtml += `
@@ -1065,7 +1080,14 @@ const BibleReader = {
               </div>
             `;
           });
-          vSpan.innerHTML = `<sup class="verse-num">${v.verse}</sup> ${wordsHtml}`;
+          const badgeText = this.interlinearVersion === 'DARBY' ? 'Darby (Interlinéaire Inversé)' : 'Segond 1910 (Interlinéaire Inversé)';
+          vSpan.innerHTML = `
+            <div class="verse-interlinear-header">
+              <sup class="verse-num">${v.verse}</sup>
+              <span class="verse-interlinear-badge">${badgeText}</span>
+            </div>
+            <div class="verse-interlinear-grid">${wordsHtml}</div>
+          `;
 
           vSpan.querySelectorAll('.interlinear-block').forEach(b => {
             // Clic gauche -> lexique

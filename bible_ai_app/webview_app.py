@@ -1,5 +1,7 @@
 import os
 import sys
+import re
+import html
 import json
 import shutil
 import zipfile
@@ -50,6 +52,67 @@ _GLOBAL_WINDOW = None
 def get_active_window():
     global _GLOBAL_WINDOW
     return _GLOBAL_WINDOW
+
+
+def parse_reverse_interlinear_verse(v_raw: str) -> List[Dict[str, Any]]:
+    """
+    Parse un verset français balisé avec des codes Strong (<w strong="Hxxxx">mot</w>)
+    pour produire les blocs de l'interlinéaire inversé français (Logos style).
+    """
+    from core.strong_lexicon import StrongLexicon
+    StrongLexicon.load_lexicon()
+    
+    tokens = re.split(r'(<w\s+strong="[^"]*">.*?</w>)', v_raw)
+    words_data = []
+    
+    for tok in tokens:
+        if not tok:
+            continue
+        m = re.match(r'<w\s+strong="([^"]*)">(.*?)</w>', tok)
+        if m:
+            s_codes = m.group(1).strip()
+            surface = m.group(2).strip()
+            surface = re.sub(r'<[^>]+>', '', surface).strip()
+            if not surface:
+                continue
+            entries = StrongLexicon.get_multiple(s_codes)
+            lemmas, translits = [], []
+            for e in entries:
+                raw_lem = e.get('lemma', '')
+                if ' - ' in raw_lem:
+                    p = raw_lem.split(' - ')
+                    lemmas.append(p[0].strip())
+                    translits.append(p[1].strip())
+                else:
+                    lemmas.append(raw_lem.strip())
+                    if e.get('translit'):
+                        translits.append(e.get('translit').strip())
+            
+            words_data.append({
+                "surface": surface,
+                "orig": " ".join(lemmas),
+                "translit": " ".join([t for t in translits if t]),
+                "lemma": " ".join(lemmas),
+                "strong": s_codes,
+                "morph": "",
+                "lang": "hebrew" if s_codes.startswith("H") else "greek"
+            })
+        else:
+            clean_t = re.sub(r'<note[^>]*>.*?</note>', '', tok, flags=re.I)
+            clean_t = re.sub(r'<[^>]+>', '', clean_t).strip()
+            for w in clean_t.split():
+                clean_w = w.strip(" ,;:.?!«»()\"'’")
+                if clean_w:
+                    words_data.append({
+                        "surface": w,
+                        "orig": "",
+                        "translit": "",
+                        "lemma": "",
+                        "strong": "",
+                        "morph": "",
+                        "lang": "fr"
+                    })
+    return words_data
 
 
 class BibleAppApi:
@@ -118,7 +181,7 @@ class BibleAppApi:
             })
         return books
 
-    def get_chapter_data(self, bible_name: str, book_code: str, chapter: int) -> Dict[str, Any]:
+    def get_chapter_data(self, bible_name: str, book_code: str, chapter: int, interlinear_version: str = "LSG") -> Dict[str, Any]:
         """Récupère les versets d'un chapitre, titre de péricope et enrichissement interlinéaire."""
         ch_int = int(chapter)
         book_data = BibleJsonLoader.load_book(bible_name, book_code)
@@ -150,8 +213,15 @@ class BibleAppApi:
         verses_list = []
         sorted_verses = sorted(verses_dict.keys(), key=lambda x: int(x) if x.isdigit() else 999)
         
-        orig_mgr = OriginalLanguagesManager.get_instance()
-        is_orig_installed = orig_mgr.is_installed()
+        # Pré-chargement de la version d'interlinéaire inversé
+        interlinear_book_data = None
+        target_inter = interlinear_version or "LSG"
+        if target_inter != bible_name:
+            interlinear_book_data = BibleJsonLoader.load_book(target_inter, book_code)
+            if not interlinear_book_data and target_inter != "LSG":
+                interlinear_book_data = BibleJsonLoader.load_book("LSG", book_code)
+            if not interlinear_book_data and target_inter != "DARBY":
+                interlinear_book_data = BibleJsonLoader.load_book("DARBY", book_code)
 
         for v_str in sorted_verses:
             v_raw = verses_dict[v_str]
@@ -159,32 +229,31 @@ class BibleAppApi:
             v_num = int(v_str) if v_str.isdigit() else v_str
 
             words_data = []
-            if is_orig_installed and isinstance(v_num, int):
-                orig_words = orig_mgr.get_verse_original_words(book_code, ch_int, v_num)
-                for w in orig_words:
-                    words_data.append({
-                        "surface": w.get("gloss") or w.get("text", ""),
-                        "orig": w.get("text", ""),
-                        "translit": w.get("transliteration", ""),
-                        "lemma": w.get("lemma", ""),
-                        "strong": w.get("strong", ""),
-                        "morph": w.get("morph_desc_fr", ""),
-                        "lang": w.get("lang", "")
-                    })
 
+            # 1. Si la version courante est déjà balisée en Strongs (ex: LSG ou DARBY)
+            if '<w' in v_raw and 'strong=' in v_raw:
+                words_data = parse_reverse_interlinear_verse(v_raw)
+            
+            # 2. Sinon, récupérer le verset balisé depuis la version d'interlinéaire inversé (LSG ou DARBY)
+            elif interlinear_book_data:
+                inter_v_raw = interlinear_book_data.get("chapters", {}).get(str(ch_int), {}).get(str(v_str), "")
+                if '<w' in inter_v_raw and 'strong=' in inter_v_raw:
+                    words_data = parse_reverse_interlinear_verse(inter_v_raw)
+
+            # 3. Fallback de découpage en tokens simples
             if not words_data:
-                # Mots de surface de base si la base STEPBible n'est pas encore téléchargée
                 for token in v_text.split():
-                    clean_tok = token.strip(" ,;:.?!«»()\"'")
-                    words_data.append({
-                        "surface": token,
-                        "orig": clean_tok,
-                        "translit": "",
-                        "lemma": clean_tok,
-                        "strong": "",
-                        "morph": "",
-                        "lang": "fr"
-                    })
+                    clean_tok = token.strip(" ,;:.?!«»()\"'’")
+                    if clean_tok:
+                        words_data.append({
+                            "surface": token,
+                            "orig": clean_tok,
+                            "translit": "",
+                            "lemma": clean_tok,
+                            "strong": "",
+                            "morph": "",
+                            "lang": "fr"
+                        })
 
             verses_list.append({
                 "verse": v_num,

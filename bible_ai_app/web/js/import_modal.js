@@ -320,10 +320,10 @@ const ImportModal = {
         
         <select class="import-chapter-select ch-scope-sel">
           <option value="GLOBAL" ${ch.corpus_scope === 'GLOBAL' ? 'selected' : ''}>GLOBAL</option>
-          <option value="OT" ${ch.corpus_scope === 'OT' ? 'selected' : ''}>OT</option>
+          <option value="OT" ${ch.corpus_scope === 'OT' || ch.corpus_scope === 'AT' ? 'selected' : ''}>AT</option>
           <option value="NT" ${ch.corpus_scope === 'NT' ? 'selected' : ''}>NT</option>
           <option value="INTER" ${ch.corpus_scope === 'INTER' ? 'selected' : ''}>INTER</option>
-          <option value="APO" ${ch.corpus_scope === 'APO' ? 'selected' : ''}>APO</option>
+          <option value="APO" ${ch.corpus_scope === 'APO' || ch.corpus_scope === 'APOCRYPHA' ? 'selected' : ''}>APO</option>
         </select>
 
         <select class="import-chapter-select ch-stype-sel">
