@@ -197,7 +197,22 @@ class DictionaryManager:
         if not art:
             return None
             
-        raw_text = art.get("text", "")
+        orig_text = art.get("text", "")
+        try:
+            from core.dictionary_polisher import DictionaryPolisher
+            cached_polish = DictionaryPolisher.get_polished_entry(dict_id, norm) or DictionaryPolisher.get_polished_entry(dict_id, art.get("title", ""))
+        except Exception:
+            cached_polish = None
+            
+        is_polished = False
+        polished_model = ""
+        if cached_polish and cached_polish.get("text"):
+            raw_text = cached_polish["text"]
+            is_polished = True
+            polished_model = cached_polish.get("model", "")
+        else:
+            raw_text = orig_text
+            
         paras = [p.strip() for p in raw_text.split('\n\n') if p.strip()]
         snippet = ""
         for p in paras:
@@ -213,6 +228,10 @@ class DictionaryManager:
             "title": art.get("title", word),
             "preview": snippet or (raw_text[:200] + "..."),
             "full_text": raw_text,
+            "raw_text": orig_text,
+            "is_polished": is_polished,
+            "polished_model": polished_model,
+            "slug": norm,
             "art": art
         }
 

@@ -1,0 +1,16 @@
+{
+  "vigouroux:éden": {
+    "title": "ÉDEN",
+    "text": "# ÉDEN\n\n---\n\n## **1. ÉDEN (Personnage / Lévite)**\n\n**Éden** (hébreu : עֵדֶן / *‘Ēḏen*, « délices ») est un nom porté par un lévite et par plusieurs localités bibliques.\n\n- **Personnage biblique** :\n  - **Éden**, fils de Joah, issu de la descendance de Gerson (1 Chron., XXIX, 12).\n    - *Texte hébreu* : בֶּן־יוֹאָח לְגֵּרְשׁוֹן עֵדֶן (*Ben-Yô’āḥ lĕ-Gēršôn ‘Ēḏen*).\n    - *Septante* : Ἐδὸν τοῦ Ἰωάχ ἐκ τῆς φυλῆς Γεδσὼν (*Edòn tou Iōákh ek tēs phylēs Gedsōn*).",
+    "model": "mistralai/Mistral-Small-4-119B-2603",
+    "dict_id": "vigouroux",
+    "slug": "eden"
+  },
+  "vigouroux:eden": {
+    "title": "ÉDEN",
+    "text": "# ÉDEN\n\n---\n\n## **1. ÉDEN (Personnage / Lévite)**\n\n**Éden** (hébreu : עֵדֶן / *‘Ēḏen*, « délices ») est un nom porté par un lévite et par plusieurs localités bibliques.\n\n- **Personnage biblique** :\n  - **Éden**, fils de Joah, issu de la descendance de Gerson (1 Chron., XXIX, 12).\n    - *Texte hébreu* : בֶּן־יוֹאָח לְגֵּרְשׁוֹן עֵדֶן (*Ben-Yô’āḥ lĕ-Gēršôn ‘Ēḏen*).\n    - *Septante* : Ἐδὸν τοῦ Ἰωάχ ἐκ τῆς φυλῆς Γεδσὼν (*Edòn tou Iōákh ek tēs phylēs Gedsōn*).",
+    "model": "mistralai/Mistral-Small-4-119B-2603",
+    "dict_id": "vigouroux",
+    "slug": "eden"
+  }
+}

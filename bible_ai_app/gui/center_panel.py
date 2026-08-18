@@ -1245,7 +1245,8 @@ class CenterPanel(ctk.CTkFrame):
         """Thread d'arrière-plan pour restaurer le texte sans bloquer l'interface."""
         ok, result = DictionaryPolisher.polish_article(raw_text, title=title, model=model, config=self.config)
         if ok:
-            DictionaryPolisher.set_polished_entry(dict_id, title, title, result, model)
+            slug = m.get("slug") or title
+            DictionaryPolisher.set_polished_entry(dict_id, title, title, result, model, slug=slug)
             m["full_text"] = result
             m["is_polished"] = True
             m["polished_model"] = model

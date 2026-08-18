@@ -29,8 +29,18 @@ Règles impératives de restauration :
    - Rends directement le texte restauré en Markdown prêt à l'affichage, sans préambule ni méta-commentaires."""
 
 AVAILABLE_POLISH_MODELS = [
+    # Infomaniak Swiss AI (Recommandé par défaut)
+    ("mistralai/Mistral-Small-4-119B-2603", "🇨🇭 Mistral Small 4 119B (Infomaniak - Recommandé)"),
+    ("mistralai/Ministral-3-14B-Instruct-2512", "🇨🇭 Ministral 3 14B (Infomaniak)"),
+    ("swiss-ai/Apertus-v1.5-70B", "🇨🇭 Swiss AI Apertus 1.5 70B (Infomaniak)"),
+    ("google/gemma-4-31B-it", "🇨🇭 Gemma 4 31B (Infomaniak)"),
+    ("moonshotai/Kimi-K2.6", "🇨🇭 Kimi K2.6 (Infomaniak)"),
+    ("nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8", "🇨🇭 Nemotron 3 Nano 30B (Infomaniak)"),
+    ("Qwen/Qwen3.5-122B-A10B-FP8", "🇨🇭 Qwen 3.5 122B (Infomaniak)"),
+    ("Qwen/Qwen3.5-397B-A17B-FP8", "🇨🇭 Qwen 3.5 397B (Infomaniak)"),
+
     # Google Gemini
-    ("gemini-2.5-flash", "⚡ Gemini 2.5 Flash (Google - Recommandé)"),
+    ("gemini-2.5-flash", "⚡ Gemini 2.5 Flash (Google)"),
     ("gemini-2.5-flash-lite", "⚡ Gemini 2.5 Flash-Lite (Google)"),
     ("gemini-3.7-flash", "🧠 Gemini 3.7 Flash (Google)"),
     ("gemini-3.5-flash", "🧠 Gemini 3.5 Flash (Google)"),
@@ -40,17 +50,7 @@ AVAILABLE_POLISH_MODELS = [
     ("mistral-small-latest", "🇫🇷 Mistral Small (Mistral AI)"),
     ("mistral-large-latest", "🇫🇷 Mistral Large (Mistral AI)"),
     ("open-mistral-nemo", "🇫🇷 Mistral Nemo (Mistral AI)"),
-    ("codestral-latest", "🇫🇷 Codestral (Mistral AI)"),
-    
-    # Infomaniak Swiss AI (Vérifiés en direct sur l'API Infomaniak)
-    ("mistralai/Ministral-3-14B-Instruct-2512", "🇨🇭 Ministral 3 14B (Infomaniak)"),
-    ("mistralai/Mistral-Small-4-119B-2603", "🇨🇭 Mistral Small 4 119B (Infomaniak)"),
-    ("swiss-ai/Apertus-v1.5-70B", "🇨🇭 Swiss AI Apertus 1.5 70B (Infomaniak)"),
-    ("google/gemma-4-31B-it", "🇨🇭 Gemma 4 31B (Infomaniak)"),
-    ("moonshotai/Kimi-K2.6", "🇨🇭 Kimi K2.6 (Infomaniak)"),
-    ("nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8", "🇨🇭 Nemotron 3 Nano 30B (Infomaniak)"),
-    ("Qwen/Qwen3.5-122B-A10B-FP8", "🇨🇭 Qwen 3.5 122B (Infomaniak)"),
-    ("Qwen/Qwen3.5-397B-A17B-FP8", "🇨🇭 Qwen 3.5 397B (Infomaniak)")
+    ("codestral-latest", "🇫🇷 Codestral (Mistral AI)")
 ]
 
 class DictionaryPolisher:
@@ -95,22 +95,33 @@ class DictionaryPolisher:
 
     @classmethod
     def get_polished_entry(cls, dict_id, slug_or_title):
-        """Récupère l'article restauré depuis le cache local si existant."""
+        """Récupère l'article restauré depuis la BDD / cache local si existant."""
         cache = cls.load_cache()
         key = cls.get_cache_key(dict_id, slug_or_title)
         return cache.get(key)
 
     @classmethod
-    def set_polished_entry(cls, dict_id, slug_or_title, title, polished_text, model):
-        """Enregistre un article poli dans le cache persistant."""
+    def set_polished_entry(cls, dict_id, slug_or_title, title, polished_text, model, slug=None):
+        """Enregistre un article poli dans la base de données locale permanente."""
         cache = cls.load_cache()
-        key = cls.get_cache_key(dict_id, slug_or_title)
-        cache[key] = {
-            "title": title,
+        entry_data = {
+            "title": title or slug_or_title,
             "text": polished_text,
             "model": model,
-            "dict_id": dict_id
+            "dict_id": dict_id,
+            "slug": slug or slug_or_title
         }
+        
+        # Enregistrer sous plusieurs clés pour un accès infaillible (titre brut, titre avec accents, slug normalisé)
+        keys_to_set = [cls.get_cache_key(dict_id, slug_or_title)]
+        if title:
+            keys_to_set.append(cls.get_cache_key(dict_id, title))
+        if slug:
+            keys_to_set.append(cls.get_cache_key(dict_id, slug))
+            
+        for k in set(keys_to_set):
+            cache[k] = entry_data
+            
         cls.save_cache()
 
     @classmethod
