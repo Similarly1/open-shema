@@ -1133,12 +1133,13 @@ const BibleReader = {
 
     for (const v of verses) {
       const rect = v.getBoundingClientRect();
-      if (rect.bottom >= containerTop + 20) {
+      if (rect.bottom >= containerTop + 5) {
         return {
           book: v.dataset.bookCode,
           chapter: v.dataset.chapter,
           verse: v.dataset.verseNum,
-          element: v
+          element: v,
+          rect: rect
         };
       }
     }
@@ -1150,7 +1151,7 @@ const BibleReader = {
     if (!sourceContainer || !targetContainer) return;
 
     const topVerse = this.getTopVisibleVerse(sourceContainer);
-    if (!topVerse || !topVerse.book || !topVerse.chapter || !topVerse.verse) return;
+    if (!topVerse || !topVerse.book || !topVerse.chapter || !topVerse.verse || !topVerse.element) return;
 
     const targetVerse = targetContainer.querySelector(
       `.verse-item[data-book-code="${topVerse.book}"][data-chapter="${topVerse.chapter}"][data-verse-num="${topVerse.verse}"]`
@@ -1158,12 +1159,24 @@ const BibleReader = {
 
     if (targetVerse) {
       this.isSyncingScroll = true;
-      const targetTop = targetVerse.offsetTop;
-      targetContainer.scrollTop = Math.max(0, targetTop - 12);
+
+      const sourceContainerTop = sourceContainer.getBoundingClientRect().top;
+      const targetContainerTop = targetContainer.getBoundingClientRect().top;
+      const sourceVerseTop = topVerse.element.getBoundingClientRect().top;
+      const targetVerseTop = targetVerse.getBoundingClientRect().top;
+
+      // Calcul ultra-précis du décalage relatif par rapport au haut du conteneur respectif
+      const sourceOffsetFromTop = sourceVerseTop - sourceContainerTop;
+      const targetOffsetFromTop = targetVerseTop - targetContainerTop;
+      const scrollDelta = targetOffsetFromTop - sourceOffsetFromTop;
+
+      if (Math.abs(scrollDelta) > 1) {
+        targetContainer.scrollTop += scrollDelta;
+      }
 
       setTimeout(() => {
         this.isSyncingScroll = false;
-      }, 60);
+      }, 50);
     }
   },
 
@@ -1292,6 +1305,13 @@ const BibleReader = {
       
       const pane2 = document.getElementById('pane-2-content');
       if (pane2) pane2.scrollTop = 0;
+
+      if (this.isScrollSynced) {
+        const pane1 = document.getElementById('pane-1-content');
+        setTimeout(() => {
+          this.syncScrollToMatch(pane1, pane2);
+        }, 60);
+      }
     }
 
     const pane1 = document.getElementById('pane-1-content');
