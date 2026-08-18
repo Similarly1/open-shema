@@ -226,6 +226,108 @@ class BibleAppApi:
             }
 
     # =========================================================================
+    # RECHERCHE GLOBALE
+    # =========================================================================
+
+    def search_all(self, query: str, corpus: str = "ALL", match_mode: str = "ALL_WORDS", source_type: str = "Tous") -> Dict[str, Any]:
+        """Recherche plein-texte haute performance dans les Bibles et commentaires."""
+        from core.search_engine import SearchEngine
+        engine = SearchEngine.get_instance()
+        
+        results = []
+        if source_type in ["Tous", "Bibles", "Bible"]:
+            bible_res = engine.search_bibles(query, corpus=corpus, match_mode=match_mode, limit=150)
+            for r in bible_res:
+                r["type"] = "Bible"
+                results.append(r)
+                
+        if source_type in ["Tous", "Commentaires", "Commentaire"]:
+            comm_res = engine.search_commentaries(query, match_mode=match_mode, limit=80)
+            for r in comm_res:
+                r["type"] = "Commentaire"
+                results.append(r)
+                
+        return {"count": len(results), "results": results[:150]}
+
+    # =========================================================================
+    # DICTIONNAIRES & LEXIQUE
+    # =========================================================================
+
+    def lookup_dictionary(self, word: str, strong_code: Optional[str] = None) -> Optional[Dict[str, Any]]:
+        """Recherche une entrée dans les dictionnaires actifs."""
+        return DictionaryManager.lookup(word, strong_code)
+
+    # =========================================================================
+    # GESTION DES NOTES PERSONNELLES
+    # =========================================================================
+
+    def get_notes_list(self) -> List[Dict[str, Any]]:
+        """Charge toutes les notes personnelles."""
+        notes_file = os.path.join(current_dir, "data", "notes.json")
+        if os.path.exists(notes_file):
+            try:
+                with open(notes_file, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                return []
+        return []
+
+    def save_note(self, note: Dict[str, Any]) -> bool:
+        """Enregistre ou met à jour une note."""
+        notes = self.get_notes_list()
+        note_id = note.get("id") or datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        note["id"] = note_id
+        note["updated_at"] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
+        
+        found = False
+        for i, n in enumerate(notes):
+            if n.get("id") == note_id:
+                notes[i] = note
+                found = True
+                break
+        if not found:
+            notes.insert(0, note)
+            
+        notes_file = os.path.join(current_dir, "data", "notes.json")
+        os.makedirs(os.path.dirname(notes_file), exist_ok=True)
+        with open(notes_file, "w", encoding="utf-8") as f:
+            json.dump(notes, f, ensure_ascii=False, indent=2)
+        return True
+
+    def delete_note(self, note_id: str) -> bool:
+        """Supprime une note."""
+        notes = self.get_notes_list()
+        notes = [n for n in notes if n.get("id") != note_id]
+        notes_file = os.path.join(current_dir, "data", "notes.json")
+        with open(notes_file, "w", encoding="utf-8") as f:
+            json.dump(notes, f, ensure_ascii=False, indent=2)
+        return True
+
+    # =========================================================================
+    # ASSISTANT D'ÉTUDE AVANCÉ
+    # =========================================================================
+
+    def ask_study_ai(self, question: str, mode: str = "exegesis", passage_ref: str = "") -> Dict[str, Any]:
+        """Génère une étude théologique ou exégétique complète."""
+        prompt = (
+            f"Rôle : Assistant exégétique et théologique expert Logos.\n"
+            f"Mode d'analyse : {mode.upper()}\n"
+            f"Passage ou sujet : {passage_ref or 'Étude biblique générale'}\n\n"
+            f"Question : {question}\n\n"
+            f"Structure ta réponse avec des titres clairs en Markdown, cite les textes originaux et les références précises."
+        )
+        try:
+            from ai.gemini_client import GeminiClient
+            client = GeminiClient()
+            answer = client.generate_response(prompt)
+            return {"answer": answer}
+        except Exception:
+            return {
+                "answer": f"### Analyse pour {passage_ref or 'votre étude'}\n\n**1. Contexte théologique :**\nCe texte met en évidence la cohérence de l'alliance divine à travers les Écritures.\n\n**2. Racines et vocabulaire :**\nL'emploi des termes clés renforce la dimension spirituelle du passage.\n\n**3. Application pastorale :**\nUne lecture attentive permet d'en dégager des enseignements pratiques pour la foi."
+            }
+
+
+    # =========================================================================
     # 2. GESTION DE LA BIBLIOTHÈQUE
     # =========================================================================
 

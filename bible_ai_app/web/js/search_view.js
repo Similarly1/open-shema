@@ -1,0 +1,101 @@
+/**
+ * Search View Controller
+ * Gère la recherche plein-texte, les filtres de corpus et le saut direct vers le lecteur.
+ */
+
+const SearchView = {
+  searchInput: null,
+  corpusFilter: null,
+  sourceFilter: null,
+  resultsContainer: null,
+  subtitleEl: null,
+
+  init() {
+    this.searchInput = document.getElementById('search-main-input');
+    this.corpusFilter = document.getElementById('search-corpus-filter');
+    this.sourceFilter = document.getElementById('search-source-filter');
+    this.resultsContainer = document.getElementById('search-results-list');
+    this.subtitleEl = document.getElementById('search-count-subtitle');
+
+    let debounceTimer = null;
+    this.searchInput.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => this.executeSearch(), 250);
+    });
+
+    this.corpusFilter.addEventListener('change', () => this.executeSearch());
+    this.sourceFilter.addEventListener('change', () => this.executeSearch());
+  },
+
+  async executeSearch() {
+    const query = this.searchInput.value.trim();
+    if (!query) {
+      this.resultsContainer.innerHTML = `
+        <div class="empty-state" style="text-align: center; padding: 60px; color: var(--text-muted);">
+          <span style="font-size: 40px; display: block; margin-bottom: 10px;">🔍</span>
+          <p>Tapez un mot ou une phrase dans la barre ci-dessus pour lancer la recherche.</p>
+        </div>
+      `;
+      this.subtitleEl.textContent = 'Recherchez instantanément dans vos Bibles et commentaires.';
+      return;
+    }
+
+    const corpus = this.corpusFilter.value;
+    const source = this.sourceFilter.value;
+
+    this.subtitleEl.textContent = 'Recherche en cours...';
+
+    try {
+      const data = await API.call('search_all', query, corpus, 'ALL_WORDS', source);
+      const results = data.results || [];
+      this.subtitleEl.textContent = `${results.length} résultat(s) trouvé(s) pour « ${query} »`;
+
+      this.resultsContainer.innerHTML = '';
+
+      if (results.length === 0) {
+        this.resultsContainer.innerHTML = `
+          <div class="empty-state" style="text-align: center; padding: 60px; color: var(--text-muted);">
+            <span style="font-size: 40px; display: block; margin-bottom: 10px;">∅</span>
+            <p>Aucun résultat ne correspond à votre recherche.</p>
+          </div>
+        `;
+        return;
+      }
+
+      results.forEach(res => {
+        const card = document.createElement('div');
+        card.className = 'search-result-card';
+        
+        const isBible = res.type === 'Bible';
+        const badgeColor = isBible ? 'var(--accent-blue)' : 'var(--accent-orange)';
+        const refStr = isBible ? `${res.book_name} ${res.chapter}:${res.verse}` : `${res.book_name} (${res.commentary_name || res.source || 'Commentaire'})`;
+
+        // Mise en évidence du texte recherché
+        let highlighted = res.text || '';
+        const regex = new RegExp(`(${query})`, 'gi');
+        highlighted = highlighted.replace(regex, '<mark>$1</mark>');
+
+        card.innerHTML = `
+          <div class="search-res-header">
+            <span class="search-res-ref" style="color: ${badgeColor};">📖 ${refStr}</span>
+            <span class="search-res-version">${res.bible_name || res.commentary_name || ''}</span>
+          </div>
+          <div class="search-res-text">${highlighted}</div>
+        `;
+
+        card.addEventListener('click', () => {
+          if (isBible && res.book_code && res.chapter) {
+            App.switchView('bible');
+            BibleReader.navigateTo(res.book_code, parseInt(res.chapter));
+          }
+        });
+
+        this.resultsContainer.appendChild(card);
+      });
+
+    } catch (e) {
+      console.error('Erreur recherche:', e);
+      this.subtitleEl.textContent = 'Erreur lors de la recherche.';
+    }
+  }
+};

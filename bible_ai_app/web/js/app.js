@@ -7,10 +7,14 @@ const App = {
   activeView: 'bible',
 
   init() {
-    // 1. Initialiser les sous-systèmes
+    // 1. Initialiser tous les sous-systèmes
     BibleReader.init();
     LibraryView.init();
     SettingsView.init();
+    SearchView.init();
+    AIStudyView.init();
+    NotesView.init();
+    DictView.init();
 
     // 2. Navigation latérale (Changement de vue)
     document.querySelectorAll('.sidebar-menu .nav-item, .sidebar-footer .nav-item').forEach(btn => {
@@ -23,6 +27,23 @@ const App = {
 
         this.switchView(viewId);
       });
+    });
+
+    // Raccourcis accès rapides
+    document.getElementById('quick-commentary')?.addEventListener('click', () => {
+      this.switchView('bible');
+      const drawer = document.getElementById('right-drawer');
+      drawer.classList.remove('collapsed');
+      document.querySelector('.drawer-tab[data-drawer-tab="commentaries"]')?.click();
+    });
+
+    document.getElementById('quick-compare')?.addEventListener('click', () => {
+      this.switchView('bible');
+      BibleReader.toggleSplitView(true);
+    });
+
+    document.getElementById('quick-dict')?.addEventListener('click', () => {
+      this.switchView('dict');
     });
 
     // 3. Onglets du panneau droit (Commentaires / IA / Lexique)
@@ -64,6 +85,11 @@ const App = {
     } else if (viewName === 'settings') {
       if (drawerEl) drawerEl.classList.add('collapsed');
       SettingsView.loadData();
+    } else if (viewName === 'notes') {
+      if (drawerEl) drawerEl.classList.add('collapsed');
+      NotesView.loadNotes();
+    } else if (viewName === 'search' || viewName === 'ai' || viewName === 'dict') {
+      if (drawerEl) drawerEl.classList.add('collapsed');
     }
   },
 
