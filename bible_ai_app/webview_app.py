@@ -295,6 +295,22 @@ class BibleAppApi:
         """Recherche une entrée dans les dictionnaires actifs."""
         return DictionaryManager.lookup(word, strong_code)
 
+    def get_wikipedia_summary(self, query: str, exact_title: Optional[str] = None) -> Dict[str, Any]:
+        """Récupère le résumé et les métadonnées Wikipédia pour un terme."""
+        from core.wikipedia_client import WikipediaClient
+        return WikipediaClient.get_summary(query, exact_title=exact_title)
+
+    def polish_dictionary_article(self, dict_id: str, title: str, raw_text: str, model: Optional[str] = None, slug: Optional[str] = None) -> Dict[str, Any]:
+        """Améliore et restructure une notice de dictionnaire ancien avec l'IA (Mistral 14B / Infomaniak)."""
+        from core.dictionary_polisher import DictionaryPolisher
+        target_model = model or self.config.get("infomaniak_polish_model") or "mistralai/Ministral-3-14B-Instruct-2512"
+        success, result = DictionaryPolisher.polish_article(raw_text, title=title, model=target_model, config=self.config)
+        if success:
+            DictionaryPolisher.set_polished_entry(dict_id, slug or title, title, result, target_model, slug=slug)
+            return {"success": True, "text": result, "model": target_model}
+        else:
+            return {"success": False, "error": result}
+
     # =========================================================================
     # GESTION DES NOTES PERSONNELLES
     # =========================================================================

@@ -566,7 +566,214 @@ const ContextMenuManager = {
 };
 
 
-// 6. MOTEUR PRINCIPAL DU LECTEUR BIBLIQUE
+// 6. GESTIONNAIRE DU LEXIQUE STRONG, DICTIONNAIRES & WIKIPÉDIA (Style Logos)
+const LexiconViewer = {
+  currentTerm: '',
+  currentStrong: null,
+  currentMatches: [],
+  activeSourceIndex: 0,
+
+  async load(word, strongCode = null) {
+    this.currentTerm = (word || '').trim();
+    this.currentStrong = strongCode;
+    this.activeSourceIndex = 0;
+
+    const drawer = document.getElementById('right-drawer');
+    drawer.classList.remove('collapsed');
+    document.querySelector('.drawer-tab[data-drawer-tab="lexicon"]')?.click();
+
+    const container = document.getElementById('lexicon-details');
+    container.innerHTML = `<div style="padding: 20px; color: var(--text-muted);">Recherche lexicale pour « ${word} » ${strongCode ? `(${strongCode})` : ''}...</div>`;
+
+    try {
+      const entry = await API.call('lookup_dictionary', word, strongCode);
+      this.currentMatches = entry?.matches || [];
+      this.render();
+    } catch (e) {
+      console.error('Erreur lookup_dictionary:', e);
+      container.innerHTML = `<div style="padding: 20px; color: var(--accent-red);">Erreur lors de la consultation lexicale.</div>`;
+    }
+  },
+
+  render() {
+    const container = document.getElementById('lexicon-details');
+    container.innerHTML = '';
+
+    // Barre d'onglets de sources (Strong, Calmet, Vigouroux, Bailly, Wikipédia)
+    const toolbar = document.createElement('div');
+    toolbar.className = 'lexicon-header-toolbar';
+
+    const tabsContainer = document.createElement('div');
+    tabsContainer.className = 'lexicon-source-tabs';
+
+    // 1. Boutons pour chaque dictionnaire trouvé
+    this.currentMatches.forEach((m, idx) => {
+      const btn = document.createElement('button');
+      btn.className = `lex-source-pill ${this.activeSourceIndex === idx ? 'active' : ''}`;
+      btn.innerHTML = `${m.badge || m.dict_name}`;
+      btn.addEventListener('click', () => {
+        this.activeSourceIndex = idx;
+        this.render();
+      });
+      tabsContainer.appendChild(btn);
+    });
+
+    // 2. Bouton Wikipédia
+    const wikiIdx = this.currentMatches.length;
+    const wikiBtn = document.createElement('button');
+    wikiBtn.className = `lex-source-pill ${this.activeSourceIndex === wikiIdx ? 'active' : ''}`;
+    wikiBtn.innerHTML = `🌐 Wikipédia`;
+    wikiBtn.addEventListener('click', () => {
+      this.activeSourceIndex = wikiIdx;
+      this.render();
+    });
+    tabsContainer.appendChild(wikiBtn);
+
+    toolbar.appendChild(tabsContainer);
+    container.appendChild(toolbar);
+
+    // Contenu principal
+    const contentBox = document.createElement('div');
+    contentBox.className = 'lexicon-active-content';
+    container.appendChild(contentBox);
+
+    if (this.activeSourceIndex === wikiIdx) {
+      this.renderWikipedia(contentBox);
+    } else if (this.currentMatches[this.activeSourceIndex]) {
+      this.renderDictionaryMatch(contentBox, this.currentMatches[this.activeSourceIndex]);
+    } else {
+      contentBox.innerHTML = `
+        <div style="padding: 24px; color: var(--text-muted); text-align: center;">
+          <span style="font-size: 32px; display: block; margin-bottom: 10px;">📖</span>
+          Aucune entrée trouvée dans ce dictionnaire pour « <strong>${this.currentTerm}</strong> ».
+        </div>
+      `;
+    }
+  },
+
+  renderDictionaryMatch(container, match) {
+    const isPolished = match.is_polished;
+    const modelName = match.polished_model || 'Mistral 14B';
+
+    let polishBarHtml = '';
+    if (match.dict_id !== 'strong') {
+      polishBarHtml = `
+        <div class="ai-polish-bar">
+          <div>
+            ${isPolished 
+              ? `<span class="ai-polished-badge">✨ Notice restaurée par IA (${modelName})</span>` 
+              : `<span style="font-size: 11px; color: #4338CA; font-weight: 600;">Améliorer la lisibilité avec l'IA</span>`
+            }
+          </div>
+          <button class="ai-polish-btn" id="btn-polish-entry">
+            <span>✨</span>
+            <span>${isPolished ? 'Re-générer' : "Améliorer avec l'IA (Mistral 14B)"}</span>
+          </button>
+        </div>
+      `;
+    }
+
+    const textToRender = (match.full_text || match.preview || '')
+      .replace(/### (.*)/g, '<h3 style="margin: 10px 0 6px 0; color: var(--accent-blue); font-size: 16px;">$1</h3>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/\n\n/g, '<br><br>');
+
+    container.innerHTML = `
+      <div style="padding: 16px;">
+        <div style="font-size: 20px; font-weight: 800; color: var(--accent-blue); margin-bottom: 4px;">${match.title || this.currentTerm}</div>
+        <div style="font-size: 11px; font-weight: 700; color: var(--accent-orange); margin-bottom: 12px;">${match.badge || match.dict_name}</div>
+        ${polishBarHtml}
+        <div style="font-family: var(--font-bible); font-size: 15px; line-height: 1.7; color: #334155;" id="match-body-text">${textToRender}</div>
+      </div>
+    `;
+
+    const btnPolish = container.querySelector('#btn-polish-entry');
+    if (btnPolish) {
+      btnPolish.addEventListener('click', async () => {
+        btnPolish.disabled = true;
+        btnPolish.innerHTML = `<span>⏳</span><span>Restauration IA en cours...</span>`;
+        const bodyEl = container.querySelector('#match-body-text');
+        bodyEl.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--accent-blue);"><em>Restauration philologique et restructuration de la notice par Mistral 14B...</em></div>`;
+
+        try {
+          const res = await API.call('polish_dictionary_article', match.dict_id, match.title, match.raw_text || match.full_text, null, match.slug);
+          if (res && res.success) {
+            match.is_polished = true;
+            match.full_text = res.text;
+            match.polished_model = res.model;
+            App.showToast('✨ Notice restaurée par IA avec succès !');
+            this.render();
+          } else {
+            alert(`Erreur d'amélioration IA : ${res?.error || 'Erreur inconnue'}`);
+            this.render();
+          }
+        } catch (e) {
+          alert(`Erreur d'appel IA : ${e}`);
+          this.render();
+        }
+      });
+    }
+  },
+
+  async renderWikipedia(container, exactTitle = null) {
+    container.innerHTML = `<div style="padding: 24px; color: var(--text-muted); text-align: center;">Chargement de l'article Wikipédia pour « ${this.currentTerm} »...</div>`;
+
+    try {
+      const data = await API.call('get_wikipedia_summary', this.currentTerm, exactTitle);
+      if (!data || !data.found) {
+        container.innerHTML = `
+          <div style="padding: 24px; color: var(--text-muted); text-align: center;">
+            <span style="font-size: 32px; display: block; margin-bottom: 10px;">🌐</span>
+            Aucun article Wikipédia trouvé pour « <strong>${this.currentTerm}</strong> ».
+          </div>
+        `;
+        return;
+      }
+
+      let candidatesHtml = '';
+      if (data.candidates && data.candidates.length > 0) {
+        candidatesHtml = `
+          <div class="wiki-candidates-box">
+            <div class="wiki-candidates-title">Articles connexes & Homonymes :</div>
+            ${data.candidates.map(c => `<button class="wiki-cand-pill" data-title="${c.title}">${c.title}</button>`).join('')}
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        <div class="wiki-container">
+          <div class="wiki-header-box">
+            <div>
+              <div class="wiki-title">${data.title}</div>
+              ${data.description ? `<div style="font-size: 11px; color: var(--text-muted); font-weight: 600; margin-top: 2px;">${data.description}</div>` : ''}
+            </div>
+            <a href="${data.url}" target="_blank" class="wiki-link-btn" title="Ouvrir sur le web">Ouvrir ↗</a>
+          </div>
+
+          ${data.thumbnail ? `<img src="${data.thumbnail}" class="wiki-thumbnail" alt="${data.title}">` : ''}
+
+          <div class="wiki-extract">${(data.extract || '').replace(/\n\n/g, '<br><br>')}</div>
+
+          ${candidatesHtml}
+        </div>
+      `;
+
+      container.querySelectorAll('.wiki-cand-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+          this.renderWikipedia(container, pill.dataset.title);
+        });
+      });
+
+    } catch (e) {
+      console.error('Erreur Wikipédia:', e);
+      container.innerHTML = `<div style="padding: 20px; color: var(--accent-red);">Erreur de connexion à Wikipédia.</div>`;
+    }
+  }
+};
+
+
+// 7. MOTEUR PRINCIPAL DU LECTEUR BIBLIQUE
 const BibleReader = {
   currentBook: 'Gen',
   currentChapter: 1,
@@ -972,54 +1179,7 @@ const BibleReader = {
   },
 
   async lookupWordInLexicon(word, strongCode = null) {
-    const drawer = document.getElementById('right-drawer');
-    drawer.classList.remove('collapsed');
-    document.querySelector('.drawer-tab[data-drawer-tab="lexicon"]')?.click();
-
-    const container = document.getElementById('lexicon-details');
-    container.innerHTML = `<div style="padding: 20px; color: var(--text-muted);">Recherche lexicale pour « ${word} » ${strongCode ? `(${strongCode})` : ''}...</div>`;
-
-    try {
-      const entry = await API.call('lookup_dictionary', word, strongCode);
-      if (entry) {
-        let contentHtml = `
-          <div style="padding: 16px;">
-            <div style="font-size: 20px; font-weight: 800; color: var(--accent-blue); margin-bottom: 4px;">${entry.title || word}</div>
-            <div style="font-size: 11px; font-weight: 700; color: var(--accent-orange); margin-bottom: 14px;">${entry.badge || 'Lexique'}</div>
-        `;
-
-        if (entry.matches && entry.matches.length > 0) {
-          entry.matches.forEach((m) => {
-            const mText = (m.full_text || m.preview || '').replace(/\n\n/g, '<br><br>');
-            contentHtml += `
-              <div style="margin-bottom: 16px; padding: 12px; background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 6px;">
-                <div style="font-size: 11px; font-weight: 700; color: var(--accent-blue); margin-bottom: 6px;">${m.badge || m.dict_name}</div>
-                <div style="font-family: var(--font-bible); font-size: 15px; line-height: 1.65; color: #334155;">${mText}</div>
-              </div>
-            `;
-          });
-        } else {
-          const bodyText = (entry.full_text || entry.preview || '').replace(/\n\n/g, '<br><br>');
-          contentHtml += `
-            <div style="font-family: var(--font-bible); font-size: 15px; line-height: 1.65; color: #334155;">${bodyText}</div>
-          `;
-        }
-
-        contentHtml += `</div>`;
-        container.innerHTML = contentHtml;
-      } else {
-        container.innerHTML = `
-          <div style="padding: 24px; color: var(--text-muted); text-align: center;">
-            <span style="font-size: 32px; display: block; margin-bottom: 10px;">📖</span>
-            Aucune entrée lexicale trouvée pour « <strong>${word}</strong> ».<br>
-            <small style="opacity: 0.8;">Vérifiez vos dictionnaires dans les Paramètres.</small>
-          </div>
-        `;
-      }
-    } catch (e) {
-      console.error('Erreur lookup_dictionary:', e);
-      container.innerHTML = `<div style="padding: 20px; color: var(--accent-red);">Erreur lors de la consultation lexicale.</div>`;
-    }
+    LexiconViewer.load(word, strongCode);
   },
 
   openBiblePicker(paneNum) {
