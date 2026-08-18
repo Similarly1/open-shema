@@ -1523,9 +1523,9 @@ class CenterPanel(ctk.CTkFrame):
             if re.match(r'^[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\s–-]{2,}$', clean_l):
                 tokens.append((0, len(line_text), 'DICT_LINK', clean_l, clean_l))
 
-        # 5. Références bibliques anciennes & romaines (ex: Gen., I, 2 ; II Cor., VI, 14 ; Ps. CIV (CIII), 20)
+        # 5. Références bibliques anciennes & romaines (ex: Gen., I, 2 ; *Gen.*, I, 1 ; II Cor., VI, 14 ; Ps. CIV (CIII), 20)
         RE_ANCIENT_BIBLE = re.compile(
-            r'\b((?:I{1,3}|IV|[1-4])\s*[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+|[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+)\.?\s*[,:]?\s*([IVXLCDM0-9]+)(?:\s*\([A-Z0-9]+\))?\s*[,:]\s*([0-9]+(?:\s*[\-–]\s*[0-9]+)?)',
+            r'(?:\*+)?\b((?:I{1,3}|IV|[1-4])\s*[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+|[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+)\.?(?:\*+)?\s*[,:]?\s*([IVXLCDM0-9]+)(?:\s*\([A-Z0-9]+\))?\s*[,:]\s*([0-9]+(?:\s*[\-–]\s*[0-9]+)?)',
             re.IGNORECASE
         )
         for m in RE_ANCIENT_BIBLE.finditer(line_text):
