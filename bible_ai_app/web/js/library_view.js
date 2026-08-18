@@ -28,11 +28,6 @@ const LibraryView = {
       this.importBook();
     });
 
-    // Événements Modal d'édition
-    document.getElementById('btn-close-edit-modal').addEventListener('click', () => this.closeEditModal());
-    document.getElementById('btn-cancel-edit-modal').addEventListener('click', () => this.closeEditModal());
-    document.getElementById('btn-save-edit-modal').addEventListener('click', () => this.saveEditedBook());
-
     this.loadBooks();
   },
 

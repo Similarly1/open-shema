@@ -9,17 +9,43 @@ const API = {
   _readyCallbacks: [],
 
   init() {
+    const markReady = () => {
+      if (!this.isReady) {
+        this.isReady = true;
+        console.log('⚡ PyWebView Bridge Connecté !');
+        const cbs = [...this._readyCallbacks];
+        this._readyCallbacks = [];
+        cbs.forEach(cb => {
+          try { cb(); } catch (e) { console.error('Erreur callback onReady:', e); }
+        });
+      }
+    };
+
     window.addEventListener('pywebviewready', () => {
-      this.isReady = true;
-      console.log('⚡ PyWebView Bridge Connecté !');
-      this._readyCallbacks.forEach(cb => cb());
-      this._readyCallbacks = [];
+      markReady();
     });
+
+    if (window.pywebview?.api) {
+      markReady();
+    }
+
+    const interval = setInterval(() => {
+      if (window.pywebview?.api) {
+        clearInterval(interval);
+        markReady();
+      }
+    }, 100);
+
+    // Timeout de secours maximum (1.2s)
+    setTimeout(() => {
+      clearInterval(interval);
+      markReady();
+    }, 1200);
   },
 
   onReady(cb) {
     if (this.isReady || window.pywebview?.api) {
-      cb();
+      setTimeout(cb, 0);
     } else {
       this._readyCallbacks.push(cb);
     }

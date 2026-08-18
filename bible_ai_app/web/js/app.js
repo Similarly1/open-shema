@@ -7,15 +7,25 @@ const App = {
   activeView: 'bible',
 
   init() {
-    // 1. Initialiser tous les sous-systèmes
-    BibleReader.init();
-    ImportModal.init();
-    LibraryView.init();
-    SettingsView.init();
-    SearchView.init();
-    AIStudyView.init();
-    NotesView.init();
-    DictView.init();
+    // 1. Initialiser tous les sous-systèmes de manière résiliente
+    const modules = [
+      { name: 'BibleReader', init: () => BibleReader.init() },
+      { name: 'ImportModal', init: () => ImportModal.init() },
+      { name: 'LibraryView', init: () => LibraryView.init() },
+      { name: 'SettingsView', init: () => SettingsView.init() },
+      { name: 'SearchView', init: () => SearchView.init() },
+      { name: 'AIStudyView', init: () => AIStudyView.init() },
+      { name: 'NotesView', init: () => NotesView.init() },
+      { name: 'DictView', init: () => DictView.init() }
+    ];
+
+    modules.forEach(m => {
+      try {
+        m.init();
+      } catch (err) {
+        console.error(`Erreur d'initialisation du module [${m.name}]:`, err);
+      }
+    });
 
     // 2. Navigation latérale (Changement de vue)
     document.querySelectorAll('.sidebar-menu .nav-item, .sidebar-footer .nav-item').forEach(btn => {
@@ -68,12 +78,17 @@ const App = {
     // 5. Raccourcis clavier globaux
     this.bindKeyboardShortcuts();
 
-    // 6. Masquage fluide du Splash Loader dès que l'API est initialisée
+    // 6. Masquage fluide du Splash Loader dès que l'API est initialisée (avec timeout de sécurité)
     API.onReady(() => {
       setTimeout(() => {
         this.hideSplash();
-      }, 600);
+      }, 500);
     });
+
+    // Sécurité absolue : quoi qu'il arrive, enlever le splash après 1.5s max
+    setTimeout(() => {
+      this.hideSplash();
+    }, 1500);
   },
 
   hideSplash() {
@@ -82,7 +97,7 @@ const App = {
       splash.classList.add('fade-out');
       setTimeout(() => {
         splash.style.display = 'none';
-      }, 500);
+      }, 400);
     }
   },
 
