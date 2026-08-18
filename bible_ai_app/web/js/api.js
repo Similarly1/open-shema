@@ -4,15 +4,19 @@
  */
 
 const API = {
-  // Attendre que pywebview soit prêt
+  // Attendre que pywebview soit réellement prêt avec ses méthodes
   isReady: false,
   _readyCallbacks: [],
 
+  _isBridgeAvailable() {
+    return !!(window.pywebview?.api && typeof window.pywebview.api.get_installed_bibles === 'function');
+  },
+
   init() {
     const markReady = () => {
-      if (!this.isReady && window.pywebview?.api) {
+      if (!this.isReady && this._isBridgeAvailable()) {
         this.isReady = true;
-        console.log('⚡ PyWebView Bridge Connecté !');
+        console.log('⚡ PyWebView Bridge Connecté et Méthodes Initialisées !');
         const cbs = [...this._readyCallbacks];
         this._readyCallbacks = [];
         cbs.forEach(cb => {
@@ -22,55 +26,81 @@ const API = {
     };
 
     window.addEventListener('pywebviewready', () => {
-      markReady();
+      // Petite attente pour s'assurer que les méthodes sont bien attachées au proxy
+      const timer = setInterval(() => {
+        if (this._isBridgeAvailable()) {
+          clearInterval(timer);
+          markReady();
+        }
+      }, 20);
+      setTimeout(() => clearInterval(timer), 3000);
     });
 
-    if (window.pywebview?.api) {
+    if (this._isBridgeAvailable()) {
       markReady();
     }
 
     const interval = setInterval(() => {
-      if (window.pywebview?.api) {
+      if (this._isBridgeAvailable()) {
         clearInterval(interval);
         markReady();
       }
-    }, 50);
+    }, 40);
 
-    // Timeout de secours maximum (6s) pour mode autonome dans navigateur
+    // Timeout de secours maximum (5s) si ouvert dans un navigateur classique sans Python
     setTimeout(() => {
       clearInterval(interval);
       if (!this.isReady) {
         this.isReady = true;
-        console.warn('⚡ PyWebView non détecté, mode autonome actif.');
+        console.warn('⚡ PyWebView non détecté, mode autonome/démo actif.');
         const cbs = [...this._readyCallbacks];
         this._readyCallbacks = [];
         cbs.forEach(cb => {
           try { cb(); } catch (e) { console.error('Erreur callback onReady:', e); }
         });
       }
-    }, 6000);
+    }, 5000);
   },
 
-  async ensureReady() {
-    if (window.pywebview?.api) return true;
+  async ensureReady(maxWaitMs = 5000) {
+    if (this._isBridgeAvailable()) return true;
+    const start = Date.now();
     return new Promise(resolve => {
-      if (window.pywebview?.api) return resolve(true);
-      let checks = 0;
-      const interval = setInterval(() => {
-        checks++;
-        if (window.pywebview?.api) {
-          clearInterval(interval);
-          resolve(true);
-        } else if (checks > 100) { // 10 secondes d'attente max
-          clearInterval(interval);
-          resolve(false);
+      const check = () => {
+        if (this._isBridgeAvailable()) {
+          this.isReady = true;
+          return resolve(true);
         }
-      }, 100);
+        if (Date.now() - start > maxWaitMs) {
+          return resolve(false);
+        }
+        setTimeout(check, 30);
+      };
+      check();
+    });
+  },
+
+  async ensureMethodReady(methodName, maxWaitMs = 5000) {
+    if (window.pywebview?.api && typeof window.pywebview.api[methodName] === 'function') {
+      return true;
+    }
+    const start = Date.now();
+    return new Promise(resolve => {
+      const check = () => {
+        if (window.pywebview?.api && typeof window.pywebview.api[methodName] === 'function') {
+          return resolve(true);
+        }
+        if (Date.now() - start > maxWaitMs) {
+          return resolve(false);
+        }
+        setTimeout(check, 30);
+      };
+      check();
     });
   },
 
   onReady(cb) {
-    if (this.isReady || window.pywebview?.api) {
+    if (this.isReady && this._isBridgeAvailable()) {
       setTimeout(cb, 0);
     } else {
       this._readyCallbacks.push(cb);
@@ -78,10 +108,9 @@ const API = {
   },
 
   async call(methodName, ...args) {
-    if (!window.pywebview?.api) {
-      await this.ensureReady();
-    }
-    if (window.pywebview?.api && typeof window.pywebview.api[methodName] === 'function') {
+    // S'assurer que la méthode spécifique est prête sur le pont pywebview
+    const ready = await this.ensureMethodReady(methodName, 4000);
+    if (ready && window.pywebview?.api && typeof window.pywebview.api[methodName] === 'function') {
       try {
         return await window.pywebview.api[methodName](...args);
       } catch (err) {
