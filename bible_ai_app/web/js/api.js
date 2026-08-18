@@ -34,13 +34,31 @@ const API = {
         clearInterval(interval);
         markReady();
       }
-    }, 100);
+    }, 50);
 
-    // Timeout de secours maximum (1.2s)
+    // Timeout de secours maximum (5s)
     setTimeout(() => {
       clearInterval(interval);
       markReady();
-    }, 1200);
+    }, 5000);
+  },
+
+  async ensureReady() {
+    if (window.pywebview?.api) return true;
+    return new Promise(resolve => {
+      if (window.pywebview?.api) return resolve(true);
+      let checks = 0;
+      const interval = setInterval(() => {
+        checks++;
+        if (window.pywebview?.api) {
+          clearInterval(interval);
+          resolve(true);
+        } else if (checks > 100) { // 10 secondes d'attente max
+          clearInterval(interval);
+          resolve(false);
+        }
+      }, 100);
+    });
   },
 
   onReady(cb) {
@@ -52,6 +70,9 @@ const API = {
   },
 
   async call(methodName, ...args) {
+    if (!window.pywebview?.api) {
+      await this.ensureReady();
+    }
     if (window.pywebview?.api && typeof window.pywebview.api[methodName] === 'function') {
       try {
         return await window.pywebview.api[methodName](...args);
@@ -98,22 +119,59 @@ const API = {
   _mockResponse(method, ...args) {
     if (method === 'get_installed_bibles') {
       return [
-        { id: 'TOB_2010', name: 'TOB 2010', title: 'Traduction Œcuménique de la Bible', active: true },
-        { id: 'Segond_21', name: 'Segond 21', title: 'Bible Segond 21', active: true },
-        { id: 'BDS', name: 'BDS', title: 'Bible du Semeur', active: true }
+        { id: 'LSG', name: 'LSG', title: 'Louis Segond 1910 (Strong)', version_code: 'LSG', active: true },
+        { id: 'DARBY', name: 'DARBY', title: 'Bible J.N. Darby', version_code: 'DARB', active: true },
+        { id: 'Colombe', name: 'Colombe', title: 'Bible à la Colombe', version_code: 'COL', active: true },
+        { id: 'Segond_21', name: 'Segond 21', title: 'Bible Segond 21', version_code: 'S21', active: true }
       ];
     }
     if (method === 'get_chapter_data') {
       return {
-        bible: args[0] || 'TOB_2010',
+        bible: args[0] || 'LSG',
         book: args[1] || 'Gen',
         book_french: 'Genèse',
         chapter: args[2] || 1,
         pericope: 'LA CRÉATION',
         verses: [
-          { verse: 1, text: "Au commencement, Dieu créa le ciel et la terre." },
-          { verse: 2, text: "La terre était déserte et vide, et la ténèbre régnait sur l'abîme." },
-          { verse: 3, text: "Dieu dit : « Que la lumière soit ! » Et la lumière fut." }
+          {
+            verse: 1,
+            text: "Au commencement, Dieu créa les cieux et la terre.",
+            words: [
+              { surface: "Au", orig: "", translit: "", lemma: "", strong: "", morph: "", lang: "fr" },
+              { surface: "commencement", orig: "רֵאשִׁית", translit: "re'shiyth", lemma: "רֵאשִׁית", strong: "H7225", morph: "", lang: "hebrew" },
+              { surface: "Dieu", orig: "אֱלֹהִים", translit: "'elohiym", lemma: "אֱלֹהִים", strong: "H0430", morph: "", lang: "hebrew" },
+              { surface: "créa", orig: "בָּרָא", translit: "bara'", lemma: "בָּרָא", strong: "H1254", morph: "", lang: "hebrew" },
+              { surface: "les", orig: "", translit: "", lemma: "", strong: "", morph: "", lang: "fr" },
+              { surface: "cieux", orig: "שָׁמַיִם", translit: "shamayim", lemma: "שָׁמַיִם", strong: "H8064", morph: "", lang: "hebrew" },
+              { surface: "et", orig: "", translit: "", lemma: "", strong: "", morph: "", lang: "fr" },
+              { surface: "la", orig: "", translit: "", lemma: "", strong: "", morph: "", lang: "fr" },
+              { surface: "terre", orig: "אֶרֶץ", translit: "'erets", lemma: "אֶרֶץ", strong: "H0776", morph: "", lang: "hebrew" }
+            ]
+          },
+          {
+            verse: 2,
+            text: "La terre était informe et vide; il y avait des ténèbres à la surface de l'abîme, et l'esprit de Dieu se mouvait au-dessus des eaux.",
+            words: [
+              { surface: "La", orig: "", translit: "", lemma: "", strong: "", morph: "", lang: "fr" },
+              { surface: "terre", orig: "אֶרֶץ", translit: "'erets", lemma: "אֶרֶץ", strong: "H0776", morph: "", lang: "hebrew" },
+              { surface: "était", orig: "הָיָה", translit: "hayah", lemma: "הָיָה", strong: "H1961", morph: "", lang: "hebrew" },
+              { surface: "informe", orig: "תֹּהוּ", translit: "tohuw", lemma: "תֹּהוּ", strong: "H8414", morph: "", lang: "hebrew" },
+              { surface: "et", orig: "", translit: "", lemma: "", strong: "", morph: "", lang: "fr" },
+              { surface: "vide", orig: "בֹּהוּ", translit: "bohuw", lemma: "בֹּהוּ", strong: "H0922", morph: "", lang: "hebrew" }
+            ]
+          },
+          {
+            verse: 3,
+            text: "Dieu dit: Que la lumière soit! Et la lumière fut.",
+            words: [
+              { surface: "Dieu", orig: "אֱלֹהִים", translit: "'elohiym", lemma: "אֱלֹהִים", strong: "H0430", morph: "", lang: "hebrew" },
+              { surface: "dit", orig: "אָמַר", translit: "'amar", lemma: "אָמַר", strong: "H0559", morph: "", lang: "hebrew" },
+              { surface: "Que", orig: "", translit: "", lemma: "", strong: "", morph: "", lang: "fr" },
+              { surface: "la", orig: "", translit: "", lemma: "", strong: "", morph: "", lang: "fr" },
+              { surface: "lumière", orig: "אוֹר", translit: "'owr", lemma: "אוֹר", strong: "H0216", morph: "", lang: "hebrew" },
+              { surface: "soit", orig: "הָיָה", translit: "hayah", lemma: "הָיָה", strong: "H1961", morph: "", lang: "hebrew" }
+            ]
+          }
         ]
       };
     }

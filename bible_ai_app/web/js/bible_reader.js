@@ -898,35 +898,39 @@ const BibleReader = {
   },
 
   bindEvents() {
-    document.getElementById('book-picker-pill').addEventListener('click', () => {
+    document.getElementById('book-picker-pill')?.addEventListener('click', () => {
       BookPicker.toggle(this.currentBook, this.currentChapter);
     });
 
-    document.getElementById('btn-history-back').addEventListener('click', () => {
+    document.getElementById('btn-history-back')?.addEventListener('click', () => {
       const prev = getPrevChapterCoord(this.currentBook, this.currentChapter);
       if (prev) this.navigateTo(prev.book, prev.chapter);
     });
     
-    document.getElementById('btn-history-forward').addEventListener('click', () => {
+    document.getElementById('btn-history-forward')?.addEventListener('click', () => {
       const next = getNextChapterCoord(this.currentBook, this.currentChapter);
       if (next) this.navigateTo(next.book, next.chapter);
     });
 
-    document.getElementById('btn-toggle-split').addEventListener('click', () => {
+    document.getElementById('btn-toggle-split')?.addEventListener('click', () => {
       this.toggleSplitView();
     });
 
-    document.getElementById('pane-1-select-bible').addEventListener('click', (e) => {
+    document.getElementById('btn-close-pane-2')?.addEventListener('click', () => {
+      this.toggleSplitView(false);
+    });
+
+    document.getElementById('pane-1-select-bible')?.addEventListener('click', (e) => {
       e.stopPropagation();
       this.openBiblePicker(1);
     });
 
-    document.getElementById('pane-2-select-bible').addEventListener('click', (e) => {
+    document.getElementById('pane-2-select-bible')?.addEventListener('click', (e) => {
       e.stopPropagation();
       this.openBiblePicker(2);
     });
 
-    document.getElementById('btn-close-bible-picker').addEventListener('click', () => {
+    document.getElementById('btn-close-bible-picker')?.addEventListener('click', () => {
       this.closeBiblePicker();
     });
 
@@ -937,21 +941,21 @@ const BibleReader = {
       }
     });
 
-    document.getElementById('btn-zoom-in').addEventListener('click', () => {
+    document.getElementById('btn-zoom-in')?.addEventListener('click', () => {
       this.setZoom(this.zoomPercent + 10);
     });
 
-    document.getElementById('btn-zoom-out').addEventListener('click', () => {
+    document.getElementById('btn-zoom-out')?.addEventListener('click', () => {
       this.setZoom(this.zoomPercent - 10);
     });
 
-    document.getElementById('btn-toggle-right-drawer').addEventListener('click', () => {
+    document.getElementById('btn-toggle-right-drawer')?.addEventListener('click', () => {
       const drawer = document.getElementById('right-drawer');
-      drawer.classList.toggle('collapsed');
+      drawer?.classList.toggle('collapsed');
     });
 
     // Filtre de recherche dans le sélecteur de Bible
-    document.getElementById('bible-picker-search').addEventListener('input', (e) => {
+    document.getElementById('bible-picker-search')?.addEventListener('input', (e) => {
       const q = e.target.value.toLowerCase();
       document.querySelectorAll('#version-list-items .version-row-btn').forEach(btn => {
         const txt = btn.textContent.toLowerCase();
