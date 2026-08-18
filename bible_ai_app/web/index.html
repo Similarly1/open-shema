@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bible AI - Étude Biblique</title>
+  
+  <!-- Polices Google : Inter (UI) & Lora / EB Garamond (Texte Biblique) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400..700;1,400..700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/logos.css">
+</head>
+<body class="theme-light">
+  <div id="app" class="app-container">
+    
+    <!-- ======================================================= -->
+    <!-- 1. SIDEBAR NAVIGATION GAUCHE (Style Logos)               -->
+    <!-- ======================================================= -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-top">
+        <!-- Logo / Icone Rapide -->
+        <button class="sidebar-icon-btn logo-btn" id="btn-quick-passage" title="Passage rapide">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+        </button>
+        
+        <!-- Champ passage rapide -->
+        <div class="quick-passage-box">
+          <input type="text" id="quick-passage-input" placeholder="Passage ou sujet..." autocomplete="off">
+        </div>
+      </div>
+      
+      <!-- Menu de navigation principal -->
+      <nav class="sidebar-menu">
+        <button class="nav-item active" data-nav="bible" id="nav-bible">
+          <span class="nav-icon">✝️</span>
+          <span class="nav-label">Bible</span>
+        </button>
+        <button class="nav-item" data-nav="library" id="nav-library">
+          <span class="nav-icon">📚</span>
+          <span class="nav-label">Bibliothèque</span>
+        </button>
+        <button class="nav-item" data-nav="search" id="nav-search">
+          <span class="nav-icon">🔍</span>
+          <span class="nav-label">Rechercher</span>
+        </button>
+        <button class="nav-item" data-nav="ai" id="nav-ai">
+          <span class="nav-icon">🤖</span>
+          <span class="nav-label">Assistant d'Étude</span>
+        </button>
+        <button class="nav-item" data-nav="notes" id="nav-notes">
+          <span class="nav-icon">📝</span>
+          <span class="nav-label">Notes</span>
+        </button>
+        
+        <div class="sidebar-section-divider"></div>
+        <div class="sidebar-section-title">Accès rapides</div>
+        
+        <button class="nav-item sub-item" id="quick-commentary">
+          <span class="nav-icon">💬</span>
+          <span class="nav-label">Commentaires</span>
+        </button>
+        <button class="nav-item sub-item" id="quick-compare">
+          <span class="nav-icon">⇄</span>
+          <span class="nav-label">Comparer des Bibles</span>
+        </button>
+        <button class="nav-item sub-item" id="quick-dict">
+          <span class="nav-icon">🔤</span>
+          <span class="nav-label">Dictionnaire biblique</span>
+        </button>
+      </nav>
+      
+      <!-- Pied de la sidebar -->
+      <div class="sidebar-footer">
+        <button class="nav-item sub-item" id="nav-settings">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Paramètres</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ======================================================= -->
+    <!-- 2. ZONE PRINCIPALE (Onglets, Barre d'outils, Colonnes)  -->
+    <!-- ======================================================= -->
+    <main class="main-content">
+      
+      <!-- BARRE D'ONGLETS MULTI-DOCUMENTS -->
+      <header class="tabs-header">
+        <div class="tabs-list" id="tabs-list">
+          <div class="tab active" data-tab-id="tab-1">
+            <span class="tab-badge-icon" style="background-color: #EA580C;">📖</span>
+            <span class="tab-title">TOB 2010</span>
+            <button class="tab-close-btn" title="Fermer">✕</button>
+          </div>
+          <div class="tab" data-tab-id="tab-2">
+            <span class="tab-badge-icon" style="background-color: #2563EB;">📖</span>
+            <span class="tab-title">Segond 21</span>
+            <button class="tab-close-btn" title="Fermer">✕</button>
+          </div>
+        </div>
+        <button class="btn-new-tab" id="btn-add-tab" title="Ouvrir un nouvel onglet">+</button>
+      </header>
+
+      <!-- BARRE D'OUTILS DE LECTURE (Style Logos) -->
+      <section class="reader-toolbar">
+        <div class="toolbar-left">
+          <!-- Historique < > -->
+          <button class="tool-btn icon-only" id="btn-history-back" title="Précédent (Alt+Gauche)">‹</button>
+          <button class="tool-btn icon-only" id="btn-history-forward" title="Suivant (Alt+Droite)">›</button>
+          
+          <!-- Pilule Sélecteur de Livre / Chapitre -->
+          <div class="book-picker-pill" id="book-picker-pill">
+            <span class="pill-bible-icon" id="pill-bible-icon">📖</span>
+            <span class="pill-reference-text" id="pill-reference-text">Genèse 1:1</span>
+            <span class="pill-arrow">▾</span>
+          </div>
+          
+          <!-- Liens de navigation mode -->
+          <div class="nav-mode-links">
+            <button class="mode-link active" id="mode-reading">Affichage</button>
+            <button class="mode-link" id="mode-search-inline">Chercher</button>
+            <button class="mode-link" id="mode-notes-inline">Notes</button>
+          </div>
+        </div>
+
+        <div class="toolbar-right">
+          <!-- Bouton Interlinéaire -->
+          <button class="tool-btn" id="btn-toggle-interlinear" title="Afficher les couches interlinéaires (Hébreu/Grec/Strong)">
+            <span class="btn-icon">🔤</span>
+            <span>Interlinéaire</span>
+            <span class="pill-arrow">▾</span>
+          </button>
+
+          <!-- Bouton Double Colonne / Comparaison -->
+          <button class="tool-btn" id="btn-toggle-split" title="Mode Double Colonne / Comparaison">
+            <span class="btn-icon">⇄</span>
+            <span>Double Vue</span>
+          </button>
+
+          <!-- Contrôle de Zoom -->
+          <div class="zoom-controls">
+            <button class="zoom-btn" id="btn-zoom-out">−</button>
+            <span class="zoom-level" id="lbl-zoom-level">100%</span>
+            <button class="zoom-btn" id="btn-zoom-in">+</button>
+          </div>
+
+          <!-- Panneau Latéral Commentaires & IA -->
+          <button class="tool-btn icon-only" id="btn-toggle-right-drawer" title="Afficher/Masquer le panneau d'étude">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <path d="M15 3v18"/>
+            </svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- ZONE DE LECTURE (Simple ou Double Colonne) -->
+      <div class="reader-workspace" id="reader-workspace">
+        
+        <!-- COLONNE 1 (Principale) -->
+        <article class="reading-pane" id="pane-left">
+          <div class="pane-header">
+            <div class="pane-breadcrumb" id="pane-1-breadcrumb">GENÈSE &gt; Chapitre 1</div>
+            <div class="pane-actions">
+              <button class="pane-action-btn" id="pane-1-select-bible" title="Changer de version biblique">
+                <span id="pane-1-bible-name">TOB 2010</span> ▾
+              </button>
+            </div>
+          </div>
+          
+          <div class="pane-scrollable-content" id="pane-1-content">
+            <!-- Rendu dynamique du texte biblique -->
+            <div class="chapter-container" id="pane-1-chapter">
+              <h1 class="pericope-title" id="pane-1-pericope">LA CRÉATION</h1>
+              <div class="verses-flow" id="pane-1-verses">
+                <!-- Les versets seront injectés dynamiquement ici -->
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- COLONNE 2 (Parallèle / Comparaison - Masquée par défaut) -->
+        <article class="reading-pane hidden" id="pane-right">
+          <div class="pane-header">
+            <div class="pane-breadcrumb" id="pane-2-breadcrumb">GENÈSE &gt; Chapitre 1</div>
+            <div class="pane-actions">
+              <button class="pane-action-btn" id="pane-2-select-bible" title="Changer de version biblique">
+                <span id="pane-2-bible-name">Segond 21</span> ▾
+              </button>
+              <button class="pane-close-btn" id="btn-close-pane-2" title="Fermer la seconde colonne">✕</button>
+            </div>
+          </div>
+          
+          <div class="pane-scrollable-content" id="pane-2-content">
+            <div class="chapter-container" id="pane-2-chapter">
+              <h1 class="pericope-title" id="pane-2-pericope">LA CRÉATION</h1>
+              <div class="verses-flow" id="pane-2-verses"></div>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </main>
+
+    <!-- ======================================================= -->
+    <!-- 3. PANNEAU LATÉRAL DROIT (Commentaires & Assistant IA)  -->
+    <!-- ======================================================= -->
+    <aside class="right-drawer" id="right-drawer">
+      <div class="drawer-tabs">
+        <button class="drawer-tab active" data-drawer-tab="commentaries">💬 Commentaires</button>
+        <button class="drawer-tab" data-drawer-tab="ai">🤖 Assistant IA</button>
+        <button class="drawer-tab" data-drawer-tab="lexicon">📜 Lexique Strong</button>
+      </div>
+
+      <div class="drawer-body">
+        <!-- Onglet 1: Commentaires Exégétiques -->
+        <div class="drawer-content active" id="drawer-tab-commentaries">
+          <div class="drawer-section-header">
+            <span class="selected-verse-badge" id="comm-selected-verse">Genèse 1:1</span>
+            <span class="comm-count" id="comm-count">Chargement...</span>
+          </div>
+          <div class="commentary-list" id="commentary-list">
+            <!-- Liste des commentaires injectée ici -->
+          </div>
+        </div>
+
+        <!-- Onglet 2: Assistant IA / Chat RAG -->
+        <div class="drawer-content" id="drawer-tab-ai">
+          <div class="chat-messages" id="chat-messages">
+            <div class="chat-message assistant">
+              <div class="msg-avatar">🤖</div>
+              <div class="msg-content">
+                Bonjour ! Posez-moi une question sur le passage en cours de lecture. Je m'appuierai sur vos Bibles et vos commentaires.
+              </div>
+            </div>
+          </div>
+          <div class="chat-input-container">
+            <textarea id="chat-input" placeholder="Posez votre question exégétique..." rows="2"></textarea>
+            <button id="btn-send-chat" class="btn-send">Envoyer</button>
+          </div>
+        </div>
+
+        <!-- Onglet 3: Lexique Strong & STEPBible -->
+        <div class="drawer-content" id="drawer-tab-lexicon">
+          <div class="lexicon-details" id="lexicon-details">
+            <p class="empty-hint">Cliquez sur un mot dans le texte biblique ou activez l'interlinéaire pour analyser sa racine hébraïque/grecque.</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ======================================================= -->
+    <!-- 4. POPOVERS FLOTTANTS (Sélecteur de Livres Logos)        -->
+    <!-- ======================================================= -->
+    
+    <!-- POPOVER SÉLECTEUR DE LIVRE ET CHAPITRE -->
+    <div class="popover-backdrop hidden" id="popover-backdrop"></div>
+    
+    <div class="book-picker-popover hidden" id="book-picker-popover">
+      <div class="popover-header">
+        <input type="text" id="picker-search-input" placeholder="Filtrer les livres (ex: Gen, Jean, Rom)..." autocomplete="off">
+      </div>
+      
+      <div class="popover-columns">
+        <!-- Colonne 1: Ancien Testament -->
+        <div class="corpus-column">
+          <div class="corpus-title">Ancien Testament (39)</div>
+          <div class="books-grid" id="grid-ot-books"></div>
+        </div>
+
+        <!-- Colonne 2: Nouveau Testament -->
+        <div class="corpus-column">
+          <div class="corpus-title">Nouveau Testament (27)</div>
+          <div class="books-grid" id="grid-nt-books"></div>
+        </div>
+
+        <!-- Colonne 3: Grille des Chapitres du livre sélectionné -->
+        <div class="chapters-column" id="chapters-column">
+          <div class="chapters-column-header">
+            <span id="selected-book-name-title">Genèse</span>
+            <span class="sub-ch-count" id="selected-book-total-ch">50 chapitres</span>
+          </div>
+          <div class="chapters-grid" id="grid-chapters"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POPOVER CHOIX DE VERSION BIBLIQUE -->
+    <div class="bible-selector-popover hidden" id="bible-selector-popover">
+      <div class="bible-list-container" id="bible-list-container">
+        <!-- Bibles disponibles injectées dynamiquement -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/book_picker.js"></script>
+  <script src="js/bible_reader.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

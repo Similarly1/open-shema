@@ -9,6 +9,38 @@ def strip_accents(text: str) -> str:
     text = ''.join(c for c in text if not unicodedata.combining(c))
     return text.lower().strip()
 
+# Listes canoniques des livres bibliques avec noms français, codes et nombres de chapitres
+BOOKS_OT = [
+    ("Genèse", "Gen", 50), ("Exode", "Exo", 40), ("Lévitique", "Lev", 27), ("Nombres", "Num", 36), ("Deutéronome", "Deu", 34),
+    ("Josué", "Jos", 24), ("Juges", "Jdg", 21), ("Ruth", "Rut", 4), ("1 Samuel", "1Sa", 31), ("2 Samuel", "2Sa", 24),
+    ("1 Rois", "1Ki", 22), ("2 Rois", "2Ki", 25), ("1 Chroniques", "1Ch", 29), ("2 Chroniques", "2Ch", 36), ("Esdras", "Ezr", 10),
+    ("Néhémie", "Neh", 13), ("Esther", "Est", 10), ("Job", "Job", 42), ("Psaumes", "Psa", 150), ("Proverbes", "Pro", 31),
+    ("Ecclésiaste", "Ecc", 12), ("Cantique", "Sol", 8), ("Ésaïe", "Isa", 66), ("Jérémie", "Jer", 52), ("Lamentations", "Lam", 5),
+    ("Ézéchiel", "Eze", 48), ("Daniel", "Dan", 12), ("Osée", "Hos", 14), ("Joël", "Joe", 3), ("Amos", "Amo", 9),
+    ("Abdias", "Oba", 1), ("Jonas", "Jon", 4), ("Michée", "Mic", 7), ("Nahum", "Nah", 3), ("Habacuc", "Hab", 3),
+    ("Sophonie", "Zep", 3), ("Aggée", "Hag", 2), ("Zacharie", "Zec", 14), ("Malachie", "Mal", 4)
+]
+
+BOOKS_NT = [
+    ("Matthieu", "Mat", 28), ("Marc", "Mar", 16), ("Luc", "Luk", 24), ("Jean", "Joh", 21), ("Actes", "Act", 28),
+    ("Romains", "Rom", 16), ("1 Corinthiens", "1Co", 16), ("2 Corinthiens", "2Co", 13), ("Galates", "Gal", 6),
+    ("Éphésiens", "Eph", 6), ("Philippiens", "Phi", 4), ("Colossiens", "Col", 4), ("1 Thessaloniciens", "1Th", 5),
+    ("2 Thessaloniciens", "2Th", 3), ("1 Timothée", "1Ti", 6), ("2 Timothée", "2Ti", 4), ("Tite", "Tit", 3),
+    ("Philémon", "Phm", 1), ("Hébreux", "Heb", 13), ("Jacques", "Jam", 5), ("1 Pierre", "1Pe", 5), ("2 Pierre", "2Pe", 3),
+    ("1 Jean", "1Jo", 5), ("2 Jean", "2Jo", 1), ("3 Jean", "3Jo", 1), ("Jude", "Jud", 1), ("Apocalypse", "Rev", 22)
+]
+
+BOOKS_DEUTERO = [
+    ("Tobie", "Tob", 14), ("Judith", "Jdt", 16), ("Esther grec", "Esg", 16),
+    ("1 Maccabées", "1Ma", 16), ("2 Maccabées", "2Ma", 15), ("3 Maccabées", "3Ma", 7),
+    ("4 Maccabées", "4Ma", 18), ("Sagesse", "Wis", 19), ("Siracide", "Sir", 51),
+    ("Baruch", "Bar", 6), ("Lettre de Jérémie", "Lje", 1), ("Daniel grec", "Dag", 14),
+    ("3 Esdras", "1Es", 9), ("4 Esdras", "2Es", 16), ("Prière de Manassé", "Man", 1),
+    ("Psaume 151", "Ps2", 1)
+]
+
+ALL_BOOKS = BOOKS_OT + BOOKS_NT + BOOKS_DEUTERO
+
 # Mapping des noms et abréviations vers les codes standards
 BOOK_MAPPING_RAW = {
     # Ancien Testament

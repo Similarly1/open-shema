@@ -1,0 +1,964 @@
+/* ==========================================================================
+   LOGOS BIBLE SOFTWARE - MODERN THEME & DESIGN SYSTEM (CSS)
+   ========================================================================== */
+
+:root {
+  /* Palette de couleurs Logos */
+  --bg-app: #F8FAFC;
+  --bg-sidebar: #F1F5F9;
+  --bg-reading: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-hover: #E2E8F0;
+  --bg-active: #E0F2FE;
+  
+  --border-color: #E2E8F0;
+  --border-subtle: #F1F5F9;
+  
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  
+  --accent-blue: #0284C7;
+  --accent-blue-hover: #0369A1;
+  --accent-orange: #EA580C;
+  --accent-purple: #7C3AED;
+  
+  /* Typographie */
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-bible: 'EB Garamond', 'Lora', 'Georgia', serif;
+  --font-title: 'Cinzel', 'EB Garamond', 'Georgia', serif;
+  
+  /* Dimensions */
+  --sidebar-width: 220px;
+  --header-height: 38px;
+  --toolbar-height: 44px;
+  
+  /* Animations */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  --shadow-popover: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+}
+
+/* Reset & Base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-ui);
+  color: var(--text-primary);
+  background-color: var(--bg-app);
+  user-select: none;
+}
+
+/* Scrollbars modernes et discrètes */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Structure principale */
+.app-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   1. SIDEBAR GAUCHE (Logos Navigation)
+   ========================================================================== */
+
+.sidebar {
+  width: var(--sidebar-width);
+  height: 100%;
+  background-color: var(--bg-sidebar);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.sidebar-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.logo-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background-color: var(--accent-blue);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.logo-btn .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.quick-passage-box {
+  flex: 1;
+}
+.quick-passage-box input {
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: #FFFFFF;
+  font-size: 12px;
+  color: var(--text-primary);
+  outline: none;
+  transition: var(--transition-fast);
+}
+.quick-passage-box input:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15);
+}
+
+.sidebar-menu {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: var(--transition-fast);
+}
+.nav-item:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+.nav-item.active {
+  background-color: #FFFFFF;
+  color: var(--accent-blue);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+.nav-icon {
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-section-divider {
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 10px 6px;
+}
+
+.sidebar-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  padding: 4px 10px;
+}
+
+.nav-item.sub-item {
+  font-size: 12px;
+  padding: 6px 10px;
+}
+
+.sidebar-footer {
+  padding: 8px;
+  border-top: 1px solid var(--border-color);
+}
+
+/* ==========================================================================
+   2. ZONE PRINCIPALE (Tabs & Toolbar)
+   ========================================================================== */
+
+.main-content {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-reading);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Barre d'onglets */
+.tabs-header {
+  height: var(--header-height);
+  background-color: #E2E8F0;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--border-color);
+  gap: 4px;
+}
+
+.tabs-list {
+  display: flex;
+  align-items: flex-end;
+  height: 100%;
+  gap: 4px;
+  overflow-x: auto;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 12px;
+  background-color: #CBD5E1;
+  border-radius: 6px 6px 0 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  position: relative;
+  transition: var(--transition-fast);
+}
+.tab:hover {
+  background-color: #DDE4EE;
+  color: var(--text-primary);
+}
+.tab.active {
+  background-color: var(--bg-reading);
+  color: var(--text-primary);
+  font-weight: 600;
+  height: 34px;
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.tab-badge-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+}
+
+.tab-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 11px;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 3px;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 2px;
+}
+.tab-close-btn:hover {
+  background-color: #E2E8F0;
+  color: #EF4444;
+}
+
+.btn-new-tab {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  margin-bottom: 2px;
+}
+.btn-new-tab:hover {
+  background-color: #CBD5E1;
+  color: var(--text-primary);
+}
+
+/* Barre d'outils du lecteur */
+.reader-toolbar {
+  height: var(--toolbar-height);
+  background-color: #FFFFFF;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  gap: 12px;
+}
+
+.toolbar-left, .toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tool-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--border-color);
+  background-color: #FFFFFF;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+.tool-btn:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+.tool-btn.icon-only {
+  width: 30px;
+  padding: 0;
+  justify-content: center;
+  font-size: 15px;
+}
+.tool-btn .icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Pilule Sélecteur de Livre / Chapitre (Logos Style) */
+.book-picker-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--border-color);
+  background-color: #FFFFFF;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+.book-picker-pill:hover {
+  border-color: var(--accent-blue);
+  background-color: var(--bg-active);
+}
+.pill-reference-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.pill-arrow {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.nav-mode-links {
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+  gap: 4px;
+}
+.mode-link {
+  border: none;
+  background: transparent;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 4px;
+}
+.mode-link:hover {
+  color: var(--text-primary);
+}
+.mode-link.active {
+  color: var(--accent-blue);
+  font-weight: 600;
+}
+
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  overflow: hidden;
+  height: 30px;
+}
+.zoom-btn {
+  width: 26px;
+  height: 100%;
+  border: none;
+  background-color: #FFFFFF;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 14px;
+}
+.zoom-btn:hover {
+  background-color: var(--bg-hover);
+}
+.zoom-level {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 0 6px;
+  color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   3. ZONE DE LECTURE & TYPOGRAPHIE BIBLIQUE (Logos Reader)
+   ========================================================================== */
+
+.reader-workspace {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  background-color: var(--bg-reading);
+}
+
+.reading-pane {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+}
+.reading-pane:last-child {
+  border-right: none;
+}
+.reading-pane.hidden {
+  display: none;
+}
+
+.pane-header {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background-color: #FFFFFF;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.pane-breadcrumb {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+.pane-action-btn {
+  border: none;
+  background: transparent;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-blue);
+  cursor: pointer;
+}
+.pane-close-btn {
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  margin-left: 8px;
+}
+.pane-close-btn:hover {
+  color: #EF4444;
+}
+
+.pane-scrollable-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 30px 40px 60px 40px;
+  display: flex;
+  justify-content: center;
+}
+
+.chapter-container {
+  width: 100%;
+  max-width: 680px;
+}
+
+/* Titre de Section / Péricope */
+.pericope-title {
+  font-family: var(--font-bible);
+  font-size: 22px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-align: center;
+  margin: 15px 0 35px 0;
+  color: var(--text-primary);
+}
+
+/* Flux de texte des versets */
+.verses-flow {
+  font-family: var(--font-bible);
+  font-size: 19px;
+  line-height: 1.85;
+  color: #1E293B;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+/* Verset individuel */
+.verse-item {
+  display: inline;
+  transition: background-color var(--transition-fast);
+  padding: 2px 0;
+  border-radius: 3px;
+  cursor: text;
+}
+.verse-item:hover {
+  background-color: rgba(2, 132, 199, 0.06);
+}
+.verse-item.selected {
+  background-color: rgba(2, 132, 199, 0.15);
+}
+
+/* Numéro de verset / chapitre */
+.chapter-number-dropcap {
+  font-size: 32px;
+  font-weight: 700;
+  color: #0F172A;
+  margin-right: 4px;
+  line-height: 1;
+}
+
+.verse-num {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748B;
+  vertical-align: super;
+  margin-right: 3px;
+  margin-left: 6px;
+  user-select: none;
+}
+.verse-item:first-child .verse-num {
+  margin-left: 0;
+}
+
+/* Interlinéaire Inversé (Style Logos) */
+.interlinear-block {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 4px 6px;
+  padding: 4px 6px;
+  background-color: #F8FAFC;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  vertical-align: middle;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+.interlinear-block:hover {
+  border-color: var(--accent-blue);
+  background-color: var(--bg-active);
+}
+.interlinear-surface {
+  font-family: var(--font-bible);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.interlinear-lemma {
+  font-family: 'Times New Roman', serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent-purple);
+}
+.interlinear-translit {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-style: italic;
+  color: var(--text-muted);
+}
+.interlinear-strong {
+  font-family: var(--font-ui);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 4px;
+  background-color: #E0F2FE;
+  color: var(--accent-blue);
+  border-radius: 3px;
+  margin-top: 2px;
+}
+
+/* ==========================================================================
+   4. PANNEAU LATÉRAL DROIT (Commentaires & Assistant IA)
+   ========================================================================== */
+
+.right-drawer {
+  width: 380px;
+  height: 100%;
+  background-color: #FFFFFF;
+  border-left: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: margin-right var(--transition-normal);
+  z-index: 10;
+}
+.right-drawer.collapsed {
+  margin-right: -380px;
+}
+
+.drawer-tabs {
+  height: var(--header-height);
+  background-color: #F1F5F9;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  padding: 0 6px;
+  align-items: flex-end;
+  gap: 2px;
+}
+.drawer-tab {
+  height: 32px;
+  padding: 0 12px;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 6px 6px 0 0;
+}
+.drawer-tab:hover {
+  color: var(--text-primary);
+}
+.drawer-tab.active {
+  background-color: #FFFFFF;
+  color: var(--accent-blue);
+  font-weight: 600;
+}
+
+.drawer-body {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.drawer-content {
+  width: 100%;
+  height: 100%;
+  display: none;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.drawer-content.active {
+  display: flex;
+}
+
+.drawer-section-header {
+  padding: 12px 16px;
+  background-color: #F8FAFC;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.selected-verse-badge {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-blue);
+}
+.comm-count {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.commentary-list {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.commentary-card {
+  background-color: #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 14px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+.comm-author {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-orange);
+  margin-bottom: 6px;
+}
+.comm-text {
+  font-family: var(--font-bible);
+  font-size: 15px;
+  line-height: 1.6;
+  color: #334155;
+}
+
+/* Chat Assistant IA */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.chat-message {
+  display: flex;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.chat-message.assistant .msg-content {
+  background-color: #F1F5F9;
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: var(--text-primary);
+}
+.chat-message.user {
+  justify-content: flex-end;
+}
+.chat-message.user .msg-content {
+  background-color: var(--accent-blue);
+  color: white;
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+
+.chat-input-container {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  gap: 8px;
+  background-color: #FFFFFF;
+}
+.chat-input-container textarea {
+  flex: 1;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-family: var(--font-ui);
+  resize: none;
+  outline: none;
+}
+.btn-send {
+  padding: 0 14px;
+  background-color: var(--accent-blue);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   5. POPOVERS FLOTTANTS (Sélecteur de livres Logos)
+   ========================================================================== */
+
+.popover-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.15);
+  z-index: 99;
+}
+.popover-backdrop.hidden {
+  display: none;
+}
+
+.book-picker-popover {
+  position: absolute;
+  top: 80px;
+  left: calc(var(--sidebar-width) + 60px);
+  width: 680px;
+  height: 480px;
+  background: #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: var(--shadow-popover);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  overflow: hidden;
+  animation: popoverFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.book-picker-popover.hidden {
+  display: none;
+}
+
+@keyframes popoverFadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.popover-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color);
+  background-color: #F8FAFC;
+}
+.popover-header input {
+  width: 100%;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 12px;
+  outline: none;
+}
+
+.popover-columns {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.corpus-column {
+  flex: 1.2;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.corpus-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 8px 12px;
+  background-color: #F8FAFC;
+  border-bottom: 1px solid var(--border-color);
+}
+.books-grid {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.book-row-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+}
+.book-row-btn:hover {
+  background-color: var(--bg-hover);
+}
+.book-row-btn.active {
+  background-color: var(--accent-blue);
+  color: white;
+  font-weight: 600;
+}
+.book-row-btn .code {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+.book-row-btn.active .code {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.chapters-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #FFFFFF;
+}
+.chapters-column-header {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 700;
+}
+.sub-ch-count {
+  font-size: 11px;
+  font-weight: normal;
+  color: var(--text-muted);
+}
+.chapters-grid {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  align-content: start;
+}
+.ch-btn {
+  height: 32px;
+  border: 1px solid var(--border-color);
+  background-color: #FFFFFF;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+}
+.ch-btn:hover {
+  border-color: var(--accent-blue);
+  background-color: var(--bg-active);
+  color: var(--accent-blue);
+}
+.ch-btn.active {
+  background-color: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+}
