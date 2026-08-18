@@ -1287,6 +1287,8 @@ class CenterPanel(ctk.CTkFrame):
         - Listes à puces avec puces stylisées et indentation multi-niveaux
         - Citations en bloc >
         - Gras et Italique inline
+        - Références bibliques anciennes et modernes cliquables avec infobulle de verset
+        - Mots en langues originales (hébreu, grec) cliquables avec infobulle Strong
         - Liens interactifs cliquables pour les renvois d'articles (*Voir* : **MOT**, 🔗 MOT, [[MOT]])
         """
         if not text:
@@ -1305,11 +1307,19 @@ class CenterPanel(ctk.CTkFrame):
         RE_QUOTE = re.compile(r'^>\s*(.+)$')
         
         lines = text.strip().splitlines()
+        in_voir_section = False
+        
         for raw_line in lines:
             line_s = raw_line.strip()
             if not line_s:
                 self.lex_textbox.insert("end", "\n")
                 continue
+                
+            # Détecter si on entre ou sort d'une section de renvois ("Voir :" ou "Voir aussi :")
+            if re.match(r'^(?:Voir(?:\s+aussi)?)\s*:\s*$', line_s, re.IGNORECASE):
+                in_voir_section = True
+            elif line_s.startswith('---') or line_s.startswith('#'):
+                in_voir_section = False
                 
             # Séparateur horizontal
             if RE_HR.match(line_s):
@@ -1322,12 +1332,8 @@ class CenterPanel(ctk.CTkFrame):
                 level = len(m_h.group(1))
                 content = m_h.group(2).strip()
                 tag_name = f"lex_h{min(level, 6)}"
-                if level == 1:
-                    self._insert_markdown_spans(content, base_tag=tag_name, ROMAN_NUMS=ROMAN_NUMS)
-                    self.lex_textbox.insert("end", "\n\n")
-                else:
-                    self._insert_markdown_spans(content, base_tag=tag_name, ROMAN_NUMS=ROMAN_NUMS)
-                    self.lex_textbox.insert("end", "\n\n")
+                self._insert_markdown_spans(content, base_tag=tag_name, ROMAN_NUMS=ROMAN_NUMS, in_voir_section=False)
+                self.lex_textbox.insert("end", "\n\n")
                 continue
                 
             # Citations en bloc (> texte)
@@ -1335,7 +1341,7 @@ class CenterPanel(ctk.CTkFrame):
             if m_q:
                 content = m_q.group(1).strip()
                 self.lex_textbox.insert("end", "│ ", "lex_quote_bar")
-                self._insert_markdown_spans(content, base_tag="lex_quote", ROMAN_NUMS=ROMAN_NUMS)
+                self._insert_markdown_spans(content, base_tag="lex_quote", ROMAN_NUMS=ROMAN_NUMS, in_voir_section=False)
                 self.lex_textbox.insert("end", "\n\n")
                 continue
                 
@@ -1355,7 +1361,7 @@ class CenterPanel(ctk.CTkFrame):
                     list_tag = "lex_list_item"
                     
                 self.lex_textbox.insert("end", bullet_prefix, "lex_bullet_dot")
-                self._insert_markdown_spans(content, base_tag=list_tag, ROMAN_NUMS=ROMAN_NUMS)
+                self._insert_markdown_spans(content, base_tag=list_tag, ROMAN_NUMS=ROMAN_NUMS, in_voir_section=in_voir_section)
                 self.lex_textbox.insert("end", "\n")
                 continue
                 
@@ -1368,22 +1374,113 @@ class CenterPanel(ctk.CTkFrame):
                 lead_prefix = f"{' ' * indent}  {lead} "
                 list_tag = "lex_sub_list_item" if indent >= 2 else "lex_list_item"
                 self.lex_textbox.insert("end", lead_prefix, "lex_lead_num")
-                self._insert_markdown_spans(content, base_tag=list_tag, ROMAN_NUMS=ROMAN_NUMS)
+                self._insert_markdown_spans(content, base_tag=list_tag, ROMAN_NUMS=ROMAN_NUMS, in_voir_section=in_voir_section)
                 self.lex_textbox.insert("end", "\n")
                 continue
                 
             # Paragraphe standard
-            self._insert_markdown_spans(line_s, base_tag="body", ROMAN_NUMS=ROMAN_NUMS)
+            self._insert_markdown_spans(line_s, base_tag="body", ROMAN_NUMS=ROMAN_NUMS, in_voir_section=in_voir_section)
             self.lex_textbox.insert("end", "\n\n")
 
-    def _insert_markdown_spans(self, line_text, base_tag="body", ROMAN_NUMS=None):
-        """Parse les éléments inline (gras, italique, liens renvois dictionnaire) et les insère dans lex_textbox."""
+    def _insert_markdown_spans(self, line_text, base_tag="body", ROMAN_NUMS=None, in_voir_section=False):
+        """Parse les éléments inline (gras, italique, versets bibliques, langues originales, renvois) et les insère dans lex_textbox."""
         if not line_text:
             return
             
         if ROMAN_NUMS is None:
             ROMAN_NUMS = set()
             
+        ANCIENT_BOOK_ALIASES = {
+            "gen": "Gen", "genese": "Gen", "ge": "Gen", "gn": "Gen",
+            "exod": "Exo", "exode": "Exo", "ex": "Exo",
+            "lev": "Lev", "levitique": "Lev", "lv": "Lev",
+            "num": "Num", "nombres": "Num", "nb": "Num",
+            "deut": "Deu", "deuteronome": "Deu", "dt": "Deu",
+            "jos": "Jos", "josue": "Jos",
+            "jug": "Jdg", "juges": "Jdg", "jg": "Jdg",
+            "ruth": "Rut", "rt": "Rut",
+            "i sam": "1Sa", "ii sam": "2Sa", "1 sam": "1Sa", "2 sam": "2Sa", "1s": "1Sa", "2s": "2Sa",
+            "i reg": "1Sa", "ii reg": "2Sa", "iii reg": "1Ki", "iv reg": "2Ki", "1 reg": "1Sa", "2 reg": "2Sa", "3 reg": "1Ki", "4 reg": "2Ki",
+            "i rois": "1Ki", "ii rois": "2Ki", "1 rois": "1Ki", "2 rois": "2Ki", "1r": "1Ki", "2r": "2Ki",
+            "i par": "1Ch", "ii par": "2Ch", "1 par": "1Ch", "2 par": "2Ch", "1 ch": "1Ch", "2 ch": "2Ch", "1ch": "1Ch", "2ch": "2Ch",
+            "esd": "Ezr", "esdras": "Ezr",
+            "neh": "Neh", "nehemie": "Neh",
+            "esth": "Est", "esther": "Est",
+            "job": "Job", "jb": "Job",
+            "ps": "Psa", "psa": "Psa", "psaumes": "Psa", "psaume": "Psa", "pss": "Psa",
+            "prov": "Pro", "proverbes": "Pro", "pr": "Pro",
+            "eccl": "Ecc", "ecclesiaste": "Ecc", "ec": "Ecc", "ecc": "Ecc",
+            "cant": "Sol", "cantique": "Sol", "ct": "Sol",
+            "is": "Isa", "isa": "Isa", "esaie": "Isa", "isaie": "Isa", "es": "Isa",
+            "jer": "Jer", "jeremie": "Jer", "jr": "Jer",
+            "lam": "Lam", "lamentations": "Lam",
+            "ezech": "Eze", "eze": "Eze", "ezechiel": "Eze", "ez": "Eze",
+            "dan": "Dan", "daniel": "Dan", "da": "Dan",
+            "os": "Hos", "osee": "Hos",
+            "joel": "Joe", "jl": "Joe",
+            "am": "Amo", "amos": "Amo",
+            "abd": "Oba", "abdias": "Oba",
+            "jon": "Jon", "jonas": "Jon",
+            "mich": "Mic", "michee": "Mic", "mi": "Mic",
+            "nah": "Nah", "nahum": "Nah", "na": "Nah",
+            "hab": "Hab", "habacuc": "Hab", "ha": "Hab",
+            "soph": "Zep", "sophonie": "Zep", "so": "Zep",
+            "agg": "Hag", "aggee": "Hag", "ag": "Hag",
+            "zach": "Zec", "zacharie": "Zec", "za": "Zec",
+            "mal": "Mal", "malachie": "Mal", "ml": "Mal",
+            "matth": "Mat", "matt": "Mat", "mat": "Mat", "matthieu": "Mat", "mt": "Mat",
+            "marc": "Mar", "mar": "Mar", "mc": "Mar",
+            "luc": "Luk", "lc": "Luk",
+            "jean": "Joh", "jn": "Joh",
+            "act": "Act", "actes": "Act", "ac": "Act",
+            "rom": "Rom", "romains": "Rom", "ro": "Rom", "rm": "Rom",
+            "i cor": "1Co", "ii cor": "2Co", "1 cor": "1Co", "2 cor": "2Co", "1co": "1Co", "2co": "2Co",
+            "gal": "Gal", "galates": "Gal", "ga": "Gal",
+            "eph": "Eph", "ephesiens": "Eph", "ep": "Eph",
+            "phil": "Phi", "philippiens": "Phi", "php": "Phi",
+            "col": "Col", "colossiens": "Col",
+            "i thes": "1Th", "ii thes": "2Th", "1 thes": "1Th", "2 thes": "2Th", "1th": "1Th", "2th": "2Th",
+            "i tim": "1Ti", "ii tim": "2Ti", "1 tim": "1Ti", "2 tim": "2Ti", "1ti": "1Ti", "2ti": "2Ti",
+            "tit": "Tit", "tite": "Tit",
+            "philm": "Phm", "philemon": "Phm", "phm": "Phm",
+            "heb": "Heb", "hebreux": "Heb", "he": "Heb",
+            "jacq": "Jam", "jacques": "Jam", "ja": "Jam", "jas": "Jam",
+            "i pierre": "1Pe", "ii pierre": "2Pe", "1 pierre": "1Pe", "2 pierre": "2Pe", "1pe": "1Pe", "2pe": "2Pe", "1p": "1Pe", "2p": "2Pe",
+            "i jean": "1Jo", "ii jean": "2Jo", "iii jean": "3Jo", "1 jean": "1Jo", "2 jean": "2Jo", "3 jean": "3Jo", "1jo": "1Jo", "2jo": "2Jo", "3jo": "3Jo",
+            "jud": "Jud", "jude": "Jud", "jd": "Jud",
+            "apoc": "Rev", "apocalypse": "Rev", "rev": "Rev", "apo": "Rev",
+            "tob": "Tob", "tobie": "Tob", "tb": "Tob",
+            "judith": "Jdt", "jdt": "Jdt",
+            "sagesse": "Wis", "sap": "Wis", "wis": "Wis",
+            "sir": "Sir", "ecclesiastique": "Sir", "si": "Sir",
+            "bar": "Bar", "baruch": "Bar", "ba": "Bar",
+            "i mac": "1Ma", "ii mac": "2Ma", "1 mac": "1Ma", "2 mac": "2Ma"
+        }
+        
+        ROMAN_NUMS_EXT = {
+            'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6, 'VII': 7, 'VIII': 8, 'IX': 9, 'X': 10,
+            'XI': 11, 'XII': 12, 'XIII': 13, 'XIV': 14, 'XV': 15, 'XVI': 16, 'XVII': 17, 'XVIII': 18, 'XIX': 19, 'XX': 20,
+            'XXI': 21, 'XXII': 22, 'XXIII': 23, 'XXIV': 24, 'XXV': 25, 'XXVI': 26, 'XXVII': 27, 'XXVIII': 28, 'XXIX': 29, 'XXX': 30,
+            'XXXI': 31, 'XXXII': 32, 'XXXIII': 33, 'XXXIV': 34, 'XXXV': 35, 'XXXVI': 36, 'XXXVII': 37, 'XXXVIII': 38, 'XXXIX': 39, 'XL': 40,
+            'XLI': 41, 'XLII': 42, 'XLIII': 43, 'XLIV': 44, 'XLV': 45, 'XLVI': 46, 'XLVII': 47, 'XLVIII': 48, 'XLIX': 49, 'L': 50,
+            'LI': 51, 'LII': 52, 'LIII': 53, 'LIV': 54, 'LV': 55, 'LVI': 56, 'LVII': 57, 'LVIII': 58, 'LIX': 59, 'LX': 60,
+            'LXI': 61, 'LXII': 62, 'LXIII': 63, 'LXIV': 64, 'LXV': 65, 'LXVI': 66, 'LXVII': 67, 'LXVIII': 68, 'LXIX': 69, 'LXX': 70,
+            'LXXI': 71, 'LXXII': 72, 'LXXIII': 73, 'LXXIV': 74, 'LXXV': 75, 'LXXVI': 76, 'LXXVII': 77, 'LXXVIII': 78, 'LXXIX': 79, 'LXXX': 80,
+            'LXXXI': 81, 'LXXXII': 82, 'LXXXIII': 83, 'LXXXIV': 84, 'LXXXV': 85, 'LXXXVI': 86, 'LXXXVII': 87, 'LXXXVIII': 88, 'LXXXIX': 89, 'XC': 90,
+            'XCI': 91, 'XCII': 92, 'XCIII': 93, 'XCIV': 94, 'XCV': 95, 'XCVI': 96, 'XCVII': 97, 'XCVIII': 98, 'XCIX': 99, 'C': 100,
+            'CI': 101, 'CII': 102, 'CIII': 103, 'CIV': 104, 'CV': 105, 'CVI': 106, 'CVII': 107, 'CVIII': 108, 'CIX': 109, 'CX': 110,
+            'CXI': 111, 'CXII': 112, 'CXIII': 113, 'CXIV': 114, 'CXV': 115, 'CXVI': 116, 'CXVII': 117, 'CXVIII': 118, 'CXIX': 119, 'CXX': 120,
+            'CXXI': 121, 'CXXII': 122, 'CXXIII': 123, 'CXXIV': 124, 'CXXV': 125, 'CXXVI': 126, 'CXXVII': 127, 'CXXVIII': 128, 'CXXIX': 129, 'CXXX': 130,
+            'CXXXI': 131, 'CXXXII': 132, 'CXXXIII': 133, 'CXXXIV': 134, 'CXXXV': 135, 'CXXXVI': 136, 'CXXXVII': 137, 'CXXXVIII': 138, 'CXXXIX': 139, 'CXL': 140,
+            'CXLI': 141, 'CXLII': 142, 'CXLIII': 143, 'CXLIV': 144, 'CXLV': 145, 'CXLVI': 146, 'CXLVII': 147, 'CXLVIII': 148, 'CXLIX': 149, 'CL': 150
+        }
+        
+        def parse_chap(s):
+            if not s: return None
+            s = s.strip()
+            if s.isdigit(): return int(s)
+            return ROMAN_NUMS_EXT.get(s.upper())
+
         tokens = []
         
         # 0. Liens préfixés par emoji 🔗 (ex: 🔗 PHÉNICIENS, 🔗 SCARABÉE)
@@ -1420,11 +1517,58 @@ class CenterPanel(ctk.CTkFrame):
             if len(target) >= 2:
                 tokens.append((m.start(1), m.end(1), 'DICT_LINK', target, target))
 
-        # 4. Gras **texte**
+        # 4. Liste directe dans section Voir (ex: • COLONNE DE NUÉE)
+        if in_voir_section:
+            clean_l = line_text.strip()
+            if re.match(r'^[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\s–-]{2,}$', clean_l):
+                tokens.append((0, len(line_text), 'DICT_LINK', clean_l, clean_l))
+
+        # 5. Références bibliques anciennes & romaines (ex: Gen., I, 2 ; II Cor., VI, 14 ; Ps. CIV (CIII), 20)
+        RE_ANCIENT_BIBLE = re.compile(
+            r'\b((?:I{1,3}|IV|[1-4])\s*[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+|[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+)\.?\s*[,:]?\s*([IVXLCDM0-9]+)(?:\s*\([A-Z0-9]+\))?\s*[,:]\s*([0-9]+(?:\s*[\-–]\s*[0-9]+)?)',
+            re.IGNORECASE
+        )
+        for m in RE_ANCIENT_BIBLE.finditer(line_text):
+            b_clean = strip_accents(m.group(1).strip()).rstrip('.')
+            code = ANCIENT_BOOK_ALIASES.get(b_clean) or BOOK_MAPPING.get(b_clean)
+            ch_num = parse_chap(m.group(2).strip())
+            if code and ch_num:
+                v_clean = m.group(3).strip().replace('–', '-').replace(' ', '') if m.group(3) else None
+                tokens.append((m.start(), m.end(), 'BIBLE_REF', m.group(0), {
+                    "book_code": code,
+                    "book_name": REVERSE_BOOK_MAPPING.get(code, code),
+                    "chapter": ch_num,
+                    "verse": v_clean
+                }))
+
+        # 6. Mots en langues originales (Hébreu et Grec) reliés au Lexique Strong
+        for m in re.finditer(r'[\u0590-\u05FF]{2,}', line_text):
+            raw_h = m.group(0)
+            entry = StrongLexicon.find_by_original_word(raw_h)
+            if entry:
+                tokens.append((m.start(), m.end(), 'ORIG_WORD', raw_h, {
+                    "code": entry.get("code"),
+                    "lang": "hebrew",
+                    "lemma": entry.get("lemma"),
+                    "definition": entry.get("definition")
+                }))
+
+        for m in re.finditer(r'[\u0370-\u03FF\u1F00-\u1FFF]{2,}', line_text):
+            raw_g = m.group(0)
+            entry = StrongLexicon.find_by_original_word(raw_g)
+            if entry:
+                tokens.append((m.start(), m.end(), 'ORIG_WORD', raw_g, {
+                    "code": entry.get("code"),
+                    "lang": "greek",
+                    "lemma": entry.get("lemma"),
+                    "definition": entry.get("definition")
+                }))
+
+        # 7. Gras **texte**
         for m in re.finditer(r'\*\*([^*]+)\*\*', line_text):
             tokens.append((m.start(), m.end(), 'BOLD', m.group(1), None))
             
-        # 5. Italique *texte*
+        # 8. Italique *texte*
         for m in re.finditer(r'(?<!\*)\*([^*]+)\*(?!\*)', line_text):
             tokens.append((m.start(), m.end(), 'ITALIC', m.group(1), None))
 
@@ -1456,6 +1600,17 @@ class CenterPanel(ctk.CTkFrame):
                 self.lex_textbox._textbox.tag_bind(unique_tag, "<Button-1>", lambda e, w=target_word: self.on_dictionary_cross_reference_clicked(w))
                 self.lex_textbox._textbox.tag_bind(unique_tag, "<Enter>", lambda e: self.lex_textbox._textbox.config(cursor="hand2"))
                 self.lex_textbox._textbox.tag_bind(unique_tag, "<Leave>", lambda e: self.lex_textbox._textbox.config(cursor=""))
+            elif t_type == 'BIBLE_REF':
+                b_code = extra["book_code"]
+                ch = extra["chapter"]
+                v_val = extra["verse"] or "0"
+                ref_tag = f"bref_{b_code}_{ch}_{v_val}"
+                self.lex_textbox.insert("end", content, (base_tag, "bible_ref_link", ref_tag))
+            elif t_type == 'ORIG_WORD':
+                code = extra["code"]
+                orig_tag = f"orig_{code}"
+                lang_tag = "lex_orig_word_hebrew" if extra["lang"] == "hebrew" else "lex_orig_word_greek"
+                self.lex_textbox.insert("end", content, (base_tag, lang_tag, orig_tag))
             elif t_type == 'BOLD':
                 bold_tag = "lex_h1_bold" if "h1" in base_tag else ("lex_h2_bold" if "h2" in base_tag else ("lex_h3_bold" if "h3" in base_tag else "lex_bold"))
                 self.lex_textbox.insert("end", content, (bold_tag, base_tag))
@@ -1468,6 +1623,130 @@ class CenterPanel(ctk.CTkFrame):
             
         if curr < len(line_text):
             self.lex_textbox.insert("end", line_text[curr:], base_tag)
+
+    def on_lex_mouse_motion(self, event):
+        """Affiche une infobulle (tooltip) au survol d'un verset biblique ou d'un mot en langue originale dans le Lexique."""
+        try:
+            idx = self.lex_textbox._textbox.index(f"@{event.x},{event.y}")
+            tags = self.lex_textbox._textbox.tag_names(idx)
+            
+            bref_tags = [t for t in tags if t.startswith("bref_")]
+            orig_tags = [t for t in tags if t.startswith("orig_")]
+            dict_tags = [t for t in tags if t.startswith("dict_link_") or t == "wiki_link" or t == "lex_dict_link_base"]
+            
+            if bref_tags:
+                self.lex_textbox._textbox.config(cursor="hand2")
+                tag_name = bref_tags[0]
+                if getattr(self, '_hover_lex_ref', None) == tag_name and getattr(self.tooltip, 'tw', None):
+                    return
+                self._hover_lex_ref = tag_name
+                
+                parts = tag_name.split("_")
+                b_code = parts[1]
+                ch = int(parts[2]) if parts[2].isdigit() else 1
+                v_str = parts[3] if len(parts) > 3 and parts[3] != '0' else None
+                
+                ref_bible = self.config.get("reference_bible", "Segond 21")
+                from core.bible_reference_detector import get_bible_passage_preview
+                ref_title, preview_txt = get_bible_passage_preview(ref_bible, b_code, ch, v_str)
+                
+                x = self.lex_textbox._textbox.winfo_rootx() + event.x + 10
+                y = self.lex_textbox._textbox.winfo_rooty() + event.y + 10
+                
+                tooltip_data = {
+                    "word": tag_name,
+                    "source": f"📖 {ref_bible}",
+                    "title": ref_title,
+                    "preview": preview_txt,
+                    "hint": "🖱️ Cliquer pour ouvrir ce passage dans la Bible"
+                }
+                self.tooltip.show(x, y, tooltip_data)
+                
+            elif orig_tags:
+                self.lex_textbox._textbox.config(cursor="hand2")
+                tag_name = orig_tags[0]
+                if getattr(self, '_hover_lex_orig', None) == tag_name and getattr(self.tooltip, 'tw', None):
+                    return
+                self._hover_lex_orig = tag_name
+                
+                code = tag_name.split("_")[1]
+                entry = StrongLexicon.get(code)
+                if entry:
+                    lang_name = "Hébreu" if entry.get("lang") == "hebrew" or code.startswith("H") else "Grec"
+                    lemma = entry.get("lemma", "")
+                    definition = entry.get("definition", "")
+                    
+                    x = self.lex_textbox._textbox.winfo_rootx() + event.x + 10
+                    y = self.lex_textbox._textbox.winfo_rooty() + event.y + 10
+                    
+                    tooltip_data = {
+                        "word": code,
+                        "source": f"📖 Lexique Strong ({lang_name})",
+                        "title": f"[{code}] {lemma}",
+                        "preview": definition,
+                        "hint": "🖱️ Cliquer pour afficher l'article complet dans le Lexique"
+                    }
+                    self.tooltip.show(x, y, tooltip_data)
+            elif dict_tags:
+                self.lex_textbox._textbox.config(cursor="hand2")
+                if getattr(self, '_hover_lex_ref', None) or getattr(self, '_hover_lex_orig', None):
+                    self._hover_lex_ref = None
+                    self._hover_lex_orig = None
+                    if self.tooltip:
+                        self.tooltip.hide()
+            else:
+                if getattr(self, '_hover_lex_ref', None) or getattr(self, '_hover_lex_orig', None):
+                    self._hover_lex_ref = None
+                    self._hover_lex_orig = None
+                    self.lex_textbox._textbox.config(cursor="")
+                    if self.tooltip:
+                        self.tooltip.hide()
+        except Exception:
+            pass
+
+    def on_lex_click(self, event):
+        """Gère le clic sur les versets bibliques ou mots en langue originale dans le Lexique."""
+        try:
+            idx = self.lex_textbox._textbox.index(f"@{event.x},{event.y}")
+            tags = self.lex_textbox._textbox.tag_names(idx)
+            
+            bref_tags = [t for t in tags if t.startswith("bref_")]
+            if not bref_tags and getattr(self, '_hover_lex_ref', None):
+                bref_tags = [self._hover_lex_ref]
+                
+            if bref_tags:
+                parts = bref_tags[0].split("_")
+                b_code = parts[1]
+                ch = int(parts[2]) if parts[2].isdigit() else 1
+                v_str = parts[3] if len(parts) > 3 and parts[3] != '0' else None
+                v_num = int(v_str.split("-")[0]) if v_str and v_str.split("-")[0].isdigit() else (int(v_str) if v_str and v_str.isdigit() else None)
+                
+                if self.tooltip:
+                    self.tooltip.hide()
+                self._hover_lex_ref = None
+                
+                fr_book = REVERSE_BOOK_MAPPING.get(b_code, b_code)
+                if self.main_tabs.get() != "📖 Lecture":
+                    self.main_tabs.set("📖 Lecture")
+                self.apply_book_selection(fr_book, chapter=ch, verse=v_num)
+                return
+                
+            orig_tags = [t for t in tags if t.startswith("orig_")]
+            if not orig_tags and getattr(self, '_hover_lex_orig', None):
+                orig_tags = [self._hover_lex_orig]
+                
+            if orig_tags:
+                code = orig_tags[0].split("_")[1]
+                if self.tooltip:
+                    self.tooltip.hide()
+                self._hover_lex_orig = None
+                results = DictionaryManager.lookup(code)
+                if results and results.get("matches"):
+                    self.current_dict_match_obj = results
+                    self.display_dictionary_entry(results)
+                return
+        except Exception as e:
+            print(f"Erreur clic lexique : {e}")
 
     def _render_wikipedia_entry(self, m):
         """Rend l'article Wikipédia sélectionné, en le chargeant en arrière-plan si nécessaire."""
@@ -2864,6 +3143,12 @@ class CenterPanel(ctk.CTkFrame):
             self.lex_textbox._textbox.tag_configure("lex_h5_bold", font=(self.font_family, max(10, self.font_size - 1), "bold"), foreground="#38BDF8" if is_dark else "#0284C7")
             self.lex_textbox._textbox.tag_configure("lex_italic", font=(self.font_family, self.font_size, "italic"), foreground=lex_it_col)
             self.lex_textbox._textbox.tag_configure("lex_dict_link_base", font=(self.font_family, self.font_size, "bold"), foreground=lex_link_col, underline=True)
+            self.lex_textbox._textbox.tag_configure("lex_orig_word_hebrew", font=(self.font_family, self.font_size + 1, "bold"), foreground="#60A5FA" if is_dark else "#2563EB", underline=True)
+            self.lex_textbox._textbox.tag_configure("lex_orig_word_greek", font=(self.font_family, self.font_size + 1, "bold"), foreground="#10B981" if is_dark else "#059669", underline=True)
+            
+            self.lex_textbox._textbox.bind("<Motion>", self.on_lex_mouse_motion)
+            self.lex_textbox._textbox.bind("<Button-1>", self.on_lex_click)
+            self.lex_textbox._textbox.bind("<Leave>", lambda e: (self.tooltip.hide() if getattr(self, 'tooltip', None) else None, self.lex_textbox._textbox.config(cursor="")))
             
             self.lex_textbox._textbox.tag_bind("wiki_link", "<Button-1>", lambda e: self.on_open_wikipedia_web())
             self.lex_textbox._textbox.tag_bind("wiki_link", "<Enter>", lambda e: self.lex_textbox._textbox.config(cursor="hand2"))

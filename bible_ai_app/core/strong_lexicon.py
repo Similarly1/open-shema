@@ -160,3 +160,51 @@ class StrongLexicon:
                     "details": []
                 })
         return results
+
+    _heb_lemma_idx = None
+    _grk_lemma_idx = None
+
+    @classmethod
+    def _ensure_lemma_indices(cls):
+        if cls._heb_lemma_idx is not None and cls._grk_lemma_idx is not None:
+            return
+            
+        lex = cls.load_lexicon()
+        cls._heb_lemma_idx = {}
+        cls._grk_lemma_idx = {}
+        
+        for code, ent in lex.items():
+            lem = ent.get("lemma", "")
+            if ent.get("lang") == "hebrew" or code.startswith("H"):
+                nfd = unicodedata.normalize('NFD', lem)
+                h_clean = ''.join(c for c in nfd if '\u0590' <= c <= '\u05ff' and unicodedata.category(c) != 'Mn')
+                if h_clean:
+                    cls._heb_lemma_idx.setdefault(h_clean, []).append(code)
+            else:
+                g_clean = cls.clean_greek_key(lem)
+                if g_clean:
+                    cls._grk_lemma_idx.setdefault(g_clean, []).append(code)
+
+    @classmethod
+    def find_by_original_word(cls, word):
+        """Retourne la fiche Strong correspondante à un mot hébreu ou grec brut."""
+        if not word:
+            return None
+        cls._ensure_lemma_indices()
+        
+        # Test hébreu
+        if any('\u0590' <= c <= '\u05ff' for c in word):
+            nfd = unicodedata.normalize('NFD', word)
+            h_clean = ''.join(c for c in nfd if '\u0590' <= c <= '\u05ff' and unicodedata.category(c) != 'Mn')
+            if h_clean in cls._heb_lemma_idx:
+                code = cls._heb_lemma_idx[h_clean][0]
+                return cls.get(code)
+                
+        # Test grec
+        if any(('\u0370' <= c <= '\u03ff' or '\u1F00' <= c <= '\u1FFF') for c in word):
+            g_clean = cls.clean_greek_key(word)
+            if g_clean in cls._grk_lemma_idx:
+                code = cls._grk_lemma_idx[g_clean][0]
+                return cls.get(code)
+                
+        return None
