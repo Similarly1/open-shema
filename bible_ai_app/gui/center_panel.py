@@ -736,6 +736,35 @@ class CenterPanel(ctk.CTkFrame):
             text_color=("#0284C7", "#38BDF8")
         )
         
+        self.lex_wiki_variant_frame = ctk.CTkFrame(self.lex_action_frame, fg_color="transparent")
+        lbl_wiki_var = ctk.CTkLabel(
+            self.lex_wiki_variant_frame,
+            text="🔀 Article :",
+            font=ctk.CTkFont(size=11, weight="bold")
+        )
+        lbl_wiki_var.pack(side="left", padx=(2, 4))
+        
+        self.lex_wiki_variant_var = ctk.StringVar(value="")
+        self.lex_wiki_variant_menu = ctk.CTkOptionMenu(
+            self.lex_wiki_variant_frame,
+            variable=self.lex_wiki_variant_var,
+            values=["Article principal"],
+            command=self.on_wiki_variant_selected,
+            height=28,
+            font=ctk.CTkFont(size=11)
+        )
+        self.lex_wiki_variant_menu.pack(side="left", fill="x", expand=True, padx=(0, 4))
+        
+        self.btn_wiki_custom_search = ctk.CTkButton(
+            self.lex_wiki_variant_frame,
+            text="🔍 Autre mot",
+            width=80,
+            height=28,
+            font=ctk.CTkFont(size=11),
+            command=self.on_search_custom_wikipedia
+        )
+        self.btn_wiki_custom_search.pack(side="right")
+        
         # 4. Langues Originales (inside tab_orig)
         self.tab_orig = self.right_tabs.add("📜 Langues Originales")
         
@@ -1077,6 +1106,8 @@ class CenterPanel(ctk.CTkFrame):
                 self.lex_textbox.configure(state="disabled")
                 if hasattr(self, 'lex_wiki_btn'):
                     self.lex_wiki_btn.pack_forget()
+                if hasattr(self, 'lex_wiki_variant_frame'):
+                    self.lex_wiki_variant_frame.pack_forget()
                 if hasattr(self, 'lex_polish_frame'):
                     self.lex_polish_frame.pack_forget()
                 return
@@ -1094,6 +1125,8 @@ class CenterPanel(ctk.CTkFrame):
 
         if hasattr(self, 'lex_wiki_btn'):
             self.lex_wiki_btn.pack_forget()
+        if hasattr(self, 'lex_wiki_variant_frame'):
+            self.lex_wiki_variant_frame.pack_forget()
             
         self.lex_textbox.insert("end", f"{badge}\n", "source_name")
         if title and dict_id != "strong":
@@ -1172,7 +1205,7 @@ class CenterPanel(ctk.CTkFrame):
         save_config(self.config)
 
     def on_polish_dictionary_with_ai(self):
-        """Lance la restauration philologique de l'article de dictionnaire courant via Gemini."""
+        """Lance la restauration philologique de l'article de dictionnaire courant."""
         selected_dict_name = self.selected_lex_dict_var.get()
         if not selected_dict_name or selected_dict_name not in self.current_dict_matches:
             return
@@ -1185,9 +1218,18 @@ class CenterPanel(ctk.CTkFrame):
             return
             
         model = self.lex_polish_model_var.get() or self.config.get("dict_polish_model", "gemini-2.5-flash")
-        api_key = self.config.get("gemini_api_key", "")
         
-        if not api_key:
+        # Vérification préalable des clés selon le fournisseur sélectionné
+        clean_m = model.lower()
+        if (clean_m.startswith("mistral-") or clean_m.startswith("open-mistral-") or clean_m.startswith("codestral-")) and not self.config.get("mistral_api_key"):
+            from gui.settings_modal import SettingsModal
+            SettingsModal(self, self.config, on_save_callback=self._on_settings_saved)
+            return
+        elif ("/" in clean_m or "infomaniak" in clean_m) and not self.config.get("infomaniak_token"):
+            from gui.settings_modal import SettingsModal
+            SettingsModal(self, self.config, on_save_callback=self._on_settings_saved)
+            return
+        elif clean_m.startswith("gemini-") and not self.config.get("gemini_api_key"):
             from gui.settings_modal import SettingsModal
             SettingsModal(self, self.config, on_save_callback=self._on_settings_saved)
             return
@@ -1195,13 +1237,13 @@ class CenterPanel(ctk.CTkFrame):
         self.lex_polish_btn.configure(state="disabled", text="⏳ Polissage IA en cours...")
         threading.Thread(
             target=self._polish_dictionary_thread,
-            args=(m, dict_id, title, raw_text, model, api_key),
+            args=(m, dict_id, title, raw_text, model),
             daemon=True
         ).start()
 
-    def _polish_dictionary_thread(self, m, dict_id, title, raw_text, model, api_key):
+    def _polish_dictionary_thread(self, m, dict_id, title, raw_text, model):
         """Thread d'arrière-plan pour restaurer le texte sans bloquer l'interface."""
-        ok, result = DictionaryPolisher.polish_article(raw_text, title=title, model=model, api_key=api_key)
+        ok, result = DictionaryPolisher.polish_article(raw_text, title=title, model=model, config=self.config)
         if ok:
             DictionaryPolisher.set_polished_entry(dict_id, title, title, result, model)
             m["full_text"] = result
@@ -1219,14 +1261,18 @@ class CenterPanel(ctk.CTkFrame):
     def _render_wikipedia_entry(self, m):
         """Rend l'article Wikipédia sélectionné, en le chargeant en arrière-plan si nécessaire."""
         search_term = m.get("search_term") or m.get("title", "")
+        exact_title = m.get("exact_title")
         self.lex_textbox.insert("end", "🌐 WIKIPÉDIA (ENCYCLOPÉDIE EN LIGNE)\n", "wiki_header")
         
         if not m.get("loaded"):
-            self.lex_textbox.insert("end", f"{search_term}\n\n", "book_title")
+            display_title = exact_title or search_term
+            self.lex_textbox.insert("end", f"{display_title}\n\n", "book_title")
             self.lex_textbox.insert("end", "⏳ Recherche de l'article sur Wikipédia en ligne...\n", "wiki_loading")
             self.lex_textbox.configure(state="disabled")
             if hasattr(self, 'lex_wiki_btn'):
                 self.lex_wiki_btn.pack_forget()
+            if hasattr(self, 'lex_wiki_variant_frame'):
+                self.lex_wiki_variant_frame.pack_forget()
             
             # Lancement asynchrone non bloquant
             threading.Thread(target=self._fetch_wikipedia_thread, args=(m,), daemon=True).start()
@@ -1234,11 +1280,12 @@ class CenterPanel(ctk.CTkFrame):
             
         data = m.get("data") or {}
         if data.get("found"):
-            page_title = data.get("title", search_term)
+            page_title = data.get("title", exact_title or search_term)
             desc = data.get("description", "")
             extract = data.get("extract", "")
             url = data.get("url", "")
             self.current_wiki_url = url
+            candidates = data.get("candidates", [])
             
             self.lex_textbox.insert("end", f"{page_title}\n", "book_title")
             if desc:
@@ -1249,34 +1296,98 @@ class CenterPanel(ctk.CTkFrame):
             self.lex_textbox.insert("end", f"{extract}\n\n", "body")
             
             if url:
-                self.lex_textbox.insert("end", "🔗 Ouvrir l'article complet dans le navigateur (fr.wikipedia.org) ↗\n", "wiki_link")
+                self.lex_textbox.insert("end", "🔗 Ouvrir cet article complet sur fr.wikipedia.org ↗\n\n", "wiki_link")
                 
+            # Section d'homonymes / variantes d'articles si disponibles
+            if candidates:
+                self.lex_textbox.insert("end", "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n", "wiki_sep")
+                self.lex_textbox.insert("end", "🔀 Autres articles correspondants (Homonymes) :\n\n", "wiki_header")
+                
+                # Nettoyer les anciens binds dynamiques
+                for tag in self.lex_textbox._textbox.tag_names():
+                    if tag.startswith("wiki_cand_"):
+                        self.lex_textbox._textbox.tag_delete(tag)
+                        
+                for i, cand in enumerate(candidates[:6]):
+                    c_title = cand.get("title", "")
+                    c_snip = cand.get("snippet", "").strip()
+                    tag_name = f"wiki_cand_{i}"
+                    
+                    self.lex_textbox.insert("end", f"👉 {c_title}\n", tag_name)
+                    if c_snip:
+                        self.lex_textbox.insert("end", f"   {c_snip}\n\n", "wiki_cand_snippet")
+                    else:
+                        self.lex_textbox.insert("end", "\n", "body")
+                        
+                    self.lex_textbox._textbox.tag_configure(
+                        tag_name, 
+                        font=(self.font_family, self.font_size, "bold"), 
+                        foreground="#38BDF8" if (ctk.get_appearance_mode() == "Dark") else "#0284C7", 
+                        underline=True
+                    )
+                    self.lex_textbox._textbox.tag_bind(tag_name, "<Button-1>", lambda e, ct=c_title: self.on_switch_wikipedia_candidate(m, ct))
+                    self.lex_textbox._textbox.tag_bind(tag_name, "<Enter>", lambda e: self.lex_textbox._textbox.config(cursor="hand2"))
+                    self.lex_textbox._textbox.tag_bind(tag_name, "<Leave>", lambda e: self.lex_textbox._textbox.config(cursor=""))
+                    
             self.lex_textbox.configure(state="disabled")
             
+            # Afficher la barre de boutons d'action
             if hasattr(self, 'lex_wiki_btn'):
                 self.lex_wiki_btn.pack(fill="x", pady=(4, 0))
                 btn_lbl = f"🌐 Ouvrir « {page_title} » sur Wikipédia ↗"
                 if len(btn_lbl) > 40:
                     btn_lbl = "🌐 Ouvrir l'article Wikipédia ↗"
                 self.lex_wiki_btn.configure(state="normal", text=btn_lbl)
+                
+            if hasattr(self, 'lex_wiki_variant_frame'):
+                if candidates:
+                    var_values = [page_title] + [c["title"] for c in candidates[:6]]
+                    self.lex_wiki_variant_var.set(page_title)
+                    self.lex_wiki_variant_menu.configure(values=var_values)
+                    self.lex_wiki_variant_frame.pack(fill="x", pady=(4, 0))
+                else:
+                    self.lex_wiki_variant_frame.pack_forget()
         else:
             self.lex_textbox.insert("end", f"{search_term}\n\n", "book_title")
             err = data.get("error") or f"Aucun article trouvé sur Wikipédia pour « {search_term} »."
             self.lex_textbox.insert("end", f"{err}\n\n", "body")
-            self.lex_textbox.insert("end", "💡 Conseil : Vous pouvez vérifier l'orthographe du mot ou essayer un terme plus général.\n", "lex_details")
+            
+            candidates = data.get("candidates", [])
+            if candidates:
+                self.lex_textbox.insert("end", "Suggestions d'articles proches :\n\n", "wiki_header")
+                for i, cand in enumerate(candidates[:6]):
+                    c_title = cand.get("title", "")
+                    tag_name = f"wiki_cand_{i}"
+                    self.lex_textbox.insert("end", f"👉 {c_title}\n\n", tag_name)
+                    self.lex_textbox._textbox.tag_configure(
+                        tag_name, 
+                        font=(self.font_family, self.font_size, "bold"), 
+                        foreground="#38BDF8" if (ctk.get_appearance_mode() == "Dark") else "#0284C7", 
+                        underline=True
+                    )
+                    self.lex_textbox._textbox.tag_bind(tag_name, "<Button-1>", lambda e, ct=c_title: self.on_switch_wikipedia_candidate(m, ct))
+                    self.lex_textbox._textbox.tag_bind(tag_name, "<Enter>", lambda e: self.lex_textbox._textbox.config(cursor="hand2"))
+                    self.lex_textbox._textbox.tag_bind(tag_name, "<Leave>", lambda e: self.lex_textbox._textbox.config(cursor=""))
+            else:
+                self.lex_textbox.insert("end", "💡 Conseil : Vous pouvez vérifier l'orthographe ou utiliser le bouton « Autre mot ».\n", "lex_details")
+                
             self.lex_textbox.configure(state="disabled")
             if hasattr(self, 'lex_wiki_btn'):
                 self.lex_wiki_btn.pack_forget()
+            if hasattr(self, 'lex_wiki_variant_frame'):
+                self.lex_wiki_variant_frame.pack_forget()
                 
         # Configurer le bouton d'analyse IA
-        self.last_selected_strong = (m, search_term)
-        self.lex_ai_btn.configure(state="normal", text=f"🤖 Analyser « {search_term} » avec l'IA")
+        first_title = (data.get("title") if data.get("found") else None) or search_term
+        self.last_selected_strong = (m, first_title)
+        self.lex_ai_btn.configure(state="normal", text=f"🤖 Analyser « {first_title} » avec l'IA")
 
     def _fetch_wikipedia_thread(self, m):
         """Thread travailleur pour interroger Wikipédia sans ralentir l'UI."""
         try:
             term = m.get("search_term") or m.get("title", "")
-            res = WikipediaClient.get_summary(term)
+            exact = m.get("exact_title")
+            res = WikipediaClient.get_summary(term, exact_title=exact)
             m["data"] = res
             m["loaded"] = True
         except Exception as e:
@@ -1290,6 +1401,39 @@ class CenterPanel(ctk.CTkFrame):
         current_selection = self.selected_lex_dict_var.get()
         if current_selection in self.current_dict_matches and self.current_dict_matches[current_selection] is m:
             self.render_selected_dictionary_view()
+
+    def on_switch_wikipedia_candidate(self, m, chosen_title):
+        """Bascule immédiatement l'affichage vers un autre article Wikipédia candidat."""
+        if not chosen_title or chosen_title == m.get("data", {}).get("title"):
+            return
+        m["exact_title"] = chosen_title
+        m["loaded"] = False
+        m["data"] = None
+        self.render_selected_dictionary_view()
+
+    def on_wiki_variant_selected(self, choice):
+        """Appelé lors de la sélection d'une variante d'article dans le menu déroulant."""
+        selected_dict_name = self.selected_lex_dict_var.get()
+        if selected_dict_name in self.current_dict_matches:
+            m = self.current_dict_matches[selected_dict_name]
+            self.on_switch_wikipedia_candidate(m, choice)
+
+    def on_search_custom_wikipedia(self):
+        """Ouvre un dialogue rapide pour rechercher n'importe quel terme sur Wikipédia."""
+        dialog = ctk.CTkInputDialog(text="Entrez le mot ou sujet à chercher sur Wikipédia :", title="Recherche Wikipédia")
+        val = dialog.get_input()
+        if val and val.strip():
+            clean_v = val.strip()
+            match_data = {"word": clean_v, "title": clean_v}
+            self.display_dictionary_entry(match_data)
+            wiki_key = None
+            for k in self.current_dict_matches:
+                if self.current_dict_matches[k].get("dict_id") == "wikipedia":
+                    wiki_key = k
+                    break
+            if wiki_key:
+                self.selected_lex_dict_var.set(wiki_key)
+                self.render_selected_dictionary_view()
 
     def on_open_wikipedia_web(self):
         """Ouvre l'URL de l'article Wikipédia courant dans le navigateur par défaut."""
@@ -2468,6 +2612,11 @@ class CenterPanel(ctk.CTkFrame):
             self.lex_textbox._textbox.tag_configure("wiki_desc", font=(self.font_family, max(10, self.font_size - 2), "italic"), foreground=wiki_desc_col, justify="center", spacing1=2, spacing3=8)
             self.lex_textbox._textbox.tag_configure("wiki_link", font=(self.font_family, self.font_size, "bold"), foreground=wiki_link_col, underline=True, spacing1=8, spacing3=8)
             self.lex_textbox._textbox.tag_configure("wiki_loading", font=(self.font_family, self.font_size, "italic"), foreground=wiki_loading_col, spacing1=8)
+            
+            wiki_cand_snip_col = "#94A3B8" if is_dark else "#64748B"
+            wiki_sep_col = "#475569" if is_dark else "#CBD5E1"
+            self.lex_textbox._textbox.tag_configure("wiki_cand_snippet", font=(self.font_family, max(9, self.font_size - 3), "italic"), foreground=wiki_cand_snip_col, spacing1=1, spacing3=4)
+            self.lex_textbox._textbox.tag_configure("wiki_sep", foreground=wiki_sep_col, justify="center")
             
             polish_badge_col = "#C084FC" if is_dark else "#7C3AED"
             self.lex_textbox._textbox.tag_configure("polish_badge", font=(self.font_family, max(9, self.font_size - 3), "bold"), foreground=polish_badge_col, justify="center", spacing1=4, spacing3=10)

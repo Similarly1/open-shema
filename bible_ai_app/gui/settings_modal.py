@@ -9,6 +9,7 @@ from tkinter import messagebox
 from gui import native_dialog as filedialog
 from core.config import load_config, save_config
 from core.dictionary_manager import DictionaryManager
+from core.dictionary_polisher import AVAILABLE_POLISH_MODELS
 
 # Composants inclus dans la sauvegarde complète
 _BACKUP_MANIFEST_VERSION = "1.0"
@@ -273,13 +274,7 @@ class SettingsTab(ctk.CTkScrollableFrame):
         self.dict_polish_model_menu = ctk.CTkOptionMenu(
             self,
             variable=self.dict_polish_model_var,
-            values=[
-                "gemini-2.5-flash",
-                "gemini-2.5-flash-lite",
-                "gemini-3.7-flash",
-                "gemini-3.5-flash",
-                "gemini-3.5-flash-lite"
-            ]
+            values=[m[0] for m in AVAILABLE_POLISH_MODELS]
         )
         self.dict_polish_model_menu.pack(fill="x", padx=20, pady=5)
         

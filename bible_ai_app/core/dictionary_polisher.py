@@ -29,11 +29,25 @@ Règles impératives de restauration :
    - Rends directement le texte restauré en Markdown prêt à l'affichage, sans préambule ni méta-commentaires."""
 
 AVAILABLE_POLISH_MODELS = [
-    ("gemini-2.5-flash", "⚡ Gemini 2.5 Flash (Rapide & Économe - Recommandé)"),
-    ("gemini-2.5-flash-lite", "⚡ Gemini 2.5 Flash-Lite (Ultra-rapide)"),
-    ("gemini-3.7-flash", "🧠 Gemini 3.7 Flash (Haute Précision Exégétique)"),
-    ("gemini-3.5-flash", "🧠 Gemini 3.5 Flash"),
-    ("gemini-3.5-flash-lite", "⚡ Gemini 3.5 Flash-Lite")
+    # Google Gemini
+    ("gemini-2.5-flash", "⚡ Gemini 2.5 Flash (Google - Recommandé)"),
+    ("gemini-2.5-flash-lite", "⚡ Gemini 2.5 Flash-Lite (Google)"),
+    ("gemini-3.7-flash", "🧠 Gemini 3.7 Flash (Google)"),
+    ("gemini-3.5-flash", "🧠 Gemini 3.5 Flash (Google)"),
+    ("gemini-3.5-flash-lite", "⚡ Gemini 3.5 Flash-Lite (Google)"),
+    
+    # Mistral AI
+    ("mistral-small-latest", "🇫🇷 Mistral Small (Mistral AI)"),
+    ("mistral-large-latest", "🇫🇷 Mistral Large (Mistral AI)"),
+    ("open-mistral-nemo", "🇫🇷 Mistral Nemo (Mistral AI)"),
+    ("codestral-latest", "🇫🇷 Codestral (Mistral AI)"),
+    
+    # Infomaniak Swiss AI
+    ("mistralai/Ministral-3-14B-Instruct-2512", "🇨🇭 Ministral 14B (Infomaniak)"),
+    ("mistralai/Mistral-Small-24B-Instruct-2501", "🇨🇭 Mistral Small 24B (Infomaniak)"),
+    ("meta-llama/Llama-3.3-70B-Instruct", "🇨🇭 Llama 3.3 70B (Infomaniak)"),
+    ("meta-llama/Llama-3.1-8B-Instruct", "🇨🇭 Llama 3.1 8B (Infomaniak)"),
+    ("Qwen/Qwen2.5-72B-Instruct", "🇨🇭 Qwen 2.5 72B (Infomaniak)")
 ]
 
 class DictionaryPolisher:
@@ -97,18 +111,30 @@ class DictionaryPolisher:
         cls.save_cache()
 
     @classmethod
-    def polish_article(cls, raw_text, title="", model="gemini-2.5-flash", api_key=None):
+    def _clean_markdown_fences(cls, text):
+        if not text:
+            return ""
+        cleaned = text.strip()
+        if cleaned.startswith("```"):
+            cleaned = re.sub(r"^```(?:markdown|md)?\s*\n?", "", cleaned, flags=re.IGNORECASE)
+            cleaned = re.sub(r"\n?```\s*$", "", cleaned)
+        return cleaned.strip()
+
+    @classmethod
+    def polish_article(cls, raw_text, title="", model="gemini-2.5-flash", config=None, api_key=None):
         """
-        Envoie le texte brut au modèle sélectionné pour restauration philologique.
+        Envoie le texte brut au modèle sélectionné (Google Gemini, Mistral AI ou Infomaniak Swiss AI).
         Retourne (success: bool, result_or_error: str).
         """
-        if not api_key:
-            return False, "Clé API Gemini non configurée dans les paramètres."
-            
+        if config is None:
+            try:
+                from core.config import load_config
+                config = load_config()
+            except Exception:
+                config = {}
+                
         clean_model = model.strip()
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{clean_model}:generateContent?key={api_key}"
-        
-        user_prompt = f"""Notice à restaurer :
+        user_prompt = f"""Notice de dictionnaire à restaurer :
 TITRE : {title or 'Article de Dictionnaire'}
 
 TEXTE BRUT ORIGINAL :
@@ -116,49 +142,121 @@ TEXTE BRUT ORIGINAL :
 {raw_text}
 \"\"\"
 """
-        payload = {
-            "systemInstruction": {
-                "parts": [{"text": POLISH_SYSTEM_PROMPT}]
-            },
-            "contents": [
-                {
-                    "role": "user",
-                    "parts": [{"text": user_prompt}]
-                }
-            ],
-            "generationConfig": {
-                "temperature": 0.2,
-                "topP": 0.95
+
+        # 1. Fournisseur MISTRAL AI
+        if clean_model.startswith("mistral-") or clean_model.startswith("open-mistral-") or clean_model.startswith("codestral-") or clean_model.startswith("pixtral-"):
+            m_key = config.get("mistral_api_key") or api_key
+            if not m_key:
+                return False, "Clé API Mistral non configurée dans les paramètres."
+                
+            url = "https://api.mistral.ai/v1/chat/completions"
+            headers = {
+                "Authorization": f"Bearer {m_key}",
+                "Content-Type": "application/json"
             }
-        }
-        
-        try:
-            resp = requests.post(url, json=payload, timeout=45)
-            if resp.status_code == 200:
-                data = resp.json()
-                candidates = data.get("candidates", [])
-                if candidates and "content" in candidates[0]:
-                    parts = candidates[0]["content"].get("parts", [])
-                    if parts and "text" in parts[0]:
-                        polished_text = parts[0]["text"].strip()
-                        return True, polished_text
-                return False, "Réponse de l'API vide ou invalide."
-            else:
-                # Fallback si systemInstruction n'est pas supporté sur certains endpoints
-                fallback_prompt = f"{POLISH_SYSTEM_PROMPT}\n\n---\n\n{user_prompt}"
-                fallback_payload = {
-                    "contents": [{"parts": [{"text": fallback_prompt}]}],
-                    "generationConfig": {"temperature": 0.2}
+            payload = {
+                "model": clean_model,
+                "messages": [
+                    {"role": "system", "content": POLISH_SYSTEM_PROMPT},
+                    {"role": "user", "content": user_prompt}
+                ],
+                "temperature": 0.2
+            }
+            try:
+                resp = requests.post(url, headers=headers, json=payload, timeout=60)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    content = data["choices"][0]["message"]["content"].strip()
+                    return True, cls._clean_markdown_fences(content)
+                return False, f"Erreur API Mistral ({resp.status_code}) : {resp.text}"
+            except requests.exceptions.Timeout:
+                return False, "Délai d'attente dépassé pour Mistral AI (timeout)."
+            except Exception as e:
+                return False, f"Erreur de communication Mistral : {e}"
+
+        # 2. Fournisseur INFOMANIAK (Swiss AI)
+        elif "/" in clean_model or clean_model.startswith("infomaniak/") or "llama" in clean_model.lower() or "ministral" in clean_model.lower() or "qwen" in clean_model.lower():
+            info_token = config.get("infomaniak_token")
+            product_id = config.get("infomaniak_product_id") or "251"
+            if not info_token:
+                return False, "Token Infomaniak non configuré dans les paramètres."
+                
+            clean_info_model = clean_model.replace("infomaniak/", "").strip()
+            url = f"https://api.infomaniak.com/2/ai/{product_id}/openai/v1/chat/completions"
+            headers = {
+                "Authorization": f"Bearer {info_token}",
+                "Content-Type": "application/json"
+            }
+            payload = {
+                "model": clean_info_model,
+                "messages": [
+                    {"role": "system", "content": POLISH_SYSTEM_PROMPT},
+                    {"role": "user", "content": user_prompt}
+                ],
+                "temperature": 0.2
+            }
+            try:
+                resp = requests.post(url, headers=headers, json=payload, timeout=60)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    content = data["choices"][0]["message"]["content"].strip()
+                    return True, cls._clean_markdown_fences(content)
+                return False, f"Erreur API Infomaniak ({resp.status_code}) : {resp.text}"
+            except requests.exceptions.Timeout:
+                return False, "Délai d'attente dépassé pour Infomaniak (timeout)."
+            except Exception as e:
+                return False, f"Erreur de communication Infomaniak : {e}"
+
+        # 3. Fournisseur GOOGLE GEMINI (Par défaut)
+        else:
+            g_key = config.get("gemini_api_key") or api_key
+            if not g_key:
+                return False, "Clé API Gemini non configurée dans les paramètres."
+                
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{clean_model}:generateContent?key={g_key}"
+            payload = {
+                "systemInstruction": {
+                    "parts": [{"text": POLISH_SYSTEM_PROMPT}]
+                },
+                "contents": [
+                    {
+                        "role": "user",
+                        "parts": [{"text": user_prompt}]
+                    }
+                ],
+                "generationConfig": {
+                    "temperature": 0.2,
+                    "topP": 0.95
                 }
-                fb_resp = requests.post(url, json=fallback_payload, timeout=45)
-                if fb_resp.status_code == 200:
-                    fb_data = fb_resp.json()
-                    fb_candidates = fb_data.get("candidates", [])
-                    if fb_candidates and "content" in fb_candidates[0]:
-                        polished_text = fb_candidates[0]["content"]["parts"][0]["text"].strip()
-                        return True, polished_text
-                return False, f"Erreur API Gemini ({resp.status_code}) : {resp.text}"
-        except requests.exceptions.Timeout:
-            return False, "Délai d'attente dépassé (timeout). Veuillez réessayer."
-        except Exception as e:
-            return False, f"Erreur lors du polissage : {e}"
+            }
+            
+            try:
+                resp = requests.post(url, json=payload, timeout=45)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    candidates = data.get("candidates", [])
+                    if candidates and "content" in candidates[0]:
+                        parts = candidates[0]["content"].get("parts", [])
+                        if parts and "text" in parts[0]:
+                            polished_text = parts[0]["text"].strip()
+                            return True, cls._clean_markdown_fences(polished_text)
+                    return False, "Réponse de l'API Gemini vide ou invalide."
+                else:
+                    # Fallback si systemInstruction n'est pas supporté
+                    fallback_prompt = f"{POLISH_SYSTEM_PROMPT}\n\n---\n\n{user_prompt}"
+                    fallback_payload = {
+                        "contents": [{"parts": [{"text": fallback_prompt}]}],
+                        "generationConfig": {"temperature": 0.2}
+                    }
+                    fb_resp = requests.post(url, json=fallback_payload, timeout=45)
+                    if fb_resp.status_code == 200:
+                        fb_data = fb_resp.json()
+                        fb_candidates = fb_data.get("candidates", [])
+                        if fb_candidates and "content" in fb_candidates[0]:
+                            polished_text = fb_candidates[0]["content"]["parts"][0]["text"].strip()
+                            return True, cls._clean_markdown_fences(polished_text)
+                    return False, f"Erreur API Gemini ({resp.status_code}) : {resp.text}"
+            except requests.exceptions.Timeout:
+                return False, "Délai d'attente dépassé (timeout). Veuillez réessayer."
+            except Exception as e:
+                return False, f"Erreur lors du polissage : {e}"
