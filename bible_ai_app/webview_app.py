@@ -146,12 +146,46 @@ class BibleAppApi:
         verses_list = []
         sorted_verses = sorted(verses_dict.keys(), key=lambda x: int(x) if x.isdigit() else 999)
         
+        orig_mgr = OriginalLanguagesManager.get_instance()
+        is_orig_installed = orig_mgr.is_installed()
+
         for v_str in sorted_verses:
             v_raw = verses_dict[v_str]
             v_text = extract_verse_text(v_raw)
+            v_num = int(v_str) if v_str.isdigit() else v_str
+
+            words_data = []
+            if is_orig_installed and isinstance(v_num, int):
+                orig_words = orig_mgr.get_verse_original_words(book_code, ch_int, v_num)
+                for w in orig_words:
+                    words_data.append({
+                        "surface": w.get("gloss") or w.get("text", ""),
+                        "orig": w.get("text", ""),
+                        "translit": w.get("transliteration", ""),
+                        "lemma": w.get("lemma", ""),
+                        "strong": w.get("strong", ""),
+                        "morph": w.get("morph_desc_fr", ""),
+                        "lang": w.get("lang", "")
+                    })
+
+            if not words_data:
+                # Mots de surface de base si la base STEPBible n'est pas encore téléchargée
+                for token in v_text.split():
+                    clean_tok = token.strip(" ,;:.?!«»()\"'")
+                    words_data.append({
+                        "surface": token,
+                        "orig": clean_tok,
+                        "translit": "",
+                        "lemma": clean_tok,
+                        "strong": "",
+                        "morph": "",
+                        "lang": "fr"
+                    })
+
             verses_list.append({
-                "verse": int(v_str) if v_str.isdigit() else v_str,
-                "text": v_text
+                "verse": v_num,
+                "text": v_text,
+                "words": words_data
             })
 
         return {

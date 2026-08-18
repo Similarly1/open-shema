@@ -1,12 +1,12 @@
 /**
  * Bible Reader Engine
- * Gère l'affichage du texte biblique, le split-pane, l'interlinéaire et les interactions versets.
+ * Gère l'affichage du texte biblique, le split-pane, l'interlinéaire, le choix de version et les interactions versets.
  */
 
 const BibleReader = {
   currentBook: 'Gen',
   currentChapter: 1,
-  currentBible1: 'TOB 2010',
+  currentBible1: 'Colombe',
   currentBible2: 'Segond 21',
   
   isSplitView: false,
@@ -14,6 +14,8 @@ const BibleReader = {
   zoomPercent: 100,
 
   selectedVerse: null,
+  installedBibles: [],
+  targetPaneForPicker: 1,
 
   async init() {
     this.bindEvents();
@@ -23,13 +25,13 @@ const BibleReader = {
       this.navigateTo(bookCode, chNum);
     });
 
-    // Charger le premier chapitre dès que l'API est prête
+    // Charger les Bibles dès que l'API est prête
     API.onReady(async () => {
-      const bibles = await API.getInstalledBibles();
-      if (bibles && bibles.length > 0) {
-        this.currentBible1 = bibles[0].name;
-        if (bibles.length > 1) {
-          this.currentBible2 = bibles[1].name;
+      this.installedBibles = await API.getInstalledBibles() || [];
+      if (this.installedBibles.length > 0) {
+        this.currentBible1 = this.installedBibles[0].name;
+        if (this.installedBibles.length > 1) {
+          this.currentBible2 = this.installedBibles[1].name;
         }
       }
       this.loadChapter();
@@ -68,6 +70,28 @@ const BibleReader = {
       this.toggleSplitView(false);
     });
 
+    // Choix de version biblique (Pane 1 et Pane 2)
+    document.getElementById('pane-1-select-bible').addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.openBiblePicker(1);
+    });
+
+    document.getElementById('pane-2-select-bible').addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.openBiblePicker(2);
+    });
+
+    document.getElementById('btn-close-bible-picker').addEventListener('click', () => {
+      this.closeBiblePicker();
+    });
+
+    document.addEventListener('click', (e) => {
+      const picker = document.getElementById('bible-version-picker-popover');
+      if (picker && !picker.classList.contains('hidden') && !picker.contains(e.target)) {
+        this.closeBiblePicker();
+      }
+    });
+
     // Zoom
     document.getElementById('btn-zoom-in').addEventListener('click', () => {
       this.setZoom(this.zoomPercent + 10);
@@ -94,6 +118,49 @@ const BibleReader = {
         }
       }
     });
+  },
+
+  openBiblePicker(paneNum) {
+    this.targetPaneForPicker = paneNum;
+    const popover = document.getElementById('bible-version-picker-popover');
+    const listEl = document.getElementById('version-list-items');
+    listEl.innerHTML = '';
+
+    const currentSelected = paneNum === 1 ? this.currentBible1 : this.currentBible2;
+
+    this.installedBibles.forEach(b => {
+      const btn = document.createElement('button');
+      btn.className = `version-row-btn ${b.name === currentSelected ? 'active' : ''}`;
+      btn.innerHTML = `
+        <span>${b.name}</span>
+        <span style="font-size: 10px; opacity: 0.7;">${b.version_code || 'BIBLE'}</span>
+      `;
+      btn.addEventListener('click', () => {
+        this.selectBibleVersion(b.name);
+      });
+      listEl.appendChild(btn);
+    });
+
+    popover.classList.remove('hidden');
+  },
+
+  closeBiblePicker() {
+    document.getElementById('bible-version-picker-popover').classList.add('hidden');
+  },
+
+  selectBibleVersion(versionName) {
+    this.closeBiblePicker();
+    if (this.targetPaneForPicker === 1) {
+      this.currentBible1 = versionName;
+      // Mettre à jour le 1er onglet
+      const tab1 = document.querySelector('.tab[data-tab-id="tab-1"] .tab-title');
+      if (tab1) tab1.textContent = versionName;
+    } else {
+      this.currentBible2 = versionName;
+      const tab2 = document.querySelector('.tab[data-tab-id="tab-2"] .tab-title');
+      if (tab2) tab2.textContent = versionName;
+    }
+    this.loadChapter();
   },
 
   async navigateTo(bookCode, chapterNum) {
@@ -144,20 +211,31 @@ const BibleReader = {
       vSpan.className = 'verse-item';
       vSpan.dataset.verseNum = v.verse;
 
-      if (this.isInterlinear && v.words) {
-        // Mode Interlinéaire Inversé
+      if (this.isInterlinear && v.words && v.words.length > 0) {
+        // Mode Interlinéaire Inversé Logos
         let wordsHtml = '';
         v.words.forEach(w => {
           wordsHtml += `
-            <div class="interlinear-block" title="Strong: ${w.strong || ''}">
+            <div class="interlinear-block" data-strong="${w.strong || ''}" data-word="${w.orig || w.surface}" title="${w.morph || ''}">
               <span class="interlinear-surface">${w.surface}</span>
-              <span class="interlinear-lemma">${w.lemma || ''}</span>
-              <span class="interlinear-translit">${w.translit || ''}</span>
+              ${w.orig && w.orig !== w.surface ? `<span class="interlinear-lemma">${w.orig}</span>` : ''}
+              ${w.translit ? `<span class="interlinear-translit">${w.translit}</span>` : ''}
               ${w.strong ? `<span class="interlinear-strong">${w.strong}</span>` : ''}
             </div>
           `;
         });
         vSpan.innerHTML = `<sup class="verse-num">${v.verse}</sup> ${wordsHtml}`;
+
+        // Clic sur mot interlinéaire -> ouvrir Strong / Lexique
+        vSpan.querySelectorAll('.interlinear-block').forEach(block => {
+          block.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const strongCode = block.dataset.strong;
+            const word = block.dataset.word;
+            this.lookupWordInLexicon(word, strongCode);
+          });
+        });
+
       } else {
         // Mode de lecture continue Logos
         const isFirst = index === 0;
@@ -180,6 +258,32 @@ const BibleReader = {
 
     // Appliquer le zoom
     versesEl.style.fontSize = `${19 * (this.zoomPercent / 100)}px`;
+  },
+
+  async lookupWordInLexicon(word, strongCode) {
+    const drawer = document.getElementById('right-drawer');
+    drawer.classList.remove('collapsed');
+    document.querySelector('.drawer-tab[data-drawer-tab="lexicon"]').click();
+
+    const container = document.getElementById('lexicon-details');
+    container.innerHTML = `<div style="padding: 20px; color: var(--text-muted);">Recherche lexicale pour « ${word} » (${strongCode || ''})...</div>`;
+
+    try {
+      const entry = await API.call('lookup_dictionary', word, strongCode);
+      if (entry) {
+        container.innerHTML = `
+          <div style="padding: 16px;">
+            <div style="font-size: 18px; font-weight: 800; color: var(--accent-blue); margin-bottom: 4px;">${entry.title}</div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--accent-orange); margin-bottom: 12px;">${entry.badge}</div>
+            <div style="font-family: var(--font-bible); font-size: 15px; line-height: 1.65; color: #334155;">${entry.full_text.replace(/\n\n/g, '<br><br>')}</div>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `<div style="padding: 20px; color: var(--text-muted);">Aucune entrée lexicale trouvée pour ce terme.</div>`;
+      }
+    } catch (e) {
+      container.innerHTML = `<div style="padding: 20px; color: var(--accent-red);">Erreur lors de la consultation.</div>`;
+    }
   },
 
   async loadCommentariesForVerse(verseNum) {
