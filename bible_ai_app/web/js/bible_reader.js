@@ -1060,12 +1060,16 @@ const BibleReader = {
     workspace?.classList.toggle('split-view', this.isSplitView);
     document.getElementById('btn-toggle-split')?.classList.toggle('active', this.isSplitView);
 
+    const btnSync = document.getElementById('btn-toggle-sync-scroll');
     if (this.isSplitView) {
+      btnSync?.classList.remove('hidden');
+      if (this.isScrollSynced) {
+        btnSync?.classList.add('active');
+      }
       this.updatePaneHeader(2);
       this.reloadPane2();
-      if (this.isScrollSynced) {
-        document.getElementById('btn-toggle-sync-scroll')?.classList.add('active');
-      }
+    } else {
+      btnSync?.classList.add('hidden');
     }
   },
 
@@ -1577,9 +1581,11 @@ const BibleReader = {
     this.installedBibles.forEach(b => {
       const btn = document.createElement('button');
       btn.className = `version-row-btn ${b.name === currentSelected ? 'active' : ''}`;
+      const displayTitle = b.title || b.name;
+      const displayCode = b.version_code || b.name;
       btn.innerHTML = `
-        <span>${b.name}</span>
-        <span style="font-size: 10px; opacity: 0.7;">${b.version_code || 'BIBLE'}</span>
+        <span class="version-name-full" title="${displayTitle}">${displayTitle}</span>
+        <span class="version-badge-code">${displayCode}</span>
       `;
       btn.addEventListener('click', () => {
         this.selectBibleVersion(b.name);
@@ -1618,26 +1624,89 @@ const BibleReader = {
     this.navigateTo(this.currentBook, this.currentChapter);
   },
 
-  toggleSplitView(forceState = null) {
-    this.isSplitView = forceState !== null ? forceState : !this.isSplitView;
-    const paneRight = document.getElementById('pane-right');
-    const btnSplit = document.getElementById('btn-toggle-split');
-
-    if (this.isSplitView) {
-      paneRight.classList.remove('hidden');
-      btnSplit.classList.add('active');
-    } else {
-      paneRight.classList.add('hidden');
-      btnSplit.classList.remove('active');
+  goToNextChapter() {
+    const next = getNextChapterCoord(this.currentBook, this.currentChapter);
+    if (next) {
+      this.navigateTo(next.book, next.chapter);
     }
-    this.navigateTo(this.currentBook, this.currentChapter);
   },
 
-  setZoom(percent) {
-    this.zoomPercent = Math.max(70, Math.min(180, percent));
-    document.getElementById('lbl-zoom-level').textContent = `${this.zoomPercent}%`;
-    document.querySelectorAll('.verses-flow').forEach(el => {
-      el.style.fontSize = `${19 * (this.zoomPercent / 100)}px`;
-    });
+  goToPrevChapter() {
+    const prev = getPrevChapterCoord(this.currentBook, this.currentChapter);
+    if (prev) {
+      this.navigateTo(prev.book, prev.chapter);
+    }
+  },
+
+  selectNextVerse() {
+    const pane1 = document.getElementById('pane-1-content');
+    if (!pane1) return;
+    const allVerses = Array.from(pane1.querySelectorAll('.verse-item'));
+    if (allVerses.length === 0) return;
+
+    let selected = pane1.querySelector('.verse-item.selected');
+    let nextIdx = 0;
+
+    if (selected) {
+      const curIdx = allVerses.indexOf(selected);
+      if (curIdx >= 0 && curIdx < allVerses.length - 1) {
+        nextIdx = curIdx + 1;
+      } else {
+        nextIdx = allVerses.length - 1;
+      }
+    } else {
+      const topV = this.getTopVisibleVerse(pane1);
+      if (topV && topV.element) {
+        const topIdx = allVerses.indexOf(topV.element);
+        nextIdx = Math.min(allVerses.length - 1, topIdx + 1);
+      }
+    }
+
+    allVerses.forEach(el => el.classList.remove('selected'));
+    const target = allVerses[nextIdx];
+    if (target) {
+      target.classList.add('selected');
+      target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      const vNum = target.dataset.verseNum;
+      const bCode = target.dataset.bookCode || this.currentBook;
+      const ch = target.dataset.chapter || this.currentChapter;
+      this.loadCommentariesForVerse(vNum, bCode, ch);
+    }
+  },
+
+  selectPrevVerse() {
+    const pane1 = document.getElementById('pane-1-content');
+    if (!pane1) return;
+    const allVerses = Array.from(pane1.querySelectorAll('.verse-item'));
+    if (allVerses.length === 0) return;
+
+    let selected = pane1.querySelector('.verse-item.selected');
+    let prevIdx = 0;
+
+    if (selected) {
+      const curIdx = allVerses.indexOf(selected);
+      if (curIdx > 0) {
+        prevIdx = curIdx - 1;
+      } else {
+        prevIdx = 0;
+      }
+    } else {
+      const topV = this.getTopVisibleVerse(pane1);
+      if (topV && topV.element) {
+        const topIdx = allVerses.indexOf(topV.element);
+        prevIdx = Math.max(0, topIdx - 1);
+      }
+    }
+
+    allVerses.forEach(el => el.classList.remove('selected'));
+    const target = allVerses[prevIdx];
+    if (target) {
+      target.classList.add('selected');
+      target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      const vNum = target.dataset.verseNum;
+      const bCode = target.dataset.bookCode || this.currentBook;
+      const ch = target.dataset.chapter || this.currentChapter;
+      this.loadCommentariesForVerse(vNum, bCode, ch);
+    }
   }
 };

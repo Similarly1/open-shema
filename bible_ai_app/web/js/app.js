@@ -189,15 +189,33 @@ const App = {
 
   bindKeyboardShortcuts() {
     window.addEventListener('keydown', (e) => {
+      const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+      const isInput = tag === 'input' || tag === 'textarea' || tag === 'select' || (document.activeElement && document.activeElement.isContentEditable);
+      
+      // Ne pas intercepter si l'utilisateur saisit du texte
+      if (isInput) return;
+
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
         e.preventDefault();
-        document.getElementById('quick-passage-input').focus();
+        document.getElementById('quick-passage-input')?.focus();
+        return;
       }
-      if (e.altKey && e.key === 'ArrowLeft') {
-        document.getElementById('btn-history-back').click();
-      }
-      if (e.altKey && e.key === 'ArrowRight') {
-        document.getElementById('btn-history-forward').click();
+
+      // Raccourcis navigation en mode Bible
+      if (this.activeView === 'bible') {
+        if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          BibleReader.goToNextChapter();
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          BibleReader.goToPrevChapter();
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          BibleReader.selectNextVerse();
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          BibleReader.selectPrevVerse();
+        }
       }
     });
   }

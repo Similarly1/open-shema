@@ -125,6 +125,29 @@ def parse_reverse_interlinear_verse(v_raw: str) -> List[Dict[str, Any]]:
     return words_data
 
 
+BIBLE_CANONICAL_INFO = {
+    "Colombe":   ("Bible à la Colombe (1978)", "COL"),
+    "Chouraqui": ("Traduction André Chouraqui (1985)", "CHOU"),
+    "Segond 21": ("Bible Segond 21 (2007)", "S21"),
+    "BDS":       ("Bible du Semeur (2015)", "BDS"),
+    "NBS":       ("Nouvelle Bible Segond (2002)", "NBS"),
+    "NFC":       ("Nouvelle Français Courant (2019)", "NFC"),
+    "PDV2017":   ("Parole de Vie (2017)", "PDV"),
+    "NEG79":     ("Nouvelle Édition de Genève (1979)", "NEG"),
+    "PV":        ("Parole Vivante (Alfred Kuen)", "PV"),
+    "NCL":       ("Néo-Crampon Libre", "NCL"),
+    "SV":        ("Sagesse Vivante", "SV"),
+    "BENFS":     ("Bible en Français Simple", "BFS"),
+    "JXLFR":     ("Juxtalinéaire Grec-Français (Xenizo)", "JXL"),
+    "APEE":      ("Bible de l'Épée (King James Française)", "APEE"),
+    "OST":       ("Bible J.F. Ostervald (1877/1996)", "OST"),
+    "LSG":       ("Louis Segond 1910 (Codes Strong)", "LSG"),
+    "DARBY":     ("Bible J.N. Darby (Codes Strong)", "DARBY"),
+    "TOB":       ("Traduction Œcuménique de la Bible (2010)", "TOB"),
+    "BDJ":       ("Bible de Jérusalem", "BDJ"),
+}
+
+
 class BibleAppApi:
     """
     API Bridge exposée au Frontend Webview JavaScript.
@@ -139,29 +162,33 @@ class BibleAppApi:
     # =========================================================================
 
     def get_installed_bibles(self) -> List[Dict[str, Any]]:
-        """Retourne la liste des Bibles installées dans la bibliothèque."""
+        """Retourne la liste des Bibles installées dans la bibliothèque avec titres complets et sigles clairs."""
         registry = load_books_metadata()
         bibles = []
         for name, meta in registry.items():
             if meta.get("type") == "Bible" and meta.get("active", True):
+                default_title, default_code = BIBLE_CANONICAL_INFO.get(name, (meta.get("title", name), meta.get("version_code", name)))
+                full_title = meta.get("title") if meta.get("title") and meta.get("title") != name else default_title
+                code = meta.get("version_code") or default_code
                 bibles.append({
                     "id": meta.get("folder_name", name),
                     "name": name,
-                    "title": meta.get("title", name),
+                    "title": full_title,
                     "author": meta.get("author", ""),
-                    "version_code": meta.get("version_code", "BIBLE")
+                    "version_code": code
                 })
         
         # Si vide, fallback sur les dossiers JSON
         if not bibles:
             installed = BibleJsonLoader.list_installed_bibles()
             for b in installed:
+                default_title, default_code = BIBLE_CANONICAL_INFO.get(b, (b.replace("_", " "), b))
                 bibles.append({
                     "id": b,
                     "name": b.replace("_", " "),
-                    "title": b.replace("_", " "),
+                    "title": default_title,
                     "author": "",
-                    "version_code": b
+                    "version_code": default_code
                 })
         return bibles
 

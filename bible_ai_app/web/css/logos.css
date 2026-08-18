@@ -2111,8 +2111,8 @@ input:checked + .slider.round:before {
   position: absolute;
   top: 75px;
   right: 40px;
-  width: 320px;
-  max-height: 420px;
+  width: 380px;
+  max-height: 440px;
   background-color: #FFFFFF;
   border: 1px solid var(--border-color);
   border-radius: 8px;
@@ -2148,7 +2148,8 @@ input:checked + .slider.round:before {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 12px;
+  gap: 12px;
+  padding: 7px 12px;
   border: none;
   background: transparent;
   border-radius: 6px;
@@ -2165,6 +2166,26 @@ input:checked + .slider.round:before {
   background-color: var(--accent-blue);
   color: white;
   font-weight: 600;
+}
+.version-row-btn .version-name-full {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.version-row-btn .version-badge-code {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--bg-hover);
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.version-row-btn.active .version-badge-code {
+  background: rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
 }
 
 /* Modal Dialog (Style Logos) */
