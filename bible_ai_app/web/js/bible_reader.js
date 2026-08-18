@@ -896,6 +896,8 @@ const BibleReader = {
   currentBible2: 'Segond 21',
   
   isSplitView: false,
+  isScrollSynced: true,
+  isSyncingScroll: false,
   isInterlinear: false,
   interlinearVersion: 'LSG',
   interlinearLayers: { surface: true, orig: true, translit: true, strong: true },
@@ -952,6 +954,15 @@ const BibleReader = {
 
     document.getElementById('btn-toggle-split')?.addEventListener('click', () => {
       this.toggleSplitView();
+    });
+
+    document.getElementById('btn-toggle-sync-scroll')?.addEventListener('click', () => {
+      if (!this.isSplitView) {
+        this.toggleSplitView(true);
+        this.toggleSyncScroll(true);
+      } else {
+        this.toggleSyncScroll();
+      }
     });
 
     document.getElementById('btn-close-pane-2')?.addEventListener('click', () => {
@@ -1046,31 +1057,117 @@ const BibleReader = {
   toggleSplitView(forceState) {
     this.isSplitView = forceState !== undefined ? forceState : !this.isSplitView;
     const workspace = document.getElementById('reader-workspace');
-    workspace.classList.toggle('split-view', this.isSplitView);
-    document.getElementById('btn-toggle-split').classList.toggle('active', this.isSplitView);
+    workspace?.classList.toggle('split-view', this.isSplitView);
+    document.getElementById('btn-toggle-split')?.classList.toggle('active', this.isSplitView);
 
     if (this.isSplitView) {
       this.updatePaneHeader(2);
       this.reloadPane2();
+      if (this.isScrollSynced) {
+        document.getElementById('btn-toggle-sync-scroll')?.classList.add('active');
+      }
+    }
+  },
+
+  toggleSyncScroll(forceState = null) {
+    this.isScrollSynced = forceState !== null ? forceState : !this.isScrollSynced;
+    const btnSync = document.getElementById('btn-toggle-sync-scroll');
+    if (btnSync) {
+      btnSync.classList.toggle('active', this.isScrollSynced);
+    }
+    
+    if (this.isScrollSynced && this.isSplitView) {
+      const pane1 = document.getElementById('pane-1-content');
+      const pane2 = document.getElementById('pane-2-content');
+      if (pane1 && pane2) {
+        this.syncScrollToMatch(pane1, pane2);
+      }
+      App.showToast('Défilement synchronisé activé (alignement verset)');
+    } else if (!this.isScrollSynced && this.isSplitView) {
+      App.showToast('Défilement synchronisé désactivé');
+    }
+  },
+
+  getTopVisibleVerse(container) {
+    if (!container) return null;
+    const verses = container.querySelectorAll('.verse-item');
+    if (!verses || verses.length === 0) return null;
+    const containerTop = container.getBoundingClientRect().top;
+
+    for (const v of verses) {
+      const rect = v.getBoundingClientRect();
+      if (rect.bottom >= containerTop + 20) {
+        return {
+          book: v.dataset.bookCode,
+          chapter: v.dataset.chapter,
+          verse: v.dataset.verseNum,
+          element: v
+        };
+      }
+    }
+    return null;
+  },
+
+  syncScrollToMatch(sourceContainer, targetContainer) {
+    if (!this.isSplitView || !this.isScrollSynced || this.isSyncingScroll) return;
+    if (!sourceContainer || !targetContainer) return;
+
+    const topVerse = this.getTopVisibleVerse(sourceContainer);
+    if (!topVerse || !topVerse.book || !topVerse.chapter || !topVerse.verse) return;
+
+    const targetVerse = targetContainer.querySelector(
+      `.verse-item[data-book-code="${topVerse.book}"][data-chapter="${topVerse.chapter}"][data-verse-num="${topVerse.verse}"]`
+    );
+
+    if (targetVerse) {
+      this.isSyncingScroll = true;
+      const targetTop = targetVerse.offsetTop;
+      targetContainer.scrollTop = Math.max(0, targetTop - 12);
+
+      setTimeout(() => {
+        this.isSyncingScroll = false;
+      }, 60);
     }
   },
 
   async reloadPane2() {
     if (!this.isSplitView) return;
     const pane2Container = document.getElementById('pane-2-verses');
+    if (!pane2Container) return;
     pane2Container.innerHTML = '';
-    const data2 = await API.getChapterData(this.currentBible2, this.currentBook, this.currentChapter, this.interlinearVersion);
-    const block2 = this.createChapterBlockElement(2, data2, this.currentBible2);
-    pane2Container.appendChild(block2);
+    
+    const chaptersToLoad = this.loadedChapters.length > 0 ? this.loadedChapters : [{ book: this.currentBook, chapter: this.currentChapter }];
+
+    for (let i = 0; i < chaptersToLoad.length; i++) {
+      const c = chaptersToLoad[i];
+      const data2 = await API.getChapterData(this.currentBible2, c.book, c.chapter, this.interlinearVersion);
+      const block2 = this.createChapterBlockElement(2, data2, this.currentBible2);
+      
+      if (i > 0) {
+        const divider2 = document.createElement('div');
+        divider2.className = 'chapter-badge-divider';
+        divider2.innerHTML = `<span>${data2.book_french} — Chapitre ${data2.chapter}</span>`;
+        pane2Container.appendChild(divider2);
+      }
+      pane2Container.appendChild(block2);
+    }
+
+    if (this.isScrollSynced) {
+      const pane1 = document.getElementById('pane-1-content');
+      const pane2 = document.getElementById('pane-2-content');
+      setTimeout(() => {
+        this.syncScrollToMatch(pane1, pane2);
+      }, 50);
+    }
   },
 
   setupInfiniteScroll() {
     const pane1 = document.getElementById('pane-1-content');
-    if (!pane1) return;
-    
-    pane1.addEventListener('scroll', () => {
+    const pane2 = document.getElementById('pane-2-content');
+
+    const handleScroll = (sourcePane, targetPane) => {
       if (this.isLoadingMore) return;
-      const { scrollTop, scrollHeight, clientHeight } = pane1;
+      const { scrollTop, scrollHeight, clientHeight } = sourcePane;
 
       // Défilement vers le bas -> charger le chapitre suivant
       if (scrollTop + clientHeight >= scrollHeight - 250) {
@@ -1079,15 +1176,33 @@ const BibleReader = {
 
       // Défilement vers le haut -> charger le chapitre précédent
       if (scrollTop <= 50) {
-        this.loadPrevChapterContinuous(pane1);
+        this.loadPrevChapterContinuous(sourcePane);
       }
 
-      // Détection du chapitre actuellement visible pour mettre à jour la pilule
-      this.updateCurrentlyVisibleHeader(pane1);
-    });
+      // Mettre à jour l'en-tête du livre / chapitres
+      this.updateCurrentlyVisibleHeader(sourcePane);
+
+      // Synchronisation du défilement
+      if (this.isSplitView && this.isScrollSynced && targetPane && !this.isSyncingScroll) {
+        this.syncScrollToMatch(sourcePane, targetPane);
+      }
+    };
+
+    if (pane1) {
+      pane1.addEventListener('scroll', () => {
+        handleScroll(pane1, pane2);
+      });
+    }
+
+    if (pane2) {
+      pane2.addEventListener('scroll', () => {
+        handleScroll(pane2, pane1);
+      });
+    }
   },
 
   updateCurrentlyVisibleHeader(container) {
+    if (!container) return;
     const blocks = container.querySelectorAll('.chapter-block');
     const containerTop = container.getBoundingClientRect().top;
 
@@ -1102,6 +1217,8 @@ const BibleReader = {
           const info = getBookInfo(bCode);
           document.getElementById('pill-reference-text').textContent = `${info.name} ${ch}`;
           document.getElementById('pane-1-breadcrumb').textContent = `${info.name.toUpperCase()} > Chapitre ${ch}`;
+          const breadcrumb2 = document.getElementById('pane-2-breadcrumb');
+          if (breadcrumb2) breadcrumb2.textContent = `${info.name.toUpperCase()} > Chapitre ${ch}`;
           TabsManager.updateActiveTab(null, bCode, ch);
         }
         break;
@@ -1117,25 +1234,31 @@ const BibleReader = {
     const info = getBookInfo(bookCode);
     document.getElementById('pill-reference-text').textContent = `${info.name} ${chapterNum}`;
     document.getElementById('pane-1-breadcrumb').textContent = `${info.name.toUpperCase()} > Chapitre ${chapterNum}`;
+    const breadcrumb2 = document.getElementById('pane-2-breadcrumb');
+    if (breadcrumb2) breadcrumb2.textContent = `${info.name.toUpperCase()} > Chapitre ${chapterNum}`;
     this.updatePaneHeader(1);
 
     const pane1Container = document.getElementById('pane-1-verses');
-    pane1Container.innerHTML = '';
+    if (pane1Container) pane1Container.innerHTML = '';
 
     const data1 = await API.getChapterData(this.currentBible1, bookCode, chapterNum, this.interlinearVersion);
     const block1 = this.createChapterBlockElement(1, data1, this.currentBible1);
-    pane1Container.appendChild(block1);
+    if (pane1Container) pane1Container.appendChild(block1);
 
     if (this.isSplitView) {
       const pane2Container = document.getElementById('pane-2-verses');
-      pane2Container.innerHTML = '';
+      if (pane2Container) pane2Container.innerHTML = '';
       this.updatePaneHeader(2);
       const data2 = await API.getChapterData(this.currentBible2, bookCode, chapterNum, this.interlinearVersion);
       const block2 = this.createChapterBlockElement(2, data2, this.currentBible2);
-      pane2Container.appendChild(block2);
+      if (pane2Container) pane2Container.appendChild(block2);
+      
+      const pane2 = document.getElementById('pane-2-content');
+      if (pane2) pane2.scrollTop = 0;
     }
 
-    document.getElementById('pane-1-content').scrollTop = 0;
+    const pane1 = document.getElementById('pane-1-content');
+    if (pane1) pane1.scrollTop = 0;
     this.loadCommentariesForVerse(1);
     TabsManager.updateActiveTab(null, bookCode, chapterNum);
   },
@@ -1143,12 +1266,36 @@ const BibleReader = {
   async reloadCurrentChapters() {
     const chaptersToReload = [...this.loadedChapters];
     const pane1Container = document.getElementById('pane-1-verses');
-    pane1Container.innerHTML = '';
+    if (pane1Container) pane1Container.innerHTML = '';
 
-    for (const c of chaptersToReload) {
+    for (let i = 0; i < chaptersToReload.length; i++) {
+      const c = chaptersToReload[i];
       const data = await API.getChapterData(this.currentBible1, c.book, c.chapter, this.interlinearVersion);
       const block = this.createChapterBlockElement(1, data, this.currentBible1);
+      if (i > 0) {
+        const divider = document.createElement('div');
+        divider.className = 'chapter-badge-divider';
+        divider.innerHTML = `<span>${data.book_french} — Chapitre ${data.chapter}</span>`;
+        pane1Container.appendChild(divider);
+      }
       pane1Container.appendChild(block);
+    }
+
+    if (this.isSplitView) {
+      const pane2Container = document.getElementById('pane-2-verses');
+      if (pane2Container) pane2Container.innerHTML = '';
+      for (let i = 0; i < chaptersToReload.length; i++) {
+        const c = chaptersToReload[i];
+        const data2 = await API.getChapterData(this.currentBible2, c.book, c.chapter, this.interlinearVersion);
+        const block2 = this.createChapterBlockElement(2, data2, this.currentBible2);
+        if (i > 0) {
+          const divider2 = document.createElement('div');
+          divider2.className = 'chapter-badge-divider';
+          divider2.innerHTML = `<span>${data2.book_french} — Chapitre ${data2.chapter}</span>`;
+          pane2Container.appendChild(divider2);
+        }
+        pane2Container.appendChild(block2);
+      }
     }
   },
 
@@ -1161,16 +1308,35 @@ const BibleReader = {
     this.isLoadingMore = true;
     this.loadedChapters.push(next);
 
-    const data = await API.getChapterData(this.currentBible1, next.book, next.chapter, this.interlinearVersion);
-    const block = this.createChapterBlockElement(1, data, this.currentBible1);
+    // Colonne 1
+    const data1 = await API.getChapterData(this.currentBible1, next.book, next.chapter, this.interlinearVersion);
+    const block1 = this.createChapterBlockElement(1, data1, this.currentBible1);
 
-    const divider = document.createElement('div');
-    divider.className = 'chapter-badge-divider';
-    divider.innerHTML = `<span>${data.book_french} — Chapitre ${data.chapter}</span>`;
+    const divider1 = document.createElement('div');
+    divider1.className = 'chapter-badge-divider';
+    divider1.innerHTML = `<span>${data1.book_french} — Chapitre ${data1.chapter}</span>`;
 
     const pane1Container = document.getElementById('pane-1-verses');
-    pane1Container.appendChild(divider);
-    pane1Container.appendChild(block);
+    if (pane1Container) {
+      pane1Container.appendChild(divider1);
+      pane1Container.appendChild(block1);
+    }
+
+    // Colonne 2 (si double vue)
+    if (this.isSplitView) {
+      const data2 = await API.getChapterData(this.currentBible2, next.book, next.chapter, this.interlinearVersion);
+      const block2 = this.createChapterBlockElement(2, data2, this.currentBible2);
+
+      const divider2 = document.createElement('div');
+      divider2.className = 'chapter-badge-divider';
+      divider2.innerHTML = `<span>${data2.book_french} — Chapitre ${data2.chapter}</span>`;
+
+      const pane2Container = document.getElementById('pane-2-verses');
+      if (pane2Container) {
+        pane2Container.appendChild(divider2);
+        pane2Container.appendChild(block2);
+      }
+    }
 
     this.isLoadingMore = false;
   },
@@ -1184,20 +1350,51 @@ const BibleReader = {
     this.isLoadingMore = true;
     this.loadedChapters.unshift(prev);
 
-    const data = await API.getChapterData(this.currentBible1, prev.book, prev.chapter, this.interlinearVersion);
-    const block = this.createChapterBlockElement(1, data, this.currentBible1);
+    // Colonne 1
+    const data1 = await API.getChapterData(this.currentBible1, prev.book, prev.chapter, this.interlinearVersion);
+    const block1 = this.createChapterBlockElement(1, data1, this.currentBible1);
 
-    const divider = document.createElement('div');
-    divider.className = 'chapter-badge-divider';
-    divider.innerHTML = `<span>${data.book_french} — Chapitre ${data.chapter}</span>`;
+    const divider1 = document.createElement('div');
+    divider1.className = 'chapter-badge-divider';
+    divider1.innerHTML = `<span>${data1.book_french} — Chapitre ${data1.chapter}</span>`;
 
-    const oldScrollHeight = scrollEl.scrollHeight;
+    const pane1 = document.getElementById('pane-1-content');
     const pane1Container = document.getElementById('pane-1-verses');
-    pane1Container.prepend(divider);
-    pane1Container.prepend(block);
+    const oldScrollHeight1 = pane1 ? pane1.scrollHeight : 0;
 
-    const diff = scrollEl.scrollHeight - oldScrollHeight;
-    scrollEl.scrollTop += diff;
+    if (pane1Container) {
+      pane1Container.prepend(divider1);
+      pane1Container.prepend(block1);
+    }
+
+    if (pane1) {
+      const diff1 = pane1.scrollHeight - oldScrollHeight1;
+      pane1.scrollTop += diff1;
+    }
+
+    // Colonne 2 (si double vue)
+    if (this.isSplitView) {
+      const data2 = await API.getChapterData(this.currentBible2, prev.book, prev.chapter, this.interlinearVersion);
+      const block2 = this.createChapterBlockElement(2, data2, this.currentBible2);
+
+      const divider2 = document.createElement('div');
+      divider2.className = 'chapter-badge-divider';
+      divider2.innerHTML = `<span>${data2.book_french} — Chapitre ${data2.chapter}</span>`;
+
+      const pane2 = document.getElementById('pane-2-content');
+      const pane2Container = document.getElementById('pane-2-verses');
+      const oldScrollHeight2 = pane2 ? pane2.scrollHeight : 0;
+
+      if (pane2Container) {
+        pane2Container.prepend(divider2);
+        pane2Container.prepend(block2);
+      }
+
+      if (pane2) {
+        const diff2 = pane2.scrollHeight - oldScrollHeight2;
+        pane2.scrollTop += diff2;
+      }
+    }
 
     this.isLoadingMore = false;
   },

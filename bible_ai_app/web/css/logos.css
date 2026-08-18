@@ -534,6 +534,12 @@ body, html {
 .tool-btn:hover {
   background-color: var(--bg-hover);
 }
+.tool-btn.active {
+  background-color: #EFF6FF;
+  border-color: #2563EB;
+  color: #2563EB;
+  font-weight: 600;
+}
 .tool-btn.icon-only {
   width: 30px;
   padding: 0;
