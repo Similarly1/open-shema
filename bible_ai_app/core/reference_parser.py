@@ -46,7 +46,7 @@ BOOK_MAPPING_RAW = {
     "jonas": "Jon", "jon": "Jon", "jonah": "Jon",
     "michee": "Mic", "mi": "Mic", "mic": "Mic", "micah": "Mic",
     "nahum": "Nah", "na": "Nah", "nah": "Nah", "nam": "Nah",
-    "habacuc": "Hab", "ha": "Hab", "hab": "Hab", "habakkuk": "Hab",
+    "habacuc": "Hab", "habakuk": "Hab", "ha": "Hab", "hab": "Hab", "habakkuk": "Hab",
     "sophonie": "Zep", "so": "Zep", "zep": "Zep", "soph": "Zep", "zephaniah": "Zep", "zeph": "Zep",
     "aggee": "Hag", "ag": "Hag", "hag": "Hag", "haggai": "Hag",
     "zacharie": "Zec", "za": "Zec", "zec": "Zec", "zach": "Zec", "zechariah": "Zec", "zech": "Zec",

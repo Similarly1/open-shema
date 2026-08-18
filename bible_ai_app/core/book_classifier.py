@@ -91,6 +91,65 @@ Règles de décision :
             return cls._get_default_tags()
             
     @classmethod
+    def heuristic_classify(cls, title: str, description: str = "") -> Dict[str, Any]:
+        """
+        Classifie localement et instantanément un ouvrage à partir de son titre et de sa description
+        sans appel réseau / LLM.
+        """
+        from core.epub_loader import EpubLoader
+        # Détection du livre biblique depuis le titre
+        res = EpubLoader.classify_chapter_title(title)
+        
+        full_text = f"{title} {description}".lower()
+        
+        # Si un livre biblique précis a été détecté
+        if res.get("book_code"):
+            return {
+                "corpus_scope": res["corpus_scope"],
+                "source_type": "commentary_verse" if any(w in full_text for w in ["commentaire", "explication", "vers par vers", "notes"]) else "book_intro",
+                "book_code": res["book_code"],
+                "confidence": "high"
+            }
+            
+        # Si c'est une théologie systématique / dogmatique
+        if any(w in full_text for w in ["systematique", "dogmatique", "institution", "doctrine chretienne", "grudem", "berkhof"]):
+            return {
+                "corpus_scope": "GLOBAL",
+                "source_type": "systematic_theology",
+                "book_code": None,
+                "confidence": "medium"
+            }
+            
+        # Si c'est un dictionnaire ou glossaire
+        if any(w in full_text for w in ["dictionnaire", "lexique", "encyclopedie", "vocabulaire"]):
+            return {
+                "corpus_scope": "GLOBAL",
+                "source_type": "dictionary",
+                "book_code": None,
+                "confidence": "high"
+            }
+            
+        # Si c'est le Nouveau Testament uniquement
+        if any(w in full_text for w in ["nouveau testament", "epitre", "evangile"]) and not any(w in full_text for w in ["ancien testament", "toute la bible"]):
+            return {
+                "corpus_scope": "NT",
+                "source_type": "nt_context",
+                "book_code": None,
+                "confidence": "medium"
+            }
+
+        # Si c'est l'Ancien Testament uniquement
+        if any(w in full_text for w in ["ancien testament", "pentateuque", "tanakh", "hebreu"]) and not any(w in full_text for w in ["nouveau testament", "toute la bible"]):
+            return {
+                "corpus_scope": "OT",
+                "source_type": "ot_context",
+                "book_code": None,
+                "confidence": "medium"
+            }
+
+        return cls._get_default_tags()
+
+    @classmethod
     def _get_default_tags(cls) -> Dict[str, Any]:
         return {
             "corpus_scope": "GLOBAL",
@@ -98,3 +157,4 @@ Règles de décision :
             "book_code": None,
             "confidence": "low"
         }
+

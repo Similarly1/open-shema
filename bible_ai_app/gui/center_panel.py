@@ -9,6 +9,7 @@ from core.reference_parser import get_french_book_name, parse_smart_book_input, 
 from core.strong_lexicon import StrongLexicon
 from core.dictionary_manager import DictionaryManager
 from core.dictionary_polisher import DictionaryPolisher, AVAILABLE_POLISH_MODELS
+from core.translation_manager import TranslationManager, AVAILABLE_TRANSLATION_MODELS
 from core.pericope_manager import PericopeManager
 from core.wikipedia_client import WikipediaClient
 from gui.tooltip import BibleTooltip, WidgetTooltip
@@ -638,6 +639,57 @@ class CenterPanel(ctk.CTkFrame):
         self.btn_comm_next = ctk.CTkButton(self.comm_nav_frame, text="▶", width=26, height=24, font=ctk.CTkFont(size=10), command=self.on_next_comm_verse)
         self.btn_comm_next.pack(side="left", padx=1)
         
+        # Barre d'outils de traduction contextuelle pour commentaires en langue étrangère
+        self.comm_trans_frame = ctk.CTkFrame(self.tab_comm, fg_color=("gray92", "#1E293B"), corner_radius=6, height=32)
+        self.lbl_comm_lang_badge = ctk.CTkLabel(
+            self.comm_trans_frame, 
+            text="🌐 EN", 
+            font=ctk.CTkFont(size=10, weight="bold"), 
+            text_color=("#2563EB", "#60A5FA"),
+            width=36
+        )
+        self.lbl_comm_lang_badge.pack(side="left", padx=(6, 2))
+        
+        self.comm_trans_view_var = ctk.StringVar(value="🇫🇷 Français")
+        self.comm_trans_toggle_btn = ctk.CTkSegmentedButton(
+            self.comm_trans_frame,
+            values=["🇫🇷 Français", "🌐 Original"],
+            variable=self.comm_trans_view_var,
+            command=self.on_comm_trans_toggle,
+            height=24,
+            font=ctk.CTkFont(size=10, weight="bold")
+        )
+        self.comm_trans_toggle_btn.pack(side="left", padx=(0, 4))
+        
+        self.btn_comm_translate = ctk.CTkButton(
+            self.comm_trans_frame,
+            text="🌐 Traduire (FR)",
+            width=90,
+            height=24,
+            font=ctk.CTkFont(size=10, weight="bold"),
+            fg_color=("#2563EB", "#1D4ED8"),
+            hover_color=("#1D4ED8", "#1E40AF"),
+            text_color="#FFFFFF",
+            command=self.on_translate_commentary_with_ai
+        )
+        self.btn_comm_translate.pack(side="left", padx=(0, 4))
+        
+        trans_model_names = [m[0] for m in AVAILABLE_TRANSLATION_MODELS]
+        default_trans_model = self.config.get("translation_model", "gemini-3.5-flash-lite")
+        if default_trans_model not in trans_model_names:
+            default_trans_model = "gemini-3.5-flash-lite"
+        self.comm_trans_model_var = ctk.StringVar(value=default_trans_model)
+        self.comm_trans_model_menu = ctk.CTkOptionMenu(
+            self.comm_trans_frame,
+            variable=self.comm_trans_model_var,
+            values=trans_model_names,
+            command=self.on_trans_model_changed,
+            height=24,
+            width=135,
+            font=ctk.CTkFont(size=10)
+        )
+        self.comm_trans_model_menu.pack(side="right", padx=(0, 6))
+        
         # Commentaires Textbox (inside tab_comm)
         self.comm_textbox = ctk.CTkTextbox(self.tab_comm, wrap="word", fg_color=("#FAFAFA", "#1E1E1E"), text_color=("#1A1A1A", "#E2E8F0"))
         self.comm_textbox.pack(fill="both", expand=True)
@@ -728,6 +780,52 @@ class CenterPanel(ctk.CTkFrame):
             font=ctk.CTkFont(size=10, weight="bold")
         )
         self.lex_polish_model_menu.pack(side="right")
+        
+        # Frame pour le bouton de traduction des notices de dictionnaire non-françaises
+        self.lex_trans_frame = ctk.CTkFrame(self.lex_action_frame, fg_color="transparent")
+        self.lbl_lex_lang_badge = ctk.CTkLabel(
+            self.lex_trans_frame, 
+            text="🌐 EN", 
+            font=ctk.CTkFont(size=10, weight="bold"), 
+            text_color=("#2563EB", "#60A5FA"),
+            width=36
+        )
+        self.lbl_lex_lang_badge.pack(side="left", padx=(2, 4))
+        
+        self.lex_trans_view_var = ctk.StringVar(value="🇫🇷 Français")
+        self.lex_trans_toggle_btn = ctk.CTkSegmentedButton(
+            self.lex_trans_frame,
+            values=["🇫🇷 Français", "🌐 Original"],
+            variable=self.lex_trans_view_var,
+            command=self.on_lex_trans_toggle,
+            height=26,
+            font=ctk.CTkFont(size=10, weight="bold")
+        )
+        self.lex_trans_toggle_btn.pack(side="left", padx=(0, 4))
+        
+        self.lex_translate_btn = ctk.CTkButton(
+            self.lex_trans_frame,
+            text="🌐 Traduire (FR)",
+            command=self.on_translate_dictionary_with_ai,
+            height=30,
+            font=ctk.CTkFont(size=11, weight="bold"),
+            fg_color=("#2563EB", "#1D4ED8"),
+            hover_color=("#1D4ED8", "#1E40AF"),
+            text_color="#FFFFFF"
+        )
+        self.lex_translate_btn.pack(side="left", fill="x", expand=True, padx=(0, 4))
+        
+        self.lex_trans_model_var = ctk.StringVar(value=default_trans_model)
+        self.lex_trans_model_menu = ctk.CTkOptionMenu(
+            self.lex_trans_frame,
+            variable=self.lex_trans_model_var,
+            values=trans_model_names,
+            command=self.on_trans_model_changed,
+            height=30,
+            width=150,
+            font=ctk.CTkFont(size=10)
+        )
+        self.lex_trans_model_menu.pack(side="right")
         
         self.lex_ai_btn = ctk.CTkButton(
             self.lex_action_frame, 
@@ -1192,24 +1290,62 @@ class CenterPanel(ctk.CTkFrame):
                     self.lex_textbox.insert("end", f"• {hw}\n", "bailly_headword")
                 self.lex_textbox.insert("end", f"{b_txt}\n\n", "body")
         else:
-            # Dictionnaires textuels (Vigouroux, Calmet, etc.)
-            if hasattr(self, 'lex_polish_frame'):
-                self.lex_polish_frame.pack(fill="x", pady=(0, 3), before=self.lex_ai_btn)
-                
+            # Dictionnaires textuels (Vigouroux, Calmet, Smith, Easton, etc.)
             full_t = m.get("full_text", "")
             raw_t = m.get("raw_text") or full_t
             m["raw_text"] = raw_t
             
-            # Vérifier si l'article est déjà restauré dans le cache local
-            cached = DictionaryPolisher.get_polished_entry(dict_id, title or m.get("search_term") or "")
-            if cached and cached.get("text"):
-                c_model = cached.get("model", "Gemini")
-                self.lex_textbox.insert("end", f"✨ Notice restaurée & structurée par IA ({c_model})\n\n", "polish_badge")
-                self._render_dictionary_markdown(cached['text'], dict_id=dict_id)
-                self.lex_polish_btn.configure(text="🔄 Re-polir avec l'IA", state="normal")
+            # Détection intelligente de la langue
+            dict_lang = TranslationManager.detect_language(raw_t)
+            is_fr = (dict_lang == 'fr')
+            
+            if is_fr:
+                # Si en français : masquer la barre de traduction et afficher le polissage
+                if hasattr(self, 'lex_trans_frame'):
+                    self.lex_trans_frame.pack_forget()
+                if hasattr(self, 'lex_polish_frame'):
+                    self.lex_polish_frame.pack(fill="x", pady=(0, 3), before=self.lex_ai_btn)
+                    
+                # Vérifier si l'article est déjà restauré dans le cache local
+                cached = DictionaryPolisher.get_polished_entry(dict_id, title or m.get("search_term") or "")
+                if cached and cached.get("text"):
+                    c_model = cached.get("model", "Gemini")
+                    self.lex_textbox.insert("end", f"✨ Notice restaurée & structurée par IA ({c_model})\n\n", "polish_badge")
+                    self._render_dictionary_markdown(cached['text'], dict_id=dict_id)
+                    self.lex_polish_btn.configure(text="🔄 Re-polir avec l'IA", state="normal")
+                else:
+                    self._render_dictionary_markdown(full_t, dict_id=dict_id)
+                    self.lex_polish_btn.configure(text="✨ Polir / Restructurer avec l'IA", state="normal")
             else:
-                self._render_dictionary_markdown(full_t, dict_id=dict_id)
-                self.lex_polish_btn.configure(text="✨ Polir / Restructurer avec l'IA", state="normal")
+                # Si en langue étrangère (EN, DE, ES...) : masquer le polissage et afficher la traduction
+                if hasattr(self, 'lex_polish_frame'):
+                    self.lex_polish_frame.pack_forget()
+                if hasattr(self, 'lex_trans_frame'):
+                    self.lex_trans_frame.pack(fill="x", pady=(0, 3), before=self.lex_ai_btn)
+                    self.lbl_lex_lang_badge.configure(text=f"🌐 {dict_lang.upper()}")
+                    
+                dict_item_id = f"{dict_id}:{title or m.get('search_term') or selected_dict_name}"
+                cached_trans = TranslationManager.get_translation("dictionary", dict_item_id)
+                self._current_lex_trans_data = {
+                    "raw_text": raw_t,
+                    "item_id": dict_item_id,
+                    "lang": dict_lang,
+                    "dict_id": dict_id,
+                    "title": title
+                }
+                
+                if cached_trans:
+                    self.lex_translate_btn.configure(text="🔄 Re-traduire", state="normal")
+                    current_view = self.lex_trans_view_var.get()
+                    if current_view == "🇫🇷 Français":
+                        self.lex_textbox.insert("end", f"🇫🇷 Notice traduite par IA ({cached_trans.get('model_used', '')})\n\n", "trans_badge")
+                        self._render_dictionary_markdown(cached_trans["translated_text"], dict_id=dict_id)
+                    else:
+                        self._render_dictionary_markdown(raw_t, dict_id=dict_id)
+                else:
+                    self.lex_trans_view_var.set("🌐 Original")
+                    self.lex_translate_btn.configure(text="🌐 Traduire (FR)", state="normal")
+                    self._render_dictionary_markdown(raw_t, dict_id=dict_id)
             
         self.lex_textbox.configure(state="disabled")
         
@@ -1218,6 +1354,76 @@ class CenterPanel(ctk.CTkFrame):
         first_title = (match_obj.get("word") if isinstance(match_obj, dict) else None) or title or selected_dict_name
         self.last_selected_strong = (m.get("entry") or m, first_title)
         self.lex_ai_btn.configure(state="normal", text=f"🤖 Analyser « {first_title} » avec l'IA")
+
+    def on_trans_model_changed(self, choice):
+        """Sauvegarde le modèle de traduction choisi et synchronise les sélecteurs."""
+        self.config["translation_model"] = choice
+        save_config(self.config)
+        if hasattr(self, 'comm_trans_model_var') and self.comm_trans_model_var.get() != choice:
+            self.comm_trans_model_var.set(choice)
+        if hasattr(self, 'lex_trans_model_var') and self.lex_trans_model_var.get() != choice:
+            self.lex_trans_model_var.set(choice)
+
+    def on_lex_trans_toggle(self, choice):
+        """Bascule l'affichage de la notice entre Français (traduit) et Original."""
+        self.render_selected_dictionary_view()
+
+    def on_translate_dictionary_with_ai(self):
+        """Lance la traduction de la notice de dictionnaire affichée."""
+        if not hasattr(self, '_current_lex_trans_data') or not self._current_lex_trans_data:
+            return
+            
+        data = self._current_lex_trans_data
+        raw_text = data.get("raw_text", "")
+        item_id = data.get("item_id", "")
+        source_lang = data.get("lang", "auto")
+        if not raw_text or not item_id:
+            return
+            
+        model = self.lex_trans_model_var.get() or self.config.get("translation_model", "gemini-3.5-flash-lite")
+        clean_m = model.lower()
+        
+        # Vérification des clés d'API
+        if (clean_m.startswith("mistral-") or clean_m.startswith("open-mistral-") or clean_m.startswith("codestral-")) and not self.config.get("mistral_api_key"):
+            from gui.settings_modal import SettingsModal
+            SettingsModal(self, self.config, on_save_callback=self._on_settings_saved)
+            return
+        elif ("/" in clean_m or "infomaniak" in clean_m) and not self.config.get("infomaniak_token"):
+            from gui.settings_modal import SettingsModal
+            SettingsModal(self, self.config, on_save_callback=self._on_settings_saved)
+            return
+        elif clean_m.startswith("gemini-") and not self.config.get("gemini_api_key"):
+            from gui.settings_modal import SettingsModal
+            SettingsModal(self, self.config, on_save_callback=self._on_settings_saved)
+            return
+            
+        self.lex_translate_btn.configure(state="disabled", text="⏳ Traduction...")
+        threading.Thread(
+            target=self._translate_lex_thread,
+            args=(raw_text, model, item_id, source_lang),
+            daemon=True
+        ).start()
+
+    def _translate_lex_thread(self, raw_text, model, item_id, source_lang):
+        try:
+            translated = TranslationManager.translate_text(
+                text=raw_text,
+                model=model,
+                config=self.config,
+                item_type="dictionary",
+                item_id=item_id,
+                source_lang=source_lang
+            )
+            def update_ui():
+                self.lex_trans_view_var.set("🇫🇷 Français")
+                self.lex_translate_btn.configure(state="normal", text="🔄 Re-traduire")
+                self.render_selected_dictionary_view()
+            self.after(0, update_ui)
+        except Exception as e:
+            def on_err():
+                self.lex_translate_btn.configure(state="normal", text="⚠️ Échec - Réessayer")
+                print(f"Erreur traduction dictionnaire : {e}")
+            self.after(0, on_err)
 
     def on_polish_model_changed(self, choice):
         """Sauvegarde le modèle de polissage choisi."""
@@ -3242,6 +3448,10 @@ class CenterPanel(ctk.CTkFrame):
             polish_badge_col = "#C084FC" if is_dark else "#7C3AED"
             self.lex_textbox._textbox.tag_configure("polish_badge", font=(self.font_family, max(9, self.font_size - 3), "bold"), foreground=polish_badge_col, justify="center", spacing1=4, spacing3=10)
             
+            trans_badge_col = "#60A5FA" if is_dark else "#2563EB"
+            self.lex_textbox._textbox.tag_configure("trans_badge", font=(self.font_family, max(9, self.font_size - 3), "bold"), foreground=trans_badge_col, justify="center", spacing1=4, spacing3=10)
+            self.comm_textbox._textbox.tag_configure("trans_badge", font=(self.font_family, max(9, self.font_size - 3), "bold"), foreground=trans_badge_col, justify="center", spacing1=4, spacing3=10)
+            
             # Styles riches pour le Markdown du Lexique & Dictionnaires
             lex_h1_col = title_col
             lex_h2_col = "#38BDF8" if is_dark else "#0284C7"
@@ -3917,6 +4127,8 @@ class CenterPanel(ctk.CTkFrame):
         self.comm_textbox.delete("0.0", "end")
         
         if not hasattr(self, 'current_comms_grouped') or not self.current_comms_grouped:
+            if hasattr(self, 'comm_trans_frame'):
+                self.comm_trans_frame.pack_forget()
             self.comm_textbox.insert("end", "Aucun commentaire lié à ce passage.", "welcome")
             self.comm_textbox.configure(state="disabled")
             return
@@ -3992,61 +4204,110 @@ class CenterPanel(ctk.CTkFrame):
             self.comm_textbox.insert("end", "─" * 28 + "\n\n", "chapter_divider")
                 
         if matched_comments:
-            for idx, (doc, meta) in enumerate(matched_comments):
-                if cur_v == 0:
-                    ref = f"{french_book} - Introduction générale"
+            # Récupérer l'intégralité du texte pour détecter la langue
+            full_comm_txt = "\n\n".join(doc for doc, meta in matched_comments)
+            comm_lang = TranslationManager.detect_language(full_comm_txt)
+            is_fr = (comm_lang == 'fr')
+            
+            comm_item_id = f"{selected_author}:{french_book}:{cur_ch}:{cur_v}"
+            cached_trans = TranslationManager.get_translation("commentary", comm_item_id) if not is_fr else None
+            
+            if is_fr:
+                if hasattr(self, 'comm_trans_frame'):
+                    self.comm_trans_frame.pack_forget()
+            else:
+                if hasattr(self, 'comm_trans_frame'):
+                    self.comm_trans_frame.pack(fill="x", padx=2, pady=(0, 4), before=self.comm_textbox)
+                    self.lbl_comm_lang_badge.configure(text=f"🌐 {comm_lang.upper()}")
+                self._current_comm_data = {
+                    "raw_text": full_comm_txt,
+                    "item_id": comm_item_id,
+                    "lang": comm_lang,
+                    "author": selected_author,
+                    "ref": f"{french_book} {cur_ch}:{cur_v}"
+                }
+                if cached_trans:
+                    self.btn_comm_translate.configure(text="🔄 Re-traduire", state="normal")
                 else:
-                    ref = meta.get('reference', f"{french_book} {cur_ch}:{cur_v}")
-                
-                if idx > 0:
-                    self.comm_textbox.insert("end", "\n" + "─" * 28 + "\n\n", "chapter_divider")
-                elif cur_v != 1 or not has_intro:
-                    self.comm_textbox.insert("end", f"───  {selected_author}  ───\n\n", "chapter_divider")
-                    
+                    self.comm_trans_view_var.set("🌐 Original")
+                    self.btn_comm_translate.configure(text="🌐 Traduire (FR)", state="normal")
+            
+            # Vérifier si l'on affiche la traduction française en cache
+            if not is_fr and cached_trans and self.comm_trans_view_var.get() == "🇫🇷 Français":
+                ref = f"{french_book} {cur_ch}:{cur_v}" if cur_v != 0 else f"{french_book} - Introduction générale"
+                self.comm_textbox.insert("end", f"───  {selected_author}  ───\n\n", "chapter_divider")
                 self.comm_textbox.insert("end", f"📍 {ref}\n\n", "book_title")
+                self.comm_textbox.insert("end", f"🇫🇷 Version traduite par IA ({cached_trans.get('model_used', '')})\n\n", "trans_badge")
                 
-                # Mise en page riche et aérée (paragraphes continus, listes à puces, titres avec liens bibliques)
-                paras = clean_and_reflow_commentary_paragraphs(doc)
-                
+                paras = clean_and_reflow_commentary_paragraphs(cached_trans["translated_text"])
                 for p in paras:
                     if not p:
                         continue
-                        
-                    # Ligne de puce (- ou • ou *)
                     if p.startswith(('-', '•', '*')):
                         self.insert_text_with_bible_links(p, "comm_list_item", end_newline="\n")
-                        continue
-                        
-                    # Titre de section ou sous-chapitre autonome
-                    if (p.isupper() and len(p) < 80) or p.startswith(('CHAPITRE ', 'NOTES SUR LE CHAPITRE', 'NOTES SUR LE CHAPITRE.')):
+                    elif (p.isupper() and len(p) < 80) or p.startswith(('CHAPITRE ', 'NOTES SUR LE CHAPITRE')):
                         self.comm_textbox.insert("end", f"{p}\n\n", "comm_section_title")
-                        continue
+                    else:
+                        self.insert_text_with_bible_links(p, "comm_body", end_newline="\n\n")
+            else:
+                # Affichage standard du texte original
+                for idx, (doc, meta) in enumerate(matched_comments):
+                    if cur_v == 0:
+                        ref = f"{french_book} - Introduction générale"
+                    else:
+                        ref = meta.get('reference', f"{french_book} {cur_ch}:{cur_v}")
+                    
+                    if idx > 0:
+                        self.comm_textbox.insert("end", "\n" + "─" * 28 + "\n\n", "chapter_divider")
+                    elif cur_v != 1 or not has_intro:
+                        self.comm_textbox.insert("end", f"───  {selected_author}  ───\n\n", "chapter_divider")
                         
-                    # Sous-titres avec préfixe (ex: Travail du sixième jour - ...)
-                    if p.startswith(('Travail du', 'Cinquième jour', 'Sixième jour', 'De la lumière et')):
-                        if ' - ' in p or '- ' in p:
-                            parts = re.split(r'\s*-\s*', p, maxsplit=1)
-                            self.comm_textbox.insert("end", f"• {parts[0]} : ", "comm_verse_lead")
-                            if len(parts) > 1:
-                                self.insert_text_with_bible_links(parts[1], "comm_body", end_newline="\n\n")
+                    self.comm_textbox.insert("end", f"📍 {ref}\n\n", "book_title")
+                    
+                    # Mise en page riche et aérée (paragraphes continus, listes à puces, titres avec liens bibliques)
+                    paras = clean_and_reflow_commentary_paragraphs(doc)
+                    
+                    for p in paras:
+                        if not p:
+                            continue
+                            
+                        # Ligne de puce (- ou • ou *)
+                        if p.startswith(('-', '•', '*')):
+                            self.insert_text_with_bible_links(p, "comm_list_item", end_newline="\n")
+                            continue
+                            
+                        # Titre de section ou sous-chapitre autonome
+                        if (p.isupper() and len(p) < 80) or p.startswith(('CHAPITRE ', 'NOTES SUR LE CHAPITRE', 'NOTES SUR LE CHAPITRE.')):
+                            self.comm_textbox.insert("end", f"{p}\n\n", "comm_section_title")
+                            continue
+                            
+                        # Sous-titres avec préfixe (ex: Travail du sixième jour - ...)
+                        if p.startswith(('Travail du', 'Cinquième jour', 'Sixième jour', 'De la lumière et')):
+                            if ' - ' in p or '- ' in p:
+                                parts = re.split(r'\s*-\s*', p, maxsplit=1)
+                                self.comm_textbox.insert("end", f"• {parts[0]} : ", "comm_verse_lead")
+                                if len(parts) > 1:
+                                    self.insert_text_with_bible_links(parts[1], "comm_body", end_newline="\n\n")
+                                else:
+                                    self.comm_textbox.insert("end", "\n\n")
                             else:
-                                self.comm_textbox.insert("end", "\n\n")
-                        else:
-                            self.insert_text_with_bible_links(p, "comm_body", end_newline="\n\n")
-                        continue
-                        
-                    # Paragraphe commençant par un numéro ou mention de verset
-                    match_lead = re.match(r'^(Verset\s+[\w\s\.:\d]+[\.:]?|\d+[\.,]\s*|\d+-\d+[\.,]\s*)(.*)$', p, re.DOTALL)
-                    if match_lead:
-                        lead = match_lead.group(1)
-                        rest = match_lead.group(2)
-                        self.comm_textbox.insert("end", lead, "comm_verse_lead")
-                        self.insert_text_with_bible_links(rest, "comm_body", end_newline="\n\n")
-                        continue
-                        
-                    # Corps de paragraphe standard avec détection de liens bibliques interactifs
-                    self.insert_text_with_bible_links(p, "comm_body", end_newline="\n\n")
+                                self.insert_text_with_bible_links(p, "comm_body", end_newline="\n\n")
+                            continue
+                            
+                        # Paragraphe commençant par un numéro ou mention de verset
+                        match_lead = re.match(r'^(Verset\s+[\w\s\.:\d]+[\.:]?|\d+[\.,]\s*|\d+-\d+[\.,]\s*)(.*)$', p, re.DOTALL)
+                        if match_lead:
+                            lead = match_lead.group(1)
+                            rest = match_lead.group(2)
+                            self.comm_textbox.insert("end", lead, "comm_verse_lead")
+                            self.insert_text_with_bible_links(rest, "comm_body", end_newline="\n\n")
+                            continue
+                            
+                        # Corps de paragraphe standard avec détection de liens bibliques interactifs
+                        self.insert_text_with_bible_links(p, "comm_body", end_newline="\n\n")
         else:
+            if hasattr(self, 'comm_trans_frame'):
+                self.comm_trans_frame.pack_forget()
             self.comm_textbox.insert("end", f"───  {selected_author}  ───\n\n", "chapter_divider")
             self.comm_textbox.insert("end", f"📍 {french_book} {cur_ch}:{cur_v}\n\n", "book_title")
             self.comm_textbox.insert("end", "(Aucun commentaire spécifique pour ce verset chez cet auteur)\n\n", "welcome")
@@ -4097,6 +4358,67 @@ class CenterPanel(ctk.CTkFrame):
                 self.comm_textbox.insert("end", "\n")
             
         self.comm_textbox.configure(state="disabled")
+
+    def on_comm_trans_toggle(self, choice):
+        """Bascule l'affichage du commentaire entre Français (traduit) et Original."""
+        self.render_commentaries_view()
+
+    def on_translate_commentary_with_ai(self):
+        """Lance la traduction du commentaire biblique affiché."""
+        if not hasattr(self, '_current_comm_data') or not self._current_comm_data:
+            return
+            
+        data = self._current_comm_data
+        raw_text = data.get("raw_text", "")
+        item_id = data.get("item_id", "")
+        source_lang = data.get("lang", "auto")
+        if not raw_text or not item_id:
+            return
+            
+        model = self.comm_trans_model_var.get() or self.config.get("translation_model", "gemini-3.5-flash-lite")
+        clean_m = model.lower()
+        
+        # Vérification des clés d'API
+        if (clean_m.startswith("mistral-") or clean_m.startswith("open-mistral-") or clean_m.startswith("codestral-")) and not self.config.get("mistral_api_key"):
+            from gui.settings_modal import SettingsModal
+            SettingsModal(self, self.config, on_save_callback=self._on_settings_saved)
+            return
+        elif ("/" in clean_m or "infomaniak" in clean_m) and not self.config.get("infomaniak_token"):
+            from gui.settings_modal import SettingsModal
+            SettingsModal(self, self.config, on_save_callback=self._on_settings_saved)
+            return
+        elif clean_m.startswith("gemini-") and not self.config.get("gemini_api_key"):
+            from gui.settings_modal import SettingsModal
+            SettingsModal(self, self.config, on_save_callback=self._on_settings_saved)
+            return
+            
+        self.btn_comm_translate.configure(state="disabled", text="⏳ Traduction...")
+        threading.Thread(
+            target=self._translate_comm_thread,
+            args=(raw_text, model, item_id, source_lang),
+            daemon=True
+        ).start()
+
+    def _translate_comm_thread(self, raw_text, model, item_id, source_lang):
+        try:
+            translated = TranslationManager.translate_text(
+                text=raw_text,
+                model=model,
+                config=self.config,
+                item_type="commentary",
+                item_id=item_id,
+                source_lang=source_lang
+            )
+            def update_ui():
+                self.comm_trans_view_var.set("🇫🇷 Français")
+                self.btn_comm_translate.configure(state="normal", text="🔄 Re-traduire")
+                self.render_commentaries_view()
+            self.after(0, update_ui)
+        except Exception as e:
+            def on_err():
+                self.btn_comm_translate.configure(state="normal", text="⚠️ Échec - Réessayer")
+                print(f"Erreur traduction commentaire : {e}")
+            self.after(0, on_err)
 
     def insert_text_with_bible_links(self, text, base_tag, end_newline="\n\n"):
         """Insère du texte dans comm_textbox en transformant automatiquement chaque référence biblique en lien cliquable avec infobulle."""

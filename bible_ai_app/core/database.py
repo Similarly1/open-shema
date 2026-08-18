@@ -56,8 +56,23 @@ class VectorDB:
             return
 
         texts = [c["text"] for c in chunks_to_process]
-        metadatas = [c["metadata"] for c in chunks_to_process]
+        raw_metadatas = [c.get("metadata", {}) for c in chunks_to_process]
         ids = [c["id"] for c in chunks_to_process]
+        
+        # Nettoyage strict des métadonnées pour ChromaDB (types primitifs uniquement, listes en chaînes)
+        metadatas = []
+        for m in raw_metadatas:
+            clean_m = {}
+            for k, v in m.items():
+                if v is None:
+                    continue
+                elif isinstance(v, (list, set, tuple)):
+                    clean_m[k] = ", ".join(str(item) for item in v)
+                elif isinstance(v, (str, int, float, bool)):
+                    clean_m[k] = v
+                else:
+                    clean_m[k] = str(v)
+            metadatas.append(clean_m)
         
         batch_size = 20 if ("gemini" in embedding_model or "infomaniak" in embedding_model or "bge" in embedding_model) else 50
         total_remaining = len(texts)

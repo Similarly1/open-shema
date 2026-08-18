@@ -121,6 +121,49 @@ class LibraryTab(ctk.CTkFrame):
             if author:
                 author_lbl = ctk.CTkLabel(book_frame, text=author, font=ctk.CTkFont(size=11), text_color="gray")
                 author_lbl.pack()
+                
+            # Badges de classification
+            tags_frame = ctk.CTkFrame(book_frame, fg_color="transparent")
+            tags_frame.pack(pady=(2, 2))
+            
+            b_type = source.get("type", "")
+            if b_type:
+                lbl_t = ctk.CTkLabel(
+                    tags_frame,
+                    text=b_type,
+                    font=ctk.CTkFont(size=9, weight="bold"),
+                    fg_color=("#E2E8F0", "#334155"),
+                    corner_radius=4,
+                    padx=4,
+                    height=18
+                )
+                lbl_t.pack(side="left", padx=2)
+                
+            scope = source.get("corpus_scope")
+            if scope:
+                s_color = "#EA580C" if scope == "OT" else ("#0284C7" if scope == "NT" else "#7C3AED")
+                lbl_s = ctk.CTkLabel(
+                    tags_frame,
+                    text=scope,
+                    font=ctk.CTkFont(size=9, weight="bold"),
+                    fg_color=s_color,
+                    text_color="white",
+                    corner_radius=4,
+                    padx=4,
+                    height=18
+                )
+                lbl_s.pack(side="left", padx=2)
+                
+            nb_ch = source.get("chapters_count")
+            if nb_ch:
+                lbl_ch = ctk.CTkLabel(
+                    tags_frame,
+                    text=f"📑 {nb_ch} ch.",
+                    font=ctk.CTkFont(size=9),
+                    text_color=("#64748B", "#94A3B8"),
+                    height=18
+                )
+                lbl_ch.pack(side="left", padx=2)
             
             actions_frame = ctk.CTkFrame(book_frame, fg_color="transparent")
             actions_frame.pack(pady=5)

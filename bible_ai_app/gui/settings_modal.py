@@ -10,6 +10,7 @@ from gui import native_dialog as filedialog
 from core.config import load_config, save_config
 from core.dictionary_manager import DictionaryManager
 from core.dictionary_polisher import AVAILABLE_POLISH_MODELS
+from core.translation_manager import AVAILABLE_TRANSLATION_MODELS
 
 # Composants inclus dans la sauvegarde complète
 _BACKUP_MANIFEST_VERSION = "1.0"
@@ -287,6 +288,17 @@ class SettingsTab(ctk.CTkScrollableFrame):
             values=[m[0] for m in AVAILABLE_POLISH_MODELS]
         )
         self.dict_polish_model_menu.pack(fill="x", padx=20, pady=5)
+        
+        # Modèle de Traduction (Commentaires & Dictionnaires Multilingues)
+        self.trans_model_label = ctk.CTkLabel(self, text="Modèle de Traduction (Commentaires & Dictionnaires) :")
+        self.trans_model_label.pack(anchor="w", padx=20, pady=(8, 0))
+        self.trans_model_var = ctk.StringVar(value=self.config.get("translation_model", "gemini-3.5-flash-lite"))
+        self.trans_model_menu = ctk.CTkOptionMenu(
+            self,
+            variable=self.trans_model_var,
+            values=[m[0] for m in AVAILABLE_TRANSLATION_MODELS]
+        )
+        self.trans_model_menu.pack(fill="x", padx=20, pady=5)
         
         self.api_key_label = ctk.CTkLabel(self, text="Clé API Mistral :")
         self.api_key_label.pack(anchor="w", padx=20, pady=(4, 0))
@@ -672,6 +684,7 @@ class SettingsTab(ctk.CTkScrollableFrame):
         self.config["google_books_api_key"] = self.google_books_key_entry.get().strip()
         self.config["chat_model"] = self.chat_model_var.get()
         self.config["dict_polish_model"] = self.dict_polish_model_var.get()
+        self.config["translation_model"] = self.trans_model_var.get()
         self.config["show_diff_percentage"] = self.show_diff_pct_var.get()
         self.config["show_diff_highlights"] = self.show_diff_colors_var.get()
         self.config["reference_bible"] = self.ref_bible_var.get()

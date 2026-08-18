@@ -43,5 +43,14 @@
     "priority": 5,
     "count": 99,
     "file": "dictionaries/theologie_systematiq.json"
+  },
+  {
+    "id": "nouveau_dictionnaire",
+    "name": "Nouveau dictionnaire biblique. Révisé et augmenté",
+    "type": "custom",
+    "enabled": true,
+    "priority": 6,
+    "count": 7016,
+    "file": "dictionaries\\nouveau_dictionnaire.json"
   }
 ]

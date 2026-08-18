@@ -1,7 +1,19 @@
 import base64
 import requests
-from mistralai.client import MistralClient
-from mistralai.models.chat_completion import ChatMessage
+
+try:
+    from mistralai.client import MistralClient
+    from mistralai.models.chat_completion import ChatMessage
+except ImportError:
+    try:
+        from mistralai import Mistral as MistralClient
+        class ChatMessage:
+            def __init__(self, role, content):
+                self.role = role
+                self.content = content
+    except ImportError:
+        MistralClient = None
+        ChatMessage = None
 
 class GeminiClient:
     CHAT_CASCADE = [
