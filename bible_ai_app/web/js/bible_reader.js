@@ -162,7 +162,7 @@ const TabsManager = {
     const openNames = this.tabs.map(t => t.bibleName);
     let chosenBible = BibleReader.installedBibles.find(b => !openNames.includes(b.name))?.name;
     if (!chosenBible) {
-      chosenBible = BibleReader.installedBibles[0]?.name || 'Colombe';
+      chosenBible = BibleReader.installedBibles[0]?.name || 'Segond 21';
     }
 
     const newTab = this.createTab(chosenBible, BibleReader.currentBook, BibleReader.currentChapter, null, true, false, 'LSG');
@@ -947,8 +947,8 @@ const LexiconViewer = {
 const BibleReader = {
   currentBook: 'Gen',
   currentChapter: 1,
-  currentBible1: 'Colombe',
-  currentBible2: 'Segond 21',
+  currentBible1: 'Segond 21',
+  currentBible2: 'BDS',
   
   isSplitView: false,
   isScrollSynced: true,

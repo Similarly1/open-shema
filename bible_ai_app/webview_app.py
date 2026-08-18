@@ -167,18 +167,21 @@ class BibleAppApi:
         bibles = []
         for name, meta in registry.items():
             if meta.get("type") == "Bible" and meta.get("active", True):
-                default_title, default_code = BIBLE_CANONICAL_INFO.get(name, (meta.get("title", name), meta.get("version_code", name)))
-                full_title = meta.get("title") if meta.get("title") and meta.get("title") != name else default_title
-                code = meta.get("version_code") or default_code
-                bibles.append({
-                    "id": meta.get("folder_name", name),
-                    "name": name,
-                    "title": full_title,
-                    "author": meta.get("author", ""),
-                    "version_code": code
-                })
+                folder = meta.get("folder_name", name)
+                # S'assurer que le dossier de la Bible existe réellement sur le disque
+                if BibleJsonLoader.find_bible_dir_by_name(folder) or BibleJsonLoader.find_bible_dir_by_name(name):
+                    default_title, default_code = BIBLE_CANONICAL_INFO.get(name, (meta.get("title", name), meta.get("version_code", name)))
+                    full_title = meta.get("title") if meta.get("title") and meta.get("title") != name else default_title
+                    code = meta.get("version_code") or default_code
+                    bibles.append({
+                        "id": folder,
+                        "name": name,
+                        "title": full_title,
+                        "author": meta.get("author", ""),
+                        "version_code": code
+                    })
         
-        # Si vide, fallback sur les dossiers JSON
+        # Si vide, fallback direct sur les dossiers JSON
         if not bibles:
             installed = BibleJsonLoader.list_installed_bibles()
             for b in installed:

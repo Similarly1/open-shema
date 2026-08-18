@@ -172,25 +172,33 @@ class BibleJsonLoader:
         from core.reference_parser import get_french_book_name
         fr_book = get_french_book_name(std_book_code)
 
-        # Scanner les fichiers du dossier
+        # Scanner les fichiers du dossier avec priorité aux fichiers structurés
+        all_json = [f for f in os.listdir(target_dir) if f.endswith(".json")]
         matched_file = None
-        for filename in os.listdir(target_dir):
-            if not filename.endswith(".json"):
-                continue
-            
-            # Recherche par code USFM (ex: "01_GEN_Genèse.json" ou "43_JHN_Jean.json")
+
+        # 1. Priorité aux fichiers avec underscore et code USFM exact (ex: "01_GEN_Genèse.json" ou "GEN_Genèse.json")
+        for filename in all_json:
             parts = filename.replace(".json", "").split("_")
-            if len(parts) >= 2 and parts[1].upper() == usfm_code.upper():
-                matched_file = os.path.join(target_dir, filename)
+            for p in parts:
+                if p.upper() == usfm_code.upper():
+                    matched_file = os.path.join(target_dir, filename)
+                    break
+            if matched_file:
                 break
-            # Recherche par code interne
-            if usfm_code.lower() in filename.lower():
-                matched_file = os.path.join(target_dir, filename)
-                break
-            # Recherche par nom français
-            if fr_book.lower() in filename.lower():
-                matched_file = os.path.join(target_dir, filename)
-                break
+
+        # 2. Recherche par nom français
+        if not matched_file and fr_book:
+            for filename in all_json:
+                if fr_book.lower() in filename.lower():
+                    matched_file = os.path.join(target_dir, filename)
+                    break
+
+        # 3. Recherche par code interne USFM partiel
+        if not matched_file:
+            for filename in all_json:
+                if usfm_code.lower() in filename.lower():
+                    matched_file = os.path.join(target_dir, filename)
+                    break
 
         if not matched_file or not os.path.exists(matched_file):
             return None
@@ -198,8 +206,21 @@ class BibleJsonLoader:
         try:
             with open(matched_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
-                cls._cache[cache_key] = data
-                return data
+
+            # Auto-normalisation si le format est une liste de versets
+            if "chapters" not in data and "verses" in data and isinstance(data["verses"], list):
+                chapters_dict = {}
+                for v in data["verses"]:
+                    ch = str(v.get("chapter", "1"))
+                    vn = str(v.get("verse_number", "1"))
+                    txt = v.get("text", "")
+                    if ch not in chapters_dict:
+                        chapters_dict[ch] = {}
+                    chapters_dict[ch][vn] = txt
+                data["chapters"] = chapters_dict
+
+            cls._cache[cache_key] = data
+            return data
         except Exception as e:
             print(f"Erreur chargement livre {matched_file} : {e}")
             return None

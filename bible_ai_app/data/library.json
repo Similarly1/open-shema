@@ -1,14 +1,4 @@
 {
-  "Colombe": {
-    "title": "Colombe",
-    "author": "",
-    "description": "",
-    "year": "",
-    "cover_path": null,
-    "type": "Bible",
-    "embedding_model": "study_library",
-    "active": true
-  },
   "Proverbes - commentaire de Kathleen Nielson": {
     "title": "Proverbes - commentaire de Kathleen Nielson",
     "author": "",
@@ -16,16 +6,6 @@
     "year": "",
     "cover_path": null,
     "type": "Commentaire",
-    "embedding_model": "study_library",
-    "active": true
-  },
-  "Chouraqui": {
-    "title": "Chouraqui",
-    "author": "",
-    "description": "",
-    "year": "",
-    "cover_path": null,
-    "type": "Bible",
     "embedding_model": "study_library",
     "active": true
   },
