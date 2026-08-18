@@ -1960,6 +1960,39 @@ input:checked + .slider.round:before {
   flex-direction: column;
   gap: 10px;
 }
+.interlinear-target-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.interlinear-target-pills {
+  display: flex;
+  gap: 3px;
+  background: var(--bg-hover, #F1F5F9);
+  padding: 3px;
+  border-radius: 6px;
+}
+.target-pane-pill {
+  flex: 1;
+  padding: 4px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+.target-pane-pill:hover {
+  color: var(--text-primary);
+}
+.target-pane-pill.active {
+  background: #FFFFFF;
+  color: var(--accent-blue);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
 .interlinear-toggle-row {
   display: flex;
   align-items: center;

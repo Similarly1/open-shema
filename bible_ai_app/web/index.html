@@ -657,7 +657,16 @@
         <button class="context-close-btn" id="btn-close-interlinear-popover">✕</button>
       </div>
 
-      <div class="interlinear-pop-body">
+        <!-- Choix de la fenêtre cible (quand double vue active) -->
+        <div class="interlinear-target-container" id="interlinear-target-container">
+          <div class="pop-section-label" style="margin-bottom: 6px;">Appliquer à :</div>
+          <div class="interlinear-target-pills">
+            <button type="button" class="target-pane-pill active" id="btn-inter-target-1" data-pane="1">Gauche (1)</button>
+            <button type="button" class="target-pane-pill" id="btn-inter-target-2" data-pane="2">Droite (2)</button>
+            <button type="button" class="target-pane-pill" id="btn-inter-target-both" data-pane="both">Les deux</button>
+          </div>
+        </div>
+
         <!-- Switch Activation Rapide -->
         <div class="interlinear-toggle-row">
           <div class="toggle-text-block">

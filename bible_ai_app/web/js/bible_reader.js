@@ -177,21 +177,14 @@ const TabsManager = {
     BibleReader.currentBible1 = target.bibleName;
     BibleReader.currentBook = target.book || 'Gen';
     BibleReader.currentChapter = target.chapter || 1;
-    BibleReader.isInterlinear = !!target.isInterlinear;
-    BibleReader.interlinearVersion = target.interlinearVersion || 'LSG';
+    BibleReader.pane1IsInterlinear = !!target.isInterlinear;
+    BibleReader.pane1InterlinearVersion = target.interlinearVersion || 'LSG';
 
     // Mettre à jour l'état visuel du bouton et du menu Interlinéaire
     const interBtn = document.getElementById('btn-toggle-interlinear');
-    const masterSwitch = document.getElementById('interlinear-master-switch');
-    if (interBtn) interBtn.classList.toggle('active', BibleReader.isInterlinear);
-    if (masterSwitch) masterSwitch.checked = BibleReader.isInterlinear;
+    if (interBtn) interBtn.classList.toggle('active', BibleReader.pane1IsInterlinear || BibleReader.pane2IsInterlinear);
 
-    const radioLSG = document.getElementById('lbl-inter-lsg');
-    const radioDarby = document.getElementById('lbl-inter-darby');
-    const radioInput = document.querySelector(`input[name="interlinear-version-radio"][value="${BibleReader.interlinearVersion}"]`);
-    if (radioInput) radioInput.checked = true;
-    if (radioLSG) radioLSG.classList.toggle('active', BibleReader.interlinearVersion === 'LSG');
-    if (radioDarby) radioDarby.classList.toggle('active', BibleReader.interlinearVersion === 'DARBY');
+    InterlinearMenu.syncPopoverUI();
 
     BibleReader.updatePaneHeader(1);
     if (BibleReader.isSplitView) BibleReader.updatePaneHeader(2);
@@ -312,6 +305,8 @@ const DisplayOptions = {
 
 // 3b. MENU OPTIONS INTERLINÉAIRE INVERSÉ (Style Logos)
 const InterlinearMenu = {
+  currentTargetPane: '1',
+
   init() {
     const btn = document.getElementById('btn-toggle-interlinear');
     const popover = document.getElementById('interlinear-options-popover');
@@ -324,6 +319,7 @@ const InterlinearMenu = {
 
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
+      this.syncPopoverUI();
       popover.classList.toggle('hidden');
     });
 
@@ -339,11 +335,31 @@ const InterlinearMenu = {
       }
     });
 
+    // Gestion du choix de la fenêtre cible (Gauche / Droite / Les deux)
+    document.querySelectorAll('.target-pane-pill').forEach(pill => {
+      pill.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.target-pane-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        this.currentTargetPane = pill.dataset.pane || '1';
+        this.syncPopoverUI();
+      });
+    });
+
     if (masterSwitch) {
       masterSwitch.addEventListener('change', (e) => {
-        BibleReader.isInterlinear = e.target.checked;
-        btn.classList.toggle('active', BibleReader.isInterlinear);
-        TabsManager.updateActiveTab(null, null, null, BibleReader.isInterlinear, BibleReader.interlinearVersion);
+        const checked = e.target.checked;
+        if (this.currentTargetPane === '1') {
+          BibleReader.pane1IsInterlinear = checked;
+        } else if (this.currentTargetPane === '2') {
+          BibleReader.pane2IsInterlinear = checked;
+        } else if (this.currentTargetPane === 'both') {
+          BibleReader.pane1IsInterlinear = checked;
+          BibleReader.pane2IsInterlinear = checked;
+        }
+
+        btn.classList.toggle('active', BibleReader.pane1IsInterlinear || BibleReader.pane2IsInterlinear);
+        TabsManager.updateActiveTab(null, null, null, BibleReader.pane1IsInterlinear, BibleReader.pane1InterlinearVersion);
         BibleReader.updatePaneHeader(1);
         if (BibleReader.isSplitView) BibleReader.updatePaneHeader(2);
         BibleReader.reloadCurrentChapters();
@@ -352,15 +368,23 @@ const InterlinearMenu = {
 
     document.querySelectorAll('input[name="interlinear-version-radio"]').forEach(radio => {
       radio.addEventListener('change', (e) => {
-        BibleReader.interlinearVersion = e.target.value;
-        if (radioLSG) radioLSG.classList.toggle('active', e.target.value === 'LSG');
-        if (radioDarby) radioDarby.classList.toggle('active', e.target.value === 'DARBY');
-        TabsManager.updateActiveTab(null, null, null, BibleReader.isInterlinear, BibleReader.interlinearVersion);
-        if (BibleReader.isInterlinear) {
-          BibleReader.updatePaneHeader(1);
-          if (BibleReader.isSplitView) BibleReader.updatePaneHeader(2);
-          BibleReader.reloadCurrentChapters();
+        const val = e.target.value;
+        if (this.currentTargetPane === '1') {
+          BibleReader.pane1InterlinearVersion = val;
+        } else if (this.currentTargetPane === '2') {
+          BibleReader.pane2InterlinearVersion = val;
+        } else if (this.currentTargetPane === 'both') {
+          BibleReader.pane1InterlinearVersion = val;
+          BibleReader.pane2InterlinearVersion = val;
         }
+
+        if (radioLSG) radioLSG.classList.toggle('active', val === 'LSG');
+        if (radioDarby) radioDarby.classList.toggle('active', val === 'DARBY');
+
+        TabsManager.updateActiveTab(null, null, null, BibleReader.pane1IsInterlinear, BibleReader.pane1InterlinearVersion);
+        BibleReader.updatePaneHeader(1);
+        if (BibleReader.isSplitView) BibleReader.updatePaneHeader(2);
+        BibleReader.reloadCurrentChapters();
       });
     });
 
@@ -376,7 +400,7 @@ const InterlinearMenu = {
         translit: layerTranslit ? layerTranslit.checked : true,
         strong: layerStrong ? layerStrong.checked : true
       };
-      if (BibleReader.isInterlinear) {
+      if (BibleReader.pane1IsInterlinear || BibleReader.pane2IsInterlinear) {
         BibleReader.reloadCurrentChapters();
       }
     };
@@ -385,6 +409,37 @@ const InterlinearMenu = {
     if (layerOrig) layerOrig.addEventListener('change', onLayerChanged);
     if (layerTranslit) layerTranslit.addEventListener('change', onLayerChanged);
     if (layerStrong) layerStrong.addEventListener('change', onLayerChanged);
+  },
+
+  syncPopoverUI() {
+    const targetBox = document.getElementById('interlinear-target-container');
+    if (targetBox) {
+      targetBox.style.display = BibleReader.isSplitView ? 'flex' : 'none';
+    }
+
+    const masterSwitch = document.getElementById('interlinear-master-switch');
+    const radioLSG = document.getElementById('lbl-inter-lsg');
+    const radioDarby = document.getElementById('lbl-inter-darby');
+
+    let isTargetActive = false;
+    let targetVersion = 'LSG';
+
+    if (this.currentTargetPane === '1') {
+      isTargetActive = BibleReader.pane1IsInterlinear;
+      targetVersion = BibleReader.pane1InterlinearVersion || 'LSG';
+    } else if (this.currentTargetPane === '2') {
+      isTargetActive = BibleReader.pane2IsInterlinear;
+      targetVersion = BibleReader.pane2InterlinearVersion || 'DARBY';
+    } else {
+      isTargetActive = BibleReader.pane1IsInterlinear || BibleReader.pane2IsInterlinear;
+      targetVersion = BibleReader.pane1InterlinearVersion || 'LSG';
+    }
+
+    if (masterSwitch) masterSwitch.checked = isTargetActive;
+    const radioInput = document.querySelector(`input[name="interlinear-version-radio"][value="${targetVersion}"]`);
+    if (radioInput) radioInput.checked = true;
+    if (radioLSG) radioLSG.classList.toggle('active', targetVersion === 'LSG');
+    if (radioDarby) radioDarby.classList.toggle('active', targetVersion === 'DARBY');
   }
 };
 
@@ -898,8 +953,26 @@ const BibleReader = {
   isSplitView: false,
   isScrollSynced: true,
   isSyncingScroll: false,
-  isInterlinear: false,
-  interlinearVersion: 'LSG',
+
+  pane1IsInterlinear: false,
+  pane1InterlinearVersion: 'LSG',
+  pane2IsInterlinear: false,
+  pane2InterlinearVersion: 'DARBY',
+
+  get isInterlinear() {
+    return this.pane1IsInterlinear || this.pane2IsInterlinear;
+  },
+  set isInterlinear(val) {
+    this.pane1IsInterlinear = !!val;
+  },
+
+  get interlinearVersion() {
+    return this.pane1InterlinearVersion || 'LSG';
+  },
+  set interlinearVersion(val) {
+    this.pane1InterlinearVersion = val;
+  },
+
   interlinearLayers: { surface: true, orig: true, translit: true, strong: true },
   zoomPercent: 100,
 
@@ -1069,18 +1142,22 @@ const BibleReader = {
 
   updatePaneHeader(paneNum) {
     if (paneNum === 1) {
-      if (this.isInterlinear) {
-        const interLabel = this.interlinearVersion === 'DARBY' ? 'Darby (Interlinéaire)' : 'LSG 1910 (Interlinéaire)';
-        document.getElementById('pane-1-bible-name').textContent = interLabel;
+      const el = document.getElementById('pane-1-bible-name');
+      if (!el) return;
+      if (this.pane1IsInterlinear) {
+        const interLabel = this.pane1InterlinearVersion === 'DARBY' ? 'Darby (Interlinéaire)' : 'LSG 1910 (Interlinéaire)';
+        el.textContent = interLabel;
       } else {
-        document.getElementById('pane-1-bible-name').textContent = this.currentBible1;
+        el.textContent = this.currentBible1;
       }
     } else if (paneNum === 2) {
-      if (this.isInterlinear) {
-        const interLabel = this.interlinearVersion === 'DARBY' ? 'Darby (Interlinéaire)' : 'LSG 1910 (Interlinéaire)';
-        document.getElementById('pane-2-bible-name').textContent = interLabel;
+      const el = document.getElementById('pane-2-bible-name');
+      if (!el) return;
+      if (this.pane2IsInterlinear) {
+        const interLabel = this.pane2InterlinearVersion === 'DARBY' ? 'Darby (Interlinéaire)' : 'LSG 1910 (Interlinéaire)';
+        el.textContent = interLabel;
       } else {
-        document.getElementById('pane-2-bible-name').textContent = this.currentBible2;
+        el.textContent = this.currentBible2;
       }
     }
   },
@@ -1199,7 +1276,7 @@ const BibleReader = {
 
     for (let i = 0; i < chaptersToLoad.length; i++) {
       const c = chaptersToLoad[i];
-      const data2 = await API.getChapterData(this.currentBible2, c.book, c.chapter, this.interlinearVersion);
+      const data2 = await API.getChapterData(this.currentBible2, c.book, c.chapter, this.pane2IsInterlinear ? this.pane2InterlinearVersion : null);
       const block2 = this.createChapterBlockElement(2, data2, this.currentBible2);
       
       if (i > 0) {
@@ -1300,7 +1377,7 @@ const BibleReader = {
     const pane1Container = document.getElementById('pane-1-verses');
     if (pane1Container) pane1Container.innerHTML = '';
 
-    const data1 = await API.getChapterData(this.currentBible1, bookCode, chapterNum, this.interlinearVersion);
+    const data1 = await API.getChapterData(this.currentBible1, bookCode, chapterNum, this.pane1IsInterlinear ? this.pane1InterlinearVersion : null);
     const block1 = this.createChapterBlockElement(1, data1, this.currentBible1);
     if (pane1Container) pane1Container.appendChild(block1);
 
@@ -1308,7 +1385,7 @@ const BibleReader = {
       const pane2Container = document.getElementById('pane-2-verses');
       if (pane2Container) pane2Container.innerHTML = '';
       this.updatePaneHeader(2);
-      const data2 = await API.getChapterData(this.currentBible2, bookCode, chapterNum, this.interlinearVersion);
+      const data2 = await API.getChapterData(this.currentBible2, bookCode, chapterNum, this.pane2IsInterlinear ? this.pane2InterlinearVersion : null);
       const block2 = this.createChapterBlockElement(2, data2, this.currentBible2);
       if (pane2Container) pane2Container.appendChild(block2);
       
@@ -1336,7 +1413,7 @@ const BibleReader = {
 
     for (let i = 0; i < chaptersToReload.length; i++) {
       const c = chaptersToReload[i];
-      const data = await API.getChapterData(this.currentBible1, c.book, c.chapter, this.interlinearVersion);
+      const data = await API.getChapterData(this.currentBible1, c.book, c.chapter, this.pane1IsInterlinear ? this.pane1InterlinearVersion : null);
       const block = this.createChapterBlockElement(1, data, this.currentBible1);
       if (i > 0) {
         const divider = document.createElement('div');
@@ -1352,7 +1429,7 @@ const BibleReader = {
       if (pane2Container) pane2Container.innerHTML = '';
       for (let i = 0; i < chaptersToReload.length; i++) {
         const c = chaptersToReload[i];
-        const data2 = await API.getChapterData(this.currentBible2, c.book, c.chapter, this.interlinearVersion);
+        const data2 = await API.getChapterData(this.currentBible2, c.book, c.chapter, this.pane2IsInterlinear ? this.pane2InterlinearVersion : null);
         const block2 = this.createChapterBlockElement(2, data2, this.currentBible2);
         if (i > 0) {
           const divider2 = document.createElement('div');
@@ -1375,7 +1452,7 @@ const BibleReader = {
     this.loadedChapters.push(next);
 
     // Colonne 1
-    const data1 = await API.getChapterData(this.currentBible1, next.book, next.chapter, this.interlinearVersion);
+    const data1 = await API.getChapterData(this.currentBible1, next.book, next.chapter, this.pane1IsInterlinear ? this.pane1InterlinearVersion : null);
     const block1 = this.createChapterBlockElement(1, data1, this.currentBible1);
 
     const divider1 = document.createElement('div');
@@ -1390,7 +1467,7 @@ const BibleReader = {
 
     // Colonne 2 (si double vue)
     if (this.isSplitView) {
-      const data2 = await API.getChapterData(this.currentBible2, next.book, next.chapter, this.interlinearVersion);
+      const data2 = await API.getChapterData(this.currentBible2, next.book, next.chapter, this.pane2IsInterlinear ? this.pane2InterlinearVersion : null);
       const block2 = this.createChapterBlockElement(2, data2, this.currentBible2);
 
       const divider2 = document.createElement('div');
@@ -1417,7 +1494,7 @@ const BibleReader = {
     this.loadedChapters.unshift(prev);
 
     // Colonne 1
-    const data1 = await API.getChapterData(this.currentBible1, prev.book, prev.chapter, this.interlinearVersion);
+    const data1 = await API.getChapterData(this.currentBible1, prev.book, prev.chapter, this.pane1IsInterlinear ? this.pane1InterlinearVersion : null);
     const block1 = this.createChapterBlockElement(1, data1, this.currentBible1);
 
     const divider1 = document.createElement('div');
@@ -1440,7 +1517,7 @@ const BibleReader = {
 
     // Colonne 2 (si double vue)
     if (this.isSplitView) {
-      const data2 = await API.getChapterData(this.currentBible2, prev.book, prev.chapter, this.interlinearVersion);
+      const data2 = await API.getChapterData(this.currentBible2, prev.book, prev.chapter, this.pane2IsInterlinear ? this.pane2InterlinearVersion : null);
       const block2 = this.createChapterBlockElement(2, data2, this.currentBible2);
 
       const divider2 = document.createElement('div');
@@ -1478,9 +1555,12 @@ const BibleReader = {
       block.appendChild(pericope);
     }
 
+    const isPaneInterlinear = paneNum === 1 ? this.pane1IsInterlinear : this.pane2IsInterlinear;
+    const paneInterVersion = paneNum === 1 ? this.pane1InterlinearVersion : this.pane2InterlinearVersion;
+
     const flow = document.createElement('div');
     flow.className = 'verses-flow';
-    if (this.isInterlinear) {
+    if (isPaneInterlinear) {
       flow.classList.add('interlinear-mode');
     }
 
@@ -1492,7 +1572,7 @@ const BibleReader = {
         vSpan.dataset.bookCode = data.book;
         vSpan.dataset.chapter = data.chapter;
 
-        if (this.isInterlinear && v.words && v.words.length > 0) {
+        if (isPaneInterlinear && v.words && v.words.length > 0) {
           vSpan.className = 'verse-item interlinear-mode';
           let wordsHtml = '';
           v.words.forEach(w => {
@@ -1510,7 +1590,7 @@ const BibleReader = {
               </div>
             `;
           });
-          const badgeText = this.interlinearVersion === 'DARBY' ? 'Bible Darby (Interlinéaire Inversé)' : 'Louis Segond 1910 (Interlinéaire Inversé)';
+          const badgeText = paneInterVersion === 'DARBY' ? 'Bible Darby (Interlinéaire Inversé)' : 'Louis Segond 1910 (Interlinéaire Inversé)';
           vSpan.innerHTML = `
             <div class="verse-interlinear-header">
               <sup class="verse-num">${v.verse}</sup>
@@ -1673,20 +1753,31 @@ const BibleReader = {
     if (this.targetPaneForPicker === 1) {
       this.currentBible1 = versionName;
       if (versionName === 'DARBY') {
-        this.interlinearVersion = 'DARBY';
+        this.pane1IsInterlinear = true;
+        this.pane1InterlinearVersion = 'DARBY';
       } else if (versionName === 'LSG') {
-        this.interlinearVersion = 'LSG';
+        this.pane1IsInterlinear = true;
+        this.pane1InterlinearVersion = 'LSG';
       } else {
-        this.isInterlinear = false;
-        const interBtn = document.getElementById('btn-toggle-interlinear');
-        const masterSwitch = document.getElementById('interlinear-master-switch');
-        if (interBtn) interBtn.classList.remove('active');
-        if (masterSwitch) masterSwitch.checked = false;
+        this.pane1IsInterlinear = false;
       }
-      TabsManager.updateActiveTab(versionName, this.currentBook, this.currentChapter, this.isInterlinear, this.interlinearVersion);
+      const interBtn = document.getElementById('btn-toggle-interlinear');
+      if (interBtn) interBtn.classList.toggle('active', this.pane1IsInterlinear || this.pane2IsInterlinear);
+      TabsManager.updateActiveTab(versionName, this.currentBook, this.currentChapter, this.pane1IsInterlinear, this.pane1InterlinearVersion);
       this.updatePaneHeader(1);
     } else {
       this.currentBible2 = versionName;
+      if (versionName === 'DARBY') {
+        this.pane2IsInterlinear = true;
+        this.pane2InterlinearVersion = 'DARBY';
+      } else if (versionName === 'LSG') {
+        this.pane2IsInterlinear = true;
+        this.pane2InterlinearVersion = 'LSG';
+      } else {
+        this.pane2IsInterlinear = false;
+      }
+      const interBtn = document.getElementById('btn-toggle-interlinear');
+      if (interBtn) interBtn.classList.toggle('active', this.pane1IsInterlinear || this.pane2IsInterlinear);
       this.updatePaneHeader(2);
     }
     this.navigateTo(this.currentBook, this.currentChapter);
