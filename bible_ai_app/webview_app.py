@@ -372,11 +372,17 @@ class BibleAppApi:
         )
 
         try:
-            from ai.gemini_client import GeminiClient
-            client = GeminiClient()
-            answer = client.generate_response(prompt)
-            return {"answer": answer}
-        except Exception:
+            from ai.llm_client import LLMClient
+            api_key = self.config.get("gemini_api_key", "")
+            if api_key:
+                client = LLMClient(api_key=api_key, model=self.config.get("chat_model", "gemini-3.7-flash"), provider="gemini")
+                answer = client.ask_question(context=f"{comm_context}\n{notes_context}", question=question)
+                return {"answer": answer}
+            else:
+                return {
+                    "answer": f"**[Analyse pour {ref}]**\n\nCe passage souligne la structure théologique du texte. Vous pouvez consulter les commentaires de la barre latérale pour des détails verset par verset (Configurez votre clé API dans les Paramètres pour activer les réponses IA dynamiques)."
+                }
+        except Exception as e:
             return {
                 "answer": f"**[Analyse pour {ref}]**\n\nCe passage souligne la structure théologique du texte. Vous pouvez consulter les commentaires de la barre latérale pour des détails verset par verset."
             }
@@ -488,59 +494,227 @@ class BibleAppApi:
     # ASSISTANT D'ÉTUDE AVANCÉ
     # =========================================================================
 
-    def ask_study_ai(self, question: str, mode: str = "exegesis", passage_ref: str = "") -> Dict[str, Any]:
-        """Génère une étude théologique ou exégétique complète avec prise en compte des notes et instructions de mode."""
+    def ask_study_ai(self, question: str, mode: str = "exegesis", passage_ref: str = "", options: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+        Génère une étude théologique ou exégétique complète avec extraction multi-sources (Bibles, Commentaires, Dicos, Notes),
+        options de modèle LLM, et pipeline RAG (Reranking Cross-Encoder CPU / LLM Curateur).
+        """
         self.config = load_config()
-        notes_context = NotesManager.build_ai_notes_context(passage_ref=passage_ref, question=question, config=self.config)
+        opts = options or {}
         
+        selected_model = opts.get("model") or self.config.get("chat_model", "gemini-3.7-flash")
+        depth_style = opts.get("depth", "academic")
+        enable_rerank = opts.get("enable_reranking", True)
+        enable_curator = opts.get("enable_curator", False)
+        sources_cfg = opts.get("sources", {
+            "bibles": True,
+            "commentaries": True,
+            "dictionaries": True,
+            "notes": True
+        })
+        
+        sources_used = []
+        context_chunks = []
+        
+        # 1. Résolution et extraction du texte biblique (Bibles & Interlinéaire)
+        if sources_cfg.get("bibles", True) and passage_ref:
+            try:
+                parsed = self.parse_reference(passage_ref)
+                if parsed and parsed.get("book"):
+                    b_code = parsed["book"]
+                    ch_num = parsed.get("chapter") or 1
+                    ch_data = self.get_chapter_data("LSG", b_code, ch_num)
+                    if ch_data and ch_data.get("verses"):
+                        v_target = parsed.get("verse")
+                        v_end = parsed.get("verse_end") or v_target
+                        verses_subset = ch_data["verses"]
+                        if v_target:
+                            verses_subset = [v for v in ch_data["verses"] if v["verse"] >= v_target and (not v_end or v["verse"] <= v_end)]
+                            if not verses_subset:
+                                verses_subset = ch_data["verses"][:5]
+                        
+                        v_lines = []
+                        for v in verses_subset[:12]:
+                            v_lines.append(f"v.{v['verse']} : {v.get('text', '')}")
+                        
+                        bible_text = "\n".join(v_lines)
+                        context_chunks.append({
+                            "id": f"bible_{passage_ref}",
+                            "text": f"### Texte Biblique ({ch_data.get('book_french', b_code)} {ch_num}) :\n{bible_text}",
+                            "metadata": {"type": "Bible", "name": "Bibles (LSG / Texte de base)", "ref": passage_ref}
+                        })
+                        sources_used.append(f"Bibles ({ch_data.get('book_french', b_code)} {ch_num})")
+            except Exception as e:
+                print(f"[ask_study_ai] Erreur extraction biblique : {e}")
+
+        # 2. Extraction des commentaires bibliques
+        if sources_cfg.get("commentaries", True) and passage_ref:
+            try:
+                parsed = self.parse_reference(passage_ref)
+                if parsed and parsed.get("book"):
+                    b_code = parsed["book"]
+                    ch_num = parsed.get("chapter") or 1
+                    v_num = parsed.get("verse") or 1
+                    comms = self.get_commentaries(b_code, ch_num, v_num)
+                    if comms:
+                        comm_names = []
+                        for c in comms[:4]:
+                            author = c.get("author") or c.get("source") or "Commentaire"
+                            comm_names.append(author)
+                            context_chunks.append({
+                                "id": f"comm_{author}",
+                                "text": f"### Commentaire [{author}] sur {passage_ref} :\n{c.get('text', '')[:1000]}",
+                                "metadata": {"type": "Commentaire", "name": author}
+                            })
+                        if comm_names:
+                            sources_used.append(f"Commentaires ({', '.join(set(comm_names[:3]))})")
+            except Exception as e:
+                print(f"[ask_study_ai] Erreur extraction commentaires : {e}")
+
+        # 3. Extraction des Dictionnaires & Lexique Strong
+        if sources_cfg.get("dictionaries", True):
+            try:
+                from core.strong_lexicon import StrongLexicon
+                from core.dictionary_manager import DictionaryManager
+                
+                # Chercher dans la question ou le passage des mots clés significatifs (>4 lettres)
+                words = re.findall(r'[a-zA-ZÀ-ÿ]{4,}', question)
+                dict_found = []
+                for w in words[:3]:
+                    res = DictionaryManager.lookup(w)
+                    if res and res.get("matches"):
+                        top_m = res["matches"][0]
+                        dict_name = top_m.get("dict_name", "Dictionnaire")
+                        dict_found.append(dict_name)
+                        context_chunks.append({
+                            "id": f"dict_{w}",
+                            "text": f"### Entrée de Dictionnaire [{dict_name} : {res.get('title', w)}] :\n{top_m.get('preview', '')[:800]}",
+                            "metadata": {"type": "Dictionnaire", "name": dict_name}
+                        })
+                if dict_found:
+                    sources_used.append(f"Dictionnaires ({', '.join(set(dict_found))})")
+            except Exception as e:
+                print(f"[ask_study_ai] Erreur extraction dictionnaires : {e}")
+
+        # 4. Extraction des notes personnelles (.md)
+        if sources_cfg.get("notes", True):
+            try:
+                notes_text = NotesManager.build_ai_notes_context(passage_ref=passage_ref, question=question, config=self.config)
+                if notes_text and notes_text.strip():
+                    context_chunks.append({
+                        "id": "user_notes",
+                        "text": notes_text,
+                        "metadata": {"type": "Notes", "name": "Notes personnelles (.md)"}
+                    })
+                    sources_used.append("Notes personnelles (.md)")
+            except Exception as e:
+                print(f"[ask_study_ai] Erreur extraction notes : {e}")
+
+        # 5. Pipeline RAG : Reranking sémantique & Curation
+        if enable_rerank and len(context_chunks) > 1:
+            try:
+                from core.reranker import LocalReranker
+                reranker = LocalReranker.get_instance()
+                context_chunks = reranker.rerank(query=f"{passage_ref} {question}", documents=context_chunks, top_k=6)
+                sources_used.append("Reranking (BGE-M3)")
+            except Exception as e:
+                print(f"[ask_study_ai] Reranking bypass : {e}")
+
+        # Assemblage du texte de contexte
+        formatted_context_sections = []
+        for chunk in context_chunks:
+            t = chunk.get("text") if isinstance(chunk, dict) else str(chunk)
+            if t:
+                formatted_context_sections.append(t)
+        
+        assembled_context = "\n\n".join(formatted_context_sections)
+
+        # Instructions du mode d'étude
         mode_instructions = {
             "exegesis": (
-                "MODE : EXÉGÈSE APPROFONDIE\n"
-                "- Analyse verset par verset, structure littéraire (chiasmes, parallélismes, articulations syntaxiques).\n"
-                "- Théologie biblique et intertextualité (liens Ancien/Nouveau Testament, accomplissement christocentrique).\n"
-                "- Rigueur académique et clarté doctrinale."
+                "MODE D'ÉTUDE : EXÉGÈSE APPROFONDIE\n"
+                "- Analyse structurelle et théologique verset par verset (chiasmes, parallélismes, syntaxe).\n"
+                "- Théologie biblique, intertextualité (accomplissement christocentrique, Alliances) et cohérence canonique.\n"
+                "- Rigueur académique, citations précises des termes et références."
             ),
             "historical": (
-                "MODE : CONTEXTE HISTORIQUE & CULTUREL\n"
-                "- Auteur, destinataires originaux, date et occasion de rédaction.\n"
-                "- Cadre socio-politique, coutumes et traditions antiques (Proche-Orient ancien ou monde gréco-romain).\n"
-                "- Données géographiques et archéologiques éclairant la compréhension du texte."
+                "MODE D'ÉTUDE : CONTEXTE HISTORIQUE & CULTUREL\n"
+                "- Auteur, destinataires, date et occasion de rédaction dans l'Antiquité.\n"
+                "- Cadre socio-politique, coutumes du Proche-Orient ancien ou monde gréco-romain, données géographiques et archéologiques."
             ),
             "sermon": (
-                "MODE : PRÉPARATION DE PRÉDICATION / MESSAGE HOMILÉTIQUE\n"
-                "- Titre percutant et Idée Maîtresse (Big Idea en une phrase claire).\n"
-                "- Plan structuré en 2 ou 3 points d'exposition avec illustrations contemporaines adaptées.\n"
-                "- Applications pratiques et pastorales concrètes pour la foi et la vie quotidienne chrétienne, suivi d'une conclusion/appel."
+                "MODE D'ÉTUDE : PRÉPARATION DE PRÉDICATION / MESSAGE HOMILÉTIQUE\n"
+                "- Titre accrocheur et Idée Maîtresse (Big Idea en une seule phrase forte).\n"
+                "- Plan structuré en 2 ou 3 points d'exposition bien délimités avec illustrations contemporaines adaptées.\n"
+                "- Applications concrètes et pastorales pour la foi et la vie quotidienne, suivies d'une conclusion/appel."
             ),
             "lexical": (
-                "MODE : ANALYSE LEXICALE (GREC & HÉBREU / STRONG)\n"
-                "- Étude détaillée des termes pivots dans leur langue originale (hébreu, araméen ou grec avec translittération et codes Strong).\n"
-                "- Étymologie, champ sémantique, nuances morphologiques et usage dans la Septante (LXX) ou le Nouveau Testament.\n"
-                "- Impact théologique du choix des mots dans le passage."
+                "MODE D'ÉTUDE : ANALYSE LEXICALE (GREC & HÉBREU / STRONG)\n"
+                "- Étude détaillée des termes pivots dans les langues originales (racines hébraïques/grecques, codes Strong, translittérations).\n"
+                "- Étymologie, champ sémantique, occurrences majeures, usage dans la Septante (LXX) ou le Nouveau Testament et portée théologique."
             )
         }
-        
+
+        depth_instructions = {
+            "academic": "STYLE : Académique, exhaustif, rigoureux, avec développement théologique soutenu.",
+            "pastoral": "STYLE : Pastoral, équilibré, chaleureux, orienté vers la transmission, la prédication et l'édification.",
+            "concise": "STYLE : Synthétique, direct, concis, sous forme de points clés et tableaux récapitulatifs."
+        }
+
         specific_instruction = mode_instructions.get(mode, mode_instructions["exegesis"])
-        
+        specific_depth = depth_instructions.get(depth_style, depth_instructions["academic"])
+
         prompt = (
             f"Rôle : Assistant exégétique et théologique expert Logos.\n"
-            f"{specific_instruction}\n\n"
-            f"Passage ou référence : {passage_ref or 'Étude biblique générale'}\n"
+            f"{specific_instruction}\n"
+            f"{specific_depth}\n\n"
+            f"Passage ou sujet : **{passage_ref or 'Étude biblique générale'}**\n"
             f"Question / Demande : {question}\n\n"
-            f"{notes_context}"
-            f"Directives de mise en forme :\n"
-            f"- Utilise des titres de section clairs en Markdown (### Titre).\n"
-            f"- Mets en valeur les mots-clés et références bibliques en gras (**Jean 1:1**).\n"
-            f"- Réponds en français avec précision, profondeur et clarté pédagogique."
+            f"--- CORPUS DOCUMENTAIRE DISPONIBLE ---\n"
+            f"{assembled_context or 'Aucun document textuel spécifique extrait.'}\n"
+            f"--------------------------------------\n\n"
+            f"Consignes de rédaction :\n"
+            f"1. Utilise des titres de section Markdown clairs (### Titre).\n"
+            f"2. Cite explicitement les documents et versets sources (**[Jean 1:1]**, **[Matthew Henry]**, etc.).\n"
+            f"3. Rédige en français avec haute précision et clarté pédagogique."
         )
+
         try:
-            from ai.gemini_client import GeminiClient
-            client = GeminiClient()
-            answer = client.generate_response(prompt)
-            return {"answer": answer}
-        except Exception:
+            from ai.llm_client import LLMClient
+            # Résoudre le bon provider selon le modèle
+            if "mistral" in selected_model.lower():
+                provider = "mistral"
+                api_key = self.config.get("mistral_api_key", "")
+                product_id = None
+            elif "infomaniak" in selected_model.lower() or "ministral" in selected_model.lower():
+                provider = "infomaniak"
+                api_key = self.config.get("infomaniak_token", "")
+                product_id = self.config.get("infomaniak_product_id", "251")
+            else:
+                provider = "gemini"
+                api_key = self.config.get("gemini_api_key", "")
+                product_id = None
+
+            if api_key:
+                client = LLMClient(api_key=api_key, model=selected_model, provider=provider, product_id=product_id)
+                answer = client.ask_question(context=assembled_context, question=question, system_prompt=f"{specific_instruction}\n{specific_depth}")
+            else:
+                # Fallback sur GeminiClient par défaut si disponible
+                from ai.gemini_client import GeminiClient
+                g_client = GeminiClient()
+                answer = g_client.generate_response(prompt)
+
             return {
-                "answer": f"### Analyse ({mode.capitalize()}) pour {passage_ref or 'votre étude'}\n\n**1. Synthèse du passage :**\nCe texte met en évidence la cohérence de l'alliance divine et la portée spirituelle du message biblique.\n\n**2. Éléments d'étude approfondie :**\nL'analyse des structures et des termes clés renforce la compréhension du dessein divin.\n\n**3. Application pratique :**\nUne lecture attentive permet d'en dégager des enseignements solides pour la méditation et l'enseignement."
+                "answer": answer,
+                "sources_used": sources_used or ["Corpus biblique général"],
+                "model_used": selected_model
+            }
+        except Exception as e:
+            print(f"[ask_study_ai] Erreur LLM : {e}")
+            return {
+                "answer": f"### Analyse ({mode.capitalize()}) pour {passage_ref or 'votre étude'}\n\n**1. Synthèse du passage :**\nCe texte met en évidence la cohérence de l'alliance divine et la portée spirituelle du message biblique.\n\n**2. Éléments d'étude approfondie :**\nL'analyse des structures et des termes clés renforce la compréhension du dessein divin.\n\n**3. Application pratique :**\nUne lecture attentive permet d'en dégager des enseignements solides pour la méditation et l'enseignement.",
+                "sources_used": sources_used or ["Corpus biblique général"],
+                "model_used": selected_model
             }
 
 

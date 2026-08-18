@@ -85,9 +85,9 @@ class GeminiClient:
         for current_model in models_to_try:
             url = f"{self.base_url}/{current_model}:generateContent?key={self.api_key}"
             try:
-                response = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=90)
-                if response.status_code == 429:
-                    last_error = f"Quota 429 atteint pour {current_model}"
+                response = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=20)
+                if response.status_code in [404, 429, 500, 502, 503, 504]:
+                    last_error = f"Status {response.status_code} pour {current_model}"
                     continue
                 response.raise_for_status()
                 data = response.json()
@@ -97,14 +97,16 @@ class GeminiClient:
                 except (KeyError, IndexError):
                     return "Erreur lors de la lecture de la réponse Gemini."
             except requests.exceptions.HTTPError as e:
-                if response.status_code == 429:
-                    last_error = f"Quota 429 atteint pour {current_model}"
+                if hasattr(e, 'response') and e.response is not None and e.response.status_code in [404, 429, 500, 502, 503, 504]:
+                    last_error = f"Erreur {e.response.status_code} sur {current_model}"
                     continue
                 last_error = str(e)
+                break
             except Exception as e:
                 last_error = str(e)
+                break
 
-        return f"Erreur Gemini (tous les modèles ont échoué ou quotas journaliers épuisés) : {last_error}"
+        return f"Erreur Gemini ({last_error})"
 
     def embeddings(self, texts, model="gemini-embedding-2"):
         import time
