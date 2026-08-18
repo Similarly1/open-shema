@@ -85,6 +85,12 @@ class BibleJsonLoader:
         bibles_dir = cls.get_bibles_dir()
         if not os.path.exists(bibles_dir):
             return None
+
+        if not bible_name or not isinstance(bible_name, str):
+            installed = cls.list_installed_bibles()
+            if installed:
+                return os.path.join(bibles_dir, installed[0])
+            return None
             
         # 1. Vérifier si un dossier a exactement ce nom
         direct_path = os.path.join(bibles_dir, bible_name)

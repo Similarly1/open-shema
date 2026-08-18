@@ -193,11 +193,13 @@ class ImportTab(ctk.CTkScrollableFrame):
         f_scope.grid(row=0, column=0, sticky="nsew", padx=(0, 6))
         lbl_scope = ctk.CTkLabel(f_scope, text="Portée du corpus :", font=ctk.CTkFont(size=11, weight="bold"))
         lbl_scope.pack(anchor="w")
-        self.corpus_scope_var = ctk.StringVar(value=self.edit_meta.get("corpus_scope", "GLOBAL"))
+        raw_scope = self.edit_meta.get("corpus_scope", "GLOBAL")
+        init_scope = "AT" if raw_scope == "OT" else ("AT+NT" if raw_scope == "BOTH" else ("APO" if raw_scope in ["APOCRYPHA", "APO"] else raw_scope))
+        self.corpus_scope_var = ctk.StringVar(value=init_scope)
         self.scope_menu = ctk.CTkOptionMenu(
             f_scope,
             variable=self.corpus_scope_var,
-            values=["GLOBAL", "OT", "NT", "BOTH", "INTER", "APOCRYPHA"],
+            values=["GLOBAL", "AT", "NT", "AT+NT", "INTER", "APO"],
             height=30
         )
         self.scope_menu.pack(fill="x", pady=(2, 0))
@@ -476,7 +478,9 @@ class ImportTab(ctk.CTkScrollableFrame):
         if not res:
             return
         if "corpus_scope" in res and res["corpus_scope"]:
-            self.corpus_scope_var.set(res["corpus_scope"])
+            raw_s = res["corpus_scope"]
+            disp_s = "AT" if raw_s == "OT" else ("AT+NT" if raw_s == "BOTH" else ("APO" if raw_s in ["APOCRYPHA", "APO"] else raw_s))
+            self.corpus_scope_var.set(disp_s)
         if "source_type" in res and res["source_type"]:
             self.source_type_var.set(res["source_type"])
         if "book_code" in res:
@@ -835,16 +839,17 @@ class ImportTab(ctk.CTkScrollableFrame):
             lbl_t.grid(row=0, column=1, padx=4, sticky="w")
 
             # Menu déroulant Portée (Interactif)
-            cur_scope = ch.get("corpus_scope", "GLOBAL")
-            scope_var = ctk.StringVar(value=cur_scope)
+            raw_cur_scope = ch.get("corpus_scope", "GLOBAL")
+            disp_cur_scope = "AT" if raw_cur_scope == "OT" else ("APO" if raw_cur_scope in ["APOCRYPHA", "APO"] else ("AT+NT" if raw_cur_scope == "BOTH" else raw_cur_scope))
+            scope_var = ctk.StringVar(value=disp_cur_scope)
             menu_scope = ctk.CTkOptionMenu(
                 row_f,
                 variable=scope_var,
-                values=["GLOBAL", "OT", "NT", "INTER", "APO"],
+                values=["GLOBAL", "AT", "NT", "INTER", "APO"],
                 width=68,
                 height=22,
                 font=ctk.CTkFont(size=9, weight="bold"),
-                command=lambda val, target_ch=ch: target_ch.update({"corpus_scope": val})
+                command=lambda val, target_ch=ch: target_ch.update({"corpus_scope": "OT" if val == "AT" else ("APOCRYPHA" if val == "APO" else val)})
             )
             menu_scope.grid(row=0, column=2, padx=2)
 
@@ -909,6 +914,9 @@ class ImportTab(ctk.CTkScrollableFrame):
         if " - " in selected_bcode_raw:
             target_bcode = selected_bcode_raw.split(" - ")[0].strip()
             
+        scope_disp = self.corpus_scope_var.get()
+        raw_scope = "OT" if scope_disp == "AT" else ("BOTH" if scope_disp == "AT+NT" else ("APOCRYPHA" if scope_disp == "APO" else scope_disp))
+
         metadata = {
             "title": self.title_entry.get().strip() or name,
             "author": self.author_entry.get().strip(),
@@ -916,7 +924,7 @@ class ImportTab(ctk.CTkScrollableFrame):
             "year": self.year_entry.get().strip(),
             "cover_path": self.cover_path,
             "type": self.type_var.get(),
-            "corpus_scope": self.corpus_scope_var.get(),
+            "corpus_scope": raw_scope,
             "source_type": self.source_type_var.get(),
             "book_code": target_bcode,
             "embedding_model": self.embed_var.get()

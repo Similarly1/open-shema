@@ -1176,19 +1176,24 @@ const BibleReader = {
     const btnSplit = document.getElementById('btn-toggle-split');
     const btnSync = document.getElementById('btn-toggle-sync-scroll');
 
-    workspace?.classList.toggle('split-view', this.isSplitView);
-    paneRight?.classList.toggle('hidden', !this.isSplitView);
-    btnSplit?.classList.toggle('active', this.isSplitView);
+    if (workspace) workspace.classList.toggle('split-view', this.isSplitView);
+    if (paneRight) paneRight.classList.toggle('hidden', !this.isSplitView);
+    if (btnSplit) btnSplit.classList.toggle('active', this.isSplitView);
 
     if (this.isSplitView) {
-      btnSync?.classList.remove('hidden');
-      if (this.isScrollSynced) {
-        btnSync?.classList.add('active');
+      if (btnSync) {
+        btnSync.classList.remove('hidden');
+        btnSync.classList.toggle('active', this.isScrollSynced);
+      }
+      // Si la bible 2 n'est pas définie ou identique à la bible 1, sélectionner une alternative
+      if (!this.currentBible2 || this.currentBible2 === this.currentBible1) {
+        const other = (this.installedBibles || []).find(b => b.name !== this.currentBible1);
+        if (other) this.currentBible2 = other.name;
       }
       this.updatePaneHeader(2);
       this.reloadPane2();
     } else {
-      btnSync?.classList.add('hidden');
+      if (btnSync) btnSync.classList.add('hidden');
     }
   },
 
@@ -1543,10 +1548,11 @@ const BibleReader = {
   },
 
   createChapterBlockElement(paneNum, data, bibleName) {
+    if (!data) return document.createElement('div');
     const block = document.createElement('div');
     block.className = 'chapter-block';
-    block.dataset.book = data.book;
-    block.dataset.chapter = data.chapter;
+    block.dataset.book = data.book || this.currentBook;
+    block.dataset.chapter = data.chapter || this.currentChapter;
 
     if (data.pericope) {
       const pericope = document.createElement('h1');
@@ -1564,13 +1570,13 @@ const BibleReader = {
       flow.classList.add('interlinear-mode');
     }
 
-    if (data.verses && data.verses.length > 0) {
+    if (data.verses && Array.isArray(data.verses) && data.verses.length > 0) {
       data.verses.forEach((v, index) => {
         const vSpan = document.createElement('span');
         vSpan.className = 'verse-item';
         vSpan.dataset.verseNum = v.verse;
-        vSpan.dataset.bookCode = data.book;
-        vSpan.dataset.chapter = data.chapter;
+        vSpan.dataset.bookCode = data.book || this.currentBook;
+        vSpan.dataset.chapter = data.chapter || this.currentChapter;
 
         if (isPaneInterlinear && v.words && v.words.length > 0) {
           vSpan.className = 'verse-item interlinear-mode';
