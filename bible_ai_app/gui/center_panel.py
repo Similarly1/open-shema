@@ -1543,7 +1543,8 @@ class CenterPanel(ctk.CTkFrame):
             ch_num = parse_chap(m.group(2).strip())
             if code and ch_num:
                 v_clean = m.group(3).strip().replace('–', '-').replace(' ', '') if m.group(3) else None
-                tokens.append((m.start(), m.end(), 'BIBLE_REF', m.group(0), {
+                clean_display = re.sub(r'[*_]+', '', m.group(0))
+                tokens.append((m.start(), m.end(), 'BIBLE_REF', clean_display, {
                     "book_code": code,
                     "book_name": REVERSE_BOOK_MAPPING.get(code, code),
                     "chapter": ch_num,
@@ -1657,8 +1658,25 @@ class CenterPanel(ctk.CTkFrame):
             from core.bible_reference_detector import get_bible_passage_preview
             ref_title, preview_txt = get_bible_passage_preview(ref_bible, b_code, ch, v_str if v_str != "0" else None)
             
-            x = self.lex_textbox._textbox.winfo_rootx() + event.x + 10
-            y = self.lex_textbox._textbox.winfo_rooty() + event.y + 10
+            target_rect = None
+            try:
+                ranges = self.lex_textbox._textbox.tag_ranges(tag_name)
+                if ranges and len(ranges) >= 2:
+                    bbox = self.lex_textbox._textbox.bbox(ranges[0])
+                    if bbox:
+                        bx, by, bw, bh = bbox
+                        rx = self.lex_textbox._textbox.winfo_rootx() + bx
+                        ry = self.lex_textbox._textbox.winfo_rooty() + by
+                        target_rect = (rx, ry, bw, bh)
+            except Exception:
+                target_rect = None
+                
+            if target_rect:
+                x, y = target_rect[0], target_rect[1]
+            else:
+                x = getattr(event, 'x_root', None) or (self.lex_textbox._textbox.winfo_rootx() + getattr(event, 'x', 0))
+                y = getattr(event, 'y_root', None) or (self.lex_textbox._textbox.winfo_rooty() + getattr(event, 'y', 0))
+                target_rect = (x, y, 40, 20)
             
             tooltip_data = {
                 "word": tag_name,
@@ -1667,7 +1685,7 @@ class CenterPanel(ctk.CTkFrame):
                 "preview": preview_txt,
                 "hint": "🖱️ Cliquer pour ouvrir ce passage dans la Bible"
             }
-            self.tooltip.show(x, y, tooltip_data)
+            self.tooltip.show(x, y, tooltip_data, target_rect=target_rect)
         except Exception:
             pass
 
@@ -1702,8 +1720,25 @@ class CenterPanel(ctk.CTkFrame):
                     lemma = ent.get("lemma", lemma)
                     definition = ent.get("definition", definition)
                     
-            x = self.lex_textbox._textbox.winfo_rootx() + event.x + 10
-            y = self.lex_textbox._textbox.winfo_rooty() + event.y + 10
+            target_rect = None
+            try:
+                ranges = self.lex_textbox._textbox.tag_ranges(tag_name)
+                if ranges and len(ranges) >= 2:
+                    bbox = self.lex_textbox._textbox.bbox(ranges[0])
+                    if bbox:
+                        bx, by, bw, bh = bbox
+                        rx = self.lex_textbox._textbox.winfo_rootx() + bx
+                        ry = self.lex_textbox._textbox.winfo_rooty() + by
+                        target_rect = (rx, ry, bw, bh)
+            except Exception:
+                target_rect = None
+                
+            if target_rect:
+                x, y = target_rect[0], target_rect[1]
+            else:
+                x = getattr(event, 'x_root', None) or (self.lex_textbox._textbox.winfo_rootx() + getattr(event, 'x', 0))
+                y = getattr(event, 'y_root', None) or (self.lex_textbox._textbox.winfo_rooty() + getattr(event, 'y', 0))
+                target_rect = (x, y, 40, 20)
             
             title_txt = f"[{code}] {lemma}" if code and code not in {"HEB", "GRK"} else lemma
             tooltip_data = {
