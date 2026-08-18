@@ -982,16 +982,34 @@ const BibleReader = {
     try {
       const entry = await API.call('lookup_dictionary', word, strongCode);
       if (entry) {
-        container.innerHTML = `
+        let contentHtml = `
           <div style="padding: 16px;">
-            <div style="font-size: 18px; font-weight: 800; color: var(--accent-blue); margin-bottom: 4px;">${entry.title}</div>
-            <div style="font-size: 11px; font-weight: 700; color: var(--accent-orange); margin-bottom: 12px;">${entry.badge}</div>
-            <div style="font-family: var(--font-bible); font-size: 15px; line-height: 1.65; color: #334155;">${entry.full_text.replace(/\n\n/g, '<br><br>')}</div>
-          </div>
+            <div style="font-size: 20px; font-weight: 800; color: var(--accent-blue); margin-bottom: 4px;">${entry.title || word}</div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--accent-orange); margin-bottom: 14px;">${entry.badge || 'Lexique'}</div>
         `;
+
+        if (entry.matches && entry.matches.length > 0) {
+          entry.matches.forEach((m) => {
+            const mText = (m.full_text || m.preview || '').replace(/\n\n/g, '<br><br>');
+            contentHtml += `
+              <div style="margin-bottom: 16px; padding: 12px; background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 6px;">
+                <div style="font-size: 11px; font-weight: 700; color: var(--accent-blue); margin-bottom: 6px;">${m.badge || m.dict_name}</div>
+                <div style="font-family: var(--font-bible); font-size: 15px; line-height: 1.65; color: #334155;">${mText}</div>
+              </div>
+            `;
+          });
+        } else {
+          const bodyText = (entry.full_text || entry.preview || '').replace(/\n\n/g, '<br><br>');
+          contentHtml += `
+            <div style="font-family: var(--font-bible); font-size: 15px; line-height: 1.65; color: #334155;">${bodyText}</div>
+          `;
+        }
+
+        contentHtml += `</div>`;
+        container.innerHTML = contentHtml;
       } else {
         container.innerHTML = `
-          <div style="padding: 20px; color: var(--text-muted); text-align: center;">
+          <div style="padding: 24px; color: var(--text-muted); text-align: center;">
             <span style="font-size: 32px; display: block; margin-bottom: 10px;">📖</span>
             Aucune entrée lexicale trouvée pour « <strong>${word}</strong> ».<br>
             <small style="opacity: 0.8;">Vérifiez vos dictionnaires dans les Paramètres.</small>
@@ -999,6 +1017,7 @@ const BibleReader = {
         `;
       }
     } catch (e) {
+      console.error('Erreur lookup_dictionary:', e);
       container.innerHTML = `<div style="padding: 20px; color: var(--accent-red);">Erreur lors de la consultation lexicale.</div>`;
     }
   },

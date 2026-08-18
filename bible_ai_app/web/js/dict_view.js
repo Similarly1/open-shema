@@ -40,13 +40,29 @@ const DictView = {
         return;
       }
 
+      let bodyHtml = '';
+      if (data.matches && data.matches.length > 0) {
+        data.matches.forEach(m => {
+          const mText = (m.full_text || m.preview || '').replace(/\n\n/g, '<br><br>');
+          bodyHtml += `
+            <div style="margin-bottom: 20px; padding: 14px; background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 8px;">
+              <div style="font-size: 12px; font-weight: 700; color: var(--accent-blue); margin-bottom: 8px;">${m.badge || m.dict_name}</div>
+              <div class="dict-entry-body">${mText}</div>
+            </div>
+          `;
+        });
+      } else {
+        const fullText = (data.full_text || data.preview || '').replace(/\n\n/g, '<br><br>');
+        bodyHtml = `<div class="dict-entry-body">${fullText}</div>`;
+      }
+
       this.contentContainer.innerHTML = `
         <div class="dict-entry-card">
           <div class="dict-entry-header">
-            <span class="dict-entry-title">${data.title}</span>
-            <span class="dict-entry-badge">${data.badge}</span>
+            <span class="dict-entry-title">${data.title || word}</span>
+            <span class="dict-entry-badge">${data.badge || 'Dictionnaire'}</span>
           </div>
-          <div class="dict-entry-body">${data.full_text.replace(/\n\n/g, '<br><br>')}</div>
+          ${bodyHtml}
         </div>
       `;
     } catch (e) {

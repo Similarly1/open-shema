@@ -132,9 +132,12 @@ class DictionaryManager:
         
         # 1. Source Strong
         if dict_type == "strong":
-            if not strong_code:
+            target_code = strong_code
+            if not target_code and word and re.match(r'^[HG]\d+', word.strip(), re.I):
+                target_code = word.strip().upper()
+            if not target_code:
                 return None
-            entry = StrongLexicon.get(strong_code)
+            entry = StrongLexicon.get(target_code)
             if not entry:
                 return None
             code = entry.get('short_code', entry.get('code', ''))
@@ -145,7 +148,7 @@ class DictionaryManager:
                 "dict_id": dict_id,
                 "dict_name": dict_info["name"],
                 "badge": f"■ Strong {code} ({lang})",
-                "title": f"{word} [{lemma}]" if word else f"Strong {code} [{lemma}]",
+                "title": f"{word} [{lemma}]" if word and word != code else f"Strong {code} [{lemma}]",
                 "preview": defn[:220] + "..." if len(defn) > 220 else defn,
                 "full_text": defn,
                 "entry": entry
@@ -153,9 +156,12 @@ class DictionaryManager:
             
         # 2. Source Bailly (grec)
         if dict_type == "greek":
-            if not strong_code or not strong_code.startswith("G"):
+            target_code = strong_code
+            if not target_code and word and re.match(r'^G\d+', word.strip(), re.I):
+                target_code = word.strip().upper()
+            if not target_code or not target_code.startswith("G"):
                 return None
-            b_entries = StrongLexicon.get_bailly_entries(strong_code)
+            b_entries = StrongLexicon.get_bailly_entries(target_code)
             if not b_entries:
                 return None
             b_first = b_entries[0]
@@ -288,6 +294,7 @@ class DictionaryManager:
             "title": global_title,
             "badge": global_badge,
             "preview": "\n\n".join(preview_lines),
+            "full_text": leader.get("full_text", "") or leader.get("preview", ""),
             "matches": matches
         }
         cls._lookup_cache[cache_key] = result
