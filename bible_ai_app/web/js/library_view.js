@@ -142,57 +142,14 @@ const LibraryView = {
   },
 
   openEditModal(book) {
-    this.currentEditingBook = book;
-    document.getElementById('edit-book-id').value = book.name;
-    document.getElementById('edit-book-title').value = book.title || book.name;
-    document.getElementById('edit-book-author').value = book.author || '';
-    document.getElementById('edit-book-type').value = book.type || 'Bible';
-    document.getElementById('edit-book-scope').value = book.corpus_scope || 'Bible complète';
-    document.getElementById('edit-book-vcode').value = book.version_code || '';
-    document.getElementById('edit-book-active').checked = book.active !== false;
-
-    this.editModalEl.classList.remove('hidden');
-  },
-
-  closeEditModal() {
-    this.editModalEl.classList.add('hidden');
-    this.currentEditingBook = null;
-  },
-
-  async saveEditedBook() {
-    if (!this.currentEditingBook) return;
-
-    const bookName = this.currentEditingBook.name;
-    const newMeta = {
-      title: document.getElementById('edit-book-title').value.trim() || bookName,
-      author: document.getElementById('edit-book-author').value.trim(),
-      type: document.getElementById('edit-book-type').value,
-      corpus_scope: document.getElementById('edit-book-scope').value,
-      version_code: document.getElementById('edit-book-vcode').value.trim(),
-      active: document.getElementById('edit-book-active').checked
-    };
-
-    try {
-      await API.call('update_book_metadata', bookName, newMeta);
-      this.closeEditModal();
-      App.showToast('Métadonnées enregistrées avec succès !');
-      this.loadBooks();
-    } catch (e) {
-      alert(`Erreur de modification : ${e}`);
+    if (typeof ImportModal !== 'undefined') {
+      ImportModal.open(true, book);
     }
   },
 
-  async importBook() {
-    try {
-      const res = await API.call('pick_and_import_book');
-      if (res && res.success) {
-        App.showToast('Ouvrage importé avec succès !');
-        this.loadBooks();
-      } else if (res && res.error) {
-        alert(`Erreur d'import : ${res.error}`);
-      }
-    } catch (e) {
-      console.error('Erreur import:', e);
+  importBook() {
+    if (typeof ImportModal !== 'undefined') {
+      ImportModal.open(false);
     }
   },
 

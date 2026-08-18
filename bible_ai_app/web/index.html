@@ -695,71 +695,191 @@
       <div class="version-list-items" id="version-list-items"></div>
     </div>
 
-    <!-- MODALE ÉDITION DE LIVRE (Style Logos) -->
-    <div class="modal-dialog-container hidden" id="modal-edit-book">
-      <div class="modal-card">
+    <!-- GRAND MODAL D'IMPORTATION & ÉDITION D'OUVRAGE (Style Logos) -->
+    <div class="modal-dialog-container hidden" id="modal-import-book">
+      <div class="modal-card modal-card-large">
         <div class="modal-header">
-          <h2 class="modal-title">Modifier l'ouvrage</h2>
-          <button class="modal-close-btn" id="btn-close-edit-modal">✕</button>
+          <h2 class="modal-title" id="import-modal-title">📥 Importer un Nouvel Ouvrage</h2>
+          <button class="modal-close-btn" id="btn-close-import-modal">✕</button>
         </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label>Nom d'origine :</label>
-            <input type="text" id="edit-book-id" class="text-field full-w" disabled>
-          </div>
-          
-          <div class="form-group" style="margin-top: 10px;">
-            <label>Titre affiché :</label>
-            <input type="text" id="edit-book-title" class="text-field full-w" placeholder="ex: Bible Segond 21">
-          </div>
 
-          <div class="form-row two-cols" style="margin-top: 10px;">
-            <div class="form-group">
-              <label>Auteur / Traducteur :</label>
-              <input type="text" id="edit-book-author" class="text-field full-w" placeholder="ex: Société Biblique">
-            </div>
-            <div class="form-group">
-              <label>Catégorie :</label>
-              <select id="edit-book-type" class="select-field full-w">
-                <option value="Bible">Bible</option>
-                <option value="Commentaire">Commentaire</option>
-                <option value="Dictionnaire">Dictionnaire</option>
-                <option value="Théologie">Théologie</option>
-              </select>
-            </div>
-          </div>
+        <div class="modal-body modal-body-scroll">
+          <div class="import-two-columns">
+            
+            <!-- COLONNE GAUCHE : MÉTADONNÉES & RAG TRI-FLUX -->
+            <div class="import-column left">
+              
+              <div class="import-section-header">
+                <span class="import-section-title">📋 Informations Générales</span>
+                <button class="btn-secondary btn-sm" id="btn-import-google-books">🔍 Google Books</button>
+              </div>
 
-          <div class="form-row two-cols" style="margin-top: 10px;">
-            <div class="form-group">
-              <label>Portée du corpus :</label>
-              <select id="edit-book-scope" class="select-field full-w">
-                <option value="Bible complète">Bible complète</option>
-                <option value="Ancien Testament">Ancien Testament (AT)</option>
-                <option value="Nouveau Testament">Nouveau Testament (NT)</option>
-                <option value="Évangiles">Évangiles</option>
-                <option value="Épîtres">Épîtres</option>
-                <option value="Pentateuque">Pentateuque</option>
-                <option value="Sagesse">Sagesse & Poésie</option>
-                <option value="Prophètes">Prophètes</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Code de version (Abréviation) :</label>
-              <input type="text" id="edit-book-vcode" class="text-field full-w" placeholder="ex: S21, TOB, BDS">
-            </div>
-          </div>
+              <div class="form-group">
+                <label>Identifiant unique (Titre court) :</label>
+                <input type="text" id="import-book-id" class="text-field full-w" placeholder="Ex: S21, Alexander, Calmet...">
+              </div>
 
-          <div class="form-group" style="margin-top: 14px;">
-            <label class="custom-checkbox">
-              <input type="checkbox" id="edit-book-active" checked>
-              <span>Ouvrage actif dans l'application</span>
-            </label>
+              <div class="form-group" style="margin-top: 8px;">
+                <label>Titre complet de l'ouvrage :</label>
+                <input type="text" id="import-book-title" class="text-field full-w" placeholder="Ex: Lire et comprendre la Bible...">
+              </div>
+
+              <div class="form-group" style="margin-top: 8px;">
+                <label>Auteur / Traducteur / Éditeur :</label>
+                <input type="text" id="import-book-author" class="text-field full-w" placeholder="Ex: J.H. Alexander, Alfred Kuen...">
+              </div>
+
+              <div class="form-group" style="margin-top: 8px;">
+                <label>Description & Notes d'étude :</label>
+                <textarea id="import-book-desc" class="text-field full-w" style="height: 60px; resize: vertical;" placeholder="Description, thèmes et contexte de l'ouvrage..."></textarea>
+              </div>
+
+              <div class="form-row two-cols" style="margin-top: 8px;">
+                <div class="form-group">
+                  <label>Type de ressource :</label>
+                  <select id="import-book-type" class="select-field full-w">
+                    <option value="Théologie">Théologie</option>
+                    <option value="Bible">Bible</option>
+                    <option value="Commentaire">Commentaire</option>
+                    <option value="Dictionnaire">Dictionnaire</option>
+                    <option value="Livre / Autre">Livre / Autre</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Année d'édition :</label>
+                  <input type="text" id="import-book-year" class="text-field full-w" placeholder="Ex: 2007">
+                </div>
+              </div>
+
+              <!-- ENCADRÉ CLASSIFICATION RAG TRI-FLUX -->
+              <div class="rag-classification-card">
+                <div class="rag-card-header">
+                  <span class="rag-card-title">🎯 Classification RAG Tri-Flux</span>
+                  <button class="btn-primary btn-xs" id="btn-import-autoclassify" style="background: #7C3AED;">✨ Auto-classifier (IA)</button>
+                </div>
+
+                <div class="form-row two-cols" style="margin-top: 6px;">
+                  <div class="form-group">
+                    <label style="font-size: 11px;">Portée du corpus :</label>
+                    <select id="import-rag-scope" class="select-field full-w" style="font-size: 11px;">
+                      <option value="GLOBAL">GLOBAL (Toute la Bible / Thème)</option>
+                      <option value="OT">OT (Ancien Testament)</option>
+                      <option value="NT">NT (Nouveau Testament)</option>
+                      <option value="BOTH">BOTH (AT + NT)</option>
+                      <option value="INTER">INTER (Intertestamentaire)</option>
+                      <option value="APOCRYPHA">APOCRYPHA (Deutérocanoniques)</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label style="font-size: 11px;">Type de source RAG :</label>
+                    <select id="import-rag-stype" class="select-field full-w" style="font-size: 11px;">
+                      <option value="general">Général (Doctrine / Pastoral)</option>
+                      <option value="book_intro">Introduction de livre biblique</option>
+                      <option value="biblical_theology">Théologie biblique</option>
+                      <option value="systematic_theology">Théologie systématique</option>
+                      <option value="ot_context">Contexte & Archéologie AT</option>
+                      <option value="nt_context">Contexte & Archéologie NT</option>
+                      <option value="commentary_verse">Commentaire verset par verset</option>
+                      <option value="dictionary">Dictionnaire / Définitions</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 6px;">
+                  <label style="font-size: 11px;">Livre biblique cible (si spécifique) :</label>
+                  <select id="import-rag-bookcode" class="select-field full-w" style="font-size: 11px;"></select>
+                </div>
+
+                <div class="form-group" style="margin-top: 6px;">
+                  <label style="font-size: 11px;">Modèle d'embedding vectoriel :</label>
+                  <select id="import-rag-embed" class="select-field full-w" style="font-size: 11px;">
+                    <option value="bge_multilingual_gemma2 (Infomaniak)">🇨🇭 bge_multilingual_gemma2 (Infomaniak - Recommandé)</option>
+                    <option value="mini_lm_l12_v2 (Infomaniak)">🇨🇭 mini_lm_l12_v2 (Infomaniak - Léger)</option>
+                    <option value="gemini-embedding-2">⚡ gemini-embedding-2 (Google)</option>
+                    <option value="gemini-embedding-1">⚡ gemini-embedding-1 (Google)</option>
+                    <option value="study_library">📚 study_library (Local)</option>
+                    <option value="mistral-embed">🇫🇷 mistral-embed (Mistral AI)</option>
+                  </select>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- COLONNE DROITE : COUVERTURE & SOURCE / CHAPITRES -->
+            <div class="import-column right">
+
+              <div class="import-section-header">
+                <span class="import-section-title">🖼️ Couverture & Fichier Source</span>
+              </div>
+
+              <!-- Zone Couverture -->
+              <div class="import-cover-box">
+                <div class="import-cover-preview" id="import-cover-preview-container">
+                  <div class="import-cover-placeholder" id="import-cover-placeholder">Aucune image</div>
+                  <img id="import-cover-img" class="hidden" alt="Couverture">
+                </div>
+                <div class="import-cover-actions">
+                  <button class="btn-secondary btn-sm" id="btn-import-pick-cover">🖼️ Choisir une image...</button>
+                  <button class="btn-secondary btn-sm" id="btn-import-smart-cover">✨ Smart Cover</button>
+                </div>
+              </div>
+
+              <!-- Zone Fichier Source -->
+              <div class="import-file-box" style="margin-top: 12px;">
+                <label>Fichier ou dossier d'ouvrage :</label>
+                <div class="import-file-picker-row">
+                  <button class="btn-primary btn-sm" id="btn-import-pick-file">📂 Parcourir...</button>
+                  <span class="import-selected-file-label" id="import-selected-file-label">Aucun fichier sélectionné</span>
+                </div>
+              </div>
+
+              <!-- Section Table des Matières / Chapitres (pour EPUB et livres) -->
+              <div class="import-chapters-card" id="import-chapters-section">
+                <div class="import-chapters-header">
+                  <span class="import-chapters-title">📑 Chapitres & Table des Matières (<span id="import-ch-count">0</span>)</span>
+                  <div class="import-chapters-btns">
+                    <button class="btn-secondary btn-xs" id="btn-ch-check-all">☑️ Tout</button>
+                    <button class="btn-secondary btn-xs" id="btn-ch-uncheck-all">☐ Aucun</button>
+                    <button class="btn-secondary btn-xs" id="btn-ch-rag-only">🎯 RAG utile</button>
+                  </div>
+                </div>
+
+                <div class="import-chapters-scroll" id="import-chapters-scroll">
+                  <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 11px;">
+                    Sélectionnez un fichier .epub pour analyser et configurer ses chapitres.
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
           </div>
         </div>
 
         <div class="modal-footer">
-          <button class="btn-secondary" id="btn-cancel-edit-modal">Annuler</button>
-          <button class="btn-primary" id="btn-save-edit-modal">💾 Enregistrer</button>
+          <button class="btn-secondary" id="btn-cancel-import-modal">Annuler</button>
+          <button class="btn-primary" id="btn-submit-import-modal">📥 Lancer l'Importation & l'Indexation RAG</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- POPOVER RECHERCHE GOOGLE BOOKS -->
+    <div class="modal-dialog-container hidden" id="modal-google-books">
+      <div class="modal-card" style="max-width: 600px; max-height: 80vh;">
+        <div class="modal-header">
+          <h3 class="modal-title">🔍 Recherche Google Books</h3>
+          <button class="modal-close-btn" id="btn-close-gb-modal">✕</button>
+        </div>
+        <div class="modal-body" style="padding: 14px;">
+          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+            <input type="text" id="gb-search-input" class="text-field" style="flex: 1;" placeholder="Titre, auteur ou mot-clé...">
+            <button class="btn-primary" id="btn-gb-search">Rechercher</button>
+          </div>
+          <div id="gb-results-list" style="max-height: 380px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+            <div style="padding: 30px; text-align: center; color: var(--text-muted); font-size: 12px;">
+              Entrez le titre d'un ouvrage pour récupérer automatiquement ses métadonnées et sa couverture.
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -773,6 +893,7 @@
   <script src="js/api.js"></script>
   <script src="js/book_picker.js"></script>
   <script src="js/bible_reader.js"></script>
+  <script src="js/import_modal.js"></script>
   <script src="js/library_view.js"></script>
   <script src="js/settings_view.js"></script>
   <script src="js/search_view.js"></script>

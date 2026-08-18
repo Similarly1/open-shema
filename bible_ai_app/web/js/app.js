@@ -9,6 +9,7 @@ const App = {
   init() {
     // 1. Initialiser tous les sous-systèmes
     BibleReader.init();
+    ImportModal.init();
     LibraryView.init();
     SettingsView.init();
     SearchView.init();

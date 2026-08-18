@@ -431,32 +431,179 @@ class BibleAppApi:
             return True
         return False
 
-    def pick_and_import_book(self) -> Dict[str, Any]:
-        """Ouvre une boîte de dialogue pour importer un fichier."""
+    def pick_import_file(self) -> Dict[str, Any]:
+        """Ouvre une boîte de dialogue native pour sélectionner un fichier d'importation."""
         win = get_active_window()
         if not win:
             return {"success": False, "error": "Fenêtre introuvable"}
             
-        file_types = ('Documents supportés (*.epub;*.json;*.docx;*.csv)', 'Tous les fichiers (*.*)')
+        file_types = ('Ouvrages supportés (*.epub;*.json;*.docx;*.csv;*.txt)', 'Tous les fichiers (*.*)')
         result = win.create_file_dialog(webview.OPEN_DIALOG, allow_multiple=False, file_types=file_types)
         
         if not result or len(result) == 0:
             return {"cancelled": True}
             
         file_path = result[0]
+        return self.inspect_import_source(file_path)
+
+    def pick_cover_image(self) -> Dict[str, Any]:
+        """Ouvre une boîte de dialogue native pour sélectionner une image de couverture."""
+        win = get_active_window()
+        if not win:
+            return {"success": False, "error": "Fenêtre introuvable"}
+            
+        file_types = ('Images (*.jpg;*.jpeg;*.png;*.webp)', 'Tous les fichiers (*.*)')
+        result = win.create_file_dialog(webview.OPEN_DIALOG, allow_multiple=False, file_types=file_types)
+        
+        if not result or len(result) == 0:
+            return {"cancelled": True}
+            
+        return {"success": True, "cover_path": result[0]}
+
+    def search_google_books_metadata(self, query: str, author: str = "", title: str = "", isbn: str = "") -> List[Dict[str, Any]]:
+        """Recherche des métadonnées bibliographiques via Google Books et Open Library."""
+        from core.book_metadata_client import BookMetadataClient
+        api_key = self.config.get("google_books_api_key")
+        return BookMetadataClient.search_books(query=query, author=author, title=title, isbn=isbn, api_key=api_key)
+
+    def download_book_cover(self, cover_url: str, book_id: str) -> Optional[str]:
+        """Télécharge une couverture depuis une URL et l'enregistre en local."""
+        from core.book_metadata_client import BookMetadataClient
+        return BookMetadataClient.download_cover(cover_url, book_id)
+
+    def auto_classify_document_metadata(self, title: str, description: str, model: str = "gemini-2.5-flash-lite") -> Dict[str, Any]:
+        """Classifie automatiquement l'ouvrage pour le RAG Tri-Flux via l'IA."""
+        from core.book_classifier import BookClassifier
+        return BookClassifier.classify_metadata(title, description, self.config, model=model)
+
+    def inspect_import_source(self, file_path: str) -> Dict[str, Any]:
+        """Inspecte un fichier d'importation et extrait les métadonnées et chapitres."""
+        if not os.path.exists(file_path):
+            return {"success": False, "error": "Fichier introuvable"}
+            
+        ext = os.path.splitext(file_path)[1].lower()
+        file_size = os.path.getsize(file_path)
+        file_name = os.path.basename(file_path)
+        
+        if ext == '.epub':
+            from core.epub_loader import EpubLoader
+            try:
+                info = EpubLoader.inspect_epub(file_path)
+                return {
+                    "success": True,
+                    "format": "epub",
+                    "file_path": file_path,
+                    "file_name": file_name,
+                    "file_size": file_size,
+                    "info": info
+                }
+            except Exception as e:
+                return {"success": False, "error": f"Erreur inspection EPUB : {e}"}
+                
+        elif ext == '.docx':
+            return {
+                "success": True,
+                "format": "docx",
+                "file_path": file_path,
+                "file_name": file_name,
+                "file_size": file_size,
+                "info": {"title": os.path.splitext(file_name)[0], "chapters": []}
+            }
+            
+        elif ext in ['.json', '.csv']:
+            return {
+                "success": True,
+                "format": "json" if ext == '.json' else "csv",
+                "file_path": file_path,
+                "file_name": file_name,
+                "file_size": file_size,
+                "info": {"title": os.path.splitext(file_name)[0], "chapters": []}
+            }
+            
+        return {"success": True, "format": "txt", "file_path": file_path, "file_name": file_name, "file_size": file_size, "info": {}}
+
+    def execute_document_import(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        """Exécute l'importation complète et l'indexation RAG d'un ouvrage."""
+        name = payload.get("name", "").strip()
+        if not name:
+            return {"success": False, "error": "Identifiant obligatoire."}
+            
+        edit_mode = payload.get("edit_mode", False)
+        old_name = payload.get("old_name", name)
+        
+        metadata = {
+            "name": name,
+            "title": payload.get("title", name),
+            "author": payload.get("author", ""),
+            "description": payload.get("description", ""),
+            "year": payload.get("year", ""),
+            "cover_path": payload.get("cover_path"),
+            "type": payload.get("type", "Théologie"),
+            "corpus_scope": payload.get("corpus_scope", "GLOBAL"),
+            "source_type": payload.get("source_type", "general"),
+            "book_code": payload.get("book_code"),
+            "embedding_model": payload.get("embedding_model", "bge_multilingual_gemma2 (Infomaniak)"),
+            "active": True
+        }
+        
+        registry = load_books_metadata()
+        
+        if edit_mode:
+            if old_name != name and old_name in registry:
+                del registry[old_name]
+            if name in registry:
+                registry[name].update(metadata)
+            else:
+                registry[name] = metadata
+            save_books_metadata(registry)
+            return {"success": True, "edited": True, "name": name}
+            
+        file_path = payload.get("file_path", "")
+        if not file_path or not os.path.exists(file_path):
+            registry[name] = metadata
+            save_books_metadata(registry)
+            return {"success": True, "name": name, "chunks_count": 0}
+            
         ext = os.path.splitext(file_path)[1].lower()
         
-        if ext in ['.docx', '.csv']:
-            res = DictionaryManager.import_dictionary(file_path)
-            return res
-        elif ext == '.epub':
+        # Cas 1 : EPUB
+        if ext == '.epub':
             from core.epub_loader import EpubLoader
-            info = EpubLoader.inspect_epub(file_path)
-            return {"success": True, "type": "epub", "file_path": file_path, "info": info}
-        elif ext == '.json':
-            return {"success": True, "type": "json", "file_path": file_path}
+            selected_chapters = payload.get("chapters", [])
+            chunks = EpubLoader.extract_chunks(file_path, selected_chapters, metadata, custom_name=name)
             
-        return {"success": False, "error": f"Format non supporté : {ext}"}
+            metadata["chapters_count"] = len([c for c in selected_chapters if c.get("include", True)])
+            metadata["chunks_count"] = len(chunks)
+            metadata["file_path"] = file_path
+            registry[name] = metadata
+            save_books_metadata(registry)
+            
+            if chunks:
+                try:
+                    from core.database import VectorDB
+                    db = VectorDB(api_keys=self.config)
+                    db.add_chunks(chunks, embedding_model=metadata.get("embedding_model", "study_library"))
+                except Exception as e:
+                    print(f"Indexation vectorielle ChromaDB : {e}")
+                    
+            return {"success": True, "name": name, "chunks_count": len(chunks)}
+            
+        # Cas 2 : Dictionnaire / Docx / CSV
+        elif ext in ['.docx', '.csv']:
+            res = DictionaryManager.import_dictionary(file_path)
+            registry[name] = metadata
+            save_books_metadata(registry)
+            return {"success": True, "name": name, "dict_res": res}
+            
+        # Cas 3 : Bible JSON
+        elif ext == '.json':
+            registry[name] = metadata
+            save_books_metadata(registry)
+            return {"success": True, "name": name, "format": "json"}
+            
+        registry[name] = metadata
+        save_books_metadata(registry)
+        return {"success": True, "name": name}
 
     # =========================================================================
     # 3. GESTION DES PARAMÈTRES
