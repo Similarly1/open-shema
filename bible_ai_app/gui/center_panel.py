@@ -5,7 +5,7 @@ import threading
 import webbrowser
 from typing import Optional, Dict, Any, List
 from core.config import save_config
-from core.reference_parser import get_french_book_name, parse_smart_book_input, resolve_book_input, strip_accents, normalize_reference, REVERSE_BOOK_MAPPING
+from core.reference_parser import get_french_book_name, parse_smart_book_input, resolve_book_input, strip_accents, normalize_reference, REVERSE_BOOK_MAPPING, BOOK_MAPPING
 from core.strong_lexicon import StrongLexicon
 from core.dictionary_manager import DictionaryManager
 from core.dictionary_polisher import DictionaryPolisher, AVAILABLE_POLISH_MODELS
