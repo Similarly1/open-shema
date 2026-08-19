@@ -1177,6 +1177,61 @@ const CommentarySynthesizerUI = {
     }
   },
 
+  commentaryCatalog: {
+    "calvin": { title: "Commentaire Biblique de Jean Calvin", author: "Jean Calvin", period: "Réforme Protestante (1550)", color: "#1E3A8A", initials: "JC" },
+    "jean calvin": { title: "Commentaire Biblique de Jean Calvin", author: "Jean Calvin", period: "Réforme Protestante (1550)", color: "#1E3A8A", initials: "JC" },
+    "henry": { title: "Commentaire Biblique de Matthew Henry", author: "Matthew Henry", period: "Puritain / Dévotionnel (1706)", color: "#065F46", initials: "MH" },
+    "matthew henry": { title: "Commentaire Biblique de Matthew Henry", author: "Matthew Henry", period: "Puritain / Dévotionnel (1706)", color: "#065F46", initials: "MH" },
+    "barnes": { title: "Commentaire Biblique par Albert Barnes", author: "Albert Barnes", period: "Notes on the Bible (1834)", color: "#7C2D12", initials: "AB" },
+    "albert barnes": { title: "Commentaire Biblique par Albert Barnes", author: "Albert Barnes", period: "Notes on the Bible (1834)", color: "#7C2D12", initials: "AB" },
+    "trapp": { title: "Commentaire complet de John Trapp", author: "John Trapp", period: "Puritain Classique (1654)", color: "#4C1D95", initials: "JT" },
+    "john trapp": { title: "Commentaire complet de John Trapp", author: "John Trapp", period: "Puritain Classique (1654)", color: "#4C1D95", initials: "JT" },
+    "gill": { title: "Commentaire Biblique de John Gill", author: "John Gill", period: "Exposition of the Bible (1748)", color: "#134E4A", initials: "JG" },
+    "john gill": { title: "Commentaire Biblique de John Gill", author: "John Gill", period: "Exposition of the Bible (1748)", color: "#134E4A", initials: "JG" },
+    "clarke": { title: "Commentaire Biblique de Adam Clarke", author: "Adam Clarke", period: "Méthodiste & Historique (1810)", color: "#831843", initials: "AC" },
+    "adam clarke": { title: "Commentaire Biblique de Adam Clarke", author: "Adam Clarke", period: "Méthodiste & Historique (1810)", color: "#831843", initials: "AC" },
+    "scofield": { title: "Commentaire Biblique de Scofield", author: "C.I. Scofield", period: "Dispensationaliste (1909)", color: "#1F2937", initials: "CIS" },
+    "pulpit": { title: "Commentaire Biblique de la chaire (Pulpit)", author: "H.D.M. Spence & J.S. Exell", period: "The Pulpit Commentary (1880)", color: "#312E81", initials: "PC" },
+    "jfb": { title: "Commentaire critique et explicatif sur toute la Bible (JFB)", author: "Jamieson, Fausset & Brown", period: "Critical & Explanatory (1871)", color: "#374151", initials: "JFB" },
+    "peake": { title: "Commentaire d'Arthur Peake sur la Bible", author: "Arthur S. Peake", period: "Critique & Historique (1919)", color: "#164E63", initials: "AP" },
+    "arthur peake": { title: "Commentaire d'Arthur Peake sur la Bible", author: "Arthur S. Peake", period: "Critique & Historique (1919)", color: "#164E63", initials: "AP" },
+    "coke": { title: "Commentaire de Coke sur la Sainte Bible", author: "Thomas Coke", period: "Commentary on the Holy Bible (1801)", color: "#701A75", initials: "TC" },
+    "dummelow": { title: "Commentaire de Dummelow sur la Bible", author: "John R. Dummelow", period: "One Volume Commentary (1909)", color: "#0F766E", initials: "JD" },
+    "meyer": { title: "Commentaire de Frederick Brotherton Meyer", author: "F.B. Meyer", period: "Dévotionnel & Pastoral (1914)", color: "#047857", initials: "FBM" },
+    "f.b. meyer": { title: "Commentaire de Frederick Brotherton Meyer", author: "F.B. Meyer", period: "Dévotionnel & Pastoral (1914)", color: "#047857", initials: "FBM" },
+    "benson": { title: "Commentaire de Joseph Benson (AT & NT)", author: "Joseph Benson", period: "Notes on the Old & New Testaments (1811)", color: "#854D0E", initials: "JB" },
+    "joseph benson": { title: "Commentaire de Joseph Benson (AT & NT)", author: "Joseph Benson", period: "Notes on the Old & New Testaments (1811)", color: "#854D0E", initials: "JB" },
+    "nicoll": { title: "Commentaire biblique de l'exposant (Nicoll)", author: "W. Robertson Nicoll", period: "The Expositor's Bible (1887)", color: "#1E40AF", initials: "WRN" },
+    "gaebelein": { title: "Bible annotée par A.C. Gaebelein", author: "Arno C. Gaebelein", period: "The Annotated Bible (1913)", color: "#475569", initials: "ACG" },
+    "a.c. gaebelein": { title: "Bible annotée par A.C. Gaebelein", author: "Arno C. Gaebelein", period: "The Annotated Bible (1913)", color: "#475569", initials: "ACG" },
+    "geneve": { title: "Commentaire de la Bible d'étude de Genève (1560)", author: "Exégètes de Genève", period: "Geneva Bible Notes (1560)", color: "#334155", initials: "BG" },
+    "bible du sermon": { title: "Commentaire de la Bible du sermon", author: "The Sermon Bible", period: "Homilétique & Exégèse (1888)", color: "#15803D", initials: "BS" },
+    "sermon": { title: "Commentaire de la Bible du sermon", author: "The Sermon Bible", period: "Homilétique & Exégèse (1888)", color: "#15803D", initials: "BS" },
+    "spurgeon": { title: "Commentaire Biblique de Charles Spurgeon", author: "Charles H. Spurgeon", period: "Trésor de David & Sermons (1870)", color: "#991B1B", initials: "CHS" },
+    "charles spurgeon": { title: "Commentaire Biblique de Charles Spurgeon", author: "Charles H. Spurgeon", period: "Trésor de David & Sermons (1870)", color: "#991B1B", initials: "CHS" },
+    "segond 21": { title: "Notes d'étude Segond 21", author: "Société Biblique de Genève", period: "Segond 21 (2007)", color: "#B91C1C", initials: "S21" },
+    "notes d'étude segond 21": { title: "Notes d'étude Segond 21", author: "Société Biblique de Genève", period: "Segond 21 (2007)", color: "#B91C1C", initials: "S21" },
+    "tsk": { title: "Trésor de la connaissance des Écritures (TSK)", author: "R.A. Torrey / TSK", period: "Treasury of Scripture Knowledge (1836)", color: "#4338CA", initials: "TSK" },
+    "macarthur": { title: "The MacArthur Bible Commentary", author: "John MacArthur", period: "Études bibliques contemporaines", color: "#1E293B", initials: "JM" }
+  },
+
+  getSourceInfo(name) {
+    if (!name) return { title: 'Commentaire Biblique', author: 'Auteur', period: 'Source d\'étude', color: '#1E293B', initials: 'BIB' };
+    const clean = name.trim().toLowerCase().replace(/[\[\]]/g, '');
+    if (this.commentaryCatalog[clean]) return this.commentaryCatalog[clean];
+    for (const [k, v] of Object.entries(this.commentaryCatalog)) {
+      if (clean.includes(k) || k.includes(clean)) return v;
+    }
+    const initials = name.split(/\s+/).map(w => w[0]).filter(Boolean).join('').slice(0, 3).toUpperCase() || 'BIB';
+    return {
+      title: `Commentaire de ${name}`,
+      author: name,
+      period: "Ouvrage de référence",
+      color: "#2563EB",
+      initials: initials
+    };
+  },
+
   renderResult(data) {
     const resultBox = document.getElementById('synth-result-container');
     const modelTag = document.getElementById('synth-model-tag');
@@ -1191,24 +1246,130 @@ const CommentarySynthesizerUI = {
     contentEl.innerHTML = this.renderMarkdown(data.synthesis || '');
     resultBox.classList.remove('hidden');
     this.enterFullResultMode();
+    this.attachCitationPopovers(contentEl);
   },
 
   renderMarkdown(text) {
     if (!text) return '<p class="empty-hint">Aucun contenu généré.</p>';
-    
-    let html = text
+
+    const svgIcon = `<svg class="synth-cite-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path><path d="M6 6h10"></path><path d="M6 10h10"></path></svg>`;
+
+    let processed = text;
+
+    // 1. Remplacer les balises explicites {sources: A, B}
+    processed = processed.replace(/\{sources:\s*([^\}]+)\}/gi, (match, raw) => {
+      const sources = raw.split(',').map(s => s.trim().replace(/[\[\]]/g, '')).filter(Boolean);
+      const srcAttr = sources.join('|');
+      return ` <span class="synth-cite-pill" data-sources="${srcAttr}" title="Consulter les sources">${svgIcon}<span class="synth-cite-count">${sources.length}</span></span>`;
+    });
+
+    // 2. Remplacer les groupes de citations entre parenthèses (**[Calvin]**, **[Pulpit]**) par le badge SVG
+    processed = processed.replace(/\(\s*((\*{0,2}\[[^\]]+\]\*{0,2}(?:\s*,\s*|\s+et\s+)?)+)\s*\)/g, (match, groupContent) => {
+      const matches = groupContent.match(/\[([^\]]+)\]/g);
+      if (matches && matches.length > 0) {
+        const sources = matches.map(m => m.replace(/[\[\]]/g, '').trim()).filter(Boolean);
+        const srcAttr = sources.join('|');
+        return ` <span class="synth-cite-pill" data-sources="${srcAttr}" title="Consulter les sources">${svgIcon}<span class="synth-cite-count">${sources.length}</span></span>`;
+      }
+      return match;
+    });
+
+    // 3. Supprimer systématiquement les crochets autour des auteurs isolés : **[Jean Calvin]** ou [Jean Calvin] -> **Jean Calvin**
+    processed = processed.replace(/\*{0,2}\[([a-zA-Z0-9\.\'\s\(\)\-éèêëàâäôöûüçÉÈÊËÀÂÄÔÖÛÜÇ]+)\]\*{0,2}/g, '**$1**');
+
+    // 4. Rendu Markdown propre
+    let html = processed
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-      .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-      .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+      .replace(/&lt;span class="synth-cite-pill" data-sources="([^"]+)" title="([^"]+)"&gt;&lt;svg class="synth-cite-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"&gt;&lt;path d="M4 19\.5v-15A2\.5 2\.5 0 0 1 6\.5 2H20v20H6\.5a2\.5 2\.5 0 0 1-2\.5-2\.5Z"&gt;&lt;\/path&gt;&lt;path d="M6 6h10"&gt;&lt;\/path&gt;&lt;path d="M6 10h10"&gt;&lt;\/path&gt;&lt;\/svg&gt;&lt;span class="synth-cite-count"&gt;(\d+)&lt;\/span&gt;&lt;\/span&gt;/g, 
+        `<span class="synth-cite-pill" data-sources="$1" title="$2">${svgIcon}<span class="synth-cite-count">$3</span></span>`)
+      .replace(/^### (.*$)/gim, '<h3 style="margin: 14px 0 6px 0; color: var(--accent-blue); font-size: 15px; font-weight: 700;">$1</h3>')
+      .replace(/^## (.*$)/gim, '<h2 style="margin: 18px 0 10px 0; color: var(--accent-blue); font-size: 17px; font-weight: 800; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">$1</h2>')
+      .replace(/^# (.*$)/gim, '<h1 style="margin: 20px 0 12px 0; color: var(--accent-blue); font-size: 19px; font-weight: 800;">$1</h1>')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>')
-      .replace(/^\- (.*$)/gim, '<li>$1</li>')
-      .replace(/^\d+\. (.*$)/gim, '<li>$1</li>')
-      .replace(/\n\n/g, '</p><p>');
+      .replace(/^> (.*$)/gim, '<blockquote style="border-left: 3px solid var(--accent-blue); padding: 8px 12px; margin: 10px 0; background: var(--bg-subtle); color: var(--text-secondary); border-radius: 0 6px 6px 0; font-style: italic;">$1</blockquote>')
+      .replace(/^[\*\-] (.*$)/gim, '<li style="margin-left: 18px; margin-bottom: 6px;">$1</li>')
+      .replace(/^\d+\. (.*$)/gim, '<li style="margin-left: 18px; margin-bottom: 6px;">$1</li>')
+      .replace(/\n\n/g, '<br><br>');
 
-    return `<div class="rendered-synth"><p>${html}</p></div>`;
+    return `<div class="rendered-synth">${html}</div>`;
+  },
+
+  attachCitationPopovers(container) {
+    let popover = document.getElementById('synth-source-popover');
+    if (!popover) {
+      popover = document.createElement('div');
+      popover.id = 'synth-source-popover';
+      popover.className = 'synth-source-popover hidden';
+      document.body.appendChild(popover);
+    }
+
+    let hideTimeout = null;
+
+    const showPopover = (e, pill) => {
+      clearTimeout(hideTimeout);
+      const rawSources = pill.dataset.sources || '';
+      const sourceList = rawSources.split('|').filter(Boolean);
+      if (sourceList.length === 0) return;
+
+      const cardsHtml = sourceList.map(s => {
+        const info = this.getSourceInfo(s);
+        return `
+          <div class="synth-popover-source-item">
+            <div class="synth-popover-cover" style="background: ${info.color};">
+              <div class="synth-popover-cover-spine"></div>
+              <div class="synth-popover-cover-title">${info.initials}</div>
+              <div class="synth-popover-cover-author">${info.author.split(' ').pop()}</div>
+            </div>
+            <div class="synth-popover-info">
+              <div class="synth-popover-title">${info.title}</div>
+              <div class="synth-popover-author">✍️ ${info.author} • <span class="synth-popover-period">${info.period}</span></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      popover.innerHTML = `
+        <div class="synth-popover-header">
+          <span>📚 Ouvrages cités (${sourceList.length})</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          ${cardsHtml}
+        </div>
+      `;
+
+      popover.classList.remove('hidden');
+
+      const rect = pill.getBoundingClientRect();
+      const popRect = popover.getBoundingClientRect();
+      let top = rect.bottom + 6;
+      let left = Math.max(10, Math.min(window.innerWidth - (popRect.width || 280) - 10, rect.left - 10));
+
+      if (top + (popRect.height || 150) > window.innerHeight - 10) {
+        top = Math.max(10, rect.top - (popRect.height || 150) - 6);
+      }
+
+      popover.style.top = `${top}px`;
+      popover.style.left = `${left}px`;
+    };
+
+    const scheduleHide = () => {
+      hideTimeout = setTimeout(() => {
+        popover.classList.add('hidden');
+      }, 250);
+    };
+
+    popover.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
+    popover.addEventListener('mouseleave', scheduleHide);
+
+    container.querySelectorAll('.synth-cite-pill').forEach(pill => {
+      pill.addEventListener('mouseenter', (e) => showPopover(e, pill));
+      pill.addEventListener('mouseleave', scheduleHide);
+      pill.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showPopover(e, pill);
+      });
+    });
   },
 
   copyToClipboard() {

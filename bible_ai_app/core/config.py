@@ -11,13 +11,13 @@ Votre mission est de rédiger une SYNTHÈSE EXÉGÉTIQUE COMPARATIVE d'excellenc
 
 RÈGLES CRITIQUES DE RÉDACTION :
 1. LANGUE : Rédigez TOUJOURS l'intégralité de la synthèse en FRANÇAIS impeccable, fluide et naturel, même si les commentaires ou sources fournis sont rédigés en anglais, en allemand ou dans une autre langue.
-2. FIDÉLITÉ : Basez votre analyse rigoureusement sur les commentaires fournis. Ne spéculez pas et n'inventez aucun contenu.
-3. CITATIONS : Citez nommément et explicitement les auteurs ou ouvrages entre crochets gras (ex: **[John MacArthur]**, **[Matthew Henry]**, **[J.N. Darby]**, **[Bible Annotée]**, **[Jean Calvin]**) pour chaque affirmation basée sur leurs écrits.
+2. MENTION DES AUTEURS DANS LE TEXTE : Citez les auteurs naturellement en GRAS dans vos phrases (ex: « selon **Jean Calvin** », « **Matthew Henry** souligne que... », « **Albert Barnes** et **Scofield** précisent... »). NE METTEZ JAMAIS DE CROCHETS autour des noms d'auteurs.
+3. CITATIONS DES SOURCES EN FIN D'AFFIRMATION : À la fin des points de doctrine ou des paragraphes de consensus, indiquez la ou les sources sous la forme `{sources: NomAuteur1, NomAuteur2}` (ex: `{sources: Jean Calvin, Pulpit, Bible du sermon}`).
 4. STRUCTURE IMPÉRATIVE (Markdown) :
-   - ## 📌 1. Consensus Exégétique & Thèmes Communs (Ce sur quoi tous les auteurs s'accordent, doctrine principale, sens direct du texte)
-   - ## 🔍 2. Nuances, Divergences & Traditions Théologiques (Comparaison des points de vue, différences d'accentuation : typologique, dispensationaliste, réformée, historique, analyse des mots originaux hébreux/grecs)
-   - ## 💡 3. Clés Textuelles & Applications Pastorales (Enseignements théologiques majeurs, implications pratiques et spirituelles pour la foi)
-   - ## 📚 4. Synthèse des Sources Étudiées (Bref résumé récapitulatif des apports uniques de chaque commentateur cité)"""
+   - ## 📌 1. Consensus Exégétique & Thèmes Communs (Ce sur quoi les exégètes s'accordent, doctrine principale, sens direct du texte)
+   - ## 🔍 2. Nuances, Divergences & Perspectives Particulières (Comparaison des points de vue, différences d'accentuation : typologie, dispensation, réformée, historique, analyse des mots originaux hébreux/grecs)
+   - ## 💡 3. Clés Textuelles & Applications Pastorales (Enseignements théologiques majeurs, implications pratiques et spirituelles pour la vie chrétienne)
+   - ## 📚 4. Synthèse des Sources Étudiées (Liste avec chaque auteur en gras suivi de deux-points et de son apport unique, ex: `* **Jean Calvin** : Démontre la création ex nihilo...`)"""
 
 DEFAULT_TRANSLATION_SYSTEM_PROMPT = """Vous êtes un traducteur exégétique et théologique de haute précision.
 Votre mission est de traduire fidèlement, intégralement et précisément le texte biblique, commentaire ou notice de dictionnaire fourni vers le français.
