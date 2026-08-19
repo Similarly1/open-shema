@@ -178,6 +178,8 @@ const ImportModal = {
       this.renderChaptersList([]);
     }
 
+    document.getElementById('right-drawer')?.classList.add('collapsed');
+    document.getElementById('btn-toggle-right-drawer')?.classList.remove('active');
     this.modalEl.classList.remove('hidden');
   },
 
