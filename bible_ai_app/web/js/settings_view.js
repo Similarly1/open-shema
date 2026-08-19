@@ -61,27 +61,62 @@ const SettingsView = {
       App.applyTheme(theme, palette, readingBg);
     };
 
-    // Changement de mode sombre / clair / système
-    document.getElementById('cfg-theme')?.addEventListener('change', (e) => {
-      const palEl = document.getElementById('cfg-theme-palette');
-      if (palEl) {
-        if (e.target.value === 'light' && palEl.value.startsWith('dark')) {
-          palEl.value = 'light-clean';
-        } else if (e.target.value === 'dark' && palEl.value.startsWith('light')) {
-          palEl.value = 'dark-slate';
+    // 1. Boutons Segmentés de Mode (Sombre / Clair / Système)
+    document.querySelectorAll('.theme-mode-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.theme-mode-pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const mode = btn.dataset.theme;
+        const themeInput = document.getElementById('cfg-theme');
+        if (themeInput) themeInput.value = mode;
+
+        // Bascule de l'affichage des 3 pastilles selon le mode
+        const darkGroup = document.getElementById('palette-selector-dark-group');
+        const lightGroup = document.getElementById('palette-selector-light-group');
+        const paletteInput = document.getElementById('cfg-theme-palette');
+
+        if (mode === 'light') {
+          darkGroup?.classList.add('hidden');
+          lightGroup?.classList.remove('hidden');
+          if (paletteInput && paletteInput.value.startsWith('dark')) {
+            paletteInput.value = 'light-clean';
+            this.updateActivePaletteCard('light-clean');
+          }
+        } else {
+          // dark ou system
+          lightGroup?.classList.add('hidden');
+          darkGroup?.classList.remove('hidden');
+          if (paletteInput && paletteInput.value.startsWith('light')) {
+            paletteInput.value = 'dark-slate';
+            this.updateActivePaletteCard('dark-slate');
+          }
         }
-      }
-      triggerThemeUpdate();
+
+        triggerThemeUpdate();
+      });
     });
 
-    // Changement de palette de couleurs
-    document.getElementById('cfg-theme-palette')?.addEventListener('change', () => {
-      triggerThemeUpdate();
+    // 2. Clic sur les pastilles bicolores de palette
+    document.querySelectorAll('.palette-swatch-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const palette = card.dataset.palette;
+        const paletteInput = document.getElementById('cfg-theme-palette');
+        if (paletteInput) paletteInput.value = palette;
+        this.updateActivePaletteCard(palette);
+        triggerThemeUpdate();
+      });
     });
 
-    // Changement de fond de canevas de lecture
-    document.getElementById('cfg-reading-bg')?.addEventListener('change', () => {
-      triggerThemeUpdate();
+    // 3. Clic sur les tuiles de fond de lecture (Harmonisé, Blanc, Sépia, Sombre)
+    document.querySelectorAll('.reading-bg-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const bgVal = card.dataset.readingBg;
+        const bgInput = document.getElementById('cfg-reading-bg');
+        if (bgInput) bgInput.value = bgVal;
+        this.updateActiveReadingBgCard(bgVal);
+        triggerThemeUpdate();
+      });
     });
 
     // Changement de police en direct
@@ -184,6 +219,18 @@ const SettingsView = {
     });
   },
 
+  updateActivePaletteCard(palette) {
+    document.querySelectorAll('.palette-swatch-card').forEach(c => {
+      c.classList.toggle('active', c.dataset.palette === palette);
+    });
+  },
+
+  updateActiveReadingBgCard(bgVal) {
+    document.querySelectorAll('.reading-bg-card').forEach(c => {
+      c.classList.toggle('active', c.dataset.readingBg === bgVal);
+    });
+  },
+
   async loadData() {
     try {
       this.config = await API.call('get_settings') || {};
@@ -208,6 +255,24 @@ const SettingsView = {
     if (document.getElementById('cfg-reading-bg')) {
       document.getElementById('cfg-reading-bg').value = readingBg;
     }
+
+    // Boutons segmentés de mode
+    document.querySelectorAll('.theme-mode-pill').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.theme === theme);
+    });
+
+    const darkGroup = document.getElementById('palette-selector-dark-group');
+    const lightGroup = document.getElementById('palette-selector-light-group');
+    if (theme === 'light') {
+      darkGroup?.classList.add('hidden');
+      lightGroup?.classList.remove('hidden');
+    } else {
+      lightGroup?.classList.add('hidden');
+      darkGroup?.classList.remove('hidden');
+    }
+
+    this.updateActivePaletteCard(palette);
+    this.updateActiveReadingBgCard(readingBg);
 
     App.applyTheme(theme, palette, readingBg);
 

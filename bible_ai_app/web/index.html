@@ -139,7 +139,7 @@
               <button class="mode-link" id="mode-notes-inline">Notes</button>
 
               <!-- Popover Options d'Affichage & Fond de Lecture Rapide -->
-              <div id="display-options-popover" class="study-mode-popover hidden" style="position: absolute; top: 36px; left: 0; width: 310px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); border-radius: 8px; z-index: 1100; text-align: left;">
+              <div id="display-options-popover" class="reader-dropdown-popover hidden" style="position: absolute; top: 38px; left: 0; width: 310px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); border-radius: 8px; z-index: 1100; text-align: left;">
                 <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
                   Affichage du Texte
                 </div>
@@ -295,57 +295,147 @@
             <div class="settings-card">
               <div class="card-title">Palette de Couleurs & Apparence Globale</div>
               
-              <div class="form-row two-cols">
-                <div class="form-group">
-                  <label>Mode d'apparence :</label>
-                  <select id="cfg-theme" class="select-field full-w">
-                    <option value="dark">🌙 Sombre (Dark Mode)</option>
-                    <option value="light">☀️ Clair (Light Mode)</option>
-                    <option value="system">💻 Système (Auto OS)</option>
-                  </select>
+              <!-- 1. Mode d'Apparence Segmenté -->
+              <div class="form-group" style="margin-bottom: 14px;">
+                <label style="font-weight: 600; margin-bottom: 8px; display: block;">Mode d'apparence de l'application :</label>
+                <div class="theme-mode-segmented" id="theme-mode-segmented">
+                  <button type="button" class="theme-mode-pill active" data-theme="dark">
+                    <span>🌙 Sombre</span>
+                  </button>
+                  <button type="button" class="theme-mode-pill" data-theme="light">
+                    <span>☀️ Clair</span>
+                  </button>
+                  <button type="button" class="theme-mode-pill" data-theme="system">
+                    <span>💻 Système</span>
+                  </button>
                 </div>
-                <div class="form-group">
-                  <label>Palette de couleurs de l'interface :</label>
-                  <select id="cfg-theme-palette" class="select-field full-w">
-                    <optgroup label="Palettes Sombres">
-                      <option value="dark-slate" selected>🌌 Bleu Nuit & Ardoise (Moderne / Par défaut)</option>
-                      <option value="dark-oled">🌑 Onyx & Noir Pur (Contraste OLED)</option>
-                      <option value="dark-warm">🪵 Ébène & Ambre Chaud (Boisé / Doux)</option>
-                    </optgroup>
-                    <optgroup label="Palettes Claires">
-                      <option value="light-clean">☀️ Blanc Pur & Azur (Immaculé / Net)</option>
-                      <option value="light-warm">📜 Papier Crème & Lapis (Livre / Ivoire)</option>
-                      <option value="light-nordic">🌿 Gris Feutré & Sauge (Nordique / Épuré)</option>
-                    </optgroup>
-                  </select>
+                <!-- Hidden inputs pour compatibilité et synchronisation -->
+                <input type="hidden" id="cfg-theme" value="dark">
+                <input type="hidden" id="cfg-theme-palette" value="dark-slate">
+                <input type="hidden" id="cfg-reading-bg" value="auto">
+              </div>
+
+              <!-- 2. Palettes en Mode Sombre (3 pastilles bicolores) -->
+              <div id="palette-selector-dark-group">
+                <label style="font-weight: 600; margin-bottom: 8px; display: block;">Association de couleurs (Mode Sombre) :</label>
+                <div class="palette-swatches-grid">
+                  <!-- Pastille 1 : Bleu Nuit -->
+                  <div class="palette-swatch-card active" data-palette="dark-slate">
+                    <div class="palette-circle-split swatch-dark-slate"></div>
+                    <div class="palette-swatch-info">
+                      <strong class="palette-swatch-title">Bleu Nuit</strong>
+                      <span class="palette-swatch-sub">Ardoise & Ciel</span>
+                    </div>
+                    <span class="palette-swatch-check">✓</span>
+                  </div>
+
+                  <!-- Pastille 2 : Onyx OLED -->
+                  <div class="palette-swatch-card" data-palette="dark-oled">
+                    <div class="palette-circle-split swatch-dark-oled"></div>
+                    <div class="palette-swatch-info">
+                      <strong class="palette-swatch-title">Onyx Profond</strong>
+                      <span class="palette-swatch-sub">Noir Pur OLED</span>
+                    </div>
+                    <span class="palette-swatch-check">✓</span>
+                  </div>
+
+                  <!-- Pastille 3 : Ébène Chaud -->
+                  <div class="palette-swatch-card" data-palette="dark-warm">
+                    <div class="palette-circle-split swatch-dark-warm"></div>
+                    <div class="palette-swatch-info">
+                      <strong class="palette-swatch-title">Ébène & Ambre</strong>
+                      <span class="palette-swatch-sub">Boisé & Chaleureux</span>
+                    </div>
+                    <span class="palette-swatch-check">✓</span>
+                  </div>
                 </div>
               </div>
 
-              <div class="form-row two-cols" style="margin-top: 10px;">
-                <div class="form-group">
-                  <label>Fond des fenêtres de lecture (Bible, comms, notes) :</label>
-                  <select id="cfg-reading-bg" class="select-field full-w">
-                    <option value="auto" selected>🎨 Harmonisé (Hérité du thème général)</option>
-                    <option value="white">⚪ Blanc Pur (Lecture nette et contrastée)</option>
-                    <option value="sepia">📜 Sépia Doux (Confort de lecture / Liseuse)</option>
-                    <option value="dark">🌑 Très Sombre (Nuit profonde / Noir)</option>
-                  </select>
+              <!-- 3. Palettes en Mode Clair (3 pastilles bicolores) -->
+              <div id="palette-selector-light-group" class="hidden">
+                <label style="font-weight: 600; margin-bottom: 8px; display: block;">Association de couleurs (Mode Clair) :</label>
+                <div class="palette-swatches-grid">
+                  <!-- Pastille 1 : Blanc Pur & Azur -->
+                  <div class="palette-swatch-card" data-palette="light-clean">
+                    <div class="palette-circle-split swatch-light-clean"></div>
+                    <div class="palette-swatch-info">
+                      <strong class="palette-swatch-title">Blanc Pur & Azur</strong>
+                      <span class="palette-swatch-sub">Immaculé & Net</span>
+                    </div>
+                    <span class="palette-swatch-check">✓</span>
+                  </div>
+
+                  <!-- Pastille 2 : Papier Crème & Lapis -->
+                  <div class="palette-swatch-card" data-palette="light-warm">
+                    <div class="palette-circle-split swatch-light-warm"></div>
+                    <div class="palette-swatch-info">
+                      <strong class="palette-swatch-title">Papier Crème</strong>
+                      <span class="palette-swatch-sub">Livre & Lapis</span>
+                    </div>
+                    <span class="palette-swatch-check">✓</span>
+                  </div>
+
+                  <!-- Pastille 3 : Gris Feutré & Sauge -->
+                  <div class="palette-swatch-card" data-palette="light-nordic">
+                    <div class="palette-circle-split swatch-light-nordic"></div>
+                    <div class="palette-swatch-info">
+                      <strong class="palette-swatch-title">Gris Feutré</strong>
+                      <span class="palette-swatch-sub">Nordique & Sauge</span>
+                    </div>
+                    <span class="palette-swatch-check">✓</span>
+                  </div>
                 </div>
-                <div class="form-group">
-                  <label>Police du texte biblique :</label>
-                  <select id="cfg-font-family" class="select-field full-w font-preview-select">
-                    <option value="EB Garamond" style="font-family: 'EB Garamond', serif; font-size: 15px; font-weight: 600;">EB Garamond (Serif Éditorial)</option>
-                    <option value="Lora" style="font-family: 'Lora', serif; font-size: 15px; font-weight: 500;">Lora (Serif Moderne)</option>
-                    <option value="Literata" style="font-family: 'Literata', serif; font-size: 15px; font-weight: 500;">Literata (Édition & Littéraire)</option>
-                    <option value="Merriweather" style="font-family: 'Merriweather', serif; font-size: 14px; font-weight: 400;">Merriweather (Lecture Confort)</option>
-                    <option value="Georgia" style="font-family: Georgia, serif; font-size: 15px;">Georgia (Classique)</option>
-                    <option value="Cinzel" style="font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700;">Cinzel (Épigraphique & Titres)</option>
-                    <option value="Inter" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500;">Inter (Sans-Serif Épurée)</option>
-                  </select>
+              </div>
+
+              <!-- 4. Fond des Fenêtres de Lecture (Indépendant) -->
+              <div style="margin-top: 18px;">
+                <label style="font-weight: 600; margin-bottom: 8px; display: block;">Fond des fenêtres de lecture (Bible, commentaires, notes, dictionnaire) :</label>
+                <div class="reading-bg-grid">
+                  <!-- Auto -->
+                  <div class="reading-bg-card active" data-reading-bg="auto">
+                    <div class="reading-bg-preview-box" style="background: linear-gradient(135deg, #0f172a 50%, #ffffff 50%); border-color: var(--border-color);">🎨</div>
+                    <div class="reading-bg-label">Harmonisé</div>
+                    <div class="reading-bg-sub">Thème général</div>
+                  </div>
+
+                  <!-- Blanc -->
+                  <div class="reading-bg-card" data-reading-bg="white">
+                    <div class="reading-bg-preview-box" style="background: #ffffff; color: #1e293b; border-color: #cbd5e1;">⚪</div>
+                    <div class="reading-bg-label">Blanc Pur</div>
+                    <div class="reading-bg-sub">Net & Lumineux</div>
+                  </div>
+
+                  <!-- Sépia -->
+                  <div class="reading-bg-card" data-reading-bg="sepia">
+                    <div class="reading-bg-preview-box" style="background: #fbf0d9; color: #382e25; border-color: #d8c7ad;">📜</div>
+                    <div class="reading-bg-label">Sépia Doux</div>
+                    <div class="reading-bg-sub">Confort Liseuse</div>
+                  </div>
+
+                  <!-- Très Sombre -->
+                  <div class="reading-bg-card" data-reading-bg="dark">
+                    <div class="reading-bg-preview-box" style="background: #070a0f; color: #f1f5f9; border-color: #334155;">🌑</div>
+                    <div class="reading-bg-label">Très Sombre</div>
+                    <div class="reading-bg-sub">Nuit Profonde</div>
+                  </div>
                 </div>
               </div>
 
               <div class="form-divider"></div>
+
+              <!-- Typographie & Sliders -->
+              <div class="form-group">
+                <label>Police du texte biblique :</label>
+                <select id="cfg-font-family" class="select-field full-w font-preview-select">
+                  <option value="EB Garamond" style="font-family: 'EB Garamond', serif; font-size: 15px; font-weight: 600;">EB Garamond (Serif Éditorial)</option>
+                  <option value="Lora" style="font-family: 'Lora', serif; font-size: 15px; font-weight: 500;">Lora (Serif Moderne)</option>
+                  <option value="Literata" style="font-family: 'Literata', serif; font-size: 15px; font-weight: 500;">Literata (Édition & Littéraire)</option>
+                  <option value="Merriweather" style="font-family: 'Merriweather', serif; font-size: 14px; font-weight: 400;">Merriweather (Lecture Confort)</option>
+                  <option value="Georgia" style="font-family: Georgia, serif; font-size: 15px;">Georgia (Classique)</option>
+                  <option value="Cinzel" style="font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700;">Cinzel (Épigraphique & Titres)</option>
+                  <option value="Inter" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500;">Inter (Sans-Serif Épurée)</option>
+                </select>
+              </div>
 
               <div class="form-slider-row">
                 <label>Taille de police :</label>
