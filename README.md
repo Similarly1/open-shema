@@ -1,39 +1,64 @@
-# Free Logos AI
+# Open Shema (שְׁמַע)
 
-Une application moderne et complète d'étude biblique assistée par IA (PyQt6 / Python), inspirée des fonctionnalités avancées de logiciels comme Logos Bible Software.
+> **« Écoute » (*Shema*)** — Une plateforme d'étude biblique ouverte, moderne et assistée par IA, pensée pour la recherche exégétique, linguistique et théologique.
 
-## Fonctionnalités Principales
+**Open Shema** est un logiciel libre (*open source*) dédié à la lecture, l'analyse approfondie et l'exploration des textes sacrés. Son nom puise sa source dans le grand verset biblique du *Shema Israël* (Deutéronome 6:4 — שְׁמַע יִשְׂרָאֵל), où écouter, lire et méditer les Écritures ne font qu'un.
 
-- **Lecteur & Étude Biblique Multi-versions** : Support de nombreuses traductions françaises et sources originales (BDS, Segond 1910, SBLGNT/MorphGNT, Chouraqui, TOB, Sagesse Vivante, Parole Vivante, etc.).
-- **Interlinéaire Inversé Complet** : Analyse mot à mot (Hébreu/Grec), lemmes, translittérations, codes Strong, analyse morphologique et dictionnaires intégrés (Strong Hébreu/Grec, Bailly, Dictionnaire Calmet).
-- **Mode Comparaison & Calcul de Différence Textuelle** : Comparaison verset par verset avec surlignage des divergences et calcul du pourcentage de similarité lexicale.
-- **Assistant IA Théologique & RAG** : Recherche sémantique locale / vectorielle avec ChromaDB, intégration Gemini et Mistral AI, citations exactes de passages et de commentaires.
-- **Interface Graphique Moderne (PyQt6)** : Thème sombre/clair personnalisable, gestion de la typographie, taille de police, espacement interlinéaire et inter-mots.
+---
 
-## Installation
+## 🌟 Points Forts & Fonctionnalités
 
-1. Cloner le dépôt :
+- **📖 Lecteur Biblique Multi-Versions & Parallèle** :
+  - Support natif d'une large bibliothèque de traductions (LSG 1910, Segond 21, BDS, Darby, Chouraqui, TOB, Parole Vivante, Sagesse Vivante, etc.).
+  - Textes originaux massorétiques (Hébreu/Araméen) et grecs (SBLGNT / MorphGNT / Septante LXX).
+  - Mode comparaison synoptique verset par verset avec surlignage des divergences et calcul de similarité textuelle.
+
+- **🔤 Interlinéaire Inversé & Morphologie Originale** :
+  - Analyse mot à mot : lemmes, racines, translittérations, codes Strong et étiquettes grammaticales complètes.
+  - Dictionnaires intégrés avec consultation instantanée au survol et en volet latéral : Lexique Strong (Hébreu/Grec), Dictionnaire Bailly Grec-Français, Dictionnaire Historique et Critique de Dom Calmet (1728), Dictionnaires encyclopédiques.
+
+- **💬 Bibliothèque de Commentaires & Navigation Persistante** :
+  - Accès aux commentaires exégétiques et homilétiques de référence (Matthew Henry, Jean Calvin, Adam Clarke, Scofield, Gaebelein, etc.).
+  - Mémorisation de l'auteur préféré avec suggestions bienveillantes en cas de verset non commenté.
+
+- **📝 Prise de Notes en Markdown Clair (`.md`)** :
+  - Stockage des notes en fichiers Markdown standard en clair dans le dossier de votre choix sur votre ordinateur.
+  - Synchronisation automatique avec le passage biblique actif.
+  - Métadonnées YAML intégrées et inclusion granulaire dans le contexte de l'IA.
+
+- **🧠 Assistant d'Étude & RAG Documentaire (Gemini / Mistral)** :
+  - 4 modes spécialisés : *🔍 Exégèse approfondie*, *🏛️ Contexte historique & culturel*, *🎙️ Préparation de prédication / Message*, *🔤 Analyse lexicale*.
+  - RAG haute précision : **Reranking sémantique local (Cross-Encoder BGE-M3)** sur CPU et **LLM Curateur** pour éliminer le bruit.
+  - Sélection granulaire des corpus documentaires (Bibles, Commentaires, Dicos, Notes).
+
+---
+
+## 🚀 Démarrage Rapide
+
+### 1. Prérequis
+- Python 3.10+
+- Navigateur moderne (Edge WebView2 sous Windows)
+
+### 2. Installation
 ```bash
 git clone https://github.com/Similarly1/free-logos-ai.git
 cd free-logos-ai/bible_ai_app
-```
 
-2. Créer un environnement virtuel et installer les dépendances :
-```bash
+# Créer un environnement virtuel
 python -m venv venv
-# Sur Windows :
-venv\Scripts\activate
-# Sur Linux/macOS :
-source venv/bin/activate
+venv\Scripts\activate  # Windows
 
+# Installer les dépendances
 pip install -r requirements.txt
 ```
 
-3. Configuration :
-Copier `data/config.example.json` vers `data/config.json` et renseigner vos clés API si vous souhaitez utiliser l'IA Gemini ou Mistral.
-
-4. Lancer l'application :
+### 3. Lancement
+Double-cliquez sur `launch_webview.bat` ou lancez :
 ```bash
-python main.py
+python webview_app.py
 ```
-ou exécuter `launch.bat` (Windows).
+
+---
+
+## 📜 Licence
+Projet Open Source sous licence MIT. Open Shema est conçu pour la communauté d'étude biblique, les pasteurs, enseignants, théologiens et curieux du texte.

@@ -320,7 +320,7 @@ const App = {
       ? JSON.stringify(this.currentErrorDetails.details, null, 2)
       : String(this.currentErrorDetails.details);
 
-    const textToCopy = `=== RAPPORT D'ERREUR BIBLE AI ===\nDate: ${new Date().toISOString()}\nTitre: ${this.currentErrorDetails.title}\nMessage: ${this.currentErrorDetails.message}\n\nDétails techniques:\n${formattedDetails}`;
+    const textToCopy = `=== RAPPORT D'ERREUR OPEN SHEMA ===\nDate: ${new Date().toISOString()}\nTitre: ${this.currentErrorDetails.title}\nMessage: ${this.currentErrorDetails.message}\n\nDétails techniques:\n${formattedDetails}`;
 
     navigator.clipboard.writeText(textToCopy).then(() => {
       const btnText = document.getElementById('btn-copy-error-text');

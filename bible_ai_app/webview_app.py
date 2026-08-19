@@ -1093,7 +1093,7 @@ def main():
     html_path = os.path.join(current_dir, "web", "index.html")
     
     _GLOBAL_WINDOW = webview.create_window(
-        title="Bible AI — Lecteur Biblique & Étude (Logos Edition)",
+        title="Open Shema — Lecteur & Assistant d'Étude Biblique",
         url=html_path,
         js_api=api,
         width=1440,

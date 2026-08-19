@@ -19,7 +19,7 @@ def main():
         print("Initialisation de la base de données...")
         db = VectorDB(persist_directory="./data/chroma_db")
         
-        print("Lancement de l'interface graphique Bible AI Study...")
+        print("Lancement de l'interface Open Shema...")
         app = App(db)
         app.mainloop()
     except Exception as e:
