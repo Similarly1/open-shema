@@ -5068,10 +5068,12 @@ body.palette-dark-warm .ctx-submenu {
   border-radius: 0;
   flex: 1;
   min-height: 0;
+  height: 100%;
   box-shadow: none;
   background: var(--bg-primary);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .comm-synthesis-panel.synthesis-fullview .synthesis-panel-header {
@@ -5089,8 +5091,9 @@ body.palette-dark-warm .ctx-submenu {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: 8px 14px 20px 14px;
+  padding: 8px 14px 14px 14px;
   gap: 0;
+  overflow: hidden;
 }
 
 .comm-synthesis-panel.synthesis-fullview .synthesis-range-controls,
@@ -5108,6 +5111,7 @@ body.palette-dark-warm .ctx-submenu {
   min-height: 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .synth-meta-bar {
@@ -5116,7 +5120,7 @@ body.palette-dark-warm .ctx-submenu {
   justify-content: space-between;
   padding: 4px 0 10px 0;
   border-bottom: 1px solid var(--border-color);
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   flex-shrink: 0;
   gap: 8px;
   flex-wrap: wrap;
@@ -5179,11 +5183,30 @@ body.palette-dark-warm .ctx-submenu {
 }
 
 .comm-synthesis-panel.synthesis-fullview .synth-markdown-content {
-  max-height: none;
   flex: 1;
   min-height: 0;
-  overflow-y: visible;
-  padding: 4px 2px 40px 2px;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  padding: 6px 8px 40px 2px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(150, 150, 150, 0.4) transparent;
+}
+
+.comm-synthesis-panel.synthesis-fullview .synth-markdown-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.comm-synthesis-panel.synthesis-fullview .synth-markdown-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.comm-synthesis-panel.synthesis-fullview .synth-markdown-content::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+.comm-synthesis-panel.synthesis-fullview .synth-markdown-content::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
 }
 
 /* Boutons et badges de traduction instantanée d'articles */
