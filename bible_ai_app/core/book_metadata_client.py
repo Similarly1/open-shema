@@ -51,7 +51,7 @@ BIBLE_VERSIONS_REGISTRY = [
         "description": "La Bible Segond 21 est une traduction de référence éditée par la Société Biblique de Genève, proposant le texte classique de Louis Segond avec le vocabulaire français contemporain.",
         "isbn": "9782608123015",
         "categories": ["Bible"],
-        "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg"
+        "cover_url": "https://images.epagine.fr/015/9782608123015_1_75.jpg"
     },
     {
         "id": "bible_bds",
@@ -69,7 +69,7 @@ BIBLE_VERSIONS_REGISTRY = [
         "description": "Traduction à équivalence dynamique d'une grande clarté littéraire, particulièrement appréciée pour la lecture continue et la prédication.",
         "isbn": "9782853006095",
         "categories": ["Bible"],
-        "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg"
+        "cover_url": "https://images.epagine.fr/095/9782853006095_1_75.jpg"
     },
     {
         "id": "bible_lsg1910",
@@ -123,7 +123,7 @@ BIBLE_VERSIONS_REGISTRY = [
         "description": "Première traduction conjointe réalisée par des spécialistes catholiques, protestants et orthodoxes.",
         "isbn": "9782204094122",
         "categories": ["Bible"],
-        "cover_url": "https://upload.wikimedia.org/wikipedia/commons/0/01/TOB_note.jpg"
+        "cover_url": "https://images.epagine.fr/122/9782204094122_1_75.jpg"
     },
     {
         "id": "bible_nbs",
@@ -325,13 +325,14 @@ class BookMetadataClient:
                     all_results.append(dict(bible))
                     break
 
-        # 2. ÉTAPE 2 : Requêtes parallèles sur les 5 catalogues en ligne
+        # 2. ÉTAPE 2 : Requêtes parallèles sur les 6 catalogues en ligne (avec DuckDuckGo Image Search)
         tasks = [
             _SEARCH_EXECUTOR.submit(cls._search_google_books, query=cleaned_query, author=cleaned_author, title=cleaned_title, isbn=cleaned_isbn, api_key=api_key, limit=8),
             _SEARCH_EXECUTOR.submit(cls._search_open_library, query=search_text, author=cleaned_author, title=cleaned_title, isbn=cleaned_isbn, limit=8),
             _SEARCH_EXECUTOR.submit(cls._search_bnf_gallica, query=search_text, author=cleaned_author, title=cleaned_title, limit=8),
             _SEARCH_EXECUTOR.submit(cls._search_internet_archive, query=search_text, author=cleaned_author, title=cleaned_title, limit=6),
-            _SEARCH_EXECUTOR.submit(cls._search_wikipedia, query=cleaned_title or cleaned_query, limit=3)
+            _SEARCH_EXECUTOR.submit(cls._search_wikipedia, query=cleaned_title or cleaned_query, limit=3),
+            _SEARCH_EXECUTOR.submit(cls._search_duckduckgo_covers, query=search_text, author=cleaned_author, title=cleaned_title, limit=2)
         ]
 
         done, _ = concurrent.futures.wait(tasks, timeout=3.5)
@@ -343,7 +344,15 @@ class BookMetadataClient:
             except Exception as e:
                 logger.debug("Erreur résultat tâche recherche métadonnées: %s", e)
 
-        # 3. ÉTAPE 3 : Dédoublonnage intelligent & tri
+        # 3. ÉTAPE 3 : Résolution automatique de la couverture par ISBN si manquante
+        for r in all_results:
+            if not r.get("cover_url") and r.get("isbn"):
+                isbn_candidate = r["isbn"].split(",")[0].strip()
+                cov = cls._get_isbn_cover(isbn_candidate)
+                if cov:
+                    r["cover_url"] = cov
+
+        # 4. ÉTAPE 4 : Dédoublonnage intelligent & tri
         seen_keys = set()
         deduped: List[Dict[str, Any]] = []
 
@@ -757,6 +766,66 @@ class BookMetadataClient:
                     })
             return results
         except Exception:
+            return []
+
+    # =========================================================================
+    # 6. DUCKDUCKGO WEB IMAGE SEARCH (JAQUETTES COMMERCIALES OFFICIELLES)
+    # =========================================================================
+
+    @classmethod
+    def _get_isbn_cover(cls, isbn: str) -> Optional[str]:
+        """Tente de trouver une couverture commerciale via Epagine ou Open Library."""
+        if not isbn:
+            return None
+        clean_isbn = re.sub(r'\D', '', str(isbn))
+        if len(clean_isbn) not in (10, 13):
+            return None
+        if len(clean_isbn) == 13:
+            last3 = clean_isbn[-3:]
+            return f"https://images.epagine.fr/{last3}/{clean_isbn}_1_75.jpg"
+        return f"https://covers.openlibrary.org/b/isbn/{clean_isbn}-M.jpg"
+
+    @classmethod
+    def _search_duckduckgo_covers(cls, query: str, author: str = "", title: str = "", limit: int = 2) -> List[Dict[str, Any]]:
+        """Interroge la recherche d'images web pour trouver la jaquette commerciale officielle du livre."""
+        if not query:
+            return []
+        try:
+            import warnings
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                from duckduckgo_search import DDGS
+                search_str = f"{title or query} {author} couverture livre".strip()
+                results = []
+                with DDGS() as ddgs:
+                    img_results = list(ddgs.images(search_str, max_results=min(max(limit, 1), 4)))
+                    for item in img_results:
+                        img_url = item.get("image") or item.get("thumbnail")
+                        if not img_url:
+                            continue
+                    item_title = item.get("title") or title or query
+                    results.append({
+                        "id": f"ddg_{abs(hash(img_url))}",
+                        "source": "Web Librairie",
+                        "source_badge": "Jaquette Web",
+                        "source_badge_color": "#EA580C",
+                        "title": item_title,
+                        "short_title": (title or item_title).split(':')[0].strip(),
+                        "authors": [author] if author else [],
+                        "author_str": author or "Édition Commerciale",
+                        "publisher": item.get("source", "Librairie"),
+                        "published_date": "",
+                        "year": "",
+                        "description": "Jaquette commerciale récupérée via recherche d'image web.",
+                        "isbn": "",
+                        "categories": ["Livre / Jaquette"],
+                        "page_count": None,
+                        "cover_url": img_url,
+                        "language": "fr"
+                    })
+            return results
+        except Exception as e:
+            logger.debug("Erreur DuckDuckGo images: %s", e)
             return []
 
     # =========================================================================

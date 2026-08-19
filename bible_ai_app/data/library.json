@@ -10,18 +10,22 @@
     "active": true
   },
   "Segond 21": {
-    "title": "Segond 21",
+    "title": "Bible Segond 21",
     "author": "Société Biblique de Genève",
-    "description": "Bible Segond 21 (Société Biblique de Genève, 2007)",
+    "description": "La Bible Segond 21 est une traduction de référence éditée par la Société Biblique de Genève, proposant le texte classique de Louis Segond avec le vocabulaire français contemporain.",
     "year": "2007",
-    "cover_path": null,
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\Bible_Segond_21_(Avec_notes_de_référence).jpg",
     "type": "Bible",
     "format": "json",
     "folder_name": "Segond_21",
     "version_code": "S21",
     "total_books": 66,
     "embedding_model": "study_library",
-    "active": true
+    "active": true,
+    "name": "Segond 21",
+    "corpus_scope": "GLOBAL",
+    "source_type": "general",
+    "book_code": null
   },
   "BDS": {
     "title": "Bible du Semeur 2015",
@@ -674,6 +678,20 @@
     "embedding_model": "study_library",
     "corpus_scope": "BOTH",
     "source_type": "devotional",
+    "active": true
+  },
+  "PSAUTIER": {
+    "name": "PSAUTIER",
+    "title": "Psautier de Genève",
+    "author": "",
+    "description": "",
+    "year": "1729",
+    "cover_path": "",
+    "type": "Bible",
+    "corpus_scope": "GLOBAL",
+    "source_type": "general",
+    "book_code": null,
+    "embedding_model": "study_library",
     "active": true
   }
 }
