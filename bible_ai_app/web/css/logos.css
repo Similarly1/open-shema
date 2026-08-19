@@ -3707,29 +3707,29 @@ input:checked + .slider.round:before {
   box-sizing: border-box;
 }
 
-/* Mode Sombre : 3 pastilles */
+/* Mode Sombre : 3 pastilles bicolores distinctes */
 .swatch-dark-slate {
-  background: linear-gradient(135deg, #0B0F17 50%, #38BDF8 50%);
+  background: linear-gradient(135deg, #0B0F17 50%, #38BDF8 50%) !important;
 }
 .swatch-dark-oled {
-  background: linear-gradient(135deg, #000000 50%, #60A5FA 50%);
+  background: linear-gradient(135deg, #000000 50%, #E2E8F0 50%) !important;
 }
 .swatch-dark-warm {
-  background: linear-gradient(135deg, #151210 50%, #E59840 50%);
+  background: linear-gradient(135deg, #151210 50%, #F59E0B 50%) !important;
 }
 
-/* Mode Clair : 3 pastilles */
+/* Mode Clair : 3 pastilles bicolores distinctes */
 .swatch-light-clean {
-  background: linear-gradient(135deg, #FFFFFF 50%, #0284C7 50%);
-  border-color: rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #FFFFFF 50%, #0284C7 50%) !important;
+  border-color: rgba(0, 0, 0, 0.2) !important;
 }
 .swatch-light-warm {
-  background: linear-gradient(135deg, #FAF7F0 50%, #1D4ED8 50%);
-  border-color: rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #FAF7F0 50%, #1D4ED8 50%) !important;
+  border-color: rgba(0, 0, 0, 0.2) !important;
 }
 .swatch-light-nordic {
-  background: linear-gradient(135deg, #F2F4F5 50%, #0F766E 50%);
-  border-color: rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #F2F4F5 50%, #0D9488 50%) !important;
+  border-color: rgba(0, 0, 0, 0.2) !important;
 }
 
 .palette-swatch-info {
@@ -3822,12 +3822,54 @@ input:checked + .slider.round:before {
   box-sizing: border-box;
 }
 
+/* --- Pastilles Universelles de Fond de Lecture (Paramètres & Popover Lecteur) --- */
+.swatch-auto,
+.reading-bg-circle.swatch-auto,
+.quick-swatch-circle.swatch-auto {
+  background: linear-gradient(135deg, #0B0F17 50%, #FFFFFF 50%) !important;
+  border: 1.5px solid var(--border-color) !important;
+}
+
+.swatch-white,
+.reading-bg-circle.swatch-white,
+.quick-swatch-circle.swatch-white {
+  background: #FFFFFF !important;
+  border: 1.5px solid #CBD5E1 !important;
+}
+
+.swatch-sepia,
+.reading-bg-circle.swatch-sepia,
+.quick-swatch-circle.swatch-sepia {
+  background: #FBF0D9 !important;
+  border: 1.5px solid #D8C7AD !important;
+}
+
+.swatch-dark,
+.reading-bg-circle.swatch-dark,
+.quick-swatch-circle.swatch-dark {
+  background: #070A0F !important;
+  border: 1.5px solid #475569 !important;
+}
+
 .reading-bg-card .quick-swatch-check {
   display: none;
 }
 
 .reading-bg-card.active .quick-swatch-check {
   display: block;
+}
+
+.swatch-auto .quick-swatch-check {
+  color: #38BDF8 !important;
+}
+.swatch-white .quick-swatch-check {
+  color: #0F172A !important;
+}
+.swatch-sepia .quick-swatch-check {
+  color: #78350F !important;
+}
+.swatch-dark .quick-swatch-check {
+  color: #38BDF8 !important;
 }
 
 .reading-bg-label {
