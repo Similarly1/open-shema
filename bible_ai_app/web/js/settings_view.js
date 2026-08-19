@@ -80,7 +80,7 @@ RÈGLES STRICTES :
 4. NE JAMAIS dialoguer ni ajouter de préambule : Renvoyez UNIQUEMENT le texte traduit en français.`,
 
   currentEditingPrompt: null,
-  activeModalTab: 'edit',
+  activeModalTab: 'preview',
 
   bindActions() {
     const triggerThemeUpdate = () => {
@@ -656,15 +656,12 @@ RÈGLES STRICTES :
       textarea.value = currentVal;
     }
 
-    this.switchPromptModalTab('edit');
+    this.switchPromptModalTab('preview');
     this.updatePromptModalStats();
 
     const modal = document.getElementById('modal-system-prompt');
     if (modal) {
       modal.classList.remove('hidden');
-      if (textarea) {
-        setTimeout(() => textarea.focus(), 100);
-      }
     }
   },
 
@@ -688,6 +685,10 @@ RÈGLES STRICTES :
       tabPrev?.classList.remove('active');
       paneEdit?.classList.remove('hidden');
       panePrev?.classList.add('hidden');
+      const textarea = document.getElementById('modal-prompt-textarea');
+      if (textarea) {
+        setTimeout(() => textarea.focus(), 60);
+      }
     } else {
       tabPrev?.classList.add('active');
       tabEdit?.classList.remove('active');

@@ -2048,14 +2048,14 @@
         <!-- Barre d'outils supérieure : Onglets & Statistiques -->
         <div class="prompt-modal-toolbar">
           <div class="prompt-modal-tabs">
-            <button type="button" class="prompt-tab-btn active" id="tab-prompt-edit">
+            <button type="button" class="prompt-tab-btn" id="tab-prompt-edit">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 20h9"></path>
                 <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
               </svg>
               <span>Édition</span>
             </button>
-            <button type="button" class="prompt-tab-btn" id="tab-prompt-preview">
+            <button type="button" class="prompt-tab-btn active" id="tab-prompt-preview">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
                 <circle cx="12" cy="12" r="3"></circle>
@@ -2074,11 +2074,11 @@
         <!-- Corps de la modale : Éditeur / Aperçu -->
         <div class="prompt-modal-body">
           <!-- Zone d'édition -->
-          <div class="prompt-editor-pane" id="prompt-editor-pane">
+          <div class="prompt-editor-pane hidden" id="prompt-editor-pane">
             <textarea id="modal-prompt-textarea" class="prompt-monospace-textarea" placeholder="Saisissez les instructions système pour l'IA..." spellcheck="false"></textarea>
           </div>
           <!-- Zone d'aperçu formaté -->
-          <div class="prompt-preview-pane hidden" id="prompt-preview-pane">
+          <div class="prompt-preview-pane" id="prompt-preview-pane">
             <div class="prompt-rendered-markdown" id="modal-prompt-rendered"></div>
           </div>
         </div>
