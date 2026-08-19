@@ -81,12 +81,7 @@ const App = {
     // 5. Raccourcis clavier globaux
     this.bindKeyboardShortcuts();
 
-    // 6b. Contrôles de fenêtre personnalisés (Mode Sans Bordure / Frameless)
-    document.getElementById('win-btn-min')?.addEventListener('click', () => API.call('minimize_window'));
-    document.getElementById('win-btn-max')?.addEventListener('click', () => API.call('maximize_window'));
-    document.getElementById('win-btn-close')?.addEventListener('click', () => API.call('close_window'));
-
-    // 7. Masquage fluide du Splash Loader dès que l'API est initialisée (avec timeout de sécurité)
+    // 6. Masquage fluide du Splash Loader dès que l'API est initialisée (avec timeout de sécurité)
     API.onReady(() => {
       setTimeout(() => {
         this.hideSplash();

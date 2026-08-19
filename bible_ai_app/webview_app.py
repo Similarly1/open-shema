@@ -1138,9 +1138,7 @@ def main():
         width=1440,
         height=920,
         min_size=(1050, 680),
-        fullscreen=True,
-        frameless=True,
-        easy_drag=True,
+        maximized=True,
         background_color="#0F172A"
     )
     
