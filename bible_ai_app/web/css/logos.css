@@ -5499,6 +5499,37 @@ body.palette-dark-warm .ctx-submenu {
    MODULE CARTES BIBLIQUES INTERACTIVES (OPEN SHEMA MAPS)
    ========================================================================== */
 
+/* Repères de lieux sur les versets bibliques */
+.verse-geo-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 0 1px;
+  margin: 0 3px 0 1px;
+  cursor: pointer;
+  vertical-align: 2px;
+  color: var(--accent-blue);
+  opacity: 0.85;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.verse-geo-badge:hover {
+  opacity: 1;
+  transform: scale(1.35);
+  color: #38bdf8;
+}
+
+.geo-pin-icon {
+  display: block;
+}
+
+.hide-geo-pins .verse-geo-badge {
+  display: none !important;
+}
+
 .maps-workspace-layout {
   display: flex;
   height: calc(100vh - 105px);

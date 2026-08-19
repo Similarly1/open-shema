@@ -341,6 +341,9 @@ RÈGLES STRICTES :
     if (document.getElementById('cfg-full-width')) {
       document.getElementById('cfg-full-width').checked = c.full_width_reading === true;
     }
+    if (document.getElementById('cfg-show-geo-pins')) {
+      document.getElementById('cfg-show-geo-pins').checked = c.show_geo_pins !== false;
+    }
 
     document.getElementById('cfg-inter-surface').checked = c.interlinear_show_surface !== false;
     document.getElementById('cfg-inter-lemma').checked = c.interlinear_show_lemma !== false;
@@ -476,6 +479,13 @@ RÈGLES STRICTES :
     newCfg.show_diff_highlights = document.getElementById('cfg-diff-highlight').checked;
     if (document.getElementById('cfg-show-chap-dividers')) {
       newCfg.show_chapter_dividers = document.getElementById('cfg-show-chap-dividers').checked;
+    }
+    if (document.getElementById('cfg-show-geo-pins')) {
+      newCfg.show_geo_pins = document.getElementById('cfg-show-geo-pins').checked;
+      const ws = document.getElementById('reader-workspace');
+      if (ws) ws.classList.toggle('hide-geo-pins', !newCfg.show_geo_pins);
+      const chkGeo = document.getElementById('opt-show-geo-pins');
+      if (chkGeo) chkGeo.checked = newCfg.show_geo_pins;
     }
     if (document.getElementById('cfg-full-width')) {
       newCfg.full_width_reading = document.getElementById('cfg-full-width').checked;

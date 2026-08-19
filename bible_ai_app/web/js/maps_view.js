@@ -236,34 +236,40 @@ const MapsView = {
     this.markersLayer.clearLayers();
 
     places.forEach(place => {
-      if (place.latitude && place.longitude) {
-        const icon = this.createCustomMarkerIcon(place);
-        const marker = L.marker([place.latitude, place.longitude], { icon: icon });
-
-        // Popup stylisé
-        const popupContent = `
-          <div class="leaflet-custom-popup">
-            <div class="popup-title-row">
-              <strong>${place.name_fr}</strong>
-              <span class="popup-type-badge">${this.getTypeLabel(place.place_type)}</span>
-            </div>
-            ${place.modern_name ? `<div class="popup-modern">Nom moderne : <em>${place.modern_name}</em></div>` : ''}
-            ${place.comment ? `<div class="popup-desc">${place.comment}</div>` : ''}
-            <div class="popup-footer">
-              <span class="popup-verses-badge">${place.verses_count || 0} référence(s)</span>
-              <button class="popup-action-btn" onclick="MapsView.showPlaceDetailsById('${place.place_id}')">Détails & versets →</button>
-            </div>
-          </div>
-        `;
-
-        marker.bindPopup(popupContent, { className: 'open-shema-map-popup' });
-        marker.on('click', () => {
-          this.selectPlace(place, false);
-        });
-
+      const marker = this.createSingleMarker(place);
+      if (marker) {
         this.markersLayer.addLayer(marker);
       }
     });
+  },
+
+  createSingleMarker(place) {
+    if (!place || !place.latitude || !place.longitude) return null;
+    const icon = this.createCustomMarkerIcon(place);
+    const marker = L.marker([place.latitude, place.longitude], { icon: icon });
+    marker._placeId = place.place_id;
+
+    // Popup stylisé
+    const popupContent = `
+      <div class="leaflet-custom-popup">
+        <div class="popup-title-row">
+          <strong>${place.name_fr}</strong>
+          <span class="popup-type-badge">${this.getTypeLabel(place.place_type)}</span>
+        </div>
+        ${place.modern_name ? `<div class="popup-modern">Nom moderne : <em>${place.modern_name}</em></div>` : ''}
+        ${place.comment ? `<div class="popup-desc">${place.comment}</div>` : ''}
+        <div class="popup-footer">
+          <span class="popup-verses-badge">${place.verses_count || place.verses_detailed?.length || 0} référence(s)</span>
+          <button class="popup-action-btn" onclick="MapsView.showPlaceDetailsById('${place.place_id}')">Détails & versets →</button>
+        </div>
+      </div>
+    `;
+
+    marker.bindPopup(popupContent, { className: 'open-shema-map-popup' });
+    marker.on('click', () => {
+      this.selectPlace(place, false);
+    });
+    return marker;
   },
 
   createCustomMarkerIcon(place) {
@@ -311,10 +317,32 @@ const MapsView = {
       item.classList.toggle('active', item.dataset.placeId === place.place_id);
     });
 
-    if (flyTo && this.map && place.latitude && place.longitude) {
-      this.map.flyTo([place.latitude, place.longitude], 10, {
-        duration: 1.0
-      });
+    if (this.map && place.latitude && place.longitude) {
+      if (flyTo) {
+        this.map.flyTo([place.latitude, place.longitude], 10, {
+          duration: 1.0
+        });
+      }
+
+      let foundMarker = null;
+      if (this.markersLayer) {
+        this.markersLayer.eachLayer(m => {
+          if (m._placeId === place.place_id) {
+            foundMarker = m;
+          }
+        });
+
+        if (!foundMarker) {
+          foundMarker = this.createSingleMarker(place);
+          if (foundMarker) this.markersLayer.addLayer(foundMarker);
+        }
+
+        if (foundMarker) {
+          setTimeout(() => {
+            try { foundMarker.openPopup(); } catch(e) {}
+          }, flyTo ? 500 : 50);
+        }
+      }
     }
 
     this.showPlaceDetails(place);

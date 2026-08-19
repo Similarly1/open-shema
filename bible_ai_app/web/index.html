@@ -232,6 +232,7 @@
                   <label class="custom-checkbox"><input type="checkbox" id="opt-show-pericopes" checked> <span>Titres de sections / Péricopes</span></label>
                   <label class="custom-checkbox"><input type="checkbox" id="opt-show-chap-num" checked> <span>Lettrine de chapitre</span></label>
                   <label class="custom-checkbox"><input type="checkbox" id="opt-show-verse-num" checked> <span>Numéros de versets</span></label>
+                  <label class="custom-checkbox"><input type="checkbox" id="opt-show-geo-pins" checked> <span>Repères de lieux géographiques (cartes)</span></label>
                   <label class="custom-checkbox"><input type="checkbox" id="opt-verse-per-line"> <span>Un verset par ligne</span></label>
                   <label class="custom-checkbox"><input type="checkbox" id="opt-show-chap-dividers" checked> <span>Séparateurs entre chapitres (lignes & pastilles)</span></label>
                   <label class="custom-checkbox"><input type="checkbox" id="opt-full-width"> <span>Pleine largeur (texte étendu)</span></label>
@@ -281,17 +282,6 @@
               <span class="btn-icon">🔤</span>
               <span>Interlinéaire</span>
               <span class="pill-arrow">▾</span>
-            </button>
-
-            <button class="tool-btn" id="btn-chapter-places" title="Lieux du chapitre sur la carte">
-              <span class="btn-icon">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"></path>
-                  <path d="M9 3v15"></path>
-                  <path d="M15 6v15"></path>
-                </svg>
-              </span>
-              <span>Lieux</span>
             </button>
 
             <button class="tool-btn" id="btn-toggle-split" title="Mode Double Colonne / Comparaison">
@@ -603,6 +593,10 @@
                 <label class="custom-checkbox">
                   <input type="checkbox" id="cfg-show-chap-dividers" checked>
                   <span>Afficher les séparateurs entre chapitres (lignes en pointillés & pastilles)</span>
+                </label>
+                <label class="custom-checkbox">
+                  <input type="checkbox" id="cfg-show-geo-pins" checked>
+                  <span>Afficher les repères géographiques (lieux & cartes) sur les versets</span>
                 </label>
                 <label class="custom-checkbox">
                   <input type="checkbox" id="cfg-full-width">

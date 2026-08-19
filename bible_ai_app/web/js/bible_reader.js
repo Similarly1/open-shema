@@ -292,6 +292,11 @@ const DisplayOptions = {
       const chkFullWidth = document.getElementById('opt-full-width');
       if (chkFullWidth) chkFullWidth.checked = isFullWidth;
       workspace?.classList.toggle('full-width', isFullWidth);
+
+      const showGeo = cfg.show_geo_pins !== false;
+      const chkGeo = document.getElementById('opt-show-geo-pins');
+      if (chkGeo) chkGeo.checked = showGeo;
+      workspace?.classList.toggle('hide-geo-pins', !showGeo);
     } catch (e) {}
 
     btn.addEventListener('click', async (e) => {
@@ -309,6 +314,11 @@ const DisplayOptions = {
         const chkFullWidth = document.getElementById('opt-full-width');
         if (chkFullWidth) chkFullWidth.checked = isFullWidth;
         workspace?.classList.toggle('full-width', isFullWidth);
+
+        const showGeo = cfg.show_geo_pins !== false;
+        const chkGeo = document.getElementById('opt-show-geo-pins');
+        if (chkGeo) chkGeo.checked = showGeo;
+        workspace?.classList.toggle('hide-geo-pins', !showGeo);
       } catch (e) {}
       popover.classList.toggle('hidden');
     });
@@ -329,6 +339,13 @@ const DisplayOptions = {
 
     document.getElementById('opt-show-verse-num')?.addEventListener('change', (e) => {
       workspace?.classList.toggle('hide-verse-num', !e.target.checked);
+    });
+
+    document.getElementById('opt-show-geo-pins')?.addEventListener('change', async (e) => {
+      workspace?.classList.toggle('hide-geo-pins', !e.target.checked);
+      const cfg = await API.getSettings() || {};
+      cfg.show_geo_pins = e.target.checked;
+      API.call('save_settings', cfg);
     });
 
     document.getElementById('opt-verse-per-line')?.addEventListener('change', (e) => {
@@ -2981,6 +2998,15 @@ const BibleReader = {
         vSpan.dataset.bookCode = data.book || this.currentBook;
         vSpan.dataset.chapter = data.chapter || this.currentChapter;
 
+        // Badge géographique cliquable si un ou plusieurs lieux sont cités dans ce verset
+        const geoPlaces = v.geo_places || [];
+        let geoBadgeHtml = '';
+        if (geoPlaces.length > 0) {
+          const names = geoPlaces.map(p => p.name_fr).join(', ');
+          const firstPlaceId = geoPlaces[0].place_id;
+          geoBadgeHtml = `<button type="button" class="verse-geo-badge" data-place-id="${firstPlaceId}" data-book="${data.book}" data-chap="${data.chapter}" data-verse="${v.verse}" title="Lieu(x) biblique(s) : ${names} (Cliquer pour voir sur la carte)"><svg class="geo-pin-icon" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"></path><path d="M9 3v15"></path><path d="M15 6v15"></path></svg></button>`;
+        }
+
         if (isPaneInterlinear && v.words && v.words.length > 0) {
           vSpan.className = 'verse-item interlinear-mode';
           let wordsHtml = '';
@@ -3002,7 +3028,7 @@ const BibleReader = {
           const badgeText = paneInterVersion === 'DARBY' ? 'Bible Darby (Interlinéaire Inversé)' : 'Louis Segond 1910 (Interlinéaire Inversé)';
           vSpan.innerHTML = `
             <div class="verse-interlinear-header">
-              <sup class="verse-num">${v.verse}</sup>
+              <sup class="verse-num">${v.verse}</sup>${geoBadgeHtml}
               <span class="verse-interlinear-badge">${badgeText}</span>
             </div>
             <div class="verse-interlinear-grid">${wordsHtml}</div>
@@ -3028,8 +3054,8 @@ const BibleReader = {
           // Lecture continue avec mots cliquables
           const isFirst = index === 0;
           const numHtml = isFirst 
-            ? `<span class="chapter-number-dropcap">${data.chapter}</span><sup class="verse-num">${v.verse}</sup>`
-            : `<sup class="verse-num">${v.verse}</sup>`;
+            ? `<span class="chapter-number-dropcap">${data.chapter}</span><sup class="verse-num">${v.verse}</sup>${geoBadgeHtml}`
+            : `<sup class="verse-num">${v.verse}</sup>${geoBadgeHtml}`;
 
           // Découper le texte en tokens pour permettre le clic/clic droit sur chaque mot
           const cleanText = (v.text || '').replace(/<[^>]+>/g, '');
@@ -3072,6 +3098,26 @@ const BibleReader = {
             });
           });
         }
+
+        // Clic sur l'icône de carte du verset -> ouvrir la carte centrée sur le lieu
+        vSpan.querySelectorAll('.verse-geo-badge').forEach(badge => {
+          badge.addEventListener('click', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            if (typeof MapsView !== 'undefined') {
+              const pId = badge.dataset.placeId;
+              App.switchView('maps');
+              document.querySelectorAll('.sidebar-menu .nav-item').forEach(b => b.classList.remove('active'));
+              document.getElementById('nav-maps')?.classList.add('active');
+              MapsView.onViewActivated();
+              if (pId) {
+                MapsView.showPlaceDetailsById(pId);
+              } else {
+                MapsView.showChapterPlaces(data.book, data.chapter);
+              }
+            }
+          });
+        });
 
         // Clic sur le verset (hors mot spécifique ou pour sélectionner) -> charger commentaires
         vSpan.addEventListener('click', () => {

@@ -296,6 +296,30 @@ class BibleAppApi:
             if not interlinear_book_data and target_inter != "DARBY":
                 interlinear_book_data = BibleJsonLoader.load_book("DARBY", book_code)
 
+        # Pré-chargement des lieux géographiques mentionnés dans ce chapitre
+        geo_places_by_verse = {}
+        try:
+            ch_places = MapsManager.get_places_for_chapter(book_code, ch_int)
+            for p in ch_places:
+                v_str_list = p.get("verses_in_chapter", "")
+                if v_str_list:
+                    for v_item in str(v_str_list).split(','):
+                        v_item = v_item.strip()
+                        if v_item.isdigit():
+                            vn = int(v_item)
+                            if vn not in geo_places_by_verse:
+                                geo_places_by_verse[vn] = []
+                            if not any(x["place_id"] == p["place_id"] for x in geo_places_by_verse[vn]):
+                                geo_places_by_verse[vn].append({
+                                    "place_id": p["place_id"],
+                                    "name_fr": p["name_fr"],
+                                    "place_type": p.get("place_type", "city"),
+                                    "latitude": p["latitude"],
+                                    "longitude": p["longitude"]
+                                })
+        except Exception as e:
+            logger.warning(f"Erreur enrichissement géo pour {book_code} {ch_int}: {e}")
+
         for v_str in sorted_verses:
             v_raw = verses_dict[v_str]
             v_text = strip_xml_tags(extract_verse_text(v_raw))
@@ -331,7 +355,8 @@ class BibleAppApi:
             verses_list.append({
                 "verse": v_num,
                 "text": v_text,
-                "words": words_data
+                "words": words_data,
+                "geo_places": geo_places_by_verse.get(v_num, [])
             })
 
         return {
@@ -340,7 +365,8 @@ class BibleAppApi:
             "book_french": french_name,
             "chapter": ch_int,
             "pericope": pericope_title,
-            "verses": verses_list
+            "verses": verses_list,
+            "geo_places_count": len(geo_places_by_verse)
         }
 
     def get_commentaries(self, book_code: str, chapter: int, verse: int) -> List[Dict[str, Any]]:
