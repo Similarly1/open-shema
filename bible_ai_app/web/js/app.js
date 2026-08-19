@@ -125,6 +125,9 @@ const App = {
         if (cfg) {
           this.applyTheme(cfg.theme || 'dark', cfg.theme_palette, cfg.reading_bg);
           if (cfg.font_family) this.applyFontFamily(cfg.font_family);
+          if (cfg.font_size) {
+            document.documentElement.style.setProperty('--bible-font-size-base', `${cfg.font_size}px`);
+          }
         }
       } catch (e) {
         console.warn('Impossible de charger les paramètres au démarrage:', e);

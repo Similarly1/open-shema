@@ -495,7 +495,7 @@
     "author": "Bible. Français. TOB. 1994, Société biblique française",
     "description": "Traduction Œcuménique de la Bible (TOB 2010)",
     "year": "1988",
-    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\cover.jpg",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\TOB.jpg",
     "type": "Bible",
     "format": "json",
     "folder_name": "TOB",
@@ -523,7 +523,7 @@
     "author": "Collectif",
     "description": "",
     "year": "1998",
-    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\Nouveau_dictionnaire_biblique._Révisé_et_augmenté.jpg",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\Nouveau_dictionnaire_biblique__R_vis__et_augment.jpg",
     "type": "Dictionnaire",
     "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
     "active": true
@@ -533,7 +533,7 @@
     "author": "Alexander, J.H.",
     "description": "Ce manuel biblique est probablement I’un des plus populaires de nos jours pour apprendre à connaître, de façon vivante et accessible pour tous, les 66 livres de la Bible. Aide précieuse dans votre étude régulière de la Bible, ce best-seller de John H. Alexander ouvrira pour vous le sens général, historique et spirituel du livre choisi. Lu de manière suivie, il vous aidera à comprendre la révélation de Dieu dans son ensemble. La Bible se présente comme la Parole de Dieu, tant par son unité et sa cohérence, que par son contenu fait de vérité révélée et de force vive.",
     "year": "2014",
-    "cover_path": "C:\\Users\\adrie\\AppData\\Local\\Temp\\bible_ai_covers\\cover_cover.jpg",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\Lire_Comprendre.jpg",
     "type": "Théologie",
     "corpus_scope": "GLOBAL",
     "source_type": "general",
@@ -548,7 +548,7 @@
     "author": "Adam Mabry / La Maison de la Bible",
     "description": "Quand la Bible semble se contredire  Il y a un certain nombre de sujets sur lesquels les chrétiens ne sont pas d'accord, alors même qu'ils se basent sur la Bible pour définir leur position. Parfois, ils vont jusqu'à se déchirer sur ces thèmes.   Et si nous étions invités à autre chose? Et si la Bible elle-même nous demandait de respecter des vérités qui nous semblent paradoxales? Et si de telles tensions étaient, en fin de compte, porteuses de riches enseignements et de fruits positifs?  Provocateur pour certains, rafraîchissant pour d'autres, ce livre apporte une perspective bienvenue sur l'attitude à adopter face aux débats théologiques, politiques et sociétaux.",
     "year": "2022",
-    "cover_path": "C:\\Users\\adrie\\AppData\\Local\\Temp\\bible_ai_covers\\cover_cover.jpg",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\Paradoxes.jpg",
     "type": "Théologie",
     "corpus_scope": "GLOBAL",
     "source_type": "general",
@@ -563,7 +563,7 @@
     "author": "E. Randolph Richards & Brandon J. O'Brien",
     "description": "Quand nos lunettes occidentales nous (dés)orientent Lorsque nous lisons la Bible, nous sommes parfois déconcertés par un comportement ou une déduction, car ils nous paraissent tout sauf logiques. D'autres fois, nous nous sentons bien plus à l'aise: l'enseignement présenté colle bien avec notre raisonnement et les valeurs dites chrétiennes.  Dans un cas comme dans l'autre, nous devrions avoir conscience des filtres culturels qui sont les nôtres, afin d'être certains de bien comprendre et, donc, bien intégrer les instructions divines. Sinon, nous nous exposons à faire des interprétations erronées et de mauvaises applications du texte censé orienter notre manière de vivre. Ce livre nous aide à identifier nos filtres et les domaines particuliers auxquels nous devons faire attention. Une lecture recommandée pour tous! Points forts:  + on ne peut plus utile + très facile à lire + plein de pistes pour la réflexion ou une étude plus poussée Thèmes: * les présupposés * l'interprétation de la Bible * les différences culturelles * intériorité et extériorité * les valeurs * les mœurs  * les races et l'ethnicité * les problèmes de langue * la notion du temps * individualisme et collectivisme * honneur et honte * les règles et les relations * la vertu et les vices * la volonté divine",
     "year": "2020",
-    "cover_path": "C:\\Users\\adrie\\AppData\\Local\\Temp\\bible_ai_covers\\cover_cover.jpg",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\LirelaBibles.jpg",
     "type": "Théologie",
     "corpus_scope": "GLOBAL",
     "source_type": "general",
@@ -578,7 +578,7 @@
     "author": "Don Carson",
     "description": "“This NIV Zondervan Study Bible is a tremendous tool for informed Bible reading and study. I highly recommend this publication.” Tim Keller, Redeemer Presbyterian Church, New York City “Let the NIV Zondervan Study Bible equip you for more faithful theological thinking and doctrinal integrity.” R. Albert Mohler, Jr., President of the Southern Baptist Theological Seminary The NIV Zondervan Study Bible, featuring Dr. D. A. Carson as general editor, is built on the truth of Scripture and centered on the gospel message. An ambitious and comprehensive undertaking, Dr. Carson, with committee members Dr. T. Desmond Alexander, Dr. Richard S. Hess, Dr. Douglas J. Moo, and Dr. Andrew David Naselli, along with a team of over 60 contributors from a wide range of evangelical denominations and perspectives, crafted all-new study notes and other study tools to present a biblical theology of God’s special revelation in the Scriptures. To further aid the readers’ understanding of the Bible, also included are full-color maps, charts, photos and diagrams. In addition, a single-column setting of the Bible text provides maximum readability.",
     "year": "2015",
-    "cover_path": "C:\\Users\\adrie\\AppData\\Local\\Temp\\bible_ai_covers\\cover_cover.jpeg",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\NIV.jpeg",
     "type": "Théologie",
     "corpus_scope": "GLOBAL",
     "source_type": "general",
@@ -593,7 +593,7 @@
     "author": "Craig S. Keener",
     "description": "<p>\"How I wish someone had put a book like this into my hands 50 years ago.\" -<strong> N.T. Wright, </strong>Research Professor of New Testament and Early Christianity, University of St. Andrews, Scotland</p><p>\"I cannot recommend a study Bible any more than this one: Five stars!\" - <strong>Scot McKnight, </strong>Julius R. Mantey Professor of New Testament, Northern Seminary</p><p> </p><p><strong>CONTEXT CHANGES EVERYTHING</strong></p><p>You've heard many Bible stories hundreds of times, but how many behind-the-scenes details are you missing? Sometimes a little context is all you need to discover the rich meaning behind the stories of Scripture.</p><p>That's what the NIV Cultural Backgrounds Study Bible provides. Every page is packed with expert insight into the customs, culture, and literature of Bible times. These fascinating explanations will serve to clarify your study of the Scriptures, reinforcing your confidence and bringing difficult passages of Scripture...",
     "year": "",
-    "cover_path": "C:\\Users\\adrie\\AppData\\Local\\Temp\\bible_ai_covers\\cover_hcp-niv11culturalbgbib-cover.jpg",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\NIV_Cultural.jpg",
     "type": "Théologie",
     "corpus_scope": "GLOBAL",
     "source_type": "general",
@@ -608,7 +608,7 @@
     "author": "John MacArthur",
     "description": "",
     "year": "2005",
-    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\The_MacArthur_Bible_commentary.jpg",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\MacArthur_BC.jpg",
     "type": "Théologie",
     "corpus_scope": "GLOBAL",
     "source_type": "general",
@@ -623,7 +623,7 @@
     "author": "Wayne A. Grudem",
     "description": "The Christian church has a long tradition of systematic theology, that is, of studying biblical teaching on centrally important doctrines such as the Word of God, redemption, and Jesus Christ. Wayne Grudem's bestselling Systematic Theology has several distinctive features:</p><li>A strong emphasis on the scriptural basis for each doctrine</li><li>Clear writing, with technical terms kept to a minimum</li><li>A contemporary approach, treating subjects of special interest to the church today</li><li>A friendly tone, appealing to the emotions and the spirit as well as the intellect</li><li>Frequent application to life</li><li>Resources for worship within each chapter</li><p> </p><p>Bibliographies in each chapter that cross-reference subjects to a wide range of other systematic theologies.</p><p>XXXXX</p>",
     "year": "2015",
-    "cover_path": "C:\\Users\\adrie\\AppData\\Local\\Temp\\bible_ai_covers\\cover_cover.jpg",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\STGru.jpg",
     "type": "Théologie",
     "corpus_scope": "GLOBAL",
     "source_type": "systematic_theology",
@@ -651,7 +651,7 @@
     "author": "Walter C. Kaiser, Jr.",
     "description": "Bring the ancient biblical world to life - Readers who desire a more intimate knowledge of the historical context of the Bible will appreciate the NIV Archaeological Study Bible. Full of informative articles and full-color photographs of places and objects from biblical times, this Bible examines the archaeological record surrounding God's Word and brings the biblical world to life. Readers' personal studies will be enriched as they become more informed about the empires, places, and peoples of the ancient world.</p><p><strong>Features:</strong></p><li>Complete text of the accurate, readable, and clear New International Version (NIV)</li><li>Four-color interior throughout</li><li>Bottom-of-page study notes exploring passages that speak on archaeological and cultural facts</li><li>520 articles covering five main categories: Archaeological Sites, Cultural and Historical Notes, Ancient Peoples and Lands, the Reliability of the Bible, and Ancient...",
     "year": "2010",
-    "cover_path": "C:\\Users\\adrie\\AppData\\Local\\Temp\\bible_ai_covers\\cover_zon-archaeology-cover.jpg",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\NIVArchaeo.jpg",
     "type": "Théologie",
     "corpus_scope": "GLOBAL",
     "source_type": "general",

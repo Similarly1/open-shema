@@ -152,6 +152,34 @@ BIBLE_CANONICAL_INFO = {
 }
 
 
+def get_cover_data_url(cover_path: Optional[str]) -> Optional[str]:
+    """Convertit un chemin d'image de couverture local en Data URL Base64 universelle."""
+    if not cover_path:
+        return None
+    if str(cover_path).startswith("data:image/") or str(cover_path).startswith("http://") or str(cover_path).startswith("https://"):
+        return cover_path
+        
+    actual_path = cover_path
+    if not os.path.exists(actual_path):
+        base_name = os.path.basename(cover_path)
+        cand = os.path.join(current_dir, "data", "covers", base_name)
+        if os.path.exists(cand):
+            actual_path = cand
+        else:
+            return None
+
+    try:
+        import base64
+        ext = os.path.splitext(actual_path)[1].lower().replace('.', '')
+        mime = 'image/jpeg' if ext in ['jpg', 'jpeg'] else (f'image/{ext}' if ext in ['png', 'webp', 'gif'] else 'image/jpeg')
+        with open(actual_path, 'rb') as f:
+            b64 = base64.b64encode(f.read()).decode('utf-8')
+        return f"data:{mime};base64,{b64}"
+    except Exception as e:
+        logger.warning(f"Erreur encodage couverture data URL ({cover_path}): {e}")
+        return None
+
+
 class BibleAppApi:
     """
     API Bridge exposée au Frontend Webview JavaScript.
@@ -423,6 +451,11 @@ class BibleAppApi:
         """Récupère le résumé et les métadonnées Wikipédia pour un terme."""
         from core.wikipedia_client import WikipediaClient
         return WikipediaClient.get_summary(query, exact_title=exact_title)
+
+    def get_wikipedia_extended(self, title: str) -> Dict[str, Any]:
+        """Récupère le contenu détaillé étendu (5 à 10 paragraphes structurés) d'un article Wikipédia."""
+        from core.wikipedia_client import WikipediaClient
+        return WikipediaClient.get_extended_content(title)
 
     def polish_dictionary_article(self, dict_id: str, title: str, raw_text: str, model: Optional[str] = None, slug: Optional[str] = None) -> Dict[str, Any]:
         """Améliore et restructure une notice de dictionnaire ancien avec l'IA (Mistral 14B / Infomaniak)."""
@@ -723,14 +756,24 @@ class BibleAppApi:
     # =========================================================================
 
     def get_library_books(self) -> List[Dict[str, Any]]:
-        """Retourne tous les ouvrages de la bibliothèque."""
+        """Retourne tous les ouvrages de la bibliothèque avec leurs couvertures en data URL."""
         registry = load_books_metadata()
         books = []
         for name, meta in registry.items():
             b = meta.copy()
             b["name"] = name
+            cov_p = b.get("cover_path")
+            data_url = get_cover_data_url(cov_p)
+            b["cover_data_url"] = data_url
+            if data_url:
+                b["cover_url"] = data_url
             books.append(b)
         return books
+
+    def get_cover_image_data(self, cover_path: str) -> Dict[str, Any]:
+        """Retourne la Data URL Base64 d'une couverture pour le frontend."""
+        data_url = get_cover_data_url(cover_path)
+        return {"success": bool(data_url), "data_url": data_url}
 
     def toggle_book(self, book_name: str, active: bool) -> bool:
         """Active ou désactive un ouvrage."""
@@ -784,7 +827,7 @@ class BibleAppApi:
         return self.inspect_import_source(file_path)
 
     def pick_cover_image(self) -> Dict[str, Any]:
-        """Ouvre une boîte de dialogue native pour sélectionner une image de couverture."""
+        """Ouvre une boîte de dialogue native pour sélectionner une image de couverture et la stocke de manière permanente."""
         win = get_active_window()
         if not win:
             return {"success": False, "error": "Fenêtre introuvable"}
@@ -795,7 +838,19 @@ class BibleAppApi:
         if not result or len(result) == 0:
             return {"cancelled": True}
             
-        return {"success": True, "cover_path": result[0]}
+        src_path = result[0]
+        try:
+            import time, uuid
+            covers_dir = os.path.join(current_dir, "data", "covers")
+            os.makedirs(covers_dir, exist_ok=True)
+            clean_base = re.sub(r'[^a-zA-Z0-9._-]', '_', os.path.basename(src_path))
+            dest_filename = f"user_{uuid.uuid4().hex[:6]}_{clean_base}"
+            dest_path = os.path.join(covers_dir, dest_filename)
+            shutil.copy2(src_path, dest_path)
+            data_url = get_cover_data_url(dest_path)
+            return {"success": True, "cover_path": dest_path, "cover_data_url": data_url}
+        except Exception as e:
+            return {"success": False, "error": f"Erreur de copie de couverture : {e}"}
 
     def search_google_books_metadata(self, query: str, author: str = "", title: str = "", isbn: str = "") -> List[Dict[str, Any]]:
         """Recherche des métadonnées bibliographiques via Google Books et Open Library."""
@@ -826,6 +881,8 @@ class BibleAppApi:
             from core.epub_loader import EpubLoader
             try:
                 info = EpubLoader.inspect_epub(file_path)
+                if info.get("cover_path"):
+                    info["cover_data_url"] = get_cover_data_url(info["cover_path"])
                 return {
                     "success": True,
                     "format": "epub",
@@ -868,13 +925,44 @@ class BibleAppApi:
         edit_mode = payload.get("edit_mode", False)
         old_name = payload.get("old_name", name)
         
+        raw_cover = payload.get("cover_path")
+        final_cover_path = raw_cover
+
+        # Traitement de la couverture : enregistrement permanent
+        if raw_cover and str(raw_cover).startswith("data:image/"):
+            try:
+                import base64
+                header, b64_data = raw_cover.split(",", 1)
+                img_data = base64.b64decode(b64_data)
+                covers_dir = os.path.join(current_dir, "data", "covers")
+                os.makedirs(covers_dir, exist_ok=True)
+                slug_name = re.sub(r'[^a-zA-Z0-9_-]', '_', name).strip('_')
+                dest_path = os.path.join(covers_dir, f"{slug_name}.png")
+                with open(dest_path, "wb") as f:
+                    f.write(img_data)
+                final_cover_path = dest_path
+            except Exception as e:
+                logger.warning(f"Erreur enregistrement Smart Cover: {e}")
+        elif raw_cover and os.path.exists(raw_cover):
+            covers_dir = os.path.abspath(os.path.join(current_dir, "data", "covers"))
+            os.makedirs(covers_dir, exist_ok=True)
+            if not os.path.abspath(raw_cover).startswith(covers_dir):
+                slug_name = re.sub(r'[^a-zA-Z0-9_-]', '_', name).strip('_')
+                ext = os.path.splitext(raw_cover)[1] or ".jpg"
+                dest_path = os.path.join(covers_dir, f"{slug_name}{ext}")
+                try:
+                    shutil.copy2(raw_cover, dest_path)
+                    final_cover_path = dest_path
+                except Exception:
+                    final_cover_path = raw_cover
+
         metadata = {
             "name": name,
             "title": payload.get("title", name),
             "author": payload.get("author", ""),
             "description": payload.get("description", ""),
             "year": payload.get("year", ""),
-            "cover_path": payload.get("cover_path"),
+            "cover_path": final_cover_path,
             "type": payload.get("type", "Théologie"),
             "corpus_scope": payload.get("corpus_scope", "GLOBAL"),
             "source_type": payload.get("source_type", "general"),

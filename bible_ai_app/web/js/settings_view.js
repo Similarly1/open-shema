@@ -35,9 +35,9 @@ const SettingsView = {
     const fontSizeLbl = document.getElementById('lbl-font-size-val');
     fontSizeSlider.addEventListener('input', (e) => {
       fontSizeLbl.textContent = `${e.target.value} pt`;
-      document.querySelectorAll('.verses-flow').forEach(el => {
-        el.style.fontSize = `${e.target.value}px`;
-      });
+      document.documentElement.style.setProperty('--bible-font-size-base', `${e.target.value}px`);
+      const ws = document.getElementById('reader-workspace');
+      if (ws) ws.style.setProperty('--bible-font-size-base', `${e.target.value}px`);
     });
 
     const lineSpacingSlider = document.getElementById('cfg-line-spacing');
@@ -294,6 +294,9 @@ const SettingsView = {
     if (c.font_size) {
       document.getElementById('cfg-font-size').value = c.font_size;
       document.getElementById('lbl-font-size-val').textContent = `${c.font_size} pt`;
+      document.documentElement.style.setProperty('--bible-font-size-base', `${c.font_size}px`);
+      const ws = document.getElementById('reader-workspace');
+      if (ws) ws.style.setProperty('--bible-font-size-base', `${c.font_size}px`);
     }
     if (c.line_spacing !== undefined) {
       document.getElementById('cfg-line-spacing').value = c.line_spacing;

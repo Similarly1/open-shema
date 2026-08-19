@@ -1,7 +1,8 @@
 /**
- * Notes View Controller & Obsidian-Style Editor
- * Gère la prise de notes bibliques en Markdown (.md), la recherche,
- * le menu contextuel clic droit Obsidian, la synchronisation avec le lecteur et le RAG IA.
+ * Notes View Controller & Obsidian-Style WYSIWYG Rich Editor
+ * Gère la prise de notes bibliques WYSIWYG, le stockage Markdown (.md) standard,
+ * les tableaux interactifs réels, les encarts Obsidian, l'historique Annuler/Rétablir (Ctrl+Z, Ctrl+Y),
+ * le menu contextuel clic droit, la recherche et la synchronisation avec le RAG IA.
  */
 
 const NotesView = {
@@ -10,15 +11,22 @@ const NotesView = {
   isPreviewMode: false,
   activeTargetInput: null,
 
+  // Éléments du DOM
   listContainer: null,
   searchInput: null,
   titleInput: null,
   refInput: null,
   tagsInput: null,
   aiToggle: null,
-  contentInput: null,
+  contentInput: null, // Div contenteditable WYSIWYG
   previewContainer: null,
   contextMenu: null,
+
+  // Pile d'historique Undo / Redo
+  history: [],
+  historyIndex: -1,
+  maxHistory: 80,
+  historyDebounceTimer: null,
 
   init() {
     this.listContainer = document.getElementById('notes-list-items');
@@ -62,41 +70,69 @@ const NotesView = {
       this.togglePreview();
     });
 
-    // Raccourcis de formatage Markdown (Barre rapide)
+    // Boutons Historique Annuler / Rétablir
+    document.getElementById('btn-note-undo')?.addEventListener('click', () => {
+      this.undo();
+    });
+
+    document.getElementById('btn-note-redo')?.addEventListener('click', () => {
+      this.redo();
+    });
+
+    // Raccourcis de formatage Barre Rapide
     this.bindMarkdownTools();
 
     // Menu contextuel style Obsidian (Clic droit) & Raccourcis clavier
     this.bindContextMenu();
     this.bindEditorShortcuts(this.contentInput);
-    const drawerContentInp = document.getElementById('drawer-note-content-input');
-    if (drawerContentInp) {
-      this.bindEditorShortcuts(drawerContentInp);
-    }
+
+    // Écoute de la saisie pour l'historique Undo / Redo
+    this.contentInput?.addEventListener('input', () => {
+      this.debouncedPushHistory();
+    });
+    this.titleInput?.addEventListener('input', () => {
+      this.debouncedPushHistory();
+    });
+    this.refInput?.addEventListener('input', () => {
+      this.debouncedPushHistory();
+    });
+    this.tagsInput?.addEventListener('input', () => {
+      this.debouncedPushHistory();
+    });
+
+    // Gestion du collage intelligent dans l'éditeur riche
+    this.contentInput?.addEventListener('paste', (e) => {
+      this.handlePaste(e);
+    });
 
     this.updateAiToggleVisibility();
     this.loadNotes();
   },
 
   bindMarkdownTools() {
+    document.getElementById('btn-md-h1')?.addEventListener('click', () => this.executeAction('h1', this.contentInput));
+    document.getElementById('btn-md-h2')?.addEventListener('click', () => this.executeAction('h2', this.contentInput));
     document.getElementById('btn-md-bold')?.addEventListener('click', () => this.executeAction('bold', this.contentInput));
     document.getElementById('btn-md-italic')?.addEventListener('click', () => this.executeAction('italic', this.contentInput));
     document.getElementById('btn-md-quote')?.addEventListener('click', () => this.executeAction('quote', this.contentInput));
     document.getElementById('btn-md-list')?.addEventListener('click', () => this.executeAction('bullet-list', this.contentInput));
+    document.getElementById('btn-md-table')?.addEventListener('click', () => this.executeAction('table', this.contentInput));
+    document.getElementById('btn-md-callout')?.addEventListener('click', () => this.executeAction('callout', this.contentInput));
   },
 
   bindContextMenu() {
     const menu = this.contextMenu;
     if (!menu) return;
 
-    // Détecter le clic droit sur la vue notes complète ou dans le volet latéral
+    // Détecter le clic droit sur la vue notes complète ou dans le tiroir latéral
     const handleContextMenu = (e) => {
-      const target = e.target.closest('textarea, input[type="text"]') || this.contentInput;
+      const target = e.target.closest('#note-edit-content, input[type="text"], textarea') || this.contentInput;
       this.activeTargetInput = target;
 
       e.preventDefault();
       e.stopPropagation();
 
-      // Fermer d'abord les éventuels sous-menus
+      // Fermer d'abord les sous-menus
       menu.querySelectorAll('.ctx-submenu').forEach(s => s.classList.remove('open-left'));
 
       // Afficher le menu
@@ -104,7 +140,7 @@ const NotesView = {
 
       // Calcul des dimensions et positionnement
       const menuWidth = 230;
-      const menuHeight = menu.offsetHeight || 300;
+      const menuHeight = menu.offsetHeight || 340;
       let x = e.clientX;
       let y = e.clientY;
 
@@ -130,7 +166,6 @@ const NotesView = {
       });
     };
 
-    // Attacher à la vue notes et au tiroir
     document.getElementById('view-notes')?.addEventListener('contextmenu', handleContextMenu);
     document.getElementById('drawer-tab-notes')?.addEventListener('contextmenu', handleContextMenu);
 
@@ -145,7 +180,7 @@ const NotesView = {
       });
     });
 
-    // Fermeture du menu au clic ailleurs ou sur Escape
+    // Fermeture du menu au clic extérieur ou touche Échap
     document.addEventListener('click', (e) => {
       if (!menu.contains(e.target)) {
         this.hideContextMenu();
@@ -173,12 +208,30 @@ const NotesView = {
     inputEl.addEventListener('keydown', (e) => {
       if (e.ctrlKey || e.metaKey) {
         const key = e.key.toLowerCase();
+        
+        // Annuler : Ctrl+Z
+        if (key === 'z' && !e.shiftKey) {
+          e.preventDefault();
+          this.undo();
+          return;
+        }
+        // Rétablir : Ctrl+Y ou Ctrl+Shift+Z
+        if (key === 'y' || (key === 'z' && e.shiftKey)) {
+          e.preventDefault();
+          this.redo();
+          return;
+        }
+
+        // Formatage clavier direct
         if (key === 'b') {
           e.preventDefault();
           this.executeAction('bold', inputEl);
         } else if (key === 'i') {
           e.preventDefault();
           this.executeAction('italic', inputEl);
+        } else if (key === 'u') {
+          e.preventDefault();
+          this.executeAction('underline', inputEl);
         } else if (e.shiftKey && key === 'x') {
           e.preventDefault();
           this.executeAction('strikethrough', inputEl);
@@ -188,237 +241,575 @@ const NotesView = {
         } else if (e.shiftKey && key === 'd') {
           e.preventDefault();
           this.executeAction('datetime', inputEl);
+        } else if (key === 's') {
+          e.preventDefault();
+          this.saveCurrentNote();
         }
       } else if (e.key === 'Tab') {
-        // Indentation fluide avec Tab / Shift+Tab
+        // Gestion de l'indentation avec Tab
         e.preventDefault();
-        const start = inputEl.selectionStart;
-        const end = inputEl.selectionEnd;
-        const text = inputEl.value;
-
-        if (e.shiftKey) {
-          // Désindenter
-          const before = text.substring(0, start);
-          const sel = text.substring(start, end);
-          const after = text.substring(end);
-          if (sel.includes('\n')) {
-            const unindented = sel.split('\n').map(l => l.startsWith('  ') ? l.substring(2) : (l.startsWith('\t') ? l.substring(1) : l)).join('\n');
-            inputEl.value = before + unindented + after;
-            inputEl.setSelectionRange(start, start + unindented.length);
-          }
-        } else {
-          // Indenter
-          if (start !== end && text.substring(start, end).includes('\n')) {
-            const sel = text.substring(start, end);
-            const indented = sel.split('\n').map(l => '  ' + l).join('\n');
-            inputEl.value = text.substring(0, start) + indented + text.substring(end);
-            inputEl.setSelectionRange(start, start + indented.length);
-          } else {
-            inputEl.value = text.substring(0, start) + '  ' + text.substring(end);
-            inputEl.setSelectionRange(start + 2, start + 2);
-          }
-        }
+        document.execCommand('insertHTML', false, '&nbsp;&nbsp;&nbsp;&nbsp;');
       }
     });
   },
 
+  // =========================================================================
+  // SYSTÈME D'HISTORIQUE (UNDO / REDO AVANCÉ)
+  // =========================================================================
+
+  debouncedPushHistory() {
+    clearTimeout(this.historyDebounceTimer);
+    this.historyDebounceTimer = setTimeout(() => {
+      this.pushHistoryState();
+    }, 350);
+  },
+
+  pushHistoryState() {
+    if (!this.contentInput) return;
+    const currentState = {
+      html: this.contentInput.innerHTML,
+      title: this.titleInput?.value || '',
+      ref: this.refInput?.value || '',
+      tags: this.tagsInput?.value || ''
+    };
+
+    // Éviter les doublons consécutifs identiques
+    if (this.historyIndex >= 0) {
+      const prev = this.history[this.historyIndex];
+      if (prev && prev.html === currentState.html && prev.title === currentState.title && prev.ref === currentState.ref && prev.tags === currentState.tags) {
+        return;
+      }
+    }
+
+    // Tronquer l'historique futur si on a annulé puis modifié
+    if (this.historyIndex < this.history.length - 1) {
+      this.history = this.history.slice(0, this.historyIndex + 1);
+    }
+
+    this.history.push(currentState);
+    if (this.history.length > this.maxHistory) {
+      this.history.shift();
+    } else {
+      this.historyIndex++;
+    }
+  },
+
+  undo() {
+    if (this.historyIndex > 0) {
+      this.historyIndex--;
+      this.restoreHistoryState(this.history[this.historyIndex]);
+      App.showToast('↶ Annulé (Ctrl+Z)');
+    } else {
+      App.showToast('Début de l\'historique atteint');
+    }
+  },
+
+  redo() {
+    if (this.historyIndex < this.history.length - 1) {
+      this.historyIndex++;
+      this.restoreHistoryState(this.history[this.historyIndex]);
+      App.showToast('↷ Rétabli (Ctrl+Y)');
+    } else {
+      App.showToast('Fin de l\'historique atteinte');
+    }
+  },
+
+  restoreHistoryState(state) {
+    if (!state) return;
+    if (this.contentInput) this.contentInput.innerHTML = state.html || '';
+    if (this.titleInput) this.titleInput.value = state.title || '';
+    if (this.refInput) this.refInput.value = state.ref || '';
+    if (this.tagsInput) this.tagsInput.value = state.tags || '';
+  },
+
+  // =========================================================================
+  // EXÉCUTION DES ACTIONS DE FORMATAGE RICHE WYSIWYG
+  // =========================================================================
+
   async executeAction(action, target) {
-    if (!target) return;
-    target.focus();
-
-    const wrapSelection = (before, after, defaultText = 'texte') => {
-      const start = target.selectionStart;
-      const end = target.selectionEnd;
-      const text = target.value;
-      const hasSel = start !== end;
-      const sel = hasSel ? text.substring(start, end) : defaultText;
-      target.value = text.substring(0, start) + before + sel + after + text.substring(end);
+    const isRichEditor = target === this.contentInput || target?.id === 'note-edit-content';
+    
+    if (isRichEditor) {
+      this.contentInput.focus();
+    } else if (target && typeof target.focus === 'function') {
       target.focus();
-      if (hasSel) {
-        target.setSelectionRange(start + before.length, start + before.length + sel.length);
-      } else {
-        target.setSelectionRange(start + before.length, start + before.length + defaultText.length);
-      }
-    };
-
-    const prefixLines = (prefix, defaultText = 'Texte') => {
-      const start = target.selectionStart;
-      const end = target.selectionEnd;
-      const text = target.value;
-
-      if (start === end) {
-        // Trouver le début de la ligne actuelle
-        const lineStart = text.lastIndexOf('\n', start - 1) + 1;
-        target.value = text.substring(0, lineStart) + prefix + text.substring(lineStart);
-        target.focus();
-        target.setSelectionRange(start + prefix.length, start + prefix.length);
-      } else {
-        const sel = text.substring(start, end);
-        const prefixed = sel.split('\n').map(line => prefix + line).join('\n');
-        target.value = text.substring(0, start) + prefixed + text.substring(end);
-        target.focus();
-        target.setSelectionRange(start, start + prefixed.length);
-      }
-    };
-
-    const insertText = (str, selectOffset = 0, selectLen = 0) => {
-      const start = target.selectionStart;
-      const end = target.selectionEnd;
-      const text = target.value;
-      target.value = text.substring(0, start) + str + text.substring(end);
-      target.focus();
-      const newPos = start + (selectOffset || str.length);
-      target.setSelectionRange(newPos, newPos + (selectLen || 0));
-    };
+    }
 
     switch (action) {
+      // 0. Historique
+      case 'undo':
+        this.undo();
+        return;
+      case 'redo':
+        this.redo();
+        return;
+
       // 1. Formater
       case 'bold':
-        wrapSelection('**', '**', 'texte en gras');
+        if (isRichEditor) {
+          document.execCommand('bold');
+        }
         break;
       case 'italic':
-        wrapSelection('*', '*', 'texte en italique');
+        if (isRichEditor) {
+          document.execCommand('italic');
+        }
+        break;
+      case 'underline':
+        if (isRichEditor) {
+          document.execCommand('underline');
+        }
         break;
       case 'strikethrough':
-        wrapSelection('~~', '~~', 'texte barré');
+        if (isRichEditor) {
+          document.execCommand('strikeThrough');
+        }
         break;
       case 'highlight':
-        wrapSelection('==', '==', 'texte surligné');
+        if (isRichEditor) {
+          this.surroundSelectionWithTag('mark');
+        }
         break;
       case 'inline-code':
-        wrapSelection('`', '`', 'code');
+        if (isRichEditor) {
+          this.surroundSelectionWithTag('code');
+        }
         break;
       case 'superscript':
-        wrapSelection('^', '^', 'exposant');
+        if (isRichEditor) {
+          document.execCommand('superscript');
+        }
         break;
       case 'subscript':
-        wrapSelection('~', '~', 'indice');
+        if (isRichEditor) {
+          document.execCommand('subscript');
+        }
         break;
 
-      // 2. Paragraphe
+      // 2. Paragraphe & Titres
       case 'h1':
-        prefixLines('# ', 'Titre 1');
+        if (isRichEditor) {
+          this.applyBlockFormat('h1');
+        }
         break;
       case 'h2':
-        prefixLines('## ', 'Titre 2');
+        if (isRichEditor) {
+          this.applyBlockFormat('h2');
+        }
         break;
       case 'h3':
-        prefixLines('### ', 'Titre 3');
+        if (isRichEditor) {
+          this.applyBlockFormat('h3');
+        }
         break;
       case 'quote':
-        prefixLines('> ', 'Citation');
+        if (isRichEditor) {
+          this.applyBlockFormat('blockquote');
+        }
         break;
       case 'bullet-list':
-        prefixLines('- ', 'Élément');
+        if (isRichEditor) {
+          document.execCommand('insertUnorderedList');
+        }
         break;
       case 'number-list':
-        prefixLines('1. ', 'Élément');
+        if (isRichEditor) {
+          document.execCommand('insertOrderedList');
+        }
         break;
       case 'task-list':
-        prefixLines('- [ ] ', 'Tâche à faire');
+        if (isRichEditor) {
+          this.insertTaskItem();
+        }
         break;
 
-      // 3. Insérer
+      // 3. Insérer (Tableaux réels, Encarts, Horodatage...)
       case 'horizontal-rule':
-        insertText('\n\n---\n\n');
-        break;
-      case 'datetime': {
-        const now = new Date();
-        const dStr = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        const tStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-        insertText(`**${dStr} à ${tStr}** `);
-        break;
-      }
-      case 'table': {
-        const tableTemplate = `\n| Colonne 1 | Colonne 2 | Colonne 3 |\n| :--- | :--- | :--- |\n| Valeur 1 | Valeur 2 | Valeur 3 |\n| Donnée A | Donnée B | Donnée C |\n\n`;
-        insertText(tableTemplate);
-        break;
-      }
-      case 'code-block': {
-        const start = target.selectionStart;
-        const end = target.selectionEnd;
-        if (start !== end) {
-          wrapSelection('\n```\n', '\n```\n', '');
-        } else {
-          insertText('\n```\n// Votre bloc de code ou note ici\n```\n');
+        if (isRichEditor) {
+          document.execCommand('insertHorizontalRule');
         }
         break;
-      }
-      case 'callout': {
-        const start = target.selectionStart;
-        const end = target.selectionEnd;
-        if (start !== end) {
-          wrapSelection('> [!NOTE] Remarque\n> ', '\n', '');
-        } else {
-          insertText('\n> [!NOTE] Remarque\n> Votre texte ou réflexion ici.\n\n');
+      case 'datetime':
+        if (isRichEditor) {
+          const now = new Date();
+          const dStr = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+          const tStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+          document.execCommand('insertHTML', false, `<strong>${dStr} à ${tStr}</strong> `);
         }
         break;
-      }
+      case 'table':
+        if (isRichEditor) {
+          this.insertRealTable();
+        }
+        break;
+      case 'code-block':
+        if (isRichEditor) {
+          this.insertCodeBlock();
+        }
+        break;
+      case 'callout':
+        if (isRichEditor) {
+          this.insertCallout();
+        }
+        break;
 
-      // 4. Couper, Copier, Coller, Tout sélectionner
-      case 'cut': {
-        const start = target.selectionStart;
-        const end = target.selectionEnd;
-        const text = target.value;
-        const sel = text.substring(start, end);
-        if (sel) {
-          try {
-            await navigator.clipboard.writeText(sel);
-          } catch (e) {
-            document.execCommand('copy');
-          }
-          target.value = text.substring(0, start) + text.substring(end);
-          target.setSelectionRange(start, start);
-          App.showToast('Texte coupé');
-        }
+      // 4. Presse-papier
+      case 'cut':
+        document.execCommand('cut');
+        App.showToast('Texte coupé');
         break;
-      }
-      case 'copy': {
-        const start = target.selectionStart;
-        const end = target.selectionEnd;
-        const sel = target.value.substring(start, end);
-        if (sel) {
-          try {
-            await navigator.clipboard.writeText(sel);
-          } catch (e) {
-            document.execCommand('copy');
-          }
-          App.showToast('Texte copié dans le presse-papier');
-        }
+      case 'copy':
+        document.execCommand('copy');
+        App.showToast('Texte copié');
         break;
-      }
-      case 'paste': {
+      case 'paste':
         try {
-          const clipText = await navigator.clipboard.readText();
-          if (clipText) {
-            insertText(clipText);
+          const text = await navigator.clipboard.readText();
+          if (text) {
+            document.execCommand('insertText', false, text);
           }
         } catch (e) {
           document.execCommand('paste');
         }
         break;
-      }
-      case 'paste-plain': {
+      case 'paste-plain':
         try {
-          let clipText = await navigator.clipboard.readText();
-          if (clipText) {
-            // Nettoyage formatage HTML éventuel
-            clipText = clipText.replace(/<[^>]*>?/gm, '');
-            insertText(clipText);
+          let text = await navigator.clipboard.readText();
+          if (text) {
+            text = text.replace(/<[^>]*>?/gm, '');
+            document.execCommand('insertText', false, text);
           }
         } catch (e) {
           document.execCommand('paste');
         }
         break;
-      }
-      case 'select-all': {
-        if (typeof target.select === 'function') {
+      case 'select-all':
+        if (isRichEditor) {
+          document.execCommand('selectAll');
+        } else if (typeof target?.select === 'function') {
           target.select();
         }
         break;
-      }
+    }
+
+    this.pushHistoryState();
+  },
+
+  surroundSelectionWithTag(tagName) {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    const selectedContent = range.extractContents();
+    const el = document.createElement(tagName);
+    if (!selectedContent.textContent.trim()) {
+      el.textContent = tagName === 'mark' ? 'Texte surligné' : 'code';
+    } else {
+      el.appendChild(selectedContent);
+    }
+    range.insertNode(el);
+    range.selectNodeContents(el);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  },
+
+  applyBlockFormat(tag) {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    let parent = range.commonAncestorContainer;
+    if (parent.nodeType === Node.TEXT_NODE) parent = parent.parentNode;
+
+    // Si on est déjà dans ce tag, repasser en <p>
+    if (parent.closest(tag)) {
+      document.execCommand('formatBlock', false, '<p>');
+    } else {
+      document.execCommand('formatBlock', false, `<${tag}>`);
     }
   },
+
+  insertRealTable() {
+    const tableHtml = `
+      <table class="note-table">
+        <thead>
+          <tr>
+            <th>Colonne 1</th>
+            <th>Colonne 2</th>
+            <th>Colonne 3</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Valeur 1</td>
+            <td>Valeur 2</td>
+            <td>Valeur 3</td>
+          </tr>
+          <tr>
+            <td>Donnée A</td>
+            <td>Donnée B</td>
+            <td>Donnée C</td>
+          </tr>
+        </tbody>
+      </table>
+      <p><br></p>
+    `;
+    document.execCommand('insertHTML', false, tableHtml);
+  },
+
+  insertCallout() {
+    const calloutHtml = `
+      <div class="note-callout">
+        <div class="note-callout-title">💡 Remarque</div>
+        <div>Votre réflexion, référence ou méditation ici...</div>
+      </div>
+      <p><br></p>
+    `;
+    document.execCommand('insertHTML', false, calloutHtml);
+  },
+
+  insertCodeBlock() {
+    const codeHtml = `
+      <pre><code>// Note ou extrait de code ici</code></pre>
+      <p><br></p>
+    `;
+    document.execCommand('insertHTML', false, codeHtml);
+  },
+
+  insertTaskItem() {
+    const taskHtml = `
+      <div class="note-task-item">
+        <input type="checkbox">
+        <span>Tâche ou point à vérifier</span>
+      </div>
+      <p><br></p>
+    `;
+    document.execCommand('insertHTML', false, taskHtml);
+  },
+
+  handlePaste(e) {
+    // Si c'est du texte brut collé, laisser faire ou formater proprement
+    const text = e.clipboardData?.getData('text/plain');
+    if (text && text.includes('\n\n')) {
+      // Préserver les paragraphes
+      e.preventDefault();
+      const paras = text.split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+      document.execCommand('insertHTML', false, paras);
+    }
+  },
+
+  // =========================================================================
+  // CONVERTISSEURS HAUTE FIDÉLITÉ (MARKDOWN <-> HTML WYSIWYG)
+  // =========================================================================
+
+  markdownToRichHtml(md) {
+    if (!md || !md.trim()) return '<p><br></p>';
+
+    let text = md.trim();
+
+    // 1. Enlever l'éventuel titre H1 initial si dupliqué
+    text = text.replace(/^#\s+[^\n]+\n+/, '');
+
+    // 2. Traitement des Encarts Obsidian : > [!NOTE] Titre
+    text = text.replace(/^\> \[!([A-Z]+)\][ ]?(.*$)\n((?:> .*$\n?)*)/gim, (match, type, title, body) => {
+      const cleanBody = body.replace(/^\> /gm, '').replace(/\n/g, '<br>');
+      const icon = type === 'WARNING' ? '⚠️' : (type === 'TIP' ? '💡' : '📌');
+      return `<div class="note-callout"><div class="note-callout-title">${icon} ${title || type}</div><div>${cleanBody}</div></div>\n\n`;
+    });
+
+    // 3. Tableaux Markdown -> Tableaux HTML réels
+    text = text.replace(/((?:^\|[^\n]+\|\r?\n)+)/gm, (match) => {
+      const lines = match.trim().split('\n').map(l => l.trim()).filter(Boolean);
+      if (lines.length < 2) return match;
+
+      // Première ligne = Entête
+      const headerCells = lines[0].split('|').slice(1, -1).map(c => c.trim());
+      // Ligne 2 = Séparateur (|---|---|)
+      const dataRows = lines.slice(2);
+
+      let tableHtml = '<table class="note-table"><thead><tr>';
+      headerCells.forEach(cell => {
+        tableHtml += `<th>${cell}</th>`;
+      });
+      tableHtml += '</tr></thead><tbody>';
+
+      dataRows.forEach(row => {
+        const cells = row.split('|').slice(1, -1).map(c => c.trim());
+        tableHtml += '<tr>';
+        cells.forEach(c => {
+          tableHtml += `<td>${c}</td>`;
+        });
+        tableHtml += '</tr>';
+      });
+
+      tableHtml += '</tbody></table>\n\n';
+      return tableHtml;
+    });
+
+    // 4. Blocs de code
+    text = text.replace(/```([\s\S]*?)```/g, (match, p1) => {
+      return `<pre><code>${p1.trim()}</code></pre>\n\n`;
+    });
+
+    // 5. Titres
+    text = text.replace(/^### (.*$)/gim, '<h3>$1</h3>\n');
+    text = text.replace(/^## (.*$)/gim, '<h2>$1</h2>\n');
+    text = text.replace(/^# (.*$)/gim, '<h1>$1</h1>\n');
+
+    // 6. Citations
+    text = text.replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>\n');
+
+    // 7. Tâches
+    text = text.replace(/^\- \[x\] (.*$)/gim, '<div class="note-task-item"><input type="checkbox" checked> <span>$1</span></div>\n');
+    text = text.replace(/^\- \[ \] (.*$)/gim, '<div class="note-task-item"><input type="checkbox"> <span>$1</span></div>\n');
+
+    // 8. Listes à puces & numérotées
+    text = text.replace(/^\- (.*$)/gim, '<ul><li>$1</li></ul>');
+    text = text.replace(/^\d+\. (.*$)/gim, '<ol><li>$1</li></ol>');
+    // Fusionner les listes consécutives
+    text = text.replace(/<\/ul>\s*<ul>/g, '').replace(/<\/ol>\s*<ol>/g, '');
+
+    // 9. Ligne horizontale
+    text = text.replace(/^---$/gim, '<hr>\n');
+
+    // 10. Formatage en ligne
+    text = text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/~~(.*?)~~/g, '<del>$1</del>')
+      .replace(/==(.*?)==/g, '<mark>$1</mark>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/\^([^\^]+)\^/g, '<sup>$1</sup>')
+      .replace(/~([^~]+)~/g, '<sub>$1</sub>');
+
+    // 11. Paragraphes normaux
+    const blocks = text.split(/\n\s*\n/);
+    const htmlBlocks = blocks.map(block => {
+      const b = block.trim();
+      if (!b) return '';
+      if (b.startsWith('<h1') || b.startsWith('<h2') || b.startsWith('<h3') || 
+          b.startsWith('<table') || b.startsWith('<pre') || b.startsWith('<blockquote') || 
+          b.startsWith('<div') || b.startsWith('<ul') || b.startsWith('<ol') || b.startsWith('<hr')) {
+        return b;
+      }
+      return `<p>${b.replace(/\n/g, '<br>')}</p>`;
+    });
+
+    return htmlBlocks.filter(Boolean).join('\n') || '<p><br></p>';
+  },
+
+  richHtmlToMarkdown(container) {
+    if (!container) return '';
+
+    const serializeNode = (node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        return node.textContent;
+      }
+      if (node.nodeType !== Node.ELEMENT_NODE) {
+        return '';
+      }
+
+      const tag = node.tagName.toLowerCase();
+      const childrenText = Array.from(node.childNodes).map(serializeNode).join('');
+
+      switch (tag) {
+        case 'h1':
+          return `\n\n# ${childrenText.trim()}\n\n`;
+        case 'h2':
+          return `\n\n## ${childrenText.trim()}\n\n`;
+        case 'h3':
+          return `\n\n### ${childrenText.trim()}\n\n`;
+        case 'strong':
+        case 'b':
+          return `**${childrenText}**`;
+        case 'em':
+        case 'i':
+          return `*${childrenText}*`;
+        case 'del':
+        case 's':
+        case 'strike':
+          return `~~${childrenText}~~`;
+        case 'mark':
+          return `==${childrenText}==`;
+        case 'code':
+          return node.parentNode?.tagName.toLowerCase() === 'pre' ? childrenText : `\`${childrenText}\``;
+        case 'pre':
+          return `\n\n\`\`\`\n${node.textContent.trim()}\n\`\`\`\n\n`;
+        case 'sup':
+          return `^${childrenText}^`;
+        case 'sub':
+          return `~${childrenText}~`;
+        case 'blockquote':
+          return `\n\n> ${childrenText.trim().replace(/\n/g, '\n> ')}\n\n`;
+        case 'hr':
+          return `\n\n---\n\n`;
+        case 'p':
+          return childrenText.trim() ? `\n\n${childrenText.trim()}\n\n` : '';
+        case 'br':
+          return '\n';
+        case 'ul':
+          return `\n${childrenText}\n`;
+        case 'ol':
+          return `\n${childrenText}\n`;
+        case 'li':
+          return `- ${childrenText.trim()}\n`;
+        case 'table': {
+          const rows = Array.from(node.querySelectorAll('tr'));
+          if (!rows.length) return '';
+          let mdTable = '\n\n';
+
+          // En-tête
+          const ths = Array.from(rows[0].querySelectorAll('th, td')).map(c => c.textContent.trim() || ' ');
+          mdTable += `| ${ths.join(' | ')} |\n`;
+          mdTable += `| ${ths.map(() => ':---').join(' | ')} |\n`;
+
+          // Lignes de corps
+          const bodyRows = rows.slice(1);
+          bodyRows.forEach(r => {
+            const tds = Array.from(r.querySelectorAll('td, th')).map(c => c.textContent.trim() || ' ');
+            mdTable += `| ${tds.join(' | ')} |\n`;
+          });
+          mdTable += '\n';
+          return mdTable;
+        }
+        case 'div': {
+          // Encart Obsidian
+          if (node.classList.contains('note-callout')) {
+            const titleEl = node.querySelector('.note-callout-title');
+            const rawTitle = titleEl ? titleEl.textContent.replace(/^[💡📌⚠️ℹ️]+\s*/, '').trim() : 'NOTE';
+            const bodyEl = node.querySelector('.note-callout-content') || node;
+            const bodyText = Array.from(bodyEl.childNodes)
+              .filter(n => n !== titleEl)
+              .map(serializeNode)
+              .join('')
+              .trim();
+            const prefixLines = bodyText.split('\n').map(l => `> ${l}`).join('\n');
+            return `\n\n> [!NOTE] ${rawTitle}\n${prefixLines}\n\n`;
+          }
+
+          // Tâche / Checkbox
+          if (node.classList.contains('note-task-item')) {
+            const chk = node.querySelector('input[type="checkbox"]');
+            const isChecked = chk && chk.checked;
+            const textSpan = node.querySelector('span') || node;
+            const textVal = textSpan.textContent.trim();
+            return `\n- [${isChecked ? 'x' : ' '}] ${textVal}\n`;
+          }
+
+          return childrenText ? `\n${childrenText}\n` : '';
+        }
+        default:
+          return childrenText;
+      }
+    };
+
+    let md = serializeNode(container);
+    // Nettoyage des sauts de ligne multiples
+    md = md.replace(/\n{3,}/g, '\n\n').trim();
+    return md;
+  },
+
+  // =========================================================================
+  // GESTION DU CYCLE DE VIE DES NOTES
+  // =========================================================================
 
   async loadNotes(selectId = null) {
     try {
@@ -495,7 +886,16 @@ const NotesView = {
     if (this.refInput) this.refInput.value = note.reference || '';
     if (this.tagsInput) this.tagsInput.value = note.tags || '';
     if (this.aiToggle) this.aiToggle.checked = note.include_in_ai !== false;
-    if (this.contentInput) this.contentInput.value = note.content || '';
+
+    // Injection dans l'éditeur WYSIWYG
+    if (this.contentInput) {
+      this.contentInput.innerHTML = this.markdownToRichHtml(note.content || '');
+    }
+
+    // Réinitialiser la pile d'historique pour cette note
+    this.history = [];
+    this.historyIndex = -1;
+    this.pushHistoryState();
 
     this.updateAiToggleVisibility();
 
@@ -519,7 +919,7 @@ const NotesView = {
     };
     this.currentNote = newNote;
     this.selectNote(newNote);
-    if (this.isPreviewMode) this.togglePreview(); // Repasser en mode édition
+    if (this.isPreviewMode) this.togglePreview();
     this.titleInput?.focus();
   },
 
@@ -541,53 +941,16 @@ const NotesView = {
 
   renderPreview() {
     if (!this.previewContainer) return;
-    const raw = this.contentInput?.value || '';
-    if (!raw.trim()) {
+    const markdownText = this.richHtmlToMarkdown(this.contentInput);
+    if (!markdownText.trim()) {
       this.previewContainer.innerHTML = '<p style="color: var(--text-muted); font-style: italic;">Note vide. Cliquez sur Éditer pour rédiger.</p>';
       return;
     }
 
-    let html = raw
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      // Code blocks ```code```
-      .replace(/```([\s\S]*?)```/g, (match, p1) => `<pre style="background: var(--bg-subtle); padding: 12px; border-radius: 6px; border: 1px solid var(--border-color); font-family: monospace; font-size: 13px; overflow-x: auto; margin: 12px 0;"><code>${p1.trim()}</code></pre>`)
-      // Callout > [!NOTE] Title
-      .replace(/^\> \[!([A-Z]+)\][ ]?(.*$)\n((?:> .*$\n?)*)/gim, (match, type, title, body) => {
-        const cleanBody = body.replace(/^\> /gm, '').replace(/\n/g, '<br>');
-        return `<div class="note-callout"><div class="note-callout-title">💡 ${title || type}</div><div>${cleanBody}</div></div>`;
-      })
-      // Titres
-      .replace(/^### (.*$)/gim, '<h3 style="font-size: 16px; font-weight: 700; color: var(--accent-blue); margin: 14px 0 6px 0;">$1</h3>')
-      .replace(/^## (.*$)/gim, '<h2 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin: 16px 0 8px 0;">$1</h2>')
-      .replace(/^# (.*$)/gim, '<h1 style="font-size: 22px; font-weight: 800; color: var(--accent-blue); margin: 18px 0 10px 0;">$1</h1>')
-      // Lignes de séparation
-      .replace(/^---$/gim, '<hr style="border: none; border-top: 1px solid var(--border-color); margin: 16px 0;">')
-      // Blockquotes classiques
-      .replace(/^\> (.*$)/gim, '<blockquote style="border-left: 3px solid var(--accent-blue); padding-left: 12px; margin: 10px 0; color: var(--text-secondary); font-style: italic; background: var(--bg-subtle); padding: 8px 12px; border-radius: 0 6px 6px 0;">$1</blockquote>')
-      // Formatage en ligne
-      .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/gim, '<em>$1</em>')
-      .replace(/~~(.*?)~~/gim, '<del>$1</del>')
-      .replace(/==(.*?)==/gim, '<mark style="background: rgba(234, 179, 8, 0.35); color: inherit; padding: 1px 4px; border-radius: 3px;">$1</mark>')
-      .replace(/`([^`]+)`/gim, '<code style="background: var(--bg-subtle); border: 1px solid var(--border-color); padding: 2px 5px; border-radius: 4px; font-family: monospace; font-size: 13px;">$1</code>')
-      .replace(/\^([^\^]+)\^/gim, '<sup>$1</sup>')
-      .replace(/~([^~]+)~/gim, '<sub>$1</sub>')
-      // Tâches
-      .replace(/^\- \[x\] (.*$)/gim, '<li style="list-style: none; display: flex; align-items: center; gap: 6px; margin: 4px 0;"><input type="checkbox" checked disabled> <del>$1</del></li>')
-      .replace(/^\- \[ \] (.*$)/gim, '<li style="list-style: none; display: flex; align-items: center; gap: 6px; margin: 4px 0;"><input type="checkbox" disabled> <span>$1</span></li>')
-      // Listes à puces & numérotées
-      .replace(/^\- (.*$)/gim, '<li style="margin-left: 20px; list-style-type: disc; margin: 3px 0;">$1</li>')
-      .replace(/^\d+\. (.*$)/gim, '<li style="margin-left: 20px; list-style-type: decimal; margin: 3px 0;">$1</li>')
-      // Retours à la ligne
-      .replace(/\n\n/g, '<br><br>')
-      .replace(/\n/g, '<br>');
-
-    // Rendre les références bibliques cliquables
+    let html = this.markdownToRichHtml(markdownText);
     html = this.linkifyScriptureRefs(html);
-
     this.previewContainer.innerHTML = html;
 
-    // Attacher les écouteurs de saut vers le verset
     this.previewContainer.querySelectorAll('.scripture-link').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
@@ -601,7 +964,6 @@ const NotesView = {
   },
 
   linkifyScriptureRefs(html) {
-    // Regex pour détecter les références simples comme Jean 3:16 ou Genèse 1:1
     const refRegex = /\b([1-3]?\s?[A-ZÀ-Ÿa-zà-ÿ]{3,15})\s+(\d{1,3}):(\d{1,3}(?:-\d{1,3})?)\b/g;
     return html.replace(refRegex, (match, book, chap, verse) => {
       return `<a href="#" class="scripture-link" data-ref="${book} ${chap}:${verse}" style="color: var(--accent-blue); font-weight: 700; text-decoration: underline; cursor: pointer;">${match}</a>`;
@@ -611,18 +973,20 @@ const NotesView = {
   async saveCurrentNote() {
     if (!this.currentNote) return;
 
+    const rawMarkdown = this.richHtmlToMarkdown(this.contentInput);
+
     const noteToSave = {
       id: this.currentNote.id,
       title: this.titleInput?.value.trim() || 'Note sans titre',
       reference: this.refInput?.value.trim() || '',
       tags: this.tagsInput?.value.trim() || '',
       include_in_ai: this.aiToggle?.checked !== false,
-      content: this.contentInput?.value || ''
+      content: rawMarkdown
     };
 
     try {
       const saved = await API.call('save_note', noteToSave);
-      App.showToast('Note enregistrée en fichier Markdown (.md) !');
+      App.showToast('💾 Note enregistrée en fichier Markdown (.md) !');
       await this.loadNotes(saved?.id || this.currentNote.id);
     } catch (e) {
       alert(`Erreur sauvegarde note : ${e}`);
@@ -638,7 +1002,7 @@ const NotesView = {
     if (confirm(`Supprimer définitivement le fichier Markdown de la note « ${this.currentNote.title} » ?`)) {
       try {
         await API.call('delete_note', this.currentNote.id);
-        App.showToast('Note supprimée du disque.');
+        App.showToast('🗑️ Note supprimée du disque.');
         await this.loadNotes();
       } catch (e) {
         alert(`Erreur suppression note : ${e}`);

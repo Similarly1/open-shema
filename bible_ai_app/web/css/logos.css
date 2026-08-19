@@ -38,7 +38,9 @@ body.palette-light-clean {
   --scrollbar-thumb-hover: #94A3B8;
   --shadow-popover: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
 
-  /* Typographie */
+  /* Typographie & Échelle de Zoom */
+  --bible-font-size-base: 19px;
+  --bible-zoom-scale: 1;
   --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-bible: 'EB Garamond', 'Lora', 'Georgia', serif;
   --font-title: 'Cinzel', 'EB Garamond', 'Georgia', serif;
@@ -235,28 +237,21 @@ body.palette-dark-warm {
 body.reading-bg-white .reader-workspace,
 body.reading-bg-white .reading-pane,
 body.reading-bg-white .pane-scrollable-content,
-body.reading-bg-white .commentary-viewer-panel,
-body.reading-bg-white .dict-view-content,
-body.reading-bg-white .dict-entry-card,
-body.reading-bg-white .notes-drawer-body,
-body.reading-bg-white #notes-drawer-content {
+body.reading-bg-white .reader-workspace .commentary-viewer-panel {
   background-color: #FFFFFF !important;
   color: #1E293B !important;
 }
-body.reading-bg-white .verses-flow,
-body.reading-bg-white .search-res-text,
-body.reading-bg-white .comm-body-text,
-body.reading-bg-white .dict-entry-body,
-body.reading-bg-white .note-view-render {
+body.reading-bg-white .reader-workspace .verses-flow,
+body.reading-bg-white .reader-workspace .comm-body-text {
   color: #0F172A !important;
 }
-body.reading-bg-white .verse-num {
+body.reading-bg-white .reader-workspace .verse-num {
   color: #64748B !important;
 }
-body.reading-bg-white .pericope-title {
+body.reading-bg-white .reader-workspace .pericope-title {
   color: #0284C7 !important;
 }
-body.reading-bg-white .pane-header {
+body.reading-bg-white .reader-workspace .pane-header {
   background-color: #F8FAFC !important;
   border-bottom-color: #E2E8F0 !important;
 }
@@ -265,28 +260,21 @@ body.reading-bg-white .pane-header {
 body.reading-bg-sepia .reader-workspace,
 body.reading-bg-sepia .reading-pane,
 body.reading-bg-sepia .pane-scrollable-content,
-body.reading-bg-sepia .commentary-viewer-panel,
-body.reading-bg-sepia .dict-view-content,
-body.reading-bg-sepia .dict-entry-card,
-body.reading-bg-sepia .notes-drawer-body,
-body.reading-bg-sepia #notes-drawer-content {
+body.reading-bg-sepia .reader-workspace .commentary-viewer-panel {
   background-color: #FBF0D9 !important;
   color: #382E25 !important;
 }
-body.reading-bg-sepia .verses-flow,
-body.reading-bg-sepia .search-res-text,
-body.reading-bg-sepia .comm-body-text,
-body.reading-bg-sepia .dict-entry-body,
-body.reading-bg-sepia .note-view-render {
+body.reading-bg-sepia .reader-workspace .verses-flow,
+body.reading-bg-sepia .reader-workspace .comm-body-text {
   color: #281E15 !important;
 }
-body.reading-bg-sepia .verse-num {
+body.reading-bg-sepia .reader-workspace .verse-num {
   color: #8C7864 !important;
 }
-body.reading-bg-sepia .pericope-title {
+body.reading-bg-sepia .reader-workspace .pericope-title {
   color: #92400E !important;
 }
-body.reading-bg-sepia .pane-header {
+body.reading-bg-sepia .reader-workspace .pane-header {
   background-color: #F3E5C8 !important;
   border-bottom-color: #E5D5B5 !important;
 }
@@ -295,28 +283,21 @@ body.reading-bg-sepia .pane-header {
 body.reading-bg-dark .reader-workspace,
 body.reading-bg-dark .reading-pane,
 body.reading-bg-dark .pane-scrollable-content,
-body.reading-bg-dark .commentary-viewer-panel,
-body.reading-bg-dark .dict-view-content,
-body.reading-bg-dark .dict-entry-card,
-body.reading-bg-dark .notes-drawer-body,
-body.reading-bg-dark #notes-drawer-content {
+body.reading-bg-dark .reader-workspace .commentary-viewer-panel {
   background-color: #070A0F !important;
   color: #F1F5F9 !important;
 }
-body.reading-bg-dark .verses-flow,
-body.reading-bg-dark .search-res-text,
-body.reading-bg-dark .comm-body-text,
-body.reading-bg-dark .dict-entry-body,
-body.reading-bg-dark .note-view-render {
+body.reading-bg-dark .reader-workspace .verses-flow,
+body.reading-bg-dark .reader-workspace .comm-body-text {
   color: #F8FAFC !important;
 }
-body.reading-bg-dark .verse-num {
+body.reading-bg-dark .reader-workspace .verse-num {
   color: #64748B !important;
 }
-body.reading-bg-dark .pericope-title {
+body.reading-bg-dark .reader-workspace .pericope-title {
   color: #38BDF8 !important;
 }
-body.reading-bg-dark .pane-header {
+body.reading-bg-dark .reader-workspace .pane-header {
   background-color: #0B0F17 !important;
   border-bottom-color: #1E293B !important;
 }
@@ -1081,7 +1062,7 @@ body, html {
 }
 .pericope-title {
   font-family: var(--font-bible);
-  font-size: 22px;
+  font-size: calc(22px * var(--bible-zoom-scale, 1));
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -1091,7 +1072,7 @@ body, html {
 }
 .verses-flow {
   font-family: var(--font-bible);
-  font-size: 19px;
+  font-size: calc(var(--bible-font-size-base, 19px) * var(--bible-zoom-scale, 1));
   line-height: 1.85;
   color: var(--text-primary);
   text-align: justify;
@@ -1141,14 +1122,14 @@ body, html {
 }
 
 .chapter-number-dropcap {
-  font-size: 32px;
+  font-size: calc(32px * var(--bible-zoom-scale, 1));
   font-weight: 700;
   color: var(--accent-blue);
   margin-right: 4px;
 }
 .verse-num {
   font-family: var(--font-ui);
-  font-size: 11px;
+  font-size: calc(11px * var(--bible-zoom-scale, 1));
   font-weight: 700;
   color: var(--text-muted);
   vertical-align: super;
@@ -1180,7 +1161,7 @@ body, html {
 }
 .reader-workspace.font-sans .verses-flow {
   font-family: var(--font-ui) !important;
-  font-size: 16px !important;
+  font-size: calc(16.5px * var(--bible-zoom-scale, 1)) !important;
   line-height: 1.7;
 }
 
@@ -1934,65 +1915,277 @@ input:checked + .slider.round:before {
 .wiki-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   padding: 16px;
 }
+
+/* 1. Barre de recherche et sélecteur d'articles Wikipédia */
+.wiki-top-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.wiki-search-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.wiki-search-input {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.wiki-search-input:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.wiki-search-submit-btn {
+  background: var(--accent-blue);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+  white-space: nowrap;
+}
+
+.wiki-search-submit-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.wiki-cloud-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wiki-cloud-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.wiki-pills-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 8px;
+  margin-top: 2px;
+  max-height: 140px;
+  overflow-y: auto;
+  padding: 2px 0;
+}
+
+.wiki-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  line-height: 1.2;
+}
+
+/* Tiers de taille proportionnelle (effet nuage de mots) */
+.wiki-pill.tier-xl {
+  font-size: 14.5px;
+  font-weight: 800;
+  padding: 6px 14px;
+  border-width: 1.5px;
+  color: var(--text-primary);
+}
+
+.wiki-pill.tier-lg {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 5px 12px;
+  color: var(--text-primary);
+}
+
+.wiki-pill.tier-md {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 10px;
+}
+
+.wiki-pill.tier-sm {
+  font-size: 10.5px;
+  font-weight: 500;
+  padding: 3px 8px;
+  opacity: 0.85;
+}
+
+.wiki-pill:hover {
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+  background: var(--bg-hover);
+  transform: translateY(-1px) scale(1.02);
+  opacity: 1;
+}
+
+.wiki-pill.active {
+  background: var(--accent-blue) !important;
+  color: #ffffff !important;
+  border-color: var(--accent-blue) !important;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+  opacity: 1 !important;
+}
+
+/* 2. En-tête de l'article affiché */
 .wiki-header-box {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   border-bottom: 1px solid var(--border-subtle);
   padding-bottom: 10px;
+  gap: 12px;
 }
 .wiki-title {
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 800;
   color: var(--text-primary);
+  line-height: 1.25;
 }
 .wiki-link-btn {
   font-size: 11px;
   font-weight: 600;
   color: var(--accent-blue);
   text-decoration: none;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  transition: all 0.15s ease;
 }
 .wiki-link-btn:hover {
-  text-decoration: underline;
+  background: var(--bg-hover);
+  border-color: var(--accent-blue);
+  text-decoration: none;
 }
 .wiki-extract {
   font-family: var(--font-bible);
-  font-size: 15px;
+  font-size: 14.5px;
   line-height: 1.7;
   color: var(--text-primary);
 }
-.wiki-candidates-box {
+.wiki-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 6px 14px;
   background: var(--bg-subtle);
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  padding: 10px 12px;
-  margin-top: 12px;
-}
-.wiki-candidates-title {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-}
-.wiki-cand-pill {
-  display: inline-block;
-  padding: 3px 8px;
-  margin: 3px 4px 3px 0;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  font-size: 11px;
   color: var(--accent-blue);
+  font-size: 12px;
+  font-weight: 700;
   cursor: pointer;
-  transition: var(--transition-fast);
+  transition: all 0.15s ease;
+  user-select: none;
 }
-.wiki-cand-pill:hover {
-  border-color: var(--accent-blue);
+.wiki-more-btn:hover {
   background: var(--bg-hover);
+  border-color: var(--accent-blue);
+  transform: translateY(-1px);
+}
+.wiki-extended-box {
+  margin-top: 8px;
+  padding: 14px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  animation: fadeIn 0.2s ease-in-out;
+}
+.wiki-extended-box.hidden {
+  display: none;
+}
+.wiki-sec-h3 {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--accent-blue);
+  margin: 14px 0 6px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 3px;
+}
+.wiki-sec-h4 {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 10px 0 4px 0;
+}
+.wiki-p {
+  font-family: var(--font-bible);
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+/* Lexicon & Dictionnaires - Contraste Parfait en Mode Sombre & Clair */
+#lexicon-details,
+.lexicon-active-content,
+.dict-entry-body,
+#match-body-text,
+#dict-match-body {
+  font-family: var(--font-bible);
+  font-size: 15.5px;
+  line-height: 1.75;
+  color: var(--text-primary) !important;
+}
+.dict-entry-body p,
+#match-body-text p,
+#dict-match-body p {
+  color: var(--text-primary) !important;
+  margin: 8px 0;
+}
+.dict-entry-body h1, .dict-entry-body h2, .dict-entry-body h3, .dict-entry-body h4,
+#match-body-text h1, #match-body-text h2, #match-body-text h3, #match-body-text h4,
+#dict-match-body h1, #dict-match-body h2, #dict-match-body h3, #dict-match-body h4 {
+  color: var(--accent-blue) !important;
+  font-weight: 700;
+}
+.dict-entry-body strong, #match-body-text strong, #dict-match-body strong {
+  color: var(--text-primary) !important;
+  font-weight: 700;
+}
+.dict-entry-body em, #match-body-text em, #dict-match-body em {
+  color: var(--text-secondary) !important;
+}
+.dict-entry-body blockquote, #match-body-text blockquote, #dict-match-body blockquote {
+  border-left: 3px solid var(--accent-blue);
+  padding: 8px 12px;
+  margin: 10px 0;
+  background: var(--bg-subtle);
+  color: var(--text-secondary) !important;
+  border-radius: 0 6px 6px 0;
+  font-style: italic;
 }
 
 .chat-messages {
@@ -2306,7 +2499,7 @@ input:checked + .slider.round:before {
 }
 
 .interlinear-surface {
-  font-size: 14px;
+  font-size: calc(14px * var(--bible-zoom-scale, 1));
   font-weight: 700;
   color: var(--text-primary);
   text-align: center;
@@ -2314,7 +2507,7 @@ input:checked + .slider.round:before {
 }
 .interlinear-lemma {
   font-family: 'SBL Hebrew', 'SBL Greek', 'Ezra SIL', 'Times New Roman', serif;
-  font-size: 15px;
+  font-size: calc(15px * var(--bible-zoom-scale, 1));
   font-weight: 600;
   color: #1D4ED8;
   margin-top: 4px;
@@ -2323,7 +2516,7 @@ input:checked + .slider.round:before {
   line-height: 1.2;
 }
 .interlinear-translit {
-  font-size: 11px;
+  font-size: calc(11px * var(--bible-zoom-scale, 1));
   font-style: italic;
   color: var(--text-secondary);
   margin-top: 2px;
@@ -2331,7 +2524,7 @@ input:checked + .slider.round:before {
   line-height: 1.1;
 }
 .interlinear-strong {
-  font-size: 10px;
+  font-size: calc(10px * var(--bible-zoom-scale, 1));
   font-weight: 700;
   color: #7C3AED;
   background: rgba(124, 58, 237, 0.12);
@@ -3365,10 +3558,141 @@ input:checked + .slider.round:before {
 }
 .notes-editor-body {
   flex: 1;
-  padding: 20px;
+  padding: 0;
   display: flex;
   position: relative;
   overflow: hidden;
+  background-color: var(--bg-reading);
+}
+.notes-rich-editor {
+  flex: 1;
+  min-height: 100%;
+  padding: 24px 28px;
+  font-family: var(--font-bible);
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--text-primary);
+  background: transparent;
+  outline: none;
+  overflow-y: auto;
+  user-select: text;
+  white-space: normal;
+  word-wrap: break-word;
+}
+.notes-rich-editor:empty:before {
+  content: attr(data-placeholder);
+  color: var(--text-muted);
+  opacity: 0.65;
+  pointer-events: none;
+  font-style: italic;
+}
+.notes-rich-editor h1 {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--accent-blue);
+  margin: 18px 0 10px 0;
+}
+.notes-rich-editor h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 16px 0 8px 0;
+}
+.notes-rich-editor h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--accent-blue);
+  margin: 14px 0 6px 0;
+}
+.notes-rich-editor blockquote {
+  border-left: 3.5px solid var(--accent-blue);
+  padding: 10px 16px;
+  margin: 12px 0;
+  background: var(--bg-subtle);
+  border-radius: 0 8px 8px 0;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+.notes-rich-editor mark {
+  background: rgba(234, 179, 8, 0.35);
+  color: inherit;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+.notes-rich-editor code {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 14px;
+}
+.notes-rich-editor pre {
+  background: var(--bg-subtle);
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  font-family: monospace;
+  font-size: 13.5px;
+  overflow-x: auto;
+  margin: 14px 0;
+}
+.notes-rich-editor .note-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.notes-rich-editor .note-table th {
+  background: var(--bg-subtle);
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 14px;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+.notes-rich-editor .note-table td {
+  padding: 8px 14px;
+  font-size: 14.5px;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+.notes-rich-editor .note-table tr:nth-child(even) td {
+  background: rgba(128, 128, 128, 0.04);
+}
+.notes-rich-editor .note-callout {
+  background: var(--bg-card);
+  border-left: 4px solid var(--accent-blue);
+  border-top: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 14px 0;
+}
+.notes-rich-editor .note-callout-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--accent-blue);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.notes-rich-editor .note-task-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+}
+.notes-rich-editor .note-task-item input[type="checkbox"] {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-blue);
 }
 .notes-editor-body textarea {
   flex: 1;
@@ -3384,7 +3708,7 @@ input:checked + .slider.round:before {
 .note-preview-content {
   flex: 1;
   overflow-y: auto;
-  padding: 10px;
+  padding: 24px 28px;
   font-family: var(--font-bible);
   font-size: 16px;
   line-height: 1.75;

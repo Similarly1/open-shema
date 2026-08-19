@@ -126,9 +126,13 @@ const DictView = {
     }
 
     const textToRender = (match.full_text || match.preview || '')
-      .replace(/### (.*)/g, '<h3 style="margin: 14px 0 8px 0; color: var(--accent-blue); font-size: 17px;">$1</h3>')
+      .replace(/^### (.*$)/gim, '<h3 style="margin: 14px 0 8px 0; color: var(--accent-blue); font-size: 17px; font-weight: 700;">$1</h3>')
+      .replace(/^## (.*$)/gim, '<h2 style="margin: 16px 0 10px 0; color: var(--accent-blue); font-size: 19px; font-weight: 700;">$1</h2>')
+      .replace(/^# (.*$)/gim, '<h1 style="margin: 18px 0 12px 0; color: var(--accent-blue); font-size: 22px; font-weight: 800;">$1</h1>')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/^\> (.*$)/gim, '<blockquote style="border-left: 3px solid var(--accent-blue); padding: 8px 14px; margin: 12px 0; background: var(--bg-subtle); color: var(--text-secondary); border-radius: 0 6px 6px 0; font-style: italic;">$1</blockquote>')
+      .replace(/^\- (.*$)/gim, '<li style="margin-left: 20px; margin-bottom: 4px;">$1</li>')
       .replace(/\n\n/g, '<br><br>');
 
     container.innerHTML = `
@@ -171,32 +175,64 @@ const DictView = {
   },
 
   async renderWikipedia(container, exactTitle = null) {
-    container.innerHTML = `<div style="padding: 30px; color: var(--text-muted); text-align: center;">Chargement de l'article Wikipédia pour « ${this.currentTerm} »...</div>`;
+    container.innerHTML = `<div style="padding: 30px; color: var(--text-muted); text-align: center;">Chargement de l'article Wikipédia pour « ${exactTitle || this.currentTerm} »...</div>`;
 
     try {
       const data = await API.call('get_wikipedia_summary', this.currentTerm, exactTitle);
-      if (!data || !data.found) {
+      if (!data || (!data.found && (!data.candidates || data.candidates.length === 0))) {
         container.innerHTML = `
           <div style="padding: 40px; color: var(--text-muted); text-align: center;">
             <span style="font-size: 40px; display: block; margin-bottom: 10px;">🌐</span>
-            Aucun article Wikipédia trouvé pour « <strong>${this.currentTerm}</strong> ».
+            Aucun article Wikipédia pertinent trouvé pour « <strong>${this.currentTerm}</strong> ».
+            <div style="margin-top: 14px; display: flex; gap: 6px; justify-content: center;">
+              <input type="text" id="dict-wiki-fallback-input" class="wiki-search-input" style="max-width: 220px;" placeholder="Autre recherche..." value="${this.currentTerm}">
+              <button id="dict-wiki-fallback-submit" class="wiki-search-submit-btn">Chercher</button>
+            </div>
           </div>
         `;
+        const fbIn = container.querySelector('#dict-wiki-fallback-input');
+        const fbBtn = container.querySelector('#dict-wiki-fallback-submit');
+        const doSearch = () => {
+          const val = fbIn?.value?.trim();
+          if (val) {
+            this.currentTerm = val;
+            this.renderWikipedia(container);
+          }
+        };
+        fbBtn?.addEventListener('click', doSearch);
+        fbIn?.addEventListener('keydown', (e) => { if (e.key === 'Enter') doSearch(); });
         return;
       }
 
-      let candidatesHtml = '';
-      if (data.candidates && data.candidates.length > 0) {
-        candidatesHtml = `
-          <div class="wiki-candidates-box">
-            <div class="wiki-candidates-title">Articles connexes & Homonymes :</div>
-            ${data.candidates.map(c => `<button class="wiki-cand-pill" data-title="${c.title}">${c.title}</button>`).join('')}
+      // Candidates Navigation (Nuage de mots)
+      const candidates = data.candidates || [];
+      const currentTitle = data.title || exactTitle || this.currentTerm;
+
+      let navHtml = `
+        <div class="wiki-top-nav">
+          <div class="wiki-search-row">
+            <input type="text" class="wiki-search-input" id="dict-wiki-query-input" placeholder="🔍 Rechercher un autre sujet..." value="${data.search_query || this.currentTerm}">
+            <button class="wiki-search-submit-btn" id="dict-wiki-query-submit">Chercher</button>
           </div>
-        `;
-      }
+          ${candidates.length > 1 ? `
+            <div class="wiki-cloud-box">
+              <div class="wiki-cloud-label">Articles connexes :</div>
+              <div class="wiki-pills-bar">
+                ${candidates.map(c => `
+                  <button class="wiki-pill tier-${c.tier || 'md'} ${c.title.toLowerCase() === currentTitle.toLowerCase() ? 'active' : ''}" data-title="${c.title}" title="${c.snippet || c.title}">
+                    ${c.title}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      `;
 
       container.innerHTML = `
         <div class="wiki-container">
+          ${navHtml}
+
           <div class="wiki-header-box">
             <div>
               <div class="wiki-title">${data.title}</div>
@@ -209,15 +245,78 @@ const DictView = {
 
           <div class="wiki-extract">${(data.extract || '').replace(/\n\n/g, '<br><br>')}</div>
 
-          ${candidatesHtml}
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="wiki-more-btn" id="btn-dict-wiki-more" data-expanded="false">
+              <span>📖</span>
+              <span id="dict-wiki-more-label">Voir plus ▾</span>
+            </button>
+          </div>
+
+          <div class="wiki-extended-box hidden" id="dict-wiki-extended-container"></div>
         </div>
       `;
 
-      container.querySelectorAll('.wiki-cand-pill').forEach(pill => {
+      // Event handlers
+      const qInput = container.querySelector('#dict-wiki-query-input');
+      const qSubmit = container.querySelector('#dict-wiki-query-submit');
+      const doNavSearch = () => {
+        const val = qInput?.value?.trim();
+        if (val) {
+          this.currentTerm = val;
+          this.renderWikipedia(container);
+        }
+      };
+      qSubmit?.addEventListener('click', doNavSearch);
+      qInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') doNavSearch(); });
+
+      container.querySelectorAll('.wiki-pill').forEach(pill => {
         pill.addEventListener('click', () => {
           this.renderWikipedia(container, pill.dataset.title);
         });
       });
+
+      const btnMore = container.querySelector('#btn-dict-wiki-more');
+      const extContainer = container.querySelector('#dict-wiki-extended-container');
+      const moreLabel = container.querySelector('#dict-wiki-more-label');
+
+      if (btnMore && extContainer) {
+        btnMore.addEventListener('click', async () => {
+          const isExp = btnMore.dataset.expanded === 'true';
+          if (isExp) {
+            extContainer.classList.add('hidden');
+            btnMore.dataset.expanded = 'false';
+            moreLabel.textContent = 'Voir plus ▾';
+          } else {
+            if (!extContainer.innerHTML.trim()) {
+              moreLabel.textContent = 'Chargement de la suite...';
+              btnMore.disabled = true;
+              try {
+                const extData = await API.call('get_wikipedia_extended', data.title);
+                if (extData && extData.found && extData.html) {
+                  extContainer.innerHTML = extData.html;
+                  extContainer.classList.remove('hidden');
+                  btnMore.dataset.expanded = 'true';
+                  moreLabel.textContent = 'Voir moins ▴';
+                } else {
+                  extContainer.innerHTML = `<div style="color: var(--text-muted); font-style: italic;">Pas de sections supplémentaires disponibles.</div>`;
+                  extContainer.classList.remove('hidden');
+                  btnMore.dataset.expanded = 'true';
+                  moreLabel.textContent = 'Voir moins ▴';
+                }
+              } catch (e) {
+                alert(`Erreur : ${e}`);
+                moreLabel.textContent = 'Voir plus ▾';
+              } finally {
+                btnMore.disabled = false;
+              }
+            } else {
+              extContainer.classList.remove('hidden');
+              btnMore.dataset.expanded = 'true';
+              moreLabel.textContent = 'Voir moins ▴';
+            }
+          }
+        });
+      }
 
     } catch (e) {
       console.error('Erreur Wikipédia:', e);

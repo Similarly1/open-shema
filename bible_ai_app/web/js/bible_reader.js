@@ -1214,9 +1214,13 @@ const LexiconViewer = {
     }
 
     const textToRender = (match.full_text || match.preview || '')
-      .replace(/### (.*)/g, '<h3 style="margin: 10px 0 6px 0; color: var(--accent-blue); font-size: 16px;">$1</h3>')
+      .replace(/^### (.*$)/gim, '<h3 style="margin: 12px 0 6px 0; color: var(--accent-blue); font-size: 16px; font-weight: 700;">$1</h3>')
+      .replace(/^## (.*$)/gim, '<h2 style="margin: 14px 0 8px 0; color: var(--accent-blue); font-size: 18px; font-weight: 700;">$1</h2>')
+      .replace(/^# (.*$)/gim, '<h1 style="margin: 16px 0 10px 0; color: var(--accent-blue); font-size: 20px; font-weight: 800;">$1</h1>')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/^\> (.*$)/gim, '<blockquote style="border-left: 3px solid var(--accent-blue); padding: 8px 12px; margin: 10px 0; background: var(--bg-subtle); color: var(--text-secondary); border-radius: 0 6px 6px 0; font-style: italic;">$1</blockquote>')
+      .replace(/^\- (.*$)/gim, '<li style="margin-left: 20px; margin-bottom: 4px;">$1</li>')
       .replace(/\n\n/g, '<br><br>');
 
     container.innerHTML = `
@@ -1224,7 +1228,7 @@ const LexiconViewer = {
         <div style="font-size: 20px; font-weight: 800; color: var(--accent-blue); margin-bottom: 4px;">${match.title || this.currentTerm}</div>
         <div style="font-size: 11px; font-weight: 700; color: var(--accent-orange); margin-bottom: 12px;">${match.badge || match.dict_name}</div>
         ${polishBarHtml}
-        <div style="font-family: var(--font-bible); font-size: 15px; line-height: 1.7; color: var(--text-primary);" id="match-body-text" class="dict-entry-body">${textToRender}</div>
+        <div style="font-family: var(--font-bible); font-size: 15px; line-height: 1.75; color: var(--text-primary);" id="match-body-text" class="dict-entry-body">${textToRender}</div>
       </div>
     `;
 
@@ -1257,32 +1261,64 @@ const LexiconViewer = {
   },
 
   async renderWikipedia(container, exactTitle = null) {
-    container.innerHTML = `<div style="padding: 24px; color: var(--text-muted); text-align: center;">Chargement de l'article Wikipédia pour « ${this.currentTerm} »...</div>`;
+    container.innerHTML = `<div style="padding: 24px; color: var(--text-muted); text-align: center;">Chargement de l'article Wikipédia pour « ${exactTitle || this.currentTerm} »...</div>`;
 
     try {
       const data = await API.call('get_wikipedia_summary', this.currentTerm, exactTitle);
-      if (!data || !data.found) {
+      if (!data || (!data.found && (!data.candidates || data.candidates.length === 0))) {
         container.innerHTML = `
           <div style="padding: 24px; color: var(--text-muted); text-align: center;">
             <span style="font-size: 32px; display: block; margin-bottom: 10px;">🌐</span>
-            Aucun article Wikipédia trouvé pour « <strong>${this.currentTerm}</strong> ».
+            Aucun article Wikipédia pertinent trouvé pour « <strong>${this.currentTerm}</strong> ».
+            <div style="margin-top: 14px; display: flex; gap: 6px; justify-content: center;">
+              <input type="text" id="wiki-fallback-input" class="wiki-search-input" style="max-width: 200px;" placeholder="Autre recherche..." value="${this.currentTerm}">
+              <button id="wiki-fallback-submit" class="wiki-search-submit-btn">Chercher</button>
+            </div>
           </div>
         `;
+        const fbIn = container.querySelector('#wiki-fallback-input');
+        const fbBtn = container.querySelector('#wiki-fallback-submit');
+        const doSearch = () => {
+          const val = fbIn?.value?.trim();
+          if (val) {
+            this.currentTerm = val;
+            this.renderWikipedia(container);
+          }
+        };
+        fbBtn?.addEventListener('click', doSearch);
+        fbIn?.addEventListener('keydown', (e) => { if (e.key === 'Enter') doSearch(); });
         return;
       }
 
-      let candidatesHtml = '';
-      if (data.candidates && data.candidates.length > 0) {
-        candidatesHtml = `
-          <div class="wiki-candidates-box">
-            <div class="wiki-candidates-title">Articles connexes & Homonymes :</div>
-            ${data.candidates.map(c => `<button class="wiki-cand-pill" data-title="${c.title}">${c.title}</button>`).join('')}
+      // Candidates Navigation (Nuage de mots)
+      const candidates = data.candidates || [];
+      const currentTitle = data.title || exactTitle || this.currentTerm;
+
+      let navHtml = `
+        <div class="wiki-top-nav">
+          <div class="wiki-search-row">
+            <input type="text" class="wiki-search-input" id="wiki-query-input" placeholder="🔍 Rechercher un autre sujet..." value="${data.search_query || this.currentTerm}">
+            <button class="wiki-search-submit-btn" id="wiki-query-submit">Chercher</button>
           </div>
-        `;
-      }
+          ${candidates.length > 1 ? `
+            <div class="wiki-cloud-box">
+              <div class="wiki-cloud-label">Articles connexes :</div>
+              <div class="wiki-pills-bar">
+                ${candidates.map(c => `
+                  <button class="wiki-pill tier-${c.tier || 'md'} ${c.title.toLowerCase() === currentTitle.toLowerCase() ? 'active' : ''}" data-title="${c.title}" title="${c.snippet || c.title}">
+                    ${c.title}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      `;
 
       container.innerHTML = `
         <div class="wiki-container">
+          ${navHtml}
+
           <div class="wiki-header-box">
             <div>
               <div class="wiki-title">${data.title}</div>
@@ -1295,15 +1331,78 @@ const LexiconViewer = {
 
           <div class="wiki-extract">${(data.extract || '').replace(/\n\n/g, '<br><br>')}</div>
 
-          ${candidatesHtml}
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="wiki-more-btn" id="btn-wiki-more" data-expanded="false">
+              <span>📖</span>
+              <span id="wiki-more-label">Voir plus ▾</span>
+            </button>
+          </div>
+
+          <div class="wiki-extended-box hidden" id="wiki-extended-container"></div>
         </div>
       `;
 
-      container.querySelectorAll('.wiki-cand-pill').forEach(pill => {
+      // Event handlers
+      const qInput = container.querySelector('#wiki-query-input');
+      const qSubmit = container.querySelector('#wiki-query-submit');
+      const doNavSearch = () => {
+        const val = qInput?.value?.trim();
+        if (val) {
+          this.currentTerm = val;
+          this.renderWikipedia(container);
+        }
+      };
+      qSubmit?.addEventListener('click', doNavSearch);
+      qInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') doNavSearch(); });
+
+      container.querySelectorAll('.wiki-pill').forEach(pill => {
         pill.addEventListener('click', () => {
           this.renderWikipedia(container, pill.dataset.title);
         });
       });
+
+      const btnMore = container.querySelector('#btn-wiki-more');
+      const extContainer = container.querySelector('#wiki-extended-container');
+      const moreLabel = container.querySelector('#wiki-more-label');
+
+      if (btnMore && extContainer) {
+        btnMore.addEventListener('click', async () => {
+          const isExp = btnMore.dataset.expanded === 'true';
+          if (isExp) {
+            extContainer.classList.add('hidden');
+            btnMore.dataset.expanded = 'false';
+            moreLabel.textContent = 'Voir plus ▾';
+          } else {
+            if (!extContainer.innerHTML.trim()) {
+              moreLabel.textContent = 'Chargement de la suite...';
+              btnMore.disabled = true;
+              try {
+                const extData = await API.call('get_wikipedia_extended', data.title);
+                if (extData && extData.found && extData.html) {
+                  extContainer.innerHTML = extData.html;
+                  extContainer.classList.remove('hidden');
+                  btnMore.dataset.expanded = 'true';
+                  moreLabel.textContent = 'Voir moins ▴';
+                } else {
+                  extContainer.innerHTML = `<div style="color: var(--text-muted); font-style: italic;">Pas de sections supplémentaires disponibles.</div>`;
+                  extContainer.classList.remove('hidden');
+                  btnMore.dataset.expanded = 'true';
+                  moreLabel.textContent = 'Voir moins ▴';
+                }
+              } catch (e) {
+                alert(`Erreur : ${e}`);
+                moreLabel.textContent = 'Voir plus ▾';
+              } finally {
+                btnMore.disabled = false;
+              }
+            } else {
+              extContainer.classList.remove('hidden');
+              btnMore.dataset.expanded = 'true';
+              moreLabel.textContent = 'Voir moins ▴';
+            }
+          }
+        });
+      }
 
     } catch (e) {
       console.error('Erreur Wikipédia:', e);
@@ -1360,6 +1459,17 @@ const BibleReader = {
     CommentaryViewer.init();
     DrawerNotesViewer.init();
     ContextMenuManager.init();
+    
+    try {
+      const savedZoom = localStorage.getItem('bible_reader_zoom');
+      if (savedZoom) {
+        this.setZoom(parseInt(savedZoom, 10));
+      } else {
+        this.setZoom(100);
+      }
+    } catch (e) {
+      this.setZoom(100);
+    }
     
     BookPicker.init((bookCode, chNum) => {
       this.navigateTo(bookCode, chNum);
@@ -1554,10 +1664,23 @@ const BibleReader = {
   },
 
   setZoom(percent) {
-    this.zoomPercent = Math.min(Math.max(70, percent), 180);
-    document.getElementById('lbl-zoom-level').textContent = `${this.zoomPercent}%`;
-    document.getElementById('pane-1-content').style.fontSize = `${this.zoomPercent}%`;
-    document.getElementById('pane-2-content').style.fontSize = `${this.zoomPercent}%`;
+    this.zoomPercent = Math.min(Math.max(60, percent), 250);
+    const lbl = document.getElementById('lbl-zoom-level');
+    if (lbl) lbl.textContent = `${this.zoomPercent}%`;
+    const scale = this.zoomPercent / 100;
+    try {
+      localStorage.setItem('bible_reader_zoom', this.zoomPercent);
+    } catch (e) {}
+
+    // Appliquer dynamiquement la variable d'échelle de zoom
+    document.documentElement.style.setProperty('--bible-zoom-scale', scale);
+    const workspace = document.getElementById('reader-workspace');
+    if (workspace) workspace.style.setProperty('--bible-zoom-scale', scale);
+
+    const pane1 = document.getElementById('pane-1-content');
+    if (pane1) pane1.style.setProperty('--bible-zoom-scale', scale);
+    const pane2 = document.getElementById('pane-2-content');
+    if (pane2) pane2.style.setProperty('--bible-zoom-scale', scale);
   },
 
   toggleSplitView(forceState) {

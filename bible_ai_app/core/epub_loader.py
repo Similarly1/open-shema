@@ -612,16 +612,21 @@ class EpubLoader:
 
     @classmethod
     def _extract_cover_temp(cls, z: zipfile.ZipFile, cover_zip_path: str) -> Optional[str]:
-        """Extrait l'image de couverture dans un dossier temporaire pour l'affichage dans l'UI."""
+        """Extrait l'image de couverture dans le dossier permanent data/covers pour l'affichage immédiat."""
         try:
+            import uuid
             ext = os.path.splitext(cover_zip_path)[1] or ".jpg"
-            temp_dir = os.path.join(tempfile.gettempdir(), "bible_ai_covers")
-            os.makedirs(temp_dir, exist_ok=True)
-            temp_file = os.path.join(temp_dir, f"cover_{os.path.basename(cover_zip_path)}")
+            app_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+            covers_dir = os.path.join(app_root, "data", "covers")
+            os.makedirs(covers_dir, exist_ok=True)
             
-            with open(temp_file, "wb") as f:
+            clean_base = re.sub(r'[^a-zA-Z0-9._-]', '_', os.path.basename(cover_zip_path))
+            unique_name = f"epub_{uuid.uuid4().hex[:8]}_{clean_base}"
+            target_file = os.path.join(covers_dir, unique_name)
+            
+            with open(target_file, "wb") as f:
                 f.write(z.read(cover_zip_path))
-            return temp_file
+            return target_file
         except Exception as e:
             logger.error(f"[EpubLoader] Erreur extraction couverture: {e}")
             return None

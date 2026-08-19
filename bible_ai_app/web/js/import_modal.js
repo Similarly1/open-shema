@@ -131,6 +131,7 @@ const ImportModal = {
     this.oldBookName = book ? (book.name || '') : '';
     this.filePath = book ? (book.file_path || '') : '';
     this.coverPath = book ? (book.cover_path || '') : '';
+    this.coverDataUrl = book ? (book.cover_data_url || book.cover_url || book.cover_path || '') : '';
     this.chapters = [];
     this.userModifiedId = editMode;
 
@@ -154,7 +155,7 @@ const ImportModal = {
       document.getElementById('import-rag-embed').value = book.embedding_model || 'bge_multilingual_gemma2 (Infomaniak)';
 
       document.getElementById('import-selected-file-label').textContent = this.filePath ? this.filePath.split(/[\\/]/).pop() : 'Fichier existant';
-      this.updateCoverPreview(this.coverPath);
+      this.updateCoverPreview(this.coverDataUrl || this.coverPath);
       this.renderChaptersList([]);
     } else {
       modalTitle.textContent = `📥 Importer un Nouvel Ouvrage dans la Bibliothèque`;
@@ -213,9 +214,10 @@ const ImportModal = {
       if (info.year && !document.getElementById('import-book-year').value) {
         document.getElementById('import-book-year').value = info.year;
       }
-      if (info.cover_path) {
+      if (info.cover_data_url || info.cover_path) {
         this.coverPath = info.cover_path;
-        this.updateCoverPreview(info.cover_path);
+        this.coverDataUrl = info.cover_data_url || info.cover_path;
+        this.updateCoverPreview(this.coverDataUrl);
       }
 
       // Remplissage des chapitres
@@ -236,9 +238,10 @@ const ImportModal = {
     try {
       const res = await API.call('pick_cover_image');
       if (!res || res.cancelled) return;
-      if (res.success && res.cover_path) {
+      if (res.success && (res.cover_data_url || res.cover_path)) {
         this.coverPath = res.cover_path;
-        this.updateCoverPreview(this.coverPath);
+        this.coverDataUrl = res.cover_data_url;
+        this.updateCoverPreview(res.cover_data_url || res.cover_path);
       }
     } catch (e) {
       console.error('Erreur pickCover:', e);
@@ -281,22 +284,44 @@ const ImportModal = {
 
     const dataUrl = canvas.toDataURL('image/png');
     this.coverPath = dataUrl;
+    this.coverDataUrl = dataUrl;
     this.updateCoverPreview(dataUrl);
   },
 
-  updateCoverPreview(pathOrUrl) {
+  async updateCoverPreview(pathOrUrl) {
     const imgEl = document.getElementById('import-cover-img');
     const placeholderEl = document.getElementById('import-cover-placeholder');
 
-    if (pathOrUrl) {
-      imgEl.src = pathOrUrl;
-      imgEl.classList.remove('hidden');
-      placeholderEl.classList.add('hidden');
-    } else {
+    if (!pathOrUrl) {
       imgEl.src = '';
       imgEl.classList.add('hidden');
       placeholderEl.classList.remove('hidden');
+      placeholderEl.textContent = 'Aucune image';
+      return;
     }
+
+    let src = pathOrUrl;
+    if (!src.startsWith('data:image/') && !src.startsWith('http://') && !src.startsWith('https://')) {
+      try {
+        const res = await API.call('get_cover_image_data', src);
+        if (res && res.success && res.data_url) {
+          src = res.data_url;
+        }
+      } catch (e) {
+        console.warn('Erreur récupération cover data:', e);
+      }
+    }
+
+    imgEl.src = src;
+    imgEl.onload = () => {
+      imgEl.classList.remove('hidden');
+      placeholderEl.classList.add('hidden');
+    };
+    imgEl.onerror = () => {
+      imgEl.classList.add('hidden');
+      placeholderEl.classList.remove('hidden');
+      placeholderEl.textContent = 'Image non disponible';
+    };
   },
 
   renderChaptersList(chapters) {
