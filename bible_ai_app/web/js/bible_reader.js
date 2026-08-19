@@ -2438,6 +2438,7 @@ const BibleReader = {
 
   installedBibles: [],
   targetPaneForPicker: 1,
+  activePickerFamily: 'all',
 
   loadedChapters: [],
   isLoadingMore: false,
@@ -2616,13 +2617,31 @@ const BibleReader = {
       if (typeof App !== 'undefined' && App.checkAutoSidebarCollapse) App.checkAutoSidebarCollapse();
     });
 
-    // Filtre de recherche dans le sélecteur de Bible
-    document.getElementById('bible-picker-search')?.addEventListener('input', (e) => {
-      const q = e.target.value.toLowerCase();
-      document.querySelectorAll('#version-list-items .version-row-btn').forEach(btn => {
-        const txt = btn.textContent.toLowerCase();
-        btn.style.display = txt.includes(q) ? 'flex' : 'none';
+    // Filtre de recherche et filtres de familles dans le sélecteur de Bible
+    document.getElementById('bible-picker-search')?.addEventListener('input', () => {
+      this.filterBiblePickerList();
+    });
+
+    document.querySelectorAll('#version-picker-families-bar .fam-filter-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#version-picker-families-bar .fam-filter-pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.activePickerFamily = btn.dataset.fam || 'all';
+        this.filterBiblePickerList();
       });
+    });
+
+    // Bouton de suggestion rapide de comparaison en Colonne 2
+    document.getElementById('pane-2-quick-suggest')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const suggested = this.getSuggestedComparativeBible(this.currentBible1);
+      if (suggested && suggested.name) {
+        this.currentBible2 = suggested.name;
+        this.pane2IsInterlinear = false;
+        this.updatePaneHeader(2);
+        this.reloadPane2();
+        App.showToast(`Colonne 2 synchronisée sur : ${suggested.title || suggested.name}`);
+      }
     });
 
     const quickPassage = document.getElementById('quick-passage-input');
@@ -2647,6 +2666,28 @@ const BibleReader = {
     }
   },
 
+  getSuggestedComparativeBible(baseBibleName) {
+    if (!this.installedBibles || this.installedBibles.length < 2) return null;
+    const base = this.installedBibles.find(b => b.name === baseBibleName) || this.installedBibles[0];
+    if (!base) return null;
+
+    const baseFam = base.famille || 'Famille Segond';
+    const suggestions = base.comparaisons_suggerees || [];
+
+    // 1. Chercher si l'un des codes suggérés est installé
+    for (const code of suggestions) {
+      const match = this.installedBibles.find(b => (b.version_code || '').toUpperCase() === code.toUpperCase() && b.name !== base.name);
+      if (match) return match;
+    }
+
+    // 2. Sinon, chercher la première Bible installée d'une famille différente
+    const diffFam = this.installedBibles.find(b => b.name !== base.name && b.famille && b.famille !== baseFam);
+    if (diffFam) return diffFam;
+
+    // 3. Fallback sur une autre Bible quelconque
+    return this.installedBibles.find(b => b.name !== base.name) || null;
+  },
+
   updatePaneHeader(paneNum) {
     if (paneNum === 1) {
       const el = document.getElementById('pane-1-bible-name');
@@ -2665,6 +2706,20 @@ const BibleReader = {
         el.textContent = interLabel;
       } else {
         el.textContent = this.currentBible2;
+      }
+
+      // Mise à jour de la suggestion rapide pour la Colonne 2
+      const suggestBtn = document.getElementById('pane-2-quick-suggest');
+      const suggestLabel = document.getElementById('pane-2-suggest-label');
+      if (suggestBtn && suggestLabel) {
+        const suggested = this.getSuggestedComparativeBible(this.currentBible1);
+        if (suggested && suggested.name && suggested.name !== this.currentBible2) {
+          suggestLabel.textContent = `Comparer : ${suggested.version_code || suggested.title}`;
+          suggestBtn.classList.remove('hidden');
+          suggestBtn.title = `Suggéré (${suggested.famille || 'Autre famille'}) : ${suggested.title}\nCliquer pour comparer en direct.`;
+        } else {
+          suggestBtn.classList.add('hidden');
+        }
       }
     }
   },
@@ -2705,10 +2760,15 @@ const BibleReader = {
         btnSync.classList.remove('hidden');
         btnSync.classList.toggle('active', this.isScrollSynced);
       }
-      // Si la bible 2 n'est pas définie ou identique à la bible 1, sélectionner une alternative
+      // Sélection intelligente de la version complémentaire (famille différente) si non définie
       if (!this.currentBible2 || this.currentBible2 === this.currentBible1) {
-        const other = (this.installedBibles || []).find(b => b.name !== this.currentBible1);
-        if (other) this.currentBible2 = other.name;
+        const suggested = this.getSuggestedComparativeBible(this.currentBible1);
+        if (suggested) {
+          this.currentBible2 = suggested.name;
+        } else {
+          const other = (this.installedBibles || []).find(b => b.name !== this.currentBible1);
+          if (other) this.currentBible2 = other.name;
+        }
       }
       this.updatePaneHeader(2);
       this.reloadPane2();
@@ -3455,18 +3515,52 @@ const BibleReader = {
     this.targetPaneForPicker = paneNum;
     const popover = document.getElementById('bible-version-picker-popover');
     const listEl = document.getElementById('version-list-items');
+    const indicator = document.getElementById('version-picker-pane-indicator');
+    const searchInput = document.getElementById('bible-picker-search');
+    
+    if (indicator) {
+      indicator.textContent = paneNum === 1 ? 'Colonne 1 (Principale)' : 'Colonne 2 (Parallèle)';
+    }
+
+    if (searchInput) searchInput.value = '';
+    this.activePickerFamily = 'all';
+    document.querySelectorAll('#version-picker-families-bar .fam-filter-pill').forEach(b => {
+      b.classList.toggle('active', b.dataset.fam === 'all');
+    });
+
     listEl.innerHTML = '';
 
     const currentSelected = paneNum === 1 ? this.currentBible1 : this.currentBible2;
+    const otherPaneSelected = paneNum === 1 ? this.currentBible2 : this.currentBible1;
+    const suggestedForComp = this.getSuggestedComparativeBible(otherPaneSelected);
 
     this.installedBibles.forEach(b => {
       const btn = document.createElement('button');
       btn.className = `version-row-btn ${b.name === currentSelected ? 'active' : ''}`;
+      btn.dataset.name = (b.name || '').toLowerCase();
+      btn.dataset.title = (b.title || '').toLowerCase();
+      btn.dataset.code = (b.version_code || '').toLowerCase();
+      btn.dataset.famille = b.famille || 'Famille Segond';
+
+      const isSuggested = suggestedForComp && b.name === suggestedForComp.name && b.name !== currentSelected;
       const displayTitle = b.title || b.name;
       const displayCode = b.version_code || b.name;
+      const displayFam = b.famille || 'Famille Segond';
+      const famColor = b.famille_badge_color || '#2563EB';
+      const phil = b.philosophie || b.editeur || '';
+
       btn.innerHTML = `
-        <span class="version-name-full" title="${displayTitle}">${displayTitle}</span>
-        <span class="version-badge-code">${displayCode}</span>
+        <div class="version-row-top">
+          <span class="version-name-full" title="${displayTitle}">${displayTitle}</span>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span class="version-family-badge" style="background-color: ${famColor};">${displayFam}</span>
+            <span class="version-badge-code">${displayCode}</span>
+          </div>
+        </div>
+        <div class="version-row-sub">
+          <span class="version-philosophy-tag" title="${phil}">${phil || (b.annee ? `Édition ${b.annee}` : '')}</span>
+          ${isSuggested ? '<span class="version-suggested-tag">⭐ Suggérée pour comparaison</span>' : ''}
+        </div>
       `;
       btn.addEventListener('click', () => {
         this.selectBibleVersion(b.name);
@@ -3475,6 +3569,24 @@ const BibleReader = {
     });
 
     popover.classList.remove('hidden');
+    searchInput?.focus();
+  },
+
+  filterBiblePickerList() {
+    const searchVal = (document.getElementById('bible-picker-search')?.value || '').toLowerCase().trim();
+    const famVal = this.activePickerFamily || 'all';
+
+    document.querySelectorAll('#version-list-items .version-row-btn').forEach(btn => {
+      const btnName = btn.dataset.name || '';
+      const btnTitle = btn.dataset.title || '';
+      const btnCode = btn.dataset.code || '';
+      const btnFam = btn.dataset.famille || '';
+
+      const matchSearch = !searchVal || btnName.includes(searchVal) || btnTitle.includes(searchVal) || btnCode.includes(searchVal) || btnFam.toLowerCase().includes(searchVal);
+      const matchFam = famVal === 'all' || btnFam === famVal;
+
+      btn.style.display = (matchSearch && matchFam) ? 'flex' : 'none';
+    });
   },
 
   closeBiblePicker() {

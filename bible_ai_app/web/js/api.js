@@ -139,6 +139,14 @@ const API = {
     return await this.call('get_installed_bibles');
   },
 
+  async getBibleRegistry() {
+    return await this.call('get_bible_registry');
+  },
+
+  async getComparativeSuggestion(currentBibleName) {
+    return await this.call('get_comparative_suggestion', currentBibleName);
+  },
+
   async getBooksList() {
     return await this.call('get_books_list');
   },

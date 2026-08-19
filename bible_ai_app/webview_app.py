@@ -134,6 +134,51 @@ def parse_reverse_interlinear_verse(v_raw: str) -> List[Dict[str, Any]]:
     return words_data
 
 
+BIBLES_REGISTRY_FILE = os.path.join(current_dir, "data", "bibles_registry.json")
+
+def load_bibles_registry() -> Dict[str, Any]:
+    """Charge le catalogue structuré des traductions bibliques (Typologie Bibliorama)."""
+    try:
+        if os.path.exists(BIBLES_REGISTRY_FILE):
+            with open(BIBLES_REGISTRY_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+    except Exception as e:
+        logger.warning(f"Erreur lecture bibles_registry.json: {e}")
+    return {}
+
+def find_bible_registry_entry(name_or_code: str, registry: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
+    """Trouve la fiche de référence exacte d'une Bible par nom, sigle ou alias."""
+    if not name_or_code:
+        return None
+    if registry is None:
+        registry = load_bibles_registry()
+    
+    clean = str(name_or_code).strip()
+    clean_upper = clean.upper()
+    clean_norm = re.sub(r'[^\w\s]', '', clean.lower()).strip()
+    
+    # 1. Clé exacte de code (S21, LSG, BDS, TOB, etc.)
+    if clean_upper in registry:
+        return registry[clean_upper]
+    
+    # 2. Correspondance stricte sur code ou nom officiel
+    for code, data in registry.items():
+        if data.get("code", "").upper() == clean_upper:
+            return data
+        if (data.get("nom_officiel") or "").lower() == clean.lower():
+            return data
+        for alias in data.get("aliases", []):
+            if alias.lower() == clean.lower() or alias.lower() == clean_norm:
+                return data
+            
+    # 3. Correspondance partielle souple
+    for code, data in registry.items():
+        for alias in data.get("aliases", []):
+            if alias.lower() in clean_norm or clean_norm in alias.lower():
+                return data
+                
+    return None
+
 BIBLE_CANONICAL_INFO = {
     "Colombe":   ("Bible à la Colombe (1978)", "COL"),
     "Chouraqui": ("Traduction André Chouraqui (1985)", "CHOU"),
@@ -199,38 +244,89 @@ class BibleAppApi:
     # =========================================================================
 
     def get_installed_bibles(self) -> List[Dict[str, Any]]:
-        """Retourne la liste des Bibles installées dans la bibliothèque avec titres complets et sigles clairs."""
+        """Retourne la liste des Bibles installées enrichie de la typologie Bibliorama (Familles & Suggestions)."""
         registry = load_books_metadata()
+        bibles_ref = load_bibles_registry()
         bibles = []
+
+        def enrich_item(raw_name: str, meta: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+            meta = meta or {}
+            folder = meta.get("folder_name", raw_name)
+            reg_entry = find_bible_registry_entry(raw_name, bibles_ref) or find_bible_registry_entry(folder, bibles_ref)
+            
+            default_title, default_code = BIBLE_CANONICAL_INFO.get(raw_name, (meta.get("title", raw_name), meta.get("version_code", raw_name)))
+            
+            full_title = (reg_entry.get("nom_officiel") if reg_entry else None) or (meta.get("title") if meta.get("title") and meta.get("title") != raw_name else default_title)
+            code = (reg_entry.get("code") if reg_entry else None) or meta.get("version_code") or default_code
+            
+            return {
+                "id": folder,
+                "name": raw_name,
+                "title": full_title,
+                "author": meta.get("author", "") or (reg_entry.get("editeur") if reg_entry else ""),
+                "version_code": code,
+                "famille": reg_entry.get("famille", "Protestante") if reg_entry else "Famille Segond",
+                "famille_badge_color": reg_entry.get("famille_badge_color", "#2563EB") if reg_entry else "#2563EB",
+                "philosophie": reg_entry.get("philosophie", "") if reg_entry else "",
+                "texte_base_at": reg_entry.get("texte_base_at", "") if reg_entry else "",
+                "texte_base_nt": reg_entry.get("texte_base_nt", "") if reg_entry else "",
+                "canon": reg_entry.get("canon", "") if reg_entry else "",
+                "annee": reg_entry.get("annee", "") if reg_entry else "",
+                "editeur": reg_entry.get("editeur", "") if reg_entry else "",
+                "comparaisons_suggerees": reg_entry.get("comparaisons_suggerees", []) if reg_entry else [],
+                "cover_url": (reg_entry.get("cover_url") if reg_entry else "") or meta.get("cover_url", "")
+            }
+
         for name, meta in registry.items():
             if meta.get("type") == "Bible" and meta.get("active", True):
                 folder = meta.get("folder_name", name)
-                # S'assurer que le dossier de la Bible existe réellement sur le disque
                 if BibleJsonLoader.find_bible_dir_by_name(folder) or BibleJsonLoader.find_bible_dir_by_name(name):
-                    default_title, default_code = BIBLE_CANONICAL_INFO.get(name, (meta.get("title", name), meta.get("version_code", name)))
-                    full_title = meta.get("title") if meta.get("title") and meta.get("title") != name else default_title
-                    code = meta.get("version_code") or default_code
-                    bibles.append({
-                        "id": folder,
-                        "name": name,
-                        "title": full_title,
-                        "author": meta.get("author", ""),
-                        "version_code": code
-                    })
+                    bibles.append(enrich_item(name, meta))
         
         # Si vide, fallback direct sur les dossiers JSON
         if not bibles:
             installed = BibleJsonLoader.list_installed_bibles()
             for b in installed:
-                default_title, default_code = BIBLE_CANONICAL_INFO.get(b, (b.replace("_", " "), b))
-                bibles.append({
-                    "id": b,
-                    "name": b.replace("_", " "),
-                    "title": default_title,
-                    "author": "",
-                    "version_code": default_code
-                })
+                bibles.append(enrich_item(b.replace("_", " "), {}))
+
         return bibles
+
+    def get_bible_registry(self) -> Dict[str, Any]:
+        """Retourne le référentiel complet de classification des Bibles (Bibliorama)."""
+        return load_bibles_registry()
+
+    def get_comparative_suggestion(self, current_bible_name: str) -> Optional[Dict[str, Any]]:
+        """Calcule automatiquement la meilleure version complémentaire installée pour la comparaison en double colonne."""
+        installed = self.get_installed_bibles()
+        if not installed or len(installed) < 2:
+            return None
+        
+        reg = load_bibles_registry()
+        current_entry = find_bible_registry_entry(current_bible_name, reg)
+        current_famille = current_entry.get("famille", "") if current_entry else ""
+        suggestions_codes = current_entry.get("comparaisons_suggerees", []) if current_entry else []
+        
+        installed_codes_map = {b.get("version_code", "").upper(): b for b in installed}
+        
+        # 1. Vérifier si l'une des versions explicitement suggérées est installée
+        for code in suggestions_codes:
+            code_up = code.upper()
+            if code_up in installed_codes_map and installed_codes_map[code_up]["name"] != current_bible_name:
+                return installed_codes_map[code_up]
+        
+        # 2. Sinon, trouver la première version installée d'une famille théologique différente
+        for b in installed:
+            if b["name"] != current_bible_name:
+                b_fam = b.get("famille", "")
+                if b_fam and b_fam != current_famille:
+                    return b
+        
+        # 3. Fallback sur n'importe quelle autre version installée
+        for b in installed:
+            if b["name"] != current_bible_name:
+                return b
+                
+        return None
 
     def get_books_list(self) -> List[Dict[str, Any]]:
         """Retourne la liste complète des livres bibliques."""

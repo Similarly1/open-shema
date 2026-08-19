@@ -378,6 +378,9 @@
             <div class="pane-header">
               <div class="pane-breadcrumb" id="pane-2-breadcrumb">GENÈSE &gt; Chapitre 1</div>
               <div class="pane-actions">
+                <button class="pane-suggest-btn hidden" id="pane-2-quick-suggest" title="Cliquer pour appliquer la version suggérée pour comparaison">
+                  <span class="suggest-sparkle">⚡</span> <span id="pane-2-suggest-label">Comparer avec BDJ</span>
+                </button>
                 <button class="pane-action-btn" id="pane-2-select-bible" title="Changer de version biblique">
                   <span id="pane-2-bible-name">Segond 21</span> ▾
                 </button>
@@ -2718,12 +2721,37 @@
       </div>
     </div>
 
-    <!-- POPOVER SÉLECTEUR DE VERSION BIBLIQUE -->
+    <!-- POPOVER SÉLECTEUR DE VERSION BIBLIQUE AVEC TYPOLOGIE BIBLIORAMA -->
     <div class="bible-version-picker-popover hidden" id="bible-version-picker-popover">
       <div class="version-picker-header">
-        <span>Choisir une version biblique</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-weight: 700; color: var(--text-primary);">Choisir une version</span>
+          <span class="version-picker-pane-indicator" id="version-picker-pane-indicator">Colonne 1</span>
+        </div>
         <button class="popover-close-btn" id="btn-close-bible-picker">✕</button>
       </div>
+
+      <div class="version-picker-search-container">
+        <svg class="version-search-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="bible-picker-search" class="version-search-input" placeholder="Rechercher par nom, sigle ou famille (ex: Segond, Catholique)...">
+      </div>
+
+      <!-- Filtres des 8 familles Bibliorama -->
+      <div class="version-picker-families-bar" id="version-picker-families-bar">
+        <button type="button" class="fam-filter-pill active" data-fam="all">Toutes</button>
+        <button type="button" class="fam-filter-pill" data-fam="Famille Segond">Famille Segond</button>
+        <button type="button" class="fam-filter-pill" data-fam="Évangélique">Évangélique</button>
+        <button type="button" class="fam-filter-pill" data-fam="Protestante">Protestante</button>
+        <button type="button" class="fam-filter-pill" data-fam="Œcuménique ou Interconfessionnelle">Œcuménique</button>
+        <button type="button" class="fam-filter-pill" data-fam="Catholique">Catholique</button>
+        <button type="button" class="fam-filter-pill" data-fam="Juive">Juive</button>
+        <button type="button" class="fam-filter-pill" data-fam="Libérale">Libérale</button>
+        <button type="button" class="fam-filter-pill" data-fam="Tendancieuse">Tendancieuse</button>
+      </div>
+
       <div class="version-list-items" id="version-list-items"></div>
     </div>
 
