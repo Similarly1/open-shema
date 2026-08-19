@@ -1095,19 +1095,54 @@ class BibleAppApi:
         return {"success": True}
 
     def maximize_window(self):
-        global _GLOBAL_WINDOW
-        if _GLOBAL_WINDOW:
-            try:
-                is_max = getattr(_GLOBAL_WINDOW, '_is_custom_maximized', True)
-                if is_max:
-                    _GLOBAL_WINDOW.restore()
-                    _GLOBAL_WINDOW._is_custom_maximized = False
-                else:
-                    _GLOBAL_WINDOW.maximize()
-                    _GLOBAL_WINDOW._is_custom_maximized = True
-            except Exception as e:
-                logger.warning(f"Erreur maximize: {e}")
-        return {"success": True}
+        global _GLOBAL_WINDOW, _IS_MAXIMIZED, _RESTORE_BOUNDS
+        if not _GLOBAL_WINDOW:
+            return {"success": False}
+
+        hwnd = None
+        try:
+            if hasattr(_GLOBAL_WINDOW, 'native') and _GLOBAL_WINDOW.native:
+                hwnd = _GLOBAL_WINDOW.native.Handle.ToInt32()
+        except Exception:
+            pass
+
+        if _IS_MAXIMIZED:
+            # Restaurer à la taille fenêtrée
+            _IS_MAXIMIZED = False
+            rx, ry, rw, rh = _RESTORE_BOUNDS
+            if hwnd:
+                user32.SetWindowPos(hwnd, 0, rx, ry, rw, rh, 0x0040)
+            else:
+                try:
+                    _GLOBAL_WINDOW.move(rx, ry)
+                    _GLOBAL_WINDOW.resize(rw, rh)
+                except Exception:
+                    pass
+        else:
+            # Sauvegarder les dimensions actuelles avant agrandissement
+            if hwnd:
+                try:
+                    curr_rect = RECT()
+                    user32.GetWindowRect(hwnd, ctypes.byref(curr_rect))
+                    w = curr_rect.right - curr_rect.left
+                    h = curr_rect.bottom - curr_rect.top
+                    if w > 600 and h > 400:
+                        _RESTORE_BOUNDS = (curr_rect.left, curr_rect.top, w, h)
+                except Exception:
+                    pass
+
+            # Agrandir pour occuper tout l'espace de travail (barre des tâches visible)
+            wx, wy, ww, wh = get_work_area()
+            _IS_MAXIMIZED = True
+            if hwnd:
+                user32.SetWindowPos(hwnd, 0, wx, wy, ww, wh, 0x0040)
+            else:
+                try:
+                    _GLOBAL_WINDOW.move(wx, wy)
+                    _GLOBAL_WINDOW.resize(ww, wh)
+                except Exception:
+                    pass
+        return {"success": True, "is_maximized": _IS_MAXIMIZED}
 
     def toggle_fullscreen(self):
         global _GLOBAL_WINDOW
@@ -1128,25 +1163,67 @@ class BibleAppApi:
         return {"success": True}
 
 
+# Helpers Win32 pour gestion fluide de l'espace de travail (WorkArea) sans bordure
+import ctypes
+from ctypes import wintypes
+
+user32 = ctypes.windll.user32
+
+class RECT(ctypes.Structure):
+    _fields_ = [
+        ('left', wintypes.LONG),
+        ('top', wintypes.LONG),
+        ('right', wintypes.LONG),
+        ('bottom', wintypes.LONG)
+    ]
+
+def get_work_area():
+    try:
+        rect = RECT()
+        user32.SystemParametersInfoW(0x0030, 0, ctypes.byref(rect), 0)
+        w = rect.right - rect.left
+        h = rect.bottom - rect.top
+        return rect.left, rect.top, (w if w > 600 else 1440), (h if h > 400 else 850)
+    except Exception:
+        return 0, 0, 1440, 850
+
+_IS_MAXIMIZED = True
+_RESTORE_BOUNDS = (80, 50, 1280, 800)
+
+
+def on_window_shown(*args, **kwargs):
+    global _GLOBAL_WINDOW, _IS_MAXIMIZED
+    try:
+        if hasattr(_GLOBAL_WINDOW, 'native') and _GLOBAL_WINDOW.native:
+            hwnd = _GLOBAL_WINDOW.native.Handle.ToInt32()
+            wx, wy, ww, wh = get_work_area()
+            user32.SetWindowPos(hwnd, 0, wx, wy, ww, wh, 0x0040)
+            _IS_MAXIMIZED = True
+    except Exception as e:
+        logger.warning(f"Erreur initialisation agrandissement: {e}")
+
+
 def main():
     global _GLOBAL_WINDOW
     api = BibleAppApi()
     
     html_path = os.path.join(current_dir, "web", "index.html")
+    wx, wy, ww, wh = get_work_area()
     
     _GLOBAL_WINDOW = webview.create_window(
         title="Open Shema — Lecteur & Assistant d'Étude Biblique",
         url=html_path,
         js_api=api,
-        width=1440,
-        height=920,
+        x=wx,
+        y=wy,
+        width=ww,
+        height=wh,
         min_size=(1050, 680),
-        maximized=True,
         frameless=True,
         easy_drag=True,
         background_color="#0F172A"
     )
-    _GLOBAL_WINDOW._is_custom_maximized = True
+    _GLOBAL_WINDOW.events.shown += on_window_shown
     
     # Lancement avec Edge WebView2
     webview.start(debug=False)

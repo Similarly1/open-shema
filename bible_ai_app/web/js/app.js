@@ -78,6 +78,9 @@ const App = {
     // 4. Chat Assistant IA
     this.bindChat();
 
+    // 5. Raccourcis clavier globaux
+    this.bindKeyboardShortcuts();
+
     // 5b. Contrôles de Fenêtre Personnalisés (Barre sans bordure Windows)
     document.getElementById('win-btn-min')?.addEventListener('click', (e) => {
       e.stopPropagation();
