@@ -59,10 +59,12 @@
     <!-- ======================================================= -->
     <!-- 1. SIDEBAR NAVIGATION GAUCHE (Style Logos)               -->
     <!-- ======================================================= -->
+    <!-- 1. SIDEBAR NAVIGATION GAUCHE (Style Moderne & Pliable)  -->
+    <!-- ======================================================= -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-top">
         <button class="sidebar-icon-btn logo-btn" id="btn-quick-passage" title="Passage rapide">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
           </svg>
         </button>
@@ -70,50 +72,105 @@
         <div class="quick-passage-box">
           <input type="text" id="quick-passage-input" placeholder="Passage ou sujet..." autocomplete="off">
         </div>
+
+        <button class="sidebar-toggle-btn" id="btn-toggle-sidebar" title="Réduire / Déplier le menu">
+          <svg class="nav-svg toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+            <path d="M9 3v18"></path>
+          </svg>
+        </button>
       </div>
       
       <nav class="sidebar-menu">
-        <button class="nav-item active" data-view="bible" id="nav-bible">
-          <span class="nav-icon">✝️</span>
+        <button class="nav-item active" data-view="bible" id="nav-bible" title="Bible">
+          <span class="nav-icon">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+              <path d="M6 6h10"></path>
+              <path d="M6 10h10"></path>
+            </svg>
+          </span>
           <span class="nav-label">Bible</span>
         </button>
-        <button class="nav-item" data-view="library" id="nav-library">
-          <span class="nav-icon">📚</span>
+        <button class="nav-item" data-view="library" id="nav-library" title="Bibliothèque">
+          <span class="nav-icon">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m16 6 4 14"></path>
+              <path d="M12 6v14"></path>
+              <path d="M8 8v12"></path>
+              <path d="M4 4v16"></path>
+            </svg>
+          </span>
           <span class="nav-label">Bibliothèque</span>
         </button>
-        <button class="nav-item" data-view="search" id="nav-search">
-          <span class="nav-icon">🔍</span>
+        <button class="nav-item" data-view="search" id="nav-search" title="Rechercher">
+          <span class="nav-icon">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+            </svg>
+          </span>
           <span class="nav-label">Rechercher</span>
         </button>
-        <button class="nav-item" data-view="ai" id="nav-ai">
-          <span class="nav-icon">🤖</span>
+        <button class="nav-item" data-view="ai" id="nav-ai" title="Assistant d'Étude">
+          <span class="nav-icon">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
+            </svg>
+          </span>
           <span class="nav-label">Assistant d'Étude</span>
         </button>
-        <button class="nav-item" data-view="notes" id="nav-notes">
-          <span class="nav-icon">📝</span>
+        <button class="nav-item" data-view="notes" id="nav-notes" title="Notes">
+          <span class="nav-icon">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+              <path d="m15 5 4 4"></path>
+            </svg>
+          </span>
           <span class="nav-label">Notes</span>
         </button>
         
         <div class="sidebar-section-divider"></div>
         <div class="sidebar-section-title">Accès rapides</div>
         
-        <button class="nav-item sub-item" id="quick-commentary">
-          <span class="nav-icon">💬</span>
+        <button class="nav-item sub-item" id="quick-commentary" title="Commentaires exégétiques">
+          <span class="nav-icon">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </span>
           <span class="nav-label">Commentaires</span>
         </button>
-        <button class="nav-item sub-item" id="quick-compare">
-          <span class="nav-icon">⇄</span>
+        <button class="nav-item sub-item" id="quick-compare" title="Comparer des Bibles">
+          <span class="nav-icon">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 3 4 7l4 4"></path>
+              <path d="M4 7h16"></path>
+              <path d="m16 21 4-4-4-4"></path>
+              <path d="M20 17H4"></path>
+            </svg>
+          </span>
           <span class="nav-label">Comparer des Bibles</span>
         </button>
-        <button class="nav-item sub-item" id="quick-dict">
-          <span class="nav-icon">🔤</span>
+        <button class="nav-item sub-item" id="quick-dict" title="Dictionnaire biblique">
+          <span class="nav-icon">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+            </svg>
+          </span>
           <span class="nav-label">Dictionnaire biblique</span>
         </button>
       </nav>
       
       <div class="sidebar-footer">
-        <button class="nav-item sub-item" data-view="settings" id="nav-settings">
-          <span class="nav-icon">⚙️</span>
+        <button class="nav-item sub-item" data-view="settings" id="nav-settings" title="Paramètres">
+          <span class="nav-icon">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </span>
           <span class="nav-label">Paramètres</span>
         </button>
       </div>
@@ -969,11 +1026,35 @@
     <!-- 3. PANNEAU LATÉRAL DROIT (Commentaires & Assistant IA & Notes) -->
     <!-- ======================================================= -->
     <aside class="right-drawer collapsed" id="right-drawer">
+      <div class="drawer-resizer-handle" id="drawer-resizer" title="Glisser pour ajuster la largeur"></div>
       <div class="drawer-tabs">
-        <button class="drawer-tab active" data-drawer-tab="commentaries">💬 Commentaires</button>
-        <button class="drawer-tab" data-drawer-tab="ai">🤖 Assistant IA</button>
-        <button class="drawer-tab" data-drawer-tab="lexicon">📜 Lexique</button>
-        <button class="drawer-tab" data-drawer-tab="notes">📝 Notes</button>
+        <button class="drawer-tab active" data-drawer-tab="commentaries" title="Commentaires exégétiques">
+          <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span>Commentaires</span>
+        </button>
+        <button class="drawer-tab" data-drawer-tab="ai" title="Assistant IA">
+          <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
+          </svg>
+          <span>Assistant IA</span>
+        </button>
+        <button class="drawer-tab" data-drawer-tab="lexicon" title="Lexique & Dictionnaires">
+          <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+            <path d="M6 6h10"></path>
+            <path d="M6 10h10"></path>
+          </svg>
+          <span>Lexique</span>
+        </button>
+        <button class="drawer-tab" data-drawer-tab="notes" title="Notes d'étude">
+          <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+            <path d="m15 5 4 4"></path>
+          </svg>
+          <span>Notes</span>
+        </button>
         <button class="drawer-close-btn" id="btn-collapse-drawer" title="Replier le volet d'étude">✕</button>
       </div>
 

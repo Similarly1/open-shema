@@ -30,7 +30,10 @@ const App = {
       }
     });
 
-    // 2. Navigation latérale (Changement de vue)
+    // 2. Initialiser la gestion de la barre latérale pliable et du volet droit redimensionnable
+    this.initSidebarAndDrawerLayout();
+
+    // 2b. Navigation latérale (Changement de vue)
     document.querySelectorAll('.sidebar-menu .nav-item, .sidebar-footer .nav-item').forEach(btn => {
       btn.addEventListener('click', () => {
         const viewId = btn.dataset.view;
@@ -48,6 +51,8 @@ const App = {
       this.switchView('bible');
       const drawer = document.getElementById('right-drawer');
       drawer.classList.remove('collapsed');
+      document.getElementById('btn-toggle-right-drawer')?.classList.add('active');
+      this.checkAutoSidebarCollapse();
       document.querySelector('.drawer-tab[data-drawer-tab="commentaries"]')?.click();
     });
 
@@ -425,6 +430,152 @@ const App = {
         sendChatMessage();
       }
     });
+  },
+
+  sidebarAutoCollapsed: false,
+
+  initSidebarAndDrawerLayout() {
+    const sidebar = document.getElementById('sidebar');
+    const btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
+    const drawer = document.getElementById('right-drawer');
+    const resizer = document.getElementById('drawer-resizer');
+
+    // 1. Restaurer la largeur personnalisée du volet droit
+    try {
+      const savedDrawerWidth = localStorage.getItem('bible_drawer_width');
+      if (savedDrawerWidth) {
+        const widthVal = parseInt(savedDrawerWidth, 10);
+        if (widthVal >= 280 && widthVal <= 1000) {
+          document.documentElement.style.setProperty('--drawer-width', `${widthVal}px`);
+        }
+      }
+    } catch (e) {}
+
+    // 2. Restaurer l'état plié/déplié de la barre latérale gauche
+    try {
+      const savedSidebarState = localStorage.getItem('bible_sidebar_collapsed');
+      if (savedSidebarState === 'true') {
+        this.setSidebarCollapsed(true, false);
+      }
+    } catch (e) {}
+
+    // 3. Gestionnaire du bouton de bascule de la sidebar
+    btnToggleSidebar?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isCurrentlyCollapsed = sidebar?.classList.contains('collapsed');
+      this.setSidebarCollapsed(!isCurrentlyCollapsed, false);
+    });
+
+    // 4. Redimensionnement fluide par glisser-déposer du volet droit
+    if (resizer && drawer) {
+      let isDragging = false;
+      let startX = 0;
+      let startWidth = 420;
+
+      resizer.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        isDragging = true;
+        startX = e.clientX;
+        
+        const styleWidth = getComputedStyle(document.documentElement).getPropertyValue('--drawer-width').trim();
+        startWidth = parseInt(styleWidth, 10) || drawer.offsetWidth || 420;
+
+        drawer.classList.add('resizing');
+        resizer.classList.add('resizing');
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+
+        const onMouseMove = (moveEvent) => {
+          if (!isDragging) return;
+          const deltaX = startX - moveEvent.clientX;
+          let newWidth = startWidth + deltaX;
+
+          // Limiter la largeur entre 280px et (largeur écran - 320px)
+          const minWidth = 280;
+          const maxWidth = Math.max(minWidth, window.innerWidth - 320);
+          newWidth = Math.min(Math.max(minWidth, newWidth), maxWidth);
+
+          document.documentElement.style.setProperty('--drawer-width', `${newWidth}px`);
+
+          // Vérifier si le texte biblique a assez de place pour une lecture confortable
+          const sidebarWidth = sidebar && !sidebar.classList.contains('collapsed') ? 220 : 58;
+          const remainingReaderWidth = window.innerWidth - newWidth - sidebarWidth;
+
+          if (remainingReaderWidth < 540) {
+            // Réduire automatiquement le menu gauche pour préserver la lisibilité du texte biblique
+            this.setSidebarCollapsed(true, true);
+          } else if (remainingReaderWidth >= 660 && this.sidebarAutoCollapsed) {
+            // Rétablir le menu gauche s'il avait été réduit automatiquement
+            this.setSidebarCollapsed(false, true);
+          }
+        };
+
+        const onMouseUp = () => {
+          if (!isDragging) return;
+          isDragging = false;
+          drawer.classList.remove('resizing');
+          resizer.classList.remove('resizing');
+          document.body.style.cursor = '';
+          document.body.style.userSelect = '';
+
+          window.removeEventListener('mousemove', onMouseMove);
+          window.removeEventListener('mouseup', onMouseUp);
+
+          const finalWidth = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--drawer-width').trim(), 10);
+          if (finalWidth) {
+            try {
+              localStorage.setItem('bible_drawer_width', finalWidth);
+            } catch (e) {}
+          }
+        };
+
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+      });
+    }
+
+    // 5. Ajustement automatique lors du redimensionnement global de la fenêtre
+    window.addEventListener('resize', () => {
+      this.checkAutoSidebarCollapse();
+    });
+  },
+
+  setSidebarCollapsed(collapsed, isAuto = false) {
+    const sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+
+    sidebar.classList.toggle('collapsed', collapsed);
+    if (isAuto) {
+      this.sidebarAutoCollapsed = collapsed;
+    } else {
+      this.sidebarAutoCollapsed = false;
+      try {
+        localStorage.setItem('bible_sidebar_collapsed', collapsed ? 'true' : 'false');
+      } catch (e) {}
+    }
+  },
+
+  checkAutoSidebarCollapse() {
+    const drawer = document.getElementById('right-drawer');
+    const isDrawerOpen = drawer && !drawer.classList.contains('collapsed');
+    if (!isDrawerOpen) {
+      if (this.sidebarAutoCollapsed) {
+        this.setSidebarCollapsed(false, false);
+      }
+      return;
+    }
+
+    const drawerWidth = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--drawer-width').trim(), 10) || 420;
+    const sidebar = document.getElementById('sidebar');
+    const sidebarWidth = sidebar && !sidebar.classList.contains('collapsed') ? 220 : 58;
+    const remainingReaderWidth = window.innerWidth - drawerWidth - sidebarWidth;
+
+    if (remainingReaderWidth < 540) {
+      this.setSidebarCollapsed(true, true);
+    } else if (remainingReaderWidth >= 660 && this.sidebarAutoCollapsed) {
+      this.setSidebarCollapsed(false, true);
+    }
   },
 
   bindKeyboardShortcuts() {

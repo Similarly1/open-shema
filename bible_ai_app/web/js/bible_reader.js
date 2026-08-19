@@ -1067,6 +1067,8 @@ const ContextMenuManager = {
       this.hide();
       const drawer = document.getElementById('right-drawer');
       drawer.classList.remove('collapsed');
+      document.getElementById('btn-toggle-right-drawer')?.classList.add('active');
+      if (typeof App !== 'undefined' && App.checkAutoSidebarCollapse) App.checkAutoSidebarCollapse();
       document.querySelector('.drawer-tab[data-drawer-tab="commentaries"]')?.click();
       BibleReader.loadCommentariesForVerse(verseNum, bookCode, chapterNum);
     });
@@ -1087,6 +1089,8 @@ const ContextMenuManager = {
       this.hide();
       const drawer = document.getElementById('right-drawer');
       drawer?.classList.remove('collapsed');
+      document.getElementById('btn-toggle-right-drawer')?.classList.add('active');
+      if (typeof App !== 'undefined' && App.checkAutoSidebarCollapse) App.checkAutoSidebarCollapse();
       document.querySelector('.drawer-tab[data-drawer-tab="notes"]')?.click();
       DrawerNotesViewer.load(bookCode, chapterNum, verseNum);
       DrawerNotesViewer.openComposer(`Note sur ${refStr}`, '');
@@ -1120,6 +1124,8 @@ const LexiconViewer = {
 
     const drawer = document.getElementById('right-drawer');
     drawer.classList.remove('collapsed');
+    document.getElementById('btn-toggle-right-drawer')?.classList.add('active');
+    if (typeof App !== 'undefined' && App.checkAutoSidebarCollapse) App.checkAutoSidebarCollapse();
     document.querySelector('.drawer-tab[data-drawer-tab="lexicon"]')?.click();
 
     const container = document.getElementById('lexicon-details');
@@ -1543,9 +1549,11 @@ const BibleReader = {
       if (isNotesOpen) {
         drawer?.classList.add('collapsed');
         document.getElementById('btn-toggle-right-drawer')?.classList.remove('active');
+        if (typeof App !== 'undefined' && App.checkAutoSidebarCollapse) App.checkAutoSidebarCollapse();
       } else {
         drawer?.classList.remove('collapsed');
         document.getElementById('btn-toggle-right-drawer')?.classList.add('active');
+        if (typeof App !== 'undefined' && App.checkAutoSidebarCollapse) App.checkAutoSidebarCollapse();
         notesTab?.click();
         DrawerNotesViewer.load(this.currentBook, this.currentChapter, this.selectedVerse || 1);
       }
@@ -1606,6 +1614,7 @@ const BibleReader = {
       if (drawer) {
         drawer.classList.toggle('collapsed');
         document.getElementById('btn-toggle-right-drawer')?.classList.toggle('active', !drawer.classList.contains('collapsed'));
+        if (typeof App !== 'undefined' && App.checkAutoSidebarCollapse) App.checkAutoSidebarCollapse();
       }
     });
 
@@ -1613,6 +1622,7 @@ const BibleReader = {
       const drawer = document.getElementById('right-drawer');
       drawer?.classList.add('collapsed');
       document.getElementById('btn-toggle-right-drawer')?.classList.remove('active');
+      if (typeof App !== 'undefined' && App.checkAutoSidebarCollapse) App.checkAutoSidebarCollapse();
     });
 
     // Filtre de recherche dans le sélecteur de Bible
