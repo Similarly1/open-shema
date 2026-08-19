@@ -53,6 +53,35 @@ const SettingsView = {
     });
   },
 
+  DEFAULT_SYNTH_PROMPT: `Vous êtes un éminent professeur de théologie et un exégète biblique chevronné.
+Votre mission est de rédiger une SYNTHÈSE EXÉGÉTIQUE COMPARATIVE d'excellence à partir des extraits de commentaires fournis.
+
+RÈGLES CRITIQUES DE RÉDACTION :
+1. LANGUE : Rédigez TOUJOURS l'intégralité de la synthèse en FRANÇAIS impeccable, fluide et naturel, même si les commentaires ou sources fournis sont rédigés en anglais, en allemand ou dans une autre langue.
+2. MENTION DES AUTEURS DANS LE TEXTE : Citez les auteurs naturellement en GRAS dans vos phrases (ex: « selon **Jean Calvin** », « **Matthew Henry** souligne que... », « **Albert Barnes** et **Scofield** précisent... »). NE METTEZ JAMAIS DE CROCHETS autour des noms d'auteurs.
+3. CITATIONS DES SOURCES EN FIN D'AFFIRMATION : À la fin des points de doctrine ou des paragraphes de consensus, indiquez la ou les sources sous la forme \`{sources: NomAuteur1, NomAuteur2}\` (ex: \`{sources: Jean Calvin, Pulpit, Bible du sermon}\`).
+4. FIDÉLITÉ STRICTE AUX SOURCES FOURNIES (ZÉRO HALLUCINATION) :
+   - Basez votre analyse EXCLUSIVEMENT sur les extraits de commentaires fournis ci-dessous et sur le verset biblique affiché. N'inventez aucun commentaire, ne citez aucune source extérieure non fournie.
+   - Si une source de la liste est une note d'étude (ex: « Notes d'étude Segond 21 » ou « Commentaire de la Bible d'étude de Genève »), citez-la expressément comme une note exégétique/d'étude et ne la confondez pas avec le texte biblique principal.
+   - Ne comparez pas d'autres versions ou traductions bibliques non fournies : concentrez-vous à 100% sur l'exégèse comparative des commentaires théologiques fournis.
+5. STRUCTURE IMPÉRATIVE (Markdown) :
+   - ## 📌 1. Consensus Exégétique & Thèmes Communs (Ce sur quoi les exégètes s'accordent, doctrine principale, sens direct du texte)
+   - ## 🔍 2. Nuances, Divergences & Perspectives Particulières (Comparaison des points de vue, différences d'accentuation : typologie, dispensation, réformée, historique, analyse des mots originaux hébreux/grecs)
+   - ## 💡 3. Clés Textuelles & Applications Pastorales (Enseignements théologiques majeurs, implications pratiques et spirituelles pour la vie chrétienne)
+   - ## 📚 4. Synthèse des Sources Étudiées (Liste avec chaque auteur en gras suivi de deux-points et de son apport unique, ex: \`* **Jean Calvin** : Démontre la création ex nihilo...\`)`,
+
+  DEFAULT_TRANS_PROMPT: `Vous êtes un traducteur exégétique et théologique de haute précision.
+Votre mission est de traduire fidèlement, intégralement et précisément le texte biblique, commentaire ou notice de dictionnaire fourni vers le français.
+
+RÈGLES STRICTES :
+1. FIDÉLITÉ ABSOLUE : Traduisez l'intégralité du texte sans rien omettre, sans résumer, et sans inventer ni ajouter d'informations non présentes dans le texte original.
+2. TERMINOLOGIE THÉOLOGIQUE : Respectez la terminologie biblique et théologique francophone établie.
+3. FORMAT : Conservez la mise en forme originale (paragraphes, puces, références bibliques, codes Strong, termes hébreux/grecs).
+4. NE JAMAIS dialoguer ni ajouter de préambule : Renvoyez UNIQUEMENT le texte traduit en français.`,
+
+  currentEditingPrompt: null,
+  activeModalTab: 'edit',
+
   bindActions() {
     const triggerThemeUpdate = () => {
       const theme = document.getElementById('cfg-theme')?.value || 'dark';
@@ -166,34 +195,74 @@ const SettingsView = {
       }
     });
 
-    document.getElementById('btn-reset-synth-prompt')?.addEventListener('click', () => {
-      const defaultSynthPrompt = `Vous êtes un éminent professeur de théologie et un exégète biblique chevronné.
-Votre mission est de rédiger une SYNTHÈSE EXÉGÉTIQUE COMPARATIVE d'excellence à partir des extraits de commentaires fournis.
+    // Boutons des cartes de prompts système
+    document.getElementById('btn-open-modal-synth-prompt')?.addEventListener('click', () => {
+      this.openPromptModal('synthesis');
+    });
 
-RÈGLES CRITIQUES DE RÉDACTION :
-1. LANGUE : Rédigez TOUJOURS l'intégralité de la synthèse en FRANÇAIS impeccable, fluide et naturel, même si les commentaires ou sources fournis sont rédigés en anglais, en allemand ou dans une autre langue.
-2. MENTION DES AUTEURS DANS LE TEXTE : Citez les auteurs naturellement en GRAS dans vos phrases (ex: « selon **Jean Calvin** », « **Matthew Henry** souligne que... », « **Albert Barnes** et **Scofield** précisent... »). NE METTEZ JAMAIS DE CROCHETS autour des noms d'auteurs.
-3. CITATIONS DES SOURCES EN FIN D'AFFIRMATION : À la fin des points de doctrine ou des paragraphes de consensus, indiquez la ou les sources sous la forme \`{sources: NomAuteur1, NomAuteur2}\` (ex: \`{sources: Jean Calvin, Pulpit, Bible du sermon}\`).
-4. STRUCTURE IMPÉRATIVE (Markdown) :
-   - ## 📌 1. Consensus Exégétique & Thèmes Communs (Ce sur quoi les exégètes s'accordent, doctrine principale, sens direct du texte)
-   - ## 🔍 2. Nuances, Divergences & Perspectives Particulières (Comparaison des points de vue, différences d'accentuation : typologie, dispensation, réformée, historique, analyse des mots originaux hébreux/grecs)
-   - ## 💡 3. Clés Textuelles & Applications Pastorales (Enseignements théologiques majeurs, implications pratiques et spirituelles pour la vie chrétienne)
-   - ## 📚 4. Synthèse des Sources Étudiées (Liste avec chaque auteur en gras suivi de deux-points et de son apport unique, ex: \`* **Jean Calvin** : Démontre la création ex nihilo...\`)`;
-      document.getElementById('cfg-synthesis-system-prompt').value = defaultSynthPrompt;
-      App.showToast('Prompt de synthèse rétabli par défaut');
+    document.getElementById('btn-open-modal-trans-prompt')?.addEventListener('click', () => {
+      this.openPromptModal('translation');
+    });
+
+    document.getElementById('btn-reset-synth-prompt')?.addEventListener('click', () => {
+      if (confirm('Voulez-vous rétablir le prompt de Synthèse Exégétique par défaut ?')) {
+        document.getElementById('cfg-synthesis-system-prompt').value = this.DEFAULT_SYNTH_PROMPT;
+        this.updateAllPromptStatusBadges();
+        this.save();
+        App.showToast('Prompt de synthèse rétabli par défaut');
+      }
     });
 
     document.getElementById('btn-reset-trans-prompt')?.addEventListener('click', () => {
-      const defaultTransPrompt = `Vous êtes un traducteur exégétique et théologique de haute précision.
-Votre mission est de traduire fidèlement, intégralement et précisément le texte biblique, commentaire ou notice de dictionnaire fourni vers le français.
+      if (confirm('Voulez-vous rétablir le prompt de Traduction par défaut ?')) {
+        document.getElementById('cfg-translation-system-prompt').value = this.DEFAULT_TRANS_PROMPT;
+        this.updateAllPromptStatusBadges();
+        this.save();
+        App.showToast('Prompt de traduction rétabli par défaut');
+      }
+    });
 
-RÈGLES STRICTES :
-1. FIDÉLITÉ ABSOLUE : Traduisez l'intégralité du texte sans rien omettre, sans résumer, et sans inventer ni ajouter d'informations non présentes dans le texte original.
-2. TERMINOLOGIE THÉOLOGIQUE : Respectez la terminologie biblique et théologique francophone établie.
-3. FORMAT : Conservez la mise en forme originale (paragraphes, puces, références bibliques, codes Strong, termes hébreux/grecs).
-4. NE JAMAIS dialoguer ni ajouter de préambule : Renvoyez UNIQUEMENT le texte traduit en français.`;
-      document.getElementById('cfg-translation-system-prompt').value = defaultTransPrompt;
-      App.showToast('Prompt de traduction rétabli par défaut');
+    // Modale de Prompt Système
+    document.getElementById('btn-close-prompt-modal')?.addEventListener('click', () => {
+      this.closePromptModal();
+    });
+
+    document.getElementById('btn-modal-cancel-prompt')?.addEventListener('click', () => {
+      this.closePromptModal();
+    });
+
+    document.getElementById('tab-prompt-edit')?.addEventListener('click', () => {
+      this.switchPromptModalTab('edit');
+    });
+
+    document.getElementById('tab-prompt-preview')?.addEventListener('click', () => {
+      this.switchPromptModalTab('preview');
+    });
+
+    document.getElementById('modal-prompt-textarea')?.addEventListener('input', () => {
+      this.updatePromptModalStats();
+      if (this.activeModalTab === 'preview') {
+        this.renderPromptPreview();
+      }
+    });
+
+    document.getElementById('btn-modal-reset-default')?.addEventListener('click', () => {
+      this.resetPromptInModal();
+    });
+
+    document.getElementById('btn-modal-copy-prompt')?.addEventListener('click', () => {
+      this.copyPromptInModal();
+    });
+
+    document.getElementById('btn-modal-save-prompt')?.addEventListener('click', () => {
+      this.savePromptFromModal();
+    });
+
+    // Fermeture modale au clic sur le fond
+    document.getElementById('modal-system-prompt')?.addEventListener('click', (e) => {
+      if (e.target.id === 'modal-system-prompt') {
+        this.closePromptModal();
+      }
     });
 
     document.getElementById('btn-save-settings-top').addEventListener('click', () => {
@@ -204,7 +273,13 @@ RÈGLES STRICTES :
     document.getElementById('btn-reindex-stepbible').addEventListener('click', async () => {
       const btn = document.getElementById('btn-reindex-stepbible');
       btn.disabled = true;
-      btn.textContent = '⏳ Indexation en cours...';
+      btn.innerHTML = `
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 14 14"></polyline>
+        </svg>
+        <span>Indexation en cours...</span>
+      `;
       try {
         const ok = await API.call('reindex_stepbible');
         if (ok) {
@@ -217,44 +292,51 @@ RÈGLES STRICTES :
         console.error(e);
       } finally {
         btn.disabled = false;
-        btn.textContent = '📥 Télécharger & Réindexer STEPBible';
+        btn.innerHTML = `
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" x2="12" y1="15" y2="3"></line>
+          </svg>
+          <span>Télécharger & Réindexer STEPBible</span>
+        `;
       }
     });
 
     // Export ZIP
     document.getElementById('btn-export-zip').addEventListener('click', async () => {
       const statusEl = document.getElementById('backup-status-text');
-      statusEl.textContent = '⏳ Compression de vos données en cours...';
+      statusEl.textContent = 'Compression de vos données en cours...';
       try {
         const res = await API.call('export_backup_zip');
         if (res && res.success) {
-          statusEl.textContent = `✅ Sauvegarde réussie (${res.size_mb} Mo) : ${res.path}`;
+          statusEl.textContent = `Sauvegarde réussie (${res.size_mb} Mo) : ${res.path}`;
           App.showToast('Sauvegarde complète exportée !');
         } else if (res && !res.cancelled) {
-          statusEl.textContent = `❌ Erreur : ${res.error}`;
+          statusEl.textContent = `Erreur : ${res.error}`;
         } else {
           statusEl.textContent = '';
         }
       } catch (e) {
-        statusEl.textContent = `❌ Erreur : ${e}`;
+        statusEl.textContent = `Erreur : ${e}`;
       }
     });
 
     // Import ZIP
     document.getElementById('btn-import-zip').addEventListener('click', async () => {
       const statusEl = document.getElementById('backup-status-text');
-      if (confirm("⚠️ Cette opération REMPLACERA vos données actuelles par celles du fichier ZIP.\n\nContinuer ?")) {
-        statusEl.textContent = '⏳ Restauration en cours...';
+      if (confirm("Cette opération REMPLACERA vos données actuelles par celles du fichier ZIP.\n\nContinuer ?")) {
+        statusEl.textContent = 'Restauration en cours...';
         try {
           const res = await API.call('import_backup_zip');
           if (res && res.success) {
-            statusEl.textContent = '✅ Données restaurées avec succès !';
+            statusEl.textContent = 'Données restaurées avec succès !';
             App.showToast('Restauration terminée !');
           } else if (res && !res.cancelled) {
-            statusEl.textContent = `❌ Erreur : ${res.error}`;
+            statusEl.textContent = `Erreur : ${res.error}`;
           }
         } catch (e) {
-          statusEl.textContent = `❌ Erreur : ${e}`;
+          statusEl.textContent = `Erreur : ${e}`;
         }
       }
     });
@@ -394,6 +476,7 @@ RÈGLES STRICTES :
     if (document.getElementById('cfg-translation-system-prompt')) {
       document.getElementById('cfg-translation-system-prompt').value = c.translation_system_prompt || '';
     }
+    this.updateAllPromptStatusBadges();
 
     if (c.gemini_api_key) document.getElementById('cfg-gemini-key').value = c.gemini_api_key;
     if (c.mistral_api_key) document.getElementById('cfg-mistral-key').value = c.mistral_api_key;
@@ -534,6 +617,7 @@ RÈGLES STRICTES :
     try {
       await API.call('save_settings', newCfg);
       this.config = newCfg;
+      this.updateAllPromptStatusBadges();
       App.applyTheme(newCfg.theme, newCfg.theme_palette, newCfg.reading_bg);
       App.applyFontFamily(newCfg.font_family);
       if (typeof NotesView !== 'undefined') {
@@ -547,5 +631,213 @@ RÈGLES STRICTES :
     } catch (e) {
       alert(`Erreur d'enregistrement : ${e}`);
     }
+  },
+
+  // =========================================================
+  // GESTIONNAIRE DE MODALE DE PROMPT SYSTÈME DÉDIÉE
+  // =========================================================
+  openPromptModal(type) {
+    this.currentEditingPrompt = type;
+    const isSynth = type === 'synthesis';
+    const titleEl = document.getElementById('system-prompt-modal-title');
+    const textarea = document.getElementById('modal-prompt-textarea');
+
+    if (titleEl) {
+      titleEl.textContent = isSynth 
+        ? 'System Prompt — Synthèse Exégétique IA' 
+        : 'System Prompt — Traduction Fidèle d\'Articles';
+    }
+
+    const currentVal = isSynth
+      ? (document.getElementById('cfg-synthesis-system-prompt')?.value || this.DEFAULT_SYNTH_PROMPT)
+      : (document.getElementById('cfg-translation-system-prompt')?.value || this.DEFAULT_TRANS_PROMPT);
+
+    if (textarea) {
+      textarea.value = currentVal;
+    }
+
+    this.switchPromptModalTab('edit');
+    this.updatePromptModalStats();
+
+    const modal = document.getElementById('modal-system-prompt');
+    if (modal) {
+      modal.classList.remove('hidden');
+      if (textarea) {
+        setTimeout(() => textarea.focus(), 100);
+      }
+    }
+  },
+
+  closePromptModal() {
+    const modal = document.getElementById('modal-system-prompt');
+    if (modal) {
+      modal.classList.add('hidden');
+    }
+    this.currentEditingPrompt = null;
+  },
+
+  switchPromptModalTab(tab) {
+    this.activeModalTab = tab;
+    const tabEdit = document.getElementById('tab-prompt-edit');
+    const tabPrev = document.getElementById('tab-prompt-preview');
+    const paneEdit = document.getElementById('prompt-editor-pane');
+    const panePrev = document.getElementById('prompt-preview-pane');
+
+    if (tab === 'edit') {
+      tabEdit?.classList.add('active');
+      tabPrev?.classList.remove('active');
+      paneEdit?.classList.remove('hidden');
+      panePrev?.classList.add('hidden');
+    } else {
+      tabPrev?.classList.add('active');
+      tabEdit?.classList.remove('active');
+      panePrev?.classList.remove('hidden');
+      paneEdit?.classList.add('hidden');
+      this.renderPromptPreview();
+    }
+  },
+
+  updatePromptModalStats() {
+    const val = document.getElementById('modal-prompt-textarea')?.value || '';
+    const charCount = val.length;
+    const lineCount = val ? val.split('\n').length : 0;
+
+    const charEl = document.getElementById('prompt-char-count');
+    const lineEl = document.getElementById('prompt-line-count');
+    const badgeEl = document.getElementById('modal-prompt-status-badge');
+
+    if (charEl) charEl.textContent = `${charCount.toLocaleString()} caractères`;
+    if (lineEl) lineEl.textContent = `${lineCount.toLocaleString()} lignes`;
+
+    if (badgeEl && this.currentEditingPrompt) {
+      const def = this.currentEditingPrompt === 'synthesis' ? this.DEFAULT_SYNTH_PROMPT : this.DEFAULT_TRANS_PROMPT;
+      const isDef = val.trim() === def.trim();
+      badgeEl.textContent = isDef ? 'Par défaut' : 'Personnalisé';
+      badgeEl.className = `prompt-status-badge ${isDef ? 'is-default' : 'is-custom'}`;
+    }
+  },
+
+  renderPromptPreview() {
+    const val = document.getElementById('modal-prompt-textarea')?.value || '';
+    const container = document.getElementById('modal-prompt-rendered');
+    if (container) {
+      container.innerHTML = this.renderPromptMarkdown(val);
+    }
+  },
+
+  async savePromptFromModal() {
+    if (!this.currentEditingPrompt) return;
+    const val = document.getElementById('modal-prompt-textarea')?.value || '';
+    const isSynth = this.currentEditingPrompt === 'synthesis';
+    const targetFieldId = isSynth ? 'cfg-synthesis-system-prompt' : 'cfg-translation-system-prompt';
+    const field = document.getElementById(targetFieldId);
+    if (field) {
+      field.value = val;
+    }
+
+    this.closePromptModal();
+    this.updateAllPromptStatusBadges();
+    await this.save();
+    App.showToast('Prompt système appliqué et enregistré !');
+  },
+
+  resetPromptInModal() {
+    if (!this.currentEditingPrompt) return;
+    const isSynth = this.currentEditingPrompt === 'synthesis';
+    const def = isSynth ? this.DEFAULT_SYNTH_PROMPT : this.DEFAULT_TRANS_PROMPT;
+    if (confirm(`Voulez-vous rétablir le prompt de ${isSynth ? 'Synthèse' : 'Traduction'} par défaut ?`)) {
+      const textarea = document.getElementById('modal-prompt-textarea');
+      if (textarea) {
+        textarea.value = def;
+        this.updatePromptModalStats();
+        if (this.activeModalTab === 'preview') {
+          this.renderPromptPreview();
+        }
+      }
+      App.showToast('Prompt réinitialisé au texte par défaut');
+    }
+  },
+
+  async copyPromptInModal() {
+    const val = document.getElementById('modal-prompt-textarea')?.value || '';
+    try {
+      await navigator.clipboard.writeText(val);
+      App.showToast('Prompt copié dans le presse-papiers !');
+    } catch (e) {
+      App.showToast('Erreur lors de la copie');
+    }
+  },
+
+  updateAllPromptStatusBadges() {
+    const synthVal = (document.getElementById('cfg-synthesis-system-prompt')?.value || '').trim();
+    const synthDefault = this.DEFAULT_SYNTH_PROMPT.trim();
+    const badgeSynth = document.getElementById('badge-synth-status');
+    if (badgeSynth) {
+      const isDef = !synthVal || synthVal === synthDefault;
+      badgeSynth.textContent = isDef ? 'Par défaut' : 'Personnalisé';
+      badgeSynth.className = `prompt-status-badge ${isDef ? 'is-default' : 'is-custom'}`;
+    }
+
+    const transVal = (document.getElementById('cfg-translation-system-prompt')?.value || '').trim();
+    const transDefault = this.DEFAULT_TRANS_PROMPT.trim();
+    const badgeTrans = document.getElementById('badge-trans-status');
+    if (badgeTrans) {
+      const isDef = !transVal || transVal === transDefault;
+      badgeTrans.textContent = isDef ? 'Par défaut' : 'Personnalisé';
+      badgeTrans.className = `prompt-status-badge ${isDef ? 'is-default' : 'is-custom'}`;
+    }
+  },
+
+  renderPromptMarkdown(text) {
+    if (!text || !text.trim()) {
+      return '<p style="color: var(--text-muted); font-style: italic;">Prompt vide.</p>';
+    }
+
+    let md = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    // 1. Blocs de code
+    md = md.replace(/```([\s\S]*?)```/g, (match, p1) => {
+      return `<pre><code>${p1.trim()}</code></pre>\n\n`;
+    });
+
+    // 2. Titres
+    md = md.replace(/^### (.*$)/gim, '<h3>$1</h3>\n');
+    md = md.replace(/^## (.*$)/gim, '<h2>$1</h2>\n');
+    md = md.replace(/^# (.*$)/gim, '<h1>$1</h1>\n');
+
+    // 3. Citations
+    md = md.replace(/^\&gt; (.*$)/gim, '<blockquote>$1</blockquote>\n');
+
+    // 4. Listes à puces & numérotées
+    md = md.replace(/^[\-\*] (.*$)/gim, '<ul><li>$1</li></ul>');
+    md = md.replace(/^\d+\. (.*$)/gim, '<ol><li>$1</li></ol>');
+    md = md.replace(/<\/ul>\s*<ul>/g, '').replace(/<\/ol>\s*<ol>/g, '');
+
+    // 5. Ligne horizontale
+    md = md.replace(/^---$/gim, '<hr>\n');
+
+    // 6. Formatage en ligne
+    md = md
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>');
+
+    // 7. Paragraphes
+    const blocks = md.split(/\n\s*\n/);
+    const htmlBlocks = blocks.map(block => {
+      const b = block.trim();
+      if (!b) return '';
+      if (b.startsWith('<h1') || b.startsWith('<h2') || b.startsWith('<h3') || 
+          b.startsWith('<pre') || b.startsWith('<blockquote') || 
+          b.startsWith('<ul') || b.startsWith('<ol') || b.startsWith('<hr')) {
+        return b;
+      }
+      return `<p>${b.replace(/\n/g, '<br>')}</p>`;
+    });
+
+    return htmlBlocks.filter(Boolean).join('\n') || '<p><br></p>';
   }
 };

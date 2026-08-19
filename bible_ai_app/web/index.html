@@ -386,18 +386,78 @@
             <h1 class="view-title">PARAMÈTRES</h1>
             <p class="view-subtitle">Personnalisez l'affichage, les modèles d'IA, STEPBible et vos données.</p>
           </div>
-          <button class="btn-primary" id="btn-save-settings-top">💾 Enregistrer</button>
+          <button class="btn-primary" id="btn-save-settings-top">
+            <svg class="btn-svg-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <polyline points="17 21 17 13 7 13 7 21"></polyline>
+              <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+            <span>Enregistrer</span>
+          </button>
         </header>
 
         <!-- Sous-onglets de réglages -->
         <div class="settings-nav-tabs">
-          <button class="settings-tab active" data-sec="apparence">🎨 Apparence</button>
-          <button class="settings-tab" data-sec="lecture">📖 Options de Lecture</button>
-          <button class="settings-tab" data-sec="notes">📝 Notes & Dossier</button>
-          <button class="settings-tab" data-sec="stepbible">📜 STEPBible (Grec/Hébreu)</button>
-          <button class="settings-tab" data-sec="dict">📚 Dictionnaires</button>
-          <button class="settings-tab" data-sec="ai">🤖 Assistant IA & Clés</button>
-          <button class="settings-tab" data-sec="backup">💾 Sauvegarde ZIP</button>
+          <button class="settings-tab active" data-sec="apparence">
+            <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"></circle>
+              <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"></circle>
+              <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"></circle>
+              <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"></circle>
+              <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.563-2.512 5.563-5.563C22 6.5 17.5 2 12 2Z"></path>
+            </svg>
+            <span>Apparence</span>
+          </button>
+          <button class="settings-tab" data-sec="lecture">
+            <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+            </svg>
+            <span>Options de Lecture</span>
+          </button>
+          <button class="settings-tab" data-sec="notes">
+            <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>Notes & Dossier</span>
+          </button>
+          <button class="settings-tab" data-sec="stepbible">
+            <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m5 8 6 6"></path>
+              <path d="m4 14 6-6 2-3"></path>
+              <path d="M2 5h12"></path>
+              <path d="M7 2h1"></path>
+              <path d="m22 22-5-10-5 10"></path>
+              <path d="M14 18h6"></path>
+            </svg>
+            <span>STEPBible (Grec/Hébreu)</span>
+          </button>
+          <button class="settings-tab" data-sec="dict">
+            <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+              <path d="M6 6h10"></path>
+              <path d="M6 10h10"></path>
+            </svg>
+            <span>Dictionnaires</span>
+          </button>
+          <button class="settings-tab" data-sec="ai">
+            <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
+            </svg>
+            <span>Assistant IA & Clés</span>
+          </button>
+          <button class="settings-tab" data-sec="backup">
+            <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="20" height="8" x="2" y="3" rx="2"></rect>
+              <path d="M4 11v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9"></path>
+              <path d="M10 15h4"></path>
+            </svg>
+            <span>Sauvegarde ZIP</span>
+          </button>
         </div>
 
         <div class="view-content settings-scroll-body">
@@ -412,13 +472,32 @@
                 <label style="font-weight: 600; margin-bottom: 8px; display: block;">Mode d'apparence de l'application :</label>
                 <div class="theme-mode-segmented" id="theme-mode-segmented">
                   <button type="button" class="theme-mode-pill active" data-theme="dark">
-                    <span>🌙 Sombre</span>
+                    <svg class="pill-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                    </svg>
+                    <span>Sombre</span>
                   </button>
                   <button type="button" class="theme-mode-pill" data-theme="light">
-                    <span>☀️ Clair</span>
+                    <svg class="pill-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="4"></circle>
+                      <path d="M12 2v2"></path>
+                      <path d="M12 20v2"></path>
+                      <path d="m4.93 4.93 1.41 1.41"></path>
+                      <path d="m17.66 17.66 1.41 1.41"></path>
+                      <path d="M2 12h2"></path>
+                      <path d="M20 12h2"></path>
+                      <path d="m6.34 17.66-1.41 1.41"></path>
+                      <path d="m19.07 4.93-1.41 1.41"></path>
+                    </svg>
+                    <span>Clair</span>
                   </button>
                   <button type="button" class="theme-mode-pill" data-theme="system">
-                    <span>💻 Système</span>
+                    <svg class="pill-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect width="20" height="14" x="2" y="3" rx="2"></rect>
+                      <line x1="8" x2="16" y1="21" y2="21"></line>
+                      <line x1="12" x2="12" y1="17" y2="21"></line>
+                    </svg>
+                    <span>Système</span>
                   </button>
                 </div>
                 <!-- Hidden inputs pour compatibilité et synchronisation -->
@@ -605,7 +684,14 @@
               </div>
 
               <div class="sub-card">
-                <div class="sub-card-title">🔬 Couches actives de l'Interlinéaire Inversé :</div>
+                <div class="sub-card-title" style="display: flex; align-items: center; gap: 6px;">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                    <polyline points="2 17 12 22 22 17"></polyline>
+                    <polyline points="2 12 12 17 22 12"></polyline>
+                  </svg>
+                  <span>Couches actives de l'Interlinéaire Inversé :</span>
+                </div>
                 <div class="grid-2">
                   <label class="custom-checkbox"><input type="checkbox" id="cfg-inter-surface" checked> <span>Texte de surface (Français)</span></label>
                   <label class="custom-checkbox"><input type="checkbox" id="cfg-inter-lemma" checked> <span>Lemme original (Hébreu/Grec)</span></label>
@@ -626,9 +712,27 @@
                 <label>Emplacement actuel du dossier de notes :</label>
                 <div style="display: flex; gap: 8px; align-items: center;">
                   <input type="text" id="cfg-notes-dir" class="text-field" style="flex: 1;" placeholder="Dossier par défaut (data/notes/)" readonly>
-                  <button class="btn-primary" id="btn-browse-notes-dir" title="Choisir un dossier sur votre PC">📂 Parcourir...</button>
-                  <button class="btn-secondary" id="btn-open-notes-dir-cfg" title="Ouvrir dans l'explorateur de fichiers">📁 Ouvrir</button>
-                  <button class="btn-secondary" id="btn-reset-notes-dir" title="Revenir au dossier par défaut du programme">↺ Par défaut</button>
+                  <button class="btn-primary" id="btn-browse-notes-dir" title="Choisir un dossier sur votre PC">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
+                      <circle cx="12" cy="13" r="2"></circle>
+                      <path d="m14 15 2 2"></path>
+                    </svg>
+                    <span>Parcourir...</span>
+                  </button>
+                  <button class="btn-secondary" id="btn-open-notes-dir-cfg" title="Ouvrir dans l'explorateur de fichiers">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
+                    </svg>
+                    <span>Ouvrir</span>
+                  </button>
+                  <button class="btn-secondary" id="btn-reset-notes-dir" title="Revenir au dossier par défaut du programme">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                      <path d="M3 3v5h5"></path>
+                    </svg>
+                    <span>Par défaut</span>
+                  </button>
                 </div>
               </div>
 
@@ -663,7 +767,14 @@
                 <span id="stepbible-status-text">Vérification de la base STEPBible...</span>
               </div>
 
-              <button class="btn-secondary" id="btn-reindex-stepbible">📥 Télécharger & Réindexer STEPBible</button>
+              <button class="btn-secondary" id="btn-reindex-stepbible">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" x2="12" y1="15" y2="3"></line>
+                </svg>
+                <span>Télécharger & Réindexer STEPBible</span>
+              </button>
             </div>
           </div>
 
@@ -763,28 +874,81 @@
                 </div>
               </div>
 
-              <div class="form-divider" style="margin: 16px 0;"></div>
-              <div class="card-title">Prompts Système Personnalisés</div>
+              <div class="form-divider" style="margin: 20px 0 16px 0;"></div>
+              
+              <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-blue);">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                <span>Prompts Système Personnalisés</span>
+              </div>
+              <p class="card-desc">Consultez et personnalisez confortablement les instructions fondamentales envoyées aux modèles d'IA.</p>
 
-              <div class="form-group" style="margin-top: 10px;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-                  <label style="font-weight: 600;">System Prompt — Synthèse Exégétique IA :</label>
-                  <button type="button" class="btn-text-action" id="btn-reset-synth-prompt" style="font-size: 11px; color: var(--accent-blue); background: none; border: none; cursor: pointer; text-decoration: underline;">Rétablir par défaut</button>
+              <div class="prompts-settings-list">
+                <!-- Carte 1 : Synthèse Exégétique -->
+                <div class="prompt-setting-card" id="prompt-card-synthesis">
+                  <div class="prompt-card-main">
+                    <div class="prompt-card-header">
+                      <strong class="prompt-card-title">Synthèse Exégétique IA</strong>
+                      <span class="prompt-status-badge is-default" id="badge-synth-status">Par défaut</span>
+                    </div>
+                    <p class="prompt-card-desc">Consignes exégétiques, structure d'analyse en 4 parties, citations d'auteurs et rédaction en français.</p>
+                  </div>
+                  <div class="prompt-card-actions">
+                    <button type="button" class="btn-secondary btn-sm" id="btn-open-modal-synth-prompt">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                      </svg>
+                      <span>Consulter / Modifier</span>
+                    </button>
+                    <button type="button" class="btn-ghost btn-sm" id="btn-reset-synth-prompt" title="Rétablir le prompt d'origine">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                        <path d="M3 3v5h5"></path>
+                      </svg>
+                      <span>Rétablir</span>
+                    </button>
+                  </div>
+                  <!-- Champ caché synchronisé -->
+                  <textarea id="cfg-synthesis-system-prompt" style="display: none;"></textarea>
                 </div>
-                <textarea id="cfg-synthesis-system-prompt" class="text-field full-w" rows="6" style="font-family: var(--font-mono, monospace); font-size: 12px; line-height: 1.4; resize: vertical;"></textarea>
-                <p class="field-hint" style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">Définit les consignes exégétiques, la structure d'analyse et l'obligation de rédaction en français.</p>
+
+                <!-- Carte 2 : Traduction Fidèle -->
+                <div class="prompt-setting-card" id="prompt-card-translation" style="margin-top: 12px;">
+                  <div class="prompt-card-main">
+                    <div class="prompt-card-header">
+                      <strong class="prompt-card-title">Traduction Fidèle d'Articles & Dictionnaires</strong>
+                      <span class="prompt-status-badge is-default" id="badge-trans-status">Par défaut</span>
+                    </div>
+                    <p class="prompt-card-desc">Fidélité stricte sans résumé ni invention, préservation des termes hébreux/grecs et formatage original.</p>
+                  </div>
+                  <div class="prompt-card-actions">
+                    <button type="button" class="btn-secondary btn-sm" id="btn-open-modal-trans-prompt">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                      </svg>
+                      <span>Consulter / Modifier</span>
+                    </button>
+                    <button type="button" class="btn-ghost btn-sm" id="btn-reset-trans-prompt" title="Rétablir le prompt d'origine">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                        <path d="M3 3v5h5"></path>
+                      </svg>
+                      <span>Rétablir</span>
+                    </button>
+                  </div>
+                  <!-- Champ caché synchronisé -->
+                  <textarea id="cfg-translation-system-prompt" style="display: none;"></textarea>
+                </div>
               </div>
 
-              <div class="form-group" style="margin-top: 14px;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-                  <label style="font-weight: 600;">System Prompt — Traduction Fidèle d'Articles :</label>
-                  <button type="button" class="btn-text-action" id="btn-reset-trans-prompt" style="font-size: 11px; color: var(--accent-blue); background: none; border: none; cursor: pointer; text-decoration: underline;">Rétablir par défaut</button>
-                </div>
-                <textarea id="cfg-translation-system-prompt" class="text-field full-w" rows="5" style="font-family: var(--font-mono, monospace); font-size: 12px; line-height: 1.4; resize: vertical;"></textarea>
-                <p class="field-hint" style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">Instructions de fidélité stricte sans résumé ni invention pour le bouton « Traduire ».</p>
-              </div>
-
-              <div class="form-divider"></div>
+              <div class="form-divider" style="margin: 20px 0 16px 0;"></div>
               <div class="card-title">Clés API</div>
 
               <div class="form-row two-cols">
@@ -818,8 +982,22 @@
               <p class="card-desc">L'archive ZIP inclut vos Bibles, commentaires, dictionnaires, vecteurs ChromaDB et paramètres.</p>
               
               <div class="actions-row">
-                <button class="btn-primary" id="btn-export-zip">📤 Exporter tout (ZIP)</button>
-                <button class="btn-secondary" id="btn-import-zip">📥 Restaurer depuis ZIP</button>
+                <button class="btn-primary" id="btn-export-zip">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" x2="12" y1="3" y2="15"></line>
+                  </svg>
+                  <span>Exporter tout (ZIP)</span>
+                </button>
+                <button class="btn-secondary" id="btn-import-zip">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" x2="12" y1="15" y2="3"></line>
+                  </svg>
+                  <span>Restaurer depuis ZIP</span>
+                </button>
               </div>
               <div class="backup-status-text" id="backup-status-text"></div>
             </div>
@@ -1819,7 +1997,11 @@
       <div class="modal-card" style="max-width: 620px; width: 90%; z-index: 1001;">
         <div class="modal-header">
           <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 16px;">⚠️</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
             <span class="modal-title" id="error-modal-title">Détails de l'erreur</span>
           </div>
           <button class="modal-btn-close" id="btn-close-error-modal">✕</button>
@@ -1832,9 +2014,104 @@
         </div>
         <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--bg-subtle); border-top: 1px solid var(--border-color);">
           <button class="btn-outline" id="btn-copy-error" style="display: flex; align-items: center; gap: 6px;">
-            <span id="btn-copy-error-icon">📋</span> <span id="btn-copy-error-text">Copier l'erreur</span>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+            </svg>
+            <span id="btn-copy-error-text">Copier l'erreur</span>
           </button>
           <button class="btn-primary" id="btn-dismiss-error-modal">Fermer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- MODALE SPÉCIALE D'ÉDITION DES PROMPTS SYSTÈME IA       -->
+    <!-- ======================================================= -->
+    <div class="modal-dialog-container hidden" id="modal-system-prompt">
+      <div class="modal-card prompt-editor-modal-card">
+        <div class="modal-header">
+          <div class="modal-title-with-badge">
+            <svg class="modal-header-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <h2 class="modal-title" id="system-prompt-modal-title">System Prompt</h2>
+            <span class="prompt-status-badge is-default" id="modal-prompt-status-badge">Par défaut</span>
+          </div>
+          <button class="modal-close-btn" id="btn-close-prompt-modal" title="Fermer la modale">✕</button>
+        </div>
+
+        <!-- Barre d'outils supérieure : Onglets & Statistiques -->
+        <div class="prompt-modal-toolbar">
+          <div class="prompt-modal-tabs">
+            <button type="button" class="prompt-tab-btn active" id="tab-prompt-edit">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+              </svg>
+              <span>Édition</span>
+            </button>
+            <button type="button" class="prompt-tab-btn" id="tab-prompt-preview">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <span>Aperçu de lecture</span>
+            </button>
+          </div>
+
+          <div class="prompt-modal-stats">
+            <span id="prompt-char-count">0 caractères</span>
+            <span class="stat-separator">•</span>
+            <span id="prompt-line-count">0 lignes</span>
+          </div>
+        </div>
+
+        <!-- Corps de la modale : Éditeur / Aperçu -->
+        <div class="prompt-modal-body">
+          <!-- Zone d'édition -->
+          <div class="prompt-editor-pane" id="prompt-editor-pane">
+            <textarea id="modal-prompt-textarea" class="prompt-monospace-textarea" placeholder="Saisissez les instructions système pour l'IA..." spellcheck="false"></textarea>
+          </div>
+          <!-- Zone d'aperçu formaté -->
+          <div class="prompt-preview-pane hidden" id="prompt-preview-pane">
+            <div class="prompt-rendered-markdown" id="modal-prompt-rendered"></div>
+          </div>
+        </div>
+
+        <!-- Pied de page : Actions -->
+        <div class="modal-footer prompt-modal-footer">
+          <div class="footer-left-actions">
+            <button type="button" class="btn-secondary btn-sm" id="btn-modal-reset-default">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <path d="M3 3v5h5"></path>
+              </svg>
+              <span>Rétablir par défaut</span>
+            </button>
+            <button type="button" class="btn-secondary btn-sm" id="btn-modal-copy-prompt">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+              </svg>
+              <span>Copier</span>
+            </button>
+          </div>
+          <div class="footer-right-actions">
+            <button type="button" class="btn-secondary" id="btn-modal-cancel-prompt">Annuler</button>
+            <button type="button" class="btn-primary" id="btn-modal-save-prompt">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+              </svg>
+              <span>Appliquer & Enregistrer</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
