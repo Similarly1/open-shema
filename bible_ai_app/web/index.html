@@ -150,15 +150,39 @@
                   <label class="custom-checkbox"><input type="checkbox" id="opt-verse-per-line"> <span>Un verset par ligne</span></label>
                 </div>
 
-                <div style="border-top: 1px solid var(--border-color); margin: 12px 0 8px 0; padding-top: 8px;">
-                  <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">
-                    Fond du Canevas de Lecture
+                <div style="border-top: 1px solid var(--border-color); margin: 12px 0 4px 0; padding-top: 10px;">
+                  <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
+                    Fond de Lecture
                   </div>
-                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 11px;">
-                    <button id="btn-quick-bg-auto" class="tool-btn" style="justify-content: center; cursor: pointer;">🎨 Harmonisé</button>
-                    <button id="btn-quick-bg-white" class="tool-btn" style="justify-content: center; background: #ffffff !important; color: #1e293b !important; border: 1px solid #cbd5e1; cursor: pointer;">⚪ Blanc</button>
-                    <button id="btn-quick-bg-sepia" class="tool-btn" style="justify-content: center; background: #fbf0d9 !important; color: #382e25 !important; border: 1px solid #d8c7ad; cursor: pointer;">📜 Sépia</button>
-                    <button id="btn-quick-bg-dark" class="tool-btn" style="justify-content: center; background: #070a0f !important; color: #f1f5f9 !important; border: 1px solid #334155; cursor: pointer;">🌑 Sombre</button>
+                  <div class="reading-bg-quick-row">
+                    <!-- 1. Auto / Harmonisé -->
+                    <button type="button" id="btn-quick-bg-auto" class="reading-bg-quick-swatch active" data-bg="auto" title="Harmonisé avec le thème (Auto)">
+                      <div class="quick-swatch-circle swatch-auto">
+                        <span class="quick-swatch-check">✓</span>
+                      </div>
+                      <span class="quick-swatch-label">Auto</span>
+                    </button>
+                    <!-- 2. Blanc Pur -->
+                    <button type="button" id="btn-quick-bg-white" class="reading-bg-quick-swatch" data-bg="white" title="Blanc pur">
+                      <div class="quick-swatch-circle swatch-white">
+                        <span class="quick-swatch-check">✓</span>
+                      </div>
+                      <span class="quick-swatch-label">Blanc</span>
+                    </button>
+                    <!-- 3. Sépia Doux -->
+                    <button type="button" id="btn-quick-bg-sepia" class="reading-bg-quick-swatch" data-bg="sepia" title="Sépia doux">
+                      <div class="quick-swatch-circle swatch-sepia">
+                        <span class="quick-swatch-check">✓</span>
+                      </div>
+                      <span class="quick-swatch-label">Sépia</span>
+                    </button>
+                    <!-- 4. Nuit Sombre -->
+                    <button type="button" id="btn-quick-bg-dark" class="reading-bg-quick-swatch" data-bg="dark" title="Très sombre / Nuit">
+                      <div class="quick-swatch-circle swatch-dark">
+                        <span class="quick-swatch-check">✓</span>
+                      </div>
+                      <span class="quick-swatch-label">Nuit</span>
+                    </button>
                   </div>
                 </div>
               </div>

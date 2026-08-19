@@ -262,15 +262,34 @@ const TabsManager = {
 
 // 3. OPTIONS D'AFFICHAGE
 const DisplayOptions = {
-  init() {
+  currentBg: 'auto',
+
+  async init() {
     const btn = document.getElementById('btn-display-options');
     const popover = document.getElementById('display-options-popover');
     const workspace = document.getElementById('reader-workspace');
 
     if (!btn || !popover) return;
 
-    btn.addEventListener('click', (e) => {
+    const updateActiveSwatch = (bgKey) => {
+      this.currentBg = bgKey || 'auto';
+      document.querySelectorAll('.reading-bg-quick-swatch').forEach(sw => {
+        sw.classList.toggle('active', sw.dataset.bg === this.currentBg);
+      });
+    };
+
+    // Synchronisation de l'état actif au démarrage
+    try {
+      const cfg = await API.getSettings() || {};
+      updateActiveSwatch(cfg.reading_bg || 'auto');
+    } catch (e) {}
+
+    btn.addEventListener('click', async (e) => {
       e.stopPropagation();
+      try {
+        const cfg = await API.getSettings() || {};
+        updateActiveSwatch(cfg.reading_bg || 'auto');
+      } catch (e) {}
       popover.classList.toggle('hidden');
     });
 
@@ -300,15 +319,19 @@ const DisplayOptions = {
       workspace?.classList.toggle('font-sans', !e.target.checked);
     });
 
-    // Boutons de changement instantané du fond de lecture
-    ['auto', 'white', 'sepia', 'dark'].forEach(bgKey => {
-      document.getElementById(`btn-quick-bg-${bgKey}`)?.addEventListener('click', async () => {
+    // Clic sur les 4 pastilles visuelles de fond de lecture
+    document.querySelectorAll('.reading-bg-quick-swatch').forEach(sw => {
+      sw.addEventListener('click', async () => {
+        const bgKey = sw.dataset.bg || 'auto';
+        updateActiveSwatch(bgKey);
+
         const cfg = await API.getSettings() || {};
         cfg.reading_bg = bgKey;
-        const selectEl = document.getElementById('cfg-reading-bg');
-        if (selectEl) selectEl.value = bgKey;
+        const bgHiddenInput = document.getElementById('cfg-reading-bg');
+        if (bgHiddenInput) bgHiddenInput.value = bgKey;
+
         App.applyTheme(cfg.theme, cfg.theme_palette, bgKey);
-        API.call('save_settings', cfg);
+        await API.call('save_settings', cfg);
         popover.classList.add('hidden');
       });
     });

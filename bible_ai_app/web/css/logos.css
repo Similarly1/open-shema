@@ -3392,6 +3392,106 @@ input:checked + .slider.round:before {
   display: none !important;
 }
 
+/* Barre de 4 pastilles de fond de lecture sans emoji */
+.reading-bg-quick-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.reading-bg-quick-swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 4px;
+  background: var(--bg-hover);
+  border: 2px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.reading-bg-quick-swatch:hover {
+  background: var(--bg-card);
+  border-color: var(--accent-blue);
+  transform: translateY(-1px);
+}
+
+.reading-bg-quick-swatch.active {
+  background: var(--bg-card);
+  border-color: var(--accent-blue);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.quick-swatch-circle {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.quick-swatch-circle.swatch-auto {
+  background: linear-gradient(135deg, #0B0F17 50%, #FFFFFF 50%);
+  border: 1.5px solid var(--border-color);
+}
+
+.quick-swatch-circle.swatch-white {
+  background: #FFFFFF;
+  border: 1.5px solid #CBD5E1;
+}
+
+.quick-swatch-circle.swatch-sepia {
+  background: #FBF0D9;
+  border: 1.5px solid #D8C7AD;
+}
+
+.quick-swatch-circle.swatch-dark {
+  background: #070A0F;
+  border: 1.5px solid #334155;
+}
+
+.quick-swatch-check {
+  font-size: 12px;
+  font-weight: 900;
+  display: none;
+}
+
+.reading-bg-quick-swatch.active .quick-swatch-check {
+  display: block;
+}
+
+.swatch-auto .quick-swatch-check {
+  color: #38BDF8;
+}
+.swatch-white .quick-swatch-check {
+  color: #0F172A;
+}
+.swatch-sepia .quick-swatch-check {
+  color: #78350F;
+}
+.swatch-dark .quick-swatch-check {
+  color: #38BDF8;
+}
+
+.quick-swatch-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: color 0.15s ease;
+}
+
+.reading-bg-quick-swatch.active .quick-swatch-label {
+  color: var(--accent-blue);
+  font-weight: 700;
+}
+
 .study-mode-popover {
   position: absolute;
   top: 42px;
