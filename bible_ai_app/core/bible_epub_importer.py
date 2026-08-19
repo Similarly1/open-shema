@@ -143,8 +143,12 @@ def resolve_book_name(identifier: str, title_text: str = '') -> str:
 
     return title_text.strip() if title_text.strip() else identifier
 
+CANONICAL_PREFIXES = r'^(?:Le\s+livre\s+(?:des?\s+|d’|d\')|L’Évangile\s+selon\s+(?:saint\s+)?|L\'Évangile\s+selon\s+(?:saint\s+)?|L’Épître\s+de\s+(?:saint\s+)?|L\'Épître\s+de\s+(?:saint\s+)?|L’Épître\s+aux?\s+|L\'Épître\s+aux?\s+|Épître\s+(?:de\s+|aux?\s+|à\s+)(?:saint\s+)?|Prophétie\s+(?:de\s+|d’|d\')|La\s+|Le\s+|Les\s+|L’|L\')'
+
 def clean_verse_text(text: str) -> str:
     text = text.replace('\xa0', ' ').replace('\u202f', ' ').replace('\u2009', ' ').replace('\u200a', ' ').replace('\ufeff', '')
+    # Remplacer les accolades de notes de traduction {Héb. ...} ou {Ou ...} par des parenthèses propres
+    text = re.sub(r'\{([^}]+)\}', r'(\1)', text)
     text = re.sub(r'([a-zà-öø-ÿ])([A-ZÀ-ÖØ-ß])', r'\1 \2', text)
     text = re.sub(r'([,;:\.!\?])([A-Za-zÀ-ÖØ-öø-ÿ0-9])', r'\1 \2', text)
     text = re.sub(r'([^\s])«', r'\1 «', text)
@@ -159,8 +163,85 @@ def clean_verse_text(text: str) -> str:
     return text.strip()
 
 
+ORDER_TO_STD = {
+    1: "Gen", 2: "Exo", 3: "Lev", 4: "Num", 5: "Deu",
+    6: "Jos", 7: "Jdg", 8: "Rut", 9: "1Sa", 10: "2Sa",
+    11: "1Ki", 12: "2Ki", 13: "1Ch", 14: "2Ch", 15: "Ezr",
+    16: "Neh", 17: "Est", 18: "Job", 19: "Psa", 20: "Pro",
+    21: "Ecc", 22: "Sol", 23: "Isa", 24: "Jer", 25: "Lam",
+    26: "Eze", 27: "Dan", 28: "Hos", 29: "Joe", 30: "Amo",
+    31: "Oba", 32: "Jon", 33: "Mic", 34: "Nah", 35: "Hab",
+    36: "Zep", 37: "Hag", 38: "Zec", 39: "Mal",
+    40: "Mat", 41: "Mar", 42: "Luk", 43: "Joh", 44: "Act",
+    45: "Rom", 46: "1Co", 47: "2Co", 48: "Gal", 49: "Eph",
+    50: "Phi", 51: "Col", 52: "1Th", 53: "2Th", 54: "1Ti",
+    55: "2Ti", 56: "Tit", 57: "Phm", 58: "Heb", 59: "Jam",
+    60: "1Pe", 61: "2Pe", 62: "1Jo", 63: "2Jo", 64: "3Jo",
+    65: "Jud", 66: "Rev"
+}
+
+
+def find_canonical_code(name: str) -> Optional[str]:
+    if not name:
+        return None
+    k = strip_accents(name).strip()
+    k = re.sub(r'\s+', ' ', k)
+    if k in BOOK_MAPPING:
+        return BOOK_MAPPING[k]
+    for sub in [k.replace('_', 'e'), k.replace('_', ' '), k.replace('_', '')]:
+        if sub in BOOK_MAPPING:
+            return BOOK_MAPPING[sub]
+    if k.isdigit() and int(k) in ORDER_TO_STD:
+        return ORDER_TO_STD[int(k)]
+    return None
+
+
 class BibleEpubImporter:
     """Importateur automatisé de fichiers EPUB bibliques."""
+
+    @classmethod
+    def resolve_book_and_chapter(cls, title: str, fname: str = '') -> Tuple[Optional[str], Optional[str], int]:
+        t = title.strip()
+        t = re.sub(r'<[^>]+>', ' ', t)
+        
+        chap_num = None
+        base = t
+        
+        # 1. Pattern '... Chapitre 12' ou '... Psaume 23'
+        m_ch = re.search(r'(?:Chapitre|Psaume|Psaumes|chap\.?|ps\.?)\s*(\d+)', t, re.I)
+        if m_ch and m_ch.start() > 0:
+            chap_num = int(m_ch.group(1))
+            base = t[:m_ch.start()].strip()
+        elif m_ch and m_ch.start() == 0 and m_ch.group(0).lower().startswith('ps'):
+            base = 'Psaumes'
+            chap_num = int(m_ch.group(1))
+        else:
+            # 2. Pattern '[Nom du livre] [Numéro]' ou '[Nom du livre]-[Numéro]'
+            m_num = re.search(r'^(.*?)[-\s]+(\d+)\s*$', t)
+            if m_num:
+                base = m_num.group(1).strip()
+                chap_num = int(m_num.group(2))
+        
+        clean_b = re.sub(CANONICAL_PREFIXES, '', base, flags=re.I).strip()
+        clean_b = re.sub(r'^Paul\s+(?:aux?|à)\s+', '', clean_b, flags=re.I).strip()
+        clean_b = re.sub(r'\s+fa[îi]te\s+[aà]\s+jean', '', clean_b, flags=re.I).strip()
+        clean_b = re.sub(r'\s+de\s+j[ée]r[ée]mie$', '', clean_b, flags=re.I).strip()
+        
+        code = find_canonical_code(clean_b) or find_canonical_code(base)
+        
+        if not code and fname:
+            f_base = os.path.splitext(os.path.basename(fname))[0]
+            m_f = re.match(r'^([A-Za-z0-9_]+)[-_](\d+)$', f_base)
+            if m_f:
+                code = find_canonical_code(m_f.group(1))
+                if not chap_num:
+                    chap_num = int(m_f.group(2))
+                    
+        if not chap_num:
+            chap_num = 1
+            
+        fr_name = get_french_book_name(code) if code else None
+        return fr_name, code, chap_num
 
     @classmethod
     def parse_bible_epub(cls, epub_path: str) -> Dict[str, Dict[str, Dict[str, str]]]:
@@ -280,67 +361,126 @@ class BibleEpubImporter:
         text_files.sort()
 
         bible: Dict[str, Dict[str, Dict[str, list]]] = {}
-        current_book = None
-        current_chap = None
-        current_verse = None
 
         for fname in text_files:
             raw = z.read(fname)
             soup = BeautifulSoup(raw.decode('utf-8', errors='ignore'), 'html.parser')
-            for h3 in soup.find_all(['h1', 'h2', 'h3']):
-                h_txt = h3.get_text(strip=True)
-                if h_txt and len(h_txt) < 40 and not any(k in h_txt.upper() for k in ['TABLE', 'SOMMAIRE', 'PREFACE', 'ANNEXE']):
-                    cand = resolve_book_name(h_txt, h_txt)
-                    if cand:
-                        current_book = cand
-                        current_chap = None
-                        current_verse = None
+            
+            # Supprimer scripts, styles, navigation et conteneurs de notes / résumés
+            for tag in soup(['script', 'style', 'nav', 'header', 'footer']):
+                tag.decompose()
+            for el in soup.find_all(class_=re.compile(r'chapnav|navcontainer|notesContainer|commentaar|footnote|note-content|descriptif|sommaire|titre-section', re.I)):
+                el.decompose()
 
-            for el in soup.find_all(['h4', 'h5', 'p', 'div']):
-                txt = el.get_text(separator=' ', strip=True).replace('\xa0', ' ').strip()
-                if not txt:
-                    continue
+            h = soup.find(['h1', 'h2', 'h3', 'title'])
+            h_text = h.get_text(strip=True) if h else ''
+            
+            fr_name, code, chap_num = cls.resolve_book_and_chapter(h_text, fname)
+            if not fr_name:
+                continue
 
-                if el.name in ['h4', 'h5'] or re.match(r'^(?:chapitre|psaume|chap\.)\s*(\d+)', txt, re.I):
-                    m_chap = re.search(r'(\d+)', txt)
-                    if m_chap:
-                        current_chap = str(int(m_chap.group(1)))
-                        current_verse = None
+            if fr_name not in bible:
+                bible[fr_name] = {}
+            chap_str = str(chap_num)
+            if chap_str not in bible[fr_name]:
+                bible[fr_name][chap_str] = {}
+
+            cur_v = '1'
+            ps = soup.find_all('p')
+            if not ps:
+                ps = soup.find_all('div')
+            has_verse_tags = any(p.find(class_=re.compile(r'verseNum|verset|verse|v\b|Num-rotation|Num', re.I)) or p.find('sup') for p in ps)
+
+            if has_verse_tags:
+                for p in ps:
+                    # Ne pas retraiter les conteneurs parents s'ils ont des sous-paragraphes
+                    if p.name == 'div' and p.find('p'):
+                        continue
+                    for child in p.descendants:
+                        if isinstance(child, Tag):
+                            classes = child.get('class', [])
+                            if any(re.search(r'verseNum|verset|verse|^v$|Num-rotation|Num', c, re.I) for c in classes) or child.name == 'sup':
+                                v_txt = child.get_text(strip=True)
+                                m_v = re.search(r'^\d+', v_txt)
+                                if m_v:
+                                    cur_v = str(int(m_v.group(0)))
+                        elif isinstance(child, NavigableString):
+                            p_parent = child.parent
+                            if isinstance(p_parent, Tag):
+                                p_classes = p_parent.get('class', [])
+                                if any(re.search(r'verseNum|verset|verse|^v$|Num-rotation|Num', c, re.I) for c in p_classes) or p_parent.name == 'sup':
+                                    continue
+                            t = str(child).strip()
+                            if t:
+                                if cur_v not in bible[fr_name][chap_str]:
+                                    bible[fr_name][chap_str][cur_v] = []
+                                bible[fr_name][chap_str][cur_v].append(t)
+            else:
+                current_verse = None
+                for p in ps:
+                    if p.name == 'div' and p.find('p'):
+                        continue
+                    txt = p.get_text(separator=' ', strip=True).replace('\xa0', ' ').strip()
+                    if not txt:
                         continue
 
-                if not current_book:
-                    continue
-                if not current_chap:
-                    current_chap = "1"
+                    # Détection d'un sous-titre de chapitre à l'intérieur d'un fichier multi-chapitres
+                    if p.name in ['h4', 'h5'] or re.match(r'^(?:chapitre|psaume|chap\.)\s*(\d+)', txt, re.I):
+                        m_chap = re.search(r'(\d+)', txt)
+                        if m_chap:
+                            chap_str = str(int(m_chap.group(1)))
+                            if chap_str not in bible[fr_name]:
+                                bible[fr_name][chap_str] = {}
+                            current_verse = None
+                            continue
 
-                if current_book not in bible:
-                    bible[current_book] = {}
-                if current_chap not in bible[current_book]:
-                    bible[current_book][current_chap] = {}
+                    # Pattern verset au début du paragraphe
+                    m_p_v = re.match(r'^(\d+)\s+(.*)', txt, re.DOTALL)
+                    if m_p_v:
+                        current_verse = m_p_v.group(1)
+                        if current_verse not in bible[fr_name][chap_str]:
+                            bible[fr_name][chap_str][current_verse] = []
+                        bible[fr_name][chap_str][current_verse].append(m_p_v.group(2))
+                        continue
 
-                # Regex versets (1 Au commencement...)
-                splits = list(re.finditer(r'(?:^|\s+)(\d+(?:-[a-z0-9]+)?)\s+([A-Za-zÀ-ÖØ-öø-ÿ"«\'])', txt))
-                if splits:
-                    for i in range(len(splits)):
-                        v_num = splits[i].group(1)
-                        s_idx = splits[i].start(2)
-                        e_idx = splits[i+1].start(0) if i+1 < len(splits) else len(txt)
-                        v_text = txt[s_idx:e_idx].strip()
-                        current_verse = v_num
-                        if current_verse not in bible[current_book][current_chap]:
-                            bible[current_book][current_chap][current_verse] = []
-                        bible[current_book][current_chap][current_verse].append(v_text)
-                else:
-                    if current_verse and current_verse in bible[current_book][current_chap]:
-                        bible[current_book][current_chap][current_verse].append(txt)
+                    splits = list(re.finditer(r'(?:^|\s+)(\d+(?:-[a-z0-9]+)?)\s+([A-Za-zÀ-ÖØ-öø-ÿ"«\'\[])', txt))
+                    if splits:
+                        for i in range(len(splits)):
+                            v_num = splits[i].group(1)
+                            s_idx = splits[i].start(2)
+                            e_idx = splits[i+1].start(0) if i+1 < len(splits) else len(txt)
+                            v_text = txt[s_idx:e_idx]
+                            current_verse = v_num
+                            if current_verse not in bible[fr_name][chap_str]:
+                                bible[fr_name][chap_str][current_verse] = []
+                            bible[fr_name][chap_str][current_verse].append(v_text)
+                    else:
+                        if current_verse and current_verse in bible[fr_name][chap_str]:
+                            bible[fr_name][chap_str][current_verse].append(txt)
 
+        # Nettoyage et tri des versets
         clean_result: Dict[str, Dict[str, Dict[str, str]]] = {}
         for b_k, ch_dict in bible.items():
+            if not ch_dict:
+                continue
             clean_result[b_k] = {}
             for ch_k in sorted(ch_dict.keys(), key=lambda x: int(x) if x.isdigit() else 0):
+                if not ch_dict[ch_k]:
+                    continue
                 clean_result[b_k][ch_k] = {}
                 for v_k in sorted(ch_dict[ch_k].keys(), key=lambda x: int(x.split('-')[0]) if re.match(r'^\d+', x) else 0):
-                    t = clean_verse_text(" ".join(ch_dict[ch_k][v_k]))
+                    raw_joined = " ".join(ch_dict[ch_k][v_k])
+                    t = clean_verse_text(raw_joined)
+                    
+                    # Réparation d'éventuelle coupure lettrine ('A u commencement' -> 'Au commencement')
+                    t = re.sub(r'^([A-ZÀ-ÖØ-ß])\s+([a-zà-öø-ÿ])', r'\1\2', t)
+                    
+                    # Nettoyer d'éventuels résidus d'en-tête répétés sur le verset 1
+                    if v_k == "1":
+                        t = re.sub(rf'^(?:{re.escape(b_k)}|Psaumes?|Chapitre)\s+{ch_k}\s*', '', t, flags=re.I).strip()
+                        t = re.sub(r'^\d+\.\d+–\d+\.\d+\s*', '', t).strip()
+                        t = re.sub(r'^([A-ZÀ-ÖØ-ß])\s+([a-zà-öø-ÿ])', r'\1\2', t)
+                        
                     if t:
                         clean_result[b_k][ch_k][v_k] = t
         return clean_result
@@ -372,6 +512,8 @@ class BibleEpubImporter:
                 if current_book not in bible:
                     bible[current_book] = {}
                 current_chapter = "1" if normalize_key(current_book) in SINGLE_CHAPTER_BOOKS else None
+                if current_chapter and current_chapter not in bible[current_book]:
+                    bible[current_book][current_chapter] = {}
                 current_verse = None
                 continue
 
@@ -406,6 +548,9 @@ class BibleEpubImporter:
             if not current_chapter:
                 continue
 
+            if current_chapter not in bible[current_book]:
+                bible[current_book][current_chapter] = {}
+
             for child in el.contents:
                 if isinstance(child, Tag):
                     child_classes = child.get('class', [])
@@ -419,10 +564,14 @@ class BibleEpubImporter:
                             continue
                     t = child.get_text(separator=' ')
                     if t and current_verse:
+                        if current_verse not in bible[current_book][current_chapter]:
+                            bible[current_book][current_chapter][current_verse] = []
                         bible[current_book][current_chapter][current_verse].append(t)
                 elif isinstance(child, NavigableString):
                     t = str(child)
                     if t and current_verse:
+                        if current_verse not in bible[current_book][current_chapter]:
+                            bible[current_book][current_chapter][current_verse] = []
                         bible[current_book][current_chapter][current_verse].append(t)
 
         clean_result: Dict[str, Dict[str, Dict[str, str]]] = {}
@@ -443,8 +592,7 @@ class BibleEpubImporter:
         Met à jour data/library.json et renvoie l'identifiant et les métadonnées.
         """
         from core.bible_json_loader import BibleJsonLoader
-        from gui.center_panel import BOOKS_OT, BOOKS_NT
-        from gui.library_utils import load_books_metadata, save_books_metadata
+        from core.reference_parser import BOOKS_OT, BOOKS_NT
 
         all_books_list = BOOKS_OT + BOOKS_NT
         app_order = {code: i + 1 for i, (name, code, ch) in enumerate(all_books_list)}
@@ -462,6 +610,14 @@ class BibleEpubImporter:
         bibles_dir = BibleJsonLoader.get_bibles_dir()
         dest_dir = os.path.join(bibles_dir, folder_clean)
         os.makedirs(dest_dir, exist_ok=True)
+
+        # Nettoyage préalable des anciens fichiers JSON pour éviter tout conflit ou reliquat
+        for old_f in os.listdir(dest_dir):
+            if old_f.endswith('.json'):
+                try:
+                    os.remove(os.path.join(dest_dir, old_f))
+                except Exception as err:
+                    logger.warning(f"Impossible de supprimer {old_f}: {err}")
 
         saved_books_count = 0
         extra_idx = 67
@@ -491,7 +647,15 @@ class BibleEpubImporter:
                 json.dump(book_obj, fp, ensure_ascii=False, indent=2)
             saved_books_count += 1
 
-        registry = load_books_metadata()
+        lib_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "library.json")
+        registry = {}
+        if os.path.exists(lib_path):
+            try:
+                with open(lib_path, "r", encoding="utf-8") as f:
+                    registry = json.load(f)
+            except Exception:
+                registry = {}
+
         meta = custom_metadata or {}
         bible_entry = {
             "title": meta.get("title") or detected_name,
@@ -509,7 +673,10 @@ class BibleEpubImporter:
         }
 
         registry[detected_name] = bible_entry
-        save_books_metadata(registry)
+        os.makedirs(os.path.dirname(lib_path), exist_ok=True)
+        with open(lib_path, "w", encoding="utf-8") as f:
+            json.dump(registry, f, ensure_ascii=False, indent=2)
+
         BibleJsonLoader.clear_cache()
 
         return detected_name, bible_entry

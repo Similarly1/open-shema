@@ -470,19 +470,37 @@ class BibleAppApi:
         }
 
     def get_commentaries(self, book_code: str, chapter: int, verse: int) -> List[Dict[str, Any]]:
-        """Récupère instantanément tous les commentaires pour un verset donné."""
+        """Récupère instantanément tous les commentaires pour un verset donné en regroupant les sections par ouvrage."""
         ch_int = int(chapter)
         v_int = int(verse)
         res = CommentaryLoader.get_all_comments_for_passage(book_code, ch_int, v_int)
         
-        comments = []
+        grouped = {}
         for i, text in enumerate(res.get("documents", [])):
             meta = res["metadatas"][i] if i < len(res.get("metadatas", [])) else {}
+            cid = meta.get("commentary_id", meta.get("name", "Commentaire"))
+            cname = meta.get("name", "Commentaire")
+            ref = meta.get("reference", f"{book_code} {ch_int}:{v_int}")
+            
+            if cid not in grouped:
+                grouped[cid] = {
+                    "author": cname,
+                    "source": cname,
+                    "reference": ref,
+                    "texts": [text]
+                }
+            else:
+                grouped[cid]["texts"].append(text)
+                if ref not in grouped[cid]["reference"]:
+                    grouped[cid]["reference"] += f" / {ref}"
+
+        comments = []
+        for cid, data in grouped.items():
             comments.append({
-                "author": meta.get("name", "Commentaire"),
-                "source": meta.get("name", "Commentaire"),
-                "reference": meta.get("reference", f"{book_code} {ch_int}:{v_int}"),
-                "text": text
+                "author": data["author"],
+                "source": data["source"],
+                "reference": data["reference"],
+                "text": "\n\n---\n\n".join(data["texts"])
             })
         return comments
 

@@ -1,14 +1,4 @@
 {
-  "Proverbes - commentaire de Kathleen Nielson": {
-    "title": "Proverbes - commentaire de Kathleen Nielson",
-    "author": "",
-    "description": "",
-    "year": "",
-    "cover_path": null,
-    "type": "Commentaire",
-    "embedding_model": "study_library",
-    "active": true
-  },
   "Segond 21": {
     "title": "Bible Segond 21",
     "author": "Société Biblique de Genève",
@@ -697,14 +687,27 @@
   "LAU": {
     "title": "Bible de Lausanne (1872)",
     "author": "Société Biblique de Lausanne / Louis Gaussen",
-    "description": "Révision protestante francophone historique menée à Lausanne sous la direction de Louis Gaussen, réputée pour sa très haute fidélité littérale au texte hébreu et grec.",
+    "description": "Bible de Lausanne (1872)",
     "year": "1872",
-    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\LAU.png",
+    "cover_path": null,
     "type": "Bible",
     "format": "json",
     "folder_name": "LAU",
     "version_code": "LAU",
-    "total_books": 236,
+    "total_books": 66,
+    "embedding_model": "study_library",
+    "active": true
+  },
+  "Commentaires The Gospel Coalition (TGC)": {
+    "title": "Commentaires Bibliques The Gospel Coalition (TGC)",
+    "author": "The Gospel Coalition (Carson, Schreiner, Alexander, Köstenberger, Doriani, etc.)",
+    "description": "Commentaires bibliques contemporains complets sur toute la Bible (66 livres, 6 216 passages exégétiques, dont les 9 livres traduits en français).",
+    "year": "2021-2024",
+    "cover_path": null,
+    "type": "Commentaire",
+    "format": "sqlite",
+    "commentary_id": "tgc_complete",
+    "chunks_count": 6216,
     "embedding_model": "study_library",
     "active": true
   }
