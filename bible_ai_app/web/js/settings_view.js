@@ -291,6 +291,9 @@ const SettingsView = {
 
     document.getElementById('cfg-diff-pct').checked = c.show_diff_percentage !== false;
     document.getElementById('cfg-diff-highlight').checked = c.show_diff_highlights !== false;
+    if (document.getElementById('cfg-show-chap-dividers')) {
+      document.getElementById('cfg-show-chap-dividers').checked = c.show_chapter_dividers !== false;
+    }
 
     document.getElementById('cfg-inter-surface').checked = c.interlinear_show_surface !== false;
     document.getElementById('cfg-inter-lemma').checked = c.interlinear_show_lemma !== false;
@@ -390,6 +393,9 @@ const SettingsView = {
 
     newCfg.show_diff_percentage = document.getElementById('cfg-diff-pct').checked;
     newCfg.show_diff_highlights = document.getElementById('cfg-diff-highlight').checked;
+    if (document.getElementById('cfg-show-chap-dividers')) {
+      newCfg.show_chapter_dividers = document.getElementById('cfg-show-chap-dividers').checked;
+    }
 
     newCfg.interlinear_show_surface = document.getElementById('cfg-inter-surface').checked;
     newCfg.interlinear_show_lemma = document.getElementById('cfg-inter-lemma').checked;

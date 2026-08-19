@@ -278,10 +278,14 @@ const DisplayOptions = {
       });
     };
 
-    // Synchronisation de l'état actif au démarrage
+    // Synchronisation de l'état actif et options au démarrage
     try {
       const cfg = await API.getSettings() || {};
       updateActiveSwatch(cfg.reading_bg || 'auto');
+      const showDiv = cfg.show_chapter_dividers !== false;
+      const chkDiv = document.getElementById('opt-show-chap-dividers');
+      if (chkDiv) chkDiv.checked = showDiv;
+      workspace?.classList.toggle('hide-chap-dividers', !showDiv);
     } catch (e) {}
 
     btn.addEventListener('click', async (e) => {
@@ -289,6 +293,10 @@ const DisplayOptions = {
       try {
         const cfg = await API.getSettings() || {};
         updateActiveSwatch(cfg.reading_bg || 'auto');
+        const showDiv = cfg.show_chapter_dividers !== false;
+        const chkDiv = document.getElementById('opt-show-chap-dividers');
+        if (chkDiv) chkDiv.checked = showDiv;
+        workspace?.classList.toggle('hide-chap-dividers', !showDiv);
       } catch (e) {}
       popover.classList.toggle('hidden');
     });
@@ -313,6 +321,15 @@ const DisplayOptions = {
 
     document.getElementById('opt-verse-per-line')?.addEventListener('change', (e) => {
       workspace?.classList.toggle('verse-per-line', e.target.checked);
+    });
+
+    document.getElementById('opt-show-chap-dividers')?.addEventListener('change', async (e) => {
+      workspace?.classList.toggle('hide-chap-dividers', !e.target.checked);
+      const cfg = await API.getSettings() || {};
+      cfg.show_chapter_dividers = e.target.checked;
+      const cfgCheck = document.getElementById('cfg-show-chap-dividers');
+      if (cfgCheck) cfgCheck.checked = e.target.checked;
+      API.call('save_settings', cfg);
     });
 
     document.getElementById('opt-font-serif')?.addEventListener('change', (e) => {

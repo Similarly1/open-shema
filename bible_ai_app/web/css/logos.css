@@ -915,20 +915,40 @@ body, html {
   border: 1px solid var(--border-color);
   border-radius: 6px;
   height: 30px;
+  background-color: var(--bg-card);
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 .zoom-btn {
-  width: 26px;
+  width: 28px;
   height: 100%;
   border: none;
   background-color: var(--bg-card);
   color: var(--text-secondary);
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  transition: all 0.15s ease;
+}
+.zoom-btn:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
 }
 .zoom-level {
   font-size: 11px;
   font-weight: 600;
   color: var(--text-primary);
-  padding: 0 6px;
+  background-color: var(--bg-card);
+  padding: 0 8px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  border-left: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
 }
 
 .reader-workspace {
@@ -1104,6 +1124,7 @@ body, html {
   margin-bottom: 40px;
   padding-bottom: 25px;
   border-bottom: 1px dashed var(--border-subtle);
+  transition: border-bottom 0.15s ease, margin-bottom 0.15s ease;
 }
 .chapter-block:last-child {
   border-bottom: none;
@@ -1113,6 +1134,7 @@ body, html {
   align-items: center;
   justify-content: center;
   margin: 35px 0 20px 0;
+  transition: opacity 0.15s ease;
 }
 .chapter-badge-divider span {
   font-size: 11px;
@@ -1123,6 +1145,45 @@ body, html {
   color: var(--text-secondary);
   padding: 4px 14px;
   border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+}
+
+/* Harmonisation des séparateurs selon la teinte de lecture */
+body.reading-bg-sepia .chapter-badge-divider span {
+  background-color: #EFE4D0 !important;
+  color: #78350F !important;
+  border-color: #DFCDB2 !important;
+}
+body.reading-bg-sepia .chapter-block {
+  border-bottom-color: #DFCDB2 !important;
+}
+
+body.reading-bg-dark .chapter-badge-divider span {
+  background-color: #141B26 !important;
+  color: #94A3B8 !important;
+  border-color: #2D3D54 !important;
+}
+body.reading-bg-dark .chapter-block {
+  border-bottom-color: #2D3D54 !important;
+}
+
+body.reading-bg-white .chapter-badge-divider span {
+  background-color: #F1F5F9 !important;
+  color: #475569 !important;
+  border-color: #CBD5E1 !important;
+}
+body.reading-bg-white .chapter-block {
+  border-bottom-color: #E2E8F0 !important;
+}
+
+/* Modificateur pour masquer les séparateurs et pastilles entre chapitres */
+.reader-workspace.hide-chap-dividers .chapter-block {
+  border-bottom: none !important;
+  margin-bottom: 25px !important;
+  padding-bottom: 0 !important;
+}
+.reader-workspace.hide-chap-dividers .chapter-badge-divider {
+  display: none !important;
 }
 
 /* ==========================================================================
