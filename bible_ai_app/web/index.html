@@ -1532,10 +1532,58 @@
             <div class="comm-verse-banner-text" id="comm-view-verse-text">« Au commencement, Dieu créa les cieux et la terre. »</div>
           </div>
 
-          <!-- ONGLETS / PILULES DES COMMENTATEURS -->
-          <div class="comm-authors-bar" id="comm-view-authors-bar">
-            <div class="comm-authors-scroll" id="comm-view-author-tabs">
-              <!-- Rempli dynamiquement -->
+          <!-- BARRE HYBRIDE : SÉLECTEUR PRINCIPAL & FAVORIS RAPIDES -->
+          <div class="comm-hybrid-bar" id="comm-view-hybrid-bar">
+            <!-- Bouton Sélecteur Principal Déroulant -->
+            <div class="comm-main-dropdown-wrapper">
+              <button class="comm-active-book-btn" id="btn-comm-active-selector" title="Cliquer pour choisir parmi tous les ouvrages de commentaires disponibles">
+                <div class="comm-book-mini-cover" id="comm-active-book-cover" style="background: #065F46;">
+                  <div class="comm-book-mini-spine"></div>
+                  <span class="comm-book-mini-initials" id="comm-active-book-initials">MH</span>
+                </div>
+                <div class="comm-active-book-info">
+                  <div class="comm-active-book-title" id="comm-active-book-title">Commentaire Biblique de Matthew Henry</div>
+                  <div class="comm-active-book-meta" id="comm-active-book-meta">Matthew Henry • Puritain / Dévotionnel (1706)</div>
+                </div>
+                <div class="comm-active-book-badge-box">
+                  <span class="comm-sources-count-badge" id="comm-active-sources-count">14 ouvrages</span>
+                  <span class="comm-dropdown-caret">▾</span>
+                </div>
+              </button>
+
+              <!-- Popover Déroulant Enrichi avec mini-couvertures et recherche -->
+              <div class="comm-picker-popover hidden" id="comm-picker-popover">
+                <div class="comm-popover-search-row">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.6;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                  <input type="text" id="comm-picker-search-input" class="comm-popover-search-input" placeholder="Filtrer par auteur, titre ou époque...">
+                </div>
+
+                <!-- Option spéciale : Synthèse IA -->
+                <div class="comm-popover-synth-row" id="btn-popover-synth-item">
+                  <div class="comm-book-mini-cover" style="background: linear-gradient(135deg, #4F46E5, #7C3AED);">
+                    <div class="comm-book-mini-spine"></div>
+                    <span class="comm-book-mini-initials">✨</span>
+                  </div>
+                  <div class="comm-popover-item-info">
+                    <div class="comm-popover-item-title">Synthèse Exégétique IA</div>
+                    <div class="comm-popover-item-meta">Analyse comparative transversale de tous les commentateurs</div>
+                  </div>
+                  <span class="comm-popover-synth-tag">IA</span>
+                </div>
+
+                <div class="comm-popover-divider"></div>
+                <div class="comm-popover-section-label" id="comm-popover-section-count">Ouvrages disponibles pour ce verset :</div>
+
+                <!-- Liste des ouvrages avec couvertures, métadonnées, extrait et favoris -->
+                <div class="comm-picker-list" id="comm-picker-list">
+                  <!-- Injecté dynamiquement -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Raccourcis Favoris & Accès Rapides (Pills compactes sans scroll horizontal) -->
+            <div class="comm-quick-favorites-group" id="comm-quick-favorites-group">
+              <!-- Injecté dynamiquement : Synthèse IA + 2 à 3 favoris disponibles -->
             </div>
           </div>
 

@@ -1,8 +1,10 @@
 /**
  * Commentaries View Controller
  * Gère la page dédiée plein écran aux commentaires exégétiques :
- * navigation fluide par verset (◀ ▶ ou saisie), sélection typographique par auteur,
- * traduction IA en français avec cache, synthèse IA multi-auteurs intégrée sur la page, copie et export vers les notes.
+ * - Sélecteur principal déroulant haut de gamme avec mini-couvertures 3D et recherche
+ * - Raccourcis favoris rapides épinglés
+ * - Synthèse IA intégrée sur la page
+ * - Traduction française, copie et export vers les notes
  */
 
 const CommentariesView = {
@@ -16,6 +18,9 @@ const CommentariesView = {
   translationCache: {},
   showTranslatedVersion: {},
   isLoading: false,
+
+  // Favoris utilisateur mémorisés
+  favorites: ['henry', 'matthew henry', 'calmet', 'pulpit', 'macarthur', 'calvin'],
 
   // Mode Synthèse IA sur la page
   isSynthMode: false,
@@ -34,10 +39,23 @@ const CommentariesView = {
   verseBannerRef: null,
   verseBannerBible: null,
   verseBannerText: null,
-  authorsTabsContainer: null,
   articleContainer: null,
   articleContent: null,
   countBadge: null,
+
+  // Éléments Sélecteur Hybride & Popover
+  btnActiveSelector: null,
+  activeBookCover: null,
+  activeBookInitials: null,
+  activeBookTitle: null,
+  activeBookMeta: null,
+  activeSourcesCount: null,
+  pickerPopover: null,
+  pickerSearchInput: null,
+  btnPopoverSynthItem: null,
+  popoverSectionCount: null,
+  pickerList: null,
+  quickFavoritesGroup: null,
 
   // Éléments Synthèse IA
   synthPanel: null,
@@ -65,6 +83,14 @@ const CommentariesView = {
   synthQuickOptions: null,
 
   init() {
+    // Restaurer les favoris personnalisés
+    try {
+      const savedFavs = localStorage.getItem('bible_comm_favorites');
+      if (savedFavs) {
+        this.favorites = JSON.parse(savedFavs);
+      }
+    } catch (e) {}
+
     this.searchInput = document.getElementById('comm-view-search-input');
     this.btnSearch = document.getElementById('btn-comm-view-search');
     this.btnPrev = document.getElementById('btn-comm-view-prev');
@@ -74,10 +100,23 @@ const CommentariesView = {
     this.verseBannerRef = document.getElementById('comm-view-verse-ref');
     this.verseBannerBible = document.getElementById('comm-view-verse-bible-name');
     this.verseBannerText = document.getElementById('comm-view-verse-text');
-    this.authorsTabsContainer = document.getElementById('comm-view-author-tabs');
     this.articleContainer = document.getElementById('comm-view-article-container');
     this.articleContent = document.getElementById('comm-view-article-content');
     this.countBadge = document.getElementById('comm-view-count-badge');
+
+    // Sélecteur Déroulant & Popover DOM
+    this.btnActiveSelector = document.getElementById('btn-comm-active-selector');
+    this.activeBookCover = document.getElementById('comm-active-book-cover');
+    this.activeBookInitials = document.getElementById('comm-active-book-initials');
+    this.activeBookTitle = document.getElementById('comm-active-book-title');
+    this.activeBookMeta = document.getElementById('comm-active-book-meta');
+    this.activeSourcesCount = document.getElementById('comm-active-sources-count');
+    this.pickerPopover = document.getElementById('comm-picker-popover');
+    this.pickerSearchInput = document.getElementById('comm-picker-search-input');
+    this.btnPopoverSynthItem = document.getElementById('btn-popover-synth-item');
+    this.popoverSectionCount = document.getElementById('comm-popover-section-count');
+    this.pickerList = document.getElementById('comm-picker-list');
+    this.quickFavoritesGroup = document.getElementById('comm-quick-favorites-group');
 
     // Synthèse IA DOM
     this.synthPanel = document.getElementById('comm-page-synth-container');
@@ -121,7 +160,28 @@ const CommentariesView = {
       this.openInBibleReader();
     });
 
-    // 3. Synthèse IA
+    // 3. Sélecteur Déroulant & Popover
+    this.btnActiveSelector?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.togglePopover();
+    });
+
+    this.pickerSearchInput?.addEventListener('input', (e) => {
+      this.filterPopoverList(e.target.value);
+    });
+
+    this.btnPopoverSynthItem?.addEventListener('click', () => {
+      this.closePopover();
+      this.openAISynthesis();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (this.pickerPopover && !this.pickerPopover.contains(e.target) && e.target !== this.btnActiveSelector && !this.btnActiveSelector?.contains(e.target)) {
+        this.closePopover();
+      }
+    });
+
+    // 4. Synthèse IA
     this.btnSynthHeader?.addEventListener('click', () => {
       if (this.isSynthMode) {
         this.closeAISynthesis();
@@ -153,7 +213,7 @@ const CommentariesView = {
       this.exportSynthesisToNote();
     });
 
-    // 4. Raccourcis clavier (flèches gauche/droite pour versets)
+    // 5. Raccourcis clavier (flèches gauche/droite pour versets)
     window.addEventListener('keydown', (e) => {
       if (App.activeView !== 'commentaries') return;
       if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.isContentEditable)) {
@@ -167,6 +227,50 @@ const CommentariesView = {
         this.navigateVerse(1);
       }
     });
+  },
+
+  togglePopover(forceState = null) {
+    if (!this.pickerPopover) return;
+    const shouldOpen = forceState !== null ? forceState : this.pickerPopover.classList.contains('hidden');
+    if (shouldOpen) {
+      this.pickerPopover.classList.remove('hidden');
+      if (this.pickerSearchInput) {
+        this.pickerSearchInput.value = '';
+        this.pickerSearchInput.focus();
+      }
+      this.filterPopoverList('');
+    } else {
+      this.pickerPopover.classList.add('hidden');
+    }
+  },
+
+  closePopover() {
+    this.togglePopover(false);
+  },
+
+  filterPopoverList(query) {
+    if (!this.pickerList) return;
+    const q = (query || '').toLowerCase().trim();
+    this.pickerList.querySelectorAll('.comm-picker-item').forEach(item => {
+      const text = item.textContent.toLowerCase();
+      item.style.display = (!q || text.includes(q)) ? 'flex' : 'none';
+    });
+  },
+
+  toggleFavorite(authorName, e) {
+    if (e) e.stopPropagation();
+    const clean = (authorName || '').toLowerCase().trim();
+    const idx = this.favorites.indexOf(clean);
+    if (idx >= 0) {
+      this.favorites.splice(idx, 1);
+    } else {
+      this.favorites.push(clean);
+    }
+    try {
+      localStorage.setItem('bible_comm_favorites', JSON.stringify(this.favorites));
+    } catch (err) {}
+    this.renderPopoverList();
+    this.renderQuickFavorites();
   },
 
   async handleSearch() {
@@ -197,7 +301,7 @@ const CommentariesView = {
     if (nextV < 1) {
       if (nextCh > 1) {
         nextCh -= 1;
-        nextV = 1; // Début du chapitre précédent
+        nextV = 1;
       } else {
         App.showToast('Début du livre');
         return;
@@ -299,10 +403,11 @@ const CommentariesView = {
       const comments = await API.getCommentaries(bookCode, this.currentChapter, this.currentVerse);
       this.currentComments = comments || [];
 
-      // Mettre à jour le badge du nombre de sources
-      if (this.countBadge) {
-        this.countBadge.textContent = `${this.currentComments.length} source${this.currentComments.length > 1 ? 's' : ''}`;
-      }
+      // Mettre à jour les compteurs
+      const countLabel = `${this.currentComments.length} ouvrage${this.currentComments.length > 1 ? 's' : ''}`;
+      if (this.countBadge) this.countBadge.textContent = countLabel;
+      if (this.activeSourcesCount) this.activeSourcesCount.textContent = countLabel;
+      if (this.popoverSectionCount) this.popoverSectionCount.textContent = `Ouvrages disponibles (${this.currentComments.length}) :`;
 
       // Synchroniser avec CommentaryViewer si présent
       if (typeof CommentaryViewer !== 'undefined') {
@@ -313,7 +418,7 @@ const CommentariesView = {
         CommentaryViewer.currentComments = this.currentComments;
       }
 
-      // Si le mode synthèse était actif, synchroniser la plage avec le nouveau verset
+      // Si le mode synthèse était actif, synchroniser la plage
       if (this.isSynthMode) {
         this.synthVerseStart = this.currentVerse;
         this.synthVerseEnd = this.currentVerse;
@@ -335,29 +440,13 @@ const CommentariesView = {
   },
 
   /**
-   * Rendu complet des pilules d'auteurs et du commentaire actif
+   * Rendu complet de la barre hybride (Sélecteur principal, Popover, Favoris) et du commentaire
    */
   render() {
-    if (!this.authorsTabsContainer) return;
-    this.authorsTabsContainer.innerHTML = '';
-
     if (!this.currentComments || this.currentComments.length === 0) {
       this.renderEmptyState();
       return;
     }
-
-    // Pilule spéciale "Synthèse IA"
-    const synthPill = document.createElement('button');
-    synthPill.className = `comm-author-pill comm-synth-pill ${this.isSynthMode ? 'active' : ''}`;
-    synthPill.innerHTML = `
-      <span class="comm-pill-avatar" style="background: linear-gradient(135deg, #6366F1, #8B5CF6); font-size: 11px;">✨</span>
-      <span class="comm-pill-name">Synthèse IA</span>
-      <span class="comm-pill-period">Tous commentateurs</span>
-    `;
-    synthPill.addEventListener('click', () => {
-      this.openAISynthesis();
-    });
-    this.authorsTabsContainer.appendChild(synthPill);
 
     // Trouver l'index du commentaire correspondant à preferredAuthor
     let targetIndex = 0;
@@ -372,19 +461,129 @@ const CommentariesView = {
     }
     this.activeIndex = targetIndex;
 
-    // Construire les pilules de sélection d'auteurs
+    // Construire le Popover et les raccourcis favoris
+    this.renderPopoverList();
+    this.renderQuickFavorites();
+
+    // Mettre à jour l'affichage de l'ouvrage actif dans le sélecteur principal
+    this.updateActiveBookDisplay();
+
+    if (!this.isSynthMode) {
+      this.selectCommentary(this.activeIndex);
+    }
+  },
+
+  updateActiveBookDisplay() {
+    const comm = this.currentComments[this.activeIndex];
+    if (!comm) return;
+
+    const authorName = comm.author || comm.source || 'Commentaire';
+    const sourceMeta = this.getSourceMeta(authorName);
+
+    if (this.activeBookCover) {
+      this.activeBookCover.style.background = sourceMeta.color || '#1E3A8A';
+    }
+    if (this.activeBookInitials) {
+      this.activeBookInitials.textContent = sourceMeta.initials || 'C';
+    }
+    if (this.activeBookTitle) {
+      this.activeBookTitle.textContent = sourceMeta.title || authorName;
+    }
+    if (this.activeBookMeta) {
+      this.activeBookMeta.textContent = `${sourceMeta.author || authorName} • ${sourceMeta.period || 'Exégèse biblique'}`;
+    }
+  },
+
+  renderPopoverList() {
+    if (!this.pickerList) return;
+    this.pickerList.innerHTML = '';
+
     this.currentComments.forEach((comm, idx) => {
       const authorName = comm.author || comm.source || 'Commentaire';
       const sourceMeta = this.getSourceMeta(authorName);
+      const isFav = this.favorites.includes(authorName.toLowerCase()) || this.favorites.includes((sourceMeta.author || '').toLowerCase());
+      const isCurrentActive = idx === this.activeIndex;
+      const previewText = (comm.text || '').slice(0, 110).replace(/[\n#\*\_]/g, ' ').trim();
 
+      const item = document.createElement('div');
+      item.className = `comm-picker-item ${isCurrentActive ? 'active' : ''}`;
+      item.innerHTML = `
+        <div class="comm-book-mini-cover" style="background: ${sourceMeta.color || '#1E3A8A'};">
+          <div class="comm-book-mini-spine"></div>
+          <span class="comm-book-mini-initials">${sourceMeta.initials || 'C'}</span>
+        </div>
+        <div class="comm-picker-item-details">
+          <div class="comm-picker-item-title-row">
+            <span class="comm-picker-item-name">${sourceMeta.title || authorName}</span>
+            <span class="comm-picker-item-period-tag">${sourceMeta.period ? sourceMeta.period.split('(')[0].trim() : ''}</span>
+          </div>
+          <div class="comm-picker-item-author">${sourceMeta.author || authorName}</div>
+          <div class="comm-picker-item-preview">${previewText}...</div>
+        </div>
+        <button class="comm-picker-fav-btn ${isFav ? 'is-fav' : ''}" title="${isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'}">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </button>
+      `;
+
+      item.addEventListener('click', (e) => {
+        if (e.target.closest('.comm-picker-fav-btn')) return;
+        this.closePopover();
+        if (this.isSynthMode) {
+          this.closeAISynthesis();
+        }
+        this.selectCommentary(idx);
+      });
+
+      const favBtn = item.querySelector('.comm-picker-fav-btn');
+      favBtn?.addEventListener('click', (e) => {
+        this.toggleFavorite(authorName, e);
+      });
+
+      this.pickerList.appendChild(item);
+    });
+  },
+
+  renderQuickFavorites() {
+    if (!this.quickFavoritesGroup) return;
+    this.quickFavoritesGroup.innerHTML = '';
+
+    // 1. Pilule d'accès rapide : Synthèse IA
+    const synthPill = document.createElement('button');
+    synthPill.className = `comm-quick-fav-pill comm-quick-synth-pill ${this.isSynthMode ? 'active' : ''}`;
+    synthPill.innerHTML = `
+      <span class="comm-quick-fav-avatar" style="background: linear-gradient(135deg, #6366F1, #8B5CF6);">✨</span>
+      <span>Synthèse IA</span>
+    `;
+    synthPill.addEventListener('click', () => {
+      this.openAISynthesis();
+    });
+    this.quickFavoritesGroup.appendChild(synthPill);
+
+    // 2. Trouver les ouvrages favoris disponibles pour ce verset
+    const favComments = [];
+    this.currentComments.forEach((comm, idx) => {
+      const authorName = (comm.author || comm.source || '').toLowerCase();
+      const sourceMeta = this.getSourceMeta(comm.author || comm.source);
+      const metaAuthor = (sourceMeta.author || '').toLowerCase();
+
+      const matchedFav = this.favorites.find(f => authorName.includes(f) || metaAuthor.includes(f) || f.includes(authorName));
+      if (matchedFav) {
+        favComments.push({ comm, idx, sourceMeta });
+      }
+    });
+
+    // Limiter aux 3 premiers favoris pour garder une barre très épurée
+    const displayFavs = favComments.slice(0, 3);
+
+    displayFavs.forEach(({ comm, idx, sourceMeta }) => {
+      const authorName = comm.author || comm.source || 'Commentaire';
       const pill = document.createElement('button');
-      pill.className = `comm-author-pill ${(!this.isSynthMode && idx === this.activeIndex) ? 'active' : ''}`;
+      pill.className = `comm-quick-fav-pill ${(!this.isSynthMode && idx === this.activeIndex) ? 'active' : ''}`;
       pill.setAttribute('data-author-idx', idx);
 
       pill.innerHTML = `
-        <span class="comm-pill-avatar" style="background-color: ${sourceMeta.color || '#3B82F6'};">${sourceMeta.initials || 'C'}</span>
-        <span class="comm-pill-name">${authorName}</span>
-        <span class="comm-pill-period">${sourceMeta.period ? sourceMeta.period.split('(')[0].trim() : ''}</span>
+        <span class="comm-quick-fav-avatar" style="background-color: ${sourceMeta.color || '#3B82F6'};">${sourceMeta.initials || 'C'}</span>
+        <span>${sourceMeta.author ? sourceMeta.author.split(' ').pop() : authorName}</span>
       `;
 
       pill.addEventListener('click', () => {
@@ -394,12 +593,8 @@ const CommentariesView = {
         this.selectCommentary(idx);
       });
 
-      this.authorsTabsContainer.appendChild(pill);
+      this.quickFavoritesGroup.appendChild(pill);
     });
-
-    if (!this.isSynthMode) {
-      this.selectCommentary(this.activeIndex);
-    }
   },
 
   selectCommentary(index) {
@@ -415,17 +610,12 @@ const CommentariesView = {
     this.synthPanel?.classList.add('hidden');
     this.btnSynthHeader?.classList.remove('active');
 
-    // Mettre à jour l'état actif des pilules
-    if (this.authorsTabsContainer) {
-      this.authorsTabsContainer.querySelectorAll('.comm-author-pill').forEach((pill) => {
-        const pIdx = pill.getAttribute('data-author-idx');
-        if (pIdx !== null) {
-          pill.classList.toggle('active', parseInt(pIdx) === index);
-        } else {
-          pill.classList.remove('active');
-        }
-      });
-    }
+    // Mettre à jour l'affichage de l'ouvrage actif dans le sélecteur
+    this.updateActiveBookDisplay();
+
+    // Mettre à jour l'état actif dans le Popover et les raccourcis
+    this.renderPopoverList();
+    this.renderQuickFavorites();
 
     if (!this.articleContent) return;
 
@@ -565,12 +755,8 @@ const CommentariesView = {
     this.synthPanel?.classList.remove('hidden');
     this.btnSynthHeader?.classList.add('active');
 
-    // Mettre à jour l'état actif des pilules
-    if (this.authorsTabsContainer) {
-      this.authorsTabsContainer.querySelectorAll('.comm-author-pill').forEach(pill => {
-        pill.classList.toggle('active', pill.classList.contains('comm-synth-pill'));
-      });
-    }
+    // Mettre à jour l'état actif dans les raccourcis
+    this.renderQuickFavorites();
 
     // Récupérer le réglage du plafond max depuis la config
     try {
@@ -662,13 +848,11 @@ const CommentariesView = {
     const isRangeVisible = !this.synthRangeControls?.classList.contains('hidden');
 
     if (isRangeVisible && isShowingResult) {
-      // Masquer la plage, afficher seulement le résultat
       this.synthRangeControls?.classList.add('hidden');
       this.synthQuickOptions?.classList.add('hidden');
       this.btnLaunchSynth?.classList.add('hidden');
       if (this.lblEditSynthRange) this.lblEditSynthRange.textContent = 'Plage';
     } else {
-      // Afficher les contrôles de plage pour ajuster et relancer
       this.synthRangeControls?.classList.remove('hidden');
       this.synthQuickOptions?.classList.remove('hidden');
       this.btnLaunchSynth?.classList.remove('hidden');
@@ -730,7 +914,6 @@ const CommentariesView = {
       this.synthMarkdownContent.innerHTML = this.formatSynthesisMarkdown(data.synthesis || '');
     }
 
-    // Masquer les champs de saisie pour n'afficher que la synthèse en grand format
     this.synthRangeControls?.classList.add('hidden');
     this.synthQuickOptions?.classList.add('hidden');
     this.btnLaunchSynth?.classList.add('hidden');
@@ -745,13 +928,11 @@ const CommentariesView = {
 
     let processed = text;
 
-    // Remplacer les balises explicites {sources: A, B}
     processed = processed.replace(/\{sources:\s*([^\}]+)\}/gi, (match, raw) => {
       const sources = raw.split(',').map(s => s.trim().replace(/[\[\]]/g, '')).filter(Boolean);
       return ` <span class="synth-cite-pill" style="display:inline-flex; align-items:center; gap:3px; background:rgba(2, 132, 199, 0.12); color:var(--accent-blue); padding:1px 6px; border-radius:10px; font-size:10.5px; font-weight:700;">${svgIcon}<span>${sources.length} sources</span></span>`;
     });
 
-    // Supprimer les crochets autour des auteurs
     processed = processed.replace(/\*{0,2}\[([a-zA-Z0-9\.\'\s\(\)\-éèêëàâäôöûüçÉÈÊËÀÂÄÔÖÛÜÇ]+)\]\*{0,2}/g, '**$1**');
 
     let html = processed
@@ -835,7 +1016,7 @@ const CommentariesView = {
         App.showError('Erreur de Traduction', res?.error || 'Impossible de traduire l\'article.');
         if (btn) {
           btn.disabled = false;
-          btn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>Réessayer</span>';
+          btn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"/></svg><span>Réessayer</span>';
         }
       }
     } catch (e) {
