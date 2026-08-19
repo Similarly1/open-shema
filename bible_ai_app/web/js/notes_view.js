@@ -73,6 +73,7 @@ const NotesView = {
       this.bindEditorShortcuts(drawerContentInp);
     }
 
+    this.updateAiToggleVisibility();
     this.loadNotes();
   },
 
@@ -434,6 +435,18 @@ const NotesView = {
     }
   },
 
+  updateAiToggleVisibility() {
+    const isGlobalAiEnabled = SettingsView?.config?.include_notes_in_ai !== false;
+    const toggleLabel = document.getElementById('note-edit-ai-toggle-label');
+    if (toggleLabel) {
+      toggleLabel.style.display = isGlobalAiEnabled ? 'flex' : 'none';
+    }
+    const drawerToggleLabel = document.getElementById('drawer-note-ai-toggle-label');
+    if (drawerToggleLabel) {
+      drawerToggleLabel.style.display = isGlobalAiEnabled ? 'flex' : 'none';
+    }
+  },
+
   renderList() {
     const q = (this.searchInput?.value || '').toLowerCase().trim();
     const filtered = this.notes.filter(n => {
@@ -452,11 +465,13 @@ const NotesView = {
       return;
     }
 
+    const isGlobalAiEnabled = SettingsView?.config?.include_notes_in_ai !== false;
+
     filtered.forEach(note => {
       const item = document.createElement('div');
       item.className = `note-list-item ${this.currentNote?.id === note.id ? 'active' : ''}`;
       
-      const aiBadge = note.include_in_ai !== false ? '<span title="Prise en compte par l\'IA" style="font-size: 11px; margin-left: 4px;">🤖</span>' : '';
+      const aiBadge = (isGlobalAiEnabled && note.include_in_ai !== false) ? '<span title="Prise en compte par l\'IA" style="font-size: 11px; margin-left: 4px;">🤖</span>' : '';
       
       item.innerHTML = `
         <div class="note-item-title">${note.title || 'Note sans titre'} ${aiBadge}</div>
@@ -481,6 +496,8 @@ const NotesView = {
     if (this.tagsInput) this.tagsInput.value = note.tags || '';
     if (this.aiToggle) this.aiToggle.checked = note.include_in_ai !== false;
     if (this.contentInput) this.contentInput.value = note.content || '';
+
+    this.updateAiToggleVisibility();
 
     if (this.isPreviewMode) {
       this.renderPreview();

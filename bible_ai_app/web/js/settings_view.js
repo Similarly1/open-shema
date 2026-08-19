@@ -155,6 +155,17 @@ const SettingsView = {
       App.showToast('Dossier réinitialisé par défaut (data/notes/)');
     });
 
+    document.getElementById('cfg-include-notes-ai')?.addEventListener('change', (e) => {
+      this.config.include_notes_in_ai = e.target.checked;
+      if (typeof NotesView !== 'undefined') {
+        NotesView.updateAiToggleVisibility();
+        NotesView.renderList();
+      }
+      if (typeof DrawerNotes !== 'undefined' && DrawerNotes.renderList) {
+        DrawerNotes.renderList();
+      }
+    });
+
     document.getElementById('btn-save-settings-top').addEventListener('click', () => {
       this.save();
     });
@@ -313,6 +324,14 @@ const SettingsView = {
     }
     document.getElementById('cfg-include-notes-ai').checked = c.include_notes_in_ai !== false;
 
+    if (typeof NotesView !== 'undefined') {
+      NotesView.updateAiToggleVisibility();
+      NotesView.renderList();
+    }
+    if (typeof DrawerNotes !== 'undefined' && DrawerNotes.renderList) {
+      DrawerNotes.renderList();
+    }
+
     if (c.chat_model) document.getElementById('cfg-chat-model').value = c.chat_model;
     if (c.gemini_api_key) document.getElementById('cfg-gemini-key').value = c.gemini_api_key;
     if (c.mistral_api_key) document.getElementById('cfg-mistral-key').value = c.mistral_api_key;
@@ -423,6 +442,13 @@ const SettingsView = {
       this.config = newCfg;
       App.applyTheme(newCfg.theme, newCfg.theme_palette, newCfg.reading_bg);
       App.applyFontFamily(newCfg.font_family);
+      if (typeof NotesView !== 'undefined') {
+        NotesView.updateAiToggleVisibility();
+        NotesView.renderList();
+      }
+      if (typeof DrawerNotes !== 'undefined' && DrawerNotes.renderList) {
+        DrawerNotes.renderList();
+      }
       App.showToast('Paramètres enregistrés avec succès !');
     } catch (e) {
       alert(`Erreur d'enregistrement : ${e}`);

@@ -766,12 +766,17 @@ const DrawerNotesViewer = {
       return;
     }
 
+    const isGlobalAiEnabled = SettingsView?.config?.include_notes_in_ai !== false;
+
     this.currentNotes.forEach((n) => {
       const card = document.createElement('div');
       card.className = 'drawer-note-card';
       card.style.cssText = 'background: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; margin-bottom: 8px; cursor: pointer;';
       
-      const aiBadge = n.include_in_ai !== false ? '<span title="Prise en compte par l\'IA" style="font-size: 11px;">🤖 IA</span>' : '<span title="Non transmise à l\'IA" style="font-size: 10px; color: var(--text-muted);">🔒 Privée</span>';
+      let aiBadge = '';
+      if (isGlobalAiEnabled) {
+        aiBadge = n.include_in_ai !== false ? '<span title="Prise en compte par l\'IA" style="font-size: 11px;">🤖 IA</span>' : '<span title="Non transmise à l\'IA" style="font-size: 10px; color: var(--text-muted);">🔒 Privée</span>';
+      }
       
       card.innerHTML = `
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
@@ -827,6 +832,12 @@ const DrawerNotesViewer = {
     const titleHeader = document.getElementById('drawer-composer-title');
     if (titleHeader) titleHeader.textContent = '✍️ Rédiger une note';
 
+    const isGlobalAiEnabled = SettingsView?.config?.include_notes_in_ai !== false;
+    const drawerAiLabel = document.getElementById('drawer-note-ai-toggle-label');
+    if (drawerAiLabel) {
+      drawerAiLabel.style.display = isGlobalAiEnabled ? 'flex' : 'none';
+    }
+
     if (titleInp) {
       titleInp.value = initialTitle || `Note sur ${refStr}`;
       titleInp.focus();
@@ -839,6 +850,12 @@ const DrawerNotesViewer = {
     const contentInp = document.getElementById('drawer-note-content-input');
     const aiToggle = document.getElementById('drawer-note-ai-toggle');
     const titleHeader = document.getElementById('drawer-composer-title');
+
+    const isGlobalAiEnabled = SettingsView?.config?.include_notes_in_ai !== false;
+    const drawerAiLabel = document.getElementById('drawer-note-ai-toggle-label');
+    if (drawerAiLabel) {
+      drawerAiLabel.style.display = isGlobalAiEnabled ? 'flex' : 'none';
+    }
 
     if (titleInp) titleInp.value = note.title || '';
     if (contentInp) contentInp.value = note.content || '';

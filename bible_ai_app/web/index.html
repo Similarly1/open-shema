@@ -907,7 +907,7 @@
             <div class="notes-editor-header">
               <input type="text" id="note-edit-title" class="note-title-input" placeholder="Titre de la note...">
               <div class="note-actions" style="display: flex; align-items: center; gap: 10px;">
-                <label style="font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                <label id="note-edit-ai-toggle-label" style="font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; cursor: pointer;">
                   <input type="checkbox" id="note-edit-ai-toggle" checked>
                   <span>🤖 Inclure dans l'IA</span>
                 </label>
@@ -1036,7 +1036,7 @@
               <input type="text" id="drawer-note-title-input" class="text-field full-w" placeholder="Titre de la note..." style="margin-bottom: 6px; font-size: 12px;">
               <textarea id="drawer-note-content-input" class="text-field full-w" placeholder="Écrivez votre note en Markdown..." style="height: 90px; resize: vertical; margin-bottom: 8px; font-family: var(--font-bible); font-size: 14px;"></textarea>
               <div style="display: flex; align-items: center; justify-content: space-between;">
-                <label style="font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; cursor: pointer;">
+                <label id="drawer-note-ai-toggle-label" style="font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; cursor: pointer;">
                   <input type="checkbox" id="drawer-note-ai-toggle" checked> <span>🤖 IA</span>
                 </label>
                 <button class="btn-primary" id="btn-drawer-save-note" style="font-size: 11px; padding: 4px 12px;">💾 Enregistrer</button>
