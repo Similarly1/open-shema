@@ -94,9 +94,12 @@ const App = {
       e.stopPropagation();
       API.call('minimize_window');
     });
-    document.getElementById('win-btn-max')?.addEventListener('click', (e) => {
+    document.getElementById('win-btn-max')?.addEventListener('click', async (e) => {
       e.stopPropagation();
-      API.call('maximize_window');
+      const res = await API.call('maximize_window');
+      if (res && typeof res.is_maximized === 'boolean') {
+        this.updateWindowState(res.is_maximized);
+      }
     });
     document.getElementById('win-btn-fs')?.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -108,9 +111,32 @@ const App = {
     });
 
     // Double clic sur la barre de titre pour Agrandir / Restaurer
-    document.getElementById('app-window-titlebar')?.addEventListener('dblclick', (e) => {
+    const titlebar = document.getElementById('app-window-titlebar');
+    titlebar?.addEventListener('dblclick', async (e) => {
       if (e.target.closest('button, .win-control-btn')) return;
-      API.call('maximize_window');
+      const res = await API.call('maximize_window');
+      if (res && typeof res.is_maximized === 'boolean') {
+        this.updateWindowState(res.is_maximized);
+      }
+    });
+
+    // Capture mousedown sur la barre de titre : bloquer tout déplacement par glisser si la fenêtre est agrandie
+    titlebar?.addEventListener('mousedown', (e) => {
+      if (this.isWindowMaximized || document.body.classList.contains('window-maximized')) {
+        if (!e.target.closest('button, .win-control-btn')) {
+          e.stopPropagation();
+        }
+      }
+    }, true);
+
+    // Initialiser l'état d'agrandissement de la fenêtre auprès du backend
+    API.onReady(async () => {
+      try {
+        const state = await API.call('get_window_state');
+        if (state && typeof state.is_maximized === 'boolean') {
+          this.updateWindowState(state.is_maximized);
+        }
+      } catch (e) {}
     });
 
     // 6. Masquage fluide du Splash Loader dès que l'API est initialisée (avec timeout de sécurité)
@@ -591,7 +617,11 @@ const App = {
 
       if (e.key === 'F11') {
         e.preventDefault();
-        API.call('maximize_window');
+        API.call('maximize_window').then(res => {
+          if (res && typeof res.is_maximized === 'boolean') {
+            App.updateWindowState(res.is_maximized);
+          }
+        });
         return;
       }
 
@@ -618,6 +648,29 @@ const App = {
         }
       }
     });
+  },
+
+  isWindowMaximized: true,
+
+  updateWindowState(isMaximized) {
+    this.isWindowMaximized = !!isMaximized;
+    const titlebar = document.getElementById('app-window-titlebar');
+    const maxBtn = document.getElementById('win-btn-max');
+    if (this.isWindowMaximized) {
+      document.body.classList.add('window-maximized');
+      titlebar?.classList.remove('pywebview-drag-region');
+      if (maxBtn) {
+        maxBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="3" width="6" height="6" rx="1"/><path d="M3 1h5a1 1 0 0 1 1 1v5"/></svg>`;
+        maxBtn.title = "Restaurer la taille de la fenêtre";
+      }
+    } else {
+      document.body.classList.remove('window-maximized');
+      titlebar?.classList.add('pywebview-drag-region');
+      if (maxBtn) {
+        maxBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="1" width="8" height="8" rx="1"/></svg>`;
+        maxBtn.title = "Agrandir la fenêtre";
+      }
+    }
   }
 };
 

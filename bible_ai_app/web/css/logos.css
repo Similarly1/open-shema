@@ -456,6 +456,12 @@ body, html {
   -webkit-app-region: drag;
 }
 
+/* Si la fenêtre est maximisée / agrandie, le déplacement est désactivé comme sous Windows */
+body.window-maximized .app-window-titlebar,
+body.window-maximized .window-titlebar-drag {
+  -webkit-app-region: no-drag !important;
+}
+
 .window-titlebar-drag {
   display: flex;
   align-items: center;

@@ -1264,6 +1264,10 @@ class BibleAppApi:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+    def get_window_state(self):
+        global _IS_MAXIMIZED
+        return {"is_maximized": _IS_MAXIMIZED}
+
     def minimize_window(self):
         global _GLOBAL_WINDOW
         if _GLOBAL_WINDOW:
@@ -1378,6 +1382,19 @@ def on_window_shown(*args, **kwargs):
             wx, wy, ww, wh = get_work_area()
             user32.SetWindowPos(hwnd, 0, wx, wy, ww, wh, 0x0040)
             _IS_MAXIMIZED = True
+        
+        # Sécurité : neutraliser le déplacement si la fenêtre est agrandie
+        if hasattr(_GLOBAL_WINDOW, 'move'):
+            orig_move = _GLOBAL_WINDOW.move
+            def safe_move(x, y):
+                global _IS_MAXIMIZED
+                if _IS_MAXIMIZED:
+                    return
+                try:
+                    orig_move(x, y)
+                except Exception:
+                    pass
+            _GLOBAL_WINDOW.move = safe_move
     except Exception as e:
         logger.warning(f"Erreur initialisation agrandissement: {e}")
 
@@ -1399,7 +1416,7 @@ def main():
         height=wh,
         min_size=(1050, 680),
         frameless=True,
-        easy_drag=True,
+        easy_drag=False,
         background_color="#0F172A"
     )
     _GLOBAL_WINDOW.events.shown += on_window_shown
