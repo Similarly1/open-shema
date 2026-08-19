@@ -14,6 +14,8 @@ DEFAULTS = {
     "embedding_provider": "local",
     "chat_model": "gemini-3.7-flash",
     "theme": "dark",
+    "theme_palette": "dark-slate",
+    "reading_bg": "auto",
     "font_family": "Georgia",
     "font_size": 18,
     "line_spacing": 6,

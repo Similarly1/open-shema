@@ -54,9 +54,34 @@ const SettingsView = {
   },
 
   bindActions() {
-    // Changement de thème en direct
+    const triggerThemeUpdate = () => {
+      const theme = document.getElementById('cfg-theme')?.value || 'dark';
+      const palette = document.getElementById('cfg-theme-palette')?.value || 'dark-slate';
+      const readingBg = document.getElementById('cfg-reading-bg')?.value || 'auto';
+      App.applyTheme(theme, palette, readingBg);
+    };
+
+    // Changement de mode sombre / clair / système
     document.getElementById('cfg-theme')?.addEventListener('change', (e) => {
-      App.applyTheme(e.target.value);
+      const palEl = document.getElementById('cfg-theme-palette');
+      if (palEl) {
+        if (e.target.value === 'light' && palEl.value.startsWith('dark')) {
+          palEl.value = 'light-clean';
+        } else if (e.target.value === 'dark' && palEl.value.startsWith('light')) {
+          palEl.value = 'dark-slate';
+        }
+      }
+      triggerThemeUpdate();
+    });
+
+    // Changement de palette de couleurs
+    document.getElementById('cfg-theme-palette')?.addEventListener('change', () => {
+      triggerThemeUpdate();
+    });
+
+    // Changement de fond de canevas de lecture
+    document.getElementById('cfg-reading-bg')?.addEventListener('change', () => {
+      triggerThemeUpdate();
     });
 
     // Changement de police en direct
@@ -173,8 +198,18 @@ const SettingsView = {
   populateForm() {
     const c = this.config;
     const theme = c.theme || 'dark';
+    const palette = c.theme_palette || 'dark-slate';
+    const readingBg = c.reading_bg || 'auto';
+
     document.getElementById('cfg-theme').value = theme;
-    App.applyTheme(theme);
+    if (document.getElementById('cfg-theme-palette')) {
+      document.getElementById('cfg-theme-palette').value = palette;
+    }
+    if (document.getElementById('cfg-reading-bg')) {
+      document.getElementById('cfg-reading-bg').value = readingBg;
+    }
+
+    App.applyTheme(theme, palette, readingBg);
 
     const font = c.font_family || 'EB Garamond';
     document.getElementById('cfg-font-family').value = font;
@@ -282,6 +317,8 @@ const SettingsView = {
   async save() {
     const newCfg = { ...this.config };
     newCfg.theme = document.getElementById('cfg-theme').value;
+    newCfg.theme_palette = document.getElementById('cfg-theme-palette')?.value || 'dark-slate';
+    newCfg.reading_bg = document.getElementById('cfg-reading-bg')?.value || 'auto';
     newCfg.font_family = document.getElementById('cfg-font-family').value;
     newCfg.font_size = parseInt(document.getElementById('cfg-font-size').value);
     newCfg.line_spacing = parseInt(document.getElementById('cfg-line-spacing').value);
@@ -307,7 +344,7 @@ const SettingsView = {
     try {
       await API.call('save_settings', newCfg);
       this.config = newCfg;
-      App.applyTheme(newCfg.theme);
+      App.applyTheme(newCfg.theme, newCfg.theme_palette, newCfg.reading_bg);
       App.applyFontFamily(newCfg.font_family);
       App.showToast('Paramètres enregistrés avec succès !');
     } catch (e) {

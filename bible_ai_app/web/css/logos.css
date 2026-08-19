@@ -3,8 +3,9 @@
    ========================================================================== */
 
 :root,
-body.theme-light {
-  /* Palette de couleurs Logos Claire */
+body.theme-light,
+body.palette-light-clean {
+  /* 1. CLAIR : Blanc Pur & Azur (Par défaut) */
   --bg-app: #F8FAFC;
   --bg-sidebar: #F1F5F9;
   --bg-reading: #FFFFFF;
@@ -35,7 +36,8 @@ body.theme-light {
   --tag-text: #475569;
   --scrollbar-thumb: #CBD5E1;
   --scrollbar-thumb-hover: #94A3B8;
-  
+  --shadow-popover: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+
   /* Typographie */
   --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-bible: 'EB Garamond', 'Lora', 'Georgia', serif;
@@ -49,11 +51,79 @@ body.theme-light {
   /* Animations */
   --transition-fast: 0.15s ease;
   --transition-normal: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  --shadow-popover: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
 }
 
-body.theme-dark {
-  /* Palette de couleurs Logos Sombre Ultra-Premium */
+/* 2. CLAIR : Papier Crème & Lapis (Chaleureux / Doux) */
+body.palette-light-warm {
+  --bg-app: #FAF7F0;
+  --bg-sidebar: #F3ECE0;
+  --bg-reading: #FFFDF8;
+  --bg-card: #FFFDF9;
+  --bg-subtle: #FAF5EA;
+  --bg-hover: #E9DFCE;
+  --bg-active: #DDE7F6;
+  
+  --border-color: #E2D5C0;
+  --border-subtle: #EDE4D3;
+  
+  --text-primary: #2C241B;
+  --text-secondary: #574B3C;
+  --text-muted: #8F8070;
+  
+  --accent-blue: #1D4ED8;
+  --accent-blue-hover: #1E40AF;
+  --accent-orange: #C2410C;
+  --accent-purple: #6D28D9;
+  --accent-green: #047857;
+  --accent-red: #BE123C;
+
+  --input-bg: #FFFDF9;
+  --input-border: #D8C7AD;
+  --header-bg: #F3ECE0;
+  --tab-inactive-bg: #E9DFCE;
+  --tag-bg: #EFE6D6;
+  --tag-text: #574B3C;
+  --scrollbar-thumb: #D8C7AD;
+  --scrollbar-thumb-hover: #B8A589;
+}
+
+/* 3. CLAIR : Gris Feutré & Sauge (Nordique / Épuré) */
+body.palette-light-nordic {
+  --bg-app: #F2F4F5;
+  --bg-sidebar: #E5E8EB;
+  --bg-reading: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-subtle: #F8F9FA;
+  --bg-hover: #D7DCE0;
+  --bg-active: #E0F2F1;
+  
+  --border-color: #CBD3DA;
+  --border-subtle: #DFE5EA;
+  
+  --text-primary: #1F2937;
+  --text-secondary: #4B5563;
+  --text-muted: #6B7280;
+  
+  --accent-blue: #0F766E;
+  --accent-blue-hover: #115E59;
+  --accent-orange: #D97706;
+  --accent-purple: #6D28D9;
+  --accent-green: #059669;
+  --accent-red: #DC2626;
+
+  --input-bg: #FFFFFF;
+  --input-border: #BCC5CD;
+  --header-bg: #E5E8EB;
+  --tab-inactive-bg: #D7DCE0;
+  --tag-bg: #E5E8EB;
+  --tag-text: #374151;
+  --scrollbar-thumb: #BCC5CD;
+  --scrollbar-thumb-hover: #9CA3AF;
+}
+
+/* 4. SOMBRE : Bleu Nuit & Ardoise (Par défaut) */
+body.theme-dark,
+body.palette-dark-slate {
   --bg-app: #0B0F17;
   --bg-sidebar: #0F172A;
   --bg-reading: #0F172A;
@@ -85,6 +155,170 @@ body.theme-dark {
   --scrollbar-thumb: #475569;
   --scrollbar-thumb-hover: #64748B;
   --shadow-popover: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+}
+
+/* 5. SOMBRE : Onyx Profond & Noir Pur (OLED) */
+body.palette-dark-oled {
+  --bg-app: #000000;
+  --bg-sidebar: #08080A;
+  --bg-reading: #08080A;
+  --bg-card: #121216;
+  --bg-subtle: #0D0D11;
+  --bg-hover: #222228;
+  --bg-active: #1E3A8A;
+  
+  --border-color: #27272F;
+  --border-subtle: #18181E;
+  
+  --text-primary: #FFFFFF;
+  --text-secondary: #D4D4D8;
+  --text-muted: #71717A;
+  
+  --accent-blue: #60A5FA;
+  --accent-blue-hover: #3B82F6;
+  --accent-orange: #FB923C;
+  --accent-purple: #C084FC;
+  --accent-green: #4ADE80;
+  --accent-red: #F87171;
+
+  --input-bg: #141418;
+  --input-border: #383842;
+  --header-bg: #08080A;
+  --tab-inactive-bg: #121216;
+  --tag-bg: #222228;
+  --tag-text: #F4F4F5;
+  --scrollbar-thumb: #383842;
+  --scrollbar-thumb-hover: #52525B;
+  --shadow-popover: 0 10px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.6);
+}
+
+/* 6. SOMBRE : Ébène & Ambre Chaud (Boisé / Confortable) */
+body.palette-dark-warm {
+  --bg-app: #151210;
+  --bg-sidebar: #1C1815;
+  --bg-reading: #1C1815;
+  --bg-card: #27221E;
+  --bg-subtle: #201B17;
+  --bg-hover: #3A322C;
+  --bg-active: #6D4C2B;
+  
+  --border-color: #423831;
+  --border-subtle: #2C2520;
+  
+  --text-primary: #FAF5EE;
+  --text-secondary: #D9CFC4;
+  --text-muted: #9E9186;
+  
+  --accent-blue: #E59840;
+  --accent-blue-hover: #D97706;
+  --accent-orange: #F97316;
+  --accent-purple: #C084FC;
+  --accent-green: #65A30D;
+  --accent-red: #E11D48;
+
+  --input-bg: #27221E;
+  --input-border: #4D4139;
+  --header-bg: #1C1815;
+  --tab-inactive-bg: #27221E;
+  --tag-bg: #3A322C;
+  --tag-text: #FAF5EE;
+  --scrollbar-thumb: #4D4139;
+  --scrollbar-thumb-hover: #66564C;
+  --shadow-popover: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+}
+
+/* ==========================================================================
+   TEINTES DE FOND DU CANEVAS DE LECTURE (INDÉPENDANTES DU THÈME GÉNÉRAL)
+   ========================================================================== */
+
+/* 1. Fond de Lecture Blanc Pur */
+body.reading-bg-white .reader-workspace,
+body.reading-bg-white .reading-pane,
+body.reading-bg-white .pane-scrollable-content,
+body.reading-bg-white .commentary-viewer-panel,
+body.reading-bg-white .dict-view-content,
+body.reading-bg-white .dict-entry-card,
+body.reading-bg-white .notes-drawer-body,
+body.reading-bg-white #notes-drawer-content {
+  background-color: #FFFFFF !important;
+  color: #1E293B !important;
+}
+body.reading-bg-white .verses-flow,
+body.reading-bg-white .search-res-text,
+body.reading-bg-white .comm-body-text,
+body.reading-bg-white .dict-entry-body,
+body.reading-bg-white .note-view-render {
+  color: #0F172A !important;
+}
+body.reading-bg-white .verse-num {
+  color: #64748B !important;
+}
+body.reading-bg-white .pericope-title {
+  color: #0284C7 !important;
+}
+body.reading-bg-white .pane-header {
+  background-color: #F8FAFC !important;
+  border-bottom-color: #E2E8F0 !important;
+}
+
+/* 2. Fond de Lecture Sépia Doux (Style Liseuse / Papier Ancien) */
+body.reading-bg-sepia .reader-workspace,
+body.reading-bg-sepia .reading-pane,
+body.reading-bg-sepia .pane-scrollable-content,
+body.reading-bg-sepia .commentary-viewer-panel,
+body.reading-bg-sepia .dict-view-content,
+body.reading-bg-sepia .dict-entry-card,
+body.reading-bg-sepia .notes-drawer-body,
+body.reading-bg-sepia #notes-drawer-content {
+  background-color: #FBF0D9 !important;
+  color: #382E25 !important;
+}
+body.reading-bg-sepia .verses-flow,
+body.reading-bg-sepia .search-res-text,
+body.reading-bg-sepia .comm-body-text,
+body.reading-bg-sepia .dict-entry-body,
+body.reading-bg-sepia .note-view-render {
+  color: #281E15 !important;
+}
+body.reading-bg-sepia .verse-num {
+  color: #8C7864 !important;
+}
+body.reading-bg-sepia .pericope-title {
+  color: #92400E !important;
+}
+body.reading-bg-sepia .pane-header {
+  background-color: #F3E5C8 !important;
+  border-bottom-color: #E5D5B5 !important;
+}
+
+/* 3. Fond de Lecture Très Sombre (Nuit Profonde / Noir Absolu) */
+body.reading-bg-dark .reader-workspace,
+body.reading-bg-dark .reading-pane,
+body.reading-bg-dark .pane-scrollable-content,
+body.reading-bg-dark .commentary-viewer-panel,
+body.reading-bg-dark .dict-view-content,
+body.reading-bg-dark .dict-entry-card,
+body.reading-bg-dark .notes-drawer-body,
+body.reading-bg-dark #notes-drawer-content {
+  background-color: #070A0F !important;
+  color: #F1F5F9 !important;
+}
+body.reading-bg-dark .verses-flow,
+body.reading-bg-dark .search-res-text,
+body.reading-bg-dark .comm-body-text,
+body.reading-bg-dark .dict-entry-body,
+body.reading-bg-dark .note-view-render {
+  color: #F8FAFC !important;
+}
+body.reading-bg-dark .verse-num {
+  color: #64748B !important;
+}
+body.reading-bg-dark .pericope-title {
+  color: #38BDF8 !important;
+}
+body.reading-bg-dark .pane-header {
+  background-color: #0B0F17 !important;
+  border-bottom-color: #1E293B !important;
 }
 
 /* Reset & Base */

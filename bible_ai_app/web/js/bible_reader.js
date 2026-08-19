@@ -299,6 +299,19 @@ const DisplayOptions = {
     document.getElementById('opt-font-serif')?.addEventListener('change', (e) => {
       workspace?.classList.toggle('font-sans', !e.target.checked);
     });
+
+    // Boutons de changement instantané du fond de lecture
+    ['auto', 'white', 'sepia', 'dark'].forEach(bgKey => {
+      document.getElementById(`btn-quick-bg-${bgKey}`)?.addEventListener('click', async () => {
+        const cfg = await API.getSettings() || {};
+        cfg.reading_bg = bgKey;
+        const selectEl = document.getElementById('cfg-reading-bg');
+        if (selectEl) selectEl.value = bgKey;
+        App.applyTheme(cfg.theme, cfg.theme_palette, bgKey);
+        API.call('save_settings', cfg);
+        popover.classList.add('hidden');
+      });
+    });
   }
 };
 

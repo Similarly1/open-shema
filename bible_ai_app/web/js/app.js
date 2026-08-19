@@ -102,7 +102,7 @@ const App = {
       try {
         const cfg = await API.getSettings();
         if (cfg) {
-          if (cfg.theme) this.applyTheme(cfg.theme);
+          this.applyTheme(cfg.theme || 'dark', cfg.theme_palette, cfg.reading_bg);
           if (cfg.font_family) this.applyFontFamily(cfg.font_family);
         }
       } catch (e) {
@@ -113,16 +113,23 @@ const App = {
     if (window.matchMedia) {
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
         const themeVal = document.getElementById('cfg-theme')?.value;
+        const paletteVal = document.getElementById('cfg-theme-palette')?.value;
+        const readingBgVal = document.getElementById('cfg-reading-bg')?.value;
         if (themeVal === 'system') {
-          this.applyTheme('system');
+          this.applyTheme('system', paletteVal, readingBgVal);
         }
       });
     }
   },
 
-  applyTheme(theme) {
+  applyTheme(theme, palette, readingBg) {
     const body = document.body;
     body.classList.remove('theme-light', 'theme-dark');
+    body.classList.remove(
+      'palette-dark-slate', 'palette-dark-oled', 'palette-dark-warm',
+      'palette-light-clean', 'palette-light-warm', 'palette-light-nordic'
+    );
+    body.classList.remove('reading-bg-white', 'reading-bg-sepia', 'reading-bg-dark');
 
     let effective = theme || 'dark';
     if (effective === 'system') {
@@ -133,6 +140,18 @@ const App = {
       body.classList.add('theme-dark');
     } else {
       body.classList.add('theme-light');
+    }
+
+    // Palette active
+    if (palette) {
+      body.classList.add(palette.startsWith('palette-') ? palette : `palette-${palette}`);
+    } else {
+      body.classList.add(effective === 'dark' ? 'palette-dark-slate' : 'palette-light-clean');
+    }
+
+    // Teinte indépendante du canevas de lecture
+    if (readingBg && readingBg !== 'auto') {
+      body.classList.add(`reading-bg-${readingBg}`);
     }
   },
 

@@ -133,10 +133,35 @@
               <span class="pill-arrow">▾</span>
             </div>
             
-            <div class="nav-mode-links">
-              <button class="mode-link" id="btn-display-options" title="Options d'affichage (Péricopes, numéros, police)">Affichage ▾</button>
+            <div class="nav-mode-links" style="position: relative;">
+              <button class="mode-link" id="btn-display-options" title="Options d'affichage (Péricopes, numéros, fond de lecture)">Affichage ▾</button>
               <button class="mode-link" id="mode-search-inline">Chercher</button>
               <button class="mode-link" id="mode-notes-inline">Notes</button>
+
+              <!-- Popover Options d'Affichage & Fond de Lecture Rapide -->
+              <div id="display-options-popover" class="study-mode-popover hidden" style="position: absolute; top: 36px; left: 0; width: 310px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); border-radius: 8px; z-index: 1100; text-align: left;">
+                <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
+                  Affichage du Texte
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px;">
+                  <label class="custom-checkbox"><input type="checkbox" id="opt-show-pericopes" checked> <span>Titres de sections / Péricopes</span></label>
+                  <label class="custom-checkbox"><input type="checkbox" id="opt-show-chap-num" checked> <span>Lettrine de chapitre</span></label>
+                  <label class="custom-checkbox"><input type="checkbox" id="opt-show-verse-num" checked> <span>Numéros de versets</span></label>
+                  <label class="custom-checkbox"><input type="checkbox" id="opt-verse-per-line"> <span>Un verset par ligne</span></label>
+                </div>
+
+                <div style="border-top: 1px solid var(--border-color); margin: 12px 0 8px 0; padding-top: 8px;">
+                  <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">
+                    Fond du Canevas de Lecture
+                  </div>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 11px;">
+                    <button id="btn-quick-bg-auto" class="tool-btn" style="justify-content: center; cursor: pointer;">🎨 Harmonisé</button>
+                    <button id="btn-quick-bg-white" class="tool-btn" style="justify-content: center; background: #ffffff !important; color: #1e293b !important; border: 1px solid #cbd5e1; cursor: pointer;">⚪ Blanc</button>
+                    <button id="btn-quick-bg-sepia" class="tool-btn" style="justify-content: center; background: #fbf0d9 !important; color: #382e25 !important; border: 1px solid #d8c7ad; cursor: pointer;">📜 Sépia</button>
+                    <button id="btn-quick-bg-dark" class="tool-btn" style="justify-content: center; background: #070a0f !important; color: #f1f5f9 !important; border: 1px solid #334155; cursor: pointer;">🌑 Sombre</button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -268,19 +293,46 @@
           <!-- Section 1 : Apparence -->
           <div class="settings-section active" id="sec-apparence">
             <div class="settings-card">
-              <div class="card-title">Typographie & Thème</div>
+              <div class="card-title">Palette de Couleurs & Apparence Globale</div>
               
               <div class="form-row two-cols">
                 <div class="form-group">
-                  <label>Thème de l'interface :</label>
+                  <label>Mode d'apparence :</label>
                   <select id="cfg-theme" class="select-field full-w">
-                    <option value="light">Clair (Logos White)</option>
-                    <option value="dark">Sombre (Dark Mode)</option>
-                    <option value="system">Système</option>
+                    <option value="dark">🌙 Sombre (Dark Mode)</option>
+                    <option value="light">☀️ Clair (Light Mode)</option>
+                    <option value="system">💻 Système (Auto OS)</option>
                   </select>
                 </div>
                 <div class="form-group">
-                  <label>Police de lecture :</label>
+                  <label>Palette de couleurs de l'interface :</label>
+                  <select id="cfg-theme-palette" class="select-field full-w">
+                    <optgroup label="Palettes Sombres">
+                      <option value="dark-slate" selected>🌌 Bleu Nuit & Ardoise (Moderne / Par défaut)</option>
+                      <option value="dark-oled">🌑 Onyx & Noir Pur (Contraste OLED)</option>
+                      <option value="dark-warm">🪵 Ébène & Ambre Chaud (Boisé / Doux)</option>
+                    </optgroup>
+                    <optgroup label="Palettes Claires">
+                      <option value="light-clean">☀️ Blanc Pur & Azur (Immaculé / Net)</option>
+                      <option value="light-warm">📜 Papier Crème & Lapis (Livre / Ivoire)</option>
+                      <option value="light-nordic">🌿 Gris Feutré & Sauge (Nordique / Épuré)</option>
+                    </optgroup>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row two-cols" style="margin-top: 10px;">
+                <div class="form-group">
+                  <label>Fond des fenêtres de lecture (Bible, comms, notes) :</label>
+                  <select id="cfg-reading-bg" class="select-field full-w">
+                    <option value="auto" selected>🎨 Harmonisé (Hérité du thème général)</option>
+                    <option value="white">⚪ Blanc Pur (Lecture nette et contrastée)</option>
+                    <option value="sepia">📜 Sépia Doux (Confort de lecture / Liseuse)</option>
+                    <option value="dark">🌑 Très Sombre (Nuit profonde / Noir)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Police du texte biblique :</label>
                   <select id="cfg-font-family" class="select-field full-w font-preview-select">
                     <option value="EB Garamond" style="font-family: 'EB Garamond', serif; font-size: 15px; font-weight: 600;">EB Garamond (Serif Éditorial)</option>
                     <option value="Lora" style="font-family: 'Lora', serif; font-size: 15px; font-weight: 500;">Lora (Serif Moderne)</option>
