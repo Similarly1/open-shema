@@ -31,15 +31,257 @@ def clean_html_tags(raw_html: str) -> str:
 
 _SEARCH_EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=12)
 
+# =============================================================================
+# REGISTRE CURATÉ DES VERSIONS BIBLIQUES (RÉSOLUTION INSTANTANÉE & COUVERTURES HD)
+# =============================================================================
+BIBLE_VERSIONS_REGISTRY = [
+    {
+        "id": "bible_s21",
+        "keywords": ["s21", "segond 21", "segond21", "bible segond 21", "societe biblique de geneve"],
+        "source": "Société Biblique de Genève",
+        "source_badge": "Bible S21",
+        "source_badge_color": "#2563EB",
+        "title": "Bible Segond 21 (Avec notes de référence)",
+        "short_title": "S21",
+        "authors": ["Société Biblique de Genève"],
+        "author_str": "Société Biblique de Genève",
+        "publisher": "Société Biblique de Genève",
+        "published_date": "2007",
+        "year": "2007",
+        "description": "La Bible Segond 21 est une traduction de référence éditée par la Société Biblique de Genève, proposant le texte classique de Louis Segond avec le vocabulaire français contemporain.",
+        "isbn": "9782608123015",
+        "categories": ["Bible"],
+        "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg"
+    },
+    {
+        "id": "bible_bds",
+        "keywords": ["bds", "semeur", "bible du semeur", "bible semeur", "alfred kuen", "excelsis"],
+        "source": "Société Biblique Internationale",
+        "source_badge": "Bible du Semeur",
+        "source_badge_color": "#0284C7",
+        "title": "La Bible du Semeur (Édition d'étude)",
+        "short_title": "BDS",
+        "authors": ["Biblica", "Alfred Kuen"],
+        "author_str": "Biblica (Alfred Kuen)",
+        "publisher": "Excelsis / Biblica",
+        "published_date": "2015",
+        "year": "2015",
+        "description": "Traduction à équivalence dynamique d'une grande clarté littéraire, particulièrement appréciée pour la lecture continue et la prédication.",
+        "isbn": "9782853006095",
+        "categories": ["Bible"],
+        "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg"
+    },
+    {
+        "id": "bible_lsg1910",
+        "keywords": ["lsg", "segond 1910", "louis segond", "segond", "lsg1910", "bible segond", "1910"],
+        "source": "Société Biblique Française",
+        "source_badge": "Bible LSG 1910",
+        "source_badge_color": "#059669",
+        "title": "Sainte Bible - Traduction Louis Segond 1910",
+        "short_title": "LSG 1910",
+        "authors": ["Louis Segond"],
+        "author_str": "Louis Segond",
+        "publisher": "Société Biblique Française",
+        "published_date": "1910",
+        "year": "1910",
+        "description": "La version protestante francophone historique la plus lue et la plus citée dans le monde évangélique et réformé.",
+        "isbn": "9782853000000",
+        "categories": ["Bible"],
+        "cover_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/La_Sainte_Bible%2C_trad._Segond%2C_ed._1910.djvu/page1-500px-La_Sainte_Bible%2C_trad._Segond%2C_ed._1910.djvu.jpg"
+    },
+    {
+        "id": "bible_bj",
+        "keywords": ["bj", "jerusalem", "jérusalem", "bible de jerusalem", "bible de jérusalem", "cerf"],
+        "source": "Éditions du Cerf",
+        "source_badge": "Bible de Jérusalem",
+        "source_badge_color": "#991B1B",
+        "title": "La Bible de Jérusalem (Nouvelle édition révisée)",
+        "short_title": "BJ",
+        "authors": ["École Biblique de Jérusalem"],
+        "author_str": "École Biblique de Jérusalem",
+        "publisher": "Éditions du Cerf",
+        "published_date": "1998",
+        "year": "1998",
+        "description": "Chef-d'œuvre de l'exégèse catholique moderne, renommée pour ses introductions détaillées et son apparat critique.",
+        "isbn": "9782204060639",
+        "categories": ["Bible"],
+        "cover_url": "https://upload.wikimedia.org/wikipedia/commons/1/11/Bible_de_Jerusalem.jpg"
+    },
+    {
+        "id": "bible_tob",
+        "keywords": ["tob", "oecumenique", "œcuménique", "traduction oecumenique", "traduction œcuménique"],
+        "source": "Cerf / Bibli'O",
+        "source_badge": "Bible TOB",
+        "source_badge_color": "#D97706",
+        "title": "Traduction Œcuménique de la Bible (TOB)",
+        "short_title": "TOB",
+        "authors": ["Société Biblique Française", "Éditions du Cerf"],
+        "author_str": "Comité Œcuménique",
+        "publisher": "Cerf / Bibli'O",
+        "published_date": "2010",
+        "year": "2010",
+        "description": "Première traduction conjointe réalisée par des spécialistes catholiques, protestants et orthodoxes.",
+        "isbn": "9782204094122",
+        "categories": ["Bible"],
+        "cover_url": "https://upload.wikimedia.org/wikipedia/commons/0/01/TOB_note.jpg"
+    },
+    {
+        "id": "bible_nbs",
+        "keywords": ["nbs", "nouvelle bible segond", "nouvelle segond"],
+        "source": "Bibli'O",
+        "source_badge": "Bible NBS",
+        "source_badge_color": "#4F46E5",
+        "title": "Nouvelle Bible Segond (Édition d'étude NBS)",
+        "short_title": "NBS",
+        "authors": ["Société Biblique Française"],
+        "author_str": "Société Biblique Française",
+        "publisher": "Bibli'O",
+        "published_date": "2002",
+        "year": "2002",
+        "description": "Révision rigoureuse à équivalence formelle maximale avec notes d'étude philologiques approfondies.",
+        "isbn": "9782853001878",
+        "categories": ["Bible"],
+        "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg"
+    },
+    {
+        "id": "bible_nfc",
+        "keywords": ["nfc", "francais courant", "français courant", "nouvelle francais courant", "nouvelle français courant"],
+        "source": "Bibli'O",
+        "source_badge": "Bible NFC",
+        "source_badge_color": "#0D9488",
+        "title": "Nouvelle Français Courant (NFC)",
+        "short_title": "NFC",
+        "authors": ["Société Biblique Française"],
+        "author_str": "Société Biblique Française",
+        "publisher": "Bibli'O",
+        "published_date": "2019",
+        "year": "2019",
+        "description": "Traduction interconfessionnelle en langage clair et accessible pour un large public contemporain.",
+        "isbn": "9782853007429",
+        "categories": ["Bible"],
+        "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg"
+    },
+    {
+        "id": "bible_darby",
+        "keywords": ["darby", "drb", "bible darby", "j.n. darby"],
+        "source": "Bibles & Publications Chrétiennes",
+        "source_badge": "Bible Darby",
+        "source_badge_color": "#7C2D12",
+        "title": "Sainte Bible - Traduction John Nelson Darby",
+        "short_title": "Darby",
+        "authors": ["John Nelson Darby"],
+        "author_str": "J.N. Darby",
+        "publisher": "BPC Valence",
+        "published_date": "1885",
+        "year": "1885",
+        "description": "Traduction littérale d'une précision extrême, respectant scrupuleusement la structure des langues originales hébraïque et grecque.",
+        "isbn": "9782900325148",
+        "categories": ["Bible"],
+        "cover_url": "https://upload.wikimedia.org/wikipedia/commons/7/76/John_Nelson_Darby_1870.jpg"
+    },
+    {
+        "id": "bible_crampon",
+        "keywords": ["crampon", "cra", "bible crampon", "augustin crampon"],
+        "source": "Société de Saint-Jean l'Évangéliste",
+        "source_badge": "Bible Crampon",
+        "source_badge_color": "#831843",
+        "title": "La Sainte Bible - Chanoine Augustin Crampon (1923)",
+        "short_title": "Crampon",
+        "authors": ["Augustin Crampon"],
+        "author_str": "Augustin Crampon",
+        "publisher": "Desclée & Cie",
+        "published_date": "1923",
+        "year": "1923",
+        "description": "La première traduction catholique moderne directement réalisée sur les textes originaux hébreu, araméen et grec.",
+        "isbn": "9782856522332",
+        "categories": ["Bible"],
+        "cover_url": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Augustin_Crampon.jpg"
+    },
+    {
+        "id": "bible_martin",
+        "keywords": ["martin", "david martin", "bible martin", "martin 1744"],
+        "source": "Patrimoine Protestant",
+        "source_badge": "Bible Martin 1744",
+        "source_badge_color": "#374151",
+        "title": "La Sainte Bible - Pasteur David Martin (1744)",
+        "short_title": "Martin 1744",
+        "authors": ["David Martin"],
+        "author_str": "David Martin",
+        "publisher": "Patrimoine Protestant",
+        "published_date": "1744",
+        "year": "1744",
+        "description": "La grande révision du XVIIIe siècle de la Bible de Genève, monument du protestantisme francophone.",
+        "isbn": "",
+        "categories": ["Bible"],
+        "cover_url": "https://upload.wikimedia.org/wikipedia/commons/7/74/Photo_Bible_David_Martin_1744.jpg"
+    },
+    {
+        "id": "bible_ostervald",
+        "keywords": ["ostervald", "osterwald", "bible ostervald", "jean-frederic ostervald"],
+        "source": "Société Biblique de France",
+        "source_badge": "Bible Ostervald",
+        "source_badge_color": "#1E3A8A",
+        "title": "La Sainte Bible - Jean-Frédéric Ostervald (1779)",
+        "short_title": "Ostervald",
+        "authors": ["Jean-Frédéric Ostervald"],
+        "author_str": "J.-F. Ostervald",
+        "publisher": "Société Biblique",
+        "published_date": "1779",
+        "year": "1779",
+        "description": "Traduction historique neuchâteloise très répandue dans les familles chrétiennes francophones.",
+        "isbn": "",
+        "categories": ["Bible"],
+        "cover_url": "https://upload.wikimedia.org/wikipedia/commons/7/74/Photo_Bible_David_Martin_1744.jpg"
+    },
+    {
+        "id": "bible_kjv",
+        "keywords": ["kjv", "king james", "king james version", "authorized version"],
+        "source": "Oxford University Press",
+        "source_badge": "King James (KJV)",
+        "source_badge_color": "#581C87",
+        "title": "The Holy Bible - King James Version (KJV)",
+        "short_title": "KJV",
+        "authors": ["King James Translation Committee"],
+        "author_str": "King James Translators",
+        "publisher": "Oxford University Press",
+        "published_date": "1611",
+        "year": "1611",
+        "description": "The landmark 1611 English Bible translation authorized by King James I.",
+        "isbn": "9780199535941",
+        "categories": ["Bible"],
+        "cover_url": "https://upload.wikimedia.org/wikipedia/commons/5/5d/KJV-King-James-Version-Bible.jpg"
+    },
+    {
+        "id": "bible_esv",
+        "keywords": ["esv", "english standard", "english standard version", "crossway"],
+        "source": "Crossway",
+        "source_badge": "Bible ESV",
+        "source_badge_color": "#1E293B",
+        "title": "The Holy Bible - English Standard Version (ESV)",
+        "short_title": "ESV",
+        "authors": ["Crossway Translation Oversight Committee"],
+        "author_str": "Crossway",
+        "publisher": "Crossway",
+        "published_date": "2001",
+        "year": "2001",
+        "description": "Essentially literal Bible translation that emphasizes word-for-word accuracy and literary excellence.",
+        "isbn": "9781433558436",
+        "categories": ["Bible"],
+        "cover_url": "https://covers.openlibrary.org/b/id/12882583-L.jpg"
+    }
+]
+
+
 class BookMetadataClient:
     """
     Client de recherche de métadonnées et couvertures bibliographiques multi-sources.
     Interroge en parallèle :
-    1. Google Books API (catalogue contemporain)
-    2. Open Library Covers & Search API (catalogue mondial ouvert & ISBN)
-    3. BnF Gallica SRU API (éditions françaises historiques, bibles anciennes, fac-similés)
-    4. Internet Archive Search API (grands commentaires exégétiques et textes libres)
-    5. Wikipédia / Wikimedia Commons API (œuvres majeures et bibles historiques)
+    1. Registre curaté des Bibles officielles (résolution instantanée & HD)
+    2. Google Books API (catalogue contemporain)
+    3. Open Library Covers & Search API (catalogue mondial ouvert & ISBN 2-step lookup)
+    4. BnF Gallica SRU API (éditions françaises historiques, bibles anciennes, fac-similés)
+    5. Internet Archive Search API (grands commentaires exégétiques et textes libres)
+    6. Wikipédia / Wikimedia Commons API (œuvres majeures et bibles historiques)
     """
 
     @staticmethod
@@ -60,7 +302,7 @@ class BookMetadataClient:
         limit: int = 15
     ) -> List[Dict[str, Any]]:
         """
-        Recherche multi-sources en parallèle (Google Books + Open Library + BnF Gallica + Internet Archive + Wikipédia).
+        Recherche multi-sources en parallèle avec résolution dédiée pour les Bibles.
         Agrège, dédoublonne et classe les résultats par pertinence visuelle.
         """
         cleaned_query = (query or "").strip()
@@ -72,7 +314,18 @@ class BookMetadataClient:
             return []
 
         search_text = cleaned_query or f"{cleaned_title} {cleaned_author}".strip()
+        search_norm = re.sub(r'[^\w\s]', '', search_text.lower()).strip()
 
+        all_results: List[Dict[str, Any]] = []
+
+        # 1. ÉTAPE 1 : Vérification dans le registre curaté des Bibles (Priorité absolue)
+        for bible in BIBLE_VERSIONS_REGISTRY:
+            for kw in bible.get("keywords", []):
+                if kw in search_norm or search_norm in kw or (len(search_norm) >= 2 and kw == search_norm):
+                    all_results.append(dict(bible))
+                    break
+
+        # 2. ÉTAPE 2 : Requêtes parallèles sur les 5 catalogues en ligne
         tasks = [
             _SEARCH_EXECUTOR.submit(cls._search_google_books, query=cleaned_query, author=cleaned_author, title=cleaned_title, isbn=cleaned_isbn, api_key=api_key, limit=8),
             _SEARCH_EXECUTOR.submit(cls._search_open_library, query=search_text, author=cleaned_author, title=cleaned_title, isbn=cleaned_isbn, limit=8),
@@ -82,7 +335,6 @@ class BookMetadataClient:
         ]
 
         done, _ = concurrent.futures.wait(tasks, timeout=3.5)
-        all_results: List[Dict[str, Any]] = []
         for future in done:
             try:
                 res = future.result()
@@ -91,12 +343,12 @@ class BookMetadataClient:
             except Exception as e:
                 logger.debug("Erreur résultat tâche recherche métadonnées: %s", e)
 
-        # Dédoublonnage intelligent & tri
+        # 3. ÉTAPE 3 : Dédoublonnage intelligent & tri
         seen_keys = set()
         deduped: List[Dict[str, Any]] = []
 
         # Priorité : résultats avec couverture haute résolution d'abord
-        all_results.sort(key=lambda r: (1 if r.get("cover_url") else 0, 1 if r.get("description") else 0), reverse=True)
+        all_results.sort(key=lambda r: (2 if r.get("id", "").startswith("bible_") else (1 if r.get("cover_url") else 0), 1 if r.get("description") else 0), reverse=True)
 
         for item in all_results:
             title_norm = re.sub(r'\W+', '', (item.get("title") or "").lower())[:40]
