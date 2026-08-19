@@ -239,13 +239,35 @@ body.palette-dark-warm {
 body.reading-bg-white .reader-workspace,
 body.reading-bg-white .reading-pane,
 body.reading-bg-white .pane-scrollable-content,
-body.reading-bg-white .reader-workspace .commentary-viewer-panel {
-  background-color: #FFFFFF !important;
+body.reading-bg-white .reader-workspace .commentary-viewer-panel,
+body.reading-bg-white #view-commentaries,
+body.reading-bg-white #view-commentaries .comm-view-main-scroll {
+  background-color: #F8FAFC !important;
   color: #1E293B !important;
 }
-body.reading-bg-white .reader-workspace .verses-flow,
-body.reading-bg-white .reader-workspace .comm-body-text {
+body.reading-bg-white #view-commentaries .comm-article-card,
+body.reading-bg-white #view-commentaries .comm-verse-banner,
+body.reading-bg-white #view-commentaries .comm-active-book-btn,
+body.reading-bg-white #view-commentaries .comm-page-synth-card {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
   color: #0F172A !important;
+}
+body.reading-bg-white .reader-workspace .verses-flow,
+body.reading-bg-white .reader-workspace .comm-body-text,
+body.reading-bg-white #view-commentaries .comm-view-reading-body,
+body.reading-bg-white #view-commentaries .comm-verse-banner-text,
+body.reading-bg-white #view-commentaries .comm-author-headline-name,
+body.reading-bg-white #view-commentaries .comm-active-book-title {
+  color: #0F172A !important;
+}
+body.reading-bg-white #view-commentaries .comm-author-headline-period,
+body.reading-bg-white #view-commentaries .comm-active-book-meta {
+  color: #64748B !important;
+}
+body.reading-bg-white #view-commentaries .comm-body-quote {
+  background-color: #F1F5F9 !important;
+  color: #334155 !important;
 }
 body.reading-bg-white .reader-workspace .verse-num {
   color: #64748B !important;
@@ -262,13 +284,35 @@ body.reading-bg-white .reader-workspace .pane-header {
 body.reading-bg-sepia .reader-workspace,
 body.reading-bg-sepia .reading-pane,
 body.reading-bg-sepia .pane-scrollable-content,
-body.reading-bg-sepia .reader-workspace .commentary-viewer-panel {
-  background-color: #FBF0D9 !important;
+body.reading-bg-sepia .reader-workspace .commentary-viewer-panel,
+body.reading-bg-sepia #view-commentaries,
+body.reading-bg-sepia #view-commentaries .comm-view-main-scroll {
+  background-color: #F3E5C8 !important;
   color: #382E25 !important;
 }
-body.reading-bg-sepia .reader-workspace .verses-flow,
-body.reading-bg-sepia .reader-workspace .comm-body-text {
+body.reading-bg-sepia #view-commentaries .comm-article-card,
+body.reading-bg-sepia #view-commentaries .comm-verse-banner,
+body.reading-bg-sepia #view-commentaries .comm-active-book-btn,
+body.reading-bg-sepia #view-commentaries .comm-page-synth-card {
+  background-color: #FBF0D9 !important;
+  border-color: #E5D5B5 !important;
   color: #281E15 !important;
+}
+body.reading-bg-sepia .reader-workspace .verses-flow,
+body.reading-bg-sepia .reader-workspace .comm-body-text,
+body.reading-bg-sepia #view-commentaries .comm-view-reading-body,
+body.reading-bg-sepia #view-commentaries .comm-verse-banner-text,
+body.reading-bg-sepia #view-commentaries .comm-author-headline-name,
+body.reading-bg-sepia #view-commentaries .comm-active-book-title {
+  color: #281E15 !important;
+}
+body.reading-bg-sepia #view-commentaries .comm-author-headline-period,
+body.reading-bg-sepia #view-commentaries .comm-active-book-meta {
+  color: #8C7864 !important;
+}
+body.reading-bg-sepia #view-commentaries .comm-body-quote {
+  background-color: #EFE2C6 !important;
+  color: #4A3E31 !important;
 }
 body.reading-bg-sepia .reader-workspace .verse-num {
   color: #8C7864 !important;
@@ -285,13 +329,35 @@ body.reading-bg-sepia .reader-workspace .pane-header {
 body.reading-bg-dark .reader-workspace,
 body.reading-bg-dark .reading-pane,
 body.reading-bg-dark .pane-scrollable-content,
-body.reading-bg-dark .reader-workspace .commentary-viewer-panel {
+body.reading-bg-dark .reader-workspace .commentary-viewer-panel,
+body.reading-bg-dark #view-commentaries,
+body.reading-bg-dark #view-commentaries .comm-view-main-scroll {
   background-color: #070A0F !important;
   color: #F1F5F9 !important;
 }
-body.reading-bg-dark .reader-workspace .verses-flow,
-body.reading-bg-dark .reader-workspace .comm-body-text {
+body.reading-bg-dark #view-commentaries .comm-article-card,
+body.reading-bg-dark #view-commentaries .comm-verse-banner,
+body.reading-bg-dark #view-commentaries .comm-active-book-btn,
+body.reading-bg-dark #view-commentaries .comm-page-synth-card {
+  background-color: #0D121D !important;
+  border-color: #1E293B !important;
   color: #F8FAFC !important;
+}
+body.reading-bg-dark .reader-workspace .verses-flow,
+body.reading-bg-dark .reader-workspace .comm-body-text,
+body.reading-bg-dark #view-commentaries .comm-view-reading-body,
+body.reading-bg-dark #view-commentaries .comm-verse-banner-text,
+body.reading-bg-dark #view-commentaries .comm-author-headline-name,
+body.reading-bg-dark #view-commentaries .comm-active-book-title {
+  color: #F8FAFC !important;
+}
+body.reading-bg-dark #view-commentaries .comm-author-headline-period,
+body.reading-bg-dark #view-commentaries .comm-active-book-meta {
+  color: #94A3B8 !important;
+}
+body.reading-bg-dark #view-commentaries .comm-body-quote {
+  background-color: #131A29 !important;
+  color: #CBD5E1 !important;
 }
 body.reading-bg-dark .reader-workspace .verse-num {
   color: #64748B !important;
