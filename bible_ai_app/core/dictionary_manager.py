@@ -170,7 +170,7 @@ class DictionaryManager:
             return {
                 "dict_id": dict_id,
                 "dict_name": dict_info["name"],
-                "badge": "🏛️ Dictionnaire Grec Bailly (1901)",
+                "badge": "Dictionnaire Grec Bailly (1901)",
                 "title": hw,
                 "preview": txt[:220] + "..." if len(txt) > 220 else txt,
                 "full_text": txt,
@@ -230,7 +230,7 @@ class DictionaryManager:
         return {
             "dict_id": dict_id,
             "dict_name": dict_info["name"],
-            "badge": f"📖 {dict_info['name']}",
+            "badge": dict_info['name'],
             "title": art.get("title", word),
             "preview": snippet or (raw_text[:200] + "..."),
             "full_text": raw_text,
@@ -288,7 +288,7 @@ class DictionaryManager:
         
         if len(matches) > 1:
             other_names = [m['dict_name'] for m in matches[1:]]
-            preview_lines.append(f"📚 Aussi disponible dans : {', '.join(other_names)}")
+            preview_lines.append(f"Aussi disponible dans : {', '.join(other_names)}")
             
         result = {
             "title": global_title,

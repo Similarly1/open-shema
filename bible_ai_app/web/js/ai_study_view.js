@@ -13,7 +13,7 @@ const AIStudyView = {
 
   MODES_INFO: {
     exegesis: {
-      icon: '🔍',
+      icon: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
       title: 'Exégèse approfondie',
       shortTitle: 'Exégèse',
       sourcesSummary: 'Bibles originales, Commentaires, Strong, Notes',
@@ -21,7 +21,7 @@ const AIStudyView = {
       placeholder: "Ex: Analyse la structure de ce passage, les articulations syntaxiques et la portée théologique..."
     },
     historical: {
-      icon: '🏛️',
+      icon: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>',
       title: 'Contexte historique & culturel',
       shortTitle: 'Histoire & Contexte',
       sourcesSummary: 'Dictionnaires (Dom Calmet, Vigouroux...), Archéologie, Notes',
@@ -29,7 +29,7 @@ const AIStudyView = {
       placeholder: "Ex: Quel est le contexte politique, culturel et historique de la rédaction de ce texte ?"
     },
     sermon: {
-      icon: '🎙️',
+      icon: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>',
       title: 'Préparation de prédication / Message',
       shortTitle: 'Prédication',
       sourcesSummary: 'Commentaires pastoraux, TSK, Illustrations, Notes',
@@ -37,7 +37,7 @@ const AIStudyView = {
       placeholder: "Ex: Propose un plan de prédication percutant en 3 points avec illustrations et applications pour l'Église..."
     },
     lexical: {
-      icon: '🔤',
+      icon: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>',
       title: 'Analyse lexicale (Grec & Hébreu)',
       shortTitle: 'Lexique Hébreu/Grec',
       sourcesSummary: 'Lexique Strong Hébreu/Grec, Dictionnaires de racines (Bailly, Gesenius), LXX',
@@ -196,7 +196,7 @@ const AIStudyView = {
     const assistantMsg = document.createElement('div');
     assistantMsg.className = 'chat-message assistant';
     assistantMsg.innerHTML = `
-      <div class="msg-avatar">🤖</div>
+      <div class="msg-avatar"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg></div>
       <div class="msg-content">
         <em>Génération de l'étude avec <strong>${options.model}</strong> (${options.enable_reranking ? 'Reranking BGE actif' : 'RAG standard'})...</em>
       </div>
@@ -219,7 +219,7 @@ const AIStudyView = {
       if (sourcesUsed && sourcesUsed.length > 0) {
         sourcesBadgeHtml = `
           <div style="margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--border-color); font-size: 11px; color: var(--text-secondary); display: flex; flex-wrap: wrap; align-items: center; gap: 6px;">
-            <span style="font-weight: 700; color: var(--accent-blue);">📚 Corpus exploité :</span>
+            <span style="font-weight: 700; color: var(--accent-blue); display: inline-flex; align-items: center; gap: 4px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg><span>Corpus exploité :</span></span>
             ${sourcesUsed.map(s => `<span style="background: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: 4px; padding: 2px 6px;">${s}</span>`).join('')}
             <span style="opacity: 0.7; margin-left: auto;">Modèle: ${options.model}</span>
           </div>

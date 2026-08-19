@@ -241,7 +241,9 @@ const TabsManager = {
         : tab.bibleName;
 
       tabEl.innerHTML = `
-        <span class="tab-badge-icon" style="background-color: ${tab.badgeColor};">📖</span>
+        <span class="tab-badge-icon" style="background-color: ${tab.badgeColor}; display: inline-flex; align-items: center; justify-content: center;">
+          <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </span>
         <span class="tab-title">${titleText}</span>
         <button class="tab-close-btn" title="Fermer cet onglet">✕</button>
       `;
@@ -737,7 +739,7 @@ const CommentaryViewer = {
         const isMatch = this.preferredAuthor && authorName.toLowerCase() === this.preferredAuthor.toLowerCase();
         const item = document.createElement('button');
         item.className = `comm-source-item ${isMatch ? 'active' : ''}`;
-        item.innerHTML = `<span>📖 ${authorName}</span>`;
+        item.innerHTML = `<span style="display:inline-flex; align-items:center; gap:5px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span>${authorName}</span></span>`;
         item.addEventListener('click', () => {
           this.preferredAuthor = authorName;
           this.selectCommentary(idx);
@@ -803,7 +805,7 @@ const CommentaryViewer = {
       if (isForeign && !hasTranslation) {
         btnTranslate.classList.remove('hidden');
         btnTranslate.disabled = false;
-        btnTranslate.innerHTML = '<span>🌐 Traduire</span>';
+        btnTranslate.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>Traduire</span>';
       } else {
         btnTranslate.classList.add('hidden');
       }
@@ -817,14 +819,14 @@ const CommentaryViewer = {
         displayedText = this.translationCache[itemId];
         translationBannerHtml = `
           <div class="comm-translate-badge">
-            <span>🌐 Traduit fidèlement en français (IA)</span>
+            <span style="display:inline-flex; align-items:center; gap:5px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>Traduit fidèlement en français (IA)</span></span>
             <span class="comm-translate-toggle-link" id="btn-toggle-orig-text">Voir texte original</span>
           </div>
         `;
       } else {
         translationBannerHtml = `
           <div class="comm-translate-badge">
-            <span>📖 Texte original (${comm.source || 'Source'})</span>
+            <span style="display:inline-flex; align-items:center; gap:5px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span>Texte original (${comm.source || 'Source'})</span></span>
             <span class="comm-translate-toggle-link" id="btn-toggle-orig-text">Voir traduction française</span>
           </div>
         `;
@@ -833,7 +835,7 @@ const CommentaryViewer = {
 
     container.innerHTML = `
       <div class="comm-single-author-header">
-        <span class="comm-single-author-badge">📖 ${authorName}</span>
+        <span class="comm-single-author-badge" style="display:inline-flex; align-items:center; gap:5px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span>${authorName}</span></span>
       </div>
       ${translationBannerHtml}
       <div class="comm-single-body">
@@ -874,14 +876,14 @@ const CommentaryViewer = {
         App.showError('Erreur de Traduction', res?.error || 'Impossible de traduire l\'article.');
         if (btnTranslate) {
           btnTranslate.disabled = false;
-          btnTranslate.innerHTML = '<span>🌐 Réessayer</span>';
+          btnTranslate.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>Réessayer</span>';
         }
       }
     } catch (e) {
       App.showError('Erreur de Traduction', String(e));
       if (btnTranslate) {
         btnTranslate.disabled = false;
-        btnTranslate.innerHTML = '<span>🌐 Réessayer</span>';
+        btnTranslate.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>Réessayer</span>';
       }
     }
   },
@@ -905,14 +907,14 @@ const CommentaryViewer = {
       suggestionsHtml = `
         <div class="comm-suggestions-box" style="margin-top: 20px; background: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; text-align: left;">
           <div style="font-size: 11px; font-weight: 700; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
-            <span>✨ Autres commentaires pour ce verset :</span>
+            <span style="display:inline-flex; align-items:center; gap:5px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg><span>Autres commentaires pour ce verset :</span></span>
             <span style="background: rgba(2, 132, 199, 0.15); color: var(--accent-blue); padding: 1px 7px; border-radius: 10px; font-size: 10px; font-weight: 700;">${this.currentComments.length}</span>
           </div>
           <div style="display: flex; flex-direction: column; gap: 6px;">
             ${this.currentComments.map((c, idx) => `
               <button class="comm-suggestion-btn" data-idx="${idx}" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 9px 12px; font-size: 12px; text-align: left; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.15s ease;">
-                <span style="font-weight: 600; color: var(--text-primary);">📖 ${c.author || c.source}</span>
-                <span style="font-size: 11px; color: var(--accent-blue); font-weight: 600;">Consulter ➔</span>
+                <span style="font-weight: 600; color: var(--text-primary); display:inline-flex; align-items:center; gap:5px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span>${c.author || c.source}</span></span>
+                <span style="font-size: 11px; color: var(--accent-blue); font-weight: 600;">Consulter →</span>
               </button>
             `).join('')}
           </div>
@@ -928,8 +930,8 @@ const CommentaryViewer = {
 
     container.innerHTML = `
       <div class="comm-absent-view" style="padding: 16px 8px; text-align: center;">
-        <div style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: var(--bg-subtle); color: var(--text-secondary); font-size: 20px; margin-bottom: 12px; border: 1px solid var(--border-color);">
-          📖
+        <div style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: var(--bg-subtle); color: var(--text-secondary); margin-bottom: 12px; border: 1px solid var(--border-color);">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
         </div>
         <div style="font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">
           ${authorName}
@@ -1334,7 +1336,7 @@ const CommentarySynthesizerUI = {
             </div>
             <div class="synth-popover-info">
               <div class="synth-popover-title">${info.title}</div>
-              <div class="synth-popover-author">✍️ ${info.author} • <span class="synth-popover-period">${info.period}</span></div>
+              <div class="synth-popover-author" style="display: flex; align-items: center; gap: 4px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg><span>${info.author} • <span class="synth-popover-period">${info.period}</span></span></div>
             </div>
           </div>
         `;
@@ -1342,7 +1344,7 @@ const CommentarySynthesizerUI = {
 
       popover.innerHTML = `
         <div class="synth-popover-header">
-          <span>📚 Ouvrages cités (${sourceList.length})</span>
+          <span style="display: flex; align-items: center; gap: 5px;"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg><span>Ouvrages cités (${sourceList.length})</span></span>
         </div>
         <div style="display: flex; flex-direction: column; gap: 6px;">
           ${cardsHtml}
@@ -1649,7 +1651,7 @@ const DrawerNotesViewer = {
     if (this.currentNotes.length === 0) {
       listEl.innerHTML = `
         <div style="padding: 16px 12px; text-align: center; color: var(--text-muted); font-size: 12px; background: var(--bg-subtle); border-radius: 6px; border: 1px dashed var(--border-color);">
-          <span style="font-size: 22px; display: block; margin-bottom: 4px;">📝</span>
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" style="display: block; margin: 0 auto 6px auto; opacity: 0.6;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
           Aucune note pour ce passage.<br>
           <span style="font-size: 11px;">Rédigez une réflexion ci-dessous.</span>
         </div>
@@ -1666,7 +1668,9 @@ const DrawerNotesViewer = {
       
       let aiBadge = '';
       if (isGlobalAiEnabled) {
-        aiBadge = n.include_in_ai !== false ? '<span title="Prise en compte par l\'IA" style="font-size: 11px;">🤖 IA</span>' : '<span title="Non transmise à l\'IA" style="font-size: 10px; color: var(--text-muted);">🔒 Privée</span>';
+        aiBadge = n.include_in_ai !== false 
+          ? '<span title="Prise en compte par l\'IA" style="display:inline-flex; align-items:center; gap:3px; font-size: 11px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>IA</span>' 
+          : '<span title="Non transmise à l\'IA" style="display:inline-flex; align-items:center; gap:3px; font-size: 10px; color: var(--text-muted);"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Privée</span>';
       }
       
       card.innerHTML = `
@@ -1684,7 +1688,7 @@ const DrawerNotesViewer = {
           <span>Modifié : ${n.updated_at || ''}</span>
           <div style="display: flex; gap: 8px;">
             <button class="btn-link btn-open-full" style="color: var(--accent-blue); font-size: 11px; background: none; border: none; cursor: pointer; text-decoration: underline;">Ouvrir ↗</button>
-            <button class="btn-link btn-del-drawer" style="color: var(--accent-red); font-size: 11px; background: none; border: none; cursor: pointer;">🗑️</button>
+            <button class="btn-link btn-del-drawer" style="color: var(--accent-red); font-size: 11px; background: none; border: none; cursor: pointer; display: flex; align-items: center;" title="Supprimer"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
           </div>
         </div>
       `;
@@ -1721,7 +1725,7 @@ const DrawerNotesViewer = {
     
     this.editingNoteId = null;
     const titleHeader = document.getElementById('drawer-composer-title');
-    if (titleHeader) titleHeader.textContent = '✍️ Rédiger une note';
+    if (titleHeader) titleHeader.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg><span>Rédiger une note</span>';
 
     const isGlobalAiEnabled = SettingsView?.config?.include_notes_in_ai !== false;
     const drawerAiLabel = document.getElementById('drawer-note-ai-toggle-label');
@@ -1751,7 +1755,7 @@ const DrawerNotesViewer = {
     if (titleInp) titleInp.value = note.title || '';
     if (contentInp) contentInp.value = note.content || '';
     if (aiToggle) aiToggle.checked = note.include_in_ai !== false;
-    if (titleHeader) titleHeader.textContent = '✏️ Modifier la note';
+    if (titleHeader) titleHeader.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><span>Modifier la note</span>';
     this.editingNoteId = note.id;
   },
 
@@ -1779,7 +1783,7 @@ const DrawerNotesViewer = {
       if (titleInp) titleInp.value = '';
       if (contentInp) contentInp.value = '';
       const titleHeader = document.getElementById('drawer-composer-title');
-      if (titleHeader) titleHeader.textContent = '✍️ Rédiger une note';
+      if (titleHeader) titleHeader.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg><span>Rédiger une note</span>';
       
       this.load(this.currentBook, this.currentChapter, this.currentVerse);
       NotesView.loadNotes();
@@ -1865,19 +1869,19 @@ const ContextMenuManager = {
 
     actionsEl.innerHTML = `
       <button class="context-action-btn" id="ctx-act-lexicon">
-        <span>📜</span>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
         <span>Voir la définition complète dans le Lexique</span>
       </button>
       <button class="context-action-btn" id="ctx-act-search">
-        <span>🔍</span>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
         <span>Rechercher toutes les occurrences de « ${cleanWord} »</span>
       </button>
       <button class="context-action-btn" id="ctx-act-ai">
-        <span>🤖</span>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
         <span>Étudier le mot avec l'Assistant IA</span>
       </button>
       <button class="context-action-btn" id="ctx-act-copy">
-        <span>📋</span>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
         <span>Copier le mot</span>
       </button>
     `;
@@ -1933,23 +1937,23 @@ const ContextMenuManager = {
 
     actionsEl.innerHTML = `
       <button class="context-action-btn" id="ctx-act-v-comm">
-        <span>💬</span>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         <span>Ouvrir les commentaires exégétiques</span>
       </button>
       <button class="context-action-btn" id="ctx-act-v-ai">
-        <span>🤖</span>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
         <span>Étudier ce verset avec l'Assistant IA</span>
       </button>
       <button class="context-action-btn" id="ctx-act-v-note">
-        <span>📝</span>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
         <span>Créer une note sur ce verset</span>
       </button>
       <button class="context-action-btn" id="ctx-act-v-split">
-        <span>⇄</span>
+        <span style="font-size: 13px;">⇄</span>
         <span>Comparer dans une 2e version</span>
       </button>
       <button class="context-action-btn" id="ctx-act-v-copy">
-        <span>📋</span>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
         <span>Copier le verset avec la référence</span>
       </button>
     `;
@@ -2059,7 +2063,7 @@ const LexiconViewer = {
     const wikiIdx = this.currentMatches.length;
     const wikiBtn = document.createElement('button');
     wikiBtn.className = `lex-source-pill ${this.activeSourceIndex === wikiIdx ? 'active' : ''}`;
-    wikiBtn.innerHTML = `🌐 Wikipédia`;
+    wikiBtn.innerHTML = `<span style="display:inline-flex; align-items:center; gap:4px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Wikipédia</span>`;
     wikiBtn.addEventListener('click', () => {
       this.activeSourceIndex = wikiIdx;
       this.render();
@@ -2081,7 +2085,7 @@ const LexiconViewer = {
     } else {
       contentBox.innerHTML = `
         <div style="padding: 24px; color: var(--text-muted); text-align: center;">
-          <span style="font-size: 32px; display: block; margin-bottom: 10px;">📖</span>
+          <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8" style="display: block; margin: 0 auto 10px auto; opacity: 0.5;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
           Aucune entrée trouvée dans ce dictionnaire pour « <strong>${this.currentTerm}</strong> ».
         </div>
       `;
@@ -2102,18 +2106,19 @@ const LexiconViewer = {
         <div class="ai-polish-bar" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
           <div>
             ${isPolished 
-              ? `<span class="ai-polished-badge">✨ Notice restaurée par IA (${modelName})</span>` 
+              ? `<span class="ai-polished-badge" style="display:inline-flex; align-items:center; gap:4px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>Notice restaurée par IA (${modelName})</span>` 
               : `<span style="font-size: 11px; color: #4338CA; font-weight: 600;">Améliorer la lisibilité avec l'IA</span>`
             }
           </div>
           <div style="display: flex; align-items: center; gap: 6px;">
             ${isForeign && !cachedTrans ? `
-              <button class="comm-translate-btn" id="btn-translate-dict" style="font-size: 11px; padding: 4px 8px;">
-                <span>🌐 Traduire</span>
+              <button class="comm-translate-btn" id="btn-translate-dict" style="font-size: 11px; padding: 4px 8px; display: flex; align-items: center; gap: 4px;">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                <span>Traduire</span>
               </button>
             ` : ''}
-            <button class="ai-polish-btn" id="btn-polish-entry">
-              <span>✨</span>
+            <button class="ai-polish-btn" id="btn-polish-entry" style="display: flex; align-items: center; gap: 4px;">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
               <span>${isPolished ? 'Re-générer' : "Améliorer avec l'IA"}</span>
             </button>
           </div>
@@ -2122,8 +2127,9 @@ const LexiconViewer = {
     } else if (isForeign && !cachedTrans) {
       polishBarHtml = `
         <div style="margin-bottom: 10px; display: flex; justify-content: flex-end;">
-          <button class="comm-translate-btn" id="btn-translate-dict" style="font-size: 11px; padding: 4px 8px;">
-            <span>🌐 Traduire en français</span>
+          <button class="comm-translate-btn" id="btn-translate-dict" style="font-size: 11px; padding: 4px 8px; display: flex; align-items: center; gap: 4px;">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span>Traduire en français</span>
           </button>
         </div>
       `;
@@ -2137,14 +2143,14 @@ const LexiconViewer = {
         rawText = cachedTrans;
         translationBannerHtml = `
           <div class="comm-translate-badge" style="margin-top: 8px;">
-            <span>🌐 Notice traduite fidèlement en français (IA)</span>
+            <span style="display:inline-flex; align-items:center; gap:5px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>Notice traduite fidèlement en français (IA)</span></span>
             <span class="comm-translate-toggle-link" id="btn-toggle-dict-orig">Voir texte original</span>
           </div>
         `;
       } else {
         translationBannerHtml = `
           <div class="comm-translate-badge" style="margin-top: 8px;">
-            <span>📖 Texte original (${match.dict_name || 'Dictionnaire'})</span>
+            <span style="display:inline-flex; align-items:center; gap:5px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span>Texte original (${match.dict_name || 'Dictionnaire'})</span></span>
             <span class="comm-translate-toggle-link" id="btn-toggle-dict-orig">Voir traduction française</span>
           </div>
         `;
@@ -2194,12 +2200,12 @@ const LexiconViewer = {
           } else {
             App.showError('Erreur de Traduction', res?.error || 'Impossible de traduire.');
             btnTranslateDict.disabled = false;
-            btnTranslateDict.innerHTML = '<span>🌐 Réessayer</span>';
+            btnTranslateDict.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>Réessayer</span>';
           }
         } catch (e) {
           App.showError('Erreur de Traduction', String(e));
           btnTranslateDict.disabled = false;
-          btnTranslateDict.innerHTML = '<span>🌐 Réessayer</span>';
+          btnTranslateDict.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>Réessayer</span>';
         }
       });
     }
@@ -2208,7 +2214,7 @@ const LexiconViewer = {
     if (btnPolish) {
       btnPolish.addEventListener('click', async () => {
         btnPolish.disabled = true;
-        btnPolish.innerHTML = `<span>⏳</span><span>Restauration IA en cours...</span>`;
+        btnPolish.innerHTML = `<span class="synth-spinner" style="width:12px; height:12px; border-width:2px; vertical-align:middle; margin-right:4px;"></span><span>Restauration IA en cours...</span>`;
         const bodyEl = container.querySelector('#match-body-text');
         bodyEl.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--accent-blue);"><em>Restauration philologique et restructuration de la notice par Mistral 14B...</em></div>`;
 
@@ -2218,7 +2224,7 @@ const LexiconViewer = {
             match.is_polished = true;
             match.full_text = res.text;
             match.polished_model = res.model;
-            App.showToast('✨ Notice restaurée par IA avec succès !');
+            App.showToast('Notice restaurée par IA avec succès !');
             this.render();
           } else {
             alert(`Erreur d'amélioration IA : ${res?.error || 'Erreur inconnue'}`);
@@ -2240,7 +2246,7 @@ const LexiconViewer = {
       if (!data || (!data.found && (!data.candidates || data.candidates.length === 0))) {
         container.innerHTML = `
           <div style="padding: 24px; color: var(--text-muted); text-align: center;">
-            <span style="font-size: 32px; display: block; margin-bottom: 10px;">🌐</span>
+            <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8" style="display: block; margin: 0 auto 10px auto; opacity: 0.5;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
             Aucun article Wikipédia pertinent trouvé pour « <strong>${this.currentTerm}</strong> ».
             <div style="margin-top: 14px; display: flex; gap: 6px; justify-content: center;">
               <input type="text" id="wiki-fallback-input" class="wiki-search-input" style="max-width: 200px;" placeholder="Autre recherche..." value="${this.currentTerm}">
@@ -2269,7 +2275,7 @@ const LexiconViewer = {
       let navHtml = `
         <div class="wiki-top-nav">
           <div class="wiki-search-row">
-            <input type="text" class="wiki-search-input" id="wiki-query-input" placeholder="🔍 Rechercher un autre sujet..." value="${data.search_query || this.currentTerm}">
+            <input type="text" class="wiki-search-input" id="wiki-query-input" placeholder="Rechercher un autre sujet..." value="${data.search_query || this.currentTerm}">
             <button class="wiki-search-submit-btn" id="wiki-query-submit">Chercher</button>
           </div>
           ${candidates.length > 1 ? `
@@ -2304,8 +2310,8 @@ const LexiconViewer = {
           <div class="wiki-extract">${(data.extract || '').replace(/\n\n/g, '<br><br>')}</div>
 
           <div style="display: flex; gap: 8px; align-items: center;">
-            <button class="wiki-more-btn" id="btn-wiki-more" data-expanded="false">
-              <span>📖</span>
+            <button class="wiki-more-btn" id="btn-wiki-more" data-expanded="false" style="display: flex; align-items: center; gap: 5px;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
               <span id="wiki-more-label">Voir plus ▾</span>
             </button>
           </div>

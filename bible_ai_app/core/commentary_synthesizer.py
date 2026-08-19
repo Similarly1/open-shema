@@ -142,23 +142,23 @@ class CommentarySynthesizer:
         if not api_key:
             # Réponse pédagogique formatée si aucune clé API n'est configurée
             synthesis_mock = (
-                f"# ✨ Synthèse Exégétique : {ref_label}\n\n"
+                f"# Synthèse Exégétique : {ref_label}\n\n"
                 f"> [!NOTE]\n"
                 f"> **Mode Démonstration** : Aucune clé API active n'a été détectée dans vos Paramètres. "
                 f"Voici la structure type générée par l'IA à partir de vos **{len(sources_set)} ouvrages de référence**.\n\n"
-                f"### 📜 Texte Biblique ({bible_name})\n"
+                f"### Texte Biblique ({bible_name})\n"
                 f"*{scripture}*\n\n"
-                f"### 📌 1. Consensus Exégétique & Sens Littéral\n"
+                f"### 1. Consensus Exégétique & Sens Littéral\n"
                 f"L'ensemble des commentateurs consultés ({', '.join(list(sources_set)[:4])}...) s'accordent sur le rôle fondamental de ce passage dans l'économie du texte. Le sens grammatical et historique met en lumière la souveraineté divine et l'intention rédemptrice.\n\n"
-                f"### 🔍 2. Nuances, Divergences & Traditions Théologiques\n"
+                f"### 2. Nuances, Divergences & Traditions Théologiques\n"
                 f"- **Perspective Réformée & Historique** : Met l'accent sur l'alliance de grâce et la portée typologique.\n"
                 f"- **Perspective Exégétique & Littérale** : Détaille les racines des termes originaux et la chronologie des événements.\n"
                 f"- **Nuances pastorales** : Souligne la dimension pratique et spirituelle immédiate pour le croyant.\n\n"
-                f"### 💡 3. Clés Textuelles & Applications Pastorales\n"
+                f"### 3. Clés Textuelles & Applications Pastorales\n"
                 f"1. **Vérité centrale** : Une affirmation d'espérance et de sanctification.\n"
                 f"2. **Application concrète** : Vivre en conformité avec cette révélation dans la prière et l'action.\n\n"
                 f"---\n"
-                f"📚 **Sources analysées ({len(sources_set)})** : {', '.join(sorted(sources_set))}"
+                f"**Sources analysées ({len(sources_set)})** : {', '.join(sorted(sources_set))}"
             )
             return {
                 "success": True,
@@ -239,15 +239,15 @@ class CommentarySynthesizer:
                 # Rendu structuré d'information si tous les modèles échouent
                 sample_authors = list(sources_set)[:5]
                 fallback_synthesis = (
-                    f"# ✨ Synthèse Exégétique : {ref_label}\n\n"
+                    f"# Synthèse Exégétique : {ref_label}\n\n"
                     f"> [!WARNING]\n"
                     f"> **Remarque API** : {last_error or 'Impossible de joindre les serveurs IA'}\n"
                     f"> *(Vérifiez votre clé API ou activez un modèle de secours dans les Paramètres > Modèles IA).*\n\n"
-                    f"### 📜 Texte Biblique ({bible_name})\n"
+                    f"### Texte Biblique ({bible_name})\n"
                     f"*{scripture}*\n\n"
-                    f"### 📌 1. Données des Commentaires Locaux ({len(sources_set)} sources disponibles)\n"
+                    f"### 1. Données des Commentaires Locaux ({len(sources_set)} sources disponibles)\n"
                     f"Les ouvrages indexés ({', '.join(sample_authors)}...) fournissent des analyses détaillées pour ce passage.\n\n"
-                    f"### 🔍 2. Extraits Exégétiques Disponibles :\n"
+                    f"### 2. Extraits Exégétiques Disponibles :\n"
                 )
                 for c in raw_comments[:4]:
                     txt_short = c.get('text', '').strip()
@@ -255,7 +255,7 @@ class CommentarySynthesizer:
                         txt_short = txt_short[:280] + "..."
                     fallback_synthesis += f"- **{c.get('author', 'Auteur')}** : {txt_short}\n\n"
 
-                fallback_synthesis += f"\n---\n📚 **Sources analysées ({len(sources_set)})** : {', '.join(sorted(sources_set))}"
+                fallback_synthesis += f"\n---\n**Sources analysées ({len(sources_set)})** : {', '.join(sorted(sources_set))}"
                 synthesis_text = fallback_synthesis
 
             return {

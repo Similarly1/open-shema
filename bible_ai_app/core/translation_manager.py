@@ -9,24 +9,24 @@ logger = logging.getLogger(__name__)
 
 AVAILABLE_TRANSLATION_MODELS: List[Tuple[str, str]] = [
     # Google Gemini Flash-Lite (Recommandé pour 500 req/jour)
-    ("gemini-3.5-flash-lite", "⚡ Gemini 3.5 Flash-Lite (500 req/j - Recommandé)"),
-    ("gemini-2.5-flash-lite", "⚡ Gemini 2.5 Flash-Lite (500 req/j)"),
-    ("gemini-3.1-flash-lite", "⚡ Gemini 3.1 Flash-Lite (500 req/j)"),
+    ("gemini-3.5-flash-lite", "Gemini 3.5 Flash-Lite (500 req/j - Recommandé)"),
+    ("gemini-2.5-flash-lite", "Gemini 2.5 Flash-Lite (500 req/j)"),
+    ("gemini-3.1-flash-lite", "Gemini 3.1 Flash-Lite (500 req/j)"),
     
     # Google Gemini Flash
-    ("gemini-3.7-flash", "🧠 Gemini 3.7 Flash (Google)"),
-    ("gemini-3.5-flash", "🧠 Gemini 3.5 Flash (Google)"),
-    ("gemini-2.5-flash", "⚡ Gemini 2.5 Flash (Google)"),
+    ("gemini-3.7-flash", "Gemini 3.7 Flash (Google)"),
+    ("gemini-3.5-flash", "Gemini 3.5 Flash (Google)"),
+    ("gemini-2.5-flash", "Gemini 2.5 Flash (Google)"),
     
     # Mistral AI
-    ("mistral-small-latest", "🇫🇷 Mistral Small (Mistral AI)"),
-    ("mistral-large-latest", "🇫🇷 Mistral Large (Mistral AI)"),
-    ("open-mistral-nemo", "🇫🇷 Mistral Nemo (Mistral AI)"),
+    ("mistral-small-latest", "Mistral Small (Mistral AI)"),
+    ("mistral-large-latest", "Mistral Large (Mistral AI)"),
+    ("open-mistral-nemo", "Mistral Nemo (Mistral AI)"),
     
     # Infomaniak Swiss AI
-    ("mistralai/Ministral-3-14B-Instruct-2512", "🇨🇭 Ministral 3 14B (Infomaniak)"),
-    ("mistralai/Mistral-Small-4-119B-2603", "🇨🇭 Mistral Small 4 119B (Infomaniak)"),
-    ("Qwen/Qwen3.5-397B-A17B-FP8", "🇨🇭 Qwen 3.5 397B (Infomaniak)")
+    ("mistralai/Ministral-3-14B-Instruct-2512", "Ministral 3 14B (Infomaniak)"),
+    ("mistralai/Mistral-Small-4-119B-2603", "Mistral Small 4 119B (Infomaniak)"),
+    ("Qwen/Qwen3.5-397B-A17B-FP8", "Qwen 3.5 397B (Infomaniak)")
 ]
 
 TRANSLATION_SYSTEM_PROMPT = """Tu es un traducteur théologique d'élite, expert en exégèse biblique et langues anciennes.

@@ -314,7 +314,7 @@ const App = {
       if (event.target && (event.target.tagName === 'IMG' || event.target.tagName === 'SCRIPT')) {
         return;
       }
-      console.error('⚠️ [Global JS Error]:', event.error || event.message);
+      console.error('[Global JS Error]:', event.error || event.message);
       this.showError('Erreur Interface', event.message || 'Une exception non interceptée est survenue', {
         message: event.message,
         filename: event.filename,
@@ -326,7 +326,7 @@ const App = {
 
     // Capture des promesses asynchrones rejetées
     window.addEventListener('unhandledrejection', (event) => {
-      console.error('⚠️ [Unhandled Promise Rejection]:', event.reason);
+      console.error('[Unhandled Promise Rejection]:', event.reason);
       const reason = event.reason;
       const msg = (reason && reason.message) || String(reason);
       this.showError('Erreur Asynchrone', msg, {
@@ -405,12 +405,9 @@ const App = {
 
     navigator.clipboard.writeText(textToCopy).then(() => {
       const btnText = document.getElementById('btn-copy-error-text');
-      const btnIcon = document.getElementById('btn-copy-error-icon');
       if (btnText) btnText.textContent = 'Copié !';
-      if (btnIcon) btnIcon.textContent = '✓';
       setTimeout(() => {
         if (btnText) btnText.textContent = "Copier l'erreur";
-        if (btnIcon) btnIcon.textContent = '📋';
       }, 2000);
     }).catch(err => {
       console.error('Erreur copie presse-papier:', err);
@@ -436,7 +433,7 @@ const App = {
       const assistantMsg = document.createElement('div');
       assistantMsg.className = 'chat-message assistant';
       assistantMsg.innerHTML = `
-        <div class="msg-avatar">🤖</div>
+        <div class="msg-avatar"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg></div>
         <div class="msg-content">Réflexion en cours...</div>
       `;
       chatMessages.appendChild(assistantMsg);

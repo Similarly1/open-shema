@@ -35,27 +35,27 @@ Règles impératives de restauration :
 
 AVAILABLE_POLISH_MODELS = [
     # Infomaniak Swiss AI (Recommandé par défaut)
-    ("mistralai/Mistral-Small-4-119B-2603", "🇨🇭 Mistral Small 4 119B (Infomaniak - Recommandé)"),
-    ("mistralai/Ministral-3-14B-Instruct-2512", "🇨🇭 Ministral 3 14B (Infomaniak)"),
-    ("swiss-ai/Apertus-v1.5-70B", "🇨🇭 Swiss AI Apertus 1.5 70B (Infomaniak)"),
-    ("google/gemma-4-31B-it", "🇨🇭 Gemma 4 31B (Infomaniak)"),
-    ("moonshotai/Kimi-K2.6", "🇨🇭 Kimi K2.6 (Infomaniak)"),
-    ("nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8", "🇨🇭 Nemotron 3 Nano 30B (Infomaniak)"),
-    ("Qwen/Qwen3.5-122B-A10B-FP8", "🇨🇭 Qwen 3.5 122B (Infomaniak)"),
-    ("Qwen/Qwen3.5-397B-A17B-FP8", "🇨🇭 Qwen 3.5 397B (Infomaniak)"),
+    ("mistralai/Mistral-Small-4-119B-2603", "Mistral Small 4 119B (Infomaniak - Recommandé)"),
+    ("mistralai/Ministral-3-14B-Instruct-2512", "Ministral 3 14B (Infomaniak)"),
+    ("swiss-ai/Apertus-v1.5-70B", "Swiss AI Apertus 1.5 70B (Infomaniak)"),
+    ("google/gemma-4-31B-it", "Gemma 4 31B (Infomaniak)"),
+    ("moonshotai/Kimi-K2.6", "Kimi K2.6 (Infomaniak)"),
+    ("nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8", "Nemotron 3 Nano 30B (Infomaniak)"),
+    ("Qwen/Qwen3.5-122B-A10B-FP8", "Qwen 3.5 122B (Infomaniak)"),
+    ("Qwen/Qwen3.5-397B-A17B-FP8", "Qwen 3.5 397B (Infomaniak)"),
 
     # Google Gemini
-    ("gemini-2.5-flash", "⚡ Gemini 2.5 Flash (Google)"),
-    ("gemini-2.5-flash-lite", "⚡ Gemini 2.5 Flash-Lite (Google)"),
-    ("gemini-3.7-flash", "🧠 Gemini 3.7 Flash (Google)"),
-    ("gemini-3.5-flash", "🧠 Gemini 3.5 Flash (Google)"),
-    ("gemini-3.5-flash-lite", "⚡ Gemini 3.5 Flash-Lite (Google)"),
+    ("gemini-2.5-flash", "Gemini 2.5 Flash (Google)"),
+    ("gemini-2.5-flash-lite", "Gemini 2.5 Flash-Lite (Google)"),
+    ("gemini-3.7-flash", "Gemini 3.7 Flash (Google)"),
+    ("gemini-3.5-flash", "Gemini 3.5 Flash (Google)"),
+    ("gemini-3.5-flash-lite", "Gemini 3.5 Flash-Lite (Google)"),
     
     # Mistral AI
-    ("mistral-small-latest", "🇫🇷 Mistral Small (Mistral AI)"),
-    ("mistral-large-latest", "🇫🇷 Mistral Large (Mistral AI)"),
-    ("open-mistral-nemo", "🇫🇷 Mistral Nemo (Mistral AI)"),
-    ("codestral-latest", "🇫🇷 Codestral (Mistral AI)")
+    ("mistral-small-latest", "Mistral Small (Mistral AI)"),
+    ("mistral-large-latest", "Mistral Large (Mistral AI)"),
+    ("open-mistral-nemo", "Mistral Nemo (Mistral AI)"),
+    ("codestral-latest", "Codestral (Mistral AI)")
 ]
 
 class DictionaryPolisher:

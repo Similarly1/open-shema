@@ -60,7 +60,7 @@ const LibraryView = {
     if (filtered.length === 0) {
       this.containerEl.innerHTML = `
         <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
-          <span style="font-size: 36px; display: block; margin-bottom: 8px;">📚</span>
+          <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8" style="display: block; margin: 0 auto 8px auto; opacity: 0.5;"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
           <p>Aucun ouvrage ne correspond à vos critères de recherche.</p>
         </div>
       `;
@@ -97,7 +97,7 @@ const LibraryView = {
           <div class="lib-tags">
             ${book.type ? `<span class="tag tag-type">${book.type}</span>` : ''}
             ${book.corpus_scope ? `<span class="tag tag-scope">${book.corpus_scope === 'OT' ? 'AT' : (book.corpus_scope === 'BOTH' ? 'AT+NT' : (book.corpus_scope === 'APOCRYPHA' ? 'APO' : book.corpus_scope))}</span>` : ''}
-            ${book.chapters_count ? `<span class="tag tag-count">📑 ${book.chapters_count} ch.</span>` : ''}
+            ${book.chapters_count ? `<span class="tag tag-count" style="display:inline-flex; align-items:center; gap:3px;"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><span>${book.chapters_count} ch.</span></span>` : ''}
           </div>
         </div>
 
@@ -108,8 +108,8 @@ const LibraryView = {
           </label>
           
           <div class="btn-group-right" style="display: flex; gap: 4px; margin-top: 12px;">
-            <button class="lib-btn-icon edit" data-book="${book.name}" title="Modifier les métadonnées">✏️</button>
-            <button class="lib-btn-icon delete" data-book="${book.name}" title="Supprimer">🗑️</button>
+            <button class="lib-btn-icon edit" data-book="${book.name}" title="Modifier les métadonnées" style="display: flex; align-items: center; justify-content: center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
+            <button class="lib-btn-icon delete" data-book="${book.name}" title="Supprimer" style="display: flex; align-items: center; justify-content: center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
           </div>
         </div>
       `;

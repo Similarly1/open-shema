@@ -558,7 +558,7 @@ const NotesView = {
   insertCallout() {
     const calloutHtml = `
       <div class="note-callout">
-        <div class="note-callout-title">💡 Remarque</div>
+        <div class="note-callout-title">Remarque</div>
         <div>Votre réflexion, référence ou méditation ici...</div>
       </div>
       <p><br></p>
@@ -611,8 +611,8 @@ const NotesView = {
     // 2. Traitement des Encarts Obsidian : > [!NOTE] Titre
     text = text.replace(/^\> \[!([A-Z]+)\][ ]?(.*$)\n((?:> .*$\n?)*)/gim, (match, type, title, body) => {
       const cleanBody = body.replace(/^\> /gm, '').replace(/\n/g, '<br>');
-      const icon = type === 'WARNING' ? '⚠️' : (type === 'TIP' ? '💡' : '📌');
-      return `<div class="note-callout"><div class="note-callout-title">${icon} ${title || type}</div><div>${cleanBody}</div></div>\n\n`;
+      const typeLabel = title || type;
+      return `<div class="note-callout"><div class="note-callout-title">${typeLabel}</div><div>${cleanBody}</div></div>\n\n`;
     });
 
     // 3. Tableaux Markdown -> Tableaux HTML réels
@@ -774,7 +774,7 @@ const NotesView = {
           // Encart Obsidian
           if (node.classList.contains('note-callout')) {
             const titleEl = node.querySelector('.note-callout-title');
-            const rawTitle = titleEl ? titleEl.textContent.replace(/^[💡📌⚠️ℹ️]+\s*/, '').trim() : 'NOTE';
+            const rawTitle = titleEl ? titleEl.textContent.trim() : 'NOTE';
             const bodyEl = node.querySelector('.note-callout-content') || node;
             const bodyText = Array.from(bodyEl.childNodes)
               .filter(n => n !== titleEl)
@@ -862,7 +862,9 @@ const NotesView = {
       const item = document.createElement('div');
       item.className = `note-list-item ${this.currentNote?.id === note.id ? 'active' : ''}`;
       
-      const aiBadge = (isGlobalAiEnabled && note.include_in_ai !== false) ? '<span title="Prise en compte par l\'IA" style="font-size: 11px; margin-left: 4px;">🤖</span>' : '';
+      const aiBadge = (isGlobalAiEnabled && note.include_in_ai !== false) 
+        ? '<span title="Prise en compte par l\'IA" style="display:inline-flex; align-items:center; margin-left: 4px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg></span>' 
+        : '';
       
       item.innerHTML = `
         <div class="note-item-title">${note.title || 'Note sans titre'} ${aiBadge}</div>
@@ -928,12 +930,12 @@ const NotesView = {
     const btn = document.getElementById('btn-toggle-note-preview');
 
     if (this.isPreviewMode) {
-      if (btn) btn.textContent = '✏️ Éditer';
+      if (btn) btn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><span>Éditer</span>';
       this.contentInput?.classList.add('hidden');
       this.previewContainer?.classList.remove('hidden');
       this.renderPreview();
     } else {
-      if (btn) btn.textContent = '👁️ Aperçu';
+      if (btn) btn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>Aperçu</span>';
       this.previewContainer?.classList.add('hidden');
       this.contentInput?.classList.remove('hidden');
     }
@@ -986,7 +988,7 @@ const NotesView = {
 
     try {
       const saved = await API.call('save_note', noteToSave);
-      App.showToast('💾 Note enregistrée en fichier Markdown (.md) !');
+      App.showToast('Note enregistrée en fichier Markdown (.md) !');
       await this.loadNotes(saved?.id || this.currentNote.id);
     } catch (e) {
       alert(`Erreur sauvegarde note : ${e}`);
@@ -1002,7 +1004,7 @@ const NotesView = {
     if (confirm(`Supprimer définitivement le fichier Markdown de la note « ${this.currentNote.title} » ?`)) {
       try {
         await API.call('delete_note', this.currentNote.id);
-        App.showToast('🗑️ Note supprimée du disque.');
+        App.showToast('Note supprimée du disque.');
         await this.loadNotes();
       } catch (e) {
         alert(`Erreur suppression note : ${e}`);

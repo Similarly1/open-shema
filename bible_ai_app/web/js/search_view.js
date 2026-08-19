@@ -32,7 +32,7 @@ const SearchView = {
     if (!query) {
       this.resultsContainer.innerHTML = `
         <div class="empty-state" style="text-align: center; padding: 60px; color: var(--text-muted);">
-          <span style="font-size: 40px; display: block; margin-bottom: 10px;">🔍</span>
+          <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.8" style="display: block; margin: 0 auto 10px auto; opacity: 0.5;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
           <p>Tapez un mot ou une phrase dans la barre ci-dessus pour lancer la recherche.</p>
         </div>
       `;
@@ -77,7 +77,7 @@ const SearchView = {
 
         card.innerHTML = `
           <div class="search-res-header">
-            <span class="search-res-ref" style="color: ${badgeColor};">📖 ${refStr}</span>
+            <span class="search-res-ref" style="color: ${badgeColor}; display: inline-flex; align-items: center; gap: 4px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span>${refStr}</span></span>
             <span class="search-res-version">${res.bible_name || res.commentary_name || ''}</span>
           </div>
           <div class="search-res-text">${highlighted}</div>

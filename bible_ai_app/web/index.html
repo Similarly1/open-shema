@@ -38,12 +38,16 @@
     <div class="topbar-center-zone" id="topbar-center-zone">
       <div class="tabs-list" id="tabs-list">
         <div class="tab active" data-tab-id="tab-1">
-          <span class="tab-badge-icon" style="background-color: #EA580C;">📖</span>
+          <span class="tab-badge-icon" style="background-color: #EA580C;">
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          </span>
           <span class="tab-title">TOB 2010</span>
           <button class="tab-close-btn" title="Fermer">✕</button>
         </div>
         <div class="tab" data-tab-id="tab-2">
-          <span class="tab-badge-icon" style="background-color: #2563EB;">📖</span>
+          <span class="tab-badge-icon" style="background-color: #2563EB;">
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          </span>
           <span class="tab-title">Segond 21</span>
           <button class="tab-close-btn" title="Fermer">✕</button>
         </div>
@@ -74,10 +78,16 @@
   <div id="app-splash-loader" class="splash-loader-overlay">
     <div class="splash-content">
       <div class="splash-logo-glow">
-        <div class="splash-icon">📜</div>
+        <div class="splash-icon">
+          <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+            <path d="M6 6h10"></path>
+            <path d="M6 10h10"></path>
+          </svg>
+        </div>
       </div>
       <div class="splash-brand-title">OPEN SHEMA</div>
-      <div class="splash-brand-subtitle">שְׁמַع • ÉTUDE & RECHERCHE BIBLIQUE OUVERTE</div>
+      <div class="splash-brand-subtitle">שְׁמַע • ÉTUDE & RECHERCHE BIBLIQUE OUVERTE</div>
       
       <div class="splash-progress-track">
         <div class="splash-progress-bar"></div>
@@ -213,7 +223,9 @@
             <button class="tool-btn icon-only" id="btn-history-forward" title="Suivant (Alt+Droite)">›</button>
             
             <div class="book-picker-pill" id="book-picker-pill">
-              <span class="pill-bible-icon" id="pill-bible-icon">📖</span>
+              <span class="pill-bible-icon" id="pill-bible-icon" style="display: inline-flex; align-items: center;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              </span>
               <span class="pill-reference-text" id="pill-reference-text">Genèse 1:1</span>
               <span class="pill-arrow">▾</span>
             </div>
@@ -279,7 +291,9 @@
 
           <div class="toolbar-right">
             <button class="tool-btn" id="btn-toggle-interlinear" title="Afficher les couches interlinéaires">
-              <span class="btn-icon">🔤</span>
+              <span class="btn-icon" style="display: inline-flex; align-items: center;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"></path><path d="m4 14 6-6 2-3"></path><path d="M2 5h12"></path><path d="M7 2h1"></path><path d="m22 22-5-10-5 10"></path><path d="M14 18h6"></path></svg>
+              </span>
               <span>Interlinéaire</span>
               <span class="pill-arrow">▾</span>
             </button>
@@ -360,7 +374,7 @@
             <p class="view-subtitle" id="lib-count-subtitle">Chargement de votre bibliothèque...</p>
           </div>
           <div class="view-actions">
-            <input type="text" id="lib-search-input" class="search-field" placeholder="🔍  Filtrer par titre ou auteur...">
+            <input type="text" id="lib-search-input" class="search-field" placeholder="Filtrer par titre ou auteur...">
             <select id="lib-type-filter" class="select-field">
               <option value="Tous">Toutes les catégories</option>
               <option value="Bible">Bibles</option>
@@ -368,7 +382,14 @@
               <option value="Dictionnaire">Dictionnaires</option>
               <option value="Théologie">Théologie</option>
             </select>
-            <button class="btn-primary" id="btn-lib-import">📥 Importer un Ouvrage</button>
+            <button class="btn-primary" id="btn-lib-import" style="display: flex; align-items: center; gap: 6px;">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>Importer un Ouvrage</span>
+            </button>
           </div>
         </header>
 
@@ -1016,7 +1037,7 @@
             <p class="view-subtitle" id="search-count-subtitle">Recherchez instantanément dans vos Bibles et commentaires.</p>
           </div>
           <div class="view-actions">
-            <input type="text" id="search-main-input" class="search-field" style="width: 280px;" placeholder="🔍 Mots-clés (ex: amour, création)...">
+            <input type="text" id="search-main-input" class="search-field" style="width: 280px;" placeholder="Mots-clés (ex: amour, création)...">
             <select id="search-corpus-filter" class="select-field">
               <option value="ALL">Toute la Bible</option>
               <option value="OT">Ancien Testament (AT)</option>
@@ -1034,7 +1055,7 @@
 
         <div class="view-content search-results-container" id="search-results-list">
           <div class="empty-state" style="text-align: center; padding: 60px; color: var(--text-muted);">
-            <span style="font-size: 40px; display: block; margin-bottom: 10px;">🔍</span>
+            <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px; opacity: 0.6;"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
             <p>Tapez un mot ou une phrase dans la barre ci-dessus pour lancer la recherche.</p>
           </div>
         </div>
@@ -1052,14 +1073,19 @@
           <div class="view-actions" style="position: relative; display: flex; align-items: center; gap: 8px;">
             <!-- Sélecteur de Mode Unifié & Élégant -->
             <button id="btn-study-mode-selector" class="study-mode-pill-btn" title="Changer de mode d'analyse et voir les documents mobilisés">
-              <span id="study-mode-pill-icon">🔍</span>
+              <span id="study-mode-pill-icon">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+              </span>
               <span id="study-mode-pill-label">Exégèse approfondie</span>
               <span class="pill-arrow">▾</span>
             </button>
 
             <!-- Bouton Options RAG & Modèle discret -->
             <button id="btn-toggle-ai-options" class="btn-icon-subtle" title="Options avancées (Modèle IA, Reranking BGE, Sources)">
-              ⚙️
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
             </button>
 
             <!-- Popover Unifié : Modes d'Étude avec Rôles & Documents Sources intégrés -->
@@ -1072,59 +1098,71 @@
                 <!-- Mode 1 -->
                 <div class="study-mode-card active" data-mode="exegesis">
                   <div class="study-mode-card-head">
-                    <span class="mode-icon">🔍</span>
+                    <span class="mode-icon">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+                    </span>
                     <strong class="mode-title">Exégèse approfondie</strong>
                     <span class="mode-check">✓</span>
                   </div>
                   <p class="mode-desc">Analyse structurelle et théologique verset par verset, chiasmes, syntaxe et cohérence canonique.</p>
-                  <div class="mode-sources-tag">📁 Bibles originales, Multi-traductions, Commentaires majeurs, Notes .md</div>
+                  <div class="mode-sources-tag">Sources : Bibles originales, Multi-traductions, Commentaires majeurs, Notes .md</div>
                 </div>
 
                 <!-- Mode 2 -->
                 <div class="study-mode-card" data-mode="historical">
                   <div class="study-mode-card-head">
-                    <span class="mode-icon">🏛️</span>
+                    <span class="mode-icon">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="20" x2="22" y2="20"></line><line x1="6" y1="20" x2="6" y2="4"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="2" y1="4" x2="22" y2="4"></line><line x1="10" y1="20" x2="10" y2="4"></line><line x1="14" y1="20" x2="14" y2="4"></line></svg>
+                    </span>
                     <strong class="mode-title">Contexte historique & culturel</strong>
                     <span class="mode-check">✓</span>
                   </div>
                   <p class="mode-desc">Arrière-plan de rédaction, auteur, destinataires, cadre socio-politique antique et géographie.</p>
-                  <div class="mode-sources-tag">📁 Dictionnaires bibliques (Dom Calmet, Vigouroux...), Archéologie, Notes .md</div>
+                  <div class="mode-sources-tag">Sources : Dictionnaires bibliques (Dom Calmet, Vigouroux...), Archéologie, Notes .md</div>
                 </div>
 
                 <!-- Mode 3 -->
                 <div class="study-mode-card" data-mode="sermon">
                   <div class="study-mode-card-head">
-                    <span class="mode-icon">🎙️</span>
+                    <span class="mode-icon">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
+                    </span>
                     <strong class="mode-title">Préparation de prédication / Message</strong>
                     <span class="mode-check">✓</span>
                   </div>
                   <p class="mode-desc">Plan homilétique complet avec idée maîtresse (Big Idea), points illustrés et applications pastorales.</p>
-                  <div class="mode-sources-tag">📁 Commentaires pastoraux, Trésor de l'Écriture (TSK), Illustrations, Notes .md</div>
+                  <div class="mode-sources-tag">Sources : Commentaires pastoraux, Trésor de l'Écriture (TSK), Illustrations, Notes .md</div>
                 </div>
 
                 <!-- Mode 4 -->
                 <div class="study-mode-card" data-mode="lexical">
                   <div class="study-mode-card-head">
-                    <span class="mode-icon">🔤</span>
+                    <span class="mode-icon">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"></path><path d="m4 14 6-6 2-3"></path><path d="M2 5h12"></path><path d="M7 2h1"></path><path d="m22 22-5-10-5 10"></path><path d="M14 18h6"></path></svg>
+                    </span>
                     <strong class="mode-title">Analyse lexicale (Grec & Hébreu)</strong>
                     <span class="mode-check">✓</span>
                   </div>
                   <p class="mode-desc">Étude des racines linguistiques, codes Strong, nuances morphologiques et sens dans la Septante (LXX).</p>
-                  <div class="mode-sources-tag">📁 Lexique Strong Hébreu/Grec, Dictionnaires de racines (Bailly, Gesenius), LXX</div>
+                  <div class="mode-sources-tag">Sources : Lexique Strong Hébreu/Grec, Dictionnaires de racines (Bailly, Gesenius), LXX</div>
                 </div>
               </div>
 
               <div class="study-mode-popover-footer">
                 <span style="font-size: 11px; color: var(--text-muted);">Cliquez pour sélectionner un mode</span>
-                <button id="btn-popover-open-options" class="btn-link-subtle">⚙️ Options RAG & Modèle</button>
+                <button id="btn-popover-open-options" class="btn-link-subtle" style="display: flex; align-items: center; gap: 4px;">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                  <span>Options RAG & Modèle</span>
+                </button>
               </div>
             </div>
 
             <!-- Flyout escamotable pour les Options RAG (Modèle, Rerank, Sources) -->
             <div id="ai-study-options-panel" class="study-options-flyout hidden">
               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);">
-                <span style="font-size: 12px; font-weight: 700; color: var(--text-primary);">
-                  ⚙️ Options du Moteur d'Étude
+                <span style="font-size: 12px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                  <span>Options du Moteur d'Étude</span>
                 </span>
                 <span id="btn-close-ai-options" style="cursor: pointer; font-size: 13px; color: var(--text-muted); padding: 2px 6px;">✕</span>
               </div>
@@ -1132,35 +1170,38 @@
               <div style="display: flex; flex-direction: column; gap: 12px;">
                 <!-- 1. Choix du modèle LLM -->
                 <div>
-                  <label style="display: block; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">
-                    🧠 Modèle de Synthèse IA
+                  <label style="display: flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">
+                    <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                    <span>Modèle de Synthèse IA</span>
                   </label>
                   <select id="ai-opt-model" class="select-field full-w" style="font-size: 12px; height: 32px;">
-                    <option value="gemini-3.7-flash" selected>⚡ Gemini 3.7 Flash (Rapide)</option>
-                    <option value="gemini-2.5-pro">🧠 Gemini 2.5 Pro (Haute précision)</option>
-                    <option value="gemini-2.5-flash">⚡ Gemini 2.5 Flash</option>
-                    <option value="mistralai/Mistral-Small-4-119B-2603">🇫🇷 Mistral Small 4 (119B)</option>
-                    <option value="mistralai/Mistral-Large-2411">🇫🇷 Mistral Large (24B)</option>
-                    <option value="mistralai/Ministral-3-14B-Instruct-2512">🇫🇷 Ministral 3 (14B)</option>
+                    <option value="gemini-3.7-flash" selected>Gemini 3.7 Flash (Rapide)</option>
+                    <option value="gemini-2.5-pro">Gemini 2.5 Pro (Haute précision)</option>
+                    <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                    <option value="mistralai/Mistral-Small-4-119B-2603">Mistral Small 4 (119B)</option>
+                    <option value="mistralai/Mistral-Large-2411">Mistral Large (24B)</option>
+                    <option value="mistralai/Ministral-3-14B-Instruct-2512">Ministral 3 (14B)</option>
                   </select>
                 </div>
 
                 <!-- 2. Profondeur et Style -->
                 <div>
-                  <label style="display: block; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">
-                    🎯 Profondeur / Style
+                  <label style="display: flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">
+                    <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                    <span>Profondeur / Style</span>
                   </label>
                   <select id="ai-opt-depth" class="select-field full-w" style="font-size: 12px; height: 32px;">
-                    <option value="academic" selected>🎓 Académique & Approfondi</option>
-                    <option value="pastoral">🕊️ Pastoral & Équilibré</option>
-                    <option value="concise">⚡ Synthétique & Concis</option>
+                    <option value="academic" selected>Académique & Approfondi</option>
+                    <option value="pastoral">Pastoral & Équilibré</option>
+                    <option value="concise">Synthétique & Concis</option>
                   </select>
                 </div>
 
                 <!-- 3. Reranking & LLM Curateur -->
                 <div style="background: var(--bg-subtle); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-color);">
-                  <label style="display: block; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">
-                    🔬 RAG & Curation
+                  <label style="display: flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">
+                    <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                    <span>RAG & Curation</span>
                   </label>
                   <div style="display: flex; flex-direction: column; gap: 6px;">
                     <label style="font-size: 11.5px; display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text-primary);">
@@ -1176,21 +1217,22 @@
 
                 <!-- 4. Sources Documentaires à Interroger -->
                 <div>
-                  <label style="display: block; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">
-                    📚 Corpus Actifs
+                  <label style="display: flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">
+                    <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path><path d="M6 6h10"></path><path d="M6 10h10"></path></svg>
+                    <span>Corpus Actifs</span>
                   </label>
                   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 11px;">
                     <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-                      <input type="checkbox" id="ai-opt-src-bibles" checked> 📖 Bibles
+                      <input type="checkbox" id="ai-opt-src-bibles" checked> <span>Bibles</span>
                     </label>
                     <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-                      <input type="checkbox" id="ai-opt-src-comms" checked> 💬 Commentaires
+                      <input type="checkbox" id="ai-opt-src-comms" checked> <span>Commentaires</span>
                     </label>
                     <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-                      <input type="checkbox" id="ai-opt-src-dict" checked> 📕 Dictionnaires
+                      <input type="checkbox" id="ai-opt-src-dict" checked> <span>Dictionnaires</span>
                     </label>
                     <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-                      <input type="checkbox" id="ai-opt-src-notes" checked> 📝 Notes (.md)
+                      <input type="checkbox" id="ai-opt-src-notes" checked> <span>Notes (.md)</span>
                     </label>
                   </div>
                 </div>
@@ -1202,9 +1244,11 @@
         <div class="view-content ai-study-container">
           <div class="ai-study-chat-flow" id="ai-study-chat-flow">
             <div class="chat-message assistant">
-              <div class="msg-avatar">🤖</div>
+              <div class="msg-avatar">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+              </div>
               <div class="msg-content">
-                <strong>Bienvenue dans l'espace d'étude approfondie Open Shema (שְׁמַע).</strong><br>
+                <strong>Bienvenue dans l'espace d'étude approfondie Open Shema (שְׁמַع).</strong><br>
                 Posez une question, soumettez un passage ou demandez une comparaison théologique. L'assistant s'appuie sur vos textes bibliques, vos dictionnaires et vos commentaires.
               </div>
             </div>
@@ -1226,9 +1270,12 @@
           <!-- Colonne Gauche : Liste des Notes -->
           <aside class="notes-sidebar">
             <div class="notes-sidebar-header">
-              <input type="text" id="notes-search-input" class="search-field full-w" placeholder="🔍 Filtrer les notes...">
+              <input type="text" id="notes-search-input" class="search-field full-w" placeholder="Filtrer les notes...">
               <button class="btn-primary full-w" id="btn-new-note" style="margin-top: 8px;">+ Nouvelle Note</button>
-              <button class="btn-secondary full-w" id="btn-open-notes-folder" style="margin-top: 6px; font-size: 11px;">📂 Ouvrir le dossier (.md)</button>
+              <button class="btn-secondary full-w" id="btn-open-notes-folder" style="margin-top: 6px; font-size: 11px; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path></svg>
+                <span>Ouvrir le dossier (.md)</span>
+              </button>
             </div>
             <div class="notes-list-items" id="notes-list-items">
               <!-- Liste des notes injectée dynamiquement -->
@@ -1244,11 +1291,21 @@
                 <button class="btn-secondary" id="btn-note-redo" title="Rétablir (Ctrl+Y / Ctrl+Shift+Z)" style="padding: 0 10px; font-size: 13px; font-weight: 600;">↷ Rétablir</button>
                 <label id="note-edit-ai-toggle-label" style="font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; cursor: pointer;">
                   <input type="checkbox" id="note-edit-ai-toggle" checked>
-                  <span>🤖 Inclure dans l'IA</span>
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                  <span>Inclure dans l'IA</span>
                 </label>
-                <button class="btn-secondary" id="btn-toggle-note-preview" title="Basculer entre Mode Édition et Prévisualisation Markdown">👁️ Aperçu</button>
-                <button class="btn-secondary" id="btn-delete-current-note">🗑️ Supprimer</button>
-                <button class="btn-primary" id="btn-save-current-note">💾 Enregistrer</button>
+                <button class="btn-secondary" id="btn-toggle-note-preview" title="Basculer entre Mode Édition et Prévisualisation Markdown" style="display: flex; align-items: center; gap: 4px;">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <span>Aperçu</span>
+                </button>
+                <button class="btn-secondary" id="btn-delete-current-note" style="display: flex; align-items: center; gap: 4px;">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                  <span>Supprimer</span>
+                </button>
+                <button class="btn-primary" id="btn-save-current-note" style="display: flex; align-items: center; gap: 4px;">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                  <span>Enregistrer</span>
+                </button>
               </div>
             </div>
             <div class="notes-editor-subbar">
@@ -1261,8 +1318,12 @@
                 <button class="btn-secondary" id="btn-md-italic" title="Italique (Ctrl+I)" style="padding: 0 8px; font-size: 11px; font-style: italic;">I</button>
                 <button class="btn-secondary" id="btn-md-quote" title="Citation" style="padding: 0 8px; font-size: 11px;">”</button>
                 <button class="btn-secondary" id="btn-md-list" title="Liste à puces" style="padding: 0 8px; font-size: 11px;">•</button>
-                <button class="btn-secondary" id="btn-md-table" title="Insérer un Tableau interactif" style="padding: 0 8px; font-size: 11px;">📊</button>
-                <button class="btn-secondary" id="btn-md-callout" title="Insérer un Encart Remarque" style="padding: 0 8px; font-size: 11px;">💡</button>
+                <button class="btn-secondary" id="btn-md-table" title="Insérer un Tableau interactif" style="padding: 0 8px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center;">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
+                </button>
+                <button class="btn-secondary" id="btn-md-callout" title="Insérer un Encart Remarque" style="padding: 0 8px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center;">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+                </button>
               </div>
             </div>
             <div class="notes-editor-body">
@@ -1283,14 +1344,14 @@
             <p class="view-subtitle">Consultez les définitions historiques, étymologiques et théologiques.</p>
           </div>
           <div class="view-actions">
-            <input type="text" id="dict-search-input" class="search-field" style="width: 280px;" placeholder="🔍 Mot ou code Strong (ex: Grâce, G1234)...">
+            <input type="text" id="dict-search-input" class="search-field" style="width: 280px;" placeholder="Mot ou code Strong (ex: Grâce, G1234)...">
             <button class="btn-primary" id="btn-dict-search">Rechercher</button>
           </div>
         </header>
 
         <div class="view-content dict-view-content" id="dict-view-content">
           <div class="empty-state" style="text-align: center; padding: 60px; color: var(--text-muted);">
-            <span style="font-size: 40px; display: block; margin-bottom: 10px;">🔤</span>
+            <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px; opacity: 0.6;"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
             <p>Tapez un terme biblique pour afficher sa définition complète.</p>
           </div>
         </div>
@@ -1341,11 +1402,11 @@
               <div class="maps-filters-row">
                 <select id="map-type-filter" class="select-field" style="flex: 1; font-size: 11.5px; height: 30px;">
                   <option value="all">Tous les types</option>
-                  <option value="city">🏛️ Villes & Cités</option>
-                  <option value="mountain">⛰️ Montagnes & Monts</option>
-                  <option value="river">🌊 Fleuves, Mers & Lacs</option>
-                  <option value="region">🗺️ Régions & Déserts</option>
-                  <option value="island">🏝️ Îles</option>
+                  <option value="city">Villes & Cités</option>
+                  <option value="mountain">Montagnes & Monts</option>
+                  <option value="river">Fleuves, Mers & Lacs</option>
+                  <option value="region">Régions & Déserts</option>
+                  <option value="island">Îles</option>
                 </select>
               </div>
 
@@ -1353,7 +1414,7 @@
               <div class="maps-itinerary-selector-box">
                 <label class="maps-section-label">Grands Itinéraires :</label>
                 <select id="map-itinerary-select" class="select-field full-w" style="font-size: 11.5px; height: 32px;">
-                  <option value="none">🗺️ Vue libre (Tous les lieux)</option>
+                  <option value="none">Vue libre (Tous les lieux)</option>
                 </select>
               </div>
 
@@ -1469,8 +1530,9 @@
             </div>
             
             <div style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
-              <button class="comm-translate-btn hidden" id="btn-translate-comm" title="Traduire fidèlement cet article en français par IA">
-                <span>🌐 Traduire</span>
+              <button class="comm-translate-btn hidden" id="btn-translate-comm" title="Traduire fidèlement cet article en français par IA" style="display: flex; align-items: center; gap: 4px;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                <span>Traduire</span>
               </button>
 
               <button class="comm-ai-synth-btn" id="btn-open-comm-synth" title="Générer une synthèse exégétique comparative par IA de tous les commentaires">
@@ -1506,7 +1568,10 @@
           <div class="comm-synthesis-panel hidden" id="comm-synthesis-panel">
             <div class="synthesis-panel-header">
               <div class="synthesis-title-row">
-                <span class="synthesis-sparkle-badge">✨ Synthèse IA</span>
+                <span class="synthesis-sparkle-badge" style="display: inline-flex; align-items: center; gap: 4px;">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                  <span>Synthèse IA</span>
+                </span>
                 <span class="synthesis-passage-badge" id="synth-passage-badge">Genèse 1:1</span>
                 <button class="synthesis-btn-close" id="btn-close-comm-synth" title="Fermer le panneau de synthèse et revenir au commentaire">✕</button>
               </div>
@@ -1528,8 +1593,9 @@
               </div>
 
               <!-- Avertissement si plafond dépassé -->
-              <div class="synth-ceiling-warning hidden" id="synth-ceiling-warning">
-                ⚠️ Plafond maximal (<span id="synth-ceiling-limit-num">5</span> versets max). La sélection a été ajustée.
+              <div class="synth-ceiling-warning hidden" id="synth-ceiling-warning" style="display: flex; align-items: center; gap: 6px;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                <span>Plafond maximal (<span id="synth-ceiling-limit-num">5</span> versets max). La sélection a été ajustée.</span>
               </div>
 
               <!-- Info sur les sources disponibles -->
@@ -1538,8 +1604,10 @@
               </div>
 
               <!-- Bouton d'action de génération -->
-              <button class="btn-primary synth-launch-btn" id="btn-launch-synth">
-                <span id="btn-launch-synth-icon">✨</span>
+              <button class="btn-primary synth-launch-btn" id="btn-launch-synth" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <span id="btn-launch-synth-icon">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                </span>
                 <span id="btn-launch-synth-text">Lancer la synthèse</span>
               </button>
 
@@ -1576,7 +1644,9 @@
         <div class="drawer-content" id="drawer-tab-ai">
           <div class="chat-messages" id="chat-messages">
             <div class="chat-message assistant">
-              <div class="msg-avatar">🤖</div>
+              <div class="msg-avatar">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+              </div>
               <div class="msg-content">
                 Bonjour ! Posez-moi une question sur le passage en cours de lecture. Je m'appuierai sur vos Bibles, vos commentaires et vos notes.
               </div>
@@ -1609,16 +1679,24 @@
             
             <div class="drawer-note-composer" id="drawer-note-composer" style="margin-top: 14px; background: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                <span style="font-size: 12px; font-weight: 700; color: var(--accent-blue);" id="drawer-composer-title">✍️ Rédiger une note</span>
+                <span style="font-size: 12px; font-weight: 700; color: var(--accent-blue); display: flex; align-items: center; gap: 4px;" id="drawer-composer-title">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path><path d="m15 5 4 4"></path></svg>
+                  <span>Rédiger une note</span>
+                </span>
                 <span style="font-size: 10px; font-weight: 600; color: var(--text-muted);" id="drawer-composer-ref">Genèse 1:1</span>
               </div>
               <input type="text" id="drawer-note-title-input" class="text-field full-w" placeholder="Titre de la note..." style="margin-bottom: 6px; font-size: 12px;">
               <textarea id="drawer-note-content-input" class="text-field full-w" placeholder="Écrivez votre note en Markdown..." style="height: 90px; resize: vertical; margin-bottom: 8px; font-family: var(--font-bible); font-size: 14px;"></textarea>
               <div style="display: flex; align-items: center; justify-content: space-between;">
                 <label id="drawer-note-ai-toggle-label" style="font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; cursor: pointer;">
-                  <input type="checkbox" id="drawer-note-ai-toggle" checked> <span>🤖 IA</span>
+                  <input type="checkbox" id="drawer-note-ai-toggle" checked>
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                  <span>IA</span>
                 </label>
-                <button class="btn-primary" id="btn-drawer-save-note" style="font-size: 11px; padding: 4px 12px;">💾 Enregistrer</button>
+                <button class="btn-primary" id="btn-drawer-save-note" style="font-size: 11px; padding: 4px 12px; display: flex; align-items: center; gap: 4px;">
+                  <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                  <span>Enregistrer</span>
+                </button>
               </div>
             </div>
           </div>
@@ -1660,10 +1738,12 @@
     <!-- Popover Dédié Menu Interlinéaire Inversé (Style Logos) -->
     <div class="interlinear-options-popover hidden" id="interlinear-options-popover">
       <div class="interlinear-pop-header">
-        <div class="interlinear-pop-title">
-          <span>🔤</span>
+        <div class="interlinear-pop-title" style="display: flex; align-items: center; gap: 6px;">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 8 6 6"></path><path d="m4 14 6-6 2-3"></path><path d="M2 5h12"></path><path d="M7 2h1"></path><path d="m22 22-5-10-5 10"></path><path d="M14 18h6"></path></svg>
           <span>Interlinéaire Inversé</span>
         </div>
+        <button class="context-close-btn" id="btn-close-interlinear-popover">✕</button>
+      </div>
         <button class="context-close-btn" id="btn-close-interlinear-popover">✕</button>
       </div>
 
@@ -1791,7 +1871,14 @@
     <div class="modal-dialog-container hidden" id="modal-import-book">
       <div class="modal-card modal-card-large">
         <div class="modal-header">
-          <h2 class="modal-title" id="import-modal-title">📥 Importer un Nouvel Ouvrage</h2>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" x2="12" y1="15" y2="3"></line>
+            </svg>
+            <h2 class="modal-title" id="import-modal-title">Importer un Nouvel Ouvrage</h2>
+          </div>
           <button class="modal-close-btn" id="btn-close-import-modal">✕</button>
         </div>
 
@@ -1802,8 +1889,14 @@
             <div class="import-column left">
               
               <div class="import-section-header">
-                <span class="import-section-title">📋 Informations Générales</span>
-                <button class="btn-secondary btn-sm" id="btn-import-google-books">🔍 Google Books</button>
+                <span class="import-section-title" style="display: flex; align-items: center; gap: 5px;">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                  <span>Informations Générales</span>
+                </span>
+                <button class="btn-secondary btn-sm" id="btn-import-google-books" style="display: flex; align-items: center; gap: 4px;">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+                  <span>Google Books</span>
+                </button>
               </div>
 
               <div class="form-group">
@@ -1846,8 +1939,14 @@
               <!-- ENCADRÉ CLASSIFICATION RAG TRI-FLUX -->
               <div class="rag-classification-card">
                 <div class="rag-card-header">
-                  <span class="rag-card-title">🎯 Classification RAG Tri-Flux</span>
-                  <button class="btn-primary btn-xs" id="btn-import-autoclassify" style="background: #7C3AED;">✨ Auto-classifier (IA)</button>
+                  <span class="rag-card-title" style="display: flex; align-items: center; gap: 5px;">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                    <span>Classification RAG Tri-Flux</span>
+                  </span>
+                  <button class="btn-primary btn-xs" id="btn-import-autoclassify" style="background: #7C3AED; display: flex; align-items: center; gap: 4px;">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                    <span>Auto-classifier (IA)</span>
+                  </button>
                 </div>
 
                 <div class="form-row two-cols" style="margin-top: 6px;">
@@ -1885,12 +1984,12 @@
                 <div class="form-group" style="margin-top: 6px;">
                   <label style="font-size: 11px;">Modèle d'embedding vectoriel :</label>
                   <select id="import-rag-embed" class="select-field full-w" style="font-size: 11px;">
-                    <option value="bge_multilingual_gemma2 (Infomaniak)">🇨🇭 bge_multilingual_gemma2 (Infomaniak - Recommandé)</option>
-                    <option value="mini_lm_l12_v2 (Infomaniak)">🇨🇭 mini_lm_l12_v2 (Infomaniak - Léger)</option>
-                    <option value="gemini-embedding-2">⚡ gemini-embedding-2 (Google)</option>
-                    <option value="gemini-embedding-1">⚡ gemini-embedding-1 (Google)</option>
-                    <option value="study_library">📚 study_library (Local)</option>
-                    <option value="mistral-embed">🇫🇷 mistral-embed (Mistral AI)</option>
+                    <option value="bge_multilingual_gemma2 (Infomaniak)">bge_multilingual_gemma2 (Infomaniak - Recommandé)</option>
+                    <option value="mini_lm_l12_v2 (Infomaniak)">mini_lm_l12_v2 (Infomaniak - Léger)</option>
+                    <option value="gemini-embedding-2">gemini-embedding-2 (Google)</option>
+                    <option value="gemini-embedding-1">gemini-embedding-1 (Google)</option>
+                    <option value="study_library">study_library (Local)</option>
+                    <option value="mistral-embed">mistral-embed (Mistral AI)</option>
                   </select>
                 </div>
               </div>
@@ -1901,7 +2000,10 @@
             <div class="import-column right">
 
               <div class="import-section-header">
-                <span class="import-section-title">🖼️ Couverture & Fichier Source</span>
+                <span class="import-section-title" style="display: flex; align-items: center; gap: 5px;">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>
+                  <span>Couverture & Fichier Source</span>
+                </span>
               </div>
 
               <!-- Zone Couverture -->
@@ -1911,8 +2013,14 @@
                   <img id="import-cover-img" class="hidden" alt="Couverture">
                 </div>
                 <div class="import-cover-actions">
-                  <button class="btn-secondary btn-sm" id="btn-import-pick-cover">🖼️ Choisir une image...</button>
-                  <button class="btn-secondary btn-sm" id="btn-import-smart-cover">✨ Smart Cover</button>
+                  <button class="btn-secondary btn-sm" id="btn-import-pick-cover" style="display: flex; align-items: center; gap: 4px;">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>
+                    <span>Choisir une image...</span>
+                  </button>
+                  <button class="btn-secondary btn-sm" id="btn-import-smart-cover" style="display: flex; align-items: center; gap: 4px;">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                    <span>Smart Cover</span>
+                  </button>
                 </div>
               </div>
 
@@ -1920,7 +2028,10 @@
               <div class="import-file-box" style="margin-top: 12px;">
                 <label>Fichier ou dossier d'ouvrage :</label>
                 <div class="import-file-picker-row">
-                  <button class="btn-primary btn-sm" id="btn-import-pick-file">📂 Parcourir...</button>
+                  <button class="btn-primary btn-sm" id="btn-import-pick-file" style="display: flex; align-items: center; gap: 4px;">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path></svg>
+                    <span>Parcourir...</span>
+                  </button>
                   <span class="import-selected-file-label" id="import-selected-file-label">Aucun fichier sélectionné</span>
                 </div>
               </div>
@@ -1928,11 +2039,23 @@
               <!-- Section Table des Matières / Chapitres (pour EPUB et livres) -->
               <div class="import-chapters-card" id="import-chapters-section">
                 <div class="import-chapters-header">
-                  <span class="import-chapters-title">📑 Chapitres & Table des Matières (<span id="import-ch-count">0</span>)</span>
+                  <span class="import-chapters-title" style="display: flex; align-items: center; gap: 5px;">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                    <span>Chapitres & Table des Matières (<span id="import-ch-count">0</span>)</span>
+                  </span>
                   <div class="import-chapters-btns">
-                    <button class="btn-secondary btn-xs" id="btn-ch-check-all">☑️ Tout</button>
-                    <button class="btn-secondary btn-xs" id="btn-ch-uncheck-all">☐ Aucun</button>
-                    <button class="btn-secondary btn-xs" id="btn-ch-rag-only">🎯 RAG utile</button>
+                    <button class="btn-secondary btn-xs" id="btn-ch-check-all" style="display: flex; align-items: center; gap: 3px;">
+                      <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                      <span>Tout</span>
+                    </button>
+                    <button class="btn-secondary btn-xs" id="btn-ch-uncheck-all" style="display: flex; align-items: center; gap: 3px;">
+                      <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"></rect></svg>
+                      <span>Aucun</span>
+                    </button>
+                    <button class="btn-secondary btn-xs" id="btn-ch-rag-only" style="display: flex; align-items: center; gap: 3px;">
+                      <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                      <span>RAG utile</span>
+                    </button>
                   </div>
                 </div>
 
@@ -1950,7 +2073,14 @@
 
         <div class="modal-footer">
           <button class="btn-secondary" id="btn-cancel-import-modal">Annuler</button>
-          <button class="btn-primary" id="btn-submit-import-modal">📥 Lancer l'Importation & l'Indexation RAG</button>
+          <button class="btn-primary" id="btn-submit-import-modal" style="display: flex; align-items: center; gap: 6px;">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" x2="12" y1="15" y2="3"></line>
+            </svg>
+            <span>Lancer l'Importation & l'Indexation RAG</span>
+          </button>
         </div>
       </div>
     </div>
@@ -1959,7 +2089,10 @@
     <div class="modal-dialog-container hidden" id="modal-google-books">
       <div class="modal-card" style="max-width: 600px; max-height: 80vh;">
         <div class="modal-header">
-          <h3 class="modal-title">🔍 Recherche Google Books</h3>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+            <h3 class="modal-title">Recherche Google Books</h3>
+          </div>
           <button class="modal-close-btn" id="btn-close-gb-modal">✕</button>
         </div>
         <div class="modal-body" style="padding: 14px;">
@@ -1981,7 +2114,13 @@
 
     <!-- Notification Toast d'Erreur (Bas Droite) -->
     <div class="error-toast-card hidden" id="error-toast">
-      <div class="error-toast-icon">⚠️</div>
+      <div class="error-toast-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </div>
       <div class="error-toast-body">
         <div class="error-toast-title" id="error-toast-title">Erreur</div>
         <div class="error-toast-msg" id="error-toast-msg">Une erreur inattendue est survenue.</div>
@@ -2206,7 +2345,9 @@
             <span class="ctx-shortcut">###</span>
           </div>
           <div class="ctx-menu-item" data-action="quote">
-            <span class="ctx-icon" style="font-size: 14px;">❝</span>
+            <span class="ctx-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2H4c-1.25 0-2 .75-2 2v6c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2h-4c-1.25 0-2 .75-2 2v6c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/></svg>
+            </span>
             <span class="ctx-label">Citation</span>
             <span class="ctx-shortcut">&gt;</span>
           </div>
@@ -2221,7 +2362,9 @@
             <span class="ctx-shortcut">1.</span>
           </div>
           <div class="ctx-menu-item" data-action="task-list">
-            <span class="ctx-icon" style="font-size: 13px;">☑</span>
+            <span class="ctx-icon">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="6" height="6" rx="1"/><path d="m3 17 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/></svg>
+            </span>
             <span class="ctx-label">Liste de tâches</span>
             <span class="ctx-shortcut">- [ ]</span>
           </div>
@@ -2243,22 +2386,30 @@
             <span class="ctx-shortcut">---</span>
           </div>
           <div class="ctx-menu-item" data-action="datetime">
-            <span class="ctx-icon" style="font-size: 13px;">📅</span>
+            <span class="ctx-icon">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </span>
             <span class="ctx-label">Date et heure</span>
             <span class="ctx-shortcut">Ctrl+Shift+D</span>
           </div>
           <div class="ctx-menu-item" data-action="table">
-            <span class="ctx-icon" style="font-size: 13px;">📊</span>
+            <span class="ctx-icon">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
+            </span>
             <span class="ctx-label">Tableau</span>
             <span class="ctx-shortcut">Table</span>
           </div>
           <div class="ctx-menu-item" data-action="code-block">
-            <span class="ctx-icon" style="font-size: 13px;">💻</span>
+            <span class="ctx-icon">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </span>
             <span class="ctx-label">Bloc de code</span>
             <span class="ctx-shortcut">```</span>
           </div>
           <div class="ctx-menu-item" data-action="callout">
-            <span class="ctx-icon" style="font-size: 13px;">💡</span>
+            <span class="ctx-icon">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+            </span>
             <span class="ctx-label">Encart / Callout</span>
             <span class="ctx-shortcut">&gt; [!NOTE]</span>
           </div>

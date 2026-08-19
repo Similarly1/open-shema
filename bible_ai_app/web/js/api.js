@@ -16,7 +16,7 @@ const API = {
     const markReady = () => {
       if (!this.isReady && this._isBridgeAvailable()) {
         this.isReady = true;
-        console.log('⚡ PyWebView Bridge Connecté et Méthodes Initialisées !');
+        console.log('[PyWebView Bridge] Connecté et Méthodes Initialisées !');
         const cbs = [...this._readyCallbacks];
         this._readyCallbacks = [];
         cbs.forEach(cb => {
@@ -52,7 +52,7 @@ const API = {
       clearInterval(interval);
       if (!this.isReady) {
         this.isReady = true;
-        console.warn('⚡ PyWebView non détecté, mode autonome/démo actif.');
+        console.warn('[PyWebView] Non détecté, mode autonome/démo actif.');
         const cbs = [...this._readyCallbacks];
         this._readyCallbacks = [];
         cbs.forEach(cb => {

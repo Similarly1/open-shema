@@ -139,8 +139,8 @@ const ImportModal = {
     const submitBtn = document.getElementById('btn-submit-import-modal');
 
     if (editMode && book) {
-      modalTitle.textContent = `✏️ Modifier les Métadonnées de l'Ouvrage`;
-      submitBtn.textContent = `💾 Enregistrer les Modifications`;
+      modalTitle.textContent = `Modifier les Métadonnées de l'Ouvrage`;
+      submitBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg><span>Enregistrer les Modifications</span>`;
       
       document.getElementById('import-book-id').value = book.name || '';
       document.getElementById('import-book-title').value = book.title || book.name || '';
@@ -158,8 +158,8 @@ const ImportModal = {
       this.updateCoverPreview(this.coverDataUrl || this.coverPath);
       this.renderChaptersList([]);
     } else {
-      modalTitle.textContent = `📥 Importer un Nouvel Ouvrage dans la Bibliothèque`;
-      submitBtn.textContent = `📥 Lancer l'Importation & l'Indexation RAG`;
+      modalTitle.textContent = `Importer un Nouvel Ouvrage dans la Bibliothèque`;
+      submitBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg><span>Lancer l'Importation & l'Indexation RAG</span>`;
 
       document.getElementById('import-book-id').value = '';
       document.getElementById('import-book-title').value = '';
@@ -352,11 +352,11 @@ const ImportModal = {
         </select>
 
         <select class="import-chapter-select ch-stype-sel">
-          <option value="general" ${ch.source_type === 'general' ? 'selected' : ''}>📄 Général</option>
-          <option value="book_intro" ${ch.source_type === 'book_intro' ? 'selected' : ''}>📖 Intro</option>
-          <option value="biblical_theology" ${ch.source_type === 'biblical_theology' ? 'selected' : ''}>💡 Théol.</option>
-          <option value="ot_context" ${ch.source_type === 'ot_context' ? 'selected' : ''}>🏛️ Context</option>
-          <option value="appendix" ${ch.source_type === 'appendix' ? 'selected' : ''}>⚙️ Annexe</option>
+          <option value="general" ${ch.source_type === 'general' ? 'selected' : ''}>Général</option>
+          <option value="book_intro" ${ch.source_type === 'book_intro' ? 'selected' : ''}>Intro</option>
+          <option value="biblical_theology" ${ch.source_type === 'biblical_theology' ? 'selected' : ''}>Théol.</option>
+          <option value="ot_context" ${ch.source_type === 'ot_context' ? 'selected' : ''}>Contexte</option>
+          <option value="appendix" ${ch.source_type === 'appendix' ? 'selected' : ''}>Annexe</option>
         </select>
       `;
 
@@ -486,7 +486,7 @@ const ImportModal = {
 
     const btn = document.getElementById('btn-import-autoclassify');
     btn.disabled = true;
-    btn.textContent = '⏳ Classification IA...';
+    btn.innerHTML = `<span class="synth-spinner" style="width:12px; height:12px; border-width:2px; vertical-align:middle; margin-right:4px;"></span><span>Classification IA...</span>`;
 
     try {
       const tags = await API.call('auto_classify_document_metadata', title, desc);
@@ -494,13 +494,13 @@ const ImportModal = {
         if (tags.corpus_scope) document.getElementById('import-rag-scope').value = tags.corpus_scope;
         if (tags.source_type) document.getElementById('import-rag-stype').value = tags.source_type;
         if (tags.book_code) document.getElementById('import-rag-bookcode').value = tags.book_code;
-        App.showToast('✨ Classification RAG Tri-Flux détectée et appliquée par IA !');
+        App.showToast('Classification RAG Tri-Flux détectée et appliquée par IA !');
       }
     } catch (e) {
       console.error('Erreur auto_classify:', e);
     } finally {
       btn.disabled = false;
-      btn.textContent = '✨ Auto-classifier (IA)';
+      btn.innerHTML = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg><span>Auto-classifier (IA)</span>`;
     }
   },
 
@@ -531,7 +531,7 @@ const ImportModal = {
 
     const submitBtn = document.getElementById('btn-submit-import-modal');
     submitBtn.disabled = true;
-    submitBtn.innerHTML = `<span>⏳</span> <span>Indexation RAG en cours...</span>`;
+    submitBtn.innerHTML = `<span class="synth-spinner" style="width:12px; height:12px; border-width:2px; vertical-align:middle; margin-right:4px;"></span> <span>Indexation RAG en cours...</span>`;
 
     try {
       const res = await API.call('execute_document_import', payload);
@@ -546,7 +546,9 @@ const ImportModal = {
       alert(`Erreur d'importation : ${e}`);
     } finally {
       submitBtn.disabled = false;
-      submitBtn.innerHTML = this.isEditMode ? `💾 Enregistrer les Modifications` : `📥 Lancer l'Importation & l'Indexation RAG`;
+      submitBtn.innerHTML = this.isEditMode 
+        ? `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg><span>Enregistrer les Modifications</span>`
+        : `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg><span>Lancer l'Importation & l'Indexation RAG</span>`;
     }
   }
 };

@@ -170,7 +170,7 @@ const MapsView = {
       const selectEl = document.getElementById('map-itinerary-select');
       if (selectEl && this.itinerariesList.length > 0) {
         selectEl.innerHTML = `
-          <option value="none">🗺️ Vue libre (Tous les lieux)</option>
+          <option value="none">Vue libre (Tous les lieux)</option>
           <optgroup label="Grandes Étapes & Voyages">
             ${this.itinerariesList.map(it => `
               <option value="${it.itinerary_id}">${it.title}</option>
@@ -595,7 +595,7 @@ const MapsView = {
         }
       }
 
-      App.showToast(`🗺️ ${places.length} lieu(x) détecté(s) dans ${this.getFrenchBook(bookCode)} ${chapterNum}`);
+      App.showToast(`${places.length} lieu(x) détecté(s) dans ${this.getFrenchBook(bookCode)} ${chapterNum}`);
     } catch (err) {
       console.error('Erreur affichage lieux chapitre:', err);
     }

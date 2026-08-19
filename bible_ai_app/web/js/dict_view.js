@@ -75,7 +75,7 @@ const DictView = {
     const wikiIdx = this.currentMatches.length;
     const wikiBtn = document.createElement('button');
     wikiBtn.className = `lex-source-pill ${this.activeSourceIndex === wikiIdx ? 'active' : ''}`;
-    wikiBtn.innerHTML = `🌐 Wikipédia`;
+    wikiBtn.innerHTML = `<span style="display:inline-flex; align-items:center; gap:4px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Wikipédia</span>`;
     wikiBtn.addEventListener('click', () => {
       this.activeSourceIndex = wikiIdx;
       this.render();
@@ -96,7 +96,7 @@ const DictView = {
     } else {
       bodyContainer.innerHTML = `
         <div style="padding: 40px; color: var(--text-muted); text-align: center;">
-          <span style="font-size: 36px; display: block; margin-bottom: 10px;">📖</span>
+          <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8" style="display: block; margin: 0 auto 10px auto; opacity: 0.5;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
           Aucune entrée trouvée pour « <strong>${this.currentTerm}</strong> » dans ce dictionnaire.
         </div>
       `;
@@ -113,12 +113,12 @@ const DictView = {
         <div class="ai-polish-bar">
           <div>
             ${isPolished 
-              ? `<span class="ai-polished-badge">✨ Notice restaurée par IA (${modelName})</span>` 
+              ? `<span class="ai-polished-badge" style="display:inline-flex; align-items:center; gap:4px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>Notice restaurée par IA (${modelName})</span>` 
               : `<span style="font-size: 11px; color: #4338CA; font-weight: 600;">Restructurer et restaurer avec l'IA</span>`
             }
           </div>
-          <button class="ai-polish-btn" id="btn-dict-polish">
-            <span>✨</span>
+          <button class="ai-polish-btn" id="btn-dict-polish" style="display: flex; align-items: center; gap: 4px;">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
             <span>${isPolished ? 'Re-générer' : "Améliorer avec l'IA (Mistral 14B)"}</span>
           </button>
         </div>
@@ -150,7 +150,7 @@ const DictView = {
     if (btnPolish) {
       btnPolish.addEventListener('click', async () => {
         btnPolish.disabled = true;
-        btnPolish.innerHTML = `<span>⏳</span><span>Restauration IA en cours...</span>`;
+        btnPolish.innerHTML = `<span class="synth-spinner" style="width:12px; height:12px; border-width:2px; vertical-align:middle; margin-right:4px;"></span><span>Restauration IA en cours...</span>`;
         const bodyEl = container.querySelector('#dict-match-body');
         bodyEl.innerHTML = `<div style="padding: 30px; text-align: center; color: var(--accent-blue);"><em>Restauration philologique et restructuration de la notice par Mistral 14B...</em></div>`;
 
@@ -160,7 +160,7 @@ const DictView = {
             match.is_polished = true;
             match.full_text = res.text;
             match.polished_model = res.model;
-            App.showToast('✨ Notice restaurée par IA avec succès !');
+            App.showToast('Notice restaurée par IA avec succès !');
             this.render();
           } else {
             alert(`Erreur IA : ${res?.error || 'Erreur inconnue'}`);
@@ -182,7 +182,7 @@ const DictView = {
       if (!data || (!data.found && (!data.candidates || data.candidates.length === 0))) {
         container.innerHTML = `
           <div style="padding: 40px; color: var(--text-muted); text-align: center;">
-            <span style="font-size: 40px; display: block; margin-bottom: 10px;">🌐</span>
+            <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.8" style="display: block; margin: 0 auto 10px auto; opacity: 0.5;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
             Aucun article Wikipédia pertinent trouvé pour « <strong>${this.currentTerm}</strong> ».
             <div style="margin-top: 14px; display: flex; gap: 6px; justify-content: center;">
               <input type="text" id="dict-wiki-fallback-input" class="wiki-search-input" style="max-width: 220px;" placeholder="Autre recherche..." value="${this.currentTerm}">
@@ -211,7 +211,7 @@ const DictView = {
       let navHtml = `
         <div class="wiki-top-nav">
           <div class="wiki-search-row">
-            <input type="text" class="wiki-search-input" id="dict-wiki-query-input" placeholder="🔍 Rechercher un autre sujet..." value="${data.search_query || this.currentTerm}">
+            <input type="text" class="wiki-search-input" id="dict-wiki-query-input" placeholder="Rechercher un autre sujet..." value="${data.search_query || this.currentTerm}">
             <button class="wiki-search-submit-btn" id="dict-wiki-query-submit">Chercher</button>
           </div>
           ${candidates.length > 1 ? `
@@ -246,8 +246,8 @@ const DictView = {
           <div class="wiki-extract">${(data.extract || '').replace(/\n\n/g, '<br><br>')}</div>
 
           <div style="display: flex; gap: 8px; align-items: center;">
-            <button class="wiki-more-btn" id="btn-dict-wiki-more" data-expanded="false">
-              <span>📖</span>
+            <button class="wiki-more-btn" id="btn-dict-wiki-more" data-expanded="false" style="display: flex; align-items: center; gap: 5px;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
               <span id="dict-wiki-more-label">Voir plus ▾</span>
             </button>
           </div>
