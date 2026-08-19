@@ -113,6 +113,14 @@
           </span>
           <span class="nav-label">Bible</span>
         </button>
+        <button class="nav-item" data-view="commentaries" id="nav-commentaries" title="Commentaires exégétiques">
+          <span class="nav-icon">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </span>
+          <span class="nav-label">Commentaires</span>
+        </button>
         <button class="nav-item" data-view="library" id="nav-library" title="Bibliothèque">
           <span class="nav-icon">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -1476,6 +1484,72 @@
         </div>
       </div>
 
+      <!-- ===================================================== -->
+      <!-- VUE I : COMMENTAIRES EXÉGÉTIQUES (PAGE PLEIN ÉCRAN)    -->
+      <!-- ===================================================== -->
+      <div class="app-view" id="view-commentaries">
+        <header class="view-header comm-view-header">
+          <div class="view-title-box">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <h1 class="view-title" style="margin: 0;">COMMENTAIRES EXÉGÉTIQUES</h1>
+              <span class="comm-view-badge" id="comm-view-count-badge">0 sources</span>
+            </div>
+            <p class="view-subtitle" id="comm-view-subtitle">Exposition approfondie verset par verset • Grands commentateurs historiques & contemporains</p>
+          </div>
+          
+          <div class="view-actions comm-view-toolbar-actions">
+            <!-- Navigation versets -->
+            <div class="comm-view-nav-group">
+              <button class="tool-btn icon-only" id="btn-comm-view-prev" title="Verset précédent (Flèche Gauche)">◀</button>
+              <div class="comm-view-ref-box">
+                <input type="text" id="comm-view-search-input" class="search-field comm-ref-search-field" placeholder="Ex: Jean 3:16, Rom 8:28..." title="Saisir un livre, chapitre ou verset">
+                <button class="btn-primary" id="btn-comm-view-search" style="padding: 0 12px; height: 32px;">Aller</button>
+              </div>
+              <button class="tool-btn icon-only" id="btn-comm-view-next" title="Verset suivant (Flèche Droite)">▶</button>
+            </div>
+
+            <!-- Action: Revenir à la Bible -->
+            <button class="tool-btn" id="btn-comm-view-back-bible" title="Ouvrir ce passage dans le lecteur biblique">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path><path d="M6 6h10"></path><path d="M6 10h10"></path></svg>
+              <span>Lecteur Biblique</span>
+            </button>
+
+            <!-- Action: Synthèse IA -->
+            <button class="tool-btn comm-action-btn-synth" id="btn-comm-view-synth" title="Synthèse exégétique comparative par IA">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+              <span>Synthèse IA</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="view-content comm-view-main-scroll">
+          <!-- BANDEAU DU VERSET BIBLIQUE -->
+          <div class="comm-verse-banner" id="comm-view-verse-banner">
+            <div class="comm-verse-banner-header">
+              <span class="comm-verse-banner-ref" id="comm-view-verse-ref">Genèse 1:1</span>
+              <span class="comm-verse-banner-bible" id="comm-view-verse-bible-name">TOB 2010</span>
+            </div>
+            <div class="comm-verse-banner-text" id="comm-view-verse-text">« Au commencement, Dieu créa les cieux et la terre. »</div>
+          </div>
+
+          <!-- ONGLETS / PILULES DES COMMENTATEURS -->
+          <div class="comm-authors-bar" id="comm-view-authors-bar">
+            <div class="comm-authors-scroll" id="comm-view-author-tabs">
+              <!-- Rempli dynamiquement -->
+            </div>
+          </div>
+
+          <!-- CONTENEUR DU COMMENTAIRE SÉLECTIONNÉ (Lecture Spacieuse & Typographique) -->
+          <div class="comm-article-container" id="comm-view-article-container">
+            <div class="comm-article-card" id="comm-view-article-card">
+              <div id="comm-view-article-content">
+                <!-- Rempli dynamiquement -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </main>
 
     <!-- ======================================================= -->
@@ -1530,6 +1604,11 @@
             </div>
             
             <div style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
+              <button class="comm-expand-btn" id="btn-expand-comm-to-view" title="Ouvrir la page dédiée aux commentaires (Plein écran)">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                <span>Plein écran</span>
+              </button>
+
               <button class="comm-translate-btn hidden" id="btn-translate-comm" title="Traduire fidèlement cet article en français par IA" style="display: flex; align-items: center; gap: 4px;">
                 <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                 <span>Traduire</span>
@@ -2469,6 +2548,7 @@
   <script src="js/api.js"></script>
   <script src="js/book_picker.js"></script>
   <script src="js/bible_reader.js"></script>
+  <script src="js/commentaries_view.js"></script>
   <script src="js/import_modal.js"></script>
   <script src="js/library_view.js"></script>
   <script src="js/settings_view.js"></script>

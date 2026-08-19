@@ -558,6 +558,15 @@ const CommentaryViewer = {
       this.translateActiveCommentary();
     });
 
+    // 1b. Bouton d'agrandissement plein écran vers la page dédiée aux commentaires
+    const btnExpand = document.getElementById('btn-expand-comm-to-view');
+    btnExpand?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (typeof CommentariesView !== 'undefined') {
+        CommentariesView.openWithCurrentState();
+      }
+    });
+
     // 2. Restaurer l'état de synchronisation
     try {
       const savedSync = localStorage.getItem('bible_comm_sync');

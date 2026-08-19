@@ -20,7 +20,8 @@ const App = {
       { name: 'AIStudyView', init: () => AIStudyView.init() },
       { name: 'NotesView', init: () => NotesView.init() },
       { name: 'DictView', init: () => DictView.init() },
-      { name: 'MapsView', init: () => MapsView.init() }
+      { name: 'MapsView', init: () => MapsView.init() },
+      { name: 'CommentariesView', init: () => CommentariesView.init() }
     ];
 
     modules.forEach(m => {
@@ -52,12 +53,13 @@ const App = {
 
     // Raccourcis accès rapides
     document.getElementById('quick-commentary')?.addEventListener('click', () => {
-      this.switchView('bible');
-      const drawer = document.getElementById('right-drawer');
-      drawer.classList.remove('collapsed');
-      document.getElementById('btn-toggle-right-drawer')?.classList.add('active');
-      this.checkAutoSidebarCollapse();
-      document.querySelector('.drawer-tab[data-drawer-tab="commentaries"]')?.click();
+      document.querySelectorAll('.sidebar-menu .nav-item, .sidebar-footer .nav-item').forEach(b => b.classList.remove('active'));
+      document.getElementById('nav-commentaries')?.classList.add('active');
+      if (typeof CommentariesView !== 'undefined') {
+        CommentariesView.openWithCurrentState();
+      } else {
+        this.switchView('commentaries');
+      }
     });
 
     document.getElementById('quick-compare')?.addEventListener('click', () => {
@@ -265,6 +267,14 @@ const App = {
     } else if (viewName === 'maps') {
       if (drawerEl) drawerEl.classList.add('collapsed');
       MapsView.onViewActivated();
+    } else if (viewName === 'commentaries') {
+      if (drawerEl) drawerEl.classList.add('collapsed');
+      if (typeof CommentariesView !== 'undefined') {
+        // Si les commentaires n'ont pas encore été chargés ou si on veut s'assurer de l'alignement
+        if (!CommentariesView.currentComments || CommentariesView.currentComments.length === 0) {
+          CommentariesView.openWithCurrentState();
+        }
+      }
     } else if (viewName === 'search' || viewName === 'ai' || viewName === 'dict') {
       if (drawerEl) drawerEl.classList.add('collapsed');
     }
