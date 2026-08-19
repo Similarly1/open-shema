@@ -360,25 +360,42 @@ class BibleAppApi:
         return comments
 
     def parse_reference(self, raw_input: str) -> Dict[str, Any]:
-        """Décode une saisie libre de passage biblique."""
-        resolved = resolve_book_input(raw_input)
-        if resolved:
-            code, french, ch_count = resolved
-            parts = raw_input.strip().split()
-            ch = 1
-            if len(parts) > 1 and parts[-1].isdigit():
-                ch = int(parts[-1])
-            elif ":" in raw_input:
-                sub = raw_input.split(":")
-                ch_candidate = "".join(filter(str.isdigit, sub[0].split()[-1]))
-                if ch_candidate:
-                    ch = int(ch_candidate)
+        """Décode une saisie libre de passage biblique (ex: 'rm 8.9', 'Romains 8:9', 'romains', 'Jn 3:16', '1 Co 13')."""
+        if not raw_input or not str(raw_input).strip():
+            return {"book": "Gen", "book_french": "Genèse", "chapter": 1, "verse": None}
+            
+        raw = str(raw_input).strip()
+        parsed = parse_smart_book_input(raw)
+        if parsed and parsed.get("code"):
+            code = parsed["code"]
+            french = parsed.get("book") or get_french_book_name(code)
+            ch = int(parsed["chapter"]) if parsed.get("chapter") and str(parsed["chapter"]).isdigit() else 1
+            verse = int(parsed["verse"]) if parsed.get("verse") and str(parsed["verse"]).isdigit() else None
             return {
                 "book": code,
                 "book_french": french,
-                "chapter": min(max(1, ch), ch_count)
+                "chapter": max(1, ch),
+                "verse": verse
             }
-        return {"book": "Gen", "book_french": "Genèse", "chapter": 1}
+            
+        resolved = resolve_book_input(raw)
+        if resolved:
+            code = "Rom" if resolved == "Romains" else resolved[:3]
+            for c, fr in [(b[1], b[0]) for b in ALL_BOOKS]:
+                if fr.lower() == resolved.lower() or c.lower() == resolved.lower():
+                    code = c
+                    french = fr
+                    break
+            else:
+                french = resolved
+            return {
+                "book": code,
+                "book_french": french,
+                "chapter": 1,
+                "verse": None
+            }
+
+        return {"book": "Gen", "book_french": "Genèse", "chapter": 1, "verse": None}
 
     def ask_ai(self, question: str, book: str, chapter: int, verse: int) -> Dict[str, Any]:
         """Interroge l'assistant IA en injectant le contexte biblique, les commentaires et les notes personnelles."""

@@ -1770,10 +1770,15 @@ const BibleReader = {
         if (e.key === 'Enter') {
           const query = e.target.value.trim();
           if (query) {
-            const parsed = await API.parseReference(query);
-            if (parsed && parsed.book) {
-              this.navigateTo(parsed.book, parsed.chapter || 1);
-              e.target.value = '';
+            try {
+              const parsed = await API.parseReference(query);
+              if (parsed && parsed.book) {
+                App.switchView('bible');
+                await this.navigateTo(parsed.book, parsed.chapter || 1, parsed.verse || null);
+                e.target.value = '';
+              }
+            } catch (err) {
+              console.error('Erreur navigation passage rapide:', err);
             }
           }
         }
@@ -2026,13 +2031,14 @@ const BibleReader = {
     }
   },
 
-  async navigateTo(bookCode, chapterNum) {
+  async navigateTo(bookCode, chapterNum, verseNum = null) {
     this.currentBook = bookCode;
     this.currentChapter = chapterNum;
     this.loadedChapters = [{ book: bookCode, chapter: chapterNum }];
 
     const info = getBookInfo(bookCode);
-    document.getElementById('pill-reference-text').textContent = `${info.name} ${chapterNum}`;
+    const targetVerse = verseNum ? parseInt(verseNum, 10) : null;
+    document.getElementById('pill-reference-text').textContent = targetVerse ? `${info.name} ${chapterNum}:${targetVerse}` : `${info.name} ${chapterNum}`;
     document.getElementById('pane-1-breadcrumb').textContent = `${info.name.toUpperCase()} > Chapitre ${chapterNum}`;
     const breadcrumb2 = document.getElementById('pane-2-breadcrumb');
     if (breadcrumb2) breadcrumb2.textContent = `${info.name.toUpperCase()} > Chapitre ${chapterNum}`;
@@ -2065,9 +2071,44 @@ const BibleReader = {
     }
 
     const pane1 = document.getElementById('pane-1-content');
-    if (pane1) pane1.scrollTop = 0;
-    this.loadCommentariesForVerse(1);
+    if (pane1 && !targetVerse) pane1.scrollTop = 0;
+
     TabsManager.updateActiveTab(null, bookCode, chapterNum);
+
+    if (targetVerse) {
+      this.selectAndScrollToVerse(targetVerse, bookCode, chapterNum);
+    } else {
+      this.loadCommentariesForVerse(1);
+    }
+  },
+
+  selectAndScrollToVerse(verseNum, bookCode = null, chapterNum = null) {
+    const vNum = parseInt(verseNum, 10);
+    if (!vNum) return;
+    const bCode = bookCode || this.currentBook;
+    const ch = chapterNum || this.currentChapter;
+
+    setTimeout(() => {
+      const pane1 = document.getElementById('pane-1-content');
+      if (!pane1) return;
+
+      const verseEl = pane1.querySelector(`.verse-item[data-book-code="${bCode}"][data-chapter="${ch}"][data-verse-num="${vNum}"]`)
+        || pane1.querySelector(`.verse-item[data-verse-num="${vNum}"]`);
+
+      if (verseEl) {
+        document.querySelectorAll('.verse-item').forEach(el => el.classList.remove('selected'));
+        verseEl.classList.add('selected');
+        verseEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+
+        if (this.isSplitView) {
+          const pane2 = document.getElementById('pane-2-content');
+          const verseEl2 = pane2?.querySelector(`.verse-item[data-book-code="${bCode}"][data-chapter="${ch}"][data-verse-num="${vNum}"]`);
+          if (verseEl2) verseEl2.classList.add('selected');
+        }
+
+        this.loadCommentariesForVerse(vNum, bCode, ch);
+      }
+    }, 120);
   },
 
   async reloadCurrentChapters() {

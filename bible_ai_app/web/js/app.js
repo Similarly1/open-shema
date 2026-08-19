@@ -33,6 +33,9 @@ const App = {
     // 2. Initialiser la gestion de la barre latérale pliable et du volet droit redimensionnable
     this.initSidebarAndDrawerLayout();
 
+    // 2a. Initialiser le gestionnaire d'erreurs et modale de détails
+    this.bindErrorHandling();
+
     // 2b. Navigation latérale (Changement de vue)
     document.querySelectorAll('.sidebar-menu .nav-item, .sidebar-footer .nav-item').forEach(btn => {
       btn.addEventListener('click', () => {

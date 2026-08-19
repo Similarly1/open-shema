@@ -1521,7 +1521,7 @@
 
     <!-- Modale Détails Complets de l'Erreur avec Bouton Copier -->
     <div class="modal-dialog-container hidden" id="error-details-modal">
-      <div class="modal-dialog" style="max-width: 620px; width: 90%;">
+      <div class="modal-card" style="max-width: 620px; width: 90%; z-index: 1001;">
         <div class="modal-header">
           <div style="display: flex; align-items: center; gap: 8px;">
             <span style="font-size: 16px;">⚠️</span>
@@ -1529,13 +1529,13 @@
           </div>
           <button class="modal-btn-close" id="btn-close-error-modal">✕</button>
         </div>
-        <div class="modal-body" style="padding: 16px;">
+        <div class="modal-body" style="padding: 16px; max-height: 60vh; overflow-y: auto;">
           <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;" id="error-modal-summary"></div>
           <div style="position: relative;">
-            <pre class="error-details-pre" id="error-modal-stack"></pre>
+            <pre class="error-details-pre" id="error-modal-stack" style="background: var(--bg-subtle); padding: 12px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--text-primary); max-height: 250px; overflow: auto; border: 1px solid var(--border-color); white-space: pre-wrap; word-break: break-all;"></pre>
           </div>
         </div>
-        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #F8FAFC; border-top: 1px solid var(--border-color);">
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--bg-subtle); border-top: 1px solid var(--border-color);">
           <button class="btn-outline" id="btn-copy-error" style="display: flex; align-items: center; gap: 6px;">
             <span id="btn-copy-error-icon">📋</span> <span id="btn-copy-error-text">Copier l'erreur</span>
           </button>
