@@ -142,13 +142,31 @@ class TheologyReaderManager:
         # Si trouvé, ordonner la liste des chapitres
         sorted_chapters = []
         for cid in sorted(chapters_dict.keys(), key=lambda x: (int(x) if str(x).isdigit() else 999, str(x))):
-            sorted_chapters.append(chapters_dict[cid])
+            item = chapters_dict[cid]
+            ctitle = item.get("title", "")
+            is_part = bool(
+                re.match(r'^(Part|Partie|Section|Volume|Livre|Book|Tome)\s+([0-9IVXLCDM]+|\b[A-Z]+\b)', ctitle, re.IGNORECASE)
+                and not re.match(r'^(Chapter|Chapitre)\s+', ctitle, re.IGNORECASE)
+                and item.get("chunks_count", 0) <= 3
+            )
+            item["is_section_header"] = is_part
+            sorted_chapters.append(item)
+
+        # Attacher le titre de section parent aux chapitres enfants
+        cur_section = None
+        for c in sorted_chapters:
+            if c.get("is_section_header"):
+                cur_section = c["title"]
+            else:
+                c["section_title"] = cur_section
 
         # Métadonnées du livre
         registry = load_books_metadata()
         book_meta = registry.get(book_name, {})
         from webview_app import get_cover_data_url
         cov_data_url = get_cover_data_url(book_meta.get("cover_path"))
+
+        readable_count = len([c for c in sorted_chapters if not c.get("is_section_header")])
 
         result = {
             "book_name": book_name,
@@ -157,7 +175,7 @@ class TheologyReaderManager:
             "year": book_meta.get("year", ""),
             "description": book_meta.get("description", ""),
             "cover_url": cov_data_url,
-            "total_chapters": len(sorted_chapters),
+            "total_chapters": readable_count,
             "chapters": sorted_chapters
         }
         cls._toc_cache[book_name] = result
@@ -250,24 +268,38 @@ class TheologyReaderManager:
         word_count = len(re.findall(r'\w+', full_raw_text))
         reading_time_min = max(1, round(word_count / 200))
 
-        # Obtenir la liste ordonnée des chapitres pour la navigation Précédent / Suivant
+        # Obtenir la liste ordonnée des chapitres pour la navigation Précédent / Suivant (en sautant les intertitres de parties)
         toc_info = cls.get_book_toc(book_name)
         chapters_list = toc_info.get("chapters", [])
+        readable_chapters = [c for c in chapters_list if not c.get("is_section_header")]
         
-        current_idx = -1
-        for idx, ch in enumerate(chapters_list):
+        current_readable_idx = -1
+        for idx, ch in enumerate(readable_chapters):
             if str(ch["chapter_id"]) == str(chapter_id):
-                current_idx = idx
+                current_readable_idx = idx
                 break
 
-        prev_chapter = chapters_list[current_idx - 1] if current_idx > 0 else None
-        next_chapter = chapters_list[current_idx + 1] if 0 <= current_idx < len(chapters_list) - 1 else None
+        if current_readable_idx >= 0:
+            prev_chapter = readable_chapters[current_readable_idx - 1] if current_readable_idx > 0 else None
+            next_chapter = readable_chapters[current_readable_idx + 1] if current_readable_idx < len(readable_chapters) - 1 else None
+            cur_idx_display = current_readable_idx + 1
+        else:
+            # Si on a ouvert directement une page d'intertitre, lier vers le prochain chapitre lisible
+            cid_val = int(chapter_id) if str(chapter_id).isdigit() else 0
+            next_readable = next((c for c in readable_chapters if int(c["chapter_id"]) > cid_val), None)
+            prev_readable = next((c for c in reversed(readable_chapters) if int(c["chapter_id"]) < cid_val), None)
+            prev_chapter = prev_readable
+            next_chapter = next_readable
+            cur_idx_display = 1
 
-        ch_title = chapter_meta.get("chapter_title") or (chapters_list[current_idx]["title"] if current_idx >= 0 else f"Chapitre {chapter_id}")
+        target_ch_info = next((c for c in chapters_list if str(c["chapter_id"]) == str(chapter_id)), {})
+        section_title = target_ch_info.get("section_title")
+
+        ch_title = chapter_meta.get("chapter_title") or target_ch_info.get("title") or f"Chapitre {chapter_id}"
         ch_title = cls._clean_text_encoding(ch_title)
 
         # Livre biblique associé éventuel
-        book_code = chapter_meta.get("book_code") or (chapters_list[current_idx].get("book_code") if current_idx >= 0 else None)
+        book_code = chapter_meta.get("book_code") or target_ch_info.get("book_code")
         book_french_name = get_french_book_name(book_code) if book_code else None
 
         registry = load_books_metadata()
@@ -288,6 +320,7 @@ class TheologyReaderManager:
             "cover_url": cov_data_url,
             "chapter_id": chapter_id,
             "chapter_title": ch_title,
+            "section_title": section_title,
             "book_code": book_code,
             "book_french_name": book_french_name,
             "paragraphs": paragraphs,
@@ -298,8 +331,8 @@ class TheologyReaderManager:
             "referenced_books": sorted_books,
             "prev_chapter": prev_chapter,
             "next_chapter": next_chapter,
-            "current_index": current_idx + 1,
-            "total_chapters": len(chapters_list)
+            "current_index": cur_idx_display,
+            "total_chapters": len(readable_chapters)
         }
 
     @classmethod

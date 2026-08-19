@@ -447,7 +447,28 @@ class BibleAppApi:
             if not installed:
                 return {"success": False, "error": "Aucune Bible installée"}
 
-            chosen_bible = bible_name if bible_name and bible_name in installed else installed[0]
+            # Priorité de sélection de version :
+            # 1. Version demandée explicitement
+            # 2. Segond 21 / Segond_21
+            # 3. LSG, NBS, BDS
+            # 4. Première installée
+            chosen_bible = None
+            if bible_name:
+                candidates = [bible_name, bible_name.replace(' ', '_'), bible_name.replace('_', ' ')]
+                for c in candidates:
+                    if c in installed:
+                        chosen_bible = c
+                        break
+
+            if not chosen_bible:
+                for pref in ['Segond_21', 'Segond 21', 'LSG', 'NBS', 'BDS', 'SG21']:
+                    if pref in installed:
+                        chosen_bible = pref
+                        break
+
+            if not chosen_bible and installed:
+                chosen_bible = installed[0]
+
             book_data = BibleJsonLoader.load_book(chosen_bible, book_code)
             if not book_data and installed:
                 for b in installed:
@@ -455,6 +476,8 @@ class BibleAppApi:
                     if book_data:
                         chosen_bible = b
                         break
+
+            display_bible = chosen_bible.replace('_', ' ') if chosen_bible else 'Segond 21'
 
             if not book_data:
                 return {"success": False, "error": "Livre non trouvé"}
@@ -476,7 +499,7 @@ class BibleAppApi:
                         "chapter": chapter,
                         "verse": target_verse,
                         "text": v_text,
-                        "bible": chosen_bible
+                        "bible": display_bible
                     }
                 else:
                     first_k = next(iter(sorted(verses_dict.keys(), key=lambda x: int(x) if x.isdigit() else 999)), None)
@@ -491,7 +514,7 @@ class BibleAppApi:
                             "chapter": chapter,
                             "verse": int(first_k) if first_k.isdigit() else 1,
                             "text": v_text,
-                            "bible": chosen_bible
+                            "bible": display_bible
                         }
             else:
                 sorted_keys = sorted(verses_dict.keys(), key=lambda x: int(x) if x.isdigit() else 999)[:3]
@@ -507,7 +530,7 @@ class BibleAppApi:
                     "chapter": chapter,
                     "verse": 1,
                     "text": " ".join(snippets),
-                    "bible": chosen_bible
+                    "bible": display_bible
                 }
 
         except Exception as e:

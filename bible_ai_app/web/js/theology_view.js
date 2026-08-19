@@ -349,8 +349,9 @@ const TheologyView = {
 
       if (this.tocList.length > 0) {
         let chId = targetChapterId;
-        if (!chId || !this.tocList.some(c => c.chapter_id === chId)) {
-          chId = this.tocList[0].chapter_id;
+        const readable = this.tocList.filter(c => !c.is_section_header);
+        if (!chId || !readable.some(c => c.chapter_id === chId)) {
+          chId = (readable[0] || this.tocList[0]).chapter_id;
         }
         await this.loadChapter(bookName, chId);
       } else {
@@ -364,7 +365,8 @@ const TheologyView = {
   updateActiveBookHeader(book) {
     const title = book.title || book.name;
     const author = book.author || 'Auteur non spécifié';
-    const chapters = book.chapters_count || this.tocList?.length || 0;
+    const readable = this.tocList?.filter(c => !c.is_section_header) || [];
+    const chapters = book.chapters_count || readable.length || this.tocList?.length || 0;
 
     if (this.activeBookTitle) this.activeBookTitle.textContent = title;
     if (this.activeBookMeta) this.activeBookMeta.textContent = `${author} ${book.year ? `(${book.year})` : ''}`.trim();
@@ -394,13 +396,31 @@ const TheologyView = {
     try {
       this.isLoading = true;
       this.currentChapterId = chapterId;
-      this.showTranslatedVersion = false;
       this.closeSynthesisPanel();
 
       this.renderLoadingArticle();
 
       const data = await API.getTheologyChapterContent(bookName, chapterId);
       this.currentChapterData = data;
+
+      // Vérifier si une traduction en cache existe pour ce chapitre (en mémoire ou SQLite)
+      const key = `${bookName}_${chapterId}`;
+      if (this.translationCache[key] && this.translationCache[key].length > 0) {
+        this.showTranslatedVersion = true;
+      } else {
+        try {
+          const cached = await API.getCachedTranslation('theology_chapter', key);
+          if (cached && cached.translated_text) {
+            const paras = cached.translated_text.split('\n\n').map(p => p.trim()).filter(p => p);
+            this.translationCache[key] = paras;
+            this.showTranslatedVersion = true;
+          } else {
+            this.showTranslatedVersion = false;
+          }
+        } catch (err) {
+          this.showTranslatedVersion = false;
+        }
+      }
 
       this.renderChapterArticle(data);
       this.highlightActiveTocItem(chapterId);
@@ -439,7 +459,7 @@ const TheologyView = {
         <div class="theol-hero-verses-row">
           <span class="theol-hero-verses-lbl">Passages bibliques cités :</span>
           <div class="theol-hero-verses-chips">
-            ${topVerses.map(v => `<button type="button" class="theol-verse-chip" data-ref="${v}" title="Ouvrir ${v} dans le lecteur biblique">${v}</button>`).join('')}
+            ${topVerses.map(v => `<button type="button" class="theol-verse-chip" data-ref="${v}">${v}</button>`).join('')}
             ${refVerses.length > 10 ? `<span class="theol-verse-chip-more">+${refVerses.length - 10}</span>` : ''}
           </div>
         </div>
@@ -449,9 +469,10 @@ const TheologyView = {
     this.articleHero.innerHTML = `
       <div class="theol-hero-badge-row">
         <span class="theol-hero-book-badge">${this.escapeHtml(bookTitle)}</span>
+        ${data.section_title ? `<span class="theol-hero-section-badge">📁 ${this.escapeHtml(data.section_title)}</span>` : ''}
         ${author ? `<span class="theol-hero-author-badge">✍️ ${this.escapeHtml(author)}</span>` : ''}
         <span class="theol-hero-time-badge">⏱️ ~${readTime} min (${wordCount.toLocaleString()} mots)</span>
-        ${data.book_french_name ? `<button type="button" class="theol-hero-bible-jump" id="btn-jump-bible-chapter" data-code="${data.book_code}" title="Étudier ${data.book_french_name} dans la Bible">📖 ${data.book_french_name}</button>` : ''}
+        ${data.book_french_name ? `<button type="button" class="theol-hero-bible-jump" id="btn-jump-bible-chapter" data-code="${data.book_code}">📖 ${data.book_french_name}</button>` : ''}
       </div>
       <h1 class="theol-hero-chapter-title">${this.escapeHtml(title)}</h1>
       <div class="theol-hero-divider"></div>
@@ -487,9 +508,22 @@ const TheologyView = {
     let paragraphsHtml = '';
     const isEnglish = this.isBookInEnglish(data.raw_text);
 
-    // Bandeau d'aide à la traduction si en anglais
+    // Bandeau d'aide à la traduction si en anglais ou si traduit
     let translationBannerHtml = '';
-    if (isEnglish) {
+    if (this.showTranslatedVersion) {
+      translationBannerHtml = `
+        <div class="theol-translation-banner theol-translation-banner-active" id="theol-translation-banner">
+          <div class="theol-trans-banner-icon">🇫🇷</div>
+          <div class="theol-trans-banner-info">
+            <div class="theol-trans-banner-title">Chapitre affiché en français (traduit par IA)</div>
+            <div class="theol-trans-banner-desc">Texte théologique traduit automatiquement et mémorisé pour ce chapitre.</div>
+          </div>
+          <button type="button" class="theol-trans-banner-btn" id="btn-banner-translate">
+            Afficher le texte original
+          </button>
+        </div>
+      `;
+    } else if (isEnglish) {
       translationBannerHtml = `
         <div class="theol-translation-banner" id="theol-translation-banner">
           <div class="theol-trans-banner-icon">🌐</div>
@@ -498,10 +532,17 @@ const TheologyView = {
             <div class="theol-trans-banner-desc">Vous pouvez traduire automatiquement ce chapitre en français soigné grâce à l'IA.</div>
           </div>
           <button type="button" class="theol-trans-banner-btn" id="btn-banner-translate">
-            ${this.showTranslatedVersion ? 'Afficher le texte original' : 'Traduire en français'}
+            Traduire en français
           </button>
         </div>
       `;
+    }
+
+    // Mettre à jour le bouton de la barre d'outils
+    if (this.btnTranslateHeader) {
+      const lbl = this.btnTranslateHeader.querySelector('span');
+      if (lbl) lbl.textContent = this.showTranslatedVersion ? 'Texte original' : 'Traduire';
+      this.btnTranslateHeader.classList.toggle('active', this.showTranslatedVersion);
     }
 
     const textToRender = this.showTranslatedVersion && this.translationCache[`${this.currentBook}_${this.currentChapterId}`]
@@ -623,7 +664,7 @@ const TheologyView = {
     // Détection des références bibliques usuelles (ex: Jean 3:16, 1 Corinthiens 13:4-8, Gen 1.1, etc.)
     const pattern = /\b((?:[1-3]\s*)?[A-ZÀ-ÿ][a-zà-ÿ]+(?:\s+[a-zà-ÿ]+)?)\s+([0-9]{1,3})[:.]([0-9]{1,3}(?:-[0-9]{1,3})?)\b/g;
     return text.replace(pattern, (match, book, ch, vs) => {
-      return `<span class="theol-inline-scripture-ref" data-ref="${match}" title="Cliquer pour afficher dans le lecteur biblique">${match}</span>`;
+      return `<span class="theol-inline-scripture-ref" data-ref="${match}">${match}</span>`;
     });
   },
 
@@ -646,6 +687,18 @@ const TheologyView = {
     }
 
     this.tocListContainer.innerHTML = filtered.map((ch, idx) => {
+      if (ch.is_section_header) {
+        return `
+          <div class="theol-toc-section-divider">
+            <div class="theol-toc-section-tag">
+              <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/></svg>
+              <span>PARTIE / SECTION</span>
+            </div>
+            <div class="theol-toc-section-title">${this.escapeHtml(ch.title)}</div>
+          </div>
+        `;
+      }
+
       const isActive = String(ch.chapter_id) === String(this.currentChapterId);
       return `
         <button type="button" class="theol-toc-item ${isActive ? 'active' : ''}" data-chapter-id="${ch.chapter_id}">
@@ -873,8 +926,7 @@ const TheologyView = {
   },
 
   // =========================================================================
-  // =========================================================================
-  // TRADUCTION DU CHAPITRE (AVEC ANIMATION DE SCAN & VAGUE LUMINEUSE)
+  // TRADUCTION DU CHAPITRE (AVEC BANDEAU DE PROGRESSION ÉLÉGANT)
   // =========================================================================
 
   async toggleChapterTranslation() {
@@ -894,26 +946,25 @@ const TheologyView = {
       return;
     }
 
-    // Activer l'animation de scan holographique sur l'article
+    // Activer l'état de traduction
     try {
       if (this.articleCard) {
         this.articleCard.classList.add('translating-scan-active');
       }
 
-      // Insérer le bandeau de scan au-dessus du texte
+      // Insérer le bandeau de progression au-dessus du texte
       const existingBanner = document.getElementById('theol-translation-banner');
       const scanBannerHtml = `
         <div class="theol-translation-scanner-banner" id="theol-translation-scanner-banner">
           <div class="theol-scanner-icon-box">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"/></svg>
           </div>
           <div class="theol-scanner-info">
             <div class="theol-scanner-title">Traduction française haute fidélité en cours...</div>
             <div class="theol-scanner-subtitle">Analyse théologique, reformulation doctrinale & conservation des citations bibliques</div>
           </div>
           <div class="theol-scanner-progress-badge">
-            <span class="theol-scanner-sparkle">✨</span>
-            <span>IA active</span>
+            <span>✨ Traduction IA</span>
           </div>
         </div>
       `;
@@ -933,12 +984,11 @@ const TheologyView = {
         this.translationCache[key] = paras;
         this.showTranslatedVersion = true;
         
-        // Retirer l'effet de scan et réafficher avec transition fluide
         if (this.articleCard) {
           this.articleCard.classList.remove('translating-scan-active');
         }
         this.renderChapterArticle(this.currentChapterData);
-        App.showToast('Traduction française appliquée !');
+        App.showToast('Traduction française appliquée & mémorisée !');
       } else {
         throw new Error(res?.error || 'Erreur traduction');
       }
@@ -1233,9 +1283,15 @@ const ScriptureTooltip = {
     this.init();
 
     elements.forEach(el => {
+      // Supprimer systématiquement l'attribut title natif pour empêcher l'infobulle Windows de s'afficher
+      if (el.hasAttribute('title')) {
+        el.removeAttribute('title');
+      }
+
       const getRef = () => el.dataset.ref || el.dataset.code || el.textContent.trim();
 
       el.addEventListener('mouseenter', () => {
+        if (el.hasAttribute('title')) el.removeAttribute('title');
         const ref = getRef();
         if (!ref) return;
         if (this.hoverTimer) clearTimeout(this.hoverTimer);
@@ -1258,10 +1314,18 @@ const ScriptureTooltip = {
     this.activeRef = ref;
     this.init();
 
+    // S'assurer que la cible n'a aucun attribut title
+    if (targetEl && targetEl.hasAttribute('title')) {
+      targetEl.removeAttribute('title');
+    }
+
     this.positionTooltip(targetEl);
 
-    if (this.cache[ref]) {
-      this.renderContent(this.cache[ref]);
+    const activeBible = (typeof BibleReader !== 'undefined' && BibleReader.currentBible1) ? BibleReader.currentBible1 : 'Segond 21';
+    const cacheKey = `${ref}_${activeBible}`;
+
+    if (this.cache[cacheKey]) {
+      this.renderContent(this.cache[cacheKey]);
       this.tooltipEl.classList.remove('hidden');
       requestAnimationFrame(() => this.tooltipEl.classList.add('visible'));
       this.positionTooltip(targetEl);
@@ -1275,7 +1339,7 @@ const ScriptureTooltip = {
           <span>📖</span>
           <span>${TheologyView.escapeHtml(ref)}</span>
         </div>
-        <div class="theol-scripture-tooltip-version">Texte biblique</div>
+        <div class="theol-scripture-tooltip-version">${TheologyView.escapeHtml(activeBible)}</div>
       </div>
       <div class="theol-scripture-tooltip-loading">
         <div class="theol-scripture-tooltip-spinner"></div>
@@ -1290,9 +1354,9 @@ const ScriptureTooltip = {
     requestAnimationFrame(() => this.tooltipEl.classList.add('visible'));
 
     try {
-      const res = await API.getVersePreview(ref);
+      const res = await API.getVersePreview(ref, activeBible);
       if (res && res.success && res.text) {
-        this.cache[ref] = res;
+        this.cache[cacheKey] = res;
         if (this.activeRef === ref) {
           this.renderContent(res);
           this.positionTooltip(targetEl);
