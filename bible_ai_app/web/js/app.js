@@ -78,8 +78,29 @@ const App = {
     // 4. Chat Assistant IA
     this.bindChat();
 
-    // 5. Raccourcis clavier globaux
-    this.bindKeyboardShortcuts();
+    // 5b. Contrôles de Fenêtre Personnalisés (Barre sans bordure Windows)
+    document.getElementById('win-btn-min')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      API.call('minimize_window');
+    });
+    document.getElementById('win-btn-max')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      API.call('maximize_window');
+    });
+    document.getElementById('win-btn-fs')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      API.call('toggle_fullscreen');
+    });
+    document.getElementById('win-btn-close')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      API.call('close_window');
+    });
+
+    // Double clic sur la barre de titre pour Agrandir / Restaurer
+    document.getElementById('app-window-titlebar')?.addEventListener('dblclick', (e) => {
+      if (e.target.closest('button, .win-control-btn')) return;
+      API.call('maximize_window');
+    });
 
     // 6. Masquage fluide du Splash Loader dès que l'API est initialisée (avec timeout de sécurité)
     API.onReady(() => {

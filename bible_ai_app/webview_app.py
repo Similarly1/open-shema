@@ -1091,29 +1091,32 @@ class BibleAppApi:
             try:
                 _GLOBAL_WINDOW.minimize()
             except Exception as e:
-                logger.warning(f"Impossible de réduire la fenêtre: {e}")
+                logger.warning(f"Erreur minimize: {e}")
         return {"success": True}
 
     def maximize_window(self):
         global _GLOBAL_WINDOW
         if _GLOBAL_WINDOW:
             try:
-                _GLOBAL_WINDOW.toggle_fullscreen()
+                is_max = getattr(_GLOBAL_WINDOW, '_is_custom_maximized', True)
+                if is_max:
+                    _GLOBAL_WINDOW.restore()
+                    _GLOBAL_WINDOW._is_custom_maximized = False
+                else:
+                    _GLOBAL_WINDOW.maximize()
+                    _GLOBAL_WINDOW._is_custom_maximized = True
             except Exception as e:
-                logger.warning(f"Erreur toggle_fullscreen: {e}")
-                try:
-                    if getattr(_GLOBAL_WINDOW, '_is_custom_maximized', True):
-                        _GLOBAL_WINDOW.restore()
-                        _GLOBAL_WINDOW._is_custom_maximized = False
-                    else:
-                        _GLOBAL_WINDOW.maximize()
-                        _GLOBAL_WINDOW._is_custom_maximized = True
-                except Exception as e2:
-                    logger.warning(f"Erreur maximize: {e2}")
+                logger.warning(f"Erreur maximize: {e}")
         return {"success": True}
 
     def toggle_fullscreen(self):
-        return self.maximize_window()
+        global _GLOBAL_WINDOW
+        if _GLOBAL_WINDOW:
+            try:
+                _GLOBAL_WINDOW.toggle_fullscreen()
+            except Exception as e:
+                logger.warning(f"Erreur toggle_fullscreen: {e}")
+        return {"success": True}
 
     def close_window(self):
         global _GLOBAL_WINDOW
@@ -1139,8 +1142,11 @@ def main():
         height=920,
         min_size=(1050, 680),
         maximized=True,
+        frameless=True,
+        easy_drag=True,
         background_color="#0F172A"
     )
+    _GLOBAL_WINDOW._is_custom_maximized = True
     
     # Lancement avec Edge WebView2
     webview.start(debug=False)
