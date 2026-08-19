@@ -7943,6 +7943,7 @@ body.theme-dark .theol-view-badge {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
 }
 
 .theol-toc-title {
@@ -7951,6 +7952,39 @@ body.theme-dark .theol-view-badge {
   text-transform: uppercase;
   letter-spacing: 0.6px;
   color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.theol-toc-translate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 7px;
+  background: rgba(2, 132, 199, 0.1);
+  border: 1px solid rgba(2, 132, 199, 0.25);
+  border-radius: 5px;
+  color: var(--accent-blue);
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.theol-toc-translate-btn:hover {
+  background: var(--accent-blue);
+  color: #ffffff;
+  border-color: var(--accent-blue);
+}
+
+.theol-toc-translate-btn.active {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #10B981;
+}
+
+.theol-toc-translate-btn.hidden {
+  display: none !important;
 }
 
 .theol-toc-search-box {
@@ -8695,6 +8729,121 @@ body.theme-dark .theol-view-badge {
 @keyframes sparkleAnim {
   0% { transform: scale(0.9) rotate(0deg); }
   100% { transform: scale(1.25) rotate(15deg); }
+}
+
+/* ==========================================================================
+   ENCART DE RÉSUMÉ DE CHAPITRE THÉOLOGIQUE IA
+   ========================================================================== */
+
+.theol-summary-encart {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(2, 132, 199, 0.06));
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 26px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+  animation: encartFadeIn 0.25s ease-out;
+}
+
+@keyframes encartFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.theol-summary-encart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.theol-summary-encart-title-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.theol-summary-encart-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #6366F1, #8B5CF6);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.theol-summary-encart-title {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+}
+
+.theol-summary-encart-sub {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.theol-summary-encart-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.theol-summary-encart-body {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+
+.theol-summary-encart-body h1,
+.theol-summary-encart-body h2,
+.theol-summary-encart-body h3 {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--accent-blue);
+  margin: 14px 0 6px 0;
+}
+
+.theol-summary-encart-body h1:first-child,
+.theol-summary-encart-body h2:first-child,
+.theol-summary-encart-body h3:first-child {
+  margin-top: 0;
+}
+
+.theol-summary-encart-body ul,
+.theol-summary-encart-body ol {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.theol-summary-encart-body li {
+  margin-bottom: 4px;
+}
+
+.theol-summary-encart-body p {
+  margin-bottom: 8px;
+}
+
+.theol-summary-encart-body strong {
+  color: var(--text-primary);
+}
+
+.theol-summary-loading-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+  text-align: center;
 }
 
 /* ==========================================================================

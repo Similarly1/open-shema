@@ -627,10 +627,191 @@ class BibleAppApi:
             }
         except Exception as e:
             logger.error("Erreur traduction: %s", e)
+    def translate_theology_toc(self, book_name: str, titles: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Traduit en français l'ensemble des titres de la table des matières d'un livre de théologie."""
+        from core.translation_manager import TranslationManager
+        from core.config import load_config
+        config = load_config()
+
+        if not titles:
+            return {"success": False, "error": "Aucun titre fourni", "translated_titles": {}}
+
+        cache_id = f"toc_{book_name}"
+        cached = TranslationManager.get_translation(item_type="theology_toc", item_id=cache_id, target_lang="fr")
+        if cached and cached.get("translated_text"):
+            try:
+                import json
+                data = json.loads(cached["translated_text"])
+                return {"success": True, "translated_titles": data, "cached": True}
+            except Exception:
+                pass
+
+        try:
+            lines = []
+            for item in titles:
+                cid = str(item.get("chapter_id", ""))
+                title = str(item.get("title", "")).strip()
+                if cid and title:
+                    lines.append(f"{cid}::: {title}")
+
+            prompt_text = (
+                "Tu es un traducteur théologique expert. Traduis fidèlement chaque titre de chapitre ou de section en français soigné.\n"
+                "Conserve impérativement le préfixe identifiant exact (ex: '1::: ' ou 'intro::: ') au tout début de chaque ligne.\n"
+                "Renvoyez UNIQUEMENT la liste traduite ligne par ligne sans aucun commentaire ni bloc markdown :\n\n"
+                + "\n".join(lines)
+            )
+
+            clean_model = config.get("translation_model") or "gemini-3.5-flash-lite"
+            from ai.llm_client import LLMClient
+            models_to_try = [clean_model]
+            fallback_model = config.get("translation_fallback_model")
+            if fallback_model and fallback_model != clean_model:
+                models_to_try.append(fallback_model)
+
+            res_text = None
+            for cur_model in models_to_try:
+                lower_m = cur_model.lower()
+                if "/" in lower_m or "infomaniak" in lower_m or lower_m.startswith("qwen"):
+                    token = config.get("infomaniak_token", "")
+                    pid = config.get("infomaniak_product_id", "251")
+                    client = LLMClient(api_key=token, model=cur_model, provider="infomaniak", product_id=pid)
+                elif lower_m.startswith("mistral-") or lower_m.startswith("open-mistral-"):
+                    api_key = config.get("mistral_api_key", "")
+                    client = LLMClient(api_key=api_key, model=cur_model, provider="mistral")
+                else:
+                    api_key = config.get("gemini_api_key", "")
+                    client = LLMClient(api_key=api_key, model=cur_model, provider="gemini")
+
+                try:
+                    out = client.chat(messages=[{"role": "user", "content": prompt_text}], system_prompt="Traducteur de titres théologiques.")
+                    if out and not str(out).startswith("Erreur"):
+                        res_text = out
+                        break
+                except Exception as e:
+                    logger.warning("Échec traduction TOC avec %s: %s", cur_model, e)
+
+            if not res_text:
+                raise Exception("Échec de la traduction des titres par le modèle IA.")
+
+            result_map = {}
+            for line in res_text.splitlines():
+                line = line.strip()
+                if ":::" in line:
+                    parts = line.split(":::", 1)
+                    k = parts[0].strip().replace("-", "").replace("*", "").strip()
+                    val = parts[1].strip()
+                    if k and val:
+                        result_map[k] = val
+
+            import json
+            TranslationManager.save_translation(
+                item_type="theology_toc",
+                item_id=cache_id,
+                translated_text=json.dumps(result_map, ensure_ascii=False),
+                model_used=clean_model,
+                source_lang="auto",
+                target_lang="fr",
+                original_text="\n".join(lines)
+            )
+
+            return {"success": True, "translated_titles": result_map, "cached": False}
+        except Exception as e:
+            logger.error("Erreur translate_theology_toc: %s", e)
+            return {"success": False, "error": str(e), "translated_titles": {}}
+
+    def summarize_theology_chapter(self, book_name: str, chapter_id: str, chapter_title: str, text: str, word_count: Optional[int] = None, model: Optional[str] = None) -> Dict[str, Any]:
+        """Génère un résumé synthétique, structuré et clair d'un chapitre de théologie via LLM."""
+        from core.translation_manager import TranslationManager
+        from core.config import load_config, DEFAULT_SUMMARY_SYSTEM_PROMPT
+        config = load_config()
+
+        cache_id = f"summary_{book_name}_{chapter_id}"
+        cached = TranslationManager.get_translation(item_type="theology_summary", item_id=cache_id, target_lang="fr")
+        if cached and cached.get("translated_text"):
+            return {
+                "success": True,
+                "summary_markdown": cached["translated_text"],
+                "cached": True,
+                "model_used": cached.get("model_used", "Cache")
+            }
+
+        try:
+            target_words = word_count or config.get("summary_word_count") or 300
+            sys_prompt = config.get("summary_system_prompt") or DEFAULT_SUMMARY_SYSTEM_PROMPT
+            clean_model = model or config.get("summary_model") or "gemini-3.7-flash"
+
+            user_prompt = (
+                f"Rédige un résumé structuré et soigné d'environ {target_words} mots du chapitre théologique suivant :\n\n"
+                f"Ouvrage : {book_name}\n"
+                f"Chapitre : {chapter_title} (ID: {chapter_id})\n\n"
+                f"--- TEXTE DU CHAPITRE ---\n{text[:16000]}"
+            )
+
+            from ai.llm_client import LLMClient
+            models_to_try = [clean_model]
+            fallback_model = config.get("summary_fallback_model")
+            if fallback_model and fallback_model != clean_model:
+                models_to_try.append(fallback_model)
+
+            summary_text = None
+            used_model = clean_model
+            last_err = None
+
+            for cur_model in models_to_try:
+                lower_m = cur_model.lower()
+                if "/" in lower_m or "infomaniak" in lower_m or lower_m.startswith("qwen"):
+                    token = config.get("infomaniak_token", "")
+                    pid = config.get("infomaniak_product_id", "251")
+                    client = LLMClient(api_key=token, model=cur_model, provider="infomaniak", product_id=pid)
+                elif lower_m.startswith("mistral-") or lower_m.startswith("open-mistral-"):
+                    api_key = config.get("mistral_api_key", "")
+                    client = LLMClient(api_key=api_key, model=cur_model, provider="mistral")
+                else:
+                    api_key = config.get("gemini_api_key", "")
+                    client = LLMClient(api_key=api_key, model=cur_model, provider="gemini")
+
+                try:
+                    out = client.chat(messages=[{"role": "user", "content": user_prompt}], system_prompt=sys_prompt)
+                    if out and not str(out).startswith("Erreur"):
+                        summary_text = out.strip()
+                        used_model = cur_model
+                        break
+                    else:
+                        last_err = out
+                except Exception as e:
+                    last_err = str(e)
+                    logger.warning("Échec résumé chapitre avec %s: %s", cur_model, e)
+
+            if not summary_text:
+                raise Exception(f"Échec de la génération du résumé ({used_model}) : {last_err}")
+
+            if summary_text.startswith("```markdown") and summary_text.endswith("```"):
+                summary_text = summary_text[11:-3].strip()
+            elif summary_text.startswith("```") and summary_text.endswith("```"):
+                summary_text = summary_text[3:-3].strip()
+
+            TranslationManager.save_translation(
+                item_type="theology_summary",
+                item_id=cache_id,
+                translated_text=summary_text,
+                model_used=used_model,
+                source_lang="auto",
+                target_lang="fr",
+                original_text=text[:1000]
+            )
+
+            return {
+                "success": True,
+                "summary_markdown": summary_text,
+                "cached": False,
+                "model_used": used_model
+            }
+        except Exception as e:
+            logger.error("Erreur summarize_theology_chapter: %s", e)
             return {
                 "success": False,
                 "error": str(e),
-                "translated_text": None
+                "summary_markdown": None
             }
 
     # =========================================================================

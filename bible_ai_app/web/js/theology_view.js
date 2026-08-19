@@ -33,9 +33,17 @@ const TheologyView = {
   // Cache de traduction française
   translationCache: {},
   showTranslatedVersion: false,
+  translatedToc: {},
+  showTranslatedToc: true,
+
+  // Résumé de chapitre IA
+  summaryCache: {},
+  showChapterSummary: false,
+  isSummaryLoading: false,
 
   // Éléments du DOM
   btnToggleToc: null,
+  btnTranslateToc: null,
   tocPanel: null,
   tocSearchInput: null,
   tocListContainer: null,
@@ -62,6 +70,7 @@ const TheologyView = {
   optFullWidth: null,
 
   btnSynthHeader: null,
+  btnSummaryHeader: null,
   btnTranslateHeader: null,
   btnExportNote: null,
   btnCopyText: null,
@@ -111,6 +120,7 @@ const TheologyView = {
 
   cacheDomElements() {
     this.btnToggleToc = document.getElementById('btn-theol-toggle-toc');
+    this.btnTranslateToc = document.getElementById('btn-theol-translate-toc');
     this.tocPanel = document.getElementById('theol-toc-panel');
     this.tocSearchInput = document.getElementById('theol-toc-search-input');
     this.tocListContainer = document.getElementById('theol-toc-list');
@@ -137,6 +147,7 @@ const TheologyView = {
     this.optFullWidth = document.getElementById('theol-opt-full-width');
 
     this.btnSynthHeader = document.getElementById('btn-theol-view-synth');
+    this.btnSummaryHeader = document.getElementById('btn-theol-view-summary');
     this.btnTranslateHeader = document.getElementById('btn-theol-view-translate');
     this.btnExportNote = document.getElementById('btn-theol-export-note');
     this.btnCopyText = document.getElementById('btn-theol-copy-text');
@@ -164,6 +175,11 @@ const TheologyView = {
     // 1. Bascule du panneau Table des Matières (TOC)
     this.btnToggleToc?.addEventListener('click', () => {
       this.toggleToc();
+    });
+
+    // Traduction des titres de la Table des Matières
+    this.btnTranslateToc?.addEventListener('click', () => {
+      this.toggleTocTranslation();
     });
 
     // Filtre recherche dans la Table des Matières
@@ -238,6 +254,10 @@ const TheologyView = {
     // 5. Actions de barre d'outils
     this.btnSynthHeader?.addEventListener('click', () => {
       this.toggleChapterSynthesis();
+    });
+
+    this.btnSummaryHeader?.addEventListener('click', () => {
+      this.toggleChapterSummary();
     });
 
     this.btnTranslateHeader?.addEventListener('click', () => {
@@ -334,6 +354,8 @@ const TheologyView = {
   async selectBook(bookName, targetChapterId = null) {
     this.currentBook = bookName;
     this.showTranslatedVersion = false;
+    this.showChapterSummary = false;
+    this.btnSummaryHeader?.classList.remove('active');
     this.closeSynthesisPanel();
 
     const book = this.books.find(b => b.name === bookName) || { name: bookName, title: bookName };
@@ -345,6 +367,20 @@ const TheologyView = {
     try {
       const tocData = await API.getTheologyBookToc(bookName);
       this.tocList = tocData?.chapters || [];
+
+      // Restaurer la traduction de la TOC si présente
+      try {
+        const savedToc = localStorage.getItem('theol_toc_trans_' + bookName);
+        if (savedToc) {
+          this.translatedToc[bookName] = JSON.parse(savedToc);
+        } else {
+          const cachedToc = await API.getCachedTranslation('theology_toc', `toc_${bookName}`);
+          if (cachedToc && cachedToc.translated_text) {
+            this.translatedToc[bookName] = JSON.parse(cachedToc.translated_text);
+          }
+        }
+      } catch (e) {}
+
       this.renderTocList();
 
       if (this.tocList.length > 0) {
@@ -405,14 +441,23 @@ const TheologyView = {
 
       // Vérifier si une traduction en cache existe pour ce chapitre (en mémoire ou SQLite)
       const key = `${bookName}_${chapterId}`;
-      if (this.translationCache[key] && this.translationCache[key].length > 0) {
+      if (this.translationCache[key]) {
         this.showTranslatedVersion = true;
       } else {
         try {
           const cached = await API.getCachedTranslation('theology_chapter', key);
           if (cached && cached.translated_text) {
-            const paras = cached.translated_text.split('\n\n').map(p => p.trim()).filter(p => p);
-            this.translationCache[key] = paras;
+            const lines = cached.translated_text.split('\n\n').map(p => p.trim()).filter(p => p);
+            let transTitle = data.chapter_title;
+            let transParas = lines;
+            if (lines.length > 0 && lines[0].startsWith('#')) {
+              transTitle = lines[0].replace(/^#+\s*/, '').trim();
+              transParas = lines.slice(1);
+            }
+            this.translationCache[key] = {
+              title: transTitle,
+              paragraphs: transParas.length > 0 ? transParas : lines
+            };
             this.showTranslatedVersion = true;
           } else {
             this.showTranslatedVersion = false;
@@ -421,6 +466,16 @@ const TheologyView = {
           this.showTranslatedVersion = false;
         }
       }
+
+      // Vérifier si un résumé en cache existe pour ce chapitre
+      try {
+        if (!this.summaryCache[key]) {
+          const cachedSum = await API.getCachedTranslation('theology_summary', key);
+          if (cachedSum && cachedSum.translated_text) {
+            this.summaryCache[key] = cachedSum.translated_text;
+          }
+        }
+      } catch (err) {}
 
       this.renderChapterArticle(data);
       this.highlightActiveTocItem(chapterId);
@@ -443,7 +498,15 @@ const TheologyView = {
       return;
     }
 
-    const title = data.chapter_title || `Chapitre ${data.chapter_id}`;
+    let title = data.chapter_title || `Chapitre ${data.chapter_id}`;
+    const key = `${this.currentBook}_${this.currentChapterId}`;
+    const transData = this.translationCache[key];
+    if (this.showTranslatedVersion && transData) {
+      if (typeof transData === 'object' && !Array.isArray(transData) && transData.title) {
+        title = transData.title;
+      }
+    }
+
     const bookTitle = data.book_title || data.book_name;
     const author = data.book_author || '';
     const readTime = data.reading_time_min || 5;
@@ -538,16 +601,14 @@ const TheologyView = {
       `;
     }
 
-    // Mettre à jour le bouton de la barre d'outils
-    if (this.btnTranslateHeader) {
-      const lbl = this.btnTranslateHeader.querySelector('span');
-      if (lbl) lbl.textContent = this.showTranslatedVersion ? 'Texte original' : 'Traduire';
-      this.btnTranslateHeader.classList.toggle('active', this.showTranslatedVersion);
+    let textToRender = data.paragraphs;
+    if (this.showTranslatedVersion && transData) {
+      if (Array.isArray(transData)) {
+        textToRender = transData;
+      } else if (transData.paragraphs) {
+        textToRender = transData.paragraphs;
+      }
     }
-
-    const textToRender = this.showTranslatedVersion && this.translationCache[`${this.currentBook}_${this.currentChapterId}`]
-      ? this.translationCache[`${this.currentBook}_${this.currentChapterId}`]
-      : data.paragraphs;
 
     paragraphsHtml = textToRender.map((p, idx) => {
       // Détecter si c'est un titre de section
@@ -562,8 +623,14 @@ const TheologyView = {
       return `<p class="theol-reading-p ${idx === 0 ? 'theol-first-p' : ''}">${this.highlightScriptureReferences(p)}</p>`;
     }).join('\n');
 
+    let summaryEncartHtml = '';
+    if (this.showChapterSummary) {
+      summaryEncartHtml = this.renderSummaryEncartHtml();
+    }
+
     this.articleContent.innerHTML = `
       ${translationBannerHtml}
+      ${summaryEncartHtml}
       <div class="theol-reading-body font-${this.fontFamily.toLowerCase().replace(/\s+/g, '-')}" id="theol-reading-body">
         ${paragraphsHtml}
       </div>
@@ -576,6 +643,17 @@ const TheologyView = {
         this.toggleChapterTranslation();
       });
     }
+
+    // Attacher les boutons de l'encart de résumé
+    document.getElementById('btn-theol-close-summary')?.addEventListener('click', () => {
+      this.toggleChapterSummary();
+    });
+    document.getElementById('btn-theol-copy-summary')?.addEventListener('click', () => {
+      this.copyChapterSummary();
+    });
+    document.getElementById('btn-theol-export-summary-note')?.addEventListener('click', () => {
+      this.exportSummaryToNotes();
+    });
 
     // Attacher les clics et infobulles sur les références bibliques intégrées
     const inlineRefs = this.articleContent.querySelectorAll('.theol-inline-scripture-ref');
@@ -671,10 +749,42 @@ const TheologyView = {
   renderTocList() {
     if (!this.tocListContainer) return;
 
+    // Bouton de traduction de la TOC
+    const isBookEnglish = this.isBookInEnglish(this.currentChapterData?.raw_text || '');
+    if (this.btnTranslateToc) {
+      const isAI = typeof App === 'undefined' || App.isAIEnabled !== false;
+      if (isBookEnglish && isAI) {
+        this.btnTranslateToc.classList.remove('hidden');
+        const translatedMap = this.translatedToc[this.currentBook];
+        const isTranslated = translatedMap && Object.keys(translatedMap).length > 0;
+        const textSpan = document.getElementById('theol-toc-translate-text');
+        if (textSpan) {
+          if (isTranslated && this.showTranslatedToc) {
+            textSpan.textContent = '🇫🇷 Traduit';
+            this.btnTranslateToc.classList.add('active');
+            this.btnTranslateToc.title = 'Afficher les titres originaux';
+          } else if (isTranslated && !this.showTranslatedToc) {
+            textSpan.textContent = '🌐 Original';
+            this.btnTranslateToc.classList.remove('active');
+            this.btnTranslateToc.title = 'Afficher les titres traduits en français';
+          } else {
+            textSpan.textContent = 'Traduire titres';
+            this.btnTranslateToc.classList.remove('active');
+            this.btnTranslateToc.title = 'Traduire tous les titres de la table des matières en français';
+          }
+        }
+      } else {
+        this.btnTranslateToc.classList.add('hidden');
+      }
+    }
+
     const q = (this.tocSearchInput?.value || '').toLowerCase().trim();
+    const translatedMap = (this.showTranslatedToc && this.translatedToc[this.currentBook]) || {};
+
     const filtered = this.tocList.filter(ch => {
       if (!q) return true;
-      return (ch.title || '').toLowerCase().includes(q) || String(ch.chapter_id).includes(q) || (ch.book_name || '').toLowerCase().includes(q);
+      const displayTitle = translatedMap[ch.chapter_id] || ch.title || '';
+      return displayTitle.toLowerCase().includes(q) || (ch.title || '').toLowerCase().includes(q) || String(ch.chapter_id).includes(q) || (ch.book_name || '').toLowerCase().includes(q);
     });
 
     if (filtered.length === 0) {
@@ -687,6 +797,7 @@ const TheologyView = {
     }
 
     this.tocListContainer.innerHTML = filtered.map((ch, idx) => {
+      const displayTitle = translatedMap[ch.chapter_id] || ch.title;
       if (ch.is_section_header) {
         return `
           <div class="theol-toc-section-divider">
@@ -694,7 +805,7 @@ const TheologyView = {
               <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/></svg>
               <span>PARTIE / SECTION</span>
             </div>
-            <div class="theol-toc-section-title">${this.escapeHtml(ch.title)}</div>
+            <div class="theol-toc-section-title">${this.escapeHtml(displayTitle)}</div>
           </div>
         `;
       }
@@ -704,7 +815,7 @@ const TheologyView = {
         <button type="button" class="theol-toc-item ${isActive ? 'active' : ''}" data-chapter-id="${ch.chapter_id}">
           <div class="theol-toc-item-num">${ch.chapter_id}</div>
           <div class="theol-toc-item-details">
-            <div class="theol-toc-item-title">${this.escapeHtml(ch.title)}</div>
+            <div class="theol-toc-item-title">${this.escapeHtml(displayTitle)}</div>
             ${ch.book_name ? `<span class="theol-toc-item-badge">${ch.book_name}</span>` : ''}
           </div>
         </button>
@@ -720,6 +831,49 @@ const TheologyView = {
         }
       });
     });
+  },
+
+  async toggleTocTranslation() {
+    const existing = this.translatedToc[this.currentBook];
+    if (existing && Object.keys(existing).length > 0) {
+      this.showTranslatedToc = !this.showTranslatedToc;
+      this.renderTocList();
+      App.showToast(this.showTranslatedToc ? 'Table des matières affichée en français' : 'Table des matières affichée en version originale');
+      return;
+    }
+
+    try {
+      const btn = this.btnTranslateToc;
+      const textSpan = document.getElementById('theol-toc-translate-text');
+      if (textSpan) textSpan.textContent = 'Traduction...';
+      if (btn) btn.disabled = true;
+
+      App.showToast('Traduction des titres de la table des matières en cours...');
+      const titles = this.tocList.map(ch => ({
+        chapter_id: ch.chapter_id,
+        title: ch.title,
+        is_section_header: !!ch.is_section_header
+      }));
+
+      const res = await API.call('translate_theology_toc', this.currentBook, titles);
+      if (res && res.success && res.translated_titles) {
+        this.translatedToc[this.currentBook] = res.translated_titles;
+        this.showTranslatedToc = true;
+        try {
+          localStorage.setItem('theol_toc_trans_' + this.currentBook, JSON.stringify(res.translated_titles));
+        } catch (e) {}
+        this.renderTocList();
+        App.showToast('Titres de la table des matières traduits en français !');
+      } else {
+        throw new Error(res?.error || 'Erreur traduction TOC');
+      }
+    } catch (e) {
+      console.error('[TheologyView] Erreur traduction TOC:', e);
+      App.showToast(`Erreur traduction titres : ${e.message || e}`);
+      this.renderTocList();
+    } finally {
+      if (this.btnTranslateToc) this.btnTranslateToc.disabled = false;
+    }
   },
 
   highlightActiveTocItem(chapterId) {
@@ -961,7 +1115,7 @@ const TheologyView = {
           </div>
           <div class="theol-scanner-info">
             <div class="theol-scanner-title">Traduction française haute fidélité en cours...</div>
-            <div class="theol-scanner-subtitle">Analyse théologique, reformulation doctrinale & conservation des citations bibliques</div>
+            <div class="theol-scanner-subtitle">Analyse théologique, traduction du titre & conservation des citations bibliques</div>
           </div>
           <div class="theol-scanner-progress-badge">
             <span>✨ Traduction IA</span>
@@ -976,12 +1130,23 @@ const TheologyView = {
       }
 
       App.showToast('Traduction du chapitre par IA en cours...');
-      const fullText = (this.currentChapterData?.paragraphs || []).join('\n\n');
+      const rawTitle = this.currentChapterData?.chapter_title || '';
+      const paragraphs = this.currentChapterData?.paragraphs || [];
+      const fullText = `# ${rawTitle}\n\n` + paragraphs.join('\n\n');
       
-      const res = await API.translateText(fullText.slice(0, 9000), 'theology_chapter', key);
+      const res = await API.translateText(fullText.slice(0, 12000), 'theology_chapter', key);
       if (res && res.success && res.translated_text) {
-        const paras = res.translated_text.split('\n\n').map(p => p.trim()).filter(p => p);
-        this.translationCache[key] = paras;
+        const lines = res.translated_text.split('\n\n').map(p => p.trim()).filter(p => p);
+        let transTitle = rawTitle;
+        let transParas = lines;
+        if (lines.length > 0 && lines[0].startsWith('#')) {
+          transTitle = lines[0].replace(/^#+\s*/, '').trim();
+          transParas = lines.slice(1);
+        }
+        this.translationCache[key] = {
+          title: transTitle,
+          paragraphs: transParas.length > 0 ? transParas : lines
+        };
         this.showTranslatedVersion = true;
         
         if (this.articleCard) {
@@ -1000,6 +1165,176 @@ const TheologyView = {
       this.renderChapterArticle(this.currentChapterData);
       App.showToast('Erreur lors de la traduction du chapitre.');
     }
+  },
+
+  // =========================================================================
+  // RÉSUMÉ DE CHAPITRE THÉOLOGIQUE PAR IA
+  // =========================================================================
+
+  async toggleChapterSummary() {
+    const key = `${this.currentBook}_${this.currentChapterId}`;
+
+    if (this.showChapterSummary && !this.isSummaryLoading) {
+      this.showChapterSummary = false;
+      this.btnSummaryHeader?.classList.remove('active');
+      this.renderChapterArticle(this.currentChapterData);
+      return;
+    }
+
+    this.showChapterSummary = true;
+    this.btnSummaryHeader?.classList.add('active');
+
+    if (this.summaryCache[key]) {
+      this.renderChapterArticle(this.currentChapterData);
+      return;
+    }
+
+    try {
+      this.isSummaryLoading = true;
+      this.renderChapterArticle(this.currentChapterData);
+
+      const chapterTitle = this.currentChapterData?.chapter_title || `Chapitre ${this.currentChapterId}`;
+      const paragraphs = this.currentChapterData?.paragraphs || [];
+      const text = paragraphs.join('\n\n');
+
+      const res = await API.call('summarize_theology_chapter', this.currentBook, this.currentChapterId, chapterTitle, text);
+      if (res && res.success && res.summary_markdown) {
+        this.summaryCache[key] = res.summary_markdown;
+        this.isSummaryLoading = false;
+        this.renderChapterArticle(this.currentChapterData);
+        App.showToast('Résumé de chapitre généré avec succès !');
+      } else {
+        throw new Error(res?.error || 'Erreur lors de la génération du résumé');
+      }
+    } catch (e) {
+      console.error('[TheologyView] Erreur résumé:', e);
+      this.isSummaryLoading = false;
+      this.showChapterSummary = false;
+      this.btnSummaryHeader?.classList.remove('active');
+      this.renderChapterArticle(this.currentChapterData);
+      App.showToast(`Erreur résumé : ${e.message || e}`);
+    }
+  },
+
+  renderSummaryEncartHtml() {
+    const key = `${this.currentBook}_${this.currentChapterId}`;
+    const bookTitle = this.currentChapterData?.book_title || this.currentChapterData?.book_name || this.currentBook;
+    const chapterTitle = this.currentChapterData?.chapter_title || `Chapitre ${this.currentChapterId}`;
+
+    if (this.isSummaryLoading) {
+      return `
+        <div class="theol-summary-encart" id="theol-summary-encart">
+          <div class="theol-summary-loading-card">
+            <div class="theol-spinner" style="width: 28px; height: 28px; border-width: 2.5px;"></div>
+            <div style="font-size: 13px; font-weight: 700; color: var(--text-primary); margin-top: 4px;">Génération du résumé théologique par IA...</div>
+            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">Extraction de la thèse centrale, des axes doctrinaux et des passages scripturaires</div>
+          </div>
+        </div>
+      `;
+    }
+
+    const summaryMd = this.summaryCache[key] || '';
+    if (!summaryMd) return '';
+
+    return `
+      <div class="theol-summary-encart" id="theol-summary-encart">
+        <div class="theol-summary-encart-header">
+          <div class="theol-summary-encart-title-box">
+            <div class="theol-summary-encart-icon">✨</div>
+            <div>
+              <div class="theol-summary-encart-title">Résumé Doctrinal & Exégétique</div>
+              <div class="theol-summary-encart-sub">${this.escapeHtml(bookTitle)} • ${this.escapeHtml(chapterTitle)}</div>
+            </div>
+          </div>
+          <div class="theol-summary-encart-actions">
+            <button type="button" class="btn-ghost btn-sm" id="btn-theol-copy-summary" title="Copier le résumé">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+              <span>Copier</span>
+            </button>
+            <button type="button" class="btn-ghost btn-sm" id="btn-theol-export-summary-note" title="Enregistrer dans vos notes">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+              <span>Vers note</span>
+            </button>
+            <button type="button" class="btn-ghost btn-sm" id="btn-theol-close-summary" title="Masquer le résumé">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="theol-summary-encart-body">
+          ${this.renderMarkdown(summaryMd)}
+        </div>
+      </div>
+    `;
+  },
+
+  async copyChapterSummary() {
+    const key = `${this.currentBook}_${this.currentChapterId}`;
+    const md = this.summaryCache[key];
+    if (!md) return;
+    try {
+      await navigator.clipboard.writeText(md);
+      App.showToast('Résumé copié dans le presse-papiers !');
+    } catch (e) {
+      App.showToast('Erreur lors de la copie');
+    }
+  },
+
+  async exportSummaryToNotes() {
+    const key = `${this.currentBook}_${this.currentChapterId}`;
+    const md = this.summaryCache[key];
+    if (!md) return;
+
+    const bookTitle = this.currentChapterData?.book_title || this.currentChapterData?.book_name || this.currentBook;
+    const chapterTitle = this.currentChapterData?.chapter_title || `Chapitre ${this.currentChapterId}`;
+    const title = `Résumé — ${chapterTitle} (${bookTitle})`;
+    const content = `# ${title}\n\n*Résumé généré par IA*\n\n${md}`;
+
+    try {
+      await API.saveNote(title, content, `${this.currentChapterData?.book_french_name || ''}`, ['Théologie', 'Résumé IA', this.currentBook]);
+      App.showToast('Résumé enregistré dans vos Notes (.md) !');
+    } catch (e) {
+      console.error('Erreur export note:', e);
+      App.showToast('Erreur lors de l\'export vers les notes');
+    }
+  },
+
+  renderMarkdown(text) {
+    if (!text) return '';
+    let md = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    // Blocs de code
+    md = md.replace(/```([\s\S]*?)```/g, (m, p) => `<pre><code>${p.trim()}</code></pre>\n\n`);
+    // Titres
+    md = md.replace(/^### (.*$)/gim, '<h3>$1</h3>\n');
+    md = md.replace(/^## (.*$)/gim, '<h2>$1</h2>\n');
+    md = md.replace(/^# (.*$)/gim, '<h1>$1</h1>\n');
+    // Citations
+    md = md.replace(/^\&gt; (.*$)/gim, '<blockquote>$1</blockquote>\n');
+    // Listes
+    md = md.replace(/^[\-\*] (.*$)/gim, '<ul><li>$1</li></ul>');
+    md = md.replace(/^\d+\. (.*$)/gim, '<ol><li>$1</li></ol>');
+    md = md.replace(/<\/ul>\s*<ul>/g, '').replace(/<\/ol>\s*<ol>/g, '');
+    // Inlines
+    md = md.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    md = md.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    md = md.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+    const blocks = md.split(/\n\s*\n/);
+    const htmlBlocks = blocks.map(block => {
+      const b = block.trim();
+      if (!b) return '';
+      if (b.startsWith('<h1') || b.startsWith('<h2') || b.startsWith('<h3') || 
+          b.startsWith('<pre') || b.startsWith('<blockquote') || 
+          b.startsWith('<ul') || b.startsWith('<ol')) {
+        return b;
+      }
+      return `<p>${b.replace(/\n/g, '<br>')}</p>`;
+    });
+
+    return htmlBlocks.filter(Boolean).join('\n');
   },
 
   // =========================================================================

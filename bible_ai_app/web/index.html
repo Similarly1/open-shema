@@ -978,6 +978,42 @@
                 </div>
               </div>
 
+              <div class="form-divider" style="margin: 16px 0 14px 0;"></div>
+
+              <div class="form-row two-cols">
+                <div class="form-group">
+                  <label>Modèle Résumé de Chapitre :</label>
+                  <select id="cfg-summary-model" class="select-field full-w">
+                    <option value="gemini-3.7-flash">Google Gemini 3.7 Flash (Recommandé)</option>
+                    <option value="gemini-3.5-flash">Google Gemini 3.5 Flash (Rapide)</option>
+                    <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
+                    <option value="mistral-large-latest">Mistral Large</option>
+                    <option value="mistral-small-latest">Mistral Small</option>
+                    <option value="mistralai/Mistral-Small-4-119B-2603">Infomaniak Mistral 119B</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Modèle de secours (Fallback Résumé) :</label>
+                  <select id="cfg-summary-fallback-model" class="select-field full-w">
+                    <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
+                    <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                    <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
+                    <option value="mistral-small-latest">Mistral Small</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row two-cols" style="margin-top: 14px;">
+                <div class="form-group">
+                  <label>Longueur cible du Résumé :</label>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <input type="number" id="cfg-summary-word-count" min="100" max="1200" step="50" value="300" class="text-field" style="width: 90px;">
+                    <span style="font-size: 12px; color: var(--text-secondary);" id="lbl-summary-word-count-val">~300 mots</span>
+                  </div>
+                  <p class="field-hint" style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">Longueur indicative envoyée au modèle pour calibrer la synthèse doctrinale.</p>
+                </div>
+              </div>
+
               <div class="form-divider" style="margin: 20px 0 16px 0;"></div>
               
               <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
@@ -1049,6 +1085,35 @@
                   </div>
                   <!-- Champ caché synchronisé -->
                   <textarea id="cfg-translation-system-prompt" style="display: none;"></textarea>
+                </div>
+
+                <!-- Carte 3 : Résumé Théologique de Chapitre -->
+                <div class="prompt-setting-card" id="prompt-card-summary" style="margin-top: 12px;">
+                  <div class="prompt-card-main">
+                    <div class="prompt-card-header">
+                      <strong class="prompt-card-title">Résumé Théologique de Chapitre</strong>
+                      <span class="prompt-status-badge is-default" id="badge-summary-status">Par défaut</span>
+                    </div>
+                    <p class="prompt-card-desc">Thèse centrale, axes doctrinaux majeurs, ancrage scripturaire et concision pédagogique.</p>
+                  </div>
+                  <div class="prompt-card-actions">
+                    <button type="button" class="btn-secondary btn-sm" id="btn-open-modal-summary-prompt">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                      </svg>
+                      <span>Consulter / Modifier</span>
+                    </button>
+                    <button type="button" class="btn-ghost btn-sm" id="btn-reset-summary-prompt" title="Rétablir le prompt d'origine">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                        <path d="M3 3v5h5"></path>
+                      </svg>
+                      <span>Rétablir</span>
+                    </button>
+                  </div>
+                  <!-- Champ caché synchronisé -->
+                  <textarea id="cfg-summary-system-prompt" style="display: none;"></textarea>
                 </div>
               </div>
 
@@ -1945,10 +2010,10 @@
               <button class="zoom-btn" id="btn-theol-zoom-in" title="Augmenter la taille du texte">+</button>
             </div>
 
-            <!-- Action: Traduire en français (pour livres anglais) -->
-            <button class="tool-btn" id="btn-theol-view-translate" title="Traduire le chapitre en français">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-              <span>Traduire</span>
+            <!-- Action: Résumer ce chapitre par IA -->
+            <button class="tool-btn ai-feature-only" id="btn-theol-view-summary" title="Générer un résumé structuré de ce chapitre par IA">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+              <span>Résumer</span>
             </button>
 
             <!-- Action: Exporter vers Notes -->
@@ -1975,6 +2040,10 @@
           <aside class="theol-toc-panel" id="theol-toc-panel">
             <div class="theol-toc-header">
               <span class="theol-toc-title">Table des matières</span>
+              <button class="theol-toc-translate-btn hidden ai-feature-only" id="btn-theol-translate-toc" title="Traduire tous les titres de la table des matières en français">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z"/></svg>
+                <span id="theol-toc-translate-text">Traduire titres</span>
+              </button>
             </div>
             <div class="theol-toc-search-box">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.5;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>

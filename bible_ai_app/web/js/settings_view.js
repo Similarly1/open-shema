@@ -79,6 +79,16 @@ RÈGLES STRICTES :
 3. FORMAT : Conservez la mise en forme originale (paragraphes, puces, références bibliques, codes Strong, termes hébreux/grecs).
 4. NE JAMAIS dialoguer ni ajouter de préambule : Renvoyez UNIQUEMENT le texte traduit en français.`,
 
+  DEFAULT_SUMMARY_PROMPT: `Tu es un professeur de théologie et un pédagogue chrétien chevronné.
+Ton rôle est de produire un résumé synthétique, structuré, clair et fidèle du chapitre ou de l'ouvrage théologique fourni.
+
+Directives de rédaction :
+1. THÈSE & AXES PRINCIPAUX : Dégage la thèse centrale de l'auteur et les 3 à 5 idées maîtresses développées dans le texte.
+2. ARGUMENTATION THÉOLOGIQUE : Explique avec rigueur les arguments doctrinaux et exégétiques clés avancés.
+3. CITATIONS & ANCRAGE BIBLIQUE : Mentionne les références scripturaires majeures citées dans le chapitre.
+4. FORMAT ET CLARTÉ : Structure le résumé avec des intertitres en gras, des puces synthétiques et une conclusion théologique en une phrase.
+5. CONCISION : Respecte scrupuleusement la longueur cible demandée. Reste direct, sans préambule superflu.`,
+
   currentEditingPrompt: null,
   activeModalTab: 'preview',
 
@@ -217,6 +227,10 @@ RÈGLES STRICTES :
       this.openPromptModal('translation');
     });
 
+    document.getElementById('btn-open-modal-summary-prompt')?.addEventListener('click', () => {
+      this.openPromptModal('summary');
+    });
+
     document.getElementById('btn-reset-synth-prompt')?.addEventListener('click', () => {
       if (confirm('Voulez-vous rétablir le prompt de Synthèse Exégétique par défaut ?')) {
         document.getElementById('cfg-synthesis-system-prompt').value = this.DEFAULT_SYNTH_PROMPT;
@@ -233,6 +247,20 @@ RÈGLES STRICTES :
         this.save();
         App.showToast('Prompt de traduction rétabli par défaut');
       }
+    });
+
+    document.getElementById('btn-reset-summary-prompt')?.addEventListener('click', () => {
+      if (confirm('Voulez-vous rétablir le prompt de Résumé de Chapitre par défaut ?')) {
+        document.getElementById('cfg-summary-system-prompt').value = this.DEFAULT_SUMMARY_PROMPT;
+        this.updateAllPromptStatusBadges();
+        this.save();
+        App.showToast('Prompt de résumé rétabli par défaut');
+      }
+    });
+
+    document.getElementById('cfg-summary-word-count')?.addEventListener('input', (e) => {
+      const lbl = document.getElementById('lbl-summary-word-count-val');
+      if (lbl) lbl.textContent = `~${e.target.value} mots`;
     });
 
     // Modale de Prompt Système
@@ -507,11 +535,25 @@ RÈGLES STRICTES :
     if (c.translation_fallback_model && document.getElementById('cfg-translation-fallback-model')) {
       document.getElementById('cfg-translation-fallback-model').value = c.translation_fallback_model;
     }
+    if (c.summary_model && document.getElementById('cfg-summary-model')) {
+      document.getElementById('cfg-summary-model').value = c.summary_model;
+    }
+    if (c.summary_fallback_model && document.getElementById('cfg-summary-fallback-model')) {
+      document.getElementById('cfg-summary-fallback-model').value = c.summary_fallback_model;
+    }
+    if (document.getElementById('cfg-summary-word-count')) {
+      document.getElementById('cfg-summary-word-count').value = c.summary_word_count || 300;
+      const lbl = document.getElementById('lbl-summary-word-count-val');
+      if (lbl) lbl.textContent = `~${c.summary_word_count || 300} mots`;
+    }
     if (document.getElementById('cfg-synthesis-system-prompt')) {
       document.getElementById('cfg-synthesis-system-prompt').value = c.synthesis_system_prompt || '';
     }
     if (document.getElementById('cfg-translation-system-prompt')) {
       document.getElementById('cfg-translation-system-prompt').value = c.translation_system_prompt || '';
+    }
+    if (document.getElementById('cfg-summary-system-prompt')) {
+      document.getElementById('cfg-summary-system-prompt').value = c.summary_system_prompt || '';
     }
     this.updateAllPromptStatusBadges();
 
@@ -559,7 +601,7 @@ RÈGLES STRICTES :
         item.querySelectorAll('.btn-prio-move').forEach(btn => {
           btn.addEventListener('click', () => {
             const dir = parseInt(btn.dataset.dir);
-            this.moveDict(idx, dir);
+            this.moveDictionaryPriority(idx, dir);
           });
         });
 
@@ -571,11 +613,11 @@ RÈGLES STRICTES :
         listEl.appendChild(item);
       });
     } catch (e) {
-      console.error(e);
+      console.error('Erreur chargement dictionnaires:', e);
     }
   },
 
-  moveDict(idx, direction) {
+  moveDictionaryPriority(idx, direction) {
     const targetIdx = idx + direction;
     if (targetIdx >= 0 && targetIdx < this.dictionaries.length) {
       const temp = this.dictionaries[idx];
@@ -640,11 +682,23 @@ RÈGLES STRICTES :
     if (document.getElementById('cfg-translation-fallback-model')) {
       newCfg.translation_fallback_model = document.getElementById('cfg-translation-fallback-model').value;
     }
+    if (document.getElementById('cfg-summary-model')) {
+      newCfg.summary_model = document.getElementById('cfg-summary-model').value;
+    }
+    if (document.getElementById('cfg-summary-fallback-model')) {
+      newCfg.summary_fallback_model = document.getElementById('cfg-summary-fallback-model').value;
+    }
+    if (document.getElementById('cfg-summary-word-count')) {
+      newCfg.summary_word_count = parseInt(document.getElementById('cfg-summary-word-count').value) || 300;
+    }
     if (document.getElementById('cfg-synthesis-system-prompt')) {
       newCfg.synthesis_system_prompt = document.getElementById('cfg-synthesis-system-prompt').value;
     }
     if (document.getElementById('cfg-translation-system-prompt')) {
       newCfg.translation_system_prompt = document.getElementById('cfg-translation-system-prompt').value;
+    }
+    if (document.getElementById('cfg-summary-system-prompt')) {
+      newCfg.summary_system_prompt = document.getElementById('cfg-summary-system-prompt').value;
     }
 
     newCfg.gemini_api_key = document.getElementById('cfg-gemini-key').value.trim();
@@ -676,19 +730,27 @@ RÈGLES STRICTES :
   // =========================================================
   openPromptModal(type) {
     this.currentEditingPrompt = type;
-    const isSynth = type === 'synthesis';
     const titleEl = document.getElementById('system-prompt-modal-title');
     const textarea = document.getElementById('modal-prompt-textarea');
 
     if (titleEl) {
-      titleEl.textContent = isSynth 
-        ? 'System Prompt — Synthèse Exégétique IA' 
-        : 'System Prompt — Traduction Fidèle d\'Articles';
+      if (type === 'synthesis') {
+        titleEl.textContent = 'System Prompt — Synthèse Exégétique IA';
+      } else if (type === 'translation') {
+        titleEl.textContent = 'System Prompt — Traduction Fidèle d\'Articles';
+      } else if (type === 'summary') {
+        titleEl.textContent = 'System Prompt — Résumé Théologique de Chapitre';
+      }
     }
 
-    const currentVal = isSynth
-      ? (document.getElementById('cfg-synthesis-system-prompt')?.value || this.DEFAULT_SYNTH_PROMPT)
-      : (document.getElementById('cfg-translation-system-prompt')?.value || this.DEFAULT_TRANS_PROMPT);
+    let currentVal = '';
+    if (type === 'synthesis') {
+      currentVal = document.getElementById('cfg-synthesis-system-prompt')?.value || this.DEFAULT_SYNTH_PROMPT;
+    } else if (type === 'translation') {
+      currentVal = document.getElementById('cfg-translation-system-prompt')?.value || this.DEFAULT_TRANS_PROMPT;
+    } else if (type === 'summary') {
+      currentVal = document.getElementById('cfg-summary-system-prompt')?.value || this.DEFAULT_SUMMARY_PROMPT;
+    }
 
     if (textarea) {
       textarea.value = currentVal;
@@ -749,7 +811,9 @@ RÈGLES STRICTES :
     if (lineEl) lineEl.textContent = `${lineCount.toLocaleString()} lignes`;
 
     if (badgeEl && this.currentEditingPrompt) {
-      const def = this.currentEditingPrompt === 'synthesis' ? this.DEFAULT_SYNTH_PROMPT : this.DEFAULT_TRANS_PROMPT;
+      let def = this.DEFAULT_SYNTH_PROMPT;
+      if (this.currentEditingPrompt === 'translation') def = this.DEFAULT_TRANS_PROMPT;
+      if (this.currentEditingPrompt === 'summary') def = this.DEFAULT_SUMMARY_PROMPT;
       const isDef = val.trim() === def.trim();
       badgeEl.textContent = isDef ? 'Par défaut' : 'Personnalisé';
       badgeEl.className = `prompt-status-badge ${isDef ? 'is-default' : 'is-custom'}`;
@@ -767,8 +831,10 @@ RÈGLES STRICTES :
   async savePromptFromModal() {
     if (!this.currentEditingPrompt) return;
     const val = document.getElementById('modal-prompt-textarea')?.value || '';
-    const isSynth = this.currentEditingPrompt === 'synthesis';
-    const targetFieldId = isSynth ? 'cfg-synthesis-system-prompt' : 'cfg-translation-system-prompt';
+    let targetFieldId = 'cfg-synthesis-system-prompt';
+    if (this.currentEditingPrompt === 'translation') targetFieldId = 'cfg-translation-system-prompt';
+    if (this.currentEditingPrompt === 'summary') targetFieldId = 'cfg-summary-system-prompt';
+
     const field = document.getElementById(targetFieldId);
     if (field) {
       field.value = val;
@@ -782,9 +848,16 @@ RÈGLES STRICTES :
 
   resetPromptInModal() {
     if (!this.currentEditingPrompt) return;
-    const isSynth = this.currentEditingPrompt === 'synthesis';
-    const def = isSynth ? this.DEFAULT_SYNTH_PROMPT : this.DEFAULT_TRANS_PROMPT;
-    if (confirm(`Voulez-vous rétablir le prompt de ${isSynth ? 'Synthèse' : 'Traduction'} par défaut ?`)) {
+    let def = this.DEFAULT_SYNTH_PROMPT;
+    let label = 'Synthèse';
+    if (this.currentEditingPrompt === 'translation') {
+      def = this.DEFAULT_TRANS_PROMPT;
+      label = 'Traduction';
+    } else if (this.currentEditingPrompt === 'summary') {
+      def = this.DEFAULT_SUMMARY_PROMPT;
+      label = 'Résumé';
+    }
+    if (confirm(`Voulez-vous rétablir le prompt de ${label} par défaut ?`)) {
       const textarea = document.getElementById('modal-prompt-textarea');
       if (textarea) {
         textarea.value = def;
@@ -824,6 +897,15 @@ RÈGLES STRICTES :
       const isDef = !transVal || transVal === transDefault;
       badgeTrans.textContent = isDef ? 'Par défaut' : 'Personnalisé';
       badgeTrans.className = `prompt-status-badge ${isDef ? 'is-default' : 'is-custom'}`;
+    }
+
+    const sumVal = (document.getElementById('cfg-summary-system-prompt')?.value || '').trim();
+    const sumDefault = this.DEFAULT_SUMMARY_PROMPT.trim();
+    const badgeSum = document.getElementById('badge-summary-status');
+    if (badgeSum) {
+      const isDef = !sumVal || sumVal === sumDefault;
+      badgeSum.textContent = isDef ? 'Par défaut' : 'Personnalisé';
+      badgeSum.className = `prompt-status-badge ${isDef ? 'is-default' : 'is-custom'}`;
     }
   },
 

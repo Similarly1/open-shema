@@ -32,6 +32,16 @@ RÈGLES STRICTES :
 3. FORMAT : Conservez la mise en forme originale (paragraphes, puces, références bibliques, codes Strong, termes hébreux/grecs).
 4. NE JAMAIS dialoguer ni ajouter de préambule : Renvoyez UNIQUEMENT le texte traduit en français."""
 
+DEFAULT_SUMMARY_SYSTEM_PROMPT = """Tu es un professeur de théologie et un pédagogue chrétien chevronné.
+Ton rôle est de produire un résumé synthétique, structuré, clair et fidèle du chapitre ou de l'ouvrage théologique fourni.
+
+Directives de rédaction :
+1. THÈSE & AXES PRINCIPAUX : Dégage la thèse centrale de l'auteur et les 3 à 5 idées maîtresses développées dans le texte.
+2. ARGUMENTATION THÉOLOGIQUE : Explique avec rigueur les arguments doctrinaux et exégétiques clés avancés.
+3. CITATIONS & ANCRAGE BIBLIQUE : Mentionne les références scripturaires majeures citées dans le chapitre.
+4. FORMAT ET CLARTÉ : Structure le résumé avec des intertitres en gras, des puces synthétiques et une conclusion théologique en une phrase.
+5. CONCISION : Respecte scrupuleusement la longueur cible demandée. Reste direct, sans préambule superflu."""
+
 DEFAULTS = {
     "mistral_api_key": "",
     "gemini_api_key": "",
@@ -69,6 +79,10 @@ DEFAULTS = {
     "synthesis_fallback_model": "gemini-2.5-flash",
     "synthesis_max_verses": 5,
     "synthesis_system_prompt": DEFAULT_SYNTHESIS_SYSTEM_PROMPT,
+    "summary_model": "gemini-3.7-flash",
+    "summary_fallback_model": "gemini-2.5-flash",
+    "summary_word_count": 300,
+    "summary_system_prompt": DEFAULT_SUMMARY_SYSTEM_PROMPT,
 }
 
 def load_config():
