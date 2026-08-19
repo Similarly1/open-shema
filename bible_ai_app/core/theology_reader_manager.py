@@ -16,6 +16,8 @@ class TheologyReaderManager:
     """
 
     _chroma_client = None
+    _books_cache = None
+    _toc_cache = {}
 
     @classmethod
     def get_chroma_client(cls, persist_directory: str = "./data/chroma_db"):
@@ -25,40 +27,39 @@ class TheologyReaderManager:
         return cls._chroma_client
 
     @classmethod
-    def get_all_theology_books(cls) -> List[Dict[str, Any]]:
+    def invalidate_cache(cls):
+        """Réinitialise les caches en mémoire si la bibliothèque change."""
+        cls._books_cache = None
+        cls._toc_cache.clear()
+
+    @classmethod
+    def get_all_theology_books(cls, force_refresh: bool = False) -> List[Dict[str, Any]]:
         """
-        Retourne la liste des ouvrages de type Théologie ou équivalents
+        Retourne instantanément la liste des ouvrages de type Théologie ou équivalents
         avec leurs métadonnées, couvertures et informations de chapitres.
         """
+        if cls._books_cache is not None and not force_refresh:
+            return cls._books_cache
+
         from webview_app import get_cover_data_url
         
         registry = load_books_metadata()
         theology_books = []
-        
-        # Collections ChromaDB potentielles
-        client = cls.get_chroma_client()
-        chroma_book_names = set()
-        for col_name in ['bible_study_bge_multilingual_gemma2_Infomaniak', 'study_library', 'bible_study_gemini_embedding_2']:
-            try:
-                col = client.get_collection(col_name)
-                res = col.get(include=['metadatas'])
-                for m in res.get('metadatas', []):
-                    n = m.get('name') or m.get('title')
-                    if n:
-                        chroma_book_names.add(n)
-            except Exception:
-                pass
 
         for name, meta in registry.items():
             b_type = str(meta.get("type", "")).strip().lower()
             is_theology = (
                 b_type in ["théologie", "theologie", "théologique", "theology", "étude", "etude", "doctrine", "introduction"]
                 or meta.get("source_type") in ["systematic_theology", "biblical_theology", "general", "nt_context", "ot_context", "book_intro"]
+                or meta.get("chapters_count", 0) > 0
                 or name in ["STGru", "Lire/Comprendre", "Paradoxes", "LirelaBibles", "NIV", "NIV Cultural", "MacArthur BC", "NIVArchaeo", "TSM"]
             )
             
-            # Si le livre est actif ou indexé
-            if is_theology and (meta.get("active", True) or name in chroma_book_names):
+            # Ne pas inclure les Bibles simples dans les livres de théologie
+            if b_type in ["bible", "bibles", "audio"]:
+                is_theology = False
+
+            if is_theology:
                 cov_p = meta.get("cover_path")
                 data_url = get_cover_data_url(cov_p)
                 
@@ -89,14 +90,18 @@ class TheologyReaderManager:
 
         # Trier par titre
         theology_books.sort(key=lambda x: x["title"].lower())
+        cls._books_cache = theology_books
         return theology_books
 
     @classmethod
     def get_book_toc(cls, book_name: str) -> Dict[str, Any]:
         """
         Récupère la table des matières (TOC) d'un livre de théologie
-        ordonnée par chapitre croissant.
+        ordonnée par chapitre croissant (avec mise en cache mémoire).
         """
+        if book_name in cls._toc_cache:
+            return cls._toc_cache[book_name]
+
         client = cls.get_chroma_client()
         chapters_dict = {}
 
@@ -145,7 +150,7 @@ class TheologyReaderManager:
         from webview_app import get_cover_data_url
         cov_data_url = get_cover_data_url(book_meta.get("cover_path"))
 
-        return {
+        result = {
             "book_name": book_name,
             "title": book_meta.get("title", book_name),
             "author": book_meta.get("author", ""),
@@ -155,6 +160,8 @@ class TheologyReaderManager:
             "total_chapters": len(sorted_chapters),
             "chapters": sorted_chapters
         }
+        cls._toc_cache[book_name] = result
+        return result
 
     @classmethod
     def get_chapter_content(cls, book_name: str, chapter_id: int) -> Dict[str, Any]:

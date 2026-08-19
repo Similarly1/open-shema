@@ -8358,5 +8358,255 @@ body.theme-dark .theol-view-badge {
   to { transform: rotate(360deg); }
 }
 
+/* ==========================================================================
+   ANIMATIONS DE CHARGEMENT LOGOS-STYLE & SCAN TRADUCTION IA
+   ========================================================================== */
+
+/* 1. ANIMATION DE CHARGEMENT INITIALE DE LA VUE THÉOLOGIE */
+.theol-view-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 20px;
+  min-height: 380px;
+}
+
+.theol-loader-glow {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(2, 132, 199, 0.28) 0%, rgba(56, 189, 248, 0.08) 50%, transparent 75%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  animation: theolLoaderPulse 2s infinite ease-in-out;
+}
+
+.theol-loader-icon {
+  color: var(--accent-blue);
+  filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.6));
+}
+
+@keyframes theolLoaderPulse {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.1); filter: brightness(1.3); }
+}
+
+.theol-loader-title {
+  font-family: var(--font-title);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.theol-loader-subtitle {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: var(--accent-blue);
+  margin-bottom: 24px;
+}
+
+.theol-loader-progress-track {
+  width: 260px;
+  height: 4px;
+  background-color: var(--border-color);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+  margin: 0 auto;
+}
+
+.theol-loader-progress-bar {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 45%;
+  background: linear-gradient(90deg, #0284C7, #38BDF8, #818CF8);
+  border-radius: 3px;
+  animation: theolProgressSlide 1.3s infinite ease-in-out;
+}
+
+@keyframes theolProgressSlide {
+  0% { left: -45%; }
+  100% { left: 100%; }
+}
+
+.theol-loader-status {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  margin-top: 14px;
+  font-weight: 500;
+}
+
+/* SKELETONS TOC & PARAGRAPHES */
+.theol-toc-skeleton {
+  padding: 8px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.theol-skeleton-item {
+  height: 28px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  opacity: 0.6;
+}
+
+.theol-paragraph-skeleton {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  opacity: 0.7;
+}
+
+.shimmer {
+  background: linear-gradient(90deg, var(--bg-subtle) 0%, var(--bg-hover) 50%, var(--bg-subtle) 100%);
+  background-size: 200% 100%;
+  animation: shimmerMove 1.5s infinite linear;
+}
+
+@keyframes shimmerMove {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* 2. ANIMATION DE SCAN & VAGUE LUMINEUSE DE TRADUCTION IA */
+.theol-article-card.translating-scan-active {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(56, 189, 248, 0.4) !important;
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.12) !important;
+}
+
+/* Faisceau / Vague lumineuse qui traverse le texte de haut en bas */
+.theol-article-card.translating-scan-active::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 140px;
+  background: linear-gradient(180deg, 
+    rgba(56, 189, 248, 0) 0%, 
+    rgba(56, 189, 248, 0.08) 35%, 
+    rgba(99, 102, 241, 0.22) 50%, 
+    rgba(56, 189, 248, 0.35) 85%, 
+    rgba(56, 189, 248, 0.85) 98%, 
+    #38BDF8 100%);
+  box-shadow: 0 4px 25px rgba(56, 189, 248, 0.6);
+  pointer-events: none;
+  z-index: 10;
+  animation: theolScanSweep 2.4s infinite ease-in-out;
+}
+
+@keyframes theolScanSweep {
+  0% {
+    top: -140px;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+.theol-article-card.translating-scan-active .theol-reading-p,
+.theol-article-card.translating-scan-active .theol-section-heading {
+  animation: theolTextGlowScan 2.4s infinite ease-in-out;
+}
+
+@keyframes theolTextGlowScan {
+  0%, 100% { opacity: 0.75; filter: blur(0px); }
+  50% { opacity: 1; text-shadow: 0 0 8px rgba(56, 189, 248, 0.35); }
+}
+
+/* BANDEAU FLOTTANT DE SCAN TRADUCTION */
+.theol-translation-scanner-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.14), rgba(99, 102, 241, 0.14));
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 10px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 16px rgba(2, 132, 199, 0.12);
+  animation: scannerBannerPulse 2s infinite ease-in-out;
+}
+
+@keyframes scannerBannerPulse {
+  0%, 100% { border-color: rgba(56, 189, 248, 0.35); }
+  50% { border-color: rgba(99, 102, 241, 0.65); box-shadow: 0 4px 20px rgba(99, 102, 241, 0.25); }
+}
+
+.theol-scanner-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--accent-blue);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  animation: theolIconSpin 3s infinite linear;
+}
+
+@keyframes theolIconSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.theol-scanner-info {
+  flex: 1;
+}
+
+.theol-scanner-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.theol-scanner-subtitle {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.theol-scanner-progress-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(99, 102, 241, 0.15);
+  color: #818CF8;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.theol-scanner-sparkle {
+  animation: sparkleAnim 1.2s infinite alternate ease-in-out;
+}
+
+@keyframes sparkleAnim {
+  0% { transform: scale(0.9) rotate(0deg); }
+  100% { transform: scale(1.25) rotate(15deg); }
+}
+
 
 

@@ -106,6 +106,7 @@ const TheologyView = {
     this.cacheDomElements();
     this.bindEvents();
     this.applyDisplayPreferences();
+    this.renderInitialLoadingState();
   },
 
   cacheDomElements() {
@@ -851,7 +852,8 @@ const TheologyView = {
   },
 
   // =========================================================================
-  // TRADUCTION DU CHAPITRE
+  // =========================================================================
+  // TRADUCTION DU CHAPITRE (AVEC ANIMATION DE SCAN & VAGUE LUMINEUSE)
   // =========================================================================
 
   async toggleChapterTranslation() {
@@ -871,23 +873,60 @@ const TheologyView = {
       return;
     }
 
-    // Traduire via LLM
+    // Activer l'animation de scan holographique sur l'article
     try {
-      App.showToast('Traduction du chapitre en cours...');
+      if (this.articleCard) {
+        this.articleCard.classList.add('translating-scan-active');
+      }
+
+      // Insérer le bandeau de scan au-dessus du texte
+      const existingBanner = document.getElementById('theol-translation-banner');
+      const scanBannerHtml = `
+        <div class="theol-translation-scanner-banner" id="theol-translation-scanner-banner">
+          <div class="theol-scanner-icon-box">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+          </div>
+          <div class="theol-scanner-info">
+            <div class="theol-scanner-title">Traduction française haute fidélité en cours...</div>
+            <div class="theol-scanner-subtitle">Analyse théologique, reformulation doctrinale & conservation des citations bibliques</div>
+          </div>
+          <div class="theol-scanner-progress-badge">
+            <span class="theol-scanner-sparkle">✨</span>
+            <span>IA active</span>
+          </div>
+        </div>
+      `;
+
+      if (existingBanner) {
+        existingBanner.outerHTML = scanBannerHtml;
+      } else if (this.articleContent) {
+        this.articleContent.insertAdjacentHTML('afterbegin', scanBannerHtml);
+      }
+
+      App.showToast('Traduction du chapitre par IA en cours...');
       const fullText = (this.currentChapterData?.paragraphs || []).join('\n\n');
       
-      const res = await API.translateText(fullText.slice(0, 8000), 'theology_chapter', key);
+      const res = await API.translateText(fullText.slice(0, 9000), 'theology_chapter', key);
       if (res && res.success && res.translated_text) {
         const paras = res.translated_text.split('\n\n').map(p => p.trim()).filter(p => p);
         this.translationCache[key] = paras;
         this.showTranslatedVersion = true;
+        
+        // Retirer l'effet de scan et réafficher avec transition fluide
+        if (this.articleCard) {
+          this.articleCard.classList.remove('translating-scan-active');
+        }
         this.renderChapterArticle(this.currentChapterData);
-        App.showToast('Traduction appliquée avec succès !');
+        App.showToast('Traduction française appliquée !');
       } else {
         throw new Error(res?.error || 'Erreur traduction');
       }
     } catch (e) {
       console.error('[TheologyView] Erreur traduction:', e);
+      if (this.articleCard) {
+        this.articleCard.classList.remove('translating-scan-active');
+      }
+      this.renderChapterArticle(this.currentChapterData);
       App.showToast('Erreur lors de la traduction du chapitre.');
     }
   },
@@ -986,20 +1025,71 @@ const TheologyView = {
   },
 
   // =========================================================================
-  // ÉTATS DE CHARGEMENT & ERREURS
+  // ÉTATS DE CHARGEMENT & ERREURS (STYLE LOGOS)
   // =========================================================================
 
-  renderLoadingArticle() {
+  renderInitialLoadingState(customText = "Chargement de vos ouvrages de théologie...") {
     if (this.articleHero) this.articleHero.innerHTML = '';
+    if (this.articleFooterNav) this.articleFooterNav.innerHTML = '';
     if (this.articleContent) {
       this.articleContent.innerHTML = `
-        <div class="theol-loading-box">
-          <div class="theol-spinner"></div>
-          <div class="theol-loading-text">Chargement du chapitre...</div>
+        <div class="theol-view-loader">
+          <div class="theol-loader-glow">
+            <div class="theol-loader-icon">
+              <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="theol-loader-title">OUVRAGES DE THÉOLOGIE</div>
+          <div class="theol-loader-subtitle">שְׁמַע • ÉTUDES DOCTRINALES & SYSTEMATIQUES</div>
+          <div class="theol-loader-progress-track">
+            <div class="theol-loader-progress-bar"></div>
+          </div>
+          <div class="theol-loader-status">${customText}</div>
         </div>
       `;
     }
+    if (this.tocListContainer) {
+      this.tocListContainer.innerHTML = `
+        <div class="theol-toc-skeleton">
+          <div class="theol-skeleton-item shimmer"></div>
+          <div class="theol-skeleton-item shimmer"></div>
+          <div class="theol-skeleton-item shimmer"></div>
+          <div class="theol-skeleton-item shimmer"></div>
+          <div class="theol-skeleton-item shimmer"></div>
+          <div class="theol-skeleton-item shimmer"></div>
+        </div>
+      `;
+    }
+  },
+
+  renderLoadingArticle(customTitle = "Chargement du chapitre...") {
+    if (this.articleHero) {
+      this.articleHero.innerHTML = `
+        <div class="theol-hero-badge-row">
+          <span class="theol-hero-book-badge">${this.escapeHtml(this.currentBook || 'Théologie')}</span>
+        </div>
+        <h1 class="theol-hero-chapter-title">${this.escapeHtml(customTitle)}</h1>
+        <div class="theol-hero-divider"></div>
+      `;
+    }
     if (this.articleFooterNav) this.articleFooterNav.innerHTML = '';
+    if (this.articleContent) {
+      this.articleContent.innerHTML = `
+        <div class="theol-chapter-loading-container" style="padding: 10px 0;">
+          <div class="theol-loader-progress-track" style="margin: 0 auto 30px auto;">
+            <div class="theol-loader-progress-bar"></div>
+          </div>
+          <div class="theol-paragraph-skeleton shimmer" style="width: 100%; height: 18px; margin-bottom: 14px; border-radius: 4px;"></div>
+          <div class="theol-paragraph-skeleton shimmer" style="width: 96%; height: 18px; margin-bottom: 14px; border-radius: 4px;"></div>
+          <div class="theol-paragraph-skeleton shimmer" style="width: 88%; height: 18px; margin-bottom: 26px; border-radius: 4px;"></div>
+          <div class="theol-paragraph-skeleton shimmer" style="width: 98%; height: 18px; margin-bottom: 14px; border-radius: 4px;"></div>
+          <div class="theol-paragraph-skeleton shimmer" style="width: 93%; height: 18px; margin-bottom: 14px; border-radius: 4px;"></div>
+          <div class="theol-paragraph-skeleton shimmer" style="width: 65%; height: 18px; margin-bottom: 26px; border-radius: 4px;"></div>
+        </div>
+      `;
+    }
   },
 
   renderEmptyChapterArticle() {
