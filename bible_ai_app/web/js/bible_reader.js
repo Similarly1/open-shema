@@ -1491,17 +1491,23 @@ const GeoPassageHoverManager = {
       ? `${bInfo.name} ${cluster.chapter}:${cluster.startVerse}`
       : `${bInfo.name} ${cluster.chapter}:${cluster.startVerse}–${cluster.endVerse}`;
 
+    const clean = (s) => (s ? String(s).replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&apos;/g, "'").trim() : '');
     const placesHtml = cluster.places.map(p => {
       const typeLabel = (typeof MapsView !== 'undefined' && MapsView.getTypeLabel) ? MapsView.getTypeLabel(p.place_type) : (p.place_type || 'Lieu');
       const badgeClass = `badge-type-${p.place_type || 'city'}`;
+      const nameFr = clean(p.name_fr);
+      const ancName = clean(p.ancient_name);
+      const modName = clean(p.modern_name);
+      const comment = clean(p.comment);
+
       return `
         <div class="geo-pop-place-row" data-place-id="${p.place_id}">
           <div class="geo-pop-place-head">
-            <span class="geo-pop-place-name">${p.name_fr}</span>
+            <span class="geo-pop-place-name">${nameFr}</span>
             <span class="geo-pop-place-type ${badgeClass}">${typeLabel}</span>
           </div>
-          ${p.ancient_name || p.modern_name ? `<div class="geo-pop-place-sub">${p.ancient_name ? `Antique : ${p.ancient_name}` : ''}${p.ancient_name && p.modern_name ? ' • ' : ''}${p.modern_name ? `Moderne : ${p.modern_name}` : ''}</div>` : ''}
-          ${p.comment ? `<div class="geo-pop-place-desc">${p.comment}</div>` : ''}
+          ${ancName || modName ? `<div class="geo-pop-place-sub">${ancName ? `Antique : ${ancName}` : ''}${ancName && modName ? ' • ' : ''}${modName ? `Moderne : ${modName}` : ''}</div>` : ''}
+          ${comment ? `<div class="geo-pop-place-desc">${comment}</div>` : ''}
         </div>
       `;
     }).join('');
@@ -3206,19 +3212,21 @@ const BibleReader = {
           const firstPlaceId = cl.places[0]?.place_id || '';
 
           marginBadgeHtml = `
-            <span class="geo-passage-margin-anchor" data-cluster-id="${cl.id}">
-              <button type="button" class="geo-passage-bracket-btn" data-cluster-id="${cl.id}" data-place-id="${firstPlaceId}" data-book="${data.book}" data-chap="${data.chapter}" data-start="${cl.startVerse}" data-end="${cl.endVerse}">
-                <span class="geo-bracket-rail-top"></span>
-                <span class="geo-bracket-pill">
-                  <svg class="geo-bracket-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"></path>
-                    <path d="M9 3v15"></path>
-                    <path d="M15 6v15"></path>
-                  </svg>
-                  <span class="geo-bracket-range">${rangeLabel}</span>
-                </span>
-                <span class="geo-bracket-rail-bottom"></span>
-              </button>
+            <span class="geo-passage-anchor-marker" data-cluster-id="${cl.id}">
+              <span class="geo-passage-margin-badge">
+                <button type="button" class="geo-passage-bracket-btn" data-cluster-id="${cl.id}" data-place-id="${firstPlaceId}" data-book="${data.book}" data-chap="${data.chapter}" data-start="${cl.startVerse}" data-end="${cl.endVerse}">
+                  <span class="geo-bracket-rail-top"></span>
+                  <span class="geo-bracket-pill">
+                    <svg class="geo-bracket-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"></path>
+                      <path d="M9 3v15"></path>
+                      <path d="M15 6v15"></path>
+                    </svg>
+                    <span class="geo-bracket-range">${rangeLabel}</span>
+                  </span>
+                  <span class="geo-bracket-rail-bottom"></span>
+                </button>
+              </span>
             </span>
           `;
         }

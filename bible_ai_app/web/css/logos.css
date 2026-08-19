@@ -5503,24 +5503,40 @@ body.palette-dark-warm .ctx-submenu {
    REPÈRES GÉOGRAPHIQUES EN MARGE & POPOVER RICHE (OPEN SHEMA GEO RAILS)
    ========================================================================== */
 
-/* 1. Ancre flottante en marge droite du passage */
-.geo-passage-margin-anchor {
+/* 1. Ancre de largeur strictement nulle flottant à droite de la ligne du verset */
+.geo-passage-anchor-marker {
   float: right;
   clear: right;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  line-height: 0;
+  font-size: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* 2. Badge déporté complètement dans la gouttière / marge droite */
+.geo-passage-margin-badge {
+  display: inline-flex;
+  align-items: center;
   position: relative;
-  margin-left: 12px;
-  margin-right: -42px;
-  margin-top: 1px;
+  left: 20px;
+  top: -4px;
+  width: max-content;
+  pointer-events: auto;
   user-select: none;
-  z-index: 15;
+  z-index: 20;
 }
 
-.reader-workspace.full-width .geo-passage-margin-anchor {
-  margin-right: -24px;
+.reader-workspace.full-width .geo-passage-margin-badge {
+  left: 14px;
 }
 
-.reader-workspace.split-view .geo-passage-margin-anchor {
-  margin-right: -20px;
+.reader-workspace.split-view .geo-passage-margin-badge {
+  left: 10px;
 }
 
 .geo-passage-bracket-btn {
@@ -5595,7 +5611,7 @@ body.palette-dark-warm .ctx-submenu {
   transition: background-color 0.15s ease;
 }
 
-.hide-geo-pins .geo-passage-margin-anchor {
+.hide-geo-pins .geo-passage-anchor-marker {
   display: none !important;
 }
 

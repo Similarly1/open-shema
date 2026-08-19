@@ -7,6 +7,7 @@ la recherche de lieux et la fourniture des grands itinéraires bibliques.
 import os
 import sqlite3
 import json
+import re
 import logging
 from typing import List, Dict, Any, Optional
 
@@ -16,6 +17,16 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 APP_DIR = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
 DATA_DIR = os.path.join(APP_DIR, "data")
 DB_PATH = os.path.join(DATA_DIR, "biblical_places.db")
+
+
+def clean_comment_markup(text: str) -> str:
+    """Nettoie les balises XML brutes (ex: <source id="...">, <modern id="...">) pour un texte lisible."""
+    if not text:
+        return ""
+    cleaned = re.sub(r'<[^>]+>', '', text)
+    cleaned = cleaned.replace('&amp;', '&').replace('&quot;', '"').replace('&apos;', "'").replace('&lt;', '<').replace('&gt;', '>')
+    cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+    return cleaned
 
 
 class MapsManager:
@@ -79,13 +90,13 @@ class MapsManager:
                     "place_id": r["place_id"],
                     "name_fr": r["name_fr"],
                     "name_en": r["name_en"],
-                    "ancient_name": r["ancient_name"],
-                    "modern_name": r["modern_name"],
+                    "ancient_name": clean_comment_markup(r["ancient_name"]),
+                    "modern_name": clean_comment_markup(r["modern_name"]),
                     "latitude": r["latitude"],
                     "longitude": r["longitude"],
                     "place_type": r["place_type"],
                     "confidence": r["confidence"],
-                    "comment": r["comment"],
+                    "comment": clean_comment_markup(r["comment"]),
                     "verses_count": r["verses_count"],
                     "verses": verses_list[:20], # Limiter pour l'aperçu
                     "thumbnail_url": r["thumbnail_url"]
@@ -131,13 +142,13 @@ class MapsManager:
                     "place_id": r["place_id"],
                     "name_fr": r["name_fr"],
                     "name_en": r["name_en"],
-                    "ancient_name": r["ancient_name"],
-                    "modern_name": r["modern_name"],
+                    "ancient_name": clean_comment_markup(r["ancient_name"]),
+                    "modern_name": clean_comment_markup(r["modern_name"]),
                     "latitude": r["latitude"],
                     "longitude": r["longitude"],
                     "place_type": r["place_type"],
                     "confidence": r["confidence"],
-                    "comment": r["comment"],
+                    "comment": clean_comment_markup(r["comment"]),
                     "verses_count": r["verses_count"],
                     "verses_in_chapter": r["verses_in_chapter"],
                     "verses": verses_list,
@@ -180,13 +191,13 @@ class MapsManager:
                 "place_id": r["place_id"],
                 "name_fr": r["name_fr"],
                 "name_en": r["name_en"],
-                "ancient_name": r["ancient_name"],
-                "modern_name": r["modern_name"],
+                "ancient_name": clean_comment_markup(r["ancient_name"]),
+                "modern_name": clean_comment_markup(r["modern_name"]),
                 "latitude": r["latitude"],
                 "longitude": r["longitude"],
                 "place_type": r["place_type"],
                 "confidence": r["confidence"],
-                "comment": r["comment"],
+                "comment": clean_comment_markup(r["comment"]),
                 "verses_count": r["verses_count"],
                 "verses_detailed": verses_detailed,
                 "thumbnail_url": r["thumbnail_url"]

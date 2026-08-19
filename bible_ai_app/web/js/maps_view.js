@@ -374,14 +374,14 @@ const MapsView = {
       } catch (e) {}
     }
 
-    document.getElementById('details-place-title').textContent = fullDetails.name_fr;
+    document.getElementById('details-place-title').textContent = this.cleanText(fullDetails.name_fr);
     document.getElementById('details-place-type').textContent = this.getTypeLabel(fullDetails.place_type);
     document.getElementById('details-place-type').className = `place-item-type badge-type-${fullDetails.place_type || 'city'}`;
     
-    document.getElementById('details-place-ancient').textContent = fullDetails.ancient_name || fullDetails.name_en || '—';
-    document.getElementById('details-place-modern').textContent = fullDetails.modern_name || '—';
+    document.getElementById('details-place-ancient').textContent = this.cleanText(fullDetails.ancient_name || fullDetails.name_en) || '—';
+    document.getElementById('details-place-modern').textContent = this.cleanText(fullDetails.modern_name) || '—';
     document.getElementById('details-place-coords').textContent = `${fullDetails.latitude.toFixed(4)}°, ${fullDetails.longitude.toFixed(4)}°`;
-    document.getElementById('details-place-comment').textContent = fullDetails.comment || 'Lieu mentionné dans les Écritures saintes.';
+    document.getElementById('details-place-comment').textContent = this.cleanText(fullDetails.comment) || 'Lieu mentionné dans les Écritures saintes.';
 
     // Niveau de certitude
     const confBadge = document.getElementById('details-place-confidence');
@@ -399,12 +399,23 @@ const MapsView = {
       }
     }
 
-    // Liste des versets
+    // Liste des versets (dédoublonnés par référence)
     const versesListEl = document.getElementById('details-place-verses-list');
     if (versesListEl) {
-      const verses = fullDetails.verses_detailed || [];
-      if (verses.length > 0) {
-        versesListEl.innerHTML = verses.map(v => {
+      const rawVerses = fullDetails.verses_detailed || [];
+      const seenRefs = new Set();
+      const uniqueVerses = [];
+
+      rawVerses.forEach(v => {
+        const refKey = `${v.book}_${v.chapter}_${v.verse}`;
+        if (!seenRefs.has(refKey)) {
+          seenRefs.add(refKey);
+          uniqueVerses.push(v);
+        }
+      });
+
+      if (uniqueVerses.length > 0) {
+        versesListEl.innerHTML = uniqueVerses.map(v => {
           const readable = `${this.getFrenchBook(v.book)} ${v.chapter}:${v.verse}`;
           return `
             <button class="place-verse-pill" data-book="${v.book}" data-chap="${v.chapter}" data-verse="${v.verse}" title="Lire ce passage dans la Bible">
@@ -426,6 +437,11 @@ const MapsView = {
         versesListEl.innerHTML = '<span style="font-size: 12px; color: var(--text-muted);">Aucune référence spécifique répertoriée.</span>';
       }
     }
+  },
+
+  cleanText(str) {
+    if (!str) return '';
+    return String(str).replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&apos;/g, "'").trim();
   },
 
   jumpToBibleVerse(bookCode, chapter, verse) {
