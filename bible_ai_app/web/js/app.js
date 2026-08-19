@@ -270,10 +270,7 @@ const App = {
     } else if (viewName === 'commentaries') {
       if (drawerEl) drawerEl.classList.add('collapsed');
       if (typeof CommentariesView !== 'undefined') {
-        // Si les commentaires n'ont pas encore été chargés ou si on veut s'assurer de l'alignement
-        if (!CommentariesView.currentComments || CommentariesView.currentComments.length === 0) {
-          CommentariesView.openWithCurrentState();
-        }
+        CommentariesView.onViewActivated();
       }
     } else if (viewName === 'search' || viewName === 'ai' || viewName === 'dict') {
       if (drawerEl) drawerEl.classList.add('collapsed');

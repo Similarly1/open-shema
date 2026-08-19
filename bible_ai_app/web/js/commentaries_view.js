@@ -122,18 +122,18 @@ const CommentariesView = {
   },
 
   /**
-   * Ouvre la page dédiée en important l'état exact du lecteur biblique / volet latéral.
+   * Appelé automatiquement lors du basculement sur la vue des commentaires.
    */
-  async openWithCurrentState() {
+  onViewActivated() {
     let book = 'Gen';
     let chapter = 1;
     let verse = 1;
     let author = null;
 
     if (typeof CommentaryViewer !== 'undefined') {
-      book = CommentaryViewer.currentBook || BibleReader.currentBook || 'Gen';
-      chapter = CommentaryViewer.currentChapter || BibleReader.currentChapter || 1;
-      verse = CommentaryViewer.currentVerse || BibleReader.currentVerse || 1;
+      book = CommentaryViewer.currentBook || BibleReader?.currentBook || 'Gen';
+      chapter = CommentaryViewer.currentChapter || BibleReader?.currentChapter || 1;
+      verse = CommentaryViewer.currentVerse || BibleReader?.currentVerse || 1;
       author = CommentaryViewer.preferredAuthor;
 
       // Partager le cache de traduction
@@ -145,8 +145,16 @@ const CommentariesView = {
       verse = BibleReader.currentVerse || 1;
     }
 
+    this.loadPassage(book, chapter, verse, author);
+  },
+
+  /**
+   * Ouvre la page dédiée en important l'état exact du lecteur biblique / volet latéral.
+   */
+  openWithCurrentState() {
+    document.querySelectorAll('.sidebar-menu .nav-item, .sidebar-footer .nav-item').forEach(b => b.classList.remove('active'));
+    document.getElementById('nav-commentaries')?.classList.add('active');
     App.switchView('commentaries');
-    await this.loadPassage(book, chapter, verse, author);
   },
 
   /**
