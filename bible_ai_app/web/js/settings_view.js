@@ -366,8 +366,14 @@ RÈGLES STRICTES :
     }
 
     if (c.chat_model) document.getElementById('cfg-chat-model').value = c.chat_model;
+    if (c.chat_fallback_model && document.getElementById('cfg-chat-fallback-model')) {
+      document.getElementById('cfg-chat-fallback-model').value = c.chat_fallback_model;
+    }
     if (c.synthesis_model && document.getElementById('cfg-synthesis-model')) {
       document.getElementById('cfg-synthesis-model').value = c.synthesis_model;
+    }
+    if (c.synthesis_fallback_model && document.getElementById('cfg-synthesis-fallback-model')) {
+      document.getElementById('cfg-synthesis-fallback-model').value = c.synthesis_fallback_model;
     }
     if (c.synthesis_max_verses && document.getElementById('cfg-synthesis-max-verses')) {
       document.getElementById('cfg-synthesis-max-verses').value = c.synthesis_max_verses;
@@ -381,6 +387,9 @@ RÈGLES STRICTES :
 
     if (c.translation_model && document.getElementById('cfg-translation-model')) {
       document.getElementById('cfg-translation-model').value = c.translation_model;
+    }
+    if (c.translation_fallback_model && document.getElementById('cfg-translation-fallback-model')) {
+      document.getElementById('cfg-translation-fallback-model').value = c.translation_fallback_model;
     }
     if (document.getElementById('cfg-synthesis-system-prompt')) {
       document.getElementById('cfg-synthesis-system-prompt').value = c.synthesis_system_prompt || '';
@@ -488,8 +497,14 @@ RÈGLES STRICTES :
     newCfg.include_notes_in_ai = document.getElementById('cfg-include-notes-ai').checked;
 
     newCfg.chat_model = document.getElementById('cfg-chat-model').value;
+    if (document.getElementById('cfg-chat-fallback-model')) {
+      newCfg.chat_fallback_model = document.getElementById('cfg-chat-fallback-model').value;
+    }
     if (document.getElementById('cfg-synthesis-model')) {
       newCfg.synthesis_model = document.getElementById('cfg-synthesis-model').value;
+    }
+    if (document.getElementById('cfg-synthesis-fallback-model')) {
+      newCfg.synthesis_fallback_model = document.getElementById('cfg-synthesis-fallback-model').value;
     }
     if (document.getElementById('cfg-synthesis-max-verses')) {
       newCfg.synthesis_max_verses = parseInt(document.getElementById('cfg-synthesis-max-verses').value) || 5;
@@ -497,8 +512,14 @@ RÈGLES STRICTES :
     if (document.getElementById('cfg-synthesis-reranking')) {
       newCfg.synthesis_enable_reranking = document.getElementById('cfg-synthesis-reranking').checked;
     }
+    if (document.getElementById('cfg-synthesis-curation-model')) {
+      newCfg.synthesis_curation_model = document.getElementById('cfg-synthesis-curation-model').value;
+    }
     if (document.getElementById('cfg-translation-model')) {
       newCfg.translation_model = document.getElementById('cfg-translation-model').value;
+    }
+    if (document.getElementById('cfg-translation-fallback-model')) {
+      newCfg.translation_fallback_model = document.getElementById('cfg-translation-fallback-model').value;
     }
     if (document.getElementById('cfg-synthesis-system-prompt')) {
       newCfg.synthesis_system_prompt = document.getElementById('cfg-synthesis-system-prompt').value;

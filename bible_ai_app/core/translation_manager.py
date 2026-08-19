@@ -206,50 +206,62 @@ class TranslationManager:
             return text
 
         clean_model = model or config.get("translation_model", "gemini-3.5-flash-lite")
-        lower_m = clean_model.lower()
-
-        # Déterminer le fournisseur et instancier le LLMClient
-        if "/" in lower_m or "infomaniak" in lower_m or lower_m.startswith("qwen") or lower_m.startswith("google/gemma"):
-            token = config.get("infomaniak_token", "")
-            pid = config.get("infomaniak_product_id", "251")
-            client = LLMClient(api_key=token, model=clean_model, provider="infomaniak", product_id=pid)
-        elif lower_m.startswith("mistral-") or lower_m.startswith("open-mistral-") or lower_m.startswith("codestral-"):
-            api_key = config.get("mistral_api_key", "")
-            client = LLMClient(api_key=api_key, model=clean_model, provider="mistral")
-        else:
-            # Google Gemini par défaut
-            api_key = config.get("gemini_api_key", "")
-            client = LLMClient(api_key=api_key, model=clean_model, provider="gemini")
+        models_to_try = [clean_model]
+        fallback_model = config.get("translation_fallback_model")
+        if fallback_model and fallback_model != clean_model:
+            models_to_try.append(fallback_model)
 
         from core.config import DEFAULT_TRANSLATION_SYSTEM_PROMPT
         system_prompt = config.get("translation_system_prompt") or DEFAULT_TRANSLATION_SYSTEM_PROMPT
-
         user_prompt = f"Voici le texte à traduire fidèlement en français (conserve le Markdown et les références) :\n\n{text}"
         messages = [{"role": "user", "content": user_prompt}]
 
-        try:
-            translated = client.chat(messages=messages, system_prompt=system_prompt)
-            
-            # Nettoyage léger des blocs de code markdown superflus si le LLM a entouré de ```markdown
-            translated = translated.strip()
-            if translated.startswith("```markdown") and translated.endswith("```"):
-                translated = translated[11:-3].strip()
-            elif translated.startswith("```") and translated.endswith("```"):
-                translated = translated[3:-3].strip()
+        translated = None
+        used_model_name = clean_model
+        last_error = None
 
-            # Enregistrer dans le cache SQLite si item_type et item_id sont renseignés
-            if item_type and item_id:
-                cls.save_translation(
-                    item_type=item_type,
-                    item_id=item_id,
-                    translated_text=translated,
-                    model_used=clean_model,
-                    source_lang=source_lang,
-                    target_lang="fr",
-                    original_text=text
-                )
+        for cur_model in models_to_try:
+            lower_m = cur_model.lower()
+            if "/" in lower_m or "infomaniak" in lower_m or lower_m.startswith("qwen") or lower_m.startswith("google/gemma"):
+                token = config.get("infomaniak_token", "")
+                pid = config.get("infomaniak_product_id", "251")
+                client = LLMClient(api_key=token, model=cur_model, provider="infomaniak", product_id=pid)
+            elif lower_m.startswith("mistral-") or lower_m.startswith("open-mistral-") or lower_m.startswith("codestral-"):
+                api_key = config.get("mistral_api_key", "")
+                client = LLMClient(api_key=api_key, model=cur_model, provider="mistral")
+            else:
+                api_key = config.get("gemini_api_key", "")
+                client = LLMClient(api_key=api_key, model=cur_model, provider="gemini")
 
-            return translated
-        except Exception as e:
-            logger.error(f"Erreur lors de la traduction LLM ({clean_model}) : {e}")
-            raise Exception(f"Échec de la traduction ({clean_model}) : {str(e)}")
+            try:
+                res = client.chat(messages=messages, system_prompt=system_prompt)
+                if res and not str(res).startswith("Erreur"):
+                    translated = res.strip()
+                    if translated.startswith("```markdown") and translated.endswith("```"):
+                        translated = translated[11:-3].strip()
+                    elif translated.startswith("```") and translated.endswith("```"):
+                        translated = translated[3:-3].strip()
+                    used_model_name = cur_model
+                    break
+                else:
+                    last_error = res
+            except Exception as e:
+                last_error = str(e)
+                logger.warning("Échec traduction avec %s: %s, tentative de fallback...", cur_model, e)
+
+        if not translated:
+            raise Exception(f"Échec de la traduction ({used_model_name}) : {last_error}")
+
+        # Enregistrer dans le cache SQLite si item_type et item_id sont renseignés
+        if item_type and item_id:
+            cls.save_translation(
+                item_type=item_type,
+                item_id=item_id,
+                translated_text=translated,
+                model_used=used_model_name,
+                source_lang=source_lang,
+                target_lang="fr",
+                original_text=text
+            )
+
+        return translated

@@ -294,26 +294,59 @@ class CommentarySynthesizer:
         )
 
         try:
-            client = LLMClient(api_key=api_key, model=target_model, provider=provider, product_id=config.get("infomaniak_product_id"))
-            messages = [{"role": "user", "content": user_content}]
+            models_to_try = [target_model]
+            fallback_model = config.get("synthesis_fallback_model")
+            if fallback_model and fallback_model != target_model:
+                models_to_try.append(fallback_model)
 
-            if provider == "gemini":
-                synthesis_text = client.client.chat(messages, system_prompt=system_instruction, fallback=True)
-            elif provider == "mistral":
-                from mistralai.models.chat_completion import ChatMessage
-                resp = client.client.chat(model=target_model, messages=[
-                    ChatMessage(role="system", content=system_instruction),
-                    ChatMessage(role="user", content=user_content)
-                ])
-                synthesis_text = resp.choices[0].message.content
-            if synthesis_text and synthesis_text.startswith("Erreur"):
-                # Générer un rendu de secours structuré à partir des commentaires locaux
+            synthesis_text = None
+            used_model_name = target_model
+            last_error = None
+
+            for cur_model in models_to_try:
+                cur_provider = "infomaniak" if ("infomaniak" in cur_model.lower() or "ministral" in cur_model.lower() or "qwen" in cur_model.lower() or "bge" in cur_model.lower()) else ("mistral" if "mistral" in cur_model.lower() else "gemini")
+                cur_api_key = gemini_key if cur_provider == "gemini" else (mistral_key if cur_provider == "mistral" else infomaniak_token)
+
+                if not cur_api_key:
+                    continue
+
+                try:
+                    client = LLMClient(api_key=cur_api_key, model=cur_model, provider=cur_provider, product_id=config.get("infomaniak_product_id"))
+                    messages = [{"role": "user", "content": user_content}]
+
+                    if cur_provider == "gemini":
+                        res = client.client.chat(messages, system_prompt=system_instruction, fallback=True)
+                    elif cur_provider == "mistral":
+                        from mistralai.models.chat_completion import ChatMessage
+                        resp = client.client.chat(model=cur_model, messages=[
+                            ChatMessage(role="system", content=system_instruction),
+                            ChatMessage(role="user", content=user_content)
+                        ])
+                        res = resp.choices[0].message.content
+                    elif cur_provider == "infomaniak":
+                        res = client.client.chat(messages, system_prompt=system_instruction, model=cur_model)
+                    else:
+                        res = None
+
+                    if res and not str(res).startswith("Erreur"):
+                        synthesis_text = res
+                        used_model_name = cur_model
+                        break
+                    else:
+                        last_error = res
+                        logger.warning("Échec synthèse avec %s: %s, tentative de fallback...", cur_model, res)
+                except Exception as ex:
+                    last_error = str(ex)
+                    logger.warning("Exception synthèse avec %s: %s, tentative de fallback...", cur_model, ex)
+
+            if not synthesis_text or synthesis_text.startswith("Erreur"):
+                # Rendu structuré d'information si tous les modèles échouent
                 sample_authors = list(sources_set)[:5]
                 fallback_synthesis = (
                     f"# ✨ Synthèse Exégétique : {ref_label}\n\n"
                     f"> [!WARNING]\n"
-                    f"> **Remarque API ({provider.capitalize()})** : {synthesis_text}\n"
-                    f"> *(Vérifiez la validité de votre clé API ou votre quota dans les Paramètres > Modèles IA).*\n\n"
+                    f"> **Remarque API** : {last_error or 'Impossible de joindre les serveurs IA'}\n"
+                    f"> *(Vérifiez votre clé API ou activez un modèle de secours dans les Paramètres > Modèles IA).*\n\n"
                     f"### 📜 Texte Biblique ({bible_name})\n"
                     f"*{scripture}*\n\n"
                     f"### 📌 1. Données des Commentaires Locaux ({len(sources_set)} sources disponibles)\n"
@@ -324,7 +357,7 @@ class CommentarySynthesizer:
                     txt_short = c.get('text', '').strip()
                     if len(txt_short) > 280:
                         txt_short = txt_short[:280] + "..."
-                    fallback_synthesis += f"- **[{c.get('author')}]** : {txt_short}\n\n"
+                    fallback_synthesis += f"- **{c.get('author', 'Auteur')}** : {txt_short}\n\n"
 
                 fallback_synthesis += f"\n---\n📚 **Sources analysées ({len(sources_set)})** : {', '.join(sorted(sources_set))}"
                 synthesis_text = fallback_synthesis
@@ -340,7 +373,7 @@ class CommentarySynthesizer:
                 "sources_count": len(sources_set),
                 "sources": sorted(list(sources_set)),
                 "reranking_applied": rerank_applied,
-                "model_used": target_model,
+                "model_used": used_model_name,
                 "synthesis": synthesis_text,
                 "scripture_text": scripture
             }

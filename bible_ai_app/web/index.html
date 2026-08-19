@@ -687,6 +687,18 @@
                   </select>
                 </div>
                 <div class="form-group">
+                  <label>Modèle de secours (Fallback Chat) :</label>
+                  <select id="cfg-chat-fallback-model" class="select-field full-w">
+                    <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
+                    <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
+                    <option value="mistral-small-latest">Mistral Small</option>
+                    <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row two-cols" style="margin-top: 14px;">
+                <div class="form-group">
                   <label>Modèle Synthèse Exégétique :</label>
                   <select id="cfg-synthesis-model" class="select-field full-w">
                     <option value="gemini-3.7-flash">Google Gemini 3.7 Flash (Recommandé)</option>
@@ -696,6 +708,16 @@
                     <option value="mistral-large-latest">Mistral Large</option>
                     <option value="mistral-small-latest">Mistral Small</option>
                     <option value="mistralai/Mistral-Small-4-119B-2603">Infomaniak Mistral 119B</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Modèle de secours (Fallback Synthèse) :</label>
+                  <select id="cfg-synthesis-fallback-model" class="select-field full-w">
+                    <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
+                    <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                    <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
+                    <option value="mistral-large-latest">Mistral Large</option>
+                    <option value="mistral-small-latest">Mistral Small</option>
                   </select>
                 </div>
               </div>
@@ -729,8 +751,18 @@
                     <option value="mistral-small-latest">Mistral Small</option>
                     <option value="mistralai/Ministral-3-14B-Instruct-2512">Infomaniak Ministral 14B</option>
                   </select>
-                  <p class="field-hint" style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">Modèle utilisé par le bouton « Traduire » pour les commentaires/dictionnaires non francophones.</p>
                 </div>
+                <div class="form-group">
+                  <label>Modèle de secours (Fallback Traduction) :</label>
+                  <select id="cfg-translation-fallback-model" class="select-field full-w">
+                    <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
+                    <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                    <option value="mistral-small-latest">Mistral Small</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row two-cols" style="margin-top: 14px;">
                 <div class="form-group" id="group-curation-model">
                   <label>Modèle pour la Curation / Re-ranking :</label>
                   <select id="cfg-synthesis-curation-model" class="select-field full-w">
@@ -1238,12 +1270,14 @@
               <!-- Résultat de la synthèse formaté -->
               <div class="synth-result-container hidden" id="synth-result-container">
                 <div class="synth-meta-bar">
-                  <span class="synth-model-tag" id="synth-model-tag">Gemini 3.7 Flash</span>
-                  <span class="synth-sources-count-tag" id="synth-sources-tag">Sources</span>
+                  <div class="synth-meta-info">
+                    <span class="synth-model-tag" id="synth-model-tag">Gemini 3.7 Flash</span>
+                    <span class="synth-sources-count-tag" id="synth-sources-tag">Sources</span>
+                  </div>
                   <div class="synth-actions-group">
-                    <button class="synth-action-btn" id="btn-edit-synth-range" title="Modifier la plage ou régénérer">⚙️ Plage</button>
-                    <button class="synth-action-btn" id="btn-copy-synth" title="Copier la synthèse dans le presse-papier">📋 Copier</button>
-                    <button class="synth-action-btn" id="btn-export-synth-note" title="Enregistrer dans les notes d'étude">📝 Vers Note</button>
+                    <button class="synth-action-btn" id="btn-edit-synth-range" title="Modifier la plage de versets">Plage</button>
+                    <button class="synth-action-btn" id="btn-copy-synth" title="Copier la synthèse dans le presse-papier">Copier</button>
+                    <button class="synth-action-btn" id="btn-export-synth-note" title="Enregistrer dans les notes d'étude">Vers note</button>
                   </div>
                 </div>
                 <div class="synth-markdown-content" id="synth-markdown-content"></div>

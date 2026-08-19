@@ -556,10 +556,23 @@ class BibleAppApi:
         self.config = load_config()
         return NotesManager.list_notes(self.config)
 
-    def save_note(self, note: Dict[str, Any]) -> Dict[str, Any]:
+    def save_note(self, *args, **kwargs) -> Dict[str, Any]:
         """Enregistre ou met à jour une note au format Markdown (.md)."""
         self.config = load_config()
         target_dir = NotesManager.get_notes_directory(self.config)
+        note = {}
+        if args and isinstance(args[0], dict):
+            note = args[0]
+        elif len(args) >= 2:
+            note = {
+                "title": args[0],
+                "content": args[1],
+                "reference": args[2] if len(args) > 2 else "",
+                "tags": args[3] if len(args) > 3 else [],
+                "id": args[4] if len(args) > 4 else None
+            }
+        elif kwargs:
+            note = kwargs
         return NotesManager.save_note_file(note, target_dir)
 
     def delete_note(self, note_id: str) -> bool:

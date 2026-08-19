@@ -216,6 +216,7 @@ class NotesManager:
             f.write(md_text)
 
         return {
+            "success": True,
             "id": note_id,
             "filename": filename,
             "file_path": file_path,

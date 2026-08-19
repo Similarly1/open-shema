@@ -1033,10 +1033,10 @@ const CommentarySynthesizerUI = {
     const isFull = panel.classList.contains('synthesis-fullview');
     if (isFull) {
       panel.classList.remove('synthesis-fullview');
-      if (btnEditRange) btnEditRange.textContent = '📖 Résultat';
+      if (btnEditRange) btnEditRange.textContent = 'Résultat';
     } else {
       panel.classList.add('synthesis-fullview');
-      if (btnEditRange) btnEditRange.textContent = '⚙️ Plage';
+      if (btnEditRange) btnEditRange.textContent = 'Plage';
     }
   },
 
@@ -1377,8 +1377,8 @@ const CommentarySynthesizerUI = {
     navigator.clipboard.writeText(this.latestSynthesisMarkdown).then(() => {
       const btn = document.getElementById('btn-copy-synth');
       if (btn) {
-        btn.textContent = '✓ Copié !';
-        setTimeout(() => btn.textContent = '📋 Copier', 2000);
+        btn.textContent = 'Copié !';
+        setTimeout(() => btn.textContent = 'Copier', 2000);
       }
       App.showToast('Synthèse copiée dans le presse-papier !');
     });
@@ -1395,20 +1395,29 @@ const CommentarySynthesizerUI = {
     const title = `Synthèse Exégétique — ${refStr}`;
     const content = `# ${title}\n\n*Date : ${new Date().toLocaleDateString('fr-FR')}*\n\n${this.latestSynthesisMarkdown}`;
 
+    const notePayload = {
+      title: title,
+      content: content,
+      reference: refStr,
+      tags: ['exégèse', 'synthèse-ia', info.name.toLowerCase()]
+    };
+
     try {
-      const res = await API.call('save_note', title, content, refStr, ['exégèse', 'synthèse-ia', info.name.toLowerCase()]);
-      if (res && res.success) {
-        App.showToast('📝 Synthèse enregistrée dans vos Notes d\'étude !');
+      const res = await API.call('save_note', notePayload);
+      if (res && (res.success || res.id || res.filename)) {
+        App.showToast('Synthèse enregistrée dans vos Notes d\'étude !');
         if (typeof NotesView !== 'undefined' && NotesView.renderList) {
           NotesView.renderList();
         }
         if (typeof DrawerNotesViewer !== 'undefined' && DrawerNotesViewer.loadNotesForCurrentContext) {
           DrawerNotesViewer.loadNotesForCurrentContext();
         }
+      } else {
+        App.showError('Erreur Note', res?.error || 'Impossible d\'enregistrer la note.');
       }
     } catch (e) {
       console.error('Erreur export note:', e);
-      App.showToast('Erreur lors de l\'export dans les notes');
+      App.showError('Erreur Note', String(e));
     }
   }
 };
