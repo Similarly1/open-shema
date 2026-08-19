@@ -768,7 +768,7 @@ const TheologyView = {
       '1\\s*Cor?', '2\\s*Cor?', '1\\s*Co\\b', '2\\s*Co\\b',
       '1\\s*The?s?s?', '2\\s*The?s?s?', '1\\s*Th\\b', '2\\s*Th\\b',
       '1\\s*Tim?', '2\\s*Tim?', '1\\s*Ti\\b', '2\\s*Ti\\b', '1\\s*Tm\\b', '2\\s*Tm\\b',
-      '1\\s*Pie?r?r?e?', '2\\s*Pie?r?r?e?', '1\\s*Pe\\b', '2\\s*Pe\\b', '1\\s*P\\b', '2\\s*P\\b',
+      '1\\s*Pie?r?r?e?', '2\\s*Pie?r?r?e?', '1\\s*Pe\\b', '2\\s*Pe\\b', '1\\s*Pi\\b', '2\\s*Pi\\b', '1\\s*P\\b', '2\\s*P\\b',
       '1\\s*Jn\\b', '2\\s*Jn\\b', '3\\s*Jn\\b', '1\\s*Joh\\b', '2\\s*Joh\\b', '3\\s*Joh\\b',
 
       // Abréviations simples AT (Initiales en majuscule)
@@ -788,8 +788,8 @@ const TheologyView = {
     ].join('|');
 
     // Détection du livre initial + chapitre + verset et chaîne de sous-références
-    // Ex: "Dtn 4,2 ; 32,47", "1 S 10,25 ; Jr 30,2", "1 Maccabées 9,27"
-    const clusterRegex = new RegExp(`\\b(${bookNamesPattern})\\s+([0-9]{1,3}(?:\\s*[:.,]\\s*[0-9]{1,3}(?:\\s*-\\s*[0-9]{1,3})?)?)((?:\\s*[,;]\\s*[0-9]{1,3}(?:\\s*[:.,]\\s*[0-9]{1,3}(?:\\s*-\\s*[0-9]{1,3})?)?)*)`, 'g');
+    // La chaîne de sous-références ne doit pas consommer un chiffre suivi de lettres (ex: "; 2 Co 6:16" ou "; 1 Pi 2:22")
+    const clusterRegex = new RegExp(`\\b(${bookNamesPattern})\\s+([0-9]{1,3}(?:\\s*[:.,]\\s*[0-9]{1,3}(?:\\s*-\\s*[0-9]{1,3})?)?)((?:\\s*[,;]\\s*[0-9]{1,3}(?:\\s*[:.,]\\s*[0-9]{1,3}(?:\\s*-\\s*[0-9]{1,3})?)?(?!\\s*[a-zA-ZÀ-ÿ]))*)`, 'g');
 
     return text.replace(clusterRegex, (fullMatch, book, firstChVs, chainedPart) => {
       const cleanBook = book.trim();
@@ -805,7 +805,7 @@ const TheologyView = {
       let result = `<span class="theol-inline-scripture-ref" data-ref="${TheologyView.escapeHtml(first.fullRef)}">${book} ${firstChVs}</span>`;
 
       if (chainedPart) {
-        const subRegex = /([,;]\s*)([0-9]{1,3}(?:\s*[:.,]\s*[0-9]{1,3}(?:\s*-\s*[0-9]{1,3})?)?)/g;
+        const subRegex = /([,;]\s*)([0-9]{1,3}(?:\s*[:.,]\s*[0-9]{1,3}(?:\s*-\\s*[0-9]{1,3})?)?)/g;
         const formattedChained = chainedPart.replace(subRegex, (m, sep, cv) => {
           const sub = parseCv(cv);
           return `${sep}<span class="theol-inline-scripture-ref" data-ref="${TheologyView.escapeHtml(sub.fullRef)}">${cv}</span>`;
