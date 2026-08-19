@@ -1000,6 +1000,7 @@ body.sidebar-is-collapsed .topbar-left-zone .quick-passage-box {
   position: relative;
   z-index: 100;
   overflow: visible;
+  container-type: inline-size;
 }
 .toolbar-left {
   display: flex;
@@ -1016,6 +1017,22 @@ body.sidebar-is-collapsed .topbar-left-zone .quick-passage-box {
   gap: 5px;
   flex-shrink: 0;
   margin-left: auto;
+}
+
+@container (max-width: 680px) {
+  #mode-search-inline,
+  #mode-notes-inline {
+    display: none !important;
+  }
+}
+
+@container (max-width: 520px) {
+  #btn-toggle-split span:not(.btn-icon) {
+    display: none;
+  }
+  .zoom-controls {
+    display: none !important;
+  }
 }
 .tool-btn {
   display: flex;

@@ -127,7 +127,7 @@ const AIStudyView = {
     // Mise à jour de l'affichage du bouton pill
     const pillIcon = document.getElementById('study-mode-pill-icon');
     const pillLabel = document.getElementById('study-mode-pill-label');
-    if (pillIcon) pillIcon.textContent = info.icon;
+    if (pillIcon) pillIcon.innerHTML = info.icon;
     if (pillLabel) pillLabel.textContent = info.title;
 
     // Mise à jour du sous-titre de l'en-tête (sobre et discret)
