@@ -252,11 +252,37 @@ class LLMClient:
             self.client = MistralClient(api_key=self.api_key) if self.api_key else None
         elif self.provider == "gemini":
             self.client = GeminiClient(api_key=self.api_key, model=self.model) if self.api_key else None
-        elif self.provider == "infomaniak":
-            self.client = InfomaniakClient(token=self.api_key, product_id=self.product_id) if self.api_key else None
-        else:
-            self.client = None
+    def chat(self, messages, system_prompt=None, **kwargs):
+        """Méthode unifiée de conversation/complétion avec le LLM selon le provider configuré."""
+        if not self.client:
+            raise Exception(f"Clé API manquante pour {self.provider}")
             
+        if self.provider == "mistral":
+            try:
+                mistral_messages = []
+                if system_prompt:
+                    mistral_messages.append(ChatMessage(role="system", content=system_prompt))
+                for m in messages:
+                    mistral_messages.append(ChatMessage(role=m.get("role", "user"), content=m.get("content", "")))
+                response = self.client.chat(model=self.model, messages=mistral_messages)
+                return response.choices[0].message.content
+            except Exception as e:
+                raise Exception(f"Erreur de communication avec l'API Mistral : {str(e)}")
+                
+        elif self.provider == "gemini":
+            try:
+                return self.client.chat(messages, system_prompt=system_prompt, **kwargs)
+            except Exception as e:
+                raise Exception(f"Erreur de communication avec l'API Gemini : {str(e)}")
+
+        elif self.provider == "infomaniak":
+            try:
+                return self.client.chat(messages, system_prompt=system_prompt, model=self.model)
+            except Exception as e:
+                raise Exception(f"Erreur de communication avec l'API Infomaniak : {str(e)}")
+        else:
+            raise Exception(f"Provider inconnu : {self.provider}")
+
     def ask_question(self, context, question, system_prompt=None, thinking_budget=None):
         if not self.client:
             return f"Erreur : Clé API manquante pour {self.provider}."

@@ -7,6 +7,10 @@ import shutil
 import zipfile
 import datetime
 import threading
+import logging
+
+logger = logging.getLogger("webview_app")
+
 try:
     import webview
 except ImportError:
