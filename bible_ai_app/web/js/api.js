@@ -163,6 +163,10 @@ const API = {
     return await this.call('get_settings');
   },
 
+  async synthesizeCommentaries(bookCode, chapterNum, verseStart, verseEnd = null, enableReranking = null, model = null) {
+    return await this.call('synthesize_commentaries', bookCode, parseInt(chapterNum), parseInt(verseStart), verseEnd ? parseInt(verseEnd) : null, enableReranking, model);
+  },
+
   // Mock pour test dans navigateur externe
   _mockResponse(method, ...args) {
     if (method === 'get_installed_bibles') {

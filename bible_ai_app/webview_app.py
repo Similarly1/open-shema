@@ -432,6 +432,18 @@ class BibleAppApi:
                 "answer": f"**[Analyse pour {ref}]**\n\nCe passage souligne la structure théologique du texte. Vous pouvez consulter les commentaires de la barre latérale pour des détails verset par verset."
             }
 
+    def synthesize_commentaries(self, book_code: str, chapter: int, verse_start: int, verse_end: Optional[int] = None, enable_reranking: Optional[bool] = None, model: Optional[str] = None) -> Dict[str, Any]:
+        """Génère une synthèse exégétique comparative par IA de tous les commentaires d'une plage de versets."""
+        from core.commentary_synthesizer import CommentarySynthesizer
+        return CommentarySynthesizer.synthesize(
+            book_code=book_code,
+            chapter=chapter,
+            verse_start=verse_start,
+            verse_end=verse_end,
+            enable_reranking=enable_reranking,
+            model=model
+        )
+
     # =========================================================================
     # RECHERCHE GLOBALE
     # =========================================================================

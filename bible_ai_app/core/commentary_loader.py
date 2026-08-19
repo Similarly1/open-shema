@@ -184,6 +184,56 @@ class CommentaryLoader:
         return {"ids": ids, "documents": docs, "metadatas": metas}
 
     @classmethod
+    def get_all_comments_for_verse_range(cls, book_code: str, chapter: int, verse_start: int, verse_end: int) -> Dict[str, Any]:
+        """
+        Récupère instantanément les commentaires de TOUTES les sources pour une plage de versets (ex: versets 1 à 4).
+        """
+        db_path = cls.get_db_path()
+        if not os.path.exists(db_path):
+            return {"ids": [], "documents": [], "metadatas": []}
+            
+        conn = sqlite3.connect(db_path)
+        cur = conn.cursor()
+        
+        v_min = min(int(verse_start), int(verse_end))
+        v_max = max(int(verse_start), int(verse_end))
+        
+        query = (
+            "SELECT id, commentary_name, book_name, chapter, verse_start, verse_end, reference, text, commentary_id "
+            "FROM commentaries WHERE book_code = ? AND chapter = ? AND verse_start <= ? AND verse_end >= ? "
+            "ORDER BY commentary_name ASC, verse_start ASC"
+        )
+        params = [book_code, int(chapter), v_max, v_min]
+        
+        cur.execute(query, params)
+        rows = cur.fetchall()
+        conn.close()
+        
+        docs = []
+        metas = []
+        ids = []
+        
+        for r in rows:
+            row_id, c_name, b_name, ch, v_s, v_e, ref, txt, cid = r
+            doc_id = f"comm_{cid}_{book_code}_{ch}_{v_s}_{v_e}_{row_id}"
+            ids.append(doc_id)
+            docs.append(txt)
+            metas.append({
+                "name": c_name,
+                "type": "Commentaire",
+                "book": b_name,
+                "book_code": book_code,
+                "chapter": ch,
+                "verse": v_s,
+                "verse_start": v_s,
+                "verse_end": v_e,
+                "reference": ref,
+                "commentary_id": cid
+            })
+            
+        return {"ids": ids, "documents": docs, "metadatas": metas}
+
+    @classmethod
     def register_all_in_library(cls, active: bool = True) -> int:
         """
         Enregistre de manière groupée tous les 10 commentaires dans data/library.json.

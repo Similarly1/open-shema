@@ -675,14 +675,57 @@
             <div class="settings-card">
               <div class="card-title">Modèles d'Intelligence Artificielle</div>
               
-              <div class="form-group">
-                <label>Modèle de Chat principal :</label>
-                <select id="cfg-chat-model" class="select-field full-w">
-                  <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
+              <div class="form-row two-cols">
+                <div class="form-group">
+                  <label>Modèle de Chat principal :</label>
+                  <select id="cfg-chat-model" class="select-field full-w">
+                    <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
+                    <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                    <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
+                    <option value="mistral-small-latest">Mistral Small</option>
+                    <option value="mistral-large-latest">Mistral Large</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Modèle Synthèse Exégétique :</label>
+                  <select id="cfg-synthesis-model" class="select-field full-w">
+                    <option value="gemini-3.7-flash">Google Gemini 3.7 Flash (Recommandé)</option>
+                    <option value="gemini-2.5-pro">Google Gemini 2.5 Pro (Approfondi)</option>
+                    <option value="gemini-3.5-flash">Google Gemini 3.5 Flash (Rapide)</option>
+                    <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
+                    <option value="mistral-large-latest">Mistral Large</option>
+                    <option value="mistral-small-latest">Mistral Small</option>
+                    <option value="mistralai/Mistral-Small-4-119B-2603">Infomaniak Mistral 119B</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row two-cols" style="margin-top: 14px;">
+                <div class="form-group">
+                  <label>Plafond de versets par synthèse :</label>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <input type="number" id="cfg-synthesis-max-verses" min="1" max="10" value="5" class="text-field" style="width: 80px;">
+                    <span style="font-size: 12px; color: var(--text-secondary);">versets max (1 à 10)</span>
+                  </div>
+                  <p class="field-hint" style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">Limite la plage pour éviter la saturation du contexte du LLM.</p>
+                </div>
+                <div class="form-group">
+                  <label>Curation & Re-ranking IA :</label>
+                  <label class="custom-checkbox" style="margin-top: 6px;">
+                    <input type="checkbox" id="cfg-synthesis-reranking" checked>
+                    <span style="font-size: 12px; font-weight: 500;">Filtrer les extraits denses</span>
+                  </label>
+                  <p class="field-hint" style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">Élimine le bruit et classe les arguments clés avant synthèse.</p>
+                </div>
+              </div>
+
+              <div class="form-group" id="group-curation-model" style="margin-top: 14px;">
+                <label>Modèle pour la Curation / Re-ranking :</label>
+                <select id="cfg-synthesis-curation-model" class="select-field full-w">
+                  <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite (Rapide & Économe)</option>
                   <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
-                  <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
                   <option value="mistral-small-latest">Mistral Small</option>
-                  <option value="mistral-large-latest">Mistral Large</option>
+                  <option value="mistralai/Ministral-3-14B-Instruct-2512">Infomaniak Ministral 14B</option>
                 </select>
               </div>
 
@@ -1073,14 +1116,23 @@
               </button>
             </div>
             
-            <div class="comm-source-selector-box">
-              <button class="comm-source-btn" id="btn-select-comm-source" title="Changer d'ouvrage de commentaire">
-                <span id="lbl-active-comm-source">Sélectionner un commentaire</span>
-                <span class="pill-arrow">▾</span>
+            <div style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
+              <button class="comm-ai-synth-btn" id="btn-open-comm-synth" title="Générer une synthèse exégétique comparative par IA de tous les commentaires">
+                <svg class="synth-sparkle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
+                </svg>
+                <span>Synthèse IA</span>
               </button>
-              <div class="comm-sources-popover hidden" id="comm-sources-popover">
-                <div class="comm-popover-title">Commentaires pour ce verset (<span id="comm-popover-count">0</span>)</div>
-                <div class="comm-sources-list" id="comm-sources-list"></div>
+
+              <div class="comm-source-selector-box">
+                <button class="comm-source-btn" id="btn-select-comm-source" title="Changer d'ouvrage de commentaire">
+                  <span id="lbl-active-comm-source">Sélectionner un commentaire</span>
+                  <span class="pill-arrow">▾</span>
+                </button>
+                <div class="comm-sources-popover hidden" id="comm-sources-popover">
+                  <div class="comm-popover-title">Commentaires pour ce verset (<span id="comm-popover-count">0</span>)</div>
+                  <div class="comm-sources-list" id="comm-sources-list"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -1091,6 +1143,72 @@
             <div style="display: flex; gap: 6px; margin-top: 6px;">
               <input type="text" id="comm-ref-input" placeholder="Ex: Jean 3:16, Rom 8:28..." style="flex: 1; height: 28px; font-size: 12px; padding: 0 8px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--input-bg); color: var(--text-primary); outline: none;">
               <button id="btn-comm-ref-submit" class="btn-primary" style="height: 28px; padding: 0 10px; font-size: 11px;">Consulter</button>
+            </div>
+          </div>
+
+          <!-- Panneau de Synthèse Exégétique Multi-Commentaires IA -->
+          <div class="comm-synthesis-panel hidden" id="comm-synthesis-panel">
+            <div class="synthesis-panel-header">
+              <div class="synthesis-title-row">
+                <span class="synthesis-sparkle-badge">✨ Synthèse IA</span>
+                <span class="synthesis-passage-badge" id="synth-passage-badge">Genèse 1:1</span>
+                <button class="synthesis-btn-close" id="btn-close-comm-synth" title="Fermer le panneau de synthèse">✕</button>
+              </div>
+            </div>
+
+            <div class="synthesis-panel-body">
+              <!-- Contrôles de sélection de plage -->
+              <div class="synthesis-range-controls">
+                <div class="range-inputs-box">
+                  <span class="range-lbl">Plage :</span>
+                  <span class="range-book-lbl" id="synth-range-book">Genèse 1:</span>
+                  <div class="range-numbers-group">
+                    <input type="number" id="synth-verse-start" min="1" max="176" value="1" class="synth-num-input" title="Verset de début">
+                    <span>à</span>
+                    <input type="number" id="synth-verse-end" min="1" max="176" value="1" class="synth-num-input" title="Verset de fin">
+                  </div>
+                </div>
+                <div class="range-badge-info" id="synth-range-info">1 verset</div>
+              </div>
+
+              <!-- Avertissement si plafond dépassé -->
+              <div class="synth-ceiling-warning hidden" id="synth-ceiling-warning">
+                ⚠️ Plafond maximal (<span id="synth-ceiling-limit-num">5</span> versets max). La sélection a été ajustée.
+              </div>
+
+              <!-- Options rapides : Re-ranking toggle -->
+              <div class="synthesis-quick-options">
+                <label class="custom-checkbox" style="font-size: 11px; cursor: pointer;">
+                  <input type="checkbox" id="synth-toggle-rerank" checked>
+                  <span style="font-size: 11px; color: var(--text-primary); font-weight: 500;">Curation & Re-ranking IA</span>
+                </label>
+                <span class="synth-sources-hint" id="synth-sources-available-hint">Commentaires disponibles</span>
+              </div>
+
+              <!-- Bouton d'action de génération -->
+              <button class="btn-primary synth-launch-btn" id="btn-launch-synth">
+                <span id="btn-launch-synth-icon">✨</span>
+                <span id="btn-launch-synth-text">Lancer la synthèse</span>
+              </button>
+
+              <!-- État de chargement / progression animée -->
+              <div class="synth-loading-box hidden" id="synth-loading-box">
+                <div class="synth-spinner"></div>
+                <div class="synth-step-status" id="synth-step-status">Extraction de tous les commentaires...</div>
+              </div>
+
+              <!-- Résultat de la synthèse formaté -->
+              <div class="synth-result-container hidden" id="synth-result-container">
+                <div class="synth-meta-bar">
+                  <span class="synth-model-tag" id="synth-model-tag">Gemini 3.7 Flash</span>
+                  <span class="synth-sources-count-tag" id="synth-sources-tag">Sources</span>
+                  <div class="synth-actions-group">
+                    <button class="synth-action-btn" id="btn-copy-synth" title="Copier la synthèse dans le presse-papier">📋 Copier</button>
+                    <button class="synth-action-btn" id="btn-export-synth-note" title="Enregistrer dans les notes d'étude">📝 Vers Note</button>
+                  </div>
+                </div>
+                <div class="synth-markdown-content" id="synth-markdown-content"></div>
+              </div>
             </div>
           </div>
 

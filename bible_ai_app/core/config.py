@@ -35,6 +35,10 @@ DEFAULTS = {
     "full_width_reading": False,
     "notes_directory": "",
     "include_notes_in_ai": True,
+    "synthesis_model": "gemini-3.7-flash",
+    "synthesis_max_verses": 5,
+    "synthesis_enable_reranking": True,
+    "synthesis_curation_model": "gemini-2.5-flash-lite",
 }
 
 def load_config():

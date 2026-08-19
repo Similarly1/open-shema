@@ -615,6 +615,9 @@ const CommentaryViewer = {
         refPopover.classList.add('hidden');
       }
     });
+
+    // 5. Initialiser le sous-système de Synthèse Exégétique Multi-Commentaires IA
+    CommentarySynthesizerUI.init();
   },
 
   toggleSync(forcedState) {
@@ -834,6 +837,277 @@ const CommentaryViewer = {
         btn.style.transform = 'translateX(0)';
       });
     });
+  }
+};
+
+
+// 4ter. CONTRÔLEUR DE SYNTHÈSE MULTI-COMMENTAIRES IA
+const CommentarySynthesizerUI = {
+  isOpen: false,
+  currentBook: 'Gen',
+  currentChapter: 1,
+  verseStart: 1,
+  verseEnd: 1,
+  maxVersesLimit: 5,
+  latestSynthesisMarkdown: '',
+
+  init() {
+    const btnOpen = document.getElementById('btn-open-comm-synth');
+    const btnClose = document.getElementById('btn-close-comm-synth');
+    const btnLaunch = document.getElementById('btn-launch-synth');
+    const startInput = document.getElementById('synth-verse-start');
+    const endInput = document.getElementById('synth-verse-end');
+    const btnCopy = document.getElementById('btn-copy-synth');
+    const btnExportNote = document.getElementById('btn-export-synth-note');
+
+    btnOpen?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.togglePanel();
+    });
+
+    btnClose?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.closePanel();
+    });
+
+    startInput?.addEventListener('input', () => this.handleRangeChange());
+    endInput?.addEventListener('input', () => this.handleRangeChange());
+
+    btnLaunch?.addEventListener('click', () => this.launchSynthesis());
+
+    btnCopy?.addEventListener('click', () => this.copyToClipboard());
+    btnExportNote?.addEventListener('click', () => this.exportToNote());
+  },
+
+  async togglePanel(forceOpen = null) {
+    const panel = document.getElementById('comm-synthesis-panel');
+    const btnOpen = document.getElementById('btn-open-comm-synth');
+    if (!panel) return;
+
+    this.isOpen = forceOpen !== null ? forceOpen : panel.classList.contains('hidden');
+
+    if (this.isOpen) {
+      panel.classList.remove('hidden');
+      btnOpen?.classList.add('active');
+      await this.refreshStateFromReader();
+    } else {
+      panel.classList.add('hidden');
+      btnOpen?.classList.remove('active');
+    }
+  },
+
+  closePanel() {
+    this.togglePanel(false);
+  },
+
+  async refreshStateFromReader() {
+    // 1. Récupérer le réglage du plafond max depuis la config
+    try {
+      const cfg = await API.getSettings();
+      if (cfg && cfg.synthesis_max_verses) {
+        this.maxVersesLimit = parseInt(cfg.synthesis_max_verses, 10) || 5;
+      }
+      const rerankToggle = document.getElementById('synth-toggle-rerank');
+      if (rerankToggle && cfg && cfg.synthesis_enable_reranking !== undefined) {
+        rerankToggle.checked = cfg.synthesis_enable_reranking;
+      }
+    } catch (e) {}
+
+    const ceilingLimitNum = document.getElementById('synth-ceiling-limit-num');
+    if (ceilingLimitNum) ceilingLimitNum.textContent = this.maxVersesLimit;
+
+    // 2. Déterminer le verset actif
+    const pane1 = document.getElementById('pane-1-content');
+    const topV = pane1 ? BibleReader.getTopVisibleVerse(pane1) : null;
+    this.currentBook = (topV && topV.book) || BibleReader.currentBook || 'Gen';
+    this.currentChapter = (topV && topV.chapter) ? parseInt(topV.chapter, 10) : (BibleReader.currentChapter || 1);
+    const activeVerse = (topV && topV.verse) ? parseInt(topV.verse, 10) : (BibleReader.selectedVerse || 1);
+
+    this.verseStart = activeVerse;
+    this.verseEnd = activeVerse;
+
+    const startInput = document.getElementById('synth-verse-start');
+    const endInput = document.getElementById('synth-verse-end');
+    if (startInput) startInput.value = this.verseStart;
+    if (endInput) endInput.value = this.verseEnd;
+
+    this.updateRangeDisplay();
+  },
+
+  handleRangeChange() {
+    const startInput = document.getElementById('synth-verse-start');
+    const endInput = document.getElementById('synth-verse-end');
+    if (!startInput || !endInput) return;
+
+    let vStart = parseInt(startInput.value, 10) || 1;
+    let vEnd = parseInt(endInput.value, 10) || vStart;
+
+    if (vStart < 1) vStart = 1;
+    if (vEnd < 1) vEnd = 1;
+
+    let vMin = Math.min(vStart, vEnd);
+    let vMax = Math.max(vStart, vEnd);
+
+    const span = (vMax - vMin + 1);
+    const ceilingWarning = document.getElementById('synth-ceiling-warning');
+
+    if (span > this.maxVersesLimit) {
+      vMax = vMin + this.maxVersesLimit - 1;
+      endInput.value = vMax;
+      ceilingWarning?.classList.remove('hidden');
+    } else {
+      ceilingWarning?.classList.add('hidden');
+    }
+
+    this.verseStart = vMin;
+    this.verseEnd = vMax;
+    this.updateRangeDisplay();
+  },
+
+  updateRangeDisplay() {
+    const info = getBookInfo(this.currentBook);
+    const bookLbl = document.getElementById('synth-range-book');
+    const passageBadge = document.getElementById('synth-passage-badge');
+    const rangeInfo = document.getElementById('synth-range-info');
+
+    const span = (this.verseEnd - this.verseStart + 1);
+    const refStr = span === 1
+      ? `${info.name} ${this.currentChapter}:${this.verseStart}`
+      : `${info.name} ${this.currentChapter}:${this.verseStart}-${this.verseEnd}`;
+
+    if (bookLbl) bookLbl.textContent = `${info.name} ${this.currentChapter}:`;
+    if (passageBadge) passageBadge.textContent = refStr;
+    if (rangeInfo) rangeInfo.textContent = span === 1 ? '1 verset' : `${span} versets (max: ${this.maxVersesLimit})`;
+
+    const hint = document.getElementById('synth-sources-available-hint');
+    if (hint) {
+      const commsCount = (CommentaryViewer.currentComments && CommentaryViewer.currentComments.length) || 'Plusieurs';
+      hint.textContent = `~${commsCount} sources indexées`;
+    }
+  },
+
+  async launchSynthesis() {
+    const btnLaunch = document.getElementById('btn-launch-synth');
+    const loadingBox = document.getElementById('synth-loading-box');
+    const resultBox = document.getElementById('synth-result-container');
+    const statusText = document.getElementById('synth-step-status');
+    const rerankChecked = document.getElementById('synth-toggle-rerank')?.checked;
+
+    if (!btnLaunch) return;
+
+    btnLaunch.disabled = true;
+    loadingBox?.classList.remove('hidden');
+    resultBox?.classList.add('hidden');
+
+    if (statusText) statusText.textContent = 'Extraction de tous les commentaires bibliques...';
+
+    const progressTimer1 = setTimeout(() => {
+      if (statusText) statusText.textContent = rerankChecked ? 'Curation & Re-ranking exégétique en cours...' : 'Formatage des sources...';
+    }, 900);
+
+    const progressTimer2 = setTimeout(() => {
+      if (statusText) statusText.textContent = 'Génération de la synthèse comparative par IA...';
+    }, 2400);
+
+    try {
+      const res = await API.synthesizeCommentaries(
+        this.currentBook,
+        this.currentChapter,
+        this.verseStart,
+        this.verseEnd,
+        rerankChecked
+      );
+
+      clearTimeout(progressTimer1);
+      clearTimeout(progressTimer2);
+
+      if (res && res.success) {
+        this.latestSynthesisMarkdown = res.synthesis || '';
+        this.renderResult(res);
+      } else {
+        App.showError('Erreur Synthèse IA', res?.error || 'Impossible de générer la synthèse.');
+      }
+    } catch (err) {
+      clearTimeout(progressTimer1);
+      clearTimeout(progressTimer2);
+      App.showError('Erreur Réseau IA', err.message || String(err));
+    } finally {
+      btnLaunch.disabled = false;
+      loadingBox?.classList.add('hidden');
+    }
+  },
+
+  renderResult(data) {
+    const resultBox = document.getElementById('synth-result-container');
+    const modelTag = document.getElementById('synth-model-tag');
+    const sourcesTag = document.getElementById('synth-sources-tag');
+    const contentEl = document.getElementById('synth-markdown-content');
+
+    if (!resultBox || !contentEl) return;
+
+    if (modelTag) modelTag.textContent = data.model_used || 'IA';
+    if (sourcesTag) sourcesTag.textContent = `${data.sources_count || 0} sources ${data.reranking_applied ? '• Curé' : ''}`;
+
+    contentEl.innerHTML = this.renderMarkdown(data.synthesis || '');
+    resultBox.classList.remove('hidden');
+  },
+
+  renderMarkdown(text) {
+    if (!text) return '<p class="empty-hint">Aucun contenu généré.</p>';
+    
+    let html = text
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+      .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+      .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>')
+      .replace(/^\- (.*$)/gim, '<li>$1</li>')
+      .replace(/^\d+\. (.*$)/gim, '<li>$1</li>')
+      .replace(/\n\n/g, '</p><p>');
+
+    return `<div class="rendered-synth"><p>${html}</p></div>`;
+  },
+
+  copyToClipboard() {
+    if (!this.latestSynthesisMarkdown) return;
+    navigator.clipboard.writeText(this.latestSynthesisMarkdown).then(() => {
+      const btn = document.getElementById('btn-copy-synth');
+      if (btn) {
+        btn.textContent = '✓ Copié !';
+        setTimeout(() => btn.textContent = '📋 Copier', 2000);
+      }
+      App.showToast('Synthèse copiée dans le presse-papier !');
+    });
+  },
+
+  async exportToNote() {
+    if (!this.latestSynthesisMarkdown) return;
+    const info = getBookInfo(this.currentBook);
+    const span = (this.verseEnd - this.verseStart + 1);
+    const refStr = span === 1
+      ? `${info.name} ${this.currentChapter}:${this.verseStart}`
+      : `${info.name} ${this.currentChapter}:${this.verseStart}-${this.verseEnd}`;
+
+    const title = `Synthèse Exégétique — ${refStr}`;
+    const content = `# ${title}\n\n*Date : ${new Date().toLocaleDateString('fr-FR')}*\n\n${this.latestSynthesisMarkdown}`;
+
+    try {
+      const res = await API.call('save_note', title, content, refStr, ['exégèse', 'synthèse-ia', info.name.toLowerCase()]);
+      if (res && res.success) {
+        App.showToast('📝 Synthèse enregistrée dans vos Notes d\'étude !');
+        if (typeof NotesView !== 'undefined' && NotesView.renderList) {
+          NotesView.renderList();
+        }
+        if (typeof DrawerNotesViewer !== 'undefined' && DrawerNotesViewer.loadNotesForCurrentContext) {
+          DrawerNotesViewer.loadNotesForCurrentContext();
+        }
+      }
+    } catch (e) {
+      console.error('Erreur export note:', e);
+      App.showToast('Erreur lors de l\'export dans les notes');
+    }
   }
 };
 

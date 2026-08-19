@@ -85,7 +85,7 @@ class GeminiClient:
         for current_model in models_to_try:
             url = f"{self.base_url}/{current_model}:generateContent?key={self.api_key}"
             try:
-                response = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=20)
+                response = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=50)
                 if response.status_code in [404, 429, 500, 502, 503, 504]:
                     last_error = f"Status {response.status_code} pour {current_model}"
                     continue

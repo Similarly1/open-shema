@@ -336,6 +336,19 @@ const SettingsView = {
     }
 
     if (c.chat_model) document.getElementById('cfg-chat-model').value = c.chat_model;
+    if (c.synthesis_model && document.getElementById('cfg-synthesis-model')) {
+      document.getElementById('cfg-synthesis-model').value = c.synthesis_model;
+    }
+    if (c.synthesis_max_verses && document.getElementById('cfg-synthesis-max-verses')) {
+      document.getElementById('cfg-synthesis-max-verses').value = c.synthesis_max_verses;
+    }
+    if (document.getElementById('cfg-synthesis-reranking')) {
+      document.getElementById('cfg-synthesis-reranking').checked = c.synthesis_enable_reranking !== false;
+    }
+    if (c.synthesis_curation_model && document.getElementById('cfg-synthesis-curation-model')) {
+      document.getElementById('cfg-synthesis-curation-model').value = c.synthesis_curation_model;
+    }
+
     if (c.gemini_api_key) document.getElementById('cfg-gemini-key').value = c.gemini_api_key;
     if (c.mistral_api_key) document.getElementById('cfg-mistral-key').value = c.mistral_api_key;
     if (c.infomaniak_token) document.getElementById('cfg-infomaniak-token').value = c.infomaniak_token;
@@ -435,6 +448,19 @@ const SettingsView = {
     newCfg.include_notes_in_ai = document.getElementById('cfg-include-notes-ai').checked;
 
     newCfg.chat_model = document.getElementById('cfg-chat-model').value;
+    if (document.getElementById('cfg-synthesis-model')) {
+      newCfg.synthesis_model = document.getElementById('cfg-synthesis-model').value;
+    }
+    if (document.getElementById('cfg-synthesis-max-verses')) {
+      newCfg.synthesis_max_verses = parseInt(document.getElementById('cfg-synthesis-max-verses').value) || 5;
+    }
+    if (document.getElementById('cfg-synthesis-reranking')) {
+      newCfg.synthesis_enable_reranking = document.getElementById('cfg-synthesis-reranking').checked;
+    }
+    if (document.getElementById('cfg-synthesis-curation-model')) {
+      newCfg.synthesis_curation_model = document.getElementById('cfg-synthesis-curation-model').value;
+    }
+
     newCfg.gemini_api_key = document.getElementById('cfg-gemini-key').value.trim();
     newCfg.mistral_api_key = document.getElementById('cfg-mistral-key').value.trim();
     newCfg.infomaniak_token = document.getElementById('cfg-infomaniak-token').value.trim();
