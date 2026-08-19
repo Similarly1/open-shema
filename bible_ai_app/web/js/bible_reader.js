@@ -2969,6 +2969,31 @@ const BibleReader = {
     }
   },
 
+  async searchPassage(refQuery) {
+    if (!refQuery || typeof refQuery !== 'string') return false;
+    try {
+      const parsed = await API.parseReference(refQuery.trim());
+      if (parsed && parsed.book) {
+        App.switchView('bible');
+        await this.navigateTo(parsed.book, parsed.chapter || 1, parsed.verse || null);
+        return true;
+      }
+    } catch (e) {
+      console.warn('[BibleReader] Erreur parsing passage:', e);
+    }
+    return false;
+  },
+
+  async loadPassage(bookCodeOrRef, chapterNum = 1, verseNum = null) {
+    if (!bookCodeOrRef) return;
+    App.switchView('bible');
+    if (typeof chapterNum === 'number' && bookCodeOrRef.length <= 4) {
+      await this.navigateTo(bookCodeOrRef, chapterNum, verseNum);
+    } else {
+      await this.searchPassage(bookCodeOrRef);
+    }
+  },
+
   selectAndScrollToVerse(verseNum, bookCode = null, chapterNum = null) {
     const vNum = parseInt(verseNum, 10);
     if (!vNum) return;

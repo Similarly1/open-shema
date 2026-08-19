@@ -254,8 +254,7 @@ const TheologyView = {
 
     this.btnOpenBible?.addEventListener('click', () => {
       if (this.currentChapterData?.book_code) {
-        App.switchView('bible');
-        BibleReader.loadPassage(this.currentChapterData.book_code, 1);
+        this.openScriptureReference(this.currentChapterData.book_code);
       } else {
         App.switchView('bible');
       }
@@ -464,8 +463,7 @@ const TheologyView = {
       btn.addEventListener('click', () => {
         const ref = btn.dataset.ref;
         if (ref) {
-          App.switchView('bible');
-          BibleReader.searchPassage(ref);
+          this.openScriptureReference(ref);
         }
       });
     });
@@ -475,8 +473,7 @@ const TheologyView = {
       jumpBtn.addEventListener('click', () => {
         const code = jumpBtn.dataset.code;
         if (code) {
-          App.switchView('bible');
-          BibleReader.loadPassage(code, 1);
+          this.openScriptureReference(code);
         }
       });
     }
@@ -539,8 +536,7 @@ const TheologyView = {
       span.addEventListener('click', () => {
         const ref = span.dataset.ref || span.textContent.trim();
         if (ref) {
-          App.switchView('bible');
-          BibleReader.searchPassage(ref);
+          this.openScriptureReference(ref);
         }
       });
     });
@@ -595,6 +591,23 @@ const TheologyView = {
     document.getElementById('btn-footer-toc')?.addEventListener('click', () => {
       this.toggleToc(true);
     });
+  },
+
+  async openScriptureReference(ref) {
+    if (!ref) return;
+    App.switchView('bible');
+    if (typeof BibleReader !== 'undefined' && typeof BibleReader.searchPassage === 'function') {
+      await BibleReader.searchPassage(ref);
+    } else if (typeof BibleReader !== 'undefined' && typeof BibleReader.navigateTo === 'function') {
+      try {
+        const parsed = await API.parseReference(ref);
+        if (parsed && parsed.book) {
+          await BibleReader.navigateTo(parsed.book, parsed.chapter || 1, parsed.verse || null);
+        }
+      } catch (e) {
+        console.warn('Erreur fallback parsing ref:', e);
+      }
+    }
   },
 
   highlightScriptureReferences(text) {
