@@ -1547,6 +1547,86 @@
               </div>
             </div>
           </div>
+
+          <!-- CONTENEUR DE LA SYNTHÈSE IA PLEINE PAGE -->
+          <div class="comm-article-container comm-page-synth-container hidden" id="comm-page-synth-container">
+            <div class="comm-article-card comm-page-synth-card">
+              <div class="synthesis-panel-header" style="border-radius: 8px 8px 0 0; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;">
+                <div class="synthesis-title-row">
+                  <span class="synthesis-sparkle-badge" style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px;">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                    <span>Synthèse Exégétique IA</span>
+                  </span>
+                  <span class="synthesis-passage-badge" id="comm-page-synth-passage-badge">Genèse 1:1</span>
+                </div>
+                <button class="synthesis-btn-close" id="btn-close-comm-page-synth" title="Fermer la synthèse et revenir au commentaire">✕ Fermer</button>
+              </div>
+
+              <div class="synthesis-panel-body" style="padding: 20px 24px;">
+                <!-- Contrôles de sélection de plage -->
+                <div class="synthesis-range-controls" id="comm-page-synth-range-controls" style="margin-bottom: 16px;">
+                  <div class="range-inputs-box">
+                    <span class="range-lbl">Plage de versets :</span>
+                    <span class="range-book-lbl" id="comm-page-synth-range-book">Genèse 1:</span>
+                    <div class="range-numbers-group">
+                      <input type="number" id="comm-page-synth-verse-start" min="1" max="176" value="1" class="synth-num-input" title="Verset de début">
+                      <span>à</span>
+                      <input type="number" id="comm-page-synth-verse-end" min="1" max="176" value="1" class="synth-num-input" title="Verset de fin">
+                    </div>
+                  </div>
+                  <div class="range-badge-info" id="comm-page-synth-range-info">1 verset</div>
+                </div>
+
+                <!-- Avertissement si plafond dépassé -->
+                <div class="synth-ceiling-warning hidden" id="comm-page-synth-ceiling-warning" style="display: flex; align-items: center; gap: 6px; margin-bottom: 12px;">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                  <span>Plafond maximal (<span id="comm-page-synth-ceiling-limit-num">5</span> versets max). La sélection a été ajustée.</span>
+                </div>
+
+                <!-- Info sur les sources disponibles -->
+                <div class="synthesis-quick-options" id="comm-page-synth-quick-options" style="margin-bottom: 16px;">
+                  <span class="synth-sources-hint" id="comm-page-synth-sources-hint" style="font-size: 12px; color: var(--text-secondary);">Analyse comparative complète de tous les commentaires indexés pour cette péricope</span>
+                </div>
+
+                <!-- Bouton de lancement -->
+                <button class="btn-primary synth-launch-btn" id="btn-comm-page-launch-synth" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 38px; font-size: 13px; font-weight: 700; width: 100%; max-width: 320px; margin: 0 auto 10px auto;">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                  <span id="btn-comm-page-launch-synth-text">Lancer la synthèse IA</span>
+                </button>
+
+                <!-- État de chargement / progression animée -->
+                <div class="synth-loading-box hidden" id="comm-page-synth-loading-box" style="padding: 40px 20px; text-align: center;">
+                  <div class="synth-spinner" style="width: 32px; height: 32px; border-width: 3px; margin: 0 auto 14px auto;"></div>
+                  <div class="synth-step-status" id="comm-page-synth-step-status" style="font-size: 13.5px; font-weight: 600; color: var(--accent-blue);">Extraction de tous les commentaires bibliques...</div>
+                </div>
+
+                <!-- Résultat de la synthèse plein format -->
+                <div class="synth-result-container hidden" id="comm-page-synth-result-container" style="display: flex; flex-direction: column; gap: 16px;">
+                  <div class="synth-meta-bar" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+                    <div class="synth-meta-info" style="display: flex; align-items: center; gap: 8px;">
+                      <span class="synth-model-tag" id="comm-page-synth-model-tag" style="background: rgba(79, 70, 229, 0.12); color: #6366F1; font-weight: 700; padding: 3px 8px; border-radius: 4px; font-size: 11px;">Gemini 3.7 Flash</span>
+                      <span class="synth-sources-count-tag" id="comm-page-synth-sources-tag" style="background: var(--bg-subtle); color: var(--text-secondary); padding: 3px 8px; border-radius: 4px; font-size: 11px;">Sources</span>
+                    </div>
+                    <div class="synth-actions-group" style="display: flex; align-items: center; gap: 8px;">
+                      <button class="comm-action-btn-pill" id="btn-comm-page-edit-synth-range" title="Modifier la plage de versets">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                        <span id="lbl-comm-page-edit-range">Plage</span>
+                      </button>
+                      <button class="comm-action-btn-pill" id="btn-comm-page-copy-synth" title="Copier la synthèse">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                        <span>Copier</span>
+                      </button>
+                      <button class="comm-action-btn-pill" id="btn-comm-page-export-synth-note" title="Enregistrer dans les notes">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                        <span>Vers note</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="comm-view-reading-body" id="comm-page-synth-markdown-content"></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

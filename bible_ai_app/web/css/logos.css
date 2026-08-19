@@ -7068,6 +7068,30 @@ body.palette-dark-warm .ctx-submenu {
   margin: 0 auto;
 }
 
+/* SYNTHÈSE IA PLEINE PAGE DÉDIÉE */
+.comm-page-synth-card {
+  padding: 0 !important;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+
+.comm-synth-pill {
+  border-color: rgba(99, 102, 241, 0.3) !important;
+}
+
+.comm-synth-pill:hover {
+  border-color: #6366F1 !important;
+}
+
+.comm-synth-pill.active {
+  background: linear-gradient(135deg, #4F46E5, #7C3AED) !important;
+  border-color: #4F46E5 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4) !important;
+}
+
+
 
 
 

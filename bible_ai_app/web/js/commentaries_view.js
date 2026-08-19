@@ -2,7 +2,7 @@
  * Commentaries View Controller
  * Gère la page dédiée plein écran aux commentaires exégétiques :
  * navigation fluide par verset (◀ ▶ ou saisie), sélection typographique par auteur,
- * traduction IA en français avec cache, synthèse IA multi-auteurs, copie et export vers les notes.
+ * traduction IA en français avec cache, synthèse IA multi-auteurs intégrée sur la page, copie et export vers les notes.
  */
 
 const CommentariesView = {
@@ -17,19 +17,52 @@ const CommentariesView = {
   showTranslatedVersion: {},
   isLoading: false,
 
+  // Mode Synthèse IA sur la page
+  isSynthMode: false,
+  synthVerseStart: 1,
+  synthVerseEnd: 1,
+  synthMaxVersesLimit: 5,
+  latestSynthesisMarkdown: '',
+
   // Éléments du DOM
   searchInput: null,
   btnSearch: null,
   btnPrev: null,
   btnNext: null,
   btnBackBible: null,
-  btnSynth: null,
+  btnSynthHeader: null,
   verseBannerRef: null,
   verseBannerBible: null,
   verseBannerText: null,
   authorsTabsContainer: null,
+  articleContainer: null,
   articleContent: null,
   countBadge: null,
+
+  // Éléments Synthèse IA
+  synthPanel: null,
+  synthPassageBadge: null,
+  synthRangeBook: null,
+  synthStartInput: null,
+  synthEndInput: null,
+  synthRangeInfo: null,
+  synthCeilingWarning: null,
+  synthCeilingLimitNum: null,
+  synthSourcesHint: null,
+  btnLaunchSynth: null,
+  synthLoadingBox: null,
+  synthStepStatus: null,
+  synthResultContainer: null,
+  synthModelTag: null,
+  synthSourcesTag: null,
+  synthMarkdownContent: null,
+  btnCloseSynth: null,
+  btnEditSynthRange: null,
+  lblEditSynthRange: null,
+  btnCopySynth: null,
+  btnExportSynthNote: null,
+  synthRangeControls: null,
+  synthQuickOptions: null,
 
   init() {
     this.searchInput = document.getElementById('comm-view-search-input');
@@ -37,13 +70,39 @@ const CommentariesView = {
     this.btnPrev = document.getElementById('btn-comm-view-prev');
     this.btnNext = document.getElementById('btn-comm-view-next');
     this.btnBackBible = document.getElementById('btn-comm-view-back-bible');
-    this.btnSynth = document.getElementById('btn-comm-view-synth');
+    this.btnSynthHeader = document.getElementById('btn-comm-view-synth');
     this.verseBannerRef = document.getElementById('comm-view-verse-ref');
     this.verseBannerBible = document.getElementById('comm-view-verse-bible-name');
     this.verseBannerText = document.getElementById('comm-view-verse-text');
     this.authorsTabsContainer = document.getElementById('comm-view-author-tabs');
+    this.articleContainer = document.getElementById('comm-view-article-container');
     this.articleContent = document.getElementById('comm-view-article-content');
     this.countBadge = document.getElementById('comm-view-count-badge');
+
+    // Synthèse IA DOM
+    this.synthPanel = document.getElementById('comm-page-synth-container');
+    this.synthPassageBadge = document.getElementById('comm-page-synth-passage-badge');
+    this.synthRangeBook = document.getElementById('comm-page-synth-range-book');
+    this.synthStartInput = document.getElementById('comm-page-synth-verse-start');
+    this.synthEndInput = document.getElementById('comm-page-synth-verse-end');
+    this.synthRangeInfo = document.getElementById('comm-page-synth-range-info');
+    this.synthCeilingWarning = document.getElementById('comm-page-synth-ceiling-warning');
+    this.synthCeilingLimitNum = document.getElementById('comm-page-synth-ceiling-limit-num');
+    this.synthSourcesHint = document.getElementById('comm-page-synth-sources-hint');
+    this.btnLaunchSynth = document.getElementById('btn-comm-page-launch-synth');
+    this.synthLoadingBox = document.getElementById('comm-page-synth-loading-box');
+    this.synthStepStatus = document.getElementById('comm-page-synth-step-status');
+    this.synthResultContainer = document.getElementById('comm-page-synth-result-container');
+    this.synthModelTag = document.getElementById('comm-page-synth-model-tag');
+    this.synthSourcesTag = document.getElementById('comm-page-synth-sources-tag');
+    this.synthMarkdownContent = document.getElementById('comm-page-synth-markdown-content');
+    this.btnCloseSynth = document.getElementById('btn-close-comm-page-synth');
+    this.btnEditSynthRange = document.getElementById('btn-comm-page-edit-synth-range');
+    this.lblEditSynthRange = document.getElementById('lbl-comm-page-edit-range');
+    this.btnCopySynth = document.getElementById('btn-comm-page-copy-synth');
+    this.btnExportSynthNote = document.getElementById('btn-comm-page-export-synth-note');
+    this.synthRangeControls = document.getElementById('comm-page-synth-range-controls');
+    this.synthQuickOptions = document.getElementById('comm-page-synth-quick-options');
 
     // 1. Événements de recherche et navigation
     this.btnSearch?.addEventListener('click', () => this.handleSearch());
@@ -63,8 +122,35 @@ const CommentariesView = {
     });
 
     // 3. Synthèse IA
-    this.btnSynth?.addEventListener('click', () => {
-      this.openAISynthesis();
+    this.btnSynthHeader?.addEventListener('click', () => {
+      if (this.isSynthMode) {
+        this.closeAISynthesis();
+      } else {
+        this.openAISynthesis();
+      }
+    });
+
+    this.btnCloseSynth?.addEventListener('click', () => {
+      this.closeAISynthesis();
+    });
+
+    this.btnLaunchSynth?.addEventListener('click', () => {
+      this.launchAISynthesis();
+    });
+
+    this.synthStartInput?.addEventListener('input', () => this.handleSynthRangeChange());
+    this.synthEndInput?.addEventListener('input', () => this.handleSynthRangeChange());
+
+    this.btnEditSynthRange?.addEventListener('click', () => {
+      this.toggleSynthRangeEdit();
+    });
+
+    this.btnCopySynth?.addEventListener('click', () => {
+      this.copySynthesis();
+    });
+
+    this.btnExportSynthNote?.addEventListener('click', () => {
+      this.exportSynthesisToNote();
     });
 
     // 4. Raccourcis clavier (flèches gauche/droite pour versets)
@@ -111,7 +197,7 @@ const CommentariesView = {
     if (nextV < 1) {
       if (nextCh > 1) {
         nextCh -= 1;
-        nextV = 1; // Simplifié : début de chapitre précédent
+        nextV = 1; // Début du chapitre précédent
       } else {
         App.showToast('Début du livre');
         return;
@@ -201,7 +287,6 @@ const CommentariesView = {
         if (chapterData && chapterData.verses) {
           const vObj = chapterData.verses.find(v => parseInt(v.verse) === this.currentVerse);
           if (vObj && this.verseBannerText) {
-            // Nettoyer les balises éventuelles pour le bandeau d'en-tête
             const plainText = (vObj.text || '').replace(/<[^>]*>/g, '').trim();
             this.verseBannerText.textContent = `« ${plainText} »`;
           }
@@ -226,6 +311,13 @@ const CommentariesView = {
         CommentaryViewer.currentVerse = this.currentVerse;
         CommentaryViewer.currentVerseRef = refString;
         CommentaryViewer.currentComments = this.currentComments;
+      }
+
+      // Si le mode synthèse était actif, synchroniser la plage avec le nouveau verset
+      if (this.isSynthMode) {
+        this.synthVerseStart = this.currentVerse;
+        this.synthVerseEnd = this.currentVerse;
+        this.updateSynthRangeDisplay();
       }
 
       this.render();
@@ -254,6 +346,19 @@ const CommentariesView = {
       return;
     }
 
+    // Pilule spéciale "Synthèse IA"
+    const synthPill = document.createElement('button');
+    synthPill.className = `comm-author-pill comm-synth-pill ${this.isSynthMode ? 'active' : ''}`;
+    synthPill.innerHTML = `
+      <span class="comm-pill-avatar" style="background: linear-gradient(135deg, #6366F1, #8B5CF6); font-size: 11px;">✨</span>
+      <span class="comm-pill-name">Synthèse IA</span>
+      <span class="comm-pill-period">Tous commentateurs</span>
+    `;
+    synthPill.addEventListener('click', () => {
+      this.openAISynthesis();
+    });
+    this.authorsTabsContainer.appendChild(synthPill);
+
     // Trouver l'index du commentaire correspondant à preferredAuthor
     let targetIndex = 0;
     if (this.preferredAuthor) {
@@ -273,7 +378,7 @@ const CommentariesView = {
       const sourceMeta = this.getSourceMeta(authorName);
 
       const pill = document.createElement('button');
-      pill.className = `comm-author-pill ${idx === this.activeIndex ? 'active' : ''}`;
+      pill.className = `comm-author-pill ${(!this.isSynthMode && idx === this.activeIndex) ? 'active' : ''}`;
       pill.setAttribute('data-author-idx', idx);
 
       pill.innerHTML = `
@@ -283,14 +388,18 @@ const CommentariesView = {
       `;
 
       pill.addEventListener('click', () => {
+        if (this.isSynthMode) {
+          this.closeAISynthesis();
+        }
         this.selectCommentary(idx);
       });
 
       this.authorsTabsContainer.appendChild(pill);
     });
 
-    // Afficher le commentaire sélectionné
-    this.selectCommentary(this.activeIndex);
+    if (!this.isSynthMode) {
+      this.selectCommentary(this.activeIndex);
+    }
   },
 
   selectCommentary(index) {
@@ -301,10 +410,20 @@ const CommentariesView = {
     const authorName = comm.author || comm.source || 'Commentaire';
     this.preferredAuthor = authorName;
 
+    // S'assurer que le panneau d'article est affiché et le panneau synthèse masqué
+    this.articleContainer?.classList.remove('hidden');
+    this.synthPanel?.classList.add('hidden');
+    this.btnSynthHeader?.classList.remove('active');
+
     // Mettre à jour l'état actif des pilules
     if (this.authorsTabsContainer) {
-      this.authorsTabsContainer.querySelectorAll('.comm-author-pill').forEach((pill, idx) => {
-        pill.classList.toggle('active', idx === index);
+      this.authorsTabsContainer.querySelectorAll('.comm-author-pill').forEach((pill) => {
+        const pIdx = pill.getAttribute('data-author-idx');
+        if (pIdx !== null) {
+          pill.classList.toggle('active', parseInt(pIdx) === index);
+        } else {
+          pill.classList.remove('active');
+        }
       });
     }
 
@@ -331,7 +450,7 @@ const CommentariesView = {
         translationBannerHtml = `
           <div class="comm-view-trans-banner">
             <span class="comm-trans-badge-text">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"/></svg>
               <span>Traduction fidèle en français (générée par IA)</span>
             </span>
             <button class="comm-trans-toggle-btn" id="btn-comm-view-toggle-orig">Voir la version originale</button>
@@ -366,7 +485,7 @@ const CommentariesView = {
           <div class="comm-author-top-actions">
             ${isForeign && !cachedTranslation ? `
               <button class="comm-action-btn-pill" id="btn-comm-view-translate-btn" title="Traduire cet article en français avec l'IA">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"/></svg>
                 <span>Traduire en français</span>
               </button>
             ` : ''}
@@ -434,6 +553,258 @@ const CommentariesView = {
     }
   },
 
+  /* ======================================================= */
+  /* GESTION COMPLÈTE DE LA SYNTHÈSE IA SUR LA PAGE DÉDIÉE   */
+  /* ======================================================= */
+
+  async openAISynthesis() {
+    this.isSynthMode = true;
+
+    // Masquer l'article individuel, afficher le panneau synthèse pleine page
+    this.articleContainer?.classList.add('hidden');
+    this.synthPanel?.classList.remove('hidden');
+    this.btnSynthHeader?.classList.add('active');
+
+    // Mettre à jour l'état actif des pilules
+    if (this.authorsTabsContainer) {
+      this.authorsTabsContainer.querySelectorAll('.comm-author-pill').forEach(pill => {
+        pill.classList.toggle('active', pill.classList.contains('comm-synth-pill'));
+      });
+    }
+
+    // Récupérer le réglage du plafond max depuis la config
+    try {
+      const cfg = await API.getSettings();
+      if (cfg && cfg.synthesis_max_verses) {
+        this.synthMaxVersesLimit = parseInt(cfg.synthesis_max_verses, 10) || 5;
+      }
+    } catch (e) {}
+
+    if (this.synthCeilingLimitNum) {
+      this.synthCeilingLimitNum.textContent = this.synthMaxVersesLimit;
+    }
+
+    this.synthVerseStart = this.currentVerse;
+    this.synthVerseEnd = this.currentVerse;
+
+    if (this.synthStartInput) this.synthStartInput.value = this.synthVerseStart;
+    if (this.synthEndInput) this.synthEndInput.value = this.synthVerseEnd;
+
+    this.updateSynthRangeDisplay();
+
+    // Si nous n'avons pas encore de résultat pour ce passage exact, afficher la configuration
+    if (!this.latestSynthesisMarkdown) {
+      this.showSynthConfigMode();
+    }
+  },
+
+  closeAISynthesis() {
+    this.isSynthMode = false;
+    this.synthPanel?.classList.add('hidden');
+    this.btnSynthHeader?.classList.remove('active');
+    this.selectCommentary(this.activeIndex);
+  },
+
+  handleSynthRangeChange() {
+    if (!this.synthStartInput || !this.synthEndInput) return;
+
+    let vStart = parseInt(this.synthStartInput.value, 10) || 1;
+    let vEnd = parseInt(this.synthEndInput.value, 10) || vStart;
+
+    if (vStart < 1) vStart = 1;
+    if (vEnd < 1) vEnd = 1;
+
+    let vMin = Math.min(vStart, vEnd);
+    let vMax = Math.max(vStart, vEnd);
+
+    const span = (vMax - vMin + 1);
+
+    if (span > this.synthMaxVersesLimit) {
+      vMax = vMin + this.synthMaxVersesLimit - 1;
+      this.synthEndInput.value = vMax;
+      this.synthCeilingWarning?.classList.remove('hidden');
+    } else {
+      this.synthCeilingWarning?.classList.add('hidden');
+    }
+
+    this.synthVerseStart = vMin;
+    this.synthVerseEnd = vMax;
+    this.updateSynthRangeDisplay();
+  },
+
+  updateSynthRangeDisplay() {
+    const span = (this.synthVerseEnd - this.synthVerseStart + 1);
+    const refStr = span === 1
+      ? `${this.currentBookFrench} ${this.currentChapter}:${this.synthVerseStart}`
+      : `${this.currentBookFrench} ${this.currentChapter}:${this.synthVerseStart}-${this.synthVerseEnd}`;
+
+    if (this.synthRangeBook) this.synthRangeBook.textContent = `${this.currentBookFrench} ${this.currentChapter}:`;
+    if (this.synthPassageBadge) this.synthPassageBadge.textContent = refStr;
+    if (this.synthRangeInfo) this.synthRangeInfo.textContent = span === 1 ? '1 verset' : `${span} versets (max: ${this.synthMaxVersesLimit})`;
+
+    if (this.synthSourcesHint) {
+      const commsCount = (this.currentComments && this.currentComments.length) || 'Plusieurs';
+      this.synthSourcesHint.textContent = `~${commsCount} sources indexées pour ce passage`;
+    }
+  },
+
+  showSynthConfigMode() {
+    this.synthRangeControls?.classList.remove('hidden');
+    this.synthQuickOptions?.classList.remove('hidden');
+    this.btnLaunchSynth?.classList.remove('hidden');
+    this.synthLoadingBox?.classList.add('hidden');
+    this.synthResultContainer?.classList.add('hidden');
+    if (this.lblEditSynthRange) this.lblEditSynthRange.textContent = 'Plage';
+  },
+
+  toggleSynthRangeEdit() {
+    const isShowingResult = !this.synthResultContainer?.classList.contains('hidden');
+    const isRangeVisible = !this.synthRangeControls?.classList.contains('hidden');
+
+    if (isRangeVisible && isShowingResult) {
+      // Masquer la plage, afficher seulement le résultat
+      this.synthRangeControls?.classList.add('hidden');
+      this.synthQuickOptions?.classList.add('hidden');
+      this.btnLaunchSynth?.classList.add('hidden');
+      if (this.lblEditSynthRange) this.lblEditSynthRange.textContent = 'Plage';
+    } else {
+      // Afficher les contrôles de plage pour ajuster et relancer
+      this.synthRangeControls?.classList.remove('hidden');
+      this.synthQuickOptions?.classList.remove('hidden');
+      this.btnLaunchSynth?.classList.remove('hidden');
+      if (this.lblEditSynthRange) this.lblEditSynthRange.textContent = 'Résultat';
+    }
+  },
+
+  async launchAISynthesis() {
+    if (!this.btnLaunchSynth) return;
+
+    this.btnLaunchSynth.disabled = true;
+    this.synthLoadingBox?.classList.remove('hidden');
+    this.synthResultContainer?.classList.add('hidden');
+
+    if (this.synthStepStatus) {
+      this.synthStepStatus.textContent = 'Extraction de tous les commentaires bibliques...';
+    }
+
+    const t1 = setTimeout(() => {
+      if (this.synthStepStatus) this.synthStepStatus.textContent = 'Formatage des sources et analyse théologique...';
+    }, 900);
+
+    const t2 = setTimeout(() => {
+      if (this.synthStepStatus) this.synthStepStatus.textContent = 'Génération de la synthèse comparative par IA...';
+    }, 2400);
+
+    try {
+      const res = await API.synthesizeCommentaries(
+        this.currentBook,
+        this.currentChapter,
+        this.synthVerseStart,
+        this.synthVerseEnd
+      );
+
+      clearTimeout(t1);
+      clearTimeout(t2);
+
+      if (res && res.success) {
+        this.latestSynthesisMarkdown = res.synthesis || '';
+        this.renderSynthesisResult(res);
+      } else {
+        App.showError('Erreur Synthèse IA', res?.error || 'Impossible de générer la synthèse.');
+      }
+    } catch (err) {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      App.showError('Erreur Réseau IA', err?.message || String(err));
+    } finally {
+      this.btnLaunchSynth.disabled = false;
+      this.synthLoadingBox?.classList.add('hidden');
+    }
+  },
+
+  renderSynthesisResult(data) {
+    if (this.synthModelTag) this.synthModelTag.textContent = data.model_used || 'Gemini 3.7 Flash';
+    if (this.synthSourcesTag) this.synthSourcesTag.textContent = `${data.sources_count || (this.currentComments?.length || 0)} sources`;
+
+    if (this.synthMarkdownContent) {
+      this.synthMarkdownContent.innerHTML = this.formatSynthesisMarkdown(data.synthesis || '');
+    }
+
+    // Masquer les champs de saisie pour n'afficher que la synthèse en grand format
+    this.synthRangeControls?.classList.add('hidden');
+    this.synthQuickOptions?.classList.add('hidden');
+    this.btnLaunchSynth?.classList.add('hidden');
+    this.synthResultContainer?.classList.remove('hidden');
+    if (this.lblEditSynthRange) this.lblEditSynthRange.textContent = 'Plage';
+  },
+
+  formatSynthesisMarkdown(text) {
+    if (!text) return '<p class="empty-hint">Aucun contenu généré.</p>';
+
+    const svgIcon = `<svg class="synth-cite-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:3px;"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path><path d="M6 6h10"></path><path d="M6 10h10"></path></svg>`;
+
+    let processed = text;
+
+    // Remplacer les balises explicites {sources: A, B}
+    processed = processed.replace(/\{sources:\s*([^\}]+)\}/gi, (match, raw) => {
+      const sources = raw.split(',').map(s => s.trim().replace(/[\[\]]/g, '')).filter(Boolean);
+      return ` <span class="synth-cite-pill" style="display:inline-flex; align-items:center; gap:3px; background:rgba(2, 132, 199, 0.12); color:var(--accent-blue); padding:1px 6px; border-radius:10px; font-size:10.5px; font-weight:700;">${svgIcon}<span>${sources.length} sources</span></span>`;
+    });
+
+    // Supprimer les crochets autour des auteurs
+    processed = processed.replace(/\*{0,2}\[([a-zA-Z0-9\.\'\s\(\)\-éèêëàâäôöûüçÉÈÊËÀÂÄÔÖÛÜÇ]+)\]\*{0,2}/g, '**$1**');
+
+    let html = processed
+      .replace(/^### (.*$)/gim, '<h3 class="comm-body-h3" style="color:var(--accent-blue); margin: 20px 0 8px 0; font-size: 16px;">$1</h3>')
+      .replace(/^## (.*$)/gim, '<h2 class="comm-body-h2" style="color:var(--accent-blue); margin: 24px 0 12px 0; font-size: 18px; border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">$1</h2>')
+      .replace(/^# (.*$)/gim, '<h1 class="comm-body-h1" style="color:var(--accent-blue); margin: 28px 0 14px 0; font-size: 22px;">$1</h1>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/^> (.*$)/gim, '<blockquote class="comm-body-quote" style="border-left: 3px solid var(--accent-blue); background: var(--bg-subtle); padding: 10px 16px; margin: 14px 0; border-radius: 0 6px 6px 0; font-style: italic; color: var(--text-secondary);">$1</blockquote>')
+      .replace(/^[\*\-] (.*$)/gim, '<li class="comm-body-li" style="margin-left: 24px; margin-bottom: 6px;">$1</li>')
+      .replace(/^\d+\. (.*$)/gim, '<li class="comm-body-li" style="margin-left: 24px; margin-bottom: 6px;">$1</li>')
+      .replace(/\n\n/g, '<br><br>');
+
+    return `<div class="rendered-synth" style="font-family: var(--font-bible, serif); font-size: var(--bible-font-size-base, 17px); line-height: 1.8;">${html}</div>`;
+  },
+
+  copySynthesis() {
+    const span = (this.synthVerseEnd - this.synthVerseStart + 1);
+    const refStr = span === 1
+      ? `${this.currentBookFrench} ${this.currentChapter}:${this.synthVerseStart}`
+      : `${this.currentBookFrench} ${this.currentChapter}:${this.synthVerseStart}-${this.synthVerseEnd}`;
+
+    const textToCopy = `[Synthèse Exégétique IA - ${refStr}]\n\n${this.latestSynthesisMarkdown}`;
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      App.showToast('Synthèse copiée dans le presse-papier !');
+    }).catch(err => {
+      console.error('Erreur copie:', err);
+      App.showToast('Impossible de copier la synthèse');
+    });
+  },
+
+  exportSynthesisToNote() {
+    const span = (this.synthVerseEnd - this.synthVerseStart + 1);
+    const refStr = span === 1
+      ? `${this.currentBookFrench} ${this.currentChapter}:${this.synthVerseStart}`
+      : `${this.currentBookFrench} ${this.currentChapter}:${this.synthVerseStart}-${this.synthVerseEnd}`;
+
+    const noteTitle = `Synthèse Exégétique — ${refStr}`;
+    const noteContent = `## Synthèse Comparative des Commentaires sur ${refStr}\n\n> « ${(this.verseBannerText?.textContent || '').replace(/[«»]/g, '').trim()} » (${refStr})\n\n${this.latestSynthesisMarkdown}\n`;
+
+    App.switchView('notes');
+    if (typeof NotesView !== 'undefined') {
+      NotesView.createNewNote(refStr, noteTitle);
+      if (NotesView.contentInput) {
+        NotesView.contentInput.innerText = noteContent;
+      }
+      if (NotesView.currentNote) {
+        NotesView.currentNote.content = noteContent;
+      }
+      App.showToast(`Synthèse enregistrée dans vos notes pour ${refStr} !`);
+    }
+  },
+
   async translateActiveCommentary() {
     const comm = this.currentComments[this.activeIndex];
     if (!comm || !comm.text) return;
@@ -453,7 +824,6 @@ const CommentariesView = {
         this.translationCache[itemId] = res.translated_text;
         this.showTranslatedVersion[itemId] = true;
         
-        // Mettre à jour aussi dans CommentaryViewer
         if (typeof CommentaryViewer !== 'undefined') {
           CommentaryViewer.translationCache[itemId] = res.translated_text;
           CommentaryViewer.showTranslatedVersion[itemId] = true;
@@ -465,7 +835,7 @@ const CommentariesView = {
         App.showError('Erreur de Traduction', res?.error || 'Impossible de traduire l\'article.');
         if (btn) {
           btn.disabled = false;
-          btn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"/></svg><span>Réessayer</span>';
+          btn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>Réessayer</span>';
         }
       }
     } catch (e) {
@@ -492,22 +862,6 @@ const CommentariesView = {
         NotesView.currentNote.content = noteContent;
       }
       App.showToast(`Nouvelle note créée pour ${refStr} !`);
-    }
-  },
-
-  openAISynthesis() {
-    if (typeof CommentarySynthesizerUI !== 'undefined') {
-      const vStart = document.getElementById('synth-verse-start');
-      const vEnd = document.getElementById('synth-verse-end');
-      if (vStart) vStart.value = this.currentVerse;
-      if (vEnd) vEnd.value = this.currentVerse;
-      
-      App.switchView('bible');
-      const drawer = document.getElementById('right-drawer');
-      drawer?.classList.remove('collapsed');
-      document.getElementById('btn-toggle-right-drawer')?.classList.add('active');
-      document.querySelector('.drawer-tab[data-drawer-tab="commentaries"]')?.click();
-      document.getElementById('btn-open-comm-synth')?.click();
     }
   },
 
