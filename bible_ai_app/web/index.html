@@ -412,45 +412,57 @@
               </div>
 
               <!-- 4. Fond des Fenêtres de Lecture (Indépendant) -->
-              <div style="margin-top: 18px;">
-                <label style="font-weight: 600; margin-bottom: 8px; display: block;">Fond des fenêtres de lecture (Bible, commentaires, notes, dictionnaire) :</label>
+              <!-- 4. Fond des Fenêtres de Lecture (Indépendant) -->
+              <div style="margin-top: 20px;">
+                <label style="font-weight: 600; margin-bottom: 10px; display: block;">Fond des fenêtres de lecture (Bible, commentaires, notes, dictionnaire) :</label>
                 <div class="reading-bg-grid">
                   <!-- Auto -->
                   <div class="reading-bg-card active" data-reading-bg="auto">
-                    <div class="reading-bg-preview-box" style="background: linear-gradient(135deg, #0f172a 50%, #ffffff 50%); border-color: var(--border-color);">🎨</div>
+                    <div class="reading-bg-circle swatch-auto">
+                      <span class="quick-swatch-check">✓</span>
+                    </div>
                     <div class="reading-bg-label">Harmonisé</div>
                     <div class="reading-bg-sub">Thème général</div>
                   </div>
 
                   <!-- Blanc -->
                   <div class="reading-bg-card" data-reading-bg="white">
-                    <div class="reading-bg-preview-box" style="background: #ffffff; color: #1e293b; border-color: #cbd5e1;">⚪</div>
+                    <div class="reading-bg-circle swatch-white">
+                      <span class="quick-swatch-check">✓</span>
+                    </div>
                     <div class="reading-bg-label">Blanc Pur</div>
                     <div class="reading-bg-sub">Net & Lumineux</div>
                   </div>
 
                   <!-- Sépia -->
                   <div class="reading-bg-card" data-reading-bg="sepia">
-                    <div class="reading-bg-preview-box" style="background: #fbf0d9; color: #382e25; border-color: #d8c7ad;">📜</div>
+                    <div class="reading-bg-circle swatch-sepia">
+                      <span class="quick-swatch-check">✓</span>
+                    </div>
                     <div class="reading-bg-label">Sépia Doux</div>
                     <div class="reading-bg-sub">Confort Liseuse</div>
                   </div>
 
                   <!-- Très Sombre -->
                   <div class="reading-bg-card" data-reading-bg="dark">
-                    <div class="reading-bg-preview-box" style="background: #070a0f; color: #f1f5f9; border-color: #334155;">🌑</div>
+                    <div class="reading-bg-circle swatch-dark">
+                      <span class="quick-swatch-check">✓</span>
+                    </div>
                     <div class="reading-bg-label">Très Sombre</div>
                     <div class="reading-bg-sub">Nuit Profonde</div>
                   </div>
                 </div>
               </div>
 
-              <div class="form-divider"></div>
+              <!-- Séparateur Typographie -->
+              <div class="form-divider" style="margin: 24px 0 20px 0;"></div>
 
-              <!-- Typographie & Sliders -->
-              <div class="form-group">
-                <label>Police du texte biblique :</label>
-                <select id="cfg-font-family" class="select-field full-w font-preview-select">
+              <div class="card-title" style="margin-bottom: 16px;">Typographie & Mise en Page du Texte</div>
+
+              <!-- Police de lecture avec espacement aéré -->
+              <div class="form-group" style="margin-bottom: 24px;">
+                <label style="font-weight: 600; margin-bottom: 8px; display: block;">Police du texte biblique :</label>
+                <select id="cfg-font-family" class="select-field full-w font-preview-select" style="height: 38px;">
                   <option value="EB Garamond" style="font-family: 'EB Garamond', serif; font-size: 15px; font-weight: 600;">EB Garamond (Serif Éditorial)</option>
                   <option value="Lora" style="font-family: 'Lora', serif; font-size: 15px; font-weight: 500;">Lora (Serif Moderne)</option>
                   <option value="Literata" style="font-family: 'Literata', serif; font-size: 15px; font-weight: 500;">Literata (Édition & Littéraire)</option>
@@ -461,15 +473,16 @@
                 </select>
               </div>
 
-              <div class="form-slider-row">
-                <label>Taille de police :</label>
-                <input type="range" id="cfg-font-size" min="14" max="32" value="19" class="slider-field">
+              <!-- Sliders bien espacés -->
+              <div class="form-slider-row" style="margin-bottom: 18px;">
+                <label style="font-weight: 500; font-size: 13px; min-width: 140px;">Taille de police :</label>
+                <input type="range" id="cfg-font-size" min="14" max="32" value="19" class="slider-field" style="flex: 1;">
                 <span class="slider-badge" id="lbl-font-size-val">19 pt</span>
               </div>
 
-              <div class="form-slider-row">
-                <label>Interlignage :</label>
-                <input type="range" id="cfg-line-spacing" min="0" max="20" value="6" class="slider-field">
+              <div class="form-slider-row" style="margin-bottom: 10px;">
+                <label style="font-weight: 500; font-size: 13px; min-width: 140px;">Interlignage :</label>
+                <input type="range" id="cfg-line-spacing" min="0" max="20" value="6" class="slider-field" style="flex: 1;">
                 <span class="slider-badge" id="lbl-line-spacing-val">6 px</span>
               </div>
             </div>

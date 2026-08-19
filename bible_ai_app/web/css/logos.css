@@ -3689,16 +3689,22 @@ input:checked + .slider.round:before {
   background: var(--bg-active);
 }
 
-/* Pastille ronde coupée en deux en diagonale 135° */
+/* Pastille ronde coupée en deux en diagonale 135° - STRICTEMENT RONDE */
 .palette-circle-split {
-  width: 38px;
-  height: 38px;
-  min-width: 38px;
-  border-radius: 50%;
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  max-width: 36px !important;
+  max-height: 36px !important;
+  border-radius: 50% !important;
+  aspect-ratio: 1 / 1 !important;
+  flex-shrink: 0 !important;
   border: 1.5px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
   position: relative;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 /* Mode Sombre : 3 pastilles */
@@ -3767,7 +3773,7 @@ input:checked + .slider.round:before {
 .reading-bg-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  gap: 12px;
   margin-top: 8px;
 }
 
@@ -3777,10 +3783,10 @@ input:checked + .slider.round:before {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 12px 8px;
+  padding: 14px 8px;
   background: var(--bg-card);
   border: 2px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.15s ease;
   text-align: center;
@@ -3797,16 +3803,31 @@ input:checked + .slider.round:before {
   background: var(--bg-active);
 }
 
-.reading-bg-preview-box {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+.reading-bg-circle {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  max-width: 28px !important;
+  max-height: 28px !important;
+  border-radius: 50% !important;
+  aspect-ratio: 1 / 1 !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 800;
+  box-sizing: border-box;
+}
+
+.reading-bg-card .quick-swatch-check {
+  display: none;
+}
+
+.reading-bg-card.active .quick-swatch-check {
+  display: block;
 }
 
 .reading-bg-label {
@@ -3818,6 +3839,44 @@ input:checked + .slider.round:before {
 .reading-bg-sub {
   font-size: 10px;
   color: var(--text-muted);
+}
+
+/* Contrôles de formulaires et curseurs de paramètres */
+.form-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.form-slider-row label {
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.slider-field {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border-color);
+  outline: none;
+  accent-color: var(--accent-blue);
+  cursor: pointer;
+}
+
+.slider-badge {
+  min-width: 50px;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-blue);
+}
+
+.form-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 22px 0 18px 0;
 }
 
 
