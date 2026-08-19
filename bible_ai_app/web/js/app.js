@@ -272,6 +272,42 @@ const App = {
       }
     });
 
+    // Gérer l'affichage des onglets Bible ou du titre contextuel dans la barre supérieure
+    const tabsList = document.getElementById('tabs-list');
+    const btnAddTab = document.getElementById('btn-add-tab');
+    const viewTitlePill = document.getElementById('topbar-view-title-pill');
+    const viewTitleIcon = document.getElementById('topbar-view-title-icon');
+    const viewTitleText = document.getElementById('topbar-view-title-text');
+
+    const VIEW_INFO = {
+      bible: { icon: '📖', title: 'Lecteur Biblique' },
+      theology: { icon: '📚', title: 'Théologie & Ouvrages d\'étude' },
+      commentaries: { icon: '💬', title: 'Commentaires Exégétiques' },
+      dict: { icon: '📖', title: 'Dictionnaires & Lexiques' },
+      maps: { icon: '🗺️', title: 'Cartographie Biblique' },
+      atlas: { icon: '🌍', title: 'Atlas Biblique 3D' },
+      notes: { icon: '📝', title: 'Notes & Prédications' },
+      library: { icon: '🏛️', title: 'Bibliothèque' },
+      settings: { icon: '⚙️', title: 'Paramètres' },
+      search: { icon: '🔍', title: 'Recherche Sémantique' },
+      ai: { icon: '✨', title: 'Assistant IA' }
+    };
+
+    if (viewName === 'bible') {
+      if (tabsList) tabsList.classList.remove('hidden');
+      if (btnAddTab) btnAddTab.classList.remove('hidden');
+      if (viewTitlePill) viewTitlePill.classList.add('hidden');
+    } else {
+      if (tabsList) tabsList.classList.add('hidden');
+      if (btnAddTab) btnAddTab.classList.add('hidden');
+      if (viewTitlePill) {
+        const info = VIEW_INFO[viewName] || { icon: '📖', title: viewName };
+        if (viewTitleIcon) viewTitleIcon.textContent = info.icon;
+        if (viewTitleText) viewTitleText.textContent = info.title;
+        viewTitlePill.classList.remove('hidden');
+      }
+    }
+
     const drawerEl = document.getElementById('right-drawer');
 
     if (viewName === 'library') {

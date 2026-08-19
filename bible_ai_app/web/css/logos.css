@@ -7579,14 +7579,41 @@ body.theme-dark .theol-view-badge {
   box-shadow: 0 4px 10px rgba(79, 70, 229, 0.5);
 }
 
-/* BARRE HYBRIDE SÉLECTEUR OUVRAGE */
-.theol-hybrid-bar {
-  background: var(--bg-card);
-  border-bottom: 1px solid var(--border-color);
-  padding: 8px 16px;
+/* BARRE DE TITRE CONTEXTUELLE DANS LA BARRE SUPÉRIEURE */
+.topbar-view-title-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  user-select: none;
+  -webkit-app-region: no-drag;
+}
+
+.topbar-view-title-icon {
+  font-size: 13px;
+}
+
+.topbar-view-title-text {
+  letter-spacing: 0.2px;
+}
+
+/* EN-TÊTE ÉPURÉ & COMPACT DE LA VUE THÉOLOGIE */
+.theol-view-header {
+  height: 52px;
+  min-height: 52px;
+  padding: 0 16px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
 }
 
@@ -7597,8 +7624,8 @@ body.theme-dark .theol-view-badge {
 .theol-active-book-btn {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 6px 12px;
+  gap: 10px;
+  padding: 5px 12px 5px 8px;
   background: var(--bg-subtle);
   border: 1px solid var(--border-color);
   border-radius: 8px;
@@ -7613,8 +7640,8 @@ body.theme-dark .theol-view-badge {
 }
 
 .theol-book-mini-cover {
-  width: 28px;
-  height: 38px;
+  width: 26px;
+  height: 34px;
   border-radius: 3px;
   box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.25);
   position: relative;
@@ -7630,13 +7657,13 @@ body.theme-dark .theol-view-badge {
   left: 0;
   top: 0;
   bottom: 0;
-  width: 4px;
+  width: 3.5px;
   background: rgba(255, 255, 255, 0.25);
   border-right: 1px solid rgba(0, 0, 0, 0.15);
 }
 
 .theol-book-mini-initials {
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 800;
   color: #ffffff;
   text-shadow: 0 1px 2px rgba(0,0,0,0.5);
@@ -7650,7 +7677,7 @@ body.theme-dark .theol-view-badge {
 }
 
 .theol-active-book-title {
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 700;
   color: var(--text-primary);
   white-space: nowrap;
@@ -7659,7 +7686,7 @@ body.theme-dark .theol-view-badge {
 }
 
 .theol-active-book-meta {
-  font-size: 11px;
+  font-size: 10.5px;
   color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
@@ -7670,16 +7697,16 @@ body.theme-dark .theol-view-badge {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-left: 8px;
+  margin-left: 6px;
 }
 
 .theol-chapters-count-badge {
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 700;
   background: var(--bg-card);
   color: var(--text-secondary);
   border: 1px solid var(--border-color);
-  padding: 2px 6px;
+  padding: 1px 5px;
   border-radius: 4px;
 }
 
@@ -7811,7 +7838,7 @@ body.theme-dark .theol-view-badge {
 .theol-workspace-body {
   display: flex;
   flex: 1;
-  height: calc(100vh - var(--header-height) - var(--toolbar-height) - 52px);
+  height: calc(100vh - var(--header-height) - 52px);
   overflow: hidden;
   position: relative;
 }

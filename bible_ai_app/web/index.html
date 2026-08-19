@@ -53,6 +53,12 @@
         </div>
       </div>
       <button class="btn-new-tab" id="btn-add-tab" title="Ouvrir un nouvel onglet">+</button>
+
+      <!-- Titre contextuel pour les vues hors-Bible (Théologie, Commentaires, etc.) -->
+      <div class="topbar-view-title-pill hidden" id="topbar-view-title-pill">
+        <span class="topbar-view-title-icon" id="topbar-view-title-icon">📚</span>
+        <span class="topbar-view-title-text" id="topbar-view-title-text">Théologie</span>
+      </div>
     </div>
 
     <!-- DROITE : Contrôles de la fenêtre Windows -->
@@ -1776,14 +1782,36 @@
       <!-- ===================================================== -->
       <div class="app-view" id="view-theology">
         <header class="view-header theol-view-header">
-          <div class="view-title-box">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <h1 class="view-title" style="margin: 0;">THÉOLOGIE & OUVRAGES D'ÉTUDE</h1>
-              <span class="theol-view-badge" id="theol-view-count-badge">0 ouvrages</span>
+          <!-- GAUCHE : Sélecteur Principal Déroulant d'Ouvrages Compact -->
+          <div class="theol-main-dropdown-wrapper">
+            <button class="theol-active-book-btn" id="btn-theol-active-selector" title="Cliquer pour choisir un autre ouvrage de théologie">
+              <div class="theol-book-mini-cover" id="theol-active-book-cover" style="background: #0F766E;">
+                <div class="theol-book-mini-spine"></div>
+                <span class="theol-book-mini-initials" id="theol-active-book-initials">TH</span>
+              </div>
+              <div class="theol-active-book-info">
+                <div class="theol-active-book-title" id="theol-active-book-title">Sélectionner un ouvrage</div>
+                <div class="theol-active-book-meta" id="theol-active-book-meta">Auteur • Date</div>
+              </div>
+              <div class="theol-active-book-badge-box">
+                <span class="theol-chapters-count-badge" id="theol-active-chapters-count">0 ch.</span>
+                <span class="theol-dropdown-caret">▾</span>
+              </div>
+            </button>
+
+            <!-- Popover Sélecteur Ouvrages avec Recherche -->
+            <div class="theol-picker-popover hidden" id="theol-picker-popover">
+              <div class="theol-popover-search-row">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.6;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input type="text" id="theol-picker-search-input" class="theol-popover-search-input" placeholder="Filtrer par titre ou auteur...">
+              </div>
+              <div class="theol-picker-list" id="theol-picker-list">
+                <!-- Rempli dynamiquement -->
+              </div>
             </div>
-            <p class="view-subtitle" id="theol-view-subtitle">Théologie systématique, manuels d'introduction, contextes historiques & études thématiques</p>
           </div>
           
+          <!-- DROITE : Outils de Lecture & Navigation -->
           <div class="view-actions theol-view-toolbar-actions">
             <!-- Bouton Afficher / Masquer le Sommaire (TOC) -->
             <button class="tool-btn active" id="btn-theol-toggle-toc" title="Afficher / Masquer la table des matières">
@@ -1893,37 +1921,6 @@
             </button>
           </div>
         </header>
-
-        <div class="theol-hybrid-bar">
-          <!-- Sélecteur Principal Déroulant d'Ouvrages -->
-          <div class="theol-main-dropdown-wrapper">
-            <button class="theol-active-book-btn" id="btn-theol-active-selector" title="Cliquer pour choisir un autre ouvrage de théologie">
-              <div class="theol-book-mini-cover" id="theol-active-book-cover" style="background: #0F766E;">
-                <div class="theol-book-mini-spine"></div>
-                <span class="theol-book-mini-initials" id="theol-active-book-initials">TH</span>
-              </div>
-              <div class="theol-active-book-info">
-                <div class="theol-active-book-title" id="theol-active-book-title">Sélectionner un ouvrage</div>
-                <div class="theol-active-book-meta" id="theol-active-book-meta">Auteur • Date</div>
-              </div>
-              <div class="theol-active-book-badge-box">
-                <span class="theol-chapters-count-badge" id="theol-active-chapters-count">0 ch.</span>
-                <span class="theol-dropdown-caret">▾</span>
-              </div>
-            </button>
-
-            <!-- Popover Sélecteur Ouvrages avec Recherche -->
-            <div class="theol-picker-popover hidden" id="theol-picker-popover">
-              <div class="theol-popover-search-row">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.6;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                <input type="text" id="theol-picker-search-input" class="theol-popover-search-input" placeholder="Filtrer par titre ou auteur...">
-              </div>
-              <div class="theol-picker-list" id="theol-picker-list">
-                <!-- Rempli dynamiquement -->
-              </div>
-            </div>
-          </div>
-        </div>
 
         <!-- DISPOSITION MASTER-DETAIL (TOC GAUCHE + ARTICLE DROITE) -->
         <div class="theol-workspace-body">
