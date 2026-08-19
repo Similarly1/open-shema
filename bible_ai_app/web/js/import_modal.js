@@ -83,6 +83,7 @@ const ImportModal = {
     });
 
     typeInput.addEventListener('change', () => {
+      this.updateResourceTypeUI(typeInput.value);
       if (!this.userModifiedId) {
         idInput.value = generateShortId(titleInput.value, typeInput.value);
       }
@@ -110,6 +111,26 @@ const ImportModal = {
     document.getElementById('btn-ch-rag-only').addEventListener('click', () => this.selectRagOnlyChapters());
 
     this.populateBookDropdown();
+  },
+
+  updateResourceTypeUI(type) {
+    const isBible = type === 'Bible';
+    const banner = document.getElementById('import-bible-banner');
+    const ragCard = document.getElementById('import-rag-card');
+    const chaptersSection = document.getElementById('import-chapters-section');
+    const submitBtn = document.getElementById('btn-submit-import-modal');
+
+    if (banner) banner.classList.toggle('hidden', !isBible);
+    if (ragCard) ragCard.style.display = isBible ? 'none' : '';
+    if (chaptersSection) chaptersSection.style.display = isBible ? 'none' : '';
+
+    if (!this.isEditMode && submitBtn) {
+      if (isBible) {
+        submitBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg><span>Importer la Bible dans la Bibliothèque</span>`;
+      } else {
+        submitBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg><span>Lancer l'Importation & l'Indexation RAG</span>`;
+      }
+    }
   },
 
   populateBookDropdown() {
@@ -157,6 +178,7 @@ const ImportModal = {
       document.getElementById('import-selected-file-label').textContent = this.filePath ? this.filePath.split(/[\\/]/).pop() : 'Fichier existant';
       this.updateCoverPreview(this.coverDataUrl || this.coverPath);
       this.renderChaptersList([]);
+      this.updateResourceTypeUI(book.type || 'Théologie');
     } else {
       modalTitle.textContent = `Importer un Nouvel Ouvrage dans la Bibliothèque`;
       submitBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg><span>Lancer l'Importation & l'Indexation RAG</span>`;
@@ -176,6 +198,7 @@ const ImportModal = {
       document.getElementById('import-selected-file-label').textContent = 'Aucun fichier sélectionné';
       this.updateCoverPreview(null);
       this.renderChaptersList([]);
+      this.updateResourceTypeUI('Théologie');
     }
 
     document.getElementById('right-drawer')?.classList.add('collapsed');
@@ -199,27 +222,41 @@ const ImportModal = {
       this.filePath = res.file_path;
       document.getElementById('import-selected-file-label').textContent = res.file_name;
 
-      // Pré-remplissage avec les informations extraites de l'EPUB ou du fichier
       const info = res.info || {};
+      const isBible = info.type === 'Bible' || info.is_bible;
+
+      if (isBible) {
+        document.getElementById('import-book-type').value = 'Bible';
+        this.updateResourceTypeUI('Bible');
+      } else {
+        if (info.type) document.getElementById('import-book-type').value = info.type;
+        this.updateResourceTypeUI(document.getElementById('import-book-type').value);
+      }
+
+      if (info.short_id) {
+        document.getElementById('import-book-id').value = info.short_id;
+        this.userModifiedId = true;
+      } else if (info.title && !this.userModifiedId) {
+        document.getElementById('import-book-id').value = generateShortId(info.title, document.getElementById('import-book-type').value);
+      }
+
       if (info.title) {
         document.getElementById('import-book-title').value = info.title;
-        if (!this.userModifiedId) {
-          document.getElementById('import-book-id').value = generateShortId(info.title, document.getElementById('import-book-type').value);
-        }
       }
-      if (info.author && !document.getElementById('import-book-author').value) {
+      if (info.author) {
         document.getElementById('import-book-author').value = info.author;
       }
       if (info.description) {
         document.getElementById('import-book-desc').value = cleanHtml(info.description);
       }
-      if (info.year && !document.getElementById('import-book-year').value) {
+      if (info.year) {
         document.getElementById('import-book-year').value = info.year;
       }
-      if (info.cover_data_url || info.cover_path) {
-        this.coverPath = info.cover_path;
-        this.coverDataUrl = info.cover_data_url || info.cover_path;
-        this.updateCoverPreview(this.coverDataUrl);
+      if (info.cover_data_url || info.cover_path || info.cover_url) {
+        const cUrl = info.cover_data_url || info.cover_url || info.cover_path;
+        this.coverPath = cUrl;
+        this.coverDataUrl = cUrl;
+        this.updateCoverPreview(cUrl);
       }
 
       // Remplissage des chapitres
@@ -229,6 +266,10 @@ const ImportModal = {
       } else {
         this.chapters = [];
         this.renderChaptersList([]);
+      }
+
+      if (isBible) {
+        App.showToast(`Bible reconnue : ${info.title || info.short_id} (Format prêt pour le lecteur)`);
       }
 
     } catch (e) {
@@ -549,16 +590,27 @@ const ImportModal = {
       old_name: this.oldBookName
     };
 
+    const isBible = payload.type === 'Bible';
     const submitBtn = document.getElementById('btn-submit-import-modal');
     submitBtn.disabled = true;
-    submitBtn.innerHTML = `<span class="synth-spinner" style="width:12px; height:12px; border-width:2px; vertical-align:middle; margin-right:4px;"></span> <span>Indexation RAG en cours...</span>`;
+    submitBtn.innerHTML = isBible 
+      ? `<span class="synth-spinner" style="width:12px; height:12px; border-width:2px; vertical-align:middle; margin-right:4px;"></span> <span>Conversion & Intégration de la Bible...</span>`
+      : `<span class="synth-spinner" style="width:12px; height:12px; border-width:2px; vertical-align:middle; margin-right:4px;"></span> <span>Indexation RAG en cours...</span>`;
 
     try {
       const res = await API.call('execute_document_import', payload);
       if (res && res.success) {
         this.close();
-        App.showToast(this.isEditMode ? 'Métadonnées enregistrées avec succès !' : `Ouvrage « ${id} » importé et indexé avec succès !`);
+        const successMsg = isBible 
+          ? `📖 Bible « ${payload.title || id} » importée avec succès dans le lecteur biblique (${res.books_count || 'tous les'} livres) !`
+          : (this.isEditMode ? 'Métadonnées enregistrées avec succès !' : `Ouvrage « ${id} » importé et indexé avec succès !`);
+        App.showToast(successMsg);
         LibraryView.loadBooks();
+        if (typeof BibleReader !== 'undefined') {
+          API.getInstalledBibles().then(bList => {
+            BibleReader.installedBibles = bList || [];
+          });
+        }
       } else {
         alert(`Erreur d'import : ${res?.error || 'Erreur inconnue'}`);
       }
@@ -566,9 +618,7 @@ const ImportModal = {
       alert(`Erreur d'importation : ${e}`);
     } finally {
       submitBtn.disabled = false;
-      submitBtn.innerHTML = this.isEditMode 
-        ? `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg><span>Enregistrer les Modifications</span>`
-        : `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg><span>Lancer l'Importation & l'Indexation RAG</span>`;
+      this.updateResourceTypeUI(payload.type);
     }
   }
 };

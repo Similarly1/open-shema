@@ -1443,48 +1443,80 @@ class BibleAppApi:
         ext = os.path.splitext(file_path)[1].lower()
         file_size = os.path.getsize(file_path)
         file_name = os.path.basename(file_path)
+        file_base = os.path.splitext(file_name)[0]
         
+        info = {}
         if ext == '.epub':
             from core.epub_loader import EpubLoader
             try:
                 info = EpubLoader.inspect_epub(file_path)
                 if info.get("cover_path"):
                     info["cover_data_url"] = get_cover_data_url(info["cover_path"])
-                return {
-                    "success": True,
-                    "format": "epub",
-                    "file_path": file_path,
-                    "file_name": file_name,
-                    "file_size": file_size,
-                    "info": info
-                }
             except Exception as e:
                 return {"success": False, "error": f"Erreur inspection EPUB : {e}"}
                 
         elif ext == '.docx':
-            return {
-                "success": True,
-                "format": "docx",
-                "file_path": file_path,
-                "file_name": file_name,
-                "file_size": file_size,
-                "info": {"title": os.path.splitext(file_name)[0], "chapters": []}
-            }
+            info = {"title": file_base, "chapters": []}
             
         elif ext in ['.json', '.csv']:
-            return {
-                "success": True,
-                "format": "json" if ext == '.json' else "csv",
-                "file_path": file_path,
-                "file_name": file_name,
-                "file_size": file_size,
-                "info": {"title": os.path.splitext(file_name)[0], "chapters": []}
-            }
+            info = {"title": file_base, "chapters": []}
+        else:
+            info = {"title": file_base, "chapters": []}
+
+        # Détection automatique de Bible et enrichissement depuis bibles_registry.json
+        raw_title = info.get("title", "")
+        reg_bibles = load_bibles_registry()
+        reg_match = (
+            find_bible_registry_entry(raw_title, reg_bibles) or 
+            find_bible_registry_entry(file_base, reg_bibles) or 
+            find_bible_registry_entry(file_name, reg_bibles)
+        )
+        
+        is_bible_kw = (
+            any(kw in raw_title.lower() for kw in ["bible", "sainte bible", "ancien testament", "nouveau testament", "evangile"]) or 
+            any(kw in file_base.lower() for kw in ["bible", "sainte bible", "nt_", "at_"])
+        )
+        biblical_chapters_count = sum(1 for c in info.get("chapters", []) if c.get("book_code") is not None)
+        is_bible_struct = len(info.get("chapters", [])) >= 20 and biblical_chapters_count >= 15
+        
+        is_bible = reg_match is not None or is_bible_kw or is_bible_struct
+
+        if is_bible:
+            info["type"] = "Bible"
+            info["is_bible"] = True
             
-        return {"success": True, "format": "txt", "file_path": file_path, "file_name": file_name, "file_size": file_size, "info": {}}
+            # Pas de vectorisation RAG pour les Bibles
+            for c in info.get("chapters", []):
+                c["include"] = False
+                
+            if reg_match:
+                info["short_id"] = reg_match.get("code") or file_base.upper()[:6]
+                info["title"] = reg_match.get("nom_officiel") or info.get("title")
+                info["author"] = reg_match.get("editeur") or reg_match.get("auteur") or info.get("author")
+                info["year"] = str(reg_match.get("annee", "")) or str(info.get("year", ""))
+                info["description"] = reg_match.get("description") or info.get("description")
+                info["famille"] = reg_match.get("famille")
+                info["famille_badge_color"] = reg_match.get("famille_badge_color")
+                if not info.get("cover_data_url") and reg_match.get("cover_url"):
+                    info["cover_data_url"] = reg_match.get("cover_url")
+                    info["cover_url"] = reg_match.get("cover_url")
+            else:
+                clean_id = re.sub(r'[^a-zA-Z0-9]', '', file_base).upper()[:8]
+                if "BIBLE" in clean_id and len(clean_id) > 5:
+                    clean_id = clean_id.replace("BIBLE", "")
+                info["short_id"] = clean_id or file_base.upper()[:6]
+
+        return {
+            "success": True,
+            "format": ext.lstrip('.'),
+            "file_path": file_path,
+            "file_name": file_name,
+            "file_size": file_size,
+            "info": info
+        }
 
     def execute_document_import(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        """Exécute l'importation complète et l'indexation RAG d'un ouvrage."""
+        """Exécute l'importation complète et l'indexation RAG d'un ouvrage (ou conversion directe de Bible)."""
         name = payload.get("name", "").strip()
         if not name:
             return {"success": False, "error": "Identifiant obligatoire."}
@@ -1558,7 +1590,44 @@ class BibleAppApi:
             
         ext = os.path.splitext(file_path)[1].lower()
         
-        # Cas 1 : EPUB
+        # Cas 1 : Importation de Bible (Pas de vectorisation RAG !)
+        if metadata.get("type") == "Bible":
+            if ext == '.epub':
+                from core.bible_epub_importer import BibleEpubImporter
+                try:
+                    b_name, b_meta = BibleEpubImporter.import_bible_epub(
+                        file_path, 
+                        custom_name=name, 
+                        custom_metadata=metadata
+                    )
+                    return {"success": True, "name": b_name, "is_bible": True, "books_count": b_meta.get("total_books", 0), "chunks_count": 0}
+                except Exception as e:
+                    logger.error(f"Erreur importation Bible EPUB : {e}", exc_info=True)
+                    return {"success": False, "error": f"Erreur importation Bible EPUB : {e}"}
+            elif ext == '.json':
+                try:
+                    b_name, b_meta = BibleJsonLoader.import_single_bible_json(
+                        file_path,
+                        custom_name=name,
+                        custom_metadata=metadata
+                    )
+                    return {"success": True, "name": b_name, "is_bible": True, "books_count": b_meta.get("total_books", 0), "chunks_count": 0}
+                except Exception as e:
+                    logger.error(f"Erreur importation Bible JSON : {e}", exc_info=True)
+                    return {"success": False, "error": f"Erreur importation Bible JSON : {e}"}
+            elif ext in ['.csv', '.tsv']:
+                try:
+                    b_name, b_meta = BibleJsonLoader.import_bible_csv(
+                        file_path,
+                        custom_name=name,
+                        custom_metadata=metadata
+                    )
+                    return {"success": True, "name": b_name, "is_bible": True, "books_count": b_meta.get("total_books", 0), "chunks_count": 0}
+                except Exception as e:
+                    logger.error(f"Erreur importation Bible CSV : {e}", exc_info=True)
+                    return {"success": False, "error": f"Erreur importation Bible CSV : {e}"}
+
+        # Cas 2 : EPUB Standard Théologie / Commentaires / Ouvrages d'étude (Vectorisation RAG)
         if ext == '.epub':
             from core.epub_loader import EpubLoader
             selected_chapters = payload.get("chapters", [])
@@ -1580,18 +1649,12 @@ class BibleAppApi:
                     
             return {"success": True, "name": name, "chunks_count": len(chunks)}
             
-        # Cas 2 : Dictionnaire / Docx / CSV
+        # Cas 3 : Dictionnaire / Docx / CSV
         elif ext in ['.docx', '.csv']:
             res = DictionaryManager.import_dictionary(file_path)
             registry[name] = metadata
             save_books_metadata(registry)
             return {"success": True, "name": name, "dict_res": res}
-            
-        # Cas 3 : Bible JSON
-        elif ext == '.json':
-            registry[name] = metadata
-            save_books_metadata(registry)
-            return {"success": True, "name": name, "format": "json"}
             
         registry[name] = metadata
         save_books_metadata(registry)

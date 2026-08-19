@@ -574,5 +574,23 @@
     "description": "Traduction anglophone contemporaine majeure à équivalence mot-à-mot, référence mondiale de l'exégèse protestante évangélique.",
     "cover_url": "https://covers.openlibrary.org/b/id/12882583-L.jpg",
     "comparaisons_suggerees": ["NIV", "KJV", "S21", "NBS"]
+  },
+  "LAU": {
+    "code": "LAU",
+    "aliases": ["lausanne", "bible de lausanne", "bible-lausanne", "bible_lausanne", "sainte bible de lausanne", "gaussen", "louis gaussen"],
+    "nom_officiel": "Bible de Lausanne (1872)",
+    "editeur": "Société Biblique de Lausanne / Louis Gaussen",
+    "annee": 1872,
+    "famille": "Protestante",
+    "famille_badge_color": "#059669",
+    "philosophie": "Littérale scrupuleuse / Mot-à-mot philologique",
+    "texte_base_at": "Texte Massorétique (Ben Asher)",
+    "texte_base_nt": "Textus Receptus (Stephanus 1550)",
+    "canon": "Protestant (66 livres)",
+    "statut_droits": "Domaine public",
+    "isbn": "9782853009999",
+    "description": "Révision protestante francophone historique menée à Lausanne sous la direction de Louis Gaussen, réputée pour sa très haute fidélité littérale au texte hébreu et grec.",
+    "cover_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/La_Sainte_Bible%2C_trad._Segond%2C_ed._1910.djvu/page1-500px-La_Sainte_Bible%2C_trad._Segond%2C_ed._1910.djvu.jpg",
+    "comparaisons_suggerees": ["S21", "DARBY", "OST", "LSG", "BDJ"]
   }
 }
