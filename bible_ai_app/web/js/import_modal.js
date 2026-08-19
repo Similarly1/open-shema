@@ -411,12 +411,17 @@ const ImportModal = {
     if (!q) return;
 
     const listEl = document.getElementById('gb-results-list');
-    listEl.innerHTML = `<div style="padding: 30px; text-align: center; color: var(--text-muted); font-size: 12px;">Recherche en direct sur Google Books...</div>`;
+    listEl.innerHTML = `
+      <div style="padding: 30px; text-align: center; color: var(--text-muted); font-size: 12px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+        <div class="theol-spinner" style="width: 20px; height: 20px; border: 2px solid var(--border-color); border-top-color: var(--accent-blue); border-radius: 50%; animation: theolSpin 0.8s linear infinite;"></div>
+        <span>Recherche simultanée en direct sur <strong>Google Books, Open Library, BnF Gallica, Internet Archive et Wikipédia</strong>...</span>
+      </div>
+    `;
 
     try {
       const results = await API.call('search_google_books_metadata', q);
       if (!results || results.length === 0) {
-        listEl.innerHTML = `<div style="padding: 30px; text-align: center; color: var(--text-muted); font-size: 12px;">Aucun résultat Google Books trouvé pour « ${q} ».</div>`;
+        listEl.innerHTML = `<div style="padding: 30px; text-align: center; color: var(--text-muted); font-size: 12px;">Aucun résultat trouvé sur les catalogues en ligne pour « ${q} ».</div>`;
         return;
       }
 
@@ -426,17 +431,24 @@ const ImportModal = {
         card.className = 'gb-result-card';
 
         const thumbHtml = res.cover_url 
-          ? `<img src="${res.cover_url}" class="gb-thumb" alt="Cover">`
-          : `<div class="gb-thumb" style="display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-muted);">Pas d'image</div>`;
+          ? `<img src="${res.cover_url}" class="gb-thumb" alt="Cover" loading="lazy" onerror="this.style.display='none'">`
+          : `<div class="gb-thumb" style="display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-muted); text-align: center; padding: 4px;">Sans image</div>`;
 
         const cleanDesc = cleanHtml(res.description || '');
+        const authorsText = res.author_str || (res.authors || []).join(', ') || 'Auteur inconnu';
+        const yearText = res.year || (res.published_date ? String(res.published_date).slice(0, 4) : '') || '—';
+        const badgeColor = res.source_badge_color || '#2563EB';
+        const badgeLabel = res.source_badge || res.source || 'Catalogue';
 
         card.innerHTML = `
           ${thumbHtml}
           <div class="gb-info">
-            <div class="gb-title">${res.title}</div>
-            <div class="gb-author">${(res.authors || []).join(', ') || 'Auteur inconnu'} (${res.publishedDate ? res.publishedDate.slice(0, 4) : '—'})</div>
-            <div class="gb-desc">${cleanDesc || 'Aucune description fournie.'}</div>
+            <div class="gb-title-row">
+              <div class="gb-title">${res.title}</div>
+              <span class="gb-source-badge" style="background-color: ${badgeColor};">${badgeLabel}</span>
+            </div>
+            <div class="gb-author">${authorsText} • <span style="opacity: 0.85;">${yearText}</span>${res.publisher ? ` • <span style="font-size: 10.5px; opacity: 0.75;">${res.publisher}</span>` : ''}</div>
+            <div class="gb-desc">${cleanDesc || 'Notice bibliographique indexée.'}</div>
           </div>
         `;
 
@@ -447,32 +459,38 @@ const ImportModal = {
             document.getElementById('import-book-id').value = generateShortId(res.title, document.getElementById('import-book-type').value);
           }
           
-          document.getElementById('import-book-author').value = (res.authors || []).join(', ');
+          document.getElementById('import-book-author').value = authorsText !== 'Auteur inconnu' ? authorsText : '';
           document.getElementById('import-book-desc').value = cleanDesc;
-          if (res.publishedDate) {
-            document.getElementById('import-book-year').value = res.publishedDate.slice(0, 4);
+          if (res.year || res.published_date) {
+            document.getElementById('import-book-year').value = res.year || String(res.published_date).slice(0, 4);
           }
 
           if (res.cover_url) {
-            const localCover = await API.call('download_book_cover', res.cover_url, res.title);
-            if (localCover) {
-              this.coverPath = localCover;
-              this.updateCoverPreview(localCover);
-            } else {
+            try {
+              App.showToast(`Téléchargement de la couverture (${badgeLabel})...`);
+              const localCover = await API.call('download_book_cover', res.cover_url, res.title);
+              if (localCover) {
+                this.coverPath = localCover;
+                this.updateCoverPreview(localCover);
+              } else {
+                this.coverPath = res.cover_url;
+                this.updateCoverPreview(res.cover_url);
+              }
+            } catch (err) {
               this.coverPath = res.cover_url;
               this.updateCoverPreview(res.cover_url);
             }
           }
 
           this.closeGoogleBooks();
-          App.showToast('Métadonnées Google Books appliquées avec succès !');
+          App.showToast(`Métadonnées appliquées depuis ${badgeLabel} !`);
         });
 
         listEl.appendChild(card);
       });
 
     } catch (e) {
-      listEl.innerHTML = `<div style="padding: 20px; color: var(--accent-red);">Erreur lors de la recherche Google Books.</div>`;
+      listEl.innerHTML = `<div style="padding: 20px; color: var(--accent-red); text-align: center;">Erreur lors de la recherche multi-catalogues.</div>`;
     }
   },
 

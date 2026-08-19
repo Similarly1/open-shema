@@ -2753,9 +2753,9 @@
                   <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
                   <span>Informations Générales</span>
                 </span>
-                <button class="btn-secondary btn-sm" id="btn-import-google-books" style="display: flex; align-items: center; gap: 4px;">
+                <button class="btn-secondary btn-sm" id="btn-import-google-books" style="display: flex; align-items: center; gap: 4px;" title="Rechercher les métadonnées et la couverture sur Google Books, Open Library, BnF Gallica, Internet Archive et Wikipédia">
                   <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
-                  <span>Google Books</span>
+                  <span>Rechercher infos & couverture</span>
                 </button>
               </div>
 
@@ -2945,24 +2945,29 @@
       </div>
     </div>
 
-    <!-- POPOVER RECHERCHE GOOGLE BOOKS -->
+    <!-- MODAL RECHERCHE MÉTADONNÉES & COUVERTURES MULTI-SOURCES -->
     <div class="modal-dialog-container hidden" id="modal-google-books">
-      <div class="modal-card" style="max-width: 600px; max-height: 80vh;">
+      <div class="modal-card" style="max-width: 640px; max-height: 82vh;">
         <div class="modal-header">
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
-            <h3 class="modal-title">Recherche Google Books</h3>
+          <div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+              <h3 class="modal-title">Recherche Métadonnées & Couvertures</h3>
+            </div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+              Google Books • Open Library • BnF Gallica • Internet Archive • Wikipédia
+            </div>
           </div>
           <button class="modal-close-btn" id="btn-close-gb-modal">✕</button>
         </div>
         <div class="modal-body" style="padding: 14px;">
           <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-            <input type="text" id="gb-search-input" class="text-field" style="flex: 1;" placeholder="Titre, auteur ou mot-clé...">
+            <input type="text" id="gb-search-input" class="text-field" style="flex: 1;" placeholder="Titre, auteur, mot-clé ou ISBN...">
             <button class="btn-primary" id="btn-gb-search">Rechercher</button>
           </div>
-          <div id="gb-results-list" style="max-height: 380px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+          <div id="gb-results-list" style="max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
             <div style="padding: 30px; text-align: center; color: var(--text-muted); font-size: 12px;">
-              Entrez le titre d'un ouvrage pour récupérer automatiquement ses métadonnées et sa couverture.
+              Entrez le titre d'un ouvrage pour récupérer automatiquement ses métadonnées et sa couverture haute définition.
             </div>
           </div>
         </div>
