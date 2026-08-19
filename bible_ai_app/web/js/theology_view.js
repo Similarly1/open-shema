@@ -523,7 +523,7 @@ const TheologyView = {
           </button>
         </div>
       `;
-    } else if (isEnglish) {
+    } else if (isEnglish && (typeof App === 'undefined' || App.isAIEnabled !== false)) {
       translationBannerHtml = `
         <div class="theol-translation-banner" id="theol-translation-banner">
           <div class="theol-trans-banner-icon">🌐</div>

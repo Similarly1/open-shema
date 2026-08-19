@@ -8889,6 +8889,17 @@ body.ai-disabled #btn-import-autoclassify,
 body.ai-disabled #btn-import-smart-cover,
 body.ai-disabled .ai-polish-bar,
 body.ai-disabled .ai-polish-btn,
+body.ai-disabled #btn-theol-view-translate,
+body.ai-disabled .theol-translation-banner,
+body.ai-disabled #theol-translation-banner,
+body.ai-disabled .theol-translation-scanner-banner,
+body.ai-disabled #theol-translation-scanner-banner,
+body.ai-disabled #btn-banner-translate,
+body.ai-disabled #btn-translate-comm,
+body.ai-disabled #btn-translate-dict,
+body.ai-disabled .comm-translate-badge,
+body.ai-disabled .comm-translate-btn,
+body.ai-disabled .dict-translate-btn,
 body.ai-disabled .ai-feature-only {
   display: none !important;
 }
