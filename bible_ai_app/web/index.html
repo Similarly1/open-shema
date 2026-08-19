@@ -121,6 +121,14 @@
           </span>
           <span class="nav-label">Commentaires</span>
         </button>
+        <button class="nav-item" data-view="theology" id="nav-theology" title="Ouvrages de théologie & études">
+          <span class="nav-icon">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            </svg>
+          </span>
+          <span class="nav-label">Théologie</span>
+        </button>
         <button class="nav-item" data-view="library" id="nav-library" title="Bibliothèque">
           <span class="nav-icon">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -179,6 +187,14 @@
             </svg>
           </span>
           <span class="nav-label">Commentaires</span>
+        </button>
+        <button class="nav-item sub-item" id="quick-theology" title="Ouvrages de théologie & études">
+          <span class="nav-icon">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            </svg>
+          </span>
+          <span class="nav-label">Ouvrages de théologie</span>
         </button>
         <button class="nav-item sub-item" id="quick-compare" title="Comparer des Bibles">
           <span class="nav-icon">
@@ -1755,6 +1771,251 @@
         </div>
       </div>
 
+      <!-- ===================================================== -->
+      <!-- VUE J : OUVRAGES DE THÉOLOGIE & ÉTUDES (PAGE PLEIN ÉCRAN) -->
+      <!-- ===================================================== -->
+      <div class="app-view" id="view-theology">
+        <header class="view-header theol-view-header">
+          <div class="view-title-box">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <h1 class="view-title" style="margin: 0;">THÉOLOGIE & OUVRAGES D'ÉTUDE</h1>
+              <span class="theol-view-badge" id="theol-view-count-badge">0 ouvrages</span>
+            </div>
+            <p class="view-subtitle" id="theol-view-subtitle">Théologie systématique, manuels d'introduction, contextes historiques & études thématiques</p>
+          </div>
+          
+          <div class="view-actions theol-view-toolbar-actions">
+            <!-- Bouton Afficher / Masquer le Sommaire (TOC) -->
+            <button class="tool-btn active" id="btn-theol-toggle-toc" title="Afficher / Masquer la table des matières">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              <span>Sommaire</span>
+            </button>
+
+            <!-- Navigation Chapitre (Précédent / Pill / Suivant) -->
+            <div class="theol-view-nav-group">
+              <button class="tool-btn icon-only" id="btn-theol-prev" title="Chapitre précédent (Alt+Gauche)">◀</button>
+              <div class="theol-chapter-pill" id="theol-chapter-pill" title="Progression dans l'ouvrage">
+                <span id="theol-chapter-pill-text">Ch. 1 / 1</span>
+              </div>
+              <button class="tool-btn icon-only" id="btn-theol-next" title="Chapitre suivant (Alt+Droite)">▶</button>
+            </div>
+
+            <!-- Options d'Affichage Popover (Police, Fond, Largeur, Zoom) -->
+            <div style="position: relative;">
+              <button class="tool-btn" id="btn-theol-display-options" title="Options de lecture (Police, fond de lecture, largeur, zoom)">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Affichage</span>
+                <span class="pill-arrow">▾</span>
+              </button>
+
+              <div id="theol-display-popover" class="reader-dropdown-popover hidden" style="position: absolute; top: 38px; right: 0; width: 310px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); border-radius: 8px; z-index: 1100; text-align: left;">
+                <!-- Police de Caractères -->
+                <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
+                  Police de Caractères
+                </div>
+                <div class="theol-font-toggle-group" style="display: flex; gap: 6px; margin-bottom: 12px;">
+                  <button type="button" class="theol-font-choice-btn active" data-font="EB Garamond" style="flex: 1; padding: 6px 4px; font-family: 'EB Garamond', serif; font-size: 13px; text-align: center; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); cursor: pointer;">
+                    Sérif
+                    <div style="font-size: 9.5px; opacity: 0.7; font-family: sans-serif;">Garamond</div>
+                  </button>
+                  <button type="button" class="theol-font-choice-btn" data-font="Georgia" style="flex: 1; padding: 6px 4px; font-family: Georgia, serif; font-size: 13px; text-align: center; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); cursor: pointer;">
+                    Sérif
+                    <div style="font-size: 9.5px; opacity: 0.7; font-family: sans-serif;">Georgia</div>
+                  </button>
+                  <button type="button" class="theol-font-choice-btn" data-font="Inter" style="flex: 1; padding: 6px 4px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; text-align: center; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); cursor: pointer;">
+                    Sans-Sérif
+                    <div style="font-size: 9.5px; opacity: 0.7; font-family: sans-serif;">Inter</div>
+                  </button>
+                </div>
+
+                <!-- Fond de Lecture -->
+                <div style="border-top: 1px solid var(--border-color); margin: 10px 0 6px 0; padding-top: 10px;">
+                  <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
+                    Fond de Lecture
+                  </div>
+                  <div class="reading-bg-quick-row">
+                    <button type="button" class="reading-bg-quick-swatch theol-bg-swatch active" data-bg="auto" title="Harmonisé avec le thème (Auto)">
+                      <div class="quick-swatch-circle swatch-auto"><span class="quick-swatch-check">✓</span></div>
+                      <span class="quick-swatch-label">Auto</span>
+                    </button>
+                    <button type="button" class="reading-bg-quick-swatch theol-bg-swatch" data-bg="white" title="Blanc pur">
+                      <div class="quick-swatch-circle swatch-white"><span class="quick-swatch-check">✓</span></div>
+                      <span class="quick-swatch-label">Blanc</span>
+                    </button>
+                    <button type="button" class="reading-bg-quick-swatch theol-bg-swatch" data-bg="sepia" title="Sépia doux">
+                      <div class="quick-swatch-circle swatch-sepia"><span class="quick-swatch-check">✓</span></div>
+                      <span class="quick-swatch-label">Sépia</span>
+                    </button>
+                    <button type="button" class="reading-bg-quick-swatch theol-bg-swatch" data-bg="dark" title="Très sombre / Nuit">
+                      <div class="quick-swatch-circle swatch-dark"><span class="quick-swatch-check">✓</span></div>
+                      <span class="quick-swatch-label">Nuit</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Option Pleine Largeur -->
+                <div style="border-top: 1px solid var(--border-color); margin: 10px 0 4px 0; padding-top: 10px;">
+                  <label class="custom-checkbox" style="font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="theol-opt-full-width">
+                    <span>Pleine largeur (texte étendu)</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contrôles de Zoom (- / % / +) -->
+            <div class="zoom-controls">
+              <button class="zoom-btn" id="btn-theol-zoom-out" title="Diminuer la taille du texte">−</button>
+              <span class="zoom-level" id="lbl-theol-zoom-level">100%</span>
+              <button class="zoom-btn" id="btn-theol-zoom-in" title="Augmenter la taille du texte">+</button>
+            </div>
+
+            <!-- Action: Synthèse IA du chapitre -->
+            <button class="tool-btn theol-action-btn-synth" id="btn-theol-view-synth" title="Synthèse théologique & doctrinale par IA">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+              <span>Synthèse IA</span>
+            </button>
+
+            <!-- Action: Traduire en français (pour livres anglais) -->
+            <button class="tool-btn" id="btn-theol-view-translate" title="Traduire le chapitre en français">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              <span>Traduire</span>
+            </button>
+
+            <!-- Action: Exporter vers Notes -->
+            <button class="tool-btn" id="btn-theol-export-note" title="Enregistrer le chapitre dans vos notes (.md)">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+              <span>Vers note</span>
+            </button>
+
+            <!-- Action: Copier le texte -->
+            <button class="tool-btn icon-only" id="btn-theol-copy-text" title="Copier le texte du chapitre">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+            </button>
+
+            <!-- Action: Ouvrir dans le lecteur biblique -->
+            <button class="tool-btn icon-only" id="btn-theol-open-bible" title="Ouvrir le passage associé dans la Bible">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+            </button>
+          </div>
+        </header>
+
+        <div class="theol-hybrid-bar">
+          <!-- Sélecteur Principal Déroulant d'Ouvrages -->
+          <div class="theol-main-dropdown-wrapper">
+            <button class="theol-active-book-btn" id="btn-theol-active-selector" title="Cliquer pour choisir un autre ouvrage de théologie">
+              <div class="theol-book-mini-cover" id="theol-active-book-cover" style="background: #0F766E;">
+                <div class="theol-book-mini-spine"></div>
+                <span class="theol-book-mini-initials" id="theol-active-book-initials">TH</span>
+              </div>
+              <div class="theol-active-book-info">
+                <div class="theol-active-book-title" id="theol-active-book-title">Sélectionner un ouvrage</div>
+                <div class="theol-active-book-meta" id="theol-active-book-meta">Auteur • Date</div>
+              </div>
+              <div class="theol-active-book-badge-box">
+                <span class="theol-chapters-count-badge" id="theol-active-chapters-count">0 ch.</span>
+                <span class="theol-dropdown-caret">▾</span>
+              </div>
+            </button>
+
+            <!-- Popover Sélecteur Ouvrages avec Recherche -->
+            <div class="theol-picker-popover hidden" id="theol-picker-popover">
+              <div class="theol-popover-search-row">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.6;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input type="text" id="theol-picker-search-input" class="theol-popover-search-input" placeholder="Filtrer par titre ou auteur...">
+              </div>
+              <div class="theol-picker-list" id="theol-picker-list">
+                <!-- Rempli dynamiquement -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DISPOSITION MASTER-DETAIL (TOC GAUCHE + ARTICLE DROITE) -->
+        <div class="theol-workspace-body">
+          <!-- 1. VOLET SOMMAIRE / TOC LATÉRAL -->
+          <aside class="theol-toc-panel" id="theol-toc-panel">
+            <div class="theol-toc-header">
+              <span class="theol-toc-title">Table des matières</span>
+            </div>
+            <div class="theol-toc-search-box">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.5;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <input type="text" id="theol-toc-search-input" placeholder="Rechercher un chapitre..." autocomplete="off">
+            </div>
+            <div class="theol-toc-list" id="theol-toc-list">
+              <!-- Liste des chapitres injectée dynamiquement -->
+            </div>
+          </aside>
+
+          <!-- 2. VOLET PRINCIPAL DE LECTURE -->
+          <div class="theol-main-reading-scroll" id="theol-main-scroll">
+            <div class="theol-article-container" id="theol-article-container">
+              <div class="theol-article-card" id="theol-article-card">
+                <!-- En-tête Hero du Chapitre -->
+                <div class="theol-article-hero" id="theol-article-hero">
+                  <!-- Injecté dynamiquement -->
+                </div>
+
+                <!-- Corps du Chapitre -->
+                <div class="theol-article-content" id="theol-article-content">
+                  <!-- Injecté dynamiquement -->
+                </div>
+
+                <!-- Navigation de fin de chapitre -->
+                <div class="theol-footer-nav" id="theol-footer-nav">
+                  <!-- Injecté dynamiquement -->
+                </div>
+              </div>
+            </div>
+
+            <!-- CONTENEUR SYNTHÈSE IA PLEINE PAGE -->
+            <div class="theol-article-container theol-page-synth-container hidden" id="theol-page-synth-container">
+              <div class="theol-article-card theol-page-synth-card" id="theol-page-synth-card">
+                <div class="synthesis-panel-header" style="border-radius: 8px 8px 0 0; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;">
+                  <div class="synthesis-title-row">
+                    <span class="synthesis-sparkle-badge" style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px;">
+                      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                      <span>Synthèse Théologique & Doctrinale IA</span>
+                    </span>
+                    <span class="synthesis-passage-badge" id="theol-page-synth-badge">Chapitre</span>
+                  </div>
+                  <button class="synthesis-btn-close" id="btn-close-theol-page-synth" title="Fermer la synthèse et revenir au texte">✕ Fermer</button>
+                </div>
+
+                <div class="synthesis-panel-body" style="padding: 24px;">
+                  <!-- Chargement -->
+                  <div class="synth-loading-box" id="theol-page-synth-loading-box" style="padding: 40px 20px; text-align: center;">
+                    <div class="synth-spinner" style="width: 32px; height: 32px; border-width: 3px; margin: 0 auto 14px auto;"></div>
+                    <div class="synth-step-status" style="font-size: 13.5px; font-weight: 600; color: var(--accent-blue);">Analyse théologique approfondie du chapitre par l'IA...</div>
+                  </div>
+
+                  <!-- Résultat -->
+                  <div class="synth-result-container hidden" id="theol-page-synth-result-container" style="display: flex; flex-direction: column; gap: 16px;">
+                    <div class="synth-meta-bar" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+                      <div class="synth-meta-info" style="display: flex; align-items: center; gap: 8px;">
+                        <span class="synth-model-tag" id="theol-page-synth-model-tag" style="background: rgba(79, 70, 229, 0.12); color: #6366F1; font-weight: 700; padding: 3px 8px; border-radius: 4px; font-size: 11px;">Gemini 3.7 Flash</span>
+                        <span class="synth-sources-count-tag" style="background: var(--bg-subtle); color: var(--text-secondary); padding: 3px 8px; border-radius: 4px; font-size: 11px;">Synthèse magistrale</span>
+                      </div>
+                      <div class="synth-actions-group" style="display: flex; align-items: center; gap: 8px;">
+                        <button class="comm-action-btn-pill" id="btn-theol-page-copy-synth" title="Copier la synthèse">
+                          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                          <span>Copier</span>
+                        </button>
+                        <button class="comm-action-btn-pill" id="btn-theol-page-export-synth-note" title="Enregistrer dans les notes">
+                          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                          <span>Vers note</span>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="theol-reading-body" id="theol-page-synth-markdown-content"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </main>
 
     <!-- ======================================================= -->
@@ -2763,6 +3024,7 @@
   <script src="js/dict_view.js"></script>
   <script src="js/leaflet.js"></script>
   <script src="js/maps_view.js"></script>
+  <script src="js/theology_view.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

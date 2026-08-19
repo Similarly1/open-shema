@@ -929,6 +929,37 @@ class BibleAppApi:
             return True
         return False
 
+    # =========================================================================
+    # LECTEUR D'OUVRAGES DE THÉOLOGIE & ÉTUDES
+    # =========================================================================
+
+    def get_theology_books(self) -> List[Dict[str, Any]]:
+        """Retourne tous les ouvrages de théologie indexés avec leurs métadonnées et couvertures."""
+        from core.theology_reader_manager import TheologyReaderManager
+        return TheologyReaderManager.get_all_theology_books()
+
+    def get_theology_book_toc(self, book_name: str) -> Dict[str, Any]:
+        """Récupère la table des matières ordonnée d'un ouvrage de théologie."""
+        from core.theology_reader_manager import TheologyReaderManager
+        return TheologyReaderManager.get_book_toc(book_name)
+
+    def get_theology_chapter_content(self, book_name: str, chapter_id: int) -> Dict[str, Any]:
+        """Récupère le contenu intégral d'un chapitre d'ouvrage de théologie."""
+        from core.theology_reader_manager import TheologyReaderManager
+        return TheologyReaderManager.get_chapter_content(book_name, chapter_id)
+
+    def synthesize_theology_chapter(self, book_name: str, chapter_id: int, model: Optional[str] = None) -> Dict[str, Any]:
+        """Génère une synthèse exégétique et théologique IA d'un chapitre."""
+        from core.theology_reader_manager import TheologyReaderManager
+        self.config = load_config()
+        return TheologyReaderManager.synthesize_chapter(book_name, chapter_id, model=model, config=self.config)
+
+    def search_theology_books(self, query: str, book_name: Optional[str] = None) -> List[Dict[str, Any]]:
+        """Recherche plein-texte dans les ouvrages de théologie."""
+        from core.theology_reader_manager import TheologyReaderManager
+        return TheologyReaderManager.search_theology_books(query, book_name=book_name)
+
+
     def pick_import_file(self) -> Dict[str, Any]:
         """Ouvre une boîte de dialogue native pour sélectionner un fichier d'importation."""
         win = get_active_window()

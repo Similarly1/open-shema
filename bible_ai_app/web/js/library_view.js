@@ -107,12 +107,51 @@ const LibraryView = {
             <span class="slider round"></span>
           </label>
           
-          <div class="btn-group-right" style="display: flex; gap: 4px; margin-top: 12px;">
+          <div class="btn-group-right" style="display: flex; gap: 4px; margin-top: 8px;">
+            <button class="lib-btn-icon read" data-book="${book.name}" title="Lire cet ouvrage" style="display: flex; align-items: center; justify-content: center; background: var(--accent-blue); color: white;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></button>
             <button class="lib-btn-icon edit" data-book="${book.name}" title="Modifier les métadonnées" style="display: flex; align-items: center; justify-content: center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
             <button class="lib-btn-icon delete" data-book="${book.name}" title="Supprimer" style="display: flex; align-items: center; justify-content: center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
           </div>
         </div>
       `;
+
+      // Read button / card click
+      const readBtn = card.querySelector('.lib-btn-icon.read');
+      const handleRead = () => {
+        const bType = (book.type || '').toLowerCase();
+        if (bType.includes('théo') || bType.includes('theo') || bType.includes('étude') || bType.includes('etude') || book.chapters_count > 0) {
+          if (typeof TheologyView !== 'undefined') {
+            TheologyView.openBook(book.name);
+          }
+        } else if (bType.includes('comm')) {
+          if (typeof CommentariesView !== 'undefined') {
+            CommentariesView.openWithCurrentState();
+          } else {
+            App.switchView('commentaries');
+          }
+        } else if (bType.includes('bibl')) {
+          App.switchView('bible');
+          BibleReader.switchVersion(book.folder_name || book.name);
+        } else if (bType.includes('dict')) {
+          App.switchView('dict');
+        } else {
+          if (typeof TheologyView !== 'undefined') {
+            TheologyView.openBook(book.name);
+          }
+        }
+      };
+
+      readBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        handleRead();
+      });
+
+      card.querySelector('.lib-cover')?.addEventListener('click', () => {
+        handleRead();
+      });
+      card.querySelector('.lib-info')?.addEventListener('click', () => {
+        handleRead();
+      });
 
       // Switch toggle
       const switchEl = card.querySelector('input[type="checkbox"]');
@@ -126,13 +165,15 @@ const LibraryView = {
 
       // Edit button
       const editBtn = card.querySelector('.lib-btn-icon.edit');
-      editBtn.addEventListener('click', () => {
+      editBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         this.openEditModal(book);
       });
 
       // Delete button
       const delBtn = card.querySelector('.lib-btn-icon.delete');
-      delBtn.addEventListener('click', async () => {
+      delBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
         if (confirm(`Êtes-vous sûr de vouloir supprimer définitivement « ${book.name} » ?`)) {
           await API.call('delete_book', book.name);
           App.showToast(`« ${book.name} » a été supprimé`);

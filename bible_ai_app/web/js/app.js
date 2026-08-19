@@ -21,7 +21,8 @@ const App = {
       { name: 'NotesView', init: () => NotesView.init() },
       { name: 'DictView', init: () => DictView.init() },
       { name: 'MapsView', init: () => MapsView.init() },
-      { name: 'CommentariesView', init: () => CommentariesView.init() }
+      { name: 'CommentariesView', init: () => CommentariesView.init() },
+      { name: 'TheologyView', init: () => TheologyView.init() }
     ];
 
     modules.forEach(m => {
@@ -60,6 +61,15 @@ const App = {
       } else {
         this.switchView('commentaries');
       }
+    });
+
+    document.getElementById('quick-theology')?.addEventListener('click', () => {
+      document.querySelectorAll('.sidebar-menu .nav-item, .sidebar-footer .nav-item').forEach(b => b.classList.remove('active'));
+      document.getElementById('nav-theology')?.classList.add('active');
+      if (typeof TheologyView !== 'undefined') {
+        TheologyView.onViewActivated();
+      }
+      this.switchView('theology');
     });
 
     document.getElementById('quick-compare')?.addEventListener('click', () => {
@@ -271,6 +281,11 @@ const App = {
       if (drawerEl) drawerEl.classList.add('collapsed');
       if (typeof CommentariesView !== 'undefined') {
         CommentariesView.onViewActivated();
+      }
+    } else if (viewName === 'theology') {
+      if (drawerEl) drawerEl.classList.add('collapsed');
+      if (typeof TheologyView !== 'undefined') {
+        TheologyView.onViewActivated();
       }
     } else if (viewName === 'search' || viewName === 'ai' || viewName === 'dict') {
       if (drawerEl) drawerEl.classList.add('collapsed');

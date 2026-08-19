@@ -179,6 +179,27 @@ const API = {
     return await this.call('detect_language', text, metaLang);
   },
 
+  async getTheologyBooks() {
+    return await this.call('get_theology_books');
+  },
+
+  async getTheologyBookToc(bookName) {
+    return await this.call('get_theology_book_toc', bookName);
+  },
+
+  async getTheologyChapterContent(bookName, chapterId) {
+    return await this.call('get_theology_chapter_content', bookName, parseInt(chapterId));
+  },
+
+  async synthesizeTheologyChapter(bookName, chapterId, model = null) {
+    return await this.call('synthesize_theology_chapter', bookName, parseInt(chapterId), model);
+  },
+
+  async searchTheologyBooks(query, bookName = null) {
+    return await this.call('search_theology_books', query, bookName);
+  },
+
+
   async getBiblicalPlaces(query = '', placeType = null, limit = 150) {
     return await this.call('get_biblical_places', query, placeType, limit);
   },

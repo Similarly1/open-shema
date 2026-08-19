@@ -1,0 +1,1079 @@
+/**
+ * Theology View Controller
+ * Gère la page dédiée plein écran à la lecture des ouvrages de théologie :
+ * - Sélecteur d'ouvrages déroulant Logos-style avec couvertures et recherche
+ * - Sommaire / Table des matières (TOC) latérale pliable (Master-Detail)
+ * - Navigation fluide de chapitre en chapitre (◀ / ▶)
+ * - Options typographiques complètes : Zoom (− / +), Polices (Sérif / Sans-sérif), Fond de lecture (Blanc, Sépia, Nuit, Auto), Pleine largeur
+ * - Synthèse théologique IA de chapitre
+ * - Traduction française à la volée des ouvrages anglophones (Grudem, NIV, MacArthur)
+ * - Références bibliques interactives intégrées au texte
+ * - Copie et export vers les notes Markdown (.md)
+ */
+
+const TheologyView = {
+  books: [],
+  currentBook: null,
+  currentChapterId: null,
+  currentChapterData: null,
+  tocList: [],
+  
+  // État UI
+  isTocOpen: true,
+  isLoading: false,
+  isSynthMode: false,
+  latestSynthesisMarkdown: '',
+
+  // Paramètres d'affichage
+  zoomPercent: 100,
+  fontFamily: 'EB Garamond',
+  readingBg: 'auto',
+  isFullWidth: false,
+
+  // Cache de traduction française
+  translationCache: {},
+  showTranslatedVersion: false,
+
+  // Éléments du DOM
+  btnToggleToc: null,
+  tocPanel: null,
+  tocSearchInput: null,
+  tocListContainer: null,
+  
+  btnActiveSelector: null,
+  activeBookCover: null,
+  activeBookInitials: null,
+  activeBookTitle: null,
+  activeBookMeta: null,
+  activeChaptersCount: null,
+  pickerPopover: null,
+  pickerSearchInput: null,
+  pickerList: null,
+
+  btnPrevChapter: null,
+  btnNextChapter: null,
+  chapterPillText: null,
+
+  btnDisplayOptions: null,
+  displayPopover: null,
+  btnZoomOut: null,
+  btnZoomIn: null,
+  lblZoomLevel: null,
+  optFullWidth: null,
+
+  btnSynthHeader: null,
+  btnTranslateHeader: null,
+  btnExportNote: null,
+  btnCopyText: null,
+  btnOpenBible: null,
+
+  articleContainer: null,
+  articleCard: null,
+  articleHero: null,
+  articleContent: null,
+  articleFooterNav: null,
+
+  // Panneau Synthèse IA
+  synthContainer: null,
+  synthCard: null,
+  synthPassageBadge: null,
+  synthLoadingBox: null,
+  synthResultContainer: null,
+  synthMarkdownContent: null,
+  btnCloseSynth: null,
+  btnCopySynth: null,
+  btnExportSynthNote: null,
+
+  init() {
+    // Restaurer les préférences d'affichage
+    try {
+      const savedZoom = localStorage.getItem('theol_view_zoom') || localStorage.getItem('bible_reader_zoom');
+      if (savedZoom) this.zoomPercent = parseInt(savedZoom, 10) || 100;
+
+      const savedFont = localStorage.getItem('theol_view_font');
+      if (savedFont) this.fontFamily = savedFont;
+
+      const savedBg = localStorage.getItem('theol_reading_bg');
+      if (savedBg) this.readingBg = savedBg;
+
+      const savedWidth = localStorage.getItem('theol_full_width');
+      if (savedWidth === 'true') this.isFullWidth = true;
+
+      const savedToc = localStorage.getItem('theol_toc_open');
+      if (savedToc !== null) this.isTocOpen = savedToc === 'true';
+    } catch (e) {}
+
+    this.cacheDomElements();
+    this.bindEvents();
+    this.applyDisplayPreferences();
+  },
+
+  cacheDomElements() {
+    this.btnToggleToc = document.getElementById('btn-theol-toggle-toc');
+    this.tocPanel = document.getElementById('theol-toc-panel');
+    this.tocSearchInput = document.getElementById('theol-toc-search-input');
+    this.tocListContainer = document.getElementById('theol-toc-list');
+
+    this.btnActiveSelector = document.getElementById('btn-theol-active-selector');
+    this.activeBookCover = document.getElementById('theol-active-book-cover');
+    this.activeBookInitials = document.getElementById('theol-active-book-initials');
+    this.activeBookTitle = document.getElementById('theol-active-book-title');
+    this.activeBookMeta = document.getElementById('theol-active-book-meta');
+    this.activeChaptersCount = document.getElementById('theol-active-chapters-count');
+    this.pickerPopover = document.getElementById('theol-picker-popover');
+    this.pickerSearchInput = document.getElementById('theol-picker-search-input');
+    this.pickerList = document.getElementById('theol-picker-list');
+
+    this.btnPrevChapter = document.getElementById('btn-theol-prev');
+    this.btnNextChapter = document.getElementById('btn-theol-next');
+    this.chapterPillText = document.getElementById('theol-chapter-pill-text');
+
+    this.btnDisplayOptions = document.getElementById('btn-theol-display-options');
+    this.displayPopover = document.getElementById('theol-display-popover');
+    this.btnZoomOut = document.getElementById('btn-theol-zoom-out');
+    this.btnZoomIn = document.getElementById('btn-theol-zoom-in');
+    this.lblZoomLevel = document.getElementById('lbl-theol-zoom-level');
+    this.optFullWidth = document.getElementById('theol-opt-full-width');
+
+    this.btnSynthHeader = document.getElementById('btn-theol-view-synth');
+    this.btnTranslateHeader = document.getElementById('btn-theol-view-translate');
+    this.btnExportNote = document.getElementById('btn-theol-export-note');
+    this.btnCopyText = document.getElementById('btn-theol-copy-text');
+    this.btnOpenBible = document.getElementById('btn-theol-open-bible');
+
+    this.articleContainer = document.getElementById('theol-article-container');
+    this.articleCard = document.getElementById('theol-article-card');
+    this.articleHero = document.getElementById('theol-article-hero');
+    this.articleContent = document.getElementById('theol-article-content');
+    this.articleFooterNav = document.getElementById('theol-footer-nav');
+
+    // Synthèse IA
+    this.synthContainer = document.getElementById('theol-page-synth-container');
+    this.synthCard = document.getElementById('theol-page-synth-card');
+    this.synthPassageBadge = document.getElementById('theol-page-synth-badge');
+    this.synthLoadingBox = document.getElementById('theol-page-synth-loading-box');
+    this.synthResultContainer = document.getElementById('theol-page-synth-result-container');
+    this.synthMarkdownContent = document.getElementById('theol-page-synth-markdown-content');
+    this.btnCloseSynth = document.getElementById('btn-close-theol-page-synth');
+    this.btnCopySynth = document.getElementById('btn-theol-page-copy-synth');
+    this.btnExportSynthNote = document.getElementById('btn-theol-page-export-synth-note');
+  },
+
+  bindEvents() {
+    // 1. Bascule du panneau Table des Matières (TOC)
+    this.btnToggleToc?.addEventListener('click', () => {
+      this.toggleToc();
+    });
+
+    // Filtre recherche dans la Table des Matières
+    this.tocSearchInput?.addEventListener('input', () => {
+      this.renderTocList();
+    });
+
+    // 2. Sélecteur principal déroulant d'ouvrages
+    this.btnActiveSelector?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.togglePickerPopover();
+    });
+
+    this.pickerSearchInput?.addEventListener('input', () => {
+      this.renderPickerList();
+    });
+
+    // 3. Navigation Précédent / Suivant
+    this.btnPrevChapter?.addEventListener('click', () => {
+      if (this.currentChapterData?.prev_chapter) {
+        this.loadChapter(this.currentBook, this.currentChapterData.prev_chapter.chapter_id);
+      }
+    });
+
+    this.btnNextChapter?.addEventListener('click', () => {
+      if (this.currentChapterData?.next_chapter) {
+        this.loadChapter(this.currentBook, this.currentChapterData.next_chapter.chapter_id);
+      }
+    });
+
+    // 4. Options d'affichage
+    this.btnDisplayOptions?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.displayPopover?.classList.toggle('hidden');
+    });
+
+    // Choix de la police
+    document.querySelectorAll('.theol-font-choice-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const font = btn.dataset.font;
+        if (!font) return;
+        document.querySelectorAll('.theol-font-choice-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.setFontFamily(font);
+      });
+    });
+
+    // Choix du fond de lecture
+    document.querySelectorAll('.theol-bg-swatch').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const bg = btn.dataset.bg;
+        if (!bg) return;
+        document.querySelectorAll('.theol-bg-swatch').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.setReadingBg(bg);
+      });
+    });
+
+    // Pleine largeur
+    this.optFullWidth?.addEventListener('change', (e) => {
+      this.setFullWidth(e.target.checked);
+    });
+
+    // Contrôles de zoom
+    this.btnZoomOut?.addEventListener('click', () => {
+      this.adjustZoom(-10);
+    });
+    this.btnZoomIn?.addEventListener('click', () => {
+      this.adjustZoom(10);
+    });
+
+    // 5. Actions de barre d'outils
+    this.btnSynthHeader?.addEventListener('click', () => {
+      this.toggleChapterSynthesis();
+    });
+
+    this.btnTranslateHeader?.addEventListener('click', () => {
+      this.toggleChapterTranslation();
+    });
+
+    this.btnExportNote?.addEventListener('click', () => {
+      this.exportChapterToNotes();
+    });
+
+    this.btnCopyText?.addEventListener('click', () => {
+      this.copyChapterText();
+    });
+
+    this.btnOpenBible?.addEventListener('click', () => {
+      if (this.currentChapterData?.book_code) {
+        App.switchView('bible');
+        BibleReader.loadPassage(this.currentChapterData.book_code, 1);
+      } else {
+        App.switchView('bible');
+      }
+    });
+
+    // Actions du panneau Synthèse IA
+    this.btnCloseSynth?.addEventListener('click', () => {
+      this.closeSynthesisPanel();
+    });
+
+    this.btnCopySynth?.addEventListener('click', () => {
+      this.copySynthesis();
+    });
+
+    this.btnExportSynthNote?.addEventListener('click', () => {
+      this.exportSynthesisToNotes();
+    });
+
+    // Fermeture des popovers au clic extérieur
+    document.addEventListener('click', (e) => {
+      if (this.pickerPopover && !this.pickerPopover.classList.contains('hidden') && !e.target.closest('#btn-theol-active-selector') && !e.target.closest('#theol-picker-popover')) {
+        this.pickerPopover.classList.add('hidden');
+      }
+      if (this.displayPopover && !this.displayPopover.classList.contains('hidden') && !e.target.closest('#btn-theol-display-options') && !e.target.closest('#theol-display-popover')) {
+        this.displayPopover.classList.add('hidden');
+      }
+    });
+  },
+
+  async onViewActivated() {
+    if (!this.books || this.books.length === 0) {
+      await this.loadBooksList();
+    } else if (this.currentBook && this.currentChapterId) {
+      // Recharger le chapitre actuel si nécessaire
+      this.loadChapter(this.currentBook, this.currentChapterId);
+    }
+  },
+
+  async openBook(bookName, chapterId = null) {
+    App.switchView('theology');
+    if (!this.books || this.books.length === 0) {
+      await this.loadBooksList();
+    }
+    
+    const targetBook = this.books.find(b => b.name === bookName || b.id === bookName || b.title === bookName);
+    const resolvedName = targetBook ? targetBook.name : (this.books[0]?.name || bookName);
+    
+    await this.selectBook(resolvedName, chapterId);
+  },
+
+  async loadBooksList() {
+    try {
+      this.isLoading = true;
+      this.books = await API.getTheologyBooks() || [];
+      
+      const badge = document.getElementById('theol-view-count-badge');
+      if (badge) badge.textContent = `${this.books.length} ouvrage${this.books.length > 1 ? 's' : ''}`;
+
+      if (this.books.length > 0) {
+        // Sélectionner par défaut Grudem, Paradoxes ou le premier livre
+        let defaultBook = this.books.find(b => b.name === 'STGru') || 
+                          this.books.find(b => b.name === 'Paradoxes') || 
+                          this.books.find(b => b.name === 'Lire/Comprendre') || 
+                          this.books[0];
+                          
+        await this.selectBook(defaultBook.name);
+      } else {
+        this.renderEmptyState();
+      }
+    } catch (e) {
+      console.error('[TheologyView] Erreur chargement livres:', e);
+    } finally {
+      this.isLoading = false;
+    }
+  },
+
+  async selectBook(bookName, targetChapterId = null) {
+    this.currentBook = bookName;
+    this.showTranslatedVersion = false;
+    this.closeSynthesisPanel();
+
+    const book = this.books.find(b => b.name === bookName) || { name: bookName, title: bookName };
+
+    // Mettre à jour l'en-tête du sélecteur actif
+    this.updateActiveBookHeader(book);
+
+    // Charger la table des matières (TOC)
+    try {
+      const tocData = await API.getTheologyBookToc(bookName);
+      this.tocList = tocData?.chapters || [];
+      this.renderTocList();
+
+      if (this.tocList.length > 0) {
+        let chId = targetChapterId;
+        if (!chId || !this.tocList.some(c => c.chapter_id === chId)) {
+          chId = this.tocList[0].chapter_id;
+        }
+        await this.loadChapter(bookName, chId);
+      } else {
+        this.renderNoChaptersState(book);
+      }
+    } catch (e) {
+      console.error('[TheologyView] Erreur chargement TOC:', e);
+    }
+  },
+
+  updateActiveBookHeader(book) {
+    const title = book.title || book.name;
+    const author = book.author || 'Auteur non spécifié';
+    const chapters = book.chapters_count || this.tocList?.length || 0;
+
+    if (this.activeBookTitle) this.activeBookTitle.textContent = title;
+    if (this.activeBookMeta) this.activeBookMeta.textContent = `${author} ${book.year ? `(${book.year})` : ''}`.trim();
+    if (this.activeChaptersCount) this.activeChaptersCount.textContent = `${chapters} ch.`;
+
+    // Couverture mini
+    if (this.activeBookCover) {
+      const coverColors = ['#0F766E', '#1E3A8A', '#4338CA', '#7C2D12', '#065F46', '#831843', '#312E81'];
+      const color = coverColors[Math.abs(this._hashCode(book.name)) % coverColors.length];
+      const initials = title.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'TH';
+      
+      const coverUrl = book.cover_data_url || book.cover_url;
+      if (coverUrl) {
+        this.activeBookCover.style.background = `url("${coverUrl}") center/cover no-repeat`;
+        if (this.activeBookInitials) this.activeBookInitials.style.display = 'none';
+      } else {
+        this.activeBookCover.style.background = color;
+        if (this.activeBookInitials) {
+          this.activeBookInitials.style.display = 'block';
+          this.activeBookInitials.textContent = initials;
+        }
+      }
+    }
+  },
+
+  async loadChapter(bookName, chapterId) {
+    try {
+      this.isLoading = true;
+      this.currentChapterId = chapterId;
+      this.showTranslatedVersion = false;
+      this.closeSynthesisPanel();
+
+      this.renderLoadingArticle();
+
+      const data = await API.getTheologyChapterContent(bookName, chapterId);
+      this.currentChapterData = data;
+
+      this.renderChapterArticle(data);
+      this.highlightActiveTocItem(chapterId);
+      this.updateHeaderNavState(data);
+
+      // Scroll en haut de l'article
+      const scrollEl = document.getElementById('theol-main-scroll');
+      if (scrollEl) scrollEl.scrollTop = 0;
+    } catch (e) {
+      console.error('[TheologyView] Erreur chargement chapitre:', e);
+      this.renderErrorArticle(e);
+    } finally {
+      this.isLoading = false;
+    }
+  },
+
+  renderChapterArticle(data) {
+    if (!data || !data.paragraphs || data.paragraphs.length === 0) {
+      this.renderEmptyChapterArticle();
+      return;
+    }
+
+    const title = data.chapter_title || `Chapitre ${data.chapter_id}`;
+    const bookTitle = data.book_title || data.book_name;
+    const author = data.book_author || '';
+    const readTime = data.reading_time_min || 5;
+    const wordCount = data.word_count || 0;
+    const refVerses = data.referenced_verses || [];
+    const refBooks = data.referenced_books || [];
+
+    // 1. Rendu du Hero Header
+    let versesHtml = '';
+    if (refVerses.length > 0) {
+      const topVerses = refVerses.slice(0, 10);
+      versesHtml = `
+        <div class="theol-hero-verses-row">
+          <span class="theol-hero-verses-lbl">Passages bibliques cités :</span>
+          <div class="theol-hero-verses-chips">
+            ${topVerses.map(v => `<button type="button" class="theol-verse-chip" data-ref="${v}" title="Ouvrir ${v} dans le lecteur biblique">${v}</button>`).join('')}
+            ${refVerses.length > 10 ? `<span class="theol-verse-chip-more">+${refVerses.length - 10}</span>` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    this.articleHero.innerHTML = `
+      <div class="theol-hero-badge-row">
+        <span class="theol-hero-book-badge">${this.escapeHtml(bookTitle)}</span>
+        ${author ? `<span class="theol-hero-author-badge">✍️ ${this.escapeHtml(author)}</span>` : ''}
+        <span class="theol-hero-time-badge">⏱️ ~${readTime} min (${wordCount.toLocaleString()} mots)</span>
+        ${data.book_french_name ? `<button type="button" class="theol-hero-bible-jump" id="btn-jump-bible-chapter" data-code="${data.book_code}" title="Étudier ${data.book_french_name} dans la Bible">📖 ${data.book_french_name}</button>` : ''}
+      </div>
+      <h1 class="theol-hero-chapter-title">${this.escapeHtml(title)}</h1>
+      <div class="theol-hero-divider"></div>
+      ${versesHtml}
+    `;
+
+    // Attacher les clics sur les puces de versets
+    this.articleHero.querySelectorAll('.theol-verse-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const ref = btn.dataset.ref;
+        if (ref) {
+          App.switchView('bible');
+          BibleReader.searchPassage(ref);
+        }
+      });
+    });
+
+    const jumpBtn = this.articleHero.querySelector('#btn-jump-bible-chapter');
+    if (jumpBtn) {
+      jumpBtn.addEventListener('click', () => {
+        const code = jumpBtn.dataset.code;
+        if (code) {
+          App.switchView('bible');
+          BibleReader.loadPassage(code, 1);
+        }
+      });
+    }
+
+    // 2. Rendu des paragraphes du contenu avec typographie soignée
+    let paragraphsHtml = '';
+    const isEnglish = this.isBookInEnglish(data.raw_text);
+
+    // Bandeau d'aide à la traduction si en anglais
+    let translationBannerHtml = '';
+    if (isEnglish) {
+      translationBannerHtml = `
+        <div class="theol-translation-banner" id="theol-translation-banner">
+          <div class="theol-trans-banner-icon">🌐</div>
+          <div class="theol-trans-banner-info">
+            <div class="theol-trans-banner-title">Ouvrage en langue originale anglaise</div>
+            <div class="theol-trans-banner-desc">Vous pouvez traduire automatiquement ce chapitre en français soigné grâce à l'IA.</div>
+          </div>
+          <button type="button" class="theol-trans-banner-btn" id="btn-banner-translate">
+            ${this.showTranslatedVersion ? 'Afficher le texte original' : 'Traduire en français'}
+          </button>
+        </div>
+      `;
+    }
+
+    const textToRender = this.showTranslatedVersion && this.translationCache[`${this.currentBook}_${this.currentChapterId}`]
+      ? this.translationCache[`${this.currentBook}_${this.currentChapterId}`]
+      : data.paragraphs;
+
+    paragraphsHtml = textToRender.map((p, idx) => {
+      // Détecter si c'est un titre de section
+      if (p.startsWith('#') || (p.length < 90 && p.toUpperCase() === p && !p.includes('.'))) {
+        const cleanHeading = p.replace(/^#+\s*/, '');
+        return `<h3 class="theol-section-heading">${this.escapeHtml(cleanHeading)}</h3>`;
+      }
+      // Détecter les citations ou versets mis en exergue
+      if (p.startsWith('>') || p.startsWith('«') || (p.length < 250 && (p.includes('Rom') || p.includes('Jean') || p.includes('Psa')) && p.includes(':'))) {
+        return `<blockquote class="theol-reading-quote">${this.highlightScriptureReferences(p)}</blockquote>`;
+      }
+      return `<p class="theol-reading-p ${idx === 0 ? 'theol-first-p' : ''}">${this.highlightScriptureReferences(p)}</p>`;
+    }).join('\n');
+
+    this.articleContent.innerHTML = `
+      ${translationBannerHtml}
+      <div class="theol-reading-body font-${this.fontFamily.toLowerCase().replace(/\s+/g, '-')}" id="theol-reading-body">
+        ${paragraphsHtml}
+      </div>
+    `;
+
+    // Attacher le bouton de traduction dans le bandeau
+    const bannerTransBtn = document.getElementById('btn-banner-translate');
+    if (bannerTransBtn) {
+      bannerTransBtn.addEventListener('click', () => {
+        this.toggleChapterTranslation();
+      });
+    }
+
+    // Attacher les clics sur les références bibliques intégrées
+    this.articleContent.querySelectorAll('.theol-inline-scripture-ref').forEach(span => {
+      span.addEventListener('click', () => {
+        const ref = span.dataset.ref || span.textContent.trim();
+        if (ref) {
+          App.switchView('bible');
+          BibleReader.searchPassage(ref);
+        }
+      });
+    });
+
+    // 3. Pied de page de navigation (Cartes Précédent / Suivant)
+    this.renderFooterNavigation(data);
+  },
+
+  renderFooterNavigation(data) {
+    if (!this.articleFooterNav) return;
+
+    const prev = data.prev_chapter;
+    const next = data.next_chapter;
+
+    this.articleFooterNav.innerHTML = `
+      <div class="theol-footer-nav-grid">
+        ${prev ? `
+          <button type="button" class="theol-nav-card theol-prev-card" id="btn-footer-prev">
+            <div class="theol-nav-card-arrow">‹</div>
+            <div class="theol-nav-card-info">
+              <span class="theol-nav-card-sub">Chapitre précédent</span>
+              <span class="theol-nav-card-title">${this.escapeHtml(prev.title)}</span>
+            </div>
+          </button>
+        ` : `<div class="theol-nav-card-empty"></div>`}
+
+        <button type="button" class="theol-nav-card theol-toc-center-card" id="btn-footer-toc">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          <span>Table des matières (${data.current_index} / ${data.total_chapters})</span>
+        </button>
+
+        ${next ? `
+          <button type="button" class="theol-nav-card theol-next-card" id="btn-footer-next">
+            <div class="theol-nav-card-info" style="text-align: right;">
+              <span class="theol-nav-card-sub">Chapitre suivant</span>
+              <span class="theol-nav-card-title">${this.escapeHtml(next.title)}</span>
+            </div>
+            <div class="theol-nav-card-arrow">›</div>
+          </button>
+        ` : `<div class="theol-nav-card-empty"></div>`}
+      </div>
+    `;
+
+    document.getElementById('btn-footer-prev')?.addEventListener('click', () => {
+      if (prev) this.loadChapter(this.currentBook, prev.chapter_id);
+    });
+
+    document.getElementById('btn-footer-next')?.addEventListener('click', () => {
+      if (next) this.loadChapter(this.currentBook, next.chapter_id);
+    });
+
+    document.getElementById('btn-footer-toc')?.addEventListener('click', () => {
+      this.toggleToc(true);
+    });
+  },
+
+  highlightScriptureReferences(text) {
+    if (!text) return '';
+    // Détection des références bibliques usuelles (ex: Jean 3:16, 1 Corinthiens 13:4-8, Gen 1.1, etc.)
+    const pattern = /\b((?:[1-3]\s*)?[A-ZÀ-ÿ][a-zà-ÿ]+(?:\s+[a-zà-ÿ]+)?)\s+([0-9]{1,3})[:.]([0-9]{1,3}(?:-[0-9]{1,3})?)\b/g;
+    return text.replace(pattern, (match, book, ch, vs) => {
+      return `<span class="theol-inline-scripture-ref" data-ref="${match}" title="Cliquer pour afficher dans le lecteur biblique">${match}</span>`;
+    });
+  },
+
+  renderTocList() {
+    if (!this.tocListContainer) return;
+
+    const q = (this.tocSearchInput?.value || '').toLowerCase().trim();
+    const filtered = this.tocList.filter(ch => {
+      if (!q) return true;
+      return (ch.title || '').toLowerCase().includes(q) || String(ch.chapter_id).includes(q) || (ch.book_name || '').toLowerCase().includes(q);
+    });
+
+    if (filtered.length === 0) {
+      this.tocListContainer.innerHTML = `
+        <div class="theol-toc-empty">
+          <p>Aucun chapitre trouvé</p>
+        </div>
+      `;
+      return;
+    }
+
+    this.tocListContainer.innerHTML = filtered.map((ch, idx) => {
+      const isActive = String(ch.chapter_id) === String(this.currentChapterId);
+      return `
+        <button type="button" class="theol-toc-item ${isActive ? 'active' : ''}" data-chapter-id="${ch.chapter_id}">
+          <div class="theol-toc-item-num">${ch.chapter_id}</div>
+          <div class="theol-toc-item-details">
+            <div class="theol-toc-item-title">${this.escapeHtml(ch.title)}</div>
+            ${ch.book_name ? `<span class="theol-toc-item-badge">${ch.book_name}</span>` : ''}
+          </div>
+        </button>
+      `;
+    }).join('');
+
+    // Attacher les écouteurs
+    this.tocListContainer.querySelectorAll('.theol-toc-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const cid = btn.dataset.chapterId;
+        if (cid) {
+          this.loadChapter(this.currentBook, cid);
+        }
+      });
+    });
+  },
+
+  highlightActiveTocItem(chapterId) {
+    if (!this.tocListContainer) return;
+    this.tocListContainer.querySelectorAll('.theol-toc-item').forEach(btn => {
+      const isAct = String(btn.dataset.chapterId) === String(chapterId);
+      btn.classList.toggle('active', isAct);
+      if (isAct) {
+        btn.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    });
+  },
+
+  updateHeaderNavState(data) {
+    if (this.btnPrevChapter) {
+      this.btnPrevChapter.disabled = !data?.prev_chapter;
+      this.btnPrevChapter.title = data?.prev_chapter ? `Précédent : ${data.prev_chapter.title}` : 'Premier chapitre';
+    }
+    if (this.btnNextChapter) {
+      this.btnNextChapter.disabled = !data?.next_chapter;
+      this.btnNextChapter.title = data?.next_chapter ? `Suivant : ${data.next_chapter.title}` : 'Dernier chapitre';
+    }
+    if (this.chapterPillText) {
+      this.chapterPillText.textContent = `Ch. ${data?.current_index || data?.chapter_id || 1} / ${data?.total_chapters || this.tocList?.length || 1}`;
+    }
+  },
+
+  toggleToc(forceState = null) {
+    this.isTocOpen = forceState !== null ? forceState : !this.isTocOpen;
+    if (this.tocPanel) {
+      this.tocPanel.classList.toggle('collapsed', !this.isTocOpen);
+    }
+    if (this.btnToggleToc) {
+      this.btnToggleToc.classList.toggle('active', this.isTocOpen);
+    }
+    try {
+      localStorage.setItem('theol_toc_open', String(this.isTocOpen));
+    } catch (e) {}
+  },
+
+  togglePickerPopover() {
+    if (!this.pickerPopover) return;
+    const isHidden = this.pickerPopover.classList.contains('hidden');
+    if (isHidden) {
+      this.pickerSearchInput.value = '';
+      this.renderPickerList();
+      this.pickerPopover.classList.remove('hidden');
+      setTimeout(() => this.pickerSearchInput?.focus(), 50);
+    } else {
+      this.pickerPopover.classList.add('hidden');
+    }
+  },
+
+  renderPickerList() {
+    if (!this.pickerList) return;
+
+    const q = (this.pickerSearchInput?.value || '').toLowerCase().trim();
+    const filtered = this.books.filter(b => {
+      if (!q) return true;
+      const title = (b.title || b.name || '').toLowerCase();
+      const author = (b.author || '').toLowerCase();
+      return title.includes(q) || author.includes(q);
+    });
+
+    if (filtered.length === 0) {
+      this.pickerList.innerHTML = `
+        <div class="theol-picker-empty">Aucun ouvrage trouvé</div>
+      `;
+      return;
+    }
+
+    const coverColors = ['#0F766E', '#1E3A8A', '#4338CA', '#7C2D12', '#065F46', '#831843', '#312E81'];
+
+    this.pickerList.innerHTML = filtered.map(b => {
+      const isActive = b.name === this.currentBook;
+      const color = coverColors[Math.abs(this._hashCode(b.name)) % coverColors.length];
+      const initials = (b.title || b.name).split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'TH';
+      const coverUrl = b.cover_data_url || b.cover_url;
+
+      const coverHtml = coverUrl
+        ? `<div class="theol-book-mini-cover" style="background: url('${coverUrl}') center/cover no-repeat;"><div class="theol-book-mini-spine"></div></div>`
+        : `<div class="theol-book-mini-cover" style="background: ${color};"><div class="theol-book-mini-spine"></div><span class="theol-book-mini-initials">${initials}</span></div>`;
+
+      return `
+        <div class="theol-picker-item ${isActive ? 'active' : ''}" data-book-name="${b.name}">
+          ${coverHtml}
+          <div class="theol-picker-item-details">
+            <div class="theol-picker-item-title-row">
+              <span class="theol-picker-item-name">${this.escapeHtml(b.title || b.name)}</span>
+              ${b.chapters_count ? `<span class="theol-picker-item-chapters-tag">${b.chapters_count} ch.</span>` : ''}
+            </div>
+            <div class="theol-picker-item-author">${this.escapeHtml(b.author || 'Auteur non spécifié')}</div>
+          </div>
+          ${isActive ? '<span class="theol-picker-item-check">✓</span>' : ''}
+        </div>
+      `;
+    }).join('');
+
+    this.pickerList.querySelectorAll('.theol-picker-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const bName = item.dataset.bookName;
+        if (bName) {
+          this.selectBook(bName);
+          this.pickerPopover?.classList.add('hidden');
+        }
+      });
+    });
+  },
+
+  // =========================================================================
+  // SYNTHÈSE THÉOLOGIQUE IA
+  // =========================================================================
+
+  async toggleChapterSynthesis() {
+    if (this.isSynthMode) {
+      this.closeSynthesisPanel();
+      return;
+    }
+
+    if (!this.currentBook || !this.currentChapterId) {
+      App.showToast('Veuillez d\'abord ouvrir un chapitre.');
+      return;
+    }
+
+    this.isSynthMode = true;
+    this.articleContainer?.classList.add('hidden');
+    this.synthContainer?.classList.remove('hidden');
+
+    if (this.synthPassageBadge) {
+      this.synthPassageBadge.textContent = `${this.currentChapterData?.book_title || this.currentBook} — ${this.currentChapterData?.chapter_title || `Ch. ${this.currentChapterId}`}`;
+    }
+
+    // Lancer la génération
+    await this.generateChapterSynthesis();
+  },
+
+  async generateChapterSynthesis() {
+    if (this.synthLoadingBox) this.synthLoadingBox.classList.remove('hidden');
+    if (this.synthResultContainer) this.synthResultContainer.classList.add('hidden');
+
+    try {
+      const res = await API.synthesizeTheologyChapter(this.currentBook, this.currentChapterId);
+      
+      if (res && res.success && res.synthesis_markdown) {
+        this.latestSynthesisMarkdown = res.synthesis_markdown;
+        
+        if (this.synthMarkdownContent) {
+          if (typeof marked !== 'undefined') {
+            this.synthMarkdownContent.innerHTML = marked.parse(res.synthesis_markdown);
+          } else {
+            this.synthMarkdownContent.innerHTML = `<pre style="white-space: pre-wrap;">${this.escapeHtml(res.synthesis_markdown)}</pre>`;
+          }
+        }
+        
+        const modelTag = document.getElementById('theol-page-synth-model-tag');
+        if (modelTag) modelTag.textContent = res.model_used || 'IA Théologique';
+
+        if (this.synthLoadingBox) this.synthLoadingBox.classList.add('hidden');
+        if (this.synthResultContainer) this.synthResultContainer.classList.remove('hidden');
+      } else {
+        throw new Error(res?.error || 'Échec de la synthèse');
+      }
+    } catch (e) {
+      console.error('[TheologyView] Erreur génération synthèse:', e);
+      if (this.synthLoadingBox) this.synthLoadingBox.classList.add('hidden');
+      if (this.synthResultContainer) {
+        this.synthResultContainer.classList.remove('hidden');
+        if (this.synthMarkdownContent) {
+          this.synthMarkdownContent.innerHTML = `
+            <div class="theol-error-box">
+              <p>Impossible de générer la synthèse : ${this.escapeHtml(e.message)}</p>
+              <button type="button" class="btn-primary" onclick="TheologyView.generateChapterSynthesis()">Réessayer</button>
+            </div>
+          `;
+        }
+      }
+    }
+  },
+
+  closeSynthesisPanel() {
+    this.isSynthMode = false;
+    this.synthContainer?.classList.add('hidden');
+    this.articleContainer?.classList.remove('hidden');
+  },
+
+  copySynthesis() {
+    if (!this.latestSynthesisMarkdown) return;
+    navigator.clipboard.writeText(this.latestSynthesisMarkdown).then(() => {
+      App.showToast('Synthèse copiée dans le presse-papiers !');
+    });
+  },
+
+  async exportSynthesisToNotes() {
+    if (!this.latestSynthesisMarkdown) return;
+    const title = `Synthèse — ${this.currentChapterData?.chapter_title || `Chapitre ${this.currentChapterId}`} (${this.currentChapterData?.book_title || this.currentBook})`;
+    const content = `# ${title}\n\n${this.latestSynthesisMarkdown}`;
+    
+    try {
+      await API.saveNote(title, content, `${this.currentChapterData?.book_french_name || ''}`, ['Théologie', 'Synthèse IA', this.currentBook]);
+      App.showToast('Synthèse enregistrée dans vos Notes (.md) !');
+    } catch (e) {
+      console.error('Erreur export note:', e);
+    }
+  },
+
+  // =========================================================================
+  // TRADUCTION DU CHAPITRE
+  // =========================================================================
+
+  async toggleChapterTranslation() {
+    const key = `${this.currentBook}_${this.currentChapterId}`;
+
+    if (this.showTranslatedVersion) {
+      this.showTranslatedVersion = false;
+      this.renderChapterArticle(this.currentChapterData);
+      App.showToast('Affichage du texte original.');
+      return;
+    }
+
+    if (this.translationCache[key]) {
+      this.showTranslatedVersion = true;
+      this.renderChapterArticle(this.currentChapterData);
+      App.showToast('Texte traduit en français.');
+      return;
+    }
+
+    // Traduire via LLM
+    try {
+      App.showToast('Traduction du chapitre en cours...');
+      const fullText = (this.currentChapterData?.paragraphs || []).join('\n\n');
+      
+      const res = await API.translateText(fullText.slice(0, 8000), 'theology_chapter', key);
+      if (res && res.success && res.translated_text) {
+        const paras = res.translated_text.split('\n\n').map(p => p.trim()).filter(p => p);
+        this.translationCache[key] = paras;
+        this.showTranslatedVersion = true;
+        this.renderChapterArticle(this.currentChapterData);
+        App.showToast('Traduction appliquée avec succès !');
+      } else {
+        throw new Error(res?.error || 'Erreur traduction');
+      }
+    } catch (e) {
+      console.error('[TheologyView] Erreur traduction:', e);
+      App.showToast('Erreur lors de la traduction du chapitre.');
+    }
+  },
+
+  // =========================================================================
+  // EXPORT & COPIE DU CHAPITRE
+  // =========================================================================
+
+  copyChapterText() {
+    if (!this.currentChapterData?.raw_text) return;
+    navigator.clipboard.writeText(this.currentChapterData.raw_text).then(() => {
+      App.showToast('Texte du chapitre copié dans le presse-papiers !');
+    });
+  },
+
+  async exportChapterToNotes() {
+    if (!this.currentChapterData?.raw_text) return;
+    const title = `${this.currentChapterData?.chapter_title || `Chapitre ${this.currentChapterId}`} — ${this.currentChapterData?.book_title || this.currentBook}`;
+    const content = `# ${title}\n\n${this.currentChapterData.raw_text}`;
+
+    try {
+      await API.saveNote(title, content, `${this.currentChapterData?.book_french_name || ''}`, ['Théologie', this.currentBook]);
+      App.showToast('Chapitre exporté vers vos Notes (.md) !');
+    } catch (e) {
+      console.error('Erreur export note:', e);
+    }
+  },
+
+  // =========================================================================
+  // GESTION DU ZOOM, DES POLICES ET DES FONDS
+  // =========================================================================
+
+  applyDisplayPreferences() {
+    this.setFontFamily(this.fontFamily);
+    this.setReadingBg(this.readingBg);
+    this.setFullWidth(this.isFullWidth);
+    this.adjustZoom(0);
+    this.toggleToc(this.isTocOpen);
+  },
+
+  setFontFamily(font) {
+    this.fontFamily = font;
+    const bodyEl = document.getElementById('theol-reading-body');
+    if (bodyEl) {
+      bodyEl.className = `theol-reading-body font-${font.toLowerCase().replace(/\s+/g, '-')}`;
+    }
+    document.querySelectorAll('.theol-font-choice-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.font === font);
+    });
+    try {
+      localStorage.setItem('theol_view_font', font);
+    } catch (e) {}
+  },
+
+  setReadingBg(bg) {
+    this.readingBg = bg;
+    if (this.articleCard) {
+      this.articleCard.classList.remove('bg-white', 'bg-sepia', 'bg-dark', 'bg-auto');
+      this.articleCard.classList.add(`bg-${bg}`);
+    }
+    document.querySelectorAll('.theol-bg-swatch').forEach(b => {
+      b.classList.toggle('active', b.dataset.bg === bg);
+    });
+    try {
+      localStorage.setItem('theol_reading_bg', bg);
+    } catch (e) {}
+  },
+
+  setFullWidth(isFull) {
+    this.isFullWidth = isFull;
+    if (this.articleContainer) {
+      this.articleContainer.classList.toggle('full-width', isFull);
+    }
+    if (this.optFullWidth) {
+      this.optFullWidth.checked = isFull;
+    }
+    try {
+      localStorage.setItem('theol_full_width', String(isFull));
+    } catch (e) {}
+  },
+
+  adjustZoom(delta) {
+    if (delta !== 0) {
+      this.zoomPercent = Math.min(180, Math.max(70, this.zoomPercent + delta));
+    }
+    if (this.lblZoomLevel) {
+      this.lblZoomLevel.textContent = `${this.zoomPercent}%`;
+    }
+    if (this.articleCard) {
+      this.articleCard.style.setProperty('--theol-zoom-scale', this.zoomPercent / 100);
+      this.articleCard.style.fontSize = `calc(18px * ${this.zoomPercent / 100})`;
+    }
+    try {
+      localStorage.setItem('theol_view_zoom', String(this.zoomPercent));
+    } catch (e) {}
+  },
+
+  // =========================================================================
+  // ÉTATS DE CHARGEMENT & ERREURS
+  // =========================================================================
+
+  renderLoadingArticle() {
+    if (this.articleHero) this.articleHero.innerHTML = '';
+    if (this.articleContent) {
+      this.articleContent.innerHTML = `
+        <div class="theol-loading-box">
+          <div class="theol-spinner"></div>
+          <div class="theol-loading-text">Chargement du chapitre...</div>
+        </div>
+      `;
+    }
+    if (this.articleFooterNav) this.articleFooterNav.innerHTML = '';
+  },
+
+  renderEmptyChapterArticle() {
+    if (this.articleContent) {
+      this.articleContent.innerHTML = `
+        <div class="theol-empty-state">
+          <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+          <h3>Aucun contenu disponible pour ce chapitre</h3>
+          <p>Ce chapitre ne contient aucun texte indexé.</p>
+        </div>
+      `;
+    }
+  },
+
+  renderErrorArticle(err) {
+    if (this.articleContent) {
+      this.articleContent.innerHTML = `
+        <div class="theol-error-box">
+          <p>Erreur lors du chargement : ${this.escapeHtml(err.message || String(err))}</p>
+        </div>
+      `;
+    }
+  },
+
+  renderNoChaptersState(book) {
+    if (this.articleHero) this.articleHero.innerHTML = `<h1>${this.escapeHtml(book.title || book.name)}</h1>`;
+    if (this.articleContent) {
+      this.articleContent.innerHTML = `
+        <div class="theol-empty-state">
+          <p>Aucun chapitre n'a été trouvé pour cet ouvrage.</p>
+        </div>
+      `;
+    }
+  },
+
+  renderEmptyState() {
+    if (this.articleContent) {
+      this.articleContent.innerHTML = `
+        <div class="theol-empty-state">
+          <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+          <h2>Aucun ouvrage de théologie indexé</h2>
+          <p>Importez des livres ou manuels d'étude au format EPUB depuis la Bibliothèque pour commencer la lecture.</p>
+        </div>
+      `;
+    }
+  },
+
+  isBookInEnglish(text) {
+    if (!text) return false;
+    const sample = text.slice(0, 1000).toLowerCase();
+    const englishWords = ['the', 'and', 'that', 'with', 'from', 'this', 'chapter', 'which', 'their', 'about'];
+    let matches = 0;
+    for (const w of englishWords) {
+      if (new RegExp(`\\b${w}\\b`).test(sample)) matches++;
+    }
+    return matches >= 4;
+  },
+
+  _hashCode(str) {
+    let hash = 0;
+    for (let i = 0; i < (str || '').length; i++) {
+      hash = (hash << 5) - hash + str.charCodeAt(i);
+      hash |= 0;
+    }
+    return hash;
+  },
+
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+};
