@@ -480,6 +480,7 @@ const TheologyView = {
       this.renderChapterArticle(data);
       this.highlightActiveTocItem(chapterId);
       this.updateHeaderNavState(data);
+      this.updateTocTranslateButton();
 
       // Scroll en haut de l'article
       const scrollEl = document.getElementById('theol-main-scroll');
@@ -740,22 +741,27 @@ const TheologyView = {
   highlightScriptureReferences(text) {
     if (!text) return '';
 
-    // Liste exhaustive des livres bibliques et abréviations françaises usuelles
+    // Liste exhaustive des livres bibliques et abréviations françaises usuelles (ordonnée par longueur décroissante)
     const bookNamesPattern = [
-      // Noms complets et usuels
+      // Deutérocanoniques & Apocryphes
+      '1\\s*Maccabées', '2\\s*Maccabées', '3\\s*Maccabées', '4\\s*Maccabées',
+      '1\\s*Maccabees', '2\\s*Maccabees', '1\\s*Mac', '2\\s*Mac', '1Ma', '2Ma', 'Maccabées', 'Maccabees',
+      'Sagesse', 'Siracide', 'Ecclésiastique', 'Tobie', 'Judith', 'Baruch', 'Prière de Manassé',
+
+      // Noms complets canoniques
       'Genèse', 'Exode', 'Lévitique', 'Nombres', 'Deutéronome', 'Josué', 'Juges', 'Ruth',
-      '1 Samuel', '2 Samuel', '1 Rois', '2 Rois', '1 Chroniques', '2 Chroniques',
+      '1\\s*Samuel', '2\\s*Samuel', '1\\s*Rois', '2\\s*Rois', '1\\s*Chroniques', '2\\s*Chroniques',
       'Esdras', 'Néhémie', 'Esther', 'Job', 'Psaumes', 'Psaume', 'Proverbes', 'Ecclésiaste',
       'Cantique des cantiques', 'Cantique', 'Ésaïe', 'Esaïe', 'Jérémie', 'Lamentations', 'Ézéchiel', 'Ezechiel',
       'Daniel', 'Osée', 'Osee', 'Joël', 'Joel', 'Amos', 'Abdias', 'Jonas', 'Michée', 'Michee',
       'Nahum', 'Habacuc', 'Sophonie', 'Aggée', 'Aggee', 'Zacharie', 'Malachie',
       'Matthieu', 'Marc', 'Luc', 'Jean', 'Actes des apôtres', 'Actes', 'Romains',
-      '1 Corinthiens', '2 Corinthiens', 'Galates', 'Éphésiens', 'Ephesiens', 'Philippiens', 'Colossiens',
-      '1 Thessaloniciens', '2 Thessaloniciens', '1 Timothée', '2 Timothée', '1 Timothee', '2 Timothee',
-      'Tite', 'Philémon', 'Philemon', 'Hébreux', 'Hebreux', 'Jacques', '1 Pierre', '2 Pierre',
-      '1 Jean', '2 Jean', '3 Jean', 'Jude', 'Apocalypse',
+      '1\\s*Corinthiens', '2\\s*Corinthiens', 'Galates', 'Éphésiens', 'Ephesiens', 'Philippiens', 'Colossiens',
+      '1\\s*Thessaloniciens', '2\\s*Thessaloniciens', '1\\s*Timothée', '2\\s*Timothée', '1\\s*Timothee', '2\\s*Timothee',
+      'Tite', 'Philémon', 'Philemon', 'Hébreux', 'Hebreux', 'Jacques', '1\\s*Pierre', '2\\s*Pierre',
+      '1\\s*Jean', '2\\s*Jean', '3\\s*Jean', 'Jude', 'Apocalypse',
 
-      // Abréviations numérotées
+      // Abréviations avec préfixe numérique
       '1\\s*Sam?', '2\\s*Sam?', '1\\s*Sa\\b', '2\\s*Sa\\b', '1\\s*S\\b', '2\\s*S\\b',
       '1\\s*Rois?', '2\\s*Rois?', '1\\s*R\\b', '2\\s*R\\b', '1\\s*Ki', '2\\s*Ki',
       '1\\s*Chr?', '2\\s*Chr?', '1\\s*Ch\\b', '2\\s*Ch\\b',
@@ -763,68 +769,89 @@ const TheologyView = {
       '1\\s*The?s?s?', '2\\s*The?s?s?', '1\\s*Th\\b', '2\\s*Th\\b',
       '1\\s*Tim?', '2\\s*Tim?', '1\\s*Ti\\b', '2\\s*Ti\\b', '1\\s*Tm\\b', '2\\s*Tm\\b',
       '1\\s*Pie?r?r?e?', '2\\s*Pie?r?r?e?', '1\\s*Pe\\b', '2\\s*Pe\\b', '1\\s*P\\b', '2\\s*P\\b',
-      '1\\s*Jn?\\b', '2\\s*Jn?\\b', '3\\s*Jn?\\b', '1\\s*Joh?\\b', '2\\s*Joh?\\b', '3\\s*Joh?\\b',
+      '1\\s*Jn\\b', '2\\s*Jn\\b', '3\\s*Jn\\b', '1\\s*Joh\\b', '2\\s*Joh\\b', '3\\s*Joh\\b',
 
-      // Abréviations simples AT
-      'Gen', 'Gn\\b', 'Exo?', 'Ex\\b', 'Lév', 'Lev', 'Lv\\b', 'Nom', 'Nomb', 'Nb\\b', 'Deut?', 'Dt\\b',
+      // Abréviations simples AT (Initiales en majuscule)
+      'Gen', 'Gn\\b', 'Exo?', 'Ex\\b', 'Lév', 'Lev', 'Lv\\b', 'Nom', 'Nomb', 'Nb\\b', 'Deut?', 'Dtn\\b', 'Dt\\b',
       'Jos', 'Jug', 'Jg\\b', 'Jdg', 'Rut?', 'Rt\\b', 'Esd', 'Ezr', 'Néh', 'Neh', 'Esth?', 'Est\\b',
       'Psa?', 'Ps\\b', 'Prov?', 'Pr\\b', 'Eccl?', 'Ecc', 'Ec\\b', 'Qoh', 'Cant?', 'Ct\\b', 'Sol',
-      'Ésa?', 'Esa?', 'Is\\b', 'Isa', 'Jér', 'Jer', 'Jr\\b', 'Lam', 'Lm\\b', 'Ézéch?', 'Ezech?', 'Ézé?', 'Eze?', 'Éz\\b', 'Ez\\b',
-      'Dan?', 'Da\\b', 'Osé?', 'Ose?', 'Os\\b', 'Hos', 'Joë?', 'Joe?', 'Jl\\b', 'Amo?', 'Am\\b',
+      'Ésa', 'Esa', 'Isa', 'Es\\b', 'És\\b', 'Is\\b', 'Jér', 'Jer', 'Jr\\b', 'Lam', 'Lm\\b', 'Ézéch?', 'Ezech?', 'Ézé?', 'Eze?', 'Éz\\b', 'Ez\\b',
+      'Dan', 'Da\\b', 'Osé', 'Ose', 'Os\\b', 'Hos', 'Joë', 'Joe', 'Jl\\b', 'Amo', 'Am\\b',
       'Abd', 'Oba', 'Jon', 'Mich?', 'Mic', 'Mi\\b', 'Nah', 'Na\\b', 'Hab', 'Ha\\b',
       'Soph', 'Zep', 'So\\b', 'Agg', 'Hag', 'Ag\\b', 'Zach?', 'Zec', 'Za\\b', 'Mal', 'Ml\\b',
 
       // Abréviations simples NT
-      'Matt?', 'Mat', 'Mt\\b', 'Marc?', 'Mar', 'Mc\\b', 'Luc?', 'Luk', 'Lc\\b', 'Jean', 'Joh', 'Jn\\b',
+      'Matt?', 'Mat', 'Mt\\b', 'Marc?', 'Mar', 'Mc\\b', 'Luc?', 'Luk', 'Lc\\b', 'Joh', 'Jn\\b',
       'Act', 'Ac\\b', 'Rom', 'Rm\\b', 'Ro\\b', 'Gal', 'Ga\\b', 'Éph', 'Eph', 'Phil', 'Phi\\b', 'Php', 'Ph\\b',
       'Col', 'Tit', 'Tt\\b', 'Philém?', 'Phm', 'Héb', 'Heb', 'Jacq?', 'Jac', 'Jc\\b', 'Jam',
       'Jud', 'Jd\\b', 'Apoc?', 'Apo', 'Ap\\b', 'Rev'
     ].join('|');
 
-    // Pattern : Livre + Chapitre + (Optionnel : séparateur [:,.] ou verset/plage de versets)
-    const regex = new RegExp(`\\b(${bookNamesPattern})\\s+([0-9]{1,3})(?:\\s*[:.,]\\s*([0-9]{1,3}(?:\\s*-\\s*[0-9]{1,3})?))?\\b`, 'gi');
+    // Détection du livre initial + chapitre + verset et chaîne de sous-références
+    // Ex: "Dtn 4,2 ; 32,47", "1 S 10,25 ; Jr 30,2", "1 Maccabées 9,27"
+    const clusterRegex = new RegExp(`\\b(${bookNamesPattern})\\s+([0-9]{1,3}(?:\\s*[:.,]\\s*[0-9]{1,3}(?:\\s*-\\s*[0-9]{1,3})?)?)((?:\\s*[,;]\\s*[0-9]{1,3}(?:\\s*[:.,]\\s*[0-9]{1,3}(?:\\s*-\\s*[0-9]{1,3})?)?)*)`, 'g');
 
-    return text.replace(regex, (match, book, ch, vs) => {
+    return text.replace(clusterRegex, (fullMatch, book, firstChVs, chainedPart) => {
       const cleanBook = book.trim();
-      const cleanCh = ch.trim();
-      const cleanVs = vs ? vs.trim().replace(/\s+/g, '') : '';
-      const fullRef = cleanVs ? `${cleanBook} ${cleanCh}:${cleanVs}` : `${cleanBook} ${cleanCh}`;
 
-      return `<span class="theol-inline-scripture-ref" data-ref="${TheologyView.escapeHtml(fullRef)}">${match}</span>`;
+      const parseCv = (cv) => {
+        const parts = cv.split(/[:.,]/);
+        const ch = parts[0].trim();
+        const vs = parts[1] ? parts[1].trim().replace(/\s+/g, '') : '';
+        return { ch, vs, fullRef: vs ? `${cleanBook} ${ch}:${vs}` : `${cleanBook} ${ch}` };
+      };
+
+      const first = parseCv(firstChVs);
+      let result = `<span class="theol-inline-scripture-ref" data-ref="${TheologyView.escapeHtml(first.fullRef)}">${book} ${firstChVs}</span>`;
+
+      if (chainedPart) {
+        const subRegex = /([,;]\s*)([0-9]{1,3}(?:\s*[:.,]\s*[0-9]{1,3}(?:\s*-\s*[0-9]{1,3})?)?)/g;
+        const formattedChained = chainedPart.replace(subRegex, (m, sep, cv) => {
+          const sub = parseCv(cv);
+          return `${sep}<span class="theol-inline-scripture-ref" data-ref="${TheologyView.escapeHtml(sub.fullRef)}">${cv}</span>`;
+        });
+        result += formattedChained;
+      }
+
+      return result;
     });
+  },
+
+  updateTocTranslateButton() {
+    if (!this.btnTranslateToc) return;
+    const isBookEnglish = this.isBookInEnglish(this.currentChapterData?.raw_text || '');
+    const isAI = typeof App === 'undefined' || App.isAIEnabled !== false;
+
+    if (isBookEnglish && isAI) {
+      this.btnTranslateToc.classList.remove('hidden');
+      const translatedMap = this.translatedToc[this.currentBook];
+      const isTranslated = translatedMap && Object.keys(translatedMap).length > 0;
+      const textSpan = document.getElementById('theol-toc-translate-text');
+      if (textSpan) {
+        if (isTranslated && this.showTranslatedToc) {
+          textSpan.textContent = '🇫🇷 Traduit';
+          this.btnTranslateToc.classList.add('active');
+          this.btnTranslateToc.title = 'Afficher les titres originaux';
+        } else if (isTranslated && !this.showTranslatedToc) {
+          textSpan.textContent = '🌐 Original';
+          this.btnTranslateToc.classList.remove('active');
+          this.btnTranslateToc.title = 'Afficher les titres traduits en français';
+        } else {
+          textSpan.textContent = 'Traduire titres';
+          this.btnTranslateToc.classList.remove('active');
+          this.btnTranslateToc.title = 'Traduire tous les titres de la table des matières en français';
+        }
+      }
+    } else {
+      this.btnTranslateToc.classList.add('hidden');
+    }
   },
 
   renderTocList() {
     if (!this.tocListContainer) return;
 
-    // Bouton de traduction de la TOC
-    const isBookEnglish = this.isBookInEnglish(this.currentChapterData?.raw_text || '');
-    if (this.btnTranslateToc) {
-      const isAI = typeof App === 'undefined' || App.isAIEnabled !== false;
-      if (isBookEnglish && isAI) {
-        this.btnTranslateToc.classList.remove('hidden');
-        const translatedMap = this.translatedToc[this.currentBook];
-        const isTranslated = translatedMap && Object.keys(translatedMap).length > 0;
-        const textSpan = document.getElementById('theol-toc-translate-text');
-        if (textSpan) {
-          if (isTranslated && this.showTranslatedToc) {
-            textSpan.textContent = '🇫🇷 Traduit';
-            this.btnTranslateToc.classList.add('active');
-            this.btnTranslateToc.title = 'Afficher les titres originaux';
-          } else if (isTranslated && !this.showTranslatedToc) {
-            textSpan.textContent = '🌐 Original';
-            this.btnTranslateToc.classList.remove('active');
-            this.btnTranslateToc.title = 'Afficher les titres traduits en français';
-          } else {
-            textSpan.textContent = 'Traduire titres';
-            this.btnTranslateToc.classList.remove('active');
-            this.btnTranslateToc.title = 'Traduire tous les titres de la table des matières en français';
-          }
-        }
-      } else {
-        this.btnTranslateToc.classList.add('hidden');
-      }
-    }
+    // Mettre à jour la visibilité du bouton de traduction de la TOC
+    this.updateTocTranslateButton();
 
     const q = (this.tocSearchInput?.value || '').toLowerCase().trim();
     const translatedMap = (this.showTranslatedToc && this.translatedToc[this.currentBook]) || {};
@@ -1633,14 +1660,38 @@ const TheologyView = {
   },
 
   isBookInEnglish(text) {
-    if (!text) return false;
-    const sample = text.slice(0, 1000).toLowerCase();
-    const englishWords = ['the', 'and', 'that', 'with', 'from', 'this', 'chapter', 'which', 'their', 'about'];
-    let matches = 0;
-    for (const w of englishWords) {
-      if (new RegExp(`\\b${w}\\b`).test(sample)) matches++;
+    // 1. Détection sur le texte brut du chapitre
+    if (text && typeof text === 'string') {
+      const sample = text.slice(0, 2000).toLowerCase();
+      const englishWords = ['the', 'and', 'that', 'with', 'from', 'this', 'chapter', 'which', 'their', 'about', 'god', 'scripture'];
+      let matches = 0;
+      for (const w of englishWords) {
+        if (new RegExp(`\\b${w}\\b`).test(sample)) matches++;
+      }
+      if (matches >= 2) return true;
     }
-    return matches >= 4;
+
+    // 2. Détection sur les titres de la table des matières (TOC)
+    if (this.tocList && this.tocList.length > 0) {
+      const tocTitles = this.tocList.map(c => c.title || '').join(' ').toLowerCase();
+      const englishTocWords = ['chapter', 'introduction', 'part', 'preface', 'the', 'of', 'doctrine', 'theology', 'god', 'church', 'christian', 'scripture'];
+      let tocMatches = 0;
+      for (const w of englishTocWords) {
+        if (new RegExp(`\\b${w}\\b`).test(tocTitles)) tocMatches++;
+      }
+      if (tocMatches >= 2) return true;
+    }
+
+    // 3. Détection sur le nom ou titre de l'ouvrage actif
+    const currentBookObj = this.books?.find(b => b.name === this.currentBook);
+    if (currentBookObj) {
+      const titleLower = `${currentBookObj.title || ''} ${currentBookObj.name || ''}`.toLowerCase();
+      if (/\b(theology|systematic|christian|doctrine|bible|commentary|introduction|handbook|guide|survey|chapter|part)\b/.test(titleLower)) {
+        return true;
+      }
+    }
+
+    return false;
   },
 
   _hashCode(str) {

@@ -48,7 +48,7 @@ BOOK_MAPPING_RAW = {
     "exode": "Exo", "ex": "Exo", "exodus": "Exo", "exod": "Exo",
     "levitique": "Lev", "lv": "Lev", "lev": "Lev", "leviticus": "Lev",
     "nombres": "Num", "nb": "Num", "num": "Num", "numbers": "Num", "nm": "Num",
-    "deuteronome": "Deu", "dt": "Deu", "deu": "Deu", "deuteronomy": "Deu", "deut": "Deu",
+    "deuteronome": "Deu", "dt": "Deu", "dtn": "Deu", "deu": "Deu", "deuteronomy": "Deu", "deut": "Deu",
     "josue": "Jos", "jos": "Jos", "joshua": "Jos", "js": "Jos", "josh": "Jos",
     "juges": "Jdg", "jg": "Jdg", "jdg": "Jdg", "juge": "Jdg", "judges": "Jdg", "judg": "Jdg",
     "ruth": "Rut", "rt": "Rut", "rut": "Rut",
