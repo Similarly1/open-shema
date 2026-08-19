@@ -631,12 +631,25 @@ const CommentaryViewer = {
     this.updateSyncButtonUI();
 
     if (this.isSynchronized) {
-      // Re-synchroniser immédiatement avec la position active du lecteur biblique
-      const curV = BibleReader.selectedVerse || 1;
-      BibleReader.loadCommentariesForVerse(curV, BibleReader.currentBook, BibleReader.currentChapter, true);
+      // Re-synchroniser immédiatement avec le verset visible à l'écran
+      const pane1 = document.getElementById('pane-1-content');
+      const topV = pane1 ? BibleReader.getTopVisibleVerse(pane1) : null;
+      const curBook = (topV && topV.book) || BibleReader.currentBook;
+      const curCh = (topV && topV.chapter) ? parseInt(topV.chapter, 10) : BibleReader.currentChapter;
+      const curV = (topV && topV.verse) ? parseInt(topV.verse, 10) : (BibleReader.selectedVerse || 1);
+
+      BibleReader.loadCommentariesForVerse(curV, curBook, curCh, true);
       App.showToast('Commentaire synchronisé avec le texte biblique');
     } else {
       App.showToast('Commentaire délié (indépendant du texte biblique)');
+    }
+  },
+
+  updateLiveBadge(verseRef) {
+    const badgeEl = document.getElementById('comm-selected-verse');
+    if (badgeEl && verseRef) {
+      badgeEl.textContent = verseRef;
+      this.currentVerseRef = verseRef;
     }
   },
 
@@ -2001,32 +2014,62 @@ const BibleReader = {
     }
   },
 
+  _commDebounceTimer: null,
+  _lastScrolledVerseRef: null,
+
+  debouncedLoadCommentaries(verseNum, bookCode, chapterNum) {
+    const info = getBookInfo(bookCode);
+    const refStr = `${info.name} ${chapterNum}:${verseNum}`;
+
+    // 1. Mettre à jour visuellement le badge du commentaire instantanément
+    if (typeof CommentaryViewer !== 'undefined' && CommentaryViewer.isSynchronized) {
+      CommentaryViewer.updateLiveBadge(refStr);
+    }
+
+    // 2. Différer l'appel API exégétique de 120ms pour un défilement ultra-fluide
+    if (this._commDebounceTimer) {
+      clearTimeout(this._commDebounceTimer);
+    }
+
+    this._commDebounceTimer = setTimeout(() => {
+      this.loadCommentariesForVerse(verseNum, bookCode, chapterNum, false);
+    }, 120);
+  },
+
   updateCurrentlyVisibleHeader(container) {
     if (!container) return;
-    const blocks = container.querySelectorAll('.chapter-block');
-    const containerTop = container.getBoundingClientRect().top;
 
-    for (const block of blocks) {
-      const rect = block.getBoundingClientRect();
-      if (rect.bottom > containerTop + 60) {
-        const bCode = block.dataset.book;
-        const ch = block.dataset.chapter;
-        if (bCode && ch && (this.currentBook !== bCode || this.currentChapter !== parseInt(ch))) {
-          this.currentBook = bCode;
-          this.currentChapter = parseInt(ch);
-          const info = getBookInfo(bCode);
-          document.getElementById('pill-reference-text').textContent = `${info.name} ${ch}`;
-          document.getElementById('pane-1-breadcrumb').textContent = `${info.name.toUpperCase()} > Chapitre ${ch}`;
-          const breadcrumb2 = document.getElementById('pane-2-breadcrumb');
-          if (breadcrumb2) breadcrumb2.textContent = `${info.name.toUpperCase()} > Chapitre ${ch}`;
-          TabsManager.updateActiveTab(null, bCode, ch);
+    // Détecter le verset visible en tête de lecture
+    const topVerse = this.getTopVisibleVerse(container);
+    if (topVerse && topVerse.book && topVerse.chapter && topVerse.verse) {
+      const bCode = topVerse.book;
+      const ch = parseInt(topVerse.chapter, 10);
+      const vNum = parseInt(topVerse.verse, 10);
+      const info = getBookInfo(bCode);
 
-          // Suivi en direct du commentaire lors du défilement continu
-          if (typeof CommentaryViewer !== 'undefined' && CommentaryViewer.isSynchronized) {
-            this.loadCommentariesForVerse(1, bCode, parseInt(ch), false);
-          }
+      // Si le chapitre a changé lors du défilement continu
+      if (this.currentBook !== bCode || this.currentChapter !== ch) {
+        this.currentBook = bCode;
+        this.currentChapter = ch;
+        document.getElementById('pane-1-breadcrumb').textContent = `${info.name.toUpperCase()} > Chapitre ${ch}`;
+        const breadcrumb2 = document.getElementById('pane-2-breadcrumb');
+        if (breadcrumb2) breadcrumb2.textContent = `${info.name.toUpperCase()} > Chapitre ${ch}`;
+        TabsManager.updateActiveTab(null, bCode, ch);
+      }
+
+      // Mettre à jour l'étiquette de référence en haut du lecteur
+      const pillRef = document.getElementById('pill-reference-text');
+      if (pillRef) {
+        pillRef.textContent = `${info.name} ${ch}:${vNum}`;
+      }
+
+      // Suivi en direct du commentaire dans le volet droit
+      const newRef = `${bCode}_${ch}_${vNum}`;
+      if (this._lastScrolledVerseRef !== newRef) {
+        this._lastScrolledVerseRef = newRef;
+        if (typeof CommentaryViewer !== 'undefined' && CommentaryViewer.isSynchronized) {
+          this.debouncedLoadCommentaries(vNum, bCode, ch);
         }
-        break;
       }
     }
   },
