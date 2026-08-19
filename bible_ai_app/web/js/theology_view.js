@@ -739,10 +739,58 @@ const TheologyView = {
 
   highlightScriptureReferences(text) {
     if (!text) return '';
-    // Détection des références bibliques usuelles (ex: Jean 3:16, 1 Corinthiens 13:4-8, Gen 1.1, etc.)
-    const pattern = /\b((?:[1-3]\s*)?[A-ZÀ-ÿ][a-zà-ÿ]+(?:\s+[a-zà-ÿ]+)?)\s+([0-9]{1,3})[:.]([0-9]{1,3}(?:-[0-9]{1,3})?)\b/g;
-    return text.replace(pattern, (match, book, ch, vs) => {
-      return `<span class="theol-inline-scripture-ref" data-ref="${match}">${match}</span>`;
+
+    // Liste exhaustive des livres bibliques et abréviations françaises usuelles
+    const bookNamesPattern = [
+      // Noms complets et usuels
+      'Genèse', 'Exode', 'Lévitique', 'Nombres', 'Deutéronome', 'Josué', 'Juges', 'Ruth',
+      '1 Samuel', '2 Samuel', '1 Rois', '2 Rois', '1 Chroniques', '2 Chroniques',
+      'Esdras', 'Néhémie', 'Esther', 'Job', 'Psaumes', 'Psaume', 'Proverbes', 'Ecclésiaste',
+      'Cantique des cantiques', 'Cantique', 'Ésaïe', 'Esaïe', 'Jérémie', 'Lamentations', 'Ézéchiel', 'Ezechiel',
+      'Daniel', 'Osée', 'Osee', 'Joël', 'Joel', 'Amos', 'Abdias', 'Jonas', 'Michée', 'Michee',
+      'Nahum', 'Habacuc', 'Sophonie', 'Aggée', 'Aggee', 'Zacharie', 'Malachie',
+      'Matthieu', 'Marc', 'Luc', 'Jean', 'Actes des apôtres', 'Actes', 'Romains',
+      '1 Corinthiens', '2 Corinthiens', 'Galates', 'Éphésiens', 'Ephesiens', 'Philippiens', 'Colossiens',
+      '1 Thessaloniciens', '2 Thessaloniciens', '1 Timothée', '2 Timothée', '1 Timothee', '2 Timothee',
+      'Tite', 'Philémon', 'Philemon', 'Hébreux', 'Hebreux', 'Jacques', '1 Pierre', '2 Pierre',
+      '1 Jean', '2 Jean', '3 Jean', 'Jude', 'Apocalypse',
+
+      // Abréviations numérotées
+      '1\\s*Sam?', '2\\s*Sam?', '1\\s*Sa\\b', '2\\s*Sa\\b', '1\\s*S\\b', '2\\s*S\\b',
+      '1\\s*Rois?', '2\\s*Rois?', '1\\s*R\\b', '2\\s*R\\b', '1\\s*Ki', '2\\s*Ki',
+      '1\\s*Chr?', '2\\s*Chr?', '1\\s*Ch\\b', '2\\s*Ch\\b',
+      '1\\s*Cor?', '2\\s*Cor?', '1\\s*Co\\b', '2\\s*Co\\b',
+      '1\\s*The?s?s?', '2\\s*The?s?s?', '1\\s*Th\\b', '2\\s*Th\\b',
+      '1\\s*Tim?', '2\\s*Tim?', '1\\s*Ti\\b', '2\\s*Ti\\b', '1\\s*Tm\\b', '2\\s*Tm\\b',
+      '1\\s*Pie?r?r?e?', '2\\s*Pie?r?r?e?', '1\\s*Pe\\b', '2\\s*Pe\\b', '1\\s*P\\b', '2\\s*P\\b',
+      '1\\s*Jn?\\b', '2\\s*Jn?\\b', '3\\s*Jn?\\b', '1\\s*Joh?\\b', '2\\s*Joh?\\b', '3\\s*Joh?\\b',
+
+      // Abréviations simples AT
+      'Gen', 'Gn\\b', 'Exo?', 'Ex\\b', 'Lév', 'Lev', 'Lv\\b', 'Nom', 'Nomb', 'Nb\\b', 'Deut?', 'Dt\\b',
+      'Jos', 'Jug', 'Jg\\b', 'Jdg', 'Rut?', 'Rt\\b', 'Esd', 'Ezr', 'Néh', 'Neh', 'Esth?', 'Est\\b',
+      'Psa?', 'Ps\\b', 'Prov?', 'Pr\\b', 'Eccl?', 'Ecc', 'Ec\\b', 'Qoh', 'Cant?', 'Ct\\b', 'Sol',
+      'Ésa?', 'Esa?', 'Is\\b', 'Isa', 'Jér', 'Jer', 'Jr\\b', 'Lam', 'Lm\\b', 'Ézéch?', 'Ezech?', 'Ézé?', 'Eze?', 'Éz\\b', 'Ez\\b',
+      'Dan?', 'Da\\b', 'Osé?', 'Ose?', 'Os\\b', 'Hos', 'Joë?', 'Joe?', 'Jl\\b', 'Amo?', 'Am\\b',
+      'Abd', 'Oba', 'Jon', 'Mich?', 'Mic', 'Mi\\b', 'Nah', 'Na\\b', 'Hab', 'Ha\\b',
+      'Soph', 'Zep', 'So\\b', 'Agg', 'Hag', 'Ag\\b', 'Zach?', 'Zec', 'Za\\b', 'Mal', 'Ml\\b',
+
+      // Abréviations simples NT
+      'Matt?', 'Mat', 'Mt\\b', 'Marc?', 'Mar', 'Mc\\b', 'Luc?', 'Luk', 'Lc\\b', 'Jean', 'Joh', 'Jn\\b',
+      'Act', 'Ac\\b', 'Rom', 'Rm\\b', 'Ro\\b', 'Gal', 'Ga\\b', 'Éph', 'Eph', 'Phil', 'Phi\\b', 'Php', 'Ph\\b',
+      'Col', 'Tit', 'Tt\\b', 'Philém?', 'Phm', 'Héb', 'Heb', 'Jacq?', 'Jac', 'Jc\\b', 'Jam',
+      'Jud', 'Jd\\b', 'Apoc?', 'Apo', 'Ap\\b', 'Rev'
+    ].join('|');
+
+    // Pattern : Livre + Chapitre + (Optionnel : séparateur [:,.] ou verset/plage de versets)
+    const regex = new RegExp(`\\b(${bookNamesPattern})\\s+([0-9]{1,3})(?:\\s*[:.,]\\s*([0-9]{1,3}(?:\\s*-\\s*[0-9]{1,3})?))?\\b`, 'gi');
+
+    return text.replace(regex, (match, book, ch, vs) => {
+      const cleanBook = book.trim();
+      const cleanCh = ch.trim();
+      const cleanVs = vs ? vs.trim().replace(/\s+/g, '') : '';
+      const fullRef = cleanVs ? `${cleanBook} ${cleanCh}:${cleanVs}` : `${cleanBook} ${cleanCh}`;
+
+      return `<span class="theol-inline-scripture-ref" data-ref="${TheologyView.escapeHtml(fullRef)}">${match}</span>`;
     });
   },
 
@@ -1072,10 +1120,24 @@ const TheologyView = {
     const content = `# ${title}\n\n${this.latestSynthesisMarkdown}`;
     
     try {
-      await API.saveNote(title, content, `${this.currentChapterData?.book_french_name || ''}`, ['Théologie', 'Synthèse IA', this.currentBook]);
-      App.showToast('Synthèse enregistrée dans vos Notes (.md) !');
+      const payload = {
+        title,
+        content,
+        reference: `${this.currentChapterData?.book_french_name || ''}`,
+        tags: ['Théologie', 'Synthèse IA', this.currentBook]
+      };
+      const res = await API.call('save_note', payload);
+      if (res && res.success !== false) {
+        App.showToast('Synthèse enregistrée dans vos Notes (.md) !');
+        if (typeof NotesView !== 'undefined' && NotesView.loadNotes) {
+          NotesView.loadNotes();
+        }
+      } else {
+        throw new Error(res?.error || 'Erreur enregistrement');
+      }
     } catch (e) {
       console.error('Erreur export note:', e);
+      App.showToast('Erreur lors de l\'export vers les notes');
     }
   },
 
@@ -1290,8 +1352,21 @@ const TheologyView = {
     const content = `# ${title}\n\n*Résumé généré par IA*\n\n${md}`;
 
     try {
-      await API.saveNote(title, content, `${this.currentChapterData?.book_french_name || ''}`, ['Théologie', 'Résumé IA', this.currentBook]);
-      App.showToast('Résumé enregistré dans vos Notes (.md) !');
+      const payload = {
+        title,
+        content,
+        reference: `${this.currentChapterData?.book_french_name || ''}`,
+        tags: ['Théologie', 'Résumé IA', this.currentBook]
+      };
+      const res = await API.call('save_note', payload);
+      if (res && res.success !== false) {
+        App.showToast('Résumé enregistré dans vos Notes (.md) !');
+        if (typeof NotesView !== 'undefined' && NotesView.loadNotes) {
+          NotesView.loadNotes();
+        }
+      } else {
+        throw new Error(res?.error || 'Erreur enregistrement');
+      }
     } catch (e) {
       console.error('Erreur export note:', e);
       App.showToast('Erreur lors de l\'export vers les notes');
@@ -1329,9 +1404,9 @@ const TheologyView = {
       if (b.startsWith('<h1') || b.startsWith('<h2') || b.startsWith('<h3') || 
           b.startsWith('<pre') || b.startsWith('<blockquote') || 
           b.startsWith('<ul') || b.startsWith('<ol')) {
-        return b;
+        return this.highlightScriptureReferences(b);
       }
-      return `<p>${b.replace(/\n/g, '<br>')}</p>`;
+      return `<p>${this.highlightScriptureReferences(b).replace(/\n/g, '<br>')}</p>`;
     });
 
     return htmlBlocks.filter(Boolean).join('\n');
@@ -1354,10 +1429,24 @@ const TheologyView = {
     const content = `# ${title}\n\n${this.currentChapterData.raw_text}`;
 
     try {
-      await API.saveNote(title, content, `${this.currentChapterData?.book_french_name || ''}`, ['Théologie', this.currentBook]);
-      App.showToast('Chapitre exporté vers vos Notes (.md) !');
+      const payload = {
+        title,
+        content,
+        reference: `${this.currentChapterData?.book_french_name || ''}`,
+        tags: ['Théologie', this.currentBook]
+      };
+      const res = await API.call('save_note', payload);
+      if (res && res.success !== false) {
+        App.showToast('Chapitre exporté vers vos Notes (.md) !');
+        if (typeof NotesView !== 'undefined' && NotesView.loadNotes) {
+          NotesView.loadNotes();
+        }
+      } else {
+        throw new Error(res?.error || 'Erreur enregistrement');
+      }
     } catch (e) {
       console.error('Erreur export note:', e);
+      App.showToast('Erreur lors de l\'export vers les notes');
     }
   },
 

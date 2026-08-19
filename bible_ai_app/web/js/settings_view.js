@@ -263,6 +263,9 @@ Directives de rédaction :
       if (lbl) lbl.textContent = `~${e.target.value} mots`;
     });
 
+    // Initialisation et liaison des paires de modèles (Principal / Fallback distincts)
+    this.initModelSelectPairs();
+
     // Modale de Prompt Système
     document.getElementById('btn-close-prompt-modal')?.addEventListener('click', () => {
       this.closePromptModal();
@@ -515,7 +518,9 @@ Directives de rédaction :
       DrawerNotes.renderList();
     }
 
-    if (c.chat_model) document.getElementById('cfg-chat-model').value = c.chat_model;
+    if (c.chat_model && document.getElementById('cfg-chat-model')) {
+      document.getElementById('cfg-chat-model').value = c.chat_model;
+    }
     if (c.chat_fallback_model && document.getElementById('cfg-chat-fallback-model')) {
       document.getElementById('cfg-chat-fallback-model').value = c.chat_fallback_model;
     }
@@ -546,6 +551,10 @@ Directives de rédaction :
       const lbl = document.getElementById('lbl-summary-word-count-val');
       if (lbl) lbl.textContent = `~${c.summary_word_count || 300} mots`;
     }
+
+    // Synchronisation et exclusion des doublons Principal / Fallback
+    this.syncAllModelPairs(false);
+
     if (document.getElementById('cfg-synthesis-system-prompt')) {
       document.getElementById('cfg-synthesis-system-prompt').value = c.synthesis_system_prompt || '';
     }
@@ -561,6 +570,122 @@ Directives de rédaction :
     if (c.mistral_api_key) document.getElementById('cfg-mistral-key').value = c.mistral_api_key;
     if (c.infomaniak_token) document.getElementById('cfg-infomaniak-token').value = c.infomaniak_token;
     if (c.infomaniak_product_id) document.getElementById('cfg-infomaniak-pid').value = c.infomaniak_product_id;
+  },
+
+  initModelSelectPairs() {
+    const pairs = [
+      { primary: 'cfg-chat-model', fallback: 'cfg-chat-fallback-model', label: 'Chat' },
+      { primary: 'cfg-synthesis-model', fallback: 'cfg-synthesis-fallback-model', label: 'Synthèse' },
+      { primary: 'cfg-translation-model', fallback: 'cfg-translation-fallback-model', label: 'Traduction' },
+      { primary: 'cfg-summary-model', fallback: 'cfg-summary-fallback-model', label: 'Résumé' }
+    ];
+
+    pairs.forEach(({ primary, fallback, label }) => {
+      const pEl = document.getElementById(primary);
+      const fEl = document.getElementById(fallback);
+      if (!pEl || !fEl) return;
+
+      pEl.addEventListener('change', () => {
+        this.syncModelPair(primary, fallback, label, true);
+        this.save();
+      });
+
+      fEl.addEventListener('change', () => {
+        if (fEl.value === pEl.value) {
+          const alternate = this.getSmartFallbackModel(pEl.value, fEl);
+          if (alternate) {
+            fEl.value = alternate;
+            App.showToast(`Le modèle de secours (${label}) doit être distinct du modèle principal.`);
+          }
+        }
+        this.syncModelPair(primary, fallback, label, false);
+        this.save();
+      });
+    });
+
+    this.syncAllModelPairs(false);
+  },
+
+  syncAllModelPairs(isUserChange = false) {
+    const pairs = [
+      { primary: 'cfg-chat-model', fallback: 'cfg-chat-fallback-model', label: 'Chat' },
+      { primary: 'cfg-synthesis-model', fallback: 'cfg-synthesis-fallback-model', label: 'Synthèse' },
+      { primary: 'cfg-translation-model', fallback: 'cfg-translation-fallback-model', label: 'Traduction' },
+      { primary: 'cfg-summary-model', fallback: 'cfg-summary-fallback-model', label: 'Résumé' }
+    ];
+
+    pairs.forEach(({ primary, fallback, label }) => {
+      this.syncModelPair(primary, fallback, label, isUserChange);
+    });
+  },
+
+  syncModelPair(primaryId, fallbackId, label, isUserChange = false) {
+    const pEl = document.getElementById(primaryId);
+    const fEl = document.getElementById(fallbackId);
+    if (!pEl || !fEl) return;
+
+    const pVal = pEl.value;
+    const fVal = fEl.value;
+
+    // Désactiver l'option identique dans le sélecteur de secours
+    Array.from(fEl.options).forEach(opt => {
+      if (opt.value === pVal) {
+        opt.disabled = true;
+        if (!opt.text.includes('(Inactif - Identique au principal)')) {
+          opt.dataset.origText = opt.text;
+          opt.text = `${opt.text} (Indisponible en secours)`;
+        }
+      } else {
+        opt.disabled = false;
+        if (opt.dataset.origText) {
+          opt.text = opt.dataset.origText;
+          delete opt.dataset.origText;
+        }
+      }
+    });
+
+    // Si le fallback a la même valeur que le principal, basculer vers un modèle alternatif distinct
+    if (fVal === pVal) {
+      const alternate = this.getSmartFallbackModel(pVal, fEl);
+      if (alternate) {
+        fEl.value = alternate;
+        if (isUserChange) {
+          App.showToast(`Modèle de secours (${label}) ajusté : distinct du modèle principal.`);
+        }
+      }
+    }
+  },
+
+  getSmartFallbackModel(primaryModel, fallbackSelectEl) {
+    // Ordre de priorité intelligent pour le fallback
+    const defaultsOrder = [
+      'gemini-3.5-flash-lite',
+      'gemini-2.5-flash-lite',
+      'gemini-3.5-flash',
+      'gemini-2.5-flash',
+      'gemini-3.1-flash-lite',
+      'mistral-small-latest',
+      'gemini-3.7-flash',
+      'mistral-large-latest',
+      'mistralai/Ministral-3-14B-Instruct-2512',
+      'mistralai/Mistral-Small-4-119B-2603',
+      'Qwen/Qwen3.5-122B-A10B-FP8'
+    ];
+
+    for (const model of defaultsOrder) {
+      if (model !== primaryModel) {
+        const opt = fallbackSelectEl.querySelector(`option[value="${model}"]`);
+        if (opt && !opt.disabled) return model;
+      }
+    }
+
+    // Premier choix valide disponible
+    for (const opt of fallbackSelectEl.options) {
+      if (opt.value && opt.value !== primaryModel && !opt.disabled) {
+        return opt.value;
+      }
+    }
+    return '';
   },
 
   async loadStepBibleStatus() {
@@ -665,13 +790,23 @@ Directives de rédaction :
 
     newCfg.chat_model = document.getElementById('cfg-chat-model').value;
     if (document.getElementById('cfg-chat-fallback-model')) {
-      newCfg.chat_fallback_model = document.getElementById('cfg-chat-fallback-model').value;
+      let fb = document.getElementById('cfg-chat-fallback-model').value;
+      if (fb === newCfg.chat_model) {
+        fb = this.getSmartFallbackModel(newCfg.chat_model, document.getElementById('cfg-chat-fallback-model'));
+        document.getElementById('cfg-chat-fallback-model').value = fb;
+      }
+      newCfg.chat_fallback_model = fb;
     }
     if (document.getElementById('cfg-synthesis-model')) {
       newCfg.synthesis_model = document.getElementById('cfg-synthesis-model').value;
     }
     if (document.getElementById('cfg-synthesis-fallback-model')) {
-      newCfg.synthesis_fallback_model = document.getElementById('cfg-synthesis-fallback-model').value;
+      let fb = document.getElementById('cfg-synthesis-fallback-model').value;
+      if (fb === newCfg.synthesis_model) {
+        fb = this.getSmartFallbackModel(newCfg.synthesis_model, document.getElementById('cfg-synthesis-fallback-model'));
+        document.getElementById('cfg-synthesis-fallback-model').value = fb;
+      }
+      newCfg.synthesis_fallback_model = fb;
     }
     if (document.getElementById('cfg-synthesis-max-verses')) {
       newCfg.synthesis_max_verses = parseInt(document.getElementById('cfg-synthesis-max-verses').value) || 5;
@@ -680,13 +815,23 @@ Directives de rédaction :
       newCfg.translation_model = document.getElementById('cfg-translation-model').value;
     }
     if (document.getElementById('cfg-translation-fallback-model')) {
-      newCfg.translation_fallback_model = document.getElementById('cfg-translation-fallback-model').value;
+      let fb = document.getElementById('cfg-translation-fallback-model').value;
+      if (fb === newCfg.translation_model) {
+        fb = this.getSmartFallbackModel(newCfg.translation_model, document.getElementById('cfg-translation-fallback-model'));
+        document.getElementById('cfg-translation-fallback-model').value = fb;
+      }
+      newCfg.translation_fallback_model = fb;
     }
     if (document.getElementById('cfg-summary-model')) {
       newCfg.summary_model = document.getElementById('cfg-summary-model').value;
     }
     if (document.getElementById('cfg-summary-fallback-model')) {
-      newCfg.summary_fallback_model = document.getElementById('cfg-summary-fallback-model').value;
+      let fb = document.getElementById('cfg-summary-fallback-model').value;
+      if (fb === newCfg.summary_model) {
+        fb = this.getSmartFallbackModel(newCfg.summary_model, document.getElementById('cfg-summary-fallback-model'));
+        document.getElementById('cfg-summary-fallback-model').value = fb;
+      }
+      newCfg.summary_fallback_model = fb;
     }
     if (document.getElementById('cfg-summary-word-count')) {
       newCfg.summary_word_count = parseInt(document.getElementById('cfg-summary-word-count').value) || 300;

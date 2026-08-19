@@ -401,12 +401,19 @@ class BibleAppApi:
             code = parsed["code"]
             french = parsed.get("book") or get_french_book_name(code)
             ch = int(parsed["chapter"]) if parsed.get("chapter") and str(parsed["chapter"]).isdigit() else 1
-            verse = int(parsed["verse"]) if parsed.get("verse") and str(parsed["verse"]).isdigit() else None
+            verse_raw = str(parsed.get("verse")) if parsed.get("verse") else None
+            verse = None
+            if verse_raw:
+                if verse_raw.isdigit():
+                    verse = int(verse_raw)
+                elif "-" in verse_raw and verse_raw.split("-")[0].isdigit():
+                    verse = int(verse_raw.split("-")[0])
             return {
                 "book": code,
                 "book_french": french,
                 "chapter": max(1, ch),
-                "verse": verse
+                "verse": verse,
+                "raw_verse": verse_raw
             }
             
         resolved = resolve_book_input(raw)
@@ -485,8 +492,29 @@ class BibleAppApi:
             chapters_dict = book_data.get("chapters", {})
             verses_dict = chapters_dict.get(str(chapter), {})
 
-            # Si un verset spécifique est demandé
+            # Si un verset spécifique ou une plage est demandée
             if target_verse is not None:
+                # Vérifier si c'est une plage (ex: 15-16 ou 6-7)
+                m_range = re.search(r'[:.,\s](\d+)-(\d+)', str(raw_reference))
+                if m_range:
+                    start_v, end_v = int(m_range.group(1)), int(m_range.group(2))
+                    range_texts = []
+                    for v_idx in range(start_v, min(end_v + 1, start_v + 8)):
+                        if str(v_idx) in verses_dict:
+                            txt = strip_xml_tags(extract_verse_text(verses_dict[str(v_idx)]))
+                            range_texts.append(f"<sup>{v_idx}</sup> {txt}")
+                    if range_texts:
+                        return {
+                            "success": True,
+                            "reference": f"{book_french} {chapter}:{start_v}-{end_v}",
+                            "book": book_code,
+                            "book_french": book_french,
+                            "chapter": chapter,
+                            "verse": f"{start_v}-{end_v}",
+                            "text": " ".join(range_texts),
+                            "bible": display_bible
+                        }
+
                 v_key = str(target_verse)
                 if v_key in verses_dict:
                     v_raw = verses_dict[v_key]

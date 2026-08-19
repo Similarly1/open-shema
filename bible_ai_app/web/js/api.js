@@ -281,6 +281,16 @@ const API = {
       };
     }
     return null;
+  },
+
+  async saveNote(title, content, reference = '', tags = [], id = null) {
+    return this.call('save_note', {
+      title,
+      content,
+      reference,
+      tags,
+      id
+    });
   }
 };
 

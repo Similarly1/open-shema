@@ -897,122 +897,331 @@
 
             <div class="ai-sub-config" id="sec-ai-sub-config">
               <div class="settings-card">
-                <div class="card-title">Modèles d'Intelligence Artificielle</div>
+                <div class="card-title" style="display: flex; align-items: center; justify-content: space-between;">
+                  <span>Modèles d'Intelligence Artificielle</span>
+                  <span style="font-size: 11.5px; font-weight: 500; color: var(--text-secondary);">20 modèles (Gemini, Mistral, Infomaniak)</span>
+                </div>
+                <p class="card-desc" style="margin-bottom: 16px;">Configurez le modèle principal et le modèle de secours (fallback automatique) pour chaque fonctionnalité exégétique.</p>
               
-              <div class="form-row two-cols">
-                <div class="form-group">
-                  <label>Modèle de Chat principal :</label>
-                  <select id="cfg-chat-model" class="select-field full-w">
-                    <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
-                    <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
-                    <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
-                    <option value="mistral-small-latest">Mistral Small</option>
-                    <option value="mistral-large-latest">Mistral Large</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>Modèle de secours (Fallback Chat) :</label>
-                  <select id="cfg-chat-fallback-model" class="select-field full-w">
-                    <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
-                    <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
-                    <option value="mistral-small-latest">Mistral Small</option>
-                    <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="form-row two-cols" style="margin-top: 14px;">
-                <div class="form-group">
-                  <label>Modèle Synthèse Exégétique :</label>
-                  <select id="cfg-synthesis-model" class="select-field full-w">
-                    <option value="gemini-3.7-flash">Google Gemini 3.7 Flash (Recommandé)</option>
-                    <option value="gemini-2.5-pro">Google Gemini 2.5 Pro (Approfondi)</option>
-                    <option value="gemini-3.5-flash">Google Gemini 3.5 Flash (Rapide)</option>
-                    <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
-                    <option value="mistral-large-latest">Mistral Large</option>
-                    <option value="mistral-small-latest">Mistral Small</option>
-                    <option value="mistralai/Mistral-Small-4-119B-2603">Infomaniak Mistral 119B</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>Modèle de secours (Fallback Synthèse) :</label>
-                  <select id="cfg-synthesis-fallback-model" class="select-field full-w">
-                    <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
-                    <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
-                    <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
-                    <option value="mistral-large-latest">Mistral Large</option>
-                    <option value="mistral-small-latest">Mistral Small</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="form-row two-cols" style="margin-top: 14px;">
-                <div class="form-group">
-                  <label>Plafond de versets par synthèse :</label>
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                    <input type="number" id="cfg-synthesis-max-verses" min="1" max="10" value="5" class="text-field" style="width: 80px;">
-                    <span style="font-size: 12px; color: var(--text-secondary);">versets max (1 à 10)</span>
+                <!-- Bloc 1 : Assistant & Chat Biblique -->
+                <div class="ai-model-feature-block">
+                  <div class="ai-model-feature-header">
+                    <div class="ai-model-feature-title">
+                      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                      <span>1. Assistant &amp; Chat Biblique</span>
+                    </div>
+                    <span class="ai-model-feature-badge">Étude &amp; Questions</span>
                   </div>
-                  <p class="field-hint" style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">Limite la plage pour optimiser le contexte et la précision de la synthèse comparative.</p>
-                </div>
-                <div class="form-group">
-                  <label>Modèle pour la Traduction d'articles :</label>
-                  <select id="cfg-translation-model" class="select-field full-w">
-                    <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite (Recommandé)</option>
-                    <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
-                    <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
-                    <option value="mistral-small-latest">Mistral Small</option>
-                    <option value="mistralai/Ministral-3-14B-Instruct-2512">Infomaniak Ministral 14B</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="form-row two-cols" style="margin-top: 14px;">
-                <div class="form-group">
-                  <label>Modèle de secours (Fallback Traduction) :</label>
-                  <select id="cfg-translation-fallback-model" class="select-field full-w">
-                    <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
-                    <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
-                    <option value="mistral-small-latest">Mistral Small</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="form-divider" style="margin: 16px 0 14px 0;"></div>
-
-              <div class="form-row two-cols">
-                <div class="form-group">
-                  <label>Modèle Résumé de Chapitre :</label>
-                  <select id="cfg-summary-model" class="select-field full-w">
-                    <option value="gemini-3.7-flash">Google Gemini 3.7 Flash (Recommandé)</option>
-                    <option value="gemini-3.5-flash">Google Gemini 3.5 Flash (Rapide)</option>
-                    <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
-                    <option value="mistral-large-latest">Mistral Large</option>
-                    <option value="mistral-small-latest">Mistral Small</option>
-                    <option value="mistralai/Mistral-Small-4-119B-2603">Infomaniak Mistral 119B</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>Modèle de secours (Fallback Résumé) :</label>
-                  <select id="cfg-summary-fallback-model" class="select-field full-w">
-                    <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
-                    <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
-                    <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
-                    <option value="mistral-small-latest">Mistral Small</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="form-row two-cols" style="margin-top: 14px;">
-                <div class="form-group">
-                  <label>Longueur cible du Résumé :</label>
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                    <input type="number" id="cfg-summary-word-count" min="100" max="1200" step="50" value="300" class="text-field" style="width: 90px;">
-                    <span style="font-size: 12px; color: var(--text-secondary);" id="lbl-summary-word-count-val">~300 mots</span>
+                  <div class="form-row two-cols">
+                    <div class="form-group">
+                      <label for="cfg-chat-model">Modèle principal :</label>
+                      <select id="cfg-chat-model" class="select-field full-w ai-model-select" data-pair="chat">
+                        <optgroup label="── Google Gemini ──">
+                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash (Recommandé)</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
+                          <option value="gemini-3-flash">Google Gemini 3.0 Flash</option>
+                          <option value="gemini-2.5-pro">Google Gemini 2.5 Pro (Haute précision)</option>
+                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
+                          <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
+                        </optgroup>
+                        <optgroup label="── Mistral AI ──">
+                          <option value="mistral-large-latest">Mistral Large (Approfondi)</option>
+                          <option value="mistral-small-latest">Mistral Small (Rapide)</option>
+                          <option value="open-mistral-nemo">Mistral Nemo</option>
+                          <option value="codestral-latest">Mistral Codestral</option>
+                        </optgroup>
+                        <optgroup label="── Infomaniak Swiss AI ──">
+                          <option value="mistralai/Ministral-3-14B-Instruct-2512">Infomaniak Ministral 14B</option>
+                          <option value="mistralai/Mistral-Small-4-119B-2603">Infomaniak Mistral 119B</option>
+                          <option value="Qwen/Qwen3.5-397B-A17B-FP8">Infomaniak Qwen 3.5 397B</option>
+                          <option value="Qwen/Qwen3.5-122B-A10B-FP8">Infomaniak Qwen 3.5 122B</option>
+                          <option value="swiss-ai/Apertus-v1.5-70B">Infomaniak Apertus 70B</option>
+                          <option value="google/gemma-4-31B-it">Infomaniak Gemma 31B</option>
+                          <option value="moonshotai/Kimi-K2.6">Infomaniak Kimi K2.6</option>
+                          <option value="nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8">Infomaniak Nemotron 30B</option>
+                        </optgroup>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="cfg-chat-fallback-model">Modèle de secours (Fallback) :</label>
+                      <select id="cfg-chat-fallback-model" class="select-field full-w ai-model-select" data-pair="chat">
+                        <optgroup label="── Google Gemini ──">
+                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
+                          <option value="gemini-3-flash">Google Gemini 3.0 Flash</option>
+                          <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
+                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
+                          <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
+                        </optgroup>
+                        <optgroup label="── Mistral AI ──">
+                          <option value="mistral-large-latest">Mistral Large</option>
+                          <option value="mistral-small-latest">Mistral Small</option>
+                          <option value="open-mistral-nemo">Mistral Nemo</option>
+                          <option value="codestral-latest">Mistral Codestral</option>
+                        </optgroup>
+                        <optgroup label="── Infomaniak Swiss AI ──">
+                          <option value="mistralai/Ministral-3-14B-Instruct-2512">Infomaniak Ministral 14B</option>
+                          <option value="mistralai/Mistral-Small-4-119B-2603">Infomaniak Mistral 119B</option>
+                          <option value="Qwen/Qwen3.5-397B-A17B-FP8">Infomaniak Qwen 3.5 397B</option>
+                          <option value="Qwen/Qwen3.5-122B-A10B-FP8">Infomaniak Qwen 3.5 122B</option>
+                          <option value="swiss-ai/Apertus-v1.5-70B">Infomaniak Apertus 70B</option>
+                          <option value="google/gemma-4-31B-it">Infomaniak Gemma 31B</option>
+                          <option value="moonshotai/Kimi-K2.6">Infomaniak Kimi K2.6</option>
+                          <option value="nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8">Infomaniak Nemotron 30B</option>
+                        </optgroup>
+                      </select>
+                    </div>
                   </div>
-                  <p class="field-hint" style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">Longueur indicative envoyée au modèle pour calibrer la synthèse doctrinale.</p>
                 </div>
-              </div>
+
+                <!-- Bloc 2 : Synthèse Exégétique Comparative -->
+                <div class="ai-model-feature-block">
+                  <div class="ai-model-feature-header">
+                    <div class="ai-model-feature-title">
+                      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+                      <span>2. Synthèse Exégétique Comparative</span>
+                    </div>
+                    <span class="ai-model-feature-badge">Commentaires</span>
+                  </div>
+                  <div class="form-row two-cols">
+                    <div class="form-group">
+                      <label for="cfg-synthesis-model">Modèle principal :</label>
+                      <select id="cfg-synthesis-model" class="select-field full-w ai-model-select" data-pair="synthesis">
+                        <optgroup label="── Google Gemini ──">
+                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash (Recommandé)</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
+                          <option value="gemini-3-flash">Google Gemini 3.0 Flash</option>
+                          <option value="gemini-2.5-pro">Google Gemini 2.5 Pro (Haute précision)</option>
+                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
+                          <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
+                        </optgroup>
+                        <optgroup label="── Mistral AI ──">
+                          <option value="mistral-large-latest">Mistral Large (Approfondi)</option>
+                          <option value="mistral-small-latest">Mistral Small (Rapide)</option>
+                          <option value="open-mistral-nemo">Mistral Nemo</option>
+                          <option value="codestral-latest">Mistral Codestral</option>
+                        </optgroup>
+                        <optgroup label="── Infomaniak Swiss AI ──">
+                          <option value="mistralai/Ministral-3-14B-Instruct-2512">Infomaniak Ministral 14B</option>
+                          <option value="mistralai/Mistral-Small-4-119B-2603">Infomaniak Mistral 119B</option>
+                          <option value="Qwen/Qwen3.5-397B-A17B-FP8">Infomaniak Qwen 3.5 397B</option>
+                          <option value="Qwen/Qwen3.5-122B-A10B-FP8">Infomaniak Qwen 3.5 122B</option>
+                          <option value="swiss-ai/Apertus-v1.5-70B">Infomaniak Apertus 70B</option>
+                          <option value="google/gemma-4-31B-it">Infomaniak Gemma 31B</option>
+                          <option value="moonshotai/Kimi-K2.6">Infomaniak Kimi K2.6</option>
+                          <option value="nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8">Infomaniak Nemotron 30B</option>
+                        </optgroup>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="cfg-synthesis-fallback-model">Modèle de secours (Fallback) :</label>
+                      <select id="cfg-synthesis-fallback-model" class="select-field full-w ai-model-select" data-pair="synthesis">
+                        <optgroup label="── Google Gemini ──">
+                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
+                          <option value="gemini-3-flash">Google Gemini 3.0 Flash</option>
+                          <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
+                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
+                          <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
+                        </optgroup>
+                        <optgroup label="── Mistral AI ──">
+                          <option value="mistral-large-latest">Mistral Large</option>
+                          <option value="mistral-small-latest">Mistral Small</option>
+                          <option value="open-mistral-nemo">Mistral Nemo</option>
+                          <option value="codestral-latest">Mistral Codestral</option>
+                        </optgroup>
+                        <optgroup label="── Infomaniak Swiss AI ──">
+                          <option value="mistralai/Ministral-3-14B-Instruct-2512">Infomaniak Ministral 14B</option>
+                          <option value="mistralai/Mistral-Small-4-119B-2603">Infomaniak Mistral 119B</option>
+                          <option value="Qwen/Qwen3.5-397B-A17B-FP8">Infomaniak Qwen 3.5 397B</option>
+                          <option value="Qwen/Qwen3.5-122B-A10B-FP8">Infomaniak Qwen 3.5 122B</option>
+                          <option value="swiss-ai/Apertus-v1.5-70B">Infomaniak Apertus 70B</option>
+                          <option value="google/gemma-4-31B-it">Infomaniak Gemma 31B</option>
+                          <option value="moonshotai/Kimi-K2.6">Infomaniak Kimi K2.6</option>
+                          <option value="nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8">Infomaniak Nemotron 30B</option>
+                        </optgroup>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-row two-cols" style="margin-top: 10px;">
+                    <div class="form-group">
+                      <label for="cfg-synthesis-max-verses">Plafond de versets par synthèse :</label>
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="number" id="cfg-synthesis-max-verses" min="1" max="10" value="5" class="text-field" style="width: 80px;">
+                        <span style="font-size: 12px; color: var(--text-secondary);">versets max (1 à 10)</span>
+                      </div>
+                      <p class="field-hint" style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">Limite la plage pour optimiser le contexte et la précision de la synthèse comparative.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Bloc 3 : Traduction d'Articles & Dictionnaires -->
+                <div class="ai-model-feature-block">
+                  <div class="ai-model-feature-header">
+                    <div class="ai-model-feature-title">
+                      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z"/></svg>
+                      <span>3. Traduction d'Articles &amp; Dictionnaires</span>
+                    </div>
+                    <span class="ai-model-feature-badge">Fidélité Littérale</span>
+                  </div>
+                  <div class="form-row two-cols">
+                    <div class="form-group">
+                      <label for="cfg-translation-model">Modèle principal :</label>
+                      <select id="cfg-translation-model" class="select-field full-w ai-model-select" data-pair="translation">
+                        <optgroup label="── Google Gemini ──">
+                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite (Recommandé)</option>
+                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
+                          <option value="gemini-3-flash">Google Gemini 3.0 Flash</option>
+                          <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
+                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
+                          <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
+                        </optgroup>
+                        <optgroup label="── Mistral AI ──">
+                          <option value="mistral-small-latest">Mistral Small (Rapide)</option>
+                          <option value="mistral-large-latest">Mistral Large</option>
+                          <option value="open-mistral-nemo">Mistral Nemo</option>
+                          <option value="codestral-latest">Mistral Codestral</option>
+                        </optgroup>
+                        <optgroup label="── Infomaniak Swiss AI ──">
+                          <option value="mistralai/Ministral-3-14B-Instruct-2512">Infomaniak Ministral 14B</option>
+                          <option value="mistralai/Mistral-Small-4-119B-2603">Infomaniak Mistral 119B</option>
+                          <option value="Qwen/Qwen3.5-397B-A17B-FP8">Infomaniak Qwen 3.5 397B</option>
+                          <option value="Qwen/Qwen3.5-122B-A10B-FP8">Infomaniak Qwen 3.5 122B</option>
+                          <option value="swiss-ai/Apertus-v1.5-70B">Infomaniak Apertus 70B</option>
+                          <option value="google/gemma-4-31B-it">Infomaniak Gemma 31B</option>
+                          <option value="moonshotai/Kimi-K2.6">Infomaniak Kimi K2.6</option>
+                          <option value="nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8">Infomaniak Nemotron 30B</option>
+                        </optgroup>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="cfg-translation-fallback-model">Modèle de secours (Fallback) :</label>
+                      <select id="cfg-translation-fallback-model" class="select-field full-w ai-model-select" data-pair="translation">
+                        <optgroup label="── Google Gemini ──">
+                          <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
+                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
+                          <option value="gemini-3-flash">Google Gemini 3.0 Flash</option>
+                          <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
+                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
+                        </optgroup>
+                        <optgroup label="── Mistral AI ──">
+                          <option value="mistral-small-latest">Mistral Small</option>
+                          <option value="mistral-large-latest">Mistral Large</option>
+                          <option value="open-mistral-nemo">Mistral Nemo</option>
+                          <option value="codestral-latest">Mistral Codestral</option>
+                        </optgroup>
+                        <optgroup label="── Infomaniak Swiss AI ──">
+                          <option value="mistralai/Ministral-3-14B-Instruct-2512">Infomaniak Ministral 14B</option>
+                          <option value="mistralai/Mistral-Small-4-119B-2603">Infomaniak Mistral 119B</option>
+                          <option value="Qwen/Qwen3.5-397B-A17B-FP8">Infomaniak Qwen 3.5 397B</option>
+                          <option value="Qwen/Qwen3.5-122B-A10B-FP8">Infomaniak Qwen 3.5 122B</option>
+                          <option value="swiss-ai/Apertus-v1.5-70B">Infomaniak Apertus 70B</option>
+                          <option value="google/gemma-4-31B-it">Infomaniak Gemma 31B</option>
+                          <option value="moonshotai/Kimi-K2.6">Infomaniak Kimi K2.6</option>
+                          <option value="nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8">Infomaniak Nemotron 30B</option>
+                        </optgroup>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Bloc 4 : Résumé Théologique de Chapitre -->
+                <div class="ai-model-feature-block">
+                  <div class="ai-model-feature-header">
+                    <div class="ai-model-feature-title">
+                      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+                      <span>4. Résumé Théologique de Chapitre</span>
+                    </div>
+                    <span class="ai-model-feature-badge">Théologie</span>
+                  </div>
+                  <div class="form-row two-cols">
+                    <div class="form-group">
+                      <label for="cfg-summary-model">Modèle principal :</label>
+                      <select id="cfg-summary-model" class="select-field full-w ai-model-select" data-pair="summary">
+                        <optgroup label="── Google Gemini ──">
+                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash (Recommandé)</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
+                          <option value="gemini-3-flash">Google Gemini 3.0 Flash</option>
+                          <option value="gemini-2.5-pro">Google Gemini 2.5 Pro (Haute précision)</option>
+                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
+                          <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
+                        </optgroup>
+                        <optgroup label="── Mistral AI ──">
+                          <option value="mistral-large-latest">Mistral Large (Approfondi)</option>
+                          <option value="mistral-small-latest">Mistral Small (Rapide)</option>
+                          <option value="open-mistral-nemo">Mistral Nemo</option>
+                          <option value="codestral-latest">Mistral Codestral</option>
+                        </optgroup>
+                        <optgroup label="── Infomaniak Swiss AI ──">
+                          <option value="mistralai/Ministral-3-14B-Instruct-2512">Infomaniak Ministral 14B</option>
+                          <option value="mistralai/Mistral-Small-4-119B-2603">Infomaniak Mistral 119B</option>
+                          <option value="Qwen/Qwen3.5-397B-A17B-FP8">Infomaniak Qwen 3.5 397B</option>
+                          <option value="Qwen/Qwen3.5-122B-A10B-FP8">Infomaniak Qwen 3.5 122B</option>
+                          <option value="swiss-ai/Apertus-v1.5-70B">Infomaniak Apertus 70B</option>
+                          <option value="google/gemma-4-31B-it">Infomaniak Gemma 31B</option>
+                          <option value="moonshotai/Kimi-K2.6">Infomaniak Kimi K2.6</option>
+                          <option value="nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8">Infomaniak Nemotron 30B</option>
+                        </optgroup>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="cfg-summary-fallback-model">Modèle de secours (Fallback) :</label>
+                      <select id="cfg-summary-fallback-model" class="select-field full-w ai-model-select" data-pair="summary">
+                        <optgroup label="── Google Gemini ──">
+                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
+                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
+                          <option value="gemini-3-flash">Google Gemini 3.0 Flash</option>
+                          <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
+                          <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
+                        </optgroup>
+                        <optgroup label="── Mistral AI ──">
+                          <option value="mistral-small-latest">Mistral Small</option>
+                          <option value="mistral-large-latest">Mistral Large</option>
+                          <option value="open-mistral-nemo">Mistral Nemo</option>
+                          <option value="codestral-latest">Mistral Codestral</option>
+                        </optgroup>
+                        <optgroup label="── Infomaniak Swiss AI ──">
+                          <option value="mistralai/Ministral-3-14B-Instruct-2512">Infomaniak Ministral 14B</option>
+                          <option value="mistralai/Mistral-Small-4-119B-2603">Infomaniak Mistral 119B</option>
+                          <option value="Qwen/Qwen3.5-397B-A17B-FP8">Infomaniak Qwen 3.5 397B</option>
+                          <option value="Qwen/Qwen3.5-122B-A10B-FP8">Infomaniak Qwen 3.5 122B</option>
+                          <option value="swiss-ai/Apertus-v1.5-70B">Infomaniak Apertus 70B</option>
+                          <option value="google/gemma-4-31B-it">Infomaniak Gemma 31B</option>
+                          <option value="moonshotai/Kimi-K2.6">Infomaniak Kimi K2.6</option>
+                          <option value="nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8">Infomaniak Nemotron 30B</option>
+                        </optgroup>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-row two-cols" style="margin-top: 10px;">
+                    <div class="form-group">
+                      <label for="cfg-summary-word-count">Longueur cible du résumé :</label>
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="number" id="cfg-summary-word-count" min="100" max="1200" step="50" value="300" class="text-field" style="width: 90px;">
+                        <span style="font-size: 12px; color: var(--text-secondary);" id="lbl-summary-word-count-val">~300 mots</span>
+                      </div>
+                      <p class="field-hint" style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">Longueur indicative transmise au modèle pour calibrer la concision doctrinale.</p>
+                    </div>
+                  </div>
+                </div>
 
               <div class="form-divider" style="margin: 20px 0 16px 0;"></div>
               

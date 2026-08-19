@@ -152,9 +152,9 @@ def normalize_reference(user_input: str) -> str:
         
     user_input = user_input.strip()
     
-    # Capte: (Livre) (Chapitre) [:. ] (Verset)
+    # Capte: (Livre) (Chapitre) [:,.] (Verset)
     # Gère aussi les chiffres devant le nom du livre comme '1 Jean' et les noms composés comme 'Cantique des cantiques'
-    pattern = r'^([1-4]?\s*[^\W\d_]+(?:\s+[^\W\d_]+)*)\s*(\d+)(?:[.: ](\d+(?:-\d+)?))?$'
+    pattern = r'^([1-4]?\s*[^\W\d_]+(?:\s+[^\W\d_]+)*)\s*(\d+)(?:[.:, ](\d+(?:-\d+)?))?$'
     match = re.match(pattern, user_input)
     
     if match:

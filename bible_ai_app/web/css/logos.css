@@ -9053,6 +9053,76 @@ body.ai-disabled .ai-feature-only {
   display: none !important;
 }
 
+/* ==========================================================================
+   BLOCS DE CONFIGURATION DES MODÈLES IA (ALIGNEMENT & DESIGN ÉLÉGANT)
+   ========================================================================== */
+
+.ai-model-feature-block {
+  background: var(--bg-surface, rgba(255, 255, 255, 0.02));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  transition: all 0.2s ease;
+}
+
+.ai-model-feature-block:hover {
+  border-color: rgba(2, 132, 199, 0.35);
+  background: var(--bg-hover, rgba(255, 255, 255, 0.035));
+}
+
+.ai-model-feature-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.06));
+}
+
+.ai-model-feature-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.ai-model-feature-title svg {
+  color: var(--accent-blue, #0284c7);
+}
+
+.ai-model-feature-badge {
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(2, 132, 199, 0.12);
+  color: var(--accent-blue, #38bdf8);
+  border: 1px solid rgba(2, 132, 199, 0.2);
+}
+
+.ai-model-select optgroup {
+  font-weight: 700;
+  color: var(--accent-blue, #0284c7);
+  background: var(--bg-card, #1e293b);
+  padding: 4px 0;
+}
+
+.ai-model-select option {
+  font-weight: 400;
+  color: var(--text-primary, #f8fafc);
+  background: var(--bg-card, #1e293b);
+  padding: 4px 8px;
+}
+
+.ai-model-select option:disabled {
+  color: var(--text-muted, rgba(255, 255, 255, 0.3)) !important;
+  background: rgba(0, 0, 0, 0.2) !important;
+}
+
+
 
 
 
