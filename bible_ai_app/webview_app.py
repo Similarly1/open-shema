@@ -444,6 +444,56 @@ class BibleAppApi:
             model=model
         )
 
+    def detect_language(self, text: str, meta_lang: Optional[str] = None) -> Dict[str, Any]:
+        """Détecte la langue d'un extrait textuel."""
+        from core.translation_manager import TranslationManager
+        lang = TranslationManager.detect_language(text, meta_lang)
+        return {"language": lang, "is_french": lang == "fr"}
+
+    def get_cached_translation(self, item_type: str, item_id: str) -> Optional[Dict[str, Any]]:
+        """Récupère une traduction déjà en cache SQLite si elle existe."""
+        from core.translation_manager import TranslationManager
+        return TranslationManager.get_translation(item_type=item_type, item_id=item_id, target_lang="fr")
+
+    def translate_text(self, text: str, item_type: str = "", item_id: str = "", model: Optional[str] = None) -> Dict[str, Any]:
+        """Traduit un texte spécifique (commentaire, dictionnaire) en français via LLM sans synthétiser."""
+        from core.translation_manager import TranslationManager
+        from core.config import load_config
+        config = load_config()
+        try:
+            # Vérifier si déjà en cache
+            if item_type and item_id:
+                cached = TranslationManager.get_translation(item_type=item_type, item_id=item_id, target_lang="fr")
+                if cached and cached.get("translated_text"):
+                    return {
+                        "success": True,
+                        "translated_text": cached["translated_text"],
+                        "cached": True,
+                        "model_used": cached.get("model_used", "Cache")
+                    }
+
+            clean_model = model or config.get("translation_model") or "gemini-3.5-flash-lite"
+            translated = TranslationManager.translate_text(
+                text=text,
+                model=clean_model,
+                config=config,
+                item_type=item_type,
+                item_id=item_id
+            )
+            return {
+                "success": True,
+                "translated_text": translated,
+                "cached": False,
+                "model_used": clean_model
+            }
+        except Exception as e:
+            logger.error("Erreur traduction: %s", e)
+            return {
+                "success": False,
+                "error": str(e),
+                "translated_text": None
+            }
+
     # =========================================================================
     # RECHERCHE GLOBALE
     # =========================================================================

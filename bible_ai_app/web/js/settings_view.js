@@ -166,6 +166,36 @@ const SettingsView = {
       }
     });
 
+    document.getElementById('btn-reset-synth-prompt')?.addEventListener('click', () => {
+      const defaultSynthPrompt = `Vous êtes un éminent professeur de théologie et un exégète biblique chevronné.
+Votre mission est de rédiger une SYNTHÈSE EXÉGÉTIQUE COMPARATIVE d'excellence à partir des extraits de commentaires fournis.
+
+RÈGLES CRITIQUES DE RÉDACTION :
+1. LANGUE : Rédigez TOUJOURS l'intégralité de la synthèse en FRANÇAIS impeccable, fluide et naturel, même si les commentaires ou sources fournis sont rédigés en anglais, en allemand ou dans une autre langue.
+2. FIDÉLITÉ : Basez votre analyse rigoureusement sur les commentaires fournis. Ne spéculez pas et n'inventez aucun contenu.
+3. CITATIONS : Citez nommément et explicitement les auteurs ou ouvrages entre crochets gras (ex: **[John MacArthur]**, **[Matthew Henry]**, **[J.N. Darby]**, **[Bible Annotée]**, **[Jean Calvin]**) pour chaque affirmation basée sur leurs écrits.
+4. STRUCTURE IMPÉRATIVE (Markdown) :
+   - ## 📌 1. Consensus Exégétique & Thèmes Communs (Ce sur quoi tous les auteurs s'accordent, doctrine principale, sens direct du texte)
+   - ## 🔍 2. Nuances, Divergences & Traditions Théologiques (Comparaison des points de vue, différences d'accentuation : typologique, dispensationaliste, réformée, historique, analyse des mots originaux hébreux/grecs)
+   - ## 💡 3. Clés Textuelles & Applications Pastorales (Enseignements théologiques majeurs, implications pratiques et spirituelles pour la foi)
+   - ## 📚 4. Synthèse des Sources Étudiées (Bref résumé récapitulatif des apports uniques de chaque commentateur cité)`;
+      document.getElementById('cfg-synthesis-system-prompt').value = defaultSynthPrompt;
+      App.showToast('Prompt de synthèse rétabli par défaut');
+    });
+
+    document.getElementById('btn-reset-trans-prompt')?.addEventListener('click', () => {
+      const defaultTransPrompt = `Vous êtes un traducteur exégétique et théologique de haute précision.
+Votre mission est de traduire fidèlement, intégralement et précisément le texte biblique, commentaire ou notice de dictionnaire fourni vers le français.
+
+RÈGLES STRICTES :
+1. FIDÉLITÉ ABSOLUE : Traduisez l'intégralité du texte sans rien omettre, sans résumer, et sans inventer ni ajouter d'informations non présentes dans le texte original.
+2. TERMINOLOGIE THÉOLOGIQUE : Respectez la terminologie biblique et théologique francophone établie.
+3. FORMAT : Conservez la mise en forme originale (paragraphes, puces, références bibliques, codes Strong, termes hébreux/grecs).
+4. NE JAMAIS dialoguer ni ajouter de préambule : Renvoyez UNIQUEMENT le texte traduit en français.`;
+      document.getElementById('cfg-translation-system-prompt').value = defaultTransPrompt;
+      App.showToast('Prompt de traduction rétabli par défaut');
+    });
+
     document.getElementById('btn-save-settings-top').addEventListener('click', () => {
       this.save();
     });
@@ -349,6 +379,16 @@ const SettingsView = {
       document.getElementById('cfg-synthesis-curation-model').value = c.synthesis_curation_model;
     }
 
+    if (c.translation_model && document.getElementById('cfg-translation-model')) {
+      document.getElementById('cfg-translation-model').value = c.translation_model;
+    }
+    if (document.getElementById('cfg-synthesis-system-prompt')) {
+      document.getElementById('cfg-synthesis-system-prompt').value = c.synthesis_system_prompt || '';
+    }
+    if (document.getElementById('cfg-translation-system-prompt')) {
+      document.getElementById('cfg-translation-system-prompt').value = c.translation_system_prompt || '';
+    }
+
     if (c.gemini_api_key) document.getElementById('cfg-gemini-key').value = c.gemini_api_key;
     if (c.mistral_api_key) document.getElementById('cfg-mistral-key').value = c.mistral_api_key;
     if (c.infomaniak_token) document.getElementById('cfg-infomaniak-token').value = c.infomaniak_token;
@@ -457,8 +497,14 @@ const SettingsView = {
     if (document.getElementById('cfg-synthesis-reranking')) {
       newCfg.synthesis_enable_reranking = document.getElementById('cfg-synthesis-reranking').checked;
     }
-    if (document.getElementById('cfg-synthesis-curation-model')) {
-      newCfg.synthesis_curation_model = document.getElementById('cfg-synthesis-curation-model').value;
+    if (document.getElementById('cfg-translation-model')) {
+      newCfg.translation_model = document.getElementById('cfg-translation-model').value;
+    }
+    if (document.getElementById('cfg-synthesis-system-prompt')) {
+      newCfg.synthesis_system_prompt = document.getElementById('cfg-synthesis-system-prompt').value;
+    }
+    if (document.getElementById('cfg-translation-system-prompt')) {
+      newCfg.translation_system_prompt = document.getElementById('cfg-translation-system-prompt').value;
     }
 
     newCfg.gemini_api_key = document.getElementById('cfg-gemini-key').value.trim();

@@ -280,20 +280,9 @@ class CommentarySynthesizer:
                 "scripture_text": scripture
             }
 
-        # 6. Prompt de Synthèse Multi-Commentaires Haute Fidélité
-        system_instruction = (
-            "Vous êtes un éminent professeur de théologie et un exégète biblique chevronné.\n"
-            "Votre mission est de rédiger une SYNTHÈSE EXÉGÉTIQUE COMPARATIVE d'excellence à partir des extraits de commentaires fournis.\n\n"
-            "RÈGLES CRITIQUES DE RÉDACTION :\n"
-            "1. Basez votre analyse rigoureusement sur les commentaires fournis. Ne spéculez pas.\n"
-            "2. Citez nommément et explicitement les auteurs ou ouvrages entre crochets gras (ex: **[John MacArthur]**, **[Matthew Henry]**, **[J.N. Darby]**, **[Bible Annotée]**) lorsque vous rapportez une idée ou une nuance distinctive.\n"
-            "3. Structurez impérativement votre réponse avec les 4 sections suivantes en Markdown impeccable :\n"
-            "   - ## 📌 1. Consensus Exégétique & Thèmes Communs (Ce sur quoi tous les auteurs s'accordent, doctrine principale, sens direct)\n"
-            "   - ## 🔍 2. Nuances, Divergences & Perspectives Particulières (Comparaison des points de vue, différences d'accentuation : typologie, dispensation, christocentrisme, analyse grammaticale/mots originaux)\n"
-            "   - ## 💡 3. Clés Textuelles & Applications Pratiques (Enseignements théologiques majeurs, implications pastorales et pour la vie de foi)\n"
-            "   - ## 📚 4. Synthèse des Sources Étudiées (Bref résumé récapitulatif des apports uniques de chaque commentateur cité)\n"
-            "4. Rédigez en français élégant, clair, précis et théologiquement rigoureux."
-        )
+        # 6. Prompt de Synthèse Multi-Commentaires Haute Fidélité (Modifiable dans les paramètres)
+        from core.config import DEFAULT_SYNTHESIS_SYSTEM_PROMPT
+        system_instruction = config.get("synthesis_system_prompt") or DEFAULT_SYNTHESIS_SYSTEM_PROMPT
 
         user_content = (
             f"### PASSAGE BIBLIQUE ÉTUDIÉ : **{ref_label}**\n\n"

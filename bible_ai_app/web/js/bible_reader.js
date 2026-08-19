@@ -528,9 +528,18 @@ const CommentaryViewer = {
   currentChapter: 1,
   currentVerse: 1,
   isSynchronized: true,
+  translationCache: {},
+  showTranslatedVersion: {},
 
   init() {
-    // 1. Restaurer l'état de synchronisation
+    // 1. Bouton de traduction d'article individuel
+    const btnTranslate = document.getElementById('btn-translate-comm');
+    btnTranslate?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.translateActiveCommentary();
+    });
+
+    // 2. Restaurer l'état de synchronisation
     try {
       const savedSync = localStorage.getItem('bible_comm_sync');
       if (savedSync !== null) {
@@ -739,6 +748,16 @@ const CommentaryViewer = {
     }
   },
 
+  isForeignText(text) {
+    if (!text || text.length < 15) return false;
+    const sample = text.toLowerCase().slice(0, 500);
+    const frWords = [' le ', ' la ', ' les ', ' un ', ' une ', ' des ', ' du ', ' dans ', ' pour ', ' avec ', ' est ', ' sont ', ' ce ', ' cette '];
+    const enWords = [' the ', ' and ', ' that ', ' with ', ' for ', ' this ', ' from ', ' which ', ' have ', ' are ', ' was ', ' were ', ' his ', ' but '];
+    const frMatches = frWords.filter(w => sample.includes(w)).length;
+    const enMatches = enWords.filter(w => sample.includes(w)).length;
+    return enMatches > frMatches;
+  },
+
   selectCommentary(index) {
     if (!this.currentComments[index]) return;
     this.activeIndex = index;
@@ -757,14 +776,97 @@ const CommentaryViewer = {
     const container = document.getElementById('commentary-single-view');
     if (!container) return;
 
+    const itemId = `${comm.source || authorName}_${this.currentBook}_${this.currentChapter}_${comm.verse_start || this.currentVerse}`;
+    const isForeign = this.isForeignText(comm.text);
+    const btnTranslate = document.getElementById('btn-translate-comm');
+    const hasTranslation = this.translationCache[itemId];
+    const isShowingTranslated = this.showTranslatedVersion[itemId] !== false && !!hasTranslation;
+
+    if (btnTranslate) {
+      if (isForeign && !hasTranslation) {
+        btnTranslate.classList.remove('hidden');
+        btnTranslate.disabled = false;
+        btnTranslate.innerHTML = '<span>🌐 Traduire</span>';
+      } else {
+        btnTranslate.classList.add('hidden');
+      }
+    }
+
+    let translationBannerHtml = '';
+    let displayedText = comm.text || '';
+
+    if (hasTranslation) {
+      if (isShowingTranslated) {
+        displayedText = this.translationCache[itemId];
+        translationBannerHtml = `
+          <div class="comm-translate-badge">
+            <span>🌐 Traduit fidèlement en français (IA)</span>
+            <span class="comm-translate-toggle-link" id="btn-toggle-orig-text">Voir texte original</span>
+          </div>
+        `;
+      } else {
+        translationBannerHtml = `
+          <div class="comm-translate-badge">
+            <span>📖 Texte original (${comm.source || 'Source'})</span>
+            <span class="comm-translate-toggle-link" id="btn-toggle-orig-text">Voir traduction française</span>
+          </div>
+        `;
+      }
+    }
+
     container.innerHTML = `
       <div class="comm-single-author-header">
         <span class="comm-single-author-badge">📖 ${authorName}</span>
       </div>
+      ${translationBannerHtml}
       <div class="comm-single-body">
-        ${(comm.text || '').replace(/\n\n/g, '<br><br>')}
+        ${(displayedText || '').replace(/\n\n/g, '<br><br>')}
       </div>
     `;
+
+    const toggleBtn = container.querySelector('#btn-toggle-orig-text');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        this.showTranslatedVersion[itemId] = !isShowingTranslated;
+        this.selectCommentary(index);
+      });
+    }
+  },
+
+  async translateActiveCommentary() {
+    const comm = this.currentComments[this.activeIndex];
+    if (!comm || !comm.text) return;
+
+    const btnTranslate = document.getElementById('btn-translate-comm');
+    const authorName = comm.author || comm.source || 'Commentaire';
+    const itemId = `${comm.source || authorName}_${this.currentBook}_${this.currentChapter}_${comm.verse_start || this.currentVerse}`;
+
+    if (btnTranslate) {
+      btnTranslate.disabled = true;
+      btnTranslate.innerHTML = '<span class="synth-spinner" style="width:12px; height:12px; border-width:2px; vertical-align:middle; margin-right:4px;"></span><span>Traduction...</span>';
+    }
+
+    try {
+      const res = await API.translateText(comm.text, 'commentary', itemId);
+      if (res && res.success && res.translated_text) {
+        this.translationCache[itemId] = res.translated_text;
+        this.showTranslatedVersion[itemId] = true;
+        this.selectCommentary(this.activeIndex);
+        App.showToast('Article traduit en français avec succès !');
+      } else {
+        App.showError('Erreur de Traduction', res?.error || 'Impossible de traduire l\'article.');
+        if (btnTranslate) {
+          btnTranslate.disabled = false;
+          btnTranslate.innerHTML = '<span>🌐 Réessayer</span>';
+        }
+      }
+    } catch (e) {
+      App.showError('Erreur de Traduction', String(e));
+      if (btnTranslate) {
+        btnTranslate.disabled = false;
+        btnTranslate.innerHTML = '<span>🌐 Réessayer</span>';
+      }
+    }
   },
 
   renderAbsentPreferredAuthor() {
@@ -859,6 +961,7 @@ const CommentarySynthesizerUI = {
     const endInput = document.getElementById('synth-verse-end');
     const btnCopy = document.getElementById('btn-copy-synth');
     const btnExportNote = document.getElementById('btn-export-synth-note');
+    const btnEditRange = document.getElementById('btn-edit-synth-range');
 
     btnOpen?.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -868,6 +971,11 @@ const CommentarySynthesizerUI = {
     btnClose?.addEventListener('click', (e) => {
       e.stopPropagation();
       this.closePanel();
+    });
+
+    btnEditRange?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggleEditRange();
     });
 
     startInput?.addEventListener('input', () => this.handleRangeChange());
@@ -882,6 +990,7 @@ const CommentarySynthesizerUI = {
   async togglePanel(forceOpen = null) {
     const panel = document.getElementById('comm-synthesis-panel');
     const btnOpen = document.getElementById('btn-open-comm-synth');
+    const singleView = document.getElementById('commentary-single-view');
     if (!panel) return;
 
     this.isOpen = forceOpen !== null ? forceOpen : panel.classList.contains('hidden');
@@ -892,12 +1001,43 @@ const CommentarySynthesizerUI = {
       await this.refreshStateFromReader();
     } else {
       panel.classList.add('hidden');
+      panel.classList.remove('synthesis-fullview');
+      singleView?.classList.remove('hidden');
       btnOpen?.classList.remove('active');
     }
   },
 
   closePanel() {
     this.togglePanel(false);
+  },
+
+  enterFullResultMode() {
+    const panel = document.getElementById('comm-synthesis-panel');
+    const singleView = document.getElementById('commentary-single-view');
+    if (panel) panel.classList.add('synthesis-fullview');
+    if (singleView) singleView.classList.add('hidden');
+  },
+
+  exitFullResultMode() {
+    const panel = document.getElementById('comm-synthesis-panel');
+    const singleView = document.getElementById('commentary-single-view');
+    if (panel) panel.classList.remove('synthesis-fullview');
+    if (singleView) singleView.classList.remove('hidden');
+  },
+
+  toggleEditRange() {
+    const panel = document.getElementById('comm-synthesis-panel');
+    const btnEditRange = document.getElementById('btn-edit-synth-range');
+    if (!panel) return;
+
+    const isFull = panel.classList.contains('synthesis-fullview');
+    if (isFull) {
+      panel.classList.remove('synthesis-fullview');
+      if (btnEditRange) btnEditRange.textContent = '📖 Résultat';
+    } else {
+      panel.classList.add('synthesis-fullview');
+      if (btnEditRange) btnEditRange.textContent = '⚙️ Plage';
+    }
   },
 
   async refreshStateFromReader() {
@@ -1050,6 +1190,7 @@ const CommentarySynthesizerUI = {
 
     contentEl.innerHTML = this.renderMarkdown(data.synthesis || '');
     resultBox.classList.remove('hidden');
+    this.enterFullResultMode();
   },
 
   renderMarkdown(text) {
@@ -1617,26 +1758,67 @@ const LexiconViewer = {
   renderDictionaryMatch(container, match) {
     const isPolished = match.is_polished;
     const modelName = match.polished_model || 'Mistral 14B';
+    const itemId = `dict_${match.dict_id}_${match.id || this.currentTerm}`;
+    const isForeign = CommentaryViewer.isForeignText(match.full_text || match.preview || '');
+    const cachedTrans = CommentaryViewer.translationCache[itemId];
+    const isShowingTranslated = CommentaryViewer.showTranslatedVersion[itemId] !== false && !!cachedTrans;
 
     let polishBarHtml = '';
     if (match.dict_id !== 'strong') {
       polishBarHtml = `
-        <div class="ai-polish-bar">
+        <div class="ai-polish-bar" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
           <div>
             ${isPolished 
               ? `<span class="ai-polished-badge">✨ Notice restaurée par IA (${modelName})</span>` 
               : `<span style="font-size: 11px; color: #4338CA; font-weight: 600;">Améliorer la lisibilité avec l'IA</span>`
             }
           </div>
-          <button class="ai-polish-btn" id="btn-polish-entry">
-            <span>✨</span>
-            <span>${isPolished ? 'Re-générer' : "Améliorer avec l'IA (Mistral 14B)"}</span>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            ${isForeign && !cachedTrans ? `
+              <button class="comm-translate-btn" id="btn-translate-dict" style="font-size: 11px; padding: 4px 8px;">
+                <span>🌐 Traduire</span>
+              </button>
+            ` : ''}
+            <button class="ai-polish-btn" id="btn-polish-entry">
+              <span>✨</span>
+              <span>${isPolished ? 'Re-générer' : "Améliorer avec l'IA"}</span>
+            </button>
+          </div>
+        </div>
+      `;
+    } else if (isForeign && !cachedTrans) {
+      polishBarHtml = `
+        <div style="margin-bottom: 10px; display: flex; justify-content: flex-end;">
+          <button class="comm-translate-btn" id="btn-translate-dict" style="font-size: 11px; padding: 4px 8px;">
+            <span>🌐 Traduire en français</span>
           </button>
         </div>
       `;
     }
 
-    const textToRender = (match.full_text || match.preview || '')
+    let translationBannerHtml = '';
+    let rawText = match.full_text || match.preview || '';
+
+    if (cachedTrans) {
+      if (isShowingTranslated) {
+        rawText = cachedTrans;
+        translationBannerHtml = `
+          <div class="comm-translate-badge" style="margin-top: 8px;">
+            <span>🌐 Notice traduite fidèlement en français (IA)</span>
+            <span class="comm-translate-toggle-link" id="btn-toggle-dict-orig">Voir texte original</span>
+          </div>
+        `;
+      } else {
+        translationBannerHtml = `
+          <div class="comm-translate-badge" style="margin-top: 8px;">
+            <span>📖 Texte original (${match.dict_name || 'Dictionnaire'})</span>
+            <span class="comm-translate-toggle-link" id="btn-toggle-dict-orig">Voir traduction française</span>
+          </div>
+        `;
+      }
+    }
+
+    const textToRender = (rawText || '')
       .replace(/^### (.*$)/gim, '<h3 style="margin: 12px 0 6px 0; color: var(--accent-blue); font-size: 16px; font-weight: 700;">$1</h3>')
       .replace(/^## (.*$)/gim, '<h2 style="margin: 14px 0 8px 0; color: var(--accent-blue); font-size: 18px; font-weight: 700;">$1</h2>')
       .replace(/^# (.*$)/gim, '<h1 style="margin: 16px 0 10px 0; color: var(--accent-blue); font-size: 20px; font-weight: 800;">$1</h1>')
@@ -1651,9 +1833,43 @@ const LexiconViewer = {
         <div style="font-size: 20px; font-weight: 800; color: var(--accent-blue); margin-bottom: 4px;">${match.title || this.currentTerm}</div>
         <div style="font-size: 11px; font-weight: 700; color: var(--accent-orange); margin-bottom: 12px;">${match.badge || match.dict_name}</div>
         ${polishBarHtml}
+        ${translationBannerHtml}
         <div style="font-family: var(--font-bible); font-size: 15px; line-height: 1.75; color: var(--text-primary);" id="match-body-text" class="dict-entry-body">${textToRender}</div>
       </div>
     `;
+
+    const toggleBtn = container.querySelector('#btn-toggle-dict-orig');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        CommentaryViewer.showTranslatedVersion[itemId] = !isShowingTranslated;
+        this.renderDictionaryMatch(container, match);
+      });
+    }
+
+    const btnTranslateDict = container.querySelector('#btn-translate-dict');
+    if (btnTranslateDict) {
+      btnTranslateDict.addEventListener('click', async () => {
+        btnTranslateDict.disabled = true;
+        btnTranslateDict.innerHTML = '<span class="synth-spinner" style="width:12px; height:12px; border-width:2px; vertical-align:middle; margin-right:4px;"></span><span>Traduction...</span>';
+        try {
+          const res = await API.translateText(match.full_text || match.preview || '', 'dictionary', itemId);
+          if (res && res.success && res.translated_text) {
+            CommentaryViewer.translationCache[itemId] = res.translated_text;
+            CommentaryViewer.showTranslatedVersion[itemId] = true;
+            this.renderDictionaryMatch(container, match);
+            App.showToast('Notice traduite en français !');
+          } else {
+            App.showError('Erreur de Traduction', res?.error || 'Impossible de traduire.');
+            btnTranslateDict.disabled = false;
+            btnTranslateDict.innerHTML = '<span>🌐 Réessayer</span>';
+          }
+        } catch (e) {
+          App.showError('Erreur de Traduction', String(e));
+          btnTranslateDict.disabled = false;
+          btnTranslateDict.innerHTML = '<span>🌐 Réessayer</span>';
+        }
+      });
+    }
 
     const btnPolish = container.querySelector('#btn-polish-entry');
     if (btnPolish) {

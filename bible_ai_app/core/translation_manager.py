@@ -221,11 +221,14 @@ class TranslationManager:
             api_key = config.get("gemini_api_key", "")
             client = LLMClient(api_key=api_key, model=clean_model, provider="gemini")
 
+        from core.config import DEFAULT_TRANSLATION_SYSTEM_PROMPT
+        system_prompt = config.get("translation_system_prompt") or DEFAULT_TRANSLATION_SYSTEM_PROMPT
+
         user_prompt = f"Voici le texte à traduire fidèlement en français (conserve le Markdown et les références) :\n\n{text}"
         messages = [{"role": "user", "content": user_prompt}]
 
         try:
-            translated = client.chat(messages=messages, system_prompt=TRANSLATION_SYSTEM_PROMPT)
+            translated = client.chat(messages=messages, system_prompt=system_prompt)
             
             # Nettoyage léger des blocs de code markdown superflus si le LLM a entouré de ```markdown
             translated = translated.strip()

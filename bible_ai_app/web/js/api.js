@@ -167,6 +167,18 @@ const API = {
     return await this.call('synthesize_commentaries', bookCode, parseInt(chapterNum), parseInt(verseStart), verseEnd ? parseInt(verseEnd) : null, enableReranking, model);
   },
 
+  async translateText(text, itemType = '', itemId = '', model = null) {
+    return await this.call('translate_text', text, itemType, itemId, model);
+  },
+
+  async getCachedTranslation(itemType, itemId) {
+    return await this.call('get_cached_translation', itemType, itemId);
+  },
+
+  async detectLanguage(text, metaLang = null) {
+    return await this.call('detect_language', text, metaLang);
+  },
+
   // Mock pour test dans navigateur externe
   _mockResponse(method, ...args) {
     if (method === 'get_installed_bibles') {
