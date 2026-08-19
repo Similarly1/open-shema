@@ -1438,6 +1438,189 @@
       </div>
     </div>
 
+    <!-- ======================================================= -->
+    <!-- MENU CONTEXTUEL STYLE OBSIDIAN (PAGE DE NOTES)           -->
+    <!-- ======================================================= -->
+    <div id="obsidian-context-menu" class="obsidian-ctx-menu hidden">
+      <!-- 1. Formater > -->
+      <div class="ctx-menu-item has-submenu" data-submenu="format">
+        <span class="ctx-icon">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 2 4 4-14 14H4v-4L18 2z"/><path d="m14.5 5.5 4 4"/></svg>
+        </span>
+        <span class="ctx-label">Formater</span>
+        <span class="ctx-arrow">›</span>
+
+        <div class="ctx-submenu" id="ctx-submenu-format">
+          <div class="ctx-menu-item" data-action="bold">
+            <span class="ctx-icon" style="font-weight: 800; font-family: var(--font-bible); font-size: 15px;">B</span>
+            <span class="ctx-label">Gras</span>
+            <span class="ctx-shortcut">Ctrl+B</span>
+          </div>
+          <div class="ctx-menu-item" data-action="italic">
+            <span class="ctx-icon" style="font-style: italic; font-family: var(--font-bible); font-size: 15px;">I</span>
+            <span class="ctx-label">Italique</span>
+            <span class="ctx-shortcut">Ctrl+I</span>
+          </div>
+          <div class="ctx-menu-item" data-action="strikethrough">
+            <span class="ctx-icon" style="text-decoration: line-through; font-weight: 600;">S</span>
+            <span class="ctx-label">Barré</span>
+            <span class="ctx-shortcut">Ctrl+Shift+X</span>
+          </div>
+          <div class="ctx-menu-item" data-action="highlight">
+            <span class="ctx-icon" style="background: rgba(234, 179, 8, 0.3); border-radius: 3px; font-weight: 700; font-size: 11px; padding: 0 3px; color: #EAB308;">==</span>
+            <span class="ctx-label">Surligné</span>
+            <span class="ctx-shortcut">Ctrl+Shift+H</span>
+          </div>
+          <div class="ctx-menu-item" data-action="inline-code">
+            <span class="ctx-icon" style="font-family: monospace; font-size: 12px; font-weight: 700;">`&nbsp;`</span>
+            <span class="ctx-label">Code en ligne</span>
+            <span class="ctx-shortcut">`</span>
+          </div>
+          <div class="ctx-menu-item" data-action="superscript">
+            <span class="ctx-icon" style="font-size: 12px;">X<sup>2</sup></span>
+            <span class="ctx-label">Exposant</span>
+            <span class="ctx-shortcut">^</span>
+          </div>
+          <div class="ctx-menu-item" data-action="subscript">
+            <span class="ctx-icon" style="font-size: 12px;">X<sub>2</sub></span>
+            <span class="ctx-label">Indice</span>
+            <span class="ctx-shortcut">~</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Paragraphe > -->
+      <div class="ctx-menu-item has-submenu" data-submenu="paragraph">
+        <span class="ctx-icon">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 4v16"/><path d="M17 4v16"/><path d="M19 4H9.5a4.5 4.5 0 0 0 0 9H13"/></svg>
+        </span>
+        <span class="ctx-label">Paragraphe</span>
+        <span class="ctx-arrow">›</span>
+
+        <div class="ctx-submenu" id="ctx-submenu-paragraph">
+          <div class="ctx-menu-item" data-action="h1">
+            <span class="ctx-icon" style="font-weight: 800; font-size: 11px;">H1</span>
+            <span class="ctx-label">Titre 1</span>
+            <span class="ctx-shortcut">#</span>
+          </div>
+          <div class="ctx-menu-item" data-action="h2">
+            <span class="ctx-icon" style="font-weight: 800; font-size: 11px;">H2</span>
+            <span class="ctx-label">Titre 2</span>
+            <span class="ctx-shortcut">##</span>
+          </div>
+          <div class="ctx-menu-item" data-action="h3">
+            <span class="ctx-icon" style="font-weight: 800; font-size: 11px;">H3</span>
+            <span class="ctx-label">Titre 3</span>
+            <span class="ctx-shortcut">###</span>
+          </div>
+          <div class="ctx-menu-item" data-action="quote">
+            <span class="ctx-icon" style="font-size: 14px;">❝</span>
+            <span class="ctx-label">Citation</span>
+            <span class="ctx-shortcut">&gt;</span>
+          </div>
+          <div class="ctx-menu-item" data-action="bullet-list">
+            <span class="ctx-icon" style="font-size: 14px;">•</span>
+            <span class="ctx-label">Liste à puces</span>
+            <span class="ctx-shortcut">-</span>
+          </div>
+          <div class="ctx-menu-item" data-action="number-list">
+            <span class="ctx-icon" style="font-size: 11px; font-weight: 700;">1.</span>
+            <span class="ctx-label">Liste numérotée</span>
+            <span class="ctx-shortcut">1.</span>
+          </div>
+          <div class="ctx-menu-item" data-action="task-list">
+            <span class="ctx-icon" style="font-size: 13px;">☑</span>
+            <span class="ctx-label">Liste de tâches</span>
+            <span class="ctx-shortcut">- [ ]</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Insérer > -->
+      <div class="ctx-menu-item has-submenu" data-submenu="insert">
+        <span class="ctx-icon">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </span>
+        <span class="ctx-label">Insérer</span>
+        <span class="ctx-arrow">›</span>
+
+        <div class="ctx-submenu" id="ctx-submenu-insert">
+          <div class="ctx-menu-item" data-action="horizontal-rule">
+            <span class="ctx-icon" style="font-weight: 700; font-size: 14px;">⎯</span>
+            <span class="ctx-label">Ligne horizontale</span>
+            <span class="ctx-shortcut">---</span>
+          </div>
+          <div class="ctx-menu-item" data-action="datetime">
+            <span class="ctx-icon" style="font-size: 13px;">📅</span>
+            <span class="ctx-label">Date et heure</span>
+            <span class="ctx-shortcut">Ctrl+Shift+D</span>
+          </div>
+          <div class="ctx-menu-item" data-action="table">
+            <span class="ctx-icon" style="font-size: 13px;">📊</span>
+            <span class="ctx-label">Tableau</span>
+            <span class="ctx-shortcut">Table</span>
+          </div>
+          <div class="ctx-menu-item" data-action="code-block">
+            <span class="ctx-icon" style="font-size: 13px;">💻</span>
+            <span class="ctx-label">Bloc de code</span>
+            <span class="ctx-shortcut">```</span>
+          </div>
+          <div class="ctx-menu-item" data-action="callout">
+            <span class="ctx-icon" style="font-size: 13px;">💡</span>
+            <span class="ctx-label">Encart / Callout</span>
+            <span class="ctx-shortcut">&gt; [!NOTE]</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ctx-divider"></div>
+
+      <!-- 4. Couper -->
+      <div class="ctx-menu-item" data-action="cut">
+        <span class="ctx-icon">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+        </span>
+        <span class="ctx-label">Couper</span>
+        <span class="ctx-shortcut">Ctrl+X</span>
+      </div>
+
+      <!-- 5. Copier -->
+      <div class="ctx-menu-item" data-action="copy">
+        <span class="ctx-icon">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </span>
+        <span class="ctx-label">Copier</span>
+        <span class="ctx-shortcut">Ctrl+C</span>
+      </div>
+
+      <!-- 6. Coller -->
+      <div class="ctx-menu-item" data-action="paste">
+        <span class="ctx-icon">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+        </span>
+        <span class="ctx-label">Coller</span>
+        <span class="ctx-shortcut">Ctrl+V</span>
+      </div>
+
+      <!-- 7. Coller en texte brut -->
+      <div class="ctx-menu-item" data-action="paste-plain">
+        <span class="ctx-icon">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+        </span>
+        <span class="ctx-label">Coller en texte brut</span>
+        <span class="ctx-shortcut">Ctrl+Shift+V</span>
+      </div>
+
+      <!-- 8. Tout sélectionner -->
+      <div class="ctx-menu-item" data-action="select-all">
+        <span class="ctx-icon">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" stroke-dasharray="4 2"/></svg>
+        </span>
+        <span class="ctx-label">Tout sélectionner</span>
+        <span class="ctx-shortcut">Ctrl+A</span>
+      </div>
+    </div>
+
   </div>
 
   <!-- Scripts -->
