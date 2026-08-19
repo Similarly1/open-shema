@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Inter:wght@300;400;500;600;700&family=Literata:ital,opsz,wght@0,7..72,400..700;1,7..72,400..700&family=Lora:ital,wght@0,400..700;1,400..700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
   
   <!-- CSS -->
+  <link rel="stylesheet" href="css/leaflet.css">
   <link rel="stylesheet" href="css/logos.css">
 </head>
 <body class="theme-dark window-maximized">
@@ -138,6 +139,16 @@
             </svg>
           </span>
           <span class="nav-label">Notes</span>
+        </button>
+        <button class="nav-item" data-view="maps" id="nav-maps" title="Cartes bibliques">
+          <span class="nav-icon">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"></path>
+              <path d="M9 3v15"></path>
+              <path d="M15 6v15"></path>
+            </svg>
+          </span>
+          <span class="nav-label">Cartes</span>
         </button>
         
         <div class="sidebar-section-divider"></div>
@@ -270,6 +281,17 @@
               <span class="btn-icon">🔤</span>
               <span>Interlinéaire</span>
               <span class="pill-arrow">▾</span>
+            </button>
+
+            <button class="tool-btn" id="btn-chapter-places" title="Lieux du chapitre sur la carte">
+              <span class="btn-icon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"></path>
+                  <path d="M9 3v15"></path>
+                  <path d="M15 6v15"></path>
+                </svg>
+              </span>
+              <span>Lieux</span>
             </button>
 
             <button class="tool-btn" id="btn-toggle-split" title="Mode Double Colonne / Comparaison">
@@ -1102,6 +1124,125 @@
         </div>
       </div>
 
+      <!-- ===================================================== -->
+      <!-- VUE H : CARTES BIBLIQUES INTERACTIVES                  -->
+      <!-- ===================================================== -->
+      <div class="app-view" id="view-maps">
+        <header class="view-header">
+          <div class="view-title-box">
+            <h1 class="view-title">CARTES BIBLIQUES</h1>
+            <p class="view-subtitle" id="maps-header-subtitle">Explorez les cités antiques, les reliefs et les grands itinéraires bibliques.</p>
+          </div>
+          <div class="view-actions" style="display: flex; align-items: center; gap: 8px;">
+            <!-- Sélecteur de fond de carte -->
+            <div class="map-layers-segmented">
+              <button type="button" class="map-layer-btn active" data-layer="voyager" title="Fond épuré & harmonieux">Voyager</button>
+              <button type="button" class="map-layer-btn" data-layer="topo" title="Reliefs & Topographie">Relief</button>
+              <button type="button" class="map-layer-btn" data-layer="dark" title="Mode Sombre Profond">Nuit</button>
+              <button type="button" class="map-layer-btn" data-layer="osm" title="OpenStreetMap standard">Standard</button>
+            </div>
+            
+            <button class="btn-secondary" id="btn-map-reset-view" title="Recentrer la carte sur Jérusalem">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <line x1="12" y1="2" x2="12" y2="22"></line>
+              </svg>
+              <span>Recentrer</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="maps-workspace-layout">
+          <!-- Volet Gauche : Recherche, Filtres & Liste des Lieux / Itinéraires -->
+          <aside class="maps-sidebar-pane">
+            <div class="maps-sidebar-controls">
+              <!-- Recherche -->
+              <div class="maps-search-box">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="maps-search-icon">
+                  <circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path>
+                </svg>
+                <input type="text" id="map-search-input" class="maps-search-field" placeholder="Chercher un lieu biblique...">
+              </div>
+
+              <!-- Filtres -->
+              <div class="maps-filters-row">
+                <select id="map-type-filter" class="select-field" style="flex: 1; font-size: 11.5px; height: 30px;">
+                  <option value="all">Tous les types</option>
+                  <option value="city">🏛️ Villes & Cités</option>
+                  <option value="mountain">⛰️ Montagnes & Monts</option>
+                  <option value="river">🌊 Fleuves, Mers & Lacs</option>
+                  <option value="region">🗺️ Régions & Déserts</option>
+                  <option value="island">🏝️ Îles</option>
+                </select>
+              </div>
+
+              <!-- Sélecteur d'Itinéraires -->
+              <div class="maps-itinerary-selector-box">
+                <label class="maps-section-label">Grands Itinéraires :</label>
+                <select id="map-itinerary-select" class="select-field full-w" style="font-size: 11.5px; height: 32px;">
+                  <option value="none">🗺️ Vue libre (Tous les lieux)</option>
+                </select>
+              </div>
+
+              <div class="maps-count-bar">
+                <span id="map-places-count">Chargement des lieux...</span>
+              </div>
+            </div>
+
+            <!-- Liste défilante des lieux -->
+            <div class="maps-places-scroll-list" id="map-places-list">
+              <!-- Éléments injectés dynamiquement -->
+            </div>
+          </aside>
+
+          <!-- Zone Centrale : Carte Leaflet -->
+          <section class="maps-canvas-pane">
+            <div id="biblical-map-container" class="biblical-map-container"></div>
+
+            <!-- Panneau rétractable de détails du lieu sélectionné -->
+            <div id="map-place-details-card" class="map-place-details-card hidden">
+              <div class="details-card-header">
+                <div class="details-title-group">
+                  <h3 id="details-place-title" class="details-title">Jérusalem</h3>
+                  <span id="details-place-type" class="place-item-type badge-type-city">Ville</span>
+                  <span id="details-place-confidence" class="confidence-badge conf-certain">Certain</span>
+                </div>
+                <button id="btn-close-place-details" class="details-close-btn" title="Fermer ce panneau">✕</button>
+              </div>
+
+              <div class="details-card-body">
+                <div class="details-info-grid">
+                  <div class="info-field">
+                    <span class="info-label">Nom antique :</span>
+                    <span id="details-place-ancient" class="info-value">Yerushalayim</span>
+                  </div>
+                  <div class="info-field">
+                    <span class="info-label">Emplacement moderne :</span>
+                    <span id="details-place-modern" class="info-value">Al-Quds / Jerusalem</span>
+                  </div>
+                  <div class="info-field">
+                    <span class="info-label">Coordonnées GPS :</span>
+                    <span id="details-place-coords" class="info-value">31.7683°, 35.2137°</span>
+                  </div>
+                </div>
+
+                <div class="details-comment-box">
+                  <p id="details-place-comment" class="details-comment-text">Ville sainte et capitale du royaume d'Israël.</p>
+                </div>
+
+                <div class="details-verses-section">
+                  <h4 class="details-verses-title">Occurrences dans la Bible (Cliquer pour lire) :</h4>
+                  <div id="details-place-verses-list" class="details-verses-grid">
+                    <!-- Versets cliquables injectés dynamiquement -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
     </main>
 
     <!-- ======================================================= -->
@@ -1914,6 +2055,8 @@
   <script src="js/ai_study_view.js"></script>
   <script src="js/notes_view.js"></script>
   <script src="js/dict_view.js"></script>
+  <script src="js/leaflet.js"></script>
+  <script src="js/maps_view.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

@@ -179,6 +179,22 @@ const API = {
     return await this.call('detect_language', text, metaLang);
   },
 
+  async getBiblicalPlaces(query = '', placeType = null, limit = 150) {
+    return await this.call('get_biblical_places', query, placeType, limit);
+  },
+
+  async getChapterPlaces(bookCode, chapterNum) {
+    return await this.call('get_chapter_places', bookCode, parseInt(chapterNum));
+  },
+
+  async getBiblicalPlaceDetails(placeId) {
+    return await this.call('get_biblical_place_details', placeId);
+  },
+
+  async getBiblicalItineraries() {
+    return await this.call('get_biblical_itineraries');
+  },
+
   // Mock pour test dans navigateur externe
   _mockResponse(method, ...args) {
     if (method === 'get_installed_bibles') {

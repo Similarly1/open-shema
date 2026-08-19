@@ -34,6 +34,7 @@ from core.dictionary_manager import DictionaryManager
 from core.original_languages_manager import OriginalLanguagesManager
 from core.config import load_config, save_config
 from core.notes_manager import NotesManager
+from core.maps_manager import MapsManager
 from gui.library_utils import load_books_metadata, save_books_metadata
 
 
@@ -1344,6 +1345,43 @@ class BibleAppApi:
             except Exception as e:
                 logger.warning(f"Erreur à la fermeture: {e}")
         return {"success": True}
+
+    # =========================================================================
+    # 7. CARTES BIBLIQUES & GÉOGRAPHIE
+    # =========================================================================
+
+    def get_biblical_places(self, query: str = "", place_type: Optional[str] = None, limit: int = 150) -> List[Dict[str, Any]]:
+        """Recherche des lieux bibliques avec filtre optionnel par type."""
+        try:
+            return MapsManager.search_places(query=query, place_type=place_type, limit=limit)
+        except Exception as e:
+            logger.error(f"Erreur API get_biblical_places: {e}")
+            return []
+
+    def get_chapter_places(self, book_code: str = "", chapter_num: int = 1) -> List[Dict[str, Any]]:
+        """Retourne les lieux mentionnés dans un chapitre biblique."""
+        try:
+            return MapsManager.get_places_for_chapter(book_code=book_code, chapter_num=chapter_num)
+        except Exception as e:
+            logger.error(f"Erreur API get_chapter_places: {e}")
+            return []
+
+    def get_biblical_place_details(self, place_id: str = "") -> Optional[Dict[str, Any]]:
+        """Détails complets d'un lieu avec ses versets."""
+        try:
+            return MapsManager.get_place_details(place_id=place_id)
+        except Exception as e:
+            logger.error(f"Erreur API get_biblical_place_details: {e}")
+            return None
+
+    def get_biblical_itineraries(self) -> List[Dict[str, Any]]:
+        """Retourne les grands itinéraires bibliques enregistrés."""
+        try:
+            return MapsManager.get_all_itineraries()
+        except Exception as e:
+            logger.error(f"Erreur API get_biblical_itineraries: {e}")
+            return []
+
 
 
 # Helpers Win32 pour gestion fluide de l'espace de travail (WorkArea) sans bordure

@@ -2360,6 +2360,12 @@ const BibleReader = {
       App.switchView('search');
     });
 
+    document.getElementById('btn-chapter-places')?.addEventListener('click', () => {
+      if (typeof MapsView !== 'undefined') {
+        MapsView.showChapterPlaces(this.currentBook, this.currentChapter);
+      }
+    });
+
     document.getElementById('btn-toggle-split')?.addEventListener('click', () => {
       this.toggleSplitView();
     });

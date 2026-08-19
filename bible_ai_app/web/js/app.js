@@ -19,7 +19,8 @@ const App = {
       { name: 'SearchView', init: () => SearchView.init() },
       { name: 'AIStudyView', init: () => AIStudyView.init() },
       { name: 'NotesView', init: () => NotesView.init() },
-      { name: 'DictView', init: () => DictView.init() }
+      { name: 'DictView', init: () => DictView.init() },
+      { name: 'MapsView', init: () => MapsView.init() }
     ];
 
     modules.forEach(m => {
@@ -261,6 +262,9 @@ const App = {
     } else if (viewName === 'notes') {
       if (drawerEl) drawerEl.classList.add('collapsed');
       NotesView.loadNotes();
+    } else if (viewName === 'maps') {
+      if (drawerEl) drawerEl.classList.add('collapsed');
+      MapsView.onViewActivated();
     } else if (viewName === 'search' || viewName === 'ai' || viewName === 'dict') {
       if (drawerEl) drawerEl.classList.add('collapsed');
     }
