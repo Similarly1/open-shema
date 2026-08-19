@@ -14,12 +14,43 @@
   <link rel="stylesheet" href="css/logos.css">
 </head>
 <body class="theme-dark window-maximized">
-  <!-- BARRE DE TITRE & CONTRÔLES DE FENÊTRE (SANS BORDURE WINDOWS) -->
+  <!-- BARRE DE TITRE UNIFIÉE AVEC RECHERCHE, ONGLETS ET CONTRÔLES WINDOWS -->
   <header class="app-window-titlebar" id="app-window-titlebar">
-    <div class="window-titlebar-drag">
-      <span class="window-titlebar-icon">📜</span>
-      <span class="window-titlebar-text">Open Shema — Lecteur & Assistant d'Étude Biblique</span>
+    <!-- GAUCHE : Zone de recherche rapide + bouton replier menu (sans bouton éclair) -->
+    <div class="topbar-left-zone" id="topbar-left-zone">
+      <div class="quick-passage-box">
+        <svg class="quick-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.3-4.3"></path>
+        </svg>
+        <input type="text" id="quick-passage-input" placeholder="Passage ou sujet..." autocomplete="off">
+      </div>
+      <button class="sidebar-toggle-btn" id="btn-toggle-sidebar" title="Réduire / Déplier le menu latéral">
+        <svg class="nav-svg toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+          <path d="M9 3v18"></path>
+        </svg>
+      </button>
     </div>
+
+    <!-- MILIEU : Onglets de documents bibliques -->
+    <div class="topbar-center-zone" id="topbar-center-zone">
+      <div class="tabs-list" id="tabs-list">
+        <div class="tab active" data-tab-id="tab-1">
+          <span class="tab-badge-icon" style="background-color: #EA580C;">📖</span>
+          <span class="tab-title">TOB 2010</span>
+          <button class="tab-close-btn" title="Fermer">✕</button>
+        </div>
+        <div class="tab" data-tab-id="tab-2">
+          <span class="tab-badge-icon" style="background-color: #2563EB;">📖</span>
+          <span class="tab-title">Segond 21</span>
+          <button class="tab-close-btn" title="Fermer">✕</button>
+        </div>
+      </div>
+      <button class="btn-new-tab" id="btn-add-tab" title="Ouvrir un nouvel onglet">+</button>
+    </div>
+
+    <!-- DROITE : Contrôles de la fenêtre Windows -->
     <div class="window-titlebar-controls">
       <button class="win-control-btn" id="win-btn-min" title="Réduire la fenêtre">
         <svg width="10" height="2" viewBox="0 0 10 2"><rect width="10" height="2" fill="currentColor"/></svg>
@@ -45,7 +76,7 @@
         <div class="splash-icon">📜</div>
       </div>
       <div class="splash-brand-title">OPEN SHEMA</div>
-      <div class="splash-brand-subtitle">שְׁמַע • ÉTUDE & RECHERCHE BIBLIQUE OUVERTE</div>
+      <div class="splash-brand-subtitle">שְׁמַع • ÉTUDE & RECHERCHE BIBLIQUE OUVERTE</div>
       
       <div class="splash-progress-track">
         <div class="splash-progress-bar"></div>
@@ -57,30 +88,9 @@
   <div id="app" class="app-container">
     
     <!-- ======================================================= -->
-    <!-- 1. SIDEBAR NAVIGATION GAUCHE (Style Logos)               -->
-    <!-- ======================================================= -->
     <!-- 1. SIDEBAR NAVIGATION GAUCHE (Style Moderne & Pliable)  -->
     <!-- ======================================================= -->
     <aside class="sidebar" id="sidebar">
-      <div class="sidebar-top">
-        <button class="sidebar-icon-btn logo-btn" id="btn-quick-passage" title="Passage rapide">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-          </svg>
-        </button>
-        
-        <div class="quick-passage-box">
-          <input type="text" id="quick-passage-input" placeholder="Passage ou sujet..." autocomplete="off">
-        </div>
-
-        <button class="sidebar-toggle-btn" id="btn-toggle-sidebar" title="Réduire / Déplier le menu">
-          <svg class="nav-svg toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <rect width="18" height="18" x="3" y="3" rx="2"></rect>
-            <path d="M9 3v18"></path>
-          </svg>
-        </button>
-      </div>
-      
       <nav class="sidebar-menu">
         <button class="nav-item active" data-view="bible" id="nav-bible" title="Bible">
           <span class="nav-icon">
@@ -185,23 +195,6 @@
       <!-- VUE A : LECTEUR BIBLIQUE                               -->
       <!-- ===================================================== -->
       <div class="app-view active" id="view-bible">
-        <!-- BARRE D'ONGLETS MULTI-DOCUMENTS -->
-        <header class="tabs-header">
-          <div class="tabs-list" id="tabs-list">
-            <div class="tab active" data-tab-id="tab-1">
-              <span class="tab-badge-icon" style="background-color: #EA580C;">📖</span>
-              <span class="tab-title">TOB 2010</span>
-              <button class="tab-close-btn" title="Fermer">✕</button>
-            </div>
-            <div class="tab" data-tab-id="tab-2">
-              <span class="tab-badge-icon" style="background-color: #2563EB;">📖</span>
-              <span class="tab-title">Segond 21</span>
-              <button class="tab-close-btn" title="Fermer">✕</button>
-            </div>
-          </div>
-          <button class="btn-new-tab" id="btn-add-tab" title="Ouvrir un nouvel onglet">+</button>
-        </header>
-
         <!-- BARRE D'OUTILS DE LECTURE (Style Logos) -->
         <section class="reader-toolbar">
           <div class="toolbar-left">

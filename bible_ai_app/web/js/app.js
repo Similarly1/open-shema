@@ -575,6 +575,8 @@ const App = {
     if (!sidebar) return;
 
     sidebar.classList.toggle('collapsed', collapsed);
+    document.body.classList.toggle('sidebar-is-collapsed', collapsed);
+
     if (isAuto) {
       this.sidebarAutoCollapsed = collapsed;
     } else {

@@ -444,32 +444,129 @@ body, html {
    ========================================================================== */
 
 .app-window-titlebar {
-  height: 32px;
+  height: 38px;
   background-color: var(--bg-card);
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 0 0 12px;
+  padding: 0;
   user-select: none;
   z-index: 10000;
   -webkit-app-region: drag;
+  box-sizing: border-box;
 }
 
 /* Si la fenêtre est maximisée / agrandie, le déplacement est désactivé comme sous Windows */
-body.window-maximized .app-window-titlebar,
-body.window-maximized .window-titlebar-drag {
+body.window-maximized .app-window-titlebar {
   -webkit-app-region: no-drag !important;
 }
 
-.window-titlebar-drag {
+.topbar-left-zone {
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  height: 100%;
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 11.5px;
-  font-weight: 600;
-  color: var(--text-secondary);
+  gap: 6px;
+  padding: 0 8px 0 10px;
+  border-right: 1px solid var(--border-color);
+  box-sizing: border-box;
+  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-app-region: no-drag;
+  flex-shrink: 0;
+}
+
+body.sidebar-is-collapsed .topbar-left-zone,
+.sidebar.collapsed ~ .main-content .topbar-left-zone {
+  width: var(--sidebar-collapsed-width);
+  min-width: var(--sidebar-collapsed-width);
+  padding: 0 4px;
+  justify-content: center;
+}
+
+body.sidebar-is-collapsed .topbar-left-zone .quick-passage-box {
+  display: none;
+}
+
+.quick-passage-box {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.quick-search-icon {
+  position: absolute;
+  left: 8px;
+  width: 13px;
+  height: 13px;
+  color: var(--text-muted);
   pointer-events: none;
+}
+
+.quick-passage-box input {
+  width: 100%;
+  height: 27px;
+  padding: 0 8px 0 26px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  background-color: var(--input-bg);
+  font-size: 11.5px;
+  color: var(--text-primary);
+  outline: none;
+  transition: var(--transition-fast);
+}
+
+.quick-passage-box input:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15);
+}
+
+.sidebar-toggle-btn {
+  width: 27px;
+  height: 27px;
+  border-radius: 5px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  -webkit-app-region: no-drag;
+}
+
+.sidebar-toggle-btn:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.sidebar-toggle-btn .toggle-icon {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  transition: transform 0.2s ease;
+}
+
+.topbar-center-zone {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 8px;
+  gap: 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.topbar-center-zone::-webkit-scrollbar {
+  display: none;
 }
 
 .window-titlebar-controls {
@@ -477,11 +574,12 @@ body.window-maximized .window-titlebar-drag {
   align-items: center;
   height: 100%;
   -webkit-app-region: no-drag;
+  flex-shrink: 0;
 }
 
 .win-control-btn {
   width: 42px;
-  height: 32px;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -505,7 +603,7 @@ body.window-maximized .window-titlebar-drag {
 .app-container {
   display: flex;
   width: 100vw;
-  height: calc(100vh - 32px);
+  height: calc(100vh - 38px);
   overflow: hidden;
 }
 
@@ -529,94 +627,6 @@ body.window-maximized .window-titlebar-drag {
 
 .sidebar.collapsed {
   width: var(--sidebar-collapsed-width);
-}
-
-.sidebar-top {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--border-color);
-  height: 52px;
-  box-sizing: border-box;
-  transition: padding 0.2s ease;
-}
-
-.sidebar.collapsed .sidebar-top {
-  padding: 10px 8px;
-  justify-content: center;
-  gap: 0;
-}
-
-.logo-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  background-color: var(--accent-blue);
-  color: white;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-.logo-btn .nav-svg {
-  width: 18px;
-  height: 18px;
-}
-.sidebar.collapsed .logo-btn {
-  display: none;
-}
-
-.quick-passage-box {
-  flex: 1;
-  overflow: hidden;
-  transition: opacity 0.15s ease;
-}
-.quick-passage-box input {
-  width: 100%;
-  height: 32px;
-  padding: 0 10px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  background-color: var(--input-bg);
-  font-size: 12px;
-  color: var(--text-primary);
-  outline: none;
-  transition: var(--transition-fast);
-}
-.quick-passage-box input:focus {
-  border-color: var(--accent-blue);
-  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15);
-}
-.sidebar.collapsed .quick-passage-box {
-  display: none;
-}
-
-.sidebar-toggle-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  flex-shrink: 0;
-}
-.sidebar-toggle-btn:hover {
-  background-color: var(--bg-hover);
-  color: var(--text-primary);
-}
-.sidebar-toggle-btn .toggle-icon {
-  width: 18px;
-  height: 18px;
-  stroke: currentColor;
-  transition: transform 0.2s ease;
 }
 .sidebar.collapsed .sidebar-toggle-btn .toggle-icon {
   transform: rotate(180deg);
@@ -877,74 +887,105 @@ body.window-maximized .window-titlebar-drag {
 }
 
 /* ==========================================================================
-   3. VUE LECTEUR BIBLIQUE
+   3. ONGLETS DE DOCUMENTS DANS LA BARRE SUPÉRIEURE
    ========================================================================== */
 
-.tabs-header {
-  height: var(--header-height);
-  background-color: var(--tab-inactive-bg);
-  display: flex;
-  align-items: flex-end;
-  padding: 0 8px;
-  border-bottom: 1px solid var(--border-color);
-  gap: 4px;
-}
 .tabs-list {
   display: flex;
   align-items: flex-end;
   height: 100%;
-  gap: 4px;
+  gap: 3px;
   overflow-x: auto;
+  scrollbar-width: none;
 }
+
+.tabs-list::-webkit-scrollbar {
+  display: none;
+}
+
 .tab {
   display: flex;
   align-items: center;
-  gap: 8px;
-  height: 32px;
-  padding: 0 12px;
+  gap: 7px;
+  height: 29px;
+  padding: 0 10px;
   background-color: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  border-bottom: none;
   border-radius: 6px 6px 0 0;
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 500;
   color: var(--text-secondary);
   cursor: pointer;
   transition: var(--transition-fast);
+  -webkit-app-region: no-drag;
+  white-space: nowrap;
+  user-select: none;
 }
+
 .tab:hover {
   background-color: var(--bg-card);
   color: var(--text-primary);
 }
+
 .tab.active {
   background-color: var(--bg-reading);
+  border-color: var(--border-color);
   color: var(--text-primary);
   font-weight: 600;
-  height: 34px;
+  height: 31px;
 }
+
 .tab-badge-icon {
-  width: 18px;
-  height: 18px;
+  width: 15px;
+  height: 15px;
   border-radius: 3px;
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: 9px;
 }
+
 .tab-close-btn {
   background: transparent;
   border: none;
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-muted);
   cursor: pointer;
+  padding: 1px 3px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.tab-close-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+}
+
 .btn-new-tab {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border: none;
+  border-radius: 5px;
   background: transparent;
   color: var(--text-secondary);
   font-size: 16px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+  transition: var(--transition-fast);
+  -webkit-app-region: no-drag;
+  flex-shrink: 0;
+}
+
+.btn-new-tab:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
 }
 
 .reader-toolbar {
