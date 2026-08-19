@@ -5499,35 +5499,244 @@ body.palette-dark-warm .ctx-submenu {
    MODULE CARTES BIBLIQUES INTERACTIVES (OPEN SHEMA MAPS)
    ========================================================================== */
 
-/* Repères de lieux sur les versets bibliques */
-.verse-geo-badge {
-  display: inline-flex;
+/* ==========================================================================
+   REPÈRES GÉOGRAPHIQUES EN MARGE & POPOVER RICHE (OPEN SHEMA GEO RAILS)
+   ========================================================================== */
+
+/* 1. Ancre flottante en marge droite du passage */
+.geo-passage-margin-anchor {
+  float: right;
+  clear: right;
+  position: relative;
+  margin-left: 12px;
+  margin-right: -42px;
+  margin-top: 1px;
+  user-select: none;
+  z-index: 15;
+}
+
+.reader-workspace.full-width .geo-passage-margin-anchor {
+  margin-right: -24px;
+}
+
+.reader-workspace.split-view .geo-passage-margin-anchor {
+  margin-right: -20px;
+}
+
+.geo-passage-bracket-btn {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
   background: transparent;
   border: none;
-  padding: 0 1px;
-  margin: 0 3px 0 1px;
+  padding: 0;
   cursor: pointer;
-  vertical-align: 2px;
+  outline: none;
+}
+
+.geo-bracket-rail-top,
+.geo-bracket-rail-bottom {
+  width: 2px;
+  height: 5px;
+  background-color: var(--accent-blue);
+  opacity: 0.35;
+  border-radius: 1px;
+  transition: all 0.2s ease;
+}
+
+.geo-bracket-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 10.5px;
+  font-weight: 700;
   color: var(--accent-blue);
-  opacity: 0.85;
-  transition: all 0.15s ease;
-  line-height: 1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+  font-family: var(--font-ui, 'Inter', sans-serif);
 }
 
-.verse-geo-badge:hover {
-  opacity: 1;
-  transform: scale(1.35);
-  color: #38bdf8;
+.geo-bracket-svg {
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
 }
 
-.geo-pin-icon {
-  display: block;
+.geo-bracket-range {
+  font-size: 10px;
+  letter-spacing: 0.2px;
 }
 
-.hide-geo-pins .verse-geo-badge {
+.geo-passage-bracket-btn:hover .geo-bracket-pill {
+  background-color: var(--accent-blue);
+  color: #ffffff;
+  border-color: var(--accent-blue);
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.35);
+  transform: scale(1.08);
+}
+
+.geo-passage-bracket-btn:hover .geo-bracket-rail-top,
+.geo-passage-bracket-btn:hover .geo-bracket-rail-bottom {
+  opacity: 0.8;
+  height: 8px;
+}
+
+/* Surbrillance de la plage de versets concernée */
+.verse-item.geo-passage-highlighted {
+  background-color: rgba(37, 99, 235, 0.12) !important;
+  border-left: 3px solid var(--accent-blue);
+  padding-left: 4px !important;
+  border-radius: 3px;
+  transition: background-color 0.15s ease;
+}
+
+.hide-geo-pins .geo-passage-margin-anchor {
   display: none !important;
+}
+
+/* 2. Popover Riche In-App (Thème Sombre / Clair Open Shema) */
+.geo-passage-hover-popover {
+  position: fixed;
+  z-index: 10000;
+  width: 350px;
+  max-width: 90vw;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.42), 0 4px 12px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: popoverFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: var(--font-ui, 'Inter', sans-serif);
+}
+
+.geo-passage-hover-popover.hidden {
+  display: none;
+}
+
+.geo-pop-header {
+  padding: 10px 14px;
+  background-color: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.geo-pop-header-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.geo-pop-svg {
+  width: 14px;
+  height: 14px;
+  color: var(--accent-blue);
+  flex-shrink: 0;
+}
+
+.geo-pop-count-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--accent-blue);
+  background-color: rgba(37, 99, 235, 0.15);
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+
+.geo-pop-places-list {
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.geo-pop-place-row {
+  padding: 8px 10px;
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.geo-pop-place-row:hover {
+  background-color: var(--bg-active);
+  border-color: var(--accent-blue);
+  transform: translateY(-1px);
+}
+
+.geo-pop-place-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.geo-pop-place-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.geo-pop-place-type {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.geo-pop-place-sub {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-bottom: 3px;
+}
+
+.geo-pop-place-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.geo-pop-footer {
+  padding: 8px 12px;
+  background-color: var(--bg-subtle);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.geo-pop-action-btn {
+  background: none;
+  border: none;
+  color: var(--accent-blue);
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.geo-pop-action-btn:hover {
+  text-decoration: underline;
 }
 
 .maps-workspace-layout {

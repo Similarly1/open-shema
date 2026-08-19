@@ -1434,6 +1434,152 @@ const CommentarySynthesizerUI = {
 };
 
 
+// 4ter. GESTIONNAIRE DES INFOBULLES RICHES DE PASSAGES GÉOGRAPHIQUES
+const GeoPassageHoverManager = {
+  popoverEl: null,
+  hideTimeout: null,
+  clustersCache: {},
+
+  init() {
+    if (!this.popoverEl) {
+      this.popoverEl = document.getElementById('geo-passage-hover-popover');
+      if (!this.popoverEl) {
+        this.popoverEl = document.createElement('div');
+        this.popoverEl.id = 'geo-passage-hover-popover';
+        this.popoverEl.className = 'geo-passage-hover-popover hidden';
+        document.body.appendChild(this.popoverEl);
+      }
+
+      this.popoverEl.addEventListener('mouseenter', () => clearTimeout(this.hideTimeout));
+      this.popoverEl.addEventListener('mouseleave', () => this.scheduleHide());
+    }
+  },
+
+  registerCluster(cluster) {
+    this.clustersCache[cluster.id] = cluster;
+  },
+
+  scheduleHide() {
+    this.hideTimeout = setTimeout(() => {
+      if (this.popoverEl) this.popoverEl.classList.add('hidden');
+      document.querySelectorAll('.verse-item.geo-passage-highlighted').forEach(el => {
+        el.classList.remove('geo-passage-highlighted');
+      });
+    }, 220);
+  },
+
+  showForCluster(btnEl, clusterId) {
+    clearTimeout(this.hideTimeout);
+    this.init();
+    const cluster = this.clustersCache[clusterId];
+    if (!cluster || !this.popoverEl) return;
+
+    // 1. Surbrillance de tous les versets de la plage dans le texte
+    const workspace = document.getElementById('reader-workspace');
+    if (workspace) {
+      workspace.querySelectorAll('.verse-item.geo-passage-highlighted').forEach(el => {
+        el.classList.remove('geo-passage-highlighted');
+      });
+      workspace.querySelectorAll(`.verse-item[data-geo-cluster-id="${clusterId}"]`).forEach(el => {
+        el.classList.add('geo-passage-highlighted');
+      });
+    }
+
+    // 2. Préparer le contenu de la popover
+    const bInfo = getBookInfo(cluster.book);
+    const rangeText = cluster.startVerse === cluster.endVerse 
+      ? `${bInfo.name} ${cluster.chapter}:${cluster.startVerse}`
+      : `${bInfo.name} ${cluster.chapter}:${cluster.startVerse}–${cluster.endVerse}`;
+
+    const placesHtml = cluster.places.map(p => {
+      const typeLabel = (typeof MapsView !== 'undefined' && MapsView.getTypeLabel) ? MapsView.getTypeLabel(p.place_type) : (p.place_type || 'Lieu');
+      const badgeClass = `badge-type-${p.place_type || 'city'}`;
+      return `
+        <div class="geo-pop-place-row" data-place-id="${p.place_id}">
+          <div class="geo-pop-place-head">
+            <span class="geo-pop-place-name">${p.name_fr}</span>
+            <span class="geo-pop-place-type ${badgeClass}">${typeLabel}</span>
+          </div>
+          ${p.ancient_name || p.modern_name ? `<div class="geo-pop-place-sub">${p.ancient_name ? `Antique : ${p.ancient_name}` : ''}${p.ancient_name && p.modern_name ? ' • ' : ''}${p.modern_name ? `Moderne : ${p.modern_name}` : ''}</div>` : ''}
+          ${p.comment ? `<div class="geo-pop-place-desc">${p.comment}</div>` : ''}
+        </div>
+      `;
+    }).join('');
+
+    this.popoverEl.innerHTML = `
+      <div class="geo-pop-header">
+        <div class="geo-pop-header-title">
+          <svg class="geo-pop-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"></path>
+            <path d="M9 3v15"></path>
+            <path d="M15 6v15"></path>
+          </svg>
+          <span>${rangeText}</span>
+        </div>
+        <span class="geo-pop-count-badge">${cluster.places.length} lieu${cluster.places.length > 1 ? 'x' : ''}</span>
+      </div>
+      <div class="geo-pop-places-list">
+        ${placesHtml}
+      </div>
+      <div class="geo-pop-footer">
+        <button type="button" class="geo-pop-action-btn" id="btn-geo-pop-open-map">
+          <span>Explorer sur la carte interactive →</span>
+        </button>
+      </div>
+    `;
+
+    // Événements de clic sur chaque lieu ou sur le bouton footer
+    this.popoverEl.querySelectorAll('.geo-pop-place-row').forEach(row => {
+      row.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const pId = row.dataset.placeId;
+        this.navigateToMap(pId, cluster.book, cluster.chapter);
+      });
+    });
+
+    this.popoverEl.querySelector('#btn-geo-pop-open-map')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const firstId = cluster.places[0]?.place_id;
+      this.navigateToMap(firstId, cluster.book, cluster.chapter);
+    });
+
+    // 3. Positionnement intelligent à côté du bouton de marge
+    this.popoverEl.classList.remove('hidden');
+    const rect = btnEl.getBoundingClientRect();
+    const popRect = this.popoverEl.getBoundingClientRect();
+    const popWidth = popRect.width || 350;
+    const popHeight = popRect.height || 220;
+
+    let left = rect.left - popWidth - 12;
+    if (left < 10) {
+      left = rect.right + 12;
+    }
+    let top = rect.top - 10;
+    if (top + popHeight > window.innerHeight - 10) {
+      top = Math.max(10, window.innerHeight - popHeight - 10);
+    }
+
+    this.popoverEl.style.top = `${top}px`;
+    this.popoverEl.style.left = `${left}px`;
+  },
+
+  navigateToMap(placeId, bookCode, chapter) {
+    if (this.popoverEl) this.popoverEl.classList.add('hidden');
+    if (typeof MapsView !== 'undefined') {
+      App.switchView('maps');
+      document.querySelectorAll('.sidebar-menu .nav-item').forEach(b => b.classList.remove('active'));
+      document.getElementById('nav-maps')?.classList.add('active');
+      MapsView.onViewActivated();
+      if (placeId) {
+        MapsView.showPlaceDetailsById(placeId);
+      } else {
+        MapsView.showChapterPlaces(bookCode, chapter);
+      }
+    }
+  }
+};
+
+
 // 4bis. GESTIONNAIRE DE NOTES DU VOLET DROIT (Bible à gauche, Notes à droite)
 const DrawerNotesViewer = {
   currentBook: 'Gen',
@@ -2991,6 +3137,54 @@ const BibleReader = {
     }
 
     if (data.verses && Array.isArray(data.verses) && data.verses.length > 0) {
+      // 1. Regroupement intelligent des versets contenant des lieux en passages contigus
+      const clusters = [];
+      let curCluster = null;
+
+      data.verses.forEach(v => {
+        const places = v.geo_places || [];
+        if (places.length > 0) {
+          if (curCluster && v.verse <= curCluster.endVerse + 2) {
+            curCluster.endVerse = v.verse;
+            curCluster.versesList.push(v.verse);
+            places.forEach(p => {
+              if (!curCluster.places.some(cp => cp.place_id === p.place_id)) {
+                curCluster.places.push(p);
+              }
+            });
+          } else {
+            if (curCluster) clusters.push(curCluster);
+            curCluster = {
+              id: `geoc_${data.book}_${data.chapter}_${v.verse}`,
+              book: data.book || this.currentBook,
+              chapter: data.chapter || this.currentChapter,
+              startVerse: v.verse,
+              endVerse: v.verse,
+              versesList: [v.verse],
+              places: [...places]
+            };
+          }
+        } else {
+          if (curCluster && v.verse > curCluster.endVerse + 2) {
+            clusters.push(curCluster);
+            curCluster = null;
+          }
+        }
+      });
+      if (curCluster) clusters.push(curCluster);
+
+      // Tables d'accès rapide
+      const clusterByVerse = {};
+      const clusterStartMap = {};
+      clusters.forEach(c => {
+        clusterStartMap[c.startVerse] = c;
+        c.versesList.forEach(vNum => {
+          clusterByVerse[vNum] = c;
+        });
+        GeoPassageHoverManager.registerCluster(c);
+      });
+
+      // 2. Rendu des versets
       data.verses.forEach((v, index) => {
         const vSpan = document.createElement('span');
         vSpan.className = 'verse-item';
@@ -2998,13 +3192,35 @@ const BibleReader = {
         vSpan.dataset.bookCode = data.book || this.currentBook;
         vSpan.dataset.chapter = data.chapter || this.currentChapter;
 
-        // Badge géographique cliquable si un ou plusieurs lieux sont cités dans ce verset
-        const geoPlaces = v.geo_places || [];
-        let geoBadgeHtml = '';
-        if (geoPlaces.length > 0) {
-          const names = geoPlaces.map(p => p.name_fr).join(', ');
-          const firstPlaceId = geoPlaces[0].place_id;
-          geoBadgeHtml = `<button type="button" class="verse-geo-badge" data-place-id="${firstPlaceId}" data-book="${data.book}" data-chap="${data.chapter}" data-verse="${v.verse}" title="Lieu(x) biblique(s) : ${names} (Cliquer pour voir sur la carte)"><svg class="geo-pin-icon" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"></path><path d="M9 3v15"></path><path d="M15 6v15"></path></svg></button>`;
+        if (clusterByVerse[v.verse]) {
+          vSpan.dataset.geoClusterId = clusterByVerse[v.verse].id;
+        }
+
+        // Indicateur de passage géographique en marge droite sur le 1er verset de la plage
+        let marginBadgeHtml = '';
+        if (clusterStartMap[v.verse]) {
+          const cl = clusterStartMap[v.verse];
+          const rangeLabel = cl.startVerse === cl.endVerse 
+            ? `v. ${cl.startVerse}` 
+            : `v. ${cl.startVerse}–${cl.endVerse}`;
+          const firstPlaceId = cl.places[0]?.place_id || '';
+
+          marginBadgeHtml = `
+            <span class="geo-passage-margin-anchor" data-cluster-id="${cl.id}">
+              <button type="button" class="geo-passage-bracket-btn" data-cluster-id="${cl.id}" data-place-id="${firstPlaceId}" data-book="${data.book}" data-chap="${data.chapter}" data-start="${cl.startVerse}" data-end="${cl.endVerse}">
+                <span class="geo-bracket-rail-top"></span>
+                <span class="geo-bracket-pill">
+                  <svg class="geo-bracket-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"></path>
+                    <path d="M9 3v15"></path>
+                    <path d="M15 6v15"></path>
+                  </svg>
+                  <span class="geo-bracket-range">${rangeLabel}</span>
+                </span>
+                <span class="geo-bracket-rail-bottom"></span>
+              </button>
+            </span>
+          `;
         }
 
         if (isPaneInterlinear && v.words && v.words.length > 0) {
@@ -3028,8 +3244,9 @@ const BibleReader = {
           const badgeText = paneInterVersion === 'DARBY' ? 'Bible Darby (Interlinéaire Inversé)' : 'Louis Segond 1910 (Interlinéaire Inversé)';
           vSpan.innerHTML = `
             <div class="verse-interlinear-header">
-              <sup class="verse-num">${v.verse}</sup>${geoBadgeHtml}
+              <sup class="verse-num">${v.verse}</sup>
               <span class="verse-interlinear-badge">${badgeText}</span>
+              ${marginBadgeHtml}
             </div>
             <div class="verse-interlinear-grid">${wordsHtml}</div>
           `;
@@ -3054,13 +3271,13 @@ const BibleReader = {
           // Lecture continue avec mots cliquables
           const isFirst = index === 0;
           const numHtml = isFirst 
-            ? `<span class="chapter-number-dropcap">${data.chapter}</span><sup class="verse-num">${v.verse}</sup>${geoBadgeHtml}`
-            : `<sup class="verse-num">${v.verse}</sup>${geoBadgeHtml}`;
+            ? `<span class="chapter-number-dropcap">${data.chapter}</span><sup class="verse-num">${v.verse}</sup>`
+            : `<sup class="verse-num">${v.verse}</sup>`;
 
           // Découper le texte en tokens pour permettre le clic/clic droit sur chaque mot
           const cleanText = (v.text || '').replace(/<[^>]+>/g, '');
           const tokens = cleanText.split(/(\s+)/);
-          let formattedHtml = numHtml;
+          let formattedHtml = marginBadgeHtml + numHtml;
 
           tokens.forEach(tok => {
             if (!tok || /^\s+$/.test(tok)) {
@@ -3076,7 +3293,6 @@ const BibleReader = {
           // Écouteurs sur chaque mot
           vSpan.querySelectorAll('.word-token').forEach(wEl => {
             const w = wEl.dataset.word;
-            // Clic gauche sur mot -> charger le lexique Strong
             wEl.addEventListener('click', (e) => {
               e.stopPropagation();
               document.querySelectorAll('.verse-item').forEach(el => el.classList.remove('selected'));
@@ -3084,13 +3300,11 @@ const BibleReader = {
               this.lookupWordInLexicon(w);
             });
 
-            // Double clic sur mot -> ouvrir menu contextuel
             wEl.addEventListener('dblclick', (e) => {
               e.stopPropagation();
               ContextMenuManager.showForWord(w, null, v.verse, data.book, data.chapter, e.clientX, e.clientY);
             });
 
-            // Clic droit sur mot -> ouvrir menu contextuel
             wEl.addEventListener('contextmenu', (e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -3098,26 +3312,6 @@ const BibleReader = {
             });
           });
         }
-
-        // Clic sur l'icône de carte du verset -> ouvrir la carte centrée sur le lieu
-        vSpan.querySelectorAll('.verse-geo-badge').forEach(badge => {
-          badge.addEventListener('click', (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            if (typeof MapsView !== 'undefined') {
-              const pId = badge.dataset.placeId;
-              App.switchView('maps');
-              document.querySelectorAll('.sidebar-menu .nav-item').forEach(b => b.classList.remove('active'));
-              document.getElementById('nav-maps')?.classList.add('active');
-              MapsView.onViewActivated();
-              if (pId) {
-                MapsView.showPlaceDetailsById(pId);
-              } else {
-                MapsView.showChapterPlaces(data.book, data.chapter);
-              }
-            }
-          });
-        });
 
         // Clic sur le verset (hors mot spécifique ou pour sélectionner) -> charger commentaires
         vSpan.addEventListener('click', () => {
@@ -3148,6 +3342,27 @@ const BibleReader = {
         });
 
         flow.appendChild(vSpan);
+      });
+
+      // 3. Écouteurs sur les boutons de passage de marge (Survol -> Infobulle riche & Surbrillance plage)
+      flow.querySelectorAll('.geo-passage-bracket-btn').forEach(btn => {
+        const clusterId = btn.dataset.clusterId;
+        btn.addEventListener('mouseenter', (e) => {
+          e.stopPropagation();
+          GeoPassageHoverManager.showForCluster(btn, clusterId);
+        });
+        btn.addEventListener('mouseleave', (e) => {
+          e.stopPropagation();
+          GeoPassageHoverManager.scheduleHide();
+        });
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          const pId = btn.dataset.placeId;
+          const b = btn.dataset.book;
+          const ch = parseInt(btn.dataset.chap, 10);
+          GeoPassageHoverManager.navigateToMap(pId, b, ch);
+        });
       });
     }
 
