@@ -155,6 +155,10 @@ const API = {
     return await this.call('parse_reference', rawText);
   },
 
+  async getVersePreview(rawReference, bibleName = null) {
+    return await this.call('get_verse_preview', rawReference, bibleName);
+  },
+
   async askAI(question, bookCode, chapterNum, verseNum) {
     return await this.call('ask_ai', question, bookCode, chapterNum, verseNum);
   },

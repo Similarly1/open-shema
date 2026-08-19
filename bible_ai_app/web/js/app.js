@@ -263,6 +263,15 @@ const App = {
       targetEl.classList.add('active');
     }
 
+    // Synchroniser l'état actif de la barre latérale
+    document.querySelectorAll('.sidebar-menu .nav-item, .sidebar-footer .nav-item').forEach(b => {
+      if (b.dataset.view === viewName || b.id === `nav-${viewName}`) {
+        b.classList.add('active');
+      } else {
+        b.classList.remove('active');
+      }
+    });
+
     const drawerEl = document.getElementById('right-drawer');
 
     if (viewName === 'library') {

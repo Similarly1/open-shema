@@ -428,6 +428,92 @@ class BibleAppApi:
 
         return {"book": "Gen", "book_french": "Genèse", "chapter": 1, "verse": None}
 
+    def get_verse_preview(self, raw_reference: str, bible_name: str = None) -> Dict[str, Any]:
+        """Extrait rapidement le texte d'un verset ou groupe de versets pour l'infobulle de survol."""
+        if not raw_reference or not str(raw_reference).strip():
+            return {"success": False, "error": "Référence vide"}
+
+        try:
+            parsed = self.parse_reference(raw_reference)
+            if not parsed or not parsed.get("book"):
+                return {"success": False, "error": "Référence non reconnue"}
+
+            book_code = parsed["book"]
+            book_french = parsed.get("book_french", get_french_book_name(book_code))
+            chapter = parsed.get("chapter", 1)
+            target_verse = parsed.get("verse")
+
+            installed = BibleJsonLoader.list_installed_bibles()
+            if not installed:
+                return {"success": False, "error": "Aucune Bible installée"}
+
+            chosen_bible = bible_name if bible_name and bible_name in installed else installed[0]
+            book_data = BibleJsonLoader.load_book(chosen_bible, book_code)
+            if not book_data and installed:
+                for b in installed:
+                    book_data = BibleJsonLoader.load_book(b, book_code)
+                    if book_data:
+                        chosen_bible = b
+                        break
+
+            if not book_data:
+                return {"success": False, "error": "Livre non trouvé"}
+
+            chapters_dict = book_data.get("chapters", {})
+            verses_dict = chapters_dict.get(str(chapter), {})
+
+            # Si un verset spécifique est demandé
+            if target_verse is not None:
+                v_key = str(target_verse)
+                if v_key in verses_dict:
+                    v_raw = verses_dict[v_key]
+                    v_text = strip_xml_tags(extract_verse_text(v_raw))
+                    return {
+                        "success": True,
+                        "reference": f"{book_french} {chapter}:{target_verse}",
+                        "book": book_code,
+                        "book_french": book_french,
+                        "chapter": chapter,
+                        "verse": target_verse,
+                        "text": v_text,
+                        "bible": chosen_bible
+                    }
+                else:
+                    first_k = next(iter(sorted(verses_dict.keys(), key=lambda x: int(x) if x.isdigit() else 999)), None)
+                    if first_k:
+                        v_raw = verses_dict[first_k]
+                        v_text = strip_xml_tags(extract_verse_text(v_raw))
+                        return {
+                            "success": True,
+                            "reference": f"{book_french} {chapter}:{first_k}",
+                            "book": book_code,
+                            "book_french": book_french,
+                            "chapter": chapter,
+                            "verse": int(first_k) if first_k.isdigit() else 1,
+                            "text": v_text,
+                            "bible": chosen_bible
+                        }
+            else:
+                sorted_keys = sorted(verses_dict.keys(), key=lambda x: int(x) if x.isdigit() else 999)[:3]
+                snippets = []
+                for k in sorted_keys:
+                    v_raw = verses_dict[k]
+                    snippets.append(f"<sup>{k}</sup> {strip_xml_tags(extract_verse_text(v_raw))}")
+                return {
+                    "success": True,
+                    "reference": f"{book_french} {chapter}",
+                    "book": book_code,
+                    "book_french": book_french,
+                    "chapter": chapter,
+                    "verse": 1,
+                    "text": " ".join(snippets),
+                    "bible": chosen_bible
+                }
+
+        except Exception as e:
+            logger.exception(f"Erreur get_verse_preview pour {raw_reference}: {e}")
+            return {"success": False, "error": str(e)}
+
     def ask_ai(self, question: str, book: str, chapter: int, verse: int) -> Dict[str, Any]:
         """Interroge l'assistant IA en injectant le contexte biblique, les commentaires et les notes personnelles."""
         self.config = load_config()

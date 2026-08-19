@@ -458,24 +458,29 @@ const TheologyView = {
       ${versesHtml}
     `;
 
-    // Attacher les clics sur les puces de versets
-    this.articleHero.querySelectorAll('.theol-verse-chip').forEach(btn => {
+    // Attacher les infobulles de survol et clics sur les puces de versets
+    const verseChips = this.articleHero.querySelectorAll('.theol-verse-chip');
+    verseChips.forEach(btn => {
       btn.addEventListener('click', () => {
         const ref = btn.dataset.ref;
         if (ref) {
+          ScriptureTooltip.hide();
           this.openScriptureReference(ref);
         }
       });
     });
+    ScriptureTooltip.bindToElements(verseChips);
 
     const jumpBtn = this.articleHero.querySelector('#btn-jump-bible-chapter');
     if (jumpBtn) {
       jumpBtn.addEventListener('click', () => {
         const code = jumpBtn.dataset.code;
         if (code) {
+          ScriptureTooltip.hide();
           this.openScriptureReference(code);
         }
       });
+      ScriptureTooltip.bindToElements([jumpBtn]);
     }
 
     // 2. Rendu des paragraphes du contenu avec typographie soignée
@@ -531,15 +536,18 @@ const TheologyView = {
       });
     }
 
-    // Attacher les clics sur les références bibliques intégrées
-    this.articleContent.querySelectorAll('.theol-inline-scripture-ref').forEach(span => {
+    // Attacher les clics et infobulles sur les références bibliques intégrées
+    const inlineRefs = this.articleContent.querySelectorAll('.theol-inline-scripture-ref');
+    inlineRefs.forEach(span => {
       span.addEventListener('click', () => {
         const ref = span.dataset.ref || span.textContent.trim();
         if (ref) {
+          ScriptureTooltip.hide();
           this.openScriptureReference(ref);
         }
       });
     });
+    ScriptureTooltip.bindToElements(inlineRefs);
 
     // 3. Pied de page de navigation (Cartes Précédent / Suivant)
     this.renderFooterNavigation(data);
@@ -1180,3 +1188,199 @@ const TheologyView = {
       .replace(/'/g, '&#039;');
   }
 };
+
+// =============================================================================
+// GESTIONNAIRE D'INFOBULLES DE PRÉVISUALISATION BIBLIQUE (LOGOS SCRIPTURE TOOLTIP)
+// =============================================================================
+
+const ScriptureTooltip = {
+  tooltipEl: null,
+  cache: {},
+  hoverTimer: null,
+  activeTarget: null,
+  activeRef: null,
+
+  init() {
+    if (this.tooltipEl) return;
+    this.tooltipEl = document.createElement('div');
+    this.tooltipEl.className = 'theol-scripture-tooltip hidden';
+    this.tooltipEl.id = 'theol-scripture-tooltip';
+    document.body.appendChild(this.tooltipEl);
+
+    // Clic sur l'infobulle pour ouvrir le passage dans le lecteur biblique
+    this.tooltipEl.addEventListener('click', () => {
+      if (this.activeRef) {
+        TheologyView.openScriptureReference(this.activeRef);
+        this.hide();
+      }
+    });
+
+    this.tooltipEl.addEventListener('mouseenter', () => {
+      if (this.hoverTimer) clearTimeout(this.hoverTimer);
+    });
+
+    this.tooltipEl.addEventListener('mouseleave', () => {
+      this.hide();
+    });
+
+    // Cacher lors du défilement
+    window.addEventListener('scroll', () => this.hide(), { passive: true });
+    document.getElementById('theol-main-scroll')?.addEventListener('scroll', () => this.hide(), { passive: true });
+  },
+
+  bindToElements(elements) {
+    if (!elements) return;
+    this.init();
+
+    elements.forEach(el => {
+      const getRef = () => el.dataset.ref || el.dataset.code || el.textContent.trim();
+
+      el.addEventListener('mouseenter', () => {
+        const ref = getRef();
+        if (!ref) return;
+        if (this.hoverTimer) clearTimeout(this.hoverTimer);
+        this.hoverTimer = setTimeout(() => {
+          this.show(el, ref);
+        }, 60);
+      });
+
+      el.addEventListener('mouseleave', () => {
+        if (this.hoverTimer) clearTimeout(this.hoverTimer);
+        this.hoverTimer = setTimeout(() => {
+          this.hide();
+        }, 120);
+      });
+    });
+  },
+
+  async show(targetEl, ref) {
+    this.activeTarget = targetEl;
+    this.activeRef = ref;
+    this.init();
+
+    this.positionTooltip(targetEl);
+
+    if (this.cache[ref]) {
+      this.renderContent(this.cache[ref]);
+      this.tooltipEl.classList.remove('hidden');
+      requestAnimationFrame(() => this.tooltipEl.classList.add('visible'));
+      this.positionTooltip(targetEl);
+      return;
+    }
+
+    // État de chargement élégant
+    this.tooltipEl.innerHTML = `
+      <div class="theol-scripture-tooltip-header">
+        <div class="theol-scripture-tooltip-ref">
+          <span>📖</span>
+          <span>${TheologyView.escapeHtml(ref)}</span>
+        </div>
+        <div class="theol-scripture-tooltip-version">Texte biblique</div>
+      </div>
+      <div class="theol-scripture-tooltip-loading">
+        <div class="theol-scripture-tooltip-spinner"></div>
+        <span>Récupération du verset...</span>
+      </div>
+      <div class="theol-scripture-tooltip-footer">
+        <span class="theol-scripture-tooltip-hint">👆 Cliquer pour ouvrir dans la Bible</span>
+      </div>
+    `;
+
+    this.tooltipEl.classList.remove('hidden');
+    requestAnimationFrame(() => this.tooltipEl.classList.add('visible'));
+
+    try {
+      const res = await API.getVersePreview(ref);
+      if (res && res.success && res.text) {
+        this.cache[ref] = res;
+        if (this.activeRef === ref) {
+          this.renderContent(res);
+          this.positionTooltip(targetEl);
+        }
+      } else {
+        if (this.activeRef === ref) {
+          this.renderFallback(ref);
+          this.positionTooltip(targetEl);
+        }
+      }
+    } catch (e) {
+      if (this.activeRef === ref) {
+        this.renderFallback(ref);
+        this.positionTooltip(targetEl);
+      }
+    }
+  },
+
+  renderContent(data) {
+    this.tooltipEl.innerHTML = `
+      <div class="theol-scripture-tooltip-header">
+        <div class="theol-scripture-tooltip-ref">
+          <span>📖</span>
+          <span>${TheologyView.escapeHtml(data.reference || data.book_french)}</span>
+        </div>
+        <div class="theol-scripture-tooltip-version">${TheologyView.escapeHtml(data.bible || 'Segond 21')}</div>
+      </div>
+      <div class="theol-scripture-tooltip-body">
+        ${data.text}
+      </div>
+      <div class="theol-scripture-tooltip-footer">
+        <span>${data.book_french} ${data.chapter}${data.verse ? `:${data.verse}` : ''}</span>
+        <span class="theol-scripture-tooltip-hint">👆 Cliquer pour ouvrir</span>
+      </div>
+    `;
+  },
+
+  renderFallback(ref) {
+    this.tooltipEl.innerHTML = `
+      <div class="theol-scripture-tooltip-header">
+        <div class="theol-scripture-tooltip-ref">
+          <span>📖</span>
+          <span>${TheologyView.escapeHtml(ref)}</span>
+        </div>
+      </div>
+      <div class="theol-scripture-tooltip-body" style="font-style: italic; color: var(--text-secondary);">
+        Consulter ce passage dans le lecteur biblique pour afficher le texte complet et l'interlinéaire.
+      </div>
+      <div class="theol-scripture-tooltip-footer">
+        <span class="theol-scripture-tooltip-hint">👆 Cliquer pour ouvrir</span>
+      </div>
+    `;
+  },
+
+  positionTooltip(targetEl) {
+    if (!this.tooltipEl || !targetEl) return;
+    const rect = targetEl.getBoundingClientRect();
+    const tooltipWidth = 350;
+    const tooltipHeight = 150;
+
+    let left = rect.left + (rect.width / 2) - (tooltipWidth / 2);
+    let top = rect.bottom + 8;
+
+    // Empêcher de déborder de l'écran horizontalement
+    if (left < 16) left = 16;
+    if (left + tooltipWidth > window.innerWidth - 16) {
+      left = window.innerWidth - tooltipWidth - 16;
+    }
+
+    // Si on déborde en bas de l'écran, basculer au-dessus
+    if (top + tooltipHeight > window.innerHeight - 16) {
+      top = Math.max(16, rect.top - tooltipHeight - 8);
+    }
+
+    this.tooltipEl.style.left = `${left}px`;
+    this.tooltipEl.style.top = `${top}px`;
+  },
+
+  hide() {
+    if (!this.tooltipEl) return;
+    this.activeRef = null;
+    this.activeTarget = null;
+    this.tooltipEl.classList.remove('visible');
+    setTimeout(() => {
+      if (!this.activeRef && this.tooltipEl) {
+        this.tooltipEl.classList.add('hidden');
+      }
+    }, 150);
+  }
+};
+

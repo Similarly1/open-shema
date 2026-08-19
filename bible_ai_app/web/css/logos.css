@@ -8608,5 +8608,117 @@ body.theme-dark .theol-view-badge {
   100% { transform: scale(1.25) rotate(15deg); }
 }
 
+/* ==========================================================================
+   INFOBULLE DE PRÉVISUALISATION BIBLIQUE (LOGOS SCRIPTURE TOOLTIP)
+   ========================================================================== */
+
+.theol-scripture-tooltip {
+  position: fixed;
+  z-index: 10000;
+  width: 350px;
+  max-width: calc(100vw - 32px);
+  background: var(--bg-card, #1e293b);
+  color: var(--text-primary, #f8fafc);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  border-radius: 12px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45), 0 0 1px rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 14px 16px;
+  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(6px) scale(0.97);
+  transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+  cursor: pointer;
+}
+
+.theol-scripture-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.theol-scripture-tooltip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+}
+
+.theol-scripture-tooltip-ref {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--accent-orange, #EA580C);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.theol-scripture-tooltip-version {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(2, 132, 199, 0.18);
+  color: var(--accent-blue, #0284c7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.theol-scripture-tooltip-body {
+  font-family: var(--font-serif, "EB Garamond", Georgia, serif);
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--text-primary, #e2e8f0);
+  max-height: 180px;
+  overflow-y: auto;
+  margin-bottom: 8px;
+}
+
+.theol-scripture-tooltip-body sup {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent-blue, #0284c7);
+  margin-right: 3px;
+}
+
+.theol-scripture-tooltip-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  font-size: 12px;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.theol-scripture-tooltip-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(2, 132, 199, 0.2);
+  border-top-color: var(--accent-blue, #0284c7);
+  border-radius: 50%;
+  animation: theolIconSpin 0.7s infinite linear;
+}
+
+.theol-scripture-tooltip-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10.5px;
+  color: var(--text-secondary, #94a3b8);
+  margin-top: 4px;
+}
+
+.theol-scripture-tooltip-hint {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--accent-blue, #38bdf8);
+  font-weight: 600;
+}
+
+
 
 
