@@ -524,26 +524,156 @@ const CommentaryViewer = {
   activeIndex: 0,
   preferredAuthor: null, // Auteur/ouvrage mémorisé pour rester constant lors de la navigation
   currentVerseRef: '',
+  currentBook: 'Gen',
+  currentChapter: 1,
+  currentVerse: 1,
+  isSynchronized: true,
 
   init() {
-    const btn = document.getElementById('btn-select-comm-source');
-    const popover = document.getElementById('comm-sources-popover');
+    // 1. Restaurer l'état de synchronisation
+    try {
+      const savedSync = localStorage.getItem('bible_comm_sync');
+      if (savedSync !== null) {
+        this.isSynchronized = savedSync !== 'false';
+      }
+    } catch (e) {}
 
-    btn?.addEventListener('click', (e) => {
+    // 2. Bouton de synchronisation / déliage
+    const btnSync = document.getElementById('btn-toggle-comm-sync');
+    btnSync?.addEventListener('click', (e) => {
       e.stopPropagation();
-      popover?.classList.toggle('hidden');
+      this.toggleSync();
+    });
+    this.updateSyncButtonUI();
+
+    // 3. Sélecteur de source de commentaire
+    const btnSource = document.getElementById('btn-select-comm-source');
+    const popoverSource = document.getElementById('comm-sources-popover');
+
+    btnSource?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      popoverSource?.classList.toggle('hidden');
     });
 
     document.addEventListener('click', (e) => {
-      if (popover && !popover.contains(e.target) && e.target !== btn) {
-        popover.classList.add('hidden');
+      if (popoverSource && !popoverSource.contains(e.target) && e.target !== btnSource) {
+        popoverSource.classList.add('hidden');
+      }
+    });
+
+    // 4. Saisie manuelle de référence pour le commentaire (mode délié ou saut rapide)
+    const refBadge = document.getElementById('comm-selected-verse');
+    const refPopover = document.getElementById('comm-ref-picker-popover');
+    const refInput = document.getElementById('comm-ref-input');
+    const btnSubmitRef = document.getElementById('btn-comm-ref-submit');
+
+    refBadge?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      refPopover?.classList.toggle('hidden');
+      if (refPopover && !refPopover.classList.contains('hidden')) {
+        if (refInput) {
+          refInput.value = this.currentVerseRef || '';
+          refInput.focus();
+          refInput.select();
+        }
+      }
+    });
+
+    const handleManualRefSubmit = async () => {
+      const query = refInput?.value?.trim();
+      if (!query) return;
+      try {
+        const parsed = await API.parseReference(query);
+        if (parsed && parsed.book) {
+          // Déconnecter la synchronisation pour laisser le commentaire indépendant
+          this.toggleSync(false);
+          await BibleReader.loadCommentariesForVerse(parsed.verse || 1, parsed.book, parsed.chapter || 1, true /* force */);
+          refPopover?.classList.add('hidden');
+          if (refInput) refInput.value = '';
+        } else {
+          App.showToast(`Référence introuvable : « ${query} »`);
+        }
+      } catch (e) {
+        console.error('Erreur saisie référence manuelle commentaire:', e);
+      }
+    };
+
+    btnSubmitRef?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      handleManualRefSubmit();
+    });
+
+    refInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleManualRefSubmit();
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (refPopover && !refPopover.contains(e.target) && e.target !== refBadge) {
+        refPopover.classList.add('hidden');
       }
     });
   },
 
-  setComments(comments, verseRef) {
+  toggleSync(forcedState) {
+    if (typeof forcedState === 'boolean') {
+      this.isSynchronized = forcedState;
+    } else {
+      this.isSynchronized = !this.isSynchronized;
+    }
+
+    try {
+      localStorage.setItem('bible_comm_sync', this.isSynchronized ? 'true' : 'false');
+    } catch (e) {}
+
+    this.updateSyncButtonUI();
+
+    if (this.isSynchronized) {
+      // Re-synchroniser immédiatement avec la position active du lecteur biblique
+      const curV = BibleReader.selectedVerse || 1;
+      BibleReader.loadCommentariesForVerse(curV, BibleReader.currentBook, BibleReader.currentChapter, true);
+      App.showToast('Commentaire synchronisé avec le texte biblique');
+    } else {
+      App.showToast('Commentaire délié (indépendant du texte biblique)');
+    }
+  },
+
+  updateSyncButtonUI() {
+    const btn = document.getElementById('btn-toggle-comm-sync');
+    if (!btn) return;
+
+    if (this.isSynchronized) {
+      btn.className = 'comm-sync-btn active';
+      btn.title = 'Synchronisation active : le commentaire suit le texte biblique en direct (Cliquer pour délier)';
+      btn.innerHTML = `
+        <svg class="sync-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+        </svg>
+        <span id="comm-sync-label">Lié</span>
+      `;
+    } else {
+      btn.className = 'comm-sync-btn unlinked';
+      btn.title = 'Commentaire indépendant (Cliquer pour lier au texte biblique)';
+      btn.innerHTML = `
+        <svg class="sync-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m18.84 12.25 1.72-1.71a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+          <path d="m5.16 11.75-1.72 1.71a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+          <line x1="2" y1="2" x2="22" y2="22"></line>
+        </svg>
+        <span id="comm-sync-label">Délié</span>
+      `;
+    }
+  },
+
+  setComments(comments, verseRef, bookCode = null, chapterNum = null, verseNum = null) {
     this.currentComments = comments || [];
     this.currentVerseRef = verseRef || '';
+    if (bookCode) this.currentBook = bookCode;
+    if (chapterNum) this.currentChapter = chapterNum;
+    if (verseNum) this.currentVerse = verseNum;
 
     const countEl = document.getElementById('comm-popover-count');
     const listEl = document.getElementById('comm-sources-list');
@@ -1885,6 +2015,11 @@ const BibleReader = {
           const breadcrumb2 = document.getElementById('pane-2-breadcrumb');
           if (breadcrumb2) breadcrumb2.textContent = `${info.name.toUpperCase()} > Chapitre ${ch}`;
           TabsManager.updateActiveTab(null, bCode, ch);
+
+          // Suivi en direct du commentaire lors du défilement continu
+          if (typeof CommentaryViewer !== 'undefined' && CommentaryViewer.isSynchronized) {
+            this.loadCommentariesForVerse(1, bCode, parseInt(ch), false);
+          }
         }
         break;
       }
@@ -2230,18 +2365,21 @@ const BibleReader = {
     return block;
   },
 
-  async loadCommentariesForVerse(verseNum, bookCode = null, chapterNum = null) {
+  async loadCommentariesForVerse(verseNum, bookCode = null, chapterNum = null, force = false) {
     this.selectedVerse = verseNum;
     const book = bookCode || this.currentBook;
     const ch = chapterNum || this.currentChapter;
     const bookInfo = getBookInfo(book);
     const refStr = `${bookInfo.name} ${ch}:${verseNum}`;
 
-    try {
-      const comms = await API.getCommentaries(book, ch, verseNum);
-      CommentaryViewer.setComments(comms, refStr);
-    } catch (e) {
-      console.error('Erreur commentaires:', e);
+    // Si la synchronisation est active ou si l'action est forcée
+    if (force || (typeof CommentaryViewer !== 'undefined' && CommentaryViewer.isSynchronized)) {
+      try {
+        const comms = await API.getCommentaries(book, ch, verseNum);
+        CommentaryViewer.setComments(comms, refStr, book, ch, verseNum);
+      } catch (e) {
+        console.error('Erreur commentaires:', e);
+      }
     }
 
     // Synchronisation automatique des notes dans le volet latéral

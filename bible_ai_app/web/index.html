@@ -1061,8 +1061,17 @@
       <div class="drawer-body">
         <!-- Onglet 1: Commentaires Exégétiques (Un seul commentaire affiché avec sélecteur discret) -->
         <div class="drawer-content active" id="drawer-tab-commentaries">
-          <div class="drawer-section-header" style="flex-wrap: wrap; gap: 8px;">
-            <span class="selected-verse-badge" id="comm-selected-verse">Genèse 1:1</span>
+          <div class="drawer-section-header comm-header-flex">
+            <div class="comm-ref-group">
+              <span class="selected-verse-badge comm-clickable-ref" id="comm-selected-verse" title="Cliquer pour choisir manuellement un passage pour le commentaire">Genèse 1:1</span>
+              <button class="comm-sync-btn active" id="btn-toggle-comm-sync" title="Synchronisation active : le commentaire suit le texte biblique (Cliquer pour délier)">
+                <svg class="sync-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+                <span id="comm-sync-label">Lié</span>
+              </button>
+            </div>
             
             <div class="comm-source-selector-box">
               <button class="comm-source-btn" id="btn-select-comm-source" title="Changer d'ouvrage de commentaire">
@@ -1075,6 +1084,16 @@
               </div>
             </div>
           </div>
+
+          <!-- Popover de saisie de passage indépendant pour le commentaire -->
+          <div class="comm-ref-picker-popover hidden" id="comm-ref-picker-popover">
+            <div class="comm-ref-picker-title">Consulter un autre passage en commentaire :</div>
+            <div style="display: flex; gap: 6px; margin-top: 6px;">
+              <input type="text" id="comm-ref-input" placeholder="Ex: Jean 3:16, Rom 8:28..." style="flex: 1; height: 28px; font-size: 12px; padding: 0 8px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--input-bg); color: var(--text-primary); outline: none;">
+              <button id="btn-comm-ref-submit" class="btn-primary" style="height: 28px; padding: 0 10px; font-size: 11px;">Consulter</button>
+            </div>
+          </div>
+
           <div class="commentary-single-view" id="commentary-single-view">
             <div class="empty-hint">Cliquez sur un verset pour charger son commentaire exégétique.</div>
           </div>
