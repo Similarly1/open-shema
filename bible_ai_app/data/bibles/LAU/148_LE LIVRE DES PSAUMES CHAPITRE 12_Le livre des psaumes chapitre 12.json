@@ -1,0 +1,21 @@
+{
+  "id": 148,
+  "code": "LE LIVRE DES PSAUMES CHAPITRE 12",
+  "name": "Le livre des psaumes chapitre 12",
+  "version": "LAU",
+  "version_fullname": "Bible de Lausanne (1872)",
+  "total_chapters": 1,
+  "chapters": {
+    "1": {
+      "1": "Au chef de musique. Sur la Scheminith. Psaume de David.",
+      "2": "Oh ! sauve-[nous], Éternel ! car l’homme qui t’aime disparaît ; car les fidèles s’en vont du milieu des fils des hommes.",
+      "3": "On se tient l’un à l’autre un langage trompeur ; c’est d’une lèvre flatteuse, avec un cœur double, qu’ils parlent.",
+      "4": "Que l’Éternel retranche toutes les lèvres flatteuses, la langue qui se vante de grandes choses,",
+      "5": "ceux qui disent : Par nos langues nous aurons le dessus ; nos lèvres sont à nous ; qui aurions-nous pour seigneur ?",
+      "6": "À cause de la désolation des affligés, à cause du cri d’angoisse des pauvres, maintenant je me lèverai, dira l’Éternel ; je donnerai le salut à celui contre qui l’on souffle.",
+      "7": "Les paroles de l’Éternel sont des paroles pures, un argent purifié dans le creuset, en terre, fondu sept fois.",
+      "8": "Toi, Éternel ! tu les garderas ; tu les mettras à couvert de cette race-là, à perpétuité.",
+      "9": "Les méchants se promènent de toutes parts quand ce qu’il y a de plus vil s’élève parmi les fils des hommes."
+    }
+  }
+}

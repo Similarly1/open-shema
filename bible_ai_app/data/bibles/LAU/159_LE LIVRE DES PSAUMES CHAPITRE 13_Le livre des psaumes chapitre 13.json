@@ -1,0 +1,18 @@
+{
+  "id": 159,
+  "code": "LE LIVRE DES PSAUMES CHAPITRE 13",
+  "name": "Le livre des psaumes chapitre 13",
+  "version": "LAU",
+  "version_fullname": "Bible de Lausanne (1872)",
+  "total_chapters": 1,
+  "chapters": {
+    "1": {
+      "1": "Au chef de musique. Psaume de David.",
+      "2": "Jusques à quand, ô Éternel ! m’oublieras-tu continuellement ? Jusques à quand me cacheras-tu ta face ?",
+      "3": "Jusques à quand renfermerai-je en mon âme des soucis ; en mon cœur chaque jour, la tristesse ? Jusques à quand mon ennemi s’élèvera-t-il contre moi ?",
+      "4": "Oh ! regarde. Réponds-moi, Éternel mon Dieu ! Oh ! donne à mes yeux la lumière, de peur que je ne m’endorme du sommeil de la mort ;",
+      "5": "de peur que mon ennemi ne dise : Je l’ai vaincu ! et que mes adversaires ne tressaillent de joie de ce que j’aurais chancelé.",
+      "6": "Pour moi, c’est en ta grâce que je me confie. Que mon cœur tressaille à cause de ton salut. Je chanterai à l’Éternel, parce qu’il me fait du bien."
+    }
+  }
+}

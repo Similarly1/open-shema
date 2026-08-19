@@ -1,0 +1,18 @@
+{
+  "id": 157,
+  "code": "LE LIVRE DES PSAUMES CHAPITRE 128",
+  "name": "Le livre des psaumes chapitre 128",
+  "version": "LAU",
+  "version_fullname": "Bible de Lausanne (1872)",
+  "total_chapters": 1,
+  "chapters": {
+    "1": {
+      "1": "Chant des degrés. Heureux est tout homme qui craint l’Éternel, et qui marche dans ses voies.",
+      "2": "Oui, tu mangeras [le fruit] du travail de tes mains.",
+      "3": "À toi le bonheur et la prospérité ; ta femme sera comme une vigne féconde dans l’intérieur de ta maison ; tes fils, comme des plants d’olivier, entoureront ta table.",
+      "4": "Voilà c’est ainsi que sera béni l’homme qui craint l’Éternel.",
+      "5": "L’Éternel te bénira de Sion, et tu verras la prospérité de Jérusalem tous les jours de ta vie.",
+      "6": "Et tu verras les fils de tes fils. Paix à Israël !"
+    }
+  }
+}

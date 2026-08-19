@@ -1,0 +1,22 @@
+{
+  "id": 139,
+  "code": "LE LIVRE DES PSAUMES CHAPITRE 111",
+  "name": "Le livre des psaumes chapitre 111",
+  "version": "LAU",
+  "version_fullname": "Bible de Lausanne (1872)",
+  "total_chapters": 1,
+  "chapters": {
+    "1": {
+      "1": "Célébrez l’Éternel. Je loue l’Éternel de tout mon cœur, dans la compagnie des hommes droits et dans l’assemblée.",
+      "2": "Les ouvrages de l’Éternel sont grands, ils sont recherchés de tous ceux qui y prennent plaisir ;",
+      "3": "son œuvre est splendeur et magnificence, et sa justice subsiste à toujours ;",
+      "4": "il a établi un mémorial de ses merveilles.",
+      "5": "L’Éternel est miséricordieux et compatissant, il donne de la nourriture à ceux qui le craignent ; il se souvient éternellement de son alliance ;",
+      "6": "il a manifesté à son peuple la force de ses ouvrages, en lui donnant l’héritage des nations.",
+      "7": "Les ouvrages des ses mains sont vérité et jugement ;",
+      "8": "tous ses préceptes sont fermes, appuyés à toujours, pour l’éternité, faits avec vérité et droiture.",
+      "9": "Il a envoyé la rédemption à son peuple ; il a prescrit son alliance pour l’éternité. Son nom est saint et redoutable.",
+      "10": "Le commencement de la sagesse est la crainte de l’Éternel ; tous ceux qui s’y adonnent {Héb. qui les font.} ont une bonne intelligence. Sa louange subsiste à toujours."
+    }
+  }
+}

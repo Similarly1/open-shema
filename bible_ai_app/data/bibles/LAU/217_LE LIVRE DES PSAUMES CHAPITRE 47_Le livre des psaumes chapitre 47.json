@@ -1,0 +1,22 @@
+{
+  "id": 217,
+  "code": "LE LIVRE DES PSAUMES CHAPITRE 47",
+  "name": "Le livre des psaumes chapitre 47",
+  "version": "LAU",
+  "version_fullname": "Bible de Lausanne (1872)",
+  "total_chapters": 1,
+  "chapters": {
+    "1": {
+      "1": "Au chef de musique. Des fils de Coré. Psaume.",
+      "2": "Vous, tous les peuples, battez des mains ; poussez à Dieu des acclamations, d’une voix de triomphe.",
+      "3": "Car l’Éternel, le Très-Haut, est redoutable ; il est grand roi sur toute la terre.",
+      "4": "Il range sous nous les peuples, et sous nos pieds les nations ;",
+      "5": "il choisit pour nous notre héritage, l’orgueil de Jacob qui est son bien-aimé. (Sélah.)",
+      "6": "Dieu monte au bruit des acclamations ; l’Éternel [s’avance] au son de la trompette.",
+      "7": "Chantez à Dieu, chantez ; chantez à notre roi, chantez ;",
+      "8": "car Dieu est roi de toute la terre : chantez le cantique {Ou chantez en parlant sagement.}",
+      "9": "Dieu règne sur les nations, Dieu siège sur le trône de sa sainteté.",
+      "10": "Les chefs des peuples se réunissent au peuple du Dieu d’Abraham ; car à Dieu sont les boucliers de la terre : il est souverainement élevé."
+    }
+  }
+}

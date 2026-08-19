@@ -1,0 +1,21 @@
+{
+  "id": 233,
+  "code": "LE LIVRE DES PSAUMES CHAPITRE 61",
+  "name": "Le livre des psaumes chapitre 61",
+  "version": "LAU",
+  "version_fullname": "Bible de Lausanne (1872)",
+  "total_chapters": 1,
+  "chapters": {
+    "1": {
+      "1": "Au chef de musique. Sur instruments à cordes. De David.",
+      "2": "Ô Dieu ! entends mon cri, sois attentif à ma prière.",
+      "3": "Du bout de la terre je crie à toi, dans l’accablement de mon cœur. Conduis-moi sur le rocher qui est trop élevé pour moi.",
+      "4": "Car tu m’es un refuge, une forte tour, en face de l’ennemi.",
+      "5": "Je séjournerai dans ta tente éternellement ; je me réfugierai à l’abri de tes ailes. (Sélah.)",
+      "6": "Car toi, ô Dieu ! tu entends mes vœux, tu me donnes l’héritage de ceux qui craignent ton nom.",
+      "7": "Tu ajouteras des jours aux jours du roi ; ses années seront comme d’âge en âge ;",
+      "8": "il siégera éternellement devant la face de Dieu. Prépare la grâce et la vérité pour être sa garde.",
+      "9": "Ainsi je chanterai ton nom à perpétuité, m’acquittant de mes vœux jour par jour."
+    }
+  }
+}

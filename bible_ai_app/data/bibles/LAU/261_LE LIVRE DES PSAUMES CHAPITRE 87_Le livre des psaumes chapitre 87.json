@@ -1,0 +1,19 @@
+{
+  "id": 261,
+  "code": "LE LIVRE DES PSAUMES CHAPITRE 87",
+  "name": "Le livre des psaumes chapitre 87",
+  "version": "LAU",
+  "version_fullname": "Bible de Lausanne (1872)",
+  "total_chapters": 1,
+  "chapters": {
+    "1": {
+      "1": "Des fils de Coré. Psaume. Chant. Ce qu’il a fondé est sur les montagnes de sainteté.",
+      "2": "L’Éternel aime les portes de Sion plus que toutes les demeures de Jacob.",
+      "3": "Des choses glorieuses sont prononcées sur toi, ville de Dieu. (Sélah.)",
+      "4": "Je mentionnerai Rahab et Babylone parmi ceux qui me connaissent ; Voici la Philistie, et Tyr, avec Cusch ; celui-ci est né là.",
+      "5": "Et de Sion il sera dit : Celui-ci et celui-là sont nés en elle. Et celui qui l’affermira, c’est le Très-Haut.",
+      "6": "En enregistrant les peuples, l’Éternel écrira : Celui-ci est né là. (Sélah.)",
+      "7": "Et ceux qui chantent comme [on chante] dans les danses [diront] : Toutes mes sources sont en toi."
+    }
+  }
+}

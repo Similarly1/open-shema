@@ -1,0 +1,20 @@
+{
+  "id": 128,
+  "code": "LE LIVRE DES PSAUMES CHAPITRE 101",
+  "name": "Le livre des psaumes chapitre 101",
+  "version": "LAU",
+  "version_fullname": "Bible de Lausanne (1872)",
+  "total_chapters": 1,
+  "chapters": {
+    "1": {
+      "1": "De David. Psaume. Je célébrerai la grâce et le jugement ; c’est à toi, Éternel ! que je veux chanter.",
+      "2": "Je veux agir sagement, dans une voie parfaite. Quand viendras-tu à moi ? Je marcherai dans l’intégrité de mon cœur au milieu de ma maison.",
+      "3": "Je ne mettrai rien de mauvais {Héb. aucune chose de Bélial.} devant mes yeux ; je hais la conduite de ceux qui se détournent, elle ne s’attachera point à moi.",
+      "4": "Le cœur pervers s’éloignera de moi ; je ne connaîtrai point le méchant ;",
+      "5": "celui qui diffame en secret son prochain, je l’anéantirai, Celui qui a le regard hautain et le cœur enflé, je ne le supporterai point.",
+      "6": "J’aurai les yeux sur les fidèles de la terre, pour les faire habiter avec moi. Celui qui marche dans une voie parfaite, celui-là sera mon serviteur.",
+      "7": "Celui qui pratique la fraude n’habitera pas au milieu de ma maison ; celui qui profère des mensonges ne sera point affermi devant mes yeux.",
+      "8": "Chaque matin j’anéantirai tous les méchants de la terre, afin d’exterminer de la ville de l’Éternel tous ceux qui pratiquent l’iniquité."
+    }
+  }
+}

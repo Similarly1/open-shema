@@ -1,0 +1,26 @@
+{
+  "id": 237,
+  "code": "LE LIVRE DES PSAUMES CHAPITRE 65",
+  "name": "Le livre des psaumes chapitre 65",
+  "version": "LAU",
+  "version_fullname": "Bible de Lausanne (1872)",
+  "total_chapters": 1,
+  "chapters": {
+    "1": {
+      "1": "Au chef de musique. Psaume de David. Chant.",
+      "2": "Ô Dieu ! il y a devant toi recueillement et louange en Sion, et pour toi s’accomplissent des vœux.",
+      "3": "Ô toi, qui entends la prière ! toute chair viendra à toi.",
+      "4": "Le poids des iniquités est trop fort pour moi {Ou Les choses d’iniquité ont été plus fortes que moi.} c’est toi qui fais propitiation pour nos transgressions.",
+      "5": "Heureux celui que tu choisis et que tu fais approcher ! il demeure dans tes parvis. Nous serons rassasiés des biens de ta maison, de la sainteté de ton palais.",
+      "6": "C’est par des choses terribles que tu nous réponds en ta justice, ô Dieu de notre salut ! confiance des extrémités lointaines de la terre et de la mer,",
+      "7": "toi qui affermis les montagnes par ta force, qui es ceint de puissance,",
+      "8": "qui réprimes le tumulte des mers, le tumulte de leurs flots et la rumeur des peuples",
+      "9": "Alors ceux qui habitent aux bouts du monde craignent à cause de tes signes. Tu fais que les portes {Héb. les issues.} du matin et du soir poussent des cris de joie.",
+      "10": "Tu visites la terre en lui donnant grande abondance, tu la combles de richesses ; le ruisseau de Dieu est rempli d’eau. Tu prépares le blé, quand tu prépares ainsi la terre.",
+      "11": "Tu arroses abondamment ses sillons, tu aplanis ses mottes, tu l’amollis par des pluies, tu bénis son germe.",
+      "12": "Tu mets le couronnement à l’année de tes bienfaits, et de tes ornières coule la graisse ;",
+      "13": "elle coule sur les habitations du désert et les collines se ceignent d’allégresse ;",
+      "14": "les pâturages se revêtent de menu bétail, les vallées se couvrent de froment : elles poussent des acclamations, même elles chantent."
+    }
+  }
+}

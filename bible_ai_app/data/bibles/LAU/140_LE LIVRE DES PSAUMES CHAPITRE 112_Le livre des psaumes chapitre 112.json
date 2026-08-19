@@ -1,0 +1,22 @@
+{
+  "id": 140,
+  "code": "LE LIVRE DES PSAUMES CHAPITRE 112",
+  "name": "Le livre des psaumes chapitre 112",
+  "version": "LAU",
+  "version_fullname": "Bible de Lausanne (1872)",
+  "total_chapters": 1,
+  "chapters": {
+    "1": {
+      "1": "Célébrez l’Éternel ! Heureux l’homme qui craint l’Éternel et qui prend un grand plaisir en ses commandements.",
+      "2": "Sa postérité sera puissante en la terre ; la race des hommes droits est bénie.",
+      "3": "L’abondance et la richesse sont dans sa maison et sa justice subsiste à toujours.",
+      "4": "La lumière se lève dans les ténèbres pour l’homme droit. Il est miséricordieux, compatissant et juste.",
+      "5": "Heureux l’homme qui est compatissant et qui prête ; il maintiendra sa cause {Héb. ses affaires.} dans le jugement.",
+      "6": "Aussi ne sera-t-il pas ébranlé, à perpétuité ; la mémoire du juste sera éternelle.",
+      "7": "Il ne craint pas une mauvaise nouvelle ; son cœur est ferme, se confiant en l’Éternel.",
+      "8": "Son cœur est bien appuyé ; il ne craint point, jusqu’à ce que sa vue se repose sur ses adversaires.",
+      "9": "Il répand, il donne aux pauvres, sa justice subsiste à toujours ; sa corne s’élève avec gloire.",
+      "10": "Le méchant le voit, il en a du dépit. Il grince les dents et se fond. Le désir des méchants périra."
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "id": 180,
+  "code": "LE LIVRE DES PSAUMES CHAPITRE 149",
+  "name": "Le livre des psaumes chapitre 149",
+  "version": "LAU",
+  "version_fullname": "Bible de Lausanne (1872)",
+  "total_chapters": 1,
+  "chapters": {
+    "1": {
+      "1": "Célébrez l’Éternel ! Chantez à l’Éternel un chant nouveau, [chantez] sa louange dans la congrégation de ceux qui l’aiment.",
+      "2": "Qu’Israël se réjouisse en son Créateur ; que les fils de Sion tressaillent de joie en leur Roi.",
+      "3": "Qu’ils célèbrent son nom avec des danses, qu’ils chantent en son honneur au son du tambourin et de la harpe.",
+      "4": "Car l’Éternel prend plaisir en son peuple ; il pare de salut les humbles.",
+      "5": "Que ceux qui l’aiment se livrent à l’allégresse dans la gloire, qu’ils chantent de joie sur leur couche.",
+      "6": "Les louanges de Dieu sont dans leur bouche, et un glaive à deux tranchants est dans leurs mains",
+      "7": "pour exercer la vengeance sur les nations, la répréhension sur les peuples,",
+      "8": "pour lier leurs rois de chaînes et leurs hommes honorables de ceps de fer,",
+      "9": "pour exercer sur eux le jugement qui est écrit. Cet honneur est pour tous ceux qui l’aiment. Célébrez l’Éternel."
+    }
+  }
+}

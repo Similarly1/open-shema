@@ -1,0 +1,17 @@
+{
+  "id": 181,
+  "code": "LE LIVRE DES PSAUMES CHAPITRE 15",
+  "name": "Le livre des psaumes chapitre 15",
+  "version": "LAU",
+  "version_fullname": "Bible de Lausanne (1872)",
+  "total_chapters": 1,
+  "chapters": {
+    "1": {
+      "1": "Psaume de David. Éternel ! qui séjournera dans ta tente ? qui demeurera sur la montagne de ta sainteté ?",
+      "2": "C’est celui qui marche dans l’intégrité et fait ce qui est juste, celui qui parle avec vérité suivant son cœur.",
+      "3": "Il ne diffame pas de sa langue ; il ne fait pas de mal à son prochain, et ne soulève pas l’opprobre contre son voisin.",
+      "4": "À ses yeux l’homme méprisable doit être rejeté, et il honore ceux qui craignent l’Éternel. A-t-il juré à [son] détriment, il ne change point.",
+      "5": "Il ne donne pas son argent à intérêt, et ne prend point de présent contre l’innocent. Celui qui fait ces choses ne sera pas ébranlé à perpétuité."
+    }
+  }
+}

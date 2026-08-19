@@ -1,0 +1,22 @@
+{
+  "id": 253,
+  "code": "LE LIVRE DES PSAUMES CHAPITRE 8",
+  "name": "Le livre des psaumes chapitre 8",
+  "version": "LAU",
+  "version_fullname": "Bible de Lausanne (1872)",
+  "total_chapters": 1,
+  "chapters": {
+    "1": {
+      "1": "Au chef de musique. Sur la Guithith. Psaume de David.",
+      "2": "Éternel notre Seigneur ! que ton nom est magnifique dans toute la terre, qui porte ta gloire par-dessus les cieux !",
+      "3": "Par la bouche des petits enfants, même de ceux qui sont à la mamelle, tu fondes ta force, à cause de tes adversaires, pour réduire au silence l’ennemi et le vindicatif.",
+      "4": "Quand je vois tes cieux, ouvrage de tes doigts, la lune et les étoiles que tu as affermies,",
+      "5": "qu’est-ce que le mortel, pour que tu te souviennes de lui, et le fils de l’homme, pour que tu le visites ?",
+      "6": "Et tu l’as fait de peu inférieur à Dieu. Et tu le couronnes de gloire et de magnificence.",
+      "7": "Tu le fais dominer sur les ouvrages de tes mains, tu as tout mis sous ses pieds ;",
+      "8": "les brebis et les bœufs, tous pareillement, et même les animaux des champs,",
+      "9": "les oiseaux du ciel et les poissons de la mer, ce qui parcourt les sentiers des mers.",
+      "10": "Éternel notre Seigneur ! que ton nom est magnifique dans toute la terre !"
+    }
+  }
+}

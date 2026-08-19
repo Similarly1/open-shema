@@ -1,0 +1,14 @@
+{
+  "id": 145,
+  "code": "LE LIVRE DES PSAUMES CHAPITRE 117",
+  "name": "Le livre des psaumes chapitre 117",
+  "version": "LAU",
+  "version_fullname": "Bible de Lausanne (1872)",
+  "total_chapters": 1,
+  "chapters": {
+    "1": {
+      "1": "Célébrez l’Éternel, vous, toutes les nations ; glorifiez-le, vous, tous les peuples.",
+      "2": "Car sa grâce se montre puissante envers nous, et la vérité de l’Éternel demeure éternellement. Célébrez l’Éternel."
+    }
+  }
+}

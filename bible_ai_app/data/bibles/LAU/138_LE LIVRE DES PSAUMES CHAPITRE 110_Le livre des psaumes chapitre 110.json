@@ -1,0 +1,19 @@
+{
+  "id": 138,
+  "code": "LE LIVRE DES PSAUMES CHAPITRE 110",
+  "name": "Le livre des psaumes chapitre 110",
+  "version": "LAU",
+  "version_fullname": "Bible de Lausanne (1872)",
+  "total_chapters": 1,
+  "chapters": {
+    "1": {
+      "1": "De David. Psaume. Oracle de l’Éternel à mon Seigneur : Assieds-toi à ma droite, jusqu’à ce que je fasse de tes ennemis le marchepied de tes pieds.",
+      "2": "L’Éternel étendra {Héb. enverra.} de Sion le sceptre de ta force : domine au milieu de tes ennemis.",
+      "3": "Ton peuple [sera] de franc vouloir, au jour de ta puissance. Dans une sainte magnificence, du sein maternel de l’aurore, ta jeune milice sort devant toi comme une rosée.",
+      "4": "L’Éternel a juré et il ne s’en repentira point : Tu es sacrificateur éternellement, selon l’ordre de Melchisédec.",
+      "5": "Le Seigneur, à ta droite, écrase des rois au jour de sa colère ;",
+      "6": "il exerce le jugement parmi les nations, il [les] remplit de corps morts ; il écrase le chef d’une vaste terre.",
+      "7": "Il boit au torrent dans le chemin, c’est pourquoi il lève haut la tête."
+    }
+  }
+}

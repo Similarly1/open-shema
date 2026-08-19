@@ -1,0 +1,21 @@
+{
+  "id": 209,
+  "code": "LE LIVRE DES PSAUMES CHAPITRE 4",
+  "name": "Le livre des psaumes chapitre 4",
+  "version": "LAU",
+  "version_fullname": "Bible de Lausanne (1872)",
+  "total_chapters": 1,
+  "chapters": {
+    "1": {
+      "1": "Au chef de musique. Avec instruments à cordes. Psaume de David.",
+      "2": "Quand je crie, réponds-moi, ô Dieu de ma justice ! Dans la détresse tu me mets au large. Aie pitié de moi et entends ma prière.",
+      "3": "Fils des grands, jusques à quand, [livrant] ma gloire à l’ignominie, aimerez-vous une chose vaine, rechercherez-vous une chose qui trompe ? (Sélah.)",
+      "4": "Sachez donc que l’Éternel distingue celui qui l’aime. L’Éternel entend quand je crie à lui.",
+      "5": "Soyez troublés, et ne péchez pas. Parlez en votre cœur sur votre couche, et gardez le silence. (Sélah.)",
+      "6": "Sacrifiez des sacrifices de justice, et confiez-vous en l’Éternel.",
+      "7": "Bien des gens disent : Qui nous fera voir du bien ? Fais lever sur nous la lumière de ta face, ô Éternel !",
+      "8": "Tu mets de la joie en mon cœur, plus qu’ils n’en ont au temps où leur blé et leur moût abondent.",
+      "9": "Avec égale paix je me couche et je m’endors ; car toi seul, ô Éternel ! tu me fais habiter en assurance."
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": 100,
+  "code": "LE LIVRE DE JOB CHAPITRE 25",
+  "name": "Le livre de job chapitre 25",
+  "version": "LAU",
+  "version_fullname": "Bible de Lausanne (1872)",
+  "total_chapters": 1,
+  "chapters": {
+    "1": {
+      "1": "Et Bildad, le Schoukite, prit la parole et dit :",
+      "2": "L’empire et la frayeur sont avec lui ; il fait la paix dans ses hautes régions.",
+      "3": "Peut-on compter ses troupes ? Et sur qui ne se lève pas sa lumière ?",
+      "4": "Comment le mortel serait-il juste devant Dieu, et comment celui qui est né de la femme serait-il pur ?",
+      "5": "Voici, la lune même n’est pas brillante, et les étoiles ne sont pas pures à ses yeux ;",
+      "6": "combien moins le mortel, qui n’est qu’un ver, et le fils de l’homme, qui n’est qu’un vermisseau !"
+    }
+  }
+}

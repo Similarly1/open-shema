@@ -1,0 +1,18 @@
+{
+  "id": 182,
+  "code": "LE LIVRE DES PSAUMES CHAPITRE 150",
+  "name": "Le livre des psaumes chapitre 150",
+  "version": "LAU",
+  "version_fullname": "Bible de Lausanne (1872)",
+  "total_chapters": 1,
+  "chapters": {
+    "1": {
+      "1": "Célébrez l’Éternel. Célébrez Dieu dans son sanctuaire. Célébrez-le dans l’étendue qu’a faite sa puissance.",
+      "2": "Célébrez-le pour ses exploits. Célébrez-le selon l’immensité de sa grandeur.",
+      "3": "Célébrez-le en sonnant de la trompette ; célébrez-le avec le luth et la harpe ;",
+      "4": "célébrez-le avec le tambourin et avec des danses ; célébrez-le au son des cordes et du chalumeau ;",
+      "5": "célébrez-le avec les cymbales résonnantes ; célébrez-le avec les cymbales retentissantes.",
+      "6": "Que tout ce qui respire célèbre l’Éternel. Célébrez l’Éternel."
+    }
+  }
+}

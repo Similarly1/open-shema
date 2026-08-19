@@ -693,5 +693,19 @@
     "book_code": null,
     "embedding_model": "study_library",
     "active": true
+  },
+  "LAU": {
+    "title": "Bible de Lausanne (1872)",
+    "author": "Société Biblique de Lausanne / Louis Gaussen",
+    "description": "Révision protestante francophone historique menée à Lausanne sous la direction de Louis Gaussen, réputée pour sa très haute fidélité littérale au texte hébreu et grec.",
+    "year": "1872",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\LAU.png",
+    "type": "Bible",
+    "format": "json",
+    "folder_name": "LAU",
+    "version_code": "LAU",
+    "total_books": 236,
+    "embedding_model": "study_library",
+    "active": true
   }
 }

@@ -1,0 +1,20 @@
+{
+  "id": 160,
+  "code": "LE LIVRE DES PSAUMES CHAPITRE 130",
+  "name": "Le livre des psaumes chapitre 130",
+  "version": "LAU",
+  "version_fullname": "Bible de Lausanne (1872)",
+  "total_chapters": 1,
+  "chapters": {
+    "1": {
+      "1": "Chant des degrés. De David. Je t’invoque des lieux profonds, ô Éternel !",
+      "2": "Seigneur, écoute ma voix ; que tes oreilles soient attentives à la voix de mes supplications.",
+      "3": "Si tu prends garde aux iniquités, Éternel ! Seigneur ! qui subsistera ?",
+      "4": "Mais auprès de toi est le pardon, afin que tu sois craint.",
+      "5": "J’attends l’Éternel, mon âme l’attend, et j’espère et sa parole.",
+      "6": "Mon âme [désire] le Seigneur, plus que les gardes [n’attendent] le matin, que les gardes [n’attendent] le matin.",
+      "7": "Israël, espère en l’Éternel ; car auprès de l’Éternel est la grâce, auprès de lui est une abondante rédemption ;",
+      "8": "c’est lui qui rachètera Israël de toutes ses iniquités."
+    }
+  }
+}

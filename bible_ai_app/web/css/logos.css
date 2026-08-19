@@ -3462,13 +3462,13 @@ input:checked + .slider.round:before {
   position: absolute;
   top: 75px;
   right: 40px;
-  width: 480px;
-  max-width: 92vw;
-  max-height: 540px;
+  width: 500px;
+  max-width: 94vw;
+  max-height: 560px;
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 10px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
   display: flex;
   flex-direction: column;
   z-index: 100;
@@ -3531,20 +3531,16 @@ input:checked + .slider.round:before {
 }
 .version-picker-families-bar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 5px;
-  padding: 6px 12px;
+  gap: 5px 6px;
+  padding: 8px 12px;
   background: var(--bg-subtle);
   border-bottom: 1px solid var(--border-color);
-  overflow-x: auto;
-  scrollbar-width: thin;
-}
-.version-picker-families-bar::-webkit-scrollbar {
-  height: 4px;
 }
 .fam-filter-pill {
   flex-shrink: 0;
-  padding: 3px 9px;
+  padding: 3px 8px;
   font-size: 11px;
   font-weight: 600;
   border-radius: 12px;

@@ -1,0 +1,21 @@
+{
+  "id": 225,
+  "code": "LE LIVRE DES PSAUMES CHAPITRE 54",
+  "name": "Le livre des psaumes chapitre 54",
+  "version": "LAU",
+  "version_fullname": "Bible de Lausanne (1872)",
+  "total_chapters": 1,
+  "chapters": {
+    "1": {
+      "1": "Au chef de musique. Avec instruments à cordes. Cantique de David.",
+      "2": "Lorsque les Ziphiens allèrent et dirent à Saül : David n’est-il pas caché parmi nous ?",
+      "3": "Ô Dieu ! sauve-moi par ton nom, et prononce sur ma cause par ta puissance.",
+      "4": "Ô Dieu ! écoute ma prière, prête l’oreille aux paroles de ma bouche.",
+      "5": "Car des étrangers se lèvent contre moi et des gens redoutables cherchent ma vie {Héb. mon âme.} Ils ne placent point Dieu devant eux. (Sélah.)",
+      "6": "Voici, Dieu est mon secours ; le Seigneur est parmi ceux qui soutiennent ma vie {Héb. mon âme.}",
+      "7": "Le mal retombera sur {Ou il fera retomber le mal sur.} mes adversaires. Selon ta vérité, anéantis-les.",
+      "8": "Je t’offrirai volontairement des sacrifices.",
+      "9": "Je louerai ton nom, ô Éternel ! car il est bon, car il me délivre de toute détresse ; et mon œil se repose sur mes ennemis."
+    }
+  }
+}

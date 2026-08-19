@@ -1,0 +1,17 @@
+{
+  "id": 213,
+  "code": "LE LIVRE DES PSAUMES CHAPITRE 43",
+  "name": "Le livre des psaumes chapitre 43",
+  "version": "LAU",
+  "version_fullname": "Bible de Lausanne (1872)",
+  "total_chapters": 1,
+  "chapters": {
+    "1": {
+      "1": "Fais-moi droit, ô Dieu ! et plaide ma cause contre une nation qui ne t’aime pas ; fais-moi échapper à l’homme de fourbe et de perversité.",
+      "2": "Car tu es le Dieu qui est mon rempart. Pourquoi m’as-tu repoussé ? pourquoi marché-je en vêtements lugubres sous l’oppression de l’ennemi ?",
+      "3": "Envoie ta lumière et ta vérité ; que ce soient elles qui me conduisent : qu’elles m’amènent à la montagne de ta sainteté et à tes demeures.",
+      "4": "Alors j’irai à l’autel de Dieu, à Dieu, la joie de mon allégresse, et je te louerai avec la harpe, ô Dieu ! mon Dieu !",
+      "5": "Pourquoi t’abats-tu, mon âme, et pourquoi frémis-tu en moi ? Attends-toi à Dieu, car je le louerai encore, lui, le salut de ma face et mon Dieu."
+    }
+  }
+}
