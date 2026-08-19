@@ -63,8 +63,6 @@ DEFAULTS = {
     "synthesis_model": "gemini-3.7-flash",
     "synthesis_fallback_model": "gemini-2.5-flash",
     "synthesis_max_verses": 5,
-    "synthesis_enable_reranking": True,
-    "synthesis_curation_model": "gemini-2.5-flash-lite",
     "synthesis_system_prompt": DEFAULT_SYNTHESIS_SYSTEM_PROMPT,
 }
 

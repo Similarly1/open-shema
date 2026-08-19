@@ -1047,10 +1047,6 @@ const CommentarySynthesizerUI = {
       if (cfg && cfg.synthesis_max_verses) {
         this.maxVersesLimit = parseInt(cfg.synthesis_max_verses, 10) || 5;
       }
-      const rerankToggle = document.getElementById('synth-toggle-rerank');
-      if (rerankToggle && cfg && cfg.synthesis_enable_reranking !== undefined) {
-        rerankToggle.checked = cfg.synthesis_enable_reranking;
-      }
     } catch (e) {}
 
     const ceilingLimitNum = document.getElementById('synth-ceiling-limit-num');
@@ -1131,7 +1127,6 @@ const CommentarySynthesizerUI = {
     const loadingBox = document.getElementById('synth-loading-box');
     const resultBox = document.getElementById('synth-result-container');
     const statusText = document.getElementById('synth-step-status');
-    const rerankChecked = document.getElementById('synth-toggle-rerank')?.checked;
 
     if (!btnLaunch) return;
 
@@ -1142,7 +1137,7 @@ const CommentarySynthesizerUI = {
     if (statusText) statusText.textContent = 'Extraction de tous les commentaires bibliques...';
 
     const progressTimer1 = setTimeout(() => {
-      if (statusText) statusText.textContent = rerankChecked ? 'Curation & Re-ranking exégétique en cours...' : 'Formatage des sources...';
+      if (statusText) statusText.textContent = 'Formatage des sources et analyse théologique...';
     }, 900);
 
     const progressTimer2 = setTimeout(() => {
@@ -1154,8 +1149,7 @@ const CommentarySynthesizerUI = {
         this.currentBook,
         this.currentChapter,
         this.verseStart,
-        this.verseEnd,
-        rerankChecked
+        this.verseEnd
       );
 
       clearTimeout(progressTimer1);
@@ -1241,7 +1235,7 @@ const CommentarySynthesizerUI = {
     if (!resultBox || !contentEl) return;
 
     if (modelTag) modelTag.textContent = data.model_used || 'IA';
-    if (sourcesTag) sourcesTag.textContent = `${data.sources_count || 0} sources ${data.reranking_applied ? '• Curé' : ''}`;
+    if (sourcesTag) sourcesTag.textContent = `${data.sources_count || 0} sources`;
 
     contentEl.innerHTML = this.renderMarkdown(data.synthesis || '');
     resultBox.classList.remove('hidden');

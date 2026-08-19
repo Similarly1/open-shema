@@ -378,12 +378,6 @@ RÈGLES STRICTES :
     if (c.synthesis_max_verses && document.getElementById('cfg-synthesis-max-verses')) {
       document.getElementById('cfg-synthesis-max-verses').value = c.synthesis_max_verses;
     }
-    if (document.getElementById('cfg-synthesis-reranking')) {
-      document.getElementById('cfg-synthesis-reranking').checked = c.synthesis_enable_reranking !== false;
-    }
-    if (c.synthesis_curation_model && document.getElementById('cfg-synthesis-curation-model')) {
-      document.getElementById('cfg-synthesis-curation-model').value = c.synthesis_curation_model;
-    }
 
     if (c.translation_model && document.getElementById('cfg-translation-model')) {
       document.getElementById('cfg-translation-model').value = c.translation_model;
@@ -508,12 +502,6 @@ RÈGLES STRICTES :
     }
     if (document.getElementById('cfg-synthesis-max-verses')) {
       newCfg.synthesis_max_verses = parseInt(document.getElementById('cfg-synthesis-max-verses').value) || 5;
-    }
-    if (document.getElementById('cfg-synthesis-reranking')) {
-      newCfg.synthesis_enable_reranking = document.getElementById('cfg-synthesis-reranking').checked;
-    }
-    if (document.getElementById('cfg-synthesis-curation-model')) {
-      newCfg.synthesis_curation_model = document.getElementById('cfg-synthesis-curation-model').value;
     }
     if (document.getElementById('cfg-translation-model')) {
       newCfg.translation_model = document.getElementById('cfg-translation-model').value;

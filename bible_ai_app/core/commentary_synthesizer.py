@@ -47,116 +47,18 @@ class CommentarySynthesizer:
             return ""
 
     @classmethod
-    def curate_and_rerank_commentaries(
-        cls,
-        raw_comments: List[Dict[str, Any]],
-        passage_ref: str,
-        scripture_text: str,
-        config: Dict[str, Any]
-    ) -> Tuple[str, bool]:
-        """
-        Filtre, condense et classe les commentaires bruts pour éliminer les répétitions textuelles
-        et extraire la quintessence théologique avant l'envoi au modèle de synthèse.
-        """
-        if not raw_comments:
-            return "", False
-
-        # Si le volume de texte total est modéré (< 2500 caractères), pas besoin d'une passe de re-ranking lourde
-        total_len = sum(len(c.get("text", "")) for c in raw_comments)
-        if total_len < 2500:
-            formatted = []
-            for c in raw_comments:
-                formatted.append(f"### Source : {c.get('author', 'Commentaire')} ({c.get('reference', passage_ref)})\n{c.get('text', '').strip()}")
-            return "\n\n".join(formatted), False
-
-        curation_model = config.get("synthesis_curation_model") or "gemini-2.5-flash-lite"
-        gemini_key = config.get("gemini_api_key", "")
-        mistral_key = config.get("mistral_api_key", "")
-        infomaniak_token = config.get("infomaniak_token", "")
-
-        provider = "gemini"
-        api_key = gemini_key
-
-        if curation_model.startswith("mistral") and mistral_key:
-            provider = "mistral"
-            api_key = mistral_key
-        elif "mistralai/" in curation_model or "infomaniak" in curation_model.lower():
-            provider = "infomaniak"
-            api_key = infomaniak_token
-        elif not api_key and mistral_key:
-            provider = "mistral"
-            api_key = mistral_key
-            curation_model = "mistral-small-latest"
-        elif not api_key and infomaniak_token:
-            provider = "infomaniak"
-            api_key = infomaniak_token
-            curation_model = "mistralai/Ministral-3-14B-Instruct-2512"
-
-        if not api_key:
-            # Fallback direct sans appel API si pas de clé
-            formatted = []
-            for c in raw_comments[:12]:
-                text = c.get('text', '').strip()
-                if len(text) > 800:
-                    text = text[:800] + "..."
-                formatted.append(f"### Source : {c.get('author', 'Commentaire')} ({c.get('reference', passage_ref)})\n{text}")
-            return "\n\n".join(formatted), False
-
-        # Préparation du prompt de curation
-        sources_text = ""
-        for i, c in enumerate(raw_comments):
-            sources_text += f"\n[SOURCE {i+1}: {c.get('author', 'Auteur')} - Réf: {c.get('reference', passage_ref)}]\n{c.get('text', '')[:1200]}\n"
-
-        curation_prompt = (
-            f"Tu es un assistant exégétique expert chargé de la curation et du re-ranking de commentaires bibliques.\n"
-            f"Passage : {passage_ref}\n"
-            f"Texte biblique :\n{scripture_text}\n\n"
-            f"Voici les extraits bruts de {len(raw_comments)} commentaires bibliques :\n{sources_text}\n\n"
-            f"TÂCHE :\n"
-            f"1. Élimine les redondances et les formules introductives creuses.\n"
-            f"2. Conserve UNIQUEMENT les arguments exégétiques les plus forts, les explications des mots hébreux/grecs, les nuances d'interprétation et les points théologiques saillants de chaque auteur.\n"
-            f"3. Restitue chaque extrait curé sous forme claire : `### [Nom de l'auteur / Source]` suivi des 2 à 4 points clés substantiels."
-        )
-
-        try:
-            client = LLMClient(api_key=api_key, model=curation_model, provider=provider, product_id=config.get("infomaniak_product_id"))
-            messages = [{"role": "user", "content": curation_prompt}]
-            
-            if provider == "gemini":
-                curated_result = client.client.chat(messages, fallback=True)
-            elif provider == "mistral":
-                from mistralai.models.chat_completion import ChatMessage
-                resp = client.client.chat(model=curation_model, messages=[ChatMessage(role="user", content=curation_prompt)])
-                curated_result = resp.choices[0].message.content
-            elif provider == "infomaniak":
-                curated_result = client.client.chat(messages, model=curation_model)
-            else:
-                curated_result = None
-
-            if curated_result and len(curated_result.strip()) > 100:
-                return curated_result.strip(), True
-        except Exception as e:
-            logger.warning("Erreur lors de la passe de curation LLM (%s), utilisation du mode standard: %s", curation_model, e)
-
-        # Repli si la curation échoue
-        formatted = []
-        for c in raw_comments:
-            formatted.append(f"### Source : {c.get('author', 'Commentaire')} ({c.get('reference', passage_ref)})\n{c.get('text', '').strip()}")
-        return "\n\n".join(formatted), False
-
-    @classmethod
     def synthesize(
         cls,
         book_code: str,
         chapter: int,
         verse_start: int,
         verse_end: Optional[int] = None,
-        enable_reranking: Optional[bool] = None,
         model: Optional[str] = None,
         bible_name: str = "LSG"
     ) -> Dict[str, Any]:
         """
-        Exécute la synthèse exégétique complète pour la plage de versets spécifiée.
+        Exécute la synthèse exégétique complète pour la plage de versets spécifiée
+        en transmettant directement l'intégralité des commentaires extraits au LLM.
         """
         config = load_config()
         ch_int = int(chapter)
@@ -206,17 +108,11 @@ class CommentarySynthesizer:
                 "sources": []
             }
 
-        # 3. Curation & Re-ranking optionnels
-        should_rerank = enable_reranking if enable_reranking is not None else config.get("synthesis_enable_reranking", True)
-        rerank_applied = False
-
-        if should_rerank:
-            context_text, rerank_applied = cls.curate_and_rerank_commentaries(raw_comments, ref_label, scripture, config)
-        else:
-            formatted = []
-            for c in raw_comments:
-                formatted.append(f"### Source : {c.get('author', 'Commentaire')} ({c.get('reference', ref_label)})\n{c.get('text', '').strip()}")
-            context_text = "\n\n".join(formatted)
+        # 3. Formatage direct de tous les commentaires extraits
+        formatted = []
+        for c in raw_comments:
+            formatted.append(f"### Source : {c.get('author', 'Commentaire')} ({c.get('reference', ref_label)})\n{c.get('text', '').strip()}")
+        context_text = "\n\n".join(formatted)
 
         # 4. Contexte des notes personnelles d'étude
         notes_context = NotesManager.build_ai_notes_context(passage_ref=ref_label, question="Synthèse des commentaires", config=config)
@@ -372,7 +268,6 @@ class CommentarySynthesizer:
                 "verse_count": span,
                 "sources_count": len(sources_set),
                 "sources": sorted(list(sources_set)),
-                "reranking_applied": rerank_applied,
                 "model_used": used_model_name,
                 "synthesis": synthesis_text,
                 "scripture_text": scripture
