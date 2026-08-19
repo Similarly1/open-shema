@@ -1245,8 +1245,12 @@ const CommentarySynthesizerUI = {
       if (clean.includes(k) || k.includes(clean)) return v;
     }
     const initials = name.split(/\s+/).map(w => w[0]).filter(Boolean).join('').slice(0, 3).toUpperCase() || 'BIB';
+    const trimmed = name.trim();
+    const title = (trimmed.toLowerCase().startsWith('commentaire') || trimmed.toLowerCase().startsWith('notes') || trimmed.toLowerCase().startsWith('bible'))
+      ? trimmed
+      : `Commentaire de ${trimmed}`;
     return {
-      title: `Commentaire de ${name}`,
+      title: title,
       author: name,
       period: "Ouvrage de référence",
       color: "#2563EB",

@@ -26,8 +26,8 @@ const CommentariesView = {
   readingBg: 'auto',
   isFullWidth: false,
 
-  // Favoris utilisateur mémorisés
-  favorites: ['henry', 'matthew henry', 'calmet', 'pulpit', 'macarthur', 'calvin'],
+  // Favoris utilisateur mémorisés (max 3, vide par défaut)
+  favorites: [],
 
   // Mode Synthèse IA sur la page
   isSynthMode: false,
@@ -98,13 +98,18 @@ const CommentariesView = {
   synthQuickOptions: null,
 
   init() {
-    // Restaurer les favoris personnalisés
+    // Restaurer les favoris personnalisés (max 3, vide par défaut)
     try {
-      const savedFavs = localStorage.getItem('bible_comm_favorites');
+      const savedFavs = localStorage.getItem('open_shema_commentary_favorites') || localStorage.getItem('bible_comm_favorites');
       if (savedFavs) {
-        this.favorites = JSON.parse(savedFavs);
+        const parsed = JSON.parse(savedFavs);
+        if (Array.isArray(parsed)) {
+          this.favorites = parsed.slice(0, 3);
+        }
       }
-    } catch (e) {}
+    } catch (e) {
+      this.favorites = [];
+    }
 
     // Restaurer les préférences d'affichage
     try {
@@ -432,20 +437,68 @@ const CommentariesView = {
     });
   },
 
-  toggleFavorite(authorName, e) {
-    if (e) e.stopPropagation();
-    const clean = (authorName || '').toLowerCase().trim();
-    const idx = this.favorites.indexOf(clean);
-    if (idx >= 0) {
-      this.favorites.splice(idx, 1);
-    } else {
-      this.favorites.push(clean);
+  getFavKey(commOrName) {
+    if (!commOrName) return '';
+    if (typeof commOrName === 'string') {
+      return commOrName.trim().toLowerCase();
     }
-    try {
-      localStorage.setItem('bible_comm_favorites', JSON.stringify(this.favorites));
-    } catch (err) {}
+    const author = (commOrName.author || commOrName.source || '').trim().toLowerCase();
+    return author;
+  },
+
+  isFavorite(commOrName) {
+    const key = this.getFavKey(commOrName);
+    if (!key) return false;
+    const sourceMeta = this.getSourceMeta(key);
+    const metaAuthor = (sourceMeta.author || '').toLowerCase();
+    return this.favorites.some(f => f === key || key.includes(f) || f.includes(key) || (metaAuthor && (f === metaAuthor || metaAuthor.includes(f) || f.includes(metaAuthor))));
+  },
+
+  addFavorite(commOrName, e) {
+    if (e) e.stopPropagation();
+    const key = this.getFavKey(commOrName);
+    if (!key) return;
+    if (this.isFavorite(key)) return;
+    if (this.favorites.length >= 3) {
+      App.showToast('Limite de 3 favoris atteinte. Supprimez un favori pour en ajouter un nouveau.');
+      return;
+    }
+    this.favorites.push(key);
+    this.saveFavorites();
+    App.showToast('Commentaire ajouté aux favoris');
     this.renderPopoverList();
     this.renderQuickFavorites();
+  },
+
+  removeFavorite(commOrName, e) {
+    if (e) e.stopPropagation();
+    const key = this.getFavKey(commOrName);
+    if (!key) return;
+    const sourceMeta = this.getSourceMeta(key);
+    const metaAuthor = (sourceMeta.author || '').toLowerCase();
+    const idx = this.favorites.findIndex(f => f === key || key.includes(f) || f.includes(key) || (metaAuthor && (f === metaAuthor || metaAuthor.includes(f) || f.includes(metaAuthor))));
+    if (idx >= 0) {
+      this.favorites.splice(idx, 1);
+      this.saveFavorites();
+      App.showToast('Favori retiré');
+    }
+    this.renderPopoverList();
+    this.renderQuickFavorites();
+  },
+
+  toggleFavorite(commOrName, e) {
+    if (this.isFavorite(commOrName)) {
+      this.removeFavorite(commOrName, e);
+    } else {
+      this.addFavorite(commOrName, e);
+    }
+  },
+
+  saveFavorites() {
+    try {
+      localStorage.setItem('open_shema_commentary_favorites', JSON.stringify(this.favorites));
+      localStorage.setItem('bible_comm_favorites', JSON.stringify(this.favorites));
+    } catch (err) {}
   },
 
   async handleSearch() {
@@ -680,15 +733,39 @@ const CommentariesView = {
     if (!this.pickerList) return;
     this.pickerList.innerHTML = '';
 
+    const isMaxFavorites = this.favorites.length >= 3;
+
     this.currentComments.forEach((comm, idx) => {
       const authorName = comm.author || comm.source || 'Commentaire';
       const sourceMeta = this.getSourceMeta(authorName);
-      const isFav = this.favorites.includes(authorName.toLowerCase()) || this.favorites.includes((sourceMeta.author || '').toLowerCase());
+      const isFav = this.isFavorite(comm);
       const isCurrentActive = idx === this.activeIndex;
       const previewText = (comm.text || '').slice(0, 110).replace(/[\n#\*\_]/g, ' ').trim();
 
       const item = document.createElement('div');
       item.className = `comm-picker-item ${isCurrentActive ? 'active' : ''}`;
+
+      let favBtnHtml = '';
+      if (isFav) {
+        favBtnHtml = `
+          <button class="comm-picker-fav-btn is-fav active" title="Retirer des favoris">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="#F59E0B" stroke="#F59E0B" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+        `;
+      } else if (isMaxFavorites) {
+        favBtnHtml = `
+          <button class="comm-picker-fav-btn disabled" disabled title="Limite de 3 favoris atteinte. Supprimez un favori pour en ajouter un autre.">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+        `;
+      } else {
+        favBtnHtml = `
+          <button class="comm-picker-fav-btn" title="Ajouter aux favoris (max 3)">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+        `;
+      }
+
       item.innerHTML = `
         <div class="comm-book-mini-cover" style="background: ${sourceMeta.color || '#1E3A8A'};">
           <div class="comm-book-mini-spine"></div>
@@ -702,9 +779,7 @@ const CommentariesView = {
           <div class="comm-picker-item-author">${sourceMeta.author || authorName}</div>
           <div class="comm-picker-item-preview">${previewText}...</div>
         </div>
-        <button class="comm-picker-fav-btn ${isFav ? 'is-fav' : ''}" title="${isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'}">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </button>
+        ${favBtnHtml}
       `;
 
       item.addEventListener('click', (e) => {
@@ -717,9 +792,15 @@ const CommentariesView = {
       });
 
       const favBtn = item.querySelector('.comm-picker-fav-btn');
-      favBtn?.addEventListener('click', (e) => {
-        this.toggleFavorite(authorName, e);
-      });
+      if (favBtn && !favBtn.classList.contains('disabled')) {
+        favBtn.addEventListener('click', (e) => {
+          if (isFav) {
+            this.removeFavorite(authorName, e);
+          } else {
+            this.addFavorite(authorName, e);
+          }
+        });
+      }
 
       this.pickerList.appendChild(item);
     });
@@ -729,54 +810,81 @@ const CommentariesView = {
     if (!this.quickFavoritesGroup) return;
     this.quickFavoritesGroup.innerHTML = '';
 
-    // 1. Pilule d'accès rapide : Synthèse IA
-    const synthPill = document.createElement('button');
-    synthPill.className = `comm-quick-fav-pill comm-quick-synth-pill ${this.isSynthMode ? 'active' : ''}`;
-    synthPill.innerHTML = `
-      <span class="comm-quick-fav-avatar" style="background: linear-gradient(135deg, #6366F1, #8B5CF6);">✨</span>
-      <span>Synthèse IA</span>
-    `;
-    synthPill.addEventListener('click', () => {
-      this.openAISynthesis();
-    });
-    this.quickFavoritesGroup.appendChild(synthPill);
+    // Rendre exactement 3 pastilles de favoris
+    for (let i = 0; i < 3; i++) {
+      const favKey = this.favorites[i];
+      if (favKey) {
+        // Slot rempli avec un favori
+        const sourceMeta = this.getSourceMeta(favKey);
 
-    // 2. Trouver les ouvrages favoris disponibles pour ce verset
-    const favComments = [];
-    this.currentComments.forEach((comm, idx) => {
-      const authorName = (comm.author || comm.source || '').toLowerCase();
-      const sourceMeta = this.getSourceMeta(comm.author || comm.source);
-      const metaAuthor = (sourceMeta.author || '').toLowerCase();
-
-      const matchedFav = this.favorites.find(f => authorName.includes(f) || metaAuthor.includes(f) || f.includes(authorName));
-      if (matchedFav) {
-        favComments.push({ comm, idx, sourceMeta });
-      }
-    });
-
-    // Limiter aux 3 premiers favoris pour garder une barre très épurée
-    const displayFavs = favComments.slice(0, 3);
-
-    displayFavs.forEach(({ comm, idx, sourceMeta }) => {
-      const authorName = comm.author || comm.source || 'Commentaire';
-      const pill = document.createElement('button');
-      pill.className = `comm-quick-fav-pill ${(!this.isSynthMode && idx === this.activeIndex) ? 'active' : ''}`;
-      pill.setAttribute('data-author-idx', idx);
-
-      pill.innerHTML = `
-        <span class="comm-quick-fav-avatar" style="background-color: ${sourceMeta.color || '#3B82F6'};">${sourceMeta.initials || 'C'}</span>
-        <span>${sourceMeta.author ? sourceMeta.author.split(' ').pop() : authorName}</span>
-      `;
-
-      pill.addEventListener('click', () => {
-        if (this.isSynthMode) {
-          this.closeAISynthesis();
+        // Trouver si présent dans currentComments
+        let commIdx = -1;
+        if (this.currentComments && this.currentComments.length > 0) {
+          commIdx = this.currentComments.findIndex(c => {
+            const cKey = (c.author || c.source || '').toLowerCase();
+            const metaAuth = (sourceMeta.author || '').toLowerCase();
+            return cKey === favKey || cKey.includes(favKey) || favKey.includes(cKey) || metaAuth === favKey || (metaAuth && metaAuth.includes(favKey));
+          });
         }
-        this.selectCommentary(idx);
-      });
 
-      this.quickFavoritesGroup.appendChild(pill);
-    });
+        const isAvailable = commIdx !== -1;
+        const isCurrentActive = (!this.isSynthMode && isAvailable && commIdx === this.activeIndex);
+        
+        let displayName = sourceMeta.author || favKey;
+        if (displayName.length > 14 && sourceMeta.author) {
+          displayName = sourceMeta.author.split(' ').pop();
+        }
+
+        const slot = document.createElement('div');
+        slot.className = `comm-fav-slot filled ${isCurrentActive ? 'active' : ''} ${!isAvailable ? 'unavailable' : ''}`;
+        slot.setAttribute('title', `${sourceMeta.title || favKey} (${isAvailable ? 'Cliquer pour ouvrir' : 'Non disponible sur ce verset'})`);
+
+        slot.innerHTML = `
+          <span class="comm-fav-avatar" style="background-color: ${sourceMeta.color || '#1E3A8A'};">${sourceMeta.initials || 'C'}</span>
+          <span class="comm-fav-name">${displayName}</span>
+          <button class="comm-fav-remove-btn" title="Supprimer ce favori">✕</button>
+        `;
+
+        // Suppression du favori via le bouton ✕
+        slot.querySelector('.comm-fav-remove-btn')?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.removeFavorite(favKey, e);
+        });
+
+        // Clic sur la pastille pour afficher
+        slot.addEventListener('click', () => {
+          if (this.isSynthMode) {
+            this.closeAISynthesis();
+          }
+          if (isAvailable) {
+            this.selectCommentary(commIdx);
+          } else {
+            this.preferredAuthor = favKey;
+            App.showToast(`« ${sourceMeta.title || favKey} » sélectionné comme préféré`);
+          }
+        });
+
+        this.quickFavoritesGroup.appendChild(slot);
+      } else {
+        // Slot vide en pointillés
+        const emptySlot = document.createElement('button');
+        emptySlot.className = 'comm-fav-slot empty';
+        emptySlot.setAttribute('type', 'button');
+        emptySlot.setAttribute('title', 'Ajouter un favori (Cliquer pour ouvrir la liste des commentaires)');
+
+        emptySlot.innerHTML = `
+          <span class="comm-fav-empty-plus">+</span>
+          <span class="comm-fav-empty-label">Favori</span>
+        `;
+
+        emptySlot.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.togglePopover(true);
+        });
+
+        this.quickFavoritesGroup.appendChild(emptySlot);
+      }
+    }
   },
 
   selectCommentary(index) {
@@ -1282,10 +1390,15 @@ const CommentariesView = {
     if (typeof CommentaryViewer !== 'undefined' && CommentaryViewer.getSourceInfo) {
       return CommentaryViewer.getSourceInfo(name);
     }
-    const initials = name ? name.split(/\s+/).map(w => w[0]).filter(Boolean).join('').slice(0, 3).toUpperCase() : 'C';
+    if (!name) return { title: 'Commentaire Biblique', author: 'Auteur', period: 'Source d\'exégèse', color: '#1E3A8A', initials: 'BIB' };
+    const trimmed = name.trim();
+    const initials = trimmed.split(/\s+/).map(w => w[0]).filter(Boolean).join('').slice(0, 3).toUpperCase() || 'BIB';
+    const title = (trimmed.toLowerCase().startsWith('commentaire') || trimmed.toLowerCase().startsWith('notes') || trimmed.toLowerCase().startsWith('bible'))
+      ? trimmed
+      : `Commentaire de ${trimmed}`;
     return {
-      title: `Commentaire de ${name}`,
-      author: name,
+      title: title,
+      author: trimmed,
       period: 'Ouvrage d\'exégèse',
       color: '#1E3A8A',
       initials

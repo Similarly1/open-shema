@@ -1511,23 +1511,16 @@
       <!-- ===================================================== -->
       <div class="app-view" id="view-commentaries">
         <header class="view-header comm-view-header">
-          <div class="view-title-box">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <h1 class="view-title" style="margin: 0;">COMMENTAIRES EXÉGÉTIQUES</h1>
-              <span class="comm-view-badge" id="comm-view-count-badge">0 sources</span>
+          <!-- GAUCHE : Navigation Passage & Recherche -->
+          <div class="comm-view-nav-group">
+            <button class="tool-btn icon-only" id="btn-comm-view-prev" title="Verset précédent (Flèche Gauche)">◀</button>
+            <div class="comm-view-ref-box">
+              <input type="text" id="comm-view-search-input" class="search-field comm-ref-search-field" placeholder="Passage (ex: Jean 3:16)..." title="Saisir un passage et appuyer sur Entrée">
             </div>
-            <p class="view-subtitle" id="comm-view-subtitle">Exposition approfondie verset par verset • Grands commentateurs historiques & contemporains</p>
+            <button class="tool-btn icon-only" id="btn-comm-view-next" title="Verset suivant (Flèche Droite)">▶</button>
           </div>
           
           <div class="view-actions comm-view-toolbar-actions">
-            <!-- Navigation versets -->
-            <div class="comm-view-nav-group">
-              <button class="tool-btn icon-only" id="btn-comm-view-prev" title="Verset précédent (Flèche Gauche)">◀</button>
-              <div class="comm-view-ref-box">
-                <input type="text" id="comm-view-search-input" class="search-field comm-ref-search-field" placeholder="Rechercher (ex: Jean 3:16)..." title="Saisir un passage et appuyer sur Entrée">
-              </div>
-              <button class="tool-btn icon-only" id="btn-comm-view-next" title="Verset suivant (Flèche Droite)">▶</button>
-            </div>
 
             <!-- Options d'Affichage Popover (Police, Fond, Largeur) -->
             <div style="position: relative;">
