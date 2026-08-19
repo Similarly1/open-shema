@@ -501,155 +501,157 @@
         <header class="view-header">
           <div class="view-title-box">
             <h1 class="view-title">ASSISTANT D'ÉTUDE</h1>
-            <p class="view-subtitle">Exégèse biblique, analyse contextuelle et théologique par IA.</p>
+            <p class="view-subtitle" id="ai-study-header-subtitle">Exégèse approfondie • Bibles, Commentaires, Strong, Notes</p>
           </div>
           <div class="view-actions" style="position: relative; display: flex; align-items: center; gap: 8px;">
-            <select id="ai-study-mode" class="select-field" style="font-weight: 600; cursor: pointer;">
-              <option value="exegesis">🔍 Exégèse approfondie</option>
-              <option value="historical">🏛️ Contexte historique & culturel</option>
-              <option value="sermon">🎙️ Préparation de prédication / Message</option>
-              <option value="lexical">🔤 Analyse lexicale (Grec & Hébreu)</option>
-            </select>
-            
-            <button id="btn-ai-mode-info" class="btn-icon" title="Comprendre les modes d'étude et documents sources" style="border: 1px solid var(--border-color); border-radius: 6px; padding: 0 10px; height: 32px; display: flex; align-items: center; gap: 4px; background: var(--bg-card); cursor: pointer; color: var(--accent-blue); font-size: 12px; font-weight: 600; transition: var(--transition-fast);">
-              <span>ℹ️ Docs & Rôles</span>
+            <!-- Sélecteur de Mode Unifié & Élégant -->
+            <button id="btn-study-mode-selector" class="study-mode-pill-btn" title="Changer de mode d'analyse et voir les documents mobilisés">
+              <span id="study-mode-pill-icon">🔍</span>
+              <span id="study-mode-pill-label">Exégèse approfondie</span>
+              <span class="pill-arrow">▾</span>
             </button>
 
-            <button id="btn-toggle-ai-options" class="btn-icon" title="Configurer le modèle, le Reranking et les sources RAG" style="border: 1px solid var(--border-color); border-radius: 6px; padding: 0 10px; height: 32px; display: flex; align-items: center; gap: 6px; background: var(--bg-card); cursor: pointer; color: var(--text-primary); font-size: 12px; font-weight: 600; transition: var(--transition-fast);">
-              <span>⚙️ Options RAG</span>
-              <span id="ai-opt-badge-count" style="background: var(--accent-blue); color: white; border-radius: 10px; font-size: 10px; padding: 1px 6px;">4</span>
+            <!-- Bouton Options RAG & Modèle discret -->
+            <button id="btn-toggle-ai-options" class="btn-icon-subtle" title="Options avancées (Modèle IA, Reranking BGE, Sources)">
+              ⚙️
             </button>
 
-            <!-- Infobulle / Popover explicatif avec types de documents sources précis -->
-            <div id="ai-mode-popover" class="comm-sources-popover hidden" style="position: absolute; top: 44px; right: 0; width: 440px; z-index: 1000; box-shadow: 0 12px 36px rgba(0,0,0,0.4); border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); background: var(--bg-card);">
-              <div class="comm-popover-title" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg-subtle); border-bottom: 1px solid var(--border-color);">
-                <span style="font-weight: 700; font-size: 12px; color: var(--text-primary);">📚 Types de Documents & Méthodologie par Mode</span>
-                <span id="btn-close-ai-mode-info" style="cursor: pointer; font-size: 14px; color: var(--text-muted); padding: 2px 6px;">✕</span>
+            <!-- Popover Unifié : Modes d'Étude avec Rôles & Documents Sources intégrés -->
+            <div id="ai-mode-dropdown-popover" class="study-mode-popover hidden">
+              <div class="study-mode-popover-header">
+                <span>Mode d'Analyse & Méthodologie</span>
+                <span id="btn-close-mode-popover" style="cursor: pointer; font-size: 13px; color: var(--text-muted); padding: 2px 6px;">✕</span>
               </div>
-              <div style="padding: 14px; display: flex; flex-direction: column; gap: 12px; font-size: 12px; line-height: 1.5; max-height: 440px; overflow-y: auto;">
-                <div style="border-left: 3px solid #0284C7; padding-left: 10px; background: var(--bg-subtle); padding: 10px 12px; border-radius: 0 6px 6px 0;">
-                  <div style="font-weight: 700; color: #0284C7; margin-bottom: 4px; font-size: 13px;">🔍 Exégèse approfondie</div>
-                  <div style="color: var(--text-secondary); margin-bottom: 6px;">Analyse minutieuse verset par verset, structure littéraire (chiasmes, parallélismes, syntaxe), théologie de l'Alliance et cohérence canonique.</div>
-                  <div style="font-size: 11px; background: var(--bg-card); padding: 6px 8px; border-radius: 4px; border: 1px solid var(--border-color); color: var(--text-primary);">
-                    <strong>📁 Documents sources mobilisés :</strong> Bibles originales (Hébreu/Grec avec Interlinéaire), Multi-traductions (LSG, S21, BDS, Darby), Commentaires exégétiques majeurs (Matthew Henry, Calvin, Scofield...), Notes personnelles (.md).
+              <div class="study-mode-items-list">
+                <!-- Mode 1 -->
+                <div class="study-mode-card active" data-mode="exegesis">
+                  <div class="study-mode-card-head">
+                    <span class="mode-icon">🔍</span>
+                    <strong class="mode-title">Exégèse approfondie</strong>
+                    <span class="mode-check">✓</span>
+                  </div>
+                  <p class="mode-desc">Analyse structurelle et théologique verset par verset, chiasmes, syntaxe et cohérence canonique.</p>
+                  <div class="mode-sources-tag">📁 Bibles originales, Multi-traductions, Commentaires majeurs, Notes .md</div>
+                </div>
+
+                <!-- Mode 2 -->
+                <div class="study-mode-card" data-mode="historical">
+                  <div class="study-mode-card-head">
+                    <span class="mode-icon">🏛️</span>
+                    <strong class="mode-title">Contexte historique & culturel</strong>
+                    <span class="mode-check">✓</span>
+                  </div>
+                  <p class="mode-desc">Arrière-plan de rédaction, auteur, destinataires, cadre socio-politique antique et géographie.</p>
+                  <div class="mode-sources-tag">📁 Dictionnaires bibliques (Dom Calmet, Vigouroux...), Archéologie, Notes .md</div>
+                </div>
+
+                <!-- Mode 3 -->
+                <div class="study-mode-card" data-mode="sermon">
+                  <div class="study-mode-card-head">
+                    <span class="mode-icon">🎙️</span>
+                    <strong class="mode-title">Préparation de prédication / Message</strong>
+                    <span class="mode-check">✓</span>
+                  </div>
+                  <p class="mode-desc">Plan homilétique complet avec idée maîtresse (Big Idea), points illustrés et applications pastorales.</p>
+                  <div class="mode-sources-tag">📁 Commentaires pastoraux, Trésor de l'Écriture (TSK), Illustrations, Notes .md</div>
+                </div>
+
+                <!-- Mode 4 -->
+                <div class="study-mode-card" data-mode="lexical">
+                  <div class="study-mode-card-head">
+                    <span class="mode-icon">🔤</span>
+                    <strong class="mode-title">Analyse lexicale (Grec & Hébreu)</strong>
+                    <span class="mode-check">✓</span>
+                  </div>
+                  <p class="mode-desc">Étude des racines linguistiques, codes Strong, nuances morphologiques et sens dans la Septante (LXX).</p>
+                  <div class="mode-sources-tag">📁 Lexique Strong Hébreu/Grec, Dictionnaires de racines (Bailly, Gesenius), LXX</div>
+                </div>
+              </div>
+
+              <div class="study-mode-popover-footer">
+                <span style="font-size: 11px; color: var(--text-muted);">Cliquez pour sélectionner un mode</span>
+                <button id="btn-popover-open-options" class="btn-link-subtle">⚙️ Options RAG & Modèle</button>
+              </div>
+            </div>
+
+            <!-- Flyout escamotable pour les Options RAG (Modèle, Rerank, Sources) -->
+            <div id="ai-study-options-panel" class="study-options-flyout hidden">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);">
+                <span style="font-size: 12px; font-weight: 700; color: var(--text-primary);">
+                  ⚙️ Options du Moteur d'Étude
+                </span>
+                <span id="btn-close-ai-options" style="cursor: pointer; font-size: 13px; color: var(--text-muted); padding: 2px 6px;">✕</span>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- 1. Choix du modèle LLM -->
+                <div>
+                  <label style="display: block; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">
+                    🧠 Modèle de Synthèse IA
+                  </label>
+                  <select id="ai-opt-model" class="select-field full-w" style="font-size: 12px; height: 32px;">
+                    <option value="gemini-3.7-flash" selected>⚡ Gemini 3.7 Flash (Rapide)</option>
+                    <option value="gemini-2.5-pro">🧠 Gemini 2.5 Pro (Haute précision)</option>
+                    <option value="gemini-2.5-flash">⚡ Gemini 2.5 Flash</option>
+                    <option value="mistralai/Mistral-Small-4-119B-2603">🇫🇷 Mistral Small 4 (119B)</option>
+                    <option value="mistralai/Mistral-Large-2411">🇫🇷 Mistral Large (24B)</option>
+                    <option value="mistralai/Ministral-3-14B-Instruct-2512">🇫🇷 Ministral 3 (14B)</option>
+                  </select>
+                </div>
+
+                <!-- 2. Profondeur et Style -->
+                <div>
+                  <label style="display: block; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">
+                    🎯 Profondeur / Style
+                  </label>
+                  <select id="ai-opt-depth" class="select-field full-w" style="font-size: 12px; height: 32px;">
+                    <option value="academic" selected>🎓 Académique & Approfondi</option>
+                    <option value="pastoral">🕊️ Pastoral & Équilibré</option>
+                    <option value="concise">⚡ Synthétique & Concis</option>
+                  </select>
+                </div>
+
+                <!-- 3. Reranking & LLM Curateur -->
+                <div style="background: var(--bg-subtle); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-color);">
+                  <label style="display: block; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">
+                    🔬 RAG & Curation
+                  </label>
+                  <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <label style="font-size: 11.5px; display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text-primary);">
+                      <input type="checkbox" id="ai-opt-reranking" checked>
+                      <span>Reranking sémantique (BGE-M3)</span>
+                    </label>
+                    <label style="font-size: 11.5px; display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text-primary);">
+                      <input type="checkbox" id="ai-opt-curator">
+                      <span>LLM Curateur intermédiaire</span>
+                    </label>
                   </div>
                 </div>
 
-                <div style="border-left: 3px solid #D97706; padding-left: 10px; background: var(--bg-subtle); padding: 10px 12px; border-radius: 0 6px 6px 0;">
-                  <div style="font-weight: 700; color: #D97706; margin-bottom: 4px; font-size: 13px;">🏛️ Contexte historique & culturel</div>
-                  <div style="color: var(--text-secondary); margin-bottom: 6px;">Arrière-plan historique, auteur, destinataires, cadre socio-politique de l'Antiquité (Proche-Orient ancien ou monde gréco-romain), coutumes et géographie.</div>
-                  <div style="font-size: 11px; background: var(--bg-card); padding: 6px 8px; border-radius: 4px; border: 1px solid var(--border-color); color: var(--text-primary);">
-                    <strong>📁 Documents sources mobilisés :</strong> Dictionnaires bibliques & encyclopédiques (Dom Calmet, Vigouroux, Fillion, Dictionnaire Biblique Universel), Ouvrages d'arrière-plan archéologique, Articles Wikipédia intégrés, Notes personnelles (.md).
-                  </div>
-                </div>
-
-                <div style="border-left: 3px solid #7C3AED; padding-left: 10px; background: var(--bg-subtle); padding: 10px 12px; border-radius: 0 6px 6px 0;">
-                  <div style="font-weight: 700; color: #7C3AED; margin-bottom: 4px; font-size: 13px;">🎙️ Préparation de prédication / Message</div>
-                  <div style="color: var(--text-secondary); margin-bottom: 6px;">Plan homilétique structuré avec Idée Maîtresse (Big Idea), 2 ou 3 points d'exposition illustrés et applications pastorales concrètes pour la vie chrétienne.</div>
-                  <div style="font-size: 11px; background: var(--bg-card); padding: 6px 8px; border-radius: 4px; border: 1px solid var(--border-color); color: var(--text-primary);">
-                    <strong>📁 Documents sources mobilisés :</strong> Commentaires homilétiques & pastoraux, Trésor de la Connaissance de l'Écriture (TSK / 500k renvois croisés), Recueils d'illustrations chrétiennes, Notes personnelles (.md).
-                  </div>
-                </div>
-
-                <div style="border-left: 3px solid #059669; padding-left: 10px; background: var(--bg-subtle); padding: 10px 12px; border-radius: 0 6px 6px 0;">
-                  <div style="font-weight: 700; color: #059669; margin-bottom: 4px; font-size: 13px;">🔤 Analyse lexicale (Grec & Hébreu)</div>
-                  <div style="color: var(--text-secondary); margin-bottom: 6px;">Étude détaillée des racines hébraïques/araméennes/grecques, codes Strong, nuances morphologiques, sens dans la Septante (LXX) et théologie des mots.</div>
-                  <div style="font-size: 11px; background: var(--bg-card); padding: 6px 8px; border-radius: 4px; border: 1px solid var(--border-color); color: var(--text-primary);">
-                    <strong>📁 Documents sources mobilisés :</strong> Lexique Strong Hébreu & Grec, Dictionnaires de racines (Bailly, Gesenius, Thayer), Concordance morphologique interlinéaire, Septante (LXX).
+                <!-- 4. Sources Documentaires à Interroger -->
+                <div>
+                  <label style="display: block; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">
+                    📚 Corpus Actifs
+                  </label>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 11px;">
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                      <input type="checkbox" id="ai-opt-src-bibles" checked> 📖 Bibles
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                      <input type="checkbox" id="ai-opt-src-comms" checked> 💬 Commentaires
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                      <input type="checkbox" id="ai-opt-src-dict" checked> 📕 Dictionnaires
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                      <input type="checkbox" id="ai-opt-src-notes" checked> 📝 Notes (.md)
+                    </label>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </header>
-
-        <!-- Panneau de Paramètres RAG & Options d'Étude (Escamotable) -->
-        <div id="ai-study-options-panel" class="hidden" style="background: var(--bg-card); border-bottom: 2px solid var(--accent-blue); padding: 16px 24px; animation: popoverFadeIn 0.2s ease;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);">
-            <span style="font-size: 13px; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
-              ⚙️ Paramètres du Moteur d'Étude & RAG Documentaire
-            </span>
-            <button id="btn-close-ai-options" style="background: transparent; border: none; font-size: 14px; cursor: pointer; color: var(--text-muted);">✕ Fermer</button>
-          </div>
-
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
-            <!-- 1. Choix du modèle LLM -->
-            <div>
-              <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">
-                🧠 Modèle de Synthèse IA (LLM)
-              </label>
-              <select id="ai-opt-model" class="select-field full-w" style="font-size: 12px;">
-                <option value="gemini-3.7-flash" selected>⚡ Gemini 3.7 Flash (Raisonnement rapide)</option>
-                <option value="gemini-2.5-pro">🧠 Gemini 2.5 Pro (Haute précision théologique)</option>
-                <option value="gemini-2.5-flash">⚡ Gemini 2.5 Flash</option>
-                <option value="mistralai/Mistral-Small-4-119B-2603">🇫🇷 Mistral Small 4 (119B)</option>
-                <option value="mistralai/Mistral-Large-2411">🇫🇷 Mistral Large (24B)</option>
-                <option value="mistralai/Ministral-3-14B-Instruct-2512">🇫🇷 Ministral 3 (14B)</option>
-              </select>
-            </div>
-
-            <!-- 2. Profondeur et Style -->
-            <div>
-              <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">
-                🎯 Style & Profondeur de Réponse
-              </label>
-              <select id="ai-opt-depth" class="select-field full-w" style="font-size: 12px;">
-                <option value="academic" selected>🎓 Académique & Approfondi (Détaillé)</option>
-                <option value="pastoral">🕊️ Pastoral & Équilibré (Prédication/Méditation)</option>
-                <option value="concise">⚡ Synthétique & Concis (Points clés)</option>
-              </select>
-            </div>
-
-            <!-- 3. Reranking & LLM Curateur -->
-            <div>
-              <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">
-                🔬 Pipeline RAG & Curation
-              </label>
-              <div style="display: flex; flex-direction: column; gap: 6px;">
-                <label style="font-size: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
-                  <input type="checkbox" id="ai-opt-reranking" checked>
-                  <span><strong>Reranking sémantique (BGE-M3)</strong> <span style="font-size: 10px; color: var(--text-muted);">(Reclassement CPU)</span></span>
-                </label>
-                <label style="font-size: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
-                  <input type="checkbox" id="ai-opt-curator">
-                  <span><strong>LLM Curateur intermédiaire</strong> <span style="font-size: 10px; color: var(--text-muted);">(Épuration du bruit)</span></span>
-                </label>
-              </div>
-            </div>
-
-            <!-- 4. Sources Documentaires à Interroger -->
-            <div>
-              <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">
-                📚 Corpus Documentaires Actifs
-              </label>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-                <label style="font-size: 11px; display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                  <input type="checkbox" id="ai-opt-src-bibles" checked> 📖 Bibles & Interlin.
-                </label>
-                <label style="font-size: 11px; display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                  <input type="checkbox" id="ai-opt-src-comms" checked> 💬 Commentaires
-                </label>
-                <label style="font-size: 11px; display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                  <input type="checkbox" id="ai-opt-src-dict" checked> 📕 Dictionnaires
-                </label>
-                <label style="font-size: 11px; display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                  <input type="checkbox" id="ai-opt-src-notes" checked> 📝 Notes (.md)
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Bandeau d'information dynamique sur le mode sélectionné -->
-        <div id="ai-mode-description-banner" style="padding: 10px 24px; background: var(--bg-subtle); border-bottom: 1px solid var(--border-color); font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; justify-content: space-between; transition: all 0.2s ease;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span id="ai-mode-desc-icon" style="font-size: 16px;">🔍</span>
-            <span id="ai-mode-desc-text"><strong>Exégèse approfondie :</strong> Analyse structurelle et théologique verset par verset, syntaxe et cohérence biblique.</span>
-          </div>
-          <div id="ai-mode-sources-chips" style="display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--accent-blue); background: rgba(2, 132, 199, 0.1); padding: 3px 8px; border-radius: 12px; border: 1px solid rgba(2, 132, 199, 0.2);">
-            <span>📚 Sources : Bibles, Commentaires, Strong, Notes</span>
-          </div>
-        </div>
 
         <div class="view-content ai-study-container">
           <div class="ai-study-chat-flow" id="ai-study-chat-flow">

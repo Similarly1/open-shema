@@ -1,37 +1,46 @@
 /**
  * AI Study View Controller
- * Gère l'assistant d'étude en mode plein écran (exégèse approfondie, préparation de sermon, etc.).
+ * Gère l'assistant d'étude en mode plein écran (exégèse approfondie, préparation de sermon, etc.)
+ * Interface unifiée, sobre et épurée.
  */
 
 const AIStudyView = {
   chatFlowEl: null,
   inputEl: null,
   passageRefEl: null,
-  modeSelectEl: null,
   btnSendEl: null,
+  currentMode: 'exegesis',
 
   MODES_INFO: {
     exegesis: {
       icon: '🔍',
       title: 'Exégèse approfondie',
-      desc: 'Analyse structurelle et théologique verset par verset, syntaxe, chiasmes et cohérence biblique.',
+      shortTitle: 'Exégèse',
+      sourcesSummary: 'Bibles originales, Commentaires, Strong, Notes',
+      desc: 'Analyse structurelle et théologique verset par verset, chiasmes, syntaxe et cohérence canonique.',
       placeholder: "Ex: Analyse la structure de ce passage, les articulations syntaxiques et la portée théologique..."
     },
     historical: {
       icon: '🏛️',
       title: 'Contexte historique & culturel',
+      shortTitle: 'Histoire & Contexte',
+      sourcesSummary: 'Dictionnaires (Dom Calmet, Vigouroux...), Archéologie, Notes',
       desc: 'Arrière-plan historique, auteur, destinataires, coutumes du Proche-Orient / gréco-romaines et géographie.',
       placeholder: "Ex: Quel est le contexte politique, culturel et historique de la rédaction de ce texte ?"
     },
     sermon: {
       icon: '🎙️',
       title: 'Préparation de prédication / Message',
+      shortTitle: 'Prédication',
+      sourcesSummary: 'Commentaires pastoraux, TSK, Illustrations, Notes',
       desc: 'Plan homilétique complet avec idée maîtresse (Big Idea), 3 points de développement et applications concrètes.',
       placeholder: "Ex: Propose un plan de prédication percutant en 3 points avec illustrations et applications pour l'Église..."
     },
     lexical: {
       icon: '🔤',
       title: 'Analyse lexicale (Grec & Hébreu)',
+      shortTitle: 'Lexique Hébreu/Grec',
+      sourcesSummary: 'Lexique Strong Hébreu/Grec, Dictionnaires de racines (Bailly, Gesenius), LXX',
       desc: 'Étude des racines hébraïques/grecques, codes Strong, nuances morphologiques et sens dans la Septante (LXX).',
       placeholder: "Ex: Analyse les termes clés en hébreu/grec dans ce verset, leurs racines et leurs nuances théologiques..."
     }
@@ -41,57 +50,64 @@ const AIStudyView = {
     this.chatFlowEl = document.getElementById('ai-study-chat-flow');
     this.inputEl = document.getElementById('ai-study-input');
     this.passageRefEl = document.getElementById('ai-passage-ref');
-    this.modeSelectEl = document.getElementById('ai-study-mode');
     this.btnSendEl = document.getElementById('btn-send-study-ai');
 
-    const btnInfo = document.getElementById('btn-ai-mode-info');
-    const popover = document.getElementById('ai-mode-popover');
-    const btnClose = document.getElementById('btn-close-ai-mode-info');
+    const btnModeSelector = document.getElementById('btn-study-mode-selector');
+    const modePopover = document.getElementById('ai-mode-dropdown-popover');
+    const btnCloseModePopover = document.getElementById('btn-close-mode-popover');
 
     const btnToggleOptions = document.getElementById('btn-toggle-ai-options');
+    const btnPopoverOptions = document.getElementById('btn-popover-open-options');
     const optionsPanel = document.getElementById('ai-study-options-panel');
     const btnCloseOptions = document.getElementById('btn-close-ai-options');
 
-    // Gestion de l'infobulle explicative
-    btnInfo?.addEventListener('click', (e) => {
+    // Ouverture/fermeture du menu des modes
+    btnModeSelector?.addEventListener('click', (e) => {
       e.stopPropagation();
-      popover?.classList.toggle('hidden');
+      modePopover?.classList.toggle('hidden');
       optionsPanel?.classList.add('hidden');
     });
 
-    btnClose?.addEventListener('click', () => {
-      popover?.classList.add('hidden');
+    btnCloseModePopover?.addEventListener('click', () => {
+      modePopover?.classList.add('hidden');
     });
 
-    // Gestion du panneau des options RAG
+    // Sélection d'un mode depuis le popover unifié
+    document.querySelectorAll('.study-mode-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const mode = card.getAttribute('data-mode');
+        if (mode) this.setMode(mode);
+      });
+    });
+
+    // Ouverture du panneau des options RAG
     btnToggleOptions?.addEventListener('click', (e) => {
       e.stopPropagation();
       optionsPanel?.classList.toggle('hidden');
-      popover?.classList.add('hidden');
+      modePopover?.classList.add('hidden');
+    });
+
+    btnPopoverOptions?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      modePopover?.classList.add('hidden');
+      optionsPanel?.classList.remove('hidden');
     });
 
     btnCloseOptions?.addEventListener('click', () => {
       optionsPanel?.classList.add('hidden');
     });
 
+    // Clic extérieur pour fermer les popovers
     document.addEventListener('click', (e) => {
-      if (popover && !popover.contains(e.target) && e.target !== btnInfo) {
-        popover.classList.add('hidden');
+      if (modePopover && !modePopover.contains(e.target) && e.target !== btnModeSelector) {
+        modePopover.classList.add('hidden');
+      }
+      if (optionsPanel && !optionsPanel.contains(e.target) && e.target !== btnToggleOptions && e.target !== btnPopoverOptions) {
+        optionsPanel.classList.add('hidden');
       }
     });
 
-    // Écouteurs sur les cases à cocher des sources pour mettre à jour les badges
-    ['ai-opt-src-bibles', 'ai-opt-src-comms', 'ai-opt-src-dict', 'ai-opt-src-notes', 'ai-opt-reranking', 'ai-opt-curator'].forEach(id => {
-      document.getElementById(id)?.addEventListener('change', () => {
-        this.updateSourcesBadge();
-      });
-    });
-
-    // Mise à jour dynamique du bandeau et du placeholder lors du changement de mode
-    this.modeSelectEl?.addEventListener('change', () => {
-      this.updateModeBanner();
-    });
-
+    // Envoi de message
     this.btnSendEl?.addEventListener('click', () => this.sendMessage());
     this.inputEl?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
@@ -100,8 +116,42 @@ const AIStudyView = {
       }
     });
 
-    this.updateModeBanner();
-    this.updateSourcesBadge();
+    this.setMode('exegesis');
+  },
+
+  setMode(modeKey) {
+    if (!this.MODES_INFO[modeKey]) return;
+    this.currentMode = modeKey;
+    const info = this.MODES_INFO[modeKey];
+
+    // Mise à jour de l'affichage du bouton pill
+    const pillIcon = document.getElementById('study-mode-pill-icon');
+    const pillLabel = document.getElementById('study-mode-pill-label');
+    if (pillIcon) pillIcon.textContent = info.icon;
+    if (pillLabel) pillLabel.textContent = info.title;
+
+    // Mise à jour du sous-titre de l'en-tête (sobre et discret)
+    const subtitleEl = document.getElementById('ai-study-header-subtitle');
+    if (subtitleEl) {
+      subtitleEl.textContent = `${info.title} • ${info.sourcesSummary}`;
+    }
+
+    // Mise à jour des classes actives sur les cartes du popover
+    document.querySelectorAll('.study-mode-card').forEach(card => {
+      if (card.getAttribute('data-mode') === modeKey) {
+        card.classList.add('active');
+      } else {
+        card.classList.remove('active');
+      }
+    });
+
+    // Mise à jour du placeholder du champ de saisie
+    if (this.inputEl) {
+      this.inputEl.placeholder = info.placeholder;
+    }
+
+    // Fermer le popover
+    document.getElementById('ai-mode-dropdown-popover')?.classList.add('hidden');
   },
 
   getOptions() {
@@ -126,47 +176,11 @@ const AIStudyView = {
     };
   },
 
-  updateSourcesBadge() {
-    const opts = this.getOptions();
-    let count = 0;
-    const activeNames = [];
-    if (opts.sources.bibles) { count++; activeNames.push('Bibles'); }
-    if (opts.sources.commentaries) { count++; activeNames.push('Commentaires'); }
-    if (opts.sources.dictionaries) { count++; activeNames.push('Dictionnaires'); }
-    if (opts.sources.notes) { count++; activeNames.push('Notes'); }
-
-    const badgeCount = document.getElementById('ai-opt-badge-count');
-    if (badgeCount) badgeCount.textContent = count;
-
-    const chipsEl = document.getElementById('ai-mode-sources-chips');
-    if (chipsEl) {
-      let extra = [];
-      if (opts.enable_reranking) extra.push('Rerank BGE');
-      if (opts.enable_curator) extra.push('Curateur LLM');
-      const extraStr = extra.length > 0 ? ` | 🔬 ${extra.join(', ')}` : '';
-      chipsEl.innerHTML = `<span>📚 Sources : ${activeNames.join(', ') || 'Aucune'}${extraStr}</span>`;
-    }
-  },
-
-  updateModeBanner() {
-    const modeKey = this.modeSelectEl?.value || 'exegesis';
-    const info = this.MODES_INFO[modeKey] || this.MODES_INFO.exegesis;
-
-    const iconEl = document.getElementById('ai-mode-desc-icon');
-    const textEl = document.getElementById('ai-mode-desc-text');
-
-    if (iconEl) iconEl.textContent = info.icon;
-    if (textEl) textEl.innerHTML = `<strong>${info.title} :</strong> ${info.desc}`;
-    if (this.inputEl) this.inputEl.placeholder = info.placeholder;
-
-    this.updateSourcesBadge();
-  },
-
   async sendMessage() {
     const text = this.inputEl.value.trim();
     if (!text) return;
 
-    const mode = this.modeSelectEl.value;
+    const mode = this.currentMode || 'exegesis';
     const passage = this.passageRefEl.value.trim() || `${BibleReader.currentBook} ${BibleReader.currentChapter}`;
     const options = this.getOptions();
 
@@ -184,7 +198,7 @@ const AIStudyView = {
     assistantMsg.innerHTML = `
       <div class="msg-avatar">🤖</div>
       <div class="msg-content">
-        <em>Génération de l'étude avec <strong>${options.model}</strong> (${options.enable_reranking ? 'Reranking CPU actif' : 'RAG standard'})...</em>
+        <em>Génération de l'étude avec <strong>${options.model}</strong> (${options.enable_reranking ? 'Reranking BGE actif' : 'RAG standard'})...</em>
       </div>
     `;
     this.chatFlowEl.appendChild(assistantMsg);
