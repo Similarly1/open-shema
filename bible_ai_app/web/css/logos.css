@@ -7318,11 +7318,35 @@ body.palette-dark-warm .ctx-submenu {
 
 /* CORPS DE LECTURE TYPOGRAPHIQUE */
 .comm-view-reading-body {
-  font-family: var(--font-bible, 'EB Garamond', Georgia, serif);
-  font-size: var(--bible-font-size-base, 17px);
+  font-family: var(--comm-font-family, var(--font-bible, 'EB Garamond', Georgia, serif));
+  font-size: calc(var(--comm-font-size-base, 17px) * var(--comm-zoom-scale, 1));
   line-height: 1.75;
   color: var(--text-primary);
   word-wrap: break-word;
+}
+
+/* BOUTONS CHOIX DE POLICE POPOVER */
+.comm-font-choice-btn {
+  transition: all 0.15s ease;
+}
+.comm-font-choice-btn:hover {
+  border-color: var(--accent-blue) !important;
+  background: var(--bg-hover) !important;
+}
+.comm-font-choice-btn.active {
+  background: var(--accent-blue) !important;
+  color: #ffffff !important;
+  border-color: var(--accent-blue) !important;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.3);
+}
+
+/* PLEINE LARGEUR ÉTENDUE */
+body.comm-full-width #view-commentaries .comm-article-container,
+body.comm-full-width #view-commentaries .comm-hybrid-bar,
+body.comm-full-width #view-commentaries .comm-verse-banner {
+  max-width: 100% !important;
+  padding-left: 24px;
+  padding-right: 24px;
 }
 
 .comm-body-h1 {

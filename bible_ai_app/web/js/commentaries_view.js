@@ -3,6 +3,7 @@
  * Gère la page dédiée plein écran aux commentaires exégétiques :
  * - Sélecteur principal déroulant haut de gamme avec mini-couvertures 3D et recherche
  * - Raccourcis favoris rapides épinglés
+ * - Options d'affichage complètes : Zoom (− / +), Polices (Sérif / Sans-sérif), Fond de lecture (Blanc, Sépia, Nuit, Auto), Pleine largeur
  * - Synthèse IA intégrée sur la page
  * - Traduction française, copie et export vers les notes
  */
@@ -18,6 +19,12 @@ const CommentariesView = {
   translationCache: {},
   showTranslatedVersion: {},
   isLoading: false,
+
+  // Paramètres d'affichage
+  zoomPercent: 100,
+  fontFamily: 'EB Garamond',
+  readingBg: 'auto',
+  isFullWidth: false,
 
   // Favoris utilisateur mémorisés
   favorites: ['henry', 'matthew henry', 'calmet', 'pulpit', 'macarthur', 'calvin'],
@@ -42,6 +49,14 @@ const CommentariesView = {
   articleContainer: null,
   articleContent: null,
   countBadge: null,
+
+  // Éléments Options d'Affichage & Zoom
+  btnDisplayOptions: null,
+  displayPopover: null,
+  btnZoomOut: null,
+  btnZoomIn: null,
+  lblZoomLevel: null,
+  optFullWidth: null,
 
   // Éléments Sélecteur Hybride & Popover
   btnActiveSelector: null,
@@ -91,6 +106,18 @@ const CommentariesView = {
       }
     } catch (e) {}
 
+    // Restaurer les préférences d'affichage
+    try {
+      const savedZoom = localStorage.getItem('comm_view_zoom') || localStorage.getItem('bible_reader_zoom');
+      if (savedZoom) this.zoomPercent = parseInt(savedZoom, 10) || 100;
+
+      const savedFont = localStorage.getItem('comm_view_font');
+      if (savedFont) this.fontFamily = savedFont;
+
+      const savedWidth = localStorage.getItem('comm_full_width');
+      if (savedWidth === 'true') this.isFullWidth = true;
+    } catch (e) {}
+
     this.searchInput = document.getElementById('comm-view-search-input');
     this.btnSearch = document.getElementById('btn-comm-view-search');
     this.btnPrev = document.getElementById('btn-comm-view-prev');
@@ -103,6 +130,14 @@ const CommentariesView = {
     this.articleContainer = document.getElementById('comm-view-article-container');
     this.articleContent = document.getElementById('comm-view-article-content');
     this.countBadge = document.getElementById('comm-view-count-badge');
+
+    // Affichage & Zoom DOM
+    this.btnDisplayOptions = document.getElementById('btn-comm-display-options');
+    this.displayPopover = document.getElementById('comm-display-popover');
+    this.btnZoomOut = document.getElementById('btn-comm-zoom-out');
+    this.btnZoomIn = document.getElementById('btn-comm-zoom-in');
+    this.lblZoomLevel = document.getElementById('lbl-comm-zoom-level');
+    this.optFullWidth = document.getElementById('comm-opt-full-width');
 
     // Sélecteur Déroulant & Popover DOM
     this.btnActiveSelector = document.getElementById('btn-comm-active-selector');
@@ -143,6 +178,11 @@ const CommentariesView = {
     this.synthRangeControls = document.getElementById('comm-page-synth-range-controls');
     this.synthQuickOptions = document.getElementById('comm-page-synth-quick-options');
 
+    // Appliquer les préférences d'affichage initiales
+    this.setZoom(this.zoomPercent);
+    this.setFontFamily(this.fontFamily);
+    this.setFullWidth(this.isFullWidth);
+
     // 1. Événements de recherche et navigation
     this.btnSearch?.addEventListener('click', () => this.handleSearch());
     this.searchInput?.addEventListener('keydown', (e) => {
@@ -160,7 +200,39 @@ const CommentariesView = {
       this.openInBibleReader();
     });
 
-    // 3. Sélecteur Déroulant & Popover
+    // 3. Options d'affichage & Zoom
+    this.btnDisplayOptions?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggleDisplayPopover();
+    });
+
+    this.btnZoomOut?.addEventListener('click', () => {
+      this.setZoom(this.zoomPercent - 10);
+    });
+
+    this.btnZoomIn?.addEventListener('click', () => {
+      this.setZoom(this.zoomPercent + 10);
+    });
+
+    document.querySelectorAll('.comm-font-choice-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const font = btn.dataset.font;
+        if (font) this.setFontFamily(font);
+      });
+    });
+
+    document.querySelectorAll('.comm-bg-swatch').forEach(sw => {
+      sw.addEventListener('click', () => {
+        const bg = sw.dataset.bg || 'auto';
+        this.setReadingBackground(bg);
+      });
+    });
+
+    this.optFullWidth?.addEventListener('change', (e) => {
+      this.setFullWidth(e.target.checked);
+    });
+
+    // 4. Sélecteur Déroulant & Popover
     this.btnActiveSelector?.addEventListener('click', (e) => {
       e.stopPropagation();
       this.togglePopover();
@@ -175,13 +247,17 @@ const CommentariesView = {
       this.openAISynthesis();
     });
 
+    // Clic extérieur pour fermer les popovers
     document.addEventListener('click', (e) => {
-      if (this.pickerPopover && !this.pickerPopover.contains(e.target) && e.target !== this.btnActiveSelector && !this.btnActiveSelector?.contains(e.target)) {
+      if (this.pickerPopover && !this.pickerPopover.classList.contains('hidden') && !this.pickerPopover.contains(e.target) && e.target !== this.btnActiveSelector && !this.btnActiveSelector?.contains(e.target)) {
         this.closePopover();
+      }
+      if (this.displayPopover && !this.displayPopover.classList.contains('hidden') && !this.displayPopover.contains(e.target) && e.target !== this.btnDisplayOptions && !this.btnDisplayOptions?.contains(e.target)) {
+        this.closeDisplayPopover();
       }
     });
 
-    // 4. Synthèse IA
+    // 5. Synthèse IA
     this.btnSynthHeader?.addEventListener('click', () => {
       if (this.isSynthMode) {
         this.closeAISynthesis();
@@ -213,7 +289,7 @@ const CommentariesView = {
       this.exportSynthesisToNote();
     });
 
-    // 5. Raccourcis clavier (flèches gauche/droite pour versets)
+    // 6. Raccourcis clavier (flèches gauche/droite pour versets)
     window.addEventListener('keydown', (e) => {
       if (App.activeView !== 'commentaries') return;
       if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.isContentEditable)) {
@@ -229,10 +305,109 @@ const CommentariesView = {
     });
   },
 
+  /* ======================================================= */
+  /* GESTION DE L'AFFICHAGE (ZOOM, POLICE, FOND, LARGEUR)    */
+  /* ======================================================= */
+
+  setZoom(percent) {
+    this.zoomPercent = Math.min(Math.max(70, percent), 200);
+    if (this.lblZoomLevel) {
+      this.lblZoomLevel.textContent = `${this.zoomPercent}%`;
+    }
+    const scale = this.zoomPercent / 100;
+    document.documentElement.style.setProperty('--comm-zoom-scale', scale);
+
+    const view = document.getElementById('view-commentaries');
+    if (view) view.style.setProperty('--comm-zoom-scale', scale);
+
+    try {
+      localStorage.setItem('comm_view_zoom', this.zoomPercent);
+    } catch (e) {}
+  },
+
+  setFontFamily(fontFamily) {
+    this.fontFamily = fontFamily || 'EB Garamond';
+    let fontStack = `'EB Garamond', Georgia, serif`;
+    if (fontFamily === 'Inter') {
+      fontStack = `'Inter', -apple-system, BlinkMacSystemFont, sans-serif`;
+    } else if (fontFamily === 'Georgia') {
+      fontStack = `Georgia, 'Times New Roman', serif`;
+    } else {
+      fontStack = `'EB Garamond', 'Lora', Georgia, serif`;
+    }
+
+    document.documentElement.style.setProperty('--comm-font-family', fontStack);
+    const view = document.getElementById('view-commentaries');
+    if (view) view.style.setProperty('--comm-font-family', fontStack);
+
+    // Mettre à jour l'état actif des boutons de police
+    document.querySelectorAll('.comm-font-choice-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.font === this.fontFamily);
+    });
+
+    try {
+      localStorage.setItem('comm_view_font', this.fontFamily);
+    } catch (e) {}
+  },
+
+  setReadingBackground(bg) {
+    this.readingBg = bg || 'auto';
+    const currentTheme = document.getElementById('cfg-theme')?.value || 'dark';
+    const currentPalette = document.getElementById('cfg-theme-palette')?.value || 'palette-dark-slate';
+
+    if (typeof App !== 'undefined' && App.applyTheme) {
+      App.applyTheme(currentTheme, currentPalette, this.readingBg);
+    }
+
+    // Mettre à jour la valeur dans les paramètres cachés
+    const bgHiddenInput = document.getElementById('cfg-reading-bg');
+    if (bgHiddenInput) bgHiddenInput.value = this.readingBg;
+
+    // Mettre à jour les pastilles dans les popovers
+    document.querySelectorAll('.comm-bg-swatch, .reading-bg-quick-swatch').forEach(sw => {
+      sw.classList.toggle('active', sw.dataset.bg === this.readingBg);
+    });
+
+    // Mettre à jour les cartes dans la vue paramètres
+    document.querySelectorAll('.reading-bg-card').forEach(c => {
+      c.classList.toggle('active', c.dataset.readingBg === this.readingBg);
+    });
+  },
+
+  setFullWidth(enabled) {
+    this.isFullWidth = !!enabled;
+    document.body.classList.toggle('comm-full-width', this.isFullWidth);
+    if (this.optFullWidth) this.optFullWidth.checked = this.isFullWidth;
+
+    try {
+      localStorage.setItem('comm_full_width', this.isFullWidth);
+    } catch (e) {}
+  },
+
+  toggleDisplayPopover(forceState = null) {
+    if (!this.displayPopover) return;
+    const shouldOpen = forceState !== null ? forceState : this.displayPopover.classList.contains('hidden');
+    if (shouldOpen) {
+      this.closePopover(); // Fermer l'autre popover si ouvert
+      this.displayPopover.classList.remove('hidden');
+    } else {
+      this.displayPopover.classList.add('hidden');
+    }
+  },
+
+  closeDisplayPopover() {
+    this.toggleDisplayPopover(false);
+  },
+
+  /* ======================================================= */
+  /* GESTION DU SÉLECTEUR DÉROULANT ET DES FAVORIS           */
+  /* ======================================================= */
+
   togglePopover(forceState = null) {
     if (!this.pickerPopover) return;
     const shouldOpen = forceState !== null ? forceState : this.pickerPopover.classList.contains('hidden');
     if (shouldOpen) {
+      this.closeDisplayPopover(); // Fermer l'autre popover si ouvert
       this.pickerPopover.classList.remove('hidden');
       if (this.pickerSearchInput) {
         this.pickerSearchInput.value = '';
@@ -334,6 +509,13 @@ const CommentariesView = {
       chapter = BibleReader.currentChapter || 1;
       verse = BibleReader.currentVerse || 1;
     }
+
+    // Synchroniser l'état du fond de lecture
+    const curBg = document.getElementById('cfg-reading-bg')?.value || 'auto';
+    this.readingBg = curBg;
+    document.querySelectorAll('.comm-bg-swatch').forEach(sw => {
+      sw.classList.toggle('active', sw.dataset.bg === this.readingBg);
+    });
 
     this.loadPassage(book, chapter, verse, author);
   },
@@ -946,7 +1128,7 @@ const CommentariesView = {
       .replace(/^\d+\. (.*$)/gim, '<li class="comm-body-li" style="margin-left: 24px; margin-bottom: 6px;">$1</li>')
       .replace(/\n\n/g, '<br><br>');
 
-    return `<div class="rendered-synth" style="font-family: var(--font-bible, serif); font-size: var(--bible-font-size-base, 17px); line-height: 1.8;">${html}</div>`;
+    return `<div class="rendered-synth" style="font-family: var(--comm-font-family, var(--font-bible, serif)); font-size: calc(var(--comm-font-size-base, 17px) * var(--comm-zoom-scale, 1)); line-height: 1.8;">${html}</div>`;
   },
 
   copySynthesis() {
