@@ -32,6 +32,7 @@ DEFAULTS = {
     "max_original_verses_for_llm": 10,
     "show_section_titles": True,
     "show_chapter_dividers": True,
+    "full_width_reading": False,
     "notes_directory": "",
     "include_notes_in_ai": True,
 }

@@ -282,10 +282,16 @@ const DisplayOptions = {
     try {
       const cfg = await API.getSettings() || {};
       updateActiveSwatch(cfg.reading_bg || 'auto');
+      
       const showDiv = cfg.show_chapter_dividers !== false;
       const chkDiv = document.getElementById('opt-show-chap-dividers');
       if (chkDiv) chkDiv.checked = showDiv;
       workspace?.classList.toggle('hide-chap-dividers', !showDiv);
+
+      const isFullWidth = cfg.full_width_reading === true;
+      const chkFullWidth = document.getElementById('opt-full-width');
+      if (chkFullWidth) chkFullWidth.checked = isFullWidth;
+      workspace?.classList.toggle('full-width', isFullWidth);
     } catch (e) {}
 
     btn.addEventListener('click', async (e) => {
@@ -293,10 +299,16 @@ const DisplayOptions = {
       try {
         const cfg = await API.getSettings() || {};
         updateActiveSwatch(cfg.reading_bg || 'auto');
+        
         const showDiv = cfg.show_chapter_dividers !== false;
         const chkDiv = document.getElementById('opt-show-chap-dividers');
         if (chkDiv) chkDiv.checked = showDiv;
         workspace?.classList.toggle('hide-chap-dividers', !showDiv);
+
+        const isFullWidth = cfg.full_width_reading === true;
+        const chkFullWidth = document.getElementById('opt-full-width');
+        if (chkFullWidth) chkFullWidth.checked = isFullWidth;
+        workspace?.classList.toggle('full-width', isFullWidth);
       } catch (e) {}
       popover.classList.toggle('hidden');
     });
@@ -328,6 +340,15 @@ const DisplayOptions = {
       const cfg = await API.getSettings() || {};
       cfg.show_chapter_dividers = e.target.checked;
       const cfgCheck = document.getElementById('cfg-show-chap-dividers');
+      if (cfgCheck) cfgCheck.checked = e.target.checked;
+      API.call('save_settings', cfg);
+    });
+
+    document.getElementById('opt-full-width')?.addEventListener('change', async (e) => {
+      workspace?.classList.toggle('full-width', e.target.checked);
+      const cfg = await API.getSettings() || {};
+      cfg.full_width_reading = e.target.checked;
+      const cfgCheck = document.getElementById('cfg-full-width');
       if (cfgCheck) cfgCheck.checked = e.target.checked;
       API.call('save_settings', cfg);
     });

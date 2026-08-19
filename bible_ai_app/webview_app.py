@@ -1085,6 +1085,40 @@ class BibleAppApi:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+    def minimize_window(self):
+        global _GLOBAL_WINDOW
+        if _GLOBAL_WINDOW:
+            try:
+                _GLOBAL_WINDOW.minimize()
+            except Exception as e:
+                logger.warning(f"Impossible de réduire la fenêtre: {e}")
+        return {"success": True}
+
+    def maximize_window(self):
+        global _GLOBAL_WINDOW
+        if _GLOBAL_WINDOW:
+            try:
+                # Si déjà maximisée, restaurer, sinon maximiser
+                is_max = getattr(_GLOBAL_WINDOW, '_is_custom_maximized', True)
+                if is_max:
+                    _GLOBAL_WINDOW.restore()
+                    _GLOBAL_WINDOW._is_custom_maximized = False
+                else:
+                    _GLOBAL_WINDOW.maximize()
+                    _GLOBAL_WINDOW._is_custom_maximized = True
+            except Exception as e:
+                logger.warning(f"Impossible de basculer la fenêtre: {e}")
+        return {"success": True}
+
+    def close_window(self):
+        global _GLOBAL_WINDOW
+        if _GLOBAL_WINDOW:
+            try:
+                _GLOBAL_WINDOW.destroy()
+            except Exception as e:
+                logger.warning(f"Erreur à la fermeture: {e}")
+        return {"success": True}
+
 
 def main():
     global _GLOBAL_WINDOW
@@ -1100,8 +1134,11 @@ def main():
         height=920,
         min_size=(1050, 680),
         maximized=True,
+        frameless=True,
+        easy_drag=True,
         background_color="#0F172A"
     )
+    _GLOBAL_WINDOW._is_custom_maximized = True
     
     # Lancement avec Edge WebView2
     webview.start(debug=False)
@@ -1109,3 +1146,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

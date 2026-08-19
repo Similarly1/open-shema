@@ -294,6 +294,9 @@ const SettingsView = {
     if (document.getElementById('cfg-show-chap-dividers')) {
       document.getElementById('cfg-show-chap-dividers').checked = c.show_chapter_dividers !== false;
     }
+    if (document.getElementById('cfg-full-width')) {
+      document.getElementById('cfg-full-width').checked = c.full_width_reading === true;
+    }
 
     document.getElementById('cfg-inter-surface').checked = c.interlinear_show_surface !== false;
     document.getElementById('cfg-inter-lemma').checked = c.interlinear_show_lemma !== false;
@@ -395,6 +398,9 @@ const SettingsView = {
     newCfg.show_diff_highlights = document.getElementById('cfg-diff-highlight').checked;
     if (document.getElementById('cfg-show-chap-dividers')) {
       newCfg.show_chapter_dividers = document.getElementById('cfg-show-chap-dividers').checked;
+    }
+    if (document.getElementById('cfg-full-width')) {
+      newCfg.full_width_reading = document.getElementById('cfg-full-width').checked;
     }
 
     newCfg.interlinear_show_surface = document.getElementById('cfg-inter-surface').checked;
