@@ -413,6 +413,12 @@ const App = {
       // Ne pas intercepter si l'utilisateur saisit du texte
       if (isInput) return;
 
+      if (e.key === 'F11') {
+        e.preventDefault();
+        API.call('maximize_window');
+        return;
+      }
+
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
         e.preventDefault();
         document.getElementById('quick-passage-input')?.focus();
