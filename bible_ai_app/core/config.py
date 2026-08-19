@@ -64,6 +64,7 @@ DEFAULTS = {
     "full_width_reading": False,
     "notes_directory": "",
     "include_notes_in_ai": True,
+    "enable_ai": True,
     "synthesis_model": "gemini-3.7-flash",
     "synthesis_fallback_model": "gemini-2.5-flash",
     "synthesis_max_verses": 5,

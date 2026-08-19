@@ -457,7 +457,7 @@
               <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"></circle>
               <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.563-2.512 5.563-5.563C22 6.5 17.5 2 12 2Z"></path>
             </svg>
-            <span>Apparence</span>
+            <span>Général & Apparence</span>
           </button>
           <button class="settings-tab" data-sec="lecture">
             <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -513,8 +513,34 @@
 
         <div class="view-content settings-scroll-body">
           
-          <!-- Section 1 : Apparence -->
+          <!-- Section 1 : Général & Apparence -->
           <div class="settings-section active" id="sec-apparence">
+            
+            <!-- CARTE COMMUTATEUR MAÎTRE IA / MODE EXÉGÈSE CLASSIQUE -->
+            <div class="settings-card ai-master-card">
+              <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;">
+                <div style="flex: 1;">
+                  <div class="card-title" style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-purple, #8B5CF6);"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                    <span>Fonctionnalités d'Intelligence Artificielle (IA)</span>
+                  </div>
+                  <p class="card-desc" style="margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--text-secondary);">
+                    Active l'Assistant d'étude, la synthèse comparative multi-commentaires, la traduction et les aides IA. Si désactivée, l'application fonctionne en <strong>mode 100% traditionnel et hors-ligne</strong> : tous les boutons et options d'IA sont complètement masqués dans l'application.
+                  </p>
+                </div>
+                <label class="toggle-switch-large" title="Activer / Désactiver l'Intelligence Artificielle">
+                  <input type="checkbox" id="cfg-enable-ai" checked>
+                  <span class="toggle-switch-slider"></span>
+                </label>
+              </div>
+
+              <!-- Bannière informative quand l'IA est désactivée -->
+              <div id="ai-disabled-status-banner" class="ai-disabled-status-box hidden" style="margin-top: 14px; padding: 12px 14px; border-radius: 8px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: var(--text-primary); font-size: 12px; display: flex; align-items: center; gap: 10px;">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#F59E0B" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span><strong>Mode Classique sans IA actif :</strong> L'ensemble des boutons, assistants et synthèses IA sont masqués. Toutes vos Bibles, commentaires, dictionnaires et notes restent 100% accessibles hors-ligne.</span>
+              </div>
+            </div>
+
             <div class="settings-card">
               <div class="card-title">Palette de Couleurs & Apparence Globale</div>
               
@@ -843,8 +869,35 @@
 
           <!-- Section 5 : Assistant IA & Clés -->
           <div class="settings-section" id="sec-ai">
-            <div class="settings-card">
-              <div class="card-title">Modèles d'Intelligence Artificielle</div>
+            
+            <!-- Commutateur d'activation dans l'onglet IA -->
+            <div class="settings-card ai-master-card">
+              <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;">
+                <div style="flex: 1;">
+                  <div class="card-title" style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-purple, #8B5CF6);"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                    <span>État de l'Intelligence Artificielle</span>
+                  </div>
+                  <p class="card-desc" style="margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--text-secondary);">
+                    Activez ou désactivez l'ensemble des modules IA. Lorsque cette option est désactivée, les modèles, synthèses et assistants sont coupés et masqués.
+                  </p>
+                </div>
+                <label class="toggle-switch-large" title="Activer / Désactiver l'Intelligence Artificielle">
+                  <input type="checkbox" id="cfg-enable-ai-tab" checked>
+                  <span class="toggle-switch-slider"></span>
+                </label>
+              </div>
+
+              <!-- Bannière informative quand l'IA est désactivée -->
+              <div id="ai-disabled-status-banner-tab" class="ai-disabled-status-box hidden" style="margin-top: 14px; padding: 12px 14px; border-radius: 8px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: var(--text-primary); font-size: 12px; display: flex; align-items: center; gap: 10px;">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#F59E0B" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span><strong>Mode Classique sans IA actif :</strong> Les modèles et clés ci-dessous sont actuellement en veille. Cochez l'interrupteur ci-dessus pour réactiver l'IA.</span>
+              </div>
+            </div>
+
+            <div class="ai-sub-config" id="sec-ai-sub-config">
+              <div class="settings-card">
+                <div class="card-title">Modèles d'Intelligence Artificielle</div>
               
               <div class="form-row two-cols">
                 <div class="form-group">
@@ -1025,6 +1078,7 @@
               </div>
             </div>
           </div>
+        </div>
 
           <!-- Section 6 : Sauvegarde ZIP -->
           <div class="settings-section" id="sec-backup">

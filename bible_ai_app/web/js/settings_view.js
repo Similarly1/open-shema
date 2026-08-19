@@ -148,6 +148,19 @@ RÈGLES STRICTES :
       });
     });
 
+    // 4. Commutateur Maître de Désactivation / Activation de l'IA
+    const handleAIToggle = (e) => {
+      const isEnabled = e.target.checked;
+      App.applyAIEnabled(isEnabled, true);
+      this.updateAIToggles(isEnabled);
+      this.config.enable_ai = isEnabled;
+      API.call('save_settings', { ...this.config, enable_ai: isEnabled });
+      App.showToast(isEnabled ? 'Intelligence Artificielle activée' : 'Mode 100% Traditionnel sans IA activé');
+    };
+
+    document.getElementById('cfg-enable-ai')?.addEventListener('change', handleAIToggle);
+    document.getElementById('cfg-enable-ai-tab')?.addEventListener('change', handleAIToggle);
+
     // Changement de police en direct
     document.getElementById('cfg-font-family')?.addEventListener('change', (e) => {
       App.applyFontFamily(e.target.value);
@@ -354,6 +367,25 @@ RÈGLES STRICTES :
     });
   },
 
+  updateAIToggles(enabled) {
+    const isEnabled = enabled !== false;
+    const chk1 = document.getElementById('cfg-enable-ai');
+    const chk2 = document.getElementById('cfg-enable-ai-tab');
+    const banner1 = document.getElementById('ai-disabled-status-banner');
+    const banner2 = document.getElementById('ai-disabled-status-banner-tab');
+    const subConfig = document.getElementById('sec-ai-sub-config');
+
+    if (chk1) chk1.checked = isEnabled;
+    if (chk2) chk2.checked = isEnabled;
+
+    if (banner1) banner1.classList.toggle('hidden', isEnabled);
+    if (banner2) banner2.classList.toggle('hidden', isEnabled);
+    if (subConfig) {
+      subConfig.style.opacity = isEnabled ? '1' : '0.45';
+      subConfig.style.pointerEvents = isEnabled ? 'auto' : 'none';
+    }
+  },
+
   async loadData() {
     try {
       this.config = await API.call('get_settings') || {};
@@ -370,6 +402,11 @@ RÈGLES STRICTES :
     const theme = c.theme || 'dark';
     const palette = c.theme_palette || 'dark-slate';
     const readingBg = c.reading_bg || 'auto';
+
+    // 0. État Maître de l'IA
+    const isAIEnabled = c.enable_ai !== false;
+    this.updateAIToggles(isAIEnabled);
+    App.applyAIEnabled(isAIEnabled, false);
 
     document.getElementById('cfg-theme').value = theme;
     if (document.getElementById('cfg-theme-palette')) {
@@ -551,6 +588,7 @@ RÈGLES STRICTES :
 
   async save() {
     const newCfg = { ...this.config };
+    newCfg.enable_ai = document.getElementById('cfg-enable-ai')?.checked !== false;
     newCfg.theme = document.getElementById('cfg-theme').value;
     newCfg.theme_palette = document.getElementById('cfg-theme-palette')?.value || 'dark-slate';
     newCfg.reading_bg = document.getElementById('cfg-reading-bg')?.value || 'auto';

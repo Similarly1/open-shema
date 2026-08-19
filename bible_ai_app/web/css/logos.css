@@ -8808,6 +8808,92 @@ body.theme-dark .theol-view-badge {
   font-weight: 600;
 }
 
+/* ==========================================================================
+   COMMUTATEUR MAÎTRE IA & MODE EXÉGÈSE TRADITIONNELLE SANS IA
+   ========================================================================== */
+
+.toggle-switch-large {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 26px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.toggle-switch-large input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-switch-slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--border-color, #4B5563);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 26px;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+}
+
+.toggle-switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 2px;
+  bottom: 2px;
+  background-color: #ffffff;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+}
+
+.toggle-switch-large input:checked + .toggle-switch-slider {
+  background-color: var(--accent-blue, #0284c7);
+  border-color: var(--accent-blue, #0284c7);
+}
+
+.toggle-switch-large input:checked + .toggle-switch-slider:before {
+  transform: translateX(22px);
+}
+
+.ai-master-card {
+  border: 1px solid rgba(139, 92, 246, 0.35) !important;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(59, 130, 246, 0.04)) !important;
+  margin-bottom: 18px !important;
+}
+
+/* ==========================================================================
+   RÈGLES STRICTES DE MASQUAGE EN MODE SANS IA (body.ai-disabled)
+   ========================================================================== */
+
+body.ai-disabled #nav-ai,
+body.ai-disabled .drawer-tab[data-drawer-tab="ai"],
+body.ai-disabled #drawer-tab-ai,
+body.ai-disabled #btn-view-ai-synth,
+body.ai-disabled #btn-synth-passages,
+body.ai-disabled #btn-comm-view-synth,
+body.ai-disabled #btn-theol-view-synth,
+body.ai-disabled #btn-open-comm-synth,
+body.ai-disabled #btn-popover-synth-item,
+body.ai-disabled .comm-quick-synth-pill,
+body.ai-disabled #comm-synthesis-panel,
+body.ai-disabled #theol-page-synth-container,
+body.ai-disabled #note-edit-ai-toggle-label,
+body.ai-disabled #drawer-note-ai-toggle-label,
+body.ai-disabled #btn-import-autoclassify,
+body.ai-disabled #btn-import-smart-cover,
+body.ai-disabled .ai-polish-bar,
+body.ai-disabled .ai-polish-btn,
+body.ai-disabled .ai-feature-only {
+  display: none !important;
+}
+
+
 
 
 

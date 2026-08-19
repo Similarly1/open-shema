@@ -5,9 +5,11 @@
 
 const App = {
   activeView: 'bible',
+  isAIEnabled: true,
 
   init() {
-    // 0. Initialisation immédiate du thème et de la typographie
+    // 0. Initialisation immédiate de l'IA, du thème et de la typographie
+    this.initAIState();
     this.initThemeAndFont();
 
     // 1. Initialiser tous les sous-systèmes de manière résiliente
@@ -165,11 +167,61 @@ const App = {
     }, 1500);
   },
 
+  initAIState() {
+    try {
+      const local = localStorage.getItem('open_shema_enable_ai');
+      if (local !== null) {
+        this.isAIEnabled = local !== 'false';
+      }
+    } catch (e) {}
+    this.applyAIEnabled(this.isAIEnabled, false);
+  },
+
+  applyAIEnabled(enabled, saveLocal = true) {
+    this.isAIEnabled = enabled !== false;
+    document.body.classList.toggle('ai-disabled', !this.isAIEnabled);
+
+    if (saveLocal) {
+      try {
+        localStorage.setItem('open_shema_enable_ai', this.isAIEnabled ? 'true' : 'false');
+      } catch (e) {}
+    }
+
+    // 1. Si désactivé et qu'on est sur la vue IA, basculer vers le lecteur biblique
+    if (!this.isAIEnabled && this.activeView === 'ai') {
+      this.switchView('bible');
+    }
+
+    // 2. Si le volet droit est ouvert sur l'onglet IA, basculer sur Commentaires
+    const aiDrawerTab = document.querySelector('.drawer-tab[data-drawer-tab="ai"]');
+    if (aiDrawerTab && aiDrawerTab.classList.contains('active')) {
+      document.querySelector('.drawer-tab[data-drawer-tab="commentaries"]')?.click();
+    }
+
+    // 3. Fermer les panneaux de synthèse si ouverts
+    if (!this.isAIEnabled) {
+      if (typeof CommentariesView !== 'undefined' && CommentariesView.closeAISynthesis) {
+        CommentariesView.closeAISynthesis();
+      }
+      if (typeof TheologyView !== 'undefined' && TheologyView.closeSynthesisPanel) {
+        TheologyView.closeSynthesisPanel();
+      }
+    }
+
+    // 4. Synchroniser avec SettingsView
+    if (typeof SettingsView !== 'undefined' && SettingsView.updateAIToggles) {
+      SettingsView.updateAIToggles(this.isAIEnabled);
+    }
+  },
+
   initThemeAndFont() {
     API.onReady(async () => {
       try {
         const cfg = await API.getSettings();
         if (cfg) {
+          if (cfg.enable_ai !== undefined) {
+            this.applyAIEnabled(cfg.enable_ai !== false, true);
+          }
           this.applyTheme(cfg.theme || 'dark', cfg.theme_palette, cfg.reading_bg);
           if (cfg.font_family) this.applyFontFamily(cfg.font_family);
           if (cfg.font_size) {
