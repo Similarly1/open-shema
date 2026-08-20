@@ -1402,7 +1402,7 @@ class BibleAppApi:
         if not win:
             return {"success": False, "error": "Fenêtre introuvable"}
             
-        file_types = ('Ouvrages supportés (*.epub;*.json;*.docx;*.csv;*.txt)', 'Tous les fichiers (*.*)')
+        file_types = ('Ouvrages supportés (*.epub;*.json;*.docx;*.md;*.txt;*.csv)', 'Tous les fichiers (*.*)')
         result = win.create_file_dialog(webview.OPEN_DIALOG, allow_multiple=False, file_types=file_types)
         
         if not result or len(result) == 0:
@@ -1436,6 +1436,33 @@ class BibleAppApi:
             return {"success": True, "cover_path": dest_path, "cover_data_url": data_url}
         except Exception as e:
             return {"success": False, "error": f"Erreur de copie de couverture : {e}"}
+
+    def save_clipboard_cover(self, data_url: str, book_id: str = "cover") -> Dict[str, Any]:
+        """Enregistre une image base64 collée depuis le presse-papier."""
+        try:
+            import base64, uuid, re
+            if not data_url or not str(data_url).startswith("data:image/"):
+                return {"success": False, "error": "Données d'image invalides"}
+            
+            header, encoded = data_url.split(",", 1)
+            ext_match = re.search(r'data:image/([a-zA-Z0-9]+);', header)
+            ext = ext_match.group(1).lower() if ext_match else "png"
+            if ext == "jpeg": ext = "jpg"
+
+            img_bytes = base64.b64decode(encoded)
+            covers_dir = os.path.join(current_dir, "data", "covers")
+            os.makedirs(covers_dir, exist_ok=True)
+            clean_id = re.sub(r'[^a-zA-Z0-9._-]', '_', book_id or 'cover')
+            dest_filename = f"clip_{uuid.uuid4().hex[:6]}_{clean_id}.{ext}"
+            dest_path = os.path.join(covers_dir, dest_filename)
+
+            with open(dest_path, "wb") as f:
+                f.write(img_bytes)
+
+            data_url_out = get_cover_data_url(dest_path)
+            return {"success": True, "cover_path": dest_path, "cover_data_url": data_url_out}
+        except Exception as e:
+            return {"success": False, "error": f"Erreur enregistrement image collée : {e}"}
 
     def search_google_books_metadata(self, query: str, author: str = "", title: str = "", isbn: str = "") -> List[Dict[str, Any]]:
         """Recherche des métadonnées bibliographiques via Google Books et Open Library."""
@@ -1473,8 +1500,47 @@ class BibleAppApi:
             except Exception as e:
                 return {"success": False, "error": f"Erreur inspection EPUB : {e}"}
                 
+        elif ext in ['.md', '.txt']:
+            try:
+                with open(file_path, 'r', encoding='utf-8', errors='replace') as f:
+                    lines = [l.strip() for l in f.readlines() if l.strip()]
+                
+                title = file_base
+                author = ""
+                chapters = []
+                current_ch_title = ""
+                current_ch_lines = []
+
+                for l in lines:
+                    if l.startswith('# '):
+                        if not title or title == file_base:
+                            title = l.lstrip('# ').strip()
+                        else:
+                            if current_ch_title:
+                                chapters.append({"title": current_ch_title, "include": True, "size": len(" ".join(current_ch_lines))})
+                            current_ch_title = l.lstrip('# ').strip()
+                            current_ch_lines = []
+                    elif l.startswith('## '):
+                        if current_ch_title:
+                            chapters.append({"title": current_ch_title, "include": True, "size": len(" ".join(current_ch_lines))})
+                        current_ch_title = l.lstrip('# ').strip()
+                        current_ch_lines = []
+                    elif l.lower().startswith('auteur:') or l.lower().startswith('par '):
+                        author = l.split(':', 1)[-1].strip() if ':' in l else l[4:].strip()
+                    else:
+                        current_ch_lines.append(l)
+
+                if current_ch_title:
+                    chapters.append({"title": current_ch_title, "include": True, "size": len(" ".join(current_ch_lines))})
+                elif not chapters:
+                    chapters.append({"title": title or "Document", "include": True, "size": len(" ".join(lines))})
+
+                info = {"title": title, "author": author, "chapters": chapters}
+            except Exception as e:
+                info = {"title": file_base, "chapters": [{"title": file_base, "include": True, "size": 0}]}
+
         elif ext == '.docx':
-            info = {"title": file_base, "chapters": []}
+            info = {"title": file_base, "chapters": [{"title": file_base, "include": True, "size": 0}]}
             
         elif ext in ['.json', '.csv']:
             info = {"title": file_base, "chapters": []}
@@ -1657,17 +1723,59 @@ class BibleAppApi:
             registry[name] = metadata
             save_books_metadata(registry)
             
-            if chunks:
+            if chunks and self.config.get("enable_ai", True):
                 try:
                     from core.database import VectorDB
                     db = VectorDB(api_keys=self.config)
-                    db.add_chunks(chunks, embedding_model=metadata.get("embedding_model", "study_library"))
+                    db.add_chunks(chunks, embedding_model=metadata.get("embedding_model", "bge_multilingual_gemma2 (Infomaniak)"))
                 except Exception as e:
-                    print(f"Indexation vectorielle ChromaDB : {e}")
+                    logger.warning(f"Indexation vectorielle ChromaDB : {e}")
                     
             return {"success": True, "name": name, "chunks_count": len(chunks)}
+
+        # Cas 3 : Markdown (.md) et Fichiers Texte (.txt)
+        elif ext in ['.md', '.txt']:
+            selected_chapters = payload.get("chapters", [])
+            chunks = []
+            try:
+                with open(file_path, 'r', encoding='utf-8', errors='replace') as f:
+                    content = f.read()
+
+                # Découpage basique en paragraphes / blocs pour RAG
+                paragraphs = [p.strip() for p in content.split('\n\n') if p.strip()]
+                for i, p in enumerate(paragraphs):
+                    chunks.append({
+                        "text": p,
+                        "metadata": {
+                            "book_name": name,
+                            "title": metadata.get("title", name),
+                            "author": metadata.get("author", ""),
+                            "chunk_id": f"{name}_ch_{i}",
+                            "type": metadata.get("type", "Théologie"),
+                            "corpus_scope": metadata.get("corpus_scope", "GLOBAL"),
+                            "source_type": metadata.get("source_type", "general")
+                        }
+                    })
+            except Exception as e:
+                logger.error(f"Erreur lecture MD/TXT: {e}")
+
+            metadata["chapters_count"] = len(selected_chapters) or 1
+            metadata["chunks_count"] = len(chunks)
+            metadata["file_path"] = file_path
+            registry[name] = metadata
+            save_books_metadata(registry)
+
+            if chunks and self.config.get("enable_ai", True):
+                try:
+                    from core.database import VectorDB
+                    db = VectorDB(api_keys=self.config)
+                    db.add_chunks(chunks, embedding_model=metadata.get("embedding_model", "bge_multilingual_gemma2 (Infomaniak)"))
+                except Exception as e:
+                    logger.warning(f"Indexation vectorielle ChromaDB MD/TXT : {e}")
+
+            return {"success": True, "name": name, "chunks_count": len(chunks)}
             
-        # Cas 3 : Dictionnaire / Docx / CSV
+        # Cas 4 : Dictionnaire / Docx / CSV
         elif ext in ['.docx', '.csv']:
             res = DictionaryManager.import_dictionary(file_path)
             registry[name] = metadata

@@ -2824,80 +2824,296 @@
               <polyline points="7 10 12 15 17 10"></polyline>
               <line x1="12" x2="12" y1="15" y2="3"></line>
             </svg>
-            <h2 class="modal-title" id="import-modal-title">Importer un Nouvel Ouvrage</h2>
+            <h2 class="modal-title" id="import-modal-title">Assistant d'Importation d'Ouvrages</h2>
           </div>
           <button class="modal-close-btn" id="btn-close-import-modal">✕</button>
         </div>
 
-        <div class="modal-body modal-body-scroll">
-          <div class="import-two-columns">
+        <!-- BARRE DE PROGRESSION DU WIZARD (4 ÉTAPES) -->
+        <div class="import-wizard-stepper" id="import-wizard-stepper">
+          <div class="wizard-step active" data-step="1" id="wizard-step-indicator-1">
+            <div class="step-badge">1</div>
+            <div class="step-text">
+              <span class="step-title">Fichier Source</span>
+              <span class="step-subtitle">Format & document</span>
+            </div>
+          </div>
+          <div class="wizard-connector" id="wizard-conn-1"></div>
+          <div class="wizard-step" data-step="2" id="wizard-step-indicator-2">
+            <div class="step-badge">2</div>
+            <div class="step-text">
+              <span class="step-title">Métadonnées</span>
+              <span class="step-subtitle">Titre & Couverture</span>
+            </div>
+          </div>
+          <div class="wizard-connector" id="wizard-conn-2"></div>
+          <div class="wizard-step" data-step="3" id="wizard-step-indicator-3">
+            <div class="step-badge">3</div>
+            <div class="step-text">
+              <span class="step-title">Structure</span>
+              <span class="step-subtitle">Chapitres & Table</span>
+            </div>
+          </div>
+          <div class="wizard-connector" id="wizard-conn-3"></div>
+          <div class="wizard-step" data-step="4" id="wizard-step-indicator-4">
+            <div class="step-badge">4</div>
+            <div class="step-text">
+              <span class="step-title" id="wizard-step-4-title">Classification</span>
+              <span class="step-subtitle" id="wizard-step-4-subtitle">Indexation & RAG</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-body modal-body-scroll" style="min-height: 420px;">
+
+          <!-- ============================================================ -->
+          <!-- ÉTAPE 1 : SÉLECTION DU FICHIER SOURCE & GUIDE DES FORMATS -->
+          <!-- ============================================================ -->
+          <div class="wizard-pane active" id="import-step-1">
             
-            <!-- COLONNE GAUCHE : MÉTADONNÉES & RAG TRI-FLUX -->
-            <div class="import-column left">
+            <!-- Zone principale de sélection de fichier (Dropzone / Parcourir) -->
+            <div class="import-dropzone" id="import-dropzone">
+              <div class="dropzone-icon-circle">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
+                  <polyline points="12 11 12 17"></polyline>
+                  <polyline points="9 14 12 11 15 14"></polyline>
+                </svg>
+              </div>
+              <div class="dropzone-text-group">
+                <h3 class="dropzone-title">Sélectionnez le fichier à importer</h3>
+                <p class="dropzone-desc">Glissez-déposez votre ouvrage ici ou cliquez sur le bouton pour parcourir vos dossiers.</p>
+              </div>
+              <button class="btn-primary btn-lg" id="btn-import-pick-file" style="display: flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path></svg>
+                <span>📁 Parcourir mes fichiers...</span>
+              </button>
+            </div>
+
+            <!-- Fiche du fichier chargé (apparaît quand un fichier est sélectionné) -->
+            <div class="selected-file-card hidden" id="import-selected-file-card">
+              <div class="file-card-icon" id="file-card-format-badge">EPUB</div>
+              <div class="file-card-info">
+                <div class="file-card-name" id="import-selected-file-name">nom_fichier.epub</div>
+                <div class="file-card-meta" id="import-selected-file-meta">Taille : 2.4 Mo • Métadonnées extraites</div>
+              </div>
+              <div class="file-card-status">
+                <span class="file-ready-badge">✓ Fichier Prêt</span>
+                <button class="btn-ghost btn-xs" id="btn-change-selected-file">Changer de fichier</button>
+              </div>
+            </div>
+
+            <!-- GUIDE DES FORMATS ACCEPTÉS -->
+            <div class="format-guide-section">
+              <div class="format-guide-title">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                <span>Guide des Formats Recommandés</span>
+              </div>
               
-              <div class="import-section-header">
-                <span class="import-section-title" style="display: flex; align-items: center; gap: 5px;">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
-                  <span>Informations Générales</span>
+              <div class="format-cards-grid">
+                <!-- Carte EPUB -->
+                <div class="format-card highlight">
+                  <div class="format-card-header">
+                    <span class="format-badge epub">.EPUB</span>
+                    <span class="format-rec-tag">Recommandé</span>
+                  </div>
+                  <div class="format-card-name">Livre Numérique EPUB</div>
+                  <p class="format-card-desc">Idéal pour les Bibles, commentaires et traités de théologie. Extraction automatique de la table des matières, des métadonnées et de la couverture.</p>
+                </div>
+
+                <!-- Carte JSON -->
+                <div class="format-card">
+                  <div class="format-card-header">
+                    <span class="format-badge json">.JSON</span>
+                    <span class="format-rec-tag">Structuré</span>
+                  </div>
+                  <div class="format-card-name">Données Structurées</div>
+                  <p class="format-card-desc">Format optimisé pour les Bibles verset par verset ou dictionnaires thématiques indexés.</p>
+                </div>
+
+                <!-- Carte DOCX / MD / TXT -->
+                <div class="format-card">
+                  <div class="format-card-header">
+                    <span class="format-badge docx">.DOCX / .MD / .TXT</span>
+                    <span class="format-rec-tag">Texte & Notes</span>
+                  </div>
+                  <div class="format-card-name">Word, Markdown & Texte</div>
+                  <p class="format-card-desc">Compatible avec les documents d'étude, notes exégétiques et exports au format Word ou Markdown.</p>
+                </div>
+              </div>
+
+              <!-- Note Pédagogique sur les PDF -->
+              <div class="pdf-info-box">
+                <div class="pdf-info-icon">ℹ️</div>
+                <div class="pdf-info-content">
+                  <div class="pdf-info-title">Pourquoi nous privilégions l'EPUB et le DOCX plutôt que le PDF ?</div>
+                  <p class="pdf-info-text">
+                    Le format PDF possède une mise en page fixe (colonnes multiples, en-têtes, numéros de page insérés au milieu des phrases et césures) qui peut altérer la précision de l'IA et de la recherche exégétique. L'EPUB et le DOCX préservent la structure sémantique continue du texte. Nous vous conseillons de convertir vos PDF en EPUB ou DOCX avant importation.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- ============================================================ -->
+          <!-- ÉTAPE 2 : MÉTADONNÉES & COUVERTURE & DOUBLONS -->
+          <!-- ============================================================ -->
+          <div class="wizard-pane hidden" id="import-step-2">
+
+            <!-- Alerte Doublon Détecté (si titre ou id similaire existe) -->
+            <div class="duplicate-warning-banner hidden" id="import-duplicate-alert">
+              <div class="dup-banner-icon">⚠️</div>
+              <div class="dup-banner-content">
+                <div class="dup-banner-title">Ouvrage similaire déjà présent dans votre bibliothèque</div>
+                <div class="dup-banner-desc" id="import-duplicate-desc">Un ouvrage nommé « ... » existe déjà. Vous pouvez le remplacer ou modifier le titre court pour créer une version distincte.</div>
+              </div>
+            </div>
+
+            <div class="import-two-columns">
+              
+              <!-- Colonne Gauche : Champs de métadonnées -->
+              <div class="import-column left">
+                <div class="import-section-header">
+                  <span class="import-section-title">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                    <span>Informations de l'Ouvrage</span>
+                  </span>
+                </div>
+
+                <div class="form-group">
+                  <label>Identifiant unique (Titre court) <span style="color: var(--accent-blue);">*</span> :</label>
+                  <input type="text" id="import-book-id" class="text-field full-w" placeholder="Ex: S21, Alexander, Calmet...">
+                </div>
+
+                <div class="form-group" style="margin-top: 8px;">
+                  <label>Titre complet de l'ouvrage <span style="color: var(--accent-blue);">*</span> :</label>
+                  <input type="text" id="import-book-title" class="text-field full-w" placeholder="Ex: Lire et comprendre la Bible...">
+                </div>
+
+                <div class="form-group" style="margin-top: 8px;">
+                  <label>Auteur / Traducteur / Éditeur :</label>
+                  <input type="text" id="import-book-author" class="text-field full-w" placeholder="Ex: J.H. Alexander, Alfred Kuen...">
+                </div>
+
+                <div class="form-group" style="margin-top: 8px;">
+                  <label>Description & Notes d'étude :</label>
+                  <textarea id="import-book-desc" class="text-field full-w" style="height: 65px; resize: vertical;" placeholder="Description, thèmes et contexte de l'ouvrage..."></textarea>
+                </div>
+
+                <div class="form-row two-cols" style="margin-top: 8px;">
+                  <div class="form-group">
+                    <label>Type de ressource :</label>
+                    <select id="import-book-type" class="select-field full-w">
+                      <option value="Théologie">Théologie</option>
+                      <option value="Bible">Bible</option>
+                      <option value="Commentaire">Commentaire</option>
+                      <option value="Dictionnaire">Dictionnaire</option>
+                      <option value="Livre / Autre">Livre / Autre</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Année d'édition :</label>
+                    <input type="text" id="import-book-year" class="text-field full-w" placeholder="Ex: 2007">
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Colonne Droite : Couverture & Outils -->
+              <div class="import-column right">
+                <div class="import-section-header">
+                  <span class="import-section-title">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>
+                    <span>Image de Couverture</span>
+                  </span>
+                </div>
+
+                <div class="import-cover-box modern">
+                  <div class="import-cover-preview large" id="import-cover-preview-container">
+                    <div class="import-cover-placeholder" id="import-cover-placeholder">Aucune image</div>
+                    <img id="import-cover-img" class="hidden" alt="Couverture">
+                  </div>
+                  
+                  <div class="import-cover-actions">
+                    <button class="btn-secondary btn-sm" id="btn-import-google-books" style="display: flex; align-items: center; gap: 6px;">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+                      <span>🔍 Rechercher infos & couverture</span>
+                    </button>
+
+                    <button class="btn-secondary btn-sm" id="btn-import-paste-cover" style="display: flex; align-items: center; gap: 6px;" title="Coller une image copiée depuis le web ou votre presse-papier (ou Ctrl+V)">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                      <span>📋 Coller l'image (Ctrl+V)</span>
+                    </button>
+
+                    <button class="btn-secondary btn-sm" id="btn-import-smart-cover" style="display: flex; align-items: center; gap: 6px;">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                      <span>✨ Smart Cover 2D</span>
+                    </button>
+
+                    <button class="btn-secondary btn-sm" id="btn-import-pick-cover" style="display: flex; align-items: center; gap: 6px;">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>
+                      <span>📁 Choisir un fichier...</span>
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- ============================================================ -->
+          <!-- ÉTAPE 3 : TABLE DES MATIÈRES & SÉLECTION DES CHAPITRES -->
+          <!-- ============================================================ -->
+          <div class="wizard-pane hidden" id="import-step-3">
+            
+            <!-- Bannière Spécifique Bibles -->
+            <div class="bible-import-banner hidden" id="import-bible-banner">
+              <div class="bible-banner-icon">📖</div>
+              <div class="bible-banner-content">
+                <div class="bible-banner-title">Traduction Biblique Directe</div>
+                <div class="bible-banner-desc">Cet ouvrage est une Bible complète : les 66 livres, chapitres et versets canoniques sont automatiquement reconnus et intégrés dans le lecteur biblique. Aucune étape manuelle requise.</div>
+              </div>
+            </div>
+
+            <!-- Carte Table des Matières pour Ouvrages de Théologie / Commentaires -->
+            <div class="import-chapters-card" id="import-chapters-section">
+              <div class="import-chapters-header">
+                <span class="import-chapters-title" style="display: flex; align-items: center; gap: 6px;">
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                  <span>Chapitres &amp; Table des Matières (<span id="import-ch-count">0</span>)</span>
                 </span>
-                <button class="btn-secondary btn-sm" id="btn-import-google-books" style="display: flex; align-items: center; gap: 4px;" title="Rechercher les métadonnées et la couverture sur Google Books, Open Library, BnF Gallica, Internet Archive et Wikipédia">
-                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
-                  <span>Rechercher infos & couverture</span>
-                </button>
-              </div>
-
-              <div class="form-group">
-                <label>Identifiant unique (Titre court) :</label>
-                <input type="text" id="import-book-id" class="text-field full-w" placeholder="Ex: S21, Alexander, Calmet...">
-              </div>
-
-              <div class="form-group" style="margin-top: 8px;">
-                <label>Titre complet de l'ouvrage :</label>
-                <input type="text" id="import-book-title" class="text-field full-w" placeholder="Ex: Lire et comprendre la Bible...">
-              </div>
-
-              <div class="form-group" style="margin-top: 8px;">
-                <label>Auteur / Traducteur / Éditeur :</label>
-                <input type="text" id="import-book-author" class="text-field full-w" placeholder="Ex: J.H. Alexander, Alfred Kuen...">
-              </div>
-
-              <div class="form-group" style="margin-top: 8px;">
-                <label>Description & Notes d'étude :</label>
-                <textarea id="import-book-desc" class="text-field full-w" style="height: 60px; resize: vertical;" placeholder="Description, thèmes et contexte de l'ouvrage..."></textarea>
-              </div>
-
-              <div class="form-row two-cols" style="margin-top: 8px;">
-                <div class="form-group">
-                  <label>Type de ressource :</label>
-                  <select id="import-book-type" class="select-field full-w">
-                    <option value="Théologie">Théologie</option>
-                    <option value="Bible">Bible</option>
-                    <option value="Commentaire">Commentaire</option>
-                    <option value="Dictionnaire">Dictionnaire</option>
-                    <option value="Livre / Autre">Livre / Autre</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>Année d'édition :</label>
-                  <input type="text" id="import-book-year" class="text-field full-w" placeholder="Ex: 2007">
+                <div class="import-chapters-btns">
+                  <button class="btn-secondary btn-xs" id="btn-ch-check-all">✓ Tout</button>
+                  <button class="btn-secondary btn-xs" id="btn-ch-uncheck-all">✗ Aucun</button>
+                  <button class="btn-secondary btn-xs" id="btn-ch-rag-only" style="background: rgba(139, 92, 246, 0.2); border-color: rgba(139, 92, 246, 0.4); color: var(--accent-purple);">🎯 <span id="btn-ch-rag-label">RAG utile</span></button>
                 </div>
               </div>
 
-              <!-- BANNIÈRE RESSOURCE BIBLIQUE (Quand le type est Bible) -->
-              <div class="bible-import-banner hidden" id="import-bible-banner">
-                <div class="bible-banner-icon">📖</div>
-                <div class="bible-banner-content">
-                  <div class="bible-banner-title">Traduction Biblique Directe</div>
-                  <div class="bible-banner-desc">Cet ouvrage sera converti et intégré dans le lecteur biblique par livres, chapitres et versets. <strong>Aucune vectorisation RAG requise.</strong></div>
+              <div class="import-chapters-scroll" id="import-chapters-scroll" style="max-height: 310px;">
+                <div style="padding: 30px; text-align: center; color: var(--text-muted); font-size: 12px;">
+                  Sélectionnez un fichier pour analyser et afficher sa table des matières.
                 </div>
               </div>
+            </div>
 
-              <!-- ENCADRÉ CLASSIFICATION RAG TRI-FLUX -->
-              <div class="rag-classification-card" id="import-rag-card">
+          </div>
+
+          <!-- ============================================================ -->
+          <!-- ÉTAPE 4 : CLASSIFICATION RAG TRI-FLUX OU RÉCAPITULATIF LOCAL -->
+          <!-- ============================================================ -->
+          <div class="wizard-pane hidden" id="import-step-4">
+
+            <!-- Option 4A : Classification RAG (Si IA activée et Ouvrage non-Bible) -->
+            <div id="import-step-4-rag-content">
+              <div class="rag-classification-card modern">
                 <div class="rag-card-header">
-                  <span class="rag-card-title" style="display: flex; align-items: center; gap: 5px;">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
-                    <span>Classification RAG Tri-Flux</span>
+                  <span class="rag-card-title" style="display: flex; align-items: center; gap: 6px; font-size: 13px;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                    <span>Classification RAG Tri-Flux pour l'Assistant IA</span>
                   </span>
                   <button class="btn-primary btn-xs" id="btn-import-autoclassify" style="background: #7C3AED; display: flex; align-items: center; gap: 4px;">
                     <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
@@ -2905,10 +3121,10 @@
                   </button>
                 </div>
 
-                <div class="form-row two-cols" style="margin-top: 6px;">
+                <div class="form-row two-cols" style="margin-top: 10px;">
                   <div class="form-group">
-                    <label style="font-size: 11px;">Portée du corpus :</label>
-                    <select id="import-rag-scope" class="select-field full-w" style="font-size: 11px;">
+                    <label>Portée du corpus :</label>
+                    <select id="import-rag-scope" class="select-field full-w">
                       <option value="GLOBAL">GLOBAL (Toute la Bible / Thème)</option>
                       <option value="OT">AT (Ancien Testament)</option>
                       <option value="NT">NT (Nouveau Testament)</option>
@@ -2918,8 +3134,8 @@
                     </select>
                   </div>
                   <div class="form-group">
-                    <label style="font-size: 11px;">Type de source RAG :</label>
-                    <select id="import-rag-stype" class="select-field full-w" style="font-size: 11px;">
+                    <label>Type de source RAG :</label>
+                    <select id="import-rag-stype" class="select-field full-w">
                       <option value="general">Général (Doctrine / Pastoral)</option>
                       <option value="book_intro">Introduction de livre biblique</option>
                       <option value="biblical_theology">Théologie biblique</option>
@@ -2932,14 +3148,14 @@
                   </div>
                 </div>
 
-                <div class="form-group" style="margin-top: 6px;">
-                  <label style="font-size: 11px;">Livre biblique cible (si spécifique) :</label>
-                  <select id="import-rag-bookcode" class="select-field full-w" style="font-size: 11px;"></select>
+                <div class="form-group" style="margin-top: 10px;">
+                  <label>Livre biblique cible (si spécifique) :</label>
+                  <select id="import-rag-bookcode" class="select-field full-w"></select>
                 </div>
 
-                <div class="form-group" style="margin-top: 6px;">
-                  <label style="font-size: 11px;">Modèle d'embedding vectoriel :</label>
-                  <select id="import-rag-embed" class="select-field full-w" style="font-size: 11px;">
+                <div class="form-group" style="margin-top: 10px;">
+                  <label>Modèle d'embedding vectoriel :</label>
+                  <select id="import-rag-embed" class="select-field full-w">
                     <option value="bge_multilingual_gemma2 (Infomaniak)">bge_multilingual_gemma2 (Infomaniak - Recommandé)</option>
                     <option value="mini_lm_l12_v2 (Infomaniak)">mini_lm_l12_v2 (Infomaniak - Léger)</option>
                     <option value="gemini-embedding-2">gemini-embedding-2 (Google)</option>
@@ -2949,94 +3165,83 @@
                   </select>
                 </div>
               </div>
-
             </div>
 
-            <!-- COLONNE DROITE : COUVERTURE & SOURCE / CHAPITRES -->
-            <div class="import-column right">
-
-              <div class="import-section-header">
-                <span class="import-section-title" style="display: flex; align-items: center; gap: 5px;">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>
-                  <span>Couverture & Fichier Source</span>
-                </span>
-              </div>
-
-              <!-- Zone Couverture -->
-              <div class="import-cover-box">
-                <div class="import-cover-preview" id="import-cover-preview-container">
-                  <div class="import-cover-placeholder" id="import-cover-placeholder">Aucune image</div>
-                  <img id="import-cover-img" class="hidden" alt="Couverture">
-                </div>
-                <div class="import-cover-actions">
-                  <button class="btn-secondary btn-sm" id="btn-import-pick-cover" style="display: flex; align-items: center; gap: 4px;">
-                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>
-                    <span>Choisir une image...</span>
-                  </button>
-                  <button class="btn-secondary btn-sm" id="btn-import-smart-cover" style="display: flex; align-items: center; gap: 4px;">
-                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
-                    <span>Smart Cover</span>
-                  </button>
+            <!-- Option 4B : Récapitulatif Local (Si IA désactivée ou Bible) -->
+            <div id="import-step-4-local-content" class="hidden">
+              <div class="local-import-summary-card">
+                <div class="summary-card-icon">📚</div>
+                <div class="summary-card-body">
+                  <h3 class="summary-card-title">Prêt pour l'Enregistrement</h3>
+                  <p class="summary-card-desc">L'ouvrage sera intégré directement dans votre bibliothèque locale et accessible dans le lecteur d'étude théologique sans traitement vectoriel lourd.</p>
                 </div>
               </div>
-
-              <!-- Zone Fichier Source -->
-              <div class="import-file-box" style="margin-top: 12px;">
-                <label>Fichier ou dossier d'ouvrage :</label>
-                <div class="import-file-picker-row">
-                  <button class="btn-primary btn-sm" id="btn-import-pick-file" style="display: flex; align-items: center; gap: 4px;">
-                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path></svg>
-                    <span>Parcourir...</span>
-                  </button>
-                  <span class="import-selected-file-label" id="import-selected-file-label">Aucun fichier sélectionné</span>
-                </div>
-              </div>
-
-              <!-- Section Table des Matières / Chapitres (pour EPUB et livres) -->
-              <div class="import-chapters-card" id="import-chapters-section">
-                <div class="import-chapters-header">
-                  <span class="import-chapters-title" style="display: flex; align-items: center; gap: 5px;">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-                    <span>Chapitres & Table des Matières (<span id="import-ch-count">0</span>)</span>
-                  </span>
-                  <div class="import-chapters-btns">
-                    <button class="btn-secondary btn-xs" id="btn-ch-check-all" style="display: flex; align-items: center; gap: 3px;">
-                      <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-                      <span>Tout</span>
-                    </button>
-                    <button class="btn-secondary btn-xs" id="btn-ch-uncheck-all" style="display: flex; align-items: center; gap: 3px;">
-                      <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"></rect></svg>
-                      <span>Aucun</span>
-                    </button>
-                    <button class="btn-secondary btn-xs" id="btn-ch-rag-only" style="display: flex; align-items: center; gap: 3px;">
-                      <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
-                      <span>RAG utile</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div class="import-chapters-scroll" id="import-chapters-scroll">
-                  <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 11px;">
-                    Sélectionnez un fichier .epub pour analyser et configurer ses chapitres.
-                  </div>
-                </div>
-              </div>
-
             </div>
 
           </div>
+
+          <!-- ============================================================ -->
+          <!-- ÉCRAN DE SUCCÈS ANIMÉ APRÈS IMPORTATION -->
+          <!-- ============================================================ -->
+          <div class="wizard-pane hidden" id="import-step-success">
+            <div class="import-success-box">
+              <div class="success-checkmark-wrapper">
+                <svg class="checkmark-svg" viewBox="0 0 52 52">
+                  <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                  <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                </svg>
+              </div>
+
+              <h2 class="success-title">Ouvrage Importé avec Succès !</h2>
+              <p class="success-subtitle" id="import-success-subtitle">Le document a été intégré et est immédiatement disponible dans votre bibliothèque.</p>
+
+              <div class="success-book-preview" id="import-success-book-preview">
+                <img id="success-cover-thumb" src="" alt="Couverture" class="success-thumb-img">
+                <div class="success-book-details">
+                  <div class="success-book-title" id="success-book-title">Titre de l'ouvrage</div>
+                  <div class="success-book-meta" id="success-book-meta">Auteur • Type • Chapitres</div>
+                </div>
+              </div>
+
+              <div class="success-action-buttons">
+                <button class="btn-primary" id="btn-success-open-reader" style="display: flex; align-items: center; gap: 6px;">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                  <span>Ouvrir dans le Lecteur</span>
+                </button>
+                <button class="btn-secondary" id="btn-success-open-library">
+                  <span>Voir dans la Bibliothèque</span>
+                </button>
+                <button class="btn-ghost" id="btn-success-import-another">
+                  <span>+ Importer un autre livre</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        <div class="modal-footer">
+        <!-- PIED DE PAGE DE NAVIGATION DU WIZARD -->
+        <div class="modal-footer" id="import-modal-footer">
           <button class="btn-secondary" id="btn-cancel-import-modal">Annuler</button>
-          <button class="btn-primary" id="btn-submit-import-modal" style="display: flex; align-items: center; gap: 6px;">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" x2="12" y1="15" y2="3"></line>
-            </svg>
-            <span>Lancer l'Importation & l'Indexation RAG</span>
-          </button>
+          
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button class="btn-secondary hidden" id="btn-import-prev" style="display: flex; align-items: center; gap: 4px;">
+              <span>‹ Précédent</span>
+            </button>
+
+            <button class="btn-primary" id="btn-import-next" disabled style="display: flex; align-items: center; gap: 6px;">
+              <span>Suivant : Métadonnées ➔</span>
+            </button>
+
+            <button class="btn-primary hidden" id="btn-submit-import-modal" style="display: flex; align-items: center; gap: 6px;">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" x2="12" y1="15" y2="3"></line>
+              </svg>
+              <span id="btn-submit-import-label">Lancer l'Importation &amp; l'Indexation RAG</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -3855,16 +3855,371 @@ input:checked + .slider.round:before {
   max-height: calc(90vh - 120px);
   padding: 16px 20px;
 }
+
+/* ========================================================================= */
+/* WIZARD D'IMPORTATION D'OUVRAGES (4 ÉTAPES)                                */
+/* ========================================================================= */
+
+.import-wizard-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-color);
+  gap: 8px;
+}
+
+.wizard-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0.55;
+  transition: all 0.25s ease;
+  cursor: default;
+}
+
+.wizard-step.active {
+  opacity: 1;
+}
+
+.wizard-step.completed .step-badge {
+  background: #10B981;
+  color: white;
+  border-color: #10B981;
+}
+
+.wizard-step.active .step-badge {
+  background: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+}
+
+.step-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+}
+
+.step-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.step-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.step-subtitle {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.wizard-connector {
+  flex: 1;
+  height: 2px;
+  background: var(--border-color);
+  margin: 0 6px;
+  transition: background 0.25s ease;
+}
+
+.wizard-connector.completed {
+  background: #10B981;
+}
+
+.wizard-pane {
+  animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wizard-pane.hidden {
+  display: none !important;
+}
+
+/* DROPZONE ÉTAPE 1 */
+.import-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  border: 2px dashed var(--border-color);
+  border-radius: 12px;
+  background: var(--bg-subtle);
+  text-align: center;
+  gap: 12px;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.import-dropzone:hover, .import-dropzone.dragover {
+  border-color: var(--accent-blue);
+  background: rgba(59, 130, 246, 0.04);
+  transform: translateY(-1px);
+}
+
+.dropzone-icon-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s ease;
+}
+
+.import-dropzone:hover .dropzone-icon-circle {
+  transform: scale(1.08);
+}
+
+.dropzone-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.dropzone-desc {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* FICHE DU FICHIER SÉLECTIONNÉ */
+.selected-file-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(16, 185, 129, 0.08));
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  margin-bottom: 18px;
+  animation: modalFadeIn 0.2s ease;
+}
+
+.file-card-icon {
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: var(--accent-blue);
+  color: white;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.file-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-card-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-card-meta {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.file-card-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.file-ready-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #10B981;
+  background: rgba(16, 185, 129, 0.12);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+/* GUIDE DES FORMATS */
+.format-guide-section {
+  margin-top: 22px;
+}
+
+.format-guide-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.format-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.format-card {
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.format-card.highlight {
+  border-color: rgba(59, 130, 246, 0.4);
+  background: linear-gradient(180deg, var(--bg-card), rgba(59, 130, 246, 0.03));
+}
+
+.format-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.format-badge {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.03em;
+}
+
+.format-badge.epub {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--accent-blue);
+}
+
+.format-badge.json {
+  background: rgba(245, 158, 11, 0.15);
+  color: #F59E0B;
+}
+
+.format-badge.docx {
+  background: rgba(139, 92, 246, 0.15);
+  color: var(--accent-purple);
+}
+
+.format-rec-tag {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.format-card-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.format-card-desc {
+  margin: 0;
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* ENCADRÉ PDF INFO */
+.pdf-info-box {
+  display: flex;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.06);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  margin-top: 14px;
+  align-items: flex-start;
+}
+
+.pdf-info-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  line-height: 1.2;
+}
+
+.pdf-info-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #F59E0B;
+  margin-bottom: 2px;
+}
+
+.pdf-info-text {
+  margin: 0;
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+/* ALERTE DOUBLON ÉTAPE 2 */
+.duplicate-warning-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  margin-bottom: 14px;
+  animation: modalFadeIn 0.2s ease;
+}
+
+.dup-banner-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.dup-banner-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #EF4444;
+}
+
+.dup-banner-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 1px;
+}
+
 .import-two-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
 }
+
 .import-column {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
+
 .import-section-header {
   display: flex;
   align-items: center;
@@ -3873,86 +4228,28 @@ input:checked + .slider.round:before {
   padding-bottom: 6px;
   border-bottom: 1px solid var(--border-color);
 }
+
 .import-section-title {
   font-size: 13px;
   font-weight: 700;
   color: var(--accent-blue);
 }
-.rag-classification-card {
-  background-color: var(--bg-subtle);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 12px;
-  margin-top: 10px;
-}
-.rag-card-header {
+
+/* COUVERTURE LARGE */
+.import-cover-box.modern {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 6px;
-}
-.rag-card-title {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--accent-purple);
-}
-.btn-xs {
-  padding: 2px 8px;
-  font-size: 10px;
-  font-weight: 700;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  color: white;
-}
-.bible-import-banner {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  margin-top: 10px;
-  background: linear-gradient(135deg, rgba(5, 150, 105, 0.12), rgba(37, 99, 235, 0.12));
-  border: 1px solid rgba(5, 150, 105, 0.35);
-  border-radius: 8px;
-  animation: modalFadeIn 0.2s ease;
-}
-.bible-import-banner.hidden {
-  display: none;
-}
-.bible-banner-icon {
-  font-size: 24px;
-  flex-shrink: 0;
-}
-.bible-banner-content {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.bible-banner-title {
-  font-size: 12.5px;
-  font-weight: 700;
-  color: #10B981;
-  letter-spacing: 0.02em;
-}
-.bible-banner-desc {
-  font-size: 11.5px;
-  color: var(--text-secondary);
-  line-height: 1.4;
-}
-.import-cover-box {
-  display: flex;
-  flex-direction: row;
   gap: 16px;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 12px;
+  padding: 14px;
   background: var(--bg-subtle);
   border: 1px solid var(--border-color);
   border-radius: 8px;
+  align-items: center;
 }
-.import-cover-preview {
-  width: 90px;
-  height: 120px;
+
+.import-cover-preview.large {
+  width: 105px;
+  height: 145px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
   background: var(--bg-card);
   border-radius: 6px;
   overflow: hidden;
@@ -3961,51 +4258,38 @@ input:checked + .slider.round:before {
   justify-content: center;
   border: 1px solid var(--border-color);
   flex-shrink: 0;
-  margin: 0;
 }
-.import-cover-preview img {
+
+.import-cover-preview.large img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
+
 .import-cover-placeholder {
   font-size: 10px;
   color: var(--text-muted);
   text-align: center;
   padding: 6px;
 }
+
 .import-cover-actions {
   display: flex;
   flex-direction: column;
   gap: 8px;
   flex: 1;
 }
-.import-file-box {
-  background: var(--bg-subtle);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 10px 12px;
-}
-.import-file-picker-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 6px;
-}
-.import-selected-file-label {
-  font-size: 11px;
-  color: var(--text-secondary);
-  word-break: break-all;
-}
+
+/* CHAPITRES */
 .import-chapters-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  margin-top: 12px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
+
 .import-chapters-header {
   padding: 8px 12px;
   background: var(--bg-subtle);
@@ -4014,23 +4298,27 @@ input:checked + .slider.round:before {
   align-items: center;
   justify-content: space-between;
 }
+
 .import-chapters-title {
   font-size: 12px;
   font-weight: 700;
   color: var(--text-primary);
 }
+
 .import-chapters-btns {
   display: flex;
   gap: 4px;
 }
+
 .import-chapters-scroll {
-  max-height: 240px;
+  max-height: 280px;
   overflow-y: auto;
   padding: 6px;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
+
 .import-chapter-row {
   display: flex;
   align-items: center;
@@ -4040,9 +4328,11 @@ input:checked + .slider.round:before {
   background: var(--bg-subtle);
   border: 1px solid var(--border-subtle);
 }
+
 .import-chapter-row:hover {
   background: var(--bg-hover);
 }
+
 .import-chapter-title {
   flex: 1;
   font-size: 11px;
@@ -4051,6 +4341,7 @@ input:checked + .slider.round:before {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .import-chapter-select {
   font-size: 10px;
   padding: 2px 4px;
@@ -4058,6 +4349,218 @@ input:checked + .slider.round:before {
   background: var(--input-bg);
   color: var(--text-primary);
   border-radius: 4px;
+}
+
+/* RAG CLASSIFICATION CARD */
+.rag-classification-card {
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.rag-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.rag-card-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--accent-purple);
+}
+
+.bible-import-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.12), rgba(37, 99, 235, 0.12));
+  border: 1px solid rgba(5, 150, 105, 0.35);
+  border-radius: 8px;
+  animation: modalFadeIn 0.2s ease;
+}
+
+.bible-import-banner.hidden {
+  display: none;
+}
+
+.bible-banner-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.bible-banner-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bible-banner-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #10B981;
+  letter-spacing: 0.02em;
+}
+
+.bible-banner-desc {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* RÉCAPITULATIF LOCAL ÉTAPE 4 */
+.local-import-summary-card {
+  display: flex;
+  gap: 16px;
+  padding: 24px 20px;
+  border-radius: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  align-items: center;
+  margin-top: 16px;
+}
+
+.summary-card-icon {
+  font-size: 36px;
+  flex-shrink: 0;
+}
+
+.summary-card-title {
+  margin: 0 0 6px 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.summary-card-desc {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ÉCRAN DE SUCCÈS ANIMÉ */
+.import-success-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px 20px;
+  text-align: center;
+  animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.success-checkmark-wrapper {
+  width: 72px;
+  height: 72px;
+  margin-bottom: 16px;
+}
+
+.checkmark-svg {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: block;
+  stroke-width: 3;
+  stroke: #10B981;
+  stroke-miterlimit: 10;
+  box-shadow: inset 0px 0px 0px #10B981;
+  animation: fillCircle .4s ease-in-out .4s forwards, scaleCheck .3s ease-in-out .9s both;
+}
+
+.checkmark-circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 3;
+  stroke-miterlimit: 10;
+  stroke: #10B981;
+  fill: none;
+  animation: strokeCircle 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark-check {
+  transform-origin: 50% 50%;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  stroke: #10B981;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: strokeCheck 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+}
+
+@keyframes strokeCircle {
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes strokeCheck {
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes scaleCheck {
+  0%, 100% { transform: none; }
+  50% { transform: scale3d(1.1, 1.1, 1); }
+}
+
+.success-title {
+  margin: 0 0 6px 0;
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.success-subtitle {
+  margin: 0 0 20px 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.success-book-preview {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 18px;
+  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  margin-bottom: 24px;
+  max-width: 460px;
+  width: 100%;
+  text-align: left;
+}
+
+.success-thumb-img {
+  width: 44px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.success-book-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.success-book-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+
+.success-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .gb-result-card {
