@@ -214,16 +214,6 @@
     "embedding_model": "study_library",
     "active": true
   },
-  "TSM": {
-    "title": "Théologie Systématique",
-    "author": "",
-    "description": "",
-    "year": "",
-    "cover_path": null,
-    "type": "Théologie",
-    "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
-    "active": true
-  },
   "Commentaire critique et explicatif sur toute la Bible (JFB)": {
     "title": "Commentaire critique et explicatif sur toute la Bible (JFB)",
     "author": "critique et explicatif sur toute la Bible (JFB)",
@@ -527,45 +517,32 @@
     "author": "Alexander, J.H.",
     "description": "Ce manuel biblique est probablement I’un des plus populaires de nos jours pour apprendre à connaître, de façon vivante et accessible pour tous, les 66 livres de la Bible. Aide précieuse dans votre étude régulière de la Bible, ce best-seller de John H. Alexander ouvrira pour vous le sens général, historique et spirituel du livre choisi. Lu de manière suivie, il vous aidera à comprendre la révélation de Dieu dans son ensemble. La Bible se présente comme la Parole de Dieu, tant par son unité et sa cohérence, que par son contenu fait de vérité révélée et de force vive.",
     "year": "2014",
-    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\Lire_Comprendre.jpg",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\clip_10a306_Lire_Comprendre.png",
     "type": "Théologie",
     "corpus_scope": "GLOBAL",
     "source_type": "general",
-    "book_code": "(Aucun",
+    "book_code": null,
     "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
     "chapters_count": 77,
     "format": "epub",
-    "active": true
+    "active": true,
+    "name": "Lire/Comprendre"
   },
   "Paradoxes": {
     "title": "Des paradoxes enrichissants",
     "author": "Adam Mabry / La Maison de la Bible",
     "description": "Quand la Bible semble se contredire  Il y a un certain nombre de sujets sur lesquels les chrétiens ne sont pas d'accord, alors même qu'ils se basent sur la Bible pour définir leur position. Parfois, ils vont jusqu'à se déchirer sur ces thèmes.   Et si nous étions invités à autre chose? Et si la Bible elle-même nous demandait de respecter des vérités qui nous semblent paradoxales? Et si de telles tensions étaient, en fin de compte, porteuses de riches enseignements et de fruits positifs?  Provocateur pour certains, rafraîchissant pour d'autres, ce livre apporte une perspective bienvenue sur l'attitude à adopter face aux débats théologiques, politiques et sociétaux.",
     "year": "2022",
-    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\Paradoxes.jpg",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\clip_cfcd04_Paradoxes.png",
     "type": "Théologie",
     "corpus_scope": "GLOBAL",
     "source_type": "general",
-    "book_code": "(Aucun",
+    "book_code": null,
     "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
     "chapters_count": 12,
     "format": "epub",
-    "active": true
-  },
-  "LirelaBibles": {
-    "title": "Lire la Bible sans filtre  (pour a a)",
-    "author": "E. Randolph Richards & Brandon J. O'Brien",
-    "description": "Quand nos lunettes occidentales nous (dés)orientent Lorsque nous lisons la Bible, nous sommes parfois déconcertés par un comportement ou une déduction, car ils nous paraissent tout sauf logiques. D'autres fois, nous nous sentons bien plus à l'aise: l'enseignement présenté colle bien avec notre raisonnement et les valeurs dites chrétiennes.  Dans un cas comme dans l'autre, nous devrions avoir conscience des filtres culturels qui sont les nôtres, afin d'être certains de bien comprendre et, donc, bien intégrer les instructions divines. Sinon, nous nous exposons à faire des interprétations erronées et de mauvaises applications du texte censé orienter notre manière de vivre. Ce livre nous aide à identifier nos filtres et les domaines particuliers auxquels nous devons faire attention. Une lecture recommandée pour tous! Points forts:  + on ne peut plus utile + très facile à lire + plein de pistes pour la réflexion ou une étude plus poussée Thèmes: * les présupposés * l'interprétation de la Bible * les différences culturelles * intériorité et extériorité * les valeurs * les mœurs  * les races et l'ethnicité * les problèmes de langue * la notion du temps * individualisme et collectivisme * honneur et honte * les règles et les relations * la vertu et les vices * la volonté divine",
-    "year": "2020",
-    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\LirelaBibles.jpg",
-    "type": "Théologie",
-    "corpus_scope": "GLOBAL",
-    "source_type": "general",
-    "book_code": "(Aucun",
-    "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
-    "chapters_count": 15,
-    "format": "epub",
-    "active": true
+    "active": true,
+    "name": "Paradoxes"
   },
   "NIV": {
     "title": "NIV, the NIV Zondervan Study Bible",
@@ -727,5 +704,19 @@
     "chapters_count": 24,
     "chunks_count": 272,
     "file_path": "C:\\Users\\adrie\\kDrive\\Documents\\Théologie\\Ressources externes\\Ebooks\\David Powlison - Good and Angry_ Redeeming Anger, Irritation, Complaining, and Bitterness-LSC-NewGrowthPress (2016).epub"
+  },
+  "LBSF": {
+    "name": "LBSF",
+    "title": "LIRE LA BIBLE SANS FILTRE",
+    "author": "E. Randolph Richards, Brandon J. O'Brien",
+    "description": "",
+    "year": "2020",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\LIRE_LA_BIBLE_SANS_FILTRE.jpg",
+    "type": "Théologie",
+    "corpus_scope": "GLOBAL",
+    "source_type": "general",
+    "book_code": null,
+    "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
+    "active": true
   }
 }
