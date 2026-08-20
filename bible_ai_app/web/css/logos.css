@@ -272,9 +272,25 @@ body.reading-bg-white #view-theology .theol-reading-body,
 body.reading-bg-white #view-theology .theol-reading-p,
 body.reading-bg-white #view-theology .theol-reading-title,
 body.reading-bg-white #view-theology .theol-chapter-title,
+body.reading-bg-white #view-theology .theol-hero-chapter-title,
+body.reading-bg-white #view-theology .theol-section-heading,
 body.reading-bg-white #view-theology .theol-header-book-title,
 body.reading-bg-white #view-theology .theol-header-chapter-name,
 body.reading-bg-white #view-theology .theol-reading-meta-tag,
+body.reading-bg-white #view-theology h1,
+body.reading-bg-white #view-theology h2,
+body.reading-bg-white #view-theology h3,
+body.reading-bg-white #view-theology h4,
+body.reading-bg-white #view-theology h5,
+body.reading-bg-white #view-theology h6,
+body.reading-bg-white #view-theology .theol-reading-body h1,
+body.reading-bg-white #view-theology .theol-reading-body h2,
+body.reading-bg-white #view-theology .theol-reading-body h3,
+body.reading-bg-white #view-theology .theol-reading-body h4,
+body.reading-bg-white #view-theology .theol-reading-body h5,
+body.reading-bg-white #view-theology .theol-reading-body h6,
+body.reading-bg-white #view-theology .theol-reading-body p,
+body.reading-bg-white #view-theology .theol-reading-body strong,
 body.reading-bg-white #view-dictionary .dict-entry-body,
 body.reading-bg-white #view-dictionary .dict-entry-title,
 body.reading-bg-white #view-dictionary #match-body-text,
@@ -376,9 +392,25 @@ body.reading-bg-sepia #view-theology .theol-reading-body,
 body.reading-bg-sepia #view-theology .theol-reading-p,
 body.reading-bg-sepia #view-theology .theol-reading-title,
 body.reading-bg-sepia #view-theology .theol-chapter-title,
+body.reading-bg-sepia #view-theology .theol-hero-chapter-title,
+body.reading-bg-sepia #view-theology .theol-section-heading,
 body.reading-bg-sepia #view-theology .theol-header-book-title,
 body.reading-bg-sepia #view-theology .theol-header-chapter-name,
 body.reading-bg-sepia #view-theology .theol-reading-meta-tag,
+body.reading-bg-sepia #view-theology h1,
+body.reading-bg-sepia #view-theology h2,
+body.reading-bg-sepia #view-theology h3,
+body.reading-bg-sepia #view-theology h4,
+body.reading-bg-sepia #view-theology h5,
+body.reading-bg-sepia #view-theology h6,
+body.reading-bg-sepia #view-theology .theol-reading-body h1,
+body.reading-bg-sepia #view-theology .theol-reading-body h2,
+body.reading-bg-sepia #view-theology .theol-reading-body h3,
+body.reading-bg-sepia #view-theology .theol-reading-body h4,
+body.reading-bg-sepia #view-theology .theol-reading-body h5,
+body.reading-bg-sepia #view-theology .theol-reading-body h6,
+body.reading-bg-sepia #view-theology .theol-reading-body p,
+body.reading-bg-sepia #view-theology .theol-reading-body strong,
 body.reading-bg-sepia #view-dictionary .dict-entry-body,
 body.reading-bg-sepia #view-dictionary .dict-entry-title,
 body.reading-bg-sepia #view-dictionary #match-body-text,
@@ -9134,29 +9166,41 @@ body.theme-dark .theol-view-badge {
 }
 
 /* FONDS DE LECTURE THÉOLOGIE */
-.theol-article-card.bg-white {
+.theol-article-card.bg-white,
+body.reading-bg-white .theol-article-card {
   background: #FFFFFF !important;
   color: #111827 !important;
 }
 
-.theol-article-card.bg-sepia {
+body.reading-bg-white .theol-hero-chapter-title,
+body.reading-bg-white .theol-section-heading {
+  color: #0F172A !important;
+}
+
+.theol-article-card.bg-sepia,
+body.reading-bg-sepia .theol-article-card {
   background: #FBF0D9 !important;
   color: #382C1E !important;
 }
 
 .theol-article-card.bg-sepia .theol-hero-chapter-title,
-.theol-article-card.bg-sepia .theol-section-heading {
+.theol-article-card.bg-sepia .theol-section-heading,
+body.reading-bg-sepia .theol-hero-chapter-title,
+body.reading-bg-sepia .theol-section-heading {
   color: #261B0E !important;
 }
 
-.theol-article-card.bg-dark {
+.theol-article-card.bg-dark,
+body.reading-bg-dark .theol-article-card {
   background: #111827 !important;
   color: #E5E7EB !important;
   border-color: #1F2937 !important;
 }
 
 .theol-article-card.bg-dark .theol-hero-chapter-title,
-.theol-article-card.bg-dark .theol-section-heading {
+.theol-article-card.bg-dark .theol-section-heading,
+body.reading-bg-dark .theol-hero-chapter-title,
+body.reading-bg-dark .theol-section-heading {
   color: #F9FAFB !important;
 }
 
