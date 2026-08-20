@@ -2335,15 +2335,34 @@ const LexiconViewer = {
       .replace(/^\- (.*$)/gim, '<li style="margin-left: 20px; margin-bottom: 4px;">$1</li>')
       .replace(/\n\n/g, '<br><br>');
 
+    const linkifiedDictText = (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences)
+      ? TheologyView.highlightScriptureReferences(textToRender)
+      : textToRender;
+
     container.innerHTML = `
       <div style="padding: 16px;">
         <div style="font-size: 20px; font-weight: 800; color: var(--accent-blue); margin-bottom: 4px;">${match.title || this.currentTerm}</div>
         <div style="font-size: 11px; font-weight: 700; color: var(--accent-orange); margin-bottom: 12px;">${match.badge || match.dict_name}</div>
         ${polishBarHtml}
         ${translationBannerHtml}
-        <div style="font-family: var(--font-bible); font-size: 15px; line-height: 1.75; color: var(--text-primary);" id="match-body-text" class="dict-entry-body">${textToRender}</div>
+        <div style="font-family: var(--font-bible); font-size: 15px; line-height: 1.75; color: var(--text-primary);" id="match-body-text" class="dict-entry-body">${linkifiedDictText}</div>
       </div>
     `;
+
+    // Attacher les infobulles et navigation sur les références bibliques
+    if (typeof ScriptureTooltip !== 'undefined') {
+      ScriptureTooltip.bindToElements(container.querySelectorAll('.theol-inline-scripture-ref'));
+    }
+    container.querySelectorAll('.theol-inline-scripture-ref').forEach(span => {
+      span.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const ref = span.dataset.ref || span.textContent.trim();
+        if (ref) {
+          if (typeof ScriptureTooltip !== 'undefined') ScriptureTooltip.hide();
+          if (typeof BibleReader !== 'undefined') BibleReader.searchPassage(ref);
+        }
+      });
+    });
 
     const toggleBtn = container.querySelector('#btn-toggle-dict-orig');
     if (toggleBtn) {
@@ -2461,6 +2480,11 @@ const LexiconViewer = {
         </div>
       `;
 
+      const cleanExtract = (data.extract || '').replace(/\n\n/g, '<br><br>');
+      const linkifiedExtract = (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences)
+        ? TheologyView.highlightScriptureReferences(cleanExtract)
+        : cleanExtract;
+
       container.innerHTML = `
         <div class="wiki-container">
           ${navHtml}
@@ -2475,7 +2499,7 @@ const LexiconViewer = {
 
           ${data.thumbnail ? `<img src="${data.thumbnail}" class="wiki-thumbnail" alt="${data.title}">` : ''}
 
-          <div class="wiki-extract">${(data.extract || '').replace(/\n\n/g, '<br><br>')}</div>
+          <div class="wiki-extract">${linkifiedExtract}</div>
 
           <div style="display: flex; gap: 8px; align-items: center;">
             <button class="wiki-more-btn" id="btn-wiki-more" data-expanded="false" style="display: flex; align-items: center; gap: 5px;">
@@ -2487,6 +2511,21 @@ const LexiconViewer = {
           <div class="wiki-extended-box hidden" id="wiki-extended-container"></div>
         </div>
       `;
+
+      // Attacher les infobulles sur le résumé Wikipédia initial
+      if (typeof ScriptureTooltip !== 'undefined') {
+        ScriptureTooltip.bindToElements(container.querySelectorAll('.theol-inline-scripture-ref'));
+      }
+      container.querySelectorAll('.theol-inline-scripture-ref').forEach(span => {
+        span.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const ref = span.dataset.ref || span.textContent.trim();
+          if (ref) {
+            if (typeof ScriptureTooltip !== 'undefined') ScriptureTooltip.hide();
+            if (typeof BibleReader !== 'undefined') BibleReader.searchPassage(ref);
+          }
+        });
+      });
 
       // Event handlers
       const qInput = container.querySelector('#wiki-query-input');
@@ -2525,7 +2564,25 @@ const LexiconViewer = {
               try {
                 const extData = await API.call('get_wikipedia_extended', data.title);
                 if (extData && extData.found && extData.html) {
-                  extContainer.innerHTML = extData.html;
+                  const linkifiedExt = (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences)
+                    ? TheologyView.highlightScriptureReferences(extData.html)
+                    : extData.html;
+                  extContainer.innerHTML = linkifiedExt;
+
+                  if (typeof ScriptureTooltip !== 'undefined') {
+                    ScriptureTooltip.bindToElements(extContainer.querySelectorAll('.theol-inline-scripture-ref'));
+                  }
+                  extContainer.querySelectorAll('.theol-inline-scripture-ref').forEach(span => {
+                    span.addEventListener('click', (e) => {
+                      e.stopPropagation();
+                      const ref = span.dataset.ref || span.textContent.trim();
+                      if (ref) {
+                        if (typeof ScriptureTooltip !== 'undefined') ScriptureTooltip.hide();
+                        if (typeof BibleReader !== 'undefined') BibleReader.searchPassage(ref);
+                      }
+                    });
+                  });
+
                   extContainer.classList.remove('hidden');
                   btnMore.dataset.expanded = 'true';
                   moreLabel.textContent = 'Voir moins ▴';

@@ -787,12 +787,15 @@ const TheologyView = {
       'Jud', 'Jd\\b', 'Apoc?', 'Apo', 'Ap\\b', 'Rev'
     ].join('|');
 
-    // Détection du livre initial + chapitre + verset et chaîne de sous-références
-    // La chaîne de sous-références ne doit pas consommer un chiffre suivi de lettres (ex: "; 2 Co 6:16" ou "; 1 Pi 2:22")
-    const clusterRegex = new RegExp(`\\b(${bookNamesPattern})\\s+([0-9]{1,3}(?:\\s*[:.,]\\s*[0-9]{1,3}(?:\\s*-\\s*[0-9]{1,3})?)?)((?:\\s*[,;]\\s*[0-9]{1,3}(?:\\s*[:.,]\\s*[0-9]{1,3}(?:\\s*-\\s*[0-9]{1,3})?)?(?!\\s*[a-zA-ZÀ-ÿ]))*)`, 'g');
+    // Détection du livre initial (+ point optionnel) + chapitre + verset et chaîne de sous-références
+    // Exemple: Gn. 5:12-17, Luc 3:37, Néhémie (11:4), Jean 3:16, 1 Co 13:4
+    const clusterRegex = new RegExp(`(\\b(?:${bookNamesPattern})\\.?)\\s*(\\([0-9]{1,3}(?:\\s*[:.,]\\s*[0-9]{1,3}(?:\\s*-\\s*[0-9]{1,3})?)?\\)|[0-9]{1,3}(?:\\s*[:.,]\\s*[0-9]{1,3}(?:\\s*-\\s*[0-9]{1,3})?)?)((?:\\s*[,;]\\s*[0-9]{1,3}(?:\\s*[:.,]\\s*[0-9]{1,3}(?:\\s*-\\s*[0-9]{1,3})?)?(?!\\s*[a-zA-ZÀ-ÿ]))*)`, 'gi');
 
-    return text.replace(clusterRegex, (fullMatch, book, firstChVs, chainedPart) => {
-      const cleanBook = book.trim();
+    return text.replace(clusterRegex, (fullMatch, book, chVsRaw, chainedPart) => {
+      const cleanBook = book.replace(/\.$/, '').trim();
+      let isParenCv = chVsRaw.startsWith('(') && chVsRaw.endsWith(')');
+      let chVs = isParenCv ? chVsRaw.slice(1, -1).trim() : chVsRaw.trim();
+      if (!chVs) return fullMatch;
 
       const parseCv = (cv) => {
         const parts = cv.split(/[:.,]/);
@@ -801,8 +804,8 @@ const TheologyView = {
         return { ch, vs, fullRef: vs ? `${cleanBook} ${ch}:${vs}` : `${cleanBook} ${ch}` };
       };
 
-      const first = parseCv(firstChVs);
-      let result = `<span class="theol-inline-scripture-ref" data-ref="${TheologyView.escapeHtml(first.fullRef)}">${book} ${firstChVs}</span>`;
+      const first = parseCv(chVs);
+      let result = `<span class="theol-inline-scripture-ref" data-ref="${TheologyView.escapeHtml(first.fullRef)}">${book} ${isParenCv ? '(' + chVs + ')' : chVs}</span>`;
 
       if (chainedPart) {
         const subRegex = /([,;]\s*)([0-9]{1,3}(?:\s*[:.,]\s*[0-9]{1,3}(?:\s*-\\s*[0-9]{1,3})?)?)/g;
@@ -1922,4 +1925,7 @@ const ScriptureTooltip = {
     }, 150);
   }
 };
+
+window.TheologyView = TheologyView;
+window.ScriptureTooltip = ScriptureTooltip;
 
