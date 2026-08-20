@@ -547,7 +547,18 @@ const DictView = {
 
     const bodyEl = document.getElementById('dict-article-body');
     if (bodyEl) {
-      bodyEl.innerHTML = `<div style="padding: 40px; text-align: center; color: var(--accent-blue);"><div class="synth-spinner" style="width:24px; height:24px; border-width:2px; margin: 0 auto 12px auto;"></div><em>Restauration philologique et restructuration de la notice par Mistral 14B...</em></div>`;
+      const bannerHtml = `
+        <div class="ai-processing-floating-banner">
+          <div class="banner-icon">✨</div>
+          <div class="banner-text shine-text">Restauration philologique et restructuration de la notice par l'IA...</div>
+        </div>
+      `;
+      const curText = match.raw_text || match.full_text || match.preview || '';
+      const formatted = this.formatArticleMarkdown(curText);
+      bodyEl.innerHTML = `
+        ${bannerHtml}
+        <div class="dict-entry-body-content ai-shining-container">${formatted}</div>
+      `;
     }
 
     try {

@@ -9512,14 +9512,148 @@ body.theme-dark .theol-view-badge {
   100% { background-position: 200% 0; }
 }
 
+/* ==========================================================================
+   SHINE TEXT ANIMATION (SmoothUI inspired AI thinking/processing effect)
+   ========================================================================== */
+
+@keyframes shine-sweep {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+:root,
+body.theme-light,
+body.palette-light-clean,
+body.palette-light-cream,
+body.palette-light-nordic {
+  --shine-base: rgba(71, 85, 105, 0.45);
+  --shine-highlight: #0284c7;
+  --shine-peak: #0f172a;
+  --shine-glow: rgba(2, 132, 199, 0.25);
+}
+
+body.theme-dark,
+body.palette-dark-slate,
+body.palette-dark-black,
+body.palette-dark-cyber {
+  --shine-base: rgba(148, 163, 184, 0.45);
+  --shine-highlight: #38bdf8;
+  --shine-peak: #ffffff;
+  --shine-glow: rgba(56, 189, 248, 0.35);
+}
+
+.shine-text,
+.ai-shine-text {
+  background: linear-gradient(
+    110deg,
+    var(--shine-base) 0%,
+    var(--shine-base) 35%,
+    var(--shine-highlight) 48%,
+    var(--shine-peak) 50%,
+    var(--shine-highlight) 52%,
+    var(--shine-base) 65%,
+    var(--shine-base) 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+  display: inline-block;
+  animation: shine-sweep 2.8s linear infinite;
+  text-decoration: none;
+  text-shadow: none !important;
+}
+
+/* Container variant: applique le balayage lumineux sur l'ensemble du texte traité */
+.ai-shining-container {
+  position: relative;
+}
+
+.ai-shining-container p,
+.ai-shining-container h1,
+.ai-shining-container h2,
+.ai-shining-container h3,
+.ai-shining-container h4,
+.ai-shining-container li,
+.ai-shining-container span:not(.no-shine),
+.ai-shining-container em,
+.ai-shining-container strong,
+.ai-shining-container blockquote,
+.ai-shining-container .dict-entry-body-content,
+.ai-shining-container .comm-body-text,
+.ai-shining-container .theol-paragraph {
+  background: linear-gradient(
+    110deg,
+    var(--shine-base) 0%,
+    var(--shine-base) 35%,
+    var(--shine-highlight) 48%,
+    var(--shine-peak) 50%,
+    var(--shine-highlight) 52%,
+    var(--shine-base) 65%,
+    var(--shine-base) 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+  animation: shine-sweep 2.8s linear infinite;
+  text-shadow: none !important;
+}
+
+/* BANDEAU FLOTTANT MODERNE LORS DU TRAITEMENT IA */
+.ai-processing-floating-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.12), rgba(99, 102, 241, 0.12));
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 18px rgba(2, 132, 199, 0.1);
+  animation: encartFadeIn 0.3s ease-out;
+}
+
+.ai-processing-floating-banner .banner-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent-blue), #6366f1);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
+  animation: bannerSparkle 1.6s infinite alternate ease-in-out;
+}
+
+.ai-processing-floating-banner .banner-text {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+@keyframes bannerSparkle {
+  0% { transform: scale(0.95) rotate(-3deg); filter: brightness(1); }
+  100% { transform: scale(1.08) rotate(3deg); filter: brightness(1.25); }
+}
+
 /* 2. ANIMATION DE SCAN & VAGUE LUMINEUSE DE TRADUCTION IA */
 .theol-article-card.translating-scan-active {
   position: relative;
-  border-color: rgba(56, 189, 248, 0.3) !important;
+  border-color: rgba(56, 189, 248, 0.4) !important;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
 }
 
 .theol-article-card.translating-scan-active .theol-reading-body {
-  opacity: 0.65;
   transition: opacity 0.3s ease;
 }
 
@@ -9529,11 +9663,11 @@ body.theme-dark .theol-view-badge {
   align-items: center;
   gap: 14px;
   padding: 14px 18px;
-  background: linear-gradient(135deg, rgba(2, 132, 199, 0.1), rgba(99, 102, 241, 0.1));
-  border: 1px solid rgba(56, 189, 248, 0.25);
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.12), rgba(99, 102, 241, 0.12));
+  border: 1px solid rgba(56, 189, 248, 0.35);
   border-radius: 10px;
   margin-bottom: 24px;
-  box-shadow: 0 4px 16px rgba(2, 132, 199, 0.08);
+  box-shadow: 0 4px 16px rgba(2, 132, 199, 0.1);
 }
 
 .theol-scanner-icon-box {

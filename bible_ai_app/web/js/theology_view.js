@@ -925,6 +925,7 @@ const TheologyView = {
       const textSpan = document.getElementById('theol-toc-translate-text');
       if (textSpan) textSpan.textContent = 'Traduction...';
       if (btn) btn.disabled = true;
+      if (this.tocListContainer) this.tocListContainer.classList.add('ai-shining-container');
 
       App.showToast('Traduction des titres de la table des matières en cours...');
       const titles = this.tocList.map(ch => ({
@@ -951,6 +952,7 @@ const TheologyView = {
       this.renderTocList();
     } finally {
       if (this.btnTranslateToc) this.btnTranslateToc.disabled = false;
+      if (this.tocListContainer) this.tocListContainer.classList.remove('ai-shining-container');
     }
   },
 
@@ -1206,11 +1208,11 @@ const TheologyView = {
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"/></svg>
           </div>
           <div class="theol-scanner-info">
-            <div class="theol-scanner-title">Traduction française haute fidélité en cours...</div>
+            <div class="theol-scanner-title shine-text">Traduction française haute fidélité en cours...</div>
             <div class="theol-scanner-subtitle">Analyse théologique, traduction du titre & conservation des citations bibliques</div>
           </div>
           <div class="theol-scanner-progress-badge">
-            <span>✨ Traduction IA</span>
+            <span class="shine-text">✨ Traduction IA</span>
           </div>
         </div>
       `;
@@ -1220,6 +1222,9 @@ const TheologyView = {
       } else if (this.articleContent) {
         this.articleContent.insertAdjacentHTML('afterbegin', scanBannerHtml);
       }
+
+      const readingBody = this.articleContent?.querySelector('.theol-reading-body');
+      if (readingBody) readingBody.classList.add('ai-shining-container');
 
       App.showToast('Traduction du chapitre par IA en cours...');
       const rawTitle = this.currentChapterData?.chapter_title || '';
@@ -1284,6 +1289,8 @@ const TheologyView = {
     try {
       this.isSummaryLoading = true;
       this.renderChapterArticle(this.currentChapterData);
+      const readingBody = this.articleContent?.querySelector('.theol-reading-body');
+      if (readingBody) readingBody.classList.add('ai-shining-container');
 
       const chapterTitle = this.currentChapterData?.chapter_title || `Chapitre ${this.currentChapterId}`;
       const paragraphs = this.currentChapterData?.paragraphs || [];
@@ -1316,10 +1323,19 @@ const TheologyView = {
     if (this.isSummaryLoading) {
       return `
         <div class="theol-summary-encart" id="theol-summary-encart">
-          <div class="theol-summary-loading-card">
-            <div class="theol-spinner" style="width: 28px; height: 28px; border-width: 2.5px;"></div>
-            <div style="font-size: 13px; font-weight: 700; color: var(--text-primary); margin-top: 4px;">Génération du résumé théologique par IA...</div>
-            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">Extraction de la thèse centrale, des axes doctrinaux et des passages scripturaires</div>
+          <div class="theol-summary-encart-header">
+            <div class="theol-summary-encart-title-box">
+              <div class="theol-summary-encart-icon">✨</div>
+              <div>
+                <div class="theol-summary-encart-title shine-text">Génération du Résumé Théologique par IA...</div>
+                <div class="theol-summary-encart-sub">${this.escapeHtml(bookTitle)} • ${this.escapeHtml(chapterTitle)}</div>
+              </div>
+            </div>
+          </div>
+          <div class="theol-summary-encart-body ai-shining-container" style="padding: 6px 0;">
+            <p class="shine-text" style="margin-bottom: 8px; font-weight: 600;">Extraction de la thèse doctrinale centrale et des axes théologiques majeurs...</p>
+            <p class="shine-text" style="margin-bottom: 8px;">Analyse contextuelle et synthèse des arguments scripturaires du chapitre...</p>
+            <p class="shine-text">Formulation des applications pastorales et doctrinales...</p>
           </div>
         </div>
       `;

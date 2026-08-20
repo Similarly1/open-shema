@@ -971,7 +971,12 @@ const CommentaryViewer = {
 
     if (btnTranslate) {
       btnTranslate.disabled = true;
-      btnTranslate.innerHTML = '<span class="synth-spinner" style="width:12px; height:12px; border-width:2px; vertical-align:middle; margin-right:4px;"></span><span>Traduction...</span>';
+      btnTranslate.innerHTML = '<span class="synth-spinner" style="width:12px; height:12px; border-width:2px; vertical-align:middle; margin-right:4px;"></span><span class="shine-text">Traduction...</span>';
+    }
+
+    const bodyEl = document.querySelector('.comm-single-body');
+    if (bodyEl) {
+      bodyEl.classList.add('ai-shining-container');
     }
 
     try {
@@ -987,6 +992,7 @@ const CommentaryViewer = {
           btnTranslate.disabled = false;
           btnTranslate.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>Réessayer</span>';
         }
+        if (bodyEl) bodyEl.classList.remove('ai-shining-container');
       }
     } catch (e) {
       App.showError('Erreur de Traduction', String(e));
@@ -994,6 +1000,7 @@ const CommentaryViewer = {
         btnTranslate.disabled = false;
         btnTranslate.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>Réessayer</span>';
       }
+      if (bodyEl) bodyEl.classList.remove('ai-shining-container');
     }
   },
 
@@ -2396,7 +2403,9 @@ const LexiconViewer = {
     if (btnTranslateDict) {
       btnTranslateDict.addEventListener('click', async () => {
         btnTranslateDict.disabled = true;
-        btnTranslateDict.innerHTML = '<span class="synth-spinner" style="width:12px; height:12px; border-width:2px; vertical-align:middle; margin-right:4px;"></span><span>Traduction...</span>';
+        btnTranslateDict.innerHTML = '<span class="synth-spinner" style="width:12px; height:12px; border-width:2px; vertical-align:middle; margin-right:4px;"></span><span class="shine-text">Traduction...</span>';
+        const bodyEl = container.querySelector('#match-body-text');
+        if (bodyEl) bodyEl.classList.add('ai-shining-container');
         try {
           const res = await API.translateText(match.full_text || match.preview || '', 'dictionary', itemId);
           if (res && res.success && res.translated_text) {
@@ -2408,11 +2417,13 @@ const LexiconViewer = {
             App.showError('Erreur de Traduction', res?.error || 'Impossible de traduire.');
             btnTranslateDict.disabled = false;
             btnTranslateDict.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>Réessayer</span>';
+            if (bodyEl) bodyEl.classList.remove('ai-shining-container');
           }
         } catch (e) {
           App.showError('Erreur de Traduction', String(e));
           btnTranslateDict.disabled = false;
           btnTranslateDict.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>Réessayer</span>';
+          if (bodyEl) bodyEl.classList.remove('ai-shining-container');
         }
       });
     }
@@ -2421,9 +2432,20 @@ const LexiconViewer = {
     if (btnPolish) {
       btnPolish.addEventListener('click', async () => {
         btnPolish.disabled = true;
-        btnPolish.innerHTML = `<span class="synth-spinner" style="width:12px; height:12px; border-width:2px; vertical-align:middle; margin-right:4px;"></span><span>Restauration IA en cours...</span>`;
+        btnPolish.innerHTML = `<span class="synth-spinner" style="width:12px; height:12px; border-width:2px; vertical-align:middle; margin-right:4px;"></span><span class="shine-text">Restauration IA...</span>`;
         const bodyEl = container.querySelector('#match-body-text');
-        bodyEl.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--accent-blue);"><em>Restauration philologique et restructuration de la notice par Mistral 14B...</em></div>`;
+        if (bodyEl) {
+          bodyEl.classList.add('ai-shining-container');
+          const bannerEl = document.createElement('div');
+          bannerEl.className = 'ai-processing-floating-banner';
+          bannerEl.style.padding = '8px 12px';
+          bannerEl.style.marginBottom = '12px';
+          bannerEl.innerHTML = `
+            <div class="banner-icon" style="width: 24px; height: 24px; font-size: 12px;">✨</div>
+            <div class="banner-text shine-text" style="font-size: 12px;">Restauration philologique IA en cours...</div>
+          `;
+          bodyEl.parentElement?.insertBefore(bannerEl, bodyEl);
+        }
 
         try {
           const res = await API.call('polish_dictionary_article', match.dict_id, match.title, match.raw_text || match.full_text, null, match.slug);
