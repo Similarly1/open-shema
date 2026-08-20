@@ -492,11 +492,12 @@ const DictView = {
     }
 
     const rawText = match.full_text || match.raw_text || match.preview || '';
-    const formatted = this.formatArticleMarkdown(rawText);
-
-    const linkified = (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences)
+    let linkified = (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences)
       ? TheologyView.highlightScriptureReferences(formatted)
       : formatted;
+    if (typeof TheologyView !== 'undefined' && TheologyView.linkifyUrls) {
+      linkified = TheologyView.linkifyUrls(linkified);
+    }
 
     bodyEl.innerHTML = `
       ${polishBannerHtml}

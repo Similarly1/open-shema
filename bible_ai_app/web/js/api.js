@@ -211,6 +211,10 @@ const API = {
     return await this.call('search_theology_books', query, bookName);
   },
 
+  async openExternalUrl(url) {
+    return await this.call('open_external_url', url);
+  },
+
 
   async getBiblicalPlaces(query = '', placeType = null, limit = 150) {
     return await this.call('get_biblical_places', query, placeType, limit);

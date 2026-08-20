@@ -25,7 +25,8 @@ const App = {
       { name: 'DictView', init: () => DictView.init() },
       { name: 'MapsView', init: () => MapsView.init() },
       { name: 'CommentariesView', init: () => CommentariesView.init() },
-      { name: 'TheologyView', init: () => TheologyView.init() }
+      { name: 'TheologyView', init: () => TheologyView.init() },
+      { name: 'SelectionContextMenu', init: () => (typeof SelectionContextMenu !== 'undefined' && SelectionContextMenu.init()) }
     ];
 
     modules.forEach(m => {

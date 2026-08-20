@@ -1465,8 +1465,16 @@ class BibleAppApi:
         import core.theology_reader_manager
         importlib.reload(core.theology_reader_manager)
         from core.theology_reader_manager import TheologyReaderManager
-        return TheologyReaderManager.search_theology_books(query, book_name=book_name)
-
+    def open_external_url(self, url: str) -> bool:
+        """Ouvre une URL externe dans le navigateur par défaut du système."""
+        import webbrowser
+        try:
+            if url and (url.startswith('http://') or url.startswith('https://') or url.startswith('mailto:')):
+                webbrowser.open(url)
+                return True
+        except Exception as e:
+            logger.error(f"[API] Erreur ouverture URL externe : {e}")
+        return False
 
     def pick_import_file(self) -> Dict[str, Any]:
         """Ouvre une boîte de dialogue native pour sélectionner un fichier d'importation."""

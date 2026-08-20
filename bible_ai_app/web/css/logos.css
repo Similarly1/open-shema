@@ -9759,6 +9759,259 @@ body.reading-bg-white .theol-fn-item {
   color: #334155 !important;
 }
 
+/* LIENS WEB EXTERNES DANS LES NOTES & LE TEXTE */
+.theol-ext-web-link {
+  color: var(--accent-blue, #3b82f6);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  word-break: break-all;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  transition: all 0.15s ease;
+  font-weight: 500;
+}
+
+.theol-ext-web-link:hover {
+  color: #60a5fa;
+  text-decoration: underline;
+}
+
+body.reading-bg-sepia .theol-ext-web-link {
+  color: #A05A2C;
+}
+
+body.reading-bg-white .theol-ext-web-link {
+  color: #2563eb;
+}
+
+/* MENU CONTEXTUEL FLOTTANT SUR SÉLECTION DE TEXTE */
+.selection-context-menu {
+  position: fixed;
+  z-index: 10000;
+  min-width: 250px;
+  max-width: 320px;
+  background: var(--bg-card, #1e293b);
+  border: 1px solid var(--border-color, #334155);
+  border-radius: 12px;
+  box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.6), 0 8px 16px -4px rgba(0, 0, 0, 0.4);
+  padding: 6px;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  animation: scmAppear 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.selection-context-menu.hidden {
+  display: none;
+}
+
+@keyframes scmAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.scm-header {
+  padding: 6px 10px 8px;
+  border-bottom: 1px solid var(--border-color, #334155);
+  margin-bottom: 4px;
+}
+
+.scm-selection-preview {
+  font-size: 0.76rem;
+  color: var(--text-muted, #94a3b8);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.scm-items {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.scm-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary, #f8fafc);
+  font-size: 0.84rem;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.12s ease;
+}
+
+.scm-item svg {
+  color: var(--accent-blue, #3b82f6);
+  flex-shrink: 0;
+  transition: transform 0.12s ease;
+}
+
+.scm-item:hover {
+  background: var(--bg-hover, rgba(255, 255, 255, 0.08));
+  color: #ffffff;
+}
+
+.scm-item:hover svg {
+  transform: scale(1.1);
+}
+
+.scm-shortcut {
+  margin-left: auto;
+  font-size: 0.72rem;
+  color: var(--text-muted, #64748b);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 5px;
+  border-radius: 4px;
+}
+
+.scm-divider {
+  height: 1px;
+  background: var(--border-color, #334155);
+  margin: 4px 6px;
+}
+
+/* POPOVER DE TRADUCTION DE SÉLECTION */
+.selection-translation-popover {
+  position: fixed;
+  z-index: 10001;
+  width: 360px;
+  max-width: calc(100vw - 32px);
+  background: var(--bg-card, #1e293b);
+  border: 1px solid var(--border-color, #334155);
+  border-radius: 12px;
+  box-shadow: 0 20px 40px -4px rgba(0, 0, 0, 0.6);
+  padding: 14px;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  animation: scmAppear 0.15s ease;
+}
+
+.selection-translation-popover.hidden {
+  display: none;
+}
+
+.stp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color, #334155);
+}
+
+.stp-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--accent-blue, #3b82f6);
+}
+
+.stp-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stp-btn-copy,
+.stp-btn-close {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-color, #334155);
+  color: var(--text-muted, #94a3b8);
+  border-radius: 6px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.stp-btn-copy:hover,
+.stp-btn-close:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary, #ffffff);
+}
+
+.stp-body {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-primary, #f8fafc);
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.stp-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.84rem;
+  padding: 12px 0;
+}
+
+.stp-error {
+  color: #ef4444;
+  font-size: 0.84rem;
+}
+
+/* THÈMES SEPIA & CLAIR POUR LE MENU CONTEXTUEL */
+body.reading-bg-sepia .selection-context-menu,
+body.reading-bg-sepia .selection-translation-popover {
+  background: #F4E8D1 !important;
+  color: #382C1E !important;
+  border-color: #D6C2A3 !important;
+  box-shadow: 0 16px 36px -4px rgba(56, 44, 30, 0.3) !important;
+}
+
+body.reading-bg-sepia .scm-item {
+  color: #382C1E !important;
+}
+
+body.reading-bg-sepia .scm-item:hover {
+  background: rgba(160, 90, 44, 0.12) !important;
+}
+
+body.reading-bg-sepia .scm-item svg {
+  color: #A05A2C !important;
+}
+
+body.reading-bg-white .selection-context-menu,
+body.reading-bg-white .selection-translation-popover {
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.15) !important;
+}
+
+body.reading-bg-white .scm-item {
+  color: #0F172A !important;
+}
+
+body.reading-bg-white .scm-item:hover {
+  background: #F1F5F9 !important;
+}
+
+body.reading-bg-white .scm-item svg {
+  color: #2563eb !important;
+}
+
 /* NAVIGATION DE FIN DE CHAPITRE */
 .theol-footer-nav {
   margin-top: 48px;

@@ -696,7 +696,7 @@ const TheologyView = {
               <li class="theol-fn-item" id="theol-fn-${fn.id}" data-fn-id="${fn.id}">
                 <span class="theol-fn-num">${fn.id}.</span>
                 <div class="theol-fn-content">
-                  <span class="theol-fn-text">${this.highlightScriptureReferences(fn.text)}</span>
+                  <span class="theol-fn-text">${this.linkifyUrls(this.highlightScriptureReferences(fn.text))}</span>
                   <a href="#theol-fnref-${fn.id}" class="theol-fn-backref" data-target-id="theol-fnref-${fn.id}" title="Retour au passage">↩</a>
                 </div>
               </li>
@@ -846,80 +846,94 @@ const TheologyView = {
     }
   },
 
+  linkifyUrls(text) {
+    if (!text) return '';
+    const urlRegex = /(https?:\/\/[^\s\)\],;\"'<>]+)/gi;
+    return text.replace(urlRegex, (url) => {
+      const cleanUrl = url.replace(/[\.\,\;\:\)]+$/, '');
+      const trailing = url.slice(cleanUrl.length);
+      return `<a href="${TheologyView.escapeHtml(cleanUrl)}" class="theol-ext-web-link" target="_blank" rel="noopener noreferrer" title="Ouvrir dans le navigateur : ${TheologyView.escapeHtml(cleanUrl)}">${TheologyView.escapeHtml(cleanUrl)} <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:middle; margin-left:2px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>${trailing}`;
+    });
+  },
+
   highlightScriptureReferences(text) {
     if (!text) return '';
 
-    // Liste exhaustive des livres bibliques et abréviations françaises usuelles (ordonnée par longueur décroissante)
-    const bookNamesPattern = [
+    // Liste exhaustive des livres bibliques et abréviations françaises & anglaises
+    const bookNames = [
       // Deutérocanoniques & Apocryphes
       '1\\s*Maccabées', '2\\s*Maccabées', '3\\s*Maccabées', '4\\s*Maccabées',
       '1\\s*Maccabees', '2\\s*Maccabees', '1\\s*Mac', '2\\s*Mac', '1Ma', '2Ma', 'Maccabées', 'Maccabees',
       'Sagesse', 'Siracide', 'Ecclésiastique', 'Tobie', 'Judith', 'Baruch', 'Prière de Manassé',
 
-      // Noms complets canoniques
-      'Genèse', 'Exode', 'Lévitique', 'Nombres', 'Deutéronome', 'Josué', 'Juges', 'Ruth',
-      '1\\s*Samuel', '2\\s*Samuel', '1\\s*Rois', '2\\s*Rois', '1\\s*Chroniques', '2\\s*Chroniques',
-      'Esdras', 'Néhémie', 'Esther', 'Job', 'Psaumes', 'Psaume', 'Proverbes', 'Ecclésiaste',
-      'Cantique des cantiques', 'Cantique', 'Ésaïe', 'Esaïe', 'Jérémie', 'Lamentations', 'Ézéchiel', 'Ezechiel',
-      'Daniel', 'Osée', 'Osee', 'Joël', 'Joel', 'Amos', 'Abdias', 'Jonas', 'Michée', 'Michee',
-      'Nahum', 'Habacuc', 'Sophonie', 'Aggée', 'Aggee', 'Zacharie', 'Malachie',
-      'Matthieu', 'Marc', 'Luc', 'Jean', 'Actes des apôtres', 'Actes', 'Romains',
-      '1\\s*Corinthiens', '2\\s*Corinthiens', 'Galates', 'Éphésiens', 'Ephesiens', 'Philippiens', 'Colossiens',
-      '1\\s*Thessaloniciens', '2\\s*Thessaloniciens', '1\\s*Timothée', '2\\s*Timothée', '1\\s*Timothee', '2\\s*Timothee',
-      'Tite', 'Philémon', 'Philemon', 'Hébreux', 'Hebreux', 'Jacques', '1\\s*Pierre', '2\\s*Pierre',
-      '1\\s*Jean', '2\\s*Jean', '3\\s*Jean', 'Jude', 'Apocalypse',
+      // Multi-word / Noms composés
+      'Cantique des cantiques', 'Cantique', 'Song of Songs', 'Song of Solomon', 'Song',
+      'Actes des apôtres', 'Acts of the Apostles', 'Actes', 'Acts',
+      '1\\s*Thessaloniciens', '2\\s*Thessaloniciens', '1\\s*Thessalonians', '2\\s*Thessalonians',
+      '1\\s*Chroniques', '2\\s*Chroniques', '1\\s*Chronicles', '2\\s*Chronicles',
+      '1\\s*Corinthiens', '2\\s*Corinthiens', '1\\s*Corinthians', '2\\s*Corinthians',
+      '1\\s*Timothée', '2\\s*Timothée', '1\\s*Timothee', '2\\s*Timothee', '1\\s*Timothy', '2\\s*Timothy',
+      '1\\s*Samuel', '2\\s*Samuel', '1\\s*Rois', '2\\s*Rois', '1\\s*Kings', '2\\s*Kings',
+      '1\\s*Pierre', '2\\s*Pierre', '1\\s*Peter', '2\\s*Peter',
+      '1\\s*Jean', '2\\s*Jean', '3\\s*Jean', '1\\s*John', '2\\s*John', '3\\s*John',
+
+      // Noms complets canoniques (Français & Anglais)
+      'Genèse', 'Genese', 'Genesis', 'Exode', 'Exodus', 'Lévitique', 'Levitique', 'Leviticus', 'Nombres', 'Numbers', 'Deutéronome', 'Deuteronome', 'Deuteronomy',
+      'Josué', 'Josue', 'Joshua', 'Juges', 'Judges', 'Ruth', 'Esdras', 'Ezra', 'Néhémie', 'Nehemie', 'Nehemiah', 'Esther', 'Job',
+      'Psaumes', 'Psaume', 'Psalms', 'Psalm', 'Proverbes', 'Proverbe', 'Proverbs', 'Ecclésiaste', 'Ecclesiaste', 'Ecclesiastes',
+      'Ésaïe', 'Esaïe', 'Esaie', 'Isaiah', 'Jérémie', 'Jeremie', 'Jeremiah', 'Lamentations', 'Ézéchiel', 'Ezechiel', 'Ezekiel',
+      'Daniel', 'Osée', 'Osee', 'Hosea', 'Joël', 'Joel', 'Amos', 'Abdias', 'Obadiah', 'Jonas', 'Jonah', 'Michée', 'Michee', 'Micah',
+      'Nahum', 'Habacuc', 'Habakkuk', 'Sophonie', 'Zephaniah', 'Aggée', 'Aggee', 'Haggai', 'Zacharie', 'Zechariah', 'Malachie', 'Malachi',
+      'Matthieu', 'Matthew', 'Marc', 'Mark', 'Luc', 'Luke', 'Jean', 'John', 'Romains', 'Romans',
+      'Galates', 'Galatians', 'Éphésiens', 'Ephesiens', 'Ephesians', 'Philippiens', 'Philippians', 'Colossiens', 'Colossians',
+      'Tite', 'Titus', 'Philémon', 'Philemon', 'Hébreux', 'Hebreux', 'Hebrews', 'Jacques', 'James', 'Jude', 'Apocalypse', 'Revelation',
 
       // Abréviations avec préfixe numérique
-      '1\\s*Sam?', '2\\s*Sam?', '1\\s*Sa\\b', '2\\s*Sa\\b', '1\\s*S\\b', '2\\s*S\\b',
-      '1\\s*Rois?', '2\\s*Rois?', '1\\s*R\\b', '2\\s*R\\b', '1\\s*Ki', '2\\s*Ki',
-      '1\\s*Chr?', '2\\s*Chr?', '1\\s*Ch\\b', '2\\s*Ch\\b',
-      '1\\s*Cor?', '2\\s*Cor?', '1\\s*Co\\b', '2\\s*Co\\b',
-      '1\\s*The?s?s?', '2\\s*The?s?s?', '1\\s*Th\\b', '2\\s*Th\\b',
-      '1\\s*Tim?', '2\\s*Tim?', '1\\s*Ti\\b', '2\\s*Ti\\b', '1\\s*Tm\\b', '2\\s*Tm\\b',
-      '1\\s*Pie?r?r?e?', '2\\s*Pie?r?r?e?', '1\\s*Pe\\b', '2\\s*Pe\\b', '1\\s*Pi\\b', '2\\s*Pi\\b', '1\\s*P\\b', '2\\s*P\\b',
-      '1\\s*Jn\\b', '2\\s*Jn\\b', '3\\s*Jn\\b', '1\\s*Joh\\b', '2\\s*Joh\\b', '3\\s*Joh\\b',
+      '1\\s*The?s?s?', '2\\s*The?s?s?', '1\\s*Th', '2\\s*Th',
+      '1\\s*Chr?o?n?', '2\\s*Chr?o?n?', '1\\s*Ch', '2\\s*Ch',
+      '1\\s*Co?r?', '2\\s*Co?r?', '1\\s*Co', '2\\s*Co',
+      '1\\s*Ti?m?', '2\\s*Ti?m?', '1\\s*Ti', '2\\s*Ti', '1\\s*Tm', '2\\s*Tm',
+      '1\\s*Sa?m?', '2\\s*Sa?m?', '1\\s*Sa', '2\\s*Sa', '1\\s*S', '2\\s*S',
+      '1\\s*Ro?i?s?', '2\\s*Ro?i?s?', '1\\s*Kgs?', '2\\s*Kgs?', '1\\s*Ki', '2\\s*Ki', '1\\s*R', '2\\s*R',
+      '1\\s*Pie?r?r?e?', '2\\s*Pie?r?r?e?', '1\\s*Pet?', '2\\s*Pet?', '1\\s*Pe', '2\\s*Pe', '1\\s*Pi', '2\\s*Pi', '1\\s*P', '2\\s*P',
+      '1\\s*Jn', '2\\s*Jn', '3\\s*Jn', '1\\s*Joh', '2\\s*Joh', '3\\s*Joh', '1\\s*J', '2\\s*J', '3\\s*J',
 
-      // Abréviations simples AT (Initiales en majuscule)
-      'Gen', 'Gn\\b', 'Exo?', 'Ex\\b', 'Lév', 'Lev', 'Lv\\b', 'Nom', 'Nomb', 'Nb\\b', 'Deut?', 'Dtn\\b', 'Dt\\b',
-      'Jos', 'Jug', 'Jg\\b', 'Jdg', 'Rut?', 'Rt\\b', 'Esd', 'Ezr', 'Néh', 'Neh', 'Esth?', 'Est\\b',
-      'Psa?', 'Ps\\b', 'Prov?', 'Pr\\b', 'Eccl?', 'Ecc', 'Ec\\b', 'Qoh', 'Cant?', 'Ct\\b', 'Sol',
-      'Ésa', 'Esa', 'Isa', 'Es\\b', 'És\\b', 'Is\\b', 'Jér', 'Jer', 'Jr\\b', 'Lam', 'Lm\\b', 'Ézéch?', 'Ezech?', 'Ézé?', 'Eze?', 'Éz\\b', 'Ez\\b',
-      'Dan', 'Da\\b', 'Osé', 'Ose', 'Os\\b', 'Hos', 'Joë', 'Joe', 'Jl\\b', 'Amo', 'Am\\b',
-      'Abd', 'Oba', 'Jon', 'Mich?', 'Mic', 'Mi\\b', 'Nah', 'Na\\b', 'Hab', 'Ha\\b',
-      'Soph', 'Zep', 'So\\b', 'Agg', 'Hag', 'Ag\\b', 'Zach?', 'Zec', 'Za\\b', 'Mal', 'Ml\\b',
+      // Abréviations simples (AT & NT)
+      'Gen', 'Gn', 'Ge', 'Exod', 'Exo', 'Ex', 'Lév', 'Lev', 'Lv', 'Nomb', 'Numb', 'Num', 'Nom', 'Nb', 'Deut', 'Dtn', 'Dt',
+      'Josh', 'Jos', 'Judg', 'Jug', 'Jdg', 'Jg', 'Rut', 'Rth', 'Rt', 'Ezr', 'Esd', 'Néhem', 'Nehem', 'Néh', 'Neh', 'Né', 'Ne', 'Esth', 'Est',
+      'Jb', 'Psa', 'Psm', 'Pss', 'Ps', 'Prov', 'Prv', 'Pr', 'Eccl', 'Ecc', 'Qoh', 'Ec', 'Cant', 'Ct',
+      'Ésa', 'Esa', 'Isa', 'És', 'Es', 'Is', 'Jér', 'Jer', 'Jr', 'Lam', 'Lm', 'Ézéch', 'Ezech', 'Ezek', 'Ézé', 'Eze', 'Éz', 'Ez',
+      'Dan', 'Da', 'Osé', 'Ose', 'Hos', 'Os', 'Joë', 'Joe', 'Jl', 'Amo', 'Am',
+      'Obad', 'Abd', 'Oba', 'Ab', 'Jonah', 'Jon', 'Mich', 'Mic', 'Mi', 'Nah', 'Na', 'Habak', 'Hab', 'Ha',
+      'Zeph', 'Soph', 'Zep', 'So', 'Hagg', 'Agg', 'Hag', 'Ag', 'Zech', 'Zach', 'Zec', 'Za', 'Mal', 'Ml',
+      'Matt', 'Mat', 'Mt', 'Marc', 'Mark', 'Mar', 'Mc', 'Mk', 'Luk', 'Luc', 'Lc', 'Lk', 'Joh', 'Jn',
+      'Acts', 'Act', 'Ac', 'Rom', 'Rm', 'Ro', 'Galat', 'Gal', 'Ga', 'Éphés', 'Ephes', 'Éph', 'Eph',
+      'Philip', 'Phil', 'Php', 'Phi', 'Ph', 'Coloss', 'Col', 'Tit', 'Tt', 'Philem', 'Philém', 'Phm', 'Phl',
+      'Hébr', 'Hebr', 'Héb', 'Heb', 'Jacq', 'Jam', 'Jac', 'Jas', 'Jc', 'Jud', 'Jd', 'Apoc', 'Rev', 'Apo', 'Ap'
+    ];
 
-      // Abréviations simples NT
-      'Matt?', 'Mat', 'Mt\\b', 'Marc?', 'Mar', 'Mc\\b', 'Luc?', 'Luk', 'Lc\\b', 'Joh', 'Jn\\b',
-      'Act', 'Ac\\b', 'Rom', 'Rm\\b', 'Ro\\b', 'Gal', 'Ga\\b', 'Éph', 'Eph', 'Phil', 'Phi\\b', 'Php', 'Ph\\b',
-      'Col', 'Tit', 'Tt\\b', 'Philém?', 'Phm', 'Héb', 'Heb', 'Jacq?', 'Jac', 'Jc\\b', 'Jam',
-      'Jud', 'Jd\\b', 'Apoc?', 'Apo', 'Ap\\b', 'Rev'
-    ].join('|');
+    const bookPatternStr = bookNames.sort((a, b) => b.length - a.length).join('|');
 
-    // Détection du livre initial (+ point optionnel) + chapitre + verset et chaîne de sous-références
-    // Exemple: Gn. 5:12-17, Luc 3:37, Néhémie (11:4), Jean 3:16, 1 Co 13:4
-    const clusterRegex = new RegExp(`(\\b(?:${bookNamesPattern})\\.?)\\s*(\\([0-9]{1,3}(?:\\s*[:.,]\\s*[0-9]{1,3}(?:\\s*-\\s*[0-9]{1,3})?)?\\)|[0-9]{1,3}(?:\\s*[:.,]\\s*[0-9]{1,3}(?:\\s*-\\s*[0-9]{1,3})?)?)((?:\\s*[,;]\\s*[0-9]{1,3}(?:\\s*[:.,]\\s*[0-9]{1,3}(?:\\s*-\\s*[0-9]{1,3})?)?(?!\\s*[a-zA-ZÀ-ÿ]))*)`, 'gi');
+    // Détection universelle avec support des tirets cadratins (\u2013, \u2014) et sous-références
+    const scriptureRegex = new RegExp(
+      `(?<=^|[\\s\\(\\[\\{;,-])((?:${bookPatternStr})\\.?)\\s*([0-9]{1,3})\\s*[:.,]\\s*([0-9]{1,3}(?:\\s*[-–—\\u2013\\u2014]\\s*[0-9]{1,3})?)((?:\\s*[,;]\\s*[0-9]{1,3}(?:\\s*[:.,]\\s*[0-9]{1,3}(?:\\s*[-–—\\u2013\\u2014]\\s*[0-9]{1,3})?)?(?!\\s*[a-zA-ZÀ-ÿ]))*)`,
+      'gi'
+    );
 
-    return text.replace(clusterRegex, (fullMatch, book, chVsRaw, chainedPart) => {
+    return text.replace(scriptureRegex, (fullMatch, book, ch, vs, chained) => {
       const cleanBook = book.replace(/\.$/, '').trim();
-      let isParenCv = chVsRaw.startsWith('(') && chVsRaw.endsWith(')');
-      let chVs = isParenCv ? chVsRaw.slice(1, -1).trim() : chVsRaw.trim();
-      if (!chVs) return fullMatch;
+      const cleanVs = vs.replace(/[\u2013\u2014\u2212\u2010\u2011\u2012\u2015]/g, '-').replace(/\s+/g, '');
+      const firstRef = `${cleanBook} ${ch}:${cleanVs}`;
+      let result = `<span class="theol-inline-scripture-ref" data-ref="${TheologyView.escapeHtml(firstRef)}">${book} ${ch}.${vs}</span>`;
 
-      const parseCv = (cv) => {
-        const parts = cv.split(/[:.,]/);
-        const ch = parts[0].trim();
-        const vs = parts[1] ? parts[1].trim().replace(/\s+/g, '') : '';
-        return { ch, vs, fullRef: vs ? `${cleanBook} ${ch}:${vs}` : `${cleanBook} ${ch}` };
-      };
-
-      const first = parseCv(chVs);
-      let result = `<span class="theol-inline-scripture-ref" data-ref="${TheologyView.escapeHtml(first.fullRef)}">${book} ${isParenCv ? '(' + chVs + ')' : chVs}</span>`;
-
-      if (chainedPart) {
-        const subRegex = /([,;]\s*)([0-9]{1,3}(?:\s*[:.,]\s*[0-9]{1,3}(?:\s*-\\s*[0-9]{1,3})?)?)/g;
-        const formattedChained = chainedPart.replace(subRegex, (m, sep, cv) => {
-          const sub = parseCv(cv);
-          return `${sep}<span class="theol-inline-scripture-ref" data-ref="${TheologyView.escapeHtml(sub.fullRef)}">${cv}</span>`;
+      if (chained) {
+        const subRegex = /([,;]\s*)([0-9]{1,3}(?:\s*[:.,]\s*[0-9]{1,3}(?:\s*[-–—\u2013\u2014]\s*[0-9]{1,3})?)?)/g;
+        const formattedChained = chained.replace(subRegex, (m, sep, subCv) => {
+          const parts = subCv.split(/[:.,]/);
+          const subCh = parts[0].trim();
+          const subVs = parts[1] ? parts[1].replace(/[\u2013\u2014\u2212\u2010\u2011\u2012\u2015]/g, '-').replace(/\s+/g, '') : '';
+          const subRef = subVs ? `${cleanBook} ${subCh}:${subVs}` : `${cleanBook} ${subCh}`;
+          return `${sep}<span class="theol-inline-scripture-ref" data-ref="${TheologyView.escapeHtml(subRef)}">${subCv}</span>`;
         });
         result += formattedChained;
       }
@@ -2210,12 +2224,18 @@ const FootnoteTooltip = {
     this.activeTarget = targetEl;
     this.activeFnId = fnId;
 
-    const formattedText = TheologyView.highlightScriptureReferences(text);
+    const formattedText = TheologyView.linkifyUrls(TheologyView.highlightScriptureReferences(text));
 
     this.tooltipEl.innerHTML = `
       <div class="theol-fn-popover-header">
         <div class="theol-fn-popover-badge">
-          <span>📝 Note ${TheologyView.escapeHtml(String(fnId))}</span>
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:middle; margin-right:4px;">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+          <span>Note ${TheologyView.escapeHtml(String(fnId))}</span>
         </div>
         <button type="button" class="theol-fn-popover-jump" data-fn-id="${fnId}">
           Voir en bas ↓
