@@ -458,41 +458,9 @@ const DictView = {
 
     const heroTitle = document.getElementById('dict-hero-title');
     const heroBadge = document.getElementById('dict-hero-badge');
-    const bodyEl = document.getElementById('dict-article-body');
-    const tabsContainer = document.getElementById('dict-sources-tabs-list');
 
     if (heroTitle) heroTitle.textContent = data.title;
-    if (heroBadge) heroBadge.textContent = data.badge || data.dict_name || 'Dictionnaire';
-
-    // Rendre les onglets multi-sources
-    if (tabsContainer) {
-      tabsContainer.innerHTML = '';
-
-      this.currentMatches.forEach((m, idx) => {
-        const btn = document.createElement('button');
-        btn.className = `dict-source-pill ${this.activeSourceIndex === idx ? 'active' : ''}`;
-        btn.innerHTML = `<span>📖</span><span>${m.badge || m.dict_name}</span>`;
-        btn.addEventListener('click', () => {
-          this.activeSourceIndex = idx;
-          this.renderSelectedSourceMatch();
-        });
-        tabsContainer.appendChild(btn);
-      });
-
-      // Onglet Wikipédia
-      const wikiIdx = this.currentMatches.length;
-      const wikiBtn = document.createElement('button');
-      wikiBtn.className = `dict-source-pill ${this.activeSourceIndex === wikiIdx ? 'active' : ''}`;
-      wikiBtn.innerHTML = `<span style="display:inline-flex; align-items:center; gap:4px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Wikipédia</span>`;
-      wikiBtn.addEventListener('click', () => {
-        this.activeSourceIndex = wikiIdx;
-        this.renderWikipedia(bodyEl);
-        document.querySelectorAll('#dict-sources-tabs-list .dict-source-pill').forEach((b, i) => {
-          b.classList.toggle('active', i === wikiIdx);
-        });
-      });
-      tabsContainer.appendChild(wikiBtn);
-    }
+    if (heroBadge) heroBadge.textContent = data.badge || data.dict_name || this.activeDictInfo?.name || 'Dictionnaire';
 
     this.renderSelectedSourceMatch();
   },
@@ -500,10 +468,6 @@ const DictView = {
   renderSelectedSourceMatch() {
     const bodyEl = document.getElementById('dict-article-body');
     if (!bodyEl) return;
-
-    document.querySelectorAll('#dict-sources-tabs-list .dict-source-pill').forEach((b, i) => {
-      b.classList.toggle('active', i === this.activeSourceIndex);
-    });
 
     const match = this.currentMatches[this.activeSourceIndex] || this.currentEntryData;
     if (!match) {
