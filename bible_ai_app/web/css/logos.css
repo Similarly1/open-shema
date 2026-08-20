@@ -9548,15 +9548,18 @@ body.palette-dark-cyber {
 
 .shine-text,
 .ai-shine-text,
-.ai-shining-container,
-.dict-entry-body.ai-shining-container,
-.dict-entry-body-content.ai-shining-container,
-#match-body-text.ai-shining-container,
-#dict-article-body .ai-shining-container,
-.comm-view-reading-body.ai-shining-container,
-.comm-single-body.ai-shining-container,
-.theol-reading-body.ai-shining-container,
-.theol-summary-encart-body.ai-shining-container {
+.ai-shining-container > p,
+.ai-shining-container > h1,
+.ai-shining-container > h2,
+.ai-shining-container > h3,
+.ai-shining-container > h4,
+.ai-shining-container > h5,
+.ai-shining-container > h6,
+.ai-shining-container > ul > li,
+.ai-shining-container > ol > li,
+.ai-shining-container > blockquote,
+.ai-shining-container > div > p,
+.ai-shining-container > span {
   background: linear-gradient(
     90deg,
     var(--shine-base) 0%,
@@ -9587,24 +9590,20 @@ button .shine-text,
   display: inline-block !important;
 }
 
-/* Désactiver tout background-clip sur les sous-éléments pour éliminer tout conflit de composition Chromium */
-.shine-text *,
-.ai-shining-container *,
-.dict-entry-body.ai-shining-container *,
-.dict-entry-body-content.ai-shining-container *,
-#match-body-text.ai-shining-container *,
-#dict-article-body .ai-shining-container *,
-.comm-view-reading-body.ai-shining-container *,
-.comm-single-body.ai-shining-container *,
-.theol-reading-body.ai-shining-container *,
-.theol-summary-encart-body.ai-shining-container * {
+/* Ensure no background overrides on descendants that need to be transparent */
+.ai-shining-container p *,
+.ai-shining-container h1 *,
+.ai-shining-container h2 *,
+.ai-shining-container h3 *,
+.ai-shining-container h4 *,
+.ai-shining-container h5 *,
+.ai-shining-container h6 *,
+.ai-shining-container li * {
   background: transparent !important;
-  -webkit-background-clip: border-box !important;
-  background-clip: border-box !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   color: transparent !important;
-  animation: none !important;
-  text-shadow: none !important;
 }
 
 /* BANDEAU FLOTTANT MODERNE LORS DU TRAITEMENT IA */

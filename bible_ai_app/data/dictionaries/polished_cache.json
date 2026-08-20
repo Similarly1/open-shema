@@ -173,5 +173,19 @@
     "model": "mistralai/Ministral-3-14B-Instruct-2512",
     "dict_id": "calmet",
     "slug": "eaux"
+  },
+  "vigouroux:troisieme": {
+    "title": "TROISIÈME",
+    "text": "# **TROISIÈME**\n\n**VILLE** *(ou *Troisième Ville* en contexte assyrien/babylonien)*\n- **Localisation et contexte archéologique** :\n  - Située à **13 mètres de profondeur** (selon les fouilles rapportées).\n  - Série de **chambres adossées au mur septentrional** d’un édifice ou d’un complexe (identification incertaine, mais probablement liée à un palais ou un temple assyrien).\n\n- **Découvertes majeures** :\n  - **Pièce archéologique clé** :\n    - Une **tablette cunéiforme** (mentionnée plus loin dans le dictionnaire, *voir* : **TABLETTES CUNÉIFORMES**).\n  - **Objets métalliques en bronze** :\n    - Pointes de lances.\n    - Poinçons (outils ou armes ?).\n    - Épingles à cheveux.\n    - Aiguilles.\n    - Couteaux (usage domestique ou rituel ?).\n  - **Stratigraphie et couches géologiques** :\n    - Au-dessus du site, un **lit de cendres** (situé approximativement au **milieu de la colline fouillée**).\n    - **Alternance de strates** :\n      - Poussière noire et blanche.\n      - Charbon et chaux.\n      - Épaisseur variable : **1 à 2 mètres**.\n    - **Traces organiques et anthropiques** :\n      - Os fragmentés (animaux ? humains ?).\n      - Débris de poterie (éclats ou vases entiers ?).\n    - **Interprétation** :\n      - Amas **mystérieux** (terme de l’auteur), suggérant soit un **incendie ancien**, soit un **dépôt rituel** ou une **couche de destruction** (cf. *Troisième Ville* comme site de bataille ou de sacrifice).\n\n---\n*Voir aussi* :\n- **ASSUR**\n- **FOUILLES DE NIMROUD**\n- **INSCRIPTIONS CUNÉIFORMES**\n- **STRATIGRAPHIE BABYLONIENNE**",
+    "model": "mistralai/Ministral-3-14B-Instruct-2512",
+    "dict_id": "vigouroux",
+    "slug": "troisieme"
+  },
+  "vigouroux:troisième": {
+    "title": "TROISIÈME",
+    "text": "# **TROISIÈME**\n\n**VILLE** *(ou *Troisième Ville* en contexte assyrien/babylonien)*\n- **Localisation et contexte archéologique** :\n  - Située à **13 mètres de profondeur** (selon les fouilles rapportées).\n  - Série de **chambres adossées au mur septentrional** d’un édifice ou d’un complexe (identification incertaine, mais probablement liée à un palais ou un temple assyrien).\n\n- **Découvertes majeures** :\n  - **Pièce archéologique clé** :\n    - Une **tablette cunéiforme** (mentionnée plus loin dans le dictionnaire, *voir* : **TABLETTES CUNÉIFORMES**).\n  - **Objets métalliques en bronze** :\n    - Pointes de lances.\n    - Poinçons (outils ou armes ?).\n    - Épingles à cheveux.\n    - Aiguilles.\n    - Couteaux (usage domestique ou rituel ?).\n  - **Stratigraphie et couches géologiques** :\n    - Au-dessus du site, un **lit de cendres** (situé approximativement au **milieu de la colline fouillée**).\n    - **Alternance de strates** :\n      - Poussière noire et blanche.\n      - Charbon et chaux.\n      - Épaisseur variable : **1 à 2 mètres**.\n    - **Traces organiques et anthropiques** :\n      - Os fragmentés (animaux ? humains ?).\n      - Débris de poterie (éclats ou vases entiers ?).\n    - **Interprétation** :\n      - Amas **mystérieux** (terme de l’auteur), suggérant soit un **incendie ancien**, soit un **dépôt rituel** ou une **couche de destruction** (cf. *Troisième Ville* comme site de bataille ou de sacrifice).\n\n---\n*Voir aussi* :\n- **ASSUR**\n- **FOUILLES DE NIMROUD**\n- **INSCRIPTIONS CUNÉIFORMES**\n- **STRATIGRAPHIE BABYLONIENNE**",
+    "model": "mistralai/Ministral-3-14B-Instruct-2512",
+    "dict_id": "vigouroux",
+    "slug": "troisieme"
   }
 }
