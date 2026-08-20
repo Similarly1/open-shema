@@ -241,14 +241,23 @@ body.reading-bg-white .reading-pane,
 body.reading-bg-white .pane-scrollable-content,
 body.reading-bg-white .reader-workspace .commentary-viewer-panel,
 body.reading-bg-white #view-commentaries,
-body.reading-bg-white #view-commentaries .comm-view-main-scroll {
+body.reading-bg-white #view-commentaries .comm-view-main-scroll,
+body.reading-bg-white #view-theology,
+body.reading-bg-white #view-theology .theol-view-main-scroll,
+body.reading-bg-white #view-theology .theol-reading-container,
+body.reading-bg-white #view-theology .theol-article-card,
+body.reading-bg-white #view-dictionary,
+body.reading-bg-white #view-dictionary .dict-view-main-scroll,
+body.reading-bg-white #view-dictionary .dict-article-card {
   background-color: #F8FAFC !important;
   color: #1E293B !important;
 }
 body.reading-bg-white #view-commentaries .comm-article-card,
 body.reading-bg-white #view-commentaries .comm-verse-banner,
 body.reading-bg-white #view-commentaries .comm-active-book-btn,
-body.reading-bg-white #view-commentaries .comm-page-synth-card {
+body.reading-bg-white #view-commentaries .comm-page-synth-card,
+body.reading-bg-white #view-theology .theol-article-card,
+body.reading-bg-white #view-dictionary .dict-article-card {
   background-color: #FFFFFF !important;
   border-color: #E2E8F0 !important;
   color: #0F172A !important;
@@ -258,8 +267,58 @@ body.reading-bg-white .reader-workspace .comm-body-text,
 body.reading-bg-white #view-commentaries .comm-view-reading-body,
 body.reading-bg-white #view-commentaries .comm-verse-banner-text,
 body.reading-bg-white #view-commentaries .comm-author-headline-name,
-body.reading-bg-white #view-commentaries .comm-active-book-title {
+body.reading-bg-white #view-commentaries .comm-active-book-title,
+body.reading-bg-white #view-theology .theol-reading-body,
+body.reading-bg-white #view-theology .theol-reading-p,
+body.reading-bg-white #view-theology .theol-reading-title,
+body.reading-bg-white #view-theology .theol-chapter-title,
+body.reading-bg-white #view-theology .theol-header-book-title,
+body.reading-bg-white #view-theology .theol-header-chapter-name,
+body.reading-bg-white #view-theology .theol-reading-meta-tag,
+body.reading-bg-white #view-dictionary .dict-entry-body,
+body.reading-bg-white #view-dictionary .dict-entry-title,
+body.reading-bg-white #view-dictionary #match-body-text,
+body.reading-bg-white #view-dictionary #dict-match-body {
   color: #0F172A !important;
+}
+body.reading-bg-white .theol-translation-banner {
+  background: #F1F5F9 !important;
+  border: 1px solid #CBD5E1 !important;
+}
+body.reading-bg-white .theol-trans-banner-title {
+  color: #0F172A !important;
+}
+body.reading-bg-white .theol-trans-banner-desc {
+  color: #475569 !important;
+}
+body.reading-bg-white .theol-summary-encart {
+  background: #FFFFFF !important;
+  border: 1px solid #CBD5E1 !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06) !important;
+}
+body.reading-bg-white .theol-summary-encart-header {
+  border-bottom: 1px solid #E2E8F0 !important;
+}
+body.reading-bg-white .theol-summary-encart-title {
+  color: #0F172A !important;
+}
+body.reading-bg-white .theol-summary-encart-sub {
+  color: #64748B !important;
+}
+body.reading-bg-white .theol-summary-encart-body,
+body.reading-bg-white .theol-summary-encart-body p,
+body.reading-bg-white .theol-summary-encart-body li,
+body.reading-bg-white .theol-summary-encart-body blockquote {
+  color: #1E293B !important;
+}
+body.reading-bg-white .theol-summary-encart-body strong {
+  color: #0F172A !important;
+  font-weight: 700;
+}
+body.reading-bg-white .theol-summary-encart-body h1,
+body.reading-bg-white .theol-summary-encart-body h2,
+body.reading-bg-white .theol-summary-encart-body h3 {
+  color: #0284C7 !important;
 }
 body.reading-bg-white #view-commentaries .comm-author-headline-period,
 body.reading-bg-white #view-commentaries .comm-active-book-meta {
@@ -286,14 +345,23 @@ body.reading-bg-sepia .reading-pane,
 body.reading-bg-sepia .pane-scrollable-content,
 body.reading-bg-sepia .reader-workspace .commentary-viewer-panel,
 body.reading-bg-sepia #view-commentaries,
-body.reading-bg-sepia #view-commentaries .comm-view-main-scroll {
+body.reading-bg-sepia #view-commentaries .comm-view-main-scroll,
+body.reading-bg-sepia #view-theology,
+body.reading-bg-sepia #view-theology .theol-view-main-scroll,
+body.reading-bg-sepia #view-theology .theol-reading-container,
+body.reading-bg-sepia #view-theology .theol-article-card,
+body.reading-bg-sepia #view-dictionary,
+body.reading-bg-sepia #view-dictionary .dict-view-main-scroll,
+body.reading-bg-sepia #view-dictionary .dict-article-card {
   background-color: #F3E5C8 !important;
   color: #382E25 !important;
 }
 body.reading-bg-sepia #view-commentaries .comm-article-card,
 body.reading-bg-sepia #view-commentaries .comm-verse-banner,
 body.reading-bg-sepia #view-commentaries .comm-active-book-btn,
-body.reading-bg-sepia #view-commentaries .comm-page-synth-card {
+body.reading-bg-sepia #view-commentaries .comm-page-synth-card,
+body.reading-bg-sepia #view-theology .theol-article-card,
+body.reading-bg-sepia #view-dictionary .dict-article-card {
   background-color: #FBF0D9 !important;
   border-color: #E5D5B5 !important;
   color: #281E15 !important;
@@ -303,8 +371,58 @@ body.reading-bg-sepia .reader-workspace .comm-body-text,
 body.reading-bg-sepia #view-commentaries .comm-view-reading-body,
 body.reading-bg-sepia #view-commentaries .comm-verse-banner-text,
 body.reading-bg-sepia #view-commentaries .comm-author-headline-name,
-body.reading-bg-sepia #view-commentaries .comm-active-book-title {
+body.reading-bg-sepia #view-commentaries .comm-active-book-title,
+body.reading-bg-sepia #view-theology .theol-reading-body,
+body.reading-bg-sepia #view-theology .theol-reading-p,
+body.reading-bg-sepia #view-theology .theol-reading-title,
+body.reading-bg-sepia #view-theology .theol-chapter-title,
+body.reading-bg-sepia #view-theology .theol-header-book-title,
+body.reading-bg-sepia #view-theology .theol-header-chapter-name,
+body.reading-bg-sepia #view-theology .theol-reading-meta-tag,
+body.reading-bg-sepia #view-dictionary .dict-entry-body,
+body.reading-bg-sepia #view-dictionary .dict-entry-title,
+body.reading-bg-sepia #view-dictionary #match-body-text,
+body.reading-bg-sepia #view-dictionary #dict-match-body {
   color: #281E15 !important;
+}
+body.reading-bg-sepia .theol-translation-banner {
+  background: #EFE2C6 !important;
+  border: 1px solid #D8C7AD !important;
+}
+body.reading-bg-sepia .theol-trans-banner-title {
+  color: #281E15 !important;
+}
+body.reading-bg-sepia .theol-trans-banner-desc {
+  color: #574B3C !important;
+}
+body.reading-bg-sepia .theol-summary-encart {
+  background: #FAF2E1 !important;
+  border: 1px solid #DEC8A9 !important;
+  box-shadow: 0 4px 18px rgba(40, 30, 21, 0.06) !important;
+}
+body.reading-bg-sepia .theol-summary-encart-header {
+  border-bottom: 1px solid #E5D5B5 !important;
+}
+body.reading-bg-sepia .theol-summary-encart-title {
+  color: #281E15 !important;
+}
+body.reading-bg-sepia .theol-summary-encart-sub {
+  color: #7D6752 !important;
+}
+body.reading-bg-sepia .theol-summary-encart-body,
+body.reading-bg-sepia .theol-summary-encart-body p,
+body.reading-bg-sepia .theol-summary-encart-body li,
+body.reading-bg-sepia .theol-summary-encart-body blockquote {
+  color: #2C241B !important;
+}
+body.reading-bg-sepia .theol-summary-encart-body strong {
+  color: #1A130D !important;
+  font-weight: 700;
+}
+body.reading-bg-sepia .theol-summary-encart-body h1,
+body.reading-bg-sepia .theol-summary-encart-body h2,
+body.reading-bg-sepia .theol-summary-encart-body h3 {
+  color: #92400E !important;
 }
 body.reading-bg-sepia #view-commentaries .comm-author-headline-period,
 body.reading-bg-sepia #view-commentaries .comm-active-book-meta {
@@ -9535,6 +9653,20 @@ body.palette-dark-cyber {
   --shine-mid: #38bdf8;
   --shine-peak: #ffffff;
   --shine-glow: rgba(56, 189, 248, 0.95);
+}
+
+body.reading-bg-white .reader-workspace,
+body.reading-bg-white #view-theology,
+body.reading-bg-white #view-dictionary,
+body.reading-bg-white #view-commentaries,
+body.reading-bg-sepia .reader-workspace,
+body.reading-bg-sepia #view-theology,
+body.reading-bg-sepia #view-dictionary,
+body.reading-bg-sepia #view-commentaries {
+  --shine-base: rgba(71, 85, 105, 0.55);
+  --shine-mid: #0284c7;
+  --shine-peak: #0f172a;
+  --shine-glow: rgba(2, 132, 199, 0.85);
 }
 
 @keyframes shine-sweep {
