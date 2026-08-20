@@ -319,6 +319,12 @@ const DisplayOptions = {
       BibleReader.parenthesesMode = savedParenMode;
       const parenRadio = document.querySelector(`input[name="opt-parentheses-mode"][value="${savedParenMode}"]`);
       if (parenRadio) parenRadio.checked = true;
+
+      // Mode d'affichage des séparateurs poétiques / césures
+      const savedCaesuraMode = localStorage.getItem('bible_reader_caesura_mode') || 'indent';
+      BibleReader.caesuraMode = savedCaesuraMode;
+      const caesuraRadio = document.querySelector(`input[name="opt-caesura-mode"][value="${savedCaesuraMode}"]`);
+      if (caesuraRadio) caesuraRadio.checked = true;
     } catch (e) {}
 
     btn.addEventListener('click', async (e) => {
@@ -351,6 +357,11 @@ const DisplayOptions = {
         BibleReader.parenthesesMode = savedParenMode;
         const parenRadio = document.querySelector(`input[name="opt-parentheses-mode"][value="${savedParenMode}"]`);
         if (parenRadio) parenRadio.checked = true;
+
+        const savedCaesuraMode = localStorage.getItem('bible_reader_caesura_mode') || 'indent';
+        BibleReader.caesuraMode = savedCaesuraMode;
+        const caesuraRadio = document.querySelector(`input[name="opt-caesura-mode"][value="${savedCaesuraMode}"]`);
+        if (caesuraRadio) caesuraRadio.checked = true;
       } catch (e) {}
       popover.classList.toggle('hidden');
     });
@@ -426,6 +437,19 @@ const DisplayOptions = {
           BibleReader.parenthesesMode = e.target.value;
           try {
             localStorage.setItem('bible_reader_parentheses_mode', BibleReader.parenthesesMode);
+          } catch (err) {}
+          BibleReader.reloadCurrentChapters();
+        }
+      });
+    });
+
+    // Choix du mode d'affichage des séparateurs poétiques
+    document.querySelectorAll('input[name="opt-caesura-mode"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        if (e.target.checked) {
+          BibleReader.caesuraMode = e.target.value;
+          try {
+            localStorage.setItem('bible_reader_caesura_mode', BibleReader.caesuraMode);
           } catch (err) {}
           BibleReader.reloadCurrentChapters();
         }
@@ -2568,6 +2592,7 @@ const BibleReader = {
   zoomPercent: 100,
   bracketsMode: 'classic',
   parenthesesMode: 'callout',
+  caesuraMode: 'indent',
 
   installedBibles: [],
   targetPaneForPicker: 1,
@@ -2579,6 +2604,7 @@ const BibleReader = {
   async init() {
     this.bracketsMode = localStorage.getItem('bible_reader_brackets_mode') || 'classic';
     this.parenthesesMode = localStorage.getItem('bible_reader_parentheses_mode') || 'callout';
+    this.caesuraMode = localStorage.getItem('bible_reader_caesura_mode') || 'indent';
     this.bindEvents();
     TabsManager.init();
     DisplayOptions.init();
@@ -3595,13 +3621,21 @@ const BibleReader = {
               // Si mode classic, continuer vers le découpage en tokens normal
             }
 
-            // Découpage en tokens des mots
-            const cleanChunk = (part || '').replace(/<[^>]+>/g, '');
+            // Découpage en tokens des mots avec gestion des séparateurs poétiques
+            let cleanChunk = (part || '').replace(/<[^>]+>/g, '');
+            if (this.caesuraMode === 'indent') {
+              cleanChunk = cleanChunk.replace(/[\u2575\u2577\u2502|¦]\s*/g, ' ___POETIC_CAESURA_BREAK___ ');
+            } else if (this.caesuraMode === 'hidden') {
+              cleanChunk = cleanChunk.replace(/[\u2575\u2577\u2502|¦]\s*/g, ' ');
+            }
+
             const tokens = cleanChunk.split(/(\s+)/);
 
             tokens.forEach(tok => {
               if (!tok || /^\s+$/.test(tok)) {
                 formattedHtml += tok;
+              } else if (tok === '___POETIC_CAESURA_BREAK___') {
+                formattedHtml += '<span class="poetic-caesura-break"><br><span class="poetic-tab"></span></span>';
               } else {
                 const hasOpeningBracket = tok.includes('[');
                 const hasClosingBracket = tok.includes(']');
@@ -3624,7 +3658,7 @@ const BibleReader = {
 
                 if (hasClosingBracket) inBracket = false;
 
-                const cleanWord = tok.replace(/^[«"'(]+|[»"') ,;:!?.…]+$/g, '').replace(/[\[\]]/g, '');
+                const cleanWord = tok.replace(/^[«"'(]+|[»"') ,;:!?.…]+$/g, '').replace(/[\[\]\u2575\u2577\u2502|¦]/g, '');
                 formattedHtml += `<span class="word-token ${isItalic ? 'bracket-interpolated-italic' : ''}" data-word="${cleanWord}" data-verse="${v.verse}">${displayTok}</span>`;
               }
             });

@@ -1454,6 +1454,20 @@ body.sidebar-is-collapsed .topbar-left-zone .quick-passage-box {
   font-style: italic;
 }
 
+.poetic-caesura-break {
+  display: inline;
+}
+.poetic-caesura-break br {
+  display: block;
+  content: "";
+  margin-top: 0.15em;
+}
+.poetic-tab {
+  display: inline-block;
+  width: 1.85em;
+  user-select: none;
+}
+
 .verse-item {
   display: inline;
   margin-right: 0.35em;

@@ -322,6 +322,26 @@
 
                 <div style="border-top: 1px solid var(--border-color); margin: 12px 0 4px 0; padding-top: 10px;">
                   <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
+                    Séparateurs poétiques / Césures (╵, |, ¦)
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
+                    <label class="custom-radio">
+                      <input type="radio" name="opt-caesura-mode" value="indent" checked id="opt-caesura-indent">
+                      <span><strong>Retour poétique indenté :</strong> saut de ligne et retrait (Par défaut)</span>
+                    </label>
+                    <label class="custom-radio">
+                      <input type="radio" name="opt-caesura-mode" value="hidden" id="opt-caesura-hidden">
+                      <span><strong>Texte fluide :</strong> supprimer les traits (lecture continue)</span>
+                    </label>
+                    <label class="custom-radio">
+                      <input type="radio" name="opt-caesura-mode" value="classic" id="opt-caesura-classic">
+                      <span><strong>Classique d'origine :</strong> garder le trait ╵ visible</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div style="border-top: 1px solid var(--border-color); margin: 12px 0 4px 0; padding-top: 10px;">
+                  <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
                     Fond de Lecture
                   </div>
                   <div class="reading-bg-quick-row">
