@@ -1383,6 +1383,77 @@ body.sidebar-is-collapsed .topbar-left-zone .quick-passage-box {
   margin: 0;
 }
 
+.note-callout-marker {
+  font-family: var(--font-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  font-size: calc(10.5px * var(--bible-zoom-scale, 1));
+  font-weight: 700;
+  color: var(--accent-blue, #2563eb);
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  border-radius: 4px;
+  padding: 0 4px;
+  margin: 0 3px 0 2px;
+  cursor: pointer;
+  user-select: none;
+  vertical-align: super;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.2;
+}
+.note-callout-marker:hover {
+  background: var(--accent-blue, #2563eb);
+  color: #ffffff;
+  border-color: var(--accent-blue, #2563eb);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+  transform: translateY(-1px);
+}
+
+.translation-note-hover-popover {
+  position: fixed;
+  z-index: 9999;
+  width: 280px;
+  max-width: calc(100vw - 32px);
+  padding: 10px 14px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.1);
+  pointer-events: auto;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  backdrop-filter: blur(12px);
+}
+.translation-note-hover-popover.hidden {
+  display: none !important;
+}
+.note-tooltip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 11px;
+}
+.note-tooltip-badge {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent-blue, #2563eb);
+  font-size: 10px;
+}
+.note-tooltip-ref {
+  font-size: 10px;
+  color: var(--text-muted, #94a3b8);
+  font-weight: 600;
+}
+.note-tooltip-body {
+  font-family: var(--font-bible, "Cardo", Georgia, serif);
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--text-primary, #1e293b);
+  font-style: italic;
+}
+
 .verse-item {
   display: inline;
   margin-right: 0.35em;

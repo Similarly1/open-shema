@@ -313,6 +313,12 @@ const DisplayOptions = {
       BibleReader.bracketsMode = savedBracketsMode;
       const bracketRadio = document.querySelector(`input[name="opt-brackets-mode"][value="${savedBracketsMode}"]`);
       if (bracketRadio) bracketRadio.checked = true;
+
+      // Mode d'affichage des notes entre parenthèses
+      const savedParenMode = localStorage.getItem('bible_reader_parentheses_mode') || 'callout';
+      BibleReader.parenthesesMode = savedParenMode;
+      const parenRadio = document.querySelector(`input[name="opt-parentheses-mode"][value="${savedParenMode}"]`);
+      if (parenRadio) parenRadio.checked = true;
     } catch (e) {}
 
     btn.addEventListener('click', async (e) => {
@@ -340,6 +346,11 @@ const DisplayOptions = {
         BibleReader.bracketsMode = savedBracketsMode;
         const bracketRadio = document.querySelector(`input[name="opt-brackets-mode"][value="${savedBracketsMode}"]`);
         if (bracketRadio) bracketRadio.checked = true;
+
+        const savedParenMode = localStorage.getItem('bible_reader_parentheses_mode') || 'callout';
+        BibleReader.parenthesesMode = savedParenMode;
+        const parenRadio = document.querySelector(`input[name="opt-parentheses-mode"][value="${savedParenMode}"]`);
+        if (parenRadio) parenRadio.checked = true;
       } catch (e) {}
       popover.classList.toggle('hidden');
     });
@@ -402,6 +413,19 @@ const DisplayOptions = {
           BibleReader.bracketsMode = e.target.value;
           try {
             localStorage.setItem('bible_reader_brackets_mode', BibleReader.bracketsMode);
+          } catch (err) {}
+          BibleReader.reloadCurrentChapters();
+        }
+      });
+    });
+
+    // Choix du mode d'affichage des notes entre parenthèses
+    document.querySelectorAll('input[name="opt-parentheses-mode"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        if (e.target.checked) {
+          BibleReader.parenthesesMode = e.target.value;
+          try {
+            localStorage.setItem('bible_reader_parentheses_mode', BibleReader.parenthesesMode);
           } catch (err) {}
           BibleReader.reloadCurrentChapters();
         }
@@ -1633,6 +1657,81 @@ const GeoPassageHoverManager = {
 };
 
 
+// 4. GESTIONNAIRE D'INFOBULLES POUR LES NOTES DE TRADUCTION & VARIANTES
+const NOTE_PREFIX_REGEX = /^\(\s*(?:Ou\b|H[ée]b\.|Heb\.|Grec\b|Litt\.|Aram\.|C\.-à-d\.|C'est-à-dire\b|Voy\.|Voir\b|Autre lecture\b|Ms\.|LXX\b|Vulgate\b|Vulg\.|Syriaque\b|Syr\.|Targum\b|Samaritain\b|Chald\.|Selon d'autres\b|En hébreu\b|En grec\b|Trad\. litt\.|Var\.)/i;
+
+const TranslationNoteHoverManager = {
+  popoverEl: null,
+  hideTimeout: null,
+
+  init() {
+    if (!this.popoverEl) {
+      this.popoverEl = document.getElementById('translation-note-hover-popover');
+      if (!this.popoverEl) {
+        this.popoverEl = document.createElement('div');
+        this.popoverEl.id = 'translation-note-hover-popover';
+        this.popoverEl.className = 'translation-note-hover-popover hidden';
+        document.body.appendChild(this.popoverEl);
+      }
+
+      this.popoverEl.addEventListener('mouseenter', () => clearTimeout(this.hideTimeout));
+      this.popoverEl.addEventListener('mouseleave', () => this.scheduleHide());
+    }
+  },
+
+  scheduleHide() {
+    this.hideTimeout = setTimeout(() => {
+      if (this.popoverEl) this.popoverEl.classList.add('hidden');
+    }, 180);
+  },
+
+  show(targetEl, noteText, verseNum = null) {
+    clearTimeout(this.hideTimeout);
+    this.init();
+    if (!this.popoverEl || !noteText) return;
+
+    let cleanNote = noteText.replace(/^\(|\)$/g, '').trim();
+    let badgeType = 'Variante / Traduction';
+    if (/^H[ée]b\./i.test(cleanNote)) badgeType = 'Hébreu (Texte Massorétique)';
+    else if (/^Grec/i.test(cleanNote)) badgeType = 'Grec (Septante / Receptus)';
+    else if (/^Litt\./i.test(cleanNote)) badgeType = 'Traduction littérale';
+    else if (/^Ou\b/i.test(cleanNote)) badgeType = 'Traduction alternative';
+    else if (/^C\.-à-d\.|^C'est-à-dire/i.test(cleanNote)) badgeType = 'Explication textuelle';
+
+    this.popoverEl.innerHTML = `
+      <div class="note-tooltip-header">
+        <span class="note-tooltip-badge">${badgeType}</span>
+        ${verseNum ? `<span class="note-tooltip-ref">Verset ${verseNum}</span>` : ''}
+      </div>
+      <div class="note-tooltip-body">
+        « ${cleanNote} »
+      </div>
+    `;
+
+    this.popoverEl.classList.remove('hidden');
+
+    const rect = targetEl.getBoundingClientRect();
+    const popRect = this.popoverEl.getBoundingClientRect();
+    const popWidth = popRect.width || 280;
+    const popHeight = popRect.height || 75;
+
+    let top = rect.top - popHeight - 8;
+    let left = rect.left + (rect.width / 2) - (popWidth / 2);
+
+    if (top < 10) {
+      top = rect.bottom + 8;
+    }
+    if (left < 10) left = 10;
+    if (left + popWidth > window.innerWidth - 10) {
+      left = window.innerWidth - popWidth - 10;
+    }
+
+    this.popoverEl.style.top = `${top}px`;
+    this.popoverEl.style.left = `${left}px`;
+  }
+};
+
+
 // 4bis. GESTIONNAIRE DE NOTES DU VOLET DROIT (Bible à gauche, Notes à droite)
 const DrawerNotesViewer = {
   currentBook: 'Gen',
@@ -2468,6 +2567,7 @@ const BibleReader = {
   interlinearLayers: { surface: true, orig: true, translit: true, strong: true },
   zoomPercent: 100,
   bracketsMode: 'classic',
+  parenthesesMode: 'callout',
 
   installedBibles: [],
   targetPaneForPicker: 1,
@@ -2478,6 +2578,7 @@ const BibleReader = {
 
   async init() {
     this.bracketsMode = localStorage.getItem('bible_reader_brackets_mode') || 'classic';
+    this.parenthesesMode = localStorage.getItem('bible_reader_parentheses_mode') || 'callout';
     this.bindEvents();
     TabsManager.init();
     DisplayOptions.init();
@@ -3473,41 +3574,60 @@ const BibleReader = {
             ? `<span class="chapter-number-dropcap">${data.chapter}</span><sup class="verse-num">${v.verse}</sup>`
             : `<sup class="verse-num">${v.verse}</sup>`;
 
-          // Découper le texte en tokens pour permettre le clic/clic droit sur chaque mot
-          const cleanText = (v.text || '').replace(/<[^>]+>/g, '');
-          const tokens = cleanText.split(/(\s+)/);
+          // Traitement combiné : notes entre parenthèses + mots entre crochets
+          const rawText = v.text || '';
+          const parts = rawText.split(/(\([^)]+\))/g);
           let formattedHtml = marginBadgeHtml + numHtml;
-
           let inBracket = false;
 
-          tokens.forEach(tok => {
-            if (!tok || /^\s+$/.test(tok)) {
-              formattedHtml += tok;
-            } else {
-              const hasOpeningBracket = tok.includes('[');
-              const hasClosingBracket = tok.includes(']');
-              const isCurrentlyBracketed = inBracket || hasOpeningBracket;
+          parts.forEach(part => {
+            if (!part) return;
 
-              if (hasOpeningBracket) inBracket = true;
-
-              let displayTok = tok;
-              let isItalic = false;
-
-              if (this.bracketsMode === 'italic') {
-                displayTok = tok.replace(/[\[\]]/g, '');
-                if (isCurrentlyBracketed) {
-                  displayTok = `<em>${displayTok}</em>`;
-                  isItalic = true;
-                }
-              } else if (this.bracketsMode === 'plain') {
-                displayTok = tok.replace(/[\[\]]/g, '');
+            // Détection intelligente : note philologique / variante entre parenthèses
+            if (part.startsWith('(') && part.endsWith(')') && NOTE_PREFIX_REGEX.test(part)) {
+              const cleanNote = part.slice(1, -1).trim();
+              if (this.parenthesesMode === 'callout') {
+                formattedHtml += `<sup class="note-callout-marker" data-note-text="${cleanNote.replace(/"/g, '&quot;')}" data-verse="${v.verse}" title="Note : ${cleanNote.replace(/"/g, '&quot;')}">ⁿ</sup>`;
+                return;
+              } else if (this.parenthesesMode === 'hidden') {
+                return;
               }
-
-              if (hasClosingBracket) inBracket = false;
-
-              const cleanWord = tok.replace(/^[«"'(]+|[»"') ,;:!?.…]+$/g, '').replace(/[\[\]]/g, '');
-              formattedHtml += `<span class="word-token ${isItalic ? 'bracket-interpolated-italic' : ''}" data-word="${cleanWord}" data-verse="${v.verse}">${displayTok}</span>`;
+              // Si mode classic, continuer vers le découpage en tokens normal
             }
+
+            // Découpage en tokens des mots
+            const cleanChunk = (part || '').replace(/<[^>]+>/g, '');
+            const tokens = cleanChunk.split(/(\s+)/);
+
+            tokens.forEach(tok => {
+              if (!tok || /^\s+$/.test(tok)) {
+                formattedHtml += tok;
+              } else {
+                const hasOpeningBracket = tok.includes('[');
+                const hasClosingBracket = tok.includes(']');
+                const isCurrentlyBracketed = inBracket || hasOpeningBracket;
+
+                if (hasOpeningBracket) inBracket = true;
+
+                let displayTok = tok;
+                let isItalic = false;
+
+                if (this.bracketsMode === 'italic') {
+                  displayTok = tok.replace(/[\[\]]/g, '');
+                  if (isCurrentlyBracketed) {
+                    displayTok = `<em>${displayTok}</em>`;
+                    isItalic = true;
+                  }
+                } else if (this.bracketsMode === 'plain') {
+                  displayTok = tok.replace(/[\[\]]/g, '');
+                }
+
+                if (hasClosingBracket) inBracket = false;
+
+                const cleanWord = tok.replace(/^[«"'(]+|[»"') ,;:!?.…]+$/g, '').replace(/[\[\]]/g, '');
+                formattedHtml += `<span class="word-token ${isItalic ? 'bracket-interpolated-italic' : ''}" data-word="${cleanWord}" data-verse="${v.verse}">${displayTok}</span>`;
+              }
+            });
           });
 
           vSpan.innerHTML = formattedHtml;
@@ -3555,6 +3675,22 @@ const BibleReader = {
         });
 
         flow.appendChild(vSpan);
+      });
+
+      // 2b. Écouteurs sur les appels de notes de traduction (Survol -> Infobulle)
+      flow.querySelectorAll('.note-callout-marker').forEach(marker => {
+        marker.addEventListener('mouseenter', (e) => {
+          e.stopPropagation();
+          TranslationNoteHoverManager.show(marker, marker.dataset.noteText, marker.dataset.verse);
+        });
+        marker.addEventListener('mouseleave', (e) => {
+          e.stopPropagation();
+          TranslationNoteHoverManager.scheduleHide();
+        });
+        marker.addEventListener('click', (e) => {
+          e.stopPropagation();
+          TranslationNoteHoverManager.show(marker, marker.dataset.noteText, marker.dataset.verse);
+        });
       });
 
       // 3. Écouteurs sur les boutons de passage de marge (Survol -> Infobulle riche & Surbrillance plage)
