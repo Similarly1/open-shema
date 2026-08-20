@@ -1679,35 +1679,63 @@ const TheologyView = {
   },
 
   isBookInEnglish(text) {
-    // 1. Détection sur le texte brut du chapitre
-    if (text && typeof text === 'string') {
-      const sample = text.slice(0, 2000).toLowerCase();
-      const englishWords = ['the', 'and', 'that', 'with', 'from', 'this', 'chapter', 'which', 'their', 'about', 'god', 'scripture'];
-      let matches = 0;
+    if (!text || typeof text !== 'string') {
+      text = this.currentChapterData?.raw_text || '';
+    }
+
+    const sample = (text ? text.slice(0, 3000) : '').toLowerCase();
+
+    // 1. Analyse statistique de fréquence de mots français vs anglais
+    if (sample.length > 30) {
+      const frenchWords = ['le', 'la', 'les', 'des', 'du', 'dans', 'pour', 'avec', 'une', 'qui', 'que', 'est', 'sont', 'cette', 'nous', 'vous', 'par', 'sur', 'mais', 'pas', 'aux', 'livre', 'chapitre', 'dieu', 'foi', 'bible', 'verset'];
+      const englishWords = ['the', 'and', 'that', 'with', 'from', 'this', 'which', 'their', 'about', 'have', 'were', 'been', 'they', 'shall', 'would', 'could', 'should', 'chapter', 'which', 'when', 'into', 'upon'];
+
+      let frCount = 0;
+      let enCount = 0;
+
+      for (const w of frenchWords) {
+        const regex = new RegExp(`\\b${w}\\b`, 'gi');
+        const matches = sample.match(regex);
+        if (matches) frCount += matches.length;
+      }
+
       for (const w of englishWords) {
-        if (new RegExp(`\\b${w}\\b`).test(sample)) matches++;
+        const regex = new RegExp(`\\b${w}\\b`, 'gi');
+        const matches = sample.match(regex);
+        if (matches) enCount += matches.length;
       }
-      if (matches >= 2) return true;
+
+      // Si le texte contient clairement des mots grammaticaux français, c'est du français
+      if (frCount >= 2 && frCount >= enCount) return false;
+      // Si les mots anglais dominent très nettement
+      if (enCount >= 4 && enCount > frCount) return true;
     }
 
-    // 2. Détection sur les titres de la table des matières (TOC)
-    if (this.tocList && this.tocList.length > 0) {
-      const tocTitles = this.tocList.map(c => c.title || '').join(' ').toLowerCase();
-      const englishTocWords = ['chapter', 'introduction', 'part', 'preface', 'the', 'of', 'doctrine', 'theology', 'god', 'church', 'christian', 'scripture'];
-      let tocMatches = 0;
-      for (const w of englishTocWords) {
-        if (new RegExp(`\\b${w}\\b`).test(tocTitles)) tocMatches++;
-      }
-      if (tocMatches >= 2) return true;
-    }
-
-    // 3. Détection sur le nom ou titre de l'ouvrage actif
+    // 2. Vérification des métadonnées du livre actif
     const currentBookObj = this.books?.find(b => b.name === this.currentBook);
-    if (currentBookObj) {
-      const titleLower = `${currentBookObj.title || ''} ${currentBookObj.name || ''}`.toLowerCase();
-      if (/\b(theology|systematic|christian|doctrine|bible|commentary|introduction|handbook|guide|survey|chapter|part)\b/.test(titleLower)) {
-        return true;
+    if (currentBookObj?.lang) {
+      const langLower = currentBookObj.lang.toLowerCase();
+      if (langLower.startsWith('fr')) return false;
+      if (langLower.startsWith('en')) return true;
+    }
+
+    // 3. Vérification des titres de la table des matières (TOC)
+    if (this.tocList && this.tocList.length > 0) {
+      const tocTitles = this.tocList.slice(0, 15).map(c => c.title || '').join(' ').toLowerCase();
+      const unambiguousFrench = ['chapitre', 'livre', 'sommaire', 'introduction', 'la', 'le', 'les', 'du', 'des', 'dans'];
+      const unambiguousEnglish = ['chapter', 'the', 'of', 'and', 'part', 'preface'];
+
+      let frToc = 0;
+      let enToc = 0;
+      for (const w of unambiguousFrench) {
+        if (new RegExp(`\\b${w}\\b`, 'i').test(tocTitles)) frToc++;
       }
+      for (const w of unambiguousEnglish) {
+        if (new RegExp(`\\b${w}\\b`, 'i').test(tocTitles)) enToc++;
+      }
+
+      if (frToc >= enToc && frToc > 0) return false;
+      if (enToc >= 2) return true;
     }
 
     return false;
