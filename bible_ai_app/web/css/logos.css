@@ -1360,6 +1360,29 @@ body.sidebar-is-collapsed .topbar-left-zone .quick-passage-box {
   text-decoration-color: rgba(2, 132, 199, 0.4);
 }
 
+.word-token.bracket-interpolated-italic em,
+.interlinear-block.bracket-interpolated-italic em {
+  font-style: italic;
+  font-family: inherit;
+  color: inherit;
+}
+
+.custom-radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 12px;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+.custom-radio input[type="radio"] {
+  cursor: pointer;
+  accent-color: var(--accent-blue);
+  margin: 0;
+}
+
 .verse-item {
   display: inline;
   margin-right: 0.35em;

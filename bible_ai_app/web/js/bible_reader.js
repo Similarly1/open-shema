@@ -173,10 +173,18 @@ const TabsManager = {
     const target = this.tabs.find(t => t.id === tabId);
     if (!target) return;
 
+    // Conserver le passage actif en cours pour ne pas revenir à Gen 1
+    const currentBook = BibleReader.currentBook || target.book || 'Gen';
+    const currentChapter = BibleReader.currentChapter || target.chapter || 1;
+    const currentVerse = BibleReader.selectedVerse || 1;
+
+    target.book = currentBook;
+    target.chapter = currentChapter;
+
     this.activeTabId = tabId;
     BibleReader.currentBible1 = target.bibleName;
-    BibleReader.currentBook = target.book || 'Gen';
-    BibleReader.currentChapter = target.chapter || 1;
+    BibleReader.currentBook = currentBook;
+    BibleReader.currentChapter = currentChapter;
     BibleReader.pane1IsInterlinear = !!target.isInterlinear;
     BibleReader.pane1InterlinearVersion = target.interlinearVersion || 'LSG';
 
@@ -189,7 +197,7 @@ const TabsManager = {
     BibleReader.updatePaneHeader(1);
     if (BibleReader.isSplitView) BibleReader.updatePaneHeader(2);
 
-    BibleReader.navigateTo(target.book, target.chapter);
+    BibleReader.navigateTo(currentBook, currentChapter, currentVerse);
     this.renderTabs();
   },
 
@@ -299,6 +307,12 @@ const DisplayOptions = {
       const chkGeo = document.getElementById('opt-show-geo-pins');
       if (chkGeo) chkGeo.checked = showGeo;
       workspace?.classList.toggle('hide-geo-pins', !showGeo);
+
+      // Mode d'affichage des mots entre crochets
+      const savedBracketsMode = localStorage.getItem('bible_reader_brackets_mode') || 'classic';
+      BibleReader.bracketsMode = savedBracketsMode;
+      const bracketRadio = document.querySelector(`input[name="opt-brackets-mode"][value="${savedBracketsMode}"]`);
+      if (bracketRadio) bracketRadio.checked = true;
     } catch (e) {}
 
     btn.addEventListener('click', async (e) => {
@@ -321,6 +335,11 @@ const DisplayOptions = {
         const chkGeo = document.getElementById('opt-show-geo-pins');
         if (chkGeo) chkGeo.checked = showGeo;
         workspace?.classList.toggle('hide-geo-pins', !showGeo);
+
+        const savedBracketsMode = localStorage.getItem('bible_reader_brackets_mode') || 'classic';
+        BibleReader.bracketsMode = savedBracketsMode;
+        const bracketRadio = document.querySelector(`input[name="opt-brackets-mode"][value="${savedBracketsMode}"]`);
+        if (bracketRadio) bracketRadio.checked = true;
       } catch (e) {}
       popover.classList.toggle('hidden');
     });
@@ -374,6 +393,19 @@ const DisplayOptions = {
 
     document.getElementById('opt-font-serif')?.addEventListener('change', (e) => {
       workspace?.classList.toggle('font-sans', !e.target.checked);
+    });
+
+    // Choix du mode d'affichage des crochets
+    document.querySelectorAll('input[name="opt-brackets-mode"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        if (e.target.checked) {
+          BibleReader.bracketsMode = e.target.value;
+          try {
+            localStorage.setItem('bible_reader_brackets_mode', BibleReader.bracketsMode);
+          } catch (err) {}
+          BibleReader.reloadCurrentChapters();
+        }
+      });
     });
 
     // Clic sur les 4 pastilles visuelles de fond de lecture
@@ -2435,6 +2467,7 @@ const BibleReader = {
 
   interlinearLayers: { surface: true, orig: true, translit: true, strong: true },
   zoomPercent: 100,
+  bracketsMode: 'classic',
 
   installedBibles: [],
   targetPaneForPicker: 1,
@@ -2444,6 +2477,7 @@ const BibleReader = {
   isLoadingMore: false,
 
   async init() {
+    this.bracketsMode = localStorage.getItem('bible_reader_brackets_mode') || 'classic';
     this.bindEvents();
     TabsManager.init();
     DisplayOptions.init();
@@ -3385,9 +3419,20 @@ const BibleReader = {
             const showTrans = this.interlinearLayers.translit && w.translit;
             const showStrong = this.interlinearLayers.strong && w.strong;
 
+            let surf = w.surface || '';
+            let isItalic = false;
+            if (this.bracketsMode === 'italic') {
+              if (surf.includes('[') || surf.includes(']')) {
+                surf = `<em>${surf.replace(/[\[\]]/g, '')}</em>`;
+                isItalic = true;
+              }
+            } else if (this.bracketsMode === 'plain') {
+              surf = surf.replace(/[\[\]]/g, '');
+            }
+
             wordsHtml += `
-              <div class="interlinear-block" data-strong="${w.strong || ''}" data-word="${w.orig || w.surface}" data-surface="${w.surface}" title="${w.morph || ''}">
-                ${showSurf ? `<span class="interlinear-surface">${w.surface}</span>` : ''}
+              <div class="interlinear-block ${isItalic ? 'bracket-interpolated-italic' : ''}" data-strong="${w.strong || ''}" data-word="${w.orig || w.surface}" data-surface="${w.surface}" title="${w.morph || ''}">
+                ${showSurf ? `<span class="interlinear-surface">${surf}</span>` : ''}
                 ${showOrig ? `<span class="interlinear-lemma">${w.orig}</span>` : ''}
                 ${showTrans ? `<span class="interlinear-translit">${w.translit}</span>` : ''}
                 ${showStrong ? `<span class="interlinear-strong">${w.strong}</span>` : ''}
@@ -3407,6 +3452,7 @@ const BibleReader = {
           vSpan.querySelectorAll('.interlinear-block').forEach(b => {
             b.addEventListener('click', (e) => {
               e.stopPropagation();
+              this.selectVerse(data.book || this.currentBook, data.chapter || this.currentChapter, v.verse, { scroll: false });
               this.lookupWordInLexicon(b.dataset.word, b.dataset.strong);
             });
             b.addEventListener('dblclick', (e) => {
@@ -3432,12 +3478,35 @@ const BibleReader = {
           const tokens = cleanText.split(/(\s+)/);
           let formattedHtml = marginBadgeHtml + numHtml;
 
+          let inBracket = false;
+
           tokens.forEach(tok => {
             if (!tok || /^\s+$/.test(tok)) {
               formattedHtml += tok;
             } else {
-              const cleanWord = tok.replace(/^[«"'(]+|[»"') ,;:!?.…]+$/g, '');
-              formattedHtml += `<span class="word-token" data-word="${cleanWord}" data-verse="${v.verse}">${tok}</span>`;
+              const hasOpeningBracket = tok.includes('[');
+              const hasClosingBracket = tok.includes(']');
+              const isCurrentlyBracketed = inBracket || hasOpeningBracket;
+
+              if (hasOpeningBracket) inBracket = true;
+
+              let displayTok = tok;
+              let isItalic = false;
+
+              if (this.bracketsMode === 'italic') {
+                displayTok = tok.replace(/[\[\]]/g, '');
+                if (isCurrentlyBracketed) {
+                  displayTok = `<em>${displayTok}</em>`;
+                  isItalic = true;
+                }
+              } else if (this.bracketsMode === 'plain') {
+                displayTok = tok.replace(/[\[\]]/g, '');
+              }
+
+              if (hasClosingBracket) inBracket = false;
+
+              const cleanWord = tok.replace(/^[«"'(]+|[»"') ,;:!?.…]+$/g, '').replace(/[\[\]]/g, '');
+              formattedHtml += `<span class="word-token ${isItalic ? 'bracket-interpolated-italic' : ''}" data-word="${cleanWord}" data-verse="${v.verse}">${displayTok}</span>`;
             }
           });
 
@@ -3627,6 +3696,7 @@ const BibleReader = {
 
   selectBibleVersion(versionName) {
     this.closeBiblePicker();
+    const curV = this.selectedVerse || 1;
     if (this.targetPaneForPicker === 1) {
       this.currentBible1 = versionName;
       if (versionName === 'DARBY') {
@@ -3657,7 +3727,7 @@ const BibleReader = {
       if (interBtn) interBtn.classList.toggle('active', this.pane1IsInterlinear || this.pane2IsInterlinear);
       this.updatePaneHeader(2);
     }
-    this.navigateTo(this.currentBook, this.currentChapter);
+    this.navigateTo(this.currentBook, this.currentChapter, curV);
   },
 
   goToNextChapter() {
