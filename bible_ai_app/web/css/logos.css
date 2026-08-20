@@ -9516,6 +9516,27 @@ body.theme-dark .theol-view-badge {
    SHINE TEXT ANIMATION (SmoothUI inspired AI thinking/processing effect)
    ========================================================================== */
 
+:root,
+body.theme-light,
+body.palette-light-clean,
+body.palette-light-cream,
+body.palette-light-nordic {
+  --shine-base: rgba(71, 85, 105, 0.45);
+  --shine-mid: #0284c7;
+  --shine-peak: #0f172a;
+  --shine-glow: rgba(2, 132, 199, 0.85);
+}
+
+body.theme-dark,
+body.palette-dark-slate,
+body.palette-dark-black,
+body.palette-dark-cyber {
+  --shine-base: rgba(148, 163, 184, 0.45);
+  --shine-mid: #38bdf8;
+  --shine-peak: #ffffff;
+  --shine-glow: rgba(56, 189, 248, 0.95);
+}
+
 @keyframes shine-sweep {
   0% {
     background-position: 200% 0;
@@ -9525,95 +9546,75 @@ body.theme-dark .theol-view-badge {
   }
 }
 
-:root,
-body.theme-light,
-body.palette-light-clean,
-body.palette-light-cream,
-body.palette-light-nordic {
-  --shine-base: rgba(71, 85, 105, 0.45);
-  --shine-highlight: #0284c7;
-  --shine-peak: #0f172a;
-  --shine-glow: rgba(2, 132, 199, 0.25);
-}
-
-body.theme-dark,
-body.palette-dark-slate,
-body.palette-dark-black,
-body.palette-dark-cyber {
-  --shine-base: rgba(148, 163, 184, 0.45);
-  --shine-highlight: #38bdf8;
-  --shine-peak: #ffffff;
-  --shine-glow: rgba(56, 189, 248, 0.35);
-}
-
 .shine-text,
 .ai-shine-text {
   background: linear-gradient(
-    110deg,
+    90deg,
     var(--shine-base) 0%,
-    var(--shine-base) 35%,
-    var(--shine-highlight) 48%,
+    var(--shine-base) 20%,
+    var(--shine-mid) 40%,
     var(--shine-peak) 50%,
-    var(--shine-highlight) 52%,
-    var(--shine-base) 65%,
+    var(--shine-mid) 60%,
+    var(--shine-base) 80%,
     var(--shine-base) 100%
-  );
-  background-size: 250% 100%;
+  ) !important;
+  background-size: 200% 100% !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   color: transparent !important;
   display: inline-block;
-  animation: shine-sweep 2.8s linear infinite;
-  text-decoration: none;
+  animation: shine-sweep 2.2s linear infinite !important;
+  text-decoration: none !important;
   text-shadow: none !important;
+  will-change: background-position;
 }
 
-/* Container variant: applique le balayage lumineux sur l'ensemble du texte traité */
+/* Container variant: applique le balayage lumineux continu horizontal sur tout le corps de texte */
 .ai-shining-container,
-.ai-shining-container *,
-.ai-shining-container p,
-.ai-shining-container h1,
-.ai-shining-container h2,
-.ai-shining-container h3,
-.ai-shining-container h4,
-.ai-shining-container li,
-.ai-shining-container span,
-.ai-shining-container em,
-.ai-shining-container strong,
-.ai-shining-container blockquote,
-.ai-shining-container a,
-.ai-shining-container div,
 .dict-entry-body.ai-shining-container,
-.dict-entry-body.ai-shining-container *,
 .dict-entry-body-content.ai-shining-container,
-.dict-entry-body-content.ai-shining-container *,
 #match-body-text.ai-shining-container,
-#match-body-text.ai-shining-container *,
 #dict-article-body .ai-shining-container,
-#dict-article-body .ai-shining-container *,
 .comm-view-reading-body.ai-shining-container,
-.comm-view-reading-body.ai-shining-container *,
 .comm-single-body.ai-shining-container,
-.comm-single-body.ai-shining-container *,
 .theol-reading-body.ai-shining-container,
-.theol-reading-body.ai-shining-container * {
+.theol-summary-encart-body.ai-shining-container {
   background: linear-gradient(
-    110deg,
+    90deg,
     var(--shine-base) 0%,
-    var(--shine-base) 35%,
-    var(--shine-highlight) 48%,
+    var(--shine-base) 20%,
+    var(--shine-mid) 40%,
     var(--shine-peak) 50%,
-    var(--shine-highlight) 52%,
-    var(--shine-base) 65%,
+    var(--shine-mid) 60%,
+    var(--shine-base) 80%,
     var(--shine-base) 100%
   ) !important;
-  background-size: 250% 100% !important;
+  background-size: 200% 100% !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   color: transparent !important;
-  animation: shine-sweep 2.8s linear infinite !important;
+  animation: shine-sweep 2.2s linear infinite !important;
+  text-shadow: none !important;
+  will-change: background-position;
+}
+
+/* Tous les sous-éléments inline et paragraphes héritent du dégradé fluide du conteneur sans fragmenter l'animation */
+.ai-shining-container *,
+.dict-entry-body.ai-shining-container *,
+.dict-entry-body-content.ai-shining-container *,
+#match-body-text.ai-shining-container *,
+#dict-article-body .ai-shining-container *,
+.comm-view-reading-body.ai-shining-container *,
+.comm-single-body.ai-shining-container *,
+.theol-reading-body.ai-shining-container *,
+.theol-summary-encart-body.ai-shining-container * {
+  background: transparent !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
   text-shadow: none !important;
 }
 
