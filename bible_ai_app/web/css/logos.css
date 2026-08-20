@@ -9547,7 +9547,16 @@ body.palette-dark-cyber {
 }
 
 .shine-text,
-.ai-shine-text {
+.ai-shine-text,
+.ai-shining-container,
+.dict-entry-body.ai-shining-container,
+.dict-entry-body-content.ai-shining-container,
+#match-body-text.ai-shining-container,
+#dict-article-body .ai-shining-container,
+.comm-view-reading-body.ai-shining-container,
+.comm-single-body.ai-shining-container,
+.theol-reading-body.ai-shining-container,
+.theol-summary-encart-body.ai-shining-container {
   background: linear-gradient(
     90deg,
     var(--shine-base) 0%,
@@ -9566,63 +9575,36 @@ body.palette-dark-cyber {
   background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   color: transparent !important;
-  display: inline-block;
   animation: shine-sweep 2.4s linear infinite !important;
-  text-decoration: none !important;
   text-shadow: none !important;
   will-change: background-position;
 }
 
-/* Container variant: applique le balayage lumineux continu horizontal sur tout le corps de texte et ses paragraphes */
-.ai-shining-container,
-.ai-shining-container p,
-.ai-shining-container span,
-.ai-shining-container strong,
-.ai-shining-container em,
-.ai-shining-container h1,
-.ai-shining-container h2,
-.ai-shining-container h3,
-.ai-shining-container h4,
-.ai-shining-container li,
-.ai-shining-container blockquote,
-.ai-shining-container a,
-.dict-entry-body.ai-shining-container,
+.banner-text.shine-text,
+.synth-step-status.shine-text,
+button .shine-text,
+.shine-text.inline {
+  display: inline-block !important;
+}
+
+/* Désactiver tout background-clip sur les sous-éléments pour éliminer tout conflit de composition Chromium */
+.shine-text *,
+.ai-shining-container *,
 .dict-entry-body.ai-shining-container *,
-.dict-entry-body-content.ai-shining-container,
 .dict-entry-body-content.ai-shining-container *,
-#match-body-text.ai-shining-container,
 #match-body-text.ai-shining-container *,
-#dict-article-body .ai-shining-container,
 #dict-article-body .ai-shining-container *,
-.comm-view-reading-body.ai-shining-container,
 .comm-view-reading-body.ai-shining-container *,
-.comm-single-body.ai-shining-container,
 .comm-single-body.ai-shining-container *,
-.theol-reading-body.ai-shining-container,
 .theol-reading-body.ai-shining-container *,
-.theol-summary-encart-body.ai-shining-container,
 .theol-summary-encart-body.ai-shining-container * {
-  background: linear-gradient(
-    90deg,
-    var(--shine-base) 0%,
-    var(--shine-mid) 18%,
-    var(--shine-peak) 25%,
-    var(--shine-mid) 32%,
-    var(--shine-base) 50%,
-    var(--shine-mid) 68%,
-    var(--shine-peak) 75%,
-    var(--shine-mid) 82%,
-    var(--shine-base) 100%
-  ) !important;
-  background-size: 200% 100% !important;
-  background-repeat: repeat-x !important;
-  -webkit-background-clip: text !important;
-  background-clip: text !important;
+  background: transparent !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
   -webkit-text-fill-color: transparent !important;
   color: transparent !important;
-  animation: shine-sweep 2.4s linear infinite !important;
+  animation: none !important;
   text-shadow: none !important;
-  will-change: background-position;
 }
 
 /* BANDEAU FLOTTANT MODERNE LORS DU TRAITEMENT IA */
