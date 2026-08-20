@@ -105,6 +105,10 @@ const ImportModal = {
   installedBooksList: [],
   lastImportedBookInfo: null,
 
+  // Verrous anti-rebond pour éviter l'ouverture multiple de boîtes de dialogue natives
+  _isPickingFile: false,
+  _isPickingCover: false,
+
   init() {
     this.modalEl = document.getElementById('modal-import-book');
     this.gbModalEl = document.getElementById('modal-google-books');
@@ -153,13 +157,22 @@ const ImportModal = {
       this.checkForDuplicates();
     });
 
-    // File Pickers & Dropzone
-    document.getElementById('btn-import-pick-file')?.addEventListener('click', () => this.pickFile());
-    document.getElementById('btn-change-selected-file')?.addEventListener('click', () => this.pickFile());
+    // File Pickers & Dropzone (avec stopPropagation pour éviter le double déclenchement)
+    document.getElementById('btn-import-pick-file')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.pickFile();
+    });
+    document.getElementById('btn-change-selected-file')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.pickFile();
+    });
     
     const dropzone = document.getElementById('import-dropzone');
     if (dropzone) {
-      dropzone.addEventListener('click', () => this.pickFile());
+      dropzone.addEventListener('click', (e) => {
+        if (e.target.closest('#btn-import-pick-file')) return;
+        this.pickFile();
+      });
       dropzone.addEventListener('dragover', (e) => {
         e.preventDefault();
         dropzone.classList.add('dragover');
@@ -170,15 +183,23 @@ const ImportModal = {
       dropzone.addEventListener('drop', (e) => {
         e.preventDefault();
         dropzone.classList.remove('dragover');
-        // Note : Sous WebView, le drop de fichier passe via pickFile ou l'API Python
         this.pickFile();
       });
     }
 
     // Cover Pickers & Paste
-    document.getElementById('btn-import-pick-cover')?.addEventListener('click', () => this.pickCover());
-    document.getElementById('btn-import-smart-cover')?.addEventListener('click', () => this.generateSmartCover());
-    document.getElementById('btn-import-paste-cover')?.addEventListener('click', () => this.pasteCoverFromClipboard());
+    document.getElementById('btn-import-pick-cover')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.pickCover();
+    });
+    document.getElementById('btn-import-smart-cover')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.generateSmartCover();
+    });
+    document.getElementById('btn-import-paste-cover')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.pasteCoverFromClipboard();
+    });
 
     // Écouteur global pour coller une image (Ctrl+V) quand le modal est ouvert à l'étape 2
     window.addEventListener('paste', (e) => {
@@ -346,7 +367,7 @@ const ImportModal = {
         } else if (!isAI) {
           submitLabel.textContent = 'Ajouter à la Bibliothèque (Local)';
         } else {
-          submitLabel.textContent = 'Lancer l\'Importation & l\'Indexation RAG';
+          submitLabel.textContent = "Lancer l'Importation & l'Indexation RAG";
         }
       }
     } else if (this.currentStep === 'success') {
@@ -382,8 +403,6 @@ const ImportModal = {
   updateResourceTypeUI(type) {
     const isBible = type === 'Bible';
     const banner = document.getElementById('import-bible-banner');
-    const ragCard = document.getElementById('import-step-4-rag-content');
-    const ragOnlyBtn = document.getElementById('btn-ch-rag-only');
     const ragOnlyLabel = document.getElementById('btn-ch-rag-label');
 
     if (banner) banner.classList.toggle('hidden', !isBible);
@@ -461,7 +480,7 @@ const ImportModal = {
 
     // Recharger la liste des livres existants pour la détection des doublons
     try {
-      this.installedBooksList = await API.getLibraryBooks() || [];
+      this.installedBooksList = await API.call('get_library_books') || [];
     } catch (e) {
       this.installedBooksList = [];
     }
@@ -523,6 +542,9 @@ const ImportModal = {
   },
 
   async pickFile() {
+    if (this._isPickingFile) return;
+    this._isPickingFile = true;
+
     try {
       const res = await API.call('pick_import_file');
       if (!res || res.cancelled) return;
@@ -608,10 +630,15 @@ const ImportModal = {
 
     } catch (e) {
       console.error('Erreur pickFile:', e);
+    } finally {
+      this._isPickingFile = false;
     }
   },
 
   async pickCover() {
+    if (this._isPickingCover) return;
+    this._isPickingCover = true;
+
     try {
       const res = await API.call('pick_cover_image');
       if (!res || res.cancelled) return;
@@ -623,6 +650,8 @@ const ImportModal = {
       }
     } catch (e) {
       console.error('Erreur pickCover:', e);
+    } finally {
+      this._isPickingCover = false;
     }
   },
 
@@ -1053,9 +1082,9 @@ const ImportModal = {
           
           LibraryView.loadBooks();
           if (typeof BibleReader !== 'undefined') {
-            API.getInstalledBibles().then(bList => {
+            API.call('get_installed_bibles').then(bList => {
               BibleReader.installedBibles = bList || [];
-            });
+            }).catch(() => {});
           }
         }
       } else {
