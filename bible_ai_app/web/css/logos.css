@@ -9707,105 +9707,62 @@ body.reading-bg-dark .theol-section-heading {
 }
 
 /* ==========================================================================
-   SHINE TEXT ANIMATION (SmoothUI inspired AI thinking/processing effect)
+   ANIMATION IA : RESPIRATION LUMINEUSE (SOFT PULSE & AURA)
    ========================================================================== */
 
-:root,
-body.theme-light,
-body.palette-light-clean,
-body.palette-light-cream,
-body.palette-light-nordic {
-  --shine-base: rgba(71, 85, 105, 0.45);
-  --shine-mid: #0284c7;
-  --shine-peak: #0f172a;
-  --shine-glow: rgba(2, 132, 199, 0.85);
-}
-
-body.theme-dark,
-body.palette-dark-slate,
-body.palette-dark-black,
-body.palette-dark-cyber {
-  --shine-base: rgba(148, 163, 184, 0.45);
-  --shine-mid: #38bdf8;
-  --shine-peak: #ffffff;
-  --shine-glow: rgba(56, 189, 248, 0.95);
-}
-
-body.reading-bg-white .reader-workspace,
-body.reading-bg-white #view-theology,
-body.reading-bg-white #view-dictionary,
-body.reading-bg-white #view-commentaries,
-body.reading-bg-sepia .reader-workspace,
-body.reading-bg-sepia #view-theology,
-body.reading-bg-sepia #view-dictionary,
-body.reading-bg-sepia #view-commentaries {
-  --shine-base: rgba(71, 85, 105, 0.55);
-  --shine-mid: #0284c7;
-  --shine-peak: #0f172a;
-  --shine-glow: rgba(2, 132, 199, 0.85);
-}
-
-@keyframes shine-sweep {
-  0% {
-    background-position-x: 200%;
+@keyframes aiPulseGlow {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 0 rgba(2, 132, 199, 0));
   }
-  100% {
-    background-position-x: -200%;
+  50% {
+    opacity: 0.48;
+    filter: drop-shadow(0 0 10px rgba(2, 132, 199, 0.4));
   }
 }
 
+@keyframes aiLabelPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* Conteneurs de texte complet en cours de traitement IA */
+.ai-shining-container,
+.dict-entry-body.ai-shining-container,
+.dict-entry-body-content.ai-shining-container,
+.theol-reading-body.ai-shining-container,
+.theol-summary-encart-body.ai-shining-container,
+.comm-single-body.ai-shining-container,
+.comm-view-reading-body.ai-shining-container,
+#match-body-text.ai-shining-container,
+#dict-article-body .ai-shining-container {
+  animation: aiPulseGlow 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite !important;
+  transition: opacity 0.3s ease;
+  user-select: none;
+  border-left: 3px solid var(--accent-blue) !important;
+  padding-left: 14px !important;
+  border-radius: 0 6px 6px 0;
+}
+
+/* Textes isolés, boutons et statuts (sans bordure) */
 .shine-text,
 .ai-shine-text,
-.ai-shining-container > p,
-.ai-shining-container > h1,
-.ai-shining-container > h2,
-.ai-shining-container > h3,
-.ai-shining-container > h4,
-.ai-shining-container > h5,
-.ai-shining-container > h6,
-.ai-shining-container > ul > li,
-.ai-shining-container > ol > li,
-.ai-shining-container > blockquote,
-.ai-shining-container > div > p,
-.ai-shining-container > span {
-  background: linear-gradient(
-    110deg,
-    var(--shine-base) 0%,
-    var(--shine-mid) 10%,
-    var(--shine-peak) 20%,
-    var(--shine-mid) 30%,
-    var(--shine-base) 100%
-  ) !important;
-  background-size: 200% 100% !important;
-  -webkit-background-clip: text !important;
-  background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  color: transparent !important;
-  animation: shine-sweep 2.5s linear infinite !important;
-  text-shadow: none !important;
-}
-
 .banner-text.shine-text,
 .synth-step-status.shine-text,
 button .shine-text,
 .shine-text.inline {
-  display: inline-block !important;
+  animation: aiLabelPulse 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite !important;
+  display: inline-block;
+  color: inherit;
 }
 
-/* Ensure no background overrides on descendants that need to be transparent */
-.ai-shining-container p *,
-.ai-shining-container h1 *,
-.ai-shining-container h2 *,
-.ai-shining-container h3 *,
-.ai-shining-container h4 *,
-.ai-shining-container h5 *,
-.ai-shining-container h6 *,
-.ai-shining-container li * {
+.ai-shining-container * {
+  color: inherit !important;
   background: transparent !important;
-  -webkit-background-clip: text !important;
-  background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  color: transparent !important;
 }
 
 /* BANDEAU FLOTTANT MODERNE LORS DU TRAITEMENT IA */
