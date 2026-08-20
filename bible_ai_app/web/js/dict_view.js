@@ -527,15 +527,21 @@ const DictView = {
 
   formatArticleMarkdown(text) {
     if (!text) return '';
-    return text
+    const formatted = text
       .replace(/^### (.*$)/gim, '<h3 style="margin: 16px 0 8px 0; font-size: 17px; font-weight: 700;">$1</h3>')
       .replace(/^## (.*$)/gim, '<h2 style="margin: 20px 0 10px 0; font-size: 19px; font-weight: 700;">$1</h2>')
       .replace(/^# (.*$)/gim, '<h1 style="margin: 22px 0 12px 0; font-size: 22px; font-weight: 800;">$1</h1>')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
       .replace(/^\> (.*$)/gim, '<blockquote style="border-left: 3px solid var(--accent-blue); padding: 8px 14px; margin: 12px 0; background: var(--bg-subtle); border-radius: 0 6px 6px 0; font-style: italic;">$1</blockquote>')
-      .replace(/^\- (.*$)/gim, '<li style="margin-left: 20px; margin-bottom: 4px;">$1</li>')
-      .replace(/\n\n/g, '<div style="height: 14px;"></div>');
+      .replace(/^\- (.*$)/gim, '<li style="margin-left: 20px; margin-bottom: 4px;">$1</li>');
+
+    return formatted
+      .split(/\n\n+/)
+      .map(p => p.trim())
+      .filter(Boolean)
+      .map(p => (p.startsWith('<h') || p.startsWith('<blockquote') || p.startsWith('<li')) ? p : `<p style="margin: 8px 0; line-height: 1.75;">${p}</p>`)
+      .join('');
   },
 
   async polishCurrentArticle() {

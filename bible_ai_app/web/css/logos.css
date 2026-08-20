@@ -9573,18 +9573,35 @@ body.palette-dark-cyber {
   will-change: background-position;
 }
 
-/* Container variant: applique le balayage lumineux continu horizontal sur tout le corps de texte */
+/* Container variant: applique le balayage lumineux continu horizontal sur tout le corps de texte et ses paragraphes */
 .ai-shining-container,
+.ai-shining-container p,
+.ai-shining-container span,
+.ai-shining-container strong,
+.ai-shining-container em,
+.ai-shining-container h1,
+.ai-shining-container h2,
+.ai-shining-container h3,
+.ai-shining-container h4,
+.ai-shining-container li,
+.ai-shining-container blockquote,
+.ai-shining-container a,
 .dict-entry-body.ai-shining-container,
+.dict-entry-body.ai-shining-container *,
 .dict-entry-body-content.ai-shining-container,
+.dict-entry-body-content.ai-shining-container *,
 #match-body-text.ai-shining-container,
+#match-body-text.ai-shining-container *,
 #dict-article-body .ai-shining-container,
+#dict-article-body .ai-shining-container *,
 .comm-view-reading-body.ai-shining-container,
+.comm-view-reading-body.ai-shining-container *,
 .comm-single-body.ai-shining-container,
+.comm-single-body.ai-shining-container *,
 .theol-reading-body.ai-shining-container,
-.theol-summary-encart-body.ai-shining-container {
-  display: inline-block !important;
-  width: 100% !important;
+.theol-reading-body.ai-shining-container *,
+.theol-summary-encart-body.ai-shining-container,
+.theol-summary-encart-body.ai-shining-container * {
   background: linear-gradient(
     90deg,
     var(--shine-base) 0%,
@@ -9606,24 +9623,6 @@ body.palette-dark-cyber {
   animation: shine-sweep 2.4s linear infinite !important;
   text-shadow: none !important;
   will-change: background-position;
-}
-
-/* Tous les sous-éléments inline et paragraphes héritent du dégradé fluide du conteneur sans fragmenter l'animation */
-.ai-shining-container *,
-.dict-entry-body.ai-shining-container *,
-.dict-entry-body-content.ai-shining-container *,
-#match-body-text.ai-shining-container *,
-#dict-article-body .ai-shining-container *,
-.comm-view-reading-body.ai-shining-container *,
-.comm-single-body.ai-shining-container *,
-.theol-reading-body.ai-shining-container *,
-.theol-summary-encart-body.ai-shining-container * {
-  background: transparent !important;
-  -webkit-background-clip: unset !important;
-  background-clip: unset !important;
-  -webkit-text-fill-color: transparent !important;
-  color: transparent !important;
-  text-shadow: none !important;
 }
 
 /* BANDEAU FLOTTANT MODERNE LORS DU TRAITEMENT IA */
