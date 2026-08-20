@@ -385,7 +385,12 @@ const App = {
       if (typeof TheologyView !== 'undefined') {
         TheologyView.onViewActivated();
       }
-    } else if (viewName === 'search' || viewName === 'ai' || viewName === 'dict') {
+    } else if (viewName === 'dict') {
+      if (drawerEl) drawerEl.classList.add('collapsed');
+      if (typeof DictView !== 'undefined') {
+        DictView.onViewActivated();
+      }
+    } else if (viewName === 'search' || viewName === 'ai') {
       if (drawerEl) drawerEl.classList.add('collapsed');
     }
   },

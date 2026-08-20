@@ -133,7 +133,11 @@ const LibraryView = {
           App.switchView('bible');
           BibleReader.switchVersion(book.folder_name || book.name);
         } else if (bType.includes('dict')) {
-          App.switchView('dict');
+          if (typeof DictView !== 'undefined' && typeof DictView.openDictionary === 'function') {
+            DictView.openDictionary(book.dict_id || book.name);
+          } else {
+            App.switchView('dict');
+          }
         } else {
           if (typeof TheologyView !== 'undefined') {
             TheologyView.openBook(book.name);

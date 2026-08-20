@@ -1,160 +1,495 @@
 /**
- * Dictionary View Controller
- * Gère la consultation interactive multi-dictionnaires, Wikipédia et le polissage IA.
+ * Dictionary View Controller (Logos Master-Detail Explorer)
+ * Gère la navigation alphabétique (A-Z), la sélection de dictionnaires,
+ * la lecture fluide des articles, la comparaison multi-sources et Wikipédia.
  */
 
 const DictView = {
-  searchInput: null,
-  contentContainer: null,
-  currentTerm: '',
+  allDictionaries: [],
+  activeDictId: null,
+  activeDictInfo: null,
+  currentHeadwords: [],
+  activeSlug: null,
+  currentEntryData: null,
   currentMatches: [],
   activeSourceIndex: 0,
+  activeLetter: 'ALL',
+  currentZoom: 100,
+  isTocCollapsed: false,
 
   init() {
-    this.searchInput = document.getElementById('dict-search-input');
-    this.contentContainer = document.getElementById('dict-view-content');
+    this.bindHeaderControls();
+    this.bindTocControls();
+    this.bindArticleControls();
+  },
 
-    document.getElementById('btn-dict-search').addEventListener('click', () => {
-      this.executeLookup();
-    });
+  onViewActivated() {
+    if (!this.allDictionaries || this.allDictionaries.length === 0) {
+      this.loadDictionaries();
+    }
+  },
 
-    this.searchInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        this.executeLookup();
+  openDictionary(dictId, targetTerm = null) {
+    App.switchView('dict');
+    if (!this.allDictionaries || this.allDictionaries.length === 0) {
+      this.loadDictionaries().then(() => {
+        this.selectDictionary(dictId, targetTerm);
+      });
+    } else {
+      this.selectDictionary(dictId, targetTerm);
+    }
+  },
+
+  // =========================================================================
+  // 1. CONTRÔLES D'EN-TÊTE & SÉLECTEUR DÉROULANT
+  // =========================================================================
+
+  bindHeaderControls() {
+    const btnSelector = document.getElementById('btn-dict-active-selector');
+    const popover = document.getElementById('dict-picker-popover');
+    const searchInPopover = document.getElementById('dict-picker-search-input');
+
+    // Basculer le popover des dictionnaires
+    btnSelector?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      popover?.classList.toggle('hidden');
+      if (popover && !popover.classList.contains('hidden')) {
+        searchInPopover?.focus();
       }
     });
+
+    // Fermer le popover au clic en dehors
+    document.addEventListener('click', (e) => {
+      if (popover && !popover.contains(e.target) && !btnSelector?.contains(e.target)) {
+        popover.classList.add('hidden');
+      }
+    });
+
+    // Filtrer les dictionnaires dans le popover
+    searchInPopover?.addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      document.querySelectorAll('#dict-picker-list .dict-picker-item').forEach(item => {
+        const title = (item.dataset.title || '').toLowerCase();
+        item.style.display = (!q || title.includes(q)) ? 'flex' : 'none';
+      });
+    });
+
+    // Recherche Rapide Globale
+    const searchInput = document.getElementById('dict-search-input');
+    const btnSearch = document.getElementById('btn-dict-search');
+    const btnClear = document.getElementById('btn-dict-search-clear');
+
+    const handleSearch = () => {
+      const q = searchInput?.value?.trim();
+      if (q) {
+        this.executeLookup(q);
+      }
+    };
+
+    btnSearch?.addEventListener('click', handleSearch);
+    searchInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleSearch();
+    });
+
+    searchInput?.addEventListener('input', (e) => {
+      if (btnClear) {
+        btnClear.classList.toggle('hidden', !e.target.value);
+      }
+    });
+
+    btnClear?.addEventListener('click', () => {
+      if (searchInput) searchInput.value = '';
+      if (btnClear) btnClear.classList.add('hidden');
+      this.loadHeadwords(this.activeLetter);
+    });
+
+    // Bouton Toggle Sommaire / Index
+    document.getElementById('btn-dict-toggle-toc')?.addEventListener('click', () => {
+      const toc = document.getElementById('dict-toc-panel');
+      const btn = document.getElementById('btn-dict-toggle-toc');
+      if (toc) {
+        this.isTocCollapsed = !this.isTocCollapsed;
+        toc.classList.toggle('collapsed', this.isTocCollapsed);
+        btn?.classList.toggle('active', !this.isTocCollapsed);
+      }
+    });
+
+    // Contrôles de Zoom
+    document.getElementById('btn-dict-zoom-out')?.addEventListener('click', () => this.adjustZoom(-10));
+    document.getElementById('btn-dict-zoom-in')?.addEventListener('click', () => this.adjustZoom(10));
   },
 
-  async executeLookup(term = null) {
-    const word = term || this.searchInput.value.trim();
-    if (!word) return;
+  adjustZoom(delta) {
+    this.currentZoom = Math.min(180, Math.max(70, this.currentZoom + delta));
+    const lbl = document.getElementById('lbl-dict-zoom-level');
+    const bodyEl = document.getElementById('dict-article-body');
+    if (lbl) lbl.textContent = `${this.currentZoom}%`;
+    if (bodyEl) {
+      bodyEl.style.fontSize = `${16 * (this.currentZoom / 100)}px`;
+    }
+  },
 
-    this.currentTerm = word;
-    this.activeSourceIndex = 0;
-    this.contentContainer.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--text-muted);">Recherche dans les dictionnaires pour « ${word} »...</div>`;
+  // =========================================================================
+  // 2. CHARGEMENT & SÉLECTION DES DICTIONNAIRES
+  // =========================================================================
+
+  async loadDictionaries() {
+    try {
+      const dicts = await API.call('get_dictionaries') || [];
+      this.allDictionaries = dicts;
+      this.renderDictionaryPickerList();
+
+      if (!this.activeDictId && dicts.length > 0) {
+        // Sélectionner par défaut le Nouveau Dictionnaire Biblique s'il existe, sinon le premier
+        const defaultDict = dicts.find(d => d.id === 'nouveau_dictionnaire') || dicts[0];
+        this.selectDictionary(defaultDict.id);
+      }
+    } catch (e) {
+      console.error('Erreur chargement dictionnaires:', e);
+    }
+  },
+
+  renderDictionaryPickerList() {
+    const listEl = document.getElementById('dict-picker-list');
+    if (!listEl) return;
+    listEl.innerHTML = '';
+
+    const colors = ['#92400e', '#065F46', '#1E3A8A', '#581C87', '#374151', '#991B1B'];
+
+    this.allDictionaries.forEach((d, idx) => {
+      const color = colors[idx % colors.length];
+      const initials = (d.name || 'D').split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'D';
+      
+      const item = document.createElement('button');
+      item.className = `dict-picker-item ${this.activeDictId === d.id ? 'active' : ''}`;
+      item.dataset.id = d.id;
+      item.dataset.title = d.name;
+
+      item.innerHTML = `
+        <div class="dict-book-mini-cover" style="background: ${color};">
+          <div class="dict-book-mini-spine"></div>
+          <span class="dict-book-mini-initials">${initials}</span>
+        </div>
+        <div class="dict-picker-item-info">
+          <div class="dict-picker-item-title">${d.name}</div>
+          <div class="dict-picker-item-meta">${d.subtitle || `${d.count || 0} articles`}</div>
+        </div>
+        <span class="dict-count-badge">${d.badge || 'DICT'}</span>
+      `;
+
+      item.addEventListener('click', () => {
+        document.getElementById('dict-picker-popover')?.classList.add('hidden');
+        this.selectDictionary(d.id);
+      });
+
+      listEl.appendChild(item);
+    });
+  },
+
+  selectDictionary(dictId, targetSlug = null) {
+    const dInfo = this.allDictionaries.find(d => d.id === dictId || d.name === dictId) || this.allDictionaries[0];
+    if (!dInfo) return;
+
+    this.activeDictId = dInfo.id;
+    this.activeDictInfo = dInfo;
+
+    // Mettre à jour le bouton actif dans l'en-tête
+    const titleEl = document.getElementById('dict-active-book-title');
+    const metaEl = document.getElementById('dict-active-book-meta');
+    const badgeEl = document.getElementById('dict-active-count-badge');
+    const coverInitials = document.getElementById('dict-active-book-initials');
+
+    if (titleEl) titleEl.textContent = dInfo.name;
+    if (metaEl) metaEl.textContent = dInfo.subtitle || `${dInfo.count || 0} articles`;
+    if (badgeEl) badgeEl.textContent = `${(dInfo.count || 0).toLocaleString('fr-FR')} entrées`;
+    if (coverInitials) {
+      coverInitials.textContent = (dInfo.name || 'D').split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'D';
+    }
+
+    // Mettre à jour l'élément sélectionné dans le popover
+    document.querySelectorAll('#dict-picker-list .dict-picker-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.id === dInfo.id);
+    });
+
+    // Réinitialiser la lettre A-Z sur 'ALL' et charger les entrées
+    this.activeLetter = 'ALL';
+    document.querySelectorAll('.dict-az-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.letter === 'ALL');
+    });
+
+    const filterInput = document.getElementById('dict-toc-filter-input');
+    if (filterInput) filterInput.value = '';
+
+    this.loadHeadwords('ALL', null, targetSlug);
+  },
+
+  // =========================================================================
+  // 3. INDEX ALPHABÉTIQUE / TABLE DES MOTS (VOLET GAUCHE)
+  // =========================================================================
+
+  bindTocControls() {
+    // Filtre de recherche dans l'index
+    const filterIn = document.getElementById('dict-toc-filter-input');
+    let filterTimer = null;
+
+    filterIn?.addEventListener('input', (e) => {
+      clearTimeout(filterTimer);
+      filterTimer = setTimeout(() => {
+        const q = e.target.value.trim();
+        this.loadHeadwords(this.activeLetter, q);
+      }, 200);
+    });
+
+    // Barre A-Z
+    document.querySelectorAll('.dict-az-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.dict-az-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.activeLetter = btn.dataset.letter;
+        
+        const filterVal = document.getElementById('dict-toc-filter-input')?.value.trim();
+        this.loadHeadwords(this.activeLetter, filterVal);
+      });
+    });
+  },
+
+  async loadHeadwords(letter = 'ALL', query = null, targetSlug = null) {
+    if (!this.activeDictId) return;
+
+    const listEl = document.getElementById('dict-toc-list');
+    const countEl = document.getElementById('dict-toc-count');
+
+    if (listEl) {
+      listEl.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px;">Chargement des entrées...</div>`;
+    }
 
     try {
-      const data = await API.call('lookup_dictionary', word);
-      this.currentMatches = data?.matches || [];
-      this.render();
+      const res = await API.call('get_dictionary_headwords', this.activeDictId, letter, query, 300, 0);
+      const headwords = res?.headwords || [];
+      this.currentHeadwords = headwords;
+
+      const total = res?.total_count || headwords.length;
+      if (countEl) {
+        countEl.textContent = `${total.toLocaleString('fr-FR')} entrée${total > 1 ? 's' : ''}`;
+      }
+
+      this.renderHeadwordsList(headwords, targetSlug);
     } catch (e) {
-      console.error('Erreur dictionnaire:', e);
-      this.contentContainer.innerHTML = `<div style="color: var(--accent-red); padding: 20px;">Erreur de consultation.</div>`;
+      console.error('Erreur chargement headwords:', e);
+      if (listEl) {
+        listEl.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--accent-red); font-size: 12px;">Erreur de chargement.</div>`;
+      }
     }
   },
 
-  render() {
-    this.contentContainer.innerHTML = '';
+  renderHeadwordsList(headwords, targetSlug = null) {
+    const listEl = document.getElementById('dict-toc-list');
+    if (!listEl) return;
+    listEl.innerHTML = '';
 
-    if (this.currentMatches.length === 0 && this.activeSourceIndex === 0) {
-      // Proposer quand même Wikipédia
-    }
-
-    const card = document.createElement('div');
-    card.className = 'dict-entry-card';
-
-    // Toolbar de sélection de dictionnaire (Strong, Calmet, Vigouroux, Bailly, Wikipédia)
-    const toolbar = document.createElement('div');
-    toolbar.className = 'lexicon-header-toolbar';
-    toolbar.style.borderRadius = '8px 8px 0 0';
-
-    const tabsContainer = document.createElement('div');
-    tabsContainer.className = 'lexicon-source-tabs';
-
-    this.currentMatches.forEach((m, idx) => {
-      const btn = document.createElement('button');
-      btn.className = `lex-source-pill ${this.activeSourceIndex === idx ? 'active' : ''}`;
-      btn.innerHTML = `${m.badge || m.dict_name}`;
-      btn.addEventListener('click', () => {
-        this.activeSourceIndex = idx;
-        this.render();
-      });
-      tabsContainer.appendChild(btn);
-    });
-
-    const wikiIdx = this.currentMatches.length;
-    const wikiBtn = document.createElement('button');
-    wikiBtn.className = `lex-source-pill ${this.activeSourceIndex === wikiIdx ? 'active' : ''}`;
-    wikiBtn.innerHTML = `<span style="display:inline-flex; align-items:center; gap:4px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Wikipédia</span>`;
-    wikiBtn.addEventListener('click', () => {
-      this.activeSourceIndex = wikiIdx;
-      this.render();
-    });
-    tabsContainer.appendChild(wikiBtn);
-
-    toolbar.appendChild(tabsContainer);
-    card.appendChild(toolbar);
-
-    const bodyContainer = document.createElement('div');
-    card.appendChild(bodyContainer);
-    this.contentContainer.appendChild(card);
-
-    if (this.activeSourceIndex === wikiIdx) {
-      this.renderWikipedia(bodyContainer);
-    } else if (this.currentMatches[this.activeSourceIndex]) {
-      this.renderDictionaryMatch(bodyContainer, this.currentMatches[this.activeSourceIndex]);
-    } else {
-      bodyContainer.innerHTML = `
-        <div style="padding: 40px; color: var(--text-muted); text-align: center;">
-          <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8" style="display: block; margin: 0 auto 10px auto; opacity: 0.5;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-          Aucune entrée trouvée pour « <strong>${this.currentTerm}</strong> » dans ce dictionnaire.
+    if (headwords.length === 0) {
+      listEl.innerHTML = `
+        <div style="padding: 30px 14px; text-align: center; color: var(--text-muted); font-size: 12px;">
+          Aucune entrée trouvée.
         </div>
       `;
+      return;
+    }
+
+    let itemToSelect = null;
+
+    headwords.forEach((hw, idx) => {
+      const item = document.createElement('div');
+      item.className = 'dict-toc-item';
+      item.dataset.slug = hw.slug;
+      if (hw.code) item.dataset.code = hw.code;
+
+      item.innerHTML = `
+        <div class="dict-toc-item-title">${hw.title}</div>
+        ${hw.snippet ? `<div class="dict-toc-item-snippet">${hw.snippet}</div>` : ''}
+      `;
+
+      item.addEventListener('click', () => {
+        this.selectEntry(hw.slug, hw.code);
+      });
+
+      listEl.appendChild(item);
+
+      if (targetSlug && (hw.slug.toLowerCase() === targetSlug.toLowerCase() || hw.title.toLowerCase() === targetSlug.toLowerCase())) {
+        itemToSelect = hw;
+      } else if (!targetSlug && idx === 0 && !this.activeSlug) {
+        itemToSelect = hw;
+      }
+    });
+
+    if (itemToSelect) {
+      this.selectEntry(itemToSelect.slug, itemToSelect.code);
+    } else if (this.activeSlug) {
+      // Maintenir la sélection actuelle si présente
+      const activeEl = listEl.querySelector(`.dict-toc-item[data-slug="${this.activeSlug}"]`);
+      if (activeEl) activeEl.classList.add('active');
     }
   },
 
-  renderDictionaryMatch(container, match) {
+  // =========================================================================
+  // 4. LECTURE & AFFICHAGE DE L'ARTICLE SÉLECTIONNÉ (VOLET DROIT)
+  // =========================================================================
+
+  bindArticleControls() {
+    // Bouton Polissage IA
+    document.getElementById('btn-dict-polish-article')?.addEventListener('click', () => {
+      this.polishCurrentArticle();
+    });
+
+    // Bouton Copier
+    document.getElementById('btn-dict-copy-article')?.addEventListener('click', () => {
+      if (!this.currentEntryData) return;
+      const text = `${this.currentEntryData.title}\n\n${this.currentEntryData.full_text || this.currentEntryData.raw_text || ''}`;
+      navigator.clipboard.writeText(text).then(() => {
+        App.showToast('Définition copiée dans le presse-papier !', 'success');
+      }).catch(() => {
+        App.showToast('Erreur lors de la copie', 'error');
+      });
+    });
+
+    // Bouton Vers Note
+    document.getElementById('btn-dict-export-note')?.addEventListener('click', () => {
+      if (!this.currentEntryData) return;
+      const title = `Notice : ${this.currentEntryData.title}`;
+      const content = `### ${this.currentEntryData.title}\n*Source : ${this.currentEntryData.dict_name || this.activeDictInfo?.name || 'Dictionnaire'}*\n\n${this.currentEntryData.full_text || this.currentEntryData.raw_text || ''}`;
+      
+      API.call('save_note', { title, content, reference: '', tags: ['Dictionnaire', this.currentEntryData.title] }).then(() => {
+        App.showToast(`Notice « ${this.currentEntryData.title} » exportée dans vos notes !`, 'success');
+      }).catch(e => {
+        alert(`Erreur d'enregistrement dans les notes : ${e}`);
+      });
+    });
+  },
+
+  async selectEntry(slug, strongCode = null) {
+    this.activeSlug = slug;
+    this.activeSourceIndex = 0;
+
+    // Mettre à jour la classe active dans l'index à gauche
+    document.querySelectorAll('#dict-toc-list .dict-toc-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.slug === slug);
+    });
+
+    const bodyEl = document.getElementById('dict-article-body');
+    const heroTitle = document.getElementById('dict-hero-title');
+    const heroBadge = document.getElementById('dict-hero-badge');
+
+    if (heroTitle) heroTitle.textContent = slug;
+    if (bodyEl) {
+      bodyEl.innerHTML = `<div style="padding: 40px; text-align: center; color: var(--text-muted);"><div class="synth-spinner" style="width:24px; height:24px; border-width:2px; margin: 0 auto 12px auto;"></div>Chargement de l'article...</div>`;
+    }
+
+    try {
+      const data = await API.call('get_dictionary_entry', this.activeDictId, slug, strongCode);
+      this.currentEntryData = data;
+      this.currentMatches = data?.matches || [];
+
+      this.renderArticleView();
+    } catch (e) {
+      console.error('Erreur lecture notice:', e);
+      if (bodyEl) {
+        bodyEl.innerHTML = `<div style="padding: 30px; text-align: center; color: var(--accent-red);">Erreur lors de la récupération de la notice.</div>`;
+      }
+    }
+  },
+
+  renderArticleView() {
+    const data = this.currentEntryData;
+    if (!data) return;
+
+    const heroTitle = document.getElementById('dict-hero-title');
+    const heroBadge = document.getElementById('dict-hero-badge');
+    const bodyEl = document.getElementById('dict-article-body');
+    const tabsContainer = document.getElementById('dict-sources-tabs-list');
+
+    if (heroTitle) heroTitle.textContent = data.title;
+    if (heroBadge) heroBadge.textContent = data.badge || data.dict_name || 'Dictionnaire';
+
+    // Rendre les onglets multi-sources
+    if (tabsContainer) {
+      tabsContainer.innerHTML = '';
+
+      this.currentMatches.forEach((m, idx) => {
+        const btn = document.createElement('button');
+        btn.className = `dict-source-pill ${this.activeSourceIndex === idx ? 'active' : ''}`;
+        btn.innerHTML = `<span>📖</span><span>${m.badge || m.dict_name}</span>`;
+        btn.addEventListener('click', () => {
+          this.activeSourceIndex = idx;
+          this.renderSelectedSourceMatch();
+        });
+        tabsContainer.appendChild(btn);
+      });
+
+      // Onglet Wikipédia
+      const wikiIdx = this.currentMatches.length;
+      const wikiBtn = document.createElement('button');
+      wikiBtn.className = `dict-source-pill ${this.activeSourceIndex === wikiIdx ? 'active' : ''}`;
+      wikiBtn.innerHTML = `<span style="display:inline-flex; align-items:center; gap:4px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Wikipédia</span>`;
+      wikiBtn.addEventListener('click', () => {
+        this.activeSourceIndex = wikiIdx;
+        this.renderWikipedia(bodyEl);
+        document.querySelectorAll('#dict-sources-tabs-list .dict-source-pill').forEach((b, i) => {
+          b.classList.toggle('active', i === wikiIdx);
+        });
+      });
+      tabsContainer.appendChild(wikiBtn);
+    }
+
+    this.renderSelectedSourceMatch();
+  },
+
+  renderSelectedSourceMatch() {
+    const bodyEl = document.getElementById('dict-article-body');
+    if (!bodyEl) return;
+
+    document.querySelectorAll('#dict-sources-tabs-list .dict-source-pill').forEach((b, i) => {
+      b.classList.toggle('active', i === this.activeSourceIndex);
+    });
+
+    const match = this.currentMatches[this.activeSourceIndex] || this.currentEntryData;
+    if (!match) {
+      bodyEl.innerHTML = `<div style="padding: 30px; text-align: center; color: var(--text-muted);">Aucune notice disponible.</div>`;
+      return;
+    }
+
     const isPolished = match.is_polished;
     const modelName = match.polished_model || 'Mistral 14B';
 
-    let polishBarHtml = '';
-    if (match.dict_id !== 'strong') {
-      polishBarHtml = `
-        <div class="ai-polish-bar">
-          <div>
-            ${isPolished 
-              ? `<span class="ai-polished-badge" style="display:inline-flex; align-items:center; gap:4px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>Notice restaurée par IA (${modelName})</span>` 
-              : `<span style="font-size: 11px; color: #4338CA; font-weight: 600;">Restructurer et restaurer avec l'IA</span>`
-            }
-          </div>
-          <button class="ai-polish-btn" id="btn-dict-polish" style="display: flex; align-items: center; gap: 4px;">
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
-            <span>${isPolished ? 'Re-générer' : "Améliorer avec l'IA (Mistral 14B)"}</span>
-          </button>
+    let polishBannerHtml = '';
+    if (isPolished) {
+      polishBannerHtml = `
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; background: rgba(79, 70, 229, 0.08); border: 1px solid rgba(79, 70, 229, 0.2); border-radius: 8px; margin-bottom: 18px;">
+          <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: #6366f1;">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+            Notice restaurée et modernisée par l'IA (${modelName})
+          </span>
+          <button id="btn-dict-view-original" style="background: transparent; border: none; font-size: 11px; color: var(--text-secondary); cursor: pointer; text-decoration: underline;">Voir l'original</button>
         </div>
       `;
     }
 
-    const textToRender = (match.full_text || match.preview || '')
-      .replace(/^### (.*$)/gim, '<h3 style="margin: 14px 0 8px 0; color: var(--accent-blue); font-size: 17px; font-weight: 700;">$1</h3>')
-      .replace(/^## (.*$)/gim, '<h2 style="margin: 16px 0 10px 0; color: var(--accent-blue); font-size: 19px; font-weight: 700;">$1</h2>')
-      .replace(/^# (.*$)/gim, '<h1 style="margin: 18px 0 12px 0; color: var(--accent-blue); font-size: 22px; font-weight: 800;">$1</h1>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/^\> (.*$)/gim, '<blockquote style="border-left: 3px solid var(--accent-blue); padding: 8px 14px; margin: 12px 0; background: var(--bg-subtle); color: var(--text-secondary); border-radius: 0 6px 6px 0; font-style: italic;">$1</blockquote>')
-      .replace(/^\- (.*$)/gim, '<li style="margin-left: 20px; margin-bottom: 4px;">$1</li>')
-      .replace(/\n\n/g, '<br><br>');
+    const rawText = match.full_text || match.raw_text || match.preview || '';
+    const formatted = this.formatArticleMarkdown(rawText);
 
-    const linkifiedDictText = (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences)
-      ? TheologyView.highlightScriptureReferences(textToRender)
-      : textToRender;
+    const linkified = (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences)
+      ? TheologyView.highlightScriptureReferences(formatted)
+      : formatted;
 
-    container.innerHTML = `
-      <div style="padding: 20px;">
-        <div class="dict-entry-header" style="margin-bottom: 14px;">
-          <span class="dict-entry-title">${match.title || this.currentTerm}</span>
-          <span class="dict-entry-badge">${match.badge || match.dict_name}</span>
-        </div>
-        ${polishBarHtml}
-        <div class="dict-entry-body" id="dict-match-body">${linkifiedDictText}</div>
-      </div>
+    bodyEl.innerHTML = `
+      ${polishBannerHtml}
+      <div class="dict-entry-body-content">${linkified}</div>
     `;
 
-    // Attacher les infobulles et navigation sur les références bibliques
+    // Attacher les liens vers les versets bibliques
     if (typeof ScriptureTooltip !== 'undefined') {
-      ScriptureTooltip.bindToElements(container.querySelectorAll('.theol-inline-scripture-ref'));
+      ScriptureTooltip.bindToElements(bodyEl.querySelectorAll('.theol-inline-scripture-ref'));
     }
-    container.querySelectorAll('.theol-inline-scripture-ref').forEach(span => {
+    bodyEl.querySelectorAll('.theol-inline-scripture-ref').forEach(span => {
       span.addEventListener('click', (e) => {
         e.stopPropagation();
         const ref = span.dataset.ref || span.textContent.trim();
@@ -165,80 +500,134 @@ const DictView = {
       });
     });
 
-    const btnPolish = container.querySelector('#btn-dict-polish');
-    if (btnPolish) {
-      btnPolish.addEventListener('click', async () => {
-        btnPolish.disabled = true;
-        btnPolish.innerHTML = `<span class="synth-spinner" style="width:12px; height:12px; border-width:2px; vertical-align:middle; margin-right:4px;"></span><span>Restauration IA en cours...</span>`;
-        const bodyEl = container.querySelector('#dict-match-body');
-        bodyEl.innerHTML = `<div style="padding: 30px; text-align: center; color: var(--accent-blue);"><em>Restauration philologique et restructuration de la notice par Mistral 14B...</em></div>`;
+    // Basculer vers l'original si cliqué
+    bodyEl.querySelector('#btn-dict-view-original')?.addEventListener('click', () => {
+      const origText = match.raw_text || match.full_text || '';
+      bodyEl.innerHTML = `<div class="dict-entry-body-content">${this.formatArticleMarkdown(origText)}</div>`;
+    });
+  },
 
-        try {
-          const res = await API.call('polish_dictionary_article', match.dict_id, match.title, match.raw_text || match.full_text, null, match.slug);
-          if (res && res.success) {
-            match.is_polished = true;
-            match.full_text = res.text;
-            match.polished_model = res.model;
-            App.showToast('Notice restaurée par IA avec succès !');
-            this.render();
-          } else {
-            alert(`Erreur IA : ${res?.error || 'Erreur inconnue'}`);
-            this.render();
-          }
-        } catch (e) {
-          alert(`Erreur d'appel IA : ${e}`);
-          this.render();
-        }
-      });
+  formatArticleMarkdown(text) {
+    if (!text) return '';
+    return text
+      .replace(/^### (.*$)/gim, '<h3 style="margin: 16px 0 8px 0; color: var(--accent-blue); font-size: 17px; font-weight: 700;">$1</h3>')
+      .replace(/^## (.*$)/gim, '<h2 style="margin: 20px 0 10px 0; color: var(--accent-blue); font-size: 19px; font-weight: 700;">$1</h2>')
+      .replace(/^# (.*$)/gim, '<h1 style="margin: 22px 0 12px 0; color: var(--accent-blue); font-size: 22px; font-weight: 800;">$1</h1>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/^\> (.*$)/gim, '<blockquote style="border-left: 3px solid var(--accent-blue); padding: 8px 14px; margin: 12px 0; background: var(--bg-subtle); color: var(--text-secondary); border-radius: 0 6px 6px 0; font-style: italic;">$1</blockquote>')
+      .replace(/^\- (.*$)/gim, '<li style="margin-left: 20px; margin-bottom: 4px;">$1</li>')
+      .replace(/\n\n/g, '<p style="margin-bottom: 14px;"></p>');
+  },
+
+  async polishCurrentArticle() {
+    const match = this.currentMatches[this.activeSourceIndex] || this.currentEntryData;
+    if (!match) return;
+
+    const btn = document.getElementById('btn-dict-polish-article');
+    if (btn) btn.disabled = true;
+
+    const bodyEl = document.getElementById('dict-article-body');
+    if (bodyEl) {
+      bodyEl.innerHTML = `<div style="padding: 40px; text-align: center; color: var(--accent-blue);"><div class="synth-spinner" style="width:24px; height:24px; border-width:2px; margin: 0 auto 12px auto;"></div><em>Restauration philologique et restructuration de la notice par Mistral 14B...</em></div>`;
+    }
+
+    try {
+      const res = await API.call('polish_dictionary_article', match.dict_id || this.activeDictId, match.title, match.raw_text || match.full_text, null, match.slug);
+      if (res && res.success) {
+        match.is_polished = true;
+        match.full_text = res.text;
+        match.polished_model = res.model;
+        App.showToast('Notice restaurée par IA avec succès !', 'success');
+        this.renderSelectedSourceMatch();
+      } else {
+        alert(`Erreur IA : ${res?.error || 'Erreur inconnue'}`);
+        this.renderSelectedSourceMatch();
+      }
+    } catch (e) {
+      alert(`Erreur d'appel IA : ${e}`);
+      this.renderSelectedSourceMatch();
+    } finally {
+      if (btn) btn.disabled = false;
     }
   },
 
-  async renderWikipedia(container, exactTitle = null) {
-    container.innerHTML = `<div style="padding: 30px; color: var(--text-muted); text-align: center;">Chargement de l'article Wikipédia pour « ${exactTitle || this.currentTerm} »...</div>`;
+  // =========================================================================
+  // 5. RECHERCHE RAPIDE MULTI-DICTIONNAIRES
+  // =========================================================================
+
+  async executeLookup(term) {
+    const word = term.trim();
+    if (!word) return;
+
+    this.activeSlug = word;
+    this.activeSourceIndex = 0;
+
+    const bodyEl = document.getElementById('dict-article-body');
+    const heroTitle = document.getElementById('dict-hero-title');
+    const heroBadge = document.getElementById('dict-hero-badge');
+
+    if (heroTitle) heroTitle.textContent = word;
+    if (heroBadge) heroBadge.textContent = 'Recherche globale';
+    if (bodyEl) {
+      bodyEl.innerHTML = `<div style="padding: 40px; text-align: center; color: var(--text-muted);"><div class="synth-spinner" style="width:24px; height:24px; border-width:2px; margin: 0 auto 12px auto;"></div>Recherche dans les dictionnaires pour « ${word} »...</div>`;
+    }
 
     try {
-      const data = await API.call('get_wikipedia_summary', this.currentTerm, exactTitle);
+      const data = await API.call('lookup_dictionary', word);
+      if (data && data.matches && data.matches.length > 0) {
+        this.currentEntryData = {
+          title: data.title || word,
+          badge: data.badge,
+          full_text: data.full_text,
+          matches: data.matches
+        };
+        this.currentMatches = data.matches;
+        this.renderArticleView();
+      } else {
+        // Fallback sur Wikipédia si aucun match dans les dictionnaires
+        this.currentMatches = [];
+        this.renderWikipedia(bodyEl);
+      }
+    } catch (e) {
+      console.error('Erreur recherche dictionnaire:', e);
+      if (bodyEl) {
+        bodyEl.innerHTML = `<div style="padding: 30px; text-align: center; color: var(--accent-red);">Erreur lors de la recherche.</div>`;
+      }
+    }
+  },
+
+  // =========================================================================
+  // 6. MODULE WIKIPÉDIA INTÉGRÉ
+  // =========================================================================
+
+  async renderWikipedia(container, exactTitle = null) {
+    const query = exactTitle || this.currentEntryData?.title || this.activeSlug || 'Bible';
+    container.innerHTML = `<div style="padding: 30px; color: var(--text-muted); text-align: center;"><div class="synth-spinner" style="width:24px; height:24px; border-width:2px; margin: 0 auto 12px auto;"></div>Chargement de l'article Wikipédia pour « ${query} »...</div>`;
+
+    try {
+      const data = await API.call('get_wikipedia_summary', query, exactTitle);
       if (!data || (!data.found && (!data.candidates || data.candidates.length === 0))) {
         container.innerHTML = `
           <div style="padding: 40px; color: var(--text-muted); text-align: center;">
             <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.8" style="display: block; margin: 0 auto 10px auto; opacity: 0.5;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-            Aucun article Wikipédia pertinent trouvé pour « <strong>${this.currentTerm}</strong> ».
-            <div style="margin-top: 14px; display: flex; gap: 6px; justify-content: center;">
-              <input type="text" id="dict-wiki-fallback-input" class="wiki-search-input" style="max-width: 220px;" placeholder="Autre recherche..." value="${this.currentTerm}">
-              <button id="dict-wiki-fallback-submit" class="wiki-search-submit-btn">Chercher</button>
-            </div>
+            Aucun article Wikipédia pertinent trouvé pour « <strong>${query}</strong> ».
           </div>
         `;
-        const fbIn = container.querySelector('#dict-wiki-fallback-input');
-        const fbBtn = container.querySelector('#dict-wiki-fallback-submit');
-        const doSearch = () => {
-          const val = fbIn?.value?.trim();
-          if (val) {
-            this.currentTerm = val;
-            this.renderWikipedia(container);
-          }
-        };
-        fbBtn?.addEventListener('click', doSearch);
-        fbIn?.addEventListener('keydown', (e) => { if (e.key === 'Enter') doSearch(); });
         return;
       }
 
-      // Candidates Navigation (Nuage de mots)
       const candidates = data.candidates || [];
-      const currentTitle = data.title || exactTitle || this.currentTerm;
+      const currentTitle = data.title || exactTitle || query;
 
       let navHtml = `
-        <div class="wiki-top-nav">
-          <div class="wiki-search-row">
-            <input type="text" class="wiki-search-input" id="dict-wiki-query-input" placeholder="Rechercher un autre sujet..." value="${data.search_query || this.currentTerm}">
-            <button class="wiki-search-submit-btn" id="dict-wiki-query-submit">Chercher</button>
-          </div>
+        <div class="wiki-top-nav" style="margin-bottom: 16px;">
           ${candidates.length > 1 ? `
             <div class="wiki-cloud-box">
-              <div class="wiki-cloud-label">Articles connexes :</div>
-              <div class="wiki-pills-bar">
+              <div class="wiki-cloud-label" style="font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">Articles connexes :</div>
+              <div class="wiki-pills-bar" style="display: flex; flex-wrap: wrap; gap: 6px;">
                 ${candidates.map(c => `
-                  <button class="wiki-pill tier-${c.tier || 'md'} ${c.title.toLowerCase() === currentTitle.toLowerCase() ? 'active' : ''}" data-title="${c.title}" title="${c.snippet || c.title}">
+                  <button class="dict-source-pill ${c.title.toLowerCase() === currentTitle.toLowerCase() ? 'active' : ''}" data-title="${c.title}">
                     ${c.title}
                   </button>
                 `).join('')}
@@ -254,126 +643,28 @@ const DictView = {
         : cleanExtract;
 
       container.innerHTML = `
-        <div class="wiki-container">
+        <div class="wiki-container" style="line-height: 1.75; font-size: 15px;">
           ${navHtml}
-
-          <div class="wiki-header-box">
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
             <div>
-              <div class="wiki-title">${data.title}</div>
+              <h2 style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin: 0;">${data.title}</h2>
               ${data.description ? `<div style="font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 2px;">${data.description}</div>` : ''}
             </div>
-            <a href="${data.url}" target="_blank" class="wiki-link-btn" title="Ouvrir sur le web">Ouvrir l'article complet ↗</a>
+            <a href="${data.url}" target="_blank" style="font-size: 11px; color: var(--accent-blue); text-decoration: none; padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 4px; white-space: nowrap;">Ouvrir sur le web ↗</a>
           </div>
 
-          ${data.thumbnail ? `<img src="${data.thumbnail}" class="wiki-thumbnail" alt="${data.title}">` : ''}
+          ${data.thumbnail ? `<img src="${data.thumbnail}" style="max-width: 180px; float: right; margin: 0 0 12px 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);" alt="${data.title}">` : ''}
 
           <div class="wiki-extract">${linkifiedExtract}</div>
-
-          <div style="display: flex; gap: 8px; align-items: center;">
-            <button class="wiki-more-btn" id="btn-dict-wiki-more" data-expanded="false" style="display: flex; align-items: center; gap: 5px;">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-              <span id="dict-wiki-more-label">Voir plus ▾</span>
-            </button>
-          </div>
-
-          <div class="wiki-extended-box hidden" id="dict-wiki-extended-container"></div>
         </div>
       `;
 
-      // Attacher les infobulles sur le résumé Wikipédia initial
-      if (typeof ScriptureTooltip !== 'undefined') {
-        ScriptureTooltip.bindToElements(container.querySelectorAll('.theol-inline-scripture-ref'));
-      }
-      container.querySelectorAll('.theol-inline-scripture-ref').forEach(span => {
-        span.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const ref = span.dataset.ref || span.textContent.trim();
-          if (ref) {
-            if (typeof ScriptureTooltip !== 'undefined') ScriptureTooltip.hide();
-            if (typeof TheologyView !== 'undefined') TheologyView.openScriptureReference(ref);
-          }
-        });
-      });
-
-      // Event handlers
-      const qInput = container.querySelector('#dict-wiki-query-input');
-      const qSubmit = container.querySelector('#dict-wiki-query-submit');
-      const doNavSearch = () => {
-        const val = qInput?.value?.trim();
-        if (val) {
-          this.currentTerm = val;
-          this.renderWikipedia(container);
-        }
-      };
-      qSubmit?.addEventListener('click', doNavSearch);
-      qInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') doNavSearch(); });
-
-      container.querySelectorAll('.wiki-pill').forEach(pill => {
+      // Attacher les clics sur les suggestions connexes
+      container.querySelectorAll('.dict-source-pill').forEach(pill => {
         pill.addEventListener('click', () => {
           this.renderWikipedia(container, pill.dataset.title);
         });
       });
-
-      const btnMore = container.querySelector('#btn-dict-wiki-more');
-      const extContainer = container.querySelector('#dict-wiki-extended-container');
-      const moreLabel = container.querySelector('#dict-wiki-more-label');
-
-      if (btnMore && extContainer) {
-        btnMore.addEventListener('click', async () => {
-          const isExp = btnMore.dataset.expanded === 'true';
-          if (isExp) {
-            extContainer.classList.add('hidden');
-            btnMore.dataset.expanded = 'false';
-            moreLabel.textContent = 'Voir plus ▾';
-          } else {
-            if (!extContainer.innerHTML.trim()) {
-              moreLabel.textContent = 'Chargement de la suite...';
-              btnMore.disabled = true;
-              try {
-                const extData = await API.call('get_wikipedia_extended', data.title);
-                if (extData && extData.found && extData.html) {
-                  const linkifiedExt = (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences)
-                    ? TheologyView.highlightScriptureReferences(extData.html)
-                    : extData.html;
-                  extContainer.innerHTML = linkifiedExt;
-
-                  if (typeof ScriptureTooltip !== 'undefined') {
-                    ScriptureTooltip.bindToElements(extContainer.querySelectorAll('.theol-inline-scripture-ref'));
-                  }
-                  extContainer.querySelectorAll('.theol-inline-scripture-ref').forEach(span => {
-                    span.addEventListener('click', (e) => {
-                      e.stopPropagation();
-                      const ref = span.dataset.ref || span.textContent.trim();
-                      if (ref) {
-                        if (typeof ScriptureTooltip !== 'undefined') ScriptureTooltip.hide();
-                        if (typeof TheologyView !== 'undefined') TheologyView.openScriptureReference(ref);
-                      }
-                    });
-                  });
-
-                  extContainer.classList.remove('hidden');
-                  btnMore.dataset.expanded = 'true';
-                  moreLabel.textContent = 'Voir moins ▴';
-                } else {
-                  extContainer.innerHTML = `<div style="color: var(--text-muted); font-style: italic;">Pas de sections supplémentaires disponibles.</div>`;
-                  extContainer.classList.remove('hidden');
-                  btnMore.dataset.expanded = 'true';
-                  moreLabel.textContent = 'Voir moins ▴';
-                }
-              } catch (e) {
-                alert(`Erreur : ${e}`);
-                moreLabel.textContent = 'Voir plus ▾';
-              } finally {
-                btnMore.disabled = false;
-              }
-            } else {
-              extContainer.classList.remove('hidden');
-              btnMore.dataset.expanded = 'true';
-              moreLabel.textContent = 'Voir moins ▴';
-            }
-          }
-        });
-      }
 
     } catch (e) {
       console.error('Erreur Wikipédia:', e);
@@ -381,3 +672,5 @@ const DictView = {
     }
   }
 };
+
+window.DictView = DictView;

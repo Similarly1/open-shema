@@ -110,7 +110,17 @@ class DictionaryManager:
             
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         rel_file = dict_info.get("file", "")
-        file_path = os.path.join(base_dir, rel_file) if not os.path.isabs(rel_file) else rel_file
+        
+        if os.path.isabs(rel_file):
+            file_path = rel_file
+        else:
+            candidates = [
+                os.path.join(base_dir, "data", rel_file),
+                os.path.join(base_dir, rel_file),
+                os.path.join(base_dir, "data", "dictionaries", os.path.basename(rel_file)),
+                os.path.join(base_dir, "data", os.path.basename(rel_file))
+            ]
+            file_path = next((p for p in candidates if os.path.exists(p)), candidates[0])
         
         if not os.path.exists(file_path):
             return None
@@ -121,8 +131,205 @@ class DictionaryManager:
                 cls._dict_cache[dict_id] = data
                 return data
         except Exception as e:
-            print(f"Erreur chargement dictionnaire {dict_id} : {e}")
+            print(f"Erreur chargement dictionnaire {dict_id} ({file_path}) : {e}")
             return None
+
+    @classmethod
+    def get_all_dictionaries(cls) -> list:
+        """Retourne la liste enrichie de tous les dictionnaires disponibles."""
+        reg = cls.load_registry()
+        result = []
+        for d in reg:
+            item = dict(d)
+            dict_type = d.get("type", "custom")
+            if dict_type == "strong":
+                item["badge"] = "STRONG"
+                item["subtitle"] = "Lexique Hébreu & Grec Strong"
+            elif dict_type == "greek":
+                item["badge"] = "BAILLY"
+                item["subtitle"] = "Grec Ancien - Français"
+            else:
+                data = cls.load_dictionary_file(d)
+                if data and "articles" in data:
+                    item["count"] = len(data["articles"])
+                item["badge"] = "DICT"
+                item["subtitle"] = f"{item.get('count', 0):,} articles".replace(",", " ")
+            result.append(item)
+        return result
+
+    @classmethod
+    def get_headwords(
+        cls, 
+        dict_id: str, 
+        letter: str = None, 
+        query: str = None, 
+        limit: int = 300, 
+        offset: int = 0
+    ) -> dict:
+        """
+        Retourne l'index alphabétique ordonné des termes / lemmes d'un dictionnaire spécifique.
+        """
+        reg = cls.load_registry()
+        d_info = next((d for d in reg if d["id"] == dict_id), None)
+        if not d_info:
+            d_info = reg[0] if reg else {"id": dict_id, "name": dict_id}
+
+        dict_type = d_info.get("type", "custom")
+        headwords = []
+
+        norm_q = cls.normalize_term(query) if query else ""
+        filter_letter = letter.upper().strip() if letter and letter not in ["ALL", "TOUS", "*"] else None
+
+        # 1. Strong
+        if dict_type == "strong":
+            from core.strong_lexicon import StrongLexicon
+            lex = StrongLexicon.load_lexicon()
+            for code, ent in lex.items():
+                short = ent.get("short_code", ent.get("code", code))
+                lemma = ent.get("lemma", "")
+                translit = ent.get("translit", "")
+                defn = ent.get("definition", "")
+                title = f"{short} — {lemma} ({translit})" if translit else f"{short} — {lemma}"
+                
+                if filter_letter:
+                    if filter_letter == "H" and not short.startswith("H"): continue
+                    elif filter_letter == "G" and not short.startswith("G"): continue
+                    elif filter_letter not in ["H", "G"] and not translit.upper().startswith(filter_letter) and not short.startswith(filter_letter):
+                        continue
+                if norm_q:
+                    search_str = f"{short} {lemma} {translit} {cls.normalize_term(defn[:150])}".lower()
+                    if norm_q not in search_str:
+                        continue
+                
+                snippet = defn[:120] + "..." if len(defn) > 120 else defn
+                headwords.append({
+                    "slug": code,
+                    "title": title,
+                    "lemma": lemma,
+                    "code": short,
+                    "snippet": snippet
+                })
+            def strong_sort_key(item):
+                c = item["code"]
+                prefix = 0 if c.startswith("H") else 1
+                num = int(re.sub(r'\D', '', c)) if re.search(r'\d+', c) else 0
+                return (prefix, num)
+            headwords.sort(key=strong_sort_key)
+
+        # 2. Bailly
+        elif dict_type == "greek":
+            from core.strong_lexicon import StrongLexicon
+            bailly_data = StrongLexicon.load_bailly()
+            by_strong = bailly_data.get("by_strong", {})
+            for code, entries in by_strong.items():
+                if not entries: continue
+                first = entries[0]
+                hw = first.get("headword", code)
+                txt = first.get("full_text", "")
+                title = f"{code} — {hw}"
+                if filter_letter and not hw.upper().startswith(filter_letter) and not code.startswith(filter_letter):
+                    continue
+                if norm_q and norm_q not in f"{code} {hw} {cls.normalize_term(txt[:150])}".lower():
+                    continue
+                headwords.append({
+                    "slug": code,
+                    "title": title,
+                    "code": code,
+                    "snippet": txt[:120] + "..." if len(txt) > 120 else txt
+                })
+            headwords.sort(key=lambda x: (int(re.sub(r'\D', '', x['code'])) if re.search(r'\d+', x['code']) else 0))
+
+        # 3. Dictionnaires Personnalisés / Calmet / Vigouroux / Nouveau Dict
+        else:
+            data = cls.load_dictionary_file(d_info)
+            articles = data.get("articles", {}) if data else {}
+            
+            for slug, art in articles.items():
+                title = art.get("title") or art.get("headword") or slug
+                clean_title = title.strip()
+                norm_title = cls.normalize_term(clean_title)
+                
+                if filter_letter:
+                    first_char = unicodedata.normalize('NFD', clean_title.upper())[0] if clean_title else ''
+                    if first_char != filter_letter:
+                        continue
+                        
+                if norm_q:
+                    art_text = art.get("text", "")[:300]
+                    if norm_q not in norm_title and norm_q not in cls.normalize_term(art_text):
+                        continue
+                        
+                txt = art.get("text", "")
+                snippet = re.sub(r'^[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\s–-]{2,}\s*', '', txt).strip()
+                if len(snippet) > 120:
+                    snippet = snippet[:120] + "..."
+                elif not snippet:
+                    snippet = txt[:120] + "..." if len(txt) > 120 else txt
+                    
+                headwords.append({
+                    "slug": slug,
+                    "title": clean_title,
+                    "snippet": snippet
+                })
+                
+            headwords.sort(key=lambda x: cls.normalize_term(x["title"]))
+
+        total_count = len(headwords)
+        paged_headwords = headwords[offset:offset + limit]
+
+        return {
+            "dict_id": d_info["id"],
+            "dict_name": d_info["name"],
+            "total_count": total_count,
+            "offset": offset,
+            "limit": limit,
+            "headwords": paged_headwords
+        }
+
+    @classmethod
+    def get_entry_content(cls, dict_id: str, slug_or_title: str, strong_code: str = None) -> dict:
+        """Retourne le contenu complet et enrichi d'un article de dictionnaire."""
+        reg = cls.load_registry()
+        d_info = next((d for d in reg if d["id"] == dict_id), None)
+        if not d_info:
+            d_info = reg[0] if reg else {"id": dict_id, "name": dict_id}
+
+        main_match = cls.lookup_in_dict(d_info, slug_or_title, strong_code=strong_code)
+        
+        other_matches = []
+        for other_d in reg:
+            if other_d["id"] == dict_id:
+                continue
+            m = cls.lookup_in_dict(other_d, slug_or_title, strong_code=strong_code)
+            if m:
+                other_matches.append(m)
+
+        all_matches = ([main_match] if main_match else []) + other_matches
+
+        if not main_match and other_matches:
+            main_match = other_matches[0]
+
+        if not main_match:
+            return {
+                "dict_id": dict_id,
+                "dict_name": d_info.get("name", dict_id),
+                "title": slug_or_title,
+                "full_text": "",
+                "matches": []
+            }
+
+        return {
+            "dict_id": dict_id,
+            "dict_name": d_info.get("name", dict_id),
+            "title": main_match.get("title", slug_or_title),
+            "badge": main_match.get("badge", d_info.get("name", dict_id)),
+            "full_text": main_match.get("full_text", ""),
+            "raw_text": main_match.get("raw_text", ""),
+            "is_polished": main_match.get("is_polished", False),
+            "polished_model": main_match.get("polished_model", ""),
+            "slug": slug_or_title,
+            "matches": all_matches
+        }
 
     @classmethod
     def lookup_in_dict(cls, dict_info, word, strong_code=None):

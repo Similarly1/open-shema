@@ -1310,9 +1310,11 @@ class BibleAppApi:
     # =========================================================================
 
     def get_library_books(self) -> List[Dict[str, Any]]:
-        """Retourne tous les ouvrages de la bibliothèque avec leurs couvertures en data URL."""
+        """Retourne tous les ouvrages de la bibliothèque (Bibles, Théologie, Dictionnaires) avec leurs couvertures."""
         registry = load_books_metadata()
         books = []
+        registered_dict_ids = set()
+
         for name, meta in registry.items():
             b = meta.copy()
             b["name"] = name
@@ -1321,7 +1323,52 @@ class BibleAppApi:
             b["cover_data_url"] = data_url
             if data_url:
                 b["cover_url"] = data_url
+            if b.get("type") == "Dictionnaire" or b.get("dict_id"):
+                registered_dict_ids.add(b.get("dict_id") or b.get("name"))
             books.append(b)
+
+        # Intégrer également tous les dictionnaires enregistrés dans DictionaryManager
+        dict_registry = DictionaryManager.get_all_dictionaries()
+        covers_dir = os.path.join(current_dir, "data", "covers")
+        
+        for d in dict_registry:
+            d_id = d.get("id")
+            d_name = d.get("name")
+            
+            # Vérifier si déjà présent dans books
+            matched_book = next((b for b in books if b.get("dict_id") == d_id or b.get("name") == d_name or b.get("title") == d_name), None)
+            if matched_book:
+                matched_book["dict_id"] = d_id
+                matched_book["type"] = "Dictionnaire"
+                matched_book["articles_count"] = d.get("count", 0)
+                matched_book["active"] = d.get("enabled", True)
+            else:
+                # Chercher une couverture automatique dans data/covers/
+                cov_path = None
+                if os.path.exists(covers_dir):
+                    for fn in os.listdir(covers_dir):
+                        fn_l = fn.lower()
+                        if (d_id in fn_l) or ("calmet" in d_id and "calmet" in fn_l) or ("vigo" in d_id and "vigo" in fn_l) or ("nouveau" in d_id and "nouveau" in fn_l):
+                            cov_path = os.path.join(covers_dir, fn)
+                            break
+                
+                author_name = "Dom Calmet" if d_id == "calmet" else ("F. Vigouroux" if d_id == "vigouroux" else ("Anatole Bailly" if d_id == "bailly" else ("James Strong" if d_id == "strong" else "Collectif")))
+                
+                books.append({
+                    "name": d_name,
+                    "title": d_name,
+                    "dict_id": d_id,
+                    "author": author_name,
+                    "type": "Dictionnaire",
+                    "description": f"Dictionnaire biblique comprenant {d.get('count', 0):,} articles et définitions.".replace(",", " "),
+                    "chapters_count": 0,
+                    "articles_count": d.get("count", 0),
+                    "active": d.get("enabled", True),
+                    "cover_path": cov_path,
+                    "cover_data_url": get_cover_data_url(cov_path) if cov_path else None,
+                    "format": "dict"
+                })
+
         return books
 
     def get_cover_image_data(self, cover_path: str) -> Dict[str, Any]:
@@ -1330,13 +1377,21 @@ class BibleAppApi:
         return {"success": bool(data_url), "data_url": data_url}
 
     def toggle_book(self, book_name: str, active: bool) -> bool:
-        """Active ou désactive un ouvrage."""
+        """Active ou désactive un ouvrage ou dictionnaire."""
+        # 1. Vérifier si c'est un dictionnaire dans DictionaryManager
+        dict_reg = DictionaryManager.load_registry()
+        for d in dict_reg:
+            if d.get("name") == book_name or d.get("id") == book_name:
+                d["enabled"] = bool(active)
+                DictionaryManager.save_registry(dict_reg)
+                break
+
         registry = load_books_metadata()
         if book_name in registry:
             registry[book_name]["active"] = bool(active)
             save_books_metadata(registry)
             return True
-        return False
+        return True
 
     def delete_book(self, book_name: str) -> bool:
         """Supprime définitivement un ouvrage."""
@@ -1882,7 +1937,13 @@ class BibleAppApi:
         return mgr.download_and_import()
 
     def get_dictionaries(self) -> List[Dict[str, Any]]:
-        return [dict(d) for d in DictionaryManager.load_registry()]
+        return DictionaryManager.get_all_dictionaries()
+
+    def get_dictionary_headwords(self, dict_id: str, letter: Optional[str] = None, query: Optional[str] = None, limit: int = 300, offset: int = 0) -> Dict[str, Any]:
+        return DictionaryManager.get_headwords(dict_id, letter=letter, query=query, limit=limit, offset=offset)
+
+    def get_dictionary_entry(self, dict_id: str, slug: str, strong_code: Optional[str] = None) -> Dict[str, Any]:
+        return DictionaryManager.get_entry_content(dict_id, slug, strong_code=strong_code)
 
     def save_dictionaries(self, dict_list: List[Dict[str, Any]]) -> bool:
         DictionaryManager.save_registry(dict_list)

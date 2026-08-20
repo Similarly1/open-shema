@@ -307,6 +307,18 @@ const API = {
       tags,
       id
     });
+  },
+
+  async getDictionaries() {
+    return this.call('get_dictionaries');
+  },
+
+  async getDictionaryHeadwords(dictId, letter = null, query = null, limit = 300, offset = 0) {
+    return this.call('get_dictionary_headwords', dictId, letter, query, limit, offset);
+  },
+
+  async getDictionaryEntry(dictId, slug, strongCode = null) {
+    return this.call('get_dictionary_entry', dictId, slug, strongCode);
   }
 };
 
