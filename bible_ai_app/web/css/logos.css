@@ -1268,6 +1268,25 @@ body.sidebar-is-collapsed .topbar-left-zone .quick-passage-box {
   font-weight: 600;
   color: var(--accent-blue);
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 280px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.pane-action-btn:hover {
+  background-color: var(--bg-hover, rgba(0, 0, 0, 0.05));
+}
+#pane-1-bible-name,
+#pane-2-bible-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .pane-close-btn {
   border: none;

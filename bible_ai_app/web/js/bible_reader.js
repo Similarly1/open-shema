@@ -1943,7 +1943,7 @@ const ContextMenuManager = {
     const actionsEl = document.getElementById('context-menu-actions');
 
     headerTitle.textContent = refStr;
-    headerBadge.textContent = BibleReader.currentBible1;
+    headerBadge.textContent = BibleReader.getBibleDisplayName(BibleReader.currentBible1);
     previewEl.innerHTML = `« ${verseText} »`;
 
     this.positionMenu(clientX, clientY);
@@ -2688,6 +2688,17 @@ const BibleReader = {
     return this.installedBibles.find(b => b.name !== base.name) || null;
   },
 
+  getBibleDisplayName(bibleName) {
+    if (!bibleName) return '';
+    const item = (this.installedBibles || []).find(b => 
+      b.name === bibleName || 
+      b.id === bibleName || 
+      (b.version_code && b.version_code.toUpperCase() === bibleName.toUpperCase())
+    );
+    if (item && item.title) return item.title;
+    return bibleName;
+  },
+
   updatePaneHeader(paneNum) {
     if (paneNum === 1) {
       const el = document.getElementById('pane-1-bible-name');
@@ -2696,7 +2707,7 @@ const BibleReader = {
         const interLabel = this.pane1InterlinearVersion === 'DARBY' ? 'Darby (Interlinéaire)' : 'LSG 1910 (Interlinéaire)';
         el.textContent = interLabel;
       } else {
-        el.textContent = this.currentBible1;
+        el.textContent = this.getBibleDisplayName(this.currentBible1);
       }
     } else if (paneNum === 2) {
       const el = document.getElementById('pane-2-bible-name');
@@ -2705,7 +2716,7 @@ const BibleReader = {
         const interLabel = this.pane2InterlinearVersion === 'DARBY' ? 'Darby (Interlinéaire)' : 'LSG 1910 (Interlinéaire)';
         el.textContent = interLabel;
       } else {
-        el.textContent = this.currentBible2;
+        el.textContent = this.getBibleDisplayName(this.currentBible2);
       }
 
       // Mise à jour de la suggestion rapide pour la Colonne 2
@@ -3058,6 +3069,54 @@ const BibleReader = {
     }
   },
 
+  selectVerse(bookCode, chapterNum, verseNum, options = {}) {
+    const { scroll = true, behavior = 'smooth', block = 'center' } = options;
+    const vStr = String(verseNum);
+    const chStr = String(chapterNum || this.currentChapter);
+    const bStr = String(bookCode || this.currentBook);
+
+    this.selectedVerse = parseInt(vStr, 10) || 1;
+
+    // Retirer 'selected' de tous les versets de l'espace de travail (volets 1 et 2)
+    const workspace = document.getElementById('reader-workspace') || document;
+    workspace.querySelectorAll('.verse-item.selected').forEach(el => el.classList.remove('selected'));
+
+    // Surligner le verset dans le Volet 1
+    const pane1 = document.getElementById('pane-1-content');
+    const v1 = pane1?.querySelector(`.verse-item[data-book-code="${bStr}"][data-chapter="${chStr}"][data-verse-num="${vStr}"]`)
+      || pane1?.querySelector(`.verse-item[data-verse-num="${vStr}"]`);
+    if (v1) {
+      v1.classList.add('selected');
+      if (scroll) {
+        v1.scrollIntoView({ block, behavior });
+      }
+    }
+
+    // Surligner le verset dans le Volet 2 si la double vue est active
+    if (this.isSplitView) {
+      const pane2 = document.getElementById('pane-2-content');
+      const v2 = pane2?.querySelector(`.verse-item[data-book-code="${bStr}"][data-chapter="${chStr}"][data-verse-num="${vStr}"]`)
+        || pane2?.querySelector(`.verse-item[data-verse-num="${vStr}"]`);
+      if (v2) {
+        v2.classList.add('selected');
+        // Si le défilement n'est pas synchronisé, faire défiler le volet 2 aussi
+        if (scroll && !this.isScrollSynced) {
+          v2.scrollIntoView({ block, behavior });
+        }
+      }
+    }
+
+    // Mettre à jour l'étiquette de référence en haut du lecteur
+    const info = getBookInfo(bStr);
+    const pillRef = document.getElementById('pill-reference-text');
+    if (pillRef && info) {
+      pillRef.textContent = `${info.name} ${chStr}:${vStr}`;
+    }
+
+    // Charger les commentaires exégétiques pour ce verset
+    this.loadCommentariesForVerse(vStr, bStr, chStr);
+  },
+
   selectAndScrollToVerse(verseNum, bookCode = null, chapterNum = null) {
     const vNum = parseInt(verseNum, 10);
     if (!vNum) return;
@@ -3065,25 +3124,7 @@ const BibleReader = {
     const ch = chapterNum || this.currentChapter;
 
     setTimeout(() => {
-      const pane1 = document.getElementById('pane-1-content');
-      if (!pane1) return;
-
-      const verseEl = pane1.querySelector(`.verse-item[data-book-code="${bCode}"][data-chapter="${ch}"][data-verse-num="${vNum}"]`)
-        || pane1.querySelector(`.verse-item[data-verse-num="${vNum}"]`);
-
-      if (verseEl) {
-        document.querySelectorAll('.verse-item').forEach(el => el.classList.remove('selected'));
-        verseEl.classList.add('selected');
-        verseEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
-
-        if (this.isSplitView) {
-          const pane2 = document.getElementById('pane-2-content');
-          const verseEl2 = pane2?.querySelector(`.verse-item[data-book-code="${bCode}"][data-chapter="${ch}"][data-verse-num="${vNum}"]`);
-          if (verseEl2) verseEl2.classList.add('selected');
-        }
-
-        this.loadCommentariesForVerse(vNum, bCode, ch);
-      }
+      this.selectVerse(bCode, ch, vNum, { scroll: true, behavior: 'smooth', block: 'center' });
     }, 120);
   },
 
@@ -3407,8 +3448,7 @@ const BibleReader = {
             const w = wEl.dataset.word;
             wEl.addEventListener('click', (e) => {
               e.stopPropagation();
-              document.querySelectorAll('.verse-item').forEach(el => el.classList.remove('selected'));
-              vSpan.classList.add('selected');
+              this.selectVerse(data.book || this.currentBook, data.chapter || this.currentChapter, v.verse, { scroll: false });
               this.lookupWordInLexicon(w);
             });
 
@@ -3427,15 +3467,7 @@ const BibleReader = {
 
         // Clic sur le verset (hors mot spécifique ou pour sélectionner) -> charger commentaires
         vSpan.addEventListener('click', () => {
-          document.querySelectorAll('.verse-item').forEach(el => el.classList.remove('selected'));
-          vSpan.classList.add('selected');
-          if (this.isSplitView) {
-            const workspace = document.getElementById('reader-workspace');
-            workspace?.querySelectorAll(`.verse-item[data-book-code="${data.book}"][data-chapter="${data.chapter}"][data-verse-num="${v.verse}"]`).forEach(el => {
-              el.classList.add('selected');
-            });
-          }
-          this.loadCommentariesForVerse(v.verse, data.book, data.chapter);
+          this.selectVerse(data.book || this.currentBook, data.chapter || this.currentChapter, v.verse, { scroll: false });
         });
 
         // Double clic sur le verset -> menu contextuel verset
@@ -3666,15 +3698,12 @@ const BibleReader = {
       }
     }
 
-    allVerses.forEach(el => el.classList.remove('selected'));
     const target = allVerses[nextIdx];
     if (target) {
-      target.classList.add('selected');
-      target.scrollIntoView({ block: 'center', behavior: 'smooth' });
       const vNum = target.dataset.verseNum;
       const bCode = target.dataset.bookCode || this.currentBook;
       const ch = target.dataset.chapter || this.currentChapter;
-      this.loadCommentariesForVerse(vNum, bCode, ch);
+      this.selectVerse(bCode, ch, vNum, { scroll: true, behavior: 'smooth', block: 'center' });
     }
   },
 
@@ -3702,15 +3731,12 @@ const BibleReader = {
       }
     }
 
-    allVerses.forEach(el => el.classList.remove('selected'));
     const target = allVerses[prevIdx];
     if (target) {
-      target.classList.add('selected');
-      target.scrollIntoView({ block: 'center', behavior: 'smooth' });
       const vNum = target.dataset.verseNum;
       const bCode = target.dataset.bookCode || this.currentBook;
       const ch = target.dataset.chapter || this.currentChapter;
-      this.loadCommentariesForVerse(vNum, bCode, ch);
+      this.selectVerse(bCode, ch, vNum, { scroll: true, behavior: 'smooth', block: 'center' });
     }
   }
 };
