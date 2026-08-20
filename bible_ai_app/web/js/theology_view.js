@@ -1583,7 +1583,7 @@ const TheologyView = {
             </div>
           </div>
           <div class="theol-loader-title">OUVRAGES DE THÉOLOGIE</div>
-          <div class="theol-loader-subtitle">שְׁמַע • ÉTUDES DOCTRINALES & SYSTEMATIQUES</div>
+          <div class="theol-loader-subtitle">ÉTUDES DOCTRINALES & SYSTEMATIQUES</div>
           <div class="theol-loader-progress-track">
             <div class="theol-loader-progress-bar"></div>
           </div>

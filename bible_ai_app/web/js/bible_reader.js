@@ -3266,6 +3266,37 @@ const BibleReader = {
     }
   },
 
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  },
+
+  getBibleLoaderHtml(bookName, chapterNum, bibleName) {
+    const title = bookName ? `${bookName} ${chapterNum}` : 'SAINTE BIBLE';
+    const sub = bibleName ? this.escapeHtml(bibleName.toUpperCase()) : 'TEXTE SACRÉ & CANON BIBLIQUE';
+    return `
+      <div class="bible-view-loader">
+        <div class="bible-loader-glow">
+          <div class="bible-loader-icon">
+            <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="bible-loader-title">${title}</div>
+        <div class="bible-loader-subtitle">${sub}</div>
+        <div class="bible-loader-progress-track">
+          <div class="bible-loader-progress-bar"></div>
+        </div>
+        <div class="bible-loader-status">Chargement du texte biblique...</div>
+      </div>
+    `;
+  },
+
   async navigateTo(bookCode, chapterNum, verseNum = null) {
     this.currentBook = bookCode;
     this.currentChapter = chapterNum;
@@ -3280,19 +3311,33 @@ const BibleReader = {
     this.updatePaneHeader(1);
 
     const pane1Container = document.getElementById('pane-1-verses');
-    if (pane1Container) pane1Container.innerHTML = '';
-
-    const data1 = await API.getChapterData(this.currentBible1, bookCode, chapterNum, this.pane1IsInterlinear ? this.pane1InterlinearVersion : null);
-    const block1 = this.createChapterBlockElement(1, data1, this.currentBible1);
-    if (pane1Container) pane1Container.appendChild(block1);
+    if (pane1Container) {
+      pane1Container.innerHTML = this.getBibleLoaderHtml(info.name.toUpperCase(), chapterNum, this.currentBible1);
+    }
 
     if (this.isSplitView) {
       const pane2Container = document.getElementById('pane-2-verses');
-      if (pane2Container) pane2Container.innerHTML = '';
+      if (pane2Container) {
+        pane2Container.innerHTML = this.getBibleLoaderHtml(info.name.toUpperCase(), chapterNum, this.currentBible2);
+      }
       this.updatePaneHeader(2);
+    }
+
+    const data1 = await API.getChapterData(this.currentBible1, bookCode, chapterNum, this.pane1IsInterlinear ? this.pane1InterlinearVersion : null);
+    const block1 = this.createChapterBlockElement(1, data1, this.currentBible1);
+    if (pane1Container) {
+      pane1Container.innerHTML = '';
+      pane1Container.appendChild(block1);
+    }
+
+    if (this.isSplitView) {
+      const pane2Container = document.getElementById('pane-2-verses');
       const data2 = await API.getChapterData(this.currentBible2, bookCode, chapterNum, this.pane2IsInterlinear ? this.pane2InterlinearVersion : null);
       const block2 = this.createChapterBlockElement(2, data2, this.currentBible2);
-      if (pane2Container) pane2Container.appendChild(block2);
+      if (pane2Container) {
+        pane2Container.innerHTML = '';
+        pane2Container.appendChild(block2);
+      }
       
       const pane2 = document.getElementById('pane-2-content');
       if (pane2) pane2.scrollTop = 0;
