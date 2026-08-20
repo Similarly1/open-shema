@@ -558,7 +558,8 @@
     "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
     "chapters_count": 86,
     "format": "epub",
-    "active": true
+    "active": true,
+    "file_path": "C:\\Users\\adrie\\kDrive\\Documents\\Théologie\\Ressources externes\\Ebooks\\NIV, the NIV Zondervan Study Bible (Bible  Zondervan [Bible  Zondervan]) (z-library.sk, 1lib.sk, z-lib.sk).epub"
   },
   "NIV Cultural": {
     "title": "NIV, Cultural Backgrounds Study Bible, eBook",
@@ -573,7 +574,8 @@
     "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
     "chapters_count": 79,
     "format": "epub",
-    "active": true
+    "active": true,
+    "file_path": "C:\\Users\\adrie\\kDrive\\Documents\\Théologie\\Ressources externes\\Ebooks\\NIV Cultural Backgrounds Study Bible Bringing to Life the Ancient World of Scripture (Keener, Craig S.Walton, John H) (z-library.sk, 1lib.sk, z-lib.sk).epub"
   },
   "MacArthur BC": {
     "title": "The MacArthur Bible commentary",
@@ -588,7 +590,8 @@
     "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
     "chapters_count": 99,
     "format": "epub",
-    "active": true
+    "active": true,
+    "file_path": "C:\\Users\\adrie\\kDrive\\Documents\\Théologie\\Ressources externes\\Ebooks\\The MacArthur Bible Commentary Unleashing Gods Truth, One Verse at a Time (John MacArthur) (z-library.sk, 1lib.sk, z-lib.sk).epub"
   },
   "STGru": {
     "title": "Systematic Theology",
@@ -603,7 +606,8 @@
     "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
     "chapters_count": 71,
     "format": "epub",
-    "active": true
+    "active": true,
+    "file_path": "C:\\Users\\adrie\\kDrive\\Documents\\Théologie\\Ressources externes\\Ebooks\\Systematic Theology (Wayne A. Grudem [Grudem, Wayne A.]) (z-library.sk, 1lib.sk, z-lib.sk).epub"
   },
   "Notes d'étude Segond 21": {
     "id": "s21_notes",
@@ -631,7 +635,8 @@
     "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
     "chapters_count": 71,
     "format": "epub",
-    "active": true
+    "active": true,
+    "file_path": "C:\\Users\\adrie\\kDrive\\Documents\\Théologie\\Ressources externes\\Ebooks\\NIV Archaeological Study Bible (Walter C. Kaiser, Jr.) (z-library.sk, 1lib.sk, z-lib.sk).epub"
   },
   "Les trésors de la foi (C. Spurgeon)": {
     "title": "Les trésors de la foi (C. Spurgeon)",
