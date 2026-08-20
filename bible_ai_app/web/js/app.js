@@ -14,6 +14,7 @@ const App = {
 
     // 1. Initialiser tous les sous-systèmes de manière résiliente
     const modules = [
+      { name: 'TaskManager', init: () => (typeof TaskManager !== 'undefined' && TaskManager.init()) },
       { name: 'BibleReader', init: () => BibleReader.init() },
       { name: 'ImportModal', init: () => ImportModal.init() },
       { name: 'LibraryView', init: () => LibraryView.init() },
@@ -531,6 +532,38 @@ const App = {
     }).catch(err => {
       console.error('Erreur copie presse-papier:', err);
     });
+  },
+
+  showToast(message, type = 'info', duration = 3500) {
+    let container = document.getElementById('app-toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'app-toast-container';
+      document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `app-toast-item toast-${type}`;
+    
+    let icon = '';
+    if (type === 'success') {
+      icon = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+    } else if (type === 'error') {
+      icon = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#ef4444" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+    } else {
+      icon = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#38bdf8" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
+    }
+
+    toast.innerHTML = `<span>${icon}</span><span>${message}</span>`;
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(10px) scale(0.95)';
+      setTimeout(() => {
+        toast.remove();
+      }, 250);
+    }, duration);
   },
 
   bindChat() {

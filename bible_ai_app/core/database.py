@@ -92,7 +92,11 @@ class VectorDB:
                 )
                 if progress_callback:
                     current_done = already_done + end
-                    progress_callback(int((current_done / total_all) * 100))
+                    pct = int((current_done / total_all) * 100)
+                    try:
+                        progress_callback(pct, current_done, total_all)
+                    except TypeError:
+                        progress_callback(pct)
             return
             
         if "infomaniak" in embedding_model or "bge" in embedding_model or "mini_lm" in embedding_model:
@@ -126,7 +130,11 @@ class VectorDB:
             )
             if progress_callback:
                 current_done = already_done + end
-                progress_callback(int((current_done / total_all) * 100))
+                pct = int((current_done / total_all) * 100)
+                try:
+                    progress_callback(pct, current_done, total_all)
+                except TypeError:
+                    progress_callback(pct)
 
     def get_by_reference(self, reference, active_sources=None):
         if not active_sources:

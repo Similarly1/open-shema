@@ -105,7 +105,15 @@ class TheologyReaderManager:
         client = cls.get_chroma_client()
         chapters_dict = {}
 
-        for col_name in ['bible_study_bge_multilingual_gemma2_Infomaniak', 'study_library', 'bible_study_gemini_embedding_2']:
+        collections_to_search = []
+        try:
+            for c in client.list_collections():
+                c_name = c.name if hasattr(c, 'name') else str(c)
+                collections_to_search.append(c_name)
+        except Exception:
+            collections_to_search = ['bible_study_bge_multilingual_gemma2_Infomaniak', 'study_library', 'bible_study_gemini_embedding_2']
+
+        for col_name in collections_to_search:
             try:
                 col = client.get_collection(col_name)
                 res = col.get(where={"name": book_name}, include=['metadatas'])
@@ -138,6 +146,30 @@ class TheologyReaderManager:
                             chapters_dict[cid_int]["chunks_count"] += 1
             except Exception as e:
                 logger.debug(f"[TheologyReaderManager] Recherche TOC {col_name} : {e}")
+
+        # Fallback si aucun fragment dans ChromaDB (ex: en cours d'indexation ou sans IA)
+        if not chapters_dict:
+            registry = load_books_metadata()
+            book_meta = registry.get(book_name, {})
+            fpath = book_meta.get("file_path", "")
+            if fpath and os.path.exists(fpath) and fpath.lower().endswith(".epub"):
+                try:
+                    from core.epub_loader import EpubLoader
+                    inspect_data = EpubLoader.inspect_epub(fpath)
+                    for ch in inspect_data.get("chapters", []):
+                        cid = ch.get("id", 0)
+                        chapters_dict[cid] = {
+                            "chapter_id": cid,
+                            "title": ch.get("title") or f"Chapitre {cid}",
+                            "book_code": ch.get("book_code"),
+                            "book_name": get_french_book_name(ch.get("book_code")) if ch.get("book_code") else None,
+                            "corpus_scope": ch.get("corpus_scope", "GLOBAL"),
+                            "source_type": ch.get("source_type", "general"),
+                            "zip_file": ch.get("zip_file", ""),
+                            "chunks_count": 1
+                        }
+                except Exception as e:
+                    logger.warning(f"Fallback EPUB direct inspection error: {e}")
 
         # Si trouvé, ordonner la liste des chapitres
         sorted_chapters = []
@@ -198,7 +230,15 @@ class TheologyReaderManager:
         except (ValueError, TypeError):
             cid_query = chapter_id
 
-        for col_name in ['bible_study_bge_multilingual_gemma2_Infomaniak', 'study_library', 'bible_study_gemini_embedding_2']:
+        collections_to_search = []
+        try:
+            for c in client.list_collections():
+                c_name = c.name if hasattr(c, 'name') else str(c)
+                collections_to_search.append(c_name)
+        except Exception:
+            collections_to_search = ['bible_study_bge_multilingual_gemma2_Infomaniak', 'study_library', 'bible_study_gemini_embedding_2']
+
+        for col_name in collections_to_search:
             try:
                 col = client.get_collection(col_name)
                 # Requête ChromaDB
@@ -233,6 +273,51 @@ class TheologyReaderManager:
                         chunks.append((c_id, m, doc))
             except Exception as e:
                 logger.debug(f"[TheologyReaderManager] Recherche content {col_name} : {e}")
+
+        # Fallback direct EPUB si aucun chunk dans ChromaDB (ex: en cours d'indexation)
+        if not chunks:
+            registry = load_books_metadata()
+            book_meta = registry.get(book_name, {})
+            fpath = book_meta.get("file_path", "")
+            if fpath and os.path.exists(fpath) and fpath.lower().endswith(".epub"):
+                try:
+                    import zipfile
+                    from bs4 import BeautifulSoup
+                    from core.epub_loader import EpubLoader
+                    inspect_data = EpubLoader.inspect_epub(fpath)
+                    ch_info = next((c for c in inspect_data.get("chapters", []) if c.get("id") == cid_query), None)
+                    if ch_info and ch_info.get("zip_file"):
+                        with zipfile.ZipFile(fpath, 'r') as z:
+                            if ch_info["zip_file"] in z.namelist():
+                                html_content = z.read(ch_info["zip_file"]).decode('utf-8', errors='ignore')
+                                soup = BeautifulSoup(html_content, 'html.parser')
+                                for tag in soup(["script", "style", "nav"]):
+                                    tag.decompose()
+                                direct_paragraphs = []
+                                for el in soup.find_all(["h1", "h2", "h3", "h4", "p", "li"]):
+                                    txt = el.get_text(separator=" ", strip=True)
+                                    if txt and txt != "[Retour au livre]" and len(txt) > 3:
+                                        direct_paragraphs.append(txt)
+                                if not direct_paragraphs:
+                                    full_txt = soup.get_text(separator="\n", strip=True)
+                                    direct_paragraphs = [p.strip() for p in full_txt.split("\n") if p.strip()]
+                                
+                                for idx_p, p_text in enumerate(direct_paragraphs):
+                                    chunks.append((f"{book_name}_direct_{idx_p}", {
+                                        "chapter_title": ch_info.get("title", ""),
+                                        "name": book_name,
+                                        "title": book_meta.get("title", book_name),
+                                        "author": book_meta.get("author", "")
+                                    }, p_text))
+                                
+                                chapter_meta = {
+                                    "chapter_title": ch_info.get("title", ""),
+                                    "name": book_name,
+                                    "title": book_meta.get("title", book_name),
+                                    "author": book_meta.get("author", "")
+                                }
+                except Exception as e:
+                    logger.warning(f"Direct EPUB chapter read fallback error: {e}")
 
         # Déterminer l'ordre des chunks
         def extract_chunk_idx(item):

@@ -325,7 +325,10 @@ const ImportModal = {
       prevBtn?.classList.add('hidden');
       nextBtn?.classList.add('hidden');
       submitBtn?.classList.remove('hidden');
-      if (submitLabel) submitLabel.textContent = 'Enregistrer les Modifications';
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg><span id="btn-submit-import-label">Enregistrer les Modifications</span>`;
+      }
       return;
     }
 
@@ -360,15 +363,17 @@ const ImportModal = {
       
       const isBible = document.getElementById('import-book-type')?.value === 'Bible';
       const isAI = App.isAIEnabled !== false;
+      let labelText = "Lancer l'Importation & l'Indexation RAG";
 
-      if (submitLabel) {
-        if (isBible) {
-          submitLabel.textContent = 'Importer la Bible dans la Bibliothèque';
-        } else if (!isAI) {
-          submitLabel.textContent = 'Ajouter à la Bibliothèque (Local)';
-        } else {
-          submitLabel.textContent = "Lancer l'Importation & l'Indexation RAG";
-        }
+      if (isBible) {
+        labelText = 'Importer la Bible dans la Bibliothèque';
+      } else if (!isAI) {
+        labelText = 'Ajouter à la Bibliothèque (Local)';
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg><span id="btn-submit-import-label">${labelText}</span>`;
       }
     } else if (this.currentStep === 'success') {
       prevBtn?.classList.add('hidden');
@@ -1059,9 +1064,11 @@ const ImportModal = {
     const submitBtn = document.getElementById('btn-submit-import-modal');
     if (submitBtn) {
       submitBtn.disabled = true;
-      submitBtn.innerHTML = isBible 
-        ? `<span class="synth-spinner" style="width:12px; height:12px; border-width:2px; vertical-align:middle; margin-right:4px;"></span> <span>Intégration de la Bible...</span>`
-        : `<span class="synth-spinner" style="width:12px; height:12px; border-width:2px; vertical-align:middle; margin-right:4px;"></span> <span>Traitement et indexation...</span>`;
+      submitBtn.innerHTML = this.isEditMode
+        ? `<span class="synth-spinner" style="width:12px; height:12px; border-width:2px; vertical-align:middle; margin-right:4px;"></span> <span>Enregistrement...</span>`
+        : (isBible 
+          ? `<span class="synth-spinner" style="width:12px; height:12px; border-width:2px; vertical-align:middle; margin-right:4px;"></span> <span>Intégration de la Bible...</span>`
+          : `<span class="synth-spinner" style="width:12px; height:12px; border-width:2px; vertical-align:middle; margin-right:4px;"></span> <span>Préparation et indexation...</span>`);
     }
 
     try {
@@ -1071,8 +1078,13 @@ const ImportModal = {
         
         if (this.isEditMode) {
           this.close();
-          App.showToast('Métadonnées enregistrées avec succès !');
-          LibraryView.loadBooks();
+          App.showToast('Métadonnées enregistrées avec succès !', 'success');
+          if (typeof LibraryView !== 'undefined' && typeof LibraryView.loadBooks === 'function') {
+            LibraryView.loadBooks();
+          }
+          if (typeof TheologyView !== 'undefined' && typeof TheologyView.loadBooksList === 'function') {
+            TheologyView.loadBooksList();
+          }
         } else {
           // Jouer le son zen harmonieux
           playSuccessSound();
@@ -1080,7 +1092,12 @@ const ImportModal = {
           // Afficher l'écran de succès animé
           this.showSuccessScreen(payload, res);
           
-          LibraryView.loadBooks();
+          if (typeof LibraryView !== 'undefined' && typeof LibraryView.loadBooks === 'function') {
+            LibraryView.loadBooks();
+          }
+          if (typeof TheologyView !== 'undefined' && typeof TheologyView.loadBooksList === 'function') {
+            TheologyView.loadBooksList();
+          }
           if (typeof BibleReader !== 'undefined') {
             API.call('get_installed_bibles').then(bList => {
               BibleReader.installedBibles = bList || [];
@@ -1120,10 +1137,16 @@ const ImportModal = {
     if (titleEl) titleEl.textContent = bookInfo.title || bookInfo.name;
     
     const isBible = bookInfo.type === 'Bible';
+    const isBackground = res?.background_indexing;
+
     if (subtitleEl) {
-      subtitleEl.textContent = isBible 
-        ? `La Bible « ${bookInfo.title || bookInfo.name} » a été convertie et intégrée dans le lecteur biblique (${res.books_count || 66} livres).`
-        : `L'ouvrage « ${bookInfo.title || bookInfo.name} » a été ajouté à votre bibliothèque (${res.chunks_count || 0} fragments traités).`;
+      if (isBible) {
+        subtitleEl.textContent = `La Bible « ${bookInfo.title || bookInfo.name} » a été convertie et intégrée (${res.books_count || 66} livres). Prête à être consultée !`;
+      } else if (isBackground) {
+        subtitleEl.textContent = `L'ouvrage « ${bookInfo.title || bookInfo.name} » est immédiatement disponible à la lecture. L'indexation vectorielle IA se poursuit en arrière-plan (progression visible en bas à droite).`;
+      } else {
+        subtitleEl.textContent = `L'ouvrage « ${bookInfo.title || bookInfo.name} » a été ajouté à votre bibliothèque (${res.chunks_count || 0} fragments traités).`;
+      }
     }
 
     if (metaEl) {

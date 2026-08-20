@@ -228,6 +228,14 @@ const API = {
     return await this.call('get_biblical_itineraries');
   },
 
+  async getBackgroundTasks() {
+    return await this.call('get_background_tasks');
+  },
+
+  async dismissBackgroundTask(taskId) {
+    return await this.call('dismiss_background_task', taskId);
+  },
+
   // Mock pour test dans navigateur externe
   _mockResponse(method, ...args) {
     if (method === 'get_installed_bibles') {

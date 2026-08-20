@@ -710,5 +710,22 @@
     "chunks_count": 6216,
     "embedding_model": "study_library",
     "active": true
+  },
+  "GAA": {
+    "name": "GAA",
+    "title": "Good and Angry",
+    "author": "David Powlison",
+    "description": "Redeeming Anger, Irritation, Complaining, and Bitterness",
+    "year": "2016",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\GAA.png",
+    "type": "Théologie",
+    "corpus_scope": "GLOBAL",
+    "source_type": "general",
+    "book_code": null,
+    "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
+    "active": true,
+    "chapters_count": 24,
+    "chunks_count": 272,
+    "file_path": "C:\\Users\\adrie\\kDrive\\Documents\\Théologie\\Ressources externes\\Ebooks\\David Powlison - Good and Angry_ Redeeming Anger, Irritation, Complaining, and Bitterness-LSC-NewGrowthPress (2016).epub"
   }
 }

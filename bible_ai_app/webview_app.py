@@ -1714,6 +1714,10 @@ class BibleAppApi:
         # Cas 2 : EPUB Standard Théologie / Commentaires / Ouvrages d'étude (Vectorisation RAG)
         if ext == '.epub':
             from core.epub_loader import EpubLoader
+            from core.theology_reader_manager import TheologyReaderManager
+            from core.task_manager import TaskManager
+            import threading
+            
             selected_chapters = payload.get("chapters", [])
             chunks = EpubLoader.extract_chapters_and_chunks(
                 epub_path=file_path,
@@ -1727,19 +1731,47 @@ class BibleAppApi:
             metadata["file_path"] = file_path
             registry[name] = metadata
             save_books_metadata(registry)
+            TheologyReaderManager.invalidate_cache()
             
-            if chunks and self.config.get("enable_ai", True):
-                try:
-                    from core.database import VectorDB
-                    db = VectorDB(api_keys=self.config)
-                    db.add_chunks(chunks, embedding_model=metadata.get("embedding_model", "bge_multilingual_gemma2 (Infomaniak)"))
-                except Exception as e:
-                    logger.warning(f"Indexation vectorielle ChromaDB : {e}")
-                    
-            return {"success": True, "name": name, "chunks_count": len(chunks)}
+            enable_ai = self.config.get("enable_ai", True)
+            if chunks and enable_ai:
+                task_id = f"import_{name}"
+                TaskManager.start_task(
+                    task_id=task_id, 
+                    title=metadata.get("title", name), 
+                    task_type="rag_indexing",
+                    total=len(chunks),
+                    detail=f"Indexation vectorielle de {len(chunks)} fragments..."
+                )
+                
+                def _async_index_worker():
+                    try:
+                        from core.database import VectorDB
+                        db = VectorDB(api_keys=self.config)
+                        def p_cb(pct, cur=0, tot=0):
+                            TaskManager.update_progress(task_id, pct, current=cur, total=tot)
+                        db.add_chunks(
+                            chunks, 
+                            embedding_model=metadata.get("embedding_model", "bge_multilingual_gemma2 (Infomaniak)"),
+                            progress_callback=p_cb
+                        )
+                        TaskManager.complete_task(task_id, message=f"Indexation terminée ({len(chunks)} fragments)")
+                        TheologyReaderManager.invalidate_cache()
+                    except Exception as e:
+                        logger.error(f"Erreur indexation vectorielle arrière-plan pour {name}: {e}", exc_info=True)
+                        TaskManager.fail_task(task_id, str(e))
+
+                threading.Thread(target=_async_index_worker, daemon=True).start()
+                return {"success": True, "name": name, "chunks_count": len(chunks), "background_indexing": True, "task_id": task_id}
+
+            return {"success": True, "name": name, "chunks_count": len(chunks), "background_indexing": False}
 
         # Cas 3 : Markdown (.md) et Fichiers Texte (.txt)
         elif ext in ['.md', '.txt']:
+            from core.theology_reader_manager import TheologyReaderManager
+            from core.task_manager import TaskManager
+            import threading
+            
             selected_chapters = payload.get("chapters", [])
             chunks = []
             try:
@@ -1769,16 +1801,40 @@ class BibleAppApi:
             metadata["file_path"] = file_path
             registry[name] = metadata
             save_books_metadata(registry)
+            TheologyReaderManager.invalidate_cache()
 
-            if chunks and self.config.get("enable_ai", True):
-                try:
-                    from core.database import VectorDB
-                    db = VectorDB(api_keys=self.config)
-                    db.add_chunks(chunks, embedding_model=metadata.get("embedding_model", "bge_multilingual_gemma2 (Infomaniak)"))
-                except Exception as e:
-                    logger.warning(f"Indexation vectorielle ChromaDB MD/TXT : {e}")
+            enable_ai = self.config.get("enable_ai", True)
+            if chunks and enable_ai:
+                task_id = f"import_{name}"
+                TaskManager.start_task(
+                    task_id=task_id, 
+                    title=metadata.get("title", name), 
+                    task_type="rag_indexing",
+                    total=len(chunks),
+                    detail=f"Indexation vectorielle de {len(chunks)} fragments..."
+                )
+                
+                def _async_index_md_worker():
+                    try:
+                        from core.database import VectorDB
+                        db = VectorDB(api_keys=self.config)
+                        def p_cb(pct, cur=0, tot=0):
+                            TaskManager.update_progress(task_id, pct, current=cur, total=tot)
+                        db.add_chunks(
+                            chunks, 
+                            embedding_model=metadata.get("embedding_model", "bge_multilingual_gemma2 (Infomaniak)"),
+                            progress_callback=p_cb
+                        )
+                        TaskManager.complete_task(task_id, message=f"Indexation terminée ({len(chunks)} fragments)")
+                        TheologyReaderManager.invalidate_cache()
+                    except Exception as e:
+                        logger.error(f"Erreur indexation vectorielle arrière-plan pour {name}: {e}", exc_info=True)
+                        TaskManager.fail_task(task_id, str(e))
 
-            return {"success": True, "name": name, "chunks_count": len(chunks)}
+                threading.Thread(target=_async_index_md_worker, daemon=True).start()
+                return {"success": True, "name": name, "chunks_count": len(chunks), "background_indexing": True, "task_id": task_id}
+
+            return {"success": True, "name": name, "chunks_count": len(chunks), "background_indexing": False}
             
         # Cas 4 : Dictionnaire / Docx / CSV
         elif ext in ['.docx', '.csv']:
@@ -1790,6 +1846,17 @@ class BibleAppApi:
         registry[name] = metadata
         save_books_metadata(registry)
         return {"success": True, "name": name}
+
+    def get_background_tasks(self) -> List[Dict[str, Any]]:
+        """Récupère la liste des tâches actives en arrière-plan."""
+        from core.task_manager import TaskManager
+        return TaskManager.get_all_tasks()
+
+    def dismiss_background_task(self, task_id: str) -> Dict[str, Any]:
+        """Supprime une tâche terminée ou fermée."""
+        from core.task_manager import TaskManager
+        TaskManager.dismiss_task(task_id)
+        return {"success": True}
 
     # =========================================================================
     # 3. GESTION DES PARAMÈTRES
@@ -2106,8 +2173,21 @@ def on_window_shown(*args, **kwargs):
         logger.warning(f"Erreur initialisation agrandissement: {e}")
 
 
+def push_task_update(event_type: str, task_data: dict):
+    global _GLOBAL_WINDOW
+    try:
+        if _GLOBAL_WINDOW:
+            json_str = json.dumps(task_data)
+            _GLOBAL_WINDOW.evaluate_js(f"window.TaskManager && window.TaskManager.handleTaskEvent('{event_type}', {json_str})")
+    except Exception as e:
+        logger.debug(f"push_task_update error: {e}")
+
+
 def main():
     global _GLOBAL_WINDOW
+    from core.task_manager import TaskManager
+    TaskManager.set_window_callback(push_task_update)
+
     api = BibleAppApi()
     
     html_path = os.path.join(current_dir, "web", "index.html")
