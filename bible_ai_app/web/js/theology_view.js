@@ -607,22 +607,100 @@ const TheologyView = {
       if (Array.isArray(transData)) {
         textToRender = transData;
       } else if (transData.paragraphs) {
-        textToRender = transData.paragraphs;
-      }
-    }
+    const footnotesList = data.footnotes || [];
+    const footnoteMap = {};
+    footnotesList.forEach(fn => {
+      footnoteMap[String(fn.id)] = fn.text;
+    });
 
     paragraphsHtml = textToRender.map((p, idx) => {
-      // Détecter si c'est un titre de section
-      if (p.startsWith('#') || (p.length < 90 && p.toUpperCase() === p && !p.includes('.'))) {
-        const cleanHeading = p.replace(/^#+\s*/, '');
-        return `<h3 class="theol-section-heading">${this.escapeHtml(cleanHeading)}</h3>`;
+      const pTrim = p.trim();
+
+      // Ignorer si c'est la répétition exacte du titre du chapitre au tout début
+      const cleanHeaderCompare = pTrim.replace(/^#+\s*/, '').replace(/^\[\d+\]\s*/, '').trim().toLowerCase();
+      if (idx === 0 && (cleanHeaderCompare === title.toLowerCase() || cleanHeaderCompare === (data.chapter_title || '').toLowerCase())) {
+        return '';
       }
-      // Détecter les citations ou versets mis en exergue
-      if (p.startsWith('>') || p.startsWith('«') || (p.length < 250 && (p.includes('Rom') || p.includes('Jean') || p.includes('Psa')) && p.includes(':'))) {
-        return `<blockquote class="theol-reading-quote">${this.highlightScriptureReferences(p)}</blockquote>`;
+
+      // 1. Détection des titres Markdown (#, ##, ###, ####)
+      if (pTrim.startsWith('#')) {
+        if (pTrim.startsWith('####')) {
+          const cleanHeading = pTrim.replace(/^####\s*/, '');
+          return `<h4 class="theol-subsubsection-heading">${this.escapeHtml(cleanHeading)}</h4>`;
+        } else if (pTrim.startsWith('###')) {
+          const cleanHeading = pTrim.replace(/^###\s*/, '');
+          return `<h3 class="theol-subsection-heading">${this.escapeHtml(cleanHeading)}</h3>`;
+        } else if (pTrim.startsWith('##')) {
+          const cleanHeading = pTrim.replace(/^##\s*/, '');
+          return `<h2 class="theol-section-heading">${this.escapeHtml(cleanHeading)}</h2>`;
+        } else {
+          const cleanHeading = pTrim.replace(/^#\s*/, '');
+          return `<h2 class="theol-section-heading theol-h1-heading">${this.escapeHtml(cleanHeading)}</h2>`;
+        }
       }
-      return `<p class="theol-reading-p ${idx === 0 ? 'theol-first-p' : ''}">${this.highlightScriptureReferences(p)}</p>`;
-    }).join('\n');
+
+      // 2. Heuristique pour les titres de sections non préfixés (ouvrages déjà indexés)
+      // Ex: "Une tension à maintenir", "Avant de commencer", "Quand les chrétiens prennent parti", "La vérité est vraie, et parfois elle est binaire"
+      const isHeadingCandidate = (
+        pTrim.length > 2 &&
+        pTrim.length < 85 &&
+        !/[.\?!,;:\…]$/.test(pTrim) &&
+        !pTrim.startsWith('>') &&
+        !pTrim.startsWith('«') &&
+        !pTrim.startsWith('"') &&
+        !pTrim.startsWith('-') &&
+        !pTrim.startsWith('*') &&
+        !/^\d+\.\s/.test(pTrim) &&
+        (pTrim.toUpperCase() === pTrim || (/^[A-ZÀ-Ÿ0-9]/.test(pTrim) && pTrim.split(/\s+/).length <= 12))
+      );
+
+      if (isHeadingCandidate) {
+        return `<h3 class="theol-section-heading">${this.escapeHtml(pTrim)}</h3>`;
+      }
+
+      // 3. Détecter les citations ou versets mis en exergue
+      if (pTrim.startsWith('>') || pTrim.startsWith('«') || (pTrim.length < 250 && (pTrim.includes('Rom') || pTrim.includes('Jean') || pTrim.includes('Psa')) && pTrim.includes(':'))) {
+        const cleanQuote = pTrim.replace(/^>\s*/, '');
+        let formatted = this.highlightScriptureReferences(cleanQuote);
+        formatted = this.formatFootnoteReferences(formatted, footnoteMap);
+        return `<blockquote class="theol-reading-quote">${formatted}</blockquote>`;
+      }
+
+      // 4. Paragraphe standard avec références bibliques et appels de notes
+      let formatted = this.highlightScriptureReferences(p);
+      formatted = this.formatFootnoteReferences(formatted, footnoteMap);
+      return `<p class="theol-reading-p ${idx === 0 ? 'theol-first-p' : ''}">${formatted}</p>`;
+    }).filter(Boolean).join('\n');
+
+    // Section dédiée aux notes de bas de page en fin de chapitre
+    let footnotesHtml = '';
+    if (footnotesList.length > 0) {
+      footnotesHtml = `
+        <div class="theol-footnotes-section" id="theol-footnotes-section">
+          <div class="theol-footnotes-header">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>Notes de bas de page (${footnotesList.length})</span>
+          </div>
+          <ol class="theol-footnotes-list">
+            ${footnotesList.map(fn => `
+              <li class="theol-fn-item" id="theol-fn-${fn.id}" data-fn-id="${fn.id}">
+                <span class="theol-fn-num">${fn.id}.</span>
+                <div class="theol-fn-content">
+                  <span class="theol-fn-text">${this.highlightScriptureReferences(fn.text)}</span>
+                  <a href="#theol-fnref-${fn.id}" class="theol-fn-backref" data-target-id="theol-fnref-${fn.id}" title="Retour au passage">↩</a>
+                </div>
+              </li>
+            `).join('')}
+          </ol>
+        </div>
+      `;
+    }
 
     let summaryEncartHtml = '';
     if (this.showChapterSummary) {
@@ -634,8 +712,34 @@ const TheologyView = {
       ${summaryEncartHtml}
       <div class="theol-reading-body font-${this.fontFamily.toLowerCase().replace(/\s+/g, '-')}" id="theol-reading-body">
         ${paragraphsHtml}
+        ${footnotesHtml}
       </div>
     `;
+
+    // Configurer et attacher le gestionnaire d'infobulles et de navigation des notes de bas de page
+    if (typeof FootnoteTooltip !== 'undefined') {
+      FootnoteTooltip.setFootnotes(footnotesList);
+      const fnBadges = this.articleContent.querySelectorAll('.theol-fn-badge');
+      FootnoteTooltip.bindToElements(fnBadges);
+    }
+
+    // Attacher les liens retour (back-links) de la section des notes
+    const fnBackRefs = this.articleContent.querySelectorAll('.theol-fn-backref');
+    fnBackRefs.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = btn.dataset.targetId;
+        if (targetId) {
+          const callEl = document.getElementById(targetId);
+          if (callEl) {
+            callEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            callEl.classList.remove('theol-highlight-pulse');
+            void callEl.offsetWidth;
+            callEl.classList.add('theol-highlight-pulse');
+          }
+        }
+      });
+    });
 
     // Attacher le bouton de traduction dans le bandeau
     const bannerTransBtn = document.getElementById('btn-banner-translate');
@@ -818,6 +922,24 @@ const TheologyView = {
 
       return result;
     });
+  },
+
+  formatFootnoteReferences(html, footnoteMap = {}) {
+    if (!html) return '';
+    // 1. Remplacer les marqueurs explicites [^1] ou [^14]
+    let result = html.replace(/\[\^(\d+)\]/g, (match, id) => {
+      return `<sup class="theol-fn-badge" data-fn-id="${id}" id="theol-fnref-${id}"><a href="#theol-fn-${id}" title="Note ${id}">${id}</a></sup>`;
+    });
+
+    // 2. Remplacer les [1] ou [14] si l'id existe dans footnoteMap
+    result = result.replace(/\[(\d+)\]/g, (match, id) => {
+      if (footnoteMap && footnoteMap[String(id)]) {
+        return `<sup class="theol-fn-badge" data-fn-id="${id}" id="theol-fnref-${id}"><a href="#theol-fn-${id}" title="Note ${id}">${id}</a></sup>`;
+      }
+      return match;
+    });
+
+    return result;
   },
 
   updateTocTranslateButton() {
@@ -1970,6 +2092,178 @@ const ScriptureTooltip = {
   }
 };
 
+// =============================================================================
+// GESTIONNAIRE D'INFOBULLES ET DE SAUTS DE NOTES DE BAS DE PAGE (FOOTNOTE TOOLTIP)
+// =============================================================================
+
+const FootnoteTooltip = {
+  tooltipEl: null,
+  activeTarget: null,
+  activeFnId: null,
+  hoverTimer: null,
+  footnotesMap: {},
+
+  init() {
+    if (this.tooltipEl) return;
+    this.tooltipEl = document.createElement('div');
+    this.tooltipEl.className = 'theol-fn-popover hidden';
+    this.tooltipEl.id = 'theol-fn-popover';
+    document.body.appendChild(this.tooltipEl);
+
+    this.tooltipEl.addEventListener('mouseenter', () => {
+      if (this.hoverTimer) clearTimeout(this.hoverTimer);
+    });
+
+    this.tooltipEl.addEventListener('mouseleave', () => {
+      this.hide();
+    });
+
+    window.addEventListener('scroll', () => this.hide(), { passive: true });
+    document.getElementById('theol-main-scroll')?.addEventListener('scroll', () => this.hide(), { passive: true });
+  },
+
+  setFootnotes(footnotesList) {
+    this.footnotesMap = {};
+    if (Array.isArray(footnotesList)) {
+      footnotesList.forEach(fn => {
+        this.footnotesMap[String(fn.id)] = fn.text;
+      });
+    }
+  },
+
+  bindToElements(elements) {
+    if (!elements) return;
+    this.init();
+
+    elements.forEach(el => {
+      if (el.hasAttribute('title')) el.removeAttribute('title');
+      const fnId = el.dataset.fnId;
+
+      el.addEventListener('mouseenter', () => {
+        if (el.hasAttribute('title')) el.removeAttribute('title');
+        if (this.hoverTimer) clearTimeout(this.hoverTimer);
+        this.hoverTimer = setTimeout(() => {
+          this.show(el, fnId);
+        }, 80);
+      });
+
+      el.addEventListener('mouseleave', () => {
+        if (this.hoverTimer) clearTimeout(this.hoverTimer);
+        this.hoverTimer = setTimeout(() => {
+          this.hide();
+        }, 150);
+      });
+
+      // Clic pour défiler directement vers la note avec animation de surbrillance
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.hide();
+        const targetFnEl = document.getElementById(`theol-fn-${fnId}`);
+        if (targetFnEl) {
+          targetFnEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          targetFnEl.classList.remove('theol-highlight-pulse');
+          void targetFnEl.offsetWidth; // Déclencher le reflow CSS
+          targetFnEl.classList.add('theol-highlight-pulse');
+        }
+      });
+    });
+  },
+
+  show(targetEl, fnId) {
+    const text = this.footnotesMap[String(fnId)];
+    if (!text) return;
+
+    this.init();
+    this.activeTarget = targetEl;
+    this.activeFnId = fnId;
+
+    const formattedText = TheologyView.highlightScriptureReferences(text);
+
+    this.tooltipEl.innerHTML = `
+      <div class="theol-fn-popover-header">
+        <div class="theol-fn-popover-badge">
+          <span>📝 Note ${TheologyView.escapeHtml(String(fnId))}</span>
+        </div>
+        <button type="button" class="theol-fn-popover-jump" data-fn-id="${fnId}">
+          Voir en bas ↓
+        </button>
+      </div>
+      <div class="theol-fn-popover-body">${formattedText}</div>
+    `;
+
+    // Attacher les clics sur les références bibliques contenues dans la note
+    const inlineRefs = this.tooltipEl.querySelectorAll('.theol-inline-scripture-ref');
+    inlineRefs.forEach(span => {
+      span.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const ref = span.dataset.ref || span.textContent.trim();
+        if (ref) {
+          this.hide();
+          TheologyView.openScriptureReference(ref);
+        }
+      });
+    });
+    if (typeof ScriptureTooltip !== 'undefined') {
+      ScriptureTooltip.bindToElements(inlineRefs);
+    }
+
+    // Bouton de saut vers la section des notes
+    const jumpBtn = this.tooltipEl.querySelector('.theol-fn-popover-jump');
+    if (jumpBtn) {
+      jumpBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.hide();
+        const targetFnEl = document.getElementById(`theol-fn-${fnId}`);
+        if (targetFnEl) {
+          targetFnEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          targetFnEl.classList.remove('theol-highlight-pulse');
+          void targetFnEl.offsetWidth;
+          targetFnEl.classList.add('theol-highlight-pulse');
+        }
+      });
+    }
+
+    this.positionTooltip(targetEl);
+    this.tooltipEl.classList.remove('hidden');
+    requestAnimationFrame(() => this.tooltipEl.classList.add('visible'));
+  },
+
+  positionTooltip(targetEl) {
+    if (!this.tooltipEl || !targetEl) return;
+    const rect = targetEl.getBoundingClientRect();
+    const tooltipWidth = 340;
+    const tooltipHeight = 120;
+
+    let left = rect.left + (rect.width / 2) - (tooltipWidth / 2);
+    let top = rect.top - tooltipHeight - 12;
+
+    if (left < 16) left = 16;
+    if (left + tooltipWidth > window.innerWidth - 16) {
+      left = window.innerWidth - tooltipWidth - 16;
+    }
+
+    if (top < 16) {
+      top = rect.bottom + 10;
+    }
+
+    this.tooltipEl.style.left = `${Math.round(left)}px`;
+    this.tooltipEl.style.top = `${Math.round(top)}px`;
+  },
+
+  hide() {
+    if (!this.tooltipEl) return;
+    this.activeTarget = null;
+    this.activeFnId = null;
+    this.tooltipEl.classList.remove('visible');
+    setTimeout(() => {
+      if (!this.activeTarget && this.tooltipEl) {
+        this.tooltipEl.classList.add('hidden');
+      }
+    }, 150);
+  }
+};
+
 window.TheologyView = TheologyView;
 window.ScriptureTooltip = ScriptureTooltip;
+window.FootnoteTooltip = FootnoteTooltip;
 

@@ -346,17 +346,77 @@ class EpubLoader:
                     html_content = z.read(zip_file).decode('utf-8', errors='ignore')
                     soup = BeautifulSoup(html_content, 'html.parser')
 
-                    # Nettoyer les éléments indésirables (scripts, styles, retours aux livres/liens popups)
+                    # Nettoyer les éléments indésirables (scripts, styles, nav)
                     for tag in soup(["script", "style", "nav"]):
                         tag.decompose()
 
-                    # Récupérer les blocs de texte (paragraphes, titres, listes)
+                    # Convertir les appels de notes (sup, a noteref, etc.) en marqueurs propres [^n]
+                    for fn_ref in soup.find_all(["sup", "a"]):
+                        is_fn = False
+                        if fn_ref.name == "sup":
+                            is_fn = True
+                        elif fn_ref.get("epub:type") == "noteref" or "footnote" in str(fn_ref.get("class", [])).lower() or "noteref" in str(fn_ref.get("class", [])).lower():
+                            is_fn = True
+                        elif fn_ref.get("href") and ("#fn" in fn_ref.get("href", "").lower() or "#note" in fn_ref.get("href", "").lower() or "note" in fn_ref.get("href", "").lower()):
+                            is_fn = True
+                        
+                        if is_fn:
+                            fn_txt = fn_ref.get_text(strip=True)
+                            fn_clean = re.sub(r'[^\w\d]', '', fn_txt)
+                            if fn_clean and (fn_clean.isdigit() or len(fn_clean) <= 4):
+                                fn_ref.replace_with(f" [^{fn_clean}] ")
+
+                    # Récupérer les blocs de texte structurés (paragraphes, titres, listes, citations)
                     paragraphs = []
-                    for el in soup.find_all(["h1", "h2", "h3", "h4", "p", "li"]):
+                    for el in soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6", "p", "li", "blockquote", "aside"]):
+                        tag_name = el.name.lower()
+                        classes = " ".join(el.get("class", [])) if el.get("class") else ""
+                        classes_lower = classes.lower()
+
+                        # Détection de titre
+                        is_h1 = tag_name == "h1" or "chapter-title" in classes_lower or "ch-title" in classes_lower
+                        is_h2 = tag_name == "h2" or "section-title" in classes_lower or "part-title" in classes_lower or "titre1" in classes_lower
+                        is_h3 = tag_name == "h3" or "subsection-title" in classes_lower or "subheading" in classes_lower or "titre2" in classes_lower
+                        is_h4 = tag_name in ["h4", "h5", "h6"] or "titre3" in classes_lower or "rubrique" in classes_lower
+
+                        # Titre via classe ou style si balise p ou div
+                        if not (is_h1 or is_h2 or is_h3 or is_h4) and tag_name in ["p", "div"]:
+                            if any(k in classes_lower for k in ["title", "titre", "heading", "head", "subhead", "sectiontitle"]):
+                                is_h3 = True
+
                         txt = el.get_text(separator=" ", strip=True)
-                        # Ignorer les liens de retour de popups comme "[Retour au livre]"
-                        if txt and txt != "[Retour au livre]" and len(txt) > 3:
-                            paragraphs.append(txt)
+                        if not txt or txt == "[Retour au livre]" or len(txt) < 2:
+                            continue
+
+                        # Nettoyer et normaliser les espaces
+                        txt = re.sub(r'\s*\[\^(\d+)\]\s*', r' [^\1] ', txt)
+                        txt = re.sub(r'[ \t]+', ' ', txt).strip()
+
+                        # Détection si c'est un paragraphe de note de bas de page (au bas du document)
+                        is_footnote_def = False
+                        if "footnote" in classes_lower or "note" in classes_lower or el.get("epub:type") == "footnote" or tag_name == "aside" or el.find_parent(attrs={"class": lambda c: c and "footnote" in str(c).lower()}):
+                            is_footnote_def = True
+                        elif re.match(r'^(\d+|\[\d+\])\s+(.+)', txt) and ("n.d.t" in txt.lower() or "n.d.e" in txt.lower() or "http" in txt.lower() or "voir " in txt.lower() or len(txt) < 300):
+                            is_footnote_def = True
+
+                        if is_footnote_def:
+                            m_fn = re.match(r'^(?:\[\^?(\d+)\]|\b(\d+)\b)\s*(.*)', txt)
+                            if m_fn:
+                                fn_id = m_fn.group(1) or m_fn.group(2)
+                                fn_body = m_fn.group(3)
+                                txt = f"[^{fn_id}]: {fn_body.strip()}"
+                        elif is_h1:
+                            txt = f"# {txt}"
+                        elif is_h2:
+                            txt = f"## {txt}"
+                        elif is_h3:
+                            txt = f"### {txt}"
+                        elif is_h4:
+                            txt = f"#### {txt}"
+                        elif tag_name == "blockquote":
+                            txt = f"> {txt}"
+
+                        paragraphs.append(txt)
 
                     if not paragraphs:
                         # Fallback texte global

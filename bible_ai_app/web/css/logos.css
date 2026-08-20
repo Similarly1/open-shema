@@ -9430,13 +9430,40 @@ body.reading-bg-dark .theol-section-heading {
 }
 
 .theol-section-heading {
-  font-family: var(--font-title);
-  font-size: 1.25em;
+  font-family: var(--font-title, "Outfit", sans-serif);
+  font-size: 1.4em;
   font-weight: 700;
+  line-height: 1.35;
   color: var(--text-primary);
-  margin: 2em 0 0.8em 0;
-  padding-bottom: 4px;
-  border-bottom: 1px solid var(--border-subtle);
+  margin: 2.2em 0 0.9em 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  letter-spacing: -0.01em;
+}
+
+.theol-section-heading.theol-h1-heading {
+  font-size: 1.55em;
+  margin-top: 1.8em;
+}
+
+.theol-subsection-heading {
+  font-family: var(--font-title, "Outfit", sans-serif);
+  font-size: 1.22em;
+  font-weight: 650;
+  line-height: 1.35;
+  color: var(--text-primary);
+  margin: 1.8em 0 0.7em 0;
+  letter-spacing: -0.005em;
+}
+
+.theol-subsubsection-heading {
+  font-family: var(--font-title, "Outfit", sans-serif);
+  font-size: 1.08em;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 1.4em 0 0.5em 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .theol-reading-quote {
@@ -9464,6 +9491,272 @@ body.reading-bg-dark .theol-section-heading {
   background: var(--accent-blue);
   color: #ffffff;
   text-decoration: none;
+}
+
+/* APPELS DE NOTES DE BAS DE PAGE DANS LE TEXTE */
+.theol-fn-badge {
+  font-size: 0.76em;
+  font-weight: 700;
+  line-height: 0;
+  vertical-align: super;
+  margin: 0 2px;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.theol-fn-badge a {
+  color: var(--accent-blue, #3b82f6);
+  text-decoration: none;
+  background: rgba(59, 130, 246, 0.12);
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  transition: all 0.15s ease;
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+.theol-fn-badge a:hover {
+  background: var(--accent-blue, #3b82f6);
+  color: #ffffff !important;
+  border-color: var(--accent-blue, #3b82f6);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+  text-decoration: none;
+}
+
+/* POPUP / INFOBULLE FLOTTANTE DE NOTE (POPOVER) */
+.theol-fn-popover {
+  position: fixed;
+  z-index: 9999;
+  width: 340px;
+  max-width: calc(100vw - 32px);
+  background: var(--bg-card, #1e293b);
+  color: var(--text-primary, #f8fafc);
+  border: 1px solid var(--border-color, #334155);
+  border-radius: 10px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  padding: 12px 14px;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.theol-fn-popover.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.theol-fn-popover.hidden {
+  display: none;
+}
+
+.theol-fn-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+}
+
+.theol-fn-popover-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent-blue, #3b82f6);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.theol-fn-popover-jump {
+  background: none;
+  border: none;
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.74rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.theol-fn-popover-jump:hover {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--accent-blue, #3b82f6);
+}
+
+.theol-fn-popover-body {
+  color: var(--text-secondary, #cbd5e1);
+  max-height: 180px;
+  overflow-y: auto;
+  word-break: break-word;
+}
+
+/* SECTION DÉDIÉE DE FIN DE CHAPITRE (NOTES DE BAS DE PAGE) */
+.theol-footnotes-section {
+  margin-top: 3.5em;
+  padding-top: 1.8em;
+  border-top: 2px dashed var(--border-color, rgba(255, 255, 255, 0.12));
+}
+
+.theol-footnotes-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-title, "Outfit", sans-serif);
+  font-size: 1.12em;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1.2em;
+}
+
+.theol-footnotes-header svg {
+  color: var(--accent-blue, #3b82f6);
+}
+
+.theol-footnotes-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.theol-fn-item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 0.92em;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--bg-subtle, rgba(255, 255, 255, 0.02));
+  border-left: 3px solid transparent;
+  transition: all 0.25s ease;
+}
+
+.theol-fn-item:hover {
+  background: var(--bg-hover, rgba(255, 255, 255, 0.05));
+  border-left-color: var(--accent-blue, #3b82f6);
+}
+
+.theol-fn-num {
+  font-weight: 700;
+  color: var(--accent-blue, #3b82f6);
+  min-width: 22px;
+  flex-shrink: 0;
+}
+
+.theol-fn-content {
+  flex: 1;
+  display: inline;
+}
+
+.theol-fn-text {
+  margin-right: 6px;
+}
+
+.theol-fn-backref {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  color: var(--accent-blue, #3b82f6);
+  text-decoration: none;
+  font-size: 0.9em;
+  background: rgba(59, 130, 246, 0.1);
+  transition: all 0.15s ease;
+  vertical-align: middle;
+}
+
+.theol-fn-backref:hover {
+  background: var(--accent-blue, #3b82f6);
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+
+/* ANIMATION DE SURBRILLANCE AU CLIC */
+.theol-highlight-pulse {
+  animation: theolPulseHighlight 1.8s ease-out;
+}
+
+@keyframes theolPulseHighlight {
+  0% {
+    background-color: rgba(59, 130, 246, 0.35) !important;
+    box-shadow: 0 0 16px rgba(59, 130, 246, 0.5);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}
+
+/* THÈMES SEPIA & WHITE POUR LES NOTES ET POPUPS */
+body.reading-bg-sepia .theol-section-heading,
+body.reading-bg-sepia .theol-subsection-heading {
+  border-bottom-color: rgba(92, 64, 51, 0.15) !important;
+}
+
+body.reading-bg-sepia .theol-fn-popover {
+  background: #F4E8D1 !important;
+  color: #382C1E !important;
+  border-color: #D6C2A3 !important;
+  box-shadow: 0 10px 25px -5px rgba(56, 44, 30, 0.25) !important;
+}
+
+body.reading-bg-sepia .theol-fn-popover-body {
+  color: #4A3A29 !important;
+}
+
+body.reading-bg-sepia .theol-fn-badge a {
+  background: rgba(160, 90, 44, 0.12) !important;
+  color: #A05A2C !important;
+  border-color: rgba(160, 90, 44, 0.3) !important;
+}
+
+body.reading-bg-sepia .theol-fn-badge a:hover {
+  background: #A05A2C !important;
+  color: #FFFFFF !important;
+}
+
+body.reading-bg-sepia .theol-footnotes-section {
+  border-top-color: rgba(92, 64, 51, 0.2) !important;
+}
+
+body.reading-bg-sepia .theol-fn-item {
+  background: rgba(92, 64, 51, 0.04) !important;
+  color: #4A3A29 !important;
+}
+
+body.reading-bg-white .theol-section-heading,
+body.reading-bg-white .theol-subsection-heading {
+  border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+body.reading-bg-white .theol-fn-popover {
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15) !important;
+}
+
+body.reading-bg-white .theol-fn-popover-body {
+  color: #334155 !important;
+}
+
+body.reading-bg-white .theol-footnotes-section {
+  border-top-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+body.reading-bg-white .theol-fn-item {
+  background: rgba(0, 0, 0, 0.02) !important;
+  color: #334155 !important;
 }
 
 /* NAVIGATION DE FIN DE CHAPITRE */
