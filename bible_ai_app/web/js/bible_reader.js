@@ -7,78 +7,98 @@
 // 1. LISTE CANONIQUE DES LIVRES & CALCULS DE NAVIGATION
 const CANONICAL_BOOKS = [
   // Ancien Testament
-  { name: "Genèse", code: "Gen", chapters: 50 },
-  { name: "Exode", code: "Exo", chapters: 40 },
-  { name: "Lévitique", code: "Lev", chapters: 27 },
-  { name: "Nombres", code: "Num", chapters: 36 },
-  { name: "Deutéronome", code: "Deu", chapters: 34 },
-  { name: "Josué", code: "Jos", chapters: 24 },
-  { name: "Juges", code: "Jdg", chapters: 21 },
-  { name: "Ruth", code: "Rut", chapters: 4 },
-  { name: "1 Samuel", code: "1Sa", chapters: 31 },
-  { name: "2 Samuel", code: "2Sa", chapters: 24 },
-  { name: "1 Rois", code: "1Ki", chapters: 22 },
-  { name: "2 Rois", code: "2Ki", chapters: 25 },
-  { name: "1 Chroniques", code: "1Ch", chapters: 29 },
-  { name: "2 Chroniques", code: "2Ch", chapters: 36 },
-  { name: "Esdras", code: "Ezr", chapters: 10 },
-  { name: "Néhémie", code: "Neh", chapters: 13 },
-  { name: "Esther", code: "Est", chapters: 10 },
-  { name: "Job", code: "Job", chapters: 42 },
-  { name: "Psaumes", code: "Psa", chapters: 150 },
-  { name: "Proverbes", code: "Pro", chapters: 31 },
-  { name: "Ecclésiaste", code: "Ecc", chapters: 12 },
-  { name: "Cantique", code: "Sol", chapters: 8 },
-  { name: "Ésaïe", code: "Isa", chapters: 66 },
-  { name: "Jérémie", code: "Jer", chapters: 52 },
-  { name: "Lamentations", code: "Lam", chapters: 5 },
-  { name: "Ézéchiel", code: "Eze", chapters: 48 },
-  { name: "Daniel", code: "Dan", chapters: 12 },
-  { name: "Osée", code: "Hos", chapters: 14 },
-  { name: "Joël", code: "Joe", chapters: 3 },
-  { name: "Amos", code: "Amo", chapters: 9 },
-  { name: "Abdias", code: "Oba", chapters: 1 },
-  { name: "Jonas", code: "Jon", chapters: 4 },
-  { name: "Michée", code: "Mic", chapters: 7 },
-  { name: "Nahum", code: "Nah", chapters: 3 },
-  { name: "Habacuc", code: "Hab", chapters: 3 },
-  { name: "Sophonie", code: "Zep", chapters: 3 },
-  { name: "Aggée", code: "Hag", chapters: 2 },
-  { name: "Zacharie", code: "Zec", chapters: 14 },
-  { name: "Malachie", code: "Mal", chapters: 4 },
+  { name: "Genèse", code: "Gen", abbr: "Gn", chapters: 50 },
+  { name: "Exode", code: "Exo", abbr: "Ex", chapters: 40 },
+  { name: "Lévitique", code: "Lev", abbr: "Lv", chapters: 27 },
+  { name: "Nombres", code: "Num", abbr: "Nb", chapters: 36 },
+  { name: "Deutéronome", code: "Deu", abbr: "Dt", chapters: 34 },
+  { name: "Josué", code: "Jos", abbr: "Jos", chapters: 24 },
+  { name: "Juges", code: "Jdg", abbr: "Jg", chapters: 21 },
+  { name: "Ruth", code: "Rut", abbr: "Rt", chapters: 4 },
+  { name: "1 Samuel", code: "1Sa", abbr: "1S", chapters: 31 },
+  { name: "2 Samuel", code: "2Sa", abbr: "2S", chapters: 24 },
+  { name: "1 Rois", code: "1Ki", abbr: "1R", chapters: 22 },
+  { name: "2 Rois", code: "2Ki", abbr: "2R", chapters: 25 },
+  { name: "1 Chroniques", code: "1Ch", abbr: "1Ch", chapters: 29 },
+  { name: "2 Chroniques", code: "2Ch", abbr: "2Ch", chapters: 36 },
+  { name: "Esdras", code: "Ezr", abbr: "Esd", chapters: 10 },
+  { name: "Néhémie", code: "Neh", abbr: "Néh", chapters: 13 },
+  { name: "Esther", code: "Est", abbr: "Est", chapters: 10 },
+  { name: "Job", code: "Job", abbr: "Jb", chapters: 42 },
+  { name: "Psaumes", code: "Psa", abbr: "Ps", chapters: 150 },
+  { name: "Proverbes", code: "Pro", abbr: "Pr", chapters: 31 },
+  { name: "Ecclésiaste", code: "Ecc", abbr: "Ec", chapters: 12 },
+  { name: "Cantique", code: "Sol", abbr: "Ct", chapters: 8 },
+  { name: "Ésaïe", code: "Isa", abbr: "És", chapters: 66 },
+  { name: "Jérémie", code: "Jer", abbr: "Jr", chapters: 52 },
+  { name: "Lamentations", code: "Lam", abbr: "La", chapters: 5 },
+  { name: "Ézéchiel", code: "Eze", abbr: "Éz", chapters: 48 },
+  { name: "Daniel", code: "Dan", abbr: "Da", chapters: 12 },
+  { name: "Osée", code: "Hos", abbr: "Os", chapters: 14 },
+  { name: "Joël", code: "Joe", abbr: "Jl", chapters: 3 },
+  { name: "Amos", code: "Amo", abbr: "Am", chapters: 9 },
+  { name: "Abdias", code: "Oba", abbr: "Ab", chapters: 1 },
+  { name: "Jonas", code: "Jon", abbr: "Jon", chapters: 4 },
+  { name: "Michée", code: "Mic", abbr: "Mi", chapters: 7 },
+  { name: "Nahum", code: "Nah", abbr: "Na", chapters: 3 },
+  { name: "Habacuc", code: "Hab", abbr: "Ha", chapters: 3 },
+  { name: "Sophonie", code: "Zep", abbr: "So", chapters: 3 },
+  { name: "Aggée", code: "Hag", abbr: "Ag", chapters: 2 },
+  { name: "Zacharie", code: "Zec", abbr: "Za", chapters: 14 },
+  { name: "Malachie", code: "Mal", abbr: "Mal", chapters: 4 },
   // Nouveau Testament
-  { name: "Matthieu", code: "Mat", chapters: 28 },
-  { name: "Marc", code: "Mar", chapters: 16 },
-  { name: "Luc", code: "Luk", chapters: 24 },
-  { name: "Jean", code: "Joh", chapters: 21 },
-  { name: "Actes", code: "Act", chapters: 28 },
-  { name: "Romains", code: "Rom", chapters: 16 },
-  { name: "1 Corinthiens", code: "1Co", chapters: 16 },
-  { name: "2 Corinthiens", code: "2Co", chapters: 13 },
-  { name: "Galates", code: "Gal", chapters: 6 },
-  { name: "Éphésiens", code: "Eph", chapters: 6 },
-  { name: "Philippiens", code: "Phi", chapters: 4 },
-  { name: "Colossiens", code: "Col", chapters: 4 },
-  { name: "1 Thessaloniciens", code: "1Th", chapters: 5 },
-  { name: "2 Thessaloniciens", code: "2Th", chapters: 3 },
-  { name: "1 Timothée", code: "1Ti", chapters: 6 },
-  { name: "2 Timothée", code: "2Ti", chapters: 4 },
-  { name: "Tite", code: "Tit", chapters: 3 },
-  { name: "Philémon", code: "Phm", chapters: 1 },
-  { name: "Hébreux", code: "Heb", chapters: 13 },
-  { name: "Jacques", code: "Jam", chapters: 5 },
-  { name: "1 Pierre", code: "1Pe", chapters: 5 },
-  { name: "2 Pierre", code: "2Pe", chapters: 3 },
-  { name: "1 Jean", code: "1Jo", chapters: 5 },
-  { name: "2 Jean", code: "2Jo", chapters: 1 },
-  { name: "3 Jean", code: "3Jo", chapters: 1 },
-  { name: "Jude", code: "Jud", chapters: 1 },
-  { name: "Apocalypse", code: "Rev", chapters: 22 }
+  { name: "Matthieu", code: "Mat", abbr: "Mt", chapters: 28 },
+  { name: "Marc", code: "Mar", abbr: "Mc", chapters: 16 },
+  { name: "Luc", code: "Luk", abbr: "Lc", chapters: 24 },
+  { name: "Jean", code: "Joh", abbr: "Jn", chapters: 21 },
+  { name: "Actes", code: "Act", abbr: "Ac", chapters: 28 },
+  { name: "Romains", code: "Rom", abbr: "Rm", chapters: 16 },
+  { name: "1 Corinthiens", code: "1Co", abbr: "1Co", chapters: 16 },
+  { name: "2 Corinthiens", code: "2Co", abbr: "2Co", chapters: 13 },
+  { name: "Galates", code: "Gal", abbr: "Ga", chapters: 6 },
+  { name: "Éphésiens", code: "Eph", abbr: "Ép", chapters: 6 },
+  { name: "Philippiens", code: "Phi", abbr: "Ph", chapters: 4 },
+  { name: "Colossiens", code: "Col", abbr: "Col", chapters: 4 },
+  { name: "1 Thessaloniciens", code: "1Th", abbr: "1Th", chapters: 5 },
+  { name: "2 Thessaloniciens", code: "2Th", abbr: "2Th", chapters: 3 },
+  { name: "1 Timothée", code: "1Ti", abbr: "1Tm", chapters: 6 },
+  { name: "2 Timothée", code: "2Ti", abbr: "2Tm", chapters: 4 },
+  { name: "Tite", code: "Tit", abbr: "Tt", chapters: 3 },
+  { name: "Philémon", code: "Phm", abbr: "Phm", chapters: 1 },
+  { name: "Hébreux", code: "Heb", abbr: "Héb", chapters: 13 },
+  { name: "Jacques", code: "Jam", abbr: "Jc", chapters: 5 },
+  { name: "1 Pierre", code: "1Pe", abbr: "1P", chapters: 5 },
+  { name: "2 Pierre", code: "2Pe", abbr: "2P", chapters: 3 },
+  { name: "1 Jean", code: "1Jo", abbr: "1Jn", chapters: 5 },
+  { name: "2 Jean", code: "2Jo", abbr: "2Jn", chapters: 1 },
+  { name: "3 Jean", code: "3Jo", abbr: "3Jn", chapters: 1 },
+  { name: "Jude", code: "Jud", abbr: "Jd", chapters: 1 },
+  { name: "Apocalypse", code: "Rev", abbr: "Ap", chapters: 22 }
 ];
 
 function getBookInfo(bookCode) {
-  const b = CANONICAL_BOOKS.find(item => item.code.toLowerCase() === bookCode.toLowerCase());
-  return b || { name: bookCode, code: bookCode, chapters: 50 };
+  const b = CANONICAL_BOOKS.find(item => item.code.toLowerCase() === (bookCode || '').toLowerCase());
+  return b || { name: bookCode, code: bookCode, abbr: bookCode, chapters: 50 };
+}
+
+function formatPassagePill(bookCode, chapterNum, verseNum = null) {
+  const info = getBookInfo(bookCode);
+  const vPart = verseNum ? `:${verseNum}` : '';
+  const fullName = `${info.name} ${chapterNum}${vPart}`;
+  const shortName = `${info.abbr || info.code || info.name} ${chapterNum}${vPart}`;
+
+  const pillRef = document.getElementById('pill-reference-text');
+  if (!pillRef) return;
+
+  const drawer = document.getElementById('right-drawer');
+  const isDrawerOpen = drawer && !drawer.classList.contains('collapsed');
+
+  // Si le volet droit est ouvert ou si la largeur disponible est réduite, utiliser l'abréviation pour garantir 1 seule ligne
+  if (isDrawerOpen || window.innerWidth < 1150) {
+    pillRef.textContent = shortName;
+  } else {
+    pillRef.textContent = fullName;
+  }
 }
 
 function getNextChapterCoord(bookCode, chNum) {
@@ -2658,6 +2678,12 @@ const BibleReader = {
   loadedChapters: [],
   isLoadingMore: false,
 
+  updatePassagePillDisplay() {
+    if (this.currentBook && this.currentChapter) {
+      formatPassagePill(this.currentBook, this.currentChapter, this.selectedVerse);
+    }
+  },
+
   async init() {
     this.bracketsMode = localStorage.getItem('bible_reader_brackets_mode') || 'classic';
     this.parenthesesMode = localStorage.getItem('bible_reader_parentheses_mode') || 'callout';
@@ -2681,8 +2707,8 @@ const BibleReader = {
       this.setZoom(100);
     }
     
-    BookPicker.init((bookCode, chNum) => {
-      this.navigateTo(bookCode, chNum);
+    BookPicker.init((bookCode, chNum, verseNum = null) => {
+      this.navigateTo(bookCode, chNum, verseNum);
     });
 
     API.onReady(async () => {
@@ -2881,7 +2907,9 @@ const BibleReader = {
           }
         }
       });
-    }
+    window.addEventListener('resize', () => {
+      this.updatePassagePillDisplay();
+    });
   },
 
   getSuggestedComparativeBible(baseBibleName) {
@@ -3195,10 +3223,7 @@ const BibleReader = {
       }
 
       // Mettre à jour l'étiquette de référence en haut du lecteur
-      const pillRef = document.getElementById('pill-reference-text');
-      if (pillRef) {
-        pillRef.textContent = `${info.name} ${ch}:${vNum}`;
-      }
+      formatPassagePill(bCode, ch, vNum);
 
       // Suivi en direct du commentaire dans le volet droit
       const newRef = `${bCode}_${ch}_${vNum}`;
@@ -3218,7 +3243,7 @@ const BibleReader = {
 
     const info = getBookInfo(bookCode);
     const targetVerse = verseNum ? parseInt(verseNum, 10) : null;
-    document.getElementById('pill-reference-text').textContent = targetVerse ? `${info.name} ${chapterNum}:${targetVerse}` : `${info.name} ${chapterNum}`;
+    formatPassagePill(bookCode, chapterNum, targetVerse);
     document.getElementById('pane-1-breadcrumb').textContent = `${info.name.toUpperCase()} > Chapitre ${chapterNum}`;
     const breadcrumb2 = document.getElementById('pane-2-breadcrumb');
     if (breadcrumb2) breadcrumb2.textContent = `${info.name.toUpperCase()} > Chapitre ${chapterNum}`;
@@ -3325,11 +3350,7 @@ const BibleReader = {
     }
 
     // Mettre à jour l'étiquette de référence en haut du lecteur
-    const info = getBookInfo(bStr);
-    const pillRef = document.getElementById('pill-reference-text');
-    if (pillRef && info) {
-      pillRef.textContent = `${info.name} ${chStr}:${vStr}`;
-    }
+    formatPassagePill(bStr, chStr, vStr);
 
     // Charger les commentaires exégétiques pour ce verset
     this.loadCommentariesForVerse(vStr, bStr, chStr);

@@ -1148,6 +1148,9 @@ body.sidebar-is-collapsed .topbar-left-zone .quick-passage-box {
   background-color: var(--bg-card);
   border-radius: 6px;
   cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  user-select: none;
 }
 .book-picker-pill:hover {
   border-color: var(--accent-blue);
@@ -1157,10 +1160,12 @@ body.sidebar-is-collapsed .topbar-left-zone .quick-passage-box {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
+  white-space: nowrap;
 }
 .pill-arrow {
   font-size: 10px;
   color: var(--text-muted);
+  flex-shrink: 0;
 }
 
 .nav-mode-links {

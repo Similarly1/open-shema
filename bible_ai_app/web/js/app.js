@@ -712,20 +712,18 @@ const App = {
     const isDrawerOpen = drawer && !drawer.classList.contains('collapsed');
     if (!isDrawerOpen) {
       if (this.sidebarAutoCollapsed) {
-        this.setSidebarCollapsed(false, false);
+        this.setSidebarCollapsed(false, true);
       }
-      return;
+    } else {
+      // Volet droit ouvert -> réduire systématiquement le volet gauche pour maximiser l'espace
+      const sidebar = document.getElementById('sidebar');
+      if (sidebar && !sidebar.classList.contains('collapsed')) {
+        this.setSidebarCollapsed(true, true);
+      }
     }
 
-    const drawerWidth = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--drawer-width').trim(), 10) || 420;
-    const sidebar = document.getElementById('sidebar');
-    const sidebarWidth = sidebar && !sidebar.classList.contains('collapsed') ? 220 : 58;
-    const remainingReaderWidth = window.innerWidth - drawerWidth - sidebarWidth;
-
-    if (remainingReaderWidth < 540) {
-      this.setSidebarCollapsed(true, true);
-    } else if (remainingReaderWidth >= 660 && this.sidebarAutoCollapsed) {
-      this.setSidebarCollapsed(false, true);
+    if (typeof BibleReader !== 'undefined' && typeof BibleReader.updatePassagePillDisplay === 'function') {
+      BibleReader.updatePassagePillDisplay();
     }
   },
 
