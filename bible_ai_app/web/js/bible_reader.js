@@ -2907,6 +2907,8 @@ const BibleReader = {
           }
         }
       });
+    }
+
     window.addEventListener('resize', () => {
       this.updatePassagePillDisplay();
     });
