@@ -9570,23 +9570,34 @@ body.palette-dark-cyber {
 }
 
 /* Container variant: applique le balayage lumineux sur l'ensemble du texte traité */
-.ai-shining-container {
-  position: relative;
-}
-
+.ai-shining-container,
+.ai-shining-container *,
 .ai-shining-container p,
 .ai-shining-container h1,
 .ai-shining-container h2,
 .ai-shining-container h3,
 .ai-shining-container h4,
 .ai-shining-container li,
-.ai-shining-container span:not(.no-shine),
+.ai-shining-container span,
 .ai-shining-container em,
 .ai-shining-container strong,
 .ai-shining-container blockquote,
-.ai-shining-container .dict-entry-body-content,
-.ai-shining-container .comm-body-text,
-.ai-shining-container .theol-paragraph {
+.ai-shining-container a,
+.ai-shining-container div,
+.dict-entry-body.ai-shining-container,
+.dict-entry-body.ai-shining-container *,
+.dict-entry-body-content.ai-shining-container,
+.dict-entry-body-content.ai-shining-container *,
+#match-body-text.ai-shining-container,
+#match-body-text.ai-shining-container *,
+#dict-article-body .ai-shining-container,
+#dict-article-body .ai-shining-container *,
+.comm-view-reading-body.ai-shining-container,
+.comm-view-reading-body.ai-shining-container *,
+.comm-single-body.ai-shining-container,
+.comm-single-body.ai-shining-container *,
+.theol-reading-body.ai-shining-container,
+.theol-reading-body.ai-shining-container * {
   background: linear-gradient(
     110deg,
     var(--shine-base) 0%,
@@ -9596,13 +9607,13 @@ body.palette-dark-cyber {
     var(--shine-highlight) 52%,
     var(--shine-base) 65%,
     var(--shine-base) 100%
-  );
-  background-size: 250% 100%;
+  ) !important;
+  background-size: 250% 100% !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   color: transparent !important;
-  animation: shine-sweep 2.8s linear infinite;
+  animation: shine-sweep 2.8s linear infinite !important;
   text-shadow: none !important;
 }
 

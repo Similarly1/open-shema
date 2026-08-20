@@ -2353,12 +2353,12 @@ const LexiconViewer = {
     }
 
     const textToRender = (rawText || '')
-      .replace(/^### (.*$)/gim, '<h3 style="margin: 12px 0 6px 0; color: var(--accent-blue); font-size: 16px; font-weight: 700;">$1</h3>')
-      .replace(/^## (.*$)/gim, '<h2 style="margin: 14px 0 8px 0; color: var(--accent-blue); font-size: 18px; font-weight: 700;">$1</h2>')
-      .replace(/^# (.*$)/gim, '<h1 style="margin: 16px 0 10px 0; color: var(--accent-blue); font-size: 20px; font-weight: 800;">$1</h1>')
+      .replace(/^### (.*$)/gim, '<h3 style="margin: 12px 0 6px 0; font-size: 16px; font-weight: 700;">$1</h3>')
+      .replace(/^## (.*$)/gim, '<h2 style="margin: 14px 0 8px 0; font-size: 18px; font-weight: 700;">$1</h2>')
+      .replace(/^# (.*$)/gim, '<h1 style="margin: 16px 0 10px 0; font-size: 20px; font-weight: 800;">$1</h1>')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/^\> (.*$)/gim, '<blockquote style="border-left: 3px solid var(--accent-blue); padding: 8px 12px; margin: 10px 0; background: var(--bg-subtle); color: var(--text-secondary); border-radius: 0 6px 6px 0; font-style: italic;">$1</blockquote>')
+      .replace(/^\> (.*$)/gim, '<blockquote style="border-left: 3px solid var(--accent-blue); padding: 8px 12px; margin: 10px 0; background: var(--bg-subtle); border-radius: 0 6px 6px 0; font-style: italic;">$1</blockquote>')
       .replace(/^\- (.*$)/gim, '<li style="margin-left: 20px; margin-bottom: 4px;">$1</li>')
       .replace(/\n\n/g, '<br><br>');
 
@@ -2372,7 +2372,7 @@ const LexiconViewer = {
         <div style="font-size: 11px; font-weight: 700; color: var(--accent-orange); margin-bottom: 12px;">${match.badge || match.dict_name}</div>
         ${polishBarHtml}
         ${translationBannerHtml}
-        <div style="font-family: var(--font-bible); font-size: 15px; line-height: 1.75; color: var(--text-primary);" id="match-body-text" class="dict-entry-body">${linkifiedDictText}</div>
+        <div style="font-family: var(--font-bible); font-size: 15px; line-height: 1.75;" id="match-body-text" class="dict-entry-body">${linkifiedDictText}</div>
       </div>
     `;
 

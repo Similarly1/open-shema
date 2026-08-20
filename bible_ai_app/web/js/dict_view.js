@@ -528,14 +528,14 @@ const DictView = {
   formatArticleMarkdown(text) {
     if (!text) return '';
     return text
-      .replace(/^### (.*$)/gim, '<h3 style="margin: 16px 0 8px 0; color: var(--accent-blue); font-size: 17px; font-weight: 700;">$1</h3>')
-      .replace(/^## (.*$)/gim, '<h2 style="margin: 20px 0 10px 0; color: var(--accent-blue); font-size: 19px; font-weight: 700;">$1</h2>')
-      .replace(/^# (.*$)/gim, '<h1 style="margin: 22px 0 12px 0; color: var(--accent-blue); font-size: 22px; font-weight: 800;">$1</h1>')
+      .replace(/^### (.*$)/gim, '<h3 style="margin: 16px 0 8px 0; font-size: 17px; font-weight: 700;">$1</h3>')
+      .replace(/^## (.*$)/gim, '<h2 style="margin: 20px 0 10px 0; font-size: 19px; font-weight: 700;">$1</h2>')
+      .replace(/^# (.*$)/gim, '<h1 style="margin: 22px 0 12px 0; font-size: 22px; font-weight: 800;">$1</h1>')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/^\> (.*$)/gim, '<blockquote style="border-left: 3px solid var(--accent-blue); padding: 8px 14px; margin: 12px 0; background: var(--bg-subtle); color: var(--text-secondary); border-radius: 0 6px 6px 0; font-style: italic;">$1</blockquote>')
+      .replace(/^\> (.*$)/gim, '<blockquote style="border-left: 3px solid var(--accent-blue); padding: 8px 14px; margin: 12px 0; background: var(--bg-subtle); border-radius: 0 6px 6px 0; font-style: italic;">$1</blockquote>')
       .replace(/^\- (.*$)/gim, '<li style="margin-left: 20px; margin-bottom: 4px;">$1</li>')
-      .replace(/\n\n/g, '<p style="margin-bottom: 14px;"></p>');
+      .replace(/\n\n/g, '<div style="height: 14px;"></div>');
   },
 
   async polishCurrentArticle() {
@@ -555,9 +555,12 @@ const DictView = {
       `;
       const curText = match.raw_text || match.full_text || match.preview || '';
       const formatted = this.formatArticleMarkdown(curText);
+      const linkified = (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences)
+        ? TheologyView.highlightScriptureReferences(formatted)
+        : formatted;
       bodyEl.innerHTML = `
         ${bannerHtml}
-        <div class="dict-entry-body-content ai-shining-container">${formatted}</div>
+        <div class="dict-entry-body dict-entry-body-content ai-shining-container">${linkified}</div>
       `;
     }
 
