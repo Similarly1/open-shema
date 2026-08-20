@@ -429,6 +429,28 @@ class EpubLoader:
         enriched_chunks = ChunkEnricher.process_document(raw_chunks)
         return enriched_chunks
 
+    @classmethod
+    def extract_chunks(
+        cls,
+        epub_path: str,
+        selected_chapters: List[Dict[str, Any]] = None,
+        metadata: Dict[str, Any] = None,
+        custom_name: str = "",
+        **kwargs
+    ) -> List[Dict[str, Any]]:
+        """Alias de compatibilité pour extract_chapters_and_chunks."""
+        if metadata is None:
+            metadata = {}
+        if not custom_name:
+            custom_name = metadata.get("title", "") or kwargs.get("name", "book")
+        return cls.extract_chapters_and_chunks(
+            epub_path=epub_path,
+            selected_chapters=selected_chapters or [],
+            custom_name=custom_name,
+            metadata=metadata,
+            **kwargs
+        )
+
     # =========================================================================
     # METHODES INTERNES DE PARSING EPUB / XML
     # =========================================================================

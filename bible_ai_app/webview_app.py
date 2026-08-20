@@ -1715,7 +1715,12 @@ class BibleAppApi:
         if ext == '.epub':
             from core.epub_loader import EpubLoader
             selected_chapters = payload.get("chapters", [])
-            chunks = EpubLoader.extract_chunks(file_path, selected_chapters, metadata, custom_name=name)
+            chunks = EpubLoader.extract_chapters_and_chunks(
+                epub_path=file_path,
+                selected_chapters=selected_chapters,
+                custom_name=name,
+                metadata=metadata
+            )
             
             metadata["chapters_count"] = len([c for c in selected_chapters if c.get("include", True)])
             metadata["chunks_count"] = len(chunks)
