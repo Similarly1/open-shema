@@ -252,6 +252,11 @@ class LLMClient:
             self.client = MistralClient(api_key=self.api_key) if self.api_key else None
         elif self.provider == "gemini":
             self.client = GeminiClient(api_key=self.api_key, model=self.model) if self.api_key else None
+        elif self.provider == "infomaniak":
+            self.client = InfomaniakClient(token=self.api_key, product_id=self.product_id) if self.api_key else None
+        else:
+            self.client = None
+
     def chat(self, messages, system_prompt=None, **kwargs):
         """Méthode unifiée de conversation/complétion avec le LLM selon le provider configuré."""
         if not self.client:
