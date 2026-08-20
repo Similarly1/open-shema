@@ -9542,7 +9542,7 @@ body.palette-dark-cyber {
     background-position: 200% 0;
   }
   100% {
-    background-position: -200% 0;
+    background-position: 0% 0;
   }
 }
 
@@ -9551,20 +9551,23 @@ body.palette-dark-cyber {
   background: linear-gradient(
     90deg,
     var(--shine-base) 0%,
-    var(--shine-base) 20%,
-    var(--shine-mid) 40%,
-    var(--shine-peak) 50%,
-    var(--shine-mid) 60%,
-    var(--shine-base) 80%,
+    var(--shine-mid) 18%,
+    var(--shine-peak) 25%,
+    var(--shine-mid) 32%,
+    var(--shine-base) 50%,
+    var(--shine-mid) 68%,
+    var(--shine-peak) 75%,
+    var(--shine-mid) 82%,
     var(--shine-base) 100%
   ) !important;
   background-size: 200% 100% !important;
+  background-repeat: repeat-x !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   color: transparent !important;
   display: inline-block;
-  animation: shine-sweep 2.2s linear infinite !important;
+  animation: shine-sweep 2.4s linear infinite !important;
   text-decoration: none !important;
   text-shadow: none !important;
   will-change: background-position;
@@ -9580,22 +9583,27 @@ body.palette-dark-cyber {
 .comm-single-body.ai-shining-container,
 .theol-reading-body.ai-shining-container,
 .theol-summary-encart-body.ai-shining-container {
+  display: inline-block !important;
+  width: 100% !important;
   background: linear-gradient(
     90deg,
     var(--shine-base) 0%,
-    var(--shine-base) 20%,
-    var(--shine-mid) 40%,
-    var(--shine-peak) 50%,
-    var(--shine-mid) 60%,
-    var(--shine-base) 80%,
+    var(--shine-mid) 18%,
+    var(--shine-peak) 25%,
+    var(--shine-mid) 32%,
+    var(--shine-base) 50%,
+    var(--shine-mid) 68%,
+    var(--shine-peak) 75%,
+    var(--shine-mid) 82%,
     var(--shine-base) 100%
   ) !important;
   background-size: 200% 100% !important;
+  background-repeat: repeat-x !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   color: transparent !important;
-  animation: shine-sweep 2.2s linear infinite !important;
+  animation: shine-sweep 2.4s linear infinite !important;
   text-shadow: none !important;
   will-change: background-position;
 }
