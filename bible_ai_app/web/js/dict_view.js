@@ -29,6 +29,25 @@ const DictView = {
     }
   },
 
+  _hashCode(str) {
+    let hash = 0;
+    if (!str) return hash;
+    for (let i = 0; i < str.length; i++) {
+      hash = (hash << 5) - hash + str.charCodeAt(i);
+      hash |= 0;
+    }
+    return hash;
+  },
+
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  },
+
   openDictionary(dictId, targetTerm = null) {
     App.switchView('dict');
     if (!this.allDictionaries || this.allDictionaries.length === 0) {
@@ -41,7 +60,7 @@ const DictView = {
   },
 
   // =========================================================================
-  // 1. CONTRÔLES D'EN-TÊTE & SÉLECTEUR DÉROULANT
+  // 1. CONTRÔLES D'EN-TÊTE & SÉLECTEUR DÉROULANT (STYLE THÉOLOGIE)
   // =========================================================================
 
   bindHeaderControls() {
@@ -52,26 +71,27 @@ const DictView = {
     // Basculer le popover des dictionnaires
     btnSelector?.addEventListener('click', (e) => {
       e.stopPropagation();
-      popover?.classList.toggle('hidden');
-      if (popover && !popover.classList.contains('hidden')) {
-        searchInPopover?.focus();
+      const isHidden = popover?.classList.contains('hidden');
+      if (isHidden) {
+        if (searchInPopover) searchInPopover.value = '';
+        this.renderDictionaryPickerList();
+        popover.classList.remove('hidden');
+        setTimeout(() => searchInPopover?.focus(), 50);
+      } else {
+        popover?.classList.add('hidden');
       }
     });
 
     // Fermer le popover au clic en dehors
     document.addEventListener('click', (e) => {
-      if (popover && !popover.contains(e.target) && !btnSelector?.contains(e.target)) {
+      if (popover && !popover.classList.contains('hidden') && !e.target.closest('#btn-dict-active-selector') && !e.target.closest('#dict-picker-popover')) {
         popover.classList.add('hidden');
       }
     });
 
     // Filtrer les dictionnaires dans le popover
-    searchInPopover?.addEventListener('input', (e) => {
-      const q = e.target.value.toLowerCase().trim();
-      document.querySelectorAll('#dict-picker-list .dict-picker-item').forEach(item => {
-        const title = (item.dataset.title || '').toLowerCase();
-        item.style.display = (!q || title.includes(q)) ? 'flex' : 'none';
-      });
+    searchInPopover?.addEventListener('input', () => {
+      this.renderDictionaryPickerList();
     });
 
     // Recherche Rapide Globale
@@ -151,38 +171,61 @@ const DictView = {
 
   renderDictionaryPickerList() {
     const listEl = document.getElementById('dict-picker-list');
+    const searchInPopover = document.getElementById('dict-picker-search-input');
     if (!listEl) return;
-    listEl.innerHTML = '';
 
-    const colors = ['#92400e', '#065F46', '#1E3A8A', '#581C87', '#374151', '#991B1B'];
+    const q = (searchInPopover?.value || '').toLowerCase().trim();
+    const filtered = this.allDictionaries.filter(d => {
+      if (!q) return true;
+      const title = (d.name || d.title || '').toLowerCase();
+      const author = (d.author || d.subtitle || '').toLowerCase();
+      return title.includes(q) || author.includes(q);
+    });
 
-    this.allDictionaries.forEach((d, idx) => {
-      const color = colors[idx % colors.length];
-      const initials = (d.name || 'D').split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'D';
-      
-      const item = document.createElement('button');
-      item.className = `dict-picker-item ${this.activeDictId === d.id ? 'active' : ''}`;
-      item.dataset.id = d.id;
-      item.dataset.title = d.name;
-
-      item.innerHTML = `
-        <div class="dict-book-mini-cover" style="background: ${color};">
-          <div class="dict-book-mini-spine"></div>
-          <span class="dict-book-mini-initials">${initials}</span>
-        </div>
-        <div class="dict-picker-item-info">
-          <div class="dict-picker-item-title">${d.name}</div>
-          <div class="dict-picker-item-meta">${d.subtitle || `${d.count || 0} articles`}</div>
-        </div>
-        <span class="dict-count-badge">${d.badge || 'DICT'}</span>
+    if (filtered.length === 0) {
+      listEl.innerHTML = `
+        <div class="theol-picker-empty">Aucun dictionnaire trouvé</div>
       `;
+      return;
+    }
 
+    const coverColors = ['#0F766E', '#1E3A8A', '#4338CA', '#7C2D12', '#065F46', '#831843', '#312E81', '#92400e'];
+
+    listEl.innerHTML = filtered.map(d => {
+      const isActive = d.id === this.activeDictId;
+      const color = coverColors[Math.abs(this._hashCode(d.id || d.name)) % coverColors.length];
+      const initials = (d.name || 'D').split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'D';
+      const coverUrl = d.cover_data_url || d.cover_url;
+
+      const coverHtml = coverUrl
+        ? `<div class="theol-book-mini-cover" style="background: url('${coverUrl}') center/cover no-repeat;"><div class="theol-book-mini-spine"></div></div>`
+        : `<div class="theol-book-mini-cover" style="background: ${color};"><div class="theol-book-mini-spine"></div><span class="theol-book-mini-initials">${initials}</span></div>`;
+
+      const articlesTag = d.badge || (d.count ? `${(d.count).toLocaleString('fr-FR')} art.` : '');
+
+      return `
+        <div class="theol-picker-item ${isActive ? 'active' : ''}" data-dict-id="${d.id}">
+          ${coverHtml}
+          <div class="theol-picker-item-details">
+            <div class="theol-picker-item-title-row">
+              <span class="theol-picker-item-name">${this.escapeHtml(d.name)}</span>
+              ${articlesTag ? `<span class="theol-picker-item-chapters-tag">${articlesTag}</span>` : ''}
+            </div>
+            <div class="theol-picker-item-author">${this.escapeHtml(d.subtitle || d.author || 'Auteur non spécifié')}</div>
+          </div>
+          ${isActive ? '<span class="theol-picker-item-check">✓</span>' : ''}
+        </div>
+      `;
+    }).join('');
+
+    listEl.querySelectorAll('.theol-picker-item').forEach(item => {
       item.addEventListener('click', () => {
-        document.getElementById('dict-picker-popover')?.classList.add('hidden');
-        this.selectDictionary(d.id);
+        const dId = item.dataset.dictId;
+        if (dId) {
+          this.selectDictionary(dId);
+          document.getElementById('dict-picker-popover')?.classList.add('hidden');
+        }
       });
-
-      listEl.appendChild(item);
     });
   },
 
@@ -193,23 +236,34 @@ const DictView = {
     this.activeDictId = dInfo.id;
     this.activeDictInfo = dInfo;
 
-    // Mettre à jour le bouton actif dans l'en-tête
+    // Mettre à jour le bouton actif dans l'en-tête (Style Théologie)
     const titleEl = document.getElementById('dict-active-book-title');
     const metaEl = document.getElementById('dict-active-book-meta');
     const badgeEl = document.getElementById('dict-active-count-badge');
+    const coverEl = document.getElementById('dict-active-book-cover');
     const coverInitials = document.getElementById('dict-active-book-initials');
 
     if (titleEl) titleEl.textContent = dInfo.name;
-    if (metaEl) metaEl.textContent = dInfo.subtitle || `${dInfo.count || 0} articles`;
-    if (badgeEl) badgeEl.textContent = `${(dInfo.count || 0).toLocaleString('fr-FR')} entrées`;
-    if (coverInitials) {
-      coverInitials.textContent = (dInfo.name || 'D').split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'D';
-    }
+    if (metaEl) metaEl.textContent = dInfo.subtitle || dInfo.author || `${dInfo.count || 0} articles`;
+    if (badgeEl) badgeEl.textContent = dInfo.badge || `${(dInfo.count || 0).toLocaleString('fr-FR')} art.`;
+    
+    if (coverEl) {
+      const coverColors = ['#0F766E', '#1E3A8A', '#4338CA', '#7C2D12', '#065F46', '#831843', '#312E81', '#92400e'];
+      const color = coverColors[Math.abs(this._hashCode(dInfo.id || dInfo.name)) % coverColors.length];
+      const initials = (dInfo.name || 'D').split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'D';
+      const coverUrl = dInfo.cover_data_url || dInfo.cover_url;
 
-    // Mettre à jour l'élément sélectionné dans le popover
-    document.querySelectorAll('#dict-picker-list .dict-picker-item').forEach(el => {
-      el.classList.toggle('active', el.dataset.id === dInfo.id);
-    });
+      if (coverUrl) {
+        coverEl.style.background = `url("${coverUrl}") center/cover no-repeat`;
+        if (coverInitials) coverInitials.style.display = 'none';
+      } else {
+        coverEl.style.background = color;
+        if (coverInitials) {
+          coverInitials.style.display = 'block';
+          coverInitials.textContent = initials;
+        }
+      }
+    }
 
     // Réinitialiser la lettre A-Z sur 'ALL' et charger les entrées
     this.activeLetter = 'ALL';

@@ -139,21 +139,46 @@ class DictionaryManager:
         """Retourne la liste enrichie de tous les dictionnaires disponibles."""
         reg = cls.load_registry()
         result = []
+        
+        meta_info = {
+            "nouveau_dictionnaire": {"author": "Collectif / Éditions Emmaüs", "year": "1992", "badge": "7 016 art.", "count": 7016},
+            "calmet": {"author": "Dom Augustin Calmet", "year": "1728", "badge": "5 369 art.", "count": 5369},
+            "vigouroux": {"author": "Fulcran Vigouroux", "year": "1912", "badge": "7 585 art.", "count": 7585},
+            "strong": {"author": "James Strong", "year": "1890", "badge": "14 024 ent.", "count": 14024},
+            "bailly": {"author": "Anatole Bailly", "year": "1901", "badge": "14 642 ent.", "count": 14642},
+            "theologie_systematiq": {"author": "Études Doctrinales", "year": "", "badge": "99 art.", "count": 99},
+        }
+
         for d in reg:
             item = dict(d)
+            d_id = d.get("id", "")
+            custom_meta = meta_info.get(d_id, {})
+            
+            if "author" in custom_meta and not item.get("author"):
+                item["author"] = custom_meta["author"]
+            if "year" in custom_meta and not item.get("year"):
+                item["year"] = custom_meta["year"]
+                
             dict_type = d.get("type", "custom")
             if dict_type == "strong":
-                item["badge"] = "STRONG"
-                item["subtitle"] = "Lexique Hébreu & Grec Strong"
+                item["count"] = 14024
+                item["badge"] = "14 024 ent."
+                item["subtitle"] = f"{item.get('author', 'James Strong')} ({item.get('year', '1890')})"
             elif dict_type == "greek":
-                item["badge"] = "BAILLY"
-                item["subtitle"] = "Grec Ancien - Français"
+                item["count"] = 14642
+                item["badge"] = "14 642 ent."
+                item["subtitle"] = f"{item.get('author', 'Anatole Bailly')} ({item.get('year', '1901')})"
             else:
                 data = cls.load_dictionary_file(d)
                 if data and "articles" in data:
                     item["count"] = len(data["articles"])
-                item["badge"] = "DICT"
-                item["subtitle"] = f"{item.get('count', 0):,} articles".replace(",", " ")
+                elif "count" in custom_meta:
+                    item["count"] = custom_meta["count"]
+                cnt = item.get("count", 0)
+                item["badge"] = f"{cnt:,} art.".replace(",", " ")
+                yr = f" ({item.get('year')})" if item.get('year') else ""
+                item["subtitle"] = f"{item.get('author', 'Auteur non spécifié')}{yr}"
+
             result.append(item)
         return result
 

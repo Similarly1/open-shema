@@ -1760,30 +1760,30 @@
       <!-- ===================================================== -->
       <div class="app-view" id="view-dict">
         <header class="view-header dict-view-header">
-          <!-- GAUCHE : Sélecteur Principal Déroulant de Dictionnaire -->
-          <div class="dict-main-dropdown-wrapper">
-            <button class="dict-active-book-btn" id="btn-dict-active-selector" title="Cliquer pour changer de dictionnaire">
-              <div class="dict-book-mini-cover" id="dict-active-book-cover" style="background: #92400e;">
-                <div class="dict-book-mini-spine"></div>
-                <span class="dict-book-mini-initials" id="dict-active-book-initials">ND</span>
+          <!-- GAUCHE : Sélecteur Principal Déroulant de Dictionnaire (Style Théologie) -->
+          <div class="theol-main-dropdown-wrapper" id="dict-main-dropdown-wrapper">
+            <button class="theol-active-book-btn" id="btn-dict-active-selector" title="Cliquer pour choisir un autre dictionnaire">
+              <div class="theol-book-mini-cover" id="dict-active-book-cover" style="background: #0F766E;">
+                <div class="theol-book-mini-spine"></div>
+                <span class="theol-book-mini-initials" id="dict-active-book-initials">ND</span>
               </div>
-              <div class="dict-active-book-info">
-                <div class="dict-active-book-title" id="dict-active-book-title">Nouveau Dictionnaire Biblique</div>
-                <div class="dict-active-book-meta" id="dict-active-book-meta">Édition Révisée • 7 016 articles</div>
+              <div class="theol-active-book-info">
+                <div class="theol-active-book-title" id="dict-active-book-title">Nouveau Dictionnaire Biblique</div>
+                <div class="theol-active-book-meta" id="dict-active-book-meta">Collectif • Édition Révisée</div>
               </div>
-              <div class="dict-active-book-badge-box">
-                <span class="dict-count-badge" id="dict-active-count-badge">7 016 entrées</span>
-                <span class="dict-dropdown-caret">▾</span>
+              <div class="theol-active-book-badge-box">
+                <span class="theol-chapters-count-badge" id="dict-active-count-badge">7 016 art.</span>
+                <span class="theol-dropdown-caret">▾</span>
               </div>
             </button>
 
-            <!-- Popover Sélecteur Dictionnaires avec Recherche -->
-            <div class="dict-picker-popover hidden" id="dict-picker-popover">
-              <div class="dict-popover-search-row">
+            <!-- Popover Sélecteur Dictionnaires avec Recherche (Identique à Théologie) -->
+            <div class="theol-picker-popover hidden" id="dict-picker-popover">
+              <div class="theol-popover-search-row">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.6;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                <input type="text" id="dict-picker-search-input" class="dict-popover-search-input" placeholder="Filtrer les dictionnaires disponibles...">
+                <input type="text" id="dict-picker-search-input" class="theol-popover-search-input" placeholder="Filtrer par titre ou auteur...">
               </div>
-              <div class="dict-picker-list" id="dict-picker-list">
+              <div class="theol-picker-list" id="dict-picker-list">
                 <!-- Rempli dynamiquement -->
               </div>
             </div>

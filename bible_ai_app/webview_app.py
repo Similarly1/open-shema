@@ -1937,7 +1937,24 @@ class BibleAppApi:
         return mgr.download_and_import()
 
     def get_dictionaries(self) -> List[Dict[str, Any]]:
-        return DictionaryManager.get_all_dictionaries()
+        dicts = DictionaryManager.get_all_dictionaries()
+        covers_dir = os.path.join(current_dir, "data", "covers")
+        for d in dicts:
+            d_id = d.get("id", "").lower()
+            d_name = d.get("name", "").lower()
+            cov_path = None
+            if os.path.exists(covers_dir):
+                for fn in os.listdir(covers_dir):
+                    fn_l = fn.lower()
+                    if (d_id and d_id in fn_l) or ("nouveau" in d_id and "nouveau" in fn_l) or ("calmet" in d_id and "calmet" in fn_l) or ("vigo" in d_id and "vigo" in fn_l) or ("strong" in d_id and "strong" in fn_l) or ("bailly" in d_id and "bailly" in fn_l):
+                        cov_path = os.path.join(covers_dir, fn)
+                        break
+            if cov_path:
+                data_url = get_cover_data_url(cov_path)
+                d["cover_path"] = cov_path
+                d["cover_data_url"] = data_url
+                d["cover_url"] = data_url
+        return dicts
 
     def get_dictionary_headwords(self, dict_id: str, letter: Optional[str] = None, query: Optional[str] = None, limit: int = 300, offset: int = 0) -> Dict[str, Any]:
         return DictionaryManager.get_headwords(dict_id, letter=letter, query=query, limit=limit, offset=offset)
