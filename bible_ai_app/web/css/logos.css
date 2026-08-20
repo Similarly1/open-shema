@@ -9539,10 +9539,10 @@ body.palette-dark-cyber {
 
 @keyframes shine-sweep {
   0% {
-    background-position: 200% 0;
+    background-position-x: 200%;
   }
   100% {
-    background-position: 0% 0;
+    background-position-x: -200%;
   }
 }
 
@@ -9561,26 +9561,20 @@ body.palette-dark-cyber {
 .ai-shining-container > div > p,
 .ai-shining-container > span {
   background: linear-gradient(
-    90deg,
+    110deg,
     var(--shine-base) 0%,
-    var(--shine-mid) 18%,
-    var(--shine-peak) 25%,
-    var(--shine-mid) 32%,
-    var(--shine-base) 50%,
-    var(--shine-mid) 68%,
-    var(--shine-peak) 75%,
-    var(--shine-mid) 82%,
+    var(--shine-mid) 10%,
+    var(--shine-peak) 20%,
+    var(--shine-mid) 30%,
     var(--shine-base) 100%
   ) !important;
   background-size: 200% 100% !important;
-  background-repeat: repeat-x !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   color: transparent !important;
-  animation: shine-sweep 2.4s linear infinite !important;
+  animation: shine-sweep 2.5s linear infinite !important;
   text-shadow: none !important;
-  will-change: background-position;
 }
 
 .banner-text.shine-text,
