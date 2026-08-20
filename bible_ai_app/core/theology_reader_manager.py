@@ -229,153 +229,158 @@ class TheologyReaderManager:
             cid_query = int(chapter_id)
         except (ValueError, TypeError):
             cid_query = chapter_id
+        registry = load_books_metadata()
+        book_meta = registry.get(book_name, {})
+        fpath = book_meta.get("file_path", "")
 
-        collections_to_search = []
-        try:
-            for c in client.list_collections():
-                c_name = c.name if hasattr(c, 'name') else str(c)
-                collections_to_search.append(c_name)
-        except Exception:
-            collections_to_search = ['bible_study_bge_multilingual_gemma2_Infomaniak', 'study_library', 'bible_study_gemini_embedding_2']
-
-        for col_name in collections_to_search:
+        # 1. Priorité à la lecture directe du fichier EPUB original (texte intégral fidèle, notes exactes, sans césure RAG)
+        if fpath and os.path.exists(fpath) and fpath.lower().endswith(".epub"):
             try:
-                col = client.get_collection(col_name)
-                # Requête ChromaDB
-                res = col.get(
-                    where={"$and": [{"name": book_name}, {"chapter_id": cid_query}]},
-                    include=['metadatas', 'documents']
-                )
-                if res and res.get('ids') and len(res['ids']) > 0:
-                    for i in range(len(res['ids'])):
-                        c_id = res['ids'][i]
-                        m = res['metadatas'][i]
-                        doc = res['documents'][i]
-                        
-                        if not chapter_meta and m:
-                            chapter_meta = m
+                import zipfile
+                from bs4 import BeautifulSoup
+                from core.epub_loader import EpubLoader
+                inspect_data = EpubLoader.inspect_epub(fpath)
+                ch_info = next((c for c in inspect_data.get("chapters", []) if c.get("id") == cid_query), None)
+                if ch_info and ch_info.get("zip_file"):
+                    with zipfile.ZipFile(fpath, 'r') as z:
+                        if ch_info["zip_file"] in z.namelist():
+                            html_content = z.read(ch_info["zip_file"]).decode('utf-8', errors='ignore')
+                            soup = BeautifulSoup(html_content, 'html.parser')
+                            for tag in soup(["script", "style", "nav"]):
+                                tag.decompose()
                             
-                        # Versets référencés
-                        rv = m.get('referenced_verses', '')
-                        if rv:
-                            for v_item in str(rv).split(','):
-                                v_clean = v_item.strip()
-                                if v_clean:
-                                    all_referenced_verses.add(v_clean)
-                                    
-                        rb = m.get('referenced_books', '')
-                        if rb:
-                            for b_item in str(rb).split(','):
-                                b_clean = b_item.strip()
-                                if b_clean:
-                                    all_referenced_books.add(b_clean)
+                            for p_tag in soup.find_all(attrs={"class": lambda c: c and any(k in str(c).lower() for k in ["page-papier", "page_papier", "pagenum", "pagebreak", "page-number"])}):
+                                p_tag.decompose()
 
-                        chunks.append((c_id, m, doc))
-            except Exception as e:
-                logger.debug(f"[TheologyReaderManager] Recherche content {col_name} : {e}")
-
-        # Fallback direct EPUB si aucun chunk dans ChromaDB (ex: en cours d'indexation)
-        if not chunks:
-            registry = load_books_metadata()
-            book_meta = registry.get(book_name, {})
-            fpath = book_meta.get("file_path", "")
-            if fpath and os.path.exists(fpath) and fpath.lower().endswith(".epub"):
-                try:
-                    import zipfile
-                    from bs4 import BeautifulSoup
-                    from core.epub_loader import EpubLoader
-                    inspect_data = EpubLoader.inspect_epub(fpath)
-                    ch_info = next((c for c in inspect_data.get("chapters", []) if c.get("id") == cid_query), None)
-                    if ch_info and ch_info.get("zip_file"):
-                        with zipfile.ZipFile(fpath, 'r') as z:
-                            if ch_info["zip_file"] in z.namelist():
-                                html_content = z.read(ch_info["zip_file"]).decode('utf-8', errors='ignore')
-                                soup = BeautifulSoup(html_content, 'html.parser')
-                                for tag in soup(["script", "style", "nav"]):
-                                    tag.decompose()
-                                direct_paragraphs = []
-                                # Convertir les appels de notes (sup, a noteref, etc.) en marqueurs propres [^n]
-                                for fn_ref in soup.find_all(["sup", "a"]):
-                                    is_fn = False
-                                    if fn_ref.name == "sup":
-                                        is_fn = True
-                                    elif fn_ref.get("epub:type") == "noteref" or "footnote" in str(fn_ref.get("class", [])).lower() or "noteref" in str(fn_ref.get("class", [])).lower():
-                                        is_fn = True
-                                    elif fn_ref.get("href") and ("#fn" in fn_ref.get("href", "").lower() or "#note" in fn_ref.get("href", "").lower()):
-                                        is_fn = True
-                                    
-                                    if is_fn:
-                                        fn_txt = fn_ref.get_text(strip=True)
-                                        fn_clean = re.sub(r'[^\w\d]', '', fn_txt)
-                                        if fn_clean and (fn_clean.isdigit() or len(fn_clean) <= 4):
-                                            fn_ref.replace_with(f" [^{fn_clean}] ")
-
-                                for el in soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6", "p", "li", "blockquote", "aside"]):
-                                    tag_name = el.name.lower()
-                                    classes = " ".join(el.get("class", [])) if el.get("class") else ""
-                                    classes_lower = classes.lower()
-
-                                    is_h1 = tag_name == "h1" or "chapter-title" in classes_lower or "ch-title" in classes_lower
-                                    is_h2 = tag_name == "h2" or "section-title" in classes_lower or "part-title" in classes_lower
-                                    is_h3 = tag_name == "h3" or "subsection-title" in classes_lower or "subheading" in classes_lower
-                                    is_h4 = tag_name in ["h4", "h5", "h6"] or "rubrique" in classes_lower
-
-                                    if not (is_h1 or is_h2 or is_h3 or is_h4) and tag_name in ["p", "div"]:
-                                        if any(k in classes_lower for k in ["title", "titre", "heading", "head", "subhead"]):
-                                            is_h3 = True
-
-                                    txt = el.get_text(separator=" ", strip=True)
-                                    if not txt or txt == "[Retour au livre]" or len(txt) < 2:
-                                        continue
-
-                                    txt = re.sub(r'\s*\[\^(\d+)\]\s*', r' [^\1] ', txt)
-                                    txt = re.sub(r'[ \t]+', ' ', txt).strip()
-
-                                    is_footnote_def = False
-                                    if "footnote" in classes_lower or "note" in classes_lower or el.get("epub:type") == "footnote" or tag_name == "aside":
-                                        is_footnote_def = True
-                                    elif re.match(r'^(\d+|\[\d+\])\s+(.+)', txt) and ("n.d.t" in txt.lower() or "n.d.e" in txt.lower() or "http" in txt.lower() or len(txt) < 300):
-                                        is_footnote_def = True
-
-                                    if is_footnote_def:
-                                        m_fn = re.match(r'^(?:\[\^?(\d+)\]|\b(\d+)\b)\s*(.*)', txt)
-                                        if m_fn:
-                                            fn_id = m_fn.group(1) or m_fn.group(2)
-                                            fn_body = m_fn.group(3)
-                                            txt = f"[^{fn_id}]: {fn_body.strip()}"
-                                    elif is_h1:
-                                        txt = f"# {txt}"
-                                    elif is_h2:
-                                        txt = f"## {txt}"
-                                    elif is_h3:
-                                        txt = f"### {txt}"
-                                    elif is_h4:
-                                        txt = f"#### {txt}"
-                                    elif tag_name == "blockquote":
-                                        txt = f"> {txt}"
-
-                                    direct_paragraphs.append(txt)
-
-                                if not direct_paragraphs:
-                                    full_txt = soup.get_text(separator="\n", strip=True)
-                                    direct_paragraphs = [p.strip() for p in full_txt.split("\n") if p.strip()]
+                            direct_paragraphs = []
+                            # Convertir les appels de notes (sup, a noteref, etc.) en marqueurs propres [^n]
+                            for fn_ref in soup.find_all(["sup", "a"]):
+                                is_fn = False
+                                if fn_ref.name == "sup":
+                                    is_fn = True
+                                elif fn_ref.get("epub:type") == "noteref" or "footnote" in str(fn_ref.get("class", [])).lower() or "noteref" in str(fn_ref.get("class", [])).lower():
+                                    is_fn = True
+                                elif fn_ref.get("href") and ("#fn" in fn_ref.get("href", "").lower() or "#note" in fn_ref.get("href", "").lower() or "note" in fn_ref.get("href", "").lower() or "footnote" in fn_ref.get("href", "").lower()):
+                                    is_fn = True
                                 
-                                for idx_p, p_text in enumerate(direct_paragraphs):
-                                    chunks.append((f"{book_name}_direct_{idx_p}", {
-                                        "chapter_title": ch_info.get("title", ""),
-                                        "name": book_name,
-                                        "title": book_meta.get("title", book_name),
-                                        "author": book_meta.get("author", "")
-                                    }, p_text))
-                                
-                                chapter_meta = {
+                                if is_fn:
+                                    fn_txt = fn_ref.get_text(strip=True)
+                                    fn_clean = re.sub(r'[^\w\d]', '', fn_txt)
+                                    if fn_clean and (fn_clean.isdigit() or len(fn_clean) <= 4):
+                                        fn_ref.replace_with(f" [^{fn_clean}] ")
+
+                            for el in soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6", "p", "li", "blockquote", "aside"]):
+                                tag_name = el.name.lower()
+                                classes = " ".join(el.get("class", [])) if el.get("class") else ""
+                                classes_lower = classes.lower()
+
+                                is_h1 = tag_name == "h1" or "chapter-title" in classes_lower or "ch-title" in classes_lower
+                                is_h2 = tag_name == "h2" or "section-title" in classes_lower or "part-title" in classes_lower or "titre-niveau-1" in classes_lower
+                                is_h3 = tag_name == "h3" or "subsection-title" in classes_lower or "subheading" in classes_lower or "titre-niveau-2" in classes_lower
+                                is_h4 = tag_name in ["h4", "h5", "h6"] or "rubrique" in classes_lower or "titre-niveau-3" in classes_lower
+
+                                if not (is_h1 or is_h2 or is_h3 or is_h4) and tag_name in ["p", "div"]:
+                                    if any(k in classes_lower for k in ["title", "titre", "heading", "head", "subhead"]):
+                                        is_h3 = True
+
+                                txt = el.get_text(separator=" ", strip=True)
+                                if not txt or txt == "[Retour au livre]" or len(txt) < 2:
+                                    continue
+
+                                txt = re.sub(r'\s*\[\^(\d+)\]\s*', r' [^\1] ', txt)
+                                txt = re.sub(r'[ \t]+', ' ', txt).strip()
+
+                                is_footnote_def = False
+                                if "footnote" in classes_lower or "note" in classes_lower or el.get("epub:type") == "footnote" or tag_name == "aside":
+                                    is_footnote_def = True
+                                elif re.match(r'^(?:\[\^?(\d+)\]|\b(\d+)\b)\s*(.+)', txt) and ("n.d.t" in txt.lower() or "n.d.e" in txt.lower() or "http" in txt.lower() or len(txt) < 300):
+                                    is_footnote_def = True
+
+                                if is_footnote_def:
+                                    m_fn = re.match(r'^(?:\[\^?(\d+)\]|\b(\d+)\b)\s*(.*)', txt)
+                                    if m_fn:
+                                        fn_id = m_fn.group(1) or m_fn.group(2)
+                                        fn_body = m_fn.group(3)
+                                        txt = f"[^{fn_id}]: {fn_body.strip()}"
+                                elif is_h1:
+                                    txt = f"# {txt}"
+                                elif is_h2:
+                                    txt = f"## {txt}"
+                                elif is_h3:
+                                    txt = f"### {txt}"
+                                elif is_h4:
+                                    txt = f"#### {txt}"
+                                elif tag_name == "blockquote":
+                                    txt = f"> {txt}"
+
+                                direct_paragraphs.append(txt)
+
+                            if not direct_paragraphs:
+                                full_txt = soup.get_text(separator="\n", strip=True)
+                                direct_paragraphs = [p.strip() for p in full_txt.split("\n") if p.strip()]
+                            
+                            for idx_p, p_text in enumerate(direct_paragraphs):
+                                chunks.append((f"{book_name}_direct_{idx_p}", {
                                     "chapter_title": ch_info.get("title", ""),
                                     "name": book_name,
                                     "title": book_meta.get("title", book_name),
                                     "author": book_meta.get("author", "")
-                                }
+                                }, p_text))
+                            
+                            chapter_meta = {
+                                "chapter_title": ch_info.get("title", ""),
+                                "name": book_name,
+                                "title": book_meta.get("title", book_name),
+                                "author": book_meta.get("author", "")
+                            }
+            except Exception as e:
+                logger.warning(f"Direct EPUB chapter read error: {e}")
+
+        # 2. Fallback ChromaDB si le fichier source n'est pas sur le disque
+        if not chunks:
+            collections_to_search = []
+            try:
+                for c in client.list_collections():
+                    c_name = c.name if hasattr(c, 'name') else str(c)
+                    collections_to_search.append(c_name)
+            except Exception:
+                collections_to_search = ['bible_study_bge_multilingual_gemma2_Infomaniak', 'study_library', 'bible_study_gemini_embedding_2']
+
+            for col_name in collections_to_search:
+                try:
+                    col = client.get_collection(col_name)
+                    # Requête ChromaDB
+                    res = col.get(
+                        where={"$and": [{"name": book_name}, {"chapter_id": cid_query}]},
+                        include=['metadatas', 'documents']
+                    )
+                    if res and res.get('ids') and len(res['ids']) > 0:
+                        for i in range(len(res['ids'])):
+                            c_id = res['ids'][i]
+                            m = res['metadatas'][i]
+                            doc = res['documents'][i]
+                            
+                            if not chapter_meta and m:
+                                chapter_meta = m
+                                
+                            # Versets référencés
+                            rv = m.get('referenced_verses', '')
+                            if rv:
+                                for v_item in str(rv).split(','):
+                                    v_clean = v_item.strip()
+                                    if v_clean:
+                                        all_referenced_verses.add(v_clean)
+                                        
+                            rb = m.get('referenced_books', '')
+                            if rb:
+                                for b_item in str(rb).split(','):
+                                    b_clean = b_item.strip()
+                                    if b_clean:
+                                        all_referenced_books.add(b_clean)
+
+                            chunks.append((c_id, m, doc))
                 except Exception as e:
-                    logger.warning(f"Direct EPUB chapter read fallback error: {e}")
+                    logger.debug(f"[TheologyReaderManager] Recherche content {col_name} : {e}")
 
         # Déterminer l'ordre des chunks
         def extract_chunk_idx(item):
@@ -457,19 +462,38 @@ class TheologyReaderManager:
                 body_paragraphs = body_paragraphs[:cut_idx]
                 footnotes = trailing_notes
 
-        # 3ème passe : normaliser les appels de notes dans le corps du texte pour le frontend
-        if footnotes:
-            fn_ids_list = sorted([str(f["id"]) for f in footnotes], key=lambda x: -len(x))
-            normalized_body = []
-            for p in body_paragraphs:
-                p_mod = p
+        # 3ème passe : nettoyer les numéros de page papier résiduels et normaliser les appels de notes
+        fn_ids_set = set(str(f["id"]) for f in footnotes)
+        fn_ids_list = sorted(list(fn_ids_set), key=lambda x: -len(x))
+        
+        normalized_body = []
+        for p in body_paragraphs:
+            p_mod = p
+            
+            # Nettoyer les numéros de pages papier résiduels entre crochets (ex: [14], [9]) qui ne sont pas des notes
+            for m in re.finditer(r'\[(\d+)\]', p_mod):
+                num_cand = m.group(1)
+                if num_cand not in fn_ids_set:
+                    p_mod = p_mod.replace(m.group(0), '')
+            p_mod = re.sub(r'[ \t]+', ' ', p_mod).strip()
+
+            if footnotes:
                 for fid in fn_ids_list:
-                    # Remplacer [fid] par [^fid]
-                    p_mod = re.sub(r'\[\^?' + fid + r'\]', f'[^{fid}]', p_mod)
-                    # Convertir les chiffres isolés après ponctuation ou guillemets
-                    p_mod = re.sub(r'([»\.\!\?:\,])\s*(\b' + fid + r'\b)(?=\s+[A-ZÀ-Ÿa-z])', r'\1 [^\2]', p_mod)
-                normalized_body.append(p_mod)
-            body_paragraphs = normalized_body
+                    # 1. Déjà entre crochets: [fid] ou [^fid]
+                    p_mod = re.sub(r'\[\^?' + fid + r'\]', f' [^{fid}] ', p_mod)
+                    # 2. Après ponctuation ou guillemets: » 67 ou . 67
+                    p_mod = re.sub(r'([»\.\!\?:\,])\s*(\b' + fid + r'\b)(?=\s+[A-ZÀ-Ÿa-z])', r'\1 [^\2] ', p_mod)
+                    # 3. Avant ponctuation ou en fin de mot: écoute67. ou écoute 67. ou mot 67,
+                    p_mod = re.sub(r'(\b[A-ZÀ-Ÿa-z]+)\s*(\b' + fid + r'\b)(?=\s*[\.\!\?:\,])', r'\1 [^\2] ', p_mod)
+                    # 4. Collé directement à un mot: écoute67
+                    p_mod = re.sub(r'(\b[A-ZÀ-Ÿa-z]+)(' + fid + r')(?=[\s\.\!\?:\,]|$)', r'\1 [^\2] ', p_mod)
+                
+                # Nettoyer les espaces superflus autour des marqueurs
+                p_mod = re.sub(r'\s*\[\^(\d+)\]\s*', r' [^\1] ', p_mod)
+                p_mod = re.sub(r'[ \t]+', ' ', p_mod).strip()
+
+            normalized_body.append(p_mod)
+        body_paragraphs = normalized_body
 
         # Calculer le temps de lecture estimé (environ 200 mots/min)
         word_count = len(re.findall(r'\w+', full_raw_text))

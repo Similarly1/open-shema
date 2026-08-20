@@ -736,7 +736,7 @@ const TheologyView = {
         if (targetId) {
           const callEl = document.getElementById(targetId);
           if (callEl) {
-            callEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            TheologyView.smoothScrollToElement(callEl);
             callEl.classList.remove('theol-highlight-pulse');
             void callEl.offsetWidth;
             callEl.classList.add('theol-highlight-pulse');
@@ -943,7 +943,36 @@ const TheologyView = {
       return match;
     });
 
+    // 3. Remplacer les numéros de notes isolés correspondant aux footnotes connues
+    if (footnoteMap && Object.keys(footnoteMap).length > 0) {
+      const sortedIds = Object.keys(footnoteMap).sort((a, b) => b.length - a.length);
+      for (const id of sortedIds) {
+        // Remplacer "mot 67." ou "mot 67," ou "» 67" ou "mot 67" par badge si pas déjà dans un tag HTML
+        const regex = new RegExp(`(?<!data-fn-id=["']|id=["']theol-fnref-|#theol-fn-)(\\b${id}\\b)(?=[\\s\\.\\,\\!\\?\\:\\;\\»\\)]|$)`, 'g');
+        result = result.replace(regex, (match, p1, offset, fullStr) => {
+          const preceding = fullStr.slice(0, offset);
+          const lastOpen = preceding.lastIndexOf('<');
+          const lastClose = preceding.lastIndexOf('>');
+          if (lastOpen > lastClose) return match;
+          return `<sup class="theol-fn-badge" data-fn-id="${id}" id="theol-fnref-${id}"><a href="#theol-fn-${id}" title="Note ${id}">${id}</a></sup>`;
+        });
+      }
+    }
+
     return result;
+  },
+
+  smoothScrollToElement(el) {
+    if (!el) return;
+    const scrollContainer = document.getElementById('theol-main-scroll');
+    if (scrollContainer) {
+      const cRect = scrollContainer.getBoundingClientRect();
+      const eRect = el.getBoundingClientRect();
+      const targetTop = scrollContainer.scrollTop + (eRect.top - cRect.top) - (cRect.height / 2) + (eRect.height / 2);
+      scrollContainer.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+    } else {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   },
 
   updateTocTranslateButton() {
@@ -2164,7 +2193,7 @@ const FootnoteTooltip = {
         this.hide();
         const targetFnEl = document.getElementById(`theol-fn-${fnId}`);
         if (targetFnEl) {
-          targetFnEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          TheologyView.smoothScrollToElement(targetFnEl);
           targetFnEl.classList.remove('theol-highlight-pulse');
           void targetFnEl.offsetWidth; // Déclencher le reflow CSS
           targetFnEl.classList.add('theol-highlight-pulse');
@@ -2219,7 +2248,7 @@ const FootnoteTooltip = {
         this.hide();
         const targetFnEl = document.getElementById(`theol-fn-${fnId}`);
         if (targetFnEl) {
-          targetFnEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          TheologyView.smoothScrollToElement(targetFnEl);
           targetFnEl.classList.remove('theol-highlight-pulse');
           void targetFnEl.offsetWidth;
           targetFnEl.classList.add('theol-highlight-pulse');

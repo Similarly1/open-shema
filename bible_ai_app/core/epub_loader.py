@@ -350,6 +350,10 @@ class EpubLoader:
                     for tag in soup(["script", "style", "nav"]):
                         tag.decompose()
 
+                    # Supprimer les balises de pagination papier InDesign (ex: <span class="page-papier">[14]</span>)
+                    for p_tag in soup.find_all(attrs={"class": lambda c: c and any(k in str(c).lower() for k in ["page-papier", "page_papier", "pagenum", "pagebreak", "page-number"])}):
+                        p_tag.decompose()
+
                     # Convertir les appels de notes (sup, a noteref, etc.) en marqueurs propres [^n]
                     for fn_ref in soup.find_all(["sup", "a"]):
                         is_fn = False
@@ -357,7 +361,7 @@ class EpubLoader:
                             is_fn = True
                         elif fn_ref.get("epub:type") == "noteref" or "footnote" in str(fn_ref.get("class", [])).lower() or "noteref" in str(fn_ref.get("class", [])).lower():
                             is_fn = True
-                        elif fn_ref.get("href") and ("#fn" in fn_ref.get("href", "").lower() or "#note" in fn_ref.get("href", "").lower() or "note" in fn_ref.get("href", "").lower()):
+                        elif fn_ref.get("href") and ("#fn" in fn_ref.get("href", "").lower() or "#note" in fn_ref.get("href", "").lower() or "note" in fn_ref.get("href", "").lower() or "footnote" in fn_ref.get("href", "").lower()):
                             is_fn = True
                         
                         if is_fn:
