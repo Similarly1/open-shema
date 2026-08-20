@@ -607,6 +607,10 @@ const TheologyView = {
       if (Array.isArray(transData)) {
         textToRender = transData;
       } else if (transData.paragraphs) {
+        textToRender = transData.paragraphs;
+      }
+    }
+
     const footnotesList = data.footnotes || [];
     const footnoteMap = {};
     footnotesList.forEach(fn => {
