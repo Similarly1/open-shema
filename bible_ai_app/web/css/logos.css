@@ -635,6 +635,37 @@ body.sidebar-is-collapsed .topbar-left-zone .quick-passage-box {
   display: none;
 }
 
+.topbar-app-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  margin: 0 auto;
+  user-select: none;
+  pointer-events: none;
+  animation: popoverFadeIn 0.2s ease;
+}
+
+.topbar-app-name {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  opacity: 0.9;
+}
+
+.topbar-app-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent-orange, #ea580c);
+  background: rgba(234, 88, 12, 0.12);
+  padding: 1px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(234, 88, 12, 0.25);
+}
+
 .window-titlebar-controls {
   display: flex;
   align-items: center;
