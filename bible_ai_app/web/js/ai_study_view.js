@@ -844,23 +844,23 @@ const AIStudyView = {
     res = res.replace(/\*(.*?)\*/g, '<em>$1</em>');
     res = res.replace(/`([^`]+)`/g, '<code class="ai-inline-code">$1</code>');
 
-    // 1. Citations bibliques par paragraphe : [Jean 3:16], [Romains 8:1-4], [[Rom 8:28]]
-    const scriptureRegex = /\[\[?([1-3]?\s?[A-Za-zÀ-ÿ]{3,15})\s+(\d{1,3}):(\d{1,3}(?:-\d{1,3})?)\]?\]/g;
+    // 1. Citations bibliques entre crochets ou parenthèses : [Jean 3:16], [Mc 12,18], [Rom 8:28], (Jn 18,36)
+    const scriptureRegex = /\[([1-3]?\s?[A-Za-zÀ-ÿ]{2,15})\s+(\d{1,3})[:,](\d{1,3}(?:-\d{1,3})?)\]/g;
     res = res.replace(scriptureRegex, (match, book, chap, verse) => {
       const fullRef = `${book} ${chap}:${verse}`;
       return `<button class="intext-source-badge scripture" data-ref="${fullRef}" title="Ouvrir ${fullRef} dans le lecteur Bible"><span class="badge-icon">${this.ICONS.bible}</span><span class="badge-text">${fullRef}</span></button>`;
     });
 
     // 2. Codes Strong : [Strong: G2631], [G2631], [H7225]
-    const strongRegex = /\[\[?(?:Strong:\s*)?([GH]\d{1,5})\]?\]/gi;
+    const strongRegex = /\[(?:Strong:\s*)?([GH]\d{1,5})\]/gi;
     res = res.replace(strongRegex, (match, code) => {
       return `<span class="intext-source-badge strong" title="Code Strong ${code.toUpperCase()}"><span class="badge-icon">${this.ICONS.search}</span><span class="badge-text">${code.toUpperCase()}</span></span>`;
     });
 
-    // 3. Auteurs et sources théologiques au fil du paragraphe : [Calvin: IRC II.16], [Matthew Henry], [Dom Calmet]
-    const authorRegex = /\[\[?(Calvin(?:[^\],]+)?|Matthew Henry|Augustin|Luther|Spurgeon|Dom Calmet|Vigouroux|Carson|Bavinck)\]?\]/gi;
-    res = res.replace(authorRegex, (match, author) => {
-      return `<span class="intext-source-badge author" title="Source : ${author}"><span class="badge-icon">${this.ICONS.book}</span><span class="badge-text">${author}</span></span>`;
+    // 3. Ouvrages, dictionnaires et sources documentaires entre crochets : [Dictionnaire Vigouroux : Pharisiens], [Dom Calmet], [Lire et comprendre la Bible], [Calvin: IRC II.16]
+    const docSourceRegex = /\[(Dictionnaire[^\n\]]+|Dom Calmet[^\n\]]*|Vigouroux[^\n\]]*|Flavius Josèphe[^\n\]]*|Lire et comprendre[^\n\]]*|Calvin[^\n\]]*|Nouveau dictionnaire[^\n\]]*|Matthew Henry[^\n\]]*|Augustin[^\n\]]*|Luther[^\n\]]*|Spurgeon[^\n\]]*)\]/gi;
+    res = res.replace(docSourceRegex, (match, docName) => {
+      return `<span class="intext-source-badge author" title="Source documentaire : ${docName}"><span class="badge-icon">${this.ICONS.book}</span><span class="badge-text">${docName}</span></span>`;
     });
 
     return res;

@@ -1167,6 +1167,88 @@ class BibleAppApi:
                 print(f"[ask_study_ai] Erreur extraction biblique : {e}")
 
         # 2. Extraction des commentaires bibliques et théologie
+        # Extraction intelligente des entités et termes clés de la question
+        stop_words_fr = {
+            "quel", "quelle", "quels", "quelles", "etait", "étaient", "était", "etaient", "etre", "être",
+            "dans", "avec", "pour", "selon", "entre", "cette", "cet", "ces", "leurs", "leur", "notre", "nos",
+            "votre", "vos", "mon", "ton", "son", "sa", "ses", "comme", "tout", "tous", "toute", "toutes",
+            "comment", "pourquoi", "vision", "texte", "temps", "epoque", "époque", "cadre", "plus", "aussi",
+            "faire", "avoir", "sujet", "point", "points", "dessus", "dessous", "alors", "ainsi", "sans"
+        }
+
+        # 1. Termes entre parenthèses et guillemets en priorité haute
+        parentheses_matches = re.findall(r'\((.*?)\)', question) + re.findall(r'«(.*?)»', question) + re.findall(r'"(.*?)"', question)
+        priority_terms = []
+        for pm in parentheses_matches:
+            for sub in re.split(r'[,;/\s]+', pm):
+                sub_clean = sub.strip()
+                if len(sub_clean) > 2 and sub_clean.lower() not in stop_words_fr:
+                    priority_terms.append(sub_clean)
+
+        # 2. Mots principaux (> 3 lettres)
+        general_words = [w for w in re.findall(r'[a-zA-ZÀ-ÿ]{3,}', question) if w.lower() not in stop_words_fr]
+        all_extracted_keywords = list(dict.fromkeys(priority_terms + general_words))
+
+        # 1. Extraction du texte biblique (si un passage est spécifié)
+        if sources_cfg.get("bibles", True) and passage_ref and passage_ref.strip():
+            try:
+                parsed = self.parse_reference(passage_ref)
+                if parsed and parsed.get("book"):
+                    b_code = parsed["book"]
+                    ch_num = parsed.get("chapter") or 1
+                    ch_data = self.get_chapter_data("LSG", b_code, ch_num)
+                    if ch_data and ch_data.get("verses"):
+                        v_target = parsed.get("verse")
+                        v_end = parsed.get("verse_end") or v_target
+                        verses_subset = ch_data["verses"]
+                        if v_target:
+                            verses_subset = [v for v in ch_data["verses"] if v["verse"] >= v_target and (not v_end or v["verse"] <= v_end)]
+                            if not verses_subset:
+                                verses_subset = ch_data["verses"][:5]
+                        
+                        v_lines = []
+                        for v in verses_subset[:12]:
+                            v_lines.append(f"v.{v['verse']} : {v.get('text', '')}")
+                        
+                        bible_text = "\n".join(v_lines)
+                        context_chunks.append({
+                            "id": f"bible_{passage_ref}",
+                            "text": f"### Texte Biblique ({ch_data.get('book_french', b_code)} {ch_num}) :\n{bible_text}",
+                            "metadata": {"type": "Bible", "name": f"Bibles (LSG — {ch_data.get('book_french', b_code)} {ch_num})", "ref": passage_ref}
+                        })
+            except Exception as e:
+                print(f"[ask_study_ai] Erreur extraction biblique : {e}")
+
+        # 2. Extraction des Dictionnaires Bibliques & Lexique Strong (Multi-termes complet)
+        if sources_cfg.get("dictionaries", True):
+            try:
+                from core.dictionary_manager import DictionaryManager
+                
+                dict_seen = set()
+                for term in all_extracted_keywords[:8]:
+                    # Recherche directe
+                    res = DictionaryManager.lookup(term)
+                    # Recherche alternative au singulier si pluriel
+                    if (not res or not res.get("matches")) and term.endswith("s") and len(term) > 4:
+                        res = DictionaryManager.lookup(term[:-1])
+                    
+                    if res and res.get("matches"):
+                        for m in res["matches"][:2]:
+                            dict_name = m.get("dict_name", "Dictionnaire Biblique")
+                            art_title = m.get("title", term)
+                            dict_key = f"{dict_name}:{art_title}".lower()
+                            if dict_key not in dict_seen:
+                                dict_seen.add(dict_key)
+                                raw_preview = m.get("preview") or m.get("full_text") or ""
+                                context_chunks.append({
+                                    "id": f"dict_{term}_{dict_name}",
+                                    "text": f"### Entrée de Dictionnaire [{dict_name} : {art_title}] :\n{raw_preview[:1200]}",
+                                    "metadata": {"type": "Dictionnaire", "name": f"{dict_name} ({art_title})"}
+                                })
+            except Exception as e:
+                print(f"[ask_study_ai] Erreur extraction dictionnaires : {e}")
+
+        # 3. Extraction des Commentaires Bibliques & Ouvrages de Théologie
         if sources_cfg.get("commentaries", True):
             try:
                 if passage_ref and passage_ref.strip():
@@ -1177,60 +1259,34 @@ class BibleAppApi:
                         v_num = parsed.get("verse") or 1
                         comms = self.get_commentaries(b_code, ch_num, v_num)
                         if comms:
-                            comm_names = []
                             for c in comms[:4]:
                                 author = c.get("author") or c.get("source") or "Commentaire"
-                                comm_names.append(author)
                                 context_chunks.append({
                                     "id": f"comm_{author}",
                                     "text": f"### Commentaire [{author}] sur {passage_ref} :\n{c.get('text', '')[:1000]}",
                                     "metadata": {"type": "Commentaire", "name": author}
                                 })
-                            if comm_names:
-                                sources_used.append(f"Commentaires ({', '.join(set(comm_names[:3]))})")
                 else:
-                    # Recherche thématique dans les ouvrages de théologie et commentaires
+                    # Recherche thématique dans les ouvrages de théologie
                     from core.theology_reader_manager import TheologyReaderManager
-                    words = [w for w in re.findall(r'[a-zA-ZÀ-ÿ]{4,}', question) if w.lower() not in ["quelle", "quels", "quelle", "comment", "pourquoi", "vision", "texte", "livre"]]
-                    for w in words[:3]:
-                        theo_res = TheologyReaderManager.search_theology_books(w, limit=3)
+                    theo_seen = set()
+                    for term in all_extracted_keywords[:6]:
+                        theo_res = TheologyReaderManager.search_theology_books(term, limit=3)
                         if theo_res:
                             for tr in theo_res[:2]:
                                 b_title = tr.get("book_title") or tr.get("title") or "Ouvrage Théologique"
-                                snippet = tr.get("snippet") or tr.get("text") or ""
-                                if snippet:
-                                    context_chunks.append({
-                                        "id": f"theo_{b_title}_{w}",
-                                        "text": f"### Extrait de [{b_title}] (sur '{w}') :\n{snippet[:800]}",
-                                        "metadata": {"type": "Théologie", "name": b_title}
-                                    })
-                                    sources_used.append(f"Ouvrage ({b_title})")
+                                t_key = f"{b_title}:{term}".lower()
+                                if t_key not in theo_seen:
+                                    theo_seen.add(t_key)
+                                    snippet = tr.get("snippet") or tr.get("text") or ""
+                                    if snippet:
+                                        context_chunks.append({
+                                            "id": f"theo_{b_title}_{term}",
+                                            "text": f"### Extrait de [{b_title}] (sur '{term}') :\n{snippet[:900]}",
+                                            "metadata": {"type": "Théologie", "name": b_title}
+                                        })
             except Exception as e:
                 print(f"[ask_study_ai] Erreur extraction commentaires/théologie : {e}")
-
-        # 3. Extraction des Dictionnaires & Lexique Strong
-        if sources_cfg.get("dictionaries", True):
-            try:
-                from core.strong_lexicon import StrongLexicon
-                from core.dictionary_manager import DictionaryManager
-                
-                words = [w for w in re.findall(r'[a-zA-ZÀ-ÿ]{4,}', question) if w.lower() not in ["quelle", "quels", "quelle", "comment", "pourquoi", "vision", "dans", "avec", "pour"]]
-                dict_found = []
-                for w in words[:3]:
-                    res = DictionaryManager.lookup(w)
-                    if res and res.get("matches"):
-                        top_m = res["matches"][0]
-                        dict_name = top_m.get("dict_name", "Dictionnaire")
-                        dict_found.append(dict_name)
-                        context_chunks.append({
-                            "id": f"dict_{w}",
-                            "text": f"### Entrée de Dictionnaire [{dict_name} : {res.get('title', w)}] :\n{top_m.get('preview', '')[:800]}",
-                            "metadata": {"type": "Dictionnaire", "name": dict_name}
-                        })
-                if dict_found:
-                    sources_used.append(f"Dictionnaires ({', '.join(set(dict_found))})")
-            except Exception as e:
-                print(f"[ask_study_ai] Erreur extraction dictionnaires : {e}")
 
         # 4. Extraction des notes personnelles (.md)
         if sources_cfg.get("notes", True):
@@ -1251,7 +1307,7 @@ class BibleAppApi:
                 from core.reranker import LocalReranker
                 reranker = LocalReranker.get_instance()
                 search_query = f"{passage_ref} {question}".strip()
-                context_chunks = reranker.rerank(query=search_query, documents=context_chunks, top_k=6)
+                context_chunks = reranker.rerank(query=search_query, documents=context_chunks, top_k=8)
             except Exception as e:
                 print(f"[ask_study_ai] Reranking bypass : {e}")
 
@@ -1267,7 +1323,7 @@ class BibleAppApi:
                 seen_source_keys.add(key)
                 text_snippet = chunk.get("text", "") if isinstance(chunk, dict) else str(chunk)
                 # Nettoyer l'en-tête pour l'infobulle
-                clean_snippet = re.sub(r'^###\s+[^\n]+\n', '', text_snippet).strip()[:200]
+                clean_snippet = re.sub(r'^###\s+[^\n]+\n', '', text_snippet).strip()[:240]
                 dedup_sources.append({
                     "title": s_name,
                     "type": s_type,
@@ -1290,48 +1346,41 @@ class BibleAppApi:
             "auto": (
                 f"MODE D'ÉTUDE : {detected_mode.upper()}\n"
                 "- Analyse la question de l'utilisateur avec rigueur, équilibre théologique et profondeur biblique.\n"
-                "- Si la question est théologique/doctrinale (ex: prédestination, Calvin, alliances), propose une synthèse claire étayée par les Écritures et les auteurs réformés/patristiques.\n"
-                "- Si la question porte sur un texte biblique, procède à une analyse exégétique et contextuelle structurée."
+                "- Fonde ton développement sur les faits historiques, doctrinaux et exégétiques présents dans le corpus documentaire ci-dessous."
             ),
             "theology": (
                 "MODE D'ÉTUDE : SYNTHÈSE THÉOLOGIQUE & DOCTRINALE\n"
-                "- Analyse doctrinale approfondie, mise en perspective historique et théologique (sources patristiques, réformées, contemporaines).\n"
-                "- Démonstration scripturaire avec références croisées précises et définitions dogmatiques."
+                "- Analyse doctrinale approfondie étayée par les traités et dictionnaires théologiques du corpus.\n"
+                "- Démonstration scripturaire et définitions théologiques précises."
             ),
             "exegesis": (
                 "MODE D'ÉTUDE : EXÉGÈSE APPROFONDIE\n"
-                "- Analyse structurelle et théologique verset par verset (chiasmes, parallélismes, syntaxe).\n"
-                "- Théologie biblique, intertextualité (accomplissement christocentrique, Alliances) et cohérence canonique.\n"
-                "- Rigueur académique, citations précises des termes et références."
+                "- Analyse structurelle et théologique verset par verset (syntaxe, intertextualité, cohérence canonique).\n"
+                "- Rigueur académique et citations précises."
             ),
             "historical": (
                 "MODE D'ÉTUDE : CONTEXTE HISTORIQUE & CULTUREL\n"
-                "- Auteur, destinataires, date et occasion de rédaction dans l'Antiquité.\n"
-                "- Cadre socio-politique, coutumes du Proche-Orient ancien ou monde gréco-romain, données géographiques et archéologiques."
+                "- Cadre socio-politique antique, courants du judaïsme (Pharisiens, Sadducéens, Zélotes, Esséniens), sources historiques et archéologiques issues du corpus."
             ),
             "sermon": (
                 "MODE D'ÉTUDE : PRÉPARATION DE PRÉDICATION / MESSAGE HOMILÉTIQUE\n"
-                "- Titre accrocheur et Idée Maîtresse (Big Idea en une seule phrase forte).\n"
-                "- Plan structuré en 2 ou 3 points d'exposition bien délimités avec illustrations contemporaines adaptées.\n"
-                "- Applications concrètes et pastorales pour la foi et la vie quotidienne, suivies d'une conclusion/appel."
+                "- Idée Maîtresse (Big Idea), plan en 2 ou 3 points homilétiques avec illustrations et applications pastorales."
             ),
             "lexical": (
                 "MODE D'ÉTUDE : ANALYSE LEXICALE (GREC & HÉBREU / STRONG)\n"
-                "- Étude détaillée des termes pivots dans les langues originales (racines hébraïques/grecques, codes Strong, translittérations).\n"
-                "- Étymologie, champ sémantique, occurrences majeures, usage dans la Septante (LXX) ou le Nouveau Testament et portée théologique."
+                "- Étude des racines linguistiques, codes Strong, étymologie et nuances dans la LXX / Nouveau Testament."
             )
         }
 
         depth_instructions = {
-            "academic": "STYLE : Académique, exhaustif, rigoureux, avec développement théologique soutenu.",
-            "pastoral": "STYLE : Pastoral, équilibré, chaleureux, orienté vers la transmission, la prédication et l'édification.",
-            "concise": "STYLE : Synthétique, direct, concis, sous forme de points clés et tableaux récapitulatifs."
+            "academic": "STYLE : Académique, rigoureux et exhaustif.",
+            "pastoral": "STYLE : Pastoral, équilibré et chaleureux.",
+            "concise": "STYLE : Synthétique et concis sous forme de points clés."
         }
 
         specific_instruction = mode_instructions.get(active_mode_key, mode_instructions.get("auto", mode_instructions["exegesis"]))
         specific_depth = depth_instructions.get(depth_style, depth_instructions["academic"])
-
-        subject_label = passage_ref if (passage_ref and passage_ref.strip()) else "Étude doctrinale et théologique générale"
+        subject_label = passage_ref if (passage_ref and passage_ref.strip()) else "Étude générale"
 
         prompt = (
             f"Rôle : Assistant exégétique, théologique et biblique expert Logos.\n"
@@ -1339,15 +1388,16 @@ class BibleAppApi:
             f"{specific_depth}\n\n"
             f"Passage ou sujet : **{subject_label}**\n"
             f"Question / Demande : {question}\n\n"
-            f"--- CORPUS DOCUMENTAIRE DISPONIBLE ---\n"
+            f"========================================================================\n"
+            f"CORPUS DOCUMENTAIRE DISPONIBLE (Bibles, Dictionnaires, Ouvrages, Notes) :\n"
+            f"========================================================================\n"
             f"{assembled_context or 'Recherche générale sur les corpus bibliques et théologiques disponibles.'}\n"
-            f"--------------------------------------\n\n"
-            f"Consignes impératives de rédaction et de mise en page :\n"
-            f"1. Utilise des titres de section Markdown hiérarchiques nets (### Titre de section).\n"
-            f"2. Intègre des tableaux comparatifs Markdown (| Colonne 1 | Colonne 2 |) lorsque pertinent pour synthétiser les points clés.\n"
-            f"3. Utilise des citations en retrait Markdown (> Citation) pour les citations d'auteurs ou de versets clés.\n"
-            f"4. CITATIONS PAR PARAGRAPHE : À la fin de CHAQUE paragraphe ou affirmation clé, indique explicitement entre crochets la source biblique ou théologique précise correspondante sous forme standardisée [Jean 1:1], [Romains 8:28], [Calvin: IRC II.16], [Matthew Henry], [Dom Calmet] ou [Strong: G2631]. Ne laisse aucun paragraphe sans citation explicite.\n"
-            f"5. Soigne la langue française, avec un style élégant, fluide et sans fautes."
+            f"========================================================================\n\n"
+            f"CONSIGNES IMPÉRATIVES DE RÉDACTION ET D'ANCRAGE DOCUMENTAIRE :\n"
+            f"1. RÈGLE D'OR : Fonde TOUTE ta réponse STRICTEMENT sur les éléments, données historiques et définitions du CORPUS DOCUMENTAIRE fourni ci-dessus.\n"
+            f"2. CITATIONS PAR PARAGRAPHE : À la fin de CHAQUE paragraphe ou sous-partie, indique OBLIGATOIREMENT entre crochets la source biblique ou documentaire précise dont provient l'information (ex: [Dictionnaire Vigouroux : Pharisiens], [Dom Calmet : Sadducéens], [Flavius Josèphe, Ant. XVIII], [Mc 12:18], [Jn 18:36], [Lire et comprendre la Bible]). Ne laisse AUCUN paragraphe sans au moins une citation de source entre crochets.\n"
+            f"3. Utilise des titres de section Markdown hiérarchiques (### Titre) et des tableaux comparatifs Markdown (| Col 1 | Col 2 |) pour synthétiser les points clés.\n"
+            f"4. Soigne la langue française, avec un style élégant, fluide et sans fautes."
         )
 
         try:
@@ -1368,9 +1418,18 @@ class BibleAppApi:
 
             if api_key:
                 client = LLMClient(api_key=api_key, model=selected_model, provider=provider, product_id=product_id)
-                answer = client.ask_question(context=assembled_context, question=question, system_prompt=f"{specific_instruction}\n{specific_depth}")
+                full_system_prompt = (
+                    f"Rôle : Assistant exégétique, théologique et biblique expert Logos.\n"
+                    f"{specific_instruction}\n"
+                    f"{specific_depth}\n\n"
+                    f"CONSIGNES IMPÉRATIVES D'ANCRAGE DOCUMENTAIRE :\n"
+                    f"1. Fonde TOUTE ta synthèse STRICTEMENT sur le corpus documentaire fourni (Dictionnaires Vigouroux/Calmet, Ouvrages de théologie, Bibles, Commentaires, Notes).\n"
+                    f"2. CITATIONS PAR PARAGRAPHE : À la fin de CHAQUE paragraphe ou affirmation clé, indique OBLIGATOIREMENT entre crochets la source précise correspondante (ex: [Dictionnaire Vigouroux : Pharisiens], [Dom Calmet : Sadducéens], [Flavius Josèphe, Ant. XVIII], [Mc 12:18], [Jn 18:36], [Lire et comprendre la Bible]).\n"
+                    f"3. Ne laisse AUCUN paragraphe sans au moins une citation de source entre crochets [Source].\n"
+                    f"4. Utilise des tableaux comparatifs Markdown (| Col 1 | Col 2 |) pour synthétiser les données."
+                )
+                answer = client.ask_question(context=assembled_context, question=question, system_prompt=full_system_prompt)
             else:
-                # Fallback sur GeminiClient par défaut si disponible
                 from ai.gemini_client import GeminiClient
                 g_client = GeminiClient()
                 answer = g_client.generate_response(prompt)
