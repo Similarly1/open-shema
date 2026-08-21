@@ -1,21 +1,23 @@
 /**
  * AI Study View Controller — Open Shema (שְׁמַع)
- * Gère l'assistant d'étude biblique et théologique :
- * - Mode Automatique intelligent (Auto) et modes spécialisés (Exégèse, Histoire, Prédication, Lexique)
- * - Sélecteur visuel BookPicker (Passage 100% optionnel & déconnectable)
- * - Suggestions dynamiques rayonnantes (SmoothUI ai-suggestions)
- * - Écran de réflexion animé avec étapes séquentielles & chronomètre (SmoothUI ai-reasoning / ai-loader)
- * - Parseur Markdown complet avec tableaux stylisés, citations et code
- * - Badges de citations in-text cliquables dans chaque paragraphe
- * - Présentation interactive des sources avec pile d'icônes (SmoothUI ai-sources)
- * - Bouton copier animé (SmoothUI button-copy) & Export 1-clic vers les Notes (.md)
+ * Version sobre, épurée, sans émojis, avec composants SmoothUI raffinés :
+ * - Mode Automatique intelligent (Auto) & modes spécialisés
+ * - Suggestions d'étude escamotables (affichées au début, masquées par défaut après envoi)
+ * - Écran de raisonnement textuel épuré avec chronomètre et étapes séquentielles
+ * - Parseur Markdown complet avec tableaux réactifs et citations de sources par paragraphe
+ * - Infobulles détaillées au survol des sources (sans mention de reranking)
+ * - Badges in-text cliquables sans émojis (ouvrent directement la Bible)
+ * - Bouton copier SmoothUI animé & Export 1-clic vers les Notes (.md)
  */
 
 const AIStudyView = {
   chatFlowEl: null,
   inputEl: null,
   btnSendEl: null,
+  suggestionsContainerEl: null,
   suggestionsBarEl: null,
+  btnToggleSuggestionsEl: null,
+  sugToggleArrowEl: null,
   btnPassagePickerEl: null,
   passageLabelEl: null,
   btnClearPassageEl: null,
@@ -28,18 +30,21 @@ const AIStudyView = {
 
   // Mode actif (auto par défaut)
   currentMode: 'auto',
+  suggestionsVisible: true,
+  hasUserSentMessage: false,
 
+  // Définition des modes d'étude
   MODES_INFO: {
     auto: {
-      icon: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>',
+      icon: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>',
       title: 'Détection Automatique',
       shortTitle: 'Auto',
       sourcesSummary: 'Bibles, Dictionnaires, Commentaires, Théologie, Notes',
       desc: "L'IA identifie l'intention doctrinale, exégétique, historique ou pastorale et mobilise les corpus les plus pertinents.",
-      placeholder: "Posez votre question (ex: Vision de Calvin sur la prédestination, Exégèse de Rom 8, Sens du terme hébreu...)"
+      placeholder: "Posez votre question (ex: Vision de Calvin sur la prédestination, Exégèse de Rom 8...)"
     },
     exegesis: {
-      icon: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+      icon: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
       title: 'Exégèse approfondie',
       shortTitle: 'Exégèse',
       sourcesSummary: 'Bibles originales, Multi-traductions, Commentaires majeurs, Notes',
@@ -47,7 +52,7 @@ const AIStudyView = {
       placeholder: "Ex: Analyse la structure de ce passage, les articulations syntaxiques et la portée théologique..."
     },
     historical: {
-      icon: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="20" x2="22" y2="20"></line><line x1="6" y1="20" x2="6" y2="4"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="2" y1="4" x2="22" y2="4"></line><line x1="10" y1="20" x2="10" y2="4"></line><line x1="14" y1="20" x2="14" y2="4"></line></svg>',
+      icon: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="20" x2="22" y2="20"></line><line x1="6" y1="20" x2="6" y2="4"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="2" y1="4" x2="22" y2="4"></line><line x1="10" y1="20" x2="10" y2="4"></line><line x1="14" y1="20" x2="14" y2="4"></line></svg>',
       title: 'Contexte historique & culturel',
       shortTitle: 'Histoire & Contexte',
       sourcesSummary: 'Dictionnaires bibliques (Dom Calmet, Vigouroux...), Archéologie, Notes',
@@ -55,7 +60,7 @@ const AIStudyView = {
       placeholder: "Ex: Quel est le contexte politique, culturel et historique de la rédaction de ce texte ?"
     },
     sermon: {
-      icon: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>',
+      icon: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>',
       title: 'Préparation de prédication / Message',
       shortTitle: 'Prédication',
       sourcesSummary: 'Commentaires pastoraux, Trésor de l\'Écriture (TSK), Illustrations, Notes',
@@ -63,7 +68,7 @@ const AIStudyView = {
       placeholder: "Ex: Propose un plan de prédication percutant en 3 points avec illustrations et applications pour l'Église..."
     },
     lexical: {
-      icon: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>',
+      icon: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>',
       title: 'Analyse lexicale (Grec & Hébreu)',
       shortTitle: 'Lexique Hébreu/Grec',
       sourcesSummary: 'Lexique Strong Hébreu/Grec, Dictionnaires de racines (Bailly, Gesenius), LXX',
@@ -72,11 +77,29 @@ const AIStudyView = {
     }
   },
 
+  // Icônes SVG sobres et universelles
+  ICONS: {
+    bible: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+    book: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>',
+    dict: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+    theology: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+    notes: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+    scales: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h18"/></svg>',
+    sparkles: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>',
+    scroll: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1 .4-1 1v7c0 .6.4 1 1 1h14Z"/><path d="M16 17v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>',
+    search: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+    mic: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>',
+    check: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+  },
+
   init() {
     this.chatFlowEl = document.getElementById('ai-study-chat-flow');
     this.inputEl = document.getElementById('ai-study-input');
     this.btnSendEl = document.getElementById('btn-send-study-ai');
+    this.suggestionsContainerEl = document.getElementById('ai-suggestions-container');
     this.suggestionsBarEl = document.getElementById('ai-suggestions-bar');
+    this.btnToggleSuggestionsEl = document.getElementById('btn-toggle-suggestions');
+    this.sugToggleArrowEl = document.getElementById('sug-toggle-arrow');
     this.btnPassagePickerEl = document.getElementById('btn-ai-passage-picker');
     this.passageLabelEl = document.getElementById('ai-passage-pill-label');
     this.btnClearPassageEl = document.getElementById('btn-ai-clear-passage');
@@ -91,7 +114,7 @@ const AIStudyView = {
     const optionsPanel = document.getElementById('ai-study-options-panel');
     const btnCloseOptions = document.getElementById('btn-close-ai-options');
 
-    // 1. Menu déroulant des modes en haut
+    // 1. Menu déroulant des modes
     btnModeSelector?.addEventListener('click', (e) => {
       e.stopPropagation();
       modePopover?.classList.toggle('hidden');
@@ -102,7 +125,6 @@ const AIStudyView = {
       modePopover?.classList.add('hidden');
     });
 
-    // Sélection d'un mode depuis le popover unifié
     document.querySelectorAll('.study-mode-card').forEach(card => {
       card.addEventListener('click', () => {
         const mode = card.getAttribute('data-mode');
@@ -127,7 +149,6 @@ const AIStudyView = {
       optionsPanel?.classList.add('hidden');
     });
 
-    // Clic extérieur pour fermer les popovers
     document.addEventListener('click', (e) => {
       if (modePopover && !modePopover.contains(e.target) && e.target !== btnModeSelector) {
         modePopover.classList.add('hidden');
@@ -153,12 +174,17 @@ const AIStudyView = {
       this.syncFromBibleReader();
     });
 
-    // 4. Auto-expansion du champ textarea
+    // 4. Volet escamotable des suggestions
+    this.btnToggleSuggestionsEl?.addEventListener('click', () => {
+      this.toggleSuggestions();
+    });
+
+    // 5. Auto-expansion du champ textarea
     this.inputEl?.addEventListener('input', () => {
       this.autoResizeTextarea();
     });
 
-    // 5. Envoi du message
+    // 6. Envoi du message
     this.btnSendEl?.addEventListener('click', () => this.sendMessage());
     this.inputEl?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
@@ -167,10 +193,25 @@ const AIStudyView = {
       }
     });
 
-    // Initialisation du mode par défaut (auto)
+    // Initialisation
     this.setMode('auto');
     this.updatePassageDisplay();
     this.renderSuggestions();
+  },
+
+  toggleSuggestions(forceState = null) {
+    if (forceState !== null) {
+      this.suggestionsVisible = forceState;
+    } else {
+      this.suggestionsVisible = !this.suggestionsVisible;
+    }
+
+    if (this.suggestionsBarEl) {
+      this.suggestionsBarEl.classList.toggle('hidden', !this.suggestionsVisible);
+    }
+    if (this.sugToggleArrowEl) {
+      this.sugToggleArrowEl.textContent = this.suggestionsVisible ? '▾' : '▸';
+    }
   },
 
   autoResizeTextarea() {
@@ -186,19 +227,16 @@ const AIStudyView = {
     this.currentMode = modeKey;
     const info = this.MODES_INFO[modeKey];
 
-    // Mise à jour de l'affichage du bouton pill d'en-tête
     const pillIcon = document.getElementById('study-mode-pill-icon');
     const pillLabel = document.getElementById('study-mode-pill-label');
     if (pillIcon) pillIcon.innerHTML = info.icon;
     if (pillLabel) pillLabel.textContent = info.title;
 
-    // Mise à jour du sous-titre de l'en-tête
     const subtitleEl = document.getElementById('ai-study-header-subtitle');
     if (subtitleEl) {
       subtitleEl.textContent = `${info.title} • ${info.sourcesSummary}`;
     }
 
-    // Mise à jour des classes actives sur les cartes du popover
     document.querySelectorAll('.study-mode-card').forEach(card => {
       if (card.getAttribute('data-mode') === modeKey) {
         card.classList.add('active');
@@ -207,15 +245,11 @@ const AIStudyView = {
       }
     });
 
-    // Mise à jour du placeholder du champ de saisie
     if (this.inputEl) {
       this.inputEl.placeholder = info.placeholder;
     }
 
-    // Fermer le popover
     document.getElementById('ai-mode-dropdown-popover')?.classList.add('hidden');
-
-    // Rafraîchir les suggestions dynamiques
     this.renderSuggestions();
   },
 
@@ -282,7 +316,7 @@ const AIStudyView = {
   },
 
   // =========================================================================
-  // MOTEUR DE SUGGESTIONS DYNAMIQUES (SmoothUI ai-suggestions)
+  // MOTEUR DE SUGGESTIONS (SmoothUI ai-suggestions - Sobre & Sans émojis)
   // =========================================================================
 
   renderSuggestions() {
@@ -295,9 +329,9 @@ const AIStudyView = {
     suggestions.forEach((sug, index) => {
       const chip = document.createElement('button');
       chip.className = 'ai-suggestion-chip';
-      chip.style.animationDelay = `${index * 50}ms`;
+      chip.style.animationDelay = `${index * 40}ms`;
       chip.innerHTML = `
-        <span class="chip-icon">${sug.icon}</span>
+        <span class="chip-icon">${sug.svg}</span>
         <span class="chip-label">${sug.label}</span>
       `;
       chip.setAttribute('title', sug.prompt);
@@ -312,90 +346,81 @@ const AIStudyView = {
     const passageLabel = this.getPassageLabel();
     const hasPassage = !!passageLabel;
     const isNT = this.currentBookCode ? this.isNewTestament(this.currentBookCode) : true;
-    const mode = this.currentMode;
 
     const list = [];
 
     if (!hasPassage) {
-      // Suggestions pour Recherche Doctrinale / Thématique générale
       list.push({
-        icon: '📚',
+        svg: this.ICONS.book,
         label: 'Calvin & Prédestination',
         prompt: "Quelle est la vision de Jean Calvin sur la prédestination et l'élection souveraine de Dieu ?",
         targetMode: 'theology'
       });
       list.push({
-        icon: '⚖️',
+        svg: this.ICONS.scales,
         label: 'Justification par la Foi',
         prompt: "Présente la doctrine de la justification par la foi selon l'apôtre Paul et la Réforme protestante.",
         targetMode: 'theology'
       });
       list.push({
-        icon: '✨',
+        svg: this.ICONS.sparkles,
         label: 'Théologie des Alliances',
         prompt: "Comment s'articulent l'Ancienne et la Nouvelle Alliance dans la théologie biblique réformée ?",
         targetMode: 'theology'
       });
       list.push({
-        icon: '📜',
+        svg: this.ICONS.scroll,
         label: 'Arrière-plan des Évangiles',
         prompt: "Quel était le contexte religieux et politique juif (pharisiens, sadducéens, zélotes) au temps de Jésus ?",
         targetMode: 'historical'
       });
       list.push({
-        icon: '🔍',
+        svg: this.ICONS.search,
         label: 'Lexique : Grâce & Miséricorde',
         prompt: "Étudie les termes hébreux (Hesed, Rahamim) et grecs (Charis, Eleos) traduisant la grâce et la miséricorde.",
         targetMode: 'lexical'
       });
     } else {
-      // Suggestions ciblées sur le passage actif
       const ref = passageLabel;
-      
-      // 1. Exégèse
       list.push({
-        icon: '🏛️',
+        svg: this.ICONS.bible,
         label: `Structure de ${ref}`,
         prompt: `Analyse la structure littéraire, syntaxique et la progression théologique de ${ref}.`,
         targetMode: 'exegesis'
       });
 
-      // 2. Lexique (Grec ou Hébreu selon le testament)
       if (isNT) {
         list.push({
-          icon: '🔍',
+          svg: this.ICONS.search,
           label: 'Mots-clés grecs & Strong',
           prompt: `Quels sont les termes grecs pivots et codes Strong majeurs dans ${ref}, avec leurs nuances théologiques ?`,
           targetMode: 'lexical'
         });
       } else {
         list.push({
-          icon: '🔍',
+          svg: this.ICONS.search,
           label: 'Racines hébraïques & Strong',
           prompt: `Analyse les racines hébraïques clés et nuances massorétiques dans ${ref}.`,
           targetMode: 'lexical'
         });
       }
 
-      // 3. Commentaires & Auteurs de la Bibliothèque
       list.push({
-        icon: '📚',
+        svg: this.ICONS.book,
         label: `Avis de Calvin & Matthew Henry`,
         prompt: `Que disent les grands commentateurs (Jean Calvin, Matthew Henry) sur la portée de ${ref} ?`,
         targetMode: 'auto'
       });
 
-      // 4. Prédication
       list.push({
-        icon: '🎙️',
+        svg: this.ICONS.mic,
         label: 'Plan de prédication en 3 points',
         prompt: `Propose un plan de prédication percutant en 3 points avec Big Idea, illustrations et applications pastorales sur ${ref}.`,
         targetMode: 'sermon'
       });
 
-      // 5. Contexte historique
       list.push({
-        icon: '📜',
+        svg: this.ICONS.scroll,
         label: 'Contexte de rédaction',
         prompt: `Quel est le contexte historique, culturel et la situation des premiers destinataires de ${ref} ?`,
         targetMode: 'historical'
@@ -410,7 +435,6 @@ const AIStudyView = {
       const b = BookPicker.booksData.find(x => x.code.toLowerCase() === bookCode.toLowerCase());
       if (b) return b.testament === 'NT';
     }
-    // Fallback liste codes NT
     const ntCodes = ['mat','mar','luk','joh','act','rom','1co','2co','gal','eph','phi','col','1th','2th','1ti','2ti','tit','phm','heb','jam','1pe','2pe','1jo','2jo','3jo','jud','rev'];
     return ntCodes.includes(bookCode.toLowerCase());
   },
@@ -451,25 +475,29 @@ const AIStudyView = {
   },
 
   // =========================================================================
-  // ENVOI DE QUESTION & AFFICHAGE DU REASONING / LOADER
+  // ENVOI DE QUESTION & AFFICHAGE DU REASONING / LOADER (Sobre & Sans émojis)
   // =========================================================================
 
   async sendMessage() {
     const text = this.inputEl?.value.trim();
     if (!text) return;
 
+    // Masquer les suggestions dès qu'un message est envoyé
+    this.hasUserSentMessage = true;
+    this.toggleSuggestions(false);
+
     const mode = this.currentMode || 'auto';
     const passage = this.getPassageLabel() || "";
     const options = this.getOptions();
     const nowTime = this.formatCurrentTime();
 
-    // 1. Affichage du message utilisateur
+    // 1. Message utilisateur sobre (fond uni élégant)
     const userMsg = document.createElement('div');
     userMsg.className = 'chat-message user';
     
     let userHeaderHtml = '';
     if (passage) {
-      userHeaderHtml = `<span class="msg-passage-tag" title="Passage lié"><span class="tag-icon">📖</span>${passage}</span> `;
+      userHeaderHtml = `<span class="msg-passage-tag" title="Passage lié"><span class="tag-icon">${this.ICONS.bible}</span>${passage}</span> `;
     }
 
     userMsg.innerHTML = `
@@ -485,7 +513,7 @@ const AIStudyView = {
     this.autoResizeTextarea();
     this.chatFlowEl.scrollTop = this.chatFlowEl.scrollHeight;
 
-    // 2. Création de la bulle assistant avec SmoothUI Reasoning Loader
+    // 2. Bulle assistant sobre avec SmoothUI Reasoning
     const assistantMsg = document.createElement('div');
     assistantMsg.className = 'chat-message assistant';
     
@@ -494,24 +522,24 @@ const AIStudyView = {
     
     assistantMsg.innerHTML = `
       <div class="msg-avatar">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
       </div>
       <div class="msg-content">
-        <!-- SmoothUI ai-reasoning component -->
+        <!-- SmoothUI ai-reasoning (sobre & textuel) -->
         <div class="ai-reasoning-box active" id="${reasoningId}">
           <div class="ai-reasoning-header">
             <div class="ai-reasoning-title">
               <span class="ai-reasoning-orb"></span>
-              <span>Réflexion en cours...</span>
+              <span>Réflexion en cours</span>
               <span class="ai-reasoning-timer" id="${timerId}">0.0s</span>
             </div>
             <span class="ai-reasoning-toggle-icon">▾</span>
           </div>
           <div class="ai-reasoning-steps-list">
-            <div class="reasoning-step step-1 active"><span class="step-icon">🔍</span><span>Analyse de l'intention et formulation des requêtes sémantiques...</span></div>
-            <div class="reasoning-step step-2 pending"><span class="step-icon">📚</span><span>Exploration du corpus documentaire (Bibles, Commentaires, Dictionnaires, Notes)...</span></div>
-            <div class="reasoning-step step-3 pending"><span class="step-icon">⚡</span><span>Reranking sémantique BGE-M3 des extraits théologiques...</span></div>
-            <div class="reasoning-step step-4 pending"><span class="step-icon">✨</span><span>Synthèse et rédaction structurée avec <strong>${options.model}</strong>...</span></div>
+            <div class="reasoning-step step-1 active"><span class="step-bullet"></span><span>Analyse de l'intention et formulation des requêtes documentaires</span></div>
+            <div class="reasoning-step step-2 pending"><span class="step-bullet"></span><span>Exploration du corpus documentaire (Bibles, Théologie, Dictionnaires, Notes)</span></div>
+            <div class="reasoning-step step-3 pending"><span class="step-bullet"></span><span>Sélection et ordonnancement sémantique des extraits pertinents</span></div>
+            <div class="reasoning-step step-4 pending"><span class="step-bullet"></span><span>Synthèse doctrinale et rédaction structurée avec ${this.escapeHtml(options.model)}</span></div>
           </div>
         </div>
         <div class="ai-answer-body"></div>
@@ -520,7 +548,7 @@ const AIStudyView = {
     this.chatFlowEl.appendChild(assistantMsg);
     this.chatFlowEl.scrollTop = this.chatFlowEl.scrollHeight;
 
-    // Lancement du chronomètre
+    // Chronomètre en direct
     const startTime = performance.now();
     const timerEl = document.getElementById(timerId);
     const intervalTimer = setInterval(() => {
@@ -528,12 +556,12 @@ const AIStudyView = {
       if (timerEl) timerEl.textContent = `${elapsed}s`;
     }, 100);
 
-    // Animation progressive des étapes
+    // Animation progressive des étapes textuelles
     const reasoningEl = document.getElementById(reasoningId);
     const stepTimeout1 = setTimeout(() => {
       reasoningEl?.querySelector('.step-1')?.classList.replace('active', 'done');
       reasoningEl?.querySelector('.step-2')?.classList.replace('pending', 'active');
-    }, 600);
+    }, 500);
 
     const stepTimeout2 = setTimeout(() => {
       reasoningEl?.querySelector('.step-2')?.classList.replace('active', 'done');
@@ -543,7 +571,7 @@ const AIStudyView = {
     const stepTimeout3 = setTimeout(() => {
       reasoningEl?.querySelector('.step-3')?.classList.replace('active', 'done');
       reasoningEl?.querySelector('.step-4')?.classList.replace('pending', 'active');
-    }, 1800);
+    }, 2000);
 
     try {
       const response = await API.call('ask_study_ai', text, mode, passage, options);
@@ -555,27 +583,27 @@ const AIStudyView = {
       const totalDuration = ((performance.now() - startTime) / 1000).toFixed(1);
       const answerText = response.answer || response;
       const sourcesUsed = response.sources_used || [];
+      const sourcesDetails = response.sources_details || [];
       const detectedMode = response.detected_mode || (this.MODES_INFO[mode]?.title || "Synthèse");
       const modelUsed = response.model_used || options.model;
       const respTime = this.formatCurrentTime();
 
-      // 1. Mise à jour du bloc de raisonnement (replié par défaut)
+      // 1. Bandeau de raisonnement terminé (sobre & replié)
       if (reasoningEl) {
         reasoningEl.classList.remove('active');
         reasoningEl.classList.add('collapsed');
         
         reasoningEl.innerHTML = `
-          <div class="ai-reasoning-header clickable" title="Cliquer pour afficher/masquer le processus de réflexion">
+          <div class="ai-reasoning-header clickable" title="Afficher ou masquer les détails du raisonnement">
             <div class="ai-reasoning-title">
-              <span class="ai-reasoning-check">✓</span>
-              <span>Raisonnement terminé (${totalDuration}s) • Mode détecté : <strong>${this.escapeHtml(detectedMode)}</strong></span>
+              <span class="ai-reasoning-check-icon">${this.ICONS.check}</span>
+              <span>Raisonnement terminé (${totalDuration}s) &bull; Mode : <strong>${this.escapeHtml(detectedMode)}</strong></span>
             </div>
             <span class="ai-reasoning-chevron">▸</span>
           </div>
           <div class="ai-reasoning-details hidden">
-            <div class="reasoning-summary-item"><span class="step-icon">🎯</span><span>Intention : ${this.escapeHtml(detectedMode)}</span></div>
-            <div class="reasoning-summary-item"><span class="step-icon">📚</span><span>Corpus : ${sourcesUsed.length} source(s) analysée(s)</span></div>
-            <div class="reasoning-summary-item"><span class="step-icon">⚡</span><span>Pipeline : ${options.enable_reranking ? 'Reranking sémantique BGE-M3' : 'Standard'}</span></div>
+            <div class="reasoning-summary-item"><span>Intention détectée : ${this.escapeHtml(detectedMode)}</span></div>
+            <div class="reasoning-summary-item"><span>Corpus mobilisé : ${sourcesUsed.length} source(s) analysée(s)</span></div>
           </div>
         `;
 
@@ -589,21 +617,22 @@ const AIStudyView = {
         });
       }
 
-      // 2. SmoothUI ai-sources : Pile d'icônes interactive avec accordéon
+      // 2. Sources mobilisées avec infobulles riches au survol (sans reranking)
       let sourcesComponentHtml = '';
-      if (sourcesUsed && sourcesUsed.length > 0) {
-        sourcesComponentHtml = this.buildSourcesComponentHtml(sourcesUsed);
+      if (sourcesDetails && sourcesDetails.length > 0) {
+        sourcesComponentHtml = this.buildSourcesWithTooltipsHtml(sourcesDetails);
+      } else if (sourcesUsed && sourcesUsed.length > 0) {
+        sourcesComponentHtml = this.buildSourcesSimpleHtml(sourcesUsed);
       }
 
-      // 3. Parseur Markdown intégral & Badges de citations interactifs
-      const formattedMarkdown = this.renderRichMarkdown(answerText);
+      // 3. Rendu Markdown enrichi avec citations par paragraphe
+      const formattedMarkdown = this.renderRichMarkdown(answerText, sourcesDetails);
 
-      // 4. Pied de message enrichi (SmoothUI button-copy, Enregistrer dans les notes, horodatage)
+      // 4. Pied de message sobre
       const footerHtml = `
         <div class="ai-msg-footer">
           <div class="ai-footer-left">
-            <!-- SmoothUI Button Copy -->
-            <button class="smooth-btn-copy" title="Copier l'étude complète dans le presse-papier">
+            <button class="smooth-btn-copy" title="Copier l'étude dans le presse-papier">
               <span class="copy-icon-wrap">
                 <svg class="icon-copy" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                 <svg class="icon-check" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -611,34 +640,31 @@ const AIStudyView = {
               <span class="copy-label">Copier</span>
             </button>
 
-            <!-- Export dans les Notes -->
-            <button class="ai-footer-action-btn btn-export-notes" title="Créer une nouvelle note avec cette étude dans vos Notes (.md)">
+            <button class="ai-footer-action-btn btn-export-notes" title="Enregistrer dans vos Notes (.md)">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-              <span>Enregistrer dans mes Notes</span>
+              <span>Enregistrer dans les notes</span>
             </button>
           </div>
 
           <div class="ai-footer-right">
-            <span class="ai-mode-pill-badge" title="Mode d'analyse retenu">${this.escapeHtml(detectedMode)}</span>
+            <span class="ai-mode-pill-badge">${this.escapeHtml(detectedMode)}</span>
             <span class="ai-model-tag">${this.escapeHtml(modelUsed)}</span>
             <span class="ai-footer-time">${respTime}</span>
           </div>
         </div>
       `;
 
-      // Injection dans le corps du message
       const answerBodyEl = assistantMsg.querySelector('.ai-answer-body');
       if (answerBodyEl) {
         answerBodyEl.innerHTML = sourcesComponentHtml + `<div class="ai-markdown-content">${formattedMarkdown}</div>` + footerHtml;
       }
 
-      // 5. Attachement des événements interactifs
       this.attachMessageActions(assistantMsg, answerText, passage, text);
 
     } catch (e) {
       clearInterval(intervalTimer);
       if (reasoningEl) {
-        reasoningEl.innerHTML = `<div class="ai-reasoning-error">❌ Erreur lors de la génération de l'étude.</div>`;
+        reasoningEl.innerHTML = `<div class="ai-reasoning-error">Erreur lors de la génération de l'étude.</div>`;
       }
       const answerBodyEl = assistantMsg.querySelector('.ai-answer-body');
       if (answerBodyEl) {
@@ -650,70 +676,94 @@ const AIStudyView = {
   },
 
   // =========================================================================
-  // SmoothUI ai-sources : Composant de Sources Dépliables
+  // Sources avec Infobulles Riches au Survol (Sans Reranking & Dédoublonnées)
   // =========================================================================
 
-  buildSourcesComponentHtml(sourcesList) {
-    const icons = {
-      bible: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
-      commentary: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>',
-      dict: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
-      theology: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
-      notes: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
-      rerank: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>'
-    };
+  buildSourcesWithTooltipsHtml(sourcesDetails) {
+    // Filtrer toute mention de Reranking
+    const validSources = sourcesDetails.filter(s => !s.title.toLowerCase().includes('rerank') && !s.type.toLowerCase().includes('rerank'));
+    if (validSources.length === 0) return '';
 
-    // Construire la pile d'icônes
-    const stackItems = sourcesList.slice(0, 4).map((src, i) => {
-      let icon = icons.commentary;
-      let badgeClass = 'comm';
-      if (src.toLowerCase().includes('bible')) { icon = icons.bible; badgeClass = 'bible'; }
-      else if (src.toLowerCase().includes('dictionnaire')) { icon = icons.dict; badgeClass = 'dict'; }
-      else if (src.toLowerCase().includes('note')) { icon = icons.notes; badgeClass = 'notes'; }
-      else if (src.toLowerCase().includes('rerank')) { icon = icons.rerank; badgeClass = 'rerank'; }
-      else if (src.toLowerCase().includes('ouvrage') || src.toLowerCase().includes('théologie')) { icon = icons.theology; badgeClass = 'theology'; }
+    const sourcePills = validSources.map(s => {
+      let typeClass = 'theology';
+      let typeLabel = s.type || 'Ouvrage';
+      let icon = this.ICONS.book;
 
-      return `<span class="source-stack-avatar ${badgeClass}" style="z-index: ${5 - i};" title="${this.escapeHtml(src)}">${icon}</span>`;
+      const tLower = (s.type || '').toLowerCase();
+      const titleLower = (s.title || '').toLowerCase();
+
+      if (tLower.includes('bible') || titleLower.includes('bible')) {
+        typeClass = 'bible';
+        typeLabel = 'Bible';
+        icon = this.ICONS.bible;
+      } else if (tLower.includes('dict') || titleLower.includes('dict')) {
+        typeClass = 'dict';
+        typeLabel = 'Dictionnaire';
+        icon = this.ICONS.dict;
+      } else if (tLower.includes('comm') || titleLower.includes('comm')) {
+        typeClass = 'comm';
+        typeLabel = 'Commentaire';
+        icon = this.ICONS.book;
+      } else if (tLower.includes('note') || titleLower.includes('note')) {
+        typeClass = 'notes';
+        typeLabel = 'Note';
+        icon = this.ICONS.notes;
+      }
+
+      const previewSnippet = s.preview ? this.escapeHtml(s.preview) : 'Ouvrage consulté pour cette analyse.';
+
+      return `
+        <div class="source-hover-pill ${typeClass}" tabindex="0">
+          <span class="pill-type-icon">${icon}</span>
+          <span class="pill-name">${this.escapeHtml(s.title)}</span>
+          
+          <!-- Infobulle flottante au survol -->
+          <div class="source-tooltip-card">
+            <div class="tooltip-header">
+              <span class="tooltip-badge ${typeClass}">${this.escapeHtml(typeLabel)}</span>
+              <strong class="tooltip-title">${this.escapeHtml(s.title)}</strong>
+            </div>
+            <div class="tooltip-body">${previewSnippet}</div>
+          </div>
+        </div>
+      `;
     }).join('');
 
     return `
-      <div class="ai-sources-component">
-        <div class="ai-sources-header clickable">
-          <div class="sources-stack-group">
-            ${stackItems}
-          </div>
-          <span class="sources-count-label"><strong>${sourcesList.length} sources</strong> mobilisées</span>
-          <span class="sources-toggle-chevron">▸</span>
+      <div class="ai-sources-compact-bar">
+        <div class="sources-label">
+          <span class="sources-icon">${this.ICONS.book}</span>
+          <span>Sources consultées (${validSources.length}) :</span>
         </div>
-        <div class="ai-sources-dropdown hidden">
-          <div class="sources-cards-grid">
-            ${sourcesList.map(s => {
-              let badgeType = 'Commentaire';
-              let badgeClass = 'comm';
-              if (s.toLowerCase().includes('bible')) { badgeType = 'Bible'; badgeClass = 'bible'; }
-              else if (s.toLowerCase().includes('dictionnaire')) { badgeType = 'Dictionnaire'; badgeClass = 'dict'; }
-              else if (s.toLowerCase().includes('note')) { badgeType = 'Note .md'; badgeClass = 'notes'; }
-              else if (s.toLowerCase().includes('rerank')) { badgeType = 'RAG BGE-M3'; badgeClass = 'rerank'; }
-              else if (s.toLowerCase().includes('ouvrage')) { badgeType = 'Théologie'; badgeClass = 'theology'; }
+        <div class="sources-pills-list">
+          ${sourcePills}
+        </div>
+      </div>
+    `;
+  },
 
-              return `
-                <div class="source-detail-card ${badgeClass}">
-                  <span class="source-type-pill ${badgeClass}">${badgeType}</span>
-                  <span class="source-title-text">${this.escapeHtml(s)}</span>
-                </div>
-              `;
-            }).join('')}
-          </div>
+  buildSourcesSimpleHtml(sourcesList) {
+    const validSources = sourcesList.filter(s => !s.toLowerCase().includes('rerank'));
+    if (validSources.length === 0) return '';
+
+    return `
+      <div class="ai-sources-compact-bar">
+        <div class="sources-label">
+          <span class="sources-icon">${this.ICONS.book}</span>
+          <span>Sources consultées (${validSources.length}) :</span>
+        </div>
+        <div class="sources-pills-list">
+          ${validSources.map(s => `<span class="source-hover-pill theology"><span class="pill-name">${this.escapeHtml(s)}</span></span>`).join('')}
         </div>
       </div>
     `;
   },
 
   // =========================================================================
-  // PARSEUR MARKDOWN INTÉGRAL AVEC TABLEAUX & CITATIONS IN-TEXT CLIQUABLES
+  // PARSEUR MARKDOWN AVEC TABLEAUX & CITATIONS IN-TEXT PAR PARAGRAPHE
   // =========================================================================
 
-  renderRichMarkdown(mdText) {
+  renderRichMarkdown(mdText, sourcesDetails = []) {
     if (!mdText) return '';
     let text = mdText;
 
@@ -755,20 +805,20 @@ const AIStudyView = {
     // 3. Citations en retrait (> Citation)
     text = text.replace(/(?:^|\n)>[ ]?([^\n]+)/g, '\n<blockquote class="ai-quote">$1</blockquote>');
 
-    // 4. Titres de section
+    // 4. Titres hiérarchiques
     text = text.replace(/^#### (.*$)/gim, '<h4 class="ai-heading h4">$1</h4>');
     text = text.replace(/^### (.*$)/gim, '<h3 class="ai-heading h3">$1</h3>');
     text = text.replace(/^## (.*$)/gim, '<h2 class="ai-heading h2">$1</h2>');
     text = text.replace(/^# (.*$)/gim, '<h1 class="ai-heading h1">$1</h1>');
 
-    // 5. Lignes horizontales
+    // 5. Lignes de séparation
     text = text.replace(/^---$/gim, '<hr class="ai-divider">');
 
-    // 6. Listes à puces et ordonnées
+    // 6. Listes à puces
     text = text.replace(/^\s*[-*]\s+(.*)$/gim, '<li class="ai-bullet-item">$1</li>');
     text = text.replace(/(<li class="ai-bullet-item">[\s\S]*?<\/li>)/g, '<ul class="ai-bullet-list">$1</ul>');
 
-    // 7. Formatage Inline (Gras, Italique, Badges in-text)
+    // 7. Formatage Inline & Badges in-text sobres
     text = this.formatInlineMarkdown(text);
 
     // 8. Rétablir les blocs de code
@@ -794,24 +844,23 @@ const AIStudyView = {
     res = res.replace(/\*(.*?)\*/g, '<em>$1</em>');
     res = res.replace(/`([^`]+)`/g, '<code class="ai-inline-code">$1</code>');
 
-    // Citations in-text cliquables (Versets, Calvin, Strong, Dictionnaires)
-    // [Jean 3:16], [Romains 8:1-4], [[Rom 8:28]]
+    // 1. Citations bibliques par paragraphe : [Jean 3:16], [Romains 8:1-4], [[Rom 8:28]]
     const scriptureRegex = /\[\[?([1-3]?\s?[A-Za-zÀ-ÿ]{3,15})\s+(\d{1,3}):(\d{1,3}(?:-\d{1,3})?)\]?\]/g;
     res = res.replace(scriptureRegex, (match, book, chap, verse) => {
       const fullRef = `${book} ${chap}:${verse}`;
-      return `<button class="intext-source-badge scripture" data-ref="${fullRef}" title="Cliquer pour ouvrir ${fullRef} dans la Bible"><span class="badge-icon">📖</span><span class="badge-text">${fullRef}</span></button>`;
+      return `<button class="intext-source-badge scripture" data-ref="${fullRef}" title="Ouvrir ${fullRef} dans le lecteur Bible"><span class="badge-icon">${this.ICONS.bible}</span><span class="badge-text">${fullRef}</span></button>`;
     });
 
-    // Codes Strong [Strong: G2631], [G2631], [H7225]
+    // 2. Codes Strong : [Strong: G2631], [G2631], [H7225]
     const strongRegex = /\[\[?(?:Strong:\s*)?([GH]\d{1,5})\]?\]/gi;
     res = res.replace(strongRegex, (match, code) => {
-      return `<span class="intext-source-badge strong" title="Code Strong ${code.toUpperCase()}"><span class="badge-icon">🔍</span><span class="badge-text">${code.toUpperCase()}</span></span>`;
+      return `<span class="intext-source-badge strong" title="Code Strong ${code.toUpperCase()}"><span class="badge-icon">${this.ICONS.search}</span><span class="badge-text">${code.toUpperCase()}</span></span>`;
     });
 
-    // Auteurs théologiques [Calvin: IRC], [Matthew Henry], [Dom Calmet]
-    const authorRegex = /\[\[?(Calvin(?:[^\],]+)?|Matthew Henry|Augustin|Luther|Spurgeon|Dom Calmet|Vigouroux)\]?\]/gi;
+    // 3. Auteurs et sources théologiques au fil du paragraphe : [Calvin: IRC II.16], [Matthew Henry], [Dom Calmet]
+    const authorRegex = /\[\[?(Calvin(?:[^\],]+)?|Matthew Henry|Augustin|Luther|Spurgeon|Dom Calmet|Vigouroux|Carson|Bavinck)\]?\]/gi;
     res = res.replace(authorRegex, (match, author) => {
-      return `<span class="intext-source-badge author" title="Source : ${author}"><span class="badge-icon">📚</span><span class="badge-text">${author}</span></span>`;
+      return `<span class="intext-source-badge author" title="Source : ${author}"><span class="badge-icon">${this.ICONS.book}</span><span class="badge-text">${author}</span></span>`;
     });
 
     return res;
@@ -832,7 +881,7 @@ const AIStudyView = {
         if (label) label.textContent = 'Copié !';
 
         if (typeof App !== 'undefined' && App.showToast) {
-          App.showToast('✓ Étude copiée dans le presse-papier !');
+          App.showToast('Étude copiée dans le presse-papier.');
         }
 
         setTimeout(() => {
@@ -860,7 +909,7 @@ const AIStudyView = {
       try {
         await API.call('save_note', noteData);
         if (typeof App !== 'undefined' && App.showToast) {
-          App.showToast(`✓ Étude enregistrée dans vos Notes : « ${noteTitle} » !`);
+          App.showToast(`Étude enregistrée dans vos Notes : « ${noteTitle} »`);
         }
         if (typeof NotesView !== 'undefined' && NotesView.loadNotes) {
           NotesView.loadNotes();
@@ -870,18 +919,7 @@ const AIStudyView = {
       }
     });
 
-    // 3. Déplier / replier le composant SmoothUI ai-sources
-    const sourcesHeader = messageEl.querySelector('.ai-sources-header');
-    sourcesHeader?.addEventListener('click', () => {
-      const dropdown = messageEl.querySelector('.ai-sources-dropdown');
-      const chevron = messageEl.querySelector('.sources-toggle-chevron');
-      if (dropdown) {
-        const isHidden = dropdown.classList.toggle('hidden');
-        if (chevron) chevron.textContent = isHidden ? '▸' : '▾';
-      }
-    });
-
-    // 4. Clics sur les badges de versets in-text -> Ouvre le verset dans le lecteur Bible
+    // 3. Clics sur les badges de versets in-text -> Ouvre le verset dans le lecteur Bible
     messageEl.querySelectorAll('.intext-source-badge.scripture').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();

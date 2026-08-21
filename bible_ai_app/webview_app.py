@@ -1242,7 +1242,6 @@ class BibleAppApi:
                         "text": notes_text,
                         "metadata": {"type": "Notes", "name": "Notes personnelles (.md)"}
                     })
-                    sources_used.append("Notes personnelles (.md)")
             except Exception as e:
                 print(f"[ask_study_ai] Erreur extraction notes : {e}")
 
@@ -1253,9 +1252,29 @@ class BibleAppApi:
                 reranker = LocalReranker.get_instance()
                 search_query = f"{passage_ref} {question}".strip()
                 context_chunks = reranker.rerank(query=search_query, documents=context_chunks, top_k=6)
-                sources_used.append("Reranking (BGE-M3)")
             except Exception as e:
                 print(f"[ask_study_ai] Reranking bypass : {e}")
+
+        # Dédoublonnage et structuration riche des sources mobilisées (avec infobulles)
+        dedup_sources = []
+        seen_source_keys = set()
+        for chunk in context_chunks:
+            meta = chunk.get("metadata") if isinstance(chunk, dict) else {}
+            s_name = meta.get("name") or chunk.get("id") or "Document"
+            s_type = meta.get("type", "Ouvrage")
+            key = f"{s_type}:{s_name}".lower()
+            if key not in seen_source_keys:
+                seen_source_keys.add(key)
+                text_snippet = chunk.get("text", "") if isinstance(chunk, dict) else str(chunk)
+                # Nettoyer l'en-tête pour l'infobulle
+                clean_snippet = re.sub(r'^###\s+[^\n]+\n', '', text_snippet).strip()[:200]
+                dedup_sources.append({
+                    "title": s_name,
+                    "type": s_type,
+                    "preview": clean_snippet
+                })
+
+        sources_used = [s["title"] for s in dedup_sources]
 
         # Assemblage du texte de contexte
         formatted_context_sections = []
@@ -1327,7 +1346,7 @@ class BibleAppApi:
             f"1. Utilise des titres de section Markdown hiérarchiques nets (### Titre de section).\n"
             f"2. Intègre des tableaux comparatifs Markdown (| Colonne 1 | Colonne 2 |) lorsque pertinent pour synthétiser les points clés.\n"
             f"3. Utilise des citations en retrait Markdown (> Citation) pour les citations d'auteurs ou de versets clés.\n"
-            f"4. Cite explicitement les versets et sources au fil du texte sous forme standardisée [Jean 1:1], [Romains 8:28], [Calvin: IRC], [Dom Calmet] ou [Strong: G2631].\n"
+            f"4. CITATIONS PAR PARAGRAPHE : À la fin de CHAQUE paragraphe ou affirmation clé, indique explicitement entre crochets la source biblique ou théologique précise correspondante sous forme standardisée [Jean 1:1], [Romains 8:28], [Calvin: IRC II.16], [Matthew Henry], [Dom Calmet] ou [Strong: G2631]. Ne laisse aucun paragraphe sans citation explicite.\n"
             f"5. Soigne la langue française, avec un style élégant, fluide et sans fautes."
         )
 
@@ -1358,9 +1377,10 @@ class BibleAppApi:
 
             return {
                 "answer": answer,
-                "sources_used": sources_used or ["Corpus théologique général"],
-                "model_used": selected_model,
-                "detected_mode": detected_mode
+                "sources_used": sources_used,
+                "sources_details": dedup_sources,
+                "detected_mode": detected_mode,
+                "model_used": selected_model
             }
         except Exception as e:
             print(f"[ask_study_ai] Erreur LLM : {e}")
