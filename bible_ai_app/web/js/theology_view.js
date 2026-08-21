@@ -1057,13 +1057,14 @@ const TheologyView = {
         `;
       }
 
+      const isSub = (ch.depth && ch.depth > 0) || ch.is_subsection;
       const isActive = String(ch.chapter_id) === String(this.currentChapterId);
       return `
-        <button type="button" class="theol-toc-item ${isActive ? 'active' : ''}" data-chapter-id="${ch.chapter_id}">
-          <div class="theol-toc-item-num">${ch.chapter_id}</div>
+        <button type="button" class="theol-toc-item ${isActive ? 'active' : ''} ${isSub ? 'theol-toc-subitem' : ''}" data-chapter-id="${ch.chapter_id}" style="${isSub ? 'padding-left: 28px; font-size: 11.5px; opacity: 0.9;' : ''}">
+          <div class="theol-toc-item-num" style="${isSub ? 'color: var(--text-muted); font-size: 11px; font-weight: normal;' : ''}">${isSub ? '↳' : ch.chapter_id}</div>
           <div class="theol-toc-item-details">
-            <div class="theol-toc-item-title">${this.escapeHtml(displayTitle)}</div>
-            ${ch.book_name ? `<span class="theol-toc-item-badge">${ch.book_name}</span>` : ''}
+            <div class="theol-toc-item-title" style="${isSub ? 'font-weight: 400; color: var(--text-secondary);' : 'font-weight: 600;'}">${this.escapeHtml(displayTitle)}</div>
+            ${ch.book_name && !isSub ? `<span class="theol-toc-item-badge">${ch.book_name}</span>` : ''}
           </div>
         </button>
       `;

@@ -7,7 +7,7 @@ from typing import Dict, List, Any, Optional, Tuple
 import chromadb
 from chromadb.config import Settings
 from gui.library_utils import load_books_metadata
-from core.reference_parser import get_french_book_name
+from core.reference_parser import get_french_book_name, strip_accents
 
 logger = logging.getLogger(__name__)
 
@@ -146,45 +146,64 @@ class TheologyReaderManager:
                                     "book_name": b_name,
                                     "corpus_scope": m.get('corpus_scope', 'GLOBAL'),
                                     "source_type": m.get('source_type', 'general'),
+                                    "depth": m.get('depth', 0),
+                                    "is_section_header": m.get('is_section_header', False),
                                     "chunks_count": 0
                                 }
                             chapters_dict[cid_int]["chunks_count"] += 1
             except Exception as e:
                 logger.debug(f"[TheologyReaderManager] Recherche TOC {col_name} : {e}")
 
-        # Fallback si aucun fragment dans ChromaDB (ex: en cours d'indexation ou sans IA)
-        if not chapters_dict:
-            registry = load_books_metadata()
-            book_meta = registry.get(book_name, {})
-            fpath = book_meta.get("file_path", "")
-            if fpath and os.path.exists(fpath) and fpath.lower().endswith(".epub"):
-                try:
-                    from core.epub_loader import EpubLoader
-                    inspect_data = EpubLoader.inspect_epub(fpath)
-                    for ch in inspect_data.get("chapters", []):
-                        cid = ch.get("id", 0)
+        # Enrichir avec la structure hiérarchique et les séparateurs de section depuis le fichier EPUB si disponible
+        registry = load_books_metadata()
+        book_meta = registry.get(book_name, {})
+        fpath = book_meta.get("file_path", "")
+        if fpath and os.path.exists(fpath) and fpath.lower().endswith(".epub"):
+            try:
+                from core.epub_loader import EpubLoader
+                inspect_data = EpubLoader.inspect_epub(fpath)
+                for ch in inspect_data.get("chapters", []):
+                    cid = ch.get("id", 0)
+                    is_sec = ch.get("is_section_header", False)
+                    depth = ch.get("depth", 0)
+                    
+                    if cid in chapters_dict:
+                        chapters_dict[cid]["depth"] = depth
+                        chapters_dict[cid]["is_section_header"] = is_sec
+                        if ch.get("book_code") and not chapters_dict[cid].get("book_code"):
+                            chapters_dict[cid]["book_code"] = ch.get("book_code")
+                            chapters_dict[cid]["book_name"] = get_french_book_name(ch.get("book_code"))
+                    elif is_sec or not chapters_dict:
+                        # Séparateur de section ou chapitre hors-ChromaDB
                         chapters_dict[cid] = {
                             "chapter_id": cid,
-                            "title": ch.get("title") or f"Chapitre {cid}",
+                            "title": ch.get("title") or f"Section {cid}",
                             "book_code": ch.get("book_code"),
                             "book_name": get_french_book_name(ch.get("book_code")) if ch.get("book_code") else None,
                             "corpus_scope": ch.get("corpus_scope", "GLOBAL"),
-                            "source_type": ch.get("source_type", "general"),
+                            "source_type": "general",
+                            "depth": depth,
+                            "is_section_header": is_sec,
                             "zip_file": ch.get("zip_file", ""),
-                            "chunks_count": 1
+                            "chunks_count": 1 if not is_sec else 0
                         }
-                except Exception as e:
-                    logger.warning(f"Fallback EPUB direct inspection error: {e}")
+            except Exception as e:
+                logger.warning(f"EPUB TOC structure enrichment error: {e}")
+
+        is_part_regex = re.compile(
+            r'^((premier|premiere|deuxieme|troisieme|quatrieme|cinquieme|sixieme|septieme|huitieme|neuvieme|dixieme|[0-9]+(ere|eme|re|er|e)?)\s+(partie|section|volume|tome|livre)|(partie|part|section|volume|tome|livre|book)\s+([0-9ivxlcdm]+|[a-z]+))\b',
+            re.IGNORECASE
+        )
 
         # Si trouvé, ordonner la liste des chapitres
         sorted_chapters = []
         for cid in sorted(chapters_dict.keys(), key=lambda x: (int(x) if str(x).isdigit() else 999, str(x))):
             item = chapters_dict[cid]
             ctitle = item.get("title", "")
+            norm_title = strip_accents(ctitle)
             is_part = bool(
-                re.match(r'^(Part|Partie|Section|Volume|Livre|Book|Tome)\s+([0-9IVXLCDM]+|\b[A-Z]+\b)', ctitle, re.IGNORECASE)
-                and not re.match(r'^(Chapter|Chapitre)\s+', ctitle, re.IGNORECASE)
-                and item.get("chunks_count", 0) <= 3
+                item.get("is_section_header") or 
+                (is_part_regex.match(norm_title) and not re.match(r'^(chapter|chapitre)\b', norm_title, re.IGNORECASE))
             )
             item["is_section_header"] = is_part
             sorted_chapters.append(item)

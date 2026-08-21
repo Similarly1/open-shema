@@ -842,9 +842,20 @@ const ImportModal = {
       const row = document.createElement('div');
       row.className = 'import-chapter-row';
 
+      const isSec = ch.is_section_header;
+      const isSub = (ch.depth && ch.depth > 0) || ch.is_subsection;
+      let titleHtml = ch.title;
+      if (isSec) {
+        titleHtml = `<span style="display: inline-block; padding: 1px 5px; background: rgba(245, 158, 11, 0.15); color: #F59E0B; border-radius: 4px; font-size: 10px; font-weight: 700; margin-right: 6px;">PARTIE</span><strong style="color: var(--text-primary);">${ch.title}</strong>`;
+      } else if (isSub) {
+        titleHtml = `<span style="color: var(--text-muted); margin-right: 4px;">↳</span><span style="opacity: 0.85;">${ch.title}</span>`;
+      } else {
+        titleHtml = `<span style="font-weight: 600;">${ch.title}</span>`;
+      }
+
       row.innerHTML = `
         <input type="checkbox" id="ch-cb-${idx}" ${ch.include !== false ? 'checked' : ''}>
-        <span class="import-chapter-title" title="${ch.title}">${ch.title}</span>
+        <span class="import-chapter-title" style="${isSub ? 'padding-left: 14px;' : ''}" title="${ch.title}">${titleHtml}</span>
         
         <select class="import-chapter-select ch-scope-sel">
           <option value="GLOBAL" ${ch.corpus_scope === 'GLOBAL' ? 'selected' : ''}>GLOBAL</option>

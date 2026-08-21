@@ -134,6 +134,11 @@ class EpubLoader:
             else:
                 book_dominant_scope = "GLOBAL"
 
+            is_part_regex = re.compile(
+                r'^((premier|premiere|deuxieme|troisieme|quatrieme|cinquieme|sixieme|septieme|huitieme|neuvieme|dixieme|[0-9]+(ere|eme|re|er|e)?)\s+(partie|section|volume|tome|livre)|(partie|part|section|volume|tome|livre|book)\s+([0-9ivxlcdm]+|[a-z]+))\b',
+                re.IGNORECASE
+            )
+
             current_active_scope = book_dominant_scope
             current_active_book_code = None
             current_active_book_name = None
@@ -144,6 +149,7 @@ class EpubLoader:
             for idx, entry in enumerate(toc_entries):
                 title = entry.get("title", f"Chapitre {idx+1}").strip()
                 src = entry.get("src", "")
+                depth = entry.get("depth", 0)
                 
                 # Résoudre le chemin de fichier dans le ZIP
                 file_zip_path = cls._resolve_zip_path(opf_dir, src.split("#")[0])
@@ -159,6 +165,9 @@ class EpubLoader:
                     except Exception:
                         pass
                 
+                norm_t = strip_accents(title)
+                is_section = bool(is_part_regex.match(norm_t))
+
                 classification = cls.classify_chapter_title(
                     title, 
                     is_systematic_theology=is_syst_theol, 
@@ -178,13 +187,16 @@ class EpubLoader:
                             classification["book_name"] = current_active_book_name
                 
                 # Déterminer si inclus par défaut
-                norm_t = strip_accents(title)
                 is_boilerplate = any(re.search(r'\b' + re.escape(strip_accents(kw)) + r'\b', norm_t) for kw in BOILERPLATE_KEYWORDS)
                 
                 # Règle d'inclusion par défaut :
+                # - Les sections / parties sont TOUJOURS incluses pour préserver la structure
                 # - Tout livre ou chapitre de contenu (> 50 caractères) est coché d'office
                 # - Les annexes/front-matter/boilerplate sont décochés d'office
-                if classification["source_type"] == "appendix" or is_boilerplate:
+                if is_section:
+                    include_default = True
+                    classification["source_type"] = "general"
+                elif classification["source_type"] == "appendix" or is_boilerplate:
                     include_default = False
                 elif classification["book_code"] is not None:
                     include_default = True
@@ -197,6 +209,8 @@ class EpubLoader:
                     "src": src,
                     "zip_file": file_zip_path,
                     "anchor": src.split("#")[1] if "#" in src else None,
+                    "depth": depth,
+                    "is_section_header": is_section,
                     "book_code": classification["book_code"],
                     "book_name": classification["book_name"],
                     "corpus_scope": classification["corpus_scope"],
@@ -634,8 +648,8 @@ class EpubLoader:
         opf_dir: str, 
         manifest: Dict[str, Dict[str, str]], 
         spine: List[str]
-    ) -> List[Dict[str, str]]:
-        """Extrait les points d'entrée de la table des matières (NCX ou Nav XHTML)."""
+    ) -> List[Dict[str, Any]]:
+        """Extrait les points d'entrée de la table des matières (NCX ou Nav XHTML) en préservant la hiérarchie."""
         toc_entries = []
 
         # 1. Essayer toc.ncx (EPUB 2 / EPUB 3 compatible)
@@ -659,14 +673,23 @@ class EpubLoader:
                     if '}' in el.tag:
                         el.tag = el.tag.split('}', 1)[1]
 
-                for np in root.findall(".//navPoint"):
-                    lbl = np.find("navLabel/text")
-                    cnt = np.find("content")
-                    if lbl is not None and lbl.text:
-                        title_t = lbl.text.strip()
-                        src_t = cnt.get("src", "") if cnt is not None else ""
-                        if title_t:
-                            toc_entries.append({"title": title_t, "src": src_t})
+                def _parse_nav_points(np_list, depth=0):
+                    for np in np_list:
+                        lbl = np.find("navLabel/text")
+                        cnt = np.find("content")
+                        if lbl is not None and lbl.text:
+                            title_t = lbl.text.strip()
+                            src_t = cnt.get("src", "") if cnt is not None else ""
+                            if title_t:
+                                toc_entries.append({"title": title_t, "src": src_t, "depth": depth})
+                        child_points = np.findall("./navPoint")
+                        if child_points:
+                            _parse_nav_points(child_points, depth + 1)
+
+                top_points = root.findall("./navMap/navPoint")
+                if not top_points:
+                    top_points = root.findall(".//navPoint")
+                _parse_nav_points(top_points, 0)
                 
                 if toc_entries:
                     return toc_entries
@@ -686,11 +709,27 @@ class EpubLoader:
                 soup = BeautifulSoup(nav_html, 'html.parser')
                 nav_tag = soup.find('nav', attrs={'epub:type': 'toc'}) or soup.find('nav')
                 if nav_tag:
-                    for a in nav_tag.find_all('a'):
-                        t = a.get_text(strip=True)
-                        h = a.get('href', '')
-                        if t:
-                            toc_entries.append({"title": t, "src": h})
+                    def _parse_nav_list(ol_or_ul, depth=0):
+                        for li in ol_or_ul.find_all('li', recursive=False):
+                            a = li.find('a', recursive=False)
+                            if a:
+                                t = a.get_text(strip=True)
+                                h = a.get('href', '')
+                                if t:
+                                    toc_entries.append({"title": t, "src": h, "depth": depth})
+                            child_list = li.find(['ol', 'ul'], recursive=False)
+                            if child_list:
+                                _parse_nav_list(child_list, depth + 1)
+
+                    top_list = nav_tag.find(['ol', 'ul'])
+                    if top_list:
+                        _parse_nav_list(top_list, 0)
+                    else:
+                        for a in nav_tag.find_all('a'):
+                            t = a.get_text(strip=True)
+                            h = a.get('href', '')
+                            if t:
+                                toc_entries.append({"title": t, "src": h, "depth": 0})
                 if toc_entries:
                     return toc_entries
             except Exception as e:
@@ -703,7 +742,8 @@ class EpubLoader:
                 base_title = os.path.splitext(os.path.basename(href))[0]
                 toc_entries.append({
                     "title": base_title.replace("-", " ").replace("_", " ").title(),
-                    "src": href
+                    "src": href,
+                    "depth": 0
                 })
 
         return toc_entries

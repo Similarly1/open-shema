@@ -737,5 +737,22 @@
     "chunks_count": 22561,
     "embedding_model": "study_library",
     "active": true
+  },
+  "LDDC": {
+    "name": "LDDC",
+    "title": "La divinité de Christ",
+    "author": "John MacArthur",
+    "description": "> La divinité de Jésus-Christ est un principe essentiel et non-négociable de la foi chrétienne\n\nLa figure de Christ étant fondamentale dans la religion chrétienne, cet ouvrage représente un enrichissement non-négligeable pour un lecteur souhaitant explorer ces notions bibliques. En restant d'une fidélité infaillible aux textes du Nouveau Testament, l'auteur révèle tout ce qui fait de Jésus une personnalisation sainte de Dieu.\n\nPoints forts:\n+ un auteur reconnu et apprécié\n+ un sujet capital pour tout croyant\n+ un livre profondément édifiant\n\nThèmes:\n* la divinité de Christ \n* les fondements du christianisme\n* la toute-puissance de Christ \n* la sainteté de Christ",
+    "year": "",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\clip_598e37_LDDC.png",
+    "type": "Théologie",
+    "corpus_scope": "GLOBAL",
+    "source_type": "general",
+    "book_code": null,
+    "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
+    "active": true,
+    "chapters_count": 70,
+    "chunks_count": 1334,
+    "file_path": "C:\\Users\\adrie\\kDrive\\Documents\\Théologie\\Ressources externes\\Ebooks\\26-John-Mac-Arthur-La-divinite-de-Christ.epub"
   }
 }
