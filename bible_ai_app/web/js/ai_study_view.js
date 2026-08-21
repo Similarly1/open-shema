@@ -692,8 +692,10 @@ const AIStudyView = {
               <div class="step-text-container">
                 <span class="step-label">Synthèse théologique & doctrinale avec ${this.escapeHtml(options.model)}</span>
                 <div class="step-time-notice hidden">
-                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  <span class="step-notice-text">Analyse et recoupement des extraits de votre bibliothèque (~1 à 2 min)...</span>
+                  <span class="step-notice-icon">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  </span>
+                  <span class="step-notice-text shine-text">Analyse et recoupement des extraits de votre bibliothèque (~1 à 2 min)...</span>
                 </div>
               </div>
             </div>
@@ -748,13 +750,11 @@ const AIStudyView = {
         this.activeRotatingTimer = setInterval(() => {
           msgIdx++;
           if (noticeTextEl) {
-            noticeTextEl.style.opacity = '0';
-            noticeTextEl.style.transform = 'translateY(-2px)';
+            noticeTextEl.classList.add('fading');
             setTimeout(() => {
               noticeTextEl.textContent = rotatingMessages[msgIdx % rotatingMessages.length];
-              noticeTextEl.style.opacity = '1';
-              noticeTextEl.style.transform = 'translateY(0)';
-            }, 250);
+              noticeTextEl.classList.remove('fading');
+            }, 350);
           }
         }, 16000);
       }
