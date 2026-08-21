@@ -1171,7 +1171,7 @@ const AIStudyView = {
     res = res.replace(/\*(.*?)\*/g, '<em>$1</em>');
     res = res.replace(/`([^`]+)`/g, '<code class="ai-inline-code">$1</code>');
 
-    // 1. Détection universelle de toutes les références bibliques (simples et chaînées)
+    // 1. Détection universelle de toutes les références bibliques (y compris [Jn 3], [Éph 2], [Hb 3-4] et versets simples/chaînés)
     res = this.linkifyScriptureInText(res);
 
     // 2. Codes Strong : [Strong: G2631], [G2631], [H7225]
@@ -1234,7 +1234,7 @@ const AIStudyView = {
       const snippetHtml = preview ? `<div class="intext-tooltip-snippet">${preview}</div>` : '';
 
       return `
-        <span class="intext-source-pill" tabindex="0" title="${this.escapeHtml(displayTitle)}">
+        <span class="intext-source-pill" tabindex="0">
           <span class="intext-source-icon">${this.ICONS.book}</span>
           <div class="source-tooltip-card intext-tooltip">
             <div class="intext-tooltip-cover-wrap">
@@ -1255,6 +1255,7 @@ const AIStudyView = {
 
     // Nettoyer la ponctuation orpheline autour des pastilles de source
     res = res.replace(/,\s*(<span class="intext-source-pill")/g, ' $1');
+    res = res.replace(/(<span class="intext-source-pill"[^>]*>[\s\S]*?<\/span>)\s*([.,;])\s*\n\s*\./g, '$1$2');
     res = res.replace(/(<span class="intext-source-pill"[^>]*>[\s\S]*?<\/span>)\s*\n\s*\./g, '$1.');
     res = res.replace(/(<span class="intext-source-pill"[^>]*>[\s\S]*?<\/span>)\s*\.\s*\n\s*\./g, '$1.');
 
@@ -1300,21 +1301,55 @@ const AIStudyView = {
 
     const bookPatternStr = bookNames.sort((a, b) => b.length - a.length).join('|');
 
-    // Détection universelle avec support des crochets [Hb 7:1-3, 10, 11] et sous-versets
-    const scriptureRegex = new RegExp(
-      `(?<=^|[\\s\\(\\[\\{;,-])((?:${bookPatternStr})\\.?)\\s*([0-9]{1,3})\\s*[:.,]\\s*([0-9]{1,3}(?:\\s*[-–—\\u2013\\u2014]\\s*[0-9]{1,3})?)((?:\\s*[,;]\\s*[0-9]{1,3}(?:\\s*[:.,]\\s*[0-9]{1,3}(?:\\s*[-–—\\u2013\\u2014]\\s*[0-9]{1,3})?)?(?!\\s*[a-zA-ZÀ-ÿ]))*)`,
+    // 1. Détection des références bibliques entre crochets : [Jn 3], [Éph 2], [Hb 3-4], [1 Corinthiens 10:1-13], [Jn 3:16]
+    const bracketScriptureRegex = new RegExp(
+      `\\[((?:${bookPatternStr})\\.?)\\s*([0-9]{1,3})(?:\\s*[:.,]\\s*([0-9]{1,3}(?:\\s*[-–—\\u2013\\u2014]\\s*[0-9]{1,3})?)|\\s*[-–—\\u2013\\u2014]\\s*([0-9]{1,3}))?((?:\\s*[,;]\\s*[0-9]{1,3}(?:\\s*[:.,]\\s*[0-9]{1,3}(?:\\s*[-–—\\u2013\\u2014]\\s*[0-9]{1,3})?)?(?!\\s*[a-zA-ZÀ-ÿ]))*)\\]`,
       'gi'
     );
 
-    return text.replace(scriptureRegex, (fullMatch, book, ch, vs, chained) => {
+    text = text.replace(bracketScriptureRegex, (fullMatch, book, ch, vs, chRange, chained) => {
+      const cleanBook = book.replace(/\.$/, '').trim();
+      let label = `${book} ${ch}`;
+      let firstRef = `${cleanBook} ${ch}:1`;
+      if (vs) {
+        const cleanVs = vs.replace(/[\u2013\u2014\u2212\u2010\u2011\u2012\u2015]/g, '-').replace(/\s+/g, '');
+        firstRef = `${cleanBook} ${ch}:${cleanVs}`;
+        label = `${book} ${ch}:${vs}`;
+      } else if (chRange) {
+        label = `${book} ${ch}-${chRange}`;
+        firstRef = `${cleanBook} ${ch}:1`;
+      }
+
+      let result = `<button class="theol-inline-scripture-ref intext-source-badge scripture" data-ref="${this.escapeHtml(firstRef)}"><span class="badge-text">${label}</span></button>`;
+
+      if (chained) {
+        const subRegex = /([,;]\s*)([0-9]{1,3}(?:\s*[:.,]\s*[0-9]{1,3}(?:\s*[-–—\u2013\\u2014]\s*[0-9]{1,3})?)?)/g;
+        const formattedChained = chained.replace(subRegex, (m, sep, subCv) => {
+          const parts = subCv.split(/[:.,]/);
+          const subCh = parts[0].trim();
+          const subVs = parts[1] ? parts[1].replace(/[\u2013\u2014\u2212\u2010\u2011\u2012\u2015]/g, '-').replace(/\s+/g, '') : '';
+          const subRef = subVs ? `${cleanBook} ${subCh}:${subVs}` : `${cleanBook} ${ch}:${subCh}`;
+          return `${sep}<button class="theol-inline-scripture-ref intext-source-badge scripture" data-ref="${this.escapeHtml(subRef)}"><span class="badge-text">${subCv}</span></button>`;
+        });
+        result += formattedChained;
+      }
+      return result;
+    });
+
+    // 2. Détection des références bibliques libres (avec verset ou plage)
+    const freeScriptureRegex = new RegExp(
+      `(?<=^|[\\s\\(\\{;,-])((?:${bookPatternStr})\\.?)\\s*([0-9]{1,3})\\s*[:.,]\\s*([0-9]{1,3}(?:\\s*[-–—\\u2013\\u2014]\\s*[0-9]{1,3})?)((?:\\s*[,;]\\s*[0-9]{1,3}(?:\\s*[:.,]\\s*[0-9]{1,3}(?:\\s*[-–—\\u2013\\u2014]\\s*[0-9]{1,3})?)?(?!\\s*[a-zA-ZÀ-ÿ]))*)`,
+      'gi'
+    );
+
+    text = text.replace(freeScriptureRegex, (fullMatch, book, ch, vs, chained) => {
       const cleanBook = book.replace(/\.$/, '').trim();
       const cleanVs = vs.replace(/[\u2013\u2014\u2212\u2010\u2011\u2012\u2015]/g, '-').replace(/\s+/g, '');
       const firstRef = `${cleanBook} ${ch}:${cleanVs}`;
-      // Juste la référence textuelle sans icône
       let result = `<button class="theol-inline-scripture-ref intext-source-badge scripture" data-ref="${this.escapeHtml(firstRef)}"><span class="badge-text">${book} ${ch}:${vs}</span></button>`;
 
       if (chained) {
-        const subRegex = /([,;]\s*)([0-9]{1,3}(?:\s*[:.,]\s*[0-9]{1,3}(?:\s*[-–—\u2013\u2014]\s*[0-9]{1,3})?)?)/g;
+        const subRegex = /([,;]\s*)([0-9]{1,3}(?:\s*[:.,]\s*[0-9]{1,3}(?:\s*[-–—\u2013\\u2014]\s*[0-9]{1,3})?)?)/g;
         const formattedChained = chained.replace(subRegex, (m, sep, subCv) => {
           const parts = subCv.split(/[:.,]/);
           const subCh = parts[0].trim();
@@ -1327,6 +1362,8 @@ const AIStudyView = {
 
       return result;
     });
+
+    return text;
   },
 
   // =========================================================================
