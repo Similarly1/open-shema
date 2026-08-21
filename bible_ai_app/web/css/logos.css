@@ -3724,9 +3724,9 @@ input:checked + .slider.round:before {
   background: var(--bg-hover);
 }
 
-/* Boîte de prompt compacte */
+/* Boîte de prompt moderne en capsule arrondie */
 .drawer-ai-input-card {
-  padding: 10px 12px;
+  padding: 10px 14px 12px 14px;
   background: var(--bg-card);
   border-top: 1px solid var(--border-color);
   display: flex;
@@ -3735,29 +3735,75 @@ input:checked + .slider.round:before {
   flex-shrink: 0;
 }
 
-.drawer-ai-input-card textarea {
-  width: 100%;
-  border: 1px solid var(--input-border, var(--border-color));
-  background-color: var(--input-bg, var(--bg-subtle));
+.drawer-ai-input-wrapper {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  background: var(--input-bg, var(--bg-subtle));
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 5px 6px 5px 14px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.drawer-ai-input-wrapper:focus-within {
+  border-color: var(--accent-orange);
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.12);
+  background: var(--bg-card);
+}
+
+.drawer-ai-input-wrapper textarea {
+  flex: 1;
+  border: none;
+  background: transparent;
   color: var(--text-primary);
-  border-radius: 6px;
-  padding: 7px 9px;
-  font-size: 12px;
+  font-size: 12.5px;
   font-family: var(--font-ui);
   resize: none;
   outline: none;
+  padding: 4px 0;
   max-height: 120px;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
-.drawer-ai-input-card textarea:focus {
-  border-color: var(--accent-orange);
+.drawer-ai-input-wrapper textarea::placeholder {
+  color: var(--text-muted);
 }
 
-.drawer-ai-input-actions {
+.btn-send-drawer-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--accent-orange);
+  color: white;
+  border: none;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-bottom: 1px;
+  transition: transform 0.12s ease, filter 0.12s ease, background-color 0.15s ease;
+}
+
+.btn-send-drawer-icon:hover {
+  transform: scale(1.06);
+  filter: brightness(1.08);
+}
+
+.btn-send-drawer-icon:active {
+  transform: scale(0.95);
+}
+
+.btn-send-drawer-icon.btn-stop {
+  background-color: #ef4444 !important;
+}
+
+.drawer-ai-input-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 4px;
 }
 
 .drawer-ai-hint {
@@ -3765,27 +3811,67 @@ input:checked + .slider.round:before {
   color: var(--text-muted);
 }
 
-.btn-send-drawer {
-  padding: 4px 10px;
-  background-color: var(--accent-orange);
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-size: 11.5px;
-  font-weight: 600;
-  cursor: pointer;
+/* Bandeau de raisonnement séquentiel dans le volet latéral (Une seule étape à la fois) */
+.ai-drawer-reasoning-band {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px 12px;
   display: flex;
   align-items: center;
-  gap: 4px;
-  transition: var(--transition-fast);
+  gap: 10px;
+  margin-bottom: 8px;
+  transition: all 0.2s ease;
 }
 
-.btn-send-drawer:hover {
-  opacity: 0.9;
+.ai-drawer-reasoning-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(234, 88, 12, 0.25);
+  border-top-color: var(--accent-orange);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
 }
 
-.btn-send-drawer.btn-stop {
-  background-color: #ef4444 !important;
+.ai-drawer-step-container {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ai-drawer-step-text {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.ai-drawer-step-text.step-exit {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+.ai-drawer-step-text.step-enter {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.ai-drawer-timer {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.ai-drawer-reasoning-band.collapsed {
+  padding: 6px 10px;
+  font-size: 11.5px;
 }
 
 /* ==========================================================================

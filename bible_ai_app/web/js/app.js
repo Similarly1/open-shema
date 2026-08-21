@@ -634,7 +634,8 @@ const App = {
       if (chatInput) chatInput.disabled = false;
       if (btnSendChat) {
         btnSendChat.classList.remove('btn-stop');
-        btnSendChat.innerHTML = `<span>Envoyer</span><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
+        btnSendChat.title = "Envoyer la question (Entrée)";
+        btnSendChat.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
       }
     };
 
@@ -695,24 +696,27 @@ const App = {
       if (chatInput) chatInput.disabled = true;
       if (btnSendChat) {
         btnSendChat.classList.add('btn-stop');
-        btnSendChat.innerHTML = `<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg><span>Arrêter</span>`;
+        btnSendChat.title = "Arrêter la génération";
+        btnSendChat.innerHTML = `<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>`;
       }
 
       const assistantMsg = document.createElement('div');
       assistantMsg.className = 'chat-message assistant';
       const timerId = `drawer-timer-${Date.now()}`;
       const reasoningId = `drawer-reasoning-${Date.now()}`;
+      const stepTextId = `drawer-step-${Date.now()}`;
 
       assistantMsg.innerHTML = `
         <div class="msg-avatar">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
         </div>
         <div class="msg-content">
-          <div class="ai-reasoning-band" id="${reasoningId}">
-            <div class="ai-reasoning-header">
-              <div class="ai-reasoning-spinner"></div>
-              <span class="ai-reasoning-label">Analyse en cours... (<span id="${timerId}">0.0s</span>)</span>
+          <div class="ai-drawer-reasoning-band" id="${reasoningId}">
+            <div class="ai-drawer-reasoning-spinner"></div>
+            <div class="ai-drawer-step-container">
+              <span class="ai-drawer-step-text" id="${stepTextId}">Analyse de l'intention et formulation des requêtes...</span>
             </div>
+            <span class="ai-drawer-timer" id="${timerId}">0.0s</span>
           </div>
           <div class="ai-answer-body"></div>
         </div>
@@ -720,6 +724,7 @@ const App = {
       chatMessages.appendChild(assistantMsg);
       chatMessages.scrollTop = chatMessages.scrollHeight;
 
+      // Chronomètre en direct
       const startTime = performance.now();
       const timerEl = document.getElementById(timerId);
       activeInterval = setInterval(() => {
@@ -727,13 +732,39 @@ const App = {
         if (timerEl) timerEl.textContent = `${elapsed}s`;
       }, 100);
 
+      // Transitions successives des étapes (une seule étape affichée à la fois avec swap fluide)
+      const stepEl = document.getElementById(stepTextId);
+      const updateStep = (newText) => {
+        if (!stepEl) return;
+        stepEl.classList.add('step-exit');
+        setTimeout(() => {
+          stepEl.textContent = newText;
+          stepEl.classList.remove('step-exit');
+          stepEl.classList.add('step-enter');
+          void stepEl.offsetWidth;
+          requestAnimationFrame(() => {
+            stepEl.classList.remove('step-enter');
+          });
+        }, 220);
+      };
+
+      const stepTimer1 = setTimeout(() => updateStep("Exploration du corpus documentaire (Bibles, Commentaires, Dicos)..."), 1200);
+      const stepTimer2 = setTimeout(() => updateStep("Sélection et ordonnancement sémantique des extraits..."), 2800);
+      const stepTimer3 = setTimeout(() => updateStep(`Synthèse exégétique et rédaction théologique avec ${options.model || 'Gemini'}...`), 4800);
+      const stepTimer4 = setTimeout(() => updateStep("Recoupement des concordances textuelles et des sources doctrinales..."), 16000);
+      const stepTimer5 = setTimeout(() => updateStep("Harmonisation des références bibliques et formulation finale..."), 32000);
+      const activeStepTimeouts = [stepTimer1, stepTimer2, stepTimer3, stepTimer4, stepTimer5];
+
       try {
         const response = await API.call('ask_study_ai', text, mode, passageRef, options);
         clearInterval(activeInterval);
+        activeStepTimeouts.forEach(t => clearTimeout(t));
+
         if (chatInput) chatInput.disabled = false;
         if (btnSendChat) {
           btnSendChat.classList.remove('btn-stop');
-          btnSendChat.innerHTML = `<span>Envoyer</span><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
+          btnSendChat.title = "Envoyer la question (Entrée)";
+          btnSendChat.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
         }
         isGenerating = false;
 
@@ -746,15 +777,13 @@ const App = {
         const detectedMode = response.detected_mode || "Étude";
         const modelUsed = response.model_used || options.model || "Gemini";
 
-        // Mettre à jour le bandeau de raisonnement
+        // Mettre à jour le bandeau de raisonnement terminé
         const reasoningEl = document.getElementById(reasoningId);
         if (reasoningEl) {
           reasoningEl.classList.add('collapsed');
           reasoningEl.innerHTML = `
-            <div class="ai-reasoning-header" style="cursor: default;">
-              <span class="ai-reasoning-check-icon">${typeof AIStudyView !== 'undefined' ? AIStudyView.ICONS.check : '✓'}</span>
-              <span>Raisonnement terminé (${totalDuration}s) &bull; <strong>${typeof AIStudyView !== 'undefined' ? AIStudyView.escapeHtml(detectedMode) : detectedMode}</strong></span>
-            </div>
+            <span class="ai-reasoning-check-icon">${typeof AIStudyView !== 'undefined' ? AIStudyView.ICONS.check : '✓'}</span>
+            <span style="font-weight: 600; color: var(--text-primary);">Raisonnement terminé (${totalDuration}s) &bull; <strong>${typeof AIStudyView !== 'undefined' ? AIStudyView.escapeHtml(detectedMode) : detectedMode}</strong></span>
           `;
         }
 
@@ -763,9 +792,14 @@ const App = {
           ? AIStudyView.renderRichMarkdown(answerText, sourcesDetails)
           : answerText;
 
-        const sourcesHtml = typeof AIStudyView !== 'undefined'
-          ? AIStudyView.buildSourcesComponentHtml(sourcesDetails, sourcesUsed.length)
-          : '';
+        let sourcesHtml = '';
+        if (typeof AIStudyView !== 'undefined') {
+          if (sourcesDetails && sourcesDetails.length > 0) {
+            sourcesHtml = AIStudyView.buildSourcesSmoothUiHtml(sourcesDetails);
+          } else if (sourcesUsed && sourcesUsed.length > 0) {
+            sourcesHtml = AIStudyView.buildSourcesSimpleHtml(sourcesUsed);
+          }
+        }
 
         const footerHtml = `
           <div class="ai-msg-footer" style="margin-top: 8px;">
@@ -803,11 +837,13 @@ const App = {
 
       } catch (err) {
         clearInterval(activeInterval);
+        activeStepTimeouts.forEach(t => clearTimeout(t));
         isGenerating = false;
         if (chatInput) chatInput.disabled = false;
         if (btnSendChat) {
           btnSendChat.classList.remove('btn-stop');
-          btnSendChat.innerHTML = `<span>Envoyer</span><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
+          btnSendChat.title = "Envoyer la question (Entrée)";
+          btnSendChat.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
         }
         const answerBodyEl = assistantMsg.querySelector('.ai-answer-body');
         if (answerBodyEl) {

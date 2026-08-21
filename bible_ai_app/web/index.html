@@ -2905,15 +2905,16 @@
             <button class="drawer-quick-chip" data-prompt-type="theology">Sens théologique</button>
           </div>
 
-          <!-- Boîte de saisie compacte -->
+          <!-- Boîte de saisie moderne avec capsule arrondie -->
           <div class="drawer-ai-input-card">
-            <textarea id="chat-input" placeholder="Poser une question sur ce passage..." rows="1"></textarea>
-            <div class="drawer-ai-input-actions">
-              <span class="drawer-ai-hint">Entrée ↵</span>
-              <button id="btn-send-chat" class="btn-send-drawer" title="Générer l'analyse (Entrée)">
-                <span>Envoyer</span>
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            <div class="drawer-ai-input-wrapper">
+              <textarea id="chat-input" placeholder="Poser une question sur ce passage..." rows="1"></textarea>
+              <button id="btn-send-chat" class="btn-send-drawer-icon" title="Envoyer la question (Entrée)">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
               </button>
+            </div>
+            <div class="drawer-ai-input-footer">
+              <span class="drawer-ai-hint">Entrée ↵ pour envoyer</span>
             </div>
           </div>
         </div>

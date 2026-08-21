@@ -31,7 +31,8 @@ from core.reference_parser import (
     BOOKS_OT,
     BOOKS_NT,
     BOOKS_DEUTERO,
-    ALL_BOOKS
+    ALL_BOOKS,
+    strip_accents
 )
 from core.pericope_manager import PericopeManager
 from core.commentary_loader import CommentaryLoader
@@ -1924,11 +1925,11 @@ class BibleAppApi:
             info = {"title": file_base, "chapters": []}
 
         # Détection automatique intelligente du type d'ouvrage (Bible vs Théologie vs Commentaire vs Dictionnaire)
-        raw_title = info.get("title", "")
-        raw_author = info.get("author", "")
-        title_lower = strip_accents(raw_title)
-        desc_lower = strip_accents(info.get("description", ""))
-        base_lower = strip_accents(file_base)
+        raw_title = info.get("title", "") or ""
+        raw_author = info.get("author", "") or ""
+        title_lower = strip_accents(raw_title).lower()
+        desc_lower = strip_accents(info.get("description", "") or "").lower()
+        base_lower = strip_accents(file_base or "").lower()
         combined_text = f"{title_lower} {desc_lower} {base_lower}"
 
         reg_bibles = load_bibles_registry()
