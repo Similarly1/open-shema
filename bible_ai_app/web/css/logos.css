@@ -6029,7 +6029,7 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
 
 /* Tableaux Markdown stylisés */
 .ai-table-responsive {
-  overflow-x: auto;
+  overflow: visible;
   margin: 12px 0;
   border-radius: 6px;
   border: 1px solid var(--border-color);

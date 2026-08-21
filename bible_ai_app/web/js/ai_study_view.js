@@ -1194,14 +1194,19 @@ const AIStudyView = {
       return id;
     });
 
-    // 1.1 Raccrocher les lignes composées uniquement de citations [Source] à la fin de la phrase/paragraphe précédent
-    text = text.replace(/([^\n])\n+(\s*(?:\[[A-Za-zÀ-ÿ0-9\s:,'’\.\-–—\(\)\/]+\][\s,;]*)+)(?=\n|$)/g, '$1 $2');
+    // 1.1 Nettoyage agressif des retours à la ligne autour des citations entre crochets
+    // Tout crochet qui se trouve en début de ligne (après n'importe quel texte sauf ":") est remonté à la ligne précédente
+    text = text.replace(/([^\n:>])\s*\n+\s*(\[[A-Za-zÀ-ÿ0-9\s:,'’\.\-–—\(\)\/]+\])/g, '$1 $2');
+    
+    // Tout crochet suivi d'un ou plusieurs retours à la ligne avant la suite du texte est rattaché à la suite
+    text = text.replace(/(\[[A-Za-zÀ-ÿ0-9\s:,'’\.\-–—\(\)\/]+\])\s*\n+\s*([^\n<])/g, '$1 $2');
+
+    // Éliminer les espaces mal placés avant la ponctuation : "[Source] . Texte" -> "[Source]. Texte"
+    text = text.replace(/\]\s+\.\s/g, ']. ');
+    text = text.replace(/\]\s+,\s/g, '], ');
+    
+    // Rapprocher les crochets consécutifs
     text = text.replace(/\]\s*\n+\s*\[/g, '] [');
-    text = text.replace(/\]\s*,\s*\n+\s*\[/g, '], [');
-    text = text.replace(/\]\s*\n+\s*([,.;])/g, ']$1');
-    text = text.replace(/\]\s*([.,;])\s*\n+\s*([A-Za-zÀ-ÿ«»""''])/g, ']$1 $2');
-    text = text.replace(/([A-Za-zÀ-ÿ0-9,;:«»""''\)])\s*\n\s*(\[[A-Za-zÀ-ÿ0-9\s:,'’\.\-–—\(\)\/]+\])/g, '$1 $2');
-    text = text.replace(/(\[[A-Za-zÀ-ÿ0-9\s:,'’\.\-–—\(\)\/]+\])\s*\n\s*([A-Za-zÀ-ÿ0-9«»""''\(])/g, '$1 $2');
 
     // 2. Parseur de tableaux Markdown (| Col 1 | Col 2 |)
     text = text.replace(/(?:^|\n)(\|[^\n]+\|\r?\n\|[-:\s|]+\|\r?\n(?:\|[^\n]+\|\r?\n?)+)/g, (match, tableBlock) => {
