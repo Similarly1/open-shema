@@ -6073,7 +6073,28 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   -webkit-user-select: text !important;
 }
 
-/* Citations de sources in-text repliées (Juste l'icône avec infobulle riche au survol) */
+/* Tooltip global portal — rattaché au <body>, jamais tronqué par overflow:hidden */
+.intext-tooltip-portal {
+  position: absolute;
+  width: 300px;
+  max-width: min(340px, calc(100vw - 32px));
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+  z-index: 9999999;
+  display: none;
+  align-items: flex-start;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.intext-tooltip-portal.is-visible {
+  display: flex;
+}
+
+
 .intext-source-pill {
   position: relative;
   display: inline-flex;

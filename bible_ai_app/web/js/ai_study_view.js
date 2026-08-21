@@ -207,6 +207,99 @@ const AIStudyView = {
     this.setMode('auto');
     this.updatePassageDisplay();
     this.renderSuggestions();
+    this.initGlobalTooltip();
+  },
+
+  // =========================================================================
+  // TOOLTIP PORTAL GLOBAL — attaché au <body> pour éviter overflow:hidden
+  // =========================================================================
+
+  initGlobalTooltip() {
+    // Créer le tooltip global unique s'il n'existe pas encore
+    let tip = document.getElementById('ai-global-source-tooltip');
+    if (!tip) {
+      tip = document.createElement('div');
+      tip.id = 'ai-global-source-tooltip';
+      tip.className = 'intext-tooltip-portal';
+      document.body.appendChild(tip);
+    }
+
+    let hideTimer = null;
+
+    const showTooltip = (pill) => {
+      clearTimeout(hideTimer);
+
+      const typeClass  = pill.dataset.type    || 'comm';
+      const title      = pill.dataset.title   || '';
+      const author     = pill.dataset.author  || '';
+      const label      = pill.dataset.label   || '';
+      const preview    = pill.dataset.preview || '';
+      const cover      = pill.dataset.cover   || '';
+
+      const coverHtml = cover
+        ? `<img class="intext-tooltip-cover-img" src="${cover}" alt="${this.escapeHtml(title)}" />`
+        : `<div class="intext-tooltip-fallback ${typeClass}">${this.ICONS.book}</div>`;
+
+      const authorHtml  = author  ? `<span class="intext-tooltip-author">${this.escapeHtml(author)}</span>` : '';
+      const snippetHtml = preview ? `<div class="intext-tooltip-snippet">${preview}</div>` : '';
+
+      tip.innerHTML = `
+        <div class="intext-tooltip-cover-wrap">${coverHtml}</div>
+        <div class="intext-tooltip-content">
+          <div class="intext-tooltip-header">
+            <span class="tooltip-badge ${typeClass}">${label}</span>
+            ${authorHtml}
+          </div>
+          <strong class="intext-tooltip-title">${this.escapeHtml(title)}</strong>
+          ${snippetHtml}
+        </div>
+      `;
+      tip.classList.add('is-visible');
+      this._repositionTooltip(tip, pill);
+    };
+
+    const hideTooltip = () => {
+      hideTimer = setTimeout(() => {
+        tip.classList.remove('is-visible');
+      }, 120);
+    };
+
+    // Délégation d'événements sur le document (fonctionne avec les éléments dynamiques)
+    document.addEventListener('mouseover', (e) => {
+      const pill = e.target.closest('.intext-source-pill');
+      if (pill) showTooltip(pill);
+    });
+    document.addEventListener('mouseout', (e) => {
+      const pill = e.target.closest('.intext-source-pill');
+      if (pill) hideTooltip();
+    });
+    tip.addEventListener('mouseover', () => clearTimeout(hideTimer));
+    tip.addEventListener('mouseout', () => hideTooltip());
+
+    // Repositionner au scroll/resize
+    window.addEventListener('scroll', () => { if (tip.classList.contains('is-visible')) tip.classList.remove('is-visible'); }, true);
+    window.addEventListener('resize', () => { if (tip.classList.contains('is-visible')) tip.classList.remove('is-visible'); });
+  },
+
+  _repositionTooltip(tip, anchor) {
+    const rect = anchor.getBoundingClientRect();
+    const tipW = 300;
+    const tipH = 100; // estimation haute
+
+    let left = rect.left + window.scrollX - 8;
+    let top  = rect.top  + window.scrollY - tipH - 10;
+
+    // Débordement à droite
+    if (left + tipW > window.innerWidth + window.scrollX - 16) {
+      left = window.innerWidth + window.scrollX - tipW - 16;
+    }
+    // Débordement en haut → afficher en dessous
+    if (top < window.scrollY + 8) {
+      top = rect.bottom + window.scrollY + 6;
+    }
+
+    tip.style.left = `${left}px`;
+    tip.style.top  = `${top}px`;
   },
 
   stopGeneration() {
@@ -1259,6 +1352,13 @@ const AIStudyView = {
       text = text.replace(`__CODE_BLOCK_${idx}__`, codeHtml);
     });
 
+    // 8.5 Convertir les \n simples résiduels en espace pour éviter les points isolés en début de ligne
+    // (les \n\n sont traités à l'étape 9, les \n simples au sein d'un paragraphe doivent devenir un espace)
+    text = text.replace(/([^\n])\n([^\n])/g, '$1 $2');
+    // Nettoyer les points flottants en début de phrase introduits par le LLM
+    text = text.replace(/\s+\.\s+/g, '. ');
+    text = text.replace(/^\s*\.\s*/gm, '');
+
     // 9. Paragraphes
     text = text.replace(/\n\n+/g, '</p><p class="ai-p">');
     text = `<p class="ai-p">${text}</p>`;
@@ -1351,38 +1451,19 @@ const AIStudyView = {
       const displayTitle = entryTerm ? `${mappedBookName} : ${entryTerm}` : mappedBookName;
       const preview = matched?.preview ? this.escapeHtml(matched.preview) : '';
 
-      const coverHtml = coverUrl
-        ? `<img class="intext-tooltip-cover-img" src="${coverUrl}" alt="${this.escapeHtml(mappedBookName)}" />`
-        : `<div class="intext-tooltip-fallback ${typeClass}">${this.ICONS.book}</div>`;
+      // Stocker toutes les données dans des data-attributes sur la pastille
+      // Le tooltip global est rendu via le portal JS (initGlobalTooltip)
+      const coverData = coverUrl ? `data-cover="${coverUrl}"` : '';
 
-      const authorHtml = author ? `<span class="intext-tooltip-author">${this.escapeHtml(author)}</span>` : '';
-      const snippetHtml = preview ? `<div class="intext-tooltip-snippet">${preview}</div>` : '';
-
-      return `
-        <span class="intext-source-pill" tabindex="0">
-          <span class="intext-source-icon">${this.ICONS.book}</span>
-          <div class="source-tooltip-card intext-tooltip">
-            <div class="intext-tooltip-cover-wrap">
-              ${coverHtml}
-            </div>
-            <div class="intext-tooltip-content">
-              <div class="intext-tooltip-header">
-                <span class="tooltip-badge ${typeClass}">${typeLabel}</span>
-                ${authorHtml}
-              </div>
-              <strong class="intext-tooltip-title">${this.escapeHtml(displayTitle)}</strong>
-              ${snippetHtml}
-            </div>
-          </div>
-        </span>
-      `;
+      return `<span class="intext-source-pill" tabindex="0"
+        data-type="${typeClass}"
+        data-title="${this.escapeHtml(displayTitle)}"
+        data-author="${this.escapeHtml(author)}"
+        data-label="${typeLabel}"
+        data-preview="${preview}"
+        ${coverData}
+      >${this.ICONS.book}</span>`;
     });
-
-    // Nettoyer la ponctuation orpheline autour des pastilles de source
-    res = res.replace(/,\s*(<span class="intext-source-pill")/g, ' $1');
-    res = res.replace(/(<span class="intext-source-pill"[^>]*>[\s\S]*?<\/span>)\s*([.,;])\s*\n\s*\./g, '$1$2');
-    res = res.replace(/(<span class="intext-source-pill"[^>]*>[\s\S]*?<\/span>)\s*\n\s*\./g, '$1.');
-    res = res.replace(/(<span class="intext-source-pill"[^>]*>[\s\S]*?<\/span>)\s*\.\s*\n\s*\./g, '$1.');
 
     return res;
   },
