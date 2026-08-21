@@ -750,11 +750,23 @@ const AIStudyView = {
         this.activeRotatingTimer = setInterval(() => {
           msgIdx++;
           if (noticeTextEl) {
-            noticeTextEl.classList.add('fading');
+            // 1. Sortie vers la gauche (x: -20px, scale: 0.98, opacity: 0)
+            noticeTextEl.classList.add('shared-axis-exit');
+            
             setTimeout(() => {
+              // 2. Changement de texte et positionnement instantané à droite (x: +24px, opacity: 0)
               noticeTextEl.textContent = rotatingMessages[msgIdx % rotatingMessages.length];
-              noticeTextEl.classList.remove('fading');
-            }, 350);
+              noticeTextEl.classList.remove('shared-axis-exit');
+              noticeTextEl.classList.add('shared-axis-enter-from-right');
+              
+              // Forcer le reflow du DOM
+              void noticeTextEl.offsetWidth;
+              
+              // 3. Glissement fluide de droite à centre (x: 0, scale: 1, opacity: 1)
+              requestAnimationFrame(() => {
+                noticeTextEl.classList.remove('shared-axis-enter-from-right');
+              });
+            }, 360);
           }
         }, 16000);
       }

@@ -5604,16 +5604,27 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   color: var(--accent-orange);
 }
 
+/* SmoothUI Shared Axis X : Transition de phrase horizontale Material */
 .step-notice-text {
   display: inline-block;
-  transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   opacity: 1;
-  transform: translateY(0);
+  transform: translateX(0) scale(1);
+  transition: opacity 0.5s cubic-bezier(0.2, 0, 0, 1), transform 0.5s cubic-bezier(0.2, 0, 0, 1);
+  will-change: transform, opacity;
 }
 
-.step-notice-text.fading {
+/* Phrase sortante : glisse vers la gauche */
+.step-notice-text.shared-axis-exit {
   opacity: 0;
-  transform: translateY(-3px);
+  transform: translateX(-20px) scale(0.98);
+  transition: opacity 0.36s cubic-bezier(0.4, 0, 1, 1), transform 0.36s cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* Phrase entrante : démarre instantanément à droite */
+.step-notice-text.shared-axis-enter-from-right {
+  opacity: 0 !important;
+  transform: translateX(24px) scale(0.98) !important;
+  transition: none !important;
 }
 
 /* SmoothUI Shine-Text effect : balayage lumineux fluide d'un faisceau net */
@@ -5621,7 +5632,6 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   --base-color: #ea580c;
   --shine-color: #ffffff;
   
-  display: inline-block;
   background-image: linear-gradient(
     110deg,
     var(--base-color) 40%,
@@ -5635,7 +5645,7 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   color: transparent;
   animation: shine-text-sweep 2.8s linear infinite;
   font-weight: 500;
-  will-change: background-position;
+  will-change: background-position, transform, opacity;
 }
 
 @keyframes shine-text-sweep {
