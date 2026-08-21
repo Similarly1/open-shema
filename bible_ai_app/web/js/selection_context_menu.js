@@ -236,6 +236,13 @@ const SelectionContextMenu = {
       previewEl.textContent = text.length > 55 ? text.slice(0, 52) + '...' : text;
     }
 
+    // Détecter si le texte est en langue étrangère (non français)
+    const translateBtn = document.getElementById('scm-btn-translate');
+    const isFr = this.isLikelyFrench(text);
+    if (translateBtn) {
+      translateBtn.style.display = isFr ? 'none' : 'flex';
+    }
+
     // Détecter si la sélection contient ou est une référence biblique
     const verseBtn = document.getElementById('scm-btn-open-verse');
     const verseLabel = document.getElementById('scm-open-verse-label');
@@ -273,6 +280,76 @@ const SelectionContextMenu = {
     if (this.menuEl) {
       this.menuEl.classList.add('hidden');
     }
+  },
+
+  isLikelyFrench(text) {
+    if (!text || text.trim().length === 0) return true;
+    const raw = text.trim();
+
+    // 1. Alphabets non-latins (Grec, Hébreu, Cyrillique, etc.) -> Langue étrangère
+    if (/[\u0370-\u03FF\u1F00-\u1FFF]/.test(raw)) return false; // Grec
+    if (/[\u0590-\u05FF]/.test(raw)) return false; // Hébreu
+    if (/[\u0400-\u04FF]/.test(raw)) return false; // Cyrillique
+
+    // 2. Contractions anglaises caractéristiques
+    if (/\b(it's|don't|can't|won't|doesn't|didn't|i'm|you're|they're|we're|i've|you've|they've|i'll|you'll|he'll|she'll|they'll|isn't|aren't|wasn't|weren't|hasn't|haven't|hadn't|shouldn't|wouldn't|couldn't)\b/i.test(raw)) {
+      return false;
+    }
+
+    // 3. Contractions françaises caractéristiques
+    const frContractionsCount = (raw.match(/\b(l'|d'|c'|qu'|j'|n'|s'|m'|t'|jusqu'|lorsqu'|puisqu')/gi) || []).length;
+
+    // 4. Lettres accentuées typiquement françaises
+    const frAccentsCount = (raw.match(/[éèêëàâùûôîïçœæÉÈÊËÀÂÙÛÔÎÏÇŒÆ]/g) || []).length;
+
+    // 5. Analyse lexicale des mots
+    const words = raw.toLowerCase().replace(/['’\-]/g, ' ').replace(/[^\p{L}\s]/gu, ' ').split(/\s+/).filter(w => w.length > 0);
+    if (words.length === 0) return true;
+
+    const frStopwords = new Set([
+      'le', 'la', 'les', 'un', 'une', 'des', 'du', 'de', 'et', 'est', 'en', 'que', 'qui', 'dans', 'pour', 'pas', 'sur',
+      'ce', 'cette', 'ces', 'cet', 'il', 'elle', 'ils', 'elles', 'nous', 'vous', 'on', 'avec', 'sont', 'ont', 'plus',
+      'par', 'au', 'aux', 'mais', 'ou', 'où', 'donc', 'or', 'ni', 'car', 'son', 'sa', 'ses', 'leur', 'leurs', 'comme',
+      'tout', 'tous', 'toute', 'toutes', 'fait', 'faire', 'dit', 'dire', 'aussi', 'bien', 'peut', 'peuvent', 'être',
+      'avoir', 'notre', 'votre', 'mon', 'ma', 'mes', 'ton', 'ta', 'tes', 'lui', 'eux', 'moi', 'toi', 'ici', 'là',
+      'très', 'sans', 'sous', 'vers', 'chez', 'ainsi', 'encore', 'selon', 'dont', 'quand', 'pourquoi', 'comment',
+      'autre', 'autres', 'même', 'mêmes', 'si', 'non', 'oui', 'rien', 'jamais', 'toujours', 'après', 'avant',
+      'dieu', 'seigneur', 'bible', 'verset', 'foi', 'grâce', 'péchés', 'vérité', 'christ', 'eglise'
+    ]);
+
+    const enStopwords = new Set([
+      'the', 'and', 'is', 'in', 'that', 'of', 'to', 'it', 'you', 'he', 'she', 'was', 'for', 'on', 'are', 'as', 'with',
+      'his', 'they', 'at', 'be', 'this', 'have', 'from', 'or', 'one', 'had', 'by', 'word', 'but', 'not', 'what', 'all',
+      'were', 'we', 'when', 'your', 'can', 'said', 'there', 'use', 'an', 'each', 'which', 'she', 'do', 'how', 'their',
+      'if', 'will', 'up', 'other', 'about', 'out', 'many', 'then', 'them', 'these', 'so', 'some', 'her', 'would',
+      'make', 'like', 'him', 'into', 'time', 'has', 'look', 'two', 'more', 'write', 'go', 'see', 'number', 'no',
+      'way', 'could', 'people', 'my', 'than', 'first', 'water', 'been', 'call', 'who', 'oil', 'its', 'now', 'find',
+      'long', 'down', 'day', 'did', 'get', 'come', 'made', 'may', 'part', 'over', 'new', 'sound', 'take', 'only',
+      'little', 'work', 'know', 'place', 'year', 'live', 'me', 'back', 'give', 'most', 'very', 'after', 'thing',
+      'our', 'just', 'name', 'good', 'sentence', 'man', 'think', 'say', 'great', 'where', 'help', 'through', 'much',
+      'before', 'line', 'right', 'too', 'means', 'old', 'any', 'same', 'tell', 'boy', 'follow', 'came', 'want', 'show',
+      'also', 'around', 'farm', 'three', 'small', 'set', 'put', 'end', 'does', 'another', 'well', 'large', 'must', 'big',
+      'even', 'such', 'because', 'turn', 'here', 'why', 'ask', 'went', 'men', 'read', 'need', 'land', 'different', 'home',
+      'us', 'move', 'try', 'kind', 'hand', 'picture', 'again', 'change', 'off', 'play', 'spell', 'air', 'away', 'animal',
+      'house', 'point', 'page', 'letter', 'mother', 'answer', 'found', 'study', 'still', 'learn', 'should', 'america', 'world',
+      'anger', 'god', 'lord', 'christ', 'sin', 'grace', 'faith', 'truth', 'bible', 'apostle', 'paul', 'church', 'jesus'
+    ]);
+
+    let frScore = frContractionsCount * 2 + frAccentsCount * 1.5;
+    let enScore = 0;
+
+    for (const w of words) {
+      if (frStopwords.has(w)) frScore += 1.5;
+      if (enStopwords.has(w)) enScore += 1.5;
+    }
+
+    if (words.length <= 2 && frAccentsCount > 0) return true;
+    if (enScore > frScore) return false;
+    if (frScore > enScore) return true;
+    if (frAccentsCount > 0) return true;
+    if (enScore > 0 && frScore === 0) return false;
+
+    return true; // Par défaut considéré comme français pour les cas ambigus
   },
 
   detectScriptureReference(text) {
