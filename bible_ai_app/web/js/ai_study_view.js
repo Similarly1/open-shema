@@ -270,7 +270,7 @@ const AIStudyView = {
     
     // Demander un nouvel ID au backend
     try {
-      this.currentSessionId = await window.API.call('create_ai_session', { mode: this.currentMode });
+      this.currentSessionId = await API.call('create_ai_session', { mode: this.currentMode });
     } catch (e) {
       console.error("Erreur création session:", e);
     }
@@ -281,7 +281,7 @@ const AIStudyView = {
     if (!listEl) return;
     
     try {
-      const sessions = await window.API.call('get_ai_history');
+      const sessions = await API.call('get_ai_history');
       listEl.innerHTML = '';
       
       if (!sessions || sessions.length === 0) {
@@ -324,7 +324,7 @@ const AIStudyView = {
     }
     
     try {
-      const sessionData = await window.API.call('get_ai_session', sessionId);
+      const sessionData = await API.call('get_ai_session', sessionId);
       if (!sessionData) return;
       
       this.currentSessionId = sessionId;
@@ -967,7 +967,7 @@ const AIStudyView = {
     if (!this.currentSessionId) {
       const context = passage ? { bookCode: this.currentBookCode, chapter: this.currentChapter, verse: this.currentVerse } : null;
       try {
-        this.currentSessionId = await window.API.call('create_ai_session', context);
+        this.currentSessionId = await API.call('create_ai_session', context);
       } catch (e) {
         console.error("Erreur création session:", e);
       }
@@ -1080,7 +1080,7 @@ const AIStudyView = {
     this.activeTimeouts = [stepTimeout1, stepTimeout2, stepTimeout3];
 
     try {
-      const response = await window.API.call('ask_study_ai', this.currentMessages, mode, passage, options);
+      const response = await API.call('ask_study_ai', this.currentMessages, mode, passage, options);
       clearInterval(intervalTimer);
       if (this.activeRotatingTimer) clearInterval(this.activeRotatingTimer);
       clearTimeout(stepTimeout1);
@@ -1183,7 +1183,7 @@ const AIStudyView = {
         // Enregistrer la réponse dans l'historique local & backend
         this.currentMessages.push({ role: 'assistant', content: answerText, sources: sourcesDetails });
         if (this.currentSessionId) {
-          window.API.call('save_ai_messages', this.currentSessionId, this.currentMessages, text).then(() => {
+          API.call('save_ai_messages', this.currentSessionId, this.currentMessages, text).then(() => {
             this.loadHistory(); // Rafraichir le titre
           });
         }
@@ -1839,7 +1839,7 @@ const AIStudyView = {
       };
 
       try {
-        await window.API.call('save_note', noteData);
+        await API.call('save_note', noteData);
         if (typeof App !== 'undefined' && App.showToast) {
           App.showToast(`Étude enregistrée dans vos Notes : « ${noteTitle} »`);
         }
@@ -1855,7 +1855,7 @@ const AIStudyView = {
     const pinConclusionBtn = messageEl.querySelector('.btn-pin-conclusion');
     pinConclusionBtn?.addEventListener('click', async () => {
       try {
-        const result = await window.API.call('pin_ai_conclusion', this.currentSessionId, rawAnswer);
+        const result = await API.call('pin_ai_conclusion', this.currentSessionId, rawAnswer);
         if (result && result.success) {
           pinConclusionBtn.classList.add('saved');
           const lbl = pinConclusionBtn.querySelector('span');
