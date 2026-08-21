@@ -5341,13 +5341,12 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   scroll-behavior: smooth;
 }
 
-/* Bulle de bienvenue */
+/* Bulle de bienvenue (Pas de double encadré) */
 .welcome-message {
-  border: 1px solid var(--border-color) !important;
-  background: var(--bg-card) !important;
-  border-radius: 12px;
-  padding: 16px 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
 }
 
 .welcome-message .welcome-title {
@@ -5453,7 +5452,7 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
 }
 
 /* ==========================================================================
-   SmoothUI ai-reasoning & ai-loader (Sobre & Textuel)
+   SmoothUI ai-reasoning & ai-loader (Sobre & Textuel avec Avertissement)
    ========================================================================== */
 
 .ai-reasoning-box {
@@ -5528,7 +5527,7 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
 .ai-reasoning-steps-list {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
   margin-top: 8px;
   padding-top: 8px;
   border-top: 1px dashed var(--border-color);
@@ -5536,7 +5535,7 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
 
 .reasoning-step {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 7px;
   font-size: 11.5px;
   color: var(--text-secondary);
@@ -5549,6 +5548,7 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   border-radius: 50%;
   background-color: var(--text-muted);
   flex-shrink: 0;
+  margin-top: 5px;
 }
 
 .reasoning-step.pending {
@@ -5574,6 +5574,27 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   background-color: var(--accent-green);
 }
 
+.step-text-container {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.step-time-notice {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--accent-orange);
+  background: rgba(234, 88, 12, 0.08);
+  border: 1px solid rgba(234, 88, 12, 0.22);
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
 .ai-reasoning-details {
   margin-top: 6px;
   padding-top: 6px;
@@ -5589,139 +5610,229 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
 }
 
 /* ==========================================================================
-   Sources Mobilisées & Infobulles Riches au Survol (Sans Reranking)
+   SmoothUI ai-sources : Pile de couvertures & Accordéon dépliable
    ========================================================================== */
 
-.ai-sources-compact-bar {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 12px;
-  padding: 6px 10px;
+.ai-sources-component {
+  margin-bottom: 14px;
   background: var(--bg-subtle);
   border: 1px solid var(--border-color);
-  border-radius: 6px;
-  font-size: 11.5px;
+  border-radius: 8px;
+  padding: 8px 12px;
+  transition: border-color 0.2s ease;
 }
 
-.sources-label {
-  display: inline-flex;
+.ai-sources-component:hover {
+  border-color: var(--border-hover, var(--accent-blue));
+}
+
+.ai-sources-header {
+  display: flex;
   align-items: center;
-  gap: 5px;
-  color: var(--text-muted);
-  font-weight: 600;
-  margin-right: 4px;
-}
-
-.sources-icon {
-  display: inline-flex;
-}
-
-.sources-pills-list {
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-
-/* Pilule de source avec infobulle positionnée */
-.source-hover-pill {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 7px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  font-size: 11px;
-  color: var(--text-secondary);
+  gap: 10px;
   cursor: pointer;
   user-select: none;
-  transition: var(--transition-fast);
 }
 
-.source-hover-pill:hover {
-  border-color: var(--accent-blue);
-  color: var(--text-primary);
-  background: var(--bg-hover);
+.sources-stack-group {
+  display: flex;
+  align-items: center;
 }
 
-.pill-type-icon {
+.source-stack-avatar {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 30px;
+  border-radius: 3px;
+  margin-right: -8px;
+  border: 1.5px solid var(--bg-card);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), margin 0.2s ease;
+  overflow: hidden;
+  background-color: var(--bg-hover);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.sources-stack-group:hover .source-stack-avatar {
+  transform: translateY(-2px) scale(1.08);
+  margin-right: -2px;
+}
+
+.source-stack-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.source-stack-avatar.monogram {
+  height: 24px;
+  width: 24px;
+  border-radius: 5px;
+  font-size: 11px;
+}
+
+.source-stack-avatar.monogram.bible { background: rgba(2, 132, 199, 0.15); color: var(--accent-blue); }
+.source-stack-avatar.monogram.comm { background: rgba(234, 88, 12, 0.15); color: var(--accent-orange); }
+.source-stack-avatar.monogram.dict { background: rgba(124, 58, 237, 0.15); color: var(--accent-purple); }
+.source-stack-avatar.monogram.theology { background: rgba(15, 118, 110, 0.15); color: #2DD4BF; }
+.source-stack-avatar.monogram.notes { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
+
+.source-stack-more {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-left: 12px;
+}
+
+.sources-count-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.sources-toggle-chevron {
+  font-size: 11px;
   color: var(--text-muted);
 }
 
-.source-hover-pill:hover .pill-type-icon {
-  color: var(--accent-blue);
+.ai-sources-dropdown {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border-color);
+  transition: all 0.2s ease;
 }
 
-/* Infobulle flottante au survol (Tooltip) */
-.source-tooltip-card {
-  position: absolute;
-  bottom: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%) translateY(4px);
-  width: 260px;
+.ai-sources-dropdown.hidden {
+  display: none;
+}
+
+.sources-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 8px;
+}
+
+.source-detail-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 10px 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  z-index: 100;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+  border-radius: 6px;
+  transition: all 0.15s ease;
 }
 
-.source-hover-pill:hover .source-tooltip-card,
-.source-hover-pill:focus .source-tooltip-card {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(0);
+.source-detail-card:hover {
+  border-color: var(--accent-blue);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-.tooltip-header {
+.source-card-cover-wrap {
+  width: 30px;
+  height: 42px;
+  border-radius: 3px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.source-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.source-card-fallback-cover {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 12px;
+}
+
+.source-card-fallback-cover.bible { color: var(--accent-blue); background: rgba(2, 132, 199, 0.1); }
+.source-card-fallback-cover.comm { color: var(--accent-orange); background: rgba(234, 88, 12, 0.1); }
+.source-card-fallback-cover.dict { color: var(--accent-purple); background: rgba(124, 58, 237, 0.1); }
+.source-card-fallback-cover.theology { color: #2DD4BF; background: rgba(15, 118, 110, 0.1); }
+.source-card-fallback-cover.notes { color: var(--accent-green); background: rgba(16, 185, 129, 0.1); }
+
+.source-card-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.source-card-header {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 6px;
 }
 
-.tooltip-badge {
+.source-type-pill {
   font-size: 9px;
   font-weight: 700;
   padding: 1px 5px;
   border-radius: 3px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
+  flex-shrink: 0;
 }
 
-.tooltip-badge.bible { background: rgba(2, 132, 199, 0.15); color: var(--accent-blue); }
-.tooltip-badge.comm { background: rgba(234, 88, 12, 0.15); color: var(--accent-orange); }
-.tooltip-badge.dict { background: rgba(124, 58, 237, 0.15); color: var(--accent-purple); }
-.tooltip-badge.theology { background: rgba(15, 118, 110, 0.15); color: #2DD4BF; }
-.tooltip-badge.notes { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
+.source-type-pill.bible { background: rgba(2, 132, 199, 0.15); color: var(--accent-blue); }
+.source-type-pill.comm { background: rgba(234, 88, 12, 0.15); color: var(--accent-orange); }
+.source-type-pill.dict { background: rgba(124, 58, 237, 0.15); color: var(--accent-purple); }
+.source-type-pill.theology { background: rgba(15, 118, 110, 0.15); color: #2DD4BF; }
+.source-type-pill.notes { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
 
-.tooltip-title {
+.source-card-title {
   font-size: 11.5px;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-weight: 600;
 }
 
-.tooltip-body {
+.source-card-snippet {
   font-size: 11px;
   color: var(--text-secondary);
-  line-height: 1.45;
-  max-height: 80px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  border-top: 1px dashed var(--border-subtle);
-  padding-top: 5px;
+}
+
+/* ==========================================================================
+   SmoothUI ai-response : Curseur & Animation de Streaming
+   ========================================================================== */
+
+.ai-streaming-cursor {
+  display: inline-block;
+  width: 5px;
+  height: 13px;
+  background-color: var(--accent-orange);
+  margin-left: 3px;
+  vertical-align: baseline;
+  border-radius: 1.5px;
+  animation: streamingCursorBlink 0.8s infinite ease-in-out;
+}
+
+@keyframes streamingCursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 /* ==========================================================================

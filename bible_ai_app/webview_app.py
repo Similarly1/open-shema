@@ -1311,9 +1311,12 @@ class BibleAppApi:
             except Exception as e:
                 print(f"[ask_study_ai] Reranking bypass : {e}")
 
-        # Dédoublonnage et structuration riche des sources mobilisées (avec infobulles)
+        # Dédoublonnage et structuration riche des sources mobilisées (avec couvertures et infobulles)
         dedup_sources = []
         seen_source_keys = set()
+        books_registry = load_books_metadata()
+        covers_dir = os.path.join(current_dir, "data", "covers")
+
         for chunk in context_chunks:
             meta = chunk.get("metadata") if isinstance(chunk, dict) else {}
             s_name = meta.get("name") or chunk.get("id") or "Document"
@@ -1324,10 +1327,34 @@ class BibleAppApi:
                 text_snippet = chunk.get("text", "") if isinstance(chunk, dict) else str(chunk)
                 # Nettoyer l'en-tête pour l'infobulle
                 clean_snippet = re.sub(r'^###\s+[^\n]+\n', '', text_snippet).strip()[:240]
+                
+                # Chercher une image de couverture correspondante
+                cover_data_url = None
+                
+                # 1. Par correspondance dans le registre des livres
+                for reg_k, reg_v in books_registry.items():
+                    if reg_k.lower() in s_name.lower() or s_name.lower() in reg_k.lower() or (reg_v.get("title") and reg_v.get("title").lower() in s_name.lower()):
+                        cov_p = reg_v.get("cover_path") or reg_v.get("cover_url")
+                        if cov_p:
+                            cover_data_url = get_cover_data_url(cov_p)
+                            break
+                            
+                # 2. Si non trouvé, chercher dans le dossier covers
+                if not cover_data_url and os.path.exists(covers_dir):
+                    clean_s = re.sub(r'[^a-zA-Z0-9]', '', s_name).lower()
+                    for fn in os.listdir(covers_dir):
+                        clean_fn = re.sub(r'[^a-zA-Z0-9]', '', fn).lower()
+                        if len(clean_s) >= 4 and (clean_s in clean_fn or clean_fn in clean_s):
+                            cov_p = os.path.join(covers_dir, fn)
+                            cover_data_url = get_cover_data_url(cov_p)
+                            if cover_data_url:
+                                break
+
                 dedup_sources.append({
                     "title": s_name,
                     "type": s_type,
-                    "preview": clean_snippet
+                    "preview": clean_snippet,
+                    "cover_url": cover_data_url
                 })
 
         sources_used = [s["title"] for s in dedup_sources]

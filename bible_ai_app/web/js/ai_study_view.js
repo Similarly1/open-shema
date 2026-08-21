@@ -539,7 +539,16 @@ const AIStudyView = {
             <div class="reasoning-step step-1 active"><span class="step-bullet"></span><span>Analyse de l'intention et formulation des requêtes documentaires</span></div>
             <div class="reasoning-step step-2 pending"><span class="step-bullet"></span><span>Exploration du corpus documentaire (Bibles, Théologie, Dictionnaires, Notes)</span></div>
             <div class="reasoning-step step-3 pending"><span class="step-bullet"></span><span>Sélection et ordonnancement sémantique des extraits pertinents</span></div>
-            <div class="reasoning-step step-4 pending"><span class="step-bullet"></span><span>Synthèse doctrinale et rédaction structurée avec ${this.escapeHtml(options.model)}</span></div>
+            <div class="reasoning-step step-4 pending">
+              <span class="step-bullet"></span>
+              <div class="step-text-container">
+                <span class="step-label">Synthèse théologique & doctrinale avec ${this.escapeHtml(options.model)}</span>
+                <div class="step-time-notice">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <span>Analyse et recoupement des extraits de votre bibliothèque (~1 à 2 min). Ce délai est normal pour une synthèse rigoureuse.</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="ai-answer-body"></div>
@@ -617,10 +626,10 @@ const AIStudyView = {
         });
       }
 
-      // 2. Sources mobilisées avec infobulles riches au survol (sans reranking)
+      // 2. SmoothUI ai-sources : Pile de couvertures et cartes détaillées
       let sourcesComponentHtml = '';
       if (sourcesDetails && sourcesDetails.length > 0) {
-        sourcesComponentHtml = this.buildSourcesWithTooltipsHtml(sourcesDetails);
+        sourcesComponentHtml = this.buildSourcesSmoothUiHtml(sourcesDetails);
       } else if (sourcesUsed && sourcesUsed.length > 0) {
         sourcesComponentHtml = this.buildSourcesSimpleHtml(sourcesUsed);
       }
@@ -656,10 +665,22 @@ const AIStudyView = {
 
       const answerBodyEl = assistantMsg.querySelector('.ai-answer-body');
       if (answerBodyEl) {
-        answerBodyEl.innerHTML = sourcesComponentHtml + `<div class="ai-markdown-content">${formattedMarkdown}</div>` + footerHtml;
+        answerBodyEl.innerHTML = sourcesComponentHtml + `<div class="ai-markdown-content"></div>` + footerHtml;
+        
+        // Attacher l'accordéon des sources
+        this.attachSourcesAccordion(answerBodyEl);
+
+        // Streaming progressif du texte (SmoothUI ai-response)
+        const markdownContentEl = answerBodyEl.querySelector('.ai-markdown-content');
+        this.streamMarkdownResponse(markdownContentEl, formattedMarkdown, () => {
+          this.attachMessageActions(assistantMsg, answerText, passage, text);
+        });
       }
 
-      this.attachMessageActions(assistantMsg, answerText, passage, text);
+      // 5. Scroll automatique doux vers le DÉBUT de la réponse
+      setTimeout(() => {
+        assistantMsg.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
 
     } catch (e) {
       clearInterval(intervalTimer);
@@ -670,64 +691,138 @@ const AIStudyView = {
       if (answerBodyEl) {
         answerBodyEl.innerHTML = `<p style="color: var(--accent-red); margin-top: 8px;">Une erreur est survenue lors de l'appel à l'assistant IA (${this.escapeHtml(e?.message || e)}).</p>`;
       }
+      setTimeout(() => {
+        assistantMsg.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
     }
-
-    this.chatFlowEl.scrollTop = this.chatFlowEl.scrollHeight;
   },
 
   // =========================================================================
-  // Sources avec Infobulles Riches au Survol (Sans Reranking & Dédoublonnées)
+  // SmoothUI ai-sources : Pile de couvertures et cartes dépliables
   // =========================================================================
 
-  buildSourcesWithTooltipsHtml(sourcesDetails) {
-    // Filtrer toute mention de Reranking
+  getSourceTypeClass(type) {
+    const t = (type || '').toLowerCase();
+    if (t.includes('bible')) return 'bible';
+    if (t.includes('dict')) return 'dict';
+    if (t.includes('comm')) return 'comm';
+    if (t.includes('note')) return 'notes';
+    return 'theology';
+  },
+
+  getSourceTypeLabel(type) {
+    const t = (type || '').toLowerCase();
+    if (t.includes('bible')) return 'Bible';
+    if (t.includes('dict')) return 'Dictionnaire';
+    if (t.includes('comm')) return 'Commentaire';
+    if (t.includes('note')) return 'Notes';
+    return 'Théologie';
+  },
+
+  getSourceIcon(type) {
+    const t = (type || '').toLowerCase();
+    if (t.includes('bible')) return this.ICONS.bible;
+    if (t.includes('dict')) return this.ICONS.dict;
+    if (t.includes('comm')) return this.ICONS.book;
+    if (t.includes('note')) return this.ICONS.notes;
+    return this.ICONS.book;
+  },
+
+  buildSourcesSmoothUiHtml(sourcesDetails) {
     const validSources = sourcesDetails.filter(s => !s.title.toLowerCase().includes('rerank') && !s.type.toLowerCase().includes('rerank'));
     if (validSources.length === 0) return '';
 
-    const sourcePills = validSources.map(s => {
-      let typeClass = 'theology';
-      let typeLabel = s.type || 'Ouvrage';
-      let icon = this.ICONS.book;
+    // 1. Pile d'avatars de couvertures
+    const avatarsHtml = validSources.slice(0, 7).map((s, idx) => {
+      const title = this.escapeHtml(s.title);
+      const coverUrl = s.cover_url;
+      const typeClass = this.getSourceTypeClass(s.type);
+      const icon = this.getSourceIcon(s.type);
+      const zIndex = validSources.length - idx;
 
-      const tLower = (s.type || '').toLowerCase();
-      const titleLower = (s.title || '').toLowerCase();
-
-      if (tLower.includes('bible') || titleLower.includes('bible')) {
-        typeClass = 'bible';
-        typeLabel = 'Bible';
-        icon = this.ICONS.bible;
-      } else if (tLower.includes('dict') || titleLower.includes('dict')) {
-        typeClass = 'dict';
-        typeLabel = 'Dictionnaire';
-        icon = this.ICONS.dict;
-      } else if (tLower.includes('comm') || titleLower.includes('comm')) {
-        typeClass = 'comm';
-        typeLabel = 'Commentaire';
-        icon = this.ICONS.book;
-      } else if (tLower.includes('note') || titleLower.includes('note')) {
-        typeClass = 'notes';
-        typeLabel = 'Note';
-        icon = this.ICONS.notes;
+      if (coverUrl) {
+        return `
+          <div class="source-stack-avatar with-cover" style="z-index: ${zIndex};" title="${title}">
+            <img class="source-stack-cover-img" src="${coverUrl}" alt="${title}" />
+          </div>
+        `;
+      } else {
+        return `
+          <div class="source-stack-avatar monogram ${typeClass}" style="z-index: ${zIndex};" title="${title}">
+            <span>${icon}</span>
+          </div>
+        `;
       }
+    }).join('');
 
-      const previewSnippet = s.preview ? this.escapeHtml(s.preview) : 'Ouvrage consulté pour cette analyse.';
+    const moreCount = validSources.length > 7 ? `<span class="source-stack-more">+${validSources.length - 7}</span>` : '';
+
+    // 2. Grille détaillée de cartes de sources (accordéon)
+    const cardsHtml = validSources.map(s => {
+      const title = this.escapeHtml(s.title);
+      const typeClass = this.getSourceTypeClass(s.type);
+      const typeLabel = this.getSourceTypeLabel(s.type);
+      const coverUrl = s.cover_url;
+      const preview = s.preview ? this.escapeHtml(s.preview) : 'Ouvrage et extraits analysés pour cette réponse.';
+      const icon = this.getSourceIcon(s.type);
+
+      const coverHtml = coverUrl
+        ? `<img class="source-card-img" src="${coverUrl}" alt="${title}" />`
+        : `<div class="source-card-fallback-cover ${typeClass}">${icon}</div>`;
 
       return `
-        <div class="source-hover-pill ${typeClass}" tabindex="0">
-          <span class="pill-type-icon">${icon}</span>
-          <span class="pill-name">${this.escapeHtml(s.title)}</span>
-          
-          <!-- Infobulle flottante au survol -->
-          <div class="source-tooltip-card">
-            <div class="tooltip-header">
-              <span class="tooltip-badge ${typeClass}">${this.escapeHtml(typeLabel)}</span>
-              <strong class="tooltip-title">${this.escapeHtml(s.title)}</strong>
+        <div class="source-detail-card" tabindex="0" title="${title}">
+          <div class="source-card-cover-wrap">
+            ${coverHtml}
+          </div>
+          <div class="source-card-content">
+            <div class="source-card-header">
+              <span class="source-type-pill ${typeClass}">${typeLabel}</span>
+              <strong class="source-card-title">${title}</strong>
             </div>
-            <div class="tooltip-body">${previewSnippet}</div>
+            <div class="source-card-snippet">${preview}</div>
           </div>
         </div>
       `;
     }).join('');
+
+    return `
+      <div class="ai-sources-component">
+        <div class="ai-sources-header" title="Cliquer pour afficher ou masquer les détails des sources">
+          <div class="sources-stack-group">
+            ${avatarsHtml}
+            ${moreCount}
+          </div>
+          <span class="sources-count-label">Sources consultées (${validSources.length})</span>
+          <span class="sources-toggle-chevron">▾</span>
+        </div>
+        <div class="ai-sources-dropdown">
+          <div class="sources-cards-grid">
+            ${cardsHtml}
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  attachSourcesAccordion(parentEl) {
+    const comp = parentEl.querySelector('.ai-sources-component');
+    if (!comp) return;
+    const header = comp.querySelector('.ai-sources-header');
+    const dropdown = comp.querySelector('.ai-sources-dropdown');
+    const chevron = comp.querySelector('.sources-toggle-chevron');
+
+    header?.addEventListener('click', () => {
+      if (dropdown) {
+        const isHidden = dropdown.classList.toggle('hidden');
+        if (chevron) chevron.textContent = isHidden ? '▸' : '▾';
+      }
+    });
+  },
+
+  buildSourcesSimpleHtml(sourcesList) {
+    const validSources = sourcesList.filter(s => !s.toLowerCase().includes('rerank'));
+    if (validSources.length === 0) return '';
 
     return `
       <div class="ai-sources-compact-bar">
@@ -736,10 +831,46 @@ const AIStudyView = {
           <span>Sources consultées (${validSources.length}) :</span>
         </div>
         <div class="sources-pills-list">
-          ${sourcePills}
+          ${validSources.map(s => `<span class="source-hover-pill theology"><span class="pill-name">${this.escapeHtml(s)}</span></span>`).join('')}
         </div>
       </div>
     `;
+  },
+
+  // =========================================================================
+  // SmoothUI ai-response : Streaming Typewriter Reveal
+  // =========================================================================
+
+  streamMarkdownResponse(containerEl, formattedMarkdown, onComplete) {
+    if (!containerEl) return;
+    
+    // Découpage en blocs HTML ou paragraphes pour un affichage progressif fluide
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = formattedMarkdown;
+    const childNodes = Array.from(tempDiv.childNodes);
+
+    if (childNodes.length <= 1) {
+      containerEl.innerHTML = formattedMarkdown;
+      if (onComplete) onComplete();
+      return;
+    }
+
+    containerEl.innerHTML = '';
+    let nodeIndex = 0;
+
+    const streamNextBlock = () => {
+      if (nodeIndex < childNodes.length) {
+        const node = childNodes[nodeIndex].cloneNode(true);
+        containerEl.appendChild(node);
+        nodeIndex++;
+        // Vitesse fluide et agréable (35ms par paragraphe/élément)
+        setTimeout(streamNextBlock, 35);
+      } else {
+        if (onComplete) onComplete();
+      }
+    };
+
+    streamNextBlock();
   },
 
   buildSourcesSimpleHtml(sourcesList) {
