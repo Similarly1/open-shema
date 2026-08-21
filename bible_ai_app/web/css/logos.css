@@ -3419,32 +3419,36 @@ input:checked + .slider.round:before {
 }
 
 /* ========================================================================= */
-/* INTERLINÉAIRE INVERSÉ (Style Logos Bible Software)                       */
+/* INTERLINÉAIRE INVERSÉ (Style Logos Bible Software - Colonnes Fluides)    */
 /* ========================================================================= */
 .verses-flow.interlinear-mode {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
   padding: 10px 4px;
 }
 
 .verse-item.interlinear-mode {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 12px 14px;
-  background-color: var(--bg-subtle);
-  border: 1px solid var(--border-subtle);
+  gap: 6px;
+  padding: 10px 14px;
+  background-color: var(--bg-subtle, rgba(0, 0, 0, 0.02));
+  border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.05));
+  border-left: 3px solid var(--accent-blue);
   border-radius: 8px;
   transition: var(--transition-fast);
 }
 .verse-item.interlinear-mode:hover {
-  border-color: var(--accent-blue);
-  background-color: var(--bg-hover);
+  border-color: var(--border-color);
+  border-left-color: var(--accent-blue-hover);
+  background-color: var(--bg-card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 .verse-item.interlinear-mode.active-verse {
   background-color: var(--bg-active);
   border-color: var(--accent-blue);
+  border-left-color: var(--accent-blue);
 }
 
 .verse-interlinear-header {
@@ -3453,6 +3457,7 @@ input:checked + .slider.round:before {
   gap: 8px;
   padding-bottom: 4px;
   border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 4px;
 }
 .verse-interlinear-header .verse-num {
   font-size: 13px;
@@ -3472,8 +3477,11 @@ input:checked + .slider.round:before {
 .verse-interlinear-grid {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 8px 10px;
+  align-items: flex-start; /* STRICT TOP ALIGNMENT so French words share the exact same top baseline */
+  row-gap: 14px;
+  column-gap: 4px;
+  padding: 4px 0;
+  line-height: normal;
 }
 
 .interlinear-block {
@@ -3481,62 +3489,137 @@ input:checked + .slider.round:before {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  min-width: 44px;
-  padding: 6px 8px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
+  min-width: fit-content;
+  padding: 3px 5px;
+  background: transparent;
+  border: 1px solid transparent;
   border-radius: 6px;
   cursor: pointer;
   user-select: none;
-  transition: all 0.15s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
+  position: relative;
 }
-.interlinear-block:hover {
+
+/* Hover effect: The smooth pill capsule only lights up when hovering */
+.interlinear-block.has-strong:hover {
+  background: var(--bg-card);
   border-color: var(--accent-blue);
-  background-color: var(--bg-hover);
-  box-shadow: 0 3px 6px -1px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 3px 8px -2px rgba(2, 132, 199, 0.18);
   transform: translateY(-2px);
+  z-index: 2;
 }
+
+.interlinear-block.plain-word:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-subtle);
+  transform: translateY(-1px);
+}
+
 .interlinear-block.active {
+  background: var(--bg-active);
   border-color: var(--accent-blue);
-  background-color: var(--bg-active);
+}
+
+.interlinear-block.plain-word {
+  cursor: default;
+}
+
+.interlinear-punct {
+  display: inline-flex;
+  align-items: flex-start;
+  align-self: flex-start;
+  font-family: var(--font-bible, serif);
+  font-size: calc(16px * var(--bible-zoom-scale, 1));
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: 3px 1px;
+  margin-left: -2px;
+  margin-right: 2px;
+  user-select: none;
+  line-height: 1.3;
 }
 
 .interlinear-surface {
-  font-size: calc(14px * var(--bible-zoom-scale, 1));
-  font-weight: 700;
+  font-family: var(--font-bible, serif);
+  font-size: calc(16px * var(--bible-zoom-scale, 1));
+  font-weight: 600;
   color: var(--text-primary);
   text-align: center;
-  line-height: 1.2;
+  line-height: 1.3;
+  min-height: 1.3em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.01em;
 }
+
 .interlinear-lemma {
-  font-family: 'SBL Hebrew', 'SBL Greek', 'Ezra SIL', 'Times New Roman', serif;
+  font-family: 'SBL Hebrew', 'SBL Greek', 'Ezra SIL', 'Cardo', 'Times New Roman', serif;
   font-size: calc(15px * var(--bible-zoom-scale, 1));
-  font-weight: 600;
+  font-weight: 500;
   color: #1D4ED8;
-  margin-top: 4px;
+  margin-top: 3px;
   text-align: center;
   direction: auto;
-  line-height: 1.2;
+  line-height: 1.25;
+  min-height: 1.25em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
 }
+
+body.theme-light .interlinear-lemma {
+  color: #1D4ED8;
+}
+body.theme-dark .interlinear-lemma {
+  color: #60A5FA;
+}
+body.palette-dark-warm .interlinear-lemma {
+  color: #FBBF24;
+}
+
 .interlinear-translit {
+  font-family: var(--font-ui, sans-serif);
   font-size: calc(11px * var(--bible-zoom-scale, 1));
   font-style: italic;
   color: var(--text-secondary);
   margin-top: 2px;
   text-align: center;
-  line-height: 1.1;
+  line-height: 1.2;
+  opacity: 0.85;
 }
+
 .interlinear-strong {
-  font-size: calc(10px * var(--bible-zoom-scale, 1));
+  font-family: var(--font-ui, sans-serif);
+  font-size: calc(9.5px * var(--bible-zoom-scale, 1));
   font-weight: 700;
-  color: #7C3AED;
-  background: rgba(124, 58, 237, 0.12);
-  border: 1px solid rgba(124, 58, 237, 0.25);
+  color: var(--accent-purple);
+  background: rgba(124, 58, 237, 0.08);
+  border: 1px solid rgba(124, 58, 237, 0.2);
   border-radius: 3px;
   padding: 1px 4px;
   margin-top: 3px;
-  line-height: 1;
+  line-height: 1.1;
+  letter-spacing: 0.03em;
+  transition: all 0.15s ease;
+}
+
+body.theme-light .interlinear-strong {
+  color: #6D28D9;
+  background: #EDE9FE;
+  border-color: #DDD6FE;
+}
+
+body.theme-dark .interlinear-strong {
+  color: #C4B5FD;
+  background: rgba(167, 139, 250, 0.15);
+  border-color: rgba(167, 139, 250, 0.3);
+}
+
+.interlinear-block:hover .interlinear-strong {
+  border-color: var(--accent-purple);
+  box-shadow: 0 1px 3px rgba(124, 58, 237, 0.2);
 }
 
 /* Popover Options d'Affichage */

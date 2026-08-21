@@ -120,7 +120,7 @@ def parse_reverse_interlinear_verse(v_raw: str) -> List[Dict[str, Any]]:
             clean_t = re.sub(r'<note[^>]*>.*?</note>', '', tok, flags=re.I)
             clean_t = re.sub(r'<[^>]+>', '', clean_t).strip()
             for w in clean_t.split():
-                clean_w = w.strip(" ,;:.?!«»()\"'’")
+                clean_w = w.strip(" ,;:.?!«»()\"'’•—–")
                 if clean_w:
                     words_data.append({
                         "surface": w,

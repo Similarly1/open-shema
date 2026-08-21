@@ -3694,25 +3694,42 @@ const BibleReader = {
           vSpan.className = 'verse-item interlinear-mode';
           let wordsHtml = '';
           v.words.forEach(w => {
+            let surf = (w.surface || '').trim();
+            if (!surf) return;
+
+            // Ignorer les puces ou tirets isolés résiduels du balisage XML
+            if (/^[•—–]$/.test(surf)) return;
+
+            // Ponctuation pure : intégration sans créer de colonne vide
+            const isPunct = /^[.,;:!?«»"()\[\]]+$/.test(surf);
+            if (isPunct) {
+              wordsHtml += `<span class="interlinear-punct">${surf}</span>`;
+              return;
+            }
+
             const showSurf = this.interlinearLayers.surface;
+            const hasStrong = !!w.strong;
             const showOrig = this.interlinearLayers.orig && w.orig && w.orig !== w.surface;
             const showTrans = this.interlinearLayers.translit && w.translit;
             const showStrong = this.interlinearLayers.strong && w.strong;
 
-            let surf = w.surface || '';
+            let displaySurf = surf;
             let isItalic = false;
             if (this.bracketsMode === 'italic') {
-              if (surf.includes('[') || surf.includes(']')) {
-                surf = `<em>${surf.replace(/[\[\]]/g, '')}</em>`;
+              if (displaySurf.includes('[') || displaySurf.includes(']')) {
+                displaySurf = `<em>${displaySurf.replace(/[\[\]]/g, '')}</em>`;
                 isItalic = true;
               }
             } else if (this.bracketsMode === 'plain') {
-              surf = surf.replace(/[\[\]]/g, '');
+              displaySurf = displaySurf.replace(/[\[\]]/g, '');
             }
 
+            const blockClass = hasStrong ? 'interlinear-block has-strong' : 'interlinear-block plain-word';
+            const italicClass = isItalic ? ' bracket-interpolated-italic' : '';
+
             wordsHtml += `
-              <div class="interlinear-block ${isItalic ? 'bracket-interpolated-italic' : ''}" data-strong="${w.strong || ''}" data-word="${w.orig || w.surface}" data-surface="${w.surface}" title="${w.morph || ''}">
-                ${showSurf ? `<span class="interlinear-surface">${surf}</span>` : ''}
+              <div class="${blockClass}${italicClass}" data-strong="${w.strong || ''}" data-word="${w.orig || w.surface}" data-surface="${w.surface}" title="${w.morph || (w.strong ? `Strong: ${w.strong}` : '')}">
+                ${showSurf ? `<span class="interlinear-surface">${displaySurf}</span>` : ''}
                 ${showOrig ? `<span class="interlinear-lemma">${w.orig}</span>` : ''}
                 ${showTrans ? `<span class="interlinear-translit">${w.translit}</span>` : ''}
                 ${showStrong ? `<span class="interlinear-strong">${w.strong}</span>` : ''}
@@ -3733,7 +3750,9 @@ const BibleReader = {
             b.addEventListener('click', (e) => {
               e.stopPropagation();
               this.selectVerse(data.book || this.currentBook, data.chapter || this.currentChapter, v.verse, { scroll: false });
-              this.lookupWordInLexicon(b.dataset.word, b.dataset.strong);
+              if (b.dataset.strong) {
+                this.lookupWordInLexicon(b.dataset.word, b.dataset.strong);
+              }
             });
             b.addEventListener('dblclick', (e) => {
               e.stopPropagation();
