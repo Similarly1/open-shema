@@ -1,5 +1,6 @@
 /**
- * AI Study View Controller — Open Shema (שְׁמַع)
+ * AI Study View Controller — Open Shema
+ * Module d'interface pour l'étude théologique et biblique assistée par IA.
  * Version sobre, épurée, sans émojis, avec composants SmoothUI raffinés :
  * - Mode Automatique intelligent (Auto) & modes spécialisés
  * - Suggestions d'étude escamotables (affichées au début, masquées par défaut après envoi)
@@ -1048,7 +1049,7 @@ const AIStudyView = {
       NodeFilter.SHOW_TEXT,
       {
         acceptNode: (node) => {
-          if (node.parentElement?.closest('pre, code, .intext-source-pill, .theol-inline-scripture-ref')) {
+          if (node.parentElement?.closest('pre, code, .intext-source-pill, .theol-inline-scripture-ref, .intext-tooltip')) {
             return NodeFilter.FILTER_REJECT;
           }
           if (!node.textContent || !node.textContent.trim()) {
@@ -1098,9 +1099,7 @@ const AIStudyView = {
 
     // Pastilles et badges interactifs inclus dans le défilement fluide
     rootEl.querySelectorAll('.theol-inline-scripture-ref, .intext-source-pill, .intext-source-badge').forEach(pill => {
-      if (!pill.classList.contains('ai-stream-chunk') && !pill.closest('.ai-stream-chunk')) {
-        pill.classList.add('ai-stream-chunk');
-      }
+      pill.classList.add('ai-stream-chunk');
     });
 
     // Blocs majeurs (tableaux, code, séparateurs)
@@ -1194,6 +1193,15 @@ const AIStudyView = {
       codeBlocks.push(`<pre class="ai-code-block"><code>${this.escapeHtml(code.trim())}</code></pre>`);
       return id;
     });
+
+    // 1.1 Raccrocher les lignes composées uniquement de citations [Source] à la fin de la phrase/paragraphe précédent
+    text = text.replace(/([^\n])\n+(\s*(?:\[[A-Za-zÀ-ÿ0-9\s:,'’\.\-–—\(\)\/]+\][\s,;]*)+)(?=\n|$)/g, '$1 $2');
+    text = text.replace(/\]\s*\n+\s*\[/g, '] [');
+    text = text.replace(/\]\s*,\s*\n+\s*\[/g, '], [');
+    text = text.replace(/\]\s*\n+\s*([,.;])/g, ']$1');
+    text = text.replace(/\]\s*([.,;])\s*\n+\s*([A-Za-zÀ-ÿ«»""''])/g, ']$1 $2');
+    text = text.replace(/([A-Za-zÀ-ÿ0-9,;:«»""''\)])\s*\n\s*(\[[A-Za-zÀ-ÿ0-9\s:,'’\.\-–—\(\)\/]+\])/g, '$1 $2');
+    text = text.replace(/(\[[A-Za-zÀ-ÿ0-9\s:,'’\.\-–—\(\)\/]+\])\s*\n\s*([A-Za-zÀ-ÿ0-9«»""''\(])/g, '$1 $2');
 
     // 2. Parseur de tableaux Markdown (| Col 1 | Col 2 |)
     text = text.replace(/(?:^|\n)(\|[^\n]+\|\r?\n\|[-:\s|]+\|\r?\n(?:\|[^\n]+\|\r?\n?)+)/g, (match, tableBlock) => {

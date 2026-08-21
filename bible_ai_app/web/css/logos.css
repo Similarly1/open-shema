@@ -5884,34 +5884,36 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
 .ai-stream-chunk {
   display: inline;
   opacity: 0;
-  filter: blur(8px);
-  transform: translateY(3px);
+  filter: blur(2.5px);
+  transform: translateY(2px);
+  transition: opacity 0.28s cubic-bezier(0.2, 0, 0, 1),
+              filter 0.28s cubic-bezier(0.2, 0, 0, 1),
+              transform 0.28s cubic-bezier(0.2, 0, 0, 1);
+  will-change: opacity, filter, transform;
+}
+
+.ai-stream-chunk.is-visible {
+  opacity: 1;
+  filter: none !important;
+  transform: none !important;
+  will-change: auto !important;
+}
+
+.ai-stream-chunk-block {
+  opacity: 0;
+  filter: blur(2.5px);
+  transform: translateY(4px);
   transition: opacity 0.32s cubic-bezier(0.2, 0, 0, 1),
               filter 0.32s cubic-bezier(0.2, 0, 0, 1),
               transform 0.32s cubic-bezier(0.2, 0, 0, 1);
   will-change: opacity, filter, transform;
 }
 
-.ai-stream-chunk.is-visible {
-  opacity: 1;
-  filter: blur(0px);
-  transform: translateY(0);
-}
-
-.ai-stream-chunk-block {
-  opacity: 0;
-  filter: blur(8px);
-  transform: translateY(6px);
-  transition: opacity 0.38s cubic-bezier(0.2, 0, 0, 1),
-              filter 0.38s cubic-bezier(0.2, 0, 0, 1),
-              transform 0.38s cubic-bezier(0.2, 0, 0, 1);
-  will-change: opacity, filter, transform;
-}
-
 .ai-stream-chunk-block.is-visible {
   opacity: 1;
-  filter: blur(0px);
-  transform: translateY(0);
+  filter: none !important;
+  transform: none !important;
+  will-change: auto !important;
 }
 
 .ai-streaming-cursor {
@@ -6091,10 +6093,11 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
 }
 
 .intext-source-pill:hover,
-.intext-source-pill:focus {
+.intext-source-pill:focus,
+.intext-source-pill:focus-within {
   background: var(--bg-hover);
   border-color: var(--accent-orange);
-  z-index: 9999;
+  z-index: 100000;
 }
 
 .intext-source-icon {
@@ -6213,9 +6216,11 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
 }
 
 .intext-source-pill:hover .intext-tooltip,
-.intext-source-pill:focus .intext-tooltip {
+.intext-source-pill:focus .intext-tooltip,
+.intext-source-pill:focus-within .intext-tooltip {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
   transform: translateY(0);
 }
 
