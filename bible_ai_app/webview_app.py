@@ -41,7 +41,7 @@ from core.config import load_config, save_config
 from core.notes_manager import NotesManager
 from core.maps_manager import MapsManager
 from gui.library_utils import load_books_metadata, save_books_metadata
-
+from core.ai_session_manager import AISessionManager
 
 # Composants inclus dans la sauvegarde complète
 _BACKUP_MANIFEST_VERSION = "1.0"
@@ -1079,10 +1079,28 @@ class BibleAppApi:
             return {"success": False, "error": str(e)}
 
     # =========================================================================
-    # ASSISTANT D'ÉTUDE AVANCÉ
+    # ASSISTANT D'ÉTUDE AVANCÉ & MÉMOIRE (AI_SESSION_MANAGER)
     # =========================================================================
 
-    def ask_study_ai(self, question: str, mode: str = "exegesis", passage_ref: str = "", options: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def get_ai_history(self) -> List[Dict[str, Any]]:
+        return AISessionManager.get_recent_sessions()
+
+    def get_ai_session(self, session_id: str) -> Optional[Dict[str, Any]]:
+        return AISessionManager.get_session(session_id)
+
+    def create_ai_session(self, initial_context: Optional[Dict[str, Any]] = None) -> str:
+        return AISessionManager.create_session(initial_context)
+
+    def save_ai_messages(self, session_id: str, messages: List[Dict[str, Any]], title: Optional[str] = None) -> bool:
+        return AISessionManager.save_messages_to_session(session_id, messages, title)
+        
+    def delete_ai_session(self, session_id: str) -> bool:
+        return AISessionManager.delete_session(session_id)
+
+    def pin_ai_conclusion(self, session_id: str, book_code: str, topic: str, content: str) -> bool:
+        return AISessionManager.pin_conclusion(session_id, book_code, topic, content)
+
+    def ask_study_ai(self, messages_history: list, mode: str = "exegesis", passage_ref: str = "", options: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
         Génère une étude théologique ou exégétique complète avec extraction multi-sources (Bibles, Commentaires, Dicos, Notes),
         options de modèle LLM, et pipeline RAG (Reranking Cross-Encoder CPU / LLM Curateur).
@@ -1111,7 +1129,14 @@ class BibleAppApi:
         detected_mode = "Auto"
         
         # Détection heuristique / sémantique du mode en mode auto
-        q_lower = question.lower()
+        current_question = ""
+        if isinstance(messages_history, list) and len(messages_history) > 0:
+            current_question = messages_history[-1].get("content", "")
+        elif isinstance(messages_history, str):
+            current_question = messages_history
+            messages_history = [{"role": "user", "content": current_question}]
+            
+        q_lower = current_question.lower()
         if mode == "auto":
             if any(k in q_lower for k in ["prêch", "prech", "sermon", "homilét", "homilet", "plan de", "culte", "message pour", "application pastorale"]):
                 detected_mode = "Préparation de prédication"
@@ -1464,12 +1489,29 @@ class BibleAppApi:
         specific_depth = depth_instructions.get(depth_style, depth_instructions["academic"])
         subject_label = passage_ref if (passage_ref and passage_ref.strip()) else "Étude générale"
 
+        # Chargement du profil et de la mémoire
+        user_profile = AISessionManager.get_user_profile()
+        book_code = None
+        if passage_ref and passage_ref.strip():
+            parsed_ref = self.parse_reference(passage_ref)
+            if parsed_ref:
+                book_code = parsed_ref.get("book")
+                
+        active_memories = AISessionManager.get_relevant_memories(book_code) if book_code else []
+        memories_text = ""
+        if active_memories:
+            m_lines = [f"- {m['topic']} : {m['content']}" for m in active_memories]
+            memories_text = "RAPPEL DE VOS CONCLUSIONS PRÉCÉDENTES SUR CE SUJET/LIVRE :\n" + "\n".join(m_lines) + "\n\n"
+
+        if active_mode_key == "sermon" and user_profile.get("custom_sermon_prompt"):
+            specific_instruction = "MODE D'ÉTUDE : PRÉPARATION DE PRÉDICATION (Gabarit personnalisé)\n" + user_profile["custom_sermon_prompt"]
+
         prompt = (
-            f"Rôle : Assistant exégétique, théologique et biblique expert Logos.\n"
+            f"Rôle : Assistant exégétique, théologique et biblique expert.\n"
             f"{specific_instruction}\n"
             f"{specific_depth}\n\n"
-            f"Passage ou sujet : **{subject_label}**\n"
-            f"Question / Demande : {question}\n\n"
+            f"Passage ou sujet : **{subject_label}**\n\n"
+            f"{memories_text}"
             f"========================================================================\n"
             f"CORPUS DOCUMENTAIRE DISPONIBLE (Bibles, Dictionnaires, Ouvrages, Notes) :\n"
             f"========================================================================\n"
@@ -1477,9 +1519,8 @@ class BibleAppApi:
             f"========================================================================\n\n"
             f"CONSIGNES IMPÉRATIVES DE RÉDACTION ET D'ANCRAGE DOCUMENTAIRE :\n"
             f"1. RÈGLE D'OR : Fonde TOUTE ta réponse STRICTEMENT sur les éléments, données historiques et définitions du CORPUS DOCUMENTAIRE fourni ci-dessus.\n"
-            f"2. CITATIONS PAR PARAGRAPHE : À la fin de CHAQUE paragraphe ou sous-partie, indique OBLIGATOIREMENT entre crochets la source biblique ou documentaire précise dont provient l'information (ex: [Dictionnaire Vigouroux : Pharisiens], [Dom Calmet : Sadducéens], [Flavius Josèphe, Ant. XVIII], [Mc 12:18], [Jn 18:36], [Lire et comprendre la Bible]). Ne laisse AUCUN paragraphe sans au moins une citation de source entre crochets.\n"
-            f"3. Utilise des titres de section Markdown hiérarchiques (### Titre) et des tableaux comparatifs Markdown (| Col 1 | Col 2 |) pour synthétiser les points clés.\n"
-            f"4. Soigne la langue française, avec un style élégant, fluide et sans fautes."
+            f"2. CITATIONS PAR PARAGRAPHE : À la fin de CHAQUE paragraphe ou sous-partie, indique OBLIGATOIREMENT entre crochets la source biblique ou documentaire précise dont provient l'information.\n"
+            f"3. Utilise des titres de section Markdown hiérarchiques et soigne la langue française."
         )
 
         try:
@@ -1498,23 +1539,27 @@ class BibleAppApi:
                 api_key = self.config.get("gemini_api_key", "")
                 product_id = None
 
+            # Fenêtre glissante (conserver au max 6 messages + la nouvelle question)
+            chat_context = messages_history[-6:] if isinstance(messages_history, list) else [{"role": "user", "content": current_question}]
+            
+            # Attacher le corpus documentaire au tout dernier message utilisateur
+            last_msg_idx = len(chat_context) - 1
+            if last_msg_idx >= 0 and chat_context[last_msg_idx]["role"] == "user":
+                chat_context[last_msg_idx]["content"] = (
+                    f"Contexte documentaire pour cette requête :\n"
+                    f"{assembled_context}\n\n"
+                    f"Ma requête : {chat_context[last_msg_idx]['content']}"
+                )
+
             if api_key:
                 client = LLMClient(api_key=api_key, model=selected_model, provider=provider, product_id=product_id)
-                full_system_prompt = (
-                    f"Rôle : Assistant exégétique, théologique et biblique expert Logos.\n"
-                    f"{specific_instruction}\n"
-                    f"{specific_depth}\n\n"
-                    f"CONSIGNES IMPÉRATIVES D'ANCRAGE DOCUMENTAIRE :\n"
-                    f"1. Fonde TOUTE ta synthèse STRICTEMENT sur le corpus documentaire fourni (Dictionnaires Vigouroux/Calmet, Ouvrages de théologie, Bibles, Commentaires, Notes).\n"
-                    f"2. CITATIONS PAR PARAGRAPHE : À la fin de CHAQUE paragraphe ou affirmation clé, indique OBLIGATOIREMENT entre crochets la source précise correspondante (ex: [Dictionnaire Vigouroux : Pharisiens], [Dom Calmet : Sadducéens], [Flavius Josèphe, Ant. XVIII], [Mc 12:18], [Jn 18:36], [Lire et comprendre la Bible]).\n"
-                    f"3. Ne laisse AUCUN paragraphe sans au moins une citation de source entre crochets [Source].\n"
-                    f"4. Utilise des tableaux comparatifs Markdown (| Col 1 | Col 2 |) pour synthétiser les données."
-                )
-                answer = client.ask_question(context=assembled_context, question=question, system_prompt=full_system_prompt)
+                full_system_prompt = prompt
+                answer = client.chat(chat_context, system_prompt=full_system_prompt)
             else:
                 from ai.gemini_client import GeminiClient
                 g_client = GeminiClient()
-                answer = g_client.generate_response(prompt)
+                # GeminiClient.chat support
+                answer = g_client.chat(chat_context, system_prompt=prompt)
 
             return {
                 "answer": answer,

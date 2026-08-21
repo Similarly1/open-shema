@@ -29,6 +29,10 @@ const AIStudyView = {
   currentChapter: null,
   currentVerse: null,
 
+  // Mémoire et Session
+  currentSessionId: null,
+  currentMessages: [],
+
   // Mode actif (auto par défaut)
   currentMode: 'auto',
   suggestionsVisible: true,
@@ -159,6 +163,23 @@ const AIStudyView = {
       }
     });
 
+    // 2.5 Sidebar Historique
+    const btnToggleHistory = document.getElementById('btn-toggle-ai-history');
+    const historySidebar = document.getElementById('ai-history-sidebar');
+    const btnNewSession = document.getElementById('btn-new-ai-session');
+
+    btnToggleHistory?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      historySidebar?.classList.toggle('hidden');
+      if (!historySidebar?.classList.contains('hidden')) {
+        this.loadHistory();
+      }
+    });
+
+    btnNewSession?.addEventListener('click', () => {
+      this.startNewSession();
+    });
+
     // 3. Sélecteur de passage & BookPicker
     this.btnPassagePickerEl?.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -209,6 +230,174 @@ const AIStudyView = {
     this.renderSuggestions();
     this.initGlobalTooltip();
     this.initContextDepthSlider();
+  },
+
+  },
+
+  // =========================================================================
+  // GESTION DES SESSIONS ET DE L'HISTORIQUE
+  // =========================================================================
+
+  async startNewSession() {
+    this.currentSessionId = null;
+    this.currentMessages = [];
+    this.hasUserSentMessage = false;
+    this.clearPassage();
+    
+    // Réinitialiser l'interface
+    if (this.chatFlowEl) {
+      this.chatFlowEl.innerHTML = `
+        <div class="chat-message assistant welcome-message">
+          <div class="msg-avatar">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+          </div>
+          <div class="msg-content">
+            <div class="welcome-title">Nouvelle étude biblique</div>
+            <p>Posez une question doctrinale, soumettez un passage pour exégèse ou demandez une comparaison théologique. L'assistant s'appuie directement sur vos textes bibliques, vos dictionnaires, vos commentaires et vos notes personnelles.</p>
+          </div>
+        </div>
+      `;
+    }
+    
+    if (!this.suggestionsVisible) {
+      this.toggleSuggestions();
+    }
+    
+    // Fermer la sidebar sur petit écran si besoin
+    if (window.innerWidth < 768) {
+      document.getElementById('ai-history-sidebar')?.classList.add('hidden');
+    }
+    
+    this.loadHistory(); // Rafraîchir l'affichage (désélection)
+    
+    // Demander un nouvel ID au backend
+    try {
+      this.currentSessionId = await window.API.call('create_ai_session', { mode: this.currentMode });
+    } catch (e) {
+      console.error("Erreur création session:", e);
+    }
+  },
+
+  async loadHistory() {
+    const listEl = document.getElementById('ai-history-list');
+    if (!listEl) return;
+    
+    try {
+      const sessions = await window.API.call('get_ai_history');
+      listEl.innerHTML = '';
+      
+      if (!sessions || sessions.length === 0) {
+        listEl.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px;">Aucun historique récent</div>`;
+        return;
+      }
+      
+      sessions.forEach(session => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'ai-history-item';
+        if (session.id === this.currentSessionId) {
+          itemEl.classList.add('active');
+        }
+        
+        const dateObj = new Date(session.updated_at);
+        const dateStr = dateObj.toLocaleDateString() + ' à ' + dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        
+        itemEl.innerHTML = `
+          <div class="ai-history-item-title">${session.title || 'Nouvelle étude'}</div>
+          <div class="ai-history-item-date">${dateStr}</div>
+        `;
+        
+        itemEl.addEventListener('click', () => {
+          this.switchSession(session.id);
+        });
+        
+        listEl.appendChild(itemEl);
+      });
+    } catch (e) {
+      console.error("Erreur chargement historique:", e);
+      listEl.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--accent-red); font-size: 12px;">Erreur de chargement</div>`;
+    }
+  },
+
+  async switchSession(sessionId) {
+    if (this.currentSessionId === sessionId) return;
+    if (this.isGenerating) {
+      console.warn("Impossible de changer de session pendant la génération.");
+      return;
+    }
+    
+    try {
+      const sessionData = await window.API.call('get_ai_session', sessionId);
+      if (!sessionData) return;
+      
+      this.currentSessionId = sessionId;
+      this.currentMessages = sessionData.messages || [];
+      this.hasUserSentMessage = this.currentMessages.length > 0;
+      
+      // Restaurer le passage si présent dans le contexte
+      if (sessionData.context && sessionData.context.bookCode) {
+        this.currentBookCode = sessionData.context.bookCode;
+        this.currentChapter = sessionData.context.chapter;
+        this.currentVerse = sessionData.context.verse;
+        this.updatePassageDisplay();
+      } else {
+        this.clearPassage();
+      }
+      
+      // Re-rendre les messages
+      if (this.chatFlowEl) {
+        this.chatFlowEl.innerHTML = '';
+        if (this.currentMessages.length === 0) {
+          this.startNewSession();
+          return;
+        }
+        
+        this.currentMessages.forEach(msg => {
+          if (msg.role === 'user') {
+            const wrap = document.createElement('div');
+            wrap.className = 'chat-message user';
+            wrap.innerHTML = `<div class="msg-content">${msg.content}</div>`;
+            this.chatFlowEl.appendChild(wrap);
+          } else {
+            // Assistant message
+            const assistantWrap = document.createElement('div');
+            assistantWrap.className = 'chat-message assistant';
+            assistantWrap.innerHTML = `
+              <div class="msg-avatar">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+              </div>
+              <div class="msg-content markdown-body"></div>
+              <div class="msg-actions"></div>
+            `;
+            const contentBox = assistantWrap.querySelector('.msg-content');
+            // Simulation du parse markdown sans re-streaming
+            contentBox.innerHTML = this.parseMarkdown(msg.content);
+            
+            // Reconnecter les actions (copier, pin)
+            const actionsBox = assistantWrap.querySelector('.msg-actions');
+            this.attachMessageActions(actionsBox, msg.content, msg.sources);
+            
+            this.chatFlowEl.appendChild(assistantWrap);
+          }
+        });
+        
+        this.scrollToBottom();
+      }
+      
+      // Masquer les suggestions si l'historique a des messages
+      if (this.hasUserSentMessage && this.suggestionsVisible) {
+        this.toggleSuggestions();
+      }
+      
+      // Fermer la sidebar sur mobile
+      if (window.innerWidth < 768) {
+        document.getElementById('ai-history-sidebar')?.classList.add('hidden');
+      }
+      
+      this.loadHistory(); // Rafraîchir pour la sélection visuelle active
+      
+    } catch (e) {
+      console.error("Erreur chargement session:", e);
+    }
   },
 
   // =========================================================================
@@ -773,8 +962,23 @@ const AIStudyView = {
     this.hasUserSentMessage = true;
     this.toggleSuggestions(false);
 
-    const mode = this.currentMode || 'auto';
+    // Mémoriser le passage actuel dans le contexte de session s'il est lié
     const passage = this.getPassageLabel() || "";
+    
+    // Assurer qu'il y a une session active
+    if (!this.currentSessionId) {
+      const context = passage ? { bookCode: this.currentBookCode, chapter: this.currentChapter, verse: this.currentVerse } : null;
+      try {
+        this.currentSessionId = await window.API.call('create_ai_session', context);
+      } catch (e) {
+        console.error("Erreur création session:", e);
+      }
+    }
+
+    // Ajouter le message utilisateur à l'historique
+    this.currentMessages.push({ role: 'user', content: text });
+
+    const mode = this.currentMode || 'auto';
     const options = this.getOptions();
     const nowTime = this.formatCurrentTime();
 
@@ -833,24 +1037,19 @@ const AIStudyView = {
             <span class="ai-reasoning-toggle-icon">▾</span>
           </div>
           <div class="ai-reasoning-steps-list">
-            <div class="reasoning-step step-1 active"><span class="step-bullet"></span><span>Analyse de l'intention et formulation des requêtes documentaires</span></div>
-            <div class="reasoning-step step-2 pending"><span class="step-bullet"></span><span>Exploration du corpus documentaire (Bibles, Théologie, Dictionnaires, Notes)</span></div>
-            <div class="reasoning-step step-3 pending"><span class="step-bullet"></span><span>Sélection et ordonnancement sémantique des extraits pertinents</span></div>
+            <div class="reasoning-step step-1 active"><span class="step-bullet"></span><span>Analyse de l'intention et du contexte</span></div>
+            <div class="reasoning-step step-2 pending"><span class="step-bullet"></span><span>Exploration du corpus documentaire</span></div>
+            <div class="reasoning-step step-3 pending"><span class="step-bullet"></span><span>Sélection et ordonnancement sémantique</span></div>
             <div class="reasoning-step step-4 pending">
               <span class="step-bullet"></span>
               <div class="step-text-container">
-                <span class="step-label">Synthèse théologique & doctrinale avec ${this.escapeHtml(options.model)}</span>
-                <div class="step-time-notice hidden">
-                  <span class="step-notice-icon">
-                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  </span>
-                  <span class="step-notice-text shine-text">Analyse et recoupement des extraits de votre bibliothèque...</span>
-                </div>
+                <span class="step-label">Synthèse IA avec ${this.escapeHtml(options.model)}</span>
               </div>
             </div>
           </div>
         </div>
         <div class="ai-answer-body"></div>
+        <div class="msg-actions"></div>
       </div>
     `;
     this.chatFlowEl.appendChild(assistantMsg);
@@ -871,59 +1070,19 @@ const AIStudyView = {
       reasoningEl?.querySelector('.step-1')?.classList.replace('active', 'done');
       reasoningEl?.querySelector('.step-2')?.classList.replace('pending', 'active');
     }, 500);
-
     const stepTimeout2 = setTimeout(() => {
       reasoningEl?.querySelector('.step-2')?.classList.replace('active', 'done');
       reasoningEl?.querySelector('.step-3')?.classList.replace('pending', 'active');
     }, 1200);
-
     const stepTimeout3 = setTimeout(() => {
       reasoningEl?.querySelector('.step-3')?.classList.replace('active', 'done');
-      const step4 = reasoningEl?.querySelector('.step-4');
-      if (step4) {
-        step4.classList.replace('pending', 'active');
-        const noticeEl = step4.querySelector('.step-time-notice');
-        const noticeTextEl = noticeEl?.querySelector('.step-notice-text');
-        if (noticeEl) noticeEl.classList.remove('hidden');
-
-        const rotatingMessages = [
-          "Analyse et recoupement des extraits de votre bibliothèque...",
-          "Recoupement des concordances textuelles et des sources doctrinales...",
-          "Structuration de l'exégèse et ordonnancement des arguments théologiques...",
-          "Intégration des citations d'auteurs et contextualisation historique...",
-          "Harmonisation des références bibliques et formulation de la synthèse...",
-          "Dernières retouches et rédaction finale en cours avec le modèle..."
-        ];
-
-        let msgIdx = 0;
-        this.activeRotatingTimer = setInterval(() => {
-          msgIdx++;
-          if (noticeTextEl) {
-            // 1. Sortie vers la gauche (x: -20px, scale: 0.98, opacity: 0)
-            noticeTextEl.classList.add('shared-axis-exit');
-            
-            setTimeout(() => {
-              // 2. Changement de texte et positionnement instantané à droite (x: +24px, opacity: 0)
-              noticeTextEl.textContent = rotatingMessages[msgIdx % rotatingMessages.length];
-              noticeTextEl.classList.remove('shared-axis-exit');
-              noticeTextEl.classList.add('shared-axis-enter-from-right');
-              
-              // Forcer le reflow du DOM
-              void noticeTextEl.offsetWidth;
-              
-              // 3. Glissement fluide de droite à centre (x: 0, scale: 1, opacity: 1)
-              requestAnimationFrame(() => {
-                noticeTextEl.classList.remove('shared-axis-enter-from-right');
-              });
-            }, 360);
-          }
-        }, 16000);
-      }
+      reasoningEl?.querySelector('.step-4')?.classList.replace('pending', 'active');
     }, 2000);
+    
     this.activeTimeouts = [stepTimeout1, stepTimeout2, stepTimeout3];
 
     try {
-      const response = await API.call('ask_study_ai', text, mode, passage, options);
+      const response = await window.API.call('ask_study_ai', this.currentMessages, mode, passage, options);
       clearInterval(intervalTimer);
       if (this.activeRotatingTimer) clearInterval(this.activeRotatingTimer);
       clearTimeout(stepTimeout1);
@@ -998,7 +1157,13 @@ const AIStudyView = {
 
             <button class="ai-footer-action-btn btn-export-notes" title="Enregistrer dans vos Notes (.md)">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-              <span>Enregistrer dans les notes</span>
+              <span>Enregistrer</span>
+            </button>
+            
+            <!-- Pin conclusion button -->
+            <button class="ai-footer-action-btn btn-pin-conclusion tooltip" data-tooltip="Épingler dans la mémoire de l'assistant pour le long-terme">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+              <span>Épingler</span>
             </button>
           </div>
 
@@ -1016,6 +1181,14 @@ const AIStudyView = {
         
         // Attacher l'accordéon des sources
         this.attachSourcesAccordion(answerBodyEl);
+
+        // Enregistrer la réponse dans l'historique local & backend
+        this.currentMessages.push({ role: 'assistant', content: answerText, sources: sourcesDetails });
+        if (this.currentSessionId) {
+          window.API.call('save_ai_messages', this.currentSessionId, this.currentMessages, text).then(() => {
+            this.loadHistory(); // Rafraichir le titre
+          });
+        }
 
         // Streaming progressif du texte (SmoothUI ai-response)
         const markdownContentEl = answerBodyEl.querySelector('.ai-markdown-content');
@@ -1668,7 +1841,7 @@ const AIStudyView = {
       };
 
       try {
-        await API.call('save_note', noteData);
+        await window.API.call('save_note', noteData);
         if (typeof App !== 'undefined' && App.showToast) {
           App.showToast(`Étude enregistrée dans vos Notes : « ${noteTitle} »`);
         }
@@ -1677,6 +1850,24 @@ const AIStudyView = {
         }
       } catch (e) {
         alert(`Erreur enregistrement note : ${e}`);
+      }
+    });
+
+    // 2.5 Bouton Épingler Conclusion
+    const pinConclusionBtn = messageEl.querySelector('.btn-pin-conclusion');
+    pinConclusionBtn?.addEventListener('click', async () => {
+      try {
+        const result = await window.API.call('pin_ai_conclusion', this.currentSessionId, rawAnswer);
+        if (result && result.success) {
+          pinConclusionBtn.classList.add('saved');
+          const lbl = pinConclusionBtn.querySelector('span');
+          if(lbl) lbl.textContent = 'Épinglé';
+          if (typeof App !== 'undefined' && App.showToast) {
+            App.showToast('Conclusion mémorisée pour les prochaines études !');
+          }
+        }
+      } catch (e) {
+        console.error("Erreur pin conclusion", e);
       }
     });
 
