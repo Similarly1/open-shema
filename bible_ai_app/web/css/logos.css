@@ -5963,6 +5963,74 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   border-bottom: none;
 }
 
+/* Sélection de texte naturelle dans tout le flux de chat */
+.ai-study-container,
+.ai-study-chat-flow,
+.chat-message,
+.msg-content,
+.ai-markdown-content,
+.ai-p,
+.ai-bullet-item,
+.ai-heading {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+/* Citations de sources in-text repliées (Juste l'icône avec infobulle riche au survol) */
+.intext-source-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 4px;
+  margin: 0 2px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  vertical-align: middle;
+  color: var(--accent-orange);
+  transition: var(--transition-fast);
+  user-select: none;
+}
+
+.intext-source-pill:hover,
+.intext-source-pill:focus {
+  background: var(--bg-hover);
+  border-color: var(--accent-orange);
+}
+
+.intext-source-icon {
+  display: inline-flex;
+  color: var(--accent-orange);
+}
+
+.intext-tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  width: 270px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+  text-align: left;
+}
+
+.intext-source-pill:hover .intext-tooltip,
+.intext-source-pill:focus .intext-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
 /* Badges de citations in-text cliquables sans émojis */
 .intext-source-badge {
   display: inline-flex;
@@ -5979,6 +6047,7 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   cursor: pointer;
   background: transparent;
   font-family: var(--font-ui);
+  user-select: none;
 }
 
 .intext-source-badge.scripture {
@@ -6009,6 +6078,25 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
 
 .intext-source-badge .badge-icon {
   display: inline-flex;
+}
+
+/* Bouton d'Arrêt (Stop) pendant la génération */
+.ai-btn-submit.btn-stop {
+  background: #DC2626 !important;
+  color: #FFF !important;
+  border-color: #DC2626 !important;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.35) !important;
+  animation: stopButtonPulse 1.8s infinite ease-in-out;
+}
+
+.ai-btn-submit.btn-stop:hover {
+  background: #B91C1C !important;
+  border-color: #B91C1C !important;
+}
+
+@keyframes stopButtonPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
 }
 
 /* ==========================================================================

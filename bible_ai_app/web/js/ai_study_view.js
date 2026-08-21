@@ -184,12 +184,21 @@ const AIStudyView = {
       this.autoResizeTextarea();
     });
 
-    // 6. Envoi du message
-    this.btnSendEl?.addEventListener('click', () => this.sendMessage());
+    // 6. Envoi du message ou arrêt de génération
+    this.btnSendEl?.addEventListener('click', () => {
+      if (this.isGenerating) {
+        this.stopGeneration();
+      } else {
+        this.sendMessage();
+      }
+    });
+
     this.inputEl?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-        this.sendMessage();
+        if (!this.isGenerating) {
+          this.sendMessage();
+        }
       }
     });
 
@@ -197,6 +206,50 @@ const AIStudyView = {
     this.setMode('auto');
     this.updatePassageDisplay();
     this.renderSuggestions();
+  },
+
+  stopGeneration() {
+    if (!this.isGenerating) return;
+    this.isGenerating = false;
+    this.activeGenerationCancelled = true;
+
+    if (this.activeInterval) clearInterval(this.activeInterval);
+    if (this.activeTimeouts) {
+      this.activeTimeouts.forEach(t => clearTimeout(t));
+      this.activeTimeouts = [];
+    }
+
+    const reasoningEl = document.querySelector('.ai-reasoning-box.active');
+    if (reasoningEl) {
+      reasoningEl.classList.remove('active');
+      reasoningEl.classList.add('collapsed');
+      reasoningEl.innerHTML = `
+        <div class="ai-reasoning-header">
+          <div class="ai-reasoning-title" style="color: var(--accent-orange);">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+            <span>Génération interrompue</span>
+          </div>
+        </div>
+      `;
+    }
+
+    this.resetInputState();
+    if (typeof App !== 'undefined' && App.showToast) {
+      App.showToast('Génération interrompue.');
+    }
+  },
+
+  resetInputState() {
+    this.isGenerating = false;
+    if (this.inputEl) {
+      this.inputEl.disabled = false;
+      this.inputEl.focus();
+    }
+    if (this.btnSendEl) {
+      this.btnSendEl.innerHTML = `<span>Générer</span><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>`;
+      this.btnSendEl.classList.remove('btn-stop');
+      this.btnSendEl.title = "Générer l'étude (Entrée)";
+    }
   },
 
   toggleSuggestions(forceState = null) {
@@ -491,6 +544,16 @@ const AIStudyView = {
     const options = this.getOptions();
     const nowTime = this.formatCurrentTime();
 
+    // État de génération actif
+    this.isGenerating = true;
+    this.activeGenerationCancelled = false;
+    if (this.inputEl) this.inputEl.disabled = true;
+    if (this.btnSendEl) {
+      this.btnSendEl.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg><span>Arrêter</span>`;
+      this.btnSendEl.classList.add('btn-stop');
+      this.btnSendEl.title = "Arrêter la génération";
+    }
+
     // 1. Message utilisateur sobre (fond uni élégant)
     const userMsg = document.createElement('div');
     userMsg.className = 'chat-message user';
@@ -564,6 +627,7 @@ const AIStudyView = {
       const elapsed = ((performance.now() - startTime) / 1000).toFixed(1);
       if (timerEl) timerEl.textContent = `${elapsed}s`;
     }, 100);
+    this.activeInterval = intervalTimer;
 
     // Animation progressive des étapes textuelles
     const reasoningEl = document.getElementById(reasoningId);
@@ -581,6 +645,7 @@ const AIStudyView = {
       reasoningEl?.querySelector('.step-3')?.classList.replace('active', 'done');
       reasoningEl?.querySelector('.step-4')?.classList.replace('pending', 'active');
     }, 2000);
+    this.activeTimeouts = [stepTimeout1, stepTimeout2, stepTimeout3];
 
     try {
       const response = await API.call('ask_study_ai', text, mode, passage, options);
@@ -588,6 +653,9 @@ const AIStudyView = {
       clearTimeout(stepTimeout1);
       clearTimeout(stepTimeout2);
       clearTimeout(stepTimeout3);
+      this.resetInputState();
+
+      if (this.activeGenerationCancelled) return;
 
       const totalDuration = ((performance.now() - startTime) / 1000).toFixed(1);
       const answerText = response.answer || response;
@@ -626,7 +694,7 @@ const AIStudyView = {
         });
       }
 
-      // 2. SmoothUI ai-sources : Pile de couvertures et cartes détaillées
+      // 2. SmoothUI ai-sources : Pile de couvertures et cartes détaillées (masquées par défaut)
       let sourcesComponentHtml = '';
       if (sourcesDetails && sourcesDetails.length > 0) {
         sourcesComponentHtml = this.buildSourcesSmoothUiHtml(sourcesDetails);
@@ -634,7 +702,7 @@ const AIStudyView = {
         sourcesComponentHtml = this.buildSourcesSimpleHtml(sourcesUsed);
       }
 
-      // 3. Rendu Markdown enrichi avec citations par paragraphe
+      // 3. Rendu Markdown enrichi avec citations par paragraphe et versets avec infobulle
       const formattedMarkdown = this.renderRichMarkdown(answerText, sourcesDetails);
 
       // 4. Pied de message sobre
@@ -684,6 +752,9 @@ const AIStudyView = {
 
     } catch (e) {
       clearInterval(intervalTimer);
+      this.resetInputState();
+      if (this.activeGenerationCancelled) return;
+
       if (reasoningEl) {
         reasoningEl.innerHTML = `<div class="ai-reasoning-error">Erreur lors de la génération de l'étude.</div>`;
       }
@@ -757,7 +828,7 @@ const AIStudyView = {
 
     const moreCount = validSources.length > 7 ? `<span class="source-stack-more">+${validSources.length - 7}</span>` : '';
 
-    // 2. Grille détaillée de cartes de sources (accordéon)
+    // 2. Grille détaillée de cartes de sources (accordéon fermé par défaut)
     const cardsHtml = validSources.map(s => {
       const title = this.escapeHtml(s.title);
       const typeClass = this.getSourceTypeClass(s.type);
@@ -794,9 +865,9 @@ const AIStudyView = {
             ${moreCount}
           </div>
           <span class="sources-count-label">Sources consultées (${validSources.length})</span>
-          <span class="sources-toggle-chevron">▾</span>
+          <span class="sources-toggle-chevron">▸</span>
         </div>
-        <div class="ai-sources-dropdown">
+        <div class="ai-sources-dropdown hidden">
           <div class="sources-cards-grid">
             ${cardsHtml}
           </div>
@@ -844,7 +915,6 @@ const AIStudyView = {
   streamMarkdownResponse(containerEl, formattedMarkdown, onComplete) {
     if (!containerEl) return;
     
-    // Découpage en blocs HTML ou paragraphes pour un affichage progressif fluide
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = formattedMarkdown;
     const childNodes = Array.from(tempDiv.childNodes);
@@ -859,12 +929,12 @@ const AIStudyView = {
     let nodeIndex = 0;
 
     const streamNextBlock = () => {
+      if (this.activeGenerationCancelled) return;
       if (nodeIndex < childNodes.length) {
         const node = childNodes[nodeIndex].cloneNode(true);
         containerEl.appendChild(node);
         nodeIndex++;
-        // Vitesse fluide et agréable (35ms par paragraphe/élément)
-        setTimeout(streamNextBlock, 35);
+        setTimeout(streamNextBlock, 30);
       } else {
         if (onComplete) onComplete();
       }
@@ -873,25 +943,8 @@ const AIStudyView = {
     streamNextBlock();
   },
 
-  buildSourcesSimpleHtml(sourcesList) {
-    const validSources = sourcesList.filter(s => !s.toLowerCase().includes('rerank'));
-    if (validSources.length === 0) return '';
-
-    return `
-      <div class="ai-sources-compact-bar">
-        <div class="sources-label">
-          <span class="sources-icon">${this.ICONS.book}</span>
-          <span>Sources consultées (${validSources.length}) :</span>
-        </div>
-        <div class="sources-pills-list">
-          ${validSources.map(s => `<span class="source-hover-pill theology"><span class="pill-name">${this.escapeHtml(s)}</span></span>`).join('')}
-        </div>
-      </div>
-    `;
-  },
-
   // =========================================================================
-  // PARSEUR MARKDOWN AVEC TABLEAUX & CITATIONS IN-TEXT PAR PARAGRAPHE
+  // PARSEUR MARKDOWN AVEC TABLEAUX, CITATIONS REPLIÉES ET RÉFÉRENCES UNIVERSELLES
   // =========================================================================
 
   renderRichMarkdown(mdText, sourcesDetails = []) {
@@ -916,7 +969,7 @@ const AIStudyView = {
 
       let tableHtml = '<div class="ai-table-responsive"><table class="ai-study-table"><thead><tr>';
       headers.forEach(h => {
-        tableHtml += `<th>${this.formatInlineMarkdown(h)}</th>`;
+        tableHtml += `<th>${this.formatInlineMarkdown(h, sourcesDetails)}</th>`;
       });
       tableHtml += '</tr></thead><tbody>';
 
@@ -924,7 +977,7 @@ const AIStudyView = {
         const cells = row.split('|').slice(1, -1).map(c => c.trim());
         tableHtml += '<tr>';
         cells.forEach(cell => {
-          tableHtml += `<td>${this.formatInlineMarkdown(cell)}</td>`;
+          tableHtml += `<td>${this.formatInlineMarkdown(cell, sourcesDetails)}</td>`;
         });
         tableHtml += '</tr>';
       });
@@ -949,8 +1002,8 @@ const AIStudyView = {
     text = text.replace(/^\s*[-*]\s+(.*)$/gim, '<li class="ai-bullet-item">$1</li>');
     text = text.replace(/(<li class="ai-bullet-item">[\s\S]*?<\/li>)/g, '<ul class="ai-bullet-list">$1</ul>');
 
-    // 7. Formatage Inline & Badges in-text sobres
-    text = this.formatInlineMarkdown(text);
+    // 7. Formatage Inline & Badges in-text
+    text = this.formatInlineMarkdown(text, sourcesDetails);
 
     // 8. Rétablir les blocs de code
     codeBlocks.forEach((codeHtml, idx) => {
@@ -965,7 +1018,7 @@ const AIStudyView = {
     return text;
   },
 
-  formatInlineMarkdown(str) {
+  formatInlineMarkdown(str, sourcesDetails = []) {
     if (!str) return '';
     let res = str;
 
@@ -975,26 +1028,113 @@ const AIStudyView = {
     res = res.replace(/\*(.*?)\*/g, '<em>$1</em>');
     res = res.replace(/`([^`]+)`/g, '<code class="ai-inline-code">$1</code>');
 
-    // 1. Citations bibliques entre crochets ou parenthèses : [Jean 3:16], [Mc 12,18], [Rom 8:28], (Jn 18,36)
-    const scriptureRegex = /\[([1-3]?\s?[A-Za-zÀ-ÿ]{2,15})\s+(\d{1,3})[:,](\d{1,3}(?:-\d{1,3})?)\]/g;
-    res = res.replace(scriptureRegex, (match, book, chap, verse) => {
-      const fullRef = `${book} ${chap}:${verse}`;
-      return `<button class="intext-source-badge scripture" data-ref="${fullRef}" title="Ouvrir ${fullRef} dans le lecteur Bible"><span class="badge-icon">${this.ICONS.bible}</span><span class="badge-text">${fullRef}</span></button>`;
+    // 1. Sources documentaires au sein des paragraphes repliées (Juste l'icône livre avec infobulle riche)
+    const docSourceRegex = /\[(Dictionnaire[^\n\]]+|Dom Calmet[^\n\]]*|Vigouroux[^\n\]]*|Flavius Josèphe[^\n\]]*|Lire et comprendre[^\n\]]*|Calvin[^\n\]]*|Nouveau dictionnaire[^\n\]]*|Matthew Henry[^\n\]]*|Augustin[^\n\]]*|Luther[^\n\]]*|Spurgeon[^\n\]]*|Good and Angry[^\n\]]*)\]/gi;
+    res = res.replace(docSourceRegex, (match, docName) => {
+      const cleanTitle = docName.trim();
+      
+      // Recherche de l'extrait correspondant dans sourcesDetails
+      const matched = sourcesDetails.find(s => {
+        const t = (s.title || '').toLowerCase();
+        const cl = cleanTitle.toLowerCase();
+        return t.includes(cl) || cl.includes(t) || (s.preview && s.preview.toLowerCase().includes(cl));
+      });
+
+      const typeClass = matched ? this.getSourceTypeClass(matched.type) : 'theology';
+      const typeLabel = matched ? this.getSourceTypeLabel(matched.type) : 'Ouvrage';
+      const preview = matched?.preview ? this.escapeHtml(matched.preview) : `Ouvrage consulté : ${cleanTitle}`;
+
+      return `
+        <span class="intext-source-pill" tabindex="0">
+          <span class="intext-source-icon">${this.ICONS.book}</span>
+          <div class="source-tooltip-card intext-tooltip">
+            <div class="tooltip-header">
+              <span class="tooltip-badge ${typeClass}">${typeLabel}</span>
+              <strong class="tooltip-title">${this.escapeHtml(cleanTitle)}</strong>
+            </div>
+            <div class="tooltip-body">${preview}</div>
+          </div>
+        </span>
+      `;
     });
 
-    // 2. Codes Strong : [Strong: G2631], [G2631], [H7225]
+    // 2. Détection universelle de toutes les références bibliques (simples et chaînées)
+    res = this.linkifyScriptureInText(res);
+
+    // 3. Codes Strong : [Strong: G2631], [G2631], [H7225]
     const strongRegex = /\[(?:Strong:\s*)?([GH]\d{1,5})\]/gi;
     res = res.replace(strongRegex, (match, code) => {
       return `<span class="intext-source-badge strong" title="Code Strong ${code.toUpperCase()}"><span class="badge-icon">${this.ICONS.search}</span><span class="badge-text">${code.toUpperCase()}</span></span>`;
     });
 
-    // 3. Ouvrages, dictionnaires et sources documentaires entre crochets : [Dictionnaire Vigouroux : Pharisiens], [Dom Calmet], [Lire et comprendre la Bible], [Calvin: IRC II.16]
-    const docSourceRegex = /\[(Dictionnaire[^\n\]]+|Dom Calmet[^\n\]]*|Vigouroux[^\n\]]*|Flavius Josèphe[^\n\]]*|Lire et comprendre[^\n\]]*|Calvin[^\n\]]*|Nouveau dictionnaire[^\n\]]*|Matthew Henry[^\n\]]*|Augustin[^\n\]]*|Luther[^\n\]]*|Spurgeon[^\n\]]*)\]/gi;
-    res = res.replace(docSourceRegex, (match, docName) => {
-      return `<span class="intext-source-badge author" title="Source documentaire : ${docName}"><span class="badge-icon">${this.ICONS.book}</span><span class="badge-text">${docName}</span></span>`;
-    });
-
     return res;
+  },
+
+  // =========================================================================
+  // DÉTECTION UNIVERSELLE DES RÉFÉRENCES BIBLIQUES (avec versets multiples)
+  // =========================================================================
+
+  linkifyScriptureInText(text) {
+    const bookNames = [
+      // Noms complets avec et sans accents
+      'Genèse', 'Genese', 'Exode', 'Lévitique', 'Levitique', 'Nombres', 'Deutéronome', 'Deuteronome',
+      'Josué', 'Josue', 'Juges', 'Ruth', '1 Samuel', '2 Samuel', '1 Rois', '2 Rois',
+      '1 Chroniques', '2 Chroniques', 'Esdras', 'Néhémie', 'Nehemie', 'Esther', 'Job', 'Psaumes', 'Psaume',
+      'Proverbes', 'Ecclésiaste', 'Ecclesiaste', 'Cantique des Cantiques', 'Cantique', 'Ésaïe', 'Esaie', 'Isaïe', 'Isaie',
+      'Jérémie', 'Jeremie', 'Lamentations', 'Ézéchiel', 'Ezechiel', 'Daniel', 'Osée', 'Osee', 'Joël', 'Joel',
+      'Amos', 'Abdias', 'Jonas', 'Michée', 'Michee', 'Nahum', 'Habacuc', 'Sophonie', 'Aggée', 'Aggee',
+      'Zacharie', 'Malachie',
+      'Matthieu', 'Marc', 'Luc', 'Jean', 'Actes', 'Romains', '1 Corinthiens', '2 Corinthiens',
+      'Galates', 'Éphésiens', 'Ephesiens', 'Philippiens', 'Colossiens', '1 Thessaloniciens', '2 Thessaloniciens',
+      '1 Timothée', '2 Timothée', '1 Timothee', '2 Timothee', 'Tite', 'Philémon', 'Philemon',
+      'Hébreux', 'Hebreux', 'Jacques', '1 Pierre', '2 Pierre', '1 Jean', '2 Jean', '3 Jean',
+      'Jude', 'Apocalypse',
+      // Formes abrégées avec chiffres
+      '1Sam', '2Sam', '1Rois', '2Rois', '1Chr', '2Chr', '1Cor', '2Cor', '1Thess', '2Thess',
+      '1Thes', '2Thes', '1Th', '2Th', '1Tim', '2Tim', '1Tm', '2Tm', '1Pier', '2Pier', '1Pi', '2Pi', '1P', '2P',
+      '1Jn', '2Jn', '3Jn', '1S', '2S', '1R', '2R', '1Ch', '2Ch', '1Co', '2Co',
+      // Abréviations simples (AT & NT)
+      'Gen', 'Gn', 'Ge', 'Exod', 'Exo', 'Ex', 'Lév', 'Lev', 'Lv', 'Nomb', 'Numb', 'Num', 'Nom', 'Nb', 'Deut', 'Dtn', 'Dt',
+      'Josh', 'Jos', 'Judg', 'Jug', 'Jdg', 'Jg', 'Rut', 'Rth', 'Rt', 'Ezr', 'Esd', 'Néhem', 'Nehem', 'Néh', 'Neh', 'Né', 'Ne', 'Esth', 'Est',
+      'Jb', 'Psa', 'Psm', 'Pss', 'Ps', 'Prov', 'Prv', 'Pr', 'Eccl', 'Ecc', 'Qoh', 'Ec', 'Cant', 'Ct',
+      'Ésa', 'Esa', 'Isa', 'És', 'Es', 'Is', 'Jér', 'Jer', 'Jr', 'Lam', 'Lm', 'Ézéch', 'Ezech', 'Ezek', 'Ézé', 'Eze', 'Éz', 'Ez',
+      'Dan', 'Da', 'Osé', 'Ose', 'Hos', 'Os', 'Joë', 'Joe', 'Jl', 'Amo', 'Am',
+      'Obad', 'Abd', 'Oba', 'Ab', 'Jonah', 'Jon', 'Mich', 'Mic', 'Mi', 'Nah', 'Na', 'Habak', 'Hab', 'Ha', 'Hb',
+      'Zeph', 'Soph', 'Zep', 'So', 'Hagg', 'Agg', 'Hag', 'Ag', 'Zech', 'Zach', 'Zec', 'Za', 'Mal', 'Ml',
+      'Matt', 'Mat', 'Mt', 'Marc', 'Mark', 'Mar', 'Mc', 'Mk', 'Luk', 'Luc', 'Lc', 'Lk', 'Joh', 'Jn',
+      'Acts', 'Act', 'Ac', 'Rom', 'Rm', 'Ro', 'Galat', 'Gal', 'Ga', 'Éphés', 'Ephes', 'Éph', 'Eph',
+      'Philip', 'Phil', 'Php', 'Phi', 'Ph', 'Coloss', 'Col', 'Tit', 'Tt', 'Philem', 'Philém', 'Phm', 'Phl',
+      'Hébr', 'Hebr', 'Héb', 'Heb', 'Jacq', 'Jam', 'Jac', 'Jas', 'Jc', 'Jud', 'Jd', 'Apoc', 'Rev', 'Apo', 'Ap'
+    ];
+
+    const bookPatternStr = bookNames.sort((a, b) => b.length - a.length).join('|');
+
+    // Détection universelle avec support des crochets [Hb 7:1-3, 10, 11] et sous-versets
+    const scriptureRegex = new RegExp(
+      `(?<=^|[\\s\\(\\[\\{;,-])((?:${bookPatternStr})\\.?)\\s*([0-9]{1,3})\\s*[:.,]\\s*([0-9]{1,3}(?:\\s*[-–—\\u2013\\u2014]\\s*[0-9]{1,3})?)((?:\\s*[,;]\\s*[0-9]{1,3}(?:\\s*[:.,]\\s*[0-9]{1,3}(?:\\s*[-–—\\u2013\\u2014]\\s*[0-9]{1,3})?)?(?!\\s*[a-zA-ZÀ-ÿ]))*)`,
+      'gi'
+    );
+
+    return text.replace(scriptureRegex, (fullMatch, book, ch, vs, chained) => {
+      const cleanBook = book.replace(/\.$/, '').trim();
+      const cleanVs = vs.replace(/[\u2013\u2014\u2212\u2010\u2011\u2012\u2015]/g, '-').replace(/\s+/g, '');
+      const firstRef = `${cleanBook} ${ch}:${cleanVs}`;
+      let result = `<button class="theol-inline-scripture-ref intext-source-badge scripture" data-ref="${this.escapeHtml(firstRef)}"><span class="badge-icon">${this.ICONS.bible}</span><span class="badge-text">${book} ${ch}:${vs}</span></button>`;
+
+      if (chained) {
+        const subRegex = /([,;]\s*)([0-9]{1,3}(?:\s*[:.,]\s*[0-9]{1,3}(?:\s*[-–—\u2013\u2014]\s*[0-9]{1,3})?)?)/g;
+        const formattedChained = chained.replace(subRegex, (m, sep, subCv) => {
+          const parts = subCv.split(/[:.,]/);
+          const subCh = parts[0].trim();
+          const subVs = parts[1] ? parts[1].replace(/[\u2013\u2014\u2212\u2010\u2011\u2012\u2015]/g, '-').replace(/\s+/g, '') : '';
+          const subRef = subVs ? `${cleanBook} ${subCh}:${subVs}` : `${cleanBook} ${ch}:${subCh}`;
+          return `${sep}<button class="theol-inline-scripture-ref intext-source-badge scripture" data-ref="${this.escapeHtml(subRef)}"><span class="badge-text">${subCv}</span></button>`;
+        });
+        result += formattedChained;
+      }
+
+      return result;
+    });
   },
 
   // =========================================================================
@@ -1050,13 +1190,19 @@ const AIStudyView = {
       }
     });
 
-    // 3. Clics sur les badges de versets in-text -> Ouvre le verset dans le lecteur Bible
-    messageEl.querySelectorAll('.intext-source-badge.scripture').forEach(btn => {
+    // 3. Liaison de l'infobulle biblique (ScriptureTooltip) & navigation
+    if (typeof ScriptureTooltip !== 'undefined') {
+      ScriptureTooltip.bindToElements(messageEl.querySelectorAll('.theol-inline-scripture-ref'));
+    }
+
+    messageEl.querySelectorAll('.theol-inline-scripture-ref').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
-        const ref = btn.getAttribute('data-ref');
-        if (ref && typeof BibleReader !== 'undefined' && typeof App !== 'undefined') {
-          App.switchView('bible');
+        e.stopPropagation();
+        const ref = btn.getAttribute('data-ref') || btn.textContent.trim();
+        if (ref && typeof BibleReader !== 'undefined') {
+          if (typeof ScriptureTooltip !== 'undefined') ScriptureTooltip.hide();
+          if (typeof App !== 'undefined') App.switchView('bible');
           BibleReader.navigateTo(ref);
         }
       });
