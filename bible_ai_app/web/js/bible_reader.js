@@ -797,6 +797,16 @@ const CommentaryViewer = {
 
     // 5. Initialiser le sous-système de Synthèse Exégétique Multi-Commentaires IA
     CommentarySynthesizerUI.init();
+
+    // 6. Charger immédiatement le commentaire du verset actif par défaut
+    setTimeout(() => {
+      if (typeof BibleReader !== 'undefined' && (!this.currentComments || this.currentComments.length === 0)) {
+        const b = BibleReader.currentBook || 'Gen';
+        const ch = BibleReader.currentChapter || 1;
+        const v = BibleReader.selectedVerse || 1;
+        BibleReader.loadCommentariesForVerse(v, b, ch, true);
+      }
+    }, 250);
   },
 
   applyFontSize() {
@@ -924,6 +934,25 @@ const CommentaryViewer = {
     }
   },
 
+  getSourceInfo(name) {
+    if (typeof CommentarySynthesizerUI !== 'undefined' && CommentarySynthesizerUI.getSourceInfo) {
+      return CommentarySynthesizerUI.getSourceInfo(name);
+    }
+    if (!name) return { title: 'Commentaire Biblique', author: 'Auteur', period: "Ouvrage d'étude", color: "#1E293B", initials: "BIB" };
+    const trimmed = name.trim();
+    const initials = trimmed.split(/\s+/).map(w => w[0]).filter(Boolean).join('').slice(0, 3).toUpperCase() || 'BIB';
+    const title = (trimmed.toLowerCase().startsWith('commentaire') || trimmed.toLowerCase().startsWith('notes') || trimmed.toLowerCase().startsWith('bible'))
+      ? trimmed
+      : `Commentaire de ${trimmed}`;
+    return {
+      title: title,
+      author: name,
+      period: "Ouvrage de référence",
+      color: "#2563EB",
+      initials: initials
+    };
+  },
+
   filterSourcesList(query) {
     const listEl = document.getElementById('comm-sources-list');
     if (!listEl) return;
@@ -931,9 +960,9 @@ const CommentaryViewer = {
     listEl.querySelectorAll('.comm-source-item').forEach(item => {
       const text = item.textContent.toLowerCase();
       if (!cleanQ || text.includes(cleanQ)) {
-        item.style.display = 'flex';
+        item.style.setProperty('display', 'flex', 'important');
       } else {
-        item.style.display = 'none';
+        item.style.setProperty('display', 'none', 'important');
       }
     });
   },
@@ -956,20 +985,17 @@ const CommentaryViewer = {
     if (badgeCountEl) badgeCountEl.textContent = countNum;
     if (listEl) listEl.innerHTML = '';
 
-    // Si aucun auteur préféré n'a encore été choisi, initialiser avec le premier disponible
-    if (!this.preferredAuthor && this.currentComments.length > 0) {
-      this.preferredAuthor = this.currentComments[0].author || this.currentComments[0].source;
-    }
-
     // Peupler le popover de sélection de source avec métadonnées enrichies
     if (this.currentComments.length > 0) {
       this.currentComments.forEach((c, idx) => {
         const authorName = c.author || c.source || `Commentaire ${idx + 1}`;
         const sourceMeta = this.getSourceInfo(authorName);
-        const isMatch = this.preferredAuthor && authorName.toLowerCase() === this.preferredAuthor.toLowerCase();
+        const isMatch = this.preferredAuthor && authorName.toLowerCase().includes(this.preferredAuthor.toLowerCase());
         
         const item = document.createElement('button');
         item.className = `comm-source-item ${isMatch ? 'active' : ''}`;
+        item.dataset.index = idx;
+        item.dataset.author = authorName;
         item.innerHTML = `
           <div style="display: flex; align-items: center; gap: 7px; min-width: 0;">
             <span class="comm-single-author-avatar" style="width: 20px; height: 20px; font-size: 9px; border-radius: 4px; background-color: ${sourceMeta.color || '#1E3A8A'};">${sourceMeta.initials || 'C'}</span>
@@ -986,20 +1012,27 @@ const CommentaryViewer = {
       });
     }
 
-    // 1. Chercher si l'auteur préféré est présent pour ce verset
-    let targetIndex = -1;
-    if (this.preferredAuthor && this.currentComments.length > 0) {
-      targetIndex = this.currentComments.findIndex(c => {
-        const aName = c.author || c.source || '';
-        return aName.toLowerCase() === this.preferredAuthor.toLowerCase();
-      });
-    }
+    if (this.currentComments.length > 0) {
+      // 1. Chercher si l'auteur préféré est présent pour ce verset
+      let targetIndex = -1;
+      if (this.preferredAuthor) {
+        const pName = this.preferredAuthor.toLowerCase();
+        targetIndex = this.currentComments.findIndex(c => {
+          const aName = (c.author || c.source || '').toLowerCase();
+          return aName === pName || aName.includes(pName) || pName.includes(aName);
+        });
+      }
 
-    if (targetIndex !== -1) {
-      // L'auteur préféré commente ce verset -> afficher directement son analyse
-      this.selectCommentary(targetIndex);
+      if (targetIndex !== -1) {
+        // L'auteur préféré commente ce verset -> afficher directement son analyse
+        this.selectCommentary(targetIndex);
+      } else {
+        // Charger le premier commentaire disponible par défaut
+        this.preferredAuthor = this.currentComments[0].author || this.currentComments[0].source;
+        this.selectCommentary(0);
+      }
     } else {
-      // L'auteur préféré n'a pas de note sur ce verset -> afficher la vue sobre avec suggestions
+      // Aucun commentaire pour ce verset
       this.renderAbsentPreferredAuthor();
     }
   },

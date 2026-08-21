@@ -96,7 +96,16 @@ const App = {
         const contentEl = document.getElementById(`drawer-tab-${tabId}`);
         if (contentEl) {
           contentEl.classList.add('active');
-          if (tabId === 'ai') {
+          if (tabId === 'commentaries') {
+            if (typeof CommentaryViewer !== 'undefined' && (!CommentaryViewer.currentComments || CommentaryViewer.currentComments.length === 0)) {
+              const b = (typeof BibleReader !== 'undefined' && BibleReader.currentBook) || 'Gen';
+              const ch = (typeof BibleReader !== 'undefined' && BibleReader.currentChapter) || 1;
+              const v = (typeof BibleReader !== 'undefined' && BibleReader.selectedVerse) || 1;
+              if (typeof BibleReader !== 'undefined') {
+                BibleReader.loadCommentariesForVerse(v, b, ch, true);
+              }
+            }
+          } else if (tabId === 'ai') {
             const passageBadge = document.getElementById('lbl-drawer-ai-passage');
             if (passageBadge && typeof BibleReader !== 'undefined') {
               const curRef = BibleReader.currentVerseRef || `${BibleReader.currentBook || 'GEN'} ${BibleReader.currentChapter || 1}:${BibleReader.selectedVerse || 1}`;

@@ -145,22 +145,25 @@ class EpubLoader:
                     except Exception:
                         pass
                 
-                classification = cls.classify_chapter_title(title, is_systematic_theology=is_syst_theol)
+                classification = cls.classify_chapter_title(
+                    title, 
+                    is_systematic_theology=is_syst_theol, 
+                    book_author=metadata.get("author", "")
+                )
                 
                 # Déterminer si inclus par défaut
                 norm_t = strip_accents(title)
-                is_boilerplate = any(kw in norm_t for kw in BOILERPLATE_KEYWORDS)
+                is_boilerplate = any(re.search(r'\b' + re.escape(strip_accents(kw)) + r'\b', norm_t) for kw in BOILERPLATE_KEYWORDS)
                 
                 # Règle d'inclusion par défaut :
-                # - Tout livre biblique identifié est coché d'office
+                # - Tout livre ou chapitre de contenu (> 50 caractères) est coché d'office
                 # - Les annexes/front-matter/boilerplate sont décochés d'office
-                # - Les autres chapitres de contenu (> 50 caractères) sont cochés
-                if classification["book_code"] is not None:
-                    include_default = True
-                elif is_boilerplate or classification["source_type"] == "appendix":
+                if classification["source_type"] == "appendix" or is_boilerplate:
                     include_default = False
+                elif classification["book_code"] is not None:
+                    include_default = True
                 else:
-                    include_default = size_chars > 50
+                    include_default = size_chars > 50 or size_chars == 0
 
                 classified_chapters.append({
                     "id": idx + 1,
@@ -181,37 +184,66 @@ class EpubLoader:
         return metadata
 
     @classmethod
-    def classify_chapter_title(cls, title: str, is_systematic_theology: bool = False) -> Dict[str, Any]:
+    def classify_chapter_title(cls, title: str, is_systematic_theology: bool = False, book_author: str = "") -> Dict[str, Any]:
         """
         Détecte automatiquement le livre biblique, le corpus et le type RAG à partir du titre du chapitre.
         """
         norm = strip_accents(title)
 
-        # 0. Détection prioritaire des introductions de groupes de livres (sections globales)
-        if any(w in norm for w in ["old testament", "ancien testament"]):
-            return {"book_code": None, "book_name": None, "corpus_scope": "OT", "source_type": "ot_context"}
-        elif any(w in norm for w in ["new testament", "nouveau testament"]):
-            return {"book_code": None, "book_name": None, "corpus_scope": "NT", "source_type": "nt_context"}
-        elif any(w in norm for w in ["historical books", "livres historiques"]):
-            return {"book_code": None, "book_name": None, "corpus_scope": "OT", "source_type": "ot_context"}
-        elif any(w in norm for w in ["wisdom and lyrical", "poetic", "livres poetiques", "livres de sagesse"]):
-            return {"book_code": None, "book_name": None, "corpus_scope": "OT", "source_type": "ot_context"}
-        elif any(w in norm for w in ["prophetic books", "livres prophetiques", "prophetes"]):
-            return {"book_code": None, "book_name": None, "corpus_scope": "OT", "source_type": "ot_context"}
-        elif any(w in norm for w in ["pentateuch", "pentateuque", "torah", "loi"]):
-            return {"book_code": None, "book_name": None, "corpus_scope": "OT", "source_type": "ot_context"}
-        elif any(w in norm for w in ["gospels and acts", "evangiles et actes", "four gospels", "quatre evangiles"]):
-            return {"book_code": None, "book_name": None, "corpus_scope": "NT", "source_type": "nt_context"}
-        elif any(w in norm for w in ["letters and revelation", "epistles", "epitres"]):
-            return {"book_code": None, "book_name": None, "corpus_scope": "NT", "source_type": "nt_context"}
+        def _has_word(words_list):
+            for w in words_list:
+                norm_w = strip_accents(w)
+                if re.search(r'\b' + re.escape(norm_w) + r'\b', norm):
+                    return True
+            return False
 
-        # 1. Normalisation ordinale (premier/premiere -> 1, deuxieme -> 2, troisieme -> 3)
+        # 0. Vérifier si c'est le nom de l'auteur de l'ouvrage ou une page d'auteur
+        if book_author and len(book_author) > 3:
+            norm_author = strip_accents(book_author)
+            if norm == norm_author or norm_author in norm or norm in norm_author:
+                return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "appendix"}
+
+        # Noms d'auteurs ou signatures courantes isolées (ex: "John MacArthur", "John Piper", "Jean Calvin")
+        if re.search(r'\b(john|jean|james|peter|pierre|paul|marc|mark|luke|luc|matthew|matthieu)\s+[a-z]+', norm):
+            if not _has_word(["evangile", "epitre", "lettre", "gospel", "epistle", "selon"]):
+                return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "appendix"}
+
+        # 1. Boilerplate / Front matter / Annexes
+        if _has_word(BOILERPLATE_KEYWORDS):
+            return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "appendix"}
+
+        # 2. Détection prioritaire des introductions de groupes de livres (sections globales)
+        if _has_word(["old testament", "ancien testament", "historical books", "livres historiques", "prophetic books", "livres prophetiques", "pentateuch", "pentateuque", "torah"]):
+            return {"book_code": None, "book_name": None, "corpus_scope": "OT", "source_type": "ot_context"}
+        elif _has_word(["new testament", "nouveau testament", "gospels and acts", "evangiles et actes", "four gospels", "quatre evangiles", "epistles", "epitres"]):
+            return {"book_code": None, "book_name": None, "corpus_scope": "NT", "source_type": "nt_context"}
+        elif _has_word(["intertestament", "between the testaments", "hasmoneen", "maccabee", "periode perse"]):
+            return {"book_code": None, "book_name": None, "corpus_scope": "INTER", "source_type": "ot_context"}
+        elif _has_word(["apocryphe", "deuterocanonique"]):
+            return {"book_code": None, "book_name": None, "corpus_scope": "APOCRYPHA", "source_type": "general"}
+
+        # 3. Détection de références bibliques explicites entre parenthèses ou avec numéros (ex: "(Jean 1.1-5)", "(Colossiens 1.15-19)")
+        ref_match = re.search(r'\(\s*([1-4]?\s*[a-zA-Z\u00C0-\u017F]+)\s+(\d+[\.:\d\-]*)', title)
+        if ref_match:
+            cand_book = strip_accents(ref_match.group(1).strip())
+            if cand_book in BOOK_MAPPING:
+                code = BOOK_MAPPING[cand_book]
+                fr_name = REVERSE_BOOK_MAPPING.get(code, code)
+                scope = "OT" if code in OT_CODES else ("NT" if code in NT_CODES else ("APOCRYPHA" if code in APOCRYPHA_CODES else "GLOBAL"))
+                return {
+                    "book_code": code,
+                    "book_name": fr_name,
+                    "corpus_scope": scope,
+                    "source_type": "systematic_theology" if is_systematic_theology else "general"
+                }
+
+        # 4. Normalisation ordinale (premier/premiere -> 1, deuxieme -> 2, etc.)
         norm_ord = re.sub(r'\b(premier|premiere|1er|1ere)\b', '1', norm)
         norm_ord = re.sub(r'\b(deuxieme|2eme|2e)\b', '2', norm_ord)
         norm_ord = re.sub(r'\b(troisieme|3eme|3e)\b', '3', norm_ord)
         norm_ord = re.sub(r'\b(quatrieme|4eme|4e)\b', '4', norm_ord)
 
-        # 2. Nettoyage des préfixes et formules d'introduction courants
+        # Nettoyage des préfixes
         clean_title = norm_ord
         clean_title = re.sub(r'\b(l[\'’]|la|le|les|de|d[\'’]|du|des|au|aux|a|the|of|to|introduction)\b', ' ', clean_title)
         clean_title = re.sub(r'\b(evangile|epitre|lettre|livre|selon|gospel|epistle|letter|book)\b', ' ', clean_title)
@@ -225,49 +257,20 @@ class EpubLoader:
             code = BOOK_MAPPING[norm_ord]
         elif norm in BOOK_MAPPING:
             code = BOOK_MAPPING[norm]
-        else:
-            # Tester si une forme ou sous-chaîne correspond à un livre biblique
-            # On trie les clés par longueur décroissante
-            for b_name, b_code in sorted(BOOK_MAPPING.items(), key=lambda x: -len(x[0])):
-                # IMPORTANT : Ne jamais matcher les abréviations courtes de 1 ou 2 lettres dans une phrase (ex: 'is', 'am', 'os', 'in')
-                if len(b_name) <= 2:
-                    continue
-                # Pour les abréviations de 3 lettres ambiguës (ex: 'mal', 'am', 'na', 'act', 'can', 'con'),
-                # ne matcher que si c'est le mot exact
-                if len(b_name) == 3 and not b_name[0].isdigit() and b_name in ["mal", "am", "na", "os", "mi", "so", "za", "act", "can", "con"]:
-                    if clean_title == b_name or norm == b_name:
-                        code = b_code
-                        break
-                    continue
-
-                if b_name[0].isdigit():
-                    if re.search(r'\b' + re.escape(b_name) + r'\b', clean_title) or re.search(r'\b' + re.escape(b_name) + r'\b', norm_ord):
-                        code = b_code
-                        break
-                else:
-                    if re.search(r'\b' + re.escape(b_name) + r'\b', clean_title):
-                        code = b_code
-                        break
 
         if code:
             fr_name = REVERSE_BOOK_MAPPING.get(code, code)
-            if code in OT_CODES:
-                scope = "OT"
-            elif code in NT_CODES:
-                scope = "NT"
-            elif code in APOCRYPHA_CODES:
-                scope = "APOCRYPHA"
-            else:
-                scope = "GLOBAL"
-                
+            scope = "OT" if code in OT_CODES else ("NT" if code in NT_CODES else ("APOCRYPHA" if code in APOCRYPHA_CODES else "GLOBAL"))
+            is_intro = any(kw in norm for kw in ["introduction", "intro", "preface"]) or clean_title == strip_accents(fr_name)
+            stype = "book_intro" if is_intro else ("systematic_theology" if is_systematic_theology else "general")
             return {
                 "book_code": code,
                 "book_name": fr_name,
                 "corpus_scope": scope,
-                "source_type": "book_intro"
+                "source_type": stype
             }
 
-        # Détection thématique générale
+        # 5. Détection thématique générale par mots entiers
         theol_keywords = [
             "salut", "grace", "justification", "foi", "doctrine", "trinite", "trinity", 
             "saint-esprit", "holy spirit", "dieu", "god", "christ", "eschatologie", "eschatology", 
@@ -278,23 +281,14 @@ class EpubLoader:
             "bapteme", "baptism", "death", "mort", "election", "predestination", "perseverance"
         ]
 
-        if any(w in norm for w in ["intertestament", "between the testaments", "periode perse", "hasmoneen", "maccabee"]):
-            return {"book_code": None, "book_name": None, "corpus_scope": "INTER", "source_type": "ot_context"}
-        elif any(w in norm for w in ["apocryphe", "deuterocanonique"]):
-            return {"book_code": None, "book_name": None, "corpus_scope": "APOCRYPHA", "source_type": "general"}
-        elif any(w in norm for w in ["nouveau testament", "new testament", "evangiles", "actes", "epitres"]):
-            return {"book_code": None, "book_name": None, "corpus_scope": "NT", "source_type": "nt_context"}
-        elif any(w in norm for w in ["ancien testament", "old testament", "pentateuque", "prophetes", "psaumes"]):
-            return {"book_code": None, "book_name": None, "corpus_scope": "OT", "source_type": "ot_context"}
-        elif any(w in norm for w in theol_keywords):
-            return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "systematic_theology"}
-        elif any(w in norm for w in ["lire", "comprendre", "symetrie", "harmonie", "etude", "canon", "inspiration", "revelation"]):
-            return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "biblical_theology"}
-        elif any(kw in norm for kw in BOILERPLATE_KEYWORDS):
-            return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "appendix"}
-
-        # Si l'ouvrage est une Théologie Systématique, tout chapitre de contenu est par défaut 'systematic_theology'
         default_stype = "systematic_theology" if is_systematic_theology else "general"
+
+        if _has_word(["christ", "jesus", "messie", "evangile", "gospel", "parole divine"]):
+            return {"book_code": None, "book_name": None, "corpus_scope": "NT", "source_type": default_stype}
+        elif _has_word(theol_keywords):
+            return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "systematic_theology"}
+        elif _has_word(["lire", "comprendre", "symetrie", "harmonie", "etude", "canon", "inspiration", "revelation"]):
+            return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "biblical_theology"}
 
         return {
             "book_code": None,

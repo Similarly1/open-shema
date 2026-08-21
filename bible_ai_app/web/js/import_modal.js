@@ -862,8 +862,9 @@ const ImportModal = {
         <select class="import-chapter-select ch-stype-sel">
           <option value="general" ${ch.source_type === 'general' ? 'selected' : ''}>Général</option>
           <option value="book_intro" ${ch.source_type === 'book_intro' ? 'selected' : ''}>Intro</option>
-          <option value="biblical_theology" ${ch.source_type === 'biblical_theology' ? 'selected' : ''}>Théol.</option>
-          <option value="ot_context" ${ch.source_type === 'ot_context' ? 'selected' : ''}>Contexte</option>
+          <option value="systematic_theology" ${ch.source_type === 'systematic_theology' || ch.source_type === 'biblical_theology' ? 'selected' : ''}>Théol.</option>
+          <option value="ot_context" ${ch.source_type === 'ot_context' || ch.source_type === 'nt_context' ? 'selected' : ''}>Contexte</option>
+          <option value="commentary_verse" ${ch.source_type === 'commentary_verse' ? 'selected' : ''}>Commentaire</option>
           <option value="appendix" ${ch.source_type === 'appendix' ? 'selected' : ''}>Annexe</option>
         </select>
       `;

@@ -1136,6 +1136,7 @@ class BibleAppApi:
             current_question = messages_history
             messages_history = [{"role": "user", "content": current_question}]
             
+        question = current_question
         q_lower = current_question.lower()
         if mode == "auto":
             if any(k in q_lower for k in ["prêch", "prech", "sermon", "homilét", "homilet", "plan de", "culte", "message pour", "application pastorale"]):
@@ -1922,8 +1923,14 @@ class BibleAppApi:
         else:
             info = {"title": file_base, "chapters": []}
 
-        # Détection automatique de Bible et enrichissement depuis bibles_registry.json
+        # Détection automatique intelligente du type d'ouvrage (Bible vs Théologie vs Commentaire vs Dictionnaire)
         raw_title = info.get("title", "")
+        raw_author = info.get("author", "")
+        title_lower = strip_accents(raw_title)
+        desc_lower = strip_accents(info.get("description", ""))
+        base_lower = strip_accents(file_base)
+        combined_text = f"{title_lower} {desc_lower} {base_lower}"
+
         reg_bibles = load_bibles_registry()
         reg_match = (
             find_bible_registry_entry(raw_title, reg_bibles) or 
@@ -1931,14 +1938,27 @@ class BibleAppApi:
             find_bible_registry_entry(file_name, reg_bibles)
         )
         
-        is_bible_kw = (
-            any(kw in raw_title.lower() for kw in ["bible", "sainte bible", "ancien testament", "nouveau testament", "evangile"]) or 
-            any(kw in file_base.lower() for kw in ["bible", "sainte bible", "nt_", "at_"])
-        )
-        biblical_chapters_count = sum(1 for c in info.get("chapters", []) if c.get("book_code") is not None)
-        is_bible_struct = len(info.get("chapters", [])) >= 20 and biblical_chapters_count >= 15
-        
-        is_bible = reg_match is not None or is_bible_kw or is_bible_struct
+        # Mots-clés excluant catégoriquement qu'un ouvrage soit une simple Bible de texte
+        non_bible_kws = [
+            "commentaire", "commentary", "theologie", "theology", "etude", "study", 
+            "doctrine", "sermon", "introduction", "cultur", "archaeolog", "manuel", 
+            "guide", "lecture", "comprendre", "selon", "divinite", "grace", "croix", 
+            "justification", "trinite", "histoire", "eglise", "philosophie", "apologetique"
+        ]
+        has_non_bible_kw = any(re.search(r'\b' + re.escape(w) + r'\b', combined_text) for w in non_bible_kws)
+        has_author = bool(raw_author and len(raw_author.strip()) > 3 and not any(kw in raw_author.lower() for kw in ["collectif", "societe biblique", "bible society", "anonymous", "inconnu"]))
+
+        is_bible = False
+        if ext in ['.json', '.csv'] and not has_non_bible_kw:
+            is_bible = True
+        elif ext == '.epub':
+            # Un EPUB n'est une Bible que s'il s'agit d'une édition intégrale de la Bible sans auteur d'essai
+            if reg_match and not has_non_bible_kw and not has_author:
+                is_bible = True
+            elif ("sainte bible" in title_lower or "holy bible" in title_lower or title_lower.startswith("bible ")) and not has_non_bible_kw and not has_author:
+                biblical_chapters_count = sum(1 for c in info.get("chapters", []) if c.get("book_code") is not None)
+                if biblical_chapters_count >= 30:
+                    is_bible = True
 
         if is_bible:
             info["type"] = "Bible"
@@ -1964,6 +1984,15 @@ class BibleAppApi:
                 if "BIBLE" in clean_id and len(clean_id) > 5:
                     clean_id = clean_id.replace("BIBLE", "")
                 info["short_id"] = clean_id or file_base.upper()[:6]
+        else:
+            # Classification automatique du type d'ouvrage pour les non-Bibles
+            info["is_bible"] = False
+            if any(w in combined_text for w in ["commentaire", "commentary", "explication", "vers par vers"]):
+                info["type"] = "Commentaire"
+            elif any(w in combined_text for w in ["dictionnaire", "dictionary", "lexique", "lexicon", "encyclopedie"]):
+                info["type"] = "Dictionnaire"
+            else:
+                info["type"] = "Théologie"
 
         return {
             "success": True,
