@@ -1094,6 +1094,8 @@ class BibleAppApi:
         depth_style = opts.get("depth", "academic")
         enable_rerank = opts.get("enable_reranking", True)
         enable_curator = opts.get("enable_curator", False)
+        # Nombre de caractères max par extrait de source (défaut = 2400 ~600 tokens)
+        max_excerpt_chars = int(opts.get("max_excerpt_chars", 2400))
         sources_cfg = opts.get("sources", {
             "bibles": True,
             "commentaries": True,
@@ -1410,11 +1412,13 @@ class BibleAppApi:
 
         sources_used = [s["title"] for s in dedup_sources]
 
-        # Assemblage du texte de contexte
+        # Assemblage du texte de contexte avec troncature par source selon le réglage utilisateur
         formatted_context_sections = []
         for chunk in context_chunks:
             t = chunk.get("text") if isinstance(chunk, dict) else str(chunk)
             if t:
+                if len(t) > max_excerpt_chars:
+                    t = t[:max_excerpt_chars].rsplit(' ', 1)[0] + " [...]"
                 formatted_context_sections.append(t)
         
         assembled_context = "\n\n".join(formatted_context_sections)

@@ -1663,7 +1663,49 @@
                   </div>
                 </div>
 
-                <!-- 4. Sources Documentaires à Interroger -->
+                <!-- 4. Profondeur du Contexte par Source -->
+                <div>
+                  <label style="display: flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
+                    <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+                    <span>Profondeur du Contexte / Source</span>
+                  </label>
+
+                  <!-- Slider 4 crans -->
+                  <div style="position: relative; padding: 0 2px;">
+                    <input type="range" id="ai-opt-context-depth"
+                      min="0" max="3" step="1" value="1"
+                      style="width: 100%; accent-color: var(--accent-orange); cursor: pointer; margin-bottom: 6px;">
+
+                    <!-- Labels des 4 crans -->
+                    <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: var(--text-muted); margin-bottom: 8px;">
+                      <span>Éclair</span>
+                      <span>Rapide</span>
+                      <span>Approfondi</span>
+                      <span>Exhaustif</span>
+                    </div>
+
+                    <!-- Jauge visuelle vitesse ↔ qualité -->
+                    <div id="ctx-depth-gauge" style="background: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px 10px;">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <span id="ctx-depth-tokens" style="font-size: 11px; font-weight: 700; color: var(--accent-orange);">~600 tokens / source</span>
+                        <span id="ctx-depth-time" style="font-size: 10px; color: var(--text-muted);">≈ 30–60 s</span>
+                      </div>
+                      <!-- Barre gradient vitesse → qualité -->
+                      <div style="position: relative; height: 6px; border-radius: 3px; background: linear-gradient(to right, #22c55e, #f59e0b, #ef4444); margin-bottom: 4px; overflow: visible;">
+                        <div id="ctx-depth-cursor" style="position: absolute; top: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; border-radius: 50%; background: white; border: 2px solid var(--accent-orange); box-shadow: 0 1px 4px rgba(0,0,0,0.4); transition: left 0.2s ease;"></div>
+                      </div>
+                      <div style="display: flex; justify-content: space-between; font-size: 9px; color: var(--text-muted);">
+                        <span style="color: #22c55e;">⚡ Rapide</span>
+                        <span style="color: #ef4444;">✦ Qualité max</span>
+                      </div>
+                      <div id="ctx-depth-desc" style="font-size: 10.5px; color: var(--text-secondary); margin-top: 5px; border-top: 1px dashed var(--border-color); padding-top: 5px;">
+                        Contexte court, idéal pour questions directes et factuelle.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
                 <div>
                   <label style="display: flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">
                     <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path><path d="M6 6h10"></path><path d="M6 10h10"></path></svg>

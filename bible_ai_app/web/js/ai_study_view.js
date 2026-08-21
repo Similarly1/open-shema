@@ -208,6 +208,60 @@ const AIStudyView = {
     this.updatePassageDisplay();
     this.renderSuggestions();
     this.initGlobalTooltip();
+    this.initContextDepthSlider();
+  },
+
+  // =========================================================================
+  // JAUGE DE PROFONDEUR DE CONTEXTE
+  // =========================================================================
+
+  initContextDepthSlider() {
+    const slider   = document.getElementById('ai-opt-context-depth');
+    const tokensEl = document.getElementById('ctx-depth-tokens');
+    const timeEl   = document.getElementById('ctx-depth-time');
+    const descEl   = document.getElementById('ctx-depth-desc');
+    const cursor   = document.getElementById('ctx-depth-cursor');
+
+    if (!slider) return;
+
+    const levels = [
+      {
+        tokens: '~200 tokens / source',
+        time: '≈ 15–40 s',
+        desc: 'Contexte minimal — idéal pour des questions courtes et factuelles, temps de réponse très court.',
+        pct: 2
+      },
+      {
+        tokens: '~600 tokens / source',
+        time: '≈ 45–120 s',
+        desc: 'Contexte équilibré — bon rapport vitesse / profondeur pour la plupart des études.',
+        pct: 33
+      },
+      {
+        tokens: '~1 500 tokens / source',
+        time: '≈ 2–5 min',
+        desc: 'Contexte approfondi — exploite les extraits en profondeur pour des analyses doctrinales riches.',
+        pct: 66
+      },
+      {
+        tokens: '~3 500 tokens / source',
+        time: '≈ 5–12 min',
+        desc: 'Contexte exhaustif — envoie l\'intégralité des extraits. Synthèse la plus complète possible.',
+        pct: 98
+      }
+    ];
+
+    const update = () => {
+      const v = parseInt(slider.value, 10);
+      const l = levels[Math.min(v, levels.length - 1)];
+      if (tokensEl) tokensEl.textContent = l.tokens;
+      if (timeEl)   timeEl.textContent   = l.time;
+      if (descEl)   descEl.textContent   = l.desc;
+      if (cursor)   cursor.style.left    = `${l.pct}%`;
+    };
+
+    slider.addEventListener('input', update);
+    update(); // État initial
   },
 
   // =========================================================================
@@ -690,6 +744,12 @@ const AIStudyView = {
     const enableReranking = document.getElementById('ai-opt-reranking')?.checked ?? true;
     const enableCurator = document.getElementById('ai-opt-curator')?.checked ?? false;
 
+    // Slider de profondeur de contexte (0=Éclair, 1=Rapide, 2=Approfondi, 3=Exhaustif)
+    const depthLevels = [800, 2400, 6000, 14000]; // en caractères (~200 / 600 / 1500 / 3500 tokens)
+    const ctxSlider = document.getElementById('ai-opt-context-depth');
+    const ctxLevel = ctxSlider ? parseInt(ctxSlider.value, 10) : 1;
+    const maxExcerptChars = depthLevels[Math.min(ctxLevel, depthLevels.length - 1)];
+
     const sources = {
       bibles: document.getElementById('ai-opt-src-bibles')?.checked ?? true,
       commentaries: document.getElementById('ai-opt-src-comms')?.checked ?? true,
@@ -702,6 +762,7 @@ const AIStudyView = {
       depth,
       enable_reranking: enableReranking,
       enable_curator: enableCurator,
+      max_excerpt_chars: maxExcerptChars,
       sources
     };
   },
