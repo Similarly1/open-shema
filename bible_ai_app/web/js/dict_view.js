@@ -492,6 +492,7 @@ const DictView = {
     }
 
     const rawText = match.full_text || match.raw_text || match.preview || '';
+    const formatted = this.formatArticleMarkdown(rawText);
     let linkified = (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences)
       ? TheologyView.highlightScriptureReferences(formatted)
       : formatted;

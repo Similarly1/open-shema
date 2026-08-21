@@ -562,6 +562,59 @@ body, html {
   user-select: none;
 }
 
+/* AUTORISER LA SÉLECTION DE TEXTE SUR TOUTES LES SURFACES DE LECTURE ET DE CONTENU */
+.theol-view-main-scroll,
+.theol-reading-container,
+.theol-article-card,
+.theol-reading-body,
+.theol-reading-body *,
+.theol-reading-p,
+.theol-footnotes-section,
+.theol-footnotes-list,
+.theol-fn-item,
+.theol-fn-text,
+.theol-summary-encart,
+.theol-summary-encart-body,
+.theol-summary-encart-body *,
+.comm-view-main-scroll,
+.comm-article-container,
+.comm-article-card,
+.comm-view-reading-body,
+.comm-view-reading-body *,
+.comm-single-body,
+.comm-single-body *,
+.commentary-content,
+.commentary-content *,
+.commentary-panel,
+.commentary-panel *,
+.dict-article-card,
+#dict-article-content,
+#dict-article-body,
+.dict-entry-body,
+.dict-entry-body *,
+.dict-entry-body-content,
+.dict-entry-body-content *,
+.reader-container,
+.reader-workspace,
+.reader-text,
+.reader-verse,
+.reader-verse-text,
+.verse-text,
+.verse-words,
+.note-editor,
+.notes-content,
+.note-edit-content,
+.note-card-content,
+.ai-chat-messages,
+.ai-message-content,
+.ai-message-text,
+.stp-body,
+input,
+textarea {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
 .hidden {
   display: none !important;
 }
