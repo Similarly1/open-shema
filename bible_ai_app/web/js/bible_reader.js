@@ -4067,21 +4067,39 @@ const BibleReader = {
 
     const targetVersionName = item ? item.name : versionName;
 
-    // Si la version ne contient que le Nouveau Testament (ex: Parole Vivante)
-    const isNtOnly = (item && (item.canon === 'NT' || item.total_books === 27)) ||
-      (typeof versionName === 'string' && (versionName.toLowerCase().includes('parole vivante') || versionName.toUpperCase() === 'PV'));
+    // Récupérer la liste des livres disponibles pour cette version
+    const availableBooks = item?.available_books || [];
+    const firstBook = item?.first_book || (availableBooks.length > 0 ? availableBooks[0] : null);
 
-    const ntBookCodes = [
-      'Mat', 'Mar', 'Luk', 'Joh', 'Act', 'Rom', '1Co', '2Co', 'Gal', 'Eph',
-      'Phi', 'Col', '1Th', '2Th', '1Ti', '2Ti', 'Tit', 'Phm', 'Heb', 'Jam',
-      '1Pe', '2Pe', '1Jo', '2Jo', '3Jo', 'Jud', 'Rev'
-    ];
-
-    // Si le livre en cours est dans l'Ancien Testament, basculer sur Matthieu 1
-    if (isNtOnly && (!this.currentBook || !ntBookCodes.includes(this.currentBook))) {
-      this.currentBook = 'Mat';
+    // Si le livre actuellement affiché n'est pas présent dans cette version biblique
+    // (ex: passer de Parole Vivante [NT] à Sagesse Vivante [Job, Pro, Ecc, Sol] ou inversement)
+    if (availableBooks.length > 0 && (!this.currentBook || !availableBooks.includes(this.currentBook))) {
+      this.currentBook = firstBook || availableBooks[0] || 'Gen';
       this.currentChapter = 1;
       this.selectedVerse = 1;
+    } else if (!availableBooks.length) {
+      // Fallback par détection canonique/nom
+      const isNtOnly = (item && (item.canon === 'NT' || item.total_books === 27)) ||
+        (typeof versionName === 'string' && (versionName.toLowerCase().includes('parole vivante') || versionName.toUpperCase() === 'PV'));
+      const isWisdomOnly = (item && item.total_books === 4) ||
+        (typeof versionName === 'string' && (versionName.toLowerCase().includes('sagesse vivante') || versionName.toUpperCase() === 'SV'));
+
+      const ntBookCodes = [
+        'Mat', 'Mar', 'Luk', 'Joh', 'Act', 'Rom', '1Co', '2Co', 'Gal', 'Eph',
+        'Phi', 'Col', '1Th', '2Th', '1Ti', '2Ti', 'Tit', 'Phm', 'Heb', 'Jam',
+        '1Pe', '2Pe', '1Jo', '2Jo', '3Jo', 'Jud', 'Rev'
+      ];
+      const wisdomBookCodes = ['Job', 'Pro', 'Ecc', 'Sol'];
+
+      if (isNtOnly && (!this.currentBook || !ntBookCodes.includes(this.currentBook))) {
+        this.currentBook = 'Mat';
+        this.currentChapter = 1;
+        this.selectedVerse = 1;
+      } else if (isWisdomOnly && (!this.currentBook || !wisdomBookCodes.includes(this.currentBook))) {
+        this.currentBook = 'Job';
+        this.currentChapter = 1;
+        this.selectedVerse = 1;
+      }
     }
 
     this.selectBibleVersion(targetVersionName);

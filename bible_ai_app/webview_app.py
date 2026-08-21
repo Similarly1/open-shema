@@ -171,12 +171,13 @@ def find_bible_registry_entry(name_or_code: str, registry: Optional[Dict[str, An
             if alias.lower() == clean.lower() or alias.lower() == clean_norm:
                 return data
             
-    # 3. Correspondance partielle souple
-    for code, data in registry.items():
-        for alias in data.get("aliases", []):
-            if alias.lower() in clean_norm or clean_norm in alias.lower():
-                return data
-                
+    # 3. Correspondance partielle souple (uniquement pour les termes de 4 caractères ou plus)
+    if len(clean_norm) >= 4:
+        for code, data in registry.items():
+            for alias in data.get("aliases", []):
+                if len(alias) >= 4 and (alias.lower() in clean_norm or clean_norm in alias.lower()):
+                    return data
+                    
     return None
 
 BIBLE_CANONICAL_INFO = {
@@ -259,6 +260,9 @@ class BibleAppApi:
             full_title = (reg_entry.get("nom_officiel") if reg_entry else None) or (meta.get("title") if meta.get("title") and meta.get("title") != raw_name else default_title)
             code = (reg_entry.get("code") if reg_entry else None) or meta.get("version_code") or default_code
             
+            avail = BibleJsonLoader.get_available_books(folder) or BibleJsonLoader.get_available_books(raw_name)
+            first_b = avail[0] if avail else "Gen"
+
             return {
                 "id": folder,
                 "name": raw_name,
@@ -274,7 +278,9 @@ class BibleAppApi:
                 "annee": reg_entry.get("annee", "") if reg_entry else "",
                 "editeur": reg_entry.get("editeur", "") if reg_entry else "",
                 "comparaisons_suggerees": reg_entry.get("comparaisons_suggerees", []) if reg_entry else [],
-                "cover_url": (reg_entry.get("cover_url") if reg_entry else "") or meta.get("cover_url", "")
+                "cover_url": (reg_entry.get("cover_url") if reg_entry else "") or meta.get("cover_url", ""),
+                "available_books": avail,
+                "first_book": first_b
             }
 
         for name, meta in registry.items():
@@ -359,12 +365,6 @@ class BibleAppApi:
         ch_int = int(chapter)
         book_data = BibleJsonLoader.load_book(bible_name, book_code)
         french_name = get_french_book_name(book_code)
-
-        if not book_data or "chapters" not in book_data:
-            bibles = BibleJsonLoader.list_installed_bibles()
-            if bibles:
-                bible_name = bibles[0]
-                book_data = BibleJsonLoader.load_book(bible_name, book_code)
 
         if not book_data:
             return {

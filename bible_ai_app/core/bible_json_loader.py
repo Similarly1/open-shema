@@ -126,6 +126,31 @@ class BibleJsonLoader:
         return None
 
     @classmethod
+    def get_available_books(cls, bible_name):
+        """Retourne la liste ordonnée des codes standard de livres disponibles dans cette Bible."""
+        target_dir = cls.find_bible_dir_by_name(bible_name)
+        if not target_dir or not os.path.exists(target_dir):
+            return []
+        
+        available = []
+        all_json = sorted([f for f in os.listdir(target_dir) if f.endswith(".json")])
+        for filename in all_json:
+            parts = filename.replace(".json", "").split("_")
+            std_code = None
+            for p in parts:
+                if p.upper() in USFM_TO_STD:
+                    std_code = USFM_TO_STD[p.upper()]
+                    break
+            if not std_code:
+                for usfm, std in USFM_TO_STD.items():
+                    if usfm.lower() in filename.lower():
+                        std_code = std
+                        break
+            if std_code and std_code not in available:
+                available.append(std_code)
+        return available
+
+    @classmethod
     def get_bible_metadata(cls, folder_or_name):
         """Lit les métadonnées d'une Bible JSON à partir de son dossier"""
         if folder_or_name in cls._metadata_cache:

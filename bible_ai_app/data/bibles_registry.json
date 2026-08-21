@@ -592,5 +592,37 @@
     "description": "Révision protestante francophone historique menée à Lausanne sous la direction de Louis Gaussen, réputée pour sa très haute fidélité littérale au texte hébreu et grec.",
     "cover_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/La_Sainte_Bible%2C_trad._Segond%2C_ed._1910.djvu/page1-500px-La_Sainte_Bible%2C_trad._Segond%2C_ed._1910.djvu.jpg",
     "comparaisons_suggerees": ["S21", "DARBY", "OST", "LSG", "BDJ"]
+  },
+  "PV": {
+    "code": "PV",
+    "aliases": ["pv", "parole vivante", "bible parole vivante", "kuen parole", "alfred kuen parole vivante", "parole_vivante"],
+    "nom_officiel": "Bible Parole Vivante (Alfred Kuen)",
+    "editeur": "Éditions Emmaüs / BLF",
+    "annee": 1976,
+    "famille": "Évangélique",
+    "famille_badge_color": "#0284C7",
+    "philosophie": "Transcription dynamique",
+    "texte_base_at": "-",
+    "texte_base_nt": "Nestle-Aland / Texte Grec",
+    "canon": "Nouveau Testament (27 livres)",
+    "statut_droits": "Sous copyright",
+    "description": "Transcription dynamique contemporaine du Nouveau Testament par Alfred Kuen, avec notes explicatives et structure clarifiée.",
+    "comparaisons_suggerees": ["SV", "BDS", "S21", "NFC"]
+  },
+  "SV": {
+    "code": "SV",
+    "aliases": ["sv", "sagesse vivante", "bible sagesse vivante", "kuen sagesse", "alfred kuen sagesse", "sagesse_vivante"],
+    "nom_officiel": "Bible Sagesse Vivante (Alfred Kuen)",
+    "editeur": "Éditions Emmaüs / BLF",
+    "annee": 1988,
+    "famille": "Évangélique",
+    "famille_badge_color": "#9D174D",
+    "philosophie": "Transcription dynamique",
+    "texte_base_at": "Texte Massorétique",
+    "texte_base_nt": "-",
+    "canon": "Livres poétiques et de sagesse (Job, Proverbes, Ecclésiaste, Cantique)",
+    "statut_droits": "Sous copyright",
+    "description": "Traduction contemporaine dynamique des livres de sagesse et poétiques de l'Ancien Testament par Alfred Kuen.",
+    "comparaisons_suggerees": ["PV", "BDS", "S21", "NBS"]
   }
 }
