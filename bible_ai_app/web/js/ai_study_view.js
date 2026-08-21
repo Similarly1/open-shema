@@ -695,7 +695,7 @@ const AIStudyView = {
                   <span class="step-notice-icon">
                     <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                   </span>
-                  <span class="step-notice-text shine-text">Analyse et recoupement des extraits de votre bibliothèque (~1 à 2 min)...</span>
+                  <span class="step-notice-text shine-text">Analyse et recoupement des extraits de votre bibliothèque...</span>
                 </div>
               </div>
             </div>
@@ -738,7 +738,7 @@ const AIStudyView = {
         if (noticeEl) noticeEl.classList.remove('hidden');
 
         const rotatingMessages = [
-          "Analyse et recoupement des extraits de votre bibliothèque (~1 à 2 min)...",
+          "Analyse et recoupement des extraits de votre bibliothèque...",
           "Recoupement des concordances textuelles et des sources doctrinales...",
           "Structuration de l'exégèse et ordonnancement des arguments théologiques...",
           "Intégration des citations d'auteurs et contextualisation historique...",
@@ -1069,6 +1069,12 @@ const AIStudyView = {
     if (!mdText) return '';
     let text = mdText;
 
+    // 0. Nettoyage préliminaire : points seuls, lignes fantômes et sauts superflus
+    text = text.replace(/^\s*\.\s*$/gm, '');
+    text = text.replace(/\n\s*\.\s*\n/g, '\n\n');
+    text = text.replace(/\]\s*\.\s*\n\s*\./g, '].');
+    text = text.replace(/\]\s*\n\s*\./g, '].');
+
     // 1. Protection des blocs de code
     const codeBlocks = [];
     text = text.replace(/```([\s\S]*?)```/g, (match, code) => {
@@ -1131,7 +1137,9 @@ const AIStudyView = {
     // 9. Paragraphes
     text = text.replace(/\n\n+/g, '</p><p class="ai-p">');
     text = `<p class="ai-p">${text}</p>`;
+    // Nettoyer les paragraphes vides ou ne contenant qu'un point isolé
     text = text.replace(/<p class="ai-p">\s*<\/p>/g, '');
+    text = text.replace(/<p class="ai-p">\s*[\.\s]*<\/p>/g, '');
 
     return text;
   },
@@ -1245,8 +1253,10 @@ const AIStudyView = {
       `;
     });
 
-    // Nettoyer la ponctuation orpheline devant les pastilles de source (ex: ", <span" -> "<span")
+    // Nettoyer la ponctuation orpheline autour des pastilles de source
     res = res.replace(/,\s*(<span class="intext-source-pill")/g, ' $1');
+    res = res.replace(/(<span class="intext-source-pill"[^>]*>[\s\S]*?<\/span>)\s*\n\s*\./g, '$1.');
+    res = res.replace(/(<span class="intext-source-pill"[^>]*>[\s\S]*?<\/span>)\s*\.\s*\n\s*\./g, '$1.');
 
     return res;
   },
