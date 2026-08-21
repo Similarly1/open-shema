@@ -85,7 +85,7 @@ class GeminiClient:
         for current_model in models_to_try:
             url = f"{self.base_url}/{current_model}:generateContent?key={self.api_key}"
             try:
-                response = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=50)
+                response = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=180)
                 if response.status_code in [404, 429, 500, 502, 503, 504]:
                     last_error = f"Status {response.status_code} pour {current_model}"
                     continue
@@ -96,15 +96,18 @@ class GeminiClient:
                     return data["candidates"][0]["content"]["parts"][0]["text"]
                 except (KeyError, IndexError):
                     return "Erreur lors de la lecture de la réponse Gemini."
+            except requests.exceptions.Timeout as e:
+                last_error = f"Délai d'attente dépassé (timeout 180s) sur {current_model}"
+                continue
             except requests.exceptions.HTTPError as e:
                 if hasattr(e, 'response') and e.response is not None and e.response.status_code in [404, 429, 500, 502, 503, 504]:
                     last_error = f"Erreur {e.response.status_code} sur {current_model}"
                     continue
                 last_error = str(e)
-                break
+                continue
             except Exception as e:
                 last_error = str(e)
-                break
+                continue
 
         return f"Erreur Gemini ({last_error})"
 
