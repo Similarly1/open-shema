@@ -173,7 +173,10 @@ const BookPicker = {
     return null;
   },
 
-  open(currentBookCode, currentChapter) {
+  activeCallback: null,
+
+  open(currentBookCode, currentChapter, customCallback = null) {
+    this.activeCallback = customCallback;
     this.selectedBook = this.booksData.find(b => b.code.toLowerCase() === (currentBookCode || '').toLowerCase()) || this.booksData[0];
     this.selectedChapter = currentChapter || 1;
     this.pendingTargetChapter = null;
@@ -191,11 +194,12 @@ const BookPicker = {
   close() {
     this.popoverEl?.classList.add('hidden');
     this.backdropEl?.classList.add('hidden');
+    this.activeCallback = null;
   },
 
-  toggle(currentBookCode, currentChapter) {
+  toggle(currentBookCode, currentChapter, customCallback = null) {
     if (!this.popoverEl || this.popoverEl.classList.contains('hidden')) {
-      this.open(currentBookCode, currentChapter);
+      this.open(currentBookCode, currentChapter, customCallback);
     } else {
       this.close();
     }
@@ -294,9 +298,10 @@ const BookPicker = {
   },
 
   confirmSelection(bookCode, chapterNum, verseNum = null) {
+    const cb = this.activeCallback || this.onSelectCallback;
     this.close();
-    if (this.onSelectCallback) {
-      this.onSelectCallback(bookCode, chapterNum, verseNum);
+    if (cb) {
+      cb(bookCode, chapterNum, verseNum);
     }
   }
 };

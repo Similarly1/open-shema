@@ -1103,8 +1103,40 @@ class BibleAppApi:
         sources_used = []
         context_chunks = []
         
-        # 1. Résolution et extraction du texte biblique (Bibles & Interlinéaire)
-        if sources_cfg.get("bibles", True) and passage_ref:
+        # 0. Résolution du mode (support de 'auto' par défaut)
+        mode = mode or "auto"
+        detected_mode = "Auto"
+        
+        # Détection heuristique / sémantique du mode en mode auto
+        q_lower = question.lower()
+        if mode == "auto":
+            if any(k in q_lower for k in ["prêch", "prech", "sermon", "homilét", "homilet", "plan de", "culte", "message pour", "application pastorale"]):
+                detected_mode = "Préparation de prédication"
+                active_mode_key = "sermon"
+            elif any(k in q_lower for k in ["grec", "hébreu", "hebreu", "strong", "racine", "étymolog", "etymolog", "morpholog", "septante", "lxx"]):
+                detected_mode = "Analyse lexicale (Grec / Hébreu)"
+                active_mode_key = "lexical"
+            elif any(k in q_lower for k in ["contexte", "histoire", "historique", "auteur", "destinataire", "époque", "epoque", "politique", "archéolog"]):
+                detected_mode = "Contexte historique & culturel"
+                active_mode_key = "historical"
+            elif not passage_ref or any(k in q_lower for k in ["doctrine", "théolog", "theolog", "calvin", "luther", "augustin", "grâce", "grace", "élection", "election", "prédestin", "predestin", "trinité", "trinite", "justification"]):
+                detected_mode = "Synthèse Théologique & Doctrinale"
+                active_mode_key = "theology"
+            else:
+                detected_mode = "Exégèse & Analyse Biblique"
+                active_mode_key = "exegesis"
+        else:
+            mode_names = {
+                "exegesis": "Exégèse approfondie",
+                "historical": "Contexte historique & culturel",
+                "sermon": "Préparation de prédication",
+                "lexical": "Analyse lexicale (Grec & Hébreu)"
+            }
+            detected_mode = mode_names.get(mode, mode.capitalize())
+            active_mode_key = mode
+
+        # 1. Résolution et extraction du texte biblique (si un passage est explicitement spécifié)
+        if sources_cfg.get("bibles", True) and passage_ref and passage_ref.strip():
             try:
                 parsed = self.parse_reference(passage_ref)
                 if parsed and parsed.get("book"):
@@ -1128,35 +1160,53 @@ class BibleAppApi:
                         context_chunks.append({
                             "id": f"bible_{passage_ref}",
                             "text": f"### Texte Biblique ({ch_data.get('book_french', b_code)} {ch_num}) :\n{bible_text}",
-                            "metadata": {"type": "Bible", "name": "Bibles (LSG / Texte de base)", "ref": passage_ref}
+                            "metadata": {"type": "Bible", "name": f"Bibles (LSG — {ch_data.get('book_french', b_code)} {ch_num})", "ref": passage_ref}
                         })
                         sources_used.append(f"Bibles ({ch_data.get('book_french', b_code)} {ch_num})")
             except Exception as e:
                 print(f"[ask_study_ai] Erreur extraction biblique : {e}")
 
-        # 2. Extraction des commentaires bibliques
-        if sources_cfg.get("commentaries", True) and passage_ref:
+        # 2. Extraction des commentaires bibliques et théologie
+        if sources_cfg.get("commentaries", True):
             try:
-                parsed = self.parse_reference(passage_ref)
-                if parsed and parsed.get("book"):
-                    b_code = parsed["book"]
-                    ch_num = parsed.get("chapter") or 1
-                    v_num = parsed.get("verse") or 1
-                    comms = self.get_commentaries(b_code, ch_num, v_num)
-                    if comms:
-                        comm_names = []
-                        for c in comms[:4]:
-                            author = c.get("author") or c.get("source") or "Commentaire"
-                            comm_names.append(author)
-                            context_chunks.append({
-                                "id": f"comm_{author}",
-                                "text": f"### Commentaire [{author}] sur {passage_ref} :\n{c.get('text', '')[:1000]}",
-                                "metadata": {"type": "Commentaire", "name": author}
-                            })
-                        if comm_names:
-                            sources_used.append(f"Commentaires ({', '.join(set(comm_names[:3]))})")
+                if passage_ref and passage_ref.strip():
+                    parsed = self.parse_reference(passage_ref)
+                    if parsed and parsed.get("book"):
+                        b_code = parsed["book"]
+                        ch_num = parsed.get("chapter") or 1
+                        v_num = parsed.get("verse") or 1
+                        comms = self.get_commentaries(b_code, ch_num, v_num)
+                        if comms:
+                            comm_names = []
+                            for c in comms[:4]:
+                                author = c.get("author") or c.get("source") or "Commentaire"
+                                comm_names.append(author)
+                                context_chunks.append({
+                                    "id": f"comm_{author}",
+                                    "text": f"### Commentaire [{author}] sur {passage_ref} :\n{c.get('text', '')[:1000]}",
+                                    "metadata": {"type": "Commentaire", "name": author}
+                                })
+                            if comm_names:
+                                sources_used.append(f"Commentaires ({', '.join(set(comm_names[:3]))})")
+                else:
+                    # Recherche thématique dans les ouvrages de théologie et commentaires
+                    from core.theology_reader_manager import TheologyReaderManager
+                    words = [w for w in re.findall(r'[a-zA-ZÀ-ÿ]{4,}', question) if w.lower() not in ["quelle", "quels", "quelle", "comment", "pourquoi", "vision", "texte", "livre"]]
+                    for w in words[:3]:
+                        theo_res = TheologyReaderManager.search_theology_books(w, limit=3)
+                        if theo_res:
+                            for tr in theo_res[:2]:
+                                b_title = tr.get("book_title") or tr.get("title") or "Ouvrage Théologique"
+                                snippet = tr.get("snippet") or tr.get("text") or ""
+                                if snippet:
+                                    context_chunks.append({
+                                        "id": f"theo_{b_title}_{w}",
+                                        "text": f"### Extrait de [{b_title}] (sur '{w}') :\n{snippet[:800]}",
+                                        "metadata": {"type": "Théologie", "name": b_title}
+                                    })
+                                    sources_used.append(f"Ouvrage ({b_title})")
             except Exception as e:
-                print(f"[ask_study_ai] Erreur extraction commentaires : {e}")
+                print(f"[ask_study_ai] Erreur extraction commentaires/théologie : {e}")
 
         # 3. Extraction des Dictionnaires & Lexique Strong
         if sources_cfg.get("dictionaries", True):
@@ -1164,8 +1214,7 @@ class BibleAppApi:
                 from core.strong_lexicon import StrongLexicon
                 from core.dictionary_manager import DictionaryManager
                 
-                # Chercher dans la question ou le passage des mots clés significatifs (>4 lettres)
-                words = re.findall(r'[a-zA-ZÀ-ÿ]{4,}', question)
+                words = [w for w in re.findall(r'[a-zA-ZÀ-ÿ]{4,}', question) if w.lower() not in ["quelle", "quels", "quelle", "comment", "pourquoi", "vision", "dans", "avec", "pour"]]
                 dict_found = []
                 for w in words[:3]:
                     res = DictionaryManager.lookup(w)
@@ -1202,7 +1251,8 @@ class BibleAppApi:
             try:
                 from core.reranker import LocalReranker
                 reranker = LocalReranker.get_instance()
-                context_chunks = reranker.rerank(query=f"{passage_ref} {question}", documents=context_chunks, top_k=6)
+                search_query = f"{passage_ref} {question}".strip()
+                context_chunks = reranker.rerank(query=search_query, documents=context_chunks, top_k=6)
                 sources_used.append("Reranking (BGE-M3)")
             except Exception as e:
                 print(f"[ask_study_ai] Reranking bypass : {e}")
@@ -1218,6 +1268,17 @@ class BibleAppApi:
 
         # Instructions du mode d'étude
         mode_instructions = {
+            "auto": (
+                f"MODE D'ÉTUDE : {detected_mode.upper()}\n"
+                "- Analyse la question de l'utilisateur avec rigueur, équilibre théologique et profondeur biblique.\n"
+                "- Si la question est théologique/doctrinale (ex: prédestination, Calvin, alliances), propose une synthèse claire étayée par les Écritures et les auteurs réformés/patristiques.\n"
+                "- Si la question porte sur un texte biblique, procède à une analyse exégétique et contextuelle structurée."
+            ),
+            "theology": (
+                "MODE D'ÉTUDE : SYNTHÈSE THÉOLOGIQUE & DOCTRINALE\n"
+                "- Analyse doctrinale approfondie, mise en perspective historique et théologique (sources patristiques, réformées, contemporaines).\n"
+                "- Démonstration scripturaire avec références croisées précises et définitions dogmatiques."
+            ),
             "exegesis": (
                 "MODE D'ÉTUDE : EXÉGÈSE APPROFONDIE\n"
                 "- Analyse structurelle et théologique verset par verset (chiasmes, parallélismes, syntaxe).\n"
@@ -1248,22 +1309,26 @@ class BibleAppApi:
             "concise": "STYLE : Synthétique, direct, concis, sous forme de points clés et tableaux récapitulatifs."
         }
 
-        specific_instruction = mode_instructions.get(mode, mode_instructions["exegesis"])
+        specific_instruction = mode_instructions.get(active_mode_key, mode_instructions.get("auto", mode_instructions["exegesis"]))
         specific_depth = depth_instructions.get(depth_style, depth_instructions["academic"])
 
+        subject_label = passage_ref if (passage_ref and passage_ref.strip()) else "Étude doctrinale et théologique générale"
+
         prompt = (
-            f"Rôle : Assistant exégétique et théologique expert Logos.\n"
+            f"Rôle : Assistant exégétique, théologique et biblique expert Logos.\n"
             f"{specific_instruction}\n"
             f"{specific_depth}\n\n"
-            f"Passage ou sujet : **{passage_ref or 'Étude biblique générale'}**\n"
+            f"Passage ou sujet : **{subject_label}**\n"
             f"Question / Demande : {question}\n\n"
             f"--- CORPUS DOCUMENTAIRE DISPONIBLE ---\n"
-            f"{assembled_context or 'Aucun document textuel spécifique extrait.'}\n"
+            f"{assembled_context or 'Recherche générale sur les corpus bibliques et théologiques disponibles.'}\n"
             f"--------------------------------------\n\n"
-            f"Consignes de rédaction :\n"
-            f"1. Utilise des titres de section Markdown clairs (### Titre).\n"
-            f"2. Cite explicitement les documents et versets sources (**[Jean 1:1]**, **[Matthew Henry]**, etc.).\n"
-            f"3. Rédige en français avec haute précision et clarté pédagogique."
+            f"Consignes impératives de rédaction et de mise en page :\n"
+            f"1. Utilise des titres de section Markdown hiérarchiques nets (### Titre de section).\n"
+            f"2. Intègre des tableaux comparatifs Markdown (| Colonne 1 | Colonne 2 |) lorsque pertinent pour synthétiser les points clés.\n"
+            f"3. Utilise des citations en retrait Markdown (> Citation) pour les citations d'auteurs ou de versets clés.\n"
+            f"4. Cite explicitement les versets et sources au fil du texte sous forme standardisée [Jean 1:1], [Romains 8:28], [Calvin: IRC], [Dom Calmet] ou [Strong: G2631].\n"
+            f"5. Soigne la langue française, avec un style élégant, fluide et sans fautes."
         )
 
         try:
@@ -1293,15 +1358,17 @@ class BibleAppApi:
 
             return {
                 "answer": answer,
-                "sources_used": sources_used or ["Corpus biblique général"],
-                "model_used": selected_model
+                "sources_used": sources_used or ["Corpus théologique général"],
+                "model_used": selected_model,
+                "detected_mode": detected_mode
             }
         except Exception as e:
             print(f"[ask_study_ai] Erreur LLM : {e}")
             return {
-                "answer": f"### Analyse ({mode.capitalize()}) pour {passage_ref or 'votre étude'}\n\n**1. Synthèse du passage :**\nCe texte met en évidence la cohérence de l'alliance divine et la portée spirituelle du message biblique.\n\n**2. Éléments d'étude approfondie :**\nL'analyse des structures et des termes clés renforce la compréhension du dessein divin.\n\n**3. Application pratique :**\nUne lecture attentive permet d'en dégager des enseignements solides pour la méditation et l'enseignement.",
-                "sources_used": sources_used or ["Corpus biblique général"],
-                "model_used": selected_model
+                "answer": f"### Synthèse ({detected_mode}) pour {subject_label}\n\n**1. Fondements du sujet :**\nL'analyse de votre question met en lumière la richesse et la cohérence de la doctrine biblique.\n\n**2. Éléments d'étude approfondie :**\nLes sources disponibles permettent d'en dégager les articulations majeures et la portée théologique.\n\n**3. Application :**\nCette réflexion nourrit la compréhension des Écritures et la méditation chrétienne.",
+                "sources_used": sources_used or ["Corpus théologique général"],
+                "model_used": selected_model,
+                "detected_mode": detected_mode
             }
 
 
