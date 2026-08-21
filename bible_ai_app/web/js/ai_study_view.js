@@ -838,6 +838,43 @@ const AIStudyView = {
       return this.shuffleArray(generalPool).slice(0, 5);
     } else {
       const ref = passageLabel;
+      
+      // Mode Prédication spécialisé avec les 5 piliers homilétiques
+      if (this.currentMode === 'sermon') {
+        return [
+          {
+            svg: this.ICONS.sparkles,
+            label: `Proposition Centrale (PC) de ${ref}`,
+            prompt: `Dégage le sujet précis et formule la Proposition Centrale (Big Idea / thèse homilétique) pour ${ref} en une phrase claire et percutante.`,
+            targetMode: 'sermon'
+          },
+          {
+            svg: this.ICONS.notes,
+            label: `Plan Expositif de ${ref}`,
+            prompt: `Construis un plan expositif fidèle en 2 à 4 points pour ${ref} selon la méthode découper-décrire-homogénéiser.`,
+            targetMode: 'sermon'
+          },
+          {
+            svg: this.ICONS.book,
+            label: `Pistes d'Illustrations sur ${ref}`,
+            prompt: `Propose 3 illustrations pertinentes (historiques, bibliques ou contemporaines) pour illuminer le message de ${ref}.`,
+            targetMode: 'sermon'
+          },
+          {
+            svg: this.ICONS.scales,
+            label: `4 Axes d'Applications pour ${ref}`,
+            prompt: `Formule des applications pastorales concrètes pour ${ref} selon les 4 axes : Cœur, Pensée, Action et Communauté, ancrées dans la grâce.`,
+            targetMode: 'sermon'
+          },
+          {
+            svg: this.ICONS.search,
+            label: `Garde-fous & Pièges sur ${ref}`,
+            prompt: `Quels sont les pièges homilétiques, le risque moraliste ou les fausses pistes à éviter lors de la prédication de ${ref} ?`,
+            targetMode: 'sermon'
+          }
+        ];
+      }
+
       const passagePool = [
         {
           svg: this.ICONS.bible,

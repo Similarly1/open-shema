@@ -647,10 +647,40 @@ const CommentaryViewer = {
   currentChapter: 1,
   currentVerse: 1,
   isSynchronized: true,
+  fontSize: 15,
   translationCache: {},
   showTranslatedVersion: {},
 
   init() {
+    // 0. Restaurer les préférences d'affichage
+    try {
+      const savedFontSize = localStorage.getItem('bible_comm_font_size');
+      if (savedFontSize) this.fontSize = parseInt(savedFontSize, 10) || 15;
+    } catch (e) {}
+    this.applyFontSize();
+
+    // 0b. Boutons de navigation verset précédent / verset suivant
+    const btnPrev = document.getElementById('btn-comm-prev-verse');
+    const btnNext = document.getElementById('btn-comm-next-verse');
+    btnPrev?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.navigateVerse(-1);
+    });
+    btnNext?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.navigateVerse(1);
+    });
+
+    // 0c. Boutons d'ajustement de taille de texte
+    document.getElementById('btn-comm-font-dec')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.adjustFontSize(-1);
+    });
+    document.getElementById('btn-comm-font-inc')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.adjustFontSize(1);
+    });
+
     // 1. Bouton de traduction d'article individuel
     const btnTranslate = document.getElementById('btn-translate-comm');
     btnTranslate?.addEventListener('click', (e) => {
@@ -675,7 +705,7 @@ const CommentaryViewer = {
       }
     } catch (e) {}
 
-    // 2. Bouton de synchronisation / déliage
+    // 2b. Bouton de synchronisation / déliage
     const btnSync = document.getElementById('btn-toggle-comm-sync');
     btnSync?.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -683,13 +713,25 @@ const CommentaryViewer = {
     });
     this.updateSyncButtonUI();
 
-    // 3. Sélecteur de source de commentaire
+    // 3. Sélecteur de source de commentaire & filtre
     const btnSource = document.getElementById('btn-select-comm-source');
     const popoverSource = document.getElementById('comm-sources-popover');
+    const filterInput = document.getElementById('comm-sources-filter-input');
 
     btnSource?.addEventListener('click', (e) => {
       e.stopPropagation();
       popoverSource?.classList.toggle('hidden');
+      if (popoverSource && !popoverSource.classList.contains('hidden')) {
+        if (filterInput) {
+          filterInput.value = '';
+          this.filterSourcesList('');
+          setTimeout(() => filterInput.focus(), 50);
+        }
+      }
+    });
+
+    filterInput?.addEventListener('input', (e) => {
+      this.filterSourcesList(e.target.value);
     });
 
     document.addEventListener('click', (e) => {
@@ -757,6 +799,59 @@ const CommentaryViewer = {
     CommentarySynthesizerUI.init();
   },
 
+  applyFontSize() {
+    const root = document.getElementById('drawer-tab-commentaries');
+    if (root) {
+      root.style.setProperty('--comm-font-size', `${this.fontSize}px`);
+    }
+  },
+
+  adjustFontSize(delta) {
+    this.fontSize = Math.max(12, Math.min(24, this.fontSize + delta));
+    this.applyFontSize();
+    try {
+      localStorage.setItem('bible_comm_font_size', String(this.fontSize));
+    } catch (e) {}
+    App.showToast(`Taille du texte : ${this.fontSize}px`);
+  },
+
+  async navigateVerse(delta) {
+    let nextV = (parseInt(this.currentVerse, 10) || 1) + delta;
+    let nextCh = parseInt(this.currentChapter, 10) || 1;
+    let nextBk = this.currentBook || 'Gen';
+
+    if (nextV < 1) {
+      if (nextCh > 1) {
+        nextCh -= 1;
+        nextV = 1;
+      } else {
+        App.showToast('Début du livre');
+        return;
+      }
+    }
+
+    if (this.isSynchronized) {
+      // Déplacer la lecture biblique principale et synchroniser
+      if (typeof BibleReader !== 'undefined' && typeof BibleReader.navigateTo === 'function') {
+        await BibleReader.navigateTo(nextBk, nextCh, nextV);
+      }
+    } else {
+      // En mode indépendant, charger directement le commentaire
+      this.currentBook = nextBk;
+      this.currentChapter = nextCh;
+      this.currentVerse = nextV;
+      const bookInfo = typeof getBookInfo === 'function' ? getBookInfo(nextBk) : { name: nextBk };
+      const refStr = `${bookInfo.name || nextBk} ${nextCh}:${nextV}`;
+      this.updateLiveBadge(refStr);
+      try {
+        const comms = await API.getCommentaries(nextBk, nextCh, nextV);
+        this.setComments(comms, refStr, nextBk, nextCh, nextV);
+      } catch (e) {
+        console.error('Erreur navigation commentaire délié:', e);
+      }
+    }
+  },
+
   toggleSync(forcedState) {
     if (typeof forcedState === 'boolean') {
       this.isSynchronized = forcedState;
@@ -786,10 +881,18 @@ const CommentaryViewer = {
   },
 
   updateLiveBadge(verseRef) {
+    const badgeTextEl = document.getElementById('comm-selected-verse-text');
     const badgeEl = document.getElementById('comm-selected-verse');
-    if (badgeEl && verseRef) {
+    if (badgeTextEl && verseRef) {
+      badgeTextEl.textContent = verseRef;
+      this.currentVerseRef = verseRef;
+    } else if (badgeEl && verseRef) {
       badgeEl.textContent = verseRef;
       this.currentVerseRef = verseRef;
+    }
+    const aiBadgeEl = document.getElementById('lbl-drawer-ai-passage');
+    if (aiBadgeEl && verseRef) {
+      aiBadgeEl.textContent = verseRef;
     }
   },
 
@@ -821,6 +924,20 @@ const CommentaryViewer = {
     }
   },
 
+  filterSourcesList(query) {
+    const listEl = document.getElementById('comm-sources-list');
+    if (!listEl) return;
+    const cleanQ = (query || '').toLowerCase().trim();
+    listEl.querySelectorAll('.comm-source-item').forEach(item => {
+      const text = item.textContent.toLowerCase();
+      if (!cleanQ || text.includes(cleanQ)) {
+        item.style.display = 'flex';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  },
+
   setComments(comments, verseRef, bookCode = null, chapterNum = null, verseNum = null) {
     this.currentComments = comments || [];
     this.currentVerseRef = verseRef || '';
@@ -829,11 +946,14 @@ const CommentaryViewer = {
     if (verseNum) this.currentVerse = verseNum;
 
     const countEl = document.getElementById('comm-popover-count');
+    const badgeCountEl = document.getElementById('lbl-comm-source-count');
     const listEl = document.getElementById('comm-sources-list');
-    const badgeEl = document.getElementById('comm-selected-verse');
 
-    if (badgeEl) badgeEl.textContent = verseRef;
-    if (countEl) countEl.textContent = this.currentComments.length;
+    this.updateLiveBadge(verseRef);
+
+    const countNum = this.currentComments.length;
+    if (countEl) countEl.textContent = countNum;
+    if (badgeCountEl) badgeCountEl.textContent = countNum;
     if (listEl) listEl.innerHTML = '';
 
     // Si aucun auteur préféré n'a encore été choisi, initialiser avec le premier disponible
@@ -841,14 +961,22 @@ const CommentaryViewer = {
       this.preferredAuthor = this.currentComments[0].author || this.currentComments[0].source;
     }
 
-    // Peupler le popover de sélection de source
+    // Peupler le popover de sélection de source avec métadonnées enrichies
     if (this.currentComments.length > 0) {
       this.currentComments.forEach((c, idx) => {
         const authorName = c.author || c.source || `Commentaire ${idx + 1}`;
+        const sourceMeta = this.getSourceInfo(authorName);
         const isMatch = this.preferredAuthor && authorName.toLowerCase() === this.preferredAuthor.toLowerCase();
+        
         const item = document.createElement('button');
         item.className = `comm-source-item ${isMatch ? 'active' : ''}`;
-        item.innerHTML = `<span style="display:inline-flex; align-items:center; gap:5px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span>${authorName}</span></span>`;
+        item.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 7px; min-width: 0;">
+            <span class="comm-single-author-avatar" style="width: 20px; height: 20px; font-size: 9px; border-radius: 4px; background-color: ${sourceMeta.color || '#1E3A8A'};">${sourceMeta.initials || 'C'}</span>
+            <span style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${sourceMeta.title || authorName}</span>
+          </div>
+          <span class="comm-source-item-meta">${sourceMeta.period ? sourceMeta.period.split('(')[0].trim() : ''}</span>
+        `;
         item.addEventListener('click', () => {
           this.preferredAuthor = authorName;
           this.selectCommentary(idx);
@@ -886,6 +1014,25 @@ const CommentaryViewer = {
     return enMatches > frMatches;
   },
 
+  formatCommentaryMarkdown(text) {
+    if (!text) return '';
+    const formatted = text
+      .replace(/^### (.*$)/gim, '<h3 style="margin: 14px 0 6px 0; font-size: 15px; font-weight: 700; color: var(--accent-blue);">$1</h3>')
+      .replace(/^## (.*$)/gim, '<h2 style="margin: 18px 0 8px 0; font-size: 17px; font-weight: 800; color: var(--accent-blue);">$1</h2>')
+      .replace(/^# (.*$)/gim, '<h1 style="margin: 20px 0 10px 0; font-size: 19px; font-weight: 800; color: var(--accent-blue);">$1</h1>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/^\> (.*$)/gim, '<blockquote style="border-left: 3px solid var(--accent-blue); padding: 6px 12px; margin: 10px 0; background: var(--bg-subtle); border-radius: 0 6px 6px 0; font-style: italic; color: var(--text-secondary);">$1</blockquote>')
+      .replace(/^\- (.*$)/gim, '<li style="margin-left: 18px; margin-bottom: 4px;">$1</li>');
+
+    return formatted
+      .split(/\n\n+/)
+      .map(p => p.trim())
+      .filter(Boolean)
+      .map(p => (p.startsWith('<h') || p.startsWith('<blockquote') || p.startsWith('<li')) ? p : `<p style="margin: 0 0 12px 0; line-height: 1.75;">${p}</p>`)
+      .join('');
+  },
+
   selectCommentary(index) {
     if (!this.currentComments[index]) return;
     this.activeIndex = index;
@@ -894,8 +1041,9 @@ const CommentaryViewer = {
     const authorName = comm.author || comm.source || 'Commentaire';
     this.preferredAuthor = authorName;
 
+    const sourceMeta = this.getSourceInfo(authorName);
     const lbl = document.getElementById('lbl-active-comm-source');
-    if (lbl) lbl.textContent = authorName;
+    if (lbl) lbl.textContent = sourceMeta.title || authorName;
 
     document.querySelectorAll('.comm-source-item').forEach((item, idx) => {
       item.classList.toggle('active', idx === index);
@@ -942,22 +1090,109 @@ const CommentaryViewer = {
       }
     }
 
+    // 1. Markdown propre
+    const formattedMarkdown = this.formatCommentaryMarkdown(displayedText);
+
+    // 2. Détection universelle des références bibliques (identique à Théologie / Lexique)
+    let linkifiedBody = (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences)
+      ? TheologyView.highlightScriptureReferences(formattedMarkdown)
+      : formattedMarkdown;
+
+    // 3. Liens web externes
+    if (typeof TheologyView !== 'undefined' && TheologyView.linkifyUrls) {
+      linkifiedBody = TheologyView.linkifyUrls(linkifiedBody);
+    }
+
     container.innerHTML = `
-      <div class="comm-single-author-header">
-        <span class="comm-single-author-badge" style="display:inline-flex; align-items:center; gap:5px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span>${authorName}</span></span>
-      </div>
-      ${translationBannerHtml}
-      <div class="comm-single-body">
-        ${(displayedText || '').replace(/\n\n/g, '<br><br>')}
+      <div class="comm-single-card">
+        <div class="comm-single-author-header">
+          <div class="comm-single-author-info">
+            <div class="comm-single-author-avatar" style="background-color: ${sourceMeta.color || '#1E3A8A'};">
+              ${sourceMeta.initials || 'C'}
+            </div>
+            <div>
+              <div class="comm-single-author-name">${sourceMeta.title || authorName}</div>
+              <div class="comm-single-author-period">${sourceMeta.period || 'Ouvrage d\'exégèse'} • ${sourceMeta.author || authorName}</div>
+            </div>
+          </div>
+
+          <div class="comm-single-top-actions">
+            <button class="comm-single-action-pill" id="btn-comm-single-copy" title="Copier ce commentaire">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+              <span>Copier</span>
+            </button>
+            <button class="comm-single-action-pill" id="btn-comm-single-note" title="Enregistrer dans les notes d'étude">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+              <span>Vers note</span>
+            </button>
+          </div>
+        </div>
+
+        ${translationBannerHtml}
+
+        <div class="comm-single-body">
+          ${linkifiedBody}
+        </div>
       </div>
     `;
 
+    // 4. Lier l'infobulle biblique interactive (ScriptureTooltip) & navigation par clic
+    if (typeof ScriptureTooltip !== 'undefined') {
+      ScriptureTooltip.bindToElements(container.querySelectorAll('.theol-inline-scripture-ref'));
+    }
+    container.querySelectorAll('.theol-inline-scripture-ref').forEach(span => {
+      span.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const ref = span.dataset.ref || span.textContent.trim();
+        if (ref) {
+          if (typeof ScriptureTooltip !== 'undefined') ScriptureTooltip.hide();
+          if (typeof BibleReader !== 'undefined') BibleReader.searchPassage(ref);
+        }
+      });
+    });
+
+    // 5. Écouteur pour la bascule de traduction
     const toggleBtn = container.querySelector('#btn-toggle-orig-text');
     if (toggleBtn) {
       toggleBtn.addEventListener('click', () => {
         this.showTranslatedVersion[itemId] = !isShowingTranslated;
         this.selectCommentary(index);
       });
+    }
+
+    // 6. Écouteur pour la copie du commentaire
+    container.querySelector('#btn-comm-single-copy')?.addEventListener('click', () => {
+      const refLabel = this.currentVerseRef || `${this.currentBook} ${this.currentChapter}:${this.currentVerse}`;
+      const fullCitation = `[Commentaire de ${authorName} - ${refLabel}]\n\n${displayedText}`;
+      navigator.clipboard.writeText(fullCitation).then(() => {
+        App.showToast('Commentaire copié dans le presse-papier !');
+      }).catch(() => {
+        App.showToast('Impossible de copier le texte');
+      });
+    });
+
+    // 7. Écouteur pour exporter vers les notes
+    container.querySelector('#btn-comm-single-note')?.addEventListener('click', () => {
+      this.exportToNotes(authorName, displayedText);
+    });
+  },
+
+  exportToNotes(authorName, text) {
+    const bookInfo = typeof getBookInfo === 'function' ? getBookInfo(this.currentBook) : { name: this.currentBook };
+    const refStr = `${bookInfo.name || this.currentBook} ${this.currentChapter}:${this.currentVerse}`;
+    const noteTitle = `Étude ${refStr} - ${authorName}`;
+    const noteContent = `## Commentaire de ${authorName} sur ${refStr}\n\n### Exposition Exégétique :\n\n${text}\n`;
+
+    App.switchView('notes');
+    if (typeof NotesView !== 'undefined') {
+      NotesView.createNewNote(refStr, noteTitle);
+      if (NotesView.contentInput) {
+        NotesView.contentInput.innerText = noteContent;
+      }
+      if (NotesView.currentNote) {
+        NotesView.currentNote.content = noteContent;
+      }
+      App.showToast(`Nouvelle note créée pour ${refStr} !`);
     }
   },
 
@@ -1006,8 +1241,9 @@ const CommentaryViewer = {
 
   renderAbsentPreferredAuthor() {
     const authorName = this.preferredAuthor || 'Commentaire';
+    const sourceMeta = this.getSourceInfo(authorName);
     const lbl = document.getElementById('lbl-active-comm-source');
-    if (lbl) lbl.textContent = `${authorName}`;
+    if (lbl) lbl.textContent = sourceMeta.title || authorName;
 
     document.querySelectorAll('.comm-source-item').forEach(item => {
       item.classList.remove('active');
@@ -1027,12 +1263,18 @@ const CommentaryViewer = {
             <span style="background: rgba(2, 132, 199, 0.15); color: var(--accent-blue); padding: 1px 7px; border-radius: 10px; font-size: 10px; font-weight: 700;">${this.currentComments.length}</span>
           </div>
           <div style="display: flex; flex-direction: column; gap: 6px;">
-            ${this.currentComments.map((c, idx) => `
-              <button class="comm-suggestion-btn" data-idx="${idx}" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 9px 12px; font-size: 12px; text-align: left; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.15s ease;">
-                <span style="font-weight: 600; color: var(--text-primary); display:inline-flex; align-items:center; gap:5px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span>${c.author || c.source}</span></span>
+            ${this.currentComments.map((c, idx) => {
+              const itemMeta = this.getSourceInfo(c.author || c.source);
+              return `
+              <button class="comm-suggestion-btn" data-idx="${idx}" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px 10px; font-size: 12px; text-align: left; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.15s ease;">
+                <span style="font-weight: 600; color: var(--text-primary); display:inline-flex; align-items:center; gap:6px;">
+                  <span class="comm-single-author-avatar" style="width: 18px; height: 18px; font-size: 8px; border-radius: 3px; background-color: ${itemMeta.color || '#1E3A8A'};">${itemMeta.initials || 'C'}</span>
+                  <span>${itemMeta.title || c.author || c.source}</span>
+                </span>
                 <span style="font-size: 11px; color: var(--accent-blue); font-weight: 600;">Consulter →</span>
               </button>
-            `).join('')}
+            `;
+            }).join('')}
           </div>
         </div>
       `;
@@ -1046,13 +1288,13 @@ const CommentaryViewer = {
 
     container.innerHTML = `
       <div class="comm-absent-view" style="padding: 16px 8px; text-align: center;">
-        <div style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: var(--bg-subtle); color: var(--text-secondary); margin-bottom: 12px; border: 1px solid var(--border-color);">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        <div style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 8px; background-color: ${sourceMeta.color || '#1E3A8A'}; color: #fff; font-weight: 800; font-size: 13px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">
+          ${sourceMeta.initials || 'C'}
         </div>
-        <div style="font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">
-          ${authorName}
+        <div style="font-size: 13.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">
+          ${sourceMeta.title || authorName}
         </div>
-        <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; max-width: 320px; margin: 0 auto;">
+        <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.5; max-width: 320px; margin: 0 auto;">
           Cet ouvrage ne comporte pas de note directe pour le verset <strong>${this.currentVerseRef || ''}</strong>.
         </div>
         ${suggestionsHtml}
@@ -1062,7 +1304,7 @@ const CommentaryViewer = {
     // Écouteurs sur les suggestions rapides
     container.querySelectorAll('.comm-suggestion-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        const idx = parseInt(btn.dataset.idx);
+        const idx = parseInt(btn.dataset.idx, 10);
         this.selectCommentary(idx);
       });
       btn.addEventListener('mouseenter', () => {
@@ -1341,7 +1583,12 @@ const CommentarySynthesizerUI = {
     "segond 21": { title: "Notes d'étude Segond 21", author: "Société Biblique de Genève", period: "Segond 21 (2007)", color: "#B91C1C", initials: "S21" },
     "notes d'étude segond 21": { title: "Notes d'étude Segond 21", author: "Société Biblique de Genève", period: "Segond 21 (2007)", color: "#B91C1C", initials: "S21" },
     "tsk": { title: "Trésor de la connaissance des Écritures (TSK)", author: "R.A. Torrey / TSK", period: "Treasury of Scripture Knowledge (1836)", color: "#4338CA", initials: "TSK" },
-    "macarthur": { title: "The MacArthur Bible Commentary", author: "John MacArthur", period: "Études bibliques contemporaines", color: "#1E293B", initials: "JM" }
+    "macarthur": { title: "The MacArthur Bible Commentary", author: "John MacArthur", period: "Études bibliques contemporaines", color: "#1E293B", initials: "JM" },
+    "godet": { title: "Bible annotée (Frédéric Godet & Neuchâtel)", author: "Frédéric Godet et collaborateurs", period: "Bible Annotée de Neuchâtel (1899)", color: "#0D9488", initials: "BAG" },
+    "frédéric godet": { title: "Bible annotée (Frédéric Godet & Neuchâtel)", author: "Frédéric Godet et collaborateurs", period: "Bible Annotée de Neuchâtel (1899)", color: "#0D9488", initials: "BAG" },
+    "bible annotée (frédéric godet)": { title: "Bible annotée (Frédéric Godet & Neuchâtel)", author: "Frédéric Godet et collaborateurs", period: "Bible Annotée de Neuchâtel (1899)", color: "#0D9488", initials: "BAG" },
+    "tgc": { title: "Commentaires The Gospel Coalition (TGC)", author: "The Gospel Coalition (Carson, Schreiner, Köstenberger, etc.)", period: "The Gospel Coalition Commentary (2021-2024)", color: "#9A3412", initials: "TGC" },
+    "the gospel coalition": { title: "Commentaires The Gospel Coalition (TGC)", author: "The Gospel Coalition (Carson, Schreiner, Köstenberger, etc.)", period: "The Gospel Coalition Commentary (2021-2024)", color: "#9A3412", initials: "TGC" }
   },
 
   getSourceInfo(name) {
@@ -1376,10 +1623,29 @@ const CommentarySynthesizerUI = {
     if (modelTag) modelTag.textContent = data.model_used || 'IA';
     if (sourcesTag) sourcesTag.textContent = `${data.sources_count || 0} sources`;
 
-    contentEl.innerHTML = this.renderMarkdown(data.synthesis || '');
+    let renderedHtml = this.renderMarkdown(data.synthesis || '');
+    if (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences) {
+      renderedHtml = TheologyView.highlightScriptureReferences(renderedHtml);
+    }
+    contentEl.innerHTML = renderedHtml;
     resultBox.classList.remove('hidden');
     this.enterFullResultMode();
     this.attachCitationPopovers(contentEl);
+
+    // Lier l'infobulle biblique interactive (ScriptureTooltip) & navigation
+    if (typeof ScriptureTooltip !== 'undefined') {
+      ScriptureTooltip.bindToElements(contentEl.querySelectorAll('.theol-inline-scripture-ref'));
+    }
+    contentEl.querySelectorAll('.theol-inline-scripture-ref').forEach(span => {
+      span.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const ref = span.dataset.ref || span.textContent.trim();
+        if (ref) {
+          if (typeof ScriptureTooltip !== 'undefined') ScriptureTooltip.hide();
+          if (typeof BibleReader !== 'undefined') BibleReader.searchPassage(ref);
+        }
+      });
+    });
   },
 
   renderMarkdown(text) {

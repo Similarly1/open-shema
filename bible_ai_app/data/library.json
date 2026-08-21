@@ -724,5 +724,18 @@
     "book_code": null,
     "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
     "active": true
+  },
+  "Bible annotée (Frédéric Godet)": {
+    "title": "Bible annotée (Frédéric Godet & Neuchâtel)",
+    "author": "Frédéric Godet, Louis Bonnet, Félix Bovet",
+    "description": "Monumental commentaire exégétique et théologique réformé francophone du XIXe siècle (22561 notes verset par verset sur toute la Bible).",
+    "year": "1899-1900",
+    "cover_path": null,
+    "type": "Commentaire",
+    "format": "sqlite",
+    "commentary_id": "godet_ba",
+    "chunks_count": 22561,
+    "embedding_model": "study_library",
+    "active": true
   }
 }

@@ -2696,45 +2696,80 @@
       <div class="drawer-body">
         <!-- Onglet 1: Commentaires Exégétiques (Un seul commentaire affiché avec sélecteur discret) -->
         <div class="drawer-content active" id="drawer-tab-commentaries">
-          <div class="drawer-section-header comm-header-flex">
-            <div class="comm-ref-group">
-              <span class="selected-verse-badge comm-clickable-ref" id="comm-selected-verse" title="Cliquer pour choisir manuellement un passage pour le commentaire">Genèse 1:1</span>
-              <button class="comm-sync-btn active" id="btn-toggle-comm-sync" title="Synchronisation active : le commentaire suit le texte biblique (Cliquer pour délier)">
-                <svg class="sync-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                </svg>
-                <span id="comm-sync-label">Lié</span>
-              </button>
+          <div class="comm-panel-header">
+            <!-- Rangée 1 : Navigation Passage & Actions Générales -->
+            <div class="comm-header-top-row">
+              <div class="comm-nav-passage-group">
+                <button class="comm-nav-arrow-btn" id="btn-comm-prev-verse" title="Verset précédent">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                
+                <span class="selected-verse-badge comm-clickable-ref" id="comm-selected-verse" title="Cliquer pour choisir manuellement un passage (Ex: Jean 3:16)">
+                  <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.8"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/></svg>
+                  <span id="comm-selected-verse-text">Genèse 1:1</span>
+                </span>
+
+                <button class="comm-nav-arrow-btn" id="btn-comm-next-verse" title="Verset suivant">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+
+                <button class="comm-sync-btn active" id="btn-toggle-comm-sync" title="Synchronisation active : le commentaire suit le texte biblique (Cliquer pour délier)">
+                  <svg class="sync-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                  </svg>
+                  <span id="comm-sync-label">Lié</span>
+                </button>
+              </div>
+              
+              <div class="comm-header-actions-right">
+                <div class="comm-font-size-ctrl" title="Ajuster la taille de lecture du commentaire">
+                  <button class="comm-font-btn" id="btn-comm-font-dec" title="Diminuer la police">A-</button>
+                  <button class="comm-font-btn" id="btn-comm-font-inc" title="Agrandir la police">A+</button>
+                </div>
+
+                <button class="comm-expand-btn" id="btn-expand-comm-to-view" title="Ouvrir la page dédiée aux commentaires (Plein écran)">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                  <span>Plein écran</span>
+                </button>
+              </div>
             </div>
-            
-            <div style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
-              <button class="comm-expand-btn" id="btn-expand-comm-to-view" title="Ouvrir la page dédiée aux commentaires (Plein écran)">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-                <span>Plein écran</span>
-              </button>
 
-              <button class="comm-translate-btn hidden" id="btn-translate-comm" title="Traduire fidèlement cet article en français par IA" style="display: flex; align-items: center; gap: 4px;">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                <span>Traduire</span>
-              </button>
-
-              <button class="comm-ai-synth-btn" id="btn-open-comm-synth" title="Générer une synthèse exégétique comparative par IA de tous les commentaires">
-                <svg class="synth-sparkle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
-                </svg>
-                <span>Synthèse IA</span>
-              </button>
-
+            <!-- Rangée 2 : Sélecteur d'ouvrage & Synthèse IA -->
+            <div class="comm-header-bottom-row">
               <div class="comm-source-selector-box">
                 <button class="comm-source-btn" id="btn-select-comm-source" title="Changer d'ouvrage de commentaire">
-                  <span id="lbl-active-comm-source">Sélectionner un commentaire</span>
-                  <span class="pill-arrow">▾</span>
+                  <span class="comm-source-btn-icon">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                  </span>
+                  <span class="comm-source-btn-label" id="lbl-active-comm-source">Sélectionner un commentaire</span>
+                  <span class="comm-source-count-badge" id="lbl-comm-source-count">0</span>
+                  <span class="comm-source-arrow">▾</span>
                 </button>
+
                 <div class="comm-sources-popover hidden" id="comm-sources-popover">
-                  <div class="comm-popover-title">Commentaires pour ce verset (<span id="comm-popover-count">0</span>)</div>
+                  <div class="comm-popover-header">
+                    <span class="comm-popover-title">Commentaires pour ce verset (<span id="comm-popover-count">0</span>)</span>
+                  </div>
+                  <div class="comm-popover-search-wrap">
+                    <input type="text" id="comm-sources-filter-input" placeholder="Filtrer un auteur ou commentaire..." class="comm-sources-filter-input">
+                  </div>
                   <div class="comm-sources-list" id="comm-sources-list"></div>
                 </div>
+              </div>
+
+              <div class="comm-ai-actions-group">
+                <button class="comm-translate-btn hidden" id="btn-translate-comm" title="Traduire fidèlement cet article en français par IA">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                  <span>Traduire</span>
+                </button>
+
+                <button class="comm-ai-synth-btn" id="btn-open-comm-synth" title="Générer une synthèse exégétique comparative par IA de tous les commentaires">
+                  <svg class="synth-sparkle-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
+                  </svg>
+                  <span>Synthèse IA</span>
+                </button>
               </div>
             </div>
           </div>
@@ -2824,21 +2859,62 @@
           </div>
         </div>
 
-        <!-- Onglet 2: Assistant IA / Chat RAG -->
-        <div class="drawer-content" id="drawer-tab-ai">
-          <div class="chat-messages" id="chat-messages">
-            <div class="chat-message assistant">
+        <!-- Onglet 2: Assistant IA / Chat RAG (Design unifié & compact) -->
+        <div class="drawer-content drawer-content-ai" id="drawer-tab-ai">
+          <!-- Barre d'ancrage contextuelle & Mode compact -->
+          <div class="drawer-ai-header">
+            <div class="drawer-ai-ref-badge" id="drawer-ai-passage-badge" title="Passage d'ancrage pour l'analyse">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              <span id="lbl-drawer-ai-passage">Genèse 1:1</span>
+            </div>
+
+            <!-- Mini sélecteur de mode -->
+            <div class="drawer-ai-mode-picker">
+              <select id="drawer-ai-mode-select" class="drawer-ai-mode-select" title="Mode d'étude de l'assistant">
+                <option value="auto" selected>✦ Auto</option>
+                <option value="exegesis">Exégèse</option>
+                <option value="theology">Théologie</option>
+                <option value="sermon">Prédication</option>
+                <option value="historical">Historique</option>
+                <option value="lexical">Lexique</option>
+              </select>
+            </div>
+
+            <button class="btn-icon-subtle" id="btn-clear-drawer-ai-chat" title="Effacer l'historique de conversation" style="margin-left: auto; width: 26px; height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+          </div>
+
+          <!-- Flux de messages du chat -->
+          <div class="chat-messages drawer-chat-messages" id="chat-messages">
+            <div class="chat-message assistant welcome-message">
               <div class="msg-avatar">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
               </div>
               <div class="msg-content">
-                Bonjour ! Posez-moi une question sur le passage en cours de lecture. Je m'appuierai sur vos Bibles, vos commentaires et vos notes.
+                <div class="welcome-title" style="font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">Assistant IA Biblique</div>
+                <p style="margin: 0; font-size: 12px; color: var(--text-secondary); line-height: 1.45;">Posez une question sur le passage en cours ou demandez une analyse exégétique, historique ou théologique.</p>
               </div>
             </div>
           </div>
-          <div class="chat-input-container">
-            <textarea id="chat-input" placeholder="Posez votre question exégétique..." rows="2"></textarea>
-            <button id="btn-send-chat" class="btn-send">Envoyer</button>
+
+          <!-- Mini puces de suggestions rapides contextuelles -->
+          <div class="drawer-ai-quick-prompts" id="drawer-ai-quick-prompts">
+            <button class="drawer-quick-chip" data-prompt-type="exegesis">Exégèse du verset</button>
+            <button class="drawer-quick-chip" data-prompt-type="historical">Contexte historique</button>
+            <button class="drawer-quick-chip" data-prompt-type="theology">Sens théologique</button>
+          </div>
+
+          <!-- Boîte de saisie compacte -->
+          <div class="drawer-ai-input-card">
+            <textarea id="chat-input" placeholder="Poser une question sur ce passage..." rows="1"></textarea>
+            <div class="drawer-ai-input-actions">
+              <span class="drawer-ai-hint">Entrée ↵</span>
+              <button id="btn-send-chat" class="btn-send-drawer" title="Générer l'analyse (Entrée)">
+                <span>Envoyer</span>
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -3901,6 +3977,7 @@
   <script src="js/api.js"></script>
   <script src="js/task_manager.js"></script>
   <script src="js/book_picker.js"></script>
+  <script src="js/theology_view.js"></script>
   <script src="js/bible_reader.js"></script>
   <script src="js/commentaries_view.js"></script>
   <script src="js/import_modal.js"></script>
@@ -3912,7 +3989,6 @@
   <script src="js/dict_view.js"></script>
   <script src="js/leaflet.js"></script>
   <script src="js/maps_view.js"></script>
-  <script src="js/theology_view.js"></script>
   <script src="js/selection_context_menu.js"></script>
   <script src="js/app.js"></script>
 </body>

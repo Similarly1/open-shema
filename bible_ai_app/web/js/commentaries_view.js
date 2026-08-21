@@ -984,11 +984,33 @@ const CommentariesView = {
 
         ${translationBannerHtml}
 
+        <div class="comm-view-passage-header">
+          <span class="comm-view-passage-pill">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+            <span>${comm.reference || `${this.currentBookFrench} ${this.currentChapter}:${this.currentVerse}`}</span>
+          </span>
+        </div>
+
         <div class="comm-view-reading-body">
           ${formattedHtml}
         </div>
       </div>
     `;
+
+    // Lier l'infobulle biblique interactive (ScriptureTooltip) & navigation par clic
+    if (typeof ScriptureTooltip !== 'undefined') {
+      ScriptureTooltip.bindToElements(this.articleContent.querySelectorAll('.theol-inline-scripture-ref'));
+    }
+    this.articleContent.querySelectorAll('.theol-inline-scripture-ref').forEach(span => {
+      span.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const ref = span.dataset.ref || span.textContent.trim();
+        if (ref) {
+          if (typeof ScriptureTooltip !== 'undefined') ScriptureTooltip.hide();
+          if (typeof TheologyView !== 'undefined') TheologyView.openScriptureReference(ref);
+        }
+      });
+    });
 
     // Écouteurs pour la bascule de traduction
     const toggleBtn = this.articleContent.querySelector('#btn-comm-view-toggle-orig');
@@ -1202,6 +1224,21 @@ const CommentariesView = {
 
     if (this.synthMarkdownContent) {
       this.synthMarkdownContent.innerHTML = this.formatSynthesisMarkdown(data.synthesis || '');
+      
+      // Lier l'infobulle biblique interactive (ScriptureTooltip) & navigation
+      if (typeof ScriptureTooltip !== 'undefined') {
+        ScriptureTooltip.bindToElements(this.synthMarkdownContent.querySelectorAll('.theol-inline-scripture-ref'));
+      }
+      this.synthMarkdownContent.querySelectorAll('.theol-inline-scripture-ref').forEach(span => {
+        span.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const ref = span.dataset.ref || span.textContent.trim();
+          if (ref) {
+            if (typeof ScriptureTooltip !== 'undefined') ScriptureTooltip.hide();
+            if (typeof TheologyView !== 'undefined') TheologyView.openScriptureReference(ref);
+          }
+        });
+      });
     }
 
     this.synthRangeControls?.classList.add('hidden');
@@ -1235,6 +1272,13 @@ const CommentariesView = {
       .replace(/^[\*\-] (.*$)/gim, '<li class="comm-body-li" style="margin-left: 24px; margin-bottom: 6px;">$1</li>')
       .replace(/^\d+\. (.*$)/gim, '<li class="comm-body-li" style="margin-left: 24px; margin-bottom: 6px;">$1</li>')
       .replace(/\n\n/g, '<br><br>');
+
+    if (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences) {
+      html = TheologyView.highlightScriptureReferences(html);
+    }
+    if (typeof TheologyView !== 'undefined' && TheologyView.linkifyUrls) {
+      html = TheologyView.linkifyUrls(html);
+    }
 
     return `<div class="rendered-synth" style="font-family: var(--comm-font-family, var(--font-bible, serif)); font-size: calc(var(--comm-font-size-base, 17px) * var(--comm-zoom-scale, 1)); line-height: 1.8;">${html}</div>`;
   },
@@ -1368,15 +1412,24 @@ const CommentariesView = {
 
   formatCommentaryContent(text) {
     if (!text) return '';
-    return text
+    let html = text
       .replace(/^### (.*$)/gim, '<h3 class="comm-body-h3">$1</h3>')
       .replace(/^## (.*$)/gim, '<h2 class="comm-body-h2">$1</h2>')
       .replace(/^# (.*$)/gim, '<h1 class="comm-body-h1">$1</h1>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="comm-body-lemma">$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em class="comm-body-em">$1</em>')
       .replace(/^\> (.*$)/gim, '<blockquote class="comm-body-quote">$1</blockquote>')
       .replace(/^\- (.*$)/gim, '<li class="comm-body-li">$1</li>')
+      .replace(/\[([A-Z0-9\u00C0-\u00DCa-z\u00E0-\u00FC\s\.\,\:\;\-]+)\]/g, '<span class="comm-cite-badge">$1</span>')
       .replace(/\n\n/g, '<br><br>');
+
+    if (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences) {
+      html = TheologyView.highlightScriptureReferences(html);
+    }
+    if (typeof TheologyView !== 'undefined' && TheologyView.linkifyUrls) {
+      html = TheologyView.linkifyUrls(html);
+    }
+    return html;
   },
 
   isForeignText(text) {

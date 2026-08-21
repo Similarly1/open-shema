@@ -96,6 +96,13 @@ const App = {
         const contentEl = document.getElementById(`drawer-tab-${tabId}`);
         if (contentEl) {
           contentEl.classList.add('active');
+          if (tabId === 'ai') {
+            const passageBadge = document.getElementById('lbl-drawer-ai-passage');
+            if (passageBadge && typeof BibleReader !== 'undefined') {
+              const curRef = BibleReader.currentVerseRef || `${BibleReader.currentBook || 'GEN'} ${BibleReader.currentChapter || 1}:${BibleReader.selectedVerse || 1}`;
+              passageBadge.textContent = curRef;
+            }
+          }
         }
       });
     });
@@ -560,43 +567,249 @@ const App = {
     const chatInput = document.getElementById('chat-input');
     const btnSendChat = document.getElementById('btn-send-chat');
     const chatMessages = document.getElementById('chat-messages');
+    const modeSelect = document.getElementById('drawer-ai-mode-select');
+    const passageBadge = document.getElementById('lbl-drawer-ai-passage');
+    const btnClearChat = document.getElementById('btn-clear-drawer-ai-chat');
+
+    let isGenerating = false;
+    let activeInterval = null;
+    let activeGenerationCancelled = false;
+
+    // Helper pour récupérer la référence courante du lecteur
+    const getCurrentPassageRef = () => {
+      if (typeof BibleReader !== 'undefined' && BibleReader.currentVerseRef) {
+        return BibleReader.currentVerseRef;
+      }
+      const b = typeof BibleReader !== 'undefined' ? (BibleReader.currentBook || 'GEN') : 'GEN';
+      const c = typeof BibleReader !== 'undefined' ? (BibleReader.currentChapter || 1) : 1;
+      const v = typeof BibleReader !== 'undefined' ? (BibleReader.selectedVerse || 1) : 1;
+      return `${b} ${c}:${v}`;
+    };
+
+    // Mettre à jour l'étiquette au démarrage
+    if (passageBadge) {
+      passageBadge.textContent = getCurrentPassageRef();
+    }
+
+    // Auto-redimensionnement du textarea
+    const autoResize = () => {
+      if (!chatInput) return;
+      chatInput.style.height = 'auto';
+      chatInput.style.height = `${Math.min(chatInput.scrollHeight, 120)}px`;
+    };
+    chatInput?.addEventListener('input', autoResize);
+
+    // Réinitialisation / Clear du chat
+    const resetChat = () => {
+      if (isGenerating) stopGeneration();
+      if (!chatMessages) return;
+      chatMessages.innerHTML = `
+        <div class="chat-message assistant welcome-message">
+          <div class="msg-avatar">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+          </div>
+          <div class="msg-content">
+            <div class="welcome-title" style="font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">Assistant IA Biblique</div>
+            <p style="margin: 0; font-size: 12px; color: var(--text-secondary); line-height: 1.45;">Posez une question sur le passage en cours ou demandez une analyse exégétique, historique ou théologique.</p>
+          </div>
+        </div>
+      `;
+    };
+    btnClearChat?.addEventListener('click', resetChat);
+
+    // Arrêt de génération
+    const stopGeneration = () => {
+      isGenerating = false;
+      activeGenerationCancelled = true;
+      if (activeInterval) clearInterval(activeInterval);
+      if (chatInput) chatInput.disabled = false;
+      if (btnSendChat) {
+        btnSendChat.classList.remove('btn-stop');
+        btnSendChat.innerHTML = `<span>Envoyer</span><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
+      }
+    };
+
+    // Gestion des puces de suggestions rapides contextuelles
+    document.querySelectorAll('.drawer-quick-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const type = chip.getAttribute('data-prompt-type');
+        const ref = getCurrentPassageRef();
+        let promptText = '';
+        if (type === 'exegesis') {
+          promptText = `Fais une analyse exégétique et doctrinale concise de ${ref}.`;
+          if (modeSelect) modeSelect.value = 'exegesis';
+        } else if (type === 'historical') {
+          promptText = `Quel est le contexte historique, culturel et l'arrière-plan de ${ref} ?`;
+          if (modeSelect) modeSelect.value = 'historical';
+        } else if (type === 'theology') {
+          promptText = `Quelles sont les doctrines et vérités théologiques majeures révélées dans ${ref} ?`;
+          if (modeSelect) modeSelect.value = 'theology';
+        }
+        if (chatInput && promptText) {
+          chatInput.value = promptText;
+          autoResize();
+          sendChatMessage();
+        }
+      });
+    });
 
     const sendChatMessage = async () => {
-      const text = chatInput.value.trim();
+      if (isGenerating) {
+        stopGeneration();
+        return;
+      }
+
+      const text = chatInput?.value.trim();
       if (!text) return;
 
+      const passageRef = getCurrentPassageRef();
+      const mode = modeSelect?.value || 'auto';
+      const options = typeof AIStudyView !== 'undefined' && AIStudyView.getOptions ? AIStudyView.getOptions() : {};
+
+      // Message utilisateur
       const userMsg = document.createElement('div');
       userMsg.className = 'chat-message user';
-      userMsg.innerHTML = `<div class="msg-content">${text}</div>`;
+      userMsg.innerHTML = `
+        <div class="msg-content">
+          <div class="drawer-user-ref-badge">${typeof AIStudyView !== 'undefined' ? AIStudyView.escapeHtml(passageRef) : passageRef}</div>
+          <div>${typeof AIStudyView !== 'undefined' ? AIStudyView.escapeHtml(text) : text}</div>
+        </div>
+      `;
       chatMessages.appendChild(userMsg);
       chatInput.value = '';
+      autoResize();
       chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      // État de génération
+      isGenerating = true;
+      activeGenerationCancelled = false;
+      if (chatInput) chatInput.disabled = true;
+      if (btnSendChat) {
+        btnSendChat.classList.add('btn-stop');
+        btnSendChat.innerHTML = `<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg><span>Arrêter</span>`;
+      }
 
       const assistantMsg = document.createElement('div');
       assistantMsg.className = 'chat-message assistant';
+      const timerId = `drawer-timer-${Date.now()}`;
+      const reasoningId = `drawer-reasoning-${Date.now()}`;
+
       assistantMsg.innerHTML = `
-        <div class="msg-avatar"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg></div>
-        <div class="msg-content">Réflexion en cours...</div>
+        <div class="msg-avatar">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+        </div>
+        <div class="msg-content">
+          <div class="ai-reasoning-band" id="${reasoningId}">
+            <div class="ai-reasoning-header">
+              <div class="ai-reasoning-spinner"></div>
+              <span class="ai-reasoning-label">Analyse en cours... (<span id="${timerId}">0.0s</span>)</span>
+            </div>
+          </div>
+          <div class="ai-answer-body"></div>
+        </div>
       `;
       chatMessages.appendChild(assistantMsg);
       chatMessages.scrollTop = chatMessages.scrollHeight;
 
+      const startTime = performance.now();
+      const timerEl = document.getElementById(timerId);
+      activeInterval = setInterval(() => {
+        const elapsed = ((performance.now() - startTime) / 1000).toFixed(1);
+        if (timerEl) timerEl.textContent = `${elapsed}s`;
+      }, 100);
+
       try {
-        const response = await API.askAI(
-          text,
-          BibleReader.currentBook,
-          BibleReader.currentChapter,
-          BibleReader.selectedVerse || 1
-        );
-        assistantMsg.querySelector('.msg-content').textContent = response.answer || response;
+        const response = await API.call('ask_study_ai', text, mode, passageRef, options);
+        clearInterval(activeInterval);
+        if (chatInput) chatInput.disabled = false;
+        if (btnSendChat) {
+          btnSendChat.classList.remove('btn-stop');
+          btnSendChat.innerHTML = `<span>Envoyer</span><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
+        }
+        isGenerating = false;
+
+        if (activeGenerationCancelled) return;
+
+        const totalDuration = ((performance.now() - startTime) / 1000).toFixed(1);
+        const answerText = response.answer || response;
+        const sourcesUsed = response.sources_used || [];
+        const sourcesDetails = response.sources_details || [];
+        const detectedMode = response.detected_mode || "Étude";
+        const modelUsed = response.model_used || options.model || "Gemini";
+
+        // Mettre à jour le bandeau de raisonnement
+        const reasoningEl = document.getElementById(reasoningId);
+        if (reasoningEl) {
+          reasoningEl.classList.add('collapsed');
+          reasoningEl.innerHTML = `
+            <div class="ai-reasoning-header" style="cursor: default;">
+              <span class="ai-reasoning-check-icon">${typeof AIStudyView !== 'undefined' ? AIStudyView.ICONS.check : '✓'}</span>
+              <span>Raisonnement terminé (${totalDuration}s) &bull; <strong>${typeof AIStudyView !== 'undefined' ? AIStudyView.escapeHtml(detectedMode) : detectedMode}</strong></span>
+            </div>
+          `;
+        }
+
+        // Formater la réponse avec le parseur riche complet
+        const formattedMarkdown = typeof AIStudyView !== 'undefined'
+          ? AIStudyView.renderRichMarkdown(answerText, sourcesDetails)
+          : answerText;
+
+        const sourcesHtml = typeof AIStudyView !== 'undefined'
+          ? AIStudyView.buildSourcesComponentHtml(sourcesDetails, sourcesUsed.length)
+          : '';
+
+        const footerHtml = `
+          <div class="ai-msg-footer" style="margin-top: 8px;">
+            <div class="ai-footer-left">
+              <button class="smooth-btn-copy" title="Copier l'analyse">
+                <span class="copy-icon-wrap">
+                  <svg class="icon-copy" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  <svg class="icon-check" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                <span class="copy-label" style="font-size: 10.5px;">Copier</span>
+              </button>
+              <button class="ai-footer-action-btn btn-export-notes" title="Enregistrer dans les notes (.md)" style="font-size: 10.5px;">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline></svg>
+                <span>Note</span>
+              </button>
+            </div>
+            <div class="ai-footer-right">
+              <span class="ai-model-tag" style="font-size: 9.5px;">${typeof AIStudyView !== 'undefined' ? AIStudyView.escapeHtml(modelUsed) : modelUsed}</span>
+            </div>
+          </div>
+        `;
+
+        const answerBodyEl = assistantMsg.querySelector('.ai-answer-body');
+        if (answerBodyEl) {
+          answerBodyEl.innerHTML = sourcesHtml + `<div class="ai-markdown-content"></div>` + footerHtml;
+          if (typeof AIStudyView !== 'undefined') {
+            AIStudyView.attachSourcesAccordion(answerBodyEl);
+            const markdownEl = answerBodyEl.querySelector('.ai-markdown-content');
+            AIStudyView.streamMarkdownResponse(markdownEl, formattedMarkdown, () => {
+              AIStudyView.attachMessageActions(assistantMsg, answerText, passageRef, text);
+            });
+          }
+        }
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
       } catch (err) {
-        assistantMsg.querySelector('.msg-content').textContent = "Désolé, une erreur est survenue lors de l'appel à l'assistant IA.";
+        clearInterval(activeInterval);
+        isGenerating = false;
+        if (chatInput) chatInput.disabled = false;
+        if (btnSendChat) {
+          btnSendChat.classList.remove('btn-stop');
+          btnSendChat.innerHTML = `<span>Envoyer</span><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
+        }
+        const answerBodyEl = assistantMsg.querySelector('.ai-answer-body');
+        if (answerBodyEl) {
+          answerBodyEl.innerHTML = `<p style="color: var(--accent-red); font-size: 12px; margin-top: 4px;">Une erreur est survenue lors de l'appel à l'assistant IA (${err?.message || err}).</p>`;
+        }
       }
       chatMessages.scrollTop = chatMessages.scrollHeight;
     };
 
-    btnSendChat.addEventListener('click', sendChatMessage);
-    chatInput.addEventListener('keydown', (e) => {
+    btnSendChat?.addEventListener('click', sendChatMessage);
+    chatInput?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         sendChatMessage();
