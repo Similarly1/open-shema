@@ -131,7 +131,13 @@ const LibraryView = {
           }
         } else if (bType.includes('bibl')) {
           App.switchView('bible');
-          BibleReader.switchVersion(book.folder_name || book.name);
+          if (typeof BibleReader !== 'undefined') {
+            if (typeof BibleReader.switchVersion === 'function') {
+              BibleReader.switchVersion(book.name || book.folder_name || book.title);
+            } else if (typeof BibleReader.selectBibleVersion === 'function') {
+              BibleReader.selectBibleVersion(book.name || book.folder_name);
+            }
+          }
         } else if (bType.includes('dict')) {
           if (typeof DictView !== 'undefined' && typeof DictView.openDictionary === 'function') {
             DictView.openDictionary(book.dict_id || book.name);

@@ -4053,6 +4053,40 @@ const BibleReader = {
     this.navigateTo(this.currentBook, this.currentChapter, curV);
   },
 
+  switchVersion(versionName) {
+    if (!versionName) return;
+
+    // Chercher la version correspondante dans installedBibles
+    const item = (this.installedBibles || []).find(b =>
+      b.name === versionName ||
+      b.id === versionName ||
+      (b.folder_name && b.folder_name === versionName) ||
+      (b.version_code && b.version_code.toUpperCase() === String(versionName).toUpperCase()) ||
+      (b.title && b.title.toLowerCase().includes(String(versionName).toLowerCase()))
+    );
+
+    const targetVersionName = item ? item.name : versionName;
+
+    // Si la version ne contient que le Nouveau Testament (ex: Parole Vivante)
+    const isNtOnly = (item && (item.canon === 'NT' || item.total_books === 27)) ||
+      (typeof versionName === 'string' && (versionName.toLowerCase().includes('parole vivante') || versionName.toUpperCase() === 'PV'));
+
+    const ntBookCodes = [
+      'Mat', 'Mar', 'Luk', 'Joh', 'Act', 'Rom', '1Co', '2Co', 'Gal', 'Eph',
+      'Phi', 'Col', '1Th', '2Th', '1Ti', '2Ti', 'Tit', 'Phm', 'Heb', 'Jam',
+      '1Pe', '2Pe', '1Jo', '2Jo', '3Jo', 'Jud', 'Rev'
+    ];
+
+    // Si le livre en cours est dans l'Ancien Testament, basculer sur Matthieu 1
+    if (isNtOnly && (!this.currentBook || !ntBookCodes.includes(this.currentBook))) {
+      this.currentBook = 'Mat';
+      this.currentChapter = 1;
+      this.selectedVerse = 1;
+    }
+
+    this.selectBibleVersion(targetVersionName);
+  },
+
   goToNextChapter() {
     const next = getNextChapterCoord(this.currentBook, this.currentChapter);
     if (next) {
@@ -4133,3 +4167,5 @@ const BibleReader = {
     }
   }
 };
+
+window.BibleReader = BibleReader;
