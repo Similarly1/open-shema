@@ -6010,7 +6010,7 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   bottom: calc(100% + 6px);
   left: 50%;
   transform: translateX(-50%) translateY(4px);
-  width: 270px;
+  width: 290px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 8px;
@@ -6022,6 +6022,86 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   pointer-events: none;
   transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
   text-align: left;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.intext-tooltip-cover-wrap {
+  width: 32px;
+  height: 44px;
+  border-radius: 3px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.intext-tooltip-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.intext-tooltip-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 13px;
+}
+
+.intext-tooltip-fallback.bible { color: var(--accent-blue); background: rgba(2, 132, 199, 0.1); }
+.intext-tooltip-fallback.comm { color: var(--accent-orange); background: rgba(234, 88, 12, 0.1); }
+.intext-tooltip-fallback.dict { color: var(--accent-purple); background: rgba(124, 58, 237, 0.1); }
+.intext-tooltip-fallback.theology { color: #2DD4BF; background: rgba(15, 118, 110, 0.1); }
+.intext-tooltip-fallback.notes { color: var(--accent-green); background: rgba(16, 185, 129, 0.1); }
+
+.intext-tooltip-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.intext-tooltip-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.intext-tooltip-author {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.intext-tooltip-title {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+
+.intext-tooltip-snippet {
+  font-size: 10.5px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-top: 3px;
+  border-top: 1px dashed var(--border-color);
+  padding-top: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .intext-source-pill:hover .intext-tooltip,

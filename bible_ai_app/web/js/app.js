@@ -370,8 +370,13 @@ const App = {
       if (typeof DictView !== 'undefined') {
         DictView.onViewActivated();
       }
-    } else if (viewName === 'search' || viewName === 'ai') {
+    } else if (viewName === 'search') {
       if (drawerEl) drawerEl.classList.add('collapsed');
+    } else if (viewName === 'ai') {
+      if (drawerEl) drawerEl.classList.add('collapsed');
+      if (typeof AIStudyView !== 'undefined') {
+        AIStudyView.onViewActivated();
+      }
     }
   },
 

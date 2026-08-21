@@ -369,10 +369,10 @@ const AIStudyView = {
   },
 
   // =========================================================================
-  // MOTEUR DE SUGGESTIONS (SmoothUI ai-suggestions - Sobre & Sans émojis)
+  // MOTEUR DE SUGGESTIONS (SmoothUI ai-suggestions - Dynamique & Renouvelé)
   // =========================================================================
 
-  renderSuggestions() {
+  renderSuggestions(forceNew = false) {
     if (!this.suggestionsBarEl) return;
     this.suggestionsBarEl.innerHTML = '';
 
@@ -400,87 +400,159 @@ const AIStudyView = {
     const hasPassage = !!passageLabel;
     const isNT = this.currentBookCode ? this.isNewTestament(this.currentBookCode) : true;
 
-    const list = [];
-
     if (!hasPassage) {
-      list.push({
-        svg: this.ICONS.book,
-        label: 'Calvin & Prédestination',
-        prompt: "Quelle est la vision de Jean Calvin sur la prédestination et l'élection souveraine de Dieu ?",
-        targetMode: 'theology'
-      });
-      list.push({
-        svg: this.ICONS.scales,
-        label: 'Justification par la Foi',
-        prompt: "Présente la doctrine de la justification par la foi selon l'apôtre Paul et la Réforme protestante.",
-        targetMode: 'theology'
-      });
-      list.push({
-        svg: this.ICONS.sparkles,
-        label: 'Théologie des Alliances',
-        prompt: "Comment s'articulent l'Ancienne et la Nouvelle Alliance dans la théologie biblique réformée ?",
-        targetMode: 'theology'
-      });
-      list.push({
-        svg: this.ICONS.scroll,
-        label: 'Arrière-plan des Évangiles',
-        prompt: "Quel était le contexte religieux et politique juif (pharisiens, sadducéens, zélotes) au temps de Jésus ?",
-        targetMode: 'historical'
-      });
-      list.push({
-        svg: this.ICONS.search,
-        label: 'Lexique : Grâce & Miséricorde',
-        prompt: "Étudie les termes hébreux (Hesed, Rahamim) et grecs (Charis, Eleos) traduisant la grâce et la miséricorde.",
-        targetMode: 'lexical'
-      });
+      const generalPool = [
+        {
+          svg: this.ICONS.book,
+          label: 'Calvin & Prédestination',
+          prompt: "Quelle est la vision de Jean Calvin sur la prédestination et l'élection souveraine de Dieu ?",
+          targetMode: 'theology'
+        },
+        {
+          svg: this.ICONS.scales,
+          label: 'Justification par la Foi',
+          prompt: "Présente la doctrine de la justification par la foi selon l'apôtre Paul et la Réforme protestante.",
+          targetMode: 'theology'
+        },
+        {
+          svg: this.ICONS.sparkles,
+          label: 'Théologie des Alliances',
+          prompt: "Comment s'articulent l'Ancienne et la Nouvelle Alliance dans la théologie biblique réformée ?",
+          targetMode: 'theology'
+        },
+        {
+          svg: this.ICONS.scroll,
+          label: 'Arrière-plan des Évangiles',
+          prompt: "Quel était le contexte religieux et politique juif (pharisiens, sadducéens, zélotes) au temps de Jésus ?",
+          targetMode: 'historical'
+        },
+        {
+          svg: this.ICONS.search,
+          label: 'Lexique : Grâce & Miséricorde',
+          prompt: "Étudie les termes hébreux (Hesed, Rahamim) et grecs (Charis, Eleos) traduisant la grâce et la miséricorde.",
+          targetMode: 'lexical'
+        },
+        {
+          svg: this.ICONS.theology,
+          label: 'Trinité & Conciles antiques',
+          prompt: "Comment la doctrine de la Trinité a-t-elle été formulée face aux hérésies (Arianisme, Sabellianisme) ?",
+          targetMode: 'theology'
+        },
+        {
+          svg: this.ICONS.bible,
+          label: 'Souveraineté & Responsabilité',
+          prompt: "Comment concilier la souveraineté absolue de Dieu et la responsabilité morale de l'homme ?",
+          targetMode: 'theology'
+        },
+        {
+          svg: this.ICONS.notes,
+          label: 'Prédication : Sainteté de Dieu',
+          prompt: "Rédige un plan homilétique percutant sur la Sainteté de Dieu basé sur Ésaïe 6.",
+          targetMode: 'sermon'
+        },
+        {
+          svg: this.ICONS.search,
+          label: 'Lexique : Rédemption & Propitiation',
+          prompt: "Analyse le sens théologique de l'expiation, de la propitiation (hilasterion) et de la rédemption (apolutrosis).",
+          targetMode: 'lexical'
+        },
+        {
+          svg: this.ICONS.scroll,
+          label: 'L\'Exil à Babylone & Identité juive',
+          prompt: "Quel a été l'impact théologique et liturgique de l'exil babylonien sur le judaïsme du Second Temple ?",
+          targetMode: 'historical'
+        },
+        {
+          svg: this.ICONS.sparkles,
+          label: 'Doctrine de la Régénération',
+          prompt: "Quelle est la nature du 'nouvel homme' et de la régénération par le Saint-Esprit selon Jean 3 et Éphésiens 2 ?",
+          targetMode: 'theology'
+        },
+        {
+          svg: this.ICONS.scales,
+          label: 'Loi morale & Cérémonielle',
+          prompt: "Quelle est la distinction réformée entre loi morale, civile et cérémonielle, et leur application chrétienne ?",
+          targetMode: 'theology'
+        },
+        {
+          svg: this.ICONS.book,
+          label: 'Augustin vs Pélage sur la Grâce',
+          prompt: "Résume les enjeux théologiques fondamentaux de la controverse entre Augustin et Pélage sur la grâce.",
+          targetMode: 'theology'
+        },
+        {
+          svg: this.ICONS.bible,
+          label: 'Christ dans les Psaumes messianiques',
+          prompt: "Comment les Psaumes 22, 110 et 2 préfigurent-ils le ministère sacerdotal et royal du Messie ?",
+          targetMode: 'theology'
+        },
+        {
+          svg: this.ICONS.scroll,
+          label: 'Origine et canon de l\'AT',
+          prompt: "Comment s'est constitué le canon de l'Ancien Testament (TaNaKh) et sa transmission massorétique ?",
+          targetMode: 'historical'
+        }
+      ];
+      return this.shuffleArray(generalPool).slice(0, 5);
     } else {
       const ref = passageLabel;
-      list.push({
-        svg: this.ICONS.bible,
-        label: `Structure de ${ref}`,
-        prompt: `Analyse la structure littéraire, syntaxique et la progression théologique de ${ref}.`,
-        targetMode: 'exegesis'
-      });
+      const passagePool = [
+        {
+          svg: this.ICONS.bible,
+          label: `Structure de ${ref}`,
+          prompt: `Analyse la structure littéraire, syntaxique et la progression théologique de ${ref}.`,
+          targetMode: 'exegesis'
+        },
+        {
+          svg: this.ICONS.notes,
+          label: `Plan de sermon sur ${ref}`,
+          prompt: `Propose un plan d'enseignement détaillé et des applications pastorales concrètes pour ${ref}.`,
+          targetMode: 'sermon'
+        },
+        {
+          svg: this.ICONS.scales,
+          label: `Doctrines clés dans ${ref}`,
+          prompt: `Quelles sont les doctrines fondamentales énoncées ou sous-jacentes dans ${ref} ?`,
+          targetMode: 'theology'
+        },
+        {
+          svg: this.ICONS.scroll,
+          label: `Contexte historique de ${ref}`,
+          prompt: `Quel est le contexte historique, l'auteur et les destinataires originaux de ${ref} ?`,
+          targetMode: 'historical'
+        },
+        {
+          svg: this.ICONS.sparkles,
+          label: `Liens canoniques avec ${ref}`,
+          prompt: `Quels sont les renvois typologiques et citations intertextuelles liés à ${ref} dans tout le canon biblique ?`,
+          targetMode: 'theology'
+        },
+        {
+          svg: this.ICONS.book,
+          label: `Calvin & Commentateurs sur ${ref}`,
+          prompt: `Que disent les grands commentateurs (Jean Calvin, Matthew Henry) sur la portée de ${ref} ?`,
+          targetMode: 'auto'
+        }
+      ];
 
       if (isNT) {
-        list.push({
+        passagePool.push({
           svg: this.ICONS.search,
-          label: 'Mots-clés grecs & Strong',
-          prompt: `Quels sont les termes grecs pivots et codes Strong majeurs dans ${ref}, avec leurs nuances théologiques ?`,
+          label: `Mots-clés grecs dans ${ref}`,
+          prompt: `Quels sont les termes grecs pivots et codes Strong majeurs dans ${ref}, avec leurs nuances ?`,
           targetMode: 'lexical'
         });
       } else {
-        list.push({
+        passagePool.push({
           svg: this.ICONS.search,
-          label: 'Racines hébraïques & Strong',
+          label: `Racines hébraïques dans ${ref}`,
           prompt: `Analyse les racines hébraïques clés et nuances massorétiques dans ${ref}.`,
           targetMode: 'lexical'
         });
       }
 
-      list.push({
-        svg: this.ICONS.book,
-        label: `Avis de Calvin & Matthew Henry`,
-        prompt: `Que disent les grands commentateurs (Jean Calvin, Matthew Henry) sur la portée de ${ref} ?`,
-        targetMode: 'auto'
-      });
-
-      list.push({
-        svg: this.ICONS.mic,
-        label: 'Plan de prédication en 3 points',
-        prompt: `Propose un plan de prédication percutant en 3 points avec Big Idea, illustrations et applications pastorales sur ${ref}.`,
-        targetMode: 'sermon'
-      });
-
-      list.push({
-        svg: this.ICONS.scroll,
-        label: 'Contexte de rédaction',
-        prompt: `Quel est le contexte historique, culturel et la situation des premiers destinataires de ${ref} ?`,
-        targetMode: 'historical'
-      });
+      return this.shuffleArray(passagePool).slice(0, 5);
     }
-
-    return list.slice(0, 5);
   },
 
   isNewTestament(bookCode) {
@@ -606,9 +678,9 @@ const AIStudyView = {
               <span class="step-bullet"></span>
               <div class="step-text-container">
                 <span class="step-label">Synthèse théologique & doctrinale avec ${this.escapeHtml(options.model)}</span>
-                <div class="step-time-notice">
+                <div class="step-time-notice hidden">
                   <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  <span>Analyse et recoupement des extraits de votre bibliothèque (~1 à 2 min). Ce délai est normal pour une synthèse rigoureuse.</span>
+                  <span class="step-notice-text">Analyse et recoupement des extraits de votre bibliothèque (~1 à 2 min)...</span>
                 </div>
               </div>
             </div>
@@ -643,13 +715,43 @@ const AIStudyView = {
 
     const stepTimeout3 = setTimeout(() => {
       reasoningEl?.querySelector('.step-3')?.classList.replace('active', 'done');
-      reasoningEl?.querySelector('.step-4')?.classList.replace('pending', 'active');
+      const step4 = reasoningEl?.querySelector('.step-4');
+      if (step4) {
+        step4.classList.replace('pending', 'active');
+        const noticeEl = step4.querySelector('.step-time-notice');
+        const noticeTextEl = noticeEl?.querySelector('.step-notice-text');
+        if (noticeEl) noticeEl.classList.remove('hidden');
+
+        const rotatingMessages = [
+          "Analyse et recoupement des extraits de votre bibliothèque (~1 à 2 min)...",
+          "Recoupement des concordances textuelles et des sources doctrinales...",
+          "Structuration de l'exégèse et ordonnancement des arguments théologiques...",
+          "Intégration des citations d'auteurs et contextualisation historique...",
+          "Harmonisation des références bibliques et formulation de la synthèse...",
+          "Dernières retouches et rédaction finale en cours avec le modèle..."
+        ];
+
+        let msgIdx = 0;
+        this.activeRotatingTimer = setInterval(() => {
+          msgIdx++;
+          if (noticeTextEl) {
+            noticeTextEl.style.opacity = '0';
+            noticeTextEl.style.transform = 'translateY(-2px)';
+            setTimeout(() => {
+              noticeTextEl.textContent = rotatingMessages[msgIdx % rotatingMessages.length];
+              noticeTextEl.style.opacity = '1';
+              noticeTextEl.style.transform = 'translateY(0)';
+            }, 250);
+          }
+        }, 16000);
+      }
     }, 2000);
     this.activeTimeouts = [stepTimeout1, stepTimeout2, stepTimeout3];
 
     try {
       const response = await API.call('ask_study_ai', text, mode, passage, options);
       clearInterval(intervalTimer);
+      if (this.activeRotatingTimer) clearInterval(this.activeRotatingTimer);
       clearTimeout(stepTimeout1);
       clearTimeout(stepTimeout2);
       clearTimeout(stepTimeout3);
@@ -664,6 +766,9 @@ const AIStudyView = {
       const detectedMode = response.detected_mode || (this.MODES_INFO[mode]?.title || "Synthèse");
       const modelUsed = response.model_used || options.model;
       const respTime = this.formatCurrentTime();
+
+      // Renouveler les suggestions de questions dynamiquement après la réponse
+      this.renderSuggestions(true);
 
       // 1. Bandeau de raisonnement terminé (sobre & replié)
       if (reasoningEl) {
@@ -1018,6 +1123,23 @@ const AIStudyView = {
     return text;
   },
 
+  guessAuthor(name) {
+    const n = (name || '').toLowerCase();
+    if (n.includes('calvin')) return 'Jean Calvin';
+    if (n.includes('vigouroux')) return 'F. Vigouroux';
+    if (n.includes('calmet')) return 'Dom Augustin Calmet';
+    if (n.includes('grudem') || n.includes('stgru')) return 'Wayne Grudem';
+    if (n.includes('nouveau dictionnaire') || n.includes('emmaus')) return 'Éditions Emmaüs';
+    if (n.includes('lire et comprendre') || n.includes('lirelabible')) return 'Société Biblique';
+    if (n.includes('josèphe') || n.includes('josephe') || n.includes('josephus')) return 'Flavius Josèphe';
+    if (n.includes('macarthur')) return 'John MacArthur';
+    if (n.includes('spurgeon')) return 'C.H. Spurgeon';
+    if (n.includes('henry')) return 'Matthew Henry';
+    if (n.includes('augustin')) return 'Saint Augustin';
+    if (n.includes('luther')) return 'Martin Luther';
+    return '';
+  },
+
   formatInlineMarkdown(str, sourcesDetails = []) {
     if (!str) return '';
     let res = str;
@@ -1028,50 +1150,96 @@ const AIStudyView = {
     res = res.replace(/\*(.*?)\*/g, '<em>$1</em>');
     res = res.replace(/`([^`]+)`/g, '<code class="ai-inline-code">$1</code>');
 
-    // 1. Sources documentaires au sein des paragraphes repliées (Juste l'icône livre avec infobulle riche)
-    const docSourceRegex = /\[(Dictionnaire[^\n\]]+|Dom Calmet[^\n\]]*|Vigouroux[^\n\]]*|Flavius Josèphe[^\n\]]*|Lire et comprendre[^\n\]]*|Calvin[^\n\]]*|Nouveau dictionnaire[^\n\]]*|Matthew Henry[^\n\]]*|Augustin[^\n\]]*|Luther[^\n\]]*|Spurgeon[^\n\]]*|Good and Angry[^\n\]]*)\]/gi;
-    res = res.replace(docSourceRegex, (match, docName) => {
-      const cleanTitle = docName.trim();
-      
-      // Recherche de l'extrait correspondant dans sourcesDetails
-      const matched = sourcesDetails.find(s => {
-        const t = (s.title || '').toLowerCase();
-        const cl = cleanTitle.toLowerCase();
-        return t.includes(cl) || cl.includes(t) || (s.preview && s.preview.toLowerCase().includes(cl));
-      });
-
-      const typeClass = matched ? this.getSourceTypeClass(matched.type) : 'theology';
-      const typeLabel = matched ? this.getSourceTypeLabel(matched.type) : 'Ouvrage';
-      const preview = matched?.preview ? this.escapeHtml(matched.preview) : `Ouvrage consulté : ${cleanTitle}`;
-
-      return `
-        <span class="intext-source-pill" tabindex="0">
-          <span class="intext-source-icon">${this.ICONS.book}</span>
-          <div class="source-tooltip-card intext-tooltip">
-            <div class="tooltip-header">
-              <span class="tooltip-badge ${typeClass}">${typeLabel}</span>
-              <strong class="tooltip-title">${this.escapeHtml(cleanTitle)}</strong>
-            </div>
-            <div class="tooltip-body">${preview}</div>
-          </div>
-        </span>
-      `;
-    });
-
-    // 2. Détection universelle de toutes les références bibliques (simples et chaînées)
+    // 1. Détection universelle de toutes les références bibliques (simples et chaînées)
     res = this.linkifyScriptureInText(res);
 
-    // 3. Codes Strong : [Strong: G2631], [G2631], [H7225]
+    // 2. Codes Strong : [Strong: G2631], [G2631], [H7225]
     const strongRegex = /\[(?:Strong:\s*)?([GH]\d{1,5})\]/gi;
     res = res.replace(strongRegex, (match, code) => {
       return `<span class="intext-source-badge strong" title="Code Strong ${code.toUpperCase()}"><span class="badge-icon">${this.ICONS.search}</span><span class="badge-text">${code.toUpperCase()}</span></span>`;
     });
 
+    // 3. Détection universelle de TOUTES les citations de sources documentaires entre crochets [Nom : Terme] ou [Nom]
+    const universalDocSourceRegex = /\[([A-Za-zÀ-ÿ0-9\s:,'’\.\-–—\(\)\/]+)\]/gi;
+    res = res.replace(universalDocSourceRegex, (match, rawDocName) => {
+      const cleanContent = rawDocName.trim();
+      
+      // Ignorer si déjà un code Strong ou trop court
+      if (/^[GH]\d{1,5}$/i.test(cleanContent) || cleanContent.length < 2) return match;
+
+      let bookName = cleanContent;
+      let entryTerm = "";
+      if (cleanContent.includes(':')) {
+        const parts = cleanContent.split(':');
+        bookName = parts[0].trim();
+        entryTerm = parts.slice(1).join(':').trim();
+      }
+
+      // Normalisation des noms internes abrégés
+      const cleanNameMap = {
+        "lirelabibles": "Lire et comprendre la Bible",
+        "lire/comprendre": "Lire et comprendre la Bible",
+        "lire_comprendre": "Lire et comprendre la Bible",
+        "stgru": "Théologie systématique",
+        "niv cultural": "NIV Cultural Backgrounds Study Bible",
+        "nivarchaeo": "NIV Archaeological Study Bible",
+        "macarthur bc": "Commentaire Biblique MacArthur",
+        "paradoxes": "Les Paradoxes de la foi",
+        "tsm": "The Treasury of Scripture Knowledge"
+      };
+      const mappedBookName = cleanNameMap[bookName.toLowerCase()] || bookName;
+
+      // Recherche de l'ouvrage dans sourcesDetails
+      const matched = sourcesDetails.find(s => {
+        const t = (s.title || '').toLowerCase();
+        const b = mappedBookName.toLowerCase();
+        const r = cleanContent.toLowerCase();
+        return t.includes(b) || b.includes(t) || t.includes(r) || r.includes(t) || (entryTerm && t.includes(entryTerm.toLowerCase()));
+      });
+
+      const typeClass = matched ? this.getSourceTypeClass(matched.type) : this.getSourceTypeClass(mappedBookName);
+      const typeLabel = matched ? this.getSourceTypeLabel(matched.type) : this.getSourceTypeLabel(mappedBookName);
+      const author = matched?.author || this.guessAuthor(mappedBookName);
+      const coverUrl = matched?.cover_url || null;
+
+      const displayTitle = entryTerm ? `${mappedBookName} : ${entryTerm}` : mappedBookName;
+      const preview = matched?.preview ? this.escapeHtml(matched.preview) : '';
+
+      const coverHtml = coverUrl
+        ? `<img class="intext-tooltip-cover-img" src="${coverUrl}" alt="${this.escapeHtml(mappedBookName)}" />`
+        : `<div class="intext-tooltip-fallback ${typeClass}">${this.ICONS.book}</div>`;
+
+      const authorHtml = author ? `<span class="intext-tooltip-author">${this.escapeHtml(author)}</span>` : '';
+      const snippetHtml = preview ? `<div class="intext-tooltip-snippet">${preview}</div>` : '';
+
+      return `
+        <span class="intext-source-pill" tabindex="0" title="${this.escapeHtml(displayTitle)}">
+          <span class="intext-source-icon">${this.ICONS.book}</span>
+          <div class="source-tooltip-card intext-tooltip">
+            <div class="intext-tooltip-cover-wrap">
+              ${coverHtml}
+            </div>
+            <div class="intext-tooltip-content">
+              <div class="intext-tooltip-header">
+                <span class="tooltip-badge ${typeClass}">${typeLabel}</span>
+                ${authorHtml}
+              </div>
+              <strong class="intext-tooltip-title">${this.escapeHtml(displayTitle)}</strong>
+              ${snippetHtml}
+            </div>
+          </div>
+        </span>
+      `;
+    });
+
+    // Nettoyer la ponctuation orpheline devant les pastilles de source (ex: ", <span" -> "<span")
+    res = res.replace(/,\s*(<span class="intext-source-pill")/g, ' $1');
+
     return res;
   },
 
   // =========================================================================
-  // DÉTECTION UNIVERSELLE DES RÉFÉRENCES BIBLIQUES (avec versets multiples)
+  // DÉTECTION UNIVERSELLE DES RÉFÉRENCES BIBLIQUES (Sans icône, pur texte)
   // =========================================================================
 
   linkifyScriptureInText(text) {
@@ -1119,7 +1287,8 @@ const AIStudyView = {
       const cleanBook = book.replace(/\.$/, '').trim();
       const cleanVs = vs.replace(/[\u2013\u2014\u2212\u2010\u2011\u2012\u2015]/g, '-').replace(/\s+/g, '');
       const firstRef = `${cleanBook} ${ch}:${cleanVs}`;
-      let result = `<button class="theol-inline-scripture-ref intext-source-badge scripture" data-ref="${this.escapeHtml(firstRef)}"><span class="badge-icon">${this.ICONS.bible}</span><span class="badge-text">${book} ${ch}:${vs}</span></button>`;
+      // Juste la référence textuelle sans icône
+      let result = `<button class="theol-inline-scripture-ref intext-source-badge scripture" data-ref="${this.escapeHtml(firstRef)}"><span class="badge-text">${book} ${ch}:${vs}</span></button>`;
 
       if (chained) {
         const subRegex = /([,;]\s*)([0-9]{1,3}(?:\s*[:.,]\s*[0-9]{1,3}(?:\s*[-–—\u2013\u2014]\s*[0-9]{1,3})?)?)/g;

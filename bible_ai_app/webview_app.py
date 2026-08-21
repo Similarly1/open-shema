@@ -1270,11 +1270,24 @@ class BibleAppApi:
                     # Recherche thématique dans les ouvrages de théologie
                     from core.theology_reader_manager import TheologyReaderManager
                     theo_seen = set()
+                    clean_name_map = {
+                        "lirelabibles": "Lire et comprendre la Bible",
+                        "lire/comprendre": "Lire et comprendre la Bible",
+                        "lire_comprendre": "Lire et comprendre la Bible",
+                        "stgru": "Théologie systématique",
+                        "niv cultural": "NIV Cultural Backgrounds Study Bible",
+                        "nivarchaeo": "NIV Archaeological Study Bible",
+                        "macarthur bc": "Commentaire Biblique MacArthur",
+                        "paradoxes": "Les Paradoxes de la foi",
+                        "tsm": "The Treasury of Scripture Knowledge"
+                    }
+
                     for term in all_extracted_keywords[:6]:
                         theo_res = TheologyReaderManager.search_theology_books(term, limit=3)
                         if theo_res:
                             for tr in theo_res[:2]:
-                                b_title = tr.get("book_title") or tr.get("title") or "Ouvrage Théologique"
+                                raw_title = tr.get("book_title") or tr.get("title") or "Ouvrage Théologique"
+                                b_title = clean_name_map.get(raw_title.lower(), raw_title)
                                 t_key = f"{b_title}:{term}".lower()
                                 if t_key not in theo_seen:
                                     theo_seen.add(t_key)
@@ -1283,7 +1296,7 @@ class BibleAppApi:
                                         context_chunks.append({
                                             "id": f"theo_{b_title}_{term}",
                                             "text": f"### Extrait de [{b_title}] (sur '{term}') :\n{snippet[:900]}",
-                                            "metadata": {"type": "Théologie", "name": b_title}
+                                            "metadata": {"type": "Théologie", "name": b_title, "author": tr.get("author", "")}
                                         })
             except Exception as e:
                 print(f"[ask_study_ai] Erreur extraction commentaires/théologie : {e}")
@@ -1296,7 +1309,7 @@ class BibleAppApi:
                     context_chunks.append({
                         "id": "user_notes",
                         "text": notes_text,
-                        "metadata": {"type": "Notes", "name": "Notes personnelles (.md)"}
+                        "metadata": {"type": "Notes", "name": "Notes personnelles (.md)", "author": "Vos notes"}
                     })
             except Exception as e:
                 print(f"[ask_study_ai] Erreur extraction notes : {e}")
@@ -1319,8 +1332,44 @@ class BibleAppApi:
 
         for chunk in context_chunks:
             meta = chunk.get("metadata") if isinstance(chunk, dict) else {}
-            s_name = meta.get("name") or chunk.get("id") or "Document"
+            raw_s_name = meta.get("name") or chunk.get("id") or "Document"
+            clean_name_map = {
+                "lirelabibles": "Lire et comprendre la Bible",
+                "lire/comprendre": "Lire et comprendre la Bible",
+                "lire_comprendre": "Lire et comprendre la Bible",
+                "stgru": "Théologie systématique (Wayne Grudem)",
+                "niv cultural": "NIV Cultural Backgrounds Study Bible",
+                "nivarchaeo": "NIV Archaeological Study Bible",
+                "macarthur bc": "Commentaire Biblique MacArthur",
+                "paradoxes": "Les Paradoxes de la foi",
+                "tsm": "The Treasury of Scripture Knowledge"
+            }
+            s_name = clean_name_map.get(raw_s_name.lower(), raw_s_name)
             s_type = meta.get("type", "Ouvrage")
+            
+            # Détection d'auteur
+            author = meta.get("author") or ""
+            if not author:
+                s_lower = s_name.lower()
+                if "vigouroux" in s_lower:
+                    author = "F. Vigouroux"
+                elif "calmet" in s_lower:
+                    author = "Dom Augustin Calmet"
+                elif "calvin" in s_lower:
+                    author = "Jean Calvin"
+                elif "grudem" in s_lower or "stgru" in s_lower:
+                    author = "Wayne Grudem"
+                elif "nouveau dictionnaire" in s_lower or "emmaus" in s_lower:
+                    author = "Éditions Emmaüs"
+                elif "lire et comprendre" in s_lower or "lirelabible" in s_lower:
+                    author = "Société Biblique"
+                elif "josèphe" in s_lower or "josephe" in s_lower or "josephus" in s_lower:
+                    author = "Flavius Josèphe"
+                elif "macarthur" in s_lower:
+                    author = "John MacArthur"
+                elif "spurgeon" in s_lower:
+                    author = "C.H. Spurgeon"
+
             key = f"{s_type}:{s_name}".lower()
             if key not in seen_source_keys:
                 seen_source_keys.add(key)
@@ -1352,6 +1401,7 @@ class BibleAppApi:
 
                 dedup_sources.append({
                     "title": s_name,
+                    "author": author,
                     "type": s_type,
                     "preview": clean_snippet,
                     "cover_url": cover_data_url
