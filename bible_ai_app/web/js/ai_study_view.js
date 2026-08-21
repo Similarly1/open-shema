@@ -1039,38 +1039,138 @@ const AIStudyView = {
   },
 
   // =========================================================================
-  // SmoothUI ai-response : Streaming Typewriter Reveal
+  // SmoothUI ai-response : Streaming Blur-In Reveal par paquets de mots (Option 1)
   // =========================================================================
+
+  wrapTextNodesIntoChunks(rootEl) {
+    const walker = document.createTreeWalker(
+      rootEl,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode: (node) => {
+          if (node.parentElement?.closest('pre, code, .intext-source-pill, .theol-inline-scripture-ref')) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          if (!node.textContent || !node.textContent.trim()) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      }
+    );
+
+    const textNodes = [];
+    while (walker.nextNode()) {
+      textNodes.push(walker.currentNode);
+    }
+
+    for (const textNode of textNodes) {
+      const text = textNode.textContent;
+      const words = text.split(/(\s+)/);
+      const frag = document.createDocumentFragment();
+      
+      let currentChunk = '';
+      let wordCount = 0;
+
+      for (let i = 0; i < words.length; i++) {
+        currentChunk += words[i];
+        if (words[i].trim().length > 0) {
+          wordCount++;
+        }
+        if (wordCount >= 3 || i === words.length - 1) {
+          if (currentChunk.trim().length > 0) {
+            const span = document.createElement('span');
+            span.className = 'ai-stream-chunk';
+            span.textContent = currentChunk;
+            frag.appendChild(span);
+          } else {
+            frag.appendChild(document.createTextNode(currentChunk));
+          }
+          currentChunk = '';
+          wordCount = 0;
+        }
+      }
+
+      if (textNode.parentNode) {
+        textNode.parentNode.replaceChild(frag, textNode);
+      }
+    }
+
+    // Pastilles et badges interactifs inclus dans le défilement fluide
+    rootEl.querySelectorAll('.theol-inline-scripture-ref, .intext-source-pill, .intext-source-badge').forEach(pill => {
+      if (!pill.classList.contains('ai-stream-chunk') && !pill.closest('.ai-stream-chunk')) {
+        pill.classList.add('ai-stream-chunk');
+      }
+    });
+
+    // Blocs majeurs (tableaux, code, séparateurs)
+    rootEl.querySelectorAll('.ai-table-responsive, .ai-code-block, .ai-divider').forEach(block => {
+      block.classList.add('ai-stream-chunk-block');
+    });
+  },
 
   streamMarkdownResponse(containerEl, formattedMarkdown, onComplete) {
     if (!containerEl) return;
     
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = formattedMarkdown;
-    const childNodes = Array.from(tempDiv.childNodes);
+    containerEl.innerHTML = formattedMarkdown;
+    this.wrapTextNodesIntoChunks(containerEl);
 
-    if (childNodes.length <= 1) {
-      containerEl.innerHTML = formattedMarkdown;
+    const chunks = Array.from(containerEl.querySelectorAll('.ai-stream-chunk, .ai-stream-chunk-block'));
+
+    if (chunks.length === 0) {
       if (onComplete) onComplete();
       return;
     }
 
-    containerEl.innerHTML = '';
-    let nodeIndex = 0;
+    let currentIndex = 0;
+    let isCompleted = false;
 
-    const streamNextBlock = () => {
-      if (this.activeGenerationCancelled) return;
-      if (nodeIndex < childNodes.length) {
-        const node = childNodes[nodeIndex].cloneNode(true);
-        containerEl.appendChild(node);
-        nodeIndex++;
-        setTimeout(streamNextBlock, 30);
-      } else {
-        if (onComplete) onComplete();
+    // Calcul du rythme pour une durée totale fluide d'environ 2 à 2.5 secondes
+    const totalDurationTargetMs = 2200;
+    const intervalMs = 24;
+    const totalSteps = Math.max(1, Math.floor(totalDurationTargetMs / intervalMs));
+    const stepSize = Math.max(1, Math.ceil(chunks.length / totalSteps));
+
+    const revealAll = () => {
+      if (isCompleted) return;
+      isCompleted = true;
+      if (this.activeStreamTimer) {
+        clearInterval(this.activeStreamTimer);
+        this.activeStreamTimer = null;
       }
+      for (const chunk of chunks) {
+        chunk.classList.add('is-visible');
+      }
+      if (onComplete) onComplete();
     };
 
-    streamNextBlock();
+    // Possibilité de cliquer sur le texte pour tout afficher instantanément
+    const clickHandler = () => {
+      revealAll();
+      containerEl.removeEventListener('click', clickHandler);
+    };
+    containerEl.addEventListener('click', clickHandler);
+
+    this.activeStreamTimer = setInterval(() => {
+      if (this.activeGenerationCancelled) {
+        clearInterval(this.activeStreamTimer);
+        this.activeStreamTimer = null;
+        return;
+      }
+
+      for (let i = 0; i < stepSize && currentIndex < chunks.length; i++) {
+        chunks[currentIndex].classList.add('is-visible');
+        currentIndex++;
+      }
+
+      if (currentIndex >= chunks.length) {
+        clearInterval(this.activeStreamTimer);
+        this.activeStreamTimer = null;
+        isCompleted = true;
+        containerEl.removeEventListener('click', clickHandler);
+        if (onComplete) onComplete();
+      }
+    }, intervalMs);
   },
 
   // =========================================================================

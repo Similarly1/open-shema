@@ -5878,8 +5878,41 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
 }
 
 /* ==========================================================================
-   SmoothUI ai-response : Curseur & Animation de Streaming
+   SmoothUI ai-response : Streaming Blur-In Reveal par paquets de mots
    ========================================================================== */
+
+.ai-stream-chunk {
+  display: inline;
+  opacity: 0;
+  filter: blur(8px);
+  transform: translateY(3px);
+  transition: opacity 0.32s cubic-bezier(0.2, 0, 0, 1),
+              filter 0.32s cubic-bezier(0.2, 0, 0, 1),
+              transform 0.32s cubic-bezier(0.2, 0, 0, 1);
+  will-change: opacity, filter, transform;
+}
+
+.ai-stream-chunk.is-visible {
+  opacity: 1;
+  filter: blur(0px);
+  transform: translateY(0);
+}
+
+.ai-stream-chunk-block {
+  opacity: 0;
+  filter: blur(8px);
+  transform: translateY(6px);
+  transition: opacity 0.38s cubic-bezier(0.2, 0, 0, 1),
+              filter 0.38s cubic-bezier(0.2, 0, 0, 1),
+              transform 0.38s cubic-bezier(0.2, 0, 0, 1);
+  will-change: opacity, filter, transform;
+}
+
+.ai-stream-chunk-block.is-visible {
+  opacity: 1;
+  filter: blur(0px);
+  transform: translateY(0);
+}
 
 .ai-streaming-cursor {
   display: inline-block;
