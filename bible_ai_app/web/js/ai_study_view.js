@@ -699,6 +699,7 @@ const AIStudyView = {
 
   onViewActivated() {
     this.renderSuggestions(true);
+    this.loadHistory();
   },
 
   shuffleArray(arr) {
@@ -1659,22 +1660,27 @@ const AIStudyView = {
     res = res.replace(/\*(.*?)\*/g, '<em>$1</em>');
     res = res.replace(/`([^`]+)`/g, '<code class="ai-inline-code">$1</code>');
 
-    // 1. Détection universelle de toutes les références bibliques (y compris [Jn 3], [Éph 2], [Hb 3-4] et versets simples/chaînés)
-    res = this.linkifyScriptureInText(res);
-
-    // 2. Codes Strong : [Strong: G2631], [G2631], [H7225]
+    // 1. Codes Strong : [Strong: G2631], [G2631], [H7225]
     const strongRegex = /\[(?:Strong:\s*)?([GH]\d{1,5})\]/gi;
     res = res.replace(strongRegex, (match, code) => {
       return `<span class="intext-source-badge strong" title="Code Strong ${code.toUpperCase()}"><span class="badge-icon">${this.ICONS.search}</span><span class="badge-text">${code.toUpperCase()}</span></span>`;
     });
 
-    // 3. Détection universelle de TOUTES les citations de sources documentaires entre crochets [Nom : Terme] ou [Nom]
+    // 2. Détection universelle de TOUTES les citations de sources documentaires entre crochets [Nom : Terme] ou [Nom (Ref)] ou [Nom]
+    // Ne s'applique pas aux références bibliques pures entre crochets comme [Jn 3:16], [Romains 8:28], [Hb 3-4]
+    const pureScriptureBracketRegex = /^\[\s*(?:[1-3]\s*)?[a-zA-ZÀ-ÿ]+\.?\s*\d+(?:\s*[:.,]\s*\d+(?:\s*[-–—]\s*\d+)?)?\s*\]$/;
     const universalDocSourceRegex = /\[([A-Za-zÀ-ÿ0-9\s:,'’\.\-–—\(\)\/]+)\]/gi;
+
     res = res.replace(universalDocSourceRegex, (match, rawDocName) => {
       const cleanContent = rawDocName.trim();
       
-      // Ignorer si déjà un code Strong ou trop court
+      // Ignorer si code Strong
       if (/^[GH]\d{1,5}$/i.test(cleanContent) || cleanContent.length < 2) return match;
+
+      // Si c'est une référence biblique pure entre crochets comme [Jean 3:16] ou [Rom 8], laisser linkifyScriptureInText s'en charger
+      if (pureScriptureBracketRegex.test(match) && !cleanContent.toLowerCase().includes('texte biblique') && !cleanContent.toLowerCase().includes('bible') && !cleanContent.includes(':')) {
+        return match;
+      }
 
       let bookName = cleanContent;
       let entryTerm = "";
@@ -1713,9 +1719,6 @@ const AIStudyView = {
 
       const displayTitle = entryTerm ? `${mappedBookName} : ${entryTerm}` : mappedBookName;
       const preview = matched?.preview ? this.escapeHtml(matched.preview) : '';
-
-      // Stocker toutes les données dans des data-attributes sur la pastille
-      // Le tooltip global est rendu via le portal JS (initGlobalTooltip)
       const coverData = coverUrl ? `data-cover="${coverUrl}"` : '';
 
       return `<span class="intext-source-pill" tabindex="0"
@@ -1727,6 +1730,9 @@ const AIStudyView = {
         ${coverData}
       >${this.ICONS.book}</span>`;
     });
+
+    // 3. Détection universelle de toutes les références bibliques résiduelles dans le texte
+    res = this.linkifyScriptureInText(res);
 
     return res;
   },

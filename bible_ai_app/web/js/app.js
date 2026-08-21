@@ -583,6 +583,8 @@ const App = {
     let isGenerating = false;
     let activeInterval = null;
     let activeGenerationCancelled = false;
+    let currentDrawerSessionId = null;
+    let currentDrawerMessages = [];
 
     // Helper pour récupérer la référence courante du lecteur
     const getCurrentPassageRef = () => {
@@ -611,6 +613,8 @@ const App = {
     // Réinitialisation / Clear du chat
     const resetChat = () => {
       if (isGenerating) stopGeneration();
+      currentDrawerSessionId = null;
+      currentDrawerMessages = [];
       if (!chatMessages) return;
       chatMessages.innerHTML = `
         <div class="chat-message assistant welcome-message">
@@ -675,6 +679,22 @@ const App = {
       const passageRef = getCurrentPassageRef();
       const mode = modeSelect?.value || 'auto';
       const options = typeof AIStudyView !== 'undefined' && AIStudyView.getOptions ? AIStudyView.getOptions() : {};
+
+      // S'assurer qu'une session existe dans l'historique
+      if (!currentDrawerSessionId) {
+        const bookCode = typeof BibleReader !== 'undefined' ? (BibleReader.currentBook || 'GEN') : 'GEN';
+        const chapter = typeof BibleReader !== 'undefined' ? (BibleReader.currentChapter || 1) : 1;
+        const verse = typeof BibleReader !== 'undefined' ? (BibleReader.selectedVerse || 1) : 1;
+        const context = { bookCode, chapter, verse, passageRef };
+        try {
+          currentDrawerSessionId = await API.call('create_ai_session', context);
+        } catch (e) {
+          console.error("Erreur création session drawer:", e);
+        }
+      }
+
+      // Ajouter le message utilisateur à la session
+      currentDrawerMessages.push({ role: 'user', content: text });
 
       // Message utilisateur
       const userMsg = document.createElement('div');
@@ -756,7 +776,7 @@ const App = {
       const activeStepTimeouts = [stepTimer1, stepTimer2, stepTimer3, stepTimer4, stepTimer5];
 
       try {
-        const response = await API.call('ask_study_ai', text, mode, passageRef, options);
+        const response = await API.call('ask_study_ai', currentDrawerMessages, mode, passageRef, options);
         clearInterval(activeInterval);
         activeStepTimeouts.forEach(t => clearTimeout(t));
 
@@ -772,9 +792,19 @@ const App = {
 
         const totalDuration = ((performance.now() - startTime) / 1000).toFixed(1);
         const answerText = response.answer || response;
-        const sourcesUsed = response.sources_used || [];
         const sourcesDetails = response.sources_details || [];
-        const detectedMode = response.detected_mode || "Étude";
+        
+        // Traduction française garantie du mode
+        const frenchModes = {
+          "theology": "Synthèse théologique & doctrinale",
+          "exegesis": "Exégèse approfondie",
+          "historical": "Contexte historique & culturel",
+          "sermon": "Préparation de prédication",
+          "lexical": "Analyse lexicale (Grec & Hébreu)",
+          "auto": "Synthèse d'étude"
+        };
+        const rawMode = (response.detected_mode || mode || "theology").toLowerCase();
+        const detectedMode = frenchModes[rawMode] || response.detected_mode || "Synthèse d'étude";
         const modelUsed = response.model_used || options.model || "Gemini";
 
         // Mettre à jour le bandeau de raisonnement terminé
@@ -787,19 +817,10 @@ const App = {
           `;
         }
 
-        // Formater la réponse avec le parseur riche complet
+        // Formater la réponse avec le parseur riche complet (pastilles in-text [ 📖 ] avec infobulles)
         const formattedMarkdown = typeof AIStudyView !== 'undefined'
           ? AIStudyView.renderRichMarkdown(answerText, sourcesDetails)
           : answerText;
-
-        let sourcesHtml = '';
-        if (typeof AIStudyView !== 'undefined') {
-          if (sourcesDetails && sourcesDetails.length > 0) {
-            sourcesHtml = AIStudyView.buildSourcesSmoothUiHtml(sourcesDetails);
-          } else if (sourcesUsed && sourcesUsed.length > 0) {
-            sourcesHtml = AIStudyView.buildSourcesSimpleHtml(sourcesUsed);
-          }
-        }
 
         const footerHtml = `
           <div class="ai-msg-footer" style="margin-top: 8px;">
@@ -824,16 +845,30 @@ const App = {
 
         const answerBodyEl = assistantMsg.querySelector('.ai-answer-body');
         if (answerBodyEl) {
-          answerBodyEl.innerHTML = sourcesHtml + `<div class="ai-markdown-content"></div>` + footerHtml;
+          answerBodyEl.innerHTML = `<div class="ai-markdown-content"></div>` + footerHtml;
+          
+          // Enregistrer la réponse dans la session persistante
+          currentDrawerMessages.push({ role: 'assistant', content: answerText, sources: sourcesDetails });
+          if (currentDrawerSessionId) {
+            API.call('save_ai_messages', currentDrawerSessionId, currentDrawerMessages, text).then(() => {
+              if (typeof AIStudyView !== 'undefined' && AIStudyView.loadHistory) {
+                AIStudyView.loadHistory();
+              }
+            });
+          }
+
           if (typeof AIStudyView !== 'undefined') {
-            AIStudyView.attachSourcesAccordion(answerBodyEl);
             const markdownEl = answerBodyEl.querySelector('.ai-markdown-content');
             AIStudyView.streamMarkdownResponse(markdownEl, formattedMarkdown, () => {
               AIStudyView.attachMessageActions(assistantMsg, answerText, passageRef, text);
             });
           }
         }
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Rester en haut de la réponse pour commencer la lecture
+        setTimeout(() => {
+          assistantMsg.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
 
       } catch (err) {
         clearInterval(activeInterval);
@@ -850,7 +885,6 @@ const App = {
           answerBodyEl.innerHTML = `<p style="color: var(--accent-red); font-size: 12px; margin-top: 4px;">Une erreur est survenue lors de l'appel à l'assistant IA (${err?.message || err}).</p>`;
         }
       }
-      chatMessages.scrollTop = chatMessages.scrollHeight;
     };
 
     btnSendChat?.addEventListener('click', sendChatMessage);

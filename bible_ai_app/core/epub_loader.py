@@ -124,9 +124,23 @@ class EpubLoader:
             # 2. Extraire la Table des Matières (TOC)
             toc_entries = cls._extract_toc(z, opf_dir, manifest_items, spine_refs)
             
-            # 3. Classifier chaque chapitre et estimer la taille
-            is_syst_theol = any(w in strip_accents(metadata.get("title", "")) for w in ["systematic theology", "theologie systematique", "theologie dogmatique", "dogmatique", "christian theology", "theologie chretienne"])
+            # 3. Déterminer la portée dominante par défaut du livre entier
+            book_title_norm = strip_accents(metadata.get("title", ""))
+            book_desc_norm = strip_accents(metadata.get("description", ""))
+            if any(w in book_title_norm for w in ["christ", "jesus", "nouveau testament", "new testament", "evangile", "gospel", "paul", "epitres"]):
+                book_dominant_scope = "NT"
+            elif any(w in book_title_norm for w in ["ancien testament", "old testament", "pentateuque", "prophetes", "psaumes", "torah"]):
+                book_dominant_scope = "OT"
+            else:
+                book_dominant_scope = "GLOBAL"
+
+            current_active_scope = book_dominant_scope
+            current_active_book_code = None
+            current_active_book_name = None
+
+            is_syst_theol = any(w in book_title_norm for w in ["systematic theology", "theologie systematique", "theologie dogmatique", "dogmatique", "christian theology", "theologie chretienne"])
             classified_chapters = []
+            
             for idx, entry in enumerate(toc_entries):
                 title = entry.get("title", f"Chapitre {idx+1}").strip()
                 src = entry.get("src", "")
@@ -150,6 +164,18 @@ class EpubLoader:
                     is_systematic_theology=is_syst_theol, 
                     book_author=metadata.get("author", "")
                 )
+                
+                # Propagation contextuelle intelligente pour les sous-sections
+                if classification["source_type"] != "appendix":
+                    if classification["book_code"]:
+                        current_active_scope = classification["corpus_scope"]
+                        current_active_book_code = classification["book_code"]
+                        current_active_book_name = classification["book_name"]
+                    elif classification["corpus_scope"] == "GLOBAL" and current_active_scope != "GLOBAL":
+                        classification["corpus_scope"] = current_active_scope
+                        if not classification["book_code"] and current_active_book_code:
+                            classification["book_code"] = current_active_book_code
+                            classification["book_name"] = current_active_book_name
                 
                 # Déterminer si inclus par défaut
                 norm_t = strip_accents(title)

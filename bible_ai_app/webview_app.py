@@ -1158,11 +1158,12 @@ class BibleAppApi:
         else:
             mode_names = {
                 "exegesis": "Exégèse approfondie",
+                "theology": "Synthèse théologique & doctrinale",
                 "historical": "Contexte historique & culturel",
                 "sermon": "Préparation de prédication",
                 "lexical": "Analyse lexicale (Grec & Hébreu)"
             }
-            detected_mode = mode_names.get(mode, mode.capitalize())
+            detected_mode = mode_names.get(mode, "Synthèse d'étude")
             active_mode_key = mode
 
         # 1. Résolution et extraction du texte biblique (si un passage est explicitement spécifié)
@@ -1840,6 +1841,42 @@ class BibleAppApi:
             return {"success": True, "cover_path": dest_path, "cover_data_url": data_url_out}
         except Exception as e:
             return {"success": False, "error": f"Erreur enregistrement image collée : {e}"}
+
+    def paste_native_clipboard_cover(self, book_id: str = "cover") -> Dict[str, Any]:
+        """Récupère directement l'image depuis le presse-papier Windows/OS de manière 100% native et sans popup de permission."""
+        try:
+            from PIL import ImageGrab, Image
+            import uuid, re
+            
+            data = ImageGrab.grabclipboard()
+            if data is None:
+                return {"success": False, "error": "Aucune image dans le presse-papier. Copiez d'abord une image (Clic droit > Copier l'image ou capture d'écran)."}
+                
+            covers_dir = os.path.join(current_dir, "data", "covers")
+            os.makedirs(covers_dir, exist_ok=True)
+            clean_id = re.sub(r'[^a-zA-Z0-9._-]', '_', book_id or 'cover')
+            dest_filename = f"clip_{uuid.uuid4().hex[:6]}_{clean_id}.png"
+            dest_path = os.path.join(covers_dir, dest_filename)
+
+            if isinstance(data, Image.Image):
+                data.save(dest_path, "PNG")
+            elif isinstance(data, list) and len(data) > 0 and os.path.exists(data[0]):
+                src_file = data[0]
+                ext = os.path.splitext(src_file)[1].lower()
+                if ext in ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.gif']:
+                    dest_filename = f"clip_{uuid.uuid4().hex[:6]}_{clean_id}{ext}"
+                    dest_path = os.path.join(covers_dir, dest_filename)
+                    shutil.copy2(src_file, dest_path)
+                else:
+                    return {"success": False, "error": "Le fichier dans le presse-papier n'est pas une image supportée."}
+            else:
+                return {"success": False, "error": "Le contenu du presse-papier n'est pas une image reconnue."}
+
+            data_url_out = get_cover_data_url(dest_path)
+            return {"success": True, "cover_path": dest_path, "cover_data_url": data_url_out}
+        except Exception as e:
+            logger.error(f"[API] Erreur paste_native_clipboard_cover : {e}")
+            return {"success": False, "error": f"Erreur de lecture du presse-papier : {e}"}
 
     def search_google_books_metadata(self, query: str, author: str = "", title: str = "", isbn: str = "") -> List[Dict[str, Any]]:
         """Recherche des métadonnées bibliographiques via Google Books et Open Library."""

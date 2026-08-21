@@ -662,28 +662,23 @@ const ImportModal = {
 
   async pasteCoverFromClipboard() {
     try {
-      if (!navigator.clipboard || !navigator.clipboard.read) {
-        App.showToast('Presse-papier direct non supporté. Utilisez Ctrl+V.');
+      const bookId = document.getElementById('import-book-id')?.value.trim() || 'cover';
+      const res = await API.call('paste_native_clipboard_cover', bookId);
+      if (res && res.success && (res.cover_data_url || res.cover_path)) {
+        this.coverPath = res.cover_path;
+        this.coverDataUrl = res.cover_data_url;
+        this.updateCoverPreview(res.cover_data_url || res.cover_path);
+        App.showToast('Image collée depuis le presse-papier avec succès !');
         return;
       }
-
-      const items = await navigator.clipboard.read();
-      for (const item of items) {
-        const imageType = item.types.find(t => t.startsWith('image/'));
-        if (imageType) {
-          const blob = await item.getType(imageType);
-          const reader = new FileReader();
-          reader.onload = async (e) => {
-            await this.applyClipboardBase64(e.target.result);
-          };
-          reader.readAsDataURL(blob);
-          return;
-        }
+      
+      if (res && res.error) {
+        App.showToast(res.error);
+        return;
       }
-      App.showToast('Aucune image trouvée dans le presse-papier.');
     } catch (err) {
-      console.warn('Clipboard API paste fallback:', err);
-      App.showToast('Pour coller l\'image : faites simplement Ctrl+V.');
+      console.warn('Erreur paste native clipboard:', err);
+      App.showToast('Erreur lors du collage depuis le presse-papier.');
     }
   },
 

@@ -826,7 +826,11 @@ const CommentaryViewer = {
   },
 
   async navigateVerse(delta) {
-    let nextV = (parseInt(this.currentVerse, 10) || 1) + delta;
+    let currentV = parseInt(this.currentVerse, 10) || 1;
+    if (typeof BibleReader !== 'undefined' && BibleReader.selectedVerse) {
+      currentV = BibleReader.selectedVerse;
+    }
+    let nextV = currentV + delta;
     let nextCh = parseInt(this.currentChapter, 10) || 1;
     let nextBk = this.currentBook || 'Gen';
 
@@ -841,9 +845,12 @@ const CommentaryViewer = {
     }
 
     if (this.isSynchronized) {
-      // Déplacer la lecture biblique principale et synchroniser
-      if (typeof BibleReader !== 'undefined' && typeof BibleReader.navigateTo === 'function') {
-        await BibleReader.navigateTo(nextBk, nextCh, nextV);
+      if (typeof BibleReader !== 'undefined') {
+        if (nextBk === BibleReader.currentBook && nextCh === BibleReader.currentChapter) {
+          BibleReader.selectVerse(nextBk, nextCh, nextV, { scroll: true, behavior: 'smooth', block: 'center' });
+        } else {
+          await BibleReader.navigateTo(nextBk, nextCh, nextV);
+        }
       }
     } else {
       // En mode indépendant, charger directement le commentaire
@@ -3510,8 +3517,12 @@ const BibleReader = {
 
   _commDebounceTimer: null,
   _lastScrolledVerseRef: null,
+  _isProgrammaticScroll: false,
+  _progScrollTimer: null,
 
   debouncedLoadCommentaries(verseNum, bookCode, chapterNum) {
+    if (this._isProgrammaticScroll) return;
+
     const info = getBookInfo(bookCode);
     const refStr = `${info.name} ${chapterNum}:${verseNum}`;
 
@@ -3526,12 +3537,13 @@ const BibleReader = {
     }
 
     this._commDebounceTimer = setTimeout(() => {
+      if (this._isProgrammaticScroll) return;
       this.loadCommentariesForVerse(verseNum, bookCode, chapterNum, false);
     }, 120);
   },
 
   updateCurrentlyVisibleHeader(container) {
-    if (!container) return;
+    if (!container || this._isProgrammaticScroll) return;
 
     // Détecter le verset visible en tête de lecture
     const topVerse = this.getTopVisibleVerse(container);
@@ -3693,6 +3705,14 @@ const BibleReader = {
     const bStr = String(bookCode || this.currentBook);
 
     this.selectedVerse = parseInt(vStr, 10) || 1;
+    this._lastScrolledVerseRef = `${bStr}_${chStr}_${vStr}`;
+
+    // Verrouiller le suivi de défilement automatique pendant l'animation de défilement
+    this._isProgrammaticScroll = true;
+    if (this._progScrollTimer) clearTimeout(this._progScrollTimer);
+    this._progScrollTimer = setTimeout(() => {
+      this._isProgrammaticScroll = false;
+    }, 650);
 
     // Retirer 'selected' de tous les versets de l'espace de travail (volets 1 et 2)
     const workspace = document.getElementById('reader-workspace') || document;
@@ -3727,7 +3747,7 @@ const BibleReader = {
     formatPassagePill(bStr, chStr, vStr);
 
     // Charger les commentaires exégétiques pour ce verset
-    this.loadCommentariesForVerse(vStr, bStr, chStr);
+    this.loadCommentariesForVerse(vStr, bStr, chStr, true);
   },
 
   selectAndScrollToVerse(verseNum, bookCode = null, chapterNum = null) {
@@ -4443,16 +4463,19 @@ const BibleReader = {
     const allVerses = Array.from(pane1.querySelectorAll('.verse-item'));
     if (allVerses.length === 0) return;
 
-    let selected = pane1.querySelector('.verse-item.selected');
-    let nextIdx = 0;
+    let curSelected = pane1.querySelector('.verse-item.selected');
+    let curIdx = -1;
+    if (curSelected) {
+      curIdx = allVerses.indexOf(curSelected);
+    } else if (this.selectedVerse) {
+      curIdx = allVerses.findIndex(el => parseInt(el.dataset.verseNum, 10) === this.selectedVerse);
+    }
 
-    if (selected) {
-      const curIdx = allVerses.indexOf(selected);
-      if (curIdx >= 0 && curIdx < allVerses.length - 1) {
-        nextIdx = curIdx + 1;
-      } else {
-        nextIdx = allVerses.length - 1;
-      }
+    let nextIdx = 0;
+    if (curIdx >= 0 && curIdx < allVerses.length - 1) {
+      nextIdx = curIdx + 1;
+    } else if (curIdx >= allVerses.length - 1) {
+      nextIdx = allVerses.length - 1;
     } else {
       const topV = this.getTopVisibleVerse(pane1);
       if (topV && topV.element) {
@@ -4476,16 +4499,19 @@ const BibleReader = {
     const allVerses = Array.from(pane1.querySelectorAll('.verse-item'));
     if (allVerses.length === 0) return;
 
-    let selected = pane1.querySelector('.verse-item.selected');
-    let prevIdx = 0;
+    let curSelected = pane1.querySelector('.verse-item.selected');
+    let curIdx = -1;
+    if (curSelected) {
+      curIdx = allVerses.indexOf(curSelected);
+    } else if (this.selectedVerse) {
+      curIdx = allVerses.findIndex(el => parseInt(el.dataset.verseNum, 10) === this.selectedVerse);
+    }
 
-    if (selected) {
-      const curIdx = allVerses.indexOf(selected);
-      if (curIdx > 0) {
-        prevIdx = curIdx - 1;
-      } else {
-        prevIdx = 0;
-      }
+    let prevIdx = 0;
+    if (curIdx > 0) {
+      prevIdx = curIdx - 1;
+    } else if (curIdx === 0) {
+      prevIdx = 0;
     } else {
       const topV = this.getTopVisibleVerse(pane1);
       if (topV && topV.element) {
