@@ -1,4 +1,5 @@
 import os
+os.environ["ANONYMIZED_TELEMETRY"] = "False"
 import sys
 import re
 import html

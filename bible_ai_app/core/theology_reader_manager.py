@@ -1,9 +1,11 @@
 import os
+os.environ["ANONYMIZED_TELEMETRY"] = "False"
 import re
 import html
 import logging
 from typing import Dict, List, Any, Optional, Tuple
 import chromadb
+from chromadb.config import Settings
 from gui.library_utils import load_books_metadata
 from core.reference_parser import get_french_book_name
 
@@ -23,7 +25,10 @@ class TheologyReaderManager:
     def get_chroma_client(cls, persist_directory: str = "./data/chroma_db"):
         if cls._chroma_client is None:
             os.makedirs(persist_directory, exist_ok=True)
-            cls._chroma_client = chromadb.PersistentClient(path=persist_directory)
+            cls._chroma_client = chromadb.PersistentClient(
+                path=persist_directory,
+                settings=Settings(anonymized_telemetry=False)
+            )
         return cls._chroma_client
 
     @classmethod

@@ -1,6 +1,8 @@
 import os
+os.environ["ANONYMIZED_TELEMETRY"] = "False"
 import re
 import chromadb
+from chromadb.config import Settings
 from ai.llm_client import LLMClient
 from core.bible_json_loader import BibleJsonLoader
 
@@ -8,7 +10,8 @@ class VectorDB:
     def __init__(self, persist_directory="./data/chroma_db", api_keys=None):
         os.makedirs(persist_directory, exist_ok=True)
         self.client = chromadb.PersistentClient(
-            path=persist_directory
+            path=persist_directory,
+            settings=Settings(anonymized_telemetry=False)
         )
         self.api_keys = api_keys or {}
 
