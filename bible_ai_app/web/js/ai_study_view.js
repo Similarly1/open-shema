@@ -220,34 +220,29 @@ const AIStudyView = {
     const tokensEl = document.getElementById('ctx-depth-tokens');
     const timeEl   = document.getElementById('ctx-depth-time');
     const descEl   = document.getElementById('ctx-depth-desc');
-    const cursor   = document.getElementById('ctx-depth-cursor');
 
     if (!slider) return;
 
     const levels = [
       {
         tokens: '~200 tokens / source',
-        time: '≈ 15–40 s',
-        desc: 'Contexte minimal — idéal pour des questions courtes et factuelles, temps de réponse très court.',
-        pct: 2
+        time: '≈ 15–30 s',
+        desc: 'Synthèse ultra-rapide — extrait les passages clés essentiels.'
       },
       {
         tokens: '~600 tokens / source',
-        time: '≈ 45–120 s',
-        desc: 'Contexte équilibré — bon rapport vitesse / profondeur pour la plupart des études.',
-        pct: 33
+        time: '≈ 45–90 s',
+        desc: 'Contexte équilibré — bon compromis vitesse / richesse doctrinale.'
       },
       {
         tokens: '~1 500 tokens / source',
-        time: '≈ 2–5 min',
-        desc: 'Contexte approfondi — exploite les extraits en profondeur pour des analyses doctrinales riches.',
-        pct: 66
+        time: '≈ 2–4 min',
+        desc: 'Étude détaillée — analyse fouillée des arguments et traités.'
       },
       {
         tokens: '~3 500 tokens / source',
-        time: '≈ 5–12 min',
-        desc: 'Contexte exhaustif — envoie l\'intégralité des extraits. Synthèse la plus complète possible.',
-        pct: 98
+        time: '≈ 4–8 min',
+        desc: 'Texte intégral — mobilise la totalité des chapitres et articles.'
       }
     ];
 
@@ -257,7 +252,6 @@ const AIStudyView = {
       if (tokensEl) tokensEl.textContent = l.tokens;
       if (timeEl)   timeEl.textContent   = l.time;
       if (descEl)   descEl.textContent   = l.desc;
-      if (cursor)   cursor.style.left    = `${l.pct}%`;
     };
 
     slider.addEventListener('input', update);
