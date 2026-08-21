@@ -146,7 +146,9 @@ class RAGPipeline:
         """
         Formate le contexte extrait de manière hautement structurée avec étiquettes de citation exactes
         et injection prioritaire du bloc de péricope littéraire et du triple bloc exégétique (Texte original, Interlinéaire, Version affichée).
+        Chaque extrait est tronqué à 2400 caractères (~600 tokens) pour limiter le volume de contexte envoyé au LLM.
         """
+        MAX_EXCERPT_CHARS = 2400  # ~600 tokens — équilibre qualité / vitesse
         sections = []
         
         if pericope_context and pericope_context.strip():
@@ -174,8 +176,13 @@ class RAGPipeline:
                 ref_str = f", {' '.join(ref_parts)}" if ref_parts else ""
                 score_str = f" [Pertinence Reranker : {int(doc.get('rerank_score', 0) * 100)}%]" if "rerank_score" in doc else ""
                 
+                # Tronquer l'extrait si nécessaire
+                excerpt = doc['text']
+                if len(excerpt) > MAX_EXCERPT_CHARS:
+                    excerpt = excerpt[:MAX_EXCERPT_CHARS].rsplit(' ', 1)[0] + " [...]"
+                
                 header = f"--- SOURCE #{i} : [{source_name}{ref_str}]{score_str} ---"
-                sections.append(f"{header}\n{doc['text']}\n")
+                sections.append(f"{header}\n{excerpt}\n")
                 
         return "\n\n".join(sections)
 
@@ -287,8 +294,6 @@ class RAGPipeline:
                             print(f"[RAGPipeline] Erreur récupération lexique Strong : {e}")
 
         t_retrieval_ms = (time.time() - t_retrieval_0) * 1000
-        if t_retrieval_ms < 500:
-            time.sleep((500 - t_retrieval_ms) / 1000.0)
         _notify("retrieval", f"Recherche terminée ({len(raw_candidates)} extraits trouvés)", "done")
 
         # 2. Reranking local
@@ -302,8 +307,6 @@ class RAGPipeline:
                 enable_rerank=True
             )
             t_rerank_ms = (time.time() - t_rerank_0) * 1000
-            if t_rerank_ms < 600:
-                time.sleep((600 - t_rerank_ms) / 1000.0)
             _notify("rerank", f"Reranking terminé ({len(reranked_docs)} passages retenus)", "done")
         else:
             reranked_docs = raw_candidates[:top_k_final]
