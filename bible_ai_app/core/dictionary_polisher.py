@@ -413,7 +413,7 @@ TEXTE BRUT ORIGINAL :
             }
             
             try:
-                resp = requests.post(url, json=payload, timeout=180)
+                resp = requests.post(url, json=payload, timeout=(10, 45))
                 if resp.status_code == 200:
                     data = resp.json()
                     candidates = data.get("candidates", [])
@@ -435,7 +435,7 @@ TEXTE BRUT ORIGINAL :
                         "contents": [{"parts": [{"text": fallback_prompt}]}],
                         "generationConfig": {"temperature": 0.2}
                     }
-                    fb_resp = requests.post(url, json=fallback_payload, timeout=180)
+                    fb_resp = requests.post(url, json=fallback_payload, timeout=(10, 45))
                     if fb_resp.status_code == 200:
                         fb_data = fb_resp.json()
                         fb_candidates = fb_data.get("candidates", [])
@@ -450,9 +450,10 @@ TEXTE BRUT ORIGINAL :
                             return True, cls._clean_markdown_fences(polished_text), usage_res
                     return False, f"Erreur API Gemini ({resp.status_code}) : {resp.text}", usage_res
             except requests.exceptions.Timeout:
-                return False, "Délai d'attente dépassé (timeout). Veuillez réessayer.", usage_res
+                return False, "Délai d'attente dépassé (timeout).", usage_res
             except Exception as e:
                 return False, f"Erreur lors du polissage : {e}", usage_res
+
 
 
 

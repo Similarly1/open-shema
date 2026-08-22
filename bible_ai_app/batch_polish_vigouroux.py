@@ -58,20 +58,22 @@ def load_all_keys():
     return keys
 
 class EndpointRateLimiter:
-    """Régulateur de débit strict (Leaky Bucket) pour garantir le respect des 15 RPM par point d'accès."""
-    def __init__(self, min_interval=4.8):
+    """Régulateur de débit strict (Leaky Bucket) sans interblocage pour garantir le respect des 15 RPM."""
+    def __init__(self, min_interval=5.0):
         self.min_interval = min_interval
-        self.last_call_time = 0.0
+        self.next_allowed_time = 0.0
         self.lock = Lock()
 
     def acquire(self):
         with self.lock:
             now = time.time()
-            elapsed = now - self.last_call_time
-            if elapsed < self.min_interval:
-                sleep_time = self.min_interval - elapsed
-                time.sleep(sleep_time)
-            self.last_call_time = time.time()
+            target_time = max(now, self.next_allowed_time)
+            self.next_allowed_time = target_time + self.min_interval
+
+        sleep_time = target_time - now
+        if sleep_time > 0:
+            time.sleep(sleep_time)
+
 
 def build_gemini_pool(keys):
     """Construit un pool 100% Google Gemini combinant les 2 clés et les modèles 3.5 & 3.1 Flash-Lite."""
