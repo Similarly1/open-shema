@@ -941,53 +941,58 @@ const DictView = {
       const seeMatch = raw.match(/^[*•-]?\s*(?:\*+|_+)?\s*Voir(?:\s+(?:aussi|également))?\s*(?:\*+|_+)?\s*:\s*(?:\*\*)?([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\s–-]+?)(?:\*\*)?(?:\s*\((.*?)\))?[\.\s]*$/i);
       if (seeMatch) {
         if (inUlList) { out.push('</ul>'); inUlList = false; }
-        if (!inSeeList) {
-          out.push('<ul class="dict-see-list" style="list-style: none; padding-left: 0; margin: 12px 0;">');
-          inSeeList = true;
-        }
+        if (inSeeList) { out.push('</ul>'); inSeeList = false; }
         const targetWord = seeMatch[1].trim();
         const details = (seeMatch[2] || '').trim();
-        const detailsHtml = details ? ` <span class="dict-see-details" style="color: var(--text-muted); font-size: 13px; font-style: italic;">(${details})</span>` : '';
+        const detailsHtml = details ? ` <span class="dict-see-details" style="color: var(--text-muted); font-size: 12.5px; font-style: italic;">(${details})</span>` : '';
         out.push(`
-          <li class="dict-see-item" style="margin-bottom: 8px;">
-            <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(targetWord)}" style="color: #6366f1; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; background: rgba(99, 102, 241, 0.08); padding: 3px 10px; border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.2); transition: all 0.15s ease;">
+          <div class="dict-see-row" style="margin: 6px 0 10px 0; display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+            <span class="dict-see-label" style="font-size: 13px; font-weight: 600; color: var(--text-muted);">Voir :</span>
+            <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(targetWord)}">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
               <span>${this.escapeHtml(targetWord)}</span>
             </a>${detailsHtml}
-          </li>
+          </div>
         `);
         return;
-      } else {
-        if (inSeeList) {
-          out.push('</ul>');
-          inSeeList = false;
-        }
       }
 
       // D) Lignes de Bibliographie / Sources *Cf.* Hurter...
       const cfMatch = raw.match(/^(?:\*+)?(?:Cf\.|Confère|Conf\.|Bibliographie\s*:|Sources?\s*:)(?:\*+)?\s*(.+)$/i);
       if (cfMatch) {
-        if (inUlList) { out.push('</ul>'); inUlList = false; }
         const srcBody = cfMatch[1].trim();
         if (this.optFootnotes) {
           const fnId = this.currentFootnotesList.length + 1;
           const cleanSrc = srcBody.replace(/[*_`]+/g, '').trim();
           this.currentFootnotesList.push({ id: fnId, text: `Cf. ${cleanSrc}` });
-          out.push(`
-            <div class="dict-cf-source-row" style="margin: 8px 0 14px 0; font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; background: rgba(99, 102, 241, 0.04); padding: 6px 12px; border-radius: 6px; border-left: 3px solid #6366f1;">
-              <span class="theol-fn-badge" data-fn-id="${fnId}" id="dict-fnref-${fnId}">${fnId}</span>
-              <span style="font-style: italic;">Cf. ${srcBody.replace(/\*(.*?)\*/g, '<em>$1</em>')}</span>
-            </div>
-          `);
+          const badgeHtml = ` <span class="theol-fn-badge" data-fn-id="${fnId}" id="dict-fnref-${fnId}">${fnId}</span>`;
+
+          // Attacher le badge en exposant directement à la fin du dernier élément (liste ou paragraphe)
+          if (out.length > 0) {
+            const lastIdx = out.length - 1;
+            if (inUlList && out[lastIdx].endsWith('</li>')) {
+              out[lastIdx] = out[lastIdx].slice(0, -5) + badgeHtml + '</li>';
+            } else if (out[lastIdx].endsWith('</p>')) {
+              out[lastIdx] = out[lastIdx].slice(0, -4) + badgeHtml + '</p>';
+            } else if (out[lastIdx].endsWith('</div>')) {
+              out[lastIdx] = out[lastIdx].slice(0, -6) + badgeHtml + '</div>';
+            } else {
+              out.push(badgeHtml);
+            }
+          } else {
+            out.push(badgeHtml);
+          }
         } else {
+          if (inUlList) { out.push('</ul>'); inUlList = false; }
           out.push(`
-            <div class="dict-cf-source-row" style="margin: 8px 0 14px 0; font-size: 13px; color: var(--text-secondary); background: rgba(99, 102, 241, 0.04); padding: 6px 12px; border-radius: 6px; border-left: 3px solid #6366f1;">
-              <span style="font-style: italic;">*Cf.* ${srcBody.replace(/\*(.*?)\*/g, '<em>$1</em>')}</span>
+            <div class="dict-cf-source-row" style="margin: 8px 0 12px 0; font-size: 13px; color: var(--text-secondary); font-style: italic;">
+              *Cf.* ${srcBody.replace(/\*(.*?)\*/g, '<em>$1</em>')}
             </div>
           `);
         }
         return;
       }
+
 
       // E) Listes à puces Markdown (* Ouvrage...)
       const bulletMatch = raw.match(/^[*•-]\s+(.+)$/);
