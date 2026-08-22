@@ -533,6 +533,23 @@ const DictView = {
       });
     });
 
+    // Attacher les interactions pour les badges de sources bibliographiques
+    bodyEl.querySelectorAll('.dict-source-badge').forEach(badge => {
+      badge.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const citation = badge.dataset.citation || badge.getAttribute('title') || '';
+        if (citation) {
+          const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(citation)}`;
+          if (typeof API !== 'undefined' && API.call) {
+            API.call('open_external_url', searchUrl).catch(() => window.open(searchUrl, '_blank'));
+          } else {
+            window.open(searchUrl, '_blank');
+          }
+        }
+      });
+    });
+
+
     // Basculer vers l'original si cliqué
     bodyEl.querySelector('#btn-dict-view-original')?.addEventListener('click', () => {
       const origText = match.raw_text || match.full_text || '';
@@ -542,14 +559,65 @@ const DictView = {
 
   formatArticleMarkdown(text) {
     if (!text) return '';
-    const formatted = text
+
+    const ROMAN_MAP = {
+      'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6, 'VII': 7, 'VIII': 8, 'IX': 9, 'X': 10,
+      'XI': 11, 'XII': 12, 'XIII': 13, 'XIV': 14, 'XV': 15, 'XVI': 16, 'XVII': 17, 'XVIII': 18, 'XIX': 19, 'XX': 20,
+      'XXI': 21, 'XXII': 22, 'XXIII': 23, 'XXIV': 24, 'XXV': 25, 'XXVI': 26, 'XXVII': 27, 'XXVIII': 28, 'XXIX': 29, 'XXX': 30,
+      'XXXI': 31, 'XXXII': 32, 'XXXIII': 33, 'XXXIV': 34, 'XXXV': 35, 'XXXVI': 36, 'XXXVII': 37, 'XXXVIII': 38, 'XXXIX': 39, 'XL': 40,
+      'XLI': 41, 'XLII': 42, 'XLIII': 43, 'XLIV': 44, 'XLV': 45, 'XLVI': 46, 'XLVII': 47, 'XLVIII': 48, 'XLIX': 49, 'L': 50,
+      'LI': 51, 'LII': 52, 'LIII': 53, 'LIV': 54, 'LV': 55, 'LVI': 56, 'LVII': 57, 'LVIII': 58, 'LIX': 59, 'LX': 60,
+      'LXI': 61, 'LXII': 62, 'LXIII': 63, 'LXIV': 64, 'LXV': 65, 'LXVI': 66, 'LXVII': 67, 'LXVIII': 68, 'LXIX': 69, 'LXX': 70,
+      'LXXI': 71, 'LXXII': 72, 'LXXIII': 73, 'LXXIV': 74, 'LXXV': 75, 'LXXVI': 76, 'LXXVII': 77, 'LXXVIII': 78, 'LXXIX': 79, 'LXXX': 80,
+      'LXXXI': 81, 'LXXXII': 82, 'LXXXIII': 83, 'LXXXIV': 84, 'LXXXV': 85, 'LXXXVI': 86, 'LXXXVII': 87, 'LXXXVIII': 88, 'LXXXIX': 89, 'XC': 90,
+      'XCI': 91, 'XCII': 92, 'XCIII': 93, 'XCIV': 94, 'XCV': 95, 'XCVI': 96, 'XCVII': 97, 'XCVIII': 98, 'XCIX': 99, 'C': 100
+    };
+
+    let processed = text;
+
+    // 1. Conversion des chiffres romains dans les tomes, parties et planches
+    processed = processed.replace(/\bI(?:re|ère)\s+(partie|série)/gi, '1re $1');
+    processed = processed.replace(/\bII(?:e|ème)\s+(partie|série)/gi, '2e $1');
+    processed = processed.replace(/\bIII(?:e|ème)\s+(partie|série)/gi, '3e $1');
+    processed = processed.replace(/\b(tomes?|t\.)\s+([IVXLCDM]+)\b/gi, (match, prefix, rom) => {
+      const arab = ROMAN_MAP[rom.toUpperCase()] || rom;
+      const normP = prefix.toLowerCase().startsWith('tome') ? 'tome' : 't.';
+      return `${normP} ${arab}`;
+    });
+    processed = processed.replace(/\b(pl\.|planche)\s+([IVXLCDM]+)\b/gi, (match, prefix, rom) => {
+      const arab = ROMAN_MAP[rom.toUpperCase()] || rom;
+      return `${prefix} ${arab}`;
+    });
+
+    // 2. Détection et transformation des citations de sources entre parenthèses en badges d'infobulles
+    processed = processed.replace(/\(([^\)\n]{15,350})\)/g, (match, inner) => {
+      const lower = inner.toLowerCase();
+      const isSource = ['col.', 'p.', 'page', 't.', 'tome', 'édit', 'éd.', 'vol.', 'in-4', 'in-8', 'in-fol', 'ouv. cité', 'op. cit.', 'comment.', 'explan.', 'scholia', 'lexicon', 'revue', 'theol.', 'religionsgeschichte', 'monuments', 'sat.', 'genesis', 'mélanges', 'description de la palestine', 'thésaurus', 'keilinschriften'].some(k => lower.includes(k));
+      if (isSource) {
+        const cleanText = inner.replace(/[*_`]+/g, '').trim();
+        let label = '📖 Source';
+        const shortMatch = cleanText.match(/([A-Z][a-zA-ZÀ-ÿ\s\.]+),\s*(?:t\.|p\.|col\.)/);
+        if (shortMatch) {
+          label = `📖 ${shortMatch[1].trim().slice(0, 20)}`;
+        } else if (cleanText.includes('t.') || cleanText.includes('col.')) {
+          const tMatch = cleanText.match(/(t\.\s*\d+(?:,\s*col\.\s*\d+)?)/);
+          if (tMatch) label = `📖 ${tMatch[1]}`;
+        }
+        const safeTooltip = this.escapeHtml(cleanText);
+        return `<span class="dict-source-badge" title="${safeTooltip}" data-citation="${safeTooltip}">${label}</span>`;
+      }
+      return match;
+    });
+
+    const formatted = processed
       .replace(/^### (.*$)/gim, '<h3 style="margin: 16px 0 8px 0; font-size: 17px; font-weight: 700;">$1</h3>')
       .replace(/^## (.*$)/gim, '<h2 style="margin: 20px 0 10px 0; font-size: 19px; font-weight: 700;">$1</h2>')
       .replace(/^# (.*$)/gim, '<h1 style="margin: 22px 0 12px 0; font-size: 22px; font-weight: 800;">$1</h1>')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
       .replace(/^\> (.*$)/gim, '<blockquote style="border-left: 3px solid var(--accent-blue); padding: 8px 14px; margin: 12px 0; background: var(--bg-subtle); border-radius: 0 6px 6px 0; font-style: italic;">$1</blockquote>')
-      .replace(/^\- (.*$)/gim, '<li style="margin-left: 20px; margin-bottom: 4px;">$1</li>');
+      .replace(/^\- (.*$)/gim, '<li style="margin-left: 20px; margin-bottom: 4px;">$1</li>')
+      .replace(/^(\s*)[*•]\s+(.*$)/gim, '<li style="margin-left: 20px; margin-bottom: 4px;">$2</li>');
 
     return formatted
       .split(/\n\n+/)
@@ -558,6 +626,7 @@ const DictView = {
       .map(p => (p.startsWith('<h') || p.startsWith('<blockquote') || p.startsWith('<li')) ? p : `<p style="margin: 8px 0; line-height: 1.75;">${p}</p>`)
       .join('');
   },
+
 
   async polishCurrentArticle() {
     const match = this.currentMatches[this.activeSourceIndex] || this.currentEntryData;

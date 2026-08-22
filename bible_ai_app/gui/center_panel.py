@@ -1733,6 +1733,26 @@ class CenterPanel(ctk.CTkFrame):
             if s.isdigit(): return int(s)
             return ROMAN_NUMS_EXT.get(s.upper())
 
+        # 0. Transformation préalable des chiffres romains dans tomes, parties et planches
+        line_text = re.sub(r'\bI(?:re|ère)\s+(partie|série)', r'1re \1', line_text, flags=re.IGNORECASE)
+        line_text = re.sub(r'\bII(?:e|ème)\s+(partie|série)', r'2e \1', line_text, flags=re.IGNORECASE)
+        line_text = re.sub(r'\bIII(?:e|ème)\s+(partie|série)', r'3e \1', line_text, flags=re.IGNORECASE)
+        
+        def _repl_t(m):
+            pref = m.group(1)
+            rom = m.group(2)
+            arab = str(ROMAN_NUMS_EXT.get(rom.upper(), rom))
+            norm_p = "tome" if pref.lower().startswith("tome") else "t."
+            return f"{norm_p} {arab}"
+        line_text = re.sub(r'\b(tomes?|t\.)\s+([IVXLCDM]+)\b', _repl_t, line_text, flags=re.IGNORECASE)
+        
+        def _repl_p(m):
+            pref = m.group(1)
+            rom = m.group(2)
+            arab = str(ROMAN_NUMS_EXT.get(rom.upper(), rom))
+            return f"{pref} {arab}"
+        line_text = re.sub(r'\b(pl\.|planche)\s+([IVXLCDM]+)\b', _repl_p, line_text, flags=re.IGNORECASE)
+
         tokens = []
         
         # 0. Liens préfixés par emoji 🔗 (ex: 🔗 PHÉNICIENS, 🔗 SCARABÉE)
@@ -1777,6 +1797,27 @@ class CenterPanel(ctk.CTkFrame):
             if len(target_name) >= 2 and target_name.upper() not in ROMAN_NUMS:
                 tokens.append((0, len(line_text), 'DICT_LINK', target_name, target_name))
 
+        # 4.5. Citations de sources bibliographiques entre parenthèses -> Badges & Infobulles
+        for m in re.finditer(r'\(([^\)\n]{12,350})\)', line_text):
+            inner = m.group(1).strip()
+            lower = inner.lower()
+            is_src = any(k in lower for k in [
+                'col.', 'p.', 'page', 't.', 'tome', 'édit', 'éd.', 'vol.', 'in-4', 'in-8',
+                'in-fol', 'ouv. cité', 'op. cit.', 'comment.', 'explan.', 'scholia', 'lexicon',
+                'revue', 'theol.', 'religionsgeschichte', 'monuments', 'sat.', 'genesis',
+                'mélanges', 'description de la palestine', 'thésaurus', 'keilinschriften'
+            ])
+            if is_src:
+                clean_inner = re.sub(r'[*_`]+', '', inner).strip()
+                label = "📖 Source"
+                short_m = re.search(r'([A-Z][a-zA-ZÀ-ÿ\s\.]+),\s*(?:t\.|p\.|col\.)', clean_inner)
+                if short_m:
+                    label = f"📖 {short_m.group(1).strip()[:18]}"
+                elif 't.' in clean_inner or 'col.' in clean_inner:
+                    m_t = re.search(r'(t\.\s*\d+(?:,\s*col\.\s*\d+)?)', clean_inner)
+                    if m_t: label = f"📖 {m_t.group(1)}"
+                tokens.append((m.start(), m.end(), 'SOURCE_CITATION', label, clean_inner))
+
         # 5. Références bibliques anciennes & romaines (ex: Gen., I, 2 ; *Gen.*, I, 1 ; II Cor., VI, 14 ; Ps. CIV (CIII), 20)
         RE_ANCIENT_BIBLE = re.compile(
             r'(?:\*+)?\b((?:I{1,3}|IV|[1-4])\s*[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+|[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+)\.?(?:\*+)?\s*[,:]?\s*([IVXLCDM0-9]+)(?:\s*\([A-Z0-9]+\))?\s*[,:]\s*([0-9]+(?:\s*[\-–]\s*[0-9]+)?)',
@@ -1788,10 +1829,11 @@ class CenterPanel(ctk.CTkFrame):
             ch_num = parse_chap(m.group(2).strip())
             if code and ch_num:
                 v_clean = m.group(3).strip().replace('–', '-').replace(' ', '') if m.group(3) else None
-                clean_display = re.sub(r'[*_]+', '', m.group(0))
-                tokens.append((m.start(), m.end(), 'BIBLE_REF', clean_display, {
+                fr_book = REVERSE_BOOK_MAPPING.get(code, code)
+                modern_display = f"{fr_book} {ch_num}:{v_clean}" if v_clean else f"{fr_book} {ch_num}"
+                tokens.append((m.start(), m.end(), 'BIBLE_REF', modern_display, {
                     "book_code": code,
-                    "book_name": REVERSE_BOOK_MAPPING.get(code, code),
+                    "book_name": fr_book,
                     "chapter": ch_num,
                     "verse": v_clean
                 }))
@@ -1855,6 +1897,14 @@ class CenterPanel(ctk.CTkFrame):
                 self.lex_textbox._textbox.tag_bind(unique_tag, "<Button-1>", lambda e, w=target_word: self.on_dictionary_cross_reference_clicked(w))
                 self.lex_textbox._textbox.tag_bind(unique_tag, "<Enter>", lambda e, w=target_word, tg=unique_tag: self._on_hover_dict_link(e, w, tg))
                 self.lex_textbox._textbox.tag_bind(unique_tag, "<Leave>", lambda e: self._on_leave_tooltip(e))
+            elif t_type == 'SOURCE_CITATION':
+                self._link_counter += 1
+                unique_tag = f"src_cite_{self._link_counter}"
+                self.lex_textbox.insert("end", f" {content} ", ("lex_source_badge", unique_tag))
+                cit_text = extra or content
+                self.lex_textbox._textbox.tag_bind(unique_tag, "<Button-1>", lambda e, cit=cit_text: self._on_click_source_citation(cit))
+                self.lex_textbox._textbox.tag_bind(unique_tag, "<Enter>", lambda e, cit=cit_text, tg=unique_tag: self._on_hover_source_citation(e, cit, tg))
+                self.lex_textbox._textbox.tag_bind(unique_tag, "<Leave>", lambda e: self._on_leave_tooltip(e))
             elif t_type == 'BIBLE_REF':
                 self._link_counter += 1
                 b_code = extra["book_code"]
@@ -1887,6 +1937,7 @@ class CenterPanel(ctk.CTkFrame):
                 self.lex_textbox.insert("end", content, base_tag)
                 
             curr = end
+
             
         if curr < len(line_text):
             self.lex_textbox.insert("end", line_text[curr:], base_tag)
@@ -2016,6 +2067,59 @@ class CenterPanel(ctk.CTkFrame):
                     self.display_dictionary_entry(results)
         except Exception as e:
             print(f"Erreur consultation mot original lexique : {e}")
+
+    def _on_hover_source_citation(self, event, citation_text, tag_name):
+        """Affiche l'infobulle complète pour une source bibliographique érudite."""
+        try:
+            self.lex_textbox._textbox.config(cursor="hand2")
+            if getattr(self, '_hover_lex_ref', None) == tag_name and getattr(self.tooltip, 'tw', None):
+                return
+            self._hover_lex_ref = tag_name
+            
+            target_rect = None
+            try:
+                ranges = self.lex_textbox._textbox.tag_ranges(tag_name)
+                if ranges and len(ranges) >= 2:
+                    bbox = self.lex_textbox._textbox.bbox(ranges[0])
+                    if bbox:
+                        bx, by, bw, bh = bbox
+                        rx = self.lex_textbox._textbox.winfo_rootx() + bx
+                        ry = self.lex_textbox._textbox.winfo_rooty() + by
+                        target_rect = (rx, ry, bw, bh)
+            except Exception:
+                target_rect = None
+                
+            if target_rect:
+                x, y = target_rect[0], target_rect[1]
+            else:
+                x = getattr(event, 'x_root', None) or (self.lex_textbox._textbox.winfo_rootx() + getattr(event, 'x', 0))
+                y = getattr(event, 'y_root', None) or (self.lex_textbox._textbox.winfo_rooty() + getattr(event, 'y', 0))
+                target_rect = (x, y, 60, 20)
+                
+            tooltip_data = {
+                "word": "Source bibliographique",
+                "source": "📖 Ouvrage & Référence académique",
+                "title": citation_text[:60] + ("..." if len(citation_text) > 60 else ""),
+                "preview": citation_text,
+                "hint": "🖱️ Cliquer pour rechercher cet ouvrage sur le Web / Google Books"
+            }
+            self.tooltip.show(x, y, tooltip_data, target_rect=target_rect, prefer_side="auto_side")
+        except Exception as e:
+            print(f"Erreur tooltip citation source : {e}")
+
+    def _on_click_source_citation(self, citation_text):
+        """Ouvre une recherche Google Books / Web sur la citation bibliographique cliquée."""
+        import urllib.parse
+        try:
+            if self.tooltip:
+                self.tooltip.hide()
+            self._hover_lex_ref = None
+            clean_q = urllib.parse.quote_plus(citation_text.strip())
+            web_url = f"https://www.google.com/search?q={clean_q}"
+            webbrowser.open(web_url)
+        except Exception as e:
+            print(f"Erreur ouverture lien source : {e}")
+
 
     def _on_hover_dict_link(self, event, target_word, tag_name):
         """Affiche une infobulle élégante indiquant si le lien mène à un article local ou à un ouvrage web."""
@@ -3486,7 +3590,12 @@ class CenterPanel(ctk.CTkFrame):
             self.lex_textbox._textbox.tag_configure("lex_orig_word_hebrew", font=(self.font_family, self.font_size + 1, "bold"), foreground="#60A5FA" if is_dark else "#2563EB", underline=True)
             self.lex_textbox._textbox.tag_configure("lex_orig_word_greek", font=(self.font_family, self.font_size + 1, "bold"), foreground="#10B981" if is_dark else "#059669", underline=True)
             
+            badge_bg = "#312E81" if is_dark else "#EEF2FF"
+            badge_fg = "#A5B4FC" if is_dark else "#4F46E5"
+            self.lex_textbox._textbox.tag_configure("lex_source_badge", font=(self.font_family, max(9, self.font_size - 2), "bold"), background=badge_bg, foreground=badge_fg)
+            
             self.lex_textbox._textbox.bind("<Leave>", lambda e: (self.tooltip.hide() if getattr(self, 'tooltip', None) else None, self.lex_textbox._textbox.config(cursor="")))
+
             
             self.lex_textbox._textbox.tag_bind("wiki_link", "<Button-1>", lambda e: self.on_open_wikipedia_web())
             self.lex_textbox._textbox.tag_bind("wiki_link", "<Enter>", lambda e: self.lex_textbox._textbox.config(cursor="hand2"))
