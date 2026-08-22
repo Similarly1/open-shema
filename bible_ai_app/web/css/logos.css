@@ -15993,71 +15993,90 @@ body:not(.theme-dark) .vintage-epoch-xix .interlinear-strong {
  * 6. ALTÉRATION TYPOGRAPHIQUE & PRESS JITTER (IMPRESSION MANUELLE & ENCRE)
  * ========================================================================= */
 
-/* --- A. MICRO-DÉCALAGES ALÉATOIRES DE LIGNE DE BASE & ROTATION DES MOTS --- */
-/* Simule le placement physique imparfait des plombs mobiles sur composteur */
+/* --- A. MICRO-DÉCALAGES DE LIGNE DE BASE & ROTATION DES MOTS --- */
 .vintage-epoch-ancient .word-token,
-.vintage-epoch-classic .word-token {
-  display: inline-block;
-  transition: transform 0.15s ease;
+.vintage-epoch-classic .word-token,
+.vintage-epoch-xix .word-token {
+  display: inline-block !important;
+  vertical-align: baseline;
+  transform-origin: center bottom;
 }
 
-/* Modèles pseudo-aléatoires de décalage vertical et d'inclinaison des plombs */
+/* Modèles de décalage et micro-rotations des plombs d'imprimerie (Antiquité & Classique) */
 .vintage-epoch-ancient .word-token:nth-child(4n+1),
 .vintage-epoch-classic .word-token:nth-child(4n+1) {
-  transform: translateY(-0.55px) rotate(-0.18deg);
+  transform: translateY(-0.95px) rotate(-0.35deg);
 }
 .vintage-epoch-ancient .word-token:nth-child(4n+3),
 .vintage-epoch-classic .word-token:nth-child(4n+3) {
-  transform: translateY(0.48px) rotate(0.14deg);
+  transform: translateY(0.85px) rotate(0.28deg);
 }
 .vintage-epoch-ancient .word-token:nth-child(6n+2),
 .vintage-epoch-classic .word-token:nth-child(6n+2) {
-  transform: translateY(-0.35px) rotate(-0.1deg);
+  transform: translateY(-0.65px) rotate(-0.2deg);
 }
 .vintage-epoch-ancient .word-token:nth-child(7n),
 .vintage-epoch-classic .word-token:nth-child(7n) {
-  transform: translateY(0.65px) rotate(0.22deg);
+  transform: translateY(1.15px) rotate(0.42deg);
 }
 .vintage-epoch-ancient .word-token:nth-child(11n+5),
 .vintage-epoch-classic .word-token:nth-child(11n+5) {
-  transform: translateY(-0.45px) rotate(-0.15deg);
+  transform: translateY(-0.85px) rotate(-0.3deg);
 }
 .vintage-epoch-ancient .word-token:nth-child(13n),
 .vintage-epoch-classic .word-token:nth-child(13n) {
-  transform: translateY(0.38px) rotate(0.09deg);
+  transform: translateY(0.75px) rotate(0.18deg);
 }
 
-/* Époque XIXe : fonte mécanique mais pressée au plomb (variations plus ténues) */
-.vintage-epoch-xix .word-token {
-  display: inline-block;
+/* Modèles pour le XIXe siècle (ex: Lausanne 1872, Darby 1885, Segond 1910) */
+/* Presse mécanique au plomb avec belle irrégularité typographique tangible */
+.vintage-epoch-xix .word-token:nth-child(4n+1) {
+  transform: translateY(-0.75px) rotate(-0.25deg);
 }
-.vintage-epoch-xix .word-token:nth-child(5n+1) {
-  transform: translateY(-0.25px);
+.vintage-epoch-xix .word-token:nth-child(4n+3) {
+  transform: translateY(0.65px) rotate(0.20deg);
 }
-.vintage-epoch-xix .word-token:nth-child(5n+3) {
-  transform: translateY(0.25px);
+.vintage-epoch-xix .word-token:nth-child(6n+2) {
+  transform: translateY(-0.45px) rotate(-0.15deg);
 }
-.vintage-epoch-xix .word-token:nth-child(8n) {
-  transform: translateY(-0.15px) rotate(-0.06deg);
+.vintage-epoch-xix .word-token:nth-child(7n) {
+  transform: translateY(0.85px) rotate(0.30deg);
+}
+.vintage-epoch-xix .word-token:nth-child(11n+4) {
+  transform: translateY(-0.60px) rotate(-0.20deg);
+}
+.vintage-epoch-xix .word-token:nth-child(13n) {
+  transform: translateY(0.55px) rotate(0.12deg);
 }
 
 /* --- B. VARIATIONS DE PRESSION D'ENCRAGE & OPACITÉ DE FRAPPE --- */
-/* Simule le rouleau d'encre inégal et la pression hétérogène de la presse à bras */
 .vintage-epoch-ancient .word-token:nth-child(5n),
-.vintage-epoch-classic .word-token:nth-child(5n) {
-  opacity: 0.92;
+.vintage-epoch-classic .word-token:nth-child(5n),
+.vintage-epoch-xix .word-token:nth-child(5n) {
+  opacity: 0.90;
 }
 .vintage-epoch-ancient .word-token:nth-child(7n+2),
-.vintage-epoch-classic .word-token:nth-child(7n+2) {
+.vintage-epoch-classic .word-token:nth-child(7n+2),
+.vintage-epoch-xix .word-token:nth-child(7n+2) {
   opacity: 0.98;
 }
 .vintage-epoch-ancient .word-token:nth-child(9n),
-.vintage-epoch-classic .word-token:nth-child(9n) {
-  opacity: 0.88;
+.vintage-epoch-classic .word-token:nth-child(9n),
+.vintage-epoch-xix .word-token:nth-child(9n) {
+  opacity: 0.85;
 }
 .vintage-epoch-ancient .word-token:nth-child(11n+3),
-.vintage-epoch-classic .word-token:nth-child(11n+3) {
-  opacity: 0.95;
+.vintage-epoch-classic .word-token:nth-child(11n+3),
+.vintage-epoch-xix .word-token:nth-child(11n+3) {
+  opacity: 0.94;
+}
+
+/* Accentuation de certains caractères de plomb plus gras/encrés */
+.vintage-epoch-ancient .word-token:nth-child(8n+3),
+.vintage-epoch-classic .word-token:nth-child(8n+3),
+.vintage-epoch-xix .word-token:nth-child(8n+3) {
+  font-weight: 600;
+  text-shadow: 0 0 0.8px rgba(29, 21, 12, 0.55);
 }
 
 /* --- C. DIFFUSION D'ENCRE & EMPÂTEMENT DANS LA FIBRE DU PAPIER (INK BLEED) --- */
