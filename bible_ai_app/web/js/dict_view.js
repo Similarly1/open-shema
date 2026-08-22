@@ -827,8 +827,8 @@ const DictView = {
         return `${bookFr} ${chNum}:${cleanV}`;
       });
 
-      // Classiques avec chiffres romains : Zach., XII, 11
-      processed = processed.replace(/(?:\*+)?\b((?:I{1,3}|IV|[1-4])\s*\*?[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+\*?|[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+\.?\*?)\s*,\s*([IVXLCDM]+)\s*,\s*([0-9]+(?:\s*[\-–]\s*[0-9]+)?)/gi, (match, rawB, romCh, verses) => {
+      // Classiques avec chiffres romains et abréviations complexes : I Par.*, VI, 41 ou Zach., XII, 11
+      processed = processed.replace(/(?:\*+)?\b((?:I{1,3}|IV|[1-4])\s*[\*A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç\.]+|[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç\.]+)(?:\*+)?\s*,\s*([IVXLCDM]+)\s*,\s*([0-9]+(?:\s*[\-–]\s*[0-9]+)?)/gi, (match, rawB, romCh, verses) => {
         const k = cleanBookKey(rawB);
         const bookFr = BOOK_ALIASES[k];
         if (bookFr) {
@@ -857,26 +857,18 @@ const DictView = {
         return `Paralipomènes (2 Chroniques ${chNum}:${v})`;
       });
 
-      // Tomes, parties et planches
+      // Tomes, parties, planches et ouvrages : t. I -> t. 1, pl. LXV -> pl. 65, Sat. I -> Sat. 1
       processed = processed.replace(/\bI(?:re|ère)\s+(partie|série)/gi, '1re $1');
       processed = processed.replace(/\bII(?:e|ème)\s+(partie|série)/gi, '2e $1');
       processed = processed.replace(/\bIII(?:e|ème)\s+(partie|série)/gi, '3e $1');
-      processed = processed.replace(/\b(tomes?|t\.)\s+([IVXLCDM]+)\b/gi, (match, prefix, rom) => {
+      processed = processed.replace(/(^|[^\w])(tomes?|t\.|pl\.|planche|sat\.|saturnales)\s+([IVXLCDM]+)\b/gi, (match, prefix, label, rom) => {
         const arab = ROMAN_MAP[rom.toUpperCase()] || rom;
-        const normP = prefix.toLowerCase().startsWith('tome') ? 'tome' : 't.';
-        return `${normP} ${arab}`;
-      });
-      processed = processed.replace(/\b(pl\.|planche)\s+([IVXLCDM]+)\b/gi, (match, prefix, rom) => {
-        const arab = ROMAN_MAP[rom.toUpperCase()] || rom;
-        return `${prefix} ${arab}`;
-      });
-      processed = processed.replace(/\b(Sat\.|Saturnales)\s+([IVXLCDM]+)\b/gi, (match, prefix, rom) => {
-        const arab = ROMAN_MAP[rom.toUpperCase()] || rom;
-        return `${prefix} ${arab}`;
+        const normL = label.toLowerCase().startsWith('tome') ? 'tome' : (label.toLowerCase().startsWith('t.') ? 't.' : label);
+        return `${prefix}${normL} ${arab}`;
       });
     }
 
-    // 2. Extraction des citations de sources en notes de bas de page
+    // 2. Extraction des citations de sources entre parenthèses
     if (this.optFootnotes) {
       processed = processed.replace(/\(([^\)\n]{12,350})\)/g, (match, inner) => {
         const lower = inner.toLowerCase();
@@ -891,24 +883,72 @@ const DictView = {
       });
     }
 
-    // 3. Transformation des renvois et Articles Connexes (*Voir* : **MOT**) en liens cliquables
+    // 3. Traitement structuré ligne par ligne (Sous-titres numérotés, Articles Connexes, Listes et Sources Cf.)
     const lines = processed.split(/\r?\n/);
-    const transformedLines = [];
+    const out = [];
     let inSeeList = false;
+    let inUlList = false;
 
     lines.forEach(line => {
-      const trimmed = line.trim();
-      // Matcher: * *Voir* : **MOT** (details) ou Voir* : MOT ou Voir : MOT
-      const seeMatch = trimmed.match(/^[*•-]?\s*(?:\*+|_+)?\s*Voir(?:\s+(?:aussi|également))?\s*(?:\*+|_+)?\s*:\s*(?:\*\*)?([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\s–-]+?)(?:\*\*)?(?:\s*\((.*?)\))?$/i);
+      const raw = line.trim();
+      if (!raw) {
+        if (inSeeList) { out.push('</ul>'); inSeeList = false; }
+        if (inUlList) { out.push('</ul>'); inUlList = false; }
+        return;
+      }
+
+      // A) Titres Markdown standards
+      if (raw.startsWith('#')) {
+        if (inSeeList) { out.push('</ul>'); inSeeList = false; }
+        if (inUlList) { out.push('</ul>'); inUlList = false; }
+        if (raw.startsWith('### ')) {
+          out.push(`<h3 style="margin: 18px 0 8px 0; font-size: 17px; font-weight: 700;">${this.escapeHtml(raw.slice(4))}</h3>`);
+          return;
+        }
+        if (raw.startsWith('## ')) {
+          out.push(`<h2 style="margin: 22px 0 10px 0; font-size: 19px; font-weight: 700;">${this.escapeHtml(raw.slice(3))}</h2>`);
+          return;
+        }
+        if (raw.startsWith('# ')) {
+          out.push(`<h1 style="margin: 24px 0 12px 0; font-size: 22px; font-weight: 800;">${this.escapeHtml(raw.slice(2))}</h1>`);
+          return;
+        }
+      }
+
+      // B) Sous-entrées numérotées : **1. AGRICOLA Conrad** ou 1. **AGRICOLA Conrad**
+      const subHdrMatch = raw.match(/^\*\*(\d+)\.\s+([^*]+?)\*\*\s*(.*)$/) || raw.match(/^(\d+)\.\s+\*\*([^*]+?)\*\*\s*(.*)$/);
+      if (subHdrMatch) {
+        if (inSeeList) { out.push('</ul>'); inSeeList = false; }
+        if (inUlList) { out.push('</ul>'); inUlList = false; }
+        const num = subHdrMatch[1];
+        const name = subHdrMatch[2].trim();
+        const rest = (subHdrMatch[3] || '').trim();
+
+        out.push(`
+          <div class="dict-subentry-heading" style="margin-top: 22px; margin-bottom: 8px; font-size: 16px; font-weight: 800; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">
+            <span class="dict-subentry-num" style="display: inline-flex; align-items: center; justify-content: center; background: #6366f1; color: #fff; border-radius: 4px; padding: 1px 7px; font-size: 11.5px; font-weight: 700; margin-right: 6px;">${num}</span>
+            <span>${this.escapeHtml(name)}</span>
+          </div>
+        `);
+        if (rest) {
+          const restFmt = rest.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>');
+          out.push(`<p style="margin: 8px 0; line-height: 1.75;">${restFmt}</p>`);
+        }
+        return;
+      }
+
+      // C) Renvois et Articles Connexes (*Voir* : **MOT**)
+      const seeMatch = raw.match(/^[*•-]?\s*(?:\*+|_+)?\s*Voir(?:\s+(?:aussi|également))?\s*(?:\*+|_+)?\s*:\s*(?:\*\*)?([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\s–-]+?)(?:\*\*)?(?:\s*\((.*?)\))?[\.\s]*$/i);
       if (seeMatch) {
+        if (inUlList) { out.push('</ul>'); inUlList = false; }
         if (!inSeeList) {
-          transformedLines.push('<ul class="dict-see-list" style="list-style: none; padding-left: 0; margin: 12px 0;">');
+          out.push('<ul class="dict-see-list" style="list-style: none; padding-left: 0; margin: 12px 0;">');
           inSeeList = true;
         }
         const targetWord = seeMatch[1].trim();
         const details = (seeMatch[2] || '').trim();
         const detailsHtml = details ? ` <span class="dict-see-details" style="color: var(--text-muted); font-size: 13px; font-style: italic;">(${details})</span>` : '';
-        transformedLines.push(`
+        out.push(`
           <li class="dict-see-item" style="margin-bottom: 8px;">
             <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(targetWord)}" style="color: #6366f1; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; background: rgba(99, 102, 241, 0.08); padding: 3px 10px; border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.2); transition: all 0.15s ease;">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
@@ -916,35 +956,71 @@ const DictView = {
             </a>${detailsHtml}
           </li>
         `);
+        return;
       } else {
         if (inSeeList) {
-          transformedLines.push('</ul>');
+          out.push('</ul>');
           inSeeList = false;
         }
-        transformedLines.push(line);
       }
+
+      // D) Lignes de Bibliographie / Sources *Cf.* Hurter...
+      const cfMatch = raw.match(/^(?:\*+)?(?:Cf\.|Confère|Conf\.|Bibliographie\s*:|Sources?\s*:)(?:\*+)?\s*(.+)$/i);
+      if (cfMatch) {
+        if (inUlList) { out.push('</ul>'); inUlList = false; }
+        const srcBody = cfMatch[1].trim();
+        if (this.optFootnotes) {
+          const fnId = this.currentFootnotesList.length + 1;
+          const cleanSrc = srcBody.replace(/[*_`]+/g, '').trim();
+          this.currentFootnotesList.push({ id: fnId, text: `Cf. ${cleanSrc}` });
+          out.push(`
+            <div class="dict-cf-source-row" style="margin: 8px 0 14px 0; font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; background: rgba(99, 102, 241, 0.04); padding: 6px 12px; border-radius: 6px; border-left: 3px solid #6366f1;">
+              <span class="theol-fn-badge" data-fn-id="${fnId}" id="dict-fnref-${fnId}">${fnId}</span>
+              <span style="font-style: italic;">Cf. ${srcBody.replace(/\*(.*?)\*/g, '<em>$1</em>')}</span>
+            </div>
+          `);
+        } else {
+          out.push(`
+            <div class="dict-cf-source-row" style="margin: 8px 0 14px 0; font-size: 13px; color: var(--text-secondary); background: rgba(99, 102, 241, 0.04); padding: 6px 12px; border-radius: 6px; border-left: 3px solid #6366f1;">
+              <span style="font-style: italic;">*Cf.* ${srcBody.replace(/\*(.*?)\*/g, '<em>$1</em>')}</span>
+            </div>
+          `);
+        }
+        return;
+      }
+
+      // E) Listes à puces Markdown (* Ouvrage...)
+      const bulletMatch = raw.match(/^[*•-]\s+(.+)$/);
+      if (bulletMatch) {
+        if (!inUlList) {
+          out.push('<ul style="padding-left: 22px; margin: 8px 0 12px 0; list-style-type: disc;">');
+          inUlList = true;
+        }
+        const itemText = bulletMatch[1].trim().replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>');
+        out.push(`<li style="margin-bottom: 5px; line-height: 1.6;">${itemText}</li>`);
+        return;
+      } else {
+        if (inUlList) {
+          out.push('</ul>');
+          inUlList = false;
+        }
+      }
+
+      // F) Paragraphe classique
+      const pFmt = raw
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/^\> (.*$)/gim, '<blockquote style="border-left: 3px solid var(--accent-blue); padding: 8px 14px; margin: 12px 0; background: var(--bg-subtle); border-radius: 0 6px 6px 0; font-style: italic;">$1</blockquote>');
+
+      out.push(`<p style="margin: 8px 0; line-height: 1.75;">${pFmt}</p>`);
     });
-    if (inSeeList) transformedLines.push('</ul>');
-    processed = transformedLines.join('\n');
 
-    // 4. Formatage Markdown
-    const formatted = processed
-      .replace(/^### (.*$)/gim, '<h3 style="margin: 18px 0 8px 0; font-size: 17px; font-weight: 700;">$1</h3>')
-      .replace(/^## (.*$)/gim, '<h2 style="margin: 22px 0 10px 0; font-size: 19px; font-weight: 700;">$1</h2>')
-      .replace(/^# (.*$)/gim, '<h1 style="margin: 24px 0 12px 0; font-size: 22px; font-weight: 800;">$1</h1>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/^\> (.*$)/gim, '<blockquote style="border-left: 3px solid var(--accent-blue); padding: 8px 14px; margin: 12px 0; background: var(--bg-subtle); border-radius: 0 6px 6px 0; font-style: italic;">$1</blockquote>')
-      .replace(/^\- (.*$)/gim, '<li style="margin-left: 20px; margin-bottom: 4px;">$1</li>')
-      .replace(/^(\s*)[*•]\s+(.*$)/gim, '<li style="margin-left: 20px; margin-bottom: 4px;">$2</li>');
+    if (inSeeList) out.push('</ul>');
+    if (inUlList) out.push('</ul>');
 
-    return formatted
-      .split(/\n\n+/)
-      .map(p => p.trim())
-      .filter(Boolean)
-      .map(p => (p.startsWith('<h') || p.startsWith('<blockquote') || p.startsWith('<li') || p.startsWith('<ul') || p.startsWith('</ul')) ? p : `<p style="margin: 8px 0; line-height: 1.75;">${p}</p>`)
-      .join('');
+    return out.join('\n');
   },
+
 
 
 
