@@ -1744,7 +1744,7 @@ textarea.text-field {
 
 .verse-item {
   display: inline;
-  margin-right: 0.35em;
+  margin-right: 0;
   border-radius: 4px;
   transition: background-color 0.12s ease;
 }
@@ -14207,8 +14207,9 @@ body.ai-disabled .ai-feature-only {
 /* HIGHLIGHTER REALISTIC TEXTURED MARKER STYLES (True PNG Paper Fiber)       */
 /* ========================================================================= */
 
-/* Base commune pour tous les versets surlignés */
-.verse-item[class*="hl-felt-"] {
+/* Base commune pour tous les versets et sélections partielles surlignés */
+.verse-item[class*="hl-felt-"],
+.verse-highlight[class*="hl-felt-"] {
   display: inline;
   background-size: 100% 100% !important;
   background-repeat: no-repeat !important;
@@ -14217,156 +14218,200 @@ body.ai-disabled .ai-feature-only {
   transition: background 0.15s ease, color 0.15s ease;
 }
 
-/* Verset isolé (Single) */
+/* Verset / Sélection isolé (Single) */
 .verse-item[class*="hl-felt-"]:not(.hl-range-start):not(.hl-range-mid):not(.hl-range-end),
-.verse-item.hl-range-single {
+.verse-item.hl-range-single,
+.verse-highlight[class*="hl-felt-"]:not(.hl-range-start):not(.hl-range-mid):not(.hl-range-end),
+.verse-highlight.hl-range-single {
   padding: 3px 6px 4px 5px !important;
   margin: 0 -2px !important;
   border-radius: 4px 8px 3px 7px / 7px 3px 8px 4px !important;
 }
 
-/* Début d'un passage multi-versets (Start) */
-.verse-item.hl-range-start {
+/* Début d'un passage multi-versets (Start) - raccordement continu parfait */
+.verse-item.hl-range-start,
+.verse-highlight.hl-range-start {
   padding: 3px 0px 4px 5px !important;
   margin: 0 0 0 -2px !important;
   border-radius: 4px 0 0 7px / 7px 0 0 4px !important;
 }
 
-/* Milieu d'un passage multi-versets (Mid) */
-.verse-item.hl-range-mid {
+/* Milieu d'un passage multi-versets (Mid) - raccordement continu parfait */
+.verse-item.hl-range-mid,
+.verse-highlight.hl-range-mid {
   padding: 3px 0px 4px 0px !important;
   margin: 0 !important;
   border-radius: 0 !important;
 }
 
-/* Fin d'un passage multi-versets (End) */
-.verse-item.hl-range-end {
+/* Fin d'un passage multi-versets (End) - raccordement continu parfait */
+.verse-item.hl-range-end,
+.verse-highlight.hl-range-end {
   padding: 3px 6px 4px 0px !important;
   margin: 0 -2px 0 0 !important;
   border-radius: 0 8px 3px 0 / 0 3px 8px 0 !important;
 }
 
 /* Annuler tout fond parasite sur les word-tokens individuels d'un verset surligné */
-.verse-item[class*="hl-"] .word-token {
+.verse-item[class*="hl-"] .word-token,
+.verse-highlight[class*="hl-"] .word-token {
   background: transparent !important;
   color: inherit !important;
   padding: 0 !important;
   margin: 0 !important;
 }
 
+/* Styling harmonieux du numéro de verset inclus dans le surlignage */
+.verse-item[class*="hl-"] .verse-num,
+.verse-highlight .verse-num {
+  color: inherit !important;
+  opacity: 0.72;
+  margin-left: 0 !important;
+  margin-right: 2px !important;
+  padding-left: 0 !important;
+}
+
 /* 1. THÈME CLAIR (Mode normal, blanc ou sépia) */
-.hl-felt-yellow {
+.hl-felt-yellow,
+.verse-highlight.hl-felt-yellow {
   background-image: url('../img/textures/light/marker_yellow_single.png') !important;
   color: #0f172a !important;
   mix-blend-mode: multiply;
 }
-.hl-felt-yellow.hl-range-start { background-image: url('../img/textures/light/marker_yellow_start.png') !important; }
-.hl-felt-yellow.hl-range-mid   { background-image: url('../img/textures/light/marker_yellow_mid.png') !important; }
-.hl-felt-yellow.hl-range-end   { background-image: url('../img/textures/light/marker_yellow_end.png') !important; }
-.hl-felt-green {
+.hl-felt-yellow.hl-range-start, .verse-highlight.hl-felt-yellow.hl-range-start { background-image: url('../img/textures/light/marker_yellow_start.png') !important; }
+.hl-felt-yellow.hl-range-mid,   .verse-highlight.hl-felt-yellow.hl-range-mid   { background-image: url('../img/textures/light/marker_yellow_mid.png') !important; }
+.hl-felt-yellow.hl-range-end,   .verse-highlight.hl-felt-yellow.hl-range-end   { background-image: url('../img/textures/light/marker_yellow_end.png') !important; }
+.hl-felt-green,
+.verse-highlight.hl-felt-green {
   background-image: url('../img/textures/light/marker_green_single.png') !important;
   color: #0f172a !important;
   mix-blend-mode: multiply;
 }
-.hl-felt-green.hl-range-start { background-image: url('../img/textures/light/marker_green_start.png') !important; }
-.hl-felt-green.hl-range-mid   { background-image: url('../img/textures/light/marker_green_mid.png') !important; }
-.hl-felt-green.hl-range-end   { background-image: url('../img/textures/light/marker_green_end.png') !important; }
-.hl-felt-blue {
+.hl-felt-green.hl-range-start, .verse-highlight.hl-felt-green.hl-range-start { background-image: url('../img/textures/light/marker_green_start.png') !important; }
+.hl-felt-green.hl-range-mid,   .verse-highlight.hl-felt-green.hl-range-mid   { background-image: url('../img/textures/light/marker_green_mid.png') !important; }
+.hl-felt-green.hl-range-end,   .verse-highlight.hl-felt-green.hl-range-end   { background-image: url('../img/textures/light/marker_green_end.png') !important; }
+.hl-felt-blue,
+.verse-highlight.hl-felt-blue {
   background-image: url('../img/textures/light/marker_blue_single.png') !important;
   color: #0f172a !important;
   mix-blend-mode: multiply;
 }
-.hl-felt-blue.hl-range-start { background-image: url('../img/textures/light/marker_blue_start.png') !important; }
-.hl-felt-blue.hl-range-mid   { background-image: url('../img/textures/light/marker_blue_mid.png') !important; }
-.hl-felt-blue.hl-range-end   { background-image: url('../img/textures/light/marker_blue_end.png') !important; }
-.hl-felt-amber {
+.hl-felt-blue.hl-range-start, .verse-highlight.hl-felt-blue.hl-range-start { background-image: url('../img/textures/light/marker_blue_start.png') !important; }
+.hl-felt-blue.hl-range-mid,   .verse-highlight.hl-felt-blue.hl-range-mid   { background-image: url('../img/textures/light/marker_blue_mid.png') !important; }
+.hl-felt-blue.hl-range-end,   .verse-highlight.hl-felt-blue.hl-range-end   { background-image: url('../img/textures/light/marker_blue_end.png') !important; }
+.hl-felt-amber,
+.verse-highlight.hl-felt-amber {
   background-image: url('../img/textures/light/marker_amber_single.png') !important;
   color: #0f172a !important;
   mix-blend-mode: multiply;
 }
-.hl-felt-amber.hl-range-start { background-image: url('../img/textures/light/marker_amber_start.png') !important; }
-.hl-felt-amber.hl-range-mid   { background-image: url('../img/textures/light/marker_amber_mid.png') !important; }
-.hl-felt-amber.hl-range-end   { background-image: url('../img/textures/light/marker_amber_end.png') !important; }
-.hl-felt-purple {
+.hl-felt-amber.hl-range-start, .verse-highlight.hl-felt-amber.hl-range-start { background-image: url('../img/textures/light/marker_amber_start.png') !important; }
+.hl-felt-amber.hl-range-mid,   .verse-highlight.hl-felt-amber.hl-range-mid   { background-image: url('../img/textures/light/marker_amber_mid.png') !important; }
+.hl-felt-amber.hl-range-end,   .verse-highlight.hl-felt-amber.hl-range-end   { background-image: url('../img/textures/light/marker_amber_end.png') !important; }
+.hl-felt-purple,
+.verse-highlight.hl-felt-purple {
   background-image: url('../img/textures/light/marker_purple_single.png') !important;
   color: #0f172a !important;
   mix-blend-mode: multiply;
 }
-.hl-felt-purple.hl-range-start { background-image: url('../img/textures/light/marker_purple_start.png') !important; }
-.hl-felt-purple.hl-range-mid   { background-image: url('../img/textures/light/marker_purple_mid.png') !important; }
-.hl-felt-purple.hl-range-end   { background-image: url('../img/textures/light/marker_purple_end.png') !important; }
-.hl-felt-rose {
+.hl-felt-purple.hl-range-start, .verse-highlight.hl-felt-purple.hl-range-start { background-image: url('../img/textures/light/marker_purple_start.png') !important; }
+.hl-felt-purple.hl-range-mid,   .verse-highlight.hl-felt-purple.hl-range-mid   { background-image: url('../img/textures/light/marker_purple_mid.png') !important; }
+.hl-felt-purple.hl-range-end,   .verse-highlight.hl-felt-purple.hl-range-end   { background-image: url('../img/textures/light/marker_purple_end.png') !important; }
+.hl-felt-rose,
+.verse-highlight.hl-felt-rose {
   background-image: url('../img/textures/light/marker_rose_single.png') !important;
   color: #0f172a !important;
   mix-blend-mode: multiply;
 }
-.hl-felt-rose.hl-range-start { background-image: url('../img/textures/light/marker_rose_start.png') !important; }
-.hl-felt-rose.hl-range-mid   { background-image: url('../img/textures/light/marker_rose_mid.png') !important; }
-.hl-felt-rose.hl-range-end   { background-image: url('../img/textures/light/marker_rose_end.png') !important; }
+.hl-felt-rose.hl-range-start, .verse-highlight.hl-felt-rose.hl-range-start { background-image: url('../img/textures/light/marker_rose_start.png') !important; }
+.hl-felt-rose.hl-range-mid,   .verse-highlight.hl-felt-rose.hl-range-mid   { background-image: url('../img/textures/light/marker_rose_mid.png') !important; }
+.hl-felt-rose.hl-range-end,   .verse-highlight.hl-felt-rose.hl-range-end   { background-image: url('../img/textures/light/marker_rose_end.png') !important; }
 
 /* 2. THÈME SOMBRE (body.theme-dark, body.reading-bg-dark) */
 body.theme-dark .hl-felt-yellow,
-body.reading-bg-dark .hl-felt-yellow {
+body.theme-dark .verse-highlight.hl-felt-yellow,
+body.reading-bg-dark .hl-felt-yellow,
+body.reading-bg-dark .verse-highlight.hl-felt-yellow {
   background-image: url('../img/textures/dark/marker_yellow_single.png') !important;
   color: #FEF9C3 !important;
   mix-blend-mode: normal !important;
 }
-body.theme-dark .hl-felt-yellow.hl-range-start, body.reading-bg-dark .hl-felt-yellow.hl-range-start { background-image: url('../img/textures/dark/marker_yellow_start.png') !important; }
-body.theme-dark .hl-felt-yellow.hl-range-mid,   body.reading-bg-dark .hl-felt-yellow.hl-range-mid   { background-image: url('../img/textures/dark/marker_yellow_mid.png') !important; }
-body.theme-dark .hl-felt-yellow.hl-range-end,   body.reading-bg-dark .hl-felt-yellow.hl-range-end   { background-image: url('../img/textures/dark/marker_yellow_end.png') !important; }
+body.theme-dark .hl-felt-yellow.hl-range-start, body.theme-dark .verse-highlight.hl-felt-yellow.hl-range-start, body.reading-bg-dark .hl-felt-yellow.hl-range-start, body.reading-bg-dark .verse-highlight.hl-felt-yellow.hl-range-start { background-image: url('../img/textures/dark/marker_yellow_start.png') !important; }
+body.theme-dark .hl-felt-yellow.hl-range-mid,   body.theme-dark .verse-highlight.hl-felt-yellow.hl-range-mid,   body.reading-bg-dark .hl-felt-yellow.hl-range-mid,   body.reading-bg-dark .verse-highlight.hl-felt-yellow.hl-range-mid   { background-image: url('../img/textures/dark/marker_yellow_mid.png') !important; }
+body.theme-dark .hl-felt-yellow.hl-range-end,   body.theme-dark .verse-highlight.hl-felt-yellow.hl-range-end,   body.reading-bg-dark .hl-felt-yellow.hl-range-end,   body.reading-bg-dark .verse-highlight.hl-felt-yellow.hl-range-end   { background-image: url('../img/textures/dark/marker_yellow_end.png') !important; }
 body.theme-dark .hl-felt-green,
-body.reading-bg-dark .hl-felt-green {
+body.theme-dark .verse-highlight.hl-felt-green,
+body.reading-bg-dark .hl-felt-green,
+body.reading-bg-dark .verse-highlight.hl-felt-green {
   background-image: url('../img/textures/dark/marker_green_single.png') !important;
   color: #DCFCE7 !important;
   mix-blend-mode: normal !important;
 }
-body.theme-dark .hl-felt-green.hl-range-start, body.reading-bg-dark .hl-felt-green.hl-range-start { background-image: url('../img/textures/dark/marker_green_start.png') !important; }
-body.theme-dark .hl-felt-green.hl-range-mid,   body.reading-bg-dark .hl-felt-green.hl-range-mid   { background-image: url('../img/textures/dark/marker_green_mid.png') !important; }
-body.theme-dark .hl-felt-green.hl-range-end,   body.reading-bg-dark .hl-felt-green.hl-range-end   { background-image: url('../img/textures/dark/marker_green_end.png') !important; }
+body.theme-dark .hl-felt-green.hl-range-start, body.theme-dark .verse-highlight.hl-felt-green.hl-range-start, body.reading-bg-dark .hl-felt-green.hl-range-start, body.reading-bg-dark .verse-highlight.hl-felt-green.hl-range-start { background-image: url('../img/textures/dark/marker_green_start.png') !important; }
+body.theme-dark .hl-felt-green.hl-range-mid,   body.theme-dark .verse-highlight.hl-felt-green.hl-range-mid,   body.reading-bg-dark .hl-felt-green.hl-range-mid,   body.reading-bg-dark .verse-highlight.hl-felt-green.hl-range-mid   { background-image: url('../img/textures/dark/marker_green_mid.png') !important; }
+body.theme-dark .hl-felt-green.hl-range-end,   body.theme-dark .verse-highlight.hl-felt-green.hl-range-end,   body.reading-bg-dark .hl-felt-green.hl-range-end,   body.reading-bg-dark .verse-highlight.hl-felt-green.hl-range-end   { background-image: url('../img/textures/dark/marker_green_end.png') !important; }
 body.theme-dark .hl-felt-blue,
-body.reading-bg-dark .hl-felt-blue {
+body.theme-dark .verse-highlight.hl-felt-blue,
+body.reading-bg-dark .hl-felt-blue,
+body.reading-bg-dark .verse-highlight.hl-felt-blue {
   background-image: url('../img/textures/dark/marker_blue_single.png') !important;
   color: #E0F2FE !important;
   mix-blend-mode: normal !important;
 }
-body.theme-dark .hl-felt-blue.hl-range-start, body.reading-bg-dark .hl-felt-blue.hl-range-start { background-image: url('../img/textures/dark/marker_blue_start.png') !important; }
-body.theme-dark .hl-felt-blue.hl-range-mid,   body.reading-bg-dark .hl-felt-blue.hl-range-mid   { background-image: url('../img/textures/dark/marker_blue_mid.png') !important; }
-body.theme-dark .hl-felt-blue.hl-range-end,   body.reading-bg-dark .hl-felt-blue.hl-range-end   { background-image: url('../img/textures/dark/marker_blue_end.png') !important; }
+body.theme-dark .hl-felt-blue.hl-range-start, body.theme-dark .verse-highlight.hl-felt-blue.hl-range-start, body.reading-bg-dark .hl-felt-blue.hl-range-start, body.reading-bg-dark .verse-highlight.hl-felt-blue.hl-range-start { background-image: url('../img/textures/dark/marker_blue_start.png') !important; }
+body.theme-dark .hl-felt-blue.hl-range-mid,   body.theme-dark .verse-highlight.hl-felt-blue.hl-range-mid,   body.reading-bg-dark .hl-felt-blue.hl-range-mid,   body.reading-bg-dark .verse-highlight.hl-felt-blue.hl-range-mid   { background-image: url('../img/textures/dark/marker_blue_mid.png') !important; }
+body.theme-dark .hl-felt-blue.hl-range-end,   body.theme-dark .verse-highlight.hl-felt-blue.hl-range-end,   body.reading-bg-dark .hl-felt-blue.hl-range-end,   body.reading-bg-dark .verse-highlight.hl-felt-blue.hl-range-end   { background-image: url('../img/textures/dark/marker_blue_end.png') !important; }
 body.theme-dark .hl-felt-amber,
-body.reading-bg-dark .hl-felt-amber {
+body.theme-dark .verse-highlight.hl-felt-amber,
+body.reading-bg-dark .hl-felt-amber,
+body.reading-bg-dark .verse-highlight.hl-felt-amber {
   background-image: url('../img/textures/dark/marker_amber_single.png') !important;
   color: #FFEDD5 !important;
   mix-blend-mode: normal !important;
 }
-body.theme-dark .hl-felt-amber.hl-range-start, body.reading-bg-dark .hl-felt-amber.hl-range-start { background-image: url('../img/textures/dark/marker_amber_start.png') !important; }
-body.theme-dark .hl-felt-amber.hl-range-mid,   body.reading-bg-dark .hl-felt-amber.hl-range-mid   { background-image: url('../img/textures/dark/marker_amber_mid.png') !important; }
-body.theme-dark .hl-felt-amber.hl-range-end,   body.reading-bg-dark .hl-felt-amber.hl-range-end   { background-image: url('../img/textures/dark/marker_amber_end.png') !important; }
+body.theme-dark .hl-felt-amber.hl-range-start, body.theme-dark .verse-highlight.hl-felt-amber.hl-range-start, body.reading-bg-dark .hl-felt-amber.hl-range-start, body.reading-bg-dark .verse-highlight.hl-felt-amber.hl-range-start { background-image: url('../img/textures/dark/marker_amber_start.png') !important; }
+body.theme-dark .hl-felt-amber.hl-range-mid,   body.theme-dark .verse-highlight.hl-felt-amber.hl-range-mid,   body.reading-bg-dark .hl-felt-amber.hl-range-mid,   body.reading-bg-dark .verse-highlight.hl-felt-amber.hl-range-mid   { background-image: url('../img/textures/dark/marker_amber_mid.png') !important; }
+body.theme-dark .hl-felt-amber.hl-range-end,   body.theme-dark .verse-highlight.hl-felt-amber.hl-range-end,   body.reading-bg-dark .hl-felt-amber.hl-range-end,   body.reading-bg-dark .verse-highlight.hl-felt-amber.hl-range-end   { background-image: url('../img/textures/dark/marker_amber_end.png') !important; }
 body.theme-dark .hl-felt-purple,
-body.reading-bg-dark .hl-felt-purple {
+body.theme-dark .verse-highlight.hl-felt-purple,
+body.reading-bg-dark .hl-felt-purple,
+body.reading-bg-dark .verse-highlight.hl-felt-purple {
   background-image: url('../img/textures/dark/marker_purple_single.png') !important;
   color: #F3E8FF !important;
   mix-blend-mode: normal !important;
 }
-body.theme-dark .hl-felt-purple.hl-range-start, body.reading-bg-dark .hl-felt-purple.hl-range-start { background-image: url('../img/textures/dark/marker_purple_start.png') !important; }
-body.theme-dark .hl-felt-purple.hl-range-mid,   body.reading-bg-dark .hl-felt-purple.hl-range-mid   { background-image: url('../img/textures/dark/marker_purple_mid.png') !important; }
-body.theme-dark .hl-felt-purple.hl-range-end,   body.reading-bg-dark .hl-felt-purple.hl-range-end   { background-image: url('../img/textures/dark/marker_purple_end.png') !important; }
+body.theme-dark .hl-felt-purple.hl-range-start, body.theme-dark .verse-highlight.hl-felt-purple.hl-range-start, body.reading-bg-dark .hl-felt-purple.hl-range-start, body.reading-bg-dark .verse-highlight.hl-felt-purple.hl-range-start { background-image: url('../img/textures/dark/marker_purple_start.png') !important; }
+body.theme-dark .hl-felt-purple.hl-range-mid,   body.theme-dark .verse-highlight.hl-felt-purple.hl-range-mid,   body.reading-bg-dark .hl-felt-purple.hl-range-mid,   body.reading-bg-dark .verse-highlight.hl-felt-purple.hl-range-mid   { background-image: url('../img/textures/dark/marker_purple_mid.png') !important; }
+body.theme-dark .hl-felt-purple.hl-range-end,   body.theme-dark .verse-highlight.hl-felt-purple.hl-range-end,   body.reading-bg-dark .hl-felt-purple.hl-range-end,   body.reading-bg-dark .verse-highlight.hl-felt-purple.hl-range-end   { background-image: url('../img/textures/dark/marker_purple_end.png') !important; }
 body.theme-dark .hl-felt-rose,
-body.reading-bg-dark .hl-felt-rose {
+body.theme-dark .verse-highlight.hl-felt-rose,
+body.reading-bg-dark .hl-felt-rose,
+body.reading-bg-dark .verse-highlight.hl-felt-rose {
   background-image: url('../img/textures/dark/marker_rose_single.png') !important;
   color: #FFE4E6 !important;
   mix-blend-mode: normal !important;
 }
-body.theme-dark .hl-felt-rose.hl-range-start, body.reading-bg-dark .hl-felt-rose.hl-range-start { background-image: url('../img/textures/dark/marker_rose_start.png') !important; }
-body.theme-dark .hl-felt-rose.hl-range-mid,   body.reading-bg-dark .hl-felt-rose.hl-range-mid   { background-image: url('../img/textures/dark/marker_rose_mid.png') !important; }
-body.theme-dark .hl-felt-rose.hl-range-end,   body.reading-bg-dark .hl-felt-rose.hl-range-end   { background-image: url('../img/textures/dark/marker_rose_end.png') !important; }
+body.theme-dark .hl-felt-rose.hl-range-start, body.theme-dark .verse-highlight.hl-felt-rose.hl-range-start, body.reading-bg-dark .hl-felt-rose.hl-range-start, body.reading-bg-dark .verse-highlight.hl-felt-rose.hl-range-start { background-image: url('../img/textures/dark/marker_rose_start.png') !important; }
+body.theme-dark .hl-felt-rose.hl-range-mid,   body.theme-dark .verse-highlight.hl-felt-rose.hl-range-mid,   body.reading-bg-dark .hl-felt-rose.hl-range-mid,   body.reading-bg-dark .verse-highlight.hl-felt-rose.hl-range-mid   { background-image: url('../img/textures/dark/marker_rose_mid.png') !important; }
+body.theme-dark .hl-felt-rose.hl-range-end,   body.theme-dark .verse-highlight.hl-felt-rose.hl-range-end,   body.reading-bg-dark .hl-felt-rose.hl-range-end,   body.reading-bg-dark .verse-highlight.hl-felt-rose.hl-range-end   { background-image: url('../img/textures/dark/marker_rose_end.png') !important; }
 
-/* 3. STYLE SOULIGNÉ FEUTRE */
-.verse-item.hl-underline-yellow { border-bottom: 3.5px solid #EAB308 !important; padding-bottom: 1px; }
-.verse-item.hl-underline-green { border-bottom: 3.5px solid #22C55E !important; padding-bottom: 1px; }
-.verse-item.hl-underline-blue { border-bottom: 3.5px solid #0EA5E9 !important; padding-bottom: 1px; }
-.verse-item.hl-underline-amber { border-bottom: 3.5px solid #F97316 !important; padding-bottom: 1px; }
-.verse-item.hl-underline-purple { border-bottom: 3.5px solid #A855F7 !important; padding-bottom: 1px; }
-.verse-item.hl-underline-rose { border-bottom: 3.5px solid #F43F5E !important; padding-bottom: 1px; }
+/* 3. STYLE SOULIGNÉ ÉPAIS FEUTRE BISEAUTÉ (Extraits et versets) */
+.verse-item[class*="hl-underline-"],
+.verse-highlight[class*="hl-underline-"] {
+  display: inline;
+  -webkit-box-decoration-break: clone !important;
+  box-decoration-break: clone !important;
+  background: transparent !important;
+  background-image: none !important;
+  padding-bottom: 2px !important;
+  text-decoration: none !important;
+}
+.verse-item.hl-underline-yellow, .verse-highlight.hl-underline-yellow { border-bottom: 3.5px solid #EAB308 !important; }
+.verse-item.hl-underline-green,  .verse-highlight.hl-underline-green  { border-bottom: 3.5px solid #22C55E !important; }
+.verse-item.hl-underline-blue,   .verse-highlight.hl-underline-blue   { border-bottom: 3.5px solid #0EA5E9 !important; }
+.verse-item.hl-underline-amber,  .verse-highlight.hl-underline-amber  { border-bottom: 3.5px solid #F97316 !important; }
+.verse-item.hl-underline-purple, .verse-highlight.hl-underline-purple { border-bottom: 3.5px solid #A855F7 !important; }
+.verse-item.hl-underline-rose,   .verse-highlight.hl-underline-rose   { border-bottom: 3.5px solid #F43F5E !important; }
 
 /* 4. NOTE LIÉE AU SURLIGNAGE (Indicateur discret) */
 .hl-has-note {
@@ -14453,11 +14498,17 @@ body.reading-bg-dark .hl-has-note {
   color: var(--accent-red, #ef4444);
 }
 
-/* 7. MODE STYLO ACTIF */
+/* 7. MODE STYLO SURLIGNEUR ACTIF (Curseur Stabilo personnalisé) */
+.hl-pen-mode-active,
 .hl-pen-mode-active .reader-container,
+.hl-pen-mode-active #view-reader,
+.hl-pen-mode-active .reader-workspace,
+.hl-pen-mode-active .reader-pane,
+.hl-pen-mode-active .reader-flow,
 .hl-pen-mode-active .verse-item,
+.hl-pen-mode-active .verse-highlight,
 .hl-pen-mode-active .word-token {
-  cursor: crosshair !important;
+  cursor: var(--hl-pen-cursor, crosshair) !important;
 }
 
 /* 8. PASTILLES DANS LE POPOVER SUPÉRIEUR */
@@ -14536,17 +14587,29 @@ body.reading-bg-dark .hl-has-note {
 /* ========================================================================= */
 body.hide-highlights .verse-item,
 body.hide-highlights .verse-item[class*="hl-"],
+body.hide-highlights .verse-highlight,
+body.hide-highlights .verse-highlight[class*="hl-"],
 body.theme-dark.hide-highlights .verse-item,
 body.theme-dark.hide-highlights .verse-item[class*="hl-"],
+body.theme-dark.hide-highlights .verse-highlight,
+body.theme-dark.hide-highlights .verse-highlight[class*="hl-"],
 body.reading-bg-dark.hide-highlights .verse-item,
 body.reading-bg-dark.hide-highlights .verse-item[class*="hl-"],
+body.reading-bg-dark.hide-highlights .verse-highlight,
+body.reading-bg-dark.hide-highlights .verse-highlight[class*="hl-"],
 body.reading-bg-white.hide-highlights .verse-item,
+body.reading-bg-white.hide-highlights .verse-highlight,
 body.reading-bg-sepia.hide-highlights .verse-item,
+body.reading-bg-sepia.hide-highlights .verse-highlight,
 .hide-highlights .verse-item,
 .hide-highlights .verse-item[class*="hl-"],
+.hide-highlights .verse-highlight,
+.hide-highlights .verse-highlight[class*="hl-"],
 .hide-highlights .word-token,
 #reader-workspace.hide-highlights .verse-item,
-#reader-workspace.hide-highlights .verse-item[class*="hl-"] {
+#reader-workspace.hide-highlights .verse-item[class*="hl-"],
+#reader-workspace.hide-highlights .verse-highlight,
+#reader-workspace.hide-highlights .verse-highlight[class*="hl-"] {
   background: none !important;
   background-image: none !important;
   background-color: transparent !important;
@@ -14555,6 +14618,6 @@ body.reading-bg-sepia.hide-highlights .verse-item,
   color: inherit !important;
   border-bottom: none !important;
   border-radius: 3px !important;
-  padding: 2px 0 !important;
+  padding: 0 !important;
   margin: 0 !important;
 }

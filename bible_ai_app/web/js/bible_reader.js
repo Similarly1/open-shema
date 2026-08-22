@@ -3081,6 +3081,10 @@ const BibleReader = {
     this.pane1InterlinearVersion = val;
   },
 
+  get currentVersion() {
+    return this.currentBible1 || this.pane1InterlinearVersion || 'LSG';
+  },
+
   interlinearLayers: { surface: true, orig: true, translit: true, strong: true },
   zoomPercent: 100,
   bracketsMode: 'classic',
@@ -4160,6 +4164,8 @@ const BibleReader = {
               ContextMenuManager.showForWord(b.dataset.surface || b.dataset.word, b.dataset.strong, v.verse, data.book, data.chapter, e.clientX, e.clientY);
             });
             b.addEventListener('contextmenu', (e) => {
+              const sel = window.getSelection();
+              if (sel && sel.toString().trim().length > 0) return;
               e.preventDefault();
               e.stopPropagation();
               ContextMenuManager.showForWord(b.dataset.surface || b.dataset.word, b.dataset.strong, v.verse, data.book, data.chapter, e.clientX, e.clientY);
@@ -4254,6 +4260,8 @@ const BibleReader = {
             });
 
             wEl.addEventListener('contextmenu', (e) => {
+              const sel = window.getSelection();
+              if (sel && sel.toString().trim().length > 0) return;
               e.preventDefault();
               e.stopPropagation();
               ContextMenuManager.showForWord(w, null, v.verse, data.book, data.chapter, e.clientX, e.clientY);
@@ -4275,6 +4283,8 @@ const BibleReader = {
 
         // Clic droit sur le verset -> menu contextuel verset
         vSpan.addEventListener('contextmenu', (e) => {
+          const sel = window.getSelection();
+          if (sel && sel.toString().trim().length > 0) return;
           if (!e.target.classList.contains('word-token')) {
             e.preventDefault();
             ContextMenuManager.showForVerse(v.verse, v.text, data.book, data.chapter, e.clientX, e.clientY);
@@ -4326,7 +4336,7 @@ const BibleReader = {
 
     // Rendre les surlignages asynchronement pour ce bloc
     if (typeof HighlighterManager !== 'undefined') {
-      setTimeout(() => HighlighterManager.renderChapterHighlights(data.book || this.currentBook, data.chapter || this.currentChapter), 50);
+      setTimeout(() => HighlighterManager.renderChapterHighlights(data.book || this.currentBook, data.chapter || this.currentChapter, data.bible_name || this.currentVersion), 50);
     }
 
     return block;

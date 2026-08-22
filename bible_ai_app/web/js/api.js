@@ -313,8 +313,9 @@ const API = {
     });
   },
 
-  async getHighlightsForChapter(book, chapter) {
-    return this.call('get_highlights_for_chapter', book, parseInt(chapter));
+  async getHighlightsForChapter(book, chapter, version = null) {
+    const ver = version || (typeof BibleReader !== 'undefined' ? BibleReader.currentVersion : '');
+    return this.call('get_highlights_for_chapter', book, parseInt(chapter), ver || '');
   },
 
   async getAllHighlights() {
@@ -329,12 +330,21 @@ const API = {
     return this.call('delete_highlight', id);
   },
 
-  async deleteHighlightsForPassage(book, chapter, verseStart, verseEnd) {
-    return this.call('delete_highlights_for_passage', book, parseInt(chapter), parseInt(verseStart), parseInt(verseEnd));
+  async deleteHighlightsForPassage(book, chapter, verseStart, verseEnd, version = null) {
+    const ver = version || (typeof BibleReader !== 'undefined' ? BibleReader.currentVersion : '');
+    return this.call('delete_highlights_for_passage', book, parseInt(chapter), parseInt(verseStart), parseInt(verseEnd), ver || '');
   },
 
   async createNoteFromHighlight(hlId, text, ref) {
     return this.call('create_note_from_highlight', hlId, text, ref);
+  },
+
+  async exportHighlights(format = 'json') {
+    return this.call('export_highlights', format);
+  },
+
+  async importHighlights(mode = 'merge') {
+    return this.call('import_highlights', mode);
   },
 
   async getDictionaries() {

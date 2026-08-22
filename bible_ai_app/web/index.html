@@ -439,8 +439,26 @@
                   </div>
                 </div>
 
-                <!-- 4. Actions rapides -->
-                <div style="border-top: 1px solid var(--border-color); margin: 10px 0 0 0; padding-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+                <!-- 4. Export & Import -->
+                <div style="border-top: 1px solid var(--border-color); margin: 10px 0 0 0; padding-top: 8px;">
+                  <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">
+                    Sauvegarde & Partage
+                  </div>
+                  <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                    <button type="button" id="btn-top-export-json" class="btn-secondary" style="font-size: 11px; padding: 4px 8px; flex: 1;" title="Sauvegarde complète au format JSON">
+                      Export JSON
+                    </button>
+                    <button type="button" id="btn-top-export-md" class="btn-secondary" style="font-size: 11px; padding: 4px 8px; flex: 1;" title="Export format texte Markdown lisible">
+                      Export MD
+                    </button>
+                    <button type="button" id="btn-top-import-json" class="btn-secondary" style="font-size: 11px; padding: 4px 8px; flex: 1;" title="Restaurer ou importer des surlignages JSON">
+                      Importer
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 5. Actions rapides -->
+                <div style="border-top: 1px solid var(--border-color); margin: 8px 0 0 0; padding-top: 8px; display: flex; justify-content: space-between; align-items: center;">
                   <button type="button" id="btn-top-erase-selected" class="btn-link" style="font-size: 11px; color: var(--accent-red); cursor: pointer; background: none; border: none; padding: 0;">Effacer le surlignage</button>
                   <button type="button" id="btn-top-view-all-hl" class="btn-link" style="font-size: 11px; color: var(--accent-blue); cursor: pointer; background: none; border: none; padding: 0;">Ouvrir les notes ↗</button>
                 </div>

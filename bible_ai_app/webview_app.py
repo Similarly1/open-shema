@@ -1054,9 +1054,9 @@ class BibleAppApi:
 
     # --- HIGHLIGHTS ---
 
-    def get_highlights_for_chapter(self, book: str, chapter: int) -> List[Dict[str, Any]]:
+    def get_highlights_for_chapter(self, book: str, chapter: int, version: str = "") -> List[Dict[str, Any]]:
         self.config = load_config()
-        return HighlightsManager.get_highlights_for_chapter(book, chapter, config=self.config)
+        return HighlightsManager.get_highlights_for_chapter(book, chapter, version=version, config=self.config)
 
     def get_all_highlights(self) -> List[Dict[str, Any]]:
         self.config = load_config()
@@ -1075,9 +1075,9 @@ class BibleAppApi:
         self.config = load_config()
         return HighlightsManager.delete_highlight(hl_id, config=self.config)
 
-    def delete_highlights_for_passage(self, book: str, chapter: int, verse_start: int, verse_end: int) -> int:
+    def delete_highlights_for_passage(self, book: str, chapter: int, verse_start: int, verse_end: int, version: str = "") -> int:
         self.config = load_config()
-        return HighlightsManager.delete_highlights_for_passage(book, int(chapter), int(verse_start), int(verse_end), config=self.config)
+        return HighlightsManager.delete_highlights_for_passage(book, int(chapter), int(verse_start), int(verse_end), version=version, config=self.config)
 
     def create_note_from_highlight(self, hl_id: str, hl_text: str, hl_ref: str) -> Dict[str, Any]:
         """Crée une note préremplie liée à un surlignage."""
@@ -1093,6 +1093,67 @@ class BibleAppApi:
         if note_res and "id" in note_res:
             HighlightsManager.link_note(hl_id, note_res["id"], config=self.config)
         return note_res
+
+    def export_highlights(self, format: str = "json") -> Dict[str, Any]:
+        """Exporte tous les surlignages vers un fichier JSON ou Markdown choisi par l'utilisateur."""
+        win = get_active_window()
+        if not win:
+            return {"success": False, "error": "Fenêtre introuvable"}
+
+        now_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        self.config = load_config()
+
+        if format.lower() in ["md", "markdown"]:
+            default_name = f"surlignages_bibliques_{now_str}.md"
+            file_types = ('Fichiers Markdown (*.md)', 'Tous les fichiers (*.*)')
+            content = HighlightsManager.export_to_markdown(self.config)
+        else:
+            default_name = f"surlignages_bibliques_{now_str}.json"
+            file_types = ('Fichiers JSON (*.json)', 'Tous les fichiers (*.*)')
+            content = HighlightsManager.export_to_json(self.config)
+
+        save_path = win.create_file_dialog(
+            webview.SAVE_FILENAME_DIALOG,
+            save_filename=default_name,
+            file_types=file_types
+        )
+        if not save_path:
+            return {"cancelled": True}
+
+        if isinstance(save_path, (list, tuple)):
+            save_path = save_path[0]
+
+        try:
+            with open(save_path, "w", encoding="utf-8") as f:
+                f.write(content)
+            return {"success": True, "path": save_path, "format": format}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    def import_highlights(self, mode: str = "merge") -> Dict[str, Any]:
+        """Importe des surlignages depuis un fichier JSON choisi par l'utilisateur."""
+        win = get_active_window()
+        if not win:
+            return {"success": False, "error": "Fenêtre introuvable"}
+
+        pick = win.create_file_dialog(
+            webview.OPEN_DIALOG,
+            allow_multiple=False,
+            file_types=('Fichiers JSON (*.json)', 'Tous les fichiers (*.*)')
+        )
+        if not pick or len(pick) == 0:
+            return {"cancelled": True}
+
+        file_path = pick[0]
+        self.config = load_config()
+
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            res = HighlightsManager.import_from_json(content, mode=mode, config=self.config)
+            return res
+        except Exception as e:
+            return {"success": False, "error": str(e)}
 
     def pick_notes_folder(self) -> Dict[str, Any]:
         """Ouvre un dialogue natif Windows pour choisir le dossier des notes Markdown."""

@@ -75,6 +75,7 @@ const HighlighterManager = {
         const color = sw.dataset.color;
         if (color) {
           this.activeColor = color;
+          this.updatePenCursor();
           this.updateTopPopoverUi();
           App.showToast(`Couleur active : ${this.getColorName(color)}`);
         }
@@ -86,6 +87,60 @@ const HighlighterManager = {
       radio.addEventListener('change', (e) => {
         this.activeStyle = e.target.value;
       });
+    });
+
+    // Exporter en JSON
+    document.getElementById('btn-top-export-json')?.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      popover.classList.add('hidden');
+      btn.classList.remove('active');
+      try {
+        const res = await API.exportHighlights('json');
+        if (res && res.success) {
+          App.showToast(`Surlignages exportés avec succès (JSON)`);
+        } else if (res && !res.cancelled) {
+          App.showToast(`Erreur export : ${res.error || 'inconnue'}`);
+        }
+      } catch (err) {
+        console.error('Erreur export JSON', err);
+      }
+    });
+
+    // Exporter en Markdown (.md)
+    document.getElementById('btn-top-export-md')?.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      popover.classList.add('hidden');
+      btn.classList.remove('active');
+      try {
+        const res = await API.exportHighlights('md');
+        if (res && res.success) {
+          App.showToast(`Surlignages exportés avec succès (Markdown)`);
+        } else if (res && !res.cancelled) {
+          App.showToast(`Erreur export : ${res.error || 'inconnue'}`);
+        }
+      } catch (err) {
+        console.error('Erreur export MD', err);
+      }
+    });
+
+    // Importer en JSON
+    document.getElementById('btn-top-import-json')?.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      popover.classList.add('hidden');
+      btn.classList.remove('active');
+      try {
+        const res = await API.importHighlights('merge');
+        if (res && res.success) {
+          App.showToast(`✓ ${res.imported_count} surlignage(s) importé(s) avec succès (${res.total_count} au total)`);
+          if (typeof BibleReader !== 'undefined') {
+            this.renderChapterHighlights(BibleReader.currentBook, BibleReader.currentChapter);
+          }
+        } else if (res && !res.cancelled) {
+          App.showToast(`Erreur import : ${res.error || 'inconnue'}`);
+        }
+      } catch (err) {
+        console.error('Erreur import JSON', err);
+      }
     });
 
     // Effacer le surlignage actif depuis le popover
@@ -114,12 +169,37 @@ const HighlighterManager = {
       document.querySelector('.drawer-tab[data-drawer-tab="notes"]')?.click();
     });
 
+    this.updatePenCursor();
     this.updateTopPopoverUi();
   },
 
   getColorName(colorId) {
     const found = this.colors.find(c => c.id === colorId);
     return found ? found.name : colorId;
+  },
+
+  getPenCursor(colorId) {
+    const hexMap = {
+      yellow: '#EAB308',
+      green:  '#22C55E',
+      blue:   '#0EA5E9',
+      amber:  '#F97316',
+      purple: '#A855F7',
+      rose:   '#F43F5E'
+    };
+    const color = hexMap[colorId] || '#EAB308';
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+      <g transform="rotate(-35 8 26)">
+        <rect x="5" y="4" width="10" height="16" rx="2" fill="#1e293b" stroke="#ffffff" stroke-width="1.2"/>
+        <rect x="7" y="6" width="6" height="8" rx="1" fill="#475569"/>
+        <path d="M5 20 L15 20 L13 28 L5 24 Z" fill="${color}" stroke="#ffffff" stroke-width="1.2"/>
+      </g>
+    </svg>`;
+    return `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}") 4 28, crosshair`;
+  },
+
+  updatePenCursor() {
+    document.documentElement.style.setProperty('--hl-pen-cursor', this.getPenCursor(this.activeColor));
   },
 
   updateTopPopoverUi() {
@@ -208,13 +288,17 @@ const HighlighterManager = {
       const selection = window.getSelection();
       const text = selection ? selection.toString().trim() : '';
 
-      if (text && text.length > 0 && e.target.closest('.reader-container, #view-reader')) {
+      if (text && text.length > 0) {
         this.captureSelectionRef(selection);
         if (this.currentSelectionRef) {
           if (this.isPenModeActive) {
-            // Surlignage direct en mode stylo actif
-            this.applyHighlight(this.activeColor, this.activeStyle);
-            selection.removeAllRanges();
+            // Surlignage direct automatique en mode stylo actif !
+            const color = this.activeColor;
+            const style = this.activeStyle;
+            this.applyHighlight(color, style);
+            setTimeout(() => {
+              window.getSelection()?.removeAllRanges();
+            }, 50);
           } else {
             this.showPalette(e.clientX, e.clientY);
           }
@@ -248,30 +332,80 @@ const HighlighterManager = {
       return;
     }
 
+    const text = selection.toString().trim();
+    if (!text) {
+      this.currentSelectionRef = null;
+      return;
+    }
+
     const range = selection.getRangeAt(0);
     const startNode = range.startContainer.nodeType === 3 ? range.startContainer.parentElement : range.startContainer;
     const endNode = range.endContainer.nodeType === 3 ? range.endContainer.parentElement : range.endContainer;
 
-    const startVerseItem = startNode.closest('.verse-item, .word-token');
-    const endVerseItem = endNode.closest('.verse-item, .word-token');
+    const startVerseItem = startNode.closest('.verse-item');
+    const endVerseItem = endNode.closest('.verse-item');
 
     if (startVerseItem && typeof BibleReader !== 'undefined') {
       const book = startVerseItem.dataset.bookCode || BibleReader.currentBook;
       const chapter = parseInt(startVerseItem.dataset.chapter || BibleReader.currentChapter, 10);
       let vStart = parseInt(startVerseItem.dataset.verseNum || startVerseItem.dataset.verse || 1, 10);
-      let vEnd = vStart;
+      let vEnd = endVerseItem ? parseInt(endVerseItem.dataset.verseNum || endVerseItem.dataset.verse || vStart, 10) : vStart;
 
-      if (endVerseItem) {
-        vEnd = parseInt(endVerseItem.dataset.verseNum || endVerseItem.dataset.verse || vStart, 10);
-      }
       if (vStart > vEnd) [vStart, vEnd] = [vEnd, vStart];
+
+      // Récupérer les indices précis de mots de début et de fin
+      let startWordIdx = 0;
+      const vStartWords = Array.from(startVerseItem.querySelectorAll('.word-token'));
+      const startWord = startNode.closest('.word-token');
+      if (startWord) {
+        const idx = vStartWords.indexOf(startWord);
+        if (idx !== -1) startWordIdx = idx;
+      } else {
+        for (let i = 0; i < vStartWords.length; i++) {
+          if (range.intersectsNode(vStartWords[i])) {
+            startWordIdx = i;
+            break;
+          }
+        }
+      }
+
+      let endWordIdx = -1;
+      const targetEndVerse = endVerseItem || startVerseItem;
+      const vEndWords = Array.from(targetEndVerse.querySelectorAll('.word-token'));
+      const endWord = endNode.closest('.word-token');
+      if (endWord) {
+        const idx = vEndWords.indexOf(endWord);
+        if (idx !== -1) endWordIdx = idx;
+      } else {
+        for (let i = vEndWords.length - 1; i >= 0; i--) {
+          if (range.intersectsNode(vEndWords[i])) {
+            endWordIdx = i;
+            break;
+          }
+        }
+        if (endWordIdx === -1) endWordIdx = vEndWords.length - 1;
+      }
+
+      // Vérifier s'il s'agit d'un surlignage partiel ou d'un verset complet
+      let isFullVerse = false;
+      if (vStart === vEnd) {
+        if (vStartWords.length > 0 && startWordIdx === 0 && endWordIdx >= vStartWords.length - 1) {
+          isFullVerse = true;
+        }
+      }
+
+      const version = (typeof BibleReader !== 'undefined' ? BibleReader.currentVersion : 'lsg') || 'lsg';
 
       this.currentSelectionRef = {
         book,
         chapter,
         verseStart: vStart,
         verseEnd: vEnd,
-        text: selection.toString().trim()
+        startWordIdx,
+        endWordIdx,
+        text,
+        isFullVerse,
+        version
       };
     } else {
       this.currentSelectionRef = null;
@@ -299,6 +433,7 @@ const HighlighterManager = {
   togglePenMode() {
     this.isPenModeActive = !this.isPenModeActive;
     document.body.classList.toggle('hl-pen-mode-active', this.isPenModeActive);
+    this.updatePenCursor();
     this.updateTopPopoverUi();
     
     if (this.isPenModeActive) {
@@ -311,14 +446,18 @@ const HighlighterManager = {
   async applyHighlight(color, style) {
     if (!this.currentSelectionRef) return;
     
-    const { book, chapter, verseStart, verseEnd, text } = this.currentSelectionRef;
+    const { book, chapter, verseStart, verseEnd, startWordIdx, endWordIdx, text, isFullVerse, version } = this.currentSelectionRef;
     
     const hlData = {
       book,
       chapter,
       verse_start: verseStart,
       verse_end: verseEnd,
+      start_word_idx: startWordIdx,
+      end_word_idx: endWordIdx,
       selected_text: text,
+      is_full_verse: isFullVerse !== false,
+      version: version || (typeof BibleReader !== 'undefined' ? BibleReader.currentVersion : 'lsg'),
       color: color || this.activeColor,
       style: style || this.activeStyle
     };
@@ -327,7 +466,7 @@ const HighlighterManager = {
       const saved = await API.saveHighlight(hlData);
       if (saved) {
         this.hidePalette();
-        await this.renderChapterHighlights(book, chapter);
+        await this.renderChapterHighlights(book, chapter, hlData.version);
         App.showToast(`Passage surligné en ${this.getColorName(hlData.color)}`);
         
         // Actualiser la vue notes si le volet est ouvert
@@ -342,12 +481,13 @@ const HighlighterManager = {
 
   async eraseHighlight() {
     if (!this.currentSelectionRef) return;
-    const { book, chapter, verseStart, verseEnd } = this.currentSelectionRef;
+    const { book, chapter, verseStart, verseEnd, version } = this.currentSelectionRef;
+    const curVer = version || (typeof BibleReader !== 'undefined' ? BibleReader.currentVersion : '');
     
     try {
-      const deletedCount = await API.deleteHighlightsForPassage(book, chapter, verseStart, verseEnd);
+      const deletedCount = await API.deleteHighlightsForPassage(book, chapter, verseStart, verseEnd, curVer);
       this.hidePalette();
-      await this.renderChapterHighlights(book, chapter);
+      await this.renderChapterHighlights(book, chapter, curVer);
       if (deletedCount > 0) {
         App.showToast("Surlignage supprimé avec succès.");
       } else {
@@ -360,10 +500,14 @@ const HighlighterManager = {
 
   async createNoteForHighlight() {
     if (!this.currentSelectionRef) return;
-    const { book, chapter, verseStart, verseEnd, text } = this.currentSelectionRef;
+    const { book, chapter, verseStart, verseEnd, startWordIdx, endWordIdx, text, isFullVerse, version } = this.currentSelectionRef;
     
     const hlData = {
-      book, chapter, verse_start: verseStart, verse_end: verseEnd, selected_text: text,
+      book, chapter, verse_start: verseStart, verse_end: verseEnd,
+      start_word_idx: startWordIdx, end_word_idx: endWordIdx,
+      selected_text: text,
+      is_full_verse: isFullVerse !== false,
+      version: version || (typeof BibleReader !== 'undefined' ? BibleReader.currentVersion : 'lsg'),
       color: this.activeColor, style: this.activeStyle
     };
 
@@ -377,7 +521,7 @@ const HighlighterManager = {
         if (note) {
           App.showToast("Note liée créée avec succès.");
           this.hidePalette();
-          await this.renderChapterHighlights(book, chapter);
+          await this.renderChapterHighlights(book, chapter, hlData.version);
           
           // Ouvrir le volet droit sur l'onglet Notes
           if (typeof BibleReader !== 'undefined') {
@@ -393,17 +537,18 @@ const HighlighterManager = {
     }
   },
 
-  async renderChapterHighlights(book, chapter) {
+  async renderChapterHighlights(book, chapter, version = null) {
     if (typeof BibleReader === 'undefined') return;
     
     try {
-      const highlights = await API.getHighlightsForChapter(book, chapter);
+      const currentVer = version || (typeof BibleReader !== 'undefined' ? BibleReader.currentVersion : '');
+      const highlights = await API.getHighlightsForChapter(book, chapter, currentVer);
       if (!highlights) return;
 
       const cleanBook = (book || '').toLowerCase();
       const chNum = parseInt(chapter, 10);
 
-      // Nettoyer les anciens surlignages du DOM du chapitre
+      // 1. Nettoyer les anciens surlignages du DOM du chapitre
       document.querySelectorAll('.verse-item').forEach(el => {
         const elBook = (el.dataset.bookCode || '').toLowerCase();
         const elChap = parseInt(el.dataset.chapter, 10);
@@ -413,12 +558,13 @@ const HighlighterManager = {
         }
       });
 
-      // Appliquer les nouveaux surlignages continus
+      // 2. Appliquer les surlignages
       highlights.forEach(hl => {
         const styleName = hl.style || 'felt';
         const colorName = hl.color || 'yellow';
         const className = `hl-${styleName}-${colorName}`;
         const isMultiVerse = hl.verse_start < hl.verse_end;
+        const isPartial = hl.is_full_verse === false;
 
         for (let v = hl.verse_start; v <= hl.verse_end; v++) {
           const verseEls = document.querySelectorAll(`.verse-item[data-verse-num="${v}"]`);
@@ -438,14 +584,190 @@ const HighlighterManager = {
             const elBook = (vEl.dataset.bookCode || '').toLowerCase();
             const elChap = parseInt(vEl.dataset.chapter, 10);
             if (elBook === cleanBook && elChap === chNum) {
-              vEl.classList.add(className, rangeClass);
-              if (hl.note_id) vEl.classList.add('hl-has-note');
+              if (isPartial) {
+                // Surlignage partiel sans trous
+                this.renderPartialHighlightForVerse(vEl, v, hl, className, rangeClass);
+              } else {
+                // Surlignage du verset complet
+                vEl.classList.add(className, rangeClass);
+                if (hl.note_id) vEl.classList.add('hl-has-note');
+              }
             }
           });
         }
       });
     } catch (e) {
       console.error('Erreur rendu highlights', e);
+    }
+  },
+
+  renderPartialHighlightForVerse(verseEl, verseNum, hl, className, rangeClass) {
+    if (!verseEl) return;
+    const wordTokens = Array.from(verseEl.querySelectorAll('.word-token'));
+    if (wordTokens.length === 0) return;
+
+    const isMulti = hl.verse_start < hl.verse_end;
+    let sIdx = 0;
+    let eIdx = wordTokens.length - 1;
+
+    if (!isMulti) {
+      // 1. Verset unique partiel
+      if (hl.start_word_idx != null && hl.end_word_idx != null && hl.end_word_idx >= 0) {
+        sIdx = hl.start_word_idx;
+        eIdx = hl.end_word_idx;
+      } else {
+        const found = this.findWordRangeInVerse(verseEl, hl.selected_text);
+        if (found) {
+          sIdx = found.start;
+          eIdx = found.end;
+        }
+      }
+    } else {
+      // 2. Passage multi-versets partiel
+      if (verseNum === hl.verse_start) {
+        // Premier verset du passage : commence à start_word_idx et va jusqu'à la FIN du verset
+        if (hl.start_word_idx != null) {
+          sIdx = hl.start_word_idx;
+        } else {
+          const found = this.findWordRangeInVerse(verseEl, hl.selected_text);
+          if (found) sIdx = found.start;
+        }
+        eIdx = wordTokens.length - 1;
+      } else if (verseNum === hl.verse_end) {
+        // Dernier verset du passage : commence au DÉBUT du verset et va jusqu'à end_word_idx
+        sIdx = 0;
+        if (hl.end_word_idx != null && hl.end_word_idx >= 0) {
+          eIdx = hl.end_word_idx;
+        } else {
+          const found = this.findWordRangeInVerse(verseEl, hl.selected_text);
+          if (found) eIdx = found.end;
+        }
+      } else {
+        // Verset intermédiaire : 100% de tout le verset
+        sIdx = 0;
+        eIdx = wordTokens.length - 1;
+      }
+    }
+
+    this.wrapWordTokensRange(verseEl, sIdx, eIdx, className, rangeClass, hl.id, !!hl.note_id);
+  },
+
+  findWordRangeInVerse(verseEl, selectedText) {
+    if (!verseEl || !selectedText) return null;
+    const targetText = selectedText.trim();
+    if (!targetText) return null;
+
+    const wordTokens = Array.from(verseEl.querySelectorAll('.word-token'));
+    if (wordTokens.length === 0) return null;
+
+    const cleanWords = wordTokens.map(w => w.textContent.trim());
+    const targetWords = targetText.split(/\s+/).filter(w => w.length > 0);
+
+    const normalize = s => (s || '').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+    const normTarget = targetWords.map(normalize).filter(w => w.length > 0);
+    const normClean = cleanWords.map(normalize);
+
+    if (normTarget.length === 0) return null;
+
+    // 1. Chercher la séquence complète continue
+    for (let i = 0; i <= normClean.length - normTarget.length; i++) {
+      let match = true;
+      for (let j = 0; j < normTarget.length; j++) {
+        if (!normClean[i + j].includes(normTarget[j]) && !normTarget[j].includes(normClean[i + j])) {
+          match = false;
+          break;
+        }
+      }
+      if (match) {
+        return { start: i, end: i + normTarget.length - 1 };
+      }
+    }
+
+    // 2. Chercher les premiers mots (début de sélection)
+    for (let len = Math.min(normTarget.length, 5); len >= 1; len--) {
+      const subTarget = normTarget.slice(0, len);
+      for (let i = 0; i <= normClean.length - len; i++) {
+        let match = true;
+        for (let j = 0; j < len; j++) {
+          if (!normClean[i + j].includes(subTarget[j]) && !subTarget[j].includes(normClean[i + j])) {
+            match = false;
+            break;
+          }
+        }
+        if (match) {
+          return { start: i, end: Math.min(normClean.length - 1, i + normTarget.length - 1) };
+        }
+      }
+    }
+
+    // 3. Chercher les derniers mots (fin de sélection)
+    for (let len = Math.min(normTarget.length, 5); len >= 1; len--) {
+      const subTarget = normTarget.slice(normTarget.length - len);
+      for (let i = normClean.length - len; i >= 0; i--) {
+        let match = true;
+        for (let j = 0; j < len; j++) {
+          if (!normClean[i + j].includes(subTarget[j]) && !subTarget[j].includes(normClean[i + j])) {
+            match = false;
+            break;
+          }
+        }
+        if (match) {
+          return { start: 0, end: i + len - 1 };
+        }
+      }
+    }
+
+    return null;
+  },
+
+  wrapWordTokensRange(verseEl, startIdx, endIdx, className, rangeClass, hlId, hasNote) {
+    if (!verseEl) return;
+    const wordTokens = Array.from(verseEl.querySelectorAll('.word-token'));
+    if (wordTokens.length === 0) return;
+
+    const sIdx = Math.max(0, Math.min(startIdx, wordTokens.length - 1));
+    const eIdx = Math.max(0, Math.min(endIdx === -1 ? wordTokens.length - 1 : endIdx, wordTokens.length - 1));
+
+    if (sIdx > eIdx) return;
+
+    let startEl = wordTokens[sIdx];
+    const endEl = wordTokens[eIdx];
+
+    // Si on commence au début du verset (mot 0), inclure le numéro de verset <sup class="verse-num"> pour éliminer toute coupure
+    if (sIdx === 0) {
+      const numEl = verseEl.querySelector('.verse-num');
+      if (numEl && numEl.parentNode === verseEl) {
+        startEl = numEl;
+      }
+    }
+
+    if (startEl.closest('.verse-highlight') || endEl.closest('.verse-highlight')) return;
+
+    const hlSpan = document.createElement('span');
+    hlSpan.className = `verse-highlight ${className} ${rangeClass}`;
+    if (hlId) hlSpan.dataset.hlId = hlId;
+    if (hasNote) hlSpan.classList.add('hl-has-note');
+
+    const nodesToWrap = [];
+    let curr = startEl;
+    while (curr) {
+      nodesToWrap.push(curr);
+      if (curr === endEl) {
+        // Si c'est le dernier mot du verset, englober également l'espace ou ponctuation finale pour un raccordement sans faille
+        if (eIdx === wordTokens.length - 1) {
+          while (curr.nextSibling && (curr.nextSibling.nodeType === 3 || !curr.nextSibling.classList?.contains('word-token'))) {
+            curr = curr.nextSibling;
+            nodesToWrap.push(curr);
+          }
+        }
+        break;
+      }
+      curr = curr.nextSibling;
+    }
+
+    if (nodesToWrap.length > 0 && startEl.parentNode) {
+      startEl.parentNode.insertBefore(hlSpan, startEl);
+      nodesToWrap.forEach(node => hlSpan.appendChild(node));
     }
   },
 
@@ -457,5 +779,16 @@ const HighlighterManager = {
       });
     });
     element.classList.remove('hl-has-note', 'hl-range-single', 'hl-range-start', 'hl-range-mid', 'hl-range-end');
+    
+    // Dé-emballer les spans .verse-highlight
+    element.querySelectorAll('.verse-highlight').forEach(wrapper => {
+      const parent = wrapper.parentNode;
+      if (parent) {
+        while (wrapper.firstChild) {
+          parent.insertBefore(wrapper.firstChild, wrapper);
+        }
+        parent.removeChild(wrapper);
+      }
+    });
   }
 };
