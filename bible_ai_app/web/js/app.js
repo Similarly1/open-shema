@@ -1224,7 +1224,7 @@ const VintageThemeManager = {
     if (chkPop) chkPop.checked = this.enabled;
     const badgePop = document.getElementById('opt-vintage-badge');
     if (badgePop) {
-      badgePop.textContent = this.enabled ? '📜 Actif' : 'Désactivé';
+      badgePop.textContent = this.enabled ? 'Actif' : 'Désactivé';
       badgePop.style.color = this.enabled ? 'var(--accent-orange)' : 'var(--text-muted)';
     }
 
@@ -1263,6 +1263,7 @@ const VintageThemeManager = {
       r.addEventListener('change', (e) => {
         if (e.target.checked) {
           this.scope = e.target.value;
+          this.persistSettings();
           this.refreshAll();
         }
       });
@@ -1272,18 +1273,32 @@ const VintageThemeManager = {
       r.addEventListener('change', (e) => {
         if (e.target.checked) {
           this.intensity = e.target.value;
+          this.persistSettings();
           this.refreshAll();
         }
       });
     });
   },
 
+  persistSettings() {
+    if (typeof API !== 'undefined' && API.saveSettings && API.getSettings) {
+      API.getSettings().then(cfg => {
+        if (!cfg) cfg = {};
+        cfg.vintage_mode = this.enabled;
+        cfg.vintage_scope = this.scope;
+        cfg.vintage_intensity = this.intensity;
+        API.saveSettings(cfg).catch(() => {});
+      }).catch(() => {});
+    }
+  },
+
   setEnabled(val) {
     this.enabled = !!val;
     this.syncUIControls();
+    this.persistSettings();
     this.refreshAll();
     if (typeof App !== 'undefined' && App.showToast) {
-      App.showToast(this.enabled ? '📜 Mode Immersion Historique activé' : 'Mode Immersion Historique désactivé');
+      App.showToast(this.enabled ? 'Mode Immersion Historique activé' : 'Mode Immersion Historique désactivé');
     }
   },
 
@@ -1340,9 +1355,9 @@ const VintageThemeManager = {
    * Retourne un libellé élégant pour le badge d'époque
    */
   getEpochLabel(epoch, year = null) {
-    if (epoch === 'ancient') return year ? `📜 ${year} (Manuscrit)` : '📜 Codex / Manuscrit';
-    if (epoch === 'classic') return year ? `📜 ${year} (Classique)` : '📜 Époque Classique';
-    if (epoch === 'xix') return year ? `📜 ${year} (XIXᵉ s.)` : '📜 Belle Époque XIXᵉ';
+    if (epoch === 'ancient') return year ? `${year} (Manuscrit)` : 'Codex / Manuscrit';
+    if (epoch === 'classic') return year ? `${year} (Classique)` : 'Époque Classique';
+    if (epoch === 'xix') return year ? `${year} (XIXᵉ s.)` : 'Belle Époque XIXᵉ';
     return '';
   },
 

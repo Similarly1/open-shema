@@ -3475,7 +3475,7 @@ const BibleReader = {
     const year = bInfo?.annee || bInfo?.year || null;
     const label = VintageThemeManager.getEpochLabel(epoch, year);
 
-    badgeEl.textContent = label;
+    badgeEl.innerHTML = `<svg class="vintage-badge-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1.5a2.5 2.5 0 0 0-5 0V19"/><path d="M4 3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h11"/></svg><span>${label}</span>`;
     badgeEl.className = `vintage-epoch-pill ${epoch}`;
     badgeEl.title = `Mode Immersion Historique : ${label}\nPatine, encre bistre et typographie d'époque actives.`;
     badgeEl.classList.remove('hidden');
