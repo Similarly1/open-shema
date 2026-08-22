@@ -1022,7 +1022,7 @@ const DictView = {
           if (varPart) {
             out.push(`<div class="dict-header-variants" style="margin-bottom: 6px; font-size: 14px; color: var(--text-secondary); line-height: 1.6;">${varPart}</div>`);
           }
-          out.push(`<div class="dict-etymology-box"><span class="dict-etymology-label">💡 Signification :</span> <span><em>${meaningOnly}</em></span></div>`);
+          out.push(`<div class="dict-etymology-box" style="margin: 10px 0 14px 0; padding: 10px 14px; background: rgba(245, 158, 11, 0.08); border-left: 3.5px solid #f59e0b; border-radius: 0 6px 6px 0; font-size: 14.5px; display: flex; align-items: center; gap: 8px;"><span class="dict-etymology-label" style="font-weight: 700; color: #d97706; font-size: 13.5px; white-space: nowrap;">💡 Signification :</span> <span><em>${meaningOnly}</em></span></div>`);
           if (introPart) {
             out.push(`<p style="margin: 8px 0 12px 0; line-height: 1.75;">${introPart}</p>`);
           }
@@ -1057,8 +1057,8 @@ const DictView = {
           }
 
           out.push(`
-            <div class="dict-roman-heading">
-              <span class="dict-roman-badge">${romNum}</span>
+            <div class="dict-roman-heading" style="margin-top: 24px; margin-bottom: 10px; font-size: 16.5px; font-weight: 800; color: var(--text-primary); border-bottom: 1.5px solid #6366f1; padding-bottom: 5px; display: flex; align-items: center; gap: 8px;">
+              <span class="dict-roman-badge" style="display: inline-flex; align-items: center; justify-content: center; background: #6366f1; color: #ffffff; border-radius: 5px; padding: 2px 9px; font-size: 12.5px; font-weight: 800;">${romNum}</span>
               <span class="dict-roman-title">${this.escapeHtml(titlePart)}</span>
             </div>
           `);
@@ -1080,7 +1080,7 @@ const DictView = {
 
         out.push(`
           <div class="dict-subentry-heading" style="margin-top: 22px; margin-bottom: 8px; font-size: 16px; font-weight: 800; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">
-            <span class="dict-subentry-num" style="display: inline-flex; align-items: center; justify-content: center; background: #6366f1; color: #fff; border-radius: 4px; padding: 1px 7px; font-size: 11.5px; font-weight: 700; margin-right: 6px;">${num}</span>
+            <span class="dict-subentry-num" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; min-width: 24px; background: #6366f1; color: #fff; border-radius: 6px; font-size: 12.5px; font-weight: 700; margin-right: 6px;">${num}</span>
             <span>${this.escapeHtml(name)}</span>
           </div>
         `);
@@ -1115,9 +1115,9 @@ const DictView = {
           }
 
           out.push(`
-            <div class="dict-subentry-card" id="dict-subentry-${num}">
-              <span class="dict-subentry-num">${num}</span>
-              <div class="dict-subentry-content">${content}</div>
+            <div class="dict-subentry-card" id="dict-subentry-${num}" style="display: flex; align-items: flex-start; gap: 12px; margin: 12px 0; padding: 11px 15px; background: rgba(99, 102, 241, 0.035); border: 1px solid rgba(99, 102, 241, 0.16); border-left: 4px solid #6366f1; border-radius: 0 8px 8px 0; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);">
+              <span class="dict-subentry-num" style="flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; min-width: 24px; background: #6366f1; color: #ffffff; border-radius: 6px; font-size: 12.5px; font-weight: 800; margin-top: 1px; box-shadow: 0 2px 4px rgba(99, 102, 241, 0.25);">${num}</span>
+              <div class="dict-subentry-content" style="flex: 1; font-size: 14.5px; line-height: 1.75;">${content}</div>
             </div>
           `);
           return;
@@ -1148,9 +1148,9 @@ const DictView = {
           }
 
           out.push(`
-            <div class="dict-subentry-card dict-subentry-alpha" id="dict-subentry-${letter}">
-              <span class="dict-subentry-num">${letter}</span>
-              <div class="dict-subentry-content">${content}</div>
+            <div class="dict-subentry-card dict-subentry-alpha" id="dict-subentry-${letter}" style="display: flex; align-items: flex-start; gap: 12px; margin: 12px 0; padding: 11px 15px; background: rgba(139, 92, 246, 0.035); border: 1px solid rgba(139, 92, 246, 0.18); border-left: 4px solid #8b5cf6; border-radius: 0 8px 8px 0; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);">
+              <span class="dict-subentry-num" style="flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; min-width: 24px; background: #8b5cf6; color: #ffffff; border-radius: 6px; font-size: 12.5px; font-weight: 800; margin-top: 1px; box-shadow: 0 2px 4px rgba(139, 92, 246, 0.25);">${letter}</span>
+              <div class="dict-subentry-content" style="flex: 1; font-size: 14.5px; line-height: 1.75;">${content}</div>
             </div>
           `);
           return;
