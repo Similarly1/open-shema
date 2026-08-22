@@ -2292,32 +2292,38 @@ const FootnoteTooltip = {
       });
     }
 
-    this.positionTooltip(targetEl);
+    // Retirer 'hidden' pour calculer la dimension réelle dans le DOM
     this.tooltipEl.classList.remove('hidden');
+    this.positionTooltip(targetEl);
     requestAnimationFrame(() => this.tooltipEl.classList.add('visible'));
   },
 
   positionTooltip(targetEl) {
     if (!this.tooltipEl || !targetEl) return;
     const rect = targetEl.getBoundingClientRect();
-    const tooltipWidth = 340;
-    const tooltipHeight = 120;
+    const realWidth = this.tooltipEl.offsetWidth || 340;
+    const realHeight = this.tooltipEl.offsetHeight || 120;
 
-    let left = rect.left + (rect.width / 2) - (tooltipWidth / 2);
-    let top = rect.top - tooltipHeight - 12;
+    let left = rect.left + (rect.width / 2) - (realWidth / 2);
+    
+    // Par défaut : positionner AU-DESSUS du badge avec 8px d'écart
+    let top = rect.top - realHeight - 8;
 
-    if (left < 16) left = 16;
-    if (left + tooltipWidth > window.innerWidth - 16) {
-      left = window.innerWidth - tooltipWidth - 16;
+    // Si pas assez de place au-dessus du haut de la fenêtre, positionner EN-DESSOUS avec 8px d'écart
+    if (top < 16) {
+      top = rect.bottom + 8;
     }
 
-    if (top < 16) {
-      top = rect.bottom + 10;
+    // Contraintes horizontales pour ne pas déborder de l'écran
+    if (left < 16) left = 16;
+    if (left + realWidth > window.innerWidth - 16) {
+      left = window.innerWidth - realWidth - 16;
     }
 
     this.tooltipEl.style.left = `${Math.round(left)}px`;
     this.tooltipEl.style.top = `${Math.round(top)}px`;
   },
+
 
   hide() {
     if (!this.tooltipEl) return;

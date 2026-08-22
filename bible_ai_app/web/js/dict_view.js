@@ -968,18 +968,23 @@ const DictView = {
           const badgeHtml = ` <span class="theol-fn-badge" data-fn-id="${fnId}" id="dict-fnref-${fnId}">${fnId}</span>`;
 
           // Attacher le badge en exposant directement à la fin du dernier élément (liste ou paragraphe)
-          if (out.length > 0) {
-            const lastIdx = out.length - 1;
-            if (inUlList && out[lastIdx].endsWith('</li>')) {
-              out[lastIdx] = out[lastIdx].slice(0, -5) + badgeHtml + '</li>';
-            } else if (out[lastIdx].endsWith('</p>')) {
-              out[lastIdx] = out[lastIdx].slice(0, -4) + badgeHtml + '</p>';
-            } else if (out[lastIdx].endsWith('</div>')) {
-              out[lastIdx] = out[lastIdx].slice(0, -6) + badgeHtml + '</div>';
-            } else {
-              out.push(badgeHtml);
+          let attached = false;
+          for (let i = out.length - 1; i >= 0; i--) {
+            if (out[i].endsWith('</li>')) {
+              out[i] = out[i].slice(0, -5) + badgeHtml + '</li>';
+              attached = true;
+              break;
+            } else if (out[i].endsWith('</p>')) {
+              out[i] = out[i].slice(0, -4) + badgeHtml + '</p>';
+              attached = true;
+              break;
+            } else if (out[i].endsWith('</div>')) {
+              out[i] = out[i].slice(0, -6) + badgeHtml + '</div>';
+              attached = true;
+              break;
             }
-          } else {
+          }
+          if (!attached) {
             out.push(badgeHtml);
           }
         } else {
