@@ -478,6 +478,8 @@ const DictView = {
     this.renderSelectedSourceMatch();
   },
 
+  currentFootnotesList: [],
+
   renderSelectedSourceMatch() {
     const bodyEl = document.getElementById('dict-article-body');
     if (!bodyEl) return;
@@ -505,6 +507,7 @@ const DictView = {
     }
 
     const rawText = match.full_text || match.raw_text || match.preview || '';
+    this.currentFootnotesList = [];
     const formatted = this.formatArticleMarkdown(rawText);
     let linkified = (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences)
       ? TheologyView.highlightScriptureReferences(formatted)
@@ -513,12 +516,41 @@ const DictView = {
       linkified = TheologyView.linkifyUrls(linkified);
     }
 
+    // Section des notes de bas de page si des citations ont été extraites
+    let footnotesHtml = '';
+    if (this.currentFootnotesList.length > 0) {
+      footnotesHtml = `
+        <div class="theol-footnotes-section" id="dict-footnotes-section" style="margin-top: 32px; border-top: 1px solid var(--border-color); padding-top: 18px;">
+          <div class="theol-footnotes-header" style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>Notes & Références de sources (${this.currentFootnotesList.length})</span>
+          </div>
+          <ol class="theol-footnotes-list" style="padding-left: 20px; font-size: 12.5px; color: var(--text-secondary); line-height: 1.6;">
+            ${this.currentFootnotesList.map(fn => `
+              <li class="theol-fn-item" id="theol-fn-${fn.id}" data-fn-id="${fn.id}" style="margin-bottom: 8px;">
+                <span class="theol-fn-num" style="font-weight: 700; color: #6366f1; margin-right: 4px;">${fn.id}.</span>
+                <span class="theol-fn-text">${(typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences) ? TheologyView.highlightScriptureReferences(fn.text) : fn.text}</span>
+                <a href="#dict-fnref-${fn.id}" class="theol-fn-backref" data-target-id="dict-fnref-${fn.id}" title="Retour au passage" style="color: #6366f1; text-decoration: none; margin-left: 6px; font-weight: bold;">↩</a>
+              </li>
+            `).join('')}
+          </ol>
+        </div>
+      `;
+    }
+
     bodyEl.innerHTML = `
       ${polishBannerHtml}
       <div class="dict-entry-body-content">${linkified}</div>
+      ${footnotesHtml}
     `;
 
-    // Attacher les liens vers les versets bibliques
+    // 1. Attacher le gestionnaire d'infobulles des versets bibliques (ScriptureTooltip)
     if (typeof ScriptureTooltip !== 'undefined') {
       ScriptureTooltip.bindToElements(bodyEl.querySelectorAll('.theol-inline-scripture-ref'));
     }
@@ -533,24 +565,30 @@ const DictView = {
       });
     });
 
-    // Attacher les interactions pour les badges de sources bibliographiques
-    bodyEl.querySelectorAll('.dict-source-badge').forEach(badge => {
-      badge.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const citation = badge.dataset.citation || badge.getAttribute('title') || '';
-        if (citation) {
-          const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(citation)}`;
-          if (typeof API !== 'undefined' && API.call) {
-            API.call('open_external_url', searchUrl).catch(() => window.open(searchUrl, '_blank'));
-          } else {
-            window.open(searchUrl, '_blank');
+    // 2. Attacher le gestionnaire d'infobulles des notes de bas de page (FootnoteTooltip)
+    if (typeof FootnoteTooltip !== 'undefined') {
+      FootnoteTooltip.setFootnotes(this.currentFootnotesList);
+      FootnoteTooltip.bindToElements(bodyEl.querySelectorAll('.theol-fn-badge'));
+    }
+
+    // 3. Attacher les liens retour (back-links) de la section des notes
+    bodyEl.querySelectorAll('.theol-fn-backref').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = btn.dataset.targetId;
+        if (targetId) {
+          const callEl = document.getElementById(targetId);
+          if (callEl) {
+            callEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            callEl.classList.remove('theol-highlight-pulse');
+            void callEl.offsetWidth;
+            callEl.classList.add('theol-highlight-pulse');
           }
         }
       });
     });
 
-
-    // Basculer vers l'original si cliqué
+    // 4. Basculer vers l'original si cliqué
     bodyEl.querySelector('#btn-dict-view-original')?.addEventListener('click', () => {
       const origText = match.raw_text || match.full_text || '';
       bodyEl.innerHTML = `<div class="dict-entry-body-content">${this.formatArticleMarkdown(origText)}</div>`;
@@ -573,9 +611,117 @@ const DictView = {
       'XCI': 91, 'XCII': 92, 'XCIII': 93, 'XCIV': 94, 'XCV': 95, 'XCVI': 96, 'XCVII': 97, 'XCVIII': 98, 'XCIX': 99, 'C': 100
     };
 
+    const BOOK_ALIASES = {
+      "gen": "Genèse", "genese": "Genèse", "ge": "Genèse", "gn": "Genèse",
+      "exod": "Exode", "exode": "Exode", "ex": "Exode",
+      "lev": "Lévitique", "levitique": "Lévitique", "lv": "Lévitique",
+      "num": "Nombres", "nombres": "Nombres", "nb": "Nombres",
+      "deut": "Deutéronome", "deuteronome": "Deutéronome", "dt": "Deutéronome",
+      "jos": "Josué", "josue": "Josué",
+      "jug": "Juges", "juges": "Juges", "jg": "Juges",
+      "ruth": "Ruth", "rt": "Ruth",
+      "i sam": "1 Samuel", "ii sam": "2 Samuel", "1 sam": "1 Samuel", "2 sam": "2 Samuel", "1s": "1 Samuel", "2s": "2 Samuel",
+      "i reg": "1 Rois", "ii reg": "2 Rois", "iii reg": "1 Rois", "iv reg": "2 Rois",
+      "1 reg": "1 Rois", "2 reg": "2 Rois", "3 reg": "1 Rois", "4 reg": "2 Rois",
+      "i rois": "1 Rois", "ii rois": "2 Rois", "1 rois": "1 Rois", "2 rois": "2 Rois",
+      "i par": "1 Chroniques", "ii par": "2 Chroniques", "1 par": "1 Chroniques", "2 par": "2 Chroniques",
+      "1 ch": "1 Chroniques", "2 ch": "2 Chroniques", "1ch": "1 Chroniques", "2ch": "2 Chroniques",
+      "i chron": "1 Chroniques", "ii chron": "2 Chroniques", "1 chron": "1 Chroniques", "2 chron": "2 Chroniques", "chron": "1 Chroniques",
+      "esd": "Esdras", "esdras": "Esdras", "i esdr": "1 Esdras", "ii esdr": "2 Esdras",
+      "neh": "Néhémie", "nehemie": "Néhémie",
+      "esth": "Esther", "esther": "Esther",
+      "job": "Job", "jb": "Job",
+      "ps": "Psaumes", "psa": "Psaumes", "psaumes": "Psaumes", "psaume": "Psaumes", "pss": "Psaumes",
+      "prov": "Proverbes", "proverbes": "Proverbes", "pr": "Proverbes",
+      "eccl": "Ecclésiaste", "ecclesiaste": "Ecclésiaste", "ec": "Ecclésiaste", "ecc": "Ecclésiaste",
+      "cant": "Cantique des cantiques", "cantique": "Cantique des cantiques", "ct": "Cantique des cantiques",
+      "is": "Ésaïe", "isa": "Ésaïe", "esaie": "Ésaïe", "isaie": "Ésaïe", "es": "Ésaïe",
+      "jer": "Jérémie", "jeremie": "Jérémie", "jr": "Jérémie",
+      "lam": "Lamentations", "lamentations": "Lamentations",
+      "ezech": "Ézéchiel", "eze": "Ézéchiel", "ezechiel": "Ézéchiel", "ez": "Ézéchiel",
+      "dan": "Daniel", "daniel": "Daniel", "da": "Daniel",
+      "os": "Osée", "osee": "Osée",
+      "joel": "Joël", "jl": "Joël",
+      "am": "Amos", "amos": "Amos",
+      "abd": "Abdias", "abdias": "Abdias",
+      "jon": "Jonas", "jonas": "Jonas",
+      "mich": "Michée", "michee": "Michée", "mi": "Michée",
+      "nah": "Nahum", "nahum": "Nahum", "na": "Nahum",
+      "hab": "Habacuc", "habacuc": "Habacuc", "ha": "Habacuc",
+      "soph": "Sophonie", "sophonie": "Sophonie", "so": "Sophonie",
+      "agg": "Aggée", "aggee": "Aggée", "ag": "Aggée",
+      "zach": "Zacharie", "zacharie": "Zacharie", "za": "Zacharie",
+      "mal": "Malachie", "malachie": "Malachie", "ml": "Malachie",
+      "matth": "Matthieu", "matt": "Matthieu", "mat": "Matthieu", "matthieu": "Matthieu", "mt": "Matthieu",
+      "marc": "Marc", "mar": "Marc", "mc": "Marc",
+      "luc": "Luc", "lc": "Luc",
+      "jean": "Jean", "jn": "Jean",
+      "act": "Actes", "actes": "Actes", "ac": "Actes",
+      "rom": "Romains", "romains": "Romains", "ro": "Romains", "rm": "Romains",
+      "i cor": "1 Corinthiens", "ii cor": "2 Corinthiens", "1 cor": "1 Corinthiens", "2 cor": "2 Corinthiens", "1co": "1 Corinthiens", "2co": "2 Corinthiens",
+      "gal": "Galates", "galates": "Galates", "ga": "Galates",
+      "eph": "Éphésiens", "ephesiens": "Éphésiens", "ep": "Éphésiens",
+      "phil": "Philippiens", "philippiens": "Philippiens", "php": "Philippiens",
+      "col": "Colossiens", "colossiens": "Colossiens",
+      "i thes": "1 Thessaloniciens", "ii thes": "2 Thessaloniciens",
+      "i tim": "1 Timothée", "ii tim": "2 Timothée",
+      "tit": "Tite", "tite": "Tite",
+      "philm": "Philémon", "philemon": "Philémon",
+      "heb": "Hébreux", "hebreux": "Hébreux", "he": "Hébreux",
+      "jacq": "Jacques", "jacques": "Jacques", "ja": "Jacques", "jas": "Jacques",
+      "i pierre": "1 Pierre", "ii pierre": "2 Pierre", "1 pierre": "1 Pierre", "2 pierre": "2 Pierre",
+      "i jean": "1 Jean", "ii jean": "2 Jean", "iii jean": "3 Jean",
+      "jud": "Juges", "jude": "Jude",
+      "apoc": "Apocalypse", "apocalypse": "Apocalypse", "rev": "Apocalypse", "apo": "Apocalypse"
+    };
+
+    const cleanBookKey = (name) => {
+      return (name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[*_`\.]+/g, '').trim().toLowerCase();
+    };
+
     let processed = text;
 
-    // 1. Conversion des chiffres romains dans les tomes, parties et planches
+    // 1. Normalisation des références bibliques Vulgate complexes : (IV Reg. [II Rois], XXIII, 29-30) ou (II Par. [Chron.], XXXV, 20-25)
+    processed = processed.replace(/([I|V|X|1-4\s]*\*?[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç\.]+\*?)\s*\[([^\]]+)\]\s*,\s*([IVXLCDM0-9]+)\s*,\s*([0-9]+(?:\s*(?:,|et|\-|\–)\s*[0-9]+)*)/gi, (match, rawB, bkAlias, romCh, verses) => {
+      const kAlias = cleanBookKey(bkAlias);
+      const kRaw = cleanBookKey(rawB);
+      const bookFr = BOOK_ALIASES[kAlias] || BOOK_ALIASES[kRaw] || bkAlias;
+      const chNum = ROMAN_MAP[romCh.toUpperCase()] || romCh;
+      const cleanV = verses.replace(/et\s+/g, '').replace(/–/g, '-').replace(/\s+/g, '');
+      return `${bookFr} ${chNum}:${cleanV}`;
+    });
+
+    // 2. Normalisation des références bibliques classiques avec chiffres romains : Zach., XII, 11 ou *Zach.*, XII, 11
+    processed = processed.replace(/(?:\*+)?\b((?:I{1,3}|IV|[1-4])\s*\*?[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+\*?|[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+\.?\*?)\s*,\s*([IVXLCDM]+)\s*,\s*([0-9]+(?:\s*[\-–]\s*[0-9]+)?)/gi, (match, rawB, romCh, verses) => {
+      const k = cleanBookKey(rawB);
+      const bookFr = BOOK_ALIASES[k];
+      if (bookFr) {
+        const chNum = ROMAN_MAP[romCh.toUpperCase()] || romCh;
+        const cleanV = verses.replace(/–/g, '-').replace(/\s+/g, '');
+        return `${bookFr} ${chNum}:${cleanV}`;
+      }
+      return match;
+    });
+
+    // 3. Normalisation des références contextuelles : Ézéchiel (VIII, 14) -> Ézéchiel 8:14
+    processed = processed.replace(/\b([A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+)\s*\(([IVXLCDM]+)\s*,\s*([0-9]+(?:\s*[\-–]\s*[0-9]+)?)\)/gi, (match, rawB, romCh, verses) => {
+      const k = cleanBookKey(rawB);
+      const bookFr = BOOK_ALIASES[k];
+      if (bookFr) {
+        const chNum = ROMAN_MAP[romCh.toUpperCase()] || romCh;
+        const cleanV = verses.replace(/–/g, '-').replace(/\s+/g, '');
+        return `${bookFr} ${chNum}:${cleanV}`;
+      }
+      return match;
+    });
+
+    // 4. Normalisation de Paralipomènes (XXXV, 25) -> (2 Chroniques 35:25)
+    processed = processed.replace(/Paralipomènes\s*\(([IVXLCDM]+)\s*,\s*([0-9]+)\)/gi, (match, romCh, v) => {
+      const chNum = ROMAN_MAP[romCh.toUpperCase()] || romCh;
+      return `Paralipomènes (2 Chroniques ${chNum}:${v})`;
+    });
+
+    // 5. Conversion des chiffres romains dans les tomes, parties et planches
     processed = processed.replace(/\bI(?:re|ère)\s+(partie|série)/gi, '1re $1');
     processed = processed.replace(/\bII(?:e|ème)\s+(partie|série)/gi, '2e $1');
     processed = processed.replace(/\bIII(?:e|ème)\s+(partie|série)/gi, '3e $1');
@@ -588,27 +734,25 @@ const DictView = {
       const arab = ROMAN_MAP[rom.toUpperCase()] || rom;
       return `${prefix} ${arab}`;
     });
+    processed = processed.replace(/\b(Sat\.|Saturnales)\s+([IVXLCDM]+)\b/gi, (match, prefix, rom) => {
+      const arab = ROMAN_MAP[rom.toUpperCase()] || rom;
+      return `${prefix} ${arab}`;
+    });
 
-    // 2. Détection et transformation des citations de sources entre parenthèses en badges d'infobulles
-    processed = processed.replace(/\(([^\)\n]{15,350})\)/g, (match, inner) => {
+    // 6. Extraction des citations de sources entre parenthèses en vraies Notes de bas de page (Style Théologie)
+    processed = processed.replace(/\(([^\)\n]{12,350})\)/g, (match, inner) => {
       const lower = inner.toLowerCase();
-      const isSource = ['col.', 'p.', 'page', 't.', 'tome', 'édit', 'éd.', 'vol.', 'in-4', 'in-8', 'in-fol', 'ouv. cité', 'op. cit.', 'comment.', 'explan.', 'scholia', 'lexicon', 'revue', 'theol.', 'religionsgeschichte', 'monuments', 'sat.', 'genesis', 'mélanges', 'description de la palestine', 'thésaurus', 'keilinschriften'].some(k => lower.includes(k));
+      const isSource = ['col.', 'p.', 'page', 't.', 'tome', 'édit', 'éd.', 'vol.', 'in-4', 'in-8', 'in-fol', 'ouv. cité', 'op. cit.', 'comment.', 'explan.', 'scholia', 'lexicon', 'revue', 'theol.', 'religionsgeschichte', 'monuments', 'sat.', 'genesis', 'mélanges', 'description de la palestine', 'thésaurus', 'keilinschriften', 'les prophètes'].some(k => lower.includes(k));
       if (isSource) {
+        const fnId = this.currentFootnotesList.length + 1;
         const cleanText = inner.replace(/[*_`]+/g, '').trim();
-        let label = '📖 Source';
-        const shortMatch = cleanText.match(/([A-Z][a-zA-ZÀ-ÿ\s\.]+),\s*(?:t\.|p\.|col\.)/);
-        if (shortMatch) {
-          label = `📖 ${shortMatch[1].trim().slice(0, 20)}`;
-        } else if (cleanText.includes('t.') || cleanText.includes('col.')) {
-          const tMatch = cleanText.match(/(t\.\s*\d+(?:,\s*col\.\s*\d+)?)/);
-          if (tMatch) label = `📖 ${tMatch[1]}`;
-        }
-        const safeTooltip = this.escapeHtml(cleanText);
-        return `<span class="dict-source-badge" title="${safeTooltip}" data-citation="${safeTooltip}">${label}</span>`;
+        this.currentFootnotesList.push({ id: fnId, text: cleanText });
+        return `<span class="theol-fn-badge" data-fn-id="${fnId}" id="dict-fnref-${fnId}">${fnId}</span>`;
       }
       return match;
     });
 
+    // 7. Formatage Markdown
     const formatted = processed
       .replace(/^### (.*$)/gim, '<h3 style="margin: 16px 0 8px 0; font-size: 17px; font-weight: 700;">$1</h3>')
       .replace(/^## (.*$)/gim, '<h2 style="margin: 20px 0 10px 0; font-size: 19px; font-weight: 700;">$1</h2>')
@@ -626,6 +770,7 @@ const DictView = {
       .map(p => (p.startsWith('<h') || p.startsWith('<blockquote') || p.startsWith('<li')) ? p : `<p style="margin: 8px 0; line-height: 1.75;">${p}</p>`)
       .join('');
   },
+
 
 
   async polishCurrentArticle() {

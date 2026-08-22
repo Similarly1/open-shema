@@ -1733,7 +1733,7 @@ class CenterPanel(ctk.CTkFrame):
             if s.isdigit(): return int(s)
             return ROMAN_NUMS_EXT.get(s.upper())
 
-        # 0. Transformation préalable des chiffres romains dans tomes, parties et planches
+        # 0. Transformation préalable des chiffres romains dans tomes, parties, planches et livres
         line_text = re.sub(r'\bI(?:re|ère)\s+(partie|série)', r'1re \1', line_text, flags=re.IGNORECASE)
         line_text = re.sub(r'\bII(?:e|ème)\s+(partie|série)', r'2e \1', line_text, flags=re.IGNORECASE)
         line_text = re.sub(r'\bIII(?:e|ème)\s+(partie|série)', r'3e \1', line_text, flags=re.IGNORECASE)
@@ -1752,6 +1752,26 @@ class CenterPanel(ctk.CTkFrame):
             arab = str(ROMAN_NUMS_EXT.get(rom.upper(), rom))
             return f"{pref} {arab}"
         line_text = re.sub(r'\b(pl\.|planche)\s+([IVXLCDM]+)\b', _repl_p, line_text, flags=re.IGNORECASE)
+        line_text = re.sub(r'\b(Sat\.|Saturnales)\s+([IVXLCDM]+)\b', _repl_p, line_text, flags=re.IGNORECASE)
+
+        # Normalisation des références Vulgate avec crochets : (IV Reg. [II Rois], XXIII, 29-30)
+        def _repl_vulg(m):
+            bk_alias = m.group(2).strip()
+            rom_ch = m.group(3).strip()
+            verses = m.group(4).strip().replace('et ', '').replace('–', '-').replace(' ', '')
+            ch_num = str(ROMAN_NUMS_EXT.get(rom_ch.upper(), rom_ch))
+            return f"{bk_alias}, {ch_num}, {verses}"
+        line_text = re.sub(
+            r'([I|V|X|1-4\s]*\*?[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç\.]+\*?)\s*\[([^\]]+)\]\s*,\s*([IVXLCDM0-9]+)\s*,\s*([0-9]+(?:\s*(?:,|et|\-|\–)\s*[0-9]+)*)',
+            _repl_vulg,
+            line_text,
+            flags=re.IGNORECASE
+        )
+        
+        # Normalisation Paralipomènes (XXXV, 25) -> Paralipomènes, XXXV, 25
+        line_text = re.sub(r'Paralipomènes\s*\(([IVXLCDM]+)\s*,\s*([0-9]+)\)', r'2 Chroniques, \1, \2', line_text, flags=re.IGNORECASE)
+        line_text = re.sub(r'\b([A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+)\s*\(([IVXLCDM]+)\s*,\s*([0-9]+(?:\s*[\-–]\s*[0-9]+)?)\)', r'\1, \2, \3', line_text)
+
 
         tokens = []
         

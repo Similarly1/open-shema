@@ -11820,14 +11820,13 @@ body.reading-bg-dark .theol-section-heading {
 .theol-fn-badge {
   font-size: 0.76em;
   font-weight: 700;
-  line-height: 0;
+  line-height: 1;
   vertical-align: super;
   margin: 0 2px;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-}
-
-.theol-fn-badge a {
   color: var(--accent-blue, #3b82f6);
   text-decoration: none;
   background: rgba(59, 130, 246, 0.12);
@@ -11836,8 +11835,15 @@ body.reading-bg-dark .theol-section-heading {
   border: 1px solid rgba(59, 130, 246, 0.25);
   transition: all 0.15s ease;
   font-family: var(--font-sans, system-ui, sans-serif);
+  user-select: none;
 }
 
+.theol-fn-badge a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.theol-fn-badge:hover,
 .theol-fn-badge a:hover {
   background: var(--accent-blue, #3b82f6);
   color: #ffffff !important;
@@ -11845,6 +11851,7 @@ body.reading-bg-dark .theol-section-heading {
   box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
   text-decoration: none;
 }
+
 
 /* POPUP / INFOBULLE FLOTTANTE DE NOTE (POPOVER) */
 .theol-fn-popover {
