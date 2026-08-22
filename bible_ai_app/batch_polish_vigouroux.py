@@ -285,9 +285,10 @@ def main():
             return slug, title, False, "Texte trop court", {}, start_endpoint["name"], start_endpoint["model"]
 
         # Essayer d'abord le endpoint assigné, puis basculer sur les autres en cas d'erreur
-        tried_endpoints = [ep for ep in ([start_endpoint] + [e for e in endpoints_pool if e != start_endpoint]) if not e.get("exhausted")]
+        tried_endpoints = [ep for ep in ([start_endpoint] + [other_ep for other_ep in endpoints_pool if other_ep != start_endpoint]) if not ep.get("exhausted")]
         if not tried_endpoints:
             return slug, title, False, "Tous les points d'accès sont épuisés pour aujourd'hui (quota journalier atteint)", {}, start_endpoint["name"], start_endpoint["model"]
+
 
         for ep in tried_endpoints:
             if ep.get("exhausted"):
