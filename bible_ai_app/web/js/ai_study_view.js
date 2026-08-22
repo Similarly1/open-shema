@@ -1635,6 +1635,10 @@ const AIStudyView = {
 
   guessAuthor(name) {
     const n = (name || '').toLowerCase();
+    if (n.includes('clarke')) return 'Adam Clarke';
+    if (n.includes('gaebelein')) return 'A.C. Gaebelein';
+    if (n.includes('godet')) return 'Frédéric Godet';
+    if (n.includes('spurgeon')) return 'C.H. Spurgeon';
     if (n.includes('calvin')) return 'Jean Calvin';
     if (n.includes('vigouroux')) return 'F. Vigouroux';
     if (n.includes('calmet')) return 'Dom Augustin Calmet';
@@ -1643,8 +1647,12 @@ const AIStudyView = {
     if (n.includes('lire et comprendre') || n.includes('lirelabible')) return 'Société Biblique';
     if (n.includes('josèphe') || n.includes('josephe') || n.includes('josephus')) return 'Flavius Josèphe';
     if (n.includes('macarthur')) return 'John MacArthur';
-    if (n.includes('spurgeon')) return 'C.H. Spurgeon';
     if (n.includes('henry')) return 'Matthew Henry';
+    if (n.includes('barnes')) return 'Albert Barnes';
+    if (n.includes('wesley')) return 'John Wesley';
+    if (n.includes('scofield')) return 'C.I. Scofield';
+    if (n.includes('darby')) return 'J.N. Darby';
+    if (n.includes('segond')) return 'Louis Segond';
     if (n.includes('augustin')) return 'Saint Augustin';
     if (n.includes('luther')) return 'Martin Luther';
     return '';
@@ -1666,31 +1674,22 @@ const AIStudyView = {
       return `<span class="intext-source-badge strong" title="Code Strong ${code.toUpperCase()}"><span class="badge-icon">${this.ICONS.search}</span><span class="badge-text">${code.toUpperCase()}</span></span>`;
     });
 
-    // 2. Détection universelle de TOUTES les citations de sources documentaires entre crochets [Nom : Terme] ou [Nom (Ref)] ou [Nom]
-    // Ne s'applique pas aux références bibliques pures entre crochets comme [Jn 3:16], [Romains 8:28], [Hb 3-4]
+    // 2. Détection universelle de TOUTES les citations de sources documentaires entre crochets [Nom : Terme] ou [Nom (Ref)] ou [Nom ; Nom]
     const pureScriptureBracketRegex = /^\[\s*(?:[1-3]\s*)?[a-zA-ZÀ-ÿ]+\.?\s*\d+(?:\s*[:.,]\s*\d+(?:\s*[-–—]\s*\d+)?)?\s*\]$/;
-    const universalDocSourceRegex = /\[([A-Za-zÀ-ÿ0-9\s:,'’\.\-–—\(\)\/]+)\]/gi;
+    const universalDocSourceRegex = /\[([A-Za-zÀ-ÿ0-9\s:;,'’\.\-–—\(\)\/]+)\]/gi;
 
-    res = res.replace(universalDocSourceRegex, (match, rawDocName) => {
-      const cleanContent = rawDocName.trim();
-      
-      // Ignorer si code Strong
-      if (/^[GH]\d{1,5}$/i.test(cleanContent) || cleanContent.length < 2) return match;
-
-      // Si c'est une référence biblique pure entre crochets comme [Jean 3:16] ou [Rom 8], laisser linkifyScriptureInText s'en charger
-      if (pureScriptureBracketRegex.test(match) && !cleanContent.toLowerCase().includes('texte biblique') && !cleanContent.toLowerCase().includes('bible') && !cleanContent.includes(':')) {
-        return match;
-      }
+    const buildSinglePill = (rawItem) => {
+      const cleanContent = rawItem.trim();
+      if (!cleanContent || /^[GH]\d{1,5}$/i.test(cleanContent) || cleanContent.length < 2) return '';
 
       let bookName = cleanContent;
       let entryTerm = "";
-      if (cleanContent.includes(':')) {
+      if (cleanContent.includes(':') && !cleanContent.toLowerCase().includes('romains') && !cleanContent.toLowerCase().includes('genèse') && !cleanContent.toLowerCase().includes('psaume')) {
         const parts = cleanContent.split(':');
         bookName = parts[0].trim();
         entryTerm = parts.slice(1).join(':').trim();
       }
 
-      // Normalisation des noms internes abrégés
       const cleanNameMap = {
         "lirelabibles": "Lire et comprendre la Bible",
         "lire/comprendre": "Lire et comprendre la Bible",
@@ -1704,12 +1703,11 @@ const AIStudyView = {
       };
       const mappedBookName = cleanNameMap[bookName.toLowerCase()] || bookName;
 
-      // Recherche de l'ouvrage dans sourcesDetails
       const matched = sourcesDetails.find(s => {
         const t = (s.title || '').toLowerCase();
         const b = mappedBookName.toLowerCase();
         const r = cleanContent.toLowerCase();
-        return t.includes(b) || b.includes(t) || t.includes(r) || r.includes(t) || (entryTerm && t.includes(entryTerm.toLowerCase()));
+        return t === b || t.includes(b) || b.includes(t) || t.includes(r) || r.includes(t) || (entryTerm && t.includes(entryTerm.toLowerCase()));
       });
 
       const typeClass = matched ? this.getSourceTypeClass(matched.type) : this.getSourceTypeClass(mappedBookName);
@@ -1721,18 +1719,37 @@ const AIStudyView = {
       const preview = matched?.preview ? this.escapeHtml(matched.preview) : '';
       const coverData = coverUrl ? `data-cover="${coverUrl}"` : '';
 
-      return `<span class="intext-source-pill" tabindex="0"
-        data-type="${typeClass}"
-        data-title="${this.escapeHtml(displayTitle)}"
-        data-author="${this.escapeHtml(author)}"
-        data-label="${typeLabel}"
-        data-preview="${preview}"
-        ${coverData}
-      >${this.ICONS.book}</span>`;
+      return `<span class="intext-source-pill" tabindex="0" data-type="${typeClass}" data-title="${this.escapeHtml(displayTitle)}" data-author="${this.escapeHtml(author)}" data-label="${typeLabel}" data-preview="${preview}" ${coverData}>${this.ICONS.book}</span>`;
+    };
+
+    res = res.replace(universalDocSourceRegex, (match, fullBracketContent) => {
+      const trimmed = fullBracketContent.trim();
+      if (!trimmed || /^[GH]\d{1,5}$/i.test(trimmed)) return match;
+
+      // Si référence biblique pure comme [Jean 3:16], laisser pour scripture linkifier
+      if (pureScriptureBracketRegex.test(match) && !trimmed.toLowerCase().includes('texte biblique') && !trimmed.toLowerCase().includes('bible') && !trimmed.toLowerCase().includes('commentaire') && !trimmed.includes(';')) {
+        return match;
+      }
+
+      // Gestion multi-sources séparées par point-virgule [Source A ; Source B]
+      if (trimmed.includes(';')) {
+        const parts = trimmed.split(';').map(p => p.trim()).filter(Boolean);
+        const pills = parts.map(p => buildSinglePill(p)).filter(Boolean);
+        return pills.length > 0 ? pills.join(' ') : match;
+      }
+
+      const singlePill = buildSinglePill(trimmed);
+      return singlePill || match;
     });
 
-    // 3. Détection universelle de toutes les références bibliques résiduelles dans le texte
-    res = this.linkifyScriptureInText(res);
+    // 3. Détection des références bibliques UNIQUEMENT sur les nœuds textuels hors balises HTML
+    const parts = res.split(/(<[^>]+>)/g);
+    for (let i = 0; i < parts.length; i += 2) {
+      if (parts[i]) {
+        parts[i] = this.linkifyScriptureInText(parts[i]);
+      }
+    }
+    res = parts.join('');
 
     return res;
   },

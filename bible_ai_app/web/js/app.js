@@ -904,6 +904,16 @@ const App = {
     const btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
     const drawer = document.getElementById('right-drawer');
     const resizer = document.getElementById('drawer-resizer');
+    const appEl = document.getElementById('app');
+
+    // Empêcher tout décalage / défilement horizontal parasite du conteneur principal
+    if (appEl) {
+      appEl.addEventListener('scroll', () => {
+        if (appEl.scrollLeft !== 0) {
+          appEl.scrollLeft = 0;
+        }
+      });
+    }
 
     // 1. Restaurer la largeur personnalisée du volet droit
     try {
@@ -967,13 +977,15 @@ const App = {
           const sidebarWidth = sidebar && !sidebar.classList.contains('collapsed') ? 220 : 58;
           const remainingReaderWidth = window.innerWidth - newWidth - sidebarWidth;
 
-          if (remainingReaderWidth < 540) {
-            // Réduire automatiquement le menu gauche pour préserver la lisibilité du texte biblique
+          if (remainingReaderWidth < 500) {
+            // Réduire automatiquement le menu gauche en mode icônes compactes
             this.setSidebarCollapsed(true, true);
-          } else if (remainingReaderWidth >= 660 && this.sidebarAutoCollapsed) {
+          } else if (remainingReaderWidth >= 640 && this.sidebarAutoCollapsed) {
             // Rétablir le menu gauche s'il avait été réduit automatiquement
             this.setSidebarCollapsed(false, true);
           }
+
+          if (appEl) appEl.scrollLeft = 0;
         };
 
         const onMouseUp = () => {
@@ -986,6 +998,8 @@ const App = {
 
           window.removeEventListener('mousemove', onMouseMove);
           window.removeEventListener('mouseup', onMouseUp);
+
+          if (appEl) appEl.scrollLeft = 0;
 
           const finalWidth = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--drawer-width').trim(), 10);
           if (finalWidth) {
@@ -1013,6 +1027,9 @@ const App = {
     sidebar.classList.toggle('collapsed', collapsed);
     document.body.classList.toggle('sidebar-is-collapsed', collapsed);
 
+    const appEl = document.getElementById('app');
+    if (appEl) appEl.scrollLeft = 0;
+
     if (isAuto) {
       this.sidebarAutoCollapsed = collapsed;
     } else {
@@ -1025,16 +1042,22 @@ const App = {
 
   checkAutoSidebarCollapse() {
     const drawer = document.getElementById('right-drawer');
+    const sidebar = document.getElementById('sidebar');
     const isDrawerOpen = drawer && !drawer.classList.contains('collapsed');
+
+    const appEl = document.getElementById('app');
+    if (appEl) appEl.scrollLeft = 0;
+
     if (!isDrawerOpen) {
       if (this.sidebarAutoCollapsed) {
         this.setSidebarCollapsed(false, true);
       }
     } else {
-      // Volet droit ouvert -> réduire systématiquement le volet gauche pour maximiser l'espace
-      const sidebar = document.getElementById('sidebar');
-      if (sidebar && !sidebar.classList.contains('collapsed')) {
-        this.setSidebarCollapsed(true, true);
+      // Si la fenêtre est particulièrement étroite (< 1100px), réduire en mode icônes
+      if (window.innerWidth < 1100) {
+        if (sidebar && !sidebar.classList.contains('collapsed')) {
+          this.setSidebarCollapsed(true, true);
+        }
       }
     }
 
