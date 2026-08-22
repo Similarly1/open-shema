@@ -209,21 +209,70 @@
       color: #4a2d14 !important;
     }
 
+    /* Texte encre bistre profonde pour le mode clair / sépia sur TOUS les contenus */
     body.reading-bg-sepia .vintage-epoch-ancient .verses-flow,
     body.reading-bg-sepia .vintage-epoch-classic .verses-flow,
     body.reading-bg-sepia .vintage-epoch-xix .verses-flow,
     body.reading-bg-sepia .vintage-epoch-ancient .word-token,
     body.reading-bg-sepia .vintage-epoch-classic .word-token,
     body.reading-bg-sepia .vintage-epoch-xix .word-token,
+    body.reading-bg-sepia .vintage-epoch-ancient .dict-entry-body,
+    body.reading-bg-sepia .vintage-epoch-classic .dict-entry-body,
+    body.reading-bg-sepia .vintage-epoch-xix .dict-entry-body,
+    body.reading-bg-sepia .vintage-epoch-ancient .dict-entry-body-content,
+    body.reading-bg-sepia .vintage-epoch-classic .dict-entry-body-content,
+    body.reading-bg-sepia .vintage-epoch-xix .dict-entry-body-content,
+    body.reading-bg-sepia .vintage-epoch-ancient .dict-entry-body-content *,
+    body.reading-bg-sepia .vintage-epoch-classic .dict-entry-body-content *,
+    body.reading-bg-sepia .vintage-epoch-xix .dict-entry-body-content *,
+    body.reading-bg-sepia .vintage-epoch-ancient p,
+    body.reading-bg-sepia .vintage-epoch-classic p,
+    body.reading-bg-sepia .vintage-epoch-xix p,
+    body.reading-bg-sepia .vintage-epoch-ancient .theol-reading-body *,
+    body.reading-bg-sepia .vintage-epoch-classic .theol-reading-body *,
+    body.reading-bg-sepia .vintage-epoch-xix .theol-reading-body *,
+    body.reading-bg-sepia .vintage-epoch-ancient .comm-body-text *,
+    body.reading-bg-sepia .vintage-epoch-classic .comm-body-text *,
+    body.reading-bg-sepia .vintage-epoch-xix .comm-body-text *,
     body:not(.theme-dark) .vintage-epoch-ancient .verses-flow,
     body:not(.theme-dark) .vintage-epoch-classic .verses-flow,
     body:not(.theme-dark) .vintage-epoch-xix .verses-flow,
     body:not(.theme-dark) .vintage-epoch-ancient .word-token,
     body:not(.theme-dark) .vintage-epoch-classic .word-token,
-    body:not(.theme-dark) .vintage-epoch-xix .word-token {
+    body:not(.theme-dark) .vintage-epoch-xix .word-token,
+    body:not(.theme-dark) .vintage-epoch-ancient .dict-entry-body,
+    body:not(.theme-dark) .vintage-epoch-classic .dict-entry-body,
+    body:not(.theme-dark) .vintage-epoch-xix .dict-entry-body,
+    body:not(.theme-dark) .vintage-epoch-ancient .dict-entry-body-content,
+    body:not(.theme-dark) .vintage-epoch-classic .dict-entry-body-content,
+    body:not(.theme-dark) .vintage-epoch-xix .dict-entry-body-content,
+    body:not(.theme-dark) .vintage-epoch-ancient .dict-entry-body-content *,
+    body:not(.theme-dark) .vintage-epoch-classic .dict-entry-body-content *,
+    body:not(.theme-dark) .vintage-epoch-xix .dict-entry-body-content *,
+    body:not(.theme-dark) .vintage-epoch-ancient p,
+    body:not(.theme-dark) .vintage-epoch-classic p,
+    body:not(.theme-dark) .vintage-epoch-xix p,
+    body:not(.theme-dark) .vintage-epoch-ancient .theol-reading-body *,
+    body:not(.theme-dark) .vintage-epoch-classic .theol-reading-body *,
+    body:not(.theme-dark) .vintage-epoch-xix .theol-reading-body *,
+    body:not(.theme-dark) .vintage-epoch-ancient .comm-body-text *,
+    body:not(.theme-dark) .vintage-epoch-classic .comm-body-text *,
+    body:not(.theme-dark) .vintage-epoch-xix .comm-body-text * {
       font-family: 'IM Fell English', 'Cardo', 'EB Garamond', Georgia, serif !important;
       color: #1d150c !important;
       line-height: 1.85 !important;
+    }
+
+    body.reading-bg-sepia .vintage-epoch-ancient .dict-entry-title,
+    body.reading-bg-sepia .vintage-epoch-classic .dict-entry-title,
+    body.reading-bg-sepia .vintage-epoch-xix .dict-entry-title,
+    body:not(.theme-dark) .vintage-epoch-ancient .dict-entry-title,
+    body:not(.theme-dark) .vintage-epoch-classic .dict-entry-title,
+    body:not(.theme-dark) .vintage-epoch-xix .dict-entry-title {
+      color: #5b2010 !important;
+      font-family: 'Cinzel', 'IM Fell English', Georgia, serif !important;
+      font-weight: 700 !important;
+      letter-spacing: 1px !important;
     }
 
     body.reading-bg-sepia .vintage-epoch-ancient .verse-num,
@@ -289,6 +338,130 @@
       content: " ❧";
       color: #8b5a2b;
       font-size: 14px;
+    }
+
+    /* Notes critiques et renvois d'époque */
+    .dict-calmet-editorial-note {
+      margin: 12px 0 12px 14px;
+      padding: 10px 14px;
+      background: rgba(0, 0, 0, 0.04);
+      border-left: 3.5px solid var(--accent-blue, #3b82f6);
+      border-radius: 0 6px 6px 0;
+      font-size: 13.5px;
+      line-height: 1.65;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+    .dict-calmet-note-label {
+      font-weight: 700;
+      font-style: normal;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    body.theme-dark .dict-calmet-editorial-note {
+      background: rgba(245, 158, 11, 0.08);
+      border-left-color: #f59e0b;
+      color: #e4d8c2;
+    }
+    body.theme-dark .dict-calmet-note-label {
+      color: #f59e0b;
+    }
+
+    body.reading-bg-sepia .dict-calmet-editorial-note,
+    body:not(.theme-dark) .dict-calmet-editorial-note {
+      background: rgba(140, 38, 20, 0.06);
+      border-left-color: #8c2614;
+      color: #2b1b0d;
+    }
+    body.reading-bg-sepia .dict-calmet-note-label,
+    body:not(.theme-dark) .dict-calmet-note-label {
+      color: #8c2614;
+    }
+
+    /* Gloses et précisions courtes inline d'époque (ex: [ou, plus communément, ABGARE]) */
+    .dict-editorial-gloss {
+      font-style: italic;
+      opacity: 0.9;
+      font-size: 0.95em;
+      padding: 0 1px;
+    }
+    body.theme-dark .dict-editorial-gloss {
+      color: #e2cfae;
+    }
+    body.reading-bg-sepia .dict-editorial-gloss,
+    body:not(.theme-dark) .dict-editorial-gloss {
+      color: #6b3518;
+    }
+
+    /* Renvois de dictionnaire (🔗 Mot-clé) */
+    .theme-dark .vintage-epoch-ancient .dict-cross-ref-link,
+    .theme-dark .vintage-epoch-classic .dict-cross-ref-link,
+    .theme-dark .vintage-epoch-xix .dict-cross-ref-link {
+      background: rgba(245, 158, 11, 0.16) !important;
+      color: #f59e0b !important;
+      border: 1px solid rgba(245, 158, 11, 0.45) !important;
+      font-weight: 700 !important;
+    }
+    .theme-dark .vintage-epoch-ancient .dict-cross-ref-link:hover,
+    .theme-dark .vintage-epoch-classic .dict-cross-ref-link:hover,
+    .theme-dark .vintage-epoch-xix .dict-cross-ref-link:hover {
+      background: #f59e0b !important;
+      color: #11151e !important;
+    }
+
+    body.reading-bg-sepia .dict-cross-ref-link,
+    body:not(.theme-dark) .vintage-epoch-ancient .dict-cross-ref-link,
+    body:not(.theme-dark) .vintage-epoch-classic .dict-cross-ref-link,
+    body:not(.theme-dark) .vintage-epoch-xix .dict-cross-ref-link {
+      background: rgba(140, 38, 20, 0.1) !important;
+      color: #8c2614 !important;
+      border: 1px solid rgba(140, 38, 20, 0.35) !important;
+      font-weight: 700 !important;
+    }
+    body.reading-bg-sepia .dict-cross-ref-link:hover,
+    body:not(.theme-dark) .vintage-epoch-ancient .dict-cross-ref-link:hover,
+    body:not(.theme-dark) .vintage-epoch-classic .dict-cross-ref-link:hover,
+    body:not(.theme-dark) .vintage-epoch-xix .dict-cross-ref-link:hover {
+      background: #8c2614 !important;
+      color: #ffffff !important;
+    }
+
+    /* Sous-entrées homonymes Calmet / NDB */
+    .theme-dark .vintage-epoch-ancient .dict-subentry-card,
+    .theme-dark .vintage-epoch-classic .dict-subentry-card,
+    .theme-dark .vintage-epoch-xix .dict-subentry-card {
+      background: rgba(14, 18, 28, 0.8) !important;
+      border: 1px solid rgba(245, 158, 11, 0.25) !important;
+      border-left: 3.5px solid #f59e0b !important;
+      color: #e4d8c2 !important;
+    }
+    .theme-dark .vintage-epoch-ancient .dict-subentry-num,
+    .theme-dark .vintage-epoch-classic .dict-subentry-num,
+    .theme-dark .vintage-epoch-xix .dict-subentry-num {
+      background: #d97706 !important;
+      color: #11151e !important;
+    }
+
+    body.reading-bg-sepia .dict-subentry-card,
+    body:not(.theme-dark) .vintage-epoch-ancient .dict-subentry-card,
+    body:not(.theme-dark) .vintage-epoch-classic .dict-subentry-card,
+    body:not(.theme-dark) .vintage-epoch-xix .dict-subentry-card {
+      background: rgba(255, 252, 245, 0.7) !important;
+      border: 1px solid rgba(139, 90, 43, 0.3) !important;
+      border-left: 3.5px solid #8c2614 !important;
+      color: #1d150c !important;
+    }
+    body.reading-bg-sepia .dict-subentry-num,
+    body:not(.theme-dark) .vintage-epoch-ancient .dict-subentry-num,
+    body:not(.theme-dark) .vintage-epoch-classic .dict-subentry-num,
+    body:not(.theme-dark) .vintage-epoch-xix .dict-subentry-num {
+      background: #8c2614 !important;
+      color: #ffffff !important;
     }
 
     /* =========================================================================

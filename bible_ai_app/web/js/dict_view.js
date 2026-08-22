@@ -864,8 +864,8 @@ const DictView = {
 
     // 0b. Restructuration Automatique des textes bruts (Logos / NDB)
     if (this.optLogosRestructure) {
-      // Badges de versions bibliques EN PREMIER (évite que T.O.B. soit pris pour un tome "t." de source)
-      processed = processed.replace(/(^|[^\w])(SEGOND|SYNODALE|JÉRUSALEM|T\.O\.B\.|TOB|DARBY|Français Courant|Colombe|BFC|NBS|NFC|S21)\b/gi, '$1<span class="dict-version-badge">$2</span>');
+      // Badges de versions bibliques EN PREMIER (explicite pour éviter de capturer la ville de Jérusalem)
+      processed = processed.replace(/(^|[^\w])(Bible\s+de\s+Jérusalem|SEGOND|SYNODALE|T\.O\.B\.|TOB|DARBY|Français\s+Courant|Colombe|BFC|NBS|NFC|S21)\b/gi, '$1<span class="dict-version-badge">$2</span>');
 
       // Normalisation des marqueurs orphelins (chiffre ou lettre seul sur une ligne avec texte sur la suivante)
       processed = processed.replace(/^(\d+)\.?\s*\n+([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇa-zÀ-ÿ])/gm, '$1. $2');
@@ -909,7 +909,7 @@ const DictView = {
             for (let i = 1; i < parts.length; i += 2) {
               const num = parts[i];
               let body = (parts[i + 1] || '').trim().replace(/\.+$/, '');
-              outCards.push(`<div class="dict-subentry-card dict-calmet-homonym" id="dict-subentry-${num}" style="display: flex; align-items: flex-start; gap: 12px; margin: 12px 0; padding: 11px 15px; background: rgba(99, 102, 241, 0.035); border: 1px solid rgba(99, 102, 241, 0.16); border-left: 4px solid #6366f1; border-radius: 0 8px 8px 0; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);"><span class="dict-subentry-num" style="flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; min-width: 24px; background: #6366f1; color: #ffffff; border-radius: 6px; font-size: 12.5px; font-weight: 800; margin-top: 1px; box-shadow: 0 2px 4px rgba(99, 102, 241, 0.25);">${num}</span><div class="dict-subentry-content" style="flex: 1; font-size: 14.5px; line-height: 1.75;">${body}</div></div>`);
+              outCards.push(`<div class="dict-subentry-card dict-calmet-homonym" id="dict-subentry-${num}"><span class="dict-subentry-num">${num}</span><div class="dict-subentry-content" style="flex: 1; font-size: 14.5px; line-height: 1.75;">${body}</div></div>`);
             }
             processed = outCards.join('\n\n');
           }
@@ -931,26 +931,34 @@ const DictView = {
 
         // Renvois cliquables vers les autres articles de Calmet
         processed = processed.replace(/\b(?:dans|à|sous)\s+l’article\s+(?:de\s+|d’)?([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ]{2,})\b/g, (match, word) => {
-          return `dans l’article de <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word)}" style="font-weight:700; color:#6366f1;">🔗 ${this.escapeHtml(word)}</a>`;
+          return `dans l’article de <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word)}">🔗 ${this.escapeHtml(word)}</a>`;
         });
         processed = processed.replace(/\bcomme on le verra dans l'article de\s+([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ]{2,})\b/g, (match, word) => {
-          return `comme on le verra dans l'article de <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word)}" style="font-weight:700; color:#6366f1;">🔗 ${this.escapeHtml(word)}</a>`;
+          return `comme on le verra dans l'article de <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word)}">🔗 ${this.escapeHtml(word)}</a>`;
         });
         processed = processed.replace(/\bVoyez\s+([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ]{2,})\b/g, (match, word) => {
-          return `Voyez <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word)}" style="font-weight:700; color:#6366f1;">🔗 ${this.escapeHtml(word)}</a>`;
+          return `Voyez <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word)}">🔗 ${this.escapeHtml(word)}</a>`;
         });
       }
 
-      // Notes critiques entre crochets [...] (Calmet & général)
+      // Notes critiques et gloses éditoriales entre crochets [...] (Calmet & général)
       if (processed.includes('[')) {
-        processed = processed.replace(/\[([^\]]{10,900})\]/g, (match, inner) => {
+        processed = processed.replace(/\[([^\]]{3,900})\]/g, (match, inner) => {
           const cleanInner = inner.trim();
+          // Cas d'un renvoi direct : [Voyez X] ou [Voir X]
           if (/^(?:Voyez|Voir)\s+[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]+$/i.test(cleanInner)) {
             const word = cleanInner.replace(/^(?:Voyez|Voir)\s+/i, '').trim();
-            return `<a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word)}" style="font-weight:700; color:#6366f1;">🔗 Voyez ${this.escapeHtml(word)}</a>`;
+            return `<a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word)}">🔗 Voyez ${this.escapeHtml(word)}</a>`;
           }
-          return `<div class="dict-calmet-editorial-note" style="margin: 12px 0 12px 14px; padding: 9px 14px; background: rgba(148, 163, 184, 0.08); border-left: 3px solid #94a3b8; border-radius: 0 6px 6px 0; font-size: 13.5px; line-height: 1.65; color: var(--text-secondary); font-style: italic;"><span style="font-weight: 700; font-style: normal; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; display: block; margin-bottom: 4px;">📝 Note critique :</span>${cleanInner}</div>`;
+          // Si c'est un long bloc éditorial indépendant (> 160 caractères ou note de savant/M. Boré)
+          if (cleanInner.length > 160 && (cleanInner.includes('. ') || cleanInner.startsWith('M.') || cleanInner.startsWith('Note'))) {
+            return `\n\n<div class="dict-calmet-editorial-note"><span class="dict-calmet-note-label">📝 Note critique :</span>${cleanInner}</div>\n\n`;
+          }
+          // Sinon, glose ou précision courte inline : reste dans le flux continu de la phrase pour ne pas casser la ponctuation
+          return `<span class="dict-editorial-gloss">[${cleanInner}]</span>`;
         });
+        // Nettoyage des virgules ou points orphelins en début de ligne
+        processed = processed.replace(/\n\s*([,;:\.])/g, '$1');
       }
 
       // Badges chronologiques (An du monde / av. J.-C.)
@@ -1120,8 +1128,8 @@ const DictView = {
           }
 
           out.push(`
-            <div class="dict-roman-heading" style="margin-top: 24px; margin-bottom: 10px; font-size: 16.5px; font-weight: 800; color: var(--text-primary); border-bottom: 1.5px solid #6366f1; padding-bottom: 5px; display: flex; align-items: center; gap: 8px;">
-              <span class="dict-roman-badge" style="display: inline-flex; align-items: center; justify-content: center; background: #6366f1; color: #ffffff; border-radius: 5px; padding: 2px 9px; font-size: 12.5px; font-weight: 800;">${romNum}</span>
+            <div class="dict-roman-heading">
+              <span class="dict-roman-badge">${romNum}</span>
               <span class="dict-roman-title">${this.escapeHtml(titlePart)}</span>
             </div>
           `);
@@ -1142,8 +1150,8 @@ const DictView = {
         const rest = (subHdrMatch[3] || '').trim();
 
         out.push(`
-          <div class="dict-subentry-heading" style="margin-top: 22px; margin-bottom: 8px; font-size: 16px; font-weight: 800; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">
-            <span class="dict-subentry-num" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; min-width: 24px; background: #6366f1; color: #fff; border-radius: 6px; font-size: 12.5px; font-weight: 700; margin-right: 6px;">${num}</span>
+          <div class="dict-subentry-heading">
+            <span class="dict-subentry-num">${num}</span>
             <span>${this.escapeHtml(name)}</span>
           </div>
         `);
@@ -1178,9 +1186,9 @@ const DictView = {
           }
 
           out.push(`
-            <div class="dict-subentry-card" id="dict-subentry-${num}" style="display: flex; align-items: flex-start; gap: 12px; margin: 12px 0; padding: 11px 15px; background: rgba(99, 102, 241, 0.035); border: 1px solid rgba(99, 102, 241, 0.16); border-left: 4px solid #6366f1; border-radius: 0 8px 8px 0; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);">
-              <span class="dict-subentry-num" style="flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; min-width: 24px; background: #6366f1; color: #ffffff; border-radius: 6px; font-size: 12.5px; font-weight: 800; margin-top: 1px; box-shadow: 0 2px 4px rgba(99, 102, 241, 0.25);">${num}</span>
-              <div class="dict-subentry-content" style="flex: 1; font-size: 14.5px; line-height: 1.75;">${content}</div>
+            <div class="dict-subentry-card" id="dict-subentry-${num}">
+              <span class="dict-subentry-num">${num}</span>
+              <div class="dict-subentry-content">${content}</div>
             </div>
           `);
           return;
