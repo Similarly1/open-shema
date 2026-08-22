@@ -1217,6 +1217,7 @@ const VintageThemeManager = {
 
     this.syncUIControls();
     this.bindEvents();
+    this.refreshAll();
   },
 
   syncUIControls() {
@@ -1298,7 +1299,7 @@ const VintageThemeManager = {
     this.persistSettings();
     this.refreshAll();
     if (typeof App !== 'undefined' && App.showToast) {
-      App.showToast(this.enabled ? 'Mode Immersion Historique activé' : 'Mode Immersion Historique désactivé');
+      App.showToast(this.enabled ? '📜 Mode Immersion Historique activé' : 'Mode Immersion Historique désactivé');
     }
   },
 
@@ -1311,41 +1312,59 @@ const VintageThemeManager = {
     if (!yearOrName) return this.scope === 'always' ? 'xix' : 'modern';
 
     let str = String(yearOrName).trim();
-    let num = parseInt(str.replace(/[^\d]/g, ''), 10);
-
     const sLower = str.toLowerCase();
 
-    // Détections textuelles prioritaires (Antiquité & Manuscrits)
-    if (sLower.includes('vulgate') || sLower.includes('hebreu') || sLower.includes('hébreu') || 
-        sLower.includes('grec') || sLower.includes('septante') || sLower.includes('lxx') || 
-        sLower.includes('peshitta') || sLower.includes('tischendorf') || sLower.includes('augustin') || 
-        sLower.includes('chrysostome') || sLower.includes('origene') || sLower.includes('origène')) {
+    // 0. Exclusions prioritaires : Versions résolument contemporaines (Segond 21, NBS, TOB, BDS, NFC, SEM, etc.)
+    if (sLower.includes('segond 21') || sLower.includes('s21') || sLower.includes('nbs') || 
+        sLower.includes('tob') || sLower.includes('bds') || sLower.includes('nfc') || 
+        sLower.includes('semeur') || sLower.includes('parole de vie') || sLower.includes('pdv') || 
+        sLower.includes('francais courant') || sLower.includes('colombe') || sLower.includes('chouraqui') ||
+        sLower.includes('bayard') || sLower.includes('jerusalem') || sLower.includes('bdj') ||
+        sLower.includes('epee') || sLower.includes('epée') || sLower.includes('osty') ||
+        sLower.includes('bible du semeur') || sLower.includes('nouvelle bible segond')) {
+      return this.scope === 'always' ? 'xix' : 'modern';
+    }
+
+    // 1. Détection prioritaire par année à 4 chiffres (1400 à 2099)
+    const yearMatch = str.match(/\b(1[4-9][0-9]{2}|20[0-9]{2})\b/);
+    if (yearMatch) {
+      const yr = parseInt(yearMatch[1], 10);
+      if (yr >= 1930) return this.scope === 'always' ? 'xix' : 'modern';
+      if (yr >= 1800) return 'xix';
+      if (yr >= 1500) return 'classic';
       return 'ancient';
     }
 
-    // Période Classique & Réforme (1500 - 1799)
-    if (sLower.includes('martin 1744') || sLower.includes('david martin') || sLower.includes('osterwald') || 
-        sLower.includes('ostervald') || sLower.includes('calvin') || sLower.includes('matthew henry') || 
-        sLower.includes('henry') || sLower.includes('kjv') || sLower.includes('king james') || 
-        sLower.includes('geneve 1669') || sLower.includes('geneve 1560') || sLower.includes('genève') ||
+    // 2. Détections textuelles : Antiquité & Manuscrits (< 1500)
+    if (sLower.includes('vulgate') || sLower.includes('vul') || sLower.includes('hebreu') || sLower.includes('hébreu') || 
+        sLower.includes('grec') || sLower.includes('septante') || sLower.includes('lxx') || sLower.includes('wlc') ||
+        sLower.includes('peshitta') || sLower.includes('tischendorf') || sLower.includes('augustin') || 
+        sLower.includes('chrysostome') || sLower.includes('origene') || sLower.includes('origène') ||
+        sLower.includes('byz') || sLower.includes('textus receptus') || sLower.includes('tr')) {
+      return 'ancient';
+    }
+
+    // 3. Période Classique & Réforme (1500 - 1799)
+    if (sLower.includes('martin') || sLower.includes('mrt') || sLower.includes('dm1744') ||
+        sLower.includes('osterwald') || sLower.includes('ostervald') || sLower.includes('ost') || sLower.includes('jfo') ||
+        sLower.includes('calvin') || sLower.includes('matthew henry') || sLower.includes('henry') || 
+        sLower.includes('kjv') || sLower.includes('king james') || sLower.includes('geneve 1669') || 
+        sLower.includes('geneve 1560') || sLower.includes('genève') || sLower.includes('bgen') ||
         sLower.includes('diodati') || sLower.includes('reina valera 1602') || sLower.includes('gill') || sLower.includes('wesley')) {
       return 'classic';
     }
 
-    // Fin XIXe / Début XXe (1800 - 1929)
-    if (sLower.includes('segond 1910') || sLower.includes('lsg 1910') || sLower.includes('lsg') || 
-        sLower.includes('darby') || sLower.includes('vigouroux') || sLower.includes('godet') || 
-        sLower.includes('bible annotée') || sLower.includes('scofield') || sLower.includes('crampon') || 
+    // 4. Fin XIXe / Belle Époque (1800 - 1929)
+    if (sLower.includes('lausanne') || sLower.includes('lau') ||
+        sLower.includes('segond') || sLower.includes('lsg') ||
+        sLower.includes('darby') || sLower.includes('drb') ||
+        sLower.includes('vigouroux') || sLower.includes('vigo') ||
+        sLower.includes('godet') || sLower.includes('bible annotée') || sLower.includes('ban') ||
+        sLower.includes('scofield') || sLower.includes('crampon') || sLower.includes('bcr') ||
         sLower.includes('stapfer') || sLower.includes('glaire') || sLower.includes('fillion') || 
-        sLower.includes('keil') || sLower.includes('delitzsch') || sLower.includes('jamieson')) {
+        sLower.includes('keil') || sLower.includes('delitzsch') || sLower.includes('jamieson') ||
+        sLower.includes('calmet') || sLower.includes('westcott') || sLower.includes('hort')) {
       return 'xix';
-    }
-
-    if (!isNaN(num) && num > 0) {
-      if (num < 1500) return 'ancient';
-      if (num <= 1799) return 'classic';
-      if (num <= 1929) return 'xix';
-      return this.scope === 'always' ? 'xix' : 'modern';
     }
 
     return this.scope === 'always' ? 'xix' : 'modern';

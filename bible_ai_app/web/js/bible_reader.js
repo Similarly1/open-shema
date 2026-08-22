@@ -3439,18 +3439,44 @@ const BibleReader = {
     // Volet Gauche (Pane 1)
     const p1 = document.getElementById('pane-left');
     if (p1) {
-      const b1 = (this.installedBibles || []).find(b => b.name === this.currentBible1);
-      const year1 = b1?.annee || b1?.year || this.currentBible1;
+      const b1 = (this.installedBibles || []).find(b => 
+        b.name === this.currentBible1 || 
+        b.id === this.currentBible1 || 
+        (b.version_code && b.version_code.toUpperCase() === (this.currentBible1 || '').toUpperCase())
+      );
+      const year1 = b1?.annee || b1?.year || b1?.title || this.currentBible1;
       VintageThemeManager.applyEpochToElement(p1, year1);
+
+      const content1 = document.getElementById('pane-1-content');
+      if (content1) VintageThemeManager.applyEpochToElement(content1, year1);
+      const chapter1 = document.getElementById('pane-1-chapter');
+      if (chapter1) VintageThemeManager.applyEpochToElement(chapter1, year1);
+      const verses1 = document.getElementById('pane-1-verses');
+      if (verses1) VintageThemeManager.applyEpochToElement(verses1, year1);
+      p1.querySelectorAll('.chapter-block').forEach(cb => VintageThemeManager.applyEpochToElement(cb, year1));
+
       this.updatePaneVintageBadge(1, year1);
     }
 
     // Volet Droit (Pane 2)
     const p2 = document.getElementById('pane-right');
     if (p2) {
-      const b2 = (this.installedBibles || []).find(b => b.name === this.currentBible2);
-      const year2 = b2?.annee || b2?.year || this.currentBible2;
+      const b2 = (this.installedBibles || []).find(b => 
+        b.name === this.currentBible2 || 
+        b.id === this.currentBible2 || 
+        (b.version_code && b.version_code.toUpperCase() === (this.currentBible2 || '').toUpperCase())
+      );
+      const year2 = b2?.annee || b2?.year || b2?.title || this.currentBible2;
       VintageThemeManager.applyEpochToElement(p2, year2);
+
+      const content2 = document.getElementById('pane-2-content');
+      if (content2) VintageThemeManager.applyEpochToElement(content2, year2);
+      const chapter2 = document.getElementById('pane-2-chapter');
+      if (chapter2) VintageThemeManager.applyEpochToElement(chapter2, year2);
+      const verses2 = document.getElementById('pane-2-verses');
+      if (verses2) VintageThemeManager.applyEpochToElement(verses2, year2);
+      p2.querySelectorAll('.chapter-block').forEach(cb => VintageThemeManager.applyEpochToElement(cb, year2));
+
       this.updatePaneVintageBadge(2, year2);
     }
   },
@@ -3471,7 +3497,11 @@ const BibleReader = {
       return;
     }
 
-    const bInfo = (this.installedBibles || []).find(b => b.name === (paneNum === 1 ? this.currentBible1 : this.currentBible2));
+    const bInfo = (this.installedBibles || []).find(b => 
+      b.name === (paneNum === 1 ? this.currentBible1 : this.currentBible2) ||
+      b.id === (paneNum === 1 ? this.currentBible1 : this.currentBible2) ||
+      (b.version_code && b.version_code.toUpperCase() === (paneNum === 1 ? this.currentBible1 : this.currentBible2 || '').toUpperCase())
+    );
     const year = bInfo?.annee || bInfo?.year || null;
     const label = VintageThemeManager.getEpochLabel(epoch, year);
 
@@ -3829,6 +3859,7 @@ const BibleReader = {
     if (pane1 && !targetVerse) pane1.scrollTop = 0;
 
     TabsManager.updateActiveTab(null, bookCode, chapterNum);
+    this.applyVintageToPanes();
 
     if (targetVerse) {
       this.selectAndScrollToVerse(targetVerse, bookCode, chapterNum);
@@ -4067,6 +4098,20 @@ const BibleReader = {
     block.className = 'chapter-block';
     block.dataset.book = data.book || this.currentBook;
     block.dataset.chapter = data.chapter || this.currentChapter;
+
+    if (typeof VintageThemeManager !== 'undefined') {
+      const bInfo = (this.installedBibles || []).find(b => 
+        b.name === bibleName || 
+        b.id === bibleName || 
+        (b.version_code && b.version_code.toUpperCase() === (bibleName || '').toUpperCase())
+      );
+      const year = bInfo?.annee || bInfo?.year || bInfo?.title || bibleName;
+      const epoch = VintageThemeManager.getEpoch(year);
+      if (VintageThemeManager.enabled && epoch !== 'modern') {
+        block.classList.add(`vintage-epoch-${epoch}`);
+        block.classList.add(`vintage-intensity-${VintageThemeManager.intensity}`);
+      }
+    }
 
     if (data.pericope) {
       const pericope = document.createElement('h1');

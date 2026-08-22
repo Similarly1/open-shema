@@ -12,7 +12,306 @@
   
   <!-- CSS -->
   <link rel="stylesheet" href="css/leaflet.css">
-  <link rel="stylesheet" href="css/logos.css?v=2.9">
+  <link rel="stylesheet" href="css/logos.css?v=3.0">
+
+  <style id="vintage-core-styles">
+    /* =========================================================================
+     * INLINE STYLES : IMMERSION HISTORIQUE NOBLE & ÉPURÉE (LIGHT & DARK)
+     * ========================================================================= */
+    :root {
+      --vintage-noise-svg: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    }
+
+    /* BADGE D'ÉPOQUE */
+    .vintage-epoch-pill {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 5px !important;
+      padding: 2px 8px !important;
+      font-size: 10.5px !important;
+      font-weight: 700 !important;
+      border-radius: 12px !important;
+      letter-spacing: 0.3px !important;
+      text-transform: uppercase !important;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15) !important;
+      user-select: none !important;
+    }
+    .vintage-epoch-pill.ancient {
+      background: rgba(180, 83, 9, 0.18) !important;
+      color: #92400e !important;
+      border: 1px solid rgba(180, 83, 9, 0.4) !important;
+    }
+    .vintage-epoch-pill.classic {
+      background: rgba(161, 98, 7, 0.18) !important;
+      color: #854d0e !important;
+      border: 1px solid rgba(161, 98, 7, 0.4) !important;
+    }
+    .vintage-epoch-pill.xix {
+      background: rgba(180, 100, 30, 0.15) !important;
+      color: #854d0e !important;
+      border: 1px solid rgba(180, 100, 30, 0.35) !important;
+    }
+    .theme-dark .vintage-epoch-pill {
+      background: rgba(245, 158, 11, 0.15) !important;
+      color: #f59e0b !important;
+      border: 1px solid rgba(245, 158, 11, 0.4) !important;
+    }
+
+    /* =========================================================================
+     * 1. MODE SOMBRE : « GRIMOIRE NOBLE & ÉPURÉ » (SOBRIÉTÉ ET FINESSE)
+     * ========================================================================= */
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .pane-scrollable-content,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .pane-scrollable-content,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .pane-scrollable-content,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .chapter-block,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .chapter-block,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .chapter-block {
+      background-color: #131720 !important;
+      background-image: 
+        radial-gradient(ellipse at 50% 40%, rgba(30, 41, 59, 0.45) 0%, rgba(15, 20, 28, 0.9) 100%),
+        var(--vintage-noise-svg) !important;
+      box-shadow: inset 0 0 45px rgba(0, 0, 0, 0.45) !important;
+      color: #e4d8c2 !important;
+    }
+
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .verses-flow,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .verses-flow,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .verses-flow,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .word-token,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .word-token,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .word-token {
+      font-family: 'IM Fell English', 'Cardo', 'EB Garamond', Georgia, serif !important;
+      color: #e4d8c2 !important;
+      line-height: 1.85 !important;
+    }
+
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .verse-num,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .verse-num,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .verse-num {
+      color: #d97706 !important;
+      font-weight: 700 !important;
+      opacity: 0.9 !important;
+    }
+
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .chapter-number-dropcap,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .chapter-number-dropcap,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .chapter-number-dropcap {
+      color: #f59e0b !important;
+      font-family: 'Cinzel', 'IM Fell English', Georgia, serif !important;
+      font-size: 2.4em !important;
+      font-weight: 700 !important;
+      line-height: 0.9 !important;
+      float: left !important;
+      margin: 0 8px 0 0 !important;
+      padding: 0 !important;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      text-shadow: 0 0 12px rgba(245, 158, 11, 0.3) !important;
+    }
+
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .pericope-title,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .pericope-title,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .pericope-title {
+      color: #f59e0b !important;
+      font-family: 'IM Fell English', 'Cinzel', Georgia, serif !important;
+      font-size: 1.25em !important;
+      font-style: italic !important;
+      text-align: center !important;
+      margin: 20px 0 16px 0 !important;
+      letter-spacing: 0.5px !important;
+      border: none !important;
+      padding: 0 !important;
+    }
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .pericope-title::before,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .pericope-title::before,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .pericope-title::before {
+      content: "❦ ";
+      color: #d97706;
+      font-size: 14px;
+    }
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .pericope-title::after,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .pericope-title::after,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .pericope-title::after {
+      content: " ❧";
+      color: #d97706;
+      font-size: 14px;
+    }
+
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .pane-header,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .pane-header,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .pane-header {
+      background: #171d27 !important;
+      border-bottom: 1px solid rgba(245, 158, 11, 0.2) !important;
+      color: #e4d8c2 !important;
+    }
+
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .pane-breadcrumb,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .pane-breadcrumb,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .pane-breadcrumb {
+      color: #f59e0b !important;
+      font-family: 'Cinzel', Georgia, serif !important;
+    }
+
+    /* =========================================================================
+     * 2. MODE SÉPIA / PAPIER VERGÉ ÉLÉGANT (SOBRE & SUBTIL)
+     * S'applique dès que reading-bg-sepia est actif, ou en mode clair vintage
+     * ========================================================================= */
+    body.reading-bg-sepia .vintage-epoch-ancient,
+    body.reading-bg-sepia .vintage-epoch-classic,
+    body.reading-bg-sepia .vintage-epoch-xix,
+    body.reading-bg-sepia .vintage-epoch-ancient .pane-scrollable-content,
+    body.reading-bg-sepia .vintage-epoch-classic .pane-scrollable-content,
+    body.reading-bg-sepia .vintage-epoch-xix .pane-scrollable-content,
+    body.reading-bg-sepia .vintage-epoch-ancient .chapter-block,
+    body.reading-bg-sepia .vintage-epoch-classic .chapter-block,
+    body.reading-bg-sepia .vintage-epoch-xix .chapter-block,
+    body:not(.theme-dark) .vintage-epoch-ancient,
+    body:not(.theme-dark) .vintage-epoch-classic,
+    body:not(.theme-dark) .vintage-epoch-xix,
+    body:not(.theme-dark) .vintage-epoch-ancient .pane-scrollable-content,
+    body:not(.theme-dark) .vintage-epoch-classic .pane-scrollable-content,
+    body:not(.theme-dark) .vintage-epoch-xix .pane-scrollable-content,
+    body:not(.theme-dark) .vintage-epoch-ancient .chapter-block,
+    body:not(.theme-dark) .vintage-epoch-classic .chapter-block,
+    body:not(.theme-dark) .vintage-epoch-xix .chapter-block {
+      background-color: #f4ecdc !important;
+      background-image: 
+        radial-gradient(circle at 14% 16%, rgba(135, 80, 25, 0.16) 0%, transparent 28px),
+        radial-gradient(circle at 86% 22%, rgba(125, 75, 20, 0.14) 0%, transparent 35px),
+        radial-gradient(circle at 8% 68%, rgba(140, 85, 30, 0.15) 0%, transparent 26px),
+        radial-gradient(circle at 91% 78%, rgba(130, 78, 22, 0.18) 0%, transparent 40px),
+        repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(140, 95, 45, 0.04) 28px),
+        radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.4) 0%, rgba(244, 236, 220, 0.6) 70%, rgba(224, 208, 180, 0.5) 100%),
+        var(--vintage-noise-svg) !important;
+      box-shadow: inset 0 0 45px rgba(130, 85, 30, 0.15) !important;
+      color: #1d150c !important;
+    }
+
+    body.reading-bg-sepia .vintage-epoch-ancient .pane-header,
+    body.reading-bg-sepia .vintage-epoch-classic .pane-header,
+    body.reading-bg-sepia .vintage-epoch-xix .pane-header,
+    body:not(.theme-dark) .vintage-epoch-ancient .pane-header,
+    body:not(.theme-dark) .vintage-epoch-classic .pane-header,
+    body:not(.theme-dark) .vintage-epoch-xix .pane-header {
+      background: #ebdcc5 !important;
+      border-bottom: 1px solid rgba(139, 90, 43, 0.25) !important;
+      color: #4a2d14 !important;
+    }
+
+    body.reading-bg-sepia .vintage-epoch-ancient .verses-flow,
+    body.reading-bg-sepia .vintage-epoch-classic .verses-flow,
+    body.reading-bg-sepia .vintage-epoch-xix .verses-flow,
+    body.reading-bg-sepia .vintage-epoch-ancient .word-token,
+    body.reading-bg-sepia .vintage-epoch-classic .word-token,
+    body.reading-bg-sepia .vintage-epoch-xix .word-token,
+    body:not(.theme-dark) .vintage-epoch-ancient .verses-flow,
+    body:not(.theme-dark) .vintage-epoch-classic .verses-flow,
+    body:not(.theme-dark) .vintage-epoch-xix .verses-flow,
+    body:not(.theme-dark) .vintage-epoch-ancient .word-token,
+    body:not(.theme-dark) .vintage-epoch-classic .word-token,
+    body:not(.theme-dark) .vintage-epoch-xix .word-token {
+      font-family: 'IM Fell English', 'Cardo', 'EB Garamond', Georgia, serif !important;
+      color: #1d150c !important;
+      line-height: 1.85 !important;
+    }
+
+    body.reading-bg-sepia .vintage-epoch-ancient .verse-num,
+    body.reading-bg-sepia .vintage-epoch-classic .verse-num,
+    body.reading-bg-sepia .vintage-epoch-xix .verse-num,
+    body:not(.theme-dark) .vintage-epoch-ancient .verse-num,
+    body:not(.theme-dark) .vintage-epoch-classic .verse-num,
+    body:not(.theme-dark) .vintage-epoch-xix .verse-num {
+      color: #8c2614 !important;
+      font-weight: 700 !important;
+    }
+
+    body.reading-bg-sepia .vintage-epoch-ancient .chapter-number-dropcap,
+    body.reading-bg-sepia .vintage-epoch-classic .chapter-number-dropcap,
+    body.reading-bg-sepia .vintage-epoch-xix .chapter-number-dropcap,
+    body:not(.theme-dark) .vintage-epoch-ancient .chapter-number-dropcap,
+    body:not(.theme-dark) .vintage-epoch-classic .chapter-number-dropcap,
+    body:not(.theme-dark) .vintage-epoch-xix .chapter-number-dropcap {
+      color: #8c2614 !important;
+      font-family: 'Cinzel', 'IM Fell English', Georgia, serif !important;
+      font-size: 2.4em !important;
+      font-weight: 700 !important;
+      line-height: 0.9 !important;
+      float: left !important;
+      margin: 0 8px 0 0 !important;
+      padding: 0 !important;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    body.reading-bg-sepia .vintage-epoch-ancient .pericope-title,
+    body.reading-bg-sepia .vintage-epoch-classic .pericope-title,
+    body.reading-bg-sepia .vintage-epoch-xix .pericope-title,
+    body:not(.theme-dark) .vintage-epoch-ancient .pericope-title,
+    body:not(.theme-dark) .vintage-epoch-classic .pericope-title,
+    body:not(.theme-dark) .vintage-epoch-xix .pericope-title {
+      color: #6b2612 !important;
+      font-family: 'IM Fell English', 'Cinzel', Georgia, serif !important;
+      font-size: 1.25em !important;
+      font-style: italic !important;
+      text-align: center !important;
+      margin: 20px 0 16px 0 !important;
+      border: none !important;
+      padding: 0 !important;
+    }
+    body.reading-bg-sepia .vintage-epoch-ancient .pericope-title::before,
+    body.reading-bg-sepia .vintage-epoch-classic .pericope-title::before,
+    body.reading-bg-sepia .vintage-epoch-xix .pericope-title::before,
+    body:not(.theme-dark) .vintage-epoch-ancient .pericope-title::before,
+    body:not(.theme-dark) .vintage-epoch-classic .pericope-title::before,
+    body:not(.theme-dark) .vintage-epoch-xix .pericope-title::before {
+      content: "❦ ";
+      color: #8b5a2b;
+      font-size: 14px;
+    }
+    body.reading-bg-sepia .vintage-epoch-ancient .pericope-title::after,
+    body.reading-bg-sepia .vintage-epoch-classic .pericope-title::after,
+    body.reading-bg-sepia .vintage-epoch-xix .pericope-title::after,
+    body:not(.theme-dark) .vintage-epoch-ancient .pericope-title::after,
+    body:not(.theme-dark) .vintage-epoch-classic .pericope-title::after,
+    body:not(.theme-dark) .vintage-epoch-xix .pericope-title::after {
+      content: " ❧";
+      color: #8b5a2b;
+      font-size: 14px;
+    }
+
+    /* =========================================================================
+     * 3. MICRO-DÉCALAGES SUBTILS DE PRESSE (SUR LES VERSETS UNIQUEMENT)
+     * ========================================================================= */
+    .vintage-epoch-ancient .verse-item:nth-child(5n+1),
+    .vintage-epoch-classic .verse-item:nth-child(5n+1),
+    .vintage-epoch-xix .verse-item:nth-child(5n+1) {
+      transform: rotate(-0.20deg);
+      display: inline;
+    }
+    .vintage-epoch-ancient .verse-item:nth-child(5n+2),
+    .vintage-epoch-classic .verse-item:nth-child(5n+2),
+    .vintage-epoch-xix .verse-item:nth-child(5n+2) {
+      transform: rotate(0.18deg);
+      display: inline;
+    }
+    .vintage-epoch-ancient .verse-item:nth-child(5n+3),
+    .vintage-epoch-classic .verse-item:nth-child(5n+3),
+    .vintage-epoch-xix .verse-item:nth-child(5n+3) {
+      transform: rotate(-0.15deg);
+      display: inline;
+    }
+    .vintage-epoch-ancient .verse-item:nth-child(5n+4),
+    .vintage-epoch-classic .verse-item:nth-child(5n+4),
+    .vintage-epoch-xix .verse-item:nth-child(5n+4) {
+      transform: rotate(0.16deg);
+      display: inline;
+    }
+  </style>
 </head>
 <body class="theme-dark window-maximized">
   <!-- BARRE DE TITRE UNIFIÉE AVEC RECHERCHE, ONGLETS ET CONTRÔLES WINDOWS -->
