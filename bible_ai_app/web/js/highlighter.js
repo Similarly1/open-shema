@@ -420,29 +420,33 @@ const HighlighterManager = {
         }
       });
 
-      // Appliquer les nouveaux
+      // Appliquer les nouveaux surlignages continus
       highlights.forEach(hl => {
         const styleName = hl.style || 'felt';
         const colorName = hl.color || 'yellow';
         const className = `hl-${styleName}-${colorName}`;
+        const isMultiVerse = hl.verse_start < hl.verse_end;
 
         for (let v = hl.verse_start; v <= hl.verse_end; v++) {
           const verseEls = document.querySelectorAll(`.verse-item[data-verse-num="${v}"]`);
           
+          let rangeClass = 'hl-range-single';
+          if (isMultiVerse) {
+            if (v === hl.verse_start) {
+              rangeClass = 'hl-range-start';
+            } else if (v === hl.verse_end) {
+              rangeClass = 'hl-range-end';
+            } else {
+              rangeClass = 'hl-range-mid';
+            }
+          }
+
           verseEls.forEach(vEl => {
             const elBook = (vEl.dataset.bookCode || '').toLowerCase();
             const elChap = parseInt(vEl.dataset.chapter, 10);
             if (elBook === cleanBook && elChap === chNum) {
-              const wordTokens = vEl.querySelectorAll('.word-token');
-              if (wordTokens.length > 0) {
-                wordTokens.forEach(w => {
-                  w.classList.add(className);
-                  if (hl.note_id) w.classList.add('hl-has-note');
-                });
-              } else {
-                vEl.classList.add(className);
-                if (hl.note_id) vEl.classList.add('hl-has-note');
-              }
+              vEl.classList.add(className, rangeClass);
+              if (hl.note_id) vEl.classList.add('hl-has-note');
             }
           });
         }
@@ -459,6 +463,6 @@ const HighlighterManager = {
         element.classList.remove(`hl-${s.id}-${c.id}`);
       });
     });
-    element.classList.remove('hl-has-note');
+    element.classList.remove('hl-has-note', 'hl-range-single', 'hl-range-start', 'hl-range-mid', 'hl-range-end');
   }
 };
