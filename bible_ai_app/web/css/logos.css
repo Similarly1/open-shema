@@ -16049,34 +16049,12 @@ body:not(.theme-dark) .vintage-epoch-xix .interlinear-strong {
   transform: translateY(0.55px) rotate(0.12deg);
 }
 
-/* --- B. VARIATIONS DE PRESSION D'ENCRAGE & OPACITÉ DE FRAPPE --- */
-.vintage-epoch-ancient .word-token:nth-child(5n),
-.vintage-epoch-classic .word-token:nth-child(5n),
-.vintage-epoch-xix .word-token:nth-child(5n) {
-  opacity: 0.90;
-}
-.vintage-epoch-ancient .word-token:nth-child(7n+2),
-.vintage-epoch-classic .word-token:nth-child(7n+2),
-.vintage-epoch-xix .word-token:nth-child(7n+2) {
-  opacity: 0.98;
-}
-.vintage-epoch-ancient .word-token:nth-child(9n),
-.vintage-epoch-classic .word-token:nth-child(9n),
-.vintage-epoch-xix .word-token:nth-child(9n) {
-  opacity: 0.85;
-}
-.vintage-epoch-ancient .word-token:nth-child(11n+3),
-.vintage-epoch-classic .word-token:nth-child(11n+3),
-.vintage-epoch-xix .word-token:nth-child(11n+3) {
-  opacity: 0.94;
-}
-
-/* Accentuation de certains caractères de plomb plus gras/encrés */
-.vintage-epoch-ancient .word-token:nth-child(8n+3),
-.vintage-epoch-classic .word-token:nth-child(8n+3),
-.vintage-epoch-xix .word-token:nth-child(8n+3) {
-  font-weight: 600;
-  text-shadow: 0 0 0.8px rgba(29, 21, 12, 0.55);
+/* --- B. LÉGÈRE HOMOGÉNÉITÉ D'ENCRE & DOUCEUR VISUELLE --- */
+.vintage-epoch-ancient .word-token,
+.vintage-epoch-classic .word-token,
+.vintage-epoch-xix .word-token {
+  font-weight: 400;
+  opacity: 1;
 }
 
 /* --- C. DIFFUSION D'ENCRE & EMPÂTEMENT DANS LA FIBRE DU PAPIER (INK BLEED) --- */
