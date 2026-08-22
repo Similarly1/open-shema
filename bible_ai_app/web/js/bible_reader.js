@@ -328,6 +328,12 @@ const DisplayOptions = {
       if (chkGeo) chkGeo.checked = showGeo;
       workspace?.classList.toggle('hide-geo-pins', !showGeo);
 
+      const showHl = cfg.show_highlights !== false;
+      const chkHl = document.getElementById('opt-show-highlights');
+      if (chkHl) chkHl.checked = showHl;
+      workspace?.classList.toggle('hide-highlights', !showHl);
+      document.body.classList.toggle('hide-highlights', !showHl);
+
       // Mode d'affichage des mots entre crochets
       const savedBracketsMode = localStorage.getItem('bible_reader_brackets_mode') || 'classic';
       BibleReader.bracketsMode = savedBracketsMode;
@@ -367,6 +373,12 @@ const DisplayOptions = {
         const chkGeo = document.getElementById('opt-show-geo-pins');
         if (chkGeo) chkGeo.checked = showGeo;
         workspace?.classList.toggle('hide-geo-pins', !showGeo);
+
+        const showHl = cfg.show_highlights !== false;
+        const chkHl = document.getElementById('opt-show-highlights');
+        if (chkHl) chkHl.checked = showHl;
+        workspace?.classList.toggle('hide-highlights', !showHl);
+        document.body.classList.toggle('hide-highlights', !showHl);
 
         const savedBracketsMode = localStorage.getItem('bible_reader_brackets_mode') || 'classic';
         BibleReader.bracketsMode = savedBracketsMode;
@@ -408,6 +420,15 @@ const DisplayOptions = {
       workspace?.classList.toggle('hide-geo-pins', !e.target.checked);
       const cfg = await API.getSettings() || {};
       cfg.show_geo_pins = e.target.checked;
+      API.call('save_settings', cfg);
+    });
+
+    document.getElementById('opt-show-highlights')?.addEventListener('change', async (e) => {
+      const hide = !e.target.checked;
+      workspace?.classList.toggle('hide-highlights', hide);
+      document.body.classList.toggle('hide-highlights', hide);
+      const cfg = await API.getSettings() || {};
+      cfg.show_highlights = e.target.checked;
       API.call('save_settings', cfg);
     });
 
@@ -2472,7 +2493,25 @@ const ContextMenuManager = {
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
         <span>Copier le verset avec la référence</span>
       </button>
+      <button class="context-action-btn" id="ctx-act-v-erase-hl" style="color: var(--accent-red);">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        <span>Supprimer le surlignage</span>
+      </button>
     `;
+
+    document.getElementById('ctx-act-v-erase-hl')?.addEventListener('click', async () => {
+      this.hide();
+      if (typeof HighlighterManager !== 'undefined') {
+        HighlighterManager.currentSelectionRef = {
+          book: bookCode,
+          chapter: parseInt(chapterNum, 10),
+          verseStart: parseInt(verseNum, 10),
+          verseEnd: parseInt(verseNum, 10),
+          text: verseText
+        };
+        await HighlighterManager.eraseHighlight();
+      }
+    });
 
     actionsEl.querySelectorAll('.ctx-hl-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
@@ -2482,18 +2521,18 @@ const ContextMenuManager = {
           if (color === 'erase') {
             HighlighterManager.currentSelectionRef = {
               book: bookCode,
-              chapter: parseInt(chapterNum),
-              verseStart: parseInt(verseNum),
-              verseEnd: parseInt(verseNum),
+              chapter: parseInt(chapterNum, 10),
+              verseStart: parseInt(verseNum, 10),
+              verseEnd: parseInt(verseNum, 10),
               text: verseText
             };
             await HighlighterManager.eraseHighlight();
           } else {
             HighlighterManager.currentSelectionRef = {
               book: bookCode,
-              chapter: parseInt(chapterNum),
-              verseStart: parseInt(verseNum),
-              verseEnd: parseInt(verseNum),
+              chapter: parseInt(chapterNum, 10),
+              verseStart: parseInt(verseNum, 10),
+              verseEnd: parseInt(verseNum, 10),
               text: verseText
             };
             await HighlighterManager.applyHighlight(color, HighlighterManager.activeStyle || 'felt');

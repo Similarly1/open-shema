@@ -79,6 +79,13 @@ const SelectionContextMenu = {
           <span>Créer une note</span>
         </button>
 
+        <button type="button" class="scm-item" data-action="erase-highlight" id="scm-btn-erase-hl" style="color: var(--accent-red);">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+          </svg>
+          <span>Supprimer le surlignage</span>
+        </button>
+
         <div class="scm-divider"></div>
 
         <button type="button" class="scm-item" data-action="open-verse" id="scm-btn-open-verse" style="display: none;">
@@ -423,6 +430,12 @@ const SelectionContextMenu = {
 
       case 'create-note':
         this.createNoteFromSelection(text, ctx);
+        break;
+
+      case 'erase-highlight':
+        if (typeof HighlighterManager !== 'undefined') {
+          HighlighterManager.eraseHighlight();
+        }
         break;
 
       case 'open-verse': {

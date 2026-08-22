@@ -113,6 +113,34 @@ class HighlightsManager:
             cls._save_all(filepath, all_hl)
             return True
         return False
+
+    @classmethod
+    def delete_highlights_for_passage(cls, book: str, chapter: int, verse_start: int, verse_end: int, config: Optional[Dict[str, Any]] = None) -> int:
+        """Supprime tous les surlignages qui chevauchent la plage de versets spécifiée."""
+        filepath = cls.get_highlights_file(config)
+        all_hl = cls._load_all(filepath)
+        clean_book = (book or "").lower().strip()
+        ch_num = int(chapter)
+        v_start = int(verse_start)
+        v_end = int(verse_end)
+
+        remaining = []
+        deleted_count = 0
+        for hl in all_hl:
+            hl_book = (hl.get("book") or "").lower().strip()
+            hl_chap = int(hl.get("chapter", 0))
+            hl_vs = int(hl.get("verse_start", 0))
+            hl_ve = int(hl.get("verse_end", hl_vs))
+
+            # Si c'est le même livre et chapitre et qu'il y a chevauchement
+            if hl_book == clean_book and hl_chap == ch_num and (hl_vs <= v_end and hl_ve >= v_start):
+                deleted_count += 1
+            else:
+                remaining.append(hl)
+
+        if deleted_count > 0:
+            cls._save_all(filepath, remaining)
+        return deleted_count
         
     @classmethod
     def link_note(cls, hl_id: str, note_id: str, config: Optional[Dict[str, Any]] = None) -> bool:

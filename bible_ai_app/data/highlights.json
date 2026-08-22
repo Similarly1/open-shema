@@ -2,18 +2,6 @@
   {
     "book": "Gen",
     "chapter": 1,
-    "verse_start": 2,
-    "verse_end": 5,
-    "selected_text": "Il y avait des ténèbres à la surface de l'abîme et l'Esprit de Dieu planait au-dessus de l'eau.3Dieu dit: «Qu'il y ait de la lumière!» et il y eut de la lumière.4Dieu vit que la lumière était bonne, et il sépara la lumière des ténèbres.5Dieu appela la lum",
-    "color": "blue",
-    "style": "felt",
-    "id": "hl_20260822090942_7db5e5b7",
-    "updated_at": "2026-08-22T09:09:42.994934",
-    "created_at": "2026-08-22T09:09:42.994934"
-  },
-  {
-    "book": "Gen",
-    "chapter": 1,
     "verse_start": 6,
     "verse_end": 8,
     "selected_text": "r les séparer les unes des autres!»7Dieu fit l'étendue et sépara ainsi l'eau qui est au-dessous de l'étendue de celle qui est au-dessus. Cela se passa ainsi.8Dieu appela l'éte",
@@ -22,5 +10,17 @@
     "id": "hl_20260822092517_1116ccc6",
     "updated_at": "2026-08-22T09:25:17.583743",
     "created_at": "2026-08-22T09:25:17.583743"
+  },
+  {
+    "book": "Gen",
+    "chapter": 1,
+    "verse_start": 1,
+    "verse_end": 1,
+    "selected_text": "Au commencement, Dieu créa le ciel et la terre.",
+    "color": "green",
+    "style": "felt",
+    "id": "hl_20260822093808_c4d09d79",
+    "updated_at": "2026-08-22T09:38:08.356797",
+    "created_at": "2026-08-22T09:38:08.356797"
   }
 ]

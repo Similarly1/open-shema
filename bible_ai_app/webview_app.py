@@ -1075,6 +1075,10 @@ class BibleAppApi:
         self.config = load_config()
         return HighlightsManager.delete_highlight(hl_id, config=self.config)
 
+    def delete_highlights_for_passage(self, book: str, chapter: int, verse_start: int, verse_end: int) -> int:
+        self.config = load_config()
+        return HighlightsManager.delete_highlights_for_passage(book, int(chapter), int(verse_start), int(verse_end), config=self.config)
+
     def create_note_from_highlight(self, hl_id: str, hl_text: str, hl_ref: str) -> Dict[str, Any]:
         """Crée une note préremplie liée à un surlignage."""
         self.config = load_config()

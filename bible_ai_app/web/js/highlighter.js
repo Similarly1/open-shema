@@ -345,20 +345,13 @@ const HighlighterManager = {
     const { book, chapter, verseStart, verseEnd } = this.currentSelectionRef;
     
     try {
-      const highlights = await API.getHighlightsForChapter(book, chapter);
-      if (highlights) {
-        let deletedCount = 0;
-        for (const hl of highlights) {
-          if (hl.verse_start <= verseEnd && hl.verse_end >= verseStart) {
-            await API.deleteHighlight(hl.id);
-            deletedCount++;
-          }
-        }
-        this.hidePalette();
-        await this.renderChapterHighlights(book, chapter);
-        if (deletedCount > 0) {
-          App.showToast("Surlignage effacé.");
-        }
+      const deletedCount = await API.deleteHighlightsForPassage(book, chapter, verseStart, verseEnd);
+      this.hidePalette();
+      await this.renderChapterHighlights(book, chapter);
+      if (deletedCount > 0) {
+        App.showToast("Surlignage supprimé avec succès.");
+      } else {
+        App.showToast("Aucun surlignage à supprimer sur ce passage.", 1500);
       }
     } catch (e) {
       console.error('Erreur effacement surlignage', e);

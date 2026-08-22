@@ -9,7 +9,6 @@ def make_svg_marker(color_start, color_mid, color_end, mode="single", opacity=0.
       - 'mid':    flat straight left, wavy top/bottom, flat straight right
       - 'end':    flat straight left, wavy top/bottom, rounded end
     """
-    # Base wavy top and bottom coordinates
     if mode == "single":
         path_d = "M 4,7 Q 28,3 58,6 Q 98,2 138,5 Q 172,3 196,6 C 201,11 201,21 196,26 Q 165,30 128,27 Q 85,30 48,27 Q 22,29 4,25 C -1,20 -1,12 4,7 Z"
     elif mode == "start":
@@ -21,13 +20,14 @@ def make_svg_marker(color_start, color_mid, color_end, mode="single", opacity=0.
     else:
         path_d = "M 4,7 Q 28,3 58,6 Q 98,2 138,5 Q 172,3 196,6 C 201,11 201,21 196,26 Q 165,30 128,27 Q 85,30 48,27 Q 22,29 4,25 C -1,20 -1,12 4,7 Z"
 
+    # Vertical chisel-felt gradient: uniform horizontal color, soft natural top/bottom edges
     svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 32" preserveAspectRatio="none">
   <defs>
-    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="{color_start}" stop-opacity="{min(1.0, opacity + 0.12):.2f}"/>
-      <stop offset="12%" stop-color="{color_mid}" stop-opacity="{opacity:.2f}"/>
-      <stop offset="88%" stop-color="{color_mid}" stop-opacity="{max(0.1, opacity - 0.05):.2f}"/>
-      <stop offset="100%" stop-color="{color_end}" stop-opacity="{min(1.0, opacity + 0.08):.2f}"/>
+    <linearGradient id="g" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="{color_start}" stop-opacity="{opacity * 0.80:.2f}"/>
+      <stop offset="20%" stop-color="{color_mid}" stop-opacity="{opacity:.2f}"/>
+      <stop offset="80%" stop-color="{color_mid}" stop-opacity="{opacity:.2f}"/>
+      <stop offset="100%" stop-color="{color_end}" stop-opacity="{opacity * 0.85:.2f}"/>
     </linearGradient>
   </defs>
   <path d="{path_d}" fill="url(#g)"/>
@@ -36,24 +36,24 @@ def make_svg_marker(color_start, color_mid, color_end, mode="single", opacity=0.
     encoded = urllib.parse.quote(clean_svg)
     return f'url("data:image/svg+xml,{encoded}")'
 
-# Couleurs Thème Clair
+# Couleurs Thème Clair (Teintes pures homogènes)
 light_colors = {
-    "yellow": ("#FACC15", "#FEF08A", "#EAB308", 0.72),
-    "green":  ("#4ADE80", "#BBF7D0", "#22C55E", 0.72),
-    "blue":   ("#38BDF8", "#BAE6FD", "#0EA5E9", 0.72),
-    "amber":  ("#FB923C", "#FED7AA", "#F97316", 0.72),
-    "purple": ("#C084FC", "#E9D5FF", "#A855F7", 0.72),
-    "rose":   ("#FB7185", "#FECDD3", "#F43F5E", 0.72),
+    "yellow": ("#FACC15", "#FACC15", "#EAB308", 0.70),
+    "green":  ("#4ADE80", "#4ADE80", "#22C55E", 0.70),
+    "blue":   ("#38BDF8", "#38BDF8", "#0EA5E9", 0.70),
+    "amber":  ("#FB923C", "#FB923C", "#F97316", 0.70),
+    "purple": ("#C084FC", "#C084FC", "#A855F7", 0.70),
+    "rose":   ("#FB7185", "#FB7185", "#F43F5E", 0.70),
 }
 
-# Couleurs Thème Sombre
+# Couleurs Thème Sombre (Teintes pures homogènes avec transparence lumineuse)
 dark_colors = {
-    "yellow": ("#FACC15", "#EAB308", "#CA8A04", 0.42),
-    "green":  ("#4ADE80", "#22C55E", "#16A34A", 0.40),
-    "blue":   ("#38BDF8", "#0EA5E9", "#0284C7", 0.42),
-    "amber":  ("#FB923C", "#F97316", "#EA580C", 0.42),
-    "purple": ("#C084FC", "#A855F7", "#9333EA", 0.42),
-    "rose":   ("#FB7185", "#F43F5E", "#E11D48", 0.42),
+    "yellow": ("#FACC15", "#FACC15", "#EAB308", 0.38),
+    "green":  ("#4ADE80", "#4ADE80", "#22C55E", 0.36),
+    "blue":   ("#38BDF8", "#38BDF8", "#0EA5E9", 0.38),
+    "amber":  ("#FB923C", "#FB923C", "#F97316", 0.38),
+    "purple": ("#C084FC", "#C084FC", "#A855F7", 0.38),
+    "rose":   ("#FB7185", "#FB7185", "#F43F5E", 0.38),
 }
 
 css_lines = [
@@ -342,6 +342,34 @@ css_lines.extend([
     "  border-color: var(--accent-red, #ef4444);",
     "  color: var(--accent-red, #ef4444);",
     "}",
+    "",
+    "/* ========================================================================= */",
+    "/* 10. MASQUAGE TOTAL DES SURLIGNAGES QUAND L'OPTION EST DÉCOCHÉE             */",
+    "/* ========================================================================= */",
+    "body.hide-highlights .verse-item,",
+    "body.hide-highlights .verse-item[class*=\"hl-\"],",
+    "body.theme-dark.hide-highlights .verse-item,",
+    "body.theme-dark.hide-highlights .verse-item[class*=\"hl-\"],",
+    "body.reading-bg-dark.hide-highlights .verse-item,",
+    "body.reading-bg-dark.hide-highlights .verse-item[class*=\"hl-\"],",
+    "body.reading-bg-white.hide-highlights .verse-item,",
+    "body.reading-bg-sepia.hide-highlights .verse-item,",
+    ".hide-highlights .verse-item,",
+    ".hide-highlights .verse-item[class*=\"hl-\"],",
+    ".hide-highlights .word-token,",
+    "#reader-workspace.hide-highlights .verse-item,",
+    "#reader-workspace.hide-highlights .verse-item[class*=\"hl-\"] {",
+    "  background: none !important;",
+    "  background-image: none !important;",
+    "  background-color: transparent !important;",
+    "  box-shadow: none !important;",
+    "  filter: none !important;",
+    "  color: inherit !important;",
+    "  border-bottom: none !important;",
+    "  border-radius: 3px !important;",
+    "  padding: 2px 0 !important;",
+    "  margin: 0 !important;",
+    "}"
 ])
 
 final_highlighter_css = "\n".join(css_lines)
@@ -357,4 +385,4 @@ if pos != -1:
 with open(css_file_path, "w", encoding="utf-8") as f:
     f.write(orig_css.rstrip() + "\n\n" + final_highlighter_css + "\n")
 
-print("Generated continuous multi-verse Logos highlighter CSS successfully!")
+print("Generated and written complete Logos highlighter CSS successfully!")

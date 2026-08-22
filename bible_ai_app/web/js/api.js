@@ -329,6 +329,10 @@ const API = {
     return this.call('delete_highlight', id);
   },
 
+  async deleteHighlightsForPassage(book, chapter, verseStart, verseEnd) {
+    return this.call('delete_highlights_for_passage', book, parseInt(chapter), parseInt(verseStart), parseInt(verseEnd));
+  },
+
   async createNoteFromHighlight(hlId, text, ref) {
     return this.call('create_note_from_highlight', hlId, text, ref);
   },
