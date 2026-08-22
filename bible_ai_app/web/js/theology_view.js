@@ -308,8 +308,23 @@ const TheologyView = {
     if (!this.books || this.books.length === 0) {
       await this.loadBooksList();
     } else if (this.currentBook && this.currentChapterId) {
-      // Recharger le chapitre actuel si nécessaire
-      this.loadChapter(this.currentBook, this.currentChapterId);
+      // Si déjà préchargé et rendu dans le DOM, affichage immédiat sans ré-interrogation
+      if (!this.currentChapterData) {
+        await this.loadChapter(this.currentBook, this.currentChapterId);
+      }
+    }
+  },
+
+  async preloadInitialData() {
+    if (this._isPreloading || this._isPreloaded) return;
+    this._isPreloading = true;
+    try {
+      await this.loadBooksList();
+      this._isPreloaded = true;
+    } catch (err) {
+      console.error('[TheologyView] Erreur preloadInitialData:', err);
+    } finally {
+      this._isPreloading = false;
     }
   },
 

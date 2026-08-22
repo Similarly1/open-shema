@@ -73,6 +73,12 @@ class EpubLoader:
     Extrait la table des matières (TOC), identifie les chapitres par livre biblique / portée théologique,
     et segmente le texte en chunks contextualisés pour le RAG Tri-Flux.
     """
+    _inspect_cache: Dict[Tuple[str, float], Dict[str, Any]] = {}
+
+    @classmethod
+    def invalidate_cache(cls):
+        """Vide le cache mémoire d'inspection EPUB."""
+        cls._inspect_cache.clear()
 
     @classmethod
     def inspect_epub(cls, epub_path: str) -> Dict[str, Any]:
@@ -82,6 +88,11 @@ class EpubLoader:
         """
         if not os.path.exists(epub_path):
             raise FileNotFoundError(f"Fichier EPUB introuvable: {epub_path}")
+
+        mtime = os.path.getmtime(epub_path)
+        cache_key = (epub_path, mtime)
+        if cache_key in cls._inspect_cache:
+            return cls._inspect_cache[cache_key]
 
         metadata = {
             "title": "",
@@ -221,6 +232,7 @@ class EpubLoader:
 
             metadata["chapters"] = classified_chapters
 
+        cls._inspect_cache[cache_key] = metadata
         return metadata
 
     @classmethod

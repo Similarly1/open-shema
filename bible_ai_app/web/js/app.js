@@ -163,27 +163,10 @@ const App = {
       }
     }, true);
 
-    // Initialiser l'état d'agrandissement de la fenêtre auprès du backend
+    // 6. Lancement du préchargement global unifié dès que l'API bridge est connectée
     API.onReady(async () => {
-      try {
-        const state = await API.call('get_window_state');
-        if (state && typeof state.is_maximized === 'boolean') {
-          this.updateWindowState(state.is_maximized);
-        }
-      } catch (e) {}
+      await this.runPreloadPipeline();
     });
-
-    // 6. Masquage fluide du Splash Loader dès que l'API est initialisée (avec timeout de sécurité)
-    API.onReady(() => {
-      setTimeout(() => {
-        this.hideSplash();
-      }, 500);
-    });
-
-    // Sécurité absolue : quoi qu'il arrive, enlever le splash après 1.5s max
-    setTimeout(() => {
-      this.hideSplash();
-    }, 1500);
   },
 
   initAIState() {
@@ -315,13 +298,89 @@ const App = {
     }
   },
 
+  updateSplashStatus(statusText, progressPercent = null) {
+    const textEl = document.getElementById('splash-status-text');
+    if (textEl && statusText) {
+      textEl.textContent = statusText;
+    }
+    const barEl = document.querySelector('.splash-progress-bar');
+    if (barEl && progressPercent !== null) {
+      barEl.style.animation = 'none';
+      barEl.style.left = '0';
+      barEl.style.width = `${Math.min(100, Math.max(0, progressPercent))}%`;
+      barEl.style.transition = 'width 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+    }
+  },
+
+  async runPreloadPipeline() {
+    if (this._isPreloadingDone) return;
+
+    // Timeout de sécurité absolue : 15s max pour garantir la levée du Splash quoi qu'il arrive
+    const safetyTimer = setTimeout(() => {
+      console.warn('[App] Timeout sécurité de préchargement atteint (15s), masquage du splash.');
+      this.hideSplash();
+    }, 15000);
+
+    try {
+      // 1. Initialisation des préférences & fenêtre (15%)
+      this.updateSplashStatus("Initialisation des préférences et de l'interface...", 15);
+      try {
+        const state = await API.call('get_window_state');
+        if (state && typeof state.is_maximized === 'boolean') {
+          this.updateWindowState(state.is_maximized);
+        }
+      } catch (e) {}
+
+      // 2. Chargement du lecteur biblique & Genèse 1 (45%)
+      this.updateSplashStatus("Chargement des Bibles et du texte biblique...", 45);
+      try {
+        if (typeof BibleReader !== 'undefined' && BibleReader.preloadInitialData) {
+          await BibleReader.preloadInitialData();
+        }
+      } catch (e) {
+        console.error('[App] Erreur préchargement BibleReader:', e);
+      }
+
+      // 3. Préchargement de la théologie : livres, TOC et 1er chapitre (80%)
+      this.updateSplashStatus("Préchargement des ouvrages et tables des matières théologiques...", 80);
+      try {
+        if (typeof TheologyView !== 'undefined' && TheologyView.preloadInitialData) {
+          await TheologyView.preloadInitialData();
+        }
+      } catch (e) {
+        console.error('[App] Erreur préchargement TheologyView:', e);
+      }
+
+      // 4. Préchargement des dictionnaires (95%)
+      this.updateSplashStatus("Préparation des dictionnaires et outils d'étude...", 95);
+      try {
+        if (typeof DictView !== 'undefined' && DictView.preloadInitialData) {
+          await DictView.preloadInitialData();
+        }
+      } catch (e) {
+        console.error('[App] Erreur préchargement DictView:', e);
+      }
+
+      // 5. Finalisation (100%)
+      this.updateSplashStatus("Prêt ! Bienvenue dans Open Shema.", 100);
+      this._isPreloadingDone = true;
+
+      await new Promise(resolve => setTimeout(resolve, 250));
+    } catch (err) {
+      console.error('[App] Erreur générale pipeline de préchargement:', err);
+    } finally {
+      clearTimeout(safetyTimer);
+      this.hideSplash();
+    }
+  },
+
   hideSplash() {
     const splash = document.getElementById('app-splash-loader');
     if (splash && !splash.classList.contains('fade-out')) {
       splash.classList.add('fade-out');
       setTimeout(() => {
         splash.style.display = 'none';
-      }, 400);
+      }, 450);
     }
   },
 

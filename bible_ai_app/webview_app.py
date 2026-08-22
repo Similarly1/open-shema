@@ -1869,45 +1869,29 @@ class BibleAppApi:
 
     def get_theology_books(self) -> List[Dict[str, Any]]:
         """Retourne tous les ouvrages de théologie indexés avec leurs métadonnées et couvertures."""
-        import importlib
-        import core.theology_reader_manager
-        importlib.reload(core.theology_reader_manager)
         from core.theology_reader_manager import TheologyReaderManager
         return TheologyReaderManager.get_all_theology_books()
 
     def get_theology_book_toc(self, book_name: str) -> Dict[str, Any]:
         """Récupère la table des matières ordonnée d'un ouvrage de théologie."""
-        import importlib
-        import core.theology_reader_manager
-        importlib.reload(core.theology_reader_manager)
         from core.theology_reader_manager import TheologyReaderManager
         return TheologyReaderManager.get_book_toc(book_name)
 
     def get_theology_chapter_content(self, book_name: str, chapter_id: int) -> Dict[str, Any]:
         """Récupère le contenu intégral d'un chapitre d'ouvrage de théologie."""
-        import importlib
-        import core.epub_loader
-        import core.theology_reader_manager
-        importlib.reload(core.epub_loader)
-        importlib.reload(core.theology_reader_manager)
         from core.theology_reader_manager import TheologyReaderManager
         return TheologyReaderManager.get_chapter_content(book_name, chapter_id)
 
     def synthesize_theology_chapter(self, book_name: str, chapter_id: int, model: Optional[str] = None) -> Dict[str, Any]:
         """Génère une synthèse exégétique et théologique IA d'un chapitre."""
-        import importlib
-        import core.theology_reader_manager
-        importlib.reload(core.theology_reader_manager)
         from core.theology_reader_manager import TheologyReaderManager
         self.config = load_config()
         return TheologyReaderManager.synthesize_chapter(book_name, chapter_id, model=model, config=self.config)
 
     def search_theology_books(self, query: str, book_name: Optional[str] = None) -> List[Dict[str, Any]]:
         """Recherche plein-texte dans les ouvrages de théologie."""
-        import importlib
-        import core.theology_reader_manager
-        importlib.reload(core.theology_reader_manager)
         from core.theology_reader_manager import TheologyReaderManager
+        return TheologyReaderManager.search_theology_books(query, book_name=book_name)
     def open_external_url(self, url: str) -> bool:
         """Ouvre une URL externe dans le navigateur par défaut du système."""
         import webbrowser

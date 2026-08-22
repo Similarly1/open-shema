@@ -20,6 +20,7 @@ class TheologyReaderManager:
     _chroma_client = None
     _books_cache = None
     _toc_cache = {}
+    _chapter_cache = {}
 
     @classmethod
     def get_chroma_client(cls, persist_directory: str = "./data/chroma_db"):
@@ -36,6 +37,12 @@ class TheologyReaderManager:
         """Réinitialise les caches en mémoire si la bibliothèque change."""
         cls._books_cache = None
         cls._toc_cache.clear()
+        cls._chapter_cache.clear()
+        try:
+            from core.epub_loader import EpubLoader
+            EpubLoader.invalidate_cache()
+        except Exception:
+            pass
 
     @classmethod
     def get_all_theology_books(cls, force_refresh: bool = False) -> List[Dict[str, Any]]:
@@ -107,57 +114,13 @@ class TheologyReaderManager:
         if book_name in cls._toc_cache:
             return cls._toc_cache[book_name]
 
-        client = cls.get_chroma_client()
         chapters_dict = {}
 
-        collections_to_search = []
-        try:
-            for c in client.list_collections():
-                c_name = c.name if hasattr(c, 'name') else str(c)
-                collections_to_search.append(c_name)
-        except Exception:
-            collections_to_search = ['bible_study_bge_multilingual_gemma2_Infomaniak', 'study_library', 'bible_study_gemini_embedding_2']
-
-        for col_name in collections_to_search:
-            try:
-                col = client.get_collection(col_name)
-                res = col.get(where={"name": book_name}, include=['metadatas'])
-                if res and res.get('metadatas'):
-                    for m in res['metadatas']:
-                        cid = m.get('chapter_id')
-                        if cid is not None:
-                            try:
-                                cid_int = int(cid)
-                            except (ValueError, TypeError):
-                                cid_int = cid
-                                
-                            ctitle = m.get('chapter_title') or f"Chapitre {cid_int}"
-                            # Nettoyer l'encodage éventuel
-                            ctitle = cls._clean_text_encoding(ctitle)
-                            
-                            b_code = m.get('book_code')
-                            b_name = get_french_book_name(b_code) if b_code else None
-                            
-                            if cid_int not in chapters_dict:
-                                chapters_dict[cid_int] = {
-                                    "chapter_id": cid_int,
-                                    "title": ctitle,
-                                    "book_code": b_code,
-                                    "book_name": b_name,
-                                    "corpus_scope": m.get('corpus_scope', 'GLOBAL'),
-                                    "source_type": m.get('source_type', 'general'),
-                                    "depth": m.get('depth', 0),
-                                    "is_section_header": m.get('is_section_header', False),
-                                    "chunks_count": 0
-                                }
-                            chapters_dict[cid_int]["chunks_count"] += 1
-            except Exception as e:
-                logger.debug(f"[TheologyReaderManager] Recherche TOC {col_name} : {e}")
-
-        # Enrichir avec la structure hiérarchique et les séparateurs de section depuis le fichier EPUB si disponible
+        # 1. Vérifier si un fichier EPUB existe (analyse directe ultra-rapide)
         registry = load_books_metadata()
         book_meta = registry.get(book_name, {})
         fpath = book_meta.get("file_path", "")
+
         if fpath and os.path.exists(fpath) and fpath.lower().endswith(".epub"):
             try:
                 from core.epub_loader import EpubLoader
@@ -166,29 +129,68 @@ class TheologyReaderManager:
                     cid = ch.get("id", 0)
                     is_sec = ch.get("is_section_header", False)
                     depth = ch.get("depth", 0)
-                    
-                    if cid in chapters_dict:
-                        chapters_dict[cid]["depth"] = depth
-                        chapters_dict[cid]["is_section_header"] = is_sec
-                        if ch.get("book_code") and not chapters_dict[cid].get("book_code"):
-                            chapters_dict[cid]["book_code"] = ch.get("book_code")
-                            chapters_dict[cid]["book_name"] = get_french_book_name(ch.get("book_code"))
-                    elif is_sec or not chapters_dict:
-                        # Séparateur de section ou chapitre hors-ChromaDB
-                        chapters_dict[cid] = {
-                            "chapter_id": cid,
-                            "title": ch.get("title") or f"Section {cid}",
-                            "book_code": ch.get("book_code"),
-                            "book_name": get_french_book_name(ch.get("book_code")) if ch.get("book_code") else None,
-                            "corpus_scope": ch.get("corpus_scope", "GLOBAL"),
-                            "source_type": "general",
-                            "depth": depth,
-                            "is_section_header": is_sec,
-                            "zip_file": ch.get("zip_file", ""),
-                            "chunks_count": 1 if not is_sec else 0
-                        }
+                    b_code = ch.get("book_code")
+                    b_name = get_french_book_name(b_code) if b_code else None
+                    chapters_dict[cid] = {
+                        "chapter_id": cid,
+                        "title": cls._clean_text_encoding(ch.get("title") or f"Chapitre {cid}"),
+                        "book_code": b_code,
+                        "book_name": b_name,
+                        "corpus_scope": ch.get("corpus_scope", "GLOBAL"),
+                        "source_type": ch.get("source_type", "general"),
+                        "depth": depth,
+                        "is_section_header": is_sec,
+                        "zip_file": ch.get("zip_file", ""),
+                        "chunks_count": 1 if not is_sec else 0
+                    }
             except Exception as e:
-                logger.warning(f"EPUB TOC structure enrichment error: {e}")
+                logger.warning(f"[TheologyReaderManager] Erreur analyse directe EPUB TOC pour {book_name}: {e}")
+
+        # 2. Fallback ChromaDB si aucun chapitre n'a été trouvé via l'EPUB
+        if not chapters_dict:
+            client = cls.get_chroma_client()
+            collections_to_search = []
+            try:
+                for c in client.list_collections():
+                    c_name = c.name if hasattr(c, 'name') else str(c)
+                    collections_to_search.append(c_name)
+            except Exception:
+                collections_to_search = ['bible_study_bge_multilingual_gemma2_Infomaniak', 'study_library', 'bible_study_gemini_embedding_2']
+
+            for col_name in collections_to_search:
+                try:
+                    col = client.get_collection(col_name)
+                    res = col.get(where={"name": book_name}, include=['metadatas'])
+                    if res and res.get('metadatas'):
+                        for m in res['metadatas']:
+                            cid = m.get('chapter_id')
+                            if cid is not None:
+                                try:
+                                    cid_int = int(cid)
+                                except (ValueError, TypeError):
+                                    cid_int = cid
+                                    
+                                ctitle = m.get('chapter_title') or f"Chapitre {cid_int}"
+                                ctitle = cls._clean_text_encoding(ctitle)
+                                
+                                b_code = m.get('book_code')
+                                b_name = get_french_book_name(b_code) if b_code else None
+                                
+                                if cid_int not in chapters_dict:
+                                    chapters_dict[cid_int] = {
+                                        "chapter_id": cid_int,
+                                        "title": ctitle,
+                                        "book_code": b_code,
+                                        "book_name": b_name,
+                                        "corpus_scope": m.get('corpus_scope', 'GLOBAL'),
+                                        "source_type": m.get('source_type', 'general'),
+                                        "depth": m.get('depth', 0),
+                                        "is_section_header": m.get('is_section_header', False),
+                                        "chunks_count": 0
+                                    }
+                                chapters_dict[cid_int]["chunks_count"] += 1
+                except Exception as e:
+                    logger.debug(f"[TheologyReaderManager] Recherche TOC ChromaDB {col_name} : {e}")
 
         is_part_regex = re.compile(
             r'^((premier|premiere|deuxieme|troisieme|quatrieme|cinquieme|sixieme|septieme|huitieme|neuvieme|dixieme|[0-9]+(ere|eme|re|er|e)?)\s+(partie|section|volume|tome|livre)|(partie|part|section|volume|tome|livre|book)\s+([0-9ivxlcdm]+|[a-z]+))\b',
@@ -243,16 +245,20 @@ class TheologyReaderManager:
         Récupère et assemble le contenu intégral d'un chapitre d'ouvrage de théologie,
         avec détection des versets cités et contexte de navigation.
         """
+        try:
+            cid_query = int(chapter_id)
+        except (ValueError, TypeError):
+            cid_query = chapter_id
+
+        cache_key = (book_name, cid_query)
+        if cache_key in cls._chapter_cache:
+            return cls._chapter_cache[cache_key]
+
         client = cls.get_chroma_client()
         chunks = []
         chapter_meta = {}
         all_referenced_verses = set()
         all_referenced_books = set()
-
-        try:
-            cid_query = int(chapter_id)
-        except (ValueError, TypeError):
-            cid_query = chapter_id
         registry = load_books_metadata()
         book_meta = registry.get(book_name, {})
         fpath = book_meta.get("file_path", "")
@@ -566,7 +572,7 @@ class TheologyReaderManager:
         sorted_verses = sorted(list(all_referenced_verses))
         sorted_books = sorted(list(all_referenced_books))
 
-        return {
+        res_dict = {
             "success": True,
             "book_name": book_name,
             "book_title": book_meta.get("title", book_name),
@@ -590,6 +596,8 @@ class TheologyReaderManager:
             "current_index": cur_idx_display,
             "total_chapters": len(readable_chapters)
         }
+        cls._chapter_cache[cache_key] = res_dict
+        return res_dict
 
     @classmethod
     def synthesize_chapter(cls, book_name: str, chapter_id: int, model: Optional[str] = None, config: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:

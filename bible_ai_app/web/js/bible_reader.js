@@ -139,8 +139,12 @@ const TabsManager = {
     });
   },
 
-  setupInitialTabs(bibles) {
+  async setupInitialTabs(bibles) {
     if (!bibles || bibles.length === 0) return;
+    if (this.tabs && this.tabs.length > 0) {
+      return await this.activateTab(this.tabs[0].id);
+    }
+    this.tabs = [];
 
     const b1 = bibles[0].name;
     const b2 = bibles.length > 1 ? bibles[1].name : b1;
@@ -150,7 +154,7 @@ const TabsManager = {
       this.createTab(b2, 'Gen', 1, '#2563EB', false, false, 'LSG');
     }
     if (this.tabs.length > 0) {
-      this.activateTab(this.tabs[0].id);
+      return await this.activateTab(this.tabs[0].id);
     }
   },
 
@@ -189,7 +193,7 @@ const TabsManager = {
     App.showToast(`Nouvel onglet ouvert : ${chosenBible}`);
   },
 
-  activateTab(tabId) {
+  async activateTab(tabId) {
     const target = this.tabs.find(t => t.id === tabId);
     if (!target) return;
 
@@ -217,8 +221,8 @@ const TabsManager = {
     BibleReader.updatePaneHeader(1);
     if (BibleReader.isSplitView) BibleReader.updatePaneHeader(2);
 
-    BibleReader.navigateTo(currentBook, currentChapter, currentVerse);
     this.renderTabs();
+    return await BibleReader.navigateTo(currentBook, currentChapter, currentVerse);
   },
 
   closeTab(tabId, e) {
@@ -3131,19 +3135,6 @@ const BibleReader = {
       this.navigateTo(bookCode, chNum, verseNum);
     });
 
-    API.onReady(async () => {
-      this.installedBibles = await API.getInstalledBibles() || [];
-      if (this.installedBibles.length > 0) {
-        this.currentBible1 = this.installedBibles[0].name;
-        if (this.installedBibles.length > 1) {
-          this.currentBible2 = this.installedBibles[1].name;
-        }
-        TabsManager.setupInitialTabs(this.installedBibles);
-      } else {
-        this.navigateTo(this.currentBook, this.currentChapter);
-      }
-    });
-
     this.setupInfiniteScroll();
 
     // Surlignage synchronisé au survol des versets en double vue
@@ -3173,6 +3164,28 @@ const BibleReader = {
           el.classList.remove('synced-hover');
         });
       });
+    }
+  },
+
+  async preloadInitialData() {
+    if (this._isPreloading || this._isPreloaded) return;
+    this._isPreloading = true;
+    try {
+      this.installedBibles = await API.getInstalledBibles() || [];
+      if (this.installedBibles.length > 0) {
+        this.currentBible1 = this.installedBibles[0].name;
+        if (this.installedBibles.length > 1) {
+          this.currentBible2 = this.installedBibles[1].name;
+        }
+        await TabsManager.setupInitialTabs(this.installedBibles);
+      } else {
+        await this.navigateTo(this.currentBook || 'Gen', this.currentChapter || 1);
+      }
+      this._isPreloaded = true;
+    } catch (err) {
+      console.error('[BibleReader] Erreur preloadInitialData:', err);
+    } finally {
+      this._isPreloading = false;
     }
   },
 

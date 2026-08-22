@@ -23,6 +23,19 @@ const DictView = {
     this.bindArticleControls();
   },
 
+  async preloadInitialData() {
+    if (this._isPreloading || this._isPreloaded) return;
+    this._isPreloading = true;
+    try {
+      await this.loadDictionaries();
+      this._isPreloaded = true;
+    } catch (err) {
+      console.error('[DictView] Erreur preloadInitialData:', err);
+    } finally {
+      this._isPreloading = false;
+    }
+  },
+
   onViewActivated() {
     if (!this.allDictionaries || this.allDictionaries.length === 0) {
       this.loadDictionaries();
