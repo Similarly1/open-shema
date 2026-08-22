@@ -1,79 +1,17 @@
 import os
-import urllib.parse
 
-def make_svg_marker(color_start, color_mid, color_end, mode="single", opacity=0.75):
-    """
-    mode:
-      - 'single': rounded start with initial ink deposit, wavy top/bottom, rounded end with lift-off dot
-      - 'start':  rounded start with initial ink deposit, wavy top/bottom, flat straight right
-      - 'mid':    flat straight left, wavy top/bottom, flat straight right
-      - 'end':    flat straight left, wavy top/bottom, rounded end with lift-off dot
-    """
-    if mode == "single":
-        path_d = "M 4,7 Q 28,3 58,6 Q 98,2 138,5 Q 172,3 196,6 C 201,11 201,21 196,26 Q 165,30 128,27 Q 85,30 48,27 Q 22,29 4,25 C -1,20 -1,12 4,7 Z"
-        ink_dots = f'''<ellipse cx="12" cy="16" rx="9" ry="8" fill="{color_start}" opacity="{min(1.0, opacity * 0.45):.2f}"/>
-<ellipse cx="190" cy="16" rx="6" ry="6" fill="{color_end}" opacity="{min(1.0, opacity * 0.30):.2f}"/>'''
-    elif mode == "start":
-        path_d = "M 4,7 Q 28,3 58,6 Q 98,2 138,5 Q 172,3 200,5 L 200,27 Q 165,30 128,27 Q 85,30 48,27 Q 22,29 4,25 C -1,20 -1,12 4,7 Z"
-        ink_dots = f'''<ellipse cx="12" cy="16" rx="9" ry="8" fill="{color_start}" opacity="{min(1.0, opacity * 0.45):.2f}"/>'''
-    elif mode == "mid":
-        path_d = "M 0,5 Q 38,2 78,5 Q 120,2 160,5 Q 185,3 200,5 L 200,27 Q 165,30 125,27 Q 75,30 35,27 L 0,27 Z"
-        ink_dots = ""
-    elif mode == "end":
-        path_d = "M 0,5 Q 38,2 78,5 Q 120,2 160,5 Q 172,3 196,6 C 201,11 201,21 196,26 Q 165,30 128,27 Q 85,30 35,27 L 0,27 Z"
-        ink_dots = f'''<ellipse cx="190" cy="16" rx="6" ry="6" fill="{color_end}" opacity="{min(1.0, opacity * 0.30):.2f}"/>'''
-    else:
-        path_d = "M 4,7 Q 28,3 58,6 Q 98,2 138,5 Q 172,3 196,6 C 201,11 201,21 196,26 Q 165,30 128,27 Q 85,30 48,27 Q 22,29 4,25 C -1,20 -1,12 4,7 Z"
-        ink_dots = ""
-
-    # Vertical chisel-felt gradient + subtle organic paper-fiber texture and pressure impact
-    svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 32" preserveAspectRatio="none">
-  <defs>
-    <linearGradient id="g" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="{color_start}" stop-opacity="{opacity * 0.78:.2f}"/>
-      <stop offset="22%" stop-color="{color_mid}" stop-opacity="{opacity:.2f}"/>
-      <stop offset="78%" stop-color="{color_mid}" stop-opacity="{opacity:.2f}"/>
-      <stop offset="100%" stop-color="{color_end}" stop-opacity="{opacity * 0.85:.2f}"/>
-    </linearGradient>
-    <filter id="f" x="0%" y="0%" width="100%" height="100%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.04 0.08" numOctaves="2" result="noise"/>
-      <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.12 0" in="noise" result="coloredNoise"/>
-      <feComposite operator="in" in2="SourceGraphic"/>
-      <feBlend mode="multiply" in="SourceGraphic"/>
-    </filter>
-  </defs>
-  <g filter="url(#f)">
-    <path d="{path_d}" fill="url(#g)"/>
-    {ink_dots}
-  </g>
-</svg>'''
-    clean_svg = "".join([line.strip() for line in svg.split("\n")])
-    encoded = urllib.parse.quote(clean_svg)
-    return f'url("data:image/svg+xml,{encoded}")'
-
-# Couleurs Thème Clair (Teintes pures homogènes)
-light_colors = {
-    "yellow": ("#EAB308", "#FACC15", "#CA8A04", 0.72),
-    "green":  ("#16A34A", "#4ADE80", "#15803D", 0.72),
-    "blue":   ("#0284C7", "#38BDF8", "#0369A1", 0.72),
-    "amber":  ("#EA580C", "#FB923C", "#C2410C", 0.72),
-    "purple": ("#9333EA", "#C084FC", "#7E22CE", 0.72),
-    "rose":   ("#E11D48", "#FB7185", "#BE123C", 0.72),
-}
-
-# Couleurs Thème Sombre (Teintes pures homogènes avec transparence lumineuse)
-dark_colors = {
-    "yellow": ("#FACC15", "#FACC15", "#EAB308", 0.40),
-    "green":  ("#4ADE80", "#4ADE80", "#22C55E", 0.38),
-    "blue":   ("#38BDF8", "#38BDF8", "#0EA5E9", 0.40),
-    "amber":  ("#FB923C", "#FB923C", "#F97316", 0.40),
-    "purple": ("#C084FC", "#C084FC", "#A855F7", 0.40),
-    "rose":   ("#FB7185", "#FB7185", "#F43F5E", 0.40),
+colors = {
+    'yellow': '#FEF9C3',
+    'green':  '#DCFCE7',
+    'blue':   '#E0F2FE',
+    'amber':  '#FFEDD5',
+    'purple': '#F3E8FF',
+    'rose':   '#FFE4E6'
 }
 
 css_lines = [
     "/* ========================================================================= */",
-    "/* HIGHLIGHTER REALISTIC MULTI-VERSE CONTINUOUS STYLES (Style Logos)         */",
+    "/* HIGHLIGHTER REALISTIC TEXTURED MARKER STYLES (True PNG Paper Fiber)       */",
     "/* ========================================================================= */",
     "",
     "/* Base commune pour tous les versets surlignés */",
@@ -126,21 +64,16 @@ css_lines = [
     "/* 1. THÈME CLAIR (Mode normal, blanc ou sépia) */"
 ]
 
-for name, (c_start, c_mid, c_end, op) in light_colors.items():
-    bg_single = make_svg_marker(c_start, c_mid, c_end, "single", opacity=op)
-    bg_start  = make_svg_marker(c_start, c_mid, c_end, "start",  opacity=op)
-    bg_mid    = make_svg_marker(c_mid,   c_mid, c_mid, "mid",    opacity=op)
-    bg_end    = make_svg_marker(c_mid,   c_mid, c_end, "end",    opacity=op)
-
+for name in colors.keys():
     css_lines.extend([
         f".hl-felt-{name} {{",
-        f"  background-image: {bg_single} !important;",
+        f"  background-image: url('../img/textures/light/marker_{name}_single.png') !important;",
         f"  color: #0f172a !important;",
         f"  mix-blend-mode: multiply;",
         f"}}",
-        f".hl-felt-{name}.hl-range-start {{ background-image: {bg_start} !important; }}",
-        f".hl-felt-{name}.hl-range-mid   {{ background-image: {bg_mid}   !important; }}",
-        f".hl-felt-{name}.hl-range-end   {{ background-image: {bg_end}   !important; }}",
+        f".hl-felt-{name}.hl-range-start {{ background-image: url('../img/textures/light/marker_{name}_start.png') !important; }}",
+        f".hl-felt-{name}.hl-range-mid   {{ background-image: url('../img/textures/light/marker_{name}_mid.png') !important; }}",
+        f".hl-felt-{name}.hl-range-end   {{ background-image: url('../img/textures/light/marker_{name}_end.png') !important; }}",
     ])
 
 css_lines.extend([
@@ -148,41 +81,17 @@ css_lines.extend([
     "/* 2. THÈME SOMBRE (body.theme-dark, body.reading-bg-dark) */"
 ])
 
-for name, (c_start, c_mid, c_end, op) in dark_colors.items():
-    bg_single = make_svg_marker(c_start, c_mid, c_end, "single", opacity=op)
-    bg_start  = make_svg_marker(c_start, c_mid, c_end, "start",  opacity=op)
-    bg_mid    = make_svg_marker(c_mid,   c_mid, c_mid, "mid",    opacity=op)
-    bg_end    = make_svg_marker(c_mid,   c_mid, c_end, "end",    opacity=op)
-
-    text_color = {
-        "yellow": "#FEF9C3",
-        "green":  "#DCFCE7",
-        "blue":   "#E0F2FE",
-        "amber":  "#FFEDD5",
-        "purple": "#F3E8FF",
-        "rose":   "#FFE4E6",
-    }[name]
-    
-    glow_color = {
-        "yellow": "rgba(250, 204, 21, 0.15)",
-        "green":  "rgba(74, 222, 128, 0.15)",
-        "blue":   "rgba(56, 189, 248, 0.15)",
-        "amber":  "rgba(251, 146, 60, 0.15)",
-        "purple": "rgba(192, 132, 252, 0.15)",
-        "rose":   "rgba(251, 113, 133, 0.15)",
-    }[name]
-
+for name, text_color in colors.items():
     css_lines.extend([
         f"body.theme-dark .hl-felt-{name},",
         f"body.reading-bg-dark .hl-felt-{name} {{",
-        f"  background-image: {bg_single} !important;",
+        f"  background-image: url('../img/textures/dark/marker_{name}_single.png') !important;",
         f"  color: {text_color} !important;",
         f"  mix-blend-mode: normal !important;",
-        f"  filter: drop-shadow(0 0 5px {glow_color});",
         f"}}",
-        f"body.theme-dark .hl-felt-{name}.hl-range-start, body.reading-bg-dark .hl-felt-{name}.hl-range-start {{ background-image: {bg_start} !important; }}",
-        f"body.theme-dark .hl-felt-{name}.hl-range-mid,   body.reading-bg-dark .hl-felt-{name}.hl-range-mid   {{ background-image: {bg_mid}   !important; }}",
-        f"body.theme-dark .hl-felt-{name}.hl-range-end,   body.reading-bg-dark .hl-felt-{name}.hl-range-end   {{ background-image: {bg_end}   !important; }}",
+        f"body.theme-dark .hl-felt-{name}.hl-range-start, body.reading-bg-dark .hl-felt-{name}.hl-range-start {{ background-image: url('../img/textures/dark/marker_{name}_start.png') !important; }}",
+        f"body.theme-dark .hl-felt-{name}.hl-range-mid,   body.reading-bg-dark .hl-felt-{name}.hl-range-mid   {{ background-image: url('../img/textures/dark/marker_{name}_mid.png') !important; }}",
+        f"body.theme-dark .hl-felt-{name}.hl-range-end,   body.reading-bg-dark .hl-felt-{name}.hl-range-end   {{ background-image: url('../img/textures/dark/marker_{name}_end.png') !important; }}",
     ])
 
 css_lines.extend([
@@ -400,4 +309,4 @@ if pos != -1:
 with open(css_file_path, "w", encoding="utf-8") as f:
     f.write(orig_css.rstrip() + "\n\n" + final_highlighter_css + "\n")
 
-print("Generated and written realistic textured highlighter CSS successfully!")
+print("Generated and written realistic PNG textured highlighter CSS successfully!")
