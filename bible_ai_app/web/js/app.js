@@ -1077,6 +1077,9 @@ const App = {
     window.addEventListener('resize', () => {
       this.checkAutoSidebarCollapse();
     });
+
+    // Initialiser l'état de la barre latérale selon l'état du volet droit
+    this.checkAutoSidebarCollapse();
   },
 
   setSidebarCollapsed(collapsed, isAuto = false) {
@@ -1112,11 +1115,9 @@ const App = {
         this.setSidebarCollapsed(false, true);
       }
     } else {
-      // Si la fenêtre est particulièrement étroite (< 1100px), réduire en mode icônes
-      if (window.innerWidth < 1100) {
-        if (sidebar && !sidebar.classList.contains('collapsed')) {
-          this.setSidebarCollapsed(true, true);
-        }
+      // Lorsque le volet droit s'ouvre -> replier systématiquement le volet gauche en mode icônes compactes
+      if (sidebar && !sidebar.classList.contains('collapsed')) {
+        this.setSidebarCollapsed(true, true);
       }
     }
 

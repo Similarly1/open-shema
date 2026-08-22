@@ -275,10 +275,24 @@
             </div>
             
             <div class="nav-mode-links" style="position: relative;">
-              <button class="mode-link" id="btn-display-options" title="Options d'affichage (Péricopes, numéros, fond de lecture)">Affichage ▾</button>
-              <button class="mode-link" id="mode-search-inline">Chercher</button>
-              <button class="mode-link" id="mode-notes-inline">Notes</button>
-              <button class="mode-link" id="btn-highlight-options" title="Options de surlignage (Couleurs, Styles, Mode Stylo)">Surligner ▾</button>
+              <button class="mode-link" id="btn-display-options" title="Options d'affichage (Péricopes, numéros, fond de lecture)">
+                <span class="mode-link-icon">👁️</span>
+                <span class="mode-link-text">Affichage</span>
+                <span class="pill-arrow">▾</span>
+              </button>
+              <button class="mode-link" id="mode-search-inline" title="Rechercher dans la Bible">
+                <span class="mode-link-icon">🔍</span>
+                <span class="mode-link-text">Chercher</span>
+              </button>
+              <button class="mode-link" id="mode-notes-inline" title="Notes d'étude et de passage">
+                <span class="mode-link-icon">📝</span>
+                <span class="mode-link-text">Notes</span>
+              </button>
+              <button class="mode-link" id="btn-highlight-options" title="Options de surlignage (Couleurs, Styles, Mode Stylo)">
+                <span class="mode-link-icon">🖍️</span>
+                <span class="mode-link-text">Surligner</span>
+                <span class="pill-arrow">▾</span>
+              </button>
 
               <!-- Popover Options d'Affichage & Fond de Lecture Rapide -->
               <div id="display-options-popover" class="reader-dropdown-popover hidden" style="position: absolute; top: 38px; left: 0; width: 310px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); border-radius: 8px; z-index: 1100; text-align: left;">
@@ -453,18 +467,18 @@
               <span class="btn-icon" style="display: inline-flex; align-items: center;">
                 <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"></path><path d="m4 14 6-6 2-3"></path><path d="M2 5h12"></path><path d="M7 2h1"></path><path d="m22 22-5-10-5 10"></path><path d="M14 18h6"></path></svg>
               </span>
-              <span>Interlinéaire</span>
+              <span class="btn-text">Interlinéaire</span>
               <span class="pill-arrow">▾</span>
             </button>
 
             <button class="tool-btn" id="btn-toggle-split" title="Mode Double Colonne / Comparaison">
               <span class="btn-icon">⇄</span>
-              <span>Double Vue</span>
+              <span class="btn-text">Double Vue</span>
             </button>
 
             <button class="tool-btn active hidden" id="btn-toggle-sync-scroll" title="Synchroniser le défilement des deux Bibles (alignement premier verset visible)">
               <span class="btn-icon">⇅</span>
-              <span>Synchro</span>
+              <span class="btn-text">Synchro</span>
             </button>
 
             <div class="zoom-controls">
