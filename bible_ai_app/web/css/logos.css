@@ -7867,6 +7867,15 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   display: none !important;
 }
 
+.reader-dropdown-popover.popover-align-right,
+#dict-display-popover,
+#comm-display-popover,
+#theol-display-popover {
+  left: auto !important;
+  right: 0 !important;
+  max-width: calc(100vw - 20px) !important;
+}
+
 /* ==========================================================================
    POPOVER OPTIONS D'AFFICHAGE RESTRUCTURÉ (STYLE LOGOS À 3 ONGLETS)
    ========================================================================== */
@@ -15599,7 +15608,162 @@ body:not(.theme-dark) .vintage-epoch-xix .pericope-title::after {
 }
 
 /* =========================================================================
- * 5. MICRO-DÉCALAGES SUBTILS DE PRESSE (SUR LES VERSETS UNIQUEMENT)
+ * 5. LISIBILITÉ DU MODE INTERLINÉAIRE EN IMMERSION VINTAGE
+ * ========================================================================= */
+/* --- Mode Sombre Grimoire --- */
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .verse-item.interlinear-mode,
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .verse-item.interlinear-mode,
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .verse-item.interlinear-mode {
+  background: rgba(14, 18, 28, 0.82) !important;
+  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+  border-left: 3.5px solid #f59e0b !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+  border-radius: 6px !important;
+  padding: 10px 14px !important;
+  margin-bottom: 14px !important;
+}
+
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .verse-item.interlinear-mode:hover,
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .verse-item.interlinear-mode:hover,
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .verse-item.interlinear-mode:hover {
+  background: rgba(22, 30, 46, 0.92) !important;
+  border-color: rgba(245, 158, 11, 0.55) !important;
+}
+
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .verse-item.interlinear-mode.selected,
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .verse-item.interlinear-mode.selected,
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .verse-item.interlinear-mode.selected,
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .verse-item.interlinear-mode.active-verse,
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .verse-item.interlinear-mode.active-verse,
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .verse-item.interlinear-mode.active-verse {
+  background: rgba(245, 158, 11, 0.16) !important;
+  border: 1.5px solid #f59e0b !important;
+  border-left: 4.5px solid #f59e0b !important;
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.3) !important;
+}
+
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .verse-interlinear-header,
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .verse-interlinear-header,
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .verse-interlinear-header {
+  border-bottom: 1px solid rgba(245, 158, 11, 0.25) !important;
+  padding-bottom: 6px !important;
+  margin-bottom: 8px !important;
+}
+
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .verse-interlinear-header .verse-num,
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .verse-interlinear-header .verse-num,
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .verse-interlinear-header .verse-num {
+  color: #f59e0b !important;
+  font-family: 'Cinzel', Georgia, serif !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+}
+
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .verse-interlinear-badge,
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .verse-interlinear-badge,
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .verse-interlinear-badge {
+  color: #e2cfae !important;
+  font-family: 'Cinzel', Georgia, serif !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+  opacity: 0.95 !important;
+}
+
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .interlinear-surface,
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .interlinear-surface,
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .interlinear-surface {
+  color: #f8fafc !important;
+  font-size: 1.05em !important;
+  font-weight: 600 !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
+}
+
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .interlinear-lemma,
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .interlinear-lemma,
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .interlinear-lemma {
+  color: #7dd3fc !important;
+  font-size: 1.15em !important;
+  font-weight: 500 !important;
+}
+
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .interlinear-translit,
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .interlinear-translit,
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .interlinear-translit {
+  color: #cbd5e1 !important;
+  font-style: italic !important;
+}
+
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .interlinear-strong,
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .interlinear-strong,
+.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .interlinear-strong {
+  background: rgba(125, 211, 252, 0.18) !important;
+  color: #7dd3fc !important;
+  border: 1px solid rgba(125, 211, 252, 0.45) !important;
+  font-weight: 700 !important;
+}
+
+/* --- Mode Sépia / Clair Vintage --- */
+body.reading-bg-sepia .vintage-epoch-ancient .verse-item.interlinear-mode,
+body.reading-bg-sepia .vintage-epoch-classic .verse-item.interlinear-mode,
+body.reading-bg-sepia .vintage-epoch-xix .verse-item.interlinear-mode,
+body:not(.theme-dark) .vintage-epoch-ancient .verse-item.interlinear-mode,
+body:not(.theme-dark) .vintage-epoch-classic .verse-item.interlinear-mode,
+body:not(.theme-dark) .vintage-epoch-xix .verse-item.interlinear-mode {
+  background: rgba(255, 252, 245, 0.7) !important;
+  border: 1px solid rgba(139, 90, 43, 0.3) !important;
+  border-left: 3.5px solid #8c2614 !important;
+  box-shadow: 0 2px 8px rgba(139, 90, 43, 0.1) !important;
+  border-radius: 6px !important;
+  padding: 10px 14px !important;
+  margin-bottom: 14px !important;
+}
+
+body.reading-bg-sepia .vintage-epoch-ancient .verse-interlinear-badge,
+body.reading-bg-sepia .vintage-epoch-classic .verse-interlinear-badge,
+body.reading-bg-sepia .vintage-epoch-xix .verse-interlinear-badge,
+body:not(.theme-dark) .vintage-epoch-ancient .verse-interlinear-badge,
+body:not(.theme-dark) .vintage-epoch-classic .verse-interlinear-badge,
+body:not(.theme-dark) .vintage-epoch-xix .verse-interlinear-badge {
+  color: #8c2614 !important;
+  font-family: 'Cinzel', Georgia, serif !important;
+  font-weight: 700 !important;
+}
+
+body.reading-bg-sepia .vintage-epoch-ancient .interlinear-surface,
+body.reading-bg-sepia .vintage-epoch-classic .interlinear-surface,
+body.reading-bg-sepia .vintage-epoch-xix .interlinear-surface,
+body:not(.theme-dark) .vintage-epoch-ancient .interlinear-surface,
+body:not(.theme-dark) .vintage-epoch-classic .interlinear-surface,
+body:not(.theme-dark) .vintage-epoch-xix .interlinear-surface {
+  color: #1d150c !important;
+  font-weight: 600 !important;
+}
+
+body.reading-bg-sepia .vintage-epoch-ancient .interlinear-lemma,
+body.reading-bg-sepia .vintage-epoch-classic .interlinear-lemma,
+body.reading-bg-sepia .vintage-epoch-xix .interlinear-lemma,
+body:not(.theme-dark) .vintage-epoch-ancient .interlinear-lemma,
+body:not(.theme-dark) .vintage-epoch-classic .interlinear-lemma,
+body:not(.theme-dark) .vintage-epoch-xix .interlinear-lemma {
+  color: #0f4c81 !important;
+  font-size: 1.15em !important;
+}
+
+body.reading-bg-sepia .vintage-epoch-ancient .interlinear-strong,
+body.reading-bg-sepia .vintage-epoch-classic .interlinear-strong,
+body.reading-bg-sepia .vintage-epoch-xix .interlinear-strong,
+body:not(.theme-dark) .vintage-epoch-ancient .interlinear-strong,
+body:not(.theme-dark) .vintage-epoch-classic .interlinear-strong,
+body:not(.theme-dark) .vintage-epoch-xix .interlinear-strong {
+  background: rgba(140, 38, 20, 0.1) !important;
+  color: #8c2614 !important;
+  border: 1px solid rgba(140, 38, 20, 0.35) !important;
+  font-weight: 700 !important;
+}
+
+/* =========================================================================
+ * 6. MICRO-DÉCALAGES SUBTILS DE PRESSE (SUR LES VERSETS UNIQUEMENT)
  * ========================================================================= */
 /* =========================================================================
  * 6. GUIDE DE PASSAGE (PASSAGE STUDY VIEW — 360° EXÉGÈSE)

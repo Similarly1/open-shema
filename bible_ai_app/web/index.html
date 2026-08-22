@@ -292,7 +292,162 @@
     }
 
     /* =========================================================================
-     * 3. MICRO-DÉCALAGES SUBTILS DE PRESSE (SUR LES VERSETS UNIQUEMENT)
+     * 3. LISIBILITÉ DU MODE INTERLINÉAIRE EN IMMERSION VINTAGE
+     * ========================================================================= */
+    /* --- Mode Sombre Grimoire --- */
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .verse-item.interlinear-mode,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .verse-item.interlinear-mode,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .verse-item.interlinear-mode {
+      background: rgba(14, 18, 28, 0.82) !important;
+      border: 1px solid rgba(245, 158, 11, 0.3) !important;
+      border-left: 3.5px solid #f59e0b !important;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+      border-radius: 6px !important;
+      padding: 10px 14px !important;
+      margin-bottom: 14px !important;
+    }
+
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .verse-item.interlinear-mode:hover,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .verse-item.interlinear-mode:hover,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .verse-item.interlinear-mode:hover {
+      background: rgba(22, 30, 46, 0.92) !important;
+      border-color: rgba(245, 158, 11, 0.55) !important;
+    }
+
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .verse-item.interlinear-mode.selected,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .verse-item.interlinear-mode.selected,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .verse-item.interlinear-mode.selected,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .verse-item.interlinear-mode.active-verse,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .verse-item.interlinear-mode.active-verse,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .verse-item.interlinear-mode.active-verse {
+      background: rgba(245, 158, 11, 0.16) !important;
+      border: 1.5px solid #f59e0b !important;
+      border-left: 4.5px solid #f59e0b !important;
+      box-shadow: 0 0 18px rgba(245, 158, 11, 0.3) !important;
+    }
+
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .verse-interlinear-header,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .verse-interlinear-header,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .verse-interlinear-header {
+      border-bottom: 1px solid rgba(245, 158, 11, 0.25) !important;
+      padding-bottom: 6px !important;
+      margin-bottom: 8px !important;
+    }
+
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .verse-interlinear-header .verse-num,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .verse-interlinear-header .verse-num,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .verse-interlinear-header .verse-num {
+      color: #f59e0b !important;
+      font-family: 'Cinzel', Georgia, serif !important;
+      font-size: 14px !important;
+      font-weight: 800 !important;
+    }
+
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .verse-interlinear-badge,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .verse-interlinear-badge,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .verse-interlinear-badge {
+      color: #e2cfae !important;
+      font-family: 'Cinzel', Georgia, serif !important;
+      font-size: 11px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.06em !important;
+      opacity: 0.95 !important;
+    }
+
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .interlinear-surface,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .interlinear-surface,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .interlinear-surface {
+      color: #f8fafc !important;
+      font-size: 1.05em !important;
+      font-weight: 600 !important;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
+    }
+
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .interlinear-lemma,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .interlinear-lemma,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .interlinear-lemma {
+      color: #7dd3fc !important;
+      font-size: 1.15em !important;
+      font-weight: 500 !important;
+    }
+
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .interlinear-translit,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .interlinear-translit,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .interlinear-translit {
+      color: #cbd5e1 !important;
+      font-style: italic !important;
+    }
+
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .interlinear-strong,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .interlinear-strong,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .interlinear-strong {
+      background: rgba(125, 211, 252, 0.18) !important;
+      color: #7dd3fc !important;
+      border: 1px solid rgba(125, 211, 252, 0.45) !important;
+      font-weight: 700 !important;
+    }
+
+    /* --- Mode Sépia / Clair Vintage --- */
+    body.reading-bg-sepia .vintage-epoch-ancient .verse-item.interlinear-mode,
+    body.reading-bg-sepia .vintage-epoch-classic .verse-item.interlinear-mode,
+    body.reading-bg-sepia .vintage-epoch-xix .verse-item.interlinear-mode,
+    body:not(.theme-dark) .vintage-epoch-ancient .verse-item.interlinear-mode,
+    body:not(.theme-dark) .vintage-epoch-classic .verse-item.interlinear-mode,
+    body:not(.theme-dark) .vintage-epoch-xix .verse-item.interlinear-mode {
+      background: rgba(255, 252, 245, 0.7) !important;
+      border: 1px solid rgba(139, 90, 43, 0.3) !important;
+      border-left: 3.5px solid #8c2614 !important;
+      box-shadow: 0 2px 8px rgba(139, 90, 43, 0.1) !important;
+      border-radius: 6px !important;
+      padding: 10px 14px !important;
+      margin-bottom: 14px !important;
+    }
+
+    body.reading-bg-sepia .vintage-epoch-ancient .verse-interlinear-badge,
+    body.reading-bg-sepia .vintage-epoch-classic .verse-interlinear-badge,
+    body.reading-bg-sepia .vintage-epoch-xix .verse-interlinear-badge,
+    body:not(.theme-dark) .vintage-epoch-ancient .verse-interlinear-badge,
+    body:not(.theme-dark) .vintage-epoch-classic .verse-interlinear-badge,
+    body:not(.theme-dark) .vintage-epoch-xix .verse-interlinear-badge {
+      color: #8c2614 !important;
+      font-family: 'Cinzel', Georgia, serif !important;
+      font-weight: 700 !important;
+    }
+
+    body.reading-bg-sepia .vintage-epoch-ancient .interlinear-surface,
+    body.reading-bg-sepia .vintage-epoch-classic .interlinear-surface,
+    body.reading-bg-sepia .vintage-epoch-xix .interlinear-surface,
+    body:not(.theme-dark) .vintage-epoch-ancient .interlinear-surface,
+    body:not(.theme-dark) .vintage-epoch-classic .interlinear-surface,
+    body:not(.theme-dark) .vintage-epoch-xix .interlinear-surface {
+      color: #1d150c !important;
+      font-weight: 600 !important;
+    }
+
+    body.reading-bg-sepia .vintage-epoch-ancient .interlinear-lemma,
+    body.reading-bg-sepia .vintage-epoch-classic .interlinear-lemma,
+    body.reading-bg-sepia .vintage-epoch-xix .interlinear-lemma,
+    body:not(.theme-dark) .vintage-epoch-ancient .interlinear-lemma,
+    body:not(.theme-dark) .vintage-epoch-classic .interlinear-lemma,
+    body:not(.theme-dark) .vintage-epoch-xix .interlinear-lemma {
+      color: #0f4c81 !important;
+      font-size: 1.15em !important;
+    }
+
+    body.reading-bg-sepia .vintage-epoch-ancient .interlinear-strong,
+    body.reading-bg-sepia .vintage-epoch-classic .interlinear-strong,
+    body.reading-bg-sepia .vintage-epoch-xix .interlinear-strong,
+    body:not(.theme-dark) .vintage-epoch-ancient .interlinear-strong,
+    body:not(.theme-dark) .vintage-epoch-classic .interlinear-strong,
+    body:not(.theme-dark) .vintage-epoch-xix .interlinear-strong {
+      background: rgba(140, 38, 20, 0.1) !important;
+      color: #8c2614 !important;
+      border: 1px solid rgba(140, 38, 20, 0.35) !important;
+      font-weight: 700 !important;
+    }
+
+    /* =========================================================================
+     * 4. MICRO-DÉCALAGES SUBTILS DE PRESSE (SUR LES VERSETS UNIQUEMENT)
      * ========================================================================= */
     .vintage-epoch-ancient .verse-item:nth-child(5n+1),
     .vintage-epoch-classic .verse-item:nth-child(5n+1),
@@ -2512,7 +2667,7 @@
                 <span class="pill-arrow">▾</span>
               </button>
 
-              <div id="dict-display-popover" class="reader-dropdown-popover hidden" style="position: absolute; top: 38px; right: 0; width: 320px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); border-radius: 8px; z-index: 1100; text-align: left;">
+              <div id="dict-display-popover" class="reader-dropdown-popover popover-align-right hidden" style="position: absolute; top: 38px; right: 0; left: auto !important; width: 320px; max-width: calc(100vw - 20px); padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); border-radius: 8px; z-index: 1100; text-align: left;">
                 <!-- 1. Transformations du Texte -->
                 <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 5px;">
                   <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
@@ -2525,7 +2680,7 @@
                   </label>
                   <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
                     <input type="checkbox" id="dict-opt-convert-roman" checked style="accent-color: #6366f1; width: 15px; height: 15px;">
-                    <span>Chiffres romains $\rightarrow$ Arabes</span>
+                    <span>Chiffres romains → Arabes</span>
                   </label>
                   <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
                     <input type="checkbox" id="dict-opt-footnotes" checked style="accent-color: #6366f1; width: 15px; height: 15px;">
@@ -2833,7 +2988,7 @@
                 <span class="pill-arrow">▾</span>
               </button>
 
-              <div id="comm-display-popover" class="reader-dropdown-popover hidden" style="position: absolute; top: 38px; right: 0; width: 310px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); border-radius: 8px; z-index: 1100; text-align: left;">
+              <div id="comm-display-popover" class="reader-dropdown-popover popover-align-right hidden" style="position: absolute; top: 38px; right: 0; left: auto !important; width: 310px; max-width: calc(100vw - 20px); padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); border-radius: 8px; z-index: 1100; text-align: left;">
                 <!-- 1. Choix de Police Sérif / Sans-Sérif -->
                 <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
                   Police de Caractères
@@ -3132,7 +3287,7 @@
                 <span class="pill-arrow">▾</span>
               </button>
 
-              <div id="theol-display-popover" class="reader-dropdown-popover hidden" style="position: absolute; top: 38px; right: 0; width: 310px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); border-radius: 8px; z-index: 1100; text-align: left;">
+              <div id="theol-display-popover" class="reader-dropdown-popover popover-align-right hidden" style="position: absolute; top: 38px; right: 0; left: auto !important; width: 310px; max-width: calc(100vw - 20px); padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); border-radius: 8px; z-index: 1100; text-align: left;">
                 <!-- Police de Caractères -->
                 <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
                   Police de Caractères
