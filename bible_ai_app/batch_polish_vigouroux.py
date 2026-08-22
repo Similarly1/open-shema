@@ -268,14 +268,16 @@ def main():
                 )
                 if ok:
                     return slug, title, True, res, usage, ep["name"], ep["model"]
-                if "quota" in str(res).lower() or "429" in str(res) or "rate" in str(res).lower():
-                    time.sleep(1.5 * attempt)
-                elif "timeout" in str(res).lower():
+                err_lower = str(res).lower()
+                if "quota" in err_lower or "429" in err_lower or "rate" in err_lower or "resource" in err_lower or "exhausted" in err_lower:
+                    time.sleep(2.5 * attempt)
+                elif "timeout" in err_lower:
                     break  # Basculer immédiatement sur l'endpoint suivant si timeout
                 else:
                     time.sleep(1)
 
         return slug, title, False, res, {}, start_endpoint["name"], start_endpoint["model"]
+
 
     print(f"\n🚀 Démarrage du traitement de {total_to_do} articles...\n")
 
