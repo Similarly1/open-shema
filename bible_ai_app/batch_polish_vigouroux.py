@@ -76,21 +76,21 @@ class EndpointRateLimiter:
 def build_gemini_pool(keys):
     """Construit un pool 100% Google Gemini combinant les 2 clés et les modèles 3.5 & 3.1 Flash-Lite."""
     pool = []
-    # Intervalle de 4.8s = max 12.5 requêtes/minute par point d'accès (bien en-dessous du plafond de 15 RPM)
+    # Intervalle de 5.5s = max 10.9 requêtes/minute par point d'accès (marge de sécurité parfaite sous les 15 RPM)
     if keys.get("gemini_key1"):
         pool.append({
             "id": "gemini_k1_3.5",
             "name": "Gemini 3.5 Lite (Clé 1)",
             "model": "gemini-3.5-flash-lite",
             "config": {"gemini_api_key": keys["gemini_key1"]},
-            "limiter": EndpointRateLimiter(min_interval=4.8)
+            "limiter": EndpointRateLimiter(min_interval=5.5)
         })
         pool.append({
             "id": "gemini_k1_3.1",
             "name": "Gemini 3.1 Lite (Clé 1)",
             "model": "gemini-3.1-flash-lite",
             "config": {"gemini_api_key": keys["gemini_key1"]},
-            "limiter": EndpointRateLimiter(min_interval=4.8)
+            "limiter": EndpointRateLimiter(min_interval=5.5)
         })
     if keys.get("gemini_key2"):
         pool.append({
@@ -98,14 +98,14 @@ def build_gemini_pool(keys):
             "name": "Gemini 3.5 Lite (Clé 2)",
             "model": "gemini-3.5-flash-lite",
             "config": {"gemini_api_key": keys["gemini_key2"]},
-            "limiter": EndpointRateLimiter(min_interval=4.8)
+            "limiter": EndpointRateLimiter(min_interval=5.5)
         })
         pool.append({
             "id": "gemini_k2_3.1",
             "name": "Gemini 3.1 Lite (Clé 2)",
             "model": "gemini-3.1-flash-lite",
             "config": {"gemini_api_key": keys["gemini_key2"]},
-            "limiter": EndpointRateLimiter(min_interval=4.8)
+            "limiter": EndpointRateLimiter(min_interval=5.5)
         })
     return pool
 
@@ -133,14 +133,14 @@ def build_hybrid_pool(keys, infomaniak_model="mistralai/Ministral-3-14B-Instruct
             "name": "Gemini 3.5 Lite (K1)",
             "model": "gemini-3.5-flash-lite",
             "config": {"gemini_api_key": keys["gemini_key1"]},
-            "limiter": EndpointRateLimiter(min_interval=4.8)
+            "limiter": EndpointRateLimiter(min_interval=5.5)
         })
         pool.append({
             "id": "gemini_k1_3.1",
             "name": "Gemini 3.1 Lite (K1)",
             "model": "gemini-3.1-flash-lite",
             "config": {"gemini_api_key": keys["gemini_key1"]},
-            "limiter": EndpointRateLimiter(min_interval=4.8)
+            "limiter": EndpointRateLimiter(min_interval=5.5)
         })
         
     # 3. Points d'accès Gemini Clé 2
@@ -150,17 +150,18 @@ def build_hybrid_pool(keys, infomaniak_model="mistralai/Ministral-3-14B-Instruct
             "name": "Gemini 3.5 Lite (K2)",
             "model": "gemini-3.5-flash-lite",
             "config": {"gemini_api_key": keys["gemini_key2"]},
-            "limiter": EndpointRateLimiter(min_interval=4.8)
+            "limiter": EndpointRateLimiter(min_interval=5.5)
         })
         pool.append({
             "id": "gemini_k2_3.1",
             "name": "Gemini 3.1 Lite (K2)",
             "model": "gemini-3.1-flash-lite",
             "config": {"gemini_api_key": keys["gemini_key2"]},
-            "limiter": EndpointRateLimiter(min_interval=4.8)
+            "limiter": EndpointRateLimiter(min_interval=5.5)
         })
         
     return pool
+
 
 
 def main():
