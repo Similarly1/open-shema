@@ -2043,7 +2043,7 @@
             <button class="btn-primary" id="btn-dict-search" style="height: 32px; padding: 0 12px; font-size: 12px; font-weight: 600;">Rechercher</button>
           </div>
 
-          <!-- DROITE : Outils & Actions -->
+          <!-- DROITE : Outils & Actions Épurés -->
           <div class="view-actions dict-view-toolbar-actions">
             <!-- Bouton Afficher / Masquer l'Index (TOC) -->
             <button class="tool-btn active" id="btn-dict-toggle-toc" title="Afficher / Masquer l'index alphabétique des mots">
@@ -2051,11 +2051,93 @@
               <span>Index</span>
             </button>
 
-            <!-- Zoom (- / % / +) -->
-            <div class="zoom-controls">
-              <button class="zoom-btn" id="btn-dict-zoom-out" title="Diminuer la taille du texte">−</button>
-              <span class="zoom-level" id="lbl-dict-zoom-level">100%</span>
-              <button class="zoom-btn" id="btn-dict-zoom-in" title="Augmenter la taille du texte">+</button>
+            <!-- Menu Déroulant Affichage & Options de transformation -->
+            <div style="position: relative;">
+              <button class="tool-btn" id="btn-dict-display-options" title="Options d'affichage & transformation du texte">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Affichage</span>
+                <span class="pill-arrow">▾</span>
+              </button>
+
+              <div id="dict-display-popover" class="reader-dropdown-popover hidden" style="position: absolute; top: 38px; right: 0; width: 320px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); border-radius: 8px; z-index: 1100; text-align: left;">
+                <!-- 1. Transformations du Texte -->
+                <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 5px;">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                  <span>Transformations du Texte</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; font-size: 12.5px;">
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+                    <input type="checkbox" id="dict-opt-convert-roman" checked style="accent-color: #6366f1; width: 15px; height: 15px;">
+                    <span>Chiffres romains $\rightarrow$ Arabes</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+                    <input type="checkbox" id="dict-opt-footnotes" checked style="accent-color: #6366f1; width: 15px; height: 15px;">
+                    <span>Citations de sources en infobulles & notes</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+                    <input type="checkbox" id="dict-opt-scripture" checked style="accent-color: #6366f1; width: 15px; height: 15px;">
+                    <span>Infobulles des versets bibliques</span>
+                  </label>
+                </div>
+
+                <!-- 2. Taille du texte / Zoom -->
+                <div style="border-top: 1px solid var(--border-color); margin: 8px 0; padding-top: 10px;">
+                  <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
+                    Taille du texte
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <button class="zoom-btn" id="btn-dict-zoom-out" style="width: 32px; height: 32px; font-size: 16px;">−</button>
+                    <span class="zoom-level" id="lbl-dict-zoom-level" style="font-weight: 700;">100%</span>
+                    <button class="zoom-btn" id="btn-dict-zoom-in" style="width: 32px; height: 32px; font-size: 16px;">+</button>
+                  </div>
+                </div>
+
+                <!-- 3. Police de Caractères -->
+                <div style="border-top: 1px solid var(--border-color); margin: 10px 0 6px 0; padding-top: 10px;">
+                  <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
+                    Police de Caractères
+                  </div>
+                  <div class="theol-font-toggle-group" style="display: flex; gap: 6px;">
+                    <button type="button" class="dict-font-choice-btn active" data-font="EB Garamond" style="flex: 1; padding: 6px 4px; font-family: 'EB Garamond', serif; font-size: 13px; text-align: center; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); cursor: pointer;">
+                      Sérif
+                      <div style="font-size: 9.5px; opacity: 0.7; font-family: sans-serif;">Garamond</div>
+                    </button>
+                    <button type="button" class="dict-font-choice-btn" data-font="Georgia" style="flex: 1; padding: 6px 4px; font-family: Georgia, serif; font-size: 13px; text-align: center; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); cursor: pointer;">
+                      Sérif
+                      <div style="font-size: 9.5px; opacity: 0.7; font-family: sans-serif;">Georgia</div>
+                    </button>
+                    <button type="button" class="dict-font-choice-btn" data-font="Inter" style="flex: 1; padding: 6px 4px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; text-align: center; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); cursor: pointer;">
+                      Sans-Sérif
+                      <div style="font-size: 9.5px; opacity: 0.7; font-family: sans-serif;">Inter</div>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 4. Fond de Lecture -->
+                <div style="border-top: 1px solid var(--border-color); margin: 10px 0 6px 0; padding-top: 10px;">
+                  <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
+                    Fond de Lecture
+                  </div>
+                  <div class="reading-bg-quick-row">
+                    <button type="button" class="reading-bg-quick-swatch dict-bg-swatch active" data-bg="auto" title="Harmonisé avec le thème (Auto)">
+                      <div class="quick-swatch-circle swatch-auto"><span class="quick-swatch-check">✓</span></div>
+                      <span class="quick-swatch-label">Auto</span>
+                    </button>
+                    <button type="button" class="reading-bg-quick-swatch dict-bg-swatch" data-bg="white" title="Blanc pur">
+                      <div class="quick-swatch-circle swatch-white"><span class="quick-swatch-check">✓</span></div>
+                      <span class="quick-swatch-label">Blanc</span>
+                    </button>
+                    <button type="button" class="reading-bg-quick-swatch dict-bg-swatch" data-bg="sepia" title="Sépia doux">
+                      <div class="quick-swatch-circle swatch-sepia"><span class="quick-swatch-check">✓</span></div>
+                      <span class="quick-swatch-label">Sépia</span>
+                    </button>
+                    <button type="button" class="reading-bg-quick-swatch dict-bg-swatch" data-bg="dark" title="Très sombre / Nuit">
+                      <div class="quick-swatch-circle swatch-dark"><span class="quick-swatch-check">✓</span></div>
+                      <span class="quick-swatch-label">Nuit</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- Action: Polissage IA -->
@@ -2064,17 +2146,17 @@
               <span>Polir IA</span>
             </button>
 
-            <!-- Action: Copier l'article -->
-            <button class="tool-btn icon-only" id="btn-dict-copy-article" title="Copier la définition">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-            </button>
-
-            <!-- Action: Exporter vers Notes -->
-            <button class="tool-btn" id="btn-dict-export-note" title="Enregistrer l'article dans vos notes (.md)">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
-              <span>Vers note</span>
-            </button>
+            <!-- Actions Secondaires : Copier & Exporter -->
+            <div class="theol-view-actions-group" style="display: flex; gap: 4px;">
+              <button class="tool-btn icon-only" id="btn-dict-copy-article" title="Copier la définition">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+              </button>
+              <button class="tool-btn icon-only" id="btn-dict-export-note" title="Enregistrer l'article dans vos notes (.md)">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+              </button>
+            </div>
           </div>
+
         </header>
 
         <!-- DISPOSITION MASTER-DETAIL (INDEX GAUCHE + ARTICLE DROITE) -->

@@ -14677,3 +14677,53 @@ body.palette-dark-slate .dict-source-badge:hover {
   color: #e0e7ff;
 }
 
+/* Liens des Articles Connexes (*Voir* : MOT) */
+.dict-cross-ref-link {
+  color: #6366f1;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(99, 102, 241, 0.08);
+  padding: 3px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.dict-cross-ref-link:hover {
+  background: #6366f1;
+  color: #ffffff !important;
+  border-color: #6366f1;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+}
+
+body.theme-dark .dict-cross-ref-link,
+body.palette-dark-slate .dict-cross-ref-link {
+  background: rgba(129, 140, 248, 0.12);
+  color: #a5b4fc;
+  border-color: rgba(129, 140, 248, 0.25);
+}
+
+body.theme-dark .dict-cross-ref-link:hover,
+body.palette-dark-slate .dict-cross-ref-link:hover {
+  background: #6366f1;
+  color: #ffffff !important;
+  border-color: #6366f1;
+}
+
+body.reading-bg-sepia .dict-cross-ref-link {
+  background: rgba(180, 83, 9, 0.1);
+  color: #b45309;
+  border-color: rgba(180, 83, 9, 0.25);
+}
+
+body.reading-bg-sepia .dict-cross-ref-link:hover {
+  background: #b45309;
+  color: #ffffff !important;
+  border-color: #b45309;
+}
+

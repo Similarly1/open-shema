@@ -16,11 +16,36 @@ const DictView = {
   activeLetter: 'ALL',
   currentZoom: 100,
   isTocCollapsed: false,
+  currentFootnotesList: [],
+
+  // Options d'affichage et de transformation du texte
+  optConvertRoman: true,
+  optFootnotes: true,
+  optScripture: true,
+  fontFamily: 'EB Garamond',
+  readingBg: 'auto',
 
   init() {
+    try {
+      const savedRoman = localStorage.getItem('dict_opt_convert_roman');
+      if (savedRoman !== null) this.optConvertRoman = (savedRoman === 'true');
+      const savedFn = localStorage.getItem('dict_opt_footnotes');
+      if (savedFn !== null) this.optFootnotes = (savedFn === 'true');
+      const savedScrip = localStorage.getItem('dict_opt_scripture');
+      if (savedScrip !== null) this.optScripture = (savedScrip === 'true');
+      const savedFont = localStorage.getItem('dict_view_font');
+      if (savedFont) this.fontFamily = savedFont;
+      const savedBg = localStorage.getItem('dict_reading_bg');
+      if (savedBg) this.readingBg = savedBg;
+      const savedZoom = localStorage.getItem('dict_view_zoom');
+      if (savedZoom) this.currentZoom = parseInt(savedZoom, 10) || 100;
+    } catch (e) {}
+
     this.bindHeaderControls();
+    this.bindDisplayOptions();
     this.bindTocControls();
     this.bindArticleControls();
+    this.applyDisplayPreferences();
   },
 
   async preloadInitialData() {
@@ -40,6 +65,7 @@ const DictView = {
     if (!this.allDictionaries || this.allDictionaries.length === 0) {
       this.loadDictionaries();
     }
+    this.applyDisplayPreferences();
   },
 
   _hashCode(str) {
@@ -152,15 +178,111 @@ const DictView = {
     document.getElementById('btn-dict-zoom-in')?.addEventListener('click', () => this.adjustZoom(10));
   },
 
-  adjustZoom(delta) {
-    this.currentZoom = Math.min(180, Math.max(70, this.currentZoom + delta));
-    const lbl = document.getElementById('lbl-dict-zoom-level');
+  bindDisplayOptions() {
+    const btnDisplay = document.getElementById('btn-dict-display-options');
+    const popover = document.getElementById('dict-display-popover');
+
+    btnDisplay?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      popover?.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (popover && !popover.classList.contains('hidden') && !e.target.closest('#btn-dict-display-options') && !e.target.closest('#dict-display-popover')) {
+        popover.classList.add('hidden');
+      }
+    });
+
+    // Checkboxes de transformation du texte
+    const chkRoman = document.getElementById('dict-opt-convert-roman');
+    const chkFn = document.getElementById('dict-opt-footnotes');
+    const chkScrip = document.getElementById('dict-opt-scripture');
+
+    if (chkRoman) {
+      chkRoman.checked = this.optConvertRoman;
+      chkRoman.addEventListener('change', () => {
+        this.optConvertRoman = chkRoman.checked;
+        localStorage.setItem('dict_opt_convert_roman', String(this.optConvertRoman));
+        this.renderSelectedSourceMatch();
+      });
+    }
+
+    if (chkFn) {
+      chkFn.checked = this.optFootnotes;
+      chkFn.addEventListener('change', () => {
+        this.optFootnotes = chkFn.checked;
+        localStorage.setItem('dict_opt_footnotes', String(this.optFootnotes));
+        this.renderSelectedSourceMatch();
+      });
+    }
+
+    if (chkScrip) {
+      chkScrip.checked = this.optScripture;
+      chkScrip.addEventListener('change', () => {
+        this.optScripture = chkScrip.checked;
+        localStorage.setItem('dict_opt_scripture', String(this.optScripture));
+        this.renderSelectedSourceMatch();
+      });
+    }
+
+    // Polices de caractères
+    document.querySelectorAll('.dict-font-choice-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const font = btn.dataset.font;
+        if (font) {
+          this.fontFamily = font;
+          localStorage.setItem('dict_view_font', font);
+          this.applyDisplayPreferences();
+        }
+      });
+    });
+
+    // Fond de lecture
+    document.querySelectorAll('.dict-bg-swatch').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const bg = btn.dataset.bg;
+        if (bg) {
+          this.readingBg = bg;
+          localStorage.setItem('dict_reading_bg', bg);
+          this.applyDisplayPreferences();
+        }
+      });
+    });
+  },
+
+  applyDisplayPreferences() {
     const bodyEl = document.getElementById('dict-article-body');
-    if (lbl) lbl.textContent = `${this.currentZoom}%`;
+    const lblZoom = document.getElementById('lbl-dict-zoom-level');
+    if (lblZoom) lblZoom.textContent = `${this.currentZoom}%`;
+
+    // Polices
+    document.querySelectorAll('.dict-font-choice-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.font === this.fontFamily);
+    });
     if (bodyEl) {
+      bodyEl.style.fontFamily = (this.fontFamily === 'Inter') ? "'Inter', sans-serif" : (this.fontFamily === 'Georgia' ? "Georgia, serif" : "'EB Garamond', serif");
       bodyEl.style.fontSize = `${16 * (this.currentZoom / 100)}px`;
     }
+
+    // Fond de lecture
+    document.querySelectorAll('.dict-bg-swatch').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.bg === this.readingBg);
+    });
+    const articleContainer = document.querySelector('.dict-article-panel');
+    if (articleContainer) {
+      articleContainer.classList.remove('reading-bg-white', 'reading-bg-sepia', 'reading-bg-dark');
+      if (this.readingBg !== 'auto') {
+        articleContainer.classList.add(`reading-bg-${this.readingBg}`);
+      }
+    }
   },
+
+  adjustZoom(delta) {
+    this.currentZoom = Math.min(180, Math.max(70, this.currentZoom + delta));
+    localStorage.setItem('dict_view_zoom', String(this.currentZoom));
+    this.applyDisplayPreferences();
+  },
+
 
   // =========================================================================
   // 2. CHARGEMENT & SÉLECTION DES DICTIONNAIRES
@@ -509,7 +631,7 @@ const DictView = {
     const rawText = match.full_text || match.raw_text || match.preview || '';
     this.currentFootnotesList = [];
     const formatted = this.formatArticleMarkdown(rawText);
-    let linkified = (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences)
+    let linkified = (this.optScripture && typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences)
       ? TheologyView.highlightScriptureReferences(formatted)
       : formatted;
     if (typeof TheologyView !== 'undefined' && TheologyView.linkifyUrls) {
@@ -518,7 +640,7 @@ const DictView = {
 
     // Section des notes de bas de page si des citations ont été extraites
     let footnotesHtml = '';
-    if (this.currentFootnotesList.length > 0) {
+    if (this.optFootnotes && this.currentFootnotesList.length > 0) {
       footnotesHtml = `
         <div class="theol-footnotes-section" id="dict-footnotes-section" style="margin-top: 32px; border-top: 1px solid var(--border-color); padding-top: 18px;">
           <div class="theol-footnotes-header" style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px;">
@@ -550,8 +672,8 @@ const DictView = {
       ${footnotesHtml}
     `;
 
-    // 1. Attacher le gestionnaire d'infobulles des versets bibliques (ScriptureTooltip)
-    if (typeof ScriptureTooltip !== 'undefined') {
+    // 1. Attacher les liens vers les versets bibliques (ScriptureTooltip)
+    if (this.optScripture && typeof ScriptureTooltip !== 'undefined') {
       ScriptureTooltip.bindToElements(bodyEl.querySelectorAll('.theol-inline-scripture-ref'));
     }
     bodyEl.querySelectorAll('.theol-inline-scripture-ref').forEach(span => {
@@ -565,13 +687,25 @@ const DictView = {
       });
     });
 
-    // 2. Attacher le gestionnaire d'infobulles des notes de bas de page (FootnoteTooltip)
-    if (typeof FootnoteTooltip !== 'undefined') {
+    // 2. Attacher les liens interactifs des Articles Connexes (*Voir* : MOT)
+    bodyEl.querySelectorAll('.dict-cross-ref-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const word = link.dataset.word;
+        if (word) {
+          this.openDictionary(this.activeDictId, word);
+        }
+      });
+    });
+
+    // 3. Attacher le gestionnaire d'infobulles des notes de bas de page (FootnoteTooltip)
+    if (this.optFootnotes && typeof FootnoteTooltip !== 'undefined') {
       FootnoteTooltip.setFootnotes(this.currentFootnotesList);
       FootnoteTooltip.bindToElements(bodyEl.querySelectorAll('.theol-fn-badge'));
     }
 
-    // 3. Attacher les liens retour (back-links) de la section des notes
+    // 4. Attacher les liens retour (back-links) de la section des notes
     bodyEl.querySelectorAll('.theol-fn-backref').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
@@ -588,7 +722,7 @@ const DictView = {
       });
     });
 
-    // 4. Basculer vers l'original si cliqué
+    // 5. Basculer vers l'original si cliqué
     bodyEl.querySelector('#btn-dict-view-original')?.addEventListener('click', () => {
       const origText = match.raw_text || match.full_text || '';
       bodyEl.innerHTML = `<div class="dict-entry-body-content">${this.formatArticleMarkdown(origText)}</div>`;
@@ -681,82 +815,123 @@ const DictView = {
 
     let processed = text;
 
-    // 1. Normalisation des références bibliques Vulgate complexes : (IV Reg. [II Rois], XXIII, 29-30) ou (II Par. [Chron.], XXXV, 20-25)
-    processed = processed.replace(/([I|V|X|1-4\s]*\*?[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç\.]+\*?)\s*\[([^\]]+)\]\s*,\s*([IVXLCDM0-9]+)\s*,\s*([0-9]+(?:\s*(?:,|et|\-|\–)\s*[0-9]+)*)/gi, (match, rawB, bkAlias, romCh, verses) => {
-      const kAlias = cleanBookKey(bkAlias);
-      const kRaw = cleanBookKey(rawB);
-      const bookFr = BOOK_ALIASES[kAlias] || BOOK_ALIASES[kRaw] || bkAlias;
-      const chNum = ROMAN_MAP[romCh.toUpperCase()] || romCh;
-      const cleanV = verses.replace(/et\s+/g, '').replace(/–/g, '-').replace(/\s+/g, '');
-      return `${bookFr} ${chNum}:${cleanV}`;
-    });
-
-    // 2. Normalisation des références bibliques classiques avec chiffres romains : Zach., XII, 11 ou *Zach.*, XII, 11
-    processed = processed.replace(/(?:\*+)?\b((?:I{1,3}|IV|[1-4])\s*\*?[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+\*?|[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+\.?\*?)\s*,\s*([IVXLCDM]+)\s*,\s*([0-9]+(?:\s*[\-–]\s*[0-9]+)?)/gi, (match, rawB, romCh, verses) => {
-      const k = cleanBookKey(rawB);
-      const bookFr = BOOK_ALIASES[k];
-      if (bookFr) {
+    // 1. Normalisation des références bibliques et conversion des chiffres romains
+    if (this.optConvertRoman) {
+      // Vulgate avec crochets : (IV Reg. [II Rois], XXIII, 29-30)
+      processed = processed.replace(/([I|V|X|1-4\s]*\*?[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç\.]+\*?)\s*\[([^\]]+)\]\s*,\s*([IVXLCDM0-9]+)\s*,\s*([0-9]+(?:\s*(?:,|et|\-|\–)\s*[0-9]+)*)/gi, (match, rawB, bkAlias, romCh, verses) => {
+        const kAlias = cleanBookKey(bkAlias);
+        const kRaw = cleanBookKey(rawB);
+        const bookFr = BOOK_ALIASES[kAlias] || BOOK_ALIASES[kRaw] || bkAlias;
         const chNum = ROMAN_MAP[romCh.toUpperCase()] || romCh;
-        const cleanV = verses.replace(/–/g, '-').replace(/\s+/g, '');
+        const cleanV = verses.replace(/et\s+/g, '').replace(/–/g, '-').replace(/\s+/g, '');
         return `${bookFr} ${chNum}:${cleanV}`;
-      }
-      return match;
-    });
+      });
 
-    // 3. Normalisation des références contextuelles : Ézéchiel (VIII, 14) -> Ézéchiel 8:14
-    processed = processed.replace(/\b([A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+)\s*\(([IVXLCDM]+)\s*,\s*([0-9]+(?:\s*[\-–]\s*[0-9]+)?)\)/gi, (match, rawB, romCh, verses) => {
-      const k = cleanBookKey(rawB);
-      const bookFr = BOOK_ALIASES[k];
-      if (bookFr) {
+      // Classiques avec chiffres romains : Zach., XII, 11
+      processed = processed.replace(/(?:\*+)?\b((?:I{1,3}|IV|[1-4])\s*\*?[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+\*?|[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+\.?\*?)\s*,\s*([IVXLCDM]+)\s*,\s*([0-9]+(?:\s*[\-–]\s*[0-9]+)?)/gi, (match, rawB, romCh, verses) => {
+        const k = cleanBookKey(rawB);
+        const bookFr = BOOK_ALIASES[k];
+        if (bookFr) {
+          const chNum = ROMAN_MAP[romCh.toUpperCase()] || romCh;
+          const cleanV = verses.replace(/–/g, '-').replace(/\s+/g, '');
+          return `${bookFr} ${chNum}:${cleanV}`;
+        }
+        return match;
+      });
+
+      // Contextuelles : Ézéchiel (VIII, 14) -> Ézéchiel 8:14
+      processed = processed.replace(/\b([A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+)\s*\(([IVXLCDM]+)\s*,\s*([0-9]+(?:\s*[\-–]\s*[0-9]+)?)\)/gi, (match, rawB, romCh, verses) => {
+        const k = cleanBookKey(rawB);
+        const bookFr = BOOK_ALIASES[k];
+        if (bookFr) {
+          const chNum = ROMAN_MAP[romCh.toUpperCase()] || romCh;
+          const cleanV = verses.replace(/–/g, '-').replace(/\s+/g, '');
+          return `${bookFr} ${chNum}:${cleanV}`;
+        }
+        return match;
+      });
+
+      // Paralipomènes (XXXV, 25) -> (2 Chroniques 35:25)
+      processed = processed.replace(/Paralipomènes\s*\(([IVXLCDM]+)\s*,\s*([0-9]+)\)/gi, (match, romCh, v) => {
         const chNum = ROMAN_MAP[romCh.toUpperCase()] || romCh;
-        const cleanV = verses.replace(/–/g, '-').replace(/\s+/g, '');
-        return `${bookFr} ${chNum}:${cleanV}`;
+        return `Paralipomènes (2 Chroniques ${chNum}:${v})`;
+      });
+
+      // Tomes, parties et planches
+      processed = processed.replace(/\bI(?:re|ère)\s+(partie|série)/gi, '1re $1');
+      processed = processed.replace(/\bII(?:e|ème)\s+(partie|série)/gi, '2e $1');
+      processed = processed.replace(/\bIII(?:e|ème)\s+(partie|série)/gi, '3e $1');
+      processed = processed.replace(/\b(tomes?|t\.)\s+([IVXLCDM]+)\b/gi, (match, prefix, rom) => {
+        const arab = ROMAN_MAP[rom.toUpperCase()] || rom;
+        const normP = prefix.toLowerCase().startsWith('tome') ? 'tome' : 't.';
+        return `${normP} ${arab}`;
+      });
+      processed = processed.replace(/\b(pl\.|planche)\s+([IVXLCDM]+)\b/gi, (match, prefix, rom) => {
+        const arab = ROMAN_MAP[rom.toUpperCase()] || rom;
+        return `${prefix} ${arab}`;
+      });
+      processed = processed.replace(/\b(Sat\.|Saturnales)\s+([IVXLCDM]+)\b/gi, (match, prefix, rom) => {
+        const arab = ROMAN_MAP[rom.toUpperCase()] || rom;
+        return `${prefix} ${arab}`;
+      });
+    }
+
+    // 2. Extraction des citations de sources en notes de bas de page
+    if (this.optFootnotes) {
+      processed = processed.replace(/\(([^\)\n]{12,350})\)/g, (match, inner) => {
+        const lower = inner.toLowerCase();
+        const isSource = ['col.', 'p.', 'page', 't.', 'tome', 'édit', 'éd.', 'vol.', 'in-4', 'in-8', 'in-fol', 'ouv. cité', 'op. cit.', 'comment.', 'explan.', 'scholia', 'lexicon', 'revue', 'theol.', 'religionsgeschichte', 'monuments', 'sat.', 'genesis', 'mélanges', 'description de la palestine', 'thésaurus', 'keilinschriften', 'les prophètes'].some(k => lower.includes(k));
+        if (isSource) {
+          const fnId = this.currentFootnotesList.length + 1;
+          const cleanText = inner.replace(/[*_`]+/g, '').trim();
+          this.currentFootnotesList.push({ id: fnId, text: cleanText });
+          return `<span class="theol-fn-badge" data-fn-id="${fnId}" id="dict-fnref-${fnId}">${fnId}</span>`;
+        }
+        return match;
+      });
+    }
+
+    // 3. Transformation des renvois et Articles Connexes (*Voir* : **MOT**) en liens cliquables
+    const lines = processed.split(/\r?\n/);
+    const transformedLines = [];
+    let inSeeList = false;
+
+    lines.forEach(line => {
+      const trimmed = line.trim();
+      // Matcher: * *Voir* : **MOT** (details) ou Voir* : MOT ou Voir : MOT
+      const seeMatch = trimmed.match(/^[*•-]?\s*(?:\*+|_+)?\s*Voir(?:\s+(?:aussi|également))?\s*(?:\*+|_+)?\s*:\s*(?:\*\*)?([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\s–-]+?)(?:\*\*)?(?:\s*\((.*?)\))?$/i);
+      if (seeMatch) {
+        if (!inSeeList) {
+          transformedLines.push('<ul class="dict-see-list" style="list-style: none; padding-left: 0; margin: 12px 0;">');
+          inSeeList = true;
+        }
+        const targetWord = seeMatch[1].trim();
+        const details = (seeMatch[2] || '').trim();
+        const detailsHtml = details ? ` <span class="dict-see-details" style="color: var(--text-muted); font-size: 13px; font-style: italic;">(${details})</span>` : '';
+        transformedLines.push(`
+          <li class="dict-see-item" style="margin-bottom: 8px;">
+            <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(targetWord)}" style="color: #6366f1; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; background: rgba(99, 102, 241, 0.08); padding: 3px 10px; border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.2); transition: all 0.15s ease;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              <span>${this.escapeHtml(targetWord)}</span>
+            </a>${detailsHtml}
+          </li>
+        `);
+      } else {
+        if (inSeeList) {
+          transformedLines.push('</ul>');
+          inSeeList = false;
+        }
+        transformedLines.push(line);
       }
-      return match;
     });
+    if (inSeeList) transformedLines.push('</ul>');
+    processed = transformedLines.join('\n');
 
-    // 4. Normalisation de Paralipomènes (XXXV, 25) -> (2 Chroniques 35:25)
-    processed = processed.replace(/Paralipomènes\s*\(([IVXLCDM]+)\s*,\s*([0-9]+)\)/gi, (match, romCh, v) => {
-      const chNum = ROMAN_MAP[romCh.toUpperCase()] || romCh;
-      return `Paralipomènes (2 Chroniques ${chNum}:${v})`;
-    });
-
-    // 5. Conversion des chiffres romains dans les tomes, parties et planches
-    processed = processed.replace(/\bI(?:re|ère)\s+(partie|série)/gi, '1re $1');
-    processed = processed.replace(/\bII(?:e|ème)\s+(partie|série)/gi, '2e $1');
-    processed = processed.replace(/\bIII(?:e|ème)\s+(partie|série)/gi, '3e $1');
-    processed = processed.replace(/\b(tomes?|t\.)\s+([IVXLCDM]+)\b/gi, (match, prefix, rom) => {
-      const arab = ROMAN_MAP[rom.toUpperCase()] || rom;
-      const normP = prefix.toLowerCase().startsWith('tome') ? 'tome' : 't.';
-      return `${normP} ${arab}`;
-    });
-    processed = processed.replace(/\b(pl\.|planche)\s+([IVXLCDM]+)\b/gi, (match, prefix, rom) => {
-      const arab = ROMAN_MAP[rom.toUpperCase()] || rom;
-      return `${prefix} ${arab}`;
-    });
-    processed = processed.replace(/\b(Sat\.|Saturnales)\s+([IVXLCDM]+)\b/gi, (match, prefix, rom) => {
-      const arab = ROMAN_MAP[rom.toUpperCase()] || rom;
-      return `${prefix} ${arab}`;
-    });
-
-    // 6. Extraction des citations de sources entre parenthèses en vraies Notes de bas de page (Style Théologie)
-    processed = processed.replace(/\(([^\)\n]{12,350})\)/g, (match, inner) => {
-      const lower = inner.toLowerCase();
-      const isSource = ['col.', 'p.', 'page', 't.', 'tome', 'édit', 'éd.', 'vol.', 'in-4', 'in-8', 'in-fol', 'ouv. cité', 'op. cit.', 'comment.', 'explan.', 'scholia', 'lexicon', 'revue', 'theol.', 'religionsgeschichte', 'monuments', 'sat.', 'genesis', 'mélanges', 'description de la palestine', 'thésaurus', 'keilinschriften', 'les prophètes'].some(k => lower.includes(k));
-      if (isSource) {
-        const fnId = this.currentFootnotesList.length + 1;
-        const cleanText = inner.replace(/[*_`]+/g, '').trim();
-        this.currentFootnotesList.push({ id: fnId, text: cleanText });
-        return `<span class="theol-fn-badge" data-fn-id="${fnId}" id="dict-fnref-${fnId}">${fnId}</span>`;
-      }
-      return match;
-    });
-
-    // 7. Formatage Markdown
+    // 4. Formatage Markdown
     const formatted = processed
-      .replace(/^### (.*$)/gim, '<h3 style="margin: 16px 0 8px 0; font-size: 17px; font-weight: 700;">$1</h3>')
-      .replace(/^## (.*$)/gim, '<h2 style="margin: 20px 0 10px 0; font-size: 19px; font-weight: 700;">$1</h2>')
-      .replace(/^# (.*$)/gim, '<h1 style="margin: 22px 0 12px 0; font-size: 22px; font-weight: 800;">$1</h1>')
+      .replace(/^### (.*$)/gim, '<h3 style="margin: 18px 0 8px 0; font-size: 17px; font-weight: 700;">$1</h3>')
+      .replace(/^## (.*$)/gim, '<h2 style="margin: 22px 0 10px 0; font-size: 19px; font-weight: 700;">$1</h2>')
+      .replace(/^# (.*$)/gim, '<h1 style="margin: 24px 0 12px 0; font-size: 22px; font-weight: 800;">$1</h1>')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
       .replace(/^\> (.*$)/gim, '<blockquote style="border-left: 3px solid var(--accent-blue); padding: 8px 14px; margin: 12px 0; background: var(--bg-subtle); border-radius: 0 6px 6px 0; font-style: italic;">$1</blockquote>')
@@ -767,9 +942,10 @@ const DictView = {
       .split(/\n\n+/)
       .map(p => p.trim())
       .filter(Boolean)
-      .map(p => (p.startsWith('<h') || p.startsWith('<blockquote') || p.startsWith('<li')) ? p : `<p style="margin: 8px 0; line-height: 1.75;">${p}</p>`)
+      .map(p => (p.startsWith('<h') || p.startsWith('<blockquote') || p.startsWith('<li') || p.startsWith('<ul') || p.startsWith('</ul')) ? p : `<p style="margin: 8px 0; line-height: 1.75;">${p}</p>`)
       .join('');
   },
+
 
 
 
