@@ -530,6 +530,12 @@ const TheologyView = {
     const refVerses = data.referenced_verses || [];
     const refBooks = data.referenced_books || [];
 
+    // Application du style d'immersion historique
+    const readingContainer = document.querySelector('.theol-reading-container') || document.querySelector('.theol-view-main-scroll');
+    if (readingContainer && typeof VintageThemeManager !== 'undefined') {
+      VintageThemeManager.applyEpochToElement(readingContainer, author || bookTitle);
+    }
+
     // 1. Rendu du Hero Header
     let versesHtml = '';
     if (refVerses.length > 0) {
@@ -1943,6 +1949,16 @@ const TheologyView = {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
+  },
+
+  refreshVintage() {
+    const readingContainer = document.querySelector('.theol-reading-container') || document.querySelector('.theol-view-main-scroll');
+    if (readingContainer && typeof VintageThemeManager !== 'undefined') {
+      const data = this.currentChapterData;
+      const author = data?.book_author || '';
+      const bookTitle = data?.book_title || data?.book_name || '';
+      VintageThemeManager.applyEpochToElement(readingContainer, author || bookTitle);
+    }
   }
 };
 

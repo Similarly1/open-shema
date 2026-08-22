@@ -557,6 +557,10 @@ Directives de rédaction :
       document.getElementById('lbl-line-spacing-val').textContent = `${c.line_spacing} px`;
     }
 
+    if (typeof VintageThemeManager !== 'undefined') {
+      VintageThemeManager.init(c);
+    }
+
     document.getElementById('cfg-diff-pct').checked = c.show_diff_percentage !== false;
     document.getElementById('cfg-diff-highlight').checked = c.show_diff_highlights !== false;
     if (document.getElementById('cfg-show-chap-dividers')) {
@@ -839,6 +843,14 @@ Directives de rédaction :
     newCfg.font_family = document.getElementById('cfg-font-family').value;
     newCfg.font_size = parseInt(document.getElementById('cfg-font-size').value);
     newCfg.line_spacing = parseInt(document.getElementById('cfg-line-spacing').value);
+
+    // Options Mode Historique & Immersion Époque
+    newCfg.vintage_mode = document.getElementById('cfg-vintage-mode')?.checked !== false;
+    newCfg.vintage_scope = document.querySelector('input[name="cfg-vintage-scope"]:checked')?.value || 'auto';
+    newCfg.vintage_intensity = document.querySelector('input[name="cfg-vintage-intensity"]:checked')?.value || 'subtle';
+    if (typeof VintageThemeManager !== 'undefined') {
+      VintageThemeManager.init(newCfg);
+    }
 
     newCfg.show_diff_percentage = document.getElementById('cfg-diff-pct').checked;
     newCfg.show_diff_highlights = document.getElementById('cfg-diff-highlight').checked;

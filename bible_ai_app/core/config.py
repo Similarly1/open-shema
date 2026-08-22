@@ -84,6 +84,9 @@ DEFAULTS = {
     "summary_fallback_model": "gemini-2.5-flash",
     "summary_word_count": 300,
     "summary_system_prompt": DEFAULT_SUMMARY_SYSTEM_PROMPT,
+    "vintage_mode": True,
+    "vintage_scope": "auto",
+    "vintage_intensity": "subtle",
 }
 
 def load_config():

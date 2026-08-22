@@ -903,6 +903,11 @@ const CommentariesView = {
     // Mettre à jour l'affichage de l'ouvrage actif dans le sélecteur
     this.updateActiveBookDisplay();
 
+    // Application du style d'ambiance historique
+    if (typeof VintageThemeManager !== 'undefined' && this.articleContainer) {
+      VintageThemeManager.applyEpochToElement(this.articleContainer, authorName);
+    }
+
     // Mettre à jour l'état actif dans le Popover et les raccourcis
     this.renderPopoverList();
     this.renderQuickFavorites();
@@ -1463,5 +1468,13 @@ const CommentariesView = {
       color: '#1E3A8A',
       initials
     };
+  },
+
+  refreshVintage() {
+    if (this.articleContainer && typeof VintageThemeManager !== 'undefined') {
+      const comm = this.currentComments?.[this.activeIndex];
+      const authorName = comm?.author || comm?.source || this.preferredAuthor || 'Commentaire';
+      VintageThemeManager.applyEpochToElement(this.articleContainer, authorName);
+    }
   }
 };
