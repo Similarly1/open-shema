@@ -19,6 +19,7 @@ const DictView = {
   currentFootnotesList: [],
 
   // Options d'affichage et de transformation du texte
+  optLogosRestructure: true,
   optConvertRoman: true,
   optFootnotes: true,
   optScripture: true,
@@ -27,6 +28,8 @@ const DictView = {
 
   init() {
     try {
+      const savedLogos = localStorage.getItem('dict_opt_logos_restructure');
+      if (savedLogos !== null) this.optLogosRestructure = (savedLogos === 'true');
       const savedRoman = localStorage.getItem('dict_opt_convert_roman');
       if (savedRoman !== null) this.optConvertRoman = (savedRoman === 'true');
       const savedFn = localStorage.getItem('dict_opt_footnotes');
@@ -40,6 +43,7 @@ const DictView = {
       const savedZoom = localStorage.getItem('dict_view_zoom');
       if (savedZoom) this.currentZoom = parseInt(savedZoom, 10) || 100;
     } catch (e) {}
+
 
     this.bindHeaderControls();
     this.bindDisplayOptions();
@@ -194,9 +198,19 @@ const DictView = {
     });
 
     // Checkboxes de transformation du texte
+    const chkLogos = document.getElementById('dict-opt-logos-restructure');
     const chkRoman = document.getElementById('dict-opt-convert-roman');
     const chkFn = document.getElementById('dict-opt-footnotes');
     const chkScrip = document.getElementById('dict-opt-scripture');
+
+    if (chkLogos) {
+      chkLogos.checked = this.optLogosRestructure;
+      chkLogos.addEventListener('change', () => {
+        this.optLogosRestructure = chkLogos.checked;
+        localStorage.setItem('dict_opt_logos_restructure', String(this.optLogosRestructure));
+        this.renderSelectedSourceMatch();
+      });
+    }
 
     if (chkRoman) {
       chkRoman.checked = this.optConvertRoman;
@@ -687,7 +701,7 @@ const DictView = {
       });
     });
 
-    // 2. Attacher les liens interactifs des Articles Connexes (*Voir* : MOT)
+    // 2. Attacher les liens    // 2. Attacher les liens interactifs des Articles Connexes (*Voir* : MOT)
     bodyEl.querySelectorAll('.dict-cross-ref-link').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
@@ -695,6 +709,24 @@ const DictView = {
         const word = link.dataset.word;
         if (word) {
           this.openDictionary(this.activeDictId, word);
+        }
+      });
+    });
+
+    // 2b. Attacher les liens de saut interne (ex: Voir N° 8)
+    bodyEl.querySelectorAll('.dict-internal-jump-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const targetId = link.dataset.jumpTo;
+        if (targetId) {
+          const targetEl = document.getElementById(targetId);
+          if (targetEl) {
+            targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            targetEl.classList.remove('theol-highlight-pulse');
+            void targetEl.offsetWidth;
+            targetEl.classList.add('theol-highlight-pulse');
+          }
         }
       });
     });
@@ -757,13 +789,13 @@ const DictView = {
       "i sam": "1 Samuel", "ii sam": "2 Samuel", "1 sam": "1 Samuel", "2 sam": "2 Samuel", "1s": "1 Samuel", "2s": "2 Samuel",
       "i reg": "1 Rois", "ii reg": "2 Rois", "iii reg": "1 Rois", "iv reg": "2 Rois",
       "1 reg": "1 Rois", "2 reg": "2 Rois", "3 reg": "1 Rois", "4 reg": "2 Rois",
-      "i rois": "1 Rois", "ii rois": "2 Rois", "1 rois": "1 Rois", "2 rois": "2 Rois",
+      "i rois": "1 Rois", "ii rois": "2 Rois", "1 rois": "1 Rois", "2 rois": "2 Rois", "1r": "1 Rois", "2r": "2 Rois",
       "i par": "1 Chroniques", "ii par": "2 Chroniques", "1 par": "1 Chroniques", "2 par": "2 Chroniques",
       "1 ch": "1 Chroniques", "2 ch": "2 Chroniques", "1ch": "1 Chroniques", "2ch": "2 Chroniques",
       "i chron": "1 Chroniques", "ii chron": "2 Chroniques", "1 chron": "1 Chroniques", "2 chron": "2 Chroniques", "chron": "1 Chroniques",
       "esd": "Esdras", "esdras": "Esdras", "i esdr": "1 Esdras", "ii esdr": "2 Esdras",
-      "neh": "Néhémie", "nehemie": "Néhémie",
-      "esth": "Esther", "esther": "Esther",
+      "neh": "Néhémie", "nehemie": "Néhémie", "né": "Néhémie", "ne": "Néhémie",
+      "esth": "Esther", "esther": "Esther", "est": "Esther",
       "job": "Job", "jb": "Job",
       "ps": "Psaumes", "psa": "Psaumes", "psaumes": "Psaumes", "psaume": "Psaumes", "pss": "Psaumes",
       "prov": "Proverbes", "proverbes": "Proverbes", "pr": "Proverbes",
@@ -771,13 +803,13 @@ const DictView = {
       "cant": "Cantique des cantiques", "cantique": "Cantique des cantiques", "ct": "Cantique des cantiques",
       "is": "Ésaïe", "isa": "Ésaïe", "esaie": "Ésaïe", "isaie": "Ésaïe", "es": "Ésaïe",
       "jer": "Jérémie", "jeremie": "Jérémie", "jr": "Jérémie",
-      "lam": "Lamentations", "lamentations": "Lamentations",
+      "lam": "Lamentations", "lamentations": "Lamentations", "lm": "Lamentations",
       "ezech": "Ézéchiel", "eze": "Ézéchiel", "ezechiel": "Ézéchiel", "ez": "Ézéchiel",
-      "dan": "Daniel", "daniel": "Daniel", "da": "Daniel",
+      "dan": "Daniel", "daniel": "Daniel", "da": "Daniel", "dn": "Daniel",
       "os": "Osée", "osee": "Osée",
       "joel": "Joël", "jl": "Joël",
       "am": "Amos", "amos": "Amos",
-      "abd": "Abdias", "abdias": "Abdias",
+      "abd": "Abdias", "abdias": "Abdias", "ab": "Abdias",
       "jon": "Jonas", "jonas": "Jonas",
       "mich": "Michée", "michee": "Michée", "mi": "Michée",
       "nah": "Nahum", "nahum": "Nahum", "na": "Nahum",
@@ -795,18 +827,18 @@ const DictView = {
       "i cor": "1 Corinthiens", "ii cor": "2 Corinthiens", "1 cor": "1 Corinthiens", "2 cor": "2 Corinthiens", "1co": "1 Corinthiens", "2co": "2 Corinthiens",
       "gal": "Galates", "galates": "Galates", "ga": "Galates",
       "eph": "Éphésiens", "ephesiens": "Éphésiens", "ep": "Éphésiens",
-      "phil": "Philippiens", "philippiens": "Philippiens", "php": "Philippiens",
+      "phil": "Philippiens", "philippiens": "Philippiens", "php": "Philippiens", "ph": "Philippiens",
       "col": "Colossiens", "colossiens": "Colossiens",
-      "i thes": "1 Thessaloniciens", "ii thes": "2 Thessaloniciens",
-      "i tim": "1 Timothée", "ii tim": "2 Timothée",
-      "tit": "Tite", "tite": "Tite",
-      "philm": "Philémon", "philemon": "Philémon",
-      "heb": "Hébreux", "hebreux": "Hébreux", "he": "Hébreux",
-      "jacq": "Jacques", "jacques": "Jacques", "ja": "Jacques", "jas": "Jacques",
-      "i pierre": "1 Pierre", "ii pierre": "2 Pierre", "1 pierre": "1 Pierre", "2 pierre": "2 Pierre",
-      "i jean": "1 Jean", "ii jean": "2 Jean", "iii jean": "3 Jean",
-      "jud": "Juges", "jude": "Jude",
-      "apoc": "Apocalypse", "apocalypse": "Apocalypse", "rev": "Apocalypse", "apo": "Apocalypse"
+      "i thes": "1 Thessaloniciens", "ii thes": "2 Thessaloniciens", "1th": "1 Thessaloniciens", "2th": "2 Thessaloniciens",
+      "i tim": "1 Timothée", "ii tim": "2 Timothée", "1tm": "1 Timothée", "2tm": "2 Timothée",
+      "tit": "Tite", "tite": "Tite", "tt": "Tite",
+      "phlm": "Philémon", "philemon": "Philémon", "phm": "Philémon",
+      "heb": "Hébreux", "hebreux": "Hébreux", "he": "Hébreux", "hé": "Hébreux",
+      "jacq": "Jacques", "jacques": "Jacques", "ja": "Jacques", "jas": "Jacques", "jc": "Jacques",
+      "i pierre": "1 Pierre", "ii pierre": "2 Pierre", "1 pierre": "1 Pierre", "2 pierre": "2 Pierre", "1p": "1 Pierre", "2p": "2 Pierre",
+      "i jean": "1 Jean", "ii jean": "2 Jean", "iii jean": "3 Jean", "1j": "1 Jean", "2j": "2 Jean", "3j": "3 Jean",
+      "jud": "Juges", "jude": "Jude", "jd": "Jude",
+      "apoc": "Apocalypse", "apocalypse": "Apocalypse", "rev": "Apocalypse", "apo": "Apocalypse", "ap": "Apocalypse"
     };
 
     const cleanBookKey = (name) => {
@@ -814,6 +846,35 @@ const DictView = {
     };
 
     let processed = text;
+
+    // 0. Traitement des Balises Logos Standards
+    processed = processed
+      .replace(/\[\[@Headword:[^\]]+\]\]/gi, '')
+      .replace(/\[\[@Bible:([^\]]+)\]\]/gi, '($1)')
+      .replace(/\[\[@(?:Topic|Article):([^\]]+)\]\]/gi, 'Voir : $1')
+      .replace(/\[\[@Strong:([HG]\d+)\]\]/gi, 'Strong $1');
+
+    // 0b. Restructuration Automatique des textes bruts (Logos / NDB)
+    if (this.optLogosRestructure) {
+      // Nettoyage typographique : suppression espace avant point, espaces dans parenthèses
+      processed = processed.replace(/\b([A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+)\s+\./g, '$1.');
+      processed = processed.replace(/\(\s+([^\)]+?)\s+\)/g, '($1)');
+      processed = processed.replace(/\s+\.1\b/g, '');
+
+      // Badges de versions bibliques
+      processed = processed.replace(/\b(SEGOND|SYNODALE|JÉRUSALEM|T\.O\.B\.|DARBY|Français Courant)\b/g, '<span class="dict-version-badge">$1</span>');
+
+      // Normalisation des références bibliques abrégées avec points (ex: 1Ch 24.1 , 6, 10 -> 1 Chroniques 24:1, 6, 10 ou Lc 1.5 -> Luc 1:5)
+      processed = processed.replace(/\b(1Ch|2Ch|1S|2S|1R|2R|Lc|Mt|Mc|Jn|Ac|Rm|1Co|2Co|Ga|Ep|Ph|Col|1Th|2Th|1Tm|2Tm|Tt|Phm|He|Hé|Jc|1P|2P|1J|2J|3J|Jd|Ap|Gn|Ex|Lv|Nb|Dt|Jos|Jg|Rt|Esd|Né|Ne|Est|Jb|Ps|Pr|Ec|Ct|Es|Jr|Lm|Ez|Dn|Os|Jl|Am|Ab|Jon|Mi|Na|Ha|So|Ag|Za|Ml)\s+(\d+)\.(\d+(?:\s*[\-–]\s*\d+)?(?:\s*,\s*\d+)*)/gi, (match, bk, ch, vs) => {
+        const k = cleanBookKey(bk);
+        const bookFr = BOOK_ALIASES[k] || bk;
+        const cleanVs = vs.replace(/\s+/g, '');
+        return `${bookFr} ${ch}:${cleanVs}`;
+      });
+
+      // Liens de saut interne : Voir N° 8 -> ancre vers sous-carte 8
+      processed = processed.replace(/\bVoir\s+(?:N°|n°|numéro)\s*(\d+)\b/gi, '<a href="javascript:void(0)" class="dict-internal-jump-link" data-jump-to="dict-subentry-$1">Voir n° $1</a>');
+    }
 
     // 1. Normalisation des références bibliques et conversion des chiffres romains
     if (this.optConvertRoman) {
@@ -883,13 +944,13 @@ const DictView = {
       });
     }
 
-    // 3. Traitement structuré ligne par ligne (Sous-titres numérotés, Articles Connexes, Listes et Sources Cf.)
+    // 3. Traitement structuré ligne par ligne
     const lines = processed.split(/\r?\n/);
     const out = [];
     let inSeeList = false;
     let inUlList = false;
 
-    lines.forEach(line => {
+    lines.forEach((line, lineIdx) => {
       const raw = line.trim();
       if (!raw) {
         if (inSeeList) { out.push('</ul>'); inSeeList = false; }
@@ -915,7 +976,21 @@ const DictView = {
         }
       }
 
-      // B) Sous-entrées numérotées : **1. AGRICOLA Conrad** ou 1. **AGRICOLA Conrad**
+      // B0) En-tête NDB avec variantes et étymologie (Ligne initiale)
+      if (this.optLogosRestructure && lineIdx === 0 && raw.includes(' : ') && !raw.startsWith('**') && !raw.startsWith('#')) {
+        const colonIdx = raw.indexOf(' : ');
+        const varPart = raw.substring(0, colonIdx).trim();
+        const meanPart = raw.substring(colonIdx + 3).trim();
+        if (meanPart.length > 0 && meanPart.length < 180) {
+          if (varPart) {
+            out.push(`<div class="dict-header-variants" style="margin-bottom: 6px; font-size: 14px; color: var(--text-secondary); line-height: 1.6;">${varPart}</div>`);
+          }
+          out.push(`<div class="dict-etymology-box"><span class="dict-etymology-label">💡 Signification :</span> <span><em>${meanPart}</em></span></div>`);
+          return;
+        }
+      }
+
+      // B1) Sous-entrées numérotées Markdown : **1. AGRICOLA Conrad**
       const subHdrMatch = raw.match(/^\*\*(\d+)\.\s+([^*]+?)\*\*\s*(.*)$/) || raw.match(/^(\d+)\.\s+\*\*([^*]+?)\*\*\s*(.*)$/);
       if (subHdrMatch) {
         if (inSeeList) { out.push('</ul>'); inSeeList = false; }
@@ -937,9 +1012,35 @@ const DictView = {
         return;
       }
 
-      // C) Renvois et Articles Connexes (*Voir* : **MOT**)
-      const seeMatch = raw.match(/^[*•-]?\s*(?:\*+|_+)?\s*Voir(?:\s+(?:aussi|également))?\s*(?:\*+|_+)?\s*:\s*(?:\*\*)?([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\s–-]+?)(?:\*\*)?(?:\s*\((.*?)\))?[\.\s]*$/i);
-      if (seeMatch) {
+      // B2) Sous-entrées numérotées NDB brutes : 1.Épouse de Hetsrôn... ou 1. Épouse...
+      if (this.optLogosRestructure) {
+        const rawNumMatch = raw.match(/^(\d+)\.\s*(.+)$/);
+        if (rawNumMatch) {
+          if (inSeeList) { out.push('</ul>'); inSeeList = false; }
+          if (inUlList) { out.push('</ul>'); inUlList = false; }
+          const num = rawNumMatch[1];
+          let content = rawNumMatch[2].trim();
+
+          // Convertir les renvois inline dans le paragraphe (ex: Voir Abiyam. ou V. Ahbân)
+          content = content.replace(/\b(?:Voir|V\.)\s+([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ][a-zA-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇa-zÀ-ÿ\-]+)/g, (sm, targetW) => {
+            return `<a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(targetW)}">🔗 ${this.escapeHtml(targetW)}</a>`;
+          });
+
+          out.push(`
+            <div class="dict-subentry-card" id="dict-subentry-${num}">
+              <div class="dict-subentry-heading">
+                <span class="dict-subentry-num" style="display: inline-flex; align-items: center; justify-content: center; background: #6366f1; color: #fff; border-radius: 4px; padding: 1px 7px; font-size: 11px; font-weight: 700; margin-right: 6px;">${num}</span>
+              </div>
+              <p style="margin: 0; line-height: 1.75;">${content}</p>
+            </div>
+          `);
+          return;
+        }
+      }
+
+      // C) Renvois et Articles Connexes (*Voir* : **MOT** ou Voir MOT ou V. MOT)
+      const seeMatch = raw.match(/^[*•-]?\s*(?:\*+|_+)?\s*(?:Voir|V\.)(?:\s+(?:aussi|également))?\s*(?:\*+|_+)?\s*:?\s*(?:\*\*)?([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\s–-]+?)(?:\*\*)?(?:\s*\((.*?)\))?[\.\s]*$/i);
+      if (seeMatch && !raw.startsWith('1.') && !raw.startsWith('2.')) {
         if (inUlList) { out.push('</ul>'); inUlList = false; }
         if (inSeeList) { out.push('</ul>'); inSeeList = false; }
         const targetWord = seeMatch[1].trim();
@@ -998,7 +1099,6 @@ const DictView = {
         return;
       }
 
-
       // E) Listes à puces Markdown (* Ouvrage...)
       const bulletMatch = raw.match(/^[*•-]\s+(.+)$/);
       if (bulletMatch) {
@@ -1030,10 +1130,6 @@ const DictView = {
 
     return out.join('\n');
   },
-
-
-
-
 
   async polishCurrentArticle() {
     const match = this.currentMatches[this.activeSourceIndex] || this.currentEntryData;
