@@ -285,9 +285,14 @@ def main():
             return slug, title, False, "Texte trop court", {}, start_endpoint["name"], start_endpoint["model"]
 
         # Essayer d'abord le endpoint assigné, puis basculer sur les autres en cas d'erreur
-        tried_endpoints = [start_endpoint] + [ep for ep in endpoints_pool if ep != start_endpoint]
+        tried_endpoints = [ep for ep in ([start_endpoint] + [e for e in endpoints_pool if e != start_endpoint]) if not e.get("exhausted")]
+        if not tried_endpoints:
+            return slug, title, False, "Tous les points d'accès sont épuisés pour aujourd'hui (quota journalier atteint)", {}, start_endpoint["name"], start_endpoint["model"]
 
         for ep in tried_endpoints:
+            if ep.get("exhausted"):
+                continue
+
             for attempt in range(1, 3):
                 # Régulation stricte du débit pour ne jamais dépasser 12 RPM (sous le seuil de 15 RPM)
                 if "limiter" in ep:
@@ -303,15 +308,20 @@ def main():
                 if ok:
                     return slug, title, True, res, usage, ep["name"], ep["model"]
                 err_lower = str(res).lower()
+                if "generaterequestsperday" in err_lower or "quota exceeded for metric" in err_lower and "day" in err_lower:
+                    ep["exhausted"] = True
+                    print(f"\n⚠️ Point d'accès [{ep['name']}] : Quota journalier atteint (500 req/jour). Basculement automatique sur les autres clés !")
+                    break  # Passer immédiatement à l'endpoint suivant
+
                 if "quota" in err_lower or "429" in err_lower or "rate" in err_lower or "resource" in err_lower or "exhausted" in err_lower:
                     time.sleep(3.0 * attempt)
-
                 elif "timeout" in err_lower:
                     break  # Basculer immédiatement sur l'endpoint suivant si timeout
                 else:
                     time.sleep(1)
 
         return slug, title, False, res, {}, start_endpoint["name"], start_endpoint["model"]
+
 
 
     print(f"\n🚀 Démarrage du traitement de {total_to_do} articles...\n")
