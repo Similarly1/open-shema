@@ -306,130 +306,163 @@
                 <span class="pill-arrow">▾</span>
               </button>
 
-              <!-- Popover Options d'Affichage & Fond de Lecture Rapide -->
-              <div id="display-options-popover" class="reader-dropdown-popover hidden" style="position: absolute; top: 38px; left: 0; width: 310px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); border-radius: 8px; z-index: 1100; text-align: left;">
-                <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
-                  Affichage du Texte
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px;">
-                  <label class="custom-checkbox"><input type="checkbox" id="opt-show-pericopes" checked> <span>Titres de sections / Péricopes</span></label>
-                  <label class="custom-checkbox"><input type="checkbox" id="opt-show-chap-num" checked> <span>Lettrine de chapitre</span></label>
-                  <label class="custom-checkbox"><input type="checkbox" id="opt-show-verse-num" checked> <span>Numéros de versets</span></label>
-                  <label class="custom-checkbox"><input type="checkbox" id="opt-show-geo-pins" checked> <span>Repères de lieux géographiques (cartes)</span></label>
-                  <label class="custom-checkbox"><input type="checkbox" id="opt-show-highlights" checked> <span>Surlignages de versets</span></label>
-                  <label class="custom-checkbox"><input type="checkbox" id="opt-verse-per-line"> <span>Un verset par ligne</span></label>
-                  <label class="custom-checkbox"><input type="checkbox" id="opt-show-chap-dividers" checked> <span>Séparateurs entre chapitres (lignes & pastilles)</span></label>
-                  <label class="custom-checkbox"><input type="checkbox" id="opt-full-width"> <span>Pleine largeur (texte étendu)</span></label>
-                </div>
-
-                <div style="border-top: 1px solid var(--border-color); margin: 12px 0 4px 0; padding-top: 10px;">
-                  <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
-                    Mots entre crochets [explicatifs]
-                  </div>
-                  <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
-                    <label class="custom-radio">
-                      <input type="radio" name="opt-brackets-mode" value="classic" checked id="opt-brackets-classic">
-                      <span><strong>Classique :</strong> [Dieu] (crochets visibles)</span>
-                    </label>
-                    <label class="custom-radio">
-                      <input type="radio" name="opt-brackets-mode" value="italic" id="opt-brackets-italic">
-                      <span><strong>Typographique fluide :</strong> <em>Dieu</em> (italique sans crochets)</span>
-                    </label>
-                    <label class="custom-radio">
-                      <input type="radio" name="opt-brackets-mode" value="plain" id="opt-brackets-plain">
-                      <span><strong>Texte brut :</strong> Dieu (normal sans crochets)</span>
-                    </label>
+              <!-- Popover Options d'Affichage Restructuré (Style Logos à 3 Onglets) -->
+              <div id="display-options-popover" class="reader-dropdown-popover display-options-popover hidden" style="position: absolute; top: 38px; left: 0; width: 380px; padding: 0; box-shadow: 0 14px 36px rgba(0,0,0,0.38); border-radius: 10px; z-index: 1200; text-align: left; overflow: hidden;">
+                
+                <!-- En-tête avec titre et 3 onglets -->
+                <div class="disp-popover-header">
+                  <div class="disp-popover-title">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    <span>Options d'Affichage</span>
                   </div>
                 </div>
 
-                <div style="border-top: 1px solid var(--border-color); margin: 12px 0 4px 0; padding-top: 10px;">
-                  <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
-                    Notes de traduction & Variantes (Héb., Ou...)
-                  </div>
-                  <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
-                    <label class="custom-radio">
-                      <input type="radio" name="opt-parentheses-mode" value="callout" checked id="opt-parentheses-callout">
-                      <span><strong>Appel de note discret :</strong> <sup class="note-callout-marker">ⁿ</sup> (Infobulle au survol)</span>
-                    </label>
-                    <label class="custom-radio">
-                      <input type="radio" name="opt-parentheses-mode" value="classic" id="opt-parentheses-classic">
-                      <span><strong>Classique :</strong> (Ou ...) (parenthèses visibles)</span>
-                    </label>
-                    <label class="custom-radio">
-                      <input type="radio" name="opt-parentheses-mode" value="hidden" id="opt-parentheses-hidden">
-                      <span><strong>Lecture épurée :</strong> (notes masquées)</span>
-                    </label>
-                  </div>
+                <div class="disp-tabs-nav">
+                  <button type="button" class="disp-tab-btn active" data-disp-tab="elements">
+                    <svg class="disp-tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    <span>Éléments</span>
+                  </button>
+                  <button type="button" class="disp-tab-btn" data-disp-tab="typography">
+                    <svg class="disp-tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+                    <span>Typographie</span>
+                  </button>
+                  <button type="button" class="disp-tab-btn" data-disp-tab="ambiance">
+                    <svg class="disp-tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 1 0 10 10"/></svg>
+                    <span>Ambiance</span>
+                  </button>
                 </div>
 
-                <div style="border-top: 1px solid var(--border-color); margin: 12px 0 4px 0; padding-top: 10px;">
-                  <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
-                    Séparateurs poétiques / Césures (╵, |, ¦)
+                <div class="disp-tab-body">
+                  <!-- ONGLET 1 : ÉLÉMENTS DU TEXTE BIBLIQUE -->
+                  <div class="disp-tab-pane" id="disp-tab-pane-elements">
+                    <div class="disp-section-title">Éléments du Texte Biblique</div>
+                    <div class="disp-elements-grid">
+                      <label class="custom-checkbox"><input type="checkbox" id="opt-show-pericopes" checked> <span>Titres / Péricopes</span></label>
+                      <label class="custom-checkbox"><input type="checkbox" id="opt-show-verse-num" checked> <span>Numéros versets</span></label>
+                      <label class="custom-checkbox"><input type="checkbox" id="opt-show-chap-num" checked> <span>Lettrines chapitre</span></label>
+                      <label class="custom-checkbox"><input type="checkbox" id="opt-show-geo-pins" checked> <span>Repères cartes 📍</span></label>
+                      <label class="custom-checkbox"><input type="checkbox" id="opt-show-highlights" checked> <span>Surlignages</span></label>
+                      <label class="custom-checkbox"><input type="checkbox" id="opt-show-chap-dividers" checked> <span>Lignes chapitres</span></label>
+                      <label class="custom-checkbox"><input type="checkbox" id="opt-verse-per-line"> <span>1 verset par ligne</span></label>
+                      <label class="custom-checkbox"><input type="checkbox" id="opt-full-width"> <span>Pleine largeur</span></label>
+                    </div>
                   </div>
-                  <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
-                    <label class="custom-radio">
-                      <input type="radio" name="opt-caesura-mode" value="indent" checked id="opt-caesura-indent">
-                      <span><strong>Retour poétique indenté :</strong> saut de ligne et retrait (Par défaut)</span>
-                    </label>
-                    <label class="custom-radio">
-                      <input type="radio" name="opt-caesura-mode" value="hidden" id="opt-caesura-hidden">
-                      <span><strong>Texte fluide :</strong> supprimer les traits (lecture continue)</span>
-                    </label>
-                    <label class="custom-radio">
-                      <input type="radio" name="opt-caesura-mode" value="classic" id="opt-caesura-classic">
-                      <span><strong>Classique d'origine :</strong> garder le trait ╵ visible</span>
-                    </label>
-                  </div>
-                </div>
 
-                <div style="border-top: 1px solid var(--border-color); margin: 12px 0 4px 0; padding-top: 10px;">
-                  <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
-                    Fond de Lecture
-                  </div>
-                  <div class="reading-bg-quick-row">
-                    <!-- 1. Auto / Harmonisé -->
-                    <button type="button" id="btn-quick-bg-auto" class="reading-bg-quick-swatch active" data-bg="auto" title="Harmonisé avec le thème (Auto)">
-                      <div class="quick-swatch-circle swatch-auto">
-                        <span class="quick-swatch-check">✓</span>
+                  <!-- ONGLET 2 : TYPOGRAPHIE & CRITIQUE -->
+                  <div class="disp-tab-pane hidden" id="disp-tab-pane-typography">
+                    <!-- 1. Crochets explicatifs -->
+                    <div>
+                      <div class="disp-section-title">Mots entre crochets [explicatifs]</div>
+                      <div class="seg-control-bar">
+                        <label class="seg-btn" title="Classique avec crochets visibles">
+                          <input type="radio" name="opt-brackets-mode" value="classic" checked id="opt-brackets-classic">
+                          <span>[ Dieu ]</span>
+                        </label>
+                        <label class="seg-btn" title="Italique typographique fluide">
+                          <input type="radio" name="opt-brackets-mode" value="italic" id="opt-brackets-italic">
+                          <span><em>Dieu</em></span>
+                        </label>
+                        <label class="seg-btn" title="Texte brut normal sans crochets">
+                          <input type="radio" name="opt-brackets-mode" value="plain" id="opt-brackets-plain">
+                          <span>Dieu</span>
+                        </label>
                       </div>
-                      <span class="quick-swatch-label">Auto</span>
-                    </button>
-                    <!-- 2. Blanc Pur -->
-                    <button type="button" id="btn-quick-bg-white" class="reading-bg-quick-swatch" data-bg="white" title="Blanc pur">
-                      <div class="quick-swatch-circle swatch-white">
-                        <span class="quick-swatch-check">✓</span>
-                      </div>
-                      <span class="quick-swatch-label">Blanc</span>
-                    </button>
-                    <!-- 3. Sépia Doux -->
-                    <button type="button" id="btn-quick-bg-sepia" class="reading-bg-quick-swatch" data-bg="sepia" title="Sépia doux">
-                      <div class="quick-swatch-circle swatch-sepia">
-                        <span class="quick-swatch-check">✓</span>
-                      </div>
-                      <span class="quick-swatch-label">Sépia</span>
-                    </button>
-                    <!-- 4. Nuit Sombre -->
-                    <button type="button" id="btn-quick-bg-dark" class="reading-bg-quick-swatch" data-bg="dark" title="Très sombre / Nuit">
-                      <div class="quick-swatch-circle swatch-dark">
-                        <span class="quick-swatch-check">✓</span>
-                      </div>
-                      <span class="quick-swatch-label">Nuit</span>
-                    </button>
-                  </div>
-                </div>
+                    </div>
 
-                <div style="border-top: 1px solid var(--border-color); margin: 12px 0 4px 0; padding-top: 10px;">
-                  <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
-                    <span style="display: inline-flex; align-items: center; gap: 5px;">
-                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1.5a2.5 2.5 0 0 0-5 0V19"/><path d="M4 3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h11"/></svg>
-                      Ambiance Historique
-                    </span>
-                    <span id="opt-vintage-badge" style="font-size: 10px; color: var(--accent-orange); font-weight: 600;">Actif</span>
+                    <!-- 2. Notes de traduction & Variantes -->
+                    <div>
+                      <div class="disp-section-title">Notes de traduction & Variantes</div>
+                      <div class="seg-control-bar">
+                        <label class="seg-btn" title="Appel de note discret avec infobulle au survol">
+                          <input type="radio" name="opt-parentheses-mode" value="callout" checked id="opt-parentheses-callout">
+                          <span>Appel ⁿ</span>
+                        </label>
+                        <label class="seg-btn" title="Parenthèses classiques visibles dans le texte">
+                          <input type="radio" name="opt-parentheses-mode" value="classic" id="opt-parentheses-classic">
+                          <span>(Ou ...)</span>
+                        </label>
+                        <label class="seg-btn" title="Notes masquées pour une lecture fluide">
+                          <input type="radio" name="opt-parentheses-mode" value="hidden" id="opt-parentheses-hidden">
+                          <span>Masqué</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <!-- 3. Césures poétiques -->
+                    <div>
+                      <div class="disp-section-title">Séparateurs poétiques / Césures (╵, |, ¦)</div>
+                      <div class="seg-control-bar">
+                        <label class="seg-btn" title="Saut de ligne et retrait poétique">
+                          <input type="radio" name="opt-caesura-mode" value="indent" checked id="opt-caesura-indent">
+                          <span>Indenté ↵</span>
+                        </label>
+                        <label class="seg-btn" title="Texte continu sans interruption">
+                          <input type="radio" name="opt-caesura-mode" value="hidden" id="opt-caesura-hidden">
+                          <span>Fluide</span>
+                        </label>
+                        <label class="seg-btn" title="Conserver le symbole de trait ╵ d'origine">
+                          <input type="radio" name="opt-caesura-mode" value="classic" id="opt-caesura-classic">
+                          <span>Trait ╵</span>
+                        </label>
+                      </div>
+                    </div>
                   </div>
-                  <label class="custom-checkbox" style="margin-bottom: 4px;">
-                    <input type="checkbox" id="opt-vintage-mode" checked>
-                    <span><strong>Mode Époque & Manuscrits :</strong> papier, encre et lettrines selon la date</span>
-                  </label>
+
+                  <!-- ONGLET 3 : AMBIANCE & FOND -->
+                  <div class="disp-tab-pane hidden" id="disp-tab-pane-ambiance">
+                    <!-- 1. Fond de lecture -->
+                    <div>
+                      <div class="disp-section-title">Fond de Lecture Rapide</div>
+                      <div class="reading-bg-quick-row">
+                        <!-- 1. Auto / Harmonisé -->
+                        <button type="button" id="btn-quick-bg-auto" class="reading-bg-quick-swatch active" data-bg="auto" title="Harmonisé avec le thème (Auto)">
+                          <div class="quick-swatch-circle swatch-auto">
+                            <span class="quick-swatch-check">✓</span>
+                          </div>
+                          <span class="quick-swatch-label">Auto</span>
+                        </button>
+                        <!-- 2. Blanc Pur -->
+                        <button type="button" id="btn-quick-bg-white" class="reading-bg-quick-swatch" data-bg="white" title="Blanc pur">
+                          <div class="quick-swatch-circle swatch-white">
+                            <span class="quick-swatch-check">✓</span>
+                          </div>
+                          <span class="quick-swatch-label">Blanc</span>
+                        </button>
+                        <!-- 3. Sépia Doux -->
+                        <button type="button" id="btn-quick-bg-sepia" class="reading-bg-quick-swatch" data-bg="sepia" title="Sépia doux">
+                          <div class="quick-swatch-circle swatch-sepia">
+                            <span class="quick-swatch-check">✓</span>
+                          </div>
+                          <span class="quick-swatch-label">Sépia</span>
+                        </button>
+                        <!-- 4. Nuit Sombre -->
+                        <button type="button" id="btn-quick-bg-dark" class="reading-bg-quick-swatch" data-bg="dark" title="Très sombre / Nuit">
+                          <div class="quick-swatch-circle swatch-dark">
+                            <span class="quick-swatch-check">✓</span>
+                          </div>
+                          <span class="quick-swatch-label">Nuit</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- 2. Ambiance Historique -->
+                    <div class="disp-vintage-card">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <span style="font-size: 11.5px; font-weight: 700; color: var(--text-primary); display: inline-flex; align-items: center; gap: 5px;">
+                          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #d97706;"><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1.5a2.5 2.5 0 0 0-5 0V19"/><path d="M4 3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h11"/></svg>
+                          Immersion Historique & Manuscrits
+                        </span>
+                        <span id="opt-vintage-badge" style="font-size: 10px; color: var(--accent-orange); font-weight: 700; background: rgba(217, 119, 6, 0.12); padding: 1px 6px; border-radius: 4px;">Actif</span>
+                      </div>
+                      <label class="custom-checkbox">
+                        <input type="checkbox" id="opt-vintage-mode" checked>
+                        <span style="font-size: 11.5px; color: var(--text-secondary);">Patine de presse, encre bistre et lettrines selon l'époque du texte</span>
+                      </label>
+                    </div>
+                  </div>
                 </div>
               </div>
 

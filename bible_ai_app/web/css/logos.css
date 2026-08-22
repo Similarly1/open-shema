@@ -7863,6 +7863,152 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   display: none !important;
 }
 
+/* ==========================================================================
+   POPOVER OPTIONS D'AFFICHAGE RESTRUCTURÉ (STYLE LOGOS À 3 ONGLETS)
+   ========================================================================== */
+
+.display-options-popover {
+  width: 380px !important;
+  padding: 0 !important;
+  border-radius: 10px !important;
+  overflow: hidden !important;
+}
+
+.disp-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px 8px 14px;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.disp-popover-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.disp-tabs-nav {
+  display: flex;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  padding: 4px 6px;
+  gap: 4px;
+}
+
+.disp-tab-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.disp-tab-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.disp-tab-btn.active {
+  background: var(--bg-active);
+  color: var(--accent-blue);
+  font-weight: 700;
+}
+
+.disp-tab-btn .disp-tab-svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+}
+
+.disp-tab-body {
+  padding: 14px 16px;
+  min-height: 190px;
+}
+
+.disp-tab-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.disp-tab-pane.hidden {
+  display: none !important;
+}
+
+.disp-section-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.disp-elements-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+}
+
+/* Boutons segmentés 3 états */
+.seg-control-bar {
+  display: flex;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 7px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.seg-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 5px;
+  user-select: none;
+  transition: all 0.12s ease;
+  text-align: center;
+}
+
+.seg-btn input {
+  display: none;
+}
+
+.seg-btn:has(input:checked) {
+  background: var(--bg-card);
+  color: var(--accent-blue);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  font-weight: 700;
+}
+
+.disp-vintage-card {
+  padding: 10px 12px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
 /* Barre de 4 pastilles de fond de lecture sans emoji */
 .reading-bg-quick-row {
   display: grid;

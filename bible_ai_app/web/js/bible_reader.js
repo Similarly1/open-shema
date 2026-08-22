@@ -517,6 +517,18 @@ const DisplayOptions = {
         popover.classList.add('hidden');
       });
     });
+
+    // Gestion des 3 onglets du panneau d'affichage (Éléments, Typographie, Ambiance)
+    popover.querySelectorAll('.disp-tab-btn').forEach(tabBtn => {
+      tabBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const targetTab = tabBtn.dataset.dispTab;
+        popover.querySelectorAll('.disp-tab-btn').forEach(b => b.classList.toggle('active', b === tabBtn));
+        popover.querySelectorAll('.disp-tab-pane').forEach(pane => {
+          pane.classList.toggle('hidden', pane.id !== `disp-tab-pane-${targetTab}`);
+        });
+      });
+    });
   }
 };
 
