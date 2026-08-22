@@ -12,7 +12,7 @@
   
   <!-- CSS -->
   <link rel="stylesheet" href="css/leaflet.css">
-  <link rel="stylesheet" href="css/logos.css?v=3.0">
+  <link rel="stylesheet" href="css/logos.css?v=3.4">
 
   <style id="vintage-core-styles">
     /* =========================================================================
@@ -60,21 +60,36 @@
     /* =========================================================================
      * 1. MODE SOMBRE : « GRIMOIRE NOBLE & ÉPURÉ » (SOBRIÉTÉ ET FINESSE)
      * ========================================================================= */
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .pane-scrollable-content,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .pane-scrollable-content,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .pane-scrollable-content,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .chapter-block,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .chapter-block,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .chapter-block {
-      background-color: #131720 !important;
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .reading-pane.vintage-epoch-ancient,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .reading-pane.vintage-epoch-classic,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .reading-pane.vintage-epoch-xix,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient.pane-scrollable-content,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic.pane-scrollable-content,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix.pane-scrollable-content {
+      background-color: #11151e !important;
       background-image: 
-        radial-gradient(ellipse at 50% 40%, rgba(30, 41, 59, 0.45) 0%, rgba(15, 20, 28, 0.9) 100%),
+        radial-gradient(ellipse at 50% 40%, rgba(26, 35, 50, 0.5) 0%, rgba(12, 16, 24, 0.92) 100%),
+        url("img/textures/vintage/cuir/large_leather.png"),
         var(--vintage-noise-svg) !important;
-      box-shadow: inset 0 0 45px rgba(0, 0, 0, 0.45) !important;
+      background-repeat: repeat !important;
+      background-attachment: fixed !important;
+      box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5) !important;
       color: #e4d8c2 !important;
+    }
+
+    /* Transparence absolue pour éviter toute délimitation ou boîte rectangulaire */
+    .vintage-epoch-ancient .chapter-container,
+    .vintage-epoch-classic .chapter-container,
+    .vintage-epoch-xix .chapter-container,
+    .vintage-epoch-ancient .chapter-block,
+    .vintage-epoch-classic .chapter-block,
+    .vintage-epoch-xix .chapter-block,
+    .vintage-epoch-ancient .verses-flow,
+    .vintage-epoch-classic .verses-flow,
+    .vintage-epoch-xix .verses-flow {
+      background: transparent !important;
+      box-shadow: none !important;
+      border: none !important;
     }
 
     .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .verses-flow,
@@ -160,34 +175,26 @@
      * 2. MODE SÉPIA / PAPIER VERGÉ ÉLÉGANT (SOBRE & SUBTIL)
      * S'applique dès que reading-bg-sepia est actif, ou en mode clair vintage
      * ========================================================================= */
-    body.reading-bg-sepia .vintage-epoch-ancient,
-    body.reading-bg-sepia .vintage-epoch-classic,
-    body.reading-bg-sepia .vintage-epoch-xix,
-    body.reading-bg-sepia .vintage-epoch-ancient .pane-scrollable-content,
-    body.reading-bg-sepia .vintage-epoch-classic .pane-scrollable-content,
-    body.reading-bg-sepia .vintage-epoch-xix .pane-scrollable-content,
-    body.reading-bg-sepia .vintage-epoch-ancient .chapter-block,
-    body.reading-bg-sepia .vintage-epoch-classic .chapter-block,
-    body.reading-bg-sepia .vintage-epoch-xix .chapter-block,
-    body:not(.theme-dark) .vintage-epoch-ancient,
-    body:not(.theme-dark) .vintage-epoch-classic,
-    body:not(.theme-dark) .vintage-epoch-xix,
-    body:not(.theme-dark) .vintage-epoch-ancient .pane-scrollable-content,
-    body:not(.theme-dark) .vintage-epoch-classic .pane-scrollable-content,
-    body:not(.theme-dark) .vintage-epoch-xix .pane-scrollable-content,
-    body:not(.theme-dark) .vintage-epoch-ancient .chapter-block,
-    body:not(.theme-dark) .vintage-epoch-classic .chapter-block,
-    body:not(.theme-dark) .vintage-epoch-xix .chapter-block {
+    body.reading-bg-sepia .reading-pane.vintage-epoch-ancient,
+    body.reading-bg-sepia .reading-pane.vintage-epoch-classic,
+    body.reading-bg-sepia .reading-pane.vintage-epoch-xix,
+    body.reading-bg-sepia .vintage-epoch-ancient.pane-scrollable-content,
+    body.reading-bg-sepia .vintage-epoch-classic.pane-scrollable-content,
+    body.reading-bg-sepia .vintage-epoch-xix.pane-scrollable-content,
+    body:not(.theme-dark) .reading-pane.vintage-epoch-ancient,
+    body:not(.theme-dark) .reading-pane.vintage-epoch-classic,
+    body:not(.theme-dark) .reading-pane.vintage-epoch-xix,
+    body:not(.theme-dark) .vintage-epoch-ancient.pane-scrollable-content,
+    body:not(.theme-dark) .vintage-epoch-classic.pane-scrollable-content,
+    body:not(.theme-dark) .vintage-epoch-xix.pane-scrollable-content {
       background-color: #f4ecdc !important;
       background-image: 
-        radial-gradient(circle at 14% 16%, rgba(135, 80, 25, 0.16) 0%, transparent 28px),
-        radial-gradient(circle at 86% 22%, rgba(125, 75, 20, 0.14) 0%, transparent 35px),
-        radial-gradient(circle at 8% 68%, rgba(140, 85, 30, 0.15) 0%, transparent 26px),
-        radial-gradient(circle at 91% 78%, rgba(130, 78, 22, 0.18) 0%, transparent 40px),
-        repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(140, 95, 45, 0.04) 28px),
-        radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.4) 0%, rgba(244, 236, 220, 0.6) 70%, rgba(224, 208, 180, 0.5) 100%),
+        radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.4) 0%, rgba(244, 236, 220, 0.5) 70%, rgba(224, 208, 180, 0.6) 100%),
+        url("img/textures/vintage/papier/textured_paper.png"),
         var(--vintage-noise-svg) !important;
-      box-shadow: inset 0 0 45px rgba(130, 85, 30, 0.15) !important;
+      background-repeat: repeat !important;
+      background-attachment: fixed !important;
+      box-shadow: inset 0 0 50px rgba(130, 85, 30, 0.15) !important;
       color: #1d150c !important;
     }
 
@@ -416,6 +423,17 @@
             </svg>
           </span>
           <span class="nav-label">Bible</span>
+        </button>
+        <button class="nav-item" data-view="passage-study" id="nav-passage-study" title="Guide de Passage (Étude exégétique 360°)">
+          <span class="nav-icon">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+              <circle cx="12" cy="8" r="2"></circle>
+              <line x1="12" y1="14" x2="12" y2="18"></line>
+            </svg>
+          </span>
+          <span class="nav-label">Guide de Passage</span>
         </button>
         <button class="nav-item" data-view="commentaries" id="nav-commentaries" title="Commentaires exégétiques">
           <span class="nav-icon">
@@ -3289,6 +3307,144 @@
         </div>
       </div>
 
+      <!-- ===================================================== -->
+      <!-- VUE K : GUIDE DE PASSAGE (ÉTUDE EXÉGÉTIQUE À 360°)     -->
+      <!-- ===================================================== -->
+      <div class="app-view" id="view-passage-study">
+        <!-- BARRE SUPÉRIEURE : Recherche, Navigation & Actions -->
+        <header class="view-header ps-view-header">
+          <div class="ps-header-left">
+            <div class="ps-search-group">
+              <svg class="ps-search-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.3-4.3"></path>
+              </svg>
+              <input type="text" id="ps-search-input" class="search-field ps-search-field" placeholder="Entrez un passage (ex: Philippiens 2:5-11, Romains 8:1-17, Genèse 22)..." autocomplete="off">
+              <button class="tool-btn icon-only" id="btn-ps-search" title="Analyser ce passage">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+
+            <!-- Suggestions de passages rapides -->
+            <div class="ps-quick-chips">
+              <button type="button" class="ps-quick-chip" data-ref="Philippiens 2:5-11">Phil 2:5-11</button>
+              <button type="button" class="ps-quick-chip" data-ref="Romains 8:1-17">Rom 8:1-17</button>
+              <button type="button" class="ps-quick-chip" data-ref="Genèse 22:1-19">Gen 22</button>
+              <button type="button" class="ps-quick-chip" data-ref="Psaume 23">Psaume 23</button>
+              <button type="button" class="ps-quick-chip" data-ref="Jean 3:16-21">Jean 3:16-21</button>
+              <button type="button" class="ps-quick-chip" data-ref="Éphésiens 2:1-10">Eph 2:1-10</button>
+            </div>
+          </div>
+
+          <div class="ps-header-center">
+            <div class="ps-pericope-nav-group">
+              <button class="tool-btn icon-only" id="btn-ps-prev-pericope" title="Péricope précédente">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <div class="ps-headline-box">
+                <div class="ps-headline-ref" id="ps-header-ref">Philippiens 2:5–11</div>
+                <div class="ps-headline-title hidden" id="ps-header-pericope">L'abaissement et l'élévation de Jésus-Christ</div>
+              </div>
+              <button class="tool-btn icon-only" id="btn-ps-next-pericope" title="Péricope suivante">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="view-actions ps-header-actions">
+            <button class="tool-btn" id="btn-ps-sync-bible" title="Prendre le passage actif du lecteur Bible">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              <span>Synchroniser Bible</span>
+            </button>
+            <button class="tool-btn primary" id="btn-ps-export-note" title="Enregistrer l'étude complète du passage dans vos notes Markdown">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Exporter en Note</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- BARRE D'ONGLETS THÉMATIQUES DU PASSAGE -->
+        <nav class="ps-nav-tabs-bar">
+          <button type="button" class="ps-nav-tab active" data-tab="scripture">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            <span>Texte & Synoptique</span>
+          </button>
+          <button type="button" class="ps-nav-tab" data-tab="original">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1 .4-1 1v7c0 .6.4 1 1 1h14Z"/><path d="M16 17v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
+            <span>Langue Originale</span>
+          </button>
+          <button type="button" class="ps-nav-tab" data-tab="commentaries">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span>Commentaires & Synthèse</span>
+          </button>
+          <button type="button" class="ps-nav-tab" data-tab="encyclopedia">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>Contexte & Lieux</span>
+          </button>
+          <button type="button" class="ps-nav-tab" data-tab="ai">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+            <span>Atelier Exégèse IA</span>
+          </button>
+          <button type="button" class="ps-nav-tab" data-tab="notes">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>Notes Personnelles</span>
+          </button>
+        </nav>
+
+        <!-- ESPACE DE TRAVAIL DU GUIDE DE PASSAGE -->
+        <div class="ps-workspace-scroll" id="ps-workspace-scroll">
+          <!-- LOADER GLOBAL -->
+          <div class="ps-global-loader hidden" id="ps-global-loader">
+            <div class="ps-loader-content">
+              <div class="ps-spinner"></div>
+              <div class="ps-loader-text">Chargement et agrégation des données du passage...</div>
+            </div>
+          </div>
+
+          <!-- PANNEAU 1 : TEXTE & SYNOPTIQUE -->
+          <div class="ps-tab-panel active" id="ps-panel-scripture">
+            <div class="ps-panel-container" id="ps-content-scripture">
+              <!-- Injecté dynamiquement par PassageStudyView -->
+            </div>
+          </div>
+
+          <!-- PANNEAU 2 : LANGUE ORIGINALE -->
+          <div class="ps-tab-panel" id="ps-panel-original">
+            <div class="ps-panel-container" id="ps-content-original">
+              <!-- Injecté dynamiquement par PassageStudyView -->
+            </div>
+          </div>
+
+          <!-- PANNEAU 3 : COMMENTAIRES & SYNTHÈSE -->
+          <div class="ps-tab-panel" id="ps-panel-commentaries">
+            <div class="ps-panel-container" id="ps-content-commentaries">
+              <!-- Injecté dynamiquement par PassageStudyView -->
+            </div>
+          </div>
+
+          <!-- PANNEAU 4 : CONTEXTE & LIEUX -->
+          <div class="ps-tab-panel" id="ps-panel-encyclopedia">
+            <div class="ps-panel-container" id="ps-content-encyclopedia">
+              <!-- Injecté dynamiquement par PassageStudyView -->
+            </div>
+          </div>
+
+          <!-- PANNEAU 5 : ATELIER EXÉGÈSE IA -->
+          <div class="ps-tab-panel" id="ps-panel-ai">
+            <div class="ps-panel-container" id="ps-content-ai">
+              <!-- Injecté dynamiquement par PassageStudyView -->
+            </div>
+          </div>
+
+          <!-- PANNEAU 6 : NOTES PERSONNELLES -->
+          <div class="ps-tab-panel" id="ps-panel-notes">
+            <div class="ps-panel-container" id="ps-content-notes">
+              <!-- Injecté dynamiquement par PassageStudyView -->
+            </div>
+          </div>
+        </div>
+      </div>
+
     </main>
 
     <!-- ======================================================= -->
@@ -4623,6 +4779,7 @@
   <script src="js/dict_view.js?v=2.8"></script>
   <script src="js/leaflet.js"></script>
   <script src="js/maps_view.js"></script>
+  <script src="js/passage_study_view.js"></script>
   <script src="js/selection_context_menu.js"></script>
   <script src="js/highlighter.js"></script>
   <script src="js/app.js"></script>

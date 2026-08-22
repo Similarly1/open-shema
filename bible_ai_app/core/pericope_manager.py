@@ -64,38 +64,47 @@ class PericopeManager:
     def get_pericope_context(cls, bible_name: str, std_book_code: str, chapter: int, verse: int) -> Dict[str, Any]:
         """
         Calcule la péricope active contenant (chapter, verse), ainsi que la péricope
-        précédente et suivante pour enrichir le contexte exégétique de l'IA.
+        précédente et suivante pour enrichir le contexte exégétique de l'IA et la navigation.
+        Bascule automatiquement sur les versions riches en péricopes (NFC, Segond_21, Parole_Vivante)
+        si la version courante (ex: LSG) n'en intègre pas directement.
         """
         book_data = BibleJsonLoader.load_book(bible_name, std_book_code)
         fr_book = get_french_book_name(std_book_code)
         
-        default_res = {
-            "has_pericope": False,
-            "bible_name": bible_name,
-            "book": std_book_code,
-            "french_book": fr_book,
-            "current": None,
-            "prev": None,
-            "next": None
-        }
+        pericopes = book_data.get("pericopes", []) if book_data else []
         
-        if not book_data:
-            return default_res
-            
-        pericopes = book_data.get("pericopes", [])
+        # 1. Si la version courante n'a pas de péricopes (ex: LSG), tester les versions de référence structurées
         if not pericopes:
-            return default_res
-            
-        # Trouver la péricope active qui contient (chapter, verse)
-        target_idx = -1
+            for fallback_b in ["NFC", "Segond_21", "Parole_Vivante"]:
+                fb_data = BibleJsonLoader.load_book(fallback_b, std_book_code)
+                if fb_data and fb_data.get("pericopes"):
+                    book_data = fb_data
+                    pericopes = fb_data.get("pericopes", [])
+                    break
+
         target_ch = int(chapter)
         target_v = int(verse) if str(verse).isdigit() else 1
         
+        # 2. Si aucune péricope n'est trouvée dans aucune version, fournir une navigation par chapitre / section logique
+        if not pericopes:
+            prev_ref = f"{fr_book} {target_ch - 1}" if target_ch > 1 else None
+            next_ref = f"{fr_book} {target_ch + 1}"
+            return {
+                "has_pericope": False,
+                "bible_name": bible_name,
+                "book": std_book_code,
+                "french_book": fr_book,
+                "current": None,
+                "prev": {"title": f"Chapitre {target_ch - 1}", "ref_range": prev_ref} if prev_ref else None,
+                "next": {"title": f"Chapitre {target_ch + 1}", "ref_range": next_ref}
+            }
+            
+        # 3. Trouver la péricope active qui contient (chapter, verse)
+        target_idx = -1
         for idx, p in enumerate(pericopes):
             s_ch, s_v = p.get("start_ch", 1), p.get("start_v", 1)
             e_ch, e_v = p.get("end_ch", 1), p.get("end_v", 999)
             
-            # Vérifier si (target_ch, target_v) est dans [ (s_ch, s_v), (e_ch, e_v) ]
             is_after_start = (target_ch > s_ch) or (target_ch == s_ch and target_v >= s_v)
             is_before_end = (target_ch < e_ch) or (target_ch == e_ch and target_v <= e_v)
             
@@ -104,7 +113,6 @@ class PericopeManager:
                 break
                 
         if target_idx == -1:
-            # Si non trouvé exactement, prendre la dernière péricope commencée avant
             for idx, p in enumerate(pericopes):
                 s_ch, s_v = p.get("start_ch", 1), p.get("start_v", 1)
                 if (target_ch > s_ch) or (target_ch == s_ch and target_v >= s_v):
@@ -114,9 +122,6 @@ class PericopeManager:
                     
         if target_idx == -1 and pericopes:
             target_idx = 0
-            
-        if target_idx == -1:
-            return default_res
             
         cur_p = pericopes[target_idx]
         prev_p = pericopes[target_idx - 1] if target_idx > 0 else None
@@ -132,7 +137,7 @@ class PericopeManager:
             ref_range = f"{fr_book} {s_ch}:{s_v} – {e_ch}:{e_v}"
             
         # Extraire le texte complet des versets de la péricope active
-        chapters_dict = book_data.get("chapters", {})
+        chapters_dict = book_data.get("chapters", {}) if book_data else {}
         pericope_verses = []
         for ch_num in range(s_ch, e_ch + 1):
             ch_str = str(ch_num)
@@ -162,6 +167,13 @@ class PericopeManager:
                 "start_ch": ps_ch, "start_v": ps_v,
                 "end_ch": pe_ch, "end_v": pe_v
             }
+        elif target_ch > 1:
+            prev_data = {
+                "title": f"Chapitre {target_ch - 1}",
+                "ref_range": f"{fr_book} {target_ch - 1}",
+                "start_ch": target_ch - 1, "start_v": 1,
+                "end_ch": target_ch - 1, "end_v": 999
+            }
             
         next_data = None
         if next_p:
@@ -173,6 +185,13 @@ class PericopeManager:
                 "ref_range": n_ref,
                 "start_ch": ns_ch, "start_v": ns_v,
                 "end_ch": ne_ch, "end_v": ne_v
+            }
+        else:
+            next_data = {
+                "title": f"Chapitre {target_ch + 1}",
+                "ref_range": f"{fr_book} {target_ch + 1}",
+                "start_ch": target_ch + 1, "start_v": 1,
+                "end_ch": target_ch + 1, "end_v": 999
             }
             
         return {

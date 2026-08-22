@@ -25,6 +25,7 @@ const App = {
       { name: 'DictView', init: () => DictView.init() },
       { name: 'MapsView', init: () => MapsView.init() },
       { name: 'CommentariesView', init: () => CommentariesView.init() },
+      { name: 'PassageStudyView', init: () => (typeof PassageStudyView !== 'undefined' && PassageStudyView.init()) },
       { name: 'TheologyView', init: () => TheologyView.init() },
       { name: 'SelectionContextMenu', init: () => (typeof SelectionContextMenu !== 'undefined' && SelectionContextMenu.init()) },
       { name: 'HighlighterManager', init: () => (typeof HighlighterManager !== 'undefined' && HighlighterManager.init()) }
@@ -306,32 +307,96 @@ const App = {
     }
   },
 
-  updateSplashStatus(statusText, progressPercent = null) {
-    const textEl = document.getElementById('splash-status-text');
-    if (textEl && statusText) {
-      textEl.textContent = statusText;
+  // Contrôleur d'animation continue haute fluidité pour la barre de chargement (60 FPS)
+  SplashProgress: {
+    current: 0,
+    target: 12,
+    timer: null,
+    isDone: false,
+
+    start() {
+      this.current = 0;
+      this.target = 15;
+      this.isDone = false;
+      if (this.timer) cancelAnimationFrame(this.timer);
+
+      const tick = () => {
+        if (this.isDone) {
+          this.current = 100;
+          this.render();
+          return;
+        }
+
+        if (this.current < this.target) {
+          const diff = this.target - this.current;
+          // Interpolation progressive continue
+          const step = Math.max(0.15, diff * 0.05);
+          this.current = Math.min(this.target, this.current + step);
+        } else if (this.current < 95) {
+          // Défilement continu organique en tâche de fond (la barre ne s'arrête jamais net)
+          this.current = Math.min(95, this.current + 0.035);
+        }
+
+        this.render();
+        this.timer = requestAnimationFrame(tick);
+      };
+
+      this.timer = requestAnimationFrame(tick);
+    },
+
+    setTarget(targetPercent, statusText = null) {
+      this.target = Math.min(100, Math.max(this.target, targetPercent));
+      if (statusText) {
+        const textEl = document.getElementById('splash-status-text');
+        if (textEl) textEl.textContent = statusText;
+      }
+    },
+
+    finish(statusText = 'Prêt !') {
+      this.isDone = true;
+      this.target = 100;
+      this.current = 100;
+      if (statusText) {
+        const textEl = document.getElementById('splash-status-text');
+        if (textEl) textEl.textContent = statusText;
+      }
+      this.render();
+      if (this.timer) cancelAnimationFrame(this.timer);
+    },
+
+    render() {
+      const barEl = document.querySelector('.splash-progress-bar');
+      if (barEl) {
+        barEl.style.width = `${this.current.toFixed(1)}%`;
+      }
     }
-    const barEl = document.querySelector('.splash-progress-bar');
-    if (barEl && progressPercent !== null) {
-      barEl.style.animation = 'none';
-      barEl.style.left = '0';
-      barEl.style.width = `${Math.min(100, Math.max(0, progressPercent))}%`;
-      barEl.style.transition = 'width 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+  },
+
+  updateSplashStatus(statusText, progressPercent = null) {
+    if (progressPercent !== null) {
+      this.SplashProgress.setTarget(progressPercent, statusText);
+    } else if (statusText) {
+      const textEl = document.getElementById('splash-status-text');
+      if (textEl) textEl.textContent = statusText;
     }
   },
 
   async runPreloadPipeline() {
     if (this._isPreloadingDone) return;
 
+    // Démarrer l'animation de progression continue
+    this.SplashProgress.start();
+
     // Timeout de sécurité absolue : 15s max pour garantir la levée du Splash quoi qu'il arrive
     const safetyTimer = setTimeout(() => {
       console.warn('[App] Timeout sécurité de préchargement atteint (15s), masquage du splash.');
+      this.SplashProgress.finish();
       this.hideSplash();
     }, 15000);
 
     try {
       // 1. Initialisation des préférences & fenêtre (15%)
-      this.updateSplashStatus("Initialisation des préférences et de l'interface...", 15);
+      this.updateSplashStatus("Initialisation des préférences et de l'interface...", 20);
       try {
         const state = await API.call('get_window_state');
         if (state && typeof state.is_maximized === 'boolean') {
@@ -339,8 +404,8 @@ const App = {
         }
       } catch (e) {}
 
-      // 2. Chargement du lecteur biblique & Genèse 1 (45%)
-      this.updateSplashStatus("Chargement des Bibles et du texte biblique...", 45);
+      // 2. Chargement du lecteur biblique & Genèse 1 (50%)
+      this.updateSplashStatus("Chargement des Bibles et du texte biblique...", 50);
       try {
         if (typeof BibleReader !== 'undefined' && BibleReader.preloadInitialData) {
           await BibleReader.preloadInitialData();
@@ -349,8 +414,8 @@ const App = {
         console.error('[App] Erreur préchargement BibleReader:', e);
       }
 
-      // 3. Préchargement de la théologie : livres, TOC et 1er chapitre (80%)
-      this.updateSplashStatus("Préchargement des ouvrages et tables des matières théologiques...", 80);
+      // 3. Préchargement de la théologie : livres, TOC et 1er chapitre (82%)
+      this.updateSplashStatus("Préchargement des ouvrages et tables des matières théologiques...", 82);
       try {
         if (typeof TheologyView !== 'undefined' && TheologyView.preloadInitialData) {
           await TheologyView.preloadInitialData();
@@ -369,8 +434,8 @@ const App = {
         console.error('[App] Erreur préchargement DictView:', e);
       }
 
-      // 5. Finalisation (100%)
-      this.updateSplashStatus("Prêt ! Bienvenue dans Open Shema.", 100);
+      // 5. Finalisation fluide (100%)
+      this.SplashProgress.finish("Prêt ! Bienvenue dans Open Shema.");
       this._isPreloadingDone = true;
 
       await new Promise(resolve => setTimeout(resolve, 250));
@@ -454,13 +519,23 @@ const App = {
       if (typeof DictView !== 'undefined') {
         DictView.onViewActivated();
       }
-    } else if (viewName === 'search') {
+    } else if (viewName === 'passage-study') {
       if (drawerEl) drawerEl.classList.add('collapsed');
+      if (typeof PassageStudyView !== 'undefined') {
+        PassageStudyView.onViewActivated();
+      }
     } else if (viewName === 'ai') {
       if (drawerEl) drawerEl.classList.add('collapsed');
       if (typeof AIStudyView !== 'undefined') {
         AIStudyView.onViewActivated();
       }
+    }
+  },
+
+  openPassageStudy(passageRef) {
+    this.switchView('passage-study');
+    if (typeof PassageStudyView !== 'undefined') {
+      PassageStudyView.loadPassage(passageRef);
     }
   },
 

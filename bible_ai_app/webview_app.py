@@ -728,6 +728,21 @@ class BibleAppApi:
             model=model
         )
 
+    def get_passage_study_data(self, passage_ref: str, bible_name: str = "LSG") -> Dict[str, Any]:
+        """Récupère l'ensemble 360° des données d'étude pour un passage (textes multi-versions, hébreu/grec intégral, commentaires, dictionnaires, lieux)."""
+        from core.passage_study_manager import PassageStudyManager
+        return PassageStudyManager.get_passage_study_data(passage_ref=passage_ref, bible_name=bible_name)
+
+    def generate_passage_ai_insight(self, passage_ref: str, insight_type: str, model: Optional[str] = None) -> Dict[str, Any]:
+        """Génère une analyse exégétique, théologique ou homilétique ciblée par IA pour un passage sans émojis."""
+        from core.passage_study_manager import PassageStudyManager
+        return PassageStudyManager.generate_passage_ai_insight(passage_ref=passage_ref, insight_type=insight_type, model=model)
+
+    def export_passage_study_to_note(self, passage_ref: str, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Exporte l'étude complète du passage en document Markdown dans les notes de l'utilisateur."""
+        from core.passage_study_manager import PassageStudyManager
+        return PassageStudyManager.export_passage_study_to_note(passage_ref=passage_ref, payload=payload or {})
+
     def detect_language(self, text: str, meta_lang: Optional[str] = None) -> Dict[str, Any]:
         """Détecte la langue d'un extrait textuel."""
         from core.translation_manager import TranslationManager

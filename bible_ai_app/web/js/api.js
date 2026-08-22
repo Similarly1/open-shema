@@ -179,6 +179,18 @@ const API = {
     return await this.call('synthesize_commentaries', bookCode, parseInt(chapterNum), parseInt(verseStart), verseEnd ? parseInt(verseEnd) : null, enableReranking, model);
   },
 
+  async getPassageStudyData(passageRef, bibleName = "LSG") {
+    return await this.call('get_passage_study_data', passageRef, bibleName);
+  },
+
+  async generatePassageAIInsight(passageRef, insightType, model = null) {
+    return await this.call('generate_passage_ai_insight', passageRef, insightType, model);
+  },
+
+  async exportPassageStudyToNote(passageRef, payload = {}) {
+    return await this.call('export_passage_study_to_note', passageRef, payload);
+  },
+
   async translateText(text, itemType = '', itemId = '', model = null) {
     return await this.call('translate_text', text, itemType, itemId, model);
   },

@@ -64,6 +64,16 @@ const SelectionContextMenu = {
           <span>Traduire en français</span>
         </button>
 
+        <button type="button" class="scm-item" data-action="study-passage" id="scm-btn-study-passage">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+            <circle cx="12" cy="8" r="2"></circle>
+            <line x1="12" y1="14" x2="12" y2="18"></line>
+          </svg>
+          <span>Étudier ce passage</span>
+        </button>
+
         <button type="button" class="scm-item" data-action="ask-ai">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
             <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
@@ -424,6 +434,10 @@ const SelectionContextMenu = {
         this.showTranslationPopover(text);
         break;
 
+      case 'study-passage':
+        this.openPassageStudyFromSelection(text, ctx);
+        break;
+
       case 'ask-ai':
         this.openAiWithSelection(text, ctx);
         break;
@@ -527,6 +541,41 @@ const SelectionContextMenu = {
       chatInput.dispatchEvent(new Event('input', { bubbles: true }));
     }
     App.showToast('Passage envoyé à l\'assistant IA');
+  },
+
+  openPassageStudyFromSelection(text, ctx) {
+    let passageRef = '';
+
+    // 1. Détection depuis une référence biblique explicite
+    const scriptureRef = this.detectScriptureReference(text);
+    if (scriptureRef) {
+      passageRef = scriptureRef;
+    }
+    // 2. Détection depuis le contexte
+    else if (ctx?.reference) {
+      passageRef = ctx.reference;
+    }
+    // 3. Détection depuis le lecteur Bible actif
+    else if (typeof BibleReader !== 'undefined' && BibleReader.currentBook) {
+      const b = BibleReader.currentBook;
+      const ch = BibleReader.currentChapter || 1;
+      const v = BibleReader.selectedVerse || 1;
+      passageRef = `${b} ${ch}:${v}`;
+    }
+    // 4. Fallback texte court
+    else if (text && text.length < 50) {
+      passageRef = text.trim();
+    }
+
+    if (passageRef) {
+      if (typeof App !== 'undefined' && typeof App.openPassageStudy === 'function') {
+        App.openPassageStudy(passageRef);
+      } else if (typeof PassageStudyView !== 'undefined') {
+        PassageStudyView.loadPassage(passageRef);
+        if (typeof App !== 'undefined') App.switchView('passage-study');
+      }
+      App.showToast(`Ouverture du Guide de Passage : ${passageRef}`);
+    }
   },
 
   createNoteFromSelection(text, ctx) {
