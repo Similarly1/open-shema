@@ -140,7 +140,7 @@ class DictionaryPolisher:
         return cleaned.strip()
 
     @classmethod
-    def split_text_into_chunks(cls, text, max_chars=20000):
+    def split_text_into_chunks(cls, text, max_chars=12000):
         """Découpe un texte trop volumineux en morceaux logiques strictement inférieurs à max_chars."""
         if len(text) <= max_chars:
             return [text]
@@ -232,15 +232,15 @@ class DictionaryPolisher:
     def polish_article(cls, raw_text, title="", model="gemini-2.5-flash", config=None, api_key=None, return_usage=False):
         """
         Envoie le texte brut au modèle sélectionné (Google Gemini, Mistral AI ou Infomaniak Swiss AI).
-        Gère automatiquement le découpage en sections si l'article est très long (> 25 000 caractères).
+        Gère automatiquement le découpage en sections si l'article est long (> 14 000 caractères).
         Retourne (success: bool, result_or_error: str) ou (success, result_or_error, usage_dict) si return_usage=True.
         """
         if not raw_text or len(raw_text.strip()) < 10:
             return (False, "Texte trop court", {}) if return_usage else (False, "Texte trop court")
 
-        # Si le texte est très long, on le découpe en plusieurs morceaux logiques pour ne jamais dépasser la fenêtre de contexte
-        if len(raw_text) > 25000:
-            chunks = cls.split_text_into_chunks(raw_text, max_chars=20000)
+        # Découpage si > 14 000 caractères pour une génération ultra-rapide et sans risque de timeout
+        if len(raw_text) > 14000:
+            chunks = cls.split_text_into_chunks(raw_text, max_chars=12000)
             polished_chunks = []
             agg_usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
             
@@ -300,7 +300,7 @@ TEXTE BRUT ORIGINAL :
                 "max_tokens": 8192
             }
             try:
-                resp = requests.post(url, headers=headers, json=payload, timeout=90)
+                resp = requests.post(url, headers=headers, json=payload, timeout=180)
                 if resp.status_code == 200:
                     data = resp.json()
                     content = data["choices"][0]["message"]["content"].strip()
@@ -345,7 +345,7 @@ TEXTE BRUT ORIGINAL :
                 "max_tokens": max_out_tokens
             }
             try:
-                resp = requests.post(url, headers=headers, json=payload, timeout=90)
+                resp = requests.post(url, headers=headers, json=payload, timeout=180)
                 if resp.status_code == 200:
                     data = resp.json()
                     content = data["choices"][0]["message"]["content"].strip()
@@ -387,7 +387,7 @@ TEXTE BRUT ORIGINAL :
             }
             
             try:
-                resp = requests.post(url, json=payload, timeout=60)
+                resp = requests.post(url, json=payload, timeout=180)
                 if resp.status_code == 200:
                     data = resp.json()
                     candidates = data.get("candidates", [])
@@ -409,7 +409,7 @@ TEXTE BRUT ORIGINAL :
                         "contents": [{"parts": [{"text": fallback_prompt}]}],
                         "generationConfig": {"temperature": 0.2}
                     }
-                    fb_resp = requests.post(url, json=fallback_payload, timeout=60)
+                    fb_resp = requests.post(url, json=fallback_payload, timeout=180)
                     if fb_resp.status_code == 200:
                         fb_data = fb_resp.json()
                         fb_candidates = fb_data.get("candidates", [])
@@ -427,5 +427,6 @@ TEXTE BRUT ORIGINAL :
                 return False, "Délai d'attente dépassé (timeout). Veuillez réessayer.", usage_res
             except Exception as e:
                 return False, f"Erreur lors du polissage : {e}", usage_res
+
 
 
