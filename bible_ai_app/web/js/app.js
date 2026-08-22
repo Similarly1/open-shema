@@ -26,7 +26,8 @@ const App = {
       { name: 'MapsView', init: () => MapsView.init() },
       { name: 'CommentariesView', init: () => CommentariesView.init() },
       { name: 'TheologyView', init: () => TheologyView.init() },
-      { name: 'SelectionContextMenu', init: () => (typeof SelectionContextMenu !== 'undefined' && SelectionContextMenu.init()) }
+      { name: 'SelectionContextMenu', init: () => (typeof SelectionContextMenu !== 'undefined' && SelectionContextMenu.init()) },
+      { name: 'HighlighterManager', init: () => (typeof HighlighterManager !== 'undefined' && HighlighterManager.init()) }
     ];
 
     modules.forEach(m => {

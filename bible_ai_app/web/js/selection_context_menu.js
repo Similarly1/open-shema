@@ -27,6 +27,21 @@ const SelectionContextMenu = {
       <div class="scm-header">
         <div class="scm-selection-preview" id="scm-selection-preview"></div>
       </div>
+      <div class="scm-highlight-row" id="scm-highlight-row">
+        <div class="scm-hl-title">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+          <span>Surligner :</span>
+        </div>
+        <div class="scm-hl-swatches">
+          <button type="button" class="scm-swatch-btn hl-bg-yellow" data-hl-color="yellow" title="Jaune Solaire"></button>
+          <button type="button" class="scm-swatch-btn hl-bg-green" data-hl-color="green" title="Vert Sauge"></button>
+          <button type="button" class="scm-swatch-btn hl-bg-blue" data-hl-color="blue" title="Bleu Céleste"></button>
+          <button type="button" class="scm-swatch-btn hl-bg-amber" data-hl-color="amber" title="Ambre Doré"></button>
+          <button type="button" class="scm-swatch-btn hl-bg-purple" data-hl-color="purple" title="Lavande Douce"></button>
+          <button type="button" class="scm-swatch-btn hl-bg-rose" data-hl-color="rose" title="Rose Corail"></button>
+          <button type="button" class="scm-swatch-btn scm-erase-btn" data-hl-color="erase" title="Effacer le surlignage">✕</button>
+        </div>
+      </div>
       <div class="scm-items">
         <button type="button" class="scm-item" data-action="copy">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
@@ -148,6 +163,9 @@ const SelectionContextMenu = {
         if (selection.rangeCount > 0) {
           this.currentSelectionRange = selection.getRangeAt(0);
         }
+        if (typeof HighlighterManager !== 'undefined') {
+          HighlighterManager.captureSelectionRef(selection);
+        }
         this.captureSourceContext(e.target);
         this.show(e.clientX, e.clientY, text);
       } else {
@@ -155,7 +173,23 @@ const SelectionContextMenu = {
       }
     });
 
-    // 2. Clics sur les options du menu contextuel
+    // 2. Clics sur les pastilles de surlignage
+    this.menuEl?.querySelectorAll('.scm-swatch-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const color = btn.dataset.hlColor;
+        this.hide();
+        if (typeof HighlighterManager !== 'undefined') {
+          if (color === 'erase') {
+            HighlighterManager.eraseHighlight();
+          } else {
+            HighlighterManager.applyHighlight(color, HighlighterManager.activeStyle || 'felt');
+          }
+        }
+      });
+    });
+
+    // 2b. Clics sur les options du menu contextuel
     this.menuEl?.querySelectorAll('.scm-item').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();

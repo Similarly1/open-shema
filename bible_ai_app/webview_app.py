@@ -40,6 +40,7 @@ from core.dictionary_manager import DictionaryManager
 from core.original_languages_manager import OriginalLanguagesManager
 from core.config import load_config, save_config
 from core.notes_manager import NotesManager
+from core.highlights_manager import HighlightsManager
 from core.maps_manager import MapsManager
 from gui.library_utils import load_books_metadata, save_books_metadata
 from core.ai_session_manager import AISessionManager
@@ -1050,6 +1051,44 @@ class BibleAppApi:
         self.config = load_config()
         french = get_french_book_name(book)
         return NotesManager.get_notes_for_passage(french, chapter, verse, config=self.config)
+
+    # --- HIGHLIGHTS ---
+
+    def get_highlights_for_chapter(self, book: str, chapter: int) -> List[Dict[str, Any]]:
+        self.config = load_config()
+        return HighlightsManager.get_highlights_for_chapter(book, chapter, config=self.config)
+
+    def get_all_highlights(self) -> List[Dict[str, Any]]:
+        self.config = load_config()
+        return HighlightsManager.get_all_highlights(config=self.config)
+
+    def save_highlight(self, *args, **kwargs) -> Dict[str, Any]:
+        self.config = load_config()
+        data = {}
+        if args and isinstance(args[0], dict):
+            data = args[0]
+        elif kwargs:
+            data = kwargs
+        return HighlightsManager.save_highlight(data, config=self.config)
+
+    def delete_highlight(self, hl_id: str) -> bool:
+        self.config = load_config()
+        return HighlightsManager.delete_highlight(hl_id, config=self.config)
+
+    def create_note_from_highlight(self, hl_id: str, hl_text: str, hl_ref: str) -> Dict[str, Any]:
+        """Crée une note préremplie liée à un surlignage."""
+        self.config = load_config()
+        target_dir = NotesManager.get_notes_directory(self.config)
+        note_data = {
+            "title": f"Note sur {hl_ref}",
+            "reference": hl_ref,
+            "content": f"> \"{hl_text}\"\n\n",
+            "tags": ["surlignage"]
+        }
+        note_res = NotesManager.save_note_file(note_data, target_dir)
+        if note_res and "id" in note_res:
+            HighlightsManager.link_note(hl_id, note_res["id"], config=self.config)
+        return note_res
 
     def pick_notes_folder(self) -> Dict[str, Any]:
         """Ouvre un dialogue natif Windows pour choisir le dossier des notes Markdown."""

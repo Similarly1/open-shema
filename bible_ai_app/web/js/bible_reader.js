@@ -2437,6 +2437,21 @@ const ContextMenuManager = {
     this.positionMenu(clientX, clientY);
 
     actionsEl.innerHTML = `
+      <div class="scm-highlight-row" style="padding: 6px 12px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+        <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; text-transform: uppercase;">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+          Surligner :
+        </span>
+        <div style="display: flex; gap: 5px; align-items: center;">
+          <button type="button" class="ctx-hl-btn hl-bg-yellow" data-color="yellow" title="Jaune Solaire" style="width: 20px; height: 20px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.12); cursor: pointer;"></button>
+          <button type="button" class="ctx-hl-btn hl-bg-green" data-color="green" title="Vert Sauge" style="width: 20px; height: 20px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.12); cursor: pointer;"></button>
+          <button type="button" class="ctx-hl-btn hl-bg-blue" data-color="blue" title="Bleu Céleste" style="width: 20px; height: 20px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.12); cursor: pointer;"></button>
+          <button type="button" class="ctx-hl-btn hl-bg-amber" data-color="amber" title="Ambre Doré" style="width: 20px; height: 20px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.12); cursor: pointer;"></button>
+          <button type="button" class="ctx-hl-btn hl-bg-purple" data-color="purple" title="Lavande Douce" style="width: 20px; height: 20px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.12); cursor: pointer;"></button>
+          <button type="button" class="ctx-hl-btn hl-bg-rose" data-color="rose" title="Rose Corail" style="width: 20px; height: 20px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.12); cursor: pointer;"></button>
+          <button type="button" class="ctx-hl-btn ctx-hl-erase" data-color="erase" title="Effacer le surlignage" style="width: 20px; height: 20px; border-radius: 50%; border: 1px dashed var(--border-color); background: none; color: var(--text-muted); font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
+        </div>
+      </div>
       <button class="context-action-btn" id="ctx-act-v-comm">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         <span>Ouvrir les commentaires exégétiques</span>
@@ -2458,6 +2473,34 @@ const ContextMenuManager = {
         <span>Copier le verset avec la référence</span>
       </button>
     `;
+
+    actionsEl.querySelectorAll('.ctx-hl-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const color = btn.dataset.color;
+        this.hide();
+        if (typeof HighlighterManager !== 'undefined') {
+          if (color === 'erase') {
+            HighlighterManager.currentSelectionRef = {
+              book: bookCode,
+              chapter: parseInt(chapterNum),
+              verseStart: parseInt(verseNum),
+              verseEnd: parseInt(verseNum),
+              text: verseText
+            };
+            await HighlighterManager.eraseHighlight();
+          } else {
+            HighlighterManager.currentSelectionRef = {
+              book: bookCode,
+              chapter: parseInt(chapterNum),
+              verseStart: parseInt(verseNum),
+              verseEnd: parseInt(verseNum),
+              text: verseText
+            };
+            await HighlighterManager.applyHighlight(color, HighlighterManager.activeStyle || 'felt');
+          }
+        }
+      });
+    });
 
     document.getElementById('ctx-act-v-comm').addEventListener('click', () => {
       this.hide();
@@ -4144,7 +4187,7 @@ const BibleReader = {
                     isItalic = true;
                   }
                 } else if (this.bracketsMode === 'plain') {
-                  displayTok = tok.replace(/[\[\]]/g, '');
+                  displayTok = displayTok.replace(/[\[\]]/g, '');
                 }
 
                 if (hasClosingBracket) inBracket = false;
@@ -4241,6 +4284,12 @@ const BibleReader = {
     }
 
     block.appendChild(flow);
+
+    // Rendre les surlignages asynchronement pour ce bloc
+    if (typeof HighlighterManager !== 'undefined') {
+      setTimeout(() => HighlighterManager.renderChapterHighlights(data.book || this.currentBook, data.chapter || this.currentChapter), 50);
+    }
+
     return block;
   },
 

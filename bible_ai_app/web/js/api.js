@@ -313,6 +313,26 @@ const API = {
     });
   },
 
+  async getHighlightsForChapter(book, chapter) {
+    return this.call('get_highlights_for_chapter', book, parseInt(chapter));
+  },
+
+  async getAllHighlights() {
+    return this.call('get_all_highlights');
+  },
+
+  async saveHighlight(data) {
+    return this.call('save_highlight', data);
+  },
+
+  async deleteHighlight(id) {
+    return this.call('delete_highlight', id);
+  },
+
+  async createNoteFromHighlight(hlId, text, ref) {
+    return this.call('create_note_from_highlight', hlId, text, ref);
+  },
+
   async getDictionaries() {
     return this.call('get_dictionaries');
   },
