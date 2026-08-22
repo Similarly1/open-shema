@@ -140,11 +140,127 @@ class DictionaryPolisher:
         return cleaned.strip()
 
     @classmethod
-    def polish_article(cls, raw_text, title="", model="gemini-2.5-flash", config=None, api_key=None):
+    def split_text_into_chunks(cls, text, max_chars=20000):
+        """Découpe un texte trop volumineux en morceaux logiques strictement inférieurs à max_chars."""
+        if len(text) <= max_chars:
+            return [text]
+            
+        def _slice_huge_string(s, limit):
+            if len(s) <= limit:
+                return [s]
+            sentences = re.split(r'(?<=[.!?])\s+', s)
+            out = []
+            cur = []
+            cur_l = 0
+            for sent in sentences:
+                if cur_l + len(sent) + 1 > limit and cur:
+                    out.append(" ".join(cur))
+                    cur = [sent]
+                    cur_l = len(sent)
+                else:
+                    cur.append(sent)
+                    cur_l += len(sent) + 1
+            if cur:
+                out.append(" ".join(cur))
+                
+            final_out = []
+            for block in out:
+                if len(block) <= limit:
+                    final_out.append(block)
+                else:
+                    words = block.split(" ")
+                    w_cur = []
+                    w_len = 0
+                    for w in words:
+                        if w_len + len(w) + 1 > limit and w_cur:
+                            final_out.append(" ".join(w_cur))
+                            w_cur = [w]
+                            w_len = len(w)
+                        else:
+                            w_cur.append(w)
+                            w_len += len(w) + 1
+                    if w_cur:
+                        final_out.append(" ".join(w_cur))
+            return final_out
+
+        paragraphs = text.split("\n\n")
+        sub_parts = []
+        for p in paragraphs:
+            if len(p) <= max_chars:
+                sub_parts.append(p)
+            else:
+                lines = p.split("\n")
+                cur_l = []
+                cur_len = 0
+                for line in lines:
+                    if len(line) > max_chars:
+                        if cur_l:
+                            sub_parts.append("\n".join(cur_l))
+                            cur_l = []
+                            cur_len = 0
+                        sliced = _slice_huge_string(line, max_chars)
+                        sub_parts.extend(sliced)
+                    elif cur_len + len(line) + 1 > max_chars and cur_l:
+                        sub_parts.append("\n".join(cur_l))
+                        cur_l = [line]
+                        cur_len = len(line)
+                    else:
+                        cur_l.append(line)
+                        cur_len += len(line) + 1
+                if cur_l:
+                    sub_parts.append("\n".join(cur_l))
+                    
+        chunks = []
+        cur_chunk = []
+        cur_len = 0
+        for sp in sub_parts:
+            if cur_len + len(sp) + 2 > max_chars and cur_chunk:
+                chunks.append("\n\n".join(cur_chunk))
+                cur_chunk = [sp]
+                cur_len = len(sp)
+            else:
+                cur_chunk.append(sp)
+                cur_len += len(sp) + 2
+                
+        if cur_chunk:
+            chunks.append("\n\n".join(cur_chunk))
+            
+        return chunks
+
+
+    @classmethod
+    def polish_article(cls, raw_text, title="", model="gemini-2.5-flash", config=None, api_key=None, return_usage=False):
         """
         Envoie le texte brut au modèle sélectionné (Google Gemini, Mistral AI ou Infomaniak Swiss AI).
-        Retourne (success: bool, result_or_error: str).
+        Gère automatiquement le découpage en sections si l'article est très long (> 25 000 caractères).
+        Retourne (success: bool, result_or_error: str) ou (success, result_or_error, usage_dict) si return_usage=True.
         """
+        if not raw_text or len(raw_text.strip()) < 10:
+            return (False, "Texte trop court", {}) if return_usage else (False, "Texte trop court")
+
+        # Si le texte est très long, on le découpe en plusieurs morceaux logiques pour ne jamais dépasser la fenêtre de contexte
+        if len(raw_text) > 25000:
+            chunks = cls.split_text_into_chunks(raw_text, max_chars=20000)
+            polished_chunks = []
+            agg_usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+            
+            for i, chunk in enumerate(chunks, 1):
+                sub_title = f"{title} (Partie {i}/{len(chunks)})" if len(chunks) > 1 else title
+                ok, res, u = cls._polish_single_chunk(chunk, title=sub_title, model=model, config=config, api_key=api_key)
+                if not ok:
+                    return (False, f"Erreur partie {i}/{len(chunks)} : {res}", agg_usage) if return_usage else (False, f"Erreur partie {i}/{len(chunks)} : {res}")
+                polished_chunks.append(res)
+                for k in agg_usage:
+                    agg_usage[k] += u.get(k, 0)
+                    
+            combined_text = "\n\n---\n\n".join(polished_chunks)
+            return (True, combined_text, agg_usage) if return_usage else (True, combined_text)
+
+        ok, res, u = cls._polish_single_chunk(raw_text, title=title, model=model, config=config, api_key=api_key)
+        return (ok, res, u) if return_usage else (ok, res)
+
+    @classmethod
+    def _polish_single_chunk(cls, raw_text, title="", model="gemini-2.5-flash", config=None, api_key=None):
         if config is None:
             try:
                 from core.config import load_config
@@ -161,12 +277,13 @@ TEXTE BRUT ORIGINAL :
 {raw_text}
 \"\"\"
 """
+        usage_res = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
 
         # 1. Fournisseur MISTRAL AI
         if clean_model.startswith("mistral-") or clean_model.startswith("open-mistral-") or clean_model.startswith("codestral-") or clean_model.startswith("pixtral-"):
             m_key = config.get("mistral_api_key") or api_key
             if not m_key:
-                return False, "Clé API Mistral non configurée dans les paramètres."
+                return False, "Clé API Mistral non configurée dans les paramètres.", usage_res
                 
             url = "https://api.mistral.ai/v1/chat/completions"
             headers = {
@@ -183,23 +300,29 @@ TEXTE BRUT ORIGINAL :
                 "max_tokens": 8192
             }
             try:
-                resp = requests.post(url, headers=headers, json=payload, timeout=60)
+                resp = requests.post(url, headers=headers, json=payload, timeout=90)
                 if resp.status_code == 200:
                     data = resp.json()
                     content = data["choices"][0]["message"]["content"].strip()
-                    return True, cls._clean_markdown_fences(content)
-                return False, f"Erreur API Mistral ({resp.status_code}) : {resp.text}"
+                    raw_u = data.get("usage", {})
+                    usage_res = {
+                        "prompt_tokens": raw_u.get("prompt_tokens", 0),
+                        "completion_tokens": raw_u.get("completion_tokens", 0),
+                        "total_tokens": raw_u.get("total_tokens", 0)
+                    }
+                    return True, cls._clean_markdown_fences(content), usage_res
+                return False, f"Erreur API Mistral ({resp.status_code}) : {resp.text}", usage_res
             except requests.exceptions.Timeout:
-                return False, "Délai d'attente dépassé pour Mistral AI (timeout)."
+                return False, "Délai d'attente dépassé pour Mistral AI (timeout).", usage_res
             except Exception as e:
-                return False, f"Erreur de communication Mistral : {e}"
+                return False, f"Erreur de communication Mistral : {e}", usage_res
 
         # 2. Fournisseur INFOMANIAK (Swiss AI)
         elif "/" in clean_model or clean_model.startswith("infomaniak/") or "llama" in clean_model.lower() or "ministral" in clean_model.lower() or "qwen" in clean_model.lower():
             info_token = config.get("infomaniak_token")
             product_id = config.get("infomaniak_product_id") or "251"
             if not info_token:
-                return False, "Token Infomaniak non configuré dans les paramètres."
+                return False, "Token Infomaniak non configuré dans les paramètres.", usage_res
                 
             clean_info_model = clean_model.replace("infomaniak/", "").strip()
             url = f"https://api.infomaniak.com/2/ai/{product_id}/openai/v1/chat/completions"
@@ -207,6 +330,11 @@ TEXTE BRUT ORIGINAL :
                 "Authorization": f"Bearer {info_token}",
                 "Content-Type": "application/json"
             }
+            
+            # Calcul adaptatif des max_tokens pour respecter la fenêtre de 80k
+            est_prompt_tokens = int(len(user_prompt) / 3.0)
+            max_out_tokens = min(8192, max(500, 75000 - est_prompt_tokens))
+
             payload = {
                 "model": clean_info_model,
                 "messages": [
@@ -214,25 +342,31 @@ TEXTE BRUT ORIGINAL :
                     {"role": "user", "content": user_prompt}
                 ],
                 "temperature": 0.2,
-                "max_tokens": 8192
+                "max_tokens": max_out_tokens
             }
             try:
-                resp = requests.post(url, headers=headers, json=payload, timeout=60)
+                resp = requests.post(url, headers=headers, json=payload, timeout=90)
                 if resp.status_code == 200:
                     data = resp.json()
                     content = data["choices"][0]["message"]["content"].strip()
-                    return True, cls._clean_markdown_fences(content)
-                return False, f"Erreur API Infomaniak ({resp.status_code}) : {resp.text}"
+                    raw_u = data.get("usage", {})
+                    usage_res = {
+                        "prompt_tokens": raw_u.get("prompt_tokens", 0),
+                        "completion_tokens": raw_u.get("completion_tokens", 0),
+                        "total_tokens": raw_u.get("total_tokens", 0)
+                    }
+                    return True, cls._clean_markdown_fences(content), usage_res
+                return False, f"Erreur API Infomaniak ({resp.status_code}) : {resp.text}", usage_res
             except requests.exceptions.Timeout:
-                return False, "Délai d'attente dépassé pour Infomaniak (timeout)."
+                return False, "Délai d'attente dépassé pour Infomaniak (timeout).", usage_res
             except Exception as e:
-                return False, f"Erreur de communication Infomaniak : {e}"
+                return False, f"Erreur de communication Infomaniak : {e}", usage_res
 
         # 3. Fournisseur GOOGLE GEMINI (Par défaut)
         else:
             g_key = config.get("gemini_api_key") or api_key
             if not g_key:
-                return False, "Clé API Gemini non configurée dans les paramètres."
+                return False, "Clé API Gemini non configurée dans les paramètres.", usage_res
                 
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{clean_model}:generateContent?key={g_key}"
             payload = {
@@ -253,32 +387,45 @@ TEXTE BRUT ORIGINAL :
             }
             
             try:
-                resp = requests.post(url, json=payload, timeout=45)
+                resp = requests.post(url, json=payload, timeout=60)
                 if resp.status_code == 200:
                     data = resp.json()
                     candidates = data.get("candidates", [])
+                    raw_u = data.get("usageMetadata", {})
+                    usage_res = {
+                        "prompt_tokens": raw_u.get("promptTokenCount", 0),
+                        "completion_tokens": raw_u.get("candidatesTokenCount", 0),
+                        "total_tokens": raw_u.get("totalTokenCount", 0)
+                    }
                     if candidates and "content" in candidates[0]:
                         parts = candidates[0]["content"].get("parts", [])
                         if parts and "text" in parts[0]:
                             polished_text = parts[0]["text"].strip()
-                            return True, cls._clean_markdown_fences(polished_text)
-                    return False, "Réponse de l'API Gemini vide ou invalide."
+                            return True, cls._clean_markdown_fences(polished_text), usage_res
+                    return False, "Réponse de l'API Gemini vide ou invalide.", usage_res
                 else:
-                    # Fallback si systemInstruction n'est pas supporté
                     fallback_prompt = f"{POLISH_SYSTEM_PROMPT}\n\n---\n\n{user_prompt}"
                     fallback_payload = {
                         "contents": [{"parts": [{"text": fallback_prompt}]}],
                         "generationConfig": {"temperature": 0.2}
                     }
-                    fb_resp = requests.post(url, json=fallback_payload, timeout=45)
+                    fb_resp = requests.post(url, json=fallback_payload, timeout=60)
                     if fb_resp.status_code == 200:
                         fb_data = fb_resp.json()
                         fb_candidates = fb_data.get("candidates", [])
+                        raw_u = fb_data.get("usageMetadata", {})
+                        usage_res = {
+                            "prompt_tokens": raw_u.get("promptTokenCount", 0),
+                            "completion_tokens": raw_u.get("candidatesTokenCount", 0),
+                            "total_tokens": raw_u.get("totalTokenCount", 0)
+                        }
                         if fb_candidates and "content" in fb_candidates[0]:
                             polished_text = fb_candidates[0]["content"]["parts"][0]["text"].strip()
-                            return True, cls._clean_markdown_fences(polished_text)
-                    return False, f"Erreur API Gemini ({resp.status_code}) : {resp.text}"
+                            return True, cls._clean_markdown_fences(polished_text), usage_res
+                    return False, f"Erreur API Gemini ({resp.status_code}) : {resp.text}", usage_res
             except requests.exceptions.Timeout:
-                return False, "Délai d'attente dépassé (timeout). Veuillez réessayer."
+                return False, "Délai d'attente dépassé (timeout). Veuillez réessayer.", usage_res
             except Exception as e:
-                return False, f"Erreur lors du polissage : {e}"
+                return False, f"Erreur lors du polissage : {e}", usage_res
+
+
