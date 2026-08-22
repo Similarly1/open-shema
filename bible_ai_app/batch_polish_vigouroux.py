@@ -57,6 +57,37 @@ def load_all_keys():
     }
     return keys
 
+def build_gemini_pool(keys):
+    """Construit un pool 100% Google Gemini combinant les 2 clés et les modèles 3.5 & 3.1 Flash-Lite."""
+    pool = []
+    if keys.get("gemini_key1"):
+        pool.append({
+            "id": "gemini_k1_3.5",
+            "name": "Gemini 3.5 Lite (Clé 1)",
+            "model": "gemini-3.5-flash-lite",
+            "config": {"gemini_api_key": keys["gemini_key1"]}
+        })
+        pool.append({
+            "id": "gemini_k1_3.1",
+            "name": "Gemini 3.1 Lite (Clé 1)",
+            "model": "gemini-3.1-flash-lite",
+            "config": {"gemini_api_key": keys["gemini_key1"]}
+        })
+    if keys.get("gemini_key2"):
+        pool.append({
+            "id": "gemini_k2_3.5",
+            "name": "Gemini 3.5 Lite (Clé 2)",
+            "model": "gemini-3.5-flash-lite",
+            "config": {"gemini_api_key": keys["gemini_key2"]}
+        })
+        pool.append({
+            "id": "gemini_k2_3.1",
+            "name": "Gemini 3.1 Lite (Clé 2)",
+            "model": "gemini-3.1-flash-lite",
+            "config": {"gemini_api_key": keys["gemini_key2"]}
+        })
+    return pool
+
 def build_hybrid_pool(keys, infomaniak_model="mistralai/Ministral-3-14B-Instruct-2512"):
     """Construit un pool de points d'accès équilibré."""
     pool = []
@@ -110,14 +141,14 @@ def main():
     parser.add_argument(
         "--model",
         type=str,
-        default="hybrid",
-        help="Modèle à utiliser ou 'hybrid' pour le pool multi-fournisseurs (défaut: hybrid)"
+        default="gemini",
+        help="Modèle à utiliser : 'gemini' (pool 2 clés 3.5/3.1 Lite), 'hybrid' (Infomaniak + Gemini), ou un nom de modèle spécifique"
     )
     parser.add_argument(
         "--workers",
         type=int,
-        default=8,
-        help="Nombre de requêtes parallèles simultanées (défaut: 8 en mode hybride)"
+        default=6,
+        help="Nombre de requêtes parallèles simultanées (défaut: 6)"
     )
     parser.add_argument(
         "--limit",
@@ -133,11 +164,18 @@ def main():
     args = parser.parse_args()
 
     keys = load_all_keys()
-    is_hybrid = args.model.lower() in {"hybrid", "hybride", "multi", "pool", "all"}
+    m_choice = args.model.lower().strip()
+    is_gemini_pool = m_choice in {"gemini", "gemini-pool", "gemini-dual", "gemini-only", "google"}
+    is_hybrid = m_choice in {"hybrid", "hybride", "multi", "pool", "all"}
     
-    if is_hybrid:
+    if is_gemini_pool:
+        endpoints_pool = build_gemini_pool(keys)
+        workers_count = args.workers or 6
+        pool_title = "POOL 100% GOOGLE GEMINI (2 Clés x Modèles 3.5 & 3.1 Flash-Lite)"
+    elif is_hybrid:
         endpoints_pool = build_hybrid_pool(keys)
         workers_count = args.workers or 8
+        pool_title = "MODE HYBRIDE (Infomaniak + 2 Clés Gemini)"
     else:
         cfg = load_config()
         endpoints_pool = [{
@@ -147,6 +185,8 @@ def main():
             "config": cfg
         }]
         workers_count = args.workers or 5
+        pool_title = f"Modèle unique : {args.model}"
+
 
     dict_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "vigouroux_dict.json")
     if not os.path.exists(dict_path):
@@ -156,13 +196,10 @@ def main():
     print("=" * 80)
     print("📖 RESTAURATION ET POLISSAGE PAR LOT - DICTIONNAIRE VIGOUROUX (1912)")
     print("=" * 80)
-    if is_hybrid:
-        print("⚡ MODE HYBRIDE MULTI-CLÉS ET MULTI-FOURNISSEURS ACTIVÉ !")
-        print(f"🎯 Points d'accès configurés ({len(endpoints_pool)}) :")
-        for ep in endpoints_pool:
-            print(f"   • {ep['name']} -> Modèle : {ep['model']}")
-    else:
-        print(f"🤖 Modèle unique sélectionné : {args.model}")
+    print(f"⚡ {pool_title}")
+    print(f"🎯 Points d'accès configurés ({len(endpoints_pool)}) :")
+    for ep in endpoints_pool:
+        print(f"   • {ep['name']} -> Modèle : {ep['model']}")
     print(f"⚡ Threads parallèles : {workers_count}")
 
     with open(dict_path, "r", encoding="utf-8") as f:
