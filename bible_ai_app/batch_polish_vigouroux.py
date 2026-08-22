@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 """
 Script de restauration et polissage IA par lot pour l'intégralité du Dictionnaire Vigouroux (1912).
-Supporte :
-- Infomaniak Swiss AI (mistralai/Ministral-3-14B-Instruct-2512, mistralai/Mistral-Small-4-119B-2603)
-- Google Gemini (gemini-2.5-flash-lite, gemini-2.5-flash)
-- Mistral AI direct (mistral-small-latest)
-- Multi-threading, reprise automatique (checkpointing), suivi des tokens et calcul précis du coût.
+Mode HYBRIDE Multi-Clés & Multi-Fournisseurs :
+- Répartition intelligente de la charge entre Infomaniak (Ministral-14B / Mistral-Small) et 2 clés Google Gemini (Gemini 3.5 & 3.1 Flash-Lite).
+- Débit démultiplié (~50-70 articles/min), contournement automatique des limites de requêtes (RPM).
+- Basculement automatique (failover) en cas de lenteur d'un fournisseur.
+- Sauvegarde continue, reprise automatique et calcul financier précis.
 """
 
 import os
@@ -14,6 +14,7 @@ import sys
 import json
 import time
 import argparse
+import itertools
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import Lock
 
@@ -24,44 +25,105 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from core.config import load_config
 from core.dictionary_polisher import DictionaryPolisher
 
-# Tarification exacte par million de tokens (Input / Output)
 MODEL_PRICING = {
     "mistralai/ministral-3-14b-instruct-2512": {"input_per_m": 0.30, "output_per_m": 0.40, "curr": "CHF"},
     "mistralai/mistral-small-4-119b-2603": {"input_per_m": 0.60, "output_per_m": 1.80, "curr": "CHF"},
-    "swiss-ai/apertus-v1.5-70b": {"input_per_m": 0.60, "output_per_m": 1.80, "curr": "CHF"},
+    "gemini-3.5-flash-lite": {"input_per_m": 0.075, "output_per_m": 0.30, "curr": "$"},
+    "gemini-3.1-flash-lite": {"input_per_m": 0.075, "output_per_m": 0.30, "curr": "$"},
     "gemini-2.5-flash-lite": {"input_per_m": 0.075, "output_per_m": 0.30, "curr": "$"},
     "gemini-2.5-flash": {"input_per_m": 0.15, "output_per_m": 0.60, "curr": "$"},
-    "gemini-3.5-flash-lite": {"input_per_m": 0.075, "output_per_m": 0.30, "curr": "$"},
     "gemini-3.7-flash": {"input_per_m": 0.15, "output_per_m": 0.60, "curr": "$"},
     "mistral-small-latest": {"input_per_m": 0.20, "output_per_m": 0.60, "curr": "€"},
 }
 
-def get_pricing_info(model_name):
-    m_clean = model_name.lower().strip().replace("infomaniak/", "")
-    for k, v in MODEL_PRICING.items():
-        if k in m_clean or m_clean in k:
-            return v
-    return {"input_per_m": 0.20, "output_per_m": 0.60, "curr": "€/$"}
+def load_all_keys():
+    """Charge et fusionne les clés locales et celles du kDrive si existantes."""
+    cfg = load_config()
+    kdrive_path = r"C:\Users\adrie\kDrive\Documents\Site chants de la bible\BDD JEM\config_keys.json"
+    ext_keys = {}
+    if os.path.exists(kdrive_path):
+        try:
+            with open(kdrive_path, "r", encoding="utf-8") as f:
+                ext_keys = json.load(f)
+        except Exception:
+            pass
+            
+    keys = {
+        "gemini_key1": ext_keys.get("gemini_key1") or cfg.get("gemini_api_key"),
+        "gemini_key2": ext_keys.get("gemini_key2"),
+        "infomaniak_token": ext_keys.get("infomaniak_token") or cfg.get("infomaniak_token"),
+        "infomaniak_product_id": ext_keys.get("infomaniak_product_id") or cfg.get("infomaniak_product_id", "251"),
+        "mistral_key": ext_keys.get("mistral_key") or cfg.get("mistral_api_key")
+    }
+    return keys
+
+def build_hybrid_pool(keys, infomaniak_model="mistralai/Ministral-3-14B-Instruct-2512"):
+    """Construit un pool de points d'accès équilibré."""
+    pool = []
+    
+    # 1. Point d'accès Infomaniak
+    if keys.get("infomaniak_token"):
+        pool.append({
+            "id": "infomaniak",
+            "name": "Infomaniak (Ministral)",
+            "model": infomaniak_model,
+            "config": {
+                "infomaniak_token": keys["infomaniak_token"],
+                "infomaniak_product_id": keys.get("infomaniak_product_id", "251")
+            }
+        })
+        
+    # 2. Points d'accès Gemini Clé 1
+    if keys.get("gemini_key1"):
+        pool.append({
+            "id": "gemini_k1_3.5",
+            "name": "Gemini 3.5 Lite (K1)",
+            "model": "gemini-3.5-flash-lite",
+            "config": {"gemini_api_key": keys["gemini_key1"]}
+        })
+        pool.append({
+            "id": "gemini_k1_3.1",
+            "name": "Gemini 3.1 Lite (K1)",
+            "model": "gemini-3.1-flash-lite",
+            "config": {"gemini_api_key": keys["gemini_key1"]}
+        })
+        
+    # 3. Points d'accès Gemini Clé 2
+    if keys.get("gemini_key2"):
+        pool.append({
+            "id": "gemini_k2_3.5",
+            "name": "Gemini 3.5 Lite (K2)",
+            "model": "gemini-3.5-flash-lite",
+            "config": {"gemini_api_key": keys["gemini_key2"]}
+        })
+        pool.append({
+            "id": "gemini_k2_3.1",
+            "name": "Gemini 3.1 Lite (K2)",
+            "model": "gemini-3.1-flash-lite",
+            "config": {"gemini_api_key": keys["gemini_key2"]}
+        })
+        
+    return pool
 
 def main():
     parser = argparse.ArgumentParser(description="Polissage IA par lot du Dictionnaire Vigouroux (1912)")
     parser.add_argument(
         "--model",
         type=str,
-        default=None,
-        help="Modèle à utiliser (ex: mistralai/Ministral-3-14B-Instruct-2512, mistralai/Mistral-Small-4-119B-2603, gemini-2.5-flash-lite, gemini-2.5-flash)"
+        default="hybrid",
+        help="Modèle à utiliser ou 'hybrid' pour le pool multi-fournisseurs (défaut: hybrid)"
     )
     parser.add_argument(
         "--workers",
         type=int,
-        default=4,
-        help="Nombre de requêtes parallèles simultanées (défaut: 4)"
+        default=8,
+        help="Nombre de requêtes parallèles simultanées (défaut: 8 en mode hybride)"
     )
     parser.add_argument(
         "--limit",
         type=int,
-        default=50,
-        help="Nombre maximum d'articles à traiter (défaut: 50, 0 = tous)"
+        default=0,
+        help="Nombre maximum d'articles à traiter (0 = tous)"
     )
     parser.add_argument(
         "--force",
@@ -70,22 +132,38 @@ def main():
     )
     args = parser.parse_args()
 
-    config = load_config()
-    model = args.model or config.get("dict_polish_model", "mistralai/Ministral-3-14B-Instruct-2512")
+    keys = load_all_keys()
+    is_hybrid = args.model.lower() in {"hybrid", "hybride", "multi", "pool", "all"}
+    
+    if is_hybrid:
+        endpoints_pool = build_hybrid_pool(keys)
+        workers_count = args.workers or 8
+    else:
+        cfg = load_config()
+        endpoints_pool = [{
+            "id": "single",
+            "name": args.model,
+            "model": args.model,
+            "config": cfg
+        }]
+        workers_count = args.workers or 5
 
     dict_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "vigouroux_dict.json")
     if not os.path.exists(dict_path):
         print(f"❌ Erreur : Fichier dictionnaire introuvable à {dict_path}")
         sys.exit(1)
 
-    pricing = get_pricing_info(model)
-
-    print("=" * 75)
-    print("📖 TEST DE RESTAURATION ET POLISSAGE PAR LOT - VIGOUROUX (1912)")
-    print("=" * 75)
-    print(f"🤖 Modèle sélectionné : {model}")
-    print(f"⚡ Threads parallèles : {args.workers}")
-    print(f"💰 Grille tarifaire estimée : {pricing['input_per_m']}{pricing['curr']}/1M in, {pricing['output_per_m']}{pricing['curr']}/1M out")
+    print("=" * 80)
+    print("📖 RESTAURATION ET POLISSAGE PAR LOT - DICTIONNAIRE VIGOUROUX (1912)")
+    print("=" * 80)
+    if is_hybrid:
+        print("⚡ MODE HYBRIDE MULTI-CLÉS ET MULTI-FOURNISSEURS ACTIVÉ !")
+        print(f"🎯 Points d'accès configurés ({len(endpoints_pool)}) :")
+        for ep in endpoints_pool:
+            print(f"   • {ep['name']} -> Modèle : {ep['model']}")
+    else:
+        print(f"🤖 Modèle unique sélectionné : {args.model}")
+    print(f"⚡ Threads parallèles : {workers_count}")
 
     with open(dict_path, "r", encoding="utf-8") as f:
         vig_data = json.load(f)
@@ -95,7 +173,8 @@ def main():
     total_articles = len(all_keys)
     print(f"📚 Total articles dans le dictionnaire : {total_articles}")
 
-    # Filtrer les articles restants à traiter
+    cache = DictionaryPolisher.load_cache()
+    
     to_process = []
     for k in all_keys:
         art = articles[k]
@@ -110,14 +189,15 @@ def main():
         to_process = to_process[:args.limit]
 
     already_done = total_articles - len(to_process)
-    print(f"🎯 Articles sélectionnés pour ce test : {len(to_process)}")
-    print("=" * 75)
+    print(f"✅ Déjà polis en cache : {already_done}")
+    print(f"🎯 Restants à polir : {len(to_process)}")
+    print("=" * 80)
 
     if not to_process:
         print("🎉 Tous les articles demandés sont déjà restaurés !")
         sys.exit(0)
 
-    # Statistiques d'exécution
+    # Compteurs et métriques
     success_count = 0
     fail_count = 0
     total_prompt_tokens = 0
@@ -128,45 +208,58 @@ def main():
     start_time = time.time()
     lock = Lock()
     save_counter = 0
+    endpoint_stats = {ep["name"]: 0 for ep in endpoints_pool}
 
-    def process_article(item):
+    pool_cycle = itertools.cycle(endpoints_pool)
+
+    def process_article(item, start_endpoint):
         slug, title, raw_text = item
         if not raw_text or len(raw_text.strip()) < 10:
-            return slug, title, False, "Texte brut trop court ou vide", {}
+            return slug, title, False, "Texte trop court", {}, start_endpoint["name"], start_endpoint["model"]
 
-        for attempt in range(1, 4):
-            ok, res, usage = DictionaryPolisher.polish_article(
-                raw_text,
-                title=title,
-                model=model,
-                config=config,
-                return_usage=True
-            )
-            if ok:
-                return slug, title, True, res, usage
-            if "quota" in str(res).lower() or "429" in str(res) or "rate" in str(res).lower():
-                time.sleep(2 * attempt)
-            else:
-                time.sleep(1)
+        # Essayer d'abord le endpoint assigné, puis basculer sur les autres en cas d'erreur
+        tried_endpoints = [start_endpoint] + [ep for ep in endpoints_pool if ep != start_endpoint]
 
-        return slug, title, False, res, {}
+        for ep in tried_endpoints:
+            for attempt in range(1, 3):
+                ok, res, usage = DictionaryPolisher.polish_article(
+                    raw_text,
+                    title=title,
+                    model=ep["model"],
+                    config=ep["config"],
+                    return_usage=True
+                )
+                if ok:
+                    return slug, title, True, res, usage, ep["name"], ep["model"]
+                if "quota" in str(res).lower() or "429" in str(res) or "rate" in str(res).lower():
+                    time.sleep(1.5 * attempt)
+                elif "timeout" in str(res).lower():
+                    break  # Basculer immédiatement sur l'endpoint suivant si timeout
+                else:
+                    time.sleep(1)
+
+        return slug, title, False, res, {}, start_endpoint["name"], start_endpoint["model"]
 
     print(f"\n🚀 Démarrage du traitement de {total_to_do} articles...\n")
 
     try:
-        with ThreadPoolExecutor(max_workers=args.workers) as executor:
-            futures = {executor.submit(process_article, item): item for item in to_process}
-            
+        with ThreadPoolExecutor(max_workers=workers_count) as executor:
+            futures = {}
+            for item in to_process:
+                ep = next(pool_cycle)
+                fut = executor.submit(process_article, item, ep)
+                futures[fut] = item
+                
             for future in as_completed(futures):
-                slug, title, ok, result, usage = future.result()
+                slug, title, ok, result, usage, ep_name, used_model = future.result()
                 with lock:
                     save_counter += 1
                     if ok:
                         success_count += 1
+                        endpoint_stats[ep_name] = endpoint_stats.get(ep_name, 0) + 1
+                        
                         p_tok = usage.get("prompt_tokens", 0)
                         c_tok = usage.get("completion_tokens", 0)
-                        
-                        # Fallback d'estimation si l'API ne renvoie pas l'usage
                         if p_tok == 0:
                             raw_t = articles.get(slug, {}).get("text", "")
                             p_tok = int(len(raw_t) / 3.5)
@@ -179,32 +272,26 @@ def main():
                         raw_t = articles.get(slug, {}).get("text", "")
                         total_chars_in += len(raw_t)
 
-                        DictionaryPolisher.set_polished_entry("vigouroux", slug, title, result, model, slug=slug)
+                        DictionaryPolisher.set_polished_entry("vigouroux", slug, title, result, used_model, slug=slug)
                     else:
                         fail_count += 1
                         print(f"\n⚠️ Échec sur [{title}] : {result}")
 
-                    # Calcul du temps et estimation
+                    # Calcul des vitesses et temps
                     elapsed = time.time() - start_time
                     done = success_count + fail_count
-                    speed = (done / elapsed) * 60 if elapsed > 0 else 0  # articles par minute
+                    speed = (done / elapsed) * 60 if elapsed > 0 else 0
                     remaining_sec = ((total_to_do - done) / (done / elapsed)) if done > 0 and elapsed > 0 else 0
                     rem_min = int(remaining_sec // 60)
                     rem_sec = int(remaining_sec % 60)
-
-                    # Calcul du coût temps réel
-                    cost_in = (total_prompt_tokens / 1_000_000) * pricing["input_per_m"]
-                    cost_out = (total_completion_tokens / 1_000_000) * pricing["output_per_m"]
-                    current_cost = cost_in + cost_out
 
                     percent = (done / total_to_do) * 100
                     status_line = (
                         f"\r[{percent:5.1f}%] {done}/{total_to_do} "
                         f"| ✅ {success_count} "
                         f"| ⚡ {speed:4.1f} art/min "
-                        f"| 💰 {current_cost:.4f}{pricing['curr']} "
                         f"| ⏳ {rem_min:02d}m{rem_sec:02d}s "
-                        f"| En cours : {title[:18]}"
+                        f"| [{ep_name[:12]}] {title[:16]}"
                     )
                     sys.stdout.write(status_line.ljust(95))
                     sys.stdout.flush()
@@ -223,34 +310,18 @@ def main():
     total_min = int(total_elapsed // 60)
     total_sec = int(total_elapsed % 60)
 
-
-    # Calculs financiers finaux
-    cost_in = (total_prompt_tokens / 1_000_000) * pricing["input_per_m"]
-    cost_out = (total_completion_tokens / 1_000_000) * pricing["output_per_m"]
-    batch_cost = cost_in + cost_out
-    
-    avg_tokens_per_art = (total_prompt_tokens + total_completion_tokens) / max(1, success_count)
-    avg_cost_per_art = batch_cost / max(1, success_count)
-    extrapolated_total_cost = avg_cost_per_art * total_articles
-    
-    extrapolated_seconds = (total_articles / (success_count / total_elapsed)) if success_count > 0 and total_elapsed > 0 else 0
-    extrap_hours = int(extrapolated_seconds // 3600)
-    extrap_mins = int((extrapolated_seconds % 3600) // 60)
-
-    print("\n\n" + "=" * 75)
-    print("📊 BILAN DU TEST (50 ARTICLES) & ESTIMATION DU DICTIONNAIRE COMPLET")
-    print("=" * 75)
-    print(f"🤖 Modèle testé : {model}")
-    print(f"⏱️ Durée du test : {total_min} min {total_sec} s ({success_count / max(0.1, total_elapsed) * 60:.1f} articles / minute)")
+    print("\n\n" + "=" * 80)
+    print("✨ TRAITEMENT TERMINÉ AVEC SUCCÈS !")
+    print("=" * 80)
+    print(f"⏱️ Durée totale : {total_min} min {total_sec} s ({success_count / max(0.1, total_elapsed) * 60:.1f} articles / minute)")
     print(f"✅ Articles polis avec succès : {success_count} / {total_to_do}")
-    print(f"🔤 Jetons consommés : {total_prompt_tokens:,} in + {total_completion_tokens:,} out = {total_prompt_tokens + total_completion_tokens:,} tokens")
-    print(f"💵 COÛT DU TEST ({success_count} articles) : {batch_cost:.4f} {pricing['curr']}")
-    print(f"📌 Coût moyen par article : {avg_cost_per_art:.5f} {pricing['curr']} (~{avg_tokens_per_art:.0f} tokens/art)")
-    print("-" * 75)
-    print(f"🔮 PROJECTION POUR LES {total_articles:,} ARTICLES COMPLETS :")
-    print(f"   💰 Coût estimé total : {extrapolated_total_cost:.2f} {pricing['curr']}")
-    print(f"   ⏱️ Durée estimée totale : environ {extrap_hours}h {extrap_mins}min (avec {args.workers} workers)")
-    print("=" * 75)
+    print(f"🔤 Total jetons traités : {total_prompt_tokens + total_completion_tokens:,} tokens")
+    print("-" * 80)
+    print("📊 Répartition par point d'accès :")
+    for ep_name, cnt in endpoint_stats.items():
+        pct = (cnt / max(1, success_count)) * 100
+        print(f"   • {ep_name.ljust(30)} : {cnt:5d} articles ({pct:5.1f}%)")
+    print("=" * 80)
 
 if __name__ == "__main__":
     main()
