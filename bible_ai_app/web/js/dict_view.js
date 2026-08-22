@@ -1065,7 +1065,7 @@ const DictView = {
         return;
       }
 
-      // B3) Sous-entrées numérotées NDB brutes : 1.Épouse de Hetsrôn... ou 1. Même lieu...
+      // B3) Sous-entrées numérotées NDB brutes : 1.Épouse de Hetsrôn... ou 1. Une réalité...
       if (this.optLogosRestructure) {
         const rawNumMatch = raw.match(/^(\d+)\.\s*(.+)$/);
         if (rawNumMatch) {
@@ -1079,12 +1079,19 @@ const DictView = {
             return `<a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(targetW)}">🔗 ${this.escapeHtml(targetW)}</a>`;
           });
 
+          // Proposition 2 : Style Typographique Épuré (Édition Papier Classique)
+          if (content.includes(' : ') && content.indexOf(' : ') < 60) {
+            const sp = content.split(' : ');
+            content = `<strong>${sp[0]} :</strong> ${sp.slice(1).join(' : ')}`;
+          } else if (content.includes('. ') && content.indexOf('. ') < 40 && !['s.', 'ch.', 'v.', 'r.', 'd.'].some(k => content.split('. ')[0].toLowerCase().includes(k))) {
+            const sp = content.split('. ');
+            content = `<strong>${sp[0]}.</strong> ${sp.slice(1).join('. ')}`;
+          }
+
           out.push(`
-            <div class="dict-subentry-card" id="dict-subentry-${num}">
-              <div class="dict-subentry-heading">
-                <span class="dict-subentry-num" style="display: inline-flex; align-items: center; justify-content: center; background: #6366f1; color: #fff; border-radius: 4px; padding: 1px 7px; font-size: 11px; font-weight: 700; margin-right: 6px;">${num}</span>
-              </div>
-              <p style="margin: 0; line-height: 1.75;">${content}</p>
+            <div class="dict-subentry-row" id="dict-subentry-${num}">
+              <span class="dict-subentry-num-classic">${num}.</span>
+              <span class="dict-subentry-text">${content}</span>
             </div>
           `);
           return;

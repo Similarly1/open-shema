@@ -14901,6 +14901,35 @@ body.reading-bg-sepia .dict-cross-ref-link:hover {
   padding-bottom: 0;
 }
 
+/* Proposition 2 : Style Typographique Épuré (Édition Papier Classique) */
+.dict-subentry-row {
+  margin: 10px 0;
+  line-height: 1.8;
+  padding-left: 1.8em;
+  text-indent: -1.8em;
+  color: var(--text-primary);
+}
+
+.dict-subentry-num-classic {
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--accent-blue, #6366f1);
+  font-family: var(--font-sans, system-ui, sans-serif);
+  margin-right: 6px;
+  display: inline-block;
+  min-width: 1.5em;
+  text-indent: 0;
+}
+
+body.theme-dark .dict-subentry-num-classic,
+body.palette-dark-slate .dict-subentry-num-classic {
+  color: #a5b4fc;
+}
+
+body.reading-bg-sepia .dict-subentry-num-classic {
+  color: #b45309;
+}
+
 .dict-internal-jump-link {
   color: #6366f1;
   font-weight: 700;
