@@ -73,6 +73,7 @@ DEFAULTS = {
     "show_chapter_dividers": True,
     "full_width_reading": False,
     "notes_directory": "",
+    "highlights_file": "",
     "include_notes_in_ai": True,
     "enable_ai": True,
     "synthesis_model": "gemini-3.7-flash",

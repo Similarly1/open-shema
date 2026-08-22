@@ -207,6 +207,80 @@ Directives de rédaction :
       App.showToast('Dossier réinitialisé par défaut (data/notes/)');
     });
 
+    // Stockage & Fichier des Surlignages
+    document.getElementById('btn-browse-highlights-file')?.addEventListener('click', async () => {
+      try {
+        const res = await API.call('pick_highlights_file');
+        if (res && res.success && res.path) {
+          document.getElementById('cfg-highlights-file').value = res.path;
+          App.showToast(`Fichier sélectionné : ${res.path}`);
+        }
+      } catch (e) {
+        alert(`Erreur sélection fichier : ${e}`);
+      }
+    });
+
+    document.getElementById('btn-open-highlights-dir')?.addEventListener('click', async () => {
+      try {
+        const res = await API.call('open_highlights_folder');
+        if (res && res.success) {
+          App.showToast(`Dossier ouvert : ${res.path}`);
+        } else {
+          alert(`Erreur : ${res?.error || 'Impossible d\'ouvrir le dossier'}`);
+        }
+      } catch (e) {
+        alert(`Erreur : ${e}`);
+      }
+    });
+
+    document.getElementById('btn-reset-highlights-file')?.addEventListener('click', () => {
+      document.getElementById('cfg-highlights-file').value = '';
+      App.showToast('Fichier réinitialisé par défaut (data/highlights.json)');
+    });
+
+    // Boutons Export / Import des Surlignages dans les Paramètres
+    document.getElementById('btn-cfg-export-hl-json')?.addEventListener('click', async () => {
+      try {
+        const res = await API.exportHighlights('json');
+        if (res && res.success) {
+          App.showToast(`Surlignages exportés avec succès (JSON)`);
+        } else if (res && !res.cancelled) {
+          App.showToast(`Erreur export : ${res.error || 'inconnue'}`);
+        }
+      } catch (err) {
+        console.error('Erreur export JSON', err);
+      }
+    });
+
+    document.getElementById('btn-cfg-export-hl-md')?.addEventListener('click', async () => {
+      try {
+        const res = await API.exportHighlights('md');
+        if (res && res.success) {
+          App.showToast(`Surlignages exportés avec succès (Markdown)`);
+        } else if (res && !res.cancelled) {
+          App.showToast(`Erreur export : ${res.error || 'inconnue'}`);
+        }
+      } catch (err) {
+        console.error('Erreur export MD', err);
+      }
+    });
+
+    document.getElementById('btn-cfg-import-hl-json')?.addEventListener('click', async () => {
+      try {
+        const res = await API.importHighlights('merge');
+        if (res && res.success) {
+          App.showToast(`✓ ${res.imported_count} surlignage(s) importé(s) (${res.total_count} au total)`);
+          if (typeof HighlighterManager !== 'undefined' && typeof BibleReader !== 'undefined') {
+            HighlighterManager.renderChapterHighlights(BibleReader.currentBook, BibleReader.currentChapter);
+          }
+        } else if (res && !res.cancelled) {
+          App.showToast(`Erreur import : ${res.error || 'inconnue'}`);
+        }
+      } catch (err) {
+        console.error('Erreur import JSON', err);
+      }
+    });
+
     document.getElementById('cfg-include-notes-ai')?.addEventListener('change', (e) => {
       this.config.include_notes_in_ai = e.target.checked;
       if (typeof NotesView !== 'undefined') {
@@ -508,6 +582,9 @@ Directives de rédaction :
     if (c.notes_directory !== undefined) {
       document.getElementById('cfg-notes-dir').value = c.notes_directory || '';
     }
+    if (c.highlights_file !== undefined && document.getElementById('cfg-highlights-file')) {
+      document.getElementById('cfg-highlights-file').value = c.highlights_file || '';
+    }
     document.getElementById('cfg-include-notes-ai').checked = c.include_notes_in_ai !== false;
 
     if (typeof NotesView !== 'undefined') {
@@ -786,6 +863,9 @@ Directives de rédaction :
 
     newCfg.max_original_verses_for_llm = parseInt(document.getElementById('cfg-max-orig-verses').value);
     newCfg.notes_directory = document.getElementById('cfg-notes-dir').value.trim();
+    if (document.getElementById('cfg-highlights-file')) {
+      newCfg.highlights_file = document.getElementById('cfg-highlights-file').value.trim();
+    }
     newCfg.include_notes_in_ai = document.getElementById('cfg-include-notes-ai').checked;
 
     newCfg.chat_model = document.getElementById('cfg-chat-model').value;

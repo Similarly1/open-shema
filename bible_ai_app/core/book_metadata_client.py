@@ -322,20 +322,26 @@ class BookMetadataClient:
         for bible in BIBLE_VERSIONS_REGISTRY:
             for kw in bible.get("keywords", []):
                 if kw in search_norm or search_norm in kw or (len(search_norm) >= 2 and kw == search_norm):
-                    all_results.append(dict(bible))
+                    b_copy = dict(bible)
+                    b_copy["rank_score"] = 1000
+                    all_results.append(b_copy)
                     break
 
-        # 2. ÉTAPE 2 : Requêtes parallèles sur les 6 catalogues en ligne (avec DuckDuckGo Image Search)
+        # 2. ÉTAPE 2 : Requêtes parallèles sur les catalogues chrétiens et généralistes
         tasks = [
+            # Priorité 1 : Éditeurs chrétiens francophones (Couvertures HD 2D officielles & métadonnées exactes)
+            _SEARCH_EXECUTOR.submit(cls._search_publications_chretiennes, query=search_text, author=cleaned_author, title=cleaned_title, limit=6),
+            _SEARCH_EXECUTOR.submit(cls._search_maison_bible, query=search_text, author=cleaned_author, title=cleaned_title, limit=4),
+            # Priorité 2 : Catalogues mondiaux
             _SEARCH_EXECUTOR.submit(cls._search_google_books, query=cleaned_query, author=cleaned_author, title=cleaned_title, isbn=cleaned_isbn, api_key=api_key, limit=8),
             _SEARCH_EXECUTOR.submit(cls._search_open_library, query=search_text, author=cleaned_author, title=cleaned_title, isbn=cleaned_isbn, limit=8),
-            _SEARCH_EXECUTOR.submit(cls._search_bnf_gallica, query=search_text, author=cleaned_author, title=cleaned_title, limit=8),
-            _SEARCH_EXECUTOR.submit(cls._search_internet_archive, query=search_text, author=cleaned_author, title=cleaned_title, limit=6),
-            _SEARCH_EXECUTOR.submit(cls._search_wikipedia, query=cleaned_title or cleaned_query, limit=3),
+            _SEARCH_EXECUTOR.submit(cls._search_bnf_gallica, query=search_text, author=cleaned_author, title=cleaned_title, limit=6),
+            _SEARCH_EXECUTOR.submit(cls._search_internet_archive, query=search_text, author=cleaned_author, title=cleaned_title, limit=4),
+            _SEARCH_EXECUTOR.submit(cls._search_wikipedia, query=cleaned_title or cleaned_query, limit=2),
             _SEARCH_EXECUTOR.submit(cls._search_duckduckgo_covers, query=search_text, author=cleaned_author, title=cleaned_title, limit=2)
         ]
 
-        done, _ = concurrent.futures.wait(tasks, timeout=3.5)
+        done, _ = concurrent.futures.wait(tasks, timeout=4.5)
         for future in done:
             try:
                 res = future.result()
@@ -344,20 +350,55 @@ class BookMetadataClient:
             except Exception as e:
                 logger.debug("Erreur résultat tâche recherche métadonnées: %s", e)
 
-        # 3. ÉTAPE 3 : Résolution automatique de la couverture par ISBN si manquante
+        # 3. ÉTAPE 3 : Résolution automatique de la couverture 2D plate par ISBN si manquante ou si 3D
         for r in all_results:
-            if not r.get("cover_url") and r.get("isbn"):
+            if r.get("isbn"):
                 isbn_candidate = r["isbn"].split(",")[0].strip()
-                cov = cls._get_isbn_cover(isbn_candidate)
-                if cov:
-                    r["cover_url"] = cov
+                if not r.get("cover_url") or r.get("is_3d_cover"):
+                    cov = cls._get_isbn_cover(isbn_candidate)
+                    if cov:
+                        r["cover_url"] = cov
+                        r["is_3d_cover"] = False
 
-        # 4. ÉTAPE 4 : Dédoublonnage intelligent & tri
+        # 4. ÉTAPE 4 : Calcul du score de pertinence et qualité d'image
+        for r in all_results:
+            if "rank_score" not in r:
+                score = 0
+                src = r.get("source", "")
+                has_cover = bool(r.get("cover_url"))
+                is_3d = bool(r.get("is_3d_cover"))
+                has_desc = bool(r.get("description"))
+                has_year = bool(r.get("year"))
+
+                # Bonus source
+                if "Publications Chrétiennes" in src:
+                    score += 400
+                elif "Maison de la Bible" in src:
+                    score += 200
+                elif "Google Books" in src:
+                    score += 150
+                elif "Open Library" in src:
+                    score += 100
+
+                # Bonus qualité couverture (2D plate vs 3D mockup)
+                if has_cover and not is_3d:
+                    score += 250
+                elif has_cover and is_3d:
+                    # Rendu 3D pénalisé pour être en dernier recours
+                    score -= 50
+
+                if has_desc:
+                    score += 80
+                if has_year:
+                    score += 40
+
+                r["rank_score"] = score
+
+        # 5. ÉTAPE 5 : Dédoublonnage intelligent & tri
         seen_keys = set()
         deduped: List[Dict[str, Any]] = []
 
-        # Priorité : résultats avec couverture haute résolution d'abord
-        all_results.sort(key=lambda r: (2 if r.get("id", "").startswith("bible_") else (1 if r.get("cover_url") else 0), 1 if r.get("description") else 0), reverse=True)
+        all_results.sort(key=lambda r: r.get("rank_score", 0), reverse=True)
 
         for item in all_results:
             title_norm = re.sub(r'\W+', '', (item.get("title") or "").lower())[:40]
@@ -370,6 +411,189 @@ class BookMetadataClient:
             deduped.append(item)
 
         return deduped[:limit]
+
+    # =========================================================================
+    # 0. ÉDITEURS CHRÉTIENS FRANCOPHONES (PRIORITÉ ABSOLUE : COUVERTURES 2D HD & MÉTHODES EXACTES)
+    # =========================================================================
+
+    @classmethod
+    def _search_publications_chretiennes(
+        cls,
+        query: str,
+        author: str = "",
+        title: str = "",
+        limit: int = 6
+    ) -> List[Dict[str, Any]]:
+        """
+        Interroge l'API JSON officielle de Publications Chrétiennes (Éditions Impact, Cruciforme, etc.).
+        Extrait les couvertures haute résolution 2D d'origine, l'ISBN, l'année exacte et la description complète.
+        """
+        search_text = query or f"{title} {author}".strip()
+        if not search_text:
+            return []
+        
+        url = f"https://publicationschretiennes.com/search/suggest.json?q={urllib.parse.quote(search_text)}&resources[type]=product"
+        headers = {"User-Agent": DEFAULT_USER_AGENT}
+        
+        try:
+            resp = requests.get(url, headers=headers, timeout=4)
+            if resp.status_code != 200:
+                return []
+            data = resp.json()
+            products = data.get("resources", {}).get("results", {}).get("products", [])
+            
+            results = []
+            from bs4 import BeautifulSoup
+            
+            for p in products[:limit]:
+                handle = p.get("handle")
+                p_title = p.get("title", "").strip()
+                img_url = p.get("image") or ""
+                if img_url:
+                    img_url = re.sub(r'_[0-9]+x[0-9]*\.', '.', img_url)
+                    img_url = re.sub(r'\?v=\d+', '', img_url)
+                    if not img_url.startswith("http"):
+                        img_url = "https:" + img_url
+
+                detail_url = f"https://publicationschretiennes.com/products/{handle}.json"
+                detail_author = p.get("vendor", "")
+                detail_desc = p.get("body", "")
+                isbn = ""
+                year = ""
+                publisher = p.get("vendor") or "Publications Chrétiennes"
+                
+                try:
+                    r_det = requests.get(detail_url, headers=headers, timeout=3)
+                    if r_det.status_code == 200:
+                        p_full = r_det.json().get("product", {})
+                        detail_desc = p_full.get("body_html", "") or detail_desc
+                        tags = p_full.get("tags", "")
+                        for t in [x.strip() for x in tags.split(",") if x.strip()]:
+                            if t.lower().startswith("auteur_"):
+                                detail_author = t.split("_", 1)[1].strip()
+                            elif t.lower().startswith("éditeur_") or t.lower().startswith("editeur_"):
+                                publisher = t.split("_", 1)[1].strip()
+                        variants = p_full.get("variants", [])
+                        if variants and variants[0].get("barcode"):
+                            isbn = variants[0].get("barcode").strip()
+                        created_at = p_full.get("created_at", "")
+                        if created_at and len(created_at) >= 4:
+                            year = created_at[:4]
+                        images = p_full.get("images", [])
+                        if images and images[0].get("src"):
+                            img_url = images[0].get("src")
+                except Exception:
+                    pass
+
+                # Nettoyage description HTML
+                soup = BeautifulSoup(detail_desc, "html.parser")
+                clean_desc = re.sub(r'\n\s*\n+', '\n\n', soup.get_text(separator="\n").strip())
+
+                results.append({
+                    "id": f"pc_{handle}",
+                    "source": "Publications Chrétiennes",
+                    "source_badge": "Publications Chrétiennes",
+                    "source_badge_color": "#DC2626",
+                    "title": p_title,
+                    "short_title": p_title.split(':')[0].strip(),
+                    "authors": [detail_author] if detail_author else ([author] if author else []),
+                    "author_str": detail_author or author,
+                    "publisher": publisher,
+                    "published_date": year,
+                    "year": year,
+                    "description": clean_desc,
+                    "isbn": isbn,
+                    "categories": ["Théologie / Édition Chrétienne"],
+                    "page_count": None,
+                    "cover_url": img_url,
+                    "language": "fr",
+                    "is_3d_cover": False
+                })
+            return results
+        except Exception as e:
+            logger.debug("Erreur Publications Chrétiennes: %s", e)
+            return []
+
+    @classmethod
+    def _search_maison_bible(
+        cls,
+        query: str,
+        author: str = "",
+        title: str = "",
+        limit: int = 4
+    ) -> List[Dict[str, Any]]:
+        """
+        Interroge le catalogue de La Maison de la Bible.
+        Extrait les métadonnées et résout en priorité une couverture 2D plate via ISBN (évite le mockup 3D).
+        """
+        search_text = query or f"{title} {author}".strip()
+        if not search_text:
+            return []
+        
+        url = f"https://maisonbible.fr/fr/recherche?controller=search&s={urllib.parse.quote(search_text)}"
+        headers = {"User-Agent": DEFAULT_USER_AGENT}
+        
+        try:
+            from bs4 import BeautifulSoup
+            resp = requests.get(url, headers=headers, timeout=4)
+            if resp.status_code != 200:
+                return []
+            
+            soup = BeautifulSoup(resp.text, "html.parser")
+            articles = soup.find_all("article", class_=re.compile(r"product-miniature|js-product-miniature"))
+            results = []
+            
+            for art in articles[:limit]:
+                title_tag = art.find(["h2", "h3"], class_=re.compile(r"product-title|title")) or art.find("a")
+                link_tag = art.find("a", href=True)
+                if not title_tag or not link_tag:
+                    continue
+                p_title = title_tag.get_text(strip=True)
+                link = link_tag.get("href", "")
+                
+                # Extraire ISBN de l'URL (ex: ...-9782890823242.html)
+                isbn_match = re.search(r'-([0-9]{10,13})\.html', link)
+                isbn = isbn_match.group(1) if isbn_match else ""
+                
+                # Résolution prioritaire d'une couverture 2D plate par ISBN
+                cover_2d = cls._get_isbn_cover(isbn) if isbn else None
+                is_3d = False
+                
+                if cover_2d:
+                    cover_url = cover_2d
+                else:
+                    img_tag = art.find("img")
+                    img_src = img_tag.get("src") or img_tag.get("data-src") if img_tag else ""
+                    if img_src and not img_src.startswith("http"):
+                        img_src = "https://maisonbible.fr" + img_src
+                    cover_url = img_src
+                    # Image directe Maison de la Bible = souvent rendu 3D
+                    is_3d = bool(img_src)
+
+                results.append({
+                    "id": f"mb_{isbn or len(results)}",
+                    "source": "La Maison de la Bible",
+                    "source_badge": "Maison de la Bible",
+                    "source_badge_color": "#2563EB",
+                    "title": p_title,
+                    "short_title": p_title.split(':')[0].strip(),
+                    "authors": [author] if author else [],
+                    "author_str": author or "La Maison de la Bible",
+                    "publisher": "La Maison de la Bible",
+                    "published_date": "",
+                    "year": "",
+                    "description": "",
+                    "isbn": isbn,
+                    "categories": ["Livre Chrétien"],
+                    "page_count": None,
+                    "cover_url": cover_url,
+                    "language": "fr",
+                    "is_3d_cover": is_3d
+                })
+            return results
+        except Exception as e:
+            logger.debug("Erreur Maison de la Bible: %s", e)
+            return []
 
     # =========================================================================
     # 1. GOOGLE BOOKS
@@ -385,7 +609,7 @@ class BookMetadataClient:
         api_key: Optional[str] = None,
         limit: int = 8
     ) -> List[Dict[str, Any]]:
-        """Interroge l'API Google Books."""
+        """Interroge l'API Google Books avec requête assouplie."""
         parts = []
         if isbn:
             parts.append(f"isbn:{isbn}")
@@ -400,25 +624,29 @@ class BookMetadataClient:
         if not final_query:
             return []
 
-        params = {
-            "q": final_query,
-            "maxResults": min(max(limit, 1), 20),
-            "printType": "books",
-        }
-        if api_key:
-            params["key"] = api_key
-
-        url = f"https://www.googleapis.com/books/v1/volumes?{urllib.parse.urlencode(params)}"
-        headers = {"User-Agent": DEFAULT_USER_AGENT}
-        try:
-            resp = requests.get(url, headers=headers, timeout=5)
-            if resp.status_code != 200:
-                return []
-            data = resp.json()
-        except Exception:
+        def _do_query(q_str):
+            params = {
+                "q": q_str,
+                "maxResults": min(max(limit, 1), 20),
+                "printType": "books",
+            }
+            if api_key:
+                params["key"] = api_key
+            url = f"https://www.googleapis.com/books/v1/volumes?{urllib.parse.urlencode(params)}"
+            headers = {"User-Agent": DEFAULT_USER_AGENT}
+            try:
+                resp = requests.get(url, headers=headers, timeout=4)
+                if resp.status_code == 200:
+                    return resp.json().get("items", [])
+            except Exception:
+                pass
             return []
 
-        items = data.get("items", [])
+        items = _do_query(final_query)
+        # Si aucun résultat avec les filtres stricts intitle/inauthor, essayer en recherche libre
+        if not items and (title or author):
+            free_q = f"{title} {author}".strip()
+            items = _do_query(free_q)
         results = []
         for item in items:
             vol = item.get("volumeInfo", {})
@@ -774,7 +1002,7 @@ class BookMetadataClient:
 
     @classmethod
     def _get_isbn_cover(cls, isbn: str) -> Optional[str]:
-        """Tente de trouver une couverture commerciale via Epagine ou Open Library."""
+        """Tente de trouver une couverture commerciale 2D plate officielle via Epagine ou Open Library."""
         if not isbn:
             return None
         clean_isbn = re.sub(r'\D', '', str(isbn))
@@ -782,8 +1010,14 @@ class BookMetadataClient:
             return None
         if len(clean_isbn) == 13:
             last3 = clean_isbn[-3:]
-            return f"https://images.epagine.fr/{last3}/{clean_isbn}_1_75.jpg"
-        return f"https://covers.openlibrary.org/b/isbn/{clean_isbn}-M.jpg"
+            url = f"https://images.epagine.fr/{last3}/{clean_isbn}_1_75.jpg"
+            try:
+                r = requests.head(url, headers={"User-Agent": DEFAULT_USER_AGENT}, timeout=2)
+                if r.status_code == 200:
+                    return url
+            except Exception:
+                pass
+        return f"https://covers.openlibrary.org/b/isbn/{clean_isbn}-L.jpg"
 
     @classmethod
     def _search_duckduckgo_covers(cls, query: str, author: str = "", title: str = "", limit: int = 2) -> List[Dict[str, Any]]:
@@ -803,26 +1037,27 @@ class BookMetadataClient:
                         img_url = item.get("image") or item.get("thumbnail")
                         if not img_url:
                             continue
-                    item_title = item.get("title") or title or query
-                    results.append({
-                        "id": f"ddg_{abs(hash(img_url))}",
-                        "source": "Web Librairie",
-                        "source_badge": "Jaquette Web",
-                        "source_badge_color": "#EA580C",
-                        "title": item_title,
-                        "short_title": (title or item_title).split(':')[0].strip(),
-                        "authors": [author] if author else [],
-                        "author_str": author or "Édition Commerciale",
-                        "publisher": item.get("source", "Librairie"),
-                        "published_date": "",
-                        "year": "",
-                        "description": "Jaquette commerciale récupérée via recherche d'image web.",
-                        "isbn": "",
-                        "categories": ["Livre / Jaquette"],
-                        "page_count": None,
-                        "cover_url": img_url,
-                        "language": "fr"
-                    })
+                        item_title = item.get("title") or title or query
+                        results.append({
+                            "id": f"ddg_{abs(hash(img_url))}",
+                            "source": "Web Librairie",
+                            "source_badge": "Jaquette Web",
+                            "source_badge_color": "#EA580C",
+                            "title": item_title,
+                            "short_title": (title or item_title).split(':')[0].strip(),
+                            "authors": [author] if author else [],
+                            "author_str": author or "Édition Commerciale",
+                            "publisher": item.get("source", "Librairie"),
+                            "published_date": "",
+                            "year": "",
+                            "description": "Jaquette commerciale récupérée via recherche d'image web.",
+                            "isbn": "",
+                            "categories": ["Livre / Jaquette"],
+                            "page_count": None,
+                            "cover_url": img_url,
+                            "language": "fr",
+                            "is_3d_cover": False
+                        })
             return results
         except Exception as e:
             logger.debug("Erreur DuckDuckGo images: %s", e)

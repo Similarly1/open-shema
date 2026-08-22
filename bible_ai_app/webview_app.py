@@ -1113,7 +1113,7 @@ class BibleAppApi:
             content = HighlightsManager.export_to_json(self.config)
 
         save_path = win.create_file_dialog(
-            webview.SAVE_FILENAME_DIALOG,
+            webview.SAVE_DIALOG,
             save_filename=default_name,
             file_types=file_types
         )
@@ -1180,6 +1180,47 @@ class BibleAppApi:
                 import subprocess
                 subprocess.Popen(['xdg-open', notes_dir])
             return {"success": True, "path": notes_dir}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    def pick_highlights_file(self) -> Dict[str, Any]:
+        """Ouvre un dialogue natif Windows pour choisir ou créer un fichier JSON de surlignages."""
+        win = get_active_window()
+        if not win:
+            return {"success": False, "error": "Fenêtre introuvable"}
+        result = win.create_file_dialog(
+            webview.SAVE_DIALOG,
+            save_filename="highlights.json",
+            file_types=('Fichiers JSON (*.json)', 'Tous les fichiers (*.*)')
+        )
+        if not result:
+            return {"cancelled": True}
+        if isinstance(result, (list, tuple)):
+            result = result[0]
+        return {"success": True, "path": result}
+
+    def open_highlights_folder(self) -> Dict[str, Any]:
+        """Ouvre le dossier contenant le fichier de surlignages dans l'explorateur de fichiers."""
+        self.config = load_config()
+        hl_file = HighlightsManager.get_highlights_file(self.config)
+        hl_dir = os.path.dirname(hl_file)
+        try:
+            if os.name == 'nt':
+                if os.path.exists(hl_file):
+                    import subprocess
+                    subprocess.Popen(f'explorer /select,"{os.path.normpath(hl_file)}"')
+                else:
+                    os.startfile(hl_dir)
+            elif sys.platform == 'darwin':
+                import subprocess
+                if os.path.exists(hl_file):
+                    subprocess.Popen(['open', '-R', hl_file])
+                else:
+                    subprocess.Popen(['open', hl_dir])
+            else:
+                import subprocess
+                subprocess.Popen(['xdg-open', hl_dir])
+            return {"success": True, "path": hl_file if os.path.exists(hl_file) else hl_dir}
         except Exception as e:
             return {"success": False, "error": str(e)}
 
@@ -2471,7 +2512,7 @@ class BibleAppApi:
         default_name = f"backup_bible_ai_{now_str}.zip"
         
         save_path = win.create_file_dialog(
-            webview.SAVE_FILENAME_DIALOG,
+            webview.SAVE_DIALOG,
             save_filename=default_name,
             file_types=('Archives ZIP (*.zip)', 'Tous les fichiers (*.*)')
         )

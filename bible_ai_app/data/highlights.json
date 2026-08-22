@@ -122,5 +122,37 @@
     "id": "hl_20260822103934_090b01a8",
     "updated_at": "2026-08-22T10:39:34.005596",
     "created_at": "2026-08-22T10:39:34.005596"
+  },
+  {
+    "book": "Gen",
+    "chapter": 1,
+    "verse_start": 2,
+    "verse_end": 2,
+    "start_word_idx": 7,
+    "end_word_idx": 11,
+    "selected_text": "Il y avait des ténèbres",
+    "is_full_verse": false,
+    "version": "Segond 21",
+    "color": "yellow",
+    "style": "felt",
+    "id": "hl_20260822104456_fa2795f1",
+    "updated_at": "2026-08-22T10:44:56.280264",
+    "created_at": "2026-08-22T10:44:56.280264"
+  },
+  {
+    "book": "Gen",
+    "chapter": 1,
+    "verse_start": 12,
+    "verse_end": 12,
+    "start_word_idx": 6,
+    "end_word_idx": 9,
+    "selected_text": "de l'herbe à graine",
+    "is_full_verse": false,
+    "version": "Segond 21",
+    "color": "rose",
+    "style": "felt",
+    "id": "hl_20260822104511_a7996e51",
+    "updated_at": "2026-08-22T10:45:11.239164",
+    "created_at": "2026-08-22T10:45:11.239164"
   }
 ]

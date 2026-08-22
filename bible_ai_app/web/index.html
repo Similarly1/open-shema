@@ -439,26 +439,8 @@
                   </div>
                 </div>
 
-                <!-- 4. Export & Import -->
-                <div style="border-top: 1px solid var(--border-color); margin: 10px 0 0 0; padding-top: 8px;">
-                  <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">
-                    Sauvegarde & Partage
-                  </div>
-                  <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                    <button type="button" id="btn-top-export-json" class="btn-secondary" style="font-size: 11px; padding: 4px 8px; flex: 1;" title="Sauvegarde complète au format JSON">
-                      Export JSON
-                    </button>
-                    <button type="button" id="btn-top-export-md" class="btn-secondary" style="font-size: 11px; padding: 4px 8px; flex: 1;" title="Export format texte Markdown lisible">
-                      Export MD
-                    </button>
-                    <button type="button" id="btn-top-import-json" class="btn-secondary" style="font-size: 11px; padding: 4px 8px; flex: 1;" title="Restaurer ou importer des surlignages JSON">
-                      Importer
-                    </button>
-                  </div>
-                </div>
-
-                <!-- 5. Actions rapides -->
-                <div style="border-top: 1px solid var(--border-color); margin: 8px 0 0 0; padding-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+                <!-- 4. Actions rapides -->
+                <div style="border-top: 1px solid var(--border-color); margin: 10px 0 0 0; padding-top: 8px; display: flex; justify-content: space-between; align-items: center;">
                   <button type="button" id="btn-top-erase-selected" class="btn-link" style="font-size: 11px; color: var(--accent-red); cursor: pointer; background: none; border: none; padding: 0;">Effacer le surlignage</button>
                   <button type="button" id="btn-top-view-all-hl" class="btn-link" style="font-size: 11px; color: var(--accent-blue); cursor: pointer; background: none; border: none; padding: 0;">Ouvrir les notes ↗</button>
                 </div>
@@ -624,7 +606,7 @@
               <line x1="16" y1="17" x2="8" y2="17"></line>
               <polyline points="10 9 9 9 8 9"></polyline>
             </svg>
-            <span>Notes & Dossier</span>
+            <span>Notes & Surlignages</span>
           </button>
           <button class="settings-tab" data-sec="stepbible">
             <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -974,6 +956,63 @@
                 <p style="font-size: 11px; color: var(--text-muted); margin-left: 24px; margin-top: 4px;">
                   Si activé, l'IA consultera vos notes associées au passage ou au sujet étudié pour enrichir ses réponses. Vous pouvez aussi désactiver des notes individuellement.
                 </p>
+              </div>
+            </div>
+
+            <!-- CARTE STOCKAGE ET SAUVEGARDE DES SURLIGNAGES -->
+            <div class="settings-card" style="margin-top: 20px;">
+              <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                <span>Stockage & Sauvegarde des Surlignages (.json / .md)</span>
+              </div>
+              <p class="card-desc">Vos surlignages sont stockés sous forme structurée sur votre ordinateur. Vous pouvez personnaliser le fichier de stockage, l'exporter pour vos études ou restaurer une sauvegarde.</p>
+
+              <div class="form-group">
+                <label>Emplacement du fichier de surlignages :</label>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <input type="text" id="cfg-highlights-file" class="text-field" style="flex: 1;" placeholder="Fichier par défaut (data/highlights.json)" readonly>
+                  <button class="btn-primary" id="btn-browse-highlights-file" title="Choisir ou créer un fichier JSON sur votre PC">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
+                      <circle cx="12" cy="13" r="2"></circle>
+                      <path d="m14 15 2 2"></path>
+                    </svg>
+                    <span>Parcourir...</span>
+                  </button>
+                  <button class="btn-secondary" id="btn-open-highlights-dir" title="Ouvrir le dossier dans l'explorateur de fichiers">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
+                    </svg>
+                    <span>Ouvrir</span>
+                  </button>
+                  <button class="btn-secondary" id="btn-reset-highlights-file" title="Revenir au fichier par défaut du programme">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                      <path d="M3 3v5h5"></path>
+                    </svg>
+                    <span>Par défaut</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-divider"></div>
+
+              <div class="card-title">Exporter / Importer les Surlignages</div>
+              <p class="card-desc">Exportez vos surlignages au format texte Markdown pour vos études personnelles (Obsidian, Notion, impression) ou sauvegardez/restaurez-les en JSON.</p>
+              
+              <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+                <button type="button" id="btn-cfg-export-hl-json" class="btn-secondary" style="padding: 7px 14px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  <span>Exporter en JSON (Sauvegarde)</span>
+                </button>
+                <button type="button" id="btn-cfg-export-hl-md" class="btn-secondary" style="padding: 7px 14px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                  <span>Exporter en Markdown (.md)</span>
+                </button>
+                <button type="button" id="btn-cfg-import-hl-json" class="btn-primary" style="padding: 7px 14px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  <span>Importer des Surlignages (JSON)...</span>
+                </button>
               </div>
             </div>
           </div>
