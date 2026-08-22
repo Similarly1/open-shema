@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Open Shema — Lecteur & Assistant d'Étude Biblique</title>
   
-  <!-- Polices Google : Inter (UI) & Lora / EB Garamond / Literata / Merriweather / Cinzel (Texte Biblique) -->
+  <!-- Polices Google : Inter (UI) & Lora / EB Garamond / Cardo / IM Fell English / Literata / Merriweather / Cinzel (Texte Biblique & Historique) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Inter:wght@300;400;500;600;700&family=Literata:ital,opsz,wght@0,7..72,400..700;1,7..72,400..700&family=Lora:ital,wght@0,400..700;1,400..700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@600;700&family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=IM+Fell+English:ital@0;1&family=Inter:wght@300;400;500;600;700&family=Literata:ital,opsz,wght@0,7..72,400..700;1,7..72,400..700&family=Lora:ital,wght@0,400..700;1,400..700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
   
   <!-- CSS -->
   <link rel="stylesheet" href="css/leaflet.css">
@@ -276,20 +276,32 @@
             
             <div class="nav-mode-links" style="position: relative;">
               <button class="mode-link" id="btn-display-options" title="Options d'affichage (Péricopes, numéros, fond de lecture)">
-                <span class="mode-link-icon">👁️</span>
+                <svg class="mode-link-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
                 <span class="mode-link-text">Affichage</span>
                 <span class="pill-arrow">▾</span>
               </button>
               <button class="mode-link" id="mode-search-inline" title="Rechercher dans la Bible">
-                <span class="mode-link-icon">🔍</span>
+                <svg class="mode-link-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"/>
+                  <path d="m21 21-4.3-4.3"/>
+                </svg>
                 <span class="mode-link-text">Chercher</span>
               </button>
               <button class="mode-link" id="mode-notes-inline" title="Notes d'étude et de passage">
-                <span class="mode-link-icon">📝</span>
+                <svg class="mode-link-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 20h9"/>
+                  <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+                </svg>
                 <span class="mode-link-text">Notes</span>
               </button>
               <button class="mode-link" id="btn-highlight-options" title="Options de surlignage (Couleurs, Styles, Mode Stylo)">
-                <span class="mode-link-icon">🖍️</span>
+                <svg class="mode-link-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m9 11-6 6v3h3l6-6"/>
+                  <path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L15 4"/>
+                </svg>
                 <span class="mode-link-text">Surligner</span>
                 <span class="pill-arrow">▾</span>
               </button>
@@ -405,6 +417,20 @@
                     </button>
                   </div>
                 </div>
+
+                <div style="border-top: 1px solid var(--border-color); margin: 12px 0 4px 0; padding-top: 10px;">
+                  <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="display: inline-flex; align-items: center; gap: 5px;">
+                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1.5a2.5 2.5 0 0 0-5 0V19"/><path d="M4 3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h11"/></svg>
+                      Ambiance Historique
+                    </span>
+                    <span id="opt-vintage-badge" style="font-size: 10px; color: var(--accent-orange); font-weight: 600;">Actif</span>
+                  </div>
+                  <label class="custom-checkbox" style="margin-bottom: 4px;">
+                    <input type="checkbox" id="opt-vintage-mode" checked>
+                    <span><strong>Mode Époque & Manuscrits :</strong> papier, encre et lettrines selon la date</span>
+                  </label>
+                </div>
               </div>
 
               <!-- Popover Options de Surlignage Rapide (Couleurs, Styles, Mode Stylo) -->
@@ -465,19 +491,29 @@
           <div class="toolbar-right">
             <button class="tool-btn" id="btn-toggle-interlinear" title="Afficher les couches interlinéaires">
               <span class="btn-icon" style="display: inline-flex; align-items: center;">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"></path><path d="m4 14 6-6 2-3"></path><path d="M2 5h12"></path><path d="M7 2h1"></path><path d="m22 22-5-10-5 10"></path><path d="M14 18h6"></path></svg>
+                <svg class="btn-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"></path><path d="m4 14 6-6 2-3"></path><path d="M2 5h12"></path><path d="M7 2h1"></path><path d="m22 22-5-10-5 10"></path><path d="M14 18h6"></path></svg>
               </span>
               <span class="btn-text">Interlinéaire</span>
               <span class="pill-arrow">▾</span>
             </button>
 
             <button class="tool-btn" id="btn-toggle-split" title="Mode Double Colonne / Comparaison">
-              <span class="btn-icon">⇄</span>
+              <span class="btn-icon" style="display: inline-flex; align-items: center;">
+                <svg class="btn-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="8" height="18" x="3" y="3" rx="1.5"/>
+                  <rect width="8" height="18" x="13" y="3" rx="1.5"/>
+                </svg>
+              </span>
               <span class="btn-text">Double Vue</span>
             </button>
 
             <button class="tool-btn active hidden" id="btn-toggle-sync-scroll" title="Synchroniser le défilement des deux Bibles (alignement premier verset visible)">
-              <span class="btn-icon">⇅</span>
+              <span class="btn-icon" style="display: inline-flex; align-items: center;">
+                <svg class="btn-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m7 15 5 5 5-5"/>
+                  <path d="m7 9 5-5 5 5"/>
+                </svg>
+              </span>
               <span class="btn-text">Synchro</span>
             </button>
 
@@ -503,6 +539,7 @@
             <div class="pane-header">
               <div class="pane-breadcrumb" id="pane-1-breadcrumb">GENÈSE &gt; Chapitre 1</div>
               <div class="pane-actions">
+                <span id="pane-1-vintage-badge" class="vintage-epoch-pill hidden"></span>
                 <button class="pane-action-btn" id="pane-1-select-bible" title="Changer de version biblique">
                   <span id="pane-1-bible-name">TOB 2010</span> ▾
                 </button>
@@ -521,6 +558,7 @@
             <div class="pane-header">
               <div class="pane-breadcrumb" id="pane-2-breadcrumb">GENÈSE &gt; Chapitre 1</div>
               <div class="pane-actions">
+                <span id="pane-2-vintage-badge" class="vintage-epoch-pill hidden"></span>
                 <button class="pane-suggest-btn hidden" id="pane-2-quick-suggest" title="Cliquer pour appliquer la version suggérée pour comparaison">
                   <span class="suggest-sparkle">⚡</span> <span id="pane-2-suggest-label">Comparer avec BDJ</span>
                 </button>
@@ -874,6 +912,57 @@
                 <label style="font-weight: 500; font-size: 13px; min-width: 140px;">Interlignage :</label>
                 <input type="range" id="cfg-line-spacing" min="0" max="20" value="6" class="slider-field" style="flex: 1;">
                 <span class="slider-badge" id="lbl-line-spacing-val">6 px</span>
+              </div>
+
+              <!-- Séparateur Mode Historique -->
+              <div class="form-divider" style="margin: 24px 0 20px 0;"></div>
+
+              <div class="card-title" style="margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+                <span style="display: flex; align-items: center; gap: 8px;">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color: #d97706;"><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1.5a2.5 2.5 0 0 0-5 0V19"/><path d="M4 3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h11"/></svg>
+                  Mode Immersion Historique & Manuscrits
+                </span>
+                <span class="badge" style="font-size: 10px; background: rgba(217, 119, 6, 0.15); color: #d97706; border: 1px solid rgba(217, 119, 6, 0.3); padding: 2px 8px; border-radius: 12px; font-weight: 600;">Authenticité</span>
+              </div>
+              <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.45;">
+                Adapte visuellement l'ambiance de lecture (fond parchemin ou vergé, encre d'imprimerie bistre, ligatures historiques, lettrines décorées et patine de presse) selon l'année ou l'époque de l'ouvrage.
+              </p>
+
+              <div class="form-group" style="margin-bottom: 14px;">
+                <label class="custom-checkbox" style="font-weight: 600;">
+                  <input type="checkbox" id="cfg-vintage-mode" checked>
+                  <span>Activer le Mode Historique & Immersion d'Époque</span>
+                </label>
+              </div>
+
+              <div id="cfg-vintage-options-group" style="display: flex; flex-direction: column; gap: 14px; padding: 12px 14px; background: var(--bg-subtle); border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 10px;">
+                <div>
+                  <label style="font-weight: 600; font-size: 12px; margin-bottom: 6px; display: block; color: var(--text-primary);">Application du style :</label>
+                  <div style="display: flex; gap: 16px; font-size: 12px;">
+                    <label class="custom-radio">
+                      <input type="radio" name="cfg-vintage-scope" value="auto" checked id="cfg-vintage-scope-auto">
+                      <span><strong>Automatique :</strong> style adapté à l'année du texte (ex: 1744, 1895, 1910)</span>
+                    </label>
+                    <label class="custom-radio">
+                      <input type="radio" name="cfg-vintage-scope" value="always" id="cfg-vintage-scope-always">
+                      <span><strong>Toujours actif :</strong> appliquer une patine d'époque à tous les textes</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div>
+                  <label style="font-weight: 600; font-size: 12px; margin-bottom: 6px; display: block; color: var(--text-primary);">Intensité de patine & vieillissement :</label>
+                  <div style="display: flex; gap: 16px; font-size: 12px;">
+                    <label class="custom-radio">
+                      <input type="radio" name="cfg-vintage-intensity" value="subtle" checked id="cfg-vintage-intensity-subtle">
+                      <span><strong>Subtile (Recommandé) :</strong> confort maximal de lecture & touches d'époque</span>
+                    </label>
+                    <label class="custom-radio">
+                      <input type="radio" name="cfg-vintage-intensity" value="rich" id="cfg-vintage-intensity-rich">
+                      <span><strong>Immersion Prononcée :</strong> grain de papier marqué, rousseurs & encre au plomb</span>
+                    </label>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

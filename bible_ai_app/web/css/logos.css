@@ -1479,11 +1479,22 @@ textarea.text-field {
   flex-shrink: 0;
   transition: all 0.15s ease;
 }
-.mode-link .mode-link-icon {
+.mode-link-svg {
+  width: 13px;
+  height: 13px;
+  stroke: currentColor;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  flex-shrink: 0;
+}
+.btn-svg {
+  width: 13px;
+  height: 13px;
+  stroke: currentColor;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 .mode-link:hover {
@@ -15051,6 +15062,384 @@ body.reading-bg-sepia .dict-alpha-card {
 body.reading-bg-sepia .dict-alpha-badge {
   color: #b45309;
 }
+
+/* =============================================================================
+ * MODULE D'IMMERSION HISTORIQUE & PAPIER D'ÉPOQUE (Style Vintage / Manuscrits)
+ * ============================================================================= */
+
+/* 1. Grain de Papier Procédural SVG & Variables d'Époque */
+:root {
+  --vintage-noise-svg: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.045'/%3E%3C/svg%3E");
+}
+
+/* 2. Badge d'Époque dans les En-têtes de Volets & Cartes */
+.vintage-epoch-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 7px;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 10px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+  user-select: none;
+  cursor: default;
+}
+
+.vintage-epoch-pill.ancient {
+  background: rgba(180, 83, 9, 0.14);
+  color: #b45309;
+  border: 1px solid rgba(180, 83, 9, 0.28);
+}
+.vintage-epoch-pill.classic {
+  background: rgba(161, 98, 7, 0.14);
+  color: #a16207;
+  border: 1px solid rgba(161, 98, 7, 0.28);
+}
+.vintage-epoch-pill.xix {
+  background: rgba(107, 114, 128, 0.14);
+  color: #4b5563;
+  border: 1px solid rgba(107, 114, 128, 0.25);
+}
+.theme-dark .vintage-epoch-pill.xix {
+  color: #9ca3af;
+  border-color: rgba(156, 163, 175, 0.25);
+}
+
+/* =========================================================================
+ * 3. ÉPOQUE 1 : ANTIQUITÉ & MANUSCRITS (< 1500)
+ * ========================================================================= */
+
+/* Mode Clair : Parchemin Vélin Ancien */
+.vintage-epoch-ancient,
+.vintage-epoch-ancient .pane-scrollable-content,
+.vintage-epoch-ancient.theol-reading-container,
+.vintage-epoch-ancient.dict-article-card,
+.vintage-epoch-ancient.comm-article-card {
+  background-color: #f5edd6 !important;
+  background-image: 
+    radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.35) 0%, rgba(215, 190, 145, 0.22) 75%, rgba(180, 148, 98, 0.38) 100%),
+    var(--vintage-noise-svg) !important;
+  color: #22180e !important;
+}
+
+.vintage-epoch-ancient .verses-flow,
+.vintage-epoch-ancient .theol-reading-body,
+.vintage-epoch-ancient .dict-entry-body,
+.vintage-epoch-ancient .comm-body-text {
+  font-family: 'Cardo', 'Cinzel', 'EB Garamond', Georgia, serif !important;
+  color: #22180e !important;
+}
+
+.vintage-epoch-ancient .verse-num {
+  color: #9a2b1c !important; /* Rouge carminé / rubrique de manuscrit */
+  font-weight: 700 !important;
+}
+
+.vintage-epoch-ancient .pericope-title,
+.vintage-epoch-ancient .theol-reading-title,
+.vintage-epoch-ancient .theol-hero-chapter-title {
+  color: #7b2014 !important;
+  font-family: 'Cinzel', 'Cardo', serif !important;
+  letter-spacing: 0.5px !important;
+}
+
+.vintage-epoch-ancient .chapter-number-dropcap {
+  color: #8c1e10 !important;
+  font-family: 'Cinzel', 'Cardo', serif !important;
+  text-shadow: 1px 1px 0 rgba(180, 130, 50, 0.3);
+}
+
+.vintage-epoch-ancient .chapter-badge-divider {
+  border-color: rgba(180, 83, 9, 0.3) !important;
+}
+.vintage-epoch-ancient .chapter-badge-text {
+  background: #ecd9b3 !important;
+  color: #7b2014 !important;
+  border-color: rgba(180, 83, 9, 0.4) !important;
+}
+
+/* Mode Sombre : Grimoire Antique & Cuir Bruni */
+.theme-dark .vintage-epoch-ancient,
+.theme-dark .vintage-epoch-ancient .pane-scrollable-content,
+.theme-dark .vintage-epoch-ancient.theol-reading-container,
+.theme-dark .vintage-epoch-ancient.dict-article-card,
+.theme-dark .vintage-epoch-ancient.comm-article-card {
+  background-color: #1e1710 !important;
+  background-image: 
+    radial-gradient(ellipse at 50% 50%, rgba(45, 33, 22, 0.5) 0%, rgba(24, 17, 11, 0.8) 80%, rgba(12, 8, 5, 0.95) 100%),
+    var(--vintage-noise-svg) !important;
+  color: #e5cfb0 !important;
+}
+
+.theme-dark .vintage-epoch-ancient .verses-flow,
+.theme-dark .vintage-epoch-ancient .theol-reading-body,
+.theme-dark .vintage-epoch-ancient .dict-entry-body,
+.theme-dark .vintage-epoch-ancient .comm-body-text {
+  color: #e5cfb0 !important;
+}
+
+.theme-dark .vintage-epoch-ancient .verse-num {
+  color: #e07a38 !important;
+}
+.theme-dark .vintage-epoch-ancient .pericope-title,
+.theme-dark .vintage-epoch-ancient .theol-reading-title {
+  color: #f19a4e !important;
+}
+.theme-dark .vintage-epoch-ancient .chapter-number-dropcap {
+  color: #e58b3c !important;
+  text-shadow: 0 0 4px rgba(229, 139, 60, 0.3);
+}
+
+/* =========================================================================
+ * 4. ÉPOQUE 2 : CLASSIQUE & RÉFORME (1500 - 1799)
+ * ========================================================================= */
+
+/* Mode Clair : Papier Vergé Artisanal & Encre de Presse au Chêne */
+.vintage-epoch-classic,
+.vintage-epoch-classic .pane-scrollable-content,
+.vintage-epoch-classic.theol-reading-container,
+.vintage-epoch-classic.dict-article-card,
+.vintage-epoch-classic.comm-article-card {
+  background-color: #f3ecdb !important;
+  background-image: 
+    repeating-linear-gradient(0deg, transparent, transparent 23px, rgba(160, 130, 90, 0.04) 24px),
+    radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.28) 0%, rgba(220, 198, 156, 0.22) 75%, rgba(185, 155, 110, 0.36) 100%),
+    var(--vintage-noise-svg) !important;
+  color: #1d150e !important;
+}
+
+.vintage-epoch-classic .verses-flow,
+.vintage-epoch-classic .theol-reading-body,
+.vintage-epoch-classic .dict-entry-body,
+.vintage-epoch-classic .comm-body-text {
+  font-family: 'IM Fell English', 'EB Garamond', 'Cardo', Georgia, serif !important;
+  color: #1d150e !important;
+  font-variant-ligatures: historical-ligatures common-ligatures contextual !important;
+  font-feature-settings: "liga" 1, "dlig" 1, "hlig" 1, "calt" 1 !important;
+}
+
+/* Micro-buvardage d'encre typographique artisanale */
+.vintage-epoch-classic .word-token,
+.vintage-epoch-classic .theol-reading-p {
+  text-shadow: 0 0 0.35px rgba(29, 21, 14, 0.38);
+}
+
+.vintage-epoch-classic .verse-num {
+  color: #724722 !important;
+  font-weight: 700 !important;
+}
+
+.vintage-epoch-classic .pericope-title {
+  color: #533318 !important;
+  font-family: 'IM Fell English', 'EB Garamond', Georgia, serif !important;
+  font-style: italic !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+.vintage-epoch-classic .pericope-title::before {
+  content: "❧";
+  font-size: 13px;
+  color: #926437;
+  font-style: normal;
+}
+.vintage-epoch-classic .pericope-title::after {
+  content: "☙";
+  font-size: 13px;
+  color: #926437;
+  font-style: normal;
+}
+
+/* Lettrine ouvragée d'imprimerie Renaissance */
+.vintage-epoch-classic .chapter-number-dropcap {
+  color: #3d2411 !important;
+  font-family: 'IM Fell English', 'EB Garamond', Georgia, serif !important;
+  border: 1px solid rgba(114, 71, 34, 0.35);
+  padding: 2px 7px 0 7px;
+  border-radius: 3px;
+  background: rgba(240, 230, 210, 0.65);
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.08);
+  margin-right: 8px !important;
+}
+
+/* Mode Sombre : Reliure Cuir & Chandelle */
+.theme-dark .vintage-epoch-classic,
+.theme-dark .vintage-epoch-classic .pane-scrollable-content,
+.theme-dark .vintage-epoch-classic.theol-reading-container,
+.theme-dark .vintage-epoch-classic.dict-article-card,
+.theme-dark .vintage-epoch-classic.comm-article-card {
+  background-color: #1c150f !important;
+  background-image: 
+    repeating-linear-gradient(0deg, transparent, transparent 23px, rgba(0, 0, 0, 0.15) 24px),
+    radial-gradient(ellipse at 50% 50%, rgba(42, 31, 21, 0.5) 0%, rgba(22, 16, 10, 0.82) 80%, rgba(10, 7, 4, 0.96) 100%),
+    var(--vintage-noise-svg) !important;
+  color: #e8d8be !important;
+}
+
+.theme-dark .vintage-epoch-classic .verses-flow,
+.theme-dark .vintage-epoch-classic .theol-reading-body,
+.theme-dark .vintage-epoch-classic .dict-entry-body,
+.theme-dark .vintage-epoch-classic .comm-body-text {
+  color: #e8d8be !important;
+}
+
+.theme-dark .vintage-epoch-classic .word-token {
+  text-shadow: 0 0 0.35px rgba(232, 216, 190, 0.3);
+}
+
+.theme-dark .vintage-epoch-classic .verse-num {
+  color: #d49b55 !important;
+}
+.theme-dark .vintage-epoch-classic .pericope-title {
+  color: #e5aa62 !important;
+}
+.theme-dark .vintage-epoch-classic .chapter-number-dropcap {
+  color: #f0c386 !important;
+  border-color: rgba(212, 155, 85, 0.4);
+  background: rgba(45, 33, 22, 0.75);
+}
+
+/* =========================================================================
+ * 5. ÉPOQUE 3 : FIN XIXe / BELLE ÉPOQUE (1800 - 1929)
+ * ========================================================================= */
+
+/* Mode Clair : Papier Ivoire Feutré & Typographie Didot Plomb */
+.vintage-epoch-xix,
+.vintage-epoch-xix .pane-scrollable-content,
+.vintage-epoch-xix.theol-reading-container,
+.vintage-epoch-xix.dict-article-card,
+.vintage-epoch-xix.comm-article-card {
+  background-color: #f7f3e8 !important;
+  background-image: 
+    radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.25) 0%, rgba(232, 220, 198, 0.16) 80%, rgba(198, 180, 148, 0.28) 100%),
+    var(--vintage-noise-svg) !important;
+  color: #231c15 !important;
+}
+
+.vintage-epoch-xix .verses-flow,
+.vintage-epoch-xix .theol-reading-body,
+.vintage-epoch-xix .dict-entry-body,
+.vintage-epoch-xix .comm-body-text {
+  font-family: 'EB Garamond', 'Literata', Georgia, serif !important;
+  color: #231c15 !important;
+  font-variant-ligatures: common-ligatures contextual !important;
+}
+
+.vintage-epoch-xix .word-token {
+  text-shadow: 0 0 0.2px rgba(35, 28, 21, 0.25);
+}
+
+.vintage-epoch-xix .verse-num {
+  color: #634f3c !important;
+  font-weight: 600 !important;
+}
+
+.vintage-epoch-xix .pericope-title {
+  color: #3e3226 !important;
+  font-family: 'EB Garamond', Georgia, serif !important;
+  font-weight: 700 !important;
+  border-top: 1px solid rgba(170, 148, 122, 0.35);
+  border-bottom: 1px solid rgba(170, 148, 122, 0.35);
+  padding: 4px 0 !important;
+  margin: 16px 0 10px 0 !important;
+}
+
+.vintage-epoch-xix .chapter-number-dropcap {
+  color: #2b2219 !important;
+  font-family: 'EB Garamond', Georgia, serif !important;
+  font-weight: 700 !important;
+}
+
+/* Mode Sombre : Reliure Toilée XIXe */
+.theme-dark .vintage-epoch-xix,
+.theme-dark .vintage-epoch-xix .pane-scrollable-content,
+.theme-dark .vintage-epoch-xix.theol-reading-container,
+.theme-dark .vintage-epoch-xix.dict-article-card,
+.theme-dark .vintage-epoch-xix.comm-article-card {
+  background-color: #1f1a14 !important;
+  background-image: 
+    radial-gradient(ellipse at 50% 50%, rgba(45, 36, 26, 0.45) 0%, rgba(25, 20, 14, 0.78) 80%, rgba(12, 9, 6, 0.94) 100%),
+    var(--vintage-noise-svg) !important;
+  color: #e6decb !important;
+}
+
+.theme-dark .vintage-epoch-xix .verses-flow,
+.theme-dark .vintage-epoch-xix .theol-reading-body,
+.theme-dark .vintage-epoch-xix .dict-entry-body,
+.theme-dark .vintage-epoch-xix .comm-body-text {
+  color: #e6decb !important;
+}
+
+.theme-dark .vintage-epoch-xix .verse-num {
+  color: #bfa588 !important;
+}
+.theme-dark .vintage-epoch-xix .pericope-title {
+  color: #cfb699 !important;
+  border-color: rgba(207, 182, 153, 0.25) !important;
+}
+.theme-dark .vintage-epoch-xix .chapter-number-dropcap {
+  color: #dfc8ad !important;
+}
+
+/* =========================================================================
+ * 6. INTENSITÉ PRONONCÉE (Rousseurs de Marge & Micro-Press Relief)
+ * ========================================================================= */
+
+.vintage-intensity-rich.vintage-epoch-classic .pane-scrollable-content::before,
+.vintage-intensity-rich.vintage-epoch-classic.theol-reading-container::before {
+  content: "";
+  position: absolute;
+  top: 18px;
+  right: 28px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(160, 115, 60, 0.18) 0%, rgba(160, 115, 60, 0.05) 60%, transparent 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.vintage-intensity-rich.vintage-epoch-classic .pane-scrollable-content::after,
+.vintage-intensity-rich.vintage-epoch-classic.theol-reading-container::after {
+  content: "";
+  position: absolute;
+  bottom: 35px;
+  left: 20px;
+  width: 22px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(175, 125, 65, 0.15) 0%, rgba(175, 125, 65, 0.04) 65%, transparent 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Micro-irrégularités imperceptibles d'alignement de presse */
+.vintage-intensity-rich.vintage-epoch-classic .chapter-block:nth-child(3n+1) {
+  transform: rotate(-0.05deg);
+}
+.vintage-intensity-rich.vintage-epoch-classic .chapter-block:nth-child(3n+2) {
+  transform: rotate(0.06deg);
+}
+
+/* Harmonisation des encarts de commentaires et dictionnaires en mode vintage */
+.vintage-epoch-ancient .dict-article-card,
+.vintage-epoch-classic .dict-article-card,
+.vintage-epoch-xix .dict-article-card {
+  border-color: rgba(160, 130, 90, 0.35) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+}
+
+.vintage-epoch-ancient .comm-article-card,
+.vintage-epoch-classic .comm-article-card,
+.vintage-epoch-xix .comm-article-card {
+  border-color: rgba(160, 130, 90, 0.35) !important;
+}
+
 
 
 

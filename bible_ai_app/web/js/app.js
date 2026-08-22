@@ -217,6 +217,11 @@ const App = {
   },
 
   initThemeAndFont() {
+    // Initialiser immédiatement le gestionnaire d'ambiance historique
+    if (typeof VintageThemeManager !== 'undefined') {
+      VintageThemeManager.init({});
+    }
+
     API.onReady(async () => {
       try {
         const cfg = await API.getSettings();
@@ -228,6 +233,9 @@ const App = {
           if (cfg.font_family) this.applyFontFamily(cfg.font_family);
           if (cfg.font_size) {
             document.documentElement.style.setProperty('--bible-font-size-base', `${cfg.font_size}px`);
+          }
+          if (typeof VintageThemeManager !== 'undefined') {
+            VintageThemeManager.init(cfg);
           }
         }
       } catch (e) {
@@ -1189,6 +1197,187 @@ const App = {
         maxBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="1" width="8" height="8" rx="1"/></svg>`;
         maxBtn.title = "Agrandir la fenêtre";
       }
+    }
+  }
+};
+
+/**
+ * Gestionnaire d'Immersion Historique & Époque (VintageThemeManager)
+ * Gère l'application contextuelle de l'apparence des vieux manuscrits / livres selon la date du texte.
+ */
+const VintageThemeManager = {
+  enabled: true,
+  scope: 'auto', // 'auto' | 'always'
+  intensity: 'subtle', // 'subtle' | 'rich'
+
+  init(cfg = {}) {
+    if (cfg.vintage_mode !== undefined) this.enabled = cfg.vintage_mode !== false;
+    if (cfg.vintage_scope) this.scope = cfg.vintage_scope;
+    if (cfg.vintage_intensity) this.intensity = cfg.vintage_intensity;
+
+    this.syncUIControls();
+    this.bindEvents();
+  },
+
+  syncUIControls() {
+    const chkPop = document.getElementById('opt-vintage-mode');
+    if (chkPop) chkPop.checked = this.enabled;
+    const badgePop = document.getElementById('opt-vintage-badge');
+    if (badgePop) {
+      badgePop.textContent = this.enabled ? '📜 Actif' : 'Désactivé';
+      badgePop.style.color = this.enabled ? 'var(--accent-orange)' : 'var(--text-muted)';
+    }
+
+    const chkCfg = document.getElementById('cfg-vintage-mode');
+    if (chkCfg) chkCfg.checked = this.enabled;
+
+    const optGroup = document.getElementById('cfg-vintage-options-group');
+    if (optGroup) optGroup.style.display = this.enabled ? 'flex' : 'none';
+
+    const radioScopeAuto = document.getElementById('cfg-vintage-scope-auto');
+    const radioScopeAlways = document.getElementById('cfg-vintage-scope-always');
+    if (radioScopeAuto && this.scope === 'auto') radioScopeAuto.checked = true;
+    if (radioScopeAlways && this.scope === 'always') radioScopeAlways.checked = true;
+
+    const radioIntSubtle = document.getElementById('cfg-vintage-intensity-subtle');
+    const radioIntRich = document.getElementById('cfg-vintage-intensity-rich');
+    if (radioIntSubtle && this.intensity === 'subtle') radioIntSubtle.checked = true;
+    if (radioIntRich && this.intensity === 'rich') radioIntRich.checked = true;
+  },
+
+  bindEvents() {
+    if (this._eventsBound) return;
+    this._eventsBound = true;
+
+    // Popover d'options rapides
+    document.getElementById('opt-vintage-mode')?.addEventListener('change', (e) => {
+      this.setEnabled(e.target.checked);
+    });
+
+    // Page Paramètres
+    document.getElementById('cfg-vintage-mode')?.addEventListener('change', (e) => {
+      this.setEnabled(e.target.checked);
+    });
+
+    document.querySelectorAll('input[name="cfg-vintage-scope"]').forEach(r => {
+      r.addEventListener('change', (e) => {
+        if (e.target.checked) {
+          this.scope = e.target.value;
+          this.refreshAll();
+        }
+      });
+    });
+
+    document.querySelectorAll('input[name="cfg-vintage-intensity"]').forEach(r => {
+      r.addEventListener('change', (e) => {
+        if (e.target.checked) {
+          this.intensity = e.target.value;
+          this.refreshAll();
+        }
+      });
+    });
+  },
+
+  setEnabled(val) {
+    this.enabled = !!val;
+    this.syncUIControls();
+    this.refreshAll();
+    if (typeof App !== 'undefined' && App.showToast) {
+      App.showToast(this.enabled ? '📜 Mode Immersion Historique activé' : 'Mode Immersion Historique désactivé');
+    }
+  },
+
+  /**
+   * Analyse une année ou un nom d'auteur / version pour déterminer l'époque
+   * @param {string|number} yearOrName
+   * @returns {'ancient'|'classic'|'xix'|'modern'}
+   */
+  getEpoch(yearOrName) {
+    if (!yearOrName) return this.scope === 'always' ? 'xix' : 'modern';
+
+    let str = String(yearOrName).trim();
+    let num = parseInt(str.replace(/[^\d]/g, ''), 10);
+
+    const sLower = str.toLowerCase();
+
+    // Détections textuelles prioritaires (Antiquité & Manuscrits)
+    if (sLower.includes('vulgate') || sLower.includes('hebreu') || sLower.includes('hébreu') || 
+        sLower.includes('grec') || sLower.includes('septante') || sLower.includes('lxx') || 
+        sLower.includes('peshitta') || sLower.includes('tischendorf') || sLower.includes('augustin') || 
+        sLower.includes('chrysostome') || sLower.includes('origene') || sLower.includes('origène')) {
+      return 'ancient';
+    }
+
+    // Période Classique & Réforme (1500 - 1799)
+    if (sLower.includes('martin 1744') || sLower.includes('david martin') || sLower.includes('osterwald') || 
+        sLower.includes('ostervald') || sLower.includes('calvin') || sLower.includes('matthew henry') || 
+        sLower.includes('henry') || sLower.includes('kjv') || sLower.includes('king james') || 
+        sLower.includes('geneve 1669') || sLower.includes('geneve 1560') || sLower.includes('genève') ||
+        sLower.includes('diodati') || sLower.includes('reina valera 1602') || sLower.includes('gill') || sLower.includes('wesley')) {
+      return 'classic';
+    }
+
+    // Fin XIXe / Début XXe (1800 - 1929)
+    if (sLower.includes('segond 1910') || sLower.includes('lsg 1910') || sLower.includes('lsg') || 
+        sLower.includes('darby') || sLower.includes('vigouroux') || sLower.includes('godet') || 
+        sLower.includes('bible annotée') || sLower.includes('scofield') || sLower.includes('crampon') || 
+        sLower.includes('stapfer') || sLower.includes('glaire') || sLower.includes('fillion') || 
+        sLower.includes('keil') || sLower.includes('delitzsch') || sLower.includes('jamieson')) {
+      return 'xix';
+    }
+
+    if (!isNaN(num) && num > 0) {
+      if (num < 1500) return 'ancient';
+      if (num <= 1799) return 'classic';
+      if (num <= 1929) return 'xix';
+      return this.scope === 'always' ? 'xix' : 'modern';
+    }
+
+    return this.scope === 'always' ? 'xix' : 'modern';
+  },
+
+  /**
+   * Retourne un libellé élégant pour le badge d'époque
+   */
+  getEpochLabel(epoch, year = null) {
+    if (epoch === 'ancient') return year ? `📜 ${year} (Manuscrit)` : '📜 Codex / Manuscrit';
+    if (epoch === 'classic') return year ? `📜 ${year} (Classique)` : '📜 Époque Classique';
+    if (epoch === 'xix') return year ? `📜 ${year} (XIXᵉ s.)` : '📜 Belle Époque XIXᵉ';
+    return '';
+  },
+
+  /**
+   * Applique les classes d'époque et d'intensité sur un élément conteneur
+   */
+  applyEpochToElement(el, yearOrName) {
+    if (!el) return;
+
+    el.classList.remove(
+      'vintage-epoch-ancient', 'vintage-epoch-classic', 'vintage-epoch-xix', 'vintage-epoch-modern',
+      'vintage-intensity-subtle', 'vintage-intensity-rich'
+    );
+
+    if (!this.enabled) return;
+
+    const epoch = this.getEpoch(yearOrName);
+    if (epoch !== 'modern') {
+      el.classList.add(`vintage-epoch-${epoch}`);
+      el.classList.add(`vintage-intensity-${this.intensity}`);
+    }
+  },
+
+  refreshAll() {
+    if (typeof BibleReader !== 'undefined' && BibleReader.applyVintageToPanes) {
+      BibleReader.applyVintageToPanes();
+    }
+    if (typeof CommentariesView !== 'undefined' && CommentariesView.refreshVintage) {
+      CommentariesView.refreshVintage();
+    }
+    if (typeof DictView !== 'undefined' && DictView.refreshVintage) {
+      DictView.refreshVintage();
+    }
+    if (typeof TheologyView !== 'undefined' && TheologyView.refreshVintage) {
+      TheologyView.refreshVintage();
     }
   }
 };
