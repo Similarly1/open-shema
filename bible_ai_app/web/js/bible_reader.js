@@ -403,7 +403,7 @@ const DisplayOptions = {
     });
 
     document.addEventListener('click', (e) => {
-      if (!popover.contains(e.target) && e.target !== btn) {
+      if (popover && !popover.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
         popover.classList.add('hidden');
       }
     });
@@ -3414,6 +3414,59 @@ const BibleReader = {
         }
       }
     }
+    this.applyVintageToPanes();
+  },
+
+  refreshVintagePanes() {
+    this.applyVintageToPanes();
+  },
+
+  applyVintageToPanes() {
+    if (typeof VintageThemeManager === 'undefined') return;
+
+    // Volet Gauche (Pane 1)
+    const p1 = document.getElementById('pane-left');
+    if (p1) {
+      const b1 = (this.installedBibles || []).find(b => b.name === this.currentBible1);
+      const year1 = b1?.annee || b1?.year || this.currentBible1;
+      VintageThemeManager.applyEpochToElement(p1, year1);
+      this.updatePaneVintageBadge(1, year1);
+    }
+
+    // Volet Droit (Pane 2)
+    const p2 = document.getElementById('pane-right');
+    if (p2) {
+      const b2 = (this.installedBibles || []).find(b => b.name === this.currentBible2);
+      const year2 = b2?.annee || b2?.year || this.currentBible2;
+      VintageThemeManager.applyEpochToElement(p2, year2);
+      this.updatePaneVintageBadge(2, year2);
+    }
+  },
+
+  updatePaneVintageBadge(paneNum, yearOrName) {
+    if (typeof VintageThemeManager === 'undefined') return;
+    const badgeEl = document.getElementById(`pane-${paneNum}-vintage-badge`);
+    if (!badgeEl) return;
+
+    if (!VintageThemeManager.enabled) {
+      badgeEl.classList.add('hidden');
+      return;
+    }
+
+    const epoch = VintageThemeManager.getEpoch(yearOrName);
+    if (epoch === 'modern') {
+      badgeEl.classList.add('hidden');
+      return;
+    }
+
+    const bInfo = (this.installedBibles || []).find(b => b.name === (paneNum === 1 ? this.currentBible1 : this.currentBible2));
+    const year = bInfo?.annee || bInfo?.year || null;
+    const label = VintageThemeManager.getEpochLabel(epoch, year);
+
+    badgeEl.textContent = label;
+    badgeEl.className = `vintage-epoch-pill ${epoch}`;
+    badgeEl.title = `Mode Immersion Historique : ${label}\nPatine, encre bistre et typographie d'époque actives.`;
+    badgeEl.classList.remove('hidden');
   },
 
   setZoom(percent) {

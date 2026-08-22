@@ -1343,7 +1343,7 @@ textarea.text-field {
   gap: 6px;
   position: relative;
   z-index: 100;
-  overflow: hidden;
+  overflow: visible;
   min-width: 0;
   width: 100%;
   box-sizing: border-box;
@@ -1356,7 +1356,7 @@ textarea.text-field {
   flex-shrink: 1;
   min-width: 0;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 .toolbar-right {
   display: flex;
@@ -1364,6 +1364,7 @@ textarea.text-field {
   gap: 5px;
   flex-shrink: 0;
   margin-left: auto;
+  overflow: visible;
 }
 
 .reader-toolbar,
@@ -1462,6 +1463,8 @@ textarea.text-field {
   margin-left: 6px;
   gap: 2px;
   flex-shrink: 0;
+  position: relative;
+  overflow: visible;
 }
 .mode-link {
   display: inline-flex;
