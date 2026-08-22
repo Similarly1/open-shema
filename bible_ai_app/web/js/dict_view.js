@@ -867,6 +867,10 @@ const DictView = {
       // Badges de versions bibliques EN PREMIER (évite que T.O.B. soit pris pour un tome "t." de source)
       processed = processed.replace(/(^|[^\w])(SEGOND|SYNODALE|JÉRUSALEM|T\.O\.B\.|TOB|DARBY|Français Courant|Colombe|BFC|NBS|NFC|S21)\b/gi, '$1<span class="dict-version-badge">$2</span>');
 
+      // Normalisation des marqueurs orphelins (chiffre ou lettre seul sur une ligne avec texte sur la suivante)
+      processed = processed.replace(/^(\d+)\.?\s*\n+([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇa-zÀ-ÿ])/gm, '$1. $2');
+      processed = processed.replace(/^([a-z]\))\s*\n+([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇa-zÀ-ÿ])/gm, '$1 $2');
+
       // Nettoyage typographique : suppression espace avant point, espaces dans parenthèses
       processed = processed.replace(/\b([A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+)\s+\./g, '$1.');
       processed = processed.replace(/\(\s+([^\)]+?)\s+\)/g, '($1)');
@@ -1006,11 +1010,22 @@ const DictView = {
         const colonIdx = raw.indexOf(' : ');
         const varPart = raw.substring(0, colonIdx).trim();
         const meanPart = raw.substring(colonIdx + 3).trim();
-        if (meanPart.length > 0 && meanPart.length < 180) {
+        if (meanPart.length > 0) {
+          let meaningOnly = meanPart;
+          let introPart = '';
+          if (meanPart.includes('. ') && meanPart.split('. ')[0].length < 60) {
+            const sp = meanPart.split('. ');
+            meaningOnly = sp[0].trim() + '.';
+            introPart = sp.slice(1).join('. ').trim();
+          }
+
           if (varPart) {
             out.push(`<div class="dict-header-variants" style="margin-bottom: 6px; font-size: 14px; color: var(--text-secondary); line-height: 1.6;">${varPart}</div>`);
           }
-          out.push(`<div class="dict-etymology-box"><span class="dict-etymology-label">💡 Signification :</span> <span><em>${meanPart}</em></span></div>`);
+          out.push(`<div class="dict-etymology-box"><span class="dict-etymology-label">💡 Signification :</span> <span><em>${meaningOnly}</em></span></div>`);
+          if (introPart) {
+            out.push(`<p style="margin: 8px 0 12px 0; line-height: 1.75;">${introPart}</p>`);
+          }
           return;
         }
       }
@@ -1116,12 +1131,26 @@ const DictView = {
           if (inSeeList) { out.push('</ul>'); inSeeList = false; }
           if (inUlList) { out.push('</ul>'); inUlList = false; }
           const letter = alphaMatch[1];
-          const content = alphaMatch[2].trim();
+          let content = alphaMatch[2].trim();
+
+          // Convertir les renvois inline dans le paragraphe
+          content = content.replace(/\b(?:Voir|V\.)\s+([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ][a-zA-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇa-zÀ-ÿ\-]+)/g, (sm, targetW) => {
+            return `<a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(targetW)}">🔗 ${this.escapeHtml(targetW)}</a>`;
+          });
+
+          // Mise en valeur de l'en-tête de phrase si présent
+          if (content.includes(' : ') && content.indexOf(' : ') < 60) {
+            const sp = content.split(' : ');
+            content = `<strong>${sp[0]} :</strong> ${sp.slice(1).join(' : ')}`;
+          } else if (content.includes('. ') && content.indexOf('. ') < 40 && !['s.', 'ch.', 'v.', 'r.', 'd.'].some(k => content.split('. ')[0].toLowerCase().includes(k))) {
+            const sp = content.split('. ');
+            content = `<strong>${sp[0]}.</strong> ${sp.slice(1).join('. ')}`;
+          }
 
           out.push(`
-            <div class="dict-alpha-card">
-              <span class="dict-alpha-badge">${letter})</span>
-              <div class="dict-alpha-content">${content}</div>
+            <div class="dict-subentry-card dict-subentry-alpha" id="dict-subentry-${letter}">
+              <span class="dict-subentry-num">${letter}</span>
+              <div class="dict-subentry-content">${content}</div>
             </div>
           `);
           return;

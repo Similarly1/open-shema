@@ -15010,13 +15010,40 @@ body.reading-bg-sepia .dict-subentry-card {
   font-family: var(--font-sans, system-ui, sans-serif);
 }
 
+.dict-subentry-card.dict-subentry-alpha {
+  border-left-color: #8b5cf6;
+}
+
+.dict-subentry-card.dict-subentry-alpha .dict-subentry-num {
+  background: #8b5cf6;
+}
+
+body.theme-dark .dict-subentry-card.dict-subentry-alpha,
+body.palette-dark-slate .dict-subentry-card.dict-subentry-alpha {
+  border-left-color: #a78bfa;
+}
+
+body.theme-dark .dict-subentry-card.dict-subentry-alpha .dict-subentry-num,
+body.palette-dark-slate .dict-subentry-card.dict-subentry-alpha .dict-subentry-num {
+  background: #a78bfa;
+  color: #0f172a;
+}
+
+body.reading-bg-sepia .dict-subentry-card.dict-subentry-alpha {
+  border-left-color: #92400e;
+}
+
+body.reading-bg-sepia .dict-subentry-card.dict-subentry-alpha .dict-subentry-num {
+  background: #92400e;
+}
+
 .dict-alpha-card {
   display: flex;
   align-items: flex-start;
   gap: 10px;
   margin: 8px 0 8px 16px;
   padding: 8px 12px;
-  border-left: 2.5px solid #6366f1;
+  border-left: 2.5px solid #8b5cf6;
   background: var(--bg-subtle, rgba(0, 0, 0, 0.02));
   border-radius: 0 6px 6px 0;
   font-size: 14px;
@@ -15026,7 +15053,7 @@ body.reading-bg-sepia .dict-subentry-card {
 .dict-alpha-badge {
   flex-shrink: 0;
   font-weight: 800;
-  color: #6366f1;
+  color: #8b5cf6;
   font-size: 13.5px;
   font-family: var(--font-sans, system-ui, sans-serif);
 }
@@ -15043,13 +15070,13 @@ body.palette-dark-slate .dict-roman-badge {
 
 body.theme-dark .dict-alpha-card,
 body.palette-dark-slate .dict-alpha-card {
-  background: rgba(129, 140, 248, 0.06);
-  border-left-color: #818cf8;
+  background: rgba(139, 92, 246, 0.06);
+  border-left-color: #a78bfa;
 }
 
 body.theme-dark .dict-alpha-badge,
 body.palette-dark-slate .dict-alpha-badge {
-  color: #a5b4fc;
+  color: #c4b5fd;
 }
 
 body.reading-bg-sepia .dict-roman-heading {
