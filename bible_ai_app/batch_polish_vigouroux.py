@@ -153,68 +153,76 @@ def main():
 
     print(f"\n🚀 Démarrage du traitement de {total_to_do} articles...\n")
 
-    with ThreadPoolExecutor(max_workers=args.workers) as executor:
-        futures = {executor.submit(process_article, item): item for item in to_process}
-        
-        for future in as_completed(futures):
-            slug, title, ok, result, usage = future.result()
-            with lock:
-                save_counter += 1
-                if ok:
-                    success_count += 1
-                    p_tok = usage.get("prompt_tokens", 0)
-                    c_tok = usage.get("completion_tokens", 0)
-                    
-                    # Fallback d'estimation si l'API ne renvoie pas l'usage
-                    if p_tok == 0:
+    try:
+        with ThreadPoolExecutor(max_workers=args.workers) as executor:
+            futures = {executor.submit(process_article, item): item for item in to_process}
+            
+            for future in as_completed(futures):
+                slug, title, ok, result, usage = future.result()
+                with lock:
+                    save_counter += 1
+                    if ok:
+                        success_count += 1
+                        p_tok = usage.get("prompt_tokens", 0)
+                        c_tok = usage.get("completion_tokens", 0)
+                        
+                        # Fallback d'estimation si l'API ne renvoie pas l'usage
+                        if p_tok == 0:
+                            raw_t = articles.get(slug, {}).get("text", "")
+                            p_tok = int(len(raw_t) / 3.5)
+                        if c_tok == 0:
+                            c_tok = int(len(result) / 3.5)
+
+                        total_prompt_tokens += p_tok
+                        total_completion_tokens += c_tok
+                        total_chars_out += len(result)
                         raw_t = articles.get(slug, {}).get("text", "")
-                        p_tok = int(len(raw_t) / 3.5)
-                    if c_tok == 0:
-                        c_tok = int(len(result) / 3.5)
+                        total_chars_in += len(raw_t)
 
-                    total_prompt_tokens += p_tok
-                    total_completion_tokens += c_tok
-                    total_chars_out += len(result)
-                    raw_t = articles.get(slug, {}).get("text", "")
-                    total_chars_in += len(raw_t)
+                        DictionaryPolisher.set_polished_entry("vigouroux", slug, title, result, model, slug=slug)
+                    else:
+                        fail_count += 1
+                        print(f"\n⚠️ Échec sur [{title}] : {result}")
 
-                    DictionaryPolisher.set_polished_entry("vigouroux", slug, title, result, model, slug=slug)
-                else:
-                    fail_count += 1
-                    print(f"\n⚠️ Échec sur [{title}] : {result}")
+                    # Calcul du temps et estimation
+                    elapsed = time.time() - start_time
+                    done = success_count + fail_count
+                    speed = (done / elapsed) * 60 if elapsed > 0 else 0  # articles par minute
+                    remaining_sec = ((total_to_do - done) / (done / elapsed)) if done > 0 and elapsed > 0 else 0
+                    rem_min = int(remaining_sec // 60)
+                    rem_sec = int(remaining_sec % 60)
 
-                # Calcul du temps et estimation
-                elapsed = time.time() - start_time
-                done = success_count + fail_count
-                speed = (done / elapsed) * 60 if elapsed > 0 else 0  # articles par minute
-                remaining_sec = ((total_to_do - done) / (done / elapsed)) if done > 0 and elapsed > 0 else 0
-                rem_min = int(remaining_sec // 60)
-                rem_sec = int(remaining_sec % 60)
+                    # Calcul du coût temps réel
+                    cost_in = (total_prompt_tokens / 1_000_000) * pricing["input_per_m"]
+                    cost_out = (total_completion_tokens / 1_000_000) * pricing["output_per_m"]
+                    current_cost = cost_in + cost_out
 
-                # Calcul du coût temps réel
-                cost_in = (total_prompt_tokens / 1_000_000) * pricing["input_per_m"]
-                cost_out = (total_completion_tokens / 1_000_000) * pricing["output_per_m"]
-                current_cost = cost_in + cost_out
+                    percent = (done / total_to_do) * 100
+                    status_line = (
+                        f"\r[{percent:5.1f}%] {done}/{total_to_do} "
+                        f"| ✅ {success_count} "
+                        f"| ⚡ {speed:4.1f} art/min "
+                        f"| 💰 {current_cost:.4f}{pricing['curr']} "
+                        f"| ⏳ {rem_min:02d}m{rem_sec:02d}s "
+                        f"| En cours : {title[:18]}"
+                    )
+                    sys.stdout.write(status_line.ljust(95))
+                    sys.stdout.flush()
 
-                percent = (done / total_to_do) * 100
-                status_line = (
-                    f"\r[{percent:5.1f}%] {done}/{total_to_do} "
-                    f"| ✅ {success_count} "
-                    f"| ⚡ {speed:4.1f} art/min "
-                    f"| 💰 {current_cost:.4f}{pricing['curr']} "
-                    f"| ⏳ {rem_min:02d}m{rem_sec:02d}s "
-                    f"| En cours : {title[:18]}"
-                )
-                sys.stdout.write(status_line.ljust(95))
-                sys.stdout.flush()
+                    if save_counter % 10 == 0:
+                        DictionaryPolisher.save_cache()
 
-                if save_counter % 10 == 0:
-                    DictionaryPolisher.save_cache()
+    except KeyboardInterrupt:
+        print("\n\n🛑 Interruption demandée (Ctrl+C). Sauvegarde immédiate du cache...")
+        DictionaryPolisher.save_cache()
+        print(f"✅ {success_count} articles sauvegardés avec succès ! Vous pouvez relancer le script à tout moment pour continuer.")
+        sys.exit(0)
 
     DictionaryPolisher.save_cache()
     total_elapsed = time.time() - start_time
     total_min = int(total_elapsed // 60)
     total_sec = int(total_elapsed % 60)
+
 
     # Calculs financiers finaux
     cost_in = (total_prompt_tokens / 1_000_000) * pricing["input_per_m"]
