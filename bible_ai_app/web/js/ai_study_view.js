@@ -349,41 +349,89 @@ const AIStudyView = {
           return;
         }
         
+        let lastUserQuestion = "";
+        const passageLabel = this.getPassageLabel() || "";
+
         this.currentMessages.forEach(msg => {
           if (msg.role === 'user') {
+            lastUserQuestion = msg.content;
             const wrap = document.createElement('div');
             wrap.className = 'chat-message user';
-            wrap.innerHTML = `<div class="msg-content">${msg.content}</div>`;
+            
+            let userHeaderHtml = '';
+            if (passageLabel) {
+              userHeaderHtml = `<span class="msg-passage-tag" title="Passage lié"><span class="tag-icon">${this.ICONS.bible}</span>${this.escapeHtml(passageLabel)}</span> `;
+            }
+
+            wrap.innerHTML = `
+              <div class="msg-content">
+                ${userHeaderHtml}${this.escapeHtml(msg.content)}
+              </div>
+            `;
             this.chatFlowEl.appendChild(wrap);
           } else {
             // Assistant message
             const assistantWrap = document.createElement('div');
             assistantWrap.className = 'chat-message assistant';
+            
+            const sourcesDetails = msg.sources || [];
+            let sourcesComponentHtml = '';
+            if (sourcesDetails && sourcesDetails.length > 0) {
+              sourcesComponentHtml = this.buildSourcesSmoothUiHtml(sourcesDetails);
+            }
+            
+            const formattedMarkdown = this.renderRichMarkdown(msg.content, sourcesDetails);
+            
+            const footerHtml = `
+              <div class="ai-msg-footer">
+                <div class="ai-footer-left">
+                  <button class="smooth-btn-copy" title="Copier l'étude dans le presse-papier">
+                    <span class="copy-icon-wrap">
+                      <svg class="icon-copy" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                      <svg class="icon-check" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </span>
+                    <span class="copy-label">Copier</span>
+                  </button>
+
+                  <button class="ai-footer-action-btn btn-export-notes" title="Enregistrer dans vos Notes (.md)">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                    <span>Enregistrer</span>
+                  </button>
+                  
+                  <button class="ai-footer-action-btn btn-pin-conclusion tooltip" data-tooltip="Épingler dans la mémoire de l'assistant pour le long-terme">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                    <span>Épingler</span>
+                  </button>
+                </div>
+              </div>
+            `;
+
             assistantWrap.innerHTML = `
               <div class="msg-avatar">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
               </div>
-              <div class="msg-content markdown-body"></div>
-              <div class="msg-actions"></div>
+              <div class="msg-content">
+                <div class="ai-answer-body">
+                  ${sourcesComponentHtml}
+                  <div class="ai-markdown-content">${formattedMarkdown}</div>
+                  ${footerHtml}
+                </div>
+              </div>
             `;
-            const contentBox = assistantWrap.querySelector('.msg-content');
-            // Simulation du parse markdown sans re-streaming
-            contentBox.innerHTML = this.parseMarkdown(msg.content);
-            
-            // Reconnecter les actions (copier, pin)
-            const actionsBox = assistantWrap.querySelector('.msg-actions');
-            this.attachMessageActions(actionsBox, msg.content, msg.sources);
             
             this.chatFlowEl.appendChild(assistantWrap);
+            
+            this.attachSourcesAccordion(assistantWrap);
+            this.attachMessageActions(assistantWrap, msg.content, passageLabel, lastUserQuestion);
           }
         });
         
-        this.scrollToBottom();
+        this.chatFlowEl.scrollTop = this.chatFlowEl.scrollHeight;
       }
       
       // Masquer les suggestions si l'historique a des messages
       if (this.hasUserSentMessage && this.suggestionsVisible) {
-        this.toggleSuggestions();
+        this.toggleSuggestions(false);
       }
       
       // Fermer la sidebar sur mobile
