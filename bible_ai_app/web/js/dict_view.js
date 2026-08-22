@@ -894,6 +894,69 @@ const DictView = {
       // Normalisation des versets composés sans rappel de livre (ex: Matthieu 18:4 ; 23.12 -> Matthieu 18:4 ; 23:12)
       processed = processed.replace(/([;,]\s*)(\d+)\.(\d+(?:\s*[\-–]\s*\d+)?(?:\s*,\s*\d+)*)/g, '$1$2:$3');
 
+      // 0c. Traitement spécifique Dom Calmet (1728)
+      if (this.activeDictId === 'calmet' || (this.optLogosRestructure && /\(\s*1\s*\)/.test(processed) && /\(\s*2\s*\)/.test(processed))) {
+        // Découpage automatique des homonymes (1), (2), (3)...
+        if (/\(\s*1\s*\)/.test(processed) && /\(\s*2\s*\)/.test(processed)) {
+          processed = processed.replace(/^[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-]{2,}\s*\(\s*1\s*\)\s*/i, '(1) ');
+          const parts = processed.split(/(?:(?:\.\.|\.)\s*|\n+)?(?:[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-]{2,}\s+)?\(\s*(\d+)\s*\)\s*/i);
+          if (parts.length > 2) {
+            const outCards = [];
+            const preamble = (parts[0] || '').trim();
+            if (preamble && preamble.length > 5 && !preamble.toUpperCase().includes('DICTIONNAIRE')) {
+              outCards.push(`<p style="margin: 8px 0 12px 0; line-height: 1.75;">${preamble}</p>`);
+            }
+            for (let i = 1; i < parts.length; i += 2) {
+              const num = parts[i];
+              let body = (parts[i + 1] || '').trim().replace(/\.+$/, '');
+              outCards.push(`<div class="dict-subentry-card dict-calmet-homonym" id="dict-subentry-${num}" style="display: flex; align-items: flex-start; gap: 12px; margin: 12px 0; padding: 11px 15px; background: rgba(99, 102, 241, 0.035); border: 1px solid rgba(99, 102, 241, 0.16); border-left: 4px solid #6366f1; border-radius: 0 8px 8px 0; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);"><span class="dict-subentry-num" style="flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; min-width: 24px; background: #6366f1; color: #ffffff; border-radius: 6px; font-size: 12.5px; font-weight: 800; margin-top: 1px; box-shadow: 0 2px 4px rgba(99, 102, 241, 0.25);">${num}</span><div class="dict-subentry-content" style="flex: 1; font-size: 14.5px; line-height: 1.75;">${body}</div></div>`);
+            }
+            processed = outCards.join('\n\n');
+          }
+        }
+
+        // Aération des longs paragraphes monolithiques de Calmet aux articulations logiques
+        const transitions = [
+          'Quelque temps après', 'Pendant le voyage', 'Pendant ce temps',
+          'Après la mort de', 'Dans la suite', 'Selon saint Jérôme',
+          'Eusèbe remarque', 'Les Hébreux croient', 'Josèphe raconte',
+          'Cette remarque servira', 'Il était plus âgé', 'Lorsque les',
+          'Après cela', 'Enfin,', 'Le Seigneur lui', 'Moïse lui raconta',
+          'Sur quoi', 'De là vient', 'Ce prince', 'On voit dans',
+          'Plus tard', 'Vers ce même temps', 'Dieu s’étant manifesté',
+          'En même temps', 'Alors ils assemblèrent', 'Pendant le voyage'
+        ];
+        const transRegex = new RegExp(`\\.\\s+(${transitions.join('|')})`, 'g');
+        processed = processed.replace(transRegex, '.\n\n$1');
+
+        // Renvois cliquables vers les autres articles de Calmet
+        processed = processed.replace(/\b(?:dans|à|sous)\s+l’article\s+(?:de\s+|d’)?([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ]{2,})\b/g, (match, word) => {
+          return `dans l’article de <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word)}" style="font-weight:700; color:#6366f1;">🔗 ${this.escapeHtml(word)}</a>`;
+        });
+        processed = processed.replace(/\bcomme on le verra dans l'article de\s+([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ]{2,})\b/g, (match, word) => {
+          return `comme on le verra dans l'article de <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word)}" style="font-weight:700; color:#6366f1;">🔗 ${this.escapeHtml(word)}</a>`;
+        });
+        processed = processed.replace(/\bVoyez\s+([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ]{2,})\b/g, (match, word) => {
+          return `Voyez <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word)}" style="font-weight:700; color:#6366f1;">🔗 ${this.escapeHtml(word)}</a>`;
+        });
+      }
+
+      // Notes critiques entre crochets [...] (Calmet & général)
+      if (processed.includes('[')) {
+        processed = processed.replace(/\[([^\]]{10,900})\]/g, (match, inner) => {
+          const cleanInner = inner.trim();
+          if (/^(?:Voyez|Voir)\s+[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]+$/i.test(cleanInner)) {
+            const word = cleanInner.replace(/^(?:Voyez|Voir)\s+/i, '').trim();
+            return `<a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word)}" style="font-weight:700; color:#6366f1;">🔗 Voyez ${this.escapeHtml(word)}</a>`;
+          }
+          return `<div class="dict-calmet-editorial-note" style="margin: 12px 0 12px 14px; padding: 9px 14px; background: rgba(148, 163, 184, 0.08); border-left: 3px solid #94a3b8; border-radius: 0 6px 6px 0; font-size: 13.5px; line-height: 1.65; color: var(--text-secondary); font-style: italic;"><span style="font-weight: 700; font-style: normal; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; display: block; margin-bottom: 4px;">📝 Note critique :</span>${cleanInner}</div>`;
+        });
+      }
+
+      // Badges chronologiques (An du monde / av. J.-C.)
+      processed = processed.replace(/\(?\b(An du monde \d+,\s*avant Jésus[–\-]Christ \d+,\s*avant l’ère vulgaire \d+)\)?/gi, '<span class="dict-chrono-badge" style="display: inline-flex; align-items: center; gap: 4px; padding: 1px 7px; background: rgba(217, 119, 6, 0.09); border: 1px solid rgba(217, 119, 6, 0.25); border-radius: 4px; font-size: 12px; font-weight: 600; color: #d97706; margin: 0 2px;">🏛️ $1</span>');
+      processed = processed.replace(/\b(l’an du monde \d+,\s*\d+\s+avant Jésus[–\-]Christ,\s*et \d+\s+ans avant l’ère vulgaire[^\.\;]*)/gi, '<span class="dict-chrono-badge" style="display: inline-flex; align-items: center; gap: 4px; padding: 1px 7px; background: rgba(217, 119, 6, 0.09); border: 1px solid rgba(217, 119, 6, 0.25); border-radius: 4px; font-size: 12px; font-weight: 600; color: #d97706; margin: 0 2px;">🏛️ $1</span>');
+
       // Liens de saut interne : Voir N° 8 -> ancre vers sous-carte 8
       processed = processed.replace(/\bVoir\s+(?:N°|n°|numéro)\s*(\d+)\b/gi, '<a href="javascript:void(0)" class="dict-internal-jump-link" data-jump-to="dict-subentry-$1">Voir n° $1</a>');
     }
@@ -1241,7 +1304,13 @@ const DictView = {
         }
       }
 
-      // F) Paragraphe classique
+      // F) Blocs HTML préformatés (cartes, notes éditoriales, citations)
+      if (raw.startsWith('<div') || raw.startsWith('<blockquote') || raw.startsWith('<p') || raw.startsWith('<ul') || raw.startsWith('<ol') || raw.startsWith('<table')) {
+        out.push(raw);
+        return;
+      }
+
+      // G) Paragraphe classique
       const pFmt = raw
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\*(.*?)\*/g, '<em>$1</em>')

@@ -15292,6 +15292,60 @@ body.reading-bg-sepia .dict-alpha-badge {
   color: #b45309;
 }
 
+/* 13. STYLES SPÉCIFIQUES DOM CALMET (1728) */
+.dict-calmet-editorial-note {
+  margin: 12px 0 12px 14px;
+  padding: 9px 14px;
+  background: rgba(148, 163, 184, 0.08);
+  border-left: 3px solid #94a3b8;
+  border-radius: 0 6px 6px 0;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.dict-chrono-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 7px;
+  background: rgba(217, 119, 6, 0.09);
+  border: 1px solid rgba(217, 119, 6, 0.25);
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #d97706;
+  margin: 0 2px;
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+body.theme-dark .dict-calmet-editorial-note,
+body.palette-dark-slate .dict-calmet-editorial-note {
+  background: rgba(148, 163, 184, 0.06);
+  border-left-color: #64748b;
+  color: #cbd5e1;
+}
+
+body.theme-dark .dict-chrono-badge,
+body.palette-dark-slate .dict-chrono-badge {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #fcd34d;
+}
+
+body.reading-bg-sepia .dict-calmet-editorial-note {
+  background: rgba(180, 83, 9, 0.06);
+  border-left-color: #b45309;
+  color: #78350f;
+}
+
+body.reading-bg-sepia .dict-chrono-badge {
+  background: rgba(180, 83, 9, 0.1);
+  border-color: rgba(180, 83, 9, 0.25);
+  color: #92400e;
+}
+
 /* =============================================================================
  * MODULE D'IMMERSION HISTORIQUE & PAPIER D'ÉPOQUE (Style Vintage / Manuscrits)
  * ============================================================================= */
