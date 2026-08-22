@@ -414,16 +414,33 @@ const DictView = {
       }
     }
 
-    // Réinitialiser la lettre A-Z sur 'ALL' et charger les entrées
-    this.activeLetter = 'ALL';
-    document.querySelectorAll('.dict-az-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.letter === 'ALL');
-    });
+    const cleanSlug = targetSlug ? targetSlug.replace(/^[^\w\u00C0-\u017F]+|[^\w\u00C0-\u017F]+$/g, '').trim() : null;
 
-    const filterInput = document.getElementById('dict-toc-filter-input');
-    if (filterInput) filterInput.value = '';
+    if (cleanSlug) {
+      const firstLetter = cleanSlug.normalize("NFD").replace(/[\u0300-\u036f]/g, "")[0]?.toUpperCase() || 'ALL';
+      this.activeLetter = firstLetter;
+      document.querySelectorAll('.dict-az-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.letter === firstLetter);
+      });
 
-    this.loadHeadwords('ALL', null, targetSlug);
+      const filterInput = document.getElementById('dict-toc-filter-input');
+      if (filterInput) filterInput.value = '';
+
+      // Ouvrir immédiatement la notice pour l'utilisateur
+      this.selectEntry(cleanSlug);
+      // Charger la tranche alphabétique correspondante dans l'index à gauche
+      this.loadHeadwords(firstLetter, null, cleanSlug);
+    } else {
+      this.activeLetter = 'ALL';
+      document.querySelectorAll('.dict-az-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.letter === 'ALL');
+      });
+
+      const filterInput = document.getElementById('dict-toc-filter-input');
+      if (filterInput) filterInput.value = '';
+
+      this.loadHeadwords('ALL', null, null);
+    }
   },
 
   // =========================================================================
@@ -708,12 +725,13 @@ const DictView = {
       });
     });
 
-    // 2. Attacher les liens    // 2. Attacher les liens interactifs des Articles Connexes (*Voir* : MOT)
+    // 2. Attacher les liens interactifs des Articles Connexes (*Voir* : MOT)
     bodyEl.querySelectorAll('.dict-cross-ref-link').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        const word = link.dataset.word;
+        const rawWord = link.dataset.word || link.textContent;
+        const word = (rawWord || '').replace(/^[^\w\u00C0-\u017F]+|[^\w\u00C0-\u017F]+$/g, '').trim();
         if (word) {
           this.openDictionary(this.activeDictId, word);
         }
@@ -853,7 +871,13 @@ const DictView = {
       return (name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[*_`\.]+/g, '').trim().toLowerCase();
     };
 
-    let processed = (text || '').replace(/[\u00a0\u202f]/g, ' ');
+    let processed = (text || '');
+
+    // Élimination du doublon de titre en tête d'article (ex: ABAGARE \n ABAGARE)
+    processed = processed.replace(/^([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]{2,})\n+\1\n+/i, '$1\n\n');
+
+    // Découpage automatique des paragraphes encodés en non-breaking spaces (\xa0, \u202f)
+    processed = processed.replace(/[\u00a0\u202f]+\s*/g, '\n\n');
 
     // 0. Traitement des Balises Logos Standards
     processed = processed
@@ -917,27 +941,38 @@ const DictView = {
 
         // Aération des longs paragraphes monolithiques de Calmet aux articulations logiques
         const transitions = [
-          'Quelque temps après', 'Pendant le voyage', 'Pendant ce temps',
-          'Après la mort de', 'Dans la suite', 'Selon saint Jérôme',
-          'Eusèbe remarque', 'Les Hébreux croient', 'Josèphe raconte',
-          'Cette remarque servira', 'Il était plus âgé', 'Lorsque les',
-          'Après cela', 'Enfin,', 'Le Seigneur lui', 'Moïse lui raconta',
-          'Sur quoi', 'De là vient', 'Ce prince', 'On voit dans',
-          'Plus tard', 'Vers ce même temps', 'Dieu s’étant manifesté',
-          'En même temps', 'Alors ils assemblèrent', 'Pendant le voyage'
+          'Jésus[–\\-]Christ lui fit réponse', 'Eusèbe dit', 'Abagare, ou Abgar,',
+          'Il est étonnant', 'Les difficultés qu\'on', 'On raconte qu\'', 'C\'est ce que raconte',
+          'Selon le récit de', 'A l\'occasion d\'un', 'En effet, plusieurs', 'Vers ces derniers temps',
+          'Il faut en effet convenir', 'A ces lettres d\'', 'Le célèbre Addison', 'La correspondance dont',
+          'Ceux qui rejettent', 'Les voies de Dieu', 'Continuons de citer', 'M\\. Boré répète',
+          'Réponse :', 'Après avoir dit', 'Toute l\'Eglise', 'M\\. Cyprien Robert', 'Or, le roi était',
+          'Les porteurs de la lettre', 'La mort d\'Arshavir', 'Quelque temps après', 'Pendant le voyage',
+          'Pendant ce temps', 'Après la mort de', 'Dans la suite', 'Selon saint Jérôme',
+          'Eusèbe remarque', 'Les Hébreux croient', 'Josèphe raconte', 'Cette remarque servira',
+          'Il était plus âgé', 'Lorsque les', 'Après cela', 'Enfin,', 'Le Seigneur lui', 'Moïse lui raconta',
+          'Sur quoi', 'De là vient', 'Ce prince', 'On voit dans', 'Plus tard', 'Vers ce même temps',
+          'Dieu s’étant manifesté', 'En même temps', 'Alors ils assemblèrent', 'Citation :'
         ];
-        const transRegex = new RegExp(`\\.\\s+(${transitions.join('|')})`, 'g');
-        processed = processed.replace(transRegex, '.\n\n$1');
+        const transRegex = new RegExp(`(?<=[.!?;:])\\s+(${transitions.join('|')})`, 'g');
+        processed = processed.replace(transRegex, '\n\n$1');
 
         // Renvois cliquables vers les autres articles de Calmet
         processed = processed.replace(/\b(?:dans|à|sous)\s+l’article\s+(?:de\s+|d’)?([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ]{2,})\b/g, (match, word) => {
-          return `dans l’article de <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word)}">🔗 ${this.escapeHtml(word)}</a>`;
+          const cleanW = word.replace(/[.,;:()\[\]]+$/, '').trim();
+          return `dans l’article de <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(cleanW)}">🔗 ${this.escapeHtml(cleanW)}</a>`;
         });
         processed = processed.replace(/\bcomme on le verra dans l'article de\s+([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ]{2,})\b/g, (match, word) => {
-          return `comme on le verra dans l'article de <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word)}">🔗 ${this.escapeHtml(word)}</a>`;
+          const cleanW = word.replace(/[.,;:()\[\]]+$/, '').trim();
+          return `comme on le verra dans l'article de <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(cleanW)}">🔗 ${this.escapeHtml(cleanW)}</a>`;
         });
         processed = processed.replace(/\bVoyez\s+([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ]{2,})\b/g, (match, word) => {
-          return `Voyez <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word)}">🔗 ${this.escapeHtml(word)}</a>`;
+          const cleanW = word.replace(/[.,;:()\[\]]+$/, '').trim();
+          return `Voyez <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(cleanW)}">🔗 ${this.escapeHtml(cleanW)}</a>`;
+        });
+        processed = processed.replace(/\bVoy\.\s+([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ]{2,})\b/g, (match, word) => {
+          const cleanW = word.replace(/[.,;:()\[\]]+$/, '').trim();
+          return `Voy. <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(cleanW)}">🔗 ${this.escapeHtml(cleanW)}</a>`;
         });
       }
 
@@ -946,13 +981,13 @@ const DictView = {
         processed = processed.replace(/\[([^\]]{3,900})\]/g, (match, inner) => {
           const cleanInner = inner.trim();
           // Cas d'un renvoi direct : [Voyez X] ou [Voir X]
-          if (/^(?:Voyez|Voir)\s+[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]+$/i.test(cleanInner)) {
-            const word = cleanInner.replace(/^(?:Voyez|Voir)\s+/i, '').trim();
+          if (/^(?:Voyez|Voir|Voy\.)\s+[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]+[.,;]?$/i.test(cleanInner)) {
+            const word = cleanInner.replace(/^(?:Voyez|Voir|Voy\.)\s+/i, '').replace(/[.,;:()\[\]]+$/, '').trim();
             return `<a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word)}">🔗 Voyez ${this.escapeHtml(word)}</a>`;
           }
           // Si c'est un long bloc éditorial indépendant (> 160 caractères ou note de savant/M. Boré)
-          if (cleanInner.length > 160 && (cleanInner.includes('. ') || cleanInner.startsWith('M.') || cleanInner.startsWith('Note'))) {
-            return `\n\n<div class="dict-calmet-editorial-note"><span class="dict-calmet-note-label">📝 Note critique :</span>${cleanInner}</div>\n\n`;
+          if (cleanInner.length > 160 && (cleanInner.includes('. ') || cleanInner.startsWith('M.') || cleanInner.startsWith('Note') || cleanInner.startsWith('A l\'occasion'))) {
+            return `\n\n<div class="dict-calmet-editorial-note"><span class="dict-calmet-note-label">📝 Note critique & historique :</span>${cleanInner}</div>\n\n`;
           }
           // Sinon, glose ou précision courte inline : reste dans le flux continu de la phrase pour ne pas casser la ponctuation
           return `<span class="dict-editorial-gloss">[${cleanInner}]</span>`;
