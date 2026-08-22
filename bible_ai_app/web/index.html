@@ -620,31 +620,146 @@
     }
 
     /* =========================================================================
-     * 4. MICRO-DÉCALAGES SUBTILS DE PRESSE (SUR LES VERSETS UNIQUEMENT)
+     * 4. ALTÉRATION TYPOGRAPHIQUE & PRESS JITTER (IMPRESSION MANUELLE & ENCRE)
      * ========================================================================= */
-    .vintage-epoch-ancient .verse-item:nth-child(5n+1),
-    .vintage-epoch-classic .verse-item:nth-child(5n+1),
-    .vintage-epoch-xix .verse-item:nth-child(5n+1) {
-      transform: rotate(-0.20deg);
-      display: inline;
+
+    /* --- A. MICRO-DÉCALAGES ALÉATOIRES DE LIGNE DE BASE & ROTATION DES MOTS --- */
+    .vintage-epoch-ancient .word-token,
+    .vintage-epoch-classic .word-token {
+      display: inline-block;
+      transition: transform 0.15s ease;
     }
-    .vintage-epoch-ancient .verse-item:nth-child(5n+2),
-    .vintage-epoch-classic .verse-item:nth-child(5n+2),
-    .vintage-epoch-xix .verse-item:nth-child(5n+2) {
-      transform: rotate(0.18deg);
-      display: inline;
+
+    /* Modèles pseudo-aléatoires de décalage vertical et d'inclinaison des plombs */
+    .vintage-epoch-ancient .word-token:nth-child(4n+1),
+    .vintage-epoch-classic .word-token:nth-child(4n+1) {
+      transform: translateY(-0.55px) rotate(-0.18deg);
     }
-    .vintage-epoch-ancient .verse-item:nth-child(5n+3),
-    .vintage-epoch-classic .verse-item:nth-child(5n+3),
-    .vintage-epoch-xix .verse-item:nth-child(5n+3) {
-      transform: rotate(-0.15deg);
-      display: inline;
+    .vintage-epoch-ancient .word-token:nth-child(4n+3),
+    .vintage-epoch-classic .word-token:nth-child(4n+3) {
+      transform: translateY(0.48px) rotate(0.14deg);
     }
-    .vintage-epoch-ancient .verse-item:nth-child(5n+4),
-    .vintage-epoch-classic .verse-item:nth-child(5n+4),
-    .vintage-epoch-xix .verse-item:nth-child(5n+4) {
-      transform: rotate(0.16deg);
-      display: inline;
+    .vintage-epoch-ancient .word-token:nth-child(6n+2),
+    .vintage-epoch-classic .word-token:nth-child(6n+2) {
+      transform: translateY(-0.35px) rotate(-0.1deg);
+    }
+    .vintage-epoch-ancient .word-token:nth-child(7n),
+    .vintage-epoch-classic .word-token:nth-child(7n) {
+      transform: translateY(0.65px) rotate(0.22deg);
+    }
+    .vintage-epoch-ancient .word-token:nth-child(11n+5),
+    .vintage-epoch-classic .word-token:nth-child(11n+5) {
+      transform: translateY(-0.45px) rotate(-0.15deg);
+    }
+    .vintage-epoch-ancient .word-token:nth-child(13n),
+    .vintage-epoch-classic .word-token:nth-child(13n) {
+      transform: translateY(0.38px) rotate(0.09deg);
+    }
+
+    /* Époque XIXe : fonte mécanique mais pressée au plomb (variations plus ténues) */
+    .vintage-epoch-xix .word-token {
+      display: inline-block;
+    }
+    .vintage-epoch-xix .word-token:nth-child(5n+1) {
+      transform: translateY(-0.25px);
+    }
+    .vintage-epoch-xix .word-token:nth-child(5n+3) {
+      transform: translateY(0.25px);
+    }
+    .vintage-epoch-xix .word-token:nth-child(8n) {
+      transform: translateY(-0.15px) rotate(-0.06deg);
+    }
+
+    /* --- B. VARIATIONS DE PRESSION D'ENCRAGE & OPACITÉ DE FRAPPE --- */
+    .vintage-epoch-ancient .word-token:nth-child(5n),
+    .vintage-epoch-classic .word-token:nth-child(5n) {
+      opacity: 0.92;
+    }
+    .vintage-epoch-ancient .word-token:nth-child(7n+2),
+    .vintage-epoch-classic .word-token:nth-child(7n+2) {
+      opacity: 0.98;
+    }
+    .vintage-epoch-ancient .word-token:nth-child(9n),
+    .vintage-epoch-classic .word-token:nth-child(9n) {
+      opacity: 0.88;
+    }
+    .vintage-epoch-ancient .word-token:nth-child(11n+3),
+    .vintage-epoch-classic .word-token:nth-child(11n+3) {
+      opacity: 0.95;
+    }
+
+    /* --- C. DIFFUSION D'ENCRE & EMPÂTEMENT DANS LA FIBRE DU PAPIER (INK BLEED) --- */
+    body.reading-bg-sepia .vintage-epoch-ancient .verses-flow,
+    body.reading-bg-sepia .vintage-epoch-classic .verses-flow,
+    body.reading-bg-sepia .vintage-epoch-ancient .dict-entry-body,
+    body.reading-bg-sepia .vintage-epoch-classic .dict-entry-body,
+    body.reading-bg-sepia .vintage-epoch-ancient .theol-reading-body,
+    body.reading-bg-sepia .vintage-epoch-classic .theol-reading-body,
+    body.reading-bg-sepia .vintage-epoch-ancient .comm-body-text,
+    body.reading-bg-sepia .vintage-epoch-classic .comm-body-text,
+    body:not(.theme-dark) .vintage-epoch-ancient .verses-flow,
+    body:not(.theme-dark) .vintage-epoch-classic .verses-flow,
+    body:not(.theme-dark) .vintage-epoch-ancient .dict-entry-body,
+    body:not(.theme-dark) .vintage-epoch-classic .dict-entry-body,
+    body:not(.theme-dark) .vintage-epoch-ancient .theol-reading-body,
+    body:not(.theme-dark) .vintage-epoch-classic .theol-reading-body,
+    body:not(.theme-dark) .vintage-epoch-ancient .comm-body-text,
+    body:not(.theme-dark) .vintage-epoch-classic .comm-body-text {
+      text-shadow: 0 0 0.45px rgba(29, 21, 12, 0.42), 0 0.25px 0.5px rgba(29, 21, 12, 0.18);
+      letter-spacing: 0.015em;
+      word-spacing: 0.025em;
+      font-feature-settings: "liga" 1, "dlig" 1, "hlig" 1, "clig" 1, "calt" 1, "onum" 1;
+    }
+
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .verses-flow,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .verses-flow,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .dict-entry-body,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .dict-entry-body,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .theol-reading-body,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .theol-reading-body,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .comm-body-text,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .comm-body-text {
+      text-shadow: 0 0 0.6px rgba(241, 229, 207, 0.35), 0 0 1px rgba(245, 158, 11, 0.12);
+      letter-spacing: 0.015em;
+      word-spacing: 0.025em;
+      font-feature-settings: "liga" 1, "dlig" 1, "hlig" 1, "clig" 1, "calt" 1, "onum" 1;
+    }
+
+    /* --- D. MICRO-INCLINAISON DE PRESSE SUR LES PARAGRAPHES --- */
+    .vintage-epoch-ancient .dict-entry-body-content p:nth-child(3n),
+    .vintage-epoch-classic .dict-entry-body-content p:nth-child(3n),
+    .vintage-epoch-ancient .theol-reading-body p:nth-child(3n),
+    .vintage-epoch-classic .theol-reading-body p:nth-child(3n),
+    .vintage-epoch-ancient .comm-body-text p:nth-child(3n),
+    .vintage-epoch-classic .comm-body-text p:nth-child(3n) {
+      transform: rotate(-0.06deg);
+    }
+
+    .vintage-epoch-ancient .dict-entry-body-content p:nth-child(5n),
+    .vintage-epoch-classic .dict-entry-body-content p:nth-child(5n),
+    .vintage-epoch-ancient .theol-reading-body p:nth-child(5n),
+    .vintage-epoch-classic .theol-reading-body p:nth-child(5n),
+    .vintage-epoch-ancient .comm-body-text p:nth-child(5n),
+    .vintage-epoch-classic .comm-body-text p:nth-child(5n) {
+      transform: rotate(0.07deg);
+    }
+
+    .vintage-epoch-ancient .dict-entry-body-content p:nth-child(7n),
+    .vintage-epoch-classic .dict-entry-body-content p:nth-child(7n) {
+      transform: rotate(-0.04deg);
+    }
+
+    /* --- E. LETTRES CAPITALES & ENPHASES GRAVÉES D'ÉPOQUE --- */
+    .vintage-epoch-ancient strong,
+    .vintage-epoch-classic strong {
+      font-weight: 700 !important;
+      letter-spacing: 0.03em;
+    }
+
+    .vintage-epoch-ancient em,
+    .vintage-epoch-classic em {
+      font-family: 'IM Fell English', 'Cardo', Georgia, serif !important;
+      letter-spacing: 0.02em;
     }
   </style>
 </head>
