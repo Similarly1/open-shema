@@ -611,6 +611,13 @@ const DictView = {
     if (heroTitle) heroTitle.textContent = data.title;
     if (heroBadge) heroBadge.textContent = data.badge || data.dict_name || this.activeDictInfo?.name || 'Dictionnaire';
 
+    // Application du style d'immersion historique (ex: Vigouroux = 1895 -> Belle Époque XIXe)
+    const cardEl = document.querySelector('.dict-article-card') || document.querySelector('.dict-view-main-scroll');
+    if (cardEl && typeof VintageThemeManager !== 'undefined') {
+      const dictName = data.badge || data.dict_name || this.activeDictInfo?.name || 'Vigouroux';
+      VintageThemeManager.applyEpochToElement(cardEl, dictName);
+    }
+
     this.renderSelectedSourceMatch();
   },
 
@@ -846,7 +853,7 @@ const DictView = {
       return (name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[*_`\.]+/g, '').trim().toLowerCase();
     };
 
-    let processed = text;
+    let processed = (text || '').replace(/[\u00a0\u202f]/g, ' ');
 
     // 0. Traitement des Balises Logos Standards
     processed = processed
@@ -1022,18 +1029,22 @@ const DictView = {
 
           if (romBody.includes(' ; ')) {
             const sp = romBody.split(' ; ');
-            titlePart = sp[0].trim();
-            restPart = sp.slice(1).join(' ; ').trim();
-          } else if (romBody.includes('. ') && romBody.split('. ')[0].length < 50) {
+            if (sp[0].trim().length < 80) {
+              titlePart = sp[0].trim();
+              restPart = sp.slice(1).join(' ; ').trim();
+            }
+          } else if (romBody.includes('. ')) {
             const sp = romBody.split('. ');
-            titlePart = sp[0].trim();
-            restPart = sp.slice(1).join('. ').trim();
+            if (sp[0].trim().length < 80) {
+              titlePart = sp[0].trim();
+              restPart = sp.slice(1).join('. ').trim();
+            }
           }
 
           out.push(`
             <div class="dict-roman-heading">
               <span class="dict-roman-badge">${romNum}</span>
-              <span>${titlePart}</span>
+              <span class="dict-roman-title">${this.escapeHtml(titlePart)}</span>
             </div>
           `);
           if (restPart) {
@@ -1079,7 +1090,7 @@ const DictView = {
             return `<a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(targetW)}">🔗 ${this.escapeHtml(targetW)}</a>`;
           });
 
-          // Proposition 2 : Style Typographique Épuré (Édition Papier Classique)
+          // Mise en valeur de l'en-tête de phrase si présent
           if (content.includes(' : ') && content.indexOf(' : ') < 60) {
             const sp = content.split(' : ');
             content = `<strong>${sp[0]} :</strong> ${sp.slice(1).join(' : ')}`;
@@ -1089,9 +1100,9 @@ const DictView = {
           }
 
           out.push(`
-            <div class="dict-subentry-row" id="dict-subentry-${num}">
-              <span class="dict-subentry-num-classic">${num}.</span>
-              <span class="dict-subentry-text">${content}</span>
+            <div class="dict-subentry-card" id="dict-subentry-${num}">
+              <span class="dict-subentry-num">${num}</span>
+              <div class="dict-subentry-content">${content}</div>
             </div>
           `);
           return;
@@ -1110,7 +1121,7 @@ const DictView = {
           out.push(`
             <div class="dict-alpha-card">
               <span class="dict-alpha-badge">${letter})</span>
-              <span>${content}</span>
+              <div class="dict-alpha-content">${content}</div>
             </div>
           `);
           return;
@@ -1380,6 +1391,15 @@ const DictView = {
     } catch (e) {
       console.error('Erreur Wikipédia:', e);
       container.innerHTML = `<div style="padding: 20px; color: var(--accent-red);">Erreur de connexion à Wikipédia.</div>`;
+    }
+  },
+
+  refreshVintage() {
+    const cardEl = document.querySelector('.dict-article-card') || document.querySelector('.dict-view-main-scroll');
+    if (cardEl && typeof VintageThemeManager !== 'undefined') {
+      const data = this.currentEntryData;
+      const dictName = data?.badge || data?.dict_name || this.activeDictInfo?.name || 'Vigouroux';
+      VintageThemeManager.applyEpochToElement(cardEl, dictName);
     }
   }
 };

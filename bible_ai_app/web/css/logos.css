@@ -14894,54 +14894,50 @@ body.reading-bg-sepia .dict-cross-ref-link:hover {
 }
 
 .dict-subentry-card {
-  margin: 14px 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 12px 0;
   padding: 10px 14px;
-  background: var(--bg-card, #ffffff);
+  background: var(--bg-card, rgba(99, 102, 241, 0.02));
   border: 1px solid var(--border-color, #e2e8f0);
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border-left: 3.5px solid var(--accent-blue, #6366f1);
+  border-radius: 0 8px 8px 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
   transition: all 0.15s ease;
 }
 
 .dict-subentry-card:hover {
-  border-color: rgba(99, 102, 241, 0.3);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+  border-color: rgba(99, 102, 241, 0.35);
+  box-shadow: 0 3px 8px rgba(99, 102, 241, 0.08);
 }
 
-.dict-subentry-card .dict-subentry-heading {
-  margin-top: 0;
-  margin-bottom: 6px;
-  border-bottom: none;
-  padding-bottom: 0;
+.dict-subentry-card .dict-subentry-num {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: #6366f1;
+  color: #ffffff;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  margin-top: 1px;
+  font-family: var(--font-sans, system-ui, sans-serif);
 }
 
-/* Proposition 2 : Style Typographique Épuré (Édition Papier Classique) */
-.dict-subentry-row {
-  margin: 10px 0;
-  line-height: 1.8;
-  padding-left: 1.8em;
-  text-indent: -1.8em;
+.dict-subentry-card .dict-subentry-content {
+  flex: 1;
+  font-size: 14.5px;
+  line-height: 1.75;
   color: var(--text-primary);
 }
 
-.dict-subentry-num-classic {
-  font-weight: 800;
-  font-size: 15px;
-  color: var(--accent-blue, #6366f1);
-  font-family: var(--font-sans, system-ui, sans-serif);
-  margin-right: 6px;
-  display: inline-block;
-  min-width: 1.5em;
-  text-indent: 0;
-}
-
-body.theme-dark .dict-subentry-num-classic,
-body.palette-dark-slate .dict-subentry-num-classic {
-  color: #a5b4fc;
-}
-
-body.reading-bg-sepia .dict-subentry-num-classic {
-  color: #b45309;
+.dict-subentry-card .dict-subentry-content p {
+  margin: 0;
+  line-height: 1.75;
 }
 
 .dict-internal-jump-link {
@@ -15015,21 +15011,28 @@ body.reading-bg-sepia .dict-subentry-card {
 }
 
 .dict-alpha-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
   margin: 8px 0 8px 16px;
-  padding: 6px 12px;
+  padding: 8px 12px;
   border-left: 2.5px solid #6366f1;
   background: var(--bg-subtle, rgba(0, 0, 0, 0.02));
   border-radius: 0 6px 6px 0;
-  font-size: 13.5px;
+  font-size: 14px;
   line-height: 1.7;
 }
 
 .dict-alpha-badge {
+  flex-shrink: 0;
   font-weight: 800;
   color: #6366f1;
-  font-size: 13px;
-  margin-right: 6px;
+  font-size: 13.5px;
   font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+.dict-alpha-content {
+  flex: 1;
 }
 
 body.theme-dark .dict-roman-badge,
