@@ -15360,7 +15360,7 @@ body.reading-bg-sepia .dict-alpha-badge {
     url("../img/textures/vintage/cuir/large_leather.png"),
     var(--vintage-noise-svg) !important;
   background-repeat: repeat !important;
-  background-attachment: fixed !important;
+  background-attachment: local !important;
   box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5) !important;
   color: #e4d8c2 !important;
 }
@@ -15500,7 +15500,7 @@ body:not(.theme-dark) .vintage-epoch-xix.pane-scrollable-content,
     url("../img/textures/vintage/papier/textured_paper.png"),
     var(--vintage-noise-svg) !important;
   background-repeat: repeat !important;
-  background-attachment: fixed !important;
+  background-attachment: local !important;
   box-shadow: inset 0 0 50px rgba(130, 85, 30, 0.15) !important;
   color: #1d150c !important;
 }
@@ -16153,6 +16153,106 @@ body.theme-light .ps-diff-toggle-btn.active {
   border-color: #2563eb !important;
 }
 
+/* --- SUGGESTIONS DE COMPARAISON MÉTHODOLOGIQUES --- */
+.ps-synoptic-suggestions-bar {
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+body.reading-bg-white .ps-synoptic-suggestions-bar,
+body.theme-light .ps-synoptic-suggestions-bar {
+  background-color: #f8fafc;
+}
+
+.ps-suggestions-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ps-suggestions-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--accent-amber, #f59e0b);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.ps-suggestions-hint {
+  font-size: 11px;
+  color: var(--text-secondary);
+  opacity: 0.85;
+}
+
+.ps-synoptic-preset-pills {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ps-preset-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.ps-preset-pill:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--accent-blue, #38bdf8);
+  transform: translateY(-1px);
+}
+
+.ps-preset-pill.active {
+  background-color: rgba(59, 130, 246, 0.22) !important;
+  color: #93c5fd !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+
+body.reading-bg-white .ps-preset-pill.active,
+body.theme-light .ps-preset-pill.active {
+  background-color: #eff6ff !important;
+  color: #1d4ed8 !important;
+  border-color: #2563eb !important;
+}
+
+.ps-preset-pill-badge {
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--accent-amber, #fbbf24);
+}
+
+.ps-preset-pill.active .ps-preset-pill-badge {
+  background-color: rgba(59, 130, 246, 0.4);
+  color: #ffffff;
+}
+
 .ps-syn-cell-ref {
   background-color: var(--bg-surface);
 }
@@ -16171,12 +16271,40 @@ body.theme-light .ps-diff-toggle-btn.active {
 
 .ps-synoptic-table th {
   background-color: var(--bg-surface);
-  color: var(--text-secondary);
+  color: var(--text-primary);
   font-weight: 700;
   padding: 8px 12px;
   text-align: left;
   border-bottom: 1px solid var(--border-color);
   border-right: 1px solid var(--border-color);
+}
+
+.ps-th-code {
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-primary);
+}
+
+.ps-th-badge {
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background-color: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.ps-th-meta {
+  font-size: 10.5px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin-top: 3px;
+  line-height: 1.35;
+  opacity: 0.85;
 }
 
 .ps-synoptic-table td {
@@ -16192,6 +16320,21 @@ body.theme-light .ps-diff-toggle-btn.active {
   color: var(--accent-amber, #d97706);
   font-size: 11px;
   text-align: center;
+}
+
+/* Style des optgroup dans les listes déroulantes */
+.ps-select-sm optgroup {
+  font-weight: 700;
+  color: var(--accent-amber, #fbbf24) !important;
+  background-color: #161b24 !important;
+  padding: 4px 0;
+  font-style: normal;
+}
+
+body.reading-bg-white .ps-select-sm optgroup,
+body.theme-light .ps-select-sm optgroup {
+  color: #0284c7 !important;
+  background-color: #f1f5f9 !important;
 }
 
 /* --- TEXTE ORIGINAL (HÉBREU & GREC) --- */

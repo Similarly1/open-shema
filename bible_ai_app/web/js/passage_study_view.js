@@ -381,15 +381,36 @@ const PassageStudyView = {
             <div class="ps-synoptic-selector-group">
               <label for="ps-synoptic-ver2-select" style="font-size: 11.5px; opacity: 0.8;">Version 2 :</label>
               <select id="ps-synoptic-ver2-select" class="ps-select-sm">
-                ${availableVersions.filter(v => v !== mainVersion).map(v => `<option value="${v}">${v}</option>`).join('')}
+                ${this.buildCategorizedVersionOptions(availableVersions, mainVersion, sc.versions_metadata || {}, false)}
               </select>
               <label for="ps-synoptic-ver3-select" style="font-size: 11.5px; opacity: 0.8; margin-left: 8px;">Version 3 :</label>
               <select id="ps-synoptic-ver3-select" class="ps-select-sm">
-                <option value="">(Aucune)</option>
-                ${availableVersions.filter(v => v !== mainVersion).map(v => `<option value="${v}">${v}</option>`).join('')}
+                ${this.buildCategorizedVersionOptions(availableVersions, mainVersion, sc.versions_metadata || {}, true)}
               </select>
             </div>
           </div>
+
+          <!-- Suggestions de comparaison méthodologiques fondées sur les catégories -->
+          ${(sc.comparison_presets && sc.comparison_presets.length > 0) ? `
+            <div class="ps-synoptic-suggestions-bar">
+              <div class="ps-suggestions-header">
+                <span class="ps-suggestions-badge">
+                  <span class="ps-icon-slot">${this.ICONS.sparkles}</span>
+                  <span>Suggestions de comparaison</span>
+                </span>
+                <span class="ps-suggestions-hint">Basées sur la typologie des traductions (Littérales, Dynamiques, Confessionnelles)</span>
+              </div>
+              <div class="ps-synoptic-preset-pills">
+                ${sc.comparison_presets.map(p => `
+                  <button type="button" class="ps-preset-pill" data-v2="${p.v2 || ''}" data-v3="${p.v3 || ''}" title="${this.escapeHtml(p.description || '')}">
+                    <span class="ps-preset-pill-badge">${this.escapeHtml(p.badge || 'Preset')}</span>
+                    <span class="ps-preset-pill-name">${this.escapeHtml(p.label)}</span>
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+
           <div class="ps-synoptic-table-wrap" id="ps-synoptic-table-container">
             <!-- Rendu dynamique de la table synoptique -->
           </div>
@@ -419,10 +440,30 @@ const PassageStudyView = {
     });
 
     document.getElementById('ps-synoptic-ver2-select')?.addEventListener('change', () => {
+      document.querySelectorAll('.ps-preset-pill').forEach(b => b.classList.remove('active'));
       this.renderSynopticTable();
     });
     document.getElementById('ps-synoptic-ver3-select')?.addEventListener('change', () => {
+      document.querySelectorAll('.ps-preset-pill').forEach(b => b.classList.remove('active'));
       this.renderSynopticTable();
+    });
+
+    // Clic sur les suggestions de comparaison (presets)
+    document.querySelectorAll('.ps-preset-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        const v2 = pill.dataset.v2;
+        const v3 = pill.dataset.v3;
+        const sel2 = document.getElementById('ps-synoptic-ver2-select');
+        const sel3 = document.getElementById('ps-synoptic-ver3-select');
+
+        if (sel2 && v2) sel2.value = v2;
+        if (sel3) sel3.value = v3 || '';
+
+        document.querySelectorAll('.ps-preset-pill').forEach(b => b.classList.remove('active'));
+        pill.classList.add('active');
+
+        this.renderSynopticTable();
+      });
     });
 
     // Événements pour le surlignage des variantes
@@ -447,6 +488,52 @@ const PassageStudyView = {
       this.diffOptions.showRemoved = e.target.checked;
       this.renderSynopticTable();
     });
+  },
+
+  buildCategorizedVersionOptions(availableVersions, mainVersion, metaMap, allowEmpty = false) {
+    let html = allowEmpty ? '<option value="">(Aucune)</option>' : '';
+
+    const familyOrder = [
+      'Famille Segond',
+      'Protestante',
+      'Évangélique',
+      'Catholique',
+      'Œcuménique ou Interconfessionnelle',
+      'Libérale',
+      'Autre'
+    ];
+
+    const groups = {};
+    availableVersions.forEach(v => {
+      if (v === mainVersion && !allowEmpty) return;
+      const meta = metaMap[v] || { code: v, nom_officiel: v, famille: 'Autre', philosophie: '' };
+      const fam = meta.famille || 'Autre';
+      if (!groups[fam]) groups[fam] = [];
+      groups[fam].push({ code: v, meta });
+    });
+
+    const allFamKeys = Object.keys(groups).sort((a, b) => {
+      const idxA = familyOrder.indexOf(a);
+      const idxB = familyOrder.indexOf(b);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      return a.localeCompare(b);
+    });
+
+    allFamKeys.forEach(fam => {
+      const items = groups[fam];
+      if (!items || items.length === 0) return;
+      html += `<optgroup label="${this.escapeHtml(fam)}">`;
+      items.forEach(({ code, meta }) => {
+        const philTxt = meta.philosophie ? ` — ${meta.philosophie}` : '';
+        const titleTxt = `${meta.nom_officiel}${philTxt}`;
+        html += `<option value="${code}" title="${this.escapeHtml(titleTxt)}">${code} · ${this.escapeHtml(meta.nom_officiel)}</option>`;
+      });
+      html += `</optgroup>`;
+    });
+
+    return html;
   },
 
   tokenizeWords(text) {
@@ -558,6 +645,7 @@ const PassageStudyView = {
     if (!container) return;
 
     const mainVersion = sc.main_version || 'LSG';
+    const metaMap = sc.versions_metadata || {};
     const sel2 = document.getElementById('ps-synoptic-ver2-select');
     const sel3 = document.getElementById('ps-synoptic-ver3-select');
     const v2Name = sel2 ? sel2.value : '';
@@ -565,14 +653,31 @@ const PassageStudyView = {
 
     const matrix = sc.synoptic_matrix || [];
 
+    const mainMeta = metaMap[mainVersion] || {};
+    const v2Meta = metaMap[v2Name] || {};
+    const v3Meta = metaMap[v3Name] || {};
+
     let html = `
       <table class="ps-synoptic-table">
         <thead>
           <tr>
-            <th style="width: 50px;">Verset</th>
-            <th>${mainVersion} (Principal)</th>
-            ${v2Name ? `<th>${v2Name}</th>` : ''}
-            ${v3Name ? `<th>${v3Name}</th>` : ''}
+            <th style="width: 50px; text-align: center;">Verset</th>
+            <th style="width: 32%;">
+              <div class="ps-th-code">${mainVersion} <span class="ps-th-badge">Référence</span></div>
+              <div class="ps-th-meta">${this.escapeHtml(mainMeta.nom_officiel || mainVersion)}${mainMeta.philosophie ? ' · ' + this.escapeHtml(mainMeta.philosophie) : ''}</div>
+            </th>
+            ${v2Name ? `
+              <th style="width: 32%;">
+                <div class="ps-th-code">${v2Name}</div>
+                <div class="ps-th-meta">${this.escapeHtml(v2Meta.nom_officiel || v2Name)}${v2Meta.philosophie ? ' · ' + this.escapeHtml(v2Meta.philosophie) : ''}</div>
+              </th>
+            ` : ''}
+            ${v3Name ? `
+              <th style="width: 32%;">
+                <div class="ps-th-code">${v3Name}</div>
+                <div class="ps-th-meta">${this.escapeHtml(v3Meta.nom_officiel || v3Name)}${v3Meta.philosophie ? ' · ' + this.escapeHtml(v3Meta.philosophie) : ''}</div>
+              </th>
+            ` : ''}
           </tr>
         </thead>
         <tbody>

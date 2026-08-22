@@ -311,6 +311,100 @@ class PassageStudyManager:
                 row["versions"][b_name] = match
             synoptic_matrix.append(row)
 
+        # Enrichir avec les catégories, familles et suggestions du registre des Bibles
+        reg_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "bibles_registry.json")
+        registry = {}
+        if os.path.exists(reg_file):
+            try:
+                with open(reg_file, "r", encoding="utf-8") as f:
+                    registry = json.load(f)
+            except Exception as e:
+                logger.warning("Erreur chargement bibles_registry dans passage_study: %s", e)
+
+        def _get_bible_meta(b_name: str) -> Dict[str, Any]:
+            clean = b_name.strip()
+            clean_norm = re.sub(r'[\W_]+', ' ', clean.lower()).strip()
+            m = registry.get(b_name) or registry.get(b_name.upper())
+            if m:
+                return m
+            for code, data in registry.items():
+                if code.lower() == clean.lower() or code.lower() == clean_norm:
+                    return data
+                aliases = [a.lower() for a in data.get("aliases", [])]
+                if clean.lower() in aliases or clean_norm in aliases:
+                    return data
+            return {}
+
+        available_version_names = list(scripture_by_version.keys())
+        versions_metadata = {}
+        for b_name in available_version_names:
+            meta = _get_bible_meta(b_name)
+            versions_metadata[b_name] = {
+                "code": b_name,
+                "nom_officiel": meta.get("nom_officiel", b_name),
+                "famille": meta.get("famille", "Autre"),
+                "famille_badge_color": meta.get("famille_badge_color", "#64748b"),
+                "philosophie": meta.get("philosophie", ""),
+                "annee": meta.get("annee", ""),
+                "comparaisons_suggerees": meta.get("comparaisons_suggerees", [])
+            }
+
+        # Presets de comparaison méthodologiques fondés sur les catégories
+        raw_presets = [
+            {
+                "id": "lit_dyn",
+                "label": "Littérale vs Dynamique",
+                "badge": "Exégèse",
+                "v2": "DARBY" if "DARBY" in available_version_names else "LAU",
+                "v3": "BDS" if "BDS" in available_version_names else "NFC",
+                "description": "Confronte la fidélité mot-à-mot (Darby) à l'équivalence fonctionnelle contemporaine (Semeur)"
+            },
+            {
+                "id": "interconf",
+                "label": "Jérusalem vs TOB",
+                "badge": "Interconfessionnel",
+                "v2": "BDJ" if "BDJ" in available_version_names else "NCL",
+                "v3": "TOB" if "TOB" in available_version_names else "NFC",
+                "description": "Rapprochement entre l'érudition catholique (Bible de Jérusalem) et la concertation œcuménique (TOB)"
+            },
+            {
+                "id": "segond_semeur",
+                "label": "Segond 21 vs Semeur",
+                "badge": "Contemporain",
+                "v2": "Segond_21" if "Segond_21" in available_version_names else "NBS",
+                "v3": "BDS" if "BDS" in available_version_names else "Parole_Vivante",
+                "description": "Les deux versions modernes de référence les plus lues en milieu protestant et évangélique"
+            },
+            {
+                "id": "hist_mod",
+                "label": "Ostervald vs Segond 21",
+                "badge": "Histoire",
+                "v2": "OST" if "OST" in available_version_names else "DARBY",
+                "v3": "Segond_21" if "Segond_21" in available_version_names else "NBS",
+                "description": "Mesure l'évolution de la langue biblique entre la tradition classique réformée et le XXIe siècle"
+            },
+            {
+                "id": "courant_paraph",
+                "label": "Français Courant vs Parole Vivante",
+                "badge": "Dynamique",
+                "v2": "NFC" if "NFC" in available_version_names else "PDV2017",
+                "v3": "Parole_Vivante" if "Parole_Vivante" in available_version_names else "BENFS",
+                "description": "Lecture fluide en langage courant et reformulation pastorale d'Alfred Kuen"
+            }
+        ]
+
+        valid_presets = []
+        for p in raw_presets:
+            v2, v3 = p["v2"], p["v3"]
+            if (v2 in available_version_names and v2 != main_bible) or (v3 in available_version_names and v3 != main_bible):
+                if v2 == main_bible:
+                    v2 = ""
+                if v3 == main_bible:
+                    v3 = ""
+                p["v2"] = v2
+                p["v3"] = v3
+                valid_presets.append(p)
+
         # 3. TEXTE ORIGINAL INTÉGRAL (Hébreu Massorétique WLC ou Grec NA28/SBLGNT)
         orig_mgr = OriginalLanguagesManager.get_instance()
         original_data = cls._extract_full_original_passage(
@@ -349,7 +443,9 @@ class PassageStudyManager:
             "scripture": {
                 "main_version": main_bible,
                 "verses": main_verses,
-                "available_versions": list(scripture_by_version.keys()),
+                "available_versions": available_version_names,
+                "versions_metadata": versions_metadata,
+                "comparison_presets": valid_presets,
                 "by_version": scripture_by_version,
                 "synoptic_matrix": synoptic_matrix
             },
