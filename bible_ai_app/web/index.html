@@ -1979,6 +1979,57 @@
             </div>
 
             <div class="ai-sub-config" id="sec-ai-sub-config">
+              <!-- Carte Profil Théologique & Herméneutique -->
+              <div class="settings-card theological-profile-card">
+                <div class="card-title" style="display: flex; align-items: center; justify-content: space-between;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-orange);"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path><path d="M6 6h10"></path><path d="M6 10h10"></path></svg>
+                    <span>Profil Théologique &amp; Herméneutique (« Mon Église »)</span>
+                  </div>
+                  <button type="button" class="btn-secondary btn-sm" id="btn-open-theological-profile-modal" style="display: flex; align-items: center; gap: 6px;">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                    <span>Modifier le profil</span>
+                  </button>
+                </div>
+                <p class="card-desc" style="margin-bottom: 14px;">
+                  Alignez l'assistant IA sur votre ministère, votre niveau linguistique, vos versions bibliques favorites et la confession de foi de votre église locale.
+                </p>
+
+                <!-- Résumé des réglages actifs -->
+                <div class="theological-profile-summary-grid" id="theological-profile-summary-grid">
+                  <div class="profile-badge-item">
+                    <span class="badge-label">Ministère</span>
+                    <strong class="badge-value" id="lbl-profile-role">Prédication pastorale</strong>
+                  </div>
+                  <div class="profile-badge-item">
+                    <span class="badge-label">Langues bibliques</span>
+                    <strong class="badge-value" id="lbl-profile-level">Intermédiaire (Strong)</strong>
+                  </div>
+                  <div class="profile-badge-item">
+                    <span class="badge-label">Posture IA</span>
+                    <strong class="badge-value" id="lbl-profile-posture">Pastoral &amp; Sparring</strong>
+                  </div>
+                  <div class="profile-badge-item">
+                    <span class="badge-label">Pays &amp; Contexte</span>
+                    <strong class="badge-value" id="lbl-profile-country">France</strong>
+                  </div>
+                </div>
+
+                <!-- Aperçu de la synthèse générée par l'IA -->
+                <div class="theological-profile-prompt-preview" style="margin-top: 14px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                    <span style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Passeport Herméneutique (Synthèse IA active)</span>
+                    <button type="button" class="btn-link-subtle" id="btn-regenerate-profile-prompt" style="font-size: 11px; display: flex; align-items: center; gap: 4px;">
+                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                      <span>Régénérer</span>
+                    </button>
+                  </div>
+                  <div id="theological-profile-prompt-text" class="profile-prompt-box">
+                    Chargement du profil...
+                  </div>
+                </div>
+              </div>
+
               <div class="settings-card">
                 <div class="card-title" style="display: flex; align-items: center; justify-content: space-between;">
                   <span>Modèles d'Intelligence Artificielle</span>
@@ -4990,6 +5041,280 @@
     </div>
 
     <!-- ======================================================= -->
+    <!-- MODALE ASSISTANT PROFIL THÉOLOGIQUE & WIZARD            -->
+    <!-- ======================================================= -->
+    <div class="modal-dialog-container hidden" id="modal-theological-profile">
+      <div class="modal-card profile-wizard-card">
+        <!-- Overlay de chargement pendant la génération IA -->
+        <div id="profile-loading-overlay" class="profile-loading-overlay hidden">
+          <div class="profile-loading-spinner"></div>
+          <strong style="font-size: 15px; color: var(--text-primary); margin-top: 16px;">Génération de votre Passeport Herméneutique...</strong>
+          <p style="font-size: 12.5px; color: var(--text-secondary); margin-top: 6px; text-align: center; max-width: 380px;">
+            L'intelligence artificielle analyse vos choix, votre cadre ministériel et votre confession de foi pour calibrer l'assistant.
+          </p>
+        </div>
+
+        <div class="modal-header">
+          <div class="modal-title-with-badge">
+            <svg class="modal-header-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+              <path d="M6 6h10"></path>
+              <path d="M6 10h10"></path>
+            </svg>
+            <div>
+              <h2 class="modal-title" style="font-size: 16px;">Profil Théologique &amp; Herméneutique</h2>
+              <span id="profile-modal-subtitle" style="font-size: 12px; color: var(--text-muted); font-weight: 500;">Étape 1 sur 4 : Ministère &amp; Cadre d'utilisation</span>
+            </div>
+          </div>
+          <button class="modal-close-btn" id="btn-close-profile-modal" title="Fermer">✕</button>
+        </div>
+
+        <!-- Indicateur d'étapes (Dots) -->
+        <div class="profile-step-dots-bar">
+          <div class="profile-step-dot active" data-step="1">
+            <span class="dot-num">1</span>
+            <span class="dot-label">Ministère</span>
+          </div>
+          <div class="profile-step-connector"></div>
+          <div class="profile-step-dot" data-step="2">
+            <span class="dot-num">2</span>
+            <span class="dot-label">Langues</span>
+          </div>
+          <div class="profile-step-connector"></div>
+          <div class="profile-step-dot" data-step="3">
+            <span class="dot-num">3</span>
+            <span class="dot-label">Posture</span>
+          </div>
+          <div class="profile-step-connector"></div>
+          <div class="profile-step-dot" data-step="4">
+            <span class="dot-num">4</span>
+            <span class="dot-label">Mon Église</span>
+          </div>
+        </div>
+
+        <div class="modal-body profile-wizard-body">
+          <!-- Étape 1 : Ministère & Rôle -->
+          <div class="profile-wizard-step active" data-step="1">
+            <p class="wizard-step-desc">
+              Sélectionnez votre cadre principal d'utilisation d'Open Shema pour adapter la pédagogie de l'assistant :
+            </p>
+            <div class="profile-options-grid">
+              <div class="profile-option-card selected" data-group="user_role" data-value="predication">
+                <div class="option-card-header">
+                  <span class="option-icon">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
+                  </span>
+                  <strong class="option-title">Prédication &amp; Ministère pastoral</strong>
+                  <span class="option-check">✓</span>
+                </div>
+                <p class="option-desc">Préparation de sermons fidèles au texte, recherche d'idées maîtresses (Big Idea), plans homilétiques et applications concrètes au cœur.</p>
+              </div>
+
+              <div class="profile-option-card" data-group="user_role" data-value="enseignement">
+                <div class="option-card-header">
+                  <span class="option-icon">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path><path d="M6 6h10"></path><path d="M6 10h10"></path></svg>
+                  </span>
+                  <strong class="option-title">Enseignement &amp; Groupes de maison</strong>
+                  <span class="option-check">✓</span>
+                </div>
+                <p class="option-desc">Études bibliques interactives, formation de disciples, catéchèse, clarification des thèmes doctrinaux et questions d'animation.</p>
+              </div>
+
+              <div class="profile-option-card" data-group="user_role" data-value="etude_perso">
+                <div class="option-card-header">
+                  <span class="option-icon">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                  </span>
+                  <strong class="option-title">Étude personnelle approfondie</strong>
+                  <span class="option-check">✓</span>
+                </div>
+                <p class="option-desc">Nourriture spirituelle quotidienne, méditation suivie des livres bibliques, recherche théologique personnelle et piété.</p>
+              </div>
+
+              <div class="profile-option-card" data-group="user_role" data-value="academique">
+                <div class="option-card-header">
+                  <span class="option-icon">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+                  </span>
+                  <strong class="option-title">Recherche académique &amp; Théologique</strong>
+                  <span class="option-check">✓</span>
+                </div>
+                <p class="option-desc">Exégèse scientifique rigoureuse, critique textuelle, histoire des dogmes et controverses doctrinales approfondies.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Étape 2 : Versions & Langues -->
+          <div class="profile-wizard-step" data-step="2">
+            <p class="wizard-step-desc">
+              Définissez vos versions bibliques favorites et votre niveau d'analyse des langues originales :
+            </p>
+            
+            <div style="margin-bottom: 18px;">
+              <label class="wizard-label">Versions bibliques favorites (Sélection multiple) :</label>
+              <div class="profile-bibles-chips-row">
+                <button type="button" class="profile-bible-chip selected" data-val="LSG1910">Segond 1910</button>
+                <button type="button" class="profile-bible-chip selected" data-val="NBS">Nouvelle Bible Segond</button>
+                <button type="button" class="profile-bible-chip" data-val="S21">Segond 21</button>
+                <button type="button" class="profile-bible-chip" data-val="NEG">Nouvelle Édition de Genève</button>
+                <button type="button" class="profile-bible-chip" data-val="COL">Colombe (1978)</button>
+                <button type="button" class="profile-bible-chip" data-val="DAR">Darby</button>
+                <button type="button" class="profile-bible-chip" data-val="MAR">Martin 1744</button>
+                <button type="button" class="profile-bible-chip" data-val="OST">Ostervald</button>
+              </div>
+            </div>
+
+            <div>
+              <label class="wizard-label">Niveau d'analyse en Grec et Hébreu souhaité :</label>
+              <div class="profile-options-grid three-cols">
+                <div class="profile-option-card" data-group="greek_hebrew_level" data-value="debutant">
+                  <div class="option-card-header">
+                    <strong class="option-title">Débutant</strong>
+                    <span class="option-check">✓</span>
+                  </div>
+                  <p class="option-desc">Translittérations simples, traductions directes, sans technicité grammaticale lourde.</p>
+                </div>
+
+                <div class="profile-option-card selected" data-group="greek_hebrew_level" data-value="intermediaire">
+                  <div class="option-card-header">
+                    <strong class="option-title">Intermédiaire (Strong)</strong>
+                    <span class="option-check">✓</span>
+                  </div>
+                  <p class="option-desc">Codes Strong, lemmes originaux, morphologie de base et nuances sémantiques.</p>
+                </div>
+
+                <div class="profile-option-card" data-group="greek_hebrew_level" data-value="avance">
+                  <div class="option-card-header">
+                    <strong class="option-title">Avancé</strong>
+                    <span class="option-check">✓</span>
+                  </div>
+                  <p class="option-desc">Syntaxe poussée (temps, voix, modes), analyse textuelle critique et nuances LXX.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Étape 3 : Posture IA -->
+          <div class="profile-wizard-step" data-step="3">
+            <p class="wizard-step-desc">
+              Choisissez la posture et le ton relationnel de l'assistant lors de vos échanges :
+            </p>
+            <div class="profile-options-grid">
+              <div class="profile-option-card selected" data-group="ai_posture" data-value="pastoral_sparring">
+                <div class="option-card-header">
+                  <span class="option-icon">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
+                  </span>
+                  <strong class="option-title">Pastoral &amp; Sparring-partner (Recommandé)</strong>
+                  <span class="option-check">✓</span>
+                </div>
+                <p class="option-desc">Chaleureux et encourageant, mais teste la solidité logique de vos arguments et pointe les objections contemporaines possibles.</p>
+              </div>
+
+              <div class="profile-option-card" data-group="ai_posture" data-value="pastoral">
+                <div class="option-card-header">
+                  <span class="option-icon">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                  </span>
+                  <strong class="option-title">Pastoral &amp; Équilibré</strong>
+                  <span class="option-check">✓</span>
+                </div>
+                <p class="option-desc">Centré sur l'édification de la foi, la grâce, la bienveillance et la transformation concrète du cœur.</p>
+              </div>
+
+              <div class="profile-option-card" data-group="ai_posture" data-value="academique">
+                <div class="option-card-header">
+                  <span class="option-icon">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                  </span>
+                  <strong class="option-title">Académique &amp; Scientifique</strong>
+                  <span class="option-check">✓</span>
+                </div>
+                <p class="option-desc">Ton neutre, objectif, historique et factuel, sans présupposé pastoral particulier.</p>
+              </div>
+
+              <div class="profile-option-card" data-group="ai_posture" data-value="pedagogique">
+                <div class="option-card-header">
+                  <span class="option-icon">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+                  </span>
+                  <strong class="option-title">Pédagogique &amp; Didactique</strong>
+                  <span class="option-check">✓</span>
+                </div>
+                <p class="option-desc">Clair, progressif, vulgarisé avec des structures logiques idéales pour transmettre à d'autres.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Étape 4 : Mon Église, Pays & Confession -->
+          <div class="profile-wizard-step" data-step="4">
+            <p class="wizard-step-desc">
+              Contextualisez l'assistant avec votre zone géographique et la confession de foi de votre église locale :
+            </p>
+            
+            <div class="form-row two-cols" style="margin-bottom: 14px;">
+              <div class="form-group">
+                <label for="profile-input-country" class="wizard-label">Pays &amp; Zone culturelle :</label>
+                <select id="profile-input-country" class="select-field full-w">
+                  <option value="France (Métropole &amp; Outre-mer)">France (Métropole &amp; Outre-mer)</option>
+                  <option value="Suisse romande">Suisse romande</option>
+                  <option value="Belgique">Belgique</option>
+                  <option value="Québec / Canada">Québec / Canada</option>
+                  <option value="Afrique de l'Ouest &amp; Centrale (RDC, Côte d'Ivoire, Cameroun...)">Afrique de l'Ouest &amp; Centrale (RDC, Côte d'Ivoire, etc.)</option>
+                  <option value="Antilles / Caraïbes / Océan Indien">Antilles / Caraïbes / Océan Indien</option>
+                  <option value="Autre / Milieu international">Autre / Milieu international</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="profile-input-tradition" class="wizard-label">Tradition théologique :</label>
+                <select id="profile-input-tradition" class="select-field full-w">
+                  <option value="Évangélique / Réformée">Évangélique / Réformée</option>
+                  <option value="Baptiste">Baptiste</option>
+                  <option value="Évangélique libre / CAEF">Évangélique libre / CAEF</option>
+                  <option value="Réformée / Presbytérienne">Réformée / Presbytérienne</option>
+                  <option value="Pentecôtiste / Charismatique">Pentecôtiste / Charismatique</option>
+                  <option value="Protestantisme historique / Luthérienne">Protestantisme historique / Luthérienne</option>
+                  <option value="Autre / Non-dénominationnelle">Autre / Non-dénominationnelle</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 14px;">
+              <label for="profile-input-cultural-notes" class="wizard-label">Précisions de contexte (Optionnel) :</label>
+              <input type="text" id="profile-input-cultural-notes" class="text-field full-w" placeholder="Ex: Milieu urbain très sécularisé, assemblée multiculturelle, jeunesse étudiante...">
+            </div>
+
+            <div class="form-group">
+              <label for="profile-input-confession" class="wizard-label" style="display: flex; align-items: center; justify-content: space-between;">
+                <span>Confession de foi de votre Église locale (Optionnel) :</span>
+                <span style="font-size: 11px; font-weight: normal; color: var(--text-muted);">Copiez-collez les statuts ou la déclaration de foi</span>
+              </label>
+              <textarea id="profile-input-confession" class="text-field full-w" style="height: 110px; font-family: monospace; font-size: 12px; resize: vertical;" placeholder="Collez ici la confession de foi de votre église (ou déclaration du CNEF, Westminster, La Rochelle, Londres 1689...)..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; border-top: 1px solid var(--border-color); background: var(--bg-subtle);">
+          <button type="button" class="btn-link-subtle" id="btn-profile-skip" style="font-size: 12px;">Passer / Plus tard</button>
+          
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button type="button" class="btn-secondary hidden" id="btn-profile-prev">Précédent</button>
+            <button type="button" class="btn-primary" id="btn-profile-next">
+              <span>Suivant</span>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+            <button type="button" class="btn-primary hidden" id="btn-profile-submit" style="background: var(--accent-orange); border-color: var(--accent-orange);">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Valider &amp; Générer la Synthèse IA</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================= -->
     <!-- MENU CONTEXTUEL STYLE OBSIDIAN (PAGE DE NOTES)           -->
     <!-- ======================================================= -->
     <div id="obsidian-context-menu" class="obsidian-ctx-menu hidden">
@@ -5223,6 +5548,7 @@
   <script src="js/passage_study_view.js"></script>
   <script src="js/selection_context_menu.js"></script>
   <script src="js/highlighter.js"></script>
+  <script src="js/theological_profile_modal.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

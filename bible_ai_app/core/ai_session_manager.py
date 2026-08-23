@@ -30,22 +30,31 @@ class AISessionManager:
                 
         if not os.path.exists(USER_PROFILE_FILE):
             default_profile = {
-                "tradition": "Neutre / Académique",
-                "greek_level": "moderate",
-                "memory_active": True,
-                "custom_sermon_prompt": ""
+                "onboarding_completed": False,
+                "user_role": "predication",
+                "preferred_bibles": ["LSG1910", "NBS"],
+                "greek_hebrew_level": "intermediaire",
+                "ai_posture": "pastoral_sparring",
+                "country_culture": "France (Métropole & Outre-mer)",
+                "cultural_notes": "",
+                "tradition": "Évangélique / Réformée",
+                "church_confession_raw": "",
+                "system_profile_prompt": "",
+                "custom_sermon_prompt": "",
+                "memory_active": True
             }
             with open(USER_PROFILE_FILE, 'w', encoding='utf-8') as f:
                 json.dump(default_profile, f, indent=2, ensure_ascii=False)
 
-    # --- Gestion du Profil Utilisateur ---
+    # --- Gestion du Profil Utilisateur & Cadrage Herméneutique ---
 
     @classmethod
     def get_user_profile(cls) -> Dict[str, Any]:
         cls.initialize()
         try:
             with open(USER_PROFILE_FILE, 'r', encoding='utf-8') as f:
-                return json.load(f)
+                data = json.load(f)
+                return data
         except Exception as e:
             logger.error(f"Erreur lecture profil : {e}")
             return {}
@@ -54,12 +63,119 @@ class AISessionManager:
     def save_user_profile(cls, profile_data: Dict[str, Any]) -> bool:
         cls.initialize()
         try:
+            # Conserver les champs existants non écrasés
+            current = cls.get_user_profile()
+            current.update(profile_data)
             with open(USER_PROFILE_FILE, 'w', encoding='utf-8') as f:
-                json.dump(profile_data, f, indent=2, ensure_ascii=False)
+                json.dump(current, f, indent=2, ensure_ascii=False)
             return True
         except Exception as e:
             logger.error(f"Erreur sauvegarde profil : {e}")
             return False
+
+    @classmethod
+    def generate_theological_profile_summary(cls, profile_data: Dict[str, Any], config: Optional[Dict[str, Any]] = None) -> str:
+        """
+        Envoie les réponses du questionnaire à l'IA pour synthétiser un 
+        « Passeport Herméneutique » condensé (150 à 250 mots).
+        """
+        from ai.llm_client import LLMClient
+        from core.config import load_config
+        
+        cfg = config or load_config()
+        
+        role_labels = {
+            "predication": "Prédication & Ministère pastoral (préparation de sermons)",
+            "enseignement": "Enseignement biblique, formation & groupes de maison",
+            "etude_perso": "Étude personnelle approfondie & dévotion",
+            "academique": "Recherche académique, exégétique et théologique"
+        }
+        
+        level_labels = {
+            "debutant": "Débutant (traductions simples, translittérations, sans jargon grammatical lourd)",
+            "intermediaire": "Intermédiaire (codes Strong, lemmes, morphologie et nuances sémantiques)",
+            "avance": "Avancé (analyse syntaxique précise, critique textuelle, temps/voix/modes grecs et hébreux)"
+        }
+        
+        posture_labels = {
+            "pastoral_sparring": "Pastoral & Sparring-partner (chaleureux mais challenge les arguments pour tester la cohérence)",
+            "pastoral": "Pastoral & Équilibré (chaleureux, édifiant, orienté vers le cœur)",
+            "academique": "Académique & Rigoureux (neutre, factuel, historique et scientifique)",
+            "pedagogique": "Pédagogique (didactique, clair, vulgarisé avec structure logique)"
+        }
+        
+        user_role_str = role_labels.get(profile_data.get("user_role", ""), profile_data.get("user_role", ""))
+        greek_level_str = level_labels.get(profile_data.get("greek_hebrew_level", ""), profile_data.get("greek_hebrew_level", ""))
+        posture_str = posture_labels.get(profile_data.get("ai_posture", ""), profile_data.get("ai_posture", ""))
+        bibles_str = ", ".join(profile_data.get("preferred_bibles", ["Segond 1910"]))
+        country_str = profile_data.get("country_culture", "Non précisé")
+        cultural_notes = profile_data.get("cultural_notes", "").strip()
+        tradition_str = profile_data.get("tradition", "Évangélique / Réformée")
+        confession_raw = profile_data.get("church_confession_raw", "").strip()
+        
+        meta_prompt = (
+            "Tu es un théologien expert et conseiller herméneutique chrétien.\n"
+            "Analyse les éléments suivants du profil d'un utilisateur d'Open Shema pour rédiger son "
+            "« Guide de Personnalisation & Cadrage Herméneutique » sous forme de directives claires et directes.\n\n"
+            "DONNÉES DU QUESTIONNAIRE UTILISATEUR :\n"
+            f"- Rôle / Cadre d'utilisation : {user_role_str}\n"
+            f"- Versions bibliques de prédilection : {bibles_str}\n"
+            f"- Niveau en langues originales (Grec/Hébreu) : {greek_level_str}\n"
+            f"- Posture souhaitée pour l'IA : {posture_str}\n"
+            f"- Contexte géographique & culturel : {country_str}" + (f" ({cultural_notes})" if cultural_notes else "") + "\n"
+            f"- Tradition ecclésiale : {tradition_str}\n"
+        )
+        
+        if confession_raw:
+            meta_prompt += f"- Confession de foi locale ou texte de référence :\n\"\"\"{confession_raw[:3000]}\"\"\"\n\n"
+        else:
+            meta_prompt += "- Confession de foi locale : Aucune confession spécifique fournie (se baser sur la tradition indiquée).\n\n"
+            
+        meta_prompt += (
+            "CONSIGNE DE RÉDACTION :\n"
+            "Rédige un texte condensé (150 à 250 mots maximum en français) sous forme de 4 points clés structurés :\n"
+            "1. CADRE MINISTÉRIEL : Pour qui et dans quel but l'IA assiste l'utilisateur.\n"
+            "2. POSTURE & TON : Comment l'IA doit s'exprimer (chaleur pastorale, rigueur, questionnement éventuel).\n"
+            "3. NIVEAU LINGUISTIQUE : Façon d'intégrer le grec, l'hébreu et les codes Strong selon son niveau.\n"
+            "4. CONTEXTUALISATION & ANCRAGE DOCTRINAL : Boussole théologique à respecter (salut par grâce, autorité des Écritures, christocentrisme) et adaptation aux réalités culturelles/sociétales du pays indiqué.\n\n"
+            "Formule ce texte directement à destination de l'IA (en utilisant des impératifs : 'Adopte...', 'Respecte...', 'Explique...'). Ne mets AUCUN préambule ni conclusion."
+        )
+        
+        try:
+            # Modèle rapide pour la synthèse (Gemini 3.7 Flash par défaut)
+            model_to_use = cfg.get("chat_model") or "gemini-3.7-flash"
+            if "mistral" in model_to_use.lower():
+                provider = "mistral"
+                api_key = cfg.get("mistral_api_key", "")
+            elif "infomaniak" in model_to_use.lower() or "ministral" in model_to_use.lower():
+                provider = "infomaniak"
+                api_key = cfg.get("infomaniak_token", "")
+            else:
+                provider = "gemini"
+                api_key = cfg.get("gemini_api_key", "")
+                
+            client = LLMClient(provider=provider, api_key=api_key, model=model_to_use)
+            summary = client.ask_question(context="", question=meta_prompt)
+            
+            # Nettoyer et stocker
+            summary = summary.strip()
+            profile_data["system_profile_prompt"] = summary
+            profile_data["onboarding_completed"] = True
+            cls.save_user_profile(profile_data)
+            return summary
+        except Exception as e:
+            logger.error(f"Erreur génération synthèse profil : {e}")
+            fallback_summary = (
+                f"DIRECTIVES DE PERSONNALISATION UTILISATEUR :\n"
+                f"- Cadre : {user_role_str}\n"
+                f"- Posture : {posture_str}\n"
+                f"- Langues originales : {greek_level_str}\n"
+                f"- Contexte & Doctrine : Respecter la tradition {tradition_str} et le contexte {country_str}."
+            )
+            profile_data["system_profile_prompt"] = fallback_summary
+            profile_data["onboarding_completed"] = True
+            cls.save_user_profile(profile_data)
+            return fallback_summary
 
     # --- Gestion des Sessions de Chat ---
 

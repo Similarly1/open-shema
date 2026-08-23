@@ -1261,6 +1261,27 @@ class BibleAppApi:
     def pin_ai_conclusion(self, session_id: str, book_code: str, topic: str, content: str) -> bool:
         return AISessionManager.pin_conclusion(session_id, book_code, topic, content)
 
+    def get_theological_profile(self) -> Dict[str, Any]:
+        """Retourne le profil théologique, ministériel et contextuel de l'utilisateur."""
+        return AISessionManager.get_user_profile()
+
+    def save_theological_profile(self, profile_data: Dict[str, Any], generate_summary: bool = True) -> Dict[str, Any]:
+        """Enregistre le profil et génère optionnellement une synthèse doctrinale IA."""
+        self.config = load_config()
+        if generate_summary:
+            summary = AISessionManager.generate_theological_profile_summary(profile_data, config=self.config)
+            return {"success": True, "profile": AISessionManager.get_user_profile(), "summary": summary}
+        else:
+            success = AISessionManager.save_user_profile(profile_data)
+            return {"success": success, "profile": AISessionManager.get_user_profile()}
+
+    def generate_theological_profile_summary(self, profile_data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Génère à nouveau la synthèse de cadrage herméneutique via l'IA."""
+        self.config = load_config()
+        data = profile_data or AISessionManager.get_user_profile()
+        summary = AISessionManager.generate_theological_profile_summary(data, config=self.config)
+        return {"success": True, "summary": summary, "profile": AISessionManager.get_user_profile()}
+
     def ask_study_ai(self, messages_history: list, mode: str = "exegesis", passage_ref: str = "", options: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
         Génère une étude théologique ou exégétique complète avec extraction multi-sources (Bibles, Commentaires, Dicos, Notes),
@@ -1691,7 +1712,13 @@ class BibleAppApi:
         if active_mode_key == "sermon" and user_profile.get("custom_sermon_prompt"):
             specific_instruction = "MODE D'ÉTUDE : PRÉPARATION DE PRÉDICATION (Gabarit personnalisé)\n" + user_profile["custom_sermon_prompt"]
 
+        profile_prompt = user_profile.get("system_profile_prompt", "").strip()
+        profile_prompt_section = ""
+        if profile_prompt:
+            profile_prompt_section = f"========================================================================\nCADRAGE HERMÉNEUTIQUE & PROFIL MINISTÉRIEL :\n{profile_prompt}\n========================================================================\n\n"
+
         prompt = (
+            f"{profile_prompt_section}"
             f"Rôle : Assistant exégétique, théologique et biblique expert.\n"
             f"{specific_instruction}\n"
             f"{specific_depth}\n\n"

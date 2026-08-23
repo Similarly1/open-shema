@@ -458,6 +458,79 @@ Directives de rédaction :
         }
       }
     });
+    // Profil Théologique & Herméneutique
+    document.getElementById('btn-open-theological-profile-modal')?.addEventListener('click', () => {
+      if (typeof TheologicalProfileModal !== 'undefined') {
+        TheologicalProfileModal.open();
+      }
+    });
+
+    document.getElementById('btn-regenerate-profile-prompt')?.addEventListener('click', async () => {
+      const btn = document.getElementById('btn-regenerate-profile-prompt');
+      if (btn) btn.innerHTML = '<span>Génération...</span>';
+      try {
+        const res = await API.call('generate_theological_profile_summary');
+        if (res && res.success) {
+          this.loadTheologicalProfileCard();
+          if (typeof App !== 'undefined' && App.showToast) {
+            App.showToast("Synthèse herméneutique régénérée avec succès !");
+          }
+        }
+      } catch (e) {
+        alert("Erreur lors de la régénération : " + (e?.message || e));
+      } finally {
+        if (btn) btn.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg><span>Régénérer</span>';
+      }
+    });
+  },
+
+  async loadTheologicalProfileCard() {
+    try {
+      const profile = await API.call('get_theological_profile') || {};
+      
+      const roleLabels = {
+        "predication": "Prédication pastorale",
+        "enseignement": "Enseignement & Groupes",
+        "etude_perso": "Étude personnelle",
+        "academique": "Recherche académique"
+      };
+      
+      const levelLabels = {
+        "debutant": "Débutant (Traductions)",
+        "intermediaire": "Intermédiaire (Strong)",
+        "avance": "Avancé (Syntaxe/LXX)"
+      };
+
+      const postureLabels = {
+        "pastoral_sparring": "Pastoral & Sparring",
+        "pastoral": "Pastoral & Équilibré",
+        "academique": "Académique & Factuel",
+        "pedagogique": "Pédagogique & Didactique"
+      };
+
+      const roleEl = document.getElementById('lbl-profile-role');
+      if (roleEl) roleEl.textContent = roleLabels[profile.user_role] || profile.user_role || "Non défini";
+
+      const levelEl = document.getElementById('lbl-profile-level');
+      if (levelEl) levelEl.textContent = levelLabels[profile.greek_hebrew_level] || profile.greek_hebrew_level || "Non défini";
+
+      const postureEl = document.getElementById('lbl-profile-posture');
+      if (postureEl) postureEl.textContent = postureLabels[profile.ai_posture] || profile.ai_posture || "Non défini";
+
+      const countryEl = document.getElementById('lbl-profile-country');
+      if (countryEl) countryEl.textContent = profile.country_culture || "France";
+
+      const promptBox = document.getElementById('theological-profile-prompt-text');
+      if (promptBox) {
+        if (profile.system_profile_prompt && profile.system_profile_prompt.trim()) {
+          promptBox.textContent = profile.system_profile_prompt.trim();
+        } else {
+          promptBox.textContent = "Aucune synthèse générée. Cliquez sur 'Modifier le profil' pour calibrer l'assistant.";
+        }
+      }
+    } catch (e) {
+      console.warn("Erreur chargement carte profil théologique :", e);
+    }
   },
 
   updateActivePaletteCard(palette) {
@@ -495,6 +568,7 @@ Directives de rédaction :
     try {
       this.config = await API.call('get_settings') || {};
       this.populateForm();
+      this.loadTheologicalProfileCard();
       this.loadStepBibleStatus();
       this.loadDictionaries();
     } catch (e) {
