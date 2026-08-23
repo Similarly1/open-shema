@@ -1,5 +1,5 @@
 from flask import Flask, request, Response, render_template_string
-import scrapetube
+import yt_dlp
 from youtube_transcript_api import YouTubeTranscriptApi
 import json
 import webbrowser
@@ -27,7 +27,7 @@ HTML_PAGE = """
             --border-color: #333333;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-primary);
             margin: 0;
@@ -37,25 +37,25 @@ HTML_PAGE = """
         }
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 850px;
             background-color: var(--surface-color);
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.5);
             border: 1px solid var(--border-color);
         }
-        h1 { margin-top: 0; color: var(--primary-color); font-weight: 500; letter-spacing: -0.5px;}
+        h1 { margin-top: 0; color: var(--primary-color); font-weight: 500; }
         p { color: var(--text-secondary); }
         textarea {
             width: 100%;
-            height: 150px;
+            height: 160px;
             background-color: #2c2c2c;
             color: var(--text-primary);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 12px;
             font-family: monospace;
-            font-size: 14px;
+            font-size: 13px;
             resize: vertical;
             box-sizing: border-box;
             margin-bottom: 20px;
@@ -75,7 +75,6 @@ HTML_PAGE = """
             font-weight: 600;
             border-radius: 6px;
             cursor: pointer;
-            transition: opacity 0.2s;
         }
         button:hover { opacity: 0.9; }
         button:disabled { background-color: #555; color: #888; cursor: not-allowed; }
@@ -85,7 +84,7 @@ HTML_PAGE = """
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 15px;
-            height: 350px;
+            height: 380px;
             overflow-y: auto;
             font-family: monospace;
             font-size: 13px;
@@ -97,7 +96,6 @@ HTML_PAGE = """
         .log-error { color: #ff5555; }
         .log-info { color: #8be9fd; }
         .log-skip { color: #f1fa8c; }
-        
         #downloadBtn { display: none; background-color: #50fa7b; color: #000; width: 100%; }
     </style>
 </head>
@@ -105,12 +103,12 @@ HTML_PAGE = """
 
 <div class="container">
     <h1>Atelier Open Schéma : Moissonneur</h1>
-    <p>Collez les URLs des chaînes YouTube (une par ligne). Le script ignorera automatiquement les cultes entiers, les annonces et les temps de louange.</p>
+    <p>Collez vos URLs de <strong>chaînes</strong> ou de <strong>playlists</strong> YouTube (une par ligne).</p>
     
-    <textarea id="chaines" placeholder="https://www.youtube.com/@EgliseLyonGerland\nhttps://www.youtube.com/@EgliseLaChapelle"></textarea>
+    <textarea id="sources" placeholder="https://www.youtube.com/@abetupes&#10;https://www.youtube.com/playlist?list=PL7NXsb91-5lUM90DqJoHa9zXb0yEVwHxl"></textarea>
     
     <div class="row">
-        <label>Vidéos cibles par chaîne :</label>
+        <label>Vidéos cibles par source :</label>
         <input type="number" id="limite" value="10" min="1" max="50">
         <button id="startBtn" onclick="startScraping()">Lancer l'extraction</button>
     </div>
@@ -123,11 +121,11 @@ HTML_PAGE = """
     let finalCorpus = [];
 
     async function startScraping() {
-        const textChaines = document.getElementById('chaines').value;
+        const textSources = document.getElementById('sources').value;
         const limite = document.getElementById('limite').value;
-        const chainesList = textChaines.split('\\n').map(c => c.trim()).filter(c => c);
+        const sourcesList = textSources.split('\\n').map(c => c.trim()).filter(c => c);
 
-        if(chainesList.length === 0) return alert("Veuillez entrer au moins une chaîne.");
+        if(sourcesList.length === 0) return alert("Veuillez entrer au moins un lien.");
 
         document.getElementById('startBtn').disabled = true;
         const consoleEl = document.getElementById('console');
@@ -135,13 +133,13 @@ HTML_PAGE = """
         consoleEl.innerHTML = '';
         document.getElementById('downloadBtn').style.display = 'none';
 
-        logMsg("Démarrage du processus de filtrage intelligent...", "log-info");
+        logMsg("Démarrage du moissonnage...", "log-info");
 
         try {
             const response = await fetch('/api/scrape', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chaines: chainesList, limite: parseInt(limite) })
+                body: JSON.stringify({ sources: sourcesList, limite: parseInt(limite) })
             });
 
             const reader = response.body.getReader();
@@ -160,8 +158,10 @@ HTML_PAGE = """
                         
                         if (data.done) {
                             finalCorpus = data.corpus;
-                            logMsg(`\\n🎉 Terminé ! ${finalCorpus.length} prédications valides trouvées.`, "log-info");
-                            document.getElementById('downloadBtn').style.display = 'block';
+                            logMsg(`\\n🎉 Terminé ! ${finalCorpus.length} prédications qualifiées prêtes.`, "log-info");
+                            if (finalCorpus.length > 0) {
+                                document.getElementById('downloadBtn').style.display = 'block';
+                            }
                             document.getElementById('startBtn').disabled = false;
                         } else if (data.log) {
                             let className = "";
@@ -175,7 +175,7 @@ HTML_PAGE = """
                 }
             }
         } catch (e) {
-            logMsg("Erreur de connexion avec le serveur local.", "log-error");
+            logMsg("Erreur de communication avec le serveur local.", "log-error");
             document.getElementById('startBtn').disabled = false;
         }
     }
@@ -205,8 +205,45 @@ HTML_PAGE = """
 """
 
 # ==========================================
-# LOGIQUE PYTHON (API & Scraping)
+# LOGIQUE PYTHON ROBUSTE
 # ==========================================
+
+LANGUES_FR = ['fr', 'fr-FR', 'fr-CA', 'fr-CH', 'fr-BE']
+
+def verifier_transcription_fr(video_id: str, ydl_instance):
+    """Vérifie la présence de sous-titres FR via YouTubeTranscriptApi puis yt-dlp en fallback."""
+    # 1. Tentative avec youtube-transcript-api
+    try:
+        t = YouTubeTranscriptApi.get_transcript(video_id, languages=LANGUES_FR)
+        if t and len(t) > 0:
+            return True, "TranscriptApi OK"
+    except Exception:
+        pass
+
+    # 2. Secours direct avec yt-dlp
+    try:
+        v_url = f"https://www.youtube.com/watch?v={video_id}"
+        v_info = ydl_instance.extract_info(v_url, download=False, process=False)
+        if not v_info:
+            return False, "Non trouvé"
+            
+        subs = v_info.get('subtitles', {})
+        auto_subs = v_info.get('automatic_captions', {})
+        
+        has_manual = any(code.startswith('fr') for code in subs.keys())
+        has_auto = any(code.startswith('fr') for code in auto_subs.keys())
+        
+        if has_manual or has_auto:
+            return True, "yt-dlp OK"
+        return False, "Aucun sous-titre FR"
+    except Exception as e:
+        return False, f"Erreur ({type(e).__name__})"
+
+def normaliser_url(url: str):
+    url = url.strip()
+    if "@" in url and not url.endswith("/videos") and not "playlist" in url and not "watch" in url:
+        url = url.rstrip('/') + "/videos"
+    return url
 
 @app.route('/')
 def home():
@@ -215,70 +252,78 @@ def home():
 @app.route('/api/scrape', methods=['POST'])
 def scrape():
     data = request.json
-    chaines = data.get('chaines', [])
+    sources = data.get('sources', [])
     limite = data.get('limite', 10)
 
-    # Mots-clés qui indiquent que ce n'est PAS une prédication
-    MOTS_BANNIS = ["louange", "worship", "annonce", "teaser", "live", "direct", "culte entier", "concert", "intégral", "baptême"]
+    MOTS_BANNIS = ["louange", "worship", "annonce", "teaser", "direct", "concert", "short"]
+
+    ydl_opts = {
+        'extract_flat': True,
+        'quiet': True,
+        'no_warnings': True,
+        'playlistend': 50
+    }
 
     def generate():
         corpus = []
-        for url in chaines:
-            yield f"data: {json.dumps({'log': f'🔍 Analyse de la chaîne : {url}'})}\n\n"
-            try:
-                videos = scrapetube.get_channel(channel_url=url, sort_by="newest")
-                compteur = 0
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            for item in sources:
+                target_url = normaliser_url(item)
+                yield f"data: {json.dumps({'log': f'🔍 Analyse de la source : {target_url}'})}\n\n"
                 
-                for v in videos:
-                    if compteur >= limite:
-                        break
+                try:
+                    info = ydl.extract_info(target_url, download=False)
+                    entries = info.get('entries', []) if info else []
                     
-                    video_id = v['videoId']
-                    titre = v.get('title', {}).get('runs', [{}])[0].get('text', '')
-                    titre_min = titre.lower()
+                    if not entries and info and 'id' in info:
+                        entries = [info]
                     
-                    # 1. Filtre par mot-clé
-                    if any(mot in titre_min for mot in MOTS_BANNIS):
-                        yield f"data: {json.dumps({'log': f'⏭️ Ignorée (mot banni) : {titre[:45]}...'})}\n\n"
-                        continue
-
-                    # 2. Filtre par durée (20 à 65 minutes)
-                    duree_str = v.get('lengthText', {}).get('simpleText', '0:00')
-                    parties = duree_str.split(':')
+                    yield f"data: {json.dumps({'log': f'ℹ️ {len(entries)} vidéos listées, filtrage en cours...'})}\n\n"
                     
-                    if len(parties) == 3: # H:MM:SS
-                        minutes = int(parties[0]) * 60 + int(parties[1])
-                    elif len(parties) == 2: # MM:SS
-                        minutes = int(parties[0])
-                    else:
-                        minutes = 0
-
-                    if not (20 <= minutes <= 65):
-                        yield f"data: {json.dumps({'log': f'⏳ Ignorée (durée {duree_str}) : {titre[:45]}...'})}\n\n"
-                        continue
-
-                    # 3. Vérification des sous-titres FR
-                    try:
-                        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-                        transcript_list.find_transcript(['fr', 'fr-FR', 'fr-CA'])
+                    compteur = 0
+                    for v in entries:
+                        if compteur >= limite:
+                            break
                         
-                        vid_data = {
-                            "video_id": video_id,
-                            "url": f"https://www.youtube.com/watch?v={video_id}",
-                            "titre": titre,
-                            "chaine": url,
-                            "duree": duree_str
-                        }
-                        corpus.append(vid_data)
-                        compteur += 1
-                        yield f"data: {json.dumps({'log': f'✅ Retenue : {titre[:45]}...'})}\n\n"
-                    except Exception:
-                        yield f"data: {json.dumps({'log': f'❌ Ignorée (pas de sous-titre FR) : {titre[:45]}...'})}\n\n"
-                        
-            except Exception as e:
-                yield f"data: {json.dumps({'log': f'⚠️ Erreur sur la chaîne {url} : {str(e)}'})}\n\n"
-        
-        # Envoi final au navigateur pour déclencher le téléchargement
+                        video_id = v.get('id')
+                        titre = v.get('title', '')
+                        if not video_id or not titre:
+                            continue
+
+                        titre_min = titre.lower()
+
+                        # 1. Filtre mots-clés bannis
+                        if any(mot in titre_min for mot in MOTS_BANNIS):
+                            yield f"data: {json.dumps({'log': f'⏭️ Ignorée (mot clé) : {titre[:45]}...'})}\n\n"
+                            continue
+
+                        # 2. Filtre durée (15 à 90 minutes) si disponible
+                        duration = v.get('duration')
+                        if duration:
+                            minutes = duration / 60
+                            if not (15 <= minutes <= 90):
+                                yield f"data: {json.dumps({'log': f'⏳ Ignorée (durée {int(minutes)}m) : {titre[:45]}...'})}\n\n"
+                                continue
+
+                        # 3. Vérification des sous-titres FR
+                        has_transcript, detail = verifier_transcription_fr(video_id, ydl)
+                        if has_transcript:
+                            vid_data = {
+                                "video_id": video_id,
+                                "url": f"https://www.youtube.com/watch?v={video_id}",
+                                "titre": titre,
+                                "source": item,
+                                "duree_secondes": duration
+                            }
+                            corpus.append(vid_data)
+                            compteur += 1
+                            yield f"data: {json.dumps({'log': f'✅ Retenue ({compteur}/{limite}) : {titre[:45]}...'})}\n\n"
+                        else:
+                            yield f"data: {json.dumps({'log': f'❌ Rejetée ({detail}) : {titre[:45]}...'})}\n\n"
+
+                except Exception as e:
+                    yield f"data: {json.dumps({'log': f'⚠️ Erreur sur {item} : {str(e)}'})}\n\n"
+
         yield f"data: {json.dumps({'done': True, 'corpus': corpus})}\n\n"
 
     return Response(generate(), mimetype='text/event-stream')
@@ -288,5 +333,5 @@ def open_browser():
 
 if __name__ == '__main__':
     Timer(1, open_browser).start()
-    print("Serveur local lancé. L'interface s'ouvre dans votre navigateur...")
+    print("Serveur local lancé sur http://127.0.0.1:5000/")
     app.run(port=5000, debug=False)
