@@ -309,13 +309,23 @@ def main():
                 if ok:
                     return slug, title, True, res, usage, ep["name"], ep["model"]
                 err_lower = str(res).lower()
-                if "generaterequestsperday" in err_lower or "quota exceeded for metric" in err_lower and "day" in err_lower:
+
+                # 1. Pause temporaire de débit RPM (ex: Please retry in 26s)
+                if "retry in" in err_lower or "retrydelay" in err_lower:
+                    m = re.search(r'retry in ([0-9\.]+)s', err_lower)
+                    wait_s = float(m.group(1)) + 2.0 if m else 25.0
+                    print(f"\n⏳ Point d'accès [{ep['name']}] : Pause de débit temporaire de {wait_s:.0f}s...", flush=True)
+                    time.sleep(wait_s)
+                    continue
+
+                # 2. Épuisement journalier réel (RPD 500/jour sans délai court de retry)
+                if "generaterequestsperday" in err_lower or ("quota exceeded for metric" in err_lower and "day" in err_lower):
                     ep["exhausted"] = True
-                    print(f"\n⚠️ Point d'accès [{ep['name']}] : Quota journalier atteint (500 req/jour). Basculement automatique sur les autres clés !")
+                    print(f"\n⚠️ Point d'accès [{ep['name']}] : Quota journalier atteint (500 req/jour). Basculement automatique sur les autres clés !", flush=True)
                     break  # Passer immédiatement à l'endpoint suivant
 
                 if "quota" in err_lower or "429" in err_lower or "rate" in err_lower or "resource" in err_lower or "exhausted" in err_lower:
-                    time.sleep(3.0 * attempt)
+                    time.sleep(4.0 * attempt)
                 elif "timeout" in err_lower:
                     break  # Basculer immédiatement sur l'endpoint suivant si timeout
                 else:

@@ -258,6 +258,10 @@ class DictionaryPolisher:
             print(f"\n   📄 [{title}] Grand article ({len(raw_text):,} caractères) découpé en {len(chunks)} sections...", flush=True)
             
             for i, chunk in enumerate(chunks, 1):
+                if i > 1:
+                    # Temporisation stricte de 5.0s entre les sections pour respecter le plafond de 15 RPM
+                    time.sleep(5.0)
+
                 sub_title = f"{title} (Partie {i}/{len(chunks)})" if len(chunks) > 1 else title
                 chunk_ok = False
                 chunk_res = ""
@@ -274,12 +278,12 @@ class DictionaryPolisher:
                         
                     err_l = str(res).lower()
                     if "429" in err_l or "quota" in err_l or "rate" in err_l or "exhausted" in err_l:
-                        wait_t = 12.0 * attempt
+                        wait_t = 15.0 * attempt
                         if "retry in" in err_l:
                             try:
                                 m = re.search(r'retry in ([0-9\.]+)s', err_l)
                                 if m:
-                                    wait_t = float(m.group(1)) + 1.0
+                                    wait_t = float(m.group(1)) + 2.0
                             except Exception:
                                 pass
                         print(f"      ⏳ Pause quota {wait_t:.0f}s sur section {i}/{len(chunks)}...", flush=True)
