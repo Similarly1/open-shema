@@ -55,6 +55,13 @@ const PassageStudyView = {
   },
   isLoading: false,
 
+  // État carte Leaflet et Dictionnaires
+  leafletMap: null,
+  leafletMarkersLayer: null,
+  mapBounds: null,
+  activeDictTerm: null,
+  activeDictSourceIdx: 0,
+
   // Icônes SVG sobres
   ICONS: {
     search: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
@@ -212,6 +219,18 @@ const PassageStudyView = {
     // Déclencher le chargement de l'atelier IA si l'onglet est ouvert pour la première fois
     if (tabKey === 'ai' && !this.aiInsightsCache[this.activeAiInsight]) {
       this.fetchAiInsight(this.activeAiInsight);
+    }
+
+    // Rafraîchir la carte Leaflet lors de l'activation de l'onglet Contexte & Lieux
+    if (tabKey === 'context' && this.leafletMap) {
+      setTimeout(() => {
+        if (this.leafletMap) {
+          this.leafletMap.invalidateSize();
+          if (this.mapBounds && this.mapBounds.isValid()) {
+            this.leafletMap.fitBounds(this.mapBounds, { padding: [35, 35], maxZoom: 12 });
+          }
+        }
+      }, 120);
     }
   },
 
@@ -1331,7 +1350,7 @@ const PassageStudyView = {
   },
 
   // =========================================================================
-  // 4. SECTION CONTEXTE HISTORIQUE, DICTIONNAIRES & LIEUX
+  // 4. SECTION CONTEXTE HISTORIQUE, DICTIONNAIRES & CARTOGRAPHIE INTERACTIVE
   // =========================================================================
   renderEncyclopedia() {
     const enc = this.currentData?.encyclopedia;
@@ -1340,57 +1359,458 @@ const PassageStudyView = {
     const places = enc.places || [];
     const dicts = enc.dict_entries || [];
 
+    // Déterminer le terme dictionnaire actif par défaut
+    if (!this.activeDictTerm && dicts.length > 0) {
+      this.activeDictTerm = dicts[0].term;
+      this.activeDictSourceIdx = 0;
+    } else if (this.activeDictTerm && !dicts.some(d => d.term.toLowerCase() === this.activeDictTerm.toLowerCase()) && dicts.length > 0) {
+      this.activeDictTerm = dicts[0].term;
+      this.activeDictSourceIdx = 0;
+    }
+
+    const currentDictEntry = dicts.find(d => d.term.toLowerCase() === (this.activeDictTerm || '').toLowerCase()) || (dicts.length > 0 ? dicts[0] : null);
+    const activeArticle = (currentDictEntry && currentDictEntry.articles && currentDictEntry.articles[this.activeDictSourceIdx]) 
+      ? currentDictEntry.articles[this.activeDictSourceIdx] 
+      : (currentDictEntry && currentDictEntry.articles ? currentDictEntry.articles[0] : null);
+
     let html = `
-      <div class="ps-grid-2col">
-        <!-- Lieux géographiques -->
-        <div class="ps-card">
+      <div class="ps-grid-2col ps-encyclopedia-grid">
+        <!-- 1. GÉOGRAPHIE & LIEUX BIBLIQUES AVEC CARTE LEAFLET INTERACTIVE -->
+        <div class="ps-card ps-places-card">
           <div class="ps-card-header">
             <div class="ps-card-title-group">
               <span class="ps-card-icon">${this.ICONS.mapPin}</span>
-              <h3 class="ps-card-title">Géographie & Lieux Bibliques</h3>
+              <div>
+                <h3 class="ps-card-title">Géographie & Lieux Bibliques</h3>
+                <div class="ps-card-subtitle">Carte interactive et topographie des sites mentionnés</div>
+              </div>
             </div>
             <span class="ps-badge ps-badge-neutral">${places.length} lieu${places.length > 1 ? 'x' : ''}</span>
           </div>
-          
-          <div class="ps-places-list">
+
+          <!-- Conteneur de la carte Leaflet interactive -->
+          <div class="ps-map-section">
+            <div class="ps-map-wrap">
+              <div id="ps-leaflet-map-container" class="ps-leaflet-map"></div>
+              <div class="ps-map-controls-overlay">
+                <button type="button" class="ps-map-overlay-btn" id="btn-ps-map-recenter" title="Recadrer la carte sur tous les lieux du passage">
+                  <span class="ps-icon-slot">${this.ICONS.compass}</span>
+                  <span>Recadrer</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Liste interactive des lieux -->
+          <div class="ps-places-list" id="ps-places-list-container">
             ${places.length > 0 ? places.map(p => `
-              <div class="ps-place-item" data-lat="${p.latitude}" data-lon="${p.longitude}">
+              <div class="ps-place-item" data-place-id="${this.escapeHtml(p.place_id || '')}" data-lat="${p.latitude ?? ''}" data-lon="${p.longitude ?? ''}">
                 <div class="ps-place-header">
-                  <span class="ps-place-name">${this.escapeHtml(p.name)}</span>
-                  <span class="ps-place-coords">${p.latitude ? `${p.latitude.toFixed(2)}°, ${p.longitude.toFixed(2)}°` : ''}</span>
+                  <div class="ps-place-info-main">
+                    <span class="ps-place-pin-icon">${this.ICONS.mapPin}</span>
+                    <span class="ps-place-name">${this.escapeHtml(p.name)}</span>
+                    <span class="ps-place-type-badge">${this.escapeHtml(p.place_type || 'Lieu')}</span>
+                  </div>
+                  ${(p.latitude !== null && p.latitude !== undefined) ? `
+                    <button type="button" class="ps-place-locate-btn" title="Centrer et zoomer sur la carte">
+                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                      <span>Localiser</span>
+                    </button>
+                  ` : ''}
                 </div>
                 ${p.comment ? `<p class="ps-place-desc">${this.escapeHtml(p.comment)}</p>` : ''}
               </div>
-            `).join('') : '<p class="ps-empty-p">Aucun lieu géographique spécifique mentionné dans ce passage.</p>'}
+            `).join('') : '<p class="ps-empty-p">Aucun lieu géographique spécifique identifié dans ce passage.</p>'}
           </div>
         </div>
 
-        <!-- Dictionnaires encyclopédiques -->
-        <div class="ps-card">
+        <!-- 2. DICTIONNAIRES & CONTEXTE HISTORIQUE AVEC LECTEUR INTÉGRÉ -->
+        <div class="ps-card ps-dict-card">
           <div class="ps-card-header">
             <div class="ps-card-title-group">
               <span class="ps-card-icon">${this.ICONS.history}</span>
-              <h3 class="ps-card-title">Dictionnaires & Contexte Historique</h3>
+              <div>
+                <h3 class="ps-card-title">Dictionnaires & Contexte Historique</h3>
+                <div class="ps-card-subtitle">Notices encyclopédiques intégrales et définitions doctrinales</div>
+              </div>
             </div>
-            <span class="ps-badge ps-badge-neutral">${dicts.length} entrée${dicts.length > 1 ? 's' : ''}</span>
+            <span class="ps-badge ps-badge-neutral">${dicts.length} terme${dicts.length > 1 ? 's' : ''}</span>
           </div>
 
-          <div class="ps-dict-entries-list">
-            ${dicts.length > 0 ? dicts.map(e => `
-              <div class="ps-dict-entry-card">
-                <div class="ps-dict-entry-header">
-                  <span class="ps-dict-entry-title">${this.escapeHtml(e.title)}</span>
-                  <span class="ps-dict-badge">${this.escapeHtml(e.dictionary)}</span>
-                </div>
-                <div class="ps-dict-entry-snippet">${this.escapeHtml(e.snippet)}...</div>
+          <!-- Barre de recherche rapide de dictionnaire -->
+          <div class="ps-dict-search-bar">
+            <div class="ps-dict-search-input-wrap">
+              <span class="ps-dict-search-icon">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              </span>
+              <input type="text" id="ps-dict-search-input" class="ps-dict-search-input" placeholder="Chercher un mot dans les dictionnaires bibliques..." autocomplete="off">
+            </div>
+            <button type="button" class="ps-btn-sm ps-btn-search-dict" id="btn-ps-dict-search">
+              <span>Rechercher</span>
+            </button>
+          </div>
+
+          <!-- Sélecteur horizontal de termes du passage -->
+          <div class="ps-dict-chips-bar">
+            <span class="ps-dict-chips-label">Mots du passage :</span>
+            <div class="ps-dict-chips-scroll" id="ps-dict-chips-list">
+              ${dicts.map(d => `
+                <button type="button" class="ps-dict-chip ${(this.activeDictTerm && d.term.toLowerCase() === this.activeDictTerm.toLowerCase()) ? 'active' : ''}" data-term="${this.escapeHtml(d.term)}">
+                  <span class="ps-dict-chip-text">${this.escapeHtml(d.title || d.term)}</span>
+                  <span class="ps-dict-chip-count" title="${d.sources_count} source(s) disponible(s)">${d.sources_count}</span>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Lecteur de notice de dictionnaire intégrale -->
+          <div class="ps-dict-reader-container" id="ps-dict-reader-content">
+            ${currentDictEntry && activeArticle ? this.renderDictionaryArticle(currentDictEntry, activeArticle) : `
+              <div class="ps-dict-empty-state">
+                <span class="ps-icon-slot">${this.ICONS.history}</span>
+                <p>Sélectionnez un mot ci-dessus ou effectuez une recherche pour afficher sa notice complète.</p>
               </div>
-            `).join('') : '<p class="ps-empty-p">Consultez la vue Dictionnaires pour explorer les thèmes doctrinaux.</p>'}
+            `}
           </div>
         </div>
       </div>
     `;
 
     this.encyclopediaContainerEl.innerHTML = html;
+
+    // Initialiser la carte Leaflet
+    this.initPassageMap(places);
+
+    // Événements dictionnaire et recherche
+    this.bindEncyclopediaEvents(places, dicts);
+  },
+
+  renderDictionaryArticle(entry, article) {
+    if (!entry || !article) return '';
+    const articles = entry.articles || [article];
+    const rawText = article.full_text || article.preview || '';
+
+    // Découper en paragraphes propres
+    const paragraphs = rawText
+      .split(/\n\s*\n/)
+      .map(p => p.trim())
+      .filter(p => p.length > 0);
+
+    return `
+      <div class="ps-dict-article-pane">
+        <div class="ps-dict-article-header">
+          <div class="ps-dict-article-title-block">
+            <h4 class="ps-dict-article-title">${this.escapeHtml(article.title || entry.title || entry.term)}</h4>
+            <div class="ps-dict-article-badge-row">
+              <span class="ps-dict-source-badge">${this.escapeHtml(article.dict_name)}</span>
+            </div>
+          </div>
+
+          <div class="ps-dict-article-actions">
+            <button type="button" class="ps-dict-action-btn" id="btn-ps-copy-dict-article" title="Copier la notice textuelle">
+              <span class="ps-icon-slot">${this.ICONS.copy}</span>
+              <span>Copier</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Onglets multi-sources si le mot est présent dans plusieurs dictionnaires -->
+        ${articles.length > 1 ? `
+          <div class="ps-dict-sources-tabs">
+            ${articles.map((art, idx) => `
+              <button type="button" class="ps-dict-source-tab ${idx === this.activeDictSourceIdx ? 'active' : ''}" data-idx="${idx}">
+                <span class="ps-dict-source-tab-dot"></span>
+                <span>${this.escapeHtml(art.dict_name)}</span>
+              </button>
+            `).join('')}
+          </div>
+        ` : ''}
+
+        <!-- Corps de l'article avec typographie aérée -->
+        <div class="ps-dict-article-body">
+          ${paragraphs.length > 0 ? paragraphs.map(p => `<p class="ps-dict-p">${this.formatDictionaryParagraph(p)}</p>`).join('') : `<p class="ps-dict-p">${this.escapeHtml(rawText)}</p>`}
+        </div>
+      </div>
+    `;
+  },
+
+  initPassageMap(places) {
+    const mapContainer = document.getElementById('ps-leaflet-map-container');
+    if (!mapContainer || typeof L === 'undefined') return;
+
+    // Si une carte existe déjà, la nettoyer
+    if (this.leafletMap) {
+      try {
+        this.leafletMap.remove();
+        this.leafletMap = null;
+      } catch (e) {
+        console.warn('Erreur reset carte:', e);
+      }
+    }
+
+    const isDark = document.body.classList.contains('theme-dark') || 
+                   (!document.body.classList.contains('reading-bg-white') && !document.body.classList.contains('theme-light'));
+
+    // Créer l'instance Leaflet
+    const defaultCenter = [31.78, 35.23];
+    this.leafletMap = L.map('ps-leaflet-map-container', {
+      center: defaultCenter,
+      zoom: 8,
+      minZoom: 4,
+      maxZoom: 17,
+      zoomControl: false
+    });
+
+    L.control.zoom({ position: 'bottomright' }).addTo(this.leafletMap);
+
+    // Fond de carte CartoDB
+    const tileUrl = isDark
+      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+      : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+
+    L.tileLayer(tileUrl, {
+      attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap',
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(this.leafletMap);
+
+    this.leafletMarkersLayer = L.layerGroup().addTo(this.leafletMap);
+
+    // Ajouter les marqueurs
+    const validPlaces = places.filter(p => p.latitude !== null && p.latitude !== undefined && p.longitude !== null && p.longitude !== undefined);
+    const bounds = L.latLngBounds();
+
+    validPlaces.forEach(p => {
+      const lat = p.latitude;
+      const lon = p.longitude;
+      bounds.extend([lat, lon]);
+
+      const pinIcon = L.divIcon({
+        className: 'ps-custom-map-pin',
+        html: `<div class="ps-pin-marker" data-place-id="${this.escapeHtml(p.place_id || '')}"><div class="ps-pin-inner"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="10" r="3"/><path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 7 8 11.7z"/></svg></div></div>`,
+        iconSize: [26, 26],
+        iconAnchor: [13, 26],
+        popupAnchor: [0, -26]
+      });
+
+      const popupHtml = `
+        <div class="ps-leaflet-popup">
+          <div class="ps-lpopup-title">${this.escapeHtml(p.name)}</div>
+          <div class="ps-lpopup-type">${this.escapeHtml(p.place_type || 'Lieu biblique')}</div>
+          ${p.comment ? `<div class="ps-lpopup-desc">${this.escapeHtml(p.comment)}</div>` : ''}
+        </div>
+      `;
+
+      const marker = L.marker([lat, lon], { icon: pinIcon })
+        .bindPopup(popupHtml)
+        .addTo(this.leafletMarkersLayer);
+
+      p._leafletMarker = marker;
+
+      marker.on('click', () => {
+        this.highlightPlaceInList(p.place_id);
+      });
+    });
+
+    if (validPlaces.length > 0 && bounds.isValid()) {
+      this.mapBounds = bounds;
+      this.leafletMap.fitBounds(bounds, { padding: [35, 35], maxZoom: 12 });
+    } else {
+      this.leafletMap.setView(defaultCenter, 8);
+    }
+
+    setTimeout(() => {
+      if (this.leafletMap) this.leafletMap.invalidateSize();
+    }, 150);
+  },
+
+  bindEncyclopediaEvents(places, dicts) {
+    // 1. Bouton Recadrer la carte
+    document.getElementById('btn-ps-map-recenter')?.addEventListener('click', () => {
+      if (this.leafletMap && this.mapBounds && this.mapBounds.isValid()) {
+        this.leafletMap.fitBounds(this.mapBounds, { padding: [35, 35], maxZoom: 12 });
+      }
+    });
+
+    // 2. Clic sur les lieux de la liste
+    document.querySelectorAll('.ps-place-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const lat = parseFloat(item.dataset.lat);
+        const lon = parseFloat(item.dataset.lon);
+        const placeId = item.dataset.placeId;
+
+        if (!isNaN(lat) && !isNaN(lon) && this.leafletMap) {
+          this.leafletMap.flyTo([lat, lon], 12, { duration: 0.8 });
+          const matchedPlace = places.find(p => p.place_id === placeId);
+          if (matchedPlace && matchedPlace._leafletMarker) {
+            matchedPlace._leafletMarker.openPopup();
+          }
+          this.highlightPlaceInList(placeId);
+        }
+      });
+    });
+
+    // 3. Clic sur les chips de dictionnaire
+    document.querySelectorAll('.ps-dict-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const term = chip.dataset.term;
+        if (!term) return;
+        this.activeDictTerm = term;
+        this.activeDictSourceIdx = 0;
+
+        document.querySelectorAll('.ps-dict-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+
+        const entry = dicts.find(d => d.term.toLowerCase() === term.toLowerCase());
+        const container = document.getElementById('ps-dict-reader-content');
+        if (container && entry && entry.articles && entry.articles[0]) {
+          container.innerHTML = this.renderDictionaryArticle(entry, entry.articles[0]);
+          this.bindArticleTabsEvents(entry);
+        }
+      });
+    });
+
+    // 4. Onglets multi-sources pour l'article actuellement affiché
+    const currentEntry = dicts.find(d => d.term.toLowerCase() === (this.activeDictTerm || '').toLowerCase()) || (dicts.length > 0 ? dicts[0] : null);
+    if (currentEntry) {
+      this.bindArticleTabsEvents(currentEntry);
+    }
+
+    // 5. Recherche rapide en direct
+    const searchInput = document.getElementById('ps-dict-search-input');
+    const searchBtn = document.getElementById('btn-ps-dict-search');
+
+    const handleSearch = async () => {
+      const q = searchInput?.value?.trim();
+      if (!q) return;
+      
+      try {
+        let res = null;
+        if (typeof API !== 'undefined' && API.call) {
+          res = await API.call('lookup_dictionary', q);
+        } else if (window.pywebview && window.pywebview.api && window.pywebview.api.lookup_dictionary) {
+          res = await window.pywebview.api.lookup_dictionary(q);
+        }
+
+        if (res && res.matches && res.matches.length > 0) {
+          const articles = res.matches.map(m => ({
+            dict_id: m.dict_id || 'dict',
+            dict_name: m.dict_name || 'Dictionnaire',
+            title: m.title || q,
+            preview: m.preview || '',
+            full_text: m.full_text || m.raw_text || m.preview || ''
+          }));
+
+          const newEntry = {
+            term: q,
+            title: articles[0].title || q,
+            sources_count: articles.length,
+            articles: articles
+          };
+
+          // Ajouter ou remplacer dans dicts
+          const existingIdx = dicts.findIndex(d => d.term.toLowerCase() === q.toLowerCase());
+          if (existingIdx !== -1) {
+            dicts[existingIdx] = newEntry;
+          } else {
+            dicts.unshift(newEntry);
+          }
+
+          this.activeDictTerm = q;
+          this.activeDictSourceIdx = 0;
+
+          // Rafraîchir les chips et l'article
+          const chipsContainer = document.getElementById('ps-dict-chips-list');
+          if (chipsContainer) {
+            chipsContainer.innerHTML = dicts.map(d => `
+              <button type="button" class="ps-dict-chip ${(d.term.toLowerCase() === this.activeDictTerm.toLowerCase()) ? 'active' : ''}" data-term="${this.escapeHtml(d.term)}">
+                <span class="ps-dict-chip-text">${this.escapeHtml(d.title || d.term)}</span>
+                <span class="ps-dict-chip-count">${d.sources_count}</span>
+              </button>
+            `).join('');
+
+            // Réattacher les clics sur les chips
+            chipsContainer.querySelectorAll('.ps-dict-chip').forEach(c => {
+              c.addEventListener('click', () => {
+                const t = c.dataset.term;
+                const ent = dicts.find(d => d.term.toLowerCase() === t.toLowerCase());
+                if (ent) {
+                  this.activeDictTerm = t;
+                  this.activeDictSourceIdx = 0;
+                  chipsContainer.querySelectorAll('.ps-dict-chip').forEach(x => x.classList.remove('active'));
+                  c.classList.add('active');
+                  const reader = document.getElementById('ps-dict-reader-content');
+                  if (reader) {
+                    reader.innerHTML = this.renderDictionaryArticle(ent, ent.articles[0]);
+                    this.bindArticleTabsEvents(ent);
+                  }
+                }
+              });
+            });
+          }
+
+          const reader = document.getElementById('ps-dict-reader-content');
+          if (reader) {
+            reader.innerHTML = this.renderDictionaryArticle(newEntry, articles[0]);
+            this.bindArticleTabsEvents(newEntry);
+          }
+        } else {
+          if (typeof App !== 'undefined' && App.showToast) {
+            App.showToast(`Aucune définition trouvée pour "${q}"`, "info");
+          }
+        }
+      } catch (err) {
+        console.error('Erreur recherche dictionnaire:', err);
+      }
+    };
+
+    searchBtn?.addEventListener('click', handleSearch);
+    searchInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleSearch();
+    });
+  },
+
+  bindArticleTabsEvents(entry) {
+    document.querySelectorAll('.ps-dict-source-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const idx = parseInt(tab.dataset.idx, 10);
+        if (isNaN(idx) || !entry.articles[idx]) return;
+        this.activeDictSourceIdx = idx;
+
+        const reader = document.getElementById('ps-dict-reader-content');
+        if (reader) {
+          reader.innerHTML = this.renderDictionaryArticle(entry, entry.articles[idx]);
+          this.bindArticleTabsEvents(entry);
+        }
+      });
+    });
+
+    document.getElementById('btn-ps-copy-dict-article')?.addEventListener('click', (e) => {
+      const art = entry.articles[this.activeDictSourceIdx] || entry.articles[0];
+      if (!art) return;
+      const textToCopy = `${art.title || entry.term}\n(${art.dict_name})\n\n${art.full_text || art.preview}`;
+      navigator.clipboard.writeText(textToCopy);
+      const btn = e.currentTarget;
+      const slot = btn.querySelector('.ps-icon-slot');
+      if (slot) slot.innerHTML = this.ICONS.check;
+      setTimeout(() => { if (slot) slot.innerHTML = this.ICONS.copy; }, 1800);
+    });
+  },
+
+  highlightPlaceInList(placeId) {
+    document.querySelectorAll('.ps-place-item').forEach(item => {
+      if (item.dataset.placeId === placeId) {
+        item.classList.add('active');
+        item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else {
+        item.classList.remove('active');
+      }
+    });
+  },
+
+  formatDictionaryParagraph(text) {
+    if (!text) return '';
+    return this.escapeHtml(text);
   },
 
   // =========================================================================

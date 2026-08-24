@@ -741,53 +741,100 @@ class PassageStudyManager:
             for ch_i in range(start_ch, end_ch + 1):
                 ch_places = MapsManager.get_places_for_chapter(book_code, ch_i)
                 for p in ch_places:
-                    # Vérifier si le lieu est dans la plage de versets
-                    p_verses = p.get("verses_in_chapter", "")
-                    if not any(dp["place_id"] == p["place_id"] for dp in detected_places):
+                    if not any(dp.get("place_id") == p.get("place_id") for dp in detected_places):
+                        lat = p.get("latitude")
+                        lon = p.get("longitude")
+                        try:
+                            lat = float(lat) if lat is not None else None
+                            lon = float(lon) if lon is not None else None
+                        except (ValueError, TypeError):
+                            lat, lon = None, None
+
                         detected_places.append({
                             "place_id": p.get("place_id"),
-                            "name": p.get("name_fr") or p.get("name_en"),
-                            "latitude": p.get("latitude"),
-                            "longitude": p.get("longitude"),
-                            "place_type": p.get("place_type"),
+                            "name": p.get("name_fr") or p.get("name_en") or p.get("place_id"),
+                            "name_fr": p.get("name_fr"),
+                            "name_en": p.get("name_en"),
+                            "latitude": lat,
+                            "longitude": lon,
+                            "place_type": p.get("place_type", "Lieu"),
                             "comment": p.get("comment", ""),
                             "found_in_chapter": ch_i
                         })
         except Exception as e:
             logger.warning("Erreur détection géographique : %s", e)
 
-        # 2. Détection des entrées dictionnaires Vigouroux / Dom Calmet / Bailly
+        # 2. Détection des entrées dictionnaires Vigouroux / Dom Calmet / Bailly / Nouveau Dict
         dict_entries = []
         try:
             candidate_terms = []
-            for lem in key_lemmas[:6]:
+
+            # A. Noms des lieux détectés
+            for p in detected_places:
+                p_name = p.get("name") or ""
+                clean_p = re.sub(r'\s*\d+$', '', p_name).strip()
+                if clean_p and len(clean_p) > 2 and clean_p.lower() not in [c.lower() for c in candidate_terms]:
+                    candidate_terms.append(clean_p)
+
+            # B. Lemmes et concepts originaux clés
+            for lem in key_lemmas[:8]:
                 gloss = lem.get("gloss", "")
-                if gloss and len(gloss) > 3:
+                if gloss and len(gloss) > 2:
                     clean_gloss = gloss.split(";")[0].split(",")[0].strip()
-                    if clean_gloss and clean_gloss not in candidate_terms:
+                    clean_gloss = re.sub(r'^[^\w]+|[^\w]+$', '', clean_gloss)
+                    if clean_gloss and clean_gloss.lower() not in [c.lower() for c in candidate_terms]:
                         candidate_terms.append(clean_gloss)
 
-            # Extraire des noms propres du texte français (mots avec majuscules)
+            # C. Noms propres et termes théologiques du texte français
             words = full_fr_text.split()
+            stop_french = {
+                "dans", "avec", "pour", "cette", "alors", "mais", "pourquoi", "ainsi",
+                "comme", "leurs", "notre", "votre", "après", "avant", "celui", "ceux",
+                "toute", "tous", "entre", "selon", "voici", "aussi", "encore", "quand"
+            }
             for w in words:
-                clean_w = re.sub(r'[^\w\u00C0-\u017F]', '', w)
-                if len(clean_w) > 3 and clean_w[0].isupper() and clean_w.lower() not in {"dans", "avec", "pour", "cette", "alors", "mais", "pourquoi", "ainsi", "comme"}:
-                    if clean_w not in candidate_terms:
+                clean_w = re.sub(r'^[^\w\u00C0-\u017F]+|[^\w\u00C0-\u017F]+$', '', w)
+                if len(clean_w) > 3 and clean_w[0].isupper() and clean_w.lower() not in stop_french:
+                    if clean_w.lower() not in [c.lower() for c in candidate_terms]:
                         candidate_terms.append(clean_w)
 
-            # Interroger le dictionnaire pour les candidats
-            for term in candidate_terms[:6]:
+            # Interroger le dictionnaire pour chaque terme candidat
+            seen_terms = set()
+            for term in candidate_terms:
+                if term.lower() in seen_terms:
+                    continue
+                seen_terms.add(term.lower())
+
                 res = DictionaryManager.lookup(term)
+                if not res or not res.get("matches"):
+                    # Essayer sans forme plurielle éventuelle
+                    if term.endswith("s") and len(term) > 4:
+                        res = DictionaryManager.lookup(term[:-1])
+
                 if res and res.get("matches"):
-                    first_match = res["matches"][0]
-                    content_str = first_match.get("content", "")
-                    clean_snippet = re.sub(r'<[^>]+>', '', content_str)[:280].strip()
-                    dict_entries.append({
-                        "term": term,
-                        "dictionary": first_match.get("dict_name", "Dictionnaire"),
-                        "title": first_match.get("title", term),
-                        "snippet": clean_snippet
-                    })
+                    matches = res["matches"]
+                    articles = []
+                    for m in matches:
+                        raw_t = m.get("full_text") or m.get("raw_text") or m.get("preview") or ""
+                        articles.append({
+                            "dict_id": m.get("dict_id", "dict"),
+                            "dict_name": m.get("dict_name", "Dictionnaire biblique"),
+                            "title": m.get("title", term),
+                            "preview": m.get("preview", ""),
+                            "full_text": raw_t
+                        })
+
+                    if articles:
+                        dict_entries.append({
+                            "term": term,
+                            "title": articles[0].get("title", term),
+                            "sources_count": len(articles),
+                            "articles": articles
+                        })
+
+                if len(dict_entries) >= 15:
+                    break
+
         except Exception as e:
             logger.warning("Erreur recherche dictionnaires : %s", e)
 
