@@ -183,6 +183,14 @@ const API = {
     return await this.call('is_commentary_window_open');
   },
 
+  async syncPassage(bookCode, bookFrench, chapterNum, verseNum = 1) {
+    return await this.call('sync_passage', bookCode, bookFrench, parseInt(chapterNum, 10), parseInt(verseNum, 10) || 1);
+  },
+
+  async syncVerse(bookCode, chapterNum, verseNum) {
+    return await this.call('sync_verse', bookCode, parseInt(chapterNum, 10), parseInt(verseNum, 10));
+  },
+
   async getMonitorsInfo() {
     return await this.call('get_monitors_info');
   },

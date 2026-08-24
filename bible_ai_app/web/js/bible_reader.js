@@ -3969,6 +3969,11 @@ const BibleReader = {
 
     // Charger les commentaires exégétiques pour ce verset
     this.loadCommentariesForVerse(vStr, bStr, chStr, true);
+
+    // Synchroniser avec la fenêtre secondaire de commentaires
+    if (typeof MultiwindowSync !== 'undefined' && MultiwindowSync.broadcastVerseChanged) {
+      MultiwindowSync.broadcastVerseChanged(bStr, chStr, vStr);
+    }
   },
 
   selectAndScrollToVerse(verseNum, bookCode = null, chapterNum = null) {
@@ -4505,6 +4510,10 @@ const BibleReader = {
         CommentaryViewer.setComments(comms, refStr, book, ch, verseNum);
       } catch (e) {
         console.error('Erreur commentaires:', e);
+      }
+
+      if (typeof MultiwindowSync !== 'undefined' && MultiwindowSync.broadcastVerseChanged) {
+        MultiwindowSync.broadcastVerseChanged(book, ch, verseNum);
       }
     }
 

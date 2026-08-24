@@ -120,14 +120,14 @@ const CommentaryWindow = {
 
     if (isNewChapter || !this.currentChapterData) {
       await this.loadChapterCommentaries(bookCode, this.currentChapter);
-    } else if (this.isSyncActive) {
-      this.scrollToVerseBlock(this.currentVerse);
+    } else {
+      this.renderStream(this.currentChapterData);
     }
   },
 
   handleVerseChanged(bookCode, chapterNum, verseNum) {
     const ch = parseInt(chapterNum, 10);
-    const v = parseInt(verseNum, 10);
+    const v = parseInt(verseNum, 10) || 1;
 
     // Si on a changé de chapitre par défilement continu OU si les données ne sont pas encore chargées
     if (this.currentBook !== bookCode || this.currentChapter !== ch || !this.currentChapterData) {
@@ -135,19 +135,14 @@ const CommentaryWindow = {
       this.currentChapter = ch;
       this.currentVerse = v;
       this.updatePassageDisplay(this.currentBookFrench, this.currentChapter, this.currentVerse);
-      this.loadChapterCommentaries(bookCode, ch).then(() => {
-        if (this.isSyncActive && !this.isUserScrolled) {
-          this.scrollToVerseBlock(v);
-        }
-      });
+      this.loadChapterCommentaries(bookCode, ch);
       return;
     }
 
     this.currentVerse = v;
     this.updatePassageDisplay(this.currentBookFrench, this.currentChapter, this.currentVerse);
-
-    if (this.isSyncActive && !this.isUserScrolled) {
-      this.scrollToVerseBlock(v);
+    if (this.currentChapterData) {
+      this.renderStream(this.currentChapterData);
     }
   },
 
@@ -179,12 +174,6 @@ const CommentaryWindow = {
     this.updatePassageDisplay(this.currentBookFrench, this.currentChapter, this.currentVerse);
     this.populateAuthorFilter(data.available_sources || []);
     this.renderStream(data);
-
-    if (this.isSyncActive) {
-      setTimeout(() => {
-        this.scrollToVerseBlock(this.currentVerse);
-      }, 60);
-    }
   },
 
   async loadChapterCommentaries(bookCode, chapterNum) {
@@ -215,12 +204,6 @@ const CommentaryWindow = {
       this.updatePassageDisplay(this.currentBookFrench, this.currentChapter, this.currentVerse);
       this.populateAuthorFilter(data.available_sources || []);
       this.renderStream(data);
-
-      if (this.isSyncActive) {
-        setTimeout(() => {
-          this.scrollToVerseBlock(this.currentVerse);
-        }, 80);
-      }
     } catch (e) {
       if (reqId !== this._currentRequestId) return;
       console.error('[CommentaryWindow] Erreur chargement commentaires:', e);
@@ -314,138 +297,112 @@ const CommentaryWindow = {
     }
 
     const currentAuthor = this.activeAuthorFilter;
+    const targetVerseNum = parseInt(this.currentVerse, 10) || 1;
+    const vObj = data.verses.find(v => v.verse === targetVerseNum) || data.verses[0] || { verse: targetVerseNum, text: '', comments: [] };
+    const vNum = vObj.verse;
+    const vText = vObj.text || '';
+    const allCommentsForVerse = vObj.comments || [];
 
-    let authorCommentsCount = 0;
-    data.verses.forEach(v => {
-      if (v.comments) {
-        v.comments.forEach(c => {
-          if (!currentAuthor || c.author === currentAuthor || c.source === currentAuthor) {
-            authorCommentsCount++;
-          }
-        });
+    // Filtrer pour l'auteur actif
+    let comments = allCommentsForVerse;
+    if (currentAuthor) {
+      comments = comments.filter(c => c.author === currentAuthor || c.source === currentAuthor);
+    }
+
+    // Auteurs alternatifs ayant des commentaires sur ce verset
+    const otherAuthorsForVerse = [];
+    allCommentsForVerse.forEach(c => {
+      const a = c.author || c.source;
+      if (a && a !== currentAuthor && !otherAuthorsForVerse.includes(a)) {
+        otherAuthorsForVerse.push(a);
       }
     });
 
     let html = `
-      <div class="comm-stream-chapter-hero">
-        <h1 class="comm-stream-chapter-title">${this.escapeHtml((data.book_french || this.currentBookFrench || '').toUpperCase())} ${data.chapter}</h1>
-        <div class="comm-stream-chapter-subtitle">
-          <span>${data.total_verses || data.verses.length} versets</span>
-          <span>•</span>
-          <span>${authorCommentsCount} note${authorCommentsCount > 1 ? 's' : ''}</span>
-          ${currentAuthor ? `<span>•</span><span style="color: var(--accent-blue); font-weight: 600;">${this.escapeHtml(currentAuthor)}</span>` : ''}
+      <div class="comm-stream-verse-block active-synced-comm" id="comm-verse-${vNum}" data-verse="${vNum}" style="margin-bottom: 24px; border: none; background: transparent;">
+        <div class="comm-verse-quote-banner" data-nav-verse="${vNum}" style="cursor: default; padding: 14px 18px; margin-bottom: 16px;">
+          <div class="comm-verse-num-badge" style="font-size: 15px; font-weight: 800; min-width: 28px; height: 28px;">${vNum}</div>
+          <div class="comm-verse-quote-text" style="font-size: 16px; font-style: italic; line-height: 1.6;">« ${this.escapeHtml(vText || '...')} »</div>
+        </div>
+        <div class="comm-verse-cards-list">
+    `;
+
+    if (comments.length === 0) {
+      html += `
+        <div class="comm-stream-card" style="padding: 32px 20px; text-align: center;">
+          <div style="font-size: 15px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;">
+            Aucune note exégétique de « ${this.escapeHtml(currentAuthor || 'cet ouvrage')} » pour ${this.escapeHtml(data.book_french || '')} ${data.chapter}:${vNum}
+          </div>
+          ${otherAuthorsForVerse.length > 0 ? `
+            <div style="font-size: 13px; color: var(--text-secondary); margin-top: 18px; margin-bottom: 10px;">
+              Commentaires disponibles pour ce verset :
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">
+              ${otherAuthorsForVerse.map(auth => `
+                <button type="button" class="comm-win-tool-btn btn-quick-switch-author" data-author="${this.escapeHtml(auth)}" style="padding: 6px 12px; font-size: 12px; background: var(--bg-hover);">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                  <span>${this.escapeHtml(auth)}</span>
+                </button>
+              `).join('')}
+            </div>
+          ` : `
+            <div style="font-size: 13px; opacity: 0.7; margin-top: 8px;">
+              Sélectionnez un autre ouvrage dans le menu supérieur pour consulter d'autres commentaires.
+            </div>
+          `}
+        </div>
+      `;
+    } else {
+      comments.forEach((comm, idx) => {
+        const itemId = `comm_${vNum}_${idx}_${(comm.author || 'comm').replace(/[^a-zA-Z0-9]/g, '_')}`;
+        const isForeign = this.isForeignText(comm.text);
+        const cachedTrans = this.translationCache[itemId];
+        const isShowingTranslated = this.showTranslatedVersion[itemId] !== false && !!cachedTrans;
+
+        let displayedText = comm.text || '';
+        if (cachedTrans && isShowingTranslated) {
+          displayedText = cachedTrans;
+        }
+
+        const formattedText = this.formatMarkdown(displayedText);
+
+        html += `
+          <article class="comm-stream-card" id="${itemId}">
+            <div class="comm-stream-card-header">
+              <div class="comm-stream-author-title">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                  <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                </svg>
+                <span style="font-weight: 700; font-size: 14px;">${this.escapeHtml(comm.author || comm.source || 'Commentaire')}</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="comm-stream-ref-badge">${this.escapeHtml(comm.reference || `${data.book_french} ${data.chapter}:${vNum}`)}</span>
+                ${isForeign ? `
+                  <button type="button" class="comm-win-tool-btn btn-trans-comm" data-item-id="${itemId}" data-raw-text="${encodeURIComponent(comm.text)}" style="height: 22px; font-size: 11px; padding: 2px 7px;">
+                    <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    <span>${cachedTrans ? (isShowingTranslated ? 'Texte original' : 'Traduction') : 'Traduire'}</span>
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+            <div class="comm-stream-body" style="font-size: 16px; line-height: 1.7;">${formattedText}</div>
+          </article>
+        `;
+      });
+    }
+
+    html += `
         </div>
       </div>
     `;
 
-    let displayedBlocksCount = 0;
-
-    data.verses.forEach(vObj => {
-      const vNum = vObj.verse;
-      const vText = vObj.text || '';
-      let comments = vObj.comments || [];
-
-      if (currentAuthor) {
-        comments = comments.filter(c => c.author === currentAuthor || c.source === currentAuthor);
-      }
-
-      displayedBlocksCount++;
-
-      html += `
-        <div class="comm-stream-verse-block ${vNum === this.currentVerse ? 'active-synced-comm' : ''}" id="comm-verse-${vNum}" data-verse="${vNum}">
-          <div class="comm-verse-quote-banner" data-nav-verse="${vNum}" title="Cliquer pour positionner la Bible principale sur ce verset" style="cursor: pointer;">
-            <div class="comm-verse-num-badge">${vNum}</div>
-            <div class="comm-verse-quote-text">« ${this.escapeHtml(vText || '...')} »</div>
-          </div>
-          <div class="comm-verse-cards-list">
-      `;
-
-      if (comments.length === 0) {
-        html += `
-          <div class="comm-stream-card" style="padding: 10px 16px; opacity: 0.55; font-style: italic; font-size: 13px;">
-            Aucun commentaire de ${this.escapeHtml(currentAuthor || 'cet ouvrage')} pour le verset ${vNum}.
-          </div>
-        `;
-      } else {
-        comments.forEach((comm, idx) => {
-          const itemId = `comm_${vNum}_${idx}_${(comm.author || 'comm').replace(/[^a-zA-Z0-9]/g, '_')}`;
-          const isForeign = this.isForeignText(comm.text);
-          const cachedTrans = this.translationCache[itemId];
-          const isShowingTranslated = this.showTranslatedVersion[itemId] !== false && !!cachedTrans;
-
-          let displayedText = comm.text || '';
-          if (cachedTrans && isShowingTranslated) {
-            displayedText = cachedTrans;
-          }
-
-          const formattedText = this.formatMarkdown(displayedText);
-
-          html += `
-            <article class="comm-stream-card" id="${itemId}">
-              <div class="comm-stream-card-header">
-                <div class="comm-stream-author-title">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                  </svg>
-                  <span>${this.escapeHtml(comm.author || comm.source || 'Commentaire')}</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span class="comm-stream-ref-badge">${this.escapeHtml(comm.reference || `${data.book_french} ${data.chapter}:${vNum}`)}</span>
-                  ${isForeign ? `
-                    <button type="button" class="comm-win-tool-btn btn-trans-comm" data-item-id="${itemId}" data-raw-text="${encodeURIComponent(comm.text)}" style="height: 22px; font-size: 11px; padding: 2px 7px;">
-                      <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                      <span>${cachedTrans ? (isShowingTranslated ? 'Texte original' : 'Traduction') : 'Traduire'}</span>
-                    </button>
-                  ` : ''}
-                </div>
-              </div>
-              <div class="comm-stream-body">${formattedText}</div>
-            </article>
-          `;
-        });
-      }
-
-      html += `
-          </div>
-        </div>
-      `;
-    });
-
-    if (authorCommentsCount === 0 && currentAuthor) {
-      html += `
-        <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
-          <div style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">Aucun commentaire trouvé pour cet ouvrage dans ce chapitre</div>
-          <div style="font-size: 12px; opacity: 0.8; margin-bottom: 12px;">« ${this.escapeHtml(currentAuthor)} » ne contient pas de notes pour ${this.escapeHtml(data.book_french || '')} ${data.chapter}.</div>
-        </div>
-      `;
-    }
-
     container.innerHTML = html;
 
-    document.getElementById('btn-reset-author-filter')?.addEventListener('click', () => {
-      this.setAuthorFilter('all');
-    });
-
-    // Attacher les clics sur les bandeaux de versets pour naviguer dans la fenêtre principale
-    container.querySelectorAll('.comm-verse-quote-banner').forEach(banner => {
-      banner.addEventListener('click', () => {
-        const v = parseInt(banner.dataset.navVerse, 10);
-        if (v) {
-          this.currentVerse = v;
-          this.updateActiveVerseHighlight(v);
-          if (typeof API !== 'undefined' && API.navigateMainFromSecondary) {
-            API.navigateMainFromSecondary(this.currentBook, this.currentChapter, v);
-          }
-          if (this.channel) {
-            this.channel.postMessage({
-              type: 'NAVIGATE_REQUEST',
-              book: this.currentBook,
-              chapter: this.currentChapter,
-              verse: v
-            });
-          }
-        }
+    // Attacher les boutons de bascule rapide d'auteur
+    container.querySelectorAll('.btn-quick-switch-author').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.setAuthorFilter(btn.dataset.author);
       });
     });
 
