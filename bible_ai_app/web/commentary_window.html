@@ -476,7 +476,7 @@
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
 
     .lex-words-flow {
@@ -526,6 +526,40 @@
       font-weight: 600;
     }
 
+    .lex-source-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 4px 0;
+    }
+
+    .lex-source-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      background: rgba(255, 255, 255, 0.08) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #94A3B8 !important;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .lex-source-pill:hover {
+      background: rgba(255, 255, 255, 0.15) !important;
+      color: #FFFFFF !important;
+    }
+
+    .lex-source-pill.active {
+      background: rgba(56, 189, 248, 0.18) !important;
+      border-color: #38BDF8 !important;
+      color: #38BDF8 !important;
+      font-weight: 700;
+    }
+
     #lex-entry-detail {
       background: #1E293B !important;
       border: 1px solid rgba(255, 255, 255, 0.12) !important;
@@ -542,8 +576,74 @@
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 10px;
       height: 100%;
+    }
+
+    .note-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 6px 10px;
+      background: #1E293B !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      border-radius: 8px;
+    }
+
+    .note-tools-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .note-tool-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      height: 28px;
+      padding: 2px 7px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #94A3B8 !important;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .note-tool-btn:hover {
+      background: rgba(255, 255, 255, 0.1) !important;
+      color: #FFFFFF !important;
+    }
+
+    .note-view-toggle {
+      display: inline-flex;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 6px;
+      padding: 2px;
+      gap: 2px;
+    }
+
+    .note-toggle-btn {
+      padding: 3px 9px;
+      font-size: 11.5px;
+      font-weight: 600;
+      border-radius: 4px;
+      border: none;
+      background: transparent;
+      color: #94A3B8 !important;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .note-toggle-btn.active {
+      background: #38BDF8 !important;
+      color: #0F172A !important;
+      font-weight: 700;
     }
 
     .note-editor-textarea {
@@ -564,6 +664,25 @@
 
     .note-editor-textarea:focus {
       border-color: #38BDF8 !important;
+    }
+
+    .note-preview-content {
+      flex: 1;
+      width: 100%;
+      background: #1E293B !important;
+      border: 1px solid rgba(255, 255, 255, 0.18) !important;
+      border-radius: 8px;
+      padding: 16px 20px;
+      color: #F8FAFC !important;
+      font-family: var(--font-reading, 'EB Garamond', serif);
+      font-size: calc(16px * var(--comm-zoom, 1)) !important;
+      line-height: 1.8;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+
+    .note-preview-content.hidden, .note-editor-textarea.hidden {
+      display: none !important;
     }
 
     /* Popovers */
@@ -599,241 +718,154 @@
       background-color: #F8EED7 !important;
       color: #382818 !important;
     }
+
     body.bg-theme-sepia .comm-win-titlebar {
-      background: #EEDCC0 !important;
-      border-bottom: 1px solid #DFC9A7 !important;
+      background: #EFE2C6 !important;
+      border-bottom-color: #DCCBB0 !important;
     }
+
     body.bg-theme-sepia .comm-tab-btn {
-      color: #5D4632 !important;
+      color: #6C4F32 !important;
     }
+
     body.bg-theme-sepia .comm-tab-btn:hover {
-      background: rgba(0, 0, 0, 0.06) !important;
+      background: #E4D3B4 !important;
       color: #261A0E !important;
     }
+
     body.bg-theme-sepia .comm-tab-btn.active {
-      background: rgba(180, 83, 9, 0.18) !important;
-      border-color: rgba(180, 83, 9, 0.4) !important;
-      color: #9A3412 !important;
+      background: #DCC49C !important;
+      border-color: #8C531B !important;
+      color: #8C531B !important;
     }
-    body.bg-theme-sepia .comm-win-tool-btn {
-      background: #E6D2B3 !important;
-      border: 1px solid #CEB692 !important;
-      color: #382818 !important;
-    }
-    body.bg-theme-sepia .comm-win-tool-btn:hover {
-      background: #DFC7A5 !important;
-      color: #1A1208 !important;
-    }
-    body.bg-theme-sepia .comm-win-control-btn {
-      color: #5D4632 !important;
-    }
-    body.bg-theme-sepia .comm-win-control-btn:hover {
-      background: rgba(0, 0, 0, 0.08) !important;
-      color: #1A1208 !important;
-    }
-    body.bg-theme-sepia .comm-win-passage-pill {
-      background: #E6D2B3 !important;
-      border: 1px solid #CEB692 !important;
-      color: #261A0E !important;
-    }
+
     body.bg-theme-sepia .comm-stream-card,
     body.bg-theme-sepia .comm-verse-quote-banner,
     body.bg-theme-sepia .ai-msg-bubble.assistant,
     body.bg-theme-sepia .lex-words-flow,
     body.bg-theme-sepia #lex-entry-detail,
-    body.bg-theme-sepia .note-editor-textarea {
-      background: #F4E7CE !important;
+    body.bg-theme-sepia .note-toolbar,
+    body.bg-theme-sepia .note-editor-textarea,
+    body.bg-theme-sepia .note-preview-content,
+    body.bg-theme-sepia .comm-dropdown-popover {
+      background: #F3E7CF !important;
+      border-color: #E0CFAE !important;
       color: #382818 !important;
-      border: 1px solid #DFCAA9 !important;
     }
+
     body.bg-theme-sepia .comm-stream-body,
     body.bg-theme-sepia .comm-stream-body p,
     body.bg-theme-sepia .comm-verse-quote-text,
-    body.bg-theme-sepia .lex-word-orig,
-    body.bg-theme-sepia .note-editor-textarea {
-      color: #382818 !important;
-    }
-    body.bg-theme-sepia .comm-stream-author-title {
-      color: #9A3412 !important;
-    }
-    body.bg-theme-sepia .comm-stream-ref-badge {
-      background: #E6D2B3 !important;
-      color: #5D4632 !important;
-    }
-    body.bg-theme-sepia .comm-dropdown-popover {
-      background: #F4E7CE !important;
-      border: 1px solid #CEB692 !important;
-      color: #382818 !important;
-      box-shadow: 0 10px 25px rgba(67, 52, 34, 0.25) !important;
-    }
-    body.bg-theme-sepia .popover-label {
-      color: #6C523B !important;
-    }
-    body.bg-theme-sepia #lbl-zoom-val {
+    body.bg-theme-sepia .lex-word-orig {
       color: #261A0E !important;
     }
-    body.bg-theme-sepia .font-choice-btn.active,
-    body.bg-theme-sepia .bg-choice-btn.active {
-      background: #DEC6A1 !important;
-      border-color: #B45309 !important;
-      color: #9A3412 !important;
-      font-weight: 700 !important;
+
+    body.bg-theme-sepia .lex-source-pill {
+      background: #E8D8BA !important;
+      border-color: #D4BE96 !important;
+      color: #5C4328 !important;
     }
-    body.bg-theme-sepia .lex-word-pill {
-      background: #EAD8BB !important;
-      border-color: #D3BE9C !important;
-    }
-    body.bg-theme-sepia .lex-word-trans {
-      color: #6C523B !important;
+
+    body.bg-theme-sepia .lex-source-pill.active {
+      background: #7A3E1D !important;
+      border-color: #7A3E1D !important;
+      color: #FFFFFF !important;
     }
 
     /* =========================================================================
-     * THÈME BLANC (LUMINEUX ÉPURÉ)
+     * THÈME BLANC (HAUTE LISIBILITÉ CLAIRE)
      * ========================================================================= */
     body.bg-theme-white {
-      background-color: #F8FAFC !important;
+      background-color: #FFFFFF !important;
       color: #0F172A !important;
     }
+
     body.bg-theme-white .comm-win-titlebar {
-      background: #FFFFFF !important;
-      border-bottom: 1px solid #E2E8F0 !important;
+      background: #F8FAFC !important;
+      border-bottom-color: #E2E8F0 !important;
     }
+
     body.bg-theme-white .comm-tab-btn {
-      color: #475569 !important;
+      color: #64748B !important;
     }
+
     body.bg-theme-white .comm-tab-btn:hover {
-      background: #F1F5F9 !important;
+      background: #E2E8F0 !important;
       color: #0F172A !important;
     }
+
     body.bg-theme-white .comm-tab-btn.active {
-      background: rgba(2, 132, 199, 0.12) !important;
-      border-color: rgba(2, 132, 199, 0.35) !important;
+      background: #E0F2FE !important;
+      border-color: #0284C7 !important;
       color: #0284C7 !important;
     }
-    body.bg-theme-white .comm-win-tool-btn {
-      background: #F1F5F9 !important;
-      border: 1px solid #CBD5E1 !important;
-      color: #0F172A !important;
-    }
-    body.bg-theme-white .comm-win-tool-btn:hover {
-      background: #E2E8F0 !important;
-    }
-    body.bg-theme-white .comm-win-control-btn {
-      color: #475569 !important;
-    }
-    body.bg-theme-white .comm-win-control-btn:hover {
-      background: #F1F5F9 !important;
-      color: #0F172A !important;
-    }
-    body.bg-theme-white .comm-win-passage-pill {
-      background: #F1F5F9 !important;
-      border: 1px solid #CBD5E1 !important;
-      color: #0F172A !important;
-    }
+
     body.bg-theme-white .comm-stream-card,
     body.bg-theme-white .comm-verse-quote-banner,
     body.bg-theme-white .ai-msg-bubble.assistant,
     body.bg-theme-white .lex-words-flow,
     body.bg-theme-white #lex-entry-detail,
-    body.bg-theme-white .note-editor-textarea {
-      background: #FFFFFF !important;
+    body.bg-theme-white .note-toolbar,
+    body.bg-theme-white .note-editor-textarea,
+    body.bg-theme-white .note-preview-content,
+    body.bg-theme-white .comm-dropdown-popover {
+      background: #F8FAFC !important;
+      border-color: #E2E8F0 !important;
       color: #0F172A !important;
-      border: 1px solid #E2E8F0 !important;
     }
+
     body.bg-theme-white .comm-stream-body,
     body.bg-theme-white .comm-stream-body p,
     body.bg-theme-white .comm-verse-quote-text,
-    body.bg-theme-white .lex-word-orig,
-    body.bg-theme-white .note-editor-textarea {
+    body.bg-theme-white .lex-word-orig {
       color: #0F172A !important;
     }
-    body.bg-theme-white .comm-stream-author-title {
-      color: #0284C7 !important;
-    }
-    body.bg-theme-white .comm-stream-ref-badge {
-      background: #F1F5F9 !important;
-      color: #475569 !important;
-    }
-    body.bg-theme-white .comm-dropdown-popover {
-      background: #FFFFFF !important;
-      border: 1px solid #CBD5E1 !important;
-      color: #0F172A !important;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
-    }
-    body.bg-theme-white .popover-label {
-      color: #64748B !important;
-    }
-    body.bg-theme-white #lbl-zoom-val {
-      color: #0F172A !important;
-    }
-    body.bg-theme-white .font-choice-btn.active,
-    body.bg-theme-white .bg-choice-btn.active {
-      background: #E0F2FE !important;
-      border-color: #0284C7 !important;
-      color: #0284C7 !important;
-      font-weight: 700 !important;
-    }
-    body.bg-theme-white .lex-word-pill {
+
+    body.bg-theme-white .lex-source-pill {
       background: #F1F5F9 !important;
       border-color: #CBD5E1 !important;
-    }
-    body.bg-theme-white .lex-word-trans {
       color: #475569 !important;
+    }
+
+    body.bg-theme-white .lex-source-pill.active {
+      background: #0284C7 !important;
+      border-color: #0284C7 !important;
+      color: #FFFFFF !important;
     }
   </style>
 </head>
 <body>
 
-  <!-- ========================================================= -->
-  <!-- 1. BARRE DE NAVIGATION & CONTRÔLES SUPÉRIEURS             -->
-  <!-- ========================================================= -->
+  <!-- BARRE DE TITRE & CONTRÔLES SUPÉRIEURS -->
   <header class="comm-win-titlebar" id="comm-win-titlebar">
-    
     <!-- GAUCHE : Onglets d'Étude Déportés -->
     <div class="comm-win-tabs-group">
-      <button type="button" class="comm-tab-btn active" data-tab="commentaries" id="tab-btn-commentaries">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-        </svg>
+      <button type="button" class="comm-tab-btn active" data-tab="commentaries">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         <span>Commentaires</span>
       </button>
-
-      <button type="button" class="comm-tab-btn" data-tab="ai" id="tab-btn-ai">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
-        </svg>
+      <button type="button" class="comm-tab-btn" data-tab="ai">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
         <span>Assistant IA</span>
       </button>
-
-      <button type="button" class="comm-tab-btn" data-tab="lexicon" id="tab-btn-lexicon">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
-          <path d="M6 6h10"></path>
-          <path d="M6 10h10"></path>
-        </svg>
+      <button type="button" class="comm-tab-btn" data-tab="lexicon">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
         <span>Lexique</span>
       </button>
-
-      <button type="button" class="comm-tab-btn" data-tab="notes" id="tab-btn-notes">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
-          <path d="m15 5 4 4"></path>
-        </svg>
+      <button type="button" class="comm-tab-btn" data-tab="notes">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
         <span>Notes</span>
       </button>
     </div>
 
     <!-- CENTRE : Passage & Synchro active -->
     <div class="comm-win-center-group">
-      <div class="comm-win-passage-pill" id="comm-win-passage-pill" title="Passage actif en direct">
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-orange, #F97316);">
-          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
-          <path d="M6 6h10"></path>
-        </svg>
-        <span id="comm-win-passage-text">Genèse 1:1</span>
+      <div class="comm-win-passage-pill" id="comm-win-passage-badge">
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        <span id="comm-win-passage-label">Genèse 1:1</span>
       </div>
 
-      <div class="comm-win-sync-indicator synced" id="comm-win-sync-badge" title="Cliquer pour suspendre/activer la synchronisation automatique">
+      <div class="comm-win-sync-indicator synced" id="comm-win-sync-badge" title="Cliquer pour suspendre/reprendre la synchronisation avec le lecteur">
         <span class="comm-win-pulse-dot"></span>
         <span id="comm-win-sync-label">Lié</span>
       </div>
@@ -841,112 +873,98 @@
 
     <!-- DROITE : Filtres, Affichage & Contrôles Fenêtre -->
     <div class="comm-win-actions-group">
-      
-      <!-- Sélecteur d'ouvrages (visible dans l'onglet Commentaires) -->
+      <!-- Sélecteur d'ouvrages -->
       <div style="position: relative;" id="comm-author-filter-wrapper">
         <button type="button" class="comm-win-tool-btn" id="btn-author-filter" title="Changer d'ouvrage de commentaire">
-          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-          </svg>
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
           <span id="lbl-active-author">Commentaires</span>
-          <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
 
-        <div class="comm-dropdown-popover hidden" id="author-filter-popover" style="right: 0; width: 280px; max-height: 400px; overflow-y: auto;">
-          <div class="popover-label">Ouvrages disponibles</div>
-          <div id="author-filter-list" style="display: flex; flex-direction: column; gap: 4px;"></div>
+        <div class="comm-dropdown-popover hidden" id="author-filter-popover" style="right: 0; width: 280px;">
+          <div class="popover-label">Sélectionner un commentaire :</div>
+          <div id="author-filter-list" style="display: flex; flex-direction: column; gap: 4px; max-height: 260px; overflow-y: auto;">
+            <!-- Rempli dynamiquement -->
+          </div>
         </div>
       </div>
 
-      <!-- Options d'Affichage (Police, Zoom, Fond) -->
+      <!-- Options d'Affichage (Zoom & Fond) -->
       <div style="position: relative;">
-        <button type="button" class="comm-win-tool-btn" id="btn-comm-display" title="Confort de lecture">
-          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="3"></circle>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-          </svg>
+        <button type="button" class="comm-win-tool-btn" id="btn-comm-display" title="Personnaliser la lecture">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           <span>Affichage</span>
         </button>
 
-        <div class="comm-dropdown-popover hidden" id="comm-display-popover" style="right: 0; width: 280px;">
-          <div class="popover-label">Police</div>
-          <div style="display: flex; gap: 4px; margin-bottom: 12px;">
-            <button type="button" class="comm-win-tool-btn font-choice-btn active" data-font="EB Garamond" style="flex: 1; justify-content: center; font-family: 'EB Garamond', serif;">Garamond</button>
-            <button type="button" class="comm-win-tool-btn font-choice-btn" data-font="Cardo" style="flex: 1; justify-content: center; font-family: 'Cardo', serif;">Cardo</button>
-            <button type="button" class="comm-win-tool-btn font-choice-btn" data-font="Inter" style="flex: 1; justify-content: center; font-family: 'Inter', sans-serif;">Inter</button>
-          </div>
-
-          <div class="popover-label">Taille du texte</div>
+        <div class="comm-dropdown-popover hidden" id="comm-display-popover" style="right: 0; width: 250px;">
+          <div class="popover-label">Taille de police</div>
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-            <button type="button" class="comm-win-tool-btn" id="btn-zoom-out" style="width: 34px; justify-content: center; font-weight: 800; font-size: 14px;">−</button>
-            <span id="lbl-zoom-val" style="font-size: 13px; font-weight: 700;">100%</span>
-            <button type="button" class="comm-win-tool-btn" id="btn-zoom-in" style="width: 34px; justify-content: center; font-weight: 800; font-size: 14px;">+</button>
+            <button type="button" class="comm-win-tool-btn" id="btn-zoom-out" style="width: 32px; height: 32px; justify-content: center; font-weight: 700;">−</button>
+            <span id="lbl-zoom-val" style="font-weight: 700; font-size: 13px;">100%</span>
+            <button type="button" class="comm-win-tool-btn" id="btn-zoom-in" style="width: 32px; height: 32px; justify-content: center; font-weight: 700;">+</button>
           </div>
 
-          <div class="popover-label">Fond de lecture</div>
+          <div class="popover-label">Police de lecture</div>
+          <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px;">
+            <button type="button" class="comm-win-tool-btn font-choice-btn active" data-font="EB Garamond" style="font-family: 'EB Garamond', serif; justify-content: flex-start;">EB Garamond (Sérif)</button>
+            <button type="button" class="comm-win-tool-btn font-choice-btn" data-font="Cardo" style="font-family: 'Cardo', serif; justify-content: flex-start;">Cardo (Classique)</button>
+            <button type="button" class="comm-win-tool-btn font-choice-btn" data-font="Inter" style="font-family: 'Inter', sans-serif; justify-content: flex-start;">Inter (Sans-sérif)</button>
+          </div>
+
+          <div class="popover-label">Thème de lecture</div>
           <div style="display: flex; gap: 6px;">
-            <button type="button" class="comm-win-tool-btn bg-choice-btn active" data-bg="auto" style="flex: 1; justify-content: center;">Auto</button>
-            <button type="button" class="comm-win-tool-btn bg-choice-btn" data-bg="white" style="flex: 1; justify-content: center;">Blanc</button>
-            <button type="button" class="comm-win-tool-btn bg-choice-btn" data-bg="sepia" style="flex: 1; justify-content: center;">Sépia</button>
-            <button type="button" class="comm-win-tool-btn bg-choice-btn" data-bg="dark" style="flex: 1; justify-content: center;">Nuit</button>
+            <button type="button" class="comm-win-tool-btn bg-choice-btn active" data-bg="dark" style="flex: 1; justify-content: center; background: #0F172A !important; color: #FFF !important; border: 1px solid #334155;">Nuit</button>
+            <button type="button" class="comm-win-tool-btn bg-choice-btn" data-bg="sepia" style="flex: 1; justify-content: center; background: #F8EED7 !important; color: #382818 !important; border: 1px solid #E4D3B4;">Sépia</button>
+            <button type="button" class="comm-win-tool-btn bg-choice-btn" data-bg="white" style="flex: 1; justify-content: center; background: #FFFFFF !important; color: #000 !important; border: 1px solid #CBD5E1;">Blanc</button>
           </div>
         </div>
       </div>
 
-      <!-- Contrôles Fenêtre -->
+      <!-- Contrôles Fenêtre (Réduire, Maximiser, Fermer) -->
       <div class="comm-win-controls">
         <button type="button" class="comm-win-control-btn" id="btn-win-min" title="Réduire">
-          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="12" x2="20" y2="12"></line></svg>
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
         </button>
-        <button type="button" class="comm-win-control-btn" id="btn-win-max" title="Agrandir / Restaurer">
-          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"></rect></svg>
+        <button type="button" class="comm-win-control-btn" id="btn-win-max" title="Agrandir / Plein écran">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
         </button>
-        <button type="button" class="comm-win-control-btn close" id="btn-win-close" title="Fermer la fenêtre">
-          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <button type="button" class="comm-win-control-btn" id="btn-win-close" title="Fermer la fenêtre">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
-
     </div>
   </header>
 
-  <!-- ========================================================= -->
-  <!-- 2. CONTENEUR MULTI-ONGLETS                                -->
-  <!-- ========================================================= -->
+  <!-- CONTENU PRINCIPAL DES 4 ONGLETS -->
   <main class="comm-tab-panels-wrap">
 
     <!-- ONGLET 1 : COMMENTAIRES EXÉGÉTIQUES -->
     <section class="comm-tab-panel active" id="tab-panel-commentaries">
       <div class="comm-stream-inner" id="comm-stream-container">
-        <div style="text-align: center; padding: 60px 20px; color: var(--text-secondary);">
-          <div style="font-size: 15px; font-weight: 600; margin-bottom: 6px;">Connexion au lecteur biblique...</div>
-          <div style="font-size: 12px; opacity: 0.7;">En attente des données du passage en cours.</div>
-        </div>
+        <!-- Rendu dynamique -->
       </div>
     </section>
 
-    <!-- ONGLET 2 : ASSISTANT IA -->
+    <!-- ONGLET 2 : ASSISTANT IA THÉOLOGIQUE -->
     <section class="comm-tab-panel" id="tab-panel-ai">
       <div class="ai-chat-wrap">
         <div class="ai-chat-header-bar">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--accent-blue)" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
-            <span style="font-size: 13px; font-weight: 700;">Assistant Théologique IA</span>
+          <div style="font-size: 13px; font-weight: 700; color: var(--accent-blue); display: flex; align-items: center; gap: 6px;">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+            <span>Assistant Théologique & Exégétique</span>
           </div>
-          <button type="button" class="comm-win-tool-btn" id="btn-clear-ai-chat" style="padding: 3px 8px; font-size: 11px;">
-            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-            <span>Effacer</span>
-          </button>
+          <button type="button" class="comm-win-tool-btn" id="btn-clear-ai-chat" style="font-size: 11px;">Effacer la discussion</button>
         </div>
 
         <div class="ai-chat-messages-stream" id="ai-chat-messages">
           <div class="ai-msg-bubble assistant">
-            Bonjour ! Je suis votre assistant d'étude biblique. Posez-moi une question sur le passage ou choisissez une piste d'analyse ci-dessous.
+            Bonjour ! Posez-moi une question doctrinale, linguistique ou exégétique sur ce passage. Vos échanges sont directement mémorisés dans votre historique de recherche.
           </div>
         </div>
 
-        <div class="ai-prompt-chips-wrap" id="ai-prompt-chips">
-          <button type="button" class="ai-prompt-chip" data-prompt="Donne-moi le contexte historique et littéraire de ce verset.">Contexte historique & littéraire</button>
-          <button type="button" class="ai-prompt-chip" data-prompt="Quelles sont les clés exégétiques majeures de ce texte ?">Clés exégétiques</button>
+        <div class="ai-prompt-chips-wrap">
+          <button type="button" class="ai-prompt-chip" data-prompt="Analyse la structure littéraire et le sens profond de ce verset.">Structure du texte</button>
+          <button type="button" class="ai-prompt-chip" data-prompt="Quelles sont les nuances des termes hébreux ou grecs originaux ?">Nuances des termes</button>
           <button type="button" class="ai-prompt-chip" data-prompt="Propose une application pratique et spirituelle pour aujourd'hui.">Application pratique</button>
           <button type="button" class="ai-prompt-chip" data-prompt="Quels sont les liens typologiques ou messianiques ?">Liens théologiques</button>
         </div>
@@ -967,6 +985,11 @@
         <div class="lex-words-flow" id="lex-words-flow">
           <div style="color: var(--text-secondary); font-size: 13px;">Chargement des termes originaux...</div>
         </div>
+        
+        <!-- Sélecteur de dictionnaire unique (Onglets de sources) -->
+        <div class="lex-source-tabs" id="lex-dict-tabs" style="display: none;"></div>
+
+        <!-- Contenu du dictionnaire unique sélectionné -->
         <div class="comm-stream-card" id="lex-entry-detail" style="margin-top: 0;">
           <div style="color: var(--text-secondary); font-size: 13px; text-align: center; padding: 20px;">
             Cliquez sur un mot ci-dessus pour afficher sa définition lexicale, sa racine et ses occurrences.
@@ -975,7 +998,7 @@
       </div>
     </section>
 
-    <!-- ONGLET 4 : NOTES PERSONNELLES -->
+    <!-- ONGLET 4 : NOTES D'ÉTUDE AVEC BARRE D'OUTILS & APERÇU DIRECT -->
     <section class="comm-tab-panel" id="tab-panel-notes">
       <div class="notes-wrap">
         <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -987,14 +1010,56 @@
             <span>Enregistrer</span>
           </button>
         </div>
+
+        <!-- Barre d'outils de formatage Markdown -->
+        <div class="note-toolbar">
+          <div class="note-tools-group">
+            <button type="button" class="note-tool-btn" id="btn-format-bold" title="Gras (**texte**)"><strong>B</strong></button>
+            <button type="button" class="note-tool-btn" id="btn-format-italic" title="Italique (*texte*)"><em>I</em></button>
+            <button type="button" class="note-tool-btn" id="btn-format-h2" title="Titre (## Titre)">H2</button>
+            <button type="button" class="note-tool-btn" id="btn-format-ul" title="Liste à puces (- élément)">• Liste</button>
+            <button type="button" class="note-tool-btn" id="btn-format-quote" title="Citation (> texte)">❝ Citation</button>
+            <button type="button" class="note-tool-btn" id="btn-format-verse" title="Insérer le verset actif">📖 Verset</button>
+          </div>
+
+          <div class="note-view-toggle">
+            <button type="button" class="note-toggle-btn active" id="btn-note-mode-edit">Édition</button>
+            <button type="button" class="note-toggle-btn" id="btn-note-mode-preview">Aperçu direct</button>
+          </div>
+        </div>
+
+        <!-- Zone d'Édition Markdown -->
         <textarea class="note-editor-textarea" id="note-editor-textarea" placeholder="Rédigez vos réflexions, analyses ou prières sur ce passage... (Format Markdown supporté)"></textarea>
+
+        <!-- Zone de Rendu Formaté Direct -->
+        <div class="note-preview-content hidden" id="note-preview-content"></div>
       </div>
     </section>
 
   </main>
 
   <!-- Scripts -->
+  <script>
+    // Polyfill global App pour les interactions partagées (Toasts, Sélection)
+    window.App = window.App || {
+      showToast: function(msg) {
+        console.log('[Toast]', msg);
+        const existing = document.getElementById('comm-toast-msg');
+        if (existing) existing.remove();
+        const toast = document.createElement('div');
+        toast.id = 'comm-toast-msg';
+        toast.style.cssText = 'position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1E293B; color: #38BDF8; border: 1px solid #38BDF8; padding: 8px 16px; border-radius: 8px; font-size: 12.5px; font-weight: 600; z-index: 9999; box-shadow: 0 4px 14px rgba(0,0,0,0.5);';
+        toast.textContent = msg;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2500);
+      }
+    };
+    window.TheologyView = window.TheologyView || {
+      escapeHtml: function(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    };
+  </script>
   <script src="js/api.js"></script>
+  <script src="js/selection_context_menu.js"></script>
   <script src="js/commentary_window.js"></script>
 </body>
 </html>

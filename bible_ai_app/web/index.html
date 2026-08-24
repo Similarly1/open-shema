@@ -13,6 +13,7 @@
   <!-- CSS -->
   <link rel="stylesheet" href="css/leaflet.css">
   <link rel="stylesheet" href="css/logos.css?v=3.8">
+  <link rel="stylesheet" href="css/articles.css">
 
   <style id="vintage-core-styles">
     /* =========================================================================
@@ -891,6 +892,17 @@
             </svg>
           </span>
           <span class="nav-label">Théologie</span>
+        </button>
+        <button class="nav-item" data-view="articles" id="nav-articles" title="Articles & Blogs théologiques">
+          <span class="nav-icon">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10l6 6v8a2 2 0 0 1-2 2z"></path>
+              <path d="M14 2v6h6"></path>
+              <path d="M7 13h10"></path>
+              <path d="M7 17h6"></path>
+            </svg>
+          </span>
+          <span class="nav-label">Articles</span>
         </button>
         <button class="nav-item" data-view="dict" id="nav-dict" title="Dictionnaires & Lexiques">
           <span class="nav-icon">
@@ -4143,6 +4155,80 @@
         </div>
       </div>
 
+      <!-- ===================================================== -->
+      <!-- VUE K : ARTICLES & BLOGS THÉOLOGIQUES -->
+      <!-- ===================================================== -->
+      <div class="app-view" id="view-articles">
+        <div class="articles-view-container">
+          
+          <!-- SECTION 1 : LISTE DES ARTICLES -->
+          <div id="articles-list-section">
+            <div class="articles-header">
+              <div class="articles-header-left">
+                <h1 class="articles-main-title">Articles & Blogs Théologiques</h1>
+                <p class="articles-sub-title">Méditations pastorales, études contemporaines et réflexions éthiques reliées aux Écritures</p>
+              </div>
+              <div class="articles-header-actions">
+                <button class="btn-articles-action" id="btn-suggest-blog" title="Proposer un nouveau blog théologique">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                  <span>Suggérer une source</span>
+                </button>
+                <button class="btn-articles-action btn-articles-primary" id="btn-sync-articles" title="Synchroniser les derniers articles des flux RSS">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                  <span>Synchroniser</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="articles-toolbar">
+              <div class="articles-search-bar">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input type="text" id="articles-search-input" class="articles-search-input" placeholder="Rechercher par mot-clé, auteur, passage biblique (ex: Romains 8)...">
+              </div>
+              <div class="articles-sources-filters" id="articles-sources-filters">
+                <!-- Injecté dynamiquement par ArticlesView -->
+              </div>
+            </div>
+
+            <!-- Grille des articles -->
+            <div class="articles-grid" id="articles-grid-container">
+              <!-- Injecté dynamiquement par ArticlesView -->
+            </div>
+
+            <div class="articles-empty-state hidden" id="articles-empty-state">
+              <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.5;"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10l6 6v8a2 2 0 0 1-2 2z"/><path d="M14 2v6h6"/><path d="M7 13h10"/><path d="M7 17h6"/></svg>
+              <h3>Aucun article trouvé</h3>
+              <p>Cliquez sur "Synchroniser" pour récupérer les derniers flux ou ajustez votre filtre de recherche.</p>
+            </div>
+          </div>
+
+          <!-- SECTION 2 : LECTURE D'UN ARTICLE -->
+          <div id="articles-reader-section" class="hidden">
+            <div class="articles-reader-header">
+              <button class="btn-articles-action" id="btn-articles-back-to-list">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                <span>Retour aux articles</span>
+              </button>
+              <a href="#" id="article-reader-external-link" class="btn-articles-action" target="_blank" title="Ouvrir la page originale sur le site">
+                <span>Site d'origine</span>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+            </div>
+
+            <div class="article-reader-container">
+              <div class="article-reader-hero">
+                <h1 class="article-reader-title" id="article-reader-title">Titre de l'article</h1>
+                <div class="article-reader-meta" id="article-reader-meta">Auteur • Date • Source</div>
+              </div>
+              <div class="article-reader-body" id="article-reader-body">
+                <!-- Rendu Markdown injecté dynamiquement -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
     </main>
 
     <!-- ======================================================= -->
@@ -4177,6 +4263,15 @@
             <path d="m15 5 4 4"></path>
           </svg>
           <span>Notes</span>
+        </button>
+        <button class="drawer-tab" data-drawer-tab="articles" title="Articles & Blogs contemporains liés au passage">
+          <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10l6 6v8a2 2 0 0 1-2 2z"></path>
+            <path d="M14 2v6h6"></path>
+            <path d="M7 13h10"></path>
+            <path d="M7 17h6"></path>
+          </svg>
+          <span>Articles</span>
         </button>
       </div>
 
@@ -4447,6 +4542,17 @@
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- Onglet 5: Articles & Blogs contemporains associés au passage -->
+        <div class="drawer-content" id="drawer-tab-articles">
+          <div class="drawer-header-banner" style="padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle, rgba(255,255,255,0.08));">
+            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">Articles contemporains</span>
+            <span class="selected-verse-badge" id="lbl-drawer-articles-passage">Genèse 1</span>
+          </div>
+          <div id="drawer-articles-list" style="flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+            <p class="empty-hint" style="color: var(--text-muted); font-size: 12px;">Sélectionnez un chapitre ou verset pour découvrir les réflexions et articles contemporains associés.</p>
           </div>
         </div>
       </div>
@@ -5538,6 +5644,52 @@
     </div>
 
     <!-- ======================================================= -->
+    <!-- MODALE : SUGGÉRER UN BLOG / FLUX RSS THÉOLOGIQUE        -->
+    <!-- ======================================================= -->
+    <div class="modal-dialog-container hidden" id="modal-suggest-blog">
+      <div class="modal-card" style="max-width: 520px; width: 90%;">
+        <div class="modal-header">
+          <div class="modal-title-with-badge">
+            <svg class="modal-header-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+            <h3 class="modal-title" style="margin: 0; font-size: 1.1rem;">Suggérer un blog ou flux RSS</h3>
+          </div>
+          <button class="modal-close-btn" id="btn-close-suggest-modal" title="Fermer">✕</button>
+        </div>
+
+        <div class="modal-body" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+          <p style="font-size: 0.88rem; color: var(--text-secondary); margin: 0; line-height: 1.5;">
+            Proposez une nouvelle source théologique ou pastorale francophone. Après validation technique du flux et des sélecteurs, elle sera intégrée au catalogue.
+          </p>
+
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary);">Nom du blog ou du site *</label>
+            <input type="text" id="suggest-blog-name" class="text-field full-w" placeholder="Ex: La Réb', Évangile 21, Le Bon Combat..." style="padding: 8px 12px; font-size: 0.9rem;">
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary);">URL du site ou du flux RSS *</label>
+            <input type="url" id="suggest-blog-url" class="text-field full-w" placeholder="Ex: https://lareb.fr ou https://lareb.fr/feed/" style="padding: 8px 12px; font-size: 0.9rem;">
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary);">Pourquoi recommandez-vous cette source ?</label>
+            <textarea id="suggest-blog-reason" class="text-field full-w" placeholder="Ex: Excellentes réflexions pastorales, études bibliques contemporaines..." style="height: 80px; resize: vertical; padding: 8px 12px; font-size: 0.9rem;"></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 14px 20px; border-top: 1px solid var(--border-color); background: var(--bg-subtle);">
+          <button type="button" class="btn-secondary" id="btn-cancel-suggest">Annuler</button>
+          <button type="button" class="btn-primary" id="btn-submit-suggest">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            <span>Envoyer la suggestion</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================= -->
     <!-- MENU CONTEXTUEL STYLE OBSIDIAN (PAGE DE NOTES)           -->
     <!-- ======================================================= -->
     <div id="obsidian-context-menu" class="obsidian-ctx-menu hidden">
@@ -5773,6 +5925,7 @@
   <script src="js/selection_context_menu.js"></script>
   <script src="js/highlighter.js"></script>
   <script src="js/theological_profile_modal.js"></script>
+  <script src="js/articles_view.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

@@ -29,7 +29,8 @@ const App = {
       { name: 'TheologyView', init: () => TheologyView.init() },
       { name: 'SelectionContextMenu', init: () => (typeof SelectionContextMenu !== 'undefined' && SelectionContextMenu.init()) },
       { name: 'TheologicalProfileModal', init: () => (typeof TheologicalProfileModal !== 'undefined' && TheologicalProfileModal.init()) },
-      { name: 'HighlighterManager', init: () => (typeof HighlighterManager !== 'undefined' && HighlighterManager.init()) }
+      { name: 'HighlighterManager', init: () => (typeof HighlighterManager !== 'undefined' && HighlighterManager.init()) },
+      { name: 'ArticlesView', init: () => (typeof ArticlesView !== 'undefined' && ArticlesView.init()) }
     ];
 
     modules.forEach(m => {
@@ -113,6 +114,12 @@ const App = {
             if (passageBadge && typeof BibleReader !== 'undefined') {
               const curRef = BibleReader.currentVerseRef || `${BibleReader.currentBook || 'GEN'} ${BibleReader.currentChapter || 1}:${BibleReader.selectedVerse || 1}`;
               passageBadge.textContent = curRef;
+            }
+          } else if (tabId === 'articles') {
+            const b = (typeof BibleReader !== 'undefined' && BibleReader.currentBook) || 'Gen';
+            const ch = (typeof BibleReader !== 'undefined' && BibleReader.currentChapter) || 1;
+            if (typeof ArticlesView !== 'undefined') {
+              ArticlesView.loadDrawerArticles(b, ch);
             }
           }
         }
@@ -524,6 +531,11 @@ const App = {
       if (drawerEl) drawerEl.classList.add('collapsed');
       if (typeof PassageStudyView !== 'undefined') {
         PassageStudyView.onViewActivated();
+      }
+    } else if (viewName === 'articles') {
+      if (drawerEl) drawerEl.classList.add('collapsed');
+      if (typeof ArticlesView !== 'undefined') {
+        ArticlesView.onViewActivated();
       }
     } else if (viewName === 'ai') {
       if (drawerEl) drawerEl.classList.add('collapsed');

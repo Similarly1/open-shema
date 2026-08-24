@@ -473,19 +473,20 @@ const CommentaryWindow = {
   },
 
   // =========================================================================
-  // 2. ONGLET ASSISTANT IA
+  // 2. ONGLET ASSISTANT IA (CONNECTÉ À LA MÉMOIRE & HISTORIQUE GLOBAL)
   // =========================================================================
+
+  aiSessionId: null,
+  aiMessagesHistory: [],
 
   renderAiChatHeader() {
     const text = document.getElementById('comm-win-passage-text')?.textContent || 'Passage en cours';
-    const chips = document.getElementById('ai-prompt-chips');
-    if (chips) {
-      chips.querySelectorAll('.ai-prompt-chip').forEach(chip => {
-        chip.onclick = () => {
-          this.sendAiMessage(chip.dataset.prompt);
-        };
-      });
-    }
+    const chips = document.querySelectorAll('.ai-prompt-chip');
+    chips.forEach(chip => {
+      chip.onclick = () => {
+        this.sendAiMessage(chip.dataset.prompt);
+      };
+    });
   },
 
   async sendAiMessage(promptText = null) {
@@ -498,23 +499,58 @@ const CommentaryWindow = {
     const messagesStream = document.getElementById('ai-chat-messages');
     if (!messagesStream) return;
 
-    // Bulle utilisateur
+    // 1. Initialiser une session IA si pas encore fait
+    if (!this.aiSessionId) {
+      try {
+        this.aiSessionId = await API.call('create_ai_session', {
+          mode: 'auto',
+          book: this.currentBook,
+          chapter: this.currentChapter,
+          verse: this.currentVerse
+        });
+      } catch (e) {
+        console.warn('Session ID locale fallback:', e);
+      }
+    }
+
+    // 2. Bulle utilisateur
     const userMsg = document.createElement('div');
     userMsg.className = 'ai-msg-bubble user';
     userMsg.textContent = query;
     messagesStream.appendChild(userMsg);
 
-    // Bulle de chargement IA
+    this.aiMessagesHistory.push({ role: 'user', content: query });
+
+    // 3. Bulle de chargement IA
     const aiMsg = document.createElement('div');
     aiMsg.className = 'ai-msg-bubble assistant';
-    aiMsg.innerHTML = '<span class="synth-spinner" style="width: 14px; height: 14px; border-width: 2px; vertical-align: middle; margin-right: 6px;"></span>Analyse théologique en cours...';
+    aiMsg.innerHTML = '<span class="synth-spinner" style="width: 14px; height: 14px; border-width: 2px; vertical-align: middle; margin-right: 6px;"></span>Analyse théologique et exégétique en cours...';
     messagesStream.appendChild(aiMsg);
     messagesStream.scrollTop = messagesStream.scrollHeight;
 
     try {
-      const response = await API.askAI(query, this.currentBook, this.currentChapter, this.currentVerse);
-      const textResult = response?.answer || response?.result || response?.text || (typeof response === 'string' ? response : 'Réponse reçue.');
+      const passageRef = `${this.currentBook} ${this.currentChapter}:${this.currentVerse}`;
+      let response = null;
+      try {
+        response = await API.call('ask_study_ai', this.aiMessagesHistory, 'auto', passageRef, { depth: 'balanced' });
+      } catch (errApi) {
+        response = await API.askAI(query, this.currentBook, this.currentChapter, this.currentVerse);
+      }
+
+      const textResult = response?.answer || response?.result || response?.text || (typeof response === 'string' ? response : 'Réponse générée.');
       aiMsg.innerHTML = this.formatMarkdown(textResult);
+
+      this.aiMessagesHistory.push({
+        role: 'assistant',
+        content: textResult,
+        sources: response?.sources || []
+      });
+
+      // 4. Mémorisation permanente dans l'historique de l'application
+      if (this.aiSessionId) {
+        const sessionTitle = `${this.currentBookFrench} ${this.currentChapter}:${this.currentVerse} — ${query.slice(0, 35)}...`;
+        await API.call('save_ai_messages', this.aiSessionId, this.aiMessagesHistory, sessionTitle);
+      }
     } catch (e) {
       aiMsg.innerHTML = `<span style="color: var(--accent-red, #EF4444);">Erreur lors de la communication avec l'assistant : ${this.escapeHtml(e.message || String(e))}</span>`;
     }
@@ -523,6 +559,8 @@ const CommentaryWindow = {
   },
 
   clearAiChat() {
+    this.aiMessagesHistory = [];
+    this.aiSessionId = null;
     const messagesStream = document.getElementById('ai-chat-messages');
     if (messagesStream) {
       messagesStream.innerHTML = `
@@ -534,15 +572,24 @@ const CommentaryWindow = {
   },
 
   // =========================================================================
-  // 3. ONGLET LEXIQUE STRONG & DICTIONNAIRES
+  // 3. ONGLET LEXIQUE STRONG & DICTIONNAIRES (UN SEUL DICTIONNAIRE À LA FOIS)
   // =========================================================================
+
+  currentLexiconMatches: [],
+  activeLexiconDictIndex: 0,
+  currentLexiconWordTerm: '',
+  currentLexiconWordOrig: '',
+  currentLexiconWordStrong: '',
+  currentLexiconWordTranslit: '',
 
   async loadLexiconForActiveVerse() {
     const wordsFlow = document.getElementById('lex-words-flow');
     const detailEl = document.getElementById('lex-entry-detail');
+    const tabsContainer = document.getElementById('lex-dict-tabs');
     if (!wordsFlow) return;
 
     wordsFlow.innerHTML = '<div style="color: var(--text-secondary); font-size: 13px;"><span class="synth-spinner" style="width: 12px; height: 12px; border-width: 1.5px; vertical-align: middle; margin-right: 6px;"></span>Chargement des racines hébraïques / grecques...</div>';
+    if (tabsContainer) tabsContainer.style.display = 'none';
 
     try {
       const chData = await API.getChapterData('LSG', this.currentBook, this.currentChapter, 'LSG');
@@ -608,7 +655,16 @@ const CommentaryWindow = {
 
   async lookupLexiconEntry(surface, strongCode = null, orig = '', translit = '') {
     const detailEl = document.getElementById('lex-entry-detail');
+    const tabsContainer = document.getElementById('lex-dict-tabs');
     if (!detailEl) return;
+
+    this.currentLexiconWordTerm = surface || orig;
+    this.currentLexiconWordOrig = orig;
+    this.currentLexiconWordStrong = strongCode;
+    this.currentLexiconWordTranslit = translit;
+    this.activeLexiconDictIndex = 0;
+
+    if (tabsContainer) tabsContainer.style.display = 'none';
 
     detailEl.innerHTML = `
       <div style="padding: 24px; color: var(--text-secondary); text-align: center;">
@@ -629,9 +685,10 @@ const CommentaryWindow = {
         entry = await API.call('lookup_dictionary', orig, null);
       }
 
-      const matches = entry?.matches || [];
+      this.currentLexiconMatches = entry?.matches || [];
 
-      if (matches.length === 0) {
+      if (this.currentLexiconMatches.length === 0) {
+        if (tabsContainer) tabsContainer.style.display = 'none';
         detailEl.innerHTML = `
           <div style="padding: 24px; text-align: center; color: var(--text-secondary);">
             <div style="font-size: 15px; font-weight: 700; color: var(--accent-orange); margin-bottom: 4px;">« ${this.escapeHtml(orig || surface)} »</div>
@@ -642,52 +699,175 @@ const CommentaryWindow = {
         return;
       }
 
-      let html = `<div style="display: flex; flex-direction: column; gap: 18px;">`;
-      
-      matches.forEach((m, idx) => {
-        const dictTitle = m.dict_name || m.badge || 'Dictionnaire';
-        const termTitle = m.title || surface || orig;
-        const contentText = m.full_text || m.preview || m.raw_text || '';
-        const formattedContent = this.formatMarkdown(contentText);
+      // Rendre les onglets de sélection de dictionnaire (1 seul actif)
+      if (tabsContainer) {
+        tabsContainer.innerHTML = '';
+        this.currentLexiconMatches.forEach((m, idx) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = `lex-source-pill ${idx === this.activeLexiconDictIndex ? 'active' : ''}`;
+          btn.textContent = m.dict_name || m.badge || 'Dictionnaire';
+          btn.addEventListener('click', () => {
+            this.activeLexiconDictIndex = idx;
+            this.renderActiveLexiconDictionary();
+          });
+          tabsContainer.appendChild(btn);
+        });
+        tabsContainer.style.display = 'flex';
+      }
 
-        html += `
-          <div style="border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.08)); padding-bottom: 16px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-weight: 800; font-size: 16px; color: var(--accent-orange, #F97316);">${this.escapeHtml(termTitle)}</span>
-                ${m.is_polished ? `<span style="font-size: 10px; background: rgba(56, 189, 248, 0.15); color: #38BDF8; padding: 2px 6px; border-radius: 4px;">Restauré IA</span>` : ''}
-              </div>
-              <span style="font-size: 11.5px; font-weight: 600; background: var(--bg-hover, rgba(255, 255, 255, 0.08)); padding: 3px 8px; border-radius: 5px;">${this.escapeHtml(dictTitle)}</span>
-            </div>
-            ${m.strong ? `<div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent-blue, #38BDF8); margin-bottom: 8px;">Code Strong : ${this.escapeHtml(m.strong)}</div>` : ''}
-            <div class="comm-stream-body" style="font-size: 14.5px; line-height: 1.7;">${formattedContent}</div>
-          </div>
-        `;
-      });
+      // Rendre le dictionnaire sélectionné
+      this.renderActiveLexiconDictionary();
 
-      html += `</div>`;
-      detailEl.innerHTML = html;
     } catch (e) {
       console.error('Erreur lookup_dictionary:', e);
       detailEl.innerHTML = `<div style="color: var(--accent-red); padding: 20px; text-align: center;">Erreur lors de la consultation lexicale.</div>`;
     }
   },
 
+  renderActiveLexiconDictionary() {
+    const detailEl = document.getElementById('lex-entry-detail');
+    const tabsContainer = document.getElementById('lex-dict-tabs');
+    if (!detailEl || !this.currentLexiconMatches) return;
+
+    // Mettre à jour l'état actif des boutons onglets
+    if (tabsContainer) {
+      tabsContainer.querySelectorAll('.lex-source-pill').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx === this.activeLexiconDictIndex);
+      });
+    }
+
+    const match = this.currentLexiconMatches[this.activeLexiconDictIndex] || this.currentLexiconMatches[0];
+    if (!match) return;
+
+    const dictTitle = match.dict_name || match.badge || 'Dictionnaire';
+    const termTitle = match.title || this.currentLexiconWordTerm;
+    const contentText = match.full_text || match.preview || match.raw_text || '';
+    const formattedContent = this.formatMarkdown(contentText);
+    const origBadge = this.currentLexiconWordOrig ? `<span style="font-family: 'Cardo', serif; font-size: 15px; color: var(--accent-orange); margin-left: 6px;">[${this.escapeHtml(this.currentLexiconWordOrig)}]</span>` : '';
+
+    detailEl.innerHTML = `
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.08)); flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-weight: 800; font-size: 17px; color: var(--accent-orange, #F97316);">${this.escapeHtml(termTitle)}</span>
+            ${origBadge}
+            ${match.is_polished ? `<span style="font-size: 10px; background: rgba(56, 189, 248, 0.15); color: #38BDF8; padding: 2px 6px; border-radius: 4px;">Restauré IA</span>` : ''}
+          </div>
+          <span style="font-size: 11.5px; font-weight: 600; background: var(--bg-hover, rgba(255, 255, 255, 0.08)); padding: 4px 10px; border-radius: 6px;">${this.escapeHtml(dictTitle)}</span>
+        </div>
+
+        ${match.strong || this.currentLexiconWordStrong ? `
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent-blue, #38BDF8); background: rgba(56, 189, 248, 0.08); padding: 4px 8px; border-radius: 4px; display: inline-block;">
+            Code Strong : ${this.escapeHtml(match.strong || this.currentLexiconWordStrong)}
+          </div>
+        ` : ''}
+
+        <div class="comm-stream-body" style="font-size: 15px; line-height: 1.75; padding-top: 4px;">
+          ${formattedContent}
+        </div>
+      </div>
+    `;
+  },
+
   // =========================================================================
-  // 4. ONGLET NOTES D'ÉTUDE
+  // 4. ONGLET NOTES D'ÉTUDE (BARRE D'OUTILS MARKDOWN & APERÇU RENDU DIRECT)
   // =========================================================================
+
+  notesViewMode: 'edit',
 
   loadNotesForActiveVerse() {
     const key = `note_${this.currentBook}_${this.currentChapter}_${this.currentVerse}`;
     const textarea = document.getElementById('note-editor-textarea');
+    const refLabel = document.getElementById('lbl-note-current-ref');
+    
+    if (refLabel) {
+      refLabel.textContent = `${this.currentBookFrench} ${this.currentChapter}:${this.currentVerse}`;
+    }
+
     if (!textarea) return;
 
     try {
       const savedNote = localStorage.getItem(key) || '';
       textarea.value = savedNote;
+      this.updateNotePreview();
     } catch (e) {
       textarea.value = '';
     }
+  },
+
+  updateNotePreview() {
+    const textarea = document.getElementById('note-editor-textarea');
+    const preview = document.getElementById('note-preview-content');
+    if (!textarea || !preview) return;
+
+    const raw = textarea.value.trim();
+    if (!raw) {
+      preview.innerHTML = '<div style="color: var(--text-secondary); font-style: italic; padding: 20px 0;">Note vide. Utilisez la barre d\'outils ou le mode Édition pour rédiger.</div>';
+    } else {
+      preview.innerHTML = this.formatMarkdown(raw);
+    }
+  },
+
+  setNoteViewMode(mode) {
+    this.notesViewMode = mode;
+    const textarea = document.getElementById('note-editor-textarea');
+    const preview = document.getElementById('note-preview-content');
+    const btnEdit = document.getElementById('btn-note-mode-edit');
+    const btnPrev = document.getElementById('btn-note-mode-preview');
+
+    if (mode === 'preview') {
+      this.updateNotePreview();
+      textarea?.classList.add('hidden');
+      preview?.classList.remove('hidden');
+      btnEdit?.classList.remove('active');
+      btnPrev?.classList.add('active');
+    } else {
+      preview?.classList.add('hidden');
+      textarea?.classList.remove('hidden');
+      btnPrev?.classList.remove('active');
+      btnEdit?.classList.add('active');
+      textarea?.focus();
+    }
+  },
+
+  applyNoteFormatting(prefix, suffix, placeholder = '') {
+    const textarea = document.getElementById('note-editor-textarea');
+    if (!textarea) return;
+
+    this.setNoteViewMode('edit');
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const value = textarea.value;
+    const selected = value.substring(start, end) || placeholder;
+
+    const replacement = prefix + selected + suffix;
+    textarea.value = value.substring(0, start) + replacement + value.substring(end);
+
+    textarea.focus();
+    textarea.selectionStart = start + prefix.length;
+    textarea.selectionEnd = start + prefix.length + selected.length;
+
+    this.saveCurrentNote();
+    this.updateNotePreview();
+  },
+
+  insertActiveVerseIntoNote() {
+    const textarea = document.getElementById('note-editor-textarea');
+    if (!textarea) return;
+
+    const verseText = this.currentVerseData?.text || '';
+    const quote = `\n> **${this.currentBookFrench} ${this.currentChapter}:${this.currentVerse}** : « ${verseText} »\n\n`;
+
+    this.setNoteViewMode('edit');
+    const start = textarea.selectionStart;
+    const value = textarea.value;
+    textarea.value = value.substring(0, start) + quote + value.substring(start);
+
+    textarea.focus();
+    this.saveCurrentNote();
+    this.updateNotePreview();
   },
 
   saveCurrentNote() {
@@ -697,6 +877,16 @@ const CommentaryWindow = {
 
     try {
       localStorage.setItem(key, textarea.value);
+      
+      // Enregistrement synchronisé vers le backend si supporté
+      try {
+        API.call('save_note', {
+          title: `Note ${this.currentBookFrench} ${this.currentChapter}:${this.currentVerse}`,
+          content: textarea.value,
+          reference: `${this.currentBook} ${this.currentChapter}:${this.currentVerse}`
+        });
+      } catch (e) {}
+
       const saveBtn = document.getElementById('btn-save-note');
       if (saveBtn) {
         saveBtn.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>Enregistré !</span>';
@@ -710,7 +900,7 @@ const CommentaryWindow = {
   },
 
   // =========================================================================
-  // ÉVÉNEMENTS & TRADUCTION
+  // ÉVÉNEMENTS, FORMATAGE & MENU CONTEXTUEL CLIC DROIT
   // =========================================================================
 
   bindEvents() {
@@ -733,8 +923,22 @@ const CommentaryWindow = {
     });
     document.getElementById('btn-clear-ai-chat')?.addEventListener('click', () => this.clearAiChat());
 
-    // 3. Notes Save
+    // 3. Notes : Outils de mise en forme & Mode
     document.getElementById('btn-save-note')?.addEventListener('click', () => this.saveCurrentNote());
+    document.getElementById('btn-format-bold')?.addEventListener('click', () => this.applyNoteFormatting('**', '**', 'texte en gras'));
+    document.getElementById('btn-format-italic')?.addEventListener('click', () => this.applyNoteFormatting('*', '*', 'texte en italique'));
+    document.getElementById('btn-format-h2')?.addEventListener('click', () => this.applyNoteFormatting('## ', '\n', 'Titre de section'));
+    document.getElementById('btn-format-ul')?.addEventListener('click', () => this.applyNoteFormatting('- ', '\n', 'Élément de liste'));
+    document.getElementById('btn-format-quote')?.addEventListener('click', () => this.applyNoteFormatting('> ', '\n', 'Citation'));
+    document.getElementById('btn-format-verse')?.addEventListener('click', () => this.insertActiveVerseIntoNote());
+
+    document.getElementById('btn-note-mode-edit')?.addEventListener('click', () => this.setNoteViewMode('edit'));
+    document.getElementById('btn-note-mode-preview')?.addEventListener('click', () => this.setNoteViewMode('preview'));
+
+    document.getElementById('note-editor-textarea')?.addEventListener('input', () => {
+      this.updateNotePreview();
+      this.saveCurrentNote();
+    });
 
     // 4. Popover Auteurs
     const btnAuthor = document.getElementById('btn-author-filter');
@@ -764,6 +968,36 @@ const CommentaryWindow = {
         popoverDisplay.classList.add('hidden');
       }
     });
+
+    // 6. Initialisation Menu Contextuel Clic Droit Universel
+    if (typeof SelectionContextMenu !== 'undefined') {
+      SelectionContextMenu.init();
+
+      // Relier "Demander à l'IA" à l'onglet IA de la fenêtre
+      SelectionContextMenu.openAiWithSelection = (text, ctx) => {
+        this.switchTab('ai');
+        const chatInput = document.getElementById('ai-chat-input');
+        if (chatInput) {
+          chatInput.value = `Explique et commente ce passage : "${text}"`;
+          chatInput.focus();
+        }
+        window.App?.showToast("Passage envoyé à l'Assistant IA");
+      };
+
+      // Relier "Créer une note" à l'onglet Notes de la fenêtre
+      SelectionContextMenu.createNoteFromSelection = (text, ctx) => {
+        this.switchTab('notes');
+        const textarea = document.getElementById('note-editor-textarea');
+        if (textarea) {
+          const quote = `\n> ${text.split('\n').join('\n> ')}\n\n`;
+          textarea.value = (textarea.value ? textarea.value + '\n' : '') + quote;
+          this.saveCurrentNote();
+          this.updateNotePreview();
+          textarea.focus();
+        }
+        window.App?.showToast("Citation ajoutée aux notes");
+      };
+    }
 
     // 6. Options d'affichage (Zoom, Police, Fond)
     document.getElementById('btn-zoom-in')?.addEventListener('click', () => this.adjustZoom(10));

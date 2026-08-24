@@ -3094,6 +3094,121 @@ class BibleAppApi:
             logger.error(f"Erreur API get_biblical_itineraries: {e}")
             return []
 
+    # =========================================================================
+    # 8. ARTICLES & BLOGS THÉOLOGIQUES
+    # =========================================================================
+
+    def get_articles(
+        self,
+        source_id: Optional[str] = None,
+        book_code: Optional[str] = None,
+        chapter: Optional[int] = None,
+        search_query: Optional[str] = None,
+        limit: int = 50,
+        offset: int = 0
+    ) -> List[Dict[str, Any]]:
+        """Retourne la liste paginée et filtrée des articles contemporains."""
+        try:
+            from core.articles_manager import ArticlesManager
+            manager = ArticlesManager.get_instance()
+            return manager.get_articles(
+                source_id=source_id,
+                book_code=book_code,
+                chapter=chapter,
+                search_query=search_query,
+                limit=limit,
+                offset=offset
+            )
+        except Exception as e:
+            logger.error(f"Erreur API get_articles: {e}")
+            return []
+
+    def get_article_content(self, article_id: str) -> Dict[str, Any]:
+        """Retourne les détails et le texte complet Markdown d'un article."""
+        try:
+            from core.articles_manager import ArticlesManager
+            manager = ArticlesManager.get_instance()
+            art = manager.db.get_article_by_id(article_id)
+            if not art:
+                return {"success": False, "error": "Article introuvable."}
+            
+            md_content = manager.get_article_markdown(article_id)
+            return {
+                "success": True,
+                "article": art,
+                "content_markdown": md_content or art.get("summary", "")
+            }
+        except Exception as e:
+            logger.error(f"Erreur API get_article_content: {e}")
+            return {"success": False, "error": str(e)}
+
+    def get_article_sources(self) -> List[Dict[str, Any]]:
+        """Retourne la liste des sources de blogs avec le décompte d'articles."""
+        try:
+            from core.articles_manager import ArticlesManager
+            manager = ArticlesManager.get_instance()
+            return manager.get_sources(enabled_only=False)
+        except Exception as e:
+            logger.error(f"Erreur API get_article_sources: {e}")
+            return []
+
+    def toggle_article_source(self, source_id: str, is_enabled: bool) -> Dict[str, Any]:
+        """Active ou désactive une source de blog."""
+        try:
+            from core.articles_manager import ArticlesManager
+            manager = ArticlesManager.get_instance()
+            manager.toggle_source(source_id, is_enabled)
+            return {"success": True, "source_id": source_id, "is_enabled": is_enabled}
+        except Exception as e:
+            logger.error(f"Erreur API toggle_article_source: {e}")
+            return {"success": False, "error": str(e)}
+
+    def sync_article_sources(self, source_id: Optional[str] = None) -> Dict[str, Any]:
+        """Déclenche la synchronisation des flux RSS de blogs."""
+        try:
+            from core.articles_manager import ArticlesManager
+            manager = ArticlesManager.get_instance()
+            
+            if source_id:
+                new_count = manager.sync_source(source_id)
+                results = {source_id: new_count}
+            else:
+                results = manager.sync_all_active_sources()
+
+            stats = manager.db.get_stats()
+            return {
+                "success": True,
+                "results": results,
+                "total_new": sum(results.values()),
+                "stats": stats
+            }
+        except Exception as e:
+            logger.error(f"Erreur API sync_article_sources: {e}")
+            return {"success": False, "error": str(e)}
+
+    def get_articles_for_passage(self, book_code: str, chapter: int, limit: int = 10) -> List[Dict[str, Any]]:
+        """Retourne les articles liés à un chapitre biblique spécifique."""
+        try:
+            from core.articles_manager import ArticlesManager
+            manager = ArticlesManager.get_instance()
+            return manager.get_articles_for_passage(book_code=book_code, chapter=chapter, limit=limit)
+        except Exception as e:
+            logger.error(f"Erreur API get_articles_for_passage: {e}")
+            return []
+
+    def get_article_suggestion_url(self, blog_name: str = "", blog_url: str = "", notes: str = "") -> Dict[str, Any]:
+        """Génère le lien mailto pour proposer une nouvelle source."""
+        try:
+            from core.articles_manager import ArticlesManager
+            url = ArticlesManager.get_suggestion_mailto_link(
+                blog_name=blog_name,
+                blog_url=blog_url,
+                notes=notes
+            )
+            return {"success": True, "mailto_url": url}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
 
 
 # Helpers Win32 pour gestion fluide de l'espace de travail (WorkArea) sans bordure

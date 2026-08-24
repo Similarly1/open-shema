@@ -1,0 +1,27 @@
+[
+  {
+    "id": "tpsg",
+    "name": "Tout Pour Sa Gloire",
+    "website_url": "https://toutpoursagloire.com",
+    "feed_url": "https://toutpoursagloire.com/feed/",
+    "category": "pastoral_contemporain",
+    "description": "Articles, réflexions et ressources pour voir le monde à travers la Bible.",
+    "enabled_by_default": true,
+    "selectors": {
+      "content": ".entry-content, article .content, .post-content",
+      "author": ".author-name, .entry-author, .author a, .post-author",
+      "excludes": [
+        ".sharedaddy",
+        ".jp-relatedposts",
+        ".newsletter-box",
+        ".social-share",
+        "nav.post-navigation",
+        ".comments-area",
+        ".elevenlabs-player",
+        "#audionative",
+        ".audionative-player",
+        ".wp-block-audio"
+      ]
+    }
+  }
+]
