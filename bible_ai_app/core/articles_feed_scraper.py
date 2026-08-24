@@ -79,6 +79,10 @@ class ArticlesFeedScraper:
                         if author:
                             break
 
+                if "@" in author:
+                    user_part = author.split("@")[0].replace(".", " ").title()
+                    author = user_part
+
                 pub_date_raw = item.findtext("pubDate") or item.findtext("date") or ""
                 pub_date_str = self._normalize_date(pub_date_raw)
 

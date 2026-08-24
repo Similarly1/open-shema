@@ -11,14 +11,13 @@ const ArticlesView = {
   sources: [],
   isSyncing: false,
 
-  // Préférences de lecture personnalisées (mémorisées en local)
+  // Préférences de lecture harmonisées avec Open Shema
   readingOpts: {
     bg: 'auto',
     fontFamily: 'EB Garamond',
     fontSize: 18,
-    width: 'normal',
-    align: 'left',
-    lineHeight: '1.8'
+    isFullWidth: false,
+    isJustified: false
   },
 
   init() {
@@ -60,6 +59,22 @@ const ArticlesView = {
       this.syncArticles();
     });
 
+    // 2b. Bouton Réglages RAG (raccourci vers les paramètres)
+    document.getElementById('btn-articles-settings')?.addEventListener('click', () => {
+      if (typeof App !== 'undefined' && App.switchView) {
+        App.switchView('settings');
+        setTimeout(() => {
+          const el = document.getElementById('sec-articles-rag-settings');
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.style.transition = 'box-shadow 0.3s ease';
+            el.style.boxShadow = '0 0 0 2px var(--accent-primary, #3b82f6)';
+            setTimeout(() => { el.style.boxShadow = ''; }, 1500);
+          }
+        }, 120);
+      }
+    });
+
     // 3. Bouton Suggérer un blog (ouvre la modale)
     document.getElementById('btn-suggest-blog')?.addEventListener('click', () => {
       this.openSuggestModal();
@@ -81,7 +96,7 @@ const ArticlesView = {
       this.closeArticleReader();
     });
 
-    // 5. Options de lecture (Popover)
+    // 5. Options d'Affichage & Lecture (Popover standard Open Shema)
     const btnReadingOpts = document.getElementById('btn-article-reading-options');
     const popoverOpts = document.getElementById('article-reading-options-popover');
     
@@ -92,7 +107,7 @@ const ArticlesView = {
 
     // Fermer le popover au clic en dehors
     document.addEventListener('click', (e) => {
-      if (popoverOpts && !popoverOpts.classList.contains('hidden') && !popoverOpts.contains(e.target) && e.target !== btnReadingOpts) {
+      if (popoverOpts && !popoverOpts.classList.contains('hidden') && !popoverOpts.contains(e.target) && !btnReadingOpts?.contains(e.target)) {
         popoverOpts.classList.add('hidden');
       }
     });
@@ -105,26 +120,18 @@ const ArticlesView = {
     const popover = document.getElementById('article-reading-options-popover');
     if (!popover) return;
 
-    // Ambiance / Fond
-    popover.querySelectorAll('.reading-opt-swatch').forEach(sw => {
-      sw.addEventListener('click', () => {
-        popover.querySelectorAll('.reading-opt-swatch').forEach(s => s.classList.remove('active'));
-        sw.classList.add('active');
-        this.readingOpts.bg = sw.dataset.bg || 'auto';
+    // 1. Choix de Police (Boutons style Open Shema)
+    popover.querySelectorAll('.article-font-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        popover.querySelectorAll('.article-font-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.readingOpts.fontFamily = btn.dataset.font || 'EB Garamond';
         this.saveReadingPreferences();
         this.applyReadingOptions();
       });
     });
 
-    // Police
-    const fontSelect = document.getElementById('article-opt-font');
-    fontSelect?.addEventListener('change', (e) => {
-      this.readingOpts.fontFamily = e.target.value;
-      this.saveReadingPreferences();
-      this.applyReadingOptions();
-    });
-
-    // Taille de police
+    // 2. Taille de police (A- / A+)
     document.getElementById('btn-article-font-dec')?.addEventListener('click', () => {
       if (this.readingOpts.fontSize > 13) {
         this.readingOpts.fontSize -= 1;
@@ -141,37 +148,30 @@ const ArticlesView = {
       }
     });
 
-    // Largeur
-    popover.querySelectorAll('[data-width]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        popover.querySelectorAll('[data-width]').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        this.readingOpts.width = btn.dataset.width;
+    // 3. Fond de lecture (Swatches style Open Shema)
+    popover.querySelectorAll('.article-bg-swatch').forEach(sw => {
+      sw.addEventListener('click', () => {
+        popover.querySelectorAll('.article-bg-swatch').forEach(s => s.classList.remove('active'));
+        sw.classList.add('active');
+        this.readingOpts.bg = sw.dataset.bg || 'auto';
         this.saveReadingPreferences();
         this.applyReadingOptions();
       });
     });
 
-    // Alignement
-    popover.querySelectorAll('[data-align]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        popover.querySelectorAll('[data-align]').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        this.readingOpts.align = btn.dataset.align;
-        this.saveReadingPreferences();
-        this.applyReadingOptions();
-      });
+    // 4. Pleine largeur & Justifié
+    const chkFullWidth = document.getElementById('article-opt-full-width');
+    chkFullWidth?.addEventListener('change', (e) => {
+      this.readingOpts.isFullWidth = e.target.checked;
+      this.saveReadingPreferences();
+      this.applyReadingOptions();
     });
 
-    // Interligne
-    popover.querySelectorAll('[data-line-height]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        popover.querySelectorAll('[data-line-height]').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        this.readingOpts.lineHeight = btn.dataset.lineHeight;
-        this.saveReadingPreferences();
-        this.applyReadingOptions();
-      });
+    const chkJustify = document.getElementById('article-opt-justify');
+    chkJustify?.addEventListener('change', (e) => {
+      this.readingOpts.isJustified = e.target.checked;
+      this.saveReadingPreferences();
+      this.applyReadingOptions();
     });
   },
 
@@ -180,8 +180,8 @@ const ArticlesView = {
     const popover = document.getElementById('article-reading-options-popover');
     if (!container) return;
 
-    // 1. Fond
-    container.classList.remove('reading-bg-white', 'reading-bg-sepia', 'reading-bg-dark', 'reading-bg-oled');
+    // 1. Fond de lecture
+    container.classList.remove('reading-bg-white', 'reading-bg-sepia', 'reading-bg-dark');
     if (this.readingOpts.bg !== 'auto') {
       container.classList.add(`reading-bg-${this.readingOpts.bg}`);
     }
@@ -204,35 +204,24 @@ const ArticlesView = {
     }
 
     // 4. Largeur
-    container.classList.remove('width-narrow', 'width-normal', 'width-wide');
-    container.classList.add(`width-${this.readingOpts.width || 'normal'}`);
+    container.classList.toggle('is-full-width', !!this.readingOpts.isFullWidth);
 
-    // 5. Alignement
-    container.classList.remove('align-left', 'align-justify');
-    container.classList.add(`align-${this.readingOpts.align || 'left'}`);
-
-    // 6. Interligne
-    if (bodyEl) {
-      bodyEl.style.lineHeight = this.readingOpts.lineHeight || '1.8';
-    }
+    // 5. Justifié
+    container.classList.toggle('is-justified', !!this.readingOpts.isJustified);
 
     // Synchroniser l'état visuel du popover
     if (popover) {
-      popover.querySelectorAll('.reading-opt-swatch').forEach(sw => {
+      popover.querySelectorAll('.article-font-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.font === this.readingOpts.fontFamily);
+      });
+      popover.querySelectorAll('.article-bg-swatch').forEach(sw => {
         sw.classList.toggle('active', sw.dataset.bg === this.readingOpts.bg);
       });
-      const fontSelect = document.getElementById('article-opt-font');
-      if (fontSelect) fontSelect.value = this.readingOpts.fontFamily;
+      const chkFull = document.getElementById('article-opt-full-width');
+      if (chkFull) chkFull.checked = !!this.readingOpts.isFullWidth;
 
-      popover.querySelectorAll('[data-width]').forEach(b => {
-        b.classList.toggle('active', b.dataset.width === this.readingOpts.width);
-      });
-      popover.querySelectorAll('[data-align]').forEach(b => {
-        b.classList.toggle('active', b.dataset.align === this.readingOpts.align);
-      });
-      popover.querySelectorAll('[data-line-height]').forEach(b => {
-        b.classList.toggle('active', b.dataset.lineHeight === this.readingOpts.lineHeight);
-      });
+      const chkJust = document.getElementById('article-opt-justify');
+      if (chkJust) chkJust.checked = !!this.readingOpts.isJustified;
     }
   },
 
@@ -294,6 +283,23 @@ const ArticlesView = {
     return colors[sourceId] || '#8B5CF6';
   },
 
+  formatAuthor(rawAuthor) {
+    if (!rawAuthor) return 'Auteur inconnu';
+    if (rawAuthor.includes('@')) {
+      const user = rawAuthor.split('@')[0].replace('.', ' ');
+      return user.charAt(0).toUpperCase() + user.slice(1);
+    }
+    return rawAuthor;
+  },
+
+  filterMainCategories(tagsList) {
+    if (!tagsList || tagsList.length === 0) return [];
+    // Prioriser les catégories majeures (débutant par une majuscule) et limiter à 4 max
+    const uppercaseTags = tagsList.filter(t => t && t[0] === t[0].toUpperCase());
+    const result = uppercaseTags.length > 0 ? uppercaseTags : tagsList;
+    return result.slice(0, 4);
+  },
+
   async loadArticles() {
     const listContainer = document.getElementById('articles-grid-container');
     const emptyContainer = document.getElementById('articles-empty-state');
@@ -332,14 +338,15 @@ const ArticlesView = {
     articles.forEach(art => {
       const color = this.getSourceColor(art.source_id);
       const pubDate = this.formatDate(art.published_at);
+      const author = this.formatAuthor(art.author);
       const refs = art.scripture_references || [];
-      const tags = art.tags_list || [];
+      const mainTags = this.filterMainCategories(art.tags_list || []);
 
       let tagsHtml = '';
-      if (tags.length > 0) {
+      if (mainTags.length > 0) {
         tagsHtml = `
           <div class="article-card-tags">
-            ${tags.slice(0, 3).map(t => `<span class="article-topic-tag" data-tag="${this.escapeHtml(t)}">${this.escapeHtml(t)}</span>`).join('')}
+            ${mainTags.map(t => `<span class="article-topic-tag" data-tag="${this.escapeHtml(t)}">${this.escapeHtml(t)}</span>`).join('')}
           </div>
         `;
       }
@@ -361,7 +368,7 @@ const ArticlesView = {
       html += `
         <div class="article-card" data-article-id="${art.id}">
           <div class="article-card-header">
-            <span class="article-source-badge" style="background-color: ${color}20; color: ${color}; border: 1px solid ${color}40;">
+            <span class="article-source-badge" style="background-color: ${color}18; color: ${color}; border: 1px solid ${color}35;">
               ${this.escapeHtml(art.source_name || art.source_id)}
             </span>
             <span class="article-pub-date">${pubDate}</span>
@@ -372,7 +379,7 @@ const ArticlesView = {
           ${tagsHtml}
 
           <div class="article-card-author">
-            Par <strong>${this.escapeHtml(art.author || 'Auteur inconnu')}</strong>
+            Par <strong>${this.escapeHtml(author)}</strong>
           </div>
 
           <p class="article-card-summary">${this.escapeHtml(art.summary || 'Cliquez pour lire l\'intégralité de cet article...')}</p>
@@ -444,13 +451,15 @@ const ArticlesView = {
       }
 
       const art = res.article;
+      const author = this.formatAuthor(art.author);
+
       if (titleEl) titleEl.textContent = art.title;
 
-      // Affichage des tags / badges sous le titre
-      const tags = art.tags_list || [];
+      // Affichage des catégories majeures en 1 ligne horizontale
+      const mainTags = this.filterMainCategories(art.tags_list || []);
       if (tagsEl) {
-        if (tags.length > 0) {
-          tagsEl.innerHTML = tags.map(t => `<span class="article-topic-tag" data-tag="${this.escapeHtml(t)}">${this.escapeHtml(t)}</span>`).join('');
+        if (mainTags.length > 0) {
+          tagsEl.innerHTML = mainTags.map(t => `<span class="article-topic-tag" data-tag="${this.escapeHtml(t)}">${this.escapeHtml(t)}</span>`).join('');
           tagsEl.classList.remove('hidden');
 
           tagsEl.querySelectorAll('.article-topic-tag').forEach(tagBtn => {
@@ -472,7 +481,7 @@ const ArticlesView = {
       if (metaEl) {
         metaEl.innerHTML = `
           <span>Source : <strong>${this.escapeHtml(art.source_name)}</strong></span> • 
-          <span>Auteur : <strong>${this.escapeHtml(art.author || 'Anonyme')}</strong></span> • 
+          <span>Auteur : <strong>${this.escapeHtml(author)}</strong></span> • 
           <span>Publié le : <strong>${this.formatDate(art.published_at)}</strong></span>
         `;
       }
@@ -694,10 +703,11 @@ const ArticlesView = {
       let html = '';
       articles.forEach(art => {
         const color = this.getSourceColor(art.source_id);
+        const author = this.formatAuthor(art.author);
         html += `
-          <div class="article-card" style="padding: 12px 14px; margin-bottom: 8px;" data-article-id="${art.id}">
+          <div class="article-card" style="padding: 14px; margin-bottom: 8px;" data-article-id="${art.id}">
             <div class="article-card-header" style="margin-bottom: 6px;">
-              <span class="article-source-badge" style="background-color: ${color}20; color: ${color}; border: 1px solid ${color}40; font-size: 10px;">
+              <span class="article-source-badge" style="background-color: ${color}18; color: ${color}; border: 1px solid ${color}35; font-size: 10px;">
                 ${this.escapeHtml(art.source_name || art.source_id)}
               </span>
               <span class="article-pub-date" style="font-size: 10px;">${this.formatDate(art.published_at)}</span>
@@ -706,7 +716,7 @@ const ArticlesView = {
               ${this.escapeHtml(art.title)}
             </h4>
             <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 6px;">
-              Par ${this.escapeHtml(art.author || 'Auteur')}
+              Par ${this.escapeHtml(author)}
             </div>
             <p style="font-size: 11.5px; color: var(--text-muted); margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
               ${this.escapeHtml(art.summary || '')}

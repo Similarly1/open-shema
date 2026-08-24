@@ -2393,7 +2393,7 @@
                 </div>
 
                 <!-- CARTE VECTORISATION DES ARTICLES & BLOGS (RAG) -->
-                <div class="settings-card" style="margin-top: 16px;">
+                <div class="settings-card" id="sec-articles-rag-settings" style="margin-top: 16px;">
                   <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-primary, #3b82f6);"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10l6 6v8a2 2 0 0 1-2 2z"></path><path d="M14 2v6h6"></path></svg>
                     <span>Articles &amp; Blogs contemporains (RAG &amp; Vectorisation)</span>
@@ -2403,9 +2403,9 @@
                   <div class="form-group">
                     <label for="cfg-articles-vec-mode">Stratégie de vectorisation :</label>
                     <select id="cfg-articles-vec-mode" class="select-field full-w" style="height: 38px;">
-                      <option value="balanced">⚡ Équilibré (Recommandé) — 10 articles récents de chaque flux + articles lus</option>
-                      <option value="economical">🌱 Économe — Uniquement les articles ouverts pour lecture ou mis en favoris</option>
-                      <option value="full">📚 Intégral — Vectorisation automatique de tous les articles en tâche de fond</option>
+                      <option value="balanced">Équilibré (Recommandé) — 10 articles récents de chaque flux + articles lus</option>
+                      <option value="economical">Économe — Uniquement les articles ouverts pour lecture ou mis en favoris</option>
+                      <option value="full">Intégral — Vectorisation automatique de tous les articles en tâche de fond</option>
                     </select>
                     <p class="field-hint" style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">
                       Le mode équilibré permet à l'IA d'avoir immédiatement accès aux thèmes théologiques récents sans aucun ralentissement.
@@ -4190,12 +4190,19 @@
                 <p class="articles-sub-title">Méditations pastorales, études contemporaines et réflexions éthiques reliées aux Écritures</p>
               </div>
               <div class="articles-header-actions">
+                <button class="btn-articles-action" id="btn-articles-settings" title="Configurer les options d'indexation et de vectorisation RAG">
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                  </svg>
+                  <span>Réglages RAG</span>
+                </button>
                 <button class="btn-articles-action" id="btn-suggest-blog" title="Proposer un nouveau blog théologique">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                   <span>Suggérer une source</span>
                 </button>
                 <button class="btn-articles-action btn-articles-primary" id="btn-sync-articles" title="Synchroniser les derniers articles des flux RSS">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
                   <span>Synchroniser</span>
                 </button>
               </div>
@@ -4239,101 +4246,97 @@
                   <span id="article-stats-text">0 min • 0 mots</span>
                 </span>
 
-                <button class="btn-articles-action" id="btn-article-reading-options" title="Options de mise en page et lecture">
-                  <span style="font-family: serif; font-weight: 700; font-size: 15px;">Aa</span>
-                  <span>Lecture</span>
-                </button>
+                <div style="position: relative;">
+                  <button class="btn-articles-action" id="btn-article-reading-options" title="Options de lecture (Police, fond, taille, largeur)">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span>Affichage</span>
+                    <span class="pill-arrow">▾</span>
+                  </button>
+
+                  <div id="article-reading-options-popover" class="reader-dropdown-popover popover-align-right hidden" style="position: absolute; top: 38px; right: 0; left: auto !important; width: 310px; max-width: calc(100vw - 20px); padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); border-radius: 8px; z-index: 1200; text-align: left;">
+                    
+                    <!-- 1. Choix de Police Sérif / Sans-Sérif -->
+                    <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
+                      Police de Caractères
+                    </div>
+                    <div class="comm-font-toggle-group" style="display: flex; gap: 6px; margin-bottom: 12px;">
+                      <button type="button" class="comm-font-choice-btn article-font-btn active" data-font="EB Garamond" style="flex: 1; padding: 6px 4px; font-family: 'EB Garamond', serif; font-size: 13px; text-align: center; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); cursor: pointer;">
+                        Sérif
+                        <div style="font-size: 9.5px; opacity: 0.7; font-family: sans-serif;">Garamond</div>
+                      </button>
+                      <button type="button" class="comm-font-choice-btn article-font-btn" data-font="Georgia" style="flex: 1; padding: 6px 4px; font-family: Georgia, serif; font-size: 13px; text-align: center; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); cursor: pointer;">
+                        Sérif
+                        <div style="font-size: 9.5px; opacity: 0.7; font-family: sans-serif;">Georgia</div>
+                      </button>
+                      <button type="button" class="comm-font-choice-btn article-font-btn" data-font="Inter" style="flex: 1; padding: 6px 4px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; text-align: center; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); cursor: pointer;">
+                        Sans-Sérif
+                        <div style="font-size: 9.5px; opacity: 0.7; font-family: sans-serif;">Inter</div>
+                      </button>
+                    </div>
+
+                    <!-- 2. Taille du texte -->
+                    <div style="border-top: 1px solid var(--border-color); margin: 10px 0 6px 0; padding-top: 10px;">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Taille du texte</span>
+                        <span id="lbl-article-font-size" style="font-size: 11.5px; font-weight: 600; color: var(--text-primary);">18 px</span>
+                      </div>
+                      <div style="display: flex; gap: 8px; align-items: center;">
+                        <button type="button" class="btn-secondary btn-sm" id="btn-article-font-dec" style="padding: 4px 10px; font-weight: 700;">A−</button>
+                        <button type="button" class="btn-secondary btn-sm" id="btn-article-font-inc" style="padding: 4px 10px; font-weight: 700;">A+</button>
+                      </div>
+                    </div>
+
+                    <!-- 3. Fond de Lecture -->
+                    <div style="border-top: 1px solid var(--border-color); margin: 10px 0 6px 0; padding-top: 10px;">
+                      <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
+                        Fond de Lecture
+                      </div>
+                      <div class="reading-bg-quick-row">
+                        <button type="button" class="reading-bg-quick-swatch article-bg-swatch active" data-bg="auto" title="Harmonisé avec le thème (Auto)">
+                          <div class="quick-swatch-circle swatch-auto">
+                            <span class="quick-swatch-check">✓</span>
+                          </div>
+                          <span class="quick-swatch-label">Auto</span>
+                        </button>
+                        <button type="button" class="reading-bg-quick-swatch article-bg-swatch" data-bg="white" title="Blanc pur">
+                          <div class="quick-swatch-circle swatch-white">
+                            <span class="quick-swatch-check">✓</span>
+                          </div>
+                          <span class="quick-swatch-label">Blanc</span>
+                        </button>
+                        <button type="button" class="reading-bg-quick-swatch article-bg-swatch" data-bg="sepia" title="Sépia doux">
+                          <div class="quick-swatch-circle swatch-sepia">
+                            <span class="quick-swatch-check">✓</span>
+                          </div>
+                          <span class="quick-swatch-label">Sépia</span>
+                        </button>
+                        <button type="button" class="reading-bg-quick-swatch article-bg-swatch" data-bg="dark" title="Très sombre / Nuit">
+                          <div class="quick-swatch-circle swatch-dark">
+                            <span class="quick-swatch-check">✓</span>
+                          </div>
+                          <span class="quick-swatch-label">Nuit</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- 4. Options d'alignement & Largeur -->
+                    <div style="border-top: 1px solid var(--border-color); margin: 10px 0 4px 0; padding-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+                      <label class="custom-checkbox" style="font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="article-opt-full-width">
+                        <span>Pleine largeur (texte étendu)</span>
+                      </label>
+                      <label class="custom-checkbox" style="font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="article-opt-justify">
+                        <span>Texte justifié</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
 
                 <a href="#" id="article-reader-external-link" class="btn-articles-action" target="_blank" title="Ouvrir la page originale sur le site">
                   <span>Site d'origine</span>
                   <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                 </a>
-              </div>
-
-              <!-- Popover des Options de Lecture -->
-              <div class="article-reading-options-popover hidden" id="article-reading-options-popover">
-                <div class="reading-opts-header">Options d'Affichage & Lecture</div>
-                
-                <!-- 1. Fond / Ambiance -->
-                <div class="reading-opts-section">
-                  <label class="reading-opts-label">Ambiance de lecture</label>
-                  <div class="reading-opts-swatches">
-                    <button class="reading-opt-swatch active" data-bg="auto" title="Thème de l'application">
-                      <span class="swatch-preview swatch-auto">🌓</span>
-                      <span>Auto</span>
-                    </button>
-                    <button class="reading-opt-swatch" data-bg="white" title="Blanc classique">
-                      <span class="swatch-preview swatch-white"></span>
-                      <span>Blanc</span>
-                    </button>
-                    <button class="reading-opt-swatch" data-bg="sepia" title="Sépia / Parchemin doux">
-                      <span class="swatch-preview swatch-sepia"></span>
-                      <span>Sépia</span>
-                    </button>
-                    <button class="reading-opt-swatch" data-bg="dark" title="Sombre / Ardoise">
-                      <span class="swatch-preview swatch-dark"></span>
-                      <span>Sombre</span>
-                    </button>
-                    <button class="reading-opt-swatch" data-bg="oled" title="Noir absolu OLED">
-                      <span class="swatch-preview swatch-oled"></span>
-                      <span>OLED</span>
-                    </button>
-                  </div>
-                </div>
-
-                <!-- 2. Police de caractères -->
-                <div class="reading-opts-section">
-                  <label class="reading-opts-label">Police de caractères</label>
-                  <select id="article-opt-font" class="reading-opts-select">
-                    <option value="EB Garamond">EB Garamond (Classique & Noble)</option>
-                    <option value="Lora">Lora (Moderne & Fluide)</option>
-                    <option value="Cardo">Cardo (Érudit)</option>
-                    <option value="IM Fell English">IM Fell English (Historique)</option>
-                    <option value="Literata">Literata (Livre numérique)</option>
-                    <option value="Merriweather">Merriweather (Très lisible)</option>
-                    <option value="Georgia">Georgia (Sérif standard)</option>
-                    <option value="Inter">Inter (Sans-sérif net)</option>
-                  </select>
-                </div>
-
-                <!-- 3. Taille de la police -->
-                <div class="reading-opts-section">
-                  <label class="reading-opts-label">Taille du texte</label>
-                  <div class="reading-opts-btn-group">
-                    <button class="reading-opts-btn" id="btn-article-font-dec">A−</button>
-                    <span class="reading-opts-val" id="lbl-article-font-size">18 px</span>
-                    <button class="reading-opts-btn" id="btn-article-font-inc">A+</button>
-                  </div>
-                </div>
-
-                <!-- 4. Largeur du texte -->
-                <div class="reading-opts-section">
-                  <label class="reading-opts-label">Largeur de lecture</label>
-                  <div class="reading-opts-btn-group">
-                    <button class="reading-opts-btn" data-width="narrow">Étroite</button>
-                    <button class="reading-opts-btn active" data-width="normal">Normale</button>
-                    <button class="reading-opts-btn" data-width="wide">Pleine</button>
-                  </div>
-                </div>
-
-                <!-- 5. Alignement -->
-                <div class="reading-opts-section">
-                  <label class="reading-opts-label">Alignement</label>
-                  <div class="reading-opts-btn-group">
-                    <button class="reading-opts-btn active" data-align="left">À gauche</button>
-                    <button class="reading-opts-btn" data-align="justify">Justifié</button>
-                  </div>
-                </div>
-
-                <!-- 6. Interligne -->
-                <div class="reading-opts-section">
-                  <label class="reading-opts-label">Interligne</label>
-                  <div class="reading-opts-btn-group">
-                    <button class="reading-opts-btn" data-line-height="1.5">Serré</button>
-                    <button class="reading-opts-btn active" data-line-height="1.8">Normal</button>
-                    <button class="reading-opts-btn" data-line-height="2.1">Aéré</button>
-                  </div>
-                </div>
               </div>
             </div>
 
