@@ -158,6 +158,16 @@ const CommentaryWindow = {
     }
   },
 
+  receiveChapterDataB64(b64Data, targetVerse = 1) {
+    try {
+      const decodedStr = decodeURIComponent(escape(atob(b64Data)));
+      const data = JSON.parse(decodedStr);
+      this.receiveChapterData(data, targetVerse);
+    } catch (e) {
+      console.error('[CommentaryWindow] Erreur de décodage JSON base64:', e);
+    }
+  },
+
   receiveChapterData(data, targetVerse = 1) {
     if (!data || !data.verses) return;
     this.currentBook = data.book || this.currentBook;

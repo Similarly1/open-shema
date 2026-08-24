@@ -3001,8 +3001,10 @@ class BibleAppApi:
             try:
                 data = self.get_chapter_commentaries_grouped(book_code, ch_int)
                 json_str = json.dumps(data)
+                import base64
+                b64_str = base64.b64encode(json_str.encode('utf-8')).decode('utf-8')
                 _COMMENTARY_WINDOW.evaluate_js(
-                    f"window.CommentaryWindow && window.CommentaryWindow.receiveChapterData({json_str}, {v_int})"
+                    f"window.CommentaryWindow && window.CommentaryWindow.receiveChapterDataB64('{b64_str}', {v_int})"
                 )
             except Exception as e:
                 logger.debug(f"Erreur evaluate_js sync_passage: {e}")
@@ -3020,8 +3022,10 @@ class BibleAppApi:
                 if prev_b != book_code or prev_ch != ch_int:
                     data = self.get_chapter_commentaries_grouped(book_code, ch_int)
                     json_str = json.dumps(data)
+                    import base64
+                    b64_str = base64.b64encode(json_str.encode('utf-8')).decode('utf-8')
                     _COMMENTARY_WINDOW.evaluate_js(
-                        f"window.CommentaryWindow && window.CommentaryWindow.receiveChapterData({json_str}, {v_int})"
+                        f"window.CommentaryWindow && window.CommentaryWindow.receiveChapterDataB64('{b64_str}', {v_int})"
                     )
                 else:
                     _COMMENTARY_WINDOW.evaluate_js(
@@ -3205,12 +3209,14 @@ def on_commentary_shown(*args, **kwargs):
             api = BibleAppApi()
             data = api.get_chapter_commentaries_grouped(b, ch)
             json_str = json.dumps(data)
+            import base64
+            b64_str = base64.b64encode(json_str.encode('utf-8')).decode('utf-8')
             
             def push_data():
                 try:
                     if _COMMENTARY_WINDOW:
                         _COMMENTARY_WINDOW.evaluate_js(
-                            f"window.CommentaryWindow && window.CommentaryWindow.receiveChapterData({json_str}, {v})"
+                            f"window.CommentaryWindow && window.CommentaryWindow.receiveChapterDataB64('{b64_str}', {v})"
                         )
                 except Exception as e:
                     logger.debug(f"push_data error: {e}")
