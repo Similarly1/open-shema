@@ -18853,3 +18853,91 @@ body.theme-light .ps-diff-double {
   border-bottom-color: #b45309 !important;
 }
 
+/* ==========================================================================
+ * FENÊTRE DE COMMENTAIRES DÉTACHÉE (SECOND ÉCRAN / MULTI-FENÊTRES)
+ * ========================================================================== */
+#btn-open-commentary-window.active {
+  background: rgba(249, 115, 22, 0.18) !important;
+  color: #f97316 !important;
+  border-color: rgba(249, 115, 22, 0.4) !important;
+  box-shadow: 0 0 8px rgba(249, 115, 22, 0.25);
+}
+
+/* Thème Blanc pour la fenêtre de commentaires détachée */
+body.reading-bg-white .comm-stream-scrollable {
+  background-color: #F8FAFC !important;
+  color: #1E293B !important;
+}
+body.reading-bg-white .comm-win-titlebar {
+  background: #FFFFFF !important;
+  border-bottom-color: #E2E8F0 !important;
+}
+body.reading-bg-white .comm-stream-card,
+body.reading-bg-white .comm-verse-quote-banner,
+body.reading-bg-white .comm-dropdown-popover {
+  background: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+  color: #0F172A !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
+}
+body.reading-bg-white .comm-verse-quote-text,
+body.reading-bg-white .comm-stream-body {
+  color: #1E293B !important;
+}
+body.reading-bg-white .comm-stream-chapter-title {
+  color: #0F172A !important;
+}
+body.reading-bg-white .comm-win-passage-pill {
+  background: #F1F5F9 !important;
+  border-color: #CBD5E1 !important;
+  color: #0F172A !important;
+}
+
+/* Thème Sépia pour la fenêtre de commentaires détachée */
+body.reading-bg-sepia .comm-stream-scrollable {
+  background-color: #F5EFEB !important;
+  color: #2D241E !important;
+}
+body.reading-bg-sepia .comm-win-titlebar {
+  background: #EBE1D8 !important;
+  border-bottom-color: #D6C7B8 !important;
+}
+body.reading-bg-sepia .comm-stream-card,
+body.reading-bg-sepia .comm-verse-quote-banner,
+body.reading-bg-sepia .comm-dropdown-popover {
+  background: #FCF8F5 !important;
+  border-color: #D6C7B8 !important;
+  color: #2D241E !important;
+  box-shadow: 0 1px 4px rgba(60, 40, 20, 0.06) !important;
+}
+body.reading-bg-sepia .comm-verse-quote-text,
+body.reading-bg-sepia .comm-stream-body {
+  color: #2D241E !important;
+}
+body.reading-bg-sepia .comm-stream-chapter-title {
+  color: #3D2B1F !important;
+}
+body.reading-bg-sepia .comm-win-passage-pill {
+  background: #E4D7CA !important;
+  border-color: #C8B7A5 !important;
+  color: #3D2B1F !important;
+}
+
+/* Thème Nuit pour la fenêtre de commentaires détachée */
+body.reading-bg-dark .comm-stream-scrollable {
+  background-color: #0B0F17 !important;
+  color: #E2E8F0 !important;
+}
+body.reading-bg-dark .comm-win-titlebar {
+  background: #111827 !important;
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+body.reading-bg-dark .comm-stream-card,
+body.reading-bg-dark .comm-verse-quote-banner,
+body.reading-bg-dark .comm-dropdown-popover {
+  background: #151D2C !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #E2E8F0 !important;
+}
+
+

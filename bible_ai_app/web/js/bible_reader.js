@@ -3290,6 +3290,25 @@ const BibleReader = {
       this.setZoom(this.zoomPercent - 10);
     });
 
+    document.getElementById('btn-open-commentary-window')?.addEventListener('click', async () => {
+      try {
+        const res = await API.openCommentaryWindow(this.currentBook, this.currentChapter, this.selectedVerse || 1);
+        if (res && res.success) {
+          if (res.on_second_screen) {
+            App.showToast("Commentaires ouverts sur le second écran");
+          } else {
+            App.showToast("Fenêtre de commentaires ouverte");
+          }
+          if (typeof MultiwindowSync !== 'undefined') {
+            MultiwindowSync.updateToolbarButtonState(true);
+            MultiwindowSync.broadcastCurrentState();
+          }
+        }
+      } catch (err) {
+        console.error("Erreur ouverture fenêtre commentaires:", err);
+      }
+    });
+
     document.getElementById('btn-toggle-right-drawer')?.addEventListener('click', () => {
       const drawer = document.getElementById('right-drawer');
       if (drawer) {
@@ -3767,6 +3786,9 @@ const BibleReader = {
         if (typeof CommentaryViewer !== 'undefined' && CommentaryViewer.isSynchronized) {
           this.debouncedLoadCommentaries(vNum, bCode, ch);
         }
+        if (typeof MultiwindowSync !== 'undefined' && MultiwindowSync.broadcastVerseChanged) {
+          MultiwindowSync.broadcastVerseChanged(bCode, ch, vNum);
+        }
       }
     }
   },
@@ -3865,6 +3887,10 @@ const BibleReader = {
       this.selectAndScrollToVerse(targetVerse, bookCode, chapterNum);
     } else {
       this.loadCommentariesForVerse(1);
+    }
+
+    if (typeof MultiwindowSync !== 'undefined' && MultiwindowSync.broadcastPassageNavigated) {
+      MultiwindowSync.broadcastPassageNavigated(bookCode, info.name, chapterNum, targetVerse || 1);
     }
   },
 

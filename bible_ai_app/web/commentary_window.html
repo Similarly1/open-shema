@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Open Shema — Commentaires Exégétiques</title>
+  
+  <!-- Polices Google : Inter (UI) & EB Garamond / Cardo / Lora / Merriweather / Georgia (Lecture Exégétique) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400..700;1,400..700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
+  
+  <!-- CSS Global -->
+  <link rel="stylesheet" href="css/logos.css?v=3.9">
+
+  <style>
+    /* =========================================================================
+     * STYLES DÉDIÉS : FENÊTRE COMPAGNON SECONDAIRE (SANS MENU LATÉRAL)
+     * ========================================================================= */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--bg-main, #0F172A);
+      color: var(--text-primary, #E2E8F0);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      user-select: text;
+    }
+
+    /* 1. BARRE DE TITRE FRAMELESS AVEC ZONE DE DRAG */
+    .comm-win-titlebar {
+      height: 42px;
+      min-height: 42px;
+      background: var(--bg-card, #1E293B);
+      border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px 0 12px;
+      -webkit-app-region: drag;
+      z-index: 1000;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    .comm-win-drag-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      -webkit-app-region: drag;
+    }
+
+    .comm-win-logo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-orange, #F97316);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 3px 8px;
+      background: rgba(249, 115, 22, 0.12);
+      border: 1px solid rgba(249, 115, 22, 0.25);
+      border-radius: 6px;
+    }
+
+    .comm-win-passage-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: var(--bg-hover, rgba(255, 255, 255, 0.08));
+      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary, #F8FAFC);
+    }
+
+    .comm-win-sync-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      -webkit-app-region: no-drag;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .comm-win-sync-indicator.synced {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10B981;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    .comm-win-sync-indicator.paused {
+      background: rgba(245, 158, 11, 0.15);
+      color: #F59E0B;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+
+    .comm-win-pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: currentColor;
+      box-shadow: 0 0 6px currentColor;
+    }
+
+    .comm-win-actions-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      -webkit-app-region: no-drag;
+    }
+
+    .comm-win-tool-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 9px;
+      height: 28px;
+      background: var(--bg-hover, rgba(255, 255, 255, 0.06));
+      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+      border-radius: 6px;
+      color: var(--text-secondary, #94A3B8);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .comm-win-tool-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--text-primary, #FFFFFF);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .comm-win-tool-btn.active {
+      background: rgba(59, 130, 246, 0.18);
+      color: #60A5FA;
+      border-color: rgba(59, 130, 246, 0.4);
+    }
+
+    /* Contrôles de fenêtre (Min, Max, Close) */
+    .comm-win-controls {
+      display: flex;
+      align-items: center;
+      margin-left: 8px;
+      border-left: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+      padding-left: 8px;
+      -webkit-app-region: no-drag;
+    }
+
+    .comm-win-control-btn {
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      border-radius: 4px;
+      color: var(--text-secondary, #94A3B8);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .comm-win-control-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #FFFFFF;
+    }
+
+    .comm-win-control-btn.close:hover {
+      background: #EF4444;
+      color: #FFFFFF;
+    }
+
+    /* 2. ZONE DE DÉFILEMENT PRINCIPALE */
+    .comm-stream-scrollable {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      position: relative;
+      scroll-behavior: smooth;
+      padding: 0;
+    }
+
+    .comm-stream-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 32px 120px 32px;
+    }
+
+    /* En-tête de chapitre */
+    .comm-stream-chapter-hero {
+      text-align: center;
+      padding: 20px 16px 28px 16px;
+      border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+      margin-bottom: 30px;
+    }
+
+    .comm-stream-chapter-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-primary, #F8FAFC);
+      letter-spacing: -0.5px;
+      margin: 0 0 6px 0;
+    }
+
+    .comm-stream-chapter-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary, #94A3B8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    /* Bloc par verset */
+    .comm-stream-verse-block {
+      margin-bottom: 36px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+    }
+
+    .comm-stream-verse-block.active-synced-comm {
+      border-color: rgba(249, 115, 22, 0.45);
+      background-color: rgba(249, 115, 22, 0.03);
+      box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.2), 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Bandeau de verset */
+    .comm-verse-quote-banner {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--bg-card, #1E293B);
+      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+      border-radius: 8px;
+      margin-bottom: 14px;
+    }
+
+    .comm-verse-num-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      height: 28px;
+      padding: 0 6px;
+      border-radius: 6px;
+      background: var(--accent-blue, #2563EB);
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .comm-stream-verse-block.active-synced-comm .comm-verse-num-badge {
+      background: var(--accent-orange, #EA580C);
+      box-shadow: 0 0 8px rgba(234, 88, 12, 0.4);
+    }
+
+    .comm-verse-quote-text {
+      font-family: var(--font-bible, 'EB Garamond', Georgia, serif);
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--text-primary, #E2E8F0);
+      font-style: italic;
+    }
+
+    /* Carte de commentaire */
+    .comm-stream-card {
+      background: var(--bg-card, #1E293B);
+      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+      border-radius: 8px;
+      padding: 18px 22px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .comm-stream-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+    }
+
+    .comm-stream-author-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--accent-blue, #38BDF8);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .comm-stream-ref-badge {
+      font-size: 11px;
+      color: var(--text-secondary, #94A3B8);
+      font-weight: 600;
+    }
+
+    .comm-stream-body {
+      font-family: var(--font-comm, 'EB Garamond', Georgia, serif);
+      font-size: 15.5px;
+      line-height: 1.75;
+      color: var(--text-primary, #E2E8F0);
+    }
+
+    .comm-stream-body p {
+      margin: 0 0 12px 0;
+    }
+
+    .comm-stream-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* 3. BOUTON FLOTTANT DE REPRISE DE SYNCHRONISATION */
+    .comm-resume-sync-pill {
+      position: fixed;
+      bottom: 24px;
+      right: 32px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      background: var(--accent-orange, #EA580C);
+      color: #FFFFFF;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 24px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(234, 88, 12, 0.4);
+      z-index: 1100;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateY(0);
+      opacity: 1;
+      user-select: none;
+    }
+
+    .comm-resume-sync-pill.hidden {
+      transform: translateY(30px);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .comm-resume-sync-pill:hover {
+      background: #F97316;
+      box-shadow: 0 10px 28px rgba(249, 115, 22, 0.5);
+      transform: translateY(-2px);
+    }
+
+    /* Popovers Déroulants */
+    .comm-dropdown-popover {
+      position: absolute;
+      top: 44px;
+      background: var(--bg-card, #1E293B);
+      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+      z-index: 1200;
+      text-align: left;
+    }
+
+    .comm-dropdown-popover.hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================= -->
+  <!-- 1. BARRE DE TITRE & CONTRÔLES SUPÉRIEURS (FRAMELESS)      -->
+  <!-- ========================================================= -->
+  <header class="comm-win-titlebar" id="comm-win-titlebar">
+    <!-- GAUCHE : Logo & Indicateur de Passage -->
+    <div class="comm-win-drag-group">
+      <div class="comm-win-logo-badge" title="Open Shema Exégèse (Écran 2)">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+        </svg>
+        <span>Exégèse</span>
+      </div>
+
+      <div class="comm-win-passage-pill" id="comm-win-passage-pill" title="Passage actif en direct">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-orange, #F97316);">
+          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+          <path d="M6 6h10"></path>
+          <path d="M6 10h10"></path>
+        </svg>
+        <span id="comm-win-passage-text">Genèse 1:1</span>
+      </div>
+
+      <div class="comm-win-sync-indicator synced" id="comm-win-sync-badge" title="Cliquer pour suspendre ou activer la synchronisation automatique">
+        <span class="comm-win-pulse-dot"></span>
+        <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+        </svg>
+        <span id="comm-win-sync-label">Synchro active</span>
+      </div>
+    </div>
+
+    <!-- DROITE : Outils de Confort & Contrôles Fenêtre -->
+    <div class="comm-win-actions-group">
+      
+      <!-- Sélecteur d'ouvrages / auteurs -->
+      <div style="position: relative;">
+        <button type="button" class="comm-win-tool-btn" id="btn-author-filter" title="Filtrer les ouvrages affichés">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+          </svg>
+          <span id="lbl-active-author">Tous les ouvrages</span>
+          <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+
+        <div class="comm-dropdown-popover hidden" id="author-filter-popover" style="right: 0; width: 260px; max-height: 380px; overflow-y: auto;">
+          <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
+            Ouvrages dans ce chapitre
+          </div>
+          <div id="author-filter-list" style="display: flex; flex-direction: column; gap: 4px;">
+            <!-- Liste dynamique des auteurs -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Options d'Affichage (Police, Zoom, Fond) -->
+      <div style="position: relative;">
+        <button type="button" class="comm-win-tool-btn" id="btn-comm-display" title="Options de confort de lecture">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span>Affichage</span>
+        </button>
+
+        <div class="comm-dropdown-popover hidden" id="comm-display-popover" style="right: 0; width: 280px;">
+          <!-- 1. Police -->
+          <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">Police</div>
+          <div style="display: flex; gap: 4px; margin-bottom: 12px;">
+            <button type="button" class="comm-win-tool-btn font-choice-btn active" data-font="EB Garamond" style="flex: 1; justify-content: center; font-family: 'EB Garamond', serif;">Garamond</button>
+            <button type="button" class="comm-win-tool-btn font-choice-btn" data-font="Cardo" style="flex: 1; justify-content: center; font-family: 'Cardo', serif;">Cardo</button>
+            <button type="button" class="comm-win-tool-btn font-choice-btn" data-font="Inter" style="flex: 1; justify-content: center; font-family: 'Inter', sans-serif;">Inter</button>
+          </div>
+
+          <!-- 2. Zoom -->
+          <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">Taille du texte</div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+            <button type="button" class="comm-win-tool-btn" id="btn-zoom-out" style="width: 32px; justify-content: center;">−</button>
+            <span id="lbl-zoom-val" style="font-size: 12px; font-weight: 700;">100%</span>
+            <button type="button" class="comm-win-tool-btn" id="btn-zoom-in" style="width: 32px; justify-content: center;">+</button>
+          </div>
+
+          <!-- 3. Fond de lecture -->
+          <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">Fond de lecture</div>
+          <div style="display: flex; gap: 6px;">
+            <button type="button" class="comm-win-tool-btn bg-choice-btn active" data-bg="auto" style="flex: 1; justify-content: center;">Auto</button>
+            <button type="button" class="comm-win-tool-btn bg-choice-btn" data-bg="white" style="flex: 1; justify-content: center;">Blanc</button>
+            <button type="button" class="comm-win-tool-btn bg-choice-btn" data-bg="sepia" style="flex: 1; justify-content: center;">Sépia</button>
+            <button type="button" class="comm-win-tool-btn bg-choice-btn" data-bg="dark" style="flex: 1; justify-content: center;">Nuit</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contrôles Fenêtre Native (Minimiser, Maximiser, Fermer) -->
+      <div class="comm-win-controls">
+        <button type="button" class="comm-win-control-btn" id="btn-win-min" title="Réduire">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="12" x2="20" y2="12"></line></svg>
+        </button>
+        <button type="button" class="comm-win-control-btn" id="btn-win-max" title="Agrandir / Restaurer">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"></rect></svg>
+        </button>
+        <button type="button" class="comm-win-control-btn close" id="btn-win-close" title="Fermer la fenêtre">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ========================================================= -->
+  <!-- 2. CANEVAS PRINCIPAL : DÉFILEMENT CONTINU DU COMMENTAIRE  -->
+  <!-- ========================================================= -->
+  <main class="comm-stream-scrollable" id="comm-stream-scrollable">
+    <div class="comm-stream-inner" id="comm-stream-container">
+      <!-- Rendu dynamique du flux de commentaires -->
+      <div style="text-align: center; padding: 60px 20px; color: var(--text-secondary);">
+        <div style="font-size: 15px; font-weight: 600; margin-bottom: 6px;">Connexion au lecteur biblique...</div>
+        <div style="font-size: 12px; opacity: 0.7;">En attente des données du passage en cours.</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ========================================================= -->
+  <!-- 3. BOUTON FLOTTANT : REPRENDRE LE SUIVI EN DIRECT         -->
+  <!-- ========================================================= -->
+  <button type="button" class="comm-resume-sync-pill hidden" id="btn-resume-sync" title="Réaligner automatiquement les commentaires sur le verset biblique affiché">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21.5 2v6h-6"></path>
+      <path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+    </svg>
+    <span>Reprendre le suivi en direct</span>
+  </button>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/commentary_window.js"></script>
+</body>
+</html>

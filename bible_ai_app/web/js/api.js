@@ -159,6 +159,34 @@ const API = {
     return await this.call('get_commentaries', bookCode, parseInt(chapterNum), parseInt(verseNum));
   },
 
+  async getChapterCommentariesGrouped(bookCode, chapterNum) {
+    return await this.call('get_chapter_commentaries_grouped', bookCode, parseInt(chapterNum));
+  },
+
+  async openCommentaryWindow(bookCode = 'Gen', chapterNum = 1, verseNum = 1) {
+    return await this.call('open_commentary_window', bookCode, parseInt(chapterNum), parseInt(verseNum));
+  },
+
+  async closeCommentaryWindow() {
+    return await this.call('close_commentary_window');
+  },
+
+  async minimizeCommentaryWindow() {
+    return await this.call('minimize_commentary_window');
+  },
+
+  async maximizeCommentaryWindow() {
+    return await this.call('maximize_commentary_window');
+  },
+
+  async isCommentaryWindowOpen() {
+    return await this.call('is_commentary_window_open');
+  },
+
+  async getMonitorsInfo() {
+    return await this.call('get_monitors_info');
+  },
+
   async parseReference(rawText) {
     return await this.call('parse_reference', rawText);
   },

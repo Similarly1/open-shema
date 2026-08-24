@@ -507,6 +507,97 @@ class BibleAppApi:
             })
         return comments
 
+    def get_chapter_commentaries_grouped(self, book_code: str, chapter: int) -> Dict[str, Any]:
+        """
+        Récupère l'intégralité des commentaires exégétiques pour un chapitre complet,
+        regroupés par verset, avec le texte biblique de référence associé pour l'affichage en flux continu.
+        """
+        ch_int = int(chapter)
+        french_name = get_french_book_name(book_code)
+
+        # 1. Récupérer tous les commentaires bruts du chapitre
+        res = CommentaryLoader.get_all_comments_for_passage(book_code, ch_int, None)
+        
+        # 2. Récupérer le texte des versets du chapitre (via la première Bible disponible)
+        verses_text_map = {}
+        try:
+            installed = self.get_installed_bibles()
+            primary_bible = installed[0]["name"] if installed else "Segond 21"
+            ch_data = self.get_chapter_data(primary_bible, book_code, ch_int)
+            for v in ch_data.get("verses", []):
+                verses_text_map[int(v["verse"])] = v.get("text", "")
+        except Exception as e:
+            logger.warning(f"Erreur chargement texte versets pour chapitre {book_code} {ch_int}: {e}")
+
+        # 3. Regrouper les commentaires par verset de départ
+        comments_by_verse: Dict[int, Dict[str, Dict[str, Any]]] = {}
+        all_sources_set = set()
+
+        for i, text in enumerate(res.get("documents", [])):
+            meta = res["metadatas"][i] if i < len(res.get("metadatas", [])) else {}
+            cid = meta.get("commentary_id", meta.get("name", "Commentaire"))
+            cname = meta.get("name", "Commentaire")
+            v_start = int(meta.get("verse_start", 1))
+            v_end = int(meta.get("verse_end", v_start))
+            ref = meta.get("reference", f"{book_code} {ch_int}:{v_start}")
+            all_sources_set.add(cname)
+
+            if v_start not in comments_by_verse:
+                comments_by_verse[v_start] = {}
+
+            if cid not in comments_by_verse[v_start]:
+                comments_by_verse[v_start][cid] = {
+                    "id": cid,
+                    "author": cname,
+                    "source": cname,
+                    "reference": ref,
+                    "verse_start": v_start,
+                    "verse_end": v_end,
+                    "texts": [text]
+                }
+            else:
+                comments_by_verse[v_start][cid]["texts"].append(text)
+                if ref not in comments_by_verse[v_start][cid]["reference"]:
+                    comments_by_verse[v_start][cid]["reference"] += f" / {ref}"
+
+        # 4. Construire la liste ordonnée des versets avec leurs commentaires
+        verses_out = []
+        max_verse = max(
+            list(verses_text_map.keys()) + list(comments_by_verse.keys()) + [1]
+        )
+
+        for v_num in range(1, max_verse + 1):
+            v_text = verses_text_map.get(v_num, "")
+            comm_dict = comments_by_verse.get(v_num, {})
+            v_comments = []
+            for cid, c_data in comm_dict.items():
+                v_comments.append({
+                    "id": c_data["id"],
+                    "author": c_data["author"],
+                    "source": c_data["source"],
+                    "reference": c_data["reference"],
+                    "verse_start": c_data["verse_start"],
+                    "verse_end": c_data["verse_end"],
+                    "text": "\n\n---\n\n".join(c_data["texts"])
+                })
+
+            verses_out.append({
+                "verse": v_num,
+                "text": v_text,
+                "comments": v_comments,
+                "has_comments": len(v_comments) > 0
+            })
+
+        return {
+            "book": book_code,
+            "book_french": french_name,
+            "chapter": ch_int,
+            "total_verses": len(verses_out),
+            "verses": verses_out,
+            "available_sources": sorted(list(all_sources_set))
+        }
+
+
     def parse_reference(self, raw_input: str) -> Dict[str, Any]:
         """Décode une saisie libre de passage biblique (ex: 'rm 8.9', 'Romains 8:9', 'romains', 'Jn 3:16', '1 Co 13')."""
         if not raw_input or not str(raw_input).strip():
@@ -2713,6 +2804,189 @@ class BibleAppApi:
         return {"success": True}
 
     # =========================================================================
+    # GESTION MULTI-FENÊTRES (ÉCRAN 2 & COMMENTAIRES DÉTACHÉS)
+    # =========================================================================
+
+    def get_monitors_info(self) -> Dict[str, Any]:
+        """Retourne la configuration des moniteurs physiques détectés."""
+        monitors = get_monitors_layout()
+        has_second = len(monitors) > 1
+        return {
+            "count": len(monitors),
+            "monitors": monitors,
+            "has_second_screen": has_second
+        }
+
+    def is_commentary_window_open(self) -> Dict[str, Any]:
+        """Indique si la seconde fenêtre de commentaires est ouverte."""
+        global _COMMENTARY_WINDOW
+        return {"is_open": _COMMENTARY_WINDOW is not None}
+
+    def open_commentary_window(self, book_code: str = "Gen", chapter: int = 1, verse: int = 1) -> Dict[str, Any]:
+        """
+        Ouvre ou ramène au premier plan la fenêtre de commentaires déportée.
+        Cible automatiquement le second écran si présent, sinon ouvre une fenêtre companion à droite.
+        """
+        global _COMMENTARY_WINDOW, _COMMENTARY_IS_MAXIMIZED, _COMMENTARY_RESTORE_BOUNDS
+        
+        if _COMMENTARY_WINDOW is not None:
+            try:
+                _COMMENTARY_WINDOW.restore()
+                _COMMENTARY_WINDOW.show()
+                return {"success": True, "already_open": True}
+            except Exception as e:
+                logger.warning(f"Erreur réactivation fenêtre commentaire: {e}")
+                _COMMENTARY_WINDOW = None
+
+        monitors = get_monitors_layout()
+        second_monitor = None
+        for m in monitors:
+            if not m.get("is_primary"):
+                second_monitor = m
+                break
+
+        on_second_screen = False
+        if second_monitor:
+            wx = second_monitor["x"]
+            wy = second_monitor["y"]
+            ww = second_monitor["width"]
+            wh = second_monitor["height"]
+            on_second_screen = True
+            _COMMENTARY_IS_MAXIMIZED = True
+        else:
+            main_wx, main_wy, main_ww, main_wh = get_work_area()
+            ww = min(1100, int(main_ww * 0.55))
+            wh = min(900, main_wh - 60)
+            wx = main_wx + main_ww - ww - 20
+            wy = main_wy + 30
+            _COMMENTARY_IS_MAXIMIZED = False
+            _COMMENTARY_RESTORE_BOUNDS = (wx, wy, ww, wh)
+
+        html_path = os.path.join(current_dir, "web", "commentary_window.html")
+        
+        def on_comm_closed():
+            global _COMMENTARY_WINDOW
+            _COMMENTARY_WINDOW = None
+            logger.info("Fenêtre de commentaires détachée fermée.")
+            if _GLOBAL_WINDOW:
+                try:
+                    _GLOBAL_WINDOW.evaluate_js("window.MultiwindowSync && window.MultiwindowSync.handleSecondaryWindowClosed()")
+                except Exception:
+                    pass
+
+        try:
+            _COMMENTARY_WINDOW = webview.create_window(
+                title="Open Shema — Commentaires Exégétiques",
+                url=html_path,
+                js_api=self,
+                x=wx,
+                y=wy,
+                width=ww,
+                height=wh,
+                min_size=(650, 480),
+                frameless=True,
+                easy_drag=False,
+                background_color="#0F172A"
+            )
+            _COMMENTARY_WINDOW.events.closed += on_comm_closed
+            return {
+                "success": True,
+                "created": True,
+                "on_second_screen": on_second_screen,
+                "bounds": {"x": wx, "y": wy, "width": ww, "height": wh}
+            }
+        except Exception as e:
+            logger.error(f"Erreur création fenêtre de commentaires: {e}")
+            return {"success": False, "error": str(e)}
+
+    def close_commentary_window(self) -> Dict[str, Any]:
+        """Ferme la fenêtre de commentaires détachée."""
+        global _COMMENTARY_WINDOW
+        if _COMMENTARY_WINDOW:
+            try:
+                _COMMENTARY_WINDOW.destroy()
+            except Exception as e:
+                logger.warning(f"Erreur destruction fenêtre commentaire: {e}")
+            _COMMENTARY_WINDOW = None
+        return {"success": True}
+
+    def minimize_commentary_window(self) -> Dict[str, Any]:
+        """Minimise la fenêtre de commentaires détachée."""
+        global _COMMENTARY_WINDOW
+        if _COMMENTARY_WINDOW:
+            try:
+                _COMMENTARY_WINDOW.minimize()
+            except Exception as e:
+                logger.warning(f"Erreur minimize commentaire: {e}")
+        return {"success": True}
+
+    def maximize_commentary_window(self) -> Dict[str, Any]:
+        """Bascule l'état maximisé de la fenêtre de commentaires détachée."""
+        global _COMMENTARY_WINDOW, _COMMENTARY_IS_MAXIMIZED, _COMMENTARY_RESTORE_BOUNDS
+        if not _COMMENTARY_WINDOW:
+            return {"success": False}
+
+        hwnd = None
+        try:
+            if hasattr(_COMMENTARY_WINDOW, 'native') and _COMMENTARY_WINDOW.native:
+                hwnd = _COMMENTARY_WINDOW.native.Handle.ToInt32()
+        except Exception:
+            pass
+
+        if _COMMENTARY_IS_MAXIMIZED:
+            _COMMENTARY_IS_MAXIMIZED = False
+            rx, ry, rw, rh = _COMMENTARY_RESTORE_BOUNDS
+            if hwnd:
+                user32.SetWindowPos(hwnd, 0, rx, ry, rw, rh, 0x0040)
+            else:
+                try:
+                    _COMMENTARY_WINDOW.move(rx, ry)
+                    _COMMENTARY_WINDOW.resize(rw, rh)
+                except Exception:
+                    pass
+        else:
+            if hwnd:
+                try:
+                    curr_rect = RECT()
+                    user32.GetWindowRect(hwnd, ctypes.byref(curr_rect))
+                    w = curr_rect.right - curr_rect.left
+                    h = curr_rect.bottom - curr_rect.top
+                    if w > 400 and h > 300:
+                        _COMMENTARY_RESTORE_BOUNDS = (curr_rect.left, curr_rect.top, w, h)
+                except Exception:
+                    pass
+
+            monitors = get_monitors_layout()
+            target_mon = None
+            if _COMMENTARY_RESTORE_BOUNDS:
+                cx = _COMMENTARY_RESTORE_BOUNDS[0]
+                cy = _COMMENTARY_RESTORE_BOUNDS[1]
+                for m in monitors:
+                    if m["x"] <= cx <= m["x"] + m["width"] and m["y"] <= cy <= m["y"] + m["height"]:
+                        target_mon = m
+                        break
+            if not target_mon:
+                target_mon = monitors[1] if len(monitors) > 1 else monitors[0]
+
+            wx = target_mon["x"]
+            wy = target_mon["y"]
+            ww = target_mon["width"]
+            wh = target_mon["height"]
+            _COMMENTARY_IS_MAXIMIZED = True
+
+            if hwnd:
+                user32.SetWindowPos(hwnd, 0, wx, wy, ww, wh, 0x0040)
+            else:
+                try:
+                    _COMMENTARY_WINDOW.move(wx, wy)
+                    _COMMENTARY_WINDOW.resize(ww, wh)
+                except Exception:
+                    pass
+
+        return {"success": True, "is_maximized": _COMMENTARY_IS_MAXIMIZED}
+
+
+    # =========================================================================
     # 7. CARTES BIBLIQUES & GÉOGRAPHIE
     # =========================================================================
 
@@ -2774,8 +3048,61 @@ def get_work_area():
     except Exception:
         return 0, 0, 1440, 850
 
+class MONITORINFO(ctypes.Structure):
+    _fields_ = [
+        ('cbSize', wintypes.DWORD),
+        ('rcMonitor', RECT),
+        ('rcWork', RECT),
+        ('dwFlags', wintypes.DWORD)
+    ]
+
+def get_monitors_layout():
+    """Renvoie la liste des zones de travail de tous les écrans connectés."""
+    monitors = []
+    
+    def _enum_proc(hMonitor, hdcMonitor, lprcMonitor, dwData):
+        try:
+            mi = MONITORINFO()
+            mi.cbSize = ctypes.sizeof(MONITORINFO)
+            if user32.GetMonitorInfoW(hMonitor, ctypes.byref(mi)):
+                rc = mi.rcWork
+                is_primary = bool(mi.dwFlags & 1)
+                monitors.append({
+                    "x": int(rc.left),
+                    "y": int(rc.top),
+                    "width": int(rc.right - rc.left),
+                    "height": int(rc.bottom - rc.top),
+                    "is_primary": is_primary
+                })
+        except Exception as e:
+            logger.warning(f"Erreur GetMonitorInfoW: {e}")
+        return True
+
+    try:
+        EnumDisplayMonitorsProc = ctypes.WINFUNCTYPE(
+            wintypes.BOOL,
+            wintypes.HMONITOR,
+            wintypes.HDC,
+            ctypes.POINTER(RECT),
+            wintypes.LPARAM
+        )
+        user32.EnumDisplayMonitors(None, None, EnumDisplayMonitorsProc(_enum_proc), 0)
+    except Exception as e:
+        logger.warning(f"Erreur EnumDisplayMonitors: {e}")
+
+    if not monitors:
+        wx, wy, ww, wh = get_work_area()
+        monitors.append({"x": wx, "y": wy, "width": ww, "height": wh, "is_primary": True})
+
+    return monitors
+
 _IS_MAXIMIZED = True
 _RESTORE_BOUNDS = (80, 50, 1280, 800)
+
+_COMMENTARY_WINDOW = None
+_COMMENTARY_IS_MAXIMIZED = False
+_COMMENTARY_RESTORE_BOUNDS = (100, 60, 1100, 750)
+
 
 
 def on_window_shown(*args, **kwargs):
