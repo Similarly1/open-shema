@@ -65,6 +65,24 @@ const ArticlesView = {
     return abbr;
   },
 
+  getEditorialBadgeLabel(text) {
+    if (!text) return 'CONTEXTE & PROVENANCE';
+    const lower = text.toLowerCase();
+    if (/extrait\s+du\s+livre|tiré\s+du\s+livre|chapitre\s+\d+|éditions|editions|éditeur|editeur|ouvrage|pp\.\s*\d+/i.test(lower)) {
+      return 'EXTRAIT D’OUVRAGE';
+    }
+    if (/série\s+de|série\s+sur|épisode\s+\d+|partie\s+\d+|série\s+d’articles|série\s+d'articles/i.test(lower)) {
+      return 'SÉRIE THÉMATIQUE';
+    }
+    if (/travail\s+de\s+recherche|thèse|mémoire|séminaire|seminary|académique|theological\s+seminary/i.test(lower)) {
+      return 'RECHERCHE & SÉMINAIRE';
+    }
+    if (/traduction|traduit\s+de|autoris|droits\s+réservés|reproduit\s+avec/i.test(lower)) {
+      return 'NOTE ÉDITORIALE';
+    }
+    return 'CONTEXTE & PROVENANCE';
+  },
+
   init() {
     this.loadReadingPreferences();
     this.bindEvents();
@@ -614,7 +632,10 @@ const ArticlesView = {
     if (container) container.scrollTop = 0;
 
     try {
-      const res = await API.call('get_article_content', articleId);
+      const fetchPromise = API.call('get_article_content', articleId);
+      const minDelay = new Promise(resolve => setTimeout(resolve, 420));
+      const [res] = await Promise.all([fetchPromise, minDelay]);
+
       if (!res || !res.success || !res.article) {
         if (skeletonEl) skeletonEl.classList.add('hidden');
         if (realContentEl) realContentEl.classList.remove('hidden');
@@ -768,6 +789,22 @@ const ArticlesView = {
                 }
               } catch (err) {
                 BibleReader.navigateTo(ref);
+              }
+            }
+          });
+        });
+
+        // Liaison des liens externes (ouverture propre dans le navigateur par défaut)
+        contentEl.querySelectorAll('a').forEach(aTag => {
+          aTag.addEventListener('click', (e) => {
+            const href = aTag.getAttribute('href');
+            if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
+              e.preventDefault();
+              e.stopPropagation();
+              if (window.pywebview?.api?.open_external_url) {
+                window.pywebview.api.open_external_url(href);
+              } else {
+                window.open(href, '_blank');
               }
             }
           });
@@ -945,6 +982,29 @@ const ArticlesView = {
     text = text.replace(/(?<!\n)\s*\*\*([A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+(?:\s+[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+)?)\*\*\s*:?\s*/g, '\n\n**$1 :** ');
     // Convertir les lignes de prise de parole en encadrés de dialogue stylisés
     text = text.replace(/(?:^|\n)\*\*([A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+(?:\s+[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+)?)\s*:\*\*\s*([^\n]+)/g, '\n\n<div class="article-speaker-turn"><span class="article-speaker-badge">$1</span><p class="article-speaker-speech">$2</p></div>\n\n');
+
+    // 5b. Structurer les sous-titres et directives bibliques ("Cléopas et la désillusion **Lisez Luc 24.13-35.**")
+    text = text.replace(/(?:^|\n)([A-ZÀ-ÿ][^\n*]+?)\s+(\*\*Lisez\s+[^*]+\*\*)/gim, '\n\n### $1\n\n$2\n\n');
+    text = text.replace(/(\*\*[^*]+\*\*)\s+([A-ZÀ-ÿ])/g, '$1\n\n$2');
+
+    // 5c. Découpage et mise en page soignée des dialogues au tiret cadratin (—, –)
+    text = text.replace(/([:!?…»])\s*([—–\u2013\u2014]\s*)/g, '$1\n\n$2');
+    text = text.replace(/\.\s+([—–\u2013\u2014]\s*[A-ZÀ-ÿ])/g, '.\n\n$1');
+
+    // Convertir les lignes de dialogue au tiret en encadrés distincts
+    text = text.replace(/(?:^|\n)\s*([—–\u2013\u2014]\s*[^\n]+)/g, '\n\n<div class="article-speaker-turn"><p class="article-speaker-speech">$1</p></div>\n\n');
+
+    // 5d. Convertir les citations bibliques avec tiret de référence (« ... » – Réf)
+    text = text.replace(/(?:^|\n)«\s*([^»]+?)\s*»\s*([–—\u2013\u2014-]\s*[A-ZÀ-ÿ0-9.:\s-]+)/g, '\n\n<blockquote class="article-bible-quote"><p>« $1 » $2</p></blockquote>\n\n');
+
+    // 5e. Détection et mise en valeur du cartouche éditorial de fin d'article (Option 3 : Badge contextuel dynamique, sans émoji/svg)
+    text = text.replace(
+      /(?:^|\n\n+)((?:Cet article\s+(?:fait partie|est extrait|est tiré|a été publié|provient|est une adaptation|est la traduction|est une traduction|est le premier|est le second|est le troisième|est basé)|Extrait du livre|Tiré du livre|Publié avec l[’']autorisation)[^\n]+(?:\n[^\n]+)*)(?=\s*$)/gi,
+      (match, content) => {
+        const badge = this.getEditorialBadgeLabel(content);
+        return `\n\n<div class="article-editorial-footer-card"><div class="article-editorial-footer-header"><span class="article-editorial-badge">${badge}</span></div><div class="article-editorial-footer-content">${content.trim()}</div></div>\n\n`;
+      }
+    );
 
     // 6. Nettoyer les émojis décoratifs résiduels
     text = text.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1FA70}-\u{1FAFF}]/gu, '');

@@ -1055,6 +1055,46 @@
   color: #93c5fd;
 }
 
+/* Références bibliques interactives en ligne (avec infobulle de verset) */
+.article-markdown-body .theol-inline-scripture-ref {
+  color: var(--accent-primary, #60a5fa) !important;
+  font-weight: 600 !important;
+  text-decoration: underline !important;
+  text-decoration-style: dotted !important;
+  text-underline-offset: 3px !important;
+  cursor: pointer !important;
+  padding: 1px 5px !important;
+  border-radius: 4px !important;
+  background: rgba(59, 130, 246, 0.1) !important;
+  transition: all 0.15s ease !important;
+  display: inline-block;
+  line-height: 1.3;
+}
+
+.article-markdown-body .theol-inline-scripture-ref:hover {
+  background: rgba(59, 130, 246, 0.22) !important;
+  color: #93c5fd !important;
+  text-decoration-style: solid !important;
+}
+
+.article-reader-container.reading-bg-white .article-markdown-body .theol-inline-scripture-ref {
+  color: #2563eb !important;
+  background: rgba(37, 99, 235, 0.08) !important;
+}
+.article-reader-container.reading-bg-white .article-markdown-body .theol-inline-scripture-ref:hover {
+  background: rgba(37, 99, 235, 0.16) !important;
+  color: #1d4ed8 !important;
+}
+
+.article-reader-container.reading-bg-sepia .article-markdown-body .theol-inline-scripture-ref {
+  color: #b45309 !important;
+  background: rgba(180, 83, 9, 0.08) !important;
+}
+.article-reader-container.reading-bg-sepia .article-markdown-body .theol-inline-scripture-ref:hover {
+  background: rgba(180, 83, 9, 0.16) !important;
+  color: #92400e !important;
+}
+
 .article-markdown-body ul,
 .article-markdown-body ol {
   padding-left: 22px;
@@ -1159,4 +1199,94 @@
   color: var(--text-muted, #94a3b8);
   text-align: center;
   gap: 12px;
+}
+
+/* =========================================================================
+ * CARTOUCHE ÉDITORIAL DYNAMIQUE DE FIN D'ARTICLE (SANS ÉMOJI NI SVG)
+ * ========================================================================= */
+
+.article-editorial-footer-card {
+  margin: 36px 0 16px 0;
+  padding: 16px 20px;
+  border-radius: 8px;
+  background: var(--bg-card, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.09));
+  border-left: 3px solid var(--accent-primary, #3b82f6);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  transition: all 0.2s ease;
+}
+
+.article-editorial-footer-header {
+  margin-bottom: 8px;
+}
+
+.article-editorial-badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--accent-primary, #60a5fa);
+  background: rgba(59, 130, 246, 0.12);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  line-height: 1.4;
+}
+
+.article-editorial-footer-content {
+  font-size: 0.9em;
+  line-height: 1.65;
+  color: var(--text-secondary, #cbd5e1);
+  font-family: inherit;
+}
+
+.article-editorial-footer-content a {
+  color: var(--accent-primary, #60a5fa);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+
+.article-editorial-footer-content a:hover {
+  color: #93c5fd;
+}
+
+/* Thème Blanc */
+.article-reader-container.reading-bg-white .article-editorial-footer-card {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  border-left-color: #2563eb !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+.article-reader-container.reading-bg-white .article-editorial-badge {
+  color: #2563eb !important;
+  background: rgba(37, 99, 235, 0.08) !important;
+  border-color: rgba(37, 99, 235, 0.2) !important;
+}
+.article-reader-container.reading-bg-white .article-editorial-footer-content {
+  color: #475569 !important;
+}
+.article-reader-container.reading-bg-white .article-editorial-footer-content a {
+  color: #2563eb !important;
+}
+
+/* Thème Sépia */
+.article-reader-container.reading-bg-sepia .article-editorial-footer-card {
+  background: #ede6d6 !important;
+  border-color: #d6ccba !important;
+  border-left-color: #d97706 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+.article-reader-container.reading-bg-sepia .article-editorial-badge {
+  color: #b45309 !important;
+  background: rgba(180, 83, 9, 0.1) !important;
+  border-color: rgba(180, 83, 9, 0.25) !important;
+}
+.article-reader-container.reading-bg-sepia .article-editorial-footer-content {
+  color: #4a4036 !important;
+}
+.article-reader-container.reading-bg-sepia .article-editorial-footer-content a {
+  color: #b45309 !important;
 }

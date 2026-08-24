@@ -271,10 +271,18 @@ class ArticlesDB:
                 params.append(source_id)
 
             if book_code:
-                where_clauses.append("EXISTS (SELECT 1 FROM article_scripture_links l WHERE l.article_id = a.id AND l.book_code = ?" + (" AND l.chapter = ?" if chapter else "") + ")")
-                params.append(book_code)
+                try:
+                    from core.reference_parser import BOOK_MAPPING, strip_accents
+                    norm_code = BOOK_MAPPING.get(strip_accents(book_code).lower().rstrip('.'), book_code)
+                except Exception:
+                    norm_code = book_code
+
                 if chapter:
-                    params.append(chapter)
+                    where_clauses.append("EXISTS (SELECT 1 FROM article_scripture_links l WHERE l.article_id = a.id AND (l.book_code = ? COLLATE NOCASE OR l.book_code = ? COLLATE NOCASE) AND l.chapter = ?)")
+                    params.extend([norm_code, book_code, chapter])
+                else:
+                    where_clauses.append("EXISTS (SELECT 1 FROM article_scripture_links l WHERE l.article_id = a.id AND (l.book_code = ? COLLATE NOCASE OR l.book_code = ? COLLATE NOCASE))")
+                    params.extend([norm_code, book_code])
 
             if search_query:
                 sq_clean = search_query.strip()
