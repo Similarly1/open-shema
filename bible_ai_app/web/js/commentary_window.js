@@ -189,7 +189,7 @@ const CommentaryWindow = {
 
   async loadChapterCommentaries(bookCode, chapterNum) {
     const reqId = ++this._currentRequestId;
-    const container = document.getElementById('commentary-stream-container');
+    const container = document.getElementById('comm-stream-container');
     
     if (container && (!this.currentChapterData || this.currentChapter !== parseInt(chapterNum, 10))) {
       container.innerHTML = `
@@ -295,7 +295,7 @@ const CommentaryWindow = {
   },
 
   renderStream(data) {
-    const container = document.getElementById('commentary-stream-container');
+    const container = document.getElementById('comm-stream-container');
     if (!container || !data || !data.verses) return;
 
     const totalCommentsCount = data.verses.reduce((acc, v) => acc + (v.comments ? v.comments.length : 0), 0);
@@ -686,6 +686,20 @@ const CommentaryWindow = {
 };
 
 window.CommentaryWindow = CommentaryWindow;
+
+// Global error handler to debug UI issues directly on screen
+window.addEventListener('error', (e) => {
+  const container = document.getElementById('comm-stream-container');
+  if (container) {
+    container.innerHTML = `<div style="padding: 20px; color: #f87171; font-family: monospace; font-size: 13px;"><b>Uncaught Error:</b><br/>${e.message}<br/>${e.filename}:${e.lineno}</div>`;
+  }
+});
+window.addEventListener('unhandledrejection', (e) => {
+  const container = document.getElementById('comm-stream-container');
+  if (container) {
+    container.innerHTML = `<div style="padding: 20px; color: #f87171; font-family: monospace; font-size: 13px;"><b>Unhandled Promise Rejection:</b><br/>${e.reason}</div>`;
+  }
+});
 
 // Initialisation dès que le DOM est chargé
 document.addEventListener('DOMContentLoaded', () => {
