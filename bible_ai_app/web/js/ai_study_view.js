@@ -79,6 +79,14 @@ const AIStudyView = {
       sourcesSummary: 'Lexique Strong Hébreu/Grec, Dictionnaires de racines (Bailly, Gesenius), LXX',
       desc: 'Étude des racines hébraïques/grecques, codes Strong, nuances morphologiques et sens dans la Septante (LXX).',
       placeholder: "Ex: Analyse les termes clés en hébreu/grec dans ce verset, leurs racines et leurs nuances théologiques..."
+    },
+    free_chat: {
+      icon: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+      title: 'Discussion libre & Réflexion',
+      shortTitle: 'Discussion libre',
+      sourcesSummary: 'Bibles, Dictionnaires, Commentaires, Théologie, Notes (selon besoin)',
+      desc: 'Échange ouvert, spontané et interactif. Dialogue fluide pour explorer des idées ou débattre sans formalisme académique.',
+      placeholder: 'Discutez librement, testez une idée théologique ou posez une question spontanée...'
     }
   },
 

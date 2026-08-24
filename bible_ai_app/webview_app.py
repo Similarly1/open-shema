@@ -1687,6 +1687,15 @@ class BibleAppApi:
             "lexical": (
                 "MODE D'ÉTUDE : ANALYSE LEXICALE (GREC & HÉBREU / STRONG)\n"
                 "- Étude des racines linguistiques, codes Strong, étymologie et nuances dans la LXX / Nouveau Testament."
+            ),
+            "free_chat": (
+                "MODE D'ÉTUDE : DISCUSSION LIBRE & RÉFLEXION THÉOLOGIQUE\n"
+                "Tu es un pair intellectuel, un compagnon d'étude théologique et un sparring-partner biblique bienveillant.\n"
+                "OBJECTIFS & POSTURE DU DIALOGUE LIBRE :\n"
+                "- Réponds de manière vivante, fluide, naturelle et directe, sans imposer de carcan académique lourd ni de découpage artificiel en sous-parties obligatoires.\n"
+                "- Adopte une posture d'échange constructif : apporte des éclairages pertinents, propose des perspectives stimulantes, et termine si approprié par une question ouverte ou une relance pour nourrir la réflexion.\n"
+                "- Mobilise les Écritures avec naturel et précision (en citant les références) sans alourdir le propos.\n"
+                "- Si des documents du corpus documentaire ci-dessous sont pertinents pour la question, appuie-toi dessus avec simplicité."
             )
         }
 
@@ -1722,6 +1731,21 @@ class BibleAppApi:
         if profile_prompt:
             profile_prompt_section = f"========================================================================\nCADRAGE HERMÉNEUTIQUE & PROFIL MINISTÉRIEL :\n{profile_prompt}\n========================================================================\n\n"
 
+        if active_mode_key == "free_chat":
+            drafting_rules = (
+                "CONSIGNES DE DIALOGUE LIBRE :\n"
+                "1. Réponds de façon directe, vivante, interactive et bienveillante.\n"
+                "2. Cite naturellement les références bibliques pertinentes dans le cours du texte.\n"
+                "3. Si tu mobilises des données du corpus, cite les sources ou auteurs avec simplicité sans formalisme rigide."
+            )
+        else:
+            drafting_rules = (
+                "CONSIGNES IMPÉRATIVES DE RÉDACTION ET D'ANCRAGE DOCUMENTAIRE :\n"
+                "1. RÈGLE D'OR : Fonde TOUTE ta réponse STRICTEMENT sur les éléments, données historiques et définitions du CORPUS DOCUMENTAIRE fourni ci-dessus.\n"
+                "2. CITATIONS PAR PARAGRAPHE : À la fin de CHAQUE paragraphe ou sous-partie, indique OBLIGATOIREMENT entre crochets la source biblique ou documentaire précise dont provient l'information.\n"
+                "3. Utilise des titres de section Markdown hiérarchiques et soigne la langue française."
+            )
+
         prompt = (
             f"{profile_prompt_section}"
             f"Rôle : Assistant exégétique, théologique et biblique expert.\n"
@@ -1734,10 +1758,7 @@ class BibleAppApi:
             f"========================================================================\n"
             f"{assembled_context or 'Recherche générale sur les corpus bibliques et théologiques disponibles.'}\n"
             f"========================================================================\n\n"
-            f"CONSIGNES IMPÉRATIVES DE RÉDACTION ET D'ANCRAGE DOCUMENTAIRE :\n"
-            f"1. RÈGLE D'OR : Fonde TOUTE ta réponse STRICTEMENT sur les éléments, données historiques et définitions du CORPUS DOCUMENTAIRE fourni ci-dessus.\n"
-            f"2. CITATIONS PAR PARAGRAPHE : À la fin de CHAQUE paragraphe ou sous-partie, indique OBLIGATOIREMENT entre crochets la source biblique ou documentaire précise dont provient l'information.\n"
-            f"3. Utilise des titres de section Markdown hiérarchiques et soigne la langue française."
+            f"{drafting_rules}"
         )
 
         try:

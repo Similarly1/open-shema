@@ -945,6 +945,7 @@ const App = {
           "historical": "Contexte historique & culturel",
           "sermon": "Préparation de prédication",
           "lexical": "Analyse lexicale (Grec & Hébreu)",
+          "free_chat": "Discussion libre & Réflexion",
           "auto": "Synthèse d'étude"
         };
         const rawMode = (response.detected_mode || mode || "theology").toLowerCase();
