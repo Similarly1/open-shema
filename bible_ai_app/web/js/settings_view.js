@@ -831,6 +831,10 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
       if (lbl) lbl.textContent = `~${c.summary_word_count || 300} mots`;
     }
 
+    if (document.getElementById('cfg-articles-vec-mode')) {
+      document.getElementById('cfg-articles-vec-mode').value = c.articles_vectorization_mode || 'balanced';
+    }
+
     // Synchronisation et exclusion des doublons Principal / Fallback
     this.syncAllModelPairs(false);
 
@@ -1123,6 +1127,9 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
     }
     if (document.getElementById('cfg-summary-word-count')) {
       newCfg.summary_word_count = parseInt(document.getElementById('cfg-summary-word-count').value) || 300;
+    }
+    if (document.getElementById('cfg-articles-vec-mode')) {
+      newCfg.articles_vectorization_mode = document.getElementById('cfg-articles-vec-mode').value;
     }
     // Sérialisation des prompts système
     Object.values(this.PROMPT_CONFIGS).forEach(cfg => {

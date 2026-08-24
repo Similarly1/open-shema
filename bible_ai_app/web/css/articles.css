@@ -216,6 +216,57 @@
   margin: 0 0 8px 0;
 }
 
+/* Badges thématiques / Tags */
+.article-card-tags {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.article-reader-tags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 12px 0 16px 0;
+}
+
+.article-topic-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(255,255,255,0.06);
+  color: var(--text-secondary, #cbd5e1);
+  border: 1px solid var(--border-subtle, rgba(255,255,255,0.15));
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.article-topic-tag:hover {
+  background: rgba(59,130,246,0.15);
+  border-color: var(--accent-primary, #3b82f6);
+  color: #60a5fa;
+  transform: translateY(-1px);
+}
+
+.reading-bg-white .article-topic-tag {
+  background: #f1f5f9;
+  color: #334155;
+  border-color: #cbd5e1;
+}
+.reading-bg-sepia .article-topic-tag {
+  background: #ede6d6;
+  color: #4a4036;
+  border-color: #d6ccba;
+}
+
 .article-card-author {
   font-size: 0.85rem;
   color: var(--text-secondary, #cbd5e1);

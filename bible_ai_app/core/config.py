@@ -148,6 +148,8 @@ DEFAULTS = {
     "vintage_mode": True,
     "vintage_scope": "auto",
     "vintage_intensity": "subtle",
+    "articles_vectorization_mode": "balanced",  # "balanced", "economical", "full"
+    "articles_recent_vectorize_cap": 10,
 }
 
 def load_config():

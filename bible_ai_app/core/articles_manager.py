@@ -161,19 +161,64 @@ class ArticlesManager:
         """Articles contemporains liés à un livre et chapitre biblique (Lecteur & Panneau latéral)."""
         return self.db.get_articles_for_passage(book_code=book_code, chapter=chapter, limit=limit)
 
+    def vectorize_single_article(
+        self,
+        article_id: str,
+        vector_db: Any,
+        embedding_model: str = "gemini-embedding-2",
+        chunk_size: int = 800,
+        chunk_overlap: int = 150
+    ) -> bool:
+        """Découpe et vectorise un article individuel dans ChromaDB (ex: lors de sa lecture ou mise en favori)."""
+        art = self.db.get_article_by_id(article_id)
+        if not art:
+            return False
+        
+        md_text = self.get_article_markdown(article_id)
+        if not md_text or len(md_text.strip()) < 100:
+            self.db.mark_as_indexed(article_id, is_indexed=True)
+            return False
+
+        chunks = self._chunk_text(
+            text=md_text,
+            article=art,
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap
+        )
+
+        if chunks and vector_db:
+            try:
+                vector_db.add_chunks(chunks, embedding_model=embedding_model)
+            except Exception as e:
+                logger.error(f"[ArticlesManager] Erreur vectorisation article {article_id}: {e}")
+                return False
+
+        self.db.mark_as_indexed(article_id, is_indexed=True)
+        return True
+
     def index_unindexed_articles_in_rag(
         self,
-        vector_db: VectorDB,
+        vector_db: Any,
         embedding_model: str = "gemini-embedding-2",
+        max_articles: Optional[int] = None,
+        mode: str = "balanced",
         chunk_size: int = 800,
         chunk_overlap: int = 150,
         progress_callback: Optional[Callable[[int], None]] = None
     ) -> int:
         """
-        Découpe et vectorise les articles non encore indexés dans ChromaDB.
-        Retourne le nombre d'articles vectorisés avec succès.
+        Découpe et vectorise les articles non encore indexés selon le mode configuré :
+        - 'economical': ne vectorise rien automatiquement (uniquement à la lecture).
+        - 'balanced': vectorise au maximum max_articles (par défaut 10 récents).
+        - 'full': vectorise l'ensemble des articles non indexés.
         """
-        unindexed = self.db.get_unindexed_articles(limit=50)
+        if mode == "economical":
+            if progress_callback:
+                progress_callback(100)
+            return 0
+
+        limit = max_articles if max_articles is not None else (10 if mode == "balanced" else 100)
+        unindexed = self.db.get_unindexed_articles(limit=limit)
         if not unindexed:
             if progress_callback:
                 progress_callback(100)
@@ -183,24 +228,15 @@ class ArticlesManager:
         indexed_count = 0
 
         for idx, art in enumerate(unindexed):
-            md_text = self.get_article_markdown(art["id"])
-            if not md_text or len(md_text.strip()) < 100:
-                self.db.mark_as_indexed(art["id"], is_indexed=True)
-                continue
-
-            # Découpage en fragments (chunks)
-            chunks = self._chunk_text(
-                text=md_text,
-                article=art,
+            success = self.vectorize_single_article(
+                article_id=art["id"],
+                vector_db=vector_db,
+                embedding_model=embedding_model,
                 chunk_size=chunk_size,
                 chunk_overlap=chunk_overlap
             )
-
-            if chunks:
-                vector_db.add_chunks(chunks, embedding_model=embedding_model)
-
-            self.db.mark_as_indexed(art["id"], is_indexed=True)
-            indexed_count += 1
+            if success:
+                indexed_count += 1
 
             if progress_callback:
                 progress_callback(int(((idx + 1) / total_articles) * 100))

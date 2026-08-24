@@ -3124,7 +3124,7 @@ class BibleAppApi:
             return []
 
     def get_article_content(self, article_id: str) -> Dict[str, Any]:
-        """Retourne les détails et le texte complet Markdown d'un article."""
+        """Retourne les détails et le texte complet Markdown d'un article, et déclenche la vectorisation à la lecture si nécessaire."""
         try:
             from core.articles_manager import ArticlesManager
             manager = ArticlesManager.get_instance()
@@ -3132,6 +3132,16 @@ class BibleAppApi:
             if not art:
                 return {"success": False, "error": "Article introuvable."}
             
+            # Déclencher la vectorisation à la demande en tâche de fond si non indexé
+            if not art.get("is_indexed") and getattr(self, "vector_db", None):
+                import threading
+                embedding_model = self.config.get("embedding_model", "gemini-embedding-2")
+                threading.Thread(
+                    target=manager.vectorize_single_article,
+                    args=(article_id, self.vector_db, embedding_model),
+                    daemon=True
+                ).start()
+
             md_content = manager.get_article_markdown(article_id)
             return {
                 "success": True,
@@ -3164,7 +3174,7 @@ class BibleAppApi:
             return {"success": False, "error": str(e)}
 
     def sync_article_sources(self, source_id: Optional[str] = None) -> Dict[str, Any]:
-        """Déclenche la synchronisation des flux RSS de blogs."""
+        """Déclenche le téléchargement textuel immédiat des flux, puis vectorise les N récents en arrière-plan selon le mode."""
         try:
             from core.articles_manager import ArticlesManager
             manager = ArticlesManager.get_instance()
@@ -3174,6 +3184,18 @@ class BibleAppApi:
                 results = {source_id: new_count}
             else:
                 results = manager.sync_all_active_sources()
+
+            # Vectorisation contrôlée en arrière-plan selon le mode configuré (balanced: cap 10, economical: 0, full: all)
+            if getattr(self, "vector_db", None):
+                import threading
+                v_mode = self.config.get("articles_vectorization_mode", "balanced")
+                v_cap = self.config.get("articles_recent_vectorize_cap", 10)
+                embedding_model = self.config.get("embedding_model", "gemini-embedding-2")
+                threading.Thread(
+                    target=manager.index_unindexed_articles_in_rag,
+                    args=(self.vector_db, embedding_model, v_cap, v_mode),
+                    daemon=True
+                ).start()
 
             stats = manager.db.get_stats()
             return {

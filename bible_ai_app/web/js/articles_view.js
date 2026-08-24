@@ -333,6 +333,16 @@ const ArticlesView = {
       const color = this.getSourceColor(art.source_id);
       const pubDate = this.formatDate(art.published_at);
       const refs = art.scripture_references || [];
+      const tags = art.tags_list || [];
+
+      let tagsHtml = '';
+      if (tags.length > 0) {
+        tagsHtml = `
+          <div class="article-card-tags">
+            ${tags.slice(0, 3).map(t => `<span class="article-topic-tag" data-tag="${this.escapeHtml(t)}">${this.escapeHtml(t)}</span>`).join('')}
+          </div>
+        `;
+      }
 
       let refsHtml = '';
       if (refs.length > 0) {
@@ -359,6 +369,8 @@ const ArticlesView = {
 
           <h3 class="article-card-title">${this.escapeHtml(art.title)}</h3>
           
+          ${tagsHtml}
+
           <div class="article-card-author">
             Par <strong>${this.escapeHtml(art.author || 'Auteur inconnu')}</strong>
           </div>
@@ -372,9 +384,22 @@ const ArticlesView = {
 
     container.innerHTML = html;
 
-    // Clic pour ouvrir un article
+    // Clic pour ouvrir un article ou filtrer par tag / verset
     container.querySelectorAll('.article-card').forEach(card => {
       card.addEventListener('click', (e) => {
+        // Clic sur un badge thématique -> filtre par tag
+        const tagEl = e.target.closest('.article-topic-tag');
+        if (tagEl) {
+          e.stopPropagation();
+          const tag = tagEl.dataset.tag;
+          const searchInput = document.getElementById('articles-search-input');
+          if (searchInput) searchInput.value = tag;
+          this.currentSearchQuery = tag;
+          this.loadArticles();
+          return;
+        }
+
+        // Clic sur un badge biblique -> ouvrir dans la Bible
         const refBadge = e.target.closest('.scripture-badge');
         if (refBadge) {
           e.stopPropagation();
@@ -401,6 +426,7 @@ const ArticlesView = {
     const contentEl = document.getElementById('article-reader-body');
     const titleEl = document.getElementById('article-reader-title');
     const metaEl = document.getElementById('article-reader-meta');
+    const tagsEl = document.getElementById('article-reader-tags');
     const extLink = document.getElementById('article-reader-external-link');
 
     if (viewList) viewList.classList.add('hidden');
@@ -419,6 +445,30 @@ const ArticlesView = {
 
       const art = res.article;
       if (titleEl) titleEl.textContent = art.title;
+
+      // Affichage des tags / badges sous le titre
+      const tags = art.tags_list || [];
+      if (tagsEl) {
+        if (tags.length > 0) {
+          tagsEl.innerHTML = tags.map(t => `<span class="article-topic-tag" data-tag="${this.escapeHtml(t)}">${this.escapeHtml(t)}</span>`).join('');
+          tagsEl.classList.remove('hidden');
+
+          tagsEl.querySelectorAll('.article-topic-tag').forEach(tagBtn => {
+            tagBtn.addEventListener('click', () => {
+              const tag = tagBtn.dataset.tag;
+              this.closeArticleReader();
+              const searchInput = document.getElementById('articles-search-input');
+              if (searchInput) searchInput.value = tag;
+              this.currentSearchQuery = tag;
+              this.loadArticles();
+            });
+          });
+        } else {
+          tagsEl.innerHTML = '';
+          tagsEl.classList.add('hidden');
+        }
+      }
+
       if (metaEl) {
         metaEl.innerHTML = `
           <span>Source : <strong>${this.escapeHtml(art.source_name)}</strong></span> • 

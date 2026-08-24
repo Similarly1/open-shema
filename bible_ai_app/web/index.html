@@ -2392,6 +2392,27 @@
                   </div>
                 </div>
 
+                <!-- CARTE VECTORISATION DES ARTICLES & BLOGS (RAG) -->
+                <div class="settings-card" style="margin-top: 16px;">
+                  <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-primary, #3b82f6);"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10l6 6v8a2 2 0 0 1-2 2z"></path><path d="M14 2v6h6"></path></svg>
+                    <span>Articles &amp; Blogs contemporains (RAG &amp; Vectorisation)</span>
+                  </div>
+                  <p class="card-desc">Choisissez comment les réflexions et articles de blogs théologiques sont indexés dans la mémoire vectorielle de l'IA.</p>
+
+                  <div class="form-group">
+                    <label for="cfg-articles-vec-mode">Stratégie de vectorisation :</label>
+                    <select id="cfg-articles-vec-mode" class="select-field full-w" style="height: 38px;">
+                      <option value="balanced">⚡ Équilibré (Recommandé) — 10 articles récents de chaque flux + articles lus</option>
+                      <option value="economical">🌱 Économe — Uniquement les articles ouverts pour lecture ou mis en favoris</option>
+                      <option value="full">📚 Intégral — Vectorisation automatique de tous les articles en tâche de fond</option>
+                    </select>
+                    <p class="field-hint" style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">
+                      Le mode équilibré permet à l'IA d'avoir immédiatement accès aux thèmes théologiques récents sans aucun ralentissement.
+                    </p>
+                  </div>
+                </div>
+
               <div class="form-divider" style="margin: 20px 0 16px 0;"></div>
               
               <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
@@ -4319,6 +4340,7 @@
             <div class="article-reader-container" id="article-reader-container">
               <div class="article-reader-hero">
                 <h1 class="article-reader-title" id="article-reader-title">Titre de l'article</h1>
+                <div class="article-reader-tags" id="article-reader-tags"></div>
                 <div class="article-reader-meta" id="article-reader-meta">Auteur • Date • Source</div>
               </div>
               <div class="article-reader-body" id="article-reader-body">

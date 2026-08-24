@@ -308,6 +308,18 @@ const SelectionContextMenu = {
       verseBtn.removeAttribute('data-ref');
     }
 
+    // Gestion contextuelle du surlignage (Option A : uniquement actif sur le texte biblique)
+    const hlRow = document.getElementById('scm-highlight-row');
+    const eraseHlBtn = document.getElementById('scm-btn-erase-hl');
+    const canHighlight = this.currentSourceContext?.type === 'bible' && typeof HighlighterManager !== 'undefined';
+    
+    if (hlRow) {
+      hlRow.style.display = canHighlight ? 'flex' : 'none';
+    }
+    if (eraseHlBtn) {
+      eraseHlBtn.style.display = canHighlight ? 'flex' : 'none';
+    }
+
     // Positionner le menu dans la fenêtre
     this.menuEl.classList.remove('hidden');
     const rect = this.menuEl.getBoundingClientRect();
