@@ -17248,14 +17248,14 @@ body.theme-light .ps-select-sm optgroup {
    ========================================================================= */
 .ps-grid-2col.ps-encyclopedia-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 20px;
   align-items: start;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1024px) {
   .ps-grid-2col.ps-encyclopedia-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -17265,7 +17265,7 @@ body.theme-light .ps-select-sm optgroup {
   flex-direction: column;
 }
 
-/* CARTE LEAFLET INTERACTIVE */
+/* CARTE LEAFLET INTERACTIVE (SPACIEUSE ET EXTENSIBLE) */
 .ps-map-section {
   margin-bottom: 12px;
 }
@@ -17273,12 +17273,18 @@ body.theme-light .ps-select-sm optgroup {
 .ps-map-wrap {
   position: relative;
   width: 100%;
-  height: 280px;
-  min-height: 280px;
+  height: 380px;
+  min-height: 380px;
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid var(--border-color);
   background-color: #161b24;
+  transition: height 0.25s ease;
+}
+
+.ps-map-wrap.expanded {
+  height: 580px !important;
+  min-height: 580px !important;
 }
 
 body.reading-bg-white .ps-map-wrap,
@@ -17289,7 +17295,7 @@ body.theme-light .ps-map-wrap {
 .ps-leaflet-map {
   width: 100% !important;
   height: 100% !important;
-  min-height: 280px !important;
+  min-height: 100% !important;
   display: block;
   z-index: 1;
 }
@@ -17299,6 +17305,9 @@ body.theme-light .ps-map-wrap {
   top: 10px;
   right: 10px;
   z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .ps-map-overlay-btn {
@@ -18469,35 +18478,21 @@ body.theme-light .ps-dict-article-body strong {
   color: var(--text-secondary);
 }
 
-.ps-author-body {
-  font-size: 14px;
-  line-height: 1.7;
-  color: var(--text-primary);
-}
-
-.ps-comm-synth-box {
-  background-color: var(--bg-surface);
-  border: 1px solid var(--accent-blue);
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 16px;
-}
-
-.ps-synth-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
-  color: var(--accent-blue);
-  font-weight: 700;
-  font-size: 13.5px;
-}
-
-/* =========================================================================
-   CONTEXTE HISTORIQUE, CARTOGRAPHIE & DICTIONNAIRES (PASSAGE STUDY)
-   ========================================================================= */
-.ps-grid-2col.ps-encyclopedia-grid {
+.ps-drawer-grid {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+.ps-drawer-item {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.ps-drawer-item-header {
+  display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 6px;

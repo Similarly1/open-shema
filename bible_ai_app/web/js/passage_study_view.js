@@ -1407,6 +1407,10 @@ const PassageStudyView = {
             <div class="ps-map-wrap">
               <div id="ps-leaflet-map-container" class="ps-leaflet-map"></div>
               <div class="ps-map-controls-overlay">
+                <button type="button" class="ps-btn-sm ps-map-overlay-btn" id="btn-ps-map-expand" title="Agrandir / Réduire la hauteur de la carte">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                  <span id="ps-map-expand-label">Agrandir</span>
+                </button>
                 <button type="button" class="ps-btn-sm ps-map-overlay-btn" id="btn-ps-map-recenter" title="Recadrer la carte sur tous les lieux du passage">
                   <span class="ps-icon-slot">${this.ICONS.compass}</span>
                   <span>Recadrer</span>
@@ -1678,7 +1682,25 @@ const PassageStudyView = {
   },
 
   bindEncyclopediaEvents(places, dicts) {
-    // 1. Bouton Recadrer la carte
+    // 1. Bouton Agrandir / Réduire la carte
+    document.getElementById('btn-ps-map-expand')?.addEventListener('click', () => {
+      const mapWrap = document.querySelector('.ps-map-wrap');
+      const label = document.getElementById('ps-map-expand-label');
+      if (mapWrap) {
+        const isExpanded = mapWrap.classList.toggle('expanded');
+        if (label) label.textContent = isExpanded ? 'Réduire' : 'Agrandir';
+        setTimeout(() => {
+          if (this.leafletMap) {
+            this.leafletMap.invalidateSize(true);
+            if (this.mapBounds && this.mapBounds.isValid()) {
+              this.leafletMap.fitBounds(this.mapBounds, { padding: [35, 35], maxZoom: 12 });
+            }
+          }
+        }, 280);
+      }
+    });
+
+    // 2. Bouton Recadrer la carte
     document.getElementById('btn-ps-map-recenter')?.addEventListener('click', () => {
       if (this.leafletMap) {
         this.leafletMap.invalidateSize(true);
