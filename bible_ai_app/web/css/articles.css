@@ -242,6 +242,19 @@
   letter-spacing: 0.3px;
 }
 
+.article-podcast-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(139, 92, 246, 0.15);
+  color: #a78bfa;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
 .article-pub-date {
   font-size: 0.78rem;
   color: var(--text-muted, #94a3b8);
@@ -449,6 +462,17 @@
   box-sizing: border-box;
   font-size: calc(18px * var(--article-zoom-factor, 1));
   transition: max-width 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+.article-reader-container *,
+.article-reader-title,
+.article-reader-lead,
+.article-markdown-body,
+.article-markdown-body * {
+  user-select: text !important;
+  -webkit-user-select: text !important;
 }
 
 /* Hero Banner avec dégradé subtil */
@@ -550,6 +574,43 @@
   color: var(--accent-primary, #60a5fa);
 }
 
+/* Lecteur Audio / Podcast */
+.article-reader-audio-wrap {
+  margin: 20px 0;
+}
+
+.article-audio-player-card {
+  background: var(--bg-card, rgba(30, 41, 59, 0.6));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.article-audio-iframe-wrap {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.article-audio-iframe-wrap iframe {
+  width: 100%;
+  border: none;
+  display: block;
+}
+
+.article-audio-native-player {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px;
+  gap: 16px;
+}
+
+.article-audio-native-player audio {
+  width: 100%;
+  outline: none;
+}
+
 /* Chapô introductif */
 .article-reader-lead {
   font-size: 1.15em;
@@ -590,12 +651,13 @@
 .article-reader-container.reading-bg-white .article-reader-lead,
 .article-reader-container.reading-bg-white .article-markdown-body h1,
 .article-reader-container.reading-bg-white .article-markdown-body h2,
-.article-reader-container.reading-bg-white .article-markdown-body h3 {
+.article-reader-container.reading-bg-white .article-markdown-body h3,
+.article-reader-container.reading-bg-white .article-markdown-body h4 {
   color: #0f172a !important;
 }
 .article-reader-container.reading-bg-white .author-pub-line,
 .article-reader-container.reading-bg-white .article-markdown-body blockquote {
-  color: #64748b !important;
+  color: #334155 !important;
 }
 .article-reader-container.reading-bg-white .article-reader-lead {
   background: #f8fafc !important;
@@ -608,6 +670,18 @@
   background: #f1f5f9;
   color: #334155;
   border-color: #cbd5e1;
+}
+.article-reader-container.reading-bg-white .article-table {
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+.article-reader-container.reading-bg-white .article-table th {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+.article-reader-container.reading-bg-white .article-table td {
+  border-color: #e2e8f0;
+  color: #334155;
 }
 
 .article-reader-container.reading-bg-sepia {
@@ -623,12 +697,13 @@
 .article-reader-container.reading-bg-sepia .article-reader-lead,
 .article-reader-container.reading-bg-sepia .article-markdown-body h1,
 .article-reader-container.reading-bg-sepia .article-markdown-body h2,
-.article-reader-container.reading-bg-sepia .article-markdown-body h3 {
+.article-reader-container.reading-bg-sepia .article-markdown-body h3,
+.article-reader-container.reading-bg-sepia .article-markdown-body h4 {
   color: #1c1815 !important;
 }
 .article-reader-container.reading-bg-sepia .author-pub-line,
 .article-reader-container.reading-bg-sepia .article-markdown-body blockquote {
-  color: #786f66 !important;
+  color: #4a4036 !important;
 }
 .article-reader-container.reading-bg-sepia .article-reader-lead {
   background: #ede6d6 !important;
@@ -642,6 +717,18 @@
   color: #4a4036;
   border-color: #d6ccba;
 }
+.article-reader-container.reading-bg-sepia .article-table {
+  background: #f7f3e8;
+  border-color: #d6ccba;
+}
+.article-reader-container.reading-bg-sepia .article-table th {
+  background: #ede6d6;
+  color: #1c1815;
+}
+.article-reader-container.reading-bg-sepia .article-table td {
+  border-color: #e3d9c6;
+  color: #4a4036;
+}
 
 .article-reader-container.reading-bg-dark {
   background-color: #161b22 !important;
@@ -651,47 +738,130 @@
   background: linear-gradient(to bottom, rgba(22,27,34,0) 45%, #161b22 100%) !important;
 }
 
-/* Corps Markdown de l'article */
+/* =========================================================================
+ * CORPS MARKDOWN DE L'ARTICLE & STRUCTURE ÉDITORIALE RICHE
+ * ========================================================================= */
+
 .article-markdown-body {
   font-size: 1em;
-  line-height: 1.8;
+  line-height: 1.85;
   color: var(--text-primary, #e2e8f0);
   font-family: inherit;
 }
 
 .article-markdown-body p {
   font-size: 1em;
-  margin-bottom: 1.35em;
+  margin-bottom: 1.4em;
 }
 
 .article-markdown-body h1,
 .article-markdown-body h2,
-.article-markdown-body h3 {
+.article-markdown-body h3,
+.article-markdown-body h4 {
   color: var(--text-primary, #f8fafc);
-  margin-top: 1.6em;
-  margin-bottom: 0.6em;
+  font-weight: 700;
+  margin-top: 1.8em;
+  margin-bottom: 0.7em;
   line-height: 1.3;
 }
 
 .article-markdown-body h2 {
-  font-size: 1.4em;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  padding-bottom: 6px;
+  font-size: 1.45em;
+  border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.08));
+  padding-bottom: 8px;
+  letter-spacing: -0.2px;
 }
 
 .article-markdown-body h3 {
-  font-size: 1.2em;
+  font-size: 1.25em;
+  color: var(--accent-primary, #60a5fa);
+  margin-top: 1.5em;
 }
 
+.article-markdown-body h4 {
+  font-size: 1.1em;
+}
+
+/* Blocs de citations bibliques / Confessions de foi */
 .article-markdown-body blockquote {
-  font-size: 0.95em;
-  border-left: 3px solid var(--accent-primary, #3b82f6);
-  padding: 8px 18px;
-  margin: 1.4em 0;
-  color: var(--text-secondary, #94a3b8);
+  position: relative;
+  font-size: 1.02em;
   font-style: italic;
-  background: rgba(255,255,255,0.02);
-  border-radius: 0 6px 6px 0;
+  line-height: 1.75;
+  border-left: 4px solid var(--accent-primary, #3b82f6);
+  background: var(--bg-card, rgba(255,255,255,0.03));
+  padding: 16px 22px 16px 36px;
+  margin: 1.8em 0;
+  border-radius: 0 10px 10px 0;
+  color: var(--text-primary, #e2e8f0);
+}
+
+.article-markdown-body blockquote::before {
+  content: "“";
+  position: absolute;
+  left: 10px;
+  top: 6px;
+  font-size: 2.2em;
+  line-height: 1;
+  font-family: Georgia, serif;
+  color: var(--accent-primary, #3b82f6);
+  opacity: 0.6;
+}
+
+.article-markdown-body blockquote p {
+  margin-bottom: 0.6em;
+}
+
+.article-markdown-body blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* Numéros de versets en exposant */
+.article-markdown-body sup,
+.article-markdown-body .verse-sup {
+  font-size: 0.75em;
+  font-weight: 700;
+  color: var(--accent-primary, #60a5fa);
+  vertical-align: super;
+  margin-right: 2px;
+}
+
+/* Tableaux comparatifs stylisés */
+.article-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1.8em 0;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, rgba(255,255,255,0.12));
+}
+
+.article-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  font-size: 0.92em;
+}
+
+.article-table th {
+  background: var(--bg-card, rgba(255,255,255,0.06));
+  color: var(--text-primary, #f8fafc);
+  font-weight: 700;
+  padding: 12px 14px;
+  border-bottom: 2px solid var(--border-color, rgba(255,255,255,0.15));
+}
+
+.article-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.06));
+  color: var(--text-secondary, #cbd5e1);
+}
+
+.article-table tr:nth-child(even) {
+  background: rgba(255,255,255,0.015);
+}
+
+.article-table tr:hover {
+  background: rgba(59,130,246,0.06);
 }
 
 .article-markdown-body .article-link {
@@ -735,6 +905,65 @@
   padding: 0 14px;
   font-size: 13px;
   color: var(--accent-primary, #d97706);
+}
+
+/* Transcriptions de podcasts & Dialogues d'interview */
+.article-speaker-turn {
+  margin: 1.2em 0;
+  padding: 10px 16px;
+  background: var(--bg-card, rgba(255, 255, 255, 0.02));
+  border-left: 3px solid var(--accent-primary, #3b82f6);
+  border-radius: 0 8px 8px 0;
+  transition: background 0.15s ease;
+}
+
+.article-speaker-turn:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.article-speaker-badge {
+  display: inline-block;
+  font-size: 0.85em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--accent-primary, #60a5fa);
+  margin-bottom: 4px;
+}
+
+.article-speaker-speech {
+  font-size: 1em;
+  line-height: 1.75;
+  color: var(--text-primary, #f1f5f9);
+  margin: 0;
+}
+
+/* Callout d'information */
+.article-info-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  margin: 1.4em 0;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 8px;
+  font-size: 0.88em;
+  color: var(--text-secondary, #cbd5e1);
+  line-height: 1.55;
+}
+
+/* Badge de série de podcast */
+.article-topic-tag-podcast {
+  background: rgba(139, 92, 246, 0.15) !important;
+  color: #c4b5fd !important;
+  border-color: rgba(139, 92, 246, 0.4) !important;
+  font-weight: 700 !important;
+}
+
+.article-topic-tag-podcast:hover {
+  background: rgba(139, 92, 246, 0.25) !important;
+  border-color: #8b5cf6 !important;
 }
 
 /* États vides et chargements */

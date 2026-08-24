@@ -58,6 +58,7 @@ class ArticlesDB:
                 image_url TEXT,
                 author_avatar_url TEXT,
                 lead_summary TEXT,
+                audio_url TEXT,
                 has_full_text INTEGER DEFAULT 1,
                 is_indexed INTEGER DEFAULT 0,
                 FOREIGN KEY (source_id) REFERENCES sources (id) ON DELETE CASCADE
@@ -65,7 +66,7 @@ class ArticlesDB:
             """)
 
             # Migration automatique si colonnes absentes
-            for col in ["tags TEXT", "image_url TEXT", "author_avatar_url TEXT", "lead_summary TEXT"]:
+            for col in ["tags TEXT", "image_url TEXT", "author_avatar_url TEXT", "lead_summary TEXT", "audio_url TEXT"]:
                 try:
                     cursor.execute(f"ALTER TABLE articles ADD COLUMN {col}")
                 except Exception:
@@ -193,11 +194,12 @@ class ArticlesDB:
             image_url = article.get("image_url", "")
             author_avatar_url = article.get("author_avatar_url", "")
             lead_summary = article.get("lead_summary", article.get("summary", ""))
+            audio_url = article.get("audio_url", "")
 
             cursor.execute("""
             INSERT INTO articles (
-                id, source_id, title, author, url, published_at, fetched_at, summary, content_path, tags, image_url, author_avatar_url, lead_summary, has_full_text, is_indexed
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                id, source_id, title, author, url, published_at, fetched_at, summary, content_path, tags, image_url, author_avatar_url, lead_summary, audio_url, has_full_text, is_indexed
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
                 title = excluded.title,
                 author = CASE WHEN excluded.author != '' THEN excluded.author ELSE articles.author END,
@@ -209,6 +211,7 @@ class ArticlesDB:
                 image_url = CASE WHEN excluded.image_url != '' THEN excluded.image_url ELSE articles.image_url END,
                 author_avatar_url = CASE WHEN excluded.author_avatar_url != '' THEN excluded.author_avatar_url ELSE articles.author_avatar_url END,
                 lead_summary = CASE WHEN excluded.lead_summary != '' THEN excluded.lead_summary ELSE articles.lead_summary END,
+                audio_url = CASE WHEN excluded.audio_url != '' THEN excluded.audio_url ELSE articles.audio_url END,
                 has_full_text = excluded.has_full_text
             """, (
                 article["id"],
@@ -224,6 +227,7 @@ class ArticlesDB:
                 image_url,
                 author_avatar_url,
                 lead_summary,
+                audio_url,
                 1 if article.get("has_full_text", True) else 0,
                 1 if article.get("is_indexed", False) else 0
             ))

@@ -273,6 +273,11 @@ const SelectionContextMenu = {
       source.type = 'bible';
       source.title = `${BibleReader?.currentBook || 'Bible'} ${BibleReader?.currentChapter || ''}`.trim();
       source.reference = source.title;
+    } else if (target.closest('#view-articles, .article-reader-container')) {
+      source.type = 'article';
+      source.title = document.getElementById('article-reader-title')?.textContent || 'Article';
+      const author = document.getElementById('article-author-name')?.textContent || '';
+      source.reference = `${source.title}${author ? ' (Par ' + author + ')' : ''}`;
     }
 
     this.currentSourceContext = source;

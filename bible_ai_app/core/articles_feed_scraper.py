@@ -193,21 +193,22 @@ class ArticlesFeedScraper:
 
         return items
 
-    def fetch_full_article_content(self, article: Dict[str, Any]) -> Tuple[str, str, str, str, str]:
+    def fetch_full_article_content(self, article: Dict[str, Any]) -> Tuple[str, str, str, str, str, str]:
         """
         Garantit l'obtention du contenu complet en Markdown et des métadonnées riches.
-        Retourne (content_markdown, author, image_url, author_avatar_url, lead_summary).
+        Retourne (content_markdown, author, image_url, author_avatar_url, lead_summary, audio_url).
         """
         raw_html = article.get("raw_content_html", "")
         author = article.get("author", "")
         image_url = article.get("image_url", "")
         author_avatar_url = article.get("author_avatar_url", "")
         lead_summary = article.get("summary", "")
+        audio_url = article.get("audio_url", "")
         source_config = article.get("source_config", {})
         selectors = source_config.get("selectors", {})
         url = article.get("url")
 
-        # Scraping de la page web pour récupérer le contenu complet, l'image héro et l'avatar auteur
+        # Scraping de la page web pour récupérer le contenu complet, l'image héro, l'avatar et l'audio
         if url:
             try:
                 resp = self.session.get(url, timeout=self.timeout)
@@ -229,7 +230,6 @@ class ArticlesFeedScraper:
                     # 2. Auteur réel et Avatar
                     author_box = page_soup.select_one(".author-info, .entry-author, .author-bio, .post-author, div[class*='author']")
                     if author_box:
-                        # Nom auteur
                         for a_tag in author_box.select("a[rel='author'], .author-name, strong, h3, h4"):
                             t = a_tag.get_text(strip=True)
                             if t and len(t) < 40 and not any(x in t.lower() for x in ["tout pour", "tpsg", "admin", "par ", "auteur"]):
@@ -254,7 +254,32 @@ class ArticlesFeedScraper:
                         if desc_cand and len(desc_cand) > len(lead_summary or ""):
                             lead_summary = desc_cand
 
-                    # 4. Corps de l'article
+                    # 4. Lecteur Audio / Podcast
+                    if not audio_url:
+                        # 4a. Iframe Spotify / Ausha / Soundcloud
+                        for ifr in page_soup.find_all("iframe"):
+                            src = ifr.get("src", "")
+                            if any(k in src.lower() for k in ["spotify", "ausha", "soundcloud", "podbean", "apple", "deezer"]):
+                                audio_url = src
+                                break
+                        # 4b. Balise audio
+                        if not audio_url:
+                            audio_tag = page_soup.find("audio")
+                            if audio_tag:
+                                audio_url = audio_tag.get("src") or ""
+                                if not audio_url:
+                                    src_tag = audio_tag.find("source")
+                                    if src_tag:
+                                        audio_url = src_tag.get("src", "")
+                        # 4c. Lien direct mp3
+                        if not audio_url:
+                            for a in page_soup.find_all("a", href=True):
+                                href = a["href"]
+                                if href.endswith(".mp3") or ".mp3?" in href:
+                                    audio_url = href
+                                    break
+
+                    # 5. Corps de l'article / Podcast
                     content_el = None
                     if selectors.get("content"):
                         for sel in selectors["content"].split(","):
@@ -269,14 +294,14 @@ class ArticlesFeedScraper:
                     if content_el:
                         md_content = self.html_to_clean_markdown(str(content_el), selectors.get("excludes", []))
                         if len(md_content) >= 300:
-                            return md_content, author, image_url, author_avatar_url, lead_summary
+                            return md_content, author, image_url, author_avatar_url, lead_summary, audio_url
 
             except Exception as e:
                 logger.warning(f"[FeedScraper] Scraping web pour {url} : {e}")
 
         # Fallback sur le contenu du flux
         md_content = self.html_to_clean_markdown(raw_html, selectors.get("excludes", []))
-        return md_content, author, image_url, author_avatar_url, lead_summary
+        return md_content, author, image_url, author_avatar_url, lead_summary, audio_url
 
     def html_to_clean_markdown(self, html_content: str, exclude_selectors: Optional[List[str]] = None) -> str:
         """
@@ -291,7 +316,7 @@ class ArticlesFeedScraper:
         for tag in soup(["script", "style", "nav", "footer", "form", "iframe", "noscript", "svg", "header"]):
             tag.decompose()
 
-        for meta_el in soup.select(".entry-meta, .post-meta, .entry-header, .post-header, .article-header, .breadcrumb, .social-share, .jp-relatedposts, .wp-block-post-date, .wp-block-post-author, .author-info"):
+        for meta_el in soup.select(".entry-meta, .post-meta, .entry-header, .post-header, .article-header, .breadcrumb, .social-share, .jp-relatedposts, .wp-block-post-date, .wp-block-post-author, .author-info, .single-header, .single-meta, .single-footer, .single-related"):
             meta_el.decompose()
 
         # Supprimer les commentaires HTML
@@ -310,6 +335,34 @@ class ArticlesFeedScraper:
         # 3. Traiter les blocs et formater en Markdown
         return self._convert_soup_to_markdown(soup).strip()
 
+    def _convert_table_to_markdown(self, table_el) -> str:
+        """Convertit un tableau HTML en tableau Markdown soigné."""
+        rows = []
+        for tr in table_el.find_all("tr"):
+            cells = []
+            for cell in tr.find_all(["th", "td"]):
+                ct = self._format_inline(cell).strip().replace("\n", " ")
+                cells.append(ct)
+            if cells:
+                rows.append(cells)
+        if not rows:
+            return ""
+        
+        max_cols = max(len(r) for r in rows)
+        if max_cols == 0:
+            return ""
+
+        norm_rows = [r + [""] * (max_cols - len(r)) for r in rows]
+        
+        md_lines = []
+        header = norm_rows[0]
+        md_lines.append("| " + " | ".join(header) + " |")
+        md_lines.append("| " + " | ".join(["---"] * max_cols) + " |")
+        for row in norm_rows[1:]:
+            md_lines.append("| " + " | ".join(row) + " |")
+            
+        return "\n".join(md_lines)
+
     def _convert_soup_to_markdown(self, soup: BeautifulSoup) -> str:
         """Convertit les nœuds BeautifulSoup en texte Markdown structuré."""
         lines = []
@@ -326,7 +379,9 @@ class ArticlesFeedScraper:
             if tag_name in ["h1", "h2", "h3", "h4", "h5", "h6"]:
                 level = int(tag_name[1])
                 prefix = "#" * level
-                lines.append(f"\n{prefix} {element.get_text(strip=True)}\n")
+                h_text = element.get_text(strip=True)
+                if h_text:
+                    lines.append(f"\n{prefix} {h_text}\n")
 
             elif tag_name == "p":
                 p_text = self._format_inline(element)
@@ -334,9 +389,24 @@ class ArticlesFeedScraper:
                     lines.append(f"\n{p_text}\n")
 
             elif tag_name == "blockquote":
-                bq_text = element.get_text(strip=True)
-                quoted = "\n".join(f"> {l}" for l in bq_text.splitlines() if l.strip())
-                lines.append(f"\n{quoted}\n")
+                bq_paragraphs = []
+                for p in element.find_all(["p", "div"]):
+                    pt = self._format_inline(p).strip()
+                    if pt:
+                        bq_paragraphs.append(pt)
+                if not bq_paragraphs:
+                    bq_text = self._format_inline(element).strip()
+                    if bq_text:
+                        bq_paragraphs = [bq_text]
+                
+                quoted = "\n>\n".join("\n".join(f"> {l}" for l in bp.splitlines() if l.strip()) for bp in bq_paragraphs)
+                if quoted:
+                    lines.append(f"\n{quoted}\n")
+
+            elif tag_name == "table":
+                table_md = self._convert_table_to_markdown(element)
+                if table_md.strip():
+                    lines.append(f"\n{table_md}\n")
 
             elif tag_name in ["ul", "ol"]:
                 for idx, li in enumerate(element.find_all("li", recursive=False), start=1):
@@ -358,12 +428,16 @@ class ArticlesFeedScraper:
                 if inline.strip():
                     lines.append(inline)
 
-        # Nettoyage des sauts de ligne multiples et résidus de lecteurs audio
+        # Nettoyage des sauts de ligne multiples et résidus
         result = "\n".join(lines)
         result = re.sub(r'(?i)Loading\s+the\s*[\r\n\s]*Elevenlabs\s+Text\s+to\s+Speech[\r\n\s]*AudioNative\s+Player[\.\u2026]*\n*', '', result)
         result = re.sub(r'(?i)Loading\s+the\s*[\r\n\s]*Elevenlabs[^\n]*\n*', '', result)
         result = re.sub(r'(?i)AudioNative\s+Player[\.\u2026]*\n*', '', result)
         result = re.sub(r'↩\s*\d+\s*▶\s*↩\s*\d+\s*[\d:]+\s*[\d:]+', '', result)
+
+        # Nettoyage de l'en-tête répété "Publié le ... Podcast ..."
+        result = re.sub(r'(?i)^\s*(?:\*\*)?Publié\s+le(?:\*\*)?\s+[^\n]+\n*', '', result)
+        result = re.sub(r'(?i)^\s*(?:\[[A-ZÉÈÊÀ\s\-]+\]\(https?://[^\)]+\)\s*)+(?:\d+\s*min\s+de\s+lecture)?[^\n]*\n*', '', result)
 
         # Nettoyage des sections de promotion / parcours e-mail en fin d'article
         result = re.sub(r'(?i)\n*#+\s*Parcours\s+e-?mail.*$', '', result, flags=re.DOTALL)
@@ -373,9 +447,17 @@ class ArticlesFeedScraper:
         return result.strip()
 
     def _format_inline(self, soup_element) -> str:
-        """Formate les éléments inline (liens, gras, italique)."""
+        """Formate les éléments inline (liens, gras, italique, exposants)."""
         if not hasattr(soup_element, "descendants"):
             return str(soup_element)
+
+        # Formater les exposants (numéros de versets, notes)
+        for sup in soup_element.find_all(["sup", "sub"]):
+            st = sup.get_text(strip=True)
+            if st:
+                # Convertir en chiffres exposants Unicode si possible
+                sup_map = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
+                sup.replace_with(f" {st.translate(sup_map)} ")
 
         # Formater les liens
         for a in soup_element.find_all("a"):
@@ -425,10 +507,10 @@ class ArticlesFeedScraper:
         Pipeline complet pour un article :
         1. Extraction Markdown propre (+ scraping si nécessaire)
         2. Détection des références bibliques
-        3. Extraction des métadonnées riches (image, avatar, chapô)
+        3. Extraction des métadonnées riches (image, avatar, chapô, audio)
         4. Retourne l'objet prêt à être persisté
         """
-        content_md, author, image_url, author_avatar_url, lead_summary = self.fetch_full_article_content(raw_item)
+        content_md, author, image_url, author_avatar_url, lead_summary, audio_url = self.fetch_full_article_content(raw_item)
         
         real_author = author or raw_item.get("author", "")
 
@@ -457,6 +539,7 @@ class ArticlesFeedScraper:
             "lead_summary": lead_summary or raw_item.get("summary", ""),
             "image_url": image_url or raw_item.get("image_url", ""),
             "author_avatar_url": author_avatar_url or raw_item.get("author_avatar_url", ""),
+            "audio_url": audio_url or raw_item.get("audio_url", ""),
             "tags": raw_item.get("tags", []),
             "content_markdown": content_md,
             "has_full_text": len(content_md) > 300,

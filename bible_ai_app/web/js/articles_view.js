@@ -396,15 +396,21 @@ const ArticlesView = {
         `;
       }
 
+      const isPodcast = !!art.audio_url || (art.tags_list || []).some(t => /podcast|prédication|predication|audio/i.test(t));
+      const podcastBadgeHtml = isPodcast ? `<span class="article-podcast-badge">🎧 Podcast</span>` : '';
+
       html += `
         <div class="article-card" data-article-id="${art.id}">
           ${thumbHtml}
 
           <div class="article-card-content">
             <div class="article-card-header">
-              <span class="article-source-badge" style="background-color: ${color}18; color: ${color}; border: 1px solid ${color}35;">
-                ${this.escapeHtml(art.source_name || art.source_id)}
-              </span>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span class="article-source-badge" style="background-color: ${color}18; color: ${color}; border: 1px solid ${color}35;">
+                  ${this.escapeHtml(art.source_name || art.source_id)}
+                </span>
+                ${podcastBadgeHtml}
+              </div>
               <span class="article-pub-date">${pubDate}</span>
             </div>
 
@@ -533,11 +539,56 @@ const ArticlesView = {
         leadEl.classList.add('hidden');
       }
 
-      // 4. Badges thématiques
+      // 3b. Lecteur Audio / Podcast
+      const audioWrap = document.getElementById('article-reader-audio-wrap');
+      const audioCard = document.getElementById('article-audio-player-card');
+      if (art.audio_url && audioWrap && audioCard) {
+        audioWrap.classList.remove('hidden');
+        if (art.audio_url.includes('open.spotify.com') || art.audio_url.includes('ausha') || art.audio_url.includes('soundcloud') || art.audio_url.includes('podbean')) {
+          let embedUrl = art.audio_url;
+          if (embedUrl.includes('open.spotify.com') && !embedUrl.includes('utm_source')) {
+            embedUrl += (embedUrl.includes('?') ? '&' : '?') + 'utm_source=generator&theme=0';
+          }
+          audioCard.innerHTML = `
+            <div class="article-audio-iframe-wrap">
+              <iframe src="${this.escapeHtml(embedUrl)}" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+            </div>
+          `;
+        } else {
+          audioCard.innerHTML = `
+            <div class="article-audio-native-player">
+              <audio controls preload="none" src="${this.escapeHtml(art.audio_url)}" style="width: 100%;">
+                Votre navigateur ne supporte pas l'élément audio.
+              </audio>
+            </div>
+          `;
+        }
+      } else if (audioWrap) {
+        audioWrap.classList.add('hidden');
+        if (audioCard) audioCard.innerHTML = '';
+      }
+
+      // 4. Badges thématiques & Badge de Série Podcast (Option A)
       const mainTags = this.filterMainCategories(art.tags_list || []);
+      let podcastSeriesName = '';
+      const mdRaw = res.content_markdown || art.summary || '';
+      
+      const seriesMatch = mdRaw.match(/^\s*\*\*Podcast\*\*\s*\n*\[([^\]]+)\]/i);
+      if (seriesMatch) {
+        podcastSeriesName = seriesMatch[1].trim();
+      }
+
       if (tagsEl) {
+        let tagsHtml = '';
+        if (podcastSeriesName) {
+          tagsHtml += `<span class="article-topic-tag article-topic-tag-podcast" data-tag="${this.escapeHtml(podcastSeriesName)}">🎙️ Série : ${this.escapeHtml(podcastSeriesName)}</span>`;
+        }
         if (mainTags.length > 0) {
-          tagsEl.innerHTML = mainTags.map(t => `<span class="article-topic-tag" data-tag="${this.escapeHtml(t)}">${this.escapeHtml(t)}</span>`).join('');
+          tagsHtml += mainTags.map(t => `<span class="article-topic-tag" data-tag="${this.escapeHtml(t)}">${this.escapeHtml(t)}</span>`).join('');
+        }
+
+        if (tagsHtml) {
+          tagsEl.innerHTML = tagsHtml;
           tagsEl.classList.remove('hidden');
 
           tagsEl.querySelectorAll('.article-topic-tag').forEach(tagBtn => {
@@ -755,33 +806,78 @@ const ArticlesView = {
     text = text.replace(/Pour\s+aller\s+plus\s+loin,\s+inscris-toi[\s\S]*$/gi, '');
     text = text.replace(/(?:#+\s*)?Inscrivez-vous\s+à\s+notre\s+newsletter[\s\S]*$/gi, '');
 
-    // 3. Nettoyer tout bloc d'en-tête redondant (titre, auteur, source, date dupliqués)
+    // 3. Nettoyer tout bloc d'en-tête redondant (titre, auteur, source, date dupliqués, Publié le..., Podcast orphelin)
     text = text.replace(/^(#\s+[^\n]+\n+)?/gi, '');
-    text = text.replace(/^(\*\*(?:Auteur|Source|Date)\s*:\*\*[^\n]*\n*|Auteur\s*:[^\n]*\n*|Source\s*:[^\n]*\n*|Date\s*:[^\n]*\n*|---\n*)+/gim, '');
+    text = text.replace(/^(\*\*(?:Auteur|Source|Date|Publié le|Podcast)\s*:\*\*[^\n]*\n*|\*\*Podcast\*\*\s*\n*|Podcast\s*\n*|Auteur\s*:[^\n]*\n*|Source\s*:[^\n]*\n*|Date\s*:[^\n]*\n*|Publié\s+le[^\n]*\n*|---\n*)+/gim, '');
+    text = text.replace(/^(?:\[[A-ZÉÈÊÀ\s\-]+\]\(https?:\/\/[^\)]+\)\s*)+(?:\d+\s*min\s+de\s+lecture)?[^\n]*\n+/gim, '');
 
-    // 4. Nettoyer les émojis décoratifs pour une mise en page typographique sobre
+    // 4. Formater les callouts d'information (ex: note de transcription automatique)
+    text = text.replace(/(?:ℹ️|ℹ)\s*([^\n]+)/gi, '\n\n<div class="article-info-callout"><span>ℹ️</span><div>$1</div></div>\n\n');
+
+    // 5. Formater les dialogues et transcriptions de podcast (intervenants multiples)
+    // Séparer les prises de parole par des sauts de ligne
+    text = text.replace(/(?<!\n)\s*\*\*([A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+(?:\s+[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+)?)\*\*\s*:?\s*/g, '\n\n**$1 :** ');
+    // Convertir les lignes de prise de parole en encadrés de dialogue stylisés
+    text = text.replace(/(?:^|\n)\*\*([A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+(?:\s+[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+)?)\s*:\*\*\s*([^\n]+)/g, '\n\n<div class="article-speaker-turn"><span class="article-speaker-badge">$1</span><p class="article-speaker-speech">$2</p></div>\n\n');
+
+    // 6. Nettoyer les émojis décoratifs résiduels
     text = text.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1FA70}-\u{1FAFF}]/gu, '');
 
-    // 5. Nettoyer les séparateurs multiples ou en fin d'article
+    // 7. Convertir les tables Markdown (| Col 1 | Col 2 | ...)
+    text = text.replace(/((?:\|[^\n]+\|\r?\n)+)/g, (match) => {
+      const rows = match.trim().split('\n').map(r => r.trim()).filter(r => r.startsWith('|') && r.endsWith('|'));
+      if (rows.length < 2) return match;
+      
+      let tableHtml = '\n\n<div class="article-table-wrap"><table class="article-table">';
+      let headerPassed = false;
+
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        if (row.includes('---')) {
+          headerPassed = true;
+          continue;
+        }
+        const cells = row.slice(1, -1).split('|').map(c => c.trim());
+        if (!headerPassed && i === 0) {
+          tableHtml += '<thead><tr>' + cells.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
+        } else {
+          tableHtml += '<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>';
+        }
+      }
+      tableHtml += '</tbody></table></div>\n\n';
+      return tableHtml;
+    });
+
+    // 8. Convertir les blockquotes consécutifs
+    text = text.replace(/((?:^>[^\n]*\r?\n?)+)/gm, (match) => {
+      const bqLines = match.split('\n').map(l => l.replace(/^>\s?/, '').trim()).filter(l => l.length > 0);
+      const bqContent = bqLines.join(' ');
+      return `\n<blockquote class="article-bible-quote"><p>${bqContent}</p></blockquote>\n\n`;
+    });
+
+    // 9. Nettoyer les séparateurs multiples ou en fin d'article
     text = text.replace(/---\s*$/gi, '');
 
-    // 6. Remplacement Markdown vers HTML
+    // 10. Remplacement Markdown vers HTML
     let html = text
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
+      // Rétablir les balises HTML injectées (dialogues, callouts, tables, blockquotes)
+      .replace(/&lt;(\/?(?:div|table|thead|tbody|tr|th|td|blockquote|p|sup|span)(?:\s+class="[^"]*")?)&gt;/gi, '<$1>')
+      .replace(/^#### (.*$)/gim, '<h4 class="article-h4">$1</h4>')
       .replace(/^### (.*$)/gim, '<h3 class="article-h3">$1</h3>')
       .replace(/^## (.*$)/gim, '<h2 class="article-h2">$1</h2>')
       .replace(/^# (.*$)/gim, '<h1 class="article-h1">$1</h1>')
-      .replace(/^\> (.*$)/gim, '<blockquote class="article-quote">$1</blockquote>')
       .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/gim, '<em>$1</em>')
       .replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2" target="_blank" class="article-link">$1</a>')
       .replace(/^---\s*$/gim, '<div class="article-ornamental-divider"><span class="article-ornamental-divider-icon">❦</span></div>')
-      .replace(/\n\n/gim, '</p><p>')
+      .replace(/([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/g, '<sup class="verse-sup">$1</sup>')
+      .replace(/\n\n+/gim, '</p><p>')
       .replace(/\n/gim, '<br>');
 
-    // 7. Détection et liaisonnement des références bibliques (ex: 1 Corinthiens 1.2, 1 Pierre 5.10, Romains 3.22-23)
+    // 11. Détection et liaisonnement des références bibliques (ex: 1 Corinthiens 1.2, 1 Pierre 5.10, Romains 3.22-23)
     if (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences) {
       html = TheologyView.highlightScriptureReferences(html);
     }
