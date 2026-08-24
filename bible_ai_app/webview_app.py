@@ -2858,8 +2858,8 @@ class BibleAppApi:
             _COMMENTARY_RESTORE_BOUNDS = (wx + 40, wy + 40, ww - 80, wh - 80)
         else:
             main_wx, main_wy, main_ww, main_wh = get_work_area()
-            ww = max(860, min(1100, int(main_ww * 0.75)))
-            wh = max(680, min(920, int(main_wh * 0.85)))
+            ww = min(1220, max(1020, int(main_ww * 0.82)))
+            wh = min(920, max(740, int(main_wh * 0.88)))
             wx = main_wx + max(0, (main_ww - ww) // 2)
             wy = main_wy + max(0, (main_wh - wh) // 2)
             on_second_screen = False

@@ -178,6 +178,16 @@
       -webkit-app-region: no-drag;
       flex-shrink: 0;
       white-space: nowrap;
+      margin-left: auto;
+    }
+
+    #lbl-active-author {
+      max-width: 135px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: inline-block;
+      vertical-align: middle;
     }
 
     .comm-win-tool-btn {
@@ -206,7 +216,7 @@
       display: flex;
       align-items: center;
       gap: 2px;
-      margin-left: 2px;
+      margin-left: 6px;
       flex-shrink: 0;
     }
 
@@ -223,6 +233,7 @@
       cursor: pointer;
       transition: all 0.15s ease;
       -webkit-app-region: no-drag;
+      flex-shrink: 0;
     }
 
     .comm-win-control-btn:hover {
