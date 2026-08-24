@@ -14219,41 +14219,35 @@ body.ai-disabled .ai-feature-only {
 
 
 .ai-history-sidebar {
-
   width: 320px;
-
-  background: var(--bg-primary);
-
-  border-left: 1px solid var(--border-subtle);
-
-  display: flex;
-
+  min-width: 320px;
+  background: var(--bg-card, var(--bg-primary));
+  border-left: 1px solid var(--border-color, var(--border-subtle));
+  display: flex !important;
   flex-direction: column;
-
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-
-  transform: translateX(0);
-
-  opacity: 1;
-
+  height: 100%;
+  position: relative;
   z-index: 10;
-
+  margin-right: 0;
+  transform: translateX(0);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: margin-right 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.25s ease,
+              visibility 0.3s ease;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.22);
+  will-change: transform, margin-right, opacity;
 }
 
-
-
 .ai-history-sidebar.hidden {
-
-  transform: translateX(320px);
-
+  display: flex !important;
+  margin-right: -320px;
+  transform: translateX(100%);
   opacity: 0;
-
+  visibility: hidden;
   pointer-events: none;
-
-  width: 0;
-
-  border-left: none;
-
 }
 
 
@@ -17953,6 +17947,49 @@ body.theme-light .ps-select-sm optgroup {
   font-size: 13px;
   line-height: 1.55;
   color: var(--text-primary);
+}
+
+/* Bouton "Voir la synopse complète" dans l'en-tête du tiroir */
+.btn-open-gospel-synopsis {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.btn-open-gospel-synopsis:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--accent-amber, #d97706);
+  transform: translateY(-1px);
+}
+
+.btn-open-gospel-synopsis .ps-btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-amber, #d97706);
+  opacity: 0.9;
+}
+
+.btn-open-gospel-synopsis .ps-btn-arrow {
+  transition: transform 0.15s ease;
+  color: var(--text-secondary);
+  margin-left: 2px;
+}
+
+.btn-open-gospel-synopsis:hover .ps-btn-arrow {
+  transform: translateX(2px);
+  color: var(--accent-amber, #d97706);
 }
 
 /* Bouton Synopse dans l'en-tête */

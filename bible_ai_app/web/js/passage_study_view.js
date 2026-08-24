@@ -383,8 +383,10 @@ const PassageStudyView = {
               <span class="ps-drawer-title">Parallèles · ${this.escapeHtml(vPar.title_fr)}</span>
               <span class="ps-badge ps-badge-neutral">${this.escapeHtml(vPar.tradition_type || 'Synopse')}</span>
             </div>
-            <button type="button" class="ps-btn-xs ps-btn-accent btn-open-gospel-synopsis" data-pericope-id="${vPar.pericope_id}" title="Ouvrir le tableau synoptique complet">
-              <span>Voir la synopse complète ➔</span>
+            <button type="button" class="btn-open-gospel-synopsis" data-pericope-id="${vPar.pericope_id}" title="Ouvrir le tableau synoptique complet de cette péricope">
+              <span class="ps-btn-icon">${this.ICONS.compass}</span>
+              <span>Voir la synopse complète</span>
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="ps-btn-arrow"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </button>
           </div>
           <div class="ps-drawer-grid">
