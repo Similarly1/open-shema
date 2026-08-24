@@ -138,6 +138,66 @@ class ArticlesManager:
                 return f.read()
         return None
 
+    def get_articles_count(self, source_id: Optional[str] = None, search_query: Optional[str] = None) -> int:
+        """Retourne le nombre total d'articles stockés en base."""
+        return self.db.get_articles_count(source_id=source_id, search_query=search_query)
+
+    def load_more_articles_archive(self, source_id: str = "tpsg", page_num: int = 2) -> Dict[str, Any]:
+        """
+        Télécharge et intègre une page d'archive antérieure du flux RSS WordPress (ex: ?paged=2, ?paged=3).
+        """
+        source = None
+        for s in self.db.get_sources():
+            if s["id"] == source_id:
+                source = s
+                break
+        if not source:
+            return {"success": False, "error": f"Source '{source_id}' introuvable", "new_count": 0}
+
+        base_feed_url = source.get("feed_url", "")
+        if not base_feed_url:
+            return {"success": False, "error": "URL de flux manquante", "new_count": 0}
+
+        sep = "&" if "?" in base_feed_url else "?"
+        paged_feed_url = f"{base_feed_url.rstrip('/')}/{sep}paged={page_num}"
+        
+        logger.info(f"[ArticlesManager] Récupération de l'archive page {page_num} : {paged_feed_url}")
+        xml_content = self.scraper.fetch_feed_xml(paged_feed_url)
+        if not xml_content:
+            return {"success": False, "error": "Impossible de récupérer cette page d'archive (fin du flux ou erreur réseau)", "new_count": 0}
+
+        raw_items = self.scraper.parse_feed_items(xml_content, source)
+        if not raw_items:
+            return {"success": True, "new_count": 0, "message": "Aucun article supplémentaire sur cette page"}
+
+        source_content_dir = os.path.join(self.content_dir, source_id)
+        os.makedirs(source_content_dir, exist_ok=True)
+        new_count = 0
+
+        for item in raw_items:
+            try:
+                processed = self.scraper.process_article(item)
+                md_path = os.path.join(source_content_dir, f"{processed['id']}.md")
+                with open(md_path, "w", encoding="utf-8") as f:
+                    f.write(processed["content_markdown"])
+
+                processed["content_path"] = os.path.relpath(md_path, start=self.base_dir)
+                is_new = self.db.upsert_article(processed, processed.get("scripture_references", []))
+                if is_new:
+                    new_count += 1
+            except Exception as e:
+                logger.error(f"[ArticlesManager] Erreur archive {item.get('title')}: {e}")
+
+        total_count = self.db.get_articles_count(source_id=source_id)
+        logger.info(f"[ArticlesManager] Page {page_num} traitée : {new_count} nouveaux articles ajoutés (Total base: {total_count}).")
+        return {
+            "success": True,
+            "new_count": new_count,
+            "fetched_count": len(raw_items),
+            "total_articles": total_count,
+            "page": page_num
+        }
+
     def get_articles(
         self,
         source_id: Optional[str] = None,

@@ -94,6 +94,14 @@ class TestArticlesPipeline(unittest.TestCase):
         self.assertEqual(len(rom_articles), 1)
         self.assertEqual(rom_articles[0]["id"], processed["id"])
 
+        # Test de recherche par abréviations (Rm 8, Jn 3.16, Romains, Rm, Eph)
+        self.assertEqual(len(self.db.get_articles(search_query="Rm 8")), 1)
+        self.assertEqual(len(self.db.get_articles(search_query="Rm")), 1)
+        self.assertEqual(len(self.db.get_articles(search_query="Romains 8")), 1)
+        self.assertEqual(len(self.db.get_articles(search_query="Jn 3.16")), 1)
+        self.assertEqual(len(self.db.get_articles(search_query="Ép 2")), 1)
+        self.assertEqual(self.db.get_articles_count(search_query="Rm 8"), 1)
+
     def test_articles_manager_workflow(self):
         manager = ArticlesManager(base_dir=self.test_dir)
         source = manager.curated_sources[0] if manager.curated_sources else None

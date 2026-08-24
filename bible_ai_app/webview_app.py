@@ -3123,6 +3123,26 @@ class BibleAppApi:
             logger.error(f"Erreur API get_articles: {e}")
             return []
 
+    def get_articles_count(self, source_id: Optional[str] = None, search_query: Optional[str] = None) -> int:
+        """Retourne le nombre total d'articles correspondant aux critères."""
+        try:
+            from core.articles_manager import ArticlesManager
+            manager = ArticlesManager.get_instance()
+            return manager.get_articles_count(source_id=source_id, search_query=search_query)
+        except Exception as e:
+            logger.error(f"Erreur API get_articles_count: {e}")
+            return 0
+
+    def load_more_articles_archive(self, source_id: str = "tpsg", page_num: int = 2) -> Dict[str, Any]:
+        """Télécharge une page d'archive plus ancienne du flux RSS."""
+        try:
+            from core.articles_manager import ArticlesManager
+            manager = ArticlesManager.get_instance()
+            return manager.load_more_articles_archive(source_id=source_id, page_num=page_num)
+        except Exception as e:
+            logger.error(f"Erreur API load_more_articles_archive: {e}")
+            return {"success": False, "error": str(e), "new_count": 0}
+
     def get_article_content(self, article_id: str) -> Dict[str, Any]:
         """Retourne les détails et le texte complet Markdown d'un article, et déclenche la vectorisation à la lecture si nécessaire."""
         try:

@@ -20,6 +20,51 @@ const ArticlesView = {
     isJustified: false
   },
 
+  // Table des abréviations bibliques françaises standards (ex: Rm 4.2, Jn 3.16, Gn 1, Ex 19)
+  BOOK_ABBREVIATIONS: {
+    'Gen': 'Gn', 'Exo': 'Ex', 'Lev': 'Lv', 'Num': 'Nb', 'Deu': 'Dt',
+    'Jos': 'Jos', 'Jdg': 'Jg', 'Rut': 'Rt', '1Sa': '1S', '2Sa': '2S',
+    '1Ki': '1R', '2Ki': '2R', '1Ch': '1Ch', '2Ch': '2Ch', 'Ezr': 'Esd',
+    'Neh': 'Ne', 'Est': 'Est', 'Job': 'Jb', 'Psa': 'Ps', 'Pro': 'Pr',
+    'Ecc': 'Ec', 'Sng': 'Ct', 'Isa': 'És', 'Jer': 'Jr', 'Lam': 'Lm',
+    'Ezk': 'Ez', 'Dan': 'Dn', 'Hos': 'Os', 'Jol': 'Jl', 'Amo': 'Am',
+    'Oba': 'Ab', 'Jon': 'Jon', 'Mic': 'Mi', 'Nah': 'Na', 'Hab': 'Ha',
+    'Zep': 'So', 'Hag': 'Ag', 'Zec': 'Za', 'Mal': 'Ml', 'Mat': 'Mt',
+    'Mrk': 'Mc', 'Luk': 'Lc', 'Jhn': 'Jn', 'Act': 'Ac', 'Rom': 'Rm',
+    '1Co': '1Co', '2Co': '2Co', 'Gal': 'Ga', 'Eph': 'Ép', 'Php': 'Ph',
+    'Col': 'Col', '1Th': '1Th', '2Th': '2Th', '1Ti': '1Tm', '2Ti': '2Tm',
+    'Tit': 'Tt', 'Phm': 'Phm', 'Heb': 'He', 'Jas': 'Jc', '1Pe': '1P',
+    '2Pe': '2P', '1Jn': '1Jn', '2Jn': '2Jn', '3Jn': '3Jn', 'Jud': 'Jde',
+    'Rev': 'Ap'
+  },
+
+  formatShortScriptureRef(r) {
+    if (!r) return '';
+    const bookCode = r.book_code || '';
+    const abbr = this.BOOK_ABBREVIATIONS[bookCode] || bookCode;
+    const ch = r.chapter;
+    const v = r.verse;
+
+    if (ch && v) {
+      const cleanV = String(v).replace(':', '.');
+      return `${abbr} ${ch}.${cleanV}`;
+    } else if (ch) {
+      return `${abbr} ${ch}`;
+    }
+    
+    if (r.raw_ref) {
+      let raw = r.raw_ref.trim();
+      for (const [code, short] of Object.entries(this.BOOK_ABBREVIATIONS)) {
+        if (code.toLowerCase() === bookCode.toLowerCase()) {
+          raw = raw.replace(new RegExp(`^(?:${code}|[a-zà-ÿ]+)`, 'i'), short);
+          break;
+        }
+      }
+      return raw.replace(':', '.');
+    }
+    return abbr;
+  },
+
   init() {
     this.loadReadingPreferences();
     this.bindEvents();
@@ -104,6 +149,11 @@ const ArticlesView = {
       if (popoverOpts && !popoverOpts.classList.contains('hidden') && !popoverOpts.contains(e.target) && !btnReadingOpts?.contains(e.target)) {
         popoverOpts.classList.add('hidden');
       }
+    });
+
+    // 5b. Bouton Charger plus d'articles précédents
+    document.getElementById('btn-load-more-articles')?.addEventListener('click', () => {
+      this.loadMoreArticles();
     });
 
     // Événements dans le popover d'options
@@ -315,9 +365,12 @@ const ArticlesView = {
     return result.slice(0, 4);
   },
 
+  currentArchivePage: 1,
+
   async loadArticles() {
     const listContainer = document.getElementById('articles-grid-container');
     const emptyContainer = document.getElementById('articles-empty-state');
+    const paginationFooter = document.getElementById('articles-pagination-footer');
     if (!listContainer) return;
 
     listContainer.innerHTML = `
@@ -326,22 +379,81 @@ const ArticlesView = {
         <span>Chargement des articles...</span>
       </div>
     `;
+    if (paginationFooter) paginationFooter.classList.add('hidden');
 
     try {
       const sourceParam = this.currentSourceFilter === 'ALL' ? null : this.currentSourceFilter;
-      this.articles = await API.call('get_articles', sourceParam, null, null, this.currentSearchQuery, 60, 0) || [];
+      this.articles = await API.call('get_articles', sourceParam, null, null, this.currentSearchQuery, 100, 0) || [];
 
       if (!this.articles || this.articles.length === 0) {
         listContainer.innerHTML = '';
         emptyContainer?.classList.remove('hidden');
+        if (paginationFooter) paginationFooter.classList.add('hidden');
         return;
       }
 
       emptyContainer?.classList.add('hidden');
       this.renderArticlesGrid(this.articles);
+      this.updatePaginationFooter();
     } catch (e) {
       console.error('[ArticlesView] Erreur chargement articles:', e);
       listContainer.innerHTML = `<div class="articles-error-state">Erreur lors de la récupération des articles.</div>`;
+    }
+  },
+
+  updatePaginationFooter() {
+    const footer = document.getElementById('articles-pagination-footer');
+    const info = document.getElementById('articles-pagination-info');
+    const btn = document.getElementById('btn-load-more-articles');
+    if (!footer) return;
+
+    const count = this.articles.length;
+    footer.classList.remove('hidden');
+    if (info) {
+      info.textContent = `${count} article${count > 1 ? 's' : ''} affiché${count > 1 ? 's' : ''}`;
+    }
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+        <span>Charger 10 articles précédents</span>
+      `;
+    }
+  },
+
+  async loadMoreArticles() {
+    const btn = document.getElementById('btn-load-more-articles');
+    if (!btn || btn.disabled) return;
+
+    btn.disabled = true;
+    btn.innerHTML = `
+      <div class="spinner-sm" style="width: 14px; height: 14px; border-width: 2px;"></div>
+      <span>Récupération des 10 articles suivants...</span>
+    `;
+
+    try {
+      this.currentArchivePage += 1;
+      const res = await API.call('load_more_articles_archive', 'tpsg', this.currentArchivePage);
+      
+      const sourceParam = this.currentSourceFilter === 'ALL' ? null : this.currentSourceFilter;
+      this.articles = await API.call('get_articles', sourceParam, null, null, this.currentSearchQuery, 200, 0) || [];
+      
+      this.renderArticlesGrid(this.articles);
+      this.updatePaginationFooter();
+
+      if (typeof App !== 'undefined' && App.showToast) {
+        if (res && res.new_count > 0) {
+          App.showToast(`${res.new_count} articles précédents ajoutés !`, 'success');
+        } else {
+          App.showToast('Articles chargés avec succès.', 'info');
+        }
+      }
+    } catch (e) {
+      console.error('[ArticlesView] Erreur chargement archives:', e);
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast('Erreur lors de la récupération des archives.', 'error');
+      }
+      this.updatePaginationFooter();
     }
   },
 
@@ -388,7 +500,7 @@ const ArticlesView = {
           <div class="article-card-refs">
             ${refs.slice(0, 4).map(r => `
               <span class="scripture-badge" data-book="${r.book_code}" data-ch="${r.chapter}" data-v="${r.verse || ''}">
-                📖 ${this.escapeHtml(r.raw_ref || `${r.book_code} ${r.chapter}`)}
+                ${this.escapeHtml(this.formatShortScriptureRef(r))}
               </span>
             `).join('')}
             ${refs.length > 4 ? `<span class="scripture-badge-more">+${refs.length - 4}</span>` : ''}
@@ -472,6 +584,8 @@ const ArticlesView = {
     this.selectedArticleId = articleId;
     const viewList = document.getElementById('articles-list-section');
     const viewReader = document.getElementById('articles-reader-section');
+    const skeletonEl = document.getElementById('article-reader-skeleton');
+    const realContentEl = document.getElementById('article-reader-real-content');
     const contentEl = document.getElementById('article-reader-body');
     const titleEl = document.getElementById('article-reader-title');
     const tagsEl = document.getElementById('article-reader-tags');
@@ -486,16 +600,24 @@ const ArticlesView = {
     const sourceNameEl = document.getElementById('article-source-name');
     const leadEl = document.getElementById('article-reader-lead');
 
+    // 1. Basculer immédiatement sur la vue lecture et afficher le Skeleton
     if (viewList) viewList.classList.add('hidden');
     if (viewReader) viewReader.classList.remove('hidden');
 
-    if (contentEl) {
-      contentEl.innerHTML = `<div class="articles-loading-state"><div class="spinner-sm"></div><span>Chargement de l'article...</span></div>`;
+    if (skeletonEl) skeletonEl.classList.remove('hidden');
+    if (realContentEl) {
+      realContentEl.classList.add('hidden');
+      realContentEl.classList.remove('fade-in');
     }
+
+    const container = document.querySelector('.articles-view-container');
+    if (container) container.scrollTop = 0;
 
     try {
       const res = await API.call('get_article_content', articleId);
       if (!res || !res.success || !res.article) {
+        if (skeletonEl) skeletonEl.classList.add('hidden');
+        if (realContentEl) realContentEl.classList.remove('hidden');
         if (contentEl) contentEl.innerHTML = `<div class="articles-error-state">Impossible de charger l'article.</div>`;
         return;
       }
@@ -658,13 +780,18 @@ const ArticlesView = {
       // Appliquer les préférences de lecture actuelles
       this.applyReadingOptions();
 
-      // Scroller en haut du container
-      const scrollParent = document.getElementById('view-articles');
-      if (scrollParent) scrollParent.scrollTop = 0;
+      // Révéler le contenu en masquant le skeleton avec une transition fluide
+      if (skeletonEl) skeletonEl.classList.add('hidden');
+      if (realContentEl) {
+        realContentEl.classList.remove('hidden');
+        realContentEl.classList.add('fade-in');
+      }
 
     } catch (e) {
-      console.error('[ArticlesView] Erreur lecture article:', e);
-      if (contentEl) contentEl.innerHTML = `<div class="articles-error-state">Erreur lors de l'affichage.</div>`;
+      console.error('[ArticlesView] Erreur affichage article:', e);
+      if (skeletonEl) skeletonEl.classList.add('hidden');
+      if (realContentEl) realContentEl.classList.remove('hidden');
+      if (contentEl) contentEl.innerHTML = `<div class="articles-error-state">Erreur lors de l'affichage de l'article.</div>`;
     }
   },
 

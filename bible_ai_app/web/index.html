@@ -4193,11 +4193,7 @@
                 <button class="btn-articles-action" id="btn-articles-settings" title="Configurer les options d'indexation et de vectorisation RAG">
                   <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                  </svg>
-                  <span>Réglages RAG</span>
-                </button>
-                <button class="btn-articles-action" id="btn-suggest-blog" title="Proposer un nouveau blog théologique">
+<button class="btn-articles-action" id="btn-suggest-blog" title="Proposer un nouveau blog théologique">
                   <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                   <span>Suggérer une source</span>
                 </button>
@@ -4221,6 +4217,15 @@
             <!-- Grille des articles -->
             <div class="articles-grid" id="articles-grid-container">
               <!-- Injecté dynamiquement par ArticlesView -->
+            </div>
+
+            <!-- Pied de page de pagination pour charger plus d'articles -->
+            <div class="articles-pagination-footer" id="articles-pagination-footer">
+              <button type="button" class="btn-load-more-articles" id="btn-load-more-articles">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+                <span>Charger 10 articles précédents</span>
+              </button>
+              <div class="articles-pagination-info" id="articles-pagination-info">10 articles chargés</div>
             </div>
 
             <div class="articles-empty-state hidden" id="articles-empty-state">
@@ -4268,58 +4273,55 @@
                         Sérif
                         <div style="font-size: 9.5px; opacity: 0.7; font-family: sans-serif;">Georgia</div>
                       </button>
-                      <button type="button" class="comm-font-choice-btn article-font-btn" data-font="Inter" style="flex: 1; padding: 6px 4px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; text-align: center; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); cursor: pointer;">
-                        Sans-Sérif
-                        <div style="font-size: 9.5px; opacity: 0.7; font-family: sans-serif;">Inter</div>
+                      <button type="button" class="comm-font-choice-btn article-font-btn" data-font="system" style="flex: 1; padding: 6px 4px; font-family: var(--font-sans); font-size: 13px; text-align: center; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); cursor: pointer;">
+                        Sans
+                        <div style="font-size: 9.5px; opacity: 0.7; font-family: sans-serif;">Moderne</div>
                       </button>
                     </div>
 
-                    <!-- 2. Taille du texte (Zoom style - 100% +) -->
-                    <div style="border-top: 1px solid var(--border-color); margin: 10px 0 6px 0; padding-top: 10px;">
-                      <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
-                        Taille du texte
-                      </div>
-                      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                          <button type="button" class="btn-secondary btn-sm" id="btn-article-zoom-out" style="width: 30px; height: 28px; padding: 0; font-weight: 700; font-size: 14px;" title="Diminuer la taille">−</button>
-                          <span id="lbl-article-zoom-val" style="font-size: 12px; font-weight: 700; min-width: 48px; text-align: center; color: var(--text-primary);">100%</span>
-                          <button type="button" class="btn-secondary btn-sm" id="btn-article-zoom-in" style="width: 30px; height: 28px; padding: 0; font-weight: 700; font-size: 14px;" title="Augmenter la taille">+</button>
-                        </div>
-                        <button type="button" class="btn-ghost btn-sm" id="btn-article-zoom-reset" title="Réinitialiser à 100%" style="font-size: 11px; padding: 4px 8px; color: var(--text-secondary);">100%</button>
-                      </div>
+                    <!-- 2. Taille du texte (- 100% +) -->
+                    <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
+                      Taille du texte
+                    </div>
+                    <div class="article-zoom-controls" style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-subtle, rgba(255,255,255,0.05)); border: 1px solid var(--border-color); border-radius: 6px; padding: 4px 8px; margin-bottom: 12px;">
+                      <button type="button" class="btn-zoom-step" id="btn-article-zoom-out" title="Diminuer la taille">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                      </button>
+                      <span class="zoom-level-label" id="lbl-article-zoom-level" style="font-size: 13px; font-weight: 600;">100%</span>
+                      <button type="button" class="btn-zoom-step" id="btn-article-zoom-in" title="Augmenter la taille">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                      </button>
                     </div>
 
-                    <!-- 3. Fond de Lecture -->
-                    <div style="border-top: 1px solid var(--border-color); margin: 10px 0 6px 0; padding-top: 10px;">
-                      <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
-                        Fond de Lecture
-                      </div>
-                      <div class="reading-bg-quick-row">
-                        <button type="button" class="reading-bg-quick-swatch article-bg-swatch active" data-bg="auto" title="Harmonisé avec le thème (Auto)">
-                          <div class="quick-swatch-circle swatch-auto">
-                            <span class="quick-swatch-check">✓</span>
-                          </div>
-                          <span class="quick-swatch-label">Auto</span>
-                        </button>
-                        <button type="button" class="reading-bg-quick-swatch article-bg-swatch" data-bg="white" title="Blanc pur">
-                          <div class="quick-swatch-circle swatch-white">
-                            <span class="quick-swatch-check">✓</span>
-                          </div>
-                          <span class="quick-swatch-label">Blanc</span>
-                        </button>
-                        <button type="button" class="reading-bg-quick-swatch article-bg-swatch" data-bg="sepia" title="Sépia doux">
-                          <div class="quick-swatch-circle swatch-sepia">
-                            <span class="quick-swatch-check">✓</span>
-                          </div>
-                          <span class="quick-swatch-label">Sépia</span>
-                        </button>
-                        <button type="button" class="reading-bg-quick-swatch article-bg-swatch" data-bg="dark" title="Très sombre / Nuit">
-                          <div class="quick-swatch-circle swatch-dark">
-                            <span class="quick-swatch-check">✓</span>
-                          </div>
-                          <span class="quick-swatch-label">Nuit</span>
-                        </button>
-                      </div>
+                    <!-- 3. Fond de lecture -->
+                    <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
+                      Fond de lecture
+                    </div>
+                    <div class="reading-bg-swatches-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px;">
+                      <button type="button" class="reading-bg-quick-swatch article-bg-swatch active" data-bg="auto" title="Thème de l'application">
+                        <div class="quick-swatch-circle swatch-auto">
+                          <span class="quick-swatch-check">✓</span>
+                        </div>
+                        <span class="quick-swatch-label">Auto</span>
+                      </button>
+                      <button type="button" class="reading-bg-quick-swatch article-bg-swatch" data-bg="white" title="Fond blanc">
+                        <div class="quick-swatch-circle swatch-white">
+                          <span class="quick-swatch-check">✓</span>
+                        </div>
+                        <span class="quick-swatch-label">Blanc</span>
+                      </button>
+                      <button type="button" class="reading-bg-quick-swatch article-bg-swatch" data-bg="sepia" title="Sépia doux">
+                        <div class="quick-swatch-circle swatch-sepia">
+                          <span class="quick-swatch-check">✓</span>
+                        </div>
+                        <span class="quick-swatch-label">Sépia</span>
+                      </button>
+                      <button type="button" class="reading-bg-quick-swatch article-bg-swatch" data-bg="dark" title="Très sombre / Nuit">
+                        <div class="quick-swatch-circle swatch-dark">
+                          <span class="quick-swatch-check">✓</span>
+                        </div>
+                        <span class="quick-swatch-label">Nuit</span>
+                      </button>
                     </div>
 
                     <!-- 4. Options d'alignement & Largeur -->
@@ -4344,45 +4346,88 @@
             </div>
 
             <div class="article-reader-container" id="article-reader-container">
-              <!-- Image Héro de l'article -->
-              <div class="article-reader-hero-banner hidden" id="article-reader-hero-banner">
-                <img id="article-reader-hero-img" src="" alt="Image de l'article" class="article-hero-image">
-                <div class="article-reader-hero-overlay"></div>
-              </div>
-
-              <div class="article-reader-hero">
-                <div class="article-reader-tags" id="article-reader-tags"></div>
-                <h1 class="article-reader-title" id="article-reader-title">Titre de l'article</h1>
-                
-                <!-- Auteur avec Avatar et Date -->
-                <div class="article-reader-author-card" id="article-reader-author-card">
-                  <div class="author-avatar-circle" id="article-author-avatar-wrap">
-                    <img id="article-author-avatar-img" src="" alt="Auteur" class="author-avatar-img">
-                    <span id="article-author-avatar-placeholder" class="author-avatar-placeholder hidden"></span>
+              <!-- Squelette Skeleton Exact (affiché pendant le chargement de l'article) -->
+              <div class="article-skeleton-wrap" id="article-reader-skeleton">
+                <div class="skeleton-hero-banner skeleton-shimmer"></div>
+                <div class="skeleton-hero-header">
+                  <div class="skeleton-tags-row">
+                    <div class="skeleton-pill skeleton-shimmer" style="width: 130px; height: 22px;"></div>
+                    <div class="skeleton-pill skeleton-shimmer" style="width: 90px; height: 22px;"></div>
                   </div>
-                  <div class="author-info-meta">
-                    <div class="author-main-name" id="article-author-name">Nom de l'auteur</div>
-                    <div class="author-pub-line">
-                      <span id="article-pub-date">Date</span> • <span id="article-source-name" class="author-source-pill">Source</span>
+                  <div class="skeleton-line skeleton-shimmer" style="width: 85%; height: 34px; margin: 14px 0 10px 0;"></div>
+                  <div class="skeleton-line skeleton-shimmer" style="width: 50%; height: 34px; margin-bottom: 20px;"></div>
+                  
+                  <div class="skeleton-author-card">
+                    <div class="skeleton-avatar skeleton-shimmer" style="width: 44px; height: 44px; border-radius: 50%;"></div>
+                    <div class="skeleton-author-meta">
+                      <div class="skeleton-line skeleton-shimmer" style="width: 140px; height: 16px; margin-bottom: 6px;"></div>
+                      <div class="skeleton-line skeleton-shimmer" style="width: 200px; height: 13px;"></div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <!-- Lecteur Audio / Podcast -->
-              <div class="article-reader-audio-wrap hidden" id="article-reader-audio-wrap">
-                <div class="article-audio-player-card" id="article-audio-player-card">
-                  <!-- Player injecté dynamiquement -->
+                <div class="skeleton-lead-box skeleton-shimmer"></div>
+
+                <div class="skeleton-body-lines">
+                  <div class="skeleton-line skeleton-shimmer" style="width: 100%; height: 16px; margin-bottom: 12px;"></div>
+                  <div class="skeleton-line skeleton-shimmer" style="width: 96%; height: 16px; margin-bottom: 12px;"></div>
+                  <div class="skeleton-line skeleton-shimmer" style="width: 92%; height: 16px; margin-bottom: 24px;"></div>
+                  
+                  <div class="skeleton-line skeleton-shimmer" style="width: 40%; height: 24px; margin: 26px 0 16px 0;"></div>
+                  
+                  <div class="skeleton-line skeleton-shimmer" style="width: 98%; height: 16px; margin-bottom: 12px;"></div>
+                  <div class="skeleton-line skeleton-shimmer" style="width: 94%; height: 16px; margin-bottom: 12px;"></div>
+                  <div class="skeleton-line skeleton-shimmer" style="width: 88%; height: 16px; margin-bottom: 24px;"></div>
+                  
+                  <div class="skeleton-quote-box skeleton-shimmer"></div>
+                  
+                  <div class="skeleton-line skeleton-shimmer" style="width: 100%; height: 16px; margin-bottom: 12px;"></div>
+                  <div class="skeleton-line skeleton-shimmer" style="width: 75%; height: 16px;"></div>
                 </div>
               </div>
 
-              <!-- Chapô d'introduction -->
-              <div class="article-reader-lead hidden" id="article-reader-lead">
-                <!-- Texte introductif -->
-              </div>
+              <!-- Contenu Réel de l'article (peuplé et révélé en fondu) -->
+              <div class="article-reader-real-content hidden" id="article-reader-real-content">
+                <!-- Image Héro de l'article -->
+                <div class="article-reader-hero-banner hidden" id="article-reader-hero-banner">
+                  <img id="article-reader-hero-img" src="" alt="Image de l'article" class="article-hero-image">
+                  <div class="article-reader-hero-overlay"></div>
+                </div>
 
-              <div class="article-reader-body" id="article-reader-body">
-                <!-- Rendu Markdown injecté dynamiquement -->
+                <div class="article-reader-hero">
+                  <div class="article-reader-tags" id="article-reader-tags"></div>
+                  <h1 class="article-reader-title" id="article-reader-title">Titre de l'article</h1>
+                  
+                  <!-- Auteur avec Avatar et Date -->
+                  <div class="article-reader-author-card" id="article-reader-author-card">
+                    <div class="author-avatar-circle" id="article-author-avatar-wrap">
+                      <img id="article-author-avatar-img" src="" alt="Auteur" class="author-avatar-img">
+                      <span id="article-author-avatar-placeholder" class="author-avatar-placeholder hidden"></span>
+                    </div>
+                    <div class="author-info-meta">
+                      <div class="author-main-name" id="article-author-name">Nom de l'auteur</div>
+                      <div class="author-pub-line">
+                        <span id="article-pub-date">Date</span> • <span id="article-source-name" class="author-source-pill">Source</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Lecteur Audio / Podcast -->
+                <div class="article-reader-audio-wrap hidden" id="article-reader-audio-wrap">
+                  <div class="article-audio-player-card" id="article-audio-player-card">
+                    <!-- Player injecté dynamiquement -->
+                  </div>
+                </div>
+
+                <!-- Chapô d'introduction -->
+                <div class="article-reader-lead hidden" id="article-reader-lead">
+                  <!-- Texte introductif -->
+                </div>
+
+                <div class="article-reader-body" id="article-reader-body">
+                  <!-- Rendu Markdown injecté dynamiquement -->
+                </div>
               </div>
             </div>
           </div>

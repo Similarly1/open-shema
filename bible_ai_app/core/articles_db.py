@@ -277,9 +277,40 @@ class ArticlesDB:
                     params.append(chapter)
 
             if search_query:
-                where_clauses.append("(a.title LIKE ? OR a.author LIKE ? OR a.summary LIKE ? OR a.tags LIKE ?)")
-                q_param = f"%{search_query}%"
-                params.extend([q_param, q_param, q_param, q_param])
+                sq_clean = search_query.strip()
+                q_param = f"%{sq_clean}%"
+                search_conditions = ["a.title LIKE ?", "a.author LIKE ?", "a.summary LIKE ?", "a.tags LIKE ?"]
+                sub_params: List[Any] = [q_param, q_param, q_param, q_param]
+
+                # 1. Vérifier si la recherche contient une référence biblique (ex: "Rm 8", "Jn 3.16", "1 Co 13")
+                try:
+                    from core.bible_reference_detector import find_bible_references
+                    detected_refs = find_bible_references(sq_clean)
+                    for ref in detected_refs:
+                        b_code = ref["book_code"]
+                        ch = ref["chapter"]
+                        search_conditions.append("EXISTS (SELECT 1 FROM article_scripture_links l WHERE l.article_id = a.id AND l.book_code = ? AND (l.chapter = ? OR ? IS NULL))")
+                        sub_params.extend([b_code, ch, ch])
+                except Exception as e:
+                    logger.debug(f"[ArticlesDB] Erreur parsing ref recherche: {e}")
+
+                # 2. Vérifier si la recherche est une abréviation ou nom de livre seul (ex: "Rm", "Romains", "Gen", "Mt")
+                try:
+                    from core.reference_parser import BOOK_MAPPING, strip_accents
+                    norm_sq = strip_accents(sq_clean).lower().rstrip('.')
+                    if norm_sq in BOOK_MAPPING:
+                        b_code = BOOK_MAPPING[norm_sq]
+                        search_conditions.append("EXISTS (SELECT 1 FROM article_scripture_links l WHERE l.article_id = a.id AND l.book_code = ?)")
+                        sub_params.append(b_code)
+                except Exception as e:
+                    logger.debug(f"[ArticlesDB] Erreur mapping livre recherche: {e}")
+
+                # 3. Matcher aussi les références brutes enregistrées (ex: "Luc 1.39-56")
+                search_conditions.append("EXISTS (SELECT 1 FROM article_scripture_links l WHERE l.article_id = a.id AND l.raw_ref LIKE ?)")
+                sub_params.append(q_param)
+
+                where_clauses.append(f"({' OR '.join(search_conditions)})")
+                params.extend(sub_params)
 
             where_str = " AND ".join(where_clauses)
             
@@ -354,6 +385,51 @@ class ArticlesDB:
             LIMIT ?
             """, (limit,))
             return [dict(r) for r in cursor.fetchall()]
+
+    def get_articles_count(self, source_id: Optional[str] = None, search_query: Optional[str] = None) -> int:
+        """Retourne le nombre total d'articles correspondant aux critères."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            query = "SELECT COUNT(*) FROM articles a JOIN sources s ON a.source_id = s.id WHERE s.is_enabled = 1"
+            params: List[Any] = []
+            if source_id:
+                query += " AND a.source_id = ?"
+                params.append(source_id)
+            if search_query:
+                sq_clean = search_query.strip()
+                q_param = f"%{sq_clean}%"
+                search_conditions = ["a.title LIKE ?", "a.author LIKE ?", "a.summary LIKE ?", "a.tags LIKE ?"]
+                sub_params: List[Any] = [q_param, q_param, q_param, q_param]
+
+                try:
+                    from core.bible_reference_detector import find_bible_references
+                    detected_refs = find_bible_references(sq_clean)
+                    for ref in detected_refs:
+                        b_code = ref["book_code"]
+                        ch = ref["chapter"]
+                        search_conditions.append("EXISTS (SELECT 1 FROM article_scripture_links l WHERE l.article_id = a.id AND l.book_code = ? AND (l.chapter = ? OR ? IS NULL))")
+                        sub_params.extend([b_code, ch, ch])
+                except Exception:
+                    pass
+
+                try:
+                    from core.reference_parser import BOOK_MAPPING, strip_accents
+                    norm_sq = strip_accents(sq_clean).lower().rstrip('.')
+                    if norm_sq in BOOK_MAPPING:
+                        b_code = BOOK_MAPPING[norm_sq]
+                        search_conditions.append("EXISTS (SELECT 1 FROM article_scripture_links l WHERE l.article_id = a.id AND l.book_code = ?)")
+                        sub_params.append(b_code)
+                except Exception:
+                    pass
+
+                search_conditions.append("EXISTS (SELECT 1 FROM article_scripture_links l WHERE l.article_id = a.id AND l.raw_ref LIKE ?)")
+                sub_params.append(q_param)
+
+                query += f" AND ({' OR '.join(search_conditions)})"
+                params.extend(sub_params)
+
+            cursor.execute(query, params)
+            return cursor.fetchone()[0]
 
     def get_stats(self) -> Dict[str, Any]:
         """Retourne des statistiques globales sur les articles."""

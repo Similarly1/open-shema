@@ -3,20 +3,27 @@ from typing import List, Dict, Any, Tuple, Optional
 from core.reference_parser import BOOK_MAPPING, strip_accents, REVERSE_BOOK_MAPPING
 from core.bible_json_loader import BibleJsonLoader
 
-# Construire la liste de toutes les formes et abréviations de livres connues
+# Construire la liste de toutes les formes et abréviations de livres connues (accentuées et non accentuées)
 _book_forms = set()
 for k in BOOK_MAPPING.keys():
     _book_forms.add(k)
+    if k.startswith('e'):
+        _book_forms.add('é' + k[1:])
+        _book_forms.add('è' + k[1:])
+    elif k.startswith('a'):
+        _book_forms.add('à' + k[1:])
 for v in REVERSE_BOOK_MAPPING.values():
-    _book_forms.add(strip_accents(v))
     _book_forms.add(v)
+    _book_forms.add(strip_accents(v))
+    _book_forms.add(v.lower())
+    _book_forms.add(strip_accents(v).lower())
 
 # Trier par longueur décroissante pour matcher les formes les plus spécifiques en premier
 _sorted_books = sorted(list(_book_forms), key=lambda x: -len(x))
 _books_pattern = '|'.join(re.escape(b) for b in _sorted_books)
 
 # Regex complète pour capturer les références bibliques
-# Exemples : 'Genèse 1:26', 'Gn 1.1', '1 Samuel 4:8', 'Ésaïe 6', 'Osée 11:12', 'Ps. 119:105', etc.
+# Exemples : 'Genèse 1:26', 'Gn 1.1', '1 Samuel 4:8', 'Ésaïe 6', 'Osée 11:12', 'Ps. 119:105', 'Ép 2', 'Rm 8', etc.
 BIBLE_REF_REGEX = re.compile(
     rf'\b({_books_pattern})\.?\s+(\d+)(?:[.:,](\d+(?:\s*-\s*\d+)?))?\b',
     re.IGNORECASE
