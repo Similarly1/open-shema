@@ -158,6 +158,25 @@ const CommentaryWindow = {
     }
   },
 
+  receiveChapterData(data, targetVerse = 1) {
+    if (!data || !data.verses) return;
+    this.currentBook = data.book || this.currentBook;
+    this.currentBookFrench = data.book_french || this.currentBookFrench;
+    this.currentChapter = parseInt(data.chapter, 10) || this.currentChapter;
+    this.currentVerse = parseInt(targetVerse, 10) || this.currentVerse;
+    this.currentChapterData = data;
+
+    this.updatePassageDisplay(this.currentBookFrench, this.currentChapter, this.currentVerse);
+    this.populateAuthorFilter(data.available_sources || []);
+    this.renderStream(data);
+
+    if (this.isSyncActive) {
+      setTimeout(() => {
+        this.scrollToVerseBlock(this.currentVerse);
+      }, 60);
+    }
+  },
+
   async loadChapterCommentaries(bookCode, chapterNum) {
     const reqId = ++this._currentRequestId;
     const container = document.getElementById('commentary-stream-container');

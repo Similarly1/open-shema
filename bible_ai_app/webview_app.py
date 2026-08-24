@@ -2991,7 +2991,7 @@ class BibleAppApi:
         return {"book": b, "book_french": french, "chapter": ch, "verse": v}
 
     def sync_passage(self, book_code: str, book_french: str = "", chapter: int = 1, verse: int = 1) -> Dict[str, Any]:
-        """Diffuse le passage actif vers la fenêtre de commentaires."""
+        """Diffuse le passage actif vers la fenêtre de commentaires avec ses données complètes."""
         global _COMMENTARY_WINDOW, _LAST_ACTIVE_PASSAGE
         ch_int = int(chapter)
         v_int = int(verse) if verse else 1
@@ -2999,8 +2999,11 @@ class BibleAppApi:
         _LAST_ACTIVE_PASSAGE = (book_code, ch_int, v_int)
         if _COMMENTARY_WINDOW:
             try:
-                js_call = f"window.CommentaryWindow && window.CommentaryWindow.handlePassageNavigated('{book_code}', '{french}', {ch_int}, {v_int})"
-                _COMMENTARY_WINDOW.evaluate_js(js_call)
+                data = self.get_chapter_commentaries_grouped(book_code, ch_int)
+                json_str = json.dumps(data)
+                _COMMENTARY_WINDOW.evaluate_js(
+                    f"window.CommentaryWindow && window.CommentaryWindow.receiveChapterData({json_str}, {v_int})"
+                )
             except Exception as e:
                 logger.debug(f"Erreur evaluate_js sync_passage: {e}")
         return {"success": True}
@@ -3010,11 +3013,20 @@ class BibleAppApi:
         global _COMMENTARY_WINDOW, _LAST_ACTIVE_PASSAGE
         ch_int = int(chapter)
         v_int = int(verse) if verse else 1
+        prev_b, prev_ch, _ = _LAST_ACTIVE_PASSAGE
         _LAST_ACTIVE_PASSAGE = (book_code, ch_int, v_int)
         if _COMMENTARY_WINDOW:
             try:
-                js_call = f"window.CommentaryWindow && window.CommentaryWindow.handleVerseChanged('{book_code}', {ch_int}, {v_int})"
-                _COMMENTARY_WINDOW.evaluate_js(js_call)
+                if prev_b != book_code or prev_ch != ch_int:
+                    data = self.get_chapter_commentaries_grouped(book_code, ch_int)
+                    json_str = json.dumps(data)
+                    _COMMENTARY_WINDOW.evaluate_js(
+                        f"window.CommentaryWindow && window.CommentaryWindow.receiveChapterData({json_str}, {v_int})"
+                    )
+                else:
+                    _COMMENTARY_WINDOW.evaluate_js(
+                        f"window.CommentaryWindow && window.CommentaryWindow.handleVerseChanged('{book_code}', {ch_int}, {v_int})"
+                    )
             except Exception as e:
                 logger.debug(f"Erreur evaluate_js sync_verse: {e}")
         return {"success": True}
@@ -3190,10 +3202,21 @@ def on_commentary_shown(*args, **kwargs):
             user32.SetWindowPos(hwnd, 0, wx, wy, ww, wh, 0x0040)
             
             b, ch, v = _LAST_ACTIVE_PASSAGE
-            french = get_french_book_name(b)
-            threading.Timer(0.4, lambda: _COMMENTARY_WINDOW.evaluate_js(
-                f"window.CommentaryWindow && window.CommentaryWindow.handlePassageNavigated('{b}', '{french}', {ch}, {v})"
-            )).start()
+            api = BibleAppApi()
+            data = api.get_chapter_commentaries_grouped(b, ch)
+            json_str = json.dumps(data)
+            
+            def push_data():
+                try:
+                    if _COMMENTARY_WINDOW:
+                        _COMMENTARY_WINDOW.evaluate_js(
+                            f"window.CommentaryWindow && window.CommentaryWindow.receiveChapterData({json_str}, {v})"
+                        )
+                except Exception as e:
+                    logger.debug(f"push_data error: {e}")
+
+            threading.Timer(0.15, push_data).start()
+            threading.Timer(0.6, push_data).start()
     except Exception as e:
         logger.warning(f"Erreur on_commentary_shown: {e}")
 
