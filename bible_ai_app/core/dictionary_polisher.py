@@ -241,7 +241,7 @@ class DictionaryPolisher:
 
 
     @classmethod
-    def polish_article(cls, raw_text, title="", model="gemini-2.5-flash", config=None, api_key=None, return_usage=False):
+    def polish_article(cls, raw_text, title="", model="gemini-2.5-flash", config=None, api_key=None, return_usage=False, limiter=None):
         """
         Envoie le texte brut au modèle sélectionné (Google Gemini, Mistral AI ou Infomaniak Swiss AI).
         Gère automatiquement le découpage en sections si l'article est long (> 14 000 caractères).
@@ -258,16 +258,14 @@ class DictionaryPolisher:
             print(f"\n   📄 [{title}] Grand article ({len(raw_text):,} caractères) découpé en {len(chunks)} sections...", flush=True)
             
             for i, chunk in enumerate(chunks, 1):
-                if i > 1:
-                    # Temporisation stricte de 5.0s entre les sections pour respecter le plafond de 15 RPM
-                    time.sleep(5.0)
-
                 sub_title = f"{title} (Partie {i}/{len(chunks)})" if len(chunks) > 1 else title
                 chunk_ok = False
                 chunk_res = ""
                 chunk_usage = {}
                 
                 for attempt in range(1, 4):
+                    if limiter:
+                        limiter.acquire()
                     ok, res, u = cls._polish_single_chunk(chunk, title=sub_title, model=model, config=config, api_key=api_key)
                     if ok:
                         chunk_ok = True
@@ -300,8 +298,8 @@ class DictionaryPolisher:
             combined_text = "\n\n---\n\n".join(polished_chunks)
             return (True, combined_text, agg_usage) if return_usage else (True, combined_text)
 
-
-
+        if limiter:
+            limiter.acquire()
         ok, res, u = cls._polish_single_chunk(raw_text, title=title, model=model, config=config, api_key=api_key)
         return (ok, res, u) if return_usage else (ok, res)
 

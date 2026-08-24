@@ -200,11 +200,11 @@ def main():
     
     if is_gemini_pool:
         endpoints_pool = build_gemini_pool(keys)
-        workers_count = args.workers or 6
+        workers_count = args.workers or len(endpoints_pool)
         pool_title = "POOL 100% GOOGLE GEMINI (2 Clés x Modèles 3.5 & 3.1 Flash-Lite)"
     elif is_hybrid:
         endpoints_pool = build_hybrid_pool(keys)
-        workers_count = args.workers or 8
+        workers_count = args.workers or len(endpoints_pool)
         pool_title = "MODE HYBRIDE (Infomaniak + 2 Clés Gemini)"
     else:
         cfg = load_config()
@@ -295,16 +295,13 @@ def main():
                 continue
 
             for attempt in range(1, 3):
-                # Régulation stricte du débit pour ne jamais dépasser 12 RPM (sous le seuil de 15 RPM)
-                if "limiter" in ep:
-                    ep["limiter"].acquire()
-
                 ok, res, usage = DictionaryPolisher.polish_article(
                     raw_text,
                     title=title,
                     model=ep["model"],
                     config=ep["config"],
-                    return_usage=True
+                    return_usage=True,
+                    limiter=ep.get("limiter")
                 )
                 if ok:
                     return slug, title, True, res, usage, ep["name"], ep["model"]
