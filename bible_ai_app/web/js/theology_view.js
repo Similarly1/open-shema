@@ -935,40 +935,63 @@ const TheologyView = {
 
     const bookPatternStr = bookNames.sort((a, b) => b.length - a.length).join('|');
 
-    // Détection universelle avec support des balises HTML (>), tirets cadratins (–, —), guillemets et chapitres seuls
+    // Détection universelle : multi-chapitres (1Co 3.1-4.2), plages chapitres (1Co 3-4), versets (1Co 4.3-21) et chapitres seuls
     const scriptureRegex = new RegExp(
-      `(?<=^|[\\s\\(\\[\\{;,>–—«»"\'\\u2013\\u2014\\u00A0-])((?:${bookPatternStr})\\.?)\\s*([0-9]{1,3})(?:\\s*[:.,]\\s*([0-9]{1,3}(?:\\s*[-–—\\u2013\\u2014]\\s*[0-9]{1,3})?))?((?:\\s*[,;]\\s*[0-9]{1,3}(?:\\s*[:.,]\\s*[0-9]{1,3}(?:\\s*[-–—\\u2013\\u2014]\\s*[0-9]{1,3})?)?(?!\\s*[a-zA-ZÀ-ÿ]))*)`,
+      `(?<=^|[\\s\\(\\[\\{;,>–—«»"\'\\u2013\\u2014\\u00A0-])((?:${bookPatternStr})\\.?)\\s*([0-9]{1,3})(?:\\s*[:.,]\\s*([0-9]{1,3}))?(?:\\s*[-–—\\u2013\\u2014]\\s*([0-9]{1,3})(?:\\s*[:.,]\\s*([0-9]{1,3}))?)?((?:\\s*[,;]\\s*[0-9]{1,3}(?:\\s*[:.,]\\s*[0-9]{1,3}(?:\\s*[-–—\\u2013\\u2014]\\s*[0-9]{1,3})?)?(?!\\s*[a-zA-ZÀ-ÿ]))*)`,
       'gi'
     );
 
-    return text.replace(scriptureRegex, (fullMatch, book, ch, vs, chained) => {
-      const cleanBook = book.replace(/\.$/, '').trim();
-      let firstRef = '';
-      let displayRef = '';
-      if (vs) {
-        const cleanVs = vs.replace(/[\u2013\u2014\u2212\u2010\u2011\u2012\u2015]/g, '-').replace(/\s+/g, '');
-        firstRef = `${cleanBook} ${ch}:${cleanVs}`;
-        displayRef = `${book} ${ch}.${cleanVs}`;
-      } else {
-        firstRef = `${cleanBook} ${ch}`;
-        displayRef = `${book} ${ch}`;
-      }
-      let result = `<span class="theol-inline-scripture-ref" data-ref="${TheologyView.escapeHtml(firstRef)}">${displayRef}</span>`;
-
-      if (chained) {
-        const subRegex = /([,;]\s*)([0-9]{1,3}(?:\s*[:.,]\s*[0-9]{1,3}(?:\s*[-–—\u2013\u2014]\s*[0-9]{1,3})?)?)/g;
-        const formattedChained = chained.replace(subRegex, (m, sep, subCv) => {
-          const parts = subCv.split(/[:.,]/);
-          const subCh = parts[0].trim();
-          const subVs = parts[1] ? parts[1].replace(/[\u2013\u2014\u2212\u2010\u2011\u2012\u2015]/g, '-').replace(/\s+/g, '') : '';
-          const subRef = subVs ? `${cleanBook} ${subCh}:${subVs}` : `${cleanBook} ${subCh}`;
-          return `${sep}<span class="theol-inline-scripture-ref" data-ref="${TheologyView.escapeHtml(subRef)}">${subCv}</span>`;
-        });
-        result += formattedChained;
+    // Découper par balises HTML pour ne jamais altérer les balises ni les attributs (ex: href, id, class)
+    const parts = text.split(/(<[^>]+>)/g);
+    return parts.map(part => {
+      if (part.startsWith('<') && part.endsWith('>')) {
+        return part;
       }
 
-      return result;
-    });
+      return part.replace(scriptureRegex, (fullMatch, book, ch1, vs1, chOrVs2, vs2, chained) => {
+        const cleanBook = book.replace(/\.$/, '').trim();
+        let displayRef = fullMatch.trim();
+        let firstRef = '';
+
+        if (vs1 && chOrVs2 && vs2) {
+          const cleanVs1 = vs1.replace(/\s+/g, '');
+          const cleanVs2 = vs2.replace(/\s+/g, '');
+          firstRef = `${cleanBook} ${ch1}:${cleanVs1}-${chOrVs2}:${cleanVs2}`;
+          displayRef = `${book} ${ch1}.${cleanVs1}-${chOrVs2}.${cleanVs2}`;
+        } else if (vs1 && chOrVs2 && !vs2) {
+          const cleanVs1 = vs1.replace(/\s+/g, '');
+          const cleanVs2 = chOrVs2.replace(/\s+/g, '');
+          firstRef = `${cleanBook} ${ch1}:${cleanVs1}-${cleanVs2}`;
+          displayRef = `${book} ${ch1}.${cleanVs1}-${cleanVs2}`;
+        } else if (!vs1 && chOrVs2 && !vs2) {
+          firstRef = `${cleanBook} ${ch1}-${chOrVs2}`;
+          displayRef = `${book} ${ch1}-${chOrVs2}`;
+        } else if (vs1 && !chOrVs2) {
+          const cleanVs1 = vs1.replace(/\s+/g, '');
+          firstRef = `${cleanBook} ${ch1}:${cleanVs1}`;
+          displayRef = `${book} ${ch1}.${cleanVs1}`;
+        } else {
+          firstRef = `${cleanBook} ${ch1}`;
+          displayRef = `${book} ${ch1}`;
+        }
+
+        let result = `<span class="theol-inline-scripture-ref" data-ref="${TheologyView.escapeHtml(firstRef)}">${displayRef}</span>`;
+
+        if (chained) {
+          const subRegex = /([,;]\s*)([0-9]{1,3}(?:\s*[:.,]\s*[0-9]{1,3}(?:\s*[-–—\u2013\u2014]\s*[0-9]{1,3})?)?)/g;
+          const formattedChained = chained.replace(subRegex, (m, sep, subCv) => {
+            const p = subCv.split(/[:.,]/);
+            const subCh = p[0].trim();
+            const subVs = p[1] ? p[1].replace(/[\u2013\u2014\u2212\u2010\u2011\u2012\u2015]/g, '-').replace(/\s+/g, '') : '';
+            const subRef = subVs ? `${cleanBook} ${subCh}:${subVs}` : `${cleanBook} ${subCh}`;
+            return `${sep}<span class="theol-inline-scripture-ref" data-ref="${TheologyView.escapeHtml(subRef)}">${subCv}</span>`;
+          });
+          result += formattedChained;
+        }
+
+        return result;
+      });
+    }).join('');
   },
 
   formatFootnoteReferences(html, footnoteMap = {}) {

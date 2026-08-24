@@ -68,7 +68,7 @@ const ArticlesView = {
   getEditorialBadgeLabel(text) {
     if (!text) return 'CONTEXTE & PROVENANCE';
     const lower = text.toLowerCase();
-    if (/extrait\s+du\s+livre|tiré\s+du\s+livre|chapitre\s+\d+|éditions|editions|éditeur|editeur|ouvrage|pp\.\s*\d+/i.test(lower)) {
+    if (/extrait\s+du\s+livre|tiré\s+du\s+livre|chapitre\s+\d+|éditions|editions|éditeur|editeur|ouvrage|pp\.\s*\d+|méditation\s+\d+/i.test(lower)) {
       return 'EXTRAIT D’OUVRAGE';
     }
     if (/série\s+de|série\s+sur|épisode\s+\d+|partie\s+\d+|série\s+d’articles|série\s+d'articles/i.test(lower)) {
@@ -794,11 +794,29 @@ const ArticlesView = {
           });
         });
 
-        // Liaison des liens externes (ouverture propre dans le navigateur par défaut)
-        contentEl.querySelectorAll('a').forEach(aTag => {
+        // 1. Liaison des liens internes (notes de bas de page et retour au texte)
+        contentEl.querySelectorAll('a[href^="#"]').forEach(aTag => {
+          aTag.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const targetId = aTag.getAttribute('href').replace(/^#/, '');
+            if (!targetId) return;
+            const targetEl = document.getElementById(targetId);
+            if (targetEl) {
+              targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              targetEl.classList.remove('article-fn-flash');
+              void targetEl.offsetWidth; // Force reflow
+              targetEl.classList.add('article-fn-flash');
+              setTimeout(() => targetEl.classList.remove('article-fn-flash'), 1800);
+            }
+          });
+        });
+
+        // 2. Liaison des liens externes (ouverture propre dans le navigateur par défaut)
+        contentEl.querySelectorAll('a:not([href^="#"])').forEach(aTag => {
           aTag.addEventListener('click', (e) => {
             const href = aTag.getAttribute('href');
-            if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
+            if (href && (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('mailto:'))) {
               e.preventDefault();
               e.stopPropagation();
               if (window.pywebview?.api?.open_external_url) {
@@ -959,10 +977,15 @@ const ArticlesView = {
     
     let text = this.fixMojibake(md);
 
-    // 1. Nettoyer les résidus de lecteur ElevenLabs audio
-    text = text.replace(/Loading\s+the[\s\S]*?AudioNative\s+Player[\.\u2026]*/gi, '');
-    text = text.replace(/Loading\s+the[\s\S]*?Elevenlabs[^\n]*\n*/gi, '');
+    // 1. Nettoyer les résidus de lecteur ElevenLabs audio sans déborder sur le texte
+    text = text.replace(/Loading\s+the\s*(?:\[[^\]]*Elevenlabs[^\]]*\]\([^)]+\)|Elevenlabs[^\n.]*)/gi, '');
     text = text.replace(/AudioNative\s+Player[\.\u2026]*/gi, '');
+
+    // 1b. Si l'article entier est sur une seule ligne compactée, découper proprement les paragraphes (sans couper les listes 1., 2. ni les abréviations)
+    if (!text.includes('\n\n')) {
+      text = text.replace(/(?<!\b(?:pp|p|chap|ch|vol|v|vs|dr|etc|ex|cf|art|\d+))\.\s+([A-ZÀ-ÿ—–«])/gi, '.\n\n$1');
+      text = text.replace(/([!?…»])\s+([A-ZÀ-ÿ0-9—–«])/g, '$1\n\n$2');
+    }
 
     // 2. Nettoyer les blocs promotionnels et parcours e-mail de fin d'article
     text = text.replace(/(?:#+\s*)?Parcours\s+e-?mail[\s\S]*$/gi, '');
@@ -974,30 +997,14 @@ const ArticlesView = {
     text = text.replace(/^(\*\*(?:Auteur|Source|Date|Publié le|Podcast)\s*:\*\*[^\n]*\n*|\*\*Podcast\*\*\s*\n*|Podcast\s*\n*|Auteur\s*:[^\n]*\n*|Source\s*:[^\n]*\n*|Date\s*:[^\n]*\n*|Publié\s+le[^\n]*\n*|---\n*)+/gim, '');
     text = text.replace(/^(?:\[[A-ZÉÈÊÀ\s\-]+\]\(https?:\/\/[^\)]+\)\s*)+(?:\d+\s*min\s+de\s+lecture)?[^\n]*\n+/gim, '');
 
-    // 4. Formater les callouts d'information (ex: note de transcription automatique)
-    text = text.replace(/(?:ℹ️|ℹ)\s*([^\n]+)/gi, '\n\n<div class="article-info-callout"><span>ℹ️</span><div>$1</div></div>\n\n');
+    // 4. Formater les callouts d'information (ex: note de transcription automatique) et nettoyer les astérisques résiduels
+    text = text.replace(/(?:^|\n)\s*\*?\s*(?:ℹ️|ℹ)\s*([^\n*]+?)\*?\s*(?=\n|$)/gi, '\n\n<div class="article-info-callout"><span>ℹ️</span><div>$1</div></div>\n\n');
+    text = text.replace(/(?:^|\n)\s*\*\s*(?=\n|$)/g, '\n');
 
-    // 5. Formater les dialogues et transcriptions de podcast (intervenants multiples)
-    // Séparer les prises de parole par des sauts de ligne
-    text = text.replace(/(?<!\n)\s*\*\*([A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+(?:\s+[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+)?)\*\*\s*:?\s*/g, '\n\n**$1 :** ');
-    // Convertir les lignes de prise de parole en encadrés de dialogue stylisés
-    text = text.replace(/(?:^|\n)\*\*([A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+(?:\s+[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+)?)\s*:\*\*\s*([^\n]+)/g, '\n\n<div class="article-speaker-turn"><span class="article-speaker-badge">$1</span><p class="article-speaker-speech">$2</p></div>\n\n');
+    // 5. Nettoyer les tirets initiaux sur les mentions éditoriales
+    text = text.replace(/(?:^|\n)\s*[—–-]\s*(Cet article\s+(?:est extrait|fait partie|est tiré|a été publié|provient|est une adaptation))/gi, '\n\n$1');
 
-    // 5b. Structurer les sous-titres et directives bibliques ("Cléopas et la désillusion **Lisez Luc 24.13-35.**")
-    text = text.replace(/(?:^|\n)([A-ZÀ-ÿ][^\n*]+?)\s+(\*\*Lisez\s+[^*]+\*\*)/gim, '\n\n### $1\n\n$2\n\n');
-    text = text.replace(/(\*\*[^*]+\*\*)\s+([A-ZÀ-ÿ])/g, '$1\n\n$2');
-
-    // 5c. Découpage et mise en page soignée des dialogues au tiret cadratin (—, –)
-    text = text.replace(/([:!?…»])\s*([—–\u2013\u2014]\s*)/g, '$1\n\n$2');
-    text = text.replace(/\.\s+([—–\u2013\u2014]\s*[A-ZÀ-ÿ])/g, '.\n\n$1');
-
-    // Convertir les lignes de dialogue au tiret en encadrés distincts
-    text = text.replace(/(?:^|\n)\s*([—–\u2013\u2014]\s*[^\n]+)/g, '\n\n<div class="article-speaker-turn"><p class="article-speaker-speech">$1</p></div>\n\n');
-
-    // 5d. Convertir les citations bibliques avec tiret de référence (« ... » – Réf)
-    text = text.replace(/(?:^|\n)«\s*([^»]+?)\s*»\s*([–—\u2013\u2014-]\s*[A-ZÀ-ÿ0-9.:\s-]+)/g, '\n\n<blockquote class="article-bible-quote"><p>« $1 » $2</p></blockquote>\n\n');
-
-    // 5e. Détection et mise en valeur du cartouche éditorial de fin d'article (Option 3 : Badge contextuel dynamique, sans émoji/svg)
+    // 5b. Détection et mise en valeur du cartouche éditorial de fin d'article (Option 3 : Badge contextuel dynamique, sans émoji/svg)
     text = text.replace(
       /(?:^|\n\n+)((?:Cet article\s+(?:fait partie|est extrait|est tiré|a été publié|provient|est une adaptation|est la traduction|est une traduction|est le premier|est le second|est le troisième|est basé)|Extrait du livre|Tiré du livre|Publié avec l[’']autorisation)[^\n]+(?:\n[^\n]+)*)(?=\s*$)/gi,
       (match, content) => {
@@ -1005,6 +1012,47 @@ const ArticlesView = {
         return `\n\n<div class="article-editorial-footer-card"><div class="article-editorial-footer-header"><span class="article-editorial-badge">${badge}</span></div><div class="article-editorial-footer-content">${content.trim()}</div></div>\n\n`;
       }
     );
+
+    // 5c. Formater les dialogues et transcriptions de podcast (intervenants multiples)
+    // Séparer les prises de parole par des sauts de ligne
+    text = text.replace(/(?<!\n)\s*\*\*([A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+(?:\s+[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+)?)\*\*\s*:?\s*/g, '\n\n**$1 :** ');
+    // Convertir les lignes de prise de parole en encadrés de dialogue stylisés
+    text = text.replace(/(?:^|\n)\*\*([A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+(?:\s+[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+)?)\s*:\*\*\s*([^\n]+)/g, '\n\n<div class="article-speaker-turn"><span class="article-speaker-badge">$1</span><p class="article-speaker-speech">$2</p></div>\n\n');
+
+    // 5d. Structurer les sous-titres et directives bibliques ("Cléopas et la désillusion **Lisez Luc 24.13-35.**")
+    text = text.replace(/(?:^|\n)([A-ZÀ-ÿ][^\n*]+?)\s+(\*\*Lisez\s+[^*]+\*\*)/gim, '\n\n### $1\n\n$2\n\n');
+    text = text.replace(/(\*\*[^*]+\*\*)\s+([A-ZÀ-ÿ])/g, '$1\n\n$2');
+
+    // 5e. Découpage et mise en page soignée des dialogues au tiret cadratin (—, –)
+    text = text.replace(/([:!?…»])\s*([—–\u2013\u2014]\s*)/g, '$1\n\n$2');
+    text = text.replace(/\.\s+([—–\u2013\u2014]\s*[A-ZÀ-ÿ])/g, '.\n\n$1');
+
+    // Convertir les lignes de dialogue au tiret en encadrés distincts
+    text = text.replace(/(?:^|\n)\s*([—–\u2013\u2014]\s*[^\n]+)/g, '\n\n<div class="article-speaker-turn"><p class="article-speaker-speech">$1</p></div>\n\n');
+
+    // 5f. Convertir les citations bibliques avec tiret de référence (« ... » – Réf)
+    text = text.replace(/(?:^|\n)«\s*([^»]+?)\s*»\s*([–—\u2013\u2014-]\s*[A-ZÀ-ÿ0-9.:\s-]+)/g, '\n\n<blockquote class="article-bible-quote"><p>« $1 » $2</p></blockquote>\n\n');
+
+    // 5g. Nettoyer les retours de note résiduels dans le markdown [↩︎](#...)
+    text = text.replace(/\[(?:↩︎|↩)\]\(#[^)]+\)/g, '');
+
+    // 5h. Détecter et formater les listes de notes de bas de page réelles (citations bibliographiques / ibid / éditions)
+    text = text.replace(/(?:^|\n)(\d+)\.\s+([^\n]+(?:\n(?!\d+\.|\s*#|\s*---|\s*$)[^\n]+)*)/g, (match, num, body) => {
+      if (/ibid|éditions|editions|editor|publisher|press|university|chapitre|vol\.|tome|trad\.|pp\.\s*\d+|p\.\s*\d+|19\d\d|20\d\d|op\.\s*cit|loc\.\s*cit/i.test(body)) {
+        return `\n\n<div class="article-footnote-item" id="article-fn-${num}"><span class="article-footnote-num">${num}.</span><span class="article-footnote-text">${body.trim()}</span> <a href="#article-fnref-${num}" class="article-footnote-backlink" title="Retour au texte">↩</a></div>\n\n`;
+      }
+      return match;
+    });
+
+    // 5i. Remplacer les chiffres exposants Unicode (ex: ⁹) ou marqueurs [^9] en badges de note interactifs
+    const supToNum = { '⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9' };
+    text = text.replace(/\[\^(\d+)\]/g, (match, num) => {
+      return `<sup class="article-fn-badge" id="article-fnref-${num}"><a href="#article-fn-${num}" title="Note ${num}">${num}</a></sup>`;
+    });
+    text = text.replace(/([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/g, (match, sups) => {
+      const num = sups.split('').map(ch => supToNum[ch] || ch).join('');
+      return `<sup class="article-fn-badge" id="article-fnref-${num}"><a href="#article-fn-${num}" title="Note ${num}">${num}</a></sup>`;
+    });
 
     // 6. Nettoyer les émojis décoratifs résiduels
     text = text.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1FA70}-\u{1FAFF}]/gu, '');
@@ -1049,17 +1097,21 @@ const ArticlesView = {
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
-      // Rétablir les balises HTML injectées (dialogues, callouts, tables, blockquotes)
-      .replace(/&lt;(\/?(?:div|table|thead|tbody|tr|th|td|blockquote|p|sup|span)(?:\s+class="[^"]*")?)&gt;/gi, '<$1>')
+      // Rétablir les balises HTML injectées (dialogues, callouts, tables, blockquotes, notes, badges)
+      .replace(/&lt;(\/?(?:div|table|thead|tbody|tr|th|td|blockquote|p|sup|span|a)(?:\s+[a-zA-Z0-9_\-]+="[^"]*")*)(\s*\/)?&gt;/gi, '<$1$2>')
       .replace(/^#### (.*$)/gim, '<h4 class="article-h4">$1</h4>')
       .replace(/^### (.*$)/gim, '<h3 class="article-h3">$1</h3>')
       .replace(/^## (.*$)/gim, '<h2 class="article-h2">$1</h2>')
       .replace(/^# (.*$)/gim, '<h1 class="article-h1">$1</h1>')
       .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/gim, '<em>$1</em>')
-      .replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2" target="_blank" class="article-link">$1</a>')
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/gim, (match, label, href) => {
+        if (href.startsWith('#')) {
+          return `<a href="${href}" class="article-internal-link">${label}</a>`;
+        }
+        return `<a href="${href}" target="_blank" class="article-link">${label}</a>`;
+      })
       .replace(/^---\s*$/gim, '<div class="article-ornamental-divider"><span class="article-ornamental-divider-icon">❦</span></div>')
-      .replace(/([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/g, '<sup class="verse-sup">$1</sup>')
       .replace(/\n\n+/gim, '</p><p>')
       .replace(/\n/gim, '<br>');
 
@@ -1159,3 +1211,5 @@ const ArticlesView = {
       .replace(/"/g, '&quot;');
   }
 };
+
+window.ArticlesView = ArticlesView;

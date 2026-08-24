@@ -1055,44 +1055,42 @@
   color: #93c5fd;
 }
 
-/* Références bibliques interactives en ligne (avec infobulle de verset) */
+/* Références bibliques interactives en ligne (strictement identiques au reste de l'application) */
 .article-markdown-body .theol-inline-scripture-ref {
-  color: var(--accent-primary, #60a5fa) !important;
+  color: var(--accent-blue, #3b82f6) !important;
   font-weight: 600 !important;
-  text-decoration: underline !important;
-  text-decoration-style: dotted !important;
-  text-underline-offset: 3px !important;
   cursor: pointer !important;
-  padding: 1px 5px !important;
+  padding: 1px 4px !important;
   border-radius: 4px !important;
-  background: rgba(59, 130, 246, 0.1) !important;
-  transition: all 0.15s ease !important;
-  display: inline-block;
-  line-height: 1.3;
+  background: rgba(2, 132, 199, 0.08) !important;
+  transition: all 0.12s ease !important;
+  display: inline !important;
+  text-decoration: none !important;
+  border: none !important;
 }
 
 .article-markdown-body .theol-inline-scripture-ref:hover {
-  background: rgba(59, 130, 246, 0.22) !important;
-  color: #93c5fd !important;
-  text-decoration-style: solid !important;
+  background: var(--accent-blue, #3b82f6) !important;
+  color: #ffffff !important;
+  text-decoration: none !important;
 }
 
 .article-reader-container.reading-bg-white .article-markdown-body .theol-inline-scripture-ref {
-  color: #2563eb !important;
-  background: rgba(37, 99, 235, 0.08) !important;
+  color: var(--accent-blue, #2563eb) !important;
+  background: rgba(2, 132, 199, 0.08) !important;
 }
 .article-reader-container.reading-bg-white .article-markdown-body .theol-inline-scripture-ref:hover {
-  background: rgba(37, 99, 235, 0.16) !important;
-  color: #1d4ed8 !important;
+  background: var(--accent-blue, #2563eb) !important;
+  color: #ffffff !important;
 }
 
 .article-reader-container.reading-bg-sepia .article-markdown-body .theol-inline-scripture-ref {
   color: #b45309 !important;
-  background: rgba(180, 83, 9, 0.08) !important;
+  background: rgba(180, 83, 9, 0.1) !important;
 }
 .article-reader-container.reading-bg-sepia .article-markdown-body .theol-inline-scripture-ref:hover {
-  background: rgba(180, 83, 9, 0.16) !important;
-  color: #92400e !important;
+  background: #b45309 !important;
+  color: #ffffff !important;
 }
 
 .article-markdown-body ul,
@@ -1289,4 +1287,131 @@
 }
 .article-reader-container.reading-bg-sepia .article-editorial-footer-content a {
   color: #b45309 !important;
+}
+
+/* =========================================================================
+ * NOTES DE BAS DE PAGE CLIQUABLES & NAVIGATION INTRA-ARTICLE
+ * ========================================================================= */
+
+.article-fn-badge {
+  font-size: 0.75em;
+  font-weight: 700;
+  line-height: 1;
+  vertical-align: super;
+  margin: 0 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.article-fn-badge a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 4px;
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--accent-primary, #60a5fa);
+  text-decoration: none !important;
+  font-size: 0.85em;
+  font-weight: 700;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.article-fn-badge a:hover {
+  background: var(--accent-primary, #3b82f6);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.article-footnote-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 12px;
+  margin: 6px 0;
+  border-radius: 6px;
+  font-size: 0.88em;
+  line-height: 1.6;
+  color: var(--text-secondary, #cbd5e1);
+  background: rgba(255, 255, 255, 0.02);
+  border-left: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.article-footnote-num {
+  font-weight: 700;
+  color: var(--accent-primary, #60a5fa);
+  min-width: 22px;
+  flex-shrink: 0;
+}
+
+.article-footnote-text {
+  flex: 1;
+}
+
+.article-footnote-backlink {
+  font-size: 1.1em;
+  color: var(--accent-primary, #60a5fa);
+  text-decoration: none !important;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  opacity: 0.75;
+}
+
+.article-footnote-backlink:hover {
+  opacity: 1;
+  background: rgba(59, 130, 246, 0.15);
+  transform: scale(1.1);
+}
+
+/* Animation de flash lumineux lors du saut vers une note ou le texte */
+@keyframes articleFnFlashAnim {
+  0% { background: rgba(59, 130, 246, 0.35); }
+  100% { background: transparent; }
+}
+
+.article-fn-flash {
+  animation: articleFnFlashAnim 1.6s ease-out;
+}
+
+/* Thème Blanc */
+.article-reader-container.reading-bg-white .article-fn-badge a {
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+}
+.article-reader-container.reading-bg-white .article-fn-badge a:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+.article-reader-container.reading-bg-white .article-footnote-item {
+  background: #f8fafc;
+  color: #475569;
+}
+.article-reader-container.reading-bg-white .article-footnote-num,
+.article-reader-container.reading-bg-white .article-footnote-backlink {
+  color: #2563eb;
+}
+
+/* Thème Sépia */
+.article-reader-container.reading-bg-sepia .article-fn-badge a {
+  background: rgba(180, 83, 9, 0.12);
+  color: #b45309;
+}
+.article-reader-container.reading-bg-sepia .article-fn-badge a:hover {
+  background: #b45309;
+  color: #ffffff;
+}
+.article-reader-container.reading-bg-sepia .article-footnote-item {
+  background: #ede6d6;
+  color: #4a4036;
+}
+.article-reader-container.reading-bg-sepia .article-footnote-num,
+.article-reader-container.reading-bg-sepia .article-footnote-backlink {
+  color: #b45309;
 }
