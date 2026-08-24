@@ -1,35 +1,39 @@
 /**
- * Commentary Window Controller (Second Screen)
- * Gère le défilement continu synchronisé et l'affichage riche des commentaires exégétiques.
- * Règle stricte : 100% icônes SVG, aucun émoji.
+ * Commentary & Companion Study Window Controller
+ * Gère le volet d'étude déporté autonome sur 2nd écran ou fenêtre détachée :
+ * - 4 Onglets complets : Commentaires, Assistant IA, Lexique Strong, Notes
+ * - Redimensionnement matériel fluide aux bordures et aux coins (WS_THICKFRAME Win32)
+ * - Synchronisation bidirectionnelle en temps réel avec le texte biblique principal
+ * - Zéro émoji, icônes vectorielles SVG épurées
  */
 
 const CommentaryWindow = {
-  channel: null,
-  isSyncActive: true,
-  isUserScrolled: false,
-  _isProgrammaticScroll: false,
-  _scrollTimeout: null,
-  _currentRequestId: 0,
-
+  // Navigation & État actif
   currentBook: 'Gen',
   currentBookFrench: 'Genèse',
   currentChapter: 1,
   currentVerse: 1,
   currentChapterData: null,
   activeAuthorFilter: null,
+  activeTab: 'commentaries', // 'commentaries' | 'ai' | 'lexicon' | 'notes'
+  isSyncActive: true,
+  _currentRequestId: 0,
+  channel: null,
 
   // Paramètres d'affichage
   zoomPercent: 100,
   fontFamily: 'EB Garamond',
   readingBg: 'auto',
 
-  // Cache de traduction
+  // Cache & Historique
   translationCache: {},
   showTranslatedVersion: {},
+  aiChatHistory: [],
+  currentLexiconWords: [],
+  activeLexiconWordIndex: -1,
 
   init() {
-    // 1. Lire les paramètres URL éventuels
+    // 1. Lire les paramètres d'URL
     try {
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('book')) this.currentBook = urlParams.get('book');
@@ -37,11 +41,20 @@ const CommentaryWindow = {
       if (urlParams.get('verse')) this.currentVerse = parseInt(urlParams.get('verse'), 10) || 1;
     } catch (e) {}
 
+    // 2. Restaurer l'onglet actif sauvegardé
+    try {
+      const savedTab = localStorage.getItem('open_shema_comm_active_tab');
+      if (savedTab && ['commentaries', 'ai', 'lexicon', 'notes'].includes(savedTab)) {
+        this.activeTab = savedTab;
+      }
+    } catch (e) {}
+
     this.initBroadcastChannel();
     this.bindEvents();
     this.restorePreferences();
+    this.switchTab(this.activeTab);
 
-    // 2. Initialiser immédiatement le chargement des commentaires
+    // 3. Charger le passage initial
     const startInitialLoad = async () => {
       try {
         const passage = await API.getCurrentPassage();
@@ -58,7 +71,6 @@ const CommentaryWindow = {
       this.loadChapterCommentaries(this.currentBook, this.currentChapter);
     };
 
-    // Démarrage dès que l'API est prête ou timeout rapide
     API.onReady(() => {
       startInitialLoad();
     });
@@ -66,7 +78,7 @@ const CommentaryWindow = {
     if (API.isReady) {
       startInitialLoad();
     } else {
-      setTimeout(startInitialLoad, 300);
+      setTimeout(startInitialLoad, 250);
     }
   },
 
@@ -76,16 +88,10 @@ const CommentaryWindow = {
       this.channel.onmessage = (event) => {
         this.handleMessage(event.data);
       };
-      console.log('[CommentaryWindow] BroadcastChannel connecté.');
-    } catch (e) {
-      console.warn('[CommentaryWindow] Erreur BroadcastChannel:', e);
-    }
-  },
-
-  notifyReady() {
-    if (this.channel) {
       this.channel.postMessage({ type: 'SECONDARY_WINDOW_READY' });
       this.channel.postMessage({ type: 'REQUEST_CURRENT_STATE' });
+    } catch (e) {
+      console.warn('[CommentaryWindow] BroadcastChannel non supporté:', e);
     }
   },
 
@@ -121,7 +127,7 @@ const CommentaryWindow = {
     if (isNewChapter || !this.currentChapterData) {
       await this.loadChapterCommentaries(bookCode, this.currentChapter);
     } else {
-      this.renderStream(this.currentChapterData);
+      this.refreshActiveTab();
     }
   },
 
@@ -129,7 +135,6 @@ const CommentaryWindow = {
     const ch = parseInt(chapterNum, 10);
     const v = parseInt(verseNum, 10) || 1;
 
-    // Si on a changé de chapitre par défilement continu OU si les données ne sont pas encore chargées
     if (this.currentBook !== bookCode || this.currentChapter !== ch || !this.currentChapterData) {
       this.currentBook = bookCode;
       this.currentChapter = ch;
@@ -141,15 +146,17 @@ const CommentaryWindow = {
 
     this.currentVerse = v;
     this.updatePassageDisplay(this.currentBookFrench, this.currentChapter, this.currentVerse);
-    if (this.currentChapterData) {
-      this.renderStream(this.currentChapterData);
-    }
+    this.refreshActiveTab();
   },
 
   updatePassageDisplay(bookName, chapter, verse) {
     const textEl = document.getElementById('comm-win-passage-text');
     if (textEl) {
       textEl.textContent = `${bookName} ${chapter}:${verse || 1}`;
+    }
+    const noteRefEl = document.getElementById('lbl-note-current-ref');
+    if (noteRefEl) {
+      noteRefEl.textContent = `${bookName} ${chapter}:${verse || 1}`;
     }
   },
 
@@ -173,7 +180,7 @@ const CommentaryWindow = {
 
     this.updatePassageDisplay(this.currentBookFrench, this.currentChapter, this.currentVerse);
     this.populateAuthorFilter(data.available_sources || []);
-    this.renderStream(data);
+    this.refreshActiveTab();
   },
 
   async loadChapterCommentaries(bookCode, chapterNum) {
@@ -193,7 +200,7 @@ const CommentaryWindow = {
       await API.ensureReady(3000);
       const data = await API.getChapterCommentariesGrouped(bookCode, parseInt(chapterNum, 10));
       
-      if (reqId !== this._currentRequestId) return; // Requête obsolète
+      if (reqId !== this._currentRequestId) return;
       
       if (!data || !data.verses || data.error) {
         throw new Error(data?.error || "Données de commentaires non disponibles");
@@ -203,7 +210,7 @@ const CommentaryWindow = {
       this.currentBookFrench = data.book_french || this.currentBookFrench;
       this.updatePassageDisplay(this.currentBookFrench, this.currentChapter, this.currentVerse);
       this.populateAuthorFilter(data.available_sources || []);
-      this.renderStream(data);
+      this.refreshActiveTab();
     } catch (e) {
       if (reqId !== this._currentRequestId) return;
       console.error('[CommentaryWindow] Erreur chargement commentaires:', e);
@@ -224,6 +231,58 @@ const CommentaryWindow = {
       }
     }
   },
+
+  // =========================================================================
+  // GESTION DES 4 ONGLETS
+  // =========================================================================
+
+  switchTab(tabId) {
+    this.activeTab = tabId;
+    try {
+      localStorage.setItem('open_shema_comm_active_tab', tabId);
+    } catch (e) {}
+
+    // Mise à jour de la barre d'onglets
+    document.querySelectorAll('.comm-tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === tabId);
+    });
+
+    // Affichage du bon panneau
+    document.querySelectorAll('.comm-tab-panel').forEach(panel => {
+      panel.classList.toggle('active', panel.id === `tab-panel-${tabId}`);
+    });
+
+    // Afficher le sélecteur d'ouvrages uniquement pour l'onglet Commentaires
+    const authorWrap = document.getElementById('comm-author-filter-wrapper');
+    if (authorWrap) {
+      authorWrap.style.display = tabId === 'commentaries' ? 'block' : 'none';
+    }
+
+    this.refreshActiveTab();
+  },
+
+  refreshActiveTab() {
+    switch (this.activeTab) {
+      case 'commentaries':
+        if (this.currentChapterData) {
+          this.renderCommentaryView(this.currentChapterData);
+        }
+        break;
+      case 'ai':
+        this.renderAiChatHeader();
+        break;
+      case 'lexicon':
+        this.loadLexiconForActiveVerse();
+        break;
+      case 'notes':
+        this.loadNotesForActiveVerse();
+        break;
+    }
+  },
+
+  // =========================================================================
+  // 1. ONGLET COMMENTAIRES (Verset unique & sélecteur d'ouvrage)
+  // =========================================================================
 
   populateAuthorFilter(sources) {
     const listEl = document.getElementById('author-filter-list');
@@ -280,11 +339,11 @@ const CommentaryWindow = {
       });
     }
     if (this.currentChapterData) {
-      this.renderStream(this.currentChapterData);
+      this.renderCommentaryView(this.currentChapterData);
     }
   },
 
-  renderStream(data) {
+  renderCommentaryView(data) {
     const container = document.getElementById('comm-stream-container');
     if (!container || !data || !data.verses) return;
 
@@ -303,13 +362,11 @@ const CommentaryWindow = {
     const vText = vObj.text || '';
     const allCommentsForVerse = vObj.comments || [];
 
-    // Filtrer pour l'auteur actif
     let comments = allCommentsForVerse;
     if (currentAuthor) {
       comments = comments.filter(c => c.author === currentAuthor || c.source === currentAuthor);
     }
 
-    // Auteurs alternatifs ayant des commentaires sur ce verset
     const otherAuthorsForVerse = [];
     allCommentsForVerse.forEach(c => {
       const a = c.author || c.source;
@@ -320,9 +377,9 @@ const CommentaryWindow = {
 
     let html = `
       <div class="comm-stream-verse-block active-synced-comm" id="comm-verse-${vNum}" data-verse="${vNum}" style="margin-bottom: 24px; border: none; background: transparent;">
-        <div class="comm-verse-quote-banner" data-nav-verse="${vNum}" style="cursor: default; padding: 14px 18px; margin-bottom: 16px;">
-          <div class="comm-verse-num-badge" style="font-size: 15px; font-weight: 800; min-width: 28px; height: 28px;">${vNum}</div>
-          <div class="comm-verse-quote-text" style="font-size: 16px; font-style: italic; line-height: 1.6;">« ${this.escapeHtml(vText || '...')} »</div>
+        <div class="comm-verse-quote-banner" data-nav-verse="${vNum}" style="cursor: default;">
+          <div class="comm-verse-num-badge">${vNum}</div>
+          <div class="comm-verse-quote-text">« ${this.escapeHtml(vText || '...')} »</div>
         </div>
         <div class="comm-verse-cards-list">
     `;
@@ -386,7 +443,7 @@ const CommentaryWindow = {
                 ` : ''}
               </div>
             </div>
-            <div class="comm-stream-body" style="font-size: 16px; line-height: 1.7;">${formattedText}</div>
+            <div class="comm-stream-body">${formattedText}</div>
           </article>
         `;
       });
@@ -399,14 +456,12 @@ const CommentaryWindow = {
 
     container.innerHTML = html;
 
-    // Attacher les boutons de bascule rapide d'auteur
     container.querySelectorAll('.btn-quick-switch-author').forEach(btn => {
       btn.addEventListener('click', () => {
         this.setAuthorFilter(btn.dataset.author);
       });
     });
 
-    // Attacher la traduction
     container.querySelectorAll('.btn-trans-comm').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.stopPropagation();
@@ -417,10 +472,288 @@ const CommentaryWindow = {
     });
   },
 
+  // =========================================================================
+  // 2. ONGLET ASSISTANT IA
+  // =========================================================================
+
+  renderAiChatHeader() {
+    const text = document.getElementById('comm-win-passage-text')?.textContent || 'Passage en cours';
+    const chips = document.getElementById('ai-prompt-chips');
+    if (chips) {
+      chips.querySelectorAll('.ai-prompt-chip').forEach(chip => {
+        chip.onclick = () => {
+          this.sendAiMessage(chip.dataset.prompt);
+        };
+      });
+    }
+  },
+
+  async sendAiMessage(promptText = null) {
+    const inputEl = document.getElementById('ai-chat-input');
+    const query = (promptText || inputEl?.value || '').trim();
+    if (!query) return;
+
+    if (inputEl && !promptText) inputEl.value = '';
+
+    const messagesStream = document.getElementById('ai-chat-messages');
+    if (!messagesStream) return;
+
+    // Bulle utilisateur
+    const userMsg = document.createElement('div');
+    userMsg.className = 'ai-msg-bubble user';
+    userMsg.textContent = query;
+    messagesStream.appendChild(userMsg);
+
+    // Bulle de chargement IA
+    const aiMsg = document.createElement('div');
+    aiMsg.className = 'ai-msg-bubble assistant';
+    aiMsg.innerHTML = '<span class="synth-spinner" style="width: 14px; height: 14px; border-width: 2px; vertical-align: middle; margin-right: 6px;"></span>Analyse théologique en cours...';
+    messagesStream.appendChild(aiMsg);
+    messagesStream.scrollTop = messagesStream.scrollHeight;
+
+    try {
+      const response = await API.askAI(query, this.currentBook, this.currentChapter, this.currentVerse);
+      const textResult = response?.answer || response?.result || response?.text || (typeof response === 'string' ? response : 'Réponse reçue.');
+      aiMsg.innerHTML = this.formatMarkdown(textResult);
+    } catch (e) {
+      aiMsg.innerHTML = `<span style="color: var(--accent-red, #EF4444);">Erreur lors de la communication avec l'assistant : ${this.escapeHtml(e.message || String(e))}</span>`;
+    }
+
+    messagesStream.scrollTop = messagesStream.scrollHeight;
+  },
+
+  clearAiChat() {
+    const messagesStream = document.getElementById('ai-chat-messages');
+    if (messagesStream) {
+      messagesStream.innerHTML = `
+        <div class="ai-msg-bubble assistant">
+          Conversation réinitialisée. Posez une nouvelle question sur ${this.currentBookFrench} ${this.currentChapter}:${this.currentVerse}.
+        </div>
+      `;
+    }
+  },
+
+  // =========================================================================
+  // 3. ONGLET LEXIQUE STRONG & DICTIONNAIRES
+  // =========================================================================
+
+  async loadLexiconForActiveVerse() {
+    const wordsFlow = document.getElementById('lex-words-flow');
+    const detailEl = document.getElementById('lex-entry-detail');
+    if (!wordsFlow) return;
+
+    wordsFlow.innerHTML = '<div style="color: var(--text-secondary); font-size: 13px;"><span class="synth-spinner" style="width: 12px; height: 12px; border-width: 1.5px; vertical-align: middle; margin-right: 6px;"></span>Chargement des racines hébraïques / grecques...</div>';
+
+    try {
+      const chData = await API.getChapterData('LSG', this.currentBook, this.currentChapter, 'LSG');
+      const vData = (chData?.verses || []).find(v => v.verse === this.currentVerse);
+
+      if (!vData || !vData.text) {
+        wordsFlow.innerHTML = '<div style="color: var(--text-secondary); font-size: 13px;">Texte du verset introuvable.</div>';
+        return;
+      }
+
+      // Découper les mots du verset
+      const rawWords = vData.text.split(/[\s,;:«»'".()]+/g).filter(w => w.length > 1);
+      wordsFlow.innerHTML = '';
+
+      rawWords.forEach((word, idx) => {
+        const pill = document.createElement('button');
+        pill.type = 'button';
+        pill.className = `lex-word-pill ${idx === 0 ? 'active' : ''}`;
+        pill.innerHTML = `
+          <span class="lex-word-orig">${this.escapeHtml(word)}</span>
+          <span class="lex-word-trans">Mot ${idx + 1}</span>
+        `;
+        pill.addEventListener('click', () => {
+          wordsFlow.querySelectorAll('.lex-word-pill').forEach(p => p.classList.remove('active'));
+          pill.classList.add('active');
+          this.lookupLexiconEntry(word);
+        });
+        wordsFlow.appendChild(pill);
+      });
+
+      if (rawWords.length > 0) {
+        this.lookupLexiconEntry(rawWords[0]);
+      }
+    } catch (e) {
+      wordsFlow.innerHTML = `<div style="color: var(--accent-red);">Erreur lexique : ${this.escapeHtml(e.message || String(e))}</div>`;
+    }
+  },
+
+  async lookupLexiconEntry(word) {
+    const detailEl = document.getElementById('lex-entry-detail');
+    if (!detailEl) return;
+
+    detailEl.innerHTML = `<div style="padding: 20px; color: var(--text-secondary); text-align: center;"><span class="synth-spinner" style="width: 14px; height: 14px; border-width: 2px; vertical-align: middle; margin-right: 6px;"></span>Recherche dans les dictionnaires Strong & Bailly pour « ${this.escapeHtml(word)} »...</div>`;
+
+    try {
+      const entry = await API.call('lookup_dictionary', word, null);
+      const matches = entry?.matches || [];
+
+      if (matches.length === 0) {
+        detailEl.innerHTML = `
+          <div style="padding: 24px; text-align: center; color: var(--text-secondary);">
+            <div style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">« ${this.escapeHtml(word)} »</div>
+            <div style="font-size: 12px; opacity: 0.8;">Aucune entrée exacte dans le lexique pour cette forme fléchie.</div>
+          </div>
+        `;
+        return;
+      }
+
+      let html = `<div style="display: flex; flex-direction: column; gap: 14px;">`;
+      matches.forEach(m => {
+        html += `
+          <div style="border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.08)); padding-bottom: 12px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+              <span style="font-weight: 700; font-size: 15px; color: var(--accent-orange, #F97316);">${this.escapeHtml(m.lemma || word)}</span>
+              <span style="font-size: 11px; background: var(--bg-hover); padding: 2px 7px; border-radius: 4px;">${this.escapeHtml(m.source || 'Lexique')}</span>
+            </div>
+            ${m.strong ? `<div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent-blue); margin-bottom: 6px;">Strong: ${this.escapeHtml(m.strong)}</div>` : ''}
+            <div style="font-size: 14px; line-height: 1.6; color: var(--text-primary);">${this.formatMarkdown(m.definition || m.content || '')}</div>
+          </div>
+        `;
+      });
+      html += `</div>`;
+      detailEl.innerHTML = html;
+    } catch (e) {
+      detailEl.innerHTML = `<div style="color: var(--accent-red); padding: 20px;">Erreur de consultation lexicale.</div>`;
+    }
+  },
+
+  // =========================================================================
+  // 4. ONGLET NOTES D'ÉTUDE
+  // =========================================================================
+
+  loadNotesForActiveVerse() {
+    const key = `note_${this.currentBook}_${this.currentChapter}_${this.currentVerse}`;
+    const textarea = document.getElementById('note-editor-textarea');
+    if (!textarea) return;
+
+    try {
+      const savedNote = localStorage.getItem(key) || '';
+      textarea.value = savedNote;
+    } catch (e) {
+      textarea.value = '';
+    }
+  },
+
+  saveCurrentNote() {
+    const key = `note_${this.currentBook}_${this.currentChapter}_${this.currentVerse}`;
+    const textarea = document.getElementById('note-editor-textarea');
+    if (!textarea) return;
+
+    try {
+      localStorage.setItem(key, textarea.value);
+      const saveBtn = document.getElementById('btn-save-note');
+      if (saveBtn) {
+        saveBtn.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>Enregistré !</span>';
+        setTimeout(() => {
+          saveBtn.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline></svg><span>Enregistrer</span>';
+        }, 1500);
+      }
+    } catch (e) {
+      console.error('Erreur sauvegarde note:', e);
+    }
+  },
+
+  // =========================================================================
+  // ÉVÉNEMENTS & TRADUCTION
+  // =========================================================================
+
+  bindEvents() {
+    // 1. Clic sur les onglets
+    document.querySelectorAll('.comm-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.switchTab(btn.dataset.tab);
+      });
+    });
+
+    // 2. Assistant IA Input & Send
+    const sendBtn = document.getElementById('btn-send-ai-chat');
+    const inputEl = document.getElementById('ai-chat-input');
+    sendBtn?.addEventListener('click', () => this.sendAiMessage());
+    inputEl?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        this.sendAiMessage();
+      }
+    });
+    document.getElementById('btn-clear-ai-chat')?.addEventListener('click', () => this.clearAiChat());
+
+    // 3. Notes Save
+    document.getElementById('btn-save-note')?.addEventListener('click', () => this.saveCurrentNote());
+
+    // 4. Popover Auteurs
+    const btnAuthor = document.getElementById('btn-author-filter');
+    const popoverAuthor = document.getElementById('author-filter-popover');
+    btnAuthor?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      popoverAuthor?.classList.toggle('hidden');
+      document.getElementById('comm-display-popover')?.classList.add('hidden');
+    });
+
+    // 5. Popover Affichage
+    const btnDisplay = document.getElementById('btn-comm-display');
+    const popoverDisplay = document.getElementById('comm-display-popover');
+    btnDisplay?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      popoverDisplay?.classList.toggle('hidden');
+      popoverAuthor?.classList.add('hidden');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (popoverAuthor && !popoverAuthor.contains(e.target) && e.target !== btnAuthor) {
+        popoverAuthor.classList.add('hidden');
+      }
+      if (popoverDisplay && !popoverDisplay.contains(e.target) && e.target !== btnDisplay) {
+        popoverDisplay.classList.add('hidden');
+      }
+    });
+
+    // 6. Options d'affichage (Zoom, Police, Fond)
+    document.getElementById('btn-zoom-in')?.addEventListener('click', () => this.adjustZoom(10));
+    document.getElementById('btn-zoom-out')?.addEventListener('click', () => this.adjustZoom(-10));
+
+    document.querySelectorAll('.font-choice-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        document.querySelectorAll('.font-choice-btn').forEach(btn => btn.classList.remove('active'));
+        b.classList.add('active');
+        this.setFontFamily(b.dataset.font);
+      });
+    });
+
+    document.querySelectorAll('.bg-choice-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        document.querySelectorAll('.bg-choice-btn').forEach(btn => btn.classList.remove('active'));
+        b.classList.add('active');
+        this.setReadingBg(b.dataset.bg);
+      });
+    });
+
+    // 7. Contrôles Fenêtre
+    document.getElementById('btn-win-min')?.addEventListener('click', () => API.minimizeCommentaryWindow());
+    document.getElementById('btn-win-max')?.addEventListener('click', () => API.maximizeCommentaryWindow());
+    document.getElementById('btn-win-close')?.addEventListener('click', () => API.closeCommentaryWindow());
+
+    // 8. Bascule de synchronisation
+    document.getElementById('comm-win-sync-badge')?.addEventListener('click', () => {
+      this.isSyncActive = !this.isSyncActive;
+      const badge = document.getElementById('comm-win-sync-badge');
+      const label = document.getElementById('comm-win-sync-label');
+      if (badge) {
+        badge.className = `comm-win-sync-indicator ${this.isSyncActive ? 'synced' : 'paused'}`;
+      }
+      if (label) {
+        label.textContent = this.isSyncActive ? 'Lié' : 'Délié';
+      }
+    });
+  },
+
   async handleTranslateClick(btn, itemId, rawText) {
     if (this.translationCache[itemId]) {
       this.showTranslatedVersion[itemId] = !this.showTranslatedVersion[itemId];
-      if (this.currentChapterData) this.renderStream(this.currentChapterData);
+      if (this.currentChapterData) this.renderCommentaryView(this.currentChapterData);
       return;
     }
 
@@ -432,39 +765,64 @@ const CommentaryWindow = {
       if (res && res.success && res.translated_text) {
         this.translationCache[itemId] = res.translated_text;
         this.showTranslatedVersion[itemId] = true;
-        if (this.currentChapterData) this.renderStream(this.currentChapterData);
+        if (this.currentChapterData) this.renderCommentaryView(this.currentChapterData);
       } else {
         alert(res?.error || 'Erreur lors de la traduction.');
-        btn.disabled = false;
-        btn.innerHTML = `<span>Traduire</span>`;
       }
-    } catch (err) {
-      alert(`Erreur : ${err}`);
+    } catch (e) {
+      console.error('Erreur traduction:', e);
+      alert('Impossible de traduire le texte.');
+    } finally {
       btn.disabled = false;
-      btn.innerHTML = `<span>Traduire</span>`;
     }
   },
 
-  scrollToVerseBlock(verseNum) {
-    const el = document.getElementById(`comm-verse-${verseNum}`);
-    if (!el) return;
+  // =========================================================================
+  // FORMATAGE & PRÉFÉRENCES
+  // =========================================================================
 
-    this.updateActiveVerseHighlight(verseNum);
-
-    this._isProgrammaticScroll = true;
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-    if (this._scrollTimeout) clearTimeout(this._scrollTimeout);
-    this._scrollTimeout = setTimeout(() => {
-      this._isProgrammaticScroll = false;
-    }, 600);
+  adjustZoom(delta) {
+    this.zoomPercent = Math.max(70, Math.min(180, this.zoomPercent + delta));
+    const lbl = document.getElementById('lbl-zoom-val');
+    if (lbl) lbl.textContent = `${this.zoomPercent}%`;
+    document.documentElement.style.setProperty('--comm-zoom', `${this.zoomPercent / 100}`);
+    document.body.style.fontSize = `${14 * (this.zoomPercent / 100)}px`;
+    try { localStorage.setItem('comm_win_zoom', String(this.zoomPercent)); } catch (e) {}
   },
 
-  updateActiveVerseHighlight(verseNum) {
-    document.querySelectorAll('.comm-stream-verse-block').forEach(b => {
-      const isTarget = parseInt(b.dataset.verse, 10) === parseInt(verseNum, 10);
-      b.classList.toggle('active-synced-comm', isTarget);
-    });
+  setFontFamily(font) {
+    this.fontFamily = font;
+    document.documentElement.style.setProperty('--font-reading', `'${font}', Georgia, serif`);
+    try { localStorage.setItem('comm_win_font', font); } catch (e) {}
+  },
+
+  setReadingBg(theme) {
+    this.readingBg = theme;
+    const body = document.body;
+    body.classList.remove('bg-theme-white', 'bg-theme-sepia', 'bg-theme-dark');
+    if (theme === 'white') body.classList.add('bg-theme-white');
+    if (theme === 'sepia') body.classList.add('bg-theme-sepia');
+    if (theme === 'dark') body.classList.add('bg-theme-dark');
+    try { localStorage.setItem('comm_win_bg', theme); } catch (e) {}
+  },
+
+  restorePreferences() {
+    try {
+      const z = localStorage.getItem('comm_win_zoom');
+      if (z) this.adjustZoom(parseInt(z, 10) - 100);
+
+      const f = localStorage.getItem('comm_win_font');
+      if (f) {
+        this.setFontFamily(f);
+        document.querySelectorAll('.font-choice-btn').forEach(b => b.classList.toggle('active', b.dataset.font === f));
+      }
+
+      const bg = localStorage.getItem('comm_win_bg');
+      if (bg) {
+        this.setReadingBg(bg);
+        document.querySelectorAll('.bg-choice-btn').forEach(b => b.classList.toggle('active', b.dataset.bg === bg));
+      }
+    } catch (e) {}
   },
 
   isForeignText(txt) {
@@ -474,6 +832,22 @@ const CommentaryWindow = {
     return englishWords.some(w => clean.includes(w));
   },
 
+  formatMarkdown(raw) {
+    if (!raw) return '';
+    return raw
+      .replace(/^### (.*$)/gim, '<h3 style="margin: 14px 0 6px 0; font-size: 15px; font-weight: 700; color: var(--accent-blue);">$1</h3>')
+      .replace(/^## (.*$)/gim, '<h2 style="margin: 16px 0 8px 0; font-size: 17px; font-weight: 700; color: var(--accent-blue);">$1</h2>')
+      .replace(/^# (.*$)/gim, '<h1 style="margin: 18px 0 10px 0; font-size: 19px; font-weight: 800; color: var(--accent-blue);">$1</h1>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/^\> (.*$)/gim, '<blockquote style="border-left: 3px solid var(--accent-blue); padding: 8px 12px; margin: 10px 0; background: var(--bg-hover); border-radius: 0 6px 6px 0; font-style: italic;">$1</blockquote>')
+      .split(/\n\n+/)
+      .map(p => p.trim())
+      .filter(Boolean)
+      .map(p => (p.startsWith('<h') || p.startsWith('<blockquote')) ? p : `<p style="margin: 0 0 12px 0; line-height: 1.75;">${p}</p>`)
+      .join('');
+  },
+
   escapeHtml(str) {
     if (!str) return '';
     return String(str)
@@ -481,200 +855,10 @@ const CommentaryWindow = {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
-  },
-
-  formatMarkdown(raw) {
-    if (!raw) return '';
-    return raw
-      .replace(/^### (.*$)/gim, '<h3 style="margin: 12px 0 6px 0; font-size: 15px; font-weight: 700;">$1</h3>')
-      .replace(/^## (.*$)/gim, '<h2 style="margin: 14px 0 8px 0; font-size: 17px; font-weight: 700;">$1</h2>')
-      .replace(/^# (.*$)/gim, '<h1 style="margin: 16px 0 10px 0; font-size: 19px; font-weight: 800;">$1</h1>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/^\> (.*$)/gim, '<blockquote style="border-left: 3px solid var(--accent-blue); padding: 8px 12px; margin: 10px 0; background: var(--bg-hover); border-radius: 0 6px 6px 0; font-style: italic;">$1</blockquote>')
-      .split(/\n\n+/)
-      .map(p => p.trim())
-      .filter(Boolean)
-      .map(p => (p.startsWith('<h') || p.startsWith('<blockquote')) ? p : `<p>${p}</p>`)
-      .join('');
-  },
-
-  bindEvents() {
-    // 1. Bouton de synchro dans la barre de titre
-    const syncBadge = document.getElementById('comm-win-sync-badge');
-    const syncLabel = document.getElementById('comm-win-sync-label');
-    syncBadge?.addEventListener('click', () => {
-      this.isSyncActive = !this.isSyncActive;
-      syncBadge.classList.toggle('synced', this.isSyncActive);
-      syncBadge.classList.toggle('paused', !this.isSyncActive);
-      if (syncLabel) {
-        syncLabel.textContent = this.isSyncActive ? 'Synchro active' : 'Synchro en pause';
-      }
-      if (this.isSyncActive) {
-        this.isUserScrolled = false;
-        document.getElementById('btn-resume-sync')?.classList.add('hidden');
-        this.scrollToVerseBlock(this.currentVerse);
-      }
-    });
-
-    // 2. Bouton flottant de reprise du suivi en direct
-    const btnResume = document.getElementById('btn-resume-sync');
-    btnResume?.addEventListener('click', () => {
-      this.isSyncActive = true;
-      this.isUserScrolled = false;
-      btnResume.classList.add('hidden');
-      if (syncBadge) {
-        syncBadge.classList.add('synced');
-        syncBadge.classList.remove('paused');
-      }
-      if (syncLabel) syncLabel.textContent = 'Synchro active';
-      this.scrollToVerseBlock(this.currentVerse);
-    });
-
-    // 3. Détection du défilement manuel utilisateur
-    const scrollContainer = document.getElementById('comm-stream-scrollable');
-    scrollContainer?.addEventListener('wheel', () => {
-      if (!this._isProgrammaticScroll) {
-        this.isUserScrolled = true;
-        btnResume?.classList.remove('hidden');
-      }
-    }, { passive: true });
-
-    scrollContainer?.addEventListener('touchmove', () => {
-      if (!this._isProgrammaticScroll) {
-        this.isUserScrolled = true;
-        btnResume?.classList.remove('hidden');
-      }
-    }, { passive: true });
-
-    // 4. Popovers
-    const btnAuthor = document.getElementById('btn-author-filter');
-    const popAuthor = document.getElementById('author-filter-popover');
-    btnAuthor?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      popAuthor?.classList.toggle('hidden');
-      document.getElementById('comm-display-popover')?.classList.add('hidden');
-    });
-
-    const btnDisplay = document.getElementById('btn-comm-display');
-    const popDisplay = document.getElementById('comm-display-popover');
-    btnDisplay?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      popDisplay?.classList.toggle('hidden');
-      document.getElementById('author-filter-popover')?.classList.add('hidden');
-    });
-
-    document.addEventListener('click', (e) => {
-      if (popAuthor && !popAuthor.contains(e.target) && e.target !== btnAuthor) {
-        popAuthor.classList.add('hidden');
-      }
-      if (popDisplay && !popDisplay.contains(e.target) && e.target !== btnDisplay) {
-        popDisplay.classList.add('hidden');
-      }
-    });
-
-    // 5. Options d'affichage (Police, Zoom, Fond)
-    document.querySelectorAll('.font-choice-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.font-choice-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        this.fontFamily = btn.dataset.font;
-        document.documentElement.style.setProperty('--font-comm', `'${this.fontFamily}', Georgia, serif`);
-        localStorage.setItem('comm_win_font', this.fontFamily);
-      });
-    });
-
-    document.getElementById('btn-zoom-in')?.addEventListener('click', () => {
-      this.setZoom(this.zoomPercent + 10);
-    });
-
-    document.getElementById('btn-zoom-out')?.addEventListener('click', () => {
-      this.setZoom(this.zoomPercent - 10);
-    });
-
-    document.querySelectorAll('.bg-choice-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.bg-choice-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        this.readingBg = btn.dataset.bg;
-        this.applyReadingBg(this.readingBg);
-      });
-    });
-
-    // 6. Contrôles Fenêtre
-    document.getElementById('btn-win-min')?.addEventListener('click', () => {
-      API.call('minimize_commentary_window');
-    });
-
-    document.getElementById('btn-win-max')?.addEventListener('click', () => {
-      API.call('maximize_commentary_window');
-    });
-
-    document.getElementById('btn-win-close')?.addEventListener('click', () => {
-      API.call('close_commentary_window');
-    });
-  },
-
-  setZoom(percent) {
-    this.zoomPercent = Math.max(70, Math.min(180, percent));
-    const lbl = document.getElementById('lbl-zoom-val');
-    if (lbl) lbl.textContent = `${this.zoomPercent}%`;
-    const container = document.getElementById('comm-stream-container');
-    if (container) {
-      container.style.fontSize = `${(this.zoomPercent / 100) * 15.5}px`;
-    }
-    localStorage.setItem('comm_win_zoom', this.zoomPercent);
-  },
-
-  applyReadingBg(bg) {
-    document.body.classList.remove('reading-bg-white', 'reading-bg-sepia', 'reading-bg-dark');
-    if (bg === 'white') document.body.classList.add('reading-bg-white');
-    else if (bg === 'sepia') document.body.classList.add('reading-bg-sepia');
-    else if (bg === 'dark') document.body.classList.add('reading-bg-dark');
-    localStorage.setItem('comm_win_bg', bg);
-  },
-
-  restorePreferences() {
-    try {
-      const savedZoom = localStorage.getItem('comm_win_zoom');
-      if (savedZoom) this.setZoom(parseInt(savedZoom, 10));
-
-      const savedFont = localStorage.getItem('comm_win_font');
-      if (savedFont) {
-        this.fontFamily = savedFont;
-        document.documentElement.style.setProperty('--font-comm', `'${this.fontFamily}', Georgia, serif`);
-        document.querySelectorAll('.font-choice-btn').forEach(btn => {
-          btn.classList.toggle('active', btn.dataset.font === this.fontFamily);
-        });
-      }
-
-      const savedBg = localStorage.getItem('comm_win_bg');
-      if (savedBg) {
-        this.readingBg = savedBg;
-        this.applyReadingBg(this.readingBg);
-        document.querySelectorAll('.bg-choice-btn').forEach(btn => {
-          btn.classList.toggle('active', btn.dataset.bg === this.readingBg);
-        });
-      }
-    } catch (e) {}
   }
 };
 
 window.CommentaryWindow = CommentaryWindow;
-
-// Global error handler to debug UI issues directly on screen
-window.addEventListener('error', (e) => {
-  const container = document.getElementById('comm-stream-container');
-  if (container) {
-    container.innerHTML = `<div style="padding: 20px; color: #f87171; font-family: monospace; font-size: 13px;"><b>Uncaught Error:</b><br/>${e.message}<br/>${e.filename}:${e.lineno}</div>`;
-  }
-});
-window.addEventListener('unhandledrejection', (e) => {
-  const container = document.getElementById('comm-stream-container');
-  if (container) {
-    container.innerHTML = `<div style="padding: 20px; color: #f87171; font-family: monospace; font-size: 13px;"><b>Unhandled Promise Rejection:</b><br/>${e.reason}</div>`;
-  }
-});
 
 // Initialisation dès que le DOM est chargé
 document.addEventListener('DOMContentLoaded', () => {

@@ -3202,8 +3202,15 @@ def on_commentary_shown(*args, **kwargs):
     try:
         if hasattr(_COMMENTARY_WINDOW, 'native') and _COMMENTARY_WINDOW.native:
             hwnd = _COMMENTARY_WINDOW.native.Handle.ToInt32()
+            
+            # Activer les poignées de redimensionnement natives sur les 4 bords et 4 coins
+            GWL_STYLE = -16
+            WS_THICKFRAME = 0x00040000
+            current_style = user32.GetWindowLongW(hwnd, GWL_STYLE)
+            user32.SetWindowLongW(hwnd, GWL_STYLE, current_style | WS_THICKFRAME)
+
             wx, wy, ww, wh = _COMMENTARY_TARGET_BOUNDS
-            user32.SetWindowPos(hwnd, 0, wx, wy, ww, wh, 0x0040)
+            user32.SetWindowPos(hwnd, 0, wx, wy, ww, wh, 0x0040 | 0x0020)
             
             b, ch, v = _LAST_ACTIVE_PASSAGE
             api = BibleAppApi()

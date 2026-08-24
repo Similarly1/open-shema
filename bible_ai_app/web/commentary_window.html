@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Open Shema — Commentaires Exégétiques</title>
+  <title>Open Shema — Volet d'Étude Déporté</title>
   
-  <!-- Polices Google : Inter (UI) & EB Garamond / Cardo / Lora / Merriweather / Georgia (Lecture Exégétique) -->
+  <!-- Polices Google : Inter (UI) & EB Garamond / Cardo / Lora (Lecture Exégétique) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400..700;1,400..700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Inter:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
   <!-- CSS Global -->
-  <link rel="stylesheet" href="css/logos.css?v=3.9">
+  <link rel="stylesheet" href="css/logos.css?v=4.0">
 
   <style>
     /* =========================================================================
-     * STYLES DÉDIÉS : FENÊTRE COMPAGNON SECONDAIRE (SANS MENU LATÉRAL)
+     * STYLES DU VOLET D'ÉTUDE DÉPORTÉ (MULTI-ONGLETS & COMPANION SCREEN)
      * ========================================================================= */
     html, body {
       margin: 0;
@@ -31,53 +31,72 @@
       user-select: text;
     }
 
-    /* 1. BARRE DE TITRE FRAMELESS AVEC ZONE DE DRAG */
+    /* 1. BARRE DE TITRE & ONGLETS PRINCIPAUX */
     .comm-win-titlebar {
-      height: 42px;
-      min-height: 42px;
+      height: 46px;
+      min-height: 46px;
       background: var(--bg-card, #1E293B);
       border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 8px 0 10px;
+      padding: 0 8px 0 6px;
       -webkit-app-region: drag;
       z-index: 1000;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
       user-select: none;
-      gap: 8px;
+      gap: 6px;
     }
 
-    .comm-win-drag-group {
+    .comm-win-tabs-group {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      -webkit-app-region: no-drag;
+      flex-shrink: 0;
+    }
+
+    .comm-tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 12px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-secondary, #94A3B8);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .comm-tab-btn:hover {
+      background: var(--bg-hover, rgba(255, 255, 255, 0.06));
+      color: var(--text-primary, #F8FAFC);
+    }
+
+    .comm-tab-btn.active {
+      background: rgba(37, 99, 235, 0.14);
+      border-color: rgba(37, 99, 235, 0.35);
+      color: var(--accent-blue, #38BDF8);
+    }
+
+    .comm-win-center-group {
       display: flex;
       align-items: center;
       gap: 8px;
       -webkit-app-region: drag;
       flex: 1;
       min-width: 0;
-      overflow: hidden;
+      justify-content: center;
       cursor: grab;
     }
 
-    .comm-win-drag-group:active {
+    .comm-win-center-group:active {
       cursor: grabbing;
-    }
-
-    .comm-win-logo-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--accent-orange, #F97316);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 3px 8px;
-      background: rgba(249, 115, 22, 0.12);
-      border: 1px solid rgba(249, 115, 22, 0.25);
-      border-radius: 6px;
-      flex-shrink: 0;
-      white-space: nowrap;
     }
 
     .comm-win-passage-pill {
@@ -93,6 +112,7 @@
       color: var(--text-primary, #F8FAFC);
       flex-shrink: 0;
       white-space: nowrap;
+      -webkit-app-region: no-drag;
     }
 
     .comm-win-sync-indicator {
@@ -100,41 +120,39 @@
       align-items: center;
       gap: 5px;
       padding: 3px 8px;
+      border-radius: 6px;
       font-size: 11px;
       font-weight: 600;
-      border-radius: 12px;
-      cursor: pointer;
-      -webkit-app-region: no-drag;
-      transition: all 0.2s ease;
-      user-select: none;
       flex-shrink: 0;
       white-space: nowrap;
+      -webkit-app-region: no-drag;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
 
     .comm-win-sync-indicator.synced {
-      background: rgba(16, 185, 129, 0.15);
-      color: #10B981;
-      border: 1px solid rgba(16, 185, 129, 0.35);
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #4ADE80;
     }
 
     .comm-win-sync-indicator.paused {
-      background: rgba(245, 158, 11, 0.15);
-      color: #F59E0B;
-      border: 1px solid rgba(245, 158, 11, 0.35);
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #F87171;
     }
 
     .comm-win-pulse-dot {
-      width: 7px;
-      height: 7px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       background-color: currentColor;
-      box-shadow: 0 0 6px currentColor;
     }
 
     .comm-win-actions-group {
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
       -webkit-app-region: no-drag;
       flex-shrink: 0;
     }
@@ -142,43 +160,29 @@
     .comm-win-tool-btn {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      padding: 4px 8px;
-      height: 28px;
-      background: var(--bg-hover, rgba(255, 255, 255, 0.06));
+      gap: 6px;
+      padding: 5px 10px;
+      background: var(--bg-hover, rgba(255, 255, 255, 0.07));
       border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
       border-radius: 6px;
-      color: var(--text-secondary, #94A3B8);
       font-size: 12px;
-      font-weight: 500;
+      font-weight: 600;
+      color: var(--text-primary, #E2E8F0);
       cursor: pointer;
       transition: all 0.15s ease;
-      user-select: none;
-      flex-shrink: 0;
-      max-width: 220px;
+      white-space: nowrap;
     }
 
     .comm-win-tool-btn:hover {
-      background: rgba(255, 255, 255, 0.12);
-      color: var(--text-primary, #FFFFFF);
+      background: rgba(255, 255, 255, 0.14);
       border-color: rgba(255, 255, 255, 0.25);
     }
 
-    .comm-win-tool-btn.active {
-      background: rgba(59, 130, 246, 0.18);
-      color: #60A5FA;
-      border-color: rgba(59, 130, 246, 0.4);
-    }
-
-    /* Contrôles de fenêtre (Min, Max, Close) */
     .comm-win-controls {
       display: flex;
       align-items: center;
-      margin-left: 4px;
-      border-left: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-      padding-left: 4px;
-      -webkit-app-region: no-drag;
-      flex-shrink: 0;
+      gap: 2px;
+      margin-left: 2px;
     }
 
     .comm-win-control-btn {
@@ -193,209 +197,335 @@
       color: var(--text-secondary, #94A3B8);
       cursor: pointer;
       transition: all 0.15s ease;
+      -webkit-app-region: no-drag;
     }
 
     .comm-win-control-btn:hover {
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.1);
       color: #FFFFFF;
     }
 
     .comm-win-control-btn.close:hover {
-      background: #EF4444;
-      color: #FFFFFF;
+      background: #EF4444 !important;
+      color: #FFFFFF !important;
     }
 
-    /* 2. ZONE DE DÉFILEMENT PRINCIPALE */
-    .comm-stream-scrollable {
+    /* 2. ZONE DE CONTENU PRINCIPALE (PANELS D'ONGLETS) */
+    .comm-tab-panels-wrap {
       flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
       position: relative;
-      scroll-behavior: smooth;
-      padding: 0;
-    }
-
-    .comm-stream-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 24px 32px 120px 32px;
-    }
-
-    /* En-tête de chapitre */
-    .comm-stream-chapter-hero {
-      text-align: center;
-      padding: 20px 16px 28px 16px;
-      border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-      margin-bottom: 30px;
-    }
-
-    .comm-stream-chapter-title {
-      font-size: 26px;
-      font-weight: 800;
-      color: var(--text-primary, #F8FAFC);
-      letter-spacing: -0.5px;
-      margin: 0 0 6px 0;
-    }
-
-    .comm-stream-chapter-subtitle {
-      font-size: 13px;
-      color: var(--text-secondary, #94A3B8);
+      overflow: hidden;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
     }
 
-    /* Bloc par verset */
-    .comm-stream-verse-block {
-      margin-bottom: 36px;
-      border-radius: 10px;
-      border: 1px solid transparent;
-      transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+    .comm-tab-panel {
+      flex: 1;
+      height: 100%;
+      overflow-y: auto;
+      display: none;
+      flex-direction: column;
     }
 
-    .comm-stream-verse-block.active-synced-comm {
-      border-color: rgba(249, 115, 22, 0.45);
-      background-color: rgba(249, 115, 22, 0.03);
-      box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.2), 0 4px 20px rgba(0, 0, 0, 0.15);
+    .comm-tab-panel.active {
+      display: flex;
     }
 
-    /* Bandeau de verset */
+    /* Styles spécifiques Onglet Commentaires */
+    .comm-stream-inner {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 24px 28px 80px 28px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
     .comm-verse-quote-banner {
       display: flex;
       align-items: flex-start;
-      gap: 12px;
-      padding: 12px 16px;
+      gap: 14px;
+      padding: 16px 20px;
       background: var(--bg-card, #1E293B);
-      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-      border-radius: 8px;
-      margin-bottom: 14px;
+      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+      border-left: 4px solid var(--accent-orange, #F97316);
+      border-radius: 10px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
     }
 
     .comm-verse-num-badge {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 28px;
-      height: 28px;
-      padding: 0 6px;
-      border-radius: 6px;
-      background: var(--accent-blue, #2563EB);
+      min-width: 30px;
+      height: 30px;
+      background: var(--accent-orange, #F97316);
       color: #FFFFFF;
-      font-size: 12px;
       font-weight: 800;
+      font-size: 15px;
+      border-radius: 7px;
       flex-shrink: 0;
     }
 
-    .comm-stream-verse-block.active-synced-comm .comm-verse-num-badge {
-      background: var(--accent-orange, #EA580C);
-      box-shadow: 0 0 8px rgba(234, 88, 12, 0.4);
-    }
-
     .comm-verse-quote-text {
-      font-family: var(--font-bible, 'EB Garamond', Georgia, serif);
-      font-size: 16px;
-      line-height: 1.6;
-      color: var(--text-primary, #E2E8F0);
+      font-family: var(--font-bible, 'Cardo', 'EB Garamond', Georgia, serif);
+      font-size: 16.5px;
+      line-height: 1.65;
+      color: var(--text-primary, #F8FAFC);
       font-style: italic;
     }
 
-    /* Carte de commentaire */
     .comm-stream-card {
       background: var(--bg-card, #1E293B);
-      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-      border-radius: 8px;
-      padding: 18px 22px;
-      margin-bottom: 14px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+      border-radius: 10px;
+      padding: 22px 24px;
+      margin-top: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16);
     }
 
     .comm-stream-card-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      padding-bottom: 14px;
+      margin-bottom: 16px;
       border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-      padding-bottom: 10px;
-      margin-bottom: 14px;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
     .comm-stream-author-title {
-      font-size: 13.5px;
-      font-weight: 700;
-      color: var(--accent-blue, #38BDF8);
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 8px;
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--accent-blue, #38BDF8);
     }
 
     .comm-stream-ref-badge {
-      font-size: 11px;
-      color: var(--text-secondary, #94A3B8);
+      font-size: 11.5px;
       font-weight: 600;
+      color: var(--text-secondary, #94A3B8);
+      background: var(--bg-hover, rgba(255, 255, 255, 0.06));
+      padding: 3px 8px;
+      border-radius: 4px;
     }
 
     .comm-stream-body {
-      font-family: var(--font-comm, 'EB Garamond', Georgia, serif);
-      font-size: 15.5px;
-      line-height: 1.75;
+      font-family: var(--font-reading, 'EB Garamond', Georgia, serif);
+      font-size: 16px;
+      line-height: 1.8;
       color: var(--text-primary, #E2E8F0);
     }
 
     .comm-stream-body p {
-      margin: 0 0 12px 0;
+      margin: 0 0 14px 0;
     }
 
-    .comm-stream-body p:last-child {
-      margin-bottom: 0;
+    /* Styles spécifiques Onglet Assistant IA */
+    .ai-chat-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 16px 20px;
     }
 
-    /* 3. BOUTON FLOTTANT DE REPRISE DE SYNCHRONISATION */
-    .comm-resume-sync-pill {
-      position: fixed;
-      bottom: 24px;
-      right: 32px;
-      display: inline-flex;
+    .ai-chat-header-bar {
+      display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 10px 18px;
-      background: var(--accent-orange, #EA580C);
-      color: #FFFFFF;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 24px;
-      font-size: 13px;
-      font-weight: 700;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+      margin-bottom: 14px;
+    }
+
+    .ai-chat-messages-stream {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding-right: 4px;
+    }
+
+    .ai-msg-bubble {
+      padding: 14px 18px;
+      border-radius: 10px;
+      font-size: 14px;
+      line-height: 1.65;
+      max-width: 92%;
+      box-sizing: border-box;
+    }
+
+    .ai-msg-bubble.user {
+      align-self: flex-end;
+      background: rgba(37, 99, 235, 0.25);
+      border: 1px solid rgba(37, 99, 235, 0.45);
+      color: #F8FAFC;
+    }
+
+    .ai-msg-bubble.assistant {
+      align-self: flex-start;
+      background: var(--bg-card, #1E293B);
+      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+      color: var(--text-primary, #E2E8F0);
+    }
+
+    .ai-prompt-chips-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 12px 0 8px 0;
+    }
+
+    .ai-prompt-chip {
+      padding: 5px 11px;
+      background: var(--bg-hover, rgba(255, 255, 255, 0.06));
+      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+      border-radius: 16px;
+      font-size: 11.5px;
+      color: var(--text-secondary, #94A3B8);
       cursor: pointer;
-      box-shadow: 0 8px 24px rgba(234, 88, 12, 0.4);
-      z-index: 1100;
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-      transform: translateY(0);
-      opacity: 1;
-      user-select: none;
+      transition: all 0.15s ease;
     }
 
-    .comm-resume-sync-pill.hidden {
-      transform: translateY(30px);
-      opacity: 0;
-      pointer-events: none;
+    .ai-prompt-chip:hover {
+      background: rgba(37, 99, 235, 0.2);
+      border-color: var(--accent-blue, #38BDF8);
+      color: #F8FAFC;
     }
 
-    .comm-resume-sync-pill:hover {
-      background: #F97316;
-      box-shadow: 0 10px 28px rgba(249, 115, 22, 0.5);
-      transform: translateY(-2px);
+    .ai-input-box-wrap {
+      display: flex;
+      gap: 8px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
     }
 
-    /* Popovers Déroulants */
-    .comm-dropdown-popover {
-      position: absolute;
-      top: 44px;
+    .ai-chat-input {
+      flex: 1;
       background: var(--bg-card, #1E293B);
       border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
       border-radius: 8px;
-      padding: 14px;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
-      z-index: 1200;
-      text-align: left;
+      padding: 10px 14px;
+      color: #FFFFFF;
+      font-size: 13.5px;
+      outline: none;
+      resize: none;
+      height: 42px;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+
+    .ai-chat-input:focus {
+      border-color: var(--accent-blue, #38BDF8);
+    }
+
+    /* Styles spécifiques Onglet Lexique */
+    .lex-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px 24px;
+      width: 100%;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .lex-words-flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 16px;
+      background: var(--bg-card, #1E293B);
+      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+      border-radius: 10px;
+    }
+
+    .lex-word-pill {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6px 10px;
+      background: var(--bg-hover, rgba(255, 255, 255, 0.05));
+      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .lex-word-pill:hover, .lex-word-pill.active {
+      background: rgba(37, 99, 235, 0.2);
+      border-color: var(--accent-blue, #38BDF8);
+    }
+
+    .lex-word-orig {
+      font-family: 'Cardo', 'EB Garamond', serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #F8FAFC;
+    }
+
+    .lex-word-trans {
+      font-size: 11px;
+      color: var(--text-secondary, #94A3B8);
+    }
+
+    .lex-word-strong {
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent-orange, #F97316);
+    }
+
+    /* Styles spécifiques Onglet Notes */
+    .notes-wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 20px 24px;
+      width: 100%;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      height: 100%;
+    }
+
+    .note-editor-textarea {
+      flex: 1;
+      width: 100%;
+      background: var(--bg-card, #1E293B);
+      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+      border-radius: 8px;
+      padding: 16px;
+      color: #FFFFFF;
+      font-family: var(--font-reading, 'EB Garamond', serif);
+      font-size: 16px;
+      line-height: 1.7;
+      box-sizing: border-box;
+      outline: none;
+      resize: none;
+    }
+
+    .note-editor-textarea:focus {
+      border-color: var(--accent-blue, #38BDF8);
+    }
+
+    /* Popovers */
+    .comm-dropdown-popover {
+      position: absolute;
+      top: 48px;
+      background: var(--bg-card, #1E293B);
+      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      padding: 12px;
+      z-index: 2000;
     }
 
     .comm-dropdown-popover.hidden {
@@ -406,65 +536,85 @@
 <body>
 
   <!-- ========================================================= -->
-  <!-- 1. BARRE DE TITRE & CONTRÔLES SUPÉRIEURS (FRAMELESS)      -->
+  <!-- 1. BARRE DE NAVIGATION & CONTRÔLES SUPÉRIEURS             -->
   <!-- ========================================================= -->
   <header class="comm-win-titlebar" id="comm-win-titlebar">
-    <!-- GAUCHE : Logo & Indicateur de Passage -->
-    <div class="comm-win-drag-group">
-      <div class="comm-win-logo-badge" title="Open Shema Exégèse (Écran 2)">
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+    
+    <!-- GAUCHE : Onglets d'Étude Déportés -->
+    <div class="comm-win-tabs-group">
+      <button type="button" class="comm-tab-btn active" data-tab="commentaries" id="tab-btn-commentaries">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
         </svg>
-        <span>Exégèse</span>
-      </div>
+        <span>Commentaires</span>
+      </button>
 
-      <div class="comm-win-passage-pill" id="comm-win-passage-pill" title="Passage actif en direct">
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-orange, #F97316);">
+      <button type="button" class="comm-tab-btn" data-tab="ai" id="tab-btn-ai">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
+        </svg>
+        <span>Assistant IA</span>
+      </button>
+
+      <button type="button" class="comm-tab-btn" data-tab="lexicon" id="tab-btn-lexicon">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
           <path d="M6 6h10"></path>
           <path d="M6 10h10"></path>
         </svg>
+        <span>Lexique</span>
+      </button>
+
+      <button type="button" class="comm-tab-btn" data-tab="notes" id="tab-btn-notes">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+          <path d="m15 5 4 4"></path>
+        </svg>
+        <span>Notes</span>
+      </button>
+    </div>
+
+    <!-- CENTRE : Passage & Synchro active -->
+    <div class="comm-win-center-group">
+      <div class="comm-win-passage-pill" id="comm-win-passage-pill" title="Passage actif en direct">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-orange, #F97316);">
+          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+          <path d="M6 6h10"></path>
+        </svg>
         <span id="comm-win-passage-text">Genèse 1:1</span>
       </div>
 
-      <div class="comm-win-sync-indicator synced" id="comm-win-sync-badge" title="Cliquer pour suspendre ou activer la synchronisation automatique">
+      <div class="comm-win-sync-indicator synced" id="comm-win-sync-badge" title="Cliquer pour suspendre/activer la synchronisation automatique">
         <span class="comm-win-pulse-dot"></span>
-        <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-        </svg>
-        <span id="comm-win-sync-label">Synchro active</span>
+        <span id="comm-win-sync-label">Lié</span>
       </div>
     </div>
 
-    <!-- DROITE : Outils de Confort & Contrôles Fenêtre -->
+    <!-- DROITE : Filtres, Affichage & Contrôles Fenêtre -->
     <div class="comm-win-actions-group">
       
-      <!-- Sélecteur d'ouvrages / auteurs -->
-      <div style="position: relative;">
-        <button type="button" class="comm-win-tool-btn" id="btn-author-filter" title="Filtrer les ouvrages affichés">
-          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Sélecteur d'ouvrages (visible dans l'onglet Commentaires) -->
+      <div style="position: relative;" id="comm-author-filter-wrapper">
+        <button type="button" class="comm-win-tool-btn" id="btn-author-filter" title="Changer d'ouvrage de commentaire">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
           </svg>
           <span id="lbl-active-author">Commentaires</span>
           <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
         </button>
 
-        <div class="comm-dropdown-popover hidden" id="author-filter-popover" style="right: 0; width: 260px; max-height: 380px; overflow-y: auto;">
+        <div class="comm-dropdown-popover hidden" id="author-filter-popover" style="right: 0; width: 280px; max-height: 400px; overflow-y: auto;">
           <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
-            Ouvrages dans ce chapitre
+            Ouvrages disponibles
           </div>
-          <div id="author-filter-list" style="display: flex; flex-direction: column; gap: 4px;">
-            <!-- Liste dynamique des auteurs -->
-          </div>
+          <div id="author-filter-list" style="display: flex; flex-direction: column; gap: 4px;"></div>
         </div>
       </div>
 
       <!-- Options d'Affichage (Police, Zoom, Fond) -->
       <div style="position: relative;">
-        <button type="button" class="comm-win-tool-btn" id="btn-comm-display" title="Options de confort de lecture">
-          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button type="button" class="comm-win-tool-btn" id="btn-comm-display" title="Confort de lecture">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="3"></circle>
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
           </svg>
@@ -472,7 +622,6 @@
         </button>
 
         <div class="comm-dropdown-popover hidden" id="comm-display-popover" style="right: 0; width: 280px;">
-          <!-- 1. Police -->
           <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">Police</div>
           <div style="display: flex; gap: 4px; margin-bottom: 12px;">
             <button type="button" class="comm-win-tool-btn font-choice-btn active" data-font="EB Garamond" style="flex: 1; justify-content: center; font-family: 'EB Garamond', serif;">Garamond</button>
@@ -480,7 +629,6 @@
             <button type="button" class="comm-win-tool-btn font-choice-btn" data-font="Inter" style="flex: 1; justify-content: center; font-family: 'Inter', sans-serif;">Inter</button>
           </div>
 
-          <!-- 2. Zoom -->
           <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">Taille du texte</div>
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
             <button type="button" class="comm-win-tool-btn" id="btn-zoom-out" style="width: 32px; justify-content: center;">−</button>
@@ -488,7 +636,6 @@
             <button type="button" class="comm-win-tool-btn" id="btn-zoom-in" style="width: 32px; justify-content: center;">+</button>
           </div>
 
-          <!-- 3. Fond de lecture -->
           <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">Fond de lecture</div>
           <div style="display: flex; gap: 6px;">
             <button type="button" class="comm-win-tool-btn bg-choice-btn active" data-bg="auto" style="flex: 1; justify-content: center;">Auto</button>
@@ -499,7 +646,7 @@
         </div>
       </div>
 
-      <!-- Contrôles Fenêtre Native (Minimiser, Maximiser, Fermer) -->
+      <!-- Contrôles Fenêtre -->
       <div class="comm-win-controls">
         <button type="button" class="comm-win-control-btn" id="btn-win-min" title="Réduire">
           <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="12" x2="20" y2="12"></line></svg>
@@ -516,28 +663,88 @@
   </header>
 
   <!-- ========================================================= -->
-  <!-- 2. CANEVAS PRINCIPAL : DÉFILEMENT CONTINU DU COMMENTAIRE  -->
+  <!-- 2. CONTENEUR MULTI-ONGLETS                                -->
   <!-- ========================================================= -->
-  <main class="comm-stream-scrollable" id="comm-stream-scrollable">
-    <div class="comm-stream-inner" id="comm-stream-container">
-      <!-- Rendu dynamique du flux de commentaires -->
-      <div style="text-align: center; padding: 60px 20px; color: var(--text-secondary);">
-        <div style="font-size: 15px; font-weight: 600; margin-bottom: 6px;">Connexion au lecteur biblique...</div>
-        <div style="font-size: 12px; opacity: 0.7;">En attente des données du passage en cours.</div>
-      </div>
-    </div>
-  </main>
+  <main class="comm-tab-panels-wrap">
 
-  <!-- ========================================================= -->
-  <!-- 3. BOUTON FLOTTANT : REPRENDRE LE SUIVI EN DIRECT         -->
-  <!-- ========================================================= -->
-  <button type="button" class="comm-resume-sync-pill hidden" id="btn-resume-sync" title="Réaligner automatiquement les commentaires sur le verset biblique affiché">
-    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21.5 2v6h-6"></path>
-      <path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
-    </svg>
-    <span>Reprendre le suivi en direct</span>
-  </button>
+    <!-- ONGLET 1 : COMMENTAIRES EXÉGÉTIQUES -->
+    <section class="comm-tab-panel active" id="tab-panel-commentaries">
+      <div class="comm-stream-inner" id="comm-stream-container">
+        <div style="text-align: center; padding: 60px 20px; color: var(--text-secondary);">
+          <div style="font-size: 15px; font-weight: 600; margin-bottom: 6px;">Connexion au lecteur biblique...</div>
+          <div style="font-size: 12px; opacity: 0.7;">En attente des données du passage en cours.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ONGLET 2 : ASSISTANT IA -->
+    <section class="comm-tab-panel" id="tab-panel-ai">
+      <div class="ai-chat-wrap">
+        <div class="ai-chat-header-bar">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--accent-blue)" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+            <span style="font-size: 13px; font-weight: 700;">Assistant Théologique IA</span>
+          </div>
+          <button type="button" class="comm-win-tool-btn" id="btn-clear-ai-chat" style="padding: 3px 8px; font-size: 11px;">
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            <span>Effacer</span>
+          </button>
+        </div>
+
+        <div class="ai-chat-messages-stream" id="ai-chat-messages">
+          <div class="ai-msg-bubble assistant">
+            Bonjour ! Je suis votre assistant d'étude biblique. Posez-moi une question sur le passage ou choisissez une piste d'analyse ci-dessous.
+          </div>
+        </div>
+
+        <div class="ai-prompt-chips-wrap" id="ai-prompt-chips">
+          <button type="button" class="ai-prompt-chip" data-prompt="Donne-moi le contexte historique et littéraire de ce verset.">Contexte historique & littéraire</button>
+          <button type="button" class="ai-prompt-chip" data-prompt="Quelles sont les clés exégétiques majeures de ce texte ?">Clés exégétiques</button>
+          <button type="button" class="ai-prompt-chip" data-prompt="Propose une application pratique et spirituelle pour aujourd'hui.">Application pratique</button>
+          <button type="button" class="ai-prompt-chip" data-prompt="Quels sont les liens typologiques ou messianiques ?">Liens théologiques</button>
+        </div>
+
+        <div class="ai-input-box-wrap">
+          <textarea class="ai-chat-input" id="ai-chat-input" placeholder="Posez une question sur le texte en cours..."></textarea>
+          <button type="button" class="comm-win-tool-btn" id="btn-send-ai-chat" style="background: var(--accent-blue, #2563EB); color: #FFF; border: none; padding: 0 16px;">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ONGLET 3 : LEXIQUE STRONG & DICTIONNAIRES -->
+    <section class="comm-tab-panel" id="tab-panel-lexicon">
+      <div class="lex-wrap" id="lex-container">
+        <div style="font-size: 13px; font-weight: 700; color: var(--accent-orange);">Mots originaux du verset :</div>
+        <div class="lex-words-flow" id="lex-words-flow">
+          <div style="color: var(--text-secondary); font-size: 13px;">Chargement des termes originaux...</div>
+        </div>
+        <div class="comm-stream-card" id="lex-entry-detail" style="margin-top: 0;">
+          <div style="color: var(--text-secondary); font-size: 13px; text-align: center; padding: 20px;">
+            Cliquez sur un mot ci-dessus pour afficher sa définition lexicale, sa racine et ses occurrences.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ONGLET 4 : NOTES PERSONNELLES -->
+    <section class="comm-tab-panel" id="tab-panel-notes">
+      <div class="notes-wrap">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="font-size: 13px; font-weight: 700; color: var(--accent-blue);">
+            Note d'étude pour <span id="lbl-note-current-ref">Genèse 1:1</span>
+          </div>
+          <button type="button" class="comm-win-tool-btn" id="btn-save-note" style="background: rgba(34, 197, 94, 0.15); border-color: rgba(34, 197, 94, 0.35); color: #4ADE80;">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline></svg>
+            <span>Enregistrer</span>
+          </button>
+        </div>
+        <textarea class="note-editor-textarea" id="note-editor-textarea" placeholder="Rédigez vos réflexions, analyses ou prières sur ce passage... (Format Markdown supporté)"></textarea>
+      </div>
+    </section>
+
+  </main>
 
   <!-- Scripts -->
   <script src="js/api.js"></script>
