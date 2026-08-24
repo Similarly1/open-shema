@@ -17,7 +17,7 @@ const CommentaryWindow = {
   currentChapter: 1,
   currentVerse: 1,
   currentChapterData: null,
-  activeAuthorFilter: 'all',
+  activeAuthorFilter: null,
 
   // Paramètres d'affichage
   zoomPercent: 100,
@@ -247,14 +247,21 @@ const CommentaryWindow = {
     const labelEl = document.getElementById('lbl-active-author');
     if (!listEl) return;
 
-    listEl.innerHTML = `
-      <button type="button" class="comm-win-tool-btn author-filter-item ${this.activeAuthorFilter === 'all' ? 'active' : ''}" data-author="all" style="width: 100%; justify-content: flex-start; text-align: left;">
-        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-        <span>Tous les ouvrages (${sources.length})</span>
-      </button>
-    `;
+    if (sources && sources.length > 0) {
+      if (!this.activeAuthorFilter || !sources.includes(this.activeAuthorFilter)) {
+        this.activeAuthorFilter = sources[0];
+      }
+    } else {
+      this.activeAuthorFilter = null;
+    }
 
-    sources.forEach(src => {
+    if (labelEl) {
+      labelEl.textContent = this.activeAuthorFilter || 'Aucun ouvrage';
+    }
+
+    listEl.innerHTML = '';
+
+    (sources || []).forEach(src => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = `comm-win-tool-btn author-filter-item ${this.activeAuthorFilter === src ? 'active' : ''}`;
@@ -281,7 +288,7 @@ const CommentaryWindow = {
     this.activeAuthorFilter = author;
     const labelEl = document.getElementById('lbl-active-author');
     if (labelEl) {
-      labelEl.textContent = author === 'all' ? 'Tous les ouvrages' : author;
+      labelEl.textContent = author || 'Aucun ouvrage';
     }
     const listEl = document.getElementById('author-filter-list');
     if (listEl) {
@@ -298,17 +305,35 @@ const CommentaryWindow = {
     const container = document.getElementById('comm-stream-container');
     if (!container || !data || !data.verses) return;
 
-    const totalCommentsCount = data.verses.reduce((acc, v) => acc + (v.comments ? v.comments.length : 0), 0);
+    if (!this.activeAuthorFilter && data.available_sources && data.available_sources.length > 0) {
+      this.activeAuthorFilter = data.available_sources[0];
+      const labelEl = document.getElementById('lbl-active-author');
+      if (labelEl) {
+        labelEl.textContent = this.activeAuthorFilter;
+      }
+    }
+
+    const currentAuthor = this.activeAuthorFilter;
+
+    let authorCommentsCount = 0;
+    data.verses.forEach(v => {
+      if (v.comments) {
+        v.comments.forEach(c => {
+          if (!currentAuthor || c.author === currentAuthor || c.source === currentAuthor) {
+            authorCommentsCount++;
+          }
+        });
+      }
+    });
 
     let html = `
       <div class="comm-stream-chapter-hero">
-        <h1 class="comm-stream-chapter-title">${this.escapeHtml(data.book_french.toUpperCase())} ${data.chapter}</h1>
+        <h1 class="comm-stream-chapter-title">${this.escapeHtml((data.book_french || this.currentBookFrench || '').toUpperCase())} ${data.chapter}</h1>
         <div class="comm-stream-chapter-subtitle">
-          <span>${data.total_verses} versets</span>
+          <span>${data.total_verses || data.verses.length} versets</span>
           <span>•</span>
-          <span>${totalCommentsCount} notes exégétiques</span>
-          <span>•</span>
-          <span>${data.available_sources.length} sources</span>
+          <span>${authorCommentsCount} note${authorCommentsCount > 1 ? 's' : ''}</span>
+          ${currentAuthor ? `<span>•</span><span style="color: var(--accent-blue); font-weight: 600;">${this.escapeHtml(currentAuthor)}</span>` : ''}
         </div>
       </div>
     `;
@@ -320,12 +345,8 @@ const CommentaryWindow = {
       const vText = vObj.text || '';
       let comments = vObj.comments || [];
 
-      if (this.activeAuthorFilter !== 'all') {
-        comments = comments.filter(c => c.author === this.activeAuthorFilter || c.source === this.activeAuthorFilter);
-      }
-
-      if (comments.length === 0 && this.activeAuthorFilter !== 'all') {
-        return;
+      if (currentAuthor) {
+        comments = comments.filter(c => c.author === currentAuthor || c.source === currentAuthor);
       }
 
       displayedBlocksCount++;
@@ -341,8 +362,8 @@ const CommentaryWindow = {
 
       if (comments.length === 0) {
         html += `
-          <div class="comm-stream-card" style="padding: 12px 18px; opacity: 0.6; font-style: italic; font-size: 13px;">
-            Aucune note exégétique directe pour ce verset dans la sélection active.
+          <div class="comm-stream-card" style="padding: 10px 16px; opacity: 0.55; font-style: italic; font-size: 13px;">
+            Aucun commentaire de ${this.escapeHtml(currentAuthor || 'cet ouvrage')} pour le verset ${vNum}.
           </div>
         `;
       } else {
@@ -391,14 +412,11 @@ const CommentaryWindow = {
       `;
     });
 
-    if (displayedBlocksCount === 0 && this.activeAuthorFilter !== 'all') {
+    if (authorCommentsCount === 0 && currentAuthor) {
       html += `
         <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
           <div style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">Aucun commentaire trouvé pour cet ouvrage dans ce chapitre</div>
-          <div style="font-size: 12px; opacity: 0.8; margin-bottom: 12px;">« ${this.escapeHtml(this.activeAuthorFilter)} » ne contient pas de notes pour ${this.escapeHtml(data.book_french)} ${data.chapter}.</div>
-          <button type="button" class="comm-win-tool-btn" id="btn-reset-author-filter" style="margin: 0 auto; display: inline-flex;">
-            <span>Afficher tous les ouvrages</span>
-          </button>
+          <div style="font-size: 12px; opacity: 0.8; margin-bottom: 12px;">« ${this.escapeHtml(currentAuthor)} » ne contient pas de notes pour ${this.escapeHtml(data.book_french || '')} ${data.chapter}.</div>
         </div>
       `;
     }
