@@ -620,7 +620,6 @@ const ArticlesView = {
       }
 
       // 5. Rendu Markdown propre et calcul des statistiques de lecture
-      const mdRaw = res.content_markdown || art.summary || '';
       const renderedHtml = this.renderMarkdown(mdRaw);
       
       if (contentEl) {
