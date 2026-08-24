@@ -174,6 +174,17 @@ const ArticlesView = {
       this.loadMoreArticles();
     });
 
+    // 5c. Bouton Toggle Sommaire Interactif (TOC)
+    document.getElementById('btn-article-toggle-toc')?.addEventListener('click', () => {
+      const sidebar = document.getElementById('article-toc-sidebar');
+      const btn = document.getElementById('btn-article-toggle-toc');
+      if (sidebar) {
+        const isHidden = sidebar.classList.toggle('hidden');
+        this.tocHiddenByUser = isHidden;
+        if (btn) btn.classList.toggle('active', !isHidden);
+      }
+    });
+
     // Événements dans le popover d'options
     this.bindReadingOptionsControls();
   },
@@ -842,6 +853,9 @@ const ArticlesView = {
         realContentEl.classList.add('fade-in');
       }
 
+      // Générer le sommaire interactif latéral (TOC)
+      this.buildTableOfContents();
+
     } catch (e) {
       console.error('[ArticlesView] Erreur affichage article:', e);
       if (skeletonEl) skeletonEl.classList.add('hidden');
@@ -864,7 +878,136 @@ const ArticlesView = {
     statsEl.textContent = `${readTimeMinutes} min de lecture • ${wordCount.toLocaleString('fr-FR')} mots`;
   },
 
+  buildTableOfContents() {
+    const sidebarEl = document.getElementById('article-toc-sidebar');
+    const navEl = document.getElementById('article-toc-nav');
+    const toggleBtn = document.getElementById('btn-article-toggle-toc');
+    const contentEl = document.getElementById('article-reader-body');
+    if (!sidebarEl || !navEl || !contentEl) return;
+
+    navEl.innerHTML = '';
+
+    // Trouver tous les titres H1, H2, H3, H4 du corps de texte (en excluant absolument les dialogues de podcast, callouts, etc.)
+    const allHeadings = Array.from(contentEl.querySelectorAll('h1, h2, h3, h4')).filter(h => {
+      // Exclure formellement les interventions/dialogues de podcast
+      if (h.closest('.article-speaker-turn') || h.closest('.article-speaker-speech') || h.closest('.article-speaker-badge')) return false;
+      // Exclure les callouts d'information et encarts éditoriaux
+      if (h.closest('.article-info-callout') || h.closest('.article-editorial-footer-card') || h.closest('.article-table-wrap')) return false;
+      // Exclure le titre principal de l'article s'il a été injecté dans le corps
+      if (h.classList.contains('article-reader-title')) return false;
+      // Exclure les titres trop courts
+      const text = h.textContent.trim();
+      return text.length >= 2;
+    });
+
+    if (allHeadings.length < 2) {
+      sidebarEl.classList.add('hidden');
+      if (toggleBtn) toggleBtn.classList.add('hidden');
+      return;
+    }
+
+    if (toggleBtn) {
+      toggleBtn.classList.remove('hidden');
+      toggleBtn.classList.toggle('active', !this.tocHiddenByUser);
+    }
+    if (!this.tocHiddenByUser) {
+      sidebarEl.classList.remove('hidden');
+    } else {
+      sidebarEl.classList.add('hidden');
+    }
+
+    let navHtml = '';
+    allHeadings.forEach((h, index) => {
+      const headingId = `article-heading-${index + 1}`;
+      h.id = headingId;
+      const level = parseInt(h.tagName.substring(1), 10) || 2;
+      const titleText = h.textContent.trim();
+
+      navHtml += `
+        <a href="#${headingId}" class="article-toc-item article-toc-level-${level}" data-target-id="${headingId}">
+          <span class="article-toc-bullet"></span>
+          <span class="article-toc-text">${this.escapeHtml(titleText)}</span>
+        </a>
+      `;
+    });
+
+    navEl.innerHTML = navHtml;
+
+    // Écouteur de clic sur chaque élément du sommaire avec défilement fluide et illumination
+    navEl.querySelectorAll('.article-toc-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const targetId = item.dataset.targetId;
+        const targetEl = document.getElementById(targetId);
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          targetEl.classList.remove('article-heading-flash');
+          void targetEl.offsetWidth; // Force reflow
+          targetEl.classList.add('article-heading-flash');
+          setTimeout(() => targetEl.classList.remove('article-heading-flash'), 1800);
+        }
+      });
+    });
+
+    this.initScrollSpy(allHeadings);
+  },
+
+  initScrollSpy(headings) {
+    const container = document.querySelector('.articles-view-container') || window;
+    const progressPctEl = document.getElementById('article-toc-progress-pct');
+    const progressBarFill = document.getElementById('article-toc-progress-bar-fill');
+    const navEl = document.getElementById('article-toc-nav');
+
+    if (this._scrollSpyHandler) {
+      (container === window ? window : container).removeEventListener('scroll', this._scrollSpyHandler);
+    }
+
+    this._scrollSpyHandler = () => {
+      const scrollEl = container === window ? (document.scrollingElement || document.documentElement) : container;
+      const scrollTop = scrollEl.scrollTop;
+      const scrollHeight = scrollEl.scrollHeight - scrollEl.clientHeight;
+      const pct = scrollHeight > 0 ? Math.min(100, Math.max(0, Math.round((scrollTop / scrollHeight) * 100))) : 0;
+
+      if (progressPctEl) progressPctEl.textContent = `${pct}%`;
+      if (progressBarFill) progressBarFill.style.width = `${pct}%`;
+
+      // Détecter la section active selon la position des titres
+      let activeHeadingId = null;
+      for (let i = headings.length - 1; i >= 0; i--) {
+        const h = headings[i];
+        const rect = h.getBoundingClientRect();
+        if (rect.top <= 180) {
+          activeHeadingId = h.id;
+          break;
+        }
+      }
+      if (!activeHeadingId && headings.length > 0) {
+        activeHeadingId = headings[0].id;
+      }
+
+      if (navEl) {
+        navEl.querySelectorAll('.article-toc-item').forEach(item => {
+          if (item.dataset.targetId === activeHeadingId) {
+            item.classList.add('active');
+          } else {
+            item.classList.remove('active');
+          }
+        });
+      }
+    };
+
+    (container === window ? window : container).addEventListener('scroll', this._scrollSpyHandler, { passive: true });
+    // Calcul initial
+    this._scrollSpyHandler();
+  },
+
   closeArticleReader() {
+    if (this._scrollSpyHandler) {
+      const container = document.querySelector('.articles-view-container') || window;
+      (container === window ? window : container).removeEventListener('scroll', this._scrollSpyHandler);
+      this._scrollSpyHandler = null;
+    }
     const viewList = document.getElementById('articles-list-section');
     const viewReader = document.getElementById('articles-reader-section');
     if (viewReader) viewReader.classList.add('hidden');

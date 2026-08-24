@@ -4338,6 +4338,18 @@
                   </div>
                 </div>
 
+                <button class="btn-articles-action" id="btn-article-toggle-toc" title="Afficher / Masquer le sommaire">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="8" y1="6" x2="21" y2="6"></line>
+                    <line x1="8" y1="12" x2="21" y2="12"></line>
+                    <line x1="8" y1="18" x2="21" y2="18"></line>
+                    <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                    <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                    <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                  </svg>
+                  <span>Sommaire</span>
+                </button>
+
                 <a href="#" id="article-reader-external-link" class="btn-articles-action" target="_blank" title="Ouvrir la page originale sur le site">
                   <span>Site d'origine</span>
                   <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -4345,90 +4357,109 @@
               </div>
             </div>
 
-            <div class="article-reader-container" id="article-reader-container">
-              <!-- Squelette Skeleton Exact (affiché pendant le chargement de l'article) -->
-              <div class="article-skeleton-wrap" id="article-reader-skeleton">
-                <div class="skeleton-hero-banner skeleton-shimmer"></div>
-                <div class="skeleton-hero-header">
-                  <div class="skeleton-tags-row">
-                    <div class="skeleton-pill skeleton-shimmer" style="width: 130px; height: 22px;"></div>
-                    <div class="skeleton-pill skeleton-shimmer" style="width: 90px; height: 22px;"></div>
-                  </div>
-                  <div class="skeleton-line skeleton-shimmer" style="width: 85%; height: 34px; margin: 14px 0 10px 0;"></div>
-                  <div class="skeleton-line skeleton-shimmer" style="width: 50%; height: 34px; margin-bottom: 20px;"></div>
-                  
-                  <div class="skeleton-author-card">
-                    <div class="skeleton-avatar skeleton-shimmer" style="width: 44px; height: 44px; border-radius: 50%;"></div>
-                    <div class="skeleton-author-meta">
-                      <div class="skeleton-line skeleton-shimmer" style="width: 140px; height: 16px; margin-bottom: 6px;"></div>
-                      <div class="skeleton-line skeleton-shimmer" style="width: 200px; height: 13px;"></div>
+            <!-- Structure avec Volet Sommaire Latéral Droit -->
+            <div class="article-reader-layout" id="article-reader-layout">
+              <div class="article-reader-container" id="article-reader-container">
+                <!-- Squelette Skeleton Exact (affiché pendant le chargement de l'article) -->
+                <div class="article-skeleton-wrap" id="article-reader-skeleton">
+                  <div class="skeleton-hero-banner skeleton-shimmer"></div>
+                  <div class="skeleton-hero-header">
+                    <div class="skeleton-tags-row">
+                      <div class="skeleton-pill skeleton-shimmer" style="width: 130px; height: 22px;"></div>
+                      <div class="skeleton-pill skeleton-shimmer" style="width: 90px; height: 22px;"></div>
                     </div>
-                  </div>
-                </div>
-
-                <div class="skeleton-lead-box skeleton-shimmer"></div>
-
-                <div class="skeleton-body-lines">
-                  <div class="skeleton-line skeleton-shimmer" style="width: 100%; height: 16px; margin-bottom: 12px;"></div>
-                  <div class="skeleton-line skeleton-shimmer" style="width: 96%; height: 16px; margin-bottom: 12px;"></div>
-                  <div class="skeleton-line skeleton-shimmer" style="width: 92%; height: 16px; margin-bottom: 24px;"></div>
-                  
-                  <div class="skeleton-line skeleton-shimmer" style="width: 40%; height: 24px; margin: 26px 0 16px 0;"></div>
-                  
-                  <div class="skeleton-line skeleton-shimmer" style="width: 98%; height: 16px; margin-bottom: 12px;"></div>
-                  <div class="skeleton-line skeleton-shimmer" style="width: 94%; height: 16px; margin-bottom: 12px;"></div>
-                  <div class="skeleton-line skeleton-shimmer" style="width: 88%; height: 16px; margin-bottom: 24px;"></div>
-                  
-                  <div class="skeleton-quote-box skeleton-shimmer"></div>
-                  
-                  <div class="skeleton-line skeleton-shimmer" style="width: 100%; height: 16px; margin-bottom: 12px;"></div>
-                  <div class="skeleton-line skeleton-shimmer" style="width: 75%; height: 16px;"></div>
-                </div>
-              </div>
-
-              <!-- Contenu Réel de l'article (peuplé et révélé en fondu) -->
-              <div class="article-reader-real-content hidden" id="article-reader-real-content">
-                <!-- Image Héro de l'article -->
-                <div class="article-reader-hero-banner hidden" id="article-reader-hero-banner">
-                  <img id="article-reader-hero-img" src="" alt="Image de l'article" class="article-hero-image">
-                  <div class="article-reader-hero-overlay"></div>
-                </div>
-
-                <div class="article-reader-hero">
-                  <div class="article-reader-tags" id="article-reader-tags"></div>
-                  <h1 class="article-reader-title" id="article-reader-title">Titre de l'article</h1>
-                  
-                  <!-- Auteur avec Avatar et Date -->
-                  <div class="article-reader-author-card" id="article-reader-author-card">
-                    <div class="author-avatar-circle" id="article-author-avatar-wrap">
-                      <img id="article-author-avatar-img" src="" alt="Auteur" class="author-avatar-img">
-                      <span id="article-author-avatar-placeholder" class="author-avatar-placeholder hidden"></span>
-                    </div>
-                    <div class="author-info-meta">
-                      <div class="author-main-name" id="article-author-name">Nom de l'auteur</div>
-                      <div class="author-pub-line">
-                        <span id="article-pub-date">Date</span> • <span id="article-source-name" class="author-source-pill">Source</span>
+                    <div class="skeleton-line skeleton-shimmer" style="width: 85%; height: 34px; margin: 14px 0 10px 0;"></div>
+                    <div class="skeleton-line skeleton-shimmer" style="width: 50%; height: 34px; margin-bottom: 20px;"></div>
+                    
+                    <div class="skeleton-author-card">
+                      <div class="skeleton-avatar skeleton-shimmer" style="width: 44px; height: 44px; border-radius: 50%;"></div>
+                      <div class="skeleton-author-meta">
+                        <div class="skeleton-line skeleton-shimmer" style="width: 140px; height: 16px; margin-bottom: 6px;"></div>
+                        <div class="skeleton-line skeleton-shimmer" style="width: 200px; height: 13px;"></div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <!-- Lecteur Audio / Podcast -->
-                <div class="article-reader-audio-wrap hidden" id="article-reader-audio-wrap">
-                  <div class="article-audio-player-card" id="article-audio-player-card">
-                    <!-- Player injecté dynamiquement -->
+                  <div class="skeleton-lead-box skeleton-shimmer"></div>
+
+                  <div class="skeleton-body-lines">
+                    <div class="skeleton-line skeleton-shimmer" style="width: 100%; height: 16px; margin-bottom: 12px;"></div>
+                    <div class="skeleton-line skeleton-shimmer" style="width: 96%; height: 16px; margin-bottom: 12px;"></div>
+                    <div class="skeleton-line skeleton-shimmer" style="width: 92%; height: 16px; margin-bottom: 24px;"></div>
+                    
+                    <div class="skeleton-line skeleton-shimmer" style="width: 40%; height: 24px; margin: 26px 0 16px 0;"></div>
+                    
+                    <div class="skeleton-line skeleton-shimmer" style="width: 98%; height: 16px; margin-bottom: 12px;"></div>
+                    <div class="skeleton-line skeleton-shimmer" style="width: 94%; height: 16px; margin-bottom: 12px;"></div>
+                    <div class="skeleton-line skeleton-shimmer" style="width: 88%; height: 16px; margin-bottom: 24px;"></div>
+                    
+                    <div class="skeleton-quote-box skeleton-shimmer"></div>
+                    
+                    <div class="skeleton-line skeleton-shimmer" style="width: 100%; height: 16px; margin-bottom: 12px;"></div>
+                    <div class="skeleton-line skeleton-shimmer" style="width: 75%; height: 16px;"></div>
                   </div>
                 </div>
 
-                <!-- Chapô d'introduction -->
-                <div class="article-reader-lead hidden" id="article-reader-lead">
-                  <!-- Texte introductif -->
-                </div>
+                <!-- Contenu Réel de l'article (peuplé et révélé en fondu) -->
+                <div class="article-reader-real-content hidden" id="article-reader-real-content">
+                  <!-- Image Héro de l'article -->
+                  <div class="article-reader-hero-banner hidden" id="article-reader-hero-banner">
+                    <img id="article-reader-hero-img" src="" alt="Image de l'article" class="article-hero-image">
+                    <div class="article-reader-hero-overlay"></div>
+                  </div>
 
-                <div class="article-reader-body" id="article-reader-body">
-                  <!-- Rendu Markdown injecté dynamiquement -->
+                  <div class="article-reader-hero">
+                    <div class="article-reader-tags" id="article-reader-tags"></div>
+                    <h1 class="article-reader-title" id="article-reader-title">Titre de l'article</h1>
+                    
+                    <!-- Auteur avec Avatar et Date -->
+                    <div class="article-reader-author-card" id="article-reader-author-card">
+                      <div class="author-avatar-circle" id="article-author-avatar-wrap">
+                        <img id="article-author-avatar-img" src="" alt="Auteur" class="author-avatar-img">
+                        <span id="article-author-avatar-placeholder" class="author-avatar-placeholder hidden"></span>
+                      </div>
+                      <div class="author-info-meta">
+                        <div class="author-main-name" id="article-author-name">Nom de l'auteur</div>
+                        <div class="author-pub-line">
+                          <span id="article-pub-date">Date</span> • <span id="article-source-name" class="author-source-pill">Source</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Lecteur Audio / Podcast -->
+                  <div class="article-reader-audio-wrap hidden" id="article-reader-audio-wrap">
+                    <div class="article-audio-player-card" id="article-audio-player-card">
+                      <!-- Player injecté dynamiquement -->
+                    </div>
+                  </div>
+
+                  <!-- Chapô d'introduction -->
+                  <div class="article-reader-lead hidden" id="article-reader-lead">
+                    <!-- Texte introductif -->
+                  </div>
+
+                  <div class="article-reader-body" id="article-reader-body">
+                    <!-- Rendu Markdown injecté dynamiquement -->
+                  </div>
                 </div>
               </div>
+
+              <!-- Volet Sommaire Interactif (Table of Contents) -->
+              <aside class="article-toc-sidebar hidden" id="article-toc-sidebar">
+                <div class="article-toc-card">
+                  <div class="article-toc-header">
+                    <span class="article-toc-title">SOMMAIRE</span>
+                    <span class="article-toc-progress-pct" id="article-toc-progress-pct">0%</span>
+                  </div>
+                  <div class="article-toc-progress-bar-track">
+                    <div class="article-toc-progress-bar-fill" id="article-toc-progress-bar-fill"></div>
+                  </div>
+                  <nav class="article-toc-nav" id="article-toc-nav">
+                    <!-- Liens injectés dynamiquement -->
+                  </nav>
+                </div>
+              </aside>
             </div>
           </div>
 
