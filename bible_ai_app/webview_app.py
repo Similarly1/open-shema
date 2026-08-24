@@ -883,6 +883,8 @@ class BibleAppApi:
             }
         except Exception as e:
             logger.error("Erreur traduction: %s", e)
+            return {"success": False, "error": str(e)}
+
     def translate_theology_toc(self, book_name: str, titles: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Traduit en français l'ensemble des titres de la table des matières d'un livre de théologie."""
         from core.translation_manager import TranslationManager

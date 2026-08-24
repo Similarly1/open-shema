@@ -83,9 +83,9 @@ class GeminiClient:
 
         last_error = None
         for current_model in models_to_try:
-            url = f"{self.base_url}/{current_model}:generateContent?key={self.api_key}"
+            url = f"{self.base_url}/{current_model}:generateContent"
             try:
-                response = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=180)
+                response = requests.post(url, json=payload, headers={"Content-Type": "application/json", "x-goog-api-key": self.api_key}, timeout=180)
                 if response.status_code in [404, 429, 500, 502, 503, 504]:
                     last_error = f"Status {response.status_code} pour {current_model}"
                     continue
@@ -135,14 +135,14 @@ class GeminiClient:
             last_err = None
 
             for current_model in models_to_try:
-                url = f"{self.base_url}/{current_model}:batchEmbedContents?key={self.api_key}"
+                url = f"{self.base_url}/{current_model}:batchEmbedContents"
                 requests_list = [{"model": f"models/{current_model}", "content": {"parts": [{"text": t}]}} for t in batch]
                 payload = {"requests": requests_list}
                 
                 # Tentatives avec pause progressive en cas de limitation TPM temporaire
                 for attempt in range(3):
                     try:
-                        response = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=60)
+                        response = requests.post(url, json=payload, headers={"Content-Type": "application/json", "x-goog-api-key": self.api_key}, timeout=60)
                         if response.status_code == 429:
                             last_err = f"Quota 429 sur {current_model} (attente 3s...)"
                             time.sleep(3 * (attempt + 1))

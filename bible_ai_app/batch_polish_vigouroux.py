@@ -51,7 +51,11 @@ MODEL_PRICING = {
 def load_all_keys():
     """Charge et fusionne les clés locales et celles du kDrive si existantes."""
     cfg = load_config()
-    kdrive_path = r"C:\Users\adrie\kDrive\Documents\Site chants de la bible\BDD JEM\config_keys.json"
+    # Chemin configurable via variable d'environnement pour portabilité
+    kdrive_path = os.environ.get(
+        "KDRIVE_KEYS_PATH",
+        r"C:\Users\adrie\kDrive\Documents\Site chants de la bible\BDD JEM\config_keys.json"
+    )
     ext_keys = {}
     if os.path.exists(kdrive_path):
         try:
