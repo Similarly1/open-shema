@@ -2981,6 +2981,13 @@ class BibleAppApi:
             mh = rc.bottom - rc.top
             user32.SetWindowPos(hwnd, 0, rc.left, rc.top, mw, mh, 0x0040)
 
+        try:
+            _COMMENTARY_WINDOW.evaluate_js(
+                f"window.CommentaryWindow && window.CommentaryWindow.updateMaximizedState({str(_COMMENTARY_IS_MAXIMIZED).lower()})"
+            )
+        except Exception:
+            pass
+
         return {"success": True, "is_maximized": _COMMENTARY_IS_MAXIMIZED}
 
     def get_current_passage(self) -> Dict[str, Any]:
@@ -3212,6 +3219,19 @@ def on_commentary_shown(*args, **kwargs):
             wx, wy, ww, wh = _COMMENTARY_TARGET_BOUNDS
             user32.SetWindowPos(hwnd, 0, wx, wy, ww, wh, 0x0040 | 0x0020)
             
+            # Neutraliser le déplacement souris si la fenêtre est maximisée / plein écran
+            if hasattr(_COMMENTARY_WINDOW, 'move'):
+                orig_comm_move = _COMMENTARY_WINDOW.move
+                def safe_comm_move(x, y):
+                    global _COMMENTARY_IS_MAXIMIZED
+                    if _COMMENTARY_IS_MAXIMIZED:
+                        return
+                    try:
+                        orig_comm_move(x, y)
+                    except Exception:
+                        pass
+                _COMMENTARY_WINDOW.move = safe_comm_move
+
             b, ch, v = _LAST_ACTIVE_PASSAGE
             api = BibleAppApi()
             data = api.get_chapter_commentaries_grouped(b, ch)

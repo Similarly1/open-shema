@@ -736,6 +736,12 @@ const CommentaryWindow = {
     document.getElementById('btn-win-max')?.addEventListener('click', () => API.maximizeCommentaryWindow());
     document.getElementById('btn-win-close')?.addEventListener('click', () => API.closeCommentaryWindow());
 
+    // Double-clic sur la barre de titre pour maximiser/restaurer
+    document.getElementById('comm-win-titlebar')?.addEventListener('dblclick', (e) => {
+      if (e.target.closest('button') || e.target.closest('input') || e.target.closest('select')) return;
+      API.maximizeCommentaryWindow();
+    });
+
     // 8. Bascule de synchronisation
     document.getElementById('comm-win-sync-badge')?.addEventListener('click', () => {
       this.isSyncActive = !this.isSyncActive;
@@ -748,6 +754,13 @@ const CommentaryWindow = {
         label.textContent = this.isSyncActive ? 'Lié' : 'Délié';
       }
     });
+  },
+
+  updateMaximizedState(isMaximized) {
+    const maxBtn = document.getElementById('btn-win-max');
+    if (maxBtn) {
+      maxBtn.title = isMaximized ? "Restaurer" : "Agrandir / Plein écran";
+    }
   },
 
   async handleTranslateClick(btn, itemId, rawText) {
