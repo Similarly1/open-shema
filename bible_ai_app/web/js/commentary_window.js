@@ -10,7 +10,7 @@ const CommentaryWindow = {
   isUserScrolled: false,
   _isProgrammaticScroll: false,
   _scrollTimeout: null,
-  _isLoading: false,
+  _currentRequestId: 0,
 
   currentBook: 'Gen',
   currentBookFrench: 'Genèse',
@@ -41,7 +41,7 @@ const CommentaryWindow = {
     this.bindEvents();
     this.restorePreferences();
 
-    // 2. Initialiser le chargement dès que l'API est prête
+    // 2. Initialiser immédiatement le chargement des commentaires
     const startInitialLoad = async () => {
       try {
         const passage = await API.getCurrentPassage();
@@ -55,10 +55,10 @@ const CommentaryWindow = {
         console.debug('[CommentaryWindow] getCurrentPassage fallback:', err);
       }
       this.updatePassageDisplay(this.currentBookFrench, this.currentChapter, this.currentVerse);
-      await this.loadChapterCommentaries(this.currentBook, this.currentChapter);
-      this.notifyReady();
+      this.loadChapterCommentaries(this.currentBook, this.currentChapter);
     };
 
+    // Démarrage dès que l'API est prête ou timeout rapide
     API.onReady(() => {
       startInitialLoad();
     });
@@ -66,8 +66,7 @@ const CommentaryWindow = {
     if (API.isReady) {
       startInitialLoad();
     } else {
-      // Sécurité : forcer le démarrage après 500ms si pywebview est prêt
-      setTimeout(startInitialLoad, 500);
+      setTimeout(startInitialLoad, 300);
     }
   },
 
@@ -108,19 +107,20 @@ const CommentaryWindow = {
   },
 
   async handlePassageNavigated(bookCode, bookFrench, chapterNum, verseNum = 1) {
-    const isNewChapter = this.currentBook !== bookCode || this.currentChapter !== parseInt(chapterNum, 10);
+    const ch = parseInt(chapterNum, 10);
+    const v = parseInt(verseNum, 10) || 1;
+    const isNewChapter = this.currentBook !== bookCode || this.currentChapter !== ch;
+
     this.currentBook = bookCode;
     this.currentBookFrench = bookFrench || bookCode;
-    this.currentChapter = parseInt(chapterNum, 10);
-    this.currentVerse = parseInt(verseNum, 10) || 1;
+    this.currentChapter = ch;
+    this.currentVerse = v;
 
     this.updatePassageDisplay(this.currentBookFrench, this.currentChapter, this.currentVerse);
 
     if (isNewChapter || !this.currentChapterData) {
       await this.loadChapterCommentaries(bookCode, this.currentChapter);
-    }
-
-    if (this.isSyncActive) {
+    } else if (this.isSyncActive) {
       this.scrollToVerseBlock(this.currentVerse);
     }
   },
@@ -159,11 +159,10 @@ const CommentaryWindow = {
   },
 
   async loadChapterCommentaries(bookCode, chapterNum) {
-    if (this._isLoading) return;
-    this._isLoading = true;
-
+    const reqId = ++this._currentRequestId;
     const container = document.getElementById('commentary-stream-container');
-    if (container && !this.currentChapterData) {
+    
+    if (container && (!this.currentChapterData || this.currentChapter !== parseInt(chapterNum, 10))) {
       container.innerHTML = `
         <div style="text-align: center; padding: 60px 20px; color: var(--text-secondary);">
           <div class="synth-spinner" style="width: 24px; height: 24px; border-width: 2.5px; margin: 0 auto 12px auto;"></div>
@@ -173,28 +172,34 @@ const CommentaryWindow = {
     }
 
     try {
-      await API.ensureReady(4000);
-      const data = await API.getChapterCommentariesGrouped(bookCode, chapterNum);
+      await API.ensureReady(3000);
+      const data = await API.getChapterCommentariesGrouped(bookCode, parseInt(chapterNum, 10));
+      
+      if (reqId !== this._currentRequestId) return; // Requête obsolète
+      
       if (!data || !data.verses || data.error) {
-        throw new Error(data?.error || "Données de commentaires non reçues");
+        throw new Error(data?.error || "Données de commentaires non disponibles");
       }
+
       this.currentChapterData = data;
       this.currentBookFrench = data.book_french || this.currentBookFrench;
       this.updatePassageDisplay(this.currentBookFrench, this.currentChapter, this.currentVerse);
       this.populateAuthorFilter(data.available_sources || []);
       this.renderStream(data);
+
       if (this.isSyncActive) {
         setTimeout(() => {
           this.scrollToVerseBlock(this.currentVerse);
         }, 80);
       }
     } catch (e) {
+      if (reqId !== this._currentRequestId) return;
       console.error('[CommentaryWindow] Erreur chargement commentaires:', e);
       if (container) {
         container.innerHTML = `
           <div style="text-align: center; padding: 40px; color: var(--accent-red, #EF4444);">
             <div style="font-size: 15px; font-weight: 700; margin-bottom: 6px;">Impossible de charger les commentaires</div>
-            <div style="font-size: 12px; opacity: 0.8; margin-bottom: 12px;">${String(e.message || e)}</div>
+            <div style="font-size: 12px; opacity: 0.8; margin-bottom: 14px;">${this.escapeHtml(e.message || String(e))}</div>
             <button type="button" class="comm-win-tool-btn" id="btn-retry-load" style="margin: 0 auto; display: inline-flex;">
               <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
               <span>Réessayer</span>
@@ -202,12 +207,9 @@ const CommentaryWindow = {
           </div>
         `;
         document.getElementById('btn-retry-load')?.addEventListener('click', () => {
-          this._isLoading = false;
           this.loadChapterCommentaries(bookCode, chapterNum);
         });
       }
-    } finally {
-      this._isLoading = false;
     }
   },
 
@@ -233,25 +235,34 @@ const CommentaryWindow = {
       btn.style.textAlign = 'left';
       btn.innerHTML = `
         <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${src}</span>
+        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${this.escapeHtml(src)}</span>
       `;
       listEl.appendChild(btn);
     });
 
     listEl.querySelectorAll('.author-filter-item').forEach(btn => {
       btn.addEventListener('click', () => {
-        this.activeAuthorFilter = btn.dataset.author;
-        listEl.querySelectorAll('.author-filter-item').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        if (labelEl) {
-          labelEl.textContent = this.activeAuthorFilter === 'all' ? 'Tous les ouvrages' : this.activeAuthorFilter;
-        }
+        this.setAuthorFilter(btn.dataset.author);
         document.getElementById('author-filter-popover')?.classList.add('hidden');
-        if (this.currentChapterData) {
-          this.renderStream(this.currentChapterData);
-        }
       });
     });
+  },
+
+  setAuthorFilter(author) {
+    this.activeAuthorFilter = author;
+    const labelEl = document.getElementById('lbl-active-author');
+    if (labelEl) {
+      labelEl.textContent = author === 'all' ? 'Tous les ouvrages' : author;
+    }
+    const listEl = document.getElementById('author-filter-list');
+    if (listEl) {
+      listEl.querySelectorAll('.author-filter-item').forEach(b => {
+        b.classList.toggle('active', b.dataset.author === author);
+      });
+    }
+    if (this.currentChapterData) {
+      this.renderStream(this.currentChapterData);
+    }
   },
 
   renderStream(data) {
@@ -262,7 +273,7 @@ const CommentaryWindow = {
 
     let html = `
       <div class="comm-stream-chapter-hero">
-        <h1 class="comm-stream-chapter-title">${data.book_french.toUpperCase()} ${data.chapter}</h1>
+        <h1 class="comm-stream-chapter-title">${this.escapeHtml(data.book_french.toUpperCase())} ${data.chapter}</h1>
         <div class="comm-stream-chapter-subtitle">
           <span>${data.total_verses} versets</span>
           <span>•</span>
@@ -272,6 +283,8 @@ const CommentaryWindow = {
         </div>
       </div>
     `;
+
+    let displayedBlocksCount = 0;
 
     data.verses.forEach(vObj => {
       const vNum = vObj.verse;
@@ -286,11 +299,13 @@ const CommentaryWindow = {
         return;
       }
 
+      displayedBlocksCount++;
+
       html += `
         <div class="comm-stream-verse-block ${vNum === this.currentVerse ? 'active-synced-comm' : ''}" id="comm-verse-${vNum}" data-verse="${vNum}">
           <div class="comm-verse-quote-banner" data-nav-verse="${vNum}" title="Cliquer pour positionner la Bible principale sur ce verset" style="cursor: pointer;">
             <div class="comm-verse-num-badge">${vNum}</div>
-            <div class="comm-verse-quote-text">« ${vText || '...'} »</div>
+            <div class="comm-verse-quote-text">« ${this.escapeHtml(vText || '...')} »</div>
           </div>
           <div class="comm-verse-cards-list">
       `;
@@ -302,8 +317,8 @@ const CommentaryWindow = {
           </div>
         `;
       } else {
-        comments.forEach(comm => {
-          const itemId = `comm_${comm.id || comm.author}_${data.book}_${data.chapter}_${vNum}`;
+        comments.forEach((comm, idx) => {
+          const itemId = `comm_${vNum}_${idx}_${(comm.author || 'comm').replace(/[^a-zA-Z0-9]/g, '_')}`;
           const isForeign = this.isForeignText(comm.text);
           const cachedTrans = this.translationCache[itemId];
           const isShowingTranslated = this.showTranslatedVersion[itemId] !== false && !!cachedTrans;
@@ -323,10 +338,10 @@ const CommentaryWindow = {
                     <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
                     <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
                   </svg>
-                  <span>${comm.author || comm.source || 'Commentaire'}</span>
+                  <span>${this.escapeHtml(comm.author || comm.source || 'Commentaire')}</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
-                  <span class="comm-stream-ref-badge">${comm.reference || `${data.book_french} ${data.chapter}:${vNum}`}</span>
+                  <span class="comm-stream-ref-badge">${this.escapeHtml(comm.reference || `${data.book_french} ${data.chapter}:${vNum}`)}</span>
                   ${isForeign ? `
                     <button type="button" class="comm-win-tool-btn btn-trans-comm" data-item-id="${itemId}" data-raw-text="${encodeURIComponent(comm.text)}" style="height: 22px; font-size: 11px; padding: 2px 7px;">
                       <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
@@ -347,7 +362,23 @@ const CommentaryWindow = {
       `;
     });
 
+    if (displayedBlocksCount === 0 && this.activeAuthorFilter !== 'all') {
+      html += `
+        <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+          <div style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">Aucun commentaire trouvé pour cet ouvrage dans ce chapitre</div>
+          <div style="font-size: 12px; opacity: 0.8; margin-bottom: 12px;">« ${this.escapeHtml(this.activeAuthorFilter)} » ne contient pas de notes pour ${this.escapeHtml(data.book_french)} ${data.chapter}.</div>
+          <button type="button" class="comm-win-tool-btn" id="btn-reset-author-filter" style="margin: 0 auto; display: inline-flex;">
+            <span>Afficher tous les ouvrages</span>
+          </button>
+        </div>
+      `;
+    }
+
     container.innerHTML = html;
+
+    document.getElementById('btn-reset-author-filter')?.addEventListener('click', () => {
+      this.setAuthorFilter('all');
+    });
 
     // Attacher les clics sur les bandeaux de versets pour naviguer dans la fenêtre principale
     container.querySelectorAll('.comm-verse-quote-banner').forEach(banner => {
@@ -437,6 +468,15 @@ const CommentaryWindow = {
     const clean = txt.substring(0, 300).toLowerCase();
     const englishWords = [' the ', ' and ', ' that ', ' with ', ' from ', ' which ', ' this ', ' have ', ' shall ', ' unto '];
     return englishWords.some(w => clean.includes(w));
+  },
+
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
   },
 
   formatMarkdown(raw) {

@@ -2858,10 +2858,11 @@ class BibleAppApi:
             _COMMENTARY_RESTORE_BOUNDS = (wx + 40, wy + 40, ww - 80, wh - 80)
         else:
             main_wx, main_wy, main_ww, main_wh = get_work_area()
-            ww = min(1100, int(main_ww * 0.55))
-            wh = min(900, main_wh - 60)
-            wx = main_wx + main_ww - ww - 20
+            ww = min(960, int(main_ww * 0.48))
+            wh = min(860, main_wh - 60)
+            wx = max(main_wx + 20, main_wx + main_ww - ww - 30)
             wy = main_wy + 30
+            on_second_screen = False
             _COMMENTARY_IS_MAXIMIZED = False
             _COMMENTARY_RESTORE_BOUNDS = (wx, wy, ww, wh)
 
@@ -2889,9 +2890,9 @@ class BibleAppApi:
                 y=wy,
                 width=ww,
                 height=wh,
-                min_size=(650, 480),
+                min_size=(550, 400),
                 frameless=True,
-                easy_drag=False,
+                easy_drag=True,
                 background_color="#0F172A"
             )
             _COMMENTARY_WINDOW.events.shown += on_commentary_shown

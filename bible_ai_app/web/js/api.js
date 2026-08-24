@@ -294,6 +294,34 @@ const API = {
         { id: 'Segond_21', name: 'Segond 21', title: 'Bible Segond 21', version_code: 'S21', active: true }
       ];
     }
+    if (method === 'get_current_passage') {
+      return { book: 'Gen', book_french: 'Genèse', chapter: 1, verse: 1 };
+    }
+    if (method === 'get_chapter_commentaries_grouped') {
+      return {
+        book: args[0] || 'Gen',
+        book_french: 'Genèse',
+        chapter: parseInt(args[1]) || 1,
+        total_verses: 3,
+        available_sources: ['Bible annotée par A.C. Gaebelein', 'Commentaire Biblique de Matthew Henry'],
+        verses: [
+          {
+            verse: 1,
+            text: "Au commencement, Dieu créa les cieux et la terre.",
+            has_comments: true,
+            comments: [
+              {
+                id: 'gaebelein',
+                author: 'Bible annotée par A.C. Gaebelein',
+                source: 'Bible annotée par A.C. Gaebelein',
+                reference: 'Genèse 1:1',
+                text: 'La création du monde visible par la parole souveraine de Dieu.'
+              }
+            ]
+          }
+        ]
+      };
+    }
     if (method === 'get_chapter_data') {
       return {
         bible: args[0] || 'LSG',

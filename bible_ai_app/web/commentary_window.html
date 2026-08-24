@@ -40,17 +40,27 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 8px 0 12px;
+      padding: 0 8px 0 10px;
       -webkit-app-region: drag;
       z-index: 1000;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      user-select: none;
+      gap: 8px;
     }
 
     .comm-win-drag-group {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       -webkit-app-region: drag;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      cursor: grab;
+    }
+
+    .comm-win-drag-group:active {
+      cursor: grabbing;
     }
 
     .comm-win-logo-badge {
@@ -66,6 +76,8 @@
       background: rgba(249, 115, 22, 0.12);
       border: 1px solid rgba(249, 115, 22, 0.25);
       border-radius: 6px;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .comm-win-passage-pill {
@@ -79,6 +91,8 @@
       font-size: 13px;
       font-weight: 700;
       color: var(--text-primary, #F8FAFC);
+      flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .comm-win-sync-indicator {
@@ -93,6 +107,8 @@
       -webkit-app-region: no-drag;
       transition: all 0.2s ease;
       user-select: none;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .comm-win-sync-indicator.synced {
@@ -118,15 +134,16 @@
     .comm-win-actions-group {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       -webkit-app-region: no-drag;
+      flex-shrink: 0;
     }
 
     .comm-win-tool-btn {
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      padding: 4px 9px;
+      padding: 4px 8px;
       height: 28px;
       background: var(--bg-hover, rgba(255, 255, 255, 0.06));
       border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
@@ -137,6 +154,8 @@
       cursor: pointer;
       transition: all 0.15s ease;
       user-select: none;
+      flex-shrink: 0;
+      max-width: 220px;
     }
 
     .comm-win-tool-btn:hover {
@@ -155,10 +174,11 @@
     .comm-win-controls {
       display: flex;
       align-items: center;
-      margin-left: 8px;
+      margin-left: 4px;
       border-left: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-      padding-left: 8px;
+      padding-left: 4px;
       -webkit-app-region: no-drag;
+      flex-shrink: 0;
     }
 
     .comm-win-control-btn {
