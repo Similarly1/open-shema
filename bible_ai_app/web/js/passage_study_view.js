@@ -222,15 +222,29 @@ const PassageStudyView = {
     }
 
     // Rafraîchir la carte Leaflet lors de l'activation de l'onglet Contexte & Lieux
-    if (tabKey === 'context' && this.leafletMap) {
+    if (tabKey === 'context') {
+      const places = this.currentData?.encyclopedia?.places || [];
       setTimeout(() => {
-        if (this.leafletMap) {
-          this.leafletMap.invalidateSize();
-          if (this.mapBounds && this.mapBounds.isValid()) {
-            this.leafletMap.fitBounds(this.mapBounds, { padding: [35, 35], maxZoom: 12 });
+        const container = document.getElementById('ps-leaflet-map-container');
+        if (container) {
+          if (!this.leafletMap) {
+            this.initPassageMap(places);
+          } else {
+            this.leafletMap.invalidateSize(true);
+            if (this.mapBounds && this.mapBounds.isValid()) {
+              this.leafletMap.fitBounds(this.mapBounds, { padding: [35, 35], maxZoom: 12 });
+            } else {
+              this.leafletMap.setView([31.78, 35.23], 7);
+            }
           }
         }
-      }, 120);
+      }, 60);
+
+      setTimeout(() => {
+        if (this.leafletMap) {
+          this.leafletMap.invalidateSize(true);
+        }
+      }, 200);
     }
   },
 
@@ -1393,7 +1407,7 @@ const PassageStudyView = {
             <div class="ps-map-wrap">
               <div id="ps-leaflet-map-container" class="ps-leaflet-map"></div>
               <div class="ps-map-controls-overlay">
-                <button type="button" class="ps-map-overlay-btn" id="btn-ps-map-recenter" title="Recadrer la carte sur tous les lieux du passage">
+                <button type="button" class="ps-btn-sm ps-map-overlay-btn" id="btn-ps-map-recenter" title="Recadrer la carte sur tous les lieux du passage">
                   <span class="ps-icon-slot">${this.ICONS.compass}</span>
                   <span>Recadrer</span>
                 </button>
@@ -1412,7 +1426,7 @@ const PassageStudyView = {
                     <span class="ps-place-type-badge">${this.escapeHtml(p.place_type || 'Lieu')}</span>
                   </div>
                   ${(p.latitude !== null && p.latitude !== undefined) ? `
-                    <button type="button" class="ps-place-locate-btn" title="Centrer et zoomer sur la carte">
+                    <button type="button" class="ps-btn-sm ps-place-locate-btn" title="Centrer et zoomer sur la carte">
                       <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
                       <span>Localiser</span>
                     </button>
@@ -1490,12 +1504,6 @@ const PassageStudyView = {
     const articles = entry.articles || [article];
     const rawText = article.full_text || article.preview || '';
 
-    // Découper en paragraphes propres
-    const paragraphs = rawText
-      .split(/\n\s*\n/)
-      .map(p => p.trim())
-      .filter(p => p.length > 0);
-
     return `
       <div class="ps-dict-article-pane">
         <div class="ps-dict-article-header">
@@ -1507,7 +1515,7 @@ const PassageStudyView = {
           </div>
 
           <div class="ps-dict-article-actions">
-            <button type="button" class="ps-dict-action-btn" id="btn-ps-copy-dict-article" title="Copier la notice textuelle">
+            <button type="button" class="ps-btn-sm ps-dict-action-btn" id="btn-ps-copy-dict-article" title="Copier la notice textuelle">
               <span class="ps-icon-slot">${this.ICONS.copy}</span>
               <span>Copier</span>
             </button>
@@ -1518,7 +1526,7 @@ const PassageStudyView = {
         ${articles.length > 1 ? `
           <div class="ps-dict-sources-tabs">
             ${articles.map((art, idx) => `
-              <button type="button" class="ps-dict-source-tab ${idx === this.activeDictSourceIdx ? 'active' : ''}" data-idx="${idx}">
+              <button type="button" class="ps-btn-sm ps-dict-source-tab ${idx === this.activeDictSourceIdx ? 'active' : ''}" data-idx="${idx}">
                 <span class="ps-dict-source-tab-dot"></span>
                 <span>${this.escapeHtml(art.dict_name)}</span>
               </button>
@@ -1526,12 +1534,56 @@ const PassageStudyView = {
           </div>
         ` : ''}
 
-        <!-- Corps de l'article avec typographie aérée -->
-        <div class="ps-dict-article-body">
-          ${paragraphs.length > 0 ? paragraphs.map(p => `<p class="ps-dict-p">${this.formatDictionaryParagraph(p)}</p>`).join('') : `<p class="ps-dict-p">${this.escapeHtml(rawText)}</p>`}
+        <!-- Corps de l'article avec typographie Markdown formatée -->
+        <div class="ps-dict-article-body markdown-body">
+          ${this.formatDictionaryMarkdown(rawText)}
         </div>
       </div>
     `;
+  },
+
+  formatDictionaryMarkdown(md) {
+    if (!md) return '';
+    let text = this.escapeHtml(md);
+
+    // Titres #, ##, ###, ####
+    text = text.replace(/^####\s+(.*$)/gim, '<h4 class="ps-dict-h4">$1</h4>');
+    text = text.replace(/^###\s+(.*$)/gim, '<h3 class="ps-dict-h3">$1</h3>');
+    text = text.replace(/^##\s+(.*$)/gim, '<h2 class="ps-dict-h2">$1</h2>');
+    text = text.replace(/^#\s+(.*$)/gim, '<h1 class="ps-dict-h1">$1</h1>');
+
+    // Lignes horizontales --- ou *** ou ___
+    text = text.replace(/^(?:---|—|___|\*\*\*)\s*$/gim, '<hr class="ps-dict-hr">');
+
+    // Gras & Italique
+    text = text.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>');
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/\*([^\*\n]+)\*/g, '<em>$1</em>');
+    text = text.replace(/_([^_\n]+)_/g, '<em>$1</em>');
+
+    // Citations >
+    text = text.replace(/^&gt;\s+(.*$)/gim, '<blockquote class="ps-dict-quote">$1</blockquote>');
+
+    // Listes à puces - ou *
+    text = text.replace(/^[\*\-]\s+(.*$)/gim, '<li class="ps-dict-li">$1</li>');
+
+    // Découper en blocs par double saut de ligne
+    const blocks = text.split(/\n\s*\n/);
+    const htmlBlocks = blocks.map(b => {
+      b = b.trim();
+      if (!b) return '';
+      if (b.startsWith('<h1') || b.startsWith('<h2') || b.startsWith('<h3') || 
+          b.startsWith('<h4') || b.startsWith('<hr') || b.startsWith('<blockquote')) {
+        return b;
+      }
+      if (b.includes('<li class="ps-dict-li">')) {
+        return `<ul class="ps-dict-ul">${b.replace(/\n/g, '')}</ul>`;
+      }
+      const withBrs = b.replace(/\n/g, '<br>');
+      return `<p class="ps-dict-p">${withBrs}</p>`;
+    });
+
+    return htmlBlocks.filter(b => b.length > 0).join('\n');
   },
 
   initPassageMap(places) {
@@ -1616,37 +1668,55 @@ const PassageStudyView = {
       this.mapBounds = bounds;
       this.leafletMap.fitBounds(bounds, { padding: [35, 35], maxZoom: 12 });
     } else {
-      this.leafletMap.setView(defaultCenter, 8);
+      this.mapBounds = null;
+      this.leafletMap.setView(defaultCenter, 7);
     }
 
     setTimeout(() => {
-      if (this.leafletMap) this.leafletMap.invalidateSize();
-    }, 150);
+      if (this.leafletMap) this.leafletMap.invalidateSize(true);
+    }, 120);
   },
 
   bindEncyclopediaEvents(places, dicts) {
     // 1. Bouton Recadrer la carte
     document.getElementById('btn-ps-map-recenter')?.addEventListener('click', () => {
-      if (this.leafletMap && this.mapBounds && this.mapBounds.isValid()) {
-        this.leafletMap.fitBounds(this.mapBounds, { padding: [35, 35], maxZoom: 12 });
+      if (this.leafletMap) {
+        this.leafletMap.invalidateSize(true);
+        if (this.mapBounds && this.mapBounds.isValid()) {
+          this.leafletMap.fitBounds(this.mapBounds, { padding: [35, 35], maxZoom: 12 });
+        } else {
+          this.leafletMap.setView([31.78, 35.23], 7);
+        }
       }
     });
 
-    // 2. Clic sur les lieux de la liste
+    // 2. Clic sur les lieux de la liste et bouton Localiser
     document.querySelectorAll('.ps-place-item').forEach(item => {
-      item.addEventListener('click', () => {
+      const handleLocate = () => {
         const lat = parseFloat(item.dataset.lat);
         const lon = parseFloat(item.dataset.lon);
         const placeId = item.dataset.placeId;
 
-        if (!isNaN(lat) && !isNaN(lon) && this.leafletMap) {
-          this.leafletMap.flyTo([lat, lon], 12, { duration: 0.8 });
-          const matchedPlace = places.find(p => p.place_id === placeId);
-          if (matchedPlace && matchedPlace._leafletMarker) {
-            matchedPlace._leafletMarker.openPopup();
+        if (!isNaN(lat) && !isNaN(lon)) {
+          if (!this.leafletMap) {
+            this.initPassageMap(places);
+          }
+          if (this.leafletMap) {
+            this.leafletMap.invalidateSize(true);
+            this.leafletMap.flyTo([lat, lon], 12, { duration: 0.8 });
+            const matchedPlace = places.find(p => p.place_id === placeId);
+            if (matchedPlace && matchedPlace._leafletMarker) {
+              matchedPlace._leafletMarker.openPopup();
+            }
           }
           this.highlightPlaceInList(placeId);
         }
+      };
+
+      item.addEventListener('click', handleLocate);
+      item.querySelector('.ps-place-locate-btn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        handleLocate();
       });
     });
 
@@ -1806,11 +1876,6 @@ const PassageStudyView = {
         item.classList.remove('active');
       }
     });
-  },
-
-  formatDictionaryParagraph(text) {
-    if (!text) return '';
-    return this.escapeHtml(text);
   },
 
   // =========================================================================

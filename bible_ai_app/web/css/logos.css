@@ -17243,54 +17243,616 @@ body.theme-light .ps-select-sm optgroup {
   font-size: 13.5px;
 }
 
-/* --- CONTEXTE HISTORIQUE & LIEUX --- */
-.ps-grid-2col {
+/* =========================================================================
+   CONTEXTE HISTORIQUE, CARTOGRAPHIE & DICTIONNAIRES (PASSAGE STUDY)
+   ========================================================================= */
+.ps-grid-2col.ps-encyclopedia-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+  align-items: start;
 }
 
-@media (max-width: 860px) {
-  .ps-grid-2col {
+@media (max-width: 960px) {
+  .ps-grid-2col.ps-encyclopedia-grid {
     grid-template-columns: 1fr;
   }
 }
 
-.ps-places-list, .ps-dict-entries-list {
+.ps-places-card,
+.ps-dict-card {
   display: flex;
   flex-direction: column;
-  gap: 10px;
 }
 
-.ps-place-item, .ps-dict-entry-card {
+/* CARTE LEAFLET INTERACTIVE */
+.ps-map-section {
+  margin-bottom: 12px;
+}
+
+.ps-map-wrap {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  min-height: 280px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  background-color: #161b24;
+}
+
+body.reading-bg-white .ps-map-wrap,
+body.theme-light .ps-map-wrap {
+  background-color: #f1f5f9;
+}
+
+.ps-leaflet-map {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 280px !important;
+  display: block;
+  z-index: 1;
+}
+
+.ps-map-controls-overlay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+}
+
+.ps-map-overlay-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background-color: rgba(20, 24, 33, 0.88);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  transition: all 0.15s ease;
+}
+
+.ps-map-overlay-btn:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--accent-amber, #f59e0b);
+  color: var(--accent-amber, #fbbf24);
+  transform: translateY(-1px);
+}
+
+body.reading-bg-white .ps-map-overlay-btn,
+body.theme-light .ps-map-overlay-btn {
+  background-color: rgba(255, 255, 255, 0.95);
+  color: #1e293b;
+  border-color: #cbd5e1;
+}
+
+/* Marqueurs Leaflet */
+.ps-custom-map-pin {
+  background: transparent;
+  border: none;
+}
+
+.ps-pin-marker {
+  width: 26px;
+  height: 26px;
+  border-radius: 50% 50% 50% 0;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  position: absolute;
+  transform: rotate(-45deg);
+  left: 50%;
+  top: 50%;
+  margin: -20px 0 0 -13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.ps-pin-marker:hover {
+  transform: rotate(-45deg) scale(1.15);
+}
+
+.ps-pin-inner {
+  transform: rotate(45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.leaflet-popup-content-wrapper {
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+.leaflet-popup-tip {
+  background: var(--bg-surface) !important;
+}
+
+.ps-leaflet-popup {
+  padding: 4px 2px;
+}
+
+.ps-lpopup-title {
+  font-weight: 800;
+  font-size: 13.5px;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.ps-lpopup-type {
+  font-size: 10px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--accent-amber, #f59e0b);
+  margin-bottom: 6px;
+}
+
+.ps-lpopup-desc {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Liste des lieux */
+.ps-places-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.ps-place-item {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  padding: 10px 14px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
-.ps-place-header, .ps-dict-entry-header {
+.ps-place-item:hover {
+  background-color: var(--bg-hover);
+  border-color: rgba(245, 158, 11, 0.5);
+  transform: translateY(-1px);
+}
+
+.ps-place-item.active {
+  background-color: rgba(245, 158, 11, 0.12) !important;
+  border-color: #f59e0b !important;
+}
+
+.ps-place-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   margin-bottom: 4px;
 }
 
-.ps-place-name, .ps-dict-entry-title {
+.ps-place-info-main {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.ps-place-pin-icon {
+  display: inline-flex;
+  color: var(--accent-amber, #f59e0b);
+}
+
+.ps-place-name {
   font-weight: 700;
-  font-size: 13.5px;
+  font-size: 13px;
+  color: var(--text-primary);
 }
 
-.ps-place-coords, .ps-dict-badge {
+.ps-place-type-badge {
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+body.reading-bg-white .ps-place-type-badge,
+body.theme-light .ps-place-type-badge {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+.ps-place-locate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: 11px;
-  color: var(--text-muted);
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 5px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
-.ps-place-desc, .ps-dict-entry-snippet {
-  font-size: 12px;
+.ps-place-locate-btn:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--accent-amber, #f59e0b);
+  color: var(--accent-amber, #fbbf24);
+  transform: translateY(-1px);
+}
+
+body.reading-bg-white .ps-place-locate-btn,
+body.theme-light .ps-place-locate-btn {
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+.ps-place-desc {
+  font-size: 11.5px;
   color: var(--text-secondary);
   line-height: 1.4;
   margin: 0;
+}
+
+/* =========================================================================
+   DICTIONNAIRES & LECTEUR DE NOTICES HISTORIQUES
+   ========================================================================= */
+.ps-dict-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ps-dict-search-input-wrap {
+  position: relative;
+  flex: 1;
+}
+
+.ps-dict-search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+.ps-dict-search-input {
+  width: 100%;
+  padding: 7px 10px 7px 30px;
+  border-radius: 6px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 12.5px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.ps-dict-search-input:focus {
+  border-color: var(--accent-amber, #f59e0b);
+}
+
+.ps-btn-search-dict {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.ps-btn-search-dict:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--accent-amber, #f59e0b);
+  color: var(--accent-amber, #fbbf24);
+}
+
+body.reading-bg-white .ps-btn-search-dict,
+body.theme-light .ps-btn-search-dict {
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+/* Barre de chips pour les termes détectés */
+.ps-dict-chips-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.ps-dict-chips-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.ps-dict-chips-scroll {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 2px 0;
+  scrollbar-width: thin;
+}
+
+.ps-dict-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  border-radius: 18px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.ps-dict-chip:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--accent-amber, #f59e0b);
+  transform: translateY(-1px);
+}
+
+.ps-dict-chip.active {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+  color: var(--accent-amber, #fbbf24) !important;
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 0 1px #f59e0b;
+}
+
+body.reading-bg-white .ps-dict-chip,
+body.theme-light .ps-dict-chip {
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+body.reading-bg-white .ps-dict-chip.active,
+body.theme-light .ps-dict-chip.active {
+  background-color: #fef3c7 !important;
+  color: #b45309 !important;
+  border-color: #f59e0b !important;
+}
+
+.ps-dict-chip-count {
+  font-size: 9.5px;
+  padding: 1px 5px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+}
+
+.ps-dict-chip.active .ps-dict-chip-count {
+  background-color: rgba(245, 158, 11, 0.4);
+  color: #ffffff;
+}
+
+/* Lecteur de dictionnaire */
+.ps-dict-reader-container {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 14px 16px;
+  max-height: 480px;
+  overflow-y: auto;
+  line-height: 1.7;
+}
+
+.ps-dict-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 10px;
+  text-align: center;
+  color: var(--text-secondary);
+  gap: 8px;
+  font-size: 12.5px;
+}
+
+.ps-dict-article-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.ps-dict-article-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 5px 0;
+  letter-spacing: 0.3px;
+}
+
+.ps-dict-source-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-amber, #f59e0b);
+  background-color: rgba(245, 158, 11, 0.12);
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.ps-dict-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ps-dict-action-btn:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--accent-amber, #f59e0b);
+  color: var(--accent-amber, #fbbf24);
+  transform: translateY(-1px);
+}
+
+body.reading-bg-white .ps-dict-action-btn,
+body.theme-light .ps-dict-action-btn {
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+/* Onglets multi-sources */
+.ps-dict-sources-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+  overflow-x: auto;
+}
+
+.ps-dict-source-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.ps-dict-source-tab:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--accent-amber, #f59e0b);
+}
+
+.ps-dict-source-tab.active {
+  background-color: rgba(245, 158, 11, 0.2);
+  color: var(--accent-amber, #fbbf24);
+  border-color: #f59e0b;
+  font-weight: 700;
+}
+
+body.reading-bg-white .ps-dict-source-tab,
+body.theme-light .ps-dict-source-tab {
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+body.reading-bg-white .ps-dict-source-tab.active,
+body.theme-light .ps-dict-source-tab.active {
+  background-color: #fef3c7;
+  color: #b45309;
+  border-color: #f59e0b;
+}
+
+.ps-dict-source-tab-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+/* Corps de l'article avec typographie Markdown */
+.ps-dict-article-body {
+  font-size: 13.5px;
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+.ps-dict-article-body h1,
+.ps-dict-article-body h2,
+.ps-dict-article-body h3,
+.ps-dict-article-body h4 {
+  color: var(--text-primary);
+  margin-top: 14px;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.ps-dict-article-body h1 { font-size: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px; }
+.ps-dict-article-body h2 { font-size: 14.5px; }
+.ps-dict-article-body h3 { font-size: 13.5px; }
+
+.ps-dict-article-body strong {
+  font-weight: 700;
+  color: var(--accent-amber, #fbbf24);
+}
+
+body.reading-bg-white .ps-dict-article-body strong,
+body.theme-light .ps-dict-article-body strong {
+  color: #b45309;
+}
+
+.ps-dict-article-body hr {
+  border: 0;
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 14px 0;
+}
+
+.ps-dict-article-body ul {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+
+.ps-dict-article-body li {
+  margin-bottom: 4px;
+}
+
+.ps-dict-article-body p {
+  margin: 0 0 10px 0;
+  text-align: justify;
 }
 
 /* --- ATELIER EXÉGÈSE IA --- */
@@ -17907,21 +18469,35 @@ body.theme-light .ps-select-sm optgroup {
   color: var(--text-secondary);
 }
 
-.ps-drawer-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 10px;
+.ps-author-body {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-primary);
 }
 
-.ps-drawer-item {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 10px 12px;
+.ps-comm-synth-box {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--accent-blue);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
 }
 
-.ps-drawer-item-header {
+.ps-synth-header {
   display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: var(--accent-blue);
+  font-weight: 700;
+  font-size: 13.5px;
+}
+
+/* =========================================================================
+   CONTEXTE HISTORIQUE, CARTOGRAPHIE & DICTIONNAIRES (PASSAGE STUDY)
+   ========================================================================= */
+.ps-grid-2col.ps-encyclopedia-grid {
+  display: grid;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 6px;
