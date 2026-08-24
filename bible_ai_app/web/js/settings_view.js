@@ -465,21 +465,28 @@ Directives de rédaction :
       }
     });
 
+    document.getElementById('btn-open-modal-profile-prompt')?.addEventListener('click', () => {
+      this.openPromptModal('theological_profile');
+    });
+
     document.getElementById('btn-regenerate-profile-prompt')?.addEventListener('click', async () => {
       const btn = document.getElementById('btn-regenerate-profile-prompt');
-      if (btn) btn.innerHTML = '<span>Génération...</span>';
+      if (btn) btn.innerHTML = '<span>Régénération...</span>';
       try {
         const res = await API.call('generate_theological_profile_summary');
         if (res && res.success) {
           this.loadTheologicalProfileCard();
+          if (typeof AIStudyView !== 'undefined' && AIStudyView.loadTheologicalProfileBadge) {
+            AIStudyView.loadTheologicalProfileBadge();
+          }
           if (typeof App !== 'undefined' && App.showToast) {
-            App.showToast("Synthèse herméneutique régénérée avec succès !");
+            App.showToast("Passeport Herméneutique régénéré avec succès !");
           }
         }
       } catch (e) {
         alert("Erreur lors de la régénération : " + (e?.message || e));
       } finally {
-        if (btn) btn.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg><span>Régénérer</span>';
+        if (btn) btn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg><span>Régénérer</span>';
       }
     });
   },
@@ -520,13 +527,11 @@ Directives de rédaction :
       const countryEl = document.getElementById('lbl-profile-country');
       if (countryEl) countryEl.textContent = profile.country_culture || "France";
 
-      const promptBox = document.getElementById('theological-profile-prompt-text');
-      if (promptBox) {
-        if (profile.system_profile_prompt && profile.system_profile_prompt.trim()) {
-          promptBox.textContent = profile.system_profile_prompt.trim();
-        } else {
-          promptBox.textContent = "Aucune synthèse générée. Cliquez sur 'Modifier le profil' pour calibrer l'assistant.";
-        }
+      const badgeEl = document.getElementById('badge-profile-prompt-status');
+      if (badgeEl) {
+        const hasPrompt = profile.system_profile_prompt && profile.system_profile_prompt.trim().length > 0;
+        badgeEl.textContent = hasPrompt ? 'Généré par IA' : 'À configurer';
+        badgeEl.className = `prompt-status-badge ${hasPrompt ? 'is-custom' : 'is-default'}`;
       }
     } catch (e) {
       console.warn("Erreur chargement carte profil théologique :", e);
@@ -1039,13 +1044,16 @@ Directives de rédaction :
   // =========================================================
   // GESTIONNAIRE DE MODALE DE PROMPT SYSTÈME DÉDIÉE
   // =========================================================
-  openPromptModal(type) {
+  async openPromptModal(type) {
     this.currentEditingPrompt = type;
     const titleEl = document.getElementById('system-prompt-modal-title');
     const textarea = document.getElementById('modal-prompt-textarea');
+    const btnReset = document.getElementById('btn-modal-reset-default');
 
     if (titleEl) {
-      if (type === 'synthesis') {
+      if (type === 'theological_profile') {
+        titleEl.textContent = 'System Prompt — Passeport Herméneutique (« Mon Église »)';
+      } else if (type === 'synthesis') {
         titleEl.textContent = 'System Prompt — Synthèse Exégétique IA';
       } else if (type === 'translation') {
         titleEl.textContent = 'System Prompt — Traduction Fidèle d\'Articles';
@@ -1054,8 +1062,22 @@ Directives de rédaction :
       }
     }
 
+    if (btnReset) {
+      btnReset.style.display = 'inline-flex';
+      btnReset.style.alignItems = 'center';
+      btnReset.style.gap = '6px';
+      if (type === 'theological_profile') {
+        btnReset.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg><span>Régénérer via IA</span>';
+      } else {
+        btnReset.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg><span>Rétablir par défaut</span>';
+      }
+    }
+
     let currentVal = '';
-    if (type === 'synthesis') {
+    if (type === 'theological_profile') {
+      const profile = await API.call('get_theological_profile') || {};
+      currentVal = profile.system_profile_prompt || '';
+    } else if (type === 'synthesis') {
       currentVal = document.getElementById('cfg-synthesis-system-prompt')?.value || this.DEFAULT_SYNTH_PROMPT;
     } else if (type === 'translation') {
       currentVal = document.getElementById('cfg-translation-system-prompt')?.value || this.DEFAULT_TRANS_PROMPT;
@@ -1122,12 +1144,18 @@ Directives de rédaction :
     if (lineEl) lineEl.textContent = `${lineCount.toLocaleString()} lignes`;
 
     if (badgeEl && this.currentEditingPrompt) {
-      let def = this.DEFAULT_SYNTH_PROMPT;
-      if (this.currentEditingPrompt === 'translation') def = this.DEFAULT_TRANS_PROMPT;
-      if (this.currentEditingPrompt === 'summary') def = this.DEFAULT_SUMMARY_PROMPT;
-      const isDef = val.trim() === def.trim();
-      badgeEl.textContent = isDef ? 'Par défaut' : 'Personnalisé';
-      badgeEl.className = `prompt-status-badge ${isDef ? 'is-default' : 'is-custom'}`;
+      if (this.currentEditingPrompt === 'theological_profile') {
+        const isCustom = val.trim().length > 0;
+        badgeEl.textContent = isCustom ? 'Généré par IA' : 'À configurer';
+        badgeEl.className = `prompt-status-badge ${isCustom ? 'is-custom' : 'is-default'}`;
+      } else {
+        let def = this.DEFAULT_SYNTH_PROMPT;
+        if (this.currentEditingPrompt === 'translation') def = this.DEFAULT_TRANS_PROMPT;
+        if (this.currentEditingPrompt === 'summary') def = this.DEFAULT_SUMMARY_PROMPT;
+        const isDef = val.trim() === def.trim();
+        badgeEl.textContent = isDef ? 'Par défaut' : 'Personnalisé';
+        badgeEl.className = `prompt-status-badge ${isDef ? 'is-default' : 'is-custom'}`;
+      }
     }
   },
 
@@ -1142,6 +1170,18 @@ Directives de rédaction :
   async savePromptFromModal() {
     if (!this.currentEditingPrompt) return;
     const val = document.getElementById('modal-prompt-textarea')?.value || '';
+
+    if (this.currentEditingPrompt === 'theological_profile') {
+      await API.call('save_theological_profile', { system_profile_prompt: val }, false);
+      this.closePromptModal();
+      this.loadTheologicalProfileCard();
+      if (typeof AIStudyView !== 'undefined' && AIStudyView.loadTheologicalProfileBadge) {
+        AIStudyView.loadTheologicalProfileBadge();
+      }
+      App.showToast('Passeport Herméneutique appliqué et enregistré !');
+      return;
+    }
+
     let targetFieldId = 'cfg-synthesis-system-prompt';
     if (this.currentEditingPrompt === 'translation') targetFieldId = 'cfg-translation-system-prompt';
     if (this.currentEditingPrompt === 'summary') targetFieldId = 'cfg-summary-system-prompt';
@@ -1157,8 +1197,35 @@ Directives de rédaction :
     App.showToast('Prompt système appliqué et enregistré !');
   },
 
-  resetPromptInModal() {
+  async resetPromptInModal() {
     if (!this.currentEditingPrompt) return;
+
+    if (this.currentEditingPrompt === 'theological_profile') {
+      const btn = document.getElementById('btn-modal-reset-default');
+      if (btn) btn.innerHTML = '<span>Régénération...</span>';
+      try {
+        const res = await API.call('generate_theological_profile_summary');
+        if (res && res.success) {
+          const textarea = document.getElementById('modal-prompt-textarea');
+          if (textarea) textarea.value = res.summary || '';
+          this.updatePromptModalStats();
+          if (this.activeModalTab === 'preview') {
+            this.renderPromptPreview();
+          }
+          this.loadTheologicalProfileCard();
+          if (typeof AIStudyView !== 'undefined' && AIStudyView.loadTheologicalProfileBadge) {
+            AIStudyView.loadTheologicalProfileBadge();
+          }
+          App.showToast('Passeport Herméneutique régénéré par l\'IA !');
+        }
+      } catch (e) {
+        alert('Erreur régénération : ' + (e?.message || e));
+      } finally {
+        if (btn) btn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg><span>Régénérer via IA</span>';
+      }
+      return;
+    }
+
     let def = this.DEFAULT_SYNTH_PROMPT;
     let label = 'Synthèse';
     if (this.currentEditingPrompt === 'translation') {

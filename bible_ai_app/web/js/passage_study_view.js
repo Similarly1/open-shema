@@ -46,6 +46,13 @@ const PassageStudyView = {
     showAdded: true,
     showRemoved: true
   },
+  gospelSynopsisState: {
+    activePericopeId: null,
+    pivotBook: null,
+    colLangs: { MAT: 'fr', MRK: 'fr', LUK: 'fr', JHN: 'fr' },
+    diffEnabled: true,
+    viewMode: 'text'
+  },
   isLoading: false,
 
   // Icônes SVG sobres
@@ -229,6 +236,12 @@ const PassageStudyView = {
       }
 
       this.currentData = data;
+      if (data.gospel_synopsis?.has_synoptic) {
+        this.gospelSynopsisState.activePericopeId = data.gospel_synopsis.primary_pericope_id || null;
+        this.gospelSynopsisState.pivotBook = data.book_code || 'MAT';
+        this.gospelSynopsisState.colLangs = { MAT: 'fr', MRK: 'fr', LUK: 'fr', JHN: 'fr' };
+        this.gospelSynopsisState.diffEnabled = true;
+      }
       this.renderHeader();
       this.renderScripture();
       this.renderOriginalLanguage();
@@ -311,7 +324,7 @@ const PassageStudyView = {
   },
 
   // =========================================================================
-  // 1. SECTION TEXTE FRANÇAIS & SYNOPTIQUE
+  // 1. SECTION TEXTE FRANÇAIS, SYNOPSE DES ÉVANGILES & COMPARAISON MULTI-VERSIONS
   // =========================================================================
   renderScripture() {
     const sc = this.currentData?.scripture;
@@ -321,6 +334,9 @@ const PassageStudyView = {
     const mainVersion = sc.main_version || 'LSG';
     const synoptic = sc.synoptic_matrix || [];
     const availableVersions = sc.available_versions || [mainVersion];
+    const gospelSyn = this.currentData?.gospel_synopsis;
+    const hasGospelSyn = gospelSyn && gospelSyn.has_synoptic && gospelSyn.pericopes && gospelSyn.pericopes.length > 0;
+    const vParMap = gospelSyn?.verse_parallels || {};
 
     let html = `
       <div class="ps-card ps-scripture-card">
@@ -335,10 +351,16 @@ const PassageStudyView = {
               <span class="ps-icon-slot">${this.ICONS.copy}</span>
               <span>Copier</span>
             </button>
-            <button type="button" class="ps-btn-sm ps-btn-accent" id="btn-ps-toggle-synoptic" title="Afficher la matrice comparative multi-versions">
+            <button type="button" class="ps-btn-sm ps-btn-accent" id="btn-ps-toggle-synoptic" title="Afficher la matrice comparative des traductions (LSG, S21, Chouraqui...)">
               <span class="ps-icon-slot">${this.ICONS.layers}</span>
               <span>Comparer les versions</span>
             </button>
+            ${hasGospelSyn ? `
+              <button type="button" class="ps-btn-sm ps-btn-gospel-synopsis" id="btn-ps-toggle-gospel-synopsis" title="Afficher l'harmonie synoptique des Évangiles (Mt // Mc // Lc // Jn)">
+                <span class="ps-icon-slot">${this.ICONS.compass}</span>
+                <span>Harmonie des Évangiles</span>
+              </button>
+            ` : ''}
           </div>
         </div>
 
@@ -346,22 +368,64 @@ const PassageStudyView = {
     `;
 
     verses.forEach(v => {
+      const vPar = vParMap[v.key];
+      const parBadgeHtml = vPar ? `
+        <button type="button" class="ps-parallel-badge" data-verse-key="${v.key}" title="Parallèles : ${this.escapeHtml(vPar.title_fr)}">
+          <span class="ps-badge-icon">☵</span>
+          <span>${this.escapeHtml(vPar.badges_str)}</span>
+        </button>
+      ` : '';
+
+      const drawerHtml = vPar ? `
+        <div class="ps-inline-parallel-drawer hidden" id="ps-drawer-${v.key.replace(':', '-')}">
+          <div class="ps-drawer-header">
+            <div class="ps-drawer-title-group">
+              <span class="ps-drawer-title">Parallèles · ${this.escapeHtml(vPar.title_fr)}</span>
+              <span class="ps-badge ps-badge-neutral">${this.escapeHtml(vPar.tradition_type || 'Synopse')}</span>
+            </div>
+            <button type="button" class="ps-btn-xs ps-btn-accent btn-open-gospel-synopsis" data-pericope-id="${vPar.pericope_id}" title="Ouvrir le tableau synoptique complet">
+              <span>Voir la synopse complète ➔</span>
+            </button>
+          </div>
+          <div class="ps-drawer-grid">
+            ${vPar.items.map(item => `
+              <div class="ps-drawer-item">
+                <div class="ps-drawer-item-header">
+                  <span class="ps-drawer-item-ref">${this.escapeHtml(item.french_book)} (${item.abbr}) ${this.escapeHtml(item.ref.replace(item.book + ' ', ''))}</span>
+                  <span class="ps-drawer-item-badge">${this.escapeHtml(mainVersion)}</span>
+                </div>
+                <div class="ps-drawer-item-text">${this.escapeHtml(item.text || 'Texte non disponible')}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : '';
+
       html += `
         <div class="ps-verse-row" data-verse-key="${v.key}">
           <span class="ps-verse-num">${v.chapter}:${v.verse}</span>
           <span class="ps-verse-text">${this.escapeHtml(v.text)}</span>
+          ${parBadgeHtml}
         </div>
+        ${drawerHtml}
       `;
     });
 
     html += `
         </div>
 
-        <!-- Panneau de comparaison synoptique escamotable -->
+        <!-- Panneau d'Harmonie des Évangiles (Niveau 2) -->
+        ${hasGospelSyn ? `
+          <div class="ps-gospel-synopsis-panel hidden" id="ps-gospel-synopsis-panel">
+            <!-- Injecté dynamiquement par renderGospelSynopsisView() -->
+          </div>
+        ` : ''}
+
+        <!-- Panneau de comparaison synoptique multi-traductions escamotable -->
         <div class="ps-synoptic-panel hidden" id="ps-synoptic-panel">
           <div class="ps-synoptic-header">
             <div class="ps-synoptic-header-left">
-              <div class="ps-synoptic-title">Comparaison synoptique multi-traductions</div>
+              <div class="ps-synoptic-title">Comparaison des versions & traductions</div>
               <div class="ps-synoptic-diff-controls">
                 <button type="button" class="ps-diff-toggle-btn ${this.diffOptions.enabled ? 'active' : ''}" id="btn-ps-toggle-diff" title="Activer / désactiver la mise en valeur des variantes">
                   <span class="ps-icon-slot">${this.ICONS.layers}</span>
@@ -430,6 +494,7 @@ const PassageStudyView = {
       setTimeout(() => { if (slot) slot.innerHTML = this.ICONS.copy; }, 1800);
     });
 
+    // 1. Bouton Comparer les versions
     const synPanel = document.getElementById('ps-synoptic-panel');
     const btnToggleSyn = document.getElementById('btn-ps-toggle-synoptic');
     btnToggleSyn?.addEventListener('click', () => {
@@ -437,6 +502,48 @@ const PassageStudyView = {
       if (!synPanel?.classList.contains('hidden')) {
         this.renderSynopticTable();
       }
+    });
+
+    // 2. Bouton Harmonie des Évangiles (Vue Synopse Plein Écran)
+    const gospelPanel = document.getElementById('ps-gospel-synopsis-panel');
+    const btnToggleGospelSyn = document.getElementById('btn-ps-toggle-gospel-synopsis');
+    btnToggleGospelSyn?.addEventListener('click', () => {
+      gospelPanel?.classList.toggle('hidden');
+      const isOpen = !gospelPanel?.classList.contains('hidden');
+      btnToggleGospelSyn.classList.toggle('active', isOpen);
+      if (isOpen) {
+        this.renderGospelSynopsisView();
+        gospelPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    });
+
+    // 3. Clic sur les badges de parallèles (Niveau 1 : Tiroir accordéon)
+    document.querySelectorAll('.ps-parallel-badge').forEach(badge => {
+      badge.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const vKey = badge.dataset.verseKey;
+        const drawer = document.getElementById(`ps-drawer-${vKey.replace(':', '-')}`);
+        if (drawer) {
+          drawer.classList.toggle('hidden');
+          badge.classList.toggle('active', !drawer.classList.contains('hidden'));
+        }
+      });
+    });
+
+    // 4. Clic sur "Voir la synopse complète" à l'intérieur du tiroir accordéon
+    document.querySelectorAll('.btn-open-gospel-synopsis').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const pid = parseInt(btn.dataset.pericopeId);
+        const gPanel = document.getElementById('ps-gospel-synopsis-panel');
+        const gBtn = document.getElementById('btn-ps-toggle-gospel-synopsis');
+        if (gPanel) {
+          gPanel.classList.remove('hidden');
+          if (gBtn) gBtn.classList.add('active');
+          this.switchSynopsisPericope(pid);
+          gPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
     });
 
     document.getElementById('ps-synoptic-ver2-select')?.addEventListener('change', () => {
@@ -712,6 +819,244 @@ const PassageStudyView = {
     `;
 
     container.innerHTML = html;
+  },
+
+  // =========================================================================
+  // 1.1 VUE SYNOPSE DES 4 ÉVANGILES (HARMONIE COMPLÈTE & DIFFING DES ACCORDS)
+  // =========================================================================
+  async switchSynopsisPericope(pericopeId) {
+    if (!pericopeId) return;
+    this.gospelSynopsisState.activePericopeId = pericopeId;
+    const activeBible = (typeof BibleReader !== 'undefined' && BibleReader.currentBible) || 'LSG';
+    const res = await API.getSynopticHarmony(pericopeId, activeBible, this.gospelSynopsisState.pivotBook);
+    if (res && res.success && res.matrix) {
+      this.renderGospelSynopsisView(res.matrix);
+    }
+  },
+
+  async switchSynopsisPivot(pivotBook) {
+    if (!pivotBook) return;
+    this.gospelSynopsisState.pivotBook = pivotBook;
+    const pid = this.gospelSynopsisState.activePericopeId || this.currentData?.gospel_synopsis?.primary_pericope_id;
+    const activeBible = (typeof BibleReader !== 'undefined' && BibleReader.currentBible) || 'LSG';
+    const res = await API.getSynopticHarmony(pid, activeBible, pivotBook);
+    if (res && res.success && res.matrix) {
+      this.renderGospelSynopsisView(res.matrix);
+    }
+  },
+
+  renderGospelSynopsisView(customMatrix = null) {
+    const container = document.getElementById('ps-gospel-synopsis-panel');
+    if (!container) return;
+
+    const synData = this.currentData?.gospel_synopsis;
+    if (!synData || !synData.has_synoptic) return;
+
+    const matrix = customMatrix || synData.synopsis_matrix;
+    if (!matrix) {
+      container.innerHTML = `<div class="ps-card ps-empty-card"><p>Aucune harmonie synoptique trouvée pour ce passage.</p></div>`;
+      return;
+    }
+
+    const pericopes = synData.pericopes || [];
+    const activePid = this.gospelSynopsisState.activePericopeId || matrix.pericope_id;
+    const pivot = this.gospelSynopsisState.pivotBook || matrix.pivot_book || 'MAT';
+    const colLangs = this.gospelSynopsisState.colLangs || { MAT: 'fr', MRK: 'fr', LUK: 'fr', JHN: 'fr' };
+    const diffEnabled = this.gospelSynopsisState.diffEnabled;
+
+    const traditionLabels = {
+      triple: "Tradition Triple (Mt // Mc // Lc)",
+      quadruple: "Tradition Quadruple (Mt // Mc // Lc // Jn)",
+      double_q: "Tradition Double / Source Q (Mt // Lc)",
+      double: "Tradition Double",
+      sondergut_mat: "Propre à Matthieu (Sondergut)",
+      sondergut_mrk: "Propre à Marc (Sondergut)",
+      sondergut_luk: "Propre à Luc (Sondergut)",
+      sondergut_jhn: "Propre à Jean (Sondergut)",
+      single: "Récit Unique"
+    };
+
+    const tradClass = `ps-tradition-${matrix.tradition_type || 'single'}`;
+    const tradLabel = traditionLabels[matrix.tradition_type] || matrix.tradition_type;
+
+    let html = `
+      <div class="ps-gospel-synopsis-toolbar">
+        <div class="ps-synopsis-toolbar-left">
+          <div class="ps-synopsis-pericope-select-group">
+            <label for="ps-synopsis-pericope-select" style="font-size: 11.5px; opacity: 0.8; font-weight: 600;">Péricope :</label>
+            <select id="ps-synopsis-pericope-select" class="ps-select-sm" style="max-width: 320px;">
+              ${pericopes.map(p => `
+                <option value="${p.id}" ${p.id === activePid ? 'selected' : ''}>#${p.id} · ${this.escapeHtml(p.title_fr)}</option>
+              `).join('')}
+            </select>
+          </div>
+          <span class="ps-synopsis-tradition-badge ${tradClass}">${this.escapeHtml(tradLabel)}</span>
+        </div>
+
+        <div class="ps-synoptic-diff-controls">
+          <button type="button" class="ps-diff-toggle-btn ${diffEnabled ? 'active' : ''}" id="btn-ps-toggle-gospel-diff" title="Mettre en valeur les mots partagés par les évangélistes">
+            <span class="ps-icon-slot">${this.ICONS.layers}</span>
+            <span>Accords synoptiques</span>
+          </button>
+          <span class="ps-diff-legend-pill" style="background: rgba(6,182,212,0.18); color:#06b6d4; border: 1px solid rgba(6,182,212,0.35);">Triple (3+)</span>
+          <span class="ps-diff-legend-pill" style="background: rgba(245,158,11,0.18); color:#f59e0b; border: 1px solid rgba(245,158,11,0.35);">Double (2)</span>
+        </div>
+      </div>
+
+      <div class="ps-gospel-synopsis-table-wrap">
+        <table class="ps-gospel-synopsis-table">
+          <thead>
+            <tr>
+              ${matrix.columns.map(col => {
+                const isPivot = col.book === pivot;
+                const lang = colLangs[col.book] || 'fr';
+                const colWidth = (100 / matrix.columns.length).toFixed(1) + '%';
+                return `
+                  <th style="width: ${colWidth};" class="${isPivot ? 'ps-syn-th-pivot' : ''}">
+                    <div class="ps-syn-col-header-box">
+                      <div class="ps-syn-col-header-top">
+                        <div class="ps-syn-book-name">
+                          <span>${this.escapeHtml(col.french_name)}</span>
+                          ${isPivot ? `<span class="ps-syn-pivot-badge">Pivot</span>` : ''}
+                        </div>
+                        <div class="ps-syn-col-controls">
+                          <button type="button" class="ps-btn-pivot ${isPivot ? 'active' : ''}" data-pivot-book="${col.book}" title="Faire de cet évangile le pivot chronologique">
+                            <span>Pivot</span>
+                          </button>
+                          <div class="ps-col-lang-toggle" data-col-book="${col.book}">
+                            <button type="button" class="ps-lang-btn ${lang === 'fr' ? 'active' : ''}" data-lang="fr">FR</button>
+                            <button type="button" class="ps-lang-btn ${lang === 'gr' ? 'active' : ''}" data-lang="gr">GR</button>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="ps-syn-col-ref">${this.escapeHtml(col.ref || '')}</div>
+                    </div>
+                  </th>
+                `;
+              }).join('')}
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+    matrix.rows.forEach(row => {
+      const renderedCells = this.renderSynopticRowCells(row.cells, matrix.columns, colLangs, diffEnabled);
+      html += `<tr>${renderedCells}</tr>`;
+    });
+
+    html += `
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    container.innerHTML = html;
+
+    // Attach events
+    document.getElementById('ps-synopsis-pericope-select')?.addEventListener('change', (e) => {
+      const pid = parseInt(e.target.value);
+      this.switchSynopsisPericope(pid);
+    });
+
+    document.getElementById('btn-ps-toggle-gospel-diff')?.addEventListener('click', () => {
+      this.gospelSynopsisState.diffEnabled = !this.gospelSynopsisState.diffEnabled;
+      this.renderGospelSynopsisView();
+    });
+
+    document.querySelectorAll('.ps-btn-pivot').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const bCode = btn.dataset.pivotBook;
+        if (bCode) this.switchSynopsisPivot(bCode);
+      });
+    });
+
+    document.querySelectorAll('.ps-col-lang-toggle .ps-lang-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const parent = btn.closest('.ps-col-lang-toggle');
+        const bCode = parent?.dataset.colBook;
+        const targetLang = btn.dataset.lang;
+        if (bCode && targetLang) {
+          this.gospelSynopsisState.colLangs[bCode] = targetLang;
+          this.renderGospelSynopsisView();
+        }
+      });
+    });
+  },
+
+  renderSynopticRowCells(cells, columns, colLangs, diffEnabled) {
+    const cleanWord = w => w.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/['’]/g, '');
+    const isWord = t => /[a-zA-ZÀ-ÿ0-9\u0370-\u03FF\u1F00-\u1FFF]/.test(t);
+
+    // 1. Collect tokens per column
+    const colTokensMap = {};
+    const wordOccurrences = {};
+
+    columns.forEach(col => {
+      const bCode = col.book;
+      const cell = cells[bCode];
+      if (!cell || cell.is_empty) {
+        colTokensMap[bCode] = null;
+        return;
+      }
+      const lang = colLangs[bCode] || 'fr';
+      const rawText = (lang === 'gr') ? (cell.text_gr || cell.text_fr) : cell.text_fr;
+      const tokens = this.tokenizeWords(rawText);
+      colTokensMap[bCode] = { tokens, cell, lang };
+
+      tokens.forEach(tok => {
+        if (isWord(tok)) {
+          const norm = cleanWord(tok);
+          if (norm.length > 2 || (lang === 'gr' && norm.length >= 2)) {
+            if (!wordOccurrences[norm]) wordOccurrences[norm] = new Set();
+            wordOccurrences[norm].add(bCode);
+          }
+        }
+      });
+    });
+
+    // 2. Render HTML for each cell
+    let html = '';
+    columns.forEach(col => {
+      const bCode = col.book;
+      const cellData = colTokensMap[bCode];
+      if (!cellData || !cellData.cell || cellData.cell.is_empty) {
+        html += `<td class="ps-syn-cell-empty"><span class="ps-cell-empty-dash">—</span></td>`;
+        return;
+      }
+
+      const { tokens, cell, lang } = cellData;
+      let cellTextHtml = '';
+
+      if (!diffEnabled) {
+        cellTextHtml = this.escapeHtml(tokens.join(''));
+      } else {
+        tokens.forEach(tok => {
+          if (isWord(tok)) {
+            const norm = cleanWord(tok);
+            const count = wordOccurrences[norm] ? wordOccurrences[norm].size : 0;
+            if (count >= 3) {
+              cellTextHtml += `<span class="ps-diff-triple" title="Accord triple (partagé par ${count} évangiles)">${this.escapeHtml(tok)}</span>`;
+            } else if (count === 2) {
+              cellTextHtml += `<span class="ps-diff-double" title="Accord double (partagé par 2 évangiles)">${this.escapeHtml(tok)}</span>`;
+            } else {
+              cellTextHtml += this.escapeHtml(tok);
+            }
+          } else {
+            cellTextHtml += this.escapeHtml(tok);
+          }
+        });
+      }
+
+      const fontClass = (lang === 'gr') ? 'greek-font' : '';
+      html += `
+        <td class="ps-synopsis-td ${fontClass}">
+          <span class="ps-syn-cell-vnum">${this.escapeHtml(cell.ref || '')}</span>
+          <span>${cellTextHtml}</span>
+        </td>
+      `;
+    });
+
+    return html;
   },
 
   // =========================================================================

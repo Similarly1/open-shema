@@ -2015,17 +2015,29 @@
                   </div>
                 </div>
 
-                <!-- Aperçu de la synthèse générée par l'IA -->
-                <div class="theological-profile-prompt-preview" style="margin-top: 14px;">
-                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-                    <span style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Passeport Herméneutique (Synthèse IA active)</span>
-                    <button type="button" class="btn-link-subtle" id="btn-regenerate-profile-prompt" style="font-size: 11px; display: flex; align-items: center; gap: 4px;">
-                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                <!-- Ligne Passeport Herméneutique (Même design que les cartes de system prompts) -->
+                <div class="prompt-setting-card" id="prompt-card-theological-profile" style="margin-top: 14px; border-color: rgba(245, 158, 11, 0.35); background: rgba(245, 158, 11, 0.04);">
+                  <div class="prompt-card-main">
+                    <div class="prompt-card-header">
+                      <strong class="prompt-card-title">Passeport Herméneutique &amp; Directives IA</strong>
+                      <span class="prompt-status-badge is-custom" id="badge-profile-prompt-status">Généré par IA</span>
+                    </div>
+                    <p class="prompt-card-desc">Directives doctrinales et herméneutiques injectées en tête de chaque requête d'étude.</p>
+                  </div>
+                  <div class="prompt-card-actions">
+                    <button type="button" class="btn-secondary btn-sm" id="btn-open-modal-profile-prompt">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                      </svg>
+                      <span>Consulter / Modifier</span>
+                    </button>
+                    <button type="button" class="btn-ghost btn-sm" id="btn-regenerate-profile-prompt" title="Régénérer la synthèse par IA">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+                      </svg>
                       <span>Régénérer</span>
                     </button>
-                  </div>
-                  <div id="theological-profile-prompt-text" class="profile-prompt-box">
-                    Chargement du profil...
                   </div>
                 </div>
               </div>
@@ -2572,6 +2584,12 @@
               <span class="pill-arrow">▾</span>
             </button>
 
+            <!-- Badge/Bouton Profil Théologique (« Mon Église ») -->
+            <button id="btn-header-profile-pill" class="study-mode-pill-btn" style="border-color: rgba(245, 158, 11, 0.35); background: rgba(245, 158, 11, 0.08); color: var(--accent-orange);" title="Mon Profil Théologique & Confession de foi (« Mon Église »)">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path><path d="M6 6h10"></path><path d="M6 10h10"></path></svg>
+              <span id="header-profile-pill-label">Profil : Prédication</span>
+            </button>
+
             <!-- Bouton Historique (Sidebar droite) -->
             <button id="btn-toggle-ai-history" class="btn-icon-subtle" title="Historique des discussions">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2663,9 +2681,9 @@
 
               <div class="study-mode-popover-footer">
                 <span style="font-size: 11px; color: var(--text-muted);">Cliquez pour sélectionner un mode</span>
-                <button id="btn-popover-open-options" class="btn-link-subtle" style="display: flex; align-items: center; gap: 4px;">
-                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                  <span>Options RAG & Modèle</span>
+                <button id="btn-popover-open-options" class="btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; cursor: pointer; padding: 4px 10px; border-radius: 6px;">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                  <span>Options RAG &amp; Modèle</span>
                 </button>
               </div>
             </div>
@@ -2780,6 +2798,24 @@
                     <label style="display: flex; align-items: center; gap: 7px; cursor: pointer; color: var(--text-primary);">
                       <input type="checkbox" id="ai-opt-src-notes" checked style="accent-color: var(--accent-orange); width: 15px; height: 15px;"> <span>Notes (.md)</span>
                     </label>
+                  </div>
+                </div>
+
+                <!-- 6. Profil Théologique & Herméneutique (« Mon Église ») -->
+                <div style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(59, 130, 246, 0.05)); padding: 12px 14px; border-radius: 8px; border: 1px solid rgba(245, 158, 11, 0.35);">
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                    <label style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: var(--accent-orange); text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path><path d="M6 6h10"></path><path d="M6 10h10"></path></svg>
+                      <span>Profil &amp; « Mon Église »</span>
+                    </label>
+                    <button type="button" class="btn-secondary btn-sm" id="btn-flyout-edit-profile" style="font-size: 11px; padding: 2px 8px; height: 24px;">
+                      Modifier
+                    </button>
+                  </div>
+                  <div id="flyout-profile-summary-text" style="font-size: 12px; color: var(--text-secondary); line-height: 1.45; margin-bottom: 6px;">
+                    Chargement du profil...
+                  </div>
+                  <div id="flyout-profile-prompt-snippet" style="font-size: 11px; color: var(--text-muted); background: var(--bg-surface); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-color); max-height: 75px; overflow-y: auto; white-space: pre-wrap; font-family: inherit; line-height: 1.4;">
                   </div>
                 </div>
               </div>
@@ -5045,13 +5081,30 @@
     <!-- ======================================================= -->
     <div class="modal-dialog-container hidden" id="modal-theological-profile">
       <div class="modal-card profile-wizard-card">
-        <!-- Overlay de chargement pendant la génération IA -->
+        <!-- Overlay de chargement / succès pendant la génération IA -->
         <div id="profile-loading-overlay" class="profile-loading-overlay hidden">
-          <div class="profile-loading-spinner"></div>
-          <strong style="font-size: 15px; color: var(--text-primary); margin-top: 16px;">Génération de votre Passeport Herméneutique...</strong>
-          <p style="font-size: 12.5px; color: var(--text-secondary); margin-top: 6px; text-align: center; max-width: 380px;">
-            L'intelligence artificielle analyse vos choix, votre cadre ministériel et votre confession de foi pour calibrer l'assistant.
-          </p>
+          <!-- État 1 : Chargement en cours -->
+          <div id="profile-overlay-loading-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+            <div class="profile-loading-spinner"></div>
+            <strong style="font-size: 15px; color: var(--text-primary); margin-top: 16px;">Génération de votre Passeport Herméneutique...</strong>
+            <p style="font-size: 12.5px; color: var(--text-secondary); margin-top: 6px; text-align: center; max-width: 380px;">
+              L'intelligence artificielle analyse vos choix, votre cadre ministériel et votre confession de foi pour calibrer l'assistant.
+            </p>
+          </div>
+
+          <!-- État 2 : Succès animé avec le vu vert -->
+          <div id="profile-overlay-success-content" class="hidden" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+            <div class="success-checkmark-wrapper" style="margin-bottom: 12px;">
+              <svg class="checkmark-svg" viewBox="0 0 52 52">
+                <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+              </svg>
+            </div>
+            <strong style="font-size: 16px; color: var(--text-primary); margin-top: 4px;">Passeport Herméneutique Calibré !</strong>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 6px; text-align: center; max-width: 380px;">
+              Votre profil théologique et l'alignement IA ont été enregistrés avec succès.
+            </p>
+          </div>
         </div>
 
         <div class="modal-header">

@@ -224,12 +224,66 @@ const AIStudyView = {
       }
     });
 
+    // 7. Profil Théologique (« Mon Église »)
+    document.getElementById('btn-header-profile-pill')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (typeof TheologicalProfileModal !== 'undefined') {
+        TheologicalProfileModal.open();
+      }
+    });
+
+    document.getElementById('btn-flyout-edit-profile')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (typeof TheologicalProfileModal !== 'undefined') {
+        TheologicalProfileModal.open();
+      }
+    });
+
     // Initialisation
     this.setMode('auto');
     this.updatePassageDisplay();
     this.renderSuggestions();
     this.initGlobalTooltip();
     this.initContextDepthSlider();
+    this.loadTheologicalProfileBadge();
+  },
+
+  async loadTheologicalProfileBadge() {
+    try {
+      const profile = await API.call('get_theological_profile') || {};
+      const roleLabels = {
+        "predication": "Prédication",
+        "enseignement": "Enseignement",
+        "etude_perso": "Étude perso",
+        "academique": "Académique"
+      };
+      
+      const roleShort = roleLabels[profile.user_role] || "Prédication";
+      const traditionShort = profile.tradition ? ` • ${profile.tradition.split('/')[0].trim()}` : "";
+      
+      const pillLabel = document.getElementById('header-profile-pill-label');
+      if (pillLabel) {
+        pillLabel.textContent = `Profil : ${roleShort}${traditionShort}`;
+      }
+
+      const flyoutSummary = document.getElementById('flyout-profile-summary-text');
+      if (flyoutSummary) {
+        const country = profile.country_culture || "France";
+        const posture = profile.ai_posture === 'pastoral_sparring' ? 'Pastoral & Sparring' : (profile.ai_posture || 'Pastoral');
+        flyoutSummary.innerHTML = `<strong>${roleShort}</strong> • Posture : <em>${posture}</em><br><span style="color: var(--text-muted); font-size: 11px;">Zone : ${country}</span>`;
+      }
+
+      const snippetEl = document.getElementById('flyout-profile-prompt-snippet');
+      if (snippetEl) {
+        if (profile.system_profile_prompt && profile.system_profile_prompt.trim()) {
+          snippetEl.textContent = profile.system_profile_prompt.trim();
+        } else {
+          snippetEl.textContent = "Aucun passeport herméneutique généré. Cliquez sur Modifier pour calibrer l'assistant.";
+        }
+      }
+    } catch (e) {
+      console.warn("Erreur chargement badge profil théologique :", e);
+    }
   },
 
   // =========================================================================

@@ -733,6 +733,11 @@ class BibleAppApi:
         from core.passage_study_manager import PassageStudyManager
         return PassageStudyManager.get_passage_study_data(passage_ref=passage_ref, bible_name=bible_name)
 
+    def get_synoptic_harmony(self, pericope_id: int, bible_name: str = "LSG", pivot_book: Optional[str] = None) -> Dict[str, Any]:
+        """Récupère la matrice synoptique complète pour une péricope évangélique avec pivot optionnel."""
+        from core.passage_study_manager import PassageStudyManager
+        return PassageStudyManager.get_synoptic_harmony(pericope_id=int(pericope_id), bible_name=bible_name, pivot_book=pivot_book)
+
     def generate_passage_ai_insight(self, passage_ref: str, insight_type: str, model: Optional[str] = None) -> Dict[str, Any]:
         """Génère une analyse exégétique, théologique ou homilétique ciblée par IA pour un passage sans émojis."""
         from core.passage_study_manager import PassageStudyManager

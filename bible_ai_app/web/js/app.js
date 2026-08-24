@@ -28,6 +28,7 @@ const App = {
       { name: 'PassageStudyView', init: () => (typeof PassageStudyView !== 'undefined' && PassageStudyView.init()) },
       { name: 'TheologyView', init: () => TheologyView.init() },
       { name: 'SelectionContextMenu', init: () => (typeof SelectionContextMenu !== 'undefined' && SelectionContextMenu.init()) },
+      { name: 'TheologicalProfileModal', init: () => (typeof TheologicalProfileModal !== 'undefined' && TheologicalProfileModal.init()) },
       { name: 'HighlighterManager', init: () => (typeof HighlighterManager !== 'undefined' && HighlighterManager.init()) }
     ];
 

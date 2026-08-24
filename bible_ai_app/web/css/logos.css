@@ -17522,6 +17522,43 @@ body.theme-light .ps-select-sm optgroup {
   padding: 24px;
 }
 
+.study-mode-popover-footer {
+  padding: 8px 12px;
+  background: var(--bg-subtle);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#btn-popover-open-options {
+  background: var(--bg-card, #1e293b);
+  color: var(--text-primary, #f1f5f9);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  outline: none !important;
+}
+
+#btn-popover-open-options:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--accent-orange, #f59e0b);
+  color: #ffffff;
+}
+
+#btn-popover-open-options:focus,
+#btn-popover-open-options:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 .profile-loading-spinner {
   width: 42px;
   height: 42px;
@@ -17727,3 +17764,484 @@ body.theme-light .ps-select-sm optgroup {
     grid-template-columns: 1fr;
   }
 }
+
+/* Reset focus outlines sur la modale du profil pour supprimer tout encadré parasite */
+#modal-theological-profile *,
+#modal-theological-profile *:focus,
+#modal-theological-profile *:focus-visible {
+  outline: none !important;
+}
+
+#btn-profile-skip {
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  color: var(--text-muted) !important;
+  cursor: pointer;
+  padding: 4px 8px;
+  font-size: 12px;
+  text-decoration: none;
+  transition: color 0.15s ease;
+  user-select: none;
+}
+
+#btn-profile-skip:hover {
+  color: var(--text-primary) !important;
+  text-decoration: underline;
+}
+
+#btn-profile-skip:focus,
+#btn-profile-skip:focus-visible,
+#btn-profile-skip:active {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.profile-option-card:focus,
+.profile-option-card:focus-visible,
+.profile-bible-chip:focus,
+.profile-bible-chip:focus-visible,
+.modal-close-btn:focus,
+.modal-close-btn:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* =========================================================================
+ * 7.1 HARMONIE DES ÉVANGILES & SYNOPSE COMPARATIVE (GUIDE DE PASSAGE)
+ * ========================================================================= */
+
+/* Badges contextuels de parallèles en ligne (Niveau 1) */
+.ps-parallel-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-blue, #3b82f6);
+  background-color: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  cursor: pointer;
+  vertical-align: middle;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.ps-parallel-badge:hover {
+  background-color: rgba(59, 130, 246, 0.18);
+  border-color: var(--accent-blue, #3b82f6);
+  transform: translateY(-1px);
+}
+
+.ps-parallel-badge.active {
+  background-color: var(--accent-blue, #2563eb);
+  color: #ffffff;
+  border-color: var(--accent-blue, #2563eb);
+  box-shadow: 0 0 0 1px #2563eb;
+}
+
+.ps-parallel-badge .ps-badge-icon {
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+/* Tiroir accordéon contextuel en ligne (Niveau 1) */
+.ps-inline-parallel-drawer {
+  margin: 6px 0 14px 28px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--accent-blue, #3b82f6);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  animation: psDrawerSlideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes psDrawerSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.footer-left-actions,
+.footer-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.prompt-modal-footer button,
+.prompt-modal-footer .btn-secondary,
+.prompt-modal-footer .btn-primary {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+}
+
+.ps-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.ps-drawer-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ps-drawer-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+}
+
+.ps-drawer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+.ps-drawer-item {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.ps-drawer-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.ps-drawer-item-ref {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-amber, #d97706);
+}
+
+.ps-drawer-item-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background-color: var(--bg-surface);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.ps-drawer-item-text {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-primary);
+}
+
+/* Bouton Synopse dans l'en-tête */
+.ps-btn-gospel-synopsis {
+  border-color: var(--accent-blue, #3b82f6);
+  color: var(--accent-blue, #3b82f6);
+  background-color: rgba(59, 130, 246, 0.08);
+}
+
+.ps-btn-gospel-synopsis:hover {
+  background-color: rgba(59, 130, 246, 0.18);
+}
+
+.ps-btn-gospel-synopsis.active {
+  background-color: var(--accent-blue, #2563eb);
+  color: #ffffff !important;
+  border-color: var(--accent-blue, #2563eb);
+}
+
+/* Panneau Synopse Plein Écran (Niveau 2) */
+.ps-gospel-synopsis-panel {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--border-color);
+}
+
+.ps-gospel-synopsis-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+.ps-synopsis-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ps-synopsis-pericope-select-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ps-synopsis-tradition-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.ps-tradition-triple {
+  background-color: rgba(6, 182, 212, 0.15);
+  color: #06b6d4;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+.ps-tradition-quadruple {
+  background-color: rgba(168, 85, 247, 0.15);
+  color: #a855f7;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.ps-tradition-double_q {
+  background-color: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.ps-tradition-single {
+  background-color: rgba(100, 116, 139, 0.15);
+  color: #94a3b8;
+  border: 1px solid rgba(100, 116, 139, 0.3);
+}
+
+.ps-gospel-synopsis-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.ps-gospel-synopsis-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  min-width: 650px;
+}
+
+.ps-gospel-synopsis-table th {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  font-weight: 700;
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 2px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  vertical-align: top;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.ps-gospel-synopsis-table th:last-child {
+  border-right: none;
+}
+
+.ps-syn-col-header-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ps-syn-col-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ps-syn-book-name {
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ps-syn-pivot-badge {
+  font-size: 9.5px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background-color: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.ps-syn-col-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ps-btn-pivot {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ps-btn-pivot:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--accent-blue);
+}
+
+.ps-btn-pivot.active {
+  background-color: var(--accent-blue, #2563eb);
+  color: #ffffff;
+  border-color: var(--accent-blue, #2563eb);
+}
+
+.ps-col-lang-toggle {
+  display: inline-flex;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.ps-lang-btn {
+  padding: 2px 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ps-lang-btn.active {
+  background: var(--accent-blue, #2563eb);
+  color: #ffffff;
+}
+
+.ps-syn-col-ref {
+  font-size: 11px;
+  color: var(--accent-amber, #d97706);
+  font-weight: 600;
+}
+
+.ps-gospel-synopsis-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  vertical-align: top;
+  line-height: 1.65;
+}
+
+.ps-gospel-synopsis-table td:last-child {
+  border-right: none;
+}
+
+.ps-gospel-synopsis-table tr:hover td {
+  background-color: rgba(255, 255, 255, 0.015);
+}
+
+.ps-syn-cell-empty {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(128, 128, 128, 0.03),
+    rgba(128, 128, 128, 0.03) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+  text-align: center;
+  color: var(--text-muted);
+  opacity: 0.5;
+  user-select: none;
+}
+
+.ps-syn-cell-empty .ps-cell-empty-dash {
+  font-size: 18px;
+  font-weight: 300;
+}
+
+.ps-syn-cell-vnum {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-amber, #d97706);
+  margin-right: 6px;
+  display: inline-block;
+  user-select: none;
+}
+
+/* Surlignage des accords synoptiques (Diffing lexical) */
+.ps-diff-triple {
+  background-color: rgba(6, 182, 212, 0.22) !important;
+  color: #22d3ee !important;
+  border-bottom: 1.5px solid #06b6d4 !important;
+  padding: 1px 3px !important;
+  border-radius: 3px !important;
+  font-weight: 600 !important;
+  display: inline !important;
+}
+
+.ps-diff-double {
+  background-color: rgba(245, 158, 11, 0.20) !important;
+  color: #fbbf24 !important;
+  border-bottom: 1.5px solid #f59e0b !important;
+  padding: 1px 3px !important;
+  border-radius: 3px !important;
+  font-weight: 600 !important;
+  display: inline !important;
+}
+
+/* Thèmes clairs pour les accords synoptiques */
+body.reading-bg-white .ps-diff-triple,
+body.theme-light .ps-diff-triple {
+  background-color: rgba(6, 182, 212, 0.15) !important;
+  color: #0891b2 !important;
+  border-bottom-color: #0891b2 !important;
+}
+
+body.reading-bg-white .ps-diff-double,
+body.theme-light .ps-diff-double {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  color: #b45309 !important;
+  border-bottom-color: #b45309 !important;
+}
+

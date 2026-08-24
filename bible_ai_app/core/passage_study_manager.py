@@ -21,6 +21,7 @@ from core.dictionary_manager import DictionaryManager
 from core.maps_manager import MapsManager
 from core.notes_manager import NotesManager
 from core.highlights_manager import HighlightsManager
+from core.synoptic_manager import SynopticManager
 from core.config import load_config
 from ai.llm_client import LLMClient
 
@@ -425,6 +426,11 @@ class PassageStudyManager:
         user_notes = cls._extract_user_notes(book_code, start_ch, start_v, end_ch, end_v)
         user_highlights = cls._extract_user_highlights(book_code, start_ch, start_v, end_ch, end_v, main_bible)
 
+        # 7. Données d'Harmonie et Parallèles Synoptiques (si Évangiles)
+        gospel_synopsis = SynopticManager.get_instance().get_synoptic_context_for_passage(
+            book_code, start_ch, start_v, end_ch, end_v, bible_name=main_bible
+        )
+
         return {
             "success": True,
             "reference": display_ref,
@@ -449,6 +455,7 @@ class PassageStudyManager:
                 "by_version": scripture_by_version,
                 "synoptic_matrix": synoptic_matrix
             },
+            "gospel_synopsis": gospel_synopsis,
             "original_language": original_data,
             "commentaries": commentaries_data,
             "encyclopedia": encyclopedia_data,
@@ -457,6 +464,21 @@ class PassageStudyManager:
                 "highlights": user_highlights
             }
         }
+
+    @classmethod
+    def get_synoptic_harmony(
+        cls,
+        pericope_id: int,
+        bible_name: str = "LSG",
+        pivot_book: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Génère la matrice synoptique complète pour une péricope donnée."""
+        matrix = SynopticManager.get_instance().build_full_synopsis_matrix(
+            pericope_id, bible_name=bible_name, pivot_book=pivot_book
+        )
+        if not matrix:
+            return {"success": False, "error": f"Péricope synoptique #{pericope_id} introuvable."}
+        return {"success": True, "matrix": matrix}
 
     @classmethod
     def _extract_full_original_passage(

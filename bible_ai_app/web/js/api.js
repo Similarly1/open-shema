@@ -183,6 +183,10 @@ const API = {
     return await this.call('get_passage_study_data', passageRef, bibleName);
   },
 
+  async getSynopticHarmony(pericopeId, bibleName = "LSG", pivotBook = null) {
+    return await this.call('get_synoptic_harmony', pericopeId, bibleName, pivotBook);
+  },
+
   async generatePassageAIInsight(passageRef, insightType, model = null) {
     return await this.call('generate_passage_ai_insight', passageRef, insightType, model);
   },
