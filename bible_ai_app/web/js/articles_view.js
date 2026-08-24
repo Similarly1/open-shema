@@ -343,6 +343,17 @@ const ArticlesView = {
       const author = this.formatAuthor(art.author);
       const refs = art.scripture_references || [];
       const mainTags = this.filterMainCategories(art.tags_list || []);
+      const imageUrl = art.image_url;
+      const avatarUrl = art.author_avatar_url;
+
+      let thumbHtml = '';
+      if (imageUrl) {
+        thumbHtml = `
+          <div class="article-card-thumb-wrap">
+            <img src="${this.escapeHtml(imageUrl)}" alt="${this.escapeHtml(art.title)}" class="article-card-thumb-img" loading="lazy">
+          </div>
+        `;
+      }
 
       let tagsHtml = '';
       if (mainTags.length > 0) {
@@ -351,6 +362,11 @@ const ArticlesView = {
             ${mainTags.map(t => `<span class="article-topic-tag" data-tag="${this.escapeHtml(t)}">${this.escapeHtml(t)}</span>`).join('')}
           </div>
         `;
+      }
+
+      let authorAvatarHtml = '';
+      if (avatarUrl) {
+        authorAvatarHtml = `<img src="${this.escapeHtml(avatarUrl)}" alt="${this.escapeHtml(author)}" class="article-card-author-avatar">`;
       }
 
       let refsHtml = '';
@@ -369,24 +385,29 @@ const ArticlesView = {
 
       html += `
         <div class="article-card" data-article-id="${art.id}">
-          <div class="article-card-header">
-            <span class="article-source-badge" style="background-color: ${color}18; color: ${color}; border: 1px solid ${color}35;">
-              ${this.escapeHtml(art.source_name || art.source_id)}
-            </span>
-            <span class="article-pub-date">${pubDate}</span>
+          ${thumbHtml}
+
+          <div class="article-card-content">
+            <div class="article-card-header">
+              <span class="article-source-badge" style="background-color: ${color}18; color: ${color}; border: 1px solid ${color}35;">
+                ${this.escapeHtml(art.source_name || art.source_id)}
+              </span>
+              <span class="article-pub-date">${pubDate}</span>
+            </div>
+
+            <h3 class="article-card-title">${this.escapeHtml(art.title)}</h3>
+            
+            ${tagsHtml}
+
+            <div class="article-card-author-row">
+              ${authorAvatarHtml}
+              <span class="article-card-author">Par <strong>${this.escapeHtml(author)}</strong></span>
+            </div>
+
+            <p class="article-card-summary">${this.escapeHtml(art.summary || 'Cliquez pour lire l\'intégralité de cet article...')}</p>
+
+            ${refsHtml}
           </div>
-
-          <h3 class="article-card-title">${this.escapeHtml(art.title)}</h3>
-          
-          ${tagsHtml}
-
-          <div class="article-card-author">
-            Par <strong>${this.escapeHtml(author)}</strong>
-          </div>
-
-          <p class="article-card-summary">${this.escapeHtml(art.summary || 'Cliquez pour lire l\'intégralité de cet article...')}</p>
-
-          ${refsHtml}
         </div>
       `;
     });
@@ -434,9 +455,17 @@ const ArticlesView = {
     const viewReader = document.getElementById('articles-reader-section');
     const contentEl = document.getElementById('article-reader-body');
     const titleEl = document.getElementById('article-reader-title');
-    const metaEl = document.getElementById('article-reader-meta');
     const tagsEl = document.getElementById('article-reader-tags');
     const extLink = document.getElementById('article-reader-external-link');
+
+    const heroBanner = document.getElementById('article-reader-hero-banner');
+    const heroImg = document.getElementById('article-reader-hero-img');
+    const authorImg = document.getElementById('article-author-avatar-img');
+    const authorPlaceholder = document.getElementById('article-author-avatar-placeholder');
+    const authorNameEl = document.getElementById('article-author-name');
+    const pubDateEl = document.getElementById('article-pub-date');
+    const sourceNameEl = document.getElementById('article-source-name');
+    const leadEl = document.getElementById('article-reader-lead');
 
     if (viewList) viewList.classList.add('hidden');
     if (viewReader) viewReader.classList.remove('hidden');
@@ -457,7 +486,41 @@ const ArticlesView = {
 
       if (titleEl) titleEl.textContent = art.title;
 
-      // Affichage des catégories majeures en 1 ligne horizontale
+      // 1. Image Héro avec dégradé
+      if (art.image_url && heroBanner && heroImg) {
+        heroImg.src = art.image_url;
+        heroBanner.classList.remove('hidden');
+      } else if (heroBanner) {
+        heroBanner.classList.add('hidden');
+      }
+
+      // 2. Auteur & Avatar
+      if (authorNameEl) authorNameEl.textContent = author;
+      if (pubDateEl) pubDateEl.textContent = this.formatDate(art.published_at);
+      if (sourceNameEl) sourceNameEl.textContent = art.source_name || art.source_id;
+
+      if (art.author_avatar_url && authorImg) {
+        authorImg.src = art.author_avatar_url;
+        authorImg.classList.remove('hidden');
+        authorPlaceholder?.classList.add('hidden');
+      } else {
+        authorImg?.classList.add('hidden');
+        if (authorPlaceholder) {
+          authorPlaceholder.textContent = (author.charAt(0) || 'A').toUpperCase();
+          authorPlaceholder.classList.remove('hidden');
+        }
+      }
+
+      // 3. Chapô / Introduction
+      const leadText = art.lead_summary || art.summary || '';
+      if (leadText && leadEl) {
+        leadEl.textContent = leadText;
+        leadEl.classList.remove('hidden');
+      } else if (leadEl) {
+        leadEl.classList.add('hidden');
+      }
+
+      // 4. Badges thématiques
       const mainTags = this.filterMainCategories(art.tags_list || []);
       if (tagsEl) {
         if (mainTags.length > 0) {
@@ -480,14 +543,6 @@ const ArticlesView = {
         }
       }
 
-      if (metaEl) {
-        metaEl.innerHTML = `
-          <span>Source : <strong>${this.escapeHtml(art.source_name)}</strong></span> • 
-          <span>Auteur : <strong>${this.escapeHtml(author)}</strong></span> • 
-          <span>Publié le : <strong>${this.formatDate(art.published_at)}</strong></span>
-        `;
-      }
-
       if (extLink) {
         extLink.href = art.url;
         extLink.onclick = (e) => {
@@ -500,7 +555,7 @@ const ArticlesView = {
         };
       }
 
-      // Rendu Markdown propre et calcul des statistiques de lecture
+      // 5. Rendu Markdown propre et calcul des statistiques de lecture
       const mdRaw = res.content_markdown || art.summary || '';
       const renderedHtml = this.renderMarkdown(mdRaw);
       
@@ -677,22 +732,27 @@ const ArticlesView = {
     
     let text = md;
 
-    // 1. Nettoyer les blocs promotionnels et parcours e-mail de fin d'article
+    // 1. Nettoyer les résidus de lecteur ElevenLabs audio
+    text = text.replace(/Loading\s+the[\s\S]*?AudioNative\s+Player\.\.\./gi, '');
+    text = text.replace(/Loading\s+the[\s\S]*?Elevenlabs[^\n]*\n*/gi, '');
+    text = text.replace(/AudioNative\s+Player\.\.\./gi, '');
+
+    // 2. Nettoyer les blocs promotionnels et parcours e-mail de fin d'article
     text = text.replace(/(?:#+\s*)?Parcours\s+e-?mail[\s\S]*$/gi, '');
     text = text.replace(/Pour\s+aller\s+plus\s+loin,\s+inscris-toi[\s\S]*$/gi, '');
     text = text.replace(/(?:#+\s*)?Inscrivez-vous\s+à\s+notre\s+newsletter[\s\S]*$/gi, '');
 
-    // 2. Nettoyer tout bloc d'en-tête redondant (titre, auteur, source, date dupliqués)
+    // 3. Nettoyer tout bloc d'en-tête redondant (titre, auteur, source, date dupliqués)
     text = text.replace(/^(#\s+[^\n]+\n+)?/gi, '');
     text = text.replace(/^(\*\*(?:Auteur|Source|Date)\s*:\*\*[^\n]*\n*|Auteur\s*:[^\n]*\n*|Source\s*:[^\n]*\n*|Date\s*:[^\n]*\n*|---\n*)+/gim, '');
 
-    // 3. Nettoyer les émojis décoratifs pour une mise en page typographique sobre
+    // 4. Nettoyer les émojis décoratifs pour une mise en page typographique sobre
     text = text.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1FA70}-\u{1FAFF}]/gu, '');
 
-    // 4. Nettoyer les séparateurs multiples ou en fin d'article
+    // 5. Nettoyer les séparateurs multiples ou en fin d'article
     text = text.replace(/---\s*$/gi, '');
 
-    // 5. Remplacement Markdown vers HTML
+    // 6. Remplacement Markdown vers HTML
     let html = text
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -708,7 +768,7 @@ const ArticlesView = {
       .replace(/\n\n/gim, '</p><p>')
       .replace(/\n/gim, '<br>');
 
-    // 6. Détection et liaisonnement des références bibliques (ex: 1 Corinthiens 1.2, 1 Pierre 5.10, Romains 3.22-23)
+    // 7. Détection et liaisonnement des références bibliques (ex: 1 Corinthiens 1.2, 1 Pierre 5.10, Romains 3.22-23)
     if (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences) {
       html = TheologyView.highlightScriptureReferences(html);
     }

@@ -4344,11 +4344,36 @@
             </div>
 
             <div class="article-reader-container" id="article-reader-container">
-              <div class="article-reader-hero">
-                <h1 class="article-reader-title" id="article-reader-title">Titre de l'article</h1>
-                <div class="article-reader-tags" id="article-reader-tags"></div>
-                <div class="article-reader-meta" id="article-reader-meta">Auteur • Date • Source</div>
+              <!-- Image Héro de l'article -->
+              <div class="article-reader-hero-banner hidden" id="article-reader-hero-banner">
+                <img id="article-reader-hero-img" src="" alt="Image de l'article" class="article-hero-image">
+                <div class="article-reader-hero-overlay"></div>
               </div>
+
+              <div class="article-reader-hero">
+                <div class="article-reader-tags" id="article-reader-tags"></div>
+                <h1 class="article-reader-title" id="article-reader-title">Titre de l'article</h1>
+                
+                <!-- Auteur avec Avatar et Date -->
+                <div class="article-reader-author-card" id="article-reader-author-card">
+                  <div class="author-avatar-circle" id="article-author-avatar-wrap">
+                    <img id="article-author-avatar-img" src="" alt="Auteur" class="author-avatar-img">
+                    <span id="article-author-avatar-placeholder" class="author-avatar-placeholder hidden"></span>
+                  </div>
+                  <div class="author-info-meta">
+                    <div class="author-main-name" id="article-author-name">Nom de l'auteur</div>
+                    <div class="author-pub-line">
+                      <span id="article-pub-date">Date</span> • <span id="article-source-name" class="author-source-pill">Source</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Chapô d'introduction -->
+              <div class="article-reader-lead hidden" id="article-reader-lead">
+                <!-- Texte introductif -->
+              </div>
+
               <div class="article-reader-body" id="article-reader-body">
                 <!-- Rendu Markdown injecté dynamiquement -->
               </div>

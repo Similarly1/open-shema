@@ -55,17 +55,21 @@ class ArticlesDB:
                 summary TEXT,
                 content_path TEXT,
                 tags TEXT,
+                image_url TEXT,
+                author_avatar_url TEXT,
+                lead_summary TEXT,
                 has_full_text INTEGER DEFAULT 1,
                 is_indexed INTEGER DEFAULT 0,
                 FOREIGN KEY (source_id) REFERENCES sources (id) ON DELETE CASCADE
             )
             """)
 
-            # Migration automatique si colonne tags absente
-            try:
-                cursor.execute("ALTER TABLE articles ADD COLUMN tags TEXT")
-            except Exception:
-                pass
+            # Migration automatique si colonnes absentes
+            for col in ["tags TEXT", "image_url TEXT", "author_avatar_url TEXT", "lead_summary TEXT"]:
+                try:
+                    cursor.execute(f"ALTER TABLE articles ADD COLUMN {col}")
+                except Exception:
+                    pass
 
             # 3. Table des liaisons de versets bibliques
             cursor.execute("""
@@ -186,19 +190,25 @@ class ArticlesDB:
 
             raw_tags = article.get("tags", [])
             tags_str = ",".join(raw_tags) if isinstance(raw_tags, list) else str(raw_tags or "")
+            image_url = article.get("image_url", "")
+            author_avatar_url = article.get("author_avatar_url", "")
+            lead_summary = article.get("lead_summary", article.get("summary", ""))
 
             cursor.execute("""
             INSERT INTO articles (
-                id, source_id, title, author, url, published_at, fetched_at, summary, content_path, tags, has_full_text, is_indexed
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                id, source_id, title, author, url, published_at, fetched_at, summary, content_path, tags, image_url, author_avatar_url, lead_summary, has_full_text, is_indexed
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
                 title = excluded.title,
-                author = excluded.author,
+                author = CASE WHEN excluded.author != '' THEN excluded.author ELSE articles.author END,
                 published_at = excluded.published_at,
                 fetched_at = excluded.fetched_at,
                 summary = excluded.summary,
-                content_path = excluded.content_path,
+                content_path = COALESCE(excluded.content_path, articles.content_path),
                 tags = excluded.tags,
+                image_url = CASE WHEN excluded.image_url != '' THEN excluded.image_url ELSE articles.image_url END,
+                author_avatar_url = CASE WHEN excluded.author_avatar_url != '' THEN excluded.author_avatar_url ELSE articles.author_avatar_url END,
+                lead_summary = CASE WHEN excluded.lead_summary != '' THEN excluded.lead_summary ELSE articles.lead_summary END,
                 has_full_text = excluded.has_full_text
             """, (
                 article["id"],
@@ -211,6 +221,9 @@ class ArticlesDB:
                 article.get("summary", ""),
                 article.get("content_path", ""),
                 tags_str,
+                image_url,
+                author_avatar_url,
+                lead_summary,
                 1 if article.get("has_full_text", True) else 0,
                 1 if article.get("is_indexed", False) else 0
             ))

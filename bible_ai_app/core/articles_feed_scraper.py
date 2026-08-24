@@ -192,60 +192,89 @@ class ArticlesFeedScraper:
 
         return items
 
-    def fetch_full_article_content(self, article: Dict[str, Any]) -> Tuple[str, str]:
+    def fetch_full_article_content(self, article: Dict[str, Any]) -> Tuple[str, str, str, str, str]:
         """
-        Garantit l'obtention du contenu complet en Markdown et le nom de l'auteur.
-        Si le flux RSS ne contient qu'un extrait court (< 800 car.), effectue le scraping de la page web.
-        Retourne (content_markdown, author).
+        Garantit l'obtention du contenu complet en Markdown et des métadonnées riches.
+        Retourne (content_markdown, author, image_url, author_avatar_url, lead_summary).
         """
         raw_html = article.get("raw_content_html", "")
         author = article.get("author", "")
+        image_url = article.get("image_url", "")
+        author_avatar_url = article.get("author_avatar_url", "")
+        lead_summary = article.get("summary", "")
         source_config = article.get("source_config", {})
         selectors = source_config.get("selectors", {})
-        
-        # Teste si le contenu HTML du flux est suffisant
-        clean_text_len = len(BeautifulSoup(raw_html, "html.parser").get_text(strip=True)) if raw_html else 0
-        
-        if clean_text_len >= 800:
-            md_content = self.html_to_clean_markdown(raw_html, selectors.get("excludes", []))
-            return md_content, author
-
-        # Scraping de la page web complète si disponible
         url = article.get("url")
-        if not url:
-            return self.html_to_clean_markdown(raw_html, selectors.get("excludes", [])), author
 
-        try:
-            resp = self.session.get(url, timeout=self.timeout)
-            if resp.status_code == 200:
-                page_soup = BeautifulSoup(resp.text, "html.parser")
-                
-                # Extraction de l'auteur si manquant
-                if not author and selectors.get("author"):
-                    auth_tag = page_soup.select_one(selectors["author"])
-                    if auth_tag:
-                        author = auth_tag.get_text(strip=True)
+        # Scraping de la page web pour récupérer le contenu complet, l'image héro et l'avatar auteur
+        if url:
+            try:
+                resp = self.session.get(url, timeout=self.timeout)
+                if resp.status_code == 200:
+                    page_soup = BeautifulSoup(resp.text, "html.parser")
+                    
+                    # 1. Image principale (Hero / OpenGraph)
+                    if not image_url:
+                        og_img = page_soup.find("meta", property="og:image") or page_soup.find("meta", attrs={"name": "twitter:image"})
+                        if og_img and og_img.get("content"):
+                            image_url = og_img["content"].strip()
+                    
+                    if not image_url:
+                        hero_img = page_soup.select_one("img.wp-post-image, .post-thumbnail img, .entry-featured-image img, .article-hero img")
+                        if hero_img:
+                            image_url = hero_img.get("src") or hero_img.get("data-src") or hero_img.get("data-lazy-src") or ""
 
-                # Extraction du corps de l'article via le sélecteur dédié
-                content_el = None
-                if selectors.get("content"):
-                    for sel in selectors["content"].split(","):
-                        found = page_soup.select_one(sel.strip())
-                        if found:
-                            content_el = found
-                            break
+                    # 2. Auteur réel et Avatar
+                    author_box = page_soup.select_one(".author-info, .entry-author, .author-bio, .post-author, div[class*='author']")
+                    if author_box:
+                        # Nom auteur
+                        for a_tag in author_box.select("a[rel='author'], .author-name, strong, h3, h4"):
+                            t = a_tag.get_text(strip=True)
+                            if t and len(t) < 40 and not any(x in t.lower() for x in ["tout pour", "tpsg", "admin", "par ", "auteur"]):
+                                author = t
+                                break
 
-                if not content_el:
-                    content_el = page_soup.find("article") or page_soup.find("main") or page_soup.find("body")
+                    # Avatar auteur
+                    if not author_avatar_url:
+                        for a_img in page_soup.find_all("img"):
+                            src = a_img.get("data-src") or a_img.get("data-lazy-src") or a_img.get("src") or ""
+                            alt = (a_img.get("alt") or "").strip()
+                            if not src or src.startswith("data:") or "logo" in src.lower():
+                                continue
+                            if "150x150" in src or "avatar" in src.lower() or (author and alt and author.lower() in alt.lower()):
+                                author_avatar_url = src
+                                break
 
-                if content_el:
-                    md_content = self.html_to_clean_markdown(str(content_el), selectors.get("excludes", []))
-                    return md_content, author
-        except Exception as e:
-            logger.warning(f"[FeedScraper] Échec du scraping web pour {url} : {e}")
+                    # 3. Chapô / Lead summary
+                    og_desc = page_soup.find("meta", property="og:description")
+                    if og_desc and og_desc.get("content"):
+                        desc_cand = og_desc["content"].strip()
+                        if desc_cand and len(desc_cand) > len(lead_summary or ""):
+                            lead_summary = desc_cand
 
-        # Fallback sur le contenu initial
-        return self.html_to_clean_markdown(raw_html, selectors.get("excludes", [])), author
+                    # 4. Corps de l'article
+                    content_el = None
+                    if selectors.get("content"):
+                        for sel in selectors["content"].split(","):
+                            found = page_soup.select_one(sel.strip())
+                            if found:
+                                content_el = found
+                                break
+
+                    if not content_el:
+                        content_el = page_soup.find("article") or page_soup.find("main") or page_soup.select_one(".entry-content, .post-content, .article-content")
+
+                    if content_el:
+                        md_content = self.html_to_clean_markdown(str(content_el), selectors.get("excludes", []))
+                        if len(md_content) >= 300:
+                            return md_content, author, image_url, author_avatar_url, lead_summary
+
+            except Exception as e:
+                logger.warning(f"[FeedScraper] Scraping web pour {url} : {e}")
+
+        # Fallback sur le contenu du flux
+        md_content = self.html_to_clean_markdown(raw_html, selectors.get("excludes", []))
+        return md_content, author, image_url, author_avatar_url, lead_summary
 
     def html_to_clean_markdown(self, html_content: str, exclude_selectors: Optional[List[str]] = None) -> str:
         """
@@ -326,7 +355,9 @@ class ArticlesFeedScraper:
 
         # Nettoyage des sauts de ligne multiples et résidus de lecteurs audio
         result = "\n".join(lines)
-        result = re.sub(r'Loading the Elevenlabs.*?\n', '', result, flags=re.IGNORECASE)
+        result = re.sub(r'(?i)Loading\s+the\s*[\r\n\s]*Elevenlabs\s+Text\s+to\s+Speech[\r\n\s]*AudioNative\s+Player\.\.\.\n*', '', result)
+        result = re.sub(r'(?i)Loading\s+the\s*[\r\n\s]*Elevenlabs[^\n]*\n*', '', result)
+        result = re.sub(r'(?i)AudioNative\s+Player\.\.\.\n*', '', result)
         result = re.sub(r'↩\s*\d+\s*▶\s*↩\s*\d+\s*[\d:]+\s*[\d:]+', '', result)
 
         # Nettoyage des sections de promotion / parcours e-mail en fin d'article
@@ -389,12 +420,12 @@ class ArticlesFeedScraper:
         Pipeline complet pour un article :
         1. Extraction Markdown propre (+ scraping si nécessaire)
         2. Détection des références bibliques
-        3. Retourne l'objet prêt à être persisté
+        3. Extraction des métadonnées riches (image, avatar, chapô)
+        4. Retourne l'objet prêt à être persisté
         """
-        content_md, author = self.fetch_full_article_content(raw_item)
+        content_md, author, image_url, author_avatar_url, lead_summary = self.fetch_full_article_content(raw_item)
         
-        if not raw_item.get("author") and author:
-            raw_item["author"] = author
+        real_author = author or raw_item.get("author", "")
 
         # Extraction des références bibliques dans le titre et le corps de l'article
         combined_text = f"{raw_item.get('title', '')}\n\n{content_md}"
@@ -413,13 +444,16 @@ class ArticlesFeedScraper:
             "id": raw_item["id"],
             "source_id": raw_item["source_id"],
             "title": raw_item["title"],
-            "author": raw_item.get("author", ""),
+            "author": real_author,
             "url": raw_item["url"],
             "published_at": raw_item.get("published_at", ""),
             "fetched_at": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "summary": raw_item.get("summary", ""),
+            "summary": lead_summary or raw_item.get("summary", ""),
+            "lead_summary": lead_summary or raw_item.get("summary", ""),
+            "image_url": image_url or raw_item.get("image_url", ""),
+            "author_avatar_url": author_avatar_url or raw_item.get("author_avatar_url", ""),
             "tags": raw_item.get("tags", []),
             "content_markdown": content_md,
-            "has_full_text": len(content_md) > 500,
+            "has_full_text": len(content_md) > 300,
             "scripture_references": unique_refs
         }
