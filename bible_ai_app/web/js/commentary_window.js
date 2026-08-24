@@ -553,71 +553,123 @@ const CommentaryWindow = {
         return;
       }
 
-      // Découper les mots du verset
-      const rawWords = vData.text.split(/[\s,;:«»'".()]+/g).filter(w => w.length > 1);
-      wordsFlow.innerHTML = '';
+      // 1. Récupérer la liste des mots enrichis avec Strongs
+      let wordList = [];
+      if (vData.words && Array.isArray(vData.words) && vData.words.length > 0) {
+        wordList = vData.words.filter(w => (w.surface || w.orig || '').trim().length > 0);
+      } else {
+        const rawTokens = vData.text.split(/[\s,;:«»'".()]+/g).filter(w => w.length > 0);
+        wordList = rawTokens.map(t => ({
+          surface: t,
+          orig: t,
+          translit: '',
+          strong: '',
+          lemma: t
+        }));
+      }
 
-      rawWords.forEach((word, idx) => {
+      wordsFlow.innerHTML = '';
+      this.currentLexiconWords = wordList;
+
+      wordList.forEach((w, idx) => {
         const pill = document.createElement('button');
         pill.type = 'button';
         pill.className = `lex-word-pill ${idx === 0 ? 'active' : ''}`;
+        pill.dataset.index = idx;
+        
+        const origDisplay = w.orig && w.orig !== w.surface ? w.orig : (w.lemma || w.surface);
+        const surfDisplay = w.surface || w.orig;
+        const strongBadge = w.strong ? `<span class="lex-word-strong">${this.escapeHtml(w.strong)}</span>` : '';
+        const translitDisplay = w.translit ? `<span class="lex-word-trans">${this.escapeHtml(w.translit)}</span>` : `<span class="lex-word-trans">${this.escapeHtml(surfDisplay)}</span>`;
+
         pill.innerHTML = `
-          <span class="lex-word-orig">${this.escapeHtml(word)}</span>
-          <span class="lex-word-trans">Mot ${idx + 1}</span>
+          <span class="lex-word-orig">${this.escapeHtml(origDisplay)}</span>
+          ${translitDisplay}
+          ${strongBadge}
         `;
+
         pill.addEventListener('click', () => {
           wordsFlow.querySelectorAll('.lex-word-pill').forEach(p => p.classList.remove('active'));
           pill.classList.add('active');
-          this.lookupLexiconEntry(word);
+          this.lookupLexiconEntry(w.surface, w.strong, w.orig, w.translit);
         });
+
         wordsFlow.appendChild(pill);
       });
 
-      if (rawWords.length > 0) {
-        this.lookupLexiconEntry(rawWords[0]);
+      if (wordList.length > 0) {
+        const first = wordList[0];
+        this.lookupLexiconEntry(first.surface, first.strong, first.orig, first.translit);
       }
     } catch (e) {
       wordsFlow.innerHTML = `<div style="color: var(--accent-red);">Erreur lexique : ${this.escapeHtml(e.message || String(e))}</div>`;
     }
   },
 
-  async lookupLexiconEntry(word) {
+  async lookupLexiconEntry(surface, strongCode = null, orig = '', translit = '') {
     const detailEl = document.getElementById('lex-entry-detail');
     if (!detailEl) return;
 
-    detailEl.innerHTML = `<div style="padding: 20px; color: var(--text-secondary); text-align: center;"><span class="synth-spinner" style="width: 14px; height: 14px; border-width: 2px; vertical-align: middle; margin-right: 6px;"></span>Recherche dans les dictionnaires Strong & Bailly pour « ${this.escapeHtml(word)} »...</div>`;
+    detailEl.innerHTML = `
+      <div style="padding: 24px; color: var(--text-secondary); text-align: center;">
+        <span class="synth-spinner" style="width: 14px; height: 14px; border-width: 2px; vertical-align: middle; margin-right: 6px;"></span>
+        Recherche dans les dictionnaires pour « ${this.escapeHtml(surface || orig)} » ${strongCode ? `(${this.escapeHtml(strongCode)})` : ''}...
+      </div>
+    `;
 
     try {
-      const entry = await API.call('lookup_dictionary', word, null);
+      let entry = null;
+      if (surface || strongCode) {
+        entry = await API.call('lookup_dictionary', surface || '', strongCode || null);
+      }
+      if (!entry && strongCode) {
+        entry = await API.call('lookup_dictionary', '', strongCode);
+      }
+      if (!entry && orig && orig !== surface) {
+        entry = await API.call('lookup_dictionary', orig, null);
+      }
+
       const matches = entry?.matches || [];
 
       if (matches.length === 0) {
         detailEl.innerHTML = `
           <div style="padding: 24px; text-align: center; color: var(--text-secondary);">
-            <div style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">« ${this.escapeHtml(word)} »</div>
-            <div style="font-size: 12px; opacity: 0.8;">Aucune entrée exacte dans le lexique pour cette forme fléchie.</div>
+            <div style="font-size: 15px; font-weight: 700; color: var(--accent-orange); margin-bottom: 4px;">« ${this.escapeHtml(orig || surface)} »</div>
+            ${translit ? `<div style="font-size: 12px; margin-bottom: 8px; font-style: italic;">Translit : ${this.escapeHtml(translit)}</div>` : ''}
+            <div style="font-size: 13px; opacity: 0.85;">Aucune notice détaillée trouvée pour cette forme spécifique.</div>
           </div>
         `;
         return;
       }
 
-      let html = `<div style="display: flex; flex-direction: column; gap: 14px;">`;
-      matches.forEach(m => {
+      let html = `<div style="display: flex; flex-direction: column; gap: 18px;">`;
+      
+      matches.forEach((m, idx) => {
+        const dictTitle = m.dict_name || m.badge || 'Dictionnaire';
+        const termTitle = m.title || surface || orig;
+        const contentText = m.full_text || m.preview || m.raw_text || '';
+        const formattedContent = this.formatMarkdown(contentText);
+
         html += `
-          <div style="border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.08)); padding-bottom: 12px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-              <span style="font-weight: 700; font-size: 15px; color: var(--accent-orange, #F97316);">${this.escapeHtml(m.lemma || word)}</span>
-              <span style="font-size: 11px; background: var(--bg-hover); padding: 2px 7px; border-radius: 4px;">${this.escapeHtml(m.source || 'Lexique')}</span>
+          <div style="border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.08)); padding-bottom: 16px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-weight: 800; font-size: 16px; color: var(--accent-orange, #F97316);">${this.escapeHtml(termTitle)}</span>
+                ${m.is_polished ? `<span style="font-size: 10px; background: rgba(56, 189, 248, 0.15); color: #38BDF8; padding: 2px 6px; border-radius: 4px;">Restauré IA</span>` : ''}
+              </div>
+              <span style="font-size: 11.5px; font-weight: 600; background: var(--bg-hover, rgba(255, 255, 255, 0.08)); padding: 3px 8px; border-radius: 5px;">${this.escapeHtml(dictTitle)}</span>
             </div>
-            ${m.strong ? `<div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent-blue); margin-bottom: 6px;">Strong: ${this.escapeHtml(m.strong)}</div>` : ''}
-            <div style="font-size: 14px; line-height: 1.6; color: var(--text-primary);">${this.formatMarkdown(m.definition || m.content || '')}</div>
+            ${m.strong ? `<div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent-blue, #38BDF8); margin-bottom: 8px;">Code Strong : ${this.escapeHtml(m.strong)}</div>` : ''}
+            <div class="comm-stream-body" style="font-size: 14.5px; line-height: 1.7;">${formattedContent}</div>
           </div>
         `;
       });
+
       html += `</div>`;
       detailEl.innerHTML = html;
     } catch (e) {
-      detailEl.innerHTML = `<div style="color: var(--accent-red); padding: 20px;">Erreur de consultation lexicale.</div>`;
+      console.error('Erreur lookup_dictionary:', e);
+      detailEl.innerHTML = `<div style="color: var(--accent-red); padding: 20px; text-align: center;">Erreur lors de la consultation lexicale.</div>`;
     }
   },
 
@@ -689,6 +741,7 @@ const CommentaryWindow = {
     const popoverAuthor = document.getElementById('author-filter-popover');
     btnAuthor?.addEventListener('click', (e) => {
       e.stopPropagation();
+      e.preventDefault();
       popoverAuthor?.classList.toggle('hidden');
       document.getElementById('comm-display-popover')?.classList.add('hidden');
     });
@@ -698,15 +751,16 @@ const CommentaryWindow = {
     const popoverDisplay = document.getElementById('comm-display-popover');
     btnDisplay?.addEventListener('click', (e) => {
       e.stopPropagation();
+      e.preventDefault();
       popoverDisplay?.classList.toggle('hidden');
-      popoverAuthor?.classList.add('hidden');
+      document.getElementById('author-filter-popover')?.classList.add('hidden');
     });
 
     document.addEventListener('click', (e) => {
-      if (popoverAuthor && !popoverAuthor.contains(e.target) && e.target !== btnAuthor) {
+      if (popoverAuthor && !popoverAuthor.classList.contains('hidden') && !popoverAuthor.contains(e.target) && !btnAuthor?.contains(e.target)) {
         popoverAuthor.classList.add('hidden');
       }
-      if (popoverDisplay && !popoverDisplay.contains(e.target) && e.target !== btnDisplay) {
+      if (popoverDisplay && !popoverDisplay.classList.contains('hidden') && !popoverDisplay.contains(e.target) && !btnDisplay?.contains(e.target)) {
         popoverDisplay.classList.add('hidden');
       }
     });
