@@ -8,9 +8,13 @@
     "description": "Articles, réflexions et ressources pour voir le monde à travers la Bible.",
     "enabled_by_default": true,
     "selectors": {
-      "content": ".entry-content, article .content, .post-content",
-      "author": ".author-name, .entry-author, .author a, .post-author",
+      "content": ".single-content, .entry-content, article .content, .post-content, .article-content",
+      "author": ".author-name, .entry-author, .author a, .post-author, .author-info",
       "excludes": [
+        ".single-header",
+        ".single-meta",
+        ".single-footer",
+        ".single-related",
         ".sharedaddy",
         ".jp-relatedposts",
         ".newsletter-box",

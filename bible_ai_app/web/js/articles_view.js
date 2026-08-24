@@ -287,11 +287,24 @@ const ArticlesView = {
 
   formatAuthor(rawAuthor) {
     if (!rawAuthor) return 'Auteur inconnu';
-    if (rawAuthor.includes('@')) {
-      const user = rawAuthor.split('@')[0].replace('.', ' ');
+    let author = this.fixMojibake(rawAuthor);
+    if (author.includes('@')) {
+      const user = author.split('@')[0].replace('.', ' ');
       return user.charAt(0).toUpperCase() + user.slice(1);
     }
-    return rawAuthor;
+    return author;
+  },
+
+  fixMojibake(str) {
+    if (!str) return '';
+    if (/Ã©|Ã |Ã¨|Ãª|Ã®|Ã¯|Ã´|Ã¹|Ã»|Ã§|Â«|Â»|â€™|â€|Ã‰|Ã€|â€¯|Ã¢|Ã´|Ã®|Ã»/.test(str)) {
+      try {
+        return decodeURIComponent(escape(str));
+      } catch (e) {
+        return str;
+      }
+    }
+    return str;
   },
 
   filterMainCategories(tagsList) {
@@ -395,7 +408,7 @@ const ArticlesView = {
               <span class="article-pub-date">${pubDate}</span>
             </div>
 
-            <h3 class="article-card-title">${this.escapeHtml(art.title)}</h3>
+            <h3 class="article-card-title">${this.escapeHtml(this.fixMojibake(art.title))}</h3>
             
             ${tagsHtml}
 
@@ -404,7 +417,7 @@ const ArticlesView = {
               <span class="article-card-author">Par <strong>${this.escapeHtml(author)}</strong></span>
             </div>
 
-            <p class="article-card-summary">${this.escapeHtml(art.summary || 'Cliquez pour lire l\'intégralité de cet article...')}</p>
+            <p class="article-card-summary">${this.escapeHtml(this.fixMojibake(art.summary || 'Cliquez pour lire l\'intégralité de cet article...'))}</p>
 
             ${refsHtml}
           </div>
@@ -484,7 +497,7 @@ const ArticlesView = {
       const art = res.article;
       const author = this.formatAuthor(art.author);
 
-      if (titleEl) titleEl.textContent = art.title;
+      if (titleEl) titleEl.textContent = this.fixMojibake(art.title);
 
       // 1. Image Héro avec dégradé
       if (art.image_url && heroBanner && heroImg) {
@@ -512,7 +525,7 @@ const ArticlesView = {
       }
 
       // 3. Chapô / Introduction
-      const leadText = art.lead_summary || art.summary || '';
+      const leadText = this.fixMojibake(art.lead_summary || art.summary || '');
       if (leadText && leadEl) {
         leadEl.textContent = leadText;
         leadEl.classList.remove('hidden');
@@ -730,12 +743,12 @@ const ArticlesView = {
   renderMarkdown(md) {
     if (!md) return '';
     
-    let text = md;
+    let text = this.fixMojibake(md);
 
     // 1. Nettoyer les résidus de lecteur ElevenLabs audio
-    text = text.replace(/Loading\s+the[\s\S]*?AudioNative\s+Player\.\.\./gi, '');
+    text = text.replace(/Loading\s+the[\s\S]*?AudioNative\s+Player[\.\u2026]*/gi, '');
     text = text.replace(/Loading\s+the[\s\S]*?Elevenlabs[^\n]*\n*/gi, '');
-    text = text.replace(/AudioNative\s+Player\.\.\./gi, '');
+    text = text.replace(/AudioNative\s+Player[\.\u2026]*/gi, '');
 
     // 2. Nettoyer les blocs promotionnels et parcours e-mail de fin d'article
     text = text.replace(/(?:#+\s*)?Parcours\s+e-?mail[\s\S]*$/gi, '');

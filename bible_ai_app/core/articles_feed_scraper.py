@@ -31,10 +31,11 @@ class ArticlesFeedScraper:
         })
 
     def fetch_feed_xml(self, feed_url: str) -> Optional[str]:
-        """Télécharge le contenu brut du flux RSS/Atom."""
+        """Télécharge le contenu brut du flux RSS/Atom avec encodage UTF-8 explicite."""
         try:
             resp = self.session.get(feed_url, timeout=self.timeout)
             if resp.status_code == 200:
+                resp.encoding = "utf-8"
                 return resp.text
             else:
                 logger.warning(f"[FeedScraper] Code HTTP {resp.status_code} pour {feed_url}")
@@ -211,7 +212,8 @@ class ArticlesFeedScraper:
             try:
                 resp = self.session.get(url, timeout=self.timeout)
                 if resp.status_code == 200:
-                    page_soup = BeautifulSoup(resp.text, "html.parser")
+                    resp.encoding = "utf-8"
+                    page_soup = BeautifulSoup(resp.content, "html.parser", from_encoding="utf-8")
                     
                     # 1. Image principale (Hero / OpenGraph)
                     if not image_url:
@@ -286,8 +288,11 @@ class ArticlesFeedScraper:
         soup = BeautifulSoup(html_content, "html.parser")
 
         # 1. Supprimer les balises indésirables
-        for tag in soup(["script", "style", "nav", "footer", "form", "iframe", "noscript", "svg"]):
+        for tag in soup(["script", "style", "nav", "footer", "form", "iframe", "noscript", "svg", "header"]):
             tag.decompose()
+
+        for meta_el in soup.select(".entry-meta, .post-meta, .entry-header, .post-header, .article-header, .breadcrumb, .social-share, .jp-relatedposts, .wp-block-post-date, .wp-block-post-author, .author-info"):
+            meta_el.decompose()
 
         # Supprimer les commentaires HTML
         for comment in soup.find_all(string=lambda text: isinstance(text, Comment)):
@@ -355,9 +360,9 @@ class ArticlesFeedScraper:
 
         # Nettoyage des sauts de ligne multiples et résidus de lecteurs audio
         result = "\n".join(lines)
-        result = re.sub(r'(?i)Loading\s+the\s*[\r\n\s]*Elevenlabs\s+Text\s+to\s+Speech[\r\n\s]*AudioNative\s+Player\.\.\.\n*', '', result)
+        result = re.sub(r'(?i)Loading\s+the\s*[\r\n\s]*Elevenlabs\s+Text\s+to\s+Speech[\r\n\s]*AudioNative\s+Player[\.\u2026]*\n*', '', result)
         result = re.sub(r'(?i)Loading\s+the\s*[\r\n\s]*Elevenlabs[^\n]*\n*', '', result)
-        result = re.sub(r'(?i)AudioNative\s+Player\.\.\.\n*', '', result)
+        result = re.sub(r'(?i)AudioNative\s+Player[\.\u2026]*\n*', '', result)
         result = re.sub(r'↩\s*\d+\s*▶\s*↩\s*\d+\s*[\d:]+\s*[\d:]+', '', result)
 
         # Nettoyage des sections de promotion / parcours e-mail en fin d'article
