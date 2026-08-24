@@ -17,17 +17,35 @@ const SettingsView = {
   bindTabs() {
     document.querySelectorAll('.settings-tab').forEach(tabBtn => {
       tabBtn.addEventListener('click', () => {
-        document.querySelectorAll('.settings-tab').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
-
-        tabBtn.classList.add('active');
         const secId = tabBtn.dataset.sec;
-        const targetSec = document.getElementById(`sec-${secId}`);
-        if (targetSec) {
-          targetSec.classList.add('active');
-        }
+        this.switchToSection(secId);
       });
     });
+  },
+
+  switchToSection(secId, scrollTargetId = null) {
+    document.querySelectorAll('.settings-tab').forEach(b => {
+      b.classList.toggle('active', b.dataset.sec === secId);
+    });
+    document.querySelectorAll('.settings-section').forEach(s => {
+      s.classList.toggle('active', s.id === `sec-${secId}`);
+    });
+
+    if (scrollTargetId) {
+      setTimeout(() => {
+        const el = document.getElementById(scrollTargetId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.style.transition = 'box-shadow 0.3s ease, border-color 0.3s ease';
+          el.style.borderColor = 'var(--accent-primary, #3b82f6)';
+          el.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.4)';
+          setTimeout(() => {
+            el.style.boxShadow = '';
+            el.style.borderColor = '';
+          }, 1800);
+        }
+      }, 120);
+    }
   },
 
   bindSliders() {

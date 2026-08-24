@@ -4274,15 +4274,18 @@
                       </button>
                     </div>
 
-                    <!-- 2. Taille du texte -->
+                    <!-- 2. Taille du texte (Zoom style - 100% +) -->
                     <div style="border-top: 1px solid var(--border-color); margin: 10px 0 6px 0; padding-top: 10px;">
-                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Taille du texte</span>
-                        <span id="lbl-article-font-size" style="font-size: 11.5px; font-weight: 600; color: var(--text-primary);">18 px</span>
+                      <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
+                        Taille du texte
                       </div>
-                      <div style="display: flex; gap: 8px; align-items: center;">
-                        <button type="button" class="btn-secondary btn-sm" id="btn-article-font-dec" style="padding: 4px 10px; font-weight: 700;">A−</button>
-                        <button type="button" class="btn-secondary btn-sm" id="btn-article-font-inc" style="padding: 4px 10px; font-weight: 700;">A+</button>
+                      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                          <button type="button" class="btn-secondary btn-sm" id="btn-article-zoom-out" style="width: 30px; height: 28px; padding: 0; font-weight: 700; font-size: 14px;" title="Diminuer la taille">−</button>
+                          <span id="lbl-article-zoom-val" style="font-size: 12px; font-weight: 700; min-width: 48px; text-align: center; color: var(--text-primary);">100%</span>
+                          <button type="button" class="btn-secondary btn-sm" id="btn-article-zoom-in" style="width: 30px; height: 28px; padding: 0; font-weight: 700; font-size: 14px;" title="Augmenter la taille">+</button>
+                        </div>
+                        <button type="button" class="btn-ghost btn-sm" id="btn-article-zoom-reset" title="Réinitialiser à 100%" style="font-size: 11px; padding: 4px 8px; color: var(--text-secondary);">100%</button>
                       </div>
                     </div>
 

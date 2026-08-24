@@ -15,7 +15,7 @@ const ArticlesView = {
   readingOpts: {
     bg: 'auto',
     fontFamily: 'EB Garamond',
-    fontSize: 18,
+    zoom: 100, // Pourcentage de zoom (style - 100% +)
     isFullWidth: false,
     isJustified: false
   },
@@ -59,19 +59,13 @@ const ArticlesView = {
       this.syncArticles();
     });
 
-    // 2b. Bouton Réglages RAG (raccourci vers les paramètres)
+    // 2b. Bouton Réglages RAG (Routage direct vers l'onglet IA + scroll automatique)
     document.getElementById('btn-articles-settings')?.addEventListener('click', () => {
       if (typeof App !== 'undefined' && App.switchView) {
         App.switchView('settings');
-        setTimeout(() => {
-          const el = document.getElementById('sec-articles-rag-settings');
-          if (el) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            el.style.transition = 'box-shadow 0.3s ease';
-            el.style.boxShadow = '0 0 0 2px var(--accent-primary, #3b82f6)';
-            setTimeout(() => { el.style.boxShadow = ''; }, 1500);
-          }
-        }, 120);
+        if (typeof SettingsView !== 'undefined' && SettingsView.switchToSection) {
+          SettingsView.switchToSection('ai', 'sec-articles-rag-settings');
+        }
       }
     });
 
@@ -131,21 +125,29 @@ const ArticlesView = {
       });
     });
 
-    // 2. Taille de police (A- / A+)
-    document.getElementById('btn-article-font-dec')?.addEventListener('click', () => {
-      if (this.readingOpts.fontSize > 13) {
-        this.readingOpts.fontSize -= 1;
+    // 2. Zoom de texte (Contrôles style - 100% +)
+    document.getElementById('btn-article-zoom-out')?.addEventListener('click', () => {
+      const cur = this.readingOpts.zoom || 100;
+      if (cur > 70) {
+        this.readingOpts.zoom = cur - 10;
         this.saveReadingPreferences();
         this.applyReadingOptions();
       }
     });
 
-    document.getElementById('btn-article-font-inc')?.addEventListener('click', () => {
-      if (this.readingOpts.fontSize < 28) {
-        this.readingOpts.fontSize += 1;
+    document.getElementById('btn-article-zoom-in')?.addEventListener('click', () => {
+      const cur = this.readingOpts.zoom || 100;
+      if (cur < 180) {
+        this.readingOpts.zoom = cur + 10;
         this.saveReadingPreferences();
         this.applyReadingOptions();
       }
+    });
+
+    document.getElementById('btn-article-zoom-reset')?.addEventListener('click', () => {
+      this.readingOpts.zoom = 100;
+      this.saveReadingPreferences();
+      this.applyReadingOptions();
     });
 
     // 3. Fond de lecture (Swatches style Open Shema)
@@ -180,6 +182,8 @@ const ArticlesView = {
     const popover = document.getElementById('article-reading-options-popover');
     if (!container) return;
 
+    const zoom = this.readingOpts.zoom || 100;
+
     // 1. Fond de lecture
     container.classList.remove('reading-bg-white', 'reading-bg-sepia', 'reading-bg-dark');
     if (this.readingOpts.bg !== 'auto') {
@@ -193,14 +197,12 @@ const ArticlesView = {
     }
     container.style.fontFamily = fontStack;
 
-    // 3. Taille
-    const bodyEl = document.getElementById('article-reader-body');
-    if (bodyEl) {
-      bodyEl.style.fontSize = `${this.readingOpts.fontSize}px`;
-    }
-    const lblSize = document.getElementById('lbl-article-font-size');
-    if (lblSize) {
-      lblSize.textContent = `${this.readingOpts.fontSize} px`;
+    // 3. Facteur de Zoom CSS appliqué sur le container
+    container.style.setProperty('--article-zoom-factor', (zoom / 100).toString());
+
+    const lblZoom = document.getElementById('lbl-article-zoom-val');
+    if (lblZoom) {
+      lblZoom.textContent = `${zoom}%`;
     }
 
     // 4. Largeur
@@ -504,6 +506,32 @@ const ArticlesView = {
       
       if (contentEl) {
         contentEl.innerHTML = renderedHtml;
+
+        // Liaison des infobulles et clics sur les références bibliques
+        if (typeof ScriptureTooltip !== 'undefined' && ScriptureTooltip.bindToElements) {
+          ScriptureTooltip.bindToElements(contentEl.querySelectorAll('.theol-inline-scripture-ref'));
+        }
+
+        contentEl.querySelectorAll('.theol-inline-scripture-ref').forEach(span => {
+          span.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const ref = span.dataset.ref || span.textContent.trim();
+            if (ref && typeof TheologyView !== 'undefined' && TheologyView.openScriptureReference) {
+              await TheologyView.openScriptureReference(ref);
+            } else if (ref && typeof BibleReader !== 'undefined') {
+              App.switchView('bible');
+              try {
+                const parsed = await API.parseReference(ref);
+                if (parsed && parsed.book) {
+                  await BibleReader.navigateTo(parsed.book, parsed.chapter || 1, parsed.verse || null);
+                }
+              } catch (err) {
+                BibleReader.navigateTo(ref);
+              }
+            }
+          });
+        });
       }
 
       // Calcul des statistiques de lecture (mots & temps)
@@ -512,7 +540,7 @@ const ArticlesView = {
       // Appliquer les préférences de lecture actuelles
       this.applyReadingOptions();
 
-      // Scroller en haut
+      // Scroller en haut du container
       const scrollParent = document.getElementById('view-articles');
       if (scrollParent) scrollParent.scrollTop = 0;
 
@@ -649,14 +677,22 @@ const ArticlesView = {
     
     let text = md;
 
-    // 1. Nettoyer tout bloc d'en-tête redondant (titre, auteur, source, date dupliqués)
+    // 1. Nettoyer les blocs promotionnels et parcours e-mail de fin d'article
+    text = text.replace(/(?:#+\s*)?Parcours\s+e-?mail[\s\S]*$/gi, '');
+    text = text.replace(/Pour\s+aller\s+plus\s+loin,\s+inscris-toi[\s\S]*$/gi, '');
+    text = text.replace(/(?:#+\s*)?Inscrivez-vous\s+à\s+notre\s+newsletter[\s\S]*$/gi, '');
+
+    // 2. Nettoyer tout bloc d'en-tête redondant (titre, auteur, source, date dupliqués)
     text = text.replace(/^(#\s+[^\n]+\n+)?/gi, '');
     text = text.replace(/^(\*\*(?:Auteur|Source|Date)\s*:\*\*[^\n]*\n*|Auteur\s*:[^\n]*\n*|Source\s*:[^\n]*\n*|Date\s*:[^\n]*\n*|---\n*)+/gim, '');
 
-    // 2. Nettoyer les séparateurs multiples ou en fin d'article
+    // 3. Nettoyer les émojis décoratifs pour une mise en page typographique sobre
+    text = text.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1FA70}-\u{1FAFF}]/gu, '');
+
+    // 4. Nettoyer les séparateurs multiples ou en fin d'article
     text = text.replace(/---\s*$/gi, '');
 
-    // 3. Remplacement Markdown vers HTML fluide
+    // 5. Remplacement Markdown vers HTML
     let html = text
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -671,6 +707,11 @@ const ArticlesView = {
       .replace(/^---\s*$/gim, '<div class="article-ornamental-divider"><span class="article-ornamental-divider-icon">❦</span></div>')
       .replace(/\n\n/gim, '</p><p>')
       .replace(/\n/gim, '<br>');
+
+    // 6. Détection et liaisonnement des références bibliques (ex: 1 Corinthiens 1.2, 1 Pierre 5.10, Romains 3.22-23)
+    if (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences) {
+      html = TheologyView.highlightScriptureReferences(html);
+    }
 
     return `<div class="article-markdown-body"><p>${html}</p></div>`;
   },

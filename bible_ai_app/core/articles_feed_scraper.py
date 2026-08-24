@@ -328,6 +328,11 @@ class ArticlesFeedScraper:
         result = "\n".join(lines)
         result = re.sub(r'Loading the Elevenlabs.*?\n', '', result, flags=re.IGNORECASE)
         result = re.sub(r'↩\s*\d+\s*▶\s*↩\s*\d+\s*[\d:]+\s*[\d:]+', '', result)
+
+        # Nettoyage des sections de promotion / parcours e-mail en fin d'article
+        result = re.sub(r'(?i)\n*#+\s*Parcours\s+e-?mail.*$', '', result, flags=re.DOTALL)
+        result = re.sub(r'(?i)\n*Pour\s+aller\s+plus\s+loin,\s+inscris-toi\s+gratuitement\s+à\s+notre\s+nouveau\s+parcours\s+e-?mail.*$', '', result, flags=re.DOTALL)
+        result = re.sub(r'(?i)\n*#+\s*Inscrivez-vous\s+à\s+notre\s+newsletter.*$', '', result, flags=re.DOTALL)
         result = re.sub(r'\n{3,}', '\n\n', result)
         return result.strip()
 
