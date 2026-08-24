@@ -512,7 +512,7 @@ const AIStudyView = {
   // JAUGE DE PROFONDEUR DE CONTEXTE
   // =========================================================================
 
-  initContextDepthSlider() {
+  updateContextDepthSliderUI() {
     const slider   = document.getElementById('ai-opt-context-depth');
     const tokensEl = document.getElementById('ctx-depth-tokens');
     const timeEl   = document.getElementById('ctx-depth-time');
@@ -543,16 +543,19 @@ const AIStudyView = {
       }
     ];
 
-    const update = () => {
-      const v = parseInt(slider.value, 10);
-      const l = levels[Math.min(v, levels.length - 1)];
-      if (tokensEl) tokensEl.textContent = l.tokens;
-      if (timeEl)   timeEl.textContent   = l.time;
-      if (descEl)   descEl.textContent   = l.desc;
-    };
+    const v = parseInt(slider.value, 10);
+    const l = levels[Math.min(v, levels.length - 1)];
+    if (tokensEl) tokensEl.textContent = l.tokens;
+    if (timeEl)   timeEl.textContent   = l.time;
+    if (descEl)   descEl.textContent   = l.desc;
+  },
 
-    slider.addEventListener('input', update);
-    update(); // État initial
+  initContextDepthSlider() {
+    const slider = document.getElementById('ai-opt-context-depth');
+    if (!slider) return;
+
+    slider.addEventListener('input', () => this.updateContextDepthSliderUI());
+    this.updateContextDepthSliderUI(); // État initial
   },
 
   // =========================================================================
@@ -736,6 +739,40 @@ const AIStudyView = {
         card.classList.remove('active');
       }
     });
+
+    // Adapter automatiquement les options et corpus selon le mode choisi
+    const chkBibles = document.getElementById('ai-opt-src-bibles');
+    const chkComms = document.getElementById('ai-opt-src-comms');
+    const chkDict = document.getElementById('ai-opt-src-dict');
+    const chkNotes = document.getElementById('ai-opt-src-notes');
+    const ctxSlider = document.getElementById('ai-opt-context-depth');
+    const depthSelect = document.getElementById('ai-opt-depth');
+
+    if (modeKey === 'free_chat') {
+      // En mode Discussion libre : RAG léger / spontané, pas de scraping de masse
+      if (chkComms) chkComms.checked = false;
+      if (chkDict) chkDict.checked = false;
+      if (chkNotes) chkNotes.checked = false;
+      if (chkBibles) chkBibles.checked = true;
+      if (ctxSlider) {
+        ctxSlider.value = 0;
+        this.updateContextDepthSliderUI();
+      }
+      if (depthSelect) depthSelect.value = 'pastoral';
+    } else {
+      // Dans les modes d'étude approfondie : tous les corpus activés
+      if (chkComms) chkComms.checked = true;
+      if (chkDict) chkDict.checked = true;
+      if (chkNotes) chkNotes.checked = true;
+      if (chkBibles) chkBibles.checked = true;
+      if (ctxSlider && ctxSlider.value == 0) {
+        ctxSlider.value = 1;
+        this.updateContextDepthSliderUI();
+      }
+      if (depthSelect && depthSelect.value === 'pastoral' && modeKey !== 'sermon') {
+        depthSelect.value = 'academic';
+      }
+    }
 
     if (this.inputEl) {
       this.inputEl.placeholder = info.placeholder;
@@ -1166,7 +1203,28 @@ const AIStudyView = {
     
     const reasoningId = `reasoning-${Date.now()}`;
     const timerId = `timer-${Date.now()}`;
-    
+    const isFreeChat = mode === 'free_chat';
+
+    const stepsHtml = isFreeChat ? `
+      <div class="reasoning-step step-1 active"><span class="step-bullet"></span><span>Cadrage théologique &amp; alignement profil</span></div>
+      <div class="reasoning-step step-2 pending">
+        <span class="step-bullet"></span>
+        <div class="step-text-container">
+          <span class="step-label">Échange et réflexion avec ${this.escapeHtml(options.model)}</span>
+        </div>
+      </div>
+    ` : `
+      <div class="reasoning-step step-1 active"><span class="step-bullet"></span><span>Analyse de l'intention et du contexte</span></div>
+      <div class="reasoning-step step-2 pending"><span class="step-bullet"></span><span>Exploration du corpus documentaire</span></div>
+      <div class="reasoning-step step-3 pending"><span class="step-bullet"></span><span>Sélection et ordonnancement sémantique</span></div>
+      <div class="reasoning-step step-4 pending">
+        <span class="step-bullet"></span>
+        <div class="step-text-container">
+          <span class="step-label">Synthèse IA avec ${this.escapeHtml(options.model)}</span>
+        </div>
+      </div>
+    `;
+
     assistantMsg.innerHTML = `
       <div class="msg-avatar">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
@@ -1183,15 +1241,7 @@ const AIStudyView = {
             <span class="ai-reasoning-toggle-icon">▾</span>
           </div>
           <div class="ai-reasoning-steps-list">
-            <div class="reasoning-step step-1 active"><span class="step-bullet"></span><span>Analyse de l'intention et du contexte</span></div>
-            <div class="reasoning-step step-2 pending"><span class="step-bullet"></span><span>Exploration du corpus documentaire</span></div>
-            <div class="reasoning-step step-3 pending"><span class="step-bullet"></span><span>Sélection et ordonnancement sémantique</span></div>
-            <div class="reasoning-step step-4 pending">
-              <span class="step-bullet"></span>
-              <div class="step-text-container">
-                <span class="step-label">Synthèse IA avec ${this.escapeHtml(options.model)}</span>
-              </div>
-            </div>
+            ${stepsHtml}
           </div>
         </div>
         <div class="ai-answer-body"></div>
@@ -1212,20 +1262,27 @@ const AIStudyView = {
 
     // Animation progressive des étapes textuelles
     const reasoningEl = document.getElementById(reasoningId);
-    const stepTimeout1 = setTimeout(() => {
-      reasoningEl?.querySelector('.step-1')?.classList.replace('active', 'done');
-      reasoningEl?.querySelector('.step-2')?.classList.replace('pending', 'active');
-    }, 500);
-    const stepTimeout2 = setTimeout(() => {
-      reasoningEl?.querySelector('.step-2')?.classList.replace('active', 'done');
-      reasoningEl?.querySelector('.step-3')?.classList.replace('pending', 'active');
-    }, 1200);
-    const stepTimeout3 = setTimeout(() => {
-      reasoningEl?.querySelector('.step-3')?.classList.replace('active', 'done');
-      reasoningEl?.querySelector('.step-4')?.classList.replace('pending', 'active');
-    }, 2000);
-    
-    this.activeTimeouts = [stepTimeout1, stepTimeout2, stepTimeout3];
+    if (isFreeChat) {
+      const stepTimeout1 = setTimeout(() => {
+        reasoningEl?.querySelector('.step-1')?.classList.replace('active', 'done');
+        reasoningEl?.querySelector('.step-2')?.classList.replace('pending', 'active');
+      }, 350);
+      this.activeTimeouts = [stepTimeout1];
+    } else {
+      const stepTimeout1 = setTimeout(() => {
+        reasoningEl?.querySelector('.step-1')?.classList.replace('active', 'done');
+        reasoningEl?.querySelector('.step-2')?.classList.replace('pending', 'active');
+      }, 500);
+      const stepTimeout2 = setTimeout(() => {
+        reasoningEl?.querySelector('.step-2')?.classList.replace('active', 'done');
+        reasoningEl?.querySelector('.step-3')?.classList.replace('pending', 'active');
+      }, 1200);
+      const stepTimeout3 = setTimeout(() => {
+        reasoningEl?.querySelector('.step-3')?.classList.replace('active', 'done');
+        reasoningEl?.querySelector('.step-4')?.classList.replace('pending', 'active');
+      }, 2000);
+      this.activeTimeouts = [stepTimeout1, stepTimeout2, stepTimeout3];
+    }
 
     try {
       const response = await API.call('ask_study_ai', this.currentMessages, mode, passage, options);

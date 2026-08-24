@@ -2381,7 +2381,153 @@
                 </svg>
                 <span>Prompts Système Personnalisés</span>
               </div>
-              <p class="card-desc">Consultez et personnalisez confortablement les instructions fondamentales envoyées aux modèles d'IA.</p>
+              <p class="card-desc">Consultez et personnalisez confortablement les instructions fondamentales envoyées aux modèles d'IA pour chaque mode d'étude et fonctionnalité.</p>
+
+              <!-- SOUS-SECTION 1 : MODES DE CHAT & D'ANALYSE IA -->
+              <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin: 18px 0 10px 0; display: flex; align-items: center; gap: 6px;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>Modes d'Étude &amp; Chat IA</span>
+              </div>
+
+              <div class="prompts-settings-list">
+                <!-- Mode 1 : Exégèse Approfondie -->
+                <div class="prompt-setting-card" id="prompt-card-mode-exegesis">
+                  <div class="prompt-card-main">
+                    <div class="prompt-card-header">
+                      <strong class="prompt-card-title">Exégèse Approfondie</strong>
+                      <span class="prompt-status-badge is-default" id="badge-mode-exegesis-status">Par défaut</span>
+                    </div>
+                    <p class="prompt-card-desc">Analyse structurelle et théologique verset par verset, langues originales et cohérence canonique.</p>
+                  </div>
+                  <div class="prompt-card-actions">
+                    <button type="button" class="btn-secondary btn-sm" id="btn-open-modal-mode-exegesis-prompt">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                      <span>Consulter / Modifier</span>
+                    </button>
+                    <button type="button" class="btn-ghost btn-sm" id="btn-reset-mode-exegesis-prompt" title="Rétablir le prompt d'origine">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                      <span>Rétablir</span>
+                    </button>
+                  </div>
+                  <textarea id="cfg-prompt-exegesis" style="display: none;"></textarea>
+                </div>
+
+                <!-- Mode 2 : Contexte Historique & Culturel -->
+                <div class="prompt-setting-card" id="prompt-card-mode-historical" style="margin-top: 12px;">
+                  <div class="prompt-card-main">
+                    <div class="prompt-card-header">
+                      <strong class="prompt-card-title">Contexte Historique &amp; Culturel</strong>
+                      <span class="prompt-status-badge is-default" id="badge-mode-historical-status">Par défaut</span>
+                    </div>
+                    <p class="prompt-card-desc">Arrière-plan de rédaction, cadre socio-politique antique, courants du judaïsme et archéologie.</p>
+                  </div>
+                  <div class="prompt-card-actions">
+                    <button type="button" class="btn-secondary btn-sm" id="btn-open-modal-mode-historical-prompt">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                      <span>Consulter / Modifier</span>
+                    </button>
+                    <button type="button" class="btn-ghost btn-sm" id="btn-reset-mode-historical-prompt" title="Rétablir le prompt d'origine">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                      <span>Rétablir</span>
+                    </button>
+                  </div>
+                  <textarea id="cfg-prompt-historical" style="display: none;"></textarea>
+                </div>
+
+                <!-- Mode 3 : Préparation de Prédication -->
+                <div class="prompt-setting-card" id="prompt-card-mode-sermon" style="margin-top: 12px;">
+                  <div class="prompt-card-main">
+                    <div class="prompt-card-header">
+                      <strong class="prompt-card-title">Préparation de Prédication / Homilétique</strong>
+                      <span class="prompt-status-badge is-default" id="badge-mode-sermon-status">Par défaut</span>
+                    </div>
+                    <p class="prompt-card-desc">Méthodologie textuelle expositive, Proposition Centrale (Big Idea), plan homogénéisé, illustrations et applications.</p>
+                  </div>
+                  <div class="prompt-card-actions">
+                    <button type="button" class="btn-secondary btn-sm" id="btn-open-modal-mode-sermon-prompt">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                      <span>Consulter / Modifier</span>
+                    </button>
+                    <button type="button" class="btn-ghost btn-sm" id="btn-reset-mode-sermon-prompt" title="Rétablir le prompt d'origine">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                      <span>Rétablir</span>
+                    </button>
+                  </div>
+                  <textarea id="cfg-prompt-sermon" style="display: none;"></textarea>
+                </div>
+
+                <!-- Mode 4 : Synthèse Théologique & Doctrinale -->
+                <div class="prompt-setting-card" id="prompt-card-mode-theology" style="margin-top: 12px;">
+                  <div class="prompt-card-main">
+                    <div class="prompt-card-header">
+                      <strong class="prompt-card-title">Synthèse Théologique &amp; Doctrinale</strong>
+                      <span class="prompt-status-badge is-default" id="badge-mode-theology-status">Par défaut</span>
+                    </div>
+                    <p class="prompt-card-desc">Analyse doctrinale systématique étayée par les traités et dictionnaires théologiques du corpus.</p>
+                  </div>
+                  <div class="prompt-card-actions">
+                    <button type="button" class="btn-secondary btn-sm" id="btn-open-modal-mode-theology-prompt">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                      <span>Consulter / Modifier</span>
+                    </button>
+                    <button type="button" class="btn-ghost btn-sm" id="btn-reset-mode-theology-prompt" title="Rétablir le prompt d'origine">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                      <span>Rétablir</span>
+                    </button>
+                  </div>
+                  <textarea id="cfg-prompt-theology" style="display: none;"></textarea>
+                </div>
+
+                <!-- Mode 5 : Analyse Lexicale -->
+                <div class="prompt-setting-card" id="prompt-card-mode-lexical" style="margin-top: 12px;">
+                  <div class="prompt-card-main">
+                    <div class="prompt-card-header">
+                      <strong class="prompt-card-title">Analyse Lexicale (Grec &amp; Hébreu)</strong>
+                      <span class="prompt-status-badge is-default" id="badge-mode-lexical-status">Par défaut</span>
+                    </div>
+                    <p class="prompt-card-desc">Étude des racines linguistiques, codes Strong, étymologie et nuances Septante (LXX) / Nouveau Testament.</p>
+                  </div>
+                  <div class="prompt-card-actions">
+                    <button type="button" class="btn-secondary btn-sm" id="btn-open-modal-mode-lexical-prompt">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                      <span>Consulter / Modifier</span>
+                    </button>
+                    <button type="button" class="btn-ghost btn-sm" id="btn-reset-mode-lexical-prompt" title="Rétablir le prompt d'origine">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                      <span>Rétablir</span>
+                    </button>
+                  </div>
+                  <textarea id="cfg-prompt-lexical" style="display: none;"></textarea>
+                </div>
+
+                <!-- Mode 6 : Discussion Libre & Réflexion -->
+                <div class="prompt-setting-card" id="prompt-card-mode-free_chat" style="margin-top: 12px;">
+                  <div class="prompt-card-main">
+                    <div class="prompt-card-header">
+                      <strong class="prompt-card-title">Discussion Libre &amp; Réflexion</strong>
+                      <span class="prompt-status-badge is-default" id="badge-mode-free_chat-status">Par défaut</span>
+                    </div>
+                    <p class="prompt-card-desc">Dialogue fluide, sparring-partner théologique, discernement des salutations et relances stimulantes.</p>
+                  </div>
+                  <div class="prompt-card-actions">
+                    <button type="button" class="btn-secondary btn-sm" id="btn-open-modal-mode-free_chat-prompt">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                      <span>Consulter / Modifier</span>
+                    </button>
+                    <button type="button" class="btn-ghost btn-sm" id="btn-reset-mode-free_chat-prompt" title="Rétablir le prompt d'origine">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                      <span>Rétablir</span>
+                    </button>
+                  </div>
+                  <textarea id="cfg-prompt-free_chat" style="display: none;"></textarea>
+                </div>
+              </div>
+
+              <!-- SOUS-SECTION 2 : FONCTIONNALITÉS SPÉCIFIQUES -->
+              <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin: 24px 0 10px 0; display: flex; align-items: center; gap: 6px;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Outils &amp; Fonctionnalités Dédiées</span>
+              </div>
 
               <div class="prompts-settings-list">
                 <!-- Carte 1 : Synthèse Exégétique -->

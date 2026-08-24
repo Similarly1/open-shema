@@ -89,6 +89,134 @@ Directives de rédaction :
 4. FORMAT ET CLARTÉ : Structure le résumé avec des intertitres en gras, des puces synthétiques et une conclusion théologique en une phrase.
 5. CONCISION : Respecte scrupuleusement la longueur cible demandée. Reste direct, sans préambule superflu.`,
 
+  DEFAULT_PROMPT_EXEGESIS: `MODE D'ÉTUDE : EXÉGÈSE APPROFONDIE
+- Analyse structurelle et théologique verset par verset (syntaxe, intertextualité, cohérence canonique).
+- Fonde ton analyse sur les langues originales et la comparaison des versions bibliques.
+- Rigueur académique, précision des termes et citations exégétiques fidèles.`,
+
+  DEFAULT_PROMPT_HISTORICAL: `MODE D'ÉTUDE : CONTEXTE HISTORIQUE & CULTUREL
+- Établis l'arrière-plan de rédaction, la datation, l'auteur et les destinataires du texte.
+- Analyse le cadre socio-politique, géopolitique et religieux antique (monde gréco-romain, judaïsme du Second Temple : Pharisiens, Sadducéens, Zélotes, Esséniens).
+- Mobilise les sources archéologiques et historiques issues du corpus documentaire.`,
+
+  DEFAULT_PROMPT_SERMON: `MODE D'ÉTUDE : PRÉPARATION DE PRÉDICATION / HOMILÉTIQUE TEXTUELLE & EXPOSITIVE
+Tu es un assistant IA expert en théologie biblique et homilétique, spécialisé dans la prédication textuelle (expositive) fidèle aux Écritures (méthode de David Helm, Haddon Robinson, Bryan Chapell, John Piper, John Stott).
+Ton rôle est d'accompagner le prédicateur à chaque étape pour concevoir un message fidèle au sens originel, centré sur la grâce de l'Évangile et percutant pour l'auditoire.
+
+MÉTHODOLOGIE HOMILÉTIQUE À APPLIQUER :
+1. IDENTIFICATION DU SUJET & DE LA PROPOSITION CENTRALE (PC / Big Idea) :
+   - Exégèse & Sens Originel : Détermine ce que le texte signifiait pour l'auteur et les destinataires d'origine (Proposition Herméneutique - hier et là-bas).
+   - Formulation de la PC : Traduis cette vérité pour aujourd'hui (ici et maintenant) en UNE seule phrase claire, intense, mémorable et ancrée dans l'Évangile.
+2. PLAN EXPOSITIF FIDÈLE (Découper, Décrire, Homogénéiser) :
+   - Découpe le texte selon ses articulations logiques naturelles et transitions.
+   - Formule entre 2 et 5 points simples (niveau 1) qui soutiennent directement la Proposition Centrale.
+   - Homogénéise la formulation des points pour leur donner une même dynamique logique et fluide.
+3. CONCEPTION D'ILLUSTRATIONS PERTINENTES :
+   - Rôle : Illuminer l'abstrait, susciter une émotion légitime, ancrer la vérité dans la mémoire.
+   - Types : Récits bibliques de l'AT, arrière-plans historiques ou biographiques, faits vécus sobres, analogies du quotidien.
+   - Critères : Intégrité absolue, précision des faits, dosage sobre, pertinence stricte au service de la PC (sans humour futile ni manipulation).
+4. FORMULATION DES APPLICATIONS PASTORALES CONCRÈTES (Viser le Cœur) :
+   - Dépasser le simple moralisme en ciblant les 4 axes :
+     * Le Cœur (Affections & Volonté) : Démanteler les idoles du cœur, susciter l'amour pour Dieu et la repentance.
+     * La Pensée (Mind) : Réformer l'intelligence et la vision du monde par la théologie du texte.
+     * L'Action (Vie pratique) : Pistes précises d'obéissance pour la semaine (« Comment faire ? »).
+     * La Communauté : Vivre cette vérité dans l'Église locale (encouragement, amour mutuel, redevabilité).
+   - Condition de grâce : Tout appel à l'obéissance découle de l'œuvre accomplie de Christ à la croix et de la force du Saint-Esprit (bannir le légalisme).
+5. GARDE-FOUS & PIÈGES À ÉVITER :
+   - Alerte le prédicateur contre la prédication moraliste/légaliste, la prédication impressionniste sans rigueur exégétique, ou le discours académique aride sans application.`,
+
+  DEFAULT_PROMPT_THEOLOGY: `MODE D'ÉTUDE : SYNTHÈSE THÉOLOGIQUE & DOCTRINALE
+- Analyse doctrinale systématique et biblique approfondie étayée par les traités et dictionnaires théologiques.
+- Démonstration scripturaire rigoureuse (analogia scripturae) et définitions théologiques précises.
+- Articulation claire des doctrines cardinales (salut par grâce, Trinité, alliances, christologie, eschatologie).`,
+
+  DEFAULT_PROMPT_LEXICAL: `MODE D'ÉTUDE : ANALYSE LEXICALE (GREC & HÉBREU / STRONG)
+- Étude détaillée des racines linguistiques hébraïques et grecques, des codes Strong et des champs sémantiques.
+- Analyse des nuances morphologiques, de l'étymologie et du sens des termes dans la Septante (LXX) et le Nouveau Testament.
+- Restitution claire des implications théologiques issues du sens originel des mots.`,
+
+  DEFAULT_PROMPT_FREE_CHAT: `MODE D'ÉTUDE : DISCUSSION LIBRE & RÉFLEXION THÉOLOGIQUE
+Tu es un pair intellectuel, un compagnon d'étude théologique et un sparring-partner biblique bienveillant.
+OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
+- RÈGLE FONDAMENTALE SUR LES SALUTATIONS : Si l'utilisateur te salue (ex: 'salut', 'bonjour', 'hello', 'coucou'), réponds simplement, chaleureusement et brièvement en lui demandant quel sujet, texte ou réflexion il aimerait aborder aujourd'hui. Ne confonds JAMAIS une salutation d'usage ('salut !') avec une question sur la doctrine sotériologique du Salut !
+- Réponds de manière vivante, fluide, naturelle et directe, avec une longueur proportionnée au message de l'utilisateur.
+- Adopte une posture d'échange constructif : apporte des éclairages stimulants, partage des perspectives bibliques équilibrées, et termine si opportun par une question ouverte ou une relance pour nourrir la réflexion.
+- Mobilise les Écritures avec naturel et précision (en citant les références) sans alourdir le propos.
+- Si des documents du corpus documentaire sont pertinents pour la question, appuie-toi dessus avec simplicité.`,
+
+  PROMPT_CONFIGS: {
+    theological_profile: {
+      title: 'System Prompt — Passeport Herméneutique (« Mon Église »)',
+      defaultProp: null,
+      fieldId: null,
+      badgeId: 'badge-profile-status',
+      label: 'Passeport Herméneutique'
+    },
+    mode_exegesis: {
+      title: 'System Prompt — Mode Exégèse Approfondie (Chat)',
+      defaultProp: 'DEFAULT_PROMPT_EXEGESIS',
+      fieldId: 'cfg-prompt-exegesis',
+      badgeId: 'badge-mode-exegesis-status',
+      label: 'Exégèse Approfondie'
+    },
+    mode_historical: {
+      title: 'System Prompt — Mode Contexte Historique & Culturel (Chat)',
+      defaultProp: 'DEFAULT_PROMPT_HISTORICAL',
+      fieldId: 'cfg-prompt-historical',
+      badgeId: 'badge-mode-historical-status',
+      label: 'Contexte Historique'
+    },
+    mode_sermon: {
+      title: 'System Prompt — Mode Préparation de Prédication (Chat)',
+      defaultProp: 'DEFAULT_PROMPT_SERMON',
+      fieldId: 'cfg-prompt-sermon',
+      badgeId: 'badge-mode-sermon-status',
+      label: 'Préparation de Prédication'
+    },
+    mode_theology: {
+      title: 'System Prompt — Mode Synthèse Théologique & Doctrinale (Chat)',
+      defaultProp: 'DEFAULT_PROMPT_THEOLOGY',
+      fieldId: 'cfg-prompt-theology',
+      badgeId: 'badge-mode-theology-status',
+      label: 'Synthèse Théologique'
+    },
+    mode_lexical: {
+      title: 'System Prompt — Mode Analyse Lexicale Grec & Hébreu (Chat)',
+      defaultProp: 'DEFAULT_PROMPT_LEXICAL',
+      fieldId: 'cfg-prompt-lexical',
+      badgeId: 'badge-mode-lexical-status',
+      label: 'Analyse Lexicale'
+    },
+    mode_free_chat: {
+      title: 'System Prompt — Mode Discussion Libre & Réflexion (Chat)',
+      defaultProp: 'DEFAULT_PROMPT_FREE_CHAT',
+      fieldId: 'cfg-prompt-free_chat',
+      badgeId: 'badge-mode-free_chat-status',
+      label: 'Discussion Libre'
+    },
+    synthesis: {
+      title: 'System Prompt — Synthèse Exégétique IA (Versets)',
+      defaultProp: 'DEFAULT_SYNTH_PROMPT',
+      fieldId: 'cfg-synthesis-system-prompt',
+      badgeId: 'badge-synth-status',
+      label: 'Synthèse Exégétique'
+    },
+    translation: {
+      title: 'System Prompt — Traduction Fidèle d\'Articles & Dictionnaires',
+      defaultProp: 'DEFAULT_TRANS_PROMPT',
+      fieldId: 'cfg-translation-system-prompt',
+      badgeId: 'badge-trans-status',
+      label: 'Traduction'
+    },
+    summary: {
+      title: 'System Prompt — Résumé Théologique de Chapitre',
+      defaultProp: 'DEFAULT_SUMMARY_PROMPT',
+      fieldId: 'cfg-summary-system-prompt',
+      badgeId: 'badge-summary-status',
+      label: 'Résumé Théologique'
+    }
+  },
+
   currentEditingPrompt: null,
   activeModalTab: 'preview',
 
@@ -293,43 +421,34 @@ Directives de rédaction :
     });
 
     // Boutons des cartes de prompts système
-    document.getElementById('btn-open-modal-synth-prompt')?.addEventListener('click', () => {
-      this.openPromptModal('synthesis');
-    });
+    const promptBtnBindings = [
+      { type: 'mode_exegesis', open: 'btn-open-modal-mode-exegesis-prompt', reset: 'btn-reset-mode-exegesis-prompt' },
+      { type: 'mode_historical', open: 'btn-open-modal-mode-historical-prompt', reset: 'btn-reset-mode-historical-prompt' },
+      { type: 'mode_sermon', open: 'btn-open-modal-mode-sermon-prompt', reset: 'btn-reset-mode-sermon-prompt' },
+      { type: 'mode_theology', open: 'btn-open-modal-mode-theology-prompt', reset: 'btn-reset-mode-theology-prompt' },
+      { type: 'mode_lexical', open: 'btn-open-modal-mode-lexical-prompt', reset: 'btn-reset-mode-lexical-prompt' },
+      { type: 'mode_free_chat', open: 'btn-open-modal-mode-free_chat-prompt', reset: 'btn-reset-mode-free_chat-prompt' },
+      { type: 'synthesis', open: 'btn-open-modal-synth-prompt', reset: 'btn-reset-synth-prompt' },
+      { type: 'translation', open: 'btn-open-modal-trans-prompt', reset: 'btn-reset-trans-prompt' },
+      { type: 'summary', open: 'btn-open-modal-summary-prompt', reset: 'btn-reset-summary-prompt' }
+    ];
 
-    document.getElementById('btn-open-modal-trans-prompt')?.addEventListener('click', () => {
-      this.openPromptModal('translation');
-    });
-
-    document.getElementById('btn-open-modal-summary-prompt')?.addEventListener('click', () => {
-      this.openPromptModal('summary');
-    });
-
-    document.getElementById('btn-reset-synth-prompt')?.addEventListener('click', () => {
-      if (confirm('Voulez-vous rétablir le prompt de Synthèse Exégétique par défaut ?')) {
-        document.getElementById('cfg-synthesis-system-prompt').value = this.DEFAULT_SYNTH_PROMPT;
-        this.updateAllPromptStatusBadges();
-        this.save();
-        App.showToast('Prompt de synthèse rétabli par défaut');
-      }
-    });
-
-    document.getElementById('btn-reset-trans-prompt')?.addEventListener('click', () => {
-      if (confirm('Voulez-vous rétablir le prompt de Traduction par défaut ?')) {
-        document.getElementById('cfg-translation-system-prompt').value = this.DEFAULT_TRANS_PROMPT;
-        this.updateAllPromptStatusBadges();
-        this.save();
-        App.showToast('Prompt de traduction rétabli par défaut');
-      }
-    });
-
-    document.getElementById('btn-reset-summary-prompt')?.addEventListener('click', () => {
-      if (confirm('Voulez-vous rétablir le prompt de Résumé de Chapitre par défaut ?')) {
-        document.getElementById('cfg-summary-system-prompt').value = this.DEFAULT_SUMMARY_PROMPT;
-        this.updateAllPromptStatusBadges();
-        this.save();
-        App.showToast('Prompt de résumé rétabli par défaut');
-      }
+    promptBtnBindings.forEach(item => {
+      const cfg = this.PROMPT_CONFIGS[item.type];
+      document.getElementById(item.open)?.addEventListener('click', () => {
+        this.openPromptModal(item.type);
+      });
+      document.getElementById(item.reset)?.addEventListener('click', () => {
+        if (!cfg || !cfg.defaultProp || !cfg.fieldId) return;
+        const def = this[cfg.defaultProp];
+        if (confirm(`Voulez-vous rétablir le prompt de « ${cfg.label} » par défaut ?`)) {
+          const field = document.getElementById(cfg.fieldId);
+          if (field) field.value = def;
+          this.updateAllPromptStatusBadges();
+          this.save();
+          App.showToast(`Prompt de « ${cfg.label} » rétabli par défaut`);
+        }
+      });
     });
 
     document.getElementById('cfg-summary-word-count')?.addEventListener('input', (e) => {
@@ -715,15 +834,13 @@ Directives de rédaction :
     // Synchronisation et exclusion des doublons Principal / Fallback
     this.syncAllModelPairs(false);
 
-    if (document.getElementById('cfg-synthesis-system-prompt')) {
-      document.getElementById('cfg-synthesis-system-prompt').value = c.synthesis_system_prompt || '';
-    }
-    if (document.getElementById('cfg-translation-system-prompt')) {
-      document.getElementById('cfg-translation-system-prompt').value = c.translation_system_prompt || '';
-    }
-    if (document.getElementById('cfg-summary-system-prompt')) {
-      document.getElementById('cfg-summary-system-prompt').value = c.summary_system_prompt || '';
-    }
+    // Chargement des prompts système (Modes de chat & Outils dédiés)
+    Object.values(this.PROMPT_CONFIGS).forEach(cfg => {
+      if (cfg.fieldId && document.getElementById(cfg.fieldId)) {
+        const configKey = cfg.fieldId.replace('cfg-', '').replace(/-/g, '_');
+        document.getElementById(cfg.fieldId).value = c[configKey] || '';
+      }
+    });
     this.updateAllPromptStatusBadges();
 
     if (c.gemini_api_key) document.getElementById('cfg-gemini-key').value = c.gemini_api_key;
@@ -1007,15 +1124,13 @@ Directives de rédaction :
     if (document.getElementById('cfg-summary-word-count')) {
       newCfg.summary_word_count = parseInt(document.getElementById('cfg-summary-word-count').value) || 300;
     }
-    if (document.getElementById('cfg-synthesis-system-prompt')) {
-      newCfg.synthesis_system_prompt = document.getElementById('cfg-synthesis-system-prompt').value;
-    }
-    if (document.getElementById('cfg-translation-system-prompt')) {
-      newCfg.translation_system_prompt = document.getElementById('cfg-translation-system-prompt').value;
-    }
-    if (document.getElementById('cfg-summary-system-prompt')) {
-      newCfg.summary_system_prompt = document.getElementById('cfg-summary-system-prompt').value;
-    }
+    // Sérialisation des prompts système
+    Object.values(this.PROMPT_CONFIGS).forEach(cfg => {
+      if (cfg.fieldId && document.getElementById(cfg.fieldId)) {
+        const configKey = cfg.fieldId.replace('cfg-', '').replace(/-/g, '_');
+        newCfg[configKey] = document.getElementById(cfg.fieldId).value;
+      }
+    });
 
     newCfg.gemini_api_key = document.getElementById('cfg-gemini-key').value.trim();
     newCfg.mistral_api_key = document.getElementById('cfg-mistral-key').value.trim();
@@ -1046,20 +1161,13 @@ Directives de rédaction :
   // =========================================================
   async openPromptModal(type) {
     this.currentEditingPrompt = type;
+    const cfg = this.PROMPT_CONFIGS[type];
     const titleEl = document.getElementById('system-prompt-modal-title');
     const textarea = document.getElementById('modal-prompt-textarea');
     const btnReset = document.getElementById('btn-modal-reset-default');
 
-    if (titleEl) {
-      if (type === 'theological_profile') {
-        titleEl.textContent = 'System Prompt — Passeport Herméneutique (« Mon Église »)';
-      } else if (type === 'synthesis') {
-        titleEl.textContent = 'System Prompt — Synthèse Exégétique IA';
-      } else if (type === 'translation') {
-        titleEl.textContent = 'System Prompt — Traduction Fidèle d\'Articles';
-      } else if (type === 'summary') {
-        titleEl.textContent = 'System Prompt — Résumé Théologique de Chapitre';
-      }
+    if (titleEl && cfg) {
+      titleEl.textContent = cfg.title;
     }
 
     if (btnReset) {
@@ -1077,12 +1185,9 @@ Directives de rédaction :
     if (type === 'theological_profile') {
       const profile = await API.call('get_theological_profile') || {};
       currentVal = profile.system_profile_prompt || '';
-    } else if (type === 'synthesis') {
-      currentVal = document.getElementById('cfg-synthesis-system-prompt')?.value || this.DEFAULT_SYNTH_PROMPT;
-    } else if (type === 'translation') {
-      currentVal = document.getElementById('cfg-translation-system-prompt')?.value || this.DEFAULT_TRANS_PROMPT;
-    } else if (type === 'summary') {
-      currentVal = document.getElementById('cfg-summary-system-prompt')?.value || this.DEFAULT_SUMMARY_PROMPT;
+    } else if (cfg && cfg.fieldId) {
+      const def = cfg.defaultProp ? (this[cfg.defaultProp] || '') : '';
+      currentVal = document.getElementById(cfg.fieldId)?.value || def;
     }
 
     if (textarea) {
@@ -1144,15 +1249,14 @@ Directives de rédaction :
     if (lineEl) lineEl.textContent = `${lineCount.toLocaleString()} lignes`;
 
     if (badgeEl && this.currentEditingPrompt) {
+      const cfg = this.PROMPT_CONFIGS[this.currentEditingPrompt];
       if (this.currentEditingPrompt === 'theological_profile') {
         const isCustom = val.trim().length > 0;
         badgeEl.textContent = isCustom ? 'Généré par IA' : 'À configurer';
         badgeEl.className = `prompt-status-badge ${isCustom ? 'is-custom' : 'is-default'}`;
-      } else {
-        let def = this.DEFAULT_SYNTH_PROMPT;
-        if (this.currentEditingPrompt === 'translation') def = this.DEFAULT_TRANS_PROMPT;
-        if (this.currentEditingPrompt === 'summary') def = this.DEFAULT_SUMMARY_PROMPT;
-        const isDef = val.trim() === def.trim();
+      } else if (cfg && cfg.defaultProp) {
+        const def = (this[cfg.defaultProp] || '').trim();
+        const isDef = val.trim() === def;
         badgeEl.textContent = isDef ? 'Par défaut' : 'Personnalisé';
         badgeEl.className = `prompt-status-badge ${isDef ? 'is-default' : 'is-custom'}`;
       }
@@ -1169,6 +1273,7 @@ Directives de rédaction :
 
   async savePromptFromModal() {
     if (!this.currentEditingPrompt) return;
+    const cfg = this.PROMPT_CONFIGS[this.currentEditingPrompt];
     const val = document.getElementById('modal-prompt-textarea')?.value || '';
 
     if (this.currentEditingPrompt === 'theological_profile') {
@@ -1182,13 +1287,11 @@ Directives de rédaction :
       return;
     }
 
-    let targetFieldId = 'cfg-synthesis-system-prompt';
-    if (this.currentEditingPrompt === 'translation') targetFieldId = 'cfg-translation-system-prompt';
-    if (this.currentEditingPrompt === 'summary') targetFieldId = 'cfg-summary-system-prompt';
-
-    const field = document.getElementById(targetFieldId);
-    if (field) {
-      field.value = val;
+    if (cfg && cfg.fieldId) {
+      const field = document.getElementById(cfg.fieldId);
+      if (field) {
+        field.value = val;
+      }
     }
 
     this.closePromptModal();
@@ -1199,6 +1302,7 @@ Directives de rédaction :
 
   async resetPromptInModal() {
     if (!this.currentEditingPrompt) return;
+    const cfg = this.PROMPT_CONFIGS[this.currentEditingPrompt];
 
     if (this.currentEditingPrompt === 'theological_profile') {
       const btn = document.getElementById('btn-modal-reset-default');
@@ -1226,16 +1330,11 @@ Directives de rédaction :
       return;
     }
 
-    let def = this.DEFAULT_SYNTH_PROMPT;
-    let label = 'Synthèse';
-    if (this.currentEditingPrompt === 'translation') {
-      def = this.DEFAULT_TRANS_PROMPT;
-      label = 'Traduction';
-    } else if (this.currentEditingPrompt === 'summary') {
-      def = this.DEFAULT_SUMMARY_PROMPT;
-      label = 'Résumé';
-    }
-    if (confirm(`Voulez-vous rétablir le prompt de ${label} par défaut ?`)) {
+    if (!cfg || !cfg.defaultProp) return;
+    const def = this[cfg.defaultProp] || '';
+    const label = cfg.label || 'ce mode';
+
+    if (confirm(`Voulez-vous rétablir le prompt de « ${label} » par défaut ?`)) {
       const textarea = document.getElementById('modal-prompt-textarea');
       if (textarea) {
         textarea.value = def;
@@ -1259,32 +1358,18 @@ Directives de rédaction :
   },
 
   updateAllPromptStatusBadges() {
-    const synthVal = (document.getElementById('cfg-synthesis-system-prompt')?.value || '').trim();
-    const synthDefault = this.DEFAULT_SYNTH_PROMPT.trim();
-    const badgeSynth = document.getElementById('badge-synth-status');
-    if (badgeSynth) {
-      const isDef = !synthVal || synthVal === synthDefault;
-      badgeSynth.textContent = isDef ? 'Par défaut' : 'Personnalisé';
-      badgeSynth.className = `prompt-status-badge ${isDef ? 'is-default' : 'is-custom'}`;
-    }
-
-    const transVal = (document.getElementById('cfg-translation-system-prompt')?.value || '').trim();
-    const transDefault = this.DEFAULT_TRANS_PROMPT.trim();
-    const badgeTrans = document.getElementById('badge-trans-status');
-    if (badgeTrans) {
-      const isDef = !transVal || transVal === transDefault;
-      badgeTrans.textContent = isDef ? 'Par défaut' : 'Personnalisé';
-      badgeTrans.className = `prompt-status-badge ${isDef ? 'is-default' : 'is-custom'}`;
-    }
-
-    const sumVal = (document.getElementById('cfg-summary-system-prompt')?.value || '').trim();
-    const sumDefault = this.DEFAULT_SUMMARY_PROMPT.trim();
-    const badgeSum = document.getElementById('badge-summary-status');
-    if (badgeSum) {
-      const isDef = !sumVal || sumVal === sumDefault;
-      badgeSum.textContent = isDef ? 'Par défaut' : 'Personnalisé';
-      badgeSum.className = `prompt-status-badge ${isDef ? 'is-default' : 'is-custom'}`;
-    }
+    Object.values(this.PROMPT_CONFIGS).forEach(cfg => {
+      if (cfg.fieldId && cfg.badgeId && cfg.defaultProp) {
+        const val = (document.getElementById(cfg.fieldId)?.value || '').trim();
+        const def = (this[cfg.defaultProp] || '').trim();
+        const badge = document.getElementById(cfg.badgeId);
+        if (badge) {
+          const isDef = !val || val === def;
+          badge.textContent = isDef ? 'Par défaut' : 'Personnalisé';
+          badge.className = `prompt-status-badge ${isDef ? 'is-default' : 'is-custom'}`;
+        }
+      }
+    });
   },
 
   renderPromptMarkdown(text) {

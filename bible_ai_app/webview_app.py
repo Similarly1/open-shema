@@ -1347,7 +1347,8 @@ class BibleAppApi:
                 "theology": "Synthèse théologique & doctrinale",
                 "historical": "Contexte historique & culturel",
                 "sermon": "Préparation de prédication",
-                "lexical": "Analyse lexicale (Grec & Hébreu)"
+                "lexical": "Analyse lexicale (Grec & Hébreu)",
+                "free_chat": "Discussion libre & Réflexion"
             }
             detected_mode = mode_names.get(mode, "Synthèse d'étude")
             active_mode_key = mode
@@ -1390,7 +1391,8 @@ class BibleAppApi:
             "dans", "avec", "pour", "selon", "entre", "cette", "cet", "ces", "leurs", "leur", "notre", "nos",
             "votre", "vos", "mon", "ton", "son", "sa", "ses", "comme", "tout", "tous", "toute", "toutes",
             "comment", "pourquoi", "vision", "texte", "temps", "epoque", "époque", "cadre", "plus", "aussi",
-            "faire", "avoir", "sujet", "point", "points", "dessus", "dessous", "alors", "ainsi", "sans"
+            "faire", "avoir", "sujet", "point", "points", "dessus", "dessous", "alors", "ainsi", "sans",
+            "salut", "bonjour", "bonsoir", "coucou", "hello", "merci", "bienvenue", "hey", "dis", "penses", "pense"
         }
 
         # 1. Termes entre parenthèses et guillemets en priorité haute
@@ -1405,6 +1407,9 @@ class BibleAppApi:
         # 2. Mots principaux (> 3 lettres)
         general_words = [w for w in re.findall(r'[a-zA-ZÀ-ÿ]{3,}', question) if w.lower() not in stop_words_fr]
         all_extracted_keywords = list(dict.fromkeys(priority_terms + general_words))
+
+        # En mode Discussion Libre sans passage spécifique et pour les salutations/phrases courtes : bypass RAG lourd
+        is_light_free_chat = (active_mode_key == "free_chat" and not passage_ref and len(all_extracted_keywords) <= 1)
 
         # 1. Extraction du texte biblique (si un passage est spécifié)
         if sources_cfg.get("bibles", True) and passage_ref and passage_ref.strip():
@@ -1437,7 +1442,7 @@ class BibleAppApi:
                 print(f"[ask_study_ai] Erreur extraction biblique : {e}")
 
         # 2. Extraction des Dictionnaires Bibliques & Lexique Strong (Multi-termes complet)
-        if sources_cfg.get("dictionaries", True):
+        if sources_cfg.get("dictionaries", True) and not is_light_free_chat:
             try:
                 from core.dictionary_manager import DictionaryManager
                 
@@ -1466,7 +1471,7 @@ class BibleAppApi:
                 print(f"[ask_study_ai] Erreur extraction dictionnaires : {e}")
 
         # 3. Extraction des Commentaires Bibliques & Ouvrages de Théologie
-        if sources_cfg.get("commentaries", True):
+        if sources_cfg.get("commentaries", True) and not is_light_free_chat:
             try:
                 if passage_ref and passage_ref.strip():
                     parsed = self.parse_reference(passage_ref)
@@ -1637,66 +1642,28 @@ class BibleAppApi:
         
         assembled_context = "\n\n".join(formatted_context_sections)
 
-        # Instructions du mode d'étude
+        from core.config import (
+            DEFAULT_EXEGESIS_SYSTEM_PROMPT,
+            DEFAULT_HISTORICAL_SYSTEM_PROMPT,
+            DEFAULT_SERMON_SYSTEM_PROMPT,
+            DEFAULT_THEOLOGY_SYSTEM_PROMPT,
+            DEFAULT_LEXICAL_SYSTEM_PROMPT,
+            DEFAULT_FREE_CHAT_SYSTEM_PROMPT
+        )
+
+        # Instructions du mode d'étude (personnalisables dans les paramètres)
         mode_instructions = {
             "auto": (
                 f"MODE D'ÉTUDE : {detected_mode.upper()}\n"
                 "- Analyse la question de l'utilisateur avec rigueur, équilibre théologique et profondeur biblique.\n"
                 "- Fonde ton développement sur les faits historiques, doctrinaux et exégétiques présents dans le corpus documentaire ci-dessous."
             ),
-            "theology": (
-                "MODE D'ÉTUDE : SYNTHÈSE THÉOLOGIQUE & DOCTRINALE\n"
-                "- Analyse doctrinale approfondie étayée par les traités et dictionnaires théologiques du corpus.\n"
-                "- Démonstration scripturaire et définitions théologiques précises."
-            ),
-            "exegesis": (
-                "MODE D'ÉTUDE : EXÉGÈSE APPROFONDIE\n"
-                "- Analyse structurelle et théologique verset par verset (syntaxe, intertextualité, cohérence canonique).\n"
-                "- Rigueur académique et citations précises."
-            ),
-            "historical": (
-                "MODE D'ÉTUDE : CONTEXTE HISTORIQUE & CULTUREL\n"
-                "- Cadre socio-politique antique, courants du judaïsme (Pharisiens, Sadducéens, Zélotes, Esséniens), sources historiques et archéologiques issues du corpus."
-            ),
-            "sermon": (
-                "MODE D'ÉTUDE : PRÉPARATION DE PRÉDICATION / HOMILÉTIQUE TEXTUELLE & EXPOSITIVE\n"
-                "Tu es un assistant IA expert en théologie biblique et homilétique, spécialisé dans la prédication textuelle (expositive) fidèle aux Écritures (méthode de David Helm, Haddon Robinson, Bryan Chapell, John Piper, John Stott).\n"
-                "Ton rôle est d'accompagner le prédicateur à chaque étape pour concevoir un message fidèle au sens originel, centré sur la grâce de l'Évangile et percutant pour l'auditoire.\n\n"
-                "MÉTHODOLOGIE HOMILÉTIQUE À APPLIQUER :\n"
-                "1. IDENTIFICATION DU SUJET & DE LA PROPOSITION CENTRALE (PC / Big Idea) :\n"
-                "   - Exégèse & Sens Originel : Détermine ce que le texte signifiait pour l'auteur et les destinataires d'origine (Proposition Herméneutique - hier et là-bas).\n"
-                "   - Formulation de la PC : Traduis cette vérité pour aujourd'hui (ici et maintenant) en UNE seule phrase claire, intense, mémorable et ancrée dans l'Évangile.\n"
-                "2. PLAN EXPOSITIF FIDÈLE (Découper, Décrire, Homogénéiser) :\n"
-                "   - Découpe le texte selon ses articulations logiques naturelles et transitions.\n"
-                "   - Formule entre 2 et 5 points simples (niveau 1) qui soutiennent directement la Proposition Centrale.\n"
-                "   - Homogénéise la formulation des points pour leur donner une même dynamique logique et fluide.\n"
-                "3. CONCEPTION D'ILLUSTRATIONS PERTINENTES :\n"
-                "   - Rôle : Illuminer l'abstrait, susciter une émotion légitime, ancrer la vérité dans la mémoire.\n"
-                "   - Types : Récits bibliques de l'AT, arrière-plans historiques ou biographiques, faits vécus sobres, analogies du quotidien.\n"
-                "   - Critères : Intégrité absolue, précision des faits, dosage sobre, pertinence stricte au service de la PC (sans humour futile ni manipulation).\n"
-                "4. FORMULATION DES APPLICATIONS PASTORALES CONCRÈTES (Viser le Cœur) :\n"
-                "   - Dépasser le simple moralisme en ciblant les 4 axes :\n"
-                "     * Le Cœur (Affections & Volonté) : Démanteler les idoles du cœur, susciter l'amour pour Dieu et la repentance.\n"
-                "     * La Pensée (Mind) : Réformer l'intelligence et la vision du monde par la théologie du texte.\n"
-                "     * L'Action (Vie pratique) : Pistes précises d'obéissance pour la semaine (« Comment faire ? »).\n"
-                "     * La Communauté : Vivre cette vérité dans l'Église locale (encouragement, amour mutuel, redevabilité).\n"
-                "   - Condition de grâce : Tout appel à l'obéissance découle de l'œuvre accomplie de Christ à la croix et de la force du Saint-Esprit (bannir le légalisme).\n"
-                "5. GARDE-FOUS & PIÈGES À ÉVITER :\n"
-                "   - Alerte le prédicateur contre la prédication moraliste/légaliste, la prédication impressionniste sans rigueur exégétique, ou le discours académique aride sans application."
-            ),
-            "lexical": (
-                "MODE D'ÉTUDE : ANALYSE LEXICALE (GREC & HÉBREU / STRONG)\n"
-                "- Étude des racines linguistiques, codes Strong, étymologie et nuances dans la LXX / Nouveau Testament."
-            ),
-            "free_chat": (
-                "MODE D'ÉTUDE : DISCUSSION LIBRE & RÉFLEXION THÉOLOGIQUE\n"
-                "Tu es un pair intellectuel, un compagnon d'étude théologique et un sparring-partner biblique bienveillant.\n"
-                "OBJECTIFS & POSTURE DU DIALOGUE LIBRE :\n"
-                "- Réponds de manière vivante, fluide, naturelle et directe, sans imposer de carcan académique lourd ni de découpage artificiel en sous-parties obligatoires.\n"
-                "- Adopte une posture d'échange constructif : apporte des éclairages pertinents, propose des perspectives stimulantes, et termine si approprié par une question ouverte ou une relance pour nourrir la réflexion.\n"
-                "- Mobilise les Écritures avec naturel et précision (en citant les références) sans alourdir le propos.\n"
-                "- Si des documents du corpus documentaire ci-dessous sont pertinents pour la question, appuie-toi dessus avec simplicité."
-            )
+            "theology": self.config.get("prompt_theology") or DEFAULT_THEOLOGY_SYSTEM_PROMPT,
+            "exegesis": self.config.get("prompt_exegesis") or DEFAULT_EXEGESIS_SYSTEM_PROMPT,
+            "historical": self.config.get("prompt_historical") or DEFAULT_HISTORICAL_SYSTEM_PROMPT,
+            "sermon": self.config.get("prompt_sermon") or DEFAULT_SERMON_SYSTEM_PROMPT,
+            "lexical": self.config.get("prompt_lexical") or DEFAULT_LEXICAL_SYSTEM_PROMPT,
+            "free_chat": self.config.get("prompt_free_chat") or DEFAULT_FREE_CHAT_SYSTEM_PROMPT,
         }
 
         depth_instructions = {
@@ -1707,7 +1674,7 @@ class BibleAppApi:
 
         specific_instruction = mode_instructions.get(active_mode_key, mode_instructions.get("auto", mode_instructions["exegesis"]))
         specific_depth = depth_instructions.get(depth_style, depth_instructions["academic"])
-        subject_label = passage_ref if (passage_ref and passage_ref.strip()) else "Étude générale"
+        subject_label = passage_ref if (passage_ref and passage_ref.strip()) else "Discussion & Réflexion"
 
         # Chargement du profil et de la mémoire
         user_profile = AISessionManager.get_user_profile()
@@ -1734,9 +1701,10 @@ class BibleAppApi:
         if active_mode_key == "free_chat":
             drafting_rules = (
                 "CONSIGNES DE DIALOGUE LIBRE :\n"
-                "1. Réponds de façon directe, vivante, interactive et bienveillante.\n"
-                "2. Cite naturellement les références bibliques pertinentes dans le cours du texte.\n"
-                "3. Si tu mobilises des données du corpus, cite les sources ou auteurs avec simplicité sans formalisme rigide."
+                "1. SALUTATIONS : Si l'utilisateur te salue simplement ('salut', 'bonjour', etc.), réponds chaleureusement et brièvement en 1 ou 2 phrases pour ouvrir l'échange. Ne rédige PAS de traité doctrinal sur le salut !\n"
+                "2. Réponds de façon directe, vivante, interactive et adaptée à la taille du message reçu.\n"
+                "3. Cite naturellement les références bibliques pertinentes dans le cours du texte lorsque la discussion porte sur un sujet biblique.\n"
+                "4. Si tu mobilises des données du corpus, cite les sources ou auteurs avec simplicité sans formalisme rigide."
             )
         else:
             drafting_rules = (
