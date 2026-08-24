@@ -2827,7 +2827,7 @@ class BibleAppApi:
         Ouvre ou ramène au premier plan la fenêtre de commentaires déportée.
         Cible automatiquement le second écran si présent, sinon ouvre une fenêtre companion à droite.
         """
-        global _COMMENTARY_WINDOW, _COMMENTARY_IS_MAXIMIZED, _COMMENTARY_RESTORE_BOUNDS
+        global _COMMENTARY_WINDOW, _COMMENTARY_IS_MAXIMIZED, _COMMENTARY_RESTORE_BOUNDS, _COMMENTARY_TARGET_BOUNDS
         
         if _COMMENTARY_WINDOW is not None:
             try:
@@ -2853,6 +2853,7 @@ class BibleAppApi:
             wh = second_monitor["height"]
             on_second_screen = True
             _COMMENTARY_IS_MAXIMIZED = True
+            _COMMENTARY_RESTORE_BOUNDS = (wx + 40, wy + 40, ww - 80, wh - 80)
         else:
             main_wx, main_wy, main_ww, main_wh = get_work_area()
             ww = min(1100, int(main_ww * 0.55))
@@ -2862,6 +2863,7 @@ class BibleAppApi:
             _COMMENTARY_IS_MAXIMIZED = False
             _COMMENTARY_RESTORE_BOUNDS = (wx, wy, ww, wh)
 
+        _COMMENTARY_TARGET_BOUNDS = (wx, wy, ww, wh)
         html_path = os.path.join(current_dir, "web", "commentary_window.html")
         
         def on_comm_closed():
@@ -2888,6 +2890,7 @@ class BibleAppApi:
                 easy_drag=False,
                 background_color="#0F172A"
             )
+            _COMMENTARY_WINDOW.events.shown += on_commentary_shown
             _COMMENTARY_WINDOW.events.closed += on_comm_closed
             return {
                 "success": True,
@@ -2921,7 +2924,7 @@ class BibleAppApi:
         return {"success": True}
 
     def maximize_commentary_window(self) -> Dict[str, Any]:
-        """Bascule l'état maximisé de la fenêtre de commentaires détachée."""
+        """Bascule l'état maximisé de la fenêtre de commentaires sur son écran actuel."""
         global _COMMENTARY_WINDOW, _COMMENTARY_IS_MAXIMIZED, _COMMENTARY_RESTORE_BOUNDS
         if not _COMMENTARY_WINDOW:
             return {"success": False}
@@ -2933,57 +2936,48 @@ class BibleAppApi:
         except Exception:
             pass
 
+        if not hwnd:
+            return {"success": False}
+
+        MONITOR_DEFAULTTONEAREST = 2
+        hmon = user32.MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST)
+        mi = MONITORINFO()
+        mi.cbSize = ctypes.sizeof(MONITORINFO)
+        if not user32.GetMonitorInfoW(hmon, ctypes.byref(mi)):
+            return {"success": False}
+
+        rc = mi.rcMonitor
+
         if _COMMENTARY_IS_MAXIMIZED:
             _COMMENTARY_IS_MAXIMIZED = False
-            rx, ry, rw, rh = _COMMENTARY_RESTORE_BOUNDS
-            if hwnd:
-                user32.SetWindowPos(hwnd, 0, rx, ry, rw, rh, 0x0040)
+            if _COMMENTARY_RESTORE_BOUNDS and rc.left <= _COMMENTARY_RESTORE_BOUNDS[0] < rc.right:
+                rx, ry, rw, rh = _COMMENTARY_RESTORE_BOUNDS
             else:
-                try:
-                    _COMMENTARY_WINDOW.move(rx, ry)
-                    _COMMENTARY_WINDOW.resize(rw, rh)
-                except Exception:
-                    pass
+                mw = rc.right - rc.left
+                mh = rc.bottom - rc.top
+                rw = int(mw * 0.85)
+                rh = int(mh * 0.85)
+                rx = rc.left + int((mw - rw) / 2)
+                ry = rc.top + int((mh - rh) / 2)
+            user32.SetWindowPos(hwnd, 0, rx, ry, rw, rh, 0x0040)
         else:
-            if hwnd:
-                try:
-                    curr_rect = RECT()
-                    user32.GetWindowRect(hwnd, ctypes.byref(curr_rect))
-                    w = curr_rect.right - curr_rect.left
-                    h = curr_rect.bottom - curr_rect.top
-                    if w > 400 and h > 300:
-                        _COMMENTARY_RESTORE_BOUNDS = (curr_rect.left, curr_rect.top, w, h)
-                except Exception:
-                    pass
+            try:
+                curr_rect = RECT()
+                user32.GetWindowRect(hwnd, ctypes.byref(curr_rect))
+                w = curr_rect.right - curr_rect.left
+                h = curr_rect.bottom - curr_rect.top
+                if w > 400 and h > 300:
+                    _COMMENTARY_RESTORE_BOUNDS = (curr_rect.left, curr_rect.top, w, h)
+            except Exception:
+                pass
 
-            monitors = get_monitors_layout()
-            target_mon = None
-            if _COMMENTARY_RESTORE_BOUNDS:
-                cx = _COMMENTARY_RESTORE_BOUNDS[0]
-                cy = _COMMENTARY_RESTORE_BOUNDS[1]
-                for m in monitors:
-                    if m["x"] <= cx <= m["x"] + m["width"] and m["y"] <= cy <= m["y"] + m["height"]:
-                        target_mon = m
-                        break
-            if not target_mon:
-                target_mon = monitors[1] if len(monitors) > 1 else monitors[0]
-
-            wx = target_mon["x"]
-            wy = target_mon["y"]
-            ww = target_mon["width"]
-            wh = target_mon["height"]
             _COMMENTARY_IS_MAXIMIZED = True
-
-            if hwnd:
-                user32.SetWindowPos(hwnd, 0, wx, wy, ww, wh, 0x0040)
-            else:
-                try:
-                    _COMMENTARY_WINDOW.move(wx, wy)
-                    _COMMENTARY_WINDOW.resize(ww, wh)
-                except Exception:
-                    pass
+            mw = rc.right - rc.left
+            mh = rc.bottom - rc.top
+            user32.SetWindowPos(hwnd, 0, rc.left, rc.top, mw, mh, 0x0040)
 
         return {"success": True, "is_maximized": _COMMENTARY_IS_MAXIMIZED}
+
 
 
     # =========================================================================
@@ -3102,6 +3096,7 @@ _RESTORE_BOUNDS = (80, 50, 1280, 800)
 _COMMENTARY_WINDOW = None
 _COMMENTARY_IS_MAXIMIZED = False
 _COMMENTARY_RESTORE_BOUNDS = (100, 60, 1100, 750)
+_COMMENTARY_TARGET_BOUNDS = (0, 0, 1200, 800)
 
 
 
@@ -3128,6 +3123,18 @@ def on_window_shown(*args, **kwargs):
             _GLOBAL_WINDOW.move = safe_move
     except Exception as e:
         logger.warning(f"Erreur initialisation agrandissement: {e}")
+
+
+def on_commentary_shown(*args, **kwargs):
+    global _COMMENTARY_WINDOW, _COMMENTARY_IS_MAXIMIZED, _COMMENTARY_TARGET_BOUNDS
+    try:
+        if hasattr(_COMMENTARY_WINDOW, 'native') and _COMMENTARY_WINDOW.native:
+            hwnd = _COMMENTARY_WINDOW.native.Handle.ToInt32()
+            wx, wy, ww, wh = _COMMENTARY_TARGET_BOUNDS
+            user32.SetWindowPos(hwnd, 0, wx, wy, ww, wh, 0x0040)
+    except Exception as e:
+        logger.warning(f"Erreur on_commentary_shown: {e}")
+
 
 
 def push_task_update(event_type: str, task_data: dict):

@@ -32,14 +32,20 @@ const CommentaryWindow = {
     this.bindEvents();
     this.restorePreferences();
 
-    // Attendre que l'API soit prête puis demander l'état actuel de la fenêtre principale
+    // 1. Charger immédiatement le chapitre par défaut
+    const startLoad = () => {
+      this.loadChapterCommentaries(this.currentBook, this.currentChapter).then(() => {
+        this.notifyReady();
+      });
+    };
+
+    // 2. Attendre que l'API soit prête
     API.onReady(() => {
-      this.notifyReady();
+      startLoad();
     });
 
-    // Fallback immédiat si API déjà initialisée
     if (API.isReady) {
-      this.notifyReady();
+      startLoad();
     }
   },
 
@@ -101,8 +107,8 @@ const CommentaryWindow = {
     const ch = parseInt(chapterNum, 10);
     const v = parseInt(verseNum, 10);
 
-    // Si on a changé de chapitre par défilement continu
-    if (this.currentBook !== bookCode || this.currentChapter !== ch) {
+    // Si on a changé de chapitre par défilement continu OU si les données ne sont pas encore chargées
+    if (this.currentBook !== bookCode || this.currentChapter !== ch || !this.currentChapterData) {
       this.currentBook = bookCode;
       this.currentChapter = ch;
       this.currentVerse = v;
@@ -146,6 +152,11 @@ const CommentaryWindow = {
       this.currentChapterData = data;
       this.populateAuthorFilter(data.available_sources || []);
       this.renderStream(data);
+      if (this.isSyncActive) {
+        setTimeout(() => {
+          this.scrollToVerseBlock(this.currentVerse);
+        }, 50);
+      }
     } catch (e) {
       console.error('[CommentaryWindow] Erreur chargement commentaires:', e);
       container.innerHTML = `
