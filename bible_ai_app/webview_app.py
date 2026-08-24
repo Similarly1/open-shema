@@ -2892,7 +2892,7 @@ class BibleAppApi:
                 height=wh,
                 min_size=(780, 520),
                 frameless=True,
-                easy_drag=True,
+                easy_drag=False,
                 background_color="#0F172A"
             )
             _COMMENTARY_WINDOW.events.shown += on_commentary_shown

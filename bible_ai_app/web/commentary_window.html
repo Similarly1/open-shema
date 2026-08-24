@@ -580,6 +580,29 @@
       height: 100%;
     }
 
+    /* Permettre la sélection libre de texte et le menu contextuel sur tous les contenus */
+    .comm-tab-panels-wrap,
+    .comm-tab-panel,
+    .comm-stream-inner,
+    .comm-stream-card,
+    .comm-stream-body,
+    .comm-stream-body *,
+    .comm-verse-quote-text,
+    .lex-wrap,
+    #lex-entry-detail,
+    #lex-entry-detail *,
+    .ai-chat-wrap,
+    .ai-msg-bubble,
+    .ai-msg-bubble *,
+    .notes-wrap,
+    .note-editor-textarea,
+    .note-preview-content,
+    .note-preview-content * {
+      -webkit-app-region: no-drag !important;
+      user-select: text !important;
+      -webkit-user-select: text !important;
+    }
+
     .note-toolbar {
       display: flex;
       align-items: center;
@@ -590,29 +613,31 @@
       background: #1E293B !important;
       border: 1px solid rgba(255, 255, 255, 0.12) !important;
       border-radius: 8px;
+      -webkit-app-region: no-drag;
+      user-select: none;
     }
 
     .note-tools-group {
       display: flex;
       align-items: center;
       gap: 4px;
+      flex-wrap: wrap;
     }
 
     .note-tool-btn {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      min-width: 28px;
-      height: 28px;
-      padding: 2px 7px;
+      gap: 5px;
+      padding: 4px 8px;
       background: transparent;
       border: 1px solid transparent;
       border-radius: 5px;
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 600;
       color: #94A3B8 !important;
       cursor: pointer;
       transition: all 0.15s ease;
+      -webkit-app-region: no-drag;
     }
 
     .note-tool-btn:hover {
@@ -626,10 +651,14 @@
       border-radius: 6px;
       padding: 2px;
       gap: 2px;
+      -webkit-app-region: no-drag;
     }
 
     .note-toggle-btn {
-      padding: 3px 9px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
       font-size: 11.5px;
       font-weight: 600;
       border-radius: 4px;
@@ -638,6 +667,7 @@
       color: #94A3B8 !important;
       cursor: pointer;
       transition: all 0.15s ease;
+      -webkit-app-region: no-drag;
     }
 
     .note-toggle-btn.active {
@@ -1011,20 +1041,44 @@
           </button>
         </div>
 
-        <!-- Barre d'outils de formatage Markdown -->
+        <!-- Barre d'outils de formatage Markdown (100% SVG, zéro émoji) -->
         <div class="note-toolbar">
           <div class="note-tools-group">
-            <button type="button" class="note-tool-btn" id="btn-format-bold" title="Gras (**texte**)"><strong>B</strong></button>
-            <button type="button" class="note-tool-btn" id="btn-format-italic" title="Italique (*texte*)"><em>I</em></button>
-            <button type="button" class="note-tool-btn" id="btn-format-h2" title="Titre (## Titre)">H2</button>
-            <button type="button" class="note-tool-btn" id="btn-format-ul" title="Liste à puces (- élément)">• Liste</button>
-            <button type="button" class="note-tool-btn" id="btn-format-quote" title="Citation (> texte)">❝ Citation</button>
-            <button type="button" class="note-tool-btn" id="btn-format-verse" title="Insérer le verset actif">📖 Verset</button>
+            <button type="button" class="note-tool-btn" id="btn-format-bold" title="Gras (**texte**)">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg>
+              <span>Gras</span>
+            </button>
+            <button type="button" class="note-tool-btn" id="btn-format-italic" title="Italique (*texte*)">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg>
+              <span>Italique</span>
+            </button>
+            <button type="button" class="note-tool-btn" id="btn-format-h2" title="Titre de section (## Titre)">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h8"/><path d="M4 18V6"/><path d="M12 18V6"/><path d="M21 18h-4c0-4 4-3 4-6 0-1.5-1-2.5-2.5-2.5S16 10.5 16 12"/></svg>
+              <span>Titre</span>
+            </button>
+            <button type="button" class="note-tool-btn" id="btn-format-ul" title="Liste à puces (- élément)">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              <span>Liste</span>
+            </button>
+            <button type="button" class="note-tool-btn" id="btn-format-quote" title="Citation (> texte)">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h4c0 3.3-1.7 5.7-5 7"/><path d="M16 21c3 0 7-1 7-8V5c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h4c0 3.3-1.7 5.7-5 7"/></svg>
+              <span>Citation</span>
+            </button>
+            <button type="button" class="note-tool-btn" id="btn-format-verse" title="Insérer le verset actif">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              <span>Verset</span>
+            </button>
           </div>
 
           <div class="note-view-toggle">
-            <button type="button" class="note-toggle-btn active" id="btn-note-mode-edit">Édition</button>
-            <button type="button" class="note-toggle-btn" id="btn-note-mode-preview">Aperçu direct</button>
+            <button type="button" class="note-toggle-btn active" id="btn-note-mode-edit">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              <span>Édition</span>
+            </button>
+            <button type="button" class="note-toggle-btn" id="btn-note-mode-preview">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span>Aperçu direct</span>
+            </button>
           </div>
         </div>
 

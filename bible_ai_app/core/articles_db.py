@@ -54,11 +54,18 @@ class ArticlesDB:
                 fetched_at TEXT,
                 summary TEXT,
                 content_path TEXT,
+                tags TEXT,
                 has_full_text INTEGER DEFAULT 1,
                 is_indexed INTEGER DEFAULT 0,
                 FOREIGN KEY (source_id) REFERENCES sources (id) ON DELETE CASCADE
             )
             """)
+
+            # Migration automatique si colonne tags absente
+            try:
+                cursor.execute("ALTER TABLE articles ADD COLUMN tags TEXT")
+            except Exception:
+                pass
 
             # 3. Table des liaisons de versets bibliques
             cursor.execute("""
@@ -177,10 +184,13 @@ class ArticlesDB:
             existing = cursor.fetchone()
             is_new = existing is None
 
+            raw_tags = article.get("tags", [])
+            tags_str = ",".join(raw_tags) if isinstance(raw_tags, list) else str(raw_tags or "")
+
             cursor.execute("""
             INSERT INTO articles (
-                id, source_id, title, author, url, published_at, fetched_at, summary, content_path, has_full_text, is_indexed
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                id, source_id, title, author, url, published_at, fetched_at, summary, content_path, tags, has_full_text, is_indexed
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
                 title = excluded.title,
                 author = excluded.author,
@@ -188,6 +198,7 @@ class ArticlesDB:
                 fetched_at = excluded.fetched_at,
                 summary = excluded.summary,
                 content_path = excluded.content_path,
+                tags = excluded.tags,
                 has_full_text = excluded.has_full_text
             """, (
                 article["id"],
@@ -199,6 +210,7 @@ class ArticlesDB:
                 article.get("fetched_at", ""),
                 article.get("summary", ""),
                 article.get("content_path", ""),
+                tags_str,
                 1 if article.get("has_full_text", True) else 0,
                 1 if article.get("is_indexed", False) else 0
             ))
@@ -248,9 +260,9 @@ class ArticlesDB:
                     params.append(chapter)
 
             if search_query:
-                where_clauses.append("(a.title LIKE ? OR a.author LIKE ? OR a.summary LIKE ?)")
+                where_clauses.append("(a.title LIKE ? OR a.author LIKE ? OR a.summary LIKE ? OR a.tags LIKE ?)")
                 q_param = f"%{search_query}%"
-                params.extend([q_param, q_param, q_param])
+                params.extend([q_param, q_param, q_param, q_param])
 
             where_str = " AND ".join(where_clauses)
             
@@ -270,6 +282,8 @@ class ArticlesDB:
             results = []
             for row in rows:
                 art = dict(row)
+                raw_t = art.get("tags") or ""
+                art["tags_list"] = [t.strip() for t in raw_t.split(",") if t.strip()]
                 # Attacher les références bibliques
                 cursor.execute("SELECT raw_ref, book_code, chapter, verse FROM article_scripture_links WHERE article_id = ?", (art["id"],))
                 art["scripture_references"] = [dict(r) for r in cursor.fetchall()]
@@ -291,6 +305,8 @@ class ArticlesDB:
             if not row:
                 return None
             art = dict(row)
+            raw_t = art.get("tags") or ""
+            art["tags_list"] = [t.strip() for t in raw_t.split(",") if t.strip()]
             cursor.execute("SELECT raw_ref, book_code, chapter, verse FROM article_scripture_links WHERE article_id = ?", (article_id,))
             art["scripture_references"] = [dict(r) for r in cursor.fetchall()]
             return art

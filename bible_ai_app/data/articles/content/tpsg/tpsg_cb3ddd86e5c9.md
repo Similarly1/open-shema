@@ -1,11 +1,3 @@
-# Les qualités de Marie (Luc 1.39-56)
-
-**Auteur :** Thomas  
-**Source :** [Tout Pour Sa Gloire](https://toutpoursagloire.com/podcasts/predications-tpsg/qualites-marie/)  
-**Date :** 2026-08-12T04:30:00Z  
-
----
-
 ℹ️ Prédication publiée pour la première fois sur notre site le 14 août 2024, remise en avant à l’occasion de la fête de l’Assomption.
 
 ## ❓ Pour aller plus loin :

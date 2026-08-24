@@ -1,11 +1,3 @@
-# Bible et tradition : faut-il vraiment choisir ?
-
-**Auteur :** sephora@toutpoursagloire.com  
-**Source :** [Tout Pour Sa Gloire](https://toutpoursagloire.com/article/bible-tradition-choisir/)  
-**Date :** 2026-08-19T04:00:00Z  
-
----
-
 Loading the
 Elevenlabs Text to Speech
 AudioNative Player…

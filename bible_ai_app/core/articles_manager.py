@@ -93,10 +93,6 @@ class ArticlesManager:
                 # Sauvegarder le fichier Markdown
                 md_path = os.path.join(source_content_dir, f"{processed['id']}.md")
                 with open(md_path, "w", encoding="utf-8") as f:
-                    f.write(f"# {processed['title']}\n\n")
-                    f.write(f"**Auteur :** {processed.get('author', 'Anonyme')}  \n")
-                    f.write(f"**Source :** [{source['name']}]({processed['url']})  \n")
-                    f.write(f"**Date :** {processed.get('published_at', '')}  \n\n---\n\n")
                     f.write(processed["content_markdown"])
 
                 processed["content_path"] = os.path.relpath(md_path, start=self.base_dir)
@@ -239,6 +235,7 @@ class ArticlesManager:
                         "author": article.get("author", ""),
                         "url": article.get("url", ""),
                         "published_at": article.get("published_at", ""),
+                        "tags": article.get("tags", ""),
                         "chunk_index": chunk_idx
                     }
                 })
@@ -268,6 +265,7 @@ class ArticlesManager:
                     "author": article.get("author", ""),
                     "url": article.get("url", ""),
                     "published_at": article.get("published_at", ""),
+                    "tags": article.get("tags", ""),
                     "chunk_index": chunk_idx
                 }
             })

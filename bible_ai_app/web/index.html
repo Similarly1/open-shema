@@ -4205,17 +4205,118 @@
           <!-- SECTION 2 : LECTURE D'UN ARTICLE -->
           <div id="articles-reader-section" class="hidden">
             <div class="articles-reader-header">
-              <button class="btn-articles-action" id="btn-articles-back-to-list">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                <span>Retour aux articles</span>
-              </button>
-              <a href="#" id="article-reader-external-link" class="btn-articles-action" target="_blank" title="Ouvrir la page originale sur le site">
-                <span>Site d'origine</span>
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-              </a>
+              <div class="articles-reader-header-left">
+                <button class="btn-articles-action" id="btn-articles-back-to-list">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                  <span>Retour aux articles</span>
+                </button>
+              </div>
+
+              <div class="articles-reader-header-right">
+                <span class="article-reading-stats-pill" id="article-reading-stats" title="Statistiques de lecture">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <span id="article-stats-text">0 min • 0 mots</span>
+                </span>
+
+                <button class="btn-articles-action" id="btn-article-reading-options" title="Options de mise en page et lecture">
+                  <span style="font-family: serif; font-weight: 700; font-size: 15px;">Aa</span>
+                  <span>Lecture</span>
+                </button>
+
+                <a href="#" id="article-reader-external-link" class="btn-articles-action" target="_blank" title="Ouvrir la page originale sur le site">
+                  <span>Site d'origine</span>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+              </div>
+
+              <!-- Popover des Options de Lecture -->
+              <div class="article-reading-options-popover hidden" id="article-reading-options-popover">
+                <div class="reading-opts-header">Options d'Affichage & Lecture</div>
+                
+                <!-- 1. Fond / Ambiance -->
+                <div class="reading-opts-section">
+                  <label class="reading-opts-label">Ambiance de lecture</label>
+                  <div class="reading-opts-swatches">
+                    <button class="reading-opt-swatch active" data-bg="auto" title="Thème de l'application">
+                      <span class="swatch-preview swatch-auto">🌓</span>
+                      <span>Auto</span>
+                    </button>
+                    <button class="reading-opt-swatch" data-bg="white" title="Blanc classique">
+                      <span class="swatch-preview swatch-white"></span>
+                      <span>Blanc</span>
+                    </button>
+                    <button class="reading-opt-swatch" data-bg="sepia" title="Sépia / Parchemin doux">
+                      <span class="swatch-preview swatch-sepia"></span>
+                      <span>Sépia</span>
+                    </button>
+                    <button class="reading-opt-swatch" data-bg="dark" title="Sombre / Ardoise">
+                      <span class="swatch-preview swatch-dark"></span>
+                      <span>Sombre</span>
+                    </button>
+                    <button class="reading-opt-swatch" data-bg="oled" title="Noir absolu OLED">
+                      <span class="swatch-preview swatch-oled"></span>
+                      <span>OLED</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 2. Police de caractères -->
+                <div class="reading-opts-section">
+                  <label class="reading-opts-label">Police de caractères</label>
+                  <select id="article-opt-font" class="reading-opts-select">
+                    <option value="EB Garamond">EB Garamond (Classique & Noble)</option>
+                    <option value="Lora">Lora (Moderne & Fluide)</option>
+                    <option value="Cardo">Cardo (Érudit)</option>
+                    <option value="IM Fell English">IM Fell English (Historique)</option>
+                    <option value="Literata">Literata (Livre numérique)</option>
+                    <option value="Merriweather">Merriweather (Très lisible)</option>
+                    <option value="Georgia">Georgia (Sérif standard)</option>
+                    <option value="Inter">Inter (Sans-sérif net)</option>
+                  </select>
+                </div>
+
+                <!-- 3. Taille de la police -->
+                <div class="reading-opts-section">
+                  <label class="reading-opts-label">Taille du texte</label>
+                  <div class="reading-opts-btn-group">
+                    <button class="reading-opts-btn" id="btn-article-font-dec">A−</button>
+                    <span class="reading-opts-val" id="lbl-article-font-size">18 px</span>
+                    <button class="reading-opts-btn" id="btn-article-font-inc">A+</button>
+                  </div>
+                </div>
+
+                <!-- 4. Largeur du texte -->
+                <div class="reading-opts-section">
+                  <label class="reading-opts-label">Largeur de lecture</label>
+                  <div class="reading-opts-btn-group">
+                    <button class="reading-opts-btn" data-width="narrow">Étroite</button>
+                    <button class="reading-opts-btn active" data-width="normal">Normale</button>
+                    <button class="reading-opts-btn" data-width="wide">Pleine</button>
+                  </div>
+                </div>
+
+                <!-- 5. Alignement -->
+                <div class="reading-opts-section">
+                  <label class="reading-opts-label">Alignement</label>
+                  <div class="reading-opts-btn-group">
+                    <button class="reading-opts-btn active" data-align="left">À gauche</button>
+                    <button class="reading-opts-btn" data-align="justify">Justifié</button>
+                  </div>
+                </div>
+
+                <!-- 6. Interligne -->
+                <div class="reading-opts-section">
+                  <label class="reading-opts-label">Interligne</label>
+                  <div class="reading-opts-btn-group">
+                    <button class="reading-opts-btn" data-line-height="1.5">Serré</button>
+                    <button class="reading-opts-btn active" data-line-height="1.8">Normal</button>
+                    <button class="reading-opts-btn" data-line-height="2.1">Aéré</button>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div class="article-reader-container">
+            <div class="article-reader-container" id="article-reader-container">
               <div class="article-reader-hero">
                 <h1 class="article-reader-title" id="article-reader-title">Titre de l'article</h1>
                 <div class="article-reader-meta" id="article-reader-meta">Auteur • Date • Source</div>

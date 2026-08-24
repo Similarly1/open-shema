@@ -1,11 +1,3 @@
-# Le cœur de l’Évangile : notre résurrection (1 Corinthiens 15.35-58)
-
-**Auteur :** Thomas  
-**Source :** [Tout Pour Sa Gloire](https://toutpoursagloire.com/podcasts/predications-tpsg/predication-tpsg-coeur-evangile-matthieu-giralt/)  
-**Date :** 2026-08-19T04:30:00Z  
-
----
-
 *ℹ️ Prédication publiée pour la première fois le 1 mars 2023, remise en avant pour atteindre une nouvelle génération d’auditeurs.*
 
 La plupart des blogueurs [ToutPourSaGloire.com](https://toutpoursagloire.com/) sont également pasteurs. Aujourd’hui, tu peux toi aussi bénéficier de leurs enseignements grâce à notre nouveau podcast « Prédications TPSG ». Ces prédications, qui se veulent résolument textuelles et christocentriques, te feront redécouvrir le sens profond des Écritures et nourriront ta foi en Christ.

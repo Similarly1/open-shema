@@ -97,6 +97,9 @@ class ArticlesFeedScraper:
                     if not content_html:
                         content_html = desc_text
 
+                # Catégories / Badges thématiques
+                tags = [c.text.strip() for c in item.findall("category") if c.text and c.text.strip()]
+
                 url_hash = hashlib.sha256(link.encode("utf-8")).hexdigest()[:12]
                 article_id = f"{source_id}_{url_hash}"
 
@@ -108,6 +111,7 @@ class ArticlesFeedScraper:
                     "author": author,
                     "published_at": pub_date_str,
                     "summary": summary_text,
+                    "tags": tags,
                     "raw_content_html": content_html,
                     "source_config": source_config
                 })
@@ -153,6 +157,13 @@ class ArticlesFeedScraper:
                         content_html = child.text or ""
                         break
 
+                # Catégories Atom
+                tags = []
+                for c in entry.findall(".//{http://www.w3.org/2005/Atom}category") or entry.findall(".//category"):
+                    term = c.attrib.get("term", "").strip() or (c.text or "").strip()
+                    if term:
+                        tags.append(term)
+
                 desc_soup = BeautifulSoup(content_html, "html.parser")
                 summary_text = desc_soup.get_text(separator=" ", strip=True)[:350]
 
@@ -167,6 +178,7 @@ class ArticlesFeedScraper:
                     "author": author,
                     "published_at": pub_date_str,
                     "summary": summary_text,
+                    "tags": tags,
                     "raw_content_html": content_html,
                     "source_config": source_config
                 })
@@ -397,6 +409,7 @@ class ArticlesFeedScraper:
             "published_at": raw_item.get("published_at", ""),
             "fetched_at": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
             "summary": raw_item.get("summary", ""),
+            "tags": raw_item.get("tags", []),
             "content_markdown": content_md,
             "has_full_text": len(content_md) > 500,
             "scripture_references": unique_refs

@@ -1,6 +1,6 @@
 /**
  * Articles & Blogs View Manager
- * Gère l'affichage, la recherche, le filtrage par source/verset et la lecture des articles de blogs théologiques.
+ * Gère l'affichage, la recherche, le filtrage par source/verset et la lecture enrichie des articles de blogs théologiques.
  */
 
 const ArticlesView = {
@@ -11,8 +11,36 @@ const ArticlesView = {
   sources: [],
   isSyncing: false,
 
+  // Préférences de lecture personnalisées (mémorisées en local)
+  readingOpts: {
+    bg: 'auto',
+    fontFamily: 'EB Garamond',
+    fontSize: 18,
+    width: 'normal',
+    align: 'left',
+    lineHeight: '1.8'
+  },
+
   init() {
+    this.loadReadingPreferences();
     this.bindEvents();
+  },
+
+  loadReadingPreferences() {
+    try {
+      const saved = localStorage.getItem('open_shema_article_reading_opts');
+      if (saved) {
+        this.readingOpts = { ...this.readingOpts, ...JSON.parse(saved) };
+      }
+    } catch (e) {
+      console.warn('[ArticlesView] Erreur lecture préférences:', e);
+    }
+  },
+
+  saveReadingPreferences() {
+    try {
+      localStorage.setItem('open_shema_article_reading_opts', JSON.stringify(this.readingOpts));
+    } catch (e) {}
   },
 
   bindEvents() {
@@ -52,6 +80,160 @@ const ArticlesView = {
     document.getElementById('btn-articles-back-to-list')?.addEventListener('click', () => {
       this.closeArticleReader();
     });
+
+    // 5. Options de lecture (Popover)
+    const btnReadingOpts = document.getElementById('btn-article-reading-options');
+    const popoverOpts = document.getElementById('article-reading-options-popover');
+    
+    btnReadingOpts?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      popoverOpts?.classList.toggle('hidden');
+    });
+
+    // Fermer le popover au clic en dehors
+    document.addEventListener('click', (e) => {
+      if (popoverOpts && !popoverOpts.classList.contains('hidden') && !popoverOpts.contains(e.target) && e.target !== btnReadingOpts) {
+        popoverOpts.classList.add('hidden');
+      }
+    });
+
+    // Événements dans le popover d'options
+    this.bindReadingOptionsControls();
+  },
+
+  bindReadingOptionsControls() {
+    const popover = document.getElementById('article-reading-options-popover');
+    if (!popover) return;
+
+    // Ambiance / Fond
+    popover.querySelectorAll('.reading-opt-swatch').forEach(sw => {
+      sw.addEventListener('click', () => {
+        popover.querySelectorAll('.reading-opt-swatch').forEach(s => s.classList.remove('active'));
+        sw.classList.add('active');
+        this.readingOpts.bg = sw.dataset.bg || 'auto';
+        this.saveReadingPreferences();
+        this.applyReadingOptions();
+      });
+    });
+
+    // Police
+    const fontSelect = document.getElementById('article-opt-font');
+    fontSelect?.addEventListener('change', (e) => {
+      this.readingOpts.fontFamily = e.target.value;
+      this.saveReadingPreferences();
+      this.applyReadingOptions();
+    });
+
+    // Taille de police
+    document.getElementById('btn-article-font-dec')?.addEventListener('click', () => {
+      if (this.readingOpts.fontSize > 13) {
+        this.readingOpts.fontSize -= 1;
+        this.saveReadingPreferences();
+        this.applyReadingOptions();
+      }
+    });
+
+    document.getElementById('btn-article-font-inc')?.addEventListener('click', () => {
+      if (this.readingOpts.fontSize < 28) {
+        this.readingOpts.fontSize += 1;
+        this.saveReadingPreferences();
+        this.applyReadingOptions();
+      }
+    });
+
+    // Largeur
+    popover.querySelectorAll('[data-width]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        popover.querySelectorAll('[data-width]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.readingOpts.width = btn.dataset.width;
+        this.saveReadingPreferences();
+        this.applyReadingOptions();
+      });
+    });
+
+    // Alignement
+    popover.querySelectorAll('[data-align]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        popover.querySelectorAll('[data-align]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.readingOpts.align = btn.dataset.align;
+        this.saveReadingPreferences();
+        this.applyReadingOptions();
+      });
+    });
+
+    // Interligne
+    popover.querySelectorAll('[data-line-height]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        popover.querySelectorAll('[data-line-height]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.readingOpts.lineHeight = btn.dataset.lineHeight;
+        this.saveReadingPreferences();
+        this.applyReadingOptions();
+      });
+    });
+  },
+
+  applyReadingOptions() {
+    const container = document.getElementById('article-reader-container');
+    const popover = document.getElementById('article-reading-options-popover');
+    if (!container) return;
+
+    // 1. Fond
+    container.classList.remove('reading-bg-white', 'reading-bg-sepia', 'reading-bg-dark', 'reading-bg-oled');
+    if (this.readingOpts.bg !== 'auto') {
+      container.classList.add(`reading-bg-${this.readingOpts.bg}`);
+    }
+
+    // 2. Police
+    let fontStack = `'${this.readingOpts.fontFamily}', Georgia, serif`;
+    if (this.readingOpts.fontFamily === 'Inter') {
+      fontStack = `'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
+    }
+    container.style.fontFamily = fontStack;
+
+    // 3. Taille
+    const bodyEl = document.getElementById('article-reader-body');
+    if (bodyEl) {
+      bodyEl.style.fontSize = `${this.readingOpts.fontSize}px`;
+    }
+    const lblSize = document.getElementById('lbl-article-font-size');
+    if (lblSize) {
+      lblSize.textContent = `${this.readingOpts.fontSize} px`;
+    }
+
+    // 4. Largeur
+    container.classList.remove('width-narrow', 'width-normal', 'width-wide');
+    container.classList.add(`width-${this.readingOpts.width || 'normal'}`);
+
+    // 5. Alignement
+    container.classList.remove('align-left', 'align-justify');
+    container.classList.add(`align-${this.readingOpts.align || 'left'}`);
+
+    // 6. Interligne
+    if (bodyEl) {
+      bodyEl.style.lineHeight = this.readingOpts.lineHeight || '1.8';
+    }
+
+    // Synchroniser l'état visuel du popover
+    if (popover) {
+      popover.querySelectorAll('.reading-opt-swatch').forEach(sw => {
+        sw.classList.toggle('active', sw.dataset.bg === this.readingOpts.bg);
+      });
+      const fontSelect = document.getElementById('article-opt-font');
+      if (fontSelect) fontSelect.value = this.readingOpts.fontFamily;
+
+      popover.querySelectorAll('[data-width]').forEach(b => {
+        b.classList.toggle('active', b.dataset.width === this.readingOpts.width);
+      });
+      popover.querySelectorAll('[data-align]').forEach(b => {
+        b.classList.toggle('active', b.dataset.align === this.readingOpts.align);
+      });
+      popover.querySelectorAll('[data-line-height]').forEach(b => {
+        b.classList.toggle('active', b.dataset.lineHeight === this.readingOpts.lineHeight);
+      });
+    }
   },
 
   async onViewActivated() {
@@ -193,7 +375,6 @@ const ArticlesView = {
     // Clic pour ouvrir un article
     container.querySelectorAll('.article-card').forEach(card => {
       card.addEventListener('click', (e) => {
-        // Si clic direct sur un badge biblique, ouvrir dans la Bible
         const refBadge = e.target.closest('.scripture-badge');
         if (refBadge) {
           e.stopPropagation();
@@ -258,10 +439,19 @@ const ArticlesView = {
         };
       }
 
-      // Rendu Markdown en HTML propre
+      // Rendu Markdown propre et calcul des statistiques de lecture
+      const mdRaw = res.content_markdown || art.summary || '';
+      const renderedHtml = this.renderMarkdown(mdRaw);
+      
       if (contentEl) {
-        contentEl.innerHTML = this.renderMarkdown(res.content_markdown || art.summary || '');
+        contentEl.innerHTML = renderedHtml;
       }
+
+      // Calcul des statistiques de lecture (mots & temps)
+      this.updateReadingStats(mdRaw);
+
+      // Appliquer les préférences de lecture actuelles
+      this.applyReadingOptions();
 
       // Scroller en haut
       const scrollParent = document.getElementById('view-articles');
@@ -271,6 +461,20 @@ const ArticlesView = {
       console.error('[ArticlesView] Erreur lecture article:', e);
       if (contentEl) contentEl.innerHTML = `<div class="articles-error-state">Erreur lors de l'affichage.</div>`;
     }
+  },
+
+  updateReadingStats(markdownText) {
+    const statsEl = document.getElementById('article-stats-text');
+    if (!statsEl || !markdownText) return;
+
+    // Compter les mots réels
+    const words = markdownText.trim().replace(/[#*>\-_`\[\]\(\)]/g, ' ').split(/\s+/).filter(w => w.length > 0);
+    const wordCount = words.length;
+
+    // Vitesse moyenne de lecture : 220 mots / minute
+    const readTimeMinutes = Math.max(1, Math.ceil(wordCount / 220));
+
+    statsEl.textContent = `${readTimeMinutes} min de lecture • ${wordCount.toLocaleString('fr-FR')} mots`;
   },
 
   closeArticleReader() {
@@ -384,10 +588,16 @@ const ArticlesView = {
   renderMarkdown(md) {
     if (!md) return '';
     
-    // Nettoyer les métadonnées de tête redondantes
-    let text = md.replace(/^#\s+.*\n/g, ''); // Enlève le premier titre H1 car affiché dans le header
+    let text = md;
 
-    // Remplacement basique Markdown vers HTML fluide
+    // 1. Nettoyer tout bloc d'en-tête redondant (titre, auteur, source, date dupliqués)
+    text = text.replace(/^(#\s+[^\n]+\n+)?/gi, '');
+    text = text.replace(/^(\*\*(?:Auteur|Source|Date)\s*:\*\*[^\n]*\n*|Auteur\s*:[^\n]*\n*|Source\s*:[^\n]*\n*|Date\s*:[^\n]*\n*|---\n*)+/gim, '');
+
+    // 2. Nettoyer les séparateurs multiples ou en fin d'article
+    text = text.replace(/---\s*$/gi, '');
+
+    // 3. Remplacement Markdown vers HTML fluide
     let html = text
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -399,6 +609,7 @@ const ArticlesView = {
       .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/gim, '<em>$1</em>')
       .replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2" target="_blank" class="article-link">$1</a>')
+      .replace(/^---\s*$/gim, '<div class="article-ornamental-divider"><span class="article-ornamental-divider-icon">❦</span></div>')
       .replace(/\n\n/gim, '</p><p>')
       .replace(/\n/gim, '<br>');
 

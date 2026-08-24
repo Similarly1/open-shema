@@ -1,11 +1,3 @@
-# Les 3 clés d’une discipline qui change le cœur de votre enfant
-
-**Auteur :** david@toutpoursagloire.com  
-**Source :** [Tout Pour Sa Gloire](https://toutpoursagloire.com/article/cles-discipline-qui-change-coeur-de-votre-enfant/)  
-**Date :** 2026-08-21T04:00:00Z  
-
----
-
 Loading the
 Elevenlabs Text to Speech
 AudioNative Player…
