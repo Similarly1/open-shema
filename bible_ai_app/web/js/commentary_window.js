@@ -10,6 +10,7 @@ const CommentaryWindow = {
   isUserScrolled: false,
   _isProgrammaticScroll: false,
   _scrollTimeout: null,
+  _isLoading: false,
 
   currentBook: 'Gen',
   currentBookFrench: 'Genèse',
@@ -28,24 +29,45 @@ const CommentaryWindow = {
   showTranslatedVersion: {},
 
   init() {
+    // 1. Lire les paramètres URL éventuels
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('book')) this.currentBook = urlParams.get('book');
+      if (urlParams.get('chapter')) this.currentChapter = parseInt(urlParams.get('chapter'), 10) || 1;
+      if (urlParams.get('verse')) this.currentVerse = parseInt(urlParams.get('verse'), 10) || 1;
+    } catch (e) {}
+
     this.initBroadcastChannel();
     this.bindEvents();
     this.restorePreferences();
 
-    // 1. Charger immédiatement le chapitre par défaut
-    const startLoad = () => {
-      this.loadChapterCommentaries(this.currentBook, this.currentChapter).then(() => {
-        this.notifyReady();
-      });
+    // 2. Initialiser le chargement dès que l'API est prête
+    const startInitialLoad = async () => {
+      try {
+        const passage = await API.getCurrentPassage();
+        if (passage && passage.book) {
+          this.currentBook = passage.book;
+          this.currentBookFrench = passage.book_french || passage.book;
+          this.currentChapter = parseInt(passage.chapter, 10) || 1;
+          this.currentVerse = parseInt(passage.verse, 10) || 1;
+        }
+      } catch (err) {
+        console.debug('[CommentaryWindow] getCurrentPassage fallback:', err);
+      }
+      this.updatePassageDisplay(this.currentBookFrench, this.currentChapter, this.currentVerse);
+      await this.loadChapterCommentaries(this.currentBook, this.currentChapter);
+      this.notifyReady();
     };
 
-    // 2. Attendre que l'API soit prête
     API.onReady(() => {
-      startLoad();
+      startInitialLoad();
     });
 
     if (API.isReady) {
-      startLoad();
+      startInitialLoad();
+    } else {
+      // Sécurité : forcer le démarrage après 500ms si pywebview est prêt
+      setTimeout(startInitialLoad, 500);
     }
   },
 
@@ -137,34 +159,55 @@ const CommentaryWindow = {
   },
 
   async loadChapterCommentaries(bookCode, chapterNum) {
-    const container = document.getElementById('commentary-stream-container');
-    if (!container) return;
+    if (this._isLoading) return;
+    this._isLoading = true;
 
-    container.innerHTML = `
-      <div style="text-align: center; padding: 60px 20px; color: var(--text-secondary);">
-        <div class="synth-spinner" style="width: 24px; height: 24px; border-width: 2.5px; margin: 0 auto 12px auto;"></div>
-        <div style="font-size: 14px; font-weight: 600;">Chargement des commentaires de ${this.currentBookFrench} ${chapterNum}...</div>
-      </div>
-    `;
+    const container = document.getElementById('commentary-stream-container');
+    if (container && !this.currentChapterData) {
+      container.innerHTML = `
+        <div style="text-align: center; padding: 60px 20px; color: var(--text-secondary);">
+          <div class="synth-spinner" style="width: 24px; height: 24px; border-width: 2.5px; margin: 0 auto 12px auto;"></div>
+          <div style="font-size: 14px; font-weight: 600;">Chargement des commentaires de ${this.currentBookFrench} ${chapterNum}...</div>
+        </div>
+      `;
+    }
 
     try {
+      await API.ensureReady(4000);
       const data = await API.getChapterCommentariesGrouped(bookCode, chapterNum);
+      if (!data || !data.verses || data.error) {
+        throw new Error(data?.error || "Données de commentaires non reçues");
+      }
       this.currentChapterData = data;
+      this.currentBookFrench = data.book_french || this.currentBookFrench;
+      this.updatePassageDisplay(this.currentBookFrench, this.currentChapter, this.currentVerse);
       this.populateAuthorFilter(data.available_sources || []);
       this.renderStream(data);
       if (this.isSyncActive) {
         setTimeout(() => {
           this.scrollToVerseBlock(this.currentVerse);
-        }, 50);
+        }, 80);
       }
     } catch (e) {
       console.error('[CommentaryWindow] Erreur chargement commentaires:', e);
-      container.innerHTML = `
-        <div style="text-align: center; padding: 40px; color: var(--accent-red, #EF4444);">
-          <div style="font-size: 15px; font-weight: 700; margin-bottom: 6px;">Impossible de charger les commentaires</div>
-          <div style="font-size: 12px; opacity: 0.8;">${String(e)}</div>
-        </div>
-      `;
+      if (container) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 40px; color: var(--accent-red, #EF4444);">
+            <div style="font-size: 15px; font-weight: 700; margin-bottom: 6px;">Impossible de charger les commentaires</div>
+            <div style="font-size: 12px; opacity: 0.8; margin-bottom: 12px;">${String(e.message || e)}</div>
+            <button type="button" class="comm-win-tool-btn" id="btn-retry-load" style="margin: 0 auto; display: inline-flex;">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              <span>Réessayer</span>
+            </button>
+          </div>
+        `;
+        document.getElementById('btn-retry-load')?.addEventListener('click', () => {
+          this._isLoading = false;
+          this.loadChapterCommentaries(bookCode, chapterNum);
+        });
+      }
+    } finally {
+      this._isLoading = false;
     }
   },
 
@@ -240,7 +283,7 @@ const CommentaryWindow = {
       }
 
       if (comments.length === 0 && this.activeAuthorFilter !== 'all') {
-        return; // Ne pas afficher le verset si aucun commentaire ne correspond au filtre
+        return;
       }
 
       html += `
@@ -310,15 +353,20 @@ const CommentaryWindow = {
     container.querySelectorAll('.comm-verse-quote-banner').forEach(banner => {
       banner.addEventListener('click', () => {
         const v = parseInt(banner.dataset.navVerse, 10);
-        if (v && this.channel) {
-          this.channel.postMessage({
-            type: 'NAVIGATE_REQUEST',
-            book: this.currentBook,
-            chapter: this.currentChapter,
-            verse: v
-          });
+        if (v) {
           this.currentVerse = v;
           this.updateActiveVerseHighlight(v);
+          if (typeof API !== 'undefined' && API.navigateMainFromSecondary) {
+            API.navigateMainFromSecondary(this.currentBook, this.currentChapter, v);
+          }
+          if (this.channel) {
+            this.channel.postMessage({
+              type: 'NAVIGATE_REQUEST',
+              book: this.currentBook,
+              chapter: this.currentChapter,
+              verse: v
+            });
+          }
         }
       });
     });
@@ -567,6 +615,8 @@ const CommentaryWindow = {
     } catch (e) {}
   }
 };
+
+window.CommentaryWindow = CommentaryWindow;
 
 // Initialisation dès que le DOM est chargé
 document.addEventListener('DOMContentLoaded', () => {

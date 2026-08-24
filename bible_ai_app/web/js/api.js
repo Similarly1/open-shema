@@ -401,7 +401,24 @@ const API = {
 
   async getDictionaryEntry(dictId, slug, strongCode = null) {
     return this.call('get_dictionary_entry', dictId, slug, strongCode);
+  },
+
+  async getCurrentPassage() {
+    return await this.call('get_current_passage');
+  },
+
+  async syncPassage(bookCode, bookFrench = '', chapterNum = 1, verseNum = 1) {
+    return await this.call('sync_passage', bookCode, bookFrench, parseInt(chapterNum), parseInt(verseNum) || 1);
+  },
+
+  async syncVerse(bookCode, chapterNum, verseNum) {
+    return await this.call('sync_verse', bookCode, parseInt(chapterNum), parseInt(verseNum));
+  },
+
+  async navigateMainFromSecondary(bookCode, chapterNum, verseNum = 1) {
+    return await this.call('navigate_main_from_secondary', bookCode, parseInt(chapterNum), parseInt(verseNum) || 1);
   }
 };
 
 API.init();
+

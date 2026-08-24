@@ -57,33 +57,43 @@ const MultiwindowSync = {
   },
 
   broadcastPassageNavigated(bookCode, bookFrench, chapterNum, verseNum = 1) {
-    if (!this.channel) return;
     this._lastSentChapter = `${bookCode}_${chapterNum}`;
     this._lastSentVerse = `${bookCode}_${chapterNum}_${verseNum}`;
 
-    this.channel.postMessage({
-      type: 'PASSAGE_NAVIGATED',
-      book: bookCode,
-      bookFrench: bookFrench,
-      chapter: parseInt(chapterNum, 10),
-      verse: parseInt(verseNum, 10) || 1,
-      timestamp: Date.now()
-    });
+    if (this.channel) {
+      this.channel.postMessage({
+        type: 'PASSAGE_NAVIGATED',
+        book: bookCode,
+        bookFrench: bookFrench,
+        chapter: parseInt(chapterNum, 10),
+        verse: parseInt(verseNum, 10) || 1,
+        timestamp: Date.now()
+      });
+    }
+
+    if (typeof API !== 'undefined' && API.syncPassage) {
+      API.syncPassage(bookCode, bookFrench, chapterNum, verseNum);
+    }
   },
 
   broadcastVerseChanged(bookCode, chapterNum, verseNum) {
-    if (!this.channel) return;
     const vKey = `${bookCode}_${chapterNum}_${verseNum}`;
     if (this._lastSentVerse === vKey) return;
     this._lastSentVerse = vKey;
 
-    this.channel.postMessage({
-      type: 'VERSE_CHANGED',
-      book: bookCode,
-      chapter: parseInt(chapterNum, 10),
-      verse: parseInt(verseNum, 10),
-      timestamp: Date.now()
-    });
+    if (this.channel) {
+      this.channel.postMessage({
+        type: 'VERSE_CHANGED',
+        book: bookCode,
+        chapter: parseInt(chapterNum, 10),
+        verse: parseInt(verseNum, 10),
+        timestamp: Date.now()
+      });
+    }
+
+    if (typeof API !== 'undefined' && API.syncVerse) {
+      API.syncVerse(bookCode, chapterNum, verseNum);
+    }
   },
 
   broadcastCurrentState() {

@@ -2864,7 +2864,9 @@ class BibleAppApi:
             _COMMENTARY_RESTORE_BOUNDS = (wx, wy, ww, wh)
 
         _COMMENTARY_TARGET_BOUNDS = (wx, wy, ww, wh)
+        _LAST_ACTIVE_PASSAGE = (book_code, int(chapter), int(verse))
         html_path = os.path.join(current_dir, "web", "commentary_window.html")
+        url_with_params = f"{html_path}?book={book_code}&chapter={chapter}&verse={verse}"
         
         def on_comm_closed():
             global _COMMENTARY_WINDOW
@@ -2879,7 +2881,7 @@ class BibleAppApi:
         try:
             _COMMENTARY_WINDOW = webview.create_window(
                 title="Open Shema — Commentaires Exégétiques",
-                url=html_path,
+                url=url_with_params,
                 js_api=self,
                 x=wx,
                 y=wy,
@@ -2977,6 +2979,56 @@ class BibleAppApi:
             user32.SetWindowPos(hwnd, 0, rc.left, rc.top, mw, mh, 0x0040)
 
         return {"success": True, "is_maximized": _COMMENTARY_IS_MAXIMIZED}
+
+    def get_current_passage(self) -> Dict[str, Any]:
+        """Retourne le dernier passage et verset actif du lecteur."""
+        global _LAST_ACTIVE_PASSAGE
+        b, ch, v = _LAST_ACTIVE_PASSAGE
+        french = get_french_book_name(b)
+        return {"book": b, "book_french": french, "chapter": ch, "verse": v}
+
+    def sync_passage(self, book_code: str, book_french: str = "", chapter: int = 1, verse: int = 1) -> Dict[str, Any]:
+        """Diffuse le passage actif vers la fenêtre de commentaires."""
+        global _COMMENTARY_WINDOW, _LAST_ACTIVE_PASSAGE
+        ch_int = int(chapter)
+        v_int = int(verse) if verse else 1
+        french = book_french or get_french_book_name(book_code)
+        _LAST_ACTIVE_PASSAGE = (book_code, ch_int, v_int)
+        if _COMMENTARY_WINDOW:
+            try:
+                js_call = f"window.CommentaryWindow && window.CommentaryWindow.handlePassageNavigated('{book_code}', '{french}', {ch_int}, {v_int})"
+                _COMMENTARY_WINDOW.evaluate_js(js_call)
+            except Exception as e:
+                logger.debug(f"Erreur evaluate_js sync_passage: {e}")
+        return {"success": True}
+
+    def sync_verse(self, book_code: str, chapter: int, verse: int) -> Dict[str, Any]:
+        """Diffuse le verset visible vers la fenêtre de commentaires."""
+        global _COMMENTARY_WINDOW, _LAST_ACTIVE_PASSAGE
+        ch_int = int(chapter)
+        v_int = int(verse) if verse else 1
+        _LAST_ACTIVE_PASSAGE = (book_code, ch_int, v_int)
+        if _COMMENTARY_WINDOW:
+            try:
+                js_call = f"window.CommentaryWindow && window.CommentaryWindow.handleVerseChanged('{book_code}', {ch_int}, {v_int})"
+                _COMMENTARY_WINDOW.evaluate_js(js_call)
+            except Exception as e:
+                logger.debug(f"Erreur evaluate_js sync_verse: {e}")
+        return {"success": True}
+
+    def navigate_main_from_secondary(self, book_code: str, chapter: int, verse: int = 1) -> Dict[str, Any]:
+        """Permet à la fenêtre secondaire de positionner la Bible principale."""
+        global _GLOBAL_WINDOW, _LAST_ACTIVE_PASSAGE
+        ch_int = int(chapter)
+        v_int = int(verse) if verse else 1
+        _LAST_ACTIVE_PASSAGE = (book_code, ch_int, v_int)
+        if _GLOBAL_WINDOW:
+            try:
+                js_call = f"window.BibleReader && window.BibleReader.navigateTo('{book_code}', {ch_int}, {v_int})"
+                _GLOBAL_WINDOW.evaluate_js(js_call)
+            except Exception as e:
+                logger.debug(f"Erreur evaluate_js navigate_main: {e}")
+        return {"success": True}
 
 
 
@@ -3097,6 +3149,7 @@ _COMMENTARY_WINDOW = None
 _COMMENTARY_IS_MAXIMIZED = False
 _COMMENTARY_RESTORE_BOUNDS = (100, 60, 1100, 750)
 _COMMENTARY_TARGET_BOUNDS = (0, 0, 1200, 800)
+_LAST_ACTIVE_PASSAGE = ("Gen", 1, 1)
 
 
 
@@ -3126,12 +3179,18 @@ def on_window_shown(*args, **kwargs):
 
 
 def on_commentary_shown(*args, **kwargs):
-    global _COMMENTARY_WINDOW, _COMMENTARY_IS_MAXIMIZED, _COMMENTARY_TARGET_BOUNDS
+    global _COMMENTARY_WINDOW, _COMMENTARY_IS_MAXIMIZED, _COMMENTARY_TARGET_BOUNDS, _LAST_ACTIVE_PASSAGE
     try:
         if hasattr(_COMMENTARY_WINDOW, 'native') and _COMMENTARY_WINDOW.native:
             hwnd = _COMMENTARY_WINDOW.native.Handle.ToInt32()
             wx, wy, ww, wh = _COMMENTARY_TARGET_BOUNDS
             user32.SetWindowPos(hwnd, 0, wx, wy, ww, wh, 0x0040)
+            
+            b, ch, v = _LAST_ACTIVE_PASSAGE
+            french = get_french_book_name(b)
+            threading.Timer(0.4, lambda: _COMMENTARY_WINDOW.evaluate_js(
+                f"window.CommentaryWindow && window.CommentaryWindow.handlePassageNavigated('{b}', '{french}', {ch}, {v})"
+            )).start()
     except Exception as e:
         logger.warning(f"Erreur on_commentary_shown: {e}")
 
