@@ -795,11 +795,12 @@ const CommentaryWindow = {
   // =========================================================================
 
   adjustZoom(delta) {
-    this.zoomPercent = Math.max(70, Math.min(180, this.zoomPercent + delta));
+    this.zoomPercent = Math.max(70, Math.min(220, this.zoomPercent + delta));
     const lbl = document.getElementById('lbl-zoom-val');
     if (lbl) lbl.textContent = `${this.zoomPercent}%`;
-    document.documentElement.style.setProperty('--comm-zoom', `${this.zoomPercent / 100}`);
-    document.body.style.fontSize = `${14 * (this.zoomPercent / 100)}px`;
+    const scale = this.zoomPercent / 100;
+    document.documentElement.style.setProperty('--comm-zoom', String(scale));
+    document.body.style.setProperty('--comm-zoom', String(scale));
     try { localStorage.setItem('comm_win_zoom', String(this.zoomPercent)); } catch (e) {}
   },
 
@@ -822,7 +823,14 @@ const CommentaryWindow = {
   restorePreferences() {
     try {
       const z = localStorage.getItem('comm_win_zoom');
-      if (z) this.adjustZoom(parseInt(z, 10) - 100);
+      if (z) {
+        this.zoomPercent = parseInt(z, 10) || 100;
+        const lbl = document.getElementById('lbl-zoom-val');
+        if (lbl) lbl.textContent = `${this.zoomPercent}%`;
+        const scale = this.zoomPercent / 100;
+        document.documentElement.style.setProperty('--comm-zoom', String(scale));
+        document.body.style.setProperty('--comm-zoom', String(scale));
+      }
 
       const f = localStorage.getItem('comm_win_font');
       if (f) {

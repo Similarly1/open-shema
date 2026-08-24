@@ -15,9 +15,11 @@
 
   <style>
     /* =========================================================================
-     * STYLES DU VOLET D'ÉTUDE DÉPORTÉ (HAUTE LISIBILITÉ & FORTS CONTRASTES)
+     * STYLES DU VOLET D'ÉTUDE DÉPORTÉ (MULTI-ONGLETS, HAUTE LISIBILITÉ & SCALING)
      * ========================================================================= */
     :root {
+      --comm-zoom: 1;
+      --font-reading: 'EB Garamond', Georgia, serif;
       --bg-main: #0F172A;
       --bg-card: #1E293B;
       --bg-hover: rgba(255, 255, 255, 0.08);
@@ -44,10 +46,10 @@
       user-select: text;
     }
 
-    /* 1. BARRE DE TITRE & ONGLETS PRINCIPAUX */
+    /* 1. BARRE DE TITRE & ONGLETS PRINCIPAUX (RESPONSIVE & SANS DÉBORDEMENT) */
     .comm-win-titlebar {
-      height: 46px;
-      min-height: 46px;
+      height: 44px;
+      min-height: 44px;
       background: #1E293B !important;
       border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
       display: flex;
@@ -59,6 +61,8 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
       user-select: none;
       gap: 6px;
+      flex-wrap: nowrap;
+      overflow: hidden;
     }
 
     .comm-win-tabs-group {
@@ -67,23 +71,25 @@
       gap: 3px;
       -webkit-app-region: no-drag;
       flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .comm-tab-btn {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      padding: 6px 12px;
+      gap: 6px;
+      padding: 5px 10px;
       background: transparent;
       border: 1px solid transparent;
       border-radius: 6px;
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 600;
       color: #94A3B8 !important;
       cursor: pointer;
       transition: all 0.15s ease;
       white-space: nowrap;
       user-select: none;
+      flex-shrink: 0;
     }
 
     .comm-tab-btn:hover {
@@ -100,12 +106,14 @@
     .comm-win-center-group {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       -webkit-app-region: drag;
       flex: 1;
       min-width: 0;
       justify-content: center;
       cursor: grab;
+      overflow: hidden;
+      white-space: nowrap;
     }
 
     .comm-win-center-group:active {
@@ -115,24 +123,26 @@
     .comm-win-passage-pill {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
+      gap: 5px;
+      padding: 3px 8px;
       background: rgba(255, 255, 255, 0.08) !important;
       border: 1px solid rgba(255, 255, 255, 0.16) !important;
       border-radius: 6px;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
       color: #F8FAFC !important;
       flex-shrink: 0;
       white-space: nowrap;
       -webkit-app-region: no-drag;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
 
     .comm-win-sync-indicator {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      padding: 3px 8px;
+      gap: 4px;
+      padding: 3px 6px;
       border-radius: 6px;
       font-size: 11px;
       font-weight: 600;
@@ -165,16 +175,17 @@
     .comm-win-actions-group {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       -webkit-app-region: no-drag;
       flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .comm-win-tool-btn {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 5px 10px;
+      gap: 5px;
+      padding: 5px 9px;
       background: rgba(255, 255, 255, 0.08) !important;
       border: 1px solid rgba(255, 255, 255, 0.15) !important;
       border-radius: 6px;
@@ -197,6 +208,7 @@
       align-items: center;
       gap: 2px;
       margin-left: 2px;
+      flex-shrink: 0;
     }
 
     .comm-win-control-btn {
@@ -248,7 +260,7 @@
     .comm-stream-inner {
       max-width: 920px;
       margin: 0 auto;
-      padding: 24px 28px 80px 28px;
+      padding: 20px 24px 80px 24px;
       width: 100%;
       box-sizing: border-box;
     }
@@ -281,7 +293,7 @@
 
     .comm-verse-quote-text {
       font-family: var(--font-bible, 'Cardo', 'EB Garamond', Georgia, serif);
-      font-size: 16.5px;
+      font-size: calc(16.5px * var(--comm-zoom, 1)) !important;
       line-height: 1.65;
       color: #F8FAFC !important;
       font-style: italic;
@@ -328,12 +340,14 @@
 
     .comm-stream-body {
       font-family: var(--font-reading, 'EB Garamond', Georgia, serif);
-      font-size: 16px;
-      line-height: 1.8;
+      font-size: calc(16px * var(--comm-zoom, 1)) !important;
+      line-height: 1.8 !important;
       color: #F1F5F9 !important;
     }
 
     .comm-stream-body p {
+      font-size: calc(16px * var(--comm-zoom, 1)) !important;
+      line-height: 1.8 !important;
       margin: 0 0 14px 0;
       color: #F1F5F9 !important;
     }
@@ -372,7 +386,7 @@
     .ai-msg-bubble {
       padding: 14px 18px;
       border-radius: 10px;
-      font-size: 14px;
+      font-size: calc(14px * var(--comm-zoom, 1)) !important;
       line-height: 1.65;
       max-width: 92%;
       box-sizing: border-box;
@@ -484,7 +498,7 @@
 
     .lex-word-orig {
       font-family: 'Cardo', 'EB Garamond', serif;
-      font-size: 16.5px;
+      font-size: calc(16.5px * var(--comm-zoom, 1)) !important;
       font-weight: 700;
       color: #FFFFFF !important;
     }
@@ -506,6 +520,7 @@
       background: #1E293B !important;
       border: 1px solid rgba(255, 255, 255, 0.12) !important;
       color: #F8FAFC !important;
+      font-size: calc(14px * var(--comm-zoom, 1)) !important;
     }
 
     /* Styles spécifiques Onglet Notes */
@@ -530,7 +545,7 @@
       padding: 16px;
       color: #FFFFFF !important;
       font-family: var(--font-reading, 'EB Garamond', serif);
-      font-size: 16px;
+      font-size: calc(16px * var(--comm-zoom, 1)) !important;
       line-height: 1.7;
       box-sizing: border-box;
       outline: none;
@@ -558,27 +573,195 @@
       display: none !important;
     }
 
-    /* Thèmes de fond de lecture */
+    .popover-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #94A3B8 !important;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    /* =========================================================================
+     * THÈME SÉPIA (HAUTE LISIBILITÉ AMBRÉE)
+     * ========================================================================= */
+    body.bg-theme-sepia {
+      background-color: #F8EED7 !important;
+      color: #382818 !important;
+    }
+    body.bg-theme-sepia .comm-win-titlebar {
+      background: #EEDCC0 !important;
+      border-bottom: 1px solid #DFC9A7 !important;
+    }
+    body.bg-theme-sepia .comm-tab-btn {
+      color: #5D4632 !important;
+    }
+    body.bg-theme-sepia .comm-tab-btn:hover {
+      background: rgba(0, 0, 0, 0.06) !important;
+      color: #261A0E !important;
+    }
+    body.bg-theme-sepia .comm-tab-btn.active {
+      background: rgba(180, 83, 9, 0.18) !important;
+      border-color: rgba(180, 83, 9, 0.4) !important;
+      color: #9A3412 !important;
+    }
+    body.bg-theme-sepia .comm-win-tool-btn {
+      background: #E6D2B3 !important;
+      border: 1px solid #CEB692 !important;
+      color: #382818 !important;
+    }
+    body.bg-theme-sepia .comm-win-tool-btn:hover {
+      background: #DFC7A5 !important;
+      color: #1A1208 !important;
+    }
+    body.bg-theme-sepia .comm-win-control-btn {
+      color: #5D4632 !important;
+    }
+    body.bg-theme-sepia .comm-win-control-btn:hover {
+      background: rgba(0, 0, 0, 0.08) !important;
+      color: #1A1208 !important;
+    }
+    body.bg-theme-sepia .comm-win-passage-pill {
+      background: #E6D2B3 !important;
+      border: 1px solid #CEB692 !important;
+      color: #261A0E !important;
+    }
+    body.bg-theme-sepia .comm-stream-card,
+    body.bg-theme-sepia .comm-verse-quote-banner,
+    body.bg-theme-sepia .ai-msg-bubble.assistant,
+    body.bg-theme-sepia .lex-words-flow,
+    body.bg-theme-sepia #lex-entry-detail,
+    body.bg-theme-sepia .note-editor-textarea {
+      background: #F4E7CE !important;
+      color: #382818 !important;
+      border: 1px solid #DFCAA9 !important;
+    }
+    body.bg-theme-sepia .comm-stream-body,
+    body.bg-theme-sepia .comm-stream-body p,
+    body.bg-theme-sepia .comm-verse-quote-text,
+    body.bg-theme-sepia .lex-word-orig,
+    body.bg-theme-sepia .note-editor-textarea {
+      color: #382818 !important;
+    }
+    body.bg-theme-sepia .comm-stream-author-title {
+      color: #9A3412 !important;
+    }
+    body.bg-theme-sepia .comm-stream-ref-badge {
+      background: #E6D2B3 !important;
+      color: #5D4632 !important;
+    }
+    body.bg-theme-sepia .comm-dropdown-popover {
+      background: #F4E7CE !important;
+      border: 1px solid #CEB692 !important;
+      color: #382818 !important;
+      box-shadow: 0 10px 25px rgba(67, 52, 34, 0.25) !important;
+    }
+    body.bg-theme-sepia .popover-label {
+      color: #6C523B !important;
+    }
+    body.bg-theme-sepia #lbl-zoom-val {
+      color: #261A0E !important;
+    }
+    body.bg-theme-sepia .font-choice-btn.active,
+    body.bg-theme-sepia .bg-choice-btn.active {
+      background: #DEC6A1 !important;
+      border-color: #B45309 !important;
+      color: #9A3412 !important;
+      font-weight: 700 !important;
+    }
+    body.bg-theme-sepia .lex-word-pill {
+      background: #EAD8BB !important;
+      border-color: #D3BE9C !important;
+    }
+    body.bg-theme-sepia .lex-word-trans {
+      color: #6C523B !important;
+    }
+
+    /* =========================================================================
+     * THÈME BLANC (LUMINEUX ÉPURÉ)
+     * ========================================================================= */
     body.bg-theme-white {
       background-color: #F8FAFC !important;
       color: #0F172A !important;
     }
-    body.bg-theme-white .comm-win-titlebar,
+    body.bg-theme-white .comm-win-titlebar {
+      background: #FFFFFF !important;
+      border-bottom: 1px solid #E2E8F0 !important;
+    }
+    body.bg-theme-white .comm-tab-btn {
+      color: #475569 !important;
+    }
+    body.bg-theme-white .comm-tab-btn:hover {
+      background: #F1F5F9 !important;
+      color: #0F172A !important;
+    }
+    body.bg-theme-white .comm-tab-btn.active {
+      background: rgba(2, 132, 199, 0.12) !important;
+      border-color: rgba(2, 132, 199, 0.35) !important;
+      color: #0284C7 !important;
+    }
+    body.bg-theme-white .comm-win-tool-btn {
+      background: #F1F5F9 !important;
+      border: 1px solid #CBD5E1 !important;
+      color: #0F172A !important;
+    }
+    body.bg-theme-white .comm-win-tool-btn:hover {
+      background: #E2E8F0 !important;
+    }
+    body.bg-theme-white .comm-win-control-btn {
+      color: #475569 !important;
+    }
+    body.bg-theme-white .comm-win-control-btn:hover {
+      background: #F1F5F9 !important;
+      color: #0F172A !important;
+    }
+    body.bg-theme-white .comm-win-passage-pill {
+      background: #F1F5F9 !important;
+      border: 1px solid #CBD5E1 !important;
+      color: #0F172A !important;
+    }
     body.bg-theme-white .comm-stream-card,
     body.bg-theme-white .comm-verse-quote-banner,
     body.bg-theme-white .ai-msg-bubble.assistant,
     body.bg-theme-white .lex-words-flow,
     body.bg-theme-white #lex-entry-detail,
-    body.bg-theme-white .note-editor-textarea,
-    body.bg-theme-white .comm-dropdown-popover {
+    body.bg-theme-white .note-editor-textarea {
       background: #FFFFFF !important;
       color: #0F172A !important;
-      border-color: #E2E8F0 !important;
+      border: 1px solid #E2E8F0 !important;
     }
+    body.bg-theme-white .comm-stream-body,
     body.bg-theme-white .comm-stream-body p,
     body.bg-theme-white .comm-verse-quote-text,
-    body.bg-theme-white .lex-word-orig {
+    body.bg-theme-white .lex-word-orig,
+    body.bg-theme-white .note-editor-textarea {
       color: #0F172A !important;
+    }
+    body.bg-theme-white .comm-stream-author-title {
+      color: #0284C7 !important;
+    }
+    body.bg-theme-white .comm-stream-ref-badge {
+      background: #F1F5F9 !important;
+      color: #475569 !important;
+    }
+    body.bg-theme-white .comm-dropdown-popover {
+      background: #FFFFFF !important;
+      border: 1px solid #CBD5E1 !important;
+      color: #0F172A !important;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+    }
+    body.bg-theme-white .popover-label {
+      color: #64748B !important;
+    }
+    body.bg-theme-white #lbl-zoom-val {
+      color: #0F172A !important;
+    }
+    body.bg-theme-white .font-choice-btn.active,
+    body.bg-theme-white .bg-choice-btn.active {
+      background: #E0F2FE !important;
+      border-color: #0284C7 !important;
+      color: #0284C7 !important;
+      font-weight: 700 !important;
     }
     body.bg-theme-white .lex-word-pill {
       background: #F1F5F9 !important;
@@ -586,35 +769,6 @@
     }
     body.bg-theme-white .lex-word-trans {
       color: #475569 !important;
-    }
-
-    body.bg-theme-sepia {
-      background-color: #FBF0D9 !important;
-      color: #433422 !important;
-    }
-    body.bg-theme-sepia .comm-win-titlebar,
-    body.bg-theme-sepia .comm-stream-card,
-    body.bg-theme-sepia .comm-verse-quote-banner,
-    body.bg-theme-sepia .ai-msg-bubble.assistant,
-    body.bg-theme-sepia .lex-words-flow,
-    body.bg-theme-sepia #lex-entry-detail,
-    body.bg-theme-sepia .note-editor-textarea,
-    body.bg-theme-sepia .comm-dropdown-popover {
-      background: #F4E8CE !important;
-      color: #433422 !important;
-      border-color: #E6D5B8 !important;
-    }
-    body.bg-theme-sepia .comm-stream-body p,
-    body.bg-theme-sepia .comm-verse-quote-text,
-    body.bg-theme-sepia .lex-word-orig {
-      color: #433422 !important;
-    }
-    body.bg-theme-sepia .lex-word-pill {
-      background: #EDE0C4 !important;
-      border-color: #DCCBB0 !important;
-    }
-    body.bg-theme-sepia .lex-word-trans {
-      color: #785E42 !important;
     }
   </style>
 </head>
@@ -689,9 +843,7 @@
         </button>
 
         <div class="comm-dropdown-popover hidden" id="author-filter-popover" style="right: 0; width: 280px; max-height: 400px; overflow-y: auto;">
-          <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
-            Ouvrages disponibles
-          </div>
+          <div class="popover-label">Ouvrages disponibles</div>
           <div id="author-filter-list" style="display: flex; flex-direction: column; gap: 4px;"></div>
         </div>
       </div>
@@ -707,21 +859,21 @@
         </button>
 
         <div class="comm-dropdown-popover hidden" id="comm-display-popover" style="right: 0; width: 280px;">
-          <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">Police</div>
+          <div class="popover-label">Police</div>
           <div style="display: flex; gap: 4px; margin-bottom: 12px;">
             <button type="button" class="comm-win-tool-btn font-choice-btn active" data-font="EB Garamond" style="flex: 1; justify-content: center; font-family: 'EB Garamond', serif;">Garamond</button>
             <button type="button" class="comm-win-tool-btn font-choice-btn" data-font="Cardo" style="flex: 1; justify-content: center; font-family: 'Cardo', serif;">Cardo</button>
             <button type="button" class="comm-win-tool-btn font-choice-btn" data-font="Inter" style="flex: 1; justify-content: center; font-family: 'Inter', sans-serif;">Inter</button>
           </div>
 
-          <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">Taille du texte</div>
+          <div class="popover-label">Taille du texte</div>
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-            <button type="button" class="comm-win-tool-btn" id="btn-zoom-out" style="width: 32px; justify-content: center;">−</button>
-            <span id="lbl-zoom-val" style="font-size: 12px; font-weight: 700;">100%</span>
-            <button type="button" class="comm-win-tool-btn" id="btn-zoom-in" style="width: 32px; justify-content: center;">+</button>
+            <button type="button" class="comm-win-tool-btn" id="btn-zoom-out" style="width: 34px; justify-content: center; font-weight: 800; font-size: 14px;">−</button>
+            <span id="lbl-zoom-val" style="font-size: 13px; font-weight: 700;">100%</span>
+            <button type="button" class="comm-win-tool-btn" id="btn-zoom-in" style="width: 34px; justify-content: center; font-weight: 800; font-size: 14px;">+</button>
           </div>
 
-          <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">Fond de lecture</div>
+          <div class="popover-label">Fond de lecture</div>
           <div style="display: flex; gap: 6px;">
             <button type="button" class="comm-win-tool-btn bg-choice-btn active" data-bg="auto" style="flex: 1; justify-content: center;">Auto</button>
             <button type="button" class="comm-win-tool-btn bg-choice-btn" data-bg="white" style="flex: 1; justify-content: center;">Blanc</button>
