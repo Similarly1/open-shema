@@ -13,6 +13,7 @@ import os
 import sys
 import json
 import time
+import signal
 import argparse
 import itertools
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -24,6 +25,17 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from core.config import load_config
 from core.dictionary_polisher import DictionaryPolisher
+
+def handle_sigint(signum, frame):
+    print("\n\n🛑 Interruption immédiate (Ctrl+C). Sauvegarde du cache...")
+    try:
+        DictionaryPolisher.save_cache()
+    except Exception:
+        pass
+    print("✅ Cache sauvegardé avec succès ! Sortie.")
+    os._exit(0)
+
+signal.signal(signal.SIGINT, handle_sigint)
 
 MODEL_PRICING = {
     "mistralai/ministral-3-14b-instruct-2512": {"input_per_m": 0.30, "output_per_m": 0.40, "curr": "CHF"},
@@ -393,9 +405,12 @@ def main():
 
     except KeyboardInterrupt:
         print("\n\n🛑 Interruption demandée (Ctrl+C). Sauvegarde immédiate du cache...")
-        DictionaryPolisher.save_cache()
-        print(f"✅ {success_count} articles sauvegardés avec succès ! Vous pouvez relancer le script à tout moment pour continuer.")
-        sys.exit(0)
+        try:
+            DictionaryPolisher.save_cache()
+        except Exception:
+            pass
+        print(f"✅ {success_count} articles sauvegardés avec succès ! Sortie immédiate.")
+        os._exit(0)
 
     DictionaryPolisher.save_cache()
     total_elapsed = time.time() - start_time
