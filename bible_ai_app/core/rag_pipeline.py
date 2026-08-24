@@ -1,6 +1,9 @@
+import logging
 import time
 from core.reranker import LocalReranker
 from ai.llm_client import LLMClient
+
+logger = logging.getLogger(__name__)
 
 class RAGPipeline:
     """
@@ -30,7 +33,7 @@ class RAGPipeline:
                 embedding_model=embedding_model
             )
         except Exception as e:
-            print(f"[RAGPipeline] Erreur lors de la recherche vectorielle : {e}")
+            logger.error("[RAGPipeline] Erreur lors de la recherche vectorielle : %s", e)
             return []
 
         if not results or "documents" not in results or not results["documents"] or not results["documents"][0]:
@@ -138,7 +141,7 @@ class RAGPipeline:
                 })
                 return curated_docs
         except Exception as e:
-            print(f"[RAGPipeline] Erreur lors de la curation IA : {e}")
+            logger.error("[RAGPipeline] Erreur lors de la curation IA : %s", e)
             
         return documents
 
@@ -291,7 +294,7 @@ class RAGPipeline:
                             if strong_entry:
                                 raw_candidates.append(strong_entry)
                         except Exception as e:
-                            print(f"[RAGPipeline] Erreur récupération lexique Strong : {e}")
+                            logger.error("[RAGPipeline] Erreur récupération lexique Strong : %s", e)
 
         t_retrieval_ms = (time.time() - t_retrieval_0) * 1000
         _notify("retrieval", f"Recherche terminée ({len(raw_candidates)} extraits trouvés)", "done")
@@ -375,7 +378,7 @@ class RAGPipeline:
                         displayed_version_name=displayed_ver_name
                     )
         except Exception as e:
-            print(f"[RAGPipeline] Erreur construction contexte exégétique original : {e}")
+            logger.error("[RAGPipeline] Erreur construction contexte exégétique original : %s", e)
 
         # Construction du bloc de péricope littéraire (Unité de sens + Péricope précédente/suivante)
         pericope_context = ""
@@ -400,7 +403,7 @@ class RAGPipeline:
                     
                     pericope_context = "\n".join(p_lines) + "\n\n"
         except Exception as e:
-            print(f"[RAGPipeline] Erreur calcul contexte péricope : {e}")
+            logger.error("[RAGPipeline] Erreur calcul contexte péricope : %s", e)
 
         structured_context = self.build_structured_context(
             final_docs, 

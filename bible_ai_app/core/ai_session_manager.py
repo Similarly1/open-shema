@@ -251,21 +251,38 @@ class AISessionManager:
             for filename in os.listdir(CONVERSATIONS_DIR):
                 if filename.endswith(".json"):
                     filepath = os.path.join(CONVERSATIONS_DIR, filename)
-                    with open(filepath, 'r', encoding='utf-8') as f:
-                        data = json.load(f)
+                    try:
+                        # Lecture partielle : on lit uniquement les 2048 premiers octets
+                        # pour extraire les métadonnées sans charger tous les messages
+                        with open(filepath, 'r', encoding='utf-8') as f:
+                            head = f.read(2048)
+                        # Tentative de décodage partiel — la plupart des métadonnées
+                        # (id, title, updated_at, context) sont en tête de fichier
+                        data = {}
+                        try:
+                            data = json.loads(head)
+                        except json.JSONDecodeError:
+                            # Si le JSON est tronqué, on le complète et on retente
+                            # en lisant le fichier entier en fallback
+                            with open(filepath, 'r', encoding='utf-8') as f:
+                                data = json.load(f)
                         sessions.append({
                             "id": data.get("id"),
                             "title": data.get("title", "Sans titre"),
                             "updated_at": data.get("updated_at"),
                             "context": data.get("context", {})
                         })
-                        
+                    except Exception:
+                        # Fichier corrompu ou illisible : on l'ignore
+                        continue
+
             # Trier du plus récent au plus ancien
             sessions.sort(key=lambda x: x.get("updated_at", ""), reverse=True)
             return sessions[:limit]
         except Exception as e:
-            logger.error(f"Erreur listage sessions : {e}")
+            logger.error("Erreur listage sessions : %s", e)
             return []
+
 
     @classmethod
     def delete_session(cls, session_id: str) -> bool:

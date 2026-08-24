@@ -1,9 +1,12 @@
 import os
+import logging
 import sqlite3
 import json
 import re
 import unicodedata
 from typing import List, Dict, Any, Optional
+
+logger = logging.getLogger(__name__)
 
 # Définition des corpus canoniques et de l'ordre standard des livres
 CANONICAL_ORDER = [
@@ -128,7 +131,6 @@ class SearchEngine:
             )
         """)
         conn.commit()
-        conn.close()
 
     def sync_all_bibles(self, force: bool = False, progress_cb=None):
         """
@@ -157,7 +159,6 @@ class SearchEngine:
                 to_index.append(folder)
 
         if not to_index:
-            conn.close()
             return
 
         total_folders = len(to_index)
@@ -225,7 +226,6 @@ class SearchEngine:
         if progress_cb:
             progress_cb(100, "Indexation terminée")
 
-        conn.close()
 
     def _format_fts_query(self, query: str, match_mode: str = "ALL_WORDS") -> str:
         """
@@ -337,10 +337,8 @@ class SearchEngine:
             rows = cur.fetchall()
         except Exception as e:
             print(f"[SearchEngine] Erreur FTS Bibles: {e}")
-            conn.close()
             return []
 
-        conn.close()
 
         results = []
         for r in rows:
@@ -372,33 +370,31 @@ class SearchEngine:
             return False
             
         try:
-            conn = sqlite3.connect(self.commentary_db_path)
-            cur = conn.cursor()
-            cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='commentaries_fts'")
-            exists = cur.fetchone()
-            if not exists:
-                cur.execute("""
-                    CREATE VIRTUAL TABLE commentaries_fts USING fts5(
-                        commentary_id UNINDEXED,
-                        commentary_name,
-                        book_code UNINDEXED,
-                        book_name,
-                        chapter UNINDEXED,
-                        reference UNINDEXED,
-                        text,
-                        tokenize='unicode61 remove_diacritics 2'
-                    )
-                """)
-                cur.execute("""
-                    INSERT INTO commentaries_fts (commentary_id, commentary_name, book_code, book_name, chapter, reference, text)
-                    SELECT commentary_id, commentary_name, book_code, book_name, chapter, reference, text
-                    FROM commentaries
-                """)
-                conn.commit()
-            conn.close()
+            with sqlite3.connect(self.commentary_db_path) as conn:
+                cur = conn.cursor()
+                cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='commentaries_fts'")
+                exists = cur.fetchone()
+                if not exists:
+                    cur.execute("""
+                        CREATE VIRTUAL TABLE commentaries_fts USING fts5(
+                            commentary_id UNINDEXED,
+                            commentary_name,
+                            book_code UNINDEXED,
+                            book_name,
+                            chapter UNINDEXED,
+                            reference UNINDEXED,
+                            text,
+                            tokenize='unicode61 remove_diacritics 2'
+                        )
+                    """)
+                    cur.execute("""
+                        INSERT INTO commentaries_fts (commentary_id, commentary_name, book_code, book_name, chapter, reference, text)
+                        SELECT commentary_id, commentary_name, book_code, book_name, chapter, reference, text
+                        FROM commentaries
+                    """)
             return True
         except Exception as e:
-            print(f"[SearchEngine] Erreur init FTS commentaires: {e}")
+            logger.error("[SearchEngine] Erreur init FTS commentaires: %s", e)
             return False
 
     def search_commentaries(
@@ -421,9 +417,9 @@ class SearchEngine:
 
         self._init_commentaries_fts()
 
-        conn = sqlite3.connect(self.commentary_db_path)
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
+        with sqlite3.connect(self.commentary_db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            cur = conn.cursor()
 
         sql_clauses = ["commentaries_fts MATCH ?"]
         params = [fts_query]
@@ -451,11 +447,9 @@ class SearchEngine:
             cur.execute(sql, params)
             rows = cur.fetchall()
         except Exception as e:
-            print(f"[SearchEngine] Erreur recherche commentaires: {e}")
-            conn.close()
+            logger.error("[SearchEngine] Erreur recherche commentaires: %s", e)
             return []
 
-        conn.close()
 
         results = []
         for r in rows:

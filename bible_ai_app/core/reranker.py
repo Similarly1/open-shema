@@ -1,6 +1,9 @@
 import os
 import math
+import logging
 import threading
+
+logger = logging.getLogger(__name__)
 
 class LocalReranker:
     """
@@ -44,7 +47,7 @@ class LocalReranker:
                 self.is_loaded = True
                 return True
             except Exception as e:
-                print(f"[Reranker] Erreur lors du chargement du modèle {self.model_name} : {e}")
+                logger.error("[Reranker] Erreur lors du chargement du modèle %s : %s", self.model_name, e)
                 self.model = None
                 self.is_loaded = False
                 return False
@@ -120,5 +123,5 @@ class LocalReranker:
             return sorted_docs[:top_k]
 
         except Exception as e:
-            print(f"[Reranker] Erreur lors du calcul de pertinence : {e}")
+            logger.error("[Reranker] Erreur lors du calcul de pertinence : %s", e)
             return normalized_docs[:top_k]

@@ -73,23 +73,21 @@ class TranslationManager:
     def _init_db(cls):
         """Initialise la table SQLite pour le cache des traductions."""
         try:
-            conn = sqlite3.connect(cls._db_path)
-            cur = conn.cursor()
-            cur.execute("""
-                CREATE TABLE IF NOT EXISTS translations (
-                    item_type TEXT,
-                    item_id TEXT,
-                    source_lang TEXT,
-                    target_lang TEXT DEFAULT 'fr',
-                    model_used TEXT,
-                    original_text TEXT,
-                    translated_text TEXT,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    PRIMARY KEY (item_type, item_id, target_lang)
-                )
-            """)
-            conn.commit()
-            conn.close()
+            with sqlite3.connect(cls._db_path) as conn:
+                cur = conn.cursor()
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS translations (
+                        item_type TEXT,
+                        item_id TEXT,
+                        source_lang TEXT,
+                        target_lang TEXT DEFAULT 'fr',
+                        model_used TEXT,
+                        original_text TEXT,
+                        translated_text TEXT,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        PRIMARY KEY (item_type, item_id, target_lang)
+                    )
+                """)
         except Exception as e:
             logger.error(f"Erreur initialisation base translations_cache.db : {e}")
 
@@ -149,15 +147,14 @@ class TranslationManager:
         """
         try:
             db_path = cls.get_db_path()
-            conn = sqlite3.connect(db_path)
-            cur = conn.cursor()
-            cur.execute("""
-                SELECT item_type, item_id, source_lang, target_lang, model_used, original_text, translated_text, created_at
-                FROM translations
-                WHERE item_type = ? AND item_id = ? AND target_lang = ?
-            """, (item_type, item_id, target_lang))
-            row = cur.fetchone()
-            conn.close()
+            with sqlite3.connect(db_path) as conn:
+                cur = conn.cursor()
+                cur.execute("""
+                    SELECT item_type, item_id, source_lang, target_lang, model_used, original_text, translated_text, created_at
+                    FROM translations
+                    WHERE item_type = ? AND item_id = ? AND target_lang = ?
+                """, (item_type, item_id, target_lang))
+                row = cur.fetchone()
 
             if row:
                 return {
@@ -182,15 +179,13 @@ class TranslationManager:
         """
         try:
             db_path = cls.get_db_path()
-            conn = sqlite3.connect(db_path)
-            cur = conn.cursor()
-            cur.execute("""
-                INSERT OR REPLACE INTO translations (
-                    item_type, item_id, source_lang, target_lang, model_used, original_text, translated_text, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-            """, (item_type, item_id, source_lang, target_lang, model_used, original_text, translated_text))
-            conn.commit()
-            conn.close()
+            with sqlite3.connect(db_path) as conn:
+                cur = conn.cursor()
+                cur.execute("""
+                    INSERT OR REPLACE INTO translations (
+                        item_type, item_id, source_lang, target_lang, model_used, original_text, translated_text, created_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                """, (item_type, item_id, source_lang, target_lang, model_used, original_text, translated_text))
             return True
         except Exception as e:
             logger.error(f"Erreur sauvegarde cache translation : {e}")
