@@ -849,6 +849,7 @@ const NotesView = {
   },
 
   renderList() {
+    const countEl = document.getElementById('notes-header-count');
     const q = (this.searchInput?.value || '').toLowerCase().trim();
     const filtered = this.notes.filter(n => {
       if (!q) return true;
@@ -857,6 +858,10 @@ const NotesView = {
              (n.content || '').toLowerCase().includes(q) ||
              (n.tags || '').toLowerCase().includes(q);
     });
+
+    if (countEl) {
+      countEl.textContent = q ? `${filtered.length}/${this.notes.length}` : `${this.notes.length}`;
+    }
 
     if (!this.listContainer) return;
     this.listContainer.innerHTML = '';

@@ -8464,8 +8464,102 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   flex-shrink: 0;
 }
 .notes-sidebar-header {
-  padding: 14px;
+  padding: 12px 14px;
   border-bottom: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.notes-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.notes-header-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.notes-header-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.2px;
+}
+.notes-header-count {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+  padding: 1px 7px;
+  border-radius: 10px;
+}
+.notes-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-icon-subtle {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-icon-subtle:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+.btn-new-note-compact {
+  padding: 0 10px;
+  height: 28px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.notes-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+.notes-search-icon {
+  position: absolute;
+  left: 9px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.notes-search-field {
+  width: 100%;
+  height: 30px;
+  padding: 0 10px 0 28px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.notes-search-field:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+.notes-search-field::placeholder {
+  color: var(--text-muted);
+  font-size: 12px;
 }
 .notes-list-items {
   flex: 1;
