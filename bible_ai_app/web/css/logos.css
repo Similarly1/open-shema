@@ -21947,8 +21947,8 @@ body.reading-bg-dark .comm-dropdown-popover {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: #1e293b;
   border: 1px solid rgba(168, 85, 247, 0.6);
@@ -21958,7 +21958,7 @@ body.reading-bg-dark .comm-dropdown-popover {
   justify-content: center;
   cursor: pointer;
   z-index: 10;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
   transition: all 0.2s ease;
 }
 
@@ -21970,18 +21970,19 @@ body.reading-bg-dark .comm-dropdown-popover {
 }
 
 .lex-tabs-scroll-left {
-  left: 3px;
+  left: 4px;
 }
 
 .lex-tabs-scroll-right {
-  right: 3px;
+  right: 4px;
 }
 
-.lex-tabs-scroll-btn.hidden {
-  opacity: 0;
+.lex-tabs-scroll-btn.is-disabled {
+  opacity: 0.25;
   pointer-events: none;
-  display: none !important;
+  cursor: default;
 }
+
 
 
 

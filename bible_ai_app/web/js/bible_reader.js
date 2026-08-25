@@ -2878,33 +2878,56 @@ const LexiconViewer = {
     toolbar.appendChild(btnScrollRight);
     container.appendChild(toolbar);
 
+    const totalPills = this.currentMatches.length + (bpStudy ? 1 : 0) + 1;
+    if (totalPills < 2) {
+      btnScrollLeft.style.display = 'none';
+      btnScrollRight.style.display = 'none';
+    } else {
+      btnScrollLeft.style.display = 'flex';
+      btnScrollRight.style.display = 'flex';
+    }
+
     const updateScrollArrows = () => {
       if (!tabsContainer) return;
       const scrollLeft = tabsContainer.scrollLeft;
       const maxScroll = tabsContainer.scrollWidth - tabsContainer.clientWidth;
-      if (maxScroll > 6) {
-        btnScrollLeft.classList.toggle('hidden', scrollLeft <= 4);
-        btnScrollRight.classList.toggle('hidden', scrollLeft >= maxScroll - 4);
-      } else {
-        btnScrollLeft.classList.add('hidden');
-        btnScrollRight.classList.add('hidden');
-      }
+      
+      btnScrollLeft.classList.toggle('is-disabled', scrollLeft <= 2);
+      btnScrollRight.classList.toggle('is-disabled', maxScroll <= 2 || scrollLeft >= maxScroll - 2);
     };
 
     tabsContainer.addEventListener('scroll', updateScrollArrows, { passive: true });
+    
+    // Support du défilement horizontal à la molette de la souris
+    tabsContainer.addEventListener('wheel', (e) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        tabsContainer.scrollLeft += e.deltaY;
+        updateScrollArrows();
+      }
+    }, { passive: false });
+
     btnScrollLeft.addEventListener('click', (e) => {
       e.stopPropagation();
-      tabsContainer.scrollBy({ left: -140, behavior: 'smooth' });
+      tabsContainer.scrollBy({ left: -160, behavior: 'smooth' });
       setTimeout(updateScrollArrows, 350);
     });
     btnScrollRight.addEventListener('click', (e) => {
       e.stopPropagation();
-      tabsContainer.scrollBy({ left: 140, behavior: 'smooth' });
+      tabsContainer.scrollBy({ left: 160, behavior: 'smooth' });
       setTimeout(updateScrollArrows, 350);
     });
+
+    // Centrer automatiquement l'onglet actif dans la vue
+    const activePill = tabsContainer.querySelector('.lex-source-pill.active');
+    if (activePill) {
+      activePill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+
     setTimeout(updateScrollArrows, 50);
-    setTimeout(updateScrollArrows, 250);
-    setTimeout(updateScrollArrows, 600);
+    setTimeout(updateScrollArrows, 200);
+    setTimeout(updateScrollArrows, 500);
+
 
     // Contenu principal
 
