@@ -249,3 +249,48 @@ class StrongLexicon:
             }
                 
         return None
+
+    _french_idx = None
+
+    @classmethod
+    def _ensure_french_index(cls):
+        if cls._french_idx is not None:
+            return
+            
+        lex = cls.load_lexicon()
+        cls._french_idx = {}
+        
+        for code, ent in lex.items():
+            defn = ent.get("definition", "")
+            tokens = re.split(r'[,;/\s()«»\[\]\.\-]+', defn)
+            for tok in tokens:
+                nt = unicodedata.normalize('NFD', tok.lower())
+                clean_tok = ''.join(c for c in nt if unicodedata.category(c) != 'Mn').strip()
+                if len(clean_tok) >= 3:
+                    if clean_tok not in cls._french_idx:
+                        cls._french_idx[clean_tok] = []
+                    if code not in cls._french_idx[clean_tok]:
+                        cls._french_idx[clean_tok].append(code)
+
+    @classmethod
+    def find_by_french_word(cls, word):
+        """Retourne la première fiche Strong pertinente pour un mot français."""
+        if not word:
+            return None
+        cls._ensure_french_index()
+        nt = unicodedata.normalize('NFD', word.lower().strip())
+        clean_w = ''.join(c for c in nt if unicodedata.category(c) != 'Mn')
+        
+        codes = cls._french_idx.get(clean_w, [])
+        if codes:
+            return cls.get(codes[0])
+            
+        # Essai avec singulier (enlever 's' ou 'x')
+        if len(clean_w) > 3 and clean_w.endswith(('s', 'x')):
+            sing = clean_w[:-1]
+            codes_sing = cls._french_idx.get(sing, [])
+            if codes_sing:
+                return cls.get(codes_sing[0])
+                
+        return None
+

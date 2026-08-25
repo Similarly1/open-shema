@@ -21771,6 +21771,66 @@ body.reading-bg-dark .comm-dropdown-popover {
   to { transform: rotate(360deg); }
 }
 
+/* Barre d'onglets de sources du Lexique avec flèches de défilement */
+.lexicon-header-toolbar {
+  display: flex;
+  align-items: center;
+  position: relative;
+  background: var(--bg-surface, #0f172a);
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  padding: 6px 6px;
+  gap: 4px;
+}
+
+.lexicon-source-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  flex: 1;
+  padding: 2px 2px;
+  scroll-behavior: smooth;
+}
+
+.lexicon-source-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.lex-tabs-scroll-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--bg-subtle, #1e293b);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+  color: var(--text-primary, #f8fafc);
+  cursor: pointer;
+  z-index: 2;
+  flex-shrink: 0;
+  padding: 0;
+  transition: all 0.15s ease;
+}
+
+.lex-tabs-scroll-btn:hover {
+  background: var(--accent-purple, #a855f7);
+  color: #ffffff;
+  border-color: var(--accent-purple, #a855f7);
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.4);
+}
+
+.lexicon-header-toolbar.has-overflow-left .btn-scroll-left {
+  display: inline-flex;
+}
+
+.lexicon-header-toolbar.has-overflow-right .btn-scroll-right {
+  display: inline-flex;
+}
+
+
 
 
 

@@ -2812,9 +2812,21 @@ const LexiconViewer = {
     container.innerHTML = '';
 
 
-    // Barre d'onglets de sources (Strong, Calmet, Vigouroux, Bailly, Wikipédia)
+    // Barre d'onglets de sources (Strong, Calmet, Vigouroux, Bailly, Wikipédia) avec flèches de défilement
     const toolbar = document.createElement('div');
     toolbar.className = 'lexicon-header-toolbar';
+
+    const btnScrollLeft = document.createElement('button');
+    btnScrollLeft.type = 'button';
+    btnScrollLeft.className = 'lex-tabs-scroll-btn btn-scroll-left';
+    btnScrollLeft.title = 'Faire défiler vers la gauche';
+    btnScrollLeft.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>`;
+
+    const btnScrollRight = document.createElement('button');
+    btnScrollRight.type = 'button';
+    btnScrollRight.className = 'lex-tabs-scroll-btn btn-scroll-right';
+    btnScrollRight.title = 'Faire défiler vers la droite';
+    btnScrollRight.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
 
     const tabsContainer = document.createElement('div');
     tabsContainer.className = 'lexicon-source-tabs';
@@ -2860,8 +2872,36 @@ const LexiconViewer = {
     });
     tabsContainer.appendChild(wikiBtn);
 
+    toolbar.appendChild(btnScrollLeft);
     toolbar.appendChild(tabsContainer);
+    toolbar.appendChild(btnScrollRight);
     container.appendChild(toolbar);
+
+    const updateScrollArrows = () => {
+      if (!tabsContainer) return;
+      const scrollLeft = tabsContainer.scrollLeft;
+      const maxScroll = tabsContainer.scrollWidth - tabsContainer.clientWidth;
+      if (maxScroll > 4) {
+        toolbar.classList.toggle('has-overflow-left', scrollLeft > 5);
+        toolbar.classList.toggle('has-overflow-right', scrollLeft < maxScroll - 5);
+      } else {
+        toolbar.classList.remove('has-overflow-left', 'has-overflow-right');
+      }
+    };
+
+    tabsContainer.addEventListener('scroll', updateScrollArrows, { passive: true });
+    btnScrollLeft.addEventListener('click', (e) => {
+      e.stopPropagation();
+      tabsContainer.scrollBy({ left: -140, behavior: 'smooth' });
+      setTimeout(updateScrollArrows, 300);
+    });
+    btnScrollRight.addEventListener('click', (e) => {
+      e.stopPropagation();
+      tabsContainer.scrollBy({ left: 140, behavior: 'smooth' });
+      setTimeout(updateScrollArrows, 300);
+    });
+    setTimeout(updateScrollArrows, 50);
+
 
     // Contenu principal
     const contentBox = document.createElement('div');

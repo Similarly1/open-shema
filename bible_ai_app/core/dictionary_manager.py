@@ -367,11 +367,20 @@ class DictionaryManager:
             target_code = strong_code
             if not target_code and word and re.match(r'^[HG]\d+', word.strip(), re.I):
                 target_code = word.strip().upper()
-            if not target_code:
-                return None
-            entry = StrongLexicon.get(target_code)
+                
+            entry = None
+            if target_code:
+                entry = StrongLexicon.get(target_code)
+            elif word:
+                # 1. Recherche par mot original hébreu/grec
+                entry = StrongLexicon.find_by_original_word(word)
+                # 2. Recherche par mot français
+                if not entry:
+                    entry = StrongLexicon.find_by_french_word(word)
+
             if not entry:
                 return None
+                
             code = entry.get('short_code', entry.get('code', ''))
             lang = "Hébreu" if entry.get('lang') == 'hebrew' else "Grec"
             lemma = entry.get('lemma', '')
@@ -383,8 +392,12 @@ class DictionaryManager:
                 "title": f"{word} [{lemma}]" if word and word != code else f"Strong {code} [{lemma}]",
                 "preview": defn[:220] + "..." if len(defn) > 220 else defn,
                 "full_text": defn,
-                "entry": entry
+                "entry": entry,
+                "is_strong": True,
+                "strong": code,
+                "lemma": lemma
             }
+
             
         # 2. Source Bailly (grec)
         if dict_type == "greek":
