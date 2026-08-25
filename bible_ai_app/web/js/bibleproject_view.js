@@ -15,7 +15,20 @@ const BibleProjectView = {
   currentPlayingYtId: null,
   isLoading: false,
 
+  // État du visualiseur de poster (Pan & Zoom)
+  panzoom: {
+    scale: 1,
+    minScale: 0.2,
+    maxScale: 5,
+    translateX: 0,
+    translateY: 0,
+    isDragging: false,
+    startX: 0,
+    startY: 0
+  },
+
   // Table de correspondance étendue Strong / Termes -> Études de mots BibleProject
+
   strongWordMap: [
     { strongs: ['G2098', 'G2097'], terms: ['evangile', 'évangile', 'euangelion', 'bonne nouvelle'], ytId: 'o1jYy7_Z0n8', title: 'Évangile (Euangelion)', orig: 'Εὐαγγέλιον', dur: '5:28' },
     { strongs: ['G3144', 'G3141', 'G3140'], terms: ['temoin', 'témoin', 'martus', 'martyre', 'temoignage'], ytId: 'Qk-e5e54qC4', title: 'Témoin (Martus)', orig: 'Μάρτυς', dur: '5:15' },
@@ -483,26 +496,27 @@ const BibleProjectView = {
 
     // Glisser-déplacer (Pan)
     viewport?.addEventListener('mousedown', (e) => {
-      if (e.button !== 0) return; // Clic gauche uniquement
+      if (e.button !== 0 || !this.panzoom) return; // Clic gauche uniquement
       this.panzoom.isDragging = true;
-      this.panzoom.startX = e.clientX - this.panzoom.translateX;
-      this.panzoom.startY = e.clientY - this.panzoom.translateY;
+      this.panzoom.startX = e.clientX - (this.panzoom.translateX || 0);
+      this.panzoom.startY = e.clientY - (this.panzoom.translateY || 0);
       viewport.style.cursor = 'grabbing';
     });
 
     window.addEventListener('mousemove', (e) => {
-      if (!this.panzoom.isDragging) return;
+      if (!this.panzoom || !this.panzoom.isDragging) return;
       this.panzoom.translateX = e.clientX - this.panzoom.startX;
       this.panzoom.translateY = e.clientY - this.panzoom.startY;
       this.applyTransform();
     });
 
     window.addEventListener('mouseup', () => {
-      if (this.panzoom.isDragging) {
+      if (this.panzoom && this.panzoom.isDragging) {
         this.panzoom.isDragging = false;
         if (viewport) viewport.style.cursor = 'grab';
       }
     });
+
 
     // Double-clic pour alterner entre vue ajustée et zoom 100%
     viewport?.addEventListener('dblclick', () => {
