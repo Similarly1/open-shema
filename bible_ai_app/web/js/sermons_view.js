@@ -108,18 +108,18 @@ const SermonsView = {
     document.getElementById('sermon-header-summary')?.addEventListener('click', () => {
       this.toggleResourcesDrawer(true);
       this.activeDrawerTab = 'metadata';
-      document.querySelectorAll('.drawer-tab-btn').forEach(b => {
+      document.querySelectorAll('#sermon-drawer-tabs-bar .drawer-tab').forEach(b => {
         b.classList.toggle('active', b.dataset.drawerTab === 'metadata');
       });
       this.renderDrawerContent();
     });
 
-    // 5. Onglets du tiroir de ressources
-    document.querySelectorAll('.drawer-tab-btn').forEach(tabBtn => {
+    // 5. Onglets du tiroir de ressources (Aperçu, Commentaires, IA, Lexique, Illustrations, Infos)
+    document.querySelectorAll('#sermon-drawer-tabs-bar .drawer-tab').forEach(tabBtn => {
       tabBtn.addEventListener('click', () => {
-        document.querySelectorAll('.drawer-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('#sermon-drawer-tabs-bar .drawer-tab').forEach(b => b.classList.remove('active'));
         tabBtn.classList.add('active');
-        this.activeDrawerTab = tabBtn.dataset.drawerTab || 'metadata';
+        this.activeDrawerTab = tabBtn.dataset.drawerTab || 'overview';
         this.renderDrawerContent();
       });
     });
@@ -929,6 +929,27 @@ const SermonsView = {
     if (this.barExegesis) this.barExegesis.style.width = `${pctExg}%`;
     if (this.barIllustration) this.barIllustration.style.width = `${pctIll}%`;
     if (this.barApplication) this.barApplication.style.width = `${pctApp}%`;
+
+    const elExg = document.getElementById('popover-pct-exegesis');
+    const elIll = document.getElementById('popover-pct-illustration');
+    const elApp = document.getElementById('popover-pct-application');
+    const elAdvice = document.getElementById('popover-balance-advice');
+
+    if (elExg) elExg.textContent = `${pctExg}%`;
+    if (elIll) elIll.textContent = `${pctIll}%`;
+    if (elApp) elApp.textContent = `${pctApp}%`;
+
+    if (elAdvice) {
+      if (pctExg > 55) {
+        elAdvice.textContent = "Conseil : Sermon riche en exégèse. Pensez à ajouter des illustrations pour faciliter l'assimilation.";
+      } else if (pctIll > 50) {
+        elAdvice.textContent = "Conseil : Nombreuses illustrations. Veillez à bien ancrer le fond doctrinal dans le texte biblique.";
+      } else if (pctApp > 50) {
+        elAdvice.textContent = "Conseil : Forte orientation pratique. Vérifiez que les fondements exégétiques sont suffisants.";
+      } else {
+        elAdvice.textContent = "Équilibre sain et harmonieux entre enseignement, clarté et impact pratique.";
+      }
+    }
   },
 
   // =========================================================================
@@ -1046,45 +1067,189 @@ const SermonsView = {
       return;
     }
 
-    if (this.activeDrawerTab === 'exegesis') {
+    if (this.activeDrawerTab === 'overview') {
       this.drawerContent.innerHTML = `
-        <div class="sermon-resource-card">
-          <div class="sermon-resource-header">
-            <span class="sermon-resource-title">Passage lié : ${this.escapeHtml(passageRef)}</span>
+        <div class="overview-panel-header" style="margin-bottom: 12px;">
+          <div class="overview-header-top-row" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+            <div class="overview-passage-info">
+              <div class="overview-ref-badge-wrap" style="display: flex; align-items: center; gap: 6px;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-orange, #f59e0b);"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                <span style="font-size: 15px; font-weight: 800; color: var(--text-primary);">${this.escapeHtml(passageRef || 'Passage non lié')}</span>
+              </div>
+              <div style="font-size: 11.5px; color: var(--text-muted); font-style: italic; margin-top: 2px;">
+                ${passageRef ? "Étude contextuelle et ressources bibliques liées" : "Définissez un passage dans l'onglet Infos pour synchroniser"}
+              </div>
+            </div>
+            <span class="sermon-badge-pill" style="background: rgba(37,99,235,0.15); color: var(--accent-blue); font-weight: 700;">Lié</span>
           </div>
-          <div class="sermon-resource-body">
-            Grec / Hébreu et lexiques disponibles pour ce texte.
+
+          <div class="overview-counters-strip" style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">
+            <span class="sermon-stat-pill" style="font-size: 11px; padding: 2px 8px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 4px; display: flex; align-items: center; gap: 4px;">
+              <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+              <span>Vidéo 1</span>
+            </span>
+            <span class="sermon-stat-pill" style="font-size: 11px; padding: 2px 8px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 4px; display: flex; align-items: center; gap: 4px;">
+              <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span>Commentaires 14</span>
+            </span>
+            <span class="sermon-stat-pill" style="font-size: 11px; padding: 2px 8px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 4px; display: flex; align-items: center; gap: 4px;">
+              <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/></svg>
+              <span>Lexique 6</span>
+            </span>
           </div>
-          <button class="btn-secondary btn-resource-insert" id="btn-add-exg-snippet">
-            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            <span>Insérer note exégèse</span>
+        </div>
+
+        <!-- 1. Carte BibleProject -->
+        <div class="sermon-resource-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px;">
+          <div class="sermon-resource-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 12px; font-weight: 700; color: #a855f7; display: flex; align-items: center; gap: 6px;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+              <span>BibleProject (Panorama & Vidéo)</span>
+            </span>
+            <span class="sermon-badge-pill" style="background: rgba(168,85,247,0.15); color: #c084fc;">7:44 min</span>
+          </div>
+          <div style="font-size: 12px; color: var(--text-primary); font-weight: 600; margin-bottom: 6px;">
+            Panorama narratif et structure théologique du livre
+          </div>
+          <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.45; margin-bottom: 10px;">
+            Visualisez le contexte historique, les thèmes principaux et la portée prophétique pour nourrir votre introduction.
+          </div>
+          <button class="btn-secondary btn-resource-insert" id="btn-insert-bp-note" style="width: 100%; justify-content: center;">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            <span>Insérer repère vidéo dans le sermon</span>
+          </button>
+        </div>
+
+        <!-- 2. Carte Commentaires clés -->
+        <div class="sermon-resource-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px;">
+          <div class="sermon-resource-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 12px; font-weight: 700; color: var(--accent-blue); display: flex; align-items: center; gap: 6px;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span>Frédéric Godet (Commentaire)</span>
+            </span>
+            <span class="sermon-badge-pill" style="background: rgba(37,99,235,0.1); color: var(--accent-blue);">Exégèse</span>
+          </div>
+          <div style="font-size: 12px; color: var(--text-primary); font-style: italic; line-height: 1.45; margin-bottom: 10px;">
+            « L'apôtre montre que la fidélité de Dieu n'est pas un concept abstrait, mais une réalité qui s'incarne dans les relations quotidiennes. »
+          </div>
+          <button class="btn-secondary btn-resource-insert" onclick="SermonsView.insertCommentarySnippet('Frédéric Godet', 'L\'apôtre montre que la fidélité de Dieu n\'est pas un concept abstrait, mais une réalité qui s\'incarne dans les relations quotidiennes.')" style="width: 100%; justify-content: center;">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            <span>Insérer citation Godet</span>
+          </button>
+        </div>
+
+        <!-- 3. Carte Lexique & Mots originaux -->
+        <div class="sermon-resource-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px;">
+          <div class="sermon-resource-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 12px; font-weight: 700; color: #10b981; display: flex; align-items: center; gap: 6px;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+              <span>Terme clé : Arrhabon (G728)</span>
+            </span>
+            <span class="sermon-badge-pill" style="background: rgba(16,185,129,0.15); color: #10b981;">Grec</span>
+          </div>
+          <div style="font-size: 12px; color: var(--text-primary); margin-bottom: 6px;">
+            <strong>ἀρραβών (arrhabōn)</strong> : Gage, acompte légal, première tranche d'un paiement garantissant le solde futur.
+          </div>
+          <button class="btn-secondary btn-resource-insert" onclick="SermonsView.insertExegesisSnippet('Arrhabon (G728)', 'Gage / Acompte de l\'Esprit garantissant notre héritage éternel.')" style="width: 100%; justify-content: center;">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            <span>Insérer note lexicale</span>
           </button>
         </div>
       `;
-      document.getElementById('btn-add-exg-snippet')?.addEventListener('click', () => {
-        this.insertBlock('exegesis');
-      });
 
-    } else if (this.activeDrawerTab === 'commentaries') {
+      document.getElementById('btn-insert-bp-note')?.addEventListener('click', () => {
+        this.insertBlock('cue');
+      });
+      return;
+    }
+
+    if (this.activeDrawerTab === 'commentaries') {
       this.drawerContent.innerHTML = `
-        <div class="sermon-resource-card">
-          <div class="sermon-resource-header">
-            <span class="sermon-resource-title">Frédéric Godet</span>
-            <span class="sermon-badge-pill" style="background: rgba(37,99,235,0.1); color: var(--accent-blue);">Romains 8</span>
+        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">
+          Commentaires pour ${this.escapeHtml(passageRef || 'le passage')}
+        </div>
+        <div class="sermon-resource-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px;">
+          <div class="sermon-resource-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-weight: 700; color: var(--accent-blue); font-size: 12px;">Frédéric Godet</span>
+            <span class="sermon-badge-pill" style="background: rgba(37,99,235,0.1); color: var(--accent-blue); font-size: 10px;">Exégèse</span>
           </div>
-          <div class="sermon-resource-body">
-            « La certitude chrétienne ne repose pas sur les dispositions changeantes de l'homme, mais sur l'immuable conseil de la grâce divine. »
+          <div class="sermon-resource-body" style="font-size: 12px; color: var(--text-primary); line-height: 1.45; margin-bottom: 8px;">
+            « La certitude chrétienne ne repose pas sur les dispositions changeantes de l'homme, mais sur l'immuable conseil de la grâce divine manifestée en Jésus-Christ. »
           </div>
-          <button class="btn-secondary btn-resource-insert" onclick="SermonsView.insertCommentarySnippet('Frédéric Godet', 'La certitude chrétienne ne repose pas sur les dispositions changeantes...')">
-            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <button class="btn-secondary btn-resource-insert" onclick="SermonsView.insertCommentarySnippet('Frédéric Godet', 'La certitude chrétienne ne repose pas sur les dispositions changeantes de l\\'homme, mais sur l\\'immuable conseil de la grâce divine.')" style="width: 100%; justify-content: center;">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            <span>Insérer citation</span>
+          </button>
+        </div>
+
+        <div class="sermon-resource-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px;">
+          <div class="sermon-resource-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-weight: 700; color: var(--accent-blue); font-size: 12px;">Matthew Henry</span>
+            <span class="sermon-badge-pill" style="background: rgba(37,99,235,0.1); color: var(--accent-blue); font-size: 10px;">Pastorale</span>
+          </div>
+          <div class="sermon-resource-body" style="font-size: 12px; color: var(--text-primary); line-height: 1.45; margin-bottom: 8px;">
+            « Toutes les promesses de Dieu sont oui et amen en Christ ; elles sont confirmées et scellées par son sang, et accomplies par son Esprit. »
+          </div>
+          <button class="btn-secondary btn-resource-insert" onclick="SermonsView.insertCommentarySnippet('Matthew Henry', 'Toutes les promesses de Dieu sont oui et amen en Christ ; elles sont confirmées et scellées par son sang.')" style="width: 100%; justify-content: center;">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
             <span>Insérer citation</span>
           </button>
         </div>
       `;
+      return;
+    }
 
-    } else if (this.activeDrawerTab === 'illustrations') {
+    if (this.activeDrawerTab === 'ai') {
+      this.drawerContent.innerHTML = `
+        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">
+          Assistant Homilétique & Exégétique
+        </div>
+        <div class="sermon-resource-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px;">
+          <div style="font-size: 12px; font-weight: 700; color: var(--accent-blue); margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+            <span>Générer des pistes pour votre message</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 8px;">
+            <button class="btn-secondary btn-sm" onclick="SermonsView.insertBlock('illustration')" style="justify-content: flex-start; text-align: left; padding: 6px 10px;">
+              💡 Idées d'illustrations concrètes
+            </button>
+            <button class="btn-secondary btn-sm" onclick="SermonsView.insertBlock('application')" style="justify-content: flex-start; text-align: left; padding: 6px 10px;">
+              🎯 Questions d'application pour l'auditoire
+            </button>
+            <button class="btn-secondary btn-sm" onclick="SermonsView.insertBlock('exegesis')" style="justify-content: flex-start; text-align: left; padding: 6px 10px;">
+              🔍 Mots-clés et contexte historique
+            </button>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    if (this.activeDrawerTab === 'lexicon') {
+      this.drawerContent.innerHTML = `
+        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">
+          Lexique & Termes originaux Strong
+        </div>
+        <div class="sermon-resource-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px;">
+          <div class="sermon-resource-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-size: 13px; font-weight: 800; color: var(--accent-blue);">G728 • arrhabōn (ἀρραβών)</span>
+            <span class="sermon-badge-pill" style="background: rgba(37,99,235,0.1); color: var(--accent-blue);">Nom masc.</span>
+          </div>
+          <div style="font-size: 12px; color: var(--text-primary); line-height: 1.45; margin-bottom: 8px;">
+            <strong>Définition :</strong> Acompte, gage versé d'avance pour valider un contrat d'achat et garantissant la pleine possession ultérieure.
+          </div>
+          <button class="btn-secondary btn-resource-insert" onclick="SermonsView.insertExegesisSnippet('arrhabōn (G728)', 'Acompte et gage de l\'Esprit')" style="width: 100%; justify-content: center;">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            <span>Insérer note lexicale</span>
+          </button>
+        </div>
+      `;
+      return;
+    }
+
+    if (this.activeDrawerTab === 'illustrations') {
       if (this.illustrations.length === 0) {
-        this.drawerContent.innerHTML = `<div style="color: var(--text-muted); font-size: 12px;">Aucune illustration dans le réservoir.</div>`;
+        this.drawerContent.innerHTML = `<div style="color: var(--text-muted); font-size: 12px; text-align: center; padding: 20px;">Aucune illustration dans le réservoir.</div>`;
         return;
       }
 
@@ -1098,19 +1263,23 @@ const SermonsView = {
         ` : '';
 
         return `
-          <div class="sermon-resource-card">
-            <div class="sermon-resource-header">
-              <span class="sermon-resource-title">${this.escapeHtml(ill.title)}</span>
+          <div class="sermon-resource-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px;">
+            <div class="sermon-resource-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span class="sermon-resource-title" style="font-weight: 700; font-size: 12.5px; color: var(--text-primary);">${this.escapeHtml(ill.title)}</span>
+              <span class="sermon-badge-pill" style="background: rgba(245,158,11,0.15); color: #f59e0b; font-size: 10px;">${this.escapeHtml(ill.category || 'Général')}</span>
             </div>
-            <div class="sermon-resource-body">${this.escapeHtml(ill.body ? ill.body.slice(0, 140) + '...' : '')}</div>
+            <div class="sermon-resource-body" style="font-size: 11.5px; color: var(--text-muted); line-height: 1.45; margin-bottom: 8px;">
+              ${this.escapeHtml(ill.body ? ill.body.slice(0, 140) + '...' : '')}
+            </div>
             ${badgeWarning}
-            <button class="btn-secondary btn-resource-insert" onclick="SermonsView.insertIllustrationSnippet('${ill.id}', '${this.escapeHtml(ill.title)}')">
-              <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              <span>Insérer</span>
+            <button class="btn-secondary btn-resource-insert" onclick="SermonsView.insertIllustrationSnippet('${ill.id}', '${this.escapeHtml(ill.title)}')" style="width: 100%; justify-content: center; margin-top: 6px;">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              <span>Insérer dans la prédication</span>
             </button>
           </div>
         `;
       }).join('');
+      return;
     }
   },
 

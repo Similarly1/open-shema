@@ -203,6 +203,18 @@ class SermonsManager:
         body = sermon.get("body", "")
 
         existing_filename = sermon.get("filename")
+        if not existing_filename:
+            try:
+                for fname in os.listdir(target_dir):
+                    if fname.endswith(".md"):
+                        fpath = os.path.join(target_dir, fname)
+                        s_meta = cls.parse_markdown_sermon(fpath)
+                        if s_meta and s_meta.get("id") == sermon_id:
+                            existing_filename = fname
+                            break
+            except Exception:
+                pass
+
         if existing_filename and os.path.exists(os.path.join(target_dir, existing_filename)):
             file_path = os.path.join(target_dir, existing_filename)
         else:
