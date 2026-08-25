@@ -3001,32 +3001,32 @@ input:checked + .slider.round:before {
 .overview-scrollable-body {
   flex: 1;
   height: 100%;
-  overflow-y: auto;
+  overflow-y: scroll !important;
   overflow-x: hidden;
   padding: 12px 14px 40px 14px;
   display: flex;
   flex-direction: column;
   gap: 12px;
   scrollbar-width: thin;
-  scrollbar-color: rgba(168, 85, 247, 0.4) rgba(0, 0, 0, 0.15);
+  scrollbar-color: #a855f7 rgba(255, 255, 255, 0.06);
 }
 
 .overview-scrollable-body::-webkit-scrollbar {
-  width: 6px;
+  width: 7px;
 }
 
 .overview-scrollable-body::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 6px;
 }
 
 .overview-scrollable-body::-webkit-scrollbar-thumb {
-  background: rgba(168, 85, 247, 0.35);
+  background: #a855f7;
   border-radius: 6px;
 }
 
 .overview-scrollable-body::-webkit-scrollbar-thumb:hover {
-  background: rgba(168, 85, 247, 0.65);
+  background: #c084fc;
 }
 
 /* Cartes Sections Accordéons Épurées */
@@ -3138,34 +3138,43 @@ input:checked + .slider.round:before {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  max-height: 210px;
+  max-height: 220px;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(168, 85, 247, 0.4) rgba(0, 0, 0, 0.12);
+  scrollbar-color: #a855f7 rgba(255, 255, 255, 0.06);
+}
+
+#sec-bibleproject .sec-body {
+  max-height: 300px;
+}
+
+#sec-theology .sec-body {
+  max-height: 250px;
 }
 
 .sec-body::-webkit-scrollbar {
-  width: 5px;
+  width: 6px;
 }
 
 .sec-body::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 4px;
 }
 
 .sec-body::-webkit-scrollbar-thumb {
-  background: rgba(168, 85, 247, 0.38);
+  background: #a855f7;
   border-radius: 4px;
 }
 
 .sec-body::-webkit-scrollbar-thumb:hover {
-  background: rgba(168, 85, 247, 0.7);
+  background: #c084fc;
 }
 
 /* Liste épurée typographique (style Logos / Apple) */
 .overview-clean-list {
   display: flex;
+
 
   flex-direction: column;
 }
