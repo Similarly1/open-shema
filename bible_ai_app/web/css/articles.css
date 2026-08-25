@@ -1188,6 +1188,44 @@
   color: var(--accent-primary, #d97706);
 }
 
+/* Listes à puces stylisées (ex: Pour aller plus loin / Recommandations) */
+.article-bullet-item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0.6em 0;
+  padding-left: 4px;
+  line-height: 1.7;
+}
+
+.article-bullet-dot {
+  color: var(--accent-primary, #60a5fa);
+  font-size: 1.1em;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.article-bullet-text {
+  flex: 1;
+  color: inherit;
+}
+
+.article-bullet-text a {
+  color: var(--accent-primary, #60a5fa);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.article-reader-container.reading-bg-white .article-bullet-dot,
+.article-reader-container.reading-bg-white .article-bullet-text a {
+  color: #2563eb;
+}
+
+.article-reader-container.reading-bg-sepia .article-bullet-dot,
+.article-reader-container.reading-bg-sepia .article-bullet-text a {
+  color: #b45309;
+}
+
 /* Transcriptions de podcasts & Dialogues d'interview */
 .article-speaker-turn {
   margin: 1.2em 0;

@@ -68,6 +68,9 @@ const ArticlesView = {
   getEditorialBadgeLabel(text) {
     if (!text) return 'CONTEXTE & PROVENANCE';
     const lower = text.toLowerCase();
+    if (/traduction|traduit\s+de|article\s+original|source\s+originale|the\s+gospel\s+coalition|desiring\s+god|9marks|crossway/i.test(lower)) {
+      return 'SOURCE ORIGINALE & TRADUCTION';
+    }
     if (/extrait\s+du\s+livre|tiré\s+du\s+livre|chapitre\s+\d+|éditions|editions|éditeur|editeur|ouvrage|pp\.\s*\d+|méditation\s+\d+/i.test(lower)) {
       return 'EXTRAIT D’OUVRAGE';
     }
@@ -77,7 +80,7 @@ const ArticlesView = {
     if (/travail\s+de\s+recherche|thèse|mémoire|séminaire|seminary|académique|theological\s+seminary/i.test(lower)) {
       return 'RECHERCHE & SÉMINAIRE';
     }
-    if (/traduction|traduit\s+de|autoris|droits\s+réservés|reproduit\s+avec/i.test(lower)) {
+    if (/autoris|droits\s+réservés|reproduit\s+avec/i.test(lower)) {
       return 'NOTE ÉDITORIALE';
     }
     return 'CONTEXTE & PROVENANCE';
@@ -1228,7 +1231,13 @@ const ArticlesView = {
       text = text.replace(/([!?…»])\s+([A-ZÀ-ÿ0-9—–«])/g, '$1\n\n$2');
     }
 
-    // 2. Nettoyer les blocs promotionnels, parcours e-mail et mentions de droits réservés
+    // 2. Nettoyer les emojis résiduels dans les listes et structurer "Pour aller plus loin"
+    text = text.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1FA70}-\u{1FAFF}]/gu, '');
+    text = text.replace(/(?:^|\n|[.!?…»])\s*(Pour\s+aller\s+plus\s+loin\s*:?)\s*(\[|Un\s+article|[A-ZÀ-ÿ])/gi, '\n\n### Pour aller plus loin\n\n- $2');
+    text = text.replace(/([A-Za-zÀ-ÿ0-9\)\]*])\s+(Un\s+article\s+de\s+[^\n:]+:\s*)/g, '$1\n- $2');
+    text = text.replace(/([.!?…»]|\))\s*([A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+(?:\s+[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+)?,\s*\*?\[[^\]]+\])/g, '$1\n- $2');
+
+    // 2b. Nettoyer les blocs promotionnels, parcours e-mail et mentions de droits réservés
     text = text.replace(/(?:#+\s*)?Parcours\s+e-?mail[\s\S]*$/gi, '');
     text = text.replace(/Pour\s+aller\s+plus\s+loin,\s+inscris-toi[\s\S]*$/gi, '');
     text = text.replace(/(?:#+\s*)?Inscrivez-vous\s+à\s+notre\s+newsletter[\s\S]*$/gi, '');
@@ -1245,25 +1254,27 @@ const ArticlesView = {
 
     // 5. Nettoyer les tirets initiaux sur les mentions éditoriales et normaliser les espaces (ex: "livreIl" -> "livre Il")
     text = text.replace(/(livre|ouvrage|série|revue|magazine|journal)([A-ZÀ-ÿ])/gi, '$1 $2');
-    text = text.replace(/([.!?…»])\s*(Cet article\s+(?:fait partie|est extrait|est tiré|a été publié|provient|est une adaptation|est la traduction|est une traduction|est le premier|est le second|est le troisième|est basé)|Extrait du livre|Tiré du livre)/gi, '$1\n\n$2');
+    text = text.replace(/([.!?…»])\s*(Merci\s+à\s+[^\n]+pour\s+la\s+traduction|Article\s+original\s*:|Publié\s+pour\s+la\s+première\s+fois|Cet article\s+(?:fait partie|est extrait|est tiré|a été publié|provient|est une adaptation|est la traduction|est une traduction|est le premier|est le second|est le troisième|est basé)|Extrait du livre|Tiré du livre)/gi, '$1\n\n$2');
+    text = text.replace(/(Publié\s+par\s+[^\n.]+[\.\s]*)\s*(Publié\s+pour\s+la\s+première\s+fois[^\n]+)/gi, '$1\n$2');
     text = text.replace(/(?:^|\n)\s*[—–-]\s*(Cet article\s+(?:est extrait|fait partie|est tiré|a été publié|provient|est une adaptation))/gi, '\n\n$1');
 
     const supToNum = { '⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9' };
     const normalizeSuperscripts = (str) => str.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]/g, ch => supToNum[ch] || ch);
 
-    // 5a-1. Normaliser immédiatement les exposants dans les références scripturaires (ex: Actes ¹.⁸-¹¹ -> Actes 1.8-11)
-    text = text.replace(/(\b(?:Actes|Genèse|Exode|Lévitique|Nombres|Deutéronome|Josué|Juges|Ruth|Samuel|Rois|Chroniques|Esdras|Néhémie|Esther|Job|Psaumes?|Proverbes?|Ecclésiaste|Cantique|Ésaïe|Jérémie|Lamentations|Ézéchiel|Daniel|Osée|Joël|Amos|Abdias|Jonas|Michée|Nahum|Habacuc|Sophonie|Aggée|Zacharie|Malachie|Matthieu|Marc|Luc|Jean|Romains|Corinthiens|Galates|Éphésiens|Philippiens|Colossiens|Thessaloniciens|Timothée|Tite|Philémon|Hébreux|Jacques|Pierre|Jude|Apocalypse|[123]\s*[A-Za-zÀ-ÿ]+|[A-ZÀ-ÿ]{2,6})\.?)\s*([⁰¹²³⁴⁵⁶⁷⁸⁹]+(?:[\s.:,/-]+[⁰¹²³⁴⁵⁶⁷⁸⁹0-9]+)*)/gi, (match, book, sups) => {
+    // 5a-1. Normaliser immédiatement les exposants dans les références scripturaires (ex: Actes ¹.⁸-¹¹ -> Actes 1.8-11, Éphésiens ³.¹⁴-¹⁵)
+    const bibleBooksPattern = '(?:Actes|Genèse|Exode|Lévitique|Nombres|Deutéronome|Josué|Juges|Ruth|Samuel|Rois|Chroniques|Esdras|Néhémie|Esther|Job|Psaumes?|Proverbes?|Ecclésiaste|Cantique|Ésaïe|Jérémie|Lamentations|Ézéchiel|Daniel|Osée|Joël|Amos|Abdias|Jonas|Michée|Nahum|Habacuc|Sophonie|Aggée|Zacharie|Malachie|Matthieu|Marc|Luc|Jean|Romains|Corinthiens|Galates|Éphésiens|Philippiens|Colossiens|Thessaloniciens|Timothée|Tite|Philémon|Hébreux|Jacques|Pierre|Jude|Apocalypse|[123]\\s*[A-Za-zÀ-ÿ]+|Gen|Ex|Lv|Nb|Dt|Jos|Jg|Rt|1S|2S|1R|2R|1Ch|2Ch|Esd|Ne|Est|Jb|Ps|Pr|Ec|Ct|Es|Jr|Lm|Ez|Dn|Os|Jl|Am|Ab|Jon|Mi|Na|Ha|So|Ag|Za|Ml|Mt|Mc|Lc|Jn|Ac|Rm|1Co|2Co|Ga|Ep|Ph|Col|1Th|2Th|1Tm|2Tm|Tt|Phm|He|Jc|1P|2P|1Jn|2Jn|3Jn|Jd|Ap)';
+    text = text.replace(new RegExp(`(\\b${bibleBooksPattern}\\.?)\\s*([⁰¹²³⁴⁵⁶⁷⁸⁹]+(?:[\\s.:,/-]+[⁰¹²³⁴⁵⁶⁷⁸⁹0-9]+)*)`, 'gi'), (match, book, sups) => {
       return book + ' ' + normalizeSuperscripts(sups);
     });
 
     // 5a-2. Dans les cartouches éditoriaux et mentions bibliographiques, convertir systématiquement les exposants en chiffres normaux
-    text = text.replace(/(?:Cet article\s+(?:fait partie|est extrait|est tiré|a été publié|provient|est une adaptation)|Extrait du livre|Tiré du livre|Publié avec)[^\n]+/gi, (match) => {
+    text = text.replace(/(?:Merci\s+à|Article\s+original|Cet article\s+(?:fait partie|est extrait|est tiré|a été publié|provient|est une adaptation)|Extrait du livre|Tiré du livre|Publié avec)[^\n]+/gi, (match) => {
       return normalizeSuperscripts(match);
     });
 
     // 5b. Détection et mise en valeur du cartouche éditorial de fin d'article (Option 3 : Badge contextuel dynamique, sans émoji/svg)
     text = text.replace(
-      /(?:^|\n\n+)((?:Cet article\s+(?:fait partie|est extrait|est tiré|a été publié|provient|est une adaptation|est la traduction|est une traduction|est le premier|est le second|est le troisième|est basé)|Extrait du livre|Tiré du livre)[\s\S]+?)(?=\s*$)/gi,
+      /(?:^|\n\n+)((?:Merci\s+à\s+[^\n]+pour\s+la\s+traduction|Article\s+original\s*:|Cet article\s+(?:fait partie|est extrait|est tiré|a été publié|provient|est une adaptation|est la traduction|est une traduction|est le premier|est le second|est le troisième|est basé)|Extrait du livre|Tiré du livre)[\s\S]+?)(?=\n\n###|\n\n<|\s*$)/gi,
       (match, content) => {
         const badge = this.getEditorialBadgeLabel(content);
         const cleanContent = normalizeSuperscripts(content.trim());
@@ -1282,14 +1293,13 @@ const ArticlesView = {
     text = text.replace(/(\*\*[^*]+\*\*)\s+([A-ZÀ-ÿ])/g, '$1\n\n$2');
 
     // 5e. Découpage et mise en page soignée des dialogues au tiret cadratin (sans couper les attributions de citations comme ". – Actes 1.8-11")
-    const bibleBooksPattern = '(?:Actes|Genèse|Exode|Lévitique|Nombres|Deutéronome|Josué|Juges|Ruth|Samuel|Rois|Chroniques|Esdras|Néhémie|Esther|Job|Psaumes?|Proverbes?|Ecclésiaste|Cantique|Ésaïe|Jérémie|Lamentations|Ézéchiel|Daniel|Osée|Joël|Amos|Abdias|Jonas|Michée|Nahum|Habacuc|Sophonie|Aggée|Zacharie|Malachie|Matthieu|Marc|Luc|Jean|Romains|Corinthiens|Galates|Éphésiens|Philippiens|Colossiens|Thessaloniciens|Timothée|Tite|Philémon|Hébreux|Jacques|Pierre|Jude|Apocalypse|[123]\\s*[A-Za-zÀ-ÿ]+|[A-ZÀ-ÿ]{2,6})';
     const notBibleRefAhead = `(?!(?:\\s*${bibleBooksPattern}\\.?\\s*[0-9⁰¹²³⁴⁵⁶⁷⁸⁹]))`;
 
-    text = text.replace(/([:!?…»])\s*([—–\u2013\u2014]\s*)/g, '$1\n\n$2');
-    text = new RegExp(`\\.\\s+([—–\\u2013\\u2014]${notBibleRefAhead}\\s*[A-ZÀ-ÿ])`, 'g')[Symbol.replace](text, '.\n\n$1');
+    text = text.replace(/([:!?…»])\s*([—–\u2013\u2014]\s+[A-ZÀ-ÿ])/g, '$1\n\n$2');
+    text = new RegExp(`\\.\\s+([—–\\u2013\\u2014]${notBibleRefAhead}\\s+[A-ZÀ-ÿ])`, 'g')[Symbol.replace](text, '.\n\n$1');
 
     // Convertir les lignes de dialogue au tiret en encadrés distincts (en protégeant les citations scripturaires)
-    text = new RegExp(`(?:^|\\n)\\s*([—–\\u2013\\u2014]${notBibleRefAhead}\\s*[^\\n]+)`, 'g')[Symbol.replace](text, '\n\n<div class="article-speaker-turn"><p class="article-speaker-speech">$1</p></div>\n\n');
+    text = new RegExp(`(?:^|\\n)\\s*([—–\\u2013\\u2014]${notBibleRefAhead}\\s+[A-ZÀ-ÿ][^\\n]+)`, 'g')[Symbol.replace](text, '\n\n<div class="article-speaker-turn"><p class="article-speaker-speech">$1</p></div>\n\n');
 
     // 5f. Convertir les citations bibliques avec tiret de référence (« ... » – Réf)
     text = text.replace(/(?:^|\n)«\s*([^»]+?)\s*»\s*([–—\u2013\u2014-]\s*[A-ZÀ-ÿ0-9.:\s-]+)/g, '\n\n<blockquote class="article-bible-quote"><p>« $1 » $2</p></blockquote>\n\n');
@@ -1297,12 +1307,11 @@ const ArticlesView = {
     // 5g. Détecter et formater les blocs de notes de bas de page avec ancres de retour [↩︎](#...)
     const backlinkRegex = /\[(?:↩︎|↩)\]\(#[^)]+\)/;
     if (backlinkRegex.test(text)) {
-      text = text.replace(/Dans\s+la\s+même\s+série[\s\S]*$/gi, '');
       const segments = text.split(/\[(?:↩︎|↩)\]\(#[^)]+\)/);
       let mainBody = segments[0];
       let firstNote = '';
       
-      const fnBoundaryMatch = mainBody.match(/^([\s\S]*[a-zA-ZÀ-ÿ]{2,}[.!?…»])\s+((?:[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+(?:\s+[A-ZÀ-ÖØ-ß]\.?)?\s+[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+|[A-ZÀ-ÿ*«]|Ibid)[^\n]*?(?:ibid|éditions|editions|editor|publisher|press|university|chapitre|vol\.|tome|trad\.|pp?\.\s*\d+|p\.\s*\d+|19\d\d|20\d\d|op\.\s*cit|loc\.\s*cit)[\s\S]*)$/i);
+      const fnBoundaryMatch = mainBody.match(/^([\s\S]*[a-zA-ZÀ-ÿ]{2,}[.!?…»])\s+((?:[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+(?:\s+[A-ZÀ-ÖØ-ß]\.?)?\s+[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+|[A-ZÀ-ÿ*«]|Ibid)[\s\S]*?(?:ibid|éditions|editions|editor|publisher|press|university|chapitre|vol\.|tome|trad\.|pp?\.\s*\d+|p\.\s*\d+|19\d\d|20\d\d|op\.\s*cit|loc\.\s*cit)[\s\S]*)$/i);
       if (fnBoundaryMatch) {
         mainBody = fnBoundaryMatch[1];
         firstNote = fnBoundaryMatch[2];
@@ -1391,6 +1400,9 @@ const ArticlesView = {
     text = text.replace(/---\s*$/gi, '');
 
     // 10. Remplacement Markdown vers HTML
+    // Remplacer d'abord les crochets imbriqués dans les titres de liens avant le parseur de liens
+    text = text.replace(/\[([^\]]*?)\[([^\]]*?)\]([^\]]*?)\]\((https?:\/\/[^\)]+)\)/g, '[$1$2$3]($4)');
+
     let html = text
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -1409,6 +1421,7 @@ const ArticlesView = {
         }
         return `<a href="${href}" target="_blank" class="article-link">${label}</a>`;
       })
+      .replace(/^-\s+(.*$)/gim, '<div class="article-bullet-item"><span class="article-bullet-dot">•</span><div class="article-bullet-text">$1</div></div>')
       .replace(/^---\s*$/gim, '<div class="article-ornamental-divider"><span class="article-ornamental-divider-icon">❦</span></div>')
       .replace(/\n\n+/gim, '</p><p>')
       .replace(/\n/gim, '<br>');
