@@ -21720,6 +21720,43 @@ body.reading-bg-dark .comm-dropdown-popover {
   gap: 4px;
 }
 
+.strong-audio-play-btn {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.strong-audio-play-btn:hover {
+  background: rgba(168, 85, 247, 0.2);
+  border-color: rgba(168, 85, 247, 0.4);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.strong-audio-play-btn.playing {
+  background: rgba(168, 85, 247, 0.35);
+  border-color: #a855f7;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
+  animation: pulse-audio 1s infinite alternate;
+}
+
+@keyframes pulse-audio {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.04); }
+}
+
+
 
 
 

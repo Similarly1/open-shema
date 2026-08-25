@@ -2918,6 +2918,32 @@ const LexiconViewer = {
   },
 
 
+  playPronunciation(text, lang = 'he', strongCode = '') {
+    const btn = document.getElementById('btn-play-strong-audio');
+    if (btn) btn.classList.add('playing');
+
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = lang === 'he' ? 'he-IL' : 'el-GR';
+      utterance.rate = 0.82; // Débit posé pour l'étude linguistique
+
+      utterance.onend = () => {
+        if (btn) btn.classList.remove('playing');
+      };
+      utterance.onerror = () => {
+        if (btn) btn.classList.remove('playing');
+      };
+
+      window.speechSynthesis.speak(utterance);
+    } else {
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast('Audio non disponible sur ce système.', 'warning');
+      }
+      if (btn) btn.classList.remove('playing');
+    }
+  },
+
   searchStrongOccurrences(strongCode, term) {
     if (typeof SearchView !== 'undefined') {
       if (typeof App !== 'undefined' && App.switchView) {
@@ -2998,6 +3024,8 @@ const LexiconViewer = {
       </span>
     `).join('');
 
+    const wordToPronounce = originalScript || frenchLemma;
+
     container.innerHTML = `
       <div class="strong-exegesis-container" style="padding: 16px;">
         ${bpVideoCardHtml}
@@ -3020,7 +3048,18 @@ const LexiconViewer = {
               </div>
             ` : ''}
             <div class="strong-french-lemma">« ${frenchLemma} »</div>
+
+            <!-- Bouton Prononciation Audio -->
+            <button type="button" class="strong-audio-play-btn" id="btn-play-strong-audio" onclick="LexiconViewer.playPronunciation('${wordToPronounce.replace(/'/g, "\\'")}', '${isHebrew ? 'he' : 'el'}', '${strongCode}')" title="Écouter la prononciation vocale">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+              </svg>
+              <span class="strong-audio-label">Prononciation</span>
+            </button>
           </div>
+
 
           <!-- Section Sens Principaux -->
           <div class="strong-card-section">
