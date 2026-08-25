@@ -345,13 +345,6 @@ const AIStudyView = {
     }
     
     this.loadHistory(); // Rafraîchir l'affichage (désélection)
-    
-    // Demander un nouvel ID au backend
-    try {
-      this.currentSessionId = await API.call('create_ai_session', { mode: this.currentMode });
-    } catch (e) {
-      console.error("Erreur création session:", e);
-    }
   },
 
   async loadHistory() {
@@ -370,6 +363,7 @@ const AIStudyView = {
       sessions.forEach(session => {
         const itemEl = document.createElement('div');
         itemEl.className = 'ai-history-item';
+        itemEl.setAttribute('data-session-id', session.id);
         if (session.id === this.currentSessionId) {
           itemEl.classList.add('active');
         }
@@ -378,12 +372,33 @@ const AIStudyView = {
         const dateStr = dateObj.toLocaleDateString() + ' à ' + dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         
         itemEl.innerHTML = `
-          <div class="ai-history-item-title">${session.title || 'Nouvelle étude'}</div>
-          <div class="ai-history-item-date">${dateStr}</div>
+          <div class="ai-history-item-body">
+            <div class="ai-history-item-title" title="${this.escapeHtml(session.title || 'Nouvelle étude')}">${this.escapeHtml(session.title || 'Nouvelle étude')}</div>
+            <div class="ai-history-item-date">${dateStr}</div>
+          </div>
+          <div class="ai-history-item-actions">
+            <button type="button" class="btn-history-action btn-history-menu" title="Options (Clic droit)">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+            </button>
+          </div>
         `;
         
-        itemEl.addEventListener('click', () => {
+        itemEl.addEventListener('click', (e) => {
+          if (e.target.closest('.btn-history-menu')) {
+            e.stopPropagation();
+            const btn = e.target.closest('.btn-history-menu');
+            const rect = btn.getBoundingClientRect();
+            this.showHistoryContextMenu(session.id, session.title, rect.right, rect.bottom);
+            return;
+          }
           this.switchSession(session.id);
+        });
+
+        // Clic droit (Menu contextuel)
+        itemEl.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          this.showHistoryContextMenu(session.id, session.title, e.clientX, e.clientY);
         });
         
         listEl.appendChild(itemEl);
@@ -391,6 +406,143 @@ const AIStudyView = {
     } catch (e) {
       console.error("Erreur chargement historique:", e);
       listEl.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--accent-red); font-size: 12px;">Erreur de chargement</div>`;
+    }
+  },
+
+  showHistoryContextMenu(sessionId, currentTitle, x, y) {
+    let menu = document.getElementById('ai-history-context-menu');
+    if (!menu) {
+      menu = document.createElement('div');
+      menu.id = 'ai-history-context-menu';
+      menu.className = 'smooth-context-menu';
+      document.body.appendChild(menu);
+    }
+
+    menu.innerHTML = `
+      <div class="context-menu-item" data-action="rename">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+        <span>Renommer</span>
+      </div>
+      <div class="context-menu-divider"></div>
+      <div class="context-menu-item danger" data-action="delete">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        <span>Supprimer</span>
+      </div>
+    `;
+
+    menu.style.display = 'flex';
+    menu.style.position = 'fixed';
+    menu.style.zIndex = '99999';
+    
+    const menuWidth = 160;
+    const menuHeight = 85;
+    const posX = Math.min(x, window.innerWidth - menuWidth - 10);
+    const posY = Math.min(y, window.innerHeight - menuHeight - 10);
+
+    menu.style.left = `${posX}px`;
+    menu.style.top = `${posY}px`;
+
+    const closeMenu = () => {
+      menu.style.display = 'none';
+      document.removeEventListener('click', closeMenu);
+      document.removeEventListener('keydown', handleKey);
+    };
+
+    const handleKey = (e) => {
+      if (e.key === 'Escape') closeMenu();
+    };
+
+    setTimeout(() => {
+      document.addEventListener('click', closeMenu);
+      document.addEventListener('keydown', handleKey);
+    }, 10);
+
+    menu.querySelector('[data-action="rename"]')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeMenu();
+      this.promptRenameSession(sessionId, currentTitle);
+    });
+
+    menu.querySelector('[data-action="delete"]')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeMenu();
+      this.deleteSessionWithConfirm(sessionId);
+    });
+  },
+
+  async promptRenameSession(sessionId, currentTitle) {
+    const itemEl = document.querySelector(`.ai-history-item[data-session-id="${sessionId}"]`);
+    const titleEl = itemEl?.querySelector('.ai-history-item-title');
+    
+    if (itemEl && titleEl) {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'history-rename-input';
+      input.value = currentTitle || '';
+      
+      titleEl.replaceWith(input);
+      input.focus();
+      input.select();
+      
+      let isSaving = false;
+      const saveRename = async () => {
+        if (isSaving) return;
+        isSaving = true;
+        const newTitle = input.value.trim() || currentTitle || 'Nouvelle étude';
+        try {
+          await API.call('rename_ai_session', sessionId, newTitle);
+          this.loadHistory();
+          if (typeof App !== 'undefined' && App.showToast) {
+            App.showToast('Discussion renommée.');
+          }
+        } catch (e) {
+          console.error("Erreur renommage session:", e);
+          this.loadHistory();
+        }
+      };
+
+      input.addEventListener('blur', saveRename);
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          input.blur();
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          this.loadHistory();
+        }
+      });
+    } else {
+      const newTitle = prompt("Nouveau titre de l'étude :", currentTitle);
+      if (newTitle !== null && newTitle.trim() && newTitle.trim() !== currentTitle) {
+        try {
+          await API.call('rename_ai_session', sessionId, newTitle.trim());
+          this.loadHistory();
+          if (typeof App !== 'undefined' && App.showToast) {
+            App.showToast('Discussion renommée.');
+          }
+        } catch (e) {
+          console.error("Erreur renommage session:", e);
+        }
+      }
+    }
+  },
+
+  async deleteSessionWithConfirm(sessionId) {
+    if (!confirm("Voulez-vous supprimer définitivement cette étude de l'historique ?")) {
+      return;
+    }
+    try {
+      await API.call('delete_ai_session', sessionId);
+      if (this.currentSessionId === sessionId) {
+        this.startNewSession();
+      } else {
+        this.loadHistory();
+      }
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast("Discussion supprimée de l'historique.");
+      }
+    } catch (e) {
+      console.error("Erreur suppression session:", e);
     }
   },
 

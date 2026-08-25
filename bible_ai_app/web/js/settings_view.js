@@ -843,6 +843,12 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
     if (c.summary_fallback_model && document.getElementById('cfg-summary-fallback-model')) {
       document.getElementById('cfg-summary-fallback-model').value = c.summary_fallback_model;
     }
+    if (c.title_model && document.getElementById('cfg-title-model')) {
+      document.getElementById('cfg-title-model').value = c.title_model;
+    }
+    if (c.title_fallback_model && document.getElementById('cfg-title-fallback-model')) {
+      document.getElementById('cfg-title-fallback-model').value = c.title_fallback_model;
+    }
     if (document.getElementById('cfg-summary-word-count')) {
       document.getElementById('cfg-summary-word-count').value = c.summary_word_count || 300;
       const lbl = document.getElementById('lbl-summary-word-count-val');
@@ -876,7 +882,8 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
       { primary: 'cfg-chat-model', fallback: 'cfg-chat-fallback-model', label: 'Chat' },
       { primary: 'cfg-synthesis-model', fallback: 'cfg-synthesis-fallback-model', label: 'Synthèse' },
       { primary: 'cfg-translation-model', fallback: 'cfg-translation-fallback-model', label: 'Traduction' },
-      { primary: 'cfg-summary-model', fallback: 'cfg-summary-fallback-model', label: 'Résumé' }
+      { primary: 'cfg-summary-model', fallback: 'cfg-summary-fallback-model', label: 'Résumé' },
+      { primary: 'cfg-title-model', fallback: 'cfg-title-fallback-model', label: 'Titres' }
     ];
 
     pairs.forEach(({ primary, fallback, label }) => {
@@ -910,7 +917,8 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
       { primary: 'cfg-chat-model', fallback: 'cfg-chat-fallback-model', label: 'Chat' },
       { primary: 'cfg-synthesis-model', fallback: 'cfg-synthesis-fallback-model', label: 'Synthèse' },
       { primary: 'cfg-translation-model', fallback: 'cfg-translation-fallback-model', label: 'Traduction' },
-      { primary: 'cfg-summary-model', fallback: 'cfg-summary-fallback-model', label: 'Résumé' }
+      { primary: 'cfg-summary-model', fallback: 'cfg-summary-fallback-model', label: 'Résumé' },
+      { primary: 'cfg-title-model', fallback: 'cfg-title-fallback-model', label: 'Titres' }
     ];
 
     pairs.forEach(({ primary, fallback, label }) => {
@@ -1142,6 +1150,17 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
         document.getElementById('cfg-summary-fallback-model').value = fb;
       }
       newCfg.summary_fallback_model = fb;
+    }
+    if (document.getElementById('cfg-title-model')) {
+      newCfg.title_model = document.getElementById('cfg-title-model').value;
+    }
+    if (document.getElementById('cfg-title-fallback-model')) {
+      let fb = document.getElementById('cfg-title-fallback-model').value;
+      if (fb === newCfg.title_model) {
+        fb = this.getSmartFallbackModel(newCfg.title_model, document.getElementById('cfg-title-fallback-model'));
+        document.getElementById('cfg-title-fallback-model').value = fb;
+      }
+      newCfg.title_fallback_model = fb;
     }
     if (document.getElementById('cfg-summary-word-count')) {
       newCfg.summary_word_count = parseInt(document.getElementById('cfg-summary-word-count').value) || 300;

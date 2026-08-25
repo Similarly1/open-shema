@@ -1456,10 +1456,14 @@ class BibleAppApi:
         return AISessionManager.create_session(initial_context)
 
     def save_ai_messages(self, session_id: str, messages: List[Dict[str, Any]], title: Optional[str] = None) -> bool:
-        return AISessionManager.save_messages_to_session(session_id, messages, title)
+        self.config = load_config()
+        return AISessionManager.save_messages_to_session(session_id, messages, title, config=self.config)
         
     def delete_ai_session(self, session_id: str) -> bool:
         return AISessionManager.delete_session(session_id)
+
+    def rename_ai_session(self, session_id: str, new_title: str) -> bool:
+        return AISessionManager.rename_session(session_id, new_title)
 
     def pin_ai_conclusion(self, session_id: str, book_code: str, topic: str, content: str) -> bool:
         return AISessionManager.pin_conclusion(session_id, book_code, topic, content)

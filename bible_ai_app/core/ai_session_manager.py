@@ -79,8 +79,12 @@ class AISessionManager:
         Envoie les réponses du questionnaire à l'IA pour synthétiser un 
         « Passeport Herméneutique » condensé (150 à 250 mots).
         """
-        from ai.llm_client import LLMClient
-        from core.config import load_config
+        try:
+            from core.config import load_config
+            from ai.llm_client import LLMClient
+        except ImportError:
+            from bible_ai_app.core.config import load_config
+            from bible_ai_app.ai.llm_client import LLMClient
         
         cfg = config or load_config()
         
@@ -224,21 +228,88 @@ class AISessionManager:
             return False
 
     @classmethod
-    def save_messages_to_session(cls, session_id: str, new_messages: List[Dict[str, Any]], title: Optional[str] = None) -> bool:
+    def generate_session_title(cls, prompt_text: str, config: Optional[Dict[str, Any]] = None) -> str:
+        """
+        Génère un titre concis et élégant (3 à 6 mots maximum) résumant la session
+        à partir du premier message de l'utilisateur, en utilisant le LLM configuré.
+        """
+        if not prompt_text or not prompt_text.strip():
+            return "Nouvelle étude"
+            
+        clean_text = prompt_text.strip()
+        # Traitement direct des salutations simples pour éviter les titres inadéquats
+        if clean_text.lower() in ["salut", "bonjour", "hello", "bonsoir", "coucou", "hi", "test", "salut !"]:
+            return "Discussion libre"
+
+        try:
+            from core.config import load_config
+            from ai.llm_client import LLMClient
+        except ImportError:
+            from bible_ai_app.core.config import load_config
+            from bible_ai_app.ai.llm_client import LLMClient
+        
+        cfg = config or load_config()
+        model_to_use = cfg.get("title_model") or "gemini-2.5-flash-lite"
+        
+        # Résolution du bon provider
+        sm_lower = model_to_use.lower()
+        if any(k in sm_lower for k in ["mistralai/", "qwen", "swiss-ai", "gemma", "kimi", "nemotron", "infomaniak"]):
+            provider = "infomaniak"
+            api_key = cfg.get("infomaniak_token", "")
+            product_id = cfg.get("infomaniak_product_id", "251")
+        elif any(k in sm_lower for k in ["mistral-large", "mistral-small", "open-mistral", "codestral"]):
+            provider = "mistral"
+            api_key = cfg.get("mistral_api_key", "")
+            product_id = None
+        else:
+            provider = "gemini"
+            api_key = cfg.get("gemini_api_key", "")
+            product_id = None
+
+        title_prompt = (
+            "Tu es un générateur de titres pour un logiciel d'étude biblique.\n"
+            "Résume la question ou requête suivante en un titre très court, élégant et pertinent (3 à 6 mots maximum, en français).\n"
+            "N'inclus AUCUN guillemet, AUCUN point final, AUCUN préfixe du type 'Titre :'.\n\n"
+            f"Requête : {clean_text[:400]}\n"
+            "Titre court :"
+        )
+        
+        try:
+            if api_key:
+                client = LLMClient(api_key=api_key, model=model_to_use, provider=provider, product_id=product_id)
+                generated = client.ask_question(context="", question=title_prompt, thinking_budget=0)
+                if generated and not generated.startswith("Erreur"):
+                    clean_res = generated.strip().strip('"\'').strip('«»').strip('`')
+                    clean_res = clean_res.replace("Titre :", "").replace("Titre:", "").strip()
+                    if len(clean_res) > 2 and len(clean_res) < 60:
+                        return clean_res
+        except Exception as e:
+            logger.warning(f"Erreur génération titre par IA: {e}")
+
+        # Fallback si le LLM n'est pas joignable
+        if len(clean_text) <= 35:
+            return clean_text.capitalize()
+        return clean_text[:35].rsplit(' ', 1)[0] + "..."
+
+    @classmethod
+    def save_messages_to_session(cls, session_id: str, new_messages: List[Dict[str, Any]], title: Optional[str] = None, config: Optional[Dict[str, Any]] = None) -> bool:
         session = cls.get_session(session_id)
         if not session:
-            # Créer la session à la volée si elle n'existe pas (fallback)
+            # Créer la session à la volée si elle n'existe pas
             session = {
                 "id": session_id,
-                "title": title or "Nouvelle étude",
+                "title": "Nouvelle étude",
                 "created_at": datetime.datetime.now().isoformat(),
                 "messages": []
             }
             
-        # Remplacer les anciens messages ou mettre à jour l'historique complet fourni par le front
-        # Dans ce workflow, le JS garde la source de vérité et l'envoie en entier
         session["messages"] = new_messages
-        if title and session.get("title") == "Nouvelle étude":
+        
+        # Générer un titre intelligent dès le premier message si aucun titre personnalisé n'est encore posé
+        current_title = session.get("title", "")
+        if (not current_title or current_title == "Nouvelle étude" or current_title == "Sans titre") and title:
+            session["title"] = cls.generate_session_title(title, config=config)
+        elif title and current_title == "Nouvelle étude":
             session["title"] = title
             
         return cls._save_session(session)
@@ -252,28 +323,26 @@ class AISessionManager:
                 if filename.endswith(".json"):
                     filepath = os.path.join(CONVERSATIONS_DIR, filename)
                     try:
-                        # Lecture partielle : on lit uniquement les 2048 premiers octets
-                        # pour extraire les métadonnées sans charger tous les messages
                         with open(filepath, 'r', encoding='utf-8') as f:
-                            head = f.read(2048)
-                        # Tentative de décodage partiel — la plupart des métadonnées
-                        # (id, title, updated_at, context) sont en tête de fichier
-                        data = {}
-                        try:
-                            data = json.loads(head)
-                        except json.JSONDecodeError:
-                            # Si le JSON est tronqué, on le complète et on retente
-                            # en lisant le fichier entier en fallback
-                            with open(filepath, 'r', encoding='utf-8') as f:
-                                data = json.load(f)
+                            data = json.load(f)
+                            
+                        # RÈGLE : Ignorer les sessions totalement vides de messages
+                        messages = data.get("messages", [])
+                        if not messages or len(messages) == 0:
+                            # Nettoyer les fichiers orphelins vides
+                            try:
+                                os.remove(filepath)
+                            except Exception:
+                                pass
+                            continue
+                            
                         sessions.append({
                             "id": data.get("id"),
-                            "title": data.get("title", "Sans titre"),
+                            "title": data.get("title", "Nouvelle étude"),
                             "updated_at": data.get("updated_at"),
                             "context": data.get("context", {})
                         })
                     except Exception:
-                        # Fichier corrompu ou illisible : on l'ignore
                         continue
 
             # Trier du plus récent au plus ancien
@@ -282,7 +351,6 @@ class AISessionManager:
         except Exception as e:
             logger.error("Erreur listage sessions : %s", e)
             return []
-
 
     @classmethod
     def delete_session(cls, session_id: str) -> bool:
@@ -299,8 +367,10 @@ class AISessionManager:
     def rename_session(cls, session_id: str, new_title: str) -> bool:
         session = cls.get_session(session_id)
         if session:
-            session["title"] = new_title
-            return cls._save_session(session)
+            clean_title = (new_title or "").strip()
+            if clean_title:
+                session["title"] = clean_title
+                return cls._save_session(session)
         return False
 
     # --- Gestion du Registre de Mémoire (Conclusions) ---
