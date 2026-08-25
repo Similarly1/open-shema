@@ -244,9 +244,10 @@ const BibleProjectView = {
 
       html += `
         <div class="bp-poster-card ${isCurrentRange ? 'is-active-range' : ''}">
-          <div class="bp-poster-thumb-wrap" onclick="BibleProjectView.openPosterModal('${p.image_url}', '${p.pdf_url}', '${this.escapeHtml(p.title)}')">
-            <img src="${p.image_url}" class="bp-poster-thumb-img" alt="${this.escapeHtml(p.title)}" loading="lazy" onerror="this.src='img/textures/vintage/fond_bible.jpg'">
+          <div class="bp-poster-thumb-wrap loading" onclick="BibleProjectView.openPosterModal('${p.image_url}', '${p.pdf_url}', '${this.escapeHtml(p.title)}')">
+            <img src="${p.image_url}" class="bp-poster-thumb-img" alt="${this.escapeHtml(p.title)}" loading="lazy" onload="this.classList.add('loaded'); this.parentElement.classList.remove('loading');" onerror="this.classList.add('loaded'); this.parentElement.classList.remove('loading');">
             <div class="bp-poster-zoom-overlay">
+
               <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
               <span>Agrandir (Zoom HD)</span>
             </div>

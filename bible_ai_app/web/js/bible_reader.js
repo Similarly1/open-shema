@@ -2658,8 +2658,26 @@ const LexiconViewer = {
       tabsContainer.appendChild(btn);
     });
 
-    // 2. Bouton Wikipédia
-    const wikiIdx = this.currentMatches.length;
+    // 2. Bouton BibleProject (si étude de mot disponible)
+    let bpStudy = null;
+    if (typeof BibleProjectView !== 'undefined' && BibleProjectView.getWordStudyForStrong) {
+      bpStudy = BibleProjectView.getWordStudyForStrong(this.currentStrong, this.currentTerm);
+    }
+
+    const bpIdx = bpStudy ? this.currentMatches.length : -1;
+    if (bpStudy) {
+      const bpBtn = document.createElement('button');
+      bpBtn.className = `lex-source-pill lex-source-pill-bp ${this.activeSourceIndex === bpIdx ? 'active' : ''}`;
+      bpBtn.innerHTML = `<span style="display:inline-flex; align-items:center; gap:4px; color:#c084fc;"><svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>BibleProject</span>`;
+      bpBtn.addEventListener('click', () => {
+        this.activeSourceIndex = bpIdx;
+        this.render();
+      });
+      tabsContainer.appendChild(bpBtn);
+    }
+
+    // 3. Bouton Wikipédia
+    const wikiIdx = this.currentMatches.length + (bpStudy ? 1 : 0);
     const wikiBtn = document.createElement('button');
     wikiBtn.className = `lex-source-pill ${this.activeSourceIndex === wikiIdx ? 'active' : ''}`;
     wikiBtn.innerHTML = `<span style="display:inline-flex; align-items:center; gap:4px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Wikipédia</span>`;
@@ -2677,7 +2695,9 @@ const LexiconViewer = {
     contentBox.className = 'lexicon-active-content';
     container.appendChild(contentBox);
 
-    if (this.activeSourceIndex === wikiIdx) {
+    if (bpStudy && this.activeSourceIndex === bpIdx) {
+      this.renderBibleProjectStudy(contentBox, bpStudy);
+    } else if (this.activeSourceIndex === wikiIdx) {
       this.renderWikipedia(contentBox);
     } else if (this.currentMatches[this.activeSourceIndex]) {
       this.renderDictionaryMatch(contentBox, this.currentMatches[this.activeSourceIndex]);
@@ -2690,6 +2710,40 @@ const LexiconViewer = {
       `;
     }
   },
+
+  renderBibleProjectStudy(container, bpStudy) {
+    container.innerHTML = `
+      <div style="padding: 16px;">
+        <div style="font-size: 20px; font-weight: 800; color: var(--accent-blue); margin-bottom: 4px;">${bpStudy.title}</div>
+        <div style="font-size: 11.5px; font-weight: 700; color: #a855f7; margin-bottom: 14px;">Étude de mot BibleProject • ${bpStudy.orig || ''}</div>
+        
+        <div class="lex-bp-main-card">
+          <div class="lex-bp-main-thumb-wrap" onclick="BibleProjectView.openAndPlayWordStudy('${bpStudy.ytId}', '${BibleProjectView.escapeHtml(bpStudy.title)}', '${BibleProjectView.escapeHtml(bpStudy.description)}')">
+            <img src="${bpStudy.thumbnail}" alt="${BibleProjectView.escapeHtml(bpStudy.title)}" loading="lazy">
+            <div class="lex-bp-main-play-btn">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
+            <span class="lex-bp-main-dur">${bpStudy.dur || '5 min'}</span>
+          </div>
+          <div class="lex-bp-main-desc">
+            <p style="margin-top: 10px; font-size: 13.5px; line-height: 1.6; color: var(--text-secondary);">
+              ${BibleProjectView.escapeHtml(bpStudy.description || 'Découvrez la richesse et les nuances théologiques de ce terme dans les textes originaux.')}
+            </p>
+            <div style="margin-top: 14px; display: flex; gap: 8px;">
+              <button type="button" class="btn-primary" style="font-size: 12px; padding: 6px 14px; display: flex; align-items: center; gap: 6px;" onclick="BibleProjectView.openAndPlayWordStudy('${bpStudy.ytId}', '${BibleProjectView.escapeHtml(bpStudy.title)}', '${BibleProjectView.escapeHtml(bpStudy.description)}')">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <span>Lancer la vidéo dans Médias</span>
+              </button>
+              <button type="button" class="btn-secondary" style="font-size: 12px; padding: 6px 12px;" onclick="API.openExternalUrl('https://www.youtube.com/watch?v=${bpStudy.ytId}')">
+                <span>YouTube ↗</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
 
   renderDictionaryMatch(container, match) {
     const isPolished = match.is_polished;

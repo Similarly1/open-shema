@@ -588,12 +588,13 @@ const PassageOverviewDrawer = {
                data-tt-title="${this.escapeHtml(p.title)}"
                data-tt-image="${p.image_url}"
                data-tt-excerpt="Structure littéraire et schéma narratif haute définition.">
-            <div class="bp-poster-mini-thumb">
-              <img src="${p.image_url}" alt="${this.escapeHtml(p.title)}" loading="lazy" onerror="this.src='img/textures/vintage/fond_bible.jpg'">
+            <div class="bp-poster-mini-thumb loading">
+              <img src="${p.image_url}" alt="${this.escapeHtml(p.title)}" loading="lazy" onload="this.classList.add('loaded'); this.parentElement.classList.remove('loading');" onerror="this.classList.add('loaded'); this.parentElement.classList.remove('loading');">
               <div class="bp-poster-zoom-mini">
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               </div>
             </div>
+
             <div class="bp-poster-mini-info">
               <span class="bp-poster-mini-title">${this.escapeHtml(p.title)}</span>
               <span class="bp-poster-mini-hint">Cliquer pour zoomer en plein écran</span>
