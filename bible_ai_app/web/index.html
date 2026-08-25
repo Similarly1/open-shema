@@ -4474,7 +4474,14 @@
     <aside class="right-drawer collapsed" id="right-drawer">
       <div class="drawer-resizer-handle" id="drawer-resizer" title="Glisser pour ajuster la largeur"></div>
       <div class="drawer-tabs">
-        <button class="drawer-tab active" data-drawer-tab="commentaries" title="Commentaires exégétiques">
+        <button class="drawer-tab active" data-drawer-tab="overview" title="Aperçu & Guide de passage 360°">
+          <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+          </svg>
+          <span>Aperçu</span>
+        </button>
+        <button class="drawer-tab" data-drawer-tab="commentaries" title="Commentaires exégétiques">
           <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
           </svg>
@@ -4513,8 +4520,53 @@
       </div>
 
       <div class="drawer-body">
+        <!-- Onglet 0: Aperçu & Hub Contextuel 360° -->
+        <div class="drawer-content active" id="drawer-tab-overview">
+          <div class="overview-panel-header">
+            <div class="overview-header-top-row">
+              <div class="overview-passage-info">
+                <div class="overview-ref-badge-wrap">
+                  <svg class="overview-compass-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+                  </svg>
+                  <span class="overview-passage-ref" id="overview-passage-ref">Genèse 1:1</span>
+                </div>
+                <div class="overview-pericope-title" id="overview-pericope-title">La création du monde</div>
+              </div>
+
+              <div class="overview-header-controls">
+                <button class="overview-nav-btn" id="btn-overview-prev-v" title="Verset précédent">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <button class="overview-nav-btn" id="btn-overview-next-v" title="Verset suivant">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+                <button class="overview-sync-btn active" id="btn-overview-toggle-sync" title="Synchronisation active : suit le texte biblique">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                  </svg>
+                  <span id="lbl-overview-sync">Lié</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Barre de compteurs rapides (Chips) -->
+            <div class="overview-chips-bar" id="overview-chips-bar"></div>
+          </div>
+
+          <!-- Corps défilant avec les cartes accordéons -->
+          <div class="overview-scrollable-body" id="overview-cards-container">
+            <div class="overview-loading-skeleton">
+              <div class="skeleton-chip"></div>
+              <div class="skeleton-card"></div>
+              <div class="skeleton-card"></div>
+            </div>
+          </div>
+        </div>
+
         <!-- Onglet 1: Commentaires Exégétiques (Un seul commentaire affiché avec sélecteur discret) -->
-        <div class="drawer-content active" id="drawer-tab-commentaries">
+        <div class="drawer-content" id="drawer-tab-commentaries">
           <div class="comm-panel-header">
             <!-- Rangée 1 : Navigation Passage & Actions Générales -->
             <div class="comm-header-top-row">
@@ -6163,6 +6215,7 @@
   <script src="js/highlighter.js"></script>
   <script src="js/theological_profile_modal.js"></script>
   <script src="js/articles_view.js"></script>
+  <script src="js/passage_overview_drawer.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

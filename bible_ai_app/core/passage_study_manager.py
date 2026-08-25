@@ -1155,3 +1155,287 @@ CONSIGNES STRICTES :
                 "success": False,
                 "error": f"Erreur lors de l'export dans les notes : {str(e)}"
             }
+
+    @classmethod
+    def get_passage_overview_bundle(
+        cls,
+        book_code: str,
+        chapter: int,
+        verse: int = 1,
+        bible_name: str = "LSG"
+    ) -> Dict[str, Any]:
+        """
+        Agrège en un seul appel ultra-rapide tout l'écosystème documentaire
+        (Commentaires, Articles de blog, Livres de théologie, Notes & Surlignages,
+        Cartes & Géographie, Strongs originaux) pour le volet droit de la Bible.
+        """
+        norm_code = get_standard_book_code(book_code) or book_code
+        french_book = get_french_book_name(norm_code) or norm_code
+        ref_display = f"{french_book} {chapter}:{verse}"
+
+        # 1. Péricope & Contexte
+        pericope_title = ""
+        pericope_range = ""
+        try:
+            pericope_info = PericopeManager.get_pericope_context(bible_name, norm_code, chapter, verse)
+            if pericope_info and pericope_info.get("current"):
+                cur = pericope_info["current"]
+                pericope_title = cur.get("title", "")
+                pericope_range = cur.get("ref_range", "")
+        except Exception as e:
+            logger.debug(f"Erreur pericope overview: {e}")
+
+        # 2. Commentaires du verset et statistiques
+        verse_commentaries = []
+        chapter_comm_count = 0
+        try:
+            res_v = CommentaryLoader.get_all_comments_for_passage(norm_code, chapter, verse)
+            grouped_v = {}
+            for i, text in enumerate(res_v.get("documents", [])):
+                meta = res_v["metadatas"][i] if i < len(res_v.get("metadatas", [])) else {}
+                cname = meta.get("name", "Commentaire")
+                if cname not in grouped_v:
+                    clean_snippet = re.sub(r'<[^>]+>', ' ', text)
+                    clean_snippet = re.sub(r'\s+', ' ', clean_snippet).strip()
+                    if len(clean_snippet) > 220:
+                        clean_snippet = clean_snippet[:217] + "..."
+                    grouped_v[cname] = {
+                        "source_id": cname,
+                        "source_name": cname,
+                        "author": cname,
+                        "title": cname,
+                        "year": meta.get("year", ""),
+                        "tradition": meta.get("tradition", "Exégétique"),
+                        "excerpt": clean_snippet,
+                        "raw_length": len(text),
+                        "is_available": bool(text.strip())
+                    }
+            verse_commentaries = list(grouped_v.values())
+
+            # Compter les commentaires totaux pour ce chapitre
+            try:
+                res_ch = CommentaryLoader.get_all_comments_for_passage(norm_code, chapter, None)
+                chapter_comm_count = len(res_ch.get("documents", []))
+            except Exception:
+                chapter_comm_count = len(verse_commentaries)
+        except Exception as e:
+            logger.warning(f"Erreur chargement commentaires overview: {e}")
+
+        # 3. Articles de blogs & Revues théologiques
+        articles_list = []
+        try:
+            from core.articles_db import ArticlesDB
+            art_db = ArticlesDB()
+            raw_articles = art_db.get_articles_for_passage(book_code=norm_code, chapter=chapter, limit=8)
+            for a in raw_articles:
+                summary = a.get("lead_summary") or a.get("excerpt") or ""
+                if len(summary) > 180:
+                    summary = summary[:177] + "..."
+                articles_list.append({
+                    "id": a.get("id", ""),
+                    "title": a.get("title", "Article sans titre"),
+                    "source_name": a.get("source_name", "Blog"),
+                    "source_category": a.get("source_category", "Théologie"),
+                    "author": a.get("author", ""),
+                    "reading_time_minutes": a.get("reading_time_minutes") or 5,
+                    "lead_summary": summary,
+                    "image_url": a.get("image_url", ""),
+                    "url": a.get("url", ""),
+                    "published_at": a.get("published_at", ""),
+                    "tags_list": a.get("tags_list", [])
+                })
+        except Exception as e:
+            logger.debug(f"Erreur articles overview: {e}")
+
+        # 4. Livres de Théologie & Manuels de la bibliothèque (recherche ultra-rapide)
+        theology_chapters = []
+        try:
+            from core.theology_reader_manager import TheologyReaderManager
+            from gui.library_utils import load_books_metadata
+            registry = load_books_metadata()
+
+            checked_books = 0
+            for b_name, b_meta in registry.items():
+                if checked_books >= 6:
+                    break
+
+                b_type = str(b_meta.get("type", "")).strip().lower()
+                if b_type not in ["théologie", "theologie", "théologique", "theology", "étude", "doctrine", "introduction", "commentaire"]:
+                    continue
+
+                # Vérifier si l'ouvrage est pertinent (titre, nom, code ou cache en mémoire)
+                is_name_match = (
+                    french_book.lower() in b_name.lower() or 
+                    norm_code.lower() in b_name.lower() or
+                    french_book.lower() in (b_meta.get("title") or "").lower() or
+                    b_meta.get("book_code", "").upper() == norm_code.upper()
+                )
+                
+                is_cached = b_name in TheologyReaderManager._toc_cache
+
+                if not is_name_match and not is_cached:
+                    continue
+
+                checked_books += 1
+                try:
+                    toc_data = TheologyReaderManager.get_book_toc(b_name)
+                    for ch in toc_data.get("chapters", []):
+                        if ch.get("is_section_header"):
+                            continue
+
+                        ch_bcode = ch.get("book_code")
+                        ch_title = ch.get("title", "")
+                        is_match = False
+
+                        if ch_bcode and (ch_bcode.upper() == norm_code.upper() or ch_bcode.lower() == norm_code.lower()):
+                            is_match = True
+                        elif french_book.lower() in ch_title.lower() or norm_code.lower() in ch_title.lower():
+                            is_match = True
+                        elif is_name_match:
+                            is_match = True
+
+                        if is_match:
+                            theology_chapters.append({
+                                "book_name": b_name,
+                                "book_title": b_meta.get("title", b_name),
+                                "book_author": b_meta.get("author", ""),
+                                "chapter_id": ch.get("chapter_id", 1),
+                                "chapter_title": ch_title,
+                                "section_title": ch.get("section_title", ""),
+                                "cover_url": b_meta.get("cover_path"),
+                                "source_type": ch.get("source_type", "general")
+                            })
+                            if len(theology_chapters) >= 6:
+                                break
+                except Exception:
+                    pass
+
+                if len(theology_chapters) >= 6:
+                    break
+        except Exception as e:
+            logger.debug(f"Erreur livres theologie overview: {e}")
+
+        # 5. Notes personnelles & Surlignages
+        notes_list = []
+        highlights_list = []
+        try:
+            raw_notes = NotesManager.get_notes_for_passage(norm_code, chapter, verse)
+            for n in raw_notes:
+                raw_c = n.get("content", "") or ""
+                snippet = re.sub(r'#+\s*', '', raw_c)
+                snippet = re.sub(r'\s+', ' ', snippet).strip()
+                if len(snippet) > 160:
+                    snippet = snippet[:157] + "..."
+                notes_list.append({
+                    "id": n.get("id", ""),
+                    "title": n.get("title", "Note"),
+                    "reference": n.get("reference", ref_display),
+                    "snippet": snippet,
+                    "updated_at": n.get("updated_at", "")
+                })
+
+            raw_hl = HighlightsManager.get_highlights_for_chapter(norm_code, chapter, bible_name)
+            for h in raw_hl:
+                h_v = h.get("verse")
+                if h_v is None or h_v == verse:
+                    highlights_list.append({
+                        "id": h.get("id"),
+                        "verse": h_v or verse,
+                        "color": h.get("color", "yellow"),
+                        "style": h.get("style", "felt"),
+                        "text": h.get("text", "")
+                    })
+        except Exception as e:
+            logger.debug(f"Erreur notes & highlights overview: {e}")
+
+        # 6. Lieux géographiques bibliques
+        maps_places = []
+        try:
+            raw_places = MapsManager.get_chapter_places(norm_code, chapter)
+            for p in raw_places:
+                desc = p.get("description", "") or ""
+                if len(desc) > 160:
+                    desc = desc[:157] + "..."
+                maps_places.append({
+                    "id": p.get("id", ""),
+                    "name": p.get("name", "Lieu"),
+                    "type": p.get("type", "Lieu"),
+                    "latitude": p.get("latitude"),
+                    "longitude": p.get("longitude"),
+                    "description": desc
+                })
+        except Exception as e:
+            logger.debug(f"Erreur maps overview: {e}")
+
+        # 7. Langues Originales & Lemmes clés du verset
+        key_lemmas = []
+        try:
+            orig_mgr = OriginalLanguagesManager.get_instance()
+            if orig_mgr.is_installed():
+                b_usfm = STD_TO_USFM.get(norm_code, norm_code).upper()
+                lexicon = orig_mgr._get_strong_lexicon()
+                with sqlite3.connect(orig_mgr.db_path) as conn:
+                    conn.row_factory = sqlite3.Row
+                    cur = conn.cursor()
+                    cur.execute("""
+                        SELECT original_text, transliteration, lemma, strong_code, morph_desc_fr, gloss, lang
+                        FROM original_words
+                        WHERE book_code = ? AND chapter = ? AND verse = ?
+                        ORDER BY word_idx ASC;
+                    """, (b_usfm, chapter, verse))
+                    rows = cur.fetchall()
+                    seen_strongs = set()
+                    for r in rows:
+                        s_code = r["strong_code"] or ""
+                        if not s_code or s_code in seen_strongs:
+                            continue
+                        seen_strongs.add(s_code)
+                        s_entry = lexicon.get(s_code) or {}
+                        lemma_clean = r["lemma"] or s_entry.get("lemma") or r["original_text"]
+                        strong_def = s_entry.get("definition", "") or r["gloss"] or ""
+                        if len(strong_def) > 140:
+                            strong_def = strong_def[:137] + "..."
+                        key_lemmas.append({
+                            "strong": s_code,
+                            "original_text": r["original_text"],
+                            "lemma": lemma_clean,
+                            "transliteration": r["transliteration"] or "",
+                            "gloss": r["gloss"] or "",
+                            "definition": strong_def,
+                            "lang": r["lang"] or "greek"
+                        })
+                        if len(key_lemmas) >= 6:
+                            break
+        except Exception as e:
+            logger.debug(f"Erreur langues originales overview: {e}")
+
+        return {
+            "success": True,
+            "book_code": norm_code,
+            "french_book": french_book,
+            "chapter": chapter,
+            "verse": verse,
+            "reference": ref_display,
+            "pericope": {
+                "title": pericope_title,
+                "ref_range": pericope_range
+            },
+            "stats": {
+                "commentaries_count": len(verse_commentaries),
+                "chapter_commentaries_count": chapter_comm_count,
+                "articles_count": len(articles_list),
+                "theology_count": len(theology_chapters),
+                "notes_count": len(notes_list),
+                "highlights_count": len(highlights_list),
+                "maps_count": len(maps_places),
+                "strongs_count": len(key_lemmas)
+            },
+            "commentaries": verse_commentaries,
+            "articles": articles_list,
+            "theology_books": theology_chapters,
+            "user_notes": notes_list,
+            "user_highlights": highlights_list,
+            "maps": maps_places,
+            "key_lemmas": key_lemmas
+        }
+

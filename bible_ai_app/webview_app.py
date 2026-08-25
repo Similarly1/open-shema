@@ -824,6 +824,16 @@ class BibleAppApi:
         from core.passage_study_manager import PassageStudyManager
         return PassageStudyManager.get_passage_study_data(passage_ref=passage_ref, bible_name=bible_name)
 
+    def get_passage_overview_bundle(self, book_code: str, chapter: int, verse: int = 1, bible_name: str = "LSG") -> Dict[str, Any]:
+        """Agrège tout l'écosystème documentaire pour le volet d'aperçu rapide de la page Bible."""
+        from core.passage_study_manager import PassageStudyManager
+        return PassageStudyManager.get_passage_overview_bundle(
+            book_code=book_code,
+            chapter=int(chapter),
+            verse=int(verse),
+            bible_name=bible_name
+        )
+
     def get_synoptic_harmony(self, pericope_id: int, bible_name: str = "LSG", pivot_book: Optional[str] = None) -> Dict[str, Any]:
         """Récupère la matrice synoptique complète pour une péricope évangélique avec pivot optionnel."""
         from core.passage_study_manager import PassageStudyManager

@@ -30,7 +30,8 @@ const App = {
       { name: 'SelectionContextMenu', init: () => (typeof SelectionContextMenu !== 'undefined' && SelectionContextMenu.init()) },
       { name: 'TheologicalProfileModal', init: () => (typeof TheologicalProfileModal !== 'undefined' && TheologicalProfileModal.init()) },
       { name: 'HighlighterManager', init: () => (typeof HighlighterManager !== 'undefined' && HighlighterManager.init()) },
-      { name: 'ArticlesView', init: () => (typeof ArticlesView !== 'undefined' && ArticlesView.init()) }
+      { name: 'ArticlesView', init: () => (typeof ArticlesView !== 'undefined' && ArticlesView.init()) },
+      { name: 'PassageOverviewDrawer', init: () => (typeof PassageOverviewDrawer !== 'undefined' && PassageOverviewDrawer.init()) }
     ];
 
     modules.forEach(m => {
@@ -89,7 +90,7 @@ const App = {
       this.switchView('dict');
     });
 
-    // 3. Onglets du panneau droit (Commentaires / IA / Lexique)
+    // 3. Onglets du panneau droit (Aperçu / Commentaires / IA / Lexique / Notes / Articles)
     document.querySelectorAll('.drawer-tab').forEach(tabBtn => {
       tabBtn.addEventListener('click', () => {
         document.querySelectorAll('.drawer-tab').forEach(b => b.classList.remove('active'));
@@ -100,7 +101,15 @@ const App = {
         const contentEl = document.getElementById(`drawer-tab-${tabId}`);
         if (contentEl) {
           contentEl.classList.add('active');
-          if (tabId === 'commentaries') {
+          if (tabId === 'overview') {
+            const b = (typeof BibleReader !== 'undefined' && BibleReader.currentBook) || 'Gen';
+            const ch = (typeof BibleReader !== 'undefined' && BibleReader.currentChapter) || 1;
+            const v = (typeof BibleReader !== 'undefined' && BibleReader.selectedVerse) || 1;
+            const bible = (typeof BibleReader !== 'undefined' && (BibleReader.currentBible1 || BibleReader.currentVersion)) || 'LSG';
+            if (typeof PassageOverviewDrawer !== 'undefined') {
+              PassageOverviewDrawer.load(b, ch, v, bible, true);
+            }
+          } else if (tabId === 'commentaries') {
             if (typeof CommentaryViewer !== 'undefined' && (!CommentaryViewer.currentComments || CommentaryViewer.currentComments.length === 0)) {
               const b = (typeof BibleReader !== 'undefined' && BibleReader.currentBook) || 'Gen';
               const ch = (typeof BibleReader !== 'undefined' && BibleReader.currentChapter) || 1;

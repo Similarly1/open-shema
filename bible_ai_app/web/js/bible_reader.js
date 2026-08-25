@@ -3130,6 +3130,9 @@ const BibleReader = {
     InterlinearMenu.init();
     CommentaryViewer.init();
     DrawerNotesViewer.init();
+    if (typeof PassageOverviewDrawer !== 'undefined') {
+      PassageOverviewDrawer.init();
+    }
     ContextMenuManager.init();
     
     try {
@@ -4522,6 +4525,15 @@ const BibleReader = {
       DrawerNotesViewer.load(book, ch, verseNum);
     } catch (e) {
       console.error('Erreur sync DrawerNotesViewer:', e);
+    }
+
+    // Synchronisation automatique du volet Aperçu 360° du passage
+    try {
+      if (typeof PassageOverviewDrawer !== 'undefined') {
+        PassageOverviewDrawer.load(book, ch, verseNum, this.currentBible1 || 'LSG', force);
+      }
+    } catch (e) {
+      console.error('Erreur sync PassageOverviewDrawer:', e);
     }
   },
 

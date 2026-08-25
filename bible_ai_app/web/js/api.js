@@ -219,6 +219,10 @@ const API = {
     return await this.call('get_passage_study_data', passageRef, bibleName);
   },
 
+  async getPassageOverviewBundle(bookCode, chapter, verse = 1, bibleName = "LSG") {
+    return await this.call('get_passage_overview_bundle', bookCode, parseInt(chapter), parseInt(verse), bibleName);
+  },
+
   async getSynopticHarmony(pericopeId, bibleName = "LSG", pivotBook = null) {
     return await this.call('get_synoptic_harmony', pericopeId, bibleName, pivotBook);
   },
