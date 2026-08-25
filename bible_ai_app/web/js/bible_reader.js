@@ -3182,36 +3182,10 @@ const LexiconViewer = {
       ? TheologyView.highlightScriptureReferences(textToRender)
       : textToRender;
 
-    // Vérification d'une étude de mot BibleProject associée
-    let bpVideoCardHtml = '';
-    if (typeof BibleProjectView !== 'undefined' && BibleProjectView.getWordStudyForStrong) {
-      const strongCode = match.strong || match.slug || this.currentStrong || '';
-      const bpStudy = BibleProjectView.getWordStudyForStrong(strongCode, this.currentTerm);
-      if (bpStudy) {
-        bpVideoCardHtml = `
-          <div class="lex-bp-video-card" onclick="BibleProjectView.openAndPlayWordStudy('${bpStudy.ytId}', '${BibleProjectView.escapeHtml(bpStudy.title)}', '${BibleProjectView.escapeHtml(bpStudy.description)}')" title="Regarder l'analyse vidéo BibleProject dans l'onglet Médias">
-            <div class="lex-bp-video-thumb">
-              <img src="${bpStudy.thumbnail}" alt="${BibleProjectView.escapeHtml(bpStudy.title)}" loading="lazy">
-              <div class="lex-bp-play-badge">
-                <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              </div>
-            </div>
-            <div class="lex-bp-video-info">
-              <div class="lex-bp-badge-row">
-                <span class="lex-bp-tag">Étude de mot BibleProject</span>
-                <span class="lex-bp-dur">${bpStudy.dur || '5 min'}</span>
-              </div>
-              <div class="lex-bp-title">${BibleProjectView.escapeHtml(bpStudy.title)}</div>
-              <div class="lex-bp-hint">Regarder l'analyse vidéo (${bpStudy.orig || ''}) ↗</div>
-            </div>
-          </div>
-        `;
-      }
-    }
-
     container.innerHTML = `
       <div style="padding: 16px;">
         ${bpVideoCardHtml}
+
         <div style="font-size: 20px; font-weight: 800; color: var(--accent-blue); margin-bottom: 4px;">${match.title || this.currentTerm}</div>
         <div style="font-size: 11px; font-weight: 700; color: var(--accent-orange); margin-bottom: 12px;">${match.badge || match.dict_name}</div>
         ${polishBarHtml}
