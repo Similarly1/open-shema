@@ -1189,6 +1189,14 @@ CONSIGNES STRICTES :
         verse_commentaries = []
         chapter_comm_count = 0
         try:
+            from gui.library_utils import load_books_metadata
+            from webview_app import get_cover_data_url
+            registry = load_books_metadata()
+        except Exception:
+            registry = {}
+            get_cover_data_url = lambda p: None
+
+        try:
             res_v = CommentaryLoader.get_all_comments_for_passage(norm_code, chapter, verse)
             grouped_v = {}
             for i, text in enumerate(res_v.get("documents", [])):
@@ -1199,6 +1207,11 @@ CONSIGNES STRICTES :
                     clean_snippet = re.sub(r'\s+', ' ', clean_snippet).strip()
                     if len(clean_snippet) > 220:
                         clean_snippet = clean_snippet[:217] + "..."
+                    
+                    b_meta = registry.get(cname, {}) if registry else {}
+                    cov_p = meta.get("cover_path") or b_meta.get("cover_path")
+                    cov_url = get_cover_data_url(cov_p) if (cov_p and get_cover_data_url) else None
+
                     grouped_v[cname] = {
                         "source_id": cname,
                         "source_name": cname,
@@ -1207,17 +1220,13 @@ CONSIGNES STRICTES :
                         "year": meta.get("year", ""),
                         "tradition": meta.get("tradition", "Exégétique"),
                         "excerpt": clean_snippet,
+                        "cover_url": cov_url,
                         "raw_length": len(text),
                         "is_available": bool(text.strip())
                     }
             verse_commentaries = list(grouped_v.values())
 
-            # Compter les commentaires totaux pour ce chapitre
-            try:
-                res_ch = CommentaryLoader.get_all_comments_for_passage(norm_code, chapter, None)
-                chapter_comm_count = len(res_ch.get("documents", []))
-            except Exception:
-                chapter_comm_count = len(verse_commentaries)
+            chapter_comm_count = len(verse_commentaries)
         except Exception as e:
             logger.warning(f"Erreur chargement commentaires overview: {e}")
 
@@ -1293,71 +1302,16 @@ CONSIGNES STRICTES :
         except Exception as e:
             logger.debug(f"Erreur articles overview: {e}")
 
-        # 4. Livres de Théologie & Manuels de la bibliothèque (recherche ultra-rapide)
+        # 4. Livres de Théologie & Manuels de la bibliothèque (citations & introductions ciblées)
         theology_chapters = []
         try:
             from core.theology_reader_manager import TheologyReaderManager
-            from gui.library_utils import load_books_metadata
-            registry = load_books_metadata()
-
-            checked_books = 0
-            for b_name, b_meta in registry.items():
-                if checked_books >= 6:
-                    break
-
-                b_type = str(b_meta.get("type", "")).strip().lower()
-                if b_type not in ["théologie", "theologie", "théologique", "theology", "étude", "doctrine", "introduction", "commentaire"]:
-                    continue
-
-                # Vérifier si l'ouvrage est pertinent (titre, nom, code ou cache en mémoire)
-                is_name_match = (
-                    french_book.lower() in b_name.lower() or 
-                    norm_code.lower() in b_name.lower() or
-                    french_book.lower() in (b_meta.get("title") or "").lower() or
-                    b_meta.get("book_code", "").upper() == norm_code.upper()
-                )
-                
-                is_cached = b_name in TheologyReaderManager._toc_cache
-
-                if not is_name_match and not is_cached:
-                    continue
-
-                checked_books += 1
-                try:
-                    toc_data = TheologyReaderManager.get_book_toc(b_name)
-                    for ch in toc_data.get("chapters", []):
-                        if ch.get("is_section_header"):
-                            continue
-
-                        ch_bcode = ch.get("book_code")
-                        ch_title = ch.get("title", "")
-                        is_match = False
-
-                        if ch_bcode and (ch_bcode.upper() == norm_code.upper() or ch_bcode.lower() == norm_code.lower()):
-                            is_match = True
-                        elif french_book.lower() in ch_title.lower() or norm_code.lower() in ch_title.lower():
-                            is_match = True
-                        elif is_name_match:
-                            is_match = True
-
-                        if is_match:
-                            theology_chapters.append({
-                                "book_name": b_name,
-                                "book_title": b_meta.get("title", b_name),
-                                "book_author": b_meta.get("author", ""),
-                                "chapter_id": ch.get("chapter_id", 1),
-                                "chapter_title": ch_title,
-                                "section_title": ch.get("section_title", ""),
-                                "cover_url": b_meta.get("cover_path"),
-                                "source_type": ch.get("source_type", "general")
-                            })
-                            if len(theology_chapters) >= 6:
-                                break
-                except Exception:
-                    pass
-
-                if len(theology_chapters) >= 6:
-                    break
+            theology_chapters = TheologyReaderManager.get_theology_resources_for_passage(
+                book_code=norm_code,
+                chapter=chapter,
+                verse=verse,
+                limit=8
+            )
         except Exception as e:
             logger.debug(f"Erreur livres theologie overview: {e}")
 

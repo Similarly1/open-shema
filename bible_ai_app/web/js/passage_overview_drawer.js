@@ -260,7 +260,7 @@ const PassageOverviewDrawer = {
   },
 
   /**
-   * Affiche l'infobulle flottante au survol d'une ressource
+   * Affiche l'infobulle flottante au survol d'une ressource (avec image / couverture)
    */
   showPopover(itemEl) {
     if (!this.popoverEl) this.initPopover();
@@ -271,6 +271,7 @@ const PassageOverviewDrawer = {
     const excerpt = itemEl.dataset.ttExcerpt || '';
     const badge = itemEl.dataset.ttBadge || '';
     const logoUrl = itemEl.dataset.ttLogo || '';
+    const imgUrl = itemEl.dataset.ttImage || '';
 
     if (!excerpt && !author && !title) return;
 
@@ -278,21 +279,41 @@ const PassageOverviewDrawer = {
     if (cat === 'Article') catIcon = this.icons.article;
     else if (cat === 'Livre') catIcon = this.icons.book;
     else if (cat === 'Note') catIcon = this.icons.note;
+    else if (cat === 'Lieu') catIcon = this.icons.map;
+
+    let coverHtml = '';
+    let bannerHtml = '';
+
+    if (cat === 'Article') {
+      if (imgUrl) {
+        bannerHtml = `<div class="popover-landscape-banner"><img src="${imgUrl}" class="popover-landscape-img" alt=""></div>`;
+      }
+    } else if (cat === 'Note') {
+      coverHtml = '';
+    } else {
+      coverHtml = imgUrl
+        ? `<div class="popover-cover-wrap"><img src="${imgUrl}" class="popover-cover-img" alt=""></div>`
+        : `<div class="popover-cover-wrap"><div class="popover-cover-fallback ${cat.toLowerCase()}">${catIcon}</div></div>`;
+    }
 
     this.popoverEl.innerHTML = `
       <div class="popover-inner">
-        <div class="popover-header">
-          <div class="popover-meta-row">
-            <span class="popover-cat-badge">${catIcon} <span>${this.escapeHtml(cat)}</span></span>
-            ${badge ? `
-              <span class="popover-source-badge ${logoUrl ? 'has-logo' : ''}">
-                ${logoUrl ? `<img src="${logoUrl}" class="popover-source-logo" alt="">` : ''}
-                <span>${this.escapeHtml(badge)}</span>
-              </span>` : ''}
-          </div>
-          <div class="popover-title-row">
-            <div class="popover-main-title">${this.escapeHtml(author)}</div>
-            ${title ? `<div class="popover-sub-title">${this.escapeHtml(title)}</div>` : ''}
+        ${bannerHtml}
+        <div class="popover-header ${!coverHtml ? 'no-cover' : ''}">
+          ${coverHtml}
+          <div class="popover-header-content">
+            <div class="popover-meta-row">
+              <span class="popover-cat-badge">${catIcon} <span>${this.escapeHtml(cat)}</span></span>
+              ${badge ? `
+                <span class="popover-source-badge ${logoUrl ? 'has-logo' : ''}">
+                  ${logoUrl ? `<img src="${logoUrl}" class="popover-source-logo" alt="">` : ''}
+                  <span>${this.escapeHtml(badge)}</span>
+                </span>` : ''}
+            </div>
+            <div class="popover-title-row">
+              <div class="popover-main-title">${this.escapeHtml(author)}</div>
+              ${title ? `<div class="popover-sub-title">${this.escapeHtml(title)}</div>` : ''}
+            </div>
           </div>
         </div>
         ${excerpt ? `<div class="popover-body">${excerpt}</div>` : ''}
@@ -540,6 +561,7 @@ const PassageOverviewDrawer = {
                data-tt-category="Commentaire"
                data-tt-author="${this.escapeHtml(author)}"
                data-tt-title="${this.escapeHtml(title)}"
+               data-tt-image="${this.escapeHtml(c.cover_url || '')}"
                data-tt-excerpt="${this.escapeHtml(excerptHtml)}">
             <div class="clean-item-header">
               <div class="clean-item-title-group">
@@ -631,6 +653,7 @@ const PassageOverviewDrawer = {
                data-tt-title="${this.escapeHtml(art.author ? 'Par ' + art.author : '')}"
                data-tt-badge="${this.escapeHtml(src)}"
                data-tt-logo="${logoUrl || ''}"
+               data-tt-image="${this.escapeHtml(art.image_url || '')}"
                data-tt-excerpt="${this.escapeHtml(summaryHtml)}">
             <div class="clean-item-header">
               <div class="clean-item-title-group">
@@ -693,6 +716,7 @@ const PassageOverviewDrawer = {
                data-tt-category="Livre"
                data-tt-author="${this.escapeHtml(bTitle)}"
                data-tt-title="${this.escapeHtml(chTitle)}"
+               data-tt-image="${this.escapeHtml(b.cover_url || '')}"
                data-tt-excerpt="${this.escapeHtml(snippetHtml)}">
             <div class="clean-item-header">
               <div class="clean-item-title-group">

@@ -21,6 +21,8 @@ class TheologyReaderManager:
     _books_cache = None
     _toc_cache = {}
     _chapter_cache = {}
+    _passage_theology_cache = {}
+    _bible_book_index = None
 
     @classmethod
     def get_chroma_client(cls, persist_directory: str = "./data/chroma_db"):
@@ -38,6 +40,8 @@ class TheologyReaderManager:
         cls._books_cache = None
         cls._toc_cache.clear()
         cls._chapter_cache.clear()
+        cls._passage_theology_cache.clear()
+        cls._bible_book_index = None
         try:
             from core.epub_loader import EpubLoader
             EpubLoader.invalidate_cache()
@@ -149,13 +153,7 @@ class TheologyReaderManager:
         # 2. Fallback ChromaDB si aucun chapitre n'a été trouvé via l'EPUB
         if not chapters_dict:
             client = cls.get_chroma_client()
-            collections_to_search = []
-            try:
-                for c in client.list_collections():
-                    c_name = c.name if hasattr(c, 'name') else str(c)
-                    collections_to_search.append(c_name)
-            except Exception:
-                collections_to_search = ['bible_study_bge_multilingual_gemma2_Infomaniak', 'study_library', 'bible_study_gemini_embedding_2']
+            collections_to_search = ['bible_study_bge_multilingual_gemma2_Infomaniak', 'bible_study_gemini_embedding_2']
 
             for col_name in collections_to_search:
                 try:
@@ -752,6 +750,194 @@ Règles de style :
                 logger.debug(f"[TheologyReaderManager] Recherche query error : {e}")
 
         return results[:limit]
+
+    @classmethod
+    def _get_bible_book_index(cls) -> Dict[str, List[Dict[str, Any]]]:
+        """Indexe en mémoire et sur disque une seule fois les chapitres d'ouvrages correspondant à chaque livre biblique."""
+        if cls._bible_book_index is not None:
+            return cls._bible_book_index
+
+        import json
+        cache_path = os.path.join("data", "cache", "theology_bible_book_index.json")
+        if os.path.exists(cache_path):
+            try:
+                with open(cache_path, "r", encoding="utf-8") as f:
+                    cls._bible_book_index = json.load(f)
+                    return cls._bible_book_index
+            except Exception:
+                pass
+
+        from core.reference_parser import get_standard_book_code, get_french_book_name
+        from webview_app import get_cover_data_url
+
+        index = {}
+        registry = load_books_metadata()
+
+        for b_name, b_meta in registry.items():
+            b_type = str(b_meta.get("type", "")).strip().lower()
+            if b_type in ["bible", "commentaire"]:
+                continue
+            is_theo_or_study = (
+                b_type in ["théologie", "theologie", "théologique", "theology", "étude", "etude", "doctrine", "introduction", "dictionnaire"]
+                or b_name in ["STGru", "Lire/Comprendre", "Paradoxes", "LirelaBibles", "NIV", "NIV Cultural", "MacArthur BC", "NIVArchaeo", "TSM", "Nouveau dictionnaire biblique. Révisé et augmenté"]
+            )
+            if not is_theo_or_study:
+                continue
+
+            try:
+                toc_data = cls.get_book_toc(b_name)
+                cov_p = b_meta.get("cover_path")
+                cov_url = get_cover_data_url(cov_p) if (cov_p and get_cover_data_url) else None
+
+                for ch in toc_data.get("chapters", []):
+                    if ch.get("is_section_header"):
+                        continue
+                    ch_bcode = (ch.get("book_code") or "").upper()
+                    ch_title = ch.get("title", "")
+                    cid = ch.get("chapter_id", 1)
+
+                    item = {
+                        "book_name": b_name,
+                        "book_title": b_meta.get("title", b_name),
+                        "book_author": b_meta.get("author", ""),
+                        "chapter_id": cid,
+                        "chapter_title": ch_title,
+                        "cover_url": cov_url,
+                        "source_type": ch.get("source_type", "general")
+                    }
+
+                    if ch_bcode:
+                        if ch_bcode not in index:
+                            index[ch_bcode] = []
+                        index[ch_bcode].append(item)
+                    else:
+                        for code, fr_name in [("GEN", "Genèse"), ("EXO", "Exode"), ("LEV", "Lévitique"), ("NUM", "Nombres"), ("DEU", "Deutéronome"),
+                                              ("MAT", "Matthieu"), ("MRK", "Marc"), ("LUK", "Luc"), ("JHN", "Jean"), ("ACT", "Actes"),
+                                              ("ROM", "Romains"), ("1CO", "1 Corinthiens"), ("2CO", "2 Corinthiens"), ("GAL", "Galates"),
+                                              ("EPH", "Éphésiens"), ("PHP", "Philippiens"), ("COL", "Colossiens"), ("1TH", "1 Thessaloniciens"),
+                                              ("2TH", "2 Thessaloniciens"), ("1TI", "1 Timothée"), ("2TI", "2 Timothée"), ("TIT", "Tite"),
+                                              ("PHM", "Philémon"), ("HEB", "Hébreux"), ("JAS", "Jacques"), ("1PE", "1 Pierre"), ("2PE", "2 Pierre"),
+                                              ("1JN", "1 Jean"), ("2JN", "2 Jean"), ("3JN", "3 Jean"), ("JUD", "Jude"), ("REV", "Apocalypse")]:
+                            if fr_name.lower() in ch_title.lower() or f"ephésiens" in ch_title.lower() or f"ephesiens" in ch_title.lower():
+                                if code not in index:
+                                    index[code] = []
+                                index[code].append(item)
+                                break
+            except Exception:
+                pass
+
+        try:
+            os.makedirs(os.path.dirname(cache_path), exist_ok=True)
+            with open(cache_path, "w", encoding="utf-8") as f:
+                json.dump(index, f, ensure_ascii=False, indent=2)
+        except Exception:
+            pass
+
+        cls._bible_book_index = index
+        return cls._bible_book_index
+
+    @classmethod
+    def get_theology_resources_for_passage(
+        cls,
+        book_code: str,
+        chapter: int,
+        verse: int = 1,
+        limit: int = 8
+    ) -> List[Dict[str, Any]]:
+        """
+        Trouve tous les chapitres de livres de théologie, manuels et dictionnaires
+        qui traitent du passage ou citent directement le verset.
+        """
+        from core.reference_parser import get_standard_book_code, get_french_book_name
+        from webview_app import get_cover_data_url
+
+        norm_code = (get_standard_book_code(book_code) or book_code).upper()
+        french_book = get_french_book_name(norm_code) or book_code
+        cache_key = f"{norm_code}_{chapter}_{verse}"
+
+        if cache_key in cls._passage_theology_cache:
+            return cls._passage_theology_cache[cache_key]
+
+        results = []
+        seen = set()
+        registry = load_books_metadata()
+
+        # 1. Chapitres de livres de la bibliothèque dédiés à ce livre biblique (instantané en mémoire)
+        book_index = cls._get_bible_book_index()
+        book_matches = book_index.get(norm_code, [])
+        for bm in book_matches:
+            if len(results) >= limit:
+                break
+            key = (bm["book_name"], bm["chapter_id"])
+            if key not in seen:
+                seen.add(key)
+                item = dict(bm)
+                item["snippet"] = f"Étude, archéologie et contexte théologique consacrés à {french_book} dans {bm['book_title']}."
+                results.append(item)
+
+        # 2. Citations directes dans les manuels de théologie systématique (ChromaDB si nécessaire)
+        if len(results) < 3:
+            client = cls.get_chroma_client()
+            search_terms = [
+                f"{french_book} {chapter}:{verse}",
+                f"{french_book} {chapter}"
+            ]
+
+            try:
+                col = client.get_collection('bible_study_bge_multilingual_gemma2_Infomaniak')
+                for term in search_terms:
+                    if len(results) >= limit:
+                        break
+                    try:
+                        res = col.get(where_document={"$contains": term}, limit=3, include=['metadatas', 'documents'])
+                        if res and res.get('ids'):
+                            for i in range(len(res['ids'])):
+                                m = res['metadatas'][i]
+                                doc = res['documents'][i]
+                                b_name = m.get('name') or m.get('title')
+                                if not b_name:
+                                    continue
+                                cid = m.get('chapter_id', 1)
+                                try:
+                                    cid_int = int(cid)
+                                except (ValueError, TypeError):
+                                    cid_int = cid
+                                
+                                key = (b_name, cid_int)
+                                if key in seen:
+                                    continue
+                                seen.add(key)
+
+                                b_meta = registry.get(b_name, {})
+                                doc_clean = cls._clean_text_encoding(doc)
+
+                                # Extraire l'extrait textuel ciblé
+                                idx = doc_clean.lower().find(term.lower())
+                                if idx != -1:
+                                    start = max(0, idx - 70)
+                                    end = min(len(doc_clean), idx + len(term) + 140)
+                                    snippet = ("..." if start > 0 else "") + doc_clean[start:end].replace('\n', ' ') + ("..." if end < len(doc_clean) else "")
+                                else:
+                                    snippet = doc_clean[:180] + "..." if len(doc_clean) > 180 else doc_clean
+
+                                cov_p = b_meta.get('cover_path')
+                                results.append({
+                                    "book_name": b_name,
+                                    "book_title": b_meta.get("title", b_name),
+                                    "book_author": b_meta.get("author", m.get("author", "")),
+                                    "chapter_id": cid_int,
+                                    "chapter_title": cls._clean_text_encoding(m.get("chapter_title", f"Chapitre {cid_int}")),
+                                    "snippet": snippet,
+                                    "cover_url": get_cover_data_url(cov_p) if (cov_p and get_cover_data_url) else None,
+                                    "source_type": m.get("source_type", "theology")
+                                })
+                    except Exception:
+                        pass
+            except Exception:
+                pass
+
+        cls._passage_theology_cache[cache_key] = results[:limit]
+        return cls._passage_theology_cache[cache_key]
 
     @staticmethod
     def _clean_text_encoding(text: str) -> str:
