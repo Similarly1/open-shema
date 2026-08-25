@@ -4,12 +4,17 @@ import re
 import html
 import logging
 from typing import Dict, List, Any, Optional, Tuple
-import chromadb
-from chromadb.config import Settings
+try:
+    import chromadb
+    from chromadb.config import Settings
+except ImportError:
+    chromadb = None
+    Settings = None
 from gui.library_utils import load_books_metadata
 from core.reference_parser import get_french_book_name, strip_accents
 
 logger = logging.getLogger(__name__)
+
 
 class TheologyReaderManager:
     """
@@ -942,11 +947,21 @@ Règles de style :
             if key not in seen:
                 seen.add(key)
                 item = dict(bm)
-                item["snippet"] = bm.get("snippet") or f"Étude et contexte consacrés à {french_book} {chapter}."
+                # Extraire le passage textuel réel du livre de théologie qui mentionne le verset/chapitre
+                snip = cls._extract_theology_snippet(
+                    bm["book_name"],
+                    bm["chapter_id"],
+                    french_book,
+                    norm_code,
+                    chapter,
+                    verse
+                )
+                item["snippet"] = snip or bm.get("snippet") or f"Étude et contexte consacrés à {french_book} {chapter}."
                 results.append(item)
 
         cls._passage_theology_cache[cache_key] = results[:limit]
         return cls._passage_theology_cache[cache_key]
+
 
     @staticmethod
     def _clean_text_encoding(text: str) -> str:
