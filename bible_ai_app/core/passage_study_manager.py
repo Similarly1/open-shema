@@ -1221,16 +1221,61 @@ CONSIGNES STRICTES :
         except Exception as e:
             logger.warning(f"Erreur chargement commentaires overview: {e}")
 
-        # 3. Articles de blogs & Revues théologiques
+        # 3. Articles de blogs & Revues théologiques (avec extrait ciblé sur la citation exacte)
         articles_list = []
         try:
             from core.articles_db import ArticlesDB
             art_db = ArticlesDB()
             raw_articles = art_db.get_articles_for_passage(book_code=norm_code, chapter=chapter, limit=8)
             for a in raw_articles:
-                summary = a.get("lead_summary") or a.get("excerpt") or ""
-                if len(summary) > 180:
-                    summary = summary[:177] + "..."
+                summary = a.get("lead_summary") or a.get("excerpt") or a.get("summary") or ""
+                cpath = a.get("content_path")
+                
+                # Tenter d'extraire la phrase exacte où le verset ou chapitre est cité
+                if cpath:
+                    try:
+                        resolved_path = cpath if os.path.exists(cpath) else os.path.join("data", "articles", cpath)
+                        if os.path.exists(resolved_path):
+                            with open(resolved_path, "r", encoding="utf-8", errors="ignore") as f:
+                                full_article_txt = f.read()
+
+                            # Motifs de recherche par ordre de précision
+                            search_patterns = [
+                                rf'\b(?:{re.escape(french_book)}|{re.escape(norm_code)})\s*{chapter}[\s\.\:\,]+{verse}\b',
+                                rf'\b(?:{re.escape(french_book)}|{re.escape(norm_code)})\s*{chapter}\b'
+                            ]
+
+                            for pat in search_patterns:
+                                m = re.search(pat, full_article_txt, re.IGNORECASE)
+                                if m:
+                                    s_start = m.start()
+                                    s_end = m.end()
+
+                                    # Trouver le début de la phrase ou paragraphe
+                                    prev_break = max(full_article_txt.rfind('.', 0, s_start), full_article_txt.rfind('\n', 0, s_start))
+                                    cut_start = prev_break + 1 if prev_break != -1 and (s_start - prev_break) < 140 else max(0, s_start - 70)
+
+                                    # Trouver la fin de la phrase
+                                    next_break = full_article_txt.find('.', s_end)
+                                    cut_end = next_break + 1 if next_break != -1 and (next_break - s_end) < 140 else min(len(full_article_txt), s_end + 90)
+
+                                    extracted = full_article_txt[cut_start:cut_end].strip()
+                                    extracted = re.sub(r'[\r\n\t]+', ' ', extracted)
+                                    extracted = re.sub(r'\s+', ' ', extracted)
+
+                                    if cut_start > 0:
+                                        extracted = "..." + extracted
+                                    if cut_end < len(full_article_txt):
+                                        extracted = extracted + "..."
+
+                                    summary = extracted
+                                    break
+                    except Exception:
+                        pass
+
+                if len(summary) > 200:
+                    summary = summary[:197] + "..."
+
                 articles_list.append({
                     "id": a.get("id", ""),
                     "title": a.get("title", "Article sans titre"),

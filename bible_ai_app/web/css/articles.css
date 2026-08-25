@@ -235,11 +235,38 @@
 }
 
 .article-source-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: 0.72rem;
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 4px;
   letter-spacing: 0.3px;
+}
+
+.article-source-logo-img,
+.source-filter-logo-img,
+.author-source-logo {
+  height: 13px;
+  width: auto;
+  max-width: 22px;
+  object-fit: contain;
+  vertical-align: middle;
+  display: inline-block;
+  border-radius: 2px;
+}
+
+.author-source-logo {
+  height: 15px;
+  max-width: 26px;
+  margin-right: 4px;
+}
+
+.author-source-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .article-podcast-badge {

@@ -86,6 +86,15 @@ const ArticlesView = {
     return 'CONTEXTE & PROVENANCE';
   },
 
+  getSourceLogo(sourceId) {
+    if (!sourceId) return null;
+    const s = sourceId.toLowerCase();
+    if (s.includes('tpsg') || s.includes('toutpoursagloire')) {
+      return 'img/sources/tpsg.svg';
+    }
+    return null;
+  },
+
   init() {
     this.loadReadingPreferences();
     this.bindEvents();
@@ -358,9 +367,13 @@ const ArticlesView = {
 
     this.sources.forEach(src => {
       const isActive = this.currentSourceFilter === src.id;
+      const logoUrl = this.getSourceLogo(src.id);
+      const iconHtml = logoUrl 
+        ? `<img src="${logoUrl}" alt="${this.escapeHtml(src.name)}" class="source-filter-logo-img">`
+        : `<span class="source-bullet" style="background-color: ${this.getSourceColor(src.id)};"></span>`;
       html += `
         <button class="source-filter-pill ${isActive ? 'active' : ''}" data-source-id="${src.id}">
-          <span class="source-bullet" style="background-color: ${this.getSourceColor(src.id)};"></span>
+          ${iconHtml}
           <span>${this.escapeHtml(src.name)}</span>
           <span class="source-count">${src.article_count || 0}</span>
         </button>
@@ -573,7 +586,7 @@ const ArticlesView = {
             <div class="article-card-header">
               <div style="display: flex; align-items: center; gap: 6px;">
                 <span class="article-source-badge" style="background-color: ${color}18; color: ${color}; border: 1px solid ${color}35;">
-                  ${this.escapeHtml(art.source_name || art.source_id)}
+                  ${this.getSourceLogo(art.source_id) ? `<img src="${this.getSourceLogo(art.source_id)}" alt="" class="article-source-logo-img">` : ''}<span>${this.escapeHtml(art.source_name || art.source_id)}</span>
                 </span>
                 ${podcastBadgeHtml}
               </div>
@@ -694,8 +707,11 @@ const ArticlesView = {
 
       // 2. Auteur & Avatar
       if (authorNameEl) authorNameEl.textContent = author;
-      if (pubDateEl) pubDateEl.textContent = this.formatDate(art.published_at);
-      if (sourceNameEl) sourceNameEl.textContent = art.source_name || art.source_id;
+      if (sourceNameEl) {
+        const logoUrl = this.getSourceLogo(art.source_id);
+        const logoHtml = logoUrl ? `<img src="${logoUrl}" alt="" class="author-source-logo">` : '';
+        sourceNameEl.innerHTML = `${logoHtml}<span>${this.escapeHtml(art.source_name || art.source_id)}</span>`;
+      }
 
       if (art.author_avatar_url && authorImg) {
         authorImg.src = art.author_avatar_url;
@@ -1492,7 +1508,7 @@ const ArticlesView = {
           <div class="article-card" style="padding: 14px; margin-bottom: 8px;" data-article-id="${art.id}">
             <div class="article-card-header" style="margin-bottom: 6px;">
               <span class="article-source-badge" style="background-color: ${color}18; color: ${color}; border: 1px solid ${color}35; font-size: 10px;">
-                ${this.escapeHtml(art.source_name || art.source_id)}
+                ${this.getSourceLogo(art.source_id) ? `<img src="${this.getSourceLogo(art.source_id)}" alt="" class="article-source-logo-img">` : ''}<span>${this.escapeHtml(art.source_name || art.source_id)}</span>
               </span>
               <span class="article-pub-date" style="font-size: 10px;">${this.formatDate(art.published_at)}</span>
             </div>

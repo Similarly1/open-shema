@@ -211,9 +211,9 @@ const PassageOverviewDrawer = {
   },
 
   /**
-   * Nettoie et formate les extraits textuels (enlève le markdown brut, les en-têtes ##, etc.)
+   * Nettoie et formate les extraits textuels en rendant le Markdown élégamment (gras, italique, etc.)
    */
-  cleanExcerpt(text) {
+  formatMarkdownExcerpt(text) {
     if (!text) return '';
     let cleaned = text.replace(/<[^>]+>/g, ' ');
     cleaned = cleaned.replace(/^#+\s+/gm, '');
@@ -222,7 +222,14 @@ const PassageOverviewDrawer = {
     if (cleaned.length > 175) {
       cleaned = cleaned.slice(0, 172) + '...';
     }
-    return cleaned;
+    // Échappement HTML sécurisé
+    let safe = this.escapeHtml(cleaned);
+    // Rendu du markdown inline
+    safe = safe.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    safe = safe.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    safe = safe.replace(/_([^_]+)_/g, '<em>$1</em>');
+    safe = safe.replace(/`([^`]+)`/g, '<code style="font-size: 10px; padding: 1px 4px; border-radius: 3px; background: var(--bg-hover);">$1</code>');
+    return safe;
   },
 
   /**
@@ -417,7 +424,7 @@ const PassageOverviewDrawer = {
       const renderItem = (c, idx) => {
         const author = c.author || c.source_name || 'Commentaire';
         const title = c.title && c.title !== author ? c.title : (c.source_name || '');
-        const excerpt = this.cleanExcerpt(c.excerpt);
+        const excerptHtml = this.formatMarkdownExcerpt(c.excerpt);
 
         return `
           <div class="overview-clean-item" data-action="select-commentary" data-author="${this.escapeHtml(author)}" data-source-id="${this.escapeHtml(c.source_id)}" data-index="${idx}">
@@ -428,7 +435,7 @@ const PassageOverviewDrawer = {
               </div>
               <span class="clean-item-arrow">${this.icons.arrowRight}</span>
             </div>
-            <p class="clean-item-excerpt">${this.escapeHtml(excerpt)}</p>
+            <p class="clean-item-excerpt">${excerptHtml}</p>
           </div>
         `;
       };
@@ -488,7 +495,7 @@ const PassageOverviewDrawer = {
         const src = art.source_name || 'Revue';
         const title = art.title || 'Article';
         const time = art.reading_time_minutes ? `${art.reading_time_minutes} min` : '';
-        const summary = this.cleanExcerpt(art.lead_summary);
+        const summaryHtml = this.formatMarkdownExcerpt(art.lead_summary);
 
         bodyHtml += `
           <div class="overview-clean-item" data-action="open-article" data-article-id="${this.escapeHtml(art.id)}">
@@ -499,7 +506,7 @@ const PassageOverviewDrawer = {
               </div>
               <span class="clean-item-arrow">${this.icons.arrowRight}</span>
             </div>
-            ${summary ? `<p class="clean-item-excerpt">${this.escapeHtml(summary)}</p>` : ''}
+            ${summaryHtml ? `<p class="clean-item-excerpt">${summaryHtml}</p>` : ''}
           </div>
         `;
       });
@@ -541,6 +548,7 @@ const PassageOverviewDrawer = {
       list.forEach((b) => {
         const bTitle = b.book_title || b.book_name || 'Ouvrage';
         const chTitle = b.chapter_title || `Chapitre ${b.chapter_id}`;
+        const snippetHtml = b.snippet ? this.formatMarkdownExcerpt(b.snippet) : '';
 
         bodyHtml += `
           <div class="overview-clean-item" data-action="open-theology-chapter" data-book-name="${this.escapeHtml(b.book_name)}" data-chapter-id="${b.chapter_id}">
@@ -551,6 +559,7 @@ const PassageOverviewDrawer = {
               </div>
               <span class="clean-item-arrow">${this.icons.arrowRight}</span>
             </div>
+            ${snippetHtml ? `<p class="clean-item-excerpt">${snippetHtml}</p>` : ''}
           </div>
         `;
       });
@@ -595,13 +604,14 @@ const PassageOverviewDrawer = {
       bodyHtml = `<div class="overview-clean-list">`;
       
       notes.forEach((n) => {
+        const snippetHtml = this.formatMarkdownExcerpt(n.snippet);
         bodyHtml += `
           <div class="overview-clean-item" data-action="open-note" data-note-id="${this.escapeHtml(n.id)}">
             <div class="clean-item-header">
               <span class="clean-author-name">${this.escapeHtml(n.title || 'Note')}</span>
               <span class="clean-item-arrow">${this.icons.arrowRight}</span>
             </div>
-            ${n.snippet ? `<p class="clean-item-excerpt">${this.escapeHtml(this.cleanExcerpt(n.snippet))}</p>` : ''}
+            ${snippetHtml ? `<p class="clean-item-excerpt">${snippetHtml}</p>` : ''}
           </div>
         `;
       });
