@@ -1441,6 +1441,24 @@ class BibleAppApi:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+    def import_sermon_file(self, file_path: Optional[str] = None) -> Dict[str, Any]:
+        """Ouvre un dialogue natif pour choisir un .docx / .md ou importe le chemin fourni."""
+        self.config = load_config()
+        if not file_path:
+            win = get_active_window()
+            if not win:
+                return {"success": False, "error": "Fenêtre introuvable"}
+            result = win.create_file_dialog(
+                webview.OPEN_DIALOG,
+                allow_multiple=False,
+                file_types=('Fichiers Prédication (*.docx;*.md;*.txt)', 'Documents Word (*.docx)', 'Fichiers Markdown (*.md)', 'Tous les fichiers (*.*)')
+            )
+            if not result:
+                return {"success": False, "cancelled": True}
+            file_path = result[0] if isinstance(result, (list, tuple)) else result
+
+        return SermonsManager.import_sermon_file(file_path, self.config)
+
     def get_illustrations_list(self) -> List[Dict[str, Any]]:
         """Charge toutes les illustrations du réservoir transversal."""
         self.config = load_config()

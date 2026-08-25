@@ -246,6 +246,136 @@ class SermonsManager:
             return {"success": False, "error": str(e)}
 
     @classmethod
+    def import_sermon_file(cls, file_path: str, config: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Importe intelligemment un fichier Word (.docx) ou Markdown (.md) et crée un nouveau sermon structuré."""
+        if not os.path.exists(file_path):
+            return {"success": False, "error": f"Fichier introuvable : {file_path}"}
+
+        ext = os.path.splitext(file_path)[1].lower()
+        title = os.path.splitext(os.path.basename(file_path))[0]
+        passage_ref = ""
+        church = ""
+        date_planned = datetime.datetime.now().strftime("%Y-%m-%d")
+        big_idea = ""
+        body_lines = []
+
+        if ext == ".docx":
+            try:
+                import zipfile, xml.etree.ElementTree as ET
+                w_ns = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+                with zipfile.ZipFile(file_path) as z:
+                    xml_content = z.read('word/document.xml')
+                tree = ET.fromstring(xml_content)
+                
+                raw_paragraphs = []
+                for p in tree.iter(f'{{{w_ns}}}p'):
+                    runs = []
+                    for r in p.iter(f'{{{w_ns}}}r'):
+                        t_elems = r.findall(f'{{{w_ns}}}t')
+                        r_text = ''.join([t.text for t in t_elems if t.text])
+                        is_bold = r.find(f'{{{w_ns}}}rPr/{{{w_ns}}}b') is not None
+                        is_italic = r.find(f'{{{w_ns}}}rPr/{{{w_ns}}}i') is not None
+                        
+                        if r_text:
+                            if is_bold:
+                                runs.append(f'**{r_text}**')
+                            elif is_italic:
+                                runs.append(f'*{r_text}*')
+                            else:
+                                runs.append(r_text)
+                    full_p = ''.join(runs).strip()
+                    full_p = re.sub(r'\*\*\s*\*\*', '', full_p)
+                    if full_p:
+                        raw_paragraphs.append(full_p)
+            except Exception as e:
+                logger.error(f"Erreur lecture docx {file_path}: {e}")
+                return {"success": False, "error": f"Erreur lecture docx : {e}"}
+        else:
+            # Fichier Markdown / texte
+            try:
+                with open(file_path, "r", encoding="utf-8", errors="replace") as f:
+                    raw_paragraphs = [l.strip() for l in f.readlines() if l.strip()]
+            except Exception as e:
+                return {"success": False, "error": f"Erreur lecture fichier : {e}"}
+
+        # Détection heuristique des métadonnées
+        bible_books_pattern = r'\b(?:Genèse|Exode|Lévitique|Nombres|Deutéronome|Josué|Juges|Ruth|1\s*Samuel|2\s*Samuel|1\s*Rois|2\s*Rois|1\s*Chroniques|2\s*Chroniques|Esdras|Néhémie|Esther|Job|Psaumes?|Proverbes?|Ecclésiaste|Cantique|Ésaïe|Esaïe|Jérémie|Lamentations|Ézéchiel|Ezechiel|Daniel|Osée|Joël|Amos|Abdias|Jonas|Michée|Nahum|Habacuc|Sophonie|Aggée|Zacharie|Malachie|Matthieu|Marc|Luc|Jean|Actes|Romains?|1\s*Corinthiens?|2\s*Corinthiens?|Galates?|Éphésiens?|Ephesiens?|Philippiens?|Colossiens?|1\s*Thessaloniciens?|2\s*Thessaloniciens?|1\s*Timothée|2\s*Timothée|Tite|Philémon|Hébreux|Jacques|1\s*Pierre|2\s*Pierre|1\s*Jean|2\s*Jean|3\s*Jean|Jude|Apocalypse|Gn|Ex|Lv|Nb|Dt|Jos|Jg|Rt|1\s*S|2\s*S|1\s*R|2\s*R|1\s*Ch|2\s*Ch|Esd|Né|Est|Jb|Ps|Pr|Ec|Ct|És|Es|Jér|Lam|Éz|Ez|Da|Os|Jl|Am|Ab|Jon|Mi|Na|Ha|So|Ag|Za|Mal|Mt|Mc|Lc|Jn|Ac|Rm|Rom|1\s*Co|2\s*Co|Ga|Gal|Ép|Ep|Ph|Col|1\s*Th|2\s*Th|1\s*Tm|2\s*Tm|Tt|Phm|Hé|He|Jc|1\s*P|2\s*P|1\s*Jn|2\s*Jn|3\s*Jn|Jud|Ap)\.?\s*\d+(?:[\s.,:-]+\d+)*'
+        
+        body_start_idx = 0
+        header_candidates = raw_paragraphs[:6]
+
+        for idx, p in enumerate(header_candidates):
+            clean = re.sub(r'[*_#]', '', p).strip()
+
+            # Passage biblique
+            b_match = re.search(bible_books_pattern, clean, re.IGNORECASE)
+            if b_match and not passage_ref:
+                passage_ref = b_match.group(0).strip()
+                body_start_idx = max(body_start_idx, idx + 1)
+                continue
+
+            # Église & Date (ex: AMD, le 22 mars 2026 ou (AMD, le 05.03.2023))
+            c_match = re.search(r'(?:\(([^,)]+),\s*(?:le\s*)?(\d{1,2}[./\s\w]+\d{2,4})\)|([A-ZÉÈÀÂÊÎÔÛ]{2,10}),\s*(?:le\s*)?(\d{1,2}[./\s\w]+\d{2,4}))', clean)
+            if c_match:
+                church = (c_match.group(1) or c_match.group(3) or '').strip()
+                raw_date = (c_match.group(2) or c_match.group(4) or '').strip()
+                # Normalisation date
+                d_match = re.search(r'(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})', raw_date)
+                if d_match:
+                    day, month, year = d_match.groups()
+                    if len(year) == 2: year = f"20{year}"
+                    date_planned = f"{year}-{int(month):02d}-{int(day):02d}"
+                body_start_idx = max(body_start_idx, idx + 1)
+                continue
+
+            if not title or title.startswith("Prédic") or title.startswith("Prédication"):
+                if len(clean) > 3 and not clean.lower().startswith('intro'):
+                    title = clean
+                    body_start_idx = max(body_start_idx, idx + 1)
+                    continue
+
+            if not big_idea and len(clean) > 15 and not clean.lower().startswith('intro'):
+                big_idea = clean
+                body_start_idx = max(body_start_idx, idx + 1)
+                continue
+
+        # Formatage du corps avec structuration des titres et repères de diapositive [_]
+        for p in raw_paragraphs[body_start_idx:]:
+            p_clean = re.sub(r'[*_#]', '', p).strip()
+
+            # Titres de sections 1 - ..., 2 - ..., Introduction, Conclusion
+            if re.match(r'^(?:\d+\s*[-–.]|[I|V|X]+\s*[-–.]|Introduction|Conclusion)\s+', p_clean, re.IGNORECASE) or p_clean.lower() in ['introduction', 'conclusion']:
+                body_lines.append(f"\n# {p_clean}\n")
+            # Sous-titres 1.1, 1.2, 2.1...
+            elif re.match(r'^\d+\.\d+\s+', p_clean):
+                body_lines.append(f"\n## {p_clean}\n")
+            # Repères de diapositive [_] ou [ _ ]
+            elif '[_]' in p or '[ _ ]' in p:
+                p_formatted = re.sub(r'\[\s*_\s*\]', '\n> [!cue] Projeter diapositive\n', p)
+                body_lines.append(p_formatted)
+            else:
+                body_lines.append(p)
+
+        body_content = "\n\n".join(body_lines)
+
+        sermon_obj = {
+            "id": f"sermon-{int(datetime.datetime.now().timestamp())}",
+            "title": title or "Prédication importée",
+            "church": church or "",
+            "date_planned": str(date_planned),
+            "status": "draft",
+            "series": {"title": ""},
+            "passage": {"reference": passage_ref or ""},
+            "big_idea": big_idea or "",
+            "goal": "",
+            "timing": {"target_duration_min": 35, "words_per_minute": 135},
+            "body": body_content
+        }
+
+        save_res = cls.save_sermon(sermon_obj, config)
+        return save_res
+
+    @classmethod
     def delete_sermon(cls, sermon_id: str, config: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Supprime un sermon."""
         target_dir = cls.get_sermons_directory(config)

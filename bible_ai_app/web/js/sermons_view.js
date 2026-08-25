@@ -78,6 +78,7 @@ const SermonsView = {
   bindEvents() {
     // 1. Boutons principaux de gestion
     document.getElementById('btn-new-sermon')?.addEventListener('click', () => this.createNewSermon());
+    document.getElementById('btn-import-sermon')?.addEventListener('click', () => this.importSermon());
     document.getElementById('btn-save-current-sermon')?.addEventListener('click', () => this.saveCurrentSermon());
     document.getElementById('btn-delete-current-sermon')?.addEventListener('click', () => this.deleteCurrentSermon());
     document.getElementById('btn-open-sermons-folder')?.addEventListener('click', () => this.openSermonsFolder());
@@ -103,12 +104,22 @@ const SermonsView = {
     document.getElementById('btn-sermon-toggle-drawer')?.addEventListener('click', () => this.toggleResourcesDrawer());
     document.getElementById('btn-close-resources-drawer')?.addEventListener('click', () => this.toggleResourcesDrawer(false));
 
+    // Clic sur le fil d'ariane sous le titre pour ouvrir l'inspecteur d'infos
+    document.getElementById('sermon-header-summary')?.addEventListener('click', () => {
+      this.toggleResourcesDrawer(true);
+      this.activeDrawerTab = 'metadata';
+      document.querySelectorAll('.drawer-tab-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.drawerTab === 'metadata');
+      });
+      this.renderDrawerContent();
+    });
+
     // 5. Onglets du tiroir de ressources
     document.querySelectorAll('.drawer-tab-btn').forEach(tabBtn => {
       tabBtn.addEventListener('click', () => {
         document.querySelectorAll('.drawer-tab-btn').forEach(b => b.classList.remove('active'));
         tabBtn.classList.add('active');
-        this.activeDrawerTab = tabBtn.dataset.drawerTab || 'exegesis';
+        this.activeDrawerTab = tabBtn.dataset.drawerTab || 'metadata';
         this.renderDrawerContent();
       });
     });
@@ -121,6 +132,7 @@ const SermonsView = {
     document.getElementById('btn-insert-illustration')?.addEventListener('click', () => this.insertBlock('illustration'));
     document.getElementById('btn-insert-application')?.addEventListener('click', () => this.insertBlock('application'));
     document.getElementById('btn-insert-cue')?.addEventListener('click', () => this.insertBlock('cue'));
+    document.getElementById('btn-insert-slide')?.addEventListener('click', () => this.insertBlock('slide'));
 
     // Outils formatage texte
     document.getElementById('btn-sermon-bold')?.addEventListener('click', () => document.execCommand('bold'));
@@ -129,9 +141,9 @@ const SermonsView = {
     document.getElementById('btn-sermon-quote')?.addEventListener('click', () => document.execCommand('formatBlock', false, 'blockquote'));
 
     // 7. Écoute de saisie pour métriques et historique
-    const inputs = [this.titleInput, this.churchInput, this.refInput, this.dateInput, this.seriesInput, this.bigIdeaInput, this.goalInput];
-    inputs.forEach(el => {
-      el?.addEventListener('input', () => this.debouncedPushHistory());
+    this.titleInput?.addEventListener('input', () => {
+      if (this.currentSermon) this.currentSermon.title = this.titleInput.value.trim();
+      this.debouncedPushHistory();
     });
 
     this.contentEditor?.addEventListener('input', (e) => {
@@ -488,12 +500,7 @@ const SermonsView = {
 
   populateEditor(sermon) {
     if (this.titleInput) this.titleInput.value = sermon.title || '';
-    if (this.churchInput) this.churchInput.value = sermon.church || '';
-    if (this.refInput) this.refInput.value = sermon.passage?.reference || '';
-    if (this.dateInput) this.dateInput.value = sermon.date_planned || '';
-    if (this.seriesInput) this.seriesInput.value = sermon.series?.title || '';
-    if (this.bigIdeaInput) this.bigIdeaInput.value = sermon.big_idea || '';
-    if (this.goalInput) this.goalInput.value = sermon.goal || '';
+    this.updateHeaderSummary(sermon);
 
     if (this.contentEditor) {
       // Transformation des callouts Markdown en HTML structuré propre
@@ -501,6 +508,22 @@ const SermonsView = {
     }
 
     this.updateMetrics();
+    this.renderDrawerContent();
+  },
+
+  updateHeaderSummary(sermon = this.currentSermon) {
+    if (!sermon) return;
+    const churchEl = document.getElementById('summary-church');
+    const refEl = document.getElementById('summary-ref');
+    const dateEl = document.getElementById('summary-date');
+
+    const church = sermon.church?.trim() || 'Lieu non spécifié';
+    const ref = sermon.passage?.reference?.trim() || 'Passage non lié';
+    const date = sermon.date_planned || 'Date à définir';
+
+    if (churchEl) churchEl.textContent = church;
+    if (refEl) refEl.textContent = ref;
+    if (dateEl) dateEl.textContent = date;
   },
 
   async createNewSermon() {
@@ -508,7 +531,7 @@ const SermonsView = {
     const newSermon = {
       id: `sermon-${Date.now()}`,
       title: "Nouvelle prédication",
-      church: this.churchInput?.value.trim() || "",
+      church: "",
       date_planned: todayStr,
       status: "draft",
       series: { title: "" },
@@ -533,6 +556,26 @@ const SermonsView = {
     }
   },
 
+  async importSermon() {
+    try {
+      const res = await API.importSermon();
+      if (res && res.cancelled) return;
+      if (res && res.success && res.sermon) {
+        await this.loadSermons();
+        await this.selectSermon(res.sermon.id);
+        if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast(`Prédication "${res.sermon.title}" importée avec succès !`);
+        }
+      } else if (res && res.error) {
+        if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast(`Erreur lors de l'import : ${res.error}`, "error");
+        }
+      }
+    } catch (e) {
+      console.error('Erreur import prédication:', e);
+    }
+  },
+
   async saveCurrentSermon() {
     if (!this.currentSermon) return;
 
@@ -540,19 +583,19 @@ const SermonsView = {
     
     const payload = {
       ...this.currentSermon,
-      title: this.titleInput?.value.trim() || 'Sermon sans titre',
-      church: this.churchInput?.value.trim() || '',
-      date_planned: this.dateInput?.value || new Date().toISOString().split('T')[0],
+      title: this.titleInput?.value.trim() || 'Prédication sans titre',
+      church: this.currentSermon.church || '',
+      date_planned: this.currentSermon.date_planned || new Date().toISOString().split('T')[0],
       series: {
         ...(this.currentSermon.series || {}),
-        title: this.seriesInput?.value.trim() || ''
+        title: this.currentSermon.series?.title || ''
       },
       passage: {
         ...(this.currentSermon.passage || {}),
-        reference: this.refInput?.value.trim() || ''
+        reference: this.currentSermon.passage?.reference || ''
       },
-      big_idea: this.bigIdeaInput?.value.trim() || '',
-      goal: this.goalInput?.value.trim() || '',
+      big_idea: this.currentSermon.big_idea || '',
+      goal: this.currentSermon.goal || '',
       body: bodyMarkdown
     };
 
@@ -561,6 +604,7 @@ const SermonsView = {
       if (res && res.success) {
         this.currentSermon = res.sermon || payload;
         await this.loadSermons();
+        this.updateHeaderSummary(this.currentSermon);
         if (typeof App !== 'undefined' && App.showToast) {
           App.showToast("Prédication enregistrée !");
         }
@@ -687,6 +731,9 @@ const SermonsView = {
           </div><p></p>
         `;
         break;
+      case 'slide':
+        htmlToInsert = `<span class="sermon-slide-badge" contenteditable="false"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> DIAPO</span>&nbsp;`;
+        break;
     }
 
     document.execCommand('insertHTML', false, htmlToInsert);
@@ -701,6 +748,9 @@ const SermonsView = {
   markdownToEditorHtml(md) {
     if (!md) return '';
     let html = md;
+
+    // Repères de diapositives [_]
+    html = html.replace(/\[\s*_\s*\]/g, '<span class="sermon-slide-badge" contenteditable="false"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> DIAPO</span>&nbsp;');
 
     // Callouts [!scripture]
     html = html.replace(/>\s*\[!scripture(?:\|ref=([^|\]]+))?(?:\|version=([^\]]+))?\]\s*\n((?:>.*?\n?)*)/gi, (match, ref, ver, content) => {
@@ -809,6 +859,12 @@ const SermonsView = {
     let temp = document.createElement('div');
     temp.innerHTML = html;
 
+    // Remplacement des badges de diapositive
+    temp.querySelectorAll('.sermon-slide-badge').forEach(b => {
+      let mdNode = document.createTextNode(' [_] ');
+      b.parentNode.replaceChild(mdNode, b);
+    });
+
     // Remplacement des callouts par leur syntaxe Markdown
     temp.querySelectorAll('.sermon-callout-block').forEach(b => {
       const type = b.dataset.type || 'cue';
@@ -889,14 +945,106 @@ const SermonsView = {
   },
 
   async syncPassageResources() {
-    const passageRef = this.refInput?.value.trim() || 'Romains 8:28-39';
     this.renderDrawerContent();
   },
 
   async renderDrawerContent() {
     if (!this.drawerContent) return;
-    const passageRef = this.refInput?.value.trim() || 'Romains 8:28-39';
-    const currentChurch = this.churchInput?.value.trim() || '';
+    const s = this.currentSermon || {};
+    const passageRef = s.passage?.reference || '';
+    const currentChurch = s.church || '';
+    const date = s.date_planned || '';
+    const series = s.series?.title || '';
+    const bigIdea = s.big_idea || '';
+    const goal = s.goal || '';
+
+    if (this.activeDrawerTab === 'metadata') {
+      this.drawerContent.innerHTML = `
+        <div class="sermon-drawer-meta-form">
+          <div class="sermon-drawer-meta-field">
+            <label class="sermon-drawer-meta-label">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              <span>Passage Biblique</span>
+            </label>
+            <div style="display: flex; gap: 4px;">
+              <input type="text" id="drawer-meta-ref" class="sermon-drawer-input" value="${this.escapeHtml(passageRef)}" placeholder="ex: Amos 3 ou Ga 3.1-14">
+              <button class="btn-secondary btn-sm" id="btn-drawer-sync-bible" title="Synchroniser l'exégèse" style="padding: 0 8px;">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="sermon-drawer-meta-field">
+            <label class="sermon-drawer-meta-label">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <span>Église / Assemblée / Lieu</span>
+            </label>
+            <input type="text" id="drawer-meta-church" class="sermon-drawer-input" value="${this.escapeHtml(currentChurch)}" placeholder="ex: AMD ou Église de Lyon">
+          </div>
+
+          <div class="sermon-drawer-meta-field">
+            <label class="sermon-drawer-meta-label">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>Date de prononciation</span>
+            </label>
+            <input type="date" id="drawer-meta-date" class="sermon-drawer-input" value="${this.escapeHtml(date)}">
+          </div>
+
+          <div class="sermon-drawer-meta-field">
+            <label class="sermon-drawer-meta-label">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+              <span>Série de prédications</span>
+            </label>
+            <input type="text" id="drawer-meta-series" class="sermon-drawer-input" value="${this.escapeHtml(series)}" placeholder="ex: Traversée d'Amos">
+          </div>
+
+          <div class="sermon-drawer-meta-field">
+            <label class="sermon-drawer-meta-label">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span>Idée Centrale (Big Idea)</span>
+            </label>
+            <textarea id="drawer-meta-bigidea" class="sermon-drawer-input sermon-drawer-textarea" placeholder="La vérité maîtresse en une phrase...">${this.escapeHtml(bigIdea)}</textarea>
+          </div>
+
+          <div class="sermon-drawer-meta-field">
+            <label class="sermon-drawer-meta-label">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+              <span>Objectif pour l'auditeur</span>
+            </label>
+            <textarea id="drawer-meta-goal" class="sermon-drawer-input sermon-drawer-textarea" placeholder="L'application ou le défi clé...">${this.escapeHtml(goal)}</textarea>
+          </div>
+        </div>
+      `;
+
+      const refIn = document.getElementById('drawer-meta-ref');
+      const churchIn = document.getElementById('drawer-meta-church');
+      const dateIn = document.getElementById('drawer-meta-date');
+      const seriesIn = document.getElementById('drawer-meta-series');
+      const bigIdeaIn = document.getElementById('drawer-meta-bigidea');
+      const goalIn = document.getElementById('drawer-meta-goal');
+
+      const updateSermonMeta = () => {
+        if (!this.currentSermon) return;
+        this.currentSermon.passage = { reference: refIn?.value.trim() || '' };
+        this.currentSermon.church = churchIn?.value.trim() || '';
+        this.currentSermon.date_planned = dateIn?.value || '';
+        this.currentSermon.series = { title: seriesIn?.value.trim() || '' };
+        this.currentSermon.big_idea = bigIdeaIn?.value.trim() || '';
+        this.currentSermon.goal = goalIn?.value.trim() || '';
+        this.updateHeaderSummary(this.currentSermon);
+        this.renderList();
+        this.debouncedPushHistory();
+      };
+
+      [refIn, churchIn, dateIn, seriesIn, bigIdeaIn, goalIn].forEach(el => {
+        el?.addEventListener('input', updateSermonMeta);
+      });
+
+      document.getElementById('btn-drawer-sync-bible')?.addEventListener('click', () => {
+        this.syncPassageResources();
+      });
+      return;
+    }
 
     if (this.activeDrawerTab === 'exegesis') {
       this.drawerContent.innerHTML = `
@@ -1035,12 +1183,20 @@ const SermonsView = {
     let temp = document.createElement('div');
     temp.innerHTML = html;
 
-    // Découpage en cartes de sections selon les H1 et H2
+    // Convertir les repères de diapositive en badges prompteur percutants
+    temp.querySelectorAll('.sermon-slide-badge').forEach(b => {
+      let slideTag = document.createElement('span');
+      slideTag.className = 'pulpit-slide-tag';
+      slideTag.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> <span>DIAPO</span>`;
+      b.replaceWith(slideTag);
+    });
+
+    // Découpage en cartes de sections selon les H1, H2 et H3
     let sections = [];
     let currentCard = { title: "Introduction", nodes: [] };
 
     Array.from(temp.childNodes).forEach(node => {
-      if (node.tagName === 'H1' || node.tagName === 'H2') {
+      if (node.tagName === 'H1' || node.tagName === 'H2' || node.tagName === 'H3') {
         if (currentCard.nodes.length > 0) {
           sections.push(currentCard);
         }
@@ -1101,10 +1257,7 @@ const SermonsView = {
     this.pulpitIsPlaying = false;
     document.getElementById('pulpit-play-icon')?.classList.remove('hidden');
     document.getElementById('pulpit-pause-icon')?.classList.add('hidden');
-    if (this.pulpitChronoTimer) {
-      clearInterval(this.pulpitChronoTimer);
-      this.pulpitChronoTimer = null;
-    }
+    clearInterval(this.pulpitChronoTimer);
   },
 
   resetPulpitChrono() {
@@ -1114,17 +1267,19 @@ const SermonsView = {
   },
 
   updatePulpitChronoDisplay() {
-    const min = Math.floor(this.pulpitChronoSeconds / 60);
-    const sec = this.pulpitChronoSeconds % 60;
-    const str = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
-    const display = document.getElementById('pulpit-chrono-display');
-    if (display) display.textContent = str;
+    const m = Math.floor(this.pulpitChronoSeconds / 60);
+    const s = this.pulpitChronoSeconds % 60;
+    const str = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    const el = document.getElementById('pulpit-chrono-time');
+    if (el) el.textContent = str;
   },
 
-  adjustPulpitFontSize(delta) {
-    this.pulpitFontSize = Math.max(16, Math.min(48, this.pulpitFontSize + delta));
+  changePulpitFontSize(delta) {
+    this.pulpitFontSize = Math.max(16, Math.min(36, this.pulpitFontSize + delta));
     const container = document.getElementById('pulpit-content-container');
-    if (container) container.style.fontSize = `${this.pulpitFontSize}px`;
+    if (container) {
+      container.style.fontSize = `${this.pulpitFontSize}px`;
+    }
   },
 
   toggleFullscreen() {
@@ -1136,19 +1291,19 @@ const SermonsView = {
   },
 
   async requestWakeLock() {
-    if ('wakeLock' in navigator) {
-      try {
-        this.wakeLockSentinel = await navigator.wakeLock.request('screen');
-      } catch (err) {
-        console.warn('Wake Lock non disponible:', err);
+    try {
+      if ('wakeLock' in navigator) {
+        this.pulpitWakeLock = await navigator.wakeLock.request('screen');
       }
+    } catch (e) {
+      console.warn("WakeLock non supporté ou refusé :", e);
     }
   },
 
   releaseWakeLock() {
-    if (this.wakeLockSentinel) {
-      this.wakeLockSentinel.release().catch(() => {});
-      this.wakeLockSentinel = null;
+    if (this.pulpitWakeLock) {
+      this.pulpitWakeLock.release().catch(() => {});
+      this.pulpitWakeLock = null;
     }
   },
 
@@ -1249,7 +1404,8 @@ const SermonsView = {
           { id: "exegesis", label: "Exégèse & Langues", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m8.5 13.5 2-5.5 2 5.5"/><path d="M9.2 11.8h2.6"/><path d="M14 8.5h3.5l-3.5 5h3.5"/></svg>`, desc: "Mots originaux hébreu/grec et lexique", action: "exegesis" },
           { id: "illustration", label: "Illustration", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`, desc: "Histoire, métaphore ou parabole", action: "illustration" },
           { id: "application", label: "Application pratique", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`, desc: "Appel à l'action ou réflexion concrète", action: "application" },
-          { id: "cue", label: "Note régie / Timing", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`, desc: "Indication technique ou projection", action: "cue" }
+          { id: "cue", label: "Note régie / Timing", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`, desc: "Indication technique ou projection", action: "cue" },
+          { id: "slide", label: "Repère diapositive [_]", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`, desc: "Changement de slide projection", action: "slide" }
         ]
       },
       {
@@ -1516,6 +1672,9 @@ const SermonsView = {
         break;
       case 'cue':
         this.insertBlock('cue');
+        break;
+      case 'slide':
+        this.insertBlock('slide');
         break;
       case 'task':
         this.insertTaskItem();

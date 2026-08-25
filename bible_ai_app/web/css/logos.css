@@ -23252,6 +23252,185 @@ body.reading-bg-dark .comm-dropdown-popover {
   overflow: hidden;
 }
 
+/* =========================================================================
+ * REPÈRES DE DIAPOSITIVE [_]
+ * ========================================================================= */
+.sermon-slide-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  user-select: none;
+  vertical-align: middle;
+}
+
+.theme-dark .sermon-slide-badge {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+  border-color: rgba(96, 165, 250, 0.35);
+}
+
+.pulpit-slide-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #2563eb;
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin: 4px 6px;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+  vertical-align: middle;
+}
+
+/* =========================================================================
+ * EN-TÊTE IMMERSIF ÉPURÉ (PROPOSITION 2)
+ * ========================================================================= */
+.sermon-header-main-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+  padding: 0 8px;
+}
+
+.sermon-immersive-title-input {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  padding: 2px 0;
+  font-family: inherit;
+  letter-spacing: -0.2px;
+}
+
+.sermon-immersive-title-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.5;
+  font-weight: 400;
+}
+
+.sermon-header-summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sermon-header-summary:hover {
+  color: var(--text-primary);
+}
+
+.sermon-header-summary .summary-bullet {
+  opacity: 0.4;
+  font-size: 10px;
+}
+
+.sermon-header-summary .summary-item.highlight {
+  color: var(--accent-blue);
+  font-weight: 600;
+}
+
+.sermon-drawer-meta-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 4px 2px;
+}
+
+.sermon-drawer-meta-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.sermon-drawer-meta-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.sermon-drawer-meta-label svg {
+  color: var(--accent-blue);
+}
+
+.sermon-drawer-input {
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 12.5px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  font-family: inherit;
+}
+
+.sermon-drawer-input:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.sermon-drawer-textarea {
+  min-height: 56px;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.sermon-drawer-stats-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.sermon-drawer-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+
+.sermon-drawer-stat-row span:first-child {
+  color: var(--text-muted);
+}
+
+.sermon-drawer-stat-row span:last-child {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
 
 
 

@@ -493,6 +493,10 @@ const API = {
     return await this.call('open_sermons_folder');
   },
 
+  async importSermon(filePath = null) {
+    return await this.call('import_sermon_file', filePath);
+  },
+
   async getIllustrationsList() {
     return await this.call('get_illustrations_list');
   },
