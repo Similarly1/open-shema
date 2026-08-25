@@ -84,7 +84,7 @@ const AIStudyView = {
       icon: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
       title: 'Discussion libre & Réflexion',
       shortTitle: 'Discussion libre',
-      sourcesSummary: 'Bibles, Dictionnaires, Commentaires, Théologie, Notes (selon besoin)',
+      sourcesSummary: 'Discussion directe (sans RAG ni Bible cochée par défaut)',
       desc: 'Échange ouvert, spontané et interactif. Dialogue fluide pour explorer des idées ou débattre sans formalisme académique.',
       placeholder: 'Discutez librement, testez une idée théologique ou posez une question spontanée...'
     }
@@ -745,26 +745,31 @@ const AIStudyView = {
     const chkComms = document.getElementById('ai-opt-src-comms');
     const chkDict = document.getElementById('ai-opt-src-dict');
     const chkNotes = document.getElementById('ai-opt-src-notes');
+    const chkRerank = document.getElementById('ai-opt-reranking');
+    const chkCurator = document.getElementById('ai-opt-curator');
     const ctxSlider = document.getElementById('ai-opt-context-depth');
     const depthSelect = document.getElementById('ai-opt-depth');
 
     if (modeKey === 'free_chat') {
-      // En mode Discussion libre : RAG léger / spontané, pas de scraping de masse
+      // En mode Discussion libre : dialogue direct, sans bible cochée, ni reranking par défaut
+      if (chkBibles) chkBibles.checked = false;
       if (chkComms) chkComms.checked = false;
       if (chkDict) chkDict.checked = false;
       if (chkNotes) chkNotes.checked = false;
-      if (chkBibles) chkBibles.checked = true;
+      if (chkRerank) chkRerank.checked = false;
+      if (chkCurator) chkCurator.checked = false;
       if (ctxSlider) {
         ctxSlider.value = 0;
         this.updateContextDepthSliderUI();
       }
       if (depthSelect) depthSelect.value = 'pastoral';
     } else {
-      // Dans les modes d'étude approfondie : tous les corpus activés
+      // Dans les modes d'étude approfondie : corpus et reranking activés
+      if (chkBibles) chkBibles.checked = true;
       if (chkComms) chkComms.checked = true;
       if (chkDict) chkDict.checked = true;
       if (chkNotes) chkNotes.checked = true;
-      if (chkBibles) chkBibles.checked = true;
+      if (chkRerank) chkRerank.checked = true;
       if (ctxSlider && ctxSlider.value == 0) {
         ctxSlider.value = 1;
         this.updateContextDepthSliderUI();
@@ -1107,7 +1112,15 @@ const AIStudyView = {
   getOptions() {
     const model = document.getElementById('ai-opt-model')?.value || 'gemini-3.7-flash';
     const depth = document.getElementById('ai-opt-depth')?.value || 'academic';
-    const enableReranking = document.getElementById('ai-opt-reranking')?.checked ?? true;
+    const thinkingLevel = document.getElementById('ai-opt-thinking-level')?.value || 'medium';
+    
+    let thinkingBudget = 4096;
+    if (thinkingLevel === 'off') thinkingBudget = 0;
+    else if (thinkingLevel === 'low') thinkingBudget = 1024;
+    else if (thinkingLevel === 'medium') thinkingBudget = 4096;
+    else if (thinkingLevel === 'high') thinkingBudget = 16384;
+
+    const enableReranking = document.getElementById('ai-opt-reranking')?.checked ?? false;
     const enableCurator = document.getElementById('ai-opt-curator')?.checked ?? false;
 
     // Slider de profondeur de contexte (0=Éclair, 1=Rapide, 2=Approfondi, 3=Exhaustif)
@@ -1117,15 +1130,17 @@ const AIStudyView = {
     const maxExcerptChars = depthLevels[Math.min(ctxLevel, depthLevels.length - 1)];
 
     const sources = {
-      bibles: document.getElementById('ai-opt-src-bibles')?.checked ?? true,
-      commentaries: document.getElementById('ai-opt-src-comms')?.checked ?? true,
-      dictionaries: document.getElementById('ai-opt-src-dict')?.checked ?? true,
-      notes: document.getElementById('ai-opt-src-notes')?.checked ?? true
+      bibles: document.getElementById('ai-opt-src-bibles')?.checked ?? false,
+      commentaries: document.getElementById('ai-opt-src-comms')?.checked ?? false,
+      dictionaries: document.getElementById('ai-opt-src-dict')?.checked ?? false,
+      notes: document.getElementById('ai-opt-src-notes')?.checked ?? false
     };
 
     return {
       model,
       depth,
+      thinking_level: thinkingLevel,
+      thinking_budget: thinkingBudget,
       enable_reranking: enableReranking,
       enable_curator: enableCurator,
       max_excerpt_chars: maxExcerptChars,
@@ -1204,26 +1219,33 @@ const AIStudyView = {
     const reasoningId = `reasoning-${Date.now()}`;
     const timerId = `timer-${Date.now()}`;
     const isFreeChat = mode === 'free_chat';
+    const isThinkingDisabled = options.thinking_level === 'off';
+    const thinkingLabel = isThinkingDisabled ? "Réflexion désactivée" : (options.thinking_level === 'low' ? "Raisonnement rapide" : (options.thinking_level === 'high' ? "Raisonnement approfondi" : "Raisonnement équilibré"));
 
-    const stepsHtml = isFreeChat ? `
-      <div class="reasoning-step step-1 active"><span class="step-bullet"></span><span>Cadrage théologique &amp; alignement profil</span></div>
-      <div class="reasoning-step step-2 pending">
-        <span class="step-bullet"></span>
-        <div class="step-text-container">
-          <span class="step-label">Échange et réflexion avec ${this.escapeHtml(options.model)}</span>
+    let stepsHtml = '';
+    if (isFreeChat) {
+      stepsHtml = `
+        <div class="reasoning-step step-1 active"><span class="step-bullet"></span><span>Cadrage théologique &amp; alignement profil</span></div>
+        <div class="reasoning-step step-2 pending">
+          <span class="step-bullet"></span>
+          <div class="step-text-container">
+            <span class="step-label">Échange et réflexion avec ${this.escapeHtml(options.model)}${isThinkingDisabled ? ' (direct)' : ''}</span>
+          </div>
         </div>
-      </div>
-    ` : `
-      <div class="reasoning-step step-1 active"><span class="step-bullet"></span><span>Analyse de l'intention et du contexte</span></div>
-      <div class="reasoning-step step-2 pending"><span class="step-bullet"></span><span>Exploration du corpus documentaire</span></div>
-      <div class="reasoning-step step-3 pending"><span class="step-bullet"></span><span>Sélection et ordonnancement sémantique</span></div>
-      <div class="reasoning-step step-4 pending">
-        <span class="step-bullet"></span>
-        <div class="step-text-container">
-          <span class="step-label">Synthèse IA avec ${this.escapeHtml(options.model)}</span>
+      `;
+    } else {
+      stepsHtml = `
+        <div class="reasoning-step step-1 active"><span class="step-bullet"></span><span>Analyse de l'intention et du contexte</span></div>
+        <div class="reasoning-step step-2 pending"><span class="step-bullet"></span><span>Exploration du corpus documentaire</span></div>
+        <div class="reasoning-step step-3 pending"><span class="step-bullet"></span><span>Sélection et ordonnancement sémantique</span></div>
+        <div class="reasoning-step step-4 pending">
+          <span class="step-bullet"></span>
+          <div class="step-text-container">
+            <span class="step-label">Synthèse IA avec ${this.escapeHtml(options.model)} (${thinkingLabel})</span>
+          </div>
         </div>
-      </div>
-    `;
+      `;
+    }
 
     assistantMsg.innerHTML = `
       <div class="msg-avatar">
@@ -1235,7 +1257,7 @@ const AIStudyView = {
           <div class="ai-reasoning-header">
             <div class="ai-reasoning-title">
               <span class="ai-reasoning-orb"></span>
-              <span>Réflexion en cours</span>
+              <span>${isThinkingDisabled ? 'Génération en cours' : 'Réflexion en cours'}</span>
               <span class="ai-reasoning-timer" id="${timerId}">0.0s</span>
             </div>
             <span class="ai-reasoning-toggle-icon">▾</span>
@@ -1259,38 +1281,40 @@ const AIStudyView = {
       if (timerEl) timerEl.textContent = `${elapsed}s`;
     }, 100);
     this.activeInterval = intervalTimer;
+    this.activeTimeouts = [];
 
     // Animation progressive des étapes textuelles
     const reasoningEl = document.getElementById(reasoningId);
     if (isFreeChat) {
-      const stepTimeout1 = setTimeout(() => {
+      const t1 = setTimeout(() => {
         reasoningEl?.querySelector('.step-1')?.classList.replace('active', 'done');
         reasoningEl?.querySelector('.step-2')?.classList.replace('pending', 'active');
       }, 350);
-      this.activeTimeouts = [stepTimeout1];
+      this.activeTimeouts.push(t1);
     } else {
-      const stepTimeout1 = setTimeout(() => {
+      const t1 = setTimeout(() => {
         reasoningEl?.querySelector('.step-1')?.classList.replace('active', 'done');
         reasoningEl?.querySelector('.step-2')?.classList.replace('pending', 'active');
       }, 500);
-      const stepTimeout2 = setTimeout(() => {
+      const t2 = setTimeout(() => {
         reasoningEl?.querySelector('.step-2')?.classList.replace('active', 'done');
         reasoningEl?.querySelector('.step-3')?.classList.replace('pending', 'active');
       }, 1200);
-      const stepTimeout3 = setTimeout(() => {
+      const t3 = setTimeout(() => {
         reasoningEl?.querySelector('.step-3')?.classList.replace('active', 'done');
         reasoningEl?.querySelector('.step-4')?.classList.replace('pending', 'active');
       }, 2000);
-      this.activeTimeouts = [stepTimeout1, stepTimeout2, stepTimeout3];
+      this.activeTimeouts.push(t1, t2, t3);
     }
 
     try {
       const response = await API.call('ask_study_ai', this.currentMessages, mode, passage, options);
       clearInterval(intervalTimer);
       if (this.activeRotatingTimer) clearInterval(this.activeRotatingTimer);
-      clearTimeout(stepTimeout1);
-      clearTimeout(stepTimeout2);
-      clearTimeout(stepTimeout3);
+      if (this.activeTimeouts) {
+        this.activeTimeouts.forEach(t => clearTimeout(t));
+        this.activeTimeouts = [];
+      }
       this.resetInputState();
 
       if (this.activeGenerationCancelled) return;
@@ -1407,6 +1431,11 @@ const AIStudyView = {
 
     } catch (e) {
       clearInterval(intervalTimer);
+      if (this.activeRotatingTimer) clearInterval(this.activeRotatingTimer);
+      if (this.activeTimeouts) {
+        this.activeTimeouts.forEach(t => clearTimeout(t));
+        this.activeTimeouts = [];
+      }
       this.resetInputState();
       if (this.activeGenerationCancelled) return;
 

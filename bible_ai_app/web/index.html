@@ -2918,6 +2918,20 @@
                   </select>
                 </div>
 
+                <!-- 1.5 Raisonnement / Réflexion IA (3 paliers + désactiver) -->
+                <div>
+                  <label style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a6 6 0 0 0-6 6c0 2.2 1.2 4.1 3 5.1V16a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-2.9c1.8-1 3-2.9 3-5.1a6 6 0 0 0-6-6Z"/><path d="M9 21h6"/></svg>
+                    <span>Raisonnement / Réflexion IA</span>
+                  </label>
+                  <select id="ai-opt-thinking-level" class="select-field full-w" style="font-size: 13px; height: 36px; padding: 0 10px; border-radius: 6px;">
+                    <option value="off">Désactivé (Réponse immédiate)</option>
+                    <option value="low">Faible / Rapide (1 024 tokens)</option>
+                    <option value="medium" selected>Moyen / Équilibré (4 096 tokens)</option>
+                    <option value="high">Élevé / Approfondi (16 384 tokens)</option>
+                  </select>
+                </div>
+
                 <!-- 2. Profondeur et Style -->
                 <div>
                   <label style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">

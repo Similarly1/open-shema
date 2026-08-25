@@ -606,8 +606,7 @@ class TheologyReaderManager:
         """
         Génère une synthèse théologique approfondie du chapitre avec l'IA.
         """
-        from ai.llm_client import LLMClient
-        from ai.gemini_client import GeminiClient
+        from ai.llm_client import LLMClient, GeminiClient
         from core.config import load_config
         
         cfg = config or load_config()

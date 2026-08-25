@@ -1927,8 +1927,20 @@ class BibleAppApi:
             f"{drafting_rules}"
         )
 
+        thinking_budget = opts.get("thinking_budget")
+        if thinking_budget is None:
+            thinking_level = opts.get("thinking_level", "medium")
+            if thinking_level == "off":
+                thinking_budget = 0
+            elif thinking_level == "low":
+                thinking_budget = 1024
+            elif thinking_level == "high":
+                thinking_budget = 16384
+            else:
+                thinking_budget = 4096
+
         try:
-            from ai.llm_client import LLMClient
+            from ai.llm_client import LLMClient, GeminiClient
             # Résoudre le bon provider selon le modèle
             if "mistral" in selected_model.lower():
                 provider = "mistral"
@@ -1958,12 +1970,10 @@ class BibleAppApi:
             if api_key:
                 client = LLMClient(api_key=api_key, model=selected_model, provider=provider, product_id=product_id)
                 full_system_prompt = prompt
-                answer = client.chat(chat_context, system_prompt=full_system_prompt)
+                answer = client.chat(chat_context, system_prompt=full_system_prompt, thinking_budget=thinking_budget)
             else:
-                from ai.gemini_client import GeminiClient
-                g_client = GeminiClient()
-                # GeminiClient.chat support
-                answer = g_client.chat(chat_context, system_prompt=prompt)
+                g_client = GeminiClient(api_key="", model=selected_model)
+                answer = g_client.chat(chat_context, system_prompt=prompt, thinking_budget=thinking_budget)
 
             return {
                 "answer": answer,
