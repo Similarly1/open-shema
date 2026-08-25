@@ -21885,7 +21885,7 @@ body.reading-bg-dark .comm-dropdown-popover {
   to { transform: rotate(360deg); }
 }
 
-/* Barre d'onglets de sources du Lexique avec flèches de défilement */
+/* Barre d'onglets de sources du Lexique - Identique à la barre supérieure */
 .lexicon-header-toolbar {
   flex-shrink: 0;
   height: 44px;
@@ -21894,11 +21894,36 @@ body.reading-bg-dark .comm-dropdown-popover {
   position: relative;
   background: var(--bg-surface, #0f172a);
   border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-  padding: 6px 4px;
+  padding: 6px 0;
   overflow: hidden;
   display: flex;
   align-items: center;
   box-sizing: border-box;
+  z-index: 5;
+}
+
+/* Dégradé progressif d'effacement sur les bords */
+.lexicon-header-toolbar.has-overflow-right::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 55px;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, #090d16 80%);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.lexicon-header-toolbar.has-overflow-left::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 55px;
+  height: 100%;
+  background: linear-gradient(90deg, #090d16 20%, transparent 100%);
+  pointer-events: none;
   z-index: 5;
 }
 
@@ -21909,9 +21934,10 @@ body.reading-bg-dark .comm-dropdown-popover {
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  padding: 2px 28px;
+  padding: 2px 14px;
   scroll-behavior: smooth;
   height: 100%;
+  width: 100%;
 }
 
 .lexicon-source-tabs::-webkit-scrollbar {
@@ -21951,14 +21977,14 @@ body.reading-bg-dark .comm-dropdown-popover {
   height: 24px;
   border-radius: 50%;
   background: #1e293b;
-  border: 1px solid rgba(168, 85, 247, 0.6);
+  border: 1px solid rgba(168, 85, 247, 0.5);
   color: #f1f5f9;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   z-index: 10;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
   transition: all 0.2s ease;
 }
 
@@ -21977,11 +22003,10 @@ body.reading-bg-dark .comm-dropdown-popover {
   right: 4px;
 }
 
-.lex-tabs-scroll-btn.is-disabled {
-  opacity: 0.25;
-  pointer-events: none;
-  cursor: default;
+.lex-tabs-scroll-btn.hidden {
+  display: none !important;
 }
+
 
 
 

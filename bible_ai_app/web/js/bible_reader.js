@@ -2878,22 +2878,32 @@ const LexiconViewer = {
     toolbar.appendChild(btnScrollRight);
     container.appendChild(toolbar);
 
-    const totalPills = this.currentMatches.length + (bpStudy ? 1 : 0) + 1;
-    if (totalPills < 2) {
-      btnScrollLeft.style.display = 'none';
-      btnScrollRight.style.display = 'none';
-    } else {
-      btnScrollLeft.style.display = 'flex';
-      btnScrollRight.style.display = 'flex';
-    }
-
     const updateScrollArrows = () => {
-      if (!tabsContainer) return;
+      if (!tabsContainer || !toolbar) return;
       const scrollLeft = tabsContainer.scrollLeft;
       const maxScroll = tabsContainer.scrollWidth - tabsContainer.clientWidth;
-      
-      btnScrollLeft.classList.toggle('is-disabled', scrollLeft <= 2);
-      btnScrollRight.classList.toggle('is-disabled', maxScroll <= 2 || scrollLeft >= maxScroll - 2);
+
+      if (maxScroll > 4) {
+        if (scrollLeft > 6) {
+          btnScrollLeft.classList.remove('hidden');
+          toolbar.classList.add('has-overflow-left');
+        } else {
+          btnScrollLeft.classList.add('hidden');
+          toolbar.classList.remove('has-overflow-left');
+        }
+
+        if (scrollLeft < maxScroll - 6) {
+          btnScrollRight.classList.remove('hidden');
+          toolbar.classList.add('has-overflow-right');
+        } else {
+          btnScrollRight.classList.add('hidden');
+          toolbar.classList.remove('has-overflow-right');
+        }
+      } else {
+        btnScrollLeft.classList.add('hidden');
+        btnScrollRight.classList.add('hidden');
+        toolbar.classList.remove('has-overflow-left', 'has-overflow-right');
+      }
     };
 
     tabsContainer.addEventListener('scroll', updateScrollArrows, { passive: true });
@@ -2924,9 +2934,10 @@ const LexiconViewer = {
       activePill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     }
 
-    setTimeout(updateScrollArrows, 50);
-    setTimeout(updateScrollArrows, 200);
-    setTimeout(updateScrollArrows, 500);
+    setTimeout(updateScrollArrows, 100);
+    setTimeout(updateScrollArrows, 350);
+    setTimeout(updateScrollArrows, 800);
+
 
 
     // Contenu principal
