@@ -29,11 +29,11 @@ timing:
   words_per_minute: 135
 delivery_history:
 - church: Église Évangélique de Lyon
-  date: 2026-08-30
+  date: '2026-08-30'
   occasion: Culte dominical
   actual_duration_min: null
   notes: ''
 created_at: '2026-08-25T20:51:02.597954'
-updated_at: '2026-08-25T20:51:05.710321'
+updated_at: '2026-08-25T21:06:17.250546'
 ---
 

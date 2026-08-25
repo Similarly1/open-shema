@@ -134,13 +134,20 @@ const SermonsView = {
       el?.addEventListener('input', () => this.debouncedPushHistory());
     });
 
-    this.contentEditor?.addEventListener('input', () => {
+    this.contentEditor?.addEventListener('input', (e) => {
       this.updateMetrics();
       this.debouncedPushHistory();
+      this.handleSlashInput(e);
     });
 
-    // 8. Raccourcis clavier (Ctrl+S, Ctrl+Z, Ctrl+Y, Ctrl+B, Ctrl+I)
+    // 8. Raccourcis clavier (Ctrl+S, Ctrl+Z, Ctrl+Y, Ctrl+B, Ctrl+I, Slash Navigation)
     this.contentEditor?.addEventListener('keydown', (e) => {
+      if (this.isSlashMenuOpen) {
+        if (this.handleSlashKeyDown(e)) {
+          return;
+        }
+      }
+
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
         e.preventDefault();
         this.saveCurrentSermon();
@@ -372,12 +379,30 @@ const SermonsView = {
 
     menu.querySelector('[data-action="delete"]')?.addEventListener('click', async () => {
       this.hideContextMenu();
-      if (confirm(`Supprimer définitivement "${currentTitle || 'ce sermon'}" ?`)) {
+      const targetTitle = currentTitle || 'cette prédication';
+      let confirmed = false;
+      if (typeof App !== 'undefined' && App.showConfirmModal) {
+        confirmed = await App.showConfirmModal({
+          title: "Supprimer la prédication",
+          message: `Voulez-vous supprimer définitivement la prédication "${targetTitle}" ?`,
+          confirmText: "Supprimer",
+          cancelText: "Annuler",
+          danger: true,
+          icon: "trash"
+        });
+      } else {
+        confirmed = confirm(`Voulez-vous supprimer définitivement la prédication "${targetTitle}" ?`);
+      }
+
+      if (confirmed) {
         await API.deleteSermon(sermonId);
         if (this.currentSermon?.id === sermonId) {
           this.currentSermon = null;
         }
         await this.loadSermons();
+        if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast("Prédication supprimée.");
+        }
       }
     });
 
@@ -499,7 +524,22 @@ const SermonsView = {
 
   async deleteCurrentSermon() {
     if (!this.currentSermon) return;
-    if (!confirm(`Supprimer définitivement la prédication "${this.currentSermon.title}" ?`)) return;
+    const targetTitle = this.currentSermon.title || 'cette prédication';
+    let confirmed = false;
+    if (typeof App !== 'undefined' && App.showConfirmModal) {
+      confirmed = await App.showConfirmModal({
+        title: "Supprimer la prédication",
+        message: `Voulez-vous supprimer définitivement la prédication "${targetTitle}" ?`,
+        confirmText: "Supprimer",
+        cancelText: "Annuler",
+        danger: true,
+        icon: "trash"
+      });
+    } else {
+      confirmed = confirm(`Voulez-vous supprimer définitivement la prédication "${targetTitle}" ?`);
+    }
+
+    if (!confirmed) return;
 
     try {
       const res = await API.deleteSermon(this.currentSermon.id);
@@ -1129,6 +1169,429 @@ const SermonsView = {
     if (this.goalInput) this.goalInput.value = state.goal;
     if (this.contentEditor) this.contentEditor.innerHTML = state.content;
     this.updateMetrics();
+  },
+
+  // =========================================================================
+  // GESTION DU MENU SLASH MODAL (STYLE ANYTYPE)
+  // =========================================================================
+
+  isSlashMenuOpen: false,
+  slashMenuEl: null,
+  slashSelectedIndex: 0,
+  slashCurrentItems: [],
+  slashAnchorRange: null,
+
+  getSlashCommandsDefinitions() {
+    return [
+      {
+        category: "Texte",
+        items: [
+          { id: "text", label: "Texte normal", iconText: "Aa", desc: "Paragraphe standard", action: "text" },
+          { id: "h1", label: "Titre", iconText: "Aa", desc: "Point principal (H1)", action: "h1" },
+          { id: "h2", label: "En-tête", iconText: "Aa", desc: "Sous-point (H2)", action: "h2" },
+          { id: "h3", label: "Sous-titre", iconText: "Aa", desc: "Sous-section mineure (H3)", action: "h3" },
+          { id: "highlight", label: "Surbrillance", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 11-6 6v3h3l6-6"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>`, desc: "Mettre en évidence le texte", action: "highlight" },
+          { id: "box", label: "Encadré", iconText: "Aa", desc: "Bloc encadré général", action: "box" }
+        ]
+      },
+      {
+        category: "Prédication",
+        items: [
+          { id: "scripture", label: "Verset biblique", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`, desc: "Citation de l'Écriture", action: "scripture" },
+          { id: "exegesis", label: "Exégèse & Langues", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m8.5 13.5 2-5.5 2 5.5"/><path d="M9.2 11.8h2.6"/><path d="M14 8.5h3.5l-3.5 5h3.5"/></svg>`, desc: "Mots originaux hébreu/grec et lexique", action: "exegesis" },
+          { id: "illustration", label: "Illustration", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`, desc: "Histoire, métaphore ou parabole", action: "illustration" },
+          { id: "application", label: "Application pratique", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`, desc: "Appel à l'action ou réflexion concrète", action: "application" },
+          { id: "cue", label: "Note régie / Timing", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`, desc: "Indication technique ou projection", action: "cue" }
+        ]
+      },
+      {
+        category: "Listes",
+        items: [
+          { id: "task", label: "Case à cocher", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/><circle cx="12" cy="12" r="10"/></svg>`, desc: "Tâche ou point à vérifier", action: "task" },
+          { id: "bullet", label: "Liste à puces", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>`, desc: "Liste non ordonnée", action: "bullet" },
+          { id: "number", label: "Liste numérotée", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><text x="6" y="16" font-size="12" font-weight="bold" fill="currentColor">1.</text></svg>`, desc: "Liste ordonnée 1, 2, 3...", action: "number" },
+          { id: "toggle", label: "Bloc dépliant", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>`, desc: "Contenu masquable / dépliable", action: "toggle" }
+        ]
+      },
+      {
+        category: "Autres",
+        items: [
+          { id: "divider", label: "Ligne de séparation", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/></svg>`, desc: "Séparateur visuel", action: "divider" },
+          { id: "table", label: "Tableau 3x3", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>`, desc: "Insérer une grille de comparaison", action: "table" },
+          { id: "quote", label: "Citation", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2H4c-1.25 0-2 .75-2 2v6c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/></svg>`, desc: "Citation en retrait", action: "quote" }
+        ]
+      }
+    ];
+  },
+
+  handleSlashInput(e) {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) {
+      this.closeSlashMenu();
+      return;
+    }
+
+    const range = sel.getRangeAt(0);
+    const node = range.startContainer;
+    if (node.nodeType !== Node.TEXT_NODE) {
+      this.closeSlashMenu();
+      return;
+    }
+
+    const textBefore = node.textContent.slice(0, range.startOffset);
+    const lastSlashIndex = textBefore.lastIndexOf('/');
+
+    if (lastSlashIndex !== -1) {
+      const isStartOrSpace = lastSlashIndex === 0 || /\s/.test(textBefore[lastSlashIndex - 1]);
+      if (isStartOrSpace) {
+        const query = textBefore.slice(lastSlashIndex + 1);
+        const rect = range.getBoundingClientRect();
+        this.openSlashMenu(query, rect);
+        return;
+      }
+    }
+
+    this.closeSlashMenu();
+  },
+
+  handleSlashKeyDown(e) {
+    if (!this.isSlashMenuOpen) return false;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (this.slashCurrentItems.length > 0) {
+        this.slashSelectedIndex = (this.slashSelectedIndex + 1) % this.slashCurrentItems.length;
+        this.updateSlashSelection();
+      }
+      return true;
+    }
+
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (this.slashCurrentItems.length > 0) {
+        this.slashSelectedIndex = (this.slashSelectedIndex - 1 + this.slashCurrentItems.length) % this.slashCurrentItems.length;
+        this.updateSlashSelection();
+      }
+      return true;
+    }
+
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      e.preventDefault();
+      if (this.slashCurrentItems.length > 0 && this.slashCurrentItems[this.slashSelectedIndex]) {
+        this.executeSlashCommand(this.slashCurrentItems[this.slashSelectedIndex].action);
+      }
+      return true;
+    }
+
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      this.closeSlashMenu();
+      return true;
+    }
+
+    return false;
+  },
+
+  openSlashMenu(query = "", rect = null) {
+    if (!this.slashMenuEl) {
+      this.slashMenuEl = document.createElement('div');
+      this.slashMenuEl.id = 'sermon-slash-menu';
+      this.slashMenuEl.className = 'sermon-slash-menu';
+      document.body.appendChild(this.slashMenuEl);
+
+      document.addEventListener('click', (e) => {
+        if (this.isSlashMenuOpen && this.slashMenuEl && !this.slashMenuEl.contains(e.target) && e.target !== this.contentEditor) {
+          this.closeSlashMenu();
+        }
+      });
+    }
+
+    const categories = this.getSlashCommandsDefinitions();
+    const cleanQ = query.toLowerCase().trim();
+
+    let flatItems = [];
+    let html = '<div class="sermon-slash-list">';
+
+    categories.forEach(cat => {
+      const filtered = cat.items.filter(item => {
+        if (!cleanQ) return true;
+        return item.label.toLowerCase().includes(cleanQ) || item.desc.toLowerCase().includes(cleanQ) || item.id.toLowerCase().includes(cleanQ);
+      });
+
+      if (filtered.length > 0) {
+        html += `<div class="sermon-slash-group-title">${cat.category}</div>`;
+        filtered.forEach(item => {
+          const itemIndex = flatItems.length;
+          flatItems.push(item);
+          
+          let iconHtml = '';
+          if (item.iconSvg) {
+            iconHtml = item.iconSvg;
+          } else {
+            iconHtml = `<span style="font-family: serif; font-size: 13px;">${item.iconText || 'Aa'}</span>`;
+          }
+
+          html += `
+            <div class="sermon-slash-item" data-index="${itemIndex}" data-action="${item.action}">
+              <div class="sermon-slash-item-icon">${iconHtml}</div>
+              <div class="sermon-slash-item-text">
+                <span class="sermon-slash-item-label">${item.label}</span>
+                <span class="sermon-slash-item-desc">${item.desc}</span>
+              </div>
+            </div>
+          `;
+        });
+      }
+    });
+
+    html += '</div>';
+
+    if (flatItems.length === 0) {
+      html = '<div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 12px;">Aucun bloc trouvé.</div>';
+    }
+
+    this.slashCurrentItems = flatItems;
+    this.slashSelectedIndex = 0;
+    this.slashMenuEl.innerHTML = html;
+    this.slashMenuEl.style.display = 'flex';
+    this.isSlashMenuOpen = true;
+
+    // Clic sur un item
+    this.slashMenuEl.querySelectorAll('.sermon-slash-item').forEach(el => {
+      el.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        const action = el.dataset.action;
+        this.executeSlashCommand(action);
+      });
+    });
+
+    this.updateSlashSelection();
+
+    // Positionnement
+    if (rect) {
+      const menuWidth = 280;
+      const menuHeight = Math.min(380, this.slashMenuEl.offsetHeight || 300);
+      let posX = Math.min(rect.left, window.innerWidth - menuWidth - 20);
+      let posY = rect.bottom + 6;
+
+      if (posY + menuHeight > window.innerHeight - 10) {
+        posY = Math.max(10, rect.top - menuHeight - 6);
+      }
+
+      this.slashMenuEl.style.left = `${posX}px`;
+      this.slashMenuEl.style.top = `${posY}px`;
+    }
+  },
+
+  updateSlashSelection() {
+    if (!this.slashMenuEl) return;
+    const items = this.slashMenuEl.querySelectorAll('.sermon-slash-item');
+    items.forEach((item, idx) => {
+      if (idx === this.slashSelectedIndex) {
+        item.classList.add('selected');
+        item.scrollIntoView({ block: 'nearest' });
+      } else {
+        item.classList.remove('selected');
+      }
+    });
+  },
+
+  closeSlashMenu() {
+    if (this.slashMenuEl) {
+      this.slashMenuEl.style.display = 'none';
+    }
+    this.isSlashMenuOpen = false;
+    this.slashCurrentItems = [];
+    this.slashSelectedIndex = 0;
+  },
+
+  removeSlashTrigger() {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    const node = range.startContainer;
+    if (node.nodeType === Node.TEXT_NODE) {
+      const text = node.textContent;
+      const lastSlashIndex = text.lastIndexOf('/', range.startOffset);
+      if (lastSlashIndex !== -1) {
+        const beforeSlash = text.slice(0, lastSlashIndex);
+        const afterCaret = text.slice(range.startOffset);
+        node.textContent = beforeSlash + afterCaret;
+        
+        // Repositionner le curseur
+        const newRange = document.createRange();
+        newRange.setStart(node, beforeSlash.length);
+        newRange.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(newRange);
+      }
+    }
+  },
+
+  executeSlashCommand(action) {
+    this.removeSlashTrigger();
+    this.closeSlashMenu();
+
+    if (!this.contentEditor) return;
+    this.contentEditor.focus();
+
+    switch (action) {
+      case 'text':
+        document.execCommand('formatBlock', false, '<p>');
+        break;
+      case 'h1':
+        this.applyBlockFormat('h1');
+        break;
+      case 'h2':
+        this.applyBlockFormat('h2');
+        break;
+      case 'h3':
+        this.applyBlockFormat('h3');
+        break;
+      case 'highlight':
+        this.surroundSelectionWithTag('mark');
+        break;
+      case 'box':
+        this.insertCallout('Remarque');
+        break;
+      case 'scripture':
+        this.insertBlock('scripture');
+        break;
+      case 'exegesis':
+        this.insertBlock('exegesis');
+        break;
+      case 'illustration':
+        this.insertBlock('illustration');
+        break;
+      case 'application':
+        this.insertBlock('application');
+        break;
+      case 'cue':
+        this.insertBlock('cue');
+        break;
+      case 'task':
+        this.insertTaskItem();
+        break;
+      case 'bullet':
+        document.execCommand('insertUnorderedList');
+        break;
+      case 'number':
+        document.execCommand('insertOrderedList');
+        break;
+      case 'toggle':
+        this.insertToggleBlock();
+        break;
+      case 'divider':
+        document.execCommand('insertHorizontalRule');
+        break;
+      case 'table':
+        this.insertTable3x3();
+        break;
+      case 'quote':
+        document.execCommand('formatBlock', false, 'blockquote');
+        break;
+      default:
+        break;
+    }
+
+    this.updateMetrics();
+    this.debouncedPushHistory();
+  },
+
+  applyBlockFormat(tag) {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    let parent = range.commonAncestorContainer;
+    if (parent.nodeType === Node.TEXT_NODE) parent = parent.parentNode;
+
+    if (parent.closest(tag)) {
+      document.execCommand('formatBlock', false, '<p>');
+    } else {
+      document.execCommand('formatBlock', false, `<${tag}>`);
+    }
+  },
+
+  surroundSelectionWithTag(tag) {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    const selectedText = range.toString();
+
+    if (selectedText) {
+      const el = document.createElement(tag);
+      el.textContent = selectedText;
+      range.deleteContents();
+      range.insertNode(el);
+    } else {
+      const el = document.createElement(tag);
+      el.innerHTML = '&nbsp;';
+      range.insertNode(el);
+      range.selectNodeContents(el);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  },
+
+  insertCallout(title = 'Remarque') {
+    const html = `
+      <div class="note-callout">
+        <div class="note-callout-title">${this.escapeHtml(title)}</div>
+        <div>Votre note ou commentaire ici...</div>
+      </div>
+      <p><br></p>
+    `;
+    document.execCommand('insertHTML', false, html);
+  },
+
+  insertTaskItem() {
+    const html = `
+      <div class="note-task-item" style="display: flex; align-items: center; gap: 8px; margin: 4px 0;">
+        <input type="checkbox" style="cursor: pointer;">
+        <span>Point ou tâche à cocher</span>
+      </div>
+      <p><br></p>
+    `;
+    document.execCommand('insertHTML', false, html);
+  },
+
+  insertToggleBlock() {
+    const html = `
+      <details class="note-details" style="margin: 8px 0; padding: 6px 10px; background: rgba(0,0,0,0.03); border-radius: 6px; cursor: pointer;">
+        <summary style="font-weight: 600;">Titre dépliant</summary>
+        <div style="padding-top: 6px;">Contenu masquable du bloc...</div>
+      </details>
+      <p><br></p>
+    `;
+    document.execCommand('insertHTML', false, html);
+  },
+
+  insertTable3x3() {
+    const html = `
+      <table class="note-table" style="width: 100%; border-collapse: collapse; margin: 12px 0;">
+        <thead>
+          <tr>
+            <th style="border: 1px solid var(--border-color); padding: 6px 10px;">Colonne 1</th>
+            <th style="border: 1px solid var(--border-color); padding: 6px 10px;">Colonne 2</th>
+            <th style="border: 1px solid var(--border-color); padding: 6px 10px;">Colonne 3</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="border: 1px solid var(--border-color); padding: 6px 10px;">Donnée 1</td>
+            <td style="border: 1px solid var(--border-color); padding: 6px 10px;">Donnée 2</td>
+            <td style="border: 1px solid var(--border-color); padding: 6px 10px;">Donnée 3</td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid var(--border-color); padding: 6px 10px;">Donnée A</td>
+            <td style="border: 1px solid var(--border-color); padding: 6px 10px;">Donnée B</td>
+            <td style="border: 1px solid var(--border-color); padding: 6px 10px;">Donnée C</td>
+          </tr>
+        </tbody>
+      </table>
+      <p><br></p>
+    `;
+    document.execCommand('insertHTML', false, html);
   },
 
   escapeHtml(str) {

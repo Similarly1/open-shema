@@ -23135,6 +23135,123 @@ body.reading-bg-dark .comm-dropdown-popover {
   gap: 8px;
 }
 
+/* =========================================================================
+ * MENU SLASH (ANYTYPE STYLE) POUR LE STUDIO DE PRÉDICATION
+ * ========================================================================= */
+.sermon-slash-menu {
+  position: fixed;
+  z-index: 100000;
+  width: 280px;
+  max-height: 380px;
+  background-color: var(--bg-card, #1c1c1f);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  border-radius: 10px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: 'Inter', -apple-system, sans-serif;
+  animation: slashMenuFadeIn 0.12s ease-out;
+}
+
+@keyframes slashMenuFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.sermon-slash-header {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+.sermon-slash-search-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 12.5px;
+  outline: none;
+}
+
+.sermon-slash-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sermon-slash-group-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  padding: 8px 8px 4px;
+}
+
+.sermon-slash-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+  user-select: none;
+}
+
+.sermon-slash-item:hover,
+.sermon-slash-item.selected {
+  background-color: var(--bg-hover, rgba(255, 255, 255, 0.08));
+}
+
+.sermon-slash-item-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  flex-shrink: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.sermon-slash-item-icon svg {
+  width: 15px;
+  height: 15px;
+}
+
+.sermon-slash-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow: hidden;
+}
+
+.sermon-slash-item-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.sermon-slash-item-desc {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
 
 
 
