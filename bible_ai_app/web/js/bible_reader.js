@@ -4535,7 +4535,20 @@ const BibleReader = {
     } catch (e) {
       console.error('Erreur sync PassageOverviewDrawer:', e);
     }
+
+    // Synchronisation automatique de BibleProject (Médias & Posters)
+    try {
+      if (typeof BibleProjectView !== 'undefined') {
+        const mediaTab = document.querySelector('.drawer-tab[data-drawer-tab="media"]');
+        if (mediaTab && mediaTab.classList.contains('active')) {
+          BibleProjectView.load(book, ch, force);
+        }
+      }
+    } catch (e) {
+      console.error('Erreur sync BibleProjectView:', e);
+    }
   },
+
 
   async lookupWordInLexicon(word, strongCode = null) {
     LexiconViewer.load(word, strongCode);

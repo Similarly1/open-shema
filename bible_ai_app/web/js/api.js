@@ -223,6 +223,11 @@ const API = {
     return await this.call('get_passage_overview_bundle', bookCode, parseInt(chapter), parseInt(verse), bibleName);
   },
 
+  async getBibleProjectMedia(bookCode, chapter = 1) {
+    return await this.call('get_bibleproject_media', bookCode, parseInt(chapter));
+  },
+
+
   async getSynopticHarmony(pericopeId, bibleName = "LSG", pivotBook = null) {
     return await this.call('get_synoptic_harmony', pericopeId, bibleName, pivotBook);
   },

@@ -28,7 +28,9 @@ const PassageOverviewDrawer = {
     book: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>`,
     note: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>`,
     map: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`,
+    video: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>`,
     lexicon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>`,
+
     sparkle: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>`,
     study: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
     chevronDown: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`,
@@ -391,50 +393,43 @@ const PassageOverviewDrawer = {
     const theoCount = (data.theology_books || []).length;
     const notesCount = ((data.user_notes || []).length) + ((data.user_highlights || []).length);
     const mapsCount = (data.maps || []).length;
-
+    const bpCount = ((data.bibleproject?.current_videos || []).length) + ((data.bibleproject?.current_posters || []).length);
     let activeHtml = '';
     let emptyHtml = '';
     let emptyCount = 0;
 
-    // A. Section Commentaires Exégétiques
-    if (commCount > 0) {
-      activeHtml += this.renderCommentariesSection(data);
-    } else {
-      emptyHtml += this.renderCommentariesSection(data);
-      emptyCount++;
-    }
+    const appendSafe = (renderFn, count) => {
+      try {
+        const html = renderFn.call(this, data);
+        if (count > 0) {
+          activeHtml += html;
+        } else {
+          emptyHtml += html;
+          emptyCount++;
+        }
+      } catch (err) {
+        console.warn('[PassageOverviewDrawer] Erreur rendu section:', err);
+      }
+    };
 
-    // B. Section Articles & Revues Théologiques
-    if (artCount > 0) {
-      activeHtml += this.renderArticlesSection(data);
-    } else {
-      emptyHtml += this.renderArticlesSection(data);
-      emptyCount++;
-    }
+    // A. Section BibleProject (Vidéos & Posters)
+    appendSafe(this.renderBibleProjectSection, bpCount);
 
-    // C. Section Livres de Théologie & Bibliothèque
-    if (theoCount > 0) {
-      activeHtml += this.renderTheologySection(data);
-    } else {
-      emptyHtml += this.renderTheologySection(data);
-      emptyCount++;
-    }
+    // B. Section Commentaires Exégétiques
+    appendSafe(this.renderCommentariesSection, commCount);
 
-    // D. Section Vos Notes & Surlignages Personnels
-    if (notesCount > 0) {
-      activeHtml += this.renderNotesSection(data);
-    } else {
-      emptyHtml += this.renderNotesSection(data);
-      emptyCount++;
-    }
+    // C. Section Articles & Revues Théologiques
+    appendSafe(this.renderArticlesSection, artCount);
 
-    // E. Section Géographie & Lieux Bibliques
-    if (mapsCount > 0) {
-      activeHtml += this.renderMapsSection(data);
-    } else {
-      emptyHtml += this.renderMapsSection(data);
-      emptyCount++;
-    }
+    // D. Section Livres de Théologie & Bibliothèque
+    appendSafe(this.renderTheologySection, theoCount);
+
+    // E. Section Vos Notes & Surlignages Personnels
+    appendSafe(this.renderNotesSection, notesCount);
+
+    // F. Section Géographie & Lieux Bibliques
+    appendSafe(this.renderMapsSection, mapsCount);
+
 
     // Assemblage avec tiroir discret pour les sections vides
     let finalHtml = activeHtml;
@@ -475,8 +470,14 @@ const PassageOverviewDrawer = {
     const theoCount = stats.theology_count || 0;
     const notesCount = (stats.notes_count || 0) + (stats.highlights_count || 0);
     const mapsCount = stats.maps_count || 0;
+    const bpCount = (stats.bibleproject_videos_count || 0) + (stats.bibleproject_posters_count || 0);
 
     chipsBar.innerHTML = `
+      <button class="overview-chip ${bpCount > 0 ? 'has-items' : 'is-empty'}" data-scroll-sec="sec-bibleproject" title="${bpCount} panorama(s) vidéo et poster(s) BibleProject">
+        <span class="chip-svg">${this.icons.video}</span>
+        <span class="chip-count">${bpCount}</span>
+      </button>
+
       <button class="overview-chip ${commCount > 0 ? 'has-items' : 'is-empty'}" data-scroll-sec="sec-commentaries" title="${commCount} commentaire(s) exégétique(s)">
         <span class="chip-svg">${this.icons.commentary}</span>
         <span class="chip-count">${commCount}</span>
@@ -523,6 +524,114 @@ const PassageOverviewDrawer = {
       });
     });
   },
+
+  /**
+   * Section BibleProject (Vidéos, Panoramas & Posters HD)
+   */
+  renderBibleProjectSection(data) {
+    const bp = data.bibleproject || {};
+    const videos = bp.current_videos || bp.all_videos || [];
+    const posters = bp.current_posters || bp.all_posters || [];
+    const isCollapsed = this.collapsedSections['sec-bibleproject'] || false;
+    const totalMedia = videos.length + posters.length;
+
+    let bodyHtml = '';
+    if (totalMedia === 0) {
+      bodyHtml = `
+        <div class="overview-empty-hint">
+          <span>Aucun panorama vidéo ou poster pour ce chapitre.</span>
+        </div>
+      `;
+    } else {
+      bodyHtml = `<div class="overview-bp-preview-flow">`;
+
+      // 1. Vidéo principale du livre / chapitre
+      if (videos.length > 0) {
+        const v = videos[0];
+        const thumbUrl = `https://img.youtube.com/vi/${v.yt_id}/mqdefault.jpg`;
+        bodyHtml += `
+          <div class="overview-bp-video-item"
+               data-action="open-bp-video"
+               data-yt-id="${v.yt_id}"
+               data-title="${this.escapeHtml(v.title)}"
+               data-desc="${this.escapeHtml(v.description || '')}"
+               data-tt-category="BibleProject"
+               data-tt-title="${this.escapeHtml(v.title)}"
+               data-tt-image="${thumbUrl}"
+               data-tt-excerpt="${this.escapeHtml(v.description || '')}">
+            <div class="bp-preview-thumb">
+              <img src="${thumbUrl}" alt="${this.escapeHtml(v.title)}" loading="lazy">
+              <div class="bp-preview-play-icon">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </div>
+              <span class="bp-preview-badge">${v.duration || 'Panorama'}</span>
+            </div>
+            <div class="bp-preview-info">
+              <span class="bp-preview-title">${this.escapeHtml(v.title)}</span>
+              <span class="bp-preview-desc">${this.escapeHtml(v.description || '')}</span>
+            </div>
+          </div>
+        `;
+      }
+
+      // 2. Poster / Affiche principale
+      if (posters.length > 0) {
+        const p = posters[0];
+        bodyHtml += `
+          <div class="overview-bp-poster-item"
+               data-action="open-bp-poster"
+               data-image-url="${p.image_url}"
+               data-pdf-url="${p.pdf_url}"
+               data-title="${this.escapeHtml(p.title)}"
+               data-tt-category="BibleProject"
+               data-tt-title="${this.escapeHtml(p.title)}"
+               data-tt-image="${p.image_url}"
+               data-tt-excerpt="Structure littéraire et schéma narratif haute définition.">
+            <div class="bp-poster-mini-thumb">
+              <img src="${p.image_url}" alt="${this.escapeHtml(p.title)}" loading="lazy" onerror="this.src='img/textures/vintage/fond_bible.jpg'">
+              <div class="bp-poster-zoom-mini">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              </div>
+            </div>
+            <div class="bp-poster-mini-info">
+              <span class="bp-poster-mini-title">${this.escapeHtml(p.title)}</span>
+              <span class="bp-poster-mini-hint">Cliquer pour zoomer en plein écran</span>
+            </div>
+          </div>
+        `;
+      }
+
+      bodyHtml += `
+        <div style="padding: 6px 4px 4px 4px;">
+          <button type="button" class="overview-link-btn" data-action="open-media-tab" style="width: 100%; justify-content: center;">
+            <span>Espace BibleProject (${videos.length} vidéo(s), ${posters.length} affiche(s))</span>
+            ${this.icons.arrowRight}
+          </button>
+        </div>
+      `;
+
+      bodyHtml += `</div>`;
+    }
+
+    return `
+      <section class="overview-section-card ${isCollapsed ? 'collapsed' : ''}" id="sec-bibleproject">
+        <header class="sec-header" data-toggle-sec="sec-bibleproject">
+          <div class="sec-header-left">
+            <span class="sec-icon sec-icon-purple">${this.icons.video}</span>
+            <span class="sec-title">BibleProject (Panoramas &amp; Posters)</span>
+          </div>
+          <div class="sec-header-right">
+            <span class="sec-count-pill">${totalMedia}</span>
+            <span class="sec-chevron">${this.icons.chevronDown}</span>
+          </div>
+        </header>
+        <div class="sec-body">
+          ${bodyHtml}
+        </div>
+      </section>
+    `;
+  },
+
 
   /**
    * Section Commentaires Exégétiques (Ultra-compacte + Infobulle au survol)
@@ -1070,6 +1179,40 @@ const PassageOverviewDrawer = {
         }
       });
     });
+
+    // 7b. Actions BibleProject (Lecture vidéo & Visualisation poster)
+    container.querySelectorAll('[data-action="open-bp-video"]').forEach(item => {
+      item.addEventListener('click', () => {
+        const ytId = item.dataset.ytId;
+        const title = item.dataset.title || '';
+        const desc = item.dataset.desc || '';
+        document.querySelector('.drawer-tab[data-drawer-tab="media"]')?.click();
+        setTimeout(() => {
+          if (typeof BibleProjectView !== 'undefined') {
+            BibleProjectView.playVideo(ytId, title, desc);
+          }
+        }, 80);
+      });
+    });
+
+    container.querySelectorAll('[data-action="open-bp-poster"]').forEach(item => {
+      item.addEventListener('click', () => {
+        const imgUrl = item.dataset.imageUrl;
+        const pdfUrl = item.dataset.pdfUrl;
+        const title = item.dataset.title;
+        if (typeof BibleProjectView !== 'undefined') {
+          BibleProjectView.openPosterModal(imgUrl, pdfUrl, title);
+        }
+      });
+    });
+
+    container.querySelectorAll('[data-action="open-media-tab"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.querySelector('.drawer-tab[data-drawer-tab="media"]')?.click();
+      });
+    });
+
 
     // 8. Boutons d'actions rapides du bas de carte
     container.querySelector('#btn-card-launch-synth')?.addEventListener('click', (e) => {

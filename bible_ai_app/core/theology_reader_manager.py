@@ -837,6 +837,76 @@ Règles de style :
         return cls._bible_book_index
 
     @classmethod
+    def _extract_theology_snippet(
+        cls,
+        book_name: str,
+        chapter_id: Any,
+        french_book: str,
+        norm_code: str,
+        chapter: int,
+        verse: int
+    ) -> str:
+        """Extrait la citation textuelle exacte ou le paragraphe le plus pertinent du chapitre."""
+        try:
+            c = cls.get_chapter_content(book_name, chapter_id)
+            paras = c.get('paragraphs', [])
+            raw_text = c.get('raw_text', '')
+
+            # 1. Recherche du verset exact (ex: 1:28, 1.28, v. 28, Genèse 1:28)
+            verse_patterns = [
+                rf'\b{chapter}[\:\.]{verse}\b',
+                rf'\b(?:v|verset|v\.)\s*{verse}\b',
+                rf'\b{re.escape(french_book)}\s*{chapter}[\:\.]{verse}\b',
+                rf'\b{re.escape(norm_code)}\s*{chapter}[\:\.]{verse}\b'
+            ]
+            for p in paras:
+                clean_p = re.sub(r'#+\s*', '', p).strip()
+                if len(clean_p) < 15:
+                    continue
+                for pat in verse_patterns:
+                    m = re.search(pat, clean_p, re.IGNORECASE)
+                    if m:
+                        idx = m.start()
+                        start = max(0, idx - 50)
+                        end = min(len(clean_p), idx + len(m.group(0)) + 170)
+                        snip = ("..." if start > 0 else "") + clean_p[start:end].replace('\n', ' ') + ("..." if end < len(clean_p) else "")
+                        return cls._clean_text_encoding(snip)
+
+            # 2. Recherche du chapitre (ex: chapitre 1, chapter 1, Genèse 1)
+            chap_patterns = [
+                rf'\b(?:chapitre|chapter)\s*{chapter}\b',
+                rf'\b{re.escape(french_book)}\s*{chapter}\b',
+                rf'\b{re.escape(norm_code)}\s*{chapter}\b'
+            ]
+            for p in paras:
+                clean_p = re.sub(r'#+\s*', '', p).strip()
+                if len(clean_p) < 25:
+                    continue
+                for pat in chap_patterns:
+                    m = re.search(pat, clean_p, re.IGNORECASE)
+                    if m:
+                        idx = m.start()
+                        start = max(0, idx - 40)
+                        end = min(len(clean_p), idx + len(m.group(0)) + 180)
+                        snip = ("..." if start > 0 else "") + clean_p[start:end].replace('\n', ' ') + ("..." if end < len(clean_p) else "")
+                        return cls._clean_text_encoding(snip)
+
+            # 3. Premier paragraphe informatif de l'ouvrage sur ce livre
+            for p in paras:
+                clean_p = re.sub(r'#+\s*', '', p).strip()
+                if len(clean_p) >= 40 and not clean_p.startswith('('):
+                    snip = clean_p[:220] + ('...' if len(clean_p) > 220 else '')
+                    return cls._clean_text_encoding(snip)
+
+            if raw_text:
+                snip = raw_text[:220] + ('...' if len(raw_text) > 220 else '')
+                return cls._clean_text_encoding(snip)
+        except Exception:
+            pass
+
+        return f"Étude et analyse contextuelle consacrées à {french_book} {chapter}."
+
+    @classmethod
     def get_theology_resources_for_passage(
         cls,
         book_code: str,
@@ -872,7 +942,14 @@ Règles de style :
             if key not in seen:
                 seen.add(key)
                 item = dict(bm)
-                item["snippet"] = f"Étude, archéologie et contexte théologique consacrés à {french_book} dans {bm['book_title']}."
+                item["snippet"] = bm.get("snippet") or cls._extract_theology_snippet(
+                    bm["book_name"],
+                    bm["chapter_id"],
+                    french_book,
+                    norm_code,
+                    chapter,
+                    verse
+                )
                 results.append(item)
 
         # 2. Citations directes dans les manuels de théologie systématique (ChromaDB si nécessaire)

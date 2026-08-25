@@ -1409,6 +1409,15 @@ CONSIGNES STRICTES :
         except Exception as e:
             logger.debug(f"Erreur langues originales overview: {e}")
 
+        # 8. Médias & Ressources BibleProject (FR)
+        bp_media = {"current_videos": [], "current_posters": [], "related_themes": []}
+        try:
+            bp_full = cls.get_bibleproject_media(norm_code, chapter)
+            if bp_full and bp_full.get("success"):
+                bp_media = bp_full
+        except Exception as e:
+            logger.debug(f"Erreur bibleproject overview: {e}")
+
         return {
             "success": True,
             "book_code": norm_code,
@@ -1428,7 +1437,9 @@ CONSIGNES STRICTES :
                 "notes_count": len(notes_list),
                 "highlights_count": len(highlights_list),
                 "maps_count": len(maps_places),
-                "strongs_count": len(key_lemmas)
+                "strongs_count": len(key_lemmas),
+                "bibleproject_videos_count": len(bp_media.get("current_videos", [])),
+                "bibleproject_posters_count": len(bp_media.get("current_posters", []))
             },
             "commentaries": verse_commentaries,
             "articles": articles_list,
@@ -1436,6 +1447,101 @@ CONSIGNES STRICTES :
             "user_notes": notes_list,
             "user_highlights": highlights_list,
             "maps": maps_places,
-            "key_lemmas": key_lemmas
+            "key_lemmas": key_lemmas,
+            "bibleproject": bp_media
         }
+
+    _bibleproject_cache = None
+
+    @classmethod
+    def _load_bibleproject_data(cls) -> Dict[str, Any]:
+        if cls._bibleproject_cache is not None:
+            return cls._bibleproject_cache
+        try:
+            base_dir = os.path.dirname(os.path.dirname(__file__))
+            json_path = os.path.join(base_dir, "data", "bibleproject_fr.json")
+            if os.path.exists(json_path):
+                with open(json_path, "r", encoding="utf-8") as f:
+                    cls._bibleproject_cache = json.load(f)
+            else:
+                cls._bibleproject_cache = {}
+        except Exception as e:
+            logger.warning(f"Erreur chargement bibleproject_fr.json: {e}")
+            cls._bibleproject_cache = {}
+        return cls._bibleproject_cache
+
+    @classmethod
+    def get_bibleproject_media(cls, book_code: str, chapter: int = 1) -> Dict[str, Any]:
+        """
+        Retourne les médias BibleProject (vidéos de panorama, posters HD, thèmes associés)
+        pour un livre et un chapitre donnés.
+        """
+        norm_code = get_standard_book_code(book_code) or book_code
+
+        # Mapping de normalisation vers les codes USFM majuscules de bibleproject_fr.json
+        usfm_map = {
+            "Gen": "GEN", "Exo": "EXO", "Lev": "LEV", "Num": "NUM", "Deu": "DEU",
+            "Jos": "JOS", "Jdg": "JDG", "Rut": "RUT", "1Sa": "1SA", "2Sa": "2SA",
+            "1Ki": "1KI", "2Ki": "2KI", "1Ch": "1CH", "2Ch": "2CH", "Ezr": "EZR",
+            "Neh": "NEH", "Est": "EST", "Job": "JOB", "Psa": "PSA", "Pro": "PRO",
+            "Ecc": "ECC", "Sol": "SNG", "Sng": "SNG", "Isa": "ISA", "Jer": "JER",
+            "Lam": "LAM", "Eze": "EZK", "Ezk": "EZK", "Dan": "DAN", "Hos": "HOS",
+            "Joe": "JOL", "Jol": "JOL", "Amo": "AMO", "Oba": "OBA", "Jon": "JON",
+            "Mic": "MIC", "Nah": "NAM", "Nam": "NAM", "Hab": "HAB", "Zep": "ZEP",
+            "Hag": "HAG", "Zec": "ZEC", "Mal": "MAL", "Mat": "MAT", "Mar": "MRK",
+            "Mrk": "MRK", "Luk": "LUK", "Joh": "JHN", "Jhn": "JHN", "Act": "ACT",
+            "Rom": "ROM", "1Co": "1CO", "2Co": "2CO", "Gal": "GAL", "Eph": "EPH",
+            "Phi": "PHP", "Php": "PHP", "Col": "COL", "1Th": "1TH", "2Th": "2TH",
+            "1Ti": "1TI", "2Ti": "2TI", "Tit": "TIT", "Phm": "PHM", "Heb": "HEB",
+            "Jam": "JAS", "Jas": "JAS", "1Pe": "1PE", "2Pe": "2PE", "1Jo": "1JN",
+            "1Jn": "1JN", "2Jo": "2JN", "2Jn": "2JN", "3Jo": "3JN", "3Jn": "3JN",
+            "Jud": "JUD", "Rev": "REV"
+        }
+        usfm_code = usfm_map.get(norm_code, norm_code.upper() if isinstance(norm_code, str) else "GEN")
+
+        data = cls._load_bibleproject_data()
+        books_data = data.get("books", {})
+        book_info = books_data.get(usfm_code) or books_data.get(norm_code, {})
+
+
+        matched_videos = []
+        for v in book_info.get("videos", []):
+            ch_range = v.get("chapters", [1, 999])
+            if ch_range[0] <= chapter <= ch_range[1]:
+                matched_videos.append(v)
+
+        all_book_videos = book_info.get("videos", [])
+        if not matched_videos:
+            matched_videos = all_book_videos
+
+        matched_posters = []
+        for p in book_info.get("posters", []):
+            ch_range = p.get("chapters", [1, 999])
+            if ch_range[0] <= chapter <= ch_range[1]:
+                matched_posters.append(p)
+        if not matched_posters:
+            matched_posters = book_info.get("posters", [])
+
+        # Thèmes liés au livre
+        related_themes = []
+        for th in data.get("themes", []):
+            if usfm_code in th.get("related_books", []) or norm_code in th.get("related_books", []):
+                related_themes.append(th)
+
+        return {
+            "success": True,
+            "book_code": usfm_code,
+            "standard_code": norm_code,
+            "book_name": book_info.get("name") or get_french_book_name(norm_code) or norm_code,
+            "chapter": chapter,
+            "current_videos": matched_videos,
+            "all_videos": all_book_videos,
+            "current_posters": matched_posters,
+            "all_posters": book_info.get("posters", []),
+            "related_themes": related_themes,
+            "all_themes": data.get("themes", []),
+            "word_studies": data.get("word_studies", [])
+        }
+
+
 

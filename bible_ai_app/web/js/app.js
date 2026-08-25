@@ -31,7 +31,8 @@ const App = {
       { name: 'TheologicalProfileModal', init: () => (typeof TheologicalProfileModal !== 'undefined' && TheologicalProfileModal.init()) },
       { name: 'HighlighterManager', init: () => (typeof HighlighterManager !== 'undefined' && HighlighterManager.init()) },
       { name: 'ArticlesView', init: () => (typeof ArticlesView !== 'undefined' && ArticlesView.init()) },
-      { name: 'PassageOverviewDrawer', init: () => (typeof PassageOverviewDrawer !== 'undefined' && PassageOverviewDrawer.init()) }
+      { name: 'PassageOverviewDrawer', init: () => (typeof PassageOverviewDrawer !== 'undefined' && PassageOverviewDrawer.init()) },
+      { name: 'BibleProjectView', init: () => (typeof BibleProjectView !== 'undefined' && BibleProjectView.init()) }
     ];
 
     modules.forEach(m => {
@@ -90,7 +91,7 @@ const App = {
       this.switchView('dict');
     });
 
-    // 3. Onglets du panneau droit (Aperçu / Commentaires / IA / Lexique / Notes / Articles)
+    // 3. Onglets du panneau droit (Aperçu / Commentaires / IA / Lexique / Notes / Articles / BibleProject)
     document.querySelectorAll('.drawer-tab').forEach(tabBtn => {
       tabBtn.addEventListener('click', () => {
         document.querySelectorAll('.drawer-tab').forEach(b => b.classList.remove('active'));
@@ -130,10 +131,17 @@ const App = {
             if (typeof ArticlesView !== 'undefined') {
               ArticlesView.loadDrawerArticles(b, ch);
             }
+          } else if (tabId === 'media') {
+            const b = (typeof BibleReader !== 'undefined' && BibleReader.currentBook) || 'Gen';
+            const ch = (typeof BibleReader !== 'undefined' && BibleReader.currentChapter) || 1;
+            if (typeof BibleProjectView !== 'undefined') {
+              BibleProjectView.load(b, ch, true);
+            }
           }
         }
       });
     });
+
 
     // 4. Chat Assistant IA
     this.bindChat();
