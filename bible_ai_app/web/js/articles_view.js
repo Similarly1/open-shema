@@ -1580,11 +1580,14 @@ const ArticlesView = {
     }
 
     try {
-      const art = await API.call('get_article', articleId);
-      if (!art) {
-        contentEl.innerHTML = `<p class="empty-hint">Article introuvable.</p>`;
+      const res = await API.call('get_article_content', articleId);
+      if (!res || !res.success || !res.article) {
+        contentEl.innerHTML = `<p class="empty-hint" style="color: var(--accent-red); padding: 20px; text-align: center;">Article introuvable ou erreur de chargement.</p>`;
         return;
       }
+
+      const art = res.article;
+      const contentMarkdown = res.content_markdown || art.content_markdown || art.content || art.summary || '';
 
       if (extLink) {
         if (art.canonical_url) {
@@ -1645,8 +1648,8 @@ const ArticlesView = {
         `;
       }
 
-      const bodyMarkdown = art.content_markdown || art.content || art.summary || '';
-      const renderedBody = this.renderMarkdown(bodyMarkdown);
+      const renderedBody = this.renderMarkdown(contentMarkdown);
+
 
       contentEl.innerHTML = `
         <div class="article-drawer-reader-body">
