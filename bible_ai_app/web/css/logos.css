@@ -23559,6 +23559,90 @@ body.reading-bg-dark .comm-dropdown-popover {
   color: var(--text-primary);
 }
 
+/* =========================================================================
+ * INFOBULLES HOMILÉTIQUES RICHES (TOOLTIPS AU SURVOL)
+ * ========================================================================= */
+.sermon-meta-tooltip-trigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+  margin-left: auto;
+  color: var(--text-muted);
+  opacity: 0.6;
+  padding: 2px;
+  border-radius: 4px;
+  transition: opacity 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.sermon-meta-tooltip-trigger:hover {
+  opacity: 1;
+  color: var(--accent-blue);
+  background: rgba(37, 99, 235, 0.08);
+}
+
+.sermon-meta-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 270px;
+  padding: 11px 13px;
+  background: var(--bg-card, #18181b);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  border-radius: 9px;
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.4), 0 6px 12px -3px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px) scale(0.96);
+  transition: opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1200;
+  text-transform: none;
+  letter-spacing: normal;
+  text-align: left;
+}
+
+.sermon-meta-tooltip-trigger:hover .sermon-meta-popover {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.meta-popover-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary, #f4f4f5);
+  margin-bottom: 2px;
+}
+
+.meta-popover-author {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent-blue, #60a5fa);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.meta-popover-body {
+  font-size: 11px;
+  color: var(--text-secondary, #d4d4d8);
+  line-height: 1.45;
+  margin-bottom: 7px;
+}
+
+.meta-popover-tip {
+  font-size: 10px;
+  color: var(--text-muted, #a1a1aa);
+  font-style: italic;
+  line-height: 1.35;
+  border-top: 1px dashed var(--border-color, rgba(255, 255, 255, 0.1));
+  padding-top: 6px;
+}
+
 
 
 
