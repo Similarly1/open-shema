@@ -475,6 +475,17 @@ const PassageOverviewDrawer = {
   },
 
   /**
+   * Retourne le chemin du logo officiel d'une source de blog / revue
+   */
+  getSourceLogo(sourceId, sourceName) {
+    const s = (String(sourceId || '') + ' ' + String(sourceName || '')).toLowerCase();
+    if (s.includes('tpsg') || s.includes('toutpoursagloire') || s.includes('tout pour sa gloire')) {
+      return 'img/sources/tpsg.svg';
+    }
+    return null;
+  },
+
+  /**
    * Section Articles de blog
    */
   renderArticlesSection(data) {
@@ -496,13 +507,19 @@ const PassageOverviewDrawer = {
         const title = art.title || 'Article';
         const time = art.reading_time_minutes ? `${art.reading_time_minutes} min` : '';
         const summaryHtml = this.formatMarkdownExcerpt(art.lead_summary);
+        const logoUrl = this.getSourceLogo(art.source_id, src);
+        const logoHtml = logoUrl ? `<img src="${logoUrl}" class="source-tag-logo" alt="${this.escapeHtml(src)}">` : '';
+        const tagClass = logoUrl ? 'clean-source-tag has-logo' : 'clean-source-tag is-generic';
 
         bodyHtml += `
           <div class="overview-clean-item" data-action="open-article" data-article-id="${this.escapeHtml(art.id)}">
             <div class="clean-item-header">
               <div class="clean-item-title-group">
                 <span class="clean-author-name">${this.escapeHtml(title)}</span>
-                <span class="clean-source-tag">${this.escapeHtml(src)}</span>
+                <span class="${tagClass}">
+                  ${logoHtml}
+                  <span class="source-tag-text">${this.escapeHtml(src)}</span>
+                </span>
               </div>
               <span class="clean-item-arrow">${this.icons.arrowRight}</span>
             </div>

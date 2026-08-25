@@ -3107,13 +3107,36 @@ input:checked + .slider.round:before {
 }
 
 .clean-source-tag {
-  font-size: 9.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
   font-weight: 600;
-  padding: 1px 5px;
-  border-radius: 3px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  line-height: 1.3;
+}
+
+.clean-source-tag.has-logo {
+  background: rgba(239, 82, 51, 0.12);
+  color: #ef5233;
+}
+
+.clean-source-tag.is-generic {
   background: rgba(139, 92, 246, 0.12);
   color: var(--accent-purple, #8b5cf6);
-  flex-shrink: 0;
+}
+
+.source-tag-logo {
+  width: 14px;
+  height: 10px;
+  object-fit: contain;
+  display: block;
+}
+
+.source-tag-text {
+  letter-spacing: 0.2px;
 }
 
 .clean-item-arrow {

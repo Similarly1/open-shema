@@ -707,6 +707,7 @@ const ArticlesView = {
 
       // 2. Auteur & Avatar
       if (authorNameEl) authorNameEl.textContent = author;
+      if (pubDateEl) pubDateEl.textContent = this.formatDate(art.published_at) || '';
       if (sourceNameEl) {
         const logoUrl = this.getSourceLogo(art.source_id);
         const logoHtml = logoUrl ? `<img src="${logoUrl}" alt="" class="author-source-logo">` : '';

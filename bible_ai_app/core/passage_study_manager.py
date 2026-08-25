@@ -1278,6 +1278,7 @@ CONSIGNES STRICTES :
 
                 articles_list.append({
                     "id": a.get("id", ""),
+                    "source_id": a.get("source_id", ""),
                     "title": a.get("title", "Article sans titre"),
                     "source_name": a.get("source_name", "Blog"),
                     "source_category": a.get("source_category", "Théologie"),
