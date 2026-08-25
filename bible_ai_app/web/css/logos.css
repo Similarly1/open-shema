@@ -8482,6 +8482,11 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   border-radius: 6px;
   cursor: pointer;
   transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  position: relative;
 }
 .note-list-item:hover {
   border-color: var(--accent-blue);
@@ -8490,10 +8495,24 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   border-color: var(--accent-blue);
   background-color: var(--bg-active);
 }
+.note-list-item-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
 .note-item-title {
   font-size: 13px;
   font-weight: 700;
   color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+}
+.note-item-title-text {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -8512,6 +8531,17 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
 .note-item-date {
   font-size: 10px;
   color: var(--text-muted);
+}
+.note-list-item-actions {
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  flex-shrink: 0;
+}
+.note-list-item:hover .note-list-item-actions,
+.note-list-item.active .note-list-item-actions {
+  opacity: 1;
 }
 
 .notes-editor-pane {

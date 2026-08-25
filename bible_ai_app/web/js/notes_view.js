@@ -838,6 +838,16 @@ const NotesView = {
     }
   },
 
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  },
+
   renderList() {
     const q = (this.searchInput?.value || '').toLowerCase().trim();
     const filtered = this.notes.filter(n => {
@@ -861,25 +871,233 @@ const NotesView = {
     filtered.forEach(note => {
       const item = document.createElement('div');
       item.className = `note-list-item ${this.currentNote?.id === note.id ? 'active' : ''}`;
+      item.setAttribute('data-note-id', note.id || '');
       
       const aiBadge = (isGlobalAiEnabled && note.include_in_ai !== false) 
-        ? '<span title="Prise en compte par l\'IA" style="display:inline-flex; align-items:center; margin-left: 4px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg></span>' 
+        ? '<span title="Prise en compte par l\'IA" style="display:inline-flex; align-items:center; margin-left: 4px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1 1.3-1.3Z"/></svg></span>' 
         : '';
       
+      const safeTitle = this.escapeHtml(note.title || 'Note sans titre');
+      const safeRef = note.reference ? this.escapeHtml(note.reference) : '';
+      const safeDate = this.escapeHtml(note.updated_at || '');
+
       item.innerHTML = `
-        <div class="note-item-title">${note.title || 'Note sans titre'} ${aiBadge}</div>
-        <div class="note-item-meta">
-          ${note.reference ? `<span class="note-ref-badge">${note.reference}</span>` : '<span style="font-size: 10px; color: var(--text-muted);">Générale</span>'}
-          <span class="note-item-date">${note.updated_at || ''}</span>
+        <div class="note-list-item-body">
+          <div class="note-item-title" title="${safeTitle}">
+            <span class="note-item-title-text">${safeTitle}</span> ${aiBadge}
+          </div>
+          <div class="note-item-meta">
+            ${safeRef ? `<span class="note-ref-badge">${safeRef}</span>` : '<span style="font-size: 10px; color: var(--text-muted);">Générale</span>'}
+            <span class="note-item-date">${safeDate}</span>
+          </div>
+        </div>
+        <div class="note-list-item-actions">
+          <button type="button" class="btn-history-action btn-note-menu" title="Options (Clic droit)">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+          </button>
         </div>
       `;
 
-      item.addEventListener('click', () => {
+      item.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-note-menu')) {
+          e.stopPropagation();
+          const btn = e.target.closest('.btn-note-menu');
+          const rect = btn.getBoundingClientRect();
+          this.showNoteContextMenu(note.id, note.title, rect.right, rect.bottom);
+          return;
+        }
         this.selectNote(note);
+      });
+
+      // Clic droit (Menu contextuel)
+      item.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.showNoteContextMenu(note.id, note.title, e.clientX, e.clientY);
       });
 
       this.listContainer.appendChild(item);
     });
+  },
+
+  showNoteContextMenu(noteId, currentTitle, x, y) {
+    let menu = document.getElementById('notes-item-context-menu');
+    if (!menu) {
+      menu = document.createElement('div');
+      menu.id = 'notes-item-context-menu';
+      menu.className = 'smooth-context-menu';
+      document.body.appendChild(menu);
+    }
+
+    menu.innerHTML = `
+      <div class="context-menu-item" data-action="rename">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+        <span>Renommer</span>
+      </div>
+      <div class="context-menu-divider"></div>
+      <div class="context-menu-item danger" data-action="delete">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        <span>Supprimer</span>
+      </div>
+    `;
+
+    menu.style.display = 'flex';
+    menu.style.position = 'fixed';
+    menu.style.zIndex = '99999';
+    
+    const menuWidth = 160;
+    const menuHeight = 85;
+    const posX = Math.min(x, window.innerWidth - menuWidth - 10);
+    const posY = Math.min(y, window.innerHeight - menuHeight - 10);
+
+    menu.style.left = `${posX}px`;
+    menu.style.top = `${posY}px`;
+
+    const closeMenu = () => {
+      menu.style.display = 'none';
+      document.removeEventListener('click', closeMenu);
+      document.removeEventListener('keydown', handleKey);
+    };
+
+    const handleKey = (e) => {
+      if (e.key === 'Escape') closeMenu();
+    };
+
+    setTimeout(() => {
+      document.addEventListener('click', closeMenu);
+      document.addEventListener('keydown', handleKey);
+    }, 10);
+
+    menu.querySelector('[data-action="rename"]')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeMenu();
+      this.promptRenameNote(noteId, currentTitle);
+    });
+
+    menu.querySelector('[data-action="delete"]')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeMenu();
+      this.deleteNoteWithConfirm(noteId);
+    });
+  },
+
+  async promptRenameNote(noteId, currentTitle) {
+    const itemEl = document.querySelector(`.note-list-item[data-note-id="${noteId}"]`);
+    const titleEl = itemEl?.querySelector('.note-item-title-text');
+    
+    if (itemEl && titleEl) {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'history-rename-input';
+      input.value = currentTitle || '';
+      
+      titleEl.replaceWith(input);
+      input.focus();
+      input.select();
+      
+      let isSaving = false;
+      const saveRename = async () => {
+        if (isSaving) return;
+        isSaving = true;
+        const newTitle = input.value.trim() || currentTitle || 'Note sans titre';
+        try {
+          const note = this.notes.find(n => n.id === noteId);
+          if (note) {
+            note.title = newTitle;
+            if (this.currentNote?.id === noteId) {
+              this.currentNote.title = newTitle;
+              if (this.titleInput) this.titleInput.value = newTitle;
+            }
+            await API.call('save_note', note);
+            await this.loadNotes(this.currentNote?.id || noteId);
+            if (typeof App !== 'undefined' && App.showToast) {
+              App.showToast('Note renommée.');
+            }
+          } else {
+            await this.loadNotes(this.currentNote?.id);
+          }
+        } catch (e) {
+          console.error("Erreur renommage note:", e);
+          await this.loadNotes(this.currentNote?.id);
+        }
+      };
+
+      input.addEventListener('blur', saveRename);
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          input.blur();
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          this.renderList();
+        }
+      });
+    } else {
+      const newTitle = prompt("Nouveau titre de la note :", currentTitle);
+      if (newTitle !== null && newTitle.trim() && newTitle.trim() !== currentTitle) {
+        try {
+          const note = this.notes.find(n => n.id === noteId);
+          if (note) {
+            note.title = newTitle.trim();
+            if (this.currentNote?.id === noteId) {
+              this.currentNote.title = newTitle.trim();
+              if (this.titleInput) this.titleInput.value = newTitle.trim();
+            }
+            await API.call('save_note', note);
+            await this.loadNotes(this.currentNote?.id || noteId);
+            if (typeof App !== 'undefined' && App.showToast) {
+              App.showToast('Note renommée.');
+            }
+          }
+        } catch (e) {
+          console.error("Erreur renommage note:", e);
+        }
+      }
+    }
+  },
+
+  async deleteNoteWithConfirm(noteId) {
+    if (!noteId) {
+      if (this.currentNote && !this.currentNote.id) {
+        this.createNewNote();
+      }
+      return;
+    }
+
+    const note = this.notes.find(n => n.id === noteId) || (this.currentNote?.id === noteId ? this.currentNote : null);
+    const noteTitle = note?.title || 'cette note';
+
+    let confirmed = false;
+    if (typeof App !== 'undefined' && App.showConfirmModal) {
+      confirmed = await App.showConfirmModal({
+        title: "Supprimer la note",
+        message: "Voulez-vous supprimer définitivement cette note ?",
+        confirmText: "Supprimer",
+        cancelText: "Annuler",
+        danger: true,
+        icon: "trash"
+      });
+    } else {
+      confirmed = confirm("Voulez-vous supprimer définitivement cette note ?");
+    }
+
+    if (!confirmed) return;
+
+    try {
+      await API.call('delete_note', noteId);
+      if (this.currentNote?.id === noteId) {
+        this.currentNote = null;
+        await this.loadNotes();
+      } else {
+        await this.loadNotes(this.currentNote?.id);
+      }
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast("Note supprimée.");
+      }
+    } catch (e) {
+      console.error("Erreur suppression note:", e);
+      alert(`Erreur suppression note : ${e}`);
+    }
   },
 
   selectNote(note) {
@@ -1000,15 +1218,6 @@ const NotesView = {
       this.createNewNote();
       return;
     }
-
-    if (confirm(`Supprimer définitivement le fichier Markdown de la note « ${this.currentNote.title} » ?`)) {
-      try {
-        await API.call('delete_note', this.currentNote.id);
-        App.showToast('Note supprimée du disque.');
-        await this.loadNotes();
-      } catch (e) {
-        alert(`Erreur suppression note : ${e}`);
-      }
-    }
+    await this.deleteNoteWithConfirm(this.currentNote.id);
   }
 };
