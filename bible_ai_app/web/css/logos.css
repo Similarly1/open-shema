@@ -3048,6 +3048,28 @@ input:checked + .slider.round:before {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  max-height: 240px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+.sec-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sec-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sec-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+}
+
+.sec-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
 }
 
 /* Liste épurée typographique (style Logos / Apple) */
@@ -20750,11 +20772,15 @@ body.reading-bg-dark .comm-dropdown-popover {
 }
 
 .bp-poster-highres-img {
-  max-width: 95%;
-  max-height: 95%;
+  max-width: 98%;
+  max-height: 98%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
   border-radius: 4px;
 }
+
 
 .bp-loading-indicator {
   position: absolute;

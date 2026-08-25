@@ -1,0 +1,41 @@
+name: Actualisation Hebdomadaire BibleProject (FR)
+
+on:
+  schedule:
+    # Exécution chaque dimanche à minuit UTC
+    - cron: '0 0 * * 0'
+  workflow_dispatch: # Permet de lancer manuellement depuis l'onglet Actions
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout du dépôt
+        uses: actions/checkout@v4
+
+      - name: Configuration de Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Installation des dépendances (yt-dlp)
+        run: |
+          python -m pip install --upgrade pip
+          pip install yt-dlp
+
+      - name: Extraction et actualisation des données BibleProject (FR)
+        run: |
+          python bible_ai_app/scripts/generate_bibleproject_index.py
+
+      - name: Vérification des modifications et Commit
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action [BibleProject Sync]"
+          if [ -n "$(git status --porcelain bible_ai_app/data/bibleproject_fr.json data/bibleproject_fr.json)" ]; then
+            git add bible_ai_app/data/bibleproject_fr.json data/bibleproject_fr.json || true
+            git commit -m "chore(data): actualisation automatique du mapping BibleProject (FR)"
+            git push
+          else
+            echo "Aucune nouvelle vidéo ou affiche détectée cette semaine."
+          fi

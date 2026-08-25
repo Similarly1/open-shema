@@ -283,12 +283,16 @@ def main():
     }
 
     base_dir = os.path.dirname(os.path.dirname(__file__))
-    target_path = os.path.join(base_dir, "data", "bibleproject_fr.json")
+    target_path = os.path.join(base_dir, "bibleproject_fr.json")
+    if not os.path.exists(os.path.dirname(target_path)):
+        os.makedirs(os.path.dirname(target_path), exist_ok=True)
+
     with open(target_path, "w", encoding="utf-8") as f:
         json.dump(final_dataset, f, indent=2, ensure_ascii=False)
 
     print(f"\n[OK] Fichier {target_path} mis à jour avec succès.")
     print(f"Livres indexés: {len(books_result)} | Thèmes: {len(themes_result)} | Études de mots: {len(word_studies_result)}")
+
 
 if __name__ == "__main__":
     main()

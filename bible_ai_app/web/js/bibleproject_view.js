@@ -193,10 +193,11 @@ const BibleProjectView = {
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
                 <span>Visualiser</span>
               </button>
-              <button type="button" class="bp-btn-pdf-download" onclick="API.openExternalUrl('${p.pdf_url || p.image_url}')" title="Télécharger le PDF officiel">
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                <span>PDF</span>
+              <button type="button" class="bp-btn-pdf-download" onclick="API.openExternalUrl('${p.pdf_url || p.image_url}')" title="Ouvrir l'affiche originale HD">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                <span>Affiche HD ↗</span>
               </button>
+
             </div>
           </div>
         </div>
@@ -467,38 +468,22 @@ const BibleProjectView = {
   },
 
   fitToScreen() {
-    const viewport = document.getElementById('bp-poster-viewport');
-    const img = document.getElementById('bp-poster-highres-img');
-    if (!viewport || !img) return;
-
-    const natW = img.naturalWidth || img.clientWidth || 1200;
-    const natH = img.naturalHeight || img.clientHeight || 800;
-
-    const vpWidth = viewport.clientWidth - 40;
-    const vpHeight = viewport.clientHeight - 40;
-
-    if (natW > 0 && natH > 0 && vpWidth > 0 && vpHeight > 0) {
-      const scaleX = vpWidth / natW;
-      const scaleY = vpHeight / natH;
-      this.panzoom.scale = Math.min(scaleX, scaleY, 1.2);
-    } else {
-      this.panzoom.scale = 1.0;
-    }
+    this.panzoom.scale = 1.0;
     this.panzoom.translateX = 0;
     this.panzoom.translateY = 0;
-
     this.applyTransform();
     this.updateZoomLabel();
   },
-
 
   resetZoom() {
-    this.panzoom.scale = 1;
+    // Mode 1:1 / Gros plan lecture (250%)
+    this.panzoom.scale = this.panzoom.scale <= 1.2 ? 2.5 : 1.0;
     this.panzoom.translateX = 0;
     this.panzoom.translateY = 0;
     this.applyTransform();
     this.updateZoomLabel();
   },
+
 
   applyTransform() {
     const layer = document.getElementById('bp-poster-transform-layer');

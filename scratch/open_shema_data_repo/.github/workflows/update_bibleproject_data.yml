@@ -1,0 +1,41 @@
+name: Actualisation Hebdomadaire BibleProject (FR)
+
+on:
+  schedule:
+    # Exécution chaque dimanche à minuit UTC
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout du dépôt
+        uses: actions/checkout@v4
+
+      - name: Configuration de Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Installation des dépendances
+        run: |
+          python -m pip install --upgrade pip
+          pip install yt-dlp
+
+      - name: Extraction et actualisation des données BibleProject (FR)
+        run: |
+          python scripts/update_data.py
+
+      - name: Commit et Push des modifications
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action [Data Sync]"
+          if [ -n "$(git status --porcelain bibleproject_fr.json)" ]; then
+            git add bibleproject_fr.json
+            git commit -m "chore(data): actualisation automatique BibleProject (FR)"
+            git push
+          else
+            echo "Aucune modification détectée cette semaine."
+          fi

@@ -620,11 +620,9 @@ const PassageOverviewDrawer = {
           <div class="sec-header-left">
             <span class="sec-icon sec-icon-purple">${this.icons.video}</span>
             <span class="sec-title">BibleProject (Panoramas &amp; Posters)</span>
+            <span class="sec-badge ${totalMedia > 0 ? 'badge-active' : ''}">${totalMedia}</span>
           </div>
-          <div class="sec-header-right">
-            <span class="sec-count-pill">${totalMedia}</span>
-            <span class="sec-chevron">${this.icons.chevronDown}</span>
-          </div>
+          <button class="sec-chevron" title="Plier / Déplier">${this.icons.chevronDown}</button>
         </header>
         <div class="sec-body">
           ${bodyHtml}
@@ -651,10 +649,6 @@ const PassageOverviewDrawer = {
         </div>
       `;
     } else {
-      const topCount = 5;
-      const initialList = list.slice(0, topCount);
-      const remainingList = list.slice(topCount);
-
       bodyHtml = `<div class="overview-clean-list">`;
       
       const renderItem = (c, idx) => {
@@ -684,21 +678,9 @@ const PassageOverviewDrawer = {
         `;
       };
 
-      initialList.forEach((c, idx) => {
+      list.forEach((c, idx) => {
         bodyHtml += renderItem(c, idx);
       });
-
-      if (remainingList.length > 0) {
-        bodyHtml += `
-          <div class="overview-extra-comms hidden" id="extra-comms-list">
-            ${remainingList.map((c, i) => renderItem(c, topCount + i)).join('')}
-          </div>
-          <button type="button" class="overview-show-more-link" data-action="toggle-more-comms">
-            <span>Afficher les ${remainingList.length} autres commentaires</span>
-            ${this.icons.chevronDown}
-          </button>
-        `;
-      }
 
       bodyHtml += `</div>`;
     }
