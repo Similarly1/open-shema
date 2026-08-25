@@ -3279,68 +3279,6 @@ input:checked + .slider.round:before {
   margin-top: 2px;
 }
 
-/* Grille Strongs Épurée */
-.overview-strongs-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 5px;
-}
-
-.strong-pill-btn {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 6px 8px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-subtle);
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.strong-pill-btn:hover {
-  background: var(--bg-hover);
-  border-color: var(--accent-teal, #14b8a6);
-  transform: translateY(-1px);
-}
-
-.strong-pill-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 4px;
-}
-
-.strong-orig-text {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.strong-orig-text.rtl-hebrew {
-  direction: rtl;
-  font-family: 'SBL Hebrew', 'Ezra SIL', serif;
-  font-size: 14px;
-}
-
-.strong-code-badge {
-  font-size: 9px;
-  font-weight: 700;
-  color: var(--accent-teal, #14b8a6);
-  background: rgba(20, 184, 166, 0.12);
-  padding: 0 4px;
-  border-radius: 3px;
-}
-
-.strong-def-preview {
-  font-size: 10.5px;
-  color: var(--text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 /* Barre d'Actions Rapides & IA Ultra-fine */
 .overview-quick-actions-bar {
   display: grid;

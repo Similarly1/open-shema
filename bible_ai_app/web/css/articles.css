@@ -1059,6 +1059,32 @@
   margin-bottom: 0;
 }
 
+/* Attribution d'auteur / source de citation alignée à droite */
+.article-quote-author {
+  display: block;
+  text-align: right;
+  margin-top: 10px;
+  font-size: 0.92em;
+  font-weight: 600;
+  font-style: normal;
+  color: var(--accent-primary, #60a5fa);
+  opacity: 0.95;
+}
+
+.article-quote-author a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.article-reader-container.reading-bg-white .article-quote-author {
+  color: #2563eb;
+}
+
+.article-reader-container.reading-bg-sepia .article-quote-author {
+  color: #b45309;
+}
+
 /* Numéros de versets en exposant */
 .article-markdown-body sup,
 .article-markdown-body .verse-sup {

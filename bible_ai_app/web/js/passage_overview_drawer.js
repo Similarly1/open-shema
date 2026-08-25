@@ -258,7 +258,6 @@ const PassageOverviewDrawer = {
     const theoCount = (data.theology_books || []).length;
     const notesCount = ((data.user_notes || []).length) + ((data.user_highlights || []).length);
     const mapsCount = (data.maps || []).length;
-    const strongsCount = (data.key_lemmas || []).length;
 
     let activeHtml = '';
     let emptyHtml = '';
@@ -304,14 +303,6 @@ const PassageOverviewDrawer = {
       emptyCount++;
     }
 
-    // F. Section Langues Originales & Lemmes Clés
-    if (strongsCount > 0) {
-      activeHtml += this.renderLanguagesSection(data);
-    } else {
-      emptyHtml += this.renderLanguagesSection(data);
-      emptyCount++;
-    }
-
     // Assemblage avec tiroir discret pour les sections vides
     let finalHtml = activeHtml;
 
@@ -351,7 +342,6 @@ const PassageOverviewDrawer = {
     const theoCount = stats.theology_count || 0;
     const notesCount = (stats.notes_count || 0) + (stats.highlights_count || 0);
     const mapsCount = stats.maps_count || 0;
-    const strongsCount = stats.strongs_count || 0;
 
     chipsBar.innerHTML = `
       <button class="overview-chip ${commCount > 0 ? 'has-items' : 'is-empty'}" data-scroll-sec="sec-commentaries" title="${commCount} commentaire(s) exégétique(s)">
@@ -377,11 +367,6 @@ const PassageOverviewDrawer = {
       <button class="overview-chip ${mapsCount > 0 ? 'has-items' : 'is-empty'}" data-scroll-sec="sec-maps" title="${mapsCount} lieu(x) biblique(s)">
         <span class="chip-svg">${this.icons.map}</span>
         <span class="chip-count">${mapsCount}</span>
-      </button>
-
-      <button class="overview-chip ${strongsCount > 0 ? 'has-items' : 'is-empty'}" data-scroll-sec="sec-languages" title="${strongsCount} lemme(s) hébreu/grec">
-        <span class="chip-svg">${this.icons.lexicon}</span>
-        <span class="chip-count">${strongsCount}</span>
       </button>
     `;
 
@@ -701,54 +686,6 @@ const PassageOverviewDrawer = {
   },
 
   /**
-   * Section Langues Originales & Lemmes Clés
-   */
-  renderLanguagesSection(data) {
-    const list = data.key_lemmas || [];
-    const isCollapsed = this.collapsedSections['sec-languages'] || false;
-
-    let bodyHtml = '';
-    if (list.length === 0) {
-      bodyHtml = `
-        <div class="overview-empty-hint">
-          <span>Langues originales non disponibles pour ce verset.</span>
-        </div>
-      `;
-    } else {
-      bodyHtml = `<div class="overview-strongs-grid">`;
-      list.forEach((l) => {
-        const orig = l.original_text || l.lemma;
-        const def = l.definition || l.gloss || '';
-
-        bodyHtml += `
-          <button type="button" class="strong-pill-btn" data-action="lookup-strong" data-strong="${this.escapeHtml(l.strong)}" data-word="${this.escapeHtml(l.lemma || orig)}" title="${this.escapeHtml(l.strong)} - ${this.escapeHtml(def)}">
-            <div class="strong-pill-top">
-              <span class="strong-orig-text ${l.lang === 'hebrew' ? 'rtl-hebrew' : ''}">${this.escapeHtml(orig)}</span>
-              <span class="strong-code-badge">${this.escapeHtml(l.strong)}</span>
-            </div>
-            ${def ? `<div class="strong-def-preview">${this.escapeHtml(def)}</div>` : ''}
-          </button>
-        `;
-      });
-      bodyHtml += `</div>`;
-    }
-
-    return `
-      <section class="overview-section-card ${isCollapsed ? 'collapsed' : ''}" id="sec-languages">
-        <header class="sec-header" data-toggle-sec="sec-languages">
-          <div class="sec-header-left">
-            <span class="sec-icon sec-icon-teal">${this.icons.lexicon}</span>
-            <span class="sec-title">Mots originaux (Strongs)</span>
-            <span class="sec-badge ${list.length > 0 ? 'badge-active' : ''}">${list.length}</span>
-          </div>
-          <button class="sec-chevron" title="Plier / Déplier">${this.icons.chevronDown}</button>
-        </header>
-        <div class="sec-body">${bodyHtml}</div>
-      </section>
-    `;
-  },
-
-  /**
    * Section Actions Rapides & IA (Épurée en barre fine)
    */
   renderQuickActionsSection(data) {
@@ -924,23 +861,7 @@ const PassageOverviewDrawer = {
       });
     });
 
-    // 8. Clic sur un Strong -> Bascule sur l'onglet Lexique
-    container.querySelectorAll('[data-action="lookup-strong"]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const strong = btn.dataset.strong;
-        const word = btn.dataset.word;
-
-        document.querySelector('.drawer-tab[data-drawer-tab="lexicon"]')?.click();
-        setTimeout(() => {
-          if (typeof LexiconViewer !== 'undefined') {
-            LexiconViewer.load(word, strong);
-          }
-        }, 50);
-      });
-    });
-
-    // 9. Boutons d'actions rapides du bas de carte
+    // 8. Boutons d'actions rapides du bas de carte
     container.querySelector('#btn-card-launch-synth')?.addEventListener('click', (e) => {
       e.stopPropagation();
       document.querySelector('.drawer-tab[data-drawer-tab="commentaries"]')?.click();

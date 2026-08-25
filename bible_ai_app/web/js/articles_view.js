@@ -1225,17 +1225,40 @@ const ArticlesView = {
     text = text.replace(/Loading\s+the\s*(?:\[[^\]]*Elevenlabs[^\]]*\]\([^)]+\)|Elevenlabs[^\n.]*)/gi, '');
     text = text.replace(/AudioNative\s+Player[\.\u2026]*/gi, '');
 
-    // 1b. Si l'article entier est sur une seule ligne compactée, découper proprement les paragraphes (sans couper les listes 1., 2. ni les abréviations)
+    // 1b-1. Convertir les blockquotes Markdown (> Citation [– Auteur]) AVANT le découpage de phrases
+    text = text.replace(/(?:^|\n)>\s*([^\n]+(?:\n(?!>|[#\n]|---)[^\n]+)*)/g, (match, bqContent) => {
+      let content = bqContent.replace(/\n>\s*/g, ' ').replace(/\n/g, ' ').trim();
+      
+      const authorMatch = content.match(/^([\s\S]+?)\s+([—–\u2013\u2014-]\s*[A-ZÀ-ÖØ-ß][^\n]*?\*(?:\[[^\]]+\]\([^)]+\)|[^*]+)\*[.,\s]*)(?:\s+([A-ZÀ-ÿ«][\s\S]*))?$/);
+      if (authorMatch) {
+        const quoteText = authorMatch[1].trim();
+        const quoteAuthor = authorMatch[2].trim();
+        const nextParagraph = authorMatch[3] ? `\n\n${authorMatch[3].trim()}` : '';
+        return `\n\n<blockquote class="article-bible-quote"><p>${quoteText}</p><footer class="article-quote-author">${quoteAuthor}</footer></blockquote>${nextParagraph}\n\n`;
+      }
+      
+      const simpleAuthorMatch = content.match(/^([\s\S]+?)\s+([—–\u2013\u2014-]\s*[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ.]*(?:\s+[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ.]*){1,4}[.,\s]*)(?:\s+([A-ZÀ-ÿ«][\s\S]*))?$/);
+      if (simpleAuthorMatch) {
+        const quoteText = simpleAuthorMatch[1].trim();
+        const quoteAuthor = simpleAuthorMatch[2].trim();
+        const nextParagraph = simpleAuthorMatch[3] ? `\n\n${simpleAuthorMatch[3].trim()}` : '';
+        return `\n\n<blockquote class="article-bible-quote"><p>${quoteText}</p><footer class="article-quote-author">${quoteAuthor}</footer></blockquote>${nextParagraph}\n\n`;
+      }
+
+      return `\n\n<blockquote class="article-bible-quote"><p>${content}</p></blockquote>\n\n`;
+    });
+
+    // 1b-2. Si l'article entier est sur une seule ligne compactée, découper proprement les paragraphes (sans couper les initiales d'auteurs C., S., J., etc., ni abréviations)
     if (!text.includes('\n\n')) {
-      text = text.replace(/(?<!\b(?:pp|p|chap|ch|vol|v|vs|dr|etc|ex|cf|art|\d+))\.\s+([A-ZÀ-ÿ—–«])/gi, '.\n\n$1');
-      text = text.replace(/([!?…»])\s+([A-ZÀ-ÿ0-9—–«])/g, '$1\n\n$2');
+      text = text.replace(/(?<!\b(?:pp|p|chap|ch|vol|v|vs|dr|etc|ex|cf|art|[A-ZÀ-ÿ]|\d+))\.\s+(?!–|—)([A-ZÀ-ÿ«])/g, '.\n\n$1');
+      text = text.replace(/([!?…»])\s+(?!–|—)([A-ZÀ-ÿ0-9«])/g, '$1\n\n$2');
     }
 
     // 2. Nettoyer les emojis résiduels dans les listes et structurer "Pour aller plus loin"
     text = text.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1FA70}-\u{1FAFF}]/gu, '');
     text = text.replace(/(?:^|\n|[.!?…»])\s*(Pour\s+aller\s+plus\s+loin\s*:?)\s*(\[|Un\s+article|[A-ZÀ-ÿ])/gi, '\n\n### Pour aller plus loin\n\n- $2');
     text = text.replace(/([A-Za-zÀ-ÿ0-9\)\]*])\s+(Un\s+article\s+de\s+[^\n:]+:\s*)/g, '$1\n- $2');
-    text = text.replace(/([.!?…»]|\))\s*([A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+(?:\s+[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+)?,\s*\*?\[[^\]]+\])/g, '$1\n- $2');
+    text = text.replace(/(?<=### Pour aller plus loin[\s\S]*?)(?:\n|[.!?…»]|\))\s*([A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+(?:\s+[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+)?,\s*\*?\[[^\]]+\])/g, '\n- $1');
 
     // 2b. Nettoyer les blocs promotionnels, parcours e-mail et mentions de droits réservés
     text = text.replace(/(?:#+\s*)?Parcours\s+e-?mail[\s\S]*$/gi, '');
@@ -1301,8 +1324,10 @@ const ArticlesView = {
     // Convertir les lignes de dialogue au tiret en encadrés distincts (en protégeant les citations scripturaires)
     text = new RegExp(`(?:^|\\n)\\s*([—–\\u2013\\u2014]${notBibleRefAhead}\\s+[A-ZÀ-ÿ][^\\n]+)`, 'g')[Symbol.replace](text, '\n\n<div class="article-speaker-turn"><p class="article-speaker-speech">$1</p></div>\n\n');
 
-    // 5f. Convertir les citations bibliques avec tiret de référence (« ... » – Réf)
-    text = text.replace(/(?:^|\n)«\s*([^»]+?)\s*»\s*([–—\u2013\u2014-]\s*[A-ZÀ-ÿ0-9.:\s-]+)/g, '\n\n<blockquote class="article-bible-quote"><p>« $1 » $2</p></blockquote>\n\n');
+    // 5f. Convertir les citations bibliques et littéraires avec tiret de référence (« ... » – Réf / Auteur)
+    text = text.replace(/(?:^|\n)«\s*([^»]+?)\s*»\s*([–—\u2013\u2014-]\s*[A-ZÀ-ÿ0-9.:\s-]+)/g, (match, quote, author) => {
+      return `\n\n<blockquote class="article-bible-quote"><p>« ${quote} »</p><footer class="article-quote-author">${author.trim()}</footer></blockquote>\n\n`;
+    });
 
     // 5g. Détecter et formater les blocs de notes de bas de page avec ancres de retour [↩︎](#...)
     const backlinkRegex = /\[(?:↩︎|↩)\]\(#[^)]+\)/;
@@ -1407,8 +1432,8 @@ const ArticlesView = {
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
-      // Rétablir les balises HTML injectées (dialogues, callouts, tables, blockquotes, notes, badges)
-      .replace(/&lt;(\/?(?:div|table|thead|tbody|tr|th|td|blockquote|p|sup|span|a)(?:\s+[a-zA-Z0-9_\-]+="[^"]*")*)(\s*\/)?&gt;/gi, '<$1$2>')
+      // Rétablir les balises HTML injectées (dialogues, callouts, tables, blockquotes, footer auteur, notes, badges)
+      .replace(/&lt;(\/?(?:div|table|thead|tbody|tr|th|td|blockquote|footer|cite|p|sup|span|a)(?:\s+[a-zA-Z0-9_\-]+="[^"]*")*)(\s*\/)?&gt;/gi, '<$1$2>')
       .replace(/^#### (.*$)/gim, '<h4 class="article-h4">$1</h4>')
       .replace(/^### (.*$)/gim, '<h3 class="article-h3">$1</h3>')
       .replace(/^## (.*$)/gim, '<h2 class="article-h2">$1</h2>')
