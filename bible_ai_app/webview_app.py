@@ -1196,7 +1196,20 @@ class BibleAppApi:
             return {"success": False, "error": str(e)}
 
 
+    def get_theology_chapter_snippet(self, book_name: str, chapter_id: Any, book_code: str, chapter: int, verse: int = 1) -> Dict[str, Any]:
+        """Extrait à la demande au survol le passage textuel pertinent d'un chapitre de théologie."""
+        try:
+            from core.theology_reader_manager import TheologyReaderManager
+            snippet = TheologyReaderManager.get_theology_chapter_snippet(
+                book_name, chapter_id, book_code, chapter, verse
+            )
+            return {"success": True, "snippet": snippet}
+        except Exception as e:
+            logger.error(f"Erreur get_theology_chapter_snippet: {e}")
+            return {"success": False, "snippet": "", "error": str(e)}
+
     def get_wikipedia_summary(self, query: str, exact_title: Optional[str] = None) -> Dict[str, Any]:
+
         """Récupère le résumé et les métadonnées Wikipédia pour un terme."""
         from core.wikipedia_client import WikipediaClient
         return WikipediaClient.get_summary(query, exact_title=exact_title)

@@ -272,21 +272,28 @@ const PassageOverviewDrawer = {
     this.popoverEl = popover;
   },
 
+  theologySnippetCache: {},
+  currentPopoverItem: null,
+
   /**
    * Affiche l'infobulle flottante au survol d'une ressource (avec image / couverture)
    */
-  showPopover(itemEl) {
+  async showPopover(itemEl) {
     if (!this.popoverEl) this.initPopover();
+    this.currentPopoverItem = itemEl;
 
     const cat = itemEl.dataset.ttCategory || 'Ressource';
     const author = itemEl.dataset.ttAuthor || '';
     const title = itemEl.dataset.ttTitle || '';
-    const excerpt = itemEl.dataset.ttExcerpt || '';
+    let excerpt = itemEl.dataset.ttExcerpt || '';
     const badge = itemEl.dataset.ttBadge || '';
     const logoUrl = itemEl.dataset.ttLogo || '';
     const imgUrl = itemEl.dataset.ttImage || '';
+    const action = itemEl.dataset.action || '';
+    const bName = itemEl.dataset.bookName || '';
+    const chId = itemEl.dataset.chapterId || '';
 
-    if (!excerpt && !author && !title) return;
+    if (!excerpt && !author && !title && !bName) return;
 
     let catIcon = this.icons.commentary;
     if (cat === 'Article') catIcon = this.icons.article;
@@ -309,6 +316,25 @@ const PassageOverviewDrawer = {
         : `<div class="popover-cover-wrap"><div class="popover-cover-fallback ${cat.toLowerCase()}">${catIcon}</div></div>`;
     }
 
+    const isTheology = action === 'open-theology-chapter' && bName;
+    const cacheKey = `${bName}_${chId}_${this.currentBook}_${this.currentChapter}_${this.currentVerse}`;
+    let isFetchingSnippet = false;
+
+    if (isTheology) {
+      if (this.theologySnippetCache[cacheKey]) {
+        excerpt = this.theologySnippetCache[cacheKey];
+      } else if (!excerpt) {
+        isFetchingSnippet = true;
+      }
+    }
+
+    const bodyContentHtml = isFetchingSnippet
+      ? `<div class="popover-body-loading" style="display:flex; align-items:center; gap:8px; color:#c084fc; font-size:12px; padding:12px 0;">
+           <span class="synth-spinner" style="width:13px; height:13px; border-width:2px; border-top-color:#c084fc;"></span>
+           <span>Recherche du passage consacré en cours...</span>
+         </div>`
+      : (excerpt ? `<div class="popover-body">${excerpt}</div>` : '');
+
     this.popoverEl.innerHTML = `
       <div class="popover-inner">
         ${bannerHtml}
@@ -329,7 +355,9 @@ const PassageOverviewDrawer = {
             </div>
           </div>
         </div>
-        ${excerpt ? `<div class="popover-body">${excerpt}</div>` : ''}
+        <div class="popover-body-container">
+          ${bodyContentHtml}
+        </div>
         <div class="popover-footer">
           <span class="popover-hint">${this.icons.arrowRight} <span>Cliquer pour ouvrir dans l'onglet</span></span>
         </div>
@@ -355,12 +383,41 @@ const PassageOverviewDrawer = {
     this.popoverEl.classList.remove('hidden');
     void this.popoverEl.offsetWidth; // Reflow
     this.popoverEl.classList.add('visible');
+
+    // Chargement asynchrone si extrait en attente
+    if (isFetchingSnippet) {
+      try {
+        const res = await API.call(
+          'get_theology_chapter_snippet',
+          bName,
+          chId,
+          this.currentBook || 'GEN',
+          this.currentChapter || 1,
+          this.currentVerse || 1
+        );
+        if (res && res.success && res.snippet) {
+          const formatted = this.formatMarkdownExcerpt(res.snippet);
+          this.theologySnippetCache[cacheKey] = formatted;
+          itemEl.dataset.ttExcerpt = formatted;
+
+          if (this.currentPopoverItem === itemEl && this.popoverEl.classList.contains('visible')) {
+            const bodyContainer = this.popoverEl.querySelector('.popover-body-container');
+            if (bodyContainer) {
+              bodyContainer.innerHTML = `<div class="popover-body" style="animation:fadeIn 0.25s ease;">${formatted}</div>`;
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('[PassageOverviewDrawer] Erreur chargement snippet théologie:', err);
+      }
+    }
   },
 
   /**
    * Masque l'infobulle flottante
    */
   hidePopover() {
+    this.currentPopoverItem = null;
     if (this.popoverEl) {
       this.popoverEl.classList.remove('visible');
       setTimeout(() => {
@@ -370,6 +427,7 @@ const PassageOverviewDrawer = {
       }, 150);
     }
   },
+
 
   /**
    * Rendu complet des cartes et compteurs.

@@ -912,6 +912,28 @@ Règles de style :
         return f"Étude et analyse contextuelle consacrées à {french_book} {chapter}."
 
     @classmethod
+    def get_theology_chapter_snippet(
+        cls,
+        book_name: str,
+        chapter_id: Any,
+        book_code: str,
+        chapter: int,
+        verse: int = 1
+    ) -> str:
+        """Extrait à la demande le paragraphe textuel exact mentionnant le verset/chapitre."""
+        from core.reference_parser import get_standard_book_code, get_french_book_name
+        norm_code = (get_standard_book_code(book_code) or book_code).upper()
+        french_book = get_french_book_name(norm_code) or book_code
+        return cls._extract_theology_snippet(
+            book_name,
+            chapter_id,
+            french_book,
+            norm_code,
+            int(chapter) if str(chapter).isdigit() else 1,
+            int(verse) if str(verse).isdigit() else 1
+        )
+
+    @classmethod
     def get_theology_resources_for_passage(
         cls,
         book_code: str,
@@ -920,8 +942,8 @@ Règles de style :
         limit: int = 8
     ) -> List[Dict[str, Any]]:
         """
-        Trouve tous les chapitres de livres de théologie, manuels et dictionnaires
-        qui traitent du passage ou citent directement le verset.
+        Trouve instantanément tous les chapitres de livres de théologie, manuels et dictionnaires
+        qui traitent du passage (les extraits complets sont chargés à la demande au survol).
         """
         from core.reference_parser import get_standard_book_code, get_french_book_name
         from webview_app import get_cover_data_url
@@ -935,9 +957,8 @@ Règles de style :
 
         results = []
         seen = set()
-        registry = load_books_metadata()
 
-        # 1. Chapitres de livres de la bibliothèque dédiés à ce livre biblique (instantané en mémoire)
+        # Chapitres de livres de la bibliothèque dédiés à ce livre biblique (instantané en mémoire)
         book_index = cls._get_bible_book_index()
         book_matches = book_index.get(norm_code, [])
         for bm in book_matches:
@@ -947,20 +968,12 @@ Règles de style :
             if key not in seen:
                 seen.add(key)
                 item = dict(bm)
-                # Extraire le passage textuel réel du livre de théologie qui mentionne le verset/chapitre
-                snip = cls._extract_theology_snippet(
-                    bm["book_name"],
-                    bm["chapter_id"],
-                    french_book,
-                    norm_code,
-                    chapter,
-                    verse
-                )
-                item["snippet"] = snip or bm.get("snippet") or f"Étude et contexte consacrés à {french_book} {chapter}."
+                item["snippet"] = None  # Chargé à la demande au survol pour affichage instantané
                 results.append(item)
 
         cls._passage_theology_cache[cache_key] = results[:limit]
         return cls._passage_theology_cache[cache_key]
+
 
 
     @staticmethod
