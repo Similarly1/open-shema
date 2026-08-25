@@ -2611,6 +2611,178 @@ const LexiconViewer = {
   currentMatches: [],
   activeSourceIndex: 0,
 
+  getPassageKeywords(book, chapter) {
+    const b = (book || (typeof BibleReader !== 'undefined' && BibleReader.currentBook) || 'GEN').toUpperCase();
+    const ch = parseInt(chapter || (typeof BibleReader !== 'undefined' && BibleReader.currentChapter) || 1, 10);
+
+    const KEYWORD_MAP = {
+      'GEN_1': [
+        { word: 'Créer', root: 'Bara', strong: 'H1254' },
+        { word: 'Dieu', root: 'Elohim', strong: 'H0430' },
+        { word: 'Lumière', root: '’Or', strong: 'H0216' },
+        { word: 'Commencement', root: 'Reshit', strong: 'H7225' }
+      ],
+      'GEN_2': [
+        { word: 'Former', root: 'Yatsar', strong: 'H3335' },
+        { word: 'Souffle de vie', root: 'Nishmat khayyim', strong: 'H5397' },
+        { word: 'Éden', root: '’Eden', strong: 'H5731' }
+      ],
+      'GEN_3': [
+        { word: 'Serpent', root: 'Nakhash', strong: 'H5175' },
+        { word: 'Arbre', root: 'ʿEts', strong: 'H6086' },
+        { word: 'Mourir', root: 'Mout', strong: 'H4191' },
+        { word: 'Ouvrir les yeux', root: 'Paqakh', strong: 'H6491' }
+      ],
+      'EXO_3': [
+        { word: 'L’Éternel (YHWH)', root: 'Yahweh', strong: 'H3068' },
+        { word: 'Buisson ardent', root: 'Seneh', strong: 'H5572' },
+        { word: 'Saint', root: 'Qadosh', strong: 'H6918' }
+      ],
+      'EXO_34': [
+        { word: 'Amour loyal', root: 'Ḥessed', strong: 'H2617' },
+        { word: 'Compassion', root: 'Raḥoum', strong: 'H7349' },
+        { word: 'Fidélité', root: '’Emeth', strong: 'H0571' }
+      ],
+      'DEU_6': [
+        { word: 'Écouter', root: 'Shemaʿ', strong: 'H8085' },
+        { word: 'Aimer', root: '’Ahav', strong: 'H0157' },
+        { word: 'Cœur', root: 'Lev', strong: 'H3820' },
+        { word: 'Force', root: 'Me’od', strong: 'H3966' }
+      ],
+      'PSA_23': [
+        { word: 'Berger', root: 'Roʿeh', strong: 'H7462' },
+        { word: 'Âme / Être', root: 'Nephesh', strong: 'H5315' },
+        { word: 'Grâce / Bonté', root: 'Ḥessed', strong: 'H2617' }
+      ],
+      'PSA_51': [
+        { word: 'Pitié / Grâce', root: 'Khanam', strong: 'H2603' },
+        { word: 'Péché', root: 'Khatta’ah', strong: 'H2403' },
+        { word: 'Cœur pur', root: 'Lev tahor', strong: 'H2889' }
+      ],
+      'ISA_53': [
+        { word: 'Serviteur', root: 'ʿEved', strong: 'H5650' },
+        { word: 'Transpercé', root: 'Khalal', strong: 'H2490' },
+        { word: 'Iniquité', root: 'ʿAvon', strong: 'H5771' },
+        { word: 'Paix', root: 'Shalom', strong: 'H7965' }
+      ],
+      'MAT_5': [
+        { word: 'Heureux', root: 'Makarios', strong: 'G3107' },
+        { word: 'Royaume', root: 'Basileia', strong: 'G0932' },
+        { word: 'Artisans de paix', root: 'Eirēnopoios', strong: 'G1518' }
+      ],
+      'MAT_6': [
+        { word: 'Père céleste', root: 'Patēr', strong: 'G3962' },
+        { word: 'Pardonner', root: 'Aphiēmi', strong: 'G0863' },
+        { word: 'Trésor', root: 'Thēsauros', strong: 'G2344' }
+      ],
+      'JHN_1': [
+        { word: 'La Parole', root: 'Logos', strong: 'G3056' },
+        { word: 'Lumière', root: 'Phōs', strong: 'G5457' },
+        { word: 'Grâce et vérité', root: 'Charis kai alētheia', strong: 'G5485' }
+      ],
+      'JHN_3': [
+        { word: 'Naître d’en haut', root: 'Anōthen', strong: 'G0509' },
+        { word: 'Amour divin', root: 'Agapē', strong: 'G0026' },
+        { word: 'Vie éternelle', root: 'Zōē aiōnios', strong: 'G2222' }
+      ],
+      'ROM_3': [
+        { word: 'Justification', root: 'Dikaiosunē', strong: 'G1343' },
+        { word: 'Foi', root: 'Pistis', strong: 'G4102' },
+        { word: 'Rédemption', root: 'Apolutrōsis', strong: 'G0629' }
+      ],
+      'ROM_8': [
+        { word: 'Esprit Saint', root: 'Pneuma', strong: 'G4151' },
+        { word: 'Espérance', root: 'Elpis', strong: 'G1680' },
+        { word: 'Amour inébranlable', root: 'Agapē', strong: 'G0026' }
+      ],
+      '1CO_13': [
+        { word: 'Amour agapé', root: 'Agapē', strong: 'G0026' },
+        { word: 'Patience', root: 'Makrothumia', strong: 'G3115' },
+        { word: 'Bienveillance', root: 'Chrēstotēs', strong: 'G5544' }
+      ],
+      '1CO_15': [
+        { word: 'Résurrection', root: 'Anastasis', strong: 'G0386' },
+        { word: 'Évangile', root: 'Euangelion', strong: 'G2098' },
+        { word: 'Victoire', root: 'Nikos', strong: 'G3534' }
+      ],
+      'GAL_5': [
+        { word: 'Fruit de l’Esprit', root: 'Karpos', strong: 'G2590' },
+        { word: 'Liberté', root: 'Eleutheria', strong: 'G1657' },
+        { word: 'Paix & Joie', root: 'Eirēnē kai Chara', strong: 'G1515' }
+      ],
+      'EPH_2': [
+        { word: 'Grâce offerte', root: 'Charis', strong: 'G5485' },
+        { word: 'Rapprochement', root: 'Engus', strong: 'G1451' },
+        { word: 'Paix du Christ', root: 'Eirēnē', strong: 'G1515' }
+      ],
+      'REV_21': [
+        { word: 'Toutes choses nouvelles', root: 'Kainos', strong: 'G2537' },
+        { word: 'Tabernacle', root: 'Skēnē', strong: 'G4633' },
+        { word: 'Plus de mort', root: 'Thanatos', strong: 'G2288' }
+      ]
+    };
+
+    const key = `${b}_${ch}`;
+    if (KEYWORD_MAP[key]) {
+      return KEYWORD_MAP[key];
+    }
+
+    const isNT = ['MAT','MRK','LUK','JHN','ACT','ROM','1CO','2CO','GAL','EPH','PHP','COL','1TH','2TH','1TI','2TI','TIT','PHM','HEB','JAS','1PE','2PE','1JN','2JN','3JN','JUD','REV'].includes(b);
+
+    if (isNT) {
+      return [
+        { word: 'Grâce', root: 'Charis', strong: 'G5485' },
+        { word: 'Foi', root: 'Pistis', strong: 'G4102' },
+        { word: 'Amour', root: 'Agapē', strong: 'G0026' }
+      ];
+    } else {
+      return [
+        { word: 'Amour loyal', root: 'Ḥessed', strong: 'H2617' },
+        { word: 'Paix / Plénitude', root: 'Shalom', strong: 'H7965' },
+        { word: 'Fidélité', root: '’Emeth', strong: 'H0571' }
+      ];
+    }
+  },
+
+  renderEmptyState(book, chapter) {
+    const container = document.getElementById('lexicon-details');
+    if (!container) return;
+
+    this.currentTerm = '';
+    this.currentStrong = null;
+    this.currentMatches = [];
+
+    const b = book || (typeof BibleReader !== 'undefined' && BibleReader.currentBook) || 'Gen';
+    const ch = chapter || (typeof BibleReader !== 'undefined' && BibleReader.currentChapter) || 1;
+    const frenchName = (typeof getFrenchBookName === 'function' ? getFrenchBookName(b) : null) || b;
+    const keywords = this.getPassageKeywords(b, ch);
+
+    container.innerHTML = `
+      <div class="lexicon-empty-state">
+        <div class="lexicon-empty-icon-wrap">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+            <path d="M6 6h10"></path>
+            <path d="M6 10h10"></path>
+          </svg>
+        </div>
+        <h3 class="lexicon-empty-title">Exploration Lexicale &amp; Strong</h3>
+        <p class="lexicon-empty-desc">Cliquez sur un mot dans le texte biblique pour analyser sa racine hébraïque ou grecque, ses définitions et ses études linguistiques.</p>
+        
+        <div class="lexicon-empty-suggestions-label">Termes clés pour ${frenchName} ${ch} :</div>
+        <div class="lexicon-empty-suggestions">
+          ${keywords.map(k => `
+            <button type="button" class="lexicon-empty-hint-tag" onclick="BibleReader.lookupWordInLexicon('${k.word.replace(/'/g, "\\'")}', '${k.strong}')">
+              <span class="lex-sug-word">${k.word}</span>
+              <span class="lex-sug-sep">•</span>
+              <span class="lex-sug-root">${k.root} (${k.strong})</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  },
+
   async load(word, strongCode = null) {
     this.currentTerm = (word || '').trim();
     this.currentStrong = strongCode;
@@ -2638,6 +2810,7 @@ const LexiconViewer = {
   render() {
     const container = document.getElementById('lexicon-details');
     container.innerHTML = '';
+
 
     // Barre d'onglets de sources (Strong, Calmet, Vigouroux, Bailly, Wikipédia)
     const toolbar = document.createElement('div');

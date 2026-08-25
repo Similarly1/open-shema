@@ -178,7 +178,15 @@ const App = {
               const curRef = BibleReader.currentVerseRef || `${BibleReader.currentBook || 'GEN'} ${BibleReader.currentChapter || 1}:${BibleReader.selectedVerse || 1}`;
               passageBadge.textContent = curRef;
             }
+          } else if (tabId === 'lexicon') {
+            if (typeof LexiconViewer !== 'undefined' && (!LexiconViewer.currentMatches || LexiconViewer.currentMatches.length === 0)) {
+              const b = (typeof BibleReader !== 'undefined' && BibleReader.currentBook) || 'Gen';
+              const ch = (typeof BibleReader !== 'undefined' && BibleReader.currentChapter) || 1;
+              LexiconViewer.renderEmptyState(b, ch);
+            }
           } else if (tabId === 'articles') {
+
+
             const b = (typeof BibleReader !== 'undefined' && BibleReader.currentBook) || 'Gen';
             const ch = (typeof BibleReader !== 'undefined' && BibleReader.currentChapter) || 1;
             if (typeof ArticlesView !== 'undefined') {
