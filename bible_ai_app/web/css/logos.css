@@ -2824,9 +2824,11 @@ input:checked + .slider.round:before {
   display: none;
   flex-direction: column;
   height: 100%;
-  overflow: hidden;
+  max-height: 100%;
+  overflow: hidden !important;
   background: var(--bg-main, #0f172a);
 }
+
 
 #drawer-tab-overview.active {
   display: flex;
@@ -2999,16 +3001,16 @@ input:checked + .slider.round:before {
 
 /* Corps défilant aéré */
 .overview-scrollable-body {
-  flex: 1;
-  height: 100%;
-  overflow-y: scroll !important;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
   overflow-x: hidden;
   padding: 12px 14px 40px 14px;
   display: flex;
   flex-direction: column;
   gap: 12px;
   scrollbar-width: thin;
-  scrollbar-color: #a855f7 rgba(255, 255, 255, 0.06);
+  scrollbar-color: #a855f7 rgba(255, 255, 255, 0.08);
 }
 
 .overview-scrollable-body::-webkit-scrollbar {
@@ -3138,19 +3140,23 @@ input:checked + .slider.round:before {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  max-height: 220px;
+  max-height: 240px;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: #a855f7 rgba(255, 255, 255, 0.06);
+  scrollbar-color: #a855f7 rgba(255, 255, 255, 0.08);
 }
 
 #sec-bibleproject .sec-body {
-  max-height: 300px;
+  max-height: 380px;
 }
 
 #sec-theology .sec-body {
-  max-height: 250px;
+  max-height: 280px;
+}
+
+#sec-commentaries .sec-body {
+  max-height: 240px;
 }
 
 .sec-body::-webkit-scrollbar {
@@ -3174,6 +3180,7 @@ input:checked + .slider.round:before {
 /* Liste épurée typographique (style Logos / Apple) */
 .overview-clean-list {
   display: flex;
+
 
 
   flex-direction: column;
