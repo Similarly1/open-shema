@@ -1482,8 +1482,10 @@ const ArticlesView = {
     if (!listEl) return;
 
     if (badgeEl) {
-      badgeEl.textContent = `${bookCode || 'Gen'} ${chapter || 1}`;
+      const frenchName = (typeof getFrenchBookName === 'function' ? getFrenchBookName(bookCode) : null) || bookCode || 'Genèse';
+      badgeEl.textContent = `${frenchName} ${chapter || 1}`;
     }
+
 
     listEl.innerHTML = `<div class="articles-loading-state" style="padding: 20px;"><div class="spinner-sm"></div><span>Recherche des articles associés...</span></div>`;
 

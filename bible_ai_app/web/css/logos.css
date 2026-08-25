@@ -21157,6 +21157,131 @@ body.reading-bg-dark .comm-dropdown-popover {
   padding: 14px;
 }
 
+/* ========================================================================= */
+/* BARRE D'ONGLETS DU TIROIR DROIT AVEC DÉFILEMENT & DÉGRADÉ D'ESTOMPEMENT    */
+/* ========================================================================= */
+
+.drawer-tabs-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: #090d16;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  min-height: 40px;
+  overflow: hidden;
+}
+
+.drawer-tabs {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+  padding: 4px 8px;
+  flex: 1;
+  white-space: nowrap;
+}
+
+.drawer-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.drawer-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #94a3b8;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.18s ease;
+}
+
+.drawer-tab:hover {
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.drawer-tab.active {
+  color: #a855f7;
+  background: rgba(168, 85, 247, 0.12);
+  border-color: rgba(168, 85, 247, 0.35);
+  font-weight: 700;
+}
+
+.drawer-tab .tab-svg {
+  flex-shrink: 0;
+}
+
+/* Dégradé progressif d'effacement sur les bords */
+.drawer-tabs-wrapper.has-overflow-right::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 55px;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, #090d16 80%);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.drawer-tabs-wrapper.has-overflow-left::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 55px;
+  height: 100%;
+  background: linear-gradient(90deg, #090d16 20%, transparent 100%);
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Boutons ronds de navigation latérale */
+.drawer-tabs-scroll-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #1e293b;
+  border: 1px solid rgba(168, 85, 247, 0.5);
+  color: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+  transition: all 0.2s ease;
+}
+
+.drawer-tabs-scroll-btn:hover {
+  background: #a855f7;
+  color: #ffffff;
+  border-color: #c084fc;
+  transform: translateY(-50%) scale(1.12);
+}
+
+.drawer-tabs-scroll-left {
+  left: 4px;
+}
+
+.drawer-tabs-scroll-right {
+  right: 4px;
+}
+
+
 
 
 

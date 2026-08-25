@@ -92,12 +92,65 @@ const App = {
     });
 
     // 3. Onglets du panneau droit (Aperçu / Commentaires / IA / Lexique / Notes / Articles / BibleProject)
+    // Gestion du défilement horizontal et des flèches pour les onglets du tiroir
+    const tabsWrapper = document.getElementById('drawer-tabs-wrapper');
+    const tabsBar = document.getElementById('drawer-tabs-bar');
+    const btnScrollLeft = document.getElementById('btn-scroll-drawer-tabs-left');
+    const btnScrollRight = document.getElementById('btn-scroll-drawer-tabs-right');
+
+    const updateTabsScrollState = () => {
+      if (!tabsBar || !tabsWrapper) return;
+      const scrollLeft = tabsBar.scrollLeft;
+      const maxScroll = tabsBar.scrollWidth - tabsBar.clientWidth;
+
+      if (maxScroll > 4) {
+        if (scrollLeft > 6) {
+          btnScrollLeft?.classList.remove('hidden');
+          tabsWrapper.classList.add('has-overflow-left');
+        } else {
+          btnScrollLeft?.classList.add('hidden');
+          tabsWrapper.classList.remove('has-overflow-left');
+        }
+
+        if (scrollLeft < maxScroll - 6) {
+          btnScrollRight?.classList.remove('hidden');
+          tabsWrapper.classList.add('has-overflow-right');
+        } else {
+          btnScrollRight?.classList.add('hidden');
+          tabsWrapper.classList.remove('has-overflow-right');
+        }
+      } else {
+        btnScrollLeft?.classList.add('hidden');
+        btnScrollRight?.classList.add('hidden');
+        tabsWrapper.classList.remove('has-overflow-left', 'has-overflow-right');
+      }
+    };
+
+    tabsBar?.addEventListener('scroll', updateTabsScrollState, { passive: true });
+    window.addEventListener('resize', updateTabsScrollState, { passive: true });
+    setTimeout(updateTabsScrollState, 200);
+
+    btnScrollLeft?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      tabsBar?.scrollBy({ left: -140, behavior: 'smooth' });
+      setTimeout(updateTabsScrollState, 350);
+    });
+
+    btnScrollRight?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      tabsBar?.scrollBy({ left: 140, behavior: 'smooth' });
+      setTimeout(updateTabsScrollState, 350);
+    });
+
     document.querySelectorAll('.drawer-tab').forEach(tabBtn => {
       tabBtn.addEventListener('click', () => {
         document.querySelectorAll('.drawer-tab').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.drawer-content').forEach(c => c.classList.remove('active'));
 
         tabBtn.classList.add('active');
+        tabBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        setTimeout(updateTabsScrollState, 300);
+
         const tabId = tabBtn.dataset.drawerTab;
         const contentEl = document.getElementById(`drawer-tab-${tabId}`);
         if (contentEl) {
@@ -141,6 +194,7 @@ const App = {
         }
       });
     });
+
 
 
     // 4. Chat Assistant IA

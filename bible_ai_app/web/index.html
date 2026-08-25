@@ -4473,58 +4473,67 @@
     <!-- ======================================================= -->
     <aside class="right-drawer collapsed" id="right-drawer">
       <div class="drawer-resizer-handle" id="drawer-resizer" title="Glisser pour ajuster la largeur"></div>
-      <div class="drawer-tabs">
-        <button class="drawer-tab active" data-drawer-tab="overview" title="Aperçu & Guide de passage 360°">
-          <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
-          </svg>
-          <span>Aperçu</span>
+      <div class="drawer-tabs-wrapper" id="drawer-tabs-wrapper">
+        <button type="button" class="drawer-tabs-scroll-btn drawer-tabs-scroll-left hidden" id="btn-scroll-drawer-tabs-left" title="Défiler les onglets vers la gauche">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
-        <button class="drawer-tab" data-drawer-tab="commentaries" title="Commentaires exégétiques">
-          <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-          </svg>
-          <span>Commentaires</span>
-        </button>
-        <button class="drawer-tab" data-drawer-tab="ai" title="Assistant IA">
-          <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
-          </svg>
-          <span>Assistant IA</span>
-        </button>
-        <button class="drawer-tab" data-drawer-tab="lexicon" title="Lexique & Dictionnaires">
-          <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
-            <path d="M6 6h10"></path>
-            <path d="M6 10h10"></path>
-          </svg>
-          <span>Lexique</span>
-        </button>
-        <button class="drawer-tab" data-drawer-tab="notes" title="Notes d'étude">
-          <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
-            <path d="m15 5 4 4"></path>
-          </svg>
-          <span>Notes</span>
-        </button>
-        <button class="drawer-tab" data-drawer-tab="articles" title="Articles & Blogs contemporains liés au passage">
-          <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10l6 6v8a2 2 0 0 1-2 2z"></path>
-            <path d="M14 2v6h6"></path>
-            <path d="M7 13h10"></path>
-            <path d="M7 17h6"></path>
-          </svg>
-          <span>Articles</span>
-        </button>
-        <button class="drawer-tab" data-drawer-tab="media" title="Médias & Vidéos bibliques (BibleProject, etc.)">
-          <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="23 7 16 12 23 17 23 7"></polygon>
-            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
-          </svg>
-          <span>Médias</span>
+        <div class="drawer-tabs" id="drawer-tabs-bar">
+          <button class="drawer-tab active" data-drawer-tab="overview" title="Aperçu & Guide de passage 360°">
+            <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+            </svg>
+            <span>Aperçu</span>
+          </button>
+          <button class="drawer-tab" data-drawer-tab="commentaries" title="Commentaires exégétiques">
+            <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>Commentaires</span>
+          </button>
+          <button class="drawer-tab" data-drawer-tab="ai" title="Assistant IA">
+            <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
+            </svg>
+            <span>Assistant IA</span>
+          </button>
+          <button class="drawer-tab" data-drawer-tab="lexicon" title="Lexique & Dictionnaires">
+            <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+              <path d="M6 6h10"></path>
+              <path d="M6 10h10"></path>
+            </svg>
+            <span>Lexique</span>
+          </button>
+          <button class="drawer-tab" data-drawer-tab="notes" title="Notes d'étude">
+            <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+              <path d="m15 5 4 4"></path>
+            </svg>
+            <span>Notes</span>
+          </button>
+          <button class="drawer-tab" data-drawer-tab="articles" title="Articles & Blogs contemporains liés au passage">
+            <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10l6 6v8a2 2 0 0 1-2 2z"></path>
+              <path d="M14 2v6h6"></path>
+              <path d="M7 13h10"></path>
+              <path d="M7 17h6"></path>
+            </svg>
+            <span>Articles</span>
+          </button>
+          <button class="drawer-tab" data-drawer-tab="media" title="Médias & Vidéos bibliques (BibleProject, etc.)">
+            <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="23 7 16 12 23 17 23 7"></polygon>
+              <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+            </svg>
+            <span>Médias</span>
+          </button>
+        </div>
+        <button type="button" class="drawer-tabs-scroll-btn drawer-tabs-scroll-right" id="btn-scroll-drawer-tabs-right" title="Défiler les onglets vers la droite">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
       </div>
+
 
 
       <div class="drawer-body">

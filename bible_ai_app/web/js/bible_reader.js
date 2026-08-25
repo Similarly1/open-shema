@@ -4630,7 +4630,26 @@ const BibleReader = {
     } catch (e) {
       console.error('Erreur sync BibleProjectView:', e);
     }
+
+    // Synchronisation automatique des Articles contemporains
+    try {
+      if (typeof ArticlesView !== 'undefined' && ArticlesView.loadDrawerArticles) {
+        const articlesTab = document.querySelector('.drawer-tab[data-drawer-tab="articles"]');
+        if (articlesTab && articlesTab.classList.contains('active')) {
+          ArticlesView.loadDrawerArticles(book, ch);
+        } else {
+          const badgeEl = document.getElementById('lbl-drawer-articles-passage');
+          if (badgeEl) {
+            const frenchName = (typeof getFrenchBookName === 'function' ? getFrenchBookName(book) : null) || book;
+            badgeEl.textContent = `${frenchName} ${ch}`;
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Erreur sync ArticlesView:', e);
+    }
   },
+
 
 
   async lookupWordInLexicon(word, strongCode = null) {
