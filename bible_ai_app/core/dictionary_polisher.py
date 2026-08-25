@@ -447,7 +447,9 @@ TEXTE BRUT ORIGINAL :
                             polished_text = parts[0]["text"].strip()
                             return True, cls._clean_markdown_fences(polished_text), usage_res
                     return False, "Réponse de l'API Gemini vide ou invalide.", usage_res
-                else:
+                elif resp.status_code == 429:
+                    return False, f"Erreur API Gemini (429) : {resp.text}", usage_res
+                elif resp.status_code == 400:
                     fallback_prompt = f"{POLISH_SYSTEM_PROMPT}\n\n---\n\n{user_prompt}"
                     fallback_payload = {
                         "contents": [{"parts": [{"text": fallback_prompt}]}],
@@ -466,6 +468,8 @@ TEXTE BRUT ORIGINAL :
                         if fb_candidates and "content" in fb_candidates[0]:
                             polished_text = fb_candidates[0]["content"]["parts"][0]["text"].strip()
                             return True, cls._clean_markdown_fences(polished_text), usage_res
+                    return False, f"Erreur API Gemini ({resp.status_code}) : {resp.text}", usage_res
+                else:
                     return False, f"Erreur API Gemini ({resp.status_code}) : {resp.text}", usage_res
             except requests.exceptions.Timeout:
                 return False, "Délai d'attente dépassé (timeout).", usage_res

@@ -350,15 +350,25 @@ def main():
 
     print(f"\n🚀 Démarrage du traitement de {total_to_do} articles...\n")
 
+    executor = ThreadPoolExecutor(max_workers=workers_count)
+    futures = {}
+    for item in to_process:
+        ep = next(pool_cycle)
+        fut = executor.submit(process_article, item, ep)
+        futures[fut] = item
+
+    pending = set(futures.keys())
+
     try:
-        with ThreadPoolExecutor(max_workers=workers_count) as executor:
-            futures = {}
-            for item in to_process:
-                ep = next(pool_cycle)
-                fut = executor.submit(process_article, item, ep)
-                futures[fut] = item
-                
-            for future in as_completed(futures):
+        while pending:
+            # Polling court (0.1s) pour garantir que Ctrl+C est intercepté à la milliseconde près sous Windows
+            done_batch = [f for f in list(pending) if f.done()]
+            if not done_batch:
+                time.sleep(0.1)
+                continue
+
+            for future in done_batch:
+                pending.remove(future)
                 slug, title, ok, result, usage, ep_name, used_model = future.result()
                 with lock:
                     save_counter += 1
@@ -409,12 +419,15 @@ def main():
 
     except KeyboardInterrupt:
         print("\n\n🛑 Interruption demandée (Ctrl+C). Sauvegarde immédiate du cache...")
+        executor.shutdown(wait=False, cancel_futures=True)
         try:
             DictionaryPolisher.save_cache()
         except Exception:
             pass
         print(f"✅ {success_count} articles sauvegardés avec succès ! Sortie immédiate.")
         os._exit(0)
+    finally:
+        executor.shutdown(wait=False, cancel_futures=True)
 
     DictionaryPolisher.save_cache()
     total_elapsed = time.time() - start_time
