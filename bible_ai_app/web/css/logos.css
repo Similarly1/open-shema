@@ -3000,11 +3000,33 @@ input:checked + .slider.round:before {
 /* Corps défilant aéré */
 .overview-scrollable-body {
   flex: 1;
+  height: 100%;
   overflow-y: auto;
-  padding: 12px 14px;
+  overflow-x: hidden;
+  padding: 12px 14px 40px 14px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(168, 85, 247, 0.4) rgba(0, 0, 0, 0.15);
+}
+
+.overview-scrollable-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overview-scrollable-body::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+}
+
+.overview-scrollable-body::-webkit-scrollbar-thumb {
+  background: rgba(168, 85, 247, 0.35);
+  border-radius: 6px;
+}
+
+.overview-scrollable-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(168, 85, 247, 0.65);
 }
 
 /* Cartes Sections Accordéons Épurées */
@@ -3116,33 +3138,35 @@ input:checked + .slider.round:before {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  max-height: 240px;
+  max-height: 210px;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+  scrollbar-color: rgba(168, 85, 247, 0.4) rgba(0, 0, 0, 0.12);
 }
 
 .sec-body::-webkit-scrollbar {
-  width: 4px;
+  width: 5px;
 }
 
 .sec-body::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
 }
 
 .sec-body::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(168, 85, 247, 0.38);
   border-radius: 4px;
 }
 
 .sec-body::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(168, 85, 247, 0.7);
 }
 
 /* Liste épurée typographique (style Logos / Apple) */
 .overview-clean-list {
   display: flex;
+
   flex-direction: column;
 }
 

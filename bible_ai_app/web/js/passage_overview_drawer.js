@@ -614,13 +614,11 @@ const PassageOverviewDrawer = {
     } else {
       bodyHtml = `<div class="overview-bp-preview-flow">`;
 
-      // 1. Vidéo principale du livre / chapitre
-      if (videos.length > 0) {
-        const v = videos[0];
+      // 1. Vidéos du livre / chapitre
+      videos.forEach((v) => {
         const thumbUrl = v.thumbnail || `https://i.ytimg.com/vi/${v.yt_id}/hqdefault.jpg`;
         bodyHtml += `
           <div class="overview-bp-video-item"
-
                data-action="open-bp-video"
                data-yt-id="${v.yt_id}"
                data-title="${this.escapeHtml(v.title)}"
@@ -642,11 +640,10 @@ const PassageOverviewDrawer = {
             </div>
           </div>
         `;
-      }
+      });
 
-      // 2. Poster / Affiche principale
-      if (posters.length > 0) {
-        const p = posters[0];
+      // 2. Posters / Affiches du livre / chapitre
+      posters.forEach((p) => {
         bodyHtml += `
           <div class="overview-bp-poster-item"
                data-action="open-bp-poster"
@@ -670,10 +667,10 @@ const PassageOverviewDrawer = {
             </div>
           </div>
         `;
-      }
+      });
 
       bodyHtml += `
-        <div style="padding: 6px 4px 4px 4px;">
+        <div style="padding: 4px 2px 2px 2px;">
           <button type="button" class="overview-link-btn" data-action="open-media-tab" style="width: 100%; justify-content: center;">
             <span>Espace BibleProject (${videos.length} vidéo(s), ${posters.length} affiche(s))</span>
             ${this.icons.arrowRight}
@@ -682,6 +679,7 @@ const PassageOverviewDrawer = {
       `;
 
       bodyHtml += `</div>`;
+
     }
 
     return `
