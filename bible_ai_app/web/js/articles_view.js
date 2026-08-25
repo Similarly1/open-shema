@@ -270,11 +270,29 @@ const ArticlesView = {
     }
 
     // 2. Police
-    let fontStack = `'${this.readingOpts.fontFamily}', Georgia, serif`;
-    if (this.readingOpts.fontFamily === 'Inter') {
-      fontStack = `'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
+    let fontStack = `'EB Garamond', 'Lora', Georgia, serif`;
+    const selectedFont = this.readingOpts.fontFamily || 'EB Garamond';
+    
+    if (selectedFont === 'Georgia') {
+      fontStack = `Georgia, 'Times New Roman', Times, serif`;
+    } else if (selectedFont === 'Inter' || selectedFont === 'system' || selectedFont === 'sans') {
+      fontStack = `'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif`;
+    } else if (selectedFont === 'EB Garamond') {
+      fontStack = `'EB Garamond', 'Lora', Georgia, serif`;
+    } else {
+      fontStack = `'${selectedFont}', Georgia, serif`;
     }
+
+    container.style.setProperty('--article-font-family', fontStack);
     container.style.fontFamily = fontStack;
+
+    // Forcer l'application sur le texte markdown, chapô et titre
+    const contentEl = document.getElementById('article-reader-content');
+    if (contentEl) contentEl.style.fontFamily = fontStack;
+    const leadEl = document.getElementById('article-reader-lead');
+    if (leadEl) leadEl.style.fontFamily = fontStack;
+    const titleEl = document.getElementById('article-reader-title');
+    if (titleEl) titleEl.style.fontFamily = fontStack;
 
     // 3. Facteur de Zoom CSS appliqué sur le container
     container.style.setProperty('--article-zoom-factor', (zoom / 100).toString());
@@ -293,7 +311,11 @@ const ArticlesView = {
     // Synchroniser l'état visuel du popover
     if (popover) {
       popover.querySelectorAll('.article-font-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.font === this.readingOpts.fontFamily);
+        const btnFont = btn.dataset.font;
+        const curFont = this.readingOpts.fontFamily;
+        const isActive = (btnFont === curFont) ||
+          ((btnFont === 'Inter' || btnFont === 'system') && (curFont === 'Inter' || curFont === 'system'));
+        btn.classList.toggle('active', isActive);
       });
       popover.querySelectorAll('.article-bg-swatch').forEach(sw => {
         sw.classList.toggle('active', sw.dataset.bg === this.readingOpts.bg);
@@ -849,6 +871,21 @@ const ArticlesView = {
           });
         });
 
+        // 1b. Liaison des infobulles de prévisualisation au survol des notes de bas de page
+        contentEl.querySelectorAll('.article-fn-badge a').forEach(aTag => {
+          const targetId = aTag.getAttribute('href').replace(/^#/, '');
+          const fnNum = aTag.textContent.trim();
+          aTag.addEventListener('mouseenter', (e) => {
+            const fnEl = document.getElementById(targetId);
+            if (!fnEl) return;
+            const fnText = fnEl.querySelector('.article-footnote-text')?.textContent || fnEl.textContent;
+            this.showFootnoteTooltip(e, fnNum, fnText);
+          });
+          aTag.addEventListener('mouseleave', () => {
+            this.hideFootnoteTooltip();
+          });
+        });
+
         // 2. Liaison des liens externes (ouverture propre dans le navigateur par défaut)
         contentEl.querySelectorAll('a:not([href^="#"])').forEach(aTag => {
           aTag.addEventListener('click', (e) => {
@@ -1029,6 +1066,7 @@ const ArticlesView = {
   },
 
   closeArticleReader() {
+    this.hideFootnoteTooltip();
     if (this._scrollSpyHandler) {
       const container = document.querySelector('.articles-view-container') || window;
       (container === window ? window : container).removeEventListener('scroll', this._scrollSpyHandler);
@@ -1039,6 +1077,40 @@ const ArticlesView = {
     if (viewReader) viewReader.classList.add('hidden');
     if (viewList) viewList.classList.remove('hidden');
     this.selectedArticleId = null;
+  },
+
+  showFootnoteTooltip(e, num, text) {
+    if (!this.fnTooltipEl) {
+      this.fnTooltipEl = document.createElement('div');
+      this.fnTooltipEl.className = 'article-fn-tooltip';
+      document.body.appendChild(this.fnTooltipEl);
+    }
+    const cleanText = (text || '').replace(/↩\s*$/, '').trim();
+    this.fnTooltipEl.innerHTML = `<div class="article-fn-tooltip-header"><span class="article-fn-tooltip-num">Note ${num}</span></div><div class="article-fn-tooltip-body">${this.escapeHtml(cleanText)}</div>`;
+    this.positionFootnoteTooltip(e);
+    this.fnTooltipEl.classList.add('visible');
+  },
+
+  positionFootnoteTooltip(e) {
+    if (!this.fnTooltipEl) return;
+    const rect = e.target.getBoundingClientRect();
+    const tooltip = this.fnTooltipEl;
+    let left = rect.left + rect.width / 2 - 140;
+    let top = rect.bottom + 8;
+
+    // Éviter les débordements d'écran
+    if (left < 12) left = 12;
+    if (left + 320 > window.innerWidth) left = window.innerWidth - 330;
+    if (top + 120 > window.innerHeight) top = rect.top - 90;
+
+    tooltip.style.left = `${left}px`;
+    tooltip.style.top = `${top}px`;
+  },
+
+  hideFootnoteTooltip() {
+    if (this.fnTooltipEl) {
+      this.fnTooltipEl.classList.remove('visible');
+    }
   },
 
   async syncArticles() {
@@ -1179,7 +1251,12 @@ const ArticlesView = {
     const supToNum = { '⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9' };
     const normalizeSuperscripts = (str) => str.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]/g, ch => supToNum[ch] || ch);
 
-    // 5a. Dans les cartouches éditoriaux et mentions bibliographiques, convertir systématiquement les exposants en chiffres normaux
+    // 5a-1. Normaliser immédiatement les exposants dans les références scripturaires (ex: Actes ¹.⁸-¹¹ -> Actes 1.8-11)
+    text = text.replace(/(\b(?:Actes|Genèse|Exode|Lévitique|Nombres|Deutéronome|Josué|Juges|Ruth|Samuel|Rois|Chroniques|Esdras|Néhémie|Esther|Job|Psaumes?|Proverbes?|Ecclésiaste|Cantique|Ésaïe|Jérémie|Lamentations|Ézéchiel|Daniel|Osée|Joël|Amos|Abdias|Jonas|Michée|Nahum|Habacuc|Sophonie|Aggée|Zacharie|Malachie|Matthieu|Marc|Luc|Jean|Romains|Corinthiens|Galates|Éphésiens|Philippiens|Colossiens|Thessaloniciens|Timothée|Tite|Philémon|Hébreux|Jacques|Pierre|Jude|Apocalypse|[123]\s*[A-Za-zÀ-ÿ]+|[A-ZÀ-ÿ]{2,6})\.?)\s*([⁰¹²³⁴⁵⁶⁷⁸⁹]+(?:[\s.:,/-]+[⁰¹²³⁴⁵⁶⁷⁸⁹0-9]+)*)/gi, (match, book, sups) => {
+      return book + ' ' + normalizeSuperscripts(sups);
+    });
+
+    // 5a-2. Dans les cartouches éditoriaux et mentions bibliographiques, convertir systématiquement les exposants en chiffres normaux
     text = text.replace(/(?:Cet article\s+(?:fait partie|est extrait|est tiré|a été publié|provient|est une adaptation)|Extrait du livre|Tiré du livre|Publié avec)[^\n]+/gi, (match) => {
       return normalizeSuperscripts(match);
     });
@@ -1204,20 +1281,46 @@ const ArticlesView = {
     text = text.replace(/(?:^|\n)([A-ZÀ-ÿ][^\n*]+?)\s+(\*\*Lisez\s+[^*]+\*\*)/gim, '\n\n### $1\n\n$2\n\n');
     text = text.replace(/(\*\*[^*]+\*\*)\s+([A-ZÀ-ÿ])/g, '$1\n\n$2');
 
-    // 5e. Découpage et mise en page soignée des dialogues au tiret cadratin (—, –)
-    text = text.replace(/([:!?…»])\s*([—–\u2013\u2014]\s*)/g, '$1\n\n$2');
-    text = text.replace(/\.\s+([—–\u2013\u2014]\s*[A-ZÀ-ÿ])/g, '.\n\n$1');
+    // 5e. Découpage et mise en page soignée des dialogues au tiret cadratin (sans couper les attributions de citations comme ". – Actes 1.8-11")
+    const bibleBooksPattern = '(?:Actes|Genèse|Exode|Lévitique|Nombres|Deutéronome|Josué|Juges|Ruth|Samuel|Rois|Chroniques|Esdras|Néhémie|Esther|Job|Psaumes?|Proverbes?|Ecclésiaste|Cantique|Ésaïe|Jérémie|Lamentations|Ézéchiel|Daniel|Osée|Joël|Amos|Abdias|Jonas|Michée|Nahum|Habacuc|Sophonie|Aggée|Zacharie|Malachie|Matthieu|Marc|Luc|Jean|Romains|Corinthiens|Galates|Éphésiens|Philippiens|Colossiens|Thessaloniciens|Timothée|Tite|Philémon|Hébreux|Jacques|Pierre|Jude|Apocalypse|[123]\\s*[A-Za-zÀ-ÿ]+|[A-ZÀ-ÿ]{2,6})';
+    const notBibleRefAhead = `(?!(?:\\s*${bibleBooksPattern}\\.?\\s*[0-9⁰¹²³⁴⁵⁶⁷⁸⁹]))`;
 
-    // Convertir les lignes de dialogue au tiret en encadrés distincts
-    text = text.replace(/(?:^|\n)\s*([—–\u2013\u2014]\s*[^\n]+)/g, '\n\n<div class="article-speaker-turn"><p class="article-speaker-speech">$1</p></div>\n\n');
+    text = text.replace(/([:!?…»])\s*([—–\u2013\u2014]\s*)/g, '$1\n\n$2');
+    text = new RegExp(`\\.\\s+([—–\\u2013\\u2014]${notBibleRefAhead}\\s*[A-ZÀ-ÿ])`, 'g')[Symbol.replace](text, '.\n\n$1');
+
+    // Convertir les lignes de dialogue au tiret en encadrés distincts (en protégeant les citations scripturaires)
+    text = new RegExp(`(?:^|\\n)\\s*([—–\\u2013\\u2014]${notBibleRefAhead}\\s*[^\\n]+)`, 'g')[Symbol.replace](text, '\n\n<div class="article-speaker-turn"><p class="article-speaker-speech">$1</p></div>\n\n');
 
     // 5f. Convertir les citations bibliques avec tiret de référence (« ... » – Réf)
     text = text.replace(/(?:^|\n)«\s*([^»]+?)\s*»\s*([–—\u2013\u2014-]\s*[A-ZÀ-ÿ0-9.:\s-]+)/g, '\n\n<blockquote class="article-bible-quote"><p>« $1 » $2</p></blockquote>\n\n');
 
-    // 5g. Nettoyer les retours de note résiduels dans le markdown [↩︎](#...)
-    text = text.replace(/\[(?:↩︎|↩)\]\(#[^)]+\)/g, '');
+    // 5g. Détecter et formater les blocs de notes de bas de page avec ancres de retour [↩︎](#...)
+    const backlinkRegex = /\[(?:↩︎|↩)\]\(#[^)]+\)/;
+    if (backlinkRegex.test(text)) {
+      text = text.replace(/Dans\s+la\s+même\s+série[\s\S]*$/gi, '');
+      const segments = text.split(/\[(?:↩︎|↩)\]\(#[^)]+\)/);
+      let mainBody = segments[0];
+      let firstNote = '';
+      
+      const fnBoundaryMatch = mainBody.match(/^([\s\S]*[a-zA-ZÀ-ÿ]{2,}[.!?…»])\s+((?:[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+(?:\s+[A-ZÀ-ÖØ-ß]\.?)?\s+[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+|[A-ZÀ-ÿ*«]|Ibid)[^\n]*?(?:ibid|éditions|editions|editor|publisher|press|university|chapitre|vol\.|tome|trad\.|pp?\.\s*\d+|p\.\s*\d+|19\d\d|20\d\d|op\.\s*cit|loc\.\s*cit)[\s\S]*)$/i);
+      if (fnBoundaryMatch) {
+        mainBody = fnBoundaryMatch[1];
+        firstNote = fnBoundaryMatch[2];
+      }
+      
+      const notes = [firstNote, ...segments.slice(1, -1)].map(s => s.trim()).filter(s => s.length > 0);
+      const trailing = segments[segments.length - 1] || '';
+      
+      const formattedNotes = notes.map((noteText, idx) => {
+        const num = idx + 1;
+        const cleanBody = normalizeSuperscripts(noteText.trim());
+        return `<div class="article-footnote-item" id="article-fn-${num}"><span class="article-footnote-num">${num}.</span><span class="article-footnote-text">${cleanBody}</span> <a href="#article-fnref-${num}" class="article-footnote-backlink" title="Retour au texte">↩</a></div>`;
+      }).join('\n\n');
+      
+      text = `${mainBody}\n\n${formattedNotes}\n\n${trailing}`;
+    }
 
-    // 5h. Détecter et formater les listes de notes de bas de page réelles (citations bibliographiques / ibid / éditions)
+    // 5h. Détecter et formater les listes de notes de bas de page numérotées (1. Auteur, Ibid...)
     text = text.replace(/(?:^|\n)(\d+)\.\s+([^\n]+(?:\n(?!\d+\.|\s*#|\s*---|\s*$)[^\n]+)*)/g, (match, num, body) => {
       if (/ibid|éditions|editions|editor|publisher|press|university|chapitre|vol\.|tome|trad\.|pp\.\s*\d+|p\.\s*\d+|19\d\d|20\d\d|op\.\s*cit|loc\.\s*cit/i.test(body)) {
         return `\n\n<div class="article-footnote-item" id="article-fn-${num}"><span class="article-footnote-num">${num}.</span><span class="article-footnote-text">${normalizeSuperscripts(body.trim())}</span> <a href="#article-fnref-${num}" class="article-footnote-backlink" title="Retour au texte">↩</a></div>\n\n`;
@@ -1246,6 +1349,8 @@ const ArticlesView = {
     });
     // Normaliser tout exposant orphelin restant en chiffre normal
     text = text.replace(/([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/g, (match) => normalizeSuperscripts(match));
+    // Supprimer les espaces indésirables entre l'appel de note et la ponctuation suivante
+    text = text.replace(/<\/sup>\s+([.,;:!?])/g, '</sup>$1');
 
     // 6. Nettoyer les émojis décoratifs résiduels
     text = text.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1FA70}-\u{1FAFF}]/gu, '');
