@@ -265,7 +265,7 @@ const SermonsView = {
       item.innerHTML = `
         <div class="sermon-list-item-body">
           <div class="sermon-item-top">
-            <span class="sermon-item-title" title="${this.escapeHtml(s.title || 'Sans titre')}">${this.escapeHtml(s.title || 'Sans titre')}</span>
+            <span class="sermon-item-title" title="${this.escapeHtml(s.title || 'Sans titre')}"><span class="sermon-item-title-text">${this.escapeHtml(s.title || 'Sans titre')}</span></span>
             <span class="sermon-badge-pill ${statusClass}">${statusLabel}</span>
           </div>
           <div class="sermon-item-church">
@@ -344,20 +344,10 @@ const SermonsView = {
     menu.style.top = `${posY}px`;
 
     // Actions
-    menu.querySelector('[data-action="rename"]')?.addEventListener('click', async () => {
+    menu.querySelector('[data-action="rename"]')?.addEventListener('click', (e) => {
+      e.stopPropagation();
       this.hideContextMenu();
-      const newTitle = prompt("Nouveau titre de la prédication :", currentTitle || "");
-      if (newTitle && newTitle.trim() && newTitle.trim() !== currentTitle) {
-        const sermon = await API.getSermon(sermonId);
-        if (sermon) {
-          sermon.title = newTitle.trim();
-          await API.saveSermon(sermon);
-          await this.loadSermons();
-          if (this.currentSermon?.id === sermonId) {
-            this.titleInput.value = newTitle.trim();
-          }
-        }
-      }
+      this.promptRenameSermon(sermonId, currentTitle);
     });
 
     menu.querySelector('[data-action="duplicate"]')?.addEventListener('click', async () => {
@@ -420,6 +410,60 @@ const SermonsView = {
     if (menu) menu.style.display = 'none';
   },
 
+  async promptRenameSermon(sermonId, currentTitle) {
+    const itemEl = document.querySelector(`.sermon-list-item[data-id="${sermonId}"]`);
+    const titleEl = itemEl?.querySelector('.sermon-item-title-text');
+
+    if (itemEl && titleEl) {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'history-rename-input';
+      input.value = currentTitle || '';
+
+      titleEl.replaceWith(input);
+      input.focus();
+      input.select();
+
+      let isSaving = false;
+      const saveRename = async () => {
+        if (isSaving) return;
+        isSaving = true;
+        const newTitle = input.value.trim() || currentTitle || 'Prédication sans titre';
+        try {
+          const sermon = await API.getSermon(sermonId);
+          if (sermon) {
+            sermon.title = newTitle;
+            if (this.currentSermon?.id === sermonId) {
+              this.currentSermon.title = newTitle;
+              if (this.titleInput) this.titleInput.value = newTitle;
+            }
+            await API.saveSermon(sermon);
+            await this.loadSermons();
+            if (typeof App !== 'undefined' && App.showToast) {
+              App.showToast('Prédication renommée.');
+            }
+          } else {
+            await this.loadSermons();
+          }
+        } catch (e) {
+          console.error("Erreur renommage prédication:", e);
+          await this.loadSermons();
+        }
+      };
+
+      input.addEventListener('blur', saveRename);
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          input.blur();
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          this.renderList();
+        }
+      });
+    }
+  },
+
   toggleSidebar() {
     const sidebar = document.getElementById('sermons-sidebar-pane');
     if (sidebar) {
@@ -464,23 +508,27 @@ const SermonsView = {
     const newSermon = {
       id: `sermon-${Date.now()}`,
       title: "Nouvelle prédication",
-      church: this.churchInput?.value || "Église locale",
+      church: this.churchInput?.value.trim() || "",
       date_planned: todayStr,
       status: "draft",
       series: { title: "" },
-      passage: { reference: "Jean 3:16" },
+      passage: { reference: "" },
       big_idea: "",
       goal: "",
       timing: { target_duration_min: 35, words_per_minute: 135 },
-      body: "# Introduction\n\n> [!cue] Projeter diapo d'introduction\n\nVotre texte ici...\n\n---\n\n# I. Premier Point\n\n> [!application]\n> Défi pour l'auditoire...\n"
+      body: ""
     };
 
     const res = await API.saveSermon(newSermon);
     if (res && res.success) {
       await this.loadSermons();
       await this.selectSermon(newSermon.id);
+      if (this.titleInput) {
+        this.titleInput.focus();
+        this.titleInput.select();
+      }
       if (typeof App !== 'undefined' && App.showToast) {
-        App.showToast("Nouveau sermon créé avec succès !");
+        App.showToast("Nouvelle prédication créée !");
       }
     }
   },
