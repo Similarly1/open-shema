@@ -132,6 +132,10 @@ class SermonsManager:
             "series": metadata.get("series", {}),
             "passage": metadata.get("passage", {}),
             "big_idea": str(metadata.get("big_idea", "")),
+            "pmt": str(metadata.get("pmt") or metadata.get("big_idea") or ""),
+            "pms": str(metadata.get("pms") or ""),
+            "contemporary_tension": str(metadata.get("contemporary_tension") or ""),
+            "redemptive_era": str(metadata.get("redemptive_era") or "christ"),
             "goal": str(metadata.get("goal", "")),
             "theme_tags": metadata.get("theme_tags", []),
             "timing": metadata.get("timing", {
@@ -232,6 +236,10 @@ class SermonsManager:
             "series": sermon.get("series", {}),
             "passage": sermon.get("passage", {}),
             "big_idea": sermon.get("big_idea", ""),
+            "pmt": sermon.get("pmt") or sermon.get("big_idea") or "",
+            "pms": sermon.get("pms", ""),
+            "contemporary_tension": sermon.get("contemporary_tension", ""),
+            "redemptive_era": sermon.get("redemptive_era", "christ"),
             "goal": sermon.get("goal", ""),
             "theme_tags": sermon.get("theme_tags", []),
             "timing": sermon.get("timing", {

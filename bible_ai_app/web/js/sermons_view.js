@@ -594,7 +594,11 @@ const SermonsView = {
         ...(this.currentSermon.passage || {}),
         reference: this.currentSermon.passage?.reference || ''
       },
-      big_idea: this.currentSermon.big_idea || '',
+      big_idea: this.currentSermon.big_idea || this.currentSermon.pmt || '',
+      pmt: this.currentSermon.pmt || this.currentSermon.big_idea || '',
+      pms: this.currentSermon.pms || '',
+      contemporary_tension: this.currentSermon.contemporary_tension || '',
+      redemptive_era: this.currentSermon.redemptive_era || 'christ',
       goal: this.currentSermon.goal || '',
       body: bodyMarkdown
     };
@@ -980,8 +984,35 @@ const SermonsView = {
     const goal = s.goal || '';
 
     if (this.activeDrawerTab === 'metadata') {
+      const s = this.currentSermon || {};
+      const passageRef = s.passage?.reference || '';
+      const currentChurch = s.church || '';
+      const date = s.date_planned || '';
+      const series = s.series?.title || '';
+      const pmt = s.pmt || s.big_idea || '';
+      const pms = s.pms || '';
+      const tension = s.contemporary_tension || '';
+      const era = s.redemptive_era || 'christ';
+      const goal = s.goal || '';
+
+      const eras = [
+        { id: "creation", name: "1. Création (Dessein originel)" },
+        { id: "fall", name: "2. Chute (Rupture & Entrée du péché)" },
+        { id: "patriarchs", name: "3. Patriarches (Alliance & Promesses)" },
+        { id: "exodus_law", name: "4. Exode & Loi (Rédemption & Sainteté)" },
+        { id: "kingdom", name: "5. Royaume & Rois (Royauté & Temple)" },
+        { id: "exile_prophets", name: "6. Exil & Prophètes (Jugement & Espérance)" },
+        { id: "christ", name: "7. Jésus-Christ (Accomplissement & Croix)" },
+        { id: "church_new_creation", name: "8. Église & Nouvelle Création (Mission & Gloire)" }
+      ];
+
+      const eraOptionsHtml = eras.map(e => `
+        <option value="${e.id}" ${era === e.id ? 'selected' : ''}>${e.name}</option>
+      `).join('');
+
       this.drawerContent.innerHTML = `
         <div class="sermon-drawer-meta-form">
+          <!-- 1. Passage biblique -->
           <div class="sermon-drawer-meta-field">
             <label class="sermon-drawer-meta-label">
               <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
@@ -995,6 +1026,54 @@ const SermonsView = {
             </div>
           </div>
 
+          <!-- 2. Théologie Biblique : Étape du Salut (Phil Crowter - Langham) -->
+          <div class="sermon-drawer-meta-field">
+            <label class="sermon-drawer-meta-label" title="Situez le passage dans la Grande Histoire de la Rédemption (Phil Crowter)">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+              <span>Étape de l'Histoire du Salut</span>
+            </label>
+            <select id="drawer-meta-era" class="sermon-drawer-input" style="cursor: pointer;">
+              ${eraOptionsHtml}
+            </select>
+          </div>
+
+          <!-- 3. PMT (Pensée Maîtresse du Texte - Florent Varak / David Helm) -->
+          <div class="sermon-drawer-meta-field">
+            <label class="sermon-drawer-meta-label" title="Ce que le texte disait à ses premiers destinataires (Sujet + Complément)">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+              <span>PMT — Pensée Maîtresse du Texte</span>
+            </label>
+            <textarea id="drawer-meta-pmt" class="sermon-drawer-input sermon-drawer-textarea" placeholder="Que disait l'auteur inspiré à ses premiers auditeurs ?">${this.escapeHtml(pmt)}</textarea>
+          </div>
+
+          <!-- 4. Le Pont / Tension contemporaine (John Stott) -->
+          <div class="sermon-drawer-meta-field">
+            <label class="sermon-drawer-meta-label" title="À quelle angoisse, question existentielle ou combat moderne ce texte répond-il ? (John Stott)">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <span>Le Pont — Tension Contemporaine</span>
+            </label>
+            <textarea id="drawer-meta-tension" class="sermon-drawer-input sermon-drawer-textarea" placeholder="Quelle question ou combat humain contemporain ce passage éclaire-t-il ?">${this.escapeHtml(tension)}</textarea>
+          </div>
+
+          <!-- 5. PMS (Pensée Maîtresse du Sermon - Varak / Stott / Robinson) -->
+          <div class="sermon-drawer-meta-field">
+            <label class="sermon-drawer-meta-label" title="La vérité active formulée pour votre assemblée en une phrase directrice">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span>PMS — Pensée Maîtresse du Sermon</span>
+            </label>
+            <textarea id="drawer-meta-pms" class="sermon-drawer-input sermon-drawer-textarea" placeholder="La vérité maîtresse en 1 phrase pour votre église aujourd'hui...">${this.escapeHtml(pms)}</textarea>
+          </div>
+
+          <!-- 6. Objectif spirituel pour l'auditeur -->
+          <div class="sermon-drawer-meta-field">
+            <label class="sermon-drawer-meta-label" title="La transformation spirituelle attendue par l'Esprit">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+              <span>Objectif pour l'auditeur</span>
+            </label>
+            <textarea id="drawer-meta-goal" class="sermon-drawer-input sermon-drawer-textarea" placeholder="La réponse attendue : foi, repentance, louange, réconfort, action...">${this.escapeHtml(goal)}</textarea>
+          </div>
+
+          <!-- 7. Organisation & Planning -->
           <div class="sermon-drawer-meta-field">
             <label class="sermon-drawer-meta-label">
               <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -1018,47 +1097,39 @@ const SermonsView = {
             </label>
             <input type="text" id="drawer-meta-series" class="sermon-drawer-input" value="${this.escapeHtml(series)}" placeholder="ex: Traversée d'Amos">
           </div>
-
-          <div class="sermon-drawer-meta-field">
-            <label class="sermon-drawer-meta-label">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-              <span>Idée Centrale (Big Idea)</span>
-            </label>
-            <textarea id="drawer-meta-bigidea" class="sermon-drawer-input sermon-drawer-textarea" placeholder="La vérité maîtresse en une phrase...">${this.escapeHtml(bigIdea)}</textarea>
-          </div>
-
-          <div class="sermon-drawer-meta-field">
-            <label class="sermon-drawer-meta-label">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-              <span>Objectif pour l'auditeur</span>
-            </label>
-            <textarea id="drawer-meta-goal" class="sermon-drawer-input sermon-drawer-textarea" placeholder="L'application ou le défi clé...">${this.escapeHtml(goal)}</textarea>
-          </div>
         </div>
       `;
 
       const refIn = document.getElementById('drawer-meta-ref');
+      const eraIn = document.getElementById('drawer-meta-era');
+      const pmtIn = document.getElementById('drawer-meta-pmt');
+      const tensionIn = document.getElementById('drawer-meta-tension');
+      const pmsIn = document.getElementById('drawer-meta-pms');
+      const goalIn = document.getElementById('drawer-meta-goal');
       const churchIn = document.getElementById('drawer-meta-church');
       const dateIn = document.getElementById('drawer-meta-date');
       const seriesIn = document.getElementById('drawer-meta-series');
-      const bigIdeaIn = document.getElementById('drawer-meta-bigidea');
-      const goalIn = document.getElementById('drawer-meta-goal');
 
       const updateSermonMeta = () => {
         if (!this.currentSermon) return;
         this.currentSermon.passage = { reference: refIn?.value.trim() || '' };
+        this.currentSermon.redemptive_era = eraIn?.value || 'christ';
+        this.currentSermon.pmt = pmtIn?.value.trim() || '';
+        this.currentSermon.big_idea = this.currentSermon.pmt;
+        this.currentSermon.contemporary_tension = tensionIn?.value.trim() || '';
+        this.currentSermon.pms = pmsIn?.value.trim() || '';
+        this.currentSermon.goal = goalIn?.value.trim() || '';
         this.currentSermon.church = churchIn?.value.trim() || '';
         this.currentSermon.date_planned = dateIn?.value || '';
         this.currentSermon.series = { title: seriesIn?.value.trim() || '' };
-        this.currentSermon.big_idea = bigIdeaIn?.value.trim() || '';
-        this.currentSermon.goal = goalIn?.value.trim() || '';
         this.updateHeaderSummary(this.currentSermon);
         this.renderList();
         this.debouncedPushHistory();
       };
 
-      [refIn, churchIn, dateIn, seriesIn, bigIdeaIn, goalIn].forEach(el => {
+      [refIn, eraIn, pmtIn, tensionIn, pmsIn, goalIn, churchIn, dateIn, seriesIn].forEach(el => {
         el?.addEventListener('input', updateSermonMeta);
+        el?.addEventListener('change', updateSermonMeta);
       });
 
       document.getElementById('btn-drawer-sync-bible')?.addEventListener('click', () => {
@@ -1207,17 +1278,28 @@ const SermonsView = {
         <div class="sermon-resource-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px;">
           <div style="font-size: 12px; font-weight: 700; color: var(--accent-blue); margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
             <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
-            <span>Générer des pistes pour votre message</span>
+            <span>Outils Méthodologiques (Stott, Helm, Kuen)</span>
           </div>
           <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 8px;">
-            <button class="btn-secondary btn-sm" onclick="SermonsView.insertBlock('illustration')" style="justify-content: flex-start; text-align: left; padding: 6px 10px;">
-              💡 Idées d'illustrations concrètes
+            <button class="btn-secondary btn-sm" onclick="SermonsView.insertHomileticOutline('inductif')" style="justify-content: flex-start; text-align: left; padding: 8px 10px; display: flex; align-items: center; gap: 8px;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="color: #3b82f6; flex-shrink: 0;"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <span>Insérer structure du Pont (John Stott)</span>
             </button>
-            <button class="btn-secondary btn-sm" onclick="SermonsView.insertBlock('application')" style="justify-content: flex-start; text-align: left; padding: 6px 10px;">
-              🎯 Questions d'application pour l'auditoire
+            <button class="btn-secondary btn-sm" onclick="SermonsView.insertHomileticOutline('synthetique')" style="justify-content: flex-start; text-align: left; padding: 8px 10px; display: flex; align-items: center; gap: 8px;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="color: #8b5cf6; flex-shrink: 0;"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              <span>Insérer plan en 3 axes (Alfred Kuen)</span>
             </button>
-            <button class="btn-secondary btn-sm" onclick="SermonsView.insertBlock('exegesis')" style="justify-content: flex-start; text-align: left; padding: 6px 10px;">
-              🔍 Mots-clés et contexte historique
+            <button class="btn-secondary btn-sm" onclick="SermonsView.insertHomileticOutline('application-grille')" style="justify-content: flex-start; text-align: left; padding: 8px 10px; display: flex; align-items: center; gap: 8px;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="color: #10b981; flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+              <span>Grille d'applications par profils (David Helm)</span>
+            </button>
+            <button class="btn-secondary btn-sm" onclick="SermonsView.insertBlock('illustration')" style="justify-content: flex-start; text-align: left; padding: 8px 10px; display: flex; align-items: center; gap: 8px;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="color: #f59e0b; flex-shrink: 0;"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <span>Idées d'illustrations & métaphores</span>
+            </button>
+            <button class="btn-secondary btn-sm" onclick="SermonsView.insertBlock('exegesis')" style="justify-content: flex-start; text-align: left; padding: 8px 10px; display: flex; align-items: center; gap: 8px;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="color: #6366f1; flex-shrink: 0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <span>Mots-clés et contexte historique</span>
             </button>
           </div>
         </div>
@@ -1578,6 +1660,15 @@ const SermonsView = {
         ]
       },
       {
+        category: "Structures & Plans",
+        items: [
+          { id: "plan-synthetique", label: "Plan Synthétique (3 points)", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>`, desc: "Structure en 3 axes avec transitions (Kuen / Stott)", action: "plan-synthetique" },
+          { id: "plan-inductif", label: "Plan Inductif (Le Pont)", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`, desc: "Tension moderne -> Texte -> Christ -> Défi (Stott)", action: "plan-inductif" },
+          { id: "plan-expositif", label: "Plan Expositif (Texte)", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`, desc: "Découpage textuel au fil des versets (Helm / Varak)", action: "plan-expositif" },
+          { id: "application-grille", label: "Grille d'Applications (4 profils)", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`, desc: "Sceptiques, Éprouvés, Établis, Quotidien (David Helm)", action: "application-grille" }
+        ]
+      },
+      {
         category: "Listes",
         items: [
           { id: "task", label: "Case à cocher", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/><circle cx="12" cy="12" r="10"/></svg>`, desc: "Tâche ou point à vérifier", action: "task" },
@@ -1845,6 +1936,18 @@ const SermonsView = {
       case 'slide':
         this.insertBlock('slide');
         break;
+      case 'plan-synthetique':
+        this.insertHomileticOutline('synthetique');
+        break;
+      case 'plan-inductif':
+        this.insertHomileticOutline('inductif');
+        break;
+      case 'plan-expositif':
+        this.insertHomileticOutline('expositif');
+        break;
+      case 'application-grille':
+        this.insertHomileticOutline('application-grille');
+        break;
       case 'task':
         this.insertTaskItem();
         break;
@@ -1872,6 +1975,110 @@ const SermonsView = {
 
     this.updateMetrics();
     this.debouncedPushHistory();
+  },
+
+  insertHomileticOutline(type) {
+    if (!this.contentEditor) return;
+    this.contentEditor.focus();
+
+    let html = '';
+    const passage = this.currentSermon?.passage?.reference || 'Passage';
+
+    switch (type) {
+      case 'synthetique':
+        html = `
+          <h2>Introduction</h2>
+          <p><strong>Accroche :</strong> Captez l'attention de l'auditoire dès les premières secondes...</p>
+          <p><strong>Tension :</strong> Quel combat ou quelle question ce texte vient-il éclairer ?</p>
+          <p><strong>Vérité Maîtresse :</strong> La proposition centrale du sermon en 1 phrase.</p>
+          <hr>
+          <h2>I. Premier Axe : La Révélation du Texte</h2>
+          <p>Explication du passage et des mots-clés...</p>
+          <div class="sermon-callout-block sermon-block-illustration" data-type="illustration">
+            <div class="sermon-block-header">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <span>Illustration</span>
+            </div>
+            <p>Image concrète ou récit éclairant ce point...</p>
+          </div>
+          <p><em>Transition vers le deuxième point...</em></p>
+          <hr>
+          <h2>II. Deuxième Axe : L'Exigence et le Cœur</h2>
+          <p>Développement de la vérité spirituelle et diagnostic de notre condition...</p>
+          <p><em>Transition vers le troisième point...</em></p>
+          <hr>
+          <h2>III. Troisième Axe : L'Accomplissement en Christ</h2>
+          <p>Comment la grâce de Jésus-Christ répond parfaitement à ce que nous ne pouvons accomplir...</p>
+          <hr>
+          <h2>Conclusion & Appel</h2>
+          <p><strong>Synthèse :</strong> Récapitulatif de la pensée maîtresse sans nouvel argument.</p>
+          <div class="sermon-callout-block sermon-block-application" data-type="application">
+            <div class="sermon-block-header">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+              <span>Appel à la Foi & Engagement</span>
+            </div>
+            <p>Défi concret pour la semaine : comment cette vérité transforme ma marche ?</p>
+          </div>
+          <p></p>
+        `;
+        break;
+
+      case 'inductif':
+        html = `
+          <h2>1. La Tension Contemporaine (Rive 2)</h2>
+          <p>Le problème humain universel, l'illusion ou la soif profonde à laquelle nous faisons face aujourd'hui...</p>
+          <h2>2. L'Écoute de la Parole (${this.escapeHtml(passage)})</h2>
+          <p>Ce que Dieu déclare dans son texte pour bousculer nos schémas de pensée...</p>
+          <h2>3. La Résolution par la Grâce (Le Pont en Christ)</h2>
+          <p>Comment la personne et l'œuvre du Christ accomplissent la rédemption...</p>
+          <h2>4. La Marche par la Foi (L'Application)</h2>
+          <div class="sermon-callout-block sermon-block-application" data-type="application">
+            <div class="sermon-block-header">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+              <span>Mise en pratique</span>
+            </div>
+            <p>Décision personnelle et impact dans nos relations quotidiennes...</p>
+          </div>
+          <p></p>
+        `;
+        break;
+
+      case 'expositif':
+        html = `
+          <h2>Introduction</h2>
+          <p>Mise en contexte littéraire et historique du livre...</p>
+          <h2>I. Première Section du Texte</h2>
+          <p>Observation et sens des premiers versets...</p>
+          <h2>II. Deuxième Section du Texte</h2>
+          <p>Progression de l'argumentation ou tournant du récit...</p>
+          <h2>III. Troisième Section & Climax</h2>
+          <p>Aboutissement théologique du passage et regard vers l'Évangile...</p>
+          <h2>Conclusion & Appel pastoral</h2>
+          <p>Synthèse de la pensée dominante pour l'église...</p>
+          <p></p>
+        `;
+        break;
+
+      case 'application-grille':
+        html = `
+          <div class="sermon-callout-block sermon-block-application" data-type="application">
+            <div class="sermon-block-header">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+              <span>Grille d'Applications Différenciées (David Helm)</span>
+            </div>
+            <p><strong>1. Pour le sceptique / non-croyant :</strong> Quelle vérité de l'Évangile l'interpelle sur ses présupposés ?</p>
+            <p><strong>2. Pour le croyant éprouvé ou souffrant :</strong> Quelle promesse et quelle consolation solide ce texte lui apporte-t-il ?</p>
+            <p><strong>3. Pour le croyant établi (danger de tiédeur) :</strong> Quel avertissement fraternel ou appel à la sainteté est proclamé ?</p>
+            <p><strong>4. Pour la vie publique et familiale :</strong> Quelle répercussion éthique (travail, foyer, société) découle de ce passage ?</p>
+          </div>
+          <p></p>
+        `;
+        break;
+    }
+
+    if (html) {
+      document.execCommand('insertHTML', false, html);
+    }
   },
 
   applyBlockFormat(tag) {
