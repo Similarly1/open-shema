@@ -97,9 +97,11 @@ const SermonsView = {
     document.getElementById('btn-sermon-undo')?.addEventListener('click', () => this.undo());
     document.getElementById('btn-sermon-redo')?.addEventListener('click', () => this.redo());
 
-    // 4. Synchronisation passage & Tiroir ressources
+    // 4. Rétractation des volets & Synchronisation
+    document.getElementById('btn-sermons-toggle-sidebar')?.addEventListener('click', () => this.toggleSidebar());
     document.getElementById('btn-sermon-sync-bible')?.addEventListener('click', () => this.syncPassageResources());
     document.getElementById('btn-sermon-toggle-drawer')?.addEventListener('click', () => this.toggleResourcesDrawer());
+    document.getElementById('btn-close-resources-drawer')?.addEventListener('click', () => this.toggleResourcesDrawer(false));
 
     // 5. Onglets du tiroir de ressources
     document.querySelectorAll('.drawer-tab-btn').forEach(tabBtn => {
@@ -240,18 +242,23 @@ const SermonsView = {
       return;
     }
 
-    this.listContainer.innerHTML = filtered.map(s => {
+    this.listContainer.innerHTML = '';
+    filtered.forEach(s => {
+      const item = document.createElement('div');
       const isActive = this.currentSermon?.id === s.id;
       const statusClass = s.status === 'ready' ? 'status-ready' : 'status-draft';
       const statusLabel = s.status === 'ready' ? 'Prêt' : 'Brouillon';
-      const passRef = s.passage?.reference || 'Sans passage';
+      const passRef = s.passage?.reference || 'Général';
       const church = s.church || 'Lieu non spécifié';
       const estMin = s.estimated_minutes ? `${s.estimated_minutes} min` : '';
 
-      return `
-        <div class="sermon-list-item ${isActive ? 'active' : ''}" data-id="${s.id}">
+      item.className = `sermon-list-item ${isActive ? 'active' : ''}`;
+      item.setAttribute('data-id', s.id);
+
+      item.innerHTML = `
+        <div class="sermon-list-item-body">
           <div class="sermon-item-top">
-            <span class="sermon-item-title">${this.escapeHtml(s.title || 'Sans titre')}</span>
+            <span class="sermon-item-title" title="${this.escapeHtml(s.title || 'Sans titre')}">${this.escapeHtml(s.title || 'Sans titre')}</span>
             <span class="sermon-badge-pill ${statusClass}">${statusLabel}</span>
           </div>
           <div class="sermon-item-church">
@@ -259,20 +266,140 @@ const SermonsView = {
             <span>${this.escapeHtml(church)}</span>
           </div>
           <div class="sermon-item-meta">
-            <span style="font-size: 11px; font-weight: 700; color: var(--accent-blue);">${this.escapeHtml(passRef)}</span>
+            <span style="font-size: 10.5px; font-weight: 700; color: var(--accent-blue);">${this.escapeHtml(passRef)}</span>
             <span class="sermon-item-timing">${estMin}</span>
           </div>
         </div>
+        <div class="sermon-list-item-actions">
+          <button type="button" class="btn-history-action btn-sermon-menu" title="Options (Clic droit)">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+          </button>
+        </div>
       `;
-    }).join('');
 
-    // Clic pour sélectionner un sermon
-    this.listContainer.querySelectorAll('.sermon-list-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const sid = item.dataset.id;
-        if (sid) this.selectSermon(sid);
+      item.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-sermon-menu')) {
+          e.stopPropagation();
+          const btn = e.target.closest('.btn-sermon-menu');
+          const rect = btn.getBoundingClientRect();
+          this.showSermonContextMenu(s.id, s.title, rect.right, rect.bottom);
+          return;
+        }
+        this.selectSermon(s.id);
       });
+
+      // Clic droit (Menu contextuel)
+      item.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.showSermonContextMenu(s.id, s.title, e.clientX, e.clientY);
+      });
+
+      this.listContainer.appendChild(item);
     });
+  },
+
+  showSermonContextMenu(sermonId, currentTitle, x, y) {
+    let menu = document.getElementById('sermons-item-context-menu');
+    if (!menu) {
+      menu = document.createElement('div');
+      menu.id = 'sermons-item-context-menu';
+      menu.className = 'smooth-context-menu';
+      document.body.appendChild(menu);
+    }
+
+    menu.innerHTML = `
+      <div class="context-menu-item" data-action="rename">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+        <span>Renommer</span>
+      </div>
+      <div class="context-menu-item" data-action="duplicate">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+        <span>Dupliquer</span>
+      </div>
+      <div class="context-menu-divider"></div>
+      <div class="context-menu-item danger" data-action="delete">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        <span>Supprimer</span>
+      </div>
+    `;
+
+    menu.style.display = 'flex';
+    menu.style.position = 'fixed';
+    menu.style.zIndex = '10000';
+
+    // Positionnement sans déborder
+    const menuWidth = 170;
+    const menuHeight = 110;
+    let posX = Math.min(x, window.innerWidth - menuWidth - 10);
+    let posY = Math.min(y, window.innerHeight - menuHeight - 10);
+    menu.style.left = `${posX}px`;
+    menu.style.top = `${posY}px`;
+
+    // Actions
+    menu.querySelector('[data-action="rename"]')?.addEventListener('click', async () => {
+      this.hideContextMenu();
+      const newTitle = prompt("Nouveau titre de la prédication :", currentTitle || "");
+      if (newTitle && newTitle.trim() && newTitle.trim() !== currentTitle) {
+        const sermon = await API.getSermon(sermonId);
+        if (sermon) {
+          sermon.title = newTitle.trim();
+          await API.saveSermon(sermon);
+          await this.loadSermons();
+          if (this.currentSermon?.id === sermonId) {
+            this.titleInput.value = newTitle.trim();
+          }
+        }
+      }
+    });
+
+    menu.querySelector('[data-action="duplicate"]')?.addEventListener('click', async () => {
+      this.hideContextMenu();
+      const sermon = await API.getSermon(sermonId);
+      if (sermon) {
+        const copy = {
+          ...sermon,
+          id: `sermon-${Date.now()}`,
+          filename: null,
+          title: `${sermon.title || 'Sermon'} (Copie)`,
+          date_planned: new Date().toISOString().split('T')[0]
+        };
+        await API.saveSermon(copy);
+        await this.loadSermons();
+        await this.selectSermon(copy.id);
+      }
+    });
+
+    menu.querySelector('[data-action="delete"]')?.addEventListener('click', async () => {
+      this.hideContextMenu();
+      if (confirm(`Supprimer définitivement "${currentTitle || 'ce sermon'}" ?`)) {
+        await API.deleteSermon(sermonId);
+        if (this.currentSermon?.id === sermonId) {
+          this.currentSermon = null;
+        }
+        await this.loadSermons();
+      }
+    });
+
+    const closeHandler = (e) => {
+      if (!menu.contains(e.target)) {
+        this.hideContextMenu();
+        document.removeEventListener('click', closeHandler);
+      }
+    };
+    setTimeout(() => document.addEventListener('click', closeHandler), 10);
+  },
+
+  hideContextMenu() {
+    const menu = document.getElementById('sermons-item-context-menu');
+    if (menu) menu.style.display = 'none';
+  },
+
+  toggleSidebar() {
+    const sidebar = document.getElementById('sermons-sidebar-pane');
+    if (sidebar) {
+      sidebar.classList.toggle('collapsed');
+    }
   },
 
   async selectSermon(sermonId) {
@@ -664,9 +791,13 @@ const SermonsView = {
   // VOLET DROIT : RESSOURCES, COMMENTAIRES & ILLUSTRATIONS
   // =========================================================================
 
-  toggleResourcesDrawer() {
+  toggleResourcesDrawer(forceState) {
     if (!this.resourcesDrawer) return;
-    this.resourcesDrawer.classList.toggle('collapsed');
+    if (typeof forceState === 'boolean') {
+      this.resourcesDrawer.classList.toggle('collapsed', !forceState);
+    } else {
+      this.resourcesDrawer.classList.toggle('collapsed');
+    }
   },
 
   async syncPassageResources() {
