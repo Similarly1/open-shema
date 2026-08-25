@@ -329,9 +329,11 @@ const TheologyView = {
   },
 
   async openBook(bookName, chapterId = null) {
-    App.switchView('theology');
+    if (typeof App !== 'undefined' && App.switchView) {
+      App.switchView('theology');
+    }
     if (!this.books || this.books.length === 0) {
-      await this.loadBooksList();
+      await this.loadBooksList(false);
     }
     
     const targetBook = this.books.find(b => b.name === bookName || b.id === bookName || b.title === bookName);
@@ -340,7 +342,7 @@ const TheologyView = {
     await this.selectBook(resolvedName, chapterId);
   },
 
-  async loadBooksList() {
+  async loadBooksList(autoSelectDefault = true) {
     try {
       this.isLoading = true;
       this.books = await API.getTheologyBooks() || [];
@@ -348,7 +350,7 @@ const TheologyView = {
       const badge = document.getElementById('theol-view-count-badge');
       if (badge) badge.textContent = `${this.books.length} ouvrage${this.books.length > 1 ? 's' : ''}`;
 
-      if (this.books.length > 0) {
+      if (this.books.length > 0 && autoSelectDefault) {
         // Sélectionner par défaut Grudem, Paradoxes ou le premier livre
         let defaultBook = this.books.find(b => b.name === 'STGru') || 
                           this.books.find(b => b.name === 'Paradoxes') || 
@@ -356,7 +358,7 @@ const TheologyView = {
                           this.books[0];
                           
         await this.selectBook(defaultBook.name);
-      } else {
+      } else if (this.books.length === 0) {
         this.renderEmptyState();
       }
     } catch (e) {
@@ -373,7 +375,7 @@ const TheologyView = {
     this.btnSummaryHeader?.classList.remove('active');
     this.closeSynthesisPanel();
 
-    const book = this.books.find(b => b.name === bookName) || { name: bookName, title: bookName };
+    const book = this.books.find(b => b.name === bookName || b.id === bookName || b.title === bookName) || { name: bookName, title: bookName };
 
     // Mettre à jour l'en-tête du sélecteur actif
     this.updateActiveBookHeader(book);
@@ -399,11 +401,24 @@ const TheologyView = {
       this.renderTocList();
 
       if (this.tocList.length > 0) {
-        let chId = targetChapterId;
         const readable = this.tocList.filter(c => !c.is_section_header);
-        if (!chId || !readable.some(c => c.chapter_id === chId)) {
-          chId = (readable[0] || this.tocList[0]).chapter_id;
+        let targetChapter = null;
+
+        if (targetChapterId !== null && targetChapterId !== undefined && String(targetChapterId).trim() !== '') {
+          const sTarget = String(targetChapterId).trim();
+          targetChapter = this.tocList.find(c => 
+            !c.is_section_header && (
+              String(c.chapter_id) === sTarget ||
+              c.chapter_id == targetChapterId ||
+              String(c.chapter_index) === sTarget ||
+              String(c.id) === sTarget ||
+              (c.file_name && String(c.file_name) === sTarget) ||
+              (c.chapter_title && sTarget.length > 2 && c.chapter_title.toLowerCase().includes(sTarget.toLowerCase()))
+            )
+          );
         }
+
+        const chId = targetChapter ? targetChapter.chapter_id : ((readable[0] || this.tocList[0])?.chapter_id);
         await this.loadChapter(bookName, chId);
       } else {
         this.renderNoChaptersState(book);
@@ -412,6 +427,7 @@ const TheologyView = {
       console.error('[TheologyView] Erreur chargement TOC:', e);
     }
   },
+
 
   updateActiveBookHeader(book) {
     const title = book.title || book.name;
@@ -508,7 +524,20 @@ const TheologyView = {
     }
   },
 
+  highlightActiveTocItem(chapterId) {
+    if (!this.tocListContainer) return;
+    const cidStr = String(chapterId);
+    this.tocListContainer.querySelectorAll('.theol-toc-item').forEach(btn => {
+      const isMatch = String(btn.dataset.chapterId) === cidStr;
+      btn.classList.toggle('active', isMatch);
+      if (isMatch) {
+        btn.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    });
+  },
+
   renderChapterArticle(data) {
+
     if (!data || !data.paragraphs || data.paragraphs.length === 0) {
       this.renderEmptyChapterArticle();
       return;

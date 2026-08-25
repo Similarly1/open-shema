@@ -1175,18 +1175,20 @@ const PassageOverviewDrawer = {
       });
     });
 
-    // 5. Clic sur un livre de théologie -> Ouvre le chapitre dans la vue théologie
+    // 5. Clic sur un livre de théologie -> Ouvre directement le bon chapitre ciblé dans la vue théologie
     container.querySelectorAll('[data-action="open-theology-chapter"]').forEach(card => {
       card.addEventListener('click', () => {
         const bName = card.dataset.bookName;
         const chId = card.dataset.chapterId;
-        if (typeof App !== 'undefined' && App.switchView) {
+        if (typeof TheologyView !== 'undefined' && typeof TheologyView.openBook === 'function') {
+          TheologyView.openBook(bName, chId);
+        } else if (typeof TheologyView !== 'undefined' && typeof TheologyView.selectBook === 'function') {
+          if (typeof App !== 'undefined' && App.switchView) {
+            App.switchView('theology');
+          }
+          TheologyView.selectBook(bName, chId);
+        } else if (typeof App !== 'undefined' && App.switchView) {
           App.switchView('theology');
-          setTimeout(() => {
-            if (typeof TheologyView !== 'undefined' && TheologyView.selectBook) {
-              TheologyView.selectBook(bName, chId);
-            }
-          }, 150);
         }
       });
     });
