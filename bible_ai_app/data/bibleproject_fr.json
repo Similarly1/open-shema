@@ -1,8 +1,10 @@
 {
-  "version": "1.0",
+  "version": "2.0",
   "channel_title": "BibleProject - Français",
   "channel_url": "https://www.youtube.com/@BibleProject-Français",
   "downloads_url": "https://bibleproject.com/locale/downloads/fra/",
+  "github_data_repo": "https://github.com/Similarly1/open-shema-data.git",
+  "total_books_covered": 66,
   "books": {
     "GEN": {
       "name": "Genèse",
@@ -10,25 +12,27 @@
       "videos": [
         {
           "id": "bp-gen-1-11",
-          "title": "Genèse 1-11 — Panorama",
-          "yt_id": "G_OERjyldV4",
+          "title": "Genèse 1–11 - Panorama",
+          "yt_id": "3m24IHVZ0XM",
           "chapters": [
             1,
             11
           ],
-          "duration": "8:15",
-          "description": "Dieu crée un monde bon et ordonné, mais l'humanité choisit de définir le bien et le mal par elle-même, menant à la spirale de rébellion jusqu'à Babel."
+          "duration": "7:44",
+          "thumbnail": "https://i.ytimg.com/vi/3m24IHVZ0XM/hqdefault.jpg",
+          "description": ""
         },
         {
           "id": "bp-gen-12-50",
-          "title": "Genèse 12-50 — Panorama",
-          "yt_id": "F4isSyennBE",
+          "title": "Genèse 12–50 - Panorama",
+          "yt_id": "NylJU42gNnU",
           "chapters": [
             12,
             50
           ],
-          "duration": "7:50",
-          "description": "Dieu fait alliance avec Abraham pour bénir toutes les nations à travers sa famille : Isaac, Jacob puis Joseph."
+          "duration": "8:06",
+          "thumbnail": "https://i.ytimg.com/vi/NylJU42gNnU/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
@@ -39,8 +43,8 @@
             1,
             11
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Genesis_1-11_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Genesis_1-11_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/genesis_1-11/GENESE_FR_FULL(1).png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/genesis_1-11/GENESE_FR_FULL(1).pdf"
         },
         {
           "id": "poster-gen-12-50",
@@ -49,8 +53,8 @@
             12,
             50
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Genesis_12-50_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Genesis_12-50_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/genesis_12-50/GENESE_FR_FULL(1).png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/genesis_12-50/GENESE_FR_FULL(1).pdf"
         }
       ]
     },
@@ -60,25 +64,27 @@
       "videos": [
         {
           "id": "bp-exo-1-18",
-          "title": "Exode 1-18 — Panorama",
-          "yt_id": "8G4_iR7158A",
+          "title": "Exode 1–18 - Panorama",
+          "yt_id": "6gAkIXm4ZN8",
           "chapters": [
             1,
             18
           ],
-          "duration": "6:30",
-          "description": "Dieu délivre Israël de l'esclavage en Égypte par les dix plaies et la traversée de la mer Rouge."
+          "duration": "6:33",
+          "thumbnail": "https://i.ytimg.com/vi/6gAkIXm4ZN8/hqdefault.jpg",
+          "description": ""
         },
         {
           "id": "bp-exo-19-40",
-          "title": "Exode 19-40 — Panorama",
-          "yt_id": "eJ2X9GqQeU4",
+          "title": "Exode 19–40 - Panorama",
+          "yt_id": "GIdz46OiA5s",
           "chapters": [
             19,
             40
           ],
-          "duration": "6:40",
-          "description": "L'alliance du Sinaï, les dix commandements et les instructions pour le Tabernacle où Dieu vient habiter."
+          "duration": "6:27",
+          "thumbnail": "https://i.ytimg.com/vi/GIdz46OiA5s/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
@@ -89,8 +95,8 @@
             1,
             18
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Exodus_1-18_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Exodus_1-18_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/exodus_1-18/Exode_FR_Full.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/exodus_1-18/Exode_FR_Full.pdf"
         },
         {
           "id": "poster-exo-19-40",
@@ -99,8 +105,8 @@
             19,
             40
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Exodus_19-40_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Exodus_19-40_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/exodus_19-40/Exode_FR_Full.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/exodus_19-40/Exode_FR_Full.pdf"
         }
       ]
     },
@@ -109,27 +115,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-lev",
-          "title": "Lévitique — Panorama",
-          "yt_id": "qR8VqY14Z2k",
+          "id": "bp-lev-1-999",
+          "title": "Lévitique - Panorama",
+          "yt_id": "Bule8U5Hfu4",
           "chapters": [
             1,
-            27
+            999
           ],
-          "duration": "8:00",
-          "description": "Comment un peuple imparfait peut-il vivre en présence d'un Dieu saint ? Rituels, pureté et Jour du Grand Pardon."
+          "duration": "8:17",
+          "thumbnail": "https://i.ytimg.com/vi/Bule8U5Hfu4/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-lev",
+          "id": "poster-lev-1-999",
           "title": "Structure littéraire : Lévitique",
           "chapters": [
             1,
-            27
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Leviticus_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Leviticus_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/leviticus/Lévitique_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/leviticus/Lévitique_FR.pdf"
         }
       ]
     },
@@ -138,27 +145,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-num",
-          "title": "Nombres — Panorama",
-          "yt_id": "y4GjQ9L8yWc",
+          "id": "bp-num-1-999",
+          "title": "Nombres - Panorama",
+          "yt_id": "VxrSqvkN-BY",
           "chapters": [
             1,
-            36
+            999
           ],
-          "duration": "7:15",
-          "description": "La marche d'Israël à travers le désert, marquée par les murmures, la rébellion et la fidélité patiente de Dieu."
+          "duration": "6:51",
+          "thumbnail": "https://i.ytimg.com/vi/VxrSqvkN-BY/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-num",
+          "id": "poster-num-1-999",
           "title": "Structure littéraire : Nombres",
           "chapters": [
             1,
-            36
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Numbers_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Numbers_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/numbers/Nombres_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/numbers/Nombres_FR.pdf"
         }
       ]
     },
@@ -167,27 +175,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-deu",
-          "title": "Deutéronome — Panorama",
-          "yt_id": "q-KqP9i5eTk",
+          "id": "bp-deu-1-999",
+          "title": "Deutéronome - Panorama",
+          "yt_id": "j8FrGTdho14",
           "chapters": [
             1,
-            34
+            999
           ],
-          "duration": "7:45",
-          "description": "Les derniers discours et exhortations de Moïse appelant la nouvelle génération à aimer Dieu de tout son cœur."
+          "duration": "7:49",
+          "thumbnail": "https://i.ytimg.com/vi/j8FrGTdho14/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-deu",
+          "id": "poster-deu-1-999",
           "title": "Structure littéraire : Deutéronome",
           "chapters": [
             1,
-            34
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Deuteronomy_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Deuteronomy_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/deuteronomy/Deutéronome_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/deuteronomy/Deutéronome_FR.pdf"
         }
       ]
     },
@@ -196,27 +205,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-jos",
-          "title": "Josué — Panorama",
-          "yt_id": "mXfK8b_1g_k",
+          "id": "bp-jos-1-999",
+          "title": "Josué - Panorama",
+          "yt_id": "3r38RWz3k4c",
           "chapters": [
             1,
-            24
+            999
           ],
-          "duration": "8:20",
-          "description": "L'entrée en terre promise, la conquête de Canaan et le partage du pays entre les douze tribus."
+          "duration": "8:48",
+          "thumbnail": "https://i.ytimg.com/vi/3r38RWz3k4c/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-jos",
+          "id": "poster-jos-1-999",
           "title": "Structure littéraire : Josué",
           "chapters": [
             1,
-            24
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Joshua_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Joshua_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/joshua/JOSUE_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/joshua/JOSUE_FR.pdf"
         }
       ]
     },
@@ -225,27 +235,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-jdg",
-          "title": "Juges — Panorama",
-          "yt_id": "f8XgB2L3eQw",
+          "id": "bp-jdg-1-999",
+          "title": "Juges - Panorama",
+          "yt_id": "CJhCzmboXSQ",
           "chapters": [
             1,
-            21
+            999
           ],
           "duration": "7:30",
-          "description": "La spirale descendante d'Israël : péché, oppression, supplication, délivrance par un juge, puis rechute."
+          "thumbnail": "https://i.ytimg.com/vi/CJhCzmboXSQ/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-jdg",
+          "id": "poster-jdg-1-999",
           "title": "Structure littéraire : Juges",
           "chapters": [
             1,
-            21
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Judges_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Judges_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/judges/SB_JUGES_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/judges/SB_JUGES_FR.pdf"
         }
       ]
     },
@@ -254,27 +265,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-rut",
-          "title": "Ruth — Panorama",
-          "yt_id": "m8gL9kY4v2U",
+          "id": "bp-rut-1-999",
+          "title": "Ruth - Panorama",
+          "yt_id": "vwh7UOJYCGw",
           "chapters": [
             1,
-            4
+            999
           ],
-          "duration": "6:00",
-          "description": "L'histoire poignante de loyauté et de rédemption entre Ruth la Moabite, Naomi et Boaz."
+          "duration": "7:09",
+          "thumbnail": "https://i.ytimg.com/vi/vwh7UOJYCGw/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-rut",
+          "id": "poster-rut-1-999",
           "title": "Structure littéraire : Ruth",
           "chapters": [
             1,
-            4
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Ruth_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Ruth_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/ruth/Ruth_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/ruth/Ruth_FR.pdf"
         }
       ]
     },
@@ -283,27 +295,50 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-1sa",
-          "title": "1 Samuel — Panorama",
-          "yt_id": "wN6_sXJ4gYc",
+          "id": "bp-1sa-1-999",
+          "title": "1 Samuel - Panorama",
+          "yt_id": "IfyG_XDWZBU",
           "chapters": [
             1,
-            31
+            999
           ],
-          "duration": "7:10",
-          "description": "La transition de l'époque des juges à la monarchie : Samuel le prophète, la chute de Saül et la montée de David."
+          "duration": "7:19",
+          "thumbnail": "https://i.ytimg.com/vi/IfyG_XDWZBU/hqdefault.jpg",
+          "description": ""
+        },
+        {
+          "id": "bp-1sa-1-999",
+          "title": "2 Samuel - Panorama",
+          "yt_id": "a8yoTzGxOTU",
+          "chapters": [
+            1,
+            999
+          ],
+          "duration": "5:59",
+          "thumbnail": "https://i.ytimg.com/vi/a8yoTzGxOTU/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-1sa",
-          "title": "Structure littéraire : 1 Samuel",
+          "id": "poster-1sa-11-12",
+          "title": "Structure littéraire : 1 Samuel 11-12",
           "chapters": [
-            1,
-            31
+            11,
+            12
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/1Samuel_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/1Samuel_Poster.pdf"
+          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2F1_samuel%2FRS_11-12_Samuel_FR_POSTER.jpg",
+          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2F1_samuel%2FRS_11-12_Samuel_FR_POSTER.pdf"
+        },
+        {
+          "id": "poster-1sa-11-12",
+          "title": "Structure littéraire : 1 Samuel 11-12",
+          "chapters": [
+            11,
+            12
+          ],
+          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2F2_samuel%2FRS_11-12_Samuel_FR_POSTER.jpg",
+          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2F2_samuel%2FRS_11-12_Samuel_FR_POSTER.pdf"
         }
       ]
     },
@@ -312,27 +347,50 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-2sa",
-          "title": "2 Samuel — Panorama",
-          "yt_id": "j9P1q7Y8rNw",
+          "id": "bp-2sa-1-999",
+          "title": "1 Samuel - Panorama",
+          "yt_id": "IfyG_XDWZBU",
           "chapters": [
             1,
-            24
+            999
           ],
-          "duration": "6:40",
-          "description": "Le règne de David, l'alliance messianique éternelle promise par Dieu, puis la tragédie avec Bethsabée et Absalom."
+          "duration": "7:19",
+          "thumbnail": "https://i.ytimg.com/vi/IfyG_XDWZBU/hqdefault.jpg",
+          "description": ""
+        },
+        {
+          "id": "bp-2sa-1-999",
+          "title": "2 Samuel - Panorama",
+          "yt_id": "a8yoTzGxOTU",
+          "chapters": [
+            1,
+            999
+          ],
+          "duration": "5:59",
+          "thumbnail": "https://i.ytimg.com/vi/a8yoTzGxOTU/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-2sa",
-          "title": "Structure littéraire : 2 Samuel",
+          "id": "poster-2sa-11-12",
+          "title": "Structure littéraire : 2 Samuel 11-12",
           "chapters": [
-            1,
-            24
+            11,
+            12
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/2Samuel_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/2Samuel_Poster.pdf"
+          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2F1_samuel%2FRS_11-12_Samuel_FR_POSTER.jpg",
+          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2F1_samuel%2FRS_11-12_Samuel_FR_POSTER.pdf"
+        },
+        {
+          "id": "poster-2sa-11-12",
+          "title": "Structure littéraire : 2 Samuel 11-12",
+          "chapters": [
+            11,
+            12
+          ],
+          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2F2_samuel%2FRS_11-12_Samuel_FR_POSTER.jpg",
+          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2F2_samuel%2FRS_11-12_Samuel_FR_POSTER.pdf"
         }
       ]
     },
@@ -341,27 +399,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-1ki-2ki",
-          "title": "1-2 Rois — Panorama",
-          "yt_id": "bV9K8Y7X4pQ",
+          "id": "bp-1ki-1-2",
+          "title": "1–2 Rois - Panorama",
+          "yt_id": "uNfWBrrMn4Y",
           "chapters": [
             1,
-            22
+            2
           ],
-          "duration": "8:30",
-          "description": "Le règne glorieux puis divisé de Salomon, la scission d'Israël et de Juda, et le ministère d'Élie et Élisée."
+          "duration": "8:51",
+          "thumbnail": "https://i.ytimg.com/vi/uNfWBrrMn4Y/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-1ki-2ki",
-          "title": "Structure littéraire : 1-2 Rois",
+          "id": "poster-1ki-1-2",
+          "title": "Structure littéraire : 1 Rois 1-2",
           "chapters": [
             1,
-            22
+            2
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Kings_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Kings_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/1_2_kings/ROIS_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/1_2_kings/ROIS_FR.pdf"
         }
       ]
     },
@@ -370,27 +429,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-1ki-2ki",
-          "title": "1-2 Rois — Panorama",
-          "yt_id": "bV9K8Y7X4pQ",
+          "id": "bp-2ki-1-2",
+          "title": "1–2 Rois - Panorama",
+          "yt_id": "uNfWBrrMn4Y",
           "chapters": [
             1,
-            25
+            2
           ],
-          "duration": "8:30",
-          "description": "L'idolâtrie croissante des rois, la destruction du royaume du Nord par l'Assyrie puis l'exil de Jérusalem à Babylone."
+          "duration": "8:51",
+          "thumbnail": "https://i.ytimg.com/vi/uNfWBrrMn4Y/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-1ki-2ki",
-          "title": "Structure littéraire : 1-2 Rois",
+          "id": "poster-2ki-1-2",
+          "title": "Structure littéraire : 2 Rois 1-2",
           "chapters": [
             1,
-            25
+            2
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Kings_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Kings_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/1_2_kings/ROIS_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/1_2_kings/ROIS_FR.pdf"
         }
       ]
     },
@@ -399,27 +459,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-1ch-2ch",
-          "title": "1-2 Chroniques — Panorama",
-          "yt_id": "a9Z1q8Y7xK4",
+          "id": "bp-1ch-1-2",
+          "title": "1–2 Chroniques - Panorama",
+          "yt_id": "zlz7aB9Zmhc",
           "chapters": [
             1,
-            29
+            2
           ],
-          "duration": "8:00",
-          "description": "Une relecture théologique de l'histoire d'Israël centrée sur l'espérance du Temple et du Roi messianique issu de David."
+          "duration": "6:29",
+          "thumbnail": "https://i.ytimg.com/vi/zlz7aB9Zmhc/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-chronicles",
-          "title": "Structure littéraire : 1-2 Chroniques",
+          "id": "poster-1ch-1-2",
+          "title": "Structure littéraire : 1 Chroniques 1-2",
           "chapters": [
             1,
-            29
+            2
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Chronicles_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Chronicles_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/1_2_chronicles/Chroniques_REDUX_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/1_2_chronicles/Chroniques_REDUX_FR.pdf"
         }
       ]
     },
@@ -428,27 +489,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-1ch-2ch",
-          "title": "1-2 Chroniques — Panorama",
-          "yt_id": "a9Z1q8Y7xK4",
+          "id": "bp-2ch-1-2",
+          "title": "1–2 Chroniques - Panorama",
+          "yt_id": "zlz7aB9Zmhc",
           "chapters": [
             1,
-            36
+            2
           ],
-          "duration": "8:00",
-          "description": "Salomon, les réveils spirituels sous Ézéchias et Josias, et le décret final de Cyrus appelant à rebâtir le Temple."
+          "duration": "6:29",
+          "thumbnail": "https://i.ytimg.com/vi/zlz7aB9Zmhc/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-chronicles",
-          "title": "Structure littéraire : 1-2 Chroniques",
+          "id": "poster-2ch-1-2",
+          "title": "Structure littéraire : 2 Chroniques 1-2",
           "chapters": [
             1,
-            36
+            2
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Chronicles_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Chronicles_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/1_2_chronicles/Chroniques_REDUX_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/1_2_chronicles/Chroniques_REDUX_FR.pdf"
         }
       ]
     },
@@ -457,27 +519,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-ezr-neh",
-          "title": "Esdras-Néhémie — Panorama",
-          "yt_id": "c8P1q9Y7xV2",
+          "id": "bp-ezr-1-999",
+          "title": "Esdras-Néhémie - Panorama",
+          "yt_id": "twgdre6_vdE",
           "chapters": [
             1,
-            10
+            999
           ],
-          "duration": "7:45",
-          "description": "Le retour d'exil sous Zorobabel et Esdras, la reconstruction du second temple et la réforme de la loi."
+          "duration": "8:37",
+          "thumbnail": "https://i.ytimg.com/vi/twgdre6_vdE/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-ezr-neh",
-          "title": "Structure littéraire : Esdras-Néhémie",
+          "id": "poster-ezr-1-999",
+          "title": "Structure littéraire : Esdras",
           "chapters": [
             1,
-            10
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Ezra_Nehemiah_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Ezra_Nehemiah_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/ezra-nehemiah/Esdras-Nehemie_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/ezra-nehemiah/Esdras-Nehemie_FR.pdf"
         }
       ]
     },
@@ -486,27 +549,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-ezr-neh",
-          "title": "Esdras-Néhémie — Panorama",
-          "yt_id": "c8P1q9Y7xV2",
+          "id": "bp-neh-1-999",
+          "title": "Esdras-Néhémie - Panorama",
+          "yt_id": "twgdre6_vdE",
           "chapters": [
             1,
-            13
+            999
           ],
-          "duration": "7:45",
-          "description": "La reconstruction des murailles de Jérusalem face aux oppositions, et le besoin d'un renouveau du cœur."
+          "duration": "8:37",
+          "thumbnail": "https://i.ytimg.com/vi/twgdre6_vdE/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-ezr-neh",
-          "title": "Structure littéraire : Esdras-Néhémie",
+          "id": "poster-neh-1-999",
+          "title": "Structure littéraire : Néhémie",
           "chapters": [
             1,
-            13
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Ezra_Nehemiah_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Ezra_Nehemiah_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/ezra-nehemiah/Esdras-Nehemie_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/ezra-nehemiah/Esdras-Nehemie_FR.pdf"
         }
       ]
     },
@@ -515,27 +579,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-est",
-          "title": "Esther — Panorama",
-          "yt_id": "d9Q1r8Z7wX4",
+          "id": "bp-est-1-999",
+          "title": "Esther - Panorama",
+          "yt_id": "wB1_ziugZB8",
           "chapters": [
             1,
-            10
+            999
           ],
-          "duration": "8:10",
-          "description": "Bien que le nom de Dieu n'y soit jamais mentionné, sa providence souveraine protège son peuple à Suse."
+          "duration": "9:14",
+          "thumbnail": "https://i.ytimg.com/vi/wB1_ziugZB8/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-est",
+          "id": "poster-est-1-999",
           "title": "Structure littéraire : Esther",
           "chapters": [
             1,
-            10
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Esther_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Esther_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/esther/Esther_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/esther/Esther_FR.pdf"
         }
       ]
     },
@@ -544,27 +609,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-job",
-          "title": "Job — Panorama",
-          "yt_id": "e8R1s9A7bK3",
+          "id": "bp-job-1-999",
+          "title": "Job - Panorama",
+          "yt_id": "xRQ5ctHjhBs",
           "chapters": [
             1,
-            42
+            999
           ],
-          "duration": "9:30",
-          "description": "Le problème de la souffrance des justes et les limites de la sagesse humaine face à la grandeur cosmique du Créateur."
+          "duration": "10:59",
+          "thumbnail": "https://i.ytimg.com/vi/xRQ5ctHjhBs/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-job",
+          "id": "poster-job-1-999",
           "title": "Structure littéraire : Job",
           "chapters": [
             1,
-            42
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Job_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Job_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/job/SB-17_Job_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/job/SB-17_Job_FR.pdf"
         }
       ]
     },
@@ -573,27 +639,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-psa",
-          "title": "Psaumes — Panorama",
-          "yt_id": "f9T1u8C7dM2",
+          "id": "bp-psa-1-999",
+          "title": "Psaumes - Panorama",
+          "yt_id": "T-DvRiiLS1Y",
           "chapters": [
             1,
-            150
+            999
           ],
-          "duration": "8:45",
-          "description": "Le livre de prière et de louange d'Israël structuré en cinq livres, des lamentations vers l'allégresse finale."
+          "duration": "9:04",
+          "thumbnail": "https://i.ytimg.com/vi/T-DvRiiLS1Y/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-psa",
+          "id": "poster-psa-1-999",
           "title": "Structure littéraire : Psaumes",
           "chapters": [
             1,
-            150
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Psalms_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Psalms_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/psalms/Psaumes_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/psalms/Psaumes_FR.pdf"
         }
       ]
     },
@@ -602,27 +669,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-pro",
-          "title": "Proverbes — Panorama",
-          "yt_id": "g8V1w9E7fP1",
+          "id": "bp-pro-1-999",
+          "title": "Proverbes - Panorama",
+          "yt_id": "aY3R8FpE92Q",
           "chapters": [
             1,
-            31
+            999
           ],
-          "duration": "7:50",
-          "description": "La crainte de l'Éternel est le commencement de la sagesse pratique (Hokhmah) pour vivre en harmonie dans le monde de Dieu."
+          "duration": "8:08",
+          "thumbnail": "https://i.ytimg.com/vi/aY3R8FpE92Q/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-pro",
+          "id": "poster-pro-1-999",
           "title": "Structure littéraire : Proverbes",
           "chapters": [
             1,
-            31
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Proverbs_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Proverbs_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/proverbs/Proverbes_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/proverbs/Proverbes_FR.pdf"
         }
       ]
     },
@@ -631,27 +699,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-ecc",
-          "title": "Ecclésiaste — Panorama",
-          "yt_id": "h9X1y8G7hR0",
+          "id": "bp-ecc-1-999",
+          "title": "Ecclésiaste - Panorama",
+          "yt_id": "VURWsXy1nww",
           "chapters": [
             1,
-            12
+            999
           ],
-          "duration": "7:40",
-          "description": "Une méditation profonde sur la fumée éphémère (Hébel) de l'existence humaine sous le soleil et l'appel à savourer les dons de Dieu."
+          "duration": "8:02",
+          "thumbnail": "https://i.ytimg.com/vi/VURWsXy1nww/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-ecc",
+          "id": "poster-ecc-1-999",
           "title": "Structure littéraire : Ecclésiaste",
           "chapters": [
             1,
-            12
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Ecclesiastes_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Ecclesiastes_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/ecclesiastes/Ecclésiaste_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/ecclesiastes/Ecclésiaste_FR.pdf"
         }
       ]
     },
@@ -660,27 +729,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-sng",
-          "title": "Cantique des Cantiques — Panorama",
-          "yt_id": "i8Z1a9I7jS9",
+          "id": "bp-sng-1-999",
+          "title": "Cantique des cantiques - Panorama",
+          "yt_id": "YE-TO4LMbtQ",
           "chapters": [
             1,
-            8
+            999
           ],
-          "duration": "6:50",
-          "description": "Un recueil poétique d'amour passionné célébrant la beauté de l'attirance et de l'intimité du couple."
+          "duration": "6:59",
+          "thumbnail": "https://i.ytimg.com/vi/YE-TO4LMbtQ/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-sng",
+          "id": "poster-sng-1-999",
           "title": "Structure littéraire : Cantique des Cantiques",
           "chapters": [
             1,
-            8
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/SongOfSongs_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/SongOfSongs_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/song_of_songs/Cantiques_Des_Cantiques.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/song_of_songs/Cantiques_Des_Cantiques.pdf"
         }
       ]
     },
@@ -690,76 +760,58 @@
       "videos": [
         {
           "id": "bp-isa-1-39",
-          "title": "Ésaïe 1-39 — Panorama",
-          "yt_id": "j9B1c8K7lT8",
+          "title": "Ésaïe 1–39 - Panorama",
+          "yt_id": "eOmd1d-6Whw",
           "chapters": [
             1,
             39
           ],
-          "duration": "7:50",
-          "description": "Jugement sur Jérusalem et les nations, promesse de l'Emmanuel et de la nouvelle Jérusalem purifiée."
+          "duration": "8:11",
+          "thumbnail": "https://i.ytimg.com/vi/eOmd1d-6Whw/hqdefault.jpg",
+          "description": ""
         },
         {
           "id": "bp-isa-40-66",
-          "title": "Ésaïe 40-66 — Panorama",
-          "yt_id": "k8D1e9M7nU7",
+          "title": "Ésaïe 40–66 - Panorama",
+          "yt_id": "ztaPgwQ5j8k",
           "chapters": [
             40,
             66
           ],
-          "duration": "8:30",
-          "description": "Consolation pour les exilés, le Serviteur Souffrant portant les péchés et la vision des nouveaux cieux et de la nouvelle terre."
+          "duration": "8:02",
+          "thumbnail": "https://i.ytimg.com/vi/ztaPgwQ5j8k/hqdefault.jpg",
+          "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-isa-1-39",
-          "title": "Structure littéraire : Ésaïe 1-39",
-          "chapters": [
-            1,
-            39
-          ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Isaiah_1-39_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Isaiah_1-39_Poster.pdf"
-        },
-        {
-          "id": "poster-isa-40-66",
-          "title": "Structure littéraire : Ésaïe 40-66",
-          "chapters": [
-            40,
-            66
-          ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Isaiah_40-66_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Isaiah_40-66_Poster.pdf"
-        }
-      ]
+      "posters": []
     },
     "JER": {
       "name": "Jérémie",
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-jer",
-          "title": "Jérémie — Panorama",
-          "yt_id": "l9F1g8O7pV6",
+          "id": "bp-jer-1-999",
+          "title": "Jérémie - Panorama",
+          "yt_id": "qTz_5zFBDsc",
           "chapters": [
             1,
-            52
+            999
           ],
-          "duration": "8:20",
-          "description": "Le prophète pleurant sur l'infidélité de Juda, annonçant l'exil mais aussi la Nouvelle Alliance gravée sur les cœurs."
+          "duration": "7:15",
+          "thumbnail": "https://i.ytimg.com/vi/qTz_5zFBDsc/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-jer",
+          "id": "poster-jer-1-999",
           "title": "Structure littéraire : Jérémie",
           "chapters": [
             1,
-            52
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Jeremiah_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Jeremiah_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/jeremiah/Jeremie_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/jeremiah/Jeremie_FR.pdf"
         }
       ]
     },
@@ -768,27 +820,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-lam",
-          "title": "Lamentations — Panorama",
-          "yt_id": "m8H1i9Q7rW5",
+          "id": "bp-lam-1-999",
+          "title": "Lamentations - Panorama",
+          "yt_id": "nY4dZgLRzSg",
           "chapters": [
             1,
-            5
+            999
           ],
-          "duration": "6:20",
-          "description": "Cinq poèmes acrostiches de deuil sur la ruine de Jérusalem, proclamant au milieu des décombres : 'Les bontés de l'Éternel ne sont pas épuisées'."
+          "duration": "7:17",
+          "thumbnail": "https://i.ytimg.com/vi/nY4dZgLRzSg/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-lam",
+          "id": "poster-lam-1-999",
           "title": "Structure littéraire : Lamentations",
           "chapters": [
             1,
-            5
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Lamentations_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Lamentations_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/lamentations/Lamentations_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/lamentations/Lamentations_FR.pdf"
         }
       ]
     },
@@ -797,48 +850,50 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-ezk-1-32",
-          "title": "Ézéchiel 1-32 — Panorama",
-          "yt_id": "n9J1k8S7tX4",
+          "id": "bp-ezk-1-33",
+          "title": "Ézéchiel 1–33 - Panorama",
+          "yt_id": "4Yr9DEYJ9IU",
           "chapters": [
             1,
-            32
+            33
           ],
-          "duration": "7:40",
-          "description": "La gloire de Dieu quitte le temple corrompu de Jérusalem ; visions étranges et prophéties contre les nations."
+          "duration": "7:27",
+          "thumbnail": "https://i.ytimg.com/vi/4Yr9DEYJ9IU/hqdefault.jpg",
+          "description": ""
         },
         {
-          "id": "bp-ezk-33-48",
-          "title": "Ézéchiel 33-48 — Panorama",
-          "yt_id": "o8L1m9U7vY3",
+          "id": "bp-ezk-34-48",
+          "title": "Ézéchiel 34–48 - Panorama",
+          "yt_id": "MyFcRxLzW6g",
           "chapters": [
-            33,
+            34,
             48
           ],
-          "duration": "8:10",
-          "description": "La résurrection des ossements desséchés, le cœur nouveau par l'Esprit et la vision du Nouveau Temple d'où coule le fleuve de vie."
+          "duration": "7:14",
+          "thumbnail": "https://i.ytimg.com/vi/MyFcRxLzW6g/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-ezk-1-32",
-          "title": "Structure littéraire : Ézéchiel 1-32",
+          "id": "poster-ezk-1-33",
+          "title": "Structure littéraire : Ézéchiel 1-33",
           "chapters": [
             1,
-            32
+            33
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Ezekiel_1-32_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Ezekiel_1-32_Poster.pdf"
+          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fezekiel_1-33%2FRS26_27_Ezechiel_FR_POSTER.jpg",
+          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fezekiel_1-33%2FRS26_27_Ezechiel_FR_POSTER.pdf"
         },
         {
-          "id": "poster-ezk-33-48",
-          "title": "Structure littéraire : Ézéchiel 33-48",
+          "id": "poster-ezk-34-48",
+          "title": "Structure littéraire : Ézéchiel 34-48",
           "chapters": [
-            33,
+            34,
             48
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Ezekiel_33-48_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Ezekiel_33-48_Poster.pdf"
+          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fezekiel_34-48%2FRS26_27_Ezechiel_FR_POSTER.jpg",
+          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fezekiel_34-48%2FRS26_27_Ezechiel_FR_POSTER.pdf"
         }
       ]
     },
@@ -847,27 +902,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-dan",
-          "title": "Daniel — Panorama",
-          "yt_id": "p9N1o8W7xZ2",
+          "id": "bp-dan-1-999",
+          "title": "Daniel - Panorama",
+          "yt_id": "5RyZ2lceuPA",
           "chapters": [
             1,
-            12
+            999
           ],
-          "duration": "8:50",
-          "description": "La fidélité de Daniel et ses compagnons à Babylone, et les visions apocalyptiques du Fils de l'Homme recevant un règne éternel."
+          "duration": "8:54",
+          "thumbnail": "https://i.ytimg.com/vi/5RyZ2lceuPA/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-dan",
+          "id": "poster-dan-1-999",
           "title": "Structure littéraire : Daniel",
           "chapters": [
             1,
-            12
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Daniel_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Daniel_Poster.pdf"
+          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fdaniel%2FRS28_Daniel_FR_POSTER.jpg",
+          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fdaniel%2FRS28_Daniel_FR_POSTER.pdf"
         }
       ]
     },
@@ -876,27 +932,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-hos",
-          "title": "Osée — Panorama",
-          "yt_id": "q8P1q9Y7aB1",
+          "id": "bp-hos-1-999",
+          "title": "Osée - Panorama",
+          "yt_id": "cFUsMnQe1Ts",
           "chapters": [
             1,
-            14
+            999
           ],
-          "duration": "7:10",
-          "description": "L'amour inconditionnel et rédempteur de Dieu comparé au mariage déchirant du prophète avec une femme infidèle."
+          "duration": "7:39",
+          "thumbnail": "https://i.ytimg.com/vi/cFUsMnQe1Ts/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-hos",
+          "id": "poster-hos-1-999",
           "title": "Structure littéraire : Osée",
           "chapters": [
             1,
-            14
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Hosea_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Hosea_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/hosea/Osée_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/hosea/Osée_FR.pdf"
         }
       ]
     },
@@ -905,27 +962,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-jol",
-          "title": "Joël — Panorama",
-          "yt_id": "r9R1s8A7cD0",
+          "id": "bp-jol-1-999",
+          "title": "Joël - Panorama",
+          "yt_id": "KyfKz8DrhVk",
           "chapters": [
             1,
-            3
+            999
           ],
-          "duration": "5:50",
-          "description": "L'invasion dévastatrice des criquets préfigurant le Jour de l'Éternel et la promesse de l'effusion de l'Esprit sur toute chair."
+          "duration": "6:49",
+          "thumbnail": "https://i.ytimg.com/vi/KyfKz8DrhVk/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-jol",
+          "id": "poster-jol-1-999",
           "title": "Structure littéraire : Joël",
           "chapters": [
             1,
-            3
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Joel_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Joel_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/joel/Joël_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/joel/Joël_FR.pdf"
         }
       ]
     },
@@ -934,27 +992,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-amo",
-          "title": "Amos — Panorama",
-          "yt_id": "s8T1u9C7eF9",
+          "id": "bp-amo-1-999",
+          "title": "Amos - Panorama",
+          "yt_id": "8sRTnbX_TJY",
           "chapters": [
             1,
-            9
+            999
           ],
-          "duration": "6:40",
-          "description": "Dénonciation cinglante de l'injustice sociale et de l'hypocrisie religieuse en Israël : 'Que le droit coule comme de l'eau'."
+          "duration": "7:13",
+          "thumbnail": "https://i.ytimg.com/vi/8sRTnbX_TJY/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-amo",
+          "id": "poster-amo-1-999",
           "title": "Structure littéraire : Amos",
           "chapters": [
             1,
-            9
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Amos_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Amos_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/amos/Amos_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/amos/Amos_FR.pdf"
         }
       ]
     },
@@ -963,27 +1022,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-oba",
-          "title": "Abdias — Panorama",
-          "yt_id": "t9V1w8E7gH8",
+          "id": "bp-oba-1-999",
+          "title": "Abdias - Panorama",
+          "yt_id": "RgTE--fi8m0",
           "chapters": [
             1,
-            1
+            999
           ],
-          "duration": "5:10",
-          "description": "La chute d'Édom pour son orgueil et sa violence contre son frère Jacob, et le triomphe du règne divin sur Sion."
+          "duration": "4:59",
+          "thumbnail": "https://i.ytimg.com/vi/RgTE--fi8m0/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-oba",
+          "id": "poster-oba-1-999",
           "title": "Structure littéraire : Abdias",
           "chapters": [
             1,
-            1
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Obadiah_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Obadiah_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/obadiah/Abdias_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/obadiah/Abdias_FR.pdf"
         }
       ]
     },
@@ -992,27 +1052,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-jon",
-          "title": "Jonas — Panorama",
-          "yt_id": "u8X1y9G7iJ7",
+          "id": "bp-jon-1-999",
+          "title": "Jonas - Panorama",
+          "yt_id": "DNjuAr9c7VU",
           "chapters": [
             1,
-            4
+            999
           ],
-          "duration": "7:00",
-          "description": "Une satire profonde sur un prophète rebelle qui méprise la grâce immense et universelle de Dieu envers ses ennemis de Ninive."
+          "duration": "9:01",
+          "thumbnail": "https://i.ytimg.com/vi/DNjuAr9c7VU/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-jon",
+          "id": "poster-jon-1-999",
           "title": "Structure littéraire : Jonas",
           "chapters": [
             1,
-            4
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Jonah_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Jonah_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/jonah/Jonas_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/jonah/Jonas_FR.pdf"
         }
       ]
     },
@@ -1021,27 +1082,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-mic",
-          "title": "Michée — Panorama",
-          "yt_id": "v9Z1a8I7kL6",
+          "id": "bp-mic-1-999",
+          "title": "Michée - Panorama",
+          "yt_id": "dmS-4-0cx5g",
           "chapters": [
             1,
-            7
+            999
           ],
-          "duration": "6:40",
-          "description": "Ce que l'Éternel demande : pratiquer la justice, aimer la miséricorde et marcher humblement, avec la promesse du Messie né à Bethléem."
+          "duration": "6:39",
+          "thumbnail": "https://i.ytimg.com/vi/dmS-4-0cx5g/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-mic",
+          "id": "poster-mic-1-999",
           "title": "Structure littéraire : Michée",
           "chapters": [
             1,
-            7
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Micah_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Micah_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/micah/Michee_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/micah/Michee_FR.pdf"
         }
       ]
     },
@@ -1050,27 +1112,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-nam",
-          "title": "Nahum — Panorama",
-          "yt_id": "w8B1c9K7mN5",
+          "id": "bp-nam-1-999",
+          "title": "Nahum - Panorama",
+          "yt_id": "7rBdJ1JZo9A",
           "chapters": [
             1,
-            3
+            999
           ],
-          "duration": "5:30",
-          "description": "La chute inéluctable de Ninive et de l'empire assyrien brutal, démontrant que Dieu renverse la tyrannie et le mal."
+          "duration": "5:07",
+          "thumbnail": "https://i.ytimg.com/vi/7rBdJ1JZo9A/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-nam",
+          "id": "poster-nam-1-999",
           "title": "Structure littéraire : Nahum",
           "chapters": [
             1,
-            3
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Nahum_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Nahum_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/nahum/Nahum_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/nahum/Nahum_FR.pdf"
         }
       ]
     },
@@ -1079,27 +1142,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-hab",
-          "title": "Habacuc — Panorama",
-          "yt_id": "x9D1e8M7oP4",
+          "id": "bp-hab-1-999",
+          "title": "Habacuc - Panorama",
+          "yt_id": "lBQbCKsvwCI",
           "chapters": [
             1,
-            3
+            999
           ],
-          "duration": "6:20",
-          "description": "Le combat de la foi : comment Dieu peut-il utiliser Babylone ? 'Le juste vivra par sa foi' même au cœur de l'obscurité."
+          "duration": "6:47",
+          "thumbnail": "https://i.ytimg.com/vi/lBQbCKsvwCI/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-hab",
+          "id": "poster-hab-1-999",
           "title": "Structure littéraire : Habacuc",
           "chapters": [
             1,
-            3
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Habakkuk_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Habakkuk_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/habakkuk/Habacuc_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/habakkuk/Habacuc_FR.pdf"
         }
       ]
     },
@@ -1108,27 +1172,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-zep",
-          "title": "Sophonie — Panorama",
-          "yt_id": "y8F1g9O7qR3",
+          "id": "bp-zep-1-999",
+          "title": "Sophonie - Panorama",
+          "yt_id": "oiTxzjDvjgk",
           "chapters": [
             1,
-            3
+            999
           ],
-          "duration": "5:40",
-          "description": "Le feu purificateur du Jour de l'Éternel qui consume le mal pour créer une famille restaurée de toutes nations."
+          "duration": "5:10",
+          "thumbnail": "https://i.ytimg.com/vi/oiTxzjDvjgk/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-zep",
+          "id": "poster-zep-1-999",
           "title": "Structure littéraire : Sophonie",
           "chapters": [
             1,
-            3
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Zephaniah_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Zephaniah_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/zephaniah/Sophonie_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/zephaniah/Sophonie_FR.pdf"
         }
       ]
     },
@@ -1137,27 +1202,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-hag",
-          "title": "Aggée — Panorama",
-          "yt_id": "z9H1i8Q7sT2",
+          "id": "bp-hag-1-999",
+          "title": "Aggée - Panorama",
+          "yt_id": "DOoPKFpFZZE",
           "chapters": [
             1,
-            2
+            999
           ],
-          "duration": "5:20",
-          "description": "Exhortation aux rapatriés d'exil à rebâtir la maison de Dieu avant de s'occuper de leurs propres maisons lambrissées."
+          "duration": "5:39",
+          "thumbnail": "https://i.ytimg.com/vi/DOoPKFpFZZE/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-hag",
+          "id": "poster-hag-1-999",
           "title": "Structure littéraire : Aggée",
           "chapters": [
             1,
-            2
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Haggai_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Haggai_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/haggai/Aggée_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/haggai/Aggée_FR.pdf"
         }
       ]
     },
@@ -1166,27 +1232,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-zec",
-          "title": "Zacharie — Panorama",
-          "yt_id": "a8J1k9S7uV1",
+          "id": "bp-zec-1-999",
+          "title": "Zacharie - Panorama",
+          "yt_id": "vyQme1-Libg",
           "chapters": [
             1,
-            14
+            999
           ],
-          "duration": "7:50",
-          "description": "Visions nocturnes, venue du Roi humble monté sur un ânon, et la purification finale de Jérusalem."
+          "duration": "8:13",
+          "thumbnail": "https://i.ytimg.com/vi/vyQme1-Libg/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-zec",
+          "id": "poster-zec-1-999",
           "title": "Structure littéraire : Zacharie",
           "chapters": [
             1,
-            14
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Zechariah_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Zechariah_Poster.pdf"
+          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fzechariah%2FRS39_Zacharie_FR_POSTER.jpg",
+          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fzechariah%2FRS39_Zacharie_FR_POSTER.pdf"
         }
       ]
     },
@@ -1195,27 +1262,28 @@
       "testament": "OT",
       "videos": [
         {
-          "id": "bp-mal",
-          "title": "Malachie — Panorama",
-          "yt_id": "b9L1m8U7wX0",
+          "id": "bp-mal-1-999",
+          "title": "Malachie - Panorama",
+          "yt_id": "2ENSIn3OOyE",
           "chapters": [
             1,
-            4
+            999
           ],
-          "duration": "6:30",
-          "description": "Six disputes entre Dieu et son peuple apathique, se concluant sur l'attente du messager précurseur et du Soleil de justice."
+          "duration": "7:09",
+          "thumbnail": "https://i.ytimg.com/vi/2ENSIn3OOyE/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-mal",
+          "id": "poster-mal-1-999",
           "title": "Structure littéraire : Malachie",
           "chapters": [
             1,
-            4
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Malachi_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Malachi_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/malachi/Malachie_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/malachi/Malachie_FR.pdf"
         }
       ]
     },
@@ -1225,25 +1293,27 @@
       "videos": [
         {
           "id": "bp-mat-1-13",
-          "title": "Matthieu 1-13 — Panorama",
-          "yt_id": "c8N1o9W7yZ9",
+          "title": "Matthieu 1–13 - Panorama",
+          "yt_id": "wOJY7gRBkNU",
           "chapters": [
             1,
             13
           ],
-          "duration": "8:10",
-          "description": "Jésus le Messie et nouveau Moïse qui accomplit les promesses de l'Ancien Testament et proclame le Royaume des cieux (Sermon sur la Montagne)."
+          "duration": "8:18",
+          "thumbnail": "https://i.ytimg.com/vi/wOJY7gRBkNU/hqdefault.jpg",
+          "description": ""
         },
         {
           "id": "bp-mat-14-28",
-          "title": "Matthieu 14-28 — Panorama",
-          "yt_id": "AUZIYQHipInPIzMnSfo0vmSOnPqaOjHi5YKdsou8WAEslcS-gzu_PdBLU3YeiRr1",
+          "title": "Matthieu 14–28 - Panorama",
+          "yt_id": "mq0vO1vNVfY",
           "chapters": [
             14,
             28
           ],
-          "duration": "8:30",
-          "description": "La confrontation avec les chefs religieux, la croix rédemptrice, la résurrection victorieuse et la Grande Mission."
+          "duration": "7:11",
+          "thumbnail": "https://i.ytimg.com/vi/mq0vO1vNVfY/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
@@ -1254,8 +1324,8 @@
             1,
             13
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Matthew_1-13_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Matthew_1-13_Poster.pdf"
+          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fmatthew_1-13%2FRS_42-43_Matthieu_POSTER_FR.jpg",
+          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fmatthew_1-13%2FRS_42-43_Matthieu_POSTER_FR.pdf"
         },
         {
           "id": "poster-mat-14-28",
@@ -1264,8 +1334,8 @@
             14,
             28
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Matthew_14-28_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Matthew_14-28_Poster.pdf"
+          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fmatthew_14-28%2FRS_42-43_Matthieu_POSTER_FR.jpg",
+          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fmatthew_14-28%2FRS_42-43_Matthieu_POSTER_FR.pdf"
         }
       ]
     },
@@ -1274,27 +1344,28 @@
       "testament": "NT",
       "videos": [
         {
-          "id": "bp-mrk",
-          "title": "Marc — Panorama",
-          "yt_id": "d8P1q9A7bC8",
+          "id": "bp-mrk-1-999",
+          "title": "Marc - Panorama",
+          "yt_id": "9NhjIuy6_oo",
           "chapters": [
             1,
-            16
+            999
           ],
-          "duration": "9:15",
-          "description": "Le Messie serviteur en action rapide : qui est Jésus, et que signifie le suivre jusqu'à la croix ?"
+          "duration": "9:32",
+          "thumbnail": "https://i.ytimg.com/vi/9NhjIuy6_oo/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-mrk",
+          "id": "poster-mrk-1-999",
           "title": "Structure littéraire : Marc",
           "chapters": [
             1,
-            16
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Mark_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Mark_Poster.pdf"
+          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fmark%2FRS_44_Marc_FR_POSTER.jpg",
+          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fmark%2FRS_44_Marc_FR_POSTER.pdf"
         }
       ]
     },
@@ -1304,25 +1375,27 @@
       "videos": [
         {
           "id": "bp-luk-1-9",
-          "title": "Luc 1-9 — Panorama",
-          "yt_id": "e9R1s8C7eG7",
+          "title": "Luc 1–9 - Panorama",
+          "yt_id": "Bo46uU2IF9w",
           "chapters": [
             1,
             9
           ],
-          "duration": "8:20",
-          "description": "L'arrivée du Sauveur pour les pauvres, les marginaux et les nations, révélant le cœur compatissant de Dieu."
+          "duration": "8:16",
+          "thumbnail": "https://i.ytimg.com/vi/Bo46uU2IF9w/hqdefault.jpg",
+          "description": ""
         },
         {
           "id": "bp-luk-10-24",
-          "title": "Luc 10-24 — Panorama",
-          "yt_id": "f8T1u9E7gI6",
+          "title": "Luc 10–24 - Panorama",
+          "yt_id": "O-Za0jggT8Q",
           "chapters": [
             10,
             24
           ],
-          "duration": "8:40",
-          "description": "La longue marche vers Jérusalem, les paraboles de la grâce (le fils prodigue), la Pâque et la marche d'Emmaüs."
+          "duration": "7:48",
+          "thumbnail": "https://i.ytimg.com/vi/O-Za0jggT8Q/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
@@ -1333,8 +1406,8 @@
             1,
             9
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Luke_1-9_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Luke_1-9_Poster.pdf"
+          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fluke_1-9%2FRS_47-48_Luc_FR_POSTER.jpg",
+          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fluke_1-9%2FRS_47-48_Luc_FR_POSTER.pdf"
         },
         {
           "id": "poster-luk-10-24",
@@ -1343,8 +1416,8 @@
             10,
             24
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Luke_10-24_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Luke_10-24_Poster.pdf"
+          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fluke_10-24%2FRS_47-48_Luc_FR_POSTER.jpg",
+          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fluke_10-24%2FRS_47-48_Luc_FR_POSTER.pdf"
         }
       ]
     },
@@ -1354,25 +1427,39 @@
       "videos": [
         {
           "id": "bp-jhn-1-12",
-          "title": "Jean 1-12 — Panorama",
-          "yt_id": "g9V1w8G7iK5",
+          "title": "Jean 1–12 - Panorama",
+          "yt_id": "QReuhS_R8Kk",
           "chapters": [
             1,
             12
           ],
-          "duration": "8:50",
-          "description": "La Parole faite chair et les sept signes miraculeux révélant la gloire de Jésus comme Fils unique de Dieu."
+          "duration": "8:46",
+          "thumbnail": "https://i.ytimg.com/vi/QReuhS_R8Kk/hqdefault.jpg",
+          "description": ""
+        },
+        {
+          "id": "bp-jhn-1-3",
+          "title": "1–3 Jean - Panorama",
+          "yt_id": "N-q8TaM8opA",
+          "chapters": [
+            1,
+            3
+          ],
+          "duration": "9:41",
+          "thumbnail": "https://i.ytimg.com/vi/N-q8TaM8opA/hqdefault.jpg",
+          "description": ""
         },
         {
           "id": "bp-jhn-13-21",
-          "title": "Jean 13-21 — Panorama",
-          "yt_id": "h8X1y9I7kM4",
+          "title": "Jean 13–21 - Panorama",
+          "yt_id": "isJCKKCZx5A",
           "chapters": [
             13,
             21
           ],
-          "duration": "8:30",
-          "description": "Les discours d'adieu, la promesse du Saint-Esprit (le Consolateur), la glorification par la croix et la résurrection."
+          "duration": "8:32",
+          "thumbnail": "https://i.ytimg.com/vi/isJCKKCZx5A/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
@@ -1383,8 +1470,8 @@
             1,
             12
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/John_1-12_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/John_1-12_Poster.pdf"
+          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fjohn_1-12%2FRS_45-46_Jean_FR_Poster.jpg",
+          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fjohn_1-12%2FRS_45-46_Jean_FR_Poster.pdf"
         },
         {
           "id": "poster-jhn-13-21",
@@ -1393,8 +1480,8 @@
             13,
             21
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/John_13-21_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/John_13-21_Poster.pdf"
+          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fjohn_13-21%2FRS_45-46_Jean_FR_Poster.jpg",
+          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fjohn_13-21%2FRS_45-46_Jean_FR_Poster.pdf"
         }
       ]
     },
@@ -1404,25 +1491,27 @@
       "videos": [
         {
           "id": "bp-act-1-12",
-          "title": "Actes 1-12 — Panorama",
-          "yt_id": "i9Z1a8K7mO3",
+          "title": "Actes 1–12 - Panorama",
+          "yt_id": "YLnUYCSWD9k",
           "chapters": [
             1,
             12
           ],
-          "duration": "8:15",
-          "description": "La Pentecôte, la naissance de l'Église à Jérusalem et l'expansion initiale en Judée et Samarie malgré la persécution."
+          "duration": "8:16",
+          "thumbnail": "https://i.ytimg.com/vi/YLnUYCSWD9k/hqdefault.jpg",
+          "description": ""
         },
         {
           "id": "bp-act-13-28",
-          "title": "Actes 13-28 — Panorama",
-          "yt_id": "j8B1c9M7oQ2",
+          "title": "Actes 13–28 - Panorama",
+          "yt_id": "M7Xgd_7bfpA",
           "chapters": [
             13,
             28
           ],
-          "duration": "8:45",
-          "description": "Les voyages missionnaires de Paul à travers l'empire gréco-romain jusqu'à son arrivée à Rome pour annoncer le Royaume sans obstacle."
+          "duration": "8:04",
+          "thumbnail": "https://i.ytimg.com/vi/M7Xgd_7bfpA/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
@@ -1433,8 +1522,8 @@
             1,
             12
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Acts_1-12_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Acts_1-12_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/acts_1-12/ACTES_FR_FULL.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/acts_1-12/ACTES_FR_FULL.pdf"
         },
         {
           "id": "poster-act-13-28",
@@ -1443,8 +1532,8 @@
             13,
             28
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Acts_13-28_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Acts_13-28_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/acts_13-28/ACTES_FR_FULL.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/acts_13-28/ACTES_FR_FULL.pdf"
         }
       ]
     },
@@ -1454,25 +1543,27 @@
       "videos": [
         {
           "id": "bp-rom-1-4",
-          "title": "Romains 1-4 — Panorama",
-          "yt_id": "k9D1e8O7qS1",
+          "title": "Romains 1–4 - Panorama",
+          "yt_id": "8EJmsrA0H4M",
           "chapters": [
             1,
             4
           ],
-          "duration": "7:40",
-          "description": "Tous ont péché et sont privés de la gloire de Dieu, mais tous sont justifiés gratuitement par la foi en Jésus-Christ."
+          "duration": "7:47",
+          "thumbnail": "https://i.ytimg.com/vi/8EJmsrA0H4M/hqdefault.jpg",
+          "description": ""
         },
         {
           "id": "bp-rom-5-16",
-          "title": "Romains 5-16 — Panorama",
-          "yt_id": "l8F1g9Q7sU0",
+          "title": "Romains 5–16 - Panorama",
+          "yt_id": "TYxbJrDgZRg",
           "chapters": [
             5,
             16
           ],
-          "duration": "9:10",
-          "description": "Vie nouvelle par l'Esprit (ch. 8), le mystère d'Israël et des nations (ch. 9-11), et l'amour sacrificiel en action."
+          "duration": "9:11",
+          "thumbnail": "https://i.ytimg.com/vi/TYxbJrDgZRg/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
@@ -1483,8 +1574,8 @@
             1,
             4
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Romans_1-4_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Romans_1-4_Poster.pdf"
+          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fromans_1-4%2FRS_50-51_Romains_FR_POSTER.jpg",
+          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fromans_1-4%2FRS_50-51_Romains_FR_POSTER.pdf"
         },
         {
           "id": "poster-rom-5-16",
@@ -1493,66 +1584,42 @@
             5,
             16
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Romans_5-16_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Romans_5-16_Poster.pdf"
+          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fromans_5-16%2FRS_50-51_Romains_FR_POSTER.jpg",
+          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fromans_5-16%2FRS_50-51_Romains_FR_POSTER.pdf"
         }
       ]
     },
     "1CO": {
       "name": "1 Corinthiens",
       "testament": "NT",
-      "videos": [
-        {
-          "id": "bp-1co",
-          "title": "1 Corinthiens — Panorama",
-          "yt_id": "m9H1i8S7uW9",
-          "chapters": [
-            1,
-            16
-          ],
-          "duration": "9:00",
-          "description": "L'Évangile appliqué aux problèmes de l'Église : divisions, sexualité, culte public, amour suprême (ch. 13) et résurrection corporelle."
-        }
-      ],
+      "videos": [],
       "posters": [
         {
-          "id": "poster-1co",
+          "id": "poster-1co-1-999",
           "title": "Structure littéraire : 1 Corinthiens",
           "chapters": [
             1,
-            16
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/1Corinthians_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/1Corinthians_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1_corinthians/1Corinthiens_FR_FULL.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1_corinthians/1Corinthiens_FR_FULL.pdf"
         }
       ]
     },
     "2CO": {
       "name": "2 Corinthiens",
       "testament": "NT",
-      "videos": [
-        {
-          "id": "bp-2co",
-          "title": "2 Corinthiens — Panorama",
-          "yt_id": "n8J1k9U7wY8",
-          "chapters": [
-            1,
-            13
-          ],
-          "duration": "7:20",
-          "description": "La puissance de Dieu se déployant dans la faiblesse humaine ; le ministère glorieux de la réconciliation."
-        }
-      ],
+      "videos": [],
       "posters": [
         {
-          "id": "poster-2co",
+          "id": "poster-2co-1-999",
           "title": "Structure littéraire : 2 Corinthiens",
           "chapters": [
             1,
-            13
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/2Corinthians_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/2Corinthians_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/2_corinthians/2_Corinthiens_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/2_corinthians/2_Corinthiens_FR.pdf"
         }
       ]
     },
@@ -1561,27 +1628,28 @@
       "testament": "NT",
       "videos": [
         {
-          "id": "bp-gal",
-          "title": "Galates — Panorama",
-          "yt_id": "o9L1m8W7yA7",
+          "id": "bp-gal-1-999",
+          "title": "Galates - Panorama",
+          "yt_id": "3elnA_n3nWc",
           "chapters": [
             1,
-            6
+            999
           ],
-          "duration": "6:30",
-          "description": "Libérés par la grâce seule : ni circoncision ni œuvres de la loi ne justifient, seul le fruit de l'Esprit transforme."
+          "duration": "9:10",
+          "thumbnail": "https://i.ytimg.com/vi/3elnA_n3nWc/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-gal",
+          "id": "poster-gal-1-999",
           "title": "Structure littéraire : Galates",
           "chapters": [
             1,
-            6
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Galatians_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Galatians_Poster.pdf"
+          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fgalatians%2FRS_54_GALATES_Poster_FR.jpg",
+          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fgalatians%2FRS_54_GALATES_Poster_FR.pdf"
         }
       ]
     },
@@ -1590,27 +1658,28 @@
       "testament": "NT",
       "videos": [
         {
-          "id": "bp-eph",
-          "title": "Éphésiens — Panorama",
-          "yt_id": "p8N1o9Y7aC6",
+          "id": "bp-eph-1-999",
+          "title": "Éphésiens - Panorama",
+          "yt_id": "7pUE5wvhbBI",
           "chapters": [
             1,
-            6
+            999
           ],
-          "duration": "8:20",
-          "description": "Le dessein cosmique de Dieu d'unir toutes choses en Christ, l'Église comme un corps unifié et l'armure de Dieu."
+          "duration": "9:01",
+          "thumbnail": "https://i.ytimg.com/vi/7pUE5wvhbBI/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-eph",
+          "id": "poster-eph-1-999",
           "title": "Structure littéraire : Éphésiens",
           "chapters": [
             1,
-            6
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Ephesians_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Ephesians_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/ephesians/Ephesiens_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/ephesians/Ephesiens_FR.pdf"
         }
       ]
     },
@@ -1619,27 +1688,28 @@
       "testament": "NT",
       "videos": [
         {
-          "id": "bp-php",
-          "title": "Philippiens — Panorama",
-          "yt_id": "q9P1q8A7cE5",
+          "id": "bp-php-1-999",
+          "title": "Philippiens - Panorama",
+          "yt_id": "ei_5jKbrUJM",
           "chapters": [
             1,
-            4
+            999
           ],
-          "duration": "7:10",
-          "description": "La joie au milieu des épreuves, l'hymne à l'abaissement et l'élévation du Christ serviteur (ch. 2)."
+          "duration": "9:13",
+          "thumbnail": "https://i.ytimg.com/vi/ei_5jKbrUJM/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-php",
+          "id": "poster-php-1-999",
           "title": "Structure littéraire : Philippiens",
           "chapters": [
             1,
-            4
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Philippians_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Philippians_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/philippians/Philippiens_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/philippians/Philippiens_FR.pdf"
         }
       ]
     },
@@ -1648,172 +1718,104 @@
       "testament": "NT",
       "videos": [
         {
-          "id": "bp-col",
-          "title": "Colossiens — Panorama",
-          "yt_id": "r8R1s9C7eG4",
+          "id": "bp-col-1-999",
+          "title": "Colossiens - Panorama",
+          "yt_id": "d9lcTLTNSF4",
           "chapters": [
             1,
-            4
+            999
           ],
-          "duration": "7:00",
-          "description": "La suprématie absolue du Christ Créateur et Tête de l'Église, triomphant de toute autorité spirituelle."
+          "duration": "9:24",
+          "thumbnail": "https://i.ytimg.com/vi/d9lcTLTNSF4/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-col",
+          "id": "poster-col-1-999",
           "title": "Structure littéraire : Colossiens",
           "chapters": [
             1,
-            4
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Colossians_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Colossians_Poster.pdf"
+          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fcolossians%2FRS_57_Colossiens_FR_POSTER.jpg",
+          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fcolossians%2FRS_57_Colossiens_FR_POSTER.pdf"
         }
       ]
     },
     "1TH": {
       "name": "1 Thessaloniciens",
       "testament": "NT",
-      "videos": [
-        {
-          "id": "bp-1th",
-          "title": "1 Thessaloniciens — Panorama",
-          "yt_id": "s9T1u8E7gI3",
-          "chapters": [
-            1,
-            5
-          ],
-          "duration": "7:15",
-          "description": "L'encouragement face à la persécution et l'espérance vivante du retour glorieux du Seigneur."
-        }
-      ],
+      "videos": [],
       "posters": [
         {
-          "id": "poster-1th",
+          "id": "poster-1th-1-999",
           "title": "Structure littéraire : 1 Thessaloniciens",
           "chapters": [
             1,
-            5
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/1Thessalonians_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/1Thessalonians_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1_thessalonians/1_Thessaloniciens_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1_thessalonians/1_Thessaloniciens_FR.pdf"
         }
       ]
     },
     "2TH": {
       "name": "2 Thessaloniciens",
       "testament": "NT",
-      "videos": [
-        {
-          "id": "bp-2th",
-          "title": "2 Thessaloniciens — Panorama",
-          "yt_id": "t8V1w9G7iK2",
-          "chapters": [
-            1,
-            3
-          ],
-          "duration": "6:00",
-          "description": "Clarifications sur le Jour du Seigneur, l'homme impie et l'exhortation à persévérer dans le travail fidèle."
-        }
-      ],
+      "videos": [],
       "posters": [
         {
-          "id": "poster-2th",
+          "id": "poster-2th-1-999",
           "title": "Structure littéraire : 2 Thessaloniciens",
           "chapters": [
             1,
-            3
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/2Thessalonians_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/2Thessalonians_Poster.pdf"
+          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2F2_thessalonians%2FRS_59b_2_Thessaloniciens_POSTER_FR.jpg",
+          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2F2_thessalonians%2FRS_59b_2_Thessaloniciens_POSTER_FR.pdf"
         }
       ]
     },
     "1TI": {
       "name": "1 Timothée",
       "testament": "NT",
-      "videos": [
-        {
-          "id": "bp-1ti",
-          "title": "1 Timothée — Panorama",
-          "yt_id": "u9X1y8I7kM1",
-          "chapters": [
-            1,
-            6
-          ],
-          "duration": "7:30",
-          "description": "Conseils pastoraux à Timothée pour l'Église d'Éphèse : saine doctrine, ordre dans le culte et qualification des responsables."
-        }
-      ],
-      "posters": [
-        {
-          "id": "poster-1ti",
-          "title": "Structure littéraire : 1 Timothée",
-          "chapters": [
-            1,
-            6
-          ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/1Timothy_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/1Timothy_Poster.pdf"
-        }
-      ]
+      "videos": [],
+      "posters": []
     },
     "2TI": {
       "name": "2 Timothée",
       "testament": "NT",
-      "videos": [
-        {
-          "id": "bp-2ti",
-          "title": "2 Timothée — Panorama",
-          "yt_id": "v8Z1a9K7mO0",
-          "chapters": [
-            1,
-            4
-          ],
-          "duration": "6:45",
-          "description": "Le testament spirituel de Paul depuis sa prison romaine : garder le bon dépôt et prêcher la Parole en toute occasion."
-        }
-      ],
-      "posters": [
-        {
-          "id": "poster-2ti",
-          "title": "Structure littéraire : 2 Timothée",
-          "chapters": [
-            1,
-            4
-          ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/2Timothy_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/2Timothy_Poster.pdf"
-        }
-      ]
+      "videos": [],
+      "posters": []
     },
     "TIT": {
       "name": "Tite",
       "testament": "NT",
       "videos": [
         {
-          "id": "bp-tit",
-          "title": "Tite — Panorama",
-          "yt_id": "w9B1c8M7oQ9",
+          "id": "bp-tit-1-999",
+          "title": "Tite - Panorama",
+          "yt_id": "2aNe6TsB64w",
           "chapters": [
             1,
-            3
+            999
           ],
-          "duration": "6:10",
-          "description": "Établir des anciens et enseigner la piété en Crète : la grâce de Dieu qui est source de salut pour tous nous enseigne à renoncer à l'impiété."
+          "duration": "8:21",
+          "thumbnail": "https://i.ytimg.com/vi/2aNe6TsB64w/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-tit",
+          "id": "poster-tit-1-999",
           "title": "Structure littéraire : Tite",
           "chapters": [
             1,
-            3
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Titus_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Titus_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/titus/Tite_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/titus/Tite_FR.pdf"
         }
       ]
     },
@@ -1822,27 +1824,28 @@
       "testament": "NT",
       "videos": [
         {
-          "id": "bp-phm",
-          "title": "Philémon — Panorama",
-          "yt_id": "x8D1e9O7qS8",
+          "id": "bp-phm-1-999",
+          "title": "Philémon - Panorama",
+          "yt_id": "6FHGUa1Usfc",
           "chapters": [
             1,
-            1
+            999
           ],
-          "duration": "5:30",
-          "description": "Une lettre intime de Paul plaidant pour l'esclave fugitif Onésime, devenu un frère bien-aimé dans le Seigneur."
+          "duration": "6:40",
+          "thumbnail": "https://i.ytimg.com/vi/6FHGUa1Usfc/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-phm",
+          "id": "poster-phm-1-999",
           "title": "Structure littéraire : Philémon",
           "chapters": [
             1,
-            1
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Philemon_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Philemon_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/philemon/Philémon_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/philemon/Philémon_FR.pdf"
         }
       ]
     },
@@ -1851,27 +1854,28 @@
       "testament": "NT",
       "videos": [
         {
-          "id": "bp-heb",
-          "title": "Hébreux — Panorama",
-          "yt_id": "AUZIYQH94qCZUCbap06uZdRS9VgTcjRlZf5C4KBAj1AgvocOG55KN_iIMVtm6fuE",
+          "id": "bp-heb-1-999",
+          "title": "Hébreux - Panorama",
+          "yt_id": "scvkhZ5DyhQ",
           "chapters": [
             1,
-            13
+            999
           ],
-          "duration": "8:40",
-          "description": "Jésus est supérieur aux anges, à Moïse et au sacerdoce lévitique ; Il est notre Souverain Sacrificateur parfait selon l'ordre de Melchisédek."
+          "duration": "8:17",
+          "thumbnail": "https://i.ytimg.com/vi/scvkhZ5DyhQ/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-heb",
+          "id": "poster-heb-1-999",
           "title": "Structure littéraire : Hébreux",
           "chapters": [
             1,
-            13
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Hebrews_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Hebrews_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/hebrews/Hebreux_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/hebrews/Hebreux_FR.pdf"
         }
       ]
     },
@@ -1880,172 +1884,113 @@
       "testament": "NT",
       "videos": [
         {
-          "id": "bp-jas",
-          "title": "Jacques — Panorama",
-          "yt_id": "z8H1i9S7uW6",
+          "id": "bp-jas-1-999",
+          "title": "Jacques - Panorama",
+          "yt_id": "_hXVE65I2tw",
           "chapters": [
             1,
-            5
+            999
           ],
-          "duration": "7:50",
-          "description": "La sagesse pratique dans les pas de Jésus : la foi authentique se démontre nécessairement par des actes concrets d'amour."
+          "duration": "8:03",
+          "thumbnail": "https://i.ytimg.com/vi/_hXVE65I2tw/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-jas",
+          "id": "poster-jas-1-999",
           "title": "Structure littéraire : Jacques",
           "chapters": [
             1,
-            5
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/James_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/James_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/james/Jacques_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/james/Jacques_FR.pdf"
         }
       ]
     },
     "1PE": {
       "name": "1 Pierre",
       "testament": "NT",
-      "videos": [
-        {
-          "id": "bp-1pe",
-          "title": "1 Pierre — Panorama",
-          "yt_id": "a9J1k8U7wY5",
-          "chapters": [
-            1,
-            5
-          ],
-          "duration": "7:30",
-          "description": "L'espérance vivante des étrangers et pèlerins sur terre appelés à témoigner de la lumière de Christ au sein de la souffrance."
-        }
-      ],
+      "videos": [],
       "posters": [
         {
-          "id": "poster-1pe",
+          "id": "poster-1pe-1-999",
           "title": "Structure littéraire : 1 Pierre",
           "chapters": [
             1,
-            5
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/1Peter_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/1Peter_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1_peter/1_Pierre_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1_peter/1_Pierre_FR.pdf"
         }
       ]
     },
     "2PE": {
       "name": "2 Pierre",
       "testament": "NT",
-      "videos": [
-        {
-          "id": "bp-2pe",
-          "title": "2 Pierre — Panorama",
-          "yt_id": "b8L1m9W7yA4",
-          "chapters": [
-            1,
-            3
-          ],
-          "duration": "6:20",
-          "description": "Mise en garde contre les faux docteurs et rappel de la patience de Dieu qui veut que tous parviennent à la repentance."
-        }
-      ],
+      "videos": [],
       "posters": [
         {
-          "id": "poster-2pe",
+          "id": "poster-2pe-1-999",
           "title": "Structure littéraire : 2 Pierre",
           "chapters": [
             1,
-            3
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/2Peter_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/2Peter_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/2_peter/2_Pierre_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/2_peter/2_Pierre_FR.pdf"
         }
       ]
     },
     "1JN": {
       "name": "1 Jean",
       "testament": "NT",
-      "videos": [
-        {
-          "id": "bp-1-3jn",
-          "title": "1-3 Jean — Panorama",
-          "yt_id": "AUZIYQHVkMsfnM6baZzCZma4c0-K3DMWSgkFhYaE1oOpiRHxfVXBD7M0PuIC8Oi9",
-          "chapters": [
-            1,
-            5
-          ],
-          "duration": "8:25",
-          "description": "Dieu est lumière et Dieu est amour : marcher dans la vérité, garder ses commandements et s'aimer les uns les autres."
-        }
-      ],
+      "videos": [],
       "posters": [
         {
-          "id": "poster-1-3jn",
-          "title": "Structure littéraire : 1-3 Jean",
+          "id": "poster-1jn-1-3",
+          "title": "Structure littéraire : 1 Jean 1-3",
           "chapters": [
             1,
-            5
+            3
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/1-3John_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/1-3John_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1-3_john/Jean123_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1-3_john/Jean123_FR.pdf"
         }
       ]
     },
     "2JN": {
       "name": "2 Jean",
       "testament": "NT",
-      "videos": [
-        {
-          "id": "bp-1-3jn",
-          "title": "1-3 Jean — Panorama",
-          "yt_id": "AUZIYQHVkMsfnM6baZzCZma4c0-K3DMWSgkFhYaE1oOpiRHxfVXBD7M0PuIC8Oi9",
-          "chapters": [
-            1,
-            1
-          ],
-          "duration": "8:25",
-          "description": "Avertissement contre ceux qui n'apportent pas la doctrine de Christ et appel à demeurer dans l'amour et la vérité."
-        }
-      ],
+      "videos": [],
       "posters": [
         {
-          "id": "poster-1-3jn",
-          "title": "Structure littéraire : 1-3 Jean",
+          "id": "poster-2jn-1-3",
+          "title": "Structure littéraire : 2 Jean 1-3",
           "chapters": [
             1,
-            1
+            3
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/1-3John_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/1-3John_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1-3_john/Jean123_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1-3_john/Jean123_FR.pdf"
         }
       ]
     },
     "3JN": {
       "name": "3 Jean",
       "testament": "NT",
-      "videos": [
-        {
-          "id": "bp-1-3jn",
-          "title": "1-3 Jean — Panorama",
-          "yt_id": "AUZIYQHVkMsfnM6baZzCZma4c0-K3DMWSgkFhYaE1oOpiRHxfVXBD7M0PuIC8Oi9",
-          "chapters": [
-            1,
-            1
-          ],
-          "duration": "8:25",
-          "description": "L'éloge de l'hospitalité généreuse de Gaïus envers les envoyés de l'Évangile face à l'orgueil de Diotrèphe."
-        }
-      ],
+      "videos": [],
       "posters": [
         {
-          "id": "poster-1-3jn",
-          "title": "Structure littéraire : 1-3 Jean",
+          "id": "poster-3jn-1-3",
+          "title": "Structure littéraire : 3 Jean 1-3",
           "chapters": [
             1,
-            1
+            3
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/1-3John_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/1-3John_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1-3_john/Jean123_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1-3_john/Jean123_FR.pdf"
         }
       ]
     },
@@ -2054,27 +1999,28 @@
       "testament": "NT",
       "videos": [
         {
-          "id": "bp-jud",
-          "title": "Jude — Panorama",
-          "yt_id": "e8P1q9A7cE1",
+          "id": "bp-jud-1-999",
+          "title": "Jude - Panorama",
+          "yt_id": "whrJ5C45tgU",
           "chapters": [
             1,
-            1
+            999
           ],
-          "duration": "6:00",
-          "description": "Combattre pour la foi transmise une fois pour toutes aux saints face aux faux enseignants qui déforment la grâce."
+          "duration": "7:45",
+          "thumbnail": "https://i.ytimg.com/vi/whrJ5C45tgU/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
         {
-          "id": "poster-jud",
+          "id": "poster-jud-1-999",
           "title": "Structure littéraire : Jude",
           "chapters": [
             1,
-            1
+            999
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Jude_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Jude_Poster.pdf"
+          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/jude/Jude_FR.png",
+          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/jude/Jude_FR.pdf"
         }
       ]
     },
@@ -2084,25 +2030,27 @@
       "videos": [
         {
           "id": "bp-rev-1-11",
-          "title": "Apocalypse 1-11 — Panorama",
-          "yt_id": "f9R1s8C7eG0",
+          "title": "Apocalypse 1–11 - Panorama",
+          "yt_id": "cAOAPSfpbR4",
           "chapters": [
             1,
             11
           ],
-          "duration": "8:30",
-          "description": "Les lettres aux sept églises, la vision du trône et de l'Agneau immolé qui seul est digne d'ouvrir les sept sceaux."
+          "duration": "11:59",
+          "thumbnail": "https://i.ytimg.com/vi/cAOAPSfpbR4/hqdefault.jpg",
+          "description": ""
         },
         {
           "id": "bp-rev-12-22",
-          "title": "Apocalypse 12-22 — Panorama",
-          "yt_id": "g8T1u9E7gI9",
+          "title": "Apocalypse 12–22 - Panorama",
+          "yt_id": "HIfJZA9fwbM",
           "chapters": [
             12,
             22
           ],
-          "duration": "9:20",
-          "description": "La chute de Babylone, le triomphe final du Roi des rois, et l'avènement de la Nouvelle Jérusalem où Dieu habite pour toujours avec l'humanité."
+          "duration": "11:51",
+          "thumbnail": "https://i.ytimg.com/vi/HIfJZA9fwbM/hqdefault.jpg",
+          "description": ""
         }
       ],
       "posters": [
@@ -2113,8 +2061,8 @@
             1,
             11
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Revelation_1-11_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Revelation_1-11_Poster.pdf"
+          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Frevelation_1-11%2FRS_69-70_Apocalypse_POSTER_FR.jpg",
+          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Frevelation_1-11%2FRS_69-70_Apocalypse_POSTER_FR.pdf"
         },
         {
           "id": "poster-rev-12-22",
@@ -2123,178 +2071,504 @@
             12,
             22
           ],
-          "image_url": "https://bibleproject.com/downloads/posters/fra/Revelation_12-22_Poster.jpg",
-          "pdf_url": "https://bibleproject.com/downloads/posters/fra/Revelation_12-22_Poster.pdf"
+          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Frevelation_12-22%2FRS_69-70_Apocalypse_POSTER_FR.jpg",
+          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Frevelation_12-22%2FRS_69-70_Apocalypse_POSTER_FR.pdf"
         }
       ]
     }
   },
   "themes": [
     {
-      "id": "theme-alliance",
-      "title": "L'Alliance (Covenant)",
-      "category": "Thème Théologique",
-      "yt_id": "8bPg_8lYgVo",
-      "duration": "5:30",
-      "description": "L'histoire de Dieu qui s'engage inconditionnellement envers des êtres humains imparfaits pour renouveler sa création.",
-      "related_books": [
-        "GEN",
-        "EXO",
-        "2SA",
-        "JER",
-        "LUK",
-        "HEB"
-      ]
+      "id": "theme-FVzc7zXuQzA",
+      "title": "Alliances",
+      "yt_id": "FVzc7zXuQzA",
+      "duration": "5:24",
+      "thumbnail": "https://i.ytimg.com/vi/FVzc7zXuQzA/hqdefault.jpg",
+      "description": "",
+      "related_books": []
     },
     {
-      "id": "theme-saintete",
-      "title": "La Sainteté (Holiness)",
-      "category": "Thème Théologique",
-      "yt_id": "l9vn5UvsHvM",
-      "duration": "6:00",
-      "description": "Comment la présence pure et transcendante de Dieu est à la fois source de vie et d'un danger purificateur pour le péché.",
-      "related_books": [
-        "EXO",
-        "LEV",
-        "ISA",
-        "HEB",
-        "1PE"
-      ]
+      "id": "theme-utHEZsmzU74",
+      "title": "Le Jour du Seigneur",
+      "yt_id": "utHEZsmzU74",
+      "duration": "6:02",
+      "thumbnail": "https://i.ytimg.com/vi/utHEZsmzU74/hqdefault.jpg",
+      "description": "",
+      "related_books": []
     },
     {
-      "id": "theme-justice",
-      "title": "La Justice (Mishpat & Tsedaqah)",
-      "category": "Thème Théologique",
-      "yt_id": "A14THPoc4-4",
-      "duration": "6:15",
-      "description": "La justice biblique n'est pas seulement rétributive, mais réparatrice et généreuse envers les faibles et les vulnérables.",
-      "related_books": [
-        "DEU",
-        "PSA",
-        "PRO",
-        "ISA",
-        "AMO",
-        "MIC",
-        "MAT",
-        "JAS"
-      ]
+      "id": "theme-txGfRrR9v_M",
+      "title": "L'Évangile du Royaume",
+      "yt_id": "txGfRrR9v_M",
+      "duration": "4:56",
+      "thumbnail": "https://i.ytimg.com/vi/txGfRrR9v_M/hqdefault.jpg",
+      "description": "",
+      "related_books": []
     },
     {
-      "id": "theme-messie",
+      "id": "theme-PZ-CmV2Xg6A",
+      "title": "Le Ciel et la Terre",
+      "yt_id": "PZ-CmV2Xg6A",
+      "duration": "5:56",
+      "thumbnail": "https://i.ytimg.com/vi/PZ-CmV2Xg6A/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-jxKoDvf2nXk",
+      "title": "La Sainteté",
+      "yt_id": "jxKoDvf2nXk",
+      "duration": "6:11",
+      "thumbnail": "https://i.ytimg.com/vi/jxKoDvf2nXk/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-n4_ZOaMvpGY",
+      "title": "Le Saint-Esprit",
+      "yt_id": "n4_ZOaMvpGY",
+      "duration": "4:02",
+      "thumbnail": "https://i.ytimg.com/vi/n4_ZOaMvpGY/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-sDnohPQxLD8",
+      "title": "L'image de Dieu",
+      "yt_id": "sDnohPQxLD8",
+      "duration": "5:35",
+      "thumbnail": "https://i.ytimg.com/vi/sDnohPQxLD8/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-4eBBvA8zzxI",
       "title": "Le Messie",
-      "category": "Thème Théologique",
-      "yt_id": "3D3ltgVpApg",
-      "duration": "5:45",
-      "description": "La promesse de la semence de la femme qui écrasera le serpent, le roi davidique souffrant et victorieux.",
-      "related_books": [
-        "GEN",
-        "2SA",
-        "PSA",
-        "ISA",
-        "MAT",
-        "LUK",
-        "REV"
-      ]
+      "yt_id": "4eBBvA8zzxI",
+      "duration": "5:27",
+      "thumbnail": "https://i.ytimg.com/vi/4eBBvA8zzxI/hqdefault.jpg",
+      "description": "",
+      "related_books": []
     },
     {
-      "id": "theme-arbre-vie",
-      "title": "L'Arbre de Vie",
-      "category": "Thème Théologique",
-      "yt_id": "TJLan3tVwgU",
-      "duration": "6:20",
-      "description": "De l'Éden à la croix du Golgotha jusqu'à la Nouvelle Jérusalem : le choix entre la sagesse humaine et la vie avec Dieu.",
-      "related_books": [
-        "GEN",
-        "PRO",
-        "JHN",
-        "REV"
-      ]
+      "id": "theme-wmICj1t6UIA",
+      "title": "Sacrifice et Expiation",
+      "yt_id": "wmICj1t6UIA",
+      "duration": "6:11",
+      "thumbnail": "https://i.ytimg.com/vi/wmICj1t6UIA/hqdefault.jpg",
+      "description": "",
+      "related_books": []
     },
     {
-      "id": "theme-temple",
-      "title": "Le Temple",
-      "category": "Thème Théologique",
-      "yt_id": "wTnq6I3vvmY",
-      "duration": "5:40",
-      "description": "Le lieu où le ciel et la terre se rejoignent : du Tabernacle à Jésus puis au corps des croyants.",
-      "related_books": [
-        "EXO",
-        "1KI",
-        "EZK",
-        "JHN",
-        "1CO",
-        "EPH",
-        "REV"
-      ]
+      "id": "theme-OMPI6mMPj7E",
+      "title": "Lecture Publique des Écritures",
+      "yt_id": "OMPI6mMPj7E",
+      "duration": "3:32",
+      "thumbnail": "https://i.ytimg.com/vi/OMPI6mMPj7E/hqdefault.jpg",
+      "description": "",
+      "related_books": []
     },
     {
-      "id": "theme-sabbat",
-      "title": "Le Sabbat (7ème Jour)",
-      "category": "Thème Théologique",
-      "yt_id": "PFTLWS8MmUc",
-      "duration": "5:30",
-      "description": "Le rythme du repos divin préfigurant la délivrance ultime et le repos offert par Jésus.",
-      "related_books": [
-        "GEN",
-        "EXO",
-        "LEV",
-        "MAT",
-        "HEB"
-      ]
+      "id": "theme-H3-GGFM3WqM",
+      "title": "Justice",
+      "yt_id": "H3-GGFM3WqM",
+      "duration": "6:02",
+      "thumbnail": "https://i.ytimg.com/vi/H3-GGFM3WqM/hqdefault.jpg",
+      "description": "",
+      "related_books": []
     },
     {
-      "id": "theme-exil",
-      "title": "L'Exil",
-      "category": "Thème Théologique",
-      "yt_id": "xSuaMACxP8E",
+      "id": "theme-nFHZQT0GuBI",
+      "title": "Exil",
+      "yt_id": "nFHZQT0GuBI",
+      "duration": "5:00",
+      "thumbnail": "https://i.ytimg.com/vi/nFHZQT0GuBI/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-tPxYu0ZPsjs",
+      "title": "Dieu",
+      "yt_id": "tPxYu0ZPsjs",
+      "duration": "8:21",
+      "thumbnail": "https://i.ytimg.com/vi/tPxYu0ZPsjs/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-eN7pv0trosE",
+      "title": "En Mode Exil",
+      "yt_id": "eN7pv0trosE",
+      "duration": "5:22",
+      "thumbnail": "https://i.ytimg.com/vi/eN7pv0trosE/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-9lxl6CS1RJk",
+      "title": "Fils de l'Homme",
+      "yt_id": "9lxl6CS1RJk",
+      "duration": "5:47",
+      "thumbnail": "https://i.ytimg.com/vi/9lxl6CS1RJk/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-6lowTdQ61Y4",
+      "title": "Sabbat",
+      "yt_id": "6lowTdQ61Y4",
+      "duration": "5:21",
+      "thumbnail": "https://i.ytimg.com/vi/6lowTdQ61Y4/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-FRqpC4yLc68",
+      "title": "Arbre de Vie",
+      "yt_id": "FRqpC4yLc68",
+      "duration": "4:40",
+      "thumbnail": "https://i.ytimg.com/vi/FRqpC4yLc68/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-0dJXpm668TE",
+      "title": "Eau de Vie",
+      "yt_id": "0dJXpm668TE",
+      "duration": "4:32",
+      "thumbnail": "https://i.ytimg.com/vi/0dJXpm668TE/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-fnP-hBi2A2Y",
+      "title": "Générosité",
+      "yt_id": "fnP-hBi2A2Y",
+      "duration": "5:13",
+      "thumbnail": "https://i.ytimg.com/vi/fnP-hBi2A2Y/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-IDS6LONO8Sw",
+      "title": "La Loi",
+      "yt_id": "IDS6LONO8Sw",
+      "duration": "5:58",
+      "thumbnail": "https://i.ytimg.com/vi/IDS6LONO8Sw/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-u-2dqyddp2o",
+      "title": "Vie Éternelle",
+      "yt_id": "u-2dqyddp2o",
+      "duration": "5:16",
+      "thumbnail": "https://i.ytimg.com/vi/u-2dqyddp2o/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-A-eeOo_TgYk",
+      "title": "Les derniers seront les premiers",
+      "yt_id": "A-eeOo_TgYk",
+      "duration": "5:17",
+      "thumbnail": "https://i.ytimg.com/vi/A-eeOo_TgYk/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-_oH7LD9MRkc",
+      "title": "Le test",
+      "yt_id": "_oH7LD9MRkc",
+      "duration": "6:05",
+      "thumbnail": "https://i.ytimg.com/vi/_oH7LD9MRkc/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-Wm30OGylv4Q",
+      "title": "La bénédiction et la malédiction",
+      "yt_id": "Wm30OGylv4Q",
+      "duration": "7:31",
+      "thumbnail": "https://i.ytimg.com/vi/Wm30OGylv4Q/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-OZh3BZHCM5s",
+      "title": "La signification et le but de l’onction dans la Bible",
+      "yt_id": "OZh3BZHCM5s",
+      "duration": "2:21",
+      "thumbnail": "https://i.ytimg.com/vi/OZh3BZHCM5s/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-MfuYg7P0iBI",
+      "title": "Alliances",
+      "yt_id": "MfuYg7P0iBI",
+      "duration": "5:27",
+      "thumbnail": "https://i.ytimg.com/vi/MfuYg7P0iBI/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-pekXBuUDiyE",
+      "title": "Cette fameuse histoire était la première du genre, selon un schéma biblique bien plus vaste…",
+      "yt_id": "pekXBuUDiyE",
+      "duration": "5:19",
+      "thumbnail": "https://i.ytimg.com/vi/pekXBuUDiyE/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-zv1LAco6pTk",
+      "title": "L’importance de la Cité dans la Bible (et le plan de Dieu à ce sujet)",
+      "yt_id": "zv1LAco6pTk",
+      "duration": "7:15",
+      "thumbnail": "https://i.ytimg.com/vi/zv1LAco6pTk/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-h-Pf4M6VZrU",
+      "title": "Les dragons sont partout dans la Bible. Voici pourquoi.",
+      "yt_id": "h-Pf4M6VZrU",
+      "duration": "3:33",
+      "thumbnail": "https://i.ytimg.com/vi/h-Pf4M6VZrU/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-rRN01oNzNo8",
+      "title": "Ceci pourrait changer notre perception des problèmes",
+      "yt_id": "rRN01oNzNo8",
       "duration": "5:20",
-      "description": "L'humanité chassée de sa véritable maison et l'espérance du grand retour prophétisé par les Écritures.",
-      "related_books": [
-        "GEN",
-        "2KI",
-        "ISA",
-        "JER",
-        "EZK",
-        "1PE"
-      ]
+      "thumbnail": "https://i.ytimg.com/vi/rRN01oNzNo8/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-bfQ6I4Smh7A",
+      "title": "Les montagnes symbolisent quelque chose de stupéfiant dans la Bible",
+      "yt_id": "bfQ6I4Smh7A",
+      "duration": "4:39",
+      "thumbnail": "https://i.ytimg.com/vi/bfQ6I4Smh7A/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-RRna_gY_TLE",
+      "title": "Pourquoi la Pâque est célébrée chaque année?",
+      "yt_id": "RRna_gY_TLE",
+      "duration": "2:46",
+      "thumbnail": "https://i.ytimg.com/vi/RRna_gY_TLE/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-HliwPZ6395I",
+      "title": "Le livre de la Genèse – partie 1",
+      "yt_id": "HliwPZ6395I",
+      "duration": "5:33",
+      "thumbnail": "https://i.ytimg.com/vi/HliwPZ6395I/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-2mCFk6oug6Y",
+      "title": "Le livre de la Genèse – partie 2",
+      "yt_id": "2mCFk6oug6Y",
+      "duration": "4:25",
+      "thumbnail": "https://i.ytimg.com/vi/2mCFk6oug6Y/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-jbf0nxJT8wI",
+      "title": "Le livre de l’Exode – partie 1",
+      "yt_id": "jbf0nxJT8wI",
+      "duration": "5:35",
+      "thumbnail": "https://i.ytimg.com/vi/jbf0nxJT8wI/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-QvjQyA4er_E",
+      "title": "Le livre de l’Exode – partie 2",
+      "yt_id": "QvjQyA4er_E",
+      "duration": "5:26",
+      "thumbnail": "https://i.ytimg.com/vi/QvjQyA4er_E/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-2uAxufq24xI",
+      "title": "Le livre du Lévitique",
+      "yt_id": "2uAxufq24xI",
+      "duration": "7:05",
+      "thumbnail": "https://i.ytimg.com/vi/2uAxufq24xI/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-mdbtTT3HzFQ",
+      "title": "Le livre des Nombres",
+      "yt_id": "mdbtTT3HzFQ",
+      "duration": "5:58",
+      "thumbnail": "https://i.ytimg.com/vi/mdbtTT3HzFQ/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-WwTg5i2kvTs",
+      "title": "Le livre du Deutéronome",
+      "yt_id": "WwTg5i2kvTs",
+      "duration": "6:27",
+      "thumbnail": "https://i.ytimg.com/vi/WwTg5i2kvTs/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-onMgVuZ4q0Q",
+      "title": "Le Livre des Proverbes",
+      "yt_id": "onMgVuZ4q0Q",
+      "duration": "4:53",
+      "thumbnail": "https://i.ytimg.com/vi/onMgVuZ4q0Q/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-2eb3BHpw0X8",
+      "title": "Le Livre d'Écclésiaste",
+      "yt_id": "2eb3BHpw0X8",
+      "duration": "5:58",
+      "thumbnail": "https://i.ytimg.com/vi/2eb3BHpw0X8/hqdefault.jpg",
+      "description": "",
+      "related_books": []
+    },
+    {
+      "id": "theme-m8gavTyySCk",
+      "title": "Le Livre de Job",
+      "yt_id": "m8gavTyySCk",
+      "duration": "6:35",
+      "thumbnail": "https://i.ytimg.com/vi/m8gavTyySCk/hqdefault.jpg",
+      "description": "",
+      "related_books": []
     }
   ],
   "word_studies": [
     {
-      "id": "word-shalom",
-      "title": "Chalom (Paix & Complétude)",
-      "hebrew_greek": "שָׁלוֹם (H7965)",
-      "strong_code": "H7965",
-      "yt_id": "oLYORLZOaZE",
-      "duration": "4:30",
-      "description": "Bien plus que l'absence de conflit : une plénitude, une restauration et une réconciliation totale."
+      "id": "word-uNPKcNKRwb8",
+      "title": "Évangile",
+      "yt_id": "uNPKcNKRwb8",
+      "duration": "4:37",
+      "thumbnail": "https://i.ytimg.com/vi/uNPKcNKRwb8/hqdefault.jpg",
+      "description": ""
     },
     {
-      "id": "word-agape",
-      "title": "Agape (Amour sacrificiel)",
-      "hebrew_greek": "ἀγάπη (G26)",
-      "strong_code": "G26",
-      "yt_id": "slyev2WFV7Y",
-      "duration": "4:45",
-      "description": "L'amour divin inconditionnel qui recherche le bien supérieur d'autrui au détriment de soi-même."
+      "id": "word-W2-G9yjdgtg",
+      "title": "Témoin",
+      "yt_id": "W2-G9yjdgtg",
+      "duration": "4:25",
+      "thumbnail": "https://i.ytimg.com/vi/W2-G9yjdgtg/hqdefault.jpg",
+      "description": ""
     },
     {
-      "id": "word-nephesh",
-      "title": "Nephesh (Âme / Être vivant)",
-      "hebrew_greek": "נֶפֶשׁ (H5315)",
-      "strong_code": "H5315",
-      "yt_id": "g_igCcQMrHU",
-      "duration": "4:15",
-      "description": "La personne humaine toute entière, avec ses désirs vitaux, sa gorge et son souffle de vie."
+      "id": "word-r4A91QVsUlI",
+      "title": "Le caractère de Dieu",
+      "yt_id": "r4A91QVsUlI",
+      "duration": "6:02",
+      "thumbnail": "https://i.ytimg.com/vi/r4A91QVsUlI/hqdefault.jpg",
+      "description": ""
     },
     {
-      "id": "word-shema",
-      "title": "Shema (Écoute & Obéissance)",
-      "hebrew_greek": "שָׁמַع (H8085)",
-      "strong_code": "H8085",
-      "yt_id": "6KQLOtZ37Sg",
-      "duration": "4:20",
-      "description": "Écouter avec le cœur pour mettre en pratique fidèlement la parole de Dieu."
+      "id": "word-69_vtfw-0mA",
+      "title": "La Compassion",
+      "yt_id": "69_vtfw-0mA",
+      "duration": "4:50",
+      "thumbnail": "https://i.ytimg.com/vi/69_vtfw-0mA/hqdefault.jpg",
+      "description": ""
+    },
+    {
+      "id": "word-wktA2VE4yhY",
+      "title": "Grâce",
+      "yt_id": "wktA2VE4yhY",
+      "duration": "4:33",
+      "thumbnail": "https://i.ytimg.com/vi/wktA2VE4yhY/hqdefault.jpg",
+      "description": ""
+    },
+    {
+      "id": "word-M1cvdmKMfGI",
+      "title": "Lent à la colère",
+      "yt_id": "M1cvdmKMfGI",
+      "duration": "5:18",
+      "thumbnail": "https://i.ytimg.com/vi/M1cvdmKMfGI/hqdefault.jpg",
+      "description": ""
+    },
+    {
+      "id": "word-4U-KtmcHrGI",
+      "title": "Amour Loyal",
+      "yt_id": "4U-KtmcHrGI",
+      "duration": "5:07",
+      "thumbnail": "https://i.ytimg.com/vi/4U-KtmcHrGI/hqdefault.jpg",
+      "description": ""
+    },
+    {
+      "id": "word-xqUPT7BoX-w",
+      "title": "Fidèle",
+      "yt_id": "xqUPT7BoX-w",
+      "duration": "5:12",
+      "thumbnail": "https://i.ytimg.com/vi/xqUPT7BoX-w/hqdefault.jpg",
+      "description": ""
+    },
+    {
+      "id": "word-1g4u57TSY0g",
+      "title": "Shema / Écouter",
+      "yt_id": "1g4u57TSY0g",
+      "duration": "3:25",
+      "thumbnail": "https://i.ytimg.com/vi/1g4u57TSY0g/hqdefault.jpg",
+      "description": ""
+    },
+    {
+      "id": "word-vxPgZ_-tzLU",
+      "title": "YHWH / L'Éternel",
+      "yt_id": "vxPgZ_-tzLU",
+      "duration": "3:58",
+      "thumbnail": "https://i.ytimg.com/vi/vxPgZ_-tzLU/hqdefault.jpg",
+      "description": ""
+    },
+    {
+      "id": "word-nJ-9YpX7IRs",
+      "title": "Ahavah / Aimer",
+      "yt_id": "nJ-9YpX7IRs",
+      "duration": "4:09",
+      "thumbnail": "https://i.ytimg.com/vi/nJ-9YpX7IRs/hqdefault.jpg",
+      "description": ""
+    },
+    {
+      "id": "word-FuQp4baBpPU",
+      "title": "Lev / Cœur",
+      "yt_id": "FuQp4baBpPU",
+      "duration": "4:00",
+      "thumbnail": "https://i.ytimg.com/vi/FuQp4baBpPU/hqdefault.jpg",
+      "description": ""
+    },
+    {
+      "id": "word-FLrm_KlwLv8",
+      "title": "Nephesh / Âme",
+      "yt_id": "FLrm_KlwLv8",
+      "duration": "4:17",
+      "thumbnail": "https://i.ytimg.com/vi/FLrm_KlwLv8/hqdefault.jpg",
+      "description": ""
+    },
+    {
+      "id": "word-cXwM1xW8LEI",
+      "title": "Me'od / Force",
+      "yt_id": "cXwM1xW8LEI",
+      "duration": "4:41",
+      "thumbnail": "https://i.ytimg.com/vi/cXwM1xW8LEI/hqdefault.jpg",
+      "description": ""
     }
   ]
 }

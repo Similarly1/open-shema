@@ -124,7 +124,7 @@ const BibleProjectView = {
     videos.forEach(v => {
       const isCurrentRange = this.currentChapter >= v.chapters[0] && this.currentChapter <= v.chapters[1];
       const isPlaying = this.currentPlayingYtId === v.yt_id;
-      const thumbUrl = `https://img.youtube.com/vi/${v.yt_id}/mqdefault.jpg`;
+      const thumbUrl = v.thumbnail || `https://i.ytimg.com/vi/${v.yt_id}/hqdefault.jpg`;
 
       html += `
         <div class="bp-video-card ${isCurrentRange ? 'is-active-range' : ''} ${isPlaying ? 'is-playing' : ''}" data-yt-id="${v.yt_id}">
@@ -159,7 +159,7 @@ const BibleProjectView = {
     const posters = this.currentData.all_posters || [];
     if (posters.length === 0) {
       root.innerHTML = `
-        <div class="bp-empty-box">
+        <div class="bp-empty-box" style="padding: 24px 12px; text-align: center; color: var(--text-muted);">
           <p>Aucun poster haute définition répertorié pour ce livre.</p>
         </div>
       `;
@@ -193,10 +193,10 @@ const BibleProjectView = {
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
                 <span>Visualiser</span>
               </button>
-              <a href="${p.pdf_url}" target="_blank" class="bp-btn-pdf-download" title="Télécharger le PDF source">
+              <button type="button" class="bp-btn-pdf-download" onclick="API.openExternalUrl('${p.pdf_url || p.image_url}')" title="Télécharger le PDF officiel">
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 <span>PDF</span>
-              </a>
+              </button>
             </div>
           </div>
         </div>
@@ -220,7 +220,7 @@ const BibleProjectView = {
 
     themes.forEach(th => {
       const isRelated = (th.related_books || []).includes(this.currentBook);
-      const thumbUrl = `https://img.youtube.com/vi/${th.yt_id}/mqdefault.jpg`;
+      const thumbUrl = th.thumbnail || `https://i.ytimg.com/vi/${th.yt_id}/hqdefault.jpg`;
 
       html += `
         <div class="bp-theme-card ${isRelated ? 'is-related-theme' : ''}">
@@ -249,7 +249,7 @@ const BibleProjectView = {
     `;
 
     words.forEach(w => {
-      const thumbUrl = `https://img.youtube.com/vi/${w.yt_id}/mqdefault.jpg`;
+      const thumbUrl = w.thumbnail || `https://i.ytimg.com/vi/${w.yt_id}/hqdefault.jpg`;
       html += `
         <div class="bp-word-card" onclick="BibleProjectView.playVideo('${w.yt_id}', '${this.escapeHtml(w.title)}', '${this.escapeHtml(w.description)}')">
           <div class="bp-word-thumb">
@@ -273,16 +273,26 @@ const BibleProjectView = {
     const placeholder = document.getElementById('bp-player-placeholder');
     const iframe = document.getElementById('bp-youtube-iframe');
     const infoBox = document.getElementById('bp-now-playing-info');
-    const titleEl = document.getElementById('bp-now-playing-title');
-    const descEl = document.getElementById('bp-now-playing-desc');
 
-    if (titleEl) titleEl.textContent = title;
-    if (descEl) descEl.textContent = desc || '';
-    if (infoBox) infoBox.classList.remove('hidden');
+    if (infoBox) {
+      infoBox.innerHTML = `
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;">
+          <div>
+            <div class="bp-now-playing-title">${this.escapeHtml(title)}</div>
+            <div class="bp-now-playing-desc">${this.escapeHtml(desc || '')}</div>
+          </div>
+          <button type="button" class="bp-btn-ext-yt" onclick="API.openExternalUrl('https://www.youtube.com/watch?v=${ytId}')" title="Ouvrir la vidéo sur YouTube">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span>YouTube ↗</span>
+          </button>
+        </div>
+      `;
+      infoBox.classList.remove('hidden');
+    }
 
     if (placeholder) {
       placeholder.innerHTML = `
-        <div class="bp-placeholder-preview" style="background-image: url('https://img.youtube.com/vi/${ytId}/hqdefault.jpg')" onclick="BibleProjectView.playVideo('${ytId}', '${this.escapeHtml(title)}', '${this.escapeHtml(desc)}')">
+        <div class="bp-placeholder-preview" style="background-image: url('https://i.ytimg.com/vi/${ytId}/hqdefault.jpg')" onclick="BibleProjectView.playVideo('${ytId}', '${this.escapeHtml(title)}', '${this.escapeHtml(desc)}')">
           <div class="bp-preview-play-btn">
             <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           </div>
@@ -302,15 +312,27 @@ const BibleProjectView = {
     const placeholder = document.getElementById('bp-player-placeholder');
     const iframe = document.getElementById('bp-youtube-iframe');
     const infoBox = document.getElementById('bp-now-playing-info');
-    const titleEl = document.getElementById('bp-now-playing-title');
-    const descEl = document.getElementById('bp-now-playing-desc');
 
-    if (titleEl) titleEl.textContent = title;
-    if (descEl) descEl.textContent = desc || '';
-    if (infoBox) infoBox.classList.remove('hidden');
+    if (infoBox) {
+      infoBox.innerHTML = `
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;">
+          <div>
+            <div class="bp-now-playing-title">${this.escapeHtml(title)}</div>
+            <div class="bp-now-playing-desc">${this.escapeHtml(desc || '')}</div>
+          </div>
+          <button type="button" class="bp-btn-ext-yt" onclick="API.openExternalUrl('https://www.youtube.com/watch?v=${ytId}')" title="Ouvrir la vidéo sur YouTube">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span>YouTube ↗</span>
+          </button>
+        </div>
+      `;
+      infoBox.classList.remove('hidden');
+    }
 
     if (placeholder) placeholder.classList.add('hidden');
     if (iframe) {
+      iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+      iframe.setAttribute('allowfullscreen', 'true');
       iframe.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`;
       iframe.classList.remove('hidden');
     }
@@ -397,17 +419,28 @@ const BibleProjectView = {
     const loader = document.getElementById('bp-poster-loading');
 
     if (titleEl) titleEl.textContent = title || 'Structure littéraire';
-    if (dlBtn) dlBtn.href = pdfUrl || '#';
+    if (dlBtn) {
+      dlBtn.onclick = (e) => {
+        e.preventDefault();
+        API.openExternalUrl(pdfUrl || imageUrl);
+      };
+    }
 
     if (img) {
       if (loader) loader.classList.remove('hidden');
+      img.style.display = 'none';
       img.src = imageUrl;
+
       img.onload = () => {
+        img.style.display = 'block';
         if (loader) loader.classList.add('hidden');
-        this.fitToScreen();
+        setTimeout(() => {
+          this.fitToScreen();
+        }, 50);
       };
       img.onerror = () => {
         if (loader) loader.classList.add('hidden');
+        img.style.display = 'block';
         img.src = 'img/textures/vintage/fond_bible.jpg';
       };
     }
@@ -436,20 +469,28 @@ const BibleProjectView = {
   fitToScreen() {
     const viewport = document.getElementById('bp-poster-viewport');
     const img = document.getElementById('bp-poster-highres-img');
-    if (!viewport || !img || !img.naturalWidth) return;
+    if (!viewport || !img) return;
+
+    const natW = img.naturalWidth || img.clientWidth || 1200;
+    const natH = img.naturalHeight || img.clientHeight || 800;
 
     const vpWidth = viewport.clientWidth - 40;
     const vpHeight = viewport.clientHeight - 40;
 
-    const scaleX = vpWidth / img.naturalWidth;
-    const scaleY = vpHeight / img.naturalHeight;
-    this.panzoom.scale = Math.min(scaleX, scaleY, 1.2);
+    if (natW > 0 && natH > 0 && vpWidth > 0 && vpHeight > 0) {
+      const scaleX = vpWidth / natW;
+      const scaleY = vpHeight / natH;
+      this.panzoom.scale = Math.min(scaleX, scaleY, 1.2);
+    } else {
+      this.panzoom.scale = 1.0;
+    }
     this.panzoom.translateX = 0;
     this.panzoom.translateY = 0;
 
     this.applyTransform();
     this.updateZoomLabel();
   },
+
 
   resetZoom() {
     this.panzoom.scale = 1;

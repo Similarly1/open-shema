@@ -859,6 +859,18 @@ class BibleAppApi:
             ch_int = 1
         return PassageStudyManager.get_bibleproject_media(book_code=book_code or "GEN", chapter=ch_int)
 
+    def open_external_url(self, url: str) -> bool:
+        """Ouvre un lien hypertexte dans le navigateur web par défaut du système."""
+        import webbrowser
+        try:
+            if url and (url.startswith("http://") or url.startswith("https://")):
+                webbrowser.open(url)
+                return True
+        except Exception as e:
+            logger.warning(f"Erreur ouverture URL externe ({url}): {e}")
+        return False
+
+
 
     def get_synoptic_harmony(self, pericope_id: int, bible_name: str = "LSG", pivot_book: Optional[str] = None) -> Dict[str, Any]:
         """Récupère la matrice synoptique complète pour une péricope évangélique avec pivot optionnel."""

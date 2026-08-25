@@ -462,8 +462,17 @@ const API = {
 
   async navigateMainFromSecondary(bookCode, chapterNum, verseNum = 1) {
     return await this.call('navigate_main_from_secondary', bookCode, parseInt(chapterNum), parseInt(verseNum) || 1);
+  },
+
+  async openExternalUrl(url) {
+    if (window.pywebview?.api && typeof window.pywebview.api.open_external_url === 'function') {
+      return await window.pywebview.api.open_external_url(url);
+    }
+    window.open(url, '_blank');
+    return true;
   }
 };
+
 
 API.init();
 

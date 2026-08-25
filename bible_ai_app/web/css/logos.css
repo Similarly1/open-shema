@@ -20813,5 +20813,27 @@ body.reading-bg-dark .comm-dropdown-popover {
   font-size: 10px;
 }
 
+.bp-btn-ext-yt {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  font-size: 10.5px;
+  font-weight: 600;
+  border-radius: 4px;
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+
+.bp-btn-ext-yt:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+
 
 

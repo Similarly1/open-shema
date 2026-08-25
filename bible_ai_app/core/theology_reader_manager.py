@@ -252,7 +252,6 @@ class TheologyReaderManager:
         if cache_key in cls._chapter_cache:
             return cls._chapter_cache[cache_key]
 
-        client = cls.get_chroma_client()
         chunks = []
         chapter_meta = {}
         all_referenced_verses = set()
@@ -758,7 +757,8 @@ Règles de style :
             return cls._bible_book_index
 
         import json
-        cache_path = os.path.join("data", "cache", "theology_bible_book_index.json")
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        cache_path = os.path.join(base_dir, "data", "cache", "theology_bible_book_index.json")
         if os.path.exists(cache_path):
             try:
                 with open(cache_path, "r", encoding="utf-8") as f:
@@ -942,76 +942,8 @@ Règles de style :
             if key not in seen:
                 seen.add(key)
                 item = dict(bm)
-                item["snippet"] = bm.get("snippet") or cls._extract_theology_snippet(
-                    bm["book_name"],
-                    bm["chapter_id"],
-                    french_book,
-                    norm_code,
-                    chapter,
-                    verse
-                )
+                item["snippet"] = bm.get("snippet") or f"Étude et contexte consacrés à {french_book} {chapter}."
                 results.append(item)
-
-        # 2. Citations directes dans les manuels de théologie systématique (ChromaDB si nécessaire)
-        if len(results) < 3:
-            client = cls.get_chroma_client()
-            search_terms = [
-                f"{french_book} {chapter}:{verse}",
-                f"{french_book} {chapter}"
-            ]
-
-            try:
-                col = client.get_collection('bible_study_bge_multilingual_gemma2_Infomaniak')
-                for term in search_terms:
-                    if len(results) >= limit:
-                        break
-                    try:
-                        res = col.get(where_document={"$contains": term}, limit=3, include=['metadatas', 'documents'])
-                        if res and res.get('ids'):
-                            for i in range(len(res['ids'])):
-                                m = res['metadatas'][i]
-                                doc = res['documents'][i]
-                                b_name = m.get('name') or m.get('title')
-                                if not b_name:
-                                    continue
-                                cid = m.get('chapter_id', 1)
-                                try:
-                                    cid_int = int(cid)
-                                except (ValueError, TypeError):
-                                    cid_int = cid
-                                
-                                key = (b_name, cid_int)
-                                if key in seen:
-                                    continue
-                                seen.add(key)
-
-                                b_meta = registry.get(b_name, {})
-                                doc_clean = cls._clean_text_encoding(doc)
-
-                                # Extraire l'extrait textuel ciblé
-                                idx = doc_clean.lower().find(term.lower())
-                                if idx != -1:
-                                    start = max(0, idx - 70)
-                                    end = min(len(doc_clean), idx + len(term) + 140)
-                                    snippet = ("..." if start > 0 else "") + doc_clean[start:end].replace('\n', ' ') + ("..." if end < len(doc_clean) else "")
-                                else:
-                                    snippet = doc_clean[:180] + "..." if len(doc_clean) > 180 else doc_clean
-
-                                cov_p = b_meta.get('cover_path')
-                                results.append({
-                                    "book_name": b_name,
-                                    "book_title": b_meta.get("title", b_name),
-                                    "book_author": b_meta.get("author", m.get("author", "")),
-                                    "chapter_id": cid_int,
-                                    "chapter_title": cls._clean_text_encoding(m.get("chapter_title", f"Chapitre {cid_int}")),
-                                    "snippet": snippet,
-                                    "cover_url": get_cover_data_url(cov_p) if (cov_p and get_cover_data_url) else None,
-                                    "source_type": m.get("source_type", "theology")
-                                })
-                    except Exception:
-                        pass
-            except Exception:
-                pass
 
         cls._passage_theology_cache[cache_key] = results[:limit]
         return cls._passage_theology_cache[cache_key]

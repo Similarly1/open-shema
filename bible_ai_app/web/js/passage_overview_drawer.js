@@ -548,9 +548,10 @@ const PassageOverviewDrawer = {
       // 1. Vidéo principale du livre / chapitre
       if (videos.length > 0) {
         const v = videos[0];
-        const thumbUrl = `https://img.youtube.com/vi/${v.yt_id}/mqdefault.jpg`;
+        const thumbUrl = v.thumbnail || `https://i.ytimg.com/vi/${v.yt_id}/hqdefault.jpg`;
         bodyHtml += `
           <div class="overview-bp-video-item"
+
                data-action="open-bp-video"
                data-yt-id="${v.yt_id}"
                data-title="${this.escapeHtml(v.title)}"
