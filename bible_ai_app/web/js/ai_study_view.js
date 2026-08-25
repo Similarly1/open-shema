@@ -528,9 +528,17 @@ const AIStudyView = {
   },
 
   async deleteSessionWithConfirm(sessionId) {
-    if (!confirm("Voulez-vous supprimer définitivement cette étude de l'historique ?")) {
-      return;
-    }
+    const confirmed = await App.showConfirmModal({
+      title: "Supprimer la discussion",
+      message: "Voulez-vous supprimer définitivement cette étude de l'historique ?",
+      confirmText: "Supprimer",
+      cancelText: "Annuler",
+      danger: true,
+      icon: "trash"
+    });
+
+    if (!confirmed) return;
+
     try {
       await API.call('delete_ai_session', sessionId);
       if (this.currentSessionId === sessionId) {

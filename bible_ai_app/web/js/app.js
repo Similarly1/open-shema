@@ -653,6 +653,113 @@ const App = {
     }, duration);
   },
 
+  /**
+   * Boîte de dialogue de confirmation moderne et intégrée (remplace confirm() natif)
+   */
+  showConfirmModal({
+    title = "Confirmation",
+    message = "Êtes-vous sûr de vouloir continuer ?",
+    confirmText = "Confirmer",
+    cancelText = "Annuler",
+    danger = false,
+    icon = "trash"
+  } = {}) {
+    return new Promise((resolve) => {
+      let modal = document.getElementById('app-custom-confirm-modal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'app-custom-confirm-modal';
+        modal.className = 'custom-confirm-overlay hidden';
+        document.body.appendChild(modal);
+      }
+
+      let iconSvg = '';
+      if (icon === 'trash' || danger) {
+        iconSvg = `<div class="confirm-icon danger">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+          </svg>
+        </div>`;
+      } else {
+        iconSvg = `<div class="confirm-icon warning">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>`;
+      }
+
+      modal.innerHTML = `
+        <div class="custom-confirm-card" role="dialog" aria-modal="true">
+          <div class="custom-confirm-header">
+            ${iconSvg}
+            <div class="custom-confirm-title">${title}</div>
+          </div>
+          <div class="custom-confirm-body">
+            <p>${message}</p>
+          </div>
+          <div class="custom-confirm-footer">
+            <button type="button" class="btn-secondary btn-modal-cancel">${cancelText}</button>
+            <button type="button" class="btn-primary ${danger ? 'btn-danger' : ''} btn-modal-confirm">${confirmText}</button>
+          </div>
+        </div>
+      `;
+
+      modal.classList.remove('hidden');
+      requestAnimationFrame(() => {
+        modal.classList.add('visible');
+      });
+
+      const btnCancel = modal.querySelector('.btn-modal-cancel');
+      const btnConfirm = modal.querySelector('.btn-modal-confirm');
+
+      let isClosed = false;
+      const cleanup = (confirmed) => {
+        if (isClosed) return;
+        isClosed = true;
+        modal.classList.remove('visible');
+        setTimeout(() => {
+          modal.classList.add('hidden');
+        }, 150);
+        document.removeEventListener('keydown', handleKey);
+        resolve(confirmed);
+      };
+
+      const handleKey = (e) => {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          cleanup(false);
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          cleanup(true);
+        }
+      };
+
+      btnCancel?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        cleanup(false);
+      });
+
+      btnConfirm?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        cleanup(true);
+      });
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          cleanup(false);
+        }
+      });
+
+      document.addEventListener('keydown', handleKey);
+      btnConfirm?.focus();
+    });
+  },
+
   // Gestionnaire d'Avertissements & Erreurs avec Détails et Copie
   currentErrorDetails: null,
 
