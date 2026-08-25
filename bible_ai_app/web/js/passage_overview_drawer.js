@@ -738,7 +738,7 @@ const PassageOverviewDrawer = {
         const tagClass = logoUrl ? 'clean-source-tag has-logo' : 'clean-source-tag is-generic';
 
         bodyHtml += `
-          <div class="overview-clean-item"
+          <div class="overview-clean-item overview-article-item"
                data-action="open-article"
                data-article-id="${this.escapeHtml(art.id)}"
                data-tt-category="Article"
@@ -748,13 +748,16 @@ const PassageOverviewDrawer = {
                data-tt-logo="${logoUrl || ''}"
                data-tt-image="${this.escapeHtml(art.image_url || '')}"
                data-tt-excerpt="${this.escapeHtml(summaryHtml)}">
-            <div class="clean-item-header">
-              <div class="clean-item-title-group">
-                <span class="clean-author-name">${this.escapeHtml(title)}</span>
-                <span class="${tagClass}">
-                  ${logoHtml}
-                  <span class="source-tag-text">${this.escapeHtml(src)}</span>
-                </span>
+            <div class="clean-article-row">
+              <div class="clean-article-content">
+                <div class="clean-article-top">
+                  <span class="${tagClass}">
+                    ${logoHtml}
+                    <span class="source-tag-text">${this.escapeHtml(src)}</span>
+                  </span>
+                  ${art.author ? `<span class="clean-article-author">Par ${this.escapeHtml(art.author)}</span>` : ''}
+                </div>
+                <div class="clean-article-title">${this.escapeHtml(title)}</div>
               </div>
               <span class="clean-item-arrow">${this.icons.arrowRight}</span>
             </div>
@@ -763,6 +766,7 @@ const PassageOverviewDrawer = {
       });
       bodyHtml += `</div>`;
     }
+
 
     return `
       <section class="overview-section-card ${isCollapsed ? 'collapsed' : ''}" id="sec-articles">
@@ -1083,20 +1087,19 @@ const PassageOverviewDrawer = {
       });
     });
 
-    // 4. Clic sur un article -> Ouvre l'article
+    // 4. Clic sur un article -> Ouvre l'article dans le tiroir latéral
     container.querySelectorAll('[data-action="open-article"]').forEach(card => {
       card.addEventListener('click', () => {
         const artId = card.dataset.articleId;
-        if (typeof App !== 'undefined' && App.switchView) {
-          App.switchView('articles');
-          setTimeout(() => {
-            if (typeof ArticlesView !== 'undefined' && ArticlesView.openArticle) {
-              ArticlesView.openArticle(artId);
-            }
-          }, 150);
-        }
+        document.querySelector('.drawer-tab[data-drawer-tab="articles"]')?.click();
+        setTimeout(() => {
+          if (typeof ArticlesView !== 'undefined' && ArticlesView.openDrawerArticle) {
+            ArticlesView.openDrawerArticle(artId);
+          }
+        }, 80);
       });
     });
+
 
     container.querySelectorAll('[data-action="open-articles-tab"]').forEach(btn => {
       btn.addEventListener('click', (e) => {

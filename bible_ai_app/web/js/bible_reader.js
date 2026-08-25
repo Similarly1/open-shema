@@ -2918,7 +2918,185 @@ const LexiconViewer = {
   },
 
 
+  searchStrongOccurrences(strongCode, term) {
+    if (typeof SearchView !== 'undefined') {
+      if (typeof App !== 'undefined' && App.switchView) {
+        App.switchView('search');
+        setTimeout(() => {
+          const input = document.getElementById('search-main-input');
+          if (input) {
+            input.value = strongCode || term;
+            SearchView.executeSearch();
+          }
+        }, 100);
+      }
+    }
+  },
+
+  copyStrongReference(frenchLemma, originalScript, strongCode) {
+    const text = `${frenchLemma} [${originalScript}] (Strong ${strongCode})`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast(`Copié : ${text}`, 'success');
+        }
+      }).catch(() => {});
+    }
+  },
+
+  renderStrongCard(container, match, bpVideoCardHtml = '') {
+    const rawTitle = match.title || this.currentTerm || '';
+    let frenchLemma = rawTitle;
+    let originalScript = match.lemma || '';
+
+    // Extraction depuis "Arbre [עֵץ]"
+    const bracketMatch = rawTitle.match(/^(.*?)\s*\[(.*?)\]/);
+    if (bracketMatch) {
+      frenchLemma = bracketMatch[1].trim();
+      originalScript = bracketMatch[2].trim();
+    }
+
+    const badgeText = match.badge || match.dict_name || '';
+    const strongCodeMatch = (match.strong || match.code || badgeText || rawTitle).match(/([HG]\d+)/i);
+    const strongCode = strongCodeMatch ? strongCodeMatch[1].toUpperCase() : (this.currentStrong || 'STRONG');
+    const isHebrew = strongCode.startsWith('H') || /hébreu|hebrew/i.test(badgeText);
+
+    // Extraction et nettoyage des définitions
+    const rawText = (match.full_text || match.preview || '').trim();
+    const cleanText = rawText.replace(/[;,\.]+\s*$/, '').replace(/\.\.\./g, '');
+    
+    // Découpage et déduplication intelligente des termes
+    const rawTokens = cleanText
+      .split(/[,;\n]+/)
+      .map(t => t.trim())
+      .filter(t => t.length > 0 && t !== '...' && !/^\s*d[e']\s*$/i.test(t));
+
+    const uniqueTokens = [];
+    const seen = new Set();
+    for (const tok of rawTokens) {
+      const lower = tok.toLowerCase();
+      if (!seen.has(lower)) {
+        seen.add(lower);
+        uniqueTokens.push(tok);
+      }
+    }
+
+    // Regroupement sémantique par blocs de sens
+    const primarySenses = [];
+    if (uniqueTokens.length > 0) {
+      for (let i = 0; i < uniqueTokens.length && primarySenses.length < 4; i += 2) {
+        const chunk = uniqueTokens.slice(i, i + 2).join(', ');
+        primarySenses.push(chunk.charAt(0).toUpperCase() + chunk.slice(1));
+      }
+    } else {
+      primarySenses.push(frenchLemma);
+    }
+
+    const pillsHtml = uniqueTokens.slice(0, 12).map(tok => `
+      <span class="strong-semantic-pill" onclick="LexiconViewer.searchStrongOccurrences('${tok.replace(/'/g, "\\'")}', '${tok.replace(/'/g, "\\'")}')">
+        ${typeof BibleProjectView !== 'undefined' && BibleProjectView.escapeHtml ? BibleProjectView.escapeHtml(tok) : tok}
+      </span>
+    `).join('');
+
+    container.innerHTML = `
+      <div class="strong-exegesis-container" style="padding: 16px;">
+        ${bpVideoCardHtml}
+
+        <div class="strong-card ${isHebrew ? 'strong-theme-hebrew' : 'strong-theme-greek'}">
+          <!-- En-tête Langue & Strong Code -->
+          <div class="strong-card-topbar">
+            <div class="strong-lang-badge">
+              <span class="strong-lang-dot"></span>
+              <span>${isHebrew ? 'Hébreu Biblique (A.T.)' : 'Grec Koinè (N.T.)'}</span>
+            </div>
+            <div class="strong-code-badge">Strong ${strongCode}</div>
+          </div>
+
+          <!-- Affichage Héro du Mot Original & Traduction -->
+          <div class="strong-hero-box">
+            ${originalScript ? `
+              <div class="strong-original-script ${isHebrew ? 'font-hebrew' : 'font-greek'}" dir="${isHebrew ? 'rtl' : 'ltr'}">
+                ${originalScript}
+              </div>
+            ` : ''}
+            <div class="strong-french-lemma">« ${frenchLemma} »</div>
+          </div>
+
+          <!-- Section Sens Principaux -->
+          <div class="strong-card-section">
+            <div class="strong-section-label">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+              <span>Sens Principaux &amp; Définitions</span>
+            </div>
+            <ul class="strong-meanings-list">
+              ${primarySenses.map(s => `<li><span class="strong-bullet">•</span><span class="strong-meaning-text">${s}</span></li>`).join('')}
+            </ul>
+          </div>
+
+          <!-- Section Nuances & Puces Sémantiques -->
+          ${uniqueTokens.length > 0 ? `
+            <div class="strong-card-section">
+              <div class="strong-section-label">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                <span>Champs Sémantiques &amp; Nuances</span>
+              </div>
+              <div class="strong-semantic-pills-wrap">
+                ${pillsHtml}
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- Barre d'Actions Rapides -->
+          <div class="strong-actions-footer">
+            <button type="button" class="btn-primary strong-btn-occurrences" onclick="LexiconViewer.searchStrongOccurrences('${strongCode}', '${frenchLemma.replace(/'/g, "\\'")}')">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <span>Occurrences de ${strongCode} dans la Bible</span>
+            </button>
+            <button type="button" class="btn-secondary strong-btn-copy" onclick="LexiconViewer.copyStrongReference('${frenchLemma.replace(/'/g, "\\'")}', '${originalScript}', '${strongCode}')" title="Copier la référence dans le presse-papier">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Copier</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
   renderDictionaryMatch(container, match) {
+    const isStrongDict = match.dict_id === 'strong' || match.is_strong || (match.dict_name && match.dict_name.toLowerCase().includes('strong'));
+
+    // Vérification d'une étude de mot BibleProject associée
+    let bpVideoCardHtml = '';
+    if (typeof BibleProjectView !== 'undefined' && BibleProjectView.getWordStudyForStrong) {
+      const strongCode = match.strong || match.slug || this.currentStrong || '';
+      const bpStudy = BibleProjectView.getWordStudyForStrong(strongCode, this.currentTerm);
+      if (bpStudy) {
+        bpVideoCardHtml = `
+          <div class="lex-bp-video-card" onclick="BibleProjectView.openAndPlayWordStudy('${bpStudy.ytId}', '${BibleProjectView.escapeHtml(bpStudy.title)}', '${BibleProjectView.escapeHtml(bpStudy.description)}')" title="Regarder l'analyse vidéo BibleProject dans l'onglet Médias">
+            <div class="lex-bp-video-thumb">
+              <img src="${bpStudy.thumbnail}" alt="${BibleProjectView.escapeHtml(bpStudy.title)}" loading="lazy">
+              <div class="lex-bp-play-badge">
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </div>
+            </div>
+            <div class="lex-bp-video-info">
+              <div class="lex-bp-badge-row">
+                <span class="lex-bp-tag">Étude de mot BibleProject</span>
+                <span class="lex-bp-dur">${bpStudy.dur || '5 min'}</span>
+              </div>
+              <div class="lex-bp-title">${BibleProjectView.escapeHtml(bpStudy.title)}</div>
+              <div class="lex-bp-hint">Regarder l'analyse vidéo (${bpStudy.orig || ''}) ↗</div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    if (isStrongDict) {
+      this.renderStrongCard(container, match, bpVideoCardHtml);
+      return;
+    }
+
     const isPolished = match.is_polished;
     const modelName = match.polished_model || 'Mistral 14B';
     const itemId = `dict_${match.dict_id}_${match.id || this.currentTerm}`;
@@ -2950,7 +3128,8 @@ const LexiconViewer = {
           </div>
         </div>
       `;
-    } else if (isForeign && !cachedTrans) {
+    }
+ else if (isForeign && !cachedTrans) {
       polishBarHtml = `
         <div style="margin-bottom: 10px; display: flex; justify-content: flex-end;">
           <button class="comm-translate-btn" id="btn-translate-dict" style="font-size: 11px; padding: 4px 8px; display: flex; align-items: center; gap: 4px;">
