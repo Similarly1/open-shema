@@ -687,8 +687,34 @@ const ArticlesView = {
       // 3. Chapô / Introduction
       const leadText = this.fixMojibake(art.lead_summary || art.summary || '');
       if (leadText && leadEl) {
-        leadEl.textContent = leadText;
+        let formattedLead = this.escapeHtml(leadText);
+        if (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences) {
+          formattedLead = TheologyView.highlightScriptureReferences(formattedLead);
+        }
+        leadEl.innerHTML = formattedLead;
         leadEl.classList.remove('hidden');
+
+        // Lier les infobulles et clics vers la Bible dans le chapô
+        if (typeof ScriptureTooltip !== 'undefined' && ScriptureTooltip.bindToElements) {
+          ScriptureTooltip.bindToElements(leadEl.querySelectorAll('.theol-inline-scripture-ref'));
+        }
+        leadEl.querySelectorAll('.theol-inline-scripture-ref').forEach(span => {
+          span.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const ref = span.dataset.ref || span.textContent.trim();
+            if (typeof BibleReader !== 'undefined') {
+              try {
+                const parsed = await API.parseReference(ref);
+                if (parsed && parsed.book) {
+                  await BibleReader.navigateTo(parsed.book, parsed.chapter || 1, parsed.verse || null);
+                }
+              } catch (err) {
+                BibleReader.navigateTo(ref);
+              }
+            }
+          });
+        });
       } else if (leadEl) {
         leadEl.classList.add('hidden');
       }
@@ -1130,10 +1156,11 @@ const ArticlesView = {
       text = text.replace(/([!?…»])\s+([A-ZÀ-ÿ0-9—–«])/g, '$1\n\n$2');
     }
 
-    // 2. Nettoyer les blocs promotionnels et parcours e-mail de fin d'article
+    // 2. Nettoyer les blocs promotionnels, parcours e-mail et mentions de droits réservés
     text = text.replace(/(?:#+\s*)?Parcours\s+e-?mail[\s\S]*$/gi, '');
     text = text.replace(/Pour\s+aller\s+plus\s+loin,\s+inscris-toi[\s\S]*$/gi, '');
     text = text.replace(/(?:#+\s*)?Inscrivez-vous\s+à\s+notre\s+newsletter[\s\S]*$/gi, '');
+    text = text.replace(/(?:Tous\s+droits\s+réservés[\.\s]*|All\s+rights\s+reserved[\.\s]*)/gi, '');
 
     // 3. Nettoyer tout bloc d'en-tête redondant (titre, auteur, source, date dupliqués, Publié le..., Podcast orphelin)
     text = text.replace(/^(#\s+[^\n]+\n+)?/gi, '');
@@ -1144,15 +1171,26 @@ const ArticlesView = {
     text = text.replace(/(?:^|\n)\s*\*?\s*(?:ℹ️|ℹ)\s*([^\n*]+?)\*?\s*(?=\n|$)/gi, '\n\n<div class="article-info-callout"><span>ℹ️</span><div>$1</div></div>\n\n');
     text = text.replace(/(?:^|\n)\s*\*\s*(?=\n|$)/g, '\n');
 
-    // 5. Nettoyer les tirets initiaux sur les mentions éditoriales
+    // 5. Nettoyer les tirets initiaux sur les mentions éditoriales et normaliser les espaces (ex: "livreIl" -> "livre Il")
+    text = text.replace(/(livre|ouvrage|série|revue|magazine|journal)([A-ZÀ-ÿ])/gi, '$1 $2');
+    text = text.replace(/([.!?…»])\s*(Cet article\s+(?:fait partie|est extrait|est tiré|a été publié|provient|est une adaptation|est la traduction|est une traduction|est le premier|est le second|est le troisième|est basé)|Extrait du livre|Tiré du livre)/gi, '$1\n\n$2');
     text = text.replace(/(?:^|\n)\s*[—–-]\s*(Cet article\s+(?:est extrait|fait partie|est tiré|a été publié|provient|est une adaptation))/gi, '\n\n$1');
+
+    const supToNum = { '⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9' };
+    const normalizeSuperscripts = (str) => str.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]/g, ch => supToNum[ch] || ch);
+
+    // 5a. Dans les cartouches éditoriaux et mentions bibliographiques, convertir systématiquement les exposants en chiffres normaux
+    text = text.replace(/(?:Cet article\s+(?:fait partie|est extrait|est tiré|a été publié|provient|est une adaptation)|Extrait du livre|Tiré du livre|Publié avec)[^\n]+/gi, (match) => {
+      return normalizeSuperscripts(match);
+    });
 
     // 5b. Détection et mise en valeur du cartouche éditorial de fin d'article (Option 3 : Badge contextuel dynamique, sans émoji/svg)
     text = text.replace(
-      /(?:^|\n\n+)((?:Cet article\s+(?:fait partie|est extrait|est tiré|a été publié|provient|est une adaptation|est la traduction|est une traduction|est le premier|est le second|est le troisième|est basé)|Extrait du livre|Tiré du livre|Publié avec l[’']autorisation)[^\n]+(?:\n[^\n]+)*)(?=\s*$)/gi,
+      /(?:^|\n\n+)((?:Cet article\s+(?:fait partie|est extrait|est tiré|a été publié|provient|est une adaptation|est la traduction|est une traduction|est le premier|est le second|est le troisième|est basé)|Extrait du livre|Tiré du livre)[\s\S]+?)(?=\s*$)/gi,
       (match, content) => {
         const badge = this.getEditorialBadgeLabel(content);
-        return `\n\n<div class="article-editorial-footer-card"><div class="article-editorial-footer-header"><span class="article-editorial-badge">${badge}</span></div><div class="article-editorial-footer-content">${content.trim()}</div></div>\n\n`;
+        const cleanContent = normalizeSuperscripts(content.trim());
+        return `\n\n<div class="article-editorial-footer-card"><div class="article-editorial-footer-header"><span class="article-editorial-badge">${badge}</span></div><div class="article-editorial-footer-content">${cleanContent}</div></div>\n\n`;
       }
     );
 
@@ -1182,20 +1220,32 @@ const ArticlesView = {
     // 5h. Détecter et formater les listes de notes de bas de page réelles (citations bibliographiques / ibid / éditions)
     text = text.replace(/(?:^|\n)(\d+)\.\s+([^\n]+(?:\n(?!\d+\.|\s*#|\s*---|\s*$)[^\n]+)*)/g, (match, num, body) => {
       if (/ibid|éditions|editions|editor|publisher|press|university|chapitre|vol\.|tome|trad\.|pp\.\s*\d+|p\.\s*\d+|19\d\d|20\d\d|op\.\s*cit|loc\.\s*cit/i.test(body)) {
-        return `\n\n<div class="article-footnote-item" id="article-fn-${num}"><span class="article-footnote-num">${num}.</span><span class="article-footnote-text">${body.trim()}</span> <a href="#article-fnref-${num}" class="article-footnote-backlink" title="Retour au texte">↩</a></div>\n\n`;
+        return `\n\n<div class="article-footnote-item" id="article-fn-${num}"><span class="article-footnote-num">${num}.</span><span class="article-footnote-text">${normalizeSuperscripts(body.trim())}</span> <a href="#article-fnref-${num}" class="article-footnote-backlink" title="Retour au texte">↩</a></div>\n\n`;
       }
       return match;
     });
 
-    // 5i. Remplacer les chiffres exposants Unicode (ex: ⁹) ou marqueurs [^9] en badges de note interactifs
-    const supToNum = { '⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9' };
+    // 5i. Normaliser les années, plages de pages et grands nombres en exposant
+    text = text.replace(/(pp?\.\s*|[0-9]+[\s-]*)([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/gi, (match, prefix, sups) => {
+      return prefix + normalizeSuperscripts(sups);
+    });
+    text = text.replace(/([⁰¹²³⁴⁵⁶⁷⁸⁹]{3,})/g, (match) => {
+      return normalizeSuperscripts(match);
+    });
+
+    // 5j. Remplacer les vrais appels de note [^9] ou exposants isolés collés au texte (valeur <= 50)
     text = text.replace(/\[\^(\d+)\]/g, (match, num) => {
       return `<sup class="article-fn-badge" id="article-fnref-${num}"><a href="#article-fn-${num}" title="Note ${num}">${num}</a></sup>`;
     });
-    text = text.replace(/([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/g, (match, sups) => {
-      const num = sups.split('').map(ch => supToNum[ch] || ch).join('');
-      return `<sup class="article-fn-badge" id="article-fnref-${num}"><a href="#article-fn-${num}" title="Note ${num}">${num}</a></sup>`;
+    text = text.replace(/([a-zA-ZÀ-ÿ»"'\).,;!?])\s*([⁰¹²³⁴⁵⁶⁷⁸⁹]{1,2})(?!\w)/g, (match, prevChar, sups) => {
+      const num = parseInt(normalizeSuperscripts(sups), 10);
+      if (num <= 50) {
+        return `${prevChar}<sup class="article-fn-badge" id="article-fnref-${num}"><a href="#article-fn-${num}" title="Note ${num}">${num}</a></sup>`;
+      }
+      return `${prevChar}${num}`;
     });
+    // Normaliser tout exposant orphelin restant en chiffre normal
+    text = text.replace(/([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/g, (match) => normalizeSuperscripts(match));
 
     // 6. Nettoyer les émojis décoratifs résiduels
     text = text.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1FA70}-\u{1FAFF}]/gu, '');
