@@ -21179,8 +21179,9 @@ body.reading-bg-dark .comm-dropdown-popover {
   scrollbar-width: none;
   -ms-overflow-style: none;
   scroll-behavior: smooth;
-  padding: 4px 8px;
+  padding: 4px 28px;
   flex: 1;
+
   white-space: nowrap;
 }
 
@@ -21280,6 +21281,134 @@ body.reading-bg-dark .comm-dropdown-popover {
 .drawer-tabs-scroll-right {
   right: 4px;
 }
+
+/* ========================================================================= */
+/* LECTEUR D'ARTICLE IMMERSIF DANS LE TIROIR LATÉRAL                         */
+/* ========================================================================= */
+
+.drawer-articles-subview {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.drawer-articles-subview.hidden {
+  display: none !important;
+}
+
+.article-drawer-reader-body {
+  padding-bottom: 20px;
+}
+
+.article-drawer-reader-body p {
+  margin: 12px 0;
+  line-height: 1.75;
+}
+
+.article-drawer-reader-body h2,
+.article-drawer-reader-body h3,
+.article-drawer-reader-body h4 {
+  margin: 18px 0 8px 0;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.article-drawer-reader-body blockquote {
+  border-left: 3px solid #a855f7;
+  padding: 8px 12px;
+  margin: 12px 0;
+  background: rgba(168, 85, 247, 0.08);
+  border-radius: 0 6px 6px 0;
+  font-style: italic;
+}
+
+/* ========================================================================= */
+/* ÉTAT VIDE CENTRÉ DU VOLET LEXIQUE                                         */
+/* ========================================================================= */
+
+#drawer-tab-lexicon {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.lexicon-details {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.lexicon-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+  min-height: 280px;
+  padding: 30px 24px;
+  margin: auto;
+}
+
+.lexicon-empty-icon-wrap {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  color: #c084fc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 18px rgba(168, 85, 247, 0.15);
+}
+
+.lexicon-empty-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0 0 8px 0;
+}
+
+.lexicon-empty-desc {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: #94a3b8;
+  max-width: 300px;
+  margin: 0 0 16px 0;
+}
+
+.lexicon-empty-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.lexicon-empty-hint-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lexicon-empty-hint-tag:hover {
+  background: rgba(168, 85, 247, 0.2);
+  border-color: rgba(168, 85, 247, 0.4);
+  color: #f1f5f9;
+  transform: translateY(-1px);
+}
+
+
 
 
 

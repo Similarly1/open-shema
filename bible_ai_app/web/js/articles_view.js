@@ -1533,8 +1533,7 @@ const ArticlesView = {
       listEl.querySelectorAll('.article-card').forEach(c => {
         c.addEventListener('click', () => {
           const artId = c.dataset.articleId;
-          App.switchView('articles');
-          ArticlesView.openArticle(artId);
+          ArticlesView.openDrawerArticle(artId);
         });
       });
     } catch (e) {
@@ -1542,6 +1541,176 @@ const ArticlesView = {
       listEl.innerHTML = `<p class="empty-hint">Erreur de chargement des articles.</p>`;
     }
   },
+
+  async openDrawerArticle(articleId) {
+    const listView = document.getElementById('drawer-articles-list-view');
+    const readerView = document.getElementById('drawer-articles-reader-view');
+    const contentEl = document.getElementById('drawer-article-reader-content');
+    const backBtn = document.getElementById('btn-drawer-article-back');
+    const fullBtn = document.getElementById('btn-drawer-article-open-full');
+    const extLink = document.getElementById('btn-drawer-article-ext');
+
+    if (!readerView || !contentEl) return;
+
+    // Basculer sur la vue lecteur intégrée
+    listView?.classList.add('hidden');
+    readerView?.classList.remove('hidden');
+
+    contentEl.innerHTML = `
+      <div class="articles-loading-state" style="padding: 40px 20px; text-align: center;">
+        <div class="spinner-sm" style="margin: 0 auto 10px auto;"></div>
+        <span style="font-size: 12.5px; color: var(--text-muted);">Chargement de l'article complet...</span>
+      </div>
+    `;
+
+    if (backBtn) {
+      backBtn.onclick = () => {
+        readerView.classList.add('hidden');
+        listView?.classList.remove('hidden');
+      };
+    }
+
+    if (fullBtn) {
+      fullBtn.onclick = () => {
+        if (typeof App !== 'undefined' && App.switchView) {
+          App.switchView('articles');
+          this.openArticle(articleId);
+        }
+      };
+    }
+
+    try {
+      const art = await API.call('get_article', articleId);
+      if (!art) {
+        contentEl.innerHTML = `<p class="empty-hint">Article introuvable.</p>`;
+        return;
+      }
+
+      if (extLink) {
+        if (art.canonical_url) {
+          extLink.href = art.canonical_url;
+          extLink.style.display = 'inline-flex';
+        } else {
+          extLink.style.display = 'none';
+        }
+      }
+
+      const color = this.getSourceColor(art.source_id);
+      const pubDate = this.formatDate(art.published_at);
+      const author = this.formatAuthor(art.author);
+      const refs = art.scripture_references || [];
+      const tags = this.filterMainCategories(art.tags_list || []);
+
+      let tagsHtml = '';
+      if (tags.length > 0) {
+        tagsHtml = `
+          <div class="article-drawer-tags" style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px;">
+            ${tags.map(t => `<span class="article-topic-tag" style="font-size: 10px; padding: 2px 6px;">${this.escapeHtml(t)}</span>`).join('')}
+          </div>
+        `;
+      }
+
+      let refsHtml = '';
+      if (refs.length > 0) {
+        refsHtml = `
+          <div class="article-drawer-refs" style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 14px;">
+            ${refs.map(r => `
+              <span class="scripture-badge" style="font-size: 10px; padding: 2px 6px; cursor: pointer;" data-book="${r.book_code}" data-ch="${r.chapter}" data-v="${r.verse || ''}">
+                ${this.escapeHtml(this.formatShortScriptureRef(r))}
+              </span>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      let audioPlayerHtml = '';
+      if (art.audio_url) {
+        audioPlayerHtml = `
+          <div class="article-drawer-audio-box" style="margin: 12px 0 16px 0; padding: 10px; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.25); border-radius: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #c084fc; margin-bottom: 6px; display: flex; align-items: center; gap: 5px;">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+              <span>Version Audio / Prédication</span>
+            </div>
+            <audio controls src="${this.escapeHtml(art.audio_url)}" style="width: 100%; height: 32px; outline: none;"></audio>
+          </div>
+        `;
+      }
+
+      let heroImageHtml = '';
+      if (art.image_url) {
+        heroImageHtml = `
+          <div class="article-drawer-hero-img-wrap" style="width: 100%; border-radius: 8px; overflow: hidden; margin-bottom: 14px; max-height: 180px;">
+            <img src="${this.escapeHtml(art.image_url)}" alt="${this.escapeHtml(art.title)}" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+        `;
+      }
+
+      const bodyMarkdown = art.content_markdown || art.content || art.summary || '';
+      const renderedBody = this.renderMarkdown(bodyMarkdown);
+
+      contentEl.innerHTML = `
+        <div class="article-drawer-reader-body">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <span class="article-source-badge" style="background-color: ${color}18; color: ${color}; border: 1px solid ${color}35; font-size: 10.5px;">
+              ${this.getSourceLogo(art.source_id) ? `<img src="${this.getSourceLogo(art.source_id)}" alt="" class="article-source-logo-img">` : ''}<span>${this.escapeHtml(art.source_name || art.source_id)}</span>
+            </span>
+            <span style="font-size: 11px; color: var(--text-muted);">${pubDate}</span>
+          </div>
+
+          <h2 style="font-size: 17px; font-weight: 800; color: var(--text-primary); line-height: 1.35; margin: 0 0 10px 0;">
+            ${this.escapeHtml(this.fixMojibake(art.title))}
+          </h2>
+
+          <div style="font-size: 11.5px; color: var(--text-secondary); margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+            ${art.author_avatar_url ? `<img src="${this.escapeHtml(art.author_avatar_url)}" style="width: 20px; height: 20px; border-radius: 50%;">` : ''}
+            <span>Par <strong>${this.escapeHtml(author)}</strong></span>
+          </div>
+
+          ${tagsHtml}
+          ${refsHtml}
+          ${heroImageHtml}
+          ${audioPlayerHtml}
+
+          <div class="article-reader-content-text" style="font-family: var(--font-bible, 'EB Garamond', Georgia, serif); font-size: 15px; line-height: 1.75; color: var(--text-primary);">
+            ${renderedBody}
+          </div>
+
+          <div style="margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--border-subtle, rgba(255,255,255,0.08)); display: flex; justify-content: space-between; align-items: center;">
+            <button type="button" class="btn-secondary" style="font-size: 11.5px;" onclick="document.getElementById('btn-drawer-article-back').click();">
+              ← Retour à la liste
+            </button>
+            ${art.canonical_url ? `
+              <a href="${art.canonical_url}" target="_blank" class="btn-secondary" style="font-size: 11.5px; text-decoration: none;">
+                Lire sur le site original ↗
+              </a>
+            ` : ''}
+          </div>
+        </div>
+      `;
+
+      // Clics sur les badges bibliques
+      contentEl.querySelectorAll('.scripture-badge').forEach(badge => {
+        badge.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const b = badge.dataset.book;
+          const ch = parseInt(badge.dataset.ch, 10) || 1;
+          const v = parseInt(badge.dataset.v, 10) || 1;
+          if (typeof BibleReader !== 'undefined') {
+            BibleReader.navigateTo(b, ch, v);
+          }
+        });
+      });
+
+      // Infobulles versets bibliques inline
+      if (typeof ScriptureTooltip !== 'undefined') {
+        ScriptureTooltip.bindToElements(contentEl.querySelectorAll('.theol-inline-scripture-ref'));
+      }
+    } catch (e) {
+      console.error('[ArticlesView] Erreur openDrawerArticle:', e);
+      contentEl.innerHTML = `<p class="empty-hint" style="color: var(--accent-red);">Erreur lors de l'ouverture de l'article.</p>`;
+    }
+  },
+
 
   formatDate(isoDateStr) {
     if (!isoDateStr) return '';
