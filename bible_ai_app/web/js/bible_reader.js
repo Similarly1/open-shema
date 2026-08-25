@@ -2918,31 +2918,107 @@ const LexiconViewer = {
   },
 
 
-  playPronunciation(text, lang = 'he', strongCode = '') {
-    const btn = document.getElementById('btn-play-strong-audio');
-    if (btn) btn.classList.add('playing');
+  currentAudioPlayer: null,
 
+  async playPronunciation(text, lang = 'he', strongCode = '') {
+    const btn = document.getElementById('btn-play-strong-audio');
+    if (!btn) return;
+
+    // 1. Si déjà en cours de lecture -> bouton Pause / Stop
+    if (this.currentAudioPlayer && !this.currentAudioPlayer.paused) {
+      this.currentAudioPlayer.pause();
+      this.currentAudioPlayer.currentTime = 0;
+      this.currentAudioPlayer = null;
+      btn.classList.remove('playing');
+      btn.innerHTML = `
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+        </svg>
+        <span class="strong-audio-label">Prononciation</span>
+      `;
+      return;
+    }
+
+    // 2. Animation de téléchargement / chargement
+    btn.disabled = true;
+    btn.innerHTML = `
+      <span class="synth-spinner" style="width:11px; height:11px; border-width:2px; display:inline-block; vertical-align:middle; margin-right:4px;"></span>
+      <span class="strong-audio-label">Chargement...</span>
+    `;
+
+    const resetBtn = () => {
+      btn.disabled = false;
+      btn.classList.remove('playing');
+      btn.innerHTML = `
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+        </svg>
+        <span class="strong-audio-label">Prononciation</span>
+      `;
+      this.currentAudioPlayer = null;
+    };
+
+    try {
+      // Récupération de l'audio haute qualité MP3
+      const res = await API.call('get_word_pronunciation_audio', text, lang, strongCode);
+
+      if (res && res.success && res.audio_base64) {
+        btn.disabled = false;
+        btn.classList.add('playing');
+        btn.innerHTML = `
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+            <rect x="6" y="4" width="4" height="16" rx="1"/>
+            <rect x="14" y="4" width="4" height="16" rx="1"/>
+          </svg>
+          <span class="strong-audio-label">Pause</span>
+        `;
+
+        const audio = new Audio(res.audio_base64);
+        this.currentAudioPlayer = audio;
+
+        audio.onended = resetBtn;
+        audio.onerror = resetBtn;
+
+        await audio.play();
+        return;
+      }
+    } catch (err) {
+      console.warn('[LexiconViewer] Erreur téléchargement MP3, bascule TTS local:', err);
+    }
+
+    // 3. Fallback synthétique si hors-ligne
     if ('speechSynthesis' in window) {
+      btn.disabled = false;
+      btn.classList.add('playing');
+      btn.innerHTML = `
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+          <rect x="6" y="4" width="4" height="16" rx="1"/>
+          <rect x="14" y="4" width="4" height="16" rx="1"/>
+        </svg>
+        <span class="strong-audio-label">Pause</span>
+      `;
+
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = lang === 'he' ? 'he-IL' : 'el-GR';
-      utterance.rate = 0.82; // Débit posé pour l'étude linguistique
+      utterance.rate = 0.82;
 
-      utterance.onend = () => {
-        if (btn) btn.classList.remove('playing');
-      };
-      utterance.onerror = () => {
-        if (btn) btn.classList.remove('playing');
-      };
+      utterance.onend = resetBtn;
+      utterance.onerror = resetBtn;
 
       window.speechSynthesis.speak(utterance);
     } else {
+      resetBtn();
       if (typeof App !== 'undefined' && App.showToast) {
         App.showToast('Audio non disponible sur ce système.', 'warning');
       }
-      if (btn) btn.classList.remove('playing');
     }
   },
+
 
   searchStrongOccurrences(strongCode, term) {
     if (typeof SearchView !== 'undefined') {

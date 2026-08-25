@@ -1152,6 +1152,50 @@ class BibleAppApi:
         """Recherche une entrée dans les dictionnaires actifs."""
         return DictionaryManager.lookup(word, strong_code)
 
+    def get_word_pronunciation_audio(self, word: str, lang: str = "he", strong_code: str = "") -> Dict[str, Any]:
+        """Télécharge ou récupère du cache l'audio MP3 haute fidélité de prononciation d'un mot hébreu ou grec."""
+        try:
+            import os, urllib.request, urllib.parse, base64, hashlib
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            cache_dir = os.path.join(base_dir, "data", "audio_cache")
+            os.makedirs(cache_dir, exist_ok=True)
+
+            code_clean = (strong_code or "").strip().upper()
+            if code_clean:
+                filename = f"{code_clean}.mp3"
+            else:
+                h = hashlib.md5(f"{lang}_{word}".encode("utf-8")).hexdigest()[:10]
+                filename = f"{lang}_{h}.mp3"
+
+            file_path = os.path.join(cache_dir, filename)
+
+            # Si déjà en cache
+            if os.path.exists(file_path) and os.path.getsize(file_path) > 100:
+                with open(file_path, "rb") as f:
+                    audio_b64 = base64.b64encode(f.read()).decode("utf-8")
+                return {"success": True, "audio_base64": f"data:audio/mp3;base64,{audio_b64}", "cached": True}
+
+            # Sinon, téléchargement à la demande
+            tl = "iw" if lang in ("he", "hebrew", "iw") else "el"
+            q = urllib.parse.quote(word.strip())
+            url = f"https://translate.google.com/translate_tts?ie=UTF-8&q={q}&tl={tl}&client=tw-ob"
+
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+            with urllib.request.urlopen(req, timeout=8) as resp:
+                audio_bytes = resp.read()
+
+            if audio_bytes and len(audio_bytes) > 100:
+                with open(file_path, "wb") as f:
+                    f.write(audio_bytes)
+                audio_b64 = base64.b64encode(audio_bytes).decode("utf-8")
+                return {"success": True, "audio_base64": f"data:audio/mp3;base64,{audio_b64}", "cached": False}
+
+            return {"success": False, "error": "Fichier audio vide."}
+        except Exception as e:
+            logger.error(f"Erreur get_word_pronunciation_audio ({word}, {lang}): {e}")
+            return {"success": False, "error": str(e)}
+
+
     def get_wikipedia_summary(self, query: str, exact_title: Optional[str] = None) -> Dict[str, Any]:
         """Récupère le résumé et les métadonnées Wikipédia pour un terme."""
         from core.wikipedia_client import WikipediaClient
