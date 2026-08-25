@@ -1,7 +1,9 @@
 /**
- * Sermons View Controller — Studio de Prédication
+ * Sermons View Controller — Studio de Prédication Modulaire par Blocs
  * 
- * Module de gestion et d'édition modulaire de sermons par blocs :
+ * Architecture en Blocs Modulaires :
+ * - Sections dépliables / repliables indépendantes (Introduction, Lecture, Points I-II-III, Conclusion).
+ * - Sommaire interactif (Outline) avec navigation fluide et calcul du temps estimé par bloc.
  * - Zéro émoji : icônes vectorielles SVG uniquement.
  * - Stockage Markdown (.md) et Frontmatter YAML standard.
  * - Volet droit de ressources connecté (Exégèse, Commentaires, Réservoir d'illustrations avec historique anti-redite).
@@ -14,20 +16,25 @@ const SermonsView = {
   illustrations: [],
   currentSermon: null,
   currentFilter: 'all',
-  activeDrawerTab: 'exegesis',
+  activeDrawerTab: 'overview',
+  
+  // Blocs de sections modulaires
+  sections: [],
+  activeSectionId: null,
   
   // Undo / Redo
   history: [],
   historyIndex: -1,
   maxHistory: 60,
   historyDebounceTimer: null,
+  saveDebounceTimer: null,
   
   // Mode Pupitre
   pulpitChronoSeconds: 0,
   pulpitChronoTimer: null,
   pulpitIsPlaying: false,
   pulpitFontSize: 24,
-  wakeLockSentinel: null,
+  pulpitWakeLock: null,
 
   // Éléments du DOM
   listContainer: null,
@@ -39,10 +46,11 @@ const SermonsView = {
   seriesInput: null,
   bigIdeaInput: null,
   goalInput: null,
-  contentEditor: null,
-  previewContainer: null,
+  sidebarPane: null,
   resourcesDrawer: null,
   drawerContent: null,
+  blocksContainer: null,
+  outlineList: null,
 
   // Métriques
   lblEstTime: null,
@@ -61,10 +69,11 @@ const SermonsView = {
     this.seriesInput = document.getElementById('sermon-edit-series');
     this.bigIdeaInput = document.getElementById('sermon-edit-bigidea');
     this.goalInput = document.getElementById('sermon-edit-goal');
-    this.contentEditor = document.getElementById('sermon-edit-content');
-    this.previewContainer = document.getElementById('sermon-preview-content');
+    this.sidebarPane = document.getElementById('sermons-sidebar-pane');
     this.resourcesDrawer = document.getElementById('sermons-resources-drawer');
     this.drawerContent = document.getElementById('sermons-drawer-content');
+    this.blocksContainer = document.getElementById('sermon-blocks-container');
+    this.outlineList = document.getElementById('sermon-outline-list');
 
     this.lblEstTime = document.getElementById('lbl-sermon-est-time');
     this.lblWordCount = document.getElementById('lbl-sermon-word-count');
@@ -124,8 +133,8 @@ const SermonsView = {
       });
     });
 
-    // 6. Insertion rapide de blocs
-    document.getElementById('btn-insert-point')?.addEventListener('click', () => this.insertBlock('point'));
+    // 6. Insertion rapide de blocs homilétiques dans la section active
+    document.getElementById('btn-insert-point')?.addEventListener('click', () => this.addSection('point'));
     document.getElementById('btn-insert-subpoint')?.addEventListener('click', () => this.insertBlock('subpoint'));
     document.getElementById('btn-insert-scripture')?.addEventListener('click', () => this.insertBlock('scripture'));
     document.getElementById('btn-insert-exegesis')?.addEventListener('click', () => this.insertBlock('exegesis'));
@@ -140,41 +149,18 @@ const SermonsView = {
     document.getElementById('btn-sermon-list')?.addEventListener('click', () => document.execCommand('insertUnorderedList'));
     document.getElementById('btn-sermon-quote')?.addEventListener('click', () => document.execCommand('formatBlock', false, 'blockquote'));
 
-    // 7. Écoute de saisie pour métriques et historique
+    // 7. Actions Sommaire & Ajout de sections
+    document.getElementById('btn-sermon-collapse-all')?.addEventListener('click', () => this.collapseAllSections());
+    document.getElementById('btn-sermon-expand-all')?.addEventListener('click', () => this.expandAllSections());
+    document.getElementById('btn-outline-add-point')?.addEventListener('click', () => this.addSection('point'));
+    document.getElementById('btn-add-section-point')?.addEventListener('click', () => this.addSection('point'));
+    document.getElementById('btn-add-section-scripture')?.addEventListener('click', () => this.addSection('scripture'));
+    document.getElementById('btn-add-section-conclusion')?.addEventListener('click', () => this.addSection('conclusion'));
+
+    // 8. Écoute du titre principal
     this.titleInput?.addEventListener('input', () => {
       if (this.currentSermon) this.currentSermon.title = this.titleInput.value.trim();
-      this.debouncedPushHistory();
-    });
-
-    this.contentEditor?.addEventListener('input', (e) => {
-      this.updateMetrics();
-      this.debouncedPushHistory();
-      this.handleSlashInput(e);
-    });
-
-    // 8. Raccourcis clavier (Ctrl+S, Ctrl+Z, Ctrl+Y, Ctrl+B, Ctrl+I, Slash Navigation)
-    this.contentEditor?.addEventListener('keydown', (e) => {
-      if (this.isSlashMenuOpen) {
-        if (this.handleSlashKeyDown(e)) {
-          return;
-        }
-      }
-
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
-        e.preventDefault();
-        this.saveCurrentSermon();
-      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
-        if (e.shiftKey) {
-          e.preventDefault();
-          this.redo();
-        } else {
-          e.preventDefault();
-          this.undo();
-        }
-      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
-        e.preventDefault();
-        this.redo();
-      }
+      this.debouncedAutoSave();
     });
 
     // 9. Mode Pupitre
@@ -182,8 +168,8 @@ const SermonsView = {
     document.getElementById('btn-pulpit-exit')?.addEventListener('click', () => this.closePulpitMode());
     document.getElementById('btn-pulpit-play-pause')?.addEventListener('click', () => this.togglePulpitChrono());
     document.getElementById('btn-pulpit-reset-chrono')?.addEventListener('click', () => this.resetPulpitChrono());
-    document.getElementById('btn-pulpit-font-inc')?.addEventListener('click', () => this.adjustPulpitFontSize(2));
-    document.getElementById('btn-pulpit-font-dec')?.addEventListener('click', () => this.adjustPulpitFontSize(-2));
+    document.getElementById('btn-pulpit-font-inc')?.addEventListener('click', () => this.changePulpitFontSize(2));
+    document.getElementById('btn-pulpit-font-dec')?.addEventListener('click', () => this.changePulpitFontSize(-2));
     document.getElementById('btn-pulpit-fullscreen')?.addEventListener('click', () => this.toggleFullscreen());
 
     // Touche Échap pour quitter le mode pupitre
@@ -237,7 +223,6 @@ const SermonsView = {
     const q = (this.searchInput?.value || '').toLowerCase().trim();
 
     let filtered = this.sermons.filter(s => {
-      // Filtre texte
       const matchQuery = !q || 
         (s.title || '').toLowerCase().includes(q) ||
         (s.church || '').toLowerCase().includes(q) ||
@@ -246,7 +231,6 @@ const SermonsView = {
 
       if (!matchQuery) return false;
 
-      // Filtres rapides
       if (this.currentFilter === 'ready') return s.status === 'ready';
       if (this.currentFilter === 'draft') return s.status === 'draft';
       return true;
@@ -261,229 +245,44 @@ const SermonsView = {
       return;
     }
 
-    this.listContainer.innerHTML = '';
-    filtered.forEach(s => {
-      const item = document.createElement('div');
-      const isActive = this.currentSermon?.id === s.id;
-      const statusClass = s.status === 'ready' ? 'status-ready' : 'status-draft';
-      const statusLabel = s.status === 'ready' ? 'Prêt' : 'Brouillon';
-      const passRef = s.passage?.reference || 'Général';
-      const church = s.church || 'Lieu non spécifié';
-      const estMin = s.estimated_minutes ? `${s.estimated_minutes} min` : '';
+    this.listContainer.innerHTML = filtered.map(sermon => {
+      const isActive = this.currentSermon?.id === sermon.id;
+      const statusClass = sermon.status === 'ready' ? 'status-ready' : 'status-draft';
+      const statusLabel = sermon.status === 'ready' ? 'Prêt' : 'Brouillon';
+      const ref = sermon.passage?.reference || 'Sans texte';
+      const date = sermon.date_planned || '';
+      const church = sermon.church || '';
+      const targetMin = sermon.timing?.target_duration_min || 35;
 
-      item.className = `sermon-list-item ${isActive ? 'active' : ''}`;
-      item.setAttribute('data-id', s.id);
-
-      item.innerHTML = `
-        <div class="sermon-list-item-body">
-          <div class="sermon-item-top">
-            <span class="sermon-item-title" title="${this.escapeHtml(s.title || 'Sans titre')}"><span class="sermon-item-title-text">${this.escapeHtml(s.title || 'Sans titre')}</span></span>
-            <span class="sermon-badge-pill ${statusClass}">${statusLabel}</span>
+      return `
+        <div class="sermon-list-item ${isActive ? 'active' : ''}" data-sermon-id="${sermon.id}">
+          <div class="sermon-list-item-body">
+            <div class="sermon-item-top">
+              <span class="sermon-badge-pill ${statusClass}">${statusLabel}</span>
+              <span class="sermon-item-timing">${targetMin} min</span>
+            </div>
+            <div class="sermon-item-title">${this.escapeHtml(sermon.title || 'Sans titre')}</div>
+            <div class="sermon-item-meta">
+              <span class="sermon-item-passage">${this.escapeHtml(ref)}</span>
+              ${church ? `<span class="sermon-item-church">• ${this.escapeHtml(church)}</span>` : ''}
+              ${date ? `<span class="sermon-item-date">• ${this.escapeHtml(date)}</span>` : ''}
+            </div>
           </div>
-          <div class="sermon-item-church">
-            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-            <span>${this.escapeHtml(church)}</span>
-          </div>
-          <div class="sermon-item-meta">
-            <span style="font-size: 10.5px; font-weight: 700; color: var(--accent-blue);">${this.escapeHtml(passRef)}</span>
-            <span class="sermon-item-timing">${estMin}</span>
-          </div>
-        </div>
-        <div class="sermon-list-item-actions">
-          <button type="button" class="btn-history-action btn-sermon-menu" title="Options (Clic droit)">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
-          </button>
         </div>
       `;
+    }).join('');
 
-      item.addEventListener('click', (e) => {
-        if (e.target.closest('.btn-sermon-menu')) {
-          e.stopPropagation();
-          const btn = e.target.closest('.btn-sermon-menu');
-          const rect = btn.getBoundingClientRect();
-          this.showSermonContextMenu(s.id, s.title, rect.right, rect.bottom);
-          return;
-        }
-        this.selectSermon(s.id);
+    this.listContainer.querySelectorAll('.sermon-list-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const id = item.dataset.sermonId;
+        this.selectSermon(id);
       });
-
-      // Clic droit (Menu contextuel)
-      item.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        this.showSermonContextMenu(s.id, s.title, e.clientX, e.clientY);
-      });
-
-      this.listContainer.appendChild(item);
     });
-  },
-
-  showSermonContextMenu(sermonId, currentTitle, x, y) {
-    let menu = document.getElementById('sermons-item-context-menu');
-    if (!menu) {
-      menu = document.createElement('div');
-      menu.id = 'sermons-item-context-menu';
-      menu.className = 'smooth-context-menu';
-      document.body.appendChild(menu);
-    }
-
-    menu.innerHTML = `
-      <div class="context-menu-item" data-action="rename">
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
-        <span>Renommer</span>
-      </div>
-      <div class="context-menu-item" data-action="duplicate">
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-        <span>Dupliquer</span>
-      </div>
-      <div class="context-menu-divider"></div>
-      <div class="context-menu-item danger" data-action="delete">
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-        <span>Supprimer</span>
-      </div>
-    `;
-
-    menu.style.display = 'flex';
-    menu.style.position = 'fixed';
-    menu.style.zIndex = '10000';
-
-    // Positionnement sans déborder
-    const menuWidth = 170;
-    const menuHeight = 110;
-    let posX = Math.min(x, window.innerWidth - menuWidth - 10);
-    let posY = Math.min(y, window.innerHeight - menuHeight - 10);
-    menu.style.left = `${posX}px`;
-    menu.style.top = `${posY}px`;
-
-    // Actions
-    menu.querySelector('[data-action="rename"]')?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.hideContextMenu();
-      this.promptRenameSermon(sermonId, currentTitle);
-    });
-
-    menu.querySelector('[data-action="duplicate"]')?.addEventListener('click', async () => {
-      this.hideContextMenu();
-      const sermon = await API.getSermon(sermonId);
-      if (sermon) {
-        const copy = {
-          ...sermon,
-          id: `sermon-${Date.now()}`,
-          filename: null,
-          title: `${sermon.title || 'Sermon'} (Copie)`,
-          date_planned: new Date().toISOString().split('T')[0]
-        };
-        await API.saveSermon(copy);
-        await this.loadSermons();
-        await this.selectSermon(copy.id);
-      }
-    });
-
-    menu.querySelector('[data-action="delete"]')?.addEventListener('click', async () => {
-      this.hideContextMenu();
-      const targetTitle = currentTitle || 'cette prédication';
-      let confirmed = false;
-      if (typeof App !== 'undefined' && App.showConfirmModal) {
-        confirmed = await App.showConfirmModal({
-          title: "Supprimer la prédication",
-          message: `Voulez-vous supprimer définitivement la prédication "${targetTitle}" ?`,
-          confirmText: "Supprimer",
-          cancelText: "Annuler",
-          danger: true,
-          icon: "trash"
-        });
-      } else {
-        confirmed = confirm(`Voulez-vous supprimer définitivement la prédication "${targetTitle}" ?`);
-      }
-
-      if (confirmed) {
-        await API.deleteSermon(sermonId);
-        if (this.currentSermon?.id === sermonId) {
-          this.currentSermon = null;
-        }
-        await this.loadSermons();
-        if (typeof App !== 'undefined' && App.showToast) {
-          App.showToast("Prédication supprimée.");
-        }
-      }
-    });
-
-    const closeHandler = (e) => {
-      if (!menu.contains(e.target)) {
-        this.hideContextMenu();
-        document.removeEventListener('click', closeHandler);
-      }
-    };
-    setTimeout(() => document.addEventListener('click', closeHandler), 10);
-  },
-
-  hideContextMenu() {
-    const menu = document.getElementById('sermons-item-context-menu');
-    if (menu) menu.style.display = 'none';
-  },
-
-  async promptRenameSermon(sermonId, currentTitle) {
-    const itemEl = document.querySelector(`.sermon-list-item[data-id="${sermonId}"]`);
-    const titleEl = itemEl?.querySelector('.sermon-item-title-text');
-
-    if (itemEl && titleEl) {
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.className = 'history-rename-input';
-      input.value = currentTitle || '';
-
-      titleEl.replaceWith(input);
-      input.focus();
-      input.select();
-
-      let isSaving = false;
-      const saveRename = async () => {
-        if (isSaving) return;
-        isSaving = true;
-        const newTitle = input.value.trim() || currentTitle || 'Prédication sans titre';
-        try {
-          const sermon = await API.getSermon(sermonId);
-          if (sermon) {
-            sermon.title = newTitle;
-            if (this.currentSermon?.id === sermonId) {
-              this.currentSermon.title = newTitle;
-              if (this.titleInput) this.titleInput.value = newTitle;
-            }
-            await API.saveSermon(sermon);
-            await this.loadSermons();
-            if (typeof App !== 'undefined' && App.showToast) {
-              App.showToast('Prédication renommée.');
-            }
-          } else {
-            await this.loadSermons();
-          }
-        } catch (e) {
-          console.error("Erreur renommage prédication:", e);
-          await this.loadSermons();
-        }
-      };
-
-      input.addEventListener('blur', saveRename);
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          input.blur();
-        } else if (e.key === 'Escape') {
-          e.preventDefault();
-          this.renderList();
-        }
-      });
-    }
-  },
-
-  toggleSidebar() {
-    const sidebar = document.getElementById('sermons-sidebar-pane');
-    if (sidebar) {
-      sidebar.classList.toggle('collapsed');
-    }
   },
 
   async selectSermon(sermonId) {
+    if (!sermonId) return;
+
     try {
       const sermon = await API.getSermon(sermonId);
       if (!sermon) return;
@@ -502,11 +301,10 @@ const SermonsView = {
     if (this.titleInput) this.titleInput.value = sermon.title || '';
     this.updateHeaderSummary(sermon);
 
-    if (this.contentEditor) {
-      // Transformation des callouts Markdown en HTML structuré propre
-      this.contentEditor.innerHTML = this.markdownToEditorHtml(sermon.body || '');
-    }
-
+    // Découpage du corps Markdown en sections modulaires
+    this.parseMarkdownIntoSections(sermon.body || '');
+    this.renderSections();
+    this.renderOutline();
     this.updateMetrics();
     this.renderDrawerContent();
   },
@@ -539,7 +337,26 @@ const SermonsView = {
       big_idea: "",
       goal: "",
       timing: { target_duration_min: 35, words_per_minute: 135 },
-      body: ""
+      body: `## Introduction
+
+Accroche et tension contemporaine...
+
+## Lecture du passage
+
+> [!scripture]
+> « Insérez le texte biblique ici »
+
+## I. Premier Point
+
+Explication du texte...
+
+## II. Deuxième Point
+
+Développement et vérité théologique...
+
+## Conclusion & Appel
+
+Synthèse et application concrète...`
     };
 
     const res = await API.saveSermon(newSermon);
@@ -579,7 +396,7 @@ const SermonsView = {
   async saveCurrentSermon() {
     if (!this.currentSermon) return;
 
-    const bodyMarkdown = this.editorHtmlToMarkdown(this.contentEditor?.innerHTML || '');
+    const bodyMarkdown = this.serializeSectionsToMarkdown();
     
     const payload = {
       ...this.currentSermon,
@@ -607,7 +424,6 @@ const SermonsView = {
       const res = await API.saveSermon(payload);
       if (res && res.success) {
         this.currentSermon = res.sermon || payload;
-        await this.loadSermons();
         this.updateHeaderSummary(this.currentSermon);
         if (typeof App !== 'undefined' && App.showToast) {
           App.showToast("Prédication enregistrée !");
@@ -616,6 +432,13 @@ const SermonsView = {
     } catch (e) {
       console.error('Erreur sauvegarde sermon:', e);
     }
+  },
+
+  debouncedAutoSave() {
+    if (this.saveDebounceTimer) clearTimeout(this.saveDebounceTimer);
+    this.saveDebounceTimer = setTimeout(() => {
+      this.saveCurrentSermon();
+    }, 1200);
   },
 
   async deleteCurrentSermon() {
@@ -663,24 +486,388 @@ const SermonsView = {
   },
 
   // =========================================================================
-  // INSERTION DE BLOCS HOMILÉTIQUES & ÉDITION
+  // MOTEUR MODULAIRE DE SECTIONS & OUTLINE
+  // =========================================================================
+
+  parseMarkdownIntoSections(markdown) {
+    if (!markdown || !markdown.trim()) {
+      this.sections = [
+        { id: `sec_${Date.now()}_1`, type: 'intro', title: 'Introduction', contentHtml: '<p>Accroche, mise en contexte et tension contemporaine...</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 },
+        { id: `sec_${Date.now()}_2`, type: 'scripture', title: 'Lecture du passage', contentHtml: '<p>« Insérez le texte biblique ici... »</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 },
+        { id: `sec_${Date.now()}_3`, type: 'point', title: 'I. Premier Point Principal', contentHtml: '<p>Explication du texte et fondement doctrinal...</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 },
+        { id: `sec_${Date.now()}_4`, type: 'point', title: 'II. Deuxième Point Principal', contentHtml: '<p>Développement théologique et résonance...</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 },
+        { id: `sec_${Date.now()}_5`, type: 'conclusion', title: 'Conclusion & Appel', contentHtml: '<p>Synthèse de la pensée maîtresse et application pour la semaine...</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 }
+      ];
+      return;
+    }
+
+    const lines = markdown.split('\n');
+    let parsedSections = [];
+    let currentSec = null;
+
+    for (let line of lines) {
+      const match = line.match(/^#{1,3}\s+(.*)$/);
+      if (match) {
+        if (currentSec) {
+          parsedSections.push(currentSec);
+        }
+        const title = match[1].trim();
+        const type = this.detectSectionType(title);
+        currentSec = {
+          id: `sec_${Date.now()}_${parsedSections.length + 1}`,
+          type: type,
+          title: title,
+          mdLines: [],
+          isCollapsed: false,
+          wordCount: 0,
+          estMinutes: 0
+        };
+      } else {
+        if (!currentSec) {
+          currentSec = {
+            id: `sec_${Date.now()}_1`,
+            type: 'intro',
+            title: 'Introduction',
+            mdLines: [],
+            isCollapsed: false,
+            wordCount: 0,
+            estMinutes: 0
+          };
+        }
+        currentSec.mdLines.push(line);
+      }
+    }
+    if (currentSec) {
+      parsedSections.push(currentSec);
+    }
+
+    this.sections = parsedSections.map(sec => ({
+      id: sec.id,
+      type: sec.type,
+      title: sec.title,
+      contentHtml: this.markdownToEditorHtml((sec.mdLines || []).join('\n').trim()),
+      isCollapsed: false,
+      wordCount: 0,
+      estMinutes: 0
+    }));
+
+    if (this.sections.length === 0) {
+      this.sections = [
+        { id: `sec_${Date.now()}_1`, type: 'point', title: 'Prédication', contentHtml: this.markdownToEditorHtml(markdown), isCollapsed: false, wordCount: 0, estMinutes: 0 }
+      ];
+    }
+  },
+
+  detectSectionType(title) {
+    const t = (title || '').toLowerCase();
+    if (t.includes('intro')) return 'intro';
+    if (t.includes('lecture') || t.includes('passage') || t.includes('texte') || t.includes('verset')) return 'scripture';
+    if (t.includes('concl') || t.includes('appel') || t.includes('synthèse') || t.includes('fin')) return 'conclusion';
+    return 'point';
+  },
+
+  serializeSectionsToMarkdown() {
+    return this.sections.map(sec => {
+      const heading = `## ${sec.title || 'Section'}`;
+      const body = this.editorHtmlToMarkdown(sec.contentHtml || '');
+      return `${heading}\n\n${body}`;
+    }).join('\n\n');
+  },
+
+  renderSections() {
+    if (!this.blocksContainer) return;
+    this.blocksContainer.innerHTML = '';
+
+    const wpm = this.currentSermon?.timing?.words_per_minute || 135;
+
+    this.sections.forEach((sec, idx) => {
+      const card = document.createElement('div');
+      card.className = `sermon-section-card ${sec.isCollapsed ? 'collapsed' : ''}`;
+      card.id = `section-card-${sec.id}`;
+      card.dataset.sectionId = sec.id;
+
+      // Calcul mots et minutes de la section
+      const words = (sec.contentHtml || '').replace(/<[^>]+>/g, ' ').trim().split(/\s+/).filter(Boolean).length;
+      sec.wordCount = words;
+      sec.estMinutes = (words / wpm).toFixed(1);
+
+      // Badge type
+      let badgeHtml = `<span class="section-type-badge">${idx + 1}</span>`;
+      if (sec.type === 'intro') badgeHtml = `<span class="section-type-badge badge-intro">Intro</span>`;
+      else if (sec.type === 'scripture') badgeHtml = `<span class="section-type-badge badge-scripture">Texte</span>`;
+      else if (sec.type === 'conclusion') badgeHtml = `<span class="section-type-badge badge-conclusion">Ccl</span>`;
+
+      card.innerHTML = `
+        <div class="section-card-header">
+          <button class="btn-section-toggle" title="Replier / Déplier la section">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          ${badgeHtml}
+          <input type="text" class="section-card-title-input" value="${this.escapeHtml(sec.title)}" placeholder="Titre de la section...">
+          <div class="section-card-meta">
+            <span class="section-badge-time" id="sec-badge-time-${sec.id}">${sec.estMinutes} min • ${sec.wordCount} mots</span>
+            <div class="section-card-actions">
+              <button class="btn-section-action btn-move-up" title="Monter cette section" ${idx === 0 ? 'disabled style="opacity:0.3;"' : ''}>
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+              </button>
+              <button class="btn-section-action btn-move-down" title="Descendre cette section" ${idx === this.sections.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <button class="btn-section-action btn-delete-section" title="Supprimer cette section">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="section-card-body">
+          <div class="sermon-section-editor" contenteditable="true" spellcheck="true" data-placeholder="Rédigez le contenu de cette section... Tapez / pour insérer un bloc (exégèse, illustration, verset, diapo).">${sec.contentHtml || ''}</div>
+        </div>
+      `;
+
+      // Event listeners sur la carte
+      const toggleBtn = card.querySelector('.btn-section-toggle');
+      toggleBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.toggleSectionCollapse(sec.id);
+      });
+
+      const titleInput = card.querySelector('.section-card-title-input');
+      titleInput?.addEventListener('input', () => {
+        sec.title = titleInput.value;
+        sec.type = this.detectSectionType(sec.title);
+        this.renderOutline();
+        this.debouncedAutoSave();
+      });
+
+      const editor = card.querySelector('.sermon-section-editor');
+      editor?.addEventListener('focus', () => {
+        this.activeSectionId = sec.id;
+        this.highlightOutlineItem(sec.id);
+      });
+
+      editor?.addEventListener('input', (e) => {
+        sec.contentHtml = editor.innerHTML;
+        const wCount = (editor.innerText || '').trim().split(/\s+/).filter(Boolean).length;
+        sec.wordCount = wCount;
+        sec.estMinutes = (wCount / wpm).toFixed(1);
+
+        const badgeEl = document.getElementById(`sec-badge-time-${sec.id}`);
+        if (badgeEl) badgeEl.textContent = `${sec.estMinutes} min • ${sec.wordCount} mots`;
+
+        this.renderOutline();
+        this.updateMetrics();
+        this.debouncedAutoSave();
+        this.handleSlashInput(e);
+      });
+
+      editor?.addEventListener('keydown', (e) => {
+        if (this.isSlashMenuOpen) {
+          if (this.handleSlashKeyDown(e)) return;
+        }
+
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+          e.preventDefault();
+          this.saveCurrentSermon();
+        } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+          if (e.shiftKey) { e.preventDefault(); this.redo(); }
+          else { e.preventDefault(); this.undo(); }
+        }
+      });
+
+      card.querySelector('.btn-move-up')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.moveSection(sec.id, -1);
+      });
+
+      card.querySelector('.btn-move-down')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.moveSection(sec.id, 1);
+      });
+
+      card.querySelector('.btn-delete-section')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.deleteSection(sec.id);
+      });
+
+      this.blocksContainer.appendChild(card);
+    });
+  },
+
+  renderOutline() {
+    if (!this.outlineList) return;
+
+    this.outlineList.innerHTML = this.sections.map((sec, idx) => {
+      let icon = `${idx + 1}`;
+      if (sec.type === 'intro') icon = 'Intro';
+      else if (sec.type === 'scripture') icon = 'Texte';
+      else if (sec.type === 'conclusion') icon = 'Ccl';
+
+      const isActive = this.activeSectionId === sec.id;
+
+      return `
+        <div class="sermon-outline-item ${isActive ? 'active' : ''}" data-sec-id="${sec.id}" id="outline-item-${sec.id}">
+          <div class="outline-item-left">
+            <span class="outline-item-icon">${icon}</span>
+            <span class="outline-item-title">${this.escapeHtml(sec.title || 'Sans titre')}</span>
+          </div>
+          <span class="outline-item-time">${sec.estMinutes || 0}m</span>
+        </div>
+      `;
+    }).join('');
+
+    this.outlineList.querySelectorAll('.sermon-outline-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const secId = item.dataset.secId;
+        this.scrollToSection(secId);
+      });
+    });
+  },
+
+  scrollToSection(secId) {
+    this.activeSectionId = secId;
+    this.highlightOutlineItem(secId);
+
+    const card = document.getElementById(`section-card-${secId}`);
+    if (card) {
+      const sec = this.sections.find(s => s.id === secId);
+      if (sec && sec.isCollapsed) {
+        this.toggleSectionCollapse(secId, false);
+      }
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.querySelector('.sermon-section-editor')?.focus();
+    }
+  },
+
+  highlightOutlineItem(secId) {
+    this.outlineList?.querySelectorAll('.sermon-outline-item').forEach(item => {
+      item.classList.toggle('active', item.dataset.secId === secId);
+    });
+  },
+
+  toggleSectionCollapse(secId, forceState) {
+    const sec = this.sections.find(s => s.id === secId);
+    if (!sec) return;
+
+    sec.isCollapsed = typeof forceState === 'boolean' ? forceState : !sec.isCollapsed;
+    const card = document.getElementById(`section-card-${secId}`);
+    if (card) {
+      card.classList.toggle('collapsed', sec.isCollapsed);
+    }
+  },
+
+  collapseAllSections() {
+    this.sections.forEach(s => s.isCollapsed = true);
+    document.querySelectorAll('.sermon-section-card').forEach(c => c.classList.add('collapsed'));
+  },
+
+  expandAllSections() {
+    this.sections.forEach(s => s.isCollapsed = false);
+    document.querySelectorAll('.sermon-section-card').forEach(c => c.classList.remove('collapsed'));
+  },
+
+  addSection(type = 'point', title = '', content = '') {
+    const defaultTitles = {
+      intro: 'Introduction',
+      scripture: 'Lecture du passage',
+      point: `Point ${this.sections.filter(s => s.type === 'point').length + 1}`,
+      conclusion: 'Conclusion & Appel'
+    };
+
+    const newSec = {
+      id: `sec_${Date.now()}_${this.sections.length + 1}`,
+      type: type,
+      title: title || defaultTitles[type] || 'Nouvelle section',
+      contentHtml: content || '<p>Contenu de cette partie...</p>',
+      isCollapsed: false,
+      wordCount: 0,
+      estMinutes: 0
+    };
+
+    this.sections.push(newSec);
+    this.renderSections();
+    this.renderOutline();
+    this.updateMetrics();
+    this.debouncedAutoSave();
+
+    setTimeout(() => {
+      this.scrollToSection(newSec.id);
+    }, 50);
+  },
+
+  deleteSection(secId) {
+    if (this.sections.length <= 1) {
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast("Le sermon doit contenir au moins une section.", "warn");
+      }
+      return;
+    }
+
+    const sec = this.sections.find(s => s.id === secId);
+    if (!sec) return;
+
+    if (!confirm(`Supprimer la section "${sec.title || 'cette partie'}" ?`)) {
+      return;
+    }
+
+    this.sections = this.sections.filter(s => s.id !== secId);
+    this.renderSections();
+    this.renderOutline();
+    this.updateMetrics();
+    this.debouncedAutoSave();
+  },
+
+  moveSection(secId, delta) {
+    const idx = this.sections.findIndex(s => s.id === secId);
+    if (idx === -1) return;
+
+    const newIdx = idx + delta;
+    if (newIdx < 0 || newIdx >= this.sections.length) return;
+
+    const temp = this.sections[idx];
+    this.sections[idx] = this.sections[newIdx];
+    this.sections[newIdx] = temp;
+
+    this.renderSections();
+    this.renderOutline();
+    this.debouncedAutoSave();
+
+    setTimeout(() => {
+      this.scrollToSection(secId);
+    }, 50);
+  },
+
+  insertHtmlIntoActiveSection(html) {
+    let targetEditor = null;
+    if (this.activeSectionId) {
+      const card = document.getElementById(`section-card-${this.activeSectionId}`);
+      targetEditor = card?.querySelector('.sermon-section-editor');
+    }
+
+    if (!targetEditor) {
+      const firstCard = document.querySelector('.sermon-section-card');
+      targetEditor = firstCard?.querySelector('.sermon-section-editor');
+    }
+
+    if (targetEditor) {
+      targetEditor.focus();
+      document.execCommand('insertHTML', false, html);
+      targetEditor.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  },
+
+  // =========================================================================
+  // INSERTION DE BLOCS SPÉCIALISÉS (DANS L'ÉDITEUR ACTIF)
   // =========================================================================
 
   insertBlock(type) {
-    if (!this.contentEditor) return;
-    this.contentEditor.focus();
-
     let htmlToInsert = '';
 
     switch (type) {
-      case 'point':
-        htmlToInsert = `<h2>Point Principal</h2><p>Développement du point...</p>`;
-        break;
       case 'subpoint':
-        htmlToInsert = `<h3>Sous-point</h3><p>Explication...</p>`;
+        htmlToInsert = `<h3>Sous-point</h3><p>Explication du sous-point...</p>`;
         break;
       case 'scripture':
-        const ref = this.refInput?.value || 'Passage lié';
+        const ref = this.currentSermon?.passage?.reference || 'Passage lié';
         htmlToInsert = `
           <div class="sermon-callout-block sermon-block-scripture" data-type="scripture">
             <div class="sermon-block-header">
@@ -740,9 +927,9 @@ const SermonsView = {
         break;
     }
 
-    document.execCommand('insertHTML', false, htmlToInsert);
-    this.updateMetrics();
-    this.debouncedPushHistory();
+    if (htmlToInsert) {
+      this.insertHtmlIntoActiveSection(htmlToInsert);
+    }
   },
 
   // =========================================================================
@@ -827,9 +1014,7 @@ const SermonsView = {
       `;
     });
 
-    // Titres Markdown
-    html = html.replace(/^# (.*?)$/gm, '<h1>$1</h1>');
-    html = html.replace(/^## (.*?)$/gm, '<h2>$1</h2>');
+    // Titres Markdown résiduels
     html = html.replace(/^### (.*?)$/gm, '<h3>$1</h3>');
     html = html.replace(/^---$/gm, '<hr>');
 
@@ -873,7 +1058,6 @@ const SermonsView = {
     temp.querySelectorAll('.sermon-callout-block').forEach(b => {
       const type = b.dataset.type || 'cue';
       const id = b.dataset.id;
-      // Extraire le texte interne sans l'en-tête
       const header = b.querySelector('.sermon-block-header');
       if (header) header.remove();
       
@@ -897,7 +1081,6 @@ const SermonsView = {
     raw = raw.replace(/<p>(.*?)<\/p>/gi, '\n$1\n');
     raw = raw.replace(/<br\s*\/?>/gi, '\n');
 
-    // Nettoyer les balises résiduelles
     temp.innerHTML = raw;
     let cleanText = temp.innerText || temp.textContent || '';
     return cleanText.replace(/\n{3,}/g, '\n\n').trim();
@@ -908,22 +1091,28 @@ const SermonsView = {
   // =========================================================================
 
   updateMetrics() {
-    if (!this.contentEditor) return;
-
-    const text = this.contentEditor.innerText || '';
-    const words = text.trim().split(/\s+/).filter(w => w.length > 0);
-    const wordCount = words.length;
-
     const wpm = this.currentSermon?.timing?.words_per_minute || 135;
-    const estMinutes = (wordCount / wpm).toFixed(1);
+    let totalWords = 0;
+
+    this.sections.forEach(sec => {
+      totalWords += (sec.wordCount || 0);
+    });
+
+    const estMinutes = (totalWords / wpm).toFixed(1);
 
     if (this.lblEstTime) this.lblEstTime.textContent = `${estMinutes} min`;
-    if (this.lblWordCount) this.lblWordCount.textContent = `${wordCount} mots`;
+    if (this.lblWordCount) this.lblWordCount.textContent = `${totalWords} mots`;
 
     // Calcul de proportion des blocs
-    const exegesisCount = this.contentEditor.querySelectorAll('.sermon-block-exegesis').length + 1;
-    const illustrationCount = this.contentEditor.querySelectorAll('.sermon-block-illustration').length + 1;
-    const applicationCount = this.contentEditor.querySelectorAll('.sermon-block-application').length + 1;
+    let exegesisCount = 1;
+    let illustrationCount = 1;
+    let applicationCount = 1;
+
+    document.querySelectorAll('.sermon-section-card').forEach(card => {
+      exegesisCount += card.querySelectorAll('.sermon-block-exegesis').length;
+      illustrationCount += card.querySelectorAll('.sermon-block-illustration').length;
+      applicationCount += card.querySelectorAll('.sermon-block-application').length;
+    });
 
     const total = exegesisCount + illustrationCount + applicationCount;
     const pctExg = Math.round((exegesisCount / total) * 100);
@@ -933,39 +1122,50 @@ const SermonsView = {
     if (this.barExegesis) this.barExegesis.style.width = `${pctExg}%`;
     if (this.barIllustration) this.barIllustration.style.width = `${pctIll}%`;
     if (this.barApplication) this.barApplication.style.width = `${pctApp}%`;
-
-    const elExg = document.getElementById('popover-pct-exegesis');
-    const elIll = document.getElementById('popover-pct-illustration');
-    const elApp = document.getElementById('popover-pct-application');
-    const elAdvice = document.getElementById('popover-balance-advice');
-
-    if (elExg) elExg.textContent = `${pctExg}%`;
-    if (elIll) elIll.textContent = `${pctIll}%`;
-    if (elApp) elApp.textContent = `${pctApp}%`;
-
-    if (elAdvice) {
-      if (pctExg > 55) {
-        elAdvice.textContent = "Conseil : Sermon riche en exégèse. Pensez à ajouter des illustrations pour faciliter l'assimilation.";
-      } else if (pctIll > 50) {
-        elAdvice.textContent = "Conseil : Nombreuses illustrations. Veillez à bien ancrer le fond doctrinal dans le texte biblique.";
-      } else if (pctApp > 50) {
-        elAdvice.textContent = "Conseil : Forte orientation pratique. Vérifiez que les fondements exégétiques sont suffisants.";
-      } else {
-        elAdvice.textContent = "Équilibre sain et harmonieux entre enseignement, clarté et impact pratique.";
-      }
-    }
   },
 
   // =========================================================================
-  // VOLET DROIT : RESSOURCES, COMMENTAIRES & ILLUSTRATIONS
+  // VOLETS GAUCHE ET DROIT : RÉTRACTATION & ANIMATION FLUIDE
   // =========================================================================
+
+  toggleSidebar(forceState) {
+    if (!this.sidebarPane) {
+      this.sidebarPane = document.getElementById('sermons-sidebar-pane');
+    }
+    if (!this.sidebarPane) return;
+
+    const willOpen = typeof forceState === 'boolean' ? forceState : this.sidebarPane.classList.contains('collapsed');
+
+    if (typeof forceState === 'boolean') {
+      this.sidebarPane.classList.toggle('collapsed', !forceState);
+    } else {
+      this.sidebarPane.classList.toggle('collapsed');
+    }
+
+    const toggleBtn = document.getElementById('btn-sermons-toggle-sidebar');
+    if (toggleBtn) {
+      toggleBtn.classList.toggle('active', willOpen);
+    }
+  },
 
   toggleResourcesDrawer(forceState) {
     if (!this.resourcesDrawer) return;
+    const willOpen = typeof forceState === 'boolean' ? forceState : this.resourcesDrawer.classList.contains('collapsed');
+
     if (typeof forceState === 'boolean') {
       this.resourcesDrawer.classList.toggle('collapsed', !forceState);
     } else {
       this.resourcesDrawer.classList.toggle('collapsed');
+    }
+
+    // Dès que le volet droit s'ouvre, fermer automatiquement le volet gauche des prédications
+    if (willOpen) {
+      this.toggleSidebar(false);
+    }
+
+    const toggleBtn = document.getElementById('btn-sermon-toggle-drawer');
+    if (toggleBtn) {
+      toggleBtn.classList.toggle('active', willOpen);
     }
   },
 
@@ -1015,310 +1215,179 @@ const SermonsView = {
           <!-- 1. Passage biblique -->
           <div class="sermon-drawer-meta-field">
             <label class="sermon-drawer-meta-label">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
               <span>Passage Biblique</span>
-              <span class="sermon-meta-tooltip-trigger">
+              <span class="sermon-meta-tooltip-trigger" title="Détails homilétiques">
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                 <div class="sermon-meta-popover">
-                  <div class="meta-popover-title">Délimitation de la Péricope</div>
+                  <div class="meta-popover-title">Passage Biblique & Péricope</div>
                   <div class="meta-popover-author">Florent Varak (IBG) • David Helm</div>
-                  <div class="meta-popover-body">Choisissez une unité littéraire cohérente et complète (paragraphe, récit ou section rhétorique).</div>
-                  <div class="meta-popover-tip">Conseil : Cliquez sur le bouton de synchronisation pour charger l'exégèse et les commentaires associés.</div>
+                  <div class="meta-popover-body">Le passage détermine les limites de votre prédication. Choisissez une unité littéraire complète (un paragraphe, une histoire, un argument).</div>
+                  <div class="meta-popover-tip">Règle d'or : Laissez le texte imposer son ordre et sa dynamique au sermon.</div>
                 </div>
               </span>
             </label>
-            <div style="display: flex; gap: 4px;">
-              <input type="text" id="drawer-meta-ref" class="sermon-drawer-input" value="${this.escapeHtml(passageRef)}" placeholder="ex: Amos 3 ou Ga 3.1-14">
-              <button class="btn-secondary btn-sm" id="btn-drawer-sync-bible" title="Synchroniser l'exégèse" style="padding: 0 8px;">
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            <div style="display: flex; gap: 6px;">
+              <input type="text" id="sermon-meta-passage" class="sermon-drawer-input" value="${this.escapeHtml(passageRef)}" placeholder="ex: 2 Corinthiens 1.12-2.13">
+              <button class="btn-secondary" id="btn-sync-meta-passage" title="Synchroniser avec la Bible" style="padding: 0 8px; flex-shrink: 0;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
               </button>
             </div>
           </div>
 
-          <!-- 2. Théologie Biblique : Étape du Salut (Phil Crowter - Langham) -->
+          <!-- 2. Histoire du Salut -->
           <div class="sermon-drawer-meta-field">
             <label class="sermon-drawer-meta-label">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-              <span>Étape de l'Histoire du Salut</span>
-              <span class="sermon-meta-tooltip-trigger">
+              <span>Histoire du Salut (Théologie Biblique)</span>
+              <span class="sermon-meta-tooltip-trigger" title="Détails homilétiques">
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                 <div class="sermon-meta-popover">
-                  <div class="meta-popover-title">La Grande Histoire de Dieu</div>
+                  <div class="meta-popover-title">Étape de la Grande Histoire de Dieu</div>
                   <div class="meta-popover-author">Phil Crowter (Langham) • David Helm</div>
-                  <div class="meta-popover-body">Situez votre texte dans l'une des 8 étapes du plan de salut pour montrer comment il s'inscrit dans l'alliance et converge vers l'œuvre de Christ.</div>
-                  <div class="meta-popover-tip">Règle d'or : Évite de prêcher l'Ancien Testament comme une morale isolée sans l'Évangile.</div>
+                  <div class="meta-popover-body">Situe le passage dans le grand récit de la rédemption en 8 étapes pour prêcher le Christ sans moralisme.</div>
+                  <div class="meta-popover-tip">Règle d'or : Toujours tracer une ligne théologique solide vers l'accomplissement en Jésus-Christ.</div>
                 </div>
               </span>
             </label>
-            <select id="drawer-meta-era" class="sermon-drawer-input" style="cursor: pointer;">
+            <select id="sermon-meta-era" class="sermon-drawer-input sermon-drawer-select">
               ${eraOptionsHtml}
             </select>
           </div>
 
-          <!-- 3. PMT (Pensée Maîtresse du Texte - Florent Varak / David Helm) -->
+          <!-- 3. PMT -->
           <div class="sermon-drawer-meta-field">
             <label class="sermon-drawer-meta-label">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
-              <span>PMT — Pensée Maîtresse du Texte</span>
-              <span class="sermon-meta-tooltip-trigger">
+              <span>PMT — Pensée Maîtresse du Texte (Rive 1)</span>
+              <span class="sermon-meta-tooltip-trigger" title="Détails homilétiques">
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                 <div class="sermon-meta-popover">
-                  <div class="meta-popover-title">Sens Originel (Rive 1)</div>
+                  <div class="meta-popover-title">Pensée Maîtresse du Texte (Sujet + Complément)</div>
                   <div class="meta-popover-author">Florent Varak & Philippe Viguier (IBG)</div>
-                  <div class="meta-popover-body">Ce que l'auteur biblique disait à ses premiers destinataires historiques. Formulez : <strong>Sujet</strong> (de quoi parle le texte ?) + <strong>Complément</strong> (qu'en dit-il précisément ?).</div>
-                  <div class="meta-popover-tip">Règle d'or : Restez dans le monde du texte avant de chercher l'application contemporaine.</div>
+                  <div class="meta-popover-body">La vérité originelle que l'auteur biblique déclarait à ses premiers destinataires dans leur contexte historique.</div>
+                  <div class="meta-popover-tip">Formule : Sujet précis + Complément (Ce que l'auteur en dit).</div>
                 </div>
               </span>
             </label>
-            <textarea id="drawer-meta-pmt" class="sermon-drawer-input sermon-drawer-textarea" placeholder="Que disait l'auteur inspiré à ses premiers auditeurs ?">${this.escapeHtml(pmt)}</textarea>
+            <textarea id="sermon-meta-pmt" class="sermon-drawer-input sermon-drawer-textarea" placeholder="Qu'est-ce que l'auteur biblique affirmait à ses premiers auditeurs ?">${this.escapeHtml(pmt)}</textarea>
           </div>
 
-          <!-- 4. Le Pont / Tension contemporaine (John Stott) -->
+          <!-- 4. Le Pont -->
           <div class="sermon-drawer-meta-field">
             <label class="sermon-drawer-meta-label">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10"/><path d="M4 15h16"/><path d="M10 7v12"/><path d="M14 7v12"/></svg>
-              <span>Le Pont — Tension Contemporaine</span>
-              <span class="sermon-meta-tooltip-trigger">
+              <span style="display: flex; align-items: center; gap: 4px;">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" style="color: #3b82f6;"><path d="M4 19V9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10"/><path d="M4 15h16"/><path d="M10 7v12"/><path d="M14 7v12"/></svg>
+                Le Pont — Tension Contemporaine
+              </span>
+              <span class="sermon-meta-tooltip-trigger" title="Détails homilétiques">
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                 <div class="sermon-meta-popover">
-                  <div class="meta-popover-title">Bâtir des Ponts (Bridge-Building)</div>
+                  <div class="meta-popover-title">Bâtir un Pont entre les deux mondes</div>
                   <div class="meta-popover-author">John Stott (Le défi de la prédication)</div>
-                  <div class="meta-popover-body">À quelle question existentielle, fardeau moderne, angoisse ou désillusion ce texte apporte-t-il la réponse divine ?</div>
-                  <div class="meta-popover-tip">Conseil : Posez cette tension dès l'introduction pour susciter l'attention de l'assemblée.</div>
+                  <div class="meta-popover-body">Traverse le fossé culturel de 2000 ans en identifiant la tension existentielle, l'angoisse ou le défi moderne auquel le texte répond.</div>
+                  <div class="meta-popover-tip">Règle d'or : Rendre le texte brûlant d'actualité pour nos contemporains.</div>
                 </div>
               </span>
             </label>
-            <textarea id="drawer-meta-tension" class="sermon-drawer-input sermon-drawer-textarea" placeholder="Quelle question ou combat humain contemporain ce passage éclaire-t-il ?">${this.escapeHtml(tension)}</textarea>
+            <textarea id="sermon-meta-tension" class="sermon-drawer-input sermon-drawer-textarea" placeholder="À quelle question ou tension de notre monde ce texte répond-il aujourd'hui ?">${this.escapeHtml(tension)}</textarea>
           </div>
 
-          <!-- 5. PMS (Pensée Maîtresse du Sermon - Varak / Stott / Robinson) -->
+          <!-- 5. PMS -->
           <div class="sermon-drawer-meta-field">
             <label class="sermon-drawer-meta-label">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-              <span>PMS — Pensée Maîtresse du Sermon</span>
-              <span class="sermon-meta-tooltip-trigger">
+              <span>PMS — Pensée Maîtresse du Sermon (Rive 2)</span>
+              <span class="sermon-meta-tooltip-trigger" title="Détails homilétiques">
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                 <div class="sermon-meta-popover">
-                  <div class="meta-popover-title">L'Idée Dominante Unique</div>
-                  <div class="meta-popover-author">Varak (IBG) • Stott • Haddon Robinson</div>
-                  <div class="meta-popover-body">La vérité théologique reformulée pour votre église en une phrase active, mémorisable et percutante.</div>
-                  <div class="meta-popover-tip">Règle de Stott : Un sermon ne doit avoir qu'une seule pensée maîtresse. Tout le reste s'y rattache.</div>
+                  <div class="meta-popover-title">Pensée Maîtresse du Sermon (La Grande Idée)</div>
+                  <div class="meta-popover-author">Florent Varak (IBG) • John Stott • Haddon Robinson</div>
+                  <div class="meta-popover-body">La proposition centrale active et percutante que chaque membre de l'assemblée doit retenir et emporter chez lui.</div>
+                  <div class="meta-popover-tip">Règle d'or : Une seule phrase mémorisable et orientée vers l'action.</div>
                 </div>
               </span>
             </label>
-            <textarea id="drawer-meta-pms" class="sermon-drawer-input sermon-drawer-textarea" placeholder="La vérité maîtresse en 1 phrase pour votre église aujourd'hui...">${this.escapeHtml(pms)}</textarea>
+            <textarea id="sermon-meta-pms" class="sermon-drawer-input sermon-drawer-textarea" placeholder="En une phrase : quelle vérité active prêchez-vous à votre assemblée ?">${this.escapeHtml(pms)}</textarea>
           </div>
 
-          <!-- 6. Objectif spirituel pour l'auditeur -->
+          <!-- 6. Objectif -->
           <div class="sermon-drawer-meta-field">
             <label class="sermon-drawer-meta-label">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-              <span>Objectif pour l'auditeur</span>
-              <span class="sermon-meta-tooltip-trigger">
+              <span>Objectif pour l'Auditeur (Transformation)</span>
+              <span class="sermon-meta-tooltip-trigger" title="Détails homilétiques">
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                 <div class="sermon-meta-popover">
-                  <div class="meta-popover-title">Transformation Spirituelle Attendue</div>
+                  <div class="meta-popover-title">Objectif Spirituel & Pastoral</div>
                   <div class="meta-popover-author">Alfred Kuen • John Stott</div>
-                  <div class="meta-popover-body">Quel changement ou quelle réponse le Saint-Esprit est-il appelé à produire chez l'auditeur (foi, repentance, adoration, réconfort, action concrète) ?</div>
-                  <div class="meta-popover-tip">Règle d'or : Prêcher pour changer des vies par la grâce, et non pour simplement transmettre de l'information.</div>
+                  <div class="meta-popover-body">La transformation de cœur, de pensée ou de comportement attendue par l'Esprit (foi, repentance, consolation, sainteté).</div>
+                  <div class="meta-popover-tip">Règle d'or : Que doivent croire, ressentir ou faire les auditeurs après ce message ?</div>
                 </div>
               </span>
             </label>
-            <textarea id="drawer-meta-goal" class="sermon-drawer-input sermon-drawer-textarea" placeholder="La réponse attendue : foi, repentance, louange, réconfort, action...">${this.escapeHtml(goal)}</textarea>
+            <textarea id="sermon-meta-goal" class="sermon-drawer-input sermon-drawer-textarea" placeholder="Que doit faire, croire ou ressentir l'assemblée suite à ce message ?">${this.escapeHtml(goal)}</textarea>
           </div>
 
-          <!-- 7. Organisation & Planning -->
+          <!-- 7. Organisation -->
           <div class="sermon-drawer-meta-field">
-            <label class="sermon-drawer-meta-label">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-              <span>Église / Assemblée / Lieu</span>
-            </label>
-            <input type="text" id="drawer-meta-church" class="sermon-drawer-input" value="${this.escapeHtml(currentChurch)}" placeholder="ex: AMD ou Église de Lyon">
+            <label class="sermon-drawer-meta-label"><span>Lieu / Église</span></label>
+            <input type="text" id="sermon-meta-church" class="sermon-drawer-input" value="${this.escapeHtml(currentChurch)}" placeholder="ex: Église Évangélique de Lyon">
           </div>
 
-          <div class="sermon-drawer-meta-field">
-            <label class="sermon-drawer-meta-label">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              <span>Date de prononciation</span>
-            </label>
-            <input type="date" id="drawer-meta-date" class="sermon-drawer-input" value="${this.escapeHtml(date)}">
-          </div>
-
-          <div class="sermon-drawer-meta-field">
-            <label class="sermon-drawer-meta-label">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-              <span>Série de prédications</span>
-            </label>
-            <input type="text" id="drawer-meta-series" class="sermon-drawer-input" value="${this.escapeHtml(series)}" placeholder="ex: Traversée d'Amos">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div class="sermon-drawer-meta-field">
+              <label class="sermon-drawer-meta-label"><span>Date prévue</span></label>
+              <input type="date" id="sermon-meta-date" class="sermon-drawer-input" value="${this.escapeHtml(date)}">
+            </div>
+            <div class="sermon-drawer-meta-field">
+              <label class="sermon-drawer-meta-label"><span>Série</span></label>
+              <input type="text" id="sermon-meta-series" class="sermon-drawer-input" value="${this.escapeHtml(series)}" placeholder="ex: Romains">
+            </div>
           </div>
         </div>
       `;
 
-      const refIn = document.getElementById('drawer-meta-ref');
-      const eraIn = document.getElementById('drawer-meta-era');
-      const pmtIn = document.getElementById('drawer-meta-pmt');
-      const tensionIn = document.getElementById('drawer-meta-tension');
-      const pmsIn = document.getElementById('drawer-meta-pms');
-      const goalIn = document.getElementById('drawer-meta-goal');
-      const churchIn = document.getElementById('drawer-meta-church');
-      const dateIn = document.getElementById('drawer-meta-date');
-      const seriesIn = document.getElementById('drawer-meta-series');
-
-      const updateSermonMeta = () => {
-        if (!this.currentSermon) return;
-        this.currentSermon.passage = { reference: refIn?.value.trim() || '' };
-        this.currentSermon.redemptive_era = eraIn?.value || 'christ';
-        this.currentSermon.pmt = pmtIn?.value.trim() || '';
-        this.currentSermon.big_idea = this.currentSermon.pmt;
-        this.currentSermon.contemporary_tension = tensionIn?.value.trim() || '';
-        this.currentSermon.pms = pmsIn?.value.trim() || '';
-        this.currentSermon.goal = goalIn?.value.trim() || '';
-        this.currentSermon.church = churchIn?.value.trim() || '';
-        this.currentSermon.date_planned = dateIn?.value || '';
-        this.currentSermon.series = { title: seriesIn?.value.trim() || '' };
-        this.updateHeaderSummary(this.currentSermon);
-        this.renderList();
-        this.debouncedPushHistory();
+      // Sauvegarde des métadonnées
+      const bindMetaInput = (id, field) => {
+        const el = document.getElementById(id);
+        el?.addEventListener('input', () => {
+          if (!this.currentSermon) return;
+          if (field === 'passage') {
+            this.currentSermon.passage = { ...(this.currentSermon.passage || {}), reference: el.value.trim() };
+          } else if (field === 'series') {
+            this.currentSermon.series = { ...(this.currentSermon.series || {}), title: el.value.trim() };
+          } else {
+            this.currentSermon[field] = el.value.trim();
+          }
+          this.updateHeaderSummary(this.currentSermon);
+          this.debouncedAutoSave();
+        });
       };
 
-      [refIn, eraIn, pmtIn, tensionIn, pmsIn, goalIn, churchIn, dateIn, seriesIn].forEach(el => {
-        el?.addEventListener('input', updateSermonMeta);
-        el?.addEventListener('change', updateSermonMeta);
-      });
+      bindMetaInput('sermon-meta-passage', 'passage');
+      bindMetaInput('sermon-meta-era', 'redemptive_era');
+      bindMetaInput('sermon-meta-pmt', 'pmt');
+      bindMetaInput('sermon-meta-tension', 'contemporary_tension');
+      bindMetaInput('sermon-meta-pms', 'pms');
+      bindMetaInput('sermon-meta-goal', 'goal');
+      bindMetaInput('sermon-meta-church', 'church');
+      bindMetaInput('sermon-meta-date', 'date_planned');
+      bindMetaInput('sermon-meta-series', 'series');
 
-      document.getElementById('btn-drawer-sync-bible')?.addEventListener('click', () => {
-        this.syncPassageResources();
-      });
       return;
     }
 
     if (this.activeDrawerTab === 'overview') {
       this.drawerContent.innerHTML = `
-        <div class="overview-panel-header" style="margin-bottom: 12px;">
-          <div class="overview-header-top-row" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-            <div class="overview-passage-info">
-              <div class="overview-ref-badge-wrap" style="display: flex; align-items: center; gap: 6px;">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-orange, #f59e0b);"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-                <span style="font-size: 15px; font-weight: 800; color: var(--text-primary);">${this.escapeHtml(passageRef || 'Passage non lié')}</span>
-              </div>
-              <div style="font-size: 11.5px; color: var(--text-muted); font-style: italic; margin-top: 2px;">
-                ${passageRef ? "Étude contextuelle et ressources bibliques liées" : "Définissez un passage dans l'onglet Infos pour synchroniser"}
-              </div>
-            </div>
-            <span class="sermon-badge-pill" style="background: rgba(37,99,235,0.15); color: var(--accent-blue); font-weight: 700;">Lié</span>
-          </div>
-
-          <div class="overview-counters-strip" style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">
-            <span class="sermon-stat-pill" style="font-size: 11px; padding: 2px 8px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 4px; display: flex; align-items: center; gap: 4px;">
-              <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-              <span>Vidéo 1</span>
-            </span>
-            <span class="sermon-stat-pill" style="font-size: 11px; padding: 2px 8px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 4px; display: flex; align-items: center; gap: 4px;">
-              <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-              <span>Commentaires 14</span>
-            </span>
-            <span class="sermon-stat-pill" style="font-size: 11px; padding: 2px 8px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 4px; display: flex; align-items: center; gap: 4px;">
-              <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/></svg>
-              <span>Lexique 6</span>
-            </span>
-          </div>
-        </div>
-
-        <!-- 1. Carte BibleProject -->
-        <div class="sermon-resource-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px;">
-          <div class="sermon-resource-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <span style="font-size: 12px; font-weight: 700; color: #a855f7; display: flex; align-items: center; gap: 6px;">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-              <span>BibleProject (Panorama & Vidéo)</span>
-            </span>
-            <span class="sermon-badge-pill" style="background: rgba(168,85,247,0.15); color: #c084fc;">7:44 min</span>
-          </div>
-          <div style="font-size: 12px; color: var(--text-primary); font-weight: 600; margin-bottom: 6px;">
-            Panorama narratif et structure théologique du livre
-          </div>
-          <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.45; margin-bottom: 10px;">
-            Visualisez le contexte historique, les thèmes principaux et la portée prophétique pour nourrir votre introduction.
-          </div>
-          <button class="btn-secondary btn-resource-insert" id="btn-insert-bp-note" style="width: 100%; justify-content: center;">
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-            <span>Insérer repère vidéo dans le sermon</span>
-          </button>
-        </div>
-
-        <!-- 2. Carte Commentaires clés -->
-        <div class="sermon-resource-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px;">
-          <div class="sermon-resource-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <span style="font-size: 12px; font-weight: 700; color: var(--accent-blue); display: flex; align-items: center; gap: 6px;">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-              <span>Frédéric Godet (Commentaire)</span>
-            </span>
-            <span class="sermon-badge-pill" style="background: rgba(37,99,235,0.1); color: var(--accent-blue);">Exégèse</span>
-          </div>
-          <div style="font-size: 12px; color: var(--text-primary); font-style: italic; line-height: 1.45; margin-bottom: 10px;">
-            « L'apôtre montre que la fidélité de Dieu n'est pas un concept abstrait, mais une réalité qui s'incarne dans les relations quotidiennes. »
-          </div>
-          <button class="btn-secondary btn-resource-insert" onclick="SermonsView.insertCommentarySnippet('Frédéric Godet', 'L\'apôtre montre que la fidélité de Dieu n\'est pas un concept abstrait, mais une réalité qui s\'incarne dans les relations quotidiennes.')" style="width: 100%; justify-content: center;">
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-            <span>Insérer citation Godet</span>
-          </button>
-        </div>
-
-        <!-- 3. Carte Lexique & Mots originaux -->
-        <div class="sermon-resource-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px;">
-          <div class="sermon-resource-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <span style="font-size: 12px; font-weight: 700; color: #10b981; display: flex; align-items: center; gap: 6px;">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
-              <span>Terme clé : Arrhabon (G728)</span>
-            </span>
-            <span class="sermon-badge-pill" style="background: rgba(16,185,129,0.15); color: #10b981;">Grec</span>
-          </div>
-          <div style="font-size: 12px; color: var(--text-primary); margin-bottom: 6px;">
-            <strong>ἀρραβών (arrhabōn)</strong> : Gage, acompte légal, première tranche d'un paiement garantissant le solde futur.
-          </div>
-          <button class="btn-secondary btn-resource-insert" onclick="SermonsView.insertExegesisSnippet('Arrhabon (G728)', 'Gage / Acompte de l\'Esprit garantissant notre héritage éternel.')" style="width: 100%; justify-content: center;">
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-            <span>Insérer note lexicale</span>
-          </button>
+        <div style="padding: 12px 6px;">
+          <h4 style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">Aperçu du Passage</h4>
+          <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5;">Texte actif : <strong>${this.escapeHtml(passageRef || 'Non défini')}</strong></p>
         </div>
       `;
-
-      document.getElementById('btn-insert-bp-note')?.addEventListener('click', () => {
-        this.insertBlock('cue');
-      });
       return;
     }
 
     if (this.activeDrawerTab === 'commentaries') {
       this.drawerContent.innerHTML = `
-        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">
-          Commentaires pour ${this.escapeHtml(passageRef || 'le passage')}
-        </div>
-        <div class="sermon-resource-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px;">
-          <div class="sermon-resource-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span style="font-weight: 700; color: var(--accent-blue); font-size: 12px;">Frédéric Godet</span>
-            <span class="sermon-badge-pill" style="background: rgba(37,99,235,0.1); color: var(--accent-blue); font-size: 10px;">Exégèse</span>
-          </div>
-          <div class="sermon-resource-body" style="font-size: 12px; color: var(--text-primary); line-height: 1.45; margin-bottom: 8px;">
-            « La certitude chrétienne ne repose pas sur les dispositions changeantes de l'homme, mais sur l'immuable conseil de la grâce divine manifestée en Jésus-Christ. »
-          </div>
-          <button class="btn-secondary btn-resource-insert" onclick="SermonsView.insertCommentarySnippet('Frédéric Godet', 'La certitude chrétienne ne repose pas sur les dispositions changeantes de l\\'homme, mais sur l\\'immuable conseil de la grâce divine.')" style="width: 100%; justify-content: center;">
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-            <span>Insérer citation</span>
-          </button>
-        </div>
-
-        <div class="sermon-resource-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px;">
-          <div class="sermon-resource-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span style="font-weight: 700; color: var(--accent-blue); font-size: 12px;">Matthew Henry</span>
-            <span class="sermon-badge-pill" style="background: rgba(37,99,235,0.1); color: var(--accent-blue); font-size: 10px;">Pastorale</span>
-          </div>
-          <div class="sermon-resource-body" style="font-size: 12px; color: var(--text-primary); line-height: 1.45; margin-bottom: 8px;">
-            « Toutes les promesses de Dieu sont oui et amen en Christ ; elles sont confirmées et scellées par son sang, et accomplies par son Esprit. »
-          </div>
-          <button class="btn-secondary btn-resource-insert" onclick="SermonsView.insertCommentarySnippet('Matthew Henry', 'Toutes les promesses de Dieu sont oui et amen en Christ ; elles sont confirmées et scellées par son sang.')" style="width: 100%; justify-content: center;">
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-            <span>Insérer citation</span>
-          </button>
+        <div style="padding: 12px 6px;">
+          <h4 style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">Commentaires Exégétiques</h4>
+          <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5;">Consultez les commentaires sur ${this.escapeHtml(passageRef || 'le passage')} depuis la bibliothèque.</p>
         </div>
       `;
       return;
@@ -1326,132 +1395,91 @@ const SermonsView = {
 
     if (this.activeDrawerTab === 'ai') {
       this.drawerContent.innerHTML = `
-        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">
-          Assistant Homilétique & Exégétique
-        </div>
-        <div class="sermon-resource-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px;">
-          <div style="font-size: 12px; font-weight: 700; color: var(--accent-blue); margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
-            <span>Outils Méthodologiques (Stott, Helm, Kuen)</span>
-          </div>
-          <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 8px;">
-            <button class="btn-secondary btn-sm" onclick="SermonsView.insertHomileticOutline('inductif')" style="justify-content: flex-start; text-align: left; padding: 8px 10px; display: flex; align-items: center; gap: 8px;">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="color: #3b82f6; flex-shrink: 0;"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
-              <span>Insérer structure du Pont (John Stott)</span>
-            </button>
-            <button class="btn-secondary btn-sm" onclick="SermonsView.insertHomileticOutline('synthetique')" style="justify-content: flex-start; text-align: left; padding: 8px 10px; display: flex; align-items: center; gap: 8px;">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="color: #8b5cf6; flex-shrink: 0;"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-              <span>Insérer plan en 3 axes (Alfred Kuen)</span>
-            </button>
-            <button class="btn-secondary btn-sm" onclick="SermonsView.insertHomileticOutline('application-grille')" style="justify-content: flex-start; text-align: left; padding: 8px 10px; display: flex; align-items: center; gap: 8px;">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="color: #10b981; flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-              <span>Grille d'applications par profils (David Helm)</span>
-            </button>
-            <button class="btn-secondary btn-sm" onclick="SermonsView.insertBlock('illustration')" style="justify-content: flex-start; text-align: left; padding: 8px 10px; display: flex; align-items: center; gap: 8px;">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="color: #f59e0b; flex-shrink: 0;"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
-              <span>Idées d'illustrations & métaphores</span>
-            </button>
-            <button class="btn-secondary btn-sm" onclick="SermonsView.insertBlock('exegesis')" style="justify-content: flex-start; text-align: left; padding: 8px 10px; display: flex; align-items: center; gap: 8px;">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="color: #6366f1; flex-shrink: 0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <span>Mots-clés et contexte historique</span>
-            </button>
-          </div>
-        </div>
-      `;
-      return;
-    }
-
-    if (this.activeDrawerTab === 'lexicon') {
-      this.drawerContent.innerHTML = `
-        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">
-          Lexique & Termes originaux Strong
-        </div>
-        <div class="sermon-resource-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px;">
-          <div class="sermon-resource-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span style="font-size: 13px; font-weight: 800; color: var(--accent-blue);">G728 • arrhabōn (ἀρραβών)</span>
-            <span class="sermon-badge-pill" style="background: rgba(37,99,235,0.1); color: var(--accent-blue);">Nom masc.</span>
-          </div>
-          <div style="font-size: 12px; color: var(--text-primary); line-height: 1.45; margin-bottom: 8px;">
-            <strong>Définition :</strong> Acompte, gage versé d'avance pour valider un contrat d'achat et garantissant la pleine possession ultérieure.
-          </div>
-          <button class="btn-secondary btn-resource-insert" onclick="SermonsView.insertExegesisSnippet('arrhabōn (G728)', 'Acompte et gage de l\'Esprit')" style="width: 100%; justify-content: center;">
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-            <span>Insérer note lexicale</span>
+        <div style="padding: 8px 4px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="font-size: 12px; font-weight: 700; color: var(--text-primary);">Structures & Plans Homilétiques</div>
+          <button class="btn-secondary" id="btn-ai-bridge-plan" style="text-align: left; padding: 8px 10px; font-size: 11.5px; display: flex; align-items: center; gap: 8px;">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="color: #3b82f6;"><path d="M4 19V9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10"/><path d="M4 15h16"/><path d="M10 7v12"/><path d="M14 7v12"/></svg>
+            <span>Insérer la structure du Pont (John Stott)</span>
+          </button>
+          <button class="btn-secondary" id="btn-ai-synthetique-plan" style="text-align: left; padding: 8px 10px; font-size: 11.5px; display: flex; align-items: center; gap: 8px;">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg>
+            <span>Insérer un Plan Synthétique (Alfred Kuen)</span>
+          </button>
+          <button class="btn-secondary" id="btn-ai-helm-grid" style="text-align: left; padding: 8px 10px; font-size: 11.5px; display: flex; align-items: center; gap: 8px;">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            <span>Insérer la Grille d'Application (David Helm)</span>
           </button>
         </div>
       `;
+
+      document.getElementById('btn-ai-bridge-plan')?.addEventListener('click', () => this.insertHomileticOutline('inductif'));
+      document.getElementById('btn-ai-synthetique-plan')?.addEventListener('click', () => this.insertHomileticOutline('synthetique'));
+      document.getElementById('btn-ai-helm-grid')?.addEventListener('click', () => this.insertHomileticOutline('application-grille'));
       return;
     }
 
     if (this.activeDrawerTab === 'illustrations') {
-      if (this.illustrations.length === 0) {
-        this.drawerContent.innerHTML = `<div style="color: var(--text-muted); font-size: 12px; text-align: center; padding: 20px;">Aucune illustration dans le réservoir.</div>`;
-        return;
-      }
-
-      this.drawerContent.innerHTML = this.illustrations.map(ill => {
-        const usedInChurch = (ill.usage_history || []).find(h => h.church && currentChurch && h.church.toLowerCase() === currentChurch.toLowerCase());
-        const badgeWarning = usedInChurch ? `
-          <div style="font-size: 10.5px; color: #f59e0b; font-weight: 700; display: flex; align-items: center; gap: 4px; margin-top: 4px;">
-            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <span>Déjà utilisée à ${this.escapeHtml(usedInChurch.church)} (${usedInChurch.date})</span>
+      this.drawerContent.innerHTML = `
+        <div style="padding: 8px 4px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 12px; font-weight: 700; color: var(--text-primary);">Illustrations Pastorales</span>
+            <button class="btn-link" id="btn-drawer-go-illustrations" style="font-size: 11px; color: var(--accent-blue);">Ouvrir la banque ↗</button>
           </div>
-        ` : '';
+          <p style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.45;">Accédez aux 1 500 fiches d'illustrations et insérez-les d'un clic dans la section active.</p>
+        </div>
+      `;
 
-        return `
-          <div class="sermon-resource-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px;">
-            <div class="sermon-resource-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-              <span class="sermon-resource-title" style="font-weight: 700; font-size: 12.5px; color: var(--text-primary);">${this.escapeHtml(ill.title)}</span>
-              <span class="sermon-badge-pill" style="background: rgba(245,158,11,0.15); color: #f59e0b; font-size: 10px;">${this.escapeHtml(ill.category || 'Général')}</span>
-            </div>
-            <div class="sermon-resource-body" style="font-size: 11.5px; color: var(--text-muted); line-height: 1.45; margin-bottom: 8px;">
-              ${this.escapeHtml(ill.body ? ill.body.slice(0, 140) + '...' : '')}
-            </div>
-            ${badgeWarning}
-            <button class="btn-secondary btn-resource-insert" onclick="SermonsView.insertIllustrationSnippet('${ill.id}', '${this.escapeHtml(ill.title)}')" style="width: 100%; justify-content: center; margin-top: 6px;">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-              <span>Insérer dans la prédication</span>
-            </button>
-          </div>
-        `;
-      }).join('');
+      document.getElementById('btn-drawer-go-illustrations')?.addEventListener('click', () => {
+        if (typeof App !== 'undefined' && App.switchView) {
+          App.switchView('illustrations');
+        }
+      });
       return;
     }
+
+    this.drawerContent.innerHTML = `
+      <div style="padding: 12px 6px; font-size: 12px; color: var(--text-muted);">
+        Contenu de l'onglet en cours de chargement...
+      </div>
+    `;
   },
 
-  insertCommentarySnippet(author, text) {
-    if (!this.contentEditor) return;
-    this.contentEditor.focus();
-    const html = `
-      <div class="sermon-callout-block sermon-block-exegesis" data-type="exegesis">
-        <div class="sermon-block-header">
-          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          <span>Commentaire (${author})</span>
-        </div>
-        <p>« ${this.escapeHtml(text)} »</p>
-      </div><p></p>
-    `;
-    document.execCommand('insertHTML', false, html);
-    this.updateMetrics();
-  },
+  insertHomileticOutline(type) {
+    const passage = this.currentSermon?.passage?.reference || 'Passage';
 
-  insertIllustrationSnippet(illId, title) {
-    const ill = this.illustrations.find(i => i.id === illId);
-    if (!ill) return;
+    if (type === 'synthetique') {
+      this.sections = [
+        { id: `sec_${Date.now()}_1`, type: 'intro', title: 'Introduction', contentHtml: '<p><strong>Accroche :</strong> Captez l\'attention dès les premières secondes...<br><strong>Tension :</strong> Quel combat existentiel ce texte éclaire-t-il ?<br><strong>Vérité Maîtresse :</strong> La proposition centrale du sermon en 1 phrase.</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 },
+        { id: `sec_${Date.now()}_2`, type: 'scripture', title: `Lecture du Passage (${passage})`, contentHtml: '<p>« Insérez les versets ici... »</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 },
+        { id: `sec_${Date.now()}_3`, type: 'point', title: 'I. Premier Axe : La Révélation du Texte', contentHtml: '<p>Explication du passage et des mots-clés originaux...</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 },
+        { id: `sec_${Date.now()}_4`, type: 'point', title: 'II. Deuxième Axe : L\'Exigence et le Diagnostic', contentHtml: '<p>Développement spirituel et résonance pour notre condition...</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 },
+        { id: `sec_${Date.now()}_5`, type: 'point', title: 'III. Troisième Axe : L\'Accomplissement en Christ', contentHtml: '<p>Comment la grâce de Jésus-Christ répond à ce que la Loi révèle...</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 },
+        { id: `sec_${Date.now()}_6`, type: 'conclusion', title: 'Conclusion & Appel', contentHtml: '<p><strong>Synthèse :</strong> Récapitulatif clair.<br><strong>Défi pratique :</strong> Comment appliquer cette vérité dès cette semaine ?</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 }
+      ];
+    } else if (type === 'inductif') {
+      this.sections = [
+        { id: `sec_${Date.now()}_1`, type: 'intro', title: '1. La Tension Contemporaine (Rive 2)', contentHtml: '<p>Le dilemme humain, la soif ou l\'épreuve universelle vécue aujourd\'hui...</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 },
+        { id: `sec_${Date.now()}_2`, type: 'scripture', title: `2. L\'Écoute de la Parole (${passage})`, contentHtml: '<p>Ce que Dieu déclare dans son texte pour bousculer nos schémas...</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 },
+        { id: `sec_${Date.now()}_3`, type: 'point', title: '3. La Résolution par la Grâce (Le Pont en Christ)', contentHtml: '<p>Comment la personne et l\'œuvre du Christ bâtissent le pont de la rédemption...</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 },
+        { id: `sec_${Date.now()}_4`, type: 'conclusion', title: '4. La Marche par la Foi (L\'Application)', contentHtml: '<p>Décision personnelle, repentance et impact concret dans nos relations quotidiennes...</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 }
+      ];
+    } else if (type === 'application-grille') {
+      this.addSection('conclusion', 'Grille d\'Applications Différenciées (David Helm)', `
+        <p><strong>1. Sceptiques & Non-croyants :</strong> Quelle vérité de l\'Évangile interpelle leurs présupposés ?</p>
+        <p><strong>2. Croyants éprouvés & souffrants :</strong> Quelle promesse et consolation solide ce texte offre-t-il ?</p>
+        <p><strong>3. Croyants établis (danger de tiédeur) :</strong> Quel avertissement ou appel à la sainteté est proclamé ?</p>
+        <p><strong>4. Vie publique & familiale :</strong> Quelle répercussion éthique (foyer, travail, société) en découle ?</p>
+      `);
+      return;
+    }
 
-    if (!this.contentEditor) return;
-    this.contentEditor.focus();
-    const html = `
-      <div class="sermon-callout-block sermon-block-illustration" data-type="illustration" data-id="${ill.id}">
-        <div class="sermon-block-header">
-          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
-          <span>Illustration : ${this.escapeHtml(title)}</span>
-        </div>
-        <p>${this.escapeHtml(ill.body || '')}</p>
-      </div><p></p>
-    `;
-    document.execCommand('insertHTML', false, html);
+    this.renderSections();
+    this.renderOutline();
     this.updateMetrics();
+    this.debouncedAutoSave();
+    if (typeof App !== 'undefined' && App.showToast) {
+      App.showToast("Structure homilétique appliquée en blocs !");
+    }
   },
 
   // =========================================================================
@@ -1463,12 +1491,33 @@ const SermonsView = {
     const container = document.getElementById('pulpit-content-container');
     if (!pulpitModal || !container) return;
 
-    // Génération de la vue haute lisibilité
-    const rawHtml = this.contentEditor?.innerHTML || '';
-    container.innerHTML = this.buildPulpitViewHtml(rawHtml);
+    const sectionsHtml = this.sections.map((sec, idx) => {
+      let temp = document.createElement('div');
+      temp.innerHTML = sec.contentHtml || '';
+
+      temp.querySelectorAll('.sermon-slide-badge').forEach(b => {
+        let slideTag = document.createElement('span');
+        slideTag.className = 'pulpit-slide-tag';
+        slideTag.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> <span>DIAPO</span>`;
+        b.replaceWith(slideTag);
+      });
+
+      return `
+        <div class="pulpit-section-card" id="pulpit-sec-${idx}">
+          <div class="pulpit-section-title-row">
+            <input type="checkbox" class="pulpit-point-check" title="Marquer cette section comme terminée">
+            <div class="pulpit-point-heading">${this.escapeHtml(sec.title)}</div>
+          </div>
+          <div class="pulpit-section-body">
+            ${temp.innerHTML}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    container.innerHTML = sectionsHtml;
     container.style.fontSize = `${this.pulpitFontSize}px`;
 
-    // Écoute des cases à cocher de validation de points
     container.querySelectorAll('.pulpit-point-check').forEach(chk => {
       chk.addEventListener('change', (e) => {
         const card = e.target.closest('.pulpit-section-card');
@@ -1479,57 +1528,7 @@ const SermonsView = {
     });
 
     pulpitModal.classList.remove('hidden');
-
-    // Demande de maintien d'écran actif (No-sleep)
     this.requestWakeLock();
-  },
-
-  buildPulpitViewHtml(html) {
-    let temp = document.createElement('div');
-    temp.innerHTML = html;
-
-    // Convertir les repères de diapositive en badges prompteur percutants
-    temp.querySelectorAll('.sermon-slide-badge').forEach(b => {
-      let slideTag = document.createElement('span');
-      slideTag.className = 'pulpit-slide-tag';
-      slideTag.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> <span>DIAPO</span>`;
-      b.replaceWith(slideTag);
-    });
-
-    // Découpage en cartes de sections selon les H1, H2 et H3
-    let sections = [];
-    let currentCard = { title: "Introduction", nodes: [] };
-
-    Array.from(temp.childNodes).forEach(node => {
-      if (node.tagName === 'H1' || node.tagName === 'H2' || node.tagName === 'H3') {
-        if (currentCard.nodes.length > 0) {
-          sections.push(currentCard);
-        }
-        currentCard = { title: node.innerText.trim(), nodes: [] };
-      } else {
-        currentCard.nodes.push(node.cloneNode(true));
-      }
-    });
-    if (currentCard.nodes.length > 0) {
-      sections.push(currentCard);
-    }
-
-    return sections.map((sec, idx) => {
-      let contentWrap = document.createElement('div');
-      sec.nodes.forEach(n => contentWrap.appendChild(n));
-
-      return `
-        <div class="pulpit-section-card" id="pulpit-sec-${idx}">
-          <div class="pulpit-section-title-row">
-            <input type="checkbox" class="pulpit-point-check" title="Marquer cette section comme terminée">
-            <div class="pulpit-point-heading">${this.escapeHtml(sec.title)}</div>
-          </div>
-          <div class="pulpit-section-body">
-            ${contentWrap.innerHTML}
-          </div>
-        </div>
-      `;
-    }).join('');
   },
 
   closePulpitMode() {
@@ -1540,11 +1539,8 @@ const SermonsView = {
   },
 
   togglePulpitChrono() {
-    if (this.pulpitIsPlaying) {
-      this.pausePulpitChrono();
-    } else {
-      this.startPulpitChrono();
-    }
+    if (this.pulpitIsPlaying) this.pausePulpitChrono();
+    else this.startPulpitChrono();
   },
 
   startPulpitChrono() {
@@ -1575,16 +1571,14 @@ const SermonsView = {
     const m = Math.floor(this.pulpitChronoSeconds / 60);
     const s = this.pulpitChronoSeconds % 60;
     const str = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-    const el = document.getElementById('pulpit-chrono-time');
+    const el = document.getElementById('pulpit-chrono-display');
     if (el) el.textContent = str;
   },
 
   changePulpitFontSize(delta) {
-    this.pulpitFontSize = Math.max(16, Math.min(36, this.pulpitFontSize + delta));
+    this.pulpitFontSize = Math.max(16, Math.min(38, this.pulpitFontSize + delta));
     const container = document.getElementById('pulpit-content-container');
-    if (container) {
-      container.style.fontSize = `${this.pulpitFontSize}px`;
-    }
+    if (container) container.style.fontSize = `${this.pulpitFontSize}px`;
   },
 
   toggleFullscreen() {
@@ -1600,9 +1594,7 @@ const SermonsView = {
       if ('wakeLock' in navigator) {
         this.pulpitWakeLock = await navigator.wakeLock.request('screen');
       }
-    } catch (e) {
-      console.warn("WakeLock non supporté ou refusé :", e);
-    }
+    } catch (e) {}
   },
 
   releaseWakeLock() {
@@ -1622,23 +1614,10 @@ const SermonsView = {
     this.pushHistoryState();
   },
 
-  debouncedPushHistory() {
-    if (this.historyDebounceTimer) clearTimeout(this.historyDebounceTimer);
-    this.historyDebounceTimer = setTimeout(() => {
-      this.pushHistoryState();
-    }, 400);
-  },
-
   pushHistoryState() {
     const state = {
       title: this.titleInput?.value || '',
-      church: this.churchInput?.value || '',
-      ref: this.refInput?.value || '',
-      date: this.dateInput?.value || '',
-      series: this.seriesInput?.value || '',
-      bigIdea: this.bigIdeaInput?.value || '',
-      goal: this.goalInput?.value || '',
-      content: this.contentEditor?.innerHTML || ''
+      sections: JSON.parse(JSON.stringify(this.sections))
     };
 
     if (this.historyIndex < this.history.length - 1) {
@@ -1669,18 +1648,14 @@ const SermonsView = {
   restoreHistoryState(state) {
     if (!state) return;
     if (this.titleInput) this.titleInput.value = state.title;
-    if (this.churchInput) this.churchInput.value = state.church;
-    if (this.refInput) this.refInput.value = state.ref;
-    if (this.dateInput) this.dateInput.value = state.date;
-    if (this.seriesInput) this.seriesInput.value = state.series;
-    if (this.bigIdeaInput) this.bigIdeaInput.value = state.bigIdea;
-    if (this.goalInput) this.goalInput.value = state.goal;
-    if (this.contentEditor) this.contentEditor.innerHTML = state.content;
+    this.sections = JSON.parse(JSON.stringify(state.sections || []));
+    this.renderSections();
+    this.renderOutline();
     this.updateMetrics();
   },
 
   // =========================================================================
-  // GESTION DU MENU SLASH MODAL (STYLE ANYTYPE)
+  // GESTION DU MENU SLASH MODAL
   // =========================================================================
 
   isSlashMenuOpen: false,
@@ -1695,47 +1670,26 @@ const SermonsView = {
         category: "Texte",
         items: [
           { id: "text", label: "Texte normal", iconText: "Aa", desc: "Paragraphe standard", action: "text" },
-          { id: "h1", label: "Titre", iconText: "Aa", desc: "Point principal (H1)", action: "h1" },
-          { id: "h2", label: "En-tête", iconText: "Aa", desc: "Sous-point (H2)", action: "h2" },
-          { id: "h3", label: "Sous-titre", iconText: "Aa", desc: "Sous-section mineure (H3)", action: "h3" },
-          { id: "highlight", label: "Surbrillance", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 11-6 6v3h3l6-6"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>`, desc: "Mettre en évidence le texte", action: "highlight" },
-          { id: "box", label: "Encadré", iconText: "Aa", desc: "Bloc encadré général", action: "box" }
+          { id: "h1", label: "Titre", iconText: "Aa", desc: "Titre principal H1", action: "h1" },
+          { id: "h2", label: "Sous-titre", iconText: "Aa", desc: "Sous-titre H2", action: "h2" },
+          { id: "h3", label: "En-tête H3", iconText: "Aa", desc: "Sous-section H3", action: "h3" }
         ]
       },
       {
         category: "Prédication",
         items: [
           { id: "scripture", label: "Verset biblique", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`, desc: "Citation de l'Écriture", action: "scripture" },
-          { id: "exegesis", label: "Exégèse & Langues", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m8.5 13.5 2-5.5 2 5.5"/><path d="M9.2 11.8h2.6"/><path d="M14 8.5h3.5l-3.5 5h3.5"/></svg>`, desc: "Mots originaux hébreu/grec et lexique", action: "exegesis" },
+          { id: "exegesis", label: "Exégèse & Langues", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m8.5 13.5 2-5.5 2 5.5"/><path d="M9.2 11.8h2.6"/><path d="M14 8.5h3.5l-3.5 5h3.5"/></svg>`, desc: "Termes originaux hébreu / grec", action: "exegesis" },
           { id: "illustration", label: "Illustration", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>`, desc: "Histoire, métaphore ou parabole", action: "illustration" },
-          { id: "application", label: "Application pratique", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`, desc: "Appel à l'action ou réflexion concrète", action: "application" },
-          { id: "cue", label: "Note régie / Timing", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`, desc: "Indication technique ou projection", action: "cue" },
+          { id: "application", label: "Application pratique", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`, desc: "Appel concret à l'action", action: "application" },
+          { id: "cue", label: "Note régie / Timing", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`, desc: "Indication technique régie", action: "cue" },
           { id: "slide", label: "Repère diapositive [_]", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`, desc: "Changement de slide projection", action: "slide" }
         ]
       },
       {
-        category: "Structures & Plans",
+        category: "Listes & Autres",
         items: [
-          { id: "plan-synthetique", label: "Plan Synthétique (3 points)", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>`, desc: "Structure en 3 axes avec transitions (Kuen / Stott)", action: "plan-synthetique" },
-          { id: "plan-inductif", label: "Plan Inductif (Le Pont)", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10"/><path d="M4 15h16"/><path d="M10 7v12"/><path d="M14 7v12"/></svg>`, desc: "Tension moderne -> Texte -> Christ -> Défi (Stott)", action: "plan-inductif" },
-          { id: "plan-expositif", label: "Plan Expositif (Texte)", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`, desc: "Découpage textuel au fil des versets (Helm / Varak)", action: "plan-expositif" },
-          { id: "application-grille", label: "Grille d'Applications (4 profils)", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`, desc: "Sceptiques, Éprouvés, Établis, Quotidien (David Helm)", action: "application-grille" }
-        ]
-      },
-      {
-        category: "Listes",
-        items: [
-          { id: "task", label: "Case à cocher", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/><circle cx="12" cy="12" r="10"/></svg>`, desc: "Tâche ou point à vérifier", action: "task" },
-          { id: "bullet", label: "Liste à puces", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>`, desc: "Liste non ordonnée", action: "bullet" },
-          { id: "number", label: "Liste numérotée", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><text x="6" y="16" font-size="12" font-weight="bold" fill="currentColor">1.</text></svg>`, desc: "Liste ordonnée 1, 2, 3...", action: "number" },
-          { id: "toggle", label: "Bloc dépliant", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>`, desc: "Contenu masquable / dépliable", action: "toggle" }
-        ]
-      },
-      {
-        category: "Autres",
-        items: [
-          { id: "divider", label: "Ligne de séparation", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/></svg>`, desc: "Séparateur visuel", action: "divider" },
-          { id: "table", label: "Tableau 3x3", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>`, desc: "Insérer une grille de comparaison", action: "table" },
+          { id: "bullet", label: "Liste à puces", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>`, desc: "Liste standard", action: "bullet" },
           { id: "quote", label: "Citation", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2H4c-1.25 0-2 .75-2 2v6c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/></svg>`, desc: "Citation en retrait", action: "quote" }
         ]
       }
@@ -1772,89 +1726,68 @@ const SermonsView = {
     this.closeSlashMenu();
   },
 
-  handleSlashKeyDown(e) {
-    if (!this.isSlashMenuOpen) return false;
-
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      if (this.slashCurrentItems.length > 0) {
-        this.slashSelectedIndex = (this.slashSelectedIndex + 1) % this.slashCurrentItems.length;
-        this.updateSlashSelection();
-      }
-      return true;
+  openSlashMenu(query = '', rect = null) {
+    if (!this.slashMenuEl) {
+      this.createSlashMenuEl();
     }
 
-    if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      if (this.slashCurrentItems.length > 0) {
-        this.slashSelectedIndex = (this.slashSelectedIndex - 1 + this.slashCurrentItems.length) % this.slashCurrentItems.length;
-        this.updateSlashSelection();
-      }
-      return true;
+    this.slashAnchorRange = window.getSelection().getRangeAt(0).cloneRange();
+    this.renderSlashMenuItems(query);
+
+    if (rect) {
+      this.slashMenuEl.style.left = `${Math.min(window.innerWidth - 300, Math.max(10, rect.left))}px`;
+      this.slashMenuEl.style.top = `${rect.bottom + window.scrollY + 6}px`;
     }
 
-    if (e.key === 'Enter' || e.key === 'Tab') {
-      e.preventDefault();
-      if (this.slashCurrentItems.length > 0 && this.slashCurrentItems[this.slashSelectedIndex]) {
-        this.executeSlashCommand(this.slashCurrentItems[this.slashSelectedIndex].action);
-      }
-      return true;
-    }
-
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      this.closeSlashMenu();
-      return true;
-    }
-
-    return false;
+    this.slashMenuEl.classList.remove('hidden');
+    this.isSlashMenuOpen = true;
   },
 
-  openSlashMenu(query = "", rect = null) {
-    if (!this.slashMenuEl) {
-      this.slashMenuEl = document.createElement('div');
-      this.slashMenuEl.id = 'sermon-slash-menu';
-      this.slashMenuEl.className = 'sermon-slash-menu';
-      document.body.appendChild(this.slashMenuEl);
-
-      document.addEventListener('click', (e) => {
-        if (this.isSlashMenuOpen && this.slashMenuEl && !this.slashMenuEl.contains(e.target) && e.target !== this.contentEditor) {
-          this.closeSlashMenu();
-        }
-      });
+  closeSlashMenu() {
+    if (this.slashMenuEl) {
+      this.slashMenuEl.classList.add('hidden');
     }
+    this.isSlashMenuOpen = false;
+  },
 
+  createSlashMenuEl() {
+    const el = document.createElement('div');
+    el.id = 'sermon-slash-menu';
+    el.className = 'sermon-slash-dropdown hidden';
+    document.body.appendChild(el);
+    this.slashMenuEl = el;
+
+    document.addEventListener('click', (e) => {
+      if (!this.slashMenuEl.contains(e.target) && !e.target.closest('.sermon-section-editor')) {
+        this.closeSlashMenu();
+      }
+    });
+  },
+
+  renderSlashMenuItems(query = '') {
+    const q = query.toLowerCase().trim();
     const categories = this.getSlashCommandsDefinitions();
-    const cleanQ = query.toLowerCase().trim();
 
     let flatItems = [];
-    let html = '<div class="sermon-slash-list">';
+    let html = '';
 
     categories.forEach(cat => {
-      const filtered = cat.items.filter(item => {
-        if (!cleanQ) return true;
-        return item.label.toLowerCase().includes(cleanQ) || item.desc.toLowerCase().includes(cleanQ) || item.id.toLowerCase().includes(cleanQ);
-      });
+      const matching = cat.items.filter(item => 
+        !q || item.label.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q)
+      );
 
-      if (filtered.length > 0) {
-        html += `<div class="sermon-slash-group-title">${cat.category}</div>`;
-        filtered.forEach(item => {
-          const itemIndex = flatItems.length;
+      if (matching.length > 0) {
+        html += `<div class="slash-category-header">${cat.category}</div>`;
+        matching.forEach(item => {
+          const currentIndex = flatItems.length;
           flatItems.push(item);
-          
-          let iconHtml = '';
-          if (item.iconSvg) {
-            iconHtml = item.iconSvg;
-          } else {
-            iconHtml = `<span style="font-family: serif; font-size: 13px;">${item.iconText || 'Aa'}</span>`;
-          }
-
+          const icon = item.iconSvg || `<span class="slash-icon-text">${item.iconText || 'Aa'}</span>`;
           html += `
-            <div class="sermon-slash-item" data-index="${itemIndex}" data-action="${item.action}">
-              <div class="sermon-slash-item-icon">${iconHtml}</div>
-              <div class="sermon-slash-item-text">
-                <span class="sermon-slash-item-label">${item.label}</span>
-                <span class="sermon-slash-item-desc">${item.desc}</span>
+            <div class="slash-item ${currentIndex === 0 ? 'active' : ''}" data-action="${item.action}" data-index="${currentIndex}">
+              <div class="slash-item-icon">${icon}</div>
+              <div class="slash-item-text">
+                <div class="slash-item-label">${this.escapeHtml(item.label)}</div>
+                <div class="slash-item-desc">${this.escapeHtml(item.desc)}</div>
               </div>
             </div>
           `;
@@ -1862,373 +1795,75 @@ const SermonsView = {
       }
     });
 
-    html += '</div>';
-
-    if (flatItems.length === 0) {
-      html = '<div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 12px;">Aucun bloc trouvé.</div>';
-    }
-
     this.slashCurrentItems = flatItems;
     this.slashSelectedIndex = 0;
-    this.slashMenuEl.innerHTML = html;
-    this.slashMenuEl.style.display = 'flex';
-    this.isSlashMenuOpen = true;
 
-    // Clic sur un item
-    this.slashMenuEl.querySelectorAll('.sermon-slash-item').forEach(el => {
-      el.addEventListener('click', (ev) => {
-        ev.stopPropagation();
-        const action = el.dataset.action;
+    if (flatItems.length === 0) {
+      html = `<div class="slash-empty">Aucune commande trouvée</div>`;
+    }
+
+    this.slashMenuEl.innerHTML = html;
+
+    this.slashMenuEl.querySelectorAll('.slash-item').forEach(itemEl => {
+      itemEl.addEventListener('click', () => {
+        const action = itemEl.dataset.action;
         this.executeSlashCommand(action);
       });
     });
+  },
 
-    this.updateSlashSelection();
+  handleSlashKeyDown(e) {
+    if (!this.isSlashMenuOpen) return false;
 
-    // Positionnement
-    if (rect) {
-      const menuWidth = 280;
-      const menuHeight = Math.min(380, this.slashMenuEl.offsetHeight || 300);
-      let posX = Math.min(rect.left, window.innerWidth - menuWidth - 20);
-      let posY = rect.bottom + 6;
-
-      if (posY + menuHeight > window.innerHeight - 10) {
-        posY = Math.max(10, rect.top - menuHeight - 6);
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      this.slashSelectedIndex = (this.slashSelectedIndex + 1) % this.slashCurrentItems.length;
+      this.updateSlashSelection();
+      return true;
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      this.slashSelectedIndex = (this.slashSelectedIndex - 1 + this.slashCurrentItems.length) % this.slashCurrentItems.length;
+      this.updateSlashSelection();
+      return true;
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (this.slashCurrentItems[this.slashSelectedIndex]) {
+        this.executeSlashCommand(this.slashCurrentItems[this.slashSelectedIndex].action);
       }
-
-      this.slashMenuEl.style.left = `${posX}px`;
-      this.slashMenuEl.style.top = `${posY}px`;
+      return true;
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      this.closeSlashMenu();
+      return true;
     }
+    return false;
   },
 
   updateSlashSelection() {
-    if (!this.slashMenuEl) return;
-    const items = this.slashMenuEl.querySelectorAll('.sermon-slash-item');
-    items.forEach((item, idx) => {
-      if (idx === this.slashSelectedIndex) {
-        item.classList.add('selected');
-        item.scrollIntoView({ block: 'nearest' });
-      } else {
-        item.classList.remove('selected');
-      }
+    this.slashMenuEl.querySelectorAll('.slash-item').forEach((item, idx) => {
+      item.classList.toggle('active', idx === this.slashSelectedIndex);
     });
   },
 
-  closeSlashMenu() {
-    if (this.slashMenuEl) {
-      this.slashMenuEl.style.display = 'none';
-    }
-    this.isSlashMenuOpen = false;
-    this.slashCurrentItems = [];
-    this.slashSelectedIndex = 0;
-  },
-
-  removeSlashTrigger() {
-    const sel = window.getSelection();
-    if (!sel.rangeCount) return;
-    const range = sel.getRangeAt(0);
-    const node = range.startContainer;
-    if (node.nodeType === Node.TEXT_NODE) {
-      const text = node.textContent;
-      const lastSlashIndex = text.lastIndexOf('/', range.startOffset);
-      if (lastSlashIndex !== -1) {
-        const beforeSlash = text.slice(0, lastSlashIndex);
-        const afterCaret = text.slice(range.startOffset);
-        node.textContent = beforeSlash + afterCaret;
-        
-        // Repositionner le curseur
-        const newRange = document.createRange();
-        newRange.setStart(node, beforeSlash.length);
-        newRange.collapse(true);
-        sel.removeAllRanges();
-        sel.addRange(newRange);
-      }
-    }
-  },
-
   executeSlashCommand(action) {
-    this.removeSlashTrigger();
     this.closeSlashMenu();
 
-    if (!this.contentEditor) return;
-    this.contentEditor.focus();
-
-    switch (action) {
-      case 'text':
-        document.execCommand('formatBlock', false, '<p>');
-        break;
-      case 'h1':
-        this.applyBlockFormat('h1');
-        break;
-      case 'h2':
-        this.applyBlockFormat('h2');
-        break;
-      case 'h3':
-        this.applyBlockFormat('h3');
-        break;
-      case 'highlight':
-        this.surroundSelectionWithTag('mark');
-        break;
-      case 'box':
-        this.insertCallout('Remarque');
-        break;
-      case 'scripture':
-        this.insertBlock('scripture');
-        break;
-      case 'exegesis':
-        this.insertBlock('exegesis');
-        break;
-      case 'illustration':
-        this.insertBlock('illustration');
-        break;
-      case 'application':
-        this.insertBlock('application');
-        break;
-      case 'cue':
-        this.insertBlock('cue');
-        break;
-      case 'slide':
-        this.insertBlock('slide');
-        break;
-      case 'plan-synthetique':
-        this.insertHomileticOutline('synthetique');
-        break;
-      case 'plan-inductif':
-        this.insertHomileticOutline('inductif');
-        break;
-      case 'plan-expositif':
-        this.insertHomileticOutline('expositif');
-        break;
-      case 'application-grille':
-        this.insertHomileticOutline('application-grille');
-        break;
-      case 'task':
-        this.insertTaskItem();
-        break;
-      case 'bullet':
-        document.execCommand('insertUnorderedList');
-        break;
-      case 'number':
-        document.execCommand('insertOrderedList');
-        break;
-      case 'toggle':
-        this.insertToggleBlock();
-        break;
-      case 'divider':
-        document.execCommand('insertHorizontalRule');
-        break;
-      case 'table':
-        this.insertTable3x3();
-        break;
-      case 'quote':
-        document.execCommand('formatBlock', false, 'blockquote');
-        break;
-      default:
-        break;
-    }
-
-    this.updateMetrics();
-    this.debouncedPushHistory();
-  },
-
-  insertHomileticOutline(type) {
-    if (!this.contentEditor) return;
-    this.contentEditor.focus();
-
-    let html = '';
-    const passage = this.currentSermon?.passage?.reference || 'Passage';
-
-    switch (type) {
-      case 'synthetique':
-        html = `
-          <h2>Introduction</h2>
-          <p><strong>Accroche :</strong> Captez l'attention de l'auditoire dès les premières secondes...</p>
-          <p><strong>Tension :</strong> Quel combat ou quelle question ce texte vient-il éclairer ?</p>
-          <p><strong>Vérité Maîtresse :</strong> La proposition centrale du sermon en 1 phrase.</p>
-          <hr>
-          <h2>I. Premier Axe : La Révélation du Texte</h2>
-          <p>Explication du passage et des mots-clés...</p>
-          <div class="sermon-callout-block sermon-block-illustration" data-type="illustration">
-            <div class="sermon-block-header">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
-              <span>Illustration</span>
-            </div>
-            <p>Image concrète ou récit éclairant ce point...</p>
-          </div>
-          <p><em>Transition vers le deuxième point...</em></p>
-          <hr>
-          <h2>II. Deuxième Axe : L'Exigence et le Cœur</h2>
-          <p>Développement de la vérité spirituelle et diagnostic de notre condition...</p>
-          <p><em>Transition vers le troisième point...</em></p>
-          <hr>
-          <h2>III. Troisième Axe : L'Accomplissement en Christ</h2>
-          <p>Comment la grâce de Jésus-Christ répond parfaitement à ce que nous ne pouvons accomplir...</p>
-          <hr>
-          <h2>Conclusion & Appel</h2>
-          <p><strong>Synthèse :</strong> Récapitulatif de la pensée maîtresse sans nouvel argument.</p>
-          <div class="sermon-callout-block sermon-block-application" data-type="application">
-            <div class="sermon-block-header">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-              <span>Appel à la Foi & Engagement</span>
-            </div>
-            <p>Défi concret pour la semaine : comment cette vérité transforme ma marche ?</p>
-          </div>
-          <p></p>
-        `;
-        break;
-
-      case 'inductif':
-        html = `
-          <h2>1. La Tension Contemporaine (Rive 2)</h2>
-          <p>Le problème humain universel, l'illusion ou la soif profonde à laquelle nous faisons face aujourd'hui...</p>
-          <h2>2. L'Écoute de la Parole (${this.escapeHtml(passage)})</h2>
-          <p>Ce que Dieu déclare dans son texte pour bousculer nos schémas de pensée...</p>
-          <h2>3. La Résolution par la Grâce (Le Pont en Christ)</h2>
-          <p>Comment la personne et l'œuvre du Christ accomplissent la rédemption...</p>
-          <h2>4. La Marche par la Foi (L'Application)</h2>
-          <div class="sermon-callout-block sermon-block-application" data-type="application">
-            <div class="sermon-block-header">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-              <span>Mise en pratique</span>
-            </div>
-            <p>Décision personnelle et impact dans nos relations quotidiennes...</p>
-          </div>
-          <p></p>
-        `;
-        break;
-
-      case 'expositif':
-        html = `
-          <h2>Introduction</h2>
-          <p>Mise en contexte littéraire et historique du livre...</p>
-          <h2>I. Première Section du Texte</h2>
-          <p>Observation et sens des premiers versets...</p>
-          <h2>II. Deuxième Section du Texte</h2>
-          <p>Progression de l'argumentation ou tournant du récit...</p>
-          <h2>III. Troisième Section & Climax</h2>
-          <p>Aboutissement théologique du passage et regard vers l'Évangile...</p>
-          <h2>Conclusion & Appel pastoral</h2>
-          <p>Synthèse de la pensée dominante pour l'église...</p>
-          <p></p>
-        `;
-        break;
-
-      case 'application-grille':
-        html = `
-          <div class="sermon-callout-block sermon-block-application" data-type="application">
-            <div class="sermon-block-header">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-              <span>Grille d'Applications Différenciées (David Helm)</span>
-            </div>
-            <p><strong>1. Pour le sceptique / non-croyant :</strong> Quelle vérité de l'Évangile l'interpelle sur ses présupposés ?</p>
-            <p><strong>2. Pour le croyant éprouvé ou souffrant :</strong> Quelle promesse et quelle consolation solide ce texte lui apporte-t-il ?</p>
-            <p><strong>3. Pour le croyant établi (danger de tiédeur) :</strong> Quel avertissement fraternel ou appel à la sainteté est proclamé ?</p>
-            <p><strong>4. Pour la vie publique et familiale :</strong> Quelle répercussion éthique (travail, foyer, société) découle de ce passage ?</p>
-          </div>
-          <p></p>
-        `;
-        break;
-    }
-
-    if (html) {
-      document.execCommand('insertHTML', false, html);
-    }
-  },
-
-  applyBlockFormat(tag) {
-    const sel = window.getSelection();
-    if (!sel.rangeCount) return;
-    const range = sel.getRangeAt(0);
-    let parent = range.commonAncestorContainer;
-    if (parent.nodeType === Node.TEXT_NODE) parent = parent.parentNode;
-
-    if (parent.closest(tag)) {
-      document.execCommand('formatBlock', false, '<p>');
-    } else {
-      document.execCommand('formatBlock', false, `<${tag}>`);
-    }
-  },
-
-  surroundSelectionWithTag(tag) {
-    const sel = window.getSelection();
-    if (!sel.rangeCount) return;
-    const range = sel.getRangeAt(0);
-    const selectedText = range.toString();
-
-    if (selectedText) {
-      const el = document.createElement(tag);
-      el.textContent = selectedText;
-      range.deleteContents();
-      range.insertNode(el);
-    } else {
-      const el = document.createElement(tag);
-      el.innerHTML = '&nbsp;';
-      range.insertNode(el);
-      range.selectNodeContents(el);
+    if (this.slashAnchorRange) {
+      const sel = window.getSelection();
       sel.removeAllRanges();
-      sel.addRange(range);
+      sel.addRange(this.slashAnchorRange);
+
+      const node = this.slashAnchorRange.startContainer;
+      if (node && node.nodeType === Node.TEXT_NODE) {
+        const text = node.textContent;
+        const lastSlash = text.lastIndexOf('/');
+        if (lastSlash !== -1) {
+          node.textContent = text.slice(0, lastSlash);
+        }
+      }
     }
-  },
 
-  insertCallout(title = 'Remarque') {
-    const html = `
-      <div class="note-callout">
-        <div class="note-callout-title">${this.escapeHtml(title)}</div>
-        <div>Votre note ou commentaire ici...</div>
-      </div>
-      <p><br></p>
-    `;
-    document.execCommand('insertHTML', false, html);
-  },
-
-  insertTaskItem() {
-    const html = `
-      <div class="note-task-item" style="display: flex; align-items: center; gap: 8px; margin: 4px 0;">
-        <input type="checkbox" style="cursor: pointer;">
-        <span>Point ou tâche à cocher</span>
-      </div>
-      <p><br></p>
-    `;
-    document.execCommand('insertHTML', false, html);
-  },
-
-  insertToggleBlock() {
-    const html = `
-      <details class="note-details" style="margin: 8px 0; padding: 6px 10px; background: rgba(0,0,0,0.03); border-radius: 6px; cursor: pointer;">
-        <summary style="font-weight: 600;">Titre dépliant</summary>
-        <div style="padding-top: 6px;">Contenu masquable du bloc...</div>
-      </details>
-      <p><br></p>
-    `;
-    document.execCommand('insertHTML', false, html);
-  },
-
-  insertTable3x3() {
-    const html = `
-      <table class="note-table" style="width: 100%; border-collapse: collapse; margin: 12px 0;">
-        <thead>
-          <tr>
-            <th style="border: 1px solid var(--border-color); padding: 6px 10px;">Colonne 1</th>
-            <th style="border: 1px solid var(--border-color); padding: 6px 10px;">Colonne 2</th>
-            <th style="border: 1px solid var(--border-color); padding: 6px 10px;">Colonne 3</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="border: 1px solid var(--border-color); padding: 6px 10px;">Donnée 1</td>
-            <td style="border: 1px solid var(--border-color); padding: 6px 10px;">Donnée 2</td>
-            <td style="border: 1px solid var(--border-color); padding: 6px 10px;">Donnée 3</td>
-          </tr>
-          <tr>
-            <td style="border: 1px solid var(--border-color); padding: 6px 10px;">Donnée A</td>
-            <td style="border: 1px solid var(--border-color); padding: 6px 10px;">Donnée B</td>
-            <td style="border: 1px solid var(--border-color); padding: 6px 10px;">Donnée C</td>
-          </tr>
-        </tbody>
-      </table>
-      <p><br></p>
-    `;
-    document.execCommand('insertHTML', false, html);
+    this.insertBlock(action);
   },
 
   escapeHtml(str) {
@@ -2241,3 +1876,5 @@ const SermonsView = {
       .replace(/'/g, '&#039;');
   }
 };
+
+window.SermonsView = SermonsView;

@@ -501,8 +501,16 @@ const API = {
     return await this.call('get_illustrations_list');
   },
 
+  async getIllustration(illId) {
+    return await this.call('get_illustration', illId);
+  },
+
   async saveIllustration(illData) {
     return await this.call('save_illustration', illData);
+  },
+
+  async deleteIllustration(illId) {
+    return await this.call('delete_illustration', illId);
   },
 
   async openIllustrationsFolder() {

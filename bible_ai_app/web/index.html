@@ -971,17 +971,35 @@
           </span>
           <span class="nav-label">Notes</span>
         </button>
-        <button class="nav-item" data-view="sermons" id="nav-sermons" title="Studio de Prédication">
-          <span class="nav-icon">
-            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
-              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-              <line x1="12" y1="19" x2="12" y2="22"/>
-              <line x1="8" y1="22" x2="16" y2="22"/>
-            </svg>
-          </span>
-          <span class="nav-label">Prédication</span>
-        </button>
+        <!-- GROUPE PRÉDICATION & BANQUE D'ILLUSTRATIONS -->
+        <div class="nav-item-group" id="group-nav-sermons">
+          <button class="nav-item has-submenu" data-view="sermons" id="nav-sermons" title="Prédication & Illustrations">
+            <span class="nav-icon">
+              <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="22"/>
+                <line x1="8" y1="22" x2="16" y2="22"/>
+              </svg>
+            </span>
+            <span class="nav-label">Prédication</span>
+            <svg class="nav-chevron" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="nav-sub-menu" id="sub-menu-sermons">
+            <button class="nav-sub-item active" data-view="sermons" id="nav-sub-sermons" title="Studio de Prédication">
+              <span class="nav-sub-icon">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+              </span>
+              <span class="nav-sub-label">Studio de Prédication</span>
+            </button>
+            <button class="nav-sub-item" data-view="illustrations" id="nav-sub-illustrations" title="Banque d'Illustrations">
+              <span class="nav-sub-icon">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+              </span>
+              <span class="nav-sub-label">Banque d'Illustrations</span>
+            </button>
+          </div>
+        </div>
         <button class="nav-item" data-view="maps" id="nav-maps" title="Cartes bibliques">
           <span class="nav-icon">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -3411,7 +3429,7 @@
                   <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="m8.5 13.5 2-5.5 2 5.5"/><path d="M9.2 11.8h2.6"/><path d="M14 8.5h3.5l-3.5 5h3.5"/></svg>
                 </button>
                 <button class="btn-secondary btn-block-insert" id="btn-insert-illustration" title="Insérer une Illustration">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
                 </button>
                 <button class="btn-secondary btn-block-insert" id="btn-insert-application" title="Insérer une Application pratique">
                   <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
@@ -3431,10 +3449,53 @@
               </div>
             </div>
 
-            <!-- Corps de Rédaction WYSIWYG par Blocs -->
-            <div class="sermons-editor-body">
-              <div id="sermon-edit-content" class="sermons-rich-editor" contenteditable="true" spellcheck="true" data-placeholder="Commencez votre sermon ici... Tapez / pour insérer un bloc ou utilisez la barre d'outils."></div>
-              <div id="sermon-preview-content" class="sermon-preview-content hidden"></div>
+            <!-- Corps de Rédaction Modulaire par Blocs avec Sommaire Interactif -->
+            <div class="sermons-editor-workspace">
+              <!-- Sommaire / Plan de vol interactif -->
+              <aside class="sermon-outline-panel" id="sermon-outline-panel">
+                <div class="sermon-outline-header">
+                  <span class="outline-title">Plan du Sermon</span>
+                  <div class="outline-header-actions">
+                    <button class="btn-icon-subtle" id="btn-sermon-collapse-all" title="Tout replier">
+                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/></svg>
+                    </button>
+                    <button class="btn-icon-subtle" id="btn-sermon-expand-all" title="Tout déplier">
+                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="sermon-outline-list" id="sermon-outline-list">
+                  <!-- Injecté dynamiquement -->
+                </div>
+                <div class="sermon-outline-footer">
+                  <button class="btn-outline-add-section" id="btn-outline-add-point">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>Ajouter un Point</span>
+                  </button>
+                </div>
+              </aside>
+
+              <!-- Conteneur des Blocs Modulaires Dépliables -->
+              <div class="sermon-blocks-scroll-pane" id="sermon-blocks-scroll-pane">
+                <div class="sermon-blocks-container" id="sermon-blocks-container">
+                  <!-- Cartes de sections injectées dynamiquement par sermons_view.js -->
+                </div>
+                <!-- Barre d'ajout rapide en bas -->
+                <div class="sermon-add-block-cta">
+                  <button class="btn-add-section-pill" id="btn-add-section-point">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>+ Point Principal</span>
+                  </button>
+                  <button class="btn-add-section-pill" id="btn-add-section-scripture">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                    <span>+ Lecture Biblique</span>
+                  </button>
+                  <button class="btn-add-section-pill" id="btn-add-section-conclusion">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                    <span>+ Conclusion & Appel</span>
+                  </button>
+                </div>
+              </div>
             </div>
 
             <!-- Pied de page : Métriques & Chronomètre dynamique en temps réel -->
@@ -3593,6 +3654,187 @@
         <div class="pulpit-scroll-viewport" id="pulpit-scroll-viewport">
           <div class="pulpit-content-container" id="pulpit-content-container">
             <!-- Rendu optimisé gros caractères du sermon avec cases à cocher de progression -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- VUE : BANQUE D'ILLUSTRATIONS & ANECDOTES PASTORALES   -->
+      <!-- ===================================================== -->
+      <div class="app-view" id="view-illustrations">
+        <div class="illustrations-layout">
+          <!-- 1. EN-TÊTE DU HUB D'ILLUSTRATIONS -->
+          <header class="illustrations-header">
+            <div class="illustrations-header-main">
+              <div class="illustrations-title-cluster">
+                <div class="illustrations-title-icon">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                </div>
+                <div>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <h1 class="illustrations-main-title">Banque d'Illustrations</h1>
+                    <span class="illustrations-count-pill" id="lbl-illustrations-count">0 illustration</span>
+                  </div>
+                  <p class="illustrations-subtitle">Réservoir d'anecdotes, récits historiques, paraboles et métaphores pour vos prédications</p>
+                </div>
+              </div>
+              <div class="illustrations-actions">
+                <button class="btn-secondary" id="btn-open-illustrations-folder" title="Ouvrir le dossier local des illustrations (.md)">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+                  <span>Dossier</span>
+                </button>
+                <button class="btn-primary" id="btn-new-illustration" title="Créer une nouvelle illustration">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  <span>Nouvelle Fiche</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Barre de Recherche & Filtres -->
+            <div class="illustrations-filter-controls">
+              <div class="illustrations-search-box">
+                <svg class="search-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="illustrations-search-input" class="illustrations-search-field" placeholder="Rechercher par titre, mot-clé, citation, auteur ou passage...">
+                <button class="btn-icon-subtle hidden" id="btn-clear-illustrations-search" title="Effacer"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+              </div>
+
+              <!-- Filtres Thématiques -->
+              <div class="illustrations-category-scroller" id="illustrations-category-scroller">
+                <button class="ill-category-pill active" data-category="all">Tous les thèmes</button>
+                <button class="ill-category-pill" data-category="Grâce & Salut">Grâce & Salut</button>
+                <button class="ill-category-pill" data-category="Foi & Confiance">Foi & Confiance</button>
+                <button class="ill-category-pill" data-category="Pardon & Réconciliation">Pardon</button>
+                <button class="ill-category-pill" data-category="Épreuve & Souffrance">Épreuve & Souffrance</button>
+                <button class="ill-category-pill" data-category="Amour & Compassion">Amour</button>
+                <button class="ill-category-pill" data-category="Prière & Intimité">Prière</button>
+                <button class="ill-category-pill" data-category="Mariage & Famille">Famille</button>
+                <button class="ill-category-pill" data-category="Argent & Générosité">Argent</button>
+                <button class="ill-category-pill" data-category="Évangélisation & Mission">Mission</button>
+                <button class="ill-category-pill" data-category="Sainteté & Obéissance">Sainteté</button>
+                <button class="ill-category-pill" data-category="Espérance & Éternité">Espérance</button>
+              </div>
+            </div>
+
+            <!-- Sous-barre : Filtres par Type & Statut pastoral -->
+            <div class="illustrations-subfilter-bar">
+              <div class="ill-types-group">
+                <span class="subfilter-label">Genre :</span>
+                <button class="ill-type-btn active" data-type="all">Tous</button>
+                <button class="ill-type-btn" data-type="Histoire vraie">Histoire vraie</button>
+                <button class="ill-type-btn" data-type="Métaphore & Vie courante">Métaphore</button>
+                <button class="ill-type-btn" data-type="Citation">Citation</button>
+                <button class="ill-type-btn" data-type="Science & Nature">Science & Nature</button>
+                <button class="ill-type-btn" data-type="Personnel">Récit personnel</button>
+              </div>
+              <div class="ill-status-group">
+                <span class="subfilter-label">Statut :</span>
+                <button class="ill-status-btn active" data-status="all">Toutes</button>
+                <button class="ill-status-btn" data-status="unused">Jamais prêchées</button>
+                <button class="ill-status-btn" data-status="used">Déjà prêchées</button>
+              </div>
+            </div>
+          </header>
+
+          <!-- 2. CORPS : GRILLE DES CARTES D'ILLUSTRATION -->
+          <main class="illustrations-main-content" id="illustrations-cards-container">
+            <!-- Injecté dynamiquement par illustrations_view.js -->
+          </main>
+        </div>
+      </div>
+
+      <!-- MODALE D'ÉDITION / LECTURE PLEIN ÉCRAN D'UNE ILLUSTRATION -->
+      <div id="illustration-detail-modal" class="modal-overlay hidden">
+        <div class="modal-card illustration-modal-card">
+          <div class="modal-header">
+            <div class="ill-modal-header-left">
+              <span class="ill-modal-badge" id="ill-modal-type-badge">Histoire vraie</span>
+              <h2 class="modal-title" id="ill-modal-title">Détail de l'illustration</h2>
+            </div>
+            <button class="btn-icon-subtle" id="btn-close-illustration-modal" title="Fermer">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div class="modal-body illustration-modal-body">
+            <div class="ill-modal-form-grid">
+              <div class="ill-modal-main-column">
+                <div class="form-group">
+                  <label class="form-label">Titre de l'illustration</label>
+                  <input type="text" id="ill-input-title" class="form-input" placeholder="Titre évocateur...">
+                </div>
+                <div class="form-group" style="flex: 1; display: flex; flex-direction: column;">
+                  <label class="form-label">Récit / Corps de l'illustration</label>
+                  <textarea id="ill-input-body" class="form-textarea" style="flex: 1; min-height: 220px;" placeholder="Rédigez ou collez ici l'histoire, la métaphore ou la citation..."></textarea>
+                </div>
+              </div>
+              <div class="ill-modal-side-column">
+                <div class="form-group">
+                  <label class="form-label">Thème Principal</label>
+                  <select id="ill-input-category" class="form-select">
+                    <option value="Grâce & Salut">Grâce & Salut</option>
+                    <option value="Foi & Confiance">Foi & Confiance</option>
+                    <option value="Pardon & Réconciliation">Pardon & Réconciliation</option>
+                    <option value="Épreuve & Souffrance">Épreuve & Souffrance</option>
+                    <option value="Amour & Compassion">Amour & Compassion</option>
+                    <option value="Prière & Intimité">Prière & Intimité</option>
+                    <option value="Mariage & Famille">Mariage & Famille</option>
+                    <option value="Argent & Générosité">Argent & Générosité</option>
+                    <option value="Évangélisation & Mission">Évangélisation & Mission</option>
+                    <option value="Sainteté & Obéissance">Sainteté & Obéissance</option>
+                    <option value="Espérance & Éternité">Espérance & Éternité</option>
+                    <option value="Général">Général</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Type / Genre</label>
+                  <select id="ill-input-type" class="form-select">
+                    <option value="Histoire vraie">Histoire vraie</option>
+                    <option value="Métaphore & Vie courante">Métaphore & Vie courante</option>
+                    <option value="Citation">Citation</option>
+                    <option value="Science & Nature">Science & Nature</option>
+                    <option value="Personnel">Récit personnel</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Passages Bibliques Associés</label>
+                  <input type="text" id="ill-input-passages" class="form-input" placeholder="ex: Romains 8:28, Psaume 23">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Source / Auteur</label>
+                  <input type="text" id="ill-input-author" class="form-input" placeholder="ex: C.H. Spurgeon, C.S. Lewis...">
+                </div>
+                <!-- Historique d'utilisation pastoral -->
+                <div class="ill-usage-history-box">
+                  <label class="form-label" style="display: flex; align-items: center; gap: 4px;">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Historique des Utilisations
+                  </label>
+                  <div id="ill-modal-history-list" class="ill-history-list">
+                    <span class="text-muted" style="font-size: 11px;">Jamais prêchée à ce jour.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <button class="btn-danger-subtle" id="btn-delete-illustration">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                <span>Supprimer</span>
+              </button>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-secondary" id="btn-copy-illustration-text">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                <span>Copier</span>
+              </button>
+              <button class="btn-secondary" id="btn-insert-illustration-to-sermon" title="Insérer cette illustration dans le sermon actif">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+                <span>Insérer dans le sermon</span>
+              </button>
+              <button class="btn-primary" id="btn-save-illustration">
+                <span>Enregistrer</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -6828,6 +7070,7 @@
   <script src="js/passage_overview_drawer.js"></script>
   <script src="js/bibleproject_view.js"></script>
   <script src="js/sermons_view.js"></script>
+  <script src="js/illustrations_view.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

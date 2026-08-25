@@ -3452,9 +3452,122 @@ class BibleAppApi:
                 blog_url=blog_url,
                 notes=notes
             )
-            return {"success": True, "mailto_url": url}
+    # =========================================================================
+    # 13. STUDIO DE PRÉDICATION & BANQUE D'ILLUSTRATIONS
+    # =========================================================================
+
+    def get_sermons_list(self) -> List[Dict[str, Any]]:
+        """Retourne la liste de tous les sermons stockés sous forme de fichiers Markdown."""
+        try:
+            return SermonsManager.list_sermons(self.config)
         except Exception as e:
+            logger.error(f"Erreur get_sermons_list: {e}")
+            return []
+
+    def get_sermon(self, sermon_id: str) -> Optional[Dict[str, Any]]:
+        """Charge un sermon complet avec métadonnées et contenu."""
+        try:
+            return SermonsManager.get_sermon(sermon_id, self.config)
+        except Exception as e:
+            logger.error(f"Erreur get_sermon({sermon_id}): {e}")
+            return None
+
+    def save_sermon(self, sermon_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Sauvegarde un sermon (création ou mise à jour)."""
+        try:
+            return SermonsManager.save_sermon(sermon_data, self.config)
+        except Exception as e:
+            logger.error(f"Erreur save_sermon: {e}")
             return {"success": False, "error": str(e)}
+
+    def delete_sermon(self, sermon_id: str) -> Dict[str, Any]:
+        """Supprime un sermon."""
+        try:
+            return SermonsManager.delete_sermon(sermon_id, self.config)
+        except Exception as e:
+            logger.error(f"Erreur delete_sermon({sermon_id}): {e}")
+            return {"success": False, "error": str(e)}
+
+    def open_sermons_folder(self) -> Dict[str, Any]:
+        """Ouvre le dossier local des sermons dans l'explorateur Windows."""
+        try:
+            d = SermonsManager.get_sermons_directory(self.config)
+            os.startfile(d)
+            return {"success": True, "path": d}
+        except Exception as e:
+            logger.error(f"Erreur open_sermons_folder: {e}")
+            return {"success": False, "error": str(e)}
+
+    def import_sermon_file(self, file_path: Optional[str] = None) -> Dict[str, Any]:
+        """Importe un sermon depuis un fichier Word (.docx) ou Markdown (.md)."""
+        try:
+            if not file_path:
+                import tkinter as tk
+                from tkinter import filedialog
+                root = tk.Tk()
+                root.withdraw()
+                root.attributes("-topmost", True)
+                file_path = filedialog.askopenfilename(
+                    title="Importer une prédication",
+                    filetypes=[
+                        ("Documents Prédication", "*.docx;*.md;*.txt"),
+                        ("Word (*.docx)", "*.docx"),
+                        ("Markdown (*.md)", "*.md"),
+                        ("Tous les fichiers", "*.*")
+                    ]
+                )
+                root.destroy()
+            
+            if not file_path:
+                return {"success": False, "cancelled": True}
+            
+            return SermonsManager.import_sermon_file(file_path, self.config)
+        except Exception as e:
+            logger.error(f"Erreur import_sermon_file: {e}")
+            return {"success": False, "error": str(e)}
+
+    def get_illustrations_list(self) -> List[Dict[str, Any]]:
+        """Retourne la liste de toutes les illustrations du réservoir."""
+        try:
+            return SermonsManager.list_illustrations(self.config)
+        except Exception as e:
+            logger.error(f"Erreur get_illustrations_list: {e}")
+            return []
+
+    def get_illustration(self, ill_id: str) -> Optional[Dict[str, Any]]:
+        """Charge une illustration complète."""
+        try:
+            return SermonsManager.get_illustration(ill_id, self.config)
+        except Exception as e:
+            logger.error(f"Erreur get_illustration({ill_id}): {e}")
+            return None
+
+    def save_illustration(self, ill_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Sauvegarde une illustration (création ou mise à jour)."""
+        try:
+            return SermonsManager.save_illustration(ill_data, self.config)
+        except Exception as e:
+            logger.error(f"Erreur save_illustration: {e}")
+            return {"success": False, "error": str(e)}
+
+    def delete_illustration(self, ill_id: str) -> Dict[str, Any]:
+        """Supprime une illustration."""
+        try:
+            return SermonsManager.delete_illustration(ill_id, self.config)
+        except Exception as e:
+            logger.error(f"Erreur delete_illustration({ill_id}): {e}")
+            return {"success": False, "error": str(e)}
+
+    def open_illustrations_folder(self) -> Dict[str, Any]:
+        """Ouvre le dossier local des illustrations dans l'explorateur Windows."""
+        try:
+            d = SermonsManager.get_illustrations_directory(self.config)
+            os.startfile(d)
+            return {"success": True, "path": d}
+        except Exception as e:
+            logger.error(f"Erreur open_illustrations_folder: {e}")
+            return {"success": False, "error": str(e)}
+
 
 
 

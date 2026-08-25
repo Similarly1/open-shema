@@ -41,7 +41,8 @@ const App = {
       { name: 'ArticlesView', init: () => (typeof ArticlesView !== 'undefined' && ArticlesView.init()) },
       { name: 'PassageOverviewDrawer', init: () => (typeof PassageOverviewDrawer !== 'undefined' && PassageOverviewDrawer.init()) },
       { name: 'BibleProjectView', init: () => (typeof BibleProjectView !== 'undefined' && BibleProjectView.init()) },
-      { name: 'SermonsView', init: () => (typeof SermonsView !== 'undefined' && SermonsView.init()) }
+      { name: 'SermonsView', init: () => (typeof SermonsView !== 'undefined' && SermonsView.init()) },
+      { name: 'IllustrationsView', init: () => (typeof IllustrationsView !== 'undefined' && IllustrationsView.init()) }
     ];
 
     modules.forEach(m => {
@@ -59,13 +60,27 @@ const App = {
     this.bindErrorHandling();
 
     // 2b. Navigation latérale (Changement de vue)
-    document.querySelectorAll('.sidebar-menu .nav-item, .sidebar-footer .nav-item').forEach(btn => {
-      btn.addEventListener('click', () => {
+    document.querySelectorAll('.sidebar-menu .nav-item, .sidebar-menu .nav-sub-item, .sidebar-footer .nav-item').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const group = btn.closest('.nav-item-group');
+        if (btn.classList.contains('has-submenu')) {
+          group?.classList.toggle('open');
+        }
+
         const viewId = btn.dataset.view;
         if (!viewId) return;
 
-        document.querySelectorAll('.sidebar-menu .nav-item, .sidebar-footer .nav-item').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.sidebar-menu .nav-item, .sidebar-menu .nav-sub-item, .sidebar-footer .nav-item').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+
+        // Mettre à jour l'état visuel du groupe parent
+        if (btn.classList.contains('nav-sub-item')) {
+          document.getElementById('nav-sermons')?.classList.add('active');
+          group?.classList.add('open');
+        } else if (btn.id === 'nav-sermons') {
+          document.getElementById('nav-sub-sermons')?.classList.add('active');
+          group?.classList.add('open');
+        }
 
         this.switchView(viewId);
       });
@@ -632,8 +647,19 @@ const App = {
       }
     } else if (viewName === 'sermons') {
       if (drawerEl) drawerEl.classList.add('collapsed');
+      document.getElementById('nav-sermons')?.classList.add('active');
+      document.getElementById('nav-sub-sermons')?.classList.add('active');
+      document.getElementById('group-nav-sermons')?.classList.add('open');
       if (typeof SermonsView !== 'undefined') {
         SermonsView.onViewActivated();
+      }
+    } else if (viewName === 'illustrations') {
+      if (drawerEl) drawerEl.classList.add('collapsed');
+      document.getElementById('nav-sermons')?.classList.add('active');
+      document.getElementById('nav-sub-illustrations')?.classList.add('active');
+      document.getElementById('group-nav-sermons')?.classList.add('open');
+      if (typeof IllustrationsView !== 'undefined') {
+        IllustrationsView.onViewActivated();
       }
     }
   },
