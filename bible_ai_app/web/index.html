@@ -2911,12 +2911,31 @@
                       <span>Modèle IA</span>
                     </label>
                     <select id="ai-opt-model" class="select-field full-w" style="font-size: 12.5px; height: 36px; padding: 0 8px; border-radius: 6px;">
-                      <option value="gemini-3.7-flash" selected>Gemini 3.7 Flash</option>
-                      <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
-                      <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
-                      <option value="mistralai/Mistral-Small-4-119B-2603">Mistral Small 4</option>
-                      <option value="mistralai/Mistral-Large-2411">Mistral Large</option>
-                      <option value="mistralai/Ministral-3-14B-Instruct-2512">Ministral 3 (14B)</option>
+                      <optgroup label="── Google Gemini ──">
+                        <option value="gemini-2.5-flash" selected>Gemini 2.5 Flash (Recommandé)</option>
+                        <option value="gemini-2.5-pro">Gemini 2.5 Pro (Haute précision)</option>
+                        <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>
+                        <option value="gemini-3.5-flash">Gemini 3.5 Flash</option>
+                        <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash Lite</option>
+                        <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash Lite</option>
+                        <option value="gemini-3.7-flash">Gemini 3.7 Flash</option>
+                      </optgroup>
+                      <optgroup label="── Mistral AI ──">
+                        <option value="mistral-large-latest">Mistral Large (Approfondi)</option>
+                        <option value="mistral-small-latest">Mistral Small (Rapide)</option>
+                        <option value="open-mistral-nemo">Mistral Nemo</option>
+                        <option value="codestral-latest">Mistral Codestral</option>
+                      </optgroup>
+                      <optgroup label="── Infomaniak Swiss AI ──">
+                        <option value="mistralai/Ministral-3-14B-Instruct-2512">Ministral 14B</option>
+                        <option value="mistralai/Mistral-Small-4-119B-2603">Mistral 119B</option>
+                        <option value="Qwen/Qwen3.5-122B-A10B-FP8">Qwen 3.5 (122B)</option>
+                        <option value="Qwen/Qwen3.5-397B-A17B-FP8">Qwen 3.5 (397B)</option>
+                        <option value="swiss-ai/Apertus-v1.5-70B">Apertus 70B</option>
+                        <option value="google/gemma-4-31B-it">Gemma 31B</option>
+                        <option value="moonshotai/Kimi-K2.6">Kimi K2.6</option>
+                        <option value="nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8">Nemotron 30B</option>
+                      </optgroup>
                     </select>
                   </div>
 

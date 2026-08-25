@@ -1941,15 +1941,16 @@ class BibleAppApi:
 
         try:
             from ai.llm_client import LLMClient, GeminiClient
-            # Résoudre le bon provider selon le modèle
-            if "mistral" in selected_model.lower():
-                provider = "mistral"
-                api_key = self.config.get("mistral_api_key", "")
-                product_id = None
-            elif "infomaniak" in selected_model.lower() or "ministral" in selected_model.lower():
+            # Résoudre le bon provider selon le modèle sélectionné
+            sm_lower = selected_model.lower()
+            if any(k in sm_lower for k in ["mistralai/", "qwen", "swiss-ai", "gemma", "kimi", "nemotron", "infomaniak"]):
                 provider = "infomaniak"
                 api_key = self.config.get("infomaniak_token", "")
                 product_id = self.config.get("infomaniak_product_id", "251")
+            elif any(k in sm_lower for k in ["mistral-large", "mistral-small", "open-mistral", "codestral"]):
+                provider = "mistral"
+                api_key = self.config.get("mistral_api_key", "")
+                product_id = None
             else:
                 provider = "gemini"
                 api_key = self.config.get("gemini_api_key", "")

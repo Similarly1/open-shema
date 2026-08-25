@@ -254,6 +254,22 @@ const AIStudyView = {
     this.initGlobalTooltip();
     this.initContextDepthSlider();
     this.loadTheologicalProfileBadge();
+    this.loadDefaultModelFromConfig();
+  },
+
+  async loadDefaultModelFromConfig() {
+    try {
+      const cfg = await API.call('get_config');
+      if (cfg && cfg.chat_model) {
+        const modelSelect = document.getElementById('ai-opt-model');
+        if (modelSelect) {
+          const opt = modelSelect.querySelector(`option[value="${cfg.chat_model}"]`);
+          if (opt) modelSelect.value = cfg.chat_model;
+        }
+      }
+    } catch (e) {
+      console.warn("Erreur chargement modèle IA par défaut :", e);
+    }
   },
 
   async loadTheologicalProfileBadge() {
@@ -1115,7 +1131,7 @@ const AIStudyView = {
   },
 
   getOptions() {
-    const model = document.getElementById('ai-opt-model')?.value || 'gemini-3.7-flash';
+    const model = document.getElementById('ai-opt-model')?.value || 'gemini-2.5-flash';
     const depth = document.getElementById('ai-opt-depth')?.value || 'academic';
     const thinkingLevel = document.getElementById('ai-opt-thinking-level')?.value || 'medium';
     

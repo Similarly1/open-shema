@@ -17,14 +17,13 @@ except ImportError:
 
 class GeminiClient:
     CHAT_CASCADE = [
-        "gemini-3.7-flash",
-        "gemini-3.6-flash",
-        "gemini-3.5-flash",
-        "gemini-3-flash",
         "gemini-2.5-flash",
+        "gemini-3.5-flash",
         "gemini-2.5-flash-lite",
         "gemini-3.5-flash-lite",
-        "gemini-3.1-flash-lite"
+        "gemini-2.5-pro",
+        "gemini-3.1-flash-lite",
+        "gemini-3.7-flash"
     ]
     
     EMBEDDING_MODELS = [
@@ -33,7 +32,7 @@ class GeminiClient:
         "gemini-embedding-001"
     ]
 
-    def __init__(self, api_key, model="gemini-3.7-flash"):
+    def __init__(self, api_key, model="gemini-2.5-flash"):
         self.api_key = api_key
         self.model = model
         self.last_used_model = model
@@ -85,7 +84,7 @@ class GeminiClient:
         for current_model in models_to_try:
             url = f"{self.base_url}/{current_model}:generateContent"
             try:
-                response = requests.post(url, json=payload, headers={"Content-Type": "application/json", "x-goog-api-key": self.api_key}, timeout=180)
+                response = requests.post(url, json=payload, headers={"Content-Type": "application/json", "x-goog-api-key": self.api_key}, timeout=20)
                 if response.status_code in [404, 429, 500, 502, 503, 504]:
                     last_error = f"Status {response.status_code} pour {current_model}"
                     continue
@@ -97,7 +96,7 @@ class GeminiClient:
                 except (KeyError, IndexError):
                     return "Erreur lors de la lecture de la réponse Gemini."
             except requests.exceptions.Timeout as e:
-                last_error = f"Délai d'attente dépassé (timeout 180s) sur {current_model}"
+                last_error = f"Délai d'attente dépassé (timeout 20s) sur {current_model}"
                 continue
             except requests.exceptions.HTTPError as e:
                 if hasattr(e, 'response') and e.response is not None and e.response.status_code in [404, 429, 500, 502, 503, 504]:

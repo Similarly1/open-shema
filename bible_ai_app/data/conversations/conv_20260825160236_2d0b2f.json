@@ -1,0 +1,18 @@
+{
+  "id": "conv_20260825160236_2d0b2f",
+  "title": "salut",
+  "created_at": "2026-08-25T16:02:36.248362",
+  "updated_at": "2026-08-25T16:05:38.349169",
+  "context": {},
+  "messages": [
+    {
+      "role": "user",
+      "content": "salut"
+    },
+    {
+      "role": "assistant",
+      "content": "Salut ! C'est un plaisir de te retrouver pour ce temps d'étude. \n\nQuel sujet, texte biblique ou réflexion théologique aimerais-tu que nous explorions et creusions ensemble aujourd'hui ?",
+      "sources": []
+    }
+  ]
+}
