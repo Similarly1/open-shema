@@ -7,7 +7,15 @@ const App = {
   activeView: 'bible',
   isAIEnabled: true,
 
+  switchDrawerTab(tabId) {
+    const tabBtn = document.querySelector(`.drawer-tab[data-drawer-tab="${tabId}"]`);
+    if (tabBtn) {
+      tabBtn.click();
+    }
+  },
+
   init() {
+
     // 0. Initialisation immédiate de l'IA, du thème et de la typographie
     this.initAIState();
     this.initThemeAndFont();

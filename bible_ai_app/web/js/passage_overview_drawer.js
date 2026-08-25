@@ -17,8 +17,19 @@ const PassageOverviewDrawer = {
   currentData: null,
   isLoading: false,
   isSynchronized: true,
+
   debounceTimer: null,
   collapsedSections: {},
+
+  switchTab(tabId) {
+    if (typeof App !== 'undefined' && App.switchDrawerTab) {
+      App.switchDrawerTab(tabId);
+    } else {
+      const tabBtn = document.querySelector(`.drawer-tab[data-drawer-tab="${tabId}"]`);
+      if (tabBtn) tabBtn.click();
+    }
+  },
+
 
   // Icônes SVG vectorielles réutilisables (100% sans émoji)
   icons: {

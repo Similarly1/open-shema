@@ -21773,13 +21773,11 @@ body.reading-bg-dark .comm-dropdown-popover {
 
 /* Barre d'onglets de sources du Lexique avec flèches de défilement */
 .lexicon-header-toolbar {
-  display: flex;
-  align-items: center;
   position: relative;
   background: var(--bg-surface, #0f172a);
   border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-  padding: 6px 6px;
-  gap: 4px;
+  padding: 6px 4px;
+  overflow: hidden;
 }
 
 .lexicon-source-tabs {
@@ -21789,8 +21787,7 @@ body.reading-bg-dark .comm-dropdown-popover {
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  flex: 1;
-  padding: 2px 2px;
+  padding: 2px 28px;
   scroll-behavior: smooth;
 }
 
@@ -21799,36 +21796,45 @@ body.reading-bg-dark .comm-dropdown-popover {
 }
 
 .lex-tabs-scroll-btn {
-  display: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #1e293b;
+  border: 1px solid rgba(168, 85, 247, 0.6);
+  color: #f1f5f9;
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--bg-subtle, #1e293b);
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
-  color: var(--text-primary, #f8fafc);
   cursor: pointer;
-  z-index: 2;
-  flex-shrink: 0;
-  padding: 0;
-  transition: all 0.15s ease;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  transition: all 0.2s ease;
 }
 
 .lex-tabs-scroll-btn:hover {
-  background: var(--accent-purple, #a855f7);
+  background: #a855f7;
   color: #ffffff;
-  border-color: var(--accent-purple, #a855f7);
-  box-shadow: 0 0 8px rgba(168, 85, 247, 0.4);
+  border-color: #c084fc;
+  transform: translateY(-50%) scale(1.12);
 }
 
-.lexicon-header-toolbar.has-overflow-left .btn-scroll-left {
-  display: inline-flex;
+.lex-tabs-scroll-left {
+  left: 3px;
 }
 
-.lexicon-header-toolbar.has-overflow-right .btn-scroll-right {
-  display: inline-flex;
+.lex-tabs-scroll-right {
+  right: 3px;
 }
+
+.lex-tabs-scroll-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+  display: none !important;
+}
+
 
 
 

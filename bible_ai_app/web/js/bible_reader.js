@@ -2881,11 +2881,12 @@ const LexiconViewer = {
       if (!tabsContainer) return;
       const scrollLeft = tabsContainer.scrollLeft;
       const maxScroll = tabsContainer.scrollWidth - tabsContainer.clientWidth;
-      if (maxScroll > 4) {
-        toolbar.classList.toggle('has-overflow-left', scrollLeft > 5);
-        toolbar.classList.toggle('has-overflow-right', scrollLeft < maxScroll - 5);
+      if (maxScroll > 6) {
+        btnScrollLeft.classList.toggle('hidden', scrollLeft <= 4);
+        btnScrollRight.classList.toggle('hidden', scrollLeft >= maxScroll - 4);
       } else {
-        toolbar.classList.remove('has-overflow-left', 'has-overflow-right');
+        btnScrollLeft.classList.add('hidden');
+        btnScrollRight.classList.add('hidden');
       }
     };
 
@@ -2893,17 +2894,19 @@ const LexiconViewer = {
     btnScrollLeft.addEventListener('click', (e) => {
       e.stopPropagation();
       tabsContainer.scrollBy({ left: -140, behavior: 'smooth' });
-      setTimeout(updateScrollArrows, 300);
+      setTimeout(updateScrollArrows, 350);
     });
     btnScrollRight.addEventListener('click', (e) => {
       e.stopPropagation();
       tabsContainer.scrollBy({ left: 140, behavior: 'smooth' });
-      setTimeout(updateScrollArrows, 300);
+      setTimeout(updateScrollArrows, 350);
     });
     setTimeout(updateScrollArrows, 50);
-
+    setTimeout(updateScrollArrows, 250);
+    setTimeout(updateScrollArrows, 600);
 
     // Contenu principal
+
     const contentBox = document.createElement('div');
     contentBox.className = 'lexicon-active-content';
     container.appendChild(contentBox);
