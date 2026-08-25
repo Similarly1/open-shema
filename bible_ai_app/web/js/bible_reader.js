@@ -2818,15 +2818,16 @@ const LexiconViewer = {
 
     const btnScrollLeft = document.createElement('button');
     btnScrollLeft.type = 'button';
-    btnScrollLeft.className = 'lex-tabs-scroll-btn btn-scroll-left';
+    btnScrollLeft.className = 'lex-tabs-scroll-btn lex-tabs-scroll-left hidden';
     btnScrollLeft.title = 'Faire défiler vers la gauche';
     btnScrollLeft.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>`;
 
     const btnScrollRight = document.createElement('button');
     btnScrollRight.type = 'button';
-    btnScrollRight.className = 'lex-tabs-scroll-btn btn-scroll-right';
+    btnScrollRight.className = 'lex-tabs-scroll-btn lex-tabs-scroll-right';
     btnScrollRight.title = 'Faire défiler vers la droite';
     btnScrollRight.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+
 
     const tabsContainer = document.createElement('div');
     tabsContainer.className = 'lexicon-source-tabs';
