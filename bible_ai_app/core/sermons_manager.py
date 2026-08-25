@@ -59,6 +59,17 @@ class SermonsManager:
         short_id = item_id[-8:] if len(item_id) > 8 else item_id
         return f"{safe_title}-{short_id}.md"
 
+    @classmethod
+    def _sanitize_for_json(cls, obj: Any) -> Any:
+        """Convertit récursivement les objets date/datetime en chaînes ISO pour json.dumps."""
+        if isinstance(obj, (datetime.date, datetime.datetime)):
+            return obj.isoformat()
+        elif isinstance(obj, dict):
+            return {k: cls._sanitize_for_json(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [cls._sanitize_for_json(item) for item in obj]
+        return obj
+
     # =========================================================================
     # 1. PARSING & SÉRIALISATION MARKDOWN / YAML
     # =========================================================================
@@ -108,20 +119,20 @@ class SermonsManager:
             wpm = 135
         est_minutes = round(word_count / wpm, 1)
 
-        return {
-            "id": item_id,
+        result = {
+            "id": str(item_id),
             "filename": os.path.basename(file_path),
             "file_path": file_path,
-            "title": title,
-            "type": metadata.get("type", "sermon"),
-            "status": metadata.get("status", "draft"),
-            "church": metadata.get("church", ""),
-            "event_occasion": metadata.get("event_occasion", "Culte dominical"),
+            "title": str(title),
+            "type": str(metadata.get("type", "sermon")),
+            "status": str(metadata.get("status", "draft")),
+            "church": str(metadata.get("church", "")),
+            "event_occasion": str(metadata.get("event_occasion", "Culte dominical")),
             "date_planned": str(date_str),
             "series": metadata.get("series", {}),
             "passage": metadata.get("passage", {}),
-            "big_idea": metadata.get("big_idea", ""),
-            "goal": metadata.get("goal", ""),
+            "big_idea": str(metadata.get("big_idea", "")),
+            "goal": str(metadata.get("goal", "")),
             "theme_tags": metadata.get("theme_tags", []),
             "timing": metadata.get("timing", {
                 "target_duration_min": 35,
@@ -131,9 +142,10 @@ class SermonsManager:
             "word_count": word_count,
             "estimated_minutes": est_minutes,
             "body": body,
-            "created_at": metadata.get("created_at") or datetime.datetime.fromtimestamp(stat.st_ctime).isoformat(),
+            "created_at": str(metadata.get("created_at") or datetime.datetime.fromtimestamp(stat.st_ctime).isoformat()),
             "updated_at": datetime.datetime.fromtimestamp(stat.st_mtime).isoformat(),
         }
+        return cls._sanitize_for_json(result)
 
     # =========================================================================
     # 2. GESTION DES SERMONS (CRUD)
@@ -287,21 +299,22 @@ class SermonsManager:
         item_id = metadata.get("id") or os.path.splitext(os.path.basename(file_path))[0]
         title = metadata.get("title") or "Illustration sans titre"
 
-        return {
-            "id": item_id,
+        res = {
+            "id": str(item_id),
             "filename": os.path.basename(file_path),
             "file_path": file_path,
-            "title": title,
-            "category": metadata.get("category", "Général"),
+            "title": str(title),
+            "category": str(metadata.get("category", "Général")),
             "tags": metadata.get("tags", []),
             "passages_associes": metadata.get("passages_associes", []),
-            "source": metadata.get("source", ""),
-            "author": metadata.get("author", ""),
+            "source": str(metadata.get("source", "")),
+            "author": str(metadata.get("author", "")),
             "usage_history": metadata.get("usage_history", []),
             "body": body.strip(),
-            "created_at": metadata.get("created_at") or datetime.datetime.fromtimestamp(stat.st_ctime).isoformat(),
+            "created_at": str(metadata.get("created_at") or datetime.datetime.fromtimestamp(stat.st_ctime).isoformat()),
             "updated_at": datetime.datetime.fromtimestamp(stat.st_mtime).isoformat(),
         }
+        return cls._sanitize_for_json(res)
 
     @classmethod
     def list_illustrations(cls, config: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
