@@ -470,6 +470,39 @@ const API = {
     }
     window.open(url, '_blank');
     return true;
+  },
+
+  // --- STUDIO DE PRÉDICATION & ILLUSTRATIONS ---
+  async getSermonsList() {
+    return await this.call('get_sermons_list');
+  },
+
+  async getSermon(sermonId) {
+    return await this.call('get_sermon', sermonId);
+  },
+
+  async saveSermon(sermonData) {
+    return await this.call('save_sermon', sermonData);
+  },
+
+  async deleteSermon(sermonId) {
+    return await this.call('delete_sermon', sermonId);
+  },
+
+  async openSermonsFolder() {
+    return await this.call('open_sermons_folder');
+  },
+
+  async getIllustrationsList() {
+    return await this.call('get_illustrations_list');
+  },
+
+  async saveIllustration(illData) {
+    return await this.call('save_illustration', illData);
+  },
+
+  async openIllustrationsFolder() {
+    return await this.call('open_illustrations_folder');
   }
 };
 

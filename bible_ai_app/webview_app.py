@@ -40,6 +40,7 @@ from core.dictionary_manager import DictionaryManager
 from core.original_languages_manager import OriginalLanguagesManager
 from core.config import load_config, save_config
 from core.notes_manager import NotesManager
+from core.sermons_manager import SermonsManager
 from core.highlights_manager import HighlightsManager
 from core.maps_manager import MapsManager
 from gui.library_utils import load_books_metadata, save_books_metadata
@@ -1398,6 +1399,72 @@ class BibleAppApi:
                 import subprocess
                 subprocess.Popen(['xdg-open', notes_dir])
             return {"success": True, "path": notes_dir}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    # --- STUDIO DE PRÉDICATION & ILLUSTRATIONS ---
+
+    def get_sermons_list(self) -> List[Dict[str, Any]]:
+        """Charge la liste de tous les sermons stockés en Markdown (.md)."""
+        self.config = load_config()
+        return SermonsManager.list_sermons(self.config)
+
+    def get_sermon(self, sermon_id: str) -> Optional[Dict[str, Any]]:
+        """Récupère un sermon complet avec son texte et ses métadonnées."""
+        self.config = load_config()
+        return SermonsManager.get_sermon(sermon_id, self.config)
+
+    def save_sermon(self, sermon_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Sauvegarde un sermon au format Markdown + Frontmatter YAML."""
+        self.config = load_config()
+        return SermonsManager.save_sermon(sermon_data, self.config)
+
+    def delete_sermon(self, sermon_id: str) -> Dict[str, Any]:
+        """Supprime un sermon du disque."""
+        self.config = load_config()
+        return SermonsManager.delete_sermon(sermon_id, self.config)
+
+    def open_sermons_folder(self) -> Dict[str, Any]:
+        """Ouvre le dossier des sermons dans l'explorateur de fichiers."""
+        self.config = load_config()
+        target_dir = SermonsManager.get_sermons_directory(self.config)
+        try:
+            if os.name == 'nt':
+                os.startfile(target_dir)
+            elif sys.platform == 'darwin':
+                import subprocess
+                subprocess.Popen(['open', target_dir])
+            else:
+                import subprocess
+                subprocess.Popen(['xdg-open', target_dir])
+            return {"success": True, "path": target_dir}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    def get_illustrations_list(self) -> List[Dict[str, Any]]:
+        """Charge toutes les illustrations du réservoir transversal."""
+        self.config = load_config()
+        return SermonsManager.list_illustrations(self.config)
+
+    def save_illustration(self, ill_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Enregistre ou met à jour une illustration dans le réservoir."""
+        self.config = load_config()
+        return SermonsManager.save_illustration(ill_data, self.config)
+
+    def open_illustrations_folder(self) -> Dict[str, Any]:
+        """Ouvre le dossier des illustrations dans l'explorateur."""
+        self.config = load_config()
+        target_dir = SermonsManager.get_illustrations_directory(self.config)
+        try:
+            if os.name == 'nt':
+                os.startfile(target_dir)
+            elif sys.platform == 'darwin':
+                import subprocess
+                subprocess.Popen(['open', target_dir])
+            else:
+                import subprocess
+                subprocess.Popen(['xdg-open', target_dir])
+            return {"success": True, "path": target_dir}
         except Exception as e:
             return {"success": False, "error": str(e)}
 

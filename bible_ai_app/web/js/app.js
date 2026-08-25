@@ -40,7 +40,8 @@ const App = {
       { name: 'HighlighterManager', init: () => (typeof HighlighterManager !== 'undefined' && HighlighterManager.init()) },
       { name: 'ArticlesView', init: () => (typeof ArticlesView !== 'undefined' && ArticlesView.init()) },
       { name: 'PassageOverviewDrawer', init: () => (typeof PassageOverviewDrawer !== 'undefined' && PassageOverviewDrawer.init()) },
-      { name: 'BibleProjectView', init: () => (typeof BibleProjectView !== 'undefined' && BibleProjectView.init()) }
+      { name: 'BibleProjectView', init: () => (typeof BibleProjectView !== 'undefined' && BibleProjectView.init()) },
+      { name: 'SermonsView', init: () => (typeof SermonsView !== 'undefined' && SermonsView.init()) }
     ];
 
     modules.forEach(m => {
@@ -628,6 +629,11 @@ const App = {
       if (drawerEl) drawerEl.classList.add('collapsed');
       if (typeof AIStudyView !== 'undefined') {
         AIStudyView.onViewActivated();
+      }
+    } else if (viewName === 'sermons') {
+      if (drawerEl) drawerEl.classList.add('collapsed');
+      if (typeof SermonsView !== 'undefined') {
+        SermonsView.onViewActivated();
       }
     }
   },
