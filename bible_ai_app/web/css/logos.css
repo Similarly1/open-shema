@@ -9244,13 +9244,18 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   right: 0;
   width: 480px;
   max-width: min(520px, 94vw);
+  max-height: calc(100vh - 90px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 12px;
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
   z-index: 1000;
-  padding: 18px 20px;
+  padding: 16px 18px;
   animation: popoverFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
 }
 
 .ctx-depth-range-input {

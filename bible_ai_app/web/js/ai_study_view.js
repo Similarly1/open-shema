@@ -747,29 +747,34 @@ const AIStudyView = {
     const chkNotes = document.getElementById('ai-opt-src-notes');
     const chkRerank = document.getElementById('ai-opt-reranking');
     const chkCurator = document.getElementById('ai-opt-curator');
+    const thinkingSelect = document.getElementById('ai-opt-thinking-level');
     const ctxSlider = document.getElementById('ai-opt-context-depth');
     const depthSelect = document.getElementById('ai-opt-depth');
 
     if (modeKey === 'free_chat') {
-      // En mode Discussion libre : dialogue direct, sans bible cochée, ni reranking par défaut
+      // En mode Discussion libre : dialogue direct, sans bible cochée, ni reranking, raisonnement désactivé
       if (chkBibles) chkBibles.checked = false;
       if (chkComms) chkComms.checked = false;
       if (chkDict) chkDict.checked = false;
       if (chkNotes) chkNotes.checked = false;
       if (chkRerank) chkRerank.checked = false;
       if (chkCurator) chkCurator.checked = false;
+      if (thinkingSelect) thinkingSelect.value = 'off';
       if (ctxSlider) {
         ctxSlider.value = 0;
         this.updateContextDepthSliderUI();
       }
       if (depthSelect) depthSelect.value = 'pastoral';
     } else {
-      // Dans les modes d'étude approfondie : corpus et reranking activés
+      // Dans les modes d'étude approfondie : corpus, reranking et raisonnement activés
       if (chkBibles) chkBibles.checked = true;
       if (chkComms) chkComms.checked = true;
       if (chkDict) chkDict.checked = true;
       if (chkNotes) chkNotes.checked = true;
       if (chkRerank) chkRerank.checked = true;
+      if (thinkingSelect && thinkingSelect.value === 'off') {
+        thinkingSelect.value = 'medium';
+      }
       if (ctxSlider && ctxSlider.value == 0) {
         ctxSlider.value = 1;
         this.updateContextDepthSliderUI();
