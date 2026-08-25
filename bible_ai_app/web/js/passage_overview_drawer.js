@@ -59,22 +59,35 @@ const PassageOverviewDrawer = {
       }
     });
 
-    // Bouton verset précédent / suivant
+    // Bouton verset précédent / suivant (Navigation précise de verset)
     document.getElementById('btn-overview-prev-v')?.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (typeof BibleReader !== 'undefined') {
-        const nextV = Math.max(1, (this.currentVerse || 1) - 1);
-        BibleReader.selectVerse(nextV);
+      const bCode = this.currentBook || (typeof BibleReader !== 'undefined' ? BibleReader.currentBook : 'GEN');
+      const ch = parseInt(this.currentChapter || (typeof BibleReader !== 'undefined' ? BibleReader.currentChapter : 1), 10) || 1;
+      const curV = parseInt(this.currentVerse || (typeof BibleReader !== 'undefined' ? BibleReader.selectedVerse : 1) || 1, 10);
+      const nextV = Math.max(1, curV - 1);
+      if (typeof BibleReader !== 'undefined' && BibleReader.selectVerse) {
+        BibleReader.selectVerse(bCode, ch, nextV, { scroll: true, behavior: 'smooth', block: 'center' });
+      } else {
+        this.load(bCode, ch, nextV, this.currentBible, true);
       }
     });
 
     document.getElementById('btn-overview-next-v')?.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (typeof BibleReader !== 'undefined') {
-        const nextV = (this.currentVerse || 1) + 1;
-        BibleReader.selectVerse(nextV);
+      const bCode = this.currentBook || (typeof BibleReader !== 'undefined' ? BibleReader.currentBook : 'GEN');
+      const ch = parseInt(this.currentChapter || (typeof BibleReader !== 'undefined' ? BibleReader.currentChapter : 1), 10) || 1;
+      const curV = parseInt(this.currentVerse || (typeof BibleReader !== 'undefined' ? BibleReader.selectedVerse : 1) || 1, 10);
+      const nextV = curV + 1;
+      if (typeof BibleReader !== 'undefined' && BibleReader.selectVerse) {
+        BibleReader.selectVerse(bCode, ch, nextV, { scroll: true, behavior: 'smooth', block: 'center' });
+      } else {
+        this.load(bCode, ch, nextV, this.currentBible, true);
       }
     });
+
+    // Initialisation du popover d'infobulle au survol
+    this.initPopover();
 
     // Boutons d'action globale
     document.getElementById('btn-overview-action-synth')?.addEventListener('click', (e) => {
@@ -230,6 +243,98 @@ const PassageOverviewDrawer = {
     safe = safe.replace(/_([^_]+)_/g, '<em>$1</em>');
     safe = safe.replace(/`([^`]+)`/g, '<code style="font-size: 10px; padding: 1px 4px; border-radius: 3px; background: var(--bg-hover);">$1</code>');
     return safe;
+  },
+
+  /**
+   * Initialise l'élément popover flottant dans le DOM
+   */
+  initPopover() {
+    let popover = document.getElementById('overview-item-popover');
+    if (!popover) {
+      popover = document.createElement('div');
+      popover.id = 'overview-item-popover';
+      popover.className = 'overview-item-popover hidden';
+      document.body.appendChild(popover);
+    }
+    this.popoverEl = popover;
+  },
+
+  /**
+   * Affiche l'infobulle flottante au survol d'une ressource
+   */
+  showPopover(itemEl) {
+    if (!this.popoverEl) this.initPopover();
+
+    const cat = itemEl.dataset.ttCategory || 'Ressource';
+    const author = itemEl.dataset.ttAuthor || '';
+    const title = itemEl.dataset.ttTitle || '';
+    const excerpt = itemEl.dataset.ttExcerpt || '';
+    const badge = itemEl.dataset.ttBadge || '';
+    const logoUrl = itemEl.dataset.ttLogo || '';
+
+    if (!excerpt && !author && !title) return;
+
+    let catIcon = this.icons.commentary;
+    if (cat === 'Article') catIcon = this.icons.article;
+    else if (cat === 'Livre') catIcon = this.icons.book;
+    else if (cat === 'Note') catIcon = this.icons.note;
+
+    this.popoverEl.innerHTML = `
+      <div class="popover-inner">
+        <div class="popover-header">
+          <div class="popover-meta-row">
+            <span class="popover-cat-badge">${catIcon} <span>${this.escapeHtml(cat)}</span></span>
+            ${badge ? `
+              <span class="popover-source-badge ${logoUrl ? 'has-logo' : ''}">
+                ${logoUrl ? `<img src="${logoUrl}" class="popover-source-logo" alt="">` : ''}
+                <span>${this.escapeHtml(badge)}</span>
+              </span>` : ''}
+          </div>
+          <div class="popover-title-row">
+            <div class="popover-main-title">${this.escapeHtml(author)}</div>
+            ${title ? `<div class="popover-sub-title">${this.escapeHtml(title)}</div>` : ''}
+          </div>
+        </div>
+        ${excerpt ? `<div class="popover-body">${excerpt}</div>` : ''}
+        <div class="popover-footer">
+          <span class="popover-hint">${this.icons.arrowRight} <span>Cliquer pour ouvrir dans l'onglet</span></span>
+        </div>
+      </div>
+    `;
+
+    const rect = itemEl.getBoundingClientRect();
+    const popoverWidth = 360;
+
+    // Positionnement à gauche du tiroir droit
+    let left = rect.left - popoverWidth - 14;
+    if (left < 10) {
+      left = Math.max(10, rect.left - 40);
+    }
+
+    let top = rect.top - 12;
+    const maxTop = window.innerHeight - 340;
+    if (top > maxTop) top = Math.max(20, maxTop);
+    if (top < 60) top = 60;
+
+    this.popoverEl.style.left = `${left}px`;
+    this.popoverEl.style.top = `${top}px`;
+    this.popoverEl.classList.remove('hidden');
+    void this.popoverEl.offsetWidth; // Reflow
+    this.popoverEl.classList.add('visible');
+  },
+
+  /**
+   * Masque l'infobulle flottante
+   */
+  hidePopover() {
+    if (this.popoverEl) {
+      this.popoverEl.classList.remove('visible');
+      setTimeout(() => {
+        if (this.popoverEl && !this.popoverEl.classList.contains('visible')) {
+          this.popoverEl.classList.add('hidden');
+        }
+      }, 150);
+    }
   },
 
   /**
@@ -399,7 +504,7 @@ const PassageOverviewDrawer = {
   },
 
   /**
-   * Section Commentaires Exégétiques (Épurée, typographique, sans boîtes lourdes)
+   * Section Commentaires Exégétiques (Ultra-compacte + Infobulle au survol)
    */
   renderCommentariesSection(data) {
     const list = data.commentaries || [];
@@ -415,7 +520,7 @@ const PassageOverviewDrawer = {
         </div>
       `;
     } else {
-      const topCount = 3;
+      const topCount = 5;
       const initialList = list.slice(0, topCount);
       const remainingList = list.slice(topCount);
 
@@ -427,7 +532,15 @@ const PassageOverviewDrawer = {
         const excerptHtml = this.formatMarkdownExcerpt(c.excerpt);
 
         return `
-          <div class="overview-clean-item" data-action="select-commentary" data-author="${this.escapeHtml(author)}" data-source-id="${this.escapeHtml(c.source_id)}" data-index="${idx}">
+          <div class="overview-clean-item"
+               data-action="select-commentary"
+               data-author="${this.escapeHtml(author)}"
+               data-source-id="${this.escapeHtml(c.source_id)}"
+               data-index="${idx}"
+               data-tt-category="Commentaire"
+               data-tt-author="${this.escapeHtml(author)}"
+               data-tt-title="${this.escapeHtml(title)}"
+               data-tt-excerpt="${this.escapeHtml(excerptHtml)}">
             <div class="clean-item-header">
               <div class="clean-item-title-group">
                 <span class="clean-author-name">${this.escapeHtml(author)}</span>
@@ -435,7 +548,6 @@ const PassageOverviewDrawer = {
               </div>
               <span class="clean-item-arrow">${this.icons.arrowRight}</span>
             </div>
-            <p class="clean-item-excerpt">${excerptHtml}</p>
           </div>
         `;
       };
@@ -486,7 +598,7 @@ const PassageOverviewDrawer = {
   },
 
   /**
-   * Section Articles de blog
+   * Section Articles de blog (Ultra-compacte + Infobulle au survol)
    */
   renderArticlesSection(data) {
     const list = data.articles || [];
@@ -505,14 +617,21 @@ const PassageOverviewDrawer = {
       list.forEach((art) => {
         const src = art.source_name || 'Revue';
         const title = art.title || 'Article';
-        const time = art.reading_time_minutes ? `${art.reading_time_minutes} min` : '';
         const summaryHtml = this.formatMarkdownExcerpt(art.lead_summary);
         const logoUrl = this.getSourceLogo(art.source_id, src);
         const logoHtml = logoUrl ? `<img src="${logoUrl}" class="source-tag-logo" alt="${this.escapeHtml(src)}">` : '';
         const tagClass = logoUrl ? 'clean-source-tag has-logo' : 'clean-source-tag is-generic';
 
         bodyHtml += `
-          <div class="overview-clean-item" data-action="open-article" data-article-id="${this.escapeHtml(art.id)}">
+          <div class="overview-clean-item"
+               data-action="open-article"
+               data-article-id="${this.escapeHtml(art.id)}"
+               data-tt-category="Article"
+               data-tt-author="${this.escapeHtml(title)}"
+               data-tt-title="${this.escapeHtml(art.author ? 'Par ' + art.author : '')}"
+               data-tt-badge="${this.escapeHtml(src)}"
+               data-tt-logo="${logoUrl || ''}"
+               data-tt-excerpt="${this.escapeHtml(summaryHtml)}">
             <div class="clean-item-header">
               <div class="clean-item-title-group">
                 <span class="clean-author-name">${this.escapeHtml(title)}</span>
@@ -523,7 +642,6 @@ const PassageOverviewDrawer = {
               </div>
               <span class="clean-item-arrow">${this.icons.arrowRight}</span>
             </div>
-            ${summaryHtml ? `<p class="clean-item-excerpt">${summaryHtml}</p>` : ''}
           </div>
         `;
       });
@@ -546,7 +664,7 @@ const PassageOverviewDrawer = {
   },
 
   /**
-   * Section Livres de Théologie & Bibliothèque
+   * Section Livres de Théologie & Bibliothèque (Ultra-compacte + Infobulle au survol)
    */
   renderTheologySection(data) {
     const list = data.theology_books || [];
@@ -568,7 +686,14 @@ const PassageOverviewDrawer = {
         const snippetHtml = b.snippet ? this.formatMarkdownExcerpt(b.snippet) : '';
 
         bodyHtml += `
-          <div class="overview-clean-item" data-action="open-theology-chapter" data-book-name="${this.escapeHtml(b.book_name)}" data-chapter-id="${b.chapter_id}">
+          <div class="overview-clean-item"
+               data-action="open-theology-chapter"
+               data-book-name="${this.escapeHtml(b.book_name)}"
+               data-chapter-id="${b.chapter_id}"
+               data-tt-category="Livre"
+               data-tt-author="${this.escapeHtml(bTitle)}"
+               data-tt-title="${this.escapeHtml(chTitle)}"
+               data-tt-excerpt="${this.escapeHtml(snippetHtml)}">
             <div class="clean-item-header">
               <div class="clean-item-title-group">
                 <span class="clean-author-name">${this.escapeHtml(bTitle)}</span>
@@ -576,7 +701,6 @@ const PassageOverviewDrawer = {
               </div>
               <span class="clean-item-arrow">${this.icons.arrowRight}</span>
             </div>
-            ${snippetHtml ? `<p class="clean-item-excerpt">${snippetHtml}</p>` : ''}
           </div>
         `;
       });
@@ -599,7 +723,7 @@ const PassageOverviewDrawer = {
   },
 
   /**
-   * Section Notes & Surlignages
+   * Section Notes & Surlignages (Ultra-compacte + Infobulle au survol)
    */
   renderNotesSection(data) {
     const notes = data.user_notes || [];
@@ -623,12 +747,16 @@ const PassageOverviewDrawer = {
       notes.forEach((n) => {
         const snippetHtml = this.formatMarkdownExcerpt(n.snippet);
         bodyHtml += `
-          <div class="overview-clean-item" data-action="open-note" data-note-id="${this.escapeHtml(n.id)}">
+          <div class="overview-clean-item"
+               data-action="open-note"
+               data-note-id="${this.escapeHtml(n.id)}"
+               data-tt-category="Note"
+               data-tt-author="${this.escapeHtml(n.title || 'Note')}"
+               data-tt-excerpt="${this.escapeHtml(snippetHtml)}">
             <div class="clean-item-header">
               <span class="clean-author-name">${this.escapeHtml(n.title || 'Note')}</span>
               <span class="clean-item-arrow">${this.icons.arrowRight}</span>
             </div>
-            ${snippetHtml ? `<p class="clean-item-excerpt">${snippetHtml}</p>` : ''}
           </div>
         `;
       });
@@ -668,7 +796,7 @@ const PassageOverviewDrawer = {
   },
 
   /**
-   * Section Lieux Géographiques
+   * Section Géographie & Lieux Bibliques
    */
   renderMapsSection(data) {
     const list = data.maps || [];
@@ -678,19 +806,29 @@ const PassageOverviewDrawer = {
     if (list.length === 0) {
       bodyHtml = `
         <div class="overview-empty-hint">
-          <span>Aucun site géographique identifié dans ce chapitre.</span>
+          <span>Aucun lieu géographique répertorié dans ce verset.</span>
+          <button class="overview-link-btn" data-action="open-maps-tab">Ouvrir l'Atlas biblique ${this.icons.arrowRight}</button>
         </div>
       `;
     } else {
       bodyHtml = `<div class="overview-clean-list">`;
       list.forEach((p) => {
+        const descHtml = this.formatMarkdownExcerpt(p.description);
         bodyHtml += `
-          <div class="overview-clean-item" data-action="focus-map-place" data-place-id="${this.escapeHtml(p.id)}">
+          <div class="overview-clean-item"
+               data-action="focus-map-place"
+               data-place-id="${this.escapeHtml(p.id)}"
+               data-tt-category="Lieu"
+               data-tt-author="${this.escapeHtml(p.name)}"
+               data-tt-title="${this.escapeHtml(p.type || 'Lieu biblique')}"
+               data-tt-excerpt="${this.escapeHtml(descHtml)}">
             <div class="clean-item-header">
-              <span class="clean-author-name">${this.escapeHtml(p.name)}</span>
-              <span class="clean-source-tag">${this.escapeHtml(p.type || 'Lieu')}</span>
+              <div class="clean-item-title-group">
+                <span class="clean-author-name">${this.escapeHtml(p.name)}</span>
+                <span class="clean-source-tag is-generic">${this.escapeHtml(p.type || 'Lieu')}</span>
+              </div>
+              <span class="clean-item-arrow">${this.icons.arrowRight}</span>
             </div>
-            ${p.description ? `<p class="clean-item-excerpt">${this.escapeHtml(this.cleanExcerpt(p.description))}</p>` : ''}
           </div>
         `;
       });
@@ -735,6 +873,27 @@ const PassageOverviewDrawer = {
    * Attache tous les événements interactifs (clic -> bascule sans quitter la Bible)
    */
   attachCardEventListeners(container, data) {
+    // Écouteurs de survol Popover sur chaque élément de ressource
+    let hoverTimer = null;
+    container.querySelectorAll('.overview-clean-item').forEach(item => {
+      item.addEventListener('mouseenter', () => {
+        clearTimeout(hoverTimer);
+        hoverTimer = setTimeout(() => {
+          this.showPopover(item);
+        }, 90);
+      });
+
+      item.addEventListener('mouseleave', () => {
+        clearTimeout(hoverTimer);
+        this.hidePopover();
+      });
+
+      item.addEventListener('click', () => {
+        clearTimeout(hoverTimer);
+        this.hidePopover();
+      });
+    });
+
     // 0. Toggle pour déplier les sections vides
     container.querySelectorAll('[data-action="toggle-empty-sections"]').forEach(btn => {
       btn.addEventListener('click', (e) => {

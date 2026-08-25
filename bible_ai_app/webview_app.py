@@ -474,8 +474,16 @@ class BibleAppApi:
 
     def get_commentaries(self, book_code: str, chapter: int, verse: int) -> List[Dict[str, Any]]:
         """Récupère instantanément tous les commentaires pour un verset donné en regroupant les sections par ouvrage."""
-        ch_int = int(chapter)
-        v_int = int(verse)
+        try:
+            ch_int = int(chapter) if chapter is not None else 1
+        except Exception:
+            ch_int = 1
+            
+        try:
+            v_int = int(verse) if verse is not None else 1
+        except Exception:
+            v_int = 1
+
         res = CommentaryLoader.get_all_comments_for_passage(book_code, ch_int, v_int)
         
         grouped = {}
