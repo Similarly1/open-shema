@@ -21720,6 +21720,120 @@ body.reading-bg-dark .comm-dropdown-popover {
   gap: 4px;
 }
 
+/* Section Analyse Linguistique & Morphologique */
+.strong-linguistic-section {
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-top: 4px;
+}
+
+.strong-linguistic-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+@media (max-width: 480px) {
+  .strong-linguistic-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.strong-ling-item {
+  position: relative;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 7px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  cursor: help;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.strong-ling-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(168, 85, 247, 0.4);
+}
+
+.strong-info-icon {
+  opacity: 0.45;
+  margin-left: 2px;
+  transition: all 0.2s ease;
+}
+
+.strong-ling-item:hover .strong-info-icon {
+  opacity: 1;
+  color: #c084fc;
+  transform: scale(1.1);
+}
+
+/* Infobulle CSS au survol */
+.strong-ling-item[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: #0f172a;
+  color: #e2e8f0;
+  font-size: 11px;
+  line-height: 1.45;
+  font-weight: 500;
+  padding: 7px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(168, 85, 247, 0.5);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.7);
+  white-space: normal;
+  width: 210px;
+  text-align: left;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+  z-index: 100;
+}
+
+.strong-ling-item[data-tooltip]:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.strong-ling-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.strong-ling-val {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.strong-translit-val {
+  font-family: var(--font-bible, 'EB Garamond', serif);
+  font-style: italic;
+  font-size: 14.5px;
+  color: #c084fc;
+}
+
+.strong-root-val {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fbbf24;
+}
+
 .strong-audio-play-btn {
   margin-top: 10px;
   display: inline-flex;
@@ -21773,11 +21887,19 @@ body.reading-bg-dark .comm-dropdown-popover {
 
 /* Barre d'onglets de sources du Lexique avec flèches de défilement */
 .lexicon-header-toolbar {
+  flex-shrink: 0;
+  height: 44px;
+  min-height: 44px;
+  max-height: 44px;
   position: relative;
   background: var(--bg-surface, #0f172a);
   border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
   padding: 6px 4px;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  z-index: 5;
 }
 
 .lexicon-source-tabs {
@@ -21789,10 +21911,36 @@ body.reading-bg-dark .comm-dropdown-popover {
   -ms-overflow-style: none;
   padding: 2px 28px;
   scroll-behavior: smooth;
+  height: 100%;
 }
 
 .lexicon-source-tabs::-webkit-scrollbar {
   display: none;
+}
+
+.lex-source-pill {
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 4px 11px;
+  border-radius: 14px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.lex-source-pill.active {
+  background: rgba(168, 85, 247, 0.25);
+  border-color: #a855f7;
+  color: #ffffff;
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.3);
 }
 
 .lex-tabs-scroll-btn {
@@ -21834,6 +21982,7 @@ body.reading-bg-dark .comm-dropdown-popover {
   pointer-events: none;
   display: none !important;
 }
+
 
 
 

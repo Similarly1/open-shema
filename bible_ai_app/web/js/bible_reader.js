@@ -3090,6 +3090,66 @@ const LexiconViewer = {
     }
   },
 
+  transliterateOriginalScript(script, isHebrew) {
+    if (!script) return '';
+    if (isHebrew) {
+      const map = {
+        '\u05D0': '’', '\u05D1': 'b', '\u05D2': 'g', '\u05D3': 'd', '\u05D4': 'h', '\u05D5': 'v',
+        '\u05D6': 'z', '\u05D7': 'ḥ', '\u05D8': 'ṭ', '\u05D9': 'y', '\u05DA': 'kh', '\u05DB': 'k',
+        '\u05DC': 'l', '\u05DD': 'm', '\u05DE': 'm', '\u05DF': 'n', '\u05E0': 'n', '\u05E1': 's',
+        '\u05E2': '‘', '\u05E3': 'f', '\u05E4': 'p', '\u05E5': 'ts', '\u05E6': 'ts', '\u05E7': 'q',
+        '\u05E8': 'r', '\u05E9': 'sh', '\u05EA': 't',
+        '\u05B7': 'a', '\u05B8': 'ā', '\u05B6': 'e', '\u05B5': 'ē', '\u05B4': 'i', '\u05B9': 'ō',
+        '\u05BB': 'u', '\u05B0': 'ə', '\u05B2': 'ă', '\u05B1': 'ĕ', '\u05B3': 'ŏ'
+      };
+      let res = '';
+      for (const ch of script) {
+        if (map[ch]) res += map[ch];
+        else if (ch === '\u05C2' && res.endsWith('sh')) {
+          res = res.slice(0, -2) + 's';
+        }
+      }
+      return res || script;
+    } else {
+      const parts = script.split(/[\-\–\—]/);
+      if (parts.length > 1) return parts[1].trim();
+      return script;
+    }
+  },
+
+  extractHebrewRoot(script) {
+    if (!script) return '';
+    const consonants = [];
+    for (const ch of script) {
+      if (ch >= '\u05D0' && ch <= '\u05EA') {
+        consonants.push(ch);
+      }
+    }
+    if (consonants.length >= 3) {
+      return consonants.slice(0, 3).join(' • ');
+    } else if (consonants.length > 0) {
+      return consonants.join(' • ');
+    }
+    return '';
+  },
+
+  deduceGrammarClass(frenchLemma, defn, isHebrew) {
+    const text = ((frenchLemma || '') + ' ' + (defn || '')).toLowerCase();
+    if (/^(aimer|dire|faire|créer|parler|marcher|bénir|donner|prendre|voir|entendre|aller|venir|sauver|prier|juger|garder)/i.test(frenchLemma) || /verbe|action|accompli|inaccompli/i.test(text)) {
+      return isHebrew ? 'Racine verbale (Verbe)' : 'Verbe Koinè';
+    }
+    if (/^(saint|grand|bon|mauvais|juste|pur|fidèle|fort|petit|haut)/i.test(frenchLemma) || /adjectif/i.test(text)) {
+      return 'Adjectif qualificatif';
+    }
+    if (/^(premier|deux|trois|quatre|dix|cent|mille)/i.test(frenchLemma) || /numéral/i.test(text)) {
+      return 'Numéral / Ordinal';
+    }
+    if (/^(dans|avec|pour|sur|sous|vers|contre|entre|devant)/i.test(frenchLemma) || /préposition/i.test(text)) {
+      return 'Préposition';
+    }
+    return isHebrew ? 'Substantif / Nom' : 'Nom (Substantif)';
+  },
+
   renderStrongCard(container, match, bpVideoCardHtml = '') {
     const rawTitle = match.title || this.currentTerm || '';
     let frenchLemma = rawTitle;
@@ -3145,6 +3205,9 @@ const LexiconViewer = {
     `).join('');
 
     const wordToPronounce = originalScript || frenchLemma;
+    const translit = this.transliterateOriginalScript(originalScript, isHebrew);
+    const hebrewRoot = isHebrew ? this.extractHebrewRoot(originalScript) : '';
+    const grammarClass = this.deduceGrammarClass(frenchLemma, cleanText, isHebrew);
 
     container.innerHTML = `
       <div class="strong-exegesis-container" style="padding: 16px;">
@@ -3180,6 +3243,60 @@ const LexiconViewer = {
             </button>
           </div>
 
+          <!-- Section Analyse Linguistique & Morphologie (OpenHebrewBible / OpenGNT) -->
+          <div class="strong-card-section strong-linguistic-section">
+            <div class="strong-section-label">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="2" y1="12" x2="22" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              </svg>
+              <span>Analyse Linguistique &amp; Morphologie</span>
+            </div>
+            
+            <div class="strong-linguistic-grid">
+              ${translit ? `
+                <div class="strong-ling-item" data-tooltip="Transcription phonétique : Permet de lire et prononcer le mot hébreu/grec en alphabet latin avec ses accents et sa métrique d'origine.">
+                  <div class="strong-ling-label">
+                    <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
+                    <span>Translittération</span>
+                    <svg class="strong-info-icon" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                  </div>
+                  <div class="strong-ling-val strong-translit-val">${translit}</div>
+                </div>
+              ` : ''}
+
+              ${isHebrew && hebrewRoot ? `
+                <div class="strong-ling-item" data-tooltip="Racine sémitique à 3 consonnes : En hébreu, presque chaque mot dérive d'une racine mère qui relie toute sa famille de sens théologique.">
+                  <div class="strong-ling-label">
+                    <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    <span>Racine Trilitère</span>
+                    <svg class="strong-info-icon" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                  </div>
+                  <div class="strong-ling-val strong-root-val font-hebrew" dir="rtl">${hebrewRoot}</div>
+                </div>
+              ` : ''}
+
+              <div class="strong-ling-item" data-tooltip="Catégorie morphologique : Indique la fonction grammaticale exacte (Nom, Verbe, Adjectif, Préposition) pour analyser précisément la phrase.">
+                <div class="strong-ling-label">
+                  <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                  <span>Nature grammaticale</span>
+                  <svg class="strong-info-icon" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                </div>
+                <div class="strong-ling-val">${grammarClass}</div>
+              </div>
+
+              <div class="strong-ling-item" data-tooltip="Manuscrit source &amp; Référence : Manuscrit académique original servant à l'alignement interlinéaire (Codex de Léningrad BHS pour l'A.T., NA28 pour le N.T.).">
+                <div class="strong-ling-label">
+                  <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                  <span>Corpus &amp; Alignement</span>
+                  <svg class="strong-info-icon" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                </div>
+                <div class="strong-ling-val">${isHebrew ? 'Codex de Léningrad (WLC / BHS)' : 'Nouveau Testament (NA28 / SBLGNT)'}</div>
+              </div>
+            </div>
+          </div>
+
 
           <!-- Section Sens Principaux -->
           <div class="strong-card-section">
@@ -3204,6 +3321,7 @@ const LexiconViewer = {
               </div>
             </div>
           ` : ''}
+
 
           <!-- Barre d'Actions Rapides -->
           <div class="strong-actions-footer">
