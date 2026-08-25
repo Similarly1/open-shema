@@ -20860,6 +20860,180 @@ body.reading-bg-dark .comm-dropdown-popover {
   color: #ffffff;
 }
 
+/* ========================================================================= */
+/* NOUVEAUX STYLES : HUB MÉDIAS, ÉTUDES DE MOTS & ENCARTS LEXICAUX           */
+/* ========================================================================= */
+
+.media-channel-select {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #f1f5f9;
+  font-size: 11.5px;
+  font-weight: 700;
+  border-radius: 6px;
+  padding: 3px 8px;
+  outline: none;
+  cursor: pointer;
+}
+
+.media-channel-select option {
+  background: #111827;
+  color: #f1f5f9;
+}
+
+/* Encart vidéo BibleProject dans le Lexique Strong */
+.lex-bp-video-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.12) 0%, rgba(99, 102, 241, 0.16) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lex-bp-video-card:hover {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(99, 102, 241, 0.25) 100%);
+  border-color: rgba(168, 85, 247, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(168, 85, 247, 0.2);
+}
+
+.lex-bp-video-thumb {
+  position: relative;
+  width: 72px;
+  height: 48px;
+  border-radius: 5px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #0f172a;
+}
+
+.lex-bp-video-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lex-bp-play-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(168, 85, 247, 0.9);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.lex-bp-video-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.lex-bp-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.lex-bp-tag {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #c084fc;
+}
+
+.lex-bp-dur {
+  font-size: 10px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.lex-bp-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #f8fafc;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lex-bp-hint {
+  font-size: 11px;
+  color: #a5b4fc;
+}
+
+/* Recherche dans le sous-onglet Études de Mots */
+.bp-words-header-box {
+  margin-bottom: 14px;
+}
+
+.bp-words-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.bp-words-search-wrap svg {
+  position: absolute;
+  left: 10px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.bp-words-search-input {
+  width: 100%;
+  background: var(--bg-subtle, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  border-radius: 6px;
+  padding: 6px 30px 6px 28px;
+  font-size: 12px;
+  color: var(--text-primary, #f1f5f9);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.bp-words-search-input:focus {
+  border-color: #a855f7;
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
+}
+
+.bp-words-search-clear {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.bp-word-dur {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #ffffff;
+  font-size: 9.5px;
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+
 
 
 
