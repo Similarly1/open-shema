@@ -24910,3 +24910,153 @@ body.reading-bg-dark .comm-dropdown-popover {
   gap: 6px;
   flex-shrink: 0;
 }
+/* =========================================================================
+ * STYLES MODALE ILLUSTRATION & MENU 3 POINTS PRÉDICATIONS
+ * ========================================================================= */
+
+.illustration-modal-card {
+  background: var(--bg-card, #18181b) !important;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12)) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6) !important;
+  overflow: hidden;
+}
+
+.illustration-modal-body {
+  padding: 20px 24px !important;
+  overflow-y: auto;
+  max-height: calc(85vh - 120px);
+}
+
+.illustration-modal-card .form-group {
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.illustration-modal-card .form-label {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: var(--text-muted, #a1a1aa) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+.illustration-modal-card .form-input,
+.illustration-modal-card .form-select,
+.illustration-modal-card .form-textarea,
+.illustration-modal-card input[type="text"],
+.illustration-modal-card select,
+.illustration-modal-card textarea {
+  background: rgba(0, 0, 0, 0.35) !important;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12)) !important;
+  border-radius: 7px !important;
+  color: var(--text-primary, #f4f4f5) !important;
+  font-size: 13px !important;
+  padding: 8px 12px !important;
+  outline: none !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  font-family: inherit !important;
+  transition: all 0.15s ease !important;
+}
+
+.illustration-modal-card .form-input:focus,
+.illustration-modal-card .form-select:focus,
+.illustration-modal-card .form-textarea:focus,
+.illustration-modal-card input[type="text"]:focus,
+.illustration-modal-card select:focus,
+.illustration-modal-card textarea:focus {
+  border-color: var(--accent-blue, #3b82f6) !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25) !important;
+}
+
+.illustration-modal-card textarea {
+  line-height: 1.6 !important;
+  resize: vertical !important;
+}
+
+.btn-danger-subtle {
+  background: rgba(239, 68, 68, 0.12) !important;
+  color: #f87171 !important;
+  border: 1px solid rgba(239, 68, 68, 0.25) !important;
+  border-radius: 6px !important;
+  padding: 7px 14px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  transition: all 0.15s ease !important;
+}
+
+.btn-danger-subtle:hover {
+  background: rgba(239, 68, 68, 0.22) !important;
+  color: #fca5a5 !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+/* MENU 3 POINTS (PLUS D'OPTIONS) SUR LES CARTES DE PRÉDICATION */
+.sermon-card-more-menu {
+  position: fixed;
+  z-index: 2500;
+  background: var(--bg-card, #18181b);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.14));
+  border-radius: 9px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
+  padding: 6px;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  backdrop-filter: blur(16px);
+}
+
+.sermon-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, #d4d4d8);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.12s ease;
+  width: 100%;
+}
+
+.sermon-menu-item svg {
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.sermon-menu-item:hover {
+  background: var(--bg-hover, rgba(255, 255, 255, 0.08));
+  color: var(--text-primary, #ffffff);
+}
+
+.sermon-menu-item:hover svg {
+  opacity: 1;
+}
+
+.sermon-menu-item.danger {
+  color: #f87171;
+}
+
+.sermon-menu-item.danger:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+}
+
+.sermon-menu-divider {
+  height: 1px;
+  background: var(--border-color, rgba(255, 255, 255, 0.08));
+  margin: 4px 0;
+}

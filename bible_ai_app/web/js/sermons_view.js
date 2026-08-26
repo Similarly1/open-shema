@@ -341,8 +341,8 @@ const SermonsView = {
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
                 <span>Pupitre</span>
               </button>
-              <button class="btn-icon-subtle btn-card-delete" data-sermon-id="${sermon.id}" title="Supprimer la prédication" style="color: #f87171;">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
+              <button class="btn-icon-subtle btn-card-more-options" data-sermon-id="${sermon.id}" title="Plus d'options">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
               </button>
             </div>
           </div>
@@ -355,7 +355,7 @@ const SermonsView = {
     // Événements sur les cartes
     this.hubCardsContainer.querySelectorAll('.sermon-card').forEach(card => {
       card.addEventListener('click', async (e) => {
-        if (e.target.closest('.btn-card-action') || e.target.closest('.btn-card-delete')) return;
+        if (e.target.closest('.btn-card-action') || e.target.closest('.btn-card-more-options')) return;
         const id = card.dataset.sermonId;
         const sermon = await API.getSermon(id);
         if (sermon) this.openEditor(sermon);
@@ -384,56 +384,179 @@ const SermonsView = {
       });
     });
 
-    this.hubCardsContainer.querySelectorAll('.btn-card-delete').forEach(btn => {
+    // Menu 3 points "Plus d'options"
+    this.hubCardsContainer.querySelectorAll('.btn-card-more-options').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const id = btn.dataset.sermonId;
-        this.deleteSermon(id);
+        const sermon = this.sermons.find(s => s.id === id);
+        if (sermon) this.openCardMoreMenu(sermon, btn);
       });
     });
   },
 
-  async deleteSermon(sermonId) {
-    const sermon = this.sermons.find(s => s.id === sermonId);
-    const title = sermon?.title || 'cette prédication';
+  openCardMoreMenu(sermon, anchorBtn) {
+    this.closeCardMoreMenu();
 
-    let confirmed = false;
-    if (typeof App !== 'undefined' && App.showConfirmModal) {
-      confirmed = await App.showConfirmModal({
-        title: "Supprimer la prédication",
-        message: `Voulez-vous supprimer définitivement la prédication "${title}" ?`,
-        confirmText: "Supprimer",
-        cancelText: "Annuler",
-        danger: true,
-        icon: "trash"
-      });
-    } else {
-      confirmed = confirm(`Voulez-vous supprimer définitivement la prédication "${title}" ?`);
+    const menu = document.createElement('div');
+    menu.id = 'sermon-card-more-menu-active';
+    menu.className = 'sermon-card-more-menu';
+
+    const isReady = sermon.status === 'ready';
+    const statusActionLabel = isReady ? 'Repasser en brouillon' : 'Marquer comme prêt';
+    const nextStatus = isReady ? 'draft' : 'ready';
+
+    menu.innerHTML = `
+      <button class="sermon-menu-item" id="menu-action-rename">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        <span>Renommer</span>
+      </button>
+      <button class="sermon-menu-item" id="menu-action-status">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span>${statusActionLabel}</span>
+      </button>
+      <button class="sermon-menu-item" id="menu-action-duplicate">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+        <span>Dupliquer</span>
+      </button>
+      <div class="sermon-menu-divider"></div>
+      <button class="sermon-menu-item danger" id="menu-action-delete">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
+        <span>Supprimer</span>
+      </button>
+    `;
+
+    document.body.appendChild(menu);
+
+    // Positionner sous ou au-dessus du bouton
+    const rect = anchorBtn.getBoundingClientRect();
+    const menuWidth = 180;
+    let left = rect.right - menuWidth;
+    if (left < 10) left = 10;
+    let top = rect.bottom + 6;
+    if (top + 160 > window.innerHeight) {
+      top = rect.top - 150;
     }
 
-    if (!confirmed) return;
+    menu.style.left = `${left}px`;
+    menu.style.top = `${top}px`;
+
+    // Événements du menu
+    menu.querySelector('#menu-action-rename')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.closeCardMoreMenu();
+      this.promptRenameSermon(sermon);
+    });
+
+    menu.querySelector('#menu-action-status')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.closeCardMoreMenu();
+      this.toggleSermonStatus(sermon, nextStatus);
+    });
+
+    menu.querySelector('#menu-action-duplicate')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.closeCardMoreMenu();
+      this.duplicateSermon(sermon);
+    });
+
+    menu.querySelector('#menu-action-delete')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.closeCardMoreMenu();
+      this.deleteSermon(sermon.id);
+    });
+
+    // Fermeture si clic extérieur
+    const onDocClick = (e) => {
+      if (!menu.contains(e.target) && e.target !== anchorBtn) {
+        this.closeCardMoreMenu();
+        document.removeEventListener('click', onDocClick);
+      }
+    };
+    setTimeout(() => document.addEventListener('click', onDocClick), 20);
+  },
+
+  closeCardMoreMenu() {
+    const existing = document.getElementById('sermon-card-more-menu-active');
+    if (existing) existing.remove();
+  },
+
+  async promptRenameSermon(sermon) {
+    if (!sermon) return;
+    const newTitle = await App.showPromptModal({
+      title: "Renommer la prédication",
+      message: "Entrez le nouveau titre du sermon :",
+      defaultValue: sermon.title || "",
+      placeholder: "Titre de la prédication...",
+      confirmText: "Renommer"
+    });
+
+    if (!newTitle || newTitle === sermon.title) return;
 
     try {
-      const res = await API.deleteSermon(sermonId);
+      const fullSermon = await API.getSermon(sermon.id) || sermon;
+      fullSermon.title = newTitle;
+      const res = await API.saveSermon(fullSermon);
       if (res && res.success) {
-        if (this.currentSermon?.id === sermonId) {
-          this.currentSermon = null;
+        if (this.currentSermon?.id === sermon.id) {
+          this.currentSermon.title = newTitle;
+          if (this.titleInput) this.titleInput.value = newTitle;
+          this.updateHeaderSummary(this.currentSermon);
         }
         await this.loadSermons();
         this.renderHubCards();
         if (typeof App !== 'undefined' && App.showToast) {
-          App.showToast("Prédication supprimée.");
+          App.showToast("Prédication renommée !");
         }
       }
     } catch (e) {
-      console.error('Erreur suppression sermon:', e);
+      console.error('Erreur renommage sermon:', e);
     }
   },
 
-  async deleteCurrentSermon() {
-    if (!this.currentSermon) return;
-    await this.deleteSermon(this.currentSermon.id);
-    this.openHub();
+  async toggleSermonStatus(sermon, newStatus) {
+    if (!sermon) return;
+    try {
+      const fullSermon = await API.getSermon(sermon.id) || sermon;
+      fullSermon.status = newStatus;
+      const res = await API.saveSermon(fullSermon);
+      if (res && res.success) {
+        if (this.currentSermon?.id === sermon.id) {
+          this.currentSermon.status = newStatus;
+        }
+        await this.loadSermons();
+        this.renderHubCards();
+        if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast(newStatus === 'ready' ? "Prédication marquée comme prête !" : "Prédication remise en brouillon.");
+        }
+      }
+    } catch (e) {
+      console.error('Erreur changement statut sermon:', e);
+    }
+  },
+
+  async duplicateSermon(sermon) {
+    if (!sermon) return;
+    try {
+      const fullSermon = await API.getSermon(sermon.id) || sermon;
+      const duplicate = {
+        ...fullSermon,
+        id: `sermon-${Date.now()}`,
+        title: `${fullSermon.title || 'Prédication'} (Copie)`,
+        date_planned: new Date().toISOString().split('T')[0],
+        status: 'draft'
+      };
+      const res = await API.saveSermon(duplicate);
+      if (res && res.success) {
+        await this.loadSermons();
+        this.renderHubCards();
+        if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast("Prédication dupliquée avec succès !");
+        }
+      }
+    } catch (e) {
+      console.error('Erreur duplication sermon:', e);
+    }
   },
 
   populateEditor(sermon) {

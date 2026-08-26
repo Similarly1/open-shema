@@ -659,7 +659,12 @@ const App = {
       document.getElementById('nav-sub-sermon-editor')?.classList.add('active');
       document.getElementById('group-nav-sermons')?.classList.add('open');
       if (typeof SermonsView !== 'undefined') {
-        SermonsView.openEditor(SermonsView.currentSermon);
+        if (!SermonsView.currentSermon && SermonsView.sermons.length > 0) {
+          SermonsView.currentSermon = SermonsView.sermons[0];
+        }
+        if (SermonsView.currentSermon) {
+          SermonsView.populateEditor(SermonsView.currentSermon);
+        }
       }
     } else if (viewName === 'illustrations') {
       if (drawerEl) drawerEl.classList.add('collapsed');
@@ -797,6 +802,102 @@ const App = {
 
       document.addEventListener('keydown', handleKey);
       btnConfirm?.focus();
+    });
+  },
+
+  /**
+   * Boîte de dialogue avec champ de saisie (remplace prompt() natif)
+   */
+  showPromptModal({
+    title = "Saisir une valeur",
+    message = "Veuillez entrer une valeur :",
+    defaultValue = "",
+    placeholder = "",
+    confirmText = "Enregistrer",
+    cancelText = "Annuler"
+  } = {}) {
+    return new Promise((resolve) => {
+      let modal = document.getElementById('app-custom-prompt-modal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'app-custom-prompt-modal';
+        modal.className = 'custom-confirm-overlay hidden';
+        document.body.appendChild(modal);
+      }
+
+      modal.innerHTML = `
+        <div class="custom-confirm-card" role="dialog" aria-modal="true" style="max-width: 440px;">
+          <div class="custom-confirm-header">
+            <div class="confirm-icon info">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+              </svg>
+            </div>
+            <div class="custom-confirm-title">${title}</div>
+          </div>
+          <div class="custom-confirm-body">
+            <p style="margin-bottom: 12px; font-size: 13px; color: var(--text-secondary, #d4d4d8);">${message}</p>
+            <input type="text" class="custom-prompt-input" style="width: 100%; height: 38px; padding: 0 12px; border-radius: 7px; border: 1px solid var(--border-color, rgba(255,255,255,0.15)); background: rgba(0,0,0,0.35); color: var(--text-primary, #f4f4f5); font-size: 13.5px; outline: none; box-sizing: border-box;" value="${(defaultValue || '').replace(/"/g, '&quot;')}" placeholder="${(placeholder || '').replace(/"/g, '&quot;')}">
+          </div>
+          <div class="custom-confirm-footer">
+            <button type="button" class="btn-secondary btn-prompt-cancel">${cancelText}</button>
+            <button type="button" class="btn-primary btn-prompt-confirm">${confirmText}</button>
+          </div>
+        </div>
+      `;
+
+      modal.classList.remove('hidden');
+      requestAnimationFrame(() => {
+        modal.classList.add('visible');
+      });
+
+      const input = modal.querySelector('.custom-prompt-input');
+      const btnCancel = modal.querySelector('.btn-prompt-cancel');
+      const btnConfirm = modal.querySelector('.btn-prompt-confirm');
+
+      let isClosed = false;
+      const cleanup = (value) => {
+        if (isClosed) return;
+        isClosed = true;
+        modal.classList.remove('visible');
+        setTimeout(() => {
+          modal.classList.add('hidden');
+        }, 150);
+        document.removeEventListener('keydown', handleKey);
+        resolve(value);
+      };
+
+      const handleKey = (e) => {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          cleanup(null);
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          cleanup(input.value.trim());
+        }
+      };
+
+      btnCancel?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        cleanup(null);
+      });
+
+      btnConfirm?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        cleanup(input.value.trim());
+      });
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          cleanup(null);
+        }
+      });
+
+      document.addEventListener('keydown', handleKey);
+      setTimeout(() => {
+        input?.focus();
+        input?.select();
+      }, 50);
     });
   },
 

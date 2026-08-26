@@ -321,14 +321,30 @@ const IllustrationsView = {
 
   async deleteCurrentModal() {
     if (!this.currentIllustration?.id) return;
-    if (!confirm(`Supprimer définitivement l'illustration "${this.currentIllustration.title || 'cette fiche'}" ?`)) {
-      return;
+    const title = this.currentIllustration.title || 'cette fiche';
+    let confirmed = false;
+    if (typeof App !== 'undefined' && App.showConfirmModal) {
+      confirmed = await App.showConfirmModal({
+        title: "Supprimer l'illustration",
+        message: `Voulez-vous supprimer définitivement l'illustration "${title}" ?`,
+        confirmText: "Supprimer",
+        cancelText: "Annuler",
+        danger: true,
+        icon: "trash"
+      });
+    } else {
+      confirmed = confirm(`Supprimer définitivement l'illustration "${title}" ?`);
     }
+
+    if (!confirmed) return;
 
     try {
       await API.deleteIllustration(this.currentIllustration.id);
       this.closeModal();
       await this.loadIllustrations();
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast("Illustration supprimée.");
+      }
     } catch (e) {
       console.error('Erreur suppression illustration:', e);
     }
@@ -378,7 +394,7 @@ const IllustrationsView = {
 
     this.closeModal();
     if (typeof App !== 'undefined' && App.switchView) {
-      App.switchView('sermons');
+      App.switchView('sermon-editor');
     }
   },
 
