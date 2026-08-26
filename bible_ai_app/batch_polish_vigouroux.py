@@ -12,6 +12,7 @@ Mode HYBRIDE Multi-Clés & Multi-Fournisseurs :
 import os
 import sys
 import json
+import re
 import time
 import signal
 import argparse
