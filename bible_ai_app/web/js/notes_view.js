@@ -28,6 +28,13 @@ const NotesView = {
   maxHistory: 80,
   historyDebounceTimer: null,
 
+  // Système d'enregistrement automatique continu
+  autoSaveTimer: null,
+  autoSaveDelay: 800,
+  isSaving: false,
+  lastSavedSignature: null,
+  autoSaveIndicator: null,
+
   init() {
     this.listContainer = document.getElementById('notes-list-items');
     this.searchInput = document.getElementById('notes-search-input');
@@ -38,6 +45,7 @@ const NotesView = {
     this.contentInput = document.getElementById('note-edit-content');
     this.previewContainer = document.getElementById('note-preview-content');
     this.contextMenu = document.getElementById('obsidian-context-menu');
+    this.autoSaveIndicator = document.getElementById('note-autosave-indicator');
 
     this.searchInput?.addEventListener('input', () => this.renderList());
 
@@ -58,10 +66,6 @@ const NotesView = {
       }
     });
 
-    document.getElementById('btn-save-current-note')?.addEventListener('click', () => {
-      this.saveCurrentNote();
-    });
-
     document.getElementById('btn-delete-current-note')?.addEventListener('click', () => {
       this.deleteCurrentNote();
     });
@@ -79,25 +83,46 @@ const NotesView = {
       this.redo();
     });
 
-    // Raccourcis de formatage Barre Rapide
-    this.bindMarkdownTools();
+    // Infobulle flottante style Anytype sur sélection de texte
+    this.bindFloatingToolbar();
 
     // Menu contextuel style Obsidian (Clic droit) & Raccourcis clavier
     this.bindContextMenu();
     this.bindEditorShortcuts(this.contentInput);
 
-    // Écoute de la saisie pour l'historique Undo / Redo
+    // Écoute de la saisie pour l'historique Undo / Redo et l'enregistrement automatique continu
     this.contentInput?.addEventListener('input', () => {
       this.debouncedPushHistory();
+      this.triggerAutoSave();
     });
     this.titleInput?.addEventListener('input', () => {
       this.debouncedPushHistory();
+      this.triggerAutoSave();
     });
     this.refInput?.addEventListener('input', () => {
       this.debouncedPushHistory();
+      this.triggerAutoSave();
     });
     this.tagsInput?.addEventListener('input', () => {
       this.debouncedPushHistory();
+      this.triggerAutoSave();
+    });
+    this.aiToggle?.addEventListener('change', () => {
+      this.triggerAutoSave();
+    });
+
+    // Enregistrement immédiat au changement de focus (blur)
+    this.contentInput?.addEventListener('blur', () => {
+      this.saveCurrentNote(true);
+    });
+    this.titleInput?.addEventListener('blur', () => {
+      this.saveCurrentNote(true);
+    });
+    this.refInput?.addEventListener('blur', () => {
+      this.saveCurrentNote(true);
+    });
+    this.tagsInput?.addEventListener('blur', () => {
+      this.saveCurrentNote(true);
     });
 
     // Gestion du collage intelligent dans l'éditeur riche
@@ -125,15 +150,252 @@ const NotesView = {
     this.loadNotes();
   },
 
-  bindMarkdownTools() {
-    document.getElementById('btn-md-h1')?.addEventListener('click', () => this.executeAction('h1', this.contentInput));
-    document.getElementById('btn-md-h2')?.addEventListener('click', () => this.executeAction('h2', this.contentInput));
-    document.getElementById('btn-md-bold')?.addEventListener('click', () => this.executeAction('bold', this.contentInput));
-    document.getElementById('btn-md-italic')?.addEventListener('click', () => this.executeAction('italic', this.contentInput));
-    document.getElementById('btn-md-quote')?.addEventListener('click', () => this.executeAction('quote', this.contentInput));
-    document.getElementById('btn-md-list')?.addEventListener('click', () => this.executeAction('bullet-list', this.contentInput));
-    document.getElementById('btn-md-table')?.addEventListener('click', () => this.executeAction('table', this.contentInput));
-    document.getElementById('btn-md-callout')?.addEventListener('click', () => this.executeAction('callout', this.contentInput));
+  // =========================================================================
+  // INFOBULLE FLOTTANTE DE SÉLECTION STYLE ANYTYPE
+  // =========================================================================
+
+  bindFloatingToolbar() {
+    const toolbar = document.getElementById('notes-floating-toolbar');
+    if (!toolbar) return;
+    this.floatingToolbar = toolbar;
+
+    // Empêcher la perte de sélection lors du clic sur la barre flottante
+    toolbar.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+    });
+
+    const blockTypeBtn = document.getElementById('nft-btn-block-type');
+    const blockMenu = document.getElementById('nft-block-menu');
+    const moreBtn = document.getElementById('nft-btn-more');
+    const moreMenu = document.getElementById('nft-more-menu');
+
+    // Menu Type de Bloc
+    blockTypeBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      moreMenu?.classList.add('hidden');
+      blockMenu?.classList.toggle('hidden');
+    });
+
+    // Menu Plus d'options
+    moreBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      blockMenu?.classList.add('hidden');
+      moreMenu?.classList.toggle('hidden');
+    });
+
+    // Clic sur les boutons principaux
+    toolbar.querySelectorAll('.nft-btn[data-action]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const action = btn.dataset.action;
+        this.handleFloatingToolbarAction(action);
+      });
+    });
+
+    // Clic sur les éléments des menus déroulants
+    toolbar.querySelectorAll('.nft-dropdown-item[data-action]').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const action = item.dataset.action;
+        blockMenu?.classList.add('hidden');
+        moreMenu?.classList.add('hidden');
+        this.handleFloatingToolbarAction(action);
+      });
+    });
+
+    // Fermer les sous-menus au clic extérieur
+    document.addEventListener('click', (e) => {
+      if (!toolbar.contains(e.target)) {
+        blockMenu?.classList.add('hidden');
+        moreMenu?.classList.add('hidden');
+      }
+    });
+
+    // Détection de la sélection dans l'éditeur
+    const updateSelectionToolbar = () => {
+      if (this.isPreviewMode) {
+        this.hideFloatingToolbar();
+        return;
+      }
+
+      const sel = window.getSelection();
+      if (!sel || sel.isCollapsed || !sel.rangeCount) {
+        this.hideFloatingToolbar();
+        return;
+      }
+
+      const range = sel.getRangeAt(0);
+      const editor = this.contentInput;
+      if (!editor || !editor.contains(range.commonAncestorContainer)) {
+        this.hideFloatingToolbar();
+        return;
+      }
+
+      const text = sel.toString().trim();
+      if (!text) {
+        this.hideFloatingToolbar();
+        return;
+      }
+
+      this.showFloatingToolbar(range);
+    };
+
+    document.addEventListener('selectionchange', () => {
+      setTimeout(updateSelectionToolbar, 10);
+    });
+
+    this.contentInput?.addEventListener('mouseup', updateSelectionToolbar);
+    this.contentInput?.addEventListener('keyup', (e) => {
+      if (['Shift', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+        updateSelectionToolbar();
+      }
+    });
+  },
+
+  showFloatingToolbar(range) {
+    const toolbar = this.floatingToolbar;
+    if (!toolbar) return;
+
+    this.currentSelectionRange = range.cloneRange();
+    const rect = range.getBoundingClientRect();
+    if (rect.width === 0 && rect.height === 0) {
+      this.hideFloatingToolbar();
+      return;
+    }
+
+    toolbar.classList.remove('hidden');
+
+    const toolbarWidth = toolbar.offsetWidth || 310;
+    const toolbarHeight = toolbar.offsetHeight || 36;
+
+    // Positionner au-dessus de la sélection
+    let top = rect.top - toolbarHeight - 8;
+    let left = rect.left + (rect.width / 2) - (toolbarWidth / 2);
+
+    // Si trop proche du haut de l'écran, positionner en dessous
+    if (top < 50) {
+      top = rect.bottom + 8;
+    }
+
+    // Garder dans les limites horizontales de l'écran
+    if (left < 10) left = 10;
+    if (left + toolbarWidth > window.innerWidth - 10) {
+      left = window.innerWidth - toolbarWidth - 10;
+    }
+
+    toolbar.style.top = `${top + window.scrollY}px`;
+    toolbar.style.left = `${left + window.scrollX}px`;
+
+    this.updateCurrentBlockLabel(range);
+    this.updateFloatingButtonsState();
+  },
+
+  hideFloatingToolbar() {
+    if (this.floatingToolbar) {
+      this.floatingToolbar.classList.add('hidden');
+      document.getElementById('nft-block-menu')?.classList.add('hidden');
+      document.getElementById('nft-more-menu')?.classList.add('hidden');
+    }
+  },
+
+  updateCurrentBlockLabel(range) {
+    const labelEl = document.getElementById('nft-current-block-label');
+    if (!labelEl) return;
+
+    let node = range.commonAncestorContainer;
+    if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
+
+    const block = node.closest('h1, h2, h3, blockquote, .note-callout, .note-task-item, ul, ol, p') || node;
+    const tag = block.tagName ? block.tagName.toLowerCase() : '';
+
+    if (tag === 'h1') labelEl.textContent = 'H1';
+    else if (tag === 'h2') labelEl.textContent = 'H2';
+    else if (tag === 'h3') labelEl.textContent = 'H3';
+    else if (tag === 'blockquote') labelEl.textContent = '”';
+    else if (block.classList?.contains('note-callout')) labelEl.textContent = '💡';
+    else if (block.classList?.contains('note-task-item')) labelEl.textContent = '☑';
+    else if (tag === 'ul') labelEl.textContent = '•';
+    else if (tag === 'ol') labelEl.textContent = '1.';
+    else labelEl.textContent = 'Aa';
+  },
+
+  updateFloatingButtonsState() {
+    if (!this.floatingToolbar) return;
+    const checkState = (action, query) => {
+      const btn = this.floatingToolbar.querySelector(`.nft-btn[data-action="${action}"]`);
+      if (btn) {
+        try {
+          const isActive = document.queryCommandState(query);
+          btn.classList.toggle('active', !!isActive);
+        } catch (e) {
+          btn.classList.remove('active');
+        }
+      }
+    };
+
+    checkState('bold', 'bold');
+    checkState('italic', 'italic');
+    checkState('underline', 'underline');
+    checkState('strikethrough', 'strikeThrough');
+  },
+
+  handleFloatingToolbarAction(action) {
+    if (this.currentSelectionRange) {
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(this.currentSelectionRange);
+    }
+
+    if (['h1', 'h2', 'h3', 'text', 'quote', 'callout', 'bullet', 'number', 'task'].includes(action)) {
+      this.setBlockType(action);
+    } else if (action === 'bold') {
+      document.execCommand('bold');
+    } else if (action === 'italic') {
+      document.execCommand('italic');
+    } else if (action === 'underline') {
+      document.execCommand('underline');
+    } else if (action === 'strikethrough') {
+      document.execCommand('strikeThrough');
+    } else if (action === 'code') {
+      this.surroundSelectionWithTag('code');
+    } else if (action === 'highlight') {
+      this.surroundSelectionWithTag('mark');
+    } else if (action === 'link') {
+      this.handleLinkAction();
+    } else if (action === 'superscript') {
+      document.execCommand('superscript');
+    } else if (action === 'subscript') {
+      document.execCommand('subscript');
+    } else if (action === 'datetime') {
+      const now = new Date();
+      const dStr = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      const tStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      document.execCommand('insertHTML', false, `<strong>${dStr} à ${tStr}</strong> `);
+    } else if (action === 'clear-format') {
+      document.execCommand('removeFormat');
+    }
+
+    this.pushHistoryState();
+    this.triggerAutoSave();
+    this.updateFloatingButtonsState();
+  },
+
+  handleLinkAction() {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return;
+    const text = sel.toString().trim();
+    
+    const refRegex = /^([1-3]?\s?[A-ZÀ-Ÿa-zà-ÿ]{3,15})\s+(\d{1,3}):(\d{1,3}(?:-\d{1,3})?)$/;
+    if (refRegex.test(text)) {
+      const html = `<a href="#" class="scripture-link" data-ref="${text}" style="color: var(--accent-blue); font-weight: 700; text-decoration: underline; cursor: pointer;">${text}</a>`;
+      document.execCommand('insertHTML', false, html);
+      return;
+    }
+
+    const url = prompt("Entrez l'URL du lien :", "https://");
+    if (url) {
+      document.execCommand('createLink', false, url);
+    }
   },
 
   bindContextMenu() {
@@ -266,7 +528,7 @@ const NotesView = {
           this.executeAction('datetime', inputEl);
         } else if (key === 's') {
           e.preventDefault();
-          this.saveCurrentNote();
+          this.saveCurrentNote(false);
         }
       } else if (e.key === 'Tab') {
         // Gestion de l'indentation avec Tab
@@ -281,22 +543,23 @@ const NotesView = {
   // =========================================================================
 
   debouncedPushHistory() {
-    clearTimeout(this.historyDebounceTimer);
+    if (this.historyDebounceTimer) {
+      clearTimeout(this.historyDebounceTimer);
+    }
     this.historyDebounceTimer = setTimeout(() => {
       this.pushHistoryState();
-    }, 350);
+    }, 400);
   },
 
   pushHistoryState() {
-    if (!this.contentInput) return;
     const currentState = {
-      html: this.contentInput.innerHTML,
-      title: this.titleInput?.value || '',
-      ref: this.refInput?.value || '',
-      tags: this.tagsInput?.value || ''
+      html: this.contentInput ? this.contentInput.innerHTML : '',
+      title: this.titleInput ? this.titleInput.value : '',
+      ref: this.refInput ? this.refInput.value : '',
+      tags: this.tagsInput ? this.tagsInput.value : ''
     };
 
-    // Éviter les doublons consécutifs identiques
+    // Éviter d'empiler des états identiques
     if (this.historyIndex >= 0) {
       const prev = this.history[this.historyIndex];
       if (prev && prev.html === currentState.html && prev.title === currentState.title && prev.ref === currentState.ref && prev.tags === currentState.tags) {
@@ -343,6 +606,7 @@ const NotesView = {
     if (this.titleInput) this.titleInput.value = state.title || '';
     if (this.refInput) this.refInput.value = state.ref || '';
     if (this.tagsInput) this.tagsInput.value = state.tags || '';
+    this.triggerAutoSave();
   },
 
   // =========================================================================
@@ -533,6 +797,7 @@ const NotesView = {
     }
 
     this.pushHistoryState();
+    this.triggerAutoSave();
   },
 
   surroundSelectionWithTag(tagName) {
@@ -552,19 +817,84 @@ const NotesView = {
     sel.addRange(range);
   },
 
-  applyBlockFormat(tag) {
+  setBlockType(type) {
     const sel = window.getSelection();
-    if (!sel.rangeCount) return;
+    if (!sel || !sel.rangeCount) return;
     const range = sel.getRangeAt(0);
-    let parent = range.commonAncestorContainer;
-    if (parent.nodeType === Node.TEXT_NODE) parent = parent.parentNode;
 
-    // Si on est déjà dans ce tag, repasser en <p>
-    if (parent.closest(tag)) {
-      document.execCommand('formatBlock', false, '<p>');
-    } else {
-      document.execCommand('formatBlock', false, `<${tag}>`);
+    if (type === 'callout') {
+      this.insertCallout();
+      return;
+    } else if (type === 'task') {
+      this.insertTaskItem();
+      return;
+    } else if (type === 'bullet') {
+      document.execCommand('insertUnorderedList');
+      return;
+    } else if (type === 'number') {
+      document.execCommand('insertOrderedList');
+      return;
     }
+
+    const tag = (type === 'text' || type === 'paragraph') ? 'p' : (type === 'quote' ? 'blockquote' : type.toLowerCase());
+
+    // Trouver le bloc actuel à formater
+    let node = range.startContainer;
+    if (node.nodeType === Node.TEXT_NODE) {
+      node = node.parentNode;
+    }
+
+    let block = node.closest('h1, h2, h3, blockquote, p, div, li');
+    if (!block || !this.contentInput.contains(block) || block === this.contentInput) {
+      // Trouver l'enfant direct de contentInput contenant la sélection
+      let child = range.startContainer;
+      while (child && child.parentNode !== this.contentInput && child !== this.contentInput) {
+        child = child.parentNode;
+      }
+      block = (child && child !== this.contentInput) ? child : null;
+    }
+
+    if (block && block.parentNode) {
+      const currentTagName = block.tagName ? block.tagName.toLowerCase() : '';
+      const targetTag = (currentTagName === tag && tag !== 'p') ? 'p' : tag;
+      const newBlock = document.createElement(targetTag);
+
+      const rawText = block.textContent.replace(/[\r\n\s]+/g, '').trim();
+      if (!rawText) {
+        newBlock.innerHTML = '<br>';
+      } else {
+        while (block.firstChild) {
+          newBlock.appendChild(block.firstChild);
+        }
+      }
+
+      block.parentNode.replaceChild(newBlock, block);
+
+      // Repositionner le curseur dans le nouveau bloc
+      const newRange = document.createRange();
+      newRange.selectNodeContents(newBlock);
+      newRange.collapse(!rawText);
+      sel.removeAllRanges();
+      sel.addRange(newRange);
+      this.contentInput.focus();
+    } else {
+      // Insertion d'un nouveau bloc
+      const newBlock = document.createElement(tag);
+      newBlock.innerHTML = '<br>';
+      range.deleteContents();
+      range.insertNode(newBlock);
+
+      const newRange = document.createRange();
+      newRange.selectNodeContents(newBlock);
+      newRange.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(newRange);
+      this.contentInput.focus();
+    }
+  },
+
+  applyBlockFormat(tag) {
+    this.setBlockType(tag);
   },
 
   insertRealTable() {
@@ -1156,7 +1486,11 @@ const NotesView = {
     }
   },
 
-  selectNote(note) {
+  async selectNote(note) {
+    if (this.currentNote && this.currentNote !== note) {
+      await this.saveCurrentNote(true);
+    }
+
     this.currentNote = note;
     if (this.titleInput) this.titleInput.value = note.title || '';
     if (this.refInput) this.refInput.value = note.reference || '';
@@ -1173,6 +1507,8 @@ const NotesView = {
     this.historyIndex = -1;
     this.pushHistoryState();
 
+    this.lastSavedSignature = this.computeCurrentSignature();
+    this.updateAutoSaveIndicator('saved');
     this.updateAiToggleVisibility();
 
     if (this.isPreviewMode) {
@@ -1182,7 +1518,10 @@ const NotesView = {
     this.renderList();
   },
 
-  createNewNote(initialRef = null, initialTitle = null) {
+  async createNewNote(initialRef = null, initialTitle = null) {
+    if (this.currentNote) {
+      await this.saveCurrentNote(true);
+    }
     const defaultRef = initialRef || '';
     const newNote = {
       id: null,
@@ -1194,7 +1533,7 @@ const NotesView = {
       updated_at: 'À l\'instant'
     };
     this.currentNote = newNote;
-    this.selectNote(newNote);
+    await this.selectNote(newNote);
     if (this.isPreviewMode) this.togglePreview();
     this.titleInput?.focus();
   },
@@ -1225,6 +1564,7 @@ const NotesView = {
           this.currentNote.title = res.title;
         }
         this.pushHistoryState();
+        this.saveCurrentNote(true);
         App.showToast(`Titre généré par IA (${res.model_used || 'IA'}) !`);
       } else {
         App.showToast(`Erreur génération titre : ${res?.error || 'Échec'}`);
@@ -1266,6 +1606,7 @@ const NotesView = {
           this.currentNote.tags = res.tags;
         }
         this.pushHistoryState();
+        this.saveCurrentNote(true);
         App.showToast(`Tags générés par IA (${res.model_used || 'IA'}) !`);
       } else {
         App.showToast(`Erreur génération tags : ${res?.error || 'Échec'}`);
@@ -1520,7 +1861,27 @@ const NotesView = {
       }
     }
 
-    this.executeAction(action, this.contentInput);
+    if (['h1', 'h2', 'h3', 'text', 'paragraph', 'quote', 'callout', 'bullet', 'number', 'task'].includes(action)) {
+      this.setBlockType(action);
+    } else if (action === 'scripture') {
+      this.insertScriptureQuote();
+    } else if (action === 'table') {
+      this.insertRealTable();
+    } else if (action === 'code') {
+      this.insertCodeBlock();
+    } else if (action === 'divider') {
+      document.execCommand('insertHorizontalRule');
+    } else if (action === 'datetime') {
+      const now = new Date();
+      const dStr = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      const tStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      document.execCommand('insertHTML', false, `<strong>${dStr} à ${tStr}</strong> `);
+    } else {
+      this.executeAction(action, this.contentInput);
+    }
+
+    this.pushHistoryState();
+    this.triggerAutoSave();
   },
 
   escapeHtml(str) {
@@ -1536,6 +1897,9 @@ const NotesView = {
   togglePreview() {
     this.isPreviewMode = !this.isPreviewMode;
     const btn = document.getElementById('btn-toggle-note-preview');
+
+    this.hideFloatingToolbar();
+    this.closeSlashMenu();
 
     if (this.isPreviewMode) {
       if (btn) btn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><span>Éditer</span>';
@@ -1580,30 +1944,130 @@ const NotesView = {
     });
   },
 
-  async saveCurrentNote() {
+  triggerAutoSave() {
+    this.updateAutoSaveIndicator('dirty');
+    if (this.autoSaveTimer) {
+      clearTimeout(this.autoSaveTimer);
+    }
+    this.autoSaveTimer = setTimeout(() => {
+      this.saveCurrentNote(true);
+    }, this.autoSaveDelay);
+  },
+
+  updateAutoSaveIndicator(status) {
+    const el = this.autoSaveIndicator || document.getElementById('note-autosave-indicator');
+    if (!el) return;
+    this.autoSaveIndicator = el;
+
+    if (status === 'saving') {
+      el.className = 'note-autosave-indicator saving';
+      el.innerHTML = `
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+        <span>Enregistrement...</span>
+      `;
+    } else if (status === 'dirty') {
+      el.className = 'note-autosave-indicator dirty';
+      el.innerHTML = `
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="4" fill="currentColor"/></svg>
+        <span>Modifié</span>
+      `;
+    } else if (status === 'saved') {
+      el.className = 'note-autosave-indicator';
+      el.innerHTML = `
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        <span>Enregistré</span>
+      `;
+    }
+  },
+
+  computeCurrentSignature() {
+    const title = this.titleInput?.value.trim() || '';
+    const ref = this.refInput?.value.trim() || '';
+    const tags = this.tagsInput?.value.trim() || '';
+    const ai = this.aiToggle?.checked !== false;
+    const content = this.contentInput?.innerHTML || '';
+    return `${title}__${ref}__${tags}__${ai}__${content}`;
+  },
+
+  async saveCurrentNote(silent = true) {
+    if (this.autoSaveTimer) {
+      clearTimeout(this.autoSaveTimer);
+      this.autoSaveTimer = null;
+    }
+
     if (!this.currentNote) return;
 
     const rawMarkdown = this.richHtmlToMarkdown(this.contentInput);
+    const titleVal = this.titleInput?.value.trim() || '';
+    const refVal = this.refInput?.value.trim() || '';
+    const tagsVal = this.tagsInput?.value.trim() || '';
+    const aiVal = this.aiToggle?.checked !== false;
+
+    // Ne rien sauvegarder si la note est neuve et totalement vide
+    if (!this.currentNote.id && !titleVal && !rawMarkdown.trim() && !refVal && !tagsVal) {
+      this.updateAutoSaveIndicator('saved');
+      return;
+    }
+
+    const currentSig = this.computeCurrentSignature();
+    if (silent && this.lastSavedSignature === currentSig) {
+      this.updateAutoSaveIndicator('saved');
+      return;
+    }
 
     const noteToSave = {
       id: this.currentNote.id,
-      title: this.titleInput?.value.trim() || 'Note sans titre',
-      reference: this.refInput?.value.trim() || '',
-      tags: this.tagsInput?.value.trim() || '',
-      include_in_ai: this.aiToggle?.checked !== false,
+      title: titleVal || 'Note sans titre',
+      reference: refVal,
+      tags: tagsVal,
+      include_in_ai: aiVal,
       content: rawMarkdown
     };
 
+    this.isSaving = true;
+    this.updateAutoSaveIndicator('saving');
+
     try {
       const saved = await API.call('save_note', noteToSave);
-      App.showToast('Note enregistrée en fichier Markdown (.md) !');
-      await this.loadNotes(saved?.id || this.currentNote.id);
+      if (saved && saved.id) {
+        this.currentNote.id = saved.id;
+        this.currentNote.title = noteToSave.title;
+        this.currentNote.reference = noteToSave.reference;
+        this.currentNote.tags = noteToSave.tags;
+        this.currentNote.include_in_ai = noteToSave.include_in_ai;
+        this.currentNote.content = noteToSave.content;
+        this.currentNote.updated_at = saved.updated_at || 'À l\'instant';
+        this.lastSavedSignature = this.computeCurrentSignature();
+
+        // Mettre à jour l'élément dans le tableau local et rafraîchir la barre latérale sans toucher à l'éditeur
+        const existingIdx = this.notes.findIndex(n => n.id === saved.id);
+        if (existingIdx !== -1) {
+          this.notes[existingIdx] = { ...this.currentNote };
+        } else {
+          this.notes.unshift({ ...this.currentNote });
+        }
+        this.renderList();
+      }
+
+      this.updateAutoSaveIndicator('saved');
+      if (!silent) {
+        App.showToast('Note enregistrée !');
+      }
     } catch (e) {
-      alert(`Erreur sauvegarde note : ${e}`);
+      console.error('Erreur sauvegarde note automatique:', e);
+      if (!silent) {
+        alert(`Erreur sauvegarde note : ${e}`);
+      }
+    } finally {
+      this.isSaving = false;
     }
   },
 
   async deleteCurrentNote() {
+    if (this.autoSaveTimer) {
+      clearTimeout(this.autoSaveTimer);
+      this.autoSaveTimer = null;
+    }
     if (!this.currentNote || !this.currentNote.id) {
       this.createNewNote();
       return;

@@ -25660,3 +25660,210 @@ select:focus,
   to { transform: translateY(-50%) rotate(360deg); }
 }
 
+/* =========================================================================
+ * INDICATEUR D'ENREGISTREMENT AUTOMATIQUE CONTINU DES NOTES
+ * ========================================================================= */
+.note-autosave-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-muted, #71717a);
+  padding: 4px 9px;
+  border-radius: 6px;
+  background-color: var(--bg-subtle, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  transition: all 0.2s ease;
+  user-select: none;
+  min-height: 28px;
+}
+
+.note-autosave-indicator svg {
+  color: #10b981;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.note-autosave-indicator.saving {
+  color: var(--accent-primary, #60a5fa);
+  border-color: rgba(96, 165, 250, 0.3);
+  background-color: rgba(59, 130, 246, 0.08);
+}
+
+.note-autosave-indicator.saving svg {
+  color: var(--accent-primary, #60a5fa);
+  animation: noteSaveSpin 0.8s linear infinite;
+}
+
+.note-autosave-indicator.dirty {
+  color: var(--text-secondary, #a1a1aa);
+}
+
+.note-autosave-indicator.dirty svg {
+  color: #eab308;
+}
+
+@keyframes noteSaveSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* =========================================================================
+ * INFOBULLE FLOTTANTE DE SÉLECTION STYLE ANYTYPE (NOTES)
+ * ========================================================================= */
+.notes-floating-toolbar {
+  position: absolute;
+  z-index: 1200;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: rgba(22, 23, 28, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 22px;
+  padding: 3px 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+  transform: translateY(0) scale(1);
+  transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  pointer-events: auto;
+}
+
+.notes-floating-toolbar.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px) scale(0.96);
+  visibility: hidden;
+}
+
+.nft-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  min-width: 28px;
+  padding: 0 6px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: #e4e4e7;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.nft-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.nft-btn:active {
+  transform: scale(0.94);
+}
+
+.nft-btn.active {
+  background: rgba(59, 130, 246, 0.28);
+  color: #60a5fa;
+}
+
+.nft-block-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+  font-weight: 600;
+  font-size: 12.5px;
+}
+
+.nft-separator {
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.14);
+  margin: 0 3px;
+}
+
+.nft-hl-circle {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #facc15;
+  box-shadow: 0 0 6px rgba(250, 204, 21, 0.6);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  display: inline-block;
+}
+
+.nft-block-dropdown-wrap,
+.nft-more-dropdown-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.nft-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 180px;
+  background: rgba(24, 25, 30, 0.97);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 4px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+  z-index: 1250;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: nftMenuFadeIn 0.15s ease-out;
+}
+
+.nft-more-dropdown-wrap .nft-dropdown-menu {
+  left: auto;
+  right: 0;
+  min-width: 190px;
+}
+
+.nft-dropdown-menu.hidden {
+  display: none;
+}
+
+@keyframes nftMenuFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.nft-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: none;
+  background: transparent;
+  color: #e4e4e7;
+  font-size: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+.nft-dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.nft-item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  color: var(--accent-primary, #60a5fa);
+  font-size: 13px;
+  text-align: center;
+}
+
+
+

@@ -3568,10 +3568,10 @@
                   <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                   <span>Aperçu</span>
                 </button>
-                <button class="btn-primary" id="btn-save-current-note" style="display: flex; align-items: center; gap: 4px;">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                  <span>Enregistrer</span>
-                </button>
+                <div id="note-autosave-indicator" class="note-autosave-indicator" title="Enregistrement automatique continu activé">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                  <span>Enregistré</span>
+                </div>
               </div>
             </div>
             <div class="notes-editor-subbar">
@@ -3582,24 +3582,109 @@
                   <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1 1.3-1.3Z"/></svg>
                 </button>
               </div>
-              <div class="notes-quick-tools" style="display: flex; gap: 4px;">
-                <button class="btn-secondary" id="btn-md-h1" title="Titre 1 (H1)" style="padding: 0 8px; font-size: 11px; font-weight: 800;">H1</button>
-                <button class="btn-secondary" id="btn-md-h2" title="Titre 2 (H2)" style="padding: 0 8px; font-size: 11px; font-weight: 800;">H2</button>
-                <button class="btn-secondary" id="btn-md-bold" title="Gras (Ctrl+B)" style="padding: 0 8px; font-size: 11px; font-weight: 700;">B</button>
-                <button class="btn-secondary" id="btn-md-italic" title="Italique (Ctrl+I)" style="padding: 0 8px; font-size: 11px; font-style: italic;">I</button>
-                <button class="btn-secondary" id="btn-md-quote" title="Citation" style="padding: 0 8px; font-size: 11px;">”</button>
-                <button class="btn-secondary" id="btn-md-list" title="Liste à puces" style="padding: 0 8px; font-size: 11px;">•</button>
-                <button class="btn-secondary" id="btn-md-table" title="Insérer un Tableau interactif" style="padding: 0 8px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center;">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
-                </button>
-                <button class="btn-secondary" id="btn-md-callout" title="Insérer un Encart Remarque" style="padding: 0 8px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center;">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
-                </button>
-              </div>
             </div>
             <div class="notes-editor-body">
               <div id="note-edit-content" class="notes-rich-editor" contenteditable="true" spellcheck="true" data-placeholder="Écrivez vos réflexions, méditations et notes exégétiques ici... Tapez « / » pour insérer un élément."></div>
               <div id="note-preview-content" class="note-preview-content hidden"></div>
+
+              <!-- Infobulle flottante Anytype sur sélection de texte -->
+              <div id="notes-floating-toolbar" class="notes-floating-toolbar hidden">
+                <div class="nft-block-dropdown-wrap">
+                  <button type="button" class="nft-btn nft-block-btn" id="nft-btn-block-type" title="Type de bloc">
+                    <span id="nft-current-block-label">Aa</span>
+                    <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <div class="nft-dropdown-menu hidden" id="nft-block-menu">
+                    <button type="button" class="nft-dropdown-item" data-action="text">
+                      <span class="nft-item-icon">¶</span>
+                      <span>Texte normal</span>
+                    </button>
+                    <button type="button" class="nft-dropdown-item" data-action="h1">
+                      <span class="nft-item-icon" style="font-weight: 800;">H1</span>
+                      <span>Grand Titre 1</span>
+                    </button>
+                    <button type="button" class="nft-dropdown-item" data-action="h2">
+                      <span class="nft-item-icon" style="font-weight: 800;">H2</span>
+                      <span>Titre de section 2</span>
+                    </button>
+                    <button type="button" class="nft-dropdown-item" data-action="h3">
+                      <span class="nft-item-icon" style="font-weight: 800;">H3</span>
+                      <span>Sous-titre 3</span>
+                    </button>
+                    <button type="button" class="nft-dropdown-item" data-action="quote">
+                      <span class="nft-item-icon">”</span>
+                      <span>Citation en retrait</span>
+                    </button>
+                    <button type="button" class="nft-dropdown-item" data-action="callout">
+                      <span class="nft-item-icon">💡</span>
+                      <span>Encart Remarque</span>
+                    </button>
+                    <button type="button" class="nft-dropdown-item" data-action="bullet">
+                      <span class="nft-item-icon">•</span>
+                      <span>Liste à puces</span>
+                    </button>
+                    <button type="button" class="nft-dropdown-item" data-action="number">
+                      <span class="nft-item-icon">1.</span>
+                      <span>Liste numérotée</span>
+                    </button>
+                    <button type="button" class="nft-dropdown-item" data-action="task">
+                      <span class="nft-item-icon">☑</span>
+                      <span>Case à cocher</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="nft-separator"></div>
+
+                <button type="button" class="nft-btn" data-action="bold" title="Gras (Ctrl+B)">
+                  <span style="font-weight: 700;">B</span>
+                </button>
+                <button type="button" class="nft-btn" data-action="italic" title="Italique (Ctrl+I)">
+                  <span style="font-style: italic; font-family: serif; font-weight: 600;">I</span>
+                </button>
+                <button type="button" class="nft-btn" data-action="strikethrough" title="Barré (Ctrl+Shift+X)">
+                  <span style="text-decoration: line-through; font-weight: 600;">S</span>
+                </button>
+                <button type="button" class="nft-btn" data-action="underline" title="Souligné (Ctrl+U)">
+                  <span style="text-decoration: underline; font-weight: 600;">U</span>
+                </button>
+                <button type="button" class="nft-btn" data-action="link" title="Lien / Référence biblique">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                </button>
+                <button type="button" class="nft-btn" data-action="code" title="Code en ligne">
+                  <span style="font-family: monospace; font-size: 11px; font-weight: 700;">&lt;/&gt;</span>
+                </button>
+
+                <div class="nft-separator"></div>
+
+                <button type="button" class="nft-btn" data-action="highlight" title="Surligner en jaune">
+                  <span class="nft-hl-circle"></span>
+                </button>
+
+                <div class="nft-more-dropdown-wrap">
+                  <button type="button" class="nft-btn" id="nft-btn-more" title="Plus d'options">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><circle cx="12" cy="12" r="1.8"/><circle cx="6" cy="12" r="1.8"/><circle cx="18" cy="12" r="1.8"/></svg>
+                  </button>
+                  <div class="nft-dropdown-menu hidden" id="nft-more-menu">
+                    <button type="button" class="nft-dropdown-item" data-action="superscript">
+                      <span class="nft-item-icon">x²</span>
+                      <span>Exposant</span>
+                    </button>
+                    <button type="button" class="nft-dropdown-item" data-action="subscript">
+                      <span class="nft-item-icon">x₂</span>
+                      <span>Indice</span>
+                    </button>
+                    <button type="button" class="nft-dropdown-item" data-action="datetime">
+                      <span class="nft-item-icon">🕒</span>
+                      <span>Date &amp; Heure</span>
+                    </button>
+                    <button type="button" class="nft-dropdown-item" data-action="clear-format">
+                      <span class="nft-item-icon">✕</span>
+                      <span>Supprimer la mise en forme</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
         </div>
