@@ -359,27 +359,41 @@
       display: flex;
     }
 
-    /* Styles spécifiques Aperçu & Hub 360° */
+    /* Styles spécifiques Onglet Aperçu */
     .overview-panel-header {
-      padding: 10px 18px;
       background: #1E293B;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-    .overview-header-top-row {
+      padding: 7px 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
+      flex-shrink: 0;
+      min-height: 44px;
+      box-sizing: border-box;
     }
 
-    .overview-passage-info {
+    .overview-header-single-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      width: 100%;
+    }
+
+    .overview-left-cluster {
       display: flex;
       align-items: center;
       gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .overview-nav-cluster {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
     }
 
     .overview-ref-badge-wrap {
@@ -387,20 +401,31 @@
       align-items: center;
       gap: 6px;
       font-weight: 700;
-      font-size: 13.5px;
+      font-size: 13px;
       color: #38BDF8;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      padding: 3px 9px;
+      border-radius: 6px;
+      white-space: nowrap;
     }
 
     .overview-pericope-title {
-      font-size: 13px;
+      font-size: 12.5px;
       color: #94A3B8;
       font-weight: 500;
+      font-style: italic;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
     }
 
-    .overview-header-controls {
+    .overview-right-cluster {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 10px;
+      flex-shrink: 0;
     }
 
     .overview-nav-btn {
@@ -1533,31 +1558,33 @@
     <!-- ONGLET 0 : APERÇU 360° DU PASSAGE -->
     <section class="comm-tab-panel active" id="tab-panel-overview">
       <div class="overview-panel-header">
-        <div class="overview-header-top-row">
-          <div class="overview-passage-info">
-            <div class="overview-ref-badge-wrap">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-              <span class="overview-passage-ref" id="overview-passage-ref">Genèse 1:1</span>
+        <div class="overview-header-single-bar">
+          <!-- Gauche : Navigation, Référence & Titre de péricope -->
+          <div class="overview-left-cluster">
+            <div class="overview-nav-cluster">
+              <button class="overview-nav-btn" id="btn-overview-prev-v" title="Verset précédent">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg>
+              </button>
+              <div class="overview-ref-badge-wrap">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                <span class="overview-passage-ref" id="overview-passage-ref">Genèse 1:1</span>
+              </div>
+              <button class="overview-nav-btn" id="btn-overview-next-v" title="Verset suivant">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
             </div>
             <div class="overview-pericope-title" id="overview-pericope-title">La création du monde</div>
           </div>
 
-          <div class="overview-header-controls">
-            <button class="overview-nav-btn" id="btn-overview-prev-v" title="Verset précédent">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg>
-            </button>
-            <button class="overview-nav-btn" id="btn-overview-next-v" title="Verset suivant">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m9 18 6-6-6-6"/></svg>
-            </button>
+          <!-- Droite : Pastilles de compteurs (Chips) & Bouton Lié -->
+          <div class="overview-right-cluster">
+            <div class="overview-chips-bar" id="overview-chips-bar"></div>
             <button class="overview-sync-btn active" id="btn-overview-toggle-sync" title="Synchronisation active : suit le texte biblique">
               <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
               <span id="lbl-overview-sync">Lié</span>
             </button>
           </div>
         </div>
-
-        <!-- Barre de compteurs rapides (Chips) -->
-        <div class="overview-chips-bar" id="overview-chips-bar"></div>
       </div>
 
       <!-- Corps défilant avec les cartes accordéons 360° -->

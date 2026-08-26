@@ -4,6 +4,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  initPagePreloader();
   initThemeToggle();
   initScrollProgress();
   initScrollAnimations();
@@ -16,13 +17,41 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ==========================================================================
+   0. PAGE PRELOADER (SMOOTH ENTRANCE & NO FONT FLICKER)
+   ========================================================================== */
+function initPagePreloader() {
+  const preloader = document.getElementById('page-preloader');
+  if (!preloader) return;
+
+  const hide = () => {
+    preloader.classList.add('fade-out');
+    setTimeout(() => {
+      preloader.style.display = 'none';
+    }, 400);
+  };
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => {
+      setTimeout(hide, 180);
+    });
+  } else {
+    window.addEventListener('load', () => {
+      setTimeout(hide, 200);
+    });
+  }
+
+  // Sécurité maximale anti-blocage (2.5s)
+  setTimeout(hide, 2500);
+}
+
+/* ==========================================================================
    1. THEME SWITCHER (DARK / LIGHT) WITH LOCALSTORAGE PERSISTENCE
    ========================================================================== */
 function initThemeToggle() {
   const toggleBtn = document.getElementById('theme-toggle-btn');
   if (!toggleBtn) return;
 
-  const currentTheme = localStorage.getItem('openshema-theme') || 'dark';
+  const currentTheme = localStorage.getItem('openshema-theme') || 'light';
   document.documentElement.setAttribute('data-theme', currentTheme);
   updateThemeIcon(currentTheme);
 

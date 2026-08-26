@@ -25513,3 +25513,150 @@ select:focus,
 .illustration-modal-card .form-select:focus {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
 }
+
+/* =========================================================================
+ * MENU SLASH (/) DANS L'ÉDITEUR DE NOTES
+ * ========================================================================= */
+.notes-slash-dropdown {
+  position: fixed;
+  z-index: 100000;
+  width: 290px;
+  max-height: 380px;
+  background-color: var(--bg-card, #1c1c1f);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  border-radius: 10px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 6px;
+  font-family: 'Inter', -apple-system, sans-serif;
+  animation: slashMenuFadeIn 0.12s ease-out;
+}
+
+.notes-slash-dropdown.hidden {
+  display: none !important;
+}
+
+.slash-category-header {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted, #71717a);
+  padding: 8px 8px 4px;
+}
+
+.slash-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+  user-select: none;
+}
+
+.slash-item:hover,
+.slash-item.active {
+  background-color: var(--bg-hover, rgba(255, 255, 255, 0.08));
+}
+
+.slash-item-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background-color: var(--bg-subtle, rgba(255, 255, 255, 0.05));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary, #3b82f6);
+  flex-shrink: 0;
+}
+
+.slash-icon-text {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
+.slash-item-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.slash-item-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary, #ffffff);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.slash-item-desc {
+  font-size: 10.5px;
+  color: var(--text-muted, #a1a1aa);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.slash-empty {
+  padding: 16px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted, #a1a1aa);
+}
+
+/* =========================================================================
+ * BOUTONS ÉTINCELLE IA INTÉGRÉS DANS LES CHAMPS TITRE & TAGS
+ * ========================================================================= */
+.btn-ai-sparkle-inline {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.2));
+  color: var(--accent-primary, #60a5fa);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  z-index: 5;
+}
+
+.btn-ai-sparkle-inline:hover {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.35), rgba(139, 92, 246, 0.4));
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(96, 165, 250, 0.4);
+  transform: translateY(-50%) scale(1.06);
+}
+
+.btn-ai-sparkle-inline:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.btn-ai-sparkle-inline.loading {
+  pointer-events: none;
+  opacity: 0.8;
+  animation: sparkleSpin 1s linear infinite;
+  background: rgba(59, 130, 246, 0.3);
+}
+
+@keyframes sparkleSpin {
+  from { transform: translateY(-50%) rotate(0deg); }
+  to { transform: translateY(-50%) rotate(360deg); }
+}
+

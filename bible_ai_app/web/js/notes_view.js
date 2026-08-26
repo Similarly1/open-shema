@@ -105,6 +105,22 @@ const NotesView = {
       this.handlePaste(e);
     });
 
+    // Boutons de génération IA (Titre & Tags)
+    document.getElementById('btn-note-gen-title-ai')?.addEventListener('click', () => {
+      this.generateTitleWithAI();
+    });
+    document.getElementById('btn-note-gen-tags-ai')?.addEventListener('click', () => {
+      this.generateTagsWithAI();
+    });
+
+    // Écoute de la saisie Slash (/) dans l'éditeur
+    this.contentInput?.addEventListener('keyup', (e) => {
+      if (['ArrowUp', 'ArrowDown', 'Enter', 'Escape'].includes(e.key) && this.isSlashMenuOpen) {
+        return;
+      }
+      this.handleSlashInput(e);
+    });
+
     this.updateAiToggleVisibility();
     this.loadNotes();
   },
@@ -206,6 +222,13 @@ const NotesView = {
   bindEditorShortcuts(inputEl) {
     if (!inputEl) return;
     inputEl.addEventListener('keydown', (e) => {
+      // Si le menu Slash est ouvert, laisser le gestionnaire de Slash intercepter flèches, entrée et échap
+      if (this.isSlashMenuOpen) {
+        if (this.handleSlashKeyDown(e)) {
+          return;
+        }
+      }
+
       if (e.ctrlKey || e.metaKey) {
         const key = e.key.toLowerCase();
         
@@ -402,22 +425,36 @@ const NotesView = {
           this.applyBlockFormat('h3');
         }
         break;
+      case 'text':
+      case 'paragraph':
+        if (isRichEditor) {
+          this.applyBlockFormat('p');
+        }
+        break;
       case 'quote':
         if (isRichEditor) {
           this.applyBlockFormat('blockquote');
         }
         break;
+      case 'scripture':
+        if (isRichEditor) {
+          this.insertScriptureQuote();
+        }
+        break;
       case 'bullet-list':
+      case 'bullet':
         if (isRichEditor) {
           document.execCommand('insertUnorderedList');
         }
         break;
       case 'number-list':
+      case 'number':
         if (isRichEditor) {
           document.execCommand('insertOrderedList');
         }
         break;
       case 'task-list':
+      case 'task':
         if (isRichEditor) {
           this.insertTaskItem();
         }
@@ -425,6 +462,8 @@ const NotesView = {
 
       // 3. Insérer (Tableaux réels, Encarts, Horodatage...)
       case 'horizontal-rule':
+      case 'divider':
+      case 'hr':
         if (isRichEditor) {
           document.execCommand('insertHorizontalRule');
         }
@@ -443,6 +482,7 @@ const NotesView = {
         }
         break;
       case 'code-block':
+      case 'code':
         if (isRichEditor) {
           this.insertCodeBlock();
         }
@@ -564,6 +604,17 @@ const NotesView = {
       <p><br></p>
     `;
     document.execCommand('insertHTML', false, calloutHtml);
+  },
+
+  insertScriptureQuote() {
+    const scriptureHtml = `
+      <blockquote>
+        <em>« Votre verset biblique ici... »</em><br>
+        <strong>— Référence (ex: Jean 3:16)</strong>
+      </blockquote>
+      <p><br></p>
+    `;
+    document.execCommand('insertHTML', false, scriptureHtml);
   },
 
   insertCodeBlock() {
@@ -1132,7 +1183,7 @@ const NotesView = {
   },
 
   createNewNote(initialRef = null, initialTitle = null) {
-    const defaultRef = initialRef || (BibleReader.currentBook ? `${BibleReader.currentBook} ${BibleReader.currentChapter || 1}` : 'Genèse 1:1');
+    const defaultRef = initialRef || '';
     const newNote = {
       id: null,
       title: initialTitle || 'Nouvelle Note',
@@ -1146,6 +1197,340 @@ const NotesView = {
     this.selectNote(newNote);
     if (this.isPreviewMode) this.togglePreview();
     this.titleInput?.focus();
+  },
+
+  async generateTitleWithAI() {
+    const rawMarkdown = this.richHtmlToMarkdown(this.contentInput);
+    if (!rawMarkdown || rawMarkdown.trim().length < 15) {
+      App.showToast('Veuillez d\'abord rédiger du contenu dans la note pour générer un titre.');
+      return;
+    }
+
+    const btn = document.getElementById('btn-note-gen-title-ai');
+    if (btn) {
+      btn.disabled = true;
+      btn.classList.add('loading');
+    }
+
+    try {
+      const ref = this.refInput?.value.trim() || '';
+      const currentTitle = this.titleInput?.value.trim() || '';
+      const res = await API.call('generate_note_title', rawMarkdown, ref, currentTitle);
+      
+      if (res && res.success && res.title) {
+        if (this.titleInput) {
+          this.titleInput.value = res.title;
+        }
+        if (this.currentNote) {
+          this.currentNote.title = res.title;
+        }
+        this.pushHistoryState();
+        App.showToast(`Titre généré par IA (${res.model_used || 'IA'}) !`);
+      } else {
+        App.showToast(`Erreur génération titre : ${res?.error || 'Échec'}`);
+      }
+    } catch (e) {
+      console.error('Erreur generateTitleWithAI:', e);
+      App.showToast(`Erreur : ${e?.message || e}`);
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.classList.remove('loading');
+      }
+    }
+  },
+
+  async generateTagsWithAI() {
+    const rawMarkdown = this.richHtmlToMarkdown(this.contentInput);
+    if (!rawMarkdown || rawMarkdown.trim().length < 15) {
+      App.showToast('Veuillez d\'abord rédiger du contenu dans la note pour générer des tags.');
+      return;
+    }
+
+    const btn = document.getElementById('btn-note-gen-tags-ai');
+    if (btn) {
+      btn.disabled = true;
+      btn.classList.add('loading');
+    }
+
+    try {
+      const ref = this.refInput?.value.trim() || '';
+      const currentTags = this.tagsInput?.value.trim() || '';
+      const res = await API.call('generate_note_tags', rawMarkdown, ref, currentTags);
+      
+      if (res && res.success && res.tags) {
+        if (this.tagsInput) {
+          this.tagsInput.value = res.tags;
+        }
+        if (this.currentNote) {
+          this.currentNote.tags = res.tags;
+        }
+        this.pushHistoryState();
+        App.showToast(`Tags générés par IA (${res.model_used || 'IA'}) !`);
+      } else {
+        App.showToast(`Erreur génération tags : ${res?.error || 'Échec'}`);
+      }
+    } catch (e) {
+      console.error('Erreur generateTagsWithAI:', e);
+      App.showToast(`Erreur : ${e?.message || e}`);
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.classList.remove('loading');
+      }
+    }
+  },
+
+  // =========================================================================
+  // GESTION DU MENU SLASH MODAL (/) DANS L'ÉDITEUR
+  // =========================================================================
+
+  isSlashMenuOpen: false,
+  slashMenuEl: null,
+  slashSelectedIndex: 0,
+  slashCurrentItems: [],
+  slashAnchorRange: null,
+
+  getSlashCommandsDefinitions() {
+    return [
+      {
+        category: "Structure & Titres",
+        items: [
+          { id: "h1", label: "Titre 1 (H1)", iconText: "H1", desc: "Grand titre de section", action: "h1" },
+          { id: "h2", label: "Titre 2 (H2)", iconText: "H2", desc: "Titre secondaire", action: "h2" },
+          { id: "h3", label: "Titre 3 (H3)", iconText: "H3", desc: "Sous-section de note", action: "h3" },
+          { id: "text", label: "Texte normal", iconText: "¶", desc: "Paragraphe standard", action: "text" }
+        ]
+      },
+      {
+        category: "Listes & Tâches",
+        items: [
+          { id: "bullet", label: "Liste à puces", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>`, desc: "Liste à puces standard", action: "bullet" },
+          { id: "number", label: "Liste numérotée", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/></svg>`, desc: "Liste ordonnée 1, 2, 3...", action: "number" },
+          { id: "task", label: "Case à cocher (To-do)", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/></svg>`, desc: "Tâche ou point à vérifier", action: "task" }
+        ]
+      },
+      {
+        category: "Étude & Réflexion",
+        items: [
+          { id: "scripture", label: "Citation biblique", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`, desc: "Verset ou passage des Écritures", action: "scripture" },
+          { id: "quote", label: "Citation d'auteur", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2H4c-1.25 0-2 .75-2 2v6c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/></svg>`, desc: "Citation en retrait", action: "quote" },
+          { id: "callout", label: "Encart Remarque", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>`, desc: "Encart mis en valeur [!NOTE]", action: "callout" }
+        ]
+      },
+      {
+        category: "Tableaux & Outils",
+        items: [
+          { id: "table", label: "Tableau interactif", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>`, desc: "Tableau à colonnes et lignes", action: "table" },
+          { id: "code", label: "Bloc de code", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`, desc: "Code ou texte préformaté", action: "code" },
+          { id: "divider", label: "Séparateur horizontal", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/></svg>`, desc: "Ligne de séparation (---)", action: "divider" },
+          { id: "datetime", label: "Date & Heure", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`, desc: "Horodatage actuel", action: "datetime" }
+        ]
+      }
+    ];
+  },
+
+  handleSlashInput(e) {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) {
+      this.closeSlashMenu();
+      return;
+    }
+
+    const range = sel.getRangeAt(0);
+    const node = range.startContainer;
+    if (node.nodeType !== Node.TEXT_NODE) {
+      this.closeSlashMenu();
+      return;
+    }
+
+    const textBefore = node.textContent.slice(0, range.startOffset);
+    const lastSlashIndex = textBefore.lastIndexOf('/');
+
+    if (lastSlashIndex !== -1) {
+      const isStartOrSpace = lastSlashIndex === 0 || /\s/.test(textBefore[lastSlashIndex - 1]);
+      if (isStartOrSpace) {
+        const query = textBefore.slice(lastSlashIndex + 1);
+        const rect = range.getBoundingClientRect();
+        this.openSlashMenu(query, rect);
+        return;
+      }
+    }
+
+    this.closeSlashMenu();
+  },
+
+  openSlashMenu(query = '', rect = null) {
+    if (!this.slashMenuEl) {
+      this.createSlashMenuEl();
+    }
+
+    try {
+      this.slashAnchorRange = window.getSelection().getRangeAt(0).cloneRange();
+    } catch (e) {
+      this.slashAnchorRange = null;
+    }
+
+    this.renderSlashMenuItems(query);
+
+    if (rect && rect.top > 0) {
+      const left = Math.min(window.innerWidth - 300, Math.max(10, rect.left));
+      const top = rect.bottom + window.scrollY + 6;
+      this.slashMenuEl.style.left = `${left}px`;
+      this.slashMenuEl.style.top = `${top}px`;
+    }
+
+    this.slashMenuEl.classList.remove('hidden');
+    this.isSlashMenuOpen = true;
+  },
+
+  closeSlashMenu() {
+    if (this.slashMenuEl) {
+      this.slashMenuEl.classList.add('hidden');
+    }
+    this.isSlashMenuOpen = false;
+  },
+
+  createSlashMenuEl() {
+    let el = document.getElementById('notes-slash-menu');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'notes-slash-menu';
+      el.className = 'notes-slash-dropdown hidden';
+      document.body.appendChild(el);
+    }
+    this.slashMenuEl = el;
+
+    document.addEventListener('click', (e) => {
+      if (this.isSlashMenuOpen && !this.slashMenuEl.contains(e.target) && e.target !== this.contentInput && !this.contentInput?.contains(e.target)) {
+        this.closeSlashMenu();
+      }
+    });
+  },
+
+  renderSlashMenuItems(query = '') {
+    const q = query.toLowerCase().trim();
+    const categories = this.getSlashCommandsDefinitions();
+
+    let flatItems = [];
+    let html = '';
+
+    categories.forEach(cat => {
+      const matching = cat.items.filter(item => 
+        !q || item.label.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q) || item.id.toLowerCase().includes(q)
+      );
+
+      if (matching.length > 0) {
+        html += `<div class="slash-category-header">${cat.category}</div>`;
+        matching.forEach(item => {
+          const currentIndex = flatItems.length;
+          flatItems.push(item);
+          const icon = item.iconSvg || `<span class="slash-icon-text">${item.iconText || 'Aa'}</span>`;
+          html += `
+            <div class="slash-item ${currentIndex === 0 ? 'active' : ''}" data-action="${item.action}" data-index="${currentIndex}">
+              <div class="slash-item-icon">${icon}</div>
+              <div class="slash-item-text">
+                <div class="slash-item-label">${this.escapeHtml(item.label)}</div>
+                <div class="slash-item-desc">${this.escapeHtml(item.desc)}</div>
+              </div>
+            </div>
+          `;
+        });
+      }
+    });
+
+    this.slashCurrentItems = flatItems;
+    this.slashSelectedIndex = 0;
+
+    if (flatItems.length === 0) {
+      html = `<div class="slash-empty">Aucune commande trouvée</div>`;
+    }
+
+    this.slashMenuEl.innerHTML = html;
+
+    this.slashMenuEl.querySelectorAll('.slash-item').forEach(itemEl => {
+      itemEl.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const action = itemEl.dataset.action;
+        this.executeSlashCommand(action);
+      });
+    });
+  },
+
+  handleSlashKeyDown(e) {
+    if (!this.isSlashMenuOpen) return false;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (this.slashCurrentItems.length > 0) {
+        this.slashSelectedIndex = (this.slashSelectedIndex + 1) % this.slashCurrentItems.length;
+        this.updateSlashSelection();
+      }
+      return true;
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (this.slashCurrentItems.length > 0) {
+        this.slashSelectedIndex = (this.slashSelectedIndex - 1 + this.slashCurrentItems.length) % this.slashCurrentItems.length;
+        this.updateSlashSelection();
+      }
+      return true;
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (this.slashCurrentItems[this.slashSelectedIndex]) {
+        this.executeSlashCommand(this.slashCurrentItems[this.slashSelectedIndex].action);
+      }
+      return true;
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      this.closeSlashMenu();
+      return true;
+    }
+    return false;
+  },
+
+  updateSlashSelection() {
+    this.slashMenuEl.querySelectorAll('.slash-item').forEach((item, idx) => {
+      const isActive = idx === this.slashSelectedIndex;
+      item.classList.toggle('active', isActive);
+      if (isActive) {
+        item.scrollIntoView({ block: 'nearest' });
+      }
+    });
+  },
+
+  executeSlashCommand(action) {
+    this.closeSlashMenu();
+
+    if (this.slashAnchorRange) {
+      try {
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(this.slashAnchorRange);
+
+        const node = this.slashAnchorRange.startContainer;
+        if (node && node.nodeType === Node.TEXT_NODE) {
+          const text = node.textContent;
+          const lastSlash = text.lastIndexOf('/');
+          if (lastSlash !== -1) {
+            node.textContent = text.slice(0, lastSlash);
+          }
+        }
+      } catch (e) {
+        console.warn('Erreur nettoyage slash anchor:', e);
+      }
+    }
+
+    this.executeAction(action, this.contentInput);
+  },
+
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   },
 
   togglePreview() {

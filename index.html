@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="dark">
+<html lang="fr" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,10 +17,29 @@
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
   
+  <!-- Google Fonts Direct Preconnect & Stylesheet (Supprime le FOUT / Flash de police) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  
   <!-- Stylesheets -->
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+
+  <!-- Animation de Chargement Initiale (Élégante & Fluide) -->
+  <div id="page-preloader" class="page-preloader">
+    <div class="preloader-content">
+      <div class="preloader-logo-wrap">
+        <img src="assets/img/logo.svg" alt="Open Shema" class="preloader-logo-img">
+        <div class="preloader-glow"></div>
+      </div>
+      <div class="preloader-bar">
+        <div class="preloader-progress"></div>
+      </div>
+      <span class="preloader-text">OPEN SHEMA</span>
+    </div>
+  </div>
 
   <!-- Barre de progression de scroll dynamique -->
   <div class="scroll-progress-bar" id="scroll-progress"></div>
@@ -47,17 +66,9 @@
       <div class="nav-actions">
         <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Changer de thème">
           <span id="theme-icon-holder">
-            <!-- Sun Icon (par défaut en mode sombre) -->
+            <!-- Moon Icon (par défaut en mode clair) -->
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="5"></circle>
-              <line x1="12" y1="1" x2="12" y2="3"></line>
-              <line x1="12" y1="21" x2="12" y2="23"></line>
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-              <line x1="1" y1="12" x2="3" y2="12"></line>
-              <line x1="21" y1="12" x2="23" y2="12"></line>
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
             </svg>
           </span>
         </button>
@@ -500,21 +511,31 @@
         <!-- Text Cards on the left -->
         <div class="sticky-split-content">
           
-          <!-- 1. Lecteur Multi-Versions & Synoptique -->
+          <!-- 1. Lecteur Multi-Versions & Volet Aperçu 360° -->
           <div class="split-feature-card active" data-slide-index="1">
             <div class="feature-number">01</div>
-            <h3 class="split-feature-title">Lecteur Multi-Versions & Comparateur Synoptique</h3>
+            <h3 class="split-feature-title">Lecteur Multi-Versions, Synoptique & Volet « Aperçu 360° »</h3>
             <p class="split-feature-desc">
-              Comparez instantanément les traductions bibliques verset par verset. Open Shema intègre un algorithme d'analyse textuelle qui calcule le score de similarité et surligne automatiquement les divergences lexicales et syntaxiques.
+              Comparez instantanément les traductions bibliques verset par verset avec calcul automatique des divergences. Le <strong>Volet contextuel « Aperçu 360° »</strong> scanne en direct toute votre bibliothèque pour faire remonter chaque commentaire, article, note et média lié au passage affiché.
             </p>
             <ul class="feature-highlights-list">
               <li class="feature-highlight-item">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                Bibliothèque francophone complète : LSG 1910, Segond 21, BDS, Darby, Chouraqui, TOB, Parole Vivante, Sagesse Vivante, NFC, Ostervald...
+                <div class="ai-point-text">
+                  <strong>Volet Aperçu & Infobulle au survol&nbsp;:</strong> Voyez en un clin d'œil quel ouvrage de votre bibliothèque cite le passage. Un simple survol à la souris affiche immédiatement l'extrait exact sans interrompre votre lecture.
+                </div>
               </li>
               <li class="feature-highlight-item">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                Surligneur réaliste texture feutre en 6 coloris avec synchronisation et notes d'annotations.
+                <div class="ai-point-text">
+                  <strong>Médias intégrés (BibleProject & TPSG)&nbsp;:</strong> Accédez aux vidéos et affiches synthétiques HD de <a href="https://bibleproject.com/francais/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: underline;"><em>BibleProject Français</em></a> et aux articles de <a href="https://toutpoursagloire.com/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: underline;"><em>Tout Pour Sa Gloire</em></a> avec détection automatique des versets <em>(et ce n'est que le début : d'autres flux RSS de référence viendront s'ajouter !)</em>.
+                </div>
+              </li>
+              <li class="feature-highlight-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <div class="ai-point-text">
+                  <strong>Traductions & surligneur feutre&nbsp;:</strong> LSG 1910, Segond 21, BDS, Darby, Chouraqui, TOB, Parole Vivante, Sagesse Vivante, NFC, Ostervald... avec surlignage texture réaliste 6 coloris.
+                </div>
               </li>
             </ul>
           </div>
@@ -529,37 +550,80 @@
             <ul class="feature-highlights-list">
               <li class="feature-highlight-item">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                Décomposition grammaticale : racine, lemme, translittération, temps, mode, voix et cas.
+                <div class="ai-point-text">
+                  Décomposition grammaticale : racine, lemme, translittération, temps, mode, voix et cas.
+                </div>
               </li>
               <li class="feature-highlight-item">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                Intégration du Bailly complet, du Dictionnaire Vigouroux et des lexiques encyclopédiques.
+                <div class="ai-point-text">
+                  Intégration du Bailly complet, du Dictionnaire Vigouroux et des lexiques encyclopédiques.
+                </div>
               </li>
             </ul>
           </div>
 
-          <!-- 3. Import Universel & Mapping Auto -->
-          <div class="split-feature-card" id="import-universel" data-slide-index="3">
+          <!-- 3. Mapping Canonique & Typographie Automatique -->
+          <div class="split-feature-card" id="mapping-canonique" data-slide-index="3">
             <div class="feature-number">03</div>
-            <h3 class="split-feature-title">Import Universel & Reconnaissance Intelligente</h3>
+            <h3 class="split-feature-title">Mapping Canonique & Typographie Automatique</h3>
             <p class="split-feature-desc">
-              Importez n'importe quel livre ou ebook sans format propriétaire fermé. Notre moteur de détection canonique et d'ancrage extrait automatiquement les versets, nettoie les artefacts InDesign et mappe instantanément vos Bibles et commentaires.
+              Open Shema structure automatiquement chaque livre importé selon l'arborescence biblique standard : <strong>Livres, Chapitres, Versets et Paragraphes</strong>. Profitez d'une mise en page typographique dynamique et personnalisable selon vos préférences d'étude.
             </p>
             <ul class="feature-highlights-list">
               <li class="feature-highlight-item">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                Bibles EPUB complexes (exports Adobe InDesign, EPUBs multi-fichiers, TOB, Crampon).
+                <div class="ai-point-text">
+                  <strong>Mots entre crochets [explicatifs]&nbsp;:</strong> Choisissez leur rendu à l'écran : avec crochets distinctifs [ Dieu ], en italique doux <em>Dieu</em>, ou en texte standard.
+                </div>
               </li>
               <li class="feature-highlight-item">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                Commentaires et traités théologiques rattachés verset par verset et indexés dans le RAG.
+                <div class="ai-point-text">
+                  <strong>Notes de traduction & variantes textuelles&nbsp;:</strong> Affichez les appels d'exposants discrets (Appelⁿ), les variantes développées en ligne (Ou ...), ou masquez-les pour une lecture fluide.
+                </div>
+              </li>
+              <li class="feature-highlight-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <div class="ai-point-text">
+                  <strong>Césures & séparateurs poétiques&nbsp;:</strong> Rendu automatique des strophes, alinéas et césures hébraïques (Indenté ↵, Fluide, ou Trait Ꞌ) pour les Psaumes et textes poétiques.
+                </div>
               </li>
             </ul>
           </div>
 
-          <!-- 4. Atelier de Prédication & Illustrations -->
-          <div class="split-feature-card" id="homiletique" data-slide-index="4">
+          <!-- 4. Import Universel, Formats & Packs Gratuits Inclus -->
+          <div class="split-feature-card" id="import-universel" data-slide-index="4">
             <div class="feature-number">04</div>
+            <h3 class="split-feature-title">Écosystème Ouvert & Packs Gratuits Inclus</h3>
+            <p class="split-feature-desc">
+              Zéro format propriétaire fermé, zéro DRM. Open Shema prend en charge les formats préservant la structure sémantique continue : <strong>EPUB (recommandé pour bibles & commentaires), DOCX (compatible livres personnels Logos), JSON structuré, Markdown (.md) et TXT</strong>.
+            </p>
+            <ul class="feature-highlights-list">
+              <li class="feature-highlight-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <div class="ai-point-text">
+                  <strong>Packs exclusifs optimisés et offerts&nbsp;:</strong> Bénéficiez en exclusivité du <strong>Dictionnaire Biblique Vigouroux</strong> (5 tomes numérisés et mis au propre) et de tous les livres personnels Logos fournis par <strong>Didier Fontaine (<a href="https://www.bibleparser.net/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: underline;">bibleparser.net</a>)</strong> avec son aimable autorisation.
+                </div>
+              </li>
+              <li class="feature-highlight-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <div class="ai-point-text">
+                  <strong>EPUB & DOCX privilégiés&nbsp;:</strong> Contrairement au PDF dont la mise en page fixe altère l'indexation, l'EPUB et le DOCX garantissent un ancrage sémantique parfait verset par verset.
+                </div>
+              </li>
+              <li class="feature-highlight-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <div class="ai-point-text">
+                  <strong>Bibliothèques gratuites & libres de droits&nbsp;:</strong> Accédez aux catalogues d'ebooks dès 0 € et aux fonds patrimoniaux théologiques du domaine public.
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <!-- 5. Atelier de Prédication & Illustrations -->
+          <div class="split-feature-card" id="homiletique" data-slide-index="5">
+            <div class="feature-number">05</div>
             <h3 class="split-feature-title">Atelier Homilétique & Réservoir d'Illustrations</h3>
             <p class="split-feature-desc">
               Un espace spécialement pensé pour la préparation de prédications et messages. Structurez votre plan (Accroche, Proposition centrale, Exégèse, Illustrations, Applications, Appel) et piochez dans votre réservoir d'illustrations indexées.
@@ -567,18 +631,22 @@
             <ul class="feature-highlights-list">
               <li class="feature-highlight-item">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                Génération IA d'accroches percutantes, d'analogies et de questions d'application pastorale.
+                <div class="ai-point-text">
+                  Éditeur Markdown dédié sans distraction avec suivi de la durée d'élocution en temps réel.
+                </div>
               </li>
               <li class="feature-highlight-item">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                Stockage en fichiers Markdown standard (`.md`) avec export PDF et suivi des séries de prédications.
+                <div class="ai-point-text">
+                  Réservoir d'illustrations indexées par thèmes (Grâce, Pardon, Foi, Épreuve) et recherche sémantique.
+                </div>
               </li>
             </ul>
           </div>
 
-          <!-- 5. IA & RAG Local Haute Précision -->
-          <div class="split-feature-card" id="ia-personnalisee" data-slide-index="5">
-            <div class="feature-number">05</div>
+          <!-- 6. IA & RAG Local Haute Précision -->
+          <div class="split-feature-card" id="ia-personnalisee" data-slide-index="6">
+            <div class="feature-number">06</div>
             <h3 class="split-feature-title">RAG Sémantique BGE-M3 & IA Personnalisée</h3>
             <p class="split-feature-desc">
               Fini les hallucinations et le bruit. Open Shema utilise un Cross-Encoder sémantique local (BGE-M3) sur votre processeur couplé à un LLM Curateur pour ne sélectionner que les sources les plus pertinentes.
@@ -586,22 +654,28 @@
             <ul class="feature-highlights-list">
               <li class="feature-highlight-item">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                <strong>Traduction théologique multilingue</strong> : Traduisez d'un clic n'importe quel commentaire ou traité (anglais, allemand, espagnol, latin) vers le français, avec préservation stricte des codes Strong et du vocabulaire doctrinal.
+                <div class="ai-point-text">
+                  <strong>Traduction théologique multilingue&nbsp;:</strong> Traduisez d'un clic n'importe quel commentaire ou traité (anglais, allemand, espagnol, latin) vers le français, avec préservation stricte des codes Strong et du vocabulaire doctrinal.
+                </div>
               </li>
               <li class="feature-highlight-item">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                <strong>IA 100% optionnelle & désactivable</strong> : Vous pouvez utiliser l'intégralité d'Open Shema sans aucune intelligence artificielle. L'IA n'est jamais imposée et l'application s'utilise sans IA sans aucun problème.
+                <div class="ai-point-text">
+                  <strong>IA 100% optionnelle & désactivable&nbsp;:</strong> Vous pouvez utiliser l'intégralité d'Open Shema sans aucune intelligence artificielle. L'IA n'est jamais imposée et l'application s'utilise sans IA sans aucun problème.
+                </div>
               </li>
               <li class="feature-highlight-item">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                <strong>System Prompts en clair & IA à la carte</strong> : Connectez votre propre clé (Gemini, Mistral AI, Infomaniak AI souverain suisse) avec mémoire active d'une session à l'autre.
+                <div class="ai-point-text">
+                  <strong>System Prompts en clair & IA à la carte&nbsp;:</strong> Connectez votre propre clé (Gemini, Mistral AI, Infomaniak AI souverain suisse) avec mémoire active d'une session à l'autre.
+                </div>
               </li>
             </ul>
           </div>
 
-          <!-- 6. Commentaires Historiques & Atlas -->
-          <div class="split-feature-card" data-slide-index="6">
-            <div class="feature-number">06</div>
+          <!-- 7. Commentaires Historiques & Atlas -->
+          <div class="split-feature-card" data-slide-index="7">
+            <div class="feature-number">07</div>
             <h3 class="split-feature-title">Commentaires Historiques & Atlas Géographique</h3>
             <p class="split-feature-desc">
               Accédez aux commentaires de Jean Calvin, Matthew Henry, Adam Clarke, Scofield, Pulpit et John Gill. Visualisez les périples de l'Exode ou les voyages missionnaires de Paul sur les cartes interactives Leaflet.
@@ -609,11 +683,21 @@
             <ul class="feature-highlights-list">
               <li class="feature-highlight-item">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                Synthétiseur IA multi-commentaires pour comparer les perspectives théologiques d'un passage.
+                <div class="ai-point-text">
+                  <strong>Optimisé Multi-Écrans (Fenêtre Déportée)&nbsp;:</strong> Détachez les commentaires et l'exégèse dans une fenêtre indépendante sur votre second moniteur, synchronisée en direct avec votre verset actif.
+                </div>
               </li>
               <li class="feature-highlight-item">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                Géolocalisation des villes et sites archéologiques bibliques.
+                <div class="ai-point-text">
+                  Synthétiseur IA multi-commentaires pour comparer les perspectives théologiques d'un passage.
+                </div>
+              </li>
+              <li class="feature-highlight-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <div class="ai-point-text">
+                  Géolocalisation des villes et sites archéologiques bibliques.
+                </div>
               </li>
             </ul>
           </div>
@@ -623,31 +707,57 @@
         <!-- Sticky Visual Display on the right -->
         <div class="sticky-visual-container">
           
-          <!-- Slide 1: Comparateur Synoptique -->
+          <!-- Slide 1: Comparateur Synoptique & Volet Aperçu 360° -->
           <div class="sticky-visual-slide active" data-slide-target="1">
             <div class="ui-mockup-card">
               <div class="ui-mockup-header">
                 <span style="display: flex; align-items: center; gap: 6px;">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><path d="M13 6h3a2 2 0 0 1 2 2v7"></path><line x1="6" y1="9" x2="6" y2="21"></line></svg>
-                  Mode Comparaison Synoptique
+                  Comparateur & Volet Aperçu 360°
                 </span>
-                <span class="badge badge-glow-cyan" style="font-size: 0.7rem;">Similarité : 88%</span>
+                <span class="badge badge-glow-cyan" style="font-size: 0.7rem;">Jean 1:1</span>
               </div>
-              <div class="ui-mockup-content">
-                <div style="display: flex; flex-direction: column; gap: 14px; font-size: 0.9rem;">
-                  <div style="background: var(--bg-card); padding: 12px; border-radius: 8px; border-left: 3px solid var(--accent-cyan);">
-                    <strong style="color: var(--accent-cyan);">Segond 21 :</strong><br>
-                    Au commencement était la <mark style="background: rgba(56, 189, 248, 0.25); color: inherit; padding: 1px 4px; border-radius: 3px;">Parole</mark>, et la Parole était avec Dieu...
+              <div class="ui-mockup-content" style="padding: 10px; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem;">
+                
+                <!-- Comparaison Synoptique -->
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                  <div style="background: var(--bg-card); padding: 8px 10px; border-radius: 6px; border-left: 3px solid var(--accent-cyan); font-size: 0.82rem;">
+                    <strong style="color: var(--accent-cyan); font-size: 0.76rem;">Segond 21 :</strong> Au commencement était la <mark style="background: rgba(56, 189, 248, 0.25); color: inherit; padding: 1px 3px; border-radius: 3px;">Parole</mark>, et la Parole était avec Dieu...
                   </div>
-                  <div style="background: var(--bg-card); padding: 12px; border-radius: 8px; border-left: 3px solid var(--accent-gold);">
-                    <strong style="color: var(--accent-gold);">Chouraqui :</strong><br>
-                    En entête était le <mark style="background: rgba(245, 158, 11, 0.25); color: inherit; padding: 1px 4px; border-radius: 3px;">Verbe</mark>, et le Verbe était auprès d'Elohîms...
-                  </div>
-                  <div style="background: var(--bg-card); padding: 12px; border-radius: 8px; border-left: 3px solid var(--accent-emerald);">
-                    <strong style="color: var(--accent-emerald);">Parole Vivante :</strong><br>
-                    Au commencement de toutes choses, la Parole existait déjà. Elle était avec Dieu...
+                  <div style="background: var(--bg-card); padding: 8px 10px; border-radius: 6px; border-left: 3px solid var(--accent-gold); font-size: 0.82rem;">
+                    <strong style="color: var(--accent-gold); font-size: 0.76rem;">Chouraqui :</strong> En entête était le <mark style="background: rgba(245, 158, 11, 0.25); color: inherit; padding: 1px 3px; border-radius: 3px;">Verbe</mark>, et le Verbe était auprès d'Elohîms...
                   </div>
                 </div>
+
+                <!-- Volet Aperçu 360° Contextuel -->
+                <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 8px 10px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                    <span style="font-family: var(--font-title); font-size: 0.72rem; font-weight: 700; color: var(--accent-cyan); display: flex; align-items: center; gap: 5px;">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                      VOLET APERÇU 360° EN DIRECT
+                    </span>
+                    <span style="font-size: 0.65rem; color: var(--accent-emerald); font-family: var(--font-mono);">✔ 7 mentions trouvées</span>
+                  </div>
+
+                  <!-- Chips de catégories -->
+                  <div style="display: flex; gap: 5px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <span style="font-size: 0.65rem; background: var(--bg-card); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-subtle);">4 Commentaires</span>
+                    <a href="https://toutpoursagloire.com/" target="_blank" rel="noopener noreferrer" style="font-size: 0.65rem; background: rgba(56, 189, 248, 0.15); color: var(--accent-cyan); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--accent-cyan); font-weight: 600; text-decoration: none;">2 Articles TPSG ↗</a>
+                    <a href="https://bibleproject.com/francais/" target="_blank" rel="noopener noreferrer" style="font-size: 0.65rem; background: var(--bg-card); color: var(--text-secondary); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-subtle); text-decoration: none;">BibleProject (Vidéo + Affiche) ↗</a>
+                  </div>
+
+                  <!-- Infobulle dynamique au survol d'un article TPSG -->
+                  <div style="background: var(--bg-card); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 6px; padding: 7px 9px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px;">
+                      <a href="https://toutpoursagloire.com/" target="_blank" rel="noopener noreferrer" style="font-size: 0.72rem; font-weight: 700; color: var(--text-main); text-decoration: none;">Tout Pour Sa Gloire ↗</a>
+                      <span style="font-size: 0.62rem; color: var(--accent-gold); font-family: var(--font-mono);">Infobulle au survol</span>
+                    </div>
+                    <div style="font-size: 0.7rem; color: var(--text-secondary); line-height: 1.35; font-style: italic;">
+                      « En Jean 1.1, l'apôtre utilise le concept de Logos pour révéler que Jésus est l'expression suprême et éternelle de Dieu... »
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
@@ -679,37 +789,167 @@
             </div>
           </div>
 
-          <!-- Slide 3: Import Universel -->
+          <!-- Slide 3: Mapping & Options d'Affichage Typographique (Inspiré de l'App) -->
           <div class="sticky-visual-slide" data-slide-target="3">
-            <div class="ui-mockup-card">
+            <div class="ui-mockup-card display-options-card">
               <div class="ui-mockup-header">
-                <span style="display: flex; align-items: center; gap: 6px;">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                  Importateur Universel de Bibles
+                <span style="display: flex; align-items: center; gap: 8px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  Options d'Affichage Typographique
                 </span>
-                <span class="badge badge-glow-cyan" style="font-size: 0.7rem;">Automatique</span>
+                <span class="badge badge-glow-gold" style="font-size: 0.7rem;">Mapping Actif</span>
               </div>
               <div class="ui-mockup-content">
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                  <div style="border: 2px dashed var(--accent-cyan); padding: 20px; border-radius: 8px; text-align: center; background: rgba(56, 189, 248, 0.05);">
-                    <div style="margin-bottom: 6px; color: var(--accent-cyan);">
-                      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                    </div>
-                    <strong style="color: var(--text-main);">Nouveau_Testament_Parole_Vivante.epub</strong>
-                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Détection InDesign & ancres de versets</div>
-                  </div>
-                  <div style="font-family: var(--font-mono); font-size: 0.78rem; background: var(--bg-card); padding: 10px; border-radius: 6px; color: var(--accent-emerald);">
-                    ✔ 27 Livres (Nouveau Testament) reconnus<br>
-                    ✔ 7 957 versets mappés avec précision<br>
-                    ✔ Indexation SQLite & ChromaDB prête
+                
+                <!-- Tabs d'affichage -->
+                <div class="display-options-tabs">
+                  <div class="opt-tab"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg> Éléments</div>
+                  <div class="opt-tab active"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="12" y1="4" x2="12" y2="20"></line></svg> Typographie</div>
+                  <div class="opt-tab"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Ambiance</div>
+                </div>
+
+                <!-- Section 1 : Mots entre crochets -->
+                <div class="opt-group">
+                  <label class="opt-group-label">MOTS ENTRE CROCHETS [EXPLICATIFS]</label>
+                  <div class="opt-btn-group">
+                    <button class="opt-btn active">[ Dieu ]</button>
+                    <button class="opt-btn"><em>Dieu</em></button>
+                    <button class="opt-btn">Dieu</button>
                   </div>
                 </div>
+
+                <!-- Section 2 : Notes de traduction -->
+                <div class="opt-group">
+                  <label class="opt-group-label">NOTES DE TRADUCTION & VARIANTES</label>
+                  <div class="opt-btn-group">
+                    <button class="opt-btn active">Appel ⁿ</button>
+                    <button class="opt-btn">(Ou ...)</button>
+                    <button class="opt-btn">Masqué</button>
+                  </div>
+                </div>
+
+                <!-- Section 3 : Césures poétiques -->
+                <div class="opt-group">
+                  <label class="opt-group-label">SÉPARATEURS POÉTIQUES / CÉSURES ( ' , | , ; )</label>
+                  <div class="opt-btn-group">
+                    <button class="opt-btn active">Indenté ↵</button>
+                    <button class="opt-btn">Fluide</button>
+                    <button class="opt-btn">Trait Ꞌ</button>
+                  </div>
+                </div>
+
+                <!-- Aperçu en direct du texte rendu -->
+                <div class="opt-preview-box">
+                  <span class="preview-verse-num">Genèse 1:2</span>
+                  <span class="preview-text">...au-dessus de l'eau.<sup class="sup-note">n</sup> <span class="bracket-word">[ Dieu ]</span> dit : « Que la lumière soit ! »</span>
+                </div>
+
               </div>
             </div>
           </div>
 
-          <!-- Slide 4: Atelier Prédication -->
+          <!-- Slide 4: Import Universel & Hub de Bibliothèques Ebooks -->
           <div class="sticky-visual-slide" data-slide-target="4">
+            <div class="ui-mockup-card ebook-hub-card">
+              <div class="ui-mockup-header">
+                <span style="display: flex; align-items: center; gap: 6px;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                  Exemples d'Ebooks & Librairies
+                </span>
+                <span class="badge badge-glow-cyan" style="font-size: 0.7rem;">Formats Ouverts</span>
+              </div>
+              <div class="ui-mockup-content ebook-hub-content">
+                
+                <!-- Showcase des 3 livres réels avec couverture, prix et auteur -->
+                <div class="book-showcase-grid">
+                  
+                  <!-- Livre 1 : Parole Vivante -->
+                  <a href="https://blfstore.com/collections/ebooks/products/ebook-parole-vivante-broche" target="_blank" rel="noopener noreferrer" class="book-card-mini">
+                    <div class="book-cover-wrap">
+                      <img src="https://blfstore.com/cdn/shop/products/I-Grande-2118-parole-vivante-broche.net_fb6b994a-d86c-48cd-8f75-701840a8fb48_449x699.jpg?v=1650380984" alt="Parole Vivante - Alfred Kuen" class="book-cover-img" loading="lazy">
+                      <span class="book-price-tag">1,00 €*</span>
+                    </div>
+                    <div class="book-info">
+                      <div class="book-title">Parole Vivante</div>
+                      <div class="book-author">Alfred Kuen</div>
+                      <div class="book-store">BLF Store</div>
+                    </div>
+                  </a>
+
+                  <!-- Livre 2 : Résolu -->
+                  <a href="https://editionscle.com/vie-chretienne/253-resolu-format-epub-9782358430500.html" target="_blank" rel="noopener noreferrer" class="book-card-mini">
+                    <div class="book-cover-wrap">
+                      <img src="https://editionscle.com/446-large_default/resolu.jpg" alt="Résolu - Philippe Viguier" class="book-cover-img" loading="lazy">
+                      <span class="book-price-tag">5,00 €*</span>
+                    </div>
+                    <div class="book-info">
+                      <div class="book-title">Résolu</div>
+                      <div class="book-author">Ph. Viguier</div>
+                      <div class="book-store">Éditions Clé</div>
+                    </div>
+                  </a>
+
+                  <!-- Livre 3 : Romains -->
+                  <a href="https://editionscle.com/ebook/331-romains-format-epub-9782358430814.html" target="_blank" rel="noopener noreferrer" class="book-card-mini">
+                    <div class="book-cover-wrap">
+                      <img src="https://editionscle.com/683-large_default/romains.jpg" alt="Commentaire Romains - Brad Dickson" class="book-cover-img" loading="lazy">
+                      <span class="book-price-tag">9,90 €*</span>
+                    </div>
+                    <div class="book-info">
+                      <div class="book-title">Com. Romains</div>
+                      <div class="book-author">B. Dickson</div>
+                      <div class="book-store">Éditions Clé</div>
+                    </div>
+                  </a>
+
+                </div>
+
+                <!-- Hub de sources organisées -->
+                <div class="hub-sources-container">
+                  <div class="hub-sources-title">OÙ EXPLORER LES CATALOGUES (DÈS 0 €) :</div>
+                  <div class="hub-sources-grid">
+                    <a href="https://blfstore.com/collections/ebooks?tab=products&sort_by=price&sort_order=asc&page=1" target="_blank" rel="noopener noreferrer" class="hub-source-card">
+                      <span class="hub-source-name">BLF Store</span>
+                      <span class="chip-tag free">Dès 0 €</span>
+                    </a>
+                    <a href="https://maisonbible.fr/fr/560-ebooks?order=ps.price.asc" target="_blank" rel="noopener noreferrer" class="hub-source-card">
+                      <span class="hub-source-name">Maison de la Bible</span>
+                      <span class="chip-tag free">Dès 0 €</span>
+                    </a>
+                    <a href="https://publicationschretiennes.com/collections/ebooks?sort_by=price-ascending" target="_blank" rel="noopener noreferrer" class="hub-source-card">
+                      <span class="hub-source-name">Pub. Chrétiennes</span>
+                      <span class="chip-tag free">Dès 0 €</span>
+                    </a>
+                    <a href="https://editionscle.com/78-ebook?order=product.price.asc" target="_blank" rel="noopener noreferrer" class="hub-source-card">
+                      <span class="hub-source-name">Éditions Clé</span>
+                      <span class="chip-tag free">Dès 0 €</span>
+                    </a>
+                    <a href="https://gallica.bnf.fr/services/engine/search/sru?operation=searchRetrieve&exactSearch=false&collapsing=true&version=1.2&query=(dc.type%20all%20%22monographie%22)%20and%20(dc.formatspecific%20all%20%22epub%22)%20and%20(access%20all%20%22all%22)%20and%20(dewey%20all%20%222%22)&suggest=10&keywords=" target="_blank" rel="noopener noreferrer" class="hub-source-card">
+                      <span class="hub-source-name">BnF Gallica</span>
+                      <span class="chip-tag free">Domaine public</span>
+                    </a>
+                    <a href="https://community.logos.com/wiki/logos-user-wiki/personal-books/user-contributed-personal-books/" target="_blank" rel="noopener noreferrer" class="hub-source-card">
+                      <span class="hub-source-name">Logos Wiki (PB)</span>
+                      <span class="chip-tag free">Domaine public</span>
+                    </a>
+                    <a href="https://logosfreelibrary.wordpress.com/" target="_blank" rel="noopener noreferrer" class="hub-source-card" style="grid-column: span 2;">
+                      <span class="hub-source-name">Logos Free Library (Livres libres)</span>
+                      <span class="chip-tag free">Bénévolat libre</span>
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Note de bas de page -->
+                <div class="hub-footnote">
+                  * Prix indicatifs constatés en août 2026, à titre d'exemple et sous réserve de modifications par les éditeurs.
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- Slide 5: Atelier Prédication -->
+          <div class="sticky-visual-slide" data-slide-target="5">
             <div class="ui-mockup-card">
               <div class="ui-mockup-header">
                 <span style="display: flex; align-items: center; gap: 6px;">
@@ -734,8 +974,8 @@
             </div>
           </div>
 
-          <!-- Slide 5: RAG BGE-M3 -->
-          <div class="sticky-visual-slide" data-slide-target="5">
+          <!-- Slide 6: RAG BGE-M3 -->
+          <div class="sticky-visual-slide" data-slide-target="6">
             <div class="ui-mockup-card">
               <div class="ui-mockup-header">
                 <span style="display: flex; align-items: center; gap: 6px;">
@@ -763,8 +1003,8 @@
             </div>
           </div>
 
-          <!-- Slide 6: Commentaires & Atlas -->
-          <div class="sticky-visual-slide" data-slide-target="6">
+          <!-- Slide 7: Commentaires & Atlas -->
+          <div class="sticky-visual-slide" data-slide-target="7">
             <div class="ui-mockup-card">
               <div class="ui-mockup-header">
                 <span style="display: flex; align-items: center; gap: 6px;">
@@ -778,15 +1018,13 @@
                   <strong style="color: var(--accent-cyan);">Calvin sur Jean 1:1 :</strong><br>
                   <em>« L'évangéliste appelle Jésus-Christ la Parole de Dieu, non seulement parce qu'il est le messager et l'interprète du Père, mais parce qu'il est sa sagesse vivante et éternelle... »</em>
                 </div>
-                <div style="margin-top: 10px; padding: 8px; background: rgba(245, 158, 11, 0.1); border-radius: 6px; font-size: 0.8rem; color: var(--accent-gold); display: flex; align-items: center; gap: 6px;">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon></svg>
-                  <strong>Atlas :</strong> Jérusalem, Béthanie au-delà du Jourdain (31.8° N, 35.5° E)
-                </div>
               </div>
             </div>
           </div>
 
         </div>
+      </div>
+    </div>
   </section>
 
   <!-- Guide Pratique & Stratégie IA (Vulgarisation, Comparatif des 3 Moteurs & Stratégie Hybride) -->
@@ -810,25 +1048,36 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
               FORCE BRUTE & CONTEXTE GÉANT
             </div>
-            <h3 class="ai-engine-title">Google Gemini</h3>
+            <h3 class="ai-engine-title">
+              <a href="https://deepmind.google/models/gemini/" target="_blank" rel="noopener noreferrer" class="ai-engine-title-link">Google Gemini</a>
+            </h3>
             <p class="ai-engine-subtitle">La puissance de calcul maximale avec un quota gratuit journalier.</p>
           </div>
           <ul class="ai-engine-points">
             <li>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              <strong>Points forts :</strong> Fenêtre de contexte gigantesque (analyse de livres entiers d'un bloc) et rapidité d'exécution foudroyante.
+              <div class="ai-point-text">
+                <strong>Points forts&nbsp;:</strong> Fenêtre de contexte gigantesque (analyse de livres entiers d'un bloc) et rapidité d'exécution foudroyante.
+              </div>
             </li>
             <li>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              <strong>Usage optimal :</strong> Recherches thématiques massives et requêtes d'exégèse lourdes.
+              <div class="ai-point-text">
+                <strong>Usage optimal&nbsp;:</strong> Recherches thématiques massives et requêtes d'exégèse lourdes.
+              </div>
             </li>
             <li>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              <strong>Modèle économique :</strong> <strong>100% Gratuit</strong> (quota journalier via Google AI Studio). Option payante illimitée à quelques centimes si besoin.
+              <div class="ai-point-text">
+                <strong>Modèle économique&nbsp;:</strong> <strong>100% Gratuit</strong> (quota journalier via Google AI Studio). Option payante illimitée à quelques centimes si besoin.
+              </div>
             </li>
           </ul>
           <div class="ai-engine-footer">
             <span class="ai-quota-tag">Limite : Quota par jour / minute</span>
+            <a href="https://deepmind.google/models/gemini/" target="_blank" rel="noopener noreferrer" class="ai-engine-ext-link">
+              Site officiel ↗
+            </a>
           </div>
         </div>
 
@@ -839,25 +1088,36 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
               LE JUSTE MILIEU IDÉAL
             </div>
-            <h3 class="ai-engine-title">Mistral AI (France)</h3>
+            <h3 class="ai-engine-title">
+              <a href="https://mistral.ai/" target="_blank" rel="noopener noreferrer" class="ai-engine-title-link">Mistral AI (France)</a>
+            </h3>
             <p class="ai-engine-subtitle">Le parfait équilibre entre gratuité, souveraineté européenne et maîtrise du français.</p>
           </div>
           <ul class="ai-engine-points">
             <li>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              <strong>Points forts :</strong> Excellence littéraire incomparable en langue française, respect des nuances théologiques et protection des données RGPD.
+              <div class="ai-point-text">
+                <strong>Points forts&nbsp;:</strong> Excellence littéraire incomparable en langue française, respect des nuances théologiques et protection des données RGPD.
+              </div>
             </li>
             <li>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              <strong>Usage optimal :</strong> Rédaction homilétique de prédications, formulation soignée et dialogue exégétique.
+              <div class="ai-point-text">
+                <strong>Usage optimal&nbsp;:</strong> Rédaction homilétique de prédications, formulation soignée et dialogue exégétique.
+              </div>
             </li>
             <li>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              <strong>Modèle économique :</strong> <strong>Plan Gratuit disponible</strong> (avec un quota mensuel de requêtes). Option pay-as-you-go illimitée très économique (~quelques centimes/mois).
+              <div class="ai-point-text">
+                <strong>Modèle économique&nbsp;:</strong> <strong>Plan Gratuit disponible</strong> (avec un quota mensuel de requêtes). Option pay-as-you-go illimitée très économique (~quelques centimes/mois).
+              </div>
             </li>
           </ul>
           <div class="ai-engine-footer">
             <span class="ai-quota-tag gold">Limite : Quota mensuel en mode gratuit</span>
+            <a href="https://mistral.ai/" target="_blank" rel="noopener noreferrer" class="ai-engine-ext-link">
+              Site officiel ↗
+            </a>
           </div>
         </div>
 
@@ -868,25 +1128,36 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
               ÉTHIQUE, ÉCOLOGIE & SOUVERAINETÉ
             </div>
-            <h3 class="ai-engine-title">Infomaniak AI (Suisse)</h3>
+            <h3 class="ai-engine-title">
+              <a href="https://www.infomaniak.com/fr/hebergement/ai-services" target="_blank" rel="noopener noreferrer" class="ai-engine-title-link">Infomaniak AI (Suisse)</a>
+            </h3>
             <p class="ai-engine-subtitle">L'IA hébergée en Suisse, 100% énergies renouvelables et respect absolu de la vie privée.</p>
           </div>
           <ul class="ai-engine-points">
             <li>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-emerald)" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              <strong>Points forts :</strong> Datacenters neutres en carbone alimentés à 100% en énergie renouvelable, zéro utilisation de vos données pour l'entraînement (LPD suisse / RGPD).
+              <div class="ai-point-text">
+                <strong>Points forts&nbsp;:</strong> Datacenters neutres en carbone alimentés à 100% en énergie renouvelable, zéro utilisation de vos données pour l'entraînement (LPD suisse / RGPD).
+              </div>
             </li>
             <li>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-emerald)" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              <strong>Usage optimal :</strong> Vectorisation de vos bibliothèques d'ouvrages et indexation sémantique durable.
+              <div class="ai-point-text">
+                <strong>Usage optimal&nbsp;:</strong> Vectorisation de vos bibliothèques d'ouvrages et indexation sémantique durable.
+              </div>
             </li>
             <li>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-emerald)" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              <strong>Modèle économique :</strong> Pay-as-you-go souverain et transparent (quelques centimes par ouvrage vectorisé).
+              <div class="ai-point-text">
+                <strong>Modèle économique&nbsp;:</strong> Pay-as-you-go souverain et transparent (quelques centimes par ouvrage vectorisé).
+              </div>
             </li>
           </ul>
           <div class="ai-engine-footer">
             <span class="ai-quota-tag emerald">Modèle : Tarification éthique à l'usage</span>
+            <a href="https://www.infomaniak.com/fr/hebergement/ai-services" target="_blank" rel="noopener noreferrer" class="ai-engine-ext-link">
+              Site officiel ↗
+            </a>
           </div>
         </div>
 
@@ -952,8 +1223,8 @@
           <thead>
             <tr>
               <th style="width: 28%;">Fonctionnalité / Critère</th>
-              <th style="width: 36%;">Logiciels Traditionnels</th>
               <th style="width: 36%;" class="col-highlight">Open Shema</th>
+              <th style="width: 36%;">Logiciels Traditionnels</th>
             </tr>
           </thead>
           <tbody>
@@ -964,8 +1235,8 @@
                   <span>Coût & Modèle Économique</span>
                 </div>
               </td>
-              <td>Abonnements récurrents (15€ à 35€/mois) ou packs initiaux à 300€ - 2500€+</td>
               <td class="col-highlight"><span class="icon-check-good">✔</span> <strong>100% Gratuit & Open Source (MIT)</strong> — Zéro abonnement</td>
+              <td>Abonnements récurrents (15€ à 35€/mois) ou packs initiaux à 300€ - 2500€+</td>
             </tr>
             <tr>
               <td class="feature-name">
@@ -974,8 +1245,8 @@
                   <span>Bibliothèque & Format des Livres</span>
                 </div>
               </td>
+              <td class="col-highlight"><span class="icon-check-good">✔</span> <strong>Formats Ouverts (EPUB, DOCX Logos, JSON, MD)</strong> avec mapping auto</td>
               <td>Formats verrouillés (DRM propriétaire), rachat de chaque livre au prix fort</td>
-              <td class="col-highlight"><span class="icon-check-good">✔</span> <strong>Import Universel Libre (EPUB, PDF, MD)</strong> avec mapping auto</td>
             </tr>
             <tr>
               <td class="feature-name">
@@ -984,8 +1255,8 @@
                   <span>Prise de Notes & Données</span>
                 </div>
               </td>
-              <td>Bases de données fermées dans le cloud avec risque de lock-in</td>
               <td class="col-highlight"><span class="icon-check-good">✔</span> <strong>Fichiers Markdown standards (`.md`)</strong> en clair sur votre disque</td>
+              <td>Bases de données fermées dans le cloud avec risque de lock-in</td>
             </tr>
             <tr>
               <td class="feature-name">
@@ -994,8 +1265,8 @@
                   <span>Intelligence Artificielle & Traduction</span>
                 </div>
               </td>
-              <td>IA bridée, surcoût mensuel opaque ou non désactivable</td>
               <td class="col-highlight"><span class="icon-check-good">✔</span> <strong>Traduction multilingue vers le français & IA 100% optionnelle / désactivable</strong></td>
+              <td>IA bridée, surcoût mensuel opaque ou non désactivable</td>
             </tr>
             <tr>
               <td class="feature-name">
@@ -1004,8 +1275,8 @@
                   <span>Moteur de Recherche RAG</span>
                 </div>
               </td>
-              <td>Recherche par mots-clés rigide ou index cloud</td>
               <td class="col-highlight"><span class="icon-check-good">✔</span> <strong>Reranking sémantique local (Cross-Encoder BGE-M3)</strong> sur CPU</td>
+              <td>Recherche par mots-clés rigide ou index cloud</td>
             </tr>
             <tr>
               <td class="feature-name">
@@ -1014,8 +1285,8 @@
                   <span>Atelier de Prédication</span>
                 </div>
               </td>
-              <td>Fonctions basiques ou modules additionnels payants</td>
               <td class="col-highlight"><span class="icon-check-good">✔</span> <strong>Gestionnaire de prédications & réservoir d'illustrations</strong> natif</td>
+              <td>Fonctions basiques ou modules additionnels payants</td>
             </tr>
             <tr>
               <td class="feature-name">
@@ -1024,8 +1295,8 @@
                   <span>Vie Privée & Pérennité</span>
                 </div>
               </td>
-              <td>Dépend de la rentabilité d'une entreprise privée</td>
               <td class="col-highlight"><span class="icon-check-good">✔</span> <strong>Code ouvert</strong> : vos études vous appartiennent pour toujours</td>
+              <td>Dépend de la rentabilité d'une entreprise privée</td>
             </tr>
           </tbody>
         </table>
@@ -1211,18 +1482,18 @@
 
         <div class="bento-card">
           <div class="bento-icon-wrapper">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
           </div>
-          <h3 class="bento-card-title">Zéro Télémétrie Intrusive</h3>
-          <p class="bento-card-desc">Aucune collecte de données personnelles ni suivi d'activité. Vos réflexions théologiques et vos recherches restent strictement confidentielles.</p>
+          <h3 class="bento-card-title">Optimisé Multi-Écrans</h3>
+          <p class="bento-card-desc">Détachez vos commentaires et l'exégèse dans une fenêtre indépendante sur votre second écran, synchronisée en temps réel avec votre lecteur principal.</p>
         </div>
 
         <div class="bento-card">
           <div class="bento-icon-wrapper">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
           </div>
-          <h3 class="bento-card-title">Rapidité SQLite & ChromaDB</h3>
-          <p class="bento-card-desc">Une vitesse de recherche instantanée sur des millions de mots grâce à une base SQLite ultra-optimisée et des vecteurs ChromaDB locaux.</p>
+          <h3 class="bento-card-title">Zéro Télémétrie Intrusive</h3>
+          <p class="bento-card-desc">Aucune collecte de données personnelles ni suivi d'activité. Vos réflexions théologiques et vos recherches restent strictement confidentielles.</p>
         </div>
 
         <div class="bento-card span-2">
@@ -1234,6 +1505,14 @@
         </div>
 
         <div class="bento-card">
+          <div class="bento-icon-wrapper">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          </div>
+          <h3 class="bento-card-title">Rapidité SQLite & ChromaDB</h3>
+          <p class="bento-card-desc">Une vitesse de recherche instantanée sur des millions de mots grâce à une base SQLite ultra-optimisée et des vecteurs ChromaDB locaux.</p>
+        </div>
+
+        <div class="bento-card span-3">
           <div class="bento-icon-wrapper">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
           </div>

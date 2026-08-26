@@ -480,16 +480,19 @@ const PassageOverviewDrawer = {
     const mapsCount = (data.maps || []).length;
     const bpCount = ((data.bibleproject?.current_videos || []).length) + ((data.bibleproject?.current_posters || []).length);
 
-    // Colonne Gauche : Visuel & Contexte (BibleProject & Cartes/Lieux)
+    // Colonne Gauche : Visuel, Contexte & Notes (BibleProject, Notes & Surlignages, Cartes/Lieux)
     const leftActiveHtml = [];
     const leftEmptyHtml = [];
     if (bpCount > 0) leftActiveHtml.push(this.renderBibleProjectSection(data));
     else leftEmptyHtml.push(this.renderBibleProjectSection(data));
 
+    if (notesCount > 0) leftActiveHtml.push(this.renderNotesSection(data));
+    else leftEmptyHtml.push(this.renderNotesSection(data));
+
     if (mapsCount > 0) leftActiveHtml.push(this.renderMapsSection(data));
     else leftEmptyHtml.push(this.renderMapsSection(data));
 
-    // Colonne Droite : Exégèse & Ressources (Commentaires, Livres, Articles, Notes)
+    // Colonne Droite : Exégèse & Ressources (Commentaires, Livres, Articles)
     const rightActiveHtml = [];
     const rightEmptyHtml = [];
     if (commCount > 0) rightActiveHtml.push(this.renderCommentariesSection(data));
@@ -500,9 +503,6 @@ const PassageOverviewDrawer = {
 
     if (artCount > 0) rightActiveHtml.push(this.renderArticlesSection(data));
     else rightEmptyHtml.push(this.renderArticlesSection(data));
-
-    if (notesCount > 0) rightActiveHtml.push(this.renderNotesSection(data));
-    else rightEmptyHtml.push(this.renderNotesSection(data));
 
     const totalActive = leftActiveHtml.length + rightActiveHtml.length;
     const totalEmpty = leftEmptyHtml.length + rightEmptyHtml.length;
@@ -1153,17 +1153,20 @@ const PassageOverviewDrawer = {
     container.querySelectorAll('[data-action="select-commentary"]').forEach(card => {
       card.addEventListener('click', () => {
         const author = card.dataset.author;
-        const sourceId = card.dataset.sourceId;
         const idx = parseInt(card.dataset.index) || 0;
 
-        document.querySelector('.drawer-tab[data-drawer-tab="commentaries"]')?.click();
-        
-        setTimeout(() => {
-          if (typeof CommentaryViewer !== 'undefined') {
-            if (author) CommentaryViewer.preferredAuthor = author;
-            CommentaryViewer.selectCommentary(idx);
-          }
-        }, 50);
+        if (typeof CommentaryWindow !== 'undefined' && typeof CommentaryWindow.selectCommentarySource === 'function') {
+          if (author) CommentaryWindow.selectCommentarySource(author);
+          CommentaryWindow.switchTab('commentaries');
+        } else {
+          document.querySelector('.drawer-tab[data-drawer-tab="commentaries"]')?.click();
+          setTimeout(() => {
+            if (typeof CommentaryViewer !== 'undefined') {
+              if (author) CommentaryViewer.preferredAuthor = author;
+              CommentaryViewer.selectCommentary(idx);
+            }
+          }, 50);
+        }
       });
     });
 
@@ -1171,7 +1174,11 @@ const PassageOverviewDrawer = {
     container.querySelectorAll('[data-action="open-commentaries-tab"]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        document.querySelector('.drawer-tab[data-drawer-tab="commentaries"]')?.click();
+        if (typeof CommentaryWindow !== 'undefined' && typeof CommentaryWindow.switchTab === 'function') {
+          CommentaryWindow.switchTab('commentaries');
+        } else {
+          document.querySelector('.drawer-tab[data-drawer-tab="commentaries"]')?.click();
+        }
       });
     });
 
@@ -1188,7 +1195,6 @@ const PassageOverviewDrawer = {
       });
     });
 
-
     container.querySelectorAll('[data-action="open-articles-tab"]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1196,7 +1202,7 @@ const PassageOverviewDrawer = {
       });
     });
 
-    // 5. Clic sur un livre de théologie -> Ouvre directement le bon chapitre ciblé dans la vue théologie
+    // 5. Clic sur un livre de théologie
     container.querySelectorAll('[data-action="open-theology-chapter"]').forEach(card => {
       card.addEventListener('click', () => {
         const bName = card.dataset.bookName;
@@ -1226,19 +1232,27 @@ const PassageOverviewDrawer = {
     // 6. Clic sur une note -> Ouvre l'onglet notes
     container.querySelectorAll('[data-action="open-note"]').forEach(card => {
       card.addEventListener('click', () => {
-        document.querySelector('.drawer-tab[data-drawer-tab="notes"]')?.click();
+        if (typeof CommentaryWindow !== 'undefined' && typeof CommentaryWindow.switchTab === 'function') {
+          CommentaryWindow.switchTab('notes');
+        } else {
+          document.querySelector('.drawer-tab[data-drawer-tab="notes"]')?.click();
+        }
       });
     });
 
     container.querySelectorAll('[data-action="add-quick-note"]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        document.querySelector('.drawer-tab[data-drawer-tab="notes"]')?.click();
-        setTimeout(() => {
-          if (typeof DrawerNotesViewer !== 'undefined' && DrawerNotesViewer.openNewNote) {
-            DrawerNotesViewer.openNewNote();
-          }
-        }, 80);
+        if (typeof CommentaryWindow !== 'undefined' && typeof CommentaryWindow.switchTab === 'function') {
+          CommentaryWindow.switchTab('notes');
+        } else {
+          document.querySelector('.drawer-tab[data-drawer-tab="notes"]')?.click();
+          setTimeout(() => {
+            if (typeof DrawerNotesViewer !== 'undefined' && DrawerNotesViewer.openNewNote) {
+              DrawerNotesViewer.openNewNote();
+            }
+          }, 80);
+        }
       });
     });
 
@@ -1257,49 +1271,57 @@ const PassageOverviewDrawer = {
       });
     });
 
-    // 7b. Actions BibleProject (Lecture vidéo & Visualisation poster)
+    // 7b. Actions BibleProject (Lecture vidéo & Visualisation poster HD)
     container.querySelectorAll('[data-action="open-bp-video"]').forEach(item => {
-      item.addEventListener('click', () => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
         const ytId = item.dataset.ytId;
         const title = item.dataset.title || '';
         const desc = item.dataset.desc || '';
-        document.querySelector('.drawer-tab[data-drawer-tab="media"]')?.click();
-        setTimeout(() => {
-          if (typeof BibleProjectView !== 'undefined') {
-            BibleProjectView.playVideo(ytId, title, desc);
-          }
-        }, 80);
+        this.playVideo(ytId, title, desc);
       });
     });
 
     container.querySelectorAll('[data-action="open-bp-poster"]').forEach(item => {
-      item.addEventListener('click', () => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
         const imgUrl = item.dataset.imageUrl;
         const pdfUrl = item.dataset.pdfUrl;
         const title = item.dataset.title;
-        if (typeof BibleProjectView !== 'undefined') {
-          BibleProjectView.openPosterModal(imgUrl, pdfUrl, title);
-        }
+        this.openPosterModal(imgUrl, pdfUrl, title);
       });
     });
 
     container.querySelectorAll('[data-action="open-media-tab"]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        document.querySelector('.drawer-tab[data-drawer-tab="media"]')?.click();
+        if (typeof App !== 'undefined' && App.switchView) {
+          App.switchView('media');
+        } else if (document.querySelector('.drawer-tab[data-drawer-tab="media"]')) {
+          document.querySelector('.drawer-tab[data-drawer-tab="media"]').click();
+        } else {
+          const firstVid = this.currentData?.bibleproject?.current_videos?.[0] || this.currentData?.bibleproject?.all_videos?.[0];
+          if (firstVid) {
+            this.playVideo(firstVid.yt_id, firstVid.title, firstVid.description);
+          }
+        }
       });
     });
-
 
     // 8. Boutons d'actions rapides du bas de carte
     container.querySelector('#btn-card-launch-synth')?.addEventListener('click', (e) => {
       e.stopPropagation();
-      document.querySelector('.drawer-tab[data-drawer-tab="commentaries"]')?.click();
-      setTimeout(() => {
-        if (typeof CommentarySynthesizerUI !== 'undefined') {
-          CommentarySynthesizerUI.openModal();
-        }
-      }, 100);
+      if (typeof CommentaryWindow !== 'undefined' && typeof CommentaryWindow.toggleSynthesisPanel === 'function') {
+        CommentaryWindow.switchTab('commentaries');
+        setTimeout(() => CommentaryWindow.toggleSynthesisPanel(true), 80);
+      } else {
+        document.querySelector('.drawer-tab[data-drawer-tab="commentaries"]')?.click();
+        setTimeout(() => {
+          if (typeof CommentarySynthesizerUI !== 'undefined') {
+            CommentarySynthesizerUI.openModal();
+          }
+        }, 100);
+      }
     });
 
     container.querySelector('#btn-card-launch-study')?.addEventListener('click', (e) => {
@@ -1314,6 +1336,278 @@ const PassageOverviewDrawer = {
         }, 150);
       }
     });
+  },
+
+  // =========================================================================
+  // GESTION DU LECTEUR VIDÉO ET DU VISUALISEUR DE POSTER HD BIBLEPROJECT
+  // =========================================================================
+
+  panzoom: {
+    scale: 1,
+    minScale: 0.5,
+    maxScale: 6.0,
+    translateX: 0,
+    translateY: 0,
+    isDragging: false,
+    startX: 0,
+    startY: 0
+  },
+
+  playVideo(ytId, title, desc) {
+    let modal = document.getElementById('bp-video-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'bp-video-modal';
+      modal.className = 'bp-modal-overlay hidden';
+      modal.innerHTML = `
+        <div class="bp-modal-window" style="max-width: 980px; height: auto; max-height: 92vh; background: #0F172A; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 24px 64px rgba(0,0,0,0.85); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;">
+          <div class="bp-modal-header" style="padding: 12px 18px; background: #1E293B; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: space-between;">
+            <div class="bp-modal-title-wrap" style="display: flex; align-items: center; gap: 10px;">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#C084FC" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+              <div>
+                <div class="bp-modal-main-title" id="bp-video-modal-title" style="font-size: 14px; font-weight: 700; color: #F8FAFC;">Lecture Vidéo BibleProject</div>
+                <div class="bp-modal-sub-title" style="font-size: 11.5px; color: #94A3B8;">BibleProject (Français) • Panorama narratif</div>
+              </div>
+            </div>
+            <div class="bp-modal-controls" style="display: flex; align-items: center; gap: 8px;">
+              <a href="#" target="_blank" class="bp-ctrl-btn bp-btn-download" id="bp-video-ext-btn" title="Ouvrir la vidéo sur YouTube" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #F8FAFC; text-decoration: none; font-size: 12px; font-weight: 600;">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                <span>YouTube ↗</span>
+              </a>
+              <button type="button" class="bp-ctrl-btn bp-btn-close" id="bp-video-modal-close" title="Fermer (Échap)" style="width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #F8FAFC; cursor: pointer;">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+          <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background: #000;">
+            <iframe id="bp-video-modal-iframe" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      modal.querySelector('#bp-video-modal-close')?.addEventListener('click', () => this.closeVideoModal());
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) this.closeVideoModal();
+      });
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
+          this.closeVideoModal();
+        }
+      });
+    }
+
+    const titleEl = modal.querySelector('#bp-video-modal-title');
+    const iframe = modal.querySelector('#bp-video-modal-iframe');
+    const extBtn = modal.querySelector('#bp-video-ext-btn');
+
+    if (titleEl) titleEl.textContent = title || 'Panorama BibleProject';
+    if (extBtn) {
+      extBtn.onclick = (e) => {
+        e.preventDefault();
+        try { API.openExternalUrl(`https://www.youtube.com/watch?v=${ytId}`); } catch(err) { window.open(`https://www.youtube.com/watch?v=${ytId}`, '_blank'); }
+      };
+    }
+    if (iframe) {
+      iframe.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`;
+    }
+
+    modal.classList.remove('hidden');
+    document.body.classList.add('bp-modal-open');
+  },
+
+  closeVideoModal() {
+    const modal = document.getElementById('bp-video-modal');
+    if (modal) {
+      const iframe = modal.querySelector('#bp-video-modal-iframe');
+      if (iframe) iframe.src = '';
+      modal.classList.add('hidden');
+      document.body.classList.remove('bp-modal-open');
+    }
+  },
+
+  openPosterModal(imageUrl, pdfUrl, title) {
+    let modal = document.getElementById('bp-poster-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'bp-poster-modal';
+      modal.className = 'bp-modal-overlay hidden';
+      modal.innerHTML = `
+        <div class="bp-modal-window" style="width: 95vw; height: 92vh; max-width: 1540px; background: #0B0F19; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 24px 64px rgba(0,0,0,0.85);">
+          <div class="bp-modal-header" style="padding: 10px 18px; background: #111726; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: space-between;">
+            <div class="bp-modal-title-wrap" style="display: flex; align-items: center; gap: 10px;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#C084FC" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <div>
+                <div class="bp-modal-main-title" id="bp-modal-poster-title" style="font-size: 13.5px; font-weight: 700; color: #F1F5F9;">Structure littéraire</div>
+                <div class="bp-modal-sub-title" style="font-size: 11px; color: #94A3B8;">BibleProject (Français) • Haute Définition</div>
+              </div>
+            </div>
+            <div class="bp-modal-controls" style="display: flex; align-items: center; gap: 6px;">
+              <button type="button" class="bp-ctrl-btn" id="bp-zoom-out" title="Dézoomer (Molette bas)" style="width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #F8FAFC; cursor: pointer;">−</button>
+              <span class="bp-zoom-level" id="bp-zoom-level-label" style="font-size: 12px; font-weight: 700; color: #94A3B8; min-width: 40px; text-align: center;">100%</span>
+              <button type="button" class="bp-ctrl-btn" id="bp-zoom-in" title="Zoomer (Molette haut)" style="width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #F8FAFC; cursor: pointer;">+</button>
+              <button type="button" class="bp-ctrl-btn" id="bp-zoom-fit" title="Ajuster à l'écran" style="padding: 4px 9px; display: inline-flex; align-items: center; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #F8FAFC; font-size: 11.5px; cursor: pointer;">Ajuster</button>
+              <button type="button" class="bp-ctrl-btn" id="bp-zoom-reset" title="Taille réelle (1:1)" style="padding: 4px 9px; display: inline-flex; align-items: center; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #F8FAFC; font-size: 11.5px; cursor: pointer;">1:1</button>
+              <a href="#" target="_blank" class="bp-ctrl-btn bp-btn-download" id="bp-poster-download-btn" title="Ouvrir l'affiche HD officielle" style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #F8FAFC; text-decoration: none; font-size: 11.5px; font-weight: 600;">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                <span>Affiche HD ↗</span>
+              </a>
+              <button type="button" class="bp-ctrl-btn bp-btn-close" id="bp-poster-modal-close" title="Fermer (Échap)" style="width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #F8FAFC; cursor: pointer;">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="bp-viewport-container" id="bp-poster-viewport" style="flex: 1; overflow: hidden; position: relative; background: #050811; cursor: grab; display: flex; align-items: center; justify-content: center;" title="Glisser pour déplacer • Molette pour zoomer">
+            <div class="bp-canvas-transform-layer" id="bp-poster-transform-layer" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transform-origin: center center; transition: transform 0.08s ease-out;">
+              <img src="" alt="Poster BibleProject" class="bp-poster-highres-img" id="bp-poster-highres-img" draggable="false" style="max-width: 96%; max-height: 96%; object-fit: contain; user-select: none;">
+            </div>
+            <div class="bp-loading-indicator hidden" id="bp-poster-loading" style="position: absolute; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+              <div class="comm-loader-orb"></div>
+              <span style="color: #94A3B8; font-size: 12px;">Chargement du poster haute définition...</span>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      this.bindPosterModalEvents();
+    }
+
+    const titleEl = modal.querySelector('#bp-modal-poster-title');
+    const dlBtn = modal.querySelector('#bp-poster-download-btn');
+    const img = modal.querySelector('#bp-poster-highres-img');
+    const loader = modal.querySelector('#bp-poster-loading');
+
+    if (titleEl) titleEl.textContent = title || 'Structure littéraire';
+    if (dlBtn) {
+      dlBtn.onclick = (e) => {
+        e.preventDefault();
+        try { API.openExternalUrl(pdfUrl || imageUrl); } catch(err) { window.open(pdfUrl || imageUrl, '_blank'); }
+      };
+    }
+
+    if (img) {
+      if (loader) loader.classList.remove('hidden');
+      img.style.display = 'none';
+      img.src = imageUrl;
+      img.onload = () => {
+        img.style.display = 'block';
+        if (loader) loader.classList.add('hidden');
+        this.fitToScreen();
+      };
+      img.onerror = () => {
+        if (loader) loader.classList.add('hidden');
+        img.style.display = 'block';
+      };
+    }
+
+    modal.classList.remove('hidden');
+    document.body.classList.add('bp-modal-open');
+  },
+
+  closePosterModal() {
+    const modal = document.getElementById('bp-poster-modal');
+    if (modal) {
+      modal.classList.add('hidden');
+      document.body.classList.remove('bp-modal-open');
+    }
+  },
+
+  bindPosterModalEvents() {
+    const modal = document.getElementById('bp-poster-modal');
+    const closeBtn = modal?.querySelector('#bp-poster-modal-close');
+    const zoomInBtn = modal?.querySelector('#bp-zoom-in');
+    const zoomOutBtn = modal?.querySelector('#bp-zoom-out');
+    const zoomFitBtn = modal?.querySelector('#bp-zoom-fit');
+    const zoomResetBtn = modal?.querySelector('#bp-zoom-reset');
+    const viewport = modal?.querySelector('#bp-poster-viewport');
+
+    closeBtn?.addEventListener('click', () => this.closePosterModal());
+    modal?.addEventListener('click', (e) => {
+      if (e.target === modal) this.closePosterModal();
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
+        this.closePosterModal();
+      }
+    });
+
+    zoomInBtn?.addEventListener('click', () => this.zoom(1.25));
+    zoomOutBtn?.addEventListener('click', () => this.zoom(0.8));
+    zoomFitBtn?.addEventListener('click', () => this.fitToScreen());
+    zoomResetBtn?.addEventListener('click', () => this.resetZoom());
+
+    viewport?.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const factor = e.deltaY < 0 ? 1.15 : 0.85;
+      this.zoom(factor);
+    }, { passive: false });
+
+    viewport?.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      this.panzoom.isDragging = true;
+      this.panzoom.startX = e.clientX - (this.panzoom.translateX || 0);
+      this.panzoom.startY = e.clientY - (this.panzoom.translateY || 0);
+      viewport.style.cursor = 'grabbing';
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!this.panzoom.isDragging) return;
+      this.panzoom.translateX = e.clientX - this.panzoom.startX;
+      this.panzoom.translateY = e.clientY - this.panzoom.startY;
+      this.applyTransform();
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (this.panzoom.isDragging) {
+        this.panzoom.isDragging = false;
+        if (viewport) viewport.style.cursor = 'grab';
+      }
+    });
+
+    viewport?.addEventListener('dblclick', () => {
+      if (Math.abs(this.panzoom.scale - 1) < 0.1) {
+        this.fitToScreen();
+      } else {
+        this.resetZoom();
+      }
+    });
+  },
+
+  zoom(factor) {
+    this.panzoom.scale = Math.min(this.panzoom.maxScale, Math.max(this.panzoom.minScale, this.panzoom.scale * factor));
+    this.applyTransform();
+    this.updateZoomLabel();
+  },
+
+  fitToScreen() {
+    this.panzoom.scale = 1.0;
+    this.panzoom.translateX = 0;
+    this.panzoom.translateY = 0;
+    this.applyTransform();
+    this.updateZoomLabel();
+  },
+
+  resetZoom() {
+    this.panzoom.scale = this.panzoom.scale <= 1.2 ? 2.2 : 1.0;
+    this.panzoom.translateX = 0;
+    this.panzoom.translateY = 0;
+    this.applyTransform();
+    this.updateZoomLabel();
+  },
+
+  applyTransform() {
+    const layer = document.getElementById('bp-poster-transform-layer');
+    if (layer) {
+      layer.style.transform = `translate(${this.panzoom.translateX}px, ${this.panzoom.translateY}px) scale(${this.panzoom.scale})`;
+    }
+  },
+
+  updateZoomLabel() {
+    const lbl = document.getElementById('bp-zoom-level-label');
+    if (lbl) {
+      lbl.textContent = `${Math.round(this.panzoom.scale * 100)}%`;
+    }
   },
 
   escapeHtml(str) {

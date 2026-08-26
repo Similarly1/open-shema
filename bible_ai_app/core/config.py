@@ -97,6 +97,21 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
 - Mobilise les Écritures avec naturel et précision (en citant les références) sans alourdir le propos.
 - Si des documents du corpus documentaire sont pertinents pour la question, appuie-toi dessus avec simplicité."""
 
+DEFAULT_NOTE_TITLE_SYSTEM_PROMPT = """Tu es un assistant éditorial et théologique de haute précision.
+Ta mission est de générer un titre court, élégant et précis (entre 3 et 7 mots maximum, en français) qui résume parfaitement l'idée maîtresse ou le sujet de la note fournie.
+
+Règles impératives :
+1. Renvoie UNIQUEMENT le titre, sans guillemets, sans point final, sans aucun préambule (ex: ne pas écrire 'Titre :').
+2. Capture l'essence théologique, spirituelle ou thématique du texte."""
+
+DEFAULT_NOTE_TAGS_SYSTEM_PROMPT = """Tu es un indexeur documentaire et théologique chevronné.
+Ta mission est d'extraire entre 3 et 6 mots-clés ou tags thématiques pertinents pour la note fournie.
+
+Règles impératives :
+1. Renvoie UNIQUEMENT les tags séparés par des virgules (ex: Grâce, Sanctification, Romains, Vie chrétienne).
+2. Privilégie les thèmes doctrinaux, les personnages, les livres bibliques ou les notions pratiques abordés.
+3. N'inclus aucun préambule, ni puce, ni dièse (#)."""
+
 DEFAULTS = {
     "mistral_api_key": "",
     "gemini_api_key": "",
@@ -140,6 +155,8 @@ DEFAULTS = {
     "summary_word_count": 300,
     "title_model": "gemini-2.5-flash-lite",
     "title_fallback_model": "gemini-2.5-flash",
+    "notes_ai_model": "gemini-2.5-flash-lite",
+    "notes_ai_fallback_model": "gemini-2.5-flash",
     "summary_system_prompt": DEFAULT_SUMMARY_SYSTEM_PROMPT,
     "prompt_exegesis": DEFAULT_EXEGESIS_SYSTEM_PROMPT,
     "prompt_historical": DEFAULT_HISTORICAL_SYSTEM_PROMPT,
@@ -147,6 +164,8 @@ DEFAULTS = {
     "prompt_theology": DEFAULT_THEOLOGY_SYSTEM_PROMPT,
     "prompt_lexical": DEFAULT_LEXICAL_SYSTEM_PROMPT,
     "prompt_free_chat": DEFAULT_FREE_CHAT_SYSTEM_PROMPT,
+    "prompt_note_title": DEFAULT_NOTE_TITLE_SYSTEM_PROMPT,
+    "prompt_note_tags": DEFAULT_NOTE_TAGS_SYSTEM_PROMPT,
     "vintage_mode": True,
     "vintage_scope": "auto",
     "vintage_intensity": "subtle",

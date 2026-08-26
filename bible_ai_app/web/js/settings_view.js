@@ -107,6 +107,21 @@ Directives de rédaction :
 4. FORMAT ET CLARTÉ : Structure le résumé avec des intertitres en gras, des puces synthétiques et une conclusion théologique en une phrase.
 5. CONCISION : Respecte scrupuleusement la longueur cible demandée. Reste direct, sans préambule superflu.`,
 
+  DEFAULT_NOTE_TITLE_PROMPT: `Tu es un assistant éditorial et théologique de haute précision.
+Ta mission est de générer un titre court, élégant et précis (entre 3 et 7 mots maximum, en français) qui résume parfaitement l'idée maîtresse ou le sujet de la note fournie.
+
+Règles impératives :
+1. Renvoie UNIQUEMENT le titre, sans guillemets, sans point final, sans aucun préambule (ex: ne pas écrire "Titre :").
+2. Capture l'essence théologique, spirituelle ou thématique du texte.`,
+
+  DEFAULT_NOTE_TAGS_PROMPT: `Tu es un indexeur documentaire et théologique chevronné.
+Ta mission est d'extraire entre 3 et 6 mots-clés ou tags thématiques pertinents pour la note fournie.
+
+Règles impératives :
+1. Renvoie UNIQUEMENT les tags séparés par des virgules (ex: Grâce, Sanctification, Romains, Vie chrétienne).
+2. Privilégie les thèmes doctrinaux, les personnages, les livres bibliques ou les notions pratiques abordés.
+3. N'inclus aucun préambule, ni puce, ni dièse (#).`,
+
   DEFAULT_PROMPT_EXEGESIS: `MODE D'ÉTUDE : EXÉGÈSE APPROFONDIE
 - Analyse structurelle et théologique verset par verset (syntaxe, intertextualité, cohérence canonique).
 - Fonde ton analyse sur les langues originales et la comparaison des versions bibliques.
@@ -232,6 +247,20 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
       fieldId: 'cfg-summary-system-prompt',
       badgeId: 'badge-summary-status',
       label: 'Résumé Théologique'
+    },
+    note_title: {
+      title: 'System Prompt — Titre de Note IA',
+      defaultProp: 'DEFAULT_NOTE_TITLE_PROMPT',
+      fieldId: 'cfg-prompt-note-title',
+      badgeId: 'badge-note-title-status',
+      label: 'Titre de Note'
+    },
+    note_tags: {
+      title: 'System Prompt — Tags de Note IA',
+      defaultProp: 'DEFAULT_NOTE_TAGS_PROMPT',
+      fieldId: 'cfg-prompt-note-tags',
+      badgeId: 'badge-note-tags-status',
+      label: 'Tags de Note'
     }
   },
 
@@ -448,7 +477,9 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
       { type: 'mode_free_chat', open: 'btn-open-modal-mode-free_chat-prompt', reset: 'btn-reset-mode-free_chat-prompt' },
       { type: 'synthesis', open: 'btn-open-modal-synth-prompt', reset: 'btn-reset-synth-prompt' },
       { type: 'translation', open: 'btn-open-modal-trans-prompt', reset: 'btn-reset-trans-prompt' },
-      { type: 'summary', open: 'btn-open-modal-summary-prompt', reset: 'btn-reset-summary-prompt' }
+      { type: 'summary', open: 'btn-open-modal-summary-prompt', reset: 'btn-reset-summary-prompt' },
+      { type: 'note_title', open: 'btn-open-modal-note-title-prompt', reset: 'btn-reset-note-title-prompt' },
+      { type: 'note_tags', open: 'btn-open-modal-note-tags-prompt', reset: 'btn-reset-note-tags-prompt' }
     ];
 
     promptBtnBindings.forEach(item => {
@@ -849,6 +880,12 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
     if (c.title_fallback_model && document.getElementById('cfg-title-fallback-model')) {
       document.getElementById('cfg-title-fallback-model').value = c.title_fallback_model;
     }
+    if (c.notes_ai_model && document.getElementById('cfg-notes-ai-model')) {
+      document.getElementById('cfg-notes-ai-model').value = c.notes_ai_model;
+    }
+    if (c.notes_ai_fallback_model && document.getElementById('cfg-notes-ai-fallback-model')) {
+      document.getElementById('cfg-notes-ai-fallback-model').value = c.notes_ai_fallback_model;
+    }
     if (document.getElementById('cfg-summary-word-count')) {
       document.getElementById('cfg-summary-word-count').value = c.summary_word_count || 300;
       const lbl = document.getElementById('lbl-summary-word-count-val');
@@ -883,7 +920,8 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
       { primary: 'cfg-synthesis-model', fallback: 'cfg-synthesis-fallback-model', label: 'Synthèse' },
       { primary: 'cfg-translation-model', fallback: 'cfg-translation-fallback-model', label: 'Traduction' },
       { primary: 'cfg-summary-model', fallback: 'cfg-summary-fallback-model', label: 'Résumé' },
-      { primary: 'cfg-title-model', fallback: 'cfg-title-fallback-model', label: 'Titres' }
+      { primary: 'cfg-title-model', fallback: 'cfg-title-fallback-model', label: 'Titres d\'historique' },
+      { primary: 'cfg-notes-ai-model', fallback: 'cfg-notes-ai-fallback-model', label: 'Notes (Titres & Tags)' }
     ];
 
     pairs.forEach(({ primary, fallback, label }) => {
@@ -918,7 +956,8 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
       { primary: 'cfg-synthesis-model', fallback: 'cfg-synthesis-fallback-model', label: 'Synthèse' },
       { primary: 'cfg-translation-model', fallback: 'cfg-translation-fallback-model', label: 'Traduction' },
       { primary: 'cfg-summary-model', fallback: 'cfg-summary-fallback-model', label: 'Résumé' },
-      { primary: 'cfg-title-model', fallback: 'cfg-title-fallback-model', label: 'Titres' }
+      { primary: 'cfg-title-model', fallback: 'cfg-title-fallback-model', label: 'Titres d\'historique' },
+      { primary: 'cfg-notes-ai-model', fallback: 'cfg-notes-ai-fallback-model', label: 'Notes (Titres & Tags)' }
     ];
 
     pairs.forEach(({ primary, fallback, label }) => {
@@ -1161,6 +1200,17 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
         document.getElementById('cfg-title-fallback-model').value = fb;
       }
       newCfg.title_fallback_model = fb;
+    }
+    if (document.getElementById('cfg-notes-ai-model')) {
+      newCfg.notes_ai_model = document.getElementById('cfg-notes-ai-model').value;
+    }
+    if (document.getElementById('cfg-notes-ai-fallback-model')) {
+      let fb = document.getElementById('cfg-notes-ai-fallback-model').value;
+      if (fb === newCfg.notes_ai_model) {
+        fb = this.getSmartFallbackModel(newCfg.notes_ai_model, document.getElementById('cfg-notes-ai-fallback-model'));
+        document.getElementById('cfg-notes-ai-fallback-model').value = fb;
+      }
+      newCfg.notes_ai_fallback_model = fb;
     }
     if (document.getElementById('cfg-summary-word-count')) {
       newCfg.summary_word_count = parseInt(document.getElementById('cfg-summary-word-count').value) || 300;

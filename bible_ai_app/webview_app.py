@@ -38,8 +38,13 @@ from core.pericope_manager import PericopeManager
 from core.commentary_loader import CommentaryLoader
 from core.dictionary_manager import DictionaryManager
 from core.original_languages_manager import OriginalLanguagesManager
-from core.config import load_config, save_config
 from core.notes_manager import NotesManager
+from core.config import (
+    load_config,
+    save_config,
+    DEFAULT_NOTE_TITLE_SYSTEM_PROMPT,
+    DEFAULT_NOTE_TAGS_SYSTEM_PROMPT
+)
 from core.sermons_manager import SermonsManager
 from core.highlights_manager import HighlightsManager
 from core.maps_manager import MapsManager
@@ -1282,6 +1287,131 @@ class BibleAppApi:
         self.config = load_config()
         french = get_french_book_name(book)
         return NotesManager.get_notes_for_passage(french, chapter, verse, config=self.config)
+
+    def generate_note_title(self, content: str, reference: str = "", current_title: str = "") -> Dict[str, Any]:
+        """Génère automatiquement un titre pour une note à partir de son contenu."""
+        self.config = load_config()
+        clean_content = (content or "").strip()
+        if not clean_content:
+            return {"success": False, "error": "Le contenu de la note est vide."}
+
+        sys_prompt = self.config.get("prompt_note_title") or self.config.get("note_title_system_prompt") or DEFAULT_NOTE_TITLE_SYSTEM_PROMPT
+        clean_model = self.config.get("notes_ai_model") or self.config.get("title_model") or "gemini-2.5-flash-lite"
+        fallback_model = self.config.get("notes_ai_fallback_model") or self.config.get("title_fallback_model")
+
+        models_to_try = [clean_model]
+        if fallback_model and fallback_model != clean_model:
+            models_to_try.append(fallback_model)
+
+        user_prompt = f"Contenu de la note :\n\"\"\"\n{clean_content[:4000]}\n\"\"\""
+        if reference:
+            user_prompt += f"\n\nPassage biblique lié : {reference}"
+
+        from ai.llm_client import LLMClient
+        used_model = clean_model
+        last_err = None
+        generated_title = None
+
+        for cur_model in models_to_try:
+            lower_m = cur_model.lower()
+            if "/" in lower_m or "infomaniak" in lower_m or lower_m.startswith("qwen") or "swiss-ai" in lower_m or "gemma" in lower_m:
+                token = self.config.get("infomaniak_token", "")
+                pid = self.config.get("infomaniak_product_id", "251")
+                client = LLMClient(api_key=token, model=cur_model, provider="infomaniak", product_id=pid)
+            elif lower_m.startswith("mistral-") or lower_m.startswith("open-mistral-") or "codestral" in lower_m:
+                api_key = self.config.get("mistral_api_key", "")
+                client = LLMClient(api_key=api_key, model=cur_model, provider="mistral")
+            else:
+                api_key = self.config.get("gemini_api_key", "")
+                client = LLMClient(api_key=api_key, model=cur_model, provider="gemini")
+
+            try:
+                out = client.chat(messages=[{"role": "user", "content": user_prompt}], system_prompt=sys_prompt)
+                if out and not str(out).startswith("Erreur"):
+                    clean_res = str(out).strip().strip('"\'').strip('«»').strip('`')
+                    clean_res = re.sub(r'^(Titre\s*:\s*|Title\s*:\s*)', '', clean_res, flags=re.IGNORECASE).strip()
+                    if clean_res:
+                        generated_title = clean_res
+                        used_model = cur_model
+                        break
+                else:
+                    last_err = out
+            except Exception as e:
+                last_err = str(e)
+                logger.warning("Échec génération titre note avec %s: %s", cur_model, e)
+
+        if not generated_title:
+            return {"success": False, "error": f"Impossible de générer le titre : {last_err}"}
+
+        return {
+            "success": True,
+            "title": generated_title,
+            "model_used": used_model
+        }
+
+    def generate_note_tags(self, content: str, reference: str = "", current_tags: str = "") -> Dict[str, Any]:
+        """Génère automatiquement des tags pour une note à partir de son contenu."""
+        self.config = load_config()
+        clean_content = (content or "").strip()
+        if not clean_content:
+            return {"success": False, "error": "Le contenu de la note est vide."}
+
+        sys_prompt = self.config.get("prompt_note_tags") or self.config.get("note_tags_system_prompt") or DEFAULT_NOTE_TAGS_SYSTEM_PROMPT
+        clean_model = self.config.get("notes_ai_model") or self.config.get("title_model") or "gemini-2.5-flash-lite"
+        fallback_model = self.config.get("notes_ai_fallback_model") or self.config.get("title_fallback_model")
+
+        models_to_try = [clean_model]
+        if fallback_model and fallback_model != clean_model:
+            models_to_try.append(fallback_model)
+
+        user_prompt = f"Contenu de la note :\n\"\"\"\n{clean_content[:4000]}\n\"\"\""
+        if reference:
+            user_prompt += f"\n\nPassage biblique lié : {reference}"
+
+        from ai.llm_client import LLMClient
+        used_model = clean_model
+        last_err = None
+        generated_tags = None
+
+        for cur_model in models_to_try:
+            lower_m = cur_model.lower()
+            if "/" in lower_m or "infomaniak" in lower_m or lower_m.startswith("qwen") or "swiss-ai" in lower_m or "gemma" in lower_m:
+                token = self.config.get("infomaniak_token", "")
+                pid = self.config.get("infomaniak_product_id", "251")
+                client = LLMClient(api_key=token, model=cur_model, provider="infomaniak", product_id=pid)
+            elif lower_m.startswith("mistral-") or lower_m.startswith("open-mistral-") or "codestral" in lower_m:
+                api_key = self.config.get("mistral_api_key", "")
+                client = LLMClient(api_key=api_key, model=cur_model, provider="mistral")
+            else:
+                api_key = self.config.get("gemini_api_key", "")
+                client = LLMClient(api_key=api_key, model=cur_model, provider="gemini")
+
+            try:
+                out = client.chat(messages=[{"role": "user", "content": user_prompt}], system_prompt=sys_prompt)
+                if out and not str(out).startswith("Erreur"):
+                    clean_res = str(out).strip().strip('"\'').strip('`')
+                    clean_res = re.sub(r'^(Tags\s*:\s*|Mots-clés\s*:\s*)', '', clean_res, flags=re.IGNORECASE).strip()
+                    clean_res = re.sub(r'^\s*[-*•]\s*', '', clean_res, flags=re.MULTILINE)
+                    clean_res = clean_res.replace('\n', ', ')
+                    clean_res = re.sub(r',\s*,+', ',', clean_res).strip(', ')
+                    if clean_res:
+                        generated_tags = clean_res
+                        used_model = cur_model
+                        break
+                else:
+                    last_err = out
+            except Exception as e:
+                last_err = str(e)
+                logger.warning("Échec génération tags note avec %s: %s", cur_model, e)
+
+        if not generated_tags:
+            return {"success": False, "error": f"Impossible de générer les tags : {last_err}"}
+
+        return {
+            "success": True,
+            "tags": generated_tags,
+            "model_used": used_model
+        }
 
     # --- HIGHLIGHTS ---
 
