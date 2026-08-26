@@ -3452,6 +3452,11 @@ class BibleAppApi:
                 blog_url=blog_url,
                 notes=notes
             )
+            return {"success": True, "url": url}
+        except Exception as e:
+            logger.error(f"Erreur get_article_suggestion_url: {e}")
+            return {"success": False, "error": str(e)}
+
     # =========================================================================
     # 13. STUDIO DE PRÉDICATION & BANQUE D'ILLUSTRATIONS
     # =========================================================================
