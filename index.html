@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Open Shema (שְׁמַע) — Plateforme d'Étude Biblique & Exégèse IA Libre</title>
+  <title>Open Shema — Plateforme d'Étude Biblique & Exégèse IA Libre</title>
   <meta name="description" content="Open Shema : Logiciel libre et gratuit d'étude biblique, exégèse linguistique (Hébreu/Grec), RAG local haute précision BGE-M3, assistant de prédication et notes Markdown locales. Zéro abonnement.">
   <meta name="keywords" content="Bible, Exégèse, Grec Biblique, Hébreu Biblique, Logiciel Biblique, Open Source, RAG, BGE-M3, IA, Prédication, Bailly, Calmet, Strong, Markdown, Logos alternative">
   
   <!-- Open Graph / Meta Partage -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Open Shema (שְׁמַע) — Étude Biblique & Exégèse IA Libre">
+  <meta property="og:title" content="Open Shema — Étude Biblique & Exégèse IA Libre">
   <meta property="og:description" content="Une plateforme d'étude biblique ouverte, moderne et assistée par IA. Sans abonnement, données 100% locales en Markdown.">
   <meta property="og:image" content="assets/img/logo.svg">
   
@@ -30,20 +30,16 @@
     <div class="container header-container">
       <a href="#" class="nav-brand">
         <img src="assets/img/logo.svg" alt="Open Shema Logo" class="brand-logo-img">
-        <div class="brand-text-wrapper">
-          <span class="brand-title">
-            Open Shema <span class="brand-hebrew">(שְׁמַע)</span>
-          </span>
-        </div>
+        <span class="brand-title">Open Shema</span>
         <span class="brand-badge">Open Source</span>
       </a>
 
       <nav>
         <ul class="nav-links">
           <li><a href="#features" class="nav-link">Fonctionnalités</a></li>
-          <li><a href="#import-universel" class="nav-link">Import Universel</a></li>
+          <li><a href="#import-universel" class="nav-link">Import EPUB</a></li>
           <li><a href="#homiletique" class="nav-link">Prédication</a></li>
-          <li><a href="#ia-personnalisee" class="nav-link">IA & RAG Local</a></li>
+          <li><a href="#ia-personnalisee" class="nav-link">IA & RAG</a></li>
           <li><a href="#comparatif" class="nav-link">Comparatif</a></li>
           <li><a href="#galerie" class="nav-link">Captures</a></li>
           <li><a href="#installation" class="nav-link">Installation</a></li>
@@ -92,50 +88,63 @@
   <!-- Hero Section -->
   <section class="hero-section">
     <div class="container">
-      <div class="hero-badge-container reveal-on-scroll">
+      <div class="hero-badge-container">
         <div class="badge badge-glow-cyan">
           <span class="badge-dot"></span>
           Logiciel Libre & Open Source (MIT)
         </div>
         <div class="badge badge-glow-gold">
-          🏛️ Zéro Abonnement • Données 100% Locales
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          Zéro Abonnement • Données 100% Locales
         </div>
         <div class="badge">
-          🧠 RAG Sémantique BGE-M3 sur CPU
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect></svg>
+          RAG Sémantique BGE-M3 sur CPU
         </div>
       </div>
 
-      <h1 class="hero-title reveal-on-scroll stagger-1">
+      <h1 class="hero-title">
         L'Étude Biblique & Exégétique <br>
         <span class="gradient-text">Augmentée par l'Intelligence Artificielle</span>
       </h1>
 
-      <p class="hero-subtitle reveal-on-scroll stagger-2">
-        <strong>Open Shema (שְׁמַע)</strong> est une plateforme de recherche exégétique, linguistique et théologique moderne. 
+      <p class="hero-subtitle">
+        <strong>Open Shema</strong> est une plateforme de recherche exégétique, linguistique et théologique moderne. 
         Conçue pour les pasteurs, enseignants, exégètes et passionnés du texte, elle allie la profondeur des langues originales 
         à la puissance d'un RAG local haute précision et d'un atelier homilétique complet.
       </p>
 
-      <div class="hero-actions reveal-on-scroll stagger-3">
-        <a href="#installation" class="btn btn-primary" style="padding: 14px 32px; font-size: 1.05rem;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M4 17l6-6-6-6M12 19h8"></path>
-          </svg>
+      <!-- Explication du Nom Open Shema -->
+      <div class="name-explanation-card">
+        <div class="name-exp-item">
+          <span class="name-exp-tag">OPEN</span>
+          <span class="name-exp-text"><strong>Libre & Transparent</strong> : 100% Open Source, sans abonnement, vos données restent à vous en fichiers Markdown standard (`.md`).</span>
+        </div>
+        <div class="name-exp-divider"></div>
+        <div class="name-exp-item">
+          <span class="name-exp-tag gold">SHEMA</span>
+          <span class="name-exp-text"><strong>« Écoute » (Deutéronome 6:4)</strong> : Du grand verset biblique <em>Shema Israël</em>, où écouter, lire, méditer et comprendre ne font qu'un.</span>
+        </div>
+      </div>
+
+      <!-- 3 Boutons CTA arrivant ensemble -->
+      <div class="hero-actions">
+        <a href="#installation" class="btn btn-primary" style="padding: 14px 28px; font-size: 1rem;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
           Installer en 1 clic
         </a>
-        <a href="#demo-interactive" class="btn btn-secondary" style="padding: 14px 28px; font-size: 1.05rem;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-          </svg>
+        <a href="#demo-interactive" class="btn btn-secondary" style="padding: 14px 26px; font-size: 1rem;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
           Tester la démo live
         </a>
-        <a href="https://github.com/Similarly1/free-logos-ai" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="padding: 14px 24px;">
-          ⭐ Code Source GitHub
+        <a href="https://github.com/Similarly1/free-logos-ai" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="padding: 14px 24px; font-size: 1rem;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          Code Source GitHub
         </a>
       </div>
 
       <!-- Stats clés -->
-      <div class="hero-stats-row reveal-on-scroll stagger-4">
+      <div class="hero-stats-row">
         <div class="hero-stat-item">
           <span class="stat-value gradient-text">66+</span>
           <span class="stat-label">Livres & Traductions Multi-langues</span>
@@ -155,7 +164,7 @@
       </div>
 
       <!-- 3D Mockup Showcase -->
-      <div class="hero-mockup-wrapper reveal-on-scroll">
+      <div class="hero-mockup-wrapper">
         <div class="app-window-frame">
           <div class="app-window-header">
             <div class="window-dots">
@@ -177,37 +186,67 @@
             <div class="mockup-sidebar">
               <div class="mockup-nav-group">
                 <span class="mockup-nav-title">Navigation</span>
-                <div class="mockup-nav-item active">📖 Lecteur Biblique</div>
-                <div class="mockup-nav-item">⚖️ Comparateur Synoptique</div>
-                <div class="mockup-nav-item">🎙️ Atelier Prédication</div>
-                <div class="mockup-nav-item">📥 Importateur Universel</div>
+                <div class="mockup-nav-item active">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                  Lecteur Biblique
+                </div>
+                <div class="mockup-nav-item">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><path d="M13 6h3a2 2 0 0 1 2 2v7"></path><line x1="6" y1="9" x2="6" y2="21"></line></svg>
+                  Comparateur Synoptique
+                </div>
+                <div class="mockup-nav-item">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path></svg>
+                  Atelier Prédication
+                </div>
+                <div class="mockup-nav-item">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  Importateur Universel
+                </div>
               </div>
               <div class="mockup-nav-group">
                 <span class="mockup-nav-title">Ressources & IA</span>
-                <div class="mockup-nav-item">💬 Commentaires Croisés</div>
-                <div class="mockup-nav-item">🏛️ Dictionnaire Dom Calmet</div>
-                <div class="mockup-nav-item">🗺️ Atlas & Géographie</div>
-                <div class="mockup-nav-item">📝 Notes Markdown (.md)</div>
+                <div class="mockup-nav-item">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                  Commentaires Croisés
+                </div>
+                <div class="mockup-nav-item">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                  Dictionnaire Dom Calmet
+                </div>
+                <div class="mockup-nav-item">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+                  Atlas & Géographie
+                </div>
+                <div class="mockup-nav-item">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                  Notes Markdown (.md)
+                </div>
               </div>
             </div>
 
             <!-- Mockup Central Reader -->
             <div class="mockup-reader">
               <div class="mockup-reader-header">
-                <h2 class="reader-passage-title">Jean 1 — L'Incarnation du Verbe</h2>
+                <div>
+                  <div style="font-size: 0.72rem; color: var(--accent-gold); font-family: var(--font-title); letter-spacing: 0.05em; margin-bottom: 2px;">
+                    ❦ NOUVEAU TESTAMENT — ÉVANGILE SELON JEAN ❧
+                  </div>
+                  <h2 class="reader-passage-title" style="font-size: 1.25rem;">Jean 1:1-5 — L'Incarnation du Verbe</h2>
+                </div>
                 <div class="reader-version-pills">
-                  <span class="version-pill active">Segond 21</span>
-                  <span class="version-pill">LSG 1910</span>
-                  <span class="version-pill">SBLGNT (Grec)</span>
-                  <span class="version-pill">Parole Vivante</span>
+                  <span class="version-pill hero-version-pill active" data-version-key="s21">Segond 21</span>
+                  <span class="version-pill hero-version-pill" data-version-key="lsg">LSG 1910</span>
+                  <span class="version-pill hero-version-pill" data-version-key="sblgnt">SBLGNT (Grec)</span>
+                  <span class="version-pill hero-version-pill" data-version-key="pv">Parole Vivante</span>
+                  <span class="version-pill hero-version-pill" data-version-key="chouraqui">Chouraqui</span>
                 </div>
               </div>
 
-              <div class="mockup-verses">
+              <div class="mockup-verses" id="hero-reader-passage">
                 <div class="mockup-verse">
                   <span class="verse-num">1</span>
-                  Au commencement était la <span class="verse-word-highlight">Parole</span> 
-                  (<span class="verse-word-greek">λόγος</span>), et la Parole était avec Dieu (<span class="verse-word-greek">θεός</span>), 
+                  Au commencement était la <span class="verse-word-highlight hero-interactive-word" data-word="logos">Parole</span> 
+                  (<span class="verse-word-greek hero-interactive-word" data-word="logos">λόγος</span>), et la Parole était avec Dieu (<span class="verse-word-greek hero-interactive-word" data-word="theos">θεός</span>), 
                   et la Parole était Dieu.
                 </div>
                 <div class="mockup-verse">
@@ -220,7 +259,7 @@
                 </div>
                 <div class="mockup-verse">
                   <span class="verse-num">4</span>
-                  En elle était la vie, et la vie était la lumière des hommes.
+                  En elle était la <span class="verse-word-greek hero-interactive-word" data-word="zoe">vie</span> (ζωή), et la vie était la <span class="verse-word-greek hero-interactive-word" data-word="phos">lumière</span> (φῶς) des hommes.
                 </div>
               </div>
             </div>
@@ -229,23 +268,26 @@
             <div class="mockup-drawer">
               <div class="drawer-header">
                 <span class="drawer-title">
-                  🔍 Exégèse & Morphologie
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                  Exégèse & Morphologie
                 </span>
-                <span class="strong-badge">G3056</span>
+                <span class="strong-badge" id="hero-strong-badge">G3056</span>
               </div>
 
-              <div class="drawer-card">
+              <div class="drawer-card" id="hero-drawer-morph">
                 <div class="drawer-card-header">
-                  🔤 Lemme : λόγος, ου (ὁ)
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
+                  Lemme : λόγος, ου (ὁ)
                 </div>
                 <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">
                   <strong>Dictionnaire Bailly :</strong> 1. Parole proférée, discours ; 2. Raison divine incarnée, Verbe créateur éternel.
                 </p>
               </div>
 
-              <div class="drawer-card" style="border-color: rgba(56, 189, 248, 0.4);">
+              <div class="drawer-card" id="hero-drawer-ai" style="border-color: rgba(56, 189, 248, 0.4);">
                 <div class="drawer-card-header" style="color: var(--accent-gold);">
-                  🧠 Assistant IA (Sparring-Partner)
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"></path><path d="M12 6v6l4 2"></path></svg>
+                  Assistant IA (Sparring-Partner)
                 </div>
                 <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">
                   <em>« Jean utilise λόγος en écho à la Genèse (Gen 1:3 "Dieu dit"), unifiant la Sagesse juive (Hokhmah) et le principe d'ordre universel grec. »</em>
@@ -272,10 +314,12 @@
       <div class="simulator-container reveal-on-scroll">
         <div class="simulator-tabs">
           <button class="sim-tab-btn active" data-sim-target="sim-panel-interlinear">
-            🔤 1. Simulateur Morphologique (Bailly & Calmet)
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
+            1. Simulateur Morphologique (Bailly & Calmet)
           </button>
           <button class="sim-tab-btn" data-sim-target="sim-panel-theology">
-            🧠 2. Cadrage Herméneutique & Passeport IA
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+            2. Cadrage Herméneutique & Passeport IA
           </button>
         </div>
 
@@ -301,8 +345,9 @@
                 </span>
               </p>
             </div>
-            <p style="font-size: 0.85rem; color: var(--text-muted);">
-              💡 <em>Dans Open Shema, chaque mot du texte massorétique et du texte grec est indexé avec lemme, translittération, parsing grammatical et définitions historiques.</em>
+            <p style="font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              <em>Dans Open Shema, chaque mot du texte massorétique et grec est indexé avec lemme, parsing et lexiques.</em>
             </p>
           </div>
 
@@ -369,16 +414,16 @@
               <span class="badge badge-glow-cyan" style="font-size: 0.7rem;">Inclus dans le System Prompt</span>
             </div>
             <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px;">
-              <strong>🎯 Objectif utilisateur :</strong> Prédication & Ministère pastoral
+              <strong>Objectif utilisateur :</strong> Prédication & Ministère pastoral
             </p>
             <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px;">
-              <strong>🧠 Posture de l'assistant :</strong> Sparring-partner exigeant et pastoral (challenge les conclusions pour tester la solidité de l'argumentation théologique).
+              <strong>Posture de l'assistant :</strong> Sparring-partner exigeant et pastoral (challenge les conclusions théologiques).
             </p>
             <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px;">
-              <strong>🔤 Niveau langues originales :</strong> Intermédiaire (lemmes, codes Strong, temps des verbes et nuances sémantiques).
+              <strong>Niveau langues originales :</strong> Intermédiaire (lemmes, codes Strong, nuances sémantiques).
             </p>
             <div style="margin-top: 12px; padding: 10px; background: rgba(56, 189, 248, 0.08); border-radius: 6px; border: 1px dashed rgba(56, 189, 248, 0.3); font-size: 0.8rem; color: var(--accent-cyan);">
-              💡 <em>L'IA adaptera chacune de ses réponses, ses citations de commentaires et ses propositions de plan à ce passeport unique.</em>
+              <em>L'IA adaptera chacune de ses réponses et ses citations de commentaires à ce passeport unique.</em>
             </div>
           </div>
         </div>
@@ -524,7 +569,10 @@
           <div class="sticky-visual-slide active" data-slide-target="1">
             <div class="ui-mockup-card">
               <div class="ui-mockup-header">
-                <span>⚖️ Mode Comparaison Synoptique</span>
+                <span style="display: flex; align-items: center; gap: 6px;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><path d="M13 6h3a2 2 0 0 1 2 2v7"></path><line x1="6" y1="9" x2="6" y2="21"></line></svg>
+                  Mode Comparaison Synoptique
+                </span>
                 <span class="badge badge-glow-cyan" style="font-size: 0.7rem;">Similarité : 88%</span>
               </div>
               <div class="ui-mockup-content">
@@ -550,7 +598,10 @@
           <div class="sticky-visual-slide" data-slide-target="2">
             <div class="ui-mockup-card">
               <div class="ui-mockup-header">
-                <span>🔤 Interlinéaire Inversé SBLGNT</span>
+                <span style="display: flex; align-items: center; gap: 6px;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
+                  Interlinéaire Inversé SBLGNT
+                </span>
                 <span class="strong-badge">G3056 • Bailly</span>
               </div>
               <div class="ui-mockup-content">
@@ -574,13 +625,18 @@
           <div class="sticky-visual-slide" data-slide-target="3">
             <div class="ui-mockup-card">
               <div class="ui-mockup-header">
-                <span>📥 Importateur Universel de Bibles</span>
+                <span style="display: flex; align-items: center; gap: 6px;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  Importateur Universel de Bibles
+                </span>
                 <span class="badge badge-glow-cyan" style="font-size: 0.7rem;">Automatique</span>
               </div>
               <div class="ui-mockup-content">
                 <div style="display: flex; flex-direction: column; gap: 12px;">
                   <div style="border: 2px dashed var(--accent-cyan); padding: 20px; border-radius: 8px; text-align: center; background: rgba(56, 189, 248, 0.05);">
-                    <div style="font-size: 1.5rem; margin-bottom: 6px;">📄</div>
+                    <div style="margin-bottom: 6px; color: var(--accent-cyan);">
+                      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
                     <strong style="color: var(--text-main);">Bible_Parole_Vivante.epub</strong>
                     <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Détection InDesign & ancres de versets</div>
                   </div>
@@ -598,7 +654,10 @@
           <div class="sticky-visual-slide" data-slide-target="4">
             <div class="ui-mockup-card">
               <div class="ui-mockup-header">
-                <span>🎙️ Sermon : La Grâce qui Transforme</span>
+                <span style="display: flex; align-items: center; gap: 6px;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path></svg>
+                  Sermon : La Grâce qui Transforme
+                </span>
                 <span class="badge badge-glow-gold" style="font-size: 0.7rem;">Éphésiens 2:1-10</span>
               </div>
               <div class="ui-mockup-content">
@@ -621,7 +680,10 @@
           <div class="sticky-visual-slide" data-slide-target="5">
             <div class="ui-mockup-card">
               <div class="ui-mockup-header">
-                <span>🔬 Pipeline RAG Haute Précision</span>
+                <span style="display: flex; align-items: center; gap: 6px;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                  Pipeline RAG Haute Précision
+                </span>
                 <span class="strong-badge">BGE-M3 Local</span>
               </div>
               <div class="ui-mockup-content">
@@ -647,7 +709,10 @@
           <div class="sticky-visual-slide" data-slide-target="6">
             <div class="ui-mockup-card">
               <div class="ui-mockup-header">
-                <span>💬 Commentaires Croisés & Atlas</span>
+                <span style="display: flex; align-items: center; gap: 6px;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                  Commentaires Croisés & Atlas
+                </span>
                 <span class="badge badge-glow-cyan" style="font-size: 0.7rem;">Jean Calvin (1560)</span>
               </div>
               <div class="ui-mockup-content">
@@ -655,8 +720,9 @@
                   <strong style="color: var(--accent-cyan);">Calvin sur Jean 1:1 :</strong><br>
                   <em>« L'évangéliste appelle Jésus-Christ la Parole de Dieu, non seulement parce qu'il est le messager et l'interprète du Père, mais parce qu'il est sa sagesse vivante et éternelle... »</em>
                 </div>
-                <div style="margin-top: 10px; padding: 8px; background: rgba(245, 158, 11, 0.1); border-radius: 6px; font-size: 0.8rem; color: var(--accent-gold);">
-                  🗺️ <strong>Atlas :</strong> Jérusalem, Béthanie au-delà du Jourdain (31.8° N, 35.5° E)
+                <div style="margin-top: 10px; padding: 8px; background: rgba(245, 158, 11, 0.1); border-radius: 6px; font-size: 0.8rem; color: var(--accent-gold); display: flex; align-items: center; gap: 6px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon></svg>
+                  <strong>Atlas :</strong> Jérusalem, Béthanie au-delà du Jourdain (31.8° N, 35.5° E)
                 </div>
               </div>
             </div>
@@ -684,42 +750,63 @@
             <tr>
               <th>Fonctionnalité / Critère</th>
               <th>Logiciels Traditionnels (Logos, Accordance...)</th>
-              <th class="col-highlight">Open Shema (שְׁמַע)</th>
+              <th class="col-highlight">Open Shema</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td class="feature-name">💰 Coût & Modèle Économique</td>
+              <td class="feature-name">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="2" style="vertical-align: middle; margin-right: 6px;"><circle cx="12" cy="12" r="10"></circle><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><line x1="12" y1="6" x2="12" y2="8"></line><line x1="12" y1="16" x2="12" y2="18"></line></svg>
+                Coût & Modèle Économique
+              </td>
               <td>Abonnements récurrents (15€ à 35€/mois) ou packs initiaux à 300€ - 2500€+</td>
               <td class="col-highlight"><span class="icon-check-good">✔</span> <strong>100% Gratuit & Open Source (MIT)</strong> — Zéro abonnement</td>
             </tr>
             <tr>
-              <td class="feature-name">📚 Bibliothèque & Format des Livres</td>
+              <td class="feature-name">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2" style="vertical-align: middle; margin-right: 6px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                Bibliothèque & Format des Livres
+              </td>
               <td>Formats verrouillés (DRM propriétaire), rachat de chaque livre au prix fort</td>
               <td class="col-highlight"><span class="icon-check-good">✔</span> <strong>Import Universel Libre (EPUB, PDF, MD)</strong> avec mapping auto</td>
             </tr>
             <tr>
-              <td class="feature-name">📝 Prise de Notes & Données</td>
+              <td class="feature-name">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="2" style="vertical-align: middle; margin-right: 6px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                Prise de Notes & Données
+              </td>
               <td>Bases de données fermées dans le cloud avec risque de lock-in</td>
               <td class="col-highlight"><span class="icon-check-good">✔</span> <strong>Fichiers Markdown standards (`.md`)</strong> en clair sur votre disque</td>
             </tr>
             <tr>
-              <td class="feature-name">🧠 Intelligence Artificielle</td>
+              <td class="feature-name">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2" style="vertical-align: middle; margin-right: 6px;"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect></svg>
+                Intelligence Artificielle
+              </td>
               <td>IA bridée ou surcoût mensuel opaque</td>
               <td class="col-highlight"><span class="icon-check-good">✔</span> <strong>IA à la carte (Gemini, Mistral, Infomaniak AI)</strong> avec votre propre clé</td>
             </tr>
             <tr>
-              <td class="feature-name">🔬 Moteur de Recherche RAG</td>
+              <td class="feature-name">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-purple)" stroke-width="2" style="vertical-align: middle; margin-right: 6px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                Moteur de Recherche RAG
+              </td>
               <td>Recherche par mots-clés rigide ou index cloud</td>
               <td class="col-highlight"><span class="icon-check-good">✔</span> <strong>Reranking sémantique local (Cross-Encoder BGE-M3)</strong> sur CPU</td>
             </tr>
             <tr>
-              <td class="feature-name">🎙️ Atelier de Prédication</td>
+              <td class="feature-name">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="2" style="vertical-align: middle; margin-right: 6px;"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path></svg>
+                Atelier de Prédication
+              </td>
               <td>Fonctions basiques ou modules additionnels payants</td>
               <td class="col-highlight"><span class="icon-check-good">✔</span> <strong>Gestionnaire de sermons & réservoir d'illustrations</strong> natif</td>
             </tr>
             <tr>
-              <td class="feature-name">🔒 Vie Privée & Pérennité</td>
+              <td class="feature-name">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-emerald)" stroke-width="2" style="vertical-align: middle; margin-right: 6px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                Vie Privée & Pérennité
+              </td>
               <td>Dépend de la rentabilité d'une entreprise privée</td>
               <td class="col-highlight"><span class="icon-check-good">✔</span> <strong>Code ouvert</strong> : vos études vous appartiennent pour toujours</td>
             </tr>
@@ -759,7 +846,10 @@
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
               <div style="margin-top: 10px; font-weight: 700; color: var(--text-main);">Interlinéaire & Morphologie</div>
             </div>
-            <div class="gallery-zoom-overlay">🔍 Agrandir</div>
+            <div class="gallery-zoom-overlay">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+              Agrandir
+            </div>
           </div>
           <div class="gallery-item-info">
             <h3 class="gallery-item-title">Lecteur & Interlinéaire Grec/Hébreu</h3>
@@ -774,7 +864,10 @@
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
               <div style="margin-top: 10px; font-weight: 700; color: var(--text-main);">Atelier de Prédication</div>
             </div>
-            <div class="gallery-zoom-overlay">🔍 Agrandir</div>
+            <div class="gallery-zoom-overlay">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+              Agrandir
+            </div>
           </div>
           <div class="gallery-item-info">
             <h3 class="gallery-item-title">Gestionnaire de Sermons & Illustrations</h3>
@@ -789,7 +882,10 @@
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
               <div style="margin-top: 10px; font-weight: 700; color: var(--text-main);">RAG Sémantique BGE-M3</div>
             </div>
-            <div class="gallery-zoom-overlay">🔍 Agrandir</div>
+            <div class="gallery-zoom-overlay">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+              Agrandir
+            </div>
           </div>
           <div class="gallery-item-info">
             <h3 class="gallery-item-title">RAG Local & Passeport Herméneutique</h3>
@@ -804,7 +900,10 @@
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
               <div style="margin-top: 10px; font-weight: 700; color: var(--text-main);">Commentaires & Dictionnaires</div>
             </div>
-            <div class="gallery-zoom-overlay">🔍 Agrandir</div>
+            <div class="gallery-zoom-overlay">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+              Agrandir
+            </div>
           </div>
           <div class="gallery-item-info">
             <h3 class="gallery-item-title">Commentaires Historiques & Dictionnaires</h3>
@@ -819,7 +918,10 @@
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"></path></svg>
               <div style="margin-top: 10px; font-weight: 700; color: var(--text-main);">Comparateur Synoptique</div>
             </div>
-            <div class="gallery-zoom-overlay">🔍 Agrandir</div>
+            <div class="gallery-zoom-overlay">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+              Agrandir
+            </div>
           </div>
           <div class="gallery-item-info">
             <h3 class="gallery-item-title">Comparateur Synoptique Verset par Verset</h3>
@@ -834,7 +936,10 @@
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
               <div style="margin-top: 10px; font-weight: 700; color: var(--text-main);">Notes Markdown (.md)</div>
             </div>
-            <div class="gallery-zoom-overlay">🔍 Agrandir</div>
+            <div class="gallery-zoom-overlay">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+              Agrandir
+            </div>
           </div>
           <div class="gallery-item-info">
             <h3 class="gallery-item-title">Notes Markdown Locales & Liées aux Versets</h3>
@@ -880,31 +985,41 @@
 
       <div class="bento-grid reveal-on-scroll">
         <div class="bento-card">
-          <div class="bento-icon-wrapper">📝</div>
+          <div class="bento-icon-wrapper">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          </div>
           <h3 class="bento-card-title">Markdown 100% Local</h3>
           <p class="bento-card-desc">Vos notes et sermons sont enregistrés en fichiers standard `.md` dans le dossier de votre choix. Ouvrez-les avec Obsidian, Notion ou VS Code.</p>
         </div>
 
         <div class="bento-card">
-          <div class="bento-icon-wrapper">🔒</div>
+          <div class="bento-icon-wrapper">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          </div>
           <h3 class="bento-card-title">Zéro Télémétrie Intrusive</h3>
           <p class="bento-card-desc">Aucune collecte de données personnelles ni suivi d'activité. Vos réflexions théologiques et vos recherches restent strictement confidentielles.</p>
         </div>
 
         <div class="bento-card">
-          <div class="bento-icon-wrapper">⚡</div>
+          <div class="bento-icon-wrapper">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          </div>
           <h3 class="bento-card-title">Rapidité SQLite & ChromaDB</h3>
           <p class="bento-card-desc">Une vitesse de recherche instantanée sur des millions de mots grâce à une base SQLite ultra-optimisée et des vecteurs ChromaDB locaux.</p>
         </div>
 
         <div class="bento-card span-2">
-          <div class="bento-icon-wrapper">🧠</div>
+          <div class="bento-icon-wrapper">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect></svg>
+          </div>
           <h3 class="bento-card-title">IA à la Carte sans Racket d'Abonnement</h3>
           <p class="bento-card-desc">Connectez votre propre clé API (Google Gemini, Mistral AI, Infomaniak AI souverain suisse) et ne payez que votre consommation réelle (quelques centimes par mois), avec une confidentialité absolue de vos requêtes.</p>
         </div>
 
         <div class="bento-card">
-          <div class="bento-icon-wrapper">📜</div>
+          <div class="bento-icon-wrapper">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+          </div>
           <h3 class="bento-card-title">Licence MIT Ouverte</h3>
           <p class="bento-card-desc">Projet libre et participatif. Modifiez le code, ajoutez vos propres lexiques et contribuez à l'écosystème d'étude biblique francophone.</p>
         </div>
@@ -985,7 +1100,7 @@
         <div>
           <div class="nav-brand" style="margin-bottom: 12px;">
             <img src="assets/img/logo.svg" alt="Open Shema Logo" class="brand-logo-img">
-            <span class="brand-title">Open Shema <span class="brand-hebrew">(שְׁמַע)</span></span>
+            <span class="brand-title">Open Shema</span>
           </div>
           <p class="footer-brand-desc">
             « Écoute, Israël » — Plateforme d'étude biblique ouverte, moderne et assistée par IA, dédiée à la communauté d'exégèse, aux pasteurs, enseignants et curieux du texte sacré.

@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initThemeToggle();
   initScrollProgress();
   initScrollAnimations();
+  initHeroMockupInteractions();
   initStickySplitScroll();
   initInteractiveSimulators();
   initLightboxModal();
@@ -401,28 +402,198 @@ function initTerminalTabs() {
 }
 
 /* ==========================================================================
-   8. MOBILE MENU TOGGLE
+   9. HERO MOCKUP HIGH-FIDELITY INTERACTIONS
    ========================================================================== */
-function initMobileMenu() {
-  const mobileBtn = document.getElementById('mobile-menu-toggle');
-  const navLinks = document.querySelector('.nav-links');
+function initHeroMockupInteractions() {
+  const versionPills = document.querySelectorAll('.hero-version-pill');
+  const readerPassage = document.getElementById('hero-reader-passage');
+  const drawerCardMorph = document.getElementById('hero-drawer-morph');
+  const drawerCardAi = document.getElementById('hero-drawer-ai');
+  const strongBadge = document.getElementById('hero-strong-badge');
 
-  if (mobileBtn && navLinks) {
-    mobileBtn.addEventListener('click', () => {
-      const isVisible = navLinks.style.display === 'flex';
-      navLinks.style.display = isVisible ? 'none' : 'flex';
-      if (!isVisible) {
-        navLinks.style.flexDirection = 'column';
-        navLinks.style.position = 'absolute';
-        navLinks.style.top = '72px';
-        navLinks.style.left = '0';
-        navLinks.style.width = '100%';
-        navLinks.style.background = 'var(--bg-surface-elevated)';
-        navLinks.style.padding = '24px';
-        navLinks.style.borderBottom = '1px solid var(--border-color)';
-      }
+  // Translation database for Jean 1:1-4
+  const translations = {
+    's21': `
+      <div class="mockup-verse">
+        <span class="verse-num">1</span>
+        Au commencement était la <span class="verse-word-highlight hero-interactive-word" data-word="logos">Parole</span> 
+        (<span class="verse-word-greek hero-interactive-word" data-word="logos">λόγος</span>), et la Parole était avec Dieu (<span class="verse-word-greek hero-interactive-word" data-word="theos">θεός</span>), 
+        et la Parole était Dieu.
+      </div>
+      <div class="mockup-verse">
+        <span class="verse-num">2</span>
+        Elle était au commencement avec Dieu.
+      </div>
+      <div class="mockup-verse">
+        <span class="verse-num">3</span>
+        Toutes choses ont été faites par elle, et rien de ce qui a été fait n'a été fait sans elle.
+      </div>
+      <div class="mockup-verse">
+        <span class="verse-num">4</span>
+        En elle était la <span class="verse-word-greek hero-interactive-word" data-word="zoe">vie</span> (ζωή), et la vie était la <span class="verse-word-greek hero-interactive-word" data-word="phos">lumière</span> (φῶς) des hommes.
+      </div>
+    `,
+    'lsg': `
+      <div class="mockup-verse">
+        <span class="verse-num">1</span>
+        Au commencement <span class="strong-badge" style="font-size:0.65rem">G1722</span> était la <span class="verse-word-highlight hero-interactive-word" data-word="logos">Parole</span> <span class="strong-badge" style="font-size:0.65rem">G3056</span>, et la Parole était avec Dieu <span class="strong-badge" style="font-size:0.65rem">G2316</span>, et la Parole était Dieu.
+      </div>
+      <div class="mockup-verse">
+        <span class="verse-num">2</span>
+        Elle était au commencement avec Dieu.
+      </div>
+      <div class="mockup-verse">
+        <span class="verse-num">3</span>
+        Toutes choses ont été faites par elle, et rien de ce qui a été fait n'a été fait sans elle.
+      </div>
+      <div class="mockup-verse">
+        <span class="verse-num">4</span>
+        En elle était la <span class="hero-interactive-word" data-word="zoe" style="border-bottom:1px dashed var(--accent-cyan)">vie</span>, et la vie était la <span class="hero-interactive-word" data-word="phos" style="border-bottom:1px dashed var(--accent-cyan)">lumière</span> des hommes.
+      </div>
+    `,
+    'sblgnt': `
+      <div class="mockup-verse greek-text" style="font-size: 1.25rem;">
+        <span class="verse-num">1</span>
+        Ἐν <span class="verse-word-greek hero-interactive-word" data-word="arche">ἀρχῇ</span> ἦν ὁ <span class="verse-word-highlight hero-interactive-word" data-word="logos">λόγος</span>, καὶ ὁ λόγος ἦν πρὸς τὸν <span class="verse-word-greek hero-interactive-word" data-word="theos">θεόν</span>, καὶ θεὸς ἦν ὁ λόγος.
+      </div>
+      <div class="mockup-verse greek-text" style="font-size: 1.25rem;">
+        <span class="verse-num">2</span>
+        οὗτος ἦν ἐν ἀρχῇ πρὸς τὸν θεόν.
+      </div>
+      <div class="mockup-verse greek-text" style="font-size: 1.25rem;">
+        <span class="verse-num">3</span>
+        πάντα δι’ αὐτοῦ ἐγένετο, καὶ χωρὶς αὐτοῦ ἐγένετο οὐδὲ ἕν ὃ γέγονεν.
+      </div>
+      <div class="mockup-verse greek-text" style="font-size: 1.25rem;">
+        <span class="verse-num">4</span>
+        ἐν αὐτῷ <span class="verse-word-greek hero-interactive-word" data-word="zoe">ζωὴ</span> ἦν, καὶ ἡ ζωὴ ἦν τὸ <span class="verse-word-greek hero-interactive-word" data-word="phos">φῶς</span> τῶν ἀνθρώπων.
+      </div>
+    `,
+    'pv': `
+      <div class="mockup-verse">
+        <span class="verse-num">1</span>
+        Au commencement de toutes choses, la <span class="verse-word-highlight hero-interactive-word" data-word="logos">Parole</span> existait déjà. Elle était avec Dieu, et elle était elle-même Dieu.
+      </div>
+      <div class="mockup-verse">
+        <span class="verse-num">2</span>
+        Dès le principe, elle était auprès de Dieu.
+      </div>
+      <div class="mockup-verse">
+        <span class="verse-num">3</span>
+        Tout a été créé par elle ; rien de ce qui existe n'a été fait sans elle.
+      </div>
+      <div class="mockup-verse">
+        <span class="verse-num">4</span>
+        En elle résidait la vie véritable, et cette vie était la lumière qui éclaire tous les êtres humains.
+      </div>
+    `,
+    'chouraqui': `
+      <div class="mockup-verse">
+        <span class="verse-num">1</span>
+        En entête était le <span class="verse-word-highlight hero-interactive-word" data-word="logos">Verbe</span>, et le Verbe était auprès d’Elohîms, et le Verbe était Elohîms.
+      </div>
+      <div class="mockup-verse">
+        <span class="verse-num">2</span>
+        Lui-même était en entête auprès d’Elohîms.
+      </div>
+      <div class="mockup-verse">
+        <span class="verse-num">3</span>
+        Tout a été par lui, et hors de lui rien n’a été de ce qui est.
+      </div>
+      <div class="mockup-verse">
+        <span class="verse-num">4</span>
+        En lui était la vie, et la vie était la lumière des hommes.
+      </div>
+    `
+  };
+
+  const wordDetails = {
+    'logos': {
+      strong: 'G3056',
+      title: '🔤 Lemme : λόγος, ου (ὁ)',
+      bailly: 'Dictionnaire Bailly : 1. Parole proférée, discours ; 2. Raison, principe d\'ordre ; 3. Dans l\'Évangile de Jean : le Verbe créateur et éternel incarné en Jésus-Christ.',
+      ai: '« Jean s\'adresse simultanément à l\'esprit grec (logos comme principe rationnel du cosmos) et à la théologie juive (Dabar Yahvé, la parole vivante et créatrice). »'
+    },
+    'theos': {
+      strong: 'G2316',
+      title: '🔤 Lemme : θεός, οῦ (ὁ)',
+      bailly: 'Dictionnaire Bailly : Dieu, la divinité suprême, l\'Être éternel créateur de l\'univers.',
+      ai: '« En Jean 1:1c (καὶ θεὸς ἦν ὁ λόγος), l\'absence d\'article devant θεός souligne la nature divine qualitative du Verbe sans le confondre avec la personne du Père. »'
+    },
+    'arche': {
+      strong: 'G746',
+      title: '🔤 Lemme : ἀρχή, ῆς (ἡ)',
+      bailly: 'Dictionnaire Bailly : 1. Commencement temporel ; 2. Principe premier, origine causale ; 3. Autorité suprême.',
+      ai: '« Écho direct à Béréshit (Genèse 1:1). Jean situe le Verbe au-delà de la création dans l\'éternité préexistante. »'
+    },
+    'zoe': {
+      strong: 'G2222',
+      title: '🔤 Lemme : ζωή, ῆς (ἡ)',
+      bailly: 'Dictionnaire Bailly : La vie au sens absolu, la force vitale spirituelle (distinct de bios, la simple vie biologique).',
+      ai: '« Dans le corpus johannique, la Zoê désigne la vie éternelle et incréée communiquée aux croyants par le Christ. »'
+    },
+    'phos': {
+      strong: 'G5457',
+      title: '🔤 Lemme : φῶς, φωτός (τό)',
+      bailly: 'Dictionnaire Bailly : Lumière, clarté, illumination spirituelle qui dissipe les ténèbres.',
+      ai: '« Thème majeur chez Jean : la lumière qui luit dans les ténèbres sans que les ténèbres n\'aient pu la submerger (katelaben). »'
+    }
+  };
+
+  function bindInteractiveWords() {
+    const words = document.querySelectorAll('.hero-interactive-word');
+    words.forEach(w => {
+      w.addEventListener('mouseenter', () => {
+        const key = w.getAttribute('data-word');
+        const d = wordDetails[key];
+        if (!d) return;
+
+        if (strongBadge) strongBadge.textContent = d.strong;
+        if (drawerCardMorph) {
+          drawerCardMorph.innerHTML = `
+            <div class="drawer-card-header">${d.title}</div>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">
+              <strong>${d.bailly}</strong>
+            </p>
+          `;
+        }
+        if (drawerCardAi) {
+          drawerCardAi.innerHTML = `
+            <div class="drawer-card-header" style="color: var(--accent-gold);">
+              🧠 Assistant IA (Sparring-Partner)
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">
+              <em>${d.ai}</em>
+            </p>
+          `;
+        }
+      });
     });
   }
+
+  versionPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      const vKey = pill.getAttribute('data-version-key');
+      versionPills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+
+      if (readerPassage && translations[vKey]) {
+        readerPassage.innerHTML = translations[vKey];
+        bindInteractiveWords();
+      }
+    });
+  });
+
+  // Sidebar mock items switching preview
+  const sidebarItems = document.querySelectorAll('.hero-sidebar-item');
+  sidebarItems.forEach(item => {
+    item.addEventListener('click', () => {
+      sidebarItems.forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+    });
+  });
+
+  bindInteractiveWords();
 }
 
 // Fade in animation helper
@@ -434,3 +605,4 @@ styleTag.textContent = `
   }
 `;
 document.head.appendChild(styleTag);
+

@@ -395,6 +395,9 @@ const IllustrationsView = {
     this.closeModal();
     if (typeof App !== 'undefined' && App.switchView) {
       App.switchView('sermon-editor');
+      if (App.showToast) {
+        App.showToast("Illustration insérée dans la prédication !");
+      }
     }
   },
 

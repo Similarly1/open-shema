@@ -1,4 +1,4 @@
-# Open Shema (שְׁמַע)
+# Open Shema
 
 > **« Écoute » (*Shema*)** — Une plateforme d'étude biblique ouverte, moderne et assistée par IA, pensée pour la recherche exégétique, linguistique et théologique.
 
@@ -26,7 +26,7 @@
   - Synchronisation automatique avec le passage biblique actif.
   - Métadonnées YAML intégrées et inclusion granulaire dans le contexte de l'IA.
 
-- **🧠 Assistant d'Étude & RAG Documentaire (Gemini / Mistral)** :
+- **🧠 Assistant d'Étude & RAG Documentaire (Gemini / Mistral / Infomaniak AI)** :
   - 4 modes spécialisés : *🔍 Exégèse approfondie*, *🏛️ Contexte historique & culturel*, *🎙️ Préparation de prédication / Message*, *🔤 Analyse lexicale*.
   - RAG haute précision : **Reranking sémantique local (Cross-Encoder BGE-M3)** sur CPU et **LLM Curateur** pour éliminer le bruit.
   - Sélection granulaire des corpus documentaires (Bibles, Commentaires, Dicos, Notes).

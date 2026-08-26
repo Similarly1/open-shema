@@ -870,9 +870,11 @@ Synthèse et application concrète...`
     }, 1200);
   },
 
-  async deleteCurrentSermon() {
-    if (!this.currentSermon) return;
-    const targetTitle = this.currentSermon.title || 'cette prédication';
+  async deleteSermon(sermonId) {
+    if (!sermonId) return;
+    const sermon = this.sermons.find(s => s.id === sermonId);
+    const targetTitle = sermon?.title || 'cette prédication';
+
     let confirmed = false;
     if (typeof App !== 'undefined' && App.showConfirmModal) {
       confirmed = await App.showConfirmModal({
@@ -890,17 +892,26 @@ Synthèse et application concrète...`
     if (!confirmed) return;
 
     try {
-      const res = await API.deleteSermon(this.currentSermon.id);
+      const res = await API.deleteSermon(sermonId);
       if (res && res.success) {
-        this.currentSermon = null;
+        if (this.currentSermon?.id === sermonId) {
+          this.currentSermon = null;
+        }
         await this.loadSermons();
+        this.renderHubCards();
         if (typeof App !== 'undefined' && App.showToast) {
-          App.showToast("Prédication supprimée.");
+          App.showToast("Prédication supprimée avec succès.");
         }
       }
     } catch (e) {
       console.error('Erreur suppression sermon:', e);
     }
+  },
+
+  async deleteCurrentSermon() {
+    if (!this.currentSermon) return;
+    await this.deleteSermon(this.currentSermon.id);
+    this.openHub();
   },
 
   async openSermonsFolder() {

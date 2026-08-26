@@ -25429,3 +25429,60 @@ body.reading-bg-dark .comm-dropdown-popover {
   overflow: hidden !important;
   transform: none !important;
 }
+/* BOUTONS D'AJOUT RAPIDE EN BAS DU STUDIO DE PRÉDICATION */
+.sermon-add-block-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px 0 40px 0;
+}
+
+.btn-add-section-pill {
+  padding: 8px 18px;
+  border-radius: 20px;
+  border: 1px dashed var(--border-color, rgba(255, 255, 255, 0.18));
+  background: var(--bg-card, rgba(255, 255, 255, 0.03));
+  color: var(--text-secondary, #d4d4d8);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-add-section-pill:hover {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: var(--accent-blue, #3b82f6);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+/* =========================================================================
+ * LISTES DÉROULANTES / SELECTS — CHEVRON STYLISÉ ET MARGES ÉQUILIBRÉES
+ * ========================================================================= */
+
+select,
+.form-select,
+.illustration-modal-card select,
+.illustration-modal-card .form-select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: calc(100% - 12px) center !important;
+  background-size: 13px 13px !important;
+  padding: 8px 36px 8px 12px !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  line-height: 1.4 !important;
+}
+
+select:focus,
+.form-select:focus,
+.illustration-modal-card select:focus,
+.illustration-modal-card .form-select:focus {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+}
