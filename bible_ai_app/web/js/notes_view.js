@@ -365,6 +365,13 @@ const NotesView = {
       const isCode = !!node.closest('code');
       const codeBtn = this.floatingToolbar.querySelector('.nft-btn[data-action="code"]');
       if (codeBtn) codeBtn.classList.toggle('active', isCode);
+
+      const isLink = !!node.closest('a');
+      const linkBtn = this.floatingToolbar.querySelector('.nft-btn[data-action="link"]');
+      if (linkBtn) {
+        linkBtn.classList.toggle('active', isLink);
+        linkBtn.title = isLink ? "Modifier ou supprimer le lien (Ctrl+K)" : "Lien / Référence biblique (Ctrl+K)";
+      }
     }
   },
 
@@ -415,50 +422,121 @@ const NotesView = {
     if (!sel || !sel.rangeCount) return;
     const text = sel.toString().trim();
     const savedRange = (this.currentSelectionRange || sel.getRangeAt(0)).cloneRange();
-    
-    // Détection automatique si le texte est déjà une référence biblique (ex: Jean 3:16)
+
+    // Vérifier si la sélection est sur ou dans un lien existant
+    let node = savedRange.commonAncestorContainer;
+    if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
+    const existingLink = node.closest('a');
+
+    const currentHref = existingLink 
+      ? (existingLink.getAttribute('data-ref') || existingLink.getAttribute('href') || '')
+      : '';
+
+    // Détection automatique si le texte sélectionné est exactement une référence biblique (ex: Jean 3:16) et qu'il n'y a pas encore de lien
     const refRegex = /^([1-3]?\s?[A-ZÀ-Ÿa-zà-ÿ]{3,15})\s+(\d{1,3}):(\d{1,3}(?:-\d{1,3})?)$/;
-    if (refRegex.test(text)) {
+    if (!existingLink && refRegex.test(text)) {
       sel.removeAllRanges();
       sel.addRange(savedRange);
       const html = `<a href="#" class="scripture-link" data-ref="${text}" style="color: var(--accent-blue); font-weight: 700; text-decoration: underline; cursor: pointer;">${text}</a>`;
       document.execCommand('insertHTML', false, html);
       this.pushHistoryState();
       this.triggerAutoSave();
+      this.updateFloatingButtonsState();
       return;
     }
 
     this.hideFloatingToolbar();
 
-    let url = null;
-    if (typeof App !== 'undefined' && App.showPromptModal) {
-      url = await App.showPromptModal({
-        title: "Insérer un lien",
-        message: text ? `Lien pour « ${text.length > 35 ? text.slice(0, 32) + '...' : text} » :` : "Entrez l'URL ou la référence biblique :",
-        defaultValue: "https://",
+    const title = existingLink ? "Modifier le lien" : "Insérer un lien";
+    const message = text 
+      ? `Lien pour « ${text.length > 35 ? text.slice(0, 32) + '...' : text} » :` 
+      : (existingLink ? "Modifier ou supprimer ce lien :" : "Entrez l'URL ou la référence biblique :");
+    const defaultValue = currentHref && currentHref !== '#' ? currentHref : "https://";
+
+    let result = null;
+    if (typeof App !== 'undefined' && App.showLinkModal) {
+      result = await App.showLinkModal({
+        title,
+        message,
+        defaultValue,
         placeholder: "https://example.com ou Jean 3:16",
-        confirmText: "Insérer",
+        confirmText: existingLink ? "Mettre à jour" : "Insérer",
+        cancelText: "Annuler",
+        isExisting: !!existingLink
+      });
+    } else if (typeof App !== 'undefined' && App.showPromptModal) {
+      const promptVal = await App.showPromptModal({
+        title,
+        message,
+        defaultValue,
+        placeholder: "https://example.com ou Jean 3:16",
+        confirmText: existingLink ? "Mettre à jour" : "Insérer",
         cancelText: "Annuler"
       });
-    } else {
-      url = prompt("Entrez l'URL du lien ou le passage :", "https://");
+      if (promptVal !== null) {
+        result = { action: promptVal.trim() ? 'save' : 'delete', url: promptVal.trim() };
+      }
     }
 
-    if (url && url.trim()) {
-      url = url.trim();
-      sel.removeAllRanges();
-      sel.addRange(savedRange);
+    if (!result) return;
 
-      if (refRegex.test(url)) {
-        const displayText = savedRange.toString() || url;
-        const html = `<a href="#" class="scripture-link" data-ref="${url}" style="color: var(--accent-blue); font-weight: 700; text-decoration: underline; cursor: pointer;">${displayText}</a>`;
-        document.execCommand('insertHTML', false, html);
+    if (result.action === 'delete') {
+      if (existingLink && this.contentInput?.contains(existingLink)) {
+        // Dé-lier proprement : remplacer la balise <a> par son texte enfant
+        const parentNode = existingLink.parentNode;
+        while (existingLink.firstChild) {
+          parentNode.insertBefore(existingLink.firstChild, existingLink);
+        }
+        parentNode.removeChild(existingLink);
+        App.showToast('Lien supprimé.');
       } else {
-        document.execCommand('createLink', false, url);
+        sel.removeAllRanges();
+        sel.addRange(savedRange);
+        document.execCommand('unlink');
+        App.showToast('Lien supprimé.');
+      }
+      this.pushHistoryState();
+      this.triggerAutoSave();
+      this.updateFloatingButtonsState();
+      return;
+    }
+
+    if (result.action === 'save' && result.url) {
+      const url = result.url.trim();
+      if (!url) return;
+
+      if (existingLink && this.contentInput?.contains(existingLink)) {
+        // Mise à jour directe du lien existant
+        if (refRegex.test(url)) {
+          existingLink.className = 'scripture-link';
+          existingLink.setAttribute('data-ref', url);
+          existingLink.setAttribute('href', '#');
+          existingLink.style.cssText = 'color: var(--accent-blue); font-weight: 700; text-decoration: underline; cursor: pointer;';
+        } else {
+          existingLink.className = '';
+          existingLink.removeAttribute('data-ref');
+          existingLink.setAttribute('href', url);
+          existingLink.removeAttribute('style');
+        }
+        App.showToast('Lien mis à jour.');
+      } else {
+        // Insertion d'un nouveau lien sur la sélection
+        sel.removeAllRanges();
+        sel.addRange(savedRange);
+
+        if (refRegex.test(url)) {
+          const displayText = savedRange.toString() || url;
+          const html = `<a href="#" class="scripture-link" data-ref="${url}" style="color: var(--accent-blue); font-weight: 700; text-decoration: underline; cursor: pointer;">${displayText}</a>`;
+          document.execCommand('insertHTML', false, html);
+        } else {
+          document.execCommand('createLink', false, url);
+        }
+        App.showToast('Lien inséré.');
       }
 
       this.pushHistoryState();
       this.triggerAutoSave();
+      this.updateFloatingButtonsState();
     }
   },
 

@@ -1981,56 +1981,84 @@ h1, h2, h3, h4, .font-title {
 }
 
 .hub-sources-container {
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
 .hub-sources-title {
   font-family: var(--font-title);
-  font-size: 0.64rem;
+  font-size: 0.62rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   color: var(--text-muted);
   margin-bottom: 6px;
 }
 
-.hub-sources-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+.hub-pills-wrap {
+  display: flex;
+  flex-wrap: wrap;
   gap: 5px;
 }
 
-.hub-source-card {
-  display: flex;
+.hub-pill-chip {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 5px;
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  padding: 5px 8px;
-  border-radius: 6px;
+  padding: 3px 7px;
+  border-radius: 16px;
   text-decoration: none;
   transition: all var(--transition-fast);
 }
 
-.hub-source-card:hover {
+.hub-pill-chip:hover {
   border-color: var(--accent-cyan);
   background: var(--bg-card-hover);
   transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.hub-source-name {
-  font-size: 0.72rem;
+.pill-logo {
+  width: 13px;
+  height: 13px;
+  border-radius: 2px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.pill-name {
+  font-size: 0.7rem;
   font-weight: 600;
   color: var(--text-main);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+.pill-price {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 8px;
+  background: rgba(56, 189, 248, 0.12);
+  color: var(--accent-cyan);
+  letter-spacing: -0.02em;
+}
+
+.pill-price.free {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--accent-emerald);
+}
+
+.pill-price.pub {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--accent-gold);
 }
 
 .hub-footnote {
   font-size: 0.58rem;
   color: var(--text-dim);
   font-style: italic;
-  margin-top: 4px;
+  margin-top: 6px;
   line-height: 1.2;
   text-align: center;
 }

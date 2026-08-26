@@ -881,6 +881,120 @@ const App = {
     });
   },
 
+  /**
+   * Boîte de dialogue pour insérer, modifier ou supprimer un lien
+   */
+  showLinkModal({
+    title = "Insérer un lien",
+    message = "Entrez l'URL ou la référence biblique :",
+    defaultValue = "https://",
+    placeholder = "https://example.com ou Jean 3:16",
+    confirmText = "Enregistrer",
+    cancelText = "Annuler",
+    isExisting = false
+  } = {}) {
+    return new Promise((resolve) => {
+      let modal = document.getElementById('app-custom-link-modal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'app-custom-link-modal';
+        modal.className = 'custom-confirm-overlay hidden';
+        document.body.appendChild(modal);
+      }
+
+      modal.innerHTML = `
+        <div class="custom-confirm-card" role="dialog" aria-modal="true" style="max-width: 460px;">
+          <div class="custom-confirm-header">
+            <div class="confirm-icon info">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+              </svg>
+            </div>
+            <div class="custom-confirm-title">${title}</div>
+          </div>
+          <div class="custom-confirm-body">
+            <p style="margin-bottom: 12px; font-size: 13px; color: var(--text-secondary, #d4d4d8);">${message}</p>
+            <input type="text" class="custom-prompt-input" style="width: 100%; height: 38px; padding: 0 12px; border-radius: 7px; border: 1px solid var(--border-color, rgba(255,255,255,0.15)); background: rgba(0,0,0,0.35); color: var(--text-primary, #f4f4f5); font-size: 13.5px; outline: none; box-sizing: border-box;" value="${(defaultValue || '').replace(/"/g, '&quot;')}" placeholder="${(placeholder || '').replace(/"/g, '&quot;')}">
+          </div>
+          <div class="custom-confirm-footer" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div>
+              ${isExisting ? `
+                <button type="button" class="btn-secondary btn-modal-delete-link" style="color: #f87171; border-color: rgba(239, 68, 68, 0.35); display: inline-flex; align-items: center; gap: 4px; padding: 0 10px; height: 32px; font-size: 12px;">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                  <span>Supprimer le lien</span>
+                </button>
+              ` : '<div></div>'}
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button type="button" class="btn-secondary btn-prompt-cancel">${cancelText}</button>
+              <button type="button" class="btn-primary btn-prompt-confirm">${confirmText}</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      modal.classList.remove('hidden');
+      requestAnimationFrame(() => {
+        modal.classList.add('visible');
+      });
+
+      const input = modal.querySelector('.custom-prompt-input');
+      const btnCancel = modal.querySelector('.btn-prompt-cancel');
+      const btnConfirm = modal.querySelector('.btn-prompt-confirm');
+      const btnDelete = modal.querySelector('.btn-modal-delete-link');
+
+      let isClosed = false;
+      const cleanup = (result) => {
+        if (isClosed) return;
+        isClosed = true;
+        modal.classList.remove('visible');
+        setTimeout(() => {
+          modal.classList.add('hidden');
+        }, 150);
+        document.removeEventListener('keydown', handleKey);
+        resolve(result);
+      };
+
+      const handleKey = (e) => {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          cleanup(null);
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          cleanup({ action: 'save', url: input.value.trim() });
+        }
+      };
+
+      btnCancel?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        cleanup(null);
+      });
+
+      btnConfirm?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        cleanup({ action: 'save', url: input.value.trim() });
+      });
+
+      btnDelete?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        cleanup({ action: 'delete' });
+      });
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          cleanup(null);
+        }
+      });
+
+      document.addEventListener('keydown', handleKey);
+      setTimeout(() => {
+        input?.focus();
+        input?.select();
+      }, 50);
+    });
+  },
+
   // Gestionnaire d'Avertissements & Erreurs avec Détails et Copie
   currentErrorDetails: null,
 

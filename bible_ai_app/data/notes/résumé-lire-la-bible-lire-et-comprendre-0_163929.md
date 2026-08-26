@@ -7,10 +7,8 @@ tags:
 - Résumé IA
 - Lire/Comprendre
 include_in_ai: true
-updated_at: 20/08/2026 16:39
+updated_at: 26/08/2026 20:38
 ---
-
-# Résumé — Lire la Bible (Lire et comprendre la Bible)
 
 # Résumé — Lire la Bible (Lire et comprendre la Bible)
 
