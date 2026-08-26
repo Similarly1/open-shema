@@ -351,6 +351,21 @@ const NotesView = {
     checkState('italic', 'italic');
     checkState('underline', 'underline');
     checkState('strikethrough', 'strikeThrough');
+
+    // Vérification de l'état actif pour le surlignage et le code en ligne
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount) {
+      let node = sel.getRangeAt(0).commonAncestorContainer;
+      if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
+
+      const isMark = !!node.closest('mark');
+      const hlBtn = this.floatingToolbar.querySelector('.nft-btn[data-action="highlight"]');
+      if (hlBtn) hlBtn.classList.toggle('active', isMark);
+
+      const isCode = !!node.closest('code');
+      const codeBtn = this.floatingToolbar.querySelector('.nft-btn[data-action="code"]');
+      if (codeBtn) codeBtn.classList.toggle('active', isCode);
+    }
   },
 
   handleFloatingToolbarAction(action) {
@@ -376,6 +391,7 @@ const NotesView = {
       this.surroundSelectionWithTag('mark');
     } else if (action === 'link') {
       this.handleLinkAction();
+      return;
     } else if (action === 'superscript') {
       document.execCommand('superscript');
     } else if (action === 'subscript') {
@@ -394,21 +410,55 @@ const NotesView = {
     this.updateFloatingButtonsState();
   },
 
-  handleLinkAction() {
+  async handleLinkAction() {
     const sel = window.getSelection();
     if (!sel || !sel.rangeCount) return;
     const text = sel.toString().trim();
+    const savedRange = (this.currentSelectionRange || sel.getRangeAt(0)).cloneRange();
     
+    // Détection automatique si le texte est déjà une référence biblique (ex: Jean 3:16)
     const refRegex = /^([1-3]?\s?[A-ZÀ-Ÿa-zà-ÿ]{3,15})\s+(\d{1,3}):(\d{1,3}(?:-\d{1,3})?)$/;
     if (refRegex.test(text)) {
+      sel.removeAllRanges();
+      sel.addRange(savedRange);
       const html = `<a href="#" class="scripture-link" data-ref="${text}" style="color: var(--accent-blue); font-weight: 700; text-decoration: underline; cursor: pointer;">${text}</a>`;
       document.execCommand('insertHTML', false, html);
+      this.pushHistoryState();
+      this.triggerAutoSave();
       return;
     }
 
-    const url = prompt("Entrez l'URL du lien :", "https://");
-    if (url) {
-      document.execCommand('createLink', false, url);
+    this.hideFloatingToolbar();
+
+    let url = null;
+    if (typeof App !== 'undefined' && App.showPromptModal) {
+      url = await App.showPromptModal({
+        title: "Insérer un lien",
+        message: text ? `Lien pour « ${text.length > 35 ? text.slice(0, 32) + '...' : text} » :` : "Entrez l'URL ou la référence biblique :",
+        defaultValue: "https://",
+        placeholder: "https://example.com ou Jean 3:16",
+        confirmText: "Insérer",
+        cancelText: "Annuler"
+      });
+    } else {
+      url = prompt("Entrez l'URL du lien ou le passage :", "https://");
+    }
+
+    if (url && url.trim()) {
+      url = url.trim();
+      sel.removeAllRanges();
+      sel.addRange(savedRange);
+
+      if (refRegex.test(url)) {
+        const displayText = savedRange.toString() || url;
+        const html = `<a href="#" class="scripture-link" data-ref="${url}" style="color: var(--accent-blue); font-weight: 700; text-decoration: underline; cursor: pointer;">${displayText}</a>`;
+        document.execCommand('insertHTML', false, html);
+      } else {
+        document.execCommand('createLink', false, url);
+      }
+
+      this.pushHistoryState();
+      this.triggerAutoSave();
     }
   },
 
@@ -816,19 +866,48 @@ const NotesView = {
 
   surroundSelectionWithTag(tagName) {
     const sel = window.getSelection();
-    if (!sel.rangeCount) return;
+    if (!sel || !sel.rangeCount) return;
     const range = sel.getRangeAt(0);
-    const selectedContent = range.extractContents();
-    const el = document.createElement(tagName);
-    if (!selectedContent.textContent.trim()) {
-      el.textContent = tagName === 'mark' ? 'Texte surligné' : 'code';
-    } else {
-      el.appendChild(selectedContent);
+
+    // 1. Si la sélection est déjà entièrement dans cette balise, la retirer (toggle un-highlight / un-code)
+    let parent = range.commonAncestorContainer;
+    if (parent.nodeType === Node.TEXT_NODE) parent = parent.parentNode;
+    const existing = parent.closest(tagName);
+    if (existing && this.contentInput?.contains(existing)) {
+      const parentNode = existing.parentNode;
+      while (existing.firstChild) {
+        parentNode.insertBefore(existing.firstChild, existing);
+      }
+      parentNode.removeChild(existing);
+      return;
     }
-    range.insertNode(el);
-    range.selectNodeContents(el);
-    sel.removeAllRanges();
-    sel.addRange(range);
+
+    // 2. Si rien n'est sélectionné, insérer un placeholder
+    if (range.collapsed) {
+      const el = document.createElement(tagName);
+      el.textContent = tagName === 'mark' ? 'Texte surligné' : 'code';
+      range.insertNode(el);
+      const newRange = document.createRange();
+      newRange.selectNodeContents(el);
+      sel.removeAllRanges();
+      sel.addRange(newRange);
+      return;
+    }
+
+    // 3. Encapsulation propre
+    try {
+      const el = document.createElement(tagName);
+      const selectedContent = range.extractContents();
+      el.appendChild(selectedContent);
+      range.insertNode(el);
+
+      const newRange = document.createRange();
+      newRange.selectNodeContents(el);
+      sel.removeAllRanges();
+      sel.addRange(newRange);
+    } catch (e) {
+      console.warn('Erreur surroundSelectionWithTag:', e);
+    }
   },
 
   setBlockType(type) {
@@ -1070,7 +1149,7 @@ const NotesView = {
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
       .replace(/~~(.*?)~~/g, '<del>$1</del>')
-      .replace(/==(.*?)==/g, '<mark>$1</mark>')
+      .replace(/==([\s\S]*?)==/g, '<mark>$1</mark>')
       .replace(/`([^`]+)`/g, '<code>$1</code>')
       .replace(/\^([^\^]+)\^/g, '<sup>$1</sup>')
       .replace(/~([^~]+)~/g, '<sub>$1</sub>');
@@ -1123,7 +1202,7 @@ const NotesView = {
         case 'strike':
           return `~~${childrenText}~~`;
         case 'mark':
-          return `==${childrenText}==`;
+          return childrenText.trim() ? `==${childrenText.trim()}==` : '';
         case 'code':
           return node.parentNode?.tagName.toLowerCase() === 'pre' ? childrenText : `\`${childrenText}\``;
         case 'pre':
@@ -1433,7 +1512,20 @@ const NotesView = {
         }
       });
     } else {
-      const newTitle = prompt("Nouveau titre de la note :", currentTitle);
+      let newTitle = null;
+      if (typeof App !== 'undefined' && App.showPromptModal) {
+        newTitle = await App.showPromptModal({
+          title: "Renommer la note",
+          message: "Entrez le nouveau titre de la note :",
+          defaultValue: currentTitle,
+          placeholder: "Titre de la note...",
+          confirmText: "Renommer",
+          cancelText: "Annuler"
+        });
+      } else {
+        newTitle = prompt("Nouveau titre de la note :", currentTitle);
+      }
+
       if (newTitle !== null && newTitle.trim() && newTitle.trim() !== currentTitle) {
         try {
           const note = this.notes.find(n => n.id === noteId);

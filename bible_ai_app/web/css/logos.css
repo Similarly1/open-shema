@@ -872,7 +872,7 @@ body.window-maximized .app-window-titlebar {
   padding: 0 8px 0 10px;
   border-right: 1px solid var(--border-color);
   box-sizing: border-box;
-  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width var(--transition-normal), min-width var(--transition-normal);
   -webkit-app-region: no-drag;
   flex-shrink: 0;
 }
@@ -1043,7 +1043,7 @@ body.sidebar-is-collapsed .topbar-left-zone .quick-passage-box {
   flex-direction: column;
   flex-shrink: 0;
   z-index: 10;
-  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width var(--transition-normal), min-width var(--transition-normal);
   overflow: hidden;
   user-select: none;
 }
@@ -1060,22 +1060,19 @@ body.sidebar-is-collapsed .topbar-left-zone .quick-passage-box {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 8px 8px;
+  padding: 8px 6px;
   display: flex;
   flex-direction: column;
   gap: 3px;
-}
-.sidebar.collapsed .sidebar-menu {
-  padding: 8px 6px;
-  align-items: center;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0;
   width: 100%;
-  padding: 8px 10px;
+  height: 38px;
+  padding: 0 4px;
   border: none;
   background: transparent;
   border-radius: 6px;
@@ -1084,16 +1081,10 @@ body.sidebar-is-collapsed .topbar-left-zone .quick-passage-box {
   font-weight: 500;
   cursor: pointer;
   text-align: left;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
   box-sizing: border-box;
   white-space: nowrap;
-}
-.sidebar.collapsed .nav-item {
-  width: 42px;
-  height: 40px;
-  padding: 0;
-  justify-content: center;
-  gap: 0;
+  position: relative;
 }
 
 .nav-item:hover {
@@ -1112,6 +1103,8 @@ body.sidebar-is-collapsed .topbar-left-zone .quick-passage-box {
 }
 
 .nav-icon {
+  width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1129,10 +1122,20 @@ body.sidebar-is-collapsed .topbar-left-zone .quick-passage-box {
 }
 
 .nav-label {
-  transition: opacity 0.15s ease;
+  margin-left: 6px;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  opacity: 1;
+  transform: translateX(0);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .sidebar.collapsed .nav-label {
-  display: none;
+  opacity: 0;
+  transform: translateX(-8px);
+  pointer-events: none;
+  width: 0;
+  margin-left: 0;
 }
 
 /* SOUS-MENU DE NAVIGATION LATÉRALE (Prédication & Illustrations) */
@@ -1149,8 +1152,9 @@ body.sidebar-is-collapsed .topbar-left-zone .quick-passage-box {
 
 .nav-chevron {
   margin-left: auto;
+  margin-right: 8px;
   opacity: 0.6;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.15s ease;
   flex-shrink: 0;
 }
 
@@ -1160,7 +1164,10 @@ body.sidebar-is-collapsed .topbar-left-zone .quick-passage-box {
 }
 
 .sidebar.collapsed .nav-chevron {
-  display: none;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  margin-right: 0;
 }
 
 .nav-sub-menu {
@@ -1256,27 +1263,27 @@ body.sidebar-is-collapsed .topbar-left-zone .quick-passage-box {
   letter-spacing: 0.05em;
   color: var(--text-muted);
   padding: 4px 10px;
+  transition: opacity 0.15s ease;
 }
 .sidebar.collapsed .sidebar-section-title {
-  display: none;
+  opacity: 0;
+  pointer-events: none;
+  height: 0;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
 }
 
 .nav-item.sub-item {
   font-size: 12px;
-  padding: 6px 10px;
-}
-.sidebar.collapsed .nav-item.sub-item {
-  padding: 0;
 }
 
 .sidebar-footer {
-  padding: 8px;
-  border-top: 1px solid var(--border-color);
-}
-.sidebar.collapsed .sidebar-footer {
   padding: 8px 6px;
+  border-top: 1px solid var(--border-color);
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 3px;
 }
 
 /* ==========================================================================
@@ -25792,6 +25799,26 @@ select:focus,
   box-shadow: 0 0 6px rgba(250, 204, 21, 0.6);
   border: 1.5px solid rgba(255, 255, 255, 0.4);
   display: inline-block;
+}
+
+.nft-btn[data-action="highlight"].active {
+  background: rgba(250, 204, 21, 0.22);
+  border: 1px solid rgba(250, 204, 21, 0.4);
+}
+
+/* Surlignage propre dans l'éditeur de notes et aperçu */
+.notes-rich-editor mark,
+.note-preview-content mark,
+mark {
+  background-color: rgba(250, 204, 21, 0.3) !important;
+  color: #fef08a !important;
+  padding: 1px 4px !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(250, 204, 21, 0.35) !important;
+  font-weight: 500 !important;
+  display: inline !important;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 
 .nft-block-dropdown-wrap,

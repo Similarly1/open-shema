@@ -86,35 +86,7 @@ const App = {
       });
     });
 
-    // Raccourcis accès rapides
-    document.getElementById('quick-commentary')?.addEventListener('click', () => {
-      document.querySelectorAll('.sidebar-menu .nav-item, .sidebar-footer .nav-item').forEach(b => b.classList.remove('active'));
-      document.getElementById('nav-commentaries')?.classList.add('active');
-      if (typeof CommentariesView !== 'undefined') {
-        CommentariesView.openWithCurrentState();
-      } else {
-        this.switchView('commentaries');
-      }
-    });
-
-    document.getElementById('quick-theology')?.addEventListener('click', () => {
-      document.querySelectorAll('.sidebar-menu .nav-item, .sidebar-footer .nav-item').forEach(b => b.classList.remove('active'));
-      document.getElementById('nav-theology')?.classList.add('active');
-      if (typeof TheologyView !== 'undefined') {
-        TheologyView.onViewActivated();
-      }
-      this.switchView('theology');
-    });
-
-    document.getElementById('quick-compare')?.addEventListener('click', () => {
-      this.switchView('bible');
-      BibleReader.toggleSplitView(true);
-    });
-
-    document.getElementById('quick-dict')?.addEventListener('click', () => {
-      this.switchView('dict');
-    });
-
+    // Bouton À propos & Crédits du footer
     document.getElementById('nav-about-btn')?.addEventListener('click', () => {
       document.querySelectorAll('.sidebar-menu .nav-item, .sidebar-footer .nav-item').forEach(b => b.classList.remove('active'));
       document.getElementById('nav-about-btn')?.classList.add('active');
