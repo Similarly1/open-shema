@@ -3491,6 +3491,14 @@ input:checked + .slider.round:before {
   width: 100%;
 }
 
+.study-drawer .overview-dashboard-grid,
+.drawer-body .overview-dashboard-grid,
+.drawer-content .overview-dashboard-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
+
 .overview-col-left,
 .overview-col-right {
   display: flex;

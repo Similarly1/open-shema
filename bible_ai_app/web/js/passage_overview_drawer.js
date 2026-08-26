@@ -480,7 +480,75 @@ const PassageOverviewDrawer = {
     const mapsCount = (data.maps || []).length;
     const bpCount = ((data.bibleproject?.current_videos || []).length) + ((data.bibleproject?.current_posters || []).length);
 
-    // Colonne Gauche : Visuel, Contexte & Notes (BibleProject, Notes & Surlignages, Cartes/Lieux)
+    const isSecondaryWindow = !!document.getElementById('comm-win-titlebar');
+
+    // =========================================================================
+    // CAS 1 : VOLET LATÉRAL CLASSIQUE (PAGE BIBLE) -> 1 COLONNE VERTICALE PURE
+    // =========================================================================
+    if (!isSecondaryWindow) {
+      let activeHtml = '';
+      let emptyHtml = '';
+      let emptyCount = 0;
+
+      const appendSafe = (renderFn, count) => {
+        try {
+          const html = renderFn.call(this, data);
+          if (count > 0) {
+            activeHtml += html;
+          } else {
+            emptyHtml += html;
+            emptyCount++;
+          }
+        } catch (err) {
+          console.warn('[PassageOverviewDrawer] Erreur rendu section:', err);
+        }
+      };
+
+      // A. Section BibleProject (Vidéos & Posters)
+      appendSafe(this.renderBibleProjectSection, bpCount);
+
+      // B. Section Commentaires Exégétiques
+      appendSafe(this.renderCommentariesSection, commCount);
+
+      // C. Section Articles & Revues Théologiques
+      appendSafe(this.renderArticlesSection, artCount);
+
+      // D. Section Livres de Théologie & Bibliothèque
+      appendSafe(this.renderTheologySection, theoCount);
+
+      // E. Section Vos Notes & Surlignages Personnels
+      appendSafe(this.renderNotesSection, notesCount);
+
+      // F. Section Géographie & Lieux Bibliques
+      appendSafe(this.renderMapsSection, mapsCount);
+
+      let finalHtml = activeHtml;
+
+      if (emptyCount > 0) {
+        const isShowEmpty = this.showEmptySections || false;
+        finalHtml += `
+          <div class="overview-empty-sections-wrap">
+            <button type="button" class="btn-toggle-empty-sections ${isShowEmpty ? 'expanded' : ''}" data-action="toggle-empty-sections">
+              <span class="empty-sec-chevron">${this.icons.chevronDown}</span>
+              <span>${emptyCount} autre(s) section(s) sans ressource</span>
+            </button>
+            <div class="empty-sections-container ${isShowEmpty ? '' : 'hidden'}">
+              ${emptyHtml}
+            </div>
+          </div>
+        `;
+      }
+
+      // G. Section Actions Rapides & IA
+      finalHtml += this.renderQuickActionsSection(data);
+      root.innerHTML = finalHtml;
+      this.attachCardEventListeners(root, data);
+      return;
+    }
+
+    // =========================================================================
+    // CAS 2 : FENÊTRE SECONDAIRE DÉPORTÉE -> GRILLE DASHBOARD (2 COLONNES)
+    // =========================================================================
     const leftActiveHtml = [];
     const leftEmptyHtml = [];
     if (bpCount > 0) leftActiveHtml.push(this.renderBibleProjectSection(data));
@@ -492,7 +560,6 @@ const PassageOverviewDrawer = {
     if (mapsCount > 0) leftActiveHtml.push(this.renderMapsSection(data));
     else leftEmptyHtml.push(this.renderMapsSection(data));
 
-    // Colonne Droite : Exégèse & Ressources (Commentaires, Livres, Articles)
     const rightActiveHtml = [];
     const rightEmptyHtml = [];
     if (commCount > 0) rightActiveHtml.push(this.renderCommentariesSection(data));
@@ -543,8 +610,6 @@ const PassageOverviewDrawer = {
     finalHtml += this.renderQuickActionsSection(data);
 
     root.innerHTML = finalHtml;
-
-    // Attacher les écouteurs de clics et d'accordéons
     this.attachCardEventListeners(root, data);
   },
 
