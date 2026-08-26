@@ -577,12 +577,11 @@ const App = {
       targetEl.classList.add('active');
     }
 
-    // Synchroniser l'état actif de la barre latérale
-    document.querySelectorAll('.sidebar-menu .nav-item, .sidebar-footer .nav-item').forEach(b => {
+    // Synchroniser l'état actif de la barre latérale et des sous-menus
+    document.querySelectorAll('.sidebar-nav .nav-item, .sidebar-footer .nav-item, .nav-sub-item').forEach(b => {
+      b.classList.remove('active');
       if (b.dataset.view === viewName || b.id === `nav-${viewName}`) {
         b.classList.add('active');
-      } else {
-        b.classList.remove('active');
       }
     });
 

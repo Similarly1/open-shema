@@ -632,7 +632,7 @@ h1, h2, h3, h4, .font-title {
   align-items: center;
   justify-content: center;
   gap: 16px;
-  margin-bottom: 28px;
+  margin-bottom: 40px;
   flex-wrap: wrap;
   animation: heroEntrance 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -654,51 +654,6 @@ h1, h2, h3, h4, .font-title {
   font-size: 1.02rem;
 }
 
-/* Sub-meta (Origine du Nom sobre) */
-.hero-sub-meta {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  margin-bottom: 45px;
-  font-size: 0.85rem;
-  color: var(--text-dim);
-  flex-wrap: wrap;
-}
-
-.meta-dot {
-  color: var(--accent-gold);
-  opacity: 0.7;
-}
-
-.hero-stats-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 40px;
-  margin-bottom: 45px;
-  flex-wrap: wrap;
-}
-
-.hero-stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.stat-value {
-  font-family: var(--font-title);
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: var(--text-main);
-}
-
-.stat-label {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  font-weight: 500;
-}
-
 /* --- Hero App Mockup / 3D Interface Showcase --- */
 .hero-mockup-wrapper {
   position: relative;
@@ -715,6 +670,163 @@ h1, h2, h3, h4, .font-title {
 .hero-mockup-wrapper:hover {
   transform: perspective(1200px) rotateX(0deg) translateY(-6px);
   box-shadow: 0 30px 70px -10px rgba(56, 189, 248, 0.4), 0 40px 90px rgba(0, 0, 0, 0.7);
+}
+
+/* --- Bandeau de Chiffres Clés au Scroll --- */
+.stats-strip-section {
+  padding: 50px 0;
+  background: var(--bg-surface-elevated);
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  position: relative;
+  z-index: 2;
+}
+
+.stats-strip-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  text-align: center;
+}
+
+.stat-strip-card {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.stat-strip-val {
+  font-family: var(--font-title);
+  font-size: 2.2rem;
+  font-weight: 800;
+}
+
+.stat-strip-lbl {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .stats-strip-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+/* --- Section Dédiée : L'Origine d'Open Shema --- */
+.section-origin {
+  background: var(--bg-app);
+  padding: 100px 0;
+}
+
+.origin-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.origin-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 36px 32px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-medium);
+}
+
+.origin-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-cyan);
+  box-shadow: var(--shadow-md), 0 10px 30px rgba(56, 189, 248, 0.1);
+}
+
+.origin-card.gold-border:hover {
+  border-color: var(--accent-gold);
+  box-shadow: var(--shadow-md), 0 10px 30px rgba(245, 158, 11, 0.1);
+}
+
+.origin-card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-title);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 4px 12px;
+  border-radius: 100px;
+  margin-bottom: 20px;
+  width: fit-content;
+}
+
+.origin-card-badge.open {
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.origin-card-badge.shema {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--accent-gold);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.origin-card-title {
+  font-family: var(--font-title);
+  font-size: 1.45rem;
+  font-weight: 700;
+  margin-bottom: 14px;
+  color: var(--text-main);
+}
+
+.origin-card-desc {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.origin-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 20px;
+}
+
+.origin-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.5;
+}
+
+.origin-list svg {
+  color: var(--accent-cyan);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.origin-card.gold-border .origin-list svg {
+  color: var(--accent-gold);
+}
+
+@media (max-width: 900px) {
+  .origin-cards-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .app-window-frame {
