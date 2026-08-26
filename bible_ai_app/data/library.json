@@ -558,7 +558,8 @@
     "chapters_count": 77,
     "format": "epub",
     "active": true,
-    "name": "Lire/Comprendre"
+    "name": "Lire/Comprendre",
+    "file_path": "C:\\Users\\adrie\\kDrive\\Documents\\Théologie\\Ressources externes\\Ebooks\\Lire et comprendre la Bible (Alexander, J.H. [Alexander, J.H.]) (z-library.sk, 1lib.sk, z-lib.sk).epub"
   },
   "Paradoxes": {
     "title": "Des paradoxes enrichissants",
@@ -760,7 +761,8 @@
     "source_type": "general",
     "book_code": null,
     "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
-    "active": true
+    "active": true,
+    "file_path": "C:\\Users\\adrie\\kDrive\\Documents\\Théologie\\Ressources externes\\Ebooks\\lire-la-bible-sans-filtre-quand-nos-lunettes-occidentales-nous-orientent.epub"
   },
   "Bible annotée (Frédéric Godet)": {
     "title": "Bible annotée (Frédéric Godet & Neuchâtel)",

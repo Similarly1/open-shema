@@ -230,11 +230,16 @@ const App = {
     });
     document.getElementById('win-btn-fs')?.addEventListener('click', async (e) => {
       e.stopPropagation();
-      const res = await API.call('toggle_fullscreen');
-      const isFs = (res && typeof res.is_fullscreen === 'boolean') 
-        ? res.is_fullscreen 
-        : !document.body.classList.contains('app-fullscreen');
-      this.updateFullscreenState(isFs);
+      const nextFs = !document.body.classList.contains('app-fullscreen');
+      this.updateFullscreenState(nextFs);
+      try {
+        const res = await API.call('toggle_fullscreen');
+        if (res && typeof res.is_fullscreen === 'boolean') {
+          this.updateFullscreenState(res.is_fullscreen);
+        }
+      } catch (err) {
+        console.warn('toggle_fullscreen error:', err);
+      }
     });
     document.getElementById('win-btn-close')?.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -245,18 +250,24 @@ const App = {
     window.addEventListener('keydown', async (e) => {
       if (e.key === 'F11') {
         e.preventDefault();
-        const res = await API.call('toggle_fullscreen');
-        const isFs = (res && typeof res.is_fullscreen === 'boolean')
-          ? res.is_fullscreen
-          : !document.body.classList.contains('app-fullscreen');
-        this.updateFullscreenState(isFs);
+        const nextFs = !document.body.classList.contains('app-fullscreen');
+        this.updateFullscreenState(nextFs);
+        try {
+          const res = await API.call('toggle_fullscreen');
+          if (res && typeof res.is_fullscreen === 'boolean') {
+            this.updateFullscreenState(res.is_fullscreen);
+          }
+        } catch (err) {
+          console.warn('toggle_fullscreen error:', err);
+        }
       } else if (e.key === 'Escape' && document.body.classList.contains('app-fullscreen')) {
         e.preventDefault();
-        const res = await API.call('toggle_fullscreen');
-        const isFs = (res && typeof res.is_fullscreen === 'boolean')
-          ? res.is_fullscreen
-          : false;
-        this.updateFullscreenState(isFs);
+        this.updateFullscreenState(false);
+        try {
+          await API.call('toggle_fullscreen');
+        } catch (err) {
+          console.warn('toggle_fullscreen error:', err);
+        }
       }
     });
 

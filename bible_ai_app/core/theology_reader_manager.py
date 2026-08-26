@@ -115,6 +115,52 @@ class TheologyReaderManager:
         return theology_books
 
     @classmethod
+    def _resolve_epub_path(cls, book_name: str, book_meta: dict) -> str:
+        """Résout de manière résiliente le chemin vers le fichier EPUB source."""
+        fpath = book_meta.get("file_path", "")
+        if fpath and os.path.exists(fpath):
+            return fpath
+
+        candidate_dirs = [
+            r"C:\Users\adrie\kDrive\Documents\Théologie\Ressources externes\Ebooks",
+            r"C:\Users\adrie\kDrive\Documents\Théologie\Ressources externes",
+            r"./data/ebooks",
+            r"./data",
+        ]
+
+        title = (book_meta.get("title") or book_name).lower()
+        author = (book_meta.get("author") or "").lower()
+        clean_title = strip_accents(title)
+
+        for cdir in candidate_dirs:
+            if not os.path.exists(cdir):
+                continue
+            try:
+                for fname in os.listdir(cdir):
+                    if not fname.lower().endswith(".epub"):
+                        continue
+                    fname_clean = strip_accents(fname.lower())
+                    if book_name.lower() in fname.lower() or (len(clean_title) >= 6 and clean_title[:18] in fname_clean):
+                        matched = os.path.join(cdir, fname)
+                        book_meta["file_path"] = matched
+                        return matched
+                    if "alexander" in author and "alexander" in fname_clean and "lire" in fname_clean:
+                        matched = os.path.join(cdir, fname)
+                        book_meta["file_path"] = matched
+                        return matched
+                    if "sans-filtre" in fname_clean and ("filtre" in clean_title or "lbsf" in book_name.lower()):
+                        matched = os.path.join(cdir, fname)
+                        book_meta["file_path"] = matched
+                        return matched
+                    if "paradoxe" in clean_title and "paradoxe" in fname_clean:
+                        matched = os.path.join(cdir, fname)
+                        book_meta["file_path"] = matched
+                        return matched
+            except Exception:
+                pass
+        return ""
+
+    @classmethod
     def get_book_toc(cls, book_name: str) -> Dict[str, Any]:
         """
         Récupère la table des matières (TOC) d'un livre de théologie
@@ -128,7 +174,7 @@ class TheologyReaderManager:
         # 1. Vérifier si un fichier EPUB existe (analyse directe ultra-rapide)
         registry = load_books_metadata()
         book_meta = registry.get(book_name, {})
-        fpath = book_meta.get("file_path", "")
+        fpath = cls._resolve_epub_path(book_name, book_meta)
 
         if fpath and os.path.exists(fpath) and fpath.lower().endswith(".epub"):
             try:
@@ -263,7 +309,7 @@ class TheologyReaderManager:
         all_referenced_books = set()
         registry = load_books_metadata()
         book_meta = registry.get(book_name, {})
-        fpath = book_meta.get("file_path", "")
+        fpath = cls._resolve_epub_path(book_name, book_meta)
 
         # 1. Priorité à la lecture directe du fichier EPUB original (texte intégral fidèle, notes exactes, sans césure RAG)
         if fpath and os.path.exists(fpath) and fpath.lower().endswith(".epub"):
@@ -272,7 +318,7 @@ class TheologyReaderManager:
                 from bs4 import BeautifulSoup
                 from core.epub_loader import EpubLoader
                 inspect_data = EpubLoader.inspect_epub(fpath)
-                ch_info = next((c for c in inspect_data.get("chapters", []) if c.get("id") == cid_query), None)
+                ch_info = next((c for c in inspect_data.get("chapters", []) if c.get("id") == cid_query or str(c.get("id")) == str(cid_query)), None)
                 if ch_info and ch_info.get("zip_file"):
                     with zipfile.ZipFile(fpath, 'r') as z:
                         if ch_info["zip_file"] in z.namelist():
@@ -370,6 +416,7 @@ class TheologyReaderManager:
 
         # 2. Fallback ChromaDB si le fichier source n'est pas sur le disque
         if not chunks:
+            client = cls.get_chroma_client()
             collections_to_search = []
             try:
                 for c in client.list_collections():

@@ -380,6 +380,10 @@ const TheologyView = {
     // Mettre à jour l'en-tête du sélecteur actif
     this.updateActiveBookHeader(book);
 
+    // Afficher immédiatement l'état skeleton sur la TOC et l'article
+    this.renderTocSkeleton();
+    this.renderLoadingArticle();
+
     // Charger la table des matières (TOC)
     try {
       const tocData = await API.getTheologyBookToc(bookName);
@@ -425,6 +429,7 @@ const TheologyView = {
       }
     } catch (e) {
       console.error('[TheologyView] Erreur chargement TOC:', e);
+      this.renderErrorArticle(e);
     }
   },
 
@@ -539,7 +544,7 @@ const TheologyView = {
   renderChapterArticle(data) {
 
     if (!data || !data.paragraphs || data.paragraphs.length === 0) {
-      this.renderEmptyChapterArticle();
+      this.renderEmptyChapterArticle(data);
       return;
     }
 
@@ -1817,8 +1822,34 @@ const TheologyView = {
   },
 
   // =========================================================================
-  // ÉTATS DE CHARGEMENT & ERREURS (STYLE LOGOS)
+  // ÉTATS DE CHARGEMENT & ERREURS (SKELETON ET ANIMATIONS SHIMMER)
   // =========================================================================
+
+  renderTocSkeleton() {
+    if (!this.tocListContainer) return;
+    const skeletonRows = [
+      { num: '1', width: '75%' },
+      { num: '2', width: '85%' },
+      { num: '3', width: '60%' },
+      { num: '4', width: '90%' },
+      { num: '5', width: '70%' },
+      { num: '6', width: '80%' },
+      { num: '7', width: '65%' },
+      { num: '8', width: '88%' },
+      { num: '9', width: '72%' },
+      { num: '10', width: '82%' }
+    ];
+    this.tocListContainer.innerHTML = `
+      <div class="theol-toc-skeleton">
+        ${skeletonRows.map(r => `
+          <div class="theol-toc-skeleton-row">
+            <div class="theol-toc-skeleton-num theol-skeleton-shimmer"></div>
+            <div class="theol-toc-skeleton-title theol-skeleton-shimmer" style="width: ${r.width};"></div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  },
 
   renderInitialLoadingState(customText = "Chargement de vos ouvrages de théologie...") {
     if (this.articleHero) this.articleHero.innerHTML = '';
@@ -1842,67 +1873,123 @@ const TheologyView = {
         </div>
       `;
     }
-    if (this.tocListContainer) {
-      this.tocListContainer.innerHTML = `
-        <div class="theol-toc-skeleton">
-          <div class="theol-skeleton-item shimmer"></div>
-          <div class="theol-skeleton-item shimmer"></div>
-          <div class="theol-skeleton-item shimmer"></div>
-          <div class="theol-skeleton-item shimmer"></div>
-          <div class="theol-skeleton-item shimmer"></div>
-          <div class="theol-skeleton-item shimmer"></div>
+    this.renderTocSkeleton();
+  },
+
+  renderLoadingArticle() {
+    if (this.articleHero) {
+      this.articleHero.innerHTML = `
+        <div class="theol-hero-badge-row">
+          <div class="theol-skeleton-pill theol-skeleton-shimmer" style="width: 140px; height: 22px;"></div>
+          <div class="theol-skeleton-pill theol-skeleton-shimmer" style="width: 90px; height: 22px;"></div>
+          <div class="theol-skeleton-pill theol-skeleton-shimmer" style="width: 110px; height: 22px; margin-left: auto;"></div>
+        </div>
+        <div class="theol-skeleton-line theol-skeleton-shimmer" style="width: 78%; height: 32px; margin: 12px 0 8px 0;"></div>
+        <div class="theol-skeleton-line theol-skeleton-shimmer" style="width: 48%; height: 32px; margin-bottom: 16px;"></div>
+        <div class="theol-hero-divider"></div>
+        <div class="theol-hero-verses-row" style="background: transparent; padding: 4px 0; gap: 8px;">
+          <div class="theol-skeleton-pill theol-skeleton-shimmer" style="width: 70px; height: 22px;"></div>
+          <div class="theol-skeleton-pill theol-skeleton-shimmer" style="width: 85px; height: 22px;"></div>
+          <div class="theol-skeleton-pill theol-skeleton-shimmer" style="width: 60px; height: 22px;"></div>
+          <div class="theol-skeleton-pill theol-skeleton-shimmer" style="width: 95px; height: 22px;"></div>
+        </div>
+      `;
+    }
+    if (this.articleFooterNav) this.articleFooterNav.innerHTML = '';
+    if (this.articleContent) {
+      this.articleContent.innerHTML = `
+        <div class="theol-reader-skeleton-wrap" style="padding: 10px 0;">
+          <div class="theol-skeleton-line theol-skeleton-shimmer" style="width: 100%; height: 16px; margin-bottom: 12px;"></div>
+          <div class="theol-skeleton-line theol-skeleton-shimmer" style="width: 96%; height: 16px; margin-bottom: 12px;"></div>
+          <div class="theol-skeleton-line theol-skeleton-shimmer" style="width: 92%; height: 16px; margin-bottom: 24px;"></div>
+          
+          <div class="theol-skeleton-line theol-skeleton-shimmer" style="width: 38%; height: 24px; margin: 26px 0 16px 0;"></div>
+          
+          <div class="theol-skeleton-line theol-skeleton-shimmer" style="width: 98%; height: 16px; margin-bottom: 12px;"></div>
+          <div class="theol-skeleton-line theol-skeleton-shimmer" style="width: 94%; height: 16px; margin-bottom: 12px;"></div>
+          <div class="theol-skeleton-line theol-skeleton-shimmer" style="width: 96%; height: 16px; margin-bottom: 12px;"></div>
+          <div class="theol-skeleton-line theol-skeleton-shimmer" style="width: 70%; height: 16px; margin-bottom: 24px;"></div>
+          
+          <div class="theol-skeleton-quote-box theol-skeleton-shimmer"></div>
+          
+          <div class="theol-skeleton-line theol-skeleton-shimmer" style="width: 100%; height: 16px; margin-bottom: 12px;"></div>
+          <div class="theol-skeleton-line theol-skeleton-shimmer" style="width: 95%; height: 16px; margin-bottom: 12px;"></div>
+          <div class="theol-skeleton-line theol-skeleton-shimmer" style="width: 60%; height: 16px; margin-bottom: 12px;"></div>
         </div>
       `;
     }
   },
 
-  renderLoadingArticle(customTitle = "Chargement du chapitre...") {
+  renderEmptyChapterArticle(data = null) {
+    const bookTitle = data?.book_title || data?.book_name || this.currentBook || 'Théologie';
+    const chapterTitle = data?.chapter_title || `Chapitre ${this.currentChapterId || ''}`;
+    const author = data?.book_author || '';
+
     if (this.articleHero) {
       this.articleHero.innerHTML = `
         <div class="theol-hero-badge-row">
-          <span class="theol-hero-book-badge">${this.escapeHtml(this.currentBook || 'Théologie')}</span>
+          <span class="theol-hero-book-badge">${this.escapeHtml(bookTitle)}</span>
+          ${data?.section_title ? `<span class="theol-hero-section-badge">📁 ${this.escapeHtml(data.section_title)}</span>` : ''}
+          ${author ? `<span class="theol-hero-author-badge">✍️ ${this.escapeHtml(author)}</span>` : ''}
         </div>
-        <h1 class="theol-hero-chapter-title">${this.escapeHtml(customTitle)}</h1>
+        <h1 class="theol-hero-chapter-title">${this.escapeHtml(chapterTitle)}</h1>
+        <div class="theol-hero-divider"></div>
+      `;
+    }
+
+    if (this.articleContent) {
+      this.articleContent.innerHTML = `
+        <div class="theol-empty-state">
+          <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+          <h3>Aucun contenu disponible pour ce chapitre</h3>
+          <p>Ce chapitre ne contient aucun texte indexé ou constitue un titre de section.</p>
+          ${data?.next_chapter ? `
+            <button type="button" class="btn-primary" style="margin-top: 14px; font-size: 12px; padding: 6px 14px;" id="btn-empty-jump-next">
+              Passer au chapitre suivant : ${this.escapeHtml(data.next_chapter.title)} →
+            </button>
+          ` : ''}
+        </div>
+      `;
+
+      document.getElementById('btn-empty-jump-next')?.addEventListener('click', () => {
+        if (data?.next_chapter?.chapter_id) {
+          this.loadChapter(this.currentBook, data.next_chapter.chapter_id);
+        }
+      });
+    }
+
+    if (data) {
+      this.renderFooterNavigation(data);
+    }
+  },
+
+  renderErrorArticle(err) {
+    const bookTitle = this.currentBook || 'Théologie';
+    if (this.articleHero) {
+      this.articleHero.innerHTML = `
+        <div class="theol-hero-badge-row">
+          <span class="theol-hero-book-badge">${this.escapeHtml(bookTitle)}</span>
+        </div>
+        <h1 class="theol-hero-chapter-title">Erreur de lecture</h1>
         <div class="theol-hero-divider"></div>
       `;
     }
     if (this.articleFooterNav) this.articleFooterNav.innerHTML = '';
     if (this.articleContent) {
       this.articleContent.innerHTML = `
-        <div class="theol-chapter-loading-container" style="padding: 10px 0;">
-          <div class="theol-loader-progress-track" style="margin: 0 auto 30px auto;">
-            <div class="theol-loader-progress-bar"></div>
-          </div>
-          <div class="theol-paragraph-skeleton shimmer" style="width: 100%; height: 18px; margin-bottom: 14px; border-radius: 4px;"></div>
-          <div class="theol-paragraph-skeleton shimmer" style="width: 96%; height: 18px; margin-bottom: 14px; border-radius: 4px;"></div>
-          <div class="theol-paragraph-skeleton shimmer" style="width: 88%; height: 18px; margin-bottom: 26px; border-radius: 4px;"></div>
-          <div class="theol-paragraph-skeleton shimmer" style="width: 98%; height: 18px; margin-bottom: 14px; border-radius: 4px;"></div>
-          <div class="theol-paragraph-skeleton shimmer" style="width: 93%; height: 18px; margin-bottom: 14px; border-radius: 4px;"></div>
-          <div class="theol-paragraph-skeleton shimmer" style="width: 65%; height: 18px; margin-bottom: 26px; border-radius: 4px;"></div>
-        </div>
-      `;
-    }
-  },
-
-  renderEmptyChapterArticle() {
-    if (this.articleContent) {
-      this.articleContent.innerHTML = `
-        <div class="theol-empty-state">
-          <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
-          <h3>Aucun contenu disponible pour ce chapitre</h3>
-          <p>Ce chapitre ne contient aucun texte indexé.</p>
-        </div>
-      `;
-    }
-  },
-
-  renderErrorArticle(err) {
-    if (this.articleContent) {
-      this.articleContent.innerHTML = `
         <div class="theol-error-box">
-          <p>Erreur lors du chargement : ${this.escapeHtml(err.message || String(err))}</p>
+          <p>Impossible de charger ce contenu : ${this.escapeHtml(err.message || String(err))}</p>
+          <button type="button" class="btn-primary" style="margin-top: 10px;" id="btn-theol-retry-load">
+            Réessayer le chargement
+          </button>
         </div>
       `;
+
+      document.getElementById('btn-theol-retry-load')?.addEventListener('click', () => {
+        if (this.currentBook && this.currentChapterId) {
+          this.loadChapter(this.currentBook, this.currentChapterId);
+        }
+      });
     }
   },
 

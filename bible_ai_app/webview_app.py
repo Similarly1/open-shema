@@ -66,6 +66,9 @@ _BACKUP_COMPONENTS = [
 
 # Fenêtre native globale (stockée en dehors de la classe API pour éviter les récursions COM/.NET)
 _GLOBAL_WINDOW = None
+_IS_MAXIMIZED = True
+_IS_FULLSCREEN = False
+_RESTORE_BOUNDS = (100, 100, 1200, 800)
 
 def get_active_window():
     global _GLOBAL_WINDOW
@@ -3072,8 +3075,8 @@ class BibleAppApi:
             return {"success": False, "error": str(e)}
 
     def get_window_state(self):
-        global _IS_MAXIMIZED
-        return {"is_maximized": _IS_MAXIMIZED}
+        global _IS_MAXIMIZED, _IS_FULLSCREEN
+        return {"is_maximized": _IS_MAXIMIZED, "is_fullscreen": _IS_FULLSCREEN}
 
     def minimize_window(self):
         global _GLOBAL_WINDOW
@@ -3135,15 +3138,65 @@ class BibleAppApi:
         return {"success": True, "is_maximized": _IS_MAXIMIZED}
 
     def toggle_fullscreen(self):
-        global _GLOBAL_WINDOW
-        is_fs = False
-        if _GLOBAL_WINDOW:
-            try:
-                _GLOBAL_WINDOW.toggle_fullscreen()
-                is_fs = bool(getattr(_GLOBAL_WINDOW, 'fullscreen', False))
-            except Exception as e:
-                logger.warning(f"Erreur toggle_fullscreen: {e}")
-        return {"success": True, "is_fullscreen": is_fs}
+        global _GLOBAL_WINDOW, _IS_FULLSCREEN, _IS_MAXIMIZED, _RESTORE_BOUNDS
+        if not _GLOBAL_WINDOW:
+            return {"success": False}
+
+        hwnd = None
+        try:
+            if hasattr(_GLOBAL_WINDOW, 'native') and _GLOBAL_WINDOW.native:
+                hwnd = _GLOBAL_WINDOW.native.Handle.ToInt32()
+        except Exception:
+            pass
+
+        if _IS_FULLSCREEN:
+            # QUITTER LE PLEIN ÉCRAN
+            _IS_FULLSCREEN = False
+            if _IS_MAXIMIZED:
+                wx, wy, ww, wh = get_work_area()
+                if hwnd:
+                    user32.SetWindowPos(hwnd, 0, wx, wy, ww, wh, 0x0040)
+                else:
+                    try:
+                        _GLOBAL_WINDOW.move(wx, wy)
+                        _GLOBAL_WINDOW.resize(ww, wh)
+                    except Exception:
+                        pass
+            else:
+                rx, ry, rw, rh = _RESTORE_BOUNDS
+                if hwnd:
+                    user32.SetWindowPos(hwnd, 0, rx, ry, rw, rh, 0x0040)
+                else:
+                    try:
+                        _GLOBAL_WINDOW.move(rx, ry)
+                        _GLOBAL_WINDOW.resize(rw, rh)
+                    except Exception:
+                        pass
+        else:
+            # ENTRER EN PLEIN ÉCRAN TOTAL (Couvre la barre des tâches)
+            _IS_FULLSCREEN = True
+            if not _IS_MAXIMIZED and hwnd:
+                try:
+                    curr_rect = RECT()
+                    user32.GetWindowRect(hwnd, ctypes.byref(curr_rect))
+                    w = curr_rect.right - curr_rect.left
+                    h = curr_rect.bottom - curr_rect.top
+                    if w > 600 and h > 400:
+                        _RESTORE_BOUNDS = (curr_rect.left, curr_rect.top, w, h)
+                except Exception:
+                    pass
+
+            fx, fy, fw, fh = get_fullscreen_bounds(hwnd)
+            if hwnd:
+                user32.SetWindowPos(hwnd, 0, fx, fy, fw, fh, 0x0040)
+            else:
+                try:
+                    _GLOBAL_WINDOW.move(fx, fy)
+                    _GLOBAL_WINDOW.resize(fw, fh)
+                except Exception:
+                    pass
+
+        return {"success": True, "is_fullscreen": _IS_FULLSCREEN}
 
     def close_window(self):
         global _GLOBAL_WINDOW
@@ -3764,6 +3817,28 @@ class MONITORINFO(ctypes.Structure):
         ('dwFlags', wintypes.DWORD)
     ]
 
+def get_fullscreen_bounds(hwnd=None):
+    """Renvoie les coordonnées (x, y, w, h) du moniteur complet (plein écran total couvrant la barre des tâches)."""
+    try:
+        if hwnd:
+            MONITOR_DEFAULTTONEAREST = 2
+            hmonitor = user32.MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST)
+            mi = MONITORINFO()
+            mi.cbSize = ctypes.sizeof(MONITORINFO)
+            if user32.GetMonitorInfoW(hmonitor, ctypes.byref(mi)):
+                rc = mi.rcMonitor
+                w = int(rc.right - rc.left)
+                h = int(rc.bottom - rc.top)
+                return int(rc.left), int(rc.top), (w if w > 600 else 1920), (h if h > 400 else 1080)
+    except Exception as e:
+        logger.debug(f"get_fullscreen_bounds hwnd error: {e}")
+    try:
+        w = user32.GetSystemMetrics(0)
+        h = user32.GetSystemMetrics(1)
+        return 0, 0, (w if w > 600 else 1920), (h if h > 400 else 1080)
+    except Exception:
+        return 0, 0, 1920, 1080
+
 def get_monitors_layout():
     """Renvoie la liste des zones de travail de tous les écrans connectés."""
     monitors = []
@@ -3828,8 +3903,8 @@ def on_window_shown(*args, **kwargs):
         if hasattr(_GLOBAL_WINDOW, 'move'):
             orig_move = _GLOBAL_WINDOW.move
             def safe_move(x, y):
-                global _IS_MAXIMIZED
-                if _IS_MAXIMIZED:
+                global _IS_MAXIMIZED, _IS_FULLSCREEN
+                if _IS_MAXIMIZED or _IS_FULLSCREEN:
                     return
                 try:
                     orig_move(x, y)
