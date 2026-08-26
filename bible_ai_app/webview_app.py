@@ -3136,12 +3136,14 @@ class BibleAppApi:
 
     def toggle_fullscreen(self):
         global _GLOBAL_WINDOW
+        is_fs = False
         if _GLOBAL_WINDOW:
             try:
                 _GLOBAL_WINDOW.toggle_fullscreen()
+                is_fs = bool(getattr(_GLOBAL_WINDOW, 'fullscreen', False))
             except Exception as e:
                 logger.warning(f"Erreur toggle_fullscreen: {e}")
-        return {"success": True}
+        return {"success": True, "is_fullscreen": is_fs}
 
     def close_window(self):
         global _GLOBAL_WINDOW

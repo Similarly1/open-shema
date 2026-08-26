@@ -228,13 +228,51 @@ const App = {
         this.updateWindowState(res.is_maximized);
       }
     });
-    document.getElementById('win-btn-fs')?.addEventListener('click', (e) => {
+    document.getElementById('win-btn-fs')?.addEventListener('click', async (e) => {
       e.stopPropagation();
-      API.call('toggle_fullscreen');
+      const res = await API.call('toggle_fullscreen');
+      const isFs = (res && typeof res.is_fullscreen === 'boolean') 
+        ? res.is_fullscreen 
+        : !document.body.classList.contains('app-fullscreen');
+      this.updateFullscreenState(isFs);
     });
     document.getElementById('win-btn-close')?.addEventListener('click', (e) => {
       e.stopPropagation();
       API.call('close_window');
+    });
+
+    // Raccourcis clavier F11 et Échap pour basculer / quitter le plein écran
+    window.addEventListener('keydown', async (e) => {
+      if (e.key === 'F11') {
+        e.preventDefault();
+        const res = await API.call('toggle_fullscreen');
+        const isFs = (res && typeof res.is_fullscreen === 'boolean')
+          ? res.is_fullscreen
+          : !document.body.classList.contains('app-fullscreen');
+        this.updateFullscreenState(isFs);
+      } else if (e.key === 'Escape' && document.body.classList.contains('app-fullscreen')) {
+        e.preventDefault();
+        const res = await API.call('toggle_fullscreen');
+        const isFs = (res && typeof res.is_fullscreen === 'boolean')
+          ? res.is_fullscreen
+          : false;
+        this.updateFullscreenState(isFs);
+      }
+    });
+
+    // Détection active du survol en haut de l'écran en mode plein écran
+    let hoverTimeout = null;
+    window.addEventListener('mousemove', (e) => {
+      if (!document.body.classList.contains('app-fullscreen')) return;
+      if (e.clientY <= 8) {
+        clearTimeout(hoverTimeout);
+        document.body.classList.add('titlebar-hover-active');
+      } else if (e.clientY > 50 && document.body.classList.contains('titlebar-hover-active')) {
+        clearTimeout(hoverTimeout);
+        hoverTimeout = setTimeout(() => {
+          document.body.classList.remove('titlebar-hover-active');
+        }, 180);
+      }
     });
 
     // Double clic sur la barre de titre pour Agrandir / Restaurer
@@ -260,6 +298,44 @@ const App = {
     API.onReady(async () => {
       await this.runPreloadPipeline();
     });
+  },
+
+  updateFullscreenState(isFs) {
+    this.isFullscreen = !!isFs;
+    if (this.isFullscreen) {
+      document.body.classList.add('app-fullscreen');
+      const fsBtn = document.getElementById('win-btn-fs');
+      if (fsBtn) {
+        fsBtn.title = "Quitter le plein écran (Échap ou F11)";
+        fsBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 1v3H1M12 1v3h3M15 12h-3v3M1 12h3v3"/></svg>`;
+      }
+    } else {
+      document.body.classList.remove('app-fullscreen', 'titlebar-hover-active');
+      const fsBtn = document.getElementById('win-btn-fs');
+      if (fsBtn) {
+        fsBtn.title = "Plein Écran Total (Masquer la barre des tâches)";
+        fsBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 5V1h4M11 1h4v4M15 11v4h-4M5 15H1v-4"/></svg>`;
+      }
+    }
+  },
+
+  updateWindowState(isMaximized) {
+    this.isWindowMaximized = !!isMaximized;
+    if (this.isWindowMaximized) {
+      document.body.classList.add('window-maximized');
+      const maxBtn = document.getElementById('win-btn-max');
+      if (maxBtn) {
+        maxBtn.title = "Restaurer la taille de la fenêtre";
+        maxBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="3" width="6" height="6" rx="1"/><path d="M3 1h5a1 1 0 0 1 1 1v5"/></svg>`;
+      }
+    } else {
+      document.body.classList.remove('window-maximized');
+      const maxBtn = document.getElementById('win-btn-max');
+      if (maxBtn) {
+        maxBtn.title = "Agrandir la fenêtre";
+        maxBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="1" width="8" height="8" rx="1"/></svg>`;
+      }
+    }
   },
 
   initAIState() {
@@ -566,20 +642,7 @@ const App = {
       }
     });
 
-    // Gérer l'affichage des onglets Bible ou du titre de l'application OPEN SHEMA dans la barre supérieure
-    const tabsList = document.getElementById('tabs-list');
-    const btnAddTab = document.getElementById('btn-add-tab');
-    const appTitle = document.getElementById('topbar-app-title');
-
-    if (viewName === 'bible') {
-      if (tabsList) tabsList.classList.remove('hidden');
-      if (btnAddTab) btnAddTab.classList.remove('hidden');
-      if (appTitle) appTitle.classList.add('hidden');
-    } else {
-      if (tabsList) tabsList.classList.add('hidden');
-      if (btnAddTab) btnAddTab.classList.add('hidden');
-      if (appTitle) appTitle.classList.remove('hidden');
-    }
+    // Le titre Open Shema reste affiché de façon unifiée dans la barre supérieure
 
     const drawerEl = document.getElementById('right-drawer');
 

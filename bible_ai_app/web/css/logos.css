@@ -957,35 +957,34 @@ body.sidebar-is-collapsed .topbar-left-zone .quick-passage-box {
   min-width: 0;
   height: 100%;
   display: flex;
-  align-items: flex-end;
-  padding: 0 8px;
-  gap: 4px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: none;
-}
-
-.topbar-center-zone::-webkit-scrollbar {
-  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  -webkit-app-region: drag;
 }
 
 .topbar-app-title {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  height: 100%;
-  margin: 0 auto;
+  gap: 7px;
   user-select: none;
   pointer-events: none;
-  animation: popoverFadeIn 0.2s ease;
+}
+
+.topbar-app-icon {
+  color: var(--accent-blue, #0284C7);
+  opacity: 0.9;
+  flex-shrink: 0;
 }
 
 .topbar-app-name {
   font-size: 11.5px;
   font-weight: 700;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.9px;
   color: var(--text-primary);
-  opacity: 0.85;
+  opacity: 0.88;
+  text-transform: uppercase;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 }
 
 .window-titlebar-controls {
@@ -1027,6 +1026,48 @@ body.sidebar-is-collapsed .topbar-left-zone .quick-passage-box {
   overflow: hidden !important;
   overflow-x: hidden !important;
   position: relative;
+  transition: height var(--transition-normal);
+}
+
+/* --- MODE PLEIN ÉCRAN TOTAL (IMMERSION / AUTO-HIDE AU SURVOL) --- */
+body.app-fullscreen .app-container {
+  height: 100vh !important;
+  max-height: 100vh !important;
+}
+
+body.app-fullscreen .app-window-titlebar {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  transform: translateY(-100%);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+  background-color: rgba(18, 18, 20, 0.92) !important;
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 999999;
+}
+
+/* Zone invisible de détection en haut de l'écran pour le déclenchement au survol */
+body.app-fullscreen .app-window-titlebar::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: transparent;
+  pointer-events: auto;
+}
+
+/* Réapparition fluide au survol de la zone haute ou de la barre elle-même */
+body.app-fullscreen .app-window-titlebar:hover,
+body.app-fullscreen .app-window-titlebar:focus-within,
+body.app-fullscreen.titlebar-hover-active .app-window-titlebar {
+  transform: translateY(0) !important;
 }
 
 /* ==========================================================================
