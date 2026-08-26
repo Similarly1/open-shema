@@ -60,5 +60,17 @@ python webview_app.py
 
 ---
 
+## 🙏 Remerciements & Bibliothèque Libre
+
+Nous remercions chaleureusement :
+- **Didier Fontaine / [Areopage.net](https://areopage.net/Logos5FreeModulesLibrary.html)** pour la mise à disposition bienveillante de la bibliothèque de modules libres au format Logos (dictionnaires historiques, traductions et commentaires).
+- **[Bible Parser](https://www.bibleparser.net)** pour le travail fondamental de numérisation, parsing, indexation et lemmatisation des textes sources.
+- L'ensemble des contributeurs du domaine public et du logiciel libre d'étude biblique.
+
+Consultez [CREDITS.md](CREDITS.md) pour la liste détaillée des attributions et sources.
+
+---
+
 ## 📜 Licence
 Projet Open Source sous licence MIT. Open Shema est conçu pour la communauté d'étude biblique, les pasteurs, enseignants, théologiens et curieux du texte.
+

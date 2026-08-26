@@ -115,6 +115,15 @@ const App = {
       this.switchView('dict');
     });
 
+    document.getElementById('nav-about-btn')?.addEventListener('click', () => {
+      document.querySelectorAll('.sidebar-menu .nav-item, .sidebar-footer .nav-item').forEach(b => b.classList.remove('active'));
+      document.getElementById('nav-about-btn')?.classList.add('active');
+      this.switchView('settings');
+      if (typeof SettingsView !== 'undefined' && SettingsView.switchToSection) {
+        SettingsView.switchToSection('about');
+      }
+    });
+
     // 3. Onglets du panneau droit (Aperçu / Commentaires / IA / Lexique / Notes / Articles / BibleProject)
     // Gestion du défilement horizontal et des flèches pour les onglets du tiroir
     const tabsWrapper = document.getElementById('drawer-tabs-wrapper');

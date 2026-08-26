@@ -652,14 +652,19 @@ class DictionaryManager:
                                 text_parts = [t.text for t in elem.iter() if t.tag.endswith('}t') and t.text]
                                 p_text = ''.join(text_parts).strip()
                                 if p_text:
-                                    m = re.search(r'\[\[@Headword:([^\]]+)\]\]', p_text)
+                                    m = re.search(r'\[\[@(Headword|Topic|Article|Dictionary):([^\]]+)\]\]', p_text)
                                     if m:
                                         if current_hw and current_paras:
                                             norm_k = cls.normalize_term(current_hw)
                                             if norm_k:
+                                                clean_txt = '\n\n'.join(current_paras).strip()
+                                                clean_txt = re.sub(r'\{\{field-(?:on|off):.*?\}\}', '', clean_txt)
+                                                clean_txt = re.sub(r'<Bible:\s*([^>]+)>', r'\1', clean_txt)
                                                 entries[norm_k] = {
                                                     "title": current_hw,
-                                                    "text": '\n\n'.join(current_paras).strip()
+                                                    "text": clean_txt,
+                                                    "source": "Didier Fontaine / Areopage.net",
+                                                    "formatter": "Bible Parser"
                                                 }
                                                 for sub_w in current_hw.split():
                                                     sub_norm = cls.normalize_term(sub_w)
@@ -668,22 +673,30 @@ class DictionaryManager:
                                                             keywords[sub_norm] = []
                                                         if norm_k not in keywords[sub_norm]:
                                                             keywords[sub_norm].append(norm_k)
-                                        current_hw = m.group(1).strip()
+                                        current_hw = m.group(2).strip()
                                         current_paras = []
-                                        clean_first = re.sub(r'\[\[@Headword:[^\]]+\]\]', '', p_text).strip()
+                                        clean_first = re.sub(r'\[\[@(Headword|Topic|Article|Dictionary):[^\]]+\]\]', '', p_text).strip()
+                                        clean_first = re.sub(r'\{\{field-(?:on|off):.*?\}\}', '', clean_first)
                                         if clean_first:
                                             current_paras.append(clean_first)
                                     else:
                                         if current_hw:
-                                            current_paras.append(p_text)
+                                            clean_line = re.sub(r'\{\{field-(?:on|off):.*?\}\}', '', p_text).strip()
+                                            if clean_line:
+                                                current_paras.append(clean_line)
                                 elem.clear()
                                 
                         if current_hw and current_paras:
                             norm_k = cls.normalize_term(current_hw)
                             if norm_k:
+                                clean_txt = '\n\n'.join(current_paras).strip()
+                                clean_txt = re.sub(r'\{\{field-(?:on|off):.*?\}\}', '', clean_txt)
+                                clean_txt = re.sub(r'<Bible:\s*([^>]+)>', r'\1', clean_txt)
                                 entries[norm_k] = {
                                     "title": current_hw,
-                                    "text": '\n\n'.join(current_paras).strip()
+                                    "text": clean_txt,
+                                    "source": "Didier Fontaine / Areopage.net",
+                                    "formatter": "Bible Parser"
                                 }
                                 
             elif ext == ".json":

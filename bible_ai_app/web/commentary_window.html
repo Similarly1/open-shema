@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Open Shema — Volet d'Étude Déporté</title>
+  <title>Open Shema — Volet d'Étude Plein Écran</title>
   
   <!-- Polices Google : Inter (UI) & EB Garamond / Cardo / Lora (Lecture Exégétique) - Chargement asynchrone avec fallback système immédiat -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,7 +12,8 @@
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Inter:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:wght@400;500;600&display=swap"></noscript>
   
   <!-- CSS Global -->
-  <link rel="stylesheet" href="css/logos.css?v=4.0">
+  <link rel="stylesheet" href="css/logos.css?v=4.6">
+  <link rel="stylesheet" href="css/articles.css">
 
   <style>
     /* =========================================================================
@@ -60,11 +61,6 @@
       100% { transform: rotate(360deg); }
     }
 
-    @keyframes commPulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.7; transform: scale(0.985); }
-    }
-
     @keyframes commFadeIn {
       from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
@@ -75,7 +71,7 @@
     }
 
     .comm-skeleton-wrap {
-      max-width: 860px;
+      max-width: 900px;
       margin: 0 auto;
       padding: 24px 20px;
       display: flex;
@@ -143,28 +139,30 @@
       border-radius: 4px;
     }
 
-    /* 1. BARRE DE TITRE & ONGLETS PRINCIPAUX (RESPONSIVE & SANS DÉBORDEMENT) */
+    /* 1. BARRE DE TITRE & ONGLETS PRINCIPAUX */
     .comm-win-titlebar {
-      height: 44px;
-      min-height: 44px;
+      height: 46px;
+      min-height: 46px;
       background: #1E293B !important;
       border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 8px 0 6px;
+      padding: 0 8px;
       -webkit-app-region: drag;
       z-index: 1000;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
       user-select: none;
       gap: 6px;
       flex-wrap: nowrap;
+      box-sizing: border-box;
+      width: 100%;
     }
 
     .comm-win-tabs-group {
       display: flex;
       align-items: center;
-      gap: 3px;
+      gap: 4px;
       -webkit-app-region: no-drag;
       flex-shrink: 0;
       white-space: nowrap;
@@ -174,11 +172,11 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 5px 10px;
+      padding: 6px 11px;
       background: transparent;
       border: 1px solid transparent;
-      border-radius: 6px;
-      font-size: 12px;
+      border-radius: 7px;
+      font-size: 12.5px;
       font-weight: 600;
       color: #94A3B8 !important;
       cursor: pointer;
@@ -204,7 +202,7 @@
       align-items: center;
       gap: 6px;
       -webkit-app-region: drag;
-      flex: 1;
+      flex: 1 1 auto;
       min-width: 0;
       justify-content: center;
       cursor: grab;
@@ -220,7 +218,7 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      padding: 3px 8px;
+      padding: 4px 10px;
       background: rgba(255, 255, 255, 0.08) !important;
       border: 1px solid rgba(255, 255, 255, 0.16) !important;
       border-radius: 6px;
@@ -238,9 +236,9 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      padding: 3px 6px;
+      padding: 4px 8px;
       border-radius: 6px;
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 600;
       flex-shrink: 0;
       white-space: nowrap;
@@ -278,15 +276,6 @@
       margin-left: auto;
     }
 
-    #lbl-active-author {
-      max-width: 135px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      display: inline-block;
-      vertical-align: middle;
-    }
-
     .comm-win-tool-btn {
       display: inline-flex;
       align-items: center;
@@ -301,6 +290,7 @@
       cursor: pointer;
       transition: all 0.15s ease;
       white-space: nowrap;
+      -webkit-app-region: no-drag;
     }
 
     .comm-win-tool-btn:hover {
@@ -312,20 +302,22 @@
     .comm-win-controls {
       display: flex;
       align-items: center;
-      gap: 2px;
+      gap: 3px;
       margin-left: 6px;
       flex-shrink: 0;
+      -webkit-app-region: no-drag;
+      z-index: 100;
     }
 
     .comm-win-control-btn {
-      width: 28px;
-      height: 28px;
+      width: 30px;
+      height: 30px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       background: transparent;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       color: #94A3B8 !important;
       cursor: pointer;
       transition: all 0.15s ease;
@@ -338,6 +330,7 @@
       color: #FFFFFF !important;
     }
 
+    .comm-win-control-btn.btn-win-close:hover,
     .comm-win-control-btn.close:hover {
       background: #EF4444 !important;
       color: #FFFFFF !important;
@@ -349,13 +342,16 @@
       position: relative;
       overflow: hidden;
       display: flex;
+      flex-direction: column;
+      background-color: var(--bg-main, #0F172A);
     }
 
     .comm-tab-panel {
-      flex: 1;
-      height: 100%;
-      overflow-y: auto;
       display: none;
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
       flex-direction: column;
     }
 
@@ -363,45 +359,451 @@
       display: flex;
     }
 
-    /* Styles spécifiques Onglet Commentaires */
-    .comm-stream-inner {
-      max-width: 920px;
+    /* Styles spécifiques Aperçu & Hub 360° */
+    .overview-panel-header {
+      padding: 10px 18px;
+      background: #1E293B;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .overview-header-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .overview-passage-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .overview-ref-badge-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      font-size: 13.5px;
+      color: #38BDF8;
+    }
+
+    .overview-pericope-title {
+      font-size: 13px;
+      color: #94A3B8;
+      font-weight: 500;
+    }
+
+    .overview-header-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .overview-nav-btn {
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.06);
+      color: #F8FAFC;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .overview-nav-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .overview-sync-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 9px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ADE80;
+    }
+
+    .overview-sync-btn.unlinked {
+      border-color: rgba(239, 68, 68, 0.35);
+      background: rgba(239, 68, 68, 0.15);
+      color: #F87171;
+    }
+
+    .overview-chips-bar {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .overview-scrollable-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 20px 24px 80px 24px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Styles spécifiques Onglet Commentaires */
+    .comm-panel-header {
+      background: #1E293B;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 8px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .comm-header-top-row,
+    .comm-header-bottom-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .comm-nav-passage-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .comm-nav-arrow-btn {
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      color: #E2E8F0;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .comm-nav-arrow-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+      color: #FFF;
+    }
+
+    .selected-verse-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #F8FAFC;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .selected-verse-badge:hover {
+      border-color: #38BDF8;
+      color: #38BDF8;
+    }
+
+    .comm-sync-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ADE80;
+    }
+
+    .comm-sync-btn.unlinked {
+      border-color: rgba(239, 68, 68, 0.35);
+      background: rgba(239, 68, 68, 0.15);
+      color: #F87171;
+    }
+
+    .comm-font-size-ctrl {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      padding: 2px;
+    }
+
+    .comm-font-btn {
+      padding: 3px 8px;
+      background: transparent;
+      border: none;
+      border-radius: 4px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #94A3B8;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .comm-font-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #FFF;
+    }
+
+    .comm-source-selector-box {
+      position: relative;
+      flex: 1;
+      max-width: 440px;
+    }
+
+    .comm-source-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 7px;
+      color: #F8FAFC;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: left;
+    }
+
+    .comm-source-btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+
+    .comm-source-btn-label {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .comm-source-count-badge {
+      font-size: 11px;
+      font-weight: 700;
+      background: #38BDF8;
+      color: #0F172A;
+      padding: 1px 6px;
+      border-radius: 10px;
+    }
+
+    .comm-sources-popover {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 380px;
+      max-width: 90vw;
+      margin-top: 6px;
+      background: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .comm-sources-popover.hidden {
+      display: none;
+    }
+
+    .comm-popover-header {
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.2);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 12px;
+      font-weight: 700;
+      color: #94A3B8;
+    }
+
+    .comm-popover-search-wrap {
+      padding: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .comm-sources-filter-input {
+      width: 100%;
+      height: 30px;
+      box-sizing: border-box;
+      background: #0F172A;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 5px;
+      color: #FFF;
+      padding: 0 10px;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .comm-sources-filter-input:focus {
+      border-color: #38BDF8;
+    }
+
+    .comm-sources-list {
+      max-height: 280px;
+      overflow-y: auto;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .comm-source-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: #F8FAFC;
+      font-size: 12.5px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+    }
+
+    .comm-source-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .comm-source-item.active {
+      background: rgba(56, 189, 248, 0.2);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #38BDF8;
+      font-weight: 600;
+    }
+
+    .comm-single-author-avatar {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 5px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #FFF;
+      flex-shrink: 0;
+    }
+
+    .comm-ai-actions-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .comm-ai-synth-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 7px;
+      color: #38BDF8;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .comm-ai-synth-btn:hover {
+      background: rgba(56, 189, 248, 0.25);
+    }
+
+    .comm-translate-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 7px;
+      color: #E2E8F0;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Corps du Commentaire Unique */
+    .commentary-single-view {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .comm-stream-inner {
+      max-width: 900px;
+      margin: 0 auto;
       width: 100%;
       box-sizing: border-box;
     }
 
     .comm-verse-quote-banner {
+      background: rgba(30, 41, 59, 0.8) !important;
+      border-left: 4px solid #F97316 !important;
+      border-radius: 8px;
+      padding: 14px 18px;
       display: flex;
       align-items: flex-start;
-      gap: 14px;
-      padding: 16px 20px;
-      background: #1E293B !important;
-      border: 1px solid rgba(255, 255, 255, 0.12) !important;
-      border-left: 4px solid #F97316 !important;
-      border-radius: 10px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+      gap: 12px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
 
     .comm-verse-num-badge {
+      background: #F97316;
+      color: #FFFFFF;
+      font-weight: 700;
+      min-width: 24px;
+      height: 24px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 30px;
-      height: 30px;
-      background: #F97316 !important;
-      color: #FFFFFF !important;
-      font-weight: 800;
-      font-size: 15px;
-      border-radius: 7px;
+      font-size: 13px;
+      border-radius: 6px;
       flex-shrink: 0;
     }
 
     .comm-verse-quote-text {
       font-family: var(--font-bible, 'Cardo', 'EB Garamond', Georgia, serif);
-      font-size: calc(16.5px * var(--comm-zoom, 1)) !important;
-      line-height: 1.65;
+      font-size: calc(16px * var(--comm-zoom, 1)) !important;
+      line-height: 1.6;
       color: #F8FAFC !important;
       font-style: italic;
     }
@@ -411,7 +813,7 @@
       border: 1px solid rgba(255, 255, 255, 0.12) !important;
       border-radius: 10px;
       padding: 22px 24px;
-      margin-top: 16px;
+      margin-top: 14px;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
       color: #F8FAFC !important;
     }
@@ -459,6 +861,175 @@
       color: #F1F5F9 !important;
     }
 
+    /* Panneau Synthèse Exégétique IA */
+    .comm-synthesis-panel {
+      padding: 16px 20px;
+      background: #1E293B;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .comm-synthesis-panel.hidden {
+      display: none;
+    }
+
+    .synthesis-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .synthesis-sparkle-badge {
+      font-weight: 700;
+      font-size: 13px;
+      color: #38BDF8;
+    }
+
+    .synthesis-passage-badge {
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 3px 8px;
+      border-radius: 5px;
+      color: #FFF;
+    }
+
+    .synthesis-btn-close {
+      background: transparent;
+      border: none;
+      color: #94A3B8;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+    }
+
+    .synthesis-btn-close:hover {
+      color: #FFF;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .synthesis-range-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 8px 12px;
+      border-radius: 6px;
+    }
+
+    .range-inputs-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+    }
+
+    .range-numbers-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .synth-num-input {
+      width: 44px;
+      height: 26px;
+      background: #0F172A;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      color: #FFF;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .synth-launch-btn {
+      padding: 8px 16px;
+      background: #0284C7;
+      border: none;
+      border-radius: 6px;
+      color: #FFF;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .synth-launch-btn:hover {
+      background: #0369A1;
+    }
+
+    .synth-result-container {
+      background: #0F172A;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .synth-meta-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .synth-model-tag {
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(56, 189, 248, 0.15);
+      color: #38BDF8;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .synth-action-btn {
+      padding: 4px 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 5px;
+      color: #E2E8F0;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .synth-action-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+      color: #FFF;
+    }
+
+    .synth-markdown-content {
+      font-family: var(--font-reading, 'EB Garamond', Georgia, serif);
+      font-size: 15.5px;
+      line-height: 1.75;
+      color: #F8FAFC;
+    }
+
+    /* Popover Référence Manuel */
+    .comm-ref-picker-popover {
+      position: absolute;
+      top: 54px;
+      left: 16px;
+      background: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      z-index: 600;
+      width: 280px;
+    }
+
+    .comm-ref-picker-popover.hidden {
+      display: none;
+    }
+
     /* Styles spécifiques Onglet Assistant IA */
     .ai-chat-wrap {
       flex: 1;
@@ -495,22 +1066,23 @@
       border-radius: 10px;
       font-size: calc(14px * var(--comm-zoom, 1)) !important;
       line-height: 1.65;
-      max-width: 92%;
-      box-sizing: border-box;
-    }
-
-    .ai-msg-bubble.user {
-      align-self: flex-end;
-      background: #1D4ED8 !important;
-      border: 1px solid #2563EB !important;
-      color: #FFFFFF !important;
+      max-width: 88%;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
 
     .ai-msg-bubble.assistant {
-      align-self: flex-start;
       background: #1E293B !important;
       border: 1px solid rgba(255, 255, 255, 0.12) !important;
       color: #F8FAFC !important;
+      align-self: flex-start;
+      border-top-left-radius: 2px;
+    }
+
+    .ai-msg-bubble.user {
+      background: #0284C7 !important;
+      color: #FFFFFF !important;
+      align-self: flex-end;
+      border-top-right-radius: 2px;
     }
 
     .ai-prompt-chips-wrap {
@@ -521,68 +1093,67 @@
     }
 
     .ai-prompt-chip {
-      padding: 6px 12px;
-      background: #1E293B !important;
-      border: 1px solid rgba(255, 255, 255, 0.15) !important;
-      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 4px 11px;
       font-size: 11.5px;
-      font-weight: 500;
-      color: #94A3B8 !important;
+      color: #94A3B8;
       cursor: pointer;
       transition: all 0.15s ease;
+      white-space: nowrap;
     }
 
     .ai-prompt-chip:hover {
-      background: rgba(56, 189, 248, 0.15) !important;
-      border-color: #38BDF8 !important;
-      color: #F8FAFC !important;
+      background: rgba(56, 189, 248, 0.15);
+      border-color: rgba(56, 189, 248, 0.4);
+      color: #38BDF8;
     }
 
     .ai-input-box-wrap {
       display: flex;
       gap: 8px;
-      padding-top: 10px;
-      border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+      position: relative;
+      background: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 6px 8px;
     }
 
     .ai-chat-input {
       flex: 1;
-      background: #1E293B !important;
-      border: 1px solid rgba(255, 255, 255, 0.2) !important;
-      border-radius: 8px;
-      padding: 10px 14px;
-      color: #FFFFFF !important;
-      font-size: 13.5px;
+      background: transparent;
+      border: none;
       outline: none;
-      resize: none;
-      height: 42px;
-      box-sizing: border-box;
+      color: #F8FAFC;
       font-family: inherit;
-    }
-
-    .ai-chat-input:focus {
-      border-color: #38BDF8 !important;
+      font-size: 13.5px;
+      resize: none;
+      height: 38px;
+      line-height: 1.4;
     }
 
     /* Styles spécifiques Onglet Lexique */
     .lex-wrap {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px 20px;
       max-width: 900px;
       margin: 0 auto;
-      padding: 20px 24px;
       width: 100%;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
     }
 
     .lex-words-flow {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      padding: 16px;
-      background: #1E293B !important;
-      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      padding: 14px 16px;
+      background: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 10px;
     }
 
@@ -590,374 +1161,229 @@
       display: inline-flex;
       flex-direction: column;
       align-items: center;
-      padding: 6px 12px;
-      background: #334155 !important;
-      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 7px;
       cursor: pointer;
       transition: all 0.15s ease;
     }
 
-    .lex-word-pill:hover, .lex-word-pill.active {
-      background: rgba(56, 189, 248, 0.2) !important;
-      border-color: #38BDF8 !important;
+    .lex-word-pill:hover {
+      background: rgba(249, 115, 22, 0.15);
+      border-color: rgba(249, 115, 22, 0.4);
+    }
+
+    .lex-word-pill.active {
+      background: rgba(249, 115, 22, 0.25);
+      border-color: #F97316;
+      box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
+    }
+
+    .lex-word-surface {
+      font-weight: 600;
+      font-size: 13px;
+      color: #F8FAFC;
     }
 
     .lex-word-orig {
-      font-family: 'Cardo', 'EB Garamond', serif;
-      font-size: calc(16.5px * var(--comm-zoom, 1)) !important;
-      font-weight: 700;
-      color: #FFFFFF !important;
-    }
-
-    .lex-word-trans {
-      font-size: 11px;
-      color: #CBD5E1 !important;
-      margin-top: 2px;
+      font-family: 'Cardo', serif;
+      font-size: 14px;
+      color: #F97316;
+      direction: rtl;
     }
 
     .lex-word-strong {
-      font-size: 10.5px;
+      font-size: 10px;
+      color: #94A3B8;
       font-family: 'JetBrains Mono', monospace;
-      color: #F97316 !important;
-      font-weight: 600;
     }
 
     .lex-source-tabs {
       display: flex;
-      flex-wrap: wrap;
       gap: 6px;
-      padding: 4px 0;
+      flex-wrap: wrap;
     }
 
     .lex-source-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
       padding: 5px 12px;
-      background: rgba(255, 255, 255, 0.08) !important;
-      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 6px;
       font-size: 12px;
       font-weight: 600;
-      color: #94A3B8 !important;
+      color: #94A3B8;
       cursor: pointer;
       transition: all 0.15s ease;
     }
 
-    .lex-source-pill:hover {
-      background: rgba(255, 255, 255, 0.15) !important;
-      color: #FFFFFF !important;
-    }
-
     .lex-source-pill.active {
-      background: rgba(56, 189, 248, 0.18) !important;
-      border-color: #38BDF8 !important;
-      color: #38BDF8 !important;
-      font-weight: 700;
-    }
-
-    #lex-entry-detail {
-      background: #1E293B !important;
-      border: 1px solid rgba(255, 255, 255, 0.12) !important;
-      color: #F8FAFC !important;
-      font-size: calc(14px * var(--comm-zoom, 1)) !important;
+      background: #F97316;
+      border-color: #F97316;
+      color: #FFFFFF;
     }
 
     /* Styles spécifiques Onglet Notes */
     .notes-wrap {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 20px 24px;
-      width: 100%;
-      box-sizing: border-box;
+      flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 10px;
       height: 100%;
-    }
-
-    /* Permettre la sélection libre de texte et le menu contextuel sur tous les contenus */
-    .comm-tab-panels-wrap,
-    .comm-tab-panel,
-    .comm-stream-inner,
-    .comm-stream-card,
-    .comm-stream-body,
-    .comm-stream-body *,
-    .comm-verse-quote-text,
-    .lex-wrap,
-    #lex-entry-detail,
-    #lex-entry-detail *,
-    .ai-chat-wrap,
-    .ai-msg-bubble,
-    .ai-msg-bubble *,
-    .notes-wrap,
-    .note-editor-textarea,
-    .note-preview-content,
-    .note-preview-content * {
-      -webkit-app-region: no-drag !important;
-      user-select: text !important;
-      -webkit-user-select: text !important;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 16px 20px;
+      gap: 12px;
     }
 
     .note-toolbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 6px;
-      padding: 6px 10px;
-      background: #1E293B !important;
-      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      background: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 8px;
-      -webkit-app-region: no-drag;
-      user-select: none;
+      padding: 5px 8px;
+      gap: 6px;
+      flex-wrap: wrap;
     }
 
     .note-tools-group {
       display: flex;
       align-items: center;
       gap: 4px;
-      flex-wrap: wrap;
     }
 
     .note-tool-btn {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       padding: 4px 8px;
       background: transparent;
       border: 1px solid transparent;
       border-radius: 5px;
-      font-size: 11.5px;
+      color: #94A3B8;
+      font-size: 12px;
       font-weight: 600;
-      color: #94A3B8 !important;
       cursor: pointer;
       transition: all 0.15s ease;
-      -webkit-app-region: no-drag;
     }
 
     .note-tool-btn:hover {
-      background: rgba(255, 255, 255, 0.1) !important;
-      color: #FFFFFF !important;
+      background: rgba(255, 255, 255, 0.08);
+      color: #F8FAFC;
     }
 
     .note-view-toggle {
-      display: inline-flex;
+      display: flex;
+      align-items: center;
+      gap: 2px;
       background: rgba(0, 0, 0, 0.25);
       border-radius: 6px;
       padding: 2px;
-      gap: 2px;
-      -webkit-app-region: no-drag;
     }
 
     .note-toggle-btn {
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      padding: 4px 10px;
+      padding: 3px 8px;
+      background: transparent;
+      border: none;
+      border-radius: 4px;
+      color: #94A3B8;
       font-size: 11.5px;
       font-weight: 600;
-      border-radius: 4px;
-      border: none;
-      background: transparent;
-      color: #94A3B8 !important;
       cursor: pointer;
       transition: all 0.15s ease;
-      -webkit-app-region: no-drag;
     }
 
     .note-toggle-btn.active {
-      background: #38BDF8 !important;
-      color: #0F172A !important;
-      font-weight: 700;
+      background: #0284C7;
+      color: #FFFFFF;
     }
 
     .note-editor-textarea {
       flex: 1;
       width: 100%;
-      background: #1E293B !important;
-      border: 1px solid rgba(255, 255, 255, 0.18) !important;
+      background: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 8px;
       padding: 16px;
-      color: #FFFFFF !important;
-      font-family: var(--font-reading, 'EB Garamond', serif);
-      font-size: calc(16px * var(--comm-zoom, 1)) !important;
+      color: #F8FAFC;
+      font-family: var(--font-reading, 'EB Garamond', Georgia, serif);
+      font-size: calc(16px * var(--comm-zoom, 1));
       line-height: 1.7;
-      box-sizing: border-box;
-      outline: none;
       resize: none;
+      outline: none;
+      box-sizing: border-box;
     }
 
     .note-editor-textarea:focus {
-      border-color: #38BDF8 !important;
+      border-color: #38BDF8;
     }
 
     .note-preview-content {
       flex: 1;
       width: 100%;
-      background: #1E293B !important;
-      border: 1px solid rgba(255, 255, 255, 0.18) !important;
+      overflow-y: auto;
+      background: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 8px;
       padding: 16px 20px;
-      color: #F8FAFC !important;
-      font-family: var(--font-reading, 'EB Garamond', serif);
-      font-size: calc(16px * var(--comm-zoom, 1)) !important;
-      line-height: 1.8;
+      color: #F8FAFC;
+      font-family: var(--font-reading, 'EB Garamond', Georgia, serif);
+      font-size: calc(16px * var(--comm-zoom, 1));
+      line-height: 1.75;
       box-sizing: border-box;
-      overflow-y: auto;
     }
 
-    .note-preview-content.hidden, .note-editor-textarea.hidden {
-      display: none !important;
+    .note-preview-content.hidden {
+      display: none;
     }
 
-    /* Popovers */
     .comm-dropdown-popover {
       position: absolute;
-      top: 48px;
-      background: #1E293B !important;
-      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      top: 100%;
+      margin-top: 6px;
+      background: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 8px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
       padding: 12px;
-      z-index: 2000;
-      color: #F8FAFC !important;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      z-index: 1100;
     }
 
     .comm-dropdown-popover.hidden {
-      display: none !important;
+      display: none;
     }
 
     .popover-label {
       font-size: 11px;
       font-weight: 700;
-      color: #94A3B8 !important;
       text-transform: uppercase;
-      margin-bottom: 6px;
       letter-spacing: 0.5px;
+      color: #94A3B8;
+      margin-bottom: 6px;
     }
 
-    /* =========================================================================
-     * THÈME SÉPIA (HAUTE LISIBILITÉ AMBRÉE)
-     * ========================================================================= */
+    /* Thèmes de lecture */
     body.bg-theme-sepia {
       background-color: #F8EED7 !important;
       color: #382818 !important;
     }
-
     body.bg-theme-sepia .comm-win-titlebar {
-      background: #EFE2C6 !important;
-      border-bottom-color: #DCCBB0 !important;
+      background: #EFE4CC !important;
+      border-bottom-color: #DECDB0 !important;
     }
-
-    body.bg-theme-sepia .comm-tab-btn {
-      color: #6C4F32 !important;
-    }
-
-    body.bg-theme-sepia .comm-tab-btn:hover {
-      background: #E4D3B4 !important;
-      color: #261A0E !important;
-    }
-
-    body.bg-theme-sepia .comm-tab-btn.active {
-      background: #DCC49C !important;
-      border-color: #8C531B !important;
-      color: #8C531B !important;
-    }
-
-    body.bg-theme-sepia .comm-stream-card,
-    body.bg-theme-sepia .comm-verse-quote-banner,
-    body.bg-theme-sepia .ai-msg-bubble.assistant,
-    body.bg-theme-sepia .lex-words-flow,
-    body.bg-theme-sepia #lex-entry-detail,
-    body.bg-theme-sepia .note-toolbar,
-    body.bg-theme-sepia .note-editor-textarea,
-    body.bg-theme-sepia .note-preview-content,
-    body.bg-theme-sepia .comm-dropdown-popover {
-      background: #F3E7CF !important;
-      border-color: #E0CFAE !important;
-      color: #382818 !important;
-    }
-
-    body.bg-theme-sepia .comm-stream-body,
-    body.bg-theme-sepia .comm-stream-body p,
-    body.bg-theme-sepia .comm-verse-quote-text,
-    body.bg-theme-sepia .lex-word-orig {
-      color: #261A0E !important;
-    }
-
-    body.bg-theme-sepia .lex-source-pill {
-      background: #E8D8BA !important;
-      border-color: #D4BE96 !important;
-      color: #5C4328 !important;
-    }
-
-    body.bg-theme-sepia .lex-source-pill.active {
-      background: #7A3E1D !important;
-      border-color: #7A3E1D !important;
-      color: #FFFFFF !important;
-    }
-
-    /* =========================================================================
-     * THÈME BLANC (HAUTE LISIBILITÉ CLAIRE)
-     * ========================================================================= */
     body.bg-theme-white {
       background-color: #FFFFFF !important;
       color: #0F172A !important;
     }
-
     body.bg-theme-white .comm-win-titlebar {
       background: #F8FAFC !important;
       border-bottom-color: #E2E8F0 !important;
-    }
-
-    body.bg-theme-white .comm-tab-btn {
-      color: #64748B !important;
-    }
-
-    body.bg-theme-white .comm-tab-btn:hover {
-      background: #E2E8F0 !important;
-      color: #0F172A !important;
-    }
-
-    body.bg-theme-white .comm-tab-btn.active {
-      background: #E0F2FE !important;
-      border-color: #0284C7 !important;
-      color: #0284C7 !important;
-    }
-
-    body.bg-theme-white .comm-stream-card,
-    body.bg-theme-white .comm-verse-quote-banner,
-    body.bg-theme-white .ai-msg-bubble.assistant,
-    body.bg-theme-white .lex-words-flow,
-    body.bg-theme-white #lex-entry-detail,
-    body.bg-theme-white .note-toolbar,
-    body.bg-theme-white .note-editor-textarea,
-    body.bg-theme-white .note-preview-content,
-    body.bg-theme-white .comm-dropdown-popover {
-      background: #F8FAFC !important;
-      border-color: #E2E8F0 !important;
-      color: #0F172A !important;
-    }
-
-    body.bg-theme-white .comm-stream-body,
-    body.bg-theme-white .comm-stream-body p,
-    body.bg-theme-white .comm-verse-quote-text,
-    body.bg-theme-white .lex-word-orig {
-      color: #0F172A !important;
-    }
-
-    body.bg-theme-white .lex-source-pill {
-      background: #F1F5F9 !important;
-      border-color: #CBD5E1 !important;
-      color: #475569 !important;
-    }
-
-    body.bg-theme-white .lex-source-pill.active {
-      background: #0284C7 !important;
-      border-color: #0284C7 !important;
-      color: #FFFFFF !important;
     }
   </style>
 </head>
@@ -965,22 +1391,26 @@
 
   <!-- BARRE DE TITRE & CONTRÔLES SUPÉRIEURS -->
   <header class="comm-win-titlebar" id="comm-win-titlebar">
-    <!-- GAUCHE : Onglets d'Étude Déportés -->
+    <!-- GAUCHE : Onglets d'Étude Déportés (Fidèle réplique du volet droit) -->
     <div class="comm-win-tabs-group">
-      <button type="button" class="comm-tab-btn active" data-tab="commentaries">
+      <button type="button" class="comm-tab-btn active" data-tab="overview" title="Aperçu & Guide 360° du passage">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+        <span>Aperçu</span>
+      </button>
+      <button type="button" class="comm-tab-btn" data-tab="commentaries" title="Commentaires exégétiques">
         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         <span>Commentaires</span>
       </button>
-      <button type="button" class="comm-tab-btn" data-tab="ai">
+      <button type="button" class="comm-tab-btn" data-tab="ai" title="Assistant IA">
         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
         <span>Assistant IA</span>
       </button>
-      <button type="button" class="comm-tab-btn" data-tab="lexicon">
+      <button type="button" class="comm-tab-btn" data-tab="lexicon" title="Lexique & Dictionnaires Strong">
         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
         <span>Lexique</span>
       </button>
-      <button type="button" class="comm-tab-btn" data-tab="notes">
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      <button type="button" class="comm-tab-btn" data-tab="notes" title="Notes d'étude">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
         <span>Notes</span>
       </button>
     </div>
@@ -998,25 +1428,8 @@
       </div>
     </div>
 
-    <!-- DROITE : Filtres, Affichage & Contrôles Fenêtre -->
+    <!-- DROITE : Options d'Affichage -->
     <div class="comm-win-actions-group">
-      <!-- Sélecteur d'ouvrages -->
-      <div style="position: relative;" id="comm-author-filter-wrapper">
-        <button type="button" class="comm-win-tool-btn" id="btn-author-filter" title="Changer d'ouvrage de commentaire">
-          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-          <span id="lbl-active-author">Commentaires</span>
-          <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-
-        <div class="comm-dropdown-popover hidden" id="author-filter-popover" style="right: 0; width: 280px;">
-          <div class="popover-label">Sélectionner un commentaire :</div>
-          <div id="author-filter-list" style="display: flex; flex-direction: column; gap: 4px; max-height: 260px; overflow-y: auto;">
-            <!-- Rempli dynamiquement -->
-          </div>
-        </div>
-      </div>
-
-      <!-- Options d'Affichage (Zoom & Fond) -->
       <div style="position: relative;">
         <button type="button" class="comm-win-tool-btn" id="btn-comm-display" title="Personnaliser la lecture">
           <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -1046,59 +1459,235 @@
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Contrôles Fenêtre (Réduire, Maximiser, Fermer) -->
-      <div class="comm-win-controls">
-        <button type="button" class="comm-win-control-btn" id="btn-win-min" title="Réduire">
-          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        </button>
-        <button type="button" class="comm-win-control-btn" id="btn-win-max" title="Agrandir / Plein écran">
-          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
-        </button>
-        <button type="button" class="comm-win-control-btn" id="btn-win-close" title="Fermer la fenêtre">
-          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
+    <!-- CONTRÔLES FENÊTRE (Toujours ancrés à droite, 100% visibles et non compressibles) -->
+    <div class="comm-win-controls">
+      <button type="button" class="comm-win-control-btn" id="btn-win-min" title="Réduire">
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <button type="button" class="comm-win-control-btn" id="btn-win-max" title="Agrandir / Plein écran">
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
+      </button>
+      <button type="button" class="comm-win-control-btn btn-win-close" id="btn-win-close" title="Fermer la fenêtre">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
   </header>
 
-  <!-- CONTENU PRINCIPAL DES 4 ONGLETS -->
+  <!-- CONTENU PRINCIPAL DES 5 ONGLETS -->
   <main class="comm-tab-panels-wrap">
 
-    <!-- ONGLET 1 : COMMENTAIRES EXÉGÉTIQUES -->
-    <section class="comm-tab-panel active" id="tab-panel-commentaries">
-      <div class="comm-stream-inner" id="comm-stream-container">
-        <!-- Skeleton Loader Animé Instantané (Zéro écran noir) -->
-        <div class="comm-skeleton-wrap" id="comm-initial-skeleton">
-          <div class="comm-skeleton-header">
-            <div class="comm-skeleton-spinner-box">
-              <div class="comm-loader-orb"></div>
-              <div>
-                <div style="font-size: 13.5px; font-weight: 700; color: #38BDF8; letter-spacing: 0.2px;">Chargement des commentaires exégétiques...</div>
-                <div style="font-size: 11.5px; color: #94A3B8; margin-top: 2px;" id="comm-skeleton-sublabel">Synchronisation du texte en cours</div>
+    <!-- ONGLET 0 : APERÇU 360° DU PASSAGE -->
+    <section class="comm-tab-panel active" id="tab-panel-overview">
+      <div class="overview-panel-header">
+        <div class="overview-header-top-row">
+          <div class="overview-passage-info">
+            <div class="overview-ref-badge-wrap">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+              <span class="overview-passage-ref" id="overview-passage-ref">Genèse 1:1</span>
+            </div>
+            <div class="overview-pericope-title" id="overview-pericope-title">La création du monde</div>
+          </div>
+
+          <div class="overview-header-controls">
+            <button class="overview-nav-btn" id="btn-overview-prev-v" title="Verset précédent">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <button class="overview-nav-btn" id="btn-overview-next-v" title="Verset suivant">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+            <button class="overview-sync-btn active" id="btn-overview-toggle-sync" title="Synchronisation active : suit le texte biblique">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              <span id="lbl-overview-sync">Lié</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Barre de compteurs rapides (Chips) -->
+        <div class="overview-chips-bar" id="overview-chips-bar"></div>
+      </div>
+
+      <!-- Corps défilant avec les cartes accordéons 360° -->
+      <div class="overview-scrollable-body" id="overview-cards-container">
+        <div class="overview-loading-skeleton">
+          <div class="skeleton-chip"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ONGLET 1 : COMMENTAIRES EXÉGÉTIQUES (RÉPLIQUE CONFORME DU VOLET DROIT) -->
+    <section class="comm-tab-panel" id="tab-panel-commentaries">
+      <div class="comm-panel-header">
+        <!-- Rangée 1 : Navigation Passage & Actions Générales -->
+        <div class="comm-header-top-row">
+          <div class="comm-nav-passage-group">
+            <button class="comm-nav-arrow-btn" id="btn-comm-prev-verse" title="Verset précédent">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            
+            <span class="selected-verse-badge comm-clickable-ref" id="comm-selected-verse" title="Cliquer pour choisir manuellement un passage (Ex: Jean 3:16)">
+              <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.8"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/></svg>
+              <span id="comm-selected-verse-text">Genèse 1:1</span>
+            </span>
+
+            <button class="comm-nav-arrow-btn" id="btn-comm-next-verse" title="Verset suivant">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+
+            <button class="comm-sync-btn active" id="btn-toggle-comm-sync" title="Synchronisation active : le commentaire suit le texte biblique (Cliquer pour délier)">
+              <svg class="sync-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+              <span id="comm-sync-label">Lié</span>
+            </button>
+          </div>
+          
+          <div class="comm-header-actions-right">
+            <div class="comm-font-size-ctrl" title="Ajuster la taille de lecture du commentaire">
+              <button class="comm-font-btn" id="btn-comm-font-dec" title="Diminuer la police">A-</button>
+              <button class="comm-font-btn" id="btn-comm-font-inc" title="Agrandir la police">A+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rangée 2 : Sélecteur d'ouvrage & Synthèse IA -->
+        <div class="comm-header-bottom-row">
+          <div class="comm-source-selector-box">
+            <button class="comm-source-btn" id="btn-select-comm-source" title="Changer d'ouvrage de commentaire">
+              <span class="comm-source-btn-icon">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              </span>
+              <span class="comm-source-btn-label" id="lbl-active-comm-source">Sélectionner un commentaire</span>
+              <span class="comm-source-count-badge" id="lbl-comm-source-count">0</span>
+              <span class="comm-source-arrow">▾</span>
+            </button>
+
+            <!-- Popover Riche de Sélection de Source avec Recherche & Badges -->
+            <div class="comm-sources-popover hidden" id="comm-sources-popover">
+              <div class="comm-popover-header">
+                <span class="comm-popover-title">Commentaires pour ce verset (<span id="comm-popover-count">0</span>)</span>
+              </div>
+              <div class="comm-popover-search-wrap">
+                <input type="text" id="comm-sources-filter-input" placeholder="Filtrer un auteur ou commentaire..." class="comm-sources-filter-input">
+              </div>
+              <div class="comm-sources-list" id="comm-sources-list"></div>
+            </div>
+          </div>
+
+          <div class="comm-ai-actions-group">
+            <button class="comm-translate-btn hidden" id="btn-translate-comm" title="Traduire fidèlement cet article en français par IA">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              <span>Traduire</span>
+            </button>
+
+            <button class="comm-ai-synth-btn" id="btn-open-comm-synth" title="Générer une synthèse exégétique comparative par IA de tous les commentaires">
+              <svg class="synth-sparkle-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1-1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>
+              <span>Synthèse IA</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Popover de saisie de passage indépendant pour le commentaire -->
+      <div class="comm-ref-picker-popover hidden" id="comm-ref-picker-popover">
+        <div class="comm-ref-picker-title" style="font-size: 12px; font-weight: 600; color: #94A3B8; margin-bottom: 6px;">Consulter un autre passage en commentaire :</div>
+        <div style="display: flex; gap: 6px;">
+          <input type="text" id="comm-ref-input" placeholder="Ex: Jean 3:16, Rom 8:28..." style="flex: 1; height: 28px; font-size: 12px; padding: 0 8px; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; background: #0F172A; color: #FFF; outline: none;">
+          <button id="btn-comm-ref-submit" class="btn-primary" style="height: 28px; padding: 0 10px; font-size: 11px; background: #0284C7; border: none; border-radius: 4px; color: #FFF; font-weight: 600; cursor: pointer;">Consulter</button>
+        </div>
+      </div>
+
+      <!-- Panneau de Synthèse Exégétique Multi-Commentaires IA -->
+      <div class="comm-synthesis-panel hidden" id="comm-synthesis-panel">
+        <div class="synthesis-panel-header">
+          <div class="synthesis-title-row">
+            <span class="synthesis-sparkle-badge" style="display: inline-flex; align-items: center; gap: 4px;">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+              <span>Synthèse IA</span>
+            </span>
+            <span class="synthesis-passage-badge" id="synth-passage-badge">Genèse 1:1</span>
+            <button class="synthesis-btn-close" id="btn-close-comm-synth" title="Fermer le panneau de synthèse et revenir au commentaire">✕</button>
+          </div>
+        </div>
+
+        <div class="synthesis-panel-body">
+          <div class="synthesis-range-controls">
+            <div class="range-inputs-box">
+              <span class="range-lbl">Plage :</span>
+              <span class="range-book-lbl" id="synth-range-book">Genèse 1:</span>
+              <div class="range-numbers-group">
+                <input type="number" id="synth-verse-start" min="1" max="176" value="1" class="synth-num-input" title="Verset de début">
+                <span>à</span>
+                <input type="number" id="synth-verse-end" min="1" max="176" value="1" class="synth-num-input" title="Verset de fin">
               </div>
             </div>
-            <div class="comm-skeleton-shimmer" style="width: 80px; height: 24px; border-radius: 6px;"></div>
+            <div class="range-badge-info" id="synth-range-info">1 verset</div>
           </div>
 
-          <div class="comm-skeleton-card">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-              <div class="comm-skeleton-shimmer" style="width: 190px; height: 16px;"></div>
-              <div class="comm-skeleton-shimmer" style="width: 70px; height: 14px;"></div>
-            </div>
-            <div class="comm-skeleton-shimmer comm-skeleton-line" style="width: 92%;"></div>
-            <div class="comm-skeleton-shimmer comm-skeleton-line" style="width: 98%;"></div>
-            <div class="comm-skeleton-shimmer comm-skeleton-line" style="width: 78%;"></div>
+          <div class="synth-ceiling-warning hidden" id="synth-ceiling-warning" style="display: flex; align-items: center; gap: 6px;">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F59E0B" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <span>Plafond maximal (<span id="synth-ceiling-limit-num">5</span> versets max). La sélection a été ajustée.</span>
           </div>
 
-          <div class="comm-skeleton-card" style="opacity: 0.85;">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-              <div class="comm-skeleton-shimmer" style="width: 220px; height: 16px;"></div>
-              <div class="comm-skeleton-shimmer" style="width: 80px; height: 14px;"></div>
+          <div class="synthesis-quick-options">
+            <span class="synth-sources-hint" id="synth-sources-available-hint" style="font-size: 11px; color: #94A3B8;">Analyse complète de tous les commentaires indexés</span>
+          </div>
+
+          <button class="synth-launch-btn" id="btn-launch-synth" style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 8px;">
+            <span id="btn-launch-synth-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+            </span>
+            <span id="btn-launch-synth-text">Lancer la synthèse</span>
+          </button>
+
+          <div class="synth-loading-box hidden" id="synth-loading-box" style="margin-top: 10px; display: flex; align-items: center; gap: 8px; color: #38BDF8;">
+            <div class="comm-loader-orb" style="width: 18px; height: 18px; border-width: 2px;"></div>
+            <div class="synth-step-status" id="synth-step-status" style="font-size: 12px;">Extraction de tous les commentaires...</div>
+          </div>
+
+          <div class="synth-result-container hidden" id="synth-result-container" style="margin-top: 12px;">
+            <div class="synth-meta-bar">
+              <div class="synth-meta-info" style="display: flex; align-items: center; gap: 6px;">
+                <span class="synth-model-tag" id="synth-model-tag">Gemini 3.7 Flash</span>
+                <span class="synth-sources-count-tag" id="synth-sources-tag" style="font-size: 11px; color: #94A3B8;">Sources</span>
+              </div>
+              <div class="synth-actions-group" style="display: flex; gap: 4px;">
+                <button class="synth-action-btn" id="btn-edit-synth-range" title="Modifier la plage de versets">Plage</button>
+                <button class="synth-action-btn" id="btn-copy-synth" title="Copier la synthèse dans le presse-papier">Copier</button>
+                <button class="synth-action-btn" id="btn-export-synth-note" title="Enregistrer dans les notes d'étude">Vers note</button>
+              </div>
             </div>
-            <div class="comm-skeleton-shimmer comm-skeleton-line" style="width: 95%;"></div>
-            <div class="comm-skeleton-shimmer comm-skeleton-line" style="width: 88%;"></div>
-            <div class="comm-skeleton-shimmer comm-skeleton-line" style="width: 60%;"></div>
+            <div class="synth-markdown-content" id="synth-markdown-content"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Corps défilant du Commentaire Unique Exégétique -->
+      <div class="commentary-single-view" id="commentary-single-view">
+        <div class="comm-stream-inner" id="comm-stream-container">
+          <!-- Skeleton Loader initial -->
+          <div class="comm-skeleton-wrap" id="comm-initial-skeleton">
+            <div class="comm-skeleton-header">
+              <div class="comm-skeleton-spinner-box">
+                <div class="comm-loader-orb"></div>
+                <div>
+                  <div style="font-size: 13.5px; font-weight: 700; color: #38BDF8; letter-spacing: 0.2px;">Chargement des commentaires exégétiques...</div>
+                  <div style="font-size: 11.5px; color: #94A3B8; margin-top: 2px;" id="comm-skeleton-sublabel">Synchronisation du texte en cours</div>
+                </div>
+              </div>
+              <div class="comm-skeleton-shimmer" style="width: 80px; height: 24px; border-radius: 6px;"></div>
+            </div>
+
+            <div class="comm-skeleton-card">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div class="comm-skeleton-shimmer" style="width: 190px; height: 16px;"></div>
+                <div class="comm-skeleton-shimmer" style="width: 70px; height: 14px;"></div>
+              </div>
+              <div class="comm-skeleton-shimmer comm-skeleton-line" style="width: 92%;"></div>
+              <div class="comm-skeleton-shimmer comm-skeleton-line" style="width: 98%;"></div>
+              <div class="comm-skeleton-shimmer comm-skeleton-line" style="width: 78%;"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1145,10 +1734,8 @@
           <div style="color: var(--text-secondary); font-size: 13px;">Chargement des termes originaux...</div>
         </div>
         
-        <!-- Sélecteur de dictionnaire unique (Onglets de sources) -->
         <div class="lex-source-tabs" id="lex-dict-tabs" style="display: none;"></div>
 
-        <!-- Contenu du dictionnaire unique sélectionné -->
         <div class="comm-stream-card" id="lex-entry-detail" style="margin-top: 0;">
           <div style="color: var(--text-secondary); font-size: 13px; text-align: center; padding: 20px;">
             Cliquez sur un mot ci-dessus pour afficher sa définition lexicale, sa racine et ses occurrences.
@@ -1170,7 +1757,6 @@
           </button>
         </div>
 
-        <!-- Barre d'outils de formatage Markdown (100% SVG, zéro émoji) -->
         <div class="note-toolbar">
           <div class="note-tools-group">
             <button type="button" class="note-tool-btn" id="btn-format-bold" title="Gras (**texte**)">
@@ -1211,10 +1797,7 @@
           </div>
         </div>
 
-        <!-- Zone d'Édition Markdown -->
         <textarea class="note-editor-textarea" id="note-editor-textarea" placeholder="Rédigez vos réflexions, analyses ou prières sur ce passage... (Format Markdown supporté)"></textarea>
-
-        <!-- Zone de Rendu Formaté Direct -->
         <div class="note-preview-content hidden" id="note-preview-content"></div>
       </div>
     </section>
@@ -1242,6 +1825,7 @@
     };
   </script>
   <script src="js/api.js"></script>
+  <script src="js/passage_overview_drawer.js"></script>
   <script src="js/selection_context_menu.js"></script>
   <script src="js/commentary_window.js"></script>
 </body>

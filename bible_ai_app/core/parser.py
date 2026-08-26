@@ -8,18 +8,20 @@ def extract_text_from_docx(file_path):
     return "\n".join([para.text for para in doc.paragraphs if para.text.strip()])
 
 def clean_logos_fields(text):
-    """Supprime les balises internes de formatage Logos comme {{field-on:Bible}}"""
+    """Supprime les balises internes de formatage Logos comme {{field-on:Bible}} ou {{field-off:Bible}}"""
     text = re.sub(r'\{\{field-on:.*?\}\}', '', text)
     text = re.sub(r'\{\{field-off:.*?\}\}', '', text)
+    # Nettoyage des balises de liens internes résiduelles
+    text = re.sub(r'<Bible:\s*([^>]+)>', r'\1', text)
     return text.strip()
 
 def chunk_by_logos_tags(text, doc_type, doc_name):
     """
     Découpe le texte en blocs basés sur les balises Logos.
-    Gère [[@Bible:Ref]] et [[@Headword:Mot]].
+    Gère [[@Bible:Ref]], [[@Headword:Mot]], [[@Topic:Sujet]], [[@Article:Titre]] et [[@Dictionary:Terme]].
     """
-    # Pattern pour capter n'importe quelle balise Logos avec son type et sa valeur
-    pattern = r'\[\[@(Bible|Headword):\s*(.*?)\s*\]\]'
+    # Pattern étendu pour capter n'importe quelle balise Logos
+    pattern = r'\[\[@(Bible|Headword|Topic|Article|Dictionary):\s*(.*?)\s*\]\]'
     
     chunks = []
     matches = list(re.finditer(pattern, text))

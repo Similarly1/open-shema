@@ -4015,6 +4015,14 @@ const BibleReader = {
 
     document.getElementById('btn-open-commentary-window')?.addEventListener('click', async () => {
       try {
+        // Masquer automatiquement le volet droit s'il est ouvert
+        const drawer = document.getElementById('right-drawer');
+        if (drawer && !drawer.classList.contains('collapsed')) {
+          drawer.classList.add('collapsed');
+          document.getElementById('btn-toggle-right-drawer')?.classList.remove('active');
+          if (typeof App !== 'undefined' && App.checkAutoSidebarCollapse) App.checkAutoSidebarCollapse();
+        }
+
         const res = await API.openCommentaryWindow(this.currentBook, this.currentChapter, this.selectedVerse || 1);
         if (res && res.success) {
           if (res.on_second_screen) {

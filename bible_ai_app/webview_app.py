@@ -3075,8 +3075,8 @@ class BibleAppApi:
             _COMMENTARY_RESTORE_BOUNDS = (wx + 40, wy + 40, ww - 80, wh - 80)
         else:
             main_wx, main_wy, main_ww, main_wh = get_work_area()
-            ww = min(1220, max(1020, int(main_ww * 0.82)))
-            wh = min(920, max(740, int(main_wh * 0.88)))
+            ww = min(1480, max(1180, int(main_ww * 0.88)))
+            wh = min(980, max(800, int(main_wh * 0.90)))
             wx = main_wx + max(0, (main_ww - ww) // 2)
             wy = main_wy + max(0, (main_wh - wh) // 2)
             on_second_screen = False
@@ -3107,7 +3107,7 @@ class BibleAppApi:
                 y=wy,
                 width=ww,
                 height=wh,
-                min_size=(780, 520),
+                min_size=(860, 560),
                 frameless=True,
                 easy_drag=False,
                 background_color="#0F172A"
@@ -3168,7 +3168,7 @@ class BibleAppApi:
         if not user32.GetMonitorInfoW(hmon, ctypes.byref(mi)):
             return {"success": False}
 
-        rc = mi.rcMonitor
+        rc = mi.rcWork if (mi.rcWork.right - mi.rcWork.left) > 0 else mi.rcMonitor
 
         if _COMMENTARY_IS_MAXIMIZED:
             _COMMENTARY_IS_MAXIMIZED = False
@@ -3181,7 +3181,7 @@ class BibleAppApi:
                 rh = int(mh * 0.85)
                 rx = rc.left + int((mw - rw) / 2)
                 ry = rc.top + int((mh - rh) / 2)
-            user32.SetWindowPos(hwnd, 0, rx, ry, rw, rh, 0x0040)
+            user32.SetWindowPos(hwnd, 0, rx, ry, rw, rh, 0x0040 | 0x0020)
         else:
             try:
                 curr_rect = RECT()
@@ -3196,16 +3196,28 @@ class BibleAppApi:
             _COMMENTARY_IS_MAXIMIZED = True
             mw = rc.right - rc.left
             mh = rc.bottom - rc.top
-            user32.SetWindowPos(hwnd, 0, rc.left, rc.top, mw, mh, 0x0040)
+            user32.SetWindowPos(hwnd, 0, rc.left, rc.top, mw, mh, 0x0040 | 0x0020)
 
         try:
             _COMMENTARY_WINDOW.evaluate_js(
-                f"window.CommentaryWindow && window.CommentaryWindow.updateMaximizedState({str(_COMMENTARY_IS_MAXIMIZED).lower()})"
+                f"window.CommentaryWindow && window.CommentaryWindow.updateMaximizedState && window.CommentaryWindow.updateMaximizedState({str(_COMMENTARY_IS_MAXIMIZED).lower()})"
             )
         except Exception:
             pass
 
         return {"success": True, "is_maximized": _COMMENTARY_IS_MAXIMIZED}
+
+    def toggle_secondary_window_maximize(self) -> Dict[str, Any]:
+        """Alias pour maximize_commentary_window."""
+        return self.maximize_commentary_window()
+
+    def minimize_secondary_window(self) -> Dict[str, Any]:
+        """Alias pour minimize_commentary_window."""
+        return self.minimize_commentary_window()
+
+    def close_secondary_window(self) -> Dict[str, Any]:
+        """Alias pour close_commentary_window."""
+        return self.close_commentary_window()
 
     def get_current_passage(self) -> Dict[str, Any]:
         """Retourne le dernier passage et verset actif du lecteur."""
