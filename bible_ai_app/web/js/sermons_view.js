@@ -494,15 +494,21 @@ const SermonsView = {
     if (!newTitle || newTitle === sermon.title) return;
 
     try {
+      // Mise à jour optimiste
+      sermon.title = newTitle;
+      const found = this.sermons.find(s => s.id === sermon.id);
+      if (found) found.title = newTitle;
+      if (this.currentSermon?.id === sermon.id) {
+        this.currentSermon.title = newTitle;
+        if (this.titleInput) this.titleInput.value = newTitle;
+        this.updateHeaderSummary(this.currentSermon);
+      }
+      this.renderHubCards();
+
       const fullSermon = await API.getSermon(sermon.id) || sermon;
       fullSermon.title = newTitle;
       const res = await API.saveSermon(fullSermon);
       if (res && res.success) {
-        if (this.currentSermon?.id === sermon.id) {
-          this.currentSermon.title = newTitle;
-          if (this.titleInput) this.titleInput.value = newTitle;
-          this.updateHeaderSummary(this.currentSermon);
-        }
         await this.loadSermons();
         this.renderHubCards();
         if (typeof App !== 'undefined' && App.showToast) {
@@ -517,17 +523,29 @@ const SermonsView = {
   async toggleSermonStatus(sermon, newStatus) {
     if (!sermon) return;
     try {
+      // 1. Mise à jour immédiate et optimiste en mémoire
+      sermon.status = newStatus;
+      const found = this.sermons.find(s => s.id === sermon.id);
+      if (found) found.status = newStatus;
+      if (this.currentSermon && this.currentSermon.id === sermon.id) {
+        this.currentSermon.status = newStatus;
+      }
+      this.renderHubCards();
+
+      // 2. Sauvegarde sur disque
       const fullSermon = await API.getSermon(sermon.id) || sermon;
       fullSermon.status = newStatus;
       const res = await API.saveSermon(fullSermon);
       if (res && res.success) {
-        if (this.currentSermon?.id === sermon.id) {
-          this.currentSermon.status = newStatus;
+        if (res.sermon) {
+          const idx = this.sermons.findIndex(s => s.id === sermon.id);
+          if (idx !== -1) this.sermons[idx] = { ...this.sermons[idx], ...res.sermon };
+          if (this.currentSermon?.id === sermon.id) this.currentSermon = res.sermon;
         }
         await this.loadSermons();
         this.renderHubCards();
         if (typeof App !== 'undefined' && App.showToast) {
-          App.showToast(newStatus === 'ready' ? "Prédication marquée comme prête !" : "Prédication remise en brouillon.");
+          App.showToast(newStatus === 'ready' ? "Prédication marquée comme prête pour la chaire !" : "Prédication remise en brouillon.");
         }
       }
     } catch (e) {
@@ -539,13 +557,18 @@ const SermonsView = {
     if (!sermon) return;
     try {
       const fullSermon = await API.getSermon(sermon.id) || sermon;
+      const newId = `sermon-${Date.now()}`;
       const duplicate = {
         ...fullSermon,
-        id: `sermon-${Date.now()}`,
+        id: newId,
         title: `${fullSermon.title || 'Prédication'} (Copie)`,
         date_planned: new Date().toISOString().split('T')[0],
         status: 'draft'
       };
+      // Supprimer explicitement les références du fichier d'origine
+      delete duplicate.filename;
+      delete duplicate.file_path;
+
       const res = await API.saveSermon(duplicate);
       if (res && res.success) {
         await this.loadSermons();

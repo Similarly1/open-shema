@@ -1,11 +1,11 @@
 ---
-id: sermon-1787685598
-title: PLACER NOTRE CONFIANCE EN LA VÉRITÉ FONDAMENTALE
+id: sermon-1787720803112
+title: PLACER NOTRE CONFIANCE EN LA VÉRITÉ FONDAMENTALE (Copie)
 type: sermon
 status: draft
 church: ''
 event_occasion: Culte dominical
-date_planned: '2026-08-25'
+date_planned: '2026-08-26'
 series:
   title: ''
 passage:
@@ -22,7 +22,7 @@ timing:
   words_per_minute: 135
 delivery_history: []
 created_at: '2026-08-25T21:19:58.557671'
-updated_at: '2026-08-26T06:56:31.748044'
+updated_at: '2026-08-26T07:06:43.115779'
 ---
 
 ## Introduction
