@@ -1069,9 +1069,24 @@ Synthèse et application concrète...`
       });
 
       const editor = card.querySelector('.sermon-section-editor');
+      
+      const clearIfDefaultPlaceholder = () => {
+        if (this.isDefaultPlaceholder(editor.innerHTML)) {
+          editor.innerHTML = '<p><br></p>';
+          sec.contentHtml = editor.innerHTML;
+          this.updateMetrics();
+          this.debouncedAutoSave();
+        }
+      };
+
+      editor?.addEventListener('pointerdown', () => {
+        clearIfDefaultPlaceholder();
+      });
+
       editor?.addEventListener('focus', () => {
         this.activeSectionId = sec.id;
         this.highlightOutlineItem(sec.id);
+        clearIfDefaultPlaceholder();
       });
 
       editor?.addEventListener('input', (e) => {
@@ -1122,6 +1137,34 @@ Synthèse et application concrète...`
     });
   },
 
+  isDefaultPlaceholder(htmlOrText) {
+    if (!htmlOrText) return false;
+    const clean = htmlOrText.replace(/<[^>]+>/g, '').trim();
+    if (!clean) return false;
+    const placeholders = [
+      'Accroche, mise en contexte et tension contemporaine...',
+      'Accroche et tension contemporaine...',
+      '« Insérez le texte biblique ici... »',
+      '« Insérez le texte biblique ici »',
+      'Insérez le texte biblique ici...',
+      'Insérez le texte biblique ici',
+      'Explication du texte et fondement doctrinal...',
+      'Explication textuelle et fondement doctrinal...',
+      'Explication du texte...',
+      'Développement théologique et illustration concrète...',
+      'Développement théologique et résonance...',
+      'Développement et vérité théologique...',
+      'Synthèse de la pensée maîtresse et application pour la semaine...',
+      'Synthèse et application concrète...',
+      'Contenu de cette partie...'
+    ];
+    return placeholders.some(p => {
+      const pClean = p.replace(/[«»….]/g, '').trim().toLowerCase();
+      const cClean = clean.replace(/[«»….]/g, '').trim().toLowerCase();
+      return pClean === cClean || (cClean.length > 6 && (pClean.includes(cClean) || cClean.includes(pClean)));
+    });
+  },
+
   renderOutline() {
     if (!this.outlineList) return;
 
@@ -1157,13 +1200,27 @@ Synthèse et application concrète...`
     this.highlightOutlineItem(secId);
 
     const card = document.getElementById(`section-card-${secId}`);
-    if (card) {
+    const scrollPane = document.getElementById('sermon-blocks-scroll-pane');
+    if (card && scrollPane) {
       const sec = this.sections.find(s => s.id === secId);
       if (sec && sec.isCollapsed) {
         this.toggleSectionCollapse(secId, false);
       }
-      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      card.querySelector('.sermon-section-editor')?.focus();
+      
+      // Défilement doux précis
+      const paneRect = scrollPane.getBoundingClientRect();
+      const cardRect = card.getBoundingClientRect();
+      const targetScrollTop = scrollPane.scrollTop + (cardRect.top - paneRect.top) - 18;
+
+      scrollPane.scrollTo({
+        top: Math.max(0, targetScrollTop),
+        behavior: 'smooth'
+      });
+
+      const editor = card.querySelector('.sermon-section-editor');
+      if (editor) {
+        editor.focus({ preventScroll: true });
+      }
     }
   },
 

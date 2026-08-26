@@ -25383,3 +25383,49 @@ body.reading-bg-dark .comm-dropdown-popover {
   gap: 5px;
   border-radius: 6px;
 }
+/* =========================================================================
+ * CENTRAGE PARFAIT HORIZONTAL & VERTICAL DE LA MODALE D'ILLUSTRATION
+ * & DÉFILEMENT DOUX DU STUDIO
+ * ========================================================================= */
+
+.sermon-blocks-scroll-pane {
+  scroll-behavior: smooth !important;
+}
+
+#illustration-detail-modal {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 99999 !important;
+  background: rgba(0, 0, 0, 0.68) !important;
+  backdrop-filter: blur(8px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 24px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+}
+
+#illustration-detail-modal.hidden {
+  display: none !important;
+}
+
+#illustration-detail-modal .illustration-modal-card {
+  max-width: 860px !important;
+  width: 100% !important;
+  max-height: 88vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  margin: auto !important;
+  background: var(--bg-card, #18181b) !important;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.14)) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75) !important;
+  overflow: hidden !important;
+  transform: none !important;
+}
