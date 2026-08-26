@@ -221,11 +221,13 @@ function initInteractiveSimulators() {
           <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-cyan); margin-bottom: 12px;">
             ${info.parse} • Vulgate : ${info.vulgate}
           </div>
-          <div style="background: var(--bg-card); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle); margin-bottom: 10px; font-size: 0.85rem; line-height: 1.5;">
-            <strong style="color: var(--accent-gold);">📖 ${info.bailly}</strong>
+          <div style="background: var(--bg-card); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle); margin-bottom: 10px; font-size: 0.85rem; line-height: 1.5; display: flex; align-items: flex-start; gap: 8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="2" style="margin-top: 2px; flex-shrink: 0;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+            <strong style="color: var(--accent-gold);">${info.bailly}</strong>
           </div>
-          <div style="background: var(--bg-card); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 0.825rem; color: var(--text-secondary); line-height: 1.5;">
-            🏛️ <em>${info.calmet}</em>
+          <div style="background: var(--bg-card); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 0.825rem; color: var(--text-secondary); line-height: 1.5; display: flex; align-items: flex-start; gap: 8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top: 2px; flex-shrink: 0; opacity: 0.8;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            <em>${info.calmet}</em>
           </div>
         </div>
       `;
@@ -266,16 +268,17 @@ function initInteractiveSimulators() {
           <span class="badge badge-glow-cyan" style="font-size: 0.7rem;">Inclus dans le System Prompt</span>
         </div>
         <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px;">
-          <strong>🎯 Objectif utilisateur :</strong> ${roleText}
+          <strong>Objectif utilisateur :</strong> ${roleText}
         </p>
         <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px;">
-          <strong>🧠 Posture de l'assistant :</strong> ${postureDesc}
+          <strong>Posture de l'assistant :</strong> ${postureDesc}
         </p>
         <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px;">
-          <strong>🔤 Niveau langues originales :</strong> ${greekDesc}
+          <strong>Niveau langues originales :</strong> ${greekDesc}
         </p>
-        <div style="margin-top: 12px; padding: 10px; background: rgba(56, 189, 248, 0.08); border-radius: 6px; border: 1px dashed rgba(56, 189, 248, 0.3); font-size: 0.8rem; color: var(--accent-cyan);">
-          💡 <em>L'IA adaptera chacune de ses réponses, ses citations de commentaires et ses propositions de plan à ce passeport unique.</em>
+        <div style="margin-top: 12px; padding: 10px; background: rgba(56, 189, 248, 0.08); border-radius: 6px; border: 1px dashed rgba(56, 189, 248, 0.3); font-size: 0.8rem; color: var(--accent-cyan); display: flex; align-items: center; gap: 8px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <em>L'IA adaptera chacune de ses réponses, ses citations et ses propositions à ce passeport unique.</em>
         </div>
       </div>
     `;
@@ -510,31 +513,31 @@ function initHeroMockupInteractions() {
   const wordDetails = {
     'logos': {
       strong: 'G3056',
-      title: '🔤 Lemme : λόγος, ου (ὁ)',
+      title: 'Lemme : λόγος, ου (ὁ)',
       bailly: 'Dictionnaire Bailly : 1. Parole proférée, discours ; 2. Raison, principe d\'ordre ; 3. Dans l\'Évangile de Jean : le Verbe créateur et éternel incarné en Jésus-Christ.',
       ai: '« Jean s\'adresse simultanément à l\'esprit grec (logos comme principe rationnel du cosmos) et à la théologie juive (Dabar Yahvé, la parole vivante et créatrice). »'
     },
     'theos': {
       strong: 'G2316',
-      title: '🔤 Lemme : θεός, οῦ (ὁ)',
+      title: 'Lemme : θεός, οῦ (ὁ)',
       bailly: 'Dictionnaire Bailly : Dieu, la divinité suprême, l\'Être éternel créateur de l\'univers.',
       ai: '« En Jean 1:1c (καὶ θεὸς ἦν ὁ λόγος), l\'absence d\'article devant θεός souligne la nature divine qualitative du Verbe sans le confondre avec la personne du Père. »'
     },
     'arche': {
       strong: 'G746',
-      title: '🔤 Lemme : ἀρχή, ῆς (ἡ)',
+      title: 'Lemme : ἀρχή, ῆς (ἡ)',
       bailly: 'Dictionnaire Bailly : 1. Commencement temporel ; 2. Principe premier, origine causale ; 3. Autorité suprême.',
       ai: '« Écho direct à Béréshit (Genèse 1:1). Jean situe le Verbe au-delà de la création dans l\'éternité préexistante. »'
     },
     'zoe': {
       strong: 'G2222',
-      title: '🔤 Lemme : ζωή, ῆς (ἡ)',
+      title: 'Lemme : ζωή, ῆς (ἡ)',
       bailly: 'Dictionnaire Bailly : La vie au sens absolu, la force vitale spirituelle (distinct de bios, la simple vie biologique).',
       ai: '« Dans le corpus johannique, la Zoê désigne la vie éternelle et incréée communiquée aux croyants par le Christ. »'
     },
     'phos': {
       strong: 'G5457',
-      title: '🔤 Lemme : φῶς, φωτός (τό)',
+      title: 'Lemme : φῶς, φωτός (τό)',
       bailly: 'Dictionnaire Bailly : Lumière, clarté, illumination spirituelle qui dissipe les ténèbres.',
       ai: '« Thème majeur chez Jean : la lumière qui luit dans les ténèbres sans que les ténèbres n\'aient pu la submerger (katelaben). »'
     }
@@ -551,7 +554,10 @@ function initHeroMockupInteractions() {
         if (strongBadge) strongBadge.textContent = d.strong;
         if (drawerCardMorph) {
           drawerCardMorph.innerHTML = `
-            <div class="drawer-card-header">${d.title}</div>
+            <div class="drawer-card-header">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
+              ${d.title}
+            </div>
             <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">
               <strong>${d.bailly}</strong>
             </p>
@@ -560,7 +566,8 @@ function initHeroMockupInteractions() {
         if (drawerCardAi) {
           drawerCardAi.innerHTML = `
             <div class="drawer-card-header" style="color: var(--accent-gold);">
-              🧠 Assistant IA (Sparring-Partner)
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"></path><path d="M12 6v6l4 2"></path></svg>
+              Assistant IA (Sparring-Partner)
             </div>
             <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">
               <em>${d.ai}</em>

@@ -32,14 +32,34 @@ const CommentaryWindow = {
   currentLexiconWords: [],
   activeLexiconWordIndex: -1,
 
+  bookFrenchMap: {
+    'Gen': 'Genèse', 'Exo': 'Exode', 'Lev': 'Lévitique', 'Num': 'Nombres', 'Deu': 'Deutéronome',
+    'Jos': 'Josué', 'Jug': 'Juges', 'Rut': 'Ruth', '1Sa': '1 Samuel', '2Sa': '2 Samuel',
+    '1Ro': '1 Rois', '2Ro': '2 Rois', '1Ch': '1 Chroniques', '2Ch': '2 Chroniques',
+    'Esd': 'Esdras', 'Nee': 'Néhémie', 'Est': 'Esther', 'Job': 'Job', 'Psa': 'Psaumes',
+    'Pro': 'Proverbes', 'Ecc': 'Ecclésiaste', 'Can': 'Cantique des Cantiques', 'Esa': 'Ésaïe',
+    'Jer': 'Jérémie', 'Lam': 'Lamentations', 'Eze': 'Ézéchiel', 'Dan': 'Daniel',
+    'Ose': 'Osée', 'Joe': 'Joël', 'Amo': 'Amos', 'Abd': 'Abdias', 'Jon': 'Jonas',
+    'Mic': 'Michée', 'Nah': 'Nahum', 'Hab': 'Habacuc', 'Soz': 'Sophonie', 'Agg': 'Aggée',
+    'Zac': 'Zacharie', 'Mal': 'Malachie', 'Mat': 'Matthieu', 'Mar': 'Marc', 'Luc': 'Luc',
+    'Jea': 'Jean', 'Act': 'Actes', 'Rom': 'Romains', '1Co': '1 Corinthiens', '2Co': '2 Corinthiens',
+    'Gal': 'Galates', 'Eph': 'Éphésiens', 'Phi': 'Philippiens', 'Col': 'Colossiens',
+    '1Th': '1 Thessaloniciens', '2Th': '2 Thessaloniciens', '1Ti': '1 Timothée', '2Ti': '2 Timothée',
+    'Tit': 'Tite', 'Phm': 'Philémon', 'Heb': 'Hébreux', 'Jac': 'Jacques',
+    '1Pi': '1 Pierre', '2Pi': '2 Pierre', '1Jn': '1 Jean', '2Jn': '2 Jean', '3Jn': '3 Jean',
+    'Jud': 'Jude', 'Apo': 'Apocalypse'
+  },
+
   init() {
-    // 1. Lire les paramètres d'URL
+    // 1. Lire les paramètres d'URL synchrones (disponibles à 0ms)
     try {
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('book')) this.currentBook = urlParams.get('book');
       if (urlParams.get('chapter')) this.currentChapter = parseInt(urlParams.get('chapter'), 10) || 1;
       if (urlParams.get('verse')) this.currentVerse = parseInt(urlParams.get('verse'), 10) || 1;
     } catch (e) {}
+
+    this.currentBookFrench = this.bookFrenchMap[this.currentBook] || this.currentBook;
 
     // 2. Restaurer l'onglet actif sauvegardé
     try {
@@ -54,31 +74,27 @@ const CommentaryWindow = {
     this.restorePreferences();
     this.switchTab(this.activeTab);
 
-    // 3. Charger le passage initial
-    const startInitialLoad = async () => {
-      try {
-        const passage = await API.getCurrentPassage();
-        if (passage && passage.book) {
-          this.currentBook = passage.book;
-          this.currentBookFrench = passage.book_french || passage.book;
-          this.currentChapter = parseInt(passage.chapter, 10) || 1;
-          this.currentVerse = parseInt(passage.verse, 10) || 1;
-        }
-      } catch (err) {
-        console.debug('[CommentaryWindow] getCurrentPassage fallback:', err);
-      }
-      this.updatePassageDisplay(this.currentBookFrench, this.currentChapter, this.currentVerse);
-      this.loadChapterCommentaries(this.currentBook, this.currentChapter);
-    };
+    // Mettre à jour l'affichage immédiatement de manière synchrone (0ms)
+    this.updatePassageDisplay(this.currentBookFrench, this.currentChapter, this.currentVerse);
+    const subLabel = document.getElementById('comm-skeleton-sublabel');
+    if (subLabel) {
+      subLabel.textContent = `${this.currentBookFrench} ${this.currentChapter}:${this.currentVerse}`;
+    }
 
-    API.onReady(() => {
-      startInitialLoad();
-    });
+    // 3. Charger le passage
+    const startInitialLoad = async () => {
+      if (!this.currentChapterData) {
+        this.loadChapterCommentaries(this.currentBook, this.currentChapter);
+      }
+    };
 
     if (API.isReady) {
       startInitialLoad();
     } else {
-      setTimeout(startInitialLoad, 250);
+      API.onReady(() => {
+        startInitialLoad();
+      });
+      setTimeout(startInitialLoad, 80);
     }
   },
 
@@ -118,7 +134,7 @@ const CommentaryWindow = {
     const isNewChapter = this.currentBook !== bookCode || this.currentChapter !== ch;
 
     this.currentBook = bookCode;
-    this.currentBookFrench = bookFrench || bookCode;
+    this.currentBookFrench = bookFrench || this.bookFrenchMap[bookCode] || bookCode;
     this.currentChapter = ch;
     this.currentVerse = v;
 
@@ -139,6 +155,7 @@ const CommentaryWindow = {
       this.currentBook = bookCode;
       this.currentChapter = ch;
       this.currentVerse = v;
+      this.currentBookFrench = this.bookFrenchMap[bookCode] || this.currentBookFrench;
       this.updatePassageDisplay(this.currentBookFrench, this.currentChapter, this.currentVerse);
       this.loadChapterCommentaries(bookCode, ch);
       return;
@@ -150,7 +167,7 @@ const CommentaryWindow = {
   },
 
   updatePassageDisplay(bookName, chapter, verse) {
-    const textEl = document.getElementById('comm-win-passage-text');
+    const textEl = document.getElementById('comm-win-passage-label') || document.getElementById('comm-win-passage-text');
     if (textEl) {
       textEl.textContent = `${bookName} ${chapter}:${verse || 1}`;
     }
@@ -173,7 +190,7 @@ const CommentaryWindow = {
   receiveChapterData(data, targetVerse = 1) {
     if (!data || !data.verses) return;
     this.currentBook = data.book || this.currentBook;
-    this.currentBookFrench = data.book_french || this.currentBookFrench;
+    this.currentBookFrench = data.book_french || this.bookFrenchMap[this.currentBook] || this.currentBookFrench;
     this.currentChapter = parseInt(data.chapter, 10) || this.currentChapter;
     this.currentVerse = parseInt(targetVerse, 10) || this.currentVerse;
     this.currentChapterData = data;
@@ -183,21 +200,54 @@ const CommentaryWindow = {
     this.refreshActiveTab();
   },
 
+  renderSkeleton(bookFrench, chapterNum) {
+    return `
+      <div class="comm-skeleton-wrap comm-fade-in">
+        <div class="comm-skeleton-header">
+          <div class="comm-skeleton-spinner-box">
+            <div class="comm-loader-orb"></div>
+            <div>
+              <div style="font-size: 13.5px; font-weight: 700; color: #38BDF8; letter-spacing: 0.2px;">Chargement des commentaires exégétiques...</div>
+              <div style="font-size: 11.5px; color: #94A3B8; margin-top: 2px;">${this.escapeHtml(bookFrench)} ${chapterNum}</div>
+            </div>
+          </div>
+          <div class="comm-skeleton-shimmer" style="width: 80px; height: 24px; border-radius: 6px;"></div>
+        </div>
+
+        <div class="comm-skeleton-card">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div class="comm-skeleton-shimmer" style="width: 190px; height: 16px;"></div>
+            <div class="comm-skeleton-shimmer" style="width: 70px; height: 14px;"></div>
+          </div>
+          <div class="comm-skeleton-shimmer comm-skeleton-line" style="width: 92%;"></div>
+          <div class="comm-skeleton-shimmer comm-skeleton-line" style="width: 98%;"></div>
+          <div class="comm-skeleton-shimmer comm-skeleton-line" style="width: 78%;"></div>
+        </div>
+
+        <div class="comm-skeleton-card" style="opacity: 0.85;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div class="comm-skeleton-shimmer" style="width: 220px; height: 16px;"></div>
+            <div class="comm-skeleton-shimmer" style="width: 80px; height: 14px;"></div>
+          </div>
+          <div class="comm-skeleton-shimmer comm-skeleton-line" style="width: 95%;"></div>
+          <div class="comm-skeleton-shimmer comm-skeleton-line" style="width: 88%;"></div>
+          <div class="comm-skeleton-shimmer comm-skeleton-line" style="width: 60%;"></div>
+        </div>
+      </div>
+    `;
+  },
+
   async loadChapterCommentaries(bookCode, chapterNum) {
     const reqId = ++this._currentRequestId;
     const container = document.getElementById('comm-stream-container');
+    const frenchName = this.bookFrenchMap[bookCode] || this.currentBookFrench || bookCode;
     
     if (container && (!this.currentChapterData || this.currentChapter !== parseInt(chapterNum, 10))) {
-      container.innerHTML = `
-        <div style="text-align: center; padding: 60px 20px; color: var(--text-secondary);">
-          <div class="synth-spinner" style="width: 24px; height: 24px; border-width: 2.5px; margin: 0 auto 12px auto;"></div>
-          <div style="font-size: 14px; font-weight: 600;">Chargement des commentaires de ${this.currentBookFrench} ${chapterNum}...</div>
-        </div>
-      `;
+      container.innerHTML = this.renderSkeleton(frenchName, chapterNum);
     }
 
     try {
-      await API.ensureReady(3000);
+      await API.ensureReady(800);
       const data = await API.getChapterCommentariesGrouped(bookCode, parseInt(chapterNum, 10));
       
       if (reqId !== this._currentRequestId) return;
@@ -207,7 +257,7 @@ const CommentaryWindow = {
       }
 
       this.currentChapterData = data;
-      this.currentBookFrench = data.book_french || this.currentBookFrench;
+      this.currentBookFrench = data.book_french || frenchName;
       this.updatePassageDisplay(this.currentBookFrench, this.currentChapter, this.currentVerse);
       this.populateAuthorFilter(data.available_sources || []);
       this.refreshActiveTab();
@@ -216,7 +266,7 @@ const CommentaryWindow = {
       console.error('[CommentaryWindow] Erreur chargement commentaires:', e);
       if (container) {
         container.innerHTML = `
-          <div style="text-align: center; padding: 40px; color: var(--accent-red, #EF4444);">
+          <div class="comm-fade-in" style="text-align: center; padding: 40px; color: var(--accent-red, #EF4444);">
             <div style="font-size: 15px; font-weight: 700; margin-bottom: 6px;">Impossible de charger les commentaires</div>
             <div style="font-size: 12px; opacity: 0.8; margin-bottom: 14px;">${this.escapeHtml(e.message || String(e))}</div>
             <button type="button" class="comm-win-tool-btn" id="btn-retry-load" style="margin: 0 auto; display: inline-flex;">
@@ -376,7 +426,7 @@ const CommentaryWindow = {
     });
 
     let html = `
-      <div class="comm-stream-verse-block active-synced-comm" id="comm-verse-${vNum}" data-verse="${vNum}" style="margin-bottom: 24px; border: none; background: transparent;">
+      <div class="comm-stream-verse-block active-synced-comm comm-fade-in" id="comm-verse-${vNum}" data-verse="${vNum}" style="margin-bottom: 24px; border: none; background: transparent;">
         <div class="comm-verse-quote-banner" data-nav-verse="${vNum}" style="cursor: default;">
           <div class="comm-verse-num-badge">${vNum}</div>
           <div class="comm-verse-quote-text">« ${this.escapeHtml(vText || '...')} »</div>
@@ -588,7 +638,15 @@ const CommentaryWindow = {
     const tabsContainer = document.getElementById('lex-dict-tabs');
     if (!wordsFlow) return;
 
-    wordsFlow.innerHTML = '<div style="color: var(--text-secondary); font-size: 13px;"><span class="synth-spinner" style="width: 12px; height: 12px; border-width: 1.5px; vertical-align: middle; margin-right: 6px;"></span>Chargement des racines hébraïques / grecques...</div>';
+    wordsFlow.innerHTML = `
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; width: 100%;" class="comm-fade-in">
+        <div class="comm-skeleton-shimmer" style="width: 85px; height: 38px; border-radius: 7px;"></div>
+        <div class="comm-skeleton-shimmer" style="width: 110px; height: 38px; border-radius: 7px;"></div>
+        <div class="comm-skeleton-shimmer" style="width: 95px; height: 38px; border-radius: 7px;"></div>
+        <div class="comm-skeleton-shimmer" style="width: 75px; height: 38px; border-radius: 7px;"></div>
+        <div class="comm-skeleton-shimmer" style="width: 120px; height: 38px; border-radius: 7px;"></div>
+      </div>
+    `;
     if (tabsContainer) tabsContainer.style.display = 'none';
 
     try {

@@ -9,7 +9,12 @@ const API = {
   _readyCallbacks: [],
 
   _isBridgeAvailable() {
-    return !!(window.pywebview?.api && typeof window.pywebview.api.get_installed_bibles === 'function');
+    return !!(window.pywebview?.api && (
+      typeof window.pywebview.api.get_installed_bibles === 'function' ||
+      typeof window.pywebview.api.get_current_passage === 'function' ||
+      typeof window.pywebview.api.get_chapter_commentaries_grouped === 'function' ||
+      (typeof window.pywebview.api === 'object' && Object.keys(window.pywebview.api).length > 0)
+    ));
   },
 
   init() {
@@ -26,14 +31,18 @@ const API = {
     };
 
     window.addEventListener('pywebviewready', () => {
-      // Petite attente pour s'assurer que les méthodes sont bien attachées au proxy
-      const timer = setInterval(() => {
-        if (this._isBridgeAvailable()) {
-          clearInterval(timer);
-          markReady();
-        }
-      }, 20);
-      setTimeout(() => clearInterval(timer), 3000);
+      // Vérification immédiate puis intervalle rapide
+      if (this._isBridgeAvailable()) {
+        markReady();
+      } else {
+        const timer = setInterval(() => {
+          if (this._isBridgeAvailable()) {
+            clearInterval(timer);
+            markReady();
+          }
+        }, 15);
+        setTimeout(() => clearInterval(timer), 1500);
+      }
     });
 
     if (this._isBridgeAvailable()) {
@@ -45,9 +54,9 @@ const API = {
         clearInterval(interval);
         markReady();
       }
-    }, 40);
+    }, 20);
 
-    // Timeout de secours maximum (5s) si ouvert dans un navigateur classique sans Python
+    // Timeout de secours maximum (1.5s) si ouvert dans un navigateur classique sans Python
     setTimeout(() => {
       clearInterval(interval);
       if (!this.isReady) {
@@ -59,11 +68,14 @@ const API = {
           try { cb(); } catch (e) { console.error('Erreur callback onReady:', e); }
         });
       }
-    }, 5000);
+    }, 1500);
   },
 
-  async ensureReady(maxWaitMs = 5000) {
-    if (this._isBridgeAvailable()) return true;
+  async ensureReady(maxWaitMs = 1500) {
+    if (this._isBridgeAvailable()) {
+      this.isReady = true;
+      return true;
+    }
     const start = Date.now();
     return new Promise(resolve => {
       const check = () => {
@@ -74,13 +86,13 @@ const API = {
         if (Date.now() - start > maxWaitMs) {
           return resolve(false);
         }
-        setTimeout(check, 30);
+        setTimeout(check, 15);
       };
       check();
     });
   },
 
-  async ensureMethodReady(methodName, maxWaitMs = 5000) {
+  async ensureMethodReady(methodName, maxWaitMs = 1200) {
     if (window.pywebview?.api && typeof window.pywebview.api[methodName] === 'function') {
       return true;
     }
@@ -93,7 +105,7 @@ const API = {
         if (Date.now() - start > maxWaitMs) {
           return resolve(false);
         }
-        setTimeout(check, 30);
+        setTimeout(check, 15);
       };
       check();
     });
@@ -109,7 +121,7 @@ const API = {
 
   async call(methodName, ...args) {
     // S'assurer que la méthode spécifique est prête sur le pont pywebview
-    const ready = await this.ensureMethodReady(methodName, 4000);
+    const ready = await this.ensureMethodReady(methodName, 1200);
     if (ready && window.pywebview?.api && typeof window.pywebview.api[methodName] === 'function') {
       try {
         return await window.pywebview.api[methodName](...args);
@@ -159,6 +171,10 @@ const API = {
     return await this.call('get_commentaries', bookCode, parseInt(chapterNum), parseInt(verseNum));
   },
 
+  async getCurrentPassage() {
+    return await this.call('get_current_passage');
+  },
+
   async getChapterCommentariesGrouped(bookCode, chapterNum) {
     return await this.call('get_chapter_commentaries_grouped', bookCode, parseInt(chapterNum));
   },
@@ -193,6 +209,10 @@ const API = {
 
   async getMonitorsInfo() {
     return await this.call('get_monitors_info');
+  },
+
+  async navigateMainFromSecondary(bookCode, chapter, verse = 1) {
+    return await this.call('navigate_main_from_secondary', bookCode, parseInt(chapter, 10), parseInt(verse, 10) || 1);
   },
 
   async parseReference(rawText) {

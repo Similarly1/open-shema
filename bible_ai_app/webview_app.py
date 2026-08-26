@@ -527,14 +527,26 @@ class BibleAppApi:
         # 1. Récupérer tous les commentaires bruts du chapitre
         res = CommentaryLoader.get_all_comments_for_passage(book_code, ch_int, None)
         
-        # 2. Récupérer le texte des versets du chapitre (via la première Bible disponible)
+        # 2. Récupérer le texte des versets du chapitre (chargement direct ultra-rapide avec cache)
         verses_text_map = {}
         try:
-            installed = self.get_installed_bibles()
-            primary_bible = installed[0]["name"] if installed else "Segond 21"
-            ch_data = self.get_chapter_data(primary_bible, book_code, ch_int)
-            for v in ch_data.get("verses", []):
-                verses_text_map[int(v["verse"])] = v.get("text", "")
+            book_data = BibleJsonLoader.load_book("Segond 21", book_code)
+            if not book_data:
+                book_data = BibleJsonLoader.load_book("LSG", book_code)
+            if not book_data:
+                book_data = BibleJsonLoader.load_book("DARBY", book_code)
+            if not book_data:
+                installed = self.get_installed_bibles()
+                if installed:
+                    book_data = BibleJsonLoader.load_book(installed[0]["name"], book_code)
+            if book_data:
+                verses_dict = book_data.get("chapters", {}).get(str(ch_int), {})
+                for v_str, v_val in verses_dict.items():
+                    if v_str.isdigit():
+                        if isinstance(v_val, dict):
+                            verses_text_map[int(v_str)] = v_val.get("text", "")
+                        else:
+                            verses_text_map[int(v_str)] = str(v_val)
         except Exception as e:
             logger.warning(f"Erreur chargement texte versets pour chapitre {book_code} {ch_int}: {e}")
 
@@ -3712,24 +3724,28 @@ def on_commentary_shown(*args, **kwargs):
                         pass
                 _COMMENTARY_WINDOW.move = safe_comm_move
 
-            b, ch, v = _LAST_ACTIVE_PASSAGE
-            api = BibleAppApi()
-            data = api.get_chapter_commentaries_grouped(b, ch)
-            json_str = json.dumps(data)
-            import base64
-            b64_str = base64.b64encode(json_str.encode('utf-8')).decode('utf-8')
-            
-            def push_data():
+            # Préparation et envoi asynchrone des données pour ne jamais bloquer le thread d'affichage natif
+            def async_push_data():
                 try:
-                    if _COMMENTARY_WINDOW:
-                        _COMMENTARY_WINDOW.evaluate_js(
-                            f"window.CommentaryWindow && window.CommentaryWindow.receiveChapterDataB64('{b64_str}', {v})"
-                        )
-                except Exception as e:
-                    logger.debug(f"push_data error: {e}")
+                    b, ch, v = _LAST_ACTIVE_PASSAGE
+                    api = BibleAppApi()
+                    data = api.get_chapter_commentaries_grouped(b, ch)
+                    json_str = json.dumps(data)
+                    import base64
+                    b64_str = base64.b64encode(json_str.encode('utf-8')).decode('utf-8')
+                    for delay in (0.05, 0.25, 0.75):
+                        time.sleep(delay)
+                        if _COMMENTARY_WINDOW:
+                            try:
+                                _COMMENTARY_WINDOW.evaluate_js(
+                                    f"window.CommentaryWindow && window.CommentaryWindow.receiveChapterDataB64('{b64_str}', {v})"
+                                )
+                            except Exception:
+                                pass
+                except Exception as ex:
+                    logger.debug(f"async_push_data error: {ex}")
 
-            threading.Timer(0.15, push_data).start()
-            threading.Timer(0.6, push_data).start()
+            threading.Thread(target=async_push_data, daemon=True).start()
     except Exception as e:
         logger.warning(f"Erreur on_commentary_shown: {e}")
 

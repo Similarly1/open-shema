@@ -1115,21 +1115,25 @@ h1, h2, h3, h4, .font-title {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  min-width: 720px;
+  min-width: 780px;
+  table-layout: fixed;
 }
 
 .comparison-table th, 
 .comparison-table td {
-  padding: 18px 24px;
+  padding: 20px 24px;
+  vertical-align: middle;
   border-bottom: 1px solid var(--border-subtle);
+  line-height: 1.55;
 }
 
 .comparison-table th {
   background: var(--bg-surface-elevated);
   font-family: var(--font-title);
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   font-weight: 700;
   color: var(--text-main);
+  letter-spacing: 0.02em;
 }
 
 .comparison-table th.col-highlight {
@@ -1143,7 +1147,7 @@ h1, h2, h3, h4, .font-title {
   background: rgba(56, 189, 248, 0.04);
   border-left: 2px solid var(--accent-cyan);
   border-right: 2px solid var(--accent-cyan);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-main);
 }
 
@@ -1154,14 +1158,23 @@ h1, h2, h3, h4, .font-title {
 .comparison-table .feature-name {
   font-weight: 600;
   color: var(--text-main);
+}
+
+.feature-title-wrap {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+}
+
+.feature-title-wrap svg {
+  flex-shrink: 0;
 }
 
 .icon-check-good {
   color: var(--accent-emerald);
-  font-size: 1.2rem;
+  font-weight: 700;
+  margin-right: 6px;
+  display: inline-block;
 }
 
 .icon-cross-bad {
