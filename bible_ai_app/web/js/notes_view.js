@@ -250,6 +250,15 @@ const NotesView = {
         updateSelectionToolbar();
       }
     });
+
+    window.addEventListener('scroll', () => {
+      if (!this.floatingToolbar?.classList.contains('hidden')) {
+        const sel = window.getSelection();
+        if (sel && !sel.isCollapsed && sel.rangeCount) {
+          this.showFloatingToolbar(sel.getRangeAt(0));
+        }
+      }
+    }, true);
   },
 
   showFloatingToolbar(range) {
@@ -268,23 +277,28 @@ const NotesView = {
     const toolbarWidth = toolbar.offsetWidth || 310;
     const toolbarHeight = toolbar.offsetHeight || 36;
 
-    // Positionner au-dessus de la sélection
-    let top = rect.top - toolbarHeight - 8;
+    // Centrage horizontal exact par rapport au début et à la fin de la sélection
     let left = rect.left + (rect.width / 2) - (toolbarWidth / 2);
 
-    // Si trop proche du haut de l'écran, positionner en dessous
-    if (top < 50) {
+    // Positionnement vertical : juste au-dessus du texte sélectionné avec une marge de 8px
+    let top = rect.top - toolbarHeight - 8;
+
+    // Si la marge supérieure est trop faible (< 55px pour éviter d'être caché sous les en-têtes), placer juste en dessous
+    if (top < 55) {
       top = rect.bottom + 8;
     }
 
-    // Garder dans les limites horizontales de l'écran
+    // Contraintes dans les limites horizontales et verticales du viewport
     if (left < 10) left = 10;
     if (left + toolbarWidth > window.innerWidth - 10) {
       left = window.innerWidth - toolbarWidth - 10;
     }
+    if (top + toolbarHeight > window.innerHeight - 10) {
+      top = window.innerHeight - toolbarHeight - 10;
+    }
 
-    toolbar.style.top = `${top + window.scrollY}px`;
-    toolbar.style.left = `${left + window.scrollX}px`;
+    toolbar.style.top = `${Math.round(top)}px`;
+    toolbar.style.left = `${Math.round(left)}px`;
 
     this.updateCurrentBlockLabel(range);
     this.updateFloatingButtonsState();
