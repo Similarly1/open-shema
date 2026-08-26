@@ -3476,6 +3476,29 @@ input:checked + .slider.round:before {
   transform: translateX(2px);
 }
 
+.overview-dashboard-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 16px;
+  align-items: start;
+  width: 100%;
+}
+
+.overview-col-left,
+.overview-col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+@media (max-width: 860px) {
+  .overview-dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
 /* Popover Flottant au Survol (Option 1) */
 .overview-item-popover {
   position: fixed;
@@ -3484,8 +3507,12 @@ input:checked + .slider.round:before {
   max-width: calc(100vw - 30px);
   pointer-events: none;
   opacity: 0;
-  transform: translateX(8px) scale(0.97);
+  transform: translateY(6px) scale(0.97);
   transition: opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.overview-item-popover.popover-top {
+  transform: translateY(-6px) scale(0.97);
 }
 
 .overview-item-popover.hidden {
@@ -3494,7 +3521,7 @@ input:checked + .slider.round:before {
 
 .overview-item-popover.visible {
   opacity: 1;
-  transform: translateX(0) scale(1);
+  transform: translateY(0) scale(1);
 }
 
 .overview-item-popover .popover-inner {

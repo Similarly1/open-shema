@@ -365,21 +365,37 @@ const PassageOverviewDrawer = {
     `;
 
     const rect = itemEl.getBoundingClientRect();
-    const popoverWidth = 360;
+    const popoverWidth = 380;
+    const estPopoverHeight = 220;
 
-    // Positionnement à gauche du tiroir droit
-    let left = rect.left - popoverWidth - 14;
-    if (left < 10) {
-      left = Math.max(10, rect.left - 40);
+    // 1. Calcul Horizontal : centré sur l'élément ou sous le curseur, avec marge de sécurité
+    let left = rect.left + (rect.width - popoverWidth) / 2;
+    if (left + popoverWidth > window.innerWidth - 16) {
+      left = window.innerWidth - popoverWidth - 16;
+    }
+    if (left < 16) {
+      left = 16;
     }
 
-    let top = rect.top - 12;
-    const maxTop = window.innerHeight - 340;
-    if (top > maxTop) top = Math.max(20, maxTop);
-    if (top < 60) top = 60;
+    // 2. Calcul Vertical adaptatif : par défaut dessous l'élément, bascule au-dessus si proche du bas
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    let top = rect.bottom + 8;
 
-    this.popoverEl.style.left = `${left}px`;
-    this.popoverEl.style.top = `${top}px`;
+    if (spaceBelow < (estPopoverHeight + 20) && spaceAbove > spaceBelow) {
+      // Position au-dessus
+      top = Math.max(10, rect.top - estPopoverHeight - 8);
+      this.popoverEl.classList.add('popover-top');
+      this.popoverEl.classList.remove('popover-bottom');
+    } else {
+      // Position au-dessous
+      top = Math.min(window.innerHeight - estPopoverHeight - 10, rect.bottom + 8);
+      this.popoverEl.classList.add('popover-bottom');
+      this.popoverEl.classList.remove('popover-top');
+    }
+
+    this.popoverEl.style.left = `${Math.round(left)}px`;
+    this.popoverEl.style.top = `${Math.round(top)}px`;
     this.popoverEl.classList.remove('hidden');
     void this.popoverEl.offsetWidth; // Reflow
     this.popoverEl.classList.add('visible');
@@ -430,7 +446,7 @@ const PassageOverviewDrawer = {
 
 
   /**
-   * Rendu complet des cartes et compteurs.
+   * Rendu complet des cartes et compteurs en 2 colonnes (Studio Dashboard).
    */
   render(data) {
     // 1. En-tête : Référence et Péricope
@@ -463,56 +479,61 @@ const PassageOverviewDrawer = {
     const notesCount = ((data.user_notes || []).length) + ((data.user_highlights || []).length);
     const mapsCount = (data.maps || []).length;
     const bpCount = ((data.bibleproject?.current_videos || []).length) + ((data.bibleproject?.current_posters || []).length);
-    let activeHtml = '';
-    let emptyHtml = '';
-    let emptyCount = 0;
 
-    const appendSafe = (renderFn, count) => {
-      try {
-        const html = renderFn.call(this, data);
-        if (count > 0) {
-          activeHtml += html;
-        } else {
-          emptyHtml += html;
-          emptyCount++;
-        }
-      } catch (err) {
-        console.warn('[PassageOverviewDrawer] Erreur rendu section:', err);
-      }
-    };
+    // Colonne Gauche : Visuel & Contexte (BibleProject & Cartes/Lieux)
+    const leftActiveHtml = [];
+    const leftEmptyHtml = [];
+    if (bpCount > 0) leftActiveHtml.push(this.renderBibleProjectSection(data));
+    else leftEmptyHtml.push(this.renderBibleProjectSection(data));
 
-    // A. Section BibleProject (Vidéos & Posters)
-    appendSafe(this.renderBibleProjectSection, bpCount);
+    if (mapsCount > 0) leftActiveHtml.push(this.renderMapsSection(data));
+    else leftEmptyHtml.push(this.renderMapsSection(data));
 
-    // B. Section Commentaires Exégétiques
-    appendSafe(this.renderCommentariesSection, commCount);
+    // Colonne Droite : Exégèse & Ressources (Commentaires, Livres, Articles, Notes)
+    const rightActiveHtml = [];
+    const rightEmptyHtml = [];
+    if (commCount > 0) rightActiveHtml.push(this.renderCommentariesSection(data));
+    else rightEmptyHtml.push(this.renderCommentariesSection(data));
 
-    // C. Section Articles & Revues Théologiques
-    appendSafe(this.renderArticlesSection, artCount);
+    if (theoCount > 0) rightActiveHtml.push(this.renderTheologySection(data));
+    else rightEmptyHtml.push(this.renderTheologySection(data));
 
-    // D. Section Livres de Théologie & Bibliothèque
-    appendSafe(this.renderTheologySection, theoCount);
+    if (artCount > 0) rightActiveHtml.push(this.renderArticlesSection(data));
+    else rightEmptyHtml.push(this.renderArticlesSection(data));
 
-    // E. Section Vos Notes & Surlignages Personnels
-    appendSafe(this.renderNotesSection, notesCount);
+    if (notesCount > 0) rightActiveHtml.push(this.renderNotesSection(data));
+    else rightEmptyHtml.push(this.renderNotesSection(data));
 
-    // F. Section Géographie & Lieux Bibliques
-    appendSafe(this.renderMapsSection, mapsCount);
+    const totalActive = leftActiveHtml.length + rightActiveHtml.length;
+    const totalEmpty = leftEmptyHtml.length + rightEmptyHtml.length;
 
+    let finalHtml = '';
+    if (totalActive > 0) {
+      finalHtml += `
+        <div class="overview-dashboard-grid">
+          <div class="overview-col-left">
+            ${leftActiveHtml.join('')}
+          </div>
+          <div class="overview-col-right">
+            ${rightActiveHtml.join('')}
+          </div>
+        </div>
+      `;
+    }
 
-    // Assemblage avec tiroir discret pour les sections vides
-    let finalHtml = activeHtml;
-
-    if (emptyCount > 0) {
+    if (totalEmpty > 0) {
       const isShowEmpty = this.showEmptySections || false;
       finalHtml += `
         <div class="overview-empty-sections-wrap">
           <button type="button" class="btn-toggle-empty-sections ${isShowEmpty ? 'expanded' : ''}" data-action="toggle-empty-sections">
             <span class="empty-sec-chevron">${this.icons.chevronDown}</span>
-            <span>${emptyCount} autre(s) section(s) sans ressource</span>
+            <span>${totalEmpty} autre(s) section(s) sans ressource</span>
           </button>
           <div class="empty-sections-container ${isShowEmpty ? '' : 'hidden'}">
-            ${emptyHtml}
+            <div class="overview-dashboard-grid">
+              <div class="overview-col-left">${leftEmptyHtml.join('')}</div>
+              <div class="overview-col-right">${rightEmptyHtml.join('')}</div>
+            </div>
           </div>
         </div>
       `;
@@ -1063,7 +1084,7 @@ const PassageOverviewDrawer = {
   attachCardEventListeners(container, data) {
     // Écouteurs de survol Popover sur chaque élément de ressource
     let hoverTimer = null;
-    container.querySelectorAll('.overview-clean-item').forEach(item => {
+    container.querySelectorAll('.overview-clean-item, .overview-bp-video-item, .overview-bp-poster-item').forEach(item => {
       item.addEventListener('mouseenter', () => {
         clearTimeout(hoverTimer);
         hoverTimer = setTimeout(() => {
