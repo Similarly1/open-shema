@@ -13,7 +13,7 @@
   
   <!-- CSS -->
   <link rel="stylesheet" href="css/leaflet.css">
-  <link rel="stylesheet" href="css/logos.css?v=4.0">
+  <link rel="stylesheet" href="css/logos.css?v=4.1">
   <link rel="stylesheet" href="css/articles.css">
 
   <style id="vintage-core-styles">
@@ -973,7 +973,7 @@
         </button>
         <!-- GROUPE PRÉDICATION & BANQUE D'ILLUSTRATIONS -->
         <div class="nav-item-group" id="group-nav-sermons">
-          <button class="nav-item has-submenu" data-view="sermons" id="nav-sermons" title="Prédication & Illustrations">
+          <button class="nav-item has-submenu" data-view="sermons" id="nav-sermons" title="Prédication">
             <span class="nav-icon">
               <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
@@ -986,17 +986,23 @@
             <svg class="nav-chevron" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div class="nav-sub-menu" id="sub-menu-sermons">
-            <button class="nav-sub-item active" data-view="sermons" id="nav-sub-sermons" title="Studio de Prédication">
+            <button class="nav-sub-item active" data-view="sermons" id="nav-sub-sermons" title="Mes Prédications">
               <span class="nav-sub-icon">
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
               </span>
-              <span class="nav-sub-label">Studio de Prédication</span>
+              <span class="nav-sub-label">Mes Prédications</span>
+            </button>
+            <button class="nav-sub-item" data-view="sermon-editor" id="nav-sub-sermon-editor" title="Nouvelle Prédication / Studio">
+              <span class="nav-sub-icon">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              </span>
+              <span class="nav-sub-label">Nouvelle Prédication</span>
             </button>
             <button class="nav-sub-item" data-view="illustrations" id="nav-sub-illustrations" title="Banque d'Illustrations">
               <span class="nav-sub-icon">
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
               </span>
-              <span class="nav-sub-label">Banque d'Illustrations</span>
+              <span class="nav-sub-label">Illustrations</span>
             </button>
           </div>
         </div>
@@ -3339,55 +3345,81 @@
       </div>
 
       <!-- ===================================================== -->
-      <!-- VUE STUDIO DE PRÉDICATION (3 VOLETS & MODE PUPITRE)   -->
+      <!-- VUE 1 : MES PRÉDICATIONS (HUB EN GRILLE DE CARTES)    -->
       <!-- ===================================================== -->
       <div class="app-view" id="view-sermons">
-        <div class="sermons-layout">
-          <!-- 1. VOLET GAUCHE : LISTE DES SERMONS & SÉRIES -->
-          <aside class="sermons-sidebar-pane" id="sermons-sidebar-pane">
-            <div class="sermons-sidebar-header">
-              <div class="sermons-header-top">
-                <span class="sermons-header-title">Prédications</span>
-                <div class="sermons-header-actions" style="display: flex; align-items: center; gap: 4px;">
-                  <button class="btn-icon-subtle" id="btn-open-sermons-folder" title="Ouvrir le dossier des sermons (.md)" style="width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px;">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
-                  </button>
-                  <button class="btn-secondary" id="btn-import-sermon" title="Importer une prédication Word (.docx) ou Markdown (.md)" style="width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px;">
-                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                  </button>
-                  <button class="btn-primary" id="btn-new-sermon" title="Créer une nouvelle prédication" style="width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px;">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                  </button>
+        <div class="sermons-hub-layout">
+          <!-- 1. EN-TÊTE DU HUB DE PRÉDICATIONS -->
+          <header class="sermons-hub-header">
+            <div class="sermons-hub-header-main">
+              <div class="sermons-hub-title-cluster">
+                <div class="sermons-hub-title-icon">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+                </div>
+                <div>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <h1 class="sermons-hub-main-title">Mes Prédications</h1>
+                    <span class="sermons-hub-count-pill" id="lbl-sermons-count">0 prédication</span>
+                  </div>
+                  <p class="sermons-hub-subtitle">Gestion homilétique, séries d'enseignements et plans textuels</p>
                 </div>
               </div>
-              <div class="sermons-search-wrap">
-                <svg class="sermons-search-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" id="sermons-search-input" class="notes-search-field" placeholder="Filtrer (titre, passage, église)...">
-              </div>
-              <!-- Filtres rapides par statut / type -->
-              <div class="sermons-filter-bar">
-                <button class="sermon-filter-pill active" data-filter="all">Tous</button>
-                <button class="sermon-filter-pill" data-filter="ready">Prêts</button>
-                <button class="sermon-filter-pill" data-filter="draft">Brouillons</button>
-                <button class="sermon-filter-pill" data-filter="illustrations">Illustrations</button>
+              <div class="sermons-hub-actions">
+                <button class="btn-secondary" id="btn-hub-open-folder" title="Ouvrir le dossier local des sermons (.md)">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+                  <span>Dossier</span>
+                </button>
+                <button class="btn-secondary" id="btn-hub-import" title="Importer une prédication (.md)">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  <span>Importer</span>
+                </button>
+                <button class="btn-primary" id="btn-hub-new-sermon" title="Créer une nouvelle prédication">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  <span>Nouvelle Prédication</span>
+                </button>
               </div>
             </div>
-            <div class="sermons-list-items" id="sermons-list-items">
-              <!-- Liste injectée dynamiquement par sermons_view.js -->
-            </div>
-          </aside>
 
-          <!-- 2. VOLET CENTRAL : ÉDITEUR WYSIWYG PAR BLOCS & HAUTEUR MAXIMALE -->
-          <section class="sermons-editor-pane">
-            <div class="sermons-editor-header">
-              <!-- Bouton rétracter volet gauche -->
-              <button class="btn-secondary btn-icon-compact" id="btn-sermons-toggle-sidebar" title="Masquer / Afficher la liste des prédications">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+            <!-- Barre de Recherche & Filtres -->
+            <div class="sermons-hub-filter-controls">
+              <div class="sermons-hub-search-box">
+                <svg class="search-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="sermons-hub-search-input" class="sermons-hub-search-field" placeholder="Rechercher par titre, passage, série, église...">
+                <button class="btn-icon-subtle hidden" id="btn-clear-sermons-hub-search" title="Effacer"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+              </div>
+
+              <!-- Filtres Statut / Séries -->
+              <div class="sermons-hub-status-pills" id="sermons-hub-status-pills">
+                <button class="sermon-hub-pill active" data-filter="all">Toutes</button>
+                <button class="sermon-hub-pill" data-filter="ready">Prêtes pour la chaire</button>
+                <button class="sermon-hub-pill" data-filter="draft">Brouillons en cours</button>
+              </div>
+            </div>
+          </header>
+
+          <!-- 2. GRILLE DES CARTES DE PRÉDICATIONS -->
+          <main class="sermons-hub-main-content" id="sermons-hub-cards-container">
+            <!-- Injecté dynamiquement par sermons_view.js -->
+          </main>
+        </div>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- VUE 2 : STUDIO DE RÉDACTION MODULAIRE PAR BLOCS       -->
+      <!-- ===================================================== -->
+      <div class="app-view" id="view-sermon-editor">
+        <div class="sermon-editor-single-layout">
+          <!-- 1. EN-TÊTE SUPÉRIEUR : BOUTON RETOUR, TITRE & ACTIONS -->
+          <header class="sermon-single-header">
+            <div class="sermon-single-header-left">
+              <button class="btn-secondary btn-back-to-hub" id="btn-sermon-back-to-hub" title="Retour à la liste de mes prédications">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+                <span>Mes Prédications</span>
               </button>
-              
-              <div class="sermon-header-main-title-wrap">
-                <input type="text" id="sermon-edit-title" class="sermon-immersive-title-input" placeholder="Titre de la prédication...">
-                <div id="sermon-header-summary" class="sermon-header-summary" title="Cliquer pour modifier les métadonnées dans le volet droit">
+              <div class="sermon-header-divider"></div>
+              <div class="sermon-header-title-box">
+                <input type="text" id="sermon-edit-title" class="sermon-single-title-input" placeholder="Titre de la prédication...">
+                <div id="sermon-header-summary" class="sermon-header-summary" title="Cliquer pour modifier les détails homilétiques (PMT, PMS, Le Pont)">
                   <span id="summary-church" class="summary-item">Lieu</span>
                   <span class="summary-bullet">•</span>
                   <span id="summary-ref" class="summary-item highlight">Passage</span>
@@ -3395,228 +3427,162 @@
                   <span id="summary-date" class="summary-item">Date</span>
                 </div>
               </div>
-              
-              <div class="sermon-actions" style="display: flex; align-items: center; gap: 6px;">
-                <button class="btn-secondary btn-icon-compact" id="btn-sermon-undo" title="Annuler (Ctrl+Z)">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
-                </button>
-                <button class="btn-secondary btn-icon-compact" id="btn-sermon-redo" title="Rétablir (Ctrl+Y)">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
-                </button>
-                <button class="btn-secondary btn-icon-compact" id="btn-sermon-pulpit-mode" title="Lancer le Mode Pupitre / Prompteur plein écran" style="color: var(--accent-orange, #f59e0b);">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
-                </button>
-                <button class="btn-secondary btn-icon-compact" id="btn-sermon-toggle-drawer" title="Masquer / Afficher le volet d'étude et ressources">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
-                </button>
-              </div>
             </div>
-
-            <!-- Barre d'outils rapides pour les blocs spécialisés (BOUTONS COMPACTS) -->
-            <div class="sermons-editor-subbar">
-              <div class="sermon-quick-tools-left">
-                <button class="btn-secondary btn-block-insert" id="btn-insert-point" title="Insérer un Point Principal (Titre H1)">
-                  <span class="block-type-tag">H1</span>
-                </button>
-                <button class="btn-secondary btn-block-insert" id="btn-insert-subpoint" title="Insérer un Sous-point (Titre H2)">
-                  <span class="block-type-tag">H2</span>
-                </button>
-                <div class="subbar-divider"></div>
-                <button class="btn-secondary btn-block-insert" id="btn-insert-scripture" title="Insérer un bloc Verset / Écriture">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-                </button>
-                <button class="btn-secondary btn-block-insert" id="btn-insert-exegesis" title="Insérer un bloc Exégèse & Mots-clés">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="m8.5 13.5 2-5.5 2 5.5"/><path d="M9.2 11.8h2.6"/><path d="M14 8.5h3.5l-3.5 5h3.5"/></svg>
-                </button>
-                <button class="btn-secondary btn-block-insert" id="btn-insert-illustration" title="Insérer une Illustration">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
-                </button>
-                <button class="btn-secondary btn-block-insert" id="btn-insert-application" title="Insérer une Application pratique">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-                </button>
-                <button class="btn-secondary btn-block-insert" id="btn-insert-cue" title="Insérer une Note Régie / Timing">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                </button>
-                <button class="btn-secondary btn-block-insert" id="btn-insert-slide" title="Insérer un repère de diapositive [_]">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-                </button>
-              </div>
-              <div class="sermon-quick-tools-right">
-                <button class="btn-secondary btn-icon-compact" id="btn-sermon-bold" title="Gras (Ctrl+B)"><strong>B</strong></button>
-                <button class="btn-secondary btn-icon-compact" id="btn-sermon-italic" title="Italique (Ctrl+I)"><em>I</em></button>
-                <button class="btn-secondary btn-icon-compact" id="btn-sermon-quote" title="Citation">”</button>
-                <button class="btn-secondary btn-icon-compact" id="btn-sermon-list" title="Liste à puces">•</button>
-              </div>
-            </div>
-
-            <!-- Corps de Rédaction Modulaire par Blocs avec Sommaire Interactif -->
-            <div class="sermons-editor-workspace">
-              <!-- Sommaire / Plan de vol interactif -->
-              <aside class="sermon-outline-panel" id="sermon-outline-panel">
-                <div class="sermon-outline-header">
-                  <span class="outline-title">Plan du Sermon</span>
-                  <div class="outline-header-actions">
-                    <button class="btn-icon-subtle" id="btn-sermon-collapse-all" title="Tout replier">
-                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/></svg>
-                    </button>
-                    <button class="btn-icon-subtle" id="btn-sermon-expand-all" title="Tout déplier">
-                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/></svg>
-                    </button>
-                  </div>
-                </div>
-                <div class="sermon-outline-list" id="sermon-outline-list">
-                  <!-- Injecté dynamiquement -->
-                </div>
-                <div class="sermon-outline-footer">
-                  <button class="btn-outline-add-section" id="btn-outline-add-point">
-                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    <span>Ajouter un Point</span>
-                  </button>
-                </div>
-              </aside>
-
-              <!-- Conteneur des Blocs Modulaires Dépliables -->
-              <div class="sermon-blocks-scroll-pane" id="sermon-blocks-scroll-pane">
-                <div class="sermon-blocks-container" id="sermon-blocks-container">
-                  <!-- Cartes de sections injectées dynamiquement par sermons_view.js -->
-                </div>
-                <!-- Barre d'ajout rapide en bas -->
-                <div class="sermon-add-block-cta">
-                  <button class="btn-add-section-pill" id="btn-add-section-point">
-                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    <span>+ Point Principal</span>
-                  </button>
-                  <button class="btn-add-section-pill" id="btn-add-section-scripture">
-                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-                    <span>+ Lecture Biblique</span>
-                  </button>
-                  <button class="btn-add-section-pill" id="btn-add-section-conclusion">
-                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-                    <span>+ Conclusion & Appel</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Pied de page : Métriques & Chronomètre dynamique en temps réel -->
-            <div class="sermons-status-bar">
-              <div class="sermon-timing-stats">
-                <span class="sermon-stat-pill" id="sermon-stat-time">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  <span id="lbl-sermon-est-time">0 min</span>
-                </span>
-                <span class="sermon-stat-pill" id="sermon-stat-words">
-                  <span id="lbl-sermon-word-count">0 mots</span>
-                </span>
-                <span class="sermon-stat-pill rate-indicator" title="Débit moyen de parole (configurable dans le YAML)">
-                  <span>135 mpm</span>
-                </span>
-              </div>
-              <div class="sermon-homiletic-balance-wrap" id="sermon-homiletic-balance-wrap">
-                <div class="sermon-homiletic-balance" id="sermon-homiletic-balance">
-                  <div class="balance-bar-segment seg-exegesis" id="bar-seg-exegesis" style="width: 33%;"></div>
-                  <div class="balance-bar-segment seg-illustration" id="bar-seg-illustration" style="width: 33%;"></div>
-                  <div class="balance-bar-segment seg-application" id="bar-seg-application" style="width: 34%;"></div>
-                </div>
-
-                <div class="sermon-balance-popover" id="sermon-balance-popover">
-                  <div class="balance-popover-header">
-                    <div class="balance-popover-title">
-                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                      <span>Équilibre Homilétique</span>
-                    </div>
-                    <span class="balance-popover-badge">En direct</span>
-                  </div>
-                  <div class="balance-popover-body">
-                    <div class="balance-popover-row">
-                      <div class="balance-row-left">
-                        <span class="balance-dot dot-exegesis"></span>
-                        <span class="balance-row-label">Exégèse & Écriture</span>
-                      </div>
-                      <span class="balance-row-pct" id="popover-pct-exegesis">33%</span>
-                    </div>
-                    <div class="balance-row-desc">Explication textuelle, étude des mots et doctrine.</div>
-
-                    <div class="balance-popover-row" style="margin-top: 8px;">
-                      <div class="balance-row-left">
-                        <span class="balance-dot dot-illustration"></span>
-                        <span class="balance-row-label">Illustrations & Récits</span>
-                      </div>
-                      <span class="balance-row-pct" id="popover-pct-illustration">33%</span>
-                    </div>
-                    <div class="balance-row-desc">Anecdotes, métaphores et visualisations concrètes.</div>
-
-                    <div class="balance-popover-row" style="margin-top: 8px;">
-                      <div class="balance-row-left">
-                        <span class="balance-dot dot-application"></span>
-                        <span class="balance-row-label">Applications & Défis</span>
-                      </div>
-                      <span class="balance-row-pct" id="popover-pct-application">34%</span>
-                    </div>
-                    <div class="balance-row-desc">Mise en pratique pour le quotidien et appels à l'action.</div>
-                  </div>
-                  <div class="balance-popover-footer" id="popover-balance-advice">
-                    Équilibre optimal entre enseignement, clarté et impact pratique.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <!-- 3. VOLET DROIT ESCAMOTABLE : STRUCTURE EXACTE DE LA PAGE BIBLE -->
-          <aside class="right-drawer sermons-resources-drawer collapsed" id="sermons-resources-drawer">
-            <div class="drawer-tabs-wrapper">
-              <div class="drawer-tabs" id="sermon-drawer-tabs-bar">
-                <button class="drawer-tab active" data-drawer-tab="overview" title="Aperçu 360° du passage biblique lié">
-                  <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
-                  </svg>
-                  <span>Aperçu</span>
-                </button>
-                <button class="drawer-tab" data-drawer-tab="commentaries" title="Commentaires bibliques du passage">
-                  <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                  </svg>
-                  <span>Commentaires</span>
-                </button>
-                <button class="drawer-tab" data-drawer-tab="ai" title="Assistant IA pour le sermon">
-                  <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
-                  </svg>
-                  <span>Assistant IA</span>
-                </button>
-                <button class="drawer-tab" data-drawer-tab="lexicon" title="Lexique & Termes originaux hébreu/grec">
-                  <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
-                    <path d="M6 6h10"></path>
-                    <path d="M6 10h10"></path>
-                  </svg>
-                  <span>Lexique</span>
-                </button>
-                <button class="drawer-tab" data-drawer-tab="illustrations" title="Réservoir d'illustrations">
-                  <svg class="tab-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>
-                  </svg>
-                  <span>Illustrations</span>
-                </button>
-                <button class="drawer-tab" data-drawer-tab="metadata" title="Métadonnées & Organisation du sermon">
-                  <svg class="tab-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
-                  </svg>
-                  <span>Infos</span>
-                </button>
-              </div>
-              <button class="btn-icon-subtle" id="btn-close-resources-drawer" title="Fermer le volet" style="padding: 0 10px; margin-left: auto;">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            
+            <div class="sermon-single-header-right">
+              <button class="btn-secondary btn-icon-compact" id="btn-sermon-undo" title="Annuler (Ctrl+Z)">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+              </button>
+              <button class="btn-secondary btn-icon-compact" id="btn-sermon-redo" title="Rétablir (Ctrl+Y)">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
+              </button>
+              <button class="btn-secondary" id="btn-sermon-pulpit-mode" title="Lancer le Mode Pupitre plein écran" style="color: var(--accent-orange, #f59e0b);">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+                <span>Pupitre Live</span>
+              </button>
+              <button class="btn-secondary btn-icon-compact" id="btn-save-current-sermon" title="Enregistrer manuellement (Ctrl+S)">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              </button>
+              <button class="btn-secondary btn-icon-compact" id="btn-delete-current-sermon" title="Supprimer la prédication" style="color: #f87171;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+              </button>
+              <button class="btn-secondary btn-icon-compact" id="btn-sermon-toggle-drawer" title="Masquer / Afficher le volet d'étude et ressources">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
               </button>
             </div>
-            <div class="drawer-body" style="padding: 0; overflow-y: auto; flex: 1;">
-              <div class="drawer-content active" id="sermons-drawer-content" style="display: block; padding: 12px 14px;">
-                <!-- Injecté dynamiquement selon l'onglet actif avec le style exact de la Bible -->
+          </header>
+
+          <!-- 2. BARRE D'OUTILS COMPACTE -->
+          <div class="sermons-editor-subbar">
+            <div class="sermon-quick-tools-left">
+              <button class="btn-secondary btn-block-insert" id="btn-insert-point" title="Insérer un Point Principal (Titre H1)">
+                <span class="block-type-tag">H1</span>
+              </button>
+              <button class="btn-secondary btn-block-insert" id="btn-insert-subpoint" title="Insérer un Sous-point (Titre H2)">
+                <span class="block-type-tag">H2</span>
+              </button>
+              <div class="subbar-divider"></div>
+              <button class="btn-secondary btn-block-insert" id="btn-insert-scripture" title="Insérer un bloc Verset / Écriture">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              </button>
+              <button class="btn-secondary btn-block-insert" id="btn-insert-exegesis" title="Insérer un bloc Exégèse & Mots-clés">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="m8.5 13.5 2-5.5 2 5.5"/><path d="M9.2 11.8h2.6"/><path d="M14 8.5h3.5l-3.5 5h3.5"/></svg>
+              </button>
+              <button class="btn-secondary btn-block-insert" id="btn-insert-illustration" title="Insérer une Illustration">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+              </button>
+              <button class="btn-secondary btn-block-insert" id="btn-insert-application" title="Insérer une Application pratique">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+              </button>
+              <button class="btn-secondary btn-block-insert" id="btn-insert-cue" title="Insérer une Note Régie / Timing">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </button>
+              <button class="btn-secondary btn-block-insert" id="btn-insert-slide" title="Insérer un repère de diapositive [_]">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              </button>
+            </div>
+            <div class="sermon-quick-tools-right">
+              <button class="btn-secondary btn-icon-compact" id="btn-sermon-bold" title="Gras (Ctrl+B)"><strong>B</strong></button>
+              <button class="btn-secondary btn-icon-compact" id="btn-sermon-italic" title="Italique (Ctrl+I)"><em>I</em></button>
+              <button class="btn-secondary btn-icon-compact" id="btn-sermon-quote" title="Citation">”</button>
+              <button class="btn-secondary btn-icon-compact" id="btn-sermon-list" title="Liste à puces">•</button>
+            </div>
+          </div>
+
+          <!-- 3. CORPS MODULAIRE : SOMMAIRE + CARTES MODULAIRES + TIROIR RESSOURCES -->
+          <div class="sermons-editor-workspace">
+            <!-- Sommaire / Plan de vol interactif -->
+            <aside class="sermon-outline-panel" id="sermon-outline-panel">
+              <div class="sermon-outline-header">
+                <span class="outline-title">Plan du Sermon</span>
+                <div class="outline-header-actions">
+                  <button class="btn-icon-subtle" id="btn-sermon-collapse-all" title="Tout replier">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/></svg>
+                  </button>
+                  <button class="btn-icon-subtle" id="btn-sermon-expand-all" title="Tout déplier">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="sermon-outline-list" id="sermon-outline-list">
+                <!-- Injecté dynamiquement -->
+              </div>
+              <div class="sermon-outline-footer">
+                <button class="btn-outline-add-section" id="btn-outline-add-point">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  <span>Ajouter un Point</span>
+                </button>
+              </div>
+            </aside>
+
+            <!-- Conteneur des Blocs Modulaires Dépliables -->
+            <div class="sermon-blocks-scroll-pane" id="sermon-blocks-scroll-pane">
+              <div class="sermon-blocks-container" id="sermon-blocks-container">
+                <!-- Cartes injectées dynamiquement -->
+              </div>
+              <!-- Barre d'ajout rapide en bas -->
+              <div class="sermon-add-block-cta">
+                <button class="btn-add-section-pill" id="btn-add-section-point">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  <span>+ Point Principal</span>
+                </button>
+                <button class="btn-add-section-pill" id="btn-add-section-scripture">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                  <span>+ Lecture Biblique</span>
+                </button>
+                <button class="btn-add-section-pill" id="btn-add-section-conclusion">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                  <span>+ Conclusion & Appel</span>
+                </button>
               </div>
             </div>
-          </aside>
+
+            <!-- Tiroir Droit Connecté : Exégèse, Commentaires, Lexique, Illustrations & Métadonnées -->
+            <aside class="right-drawer sermons-resources-drawer collapsed" id="sermons-resources-drawer">
+              <div class="drawer-tabs-wrapper">
+                <div class="drawer-tabs" id="sermon-drawer-tabs-bar">
+                  <button class="drawer-tab active" data-drawer-tab="metadata" title="Métadonnées & Matrice Homilétique">Infos</button>
+                  <button class="drawer-tab" data-drawer-tab="overview" title="Aperçu du texte biblique">Aperçu</button>
+                  <button class="drawer-tab" data-drawer-tab="commentaries" title="Commentaires exégétiques">Commentaires</button>
+                  <button class="drawer-tab" data-drawer-tab="ai" title="Assistant & Structures homilétiques">Structures</button>
+                  <button class="drawer-tab" data-drawer-tab="illustrations" title="Illustrations associées">Illustrations</button>
+                </div>
+                <button class="btn-icon-subtle" id="btn-close-resources-drawer" title="Fermer le volet" style="padding: 0 10px; margin-left: auto;">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+              </div>
+              <div class="drawer-body" style="padding: 0; overflow-y: auto; flex: 1;">
+                <div class="drawer-content active" id="sermons-drawer-content" style="display: block; padding: 12px 14px;">
+                  <!-- Injecté dynamiquement selon l'onglet actif -->
+                </div>
+              </div>
+            </aside>
+          </div>
+
+          <!-- 4. PIED DE PAGE : STATUT & ÉQUILIBRE HOMILÉTIQUE -->
+          <footer class="sermons-status-bar">
+            <div class="sermon-timing-stats">
+              <span class="sermon-stat-pill" id="sermon-stat-time">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span id="lbl-sermon-est-time">0 min</span>
+              </span>
+              <span class="sermon-stat-pill" id="sermon-stat-words">
+                <span id="lbl-sermon-word-count">0 mots</span>
+              </span>
+              <span class="sermon-stat-pill rate-indicator" title="Débit moyen de parole (135 mots/min)">
+                <span>135 mpm</span>
+              </span>
+            </div>
+
+            <!-- Jauge d'équilibre homilétique -->
+            <div class="sermon-homiletic-balance-wrap" id="sermon-homiletic-balance-wrap">
+              <div class="sermon-homiletic-balance" id="sermon-homiletic-balance">
+                <div class="balance-bar-segment seg-exegesis" id="bar-seg-exegesis" style="width: 33%;"></div>
+                <div class="balance-bar-segment seg-illustration" id="bar-seg-illustration" style="width: 33%;"></div>
+                <div class="balance-bar-segment seg-application" id="bar-seg-application" style="width: 34%;"></div>
+              </div>
+            </div>
+          </footer>
         </div>
       </div>
 

@@ -653,6 +653,14 @@ const App = {
       if (typeof SermonsView !== 'undefined') {
         SermonsView.onViewActivated();
       }
+    } else if (viewName === 'sermon-editor') {
+      if (drawerEl) drawerEl.classList.add('collapsed');
+      document.getElementById('nav-sermons')?.classList.add('active');
+      document.getElementById('nav-sub-sermon-editor')?.classList.add('active');
+      document.getElementById('group-nav-sermons')?.classList.add('open');
+      if (typeof SermonsView !== 'undefined') {
+        SermonsView.openEditor(SermonsView.currentSermon);
+      }
     } else if (viewName === 'illustrations') {
       if (drawerEl) drawerEl.classList.add('collapsed');
       document.getElementById('nav-sermons')?.classList.add('active');

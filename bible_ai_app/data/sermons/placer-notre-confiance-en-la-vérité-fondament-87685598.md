@@ -11,6 +11,10 @@ series:
 passage:
   reference: Ga 3.1-14
 big_idea: 0 - Introduction
+pmt: 0 - Introduction
+pms: ''
+contemporary_tension: ''
+redemptive_era: christ
 goal: ''
 theme_tags: []
 timing:
@@ -18,8 +22,10 @@ timing:
   words_per_minute: 135
 delivery_history: []
 created_at: '2026-08-25T21:19:58.557671'
-updated_at: '2026-08-25T21:19:58.557671'
+updated_at: '2026-08-26T06:56:31.748044'
 ---
+
+## Introduction
 
 Se présenter
 
@@ -49,9 +55,7 @@ Lisons l’épitre aux Galates 3.1-14 :
 
 En premier, on voit que Paul accuse les Galates, en accomplissant la loi, de placer leur confiance en eux-mêmes.
 
-
-# 1 - Placer sa confiance en soi-même (1-5 & 10-12)
-
+## 1 - Placer sa confiance en soi-même (1-5 & 10-12)
 
 Explications
 
@@ -75,9 +79,7 @@ Comme David l’a évoqué dans l’introduction de cette série de prédication
 
 Attention, je ne dis pas qu’il ne faut pas croire du tout en soi-même, ne plus avoir de jugement ni de décisions personnelles, ou bien nous serions une secte ! Non, Paul appelle les Corinthiens à faire part de discernement pour donner, aux Galates de se montrer intelligents par rapport à l’Évangile, et Jésus appelle ses disciples à se méfier des spécialistes de la loi. Ce que je dis est que l’on ne doit pas placer notre confiance seulement en nous-même, car notre priorité est de chercher à placer notre confiance en Dieu.
 
-
-# 2 - Placer sa confiance en Dieu (6-9)
-
+## 2 - Placer sa confiance en Dieu (6-9)
 
 Relisons les versets 6 à 9 :
 
@@ -103,9 +105,7 @@ La prochaine fois que vous irez vous baignez à la mer et que vous buvez la tass
 
 Le problème ne vient pas de Dieu, mais de nos cœurs. Le mal nous montre qu’il faut changer, qu’il faut se repentir pour être sauvé et être libéré de notre culpabilité. Pour ça, la seule solution durable et vraie se trouve en plaçant notre confiance en Christ.
 
-
-# 3 - Placer sa confiance en Christ (13-14)
-
+## 3 - Placer sa confiance en Christ (13-14)
 
 Revenons à notre texte et relisons les versets 13 et 14 :
 
@@ -127,8 +127,10 @@ Illustration
 
 Continuer de vouloir s’approcher de Dieu par nos efforts au lieu de regarder à Christ qui a tout accompli à notre place, c’est un peu comme un enfant qui joue dans une flaque de boue puante alors qu’il y a une magnifique plage de sable fin à quelques mètres de lui : c’est ridicule quand on prend du recul !
 
-
-# 4 – Conclusion
-
+## 4 – Conclusion
 
 Pour résumer les trois points : placer ma confiance uniquement en moi-même, c’est faire comme si Jésus était mort pour rien. Recherchons plutôt à connaître Dieu pour lui faire confiance, « *Compte les bienfaits de Dieu, met les tous devant tes yeux et tu verras en adorant combien le nombre en est grand* » dit le chant. Oui Dieu est bon, sa grâce nous dépasse, il nous justifie non pas par nos agissements mais parce que l’on a foi en lui, de même qu’Abraham n’était pas circoncis lorsque Dieu l’a reconnu comme juste. Et Dieu nous a fait le plus grand cadeau qu’il soit : son Fils Jésus, Dieu qui vient nous sauver. Placez-vous votre confiance uniquement en vous-même ou bien en ce Dieu qui sauve ?
+
+## Point 4
+
+Contenu de cette partie...

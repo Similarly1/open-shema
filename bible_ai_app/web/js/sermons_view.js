@@ -1,14 +1,10 @@
 /**
- * Sermons View Controller — Studio de Prédication Modulaire par Blocs
+ * Sermons View Controller — Studio de Prédication Modulaire & Hub de Cartes
  * 
- * Architecture en Blocs Modulaires :
- * - Sections dépliables / repliables indépendantes (Introduction, Lecture, Points I-II-III, Conclusion).
- * - Sommaire interactif (Outline) avec navigation fluide et calcul du temps estimé par bloc.
- * - Zéro émoji : icônes vectorielles SVG uniquement.
- * - Stockage Markdown (.md) et Frontmatter YAML standard.
- * - Volet droit de ressources connecté (Exégèse, Commentaires, Réservoir d'illustrations avec historique anti-redite).
- * - Calcul dynamique du temps de parole par section (mots/minute) et équilibre homilétique.
- * - Mode Pupitre / Prompteur plein écran avec chronomètre et validation de points.
+ * Architecture en 3 Sous-pages Homilétiques :
+ * 1. « Mes Prédications » (Hub en grille de cartes modernes, filtres statut & séries, recherche).
+ * 2. « Studio de Rédaction » (Espace plein écran épuré, sans volet gauche encombrant, sommaire interactif, blocs modulaires).
+ * 3. « Banque d'Illustrations » (Hub d'anecdotes et récits avec anti-redite).
  */
 
 const SermonsView = {
@@ -16,7 +12,7 @@ const SermonsView = {
   illustrations: [],
   currentSermon: null,
   currentFilter: 'all',
-  activeDrawerTab: 'overview',
+  activeDrawerTab: 'metadata',
   
   // Blocs de sections modulaires
   sections: [],
@@ -36,9 +32,12 @@ const SermonsView = {
   pulpitFontSize: 24,
   pulpitWakeLock: null,
 
-  // Éléments du DOM
-  listContainer: null,
-  searchInput: null,
+  // Éléments du Hub
+  hubCardsContainer: null,
+  hubSearchInput: null,
+  lblSermonsCount: null,
+
+  // Éléments du Studio de Rédaction
   titleInput: null,
   churchInput: null,
   refInput: null,
@@ -46,7 +45,6 @@ const SermonsView = {
   seriesInput: null,
   bigIdeaInput: null,
   goalInput: null,
-  sidebarPane: null,
   resourcesDrawer: null,
   drawerContent: null,
   blocksContainer: null,
@@ -60,8 +58,12 @@ const SermonsView = {
   barApplication: null,
 
   init() {
-    this.listContainer = document.getElementById('sermons-list-items');
-    this.searchInput = document.getElementById('sermons-search-input');
+    // 1. Hub de cartes
+    this.hubCardsContainer = document.getElementById('sermons-hub-cards-container');
+    this.hubSearchInput = document.getElementById('sermons-hub-search-input');
+    this.lblSermonsCount = document.getElementById('lbl-sermons-count');
+
+    // 2. Studio de Rédaction
     this.titleInput = document.getElementById('sermon-edit-title');
     this.churchInput = document.getElementById('sermon-edit-church');
     this.refInput = document.getElementById('sermon-edit-ref');
@@ -69,7 +71,6 @@ const SermonsView = {
     this.seriesInput = document.getElementById('sermon-edit-series');
     this.bigIdeaInput = document.getElementById('sermon-edit-bigidea');
     this.goalInput = document.getElementById('sermon-edit-goal');
-    this.sidebarPane = document.getElementById('sermons-sidebar-pane');
     this.resourcesDrawer = document.getElementById('sermons-resources-drawer');
     this.drawerContent = document.getElementById('sermons-drawer-content');
     this.blocksContainer = document.getElementById('sermon-blocks-container');
@@ -85,35 +86,47 @@ const SermonsView = {
   },
 
   bindEvents() {
-    // 1. Boutons principaux de gestion
-    document.getElementById('btn-new-sermon')?.addEventListener('click', () => this.createNewSermon());
-    document.getElementById('btn-import-sermon')?.addEventListener('click', () => this.importSermon());
-    document.getElementById('btn-save-current-sermon')?.addEventListener('click', () => this.saveCurrentSermon());
-    document.getElementById('btn-delete-current-sermon')?.addEventListener('click', () => this.deleteCurrentSermon());
-    document.getElementById('btn-open-sermons-folder')?.addEventListener('click', () => this.openSermonsFolder());
+    // 1. Actions du Hub de prédications
+    document.getElementById('btn-hub-new-sermon')?.addEventListener('click', () => this.createNewSermon());
+    document.getElementById('btn-hub-open-folder')?.addEventListener('click', () => this.openSermonsFolder());
+    document.getElementById('btn-hub-import')?.addEventListener('click', () => this.importSermon());
 
-    // 2. Recherche & Filtres
-    this.searchInput?.addEventListener('input', () => this.renderList());
-    document.querySelectorAll('.sermon-filter-pill').forEach(pill => {
+    this.hubSearchInput?.addEventListener('input', () => {
+      const val = this.hubSearchInput.value.trim();
+      const clearBtn = document.getElementById('btn-clear-sermons-hub-search');
+      if (clearBtn) clearBtn.classList.toggle('hidden', !val);
+      this.renderHubCards();
+    });
+
+    document.getElementById('btn-clear-sermons-hub-search')?.addEventListener('click', () => {
+      if (this.hubSearchInput) this.hubSearchInput.value = '';
+      document.getElementById('btn-clear-sermons-hub-search')?.classList.add('hidden');
+      this.renderHubCards();
+    });
+
+    document.querySelectorAll('#sermons-hub-status-pills .sermon-hub-pill').forEach(pill => {
       pill.addEventListener('click', () => {
-        document.querySelectorAll('.sermon-filter-pill').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('#sermons-hub-status-pills .sermon-hub-pill').forEach(p => p.classList.remove('active'));
         pill.classList.add('active');
         this.currentFilter = pill.dataset.filter || 'all';
-        this.renderList();
+        this.renderHubCards();
       });
     });
 
-    // 3. Undo / Redo
+    // 2. Navigation Studio <-> Hub
+    document.getElementById('btn-sermon-back-to-hub')?.addEventListener('click', () => this.openHub());
+
+    // 3. Actions Studio de Rédaction
+    document.getElementById('btn-save-current-sermon')?.addEventListener('click', () => this.saveCurrentSermon());
+    document.getElementById('btn-delete-current-sermon')?.addEventListener('click', () => this.deleteCurrentSermon());
     document.getElementById('btn-sermon-undo')?.addEventListener('click', () => this.undo());
     document.getElementById('btn-sermon-redo')?.addEventListener('click', () => this.redo());
 
-    // 4. Rétractation des volets & Synchronisation
-    document.getElementById('btn-sermons-toggle-sidebar')?.addEventListener('click', () => this.toggleSidebar());
-    document.getElementById('btn-sermon-sync-bible')?.addEventListener('click', () => this.syncPassageResources());
+    // 4. Tiroir de ressources
     document.getElementById('btn-sermon-toggle-drawer')?.addEventListener('click', () => this.toggleResourcesDrawer());
     document.getElementById('btn-close-resources-drawer')?.addEventListener('click', () => this.toggleResourcesDrawer(false));
 
-    // Clic sur le fil d'ariane sous le titre pour ouvrir l'inspecteur d'infos
+    // Clic sur le fil d'ariane pour ouvrir les détails homilétiques
     document.getElementById('sermon-header-summary')?.addEventListener('click', () => {
       this.toggleResourcesDrawer(true);
       this.activeDrawerTab = 'metadata';
@@ -123,7 +136,7 @@ const SermonsView = {
       this.renderDrawerContent();
     });
 
-    // 5. Onglets du tiroir de ressources (Aperçu, Commentaires, IA, Lexique, Illustrations, Infos)
+    // 5. Onglets du tiroir
     document.querySelectorAll('#sermon-drawer-tabs-bar .drawer-tab').forEach(tabBtn => {
       tabBtn.addEventListener('click', () => {
         document.querySelectorAll('#sermon-drawer-tabs-bar .drawer-tab').forEach(b => b.classList.remove('active'));
@@ -133,7 +146,7 @@ const SermonsView = {
       });
     });
 
-    // 6. Insertion rapide de blocs homilétiques dans la section active
+    // 6. Insertion rapide de blocs homilétiques
     document.getElementById('btn-insert-point')?.addEventListener('click', () => this.addSection('point'));
     document.getElementById('btn-insert-subpoint')?.addEventListener('click', () => this.insertBlock('subpoint'));
     document.getElementById('btn-insert-scripture')?.addEventListener('click', () => this.insertBlock('scripture'));
@@ -157,7 +170,7 @@ const SermonsView = {
     document.getElementById('btn-add-section-scripture')?.addEventListener('click', () => this.addSection('scripture'));
     document.getElementById('btn-add-section-conclusion')?.addEventListener('click', () => this.addSection('conclusion'));
 
-    // 8. Écoute du titre principal
+    // 8. Titre du sermon
     this.titleInput?.addEventListener('input', () => {
       if (this.currentSermon) this.currentSermon.title = this.titleInput.value.trim();
       this.debouncedAutoSave();
@@ -186,23 +199,47 @@ const SermonsView = {
   async onViewActivated() {
     await this.loadSermons();
     await this.loadIllustrations();
-    if (this.currentSermon) {
-      this.syncPassageResources();
+    this.renderHubCards();
+  },
+
+  openHub() {
+    if (typeof App !== 'undefined') {
+      App.switchView('sermons');
     }
+    this.renderHubCards();
+  },
+
+  async openEditor(sermon = null) {
+    if (!sermon) {
+      if (this.currentSermon) {
+        sermon = this.currentSermon;
+      } else if (this.sermons.length > 0) {
+        sermon = await API.getSermon(this.sermons[0].id) || this.sermons[0];
+      } else {
+        await this.createNewSermon();
+        return;
+      }
+    }
+
+    this.currentSermon = sermon;
+    if (typeof App !== 'undefined') {
+      App.switchView('sermon-editor');
+    }
+    this.populateEditor(sermon);
+    this.resetHistory();
+    this.syncPassageResources();
   },
 
   // =========================================================================
-  // CHARGEMENT & GESTION DES SERMONS
+  // CHARGEMENT & GESTION DU HUB DE PRÉDICATIONS (VUE EN CARTES)
   // =========================================================================
 
   async loadSermons() {
     try {
       const list = await API.getSermonsList();
       this.sermons = Array.isArray(list) ? list : [];
-      this.renderList();
-
       if (!this.currentSermon && this.sermons.length > 0) {
-        await this.selectSermon(this.sermons[0].id);
+        this.currentSermon = this.sermons[0];
       }
     } catch (e) {
       console.error('Erreur chargement des sermons:', e);
@@ -218,15 +255,16 @@ const SermonsView = {
     }
   },
 
-  renderList() {
-    if (!this.listContainer) return;
-    const q = (this.searchInput?.value || '').toLowerCase().trim();
+  renderHubCards() {
+    if (!this.hubCardsContainer) return;
+    const q = (this.hubSearchInput?.value || '').toLowerCase().trim();
 
     let filtered = this.sermons.filter(s => {
       const matchQuery = !q || 
         (s.title || '').toLowerCase().includes(q) ||
         (s.church || '').toLowerCase().includes(q) ||
         (s.passage?.reference || '').toLowerCase().includes(q) ||
+        (s.series?.title || '').toLowerCase().includes(q) ||
         (s.theme_tags || []).some(t => t.toLowerCase().includes(q));
 
       if (!matchQuery) return false;
@@ -236,65 +274,310 @@ const SermonsView = {
       return true;
     });
 
+    if (this.lblSermonsCount) {
+      const count = filtered.length;
+      this.lblSermonsCount.textContent = `${count} ${count > 1 ? 'prédications' : 'prédication'}`;
+    }
+
     if (filtered.length === 0) {
-      this.listContainer.innerHTML = `
-        <div style="padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: 12.5px;">
-          Aucune prédication correspondante.
+      this.hubCardsContainer.innerHTML = `
+        <div style="padding: 56px 24px; text-align: center; color: var(--text-muted);">
+          <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 14px; opacity: 0.4;">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="22"/>
+            <line x1="8" y1="22" x2="16" y2="22"/>
+          </svg>
+          <div style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">Aucune prédication trouvée</div>
+          <div style="font-size: 13px; max-width: 400px; margin: 0 auto 16px auto;">Créez votre première prédication ou modifiez vos termes de recherche.</div>
+          <button class="btn-primary" id="btn-empty-new-sermon" style="display: inline-flex; align-items: center; gap: 6px; margin: 0 auto;">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>Nouvelle Prédication</span>
+          </button>
         </div>
       `;
+      document.getElementById('btn-empty-new-sermon')?.addEventListener('click', () => this.createNewSermon());
       return;
     }
 
-    this.listContainer.innerHTML = filtered.map(sermon => {
-      const isActive = this.currentSermon?.id === sermon.id;
+    const cardsHtml = filtered.map(sermon => {
       const statusClass = sermon.status === 'ready' ? 'status-ready' : 'status-draft';
-      const statusLabel = sermon.status === 'ready' ? 'Prêt' : 'Brouillon';
-      const ref = sermon.passage?.reference || 'Sans texte';
+      const statusLabel = sermon.status === 'ready' ? 'Prêt pour la chaire' : 'Brouillon en cours';
+      const ref = sermon.passage?.reference || 'Sans passage lié';
       const date = sermon.date_planned || '';
       const church = sermon.church || '';
+      const series = sermon.series?.title || '';
       const targetMin = sermon.timing?.target_duration_min || 35;
+      const bigIdea = sermon.big_idea || sermon.pmt || sermon.contemporary_tension || '';
 
       return `
-        <div class="sermon-list-item ${isActive ? 'active' : ''}" data-sermon-id="${sermon.id}">
-          <div class="sermon-list-item-body">
-            <div class="sermon-item-top">
-              <span class="sermon-badge-pill ${statusClass}">${statusLabel}</span>
-              <span class="sermon-item-timing">${targetMin} min</span>
-            </div>
-            <div class="sermon-item-title">${this.escapeHtml(sermon.title || 'Sans titre')}</div>
-            <div class="sermon-item-meta">
-              <span class="sermon-item-passage">${this.escapeHtml(ref)}</span>
-              ${church ? `<span class="sermon-item-church">• ${this.escapeHtml(church)}</span>` : ''}
-              ${date ? `<span class="sermon-item-date">• ${this.escapeHtml(date)}</span>` : ''}
+        <article class="sermon-card" data-sermon-id="${sermon.id}">
+          <div class="sermon-card-header">
+            <span class="sermon-card-badge ${statusClass}">${statusLabel}</span>
+            <span class="sermon-card-timing">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span>${targetMin} min</span>
+            </span>
+          </div>
+
+          <h2 class="sermon-card-title">${this.escapeHtml(sermon.title || 'Prédication sans titre')}</h2>
+
+          <div class="sermon-card-meta">
+            <span class="sermon-card-passage">${this.escapeHtml(ref)}</span>
+            ${church ? `<span>• ${this.escapeHtml(church)}</span>` : ''}
+            ${date ? `<span>• ${this.escapeHtml(date)}</span>` : ''}
+            ${series ? `<span>• Série : ${this.escapeHtml(series)}</span>` : ''}
+          </div>
+
+          ${bigIdea ? `<div class="sermon-card-idea">« ${this.escapeHtml(bigIdea)} »</div>` : ''}
+
+          <div class="sermon-card-footer">
+            <button class="btn-primary btn-card-action btn-open-sermon-editor" data-sermon-id="${sermon.id}" title="Ouvrir dans le studio de rédaction">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              <span>Rédiger</span>
+            </button>
+            <div class="sermon-card-actions">
+              <button class="btn-secondary btn-card-action btn-card-pulpit" data-sermon-id="${sermon.id}" title="Lancer le Mode Pupitre directement" style="color: var(--accent-orange, #f59e0b);">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+                <span>Pupitre</span>
+              </button>
+              <button class="btn-icon-subtle btn-card-delete" data-sermon-id="${sermon.id}" title="Supprimer la prédication" style="color: #f87171;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
+              </button>
             </div>
           </div>
-        </div>
+        </article>
       `;
     }).join('');
 
-    this.listContainer.querySelectorAll('.sermon-list-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const id = item.dataset.sermonId;
-        this.selectSermon(id);
+    this.hubCardsContainer.innerHTML = `<div class="sermons-grid">${cardsHtml}</div>`;
+
+    // Événements sur les cartes
+    this.hubCardsContainer.querySelectorAll('.sermon-card').forEach(card => {
+      card.addEventListener('click', async (e) => {
+        if (e.target.closest('.btn-card-action') || e.target.closest('.btn-card-delete')) return;
+        const id = card.dataset.sermonId;
+        const sermon = await API.getSermon(id);
+        if (sermon) this.openEditor(sermon);
+      });
+    });
+
+    this.hubCardsContainer.querySelectorAll('.btn-open-sermon-editor').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.sermonId;
+        const sermon = await API.getSermon(id);
+        if (sermon) this.openEditor(sermon);
+      });
+    });
+
+    this.hubCardsContainer.querySelectorAll('.btn-card-pulpit').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.sermonId;
+        const sermon = await API.getSermon(id);
+        if (sermon) {
+          this.currentSermon = sermon;
+          this.populateEditor(sermon);
+          this.openPulpitMode();
+        }
+      });
+    });
+
+    this.hubCardsContainer.querySelectorAll('.btn-card-delete').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.sermonId;
+        this.deleteSermon(id);
       });
     });
   },
 
-  async selectSermon(sermonId) {
-    if (!sermonId) return;
+  async deleteSermon(sermonId) {
+    const sermon = this.sermons.find(s => s.id === sermonId);
+    const title = sermon?.title || 'cette prédication';
+
+    let confirmed = false;
+    if (typeof App !== 'undefined' && App.showConfirmModal) {
+      confirmed = await App.showConfirmModal({
+        title: "Supprimer la prédication",
+        message: `Voulez-vous supprimer définitivement la prédication "${title}" ?`,
+        confirmText: "Supprimer",
+        cancelText: "Annuler",
+        danger: true,
+        icon: "trash"
+      });
+    } else {
+      confirmed = confirm(`Voulez-vous supprimer définitivement la prédication "${title}" ?`);
+    }
+
+    if (!confirmed) return;
 
     try {
-      const sermon = await API.getSermon(sermonId);
-      if (!sermon) return;
-
-      this.currentSermon = sermon;
-      this.populateEditor(sermon);
-      this.renderList();
-      this.resetHistory();
-      this.syncPassageResources();
+      const res = await API.deleteSermon(sermonId);
+      if (res && res.success) {
+        if (this.currentSermon?.id === sermonId) {
+          this.currentSermon = null;
+        }
+        await this.loadSermons();
+        this.renderHubCards();
+        if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast("Prédication supprimée.");
+        }
+      }
     } catch (e) {
-      console.error('Erreur sélection sermon:', e);
+      console.error('Erreur suppression sermon:', e);
     }
+  },
+
+  async deleteCurrentSermon() {
+    if (!this.currentSermon) return;
+    await this.deleteSermon(this.currentSermon.id);
+    this.openHub();
+  },
+
+  populateEditor(sermon) {
+    if (this.titleInput) this.titleInput.value = sermon.title || '';
+    this.updateHeaderSummary(sermon);
+
+    // Découpage du corps Markdown en sections modulaires
+    this.parseMarkdownIntoSections(sermon.body || '');
+    this.renderSections();
+    this.renderOutline();
+    this.updateMetrics();
+    this.renderDrawerContent();
+  },
+
+  updateHeaderSummary(sermon = this.currentSermon) {
+    if (!sermon) return;
+    const churchEl = document.getElementById('summary-church');
+    const refEl = document.getElementById('summary-ref');
+    const dateEl = document.getElementById('summary-date');
+
+    const church = sermon.church?.trim() || 'Lieu non spécifié';
+    const ref = sermon.passage?.reference?.trim() || 'Passage non lié';
+    const date = sermon.date_planned || 'Date à définir';
+
+    if (churchEl) churchEl.textContent = church;
+    if (refEl) refEl.textContent = ref;
+    if (dateEl) dateEl.textContent = date;
+  },
+
+  async createNewSermon() {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const newSermon = {
+      id: `sermon-${Date.now()}`,
+      title: "Nouvelle prédication",
+      church: "",
+      date_planned: todayStr,
+      status: "draft",
+      series: { title: "" },
+      passage: { reference: "" },
+      big_idea: "",
+      goal: "",
+      timing: { target_duration_min: 35, words_per_minute: 135 },
+      body: `## Introduction
+
+Accroche et tension contemporaine...
+
+## Lecture du passage
+
+> [!scripture]
+> « Insérez le texte biblique ici »
+
+## I. Premier Point Principal
+
+Explication textuelle et fondement doctrinal...
+
+## II. Deuxième Point Principal
+
+Développement théologique et illustration concrète...
+
+## Conclusion & Appel
+
+Synthèse de la pensée maîtresse et application pour la semaine...`
+    };
+
+    const res = await API.saveSermon(newSermon);
+    if (res && res.success) {
+      await this.loadSermons();
+      await this.openEditor(newSermon);
+      if (this.titleInput) {
+        this.titleInput.focus();
+        this.titleInput.select();
+      }
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast("Nouvelle prédication créée !");
+      }
+    }
+  },
+
+  async importSermon() {
+    try {
+      const res = await API.importSermon();
+      if (res && res.cancelled) return;
+      if (res && res.success && res.sermon) {
+        await this.loadSermons();
+        await this.openEditor(res.sermon);
+        if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast(`Prédication "${res.sermon.title}" importée avec succès !`);
+        }
+      } else if (res && res.error) {
+        if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast(`Erreur lors de l'import : ${res.error}`, "error");
+        }
+      }
+    } catch (e) {
+      console.error('Erreur import prédication:', e);
+    }
+  },
+
+  async saveCurrentSermon() {
+    if (!this.currentSermon) return;
+
+    const bodyMarkdown = this.serializeSectionsToMarkdown();
+    
+    const payload = {
+      ...this.currentSermon,
+      title: this.titleInput?.value.trim() || 'Prédication sans titre',
+      church: this.currentSermon.church || '',
+      date_planned: this.currentSermon.date_planned || new Date().toISOString().split('T')[0],
+      series: {
+        ...(this.currentSermon.series || {}),
+        title: this.currentSermon.series?.title || ''
+      },
+      passage: {
+        ...(this.currentSermon.passage || {}),
+        reference: this.currentSermon.passage?.reference || ''
+      },
+      big_idea: this.currentSermon.big_idea || this.currentSermon.pmt || '',
+      pmt: this.currentSermon.pmt || this.currentSermon.big_idea || '',
+      pms: this.currentSermon.pms || '',
+      contemporary_tension: this.currentSermon.contemporary_tension || '',
+      redemptive_era: this.currentSermon.redemptive_era || 'christ',
+      goal: this.currentSermon.goal || '',
+      body: bodyMarkdown
+    };
+
+    try {
+      const res = await API.saveSermon(payload);
+      if (res && res.success) {
+        this.currentSermon = res.sermon || payload;
+        this.updateHeaderSummary(this.currentSermon);
+        if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast("Prédication enregistrée !");
+        }
+      }
+    } catch (e) {
+      console.error('Erreur sauvegarde sermon:', e);
+    }
+  },
+
+  debouncedAutoSave() {
+    if (this.saveDebounceTimer) clearTimeout(this.saveDebounceTimer);
+    this.saveDebounceTimer = setTimeout(() => {
+      this.saveCurrentSermon();
+    }, 1200);
   },
 
   populateEditor(sermon) {
