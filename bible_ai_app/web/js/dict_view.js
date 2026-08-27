@@ -1149,19 +1149,19 @@ const DictView = {
         // Renvois cliquables vers les autres articles de Calmet
         processed = processed.replace(/\b(?:dans|à|sous)\s+l’article\s+(?:de\s+|d’)?([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ]{2,})\b/g, (match, word) => {
           const cleanW = word.replace(/[.,;:()\[\]]+$/, '').trim();
-          return `dans l’article de <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(cleanW)}">🔗 ${this.escapeHtml(cleanW)}</a>`;
+          return `dans l’article de <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(cleanW)}">${this.escapeHtml(cleanW)}</a>`;
         });
         processed = processed.replace(/\bcomme on le verra dans l'article de\s+([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ]{2,})\b/g, (match, word) => {
           const cleanW = word.replace(/[.,;:()\[\]]+$/, '').trim();
-          return `comme on le verra dans l'article de <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(cleanW)}">🔗 ${this.escapeHtml(cleanW)}</a>`;
+          return `comme on le verra dans l'article de <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(cleanW)}">${this.escapeHtml(cleanW)}</a>`;
         });
         processed = processed.replace(/\bVoyez\s+([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ]{2,})\b/g, (match, word) => {
           const cleanW = word.replace(/[.,;:()\[\]]+$/, '').trim();
-          return `Voyez <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(cleanW)}">🔗 ${this.escapeHtml(cleanW)}</a>`;
+          return `Voyez <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(cleanW)}">${this.escapeHtml(cleanW)}</a>`;
         });
         processed = processed.replace(/\bVoy\.\s+([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ]{2,})\b/g, (match, word) => {
           const cleanW = word.replace(/[.,;:()\[\]]+$/, '').trim();
-          return `Voy. <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(cleanW)}">🔗 ${this.escapeHtml(cleanW)}</a>`;
+          return `Voy. <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(cleanW)}">${this.escapeHtml(cleanW)}</a>`;
         });
       }
 
@@ -1171,11 +1171,11 @@ const DictView = {
         // Cas d'un renvoi direct : [Voyez X] ou [Voir X]
         if (/^(?:Voyez|Voir|Voy\.)\s+[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]+[.,;]?$/i.test(cleanInner)) {
           const word = cleanInner.replace(/^(?:Voyez|Voir|Voy\.)\s+/i, '').replace(/[.,;:()\[\]]+$/, '').trim();
-          return `<a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word)}">🔗 Voyez ${this.escapeHtml(word)}</a>`;
+          return `<a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word)}">Voyez ${this.escapeHtml(word)}</a>`;
         }
         // Si c'est un long bloc éditorial indépendant (> 160 caractères ou note de savant/M. Boré)
         if (cleanInner.length > 160 && (cleanInner.includes('. ') || cleanInner.startsWith('M.') || cleanInner.startsWith('Note') || cleanInner.startsWith('A l\'occasion'))) {
-          return `\n\n<div class="dict-calmet-editorial-note"><span class="dict-calmet-note-label">📝 Note critique & historique :</span>${cleanInner}</div>\n\n`;
+          return `\n\n<div class="dict-calmet-editorial-note"><span class="dict-calmet-note-label">Note critique & historique :</span>${cleanInner}</div>\n\n`;
         }
         // Sinon, glose ou précision courte inline
         return `<span class="dict-editorial-gloss">[${cleanInner}]</span>`;
@@ -1349,8 +1349,24 @@ const DictView = {
         return;
       }
 
-      // B0) En-tête NDB avec variantes et étymologie (Ligne initiale)
-      if (this.optLogosRestructure && lineIdx <= 1 && raw.includes(' : ') && !raw.startsWith('I.') && !raw.startsWith('1.') && !raw.startsWith('**') && !raw.startsWith('#')) {
+      // B00) Ligne initiale d'Étymologie & Langues originales (ex: *(Hébreu : מַעֲלוֹת / ma‘ălôt ; Septante : ὡρολόγιον ; Vulgate : horologium).*)
+      const isInitialEtym = lineIdx <= 2 && /^\*?\(?\s*(?:Hébreu|Grec|Latin|Septante|Vulgate|Araméen|Arabe|Syriaque)\s*:/i.test(raw);
+      if (isInitialEtym) {
+        let cleanEtym = raw.replace(/^[*_`\s\(\)]+/, '').replace(/[*_`\s\(\)\.]*$/, '').trim();
+        const cleanEtymFmt = cleanEtym
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.*?)\*/g, '<em>$1</em>');
+        out.push(`
+          <div class="dict-etymology-box" style="margin: 10px 0 14px 0; padding: 10px 14px; border-radius: 0 6px 6px 0; font-size: 14.5px;">
+            <span class="dict-etymology-label" style="font-weight: 700; font-size: 13.5px;">Langues originales :</span>
+            <span class="dict-etymology-content" style="margin-left: 6px;">${cleanEtymFmt}</span>
+          </div>
+        `);
+        return;
+      }
+
+      // B0) En-tête NDB avec variantes et définition courte (Ligne initiale)
+      if (this.optLogosRestructure && lineIdx <= 2 && raw.includes(' : ') && !raw.startsWith('I.') && !raw.startsWith('1.') && !raw.startsWith('**') && !raw.startsWith('#') && !raw.startsWith('*(') && !raw.startsWith('(')) {
         const colonIdx = raw.indexOf(' : ');
         const varPart = raw.substring(0, colonIdx).trim();
         const meanPart = raw.substring(colonIdx + 3).trim();
@@ -1366,7 +1382,7 @@ const DictView = {
           if (varPart) {
             out.push(`<div class="dict-header-variants" style="margin-bottom: 6px; font-size: 14px; color: var(--text-secondary); line-height: 1.6;">${varPart}</div>`);
           }
-          out.push(`<div class="dict-etymology-box" style="margin: 10px 0 14px 0; padding: 10px 14px; border-radius: 0 6px 6px 0; font-size: 14.5px; display: flex; align-items: center; gap: 8px;"><span class="dict-etymology-label" style="font-weight: 700; font-size: 13.5px; white-space: nowrap;">💡 Signification :</span> <span><em>${meaningOnly}</em></span></div>`);
+          out.push(`<div class="dict-etymology-box" style="margin: 10px 0 14px 0; padding: 10px 14px; border-radius: 0 6px 6px 0; font-size: 14.5px; display: flex; align-items: center; gap: 8px;"><span class="dict-etymology-label" style="font-weight: 700; font-size: 13.5px; white-space: nowrap;">Signification :</span> <span><em>${meaningOnly}</em></span></div>`);
           if (introPart) {
             out.push(`<p style="margin: 8px 0 12px 0; line-height: 1.75;">${introPart}</p>`);
           }
@@ -1723,7 +1739,7 @@ const DictView = {
           // Titre de section bibliographique autonome (ex: **Bibliographie :**) -> afficher comme en-tête propre
           if (inUlList) { out.push('</ul>'); inUlList = false; }
           const headingLabel = raw.replace(/[*_`]+/g, '').trim();
-          out.push(`<div class="dict-biblio-heading" style="margin: 16px 0 6px 0; font-weight: 700; font-size: 14.5px; color: var(--text-primary); font-style: italic;">📚 ${this.escapeHtml(headingLabel)}</div>`);
+          out.push(`<div class="dict-biblio-heading" style="margin: 16px 0 6px 0; font-weight: 700; font-size: 14.5px; color: var(--text-primary); font-style: italic;">${this.escapeHtml(headingLabel)}</div>`);
           return;
         }
       }
@@ -1740,7 +1756,7 @@ const DictView = {
 
         // Rendre cliquables les renvois à l'intérieur des listes à puces (ex: *Voir* : **ÉBAL (1)**)
         itemText = itemText.replace(/\b(?:Voir|V\.)\s*:\s*<strong>([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ][^<]+?)<\/strong>/gi, (m, word) => {
-          return `Voir : <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word.trim())}">🔗 ${this.escapeHtml(word.trim())}</a>`;
+          return `Voir : <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word.trim())}">${this.escapeHtml(word.trim())}</a>`;
         });
 
         // Détection de catégorie d'en-tête (ex: * **Attributs individuels :**)
