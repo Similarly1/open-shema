@@ -25,6 +25,9 @@ const DictView = {
   historyPointer: -1,
   _isNavigatingHistory: false,
 
+  // Cache des mots-vedettes valides pour vérifier les liens de renvois
+  knownHeadwordsSet: new Set(),
+
   // Options d'affichage et de transformation du texte
   optLogosRestructure: true,
   optConvertRoman: true,
@@ -219,27 +222,43 @@ const DictView = {
     const btnHistBack = document.getElementById('btn-dict-history-back');
     const btnHistFwd = document.getElementById('btn-dict-history-forward');
 
-    btnHistBack?.addEventListener('click', () => {
+    btnHistBack?.addEventListener('click', async () => {
       if (this.historyPointer > 0) {
         this.historyPointer--;
         const item = this.historyStack[this.historyPointer];
         this._isNavigatingHistory = true;
-        this.selectDictionary(item.dictId, item.slug).finally(() => {
+        try {
+          if (item.dictId && item.dictId !== this.activeDictId) {
+            await this.selectDictionary(item.dictId, item.slug);
+          } else {
+            await this.selectEntry(item.slug);
+          }
+        } catch (e) {
+          console.error('Erreur navigation historique arrière:', e);
+        } finally {
           this._isNavigatingHistory = false;
           this.updateHistoryButtons();
-        });
+        }
       }
     });
 
-    btnHistFwd?.addEventListener('click', () => {
+    btnHistFwd?.addEventListener('click', async () => {
       if (this.historyPointer < this.historyStack.length - 1) {
         this.historyPointer++;
         const item = this.historyStack[this.historyPointer];
         this._isNavigatingHistory = true;
-        this.selectDictionary(item.dictId, item.slug).finally(() => {
+        try {
+          if (item.dictId && item.dictId !== this.activeDictId) {
+            await this.selectDictionary(item.dictId, item.slug);
+          } else {
+            await this.selectEntry(item.slug);
+          }
+        } catch (e) {
+          console.error('Erreur navigation historique avant:', e);
+        } finally {
           this._isNavigatingHistory = false;
           this.updateHistoryButtons();
-        });
+        }
       }
     });
 
@@ -503,12 +522,15 @@ const DictView = {
     });
   },
 
-  selectDictionary(dictId, targetSlug = null) {
+  async selectDictionary(dictId, targetSlug = null) {
     const dInfo = this.allDictionaries.find(d => d.id === dictId || d.name === dictId) || this.allDictionaries[0];
     if (!dInfo) return;
 
     this.activeDictId = dInfo.id;
     this.activeDictInfo = dInfo;
+
+    // Charger les mots-vedettes valides pour filtrer les boutons de renvois
+    this.loadValidHeadwords(this.activeDictId);
 
     // Mettre à jour le bouton actif dans l'en-tête (Style Théologie)
     const titleEl = document.getElementById('dict-active-book-title');
@@ -566,6 +588,25 @@ const DictView = {
 
       this.loadHeadwords('ALL', null, null);
     }
+  },
+
+  async loadValidHeadwords(dictId) {
+    try {
+      const list = await API.getDictionaryValidHeadwords(dictId);
+      if (Array.isArray(list)) {
+        this.knownHeadwordsSet = new Set(list.map(s => (s || '').toUpperCase().trim()));
+      }
+    } catch (e) {
+      console.error('Erreur chargement mots-vedettes valides:', e);
+    }
+  },
+
+  isValidHeadword(word) {
+    if (!word) return false;
+    if (!this.knownHeadwordsSet || this.knownHeadwordsSet.size === 0) return true;
+    const wUpper = word.toUpperCase().trim();
+    const wNorm = wUpper.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Z0-9]/g, '');
+    return this.knownHeadwordsSet.has(wUpper) || this.knownHeadwordsSet.has(wNorm);
   },
 
   // =========================================================================
@@ -1116,9 +1157,7 @@ const DictView = {
     // Nettoyage des artefacts de découpage intermédiaire (ex: " (Partie 1/2)", " (Partie 2/2)")
     processed = processed.replace(/\s*\((?:Partie|partie)\s+\d+\/\d+\)/gi, '');
 
-    // Nettoyage universel de toute astérisque orpheline (*sa-ba-tu -> sa-ba-tu, mot* -> mot, etc.)
-    processed = processed.replace(/\*([a-zA-ZÀ-ÿ0-9_\-]+)/g, '$1');
-    processed = processed.replace(/([a-zA-ZÀ-ÿ0-9_\-]+)\*/g, '$1');
+    // Nettoyage des astérisques de notes attachées aux chiffres/versets et ponctuations
     processed = processed.replace(/(\b[0-9]+(?::|\.)[0-9]+(?:\s*[\-–,]\s*[0-9]+)*)\s*\*/g, '$1');
     processed = processed.replace(/\(\s*([^\)\n]+?)\s*\*\s*\)/g, '($1)');
     processed = processed.replace(/(?<=[0-9\.,;\s\(\[])\*(?=[0-9\.,;\s\)\]]|$)/g, '');
@@ -1128,6 +1167,18 @@ const DictView = {
     // Espacement et découpage des doubles deux-points collés (ex: Sources :Voir aussi :)
     processed = processed.replace(/:\s*Voir aussi\s*:/gi, '.\n\n*Voir aussi :*');
     processed = processed.replace(/:\s*Voir\s*:/gi, '.\n\n*Voir :*');
+
+    // Helper Markdown inline universel et robuste (garantit ZERO astérisque à l'écran)
+    const formatInlineMarkdown = (s) => {
+      if (!s) return '';
+      let res = s;
+      res = res.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>');
+      res = res.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      res = res.replace(/(?<=[^\w*]|^)\*([^\s*\n].*?[^\s*\n])\*(?=[^\w*]|$)/g, '<em>$1</em>');
+      res = res.replace(/(?<=[^\w*]|^)\*([^\s*\n])\*(?=[^\w*]|$)/g, '<em>$1</em>');
+      res = res.replace(/(?<!<[^>]*)\*/g, '');
+      return res;
+    };
 
     // Élimination du doublon de titre en tête d'article (ex: ABAGARE \n ABAGARE)
     processed = processed.replace(/^([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]{2,})\n+\1\n+/i, '$1\n\n');
@@ -1339,8 +1390,8 @@ const DictView = {
     processed = processed.replace(inlineSeeRx, (match, boldW, plainW, parenMeta) => {
       let cleanW = (boldW || plainW || '').replace(/^(?:voir|voyez)?\s*(?:aussi|également)?\s*[:\s]*/i, '').trim();
       if (!cleanW || cleanW.length < 2) return match;
-      // RÈGLE STRICTE : Uniquement les noms en MAJUSCULES (ex: CALENDRIER). Rejeter les auteurs avec minuscules (ex: Johannes Buxtorf)
-      if (cleanW !== cleanW.toUpperCase() || !/^[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]{2,35}$/.test(cleanW)) {
+      // RÈGLE STRICTE : Uniquement les noms en MAJUSCULES qui existent RÉELLEMENT dans le dictionnaire
+      if (cleanW !== cleanW.toUpperCase() || !/^[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]{2,35}$/.test(cleanW) || !this.isValidHeadword(cleanW)) {
         return match;
       }
       if (/^(?:I{1,3}|IV|V|VI|VII|VIII|IX|X|XI|XII|TOB|NBS|BFC|S21)$/.test(cleanW)) return match;
@@ -1436,9 +1487,7 @@ const DictView = {
         const level = headingMatch[1].length;
         let titleContent = headingMatch[2].trim();
         // Évaluer le gras et l'italique à l'intérieur du titre pour supprimer les astérisques brutes
-        const titleFmt = titleContent
-          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-          .replace(/\*(.*?)\*/g, '<em>$1</em>');
+        const titleFmt = formatInlineMarkdown(titleContent);
         
         const margins = {
           1: 'margin: 24px 0 12px 0; font-size: 22px; font-weight: 800;',
@@ -1456,9 +1505,7 @@ const DictView = {
       const isInitialEtym = lineIdx <= 2 && /^\*?\(?\s*(?:Hébreu|Grec|Latin|Septante|Vulgate|Araméen|Arabe|Syriaque)\s*:/i.test(raw);
       if (isInitialEtym) {
         let cleanEtym = raw.replace(/^[*_`\s\(\)]+/, '').replace(/[*_`\s\(\)\.]*$/, '').trim();
-        const cleanEtymFmt = cleanEtym
-          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-          .replace(/\*(.*?)\*/g, '<em>$1</em>');
+        const cleanEtymFmt = formatInlineMarkdown(cleanEtym);
         out.push(`
           <div class="dict-etymology-box" style="margin: 10px 0 14px 0; padding: 10px 14px; border-radius: 0 6px 6px 0; font-size: 14.5px;">
             <span class="dict-etymology-label" style="font-weight: 700; font-size: 13.5px;">Langues originales :</span>
@@ -1751,8 +1798,8 @@ const DictView = {
             word = word.replace(/^(?:voir|voyez)?\s*(?:aussi|également)?\s*[:\s]*/i, '').replace(/[.,;:]+$/, '').trim();
             const currentTitleNorm = (this.currentEntryData?.title || this.activeSlug || '').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Z0-9]/g, '');
             const wordNorm = word.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Z0-9]/g, '');
-            // RÈGLE STRICTE : Le mot DOIT être en majuscules pour être un article
-            if (word && word === word.toUpperCase() && /^[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]{2,35}$/.test(word) && wordNorm !== currentTitleNorm) {
+            // RÈGLE STRICTE : Le mot DOIT être en majuscules ET exister dans le dictionnaire pour avoir un bouton
+            if (word && word === word.toUpperCase() && /^[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]{2,35}$/.test(word) && wordNorm !== currentTitleNorm && this.isValidHeadword(word)) {
               parsedTargets.push({ word, meta, qualifier });
             }
           });
@@ -1931,9 +1978,7 @@ const DictView = {
           inBulletCategory = false;
         }
 
-        const itemFormatted = itemText
-          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-          .replace(/\*(.*?)\*/g, '<em>$1</em>');
+        const itemFormatted = formatInlineMarkdown(itemText);
 
         const extraClass = isNested ? ' dict-bullet-nested' : (isHeaderOnly ? ' dict-bullet-category' : '');
         out.push(`<li class="dict-bullet-item${extraClass}">${itemFormatted}</li>`);
@@ -1963,9 +2008,7 @@ const DictView = {
             out.push(`<div class="dict-biblio-heading" style="margin: 16px 0 6px 0; font-weight: 700; font-size: 14.5px; color: var(--text-primary); font-style: italic;">Ouvrages recommandés :</div>`);
             out.push('<ul class="dict-bullet-list">');
             items.forEach(it => {
-              const itFmt = it
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>');
+              const itFmt = formatInlineMarkdown(it);
               out.push(`  <li class="dict-bullet-item">${itFmt}</li>`);
             });
             out.push('</ul>');
@@ -1975,9 +2018,7 @@ const DictView = {
       }
 
       // G) Paragraphe classique
-      const pFmt = raw
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>');
+      const pFmt = formatInlineMarkdown(raw);
 
       out.push(`<p style="margin: 8px 0; line-height: 1.75;">${pFmt}</p>`);
     });

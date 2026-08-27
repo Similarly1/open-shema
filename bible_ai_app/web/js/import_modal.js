@@ -799,62 +799,170 @@ const ImportModal = {
   },
 
   generateSmartCover() {
-    const title = document.getElementById('import-book-title')?.value || document.getElementById('import-book-id')?.value || 'OUVRAGE BIBLIQUE';
-    const author = document.getElementById('import-book-author')?.value || '';
+    let rawTitle = (document.getElementById('import-book-title')?.value || document.getElementById('import-book-id')?.value || 'OUVRAGE BIBLIQUE').trim();
+    // Épuration de la date entre parenthèses en fin de titre pour éviter la redondance avec la mention d'édition en bas
+    const title = rawTitle.replace(/\s*\(\s*\d{4}(?:\s*[-–/]\s*\d{4})?\s*\)\s*$/, '').trim();
+    const author = (document.getElementById('import-book-author')?.value || '').trim();
+    const year = (document.getElementById('import-book-year')?.value || '').trim();
     const isBible = document.getElementById('import-book-type')?.value === 'Bible';
     
-    // Génération locale de couverture élégante et épurée 2D avec Canvas
+    // Génération locale de couverture élégante et épurée 2D Haute Résolution (HD 400x560)
     const canvas = document.createElement('canvas');
-    canvas.width = 200;
-    canvas.height = 280;
+    const width = 400;
+    const height = 560;
+    canvas.width = width;
+    canvas.height = height;
     const ctx = canvas.getContext('2d');
 
-    // Fond dégradé sobre et élégant
-    const grad = ctx.createLinearGradient(0, 0, 0, 280);
+    // 1. Fond dégradé noble et profond
+    const grad = ctx.createLinearGradient(0, 0, 0, height);
     if (isBible) {
       grad.addColorStop(0, '#1E1B4B');
-      grad.addColorStop(1, '#0F172A');
+      grad.addColorStop(0.5, '#171E38');
+      grad.addColorStop(1, '#0B0F19');
     } else {
       grad.addColorStop(0, '#0F172A');
-      grad.addColorStop(1, '#1E3A8A');
+      grad.addColorStop(0.5, '#1E293B');
+      grad.addColorStop(1, '#090D16');
     }
     ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 200, 280);
+    ctx.fillRect(0, 0, width, height);
 
-    // Cadre doré fin
-    ctx.strokeStyle = isBible ? '#F59E0B' : '#60A5FA';
-    ctx.lineWidth = 2.5;
-    ctx.strokeRect(10, 10, 180, 260);
+    // 2. Texture de grain subtile
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+    for (let x = 0; x < width; x += 4) {
+      for (let y = 0; y < height; y += 4) {
+        if ((x + y) % 8 === 0) {
+          ctx.fillRect(x, y, 2, 2);
+        }
+      }
+    }
 
-    // Filet intérieur subtil
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(14, 14, 172, 252);
-
-    // Titre de l'ouvrage
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 13px Inter, sans-serif';
-    ctx.textAlign = 'center';
+    // 3. Cadre doré / accent extérieur
+    const frameColor = isBible ? '#D97706' : '#3B82F6';
+    const innerFrameColor = isBible ? 'rgba(245, 158, 11, 0.4)' : 'rgba(96, 165, 250, 0.4)';
     
-    const words = title.split(' ');
-    let line1 = words.slice(0, 3).join(' ');
-    let line2 = words.slice(3, 6).join(' ');
-    let line3 = words.slice(6, 9).join(' ');
+    ctx.strokeStyle = frameColor;
+    ctx.lineWidth = 4;
+    ctx.strokeRect(20, 20, width - 40, height - 40);
 
-    ctx.fillText(line1, 100, 95);
-    if (line2) ctx.fillText(line2, 100, 115);
-    if (line3) ctx.fillText(line3, 100, 135);
+    // Filet intérieur fin
+    ctx.strokeStyle = innerFrameColor;
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(28, 28, width - 56, height - 56);
 
-    // Badge / type
+    // Coins décoratifs
+    const cornerSize = 16;
+    ctx.strokeStyle = frameColor;
+    ctx.lineWidth = 2.5;
+    // Haut Gauche
+    ctx.strokeRect(24, 24, cornerSize, cornerSize);
+    // Haut Droit
+    ctx.strokeRect(width - 24 - cornerSize, 24, cornerSize, cornerSize);
+    // Bas Gauche
+    ctx.strokeRect(24, height - 24 - cornerSize, cornerSize, cornerSize);
+    // Bas Droit
+    ctx.strokeRect(width - 24 - cornerSize, height - 24 - cornerSize, cornerSize, cornerSize);
+
+    // Fonction d'auto-wrapping de texte avec mesure précise de largeur
+    const wrapText = (text, maxWidth, maxLines = 5) => {
+      const words = text.split(/\s+/);
+      const lines = [];
+      let currentLine = '';
+
+      for (const word of words) {
+        const testLine = currentLine ? `${currentLine} ${word}` : word;
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && currentLine) {
+          lines.push(currentLine);
+          currentLine = word;
+          if (lines.length >= maxLines - 1) break;
+        } else {
+          currentLine = testLine;
+        }
+      }
+      if (currentLine && lines.length < maxLines) {
+        lines.push(currentLine);
+      }
+      return lines;
+    };
+
+    // 4. En-tête / Badge supérieur
+    ctx.textAlign = 'center';
     ctx.fillStyle = isBible ? '#FDE68A' : '#93C5FD';
-    ctx.font = '10px Inter, sans-serif';
-    ctx.fillText(author || (isBible ? 'SAINTE BIBLE' : 'ÉTUDE THÉOLOGIQUE'), 100, 230);
+    ctx.font = '600 14px "Inter", sans-serif';
+    ctx.letterSpacing = '2px';
+    const topBadge = isBible ? '✦ SAINTE BIBLE ✦' : '✦ ÉTUDE BIBLIQUE ✦';
+    ctx.fillText(topBadge, width / 2, 75);
+
+    // Filet sous l'en-tête
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(width / 2 - 50, 95);
+    ctx.lineTo(width / 2 + 50, 95);
+    ctx.stroke();
+
+    // 5. Titre de l'ouvrage (centré verticalement avec retour à la ligne intelligent)
+    const maxTitleWidth = width - 90; // 310px
+    let titleFontSize = 26;
+    if (title.length > 40) titleFontSize = 22;
+    if (title.length > 70) titleFontSize = 19;
+
+    ctx.font = `bold ${titleFontSize}px "Cinzel", "Cardo", "EB Garamond", serif, sans-serif`;
+    ctx.fillStyle = '#FFFFFF';
+    
+    let titleLines = wrapText(title, maxTitleWidth, 5);
+    
+    // Si trop de lignes, réduire légèrement la police
+    if (titleLines.length > 3 && titleFontSize > 20) {
+      titleFontSize = 20;
+      ctx.font = `bold ${titleFontSize}px "Cinzel", "Cardo", "EB Garamond", serif, sans-serif`;
+      titleLines = wrapText(title, maxTitleWidth, 5);
+    }
+
+    const titleLineHeight = titleFontSize * 1.35;
+    const totalTitleHeight = titleLines.length * titleLineHeight;
+    const titleStartY = 240 - (totalTitleHeight / 2);
+
+    titleLines.forEach((line, idx) => {
+      ctx.fillText(line, width / 2, titleStartY + (idx * titleLineHeight));
+    });
+
+    // Filet décoratif sous le titre
+    ctx.strokeStyle = isBible ? 'rgba(245, 158, 11, 0.6)' : 'rgba(59, 130, 246, 0.6)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(width / 2 - 40, titleStartY + totalTitleHeight + 15);
+    ctx.lineTo(width / 2 + 40, titleStartY + totalTitleHeight + 15);
+    ctx.stroke();
+
+    // 6. Auteur / Éditeur (en bas avec wrapping automatique)
+    const authorText = author || (isBible ? 'Traduction d’après les textes originaux' : 'Ouvrage de référence');
+    const maxAuthorWidth = width - 100;
+    ctx.font = '500 14px "Inter", sans-serif';
+    ctx.fillStyle = isBible ? '#FCD34D' : '#BFDBFE';
+    
+    const authorLines = wrapText(authorText, maxAuthorWidth, 3);
+    const authorLineHeight = 20;
+    const authorStartY = height - 120 - ((authorLines.length - 1) * authorLineHeight / 2);
+
+    authorLines.forEach((line, idx) => {
+      ctx.fillText(line, width / 2, authorStartY + (idx * authorLineHeight));
+    });
+
+    // 7. Année d'édition (si disponible)
+    if (year) {
+      ctx.font = '400 12px "Inter", sans-serif';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+      ctx.fillText(`Édition ${year}`, width / 2, height - 60);
+    }
 
     const dataUrl = canvas.toDataURL('image/png');
     this.coverPath = dataUrl;
     this.coverDataUrl = dataUrl;
     this.updateCoverPreview(dataUrl);
-    App.showToast('Smart Cover 2D générée !');
+    App.showToast('Smart Cover 2D générée avec succès !');
   },
 
   async updateCoverPreview(pathOrUrl) {

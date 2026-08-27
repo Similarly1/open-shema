@@ -284,6 +284,30 @@ class DictionaryManager:
         return indexed_items
 
     @classmethod
+    def get_all_headword_titles(cls, dict_id: str) -> List[str]:
+        """Retourne la liste de tous les titres et slugs disponibles pour valider les renvois en temps réel."""
+        reg = cls.load_registry()
+        d_info = next((d for d in reg if d["id"] == dict_id), None)
+        if not d_info:
+            return []
+        items = cls._get_or_build_index(dict_id, d_info)
+        titles = set()
+        for it in items:
+            if it.get("slug"):
+                slug_up = it["slug"].upper()
+                titles.add(slug_up)
+                titles.add(unicodedata.normalize('NFD', slug_up).encode('ascii', 'ignore').decode('utf-8'))
+            if it.get("title"):
+                t_clean = re.sub(r'^(?:[0-9]+\.\s*)', '', it["title"]).strip().upper()
+                titles.add(t_clean)
+                titles.add(unicodedata.normalize('NFD', t_clean).encode('ascii', 'ignore').decode('utf-8'))
+                first_word = t_clean.split(' ')[0]
+                if len(first_word) >= 3:
+                    titles.add(first_word)
+                    titles.add(unicodedata.normalize('NFD', first_word).encode('ascii', 'ignore').decode('utf-8'))
+        return list(titles)
+
+    @classmethod
     def get_headwords(
         cls, 
         dict_id: str, 

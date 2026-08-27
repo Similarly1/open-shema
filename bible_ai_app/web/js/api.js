@@ -468,6 +468,10 @@ const API = {
     return this.call('get_dictionary_entry', dictId, slug, strongCode);
   },
 
+  async getDictionaryValidHeadwords(dictId) {
+    return this.call('get_dictionary_valid_headwords', dictId);
+  },
+
   async getCurrentPassage() {
     return await this.call('get_current_passage');
   },

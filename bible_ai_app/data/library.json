@@ -845,5 +845,19 @@
     "total_books": 27,
     "embedding_model": "study_library",
     "active": true
+  },
+  "OLT": {
+    "title": "Nouveau Testament - Hugues Oltramare",
+    "author": "Agence de la Société Biblique Protestante",
+    "description": "Version nouvelle et soignée du Nouveau Testament traduite sur le texte grec par Hugues Oltramare, professeur à la Faculté de Théologie de Genève. Formatage Logos par Didier Fontaine / Areopage.net.",
+    "year": "1874",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\OLT.png",
+    "type": "Bible",
+    "format": "json",
+    "folder_name": "OLT",
+    "version_code": "OLT",
+    "total_books": 27,
+    "embedding_model": "study_library",
+    "active": true
   }
 }

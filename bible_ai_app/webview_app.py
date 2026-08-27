@@ -3014,6 +3014,9 @@ class BibleAppApi:
     def get_dictionary_entry(self, dict_id: str, slug: str, strong_code: Optional[str] = None) -> Dict[str, Any]:
         return DictionaryManager.get_entry_content(dict_id, slug, strong_code=strong_code)
 
+    def get_dictionary_valid_headwords(self, dict_id: str) -> List[str]:
+        return DictionaryManager.get_all_headword_titles(dict_id)
+
     def save_dictionaries(self, dict_list: List[Dict[str, Any]]) -> bool:
         DictionaryManager.save_registry(dict_list)
         return True
