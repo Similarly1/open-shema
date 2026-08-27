@@ -2636,7 +2636,16 @@ const TheolLatinGlossary = {
     'sqq.': { term: 'sqq.', full: 'Sequentia', cat: 'Pagination', desc: '« Et les pages / colonnes suivantes ».' },
     'et suiv.': { term: 'et suiv.', full: 'Et sequentia', cat: 'Pagination', desc: '« Et pages ou colonnes suivantes ».' },
     'cf.': { term: 'cf.', full: 'Confer', cat: 'Renvoi', desc: '« Confère / Comparez avec » (renvoi pour vérification).' },
-    'édit. mangey': { term: 'édit. Mangey', full: 'Édition Thomas Mangey (1742)', cat: 'Édition', desc: 'Édition scientifique de référence des œuvres de Philon d’Alexandrie.' }
+    'édit. mangey': { term: 'édit. Mangey', full: 'Édition Thomas Mangey (1742)', cat: 'Édition', desc: 'Édition scientifique de référence des œuvres de Philon d’Alexandrie.' },
+    'in-folio': { term: 'in-folio', full: 'Format in-folio (in-fol.)', cat: 'Format de livre', desc: 'Très grand format d’imprimerie où la feuille de papier n’est pliée qu’en deux (2 feuillets / 4 pages, haut. > 30 cm), réservé aux bibles et grandes sommes théologiques anciennes.' },
+    'in-fol.': { term: 'in-fol.', full: 'Format in-folio', cat: 'Format de livre', desc: 'Grand format d’impression (feuille pliée en deux, > 30 cm), typique des grandes éditions savantes anciennes.' },
+    'in-fol': { term: 'in-fol', full: 'Format in-folio', cat: 'Format de livre', desc: 'Grand format d’impression (feuille pliée en deux, > 30 cm), typique des grandes éditions savantes anciennes.' },
+    'in-4°': { term: 'in-4°', full: 'Format in-quarto', cat: 'Format de livre', desc: 'Format de livre moyen-grand où la feuille est pliée en 4 (4 feuillets / 8 pages, ~25–30 cm).' },
+    'in-4': { term: 'in-4', full: 'Format in-quarto', cat: 'Format de livre', desc: 'Format de livre moyen-grand où la feuille est pliée en 4 (4 feuillets / 8 pages, ~25–30 cm).' },
+    'in-8°': { term: 'in-8°', full: 'Format in-octavo', cat: 'Format de livre', desc: 'Format standard où la feuille est pliée en 8 (8 feuillets / 16 pages, ~20–25 cm).' },
+    'in-8': { term: 'in-8', full: 'Format in-octavo', cat: 'Format de livre', desc: 'Format standard où la feuille est pliée en 8 (8 feuillets / 16 pages, ~20–25 cm).' },
+    'in-12°': { term: 'in-12°', full: 'Format in-duodecimo', cat: 'Format de livre', desc: 'Petit format ancien (format de poche, ~15–18 cm).' },
+    'in-12': { term: 'in-12', full: 'Format in-duodecimo', cat: 'Format de livre', desc: 'Petit format ancien (format de poche, ~15–18 cm).' }
   },
 
   annotate(text) {

@@ -768,6 +768,9 @@ const DictView = {
     if (typeof TheologyView !== 'undefined' && TheologyView.linkifyUrls) {
       linkified = TheologyView.linkifyUrls(linkified);
     }
+    if (isVigouroux && typeof TheolLatinGlossary !== 'undefined') {
+      linkified = TheolLatinGlossary.annotate(linkified);
+    }
 
     // Section des notes de bas de page si des citations ont été extraites
     let footnotesHtml = '';
@@ -1791,6 +1794,28 @@ const DictView = {
       if (raw.startsWith('<div') || raw.startsWith('<blockquote') || raw.startsWith('<p') || raw.startsWith('<ul') || raw.startsWith('<ol') || raw.startsWith('<table')) {
         out.push(raw);
         return;
+      }
+
+      // F2) Ligne d'ouvrages recommandés / bibliographie multiple avec points-virgules
+      const biblioMultiMatch = raw.match(/^(?:\*+)?(?:Voir également|Voir aussi|Consulter aussi|Ouvrages recommandés|Ouvrages de référence|Bibliographie)\s*:(?:\*+)?\s*(.+)$/i);
+      if (biblioMultiMatch) {
+        const content = biblioMultiMatch[1].trim();
+        if (content.includes(' ; ') || (content.includes(';') && content.split(';').length >= 2)) {
+          const items = content.split(/\s*;\s*/).map(s => s.trim().replace(/\.$/, '')).filter(Boolean);
+          if (items.length >= 2) {
+            if (inUlList) { out.push('</ul>'); inUlList = false; }
+            out.push(`<div class="dict-biblio-heading" style="margin: 16px 0 6px 0; font-weight: 700; font-size: 14.5px; color: var(--text-primary); font-style: italic;">Ouvrages recommandés :</div>`);
+            out.push('<ul class="dict-bullet-list">');
+            items.forEach(it => {
+              const itFmt = it
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>');
+              out.push(`  <li class="dict-bullet-item">${itFmt}</li>`);
+            });
+            out.push('</ul>');
+            return;
+          }
+        }
       }
 
       // G) Paragraphe classique
