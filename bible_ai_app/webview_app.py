@@ -23,6 +23,22 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.insert(0, current_dir)
 
+# Purge préventive des .pyc périmés (évite les crashs sur bytecode obsolète après modifications sources)
+def _purge_stale_pyc_caches(root: str):
+    import glob
+    for pyc_path in glob.glob(os.path.join(root, "**", "__pycache__", "*.pyc"), recursive=True):
+        cache_dir = os.path.dirname(pyc_path)
+        pkg_dir = os.path.dirname(cache_dir)
+        basename = os.path.basename(pyc_path).split(".")[0]
+        py_path = os.path.join(pkg_dir, basename + ".py")
+        if os.path.exists(py_path) and os.path.getmtime(py_path) > os.path.getmtime(pyc_path):
+            try:
+                os.remove(pyc_path)
+            except OSError:
+                pass
+
+_purge_stale_pyc_caches(current_dir)
+
 from core.bible_json_loader import BibleJsonLoader, extract_verse_text
 from core.reference_parser import (
     get_french_book_name,

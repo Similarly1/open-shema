@@ -9,32 +9,7 @@ logging.getLogger("chromadb").setLevel(logging.CRITICAL)
 logging.getLogger("posthog").setLevel(logging.CRITICAL)
 
 # Ajout du chemin pour permettre les imports absolus depuis la racine du projet
-_ROOT = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(_ROOT)
-
-def _purge_stale_pyc_caches(root: str):
-    """
-    Supprime les dossiers __pycache__ dont au moins un .pyc est plus ancien
-    que son fichier source .py correspondant.
-    Evite les crashs causés par du bytecode compilé depuis une version obsolète du source.
-    """
-    import glob, importlib.util
-    for pyc_path in glob.glob(os.path.join(root, "**", "__pycache__", "*.pyc"), recursive=True):
-        # Retrouver le .py source correspondant
-        cache_dir = os.path.dirname(pyc_path)
-        pkg_dir = os.path.dirname(cache_dir)
-        basename = os.path.basename(pyc_path).split(".")[0]  # ex: center_panel
-        py_path = os.path.join(pkg_dir, basename + ".py")
-        if os.path.exists(py_path):
-            py_mtime = os.path.getmtime(py_path)
-            pyc_mtime = os.path.getmtime(pyc_path)
-            if py_mtime > pyc_mtime:
-                try:
-                    os.remove(pyc_path)
-                except OSError:
-                    pass
-
-_purge_stale_pyc_caches(_ROOT)
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from core.database import VectorDB
 from gui.app import App
