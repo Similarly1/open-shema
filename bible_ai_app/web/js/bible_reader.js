@@ -4238,22 +4238,26 @@ const BibleReader = {
 
     if (!VintageThemeManager.enabled) {
       badgeEl.classList.add('hidden');
+      badgeEl.innerHTML = '';
       return;
     }
 
-    const epoch = VintageThemeManager.getEpoch(yearOrName);
+    const currentBible = paneNum === 1 ? this.currentBible1 : this.currentBible2;
+    const bInfo = (this.installedBibles || []).find(b => 
+      b.name === currentBible ||
+      b.id === currentBible ||
+      (b.version_code && b.version_code.toUpperCase() === (currentBible || '').toUpperCase())
+    );
+    const resolvedYear = bInfo?.annee || bInfo?.year || (yearOrName && !isNaN(parseInt(yearOrName, 10)) ? yearOrName : null);
+    const epoch = VintageThemeManager.getEpoch(resolvedYear || yearOrName || currentBible);
+
     if (epoch === 'modern') {
       badgeEl.classList.add('hidden');
+      badgeEl.innerHTML = '';
       return;
     }
 
-    const bInfo = (this.installedBibles || []).find(b => 
-      b.name === (paneNum === 1 ? this.currentBible1 : this.currentBible2) ||
-      b.id === (paneNum === 1 ? this.currentBible1 : this.currentBible2) ||
-      (b.version_code && b.version_code.toUpperCase() === (paneNum === 1 ? this.currentBible1 : this.currentBible2 || '').toUpperCase())
-    );
-    const year = bInfo?.annee || bInfo?.year || null;
-    const label = VintageThemeManager.getEpochLabel(epoch, year);
+    const label = VintageThemeManager.getEpochLabel(epoch, resolvedYear);
 
     badgeEl.innerHTML = `<svg class="vintage-badge-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1.5a2.5 2.5 0 0 0-5 0V19"/><path d="M4 3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h11"/></svg><span>${label}</span>`;
     badgeEl.className = `vintage-epoch-pill ${epoch}`;

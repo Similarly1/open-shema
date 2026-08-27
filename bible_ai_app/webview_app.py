@@ -275,6 +275,8 @@ class BibleAppApi:
             avail = BibleJsonLoader.get_available_books(folder) or BibleJsonLoader.get_available_books(raw_name)
             first_b = avail[0] if avail else "Gen"
 
+            year_val = (reg_entry.get("annee") if reg_entry else None) or meta.get("year") or meta.get("annee") or ""
+
             return {
                 "id": folder,
                 "name": raw_name,
@@ -287,8 +289,9 @@ class BibleAppApi:
                 "texte_base_at": reg_entry.get("texte_base_at", "") if reg_entry else "",
                 "texte_base_nt": reg_entry.get("texte_base_nt", "") if reg_entry else "",
                 "canon": reg_entry.get("canon", "") if reg_entry else "",
-                "annee": reg_entry.get("annee", "") if reg_entry else "",
-                "editeur": reg_entry.get("editeur", "") if reg_entry else "",
+                "annee": str(year_val) if year_val else "",
+                "year": str(year_val) if year_val else "",
+                "editeur": (reg_entry.get("editeur") if reg_entry else "") or meta.get("author", ""),
                 "comparaisons_suggerees": reg_entry.get("comparaisons_suggerees", []) if reg_entry else [],
                 "cover_url": (reg_entry.get("cover_url") if reg_entry else "") or meta.get("cover_url", ""),
                 "available_books": avail,

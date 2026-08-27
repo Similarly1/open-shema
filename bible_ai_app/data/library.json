@@ -815,9 +815,9 @@
     "book_code": null
   },
   "CAHEN": {
-    "title": "Bible Cahen",
+    "title": "La Bible, Traduction Nouvelle - Samuel Cahen (1831)",
     "author": "Samuel Cahen",
-    "description": "Bible Cahen",
+    "description": "Première traduction juive intégrale de la Bible hébraïque en français moderne par Samuel Cahen (1831-1839).",
     "year": "1831",
     "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\CAHEN.png",
     "type": "Bible",
@@ -826,6 +826,10 @@
     "version_code": "CAHEN",
     "total_books": 38,
     "embedding_model": "study_library",
-    "active": true
+    "active": true,
+    "name": "CAHEN",
+    "corpus_scope": "GLOBAL",
+    "source_type": "general",
+    "book_code": null
   }
 }

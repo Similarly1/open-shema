@@ -1950,6 +1950,7 @@ const VintageThemeManager = {
     if (sLower.includes('lausanne') || sLower.includes('lau') ||
         sLower.includes('segond') || sLower.includes('lsg') ||
         sLower.includes('darby') || sLower.includes('drb') ||
+        sLower.includes('cahen') || sLower.includes('rabbinat') || sLower.includes('rab') ||
         sLower.includes('vigouroux') || sLower.includes('vigo') ||
         sLower.includes('godet') || sLower.includes('bible annotée') || sLower.includes('ban') ||
         sLower.includes('scofield') || sLower.includes('crampon') || sLower.includes('bcr') ||
