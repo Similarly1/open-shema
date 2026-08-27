@@ -1427,7 +1427,7 @@ const ArticlesView = {
   renderMarkdown(md) {
     if (!md) return '';
     
-    let text = this.fixMojibake(md);
+    let text = this.fixMojibake(md).replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
     // 1. Nettoyer les résidus de lecteur ElevenLabs audio sans déborder sur le texte
     text = text.replace(/Loading\s+the\s*(?:\[[^\]]*Elevenlabs[^\]]*\]\([^)]+\)|Elevenlabs[^\n.]*)/gi, '');
@@ -1467,20 +1467,31 @@ const ArticlesView = {
     text = text.replace(/(?<=### Dans la même série[\s\S]*?)(?<=\))\s*([—–\u2013\u2014-]\s*[A-ZÀ-ÿ][^\n\[]+?)\s+(\[[^\]]+\]\([^)]+\))/g, '$1\n- $2');
     text = text.replace(/(?<=### Dans la même série[\s\S]*?)(?<=\))\s+(\[[^\]]+\]\([^)]+\))/g, '\n- $1');
 
-    // 1b-4. Découper les blocs et lignes excessivement longs (transcriptions ou articles compactés) en paragraphes de 2-3 phrases
+    // 1b-4. Découper les blocs et lignes excessivement longs (transcriptions brutes compactées) en paragraphes
+    const abbrevsPattern = '(?:Sam|Rois|Chron|Thess|Cor|Tim|Pierre|Jean|Gen|Ex|Lv|Nb|Dt|Jos|Jg|Rt|Ps|Pr|Ec|Ct|Es|Jr|Lm|Ez|Dn|Os|Jl|Am|Ab|Jon|Mi|Na|Ha|So|Ag|Za|Ml|Mt|Mc|Lc|Jn|Ac|Rm|Ga|Ep|Ph|Col|Tt|Phm|He|Jc|Jd|Ap|p|pp|vol|tome|chap|art|col|éd|ed|cf|ex|al|etc|dr|prof|st|ste|vs|v|vv)';
+    const sentenceSplitRegex = new RegExp(`(?<!\\b${abbrevsPattern})[.!?…»]\\s+(?!–|—)([A-ZÀ-ÖØ-ß«])`, 'g');
+
     const rawLines = text.split('\n');
     const processedLines = rawLines.map(line => {
-      if (line.startsWith('#') || line.startsWith('>') || line.startsWith('-') || line.startsWith('<') || line.length < 350) {
+      if (line.startsWith('#') || line.startsWith('>') || line.startsWith('-') || line.startsWith('<') || line.length < 650) {
         return line;
       }
       let sentenceCount = 0;
-      return line.replace(/(?<=[.!?…»])\s+(?!–|—)([A-ZÀ-ÿ«0-9])/g, (match, nextChar) => {
-        sentenceCount++;
-        if (sentenceCount >= 2) {
-          sentenceCount = 0;
-          return '\n\n' + nextChar;
+      return line.replace(sentenceSplitRegex, (match, nextChar, offset, str) => {
+        // Ne jamais couper à l'intérieur d'une parenthèse (ex: "(voir 2 Sam. 7)")
+        const prefix = str.substring(0, offset);
+        const openParens = (prefix.match(/\(/g) || []).length;
+        const closeParens = (prefix.match(/\)/g) || []).length;
+        if (openParens > closeParens) {
+          return match;
         }
-        return ' ' + nextChar;
+
+        sentenceCount++;
+        if (sentenceCount >= 3) {
+          sentenceCount = 0;
+          return match.charAt(0) + '\n\n' + nextChar;
+        }
+        return match;
       });
     });
     text = processedLines.join('\n');
@@ -1581,14 +1592,13 @@ const ArticlesView = {
       return `\n\n<blockquote class="article-bible-quote"><p>« ${quote} »</p><footer class="article-quote-author">${author.trim()}</footer></blockquote>\n\n`;
     });
 
-    // 5g. Remplacer les appels de notes dans le texte: [[1]](#fn1), [[¹]](#fn1), [¹](#fn1), [1](#fn1), [^1]
-    text = text.replace(/\[(?:\[)?([0-9¹²³⁴⁵⁶⁷⁸⁹]+)\](?:\])?\(#(?:fn|article-fn|note|ftnt)[^)]*\)/gi, (match, n) => {
+    // 5g. Remplacer tous les appels de notes dans le texte: [[[^1]](#fn1), [[^4]]](#fn4), [[1]](#fn1), [^1], [1](#fn1), [[¹]](#fn1), etc.
+    text = text.replace(/\[+(?:\^)?([0-9¹²³⁴⁵⁶⁷⁸⁹]+)\]+(?:\(#(?:fn|article-fn|note|ftnt)[^)]*\))?\]*/gi, (match, n) => {
       const num = parseInt(normalizeSuperscripts(n), 10);
-      return `<sup class="article-fn-badge" id="article-fnref-${num}"><a href="#article-fn-${num}" title="Note ${num}">${num}</a></sup>`;
-    });
-
-    text = text.replace(/\[\^(\d+)\]/g, (match, num) => {
-      return `<sup class="article-fn-badge" id="article-fnref-${num}"><a href="#article-fn-${num}" title="Note ${num}">${num}</a></sup>`;
+      if (num >= 1 && num <= 99) {
+        return `<sup class="article-fn-badge" id="article-fnref-${num}"><a href="#article-fn-${num}" title="Note ${num}">${num}</a></sup>`;
+      }
+      return match;
     });
 
     text = text.replace(/([a-zA-ZÀ-ÿ»"'\).,;!?])\s*([⁰¹²³⁴⁵⁶⁷⁸⁹]{1,2})(?!\w)/g, (match, prevChar, sups) => {
@@ -1602,7 +1612,8 @@ const ArticlesView = {
     // Supprimer les espaces indésirables entre l'appel de note et la ponctuation suivante (ex: </sup> . -> </sup>.)
     text = text.replace(/<\/sup>\s+([.,;:!?])/g, '</sup>$1');
 
-    // 5h. Joindre les numéros de notes séparés de leur texte par un saut de ligne (ex: "1.\nPaul David...")
+    // 5h. Normaliser les notes de bas de page : suppression des symboles ↩ et jonction des numéros
+    text = text.replace(/[↩︎↩]/g, '');
     text = text.replace(/(?:^|\n)(\d+)\.\s*\n+([^\n]+)/g, '\n$1. $2');
 
     // 5i. Formater et nettoyer les liens d'URLs brutes dans les notes (ex: [https://...])
@@ -1617,12 +1628,14 @@ const ArticlesView = {
       }
     });
 
-    // Éliminer les symboles de retour ↩ isolés sur leur propre ligne
-    text = text.replace(/(?:^|\n)\s*↩\s*(?=\n|$)/g, '\n');
+    // 5i-2. Joindre les lignes orphelines de citations secondaires à l'intérieur des notes (ex: "8. Stephen...\n\nGrudem, p. 24.\n\n9. John...")
+    text = text.replace(/(?:^|\n)(\d+\.\s+[^\n]+(?:\n\n(?!\d+\.|\s*#|\s*<|\s*---|\s*\*\*)[^\n]+)+)/g, (match) => {
+      return match.replace(/\n\n+/g, ' ');
+    });
 
-    // 5j. Détecter et formater les listes de notes de bas de page numérotées (1. Auteur, Ibid...)
-    text = text.replace(/(?:^|\n)(\d+)\.\s+([^\n]+(?:\n(?!\d+\.|\s*#|\s*---|\s*$)[^\n]+)*)/g, (match, num, body) => {
-      let cleanBody = normalizeSuperscripts(body.replace(/\s*↩\s*$/g, '').trim());
+    // 5j. Détecter et formater les listes de notes de bas de page numérotées (y compris les notes multi-citations)
+    text = text.replace(/(?:^|\n)(\d+)\.\s+([^\n]+(?:\n(?!\d+\.|\s*#|\s*<|\s*---|\s*$)[^\n]+)*)/g, (match, num, body) => {
+      let cleanBody = normalizeSuperscripts(body.replace(/\n+/g, ' ').replace(/\s+/g, ' ').trim());
       return `\n\n<div class="article-footnote-item" id="article-fn-${num}"><span class="article-footnote-num">${num}.</span><span class="article-footnote-text">${cleanBody}</span> <a href="#article-fnref-${num}" class="article-footnote-backlink" title="Retour au texte">↩</a></div>\n\n`;
     });
 

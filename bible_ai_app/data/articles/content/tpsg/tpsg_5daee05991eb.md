@@ -9,7 +9,7 @@ Selon Jordan Peterson, il existe en réalité deux manières d’« irriter 
 
 Jordan Peterson écrit :
 
-> Les parents qui refusent d’assumer la responsabilité de discipliner leurs enfants pensent qu’ils peuvent simplement éviter le conflit nécessaire à une bonne éducation. Ils évitent d’endosser le mauvais rôle (à court terme). Mais ils ne protègent absolument pas leurs enfants de la douleur. Au contraire : le monde extérieur, froid et impitoyable, leur infligera des sanctions bien plus dures que celles qu’un parent aimant leur aurait appliquées. Vous pouvez discipliner vos enfants, ou vous pouvez confier cette responsabilité au monde dur et impitoyable – mais soyez certain que ce second choix n’est jamais motivé par l’amour ¹ .
+> Les parents qui refusent d’assumer la responsabilité de discipliner leurs enfants pensent qu’ils peuvent simplement éviter le conflit nécessaire à une bonne éducation. Ils évitent d’endosser le mauvais rôle (à court terme). Mais ils ne protègent absolument pas leurs enfants de la douleur. Au contraire : le monde extérieur, froid et impitoyable, leur infligera des sanctions bien plus dures que celles qu’un parent aimant leur aurait appliquées. Vous pouvez discipliner vos enfants, ou vous pouvez confier cette responsabilité au monde dur et impitoyable – mais soyez certain que ce second choix n’est jamais motivé par l’amour [^1] .
 
 Dit autrement, si vous dites que vous aimez vos enfants et que vous ne les disciplinez pas, vous vous mentez à vous-mêmes ! Ce que vous faites, en réalité, c’est que vous les placez dans une situation où ils seront constamment frustrés, irrités, amers et en colère quand ils entreront dans le monde et découvriront que le monde n’est pas aussi conciliant envers tous leurs désirs que vous ne l’avez été.
 
@@ -28,7 +28,7 @@ Mais aussi, si vous ne corrigez pas sa désobéissance, si vous n’apprenez pas
 
 Pour le dire en une phrase :
 
-> Apprendre à apprécier l’autorité de ses parents, c’est le premier pas pour accepter de plein gré l’autorité de Dieu ² .
+> Apprendre à apprécier l’autorité de ses parents, c’est le premier pas pour accepter de plein gré l’autorité de Dieu [^2] .
 
 Les parents sont le don de Dieu aux enfants pour leur apprendre à vivre sous l’autorité. Et pour les préparer à rencontrer le vrai Roi de leur vie.
 
@@ -48,7 +48,7 @@ Mais il ajoute aussitôt une distinction essentielle : « Dieu nous corrige p
 
 Qu’est-ce que ça veut dire ? Ça veut dire que lorsque *Dieu* nous corrige, il ne le fait pas pour sa propre stabilité émotionnelle : il ne se sert pas de vous pour évacuer sa colère, autrement dit, ou pour décompresser. Et ça veut dire aussi que la douleur qu’il permet dans vos vies est toujours adaptée à ce que vous pouvez supporter : « il ne permettra pas que vous soyez éprouvés au-delà de vos forces » (1Co 10.13). Il vous corrige pour votre véritable intérêt…
 
-Et la question qu’il nous faut nous poser, c’est : à quoi ressemble une telle discipline envers nos enfants ? Si nous visons véritablement *leur* intérêt, notre discipline sera calme, claire et cohérente ³ .
+Et la question qu’il nous faut nous poser, c’est : à quoi ressemble une telle discipline envers nos enfants ? Si nous visons véritablement *leur* intérêt, notre discipline sera calme, claire et cohérente [^3] .
 
 ### Calme
 
@@ -106,7 +106,7 @@ Puis il observe :
 
 Et il se demande pourquoi. Quel est le problème ?
 
-> Le problème, ce n’est pas le comportement de mes enfants. Le problème est que mes désirs veulent gouverner mon cœur, à la place de Dieu. Bien sûr, mes enfants se comportent mal. Mais quand mon cœur égoïste est entièrement soumis à Dieu, je les corrige calmement et avec amour. En revanche, si mes désirs égoïstes gouvernent mon cœur, alors je vais mal réagir. Mon égoïsme faussera ma manière de les corriger [et fera beaucoup de dégâts] ⁴ .
+> Le problème, ce n’est pas le comportement de mes enfants. Le problème est que mes désirs veulent gouverner mon cœur, à la place de Dieu. Bien sûr, mes enfants se comportent mal. Mais quand mon cœur égoïste est entièrement soumis à Dieu, je les corrige calmement et avec amour. En revanche, si mes désirs égoïstes gouvernent mon cœur, alors je vais mal réagir. Mon égoïsme faussera ma manière de les corriger [et fera beaucoup de dégâts] [^4] .
 
 Cela rejoint ce que nous avons vu dans Hébreux 12 : d’un côté, Dieu corrige « pour notre véritable intérêt »; de l’autre, nous corrigeons souvent « pour peu de temps, comme nous le jugeons bon ».
 
@@ -129,7 +129,7 @@ Tout ce que je chercherais à obtenir, c’est *le contrôle de son comportement
 
 Tim Chester résume très bien le danger :
 
-> Si vos objectifs sont égoïstes (une vie tranquille ou votre réputation, par exemple), vous ferez tout pour essayer de contrôler le comportement de votre enfant ⁵ .
+> Si vos objectifs sont égoïstes (une vie tranquille ou votre réputation, par exemple), vous ferez tout pour essayer de contrôler le comportement de votre enfant [^5] .
 
 Et cela se traduit très concrètement par deux dérives classiques : par des *menaces* et de la *manipulation* . Dit autrement, ce sera parfois « la carotte » et parfois « le bâton » que nous utiliserons pour que nos enfants « marchent droit » :
 
@@ -142,7 +142,7 @@ Le problème, c’est que ce n’est que momentanément efficace : il n’y a p
 
 Et j’espère que vous voyez, alors, combien le plus grand obstacle à l’exercice d’une bonne discipline, c’est notre propre cœur égoïste. Et Paul Tripp a donc raison de dire :
 
-> Si vous voulez devenir l’instrument de Dieu pour le salut et la transformation du cœur de vos enfants, commencez humblement par votre propre cœur ⁶ .
+> Si vous voulez devenir l’instrument de Dieu pour le salut et la transformation du cœur de vos enfants, commencez humblement par votre propre cœur [^6] .
 
 Commencez d’abord par faire mourir ces désirs égoïstes en vous, avant de vous occuper du cœur de votre enfant.
 
@@ -154,7 +154,7 @@ Une bonne discipline est donc *calquée sur le modèle de Dieu* . Elle est *cons
 
 Paul Tripp l’exprime très justement :
 
-> La désobéissance que vous combattez n’est pas avant tout un problème de comportement ; c’est un problème de cœur. C’est l’orgueil, la rébellion, l’autonomie, l’autosuffisance et le désir d’être seul maître à bord, toutes ces choses tapies dans leur cœur, qui les poussent à vous désobéir. Il ne suffit donc pas de [dire : « Tu te rends compte de ce que tu as fait ? Voilà la punition », ou] « Voilà ce qui va t’arriver pour avoir fait cela »… [Non,] tout changement comportemental durable chez chacun de vos enfants (l’espoir de tout parent !) passera par le chemin de leur cœur ⁷ .
+> La désobéissance que vous combattez n’est pas avant tout un problème de comportement ; c’est un problème de cœur. C’est l’orgueil, la rébellion, l’autonomie, l’autosuffisance et le désir d’être seul maître à bord, toutes ces choses tapies dans leur cœur, qui les poussent à vous désobéir. Il ne suffit donc pas de [dire : « Tu te rends compte de ce que tu as fait ? Voilà la punition », ou] « Voilà ce qui va t’arriver pour avoir fait cela »… [Non,] tout changement comportemental durable chez chacun de vos enfants (l’espoir de tout parent !) passera par le chemin de leur cœur [^7] .
 
 Voilà trois manières d’atteindre le cœur de votre enfant.
 
@@ -186,7 +186,7 @@ Et qu’est-ce que ça va changer ? Vous ne verrez plus la désobéissance de 
 
 Comme le dit Paul D. Tripp :
 
-> Chaque temps de correction doit s’accompagner d’un temps d’instruction. Quel genre d’instruction ? Lorsque vous corrigez votre enfant, Dieu vous accorde une occasion de lui parler de son cœur. Comme il est vrai que son comportement révèle la véritable condition de son cœur, son mauvais comportement vous donne une idée de ce qui domine son cœur. Le Sauveur de toutes grâces vous donne alors l’occasion d’aider votre enfant à voir ce que son cœur renferme. Chaque fois que vous le faites, vous participez à l’œuvre que Dieu veut accomplir dans la vie de votre enfant, et vous donnez l’occasion à l’Esprit de Dieu de communiquer à votre enfant une meilleure compréhension de [qui Dieu est, de ce qui est bien et mal, afin qu’il soit convaincu de son péché et de son besoin d’un Sauveur] ⁸ .
+> Chaque temps de correction doit s’accompagner d’un temps d’instruction. Quel genre d’instruction ? Lorsque vous corrigez votre enfant, Dieu vous accorde une occasion de lui parler de son cœur. Comme il est vrai que son comportement révèle la véritable condition de son cœur, son mauvais comportement vous donne une idée de ce qui domine son cœur. Le Sauveur de toutes grâces vous donne alors l’occasion d’aider votre enfant à voir ce que son cœur renferme. Chaque fois que vous le faites, vous participez à l’œuvre que Dieu veut accomplir dans la vie de votre enfant, et vous donnez l’occasion à l’Esprit de Dieu de communiquer à votre enfant une meilleure compréhension de [qui Dieu est, de ce qui est bien et mal, afin qu’il soit convaincu de son péché et de son besoin d’un Sauveur] [^8] .
 
 ### La grâce, pas juste la loi
 
@@ -202,7 +202,7 @@ Autrement dit, appliquez la grâce à leur vie, pas juste la loi.
 
 Selon les mots de Paul D. Tripp :
 
-> Chaque moment de discipline et de correction est en même temps aussi une occasion que Dieu vous offre d’aborder des questions de cœur avec vos enfants. Ceux-ci ont besoin de la grâce de se voir tels qu’ils sont, car celle-ci ouvre la voie à la grâce de la confession qui, elle, ouvre la porte à la grâce de la vie nouvelle ⁹ .
+> Chaque moment de discipline et de correction est en même temps aussi une occasion que Dieu vous offre d’aborder des questions de cœur avec vos enfants. Ceux-ci ont besoin de la grâce de se voir tels qu’ils sont, car celle-ci ouvre la voie à la grâce de la confession qui, elle, ouvre la porte à la grâce de la vie nouvelle [^9] .
 
 1. Jordan B. Peterson, *[12 rules for life : an antidote to chaos](https://www.amazon.fr/12-Rules-Life-Antidote-Chaos/dp/0141988517/&tag=etrangeetvoya-21)* , New York, Penguin Books, 2018, pp. 133-134. [↩︎](#d3f68a8a-fd4a-4d98-b771-da3d3bed0e73-link)
 2. Tim Chester, *[Parents centrés sur l’Évangile](https://blfstore.com/products/parents-centres-evangile/?bg_ref=f5HKGMgR9Q)* , Marpent, BLF Éditions, 2022, p. 24. [↩︎](#9e6121d9-10a9-42c9-8828-f1b02e679ddf-link)
