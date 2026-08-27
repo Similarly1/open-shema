@@ -988,8 +988,8 @@ const DictView = {
       "jos": "Josué", "josue": "Josué",
       "jug": "Juges", "juges": "Juges", "jg": "Juges",
       "ruth": "Ruth", "rt": "Ruth",
-      "1 sam": "1 Samuel", "2 sam": "2 Samuel", "1 samuel": "1 Samuel", "2 samuel": "2 Samuel", "1s": "1 Samuel", "2s": "2 Samuel", "i sam": "1 Samuel", "ii sam": "2 Samuel", "i samuel": "1 Samuel", "ii samuel": "2 Samuel",
-      "1 rois": "1 Rois", "2 rois": "2 Rois", "1r": "1 Rois", "2r": "2 Rois", "i rois": "1 Rois", "ii rois": "2 Rois", "i reg": "1 Rois", "ii reg": "2 Rois", "iii reg": "1 Rois", "iv reg": "2 Rois", "1 reg": "1 Rois", "2 reg": "2 Rois", "3 reg": "1 Rois", "4 reg": "2 Rois",
+      "1 sam": "1 Samuel", "2 sam": "2 Samuel", "1 samuel": "1 Samuel", "2 samuel": "2 Samuel", "1s": "1 Samuel", "2s": "2 Samuel", "i sam": "1 Samuel", "ii sam": "2 Samuel", "i samuel": "1 Samuel", "ii samuel": "2 Samuel", "i reg": "1 Samuel", "ii reg": "2 Samuel", "1 reg": "1 Samuel", "2 reg": "2 Samuel",
+      "1 rois": "1 Rois", "2 rois": "2 Rois", "1r": "1 Rois", "2r": "2 Rois", "i rois": "1 Rois", "ii rois": "2 Rois", "iii reg": "1 Rois", "iv reg": "2 Rois", "3 reg": "1 Rois", "4 reg": "2 Rois",
       "1 chron": "1 Chroniques", "2 chron": "2 Chroniques", "1 chroniques": "1 Chroniques", "2 chroniques": "2 Chroniques", "1 ch": "1 Chroniques", "2 ch": "2 Chroniques", "1ch": "1 Chroniques", "2ch": "2 Chroniques", "i chron": "1 Chroniques", "ii chron": "2 Chroniques", "i chroniques": "1 Chroniques", "ii chroniques": "2 Chroniques", "i par": "1 Chroniques", "ii par": "2 Chroniques", "1 par": "1 Chroniques", "2 par": "2 Chroniques", "chron": "1 Chroniques", "par": "1 Chroniques", "paralipomenes": "1 Chroniques", "i paralipomenes": "1 Chroniques", "ii paralipomenes": "2 Chroniques",
       "esd": "Esdras", "esdras": "Esdras", "1 esdr": "1 Esdras", "2 esdr": "2 Esdras", "i esdr": "1 Esdras", "ii esdr": "2 Esdras",
       "neh": "Néhémie", "nehemie": "Néhémie", "ne": "Néhémie",
@@ -1053,7 +1053,7 @@ const DictView = {
     let processed = (text || '');
 
     // 0a. Nettoyage de tout préambule conversationnel d'IA en tête d'article
-    processed = processed.replace(/^[\s\n]*(?:Voici (?:la notice|le texte|la version|l['’]article|ce texte)[^\n]*|Ci-dessous[^\n]*|Notice restaurée[^\n]*)\s*\n+/i, '');
+    processed = processed.replace(/^[\s\n]*(?:Voici\s+(?:la\s+restauration|la\s+mise\s+en\s+forme|la\s+notice|les\s+notices|le\s+texte|la\s+version|l['’]article|ce\s+texte|une\s+version)[^\n]*|Ci-dessous[^\n]*|Notice\s+(?:restaurée|mise\s+à\s+jour|modernisée|révisée)[^\n]*|Bien\s+sûr[^\n]*)\s*\n+/i, '');
     processed = processed.replace(/^[\s\n]*(?:[-*_—–]{3,}\s*\n+)+/, '');
 
     // Nettoyage des artefacts de découpage intermédiaire (ex: " (Partie 1/2)", " (Partie 2/2)")
@@ -1260,8 +1260,8 @@ const DictView = {
       });
     }
 
-    // 1c. Remplacement des renvois d'articles inline en cours de paragraphe (ex: *Voir aussi :* **FUMIER** (tome 2, colonne 2415))
-    const inlineSeeRx = /(?:[*_]+)?\s*(?:Voir(?:\s+(?:aussi|également))?|Voyez)\s*(?:[*_]+)?\s*:\s*(?:[*_]+)?\s*(?:\*\*([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]{2,35})\*\*|([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]{2,35}))(?:\s*\(([^)]+)\))?(?=[.,;:!\?\s]|$)/gi;
+    // 1c. Remplacement des renvois d'articles inline en cours de paragraphe (ex: *Voir aussi :* **FUMIER** (tome 2, colonne 2415) ou Voir HACHILA.)
+    const inlineSeeRx = /(?:[*_]+)?\s*\b(?:Voir(?:\s+(?:aussi|également))?|Voyez)\b(?:\s*:\s*|\s+)(?:\*\*([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]{2,35})\*\*|([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]{2,35}))(?:\s*\(([^)]+)\))?(?=[.,;:!\?\s]|$)/gi;
     processed = processed.replace(inlineSeeRx, (match, boldW, plainW, parenMeta) => {
       const cleanW = (boldW || plainW || '').trim();
       if (!cleanW || cleanW.length < 2) return match;
@@ -1374,7 +1374,7 @@ const DictView = {
         return;
       }
 
-      // B00) Ligne initiale d'Étymologie & Langues originales (ex: *(Hébreu : מַעֲלוֹת / ma‘ălôt ; Septante : ὡρολόγιον ; Vulgate : horologium).*)
+      // B00) Ligne initiale d'Étymologie & Langues originales (ex: *(Hébreu : מַעֲלוֹת / ma‘ălôt)* ou GÉHENNE (grec : γέεννα...))
       const isInitialEtym = lineIdx <= 2 && /^\*?\(?\s*(?:Hébreu|Grec|Latin|Septante|Vulgate|Araméen|Arabe|Syriaque)\s*:/i.test(raw);
       if (isInitialEtym) {
         let cleanEtym = raw.replace(/^[*_`\s\(\)]+/, '').replace(/[*_`\s\(\)\.]*$/, '').trim();
@@ -1390,12 +1390,37 @@ const DictView = {
         return;
       }
 
-      // B0) En-tête NDB avec variantes et définition courte (Ligne initiale)
-      if (this.optLogosRestructure && lineIdx <= 2 && raw.includes(' : ') && !raw.startsWith('I.') && !raw.startsWith('1.') && !raw.startsWith('**') && !raw.startsWith('#') && !raw.startsWith('*(') && !raw.startsWith('(')) {
+      // B00b) Ligne initiale avec Mot-Vedette et étymologie entre parenthèses (ex: 8. GABAA HACHILA (hébreu : ...) ou GÉHENNE (grec : γέεννα...))
+      if (lineIdx <= 2 && !raw.startsWith('I.') && !raw.startsWith('#')) {
+        const etymInlineMatch = raw.match(/^(?:[0-9]+\.\s+)?([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]{2,})\s*\(([^)]*(?:hébreu|grec|latin|septante|vulgate|araméen|arabe|syriaque)[^)]*)\)[,\s]*(.*)$/i);
+        if (etymInlineMatch) {
+          const innerEtym = etymInlineMatch[2].trim();
+          const restText = etymInlineMatch[3].trim();
+          const cleanEtymFmt = innerEtym
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+          out.push(`
+            <div class="dict-etymology-box" style="margin: 10px 0 14px 0; padding: 10px 14px; border-radius: 0 6px 6px 0; font-size: 14.5px;">
+              <span class="dict-etymology-label" style="font-weight: 700; font-size: 13.5px;">Langues originales :</span>
+              <span class="dict-etymology-content" style="margin-left: 6px;">${cleanEtymFmt}</span>
+            </div>
+          `);
+          if (restText) {
+            const restFormatted = restText
+              .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+              .replace(/\*(.*?)\*/g, '<em>$1</em>');
+            out.push(`<p style="margin: 12px 0; line-height: 1.75;">${restFormatted}</p>`);
+          }
+          return;
+        }
+      }
+
+      // B0) En-tête NDB avec variantes et définition courte (Ligne initiale - strictement réservé à NDB)
+      if (this.optLogosRestructure && !isVigouroux && lineIdx <= 2 && raw.includes(' : ') && !raw.startsWith('I.') && !raw.startsWith('1.') && !raw.startsWith('**') && !raw.startsWith('#') && !raw.startsWith('*(') && !raw.startsWith('(')) {
         const colonIdx = raw.indexOf(' : ');
         const varPart = raw.substring(0, colonIdx).trim();
         const meanPart = raw.substring(colonIdx + 3).trim();
-        if (meanPart.length > 0) {
+        if (!varPart.includes('(') && meanPart.length > 0) {
           let meaningOnly = meanPart;
           let introPart = '';
           if (meanPart.includes('. ') && meanPart.split('. ')[0].length < 60) {
