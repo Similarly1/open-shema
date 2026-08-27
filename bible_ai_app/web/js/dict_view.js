@@ -1258,6 +1258,10 @@ const DictView = {
         const normL = label.toLowerCase().startsWith('tome') ? 'tome' : (label.toLowerCase().startsWith('t.') ? 't.' : label);
         return `${prefix}${normL} ${arab}`;
       });
+
+      // Nettoyage des astérisques orphelins attachés aux versets bibliques (ex: Matthieu 22.4 * -> Matthieu 22.4)
+      processed = processed.replace(/(\b[0-9]+(?::|\.)[0-9]+(?:\s*[\-–,]\s*[0-9]+)*)\s*\*/g, '$1');
+      processed = processed.replace(/\(\s*([^\)\n]+?)\s*\*\s*\)/g, '($1)');
     }
 
     // 1c. Remplacement des renvois d'articles inline en cours de paragraphe (ex: *Voir aussi :* **FUMIER** (tome 2, colonne 2415) ou Voir HACHILA.)
@@ -1618,7 +1622,7 @@ const DictView = {
           let bracketDepth = 0;
 
           for (let i = 0; i < cleanTargetStr.length; i++) {
-            const char = rawTargetStr[i];
+            const char = cleanTargetStr[i];
             if (char === '(') parenDepth++;
             else if (char === ')') parenDepth = Math.max(0, parenDepth - 1);
             else if (char === '[') bracketDepth++;
@@ -1639,6 +1643,8 @@ const DictView = {
           const parsedTargets = [];
           rawChunks.forEach(chunk => {
             let c = chunk.replace(/\*\*/g, '').replace(/\*/g, '').trim().replace(/[.,;:]+$/, '');
+            // Nettoyage strict : retirer tout "aussi :", "voir :", "v. :", etc.
+            c = c.replace(/^(?:voir|voyez)?\s*(?:aussi|également)?\s*[:\s]*/i, '').trim();
             if (!c) return;
 
             const isPureMeta = /^(?:colonne|col\.|tome|t\.|p\.|page|vol\.|volume)\s*[0-9IVXLCDM]+/i.test(c);
@@ -1668,7 +1674,7 @@ const DictView = {
               }
             }
 
-            word = word.replace(/[.,;:]+$/, '').trim();
+            word = word.replace(/^(?:voir|voyez)?\s*(?:aussi|également)?\s*[:\s]*/i, '').replace(/[.,;:]+$/, '').trim();
             const currentTitleNorm = (this.currentEntryData?.title || this.activeSlug || '').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Z0-9]/g, '');
             const wordNorm = word.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Z0-9]/g, '');
             if (word && wordNorm !== currentTitleNorm) {
@@ -1683,7 +1689,7 @@ const DictView = {
                 const cleanMetaWord = (typeof TheolLatinGlossary !== 'undefined') ? TheolLatinGlossary.annotate(t.word) : this.escapeHtml(t.word);
                 return `<span class="dict-see-meta">${cleanMetaWord}</span>`;
               }
-              const displayLabel = t.word;
+              const displayLabel = t.word.replace(/^(?:voir|voyez)?\s*(?:aussi|également)?\s*[:\s]*/i, '').trim();
               const qualifierHtml = t.qualifier ? ` <span class="dict-see-qualifier" style="font-size: 13px; color: var(--text-secondary); font-style: italic;">(${this.escapeHtml(t.qualifier)})</span>` : '';
               let metaHtml = '';
               if (t.meta) {

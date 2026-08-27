@@ -215,31 +215,51 @@ class DictionaryManager:
                 translit = ent.get("translit", "")
                 defn = ent.get("definition", "")
                 title = f"{short} — {lemma} ({translit})" if translit else f"{short} — {lemma}"
+                norm_title = f"{cls.normalize_term(short)} {cls.normalize_term(lemma)} {cls.normalize_term(translit)}".strip()
                 
                 if filter_letter:
                     if filter_letter == "H" and not short.startswith("H"): continue
                     elif filter_letter == "G" and not short.startswith("G"): continue
                     elif filter_letter not in ["H", "G"] and not translit.upper().startswith(filter_letter) and not short.startswith(filter_letter):
                         continue
+
+                match_score = 0
                 if norm_q:
-                    search_str = f"{short} {lemma} {translit} {cls.normalize_term(defn[:150])}".lower()
-                    if norm_q not in search_str:
+                    norm_defn = cls.normalize_term(defn)
+                    if norm_title == norm_q or cls.normalize_term(short) == norm_q or cls.normalize_term(lemma) == norm_q:
+                        match_score = 0
+                    elif norm_title.startswith(norm_q) or cls.normalize_term(short).startswith(norm_q) or cls.normalize_term(lemma).startswith(norm_q) or cls.normalize_term(translit).startswith(norm_q):
+                        match_score = 1
+                    elif re.search(r'\b' + re.escape(norm_q), norm_title):
+                        match_score = 2
+                    elif norm_q in norm_title:
+                        match_score = 3
+                    elif norm_q in norm_defn:
+                        match_score = 4
+                    else:
                         continue
                 
                 snippet = defn[:120] + "..." if len(defn) > 120 else defn
+                snippet = re.sub(r'^[,\.\:\;\—\–\-\s\'\^£«»\(\)\[\]]+', '', snippet).strip()
                 headwords.append({
                     "slug": code,
                     "title": title,
                     "lemma": lemma,
                     "code": short,
-                    "snippet": snippet
+                    "snippet": snippet,
+                    "_score": match_score,
+                    "_norm_title": norm_title
                 })
-            def strong_sort_key(item):
-                c = item["code"]
-                prefix = 0 if c.startswith("H") else 1
-                num = int(re.sub(r'\D', '', c)) if re.search(r'\d+', c) else 0
-                return (prefix, num)
-            headwords.sort(key=strong_sort_key)
+
+            if norm_q:
+                headwords.sort(key=lambda x: (x["_score"], len(x["title"]), x["_norm_title"]))
+            else:
+                def strong_sort_key(item):
+                    c = item["code"]
+                    prefix = 0 if c.startswith("H") else 1
+                    num = int(re.sub(r'\D', '', c)) if re.search(r'\d+', c) else 0
+                    return (prefix, num)
+                headwords.sort(key=strong_sort_key)
 
         # 2. Bailly
         elif dict_type == "greek":
@@ -252,17 +272,42 @@ class DictionaryManager:
                 hw = first.get("headword", code)
                 txt = first.get("full_text", "")
                 title = f"{code} — {hw}"
+                norm_title = f"{cls.normalize_term(code)} {cls.normalize_term(hw)}".strip()
+
                 if filter_letter and not hw.upper().startswith(filter_letter) and not code.startswith(filter_letter):
                     continue
-                if norm_q and norm_q not in f"{code} {hw} {cls.normalize_term(txt[:150])}".lower():
-                    continue
+
+                match_score = 0
+                if norm_q:
+                    norm_txt = cls.normalize_term(txt)
+                    if norm_title == norm_q or cls.normalize_term(code) == norm_q or cls.normalize_term(hw) == norm_q:
+                        match_score = 0
+                    elif norm_title.startswith(norm_q) or cls.normalize_term(code).startswith(norm_q) or cls.normalize_term(hw).startswith(norm_q):
+                        match_score = 1
+                    elif re.search(r'\b' + re.escape(norm_q), norm_title):
+                        match_score = 2
+                    elif norm_q in norm_title:
+                        match_score = 3
+                    elif norm_q in norm_txt:
+                        match_score = 4
+                    else:
+                        continue
+
+                snippet = txt[:120] + "..." if len(txt) > 120 else txt
+                snippet = re.sub(r'^[,\.\:\;\—\–\-\s\'\^£«»\(\)\[\]]+', '', snippet).strip()
                 headwords.append({
                     "slug": code,
                     "title": title,
                     "code": code,
-                    "snippet": txt[:120] + "..." if len(txt) > 120 else txt
+                    "snippet": snippet,
+                    "_score": match_score,
+                    "_norm_title": norm_title
                 })
-            headwords.sort(key=lambda x: (int(re.sub(r'\D', '', x['code'])) if re.search(r'\d+', x['code']) else 0))
+
+            if norm_q:
+                headwords.sort(key=lambda x: (x["_score"], len(x["title"]), x["_norm_title"]))
+            else:
+                headwords.sort(key=lambda x: (int(re.sub(r'\D', '', x['code'])) if re.search(r'\d+', x['code']) else 0))
 
         # 3. Dictionnaires Personnalisés / Calmet / Vigouroux / Nouveau Dict
         else:
@@ -278,26 +323,55 @@ class DictionaryManager:
                     first_char = unicodedata.normalize('NFD', clean_title.upper())[0] if clean_title else ''
                     if first_char != filter_letter:
                         continue
-                        
+
+                match_score = 0
+                txt = art.get("text", "")
                 if norm_q:
-                    art_text = art.get("text", "")[:300]
-                    if norm_q not in norm_title and norm_q not in cls.normalize_term(art_text):
+                    norm_body = cls.normalize_term(txt)
+                    if norm_title == norm_q:
+                        match_score = 0
+                    elif norm_title.startswith(norm_q):
+                        match_score = 1
+                    elif re.search(r'\b' + re.escape(norm_q), norm_title):
+                        match_score = 2
+                    elif norm_q in norm_title:
+                        match_score = 3
+                    elif norm_q in norm_body:
+                        match_score = 4
+                    else:
                         continue
                         
-                txt = art.get("text", "")
-                snippet = re.sub(r'^[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\s–-]{2,}\s*', '', txt).strip()
-                if len(snippet) > 120:
-                    snippet = snippet[:120] + "..."
-                elif not snippet:
-                    snippet = txt[:120] + "..." if len(txt) > 120 else txt
+                # Nettoyage rigoureux de l'extrait pour supprimer la répétition du titre et la ponctuation parasite initiale
+                snippet = re.sub(r'^(?:[0-9]+\.\s*)?[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\s–-]{2,}\s*', '', txt).strip()
+                snippet = re.sub(r'^[,\.\:\;\—\–\-\s\'\^£«»\(\)\[\]\?\/\\\|]+', '', snippet).strip()
+                if not snippet:
+                    snippet = re.sub(r'^[,\.\:\;\—\–\-\s\'\^£«»]+', '', txt).strip()
+
+                # Si c'est une correspondance uniquement dans le corps du texte (Score 4), centrer l'extrait sur le terme cherché
+                if match_score == 4 and norm_q:
+                    clean_norm_snip = cls.normalize_term(snippet)
+                    match_pos = clean_norm_snip.find(norm_q)
+                    if match_pos > 35:
+                        start_pos = max(0, match_pos - 35)
+                        snippet = "..." + snippet[start_pos:]
+
+                if len(snippet) > 130:
+                    snippet = snippet[:130] + "..."
                     
                 headwords.append({
                     "slug": slug,
                     "title": clean_title,
-                    "snippet": snippet
+                    "snippet": snippet,
+                    "_score": match_score,
+                    "_norm_title": norm_title
                 })
                 
-            headwords.sort(key=lambda x: cls.normalize_term(x["title"]))
+            if norm_q:
+                # Priorité absolue : 
+                # Score 0 (titre exact) -> Score 1 (titre commence par) -> Score 2 (mot du titre commence par) -> Score 3 (titre contient) -> Score 4 (corps de l'article)
+                headwords.sort(key=lambda x: (x["_score"], len(x["title"]), x["_norm_title"]))
+            else:
+                headwords.sort(key=lambda x: x["_norm_title"])
 
         total_count = len(headwords)
         paged_headwords = headwords[offset:offset + limit]
