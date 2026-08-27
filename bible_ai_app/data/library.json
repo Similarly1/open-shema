@@ -181,20 +181,6 @@
     "embedding_model": "study_library",
     "active": true
   },
-  "APEE": {
-    "title": "Bible de l'Épée",
-    "author": "APEE",
-    "description": "Bible de l'Épée (APEE 2010)",
-    "year": "2010",
-    "cover_path": null,
-    "type": "Bible",
-    "format": "json",
-    "folder_name": "APEE",
-    "version_code": "APEE",
-    "total_books": 66,
-    "embedding_model": "study_library",
-    "active": true
-  },
   "OST": {
     "title": "Bible Ostervald",
     "author": "La Maison de la Bible",
@@ -831,5 +817,33 @@
     "corpus_scope": "GLOBAL",
     "source_type": "general",
     "book_code": null
+  },
+  "GIG": {
+    "title": "La Sainte Bible d'après les Septante - Pierre Giguet (1872)",
+    "author": "Pierre Giguet / Lethielleux",
+    "description": "La première et magistrale traduction française intégrale de l'Ancien Testament d'après la version des Septante (texte grec d'Alexandrie) réalisée par Pierre Giguet en 4 tomes (1872).",
+    "year": "1872",
+    "cover_path": null,
+    "type": "Bible",
+    "format": "json",
+    "folder_name": "GIG",
+    "version_code": "GIG",
+    "total_books": 38,
+    "embedding_model": "study_library",
+    "active": true
+  },
+  "STAPFER": {
+    "title": "Le Nouveau Testament",
+    "author": "Edmond Louis Stapfer",
+    "description": "Le Nouveau Testament",
+    "year": "1889",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\Le_Nouveau_Testament.jpg",
+    "type": "Bible",
+    "format": "json",
+    "folder_name": "STAPFER",
+    "version_code": "STAPFER",
+    "total_books": 27,
+    "embedding_model": "study_library",
+    "active": true
   }
 }

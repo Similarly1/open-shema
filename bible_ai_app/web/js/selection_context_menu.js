@@ -302,7 +302,9 @@ const SelectionContextMenu = {
     // Détecter si la sélection contient ou est une référence biblique
     const verseBtn = document.getElementById('scm-btn-open-verse');
     const verseLabel = document.getElementById('scm-open-verse-label');
+    const studyBtn = document.getElementById('scm-btn-study-passage');
     const potentialRef = this.detectScriptureReference(text);
+    const isBibleContext = this.currentSourceContext?.type === 'bible';
 
     if (potentialRef && verseBtn) {
       verseBtn.style.display = 'flex';
@@ -311,6 +313,23 @@ const SelectionContextMenu = {
     } else if (verseBtn) {
       verseBtn.style.display = 'none';
       verseBtn.removeAttribute('data-ref');
+    }
+
+    if (studyBtn) {
+      if (potentialRef) {
+        studyBtn.style.display = 'flex';
+        const span = studyBtn.querySelector('span');
+        if (span) span.textContent = `Étudier ${potentialRef}`;
+        studyBtn.dataset.ref = potentialRef;
+      } else if (isBibleContext) {
+        studyBtn.style.display = 'flex';
+        const span = studyBtn.querySelector('span');
+        if (span) span.textContent = 'Étudier ce passage';
+        studyBtn.removeAttribute('data-ref');
+      } else {
+        studyBtn.style.display = 'none';
+        studyBtn.removeAttribute('data-ref');
+      }
     }
 
     // Gestion contextuelle du surlignage (Option A : uniquement actif sur le texte biblique)
@@ -421,13 +440,14 @@ const SelectionContextMenu = {
   },
 
   detectScriptureReference(text) {
-    if (!text || text.length > 70) return null;
+    if (!text) return null;
     const clean = text.replace(/^[\(\[\{«"'\s]+|[\)\]\}»"'\s\.\,\;]+$/g, '').trim();
+    if (!clean || clean.length > 250) return null;
 
     if (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences) {
       const html = TheologyView.highlightScriptureReferences(clean);
       const m = html.match(/data-ref="([^"]+)"/);
-      if (m) return m[1];
+      if (m && m[1]) return m[1];
     }
     return null;
   },
@@ -563,25 +583,21 @@ const SelectionContextMenu = {
   openPassageStudyFromSelection(text, ctx) {
     let passageRef = '';
 
-    // 1. Détection depuis une référence biblique explicite
+    // 1. Détection depuis une référence biblique explicite dans le texte sélectionné
     const scriptureRef = this.detectScriptureReference(text);
     if (scriptureRef) {
       passageRef = scriptureRef;
     }
-    // 2. Détection depuis le contexte
-    else if (ctx?.reference) {
+    // 2. Détection depuis le contexte si et seulement si c'est la Bible
+    else if (ctx?.type === 'bible' && ctx?.reference) {
       passageRef = ctx.reference;
     }
-    // 3. Détection depuis le lecteur Bible actif
-    else if (typeof BibleReader !== 'undefined' && BibleReader.currentBook) {
+    // 3. Détection depuis le lecteur Bible actif si on est dans le lecteur Bible
+    else if (ctx?.type === 'bible' && typeof BibleReader !== 'undefined' && BibleReader.currentBook) {
       const b = BibleReader.currentBook;
       const ch = BibleReader.currentChapter || 1;
       const v = BibleReader.selectedVerse || 1;
       passageRef = `${b} ${ch}:${v}`;
-    }
-    // 4. Fallback texte court
-    else if (text && text.length < 50) {
-      passageRef = text.trim();
     }
 
     if (passageRef) {
@@ -592,6 +608,10 @@ const SelectionContextMenu = {
         if (typeof App !== 'undefined') App.switchView('passage-study');
       }
       App.showToast(`Ouverture du Guide de Passage : ${passageRef}`);
+    } else {
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast("Sélectionnez une référence biblique (ex: Jean 3:16) pour ouvrir le Guide de Passage", "warning");
+      }
     }
   },
 

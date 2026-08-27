@@ -199,6 +199,13 @@ REVERSE_BOOK_MAPPING = {
 def get_french_book_name(book_code: str) -> str:
     return REVERSE_BOOK_MAPPING.get(book_code, book_code)
 
+def is_valid_book_code(book_code: str) -> bool:
+    """Vérifie si le code correspond à un livre biblique canonique ou deutérocanonique reconnu."""
+    if not book_code:
+        return False
+    return book_code in REVERSE_BOOK_MAPPING
+
+
 def resolve_book_input(query: str, all_books: list = None) -> str:
     """
     Résout une chaîne saisie par l'utilisateur (code, abréviation ou préfixe) vers le nom français officiel du livre.

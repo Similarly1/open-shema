@@ -101,9 +101,12 @@ class BibleDocxImporter:
             t = para.text.strip()
             if not t or '[[@Bible:' in t:
                 continue
-            if not title and (para.style.name.startswith('Heading') or 'bible' in t.lower() or len(t) < 40):
+            # Ignorer si le paragraphe est simplement le nom d'un livre biblique (ex: Genèse, Exode...)
+            if get_standard_book_code(t):
+                continue
+            if not title and (para.style.name.startswith('Heading') or any(kw in t.lower() for kw in ['bible', 'septante', 'testament', 'traduction', 'saintes ecritures'])):
                 title = t
-            elif not author and any(w in t.lower() for w in ['crampon', 'segond', 'darby', 'ostervald', 'chouraqui', 'auteur', 'traduction']):
+            elif not author and any(w in t.lower() for w in ['crampon', 'segond', 'darby', 'giguet', 'cahen', 'ostervald', 'chouraqui', 'auteur', 'traduction', 'abbé', 'chanoine', 'pasteur']):
                 author = t
             elif not year and re.search(r'\b(1[5-9]\d{2}|20\d{2})\b', t):
                 m_y = re.search(r'\b(1[5-9]\d{2}|20\d{2})\b', t)

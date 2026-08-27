@@ -485,6 +485,24 @@
     "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg",
     "comparaisons_suggerees": ["CRA", "SACY", "OST", "DARBY"]
   },
+  "GIG": {
+    "code": "GIG",
+    "aliases": ["giguet", "pierre giguet", "septante giguet", "septante de giguet", "bible giguet", "lxx giguet", "septante"],
+    "nom_officiel": "La Sainte Bible d'après les Septante - Pierre Giguet (1872)",
+    "editeur": "Pierre Giguet / Lethielleux",
+    "annee": 1872,
+    "famille": "Catholique",
+    "famille_badge_color": "#991B1B",
+    "philosophie": "Traduction intégrale française de la Septante grecque (LXX)",
+    "texte_base_at": "Septante grecque (LXX) avec apparat critique",
+    "texte_base_nt": "Non applicable (Ancien Testament seul)",
+    "canon": "Septante grecque (Ancien Testament & Deutérocanoniques)",
+    "statut_droits": "Domaine public",
+    "isbn": "",
+    "description": "La première et magistrale traduction française intégrale de l'Ancien Testament d'après la version des Septante (texte grec d'Alexandrie) réalisée par Pierre Giguet en 4 tomes (1872).",
+    "cover_url": "",
+    "comparaisons_suggerees": ["BDJ", "CRA", "GLA", "CHOU", "S21"]
+  },
   "CHOU": {
     "code": "CHOU",
     "aliases": ["chouraqui", "chou", "bible chouraqui", "andre chouraqui"],

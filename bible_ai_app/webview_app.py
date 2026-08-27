@@ -2613,13 +2613,19 @@ class BibleAppApi:
             if (reg_match and not has_non_bible_kw and not has_author) or info.get("is_bible") or BibleDocxImporter.is_logos_bible_docx(file_path):
                 is_bible = True
         elif ext == '.epub':
-            # Un EPUB n'est une Bible que s'il s'agit d'une édition intégrale de la Bible sans auteur d'essai
             if reg_match and not has_non_bible_kw and not has_author:
                 is_bible = True
-            elif ("sainte bible" in title_lower or "holy bible" in title_lower or title_lower.startswith("bible ")) and not has_non_bible_kw and not has_author:
+            else:
                 biblical_chapters_count = sum(1 for c in info.get("chapters", []) if c.get("book_code") is not None)
-                if biblical_chapters_count >= 30:
-                    is_bible = True
+                total_chapters = len(info.get("chapters", []))
+                if not has_non_bible_kw and not has_author:
+                    if biblical_chapters_count >= 10:
+                        is_bible = True
+                    elif total_chapters > 0 and (biblical_chapters_count / total_chapters) >= 0.5:
+                        is_bible = True
+                    elif any(kw in combined_text for kw in ["sainte bible", "holy bible", "septante", "tanakh", "ancien testament", "nouveau testament", "evangiles"]):
+                        if biblical_chapters_count >= 1:
+                            is_bible = True
 
         if is_bible:
             info["type"] = "Bible"

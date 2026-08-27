@@ -685,9 +685,10 @@ const DictView = {
       `;
     }
 
+    const isVigouroux = (match?.dict_id || this.activeDictId || '').toLowerCase().includes('vigouroux') || (this.activeDictInfo?.name || '').toLowerCase().includes('vigouroux');
     const rawText = match.full_text || match.raw_text || match.preview || '';
     this.currentFootnotesList = [];
-    const formatted = this.formatArticleMarkdown(rawText);
+    const formatted = this.formatArticleMarkdown(rawText, isVigouroux);
     let linkified = (this.optScripture && typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences)
       ? TheologyView.highlightScriptureReferences(formatted)
       : formatted;
@@ -698,6 +699,21 @@ const DictView = {
     // Section des notes de bas de page si des citations ont été extraites
     let footnotesHtml = '';
     if (this.optFootnotes && this.currentFootnotesList.length > 0) {
+      // Pour Vigouroux : enrichir le texte des notes avec le glossaire patristique latin
+      const renderedFootnotes = this.currentFootnotesList.map(fn => {
+        let fnText = (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences) ? TheologyView.highlightScriptureReferences(fn.text) : fn.text;
+        if (isVigouroux && typeof TheolLatinGlossary !== 'undefined') {
+          fnText = TheolLatinGlossary.annotate(fnText);
+        }
+        return `
+          <li class="theol-fn-item" id="theol-fn-${fn.id}" data-fn-id="${fn.id}" style="margin-bottom: 8px;">
+            <span class="theol-fn-num" style="font-weight: 700; color: #6366f1; margin-right: 4px;">${fn.id}.</span>
+            <span class="theol-fn-text">${fnText}</span>
+            <a href="#dict-fnref-${fn.id}" class="theol-fn-backref" data-target-id="dict-fnref-${fn.id}" title="Retour au passage" style="color: #6366f1; text-decoration: none; margin-left: 6px; font-weight: bold;">↩</a>
+          </li>
+        `;
+      }).join('');
+
       footnotesHtml = `
         <div class="theol-footnotes-section" id="dict-footnotes-section" style="margin-top: 32px; border-top: 1px solid var(--border-color); padding-top: 18px;">
           <div class="theol-footnotes-header" style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px;">
@@ -711,13 +727,7 @@ const DictView = {
             <span>Notes & Références de sources (${this.currentFootnotesList.length})</span>
           </div>
           <ol class="theol-footnotes-list" style="padding-left: 20px; font-size: 12.5px; color: var(--text-secondary); line-height: 1.6;">
-            ${this.currentFootnotesList.map(fn => `
-              <li class="theol-fn-item" id="theol-fn-${fn.id}" data-fn-id="${fn.id}" style="margin-bottom: 8px;">
-                <span class="theol-fn-num" style="font-weight: 700; color: #6366f1; margin-right: 4px;">${fn.id}.</span>
-                <span class="theol-fn-text">${(typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences) ? TheologyView.highlightScriptureReferences(fn.text) : fn.text}</span>
-                <a href="#dict-fnref-${fn.id}" class="theol-fn-backref" data-target-id="dict-fnref-${fn.id}" title="Retour au passage" style="color: #6366f1; text-decoration: none; margin-left: 6px; font-weight: bold;">↩</a>
-              </li>
-            `).join('')}
+            ${renderedFootnotes}
           </ol>
         </div>
       `;
@@ -781,6 +791,11 @@ const DictView = {
       FootnoteTooltip.bindToElements(bodyEl.querySelectorAll('.theol-fn-badge'));
     }
 
+    // 3b. Attacher le gestionnaire d'infobulles patristiques / latines (LatinGlossTooltip)
+    if (isVigouroux && typeof LatinGlossTooltip !== 'undefined') {
+      LatinGlossTooltip.bindToElements(bodyEl.querySelectorAll('.theol-latin-gloss'));
+    }
+
     // 4. Attacher les liens retour (back-links) de la section des notes
     bodyEl.querySelectorAll('.theol-fn-backref').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -805,8 +820,9 @@ const DictView = {
     });
   },
 
-  formatArticleMarkdown(text) {
+  formatArticleMarkdown(text, isVigouroux = false) {
     if (!text) return '';
+    isVigouroux = isVigouroux || (this.activeDictId || '').toLowerCase().includes('vigouroux') || (this.activeDictInfo?.name || '').toLowerCase().includes('vigouroux');
 
     const ROMAN_MAP = {
       'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6, 'VII': 7, 'VIII': 8, 'IX': 9, 'X': 10,
@@ -1351,40 +1367,131 @@ const DictView = {
       if (seeMatch && !raw.startsWith('1.') && !raw.startsWith('2.') && !raw.startsWith('I.') && seeMatch[1].trim().length > 0) {
         let rawTargetStr = seeMatch[1].trim();
         // Supprimer toute balise HTML déjà injectée (ex: <span class="theol-fn-badge">...)
-        rawTargetStr = rawTargetStr.replace(/<[^>]+>/g, ' ').replace(/&lt;[^&]+&gt;/g, ' ').replace(/\s+/g, ' ').trim();
+        rawTargetStr = rawTargetStr
+          .replace(/<[^>]+>/g, ' ')
+          .replace(/&lt;[^&]+&gt;/g, ' ')
+          .replace(/\[([^\]]+)\](?:\([^\)]*\))?/g, '$1')
+          .replace(/\s+/g, ' ')
+          .trim();
 
-        if (rawTargetStr.length < 200 && (/[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ]{2,}/.test(rawTargetStr) || rawTargetStr.includes('**') || rawTargetStr.includes('colonne') || rawTargetStr.includes('tome'))) {
+        if (rawTargetStr.length < 250 && (/[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ]{2,}/.test(rawTargetStr) || rawTargetStr.includes('**') || rawTargetStr.includes('colonne') || rawTargetStr.includes('tome'))) {
           if (inUlList) { out.push('</ul>'); inUlList = false; }
           if (inSeeList) { out.push('</ul>'); inSeeList = false; }
 
-          const targets = rawTargetStr.split(/[;,]/).map(t => {
-            return t.replace(/\*\*/g, '').replace(/\*/g, '').trim();
-          }).filter(t => t.length > 0);
+          // Découpage intelligent respectant les parenthèses et crochets
+          const rawChunks = [];
+          let currentChunk = [];
+          let parenDepth = 0;
+          let bracketDepth = 0;
 
-          if (targets.length > 0) {
-            const linksHtml = targets.map(t => {
-              let cleanWord = t.replace(/[.,;:]+$/, '').trim();
-              if (cleanWord.startsWith('(') && cleanWord.endsWith(')')) {
-                cleanWord = cleanWord.slice(1, -1).trim();
+          for (let i = 0; i < rawTargetStr.length; i++) {
+            const char = rawTargetStr[i];
+            if (char === '(') parenDepth++;
+            else if (char === ')') parenDepth = Math.max(0, parenDepth - 1);
+            else if (char === '[') bracketDepth++;
+            else if (char === ']') bracketDepth = Math.max(0, bracketDepth - 1);
+
+            if ((char === ';' || char === ',') && parenDepth === 0 && bracketDepth === 0) {
+              const piece = currentChunk.join('').trim();
+              if (piece) rawChunks.push(piece);
+              currentChunk = [];
+            } else {
+              currentChunk.push(char);
+            }
+          }
+          const lastPiece = currentChunk.join('').trim();
+          if (lastPiece) rawChunks.push(lastPiece);
+
+          // Regrouper les métadonnées isolées (ex: "col. 654" ou "t. II") avec l'article précédent
+          const parsedTargets = [];
+          rawChunks.forEach(chunk => {
+            let c = chunk.replace(/\*\*/g, '').replace(/\*/g, '').trim().replace(/[.,;:]+$/, '');
+            if (!c) return;
+
+            const isPureMeta = /^(?:colonne|col\.|tome|t\.|p\.|page|vol\.|volume)\s*[0-9IVXLCDM]+/i.test(c);
+            if (isPureMeta && parsedTargets.length > 0) {
+              parsedTargets[parsedTargets.length - 1].meta = parsedTargets[parsedTargets.length - 1].meta ? `${parsedTargets[parsedTargets.length - 1].meta}, ${c}` : c;
+              return;
+            }
+
+            let word = c;
+            let meta = '';
+            let qualifier = '';
+
+            const parenMatch = c.match(/^([^(]+?)\s*\(([^)]+)\)\s*$/);
+            if (parenMatch) {
+              word = parenMatch[1].trim();
+              const inner = parenMatch[2].trim();
+              if (/(?:colonne|col\.|tome|t\.|p\.|page|vol\.|volume)\s*[0-9IVXLCDM]+/i.test(inner)) {
+                meta = inner;
+              } else {
+                qualifier = inner;
               }
-              const isColOrTome = /^(?:colonne|col\.|tome|t\.|p\.|page)\s*\d+/i.test(cleanWord);
+            }
+
+            word = word.replace(/[.,;:]+$/, '').trim();
+            if (word) {
+              parsedTargets.push({ word, meta, qualifier });
+            }
+          });
+
+          if (parsedTargets.length > 0) {
+            const linksHtml = parsedTargets.map(t => {
+              const isColOrTome = /^(?:colonne|col\.|tome|t\.|p\.|page)\s*\d+/i.test(t.word);
               if (isColOrTome) {
-                return `<span class="dict-see-meta" style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; opacity: 0.85;">🔗 ${this.escapeHtml(cleanWord)}</span>`;
+                return `<span class="dict-see-meta" style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; opacity: 0.85;">🔗 ${this.escapeHtml(t.word)}</span>`;
               }
+              const displayLabel = t.qualifier ? `${t.word} (${t.qualifier})` : t.word;
+              const metaHtml = t.meta ? ` <span class="dict-see-meta" title="Volume et Colonne">📖 ${this.escapeHtml(t.meta)}</span>` : '';
               return `
-                <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(cleanWord)}">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                  <span>${this.escapeHtml(cleanWord)}</span>
-                </a>
+                <span class="dict-cross-ref-item" style="display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                  <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(t.word)}">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                    <span>${this.escapeHtml(displayLabel)}</span>
+                  </a>
+                  ${metaHtml}
+                </span>
               `;
             }).join(' ');
 
-            out.push(`
-              <div class="dict-see-row">
-                <span class="dict-see-label">Voir aussi :</span>
-                ${linksHtml}
-              </div>
-            `);
+            // OPTION B (Spécifique Vigouroux) : Fusion dans une boîte « Étude approfondie & Notice liée »
+            let mergedOptionB = false;
+            if (isVigouroux && out.length > 0) {
+              const lastOut = out[out.length - 1];
+              const pMatch = lastOut.match(/^<p style="[^"]*">(.*?)<\/p>$/);
+              if (pMatch) {
+                let pText = pMatch[1].trim();
+                const isIntroPattern = /^(?:Pour (?:une étude|l['’]étude|en savoir plus)|Sur la signification|Ce terme désigne|Consulter également|Pour la symbolique|\*+\s*Exégèse)/i.test(pText) || pText.endsWith(',') || pText.endsWith(':');
+                if (isIntroPattern) {
+                  // Nettoyer la ponctuation terminale
+                  let cleanIntro = pText.replace(/[,\s]+$/, ' :');
+                  if (!cleanIntro.endsWith(':') && !cleanIntro.endsWith('.')) cleanIntro += ' :';
+                  out.pop(); // Retirer le paragraphe précédent pour le fusionner
+                  out.push(`
+                    <div class="dict-related-notice-box">
+                      <div class="dict-related-notice-header">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                        <span>Étude approfondie &amp; Notice liée</span>
+                      </div>
+                      <div class="dict-related-notice-body">
+                        <p class="dict-related-intro">${cleanIntro}</p>
+                        <div class="dict-related-actions">${linksHtml}</div>
+                      </div>
+                    </div>
+                  `);
+                  mergedOptionB = true;
+                }
+              }
+            }
+
+            if (!mergedOptionB) {
+              out.push(`
+                <div class="dict-see-row">
+                  <span class="dict-see-label">Voir aussi :</span>
+                  ${linksHtml}
+                </div>
+              `);
+            }
             return;
           }
         }

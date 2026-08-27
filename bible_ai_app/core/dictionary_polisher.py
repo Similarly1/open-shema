@@ -37,7 +37,9 @@ Règles impératives de restauration :
    - Mets en *italique* les citations latines et titres d'ouvrages (*Commentarius in Scripturam Sacram*, *Keilinschriften*, etc.).
 
 5. Renvois et Références Croisées (Voir aussi) :
-   - Pour tous les renvois vers d'autres articles du dictionnaire (ex: 'Voir : BETH', 'Voir aussi : TORCHE'), formate clairement en fin d'article ou de paragraphe sous la forme `*Voir* : **NOM_ARTICLE**` ou `*Voir aussi* : **NOM_ARTICLE**` pour permettre la navigation interactive par clic.
+   - Pour tous les renvois vers d'autres articles du dictionnaire (ex: 'Voir : BETH', 'Voir aussi : TORCHE', 'Voir : CHÊNE (tome II, colonne 654)'), formate clairement sous la forme `*Voir* : **NOM_ARTICLE**` ou `*Voir aussi* : **NOM_ARTICLE** (tome X, colonne Y)` sans inclure les tomes ou parenthèses dans le nom en gras.
+   - Ne termine JAMAIS une phrase introductive par une virgule orpheline avant un renvoi `*Voir* :` ; termine toujours la phrase introductive par un point `.` ou deux-points `:`.
+   - Ne laisse JAMAIS de ligne orpheline `*Voir aussi* :` vide.
 
 6. Intégrité et Fidélité absolue :
    - N'invente JAMAIS de faits ou de sections fictives non documentées.

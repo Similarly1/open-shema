@@ -914,6 +914,69 @@ const TheologyView = {
   highlightScriptureReferences(text) {
     if (!text) return '';
 
+    const BIBLE_MAX_CHAPTERS_MAP = {
+      'genese': 50, 'gen': 50, 'gn': 50, 'ge': 50, 'genesis': 50,
+      'exode': 40, 'exod': 40, 'exo': 40, 'ex': 40, 'exodus': 40,
+      'levitique': 27, 'lev': 27, 'lv': 27, 'leviticus': 27,
+      'nombres': 36, 'nom': 36, 'nb': 36, 'num': 36, 'numb': 36, 'numbers': 36,
+      'deuteronome': 34, 'deut': 34, 'dtn': 34, 'dt': 34, 'deuteronomy': 34,
+      'josue': 24, 'jos': 24, 'josh': 24, 'joshua': 24, 'juges': 21, 'jug': 21, 'jdg': 21, 'jg': 21, 'judges': 21,
+      'ruth': 4, 'rut': 4, 'rth': 4, 'rt': 4,
+      '1samuel': 31, '1sam': 31, '1sa': 31, '1s': 31,
+      '2samuel': 24, '2sam': 24, '2sa': 24, '2s': 24,
+      '1rois': 22, '1roi': 22, '1r': 22, '1kings': 22, '1ki': 22, '1kgs': 22,
+      '2rois': 25, '2roi': 25, '2r': 25, '2kings': 25, '2ki': 25, '2kgs': 25,
+      '1chroniques': 29, '1chron': 29, '1chr': 29, '1ch': 29, '1chronicles': 29,
+      '2chroniques': 36, '2chron': 36, '2chr': 36, '2ch': 36, '2chronicles': 36,
+      'esdras': 10, 'esd': 10, 'ezr': 10, 'ezra': 10, 'nehemie': 13, 'nehem': 13, 'neh': 13, 'ne': 13, 'nehemiah': 13,
+      'esther': 10, 'esth': 10, 'est': 10, 'job': 42, 'jb': 42,
+      'psaumes': 150, 'psaume': 150, 'ps': 150, 'psa': 150, 'psm': 150, 'pss': 150, 'psalms': 150, 'psalm': 150,
+      'proverbes': 31, 'proverbe': 31, 'prov': 31, 'prv': 31, 'pr': 31, 'proverbs': 31,
+      'ecclesiaste': 12, 'eccl': 12, 'ecc': 12, 'qoh': 12, 'ec': 12, 'ecclesiastes': 12,
+      'cantique': 8, 'cantiquedescantiques': 8, 'cant': 8, 'ct': 8, 'songofsongs': 8, 'song': 8,
+      'esaie': 66, 'esai': 66, 'isaiah': 66, 'isa': 66, 'es': 66, 'is': 66,
+      'jeremie': 52, 'jer': 52, 'jr': 52, 'jeremiah': 52, 'lamentations': 5, 'lam': 5, 'lm': 5,
+      'ezechiel': 48, 'ezech': 48, 'ezek': 48, 'eze': 48, 'ez': 48, 'ezekiel': 48,
+      'daniel': 14, 'dan': 14, 'da': 14, 'osee': 14, 'ose': 14, 'hos': 14, 'os': 14, 'hosea': 14,
+      'joel': 3, 'joe': 3, 'jl': 3, 'amos': 9, 'amo': 9, 'am': 9, 'abdias': 1, 'abd': 1, 'obad': 1, 'oba': 1, 'ab': 1, 'obadiah': 1,
+      'jonas': 4, 'jon': 4, 'jonah': 4, 'michee': 7, 'mich': 7, 'mic': 7, 'mi': 7, 'micah': 7,
+      'nahum': 3, 'nah': 3, 'na': 3, 'habacuc': 3, 'hab': 3, 'ha': 3, 'habak': 3, 'habakkuk': 3,
+      'sophonie': 3, 'soph': 3, 'so': 3, 'zep': 3, 'zeph': 3, 'zephaniah': 3,
+      'aggee': 2, 'agg': 2, 'ag': 2, 'hag': 2, 'hagg': 2, 'haggai': 2,
+      'zacharie': 14, 'zach': 14, 'zac': 14, 'za': 14, 'zech': 14, 'zec': 14, 'zechariah': 14,
+      'malachie': 4, 'mal': 4, 'ml': 4, 'malachi': 4,
+      'matthieu': 28, 'mat': 28, 'matt': 28, 'mt': 28, 'matthew': 28,
+      'marc': 16, 'mar': 16, 'mc': 16, 'mk': 16, 'mark': 16,
+      'luc': 24, 'luk': 24, 'lc': 24, 'lk': 24, 'luke': 24,
+      'jean': 21, 'joh': 21, 'jn': 21, 'john': 21,
+      'actes': 28, 'act': 28, 'ac': 28, 'acts': 28,
+      'romains': 16, 'rom': 16, 'rm': 16, 'ro': 16, 'romans': 16,
+      '1corinthiens': 16, '1cor': 16, '1co': 16, '1corinthians': 16,
+      '2corinthiens': 13, '2cor': 13, '2co': 13, '2corinthians': 13,
+      'galates': 6, 'galat': 6, 'gal': 6, 'ga': 6, 'galatians': 6,
+      'ephesiens': 6, 'ephes': 6, 'eph': 6, 'ep': 6, 'ephesians': 6,
+      'philippiens': 4, 'philip': 4, 'phil': 4, 'php': 4, 'phi': 4, 'ph': 4, 'philippians': 4,
+      'colossiens': 4, 'coloss': 4, 'col': 4, 'colossians': 4,
+      '1thessaloniciens': 5, '1thess': 5, '1th': 5, '1thessalonians': 5,
+      '2thessaloniciens': 3, '2thess': 3, '2th': 3, '2thessalonians': 3,
+      '1timothee': 6, '1tim': 6, '1ti': 6, '1tm': 6, '1timothy': 6,
+      '2timothee': 4, '2tim': 4, '2ti': 4, '2tm': 4, '2timothy': 4,
+      'tite': 3, 'tit': 3, 'tt': 3, 'titus': 3,
+      'philemon': 1, 'philem': 1, 'phm': 1, 'phl': 1, 'philemon': 1,
+      'hebreux': 13, 'hebr': 13, 'heb': 13, 'he': 13, 'hebrews': 13,
+      'jacques': 5, 'jacq': 5, 'jac': 5, 'jas': 5, 'jc': 5, 'james': 5,
+      '1pierre': 5, '1pie': 5, '1pi': 5, '1pe': 5, '1p': 5, '1peter': 5,
+      '2pierre': 3, '2pie': 3, '2pi': 3, '2pe': 3, '2p': 3, '2peter': 3,
+      '1jean': 5, '1jn': 5, '1joh': 5, '1j': 5, '1john': 5,
+      '2jean': 1, '2jn': 1, '2joh': 1, '2j': 1, '2john': 1,
+      '3jean': 1, '3jn': 1, '3joh': 1, '3j': 1, '3john': 1,
+      'jude': 1, 'jud': 1, 'jd': 1,
+      'apocalypse': 22, 'apoc': 22, 'apo': 22, 'ap': 22, 'rev': 22, 'revelation': 22,
+      'sagesse': 19, 'siracide': 51, 'ecclesiastique': 51, 'tobie': 14, 'judith': 16, 'baruch': 6,
+      '1maccabees': 16, '2maccabees': 15, '3maccabees': 7, '4maccabees': 18,
+      '1maccabees': 16, '2maccabees': 15, '1mac': 16, '2mac': 15, '1ma': 16, '2ma': 15
+    };
+
     // Liste exhaustive des livres bibliques et abréviations françaises & anglaises
     const bookNames = [
       // Deutérocanoniques & Apocryphes
@@ -982,8 +1045,25 @@ const TheologyView = {
         return part;
       }
 
-      return part.replace(scriptureRegex, (fullMatch, book, ch1, vs1, chOrVs2, vs2, chained) => {
+      return part.replace(scriptureRegex, (fullMatch, book, ch1, vs1, chOrVs2, vs2, chained, offset, origStr) => {
         const cleanBook = book.replace(/\.$/, '').trim();
+        const kBook = cleanBook.toLowerCase().replace(/[\s\-_]+/g, '').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const ch1Num = parseInt(ch1, 10);
+        const maxCh = BIBLE_MAX_CHAPTERS_MAP[kBook];
+
+        // 1. Validation canonique stricte : Si le chapitre dépasse le max (ex: col. 1083 ou col. 108 -> Colossiens max 4), REJETER
+        if (maxCh && ch1Num > maxCh) {
+          return fullMatch;
+        }
+
+        // 2. Désambiguïsation contextuelle des colonnes de livres (ex: t. 91, col. 108 ou l. II, col. 5)
+        if (/^col\.?$/i.test(cleanBook)) {
+          const pre = origStr.slice(Math.max(0, offset - 35), offset);
+          if (/(?:t\.|tome|vol\.|volume|lib\.|l\.|in-8°?|in-4°?|in-fol\.?|p\.|page)\s*[0-9IVXLCDM]*\s*,\s*$/i.test(pre)) {
+            return fullMatch;
+          }
+        }
+
         let displayRef = fullMatch.trim();
         let firstRef = '';
 
@@ -2439,6 +2519,12 @@ const FootnoteTooltip = {
       ScriptureTooltip.bindToElements(inlineRefs);
     }
 
+    // Attacher les infobulles du glossaire latin patristique contenues dans la note
+    const glossEls = this.tooltipEl.querySelectorAll('.theol-latin-gloss');
+    if (glossEls.length > 0 && typeof LatinGlossTooltip !== 'undefined') {
+      LatinGlossTooltip.bindToElements(glossEls);
+    }
+
     // Bouton de saut vers la section des notes
     const jumpBtn = this.tooltipEl.querySelector('.theol-fn-popover-jump');
     if (jumpBtn) {
@@ -2487,7 +2573,6 @@ const FootnoteTooltip = {
     this.tooltipEl.style.top = `${Math.round(top)}px`;
   },
 
-
   hide() {
     if (!this.tooltipEl) return;
     this.activeTarget = null;
@@ -2501,7 +2586,189 @@ const FootnoteTooltip = {
   }
 };
 
+// =============================================================================
+// GLOSSAIRE LATIN, PATRISTIQUE & ÉRUDITION THEOLOGIQUE
+// =============================================================================
+
+const TheolLatinGlossary = {
+  glossary: {
+    // Commentaires patristiques sur l'Écriture
+    'in cant.': { term: 'In Cant.', full: 'In Cantica Canticorum', cat: 'Patristique', desc: 'Commentaire sur le livre biblique du Cantique des Cantiques (ex: saint Bède le Vénérable, saint Bernard).' },
+    'in cantica canticorum': { term: 'In Cantica Canticorum', full: 'In Cantica Canticorum', cat: 'Patristique', desc: 'Commentaire patristique sur le Cantique des Cantiques.' },
+    'in hexaëm.': { term: 'In Hexaëm.', full: 'In Hexaëmeron', cat: 'Patristique', desc: 'Traité ou homélies sur les six jours de la Création (Genèse).' },
+    'in hexameron': { term: 'In Hexameron', full: 'In Hexaëmeron', cat: 'Patristique', desc: 'Traité sur les six jours de la Création (Genèse).' },
+    'in matth.': { term: 'In Matth.', full: 'In Matthaeum', cat: 'Patristique', desc: 'Commentaire patristique ou exégétique sur l’Évangile selon saint Matthieu.' },
+    'in luc.': { term: 'In Luc.', full: 'In Lucam', cat: 'Patristique', desc: 'Commentaire sur l’Évangile selon saint Luc.' },
+    'in joa.': { term: 'In Joa.', full: 'In Joannem', cat: 'Patristique', desc: 'Commentaire sur l’Évangile selon saint Jean.' },
+    'in rom.': { term: 'In Rom.', full: 'In Epistolam ad Romanos', cat: 'Patristique', desc: 'Commentaire sur l’Épître de saint Paul aux Romains.' },
+    'in gal.': { term: 'In Gal.', full: 'In Epistolam ad Galatas', cat: 'Patristique', desc: 'Commentaire sur l’Épître aux Galates.' },
+    'in genes.': { term: 'In Genes.', full: 'In Genesim', cat: 'Patristique', desc: 'Commentaire sur le livre de la Genèse.' },
+    'in psal.': { term: 'In Psal.', full: 'In Psalmos', cat: 'Patristique', desc: 'Commentaire patristique sur les Psaumes.' },
+    'enarrationes in psalmos': { term: 'Enarrationes in Psalmos', full: 'Enarrationes in Psalmos', cat: 'Patristique', desc: 'Expositions / Discours sur les Psaumes par saint Augustin.' },
+    'enarr. in psal.': { term: 'Enarr. in Psal.', full: 'Enarrationes in Psalmos', cat: 'Patristique', desc: 'Expositions sur les Psaumes par saint Augustin.' },
+    'de consensu evang.': { term: 'De consensu evang.', full: 'De consensu Evangelistarum', cat: 'Patristique', desc: '« De l’accord des Évangélistes » (Traité de concorde évangélique de saint Augustin).' },
+    
+    // Grands traités patristiques
+    'adv. haer.': { term: 'Adv. Haer.', full: 'Adversus Haereses', cat: 'Patristique', desc: '« Contre les Hérésies » (Traité majeur de saint Irénée de Lyon, v. 180).' },
+    'adversus haereses': { term: 'Adversus Haereses', full: 'Adversus Haereses', cat: 'Patristique', desc: '« Contre les Hérésies » (saint Irénée de Lyon).' },
+    'de civ. dei': { term: 'De Civ. Dei', full: 'De Civitate Dei', cat: 'Patristique', desc: '« La Cité de Dieu » (Ouvrage majeur de saint Augustin en 22 livres, 426).' },
+    'de civitate dei': { term: 'De Civitate Dei', full: 'De Civitate Dei', cat: 'Patristique', desc: '« La Cité de Dieu » (saint Augustin).' },
+    'praep. ev.': { term: 'Praep. Ev.', full: 'Praeparatio Evangelica', cat: 'Patristique', desc: '« La Préparation évangélique » (Ouvrage apologétique d’Eusèbe de Césarée, IVe s.).' },
+    'demonstr. ev.': { term: 'Demonstr. Ev.', full: 'Demonstratio Evangelica', cat: 'Patristique', desc: '« La Démonstration évangélique » (Eusèbe de Césarée).' },
+    'hist. eccl.': { term: 'Hist. Eccl.', full: 'Historia Ecclesiastica', cat: 'Histoire', desc: '« Histoire ecclésiastique » (Eusèbe de Césarée / Rufin / Socrate).' },
+    'h. e.': { term: 'H. E.', full: 'Historia Ecclesiastica', cat: 'Histoire', desc: '« Histoire ecclésiastique » (Eusèbe de Césarée).' },
+    'de bono patientiae': { term: 'De bono patientiae', full: 'De bono patientiae', cat: 'Patristique', desc: '« Du bien de la patience » (Traité de saint Cyprien de Carthage, IIIe s.).' },
+    'de bono patientise': { term: 'De bono patientiae', full: 'De bono patientiae', cat: 'Patristique', desc: '« Du bien de la patience » (Traité de saint Cyprien de Carthage, IIIe s.).' },
+    'dial. cum tryph.': { term: 'Dial. cum Tryph.', full: 'Dialogus cum Tryphone Judaeo', cat: 'Patristique', desc: '« Dialogue avec le juif Tryphon » (saint Justin Martyr, v. 160).' },
+    'orat. cont. judaeos': { term: 'Orat. cont. Judaeos', full: 'Oratio contra Judaeos', cat: 'Patristique', desc: 'Homélies polémiques de saint Jean Chrysostome (IVe s.).' },
+    'orat. cont. judseos': { term: 'Orat. cont. Judaeos', full: 'Oratio contra Judaeos', cat: 'Patristique', desc: 'Homélies polémiques de saint Jean Chrysostome (IVe s.).' },
+    'ant. jud.': { term: 'Ant. jud.', full: 'Antiquitates Judaicae', cat: 'Histoire', desc: '« Antiquités judaïques » (Ouvrage d’histoire juive de Flavius Josèphe).' },
+    'de bell. jud.': { term: 'De bell. jud.', full: 'De Bello Judaico', cat: 'Histoire', desc: '« La Guerre des Juifs » (Flavius Josèphe).' },
+    
+    // Locutions et abréviations d'érudition
+    'op. cit.': { term: 'op. cit.', full: 'Opus citatum / Opere citato', cat: 'Citation', desc: '« Dans l’ouvrage déjà cité » de cet auteur.' },
+    'ibid.': { term: 'ibid.', full: 'Ibidem', cat: 'Citation', desc: '« Au même endroit » (dans le même livre ou passage cité juste avant).' },
+    'ib.': { term: 'ib.', full: 'Ibidem', cat: 'Citation', desc: '« Au même endroit » (dans le même livre cité précédemment).' },
+    'loc. cit.': { term: 'loc. cit.', full: 'Loco citato', cat: 'Citation', desc: '« Au passage cité » (à la page ou colonne exacte citée plus haut).' },
+    'ad loc.': { term: 'ad loc.', full: 'Ad locum', cat: 'Exégèse', desc: '« Au passage en question » (note ou commentaire direct sur ce verset).' },
+    'passim': { term: 'passim', full: 'Passim', cat: 'Érudition', desc: '« Çà et là » (notion dispersée fréquemment à divers endroits de l’œuvre).' },
+    'sq.': { term: 'sq.', full: 'Sequitur / Sequentia', cat: 'Pagination', desc: '« Et la page / colonne suivante ».' },
+    'sqq.': { term: 'sqq.', full: 'Sequentia', cat: 'Pagination', desc: '« Et les pages / colonnes suivantes ».' },
+    'et suiv.': { term: 'et suiv.', full: 'Et sequentia', cat: 'Pagination', desc: '« Et pages ou colonnes suivantes ».' },
+    'cf.': { term: 'cf.', full: 'Confer', cat: 'Renvoi', desc: '« Confère / Comparez avec » (renvoi pour vérification).' },
+    'édit. mangey': { term: 'édit. Mangey', full: 'Édition Thomas Mangey (1742)', cat: 'Édition', desc: 'Édition scientifique de référence des œuvres de Philon d’Alexandrie.' }
+  },
+
+  annotate(text) {
+    if (!text) return '';
+    let res = text;
+
+    // 1. Détection des livres / tomes / colonnes combinés (ex: l. II, t. 91, col. 108 3 ou t. XLV, col. 1575)
+    res = res.replace(/\b(?:(l\.|lib\.|livre)\s+([IVXLCDM\d]+)\s*,\s*)?(?:(t\.|tome)\s+([IVXLCDM\d]+))\s*,\s*(?:(col\.|colonne|p\.|page)\s*(\d+(?:\s+\d+)?))\b/gi, (match, lPrefix, lNum, tPrefix, tNum, cPrefix, cNum) => {
+      const cleanCol = cNum.replace(/\s+/g, '');
+      const isCol = cPrefix.toLowerCase().startsWith('col');
+      const unitLabel = isCol ? 'colonne' : 'page';
+      const libPart = lNum ? `Livre ${lNum}, ` : '';
+      const titleAttr = `${libPart}Tome ${tNum}, ${unitLabel} ${cleanCol}`;
+      const descAttr = `Référence de volume et ${unitLabel} (notamment dans la Patrologie de Migne ou les grands répertoires théologiques).`;
+      return `<span class="theol-latin-gloss" data-gloss-term="${TheologyView.escapeHtml(match)}" data-gloss-full="${TheologyView.escapeHtml(titleAttr)}" data-gloss-cat="Volume &amp; Colonne" data-gloss-desc="${TheologyView.escapeHtml(descAttr)}">${match}</span>`;
+    });
+
+    // 2. Détection des formules enregistrées dans le glossaire
+    const terms = Object.keys(this.glossary).sort((a, b) => b.length - a.length);
+    for (const rawK of terms) {
+      const g = this.glossary[rawK];
+      const escapedK = rawK.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      const reg = new RegExp(`(?<=^|[\\s\\(\\['">,;:–—«»])(${escapedK})(?=[\\s\\)\\].;:–—«»,'"]|$)`, 'gi');
+      res = res.replace(reg, (match, matchedTerm, offset, fullStr) => {
+        const preceding = fullStr.slice(0, offset);
+        const lastOpen = preceding.lastIndexOf('<');
+        const lastClose = preceding.lastIndexOf('>');
+        if (lastOpen > lastClose) return match;
+        return `<span class="theol-latin-gloss" data-gloss-term="${TheologyView.escapeHtml(matchedTerm)}" data-gloss-full="${TheologyView.escapeHtml(g.full)}" data-gloss-cat="${TheologyView.escapeHtml(g.cat)}" data-gloss-desc="${TheologyView.escapeHtml(g.desc)}">${matchedTerm}</span>`;
+      });
+    }
+
+    return res;
+  }
+};
+
+const LatinGlossTooltip = {
+  tooltipEl: null,
+  activeTarget: null,
+  hoverTimer: null,
+
+  init() {
+    if (this.tooltipEl) return;
+    this.tooltipEl = document.createElement('div');
+    this.tooltipEl.className = 'theol-latin-popover hidden';
+    this.tooltipEl.id = 'theol-latin-popover';
+    document.body.appendChild(this.tooltipEl);
+
+    window.addEventListener('scroll', () => this.hide(), { passive: true });
+    document.getElementById('dict-article-body')?.addEventListener('scroll', () => this.hide(), { passive: true });
+  },
+
+  bindToElements(elements) {
+    if (!elements || elements.length === 0) return;
+    this.init();
+
+    elements.forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        if (this.hoverTimer) clearTimeout(this.hoverTimer);
+        this.hoverTimer = setTimeout(() => {
+          this.show(el);
+        }, 100);
+      });
+
+      el.addEventListener('mouseleave', () => {
+        if (this.hoverTimer) clearTimeout(this.hoverTimer);
+        this.hoverTimer = setTimeout(() => {
+          this.hide();
+        }, 120);
+      });
+    });
+  },
+
+  show(targetEl) {
+    if (!targetEl) return;
+    this.init();
+    this.activeTarget = targetEl;
+
+    const term = targetEl.dataset.glossTerm || targetEl.textContent.trim();
+    const full = targetEl.dataset.glossFull || term;
+    const cat = targetEl.dataset.glossCat || 'Référence';
+    const desc = targetEl.dataset.glossDesc || '';
+
+    this.tooltipEl.innerHTML = `
+      <div class="theol-latin-popover-header">
+        <span class="theol-latin-popover-badge">🏛️ ${TheologyView.escapeHtml(cat)}</span>
+      </div>
+      <div class="theol-latin-popover-term">${TheologyView.escapeHtml(full)}</div>
+      ${desc ? `<div class="theol-latin-popover-desc">${TheologyView.escapeHtml(desc)}</div>` : ''}
+    `;
+
+    this.tooltipEl.classList.remove('hidden');
+    this.positionTooltip(targetEl);
+    requestAnimationFrame(() => this.tooltipEl.classList.add('visible'));
+  },
+
+  positionTooltip(targetEl) {
+    if (!this.tooltipEl || !targetEl) return;
+    const rect = targetEl.getBoundingClientRect();
+    const realWidth = this.tooltipEl.offsetWidth || 280;
+    const realHeight = this.tooltipEl.offsetHeight || 80;
+
+    let left = rect.left + (rect.width / 2) - (realWidth / 2);
+    let top = rect.top - realHeight - 6;
+
+    if (top < 10) {
+      top = rect.bottom + 6;
+    }
+    if (left < 10) left = 10;
+    if (left + realWidth > window.innerWidth - 10) {
+      left = window.innerWidth - realWidth - 10;
+    }
+
+    this.tooltipEl.style.left = `${Math.round(left)}px`;
+    this.tooltipEl.style.top = `${Math.round(top)}px`;
+  },
+
+  hide() {
+    if (!this.tooltipEl) return;
+    this.activeTarget = null;
+    this.tooltipEl.classList.remove('visible');
+    setTimeout(() => {
+      if (!this.activeTarget && this.tooltipEl) {
+        this.tooltipEl.classList.add('hidden');
+      }
+    }, 150);
+  }
+};
+
 window.TheologyView = TheologyView;
 window.ScriptureTooltip = ScriptureTooltip;
 window.FootnoteTooltip = FootnoteTooltip;
+window.TheolLatinGlossary = TheolLatinGlossary;
+window.LatinGlossTooltip = LatinGlossTooltip;
 

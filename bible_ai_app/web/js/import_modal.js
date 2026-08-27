@@ -126,6 +126,8 @@ const ImportModal = {
     document.querySelectorAll('.wizard-step').forEach(stepEl => {
       stepEl.addEventListener('click', () => {
         const targetStep = parseInt(stepEl.dataset.step, 10);
+        const isBible = document.getElementById('import-book-type')?.value === 'Bible';
+        if (isBible && targetStep === 3) return;
         if (this.isEditMode || targetStep < this.currentStep || (this.filePath && targetStep <= 4)) {
           this.goToStep(targetStep);
         }
@@ -255,6 +257,13 @@ const ImportModal = {
   },
 
   goToStep(step) {
+    const isBible = document.getElementById('import-book-type')?.value === 'Bible';
+    
+    // Si c'est une Bible et que l'étape 3 est demandée, rediriger vers l'étape 4
+    if (isBible && step === 3) {
+      step = 4;
+    }
+
     this.currentStep = step;
 
     // 1. Masquer tous les panneaux
@@ -271,10 +280,10 @@ const ImportModal = {
       
       if (ind) {
         ind.classList.toggle('active', i === step);
-        ind.classList.toggle('completed', i < step);
+        ind.classList.toggle('completed', isBible && step === 4 ? (i <= 2) : (i < step));
       }
       if (conn) {
-        conn.classList.toggle('completed', i < step);
+        conn.classList.toggle('completed', isBible && step === 4 ? (i === 1) : (i < step));
       }
     }
 
@@ -303,13 +312,25 @@ const ImportModal = {
         alert('Veuillez renseigner au moins le titre et l\'identifiant court de l\'ouvrage.');
         return;
       }
-      this.goToStep(3);
+      const isBible = document.getElementById('import-book-type')?.value === 'Bible';
+      if (isBible) {
+        this.goToStep(4);
+      } else {
+        this.goToStep(3);
+      }
     } else if (this.currentStep === 3) {
       this.goToStep(4);
     }
   },
 
   prevStep() {
+    if (this.currentStep === 4) {
+      const isBible = document.getElementById('import-book-type')?.value === 'Bible';
+      if (isBible) {
+        this.goToStep(2);
+        return;
+      }
+    }
     if (this.currentStep > 1 && this.currentStep !== 'success') {
       this.goToStep(this.currentStep - 1);
     }
@@ -332,6 +353,8 @@ const ImportModal = {
       return;
     }
 
+    const isBible = document.getElementById('import-book-type')?.value === 'Bible';
+
     if (this.currentStep === 1) {
       prevBtn?.classList.add('hidden');
       nextBtn?.classList.remove('hidden');
@@ -346,7 +369,7 @@ const ImportModal = {
       submitBtn?.classList.add('hidden');
       if (nextBtn) {
         nextBtn.disabled = false;
-        nextBtn.innerHTML = `<span>Suivant : Structure ➔</span>`;
+        nextBtn.innerHTML = isBible ? `<span>Suivant : Finalisation ➔</span>` : `<span>Suivant : Structure ➔</span>`;
       }
     } else if (this.currentStep === 3) {
       prevBtn?.classList.remove('hidden');
@@ -361,7 +384,6 @@ const ImportModal = {
       nextBtn?.classList.add('hidden');
       submitBtn?.classList.remove('hidden');
       
-      const isBible = document.getElementById('import-book-type')?.value === 'Bible';
       const isAI = App.isAIEnabled !== false;
       let labelText = "Lancer l'Importation & l'Indexation RAG";
 
@@ -396,7 +418,7 @@ const ImportModal = {
       ragContent?.classList.add('hidden');
       localContent?.classList.remove('hidden');
       if (step4Title) step4Title.textContent = 'Finalisation';
-      if (step4Subtitle) step4Subtitle.textContent = 'Intégration locale';
+      if (step4Subtitle) step4Subtitle.textContent = 'Intégration dans le Lecteur';
     } else {
       ragContent?.classList.remove('hidden');
       localContent?.classList.add('hidden');
@@ -409,8 +431,21 @@ const ImportModal = {
     const isBible = type === 'Bible';
     const banner = document.getElementById('import-bible-banner');
     const ragOnlyLabel = document.getElementById('btn-ch-rag-label');
+    const step3Ind = document.getElementById('wizard-step-indicator-3');
+    const conn2 = document.getElementById('wizard-conn-2');
+    const step4Badge = document.querySelector('#wizard-step-indicator-4 .step-badge');
 
     if (banner) banner.classList.toggle('hidden', !isBible);
+
+    if (isBible) {
+      if (step3Ind) step3Ind.classList.add('hidden');
+      if (conn2) conn2.classList.add('hidden');
+      if (step4Badge) step4Badge.textContent = '3';
+    } else {
+      if (step3Ind) step3Ind.classList.remove('hidden');
+      if (conn2) conn2.classList.remove('hidden');
+      if (step4Badge) step4Badge.textContent = '4';
+    }
     
     if (ragOnlyLabel) {
       ragOnlyLabel.textContent = (App.isAIEnabled === false) ? 'Principaux' : 'RAG utile';
@@ -550,7 +585,18 @@ const ImportModal = {
     if (this._isPickingFile) return;
     this._isPickingFile = true;
 
+    const analyzingCard = document.getElementById('import-analyzing-card');
+    const fileCard = document.getElementById('import-selected-file-card');
+    const pickBtn = document.getElementById('btn-import-pick-file');
+
     try {
+      if (analyzingCard) analyzingCard.classList.remove('hidden');
+      if (fileCard) fileCard.classList.add('hidden');
+      if (pickBtn) {
+        pickBtn.disabled = true;
+        pickBtn.innerHTML = `<div class="analyzing-spinner-ring" style="width: 16px; height: 16px; border-width: 2px;"></div><span>Analyse du document...</span>`;
+      }
+
       const res = await API.call('pick_import_file');
       if (!res || res.cancelled) return;
       if (!res.success) {
@@ -564,7 +610,6 @@ const ImportModal = {
       this.fileFormat = (res.format || '').toUpperCase();
 
       // Afficher la fiche du fichier chargé à l'étape 1
-      const fileCard = document.getElementById('import-selected-file-card');
       const badgeEl = document.getElementById('file-card-format-badge');
       const nameEl = document.getElementById('import-selected-file-name');
       const metaEl = document.getElementById('import-selected-file-meta');
@@ -636,6 +681,11 @@ const ImportModal = {
     } catch (e) {
       console.error('Erreur pickFile:', e);
     } finally {
+      if (analyzingCard) analyzingCard.classList.add('hidden');
+      if (pickBtn) {
+        pickBtn.disabled = false;
+        pickBtn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path></svg><span>📁 Parcourir mes fichiers...</span>`;
+      }
       this._isPickingFile = false;
     }
   },

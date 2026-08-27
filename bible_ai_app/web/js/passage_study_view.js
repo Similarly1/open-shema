@@ -232,16 +232,16 @@ const PassageStudyView = {
           } else {
             this.leafletMap.invalidateSize(true);
             if (this.mapBounds && this.mapBounds.isValid()) {
-              this.leafletMap.fitBounds(this.mapBounds, { padding: [35, 35], maxZoom: 12 });
+              this.leafletMap.fitBounds(this.mapBounds, { padding: [35, 35], maxZoom: 12, animate: false });
             } else {
-              this.leafletMap.setView([31.78, 35.23], 7);
+              this.leafletMap.setView([31.78, 35.23], 7, { animate: false });
             }
           }
         }
       }, 60);
 
       setTimeout(() => {
-        if (this.leafletMap) {
+        if (this.leafletMap && document.getElementById('ps-leaflet-map-container')) {
           this.leafletMap.invalidateSize(true);
         }
       }, 200);
@@ -250,6 +250,7 @@ const PassageStudyView = {
 
   async loadPassage(passageRef) {
     if (!passageRef || !passageRef.trim()) return;
+    this.destroyPassageMap();
     this.isLoading = true;
     this.currentReference = passageRef.trim();
     this.aiInsightsCache = {};
@@ -1494,13 +1495,37 @@ const PassageStudyView = {
       </div>
     `;
 
+    // 1. Nettoyer et détruire proprement toute instance de carte existante AVANT de modifier le DOM
+    this.destroyPassageMap();
+
     this.encyclopediaContainerEl.innerHTML = html;
 
-    // Initialiser la carte Leaflet
+    // 2. Initialiser la carte Leaflet
     this.initPassageMap(places);
 
     // Événements dictionnaire et recherche
     this.bindEncyclopediaEvents(places, dicts);
+  },
+
+  destroyPassageMap() {
+    if (this.leafletMap) {
+      try {
+        if (typeof this.leafletMap.stop === 'function') {
+          this.leafletMap.stop();
+        }
+        this.leafletMap.off();
+        if (this.leafletMarkersLayer) {
+          this.leafletMarkersLayer.clearLayers();
+        }
+        this.leafletMap.remove();
+      } catch (e) {
+        console.warn('Erreur reset carte Leaflet:', e);
+      } finally {
+        this.leafletMap = null;
+        this.leafletMarkersLayer = null;
+        this.mapBounds = null;
+      }
+    }
   },
 
   renderDictionaryArticle(entry, article) {
@@ -1595,90 +1620,92 @@ const PassageStudyView = {
     if (!mapContainer || typeof L === 'undefined') return;
 
     // Si une carte existe déjà, la nettoyer
-    if (this.leafletMap) {
-      try {
-        this.leafletMap.remove();
-        this.leafletMap = null;
-      } catch (e) {
-        console.warn('Erreur reset carte:', e);
-      }
-    }
+    this.destroyPassageMap();
+
+    const currentContainer = document.getElementById('ps-leaflet-map-container');
+    if (!currentContainer) return;
 
     const isDark = document.body.classList.contains('theme-dark') || 
                    (!document.body.classList.contains('reading-bg-white') && !document.body.classList.contains('theme-light'));
 
     // Créer l'instance Leaflet
     const defaultCenter = [31.78, 35.23];
-    this.leafletMap = L.map('ps-leaflet-map-container', {
-      center: defaultCenter,
-      zoom: 8,
-      minZoom: 4,
-      maxZoom: 17,
-      zoomControl: false
-    });
-
-    L.control.zoom({ position: 'bottomright' }).addTo(this.leafletMap);
-
-    // Fond de carte CartoDB
-    const tileUrl = isDark
-      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-      : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-
-    L.tileLayer(tileUrl, {
-      attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap',
-      subdomains: 'abcd',
-      maxZoom: 19
-    }).addTo(this.leafletMap);
-
-    this.leafletMarkersLayer = L.layerGroup().addTo(this.leafletMap);
-
-    // Ajouter les marqueurs
-    const validPlaces = places.filter(p => p.latitude !== null && p.latitude !== undefined && p.longitude !== null && p.longitude !== undefined);
-    const bounds = L.latLngBounds();
-
-    validPlaces.forEach(p => {
-      const lat = p.latitude;
-      const lon = p.longitude;
-      bounds.extend([lat, lon]);
-
-      const pinIcon = L.divIcon({
-        className: 'ps-custom-map-pin',
-        html: `<div class="ps-pin-marker" data-place-id="${this.escapeHtml(p.place_id || '')}"><div class="ps-pin-inner"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="10" r="3"/><path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 7 8 11.7z"/></svg></div></div>`,
-        iconSize: [26, 26],
-        iconAnchor: [13, 26],
-        popupAnchor: [0, -26]
+    try {
+      this.leafletMap = L.map('ps-leaflet-map-container', {
+        center: defaultCenter,
+        zoom: 8,
+        minZoom: 4,
+        maxZoom: 17,
+        zoomControl: false
       });
 
-      const popupHtml = `
-        <div class="ps-leaflet-popup">
-          <div class="ps-lpopup-title">${this.escapeHtml(p.name)}</div>
-          <div class="ps-lpopup-type">${this.escapeHtml(p.place_type || 'Lieu biblique')}</div>
-          ${p.comment ? `<div class="ps-lpopup-desc">${this.escapeHtml(p.comment)}</div>` : ''}
-        </div>
-      `;
+      L.control.zoom({ position: 'bottomright' }).addTo(this.leafletMap);
 
-      const marker = L.marker([lat, lon], { icon: pinIcon })
-        .bindPopup(popupHtml)
-        .addTo(this.leafletMarkersLayer);
+      // Fond de carte CartoDB
+      const tileUrl = isDark
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
 
-      p._leafletMarker = marker;
+      L.tileLayer(tileUrl, {
+        attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap',
+        subdomains: 'abcd',
+        maxZoom: 19
+      }).addTo(this.leafletMap);
 
-      marker.on('click', () => {
-        this.highlightPlaceInList(p.place_id);
+      this.leafletMarkersLayer = L.layerGroup().addTo(this.leafletMap);
+
+      // Ajouter les marqueurs
+      const validPlaces = (places || []).filter(p => p && p.latitude !== null && p.latitude !== undefined && p.longitude !== null && p.longitude !== undefined);
+      const bounds = L.latLngBounds();
+
+      validPlaces.forEach(p => {
+        const lat = p.latitude;
+        const lon = p.longitude;
+        bounds.extend([lat, lon]);
+
+        const pinIcon = L.divIcon({
+          className: 'ps-custom-map-pin',
+          html: `<div class="ps-pin-marker" data-place-id="${this.escapeHtml(p.place_id || '')}"><div class="ps-pin-inner"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="10" r="3"/><path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 7 8 11.7z"/></svg></div></div>`,
+          iconSize: [26, 26],
+          iconAnchor: [13, 26],
+          popupAnchor: [0, -26]
+        });
+
+        const popupHtml = `
+          <div class="ps-leaflet-popup">
+            <div class="ps-lpopup-title">${this.escapeHtml(p.name)}</div>
+            <div class="ps-lpopup-type">${this.escapeHtml(p.place_type || 'Lieu biblique')}</div>
+            ${p.comment ? `<div class="ps-lpopup-desc">${this.escapeHtml(p.comment)}</div>` : ''}
+          </div>
+        `;
+
+        const marker = L.marker([lat, lon], { icon: pinIcon })
+          .bindPopup(popupHtml)
+          .addTo(this.leafletMarkersLayer);
+
+        p._leafletMarker = marker;
+
+        marker.on('click', () => {
+          this.highlightPlaceInList(p.place_id);
+        });
       });
-    });
 
-    if (validPlaces.length > 0 && bounds.isValid()) {
-      this.mapBounds = bounds;
-      this.leafletMap.fitBounds(bounds, { padding: [35, 35], maxZoom: 12 });
-    } else {
-      this.mapBounds = null;
-      this.leafletMap.setView(defaultCenter, 7);
+      if (validPlaces.length > 0 && bounds.isValid()) {
+        this.mapBounds = bounds;
+        this.leafletMap.fitBounds(bounds, { padding: [35, 35], maxZoom: 12, animate: false });
+      } else {
+        this.mapBounds = null;
+        this.leafletMap.setView(defaultCenter, 7, { animate: false });
+      }
+
+      setTimeout(() => {
+        if (this.leafletMap && document.getElementById('ps-leaflet-map-container')) {
+          this.leafletMap.invalidateSize(true);
+        }
+      }, 120);
+    } catch (e) {
+      console.warn('Erreur initialisation carte Leaflet:', e);
     }
-
-    setTimeout(() => {
-      if (this.leafletMap) this.leafletMap.invalidateSize(true);
-    }, 120);
   },
 
   bindEncyclopediaEvents(places, dicts) {

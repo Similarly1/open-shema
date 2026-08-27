@@ -9,6 +9,7 @@ from core.reference_parser import (
     normalize_reference,
     get_standard_book_code,
     get_french_book_name,
+    is_valid_book_code,
     REVERSE_BOOK_MAPPING,
     BOOK_MAPPING
 )
@@ -40,6 +41,7 @@ class PassageStudyManager:
         """
         Parse une référence biblique quelconque (ex: 'Ph 2:5-11', 'Romains 8:1-17', 'Genèse 22', 'Jean 3:16')
         et retourne un dictionnaire avec le livre standard, nom français, chapitres et versets de début et fin.
+        Retourne None si la référence n'appartient pas au canon biblique.
         """
         if not raw_input or not raw_input.strip():
             return None
@@ -61,120 +63,126 @@ class PassageStudyManager:
         if m_cross:
             b_raw, c1, v1, c2, v2 = m_cross.groups()
             b_code = get_standard_book_code(b_raw)
-            return {
-                "book_code": b_code,
-                "french_book": get_french_book_name(b_code),
-                "start_ch": int(c1),
-                "start_v": int(v1),
-                "end_ch": int(c2),
-                "end_v": int(v2),
-                "is_range": True,
-                "raw_reference": raw
-            }
+            if is_valid_book_code(b_code):
+                return {
+                    "book_code": b_code,
+                    "french_book": get_french_book_name(b_code),
+                    "start_ch": int(c1),
+                    "start_v": int(v1),
+                    "end_ch": int(c2),
+                    "end_v": int(v2),
+                    "is_range": True,
+                    "raw_reference": raw
+                }
 
         # Cas 1: Livre ch:v-v
         m_range = re.match(r'^([1-4]?\s*[^\W\d_]+(?:\s+[^\W\d_]+)*)\s*(\d+)[:.](\d+)\s*-\s*(\d+)$', raw_clean)
         if m_range:
             b_raw, c, v1, v2 = m_range.groups()
             b_code = get_standard_book_code(b_raw)
-            return {
-                "book_code": b_code,
-                "french_book": get_french_book_name(b_code),
-                "start_ch": int(c),
-                "start_v": int(v1),
-                "end_ch": int(c),
-                "end_v": int(v2),
-                "is_range": True,
-                "raw_reference": raw
-            }
+            if is_valid_book_code(b_code):
+                return {
+                    "book_code": b_code,
+                    "french_book": get_french_book_name(b_code),
+                    "start_ch": int(c),
+                    "start_v": int(v1),
+                    "end_ch": int(c),
+                    "end_v": int(v2),
+                    "is_range": True,
+                    "raw_reference": raw
+                }
 
         # Cas 3: Livre ch-ch
         m_ch_range = re.match(r'^([1-4]?\s*[^\W\d_]+(?:\s+[^\W\d_]+)*)\s*(\d+)\s*-\s*(\d+)$', raw_clean)
         if m_ch_range:
             b_raw, c1, c2 = m_ch_range.groups()
             b_code = get_standard_book_code(b_raw)
-            return {
-                "book_code": b_code,
-                "french_book": get_french_book_name(b_code),
-                "start_ch": int(c1),
-                "start_v": 1,
-                "end_ch": int(c2),
-                "end_v": 999,
-                "is_range": True,
-                "raw_reference": raw
-            }
+            if is_valid_book_code(b_code):
+                return {
+                    "book_code": b_code,
+                    "french_book": get_french_book_name(b_code),
+                    "start_ch": int(c1),
+                    "start_v": 1,
+                    "end_ch": int(c2),
+                    "end_v": 999,
+                    "is_range": True,
+                    "raw_reference": raw
+                }
 
         # Cas 4: Livre ch:v
         m_single_v = re.match(r'^([1-4]?\s*[^\W\d_]+(?:\s+[^\W\d_]+)*)\s*(\d+)[:.](\d+)$', raw_clean)
         if m_single_v:
             b_raw, c, v = m_single_v.groups()
             b_code = get_standard_book_code(b_raw)
-            return {
-                "book_code": b_code,
-                "french_book": get_french_book_name(b_code),
-                "start_ch": int(c),
-                "start_v": int(v),
-                "end_ch": int(c),
-                "end_v": int(v),
-                "is_range": False,
-                "raw_reference": raw
-            }
+            if is_valid_book_code(b_code):
+                return {
+                    "book_code": b_code,
+                    "french_book": get_french_book_name(b_code),
+                    "start_ch": int(c),
+                    "start_v": int(v),
+                    "end_ch": int(c),
+                    "end_v": int(v),
+                    "is_range": False,
+                    "raw_reference": raw
+                }
 
         # Cas 5: Livre ch
         m_ch = re.match(r'^([1-4]?\s*[^\W\d_]+(?:\s+[^\W\d_]+)*)\s*(\d+)$', raw_clean)
         if m_ch:
             b_raw, c = m_ch.groups()
             b_code = get_standard_book_code(b_raw)
-            return {
-                "book_code": b_code,
-                "french_book": get_french_book_name(b_code),
-                "start_ch": int(c),
-                "start_v": 1,
-                "end_ch": int(c),
-                "end_v": 999,
-                "is_range": True,
-                "raw_reference": raw
-            }
+            if is_valid_book_code(b_code):
+                return {
+                    "book_code": b_code,
+                    "french_book": get_french_book_name(b_code),
+                    "start_ch": int(c),
+                    "start_v": 1,
+                    "end_ch": int(c),
+                    "end_v": 999,
+                    "is_range": True,
+                    "raw_reference": raw
+                }
 
         # Fallback normalisation standard
         norm = normalize_reference(raw_clean)
         if norm and " " in norm:
             parts = norm.split(" ", 1)
             b_code = parts[0]
-            ch_v = parts[1]
-            if ":" in ch_v:
-                cv_parts = ch_v.split(":")
-                ch = int(cv_parts[0]) if cv_parts[0].isdigit() else 1
-                v_part = cv_parts[1]
-                if "-" in v_part:
-                    v_sub = v_part.split("-")
-                    v1 = int(v_sub[0]) if v_sub[0].isdigit() else 1
-                    v2 = int(v_sub[1]) if len(v_sub) > 1 and v_sub[1].isdigit() else v1
-                else:
-                    v1 = int(v_part) if v_part.isdigit() else 1
-                    v2 = v1
-                return {
-                    "book_code": b_code,
-                    "french_book": get_french_book_name(b_code),
-                    "start_ch": ch,
-                    "start_v": v1,
-                    "end_ch": ch,
-                    "end_v": v2,
-                    "is_range": (v1 != v2),
-                    "raw_reference": raw
-                }
-            elif ch_v.isdigit():
-                ch = int(ch_v)
-                return {
-                    "book_code": b_code,
-                    "french_book": get_french_book_name(b_code),
-                    "start_ch": ch,
-                    "start_v": 1,
-                    "end_ch": ch,
-                    "end_v": 999,
-                    "is_range": True,
-                    "raw_reference": raw
-                }
+            if is_valid_book_code(b_code):
+                ch_v = parts[1]
+                if ":" in ch_v:
+                    cv_parts = ch_v.split(":")
+                    ch = int(cv_parts[0]) if cv_parts[0].isdigit() else 1
+                    v_part = cv_parts[1]
+                    if "-" in v_part:
+                        v_sub = v_part.split("-")
+                        v1 = int(v_sub[0]) if v_sub[0].isdigit() else 1
+                        v2 = int(v_sub[1]) if len(v_sub) > 1 and v_sub[1].isdigit() else v1
+                    else:
+                        v1 = int(v_part) if v_part.isdigit() else 1
+                        v2 = v1
+                    return {
+                        "book_code": b_code,
+                        "french_book": get_french_book_name(b_code),
+                        "start_ch": ch,
+                        "start_v": v1,
+                        "end_ch": ch,
+                        "end_v": v2,
+                        "is_range": (v1 != v2),
+                        "raw_reference": raw
+                    }
+                elif ch_v.isdigit():
+                    ch = int(ch_v)
+                    return {
+                        "book_code": b_code,
+                        "french_book": get_french_book_name(b_code),
+                        "start_ch": ch,
+                        "start_v": 1,
+                        "end_ch": ch,
+                        "end_v": 999,
+                        "is_range": True,
+                        "raw_reference": raw
+                    }
 
         return None
 
@@ -288,6 +296,12 @@ class PassageStudyManager:
         main_verses = scripture_by_version.get(main_bible, [])
         if not main_verses and scripture_by_version:
             main_verses = next(iter(scripture_by_version.values()))
+
+        if not main_verses:
+            return {
+                "success": False,
+                "error": f"Aucun verset biblique trouvé pour la référence : '{passage_ref}'"
+            }
 
         # Corriger la limite max réelle si end_v était 999
         if main_verses and end_v == 999:

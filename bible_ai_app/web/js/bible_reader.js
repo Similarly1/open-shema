@@ -101,11 +101,24 @@ function formatPassagePill(bookCode, chapterNum, verseNum = null) {
   }
 }
 
-function getNextChapterCoord(bookCode, chNum) {
+function getNextChapterCoord(bookCode, chNum, bibleName = null) {
   const info = getBookInfo(bookCode);
   if (chNum < info.chapters) {
     return { book: info.code, chapter: chNum + 1 };
   }
+  const targetBible = bibleName || (typeof BibleReader !== 'undefined' ? BibleReader.currentBible1 : null);
+  const availBooks = (targetBible && typeof BibleReader !== 'undefined' && typeof BibleReader.getAvailableBooksForBible === 'function')
+    ? BibleReader.getAvailableBooksForBible(targetBible)
+    : null;
+
+  if (availBooks && availBooks.length > 0) {
+    const curIdx = availBooks.findIndex(code => code.toLowerCase() === bookCode.toLowerCase());
+    if (curIdx !== -1 && curIdx < availBooks.length - 1) {
+      return { book: availBooks[curIdx + 1], chapter: 1 };
+    }
+    return null;
+  }
+
   const idx = CANONICAL_BOOKS.findIndex(item => item.code.toLowerCase() === bookCode.toLowerCase());
   if (idx !== -1 && idx < CANONICAL_BOOKS.length - 1) {
     return { book: CANONICAL_BOOKS[idx + 1].code, chapter: 1 };
@@ -113,10 +126,25 @@ function getNextChapterCoord(bookCode, chNum) {
   return null;
 }
 
-function getPrevChapterCoord(bookCode, chNum) {
+function getPrevChapterCoord(bookCode, chNum, bibleName = null) {
   if (chNum > 1) {
     return { book: bookCode, chapter: chNum - 1 };
   }
+  const targetBible = bibleName || (typeof BibleReader !== 'undefined' ? BibleReader.currentBible1 : null);
+  const availBooks = (targetBible && typeof BibleReader !== 'undefined' && typeof BibleReader.getAvailableBooksForBible === 'function')
+    ? BibleReader.getAvailableBooksForBible(targetBible)
+    : null;
+
+  if (availBooks && availBooks.length > 0) {
+    const curIdx = availBooks.findIndex(code => code.toLowerCase() === bookCode.toLowerCase());
+    if (curIdx > 0) {
+      const prevBookCode = availBooks[curIdx - 1];
+      const prevInfo = getBookInfo(prevBookCode);
+      return { book: prevBookCode, chapter: prevInfo.chapters };
+    }
+    return null;
+  }
+
   const idx = CANONICAL_BOOKS.findIndex(item => item.code.toLowerCase() === bookCode.toLowerCase());
   if (idx > 0) {
     const prevBook = CANONICAL_BOOKS[idx - 1];
@@ -149,9 +177,16 @@ const TabsManager = {
     const b1 = bibles[0].name;
     const b2 = bibles.length > 1 ? bibles[1].name : b1;
 
-    this.createTab(b1, 'Gen', 1, '#EA580C', false, false, 'LSG');
+    const firstBook1 = (typeof BibleReader !== 'undefined' && typeof BibleReader.getFirstBookForBible === 'function') 
+      ? BibleReader.getFirstBookForBible(b1) 
+      : 'Gen';
+    const firstBook2 = (typeof BibleReader !== 'undefined' && typeof BibleReader.getFirstBookForBible === 'function') 
+      ? BibleReader.getFirstBookForBible(b2) 
+      : 'Gen';
+
+    this.createTab(b1, firstBook1, 1, '#EA580C', false, false, 'LSG');
     if (bibles.length > 1) {
-      this.createTab(b2, 'Gen', 1, '#2563EB', false, false, 'LSG');
+      this.createTab(b2, firstBook2, 1, '#2563EB', false, false, 'LSG');
     }
     if (this.tabs.length > 0) {
       return await this.activateTab(this.tabs[0].id);
@@ -163,11 +198,20 @@ const TabsManager = {
     const colorPalette = ['#EA580C', '#2563EB', '#059669', '#7C3AED', '#DB2777', '#D97706', '#0891B2'];
     const badgeColor = forceColor || colorPalette[this.tabs.length % colorPalette.length];
 
+    let targetBook = book;
+    let targetChapter = chapter;
+    if (typeof BibleReader !== 'undefined' && typeof BibleReader.isBookAvailableInBible === 'function') {
+      if (!BibleReader.isBookAvailableInBible(bibleName, targetBook)) {
+        targetBook = BibleReader.getFirstBookForBible(bibleName);
+        targetChapter = 1;
+      }
+    }
+
     const tab = {
       id: id,
       bibleName: bibleName,
-      book: book,
-      chapter: chapter,
+      book: targetBook,
+      chapter: targetChapter,
       badgeColor: badgeColor,
       isInterlinear: isInterlinear,
       interlinearVersion: interlinearVersion
@@ -189,7 +233,16 @@ const TabsManager = {
       chosenBible = BibleReader.installedBibles[0]?.name || 'Segond 21';
     }
 
-    const newTab = this.createTab(chosenBible, BibleReader.currentBook, BibleReader.currentChapter, null, true, false, 'LSG');
+    let b = BibleReader.currentBook || 'Gen';
+    let ch = BibleReader.currentChapter || 1;
+    if (typeof BibleReader !== 'undefined' && typeof BibleReader.isBookAvailableInBible === 'function') {
+      if (!BibleReader.isBookAvailableInBible(chosenBible, b)) {
+        b = BibleReader.getFirstBookForBible(chosenBible);
+        ch = 1;
+      }
+    }
+
+    const newTab = this.createTab(chosenBible, b, ch, null, true, false, 'LSG');
     App.showToast(`Nouvel onglet ouvert : ${chosenBible}`);
   },
 
@@ -197,18 +250,33 @@ const TabsManager = {
     const target = this.tabs.find(t => t.id === tabId);
     if (!target) return;
 
-    // Conserver le passage actif en cours pour ne pas revenir à Gen 1
-    const currentBook = BibleReader.currentBook || target.book || 'Gen';
-    const currentChapter = BibleReader.currentChapter || target.chapter || 1;
-    const currentVerse = BibleReader.selectedVerse || 1;
+    let targetBook = target.book || BibleReader.currentBook || 'Gen';
+    let targetChapter = target.chapter || BibleReader.currentChapter || 1;
+    let targetVerse = BibleReader.selectedVerse || 1;
 
-    target.book = currentBook;
-    target.chapter = currentChapter;
+    const currentBook = BibleReader.currentBook || targetBook;
+    const currentChapter = BibleReader.currentChapter || targetChapter;
+
+    // Si le livre actuellement affiché est supporté par la Bible de ce nouvel onglet, on maintient la navigation active
+    if (typeof BibleReader !== 'undefined' && typeof BibleReader.isBookAvailableInBible === 'function') {
+      if (BibleReader.isBookAvailableInBible(target.bibleName, currentBook)) {
+        targetBook = currentBook;
+        targetChapter = currentChapter;
+      } else if (!BibleReader.isBookAvailableInBible(target.bibleName, targetBook)) {
+        // Si le livre en mémoire de l'onglet n'est pas non plus compatible, aller au premier livre disponible
+        targetBook = BibleReader.getFirstBookForBible(target.bibleName);
+        targetChapter = 1;
+        targetVerse = 1;
+      }
+    }
+
+    target.book = targetBook;
+    target.chapter = targetChapter;
 
     this.activeTabId = tabId;
     BibleReader.currentBible1 = target.bibleName;
-    BibleReader.currentBook = currentBook;
-    BibleReader.currentChapter = currentChapter;
+    BibleReader.currentBook = targetBook;
+    BibleReader.currentChapter = targetChapter;
     BibleReader.pane1IsInterlinear = !!target.isInterlinear;
     BibleReader.pane1InterlinearVersion = target.interlinearVersion || 'LSG';
 
@@ -216,13 +284,15 @@ const TabsManager = {
     const interBtn = document.getElementById('btn-toggle-interlinear');
     if (interBtn) interBtn.classList.toggle('active', BibleReader.pane1IsInterlinear || BibleReader.pane2IsInterlinear);
 
-    InterlinearMenu.syncPopoverUI();
+    if (typeof InterlinearMenu !== 'undefined') {
+      InterlinearMenu.syncPopoverUI();
+    }
 
     BibleReader.updatePaneHeader(1);
     if (BibleReader.isSplitView) BibleReader.updatePaneHeader(2);
 
     this.renderTabs();
-    return await BibleReader.navigateTo(currentBook, currentChapter, currentVerse);
+    return await BibleReader.navigateTo(targetBook, targetChapter, targetVerse);
   },
 
   closeTab(tabId, e) {
@@ -4131,13 +4201,80 @@ const BibleReader = {
     return this.installedBibles.find(b => b.name !== base.name) || null;
   },
 
+  getBibleInfo(bibleName) {
+    if (!bibleName) return null;
+    const str = String(bibleName).trim();
+    const strUpper = str.toUpperCase();
+    const strLower = str.toLowerCase();
+    return (this.installedBibles || []).find(b => 
+      b.name === str || 
+      b.id === str || 
+      (b.folder_name && b.folder_name === str) ||
+      (b.version_code && b.version_code.toUpperCase() === strUpper) ||
+      (b.title && b.title.toLowerCase().includes(strLower))
+    ) || null;
+  },
+
+  getAvailableBooksForBible(bibleName) {
+    const item = this.getBibleInfo(bibleName);
+    if (item && Array.isArray(item.available_books) && item.available_books.length > 0) {
+      return item.available_books;
+    }
+    // Fallback dynamique si non spécifié
+    const s = String(bibleName || '').toLowerCase();
+    const canon = String(item?.canon || '').toUpperCase();
+    if (canon === 'NT' || item?.total_books === 27 || s.includes('nouveau testament') || s.includes('parole vivante') || s === 'pv' || s === 'stapfer') {
+      return [
+        'Mat', 'Mar', 'Luk', 'Joh', 'Act', 'Rom', '1Co', '2Co', 'Gal', 'Eph',
+        'Phi', 'Col', '1Th', '2Th', '1Ti', '2Ti', 'Tit', 'Phm', 'Heb', 'Jam',
+        '1Pe', '2Pe', '1Jo', '2Jo', '3Jo', 'Jud', 'Rev'
+      ];
+    }
+    if (s.includes('sagesse vivante') || s === 'sv' || item?.total_books === 4) {
+      return ['Job', 'Pro', 'Ecc', 'Sol'];
+    }
+    if (canon === 'AT' || s.includes('cahen') || s.includes('ancien testament') || s === 'gig') {
+      return CANONICAL_BOOKS.slice(0, 39).map(b => b.code);
+    }
+    return CANONICAL_BOOKS.map(b => b.code);
+  },
+
+  getFirstBookForBible(bibleName) {
+    const item = this.getBibleInfo(bibleName);
+    if (item?.first_book) return item.first_book;
+    const avail = this.getAvailableBooksForBible(bibleName);
+    return (avail && avail.length > 0) ? avail[0] : 'Gen';
+  },
+
+  isBookAvailableInBible(bibleName, bookCode) {
+    if (!bookCode || !bibleName) return true;
+    const avail = this.getAvailableBooksForBible(bibleName);
+    if (!avail || avail.length === 0) return true;
+    return avail.some(b => b.toLowerCase() === String(bookCode).toLowerCase());
+  },
+
+  findBibleContainingBook(bookCode, preferredBible = 'Segond 21') {
+    if (!bookCode) return preferredBible || 'Segond 21';
+    // 1. Essayer la Bible préférée si elle contient le livre
+    if (preferredBible && this.isBookAvailableInBible(preferredBible, bookCode)) {
+      return preferredBible;
+    }
+    // 2. Essayer les Bibles complètes populaires
+    for (const fav of ['Segond 21', 'LSG', 'NBS', 'BDS', 'TOB']) {
+      const match = (this.installedBibles || []).find(b => b.name === fav || (b.version_code && b.version_code.toUpperCase() === fav));
+      if (match && this.isBookAvailableInBible(match.name, bookCode)) {
+        return match.name;
+      }
+    }
+    // 3. Trouver la première Bible installée qui contient le livre
+    const found = (this.installedBibles || []).find(b => this.isBookAvailableInBible(b.name, bookCode));
+    if (found) return found.name;
+    return this.currentBible1 || 'Segond 21';
+  },
+
   getBibleDisplayName(bibleName) {
     if (!bibleName) return '';
-    const item = (this.installedBibles || []).find(b => 
-      b.name === bibleName || 
-      b.id === bibleName || 
-      (b.version_code && b.version_code.toUpperCase() === bibleName.toUpperCase())
-    );
+    const item = this.getBibleInfo(bibleName);
     if (item && item.title) return item.title;
     return bibleName;
   },
@@ -4560,16 +4697,35 @@ const BibleReader = {
   },
 
   async navigateTo(bookCode, chapterNum, verseNum = null) {
-    this.currentBook = bookCode;
-    this.currentChapter = chapterNum;
-    this.loadedChapters = [{ book: bookCode, chapter: chapterNum }];
+    let finalBookCode = bookCode;
+    let finalChapterNum = chapterNum;
+    let finalVerseNum = verseNum;
 
-    const info = getBookInfo(bookCode);
-    const targetVerse = verseNum ? parseInt(verseNum, 10) : null;
-    formatPassagePill(bookCode, chapterNum, targetVerse);
-    document.getElementById('pane-1-breadcrumb').textContent = `${info.name.toUpperCase()} > Chapitre ${chapterNum}`;
+    // Si le livre demandé n'existe pas dans la Bible active de la Colonne 1
+    if (!this.isBookAvailableInBible(this.currentBible1, finalBookCode)) {
+      const altBible = this.findBibleContainingBook(finalBookCode, 'Segond 21');
+      if (altBible && altBible !== this.currentBible1) {
+        const prevBible = this.currentBible1;
+        this.currentBible1 = altBible;
+        const bInfo = getBookInfo(finalBookCode);
+        if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast(`Passage sur ${altBible} (${bInfo.name} non inclus dans ${prevBible})`);
+        }
+        TabsManager.updateActiveTab(altBible, finalBookCode, finalChapterNum);
+        this.updatePaneHeader(1);
+      }
+    }
+
+    this.currentBook = finalBookCode;
+    this.currentChapter = finalChapterNum;
+    this.loadedChapters = [{ book: finalBookCode, chapter: finalChapterNum }];
+
+    const info = getBookInfo(finalBookCode);
+    const targetVerse = finalVerseNum ? parseInt(finalVerseNum, 10) : null;
+    formatPassagePill(finalBookCode, finalChapterNum, targetVerse);
+    document.getElementById('pane-1-breadcrumb').textContent = `${info.name.toUpperCase()} > Chapitre ${finalChapterNum}`;
     const breadcrumb2 = document.getElementById('pane-2-breadcrumb');
-    if (breadcrumb2) breadcrumb2.textContent = `${info.name.toUpperCase()} > Chapitre ${chapterNum}`;
+    if (breadcrumb2) breadcrumb2.textContent = `${info.name.toUpperCase()} > Chapitre ${finalChapterNum}`;
     this.updatePaneHeader(1);
 
     const pane1Container = document.getElementById('pane-1-verses');
@@ -5219,6 +5375,21 @@ const BibleReader = {
           GeoPassageHoverManager.navigateToMap(pId, b, ch);
         });
       });
+    } else {
+      const emptyNotice = document.createElement('div');
+      emptyNotice.className = 'chapter-unavailable-notice';
+      const bDisp = this.getBibleDisplayName(bibleName) || bibleName;
+      const bFr = data.book_french || (typeof getFrenchBookName === 'function' ? getFrenchBookName(data.book) : data.book);
+      emptyNotice.innerHTML = `
+        <div class="empty-notice-box">
+          <div class="empty-notice-icon">📖</div>
+          <div class="empty-notice-title">Livre non disponible dans cette version</div>
+          <div class="empty-notice-desc">
+            Le livre de <strong>${this.escapeHtml(bFr)}</strong> n'est pas inclus dans <em>${this.escapeHtml(bDisp)}</em>.
+          </div>
+        </div>
+      `;
+      flow.appendChild(emptyNotice);
     }
 
     block.appendChild(flow);
@@ -5389,13 +5560,16 @@ const BibleReader = {
 
   selectBibleVersion(versionName) {
     this.closeBiblePicker();
+    const item = this.getBibleInfo(versionName);
+    const targetVersionName = item ? item.name : versionName;
     const curV = this.selectedVerse || 1;
+
     if (this.targetPaneForPicker === 1) {
-      this.currentBible1 = versionName;
-      if (versionName === 'DARBY') {
+      this.currentBible1 = targetVersionName;
+      if (targetVersionName === 'DARBY') {
         this.pane1IsInterlinear = true;
         this.pane1InterlinearVersion = 'DARBY';
-      } else if (versionName === 'LSG') {
+      } else if (targetVersionName === 'LSG') {
         this.pane1IsInterlinear = true;
         this.pane1InterlinearVersion = 'LSG';
       } else {
@@ -5403,14 +5577,30 @@ const BibleReader = {
       }
       const interBtn = document.getElementById('btn-toggle-interlinear');
       if (interBtn) interBtn.classList.toggle('active', this.pane1IsInterlinear || this.pane2IsInterlinear);
-      TabsManager.updateActiveTab(versionName, this.currentBook, this.currentChapter, this.pane1IsInterlinear, this.pane1InterlinearVersion);
+
+      // Si le livre actuellement affiché n'est pas présent dans la nouvelle version (ex: Genèse dans une version NT uniquement comme Stapfer)
+      let targetBook = this.currentBook;
+      let targetChapter = this.currentChapter;
+      let targetVerse = curV;
+
+      if (!this.isBookAvailableInBible(targetVersionName, targetBook)) {
+        targetBook = this.getFirstBookForBible(targetVersionName);
+        targetChapter = 1;
+        targetVerse = 1;
+        this.currentBook = targetBook;
+        this.currentChapter = targetChapter;
+        this.selectedVerse = targetVerse;
+      }
+
+      TabsManager.updateActiveTab(targetVersionName, targetBook, targetChapter, this.pane1IsInterlinear, this.pane1InterlinearVersion);
       this.updatePaneHeader(1);
+      this.navigateTo(targetBook, targetChapter, targetVerse);
     } else {
-      this.currentBible2 = versionName;
-      if (versionName === 'DARBY') {
+      this.currentBible2 = targetVersionName;
+      if (targetVersionName === 'DARBY') {
         this.pane2IsInterlinear = true;
         this.pane2InterlinearVersion = 'DARBY';
-      } else if (versionName === 'LSG') {
+      } else if (targetVersionName === 'LSG') {
         this.pane2IsInterlinear = true;
         this.pane2InterlinearVersion = 'LSG';
       } else {
@@ -5419,60 +5609,14 @@ const BibleReader = {
       const interBtn = document.getElementById('btn-toggle-interlinear');
       if (interBtn) interBtn.classList.toggle('active', this.pane1IsInterlinear || this.pane2IsInterlinear);
       this.updatePaneHeader(2);
+      this.reloadPane2();
     }
-    this.navigateTo(this.currentBook, this.currentChapter, curV);
   },
 
   switchVersion(versionName) {
     if (!versionName) return;
-
-    // Chercher la version correspondante dans installedBibles
-    const item = (this.installedBibles || []).find(b =>
-      b.name === versionName ||
-      b.id === versionName ||
-      (b.folder_name && b.folder_name === versionName) ||
-      (b.version_code && b.version_code.toUpperCase() === String(versionName).toUpperCase()) ||
-      (b.title && b.title.toLowerCase().includes(String(versionName).toLowerCase()))
-    );
-
-    const targetVersionName = item ? item.name : versionName;
-
-    // Récupérer la liste des livres disponibles pour cette version
-    const availableBooks = item?.available_books || [];
-    const firstBook = item?.first_book || (availableBooks.length > 0 ? availableBooks[0] : null);
-
-    // Si le livre actuellement affiché n'est pas présent dans cette version biblique
-    // (ex: passer de Parole Vivante [NT] à Sagesse Vivante [Job, Pro, Ecc, Sol] ou inversement)
-    if (availableBooks.length > 0 && (!this.currentBook || !availableBooks.includes(this.currentBook))) {
-      this.currentBook = firstBook || availableBooks[0] || 'Gen';
-      this.currentChapter = 1;
-      this.selectedVerse = 1;
-    } else if (!availableBooks.length) {
-      // Fallback par détection canonique/nom
-      const isNtOnly = (item && (item.canon === 'NT' || item.total_books === 27)) ||
-        (typeof versionName === 'string' && (versionName.toLowerCase().includes('parole vivante') || versionName.toUpperCase() === 'PV'));
-      const isWisdomOnly = (item && item.total_books === 4) ||
-        (typeof versionName === 'string' && (versionName.toLowerCase().includes('sagesse vivante') || versionName.toUpperCase() === 'SV'));
-
-      const ntBookCodes = [
-        'Mat', 'Mar', 'Luk', 'Joh', 'Act', 'Rom', '1Co', '2Co', 'Gal', 'Eph',
-        'Phi', 'Col', '1Th', '2Th', '1Ti', '2Ti', 'Tit', 'Phm', 'Heb', 'Jam',
-        '1Pe', '2Pe', '1Jo', '2Jo', '3Jo', 'Jud', 'Rev'
-      ];
-      const wisdomBookCodes = ['Job', 'Pro', 'Ecc', 'Sol'];
-
-      if (isNtOnly && (!this.currentBook || !ntBookCodes.includes(this.currentBook))) {
-        this.currentBook = 'Mat';
-        this.currentChapter = 1;
-        this.selectedVerse = 1;
-      } else if (isWisdomOnly && (!this.currentBook || !wisdomBookCodes.includes(this.currentBook))) {
-        this.currentBook = 'Job';
-        this.currentChapter = 1;
-        this.selectedVerse = 1;
-      }
-    }
-
-    this.selectBibleVersion(targetVersionName);
+    this.targetPaneForPicker = 1;
+    this.selectBibleVersion(versionName);
   },
 
   goToNextChapter() {

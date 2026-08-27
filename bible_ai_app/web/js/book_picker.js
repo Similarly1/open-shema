@@ -177,7 +177,15 @@ const BookPicker = {
 
   open(currentBookCode, currentChapter, customCallback = null) {
     this.activeCallback = customCallback;
-    this.selectedBook = this.booksData.find(b => b.code.toLowerCase() === (currentBookCode || '').toLowerCase()) || this.booksData[0];
+    let targetBook = this.booksData.find(b => b.code.toLowerCase() === (currentBookCode || '').toLowerCase());
+    if (!targetBook) {
+      const activeBible = (typeof BibleReader !== 'undefined' && BibleReader.currentBible1) ? BibleReader.currentBible1 : null;
+      const firstB = (activeBible && typeof BibleReader !== 'undefined' && typeof BibleReader.getFirstBookForBible === 'function') 
+        ? BibleReader.getFirstBookForBible(activeBible) 
+        : 'Gen';
+      targetBook = this.booksData.find(b => b.code.toLowerCase() === (firstB || '').toLowerCase()) || this.booksData[0];
+    }
+    this.selectedBook = targetBook;
     this.selectedChapter = currentChapter || 1;
     this.pendingTargetChapter = null;
     this.pendingTargetVerse = null;

@@ -1,0 +1,62 @@
+{
+  "id": 56,
+  "code": "TIT",
+  "name": "Tite",
+  "version": "STAPFER",
+  "version_fullname": "Le Nouveau Testament",
+  "total_chapters": 3,
+  "chapters": {
+    "1": {
+      "1": "Paul, serviteur de Dieu, apôtre de Jésus–Christ, pour annoncer la foi des élus de Dieu, pour faire connaître la vérité conforme a la piété",
+      "2": "et donner l'espérance de la vie éternelle, promise depuis un temps immémorial par le Dieu véridique,",
+      "3": "révélée au temps marqué par sa parole dont il a donné l'ordre de me confier la prédication, lui, notre Dieu sauveur,",
+      "4": "à Tite, mon véritable enfant dans la foi qui nous est commune. Grâce et paix te soient données par Dieu notre Père et par Jésus–Christ notre Seigneur.",
+      "5": "Voici pourquoi je t'ai laissé en Crète : pour que tu règles ce qui reste à régler et que, dans chaque ville, tu installes des Anciens aux conditions que je t'ai indiquées :",
+      "6": "être sans reproche, mari d'une seule femme, avoir des enfants croyants, qui ne soient ni indisciplinés, ni accusés de vivre dans le désordre.",
+      "7": "Oui, le conducteur d'une Église doit être sans reproche, étant l'intendant de Dieu ; il ne doit être ni insolent, ni colère ; n'aimer ni le vin ni les querelles ; ne pas être bassement intéressé ;",
+      "8": "mais être hospitalier, aimer à faire le bien ; être modéré, juste, pieux, sobre,",
+      "9": "attaché à la parole authentique, conformément à la doctrine reçue, pour être capable, lui aussi, d'exhorter par un sain enseignement et de réfuter les contradicteurs.",
+      "10": "Car ils sont nombreux, surtout parmi les circoncis, les indisciplinés, les bavards, les trompeurs",
+      "11": "auxquels il faut fermer la bouche. Ces gens–là mettent le désordre dans des familles entières, enseignant ce qu'il ne faut pas enseigner et cela par honteux intérêt.",
+      "12": "Un des leurs a été leur propre prophète quand il a dit : \"...Crétois, toujours menteurs, vilaines bêtes, ventres paresseux...\"",
+      "13": "Voilà un jugement mérité ; voilà le motif de les reprendre sévèrement, pour qu'ils aient une foi saine,",
+      "14": "qu'ils ne s'occupent pas de contes judaïques et de commandements d'hommes abandonnant la vérité.",
+      "15": "Tout est pur pour ceux qui sont purs ; quant aux corrompus et aux incrédules, rien ne leur est pur ; leurs pensées et leurs consciences sont corrompues.",
+      "16": "Ils prétendent connaître Dieu, et leurs oeuvres le renient ; ils sont abominables, rebelles, incapables de rien faire de bien."
+    },
+    "2": {
+      "1": "Mais, toi, prêche comme le demande un sain enseignement :",
+      "2": "Que les hommes d'un âge mûr doivent être sobres, mesurés, sérieux, sains dans leur foi, leur charité, leur patience.",
+      "3": "Que les femmes âgées doivent aussi avoir un extérieur respectable, n'être ni médisantes, ni adonnées à la boisson ; qu'elles doivent être bonnes conseillères ;",
+      "4": "qu'elles apprennent aux jeunes femmes à aimer leurs maris et leurs enfants,",
+      "5": "à être sérieuses, chastes, bonnes ménagères, soumises, chacune à son mari, pour qu'on ne dise point de mal de la parole de Dieu.",
+      "6": "Exhorte aussi les jeunes gens à être sérieux,",
+      "7": "et donne toi–même à tous égards le modèle de toutes les vertus, de la pureté dans l'enseignement, de la dignité,",
+      "8": "d'une prédication saine et irréprochable, et l'adversaire aura la confusion de ne pouvoir dire aucun mal de nous.",
+      "9": "Aux esclaves tu diras d'être soumis à leurs maîtres, qu'en tout ils cherchent à leur plaire, qu'ils ne les contredisent pas ;",
+      "10": "qu'ils ne détournent rien, mais qu'ils se montrent en tout parfaitement fidèles, et ainsi ils feront honneur en tout à la doctrine de Dieu notre Sauveur.",
+      "11": "Car la grâce de Dieu qui sauve tous les hommes a été révélée ;",
+      "12": "elle nous apprend à renoncer à l'impiété et aux plaisirs du monde, à vivre sagement, justement et pieusement dans le monde présent,",
+      "13": "et à attendre la réalisation de notre bienheureuse espérance, l'apparition de la gloire de notre grand Dieu et Sauveur Jésus–Christ.",
+      "14": "Il s'est lui–même donné pour nous afin de nous racheter de tout péché et de se créer un peuple particulier\" et zélé pour les bonnes oeuvres.",
+      "15": "Voilà ce que tu dois dire, enseigner, recommander avec une pleine autorité ; que personne ne te méprise."
+    },
+    "3": {
+      "1": "Rappelle aux fidèles qu'ils ont à se soumettre aux autorités, aux, puissances, à leur obéir, à être prêts à faire le bien ;",
+      "2": "à ne dire de mal de personne, à être paisibles, indulgents, à se montrer doux envers tout le monde.",
+      "3": "Nous aussi étions autrefois insensés, désobéissants, égarés, esclaves de toutes sortes de plaisirs et de passions, vivant dans la méchanceté et la jalousie, ne méritant que la haine et nous haïssant les uns les autres.",
+      "4": "Mais quand a paru la bonté, l'amour pour les hommes de Dieu notre Sauveur,",
+      "5": "nous avons été sauvés, non parce que nous avions accompli des oeuvres de justice, mais parce qu'il est miséricordieux ; il nous a purifiés, régénérés, renouvelés par l'Esprit saint",
+      "6": "qu'il a libéralement répandu sur nous par Jésus–Christ notre Sauveur.",
+      "7": "C'est ainsi que justifiés par sa grâce, nous devenons, en espérance, héritiers de la vie éternelle.",
+      "8": "Le fait est certain, et je veux que tu les en persuades, afin que ceux qui ont cru en Dieu se mettent à faire de bonnes oeuvres. Voilà ce qui est bon et utile aux hommes.",
+      "9": "Quant aux sottes questions, aux généalogies, aux querelles et aux discussions sur la Loi, écarte–les ; tout cela est frivole et inutile.",
+      "10": "Tu rompras après deux avertissements avec celui qui fomente des divisions ;",
+      "11": "ces gens–là, sache–le, sont coupables, pervertis et se condamnent eux–mêmes.",
+      "12": "Dès que je t'aurai envoyé soit Artémas, soit Tychique, tache de me rejoindre à Nicopolis, car je me suis décidé à y passer l'hiver.",
+      "13": "Tu auras bien soin de Zénas, le docteur de la Loi, et d'Apollon, quand ils partiront ; qu'il ne leur manque rien.",
+      "14": "Les nôtres aussi doivent apprendre, dans les cas urgents, à pratiquer de bonnes oeuvres et ainsi à ne pas rester stériles.",
+      "15": "Tous ceux qui sont avec moi te saluent. Salue les croyants qui nous aiment."
+    }
+  }
+}
