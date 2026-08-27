@@ -1265,11 +1265,34 @@ const ArticlesView = {
       return `\n\n<blockquote class="article-bible-quote"><p>${content}</p></blockquote>\n\n`;
     });
 
-    // 1b-2. Si l'article entier est sur une seule ligne compactée, découper proprement les paragraphes (sans couper les initiales d'auteurs C., S., J., etc., ni abréviations)
-    if (!text.includes('\n\n')) {
-      text = text.replace(/(?<!\b(?:pp|p|chap|ch|vol|v|vs|dr|etc|ex|cf|art|[A-ZÀ-ÿ]|\d+))\.\s+(?!–|—)([A-ZÀ-ÿ«])/g, '.\n\n$1');
-      text = text.replace(/([!?…»])\s+(?!–|—)([A-ZÀ-ÿ0-9«])/g, '$1\n\n$2');
-    }
+    // 1b-2. Structurer "Transcription de la prédication" et son avertissement
+    text = text.replace(/\s*Transcription\s+de\s+la\s+prédication\s*:?\s*(?:(?:\*|<em>)?ℹ️\s*([^*\n<]+)(?:\*|<\/em>)?)?/gi, (match, note) => {
+      const noteHtml = note ? `\n\n<div class="article-info-callout"><span>ℹ️</span><div>${note.trim()}</div></div>\n\n` : '';
+      return `\n\n### Transcription de la prédication\n\n${noteHtml}`;
+    });
+
+    // 1b-3. Structurer "Dans la même série"
+    text = text.replace(/(?:^|\n|[.!?…»])\s*(Dans\s+la\s+même\s+série\s*:?)\s*(\[|[A-ZÀ-ÿ])/gi, '\n\n### Dans la même série\n\n- $2');
+    text = text.replace(/(?<=### Dans la même série[\s\S]*?)(?<=\))\s*([—–\u2013\u2014-]\s*[A-ZÀ-ÿ][^\n\[]+?)\s+(\[[^\]]+\]\([^)]+\))/g, '$1\n- $2');
+    text = text.replace(/(?<=### Dans la même série[\s\S]*?)(?<=\))\s+(\[[^\]]+\]\([^)]+\))/g, '\n- $1');
+
+    // 1b-4. Découper les blocs et lignes excessivement longs (transcriptions ou articles compactés) en paragraphes de 2-3 phrases
+    const rawLines = text.split('\n');
+    const processedLines = rawLines.map(line => {
+      if (line.startsWith('#') || line.startsWith('>') || line.startsWith('-') || line.startsWith('<') || line.length < 350) {
+        return line;
+      }
+      let sentenceCount = 0;
+      return line.replace(/(?<=[.!?…»])\s+(?!–|—)([A-ZÀ-ÿ«0-9])/g, (match, nextChar) => {
+        sentenceCount++;
+        if (sentenceCount >= 2) {
+          sentenceCount = 0;
+          return '\n\n' + nextChar;
+        }
+        return ' ' + nextChar;
+      });
+    });
+    text = processedLines.join('\n');
 
     // 2. Nettoyer les emojis résiduels dans les listes et structurer "Pour aller plus loin"
     text = text.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1FA70}-\u{1FAFF}]/gu, '');
