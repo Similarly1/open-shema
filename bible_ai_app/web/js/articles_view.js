@@ -525,7 +525,56 @@ const ArticlesView = {
     return result.slice(0, 4);
   },
 
-  currentArchivePage: 1,
+  getGridSkeletonHtml(count = 6) {
+    return Array.from({ length: count }, () => `
+      <div class="article-card article-card-skeleton">
+        <div class="skeleton-card-thumb skeleton-shimmer"></div>
+        <div class="article-card-content">
+          <div class="article-card-header">
+            <div class="skeleton-shimmer" style="width: 105px; height: 20px; border-radius: 12px;"></div>
+            <div class="skeleton-shimmer" style="width: 75px; height: 13px; border-radius: 4px;"></div>
+          </div>
+          <div class="skeleton-shimmer" style="width: 90%; height: 20px; border-radius: 4px; margin: 10px 0 6px 0;"></div>
+          <div class="skeleton-shimmer" style="width: 65%; height: 20px; border-radius: 4px; margin-bottom: 12px;"></div>
+          <div class="article-topics-list" style="margin-bottom: 12px; display: flex; gap: 6px;">
+            <div class="skeleton-shimmer" style="width: 110px; height: 18px; border-radius: 10px;"></div>
+            <div class="skeleton-shimmer" style="width: 85px; height: 18px; border-radius: 10px;"></div>
+          </div>
+          <div class="article-card-author-row" style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            <div class="skeleton-shimmer" style="width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;"></div>
+            <div class="skeleton-shimmer" style="width: 110px; height: 13px; border-radius: 4px;"></div>
+          </div>
+          <div class="skeleton-shimmer" style="width: 100%; height: 13px; border-radius: 4px; margin-bottom: 6px;"></div>
+          <div class="skeleton-shimmer" style="width: 94%; height: 13px; border-radius: 4px; margin-bottom: 6px;"></div>
+          <div class="skeleton-shimmer" style="width: 55%; height: 13px; border-radius: 4px; margin-bottom: 16px;"></div>
+          <div class="article-card-scripture-refs" style="margin-top: auto; display: flex; gap: 6px;">
+            <div class="skeleton-shimmer" style="width: 48px; height: 20px; border-radius: 6px;"></div>
+            <div class="skeleton-shimmer" style="width: 64px; height: 20px; border-radius: 6px;"></div>
+            <div class="skeleton-shimmer" style="width: 42px; height: 20px; border-radius: 6px;"></div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  getDrawerSkeletonHtml(count = 3) {
+    return Array.from({ length: count }, () => `
+      <div class="drawer-article-card-skeleton">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <div class="skeleton-shimmer" style="width: 85px; height: 16px; border-radius: 10px;"></div>
+          <div class="skeleton-shimmer" style="width: 55px; height: 12px; border-radius: 4px;"></div>
+        </div>
+        <div class="skeleton-shimmer" style="width: 92%; height: 16px; border-radius: 4px; margin-bottom: 5px;"></div>
+        <div class="skeleton-shimmer" style="width: 70%; height: 16px; border-radius: 4px; margin-bottom: 8px;"></div>
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+          <div class="skeleton-shimmer" style="width: 18px; height: 18px; border-radius: 50%;"></div>
+          <div class="skeleton-shimmer" style="width: 80px; height: 12px; border-radius: 4px;"></div>
+        </div>
+        <div class="skeleton-shimmer" style="width: 100%; height: 12px; border-radius: 4px; margin-bottom: 4px;"></div>
+        <div class="skeleton-shimmer" style="width: 85%; height: 12px; border-radius: 4px;"></div>
+      </div>
+    `).join('');
+  },
 
   async loadArticles() {
     const listContainer = document.getElementById('articles-grid-container');
@@ -533,12 +582,7 @@ const ArticlesView = {
     const paginationFooter = document.getElementById('articles-pagination-footer');
     if (!listContainer) return;
 
-    listContainer.innerHTML = `
-      <div class="articles-loading-state">
-        <div class="spinner-sm"></div>
-        <span>Chargement des articles...</span>
-      </div>
-    `;
+    listContainer.innerHTML = this.getGridSkeletonHtml(6);
     if (paginationFooter) paginationFooter.classList.add('hidden');
 
     try {
@@ -1750,7 +1794,7 @@ const ArticlesView = {
     }
 
 
-    listEl.innerHTML = `<div class="articles-loading-state" style="padding: 20px;"><div class="spinner-sm"></div><span>Recherche des articles associés...</span></div>`;
+    listEl.innerHTML = this.getDrawerSkeletonHtml(3);
 
     try {
       const articles = await API.call('get_articles_for_passage', bookCode || 'Gen', parseInt(chapter, 10) || 1, 10) || [];
