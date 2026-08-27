@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 import customtkinter as ctk
 from tkinter import messagebox
 import os
@@ -39,8 +41,8 @@ def get_or_create_cover_ctk_image(title, cover_path=None, size=(130, 195)):
     if cover_path and os.path.exists(cover_path):
         try:
             pil_img = Image.open(cover_path)
-        except Exception:
-            pass
+        except Exception as _silent_e:
+            logger.debug("Erreur ignoree : %s", _silent_e)
 
     if pil_img is None:
         if title in _PIL_IMAGE_CACHE:
@@ -207,8 +209,8 @@ class LibraryTab(ctk.CTkFrame):
         try:
             self.loader_frame.grid_forget()
             self.loader_frame.destroy()
-        except Exception:
-            pass
+        except Exception as _silent_e:
+            logger.debug("Erreur ignoree : %s", _silent_e)
         self.scroll_frame.grid(row=1, column=0, padx=12, pady=(0, 10), sticky="nsew")
 
     def refresh_library(self):
@@ -247,8 +249,8 @@ class LibraryTab(ctk.CTkFrame):
             for widget in self.book_widgets:
                 try:
                     widget.destroy()
-                except Exception:
-                    pass
+                except Exception as _silent_e:
+                    logger.debug("Erreur ignoree : %s", _silent_e)
         self.book_widgets = []
 
         if not self.sources:

@@ -332,8 +332,8 @@ class AISessionManager:
                             # Nettoyer les fichiers orphelins vides
                             try:
                                 os.remove(filepath)
-                            except Exception:
-                                pass
+                            except Exception as _silent_e:
+                                logger.debug("Erreur ignoree : %s", _silent_e)
                             continue
                             
                         sessions.append({
@@ -342,7 +342,8 @@ class AISessionManager:
                             "updated_at": data.get("updated_at"),
                             "context": data.get("context", {})
                         })
-                    except Exception:
+                    except Exception as _silent_e:
+                        logger.debug("Erreur ignoree : %s", _silent_e)
                         continue
 
             # Trier du plus récent au plus ancien

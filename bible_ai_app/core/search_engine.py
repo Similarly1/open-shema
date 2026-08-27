@@ -182,7 +182,8 @@ class SearchEngine:
                 try:
                     with open(f_path, "r", encoding="utf-8") as f:
                         b_data = json.load(f)
-                except Exception:
+                except Exception as _silent_e:
+                    logger.debug("Erreur ignoree : %s", _silent_e)
                     continue
 
                 raw_code = b_data.get("code", "")

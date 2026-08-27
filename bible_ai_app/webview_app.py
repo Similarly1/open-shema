@@ -66,6 +66,7 @@ from core.highlights_manager import HighlightsManager
 from core.maps_manager import MapsManager
 from gui.library_utils import load_books_metadata, save_books_metadata
 from core.ai_session_manager import AISessionManager
+from core.secrets_manager import migrate_secrets_from_config, load_secrets_into_config
 
 # Composants inclus dans la sauvegarde complète
 _BACKUP_MANIFEST_VERSION = "1.0"
@@ -266,7 +267,11 @@ class BibleAppApi:
     """
 
     def __init__(self):
-        self.config = load_config()
+        raw_config = load_config()
+        # Migration one-shot des cles API vers le trousseau Windows (si presentes en clair)
+        raw_config = migrate_secrets_from_config(raw_config)
+        # Injecter les cles depuis le trousseau dans le dict de config pour usage interne
+        self.config = load_secrets_into_config(raw_config)
 
     # =========================================================================
     # 1. LECTEUR BIBLIQUE
@@ -989,8 +994,8 @@ class BibleAppApi:
                 import json
                 data = json.loads(cached["translated_text"])
                 return {"success": True, "translated_titles": data, "cached": True}
-            except Exception:
-                pass
+            except Exception as _silent_e:
+                logger.debug("Erreur ignoree : %s", _silent_e)
 
         try:
             lines = []
@@ -2344,8 +2349,8 @@ class BibleAppApi:
             if os.path.exists(json_dir):
                 try:
                     shutil.rmtree(json_dir)
-                except Exception:
-                    pass
+                except Exception as _silent_e:
+                    logger.debug("Erreur ignoree : %s", _silent_e)
             BibleJsonLoader.clear_cache()
             del registry[book_name]
             save_books_metadata(registry)
@@ -2989,8 +2994,11 @@ class BibleAppApi:
         return load_config()
 
     def save_settings(self, new_config: Dict[str, Any]) -> bool:
+        # Migrer les nouvelles cles API vers le trousseau avant sauvegarde
+        new_config = migrate_secrets_from_config(new_config)
         save_config(new_config)
-        self.config = load_config()
+        raw = load_config()
+        self.config = load_secrets_into_config(raw)
         return True
 
     # =========================================================================
@@ -3172,8 +3180,8 @@ class BibleAppApi:
         try:
             if hasattr(_GLOBAL_WINDOW, 'native') and _GLOBAL_WINDOW.native:
                 hwnd = _GLOBAL_WINDOW.native.Handle.ToInt32()
-        except Exception:
-            pass
+        except Exception as _silent_e:
+            logger.debug("Erreur ignoree : %s", _silent_e)
 
         if _IS_MAXIMIZED:
             # Restaurer à la taille fenêtrée
@@ -3185,8 +3193,8 @@ class BibleAppApi:
                 try:
                     _GLOBAL_WINDOW.move(rx, ry)
                     _GLOBAL_WINDOW.resize(rw, rh)
-                except Exception:
-                    pass
+                except Exception as _silent_e:
+                    logger.debug("Erreur ignoree : %s", _silent_e)
         else:
             # Sauvegarder les dimensions actuelles avant agrandissement
             if hwnd:
@@ -3197,8 +3205,8 @@ class BibleAppApi:
                     h = curr_rect.bottom - curr_rect.top
                     if w > 600 and h > 400:
                         _RESTORE_BOUNDS = (curr_rect.left, curr_rect.top, w, h)
-                except Exception:
-                    pass
+                except Exception as _silent_e:
+                    logger.debug("Erreur ignoree : %s", _silent_e)
 
             # Agrandir pour occuper tout l'espace de travail (barre des tâches visible)
             wx, wy, ww, wh = get_work_area()
@@ -3209,8 +3217,8 @@ class BibleAppApi:
                 try:
                     _GLOBAL_WINDOW.move(wx, wy)
                     _GLOBAL_WINDOW.resize(ww, wh)
-                except Exception:
-                    pass
+                except Exception as _silent_e:
+                    logger.debug("Erreur ignoree : %s", _silent_e)
         return {"success": True, "is_maximized": _IS_MAXIMIZED}
 
     def toggle_fullscreen(self):
@@ -3222,8 +3230,8 @@ class BibleAppApi:
         try:
             if hasattr(_GLOBAL_WINDOW, 'native') and _GLOBAL_WINDOW.native:
                 hwnd = _GLOBAL_WINDOW.native.Handle.ToInt32()
-        except Exception:
-            pass
+        except Exception as _silent_e:
+            logger.debug("Erreur ignoree : %s", _silent_e)
 
         if _IS_FULLSCREEN:
             # QUITTER LE PLEIN ÉCRAN
@@ -3236,8 +3244,8 @@ class BibleAppApi:
                     try:
                         _GLOBAL_WINDOW.move(wx, wy)
                         _GLOBAL_WINDOW.resize(ww, wh)
-                    except Exception:
-                        pass
+                    except Exception as _silent_e:
+                        logger.debug("Erreur ignoree : %s", _silent_e)
             else:
                 rx, ry, rw, rh = _RESTORE_BOUNDS
                 if hwnd:
@@ -3246,8 +3254,8 @@ class BibleAppApi:
                     try:
                         _GLOBAL_WINDOW.move(rx, ry)
                         _GLOBAL_WINDOW.resize(rw, rh)
-                    except Exception:
-                        pass
+                    except Exception as _silent_e:
+                        logger.debug("Erreur ignoree : %s", _silent_e)
         else:
             # ENTRER EN PLEIN ÉCRAN TOTAL (Couvre la barre des tâches)
             _IS_FULLSCREEN = True
@@ -3259,8 +3267,8 @@ class BibleAppApi:
                     h = curr_rect.bottom - curr_rect.top
                     if w > 600 and h > 400:
                         _RESTORE_BOUNDS = (curr_rect.left, curr_rect.top, w, h)
-                except Exception:
-                    pass
+                except Exception as _silent_e:
+                    logger.debug("Erreur ignoree : %s", _silent_e)
 
             fx, fy, fw, fh = get_fullscreen_bounds(hwnd)
             if hwnd:
@@ -3269,8 +3277,8 @@ class BibleAppApi:
                 try:
                     _GLOBAL_WINDOW.move(fx, fy)
                     _GLOBAL_WINDOW.resize(fw, fh)
-                except Exception:
-                    pass
+                except Exception as _silent_e:
+                    logger.debug("Erreur ignoree : %s", _silent_e)
 
         return {"success": True, "is_fullscreen": _IS_FULLSCREEN}
 
@@ -3356,8 +3364,8 @@ class BibleAppApi:
             if _GLOBAL_WINDOW:
                 try:
                     _GLOBAL_WINDOW.evaluate_js("window.MultiwindowSync && window.MultiwindowSync.handleSecondaryWindowClosed()")
-                except Exception:
-                    pass
+                except Exception as _silent_e:
+                    logger.debug("Erreur ignoree : %s", _silent_e)
 
         try:
             _COMMENTARY_WINDOW = webview.create_window(
@@ -3416,8 +3424,8 @@ class BibleAppApi:
         try:
             if hasattr(_COMMENTARY_WINDOW, 'native') and _COMMENTARY_WINDOW.native:
                 hwnd = _COMMENTARY_WINDOW.native.Handle.ToInt32()
-        except Exception:
-            pass
+        except Exception as _silent_e:
+            logger.debug("Erreur ignoree : %s", _silent_e)
 
         if not hwnd:
             return {"success": False}
@@ -3451,8 +3459,8 @@ class BibleAppApi:
                 h = curr_rect.bottom - curr_rect.top
                 if w > 400 and h > 300:
                     _COMMENTARY_RESTORE_BOUNDS = (curr_rect.left, curr_rect.top, w, h)
-            except Exception:
-                pass
+            except Exception as _silent_e:
+                logger.debug("Erreur ignoree : %s", _silent_e)
 
             _COMMENTARY_IS_MAXIMIZED = True
             mw = rc.right - rc.left
@@ -3463,8 +3471,8 @@ class BibleAppApi:
             _COMMENTARY_WINDOW.evaluate_js(
                 f"window.CommentaryWindow && window.CommentaryWindow.updateMaximizedState && window.CommentaryWindow.updateMaximizedState({str(_COMMENTARY_IS_MAXIMIZED).lower()})"
             )
-        except Exception:
-            pass
+        except Exception as _silent_e:
+            logger.debug("Erreur ignoree : %s", _silent_e)
 
         return {"success": True, "is_maximized": _COMMENTARY_IS_MAXIMIZED}
 
@@ -3984,8 +3992,8 @@ def on_window_shown(*args, **kwargs):
                     return
                 try:
                     orig_move(x, y)
-                except Exception:
-                    pass
+                except Exception as _silent_e:
+                    logger.debug("Erreur ignoree : %s", _silent_e)
             _GLOBAL_WINDOW.move = safe_move
     except Exception as e:
         logger.warning(f"Erreur initialisation agrandissement: {e}")
@@ -4015,8 +4023,8 @@ def on_commentary_shown(*args, **kwargs):
                         return
                     try:
                         orig_comm_move(x, y)
-                    except Exception:
-                        pass
+                    except Exception as _silent_e:
+                        logger.debug("Erreur ignoree : %s", _silent_e)
                 _COMMENTARY_WINDOW.move = safe_comm_move
 
             # Préparation et envoi asynchrone des données pour ne jamais bloquer le thread d'affichage natif
@@ -4035,8 +4043,8 @@ def on_commentary_shown(*args, **kwargs):
                                 _COMMENTARY_WINDOW.evaluate_js(
                                     f"window.CommentaryWindow && window.CommentaryWindow.receiveChapterDataB64('{b64_str}', {v})"
                                 )
-                            except Exception:
-                                pass
+                            except Exception as _silent_e:
+                                logger.debug("Erreur ignoree : %s", _silent_e)
                 except Exception as ex:
                     logger.debug(f"async_push_data error: {ex}")
 

@@ -317,8 +317,8 @@ class WikipediaClient:
                                     "snippet": clean_snip,
                                     "score_bonus": 0
                                 }
-            except Exception:
-                pass
+            except Exception as _silent_e:
+                logger.debug("Erreur ignoree : %s", _silent_e)
 
         # 3. Classer et trier les candidats
         scored_candidates = []

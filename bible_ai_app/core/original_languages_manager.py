@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 import os
 import re
 import json
@@ -628,6 +630,6 @@ class OriginalLanguagesManager:
                 r = cur.fetchone()
                 if r and r[0]:
                     return int(r[0])
-        except Exception:
-            pass
+        except Exception as _silent_e:
+            logger.debug("Erreur ignoree : %s", _silent_e)
         return 30

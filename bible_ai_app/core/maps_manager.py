@@ -84,8 +84,8 @@ class MapsManager:
                 if r["verses_json"]:
                     try:
                         verses_list = json.loads(r["verses_json"])
-                    except Exception:
-                        pass
+                    except Exception as _silent_e:
+                        logger.debug("Erreur ignoree : %s", _silent_e)
                 results.append({
                     "place_id": r["place_id"],
                     "name_fr": r["name_fr"],
@@ -136,8 +136,8 @@ class MapsManager:
                 if r["verses_json"]:
                     try:
                         verses_list = json.loads(r["verses_json"])
-                    except Exception:
-                        pass
+                    except Exception as _silent_e:
+                        logger.debug("Erreur ignoree : %s", _silent_e)
                 places.append({
                     "place_id": r["place_id"],
                     "name_fr": r["name_fr"],
@@ -225,8 +225,8 @@ class MapsManager:
                 if r["waypoints_json"]:
                     try:
                         waypoints = json.loads(r["waypoints_json"])
-                    except Exception:
-                        pass
+                    except Exception as _silent_e:
+                        logger.debug("Erreur ignoree : %s", _silent_e)
                 results.append({
                     "itinerary_id": r["itinerary_id"],
                     "title": r["title"],

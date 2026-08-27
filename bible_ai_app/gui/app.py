@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 import customtkinter as ctk
 import os
 from gui.left_panel import LeftPanel
@@ -102,10 +104,10 @@ class App(ctk.CTk):
                     if state == "disabled":
                         return False
                     return True
-                except Exception:
-                    pass
-        except Exception:
-            pass
+                except Exception as _silent_e:
+                    logger.debug("Erreur ignoree : %s", _silent_e)
+        except Exception as _silent_e:
+            logger.debug("Erreur ignoree : %s", _silent_e)
         return False
 
     def _on_key_down(self, event):
@@ -196,8 +198,8 @@ class App(ctk.CTk):
                 try:
                     if hasattr(self, 'winfo_exists') and self.winfo_exists():
                         self.after(0, self.finish_search, reference, results)
-                except Exception:
-                    pass
+                except Exception as _silent_e:
+                    logger.debug("Erreur ignoree : %s", _silent_e)
             
         import threading
         threading.Thread(target=do_search, daemon=True).start()

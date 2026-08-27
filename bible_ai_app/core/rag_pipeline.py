@@ -212,8 +212,8 @@ class RAGPipeline:
             if step_callback:
                 try:
                     step_callback(step_id, label, status)
-                except Exception:
-                    pass
+                except Exception as _silent_e:
+                    logger.debug("Erreur ignoree : %s", _silent_e)
 
         # 1a. Détection du contexte et scope vectoriel (Le "Tri-Flux")
         where_clause = None

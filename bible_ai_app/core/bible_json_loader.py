@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 import os
 import json
 import re
@@ -108,8 +110,8 @@ class BibleJsonLoader:
                     p = os.path.join(bibles_dir, meta["folder_name"])
                     if os.path.exists(p):
                         return p
-            except Exception:
-                pass
+            except Exception as _silent_e:
+                logger.debug("Erreur ignoree : %s", _silent_e)
 
         # 3. Scanner les dossiers pour faire correspondre le nom ou la version
         for d in os.listdir(bibles_dir):

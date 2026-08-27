@@ -225,8 +225,8 @@ class SermonsManager:
                         if s_meta and str(s_meta.get("id")) == str(sermon_id):
                             existing_filename = fname
                             break
-            except Exception:
-                pass
+            except Exception as _silent_e:
+                logger.debug("Erreur ignoree : %s", _silent_e)
 
         if existing_filename and os.path.exists(os.path.join(target_dir, existing_filename)):
             file_path = os.path.join(target_dir, existing_filename)

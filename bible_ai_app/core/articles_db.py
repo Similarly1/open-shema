@@ -69,8 +69,8 @@ class ArticlesDB:
             for col in ["tags TEXT", "image_url TEXT", "author_avatar_url TEXT", "lead_summary TEXT", "audio_url TEXT"]:
                 try:
                     cursor.execute(f"ALTER TABLE articles ADD COLUMN {col}")
-                except Exception:
-                    pass
+                except Exception as _silent_e:
+                    logger.debug("Erreur ignoree : %s", _silent_e)
 
             # 3. Table des liaisons de versets bibliques
             cursor.execute("""
@@ -295,30 +295,33 @@ class ArticlesDB:
                 search_conditions = ["a.title LIKE ?", "a.author LIKE ?", "a.summary LIKE ?", "a.tags LIKE ?"]
                 sub_params: List[Any] = [q_param, q_param, q_param, q_param]
 
-                # 1. Vérifier si la recherche contient une référence biblique (ex: "Rm 8", "Jn 3.16", "1 Co 13")
+                # 1. Analyser si la recherche est une référence biblique universelle (ex: 'rm 4', 'romains 4', '1co 13', 'ps 23', 'jn 3.16', 'rm', etc.)
                 try:
-                    from core.bible_reference_detector import find_bible_references
-                    detected_refs = find_bible_references(sq_clean)
-                    for ref in detected_refs:
+                    from core.reference_parser import parse_bible_search_query
+                    parsed_bible_refs = parse_bible_search_query(sq_clean)
+                    for ref in parsed_bible_refs:
                         b_code = ref["book_code"]
-                        ch = ref["chapter"]
-                        search_conditions.append("EXISTS (SELECT 1 FROM article_scripture_links l WHERE l.article_id = a.id AND l.book_code = ? AND (l.chapter = ? OR ? IS NULL))")
-                        sub_params.extend([b_code, ch, ch])
+                        ch = ref.get("chapter")
+                        v = ref.get("verse")
+                        if ch is not None and v is not None:
+                            search_conditions.append(
+                                "EXISTS (SELECT 1 FROM article_scripture_links l WHERE l.article_id = a.id AND l.book_code = ? AND l.chapter = ? AND (l.verse = ? OR l.verse IS NULL))"
+                            )
+                            sub_params.extend([b_code, ch, v])
+                        elif ch is not None:
+                            search_conditions.append(
+                                "EXISTS (SELECT 1 FROM article_scripture_links l WHERE l.article_id = a.id AND l.book_code = ? AND l.chapter = ?)"
+                            )
+                            sub_params.extend([b_code, ch])
+                        else:
+                            search_conditions.append(
+                                "EXISTS (SELECT 1 FROM article_scripture_links l WHERE l.article_id = a.id AND l.book_code = ?)"
+                            )
+                            sub_params.append(b_code)
                 except Exception as e:
-                    logger.debug(f"[ArticlesDB] Erreur parsing ref recherche: {e}")
+                    logger.debug(f"[ArticlesDB] Erreur parse_bible_search_query: {e}")
 
-                # 2. Vérifier si la recherche est une abréviation ou nom de livre seul (ex: "Rm", "Romains", "Gen", "Mt")
-                try:
-                    from core.reference_parser import BOOK_MAPPING, strip_accents
-                    norm_sq = strip_accents(sq_clean).lower().rstrip('.')
-                    if norm_sq in BOOK_MAPPING:
-                        b_code = BOOK_MAPPING[norm_sq]
-                        search_conditions.append("EXISTS (SELECT 1 FROM article_scripture_links l WHERE l.article_id = a.id AND l.book_code = ?)")
-                        sub_params.append(b_code)
-                except Exception as e:
-                    logger.debug(f"[ArticlesDB] Erreur mapping livre recherche: {e}")
-
-                # 3. Matcher aussi les références brutes enregistrées (ex: "Luc 1.39-56")
+                # 2. Matcher aussi les références brutes textuelles (ex: "Luc 1.39-56")
                 search_conditions.append("EXISTS (SELECT 1 FROM article_scripture_links l WHERE l.article_id = a.id AND l.raw_ref LIKE ?)")
                 sub_params.append(q_param)
 
@@ -415,25 +418,29 @@ class ArticlesDB:
                 sub_params: List[Any] = [q_param, q_param, q_param, q_param]
 
                 try:
-                    from core.bible_reference_detector import find_bible_references
-                    detected_refs = find_bible_references(sq_clean)
-                    for ref in detected_refs:
+                    from core.reference_parser import parse_bible_search_query
+                    parsed_bible_refs = parse_bible_search_query(sq_clean)
+                    for ref in parsed_bible_refs:
                         b_code = ref["book_code"]
-                        ch = ref["chapter"]
-                        search_conditions.append("EXISTS (SELECT 1 FROM article_scripture_links l WHERE l.article_id = a.id AND l.book_code = ? AND (l.chapter = ? OR ? IS NULL))")
-                        sub_params.extend([b_code, ch, ch])
-                except Exception:
-                    pass
-
-                try:
-                    from core.reference_parser import BOOK_MAPPING, strip_accents
-                    norm_sq = strip_accents(sq_clean).lower().rstrip('.')
-                    if norm_sq in BOOK_MAPPING:
-                        b_code = BOOK_MAPPING[norm_sq]
-                        search_conditions.append("EXISTS (SELECT 1 FROM article_scripture_links l WHERE l.article_id = a.id AND l.book_code = ?)")
-                        sub_params.append(b_code)
-                except Exception:
-                    pass
+                        ch = ref.get("chapter")
+                        v = ref.get("verse")
+                        if ch is not None and v is not None:
+                            search_conditions.append(
+                                "EXISTS (SELECT 1 FROM article_scripture_links l WHERE l.article_id = a.id AND l.book_code = ? AND l.chapter = ? AND (l.verse = ? OR l.verse IS NULL))"
+                            )
+                            sub_params.extend([b_code, ch, v])
+                        elif ch is not None:
+                            search_conditions.append(
+                                "EXISTS (SELECT 1 FROM article_scripture_links l WHERE l.article_id = a.id AND l.book_code = ? AND l.chapter = ?)"
+                            )
+                            sub_params.extend([b_code, ch])
+                        else:
+                            search_conditions.append(
+                                "EXISTS (SELECT 1 FROM article_scripture_links l WHERE l.article_id = a.id AND l.book_code = ?)"
+                            )
+                            sub_params.append(b_code)
+                except Exception as _silent_e:
+                    logger.debug("Erreur ignoree : %s", _silent_e)
 
                 search_conditions.append("EXISTS (SELECT 1 FROM article_scripture_links l WHERE l.article_id = a.id AND l.raw_ref LIKE ?)")
                 sub_params.append(q_param)

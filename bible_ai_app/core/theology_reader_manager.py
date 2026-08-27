@@ -50,8 +50,8 @@ class TheologyReaderManager:
         try:
             from core.epub_loader import EpubLoader
             EpubLoader.invalidate_cache()
-        except Exception:
-            pass
+        except Exception as _silent_e:
+            logger.debug("Erreur ignoree : %s", _silent_e)
 
     @classmethod
     def get_all_theology_books(cls, force_refresh: bool = False) -> List[Dict[str, Any]]:
@@ -156,8 +156,8 @@ class TheologyReaderManager:
                         matched = os.path.join(cdir, fname)
                         book_meta["file_path"] = matched
                         return matched
-            except Exception:
-                pass
+            except Exception as _silent_e:
+                logger.debug("Erreur ignoree : %s", _silent_e)
         return ""
 
     @classmethod
@@ -815,8 +815,8 @@ Règles de style :
                 with open(cache_path, "r", encoding="utf-8") as f:
                     cls._bible_book_index = json.load(f)
                     return cls._bible_book_index
-            except Exception:
-                pass
+            except Exception as _silent_e:
+                logger.debug("Erreur ignoree : %s", _silent_e)
 
         from core.reference_parser import get_standard_book_code, get_french_book_name
         from webview_app import get_cover_data_url
@@ -874,15 +874,15 @@ Règles de style :
                                     index[code] = []
                                 index[code].append(item)
                                 break
-            except Exception:
-                pass
+            except Exception as _silent_e:
+                logger.debug("Erreur ignoree : %s", _silent_e)
 
         try:
             os.makedirs(os.path.dirname(cache_path), exist_ok=True)
             with open(cache_path, "w", encoding="utf-8") as f:
                 json.dump(index, f, ensure_ascii=False, indent=2)
-        except Exception:
-            pass
+        except Exception as _silent_e:
+            logger.debug("Erreur ignoree : %s", _silent_e)
 
         cls._bible_book_index = index
         return cls._bible_book_index
@@ -952,8 +952,8 @@ Règles de style :
             if raw_text:
                 snip = raw_text[:220] + ('...' if len(raw_text) > 220 else '')
                 return cls._clean_text_encoding(snip)
-        except Exception:
-            pass
+        except Exception as _silent_e:
+            logger.debug("Erreur ignoree : %s", _silent_e)
 
         return f"Étude et analyse contextuelle consacrées à {french_book} {chapter}."
 

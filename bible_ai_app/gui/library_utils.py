@@ -1,18 +1,32 @@
+import logging
+logger = logging.getLogger(__name__)
 import os
 import json
 import shutil
 
-def load_books_metadata():
-    path = 'data/library.json'
+# Cache en mémoire pour éviter de relire library.json à chaque navigation de verset.
+# Invalidé automatiquement par save_books_metadata().
+_LIBRARY_CACHE: dict | None = None
+_LIBRARY_PATH = 'data/library.json'
+
+def load_books_metadata() -> dict:
+    global _LIBRARY_CACHE
+    if _LIBRARY_CACHE is not None:
+        return _LIBRARY_CACHE
     registry = {}
-    if os.path.exists(path):
+    if os.path.exists(_LIBRARY_PATH):
         try:
-            with open(path, 'r', encoding='utf-8') as f:
+            with open(_LIBRARY_PATH, 'r', encoding='utf-8') as f:
                 registry = json.load(f)
-        except Exception:
-            pass
-            
+        except Exception as _silent_e:
+            logger.debug("Erreur ignoree : %s", _silent_e)
+    _LIBRARY_CACHE = registry
     return registry
+
+def invalidate_library_cache():
+    """Force le rechargement de library.json au prochain appel de load_books_metadata()."""
+    global _LIBRARY_CACHE
+    _LIBRARY_CACHE = None
 
 def recover_books_metadata():
     path = 'data/library.json'
@@ -94,6 +108,8 @@ def recover_books_metadata():
     return registry
 
 def save_books_metadata(data):
+    global _LIBRARY_CACHE
     os.makedirs('data', exist_ok=True)
-    with open('data/library.json', 'w', encoding='utf-8') as f:
+    with open(_LIBRARY_PATH, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+    _LIBRARY_CACHE = None  # Invalider le cache après toute écriture

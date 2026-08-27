@@ -1293,8 +1293,8 @@ CONSIGNES STRICTES :
 
                                     summary = extracted
                                     break
-                    except Exception:
-                        pass
+                    except Exception as _silent_e:
+                        logger.debug("Erreur ignoree : %s", _silent_e)
 
                 if len(summary) > 200:
                     summary = summary[:197] + "..."
