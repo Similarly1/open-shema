@@ -45,7 +45,10 @@ Règles impératives de restauration :
    - N'invente JAMAIS de faits ou de sections fictives non documentées.
    - Conserve rigoureusement toute la substance exégétique, historique, biographique, géographique et théologique de l'auteur d'origine.
    - Ne laisse AUCUNE section ou puce vide ou tronquée.
-   - Rends directement le texte restauré en Markdown prêt à l'affichage, sans préambule ni méta-commentaires."""
+   - Rends directement le texte restauré en Markdown prêt à l'affichage, sans préambule ni méta-commentaires.
+
+7. Illustrations et Gravures :
+   - Si la notice originale mentionne une figure ou une illustration (ex: '3. — Cad. D\'après une peinture de Pompéi.', 'Illustration : ...'), préserve cette mention sous la forme `*Illustration : Description de la gravure.*` pour que l'application charge automatiquement la gravure correspondante."""
 
 
 AVAILABLE_POLISH_MODELS = [

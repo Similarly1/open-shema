@@ -17,6 +17,8 @@ const DictView = {
   currentZoom: 100,
   isTocCollapsed: false,
   currentFootnotesList: [],
+  vigourouxIllustrationsMap: null,
+  lightboxEl: null,
 
   // Options d'affichage et de transformation du texte
   optLogosRestructure: true,
@@ -44,12 +46,67 @@ const DictView = {
       if (savedZoom) this.currentZoom = parseInt(savedZoom, 10) || 100;
     } catch (e) {}
 
-
     this.bindHeaderControls();
     this.bindDisplayOptions();
     this.bindTocControls();
     this.bindArticleControls();
     this.applyDisplayPreferences();
+    this.loadVigourouxIllustrations();
+  },
+
+  async loadVigourouxIllustrations() {
+    if (this.vigourouxIllustrationsMap) return this.vigourouxIllustrationsMap;
+    try {
+      const res = await fetch('data/dictionaries/vigouroux_illustrations.json');
+      if (res.ok) {
+        this.vigourouxIllustrationsMap = await res.json();
+      } else {
+        this.vigourouxIllustrationsMap = {};
+      }
+    } catch (e) {
+      this.vigourouxIllustrationsMap = {};
+    }
+    return this.vigourouxIllustrationsMap;
+  },
+
+  initLightbox() {
+    if (this.lightboxEl) return;
+    this.lightboxEl = document.createElement('div');
+    this.lightboxEl.className = 'dict-lightbox-overlay';
+    this.lightboxEl.id = 'dict-lightbox-overlay';
+    this.lightboxEl.innerHTML = `
+      <div class="dict-lightbox-container">
+        <button type="button" class="dict-lightbox-close" title="Fermer (Échap)">✕</button>
+        <img src="" alt="" class="dict-lightbox-img" />
+        <div class="dict-lightbox-caption"></div>
+      </div>
+    `;
+    document.body.appendChild(this.lightboxEl);
+
+    this.lightboxEl.querySelector('.dict-lightbox-close')?.addEventListener('click', () => this.hideLightbox());
+    this.lightboxEl.addEventListener('click', (e) => {
+      if (e.target === this.lightboxEl || e.target.classList.contains('dict-lightbox-img')) {
+        this.hideLightbox();
+      }
+    });
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') this.hideLightbox();
+    });
+  },
+
+  showLightbox(src, caption) {
+    this.initLightbox();
+    const imgEl = this.lightboxEl.querySelector('.dict-lightbox-img');
+    const capEl = this.lightboxEl.querySelector('.dict-lightbox-caption');
+    if (imgEl) imgEl.src = src;
+    if (capEl) capEl.textContent = caption || '';
+    this.lightboxEl.classList.add('visible');
+  },
+
+  hideLightbox() {
+    if (this.lightboxEl) {
+      this.lightboxEl.classList.remove('visible');
+    }
   },
 
   async preloadInitialData() {
@@ -733,6 +790,58 @@ const DictView = {
       `;
     }
 
+    // 0b. Intégration des gravures historiques Vigouroux
+    let illustrationsHtml = '';
+    if (isVigouroux) {
+      const rawTitle = match.title || match.headword || this.currentEntryData?.title || '';
+      const normTitle = rawTitle.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Z0-9]/g, '');
+      const map = this.vigourouxIllustrationsMap || {};
+      const figs = (match.illustrations && match.illustrations.length > 0)
+        ? match.illustrations
+        : (this.currentEntryData?.illustrations && this.currentEntryData.illustrations.length > 0)
+          ? this.currentEntryData.illustrations
+          : (map[rawTitle.toUpperCase()] || map[normTitle] || []);
+      if (figs.length > 0) {
+        illustrationsHtml = `
+          <div class="dict-illustrations-gallery">
+            ${figs.map(fig => `
+              <figure class="dict-article-figure">
+                <div class="dict-article-img-wrap" data-img-src="${fig.rel_path}" data-img-caption="${this.escapeHtml(fig.caption)}">
+                  <img src="${fig.rel_path}" alt="${this.escapeHtml(fig.caption)}" class="dict-article-img" loading="lazy" />
+                </div>
+                <figcaption class="dict-article-figcaption">
+                  <span class="dict-fig-badge">Fig. ${fig.fig_num}</span> ${this.escapeHtml(fig.caption)}
+                </figcaption>
+              </figure>
+            `).join('')}
+          </div>
+        `;
+      }
+    }
+
+    if (illustrationsHtml) {
+      if (linkified.includes('<!-- ILLUSTRATION_PLACEHOLDER')) {
+        linkified = linkified.replace(/<!-- ILLUSTRATION_PLACEHOLDER:[^>]*-->/g, illustrationsHtml);
+      } else {
+        const firstPEnd = linkified.indexOf('</p>');
+        if (firstPEnd !== -1) {
+          linkified = linkified.slice(0, firstPEnd + 4) + illustrationsHtml + linkified.slice(firstPEnd + 4);
+        } else {
+          linkified = illustrationsHtml + linkified;
+        }
+      }
+    } else {
+      linkified = linkified.replace(/<!-- ILLUSTRATION_PLACEHOLDER:(.*?)-->/g, (m, cap) => {
+        return `
+          <figure class="dict-article-figure" style="opacity: 0.85;">
+            <figcaption class="dict-article-figcaption">
+              <span class="dict-fig-badge">Illustration</span> ${cap}
+            </figcaption>
+          </figure>
+        `;
+      });
+    }
+
     bodyEl.innerHTML = `
       ${polishBannerHtml}
       <div class="dict-entry-body-content">${linkified}</div>
@@ -810,6 +919,15 @@ const DictView = {
             callEl.classList.add('theol-highlight-pulse');
           }
         }
+      });
+    });
+
+    // 4b. Attacher les clics sur les gravures pour ouvrir la visionneuse LightBox HD
+    bodyEl.querySelectorAll('.dict-article-img-wrap').forEach(wrap => {
+      wrap.addEventListener('click', () => {
+        const src = wrap.dataset.imgSrc || wrap.querySelector('img')?.src;
+        const caption = wrap.dataset.imgCaption || wrap.querySelector('img')?.alt;
+        if (src) this.showLightbox(src, caption);
       });
     });
 
@@ -1508,6 +1626,15 @@ const DictView = {
             return;
           }
         }
+      }
+
+      // D0) Lignes d'Illustration brute (ex: *Illustration : D'après une peinture de Pompéi...*)
+      const illustrMatch = raw.match(/^(?:\*+)?(?:Illustration|Figure|Gravure)\s*:\s*(.+?)(?:\*+)?$/i);
+      if (illustrMatch) {
+        const captionText = illustrMatch[1].replace(/[*_`]+/g, '').trim();
+        if (inUlList) { out.push('</ul>'); inUlList = false; }
+        out.push(`<!-- ILLUSTRATION_PLACEHOLDER:${this.escapeHtml(captionText)} -->`);
+        return;
       }
 
       // D) Lignes de Bibliographie / Sources *Cf.* Hurter...

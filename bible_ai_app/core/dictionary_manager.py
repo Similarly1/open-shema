@@ -353,8 +353,33 @@ class DictionaryManager:
             "is_polished": main_match.get("is_polished", False),
             "polished_model": main_match.get("polished_model", ""),
             "slug": slug_or_title,
+            "illustrations": main_match.get("illustrations", []),
             "matches": all_matches
         }
+
+    _vigouroux_illustrations = None
+
+    @classmethod
+    def get_vigouroux_illustrations(cls, word_or_title: str) -> list:
+        """Récupère la liste des gravures Vigouroux associées à un mot-clé."""
+        if cls._vigouroux_illustrations is None:
+            data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "dictionaries")
+            json_path = os.path.join(data_dir, "vigouroux_illustrations.json")
+            if os.path.exists(json_path):
+                try:
+                    with open(json_path, "r", encoding="utf-8") as f:
+                        cls._vigouroux_illustrations = json.load(f)
+                except Exception:
+                    cls._vigouroux_illustrations = {}
+            else:
+                cls._vigouroux_illustrations = {}
+        
+        if not word_or_title:
+            return []
+        
+        key = word_or_title.strip().upper()
+        norm_key = re.sub(r'[^A-Z0-9]', '', key)
+        return cls._vigouroux_illustrations.get(key) or cls._vigouroux_illustrations.get(norm_key) or []
 
     @classmethod
     def lookup_in_dict(cls, dict_info, word, strong_code=None):
@@ -472,6 +497,10 @@ class DictionaryManager:
                 snippet = cleaned_p[:240] + "..." if len(cleaned_p) > 240 else cleaned_p
                 break
                 
+        illustrations = []
+        if "vigouroux" in dict_id.lower() or "vigouroux" in dict_info.get("name", "").lower():
+            illustrations = cls.get_vigouroux_illustrations(art.get("title", word)) or cls.get_vigouroux_illustrations(norm)
+
         return {
             "dict_id": dict_id,
             "dict_name": dict_info["name"],
@@ -483,6 +512,7 @@ class DictionaryManager:
             "is_polished": is_polished,
             "polished_model": polished_model,
             "slug": norm,
+            "illustrations": illustrations,
             "art": art
         }
 
