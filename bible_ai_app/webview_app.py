@@ -2385,6 +2385,30 @@ class BibleAppApi:
             logger.error(f"[API] Erreur ouverture URL externe : {e}")
         return False
 
+    def choose_import_file(self) -> Dict[str, Any]:
+        """Ouvre une boîte de dialogue native pour sélectionner un fichier sans bloquer le rendu web."""
+        win = get_active_window()
+        if not win:
+            return {"success": False, "error": "Fenêtre introuvable"}
+            
+        file_types = ('Ouvrages supportés (*.epub;*.json;*.docx;*.md;*.txt;*.csv)', 'Tous les fichiers (*.*)')
+        result = win.create_file_dialog(webview.OPEN_DIALOG, allow_multiple=False, file_types=file_types)
+        
+        if not result or len(result) == 0:
+            return {"cancelled": True}
+            
+        file_path = result[0]
+        file_name = os.path.basename(file_path)
+        file_size = os.path.getsize(file_path) if os.path.exists(file_path) else 0
+        ext = os.path.splitext(file_name)[1].lower()
+        return {
+            "success": True,
+            "file_path": file_path,
+            "file_name": file_name,
+            "file_size": file_size,
+            "format": ext.replace('.', '').upper()
+        }
+
     def pick_import_file(self) -> Dict[str, Any]:
         """Ouvre une boîte de dialogue native pour sélectionner un fichier d'importation."""
         win = get_active_window()

@@ -585,29 +585,55 @@ const ImportModal = {
     if (this._isPickingFile) return;
     this._isPickingFile = true;
 
+    try {
+      // 1. Sélection native du fichier (sans bloquer ni afficher de fausse animation pendant le choix)
+      const chosen = await API.call('choose_import_file');
+      if (!chosen || chosen.cancelled) return;
+      if (!chosen.success) {
+        alert(`Erreur de sélection : ${chosen.error || 'Fichier inaccessible'}`);
+        return;
+      }
+
+      // 2. Lancer l'analyse effective du fichier avec l'animation de chargement
+      await this.inspectAndLoadFile(chosen.file_path, chosen.file_name, chosen.file_size, chosen.format);
+
+    } catch (e) {
+      console.error('Erreur pickFile:', e);
+    } finally {
+      this._isPickingFile = false;
+    }
+  },
+
+  async inspectAndLoadFile(filePath, fileName, fileSize = 0, fileFormat = '') {
     const analyzingCard = document.getElementById('import-analyzing-card');
+    const analyzingTitle = document.getElementById('import-analyzing-title');
     const fileCard = document.getElementById('import-selected-file-card');
     const pickBtn = document.getElementById('btn-import-pick-file');
 
     try {
-      if (analyzingCard) analyzingCard.classList.remove('hidden');
+      // Afficher l'animation de chargement UNIQUEMENT durant l'analyse effective
+      if (analyzingCard) {
+        if (analyzingTitle && fileName) {
+          analyzingTitle.textContent = `Analyse de ${fileName} en cours...`;
+        }
+        analyzingCard.classList.remove('hidden');
+      }
       if (fileCard) fileCard.classList.add('hidden');
       if (pickBtn) {
         pickBtn.disabled = true;
         pickBtn.innerHTML = `<div class="analyzing-spinner-ring" style="width: 16px; height: 16px; border-width: 2px;"></div><span>Analyse du document...</span>`;
       }
 
-      const res = await API.call('pick_import_file');
-      if (!res || res.cancelled) return;
-      if (!res.success) {
-        alert(`Erreur de sélection : ${res.error}`);
+      const res = await API.call('inspect_import_source', filePath);
+      if (!res || !res.success) {
+        alert(`Erreur lors de l'analyse du document : ${res?.error || 'Format non reconnu'}`);
         return;
       }
 
-      this.filePath = res.file_path;
-      this.fileName = res.file_name;
-      this.fileSize = res.file_size || 0;
-      this.fileFormat = (res.format || '').toUpperCase();
+      this.filePath = res.file_path || filePath;
+      this.fileName = res.file_name || fileName;
+      this.fileSize = res.file_size || fileSize || 0;
+      this.fileFormat = (res.format || fileFormat || '').toUpperCase();
 
       // Afficher la fiche du fichier chargé à l'étape 1
       const badgeEl = document.getElementById('file-card-format-badge');
@@ -679,14 +705,14 @@ const ImportModal = {
       App.showToast(`Document analysé avec succès : ${info.title || this.fileName}`);
 
     } catch (e) {
-      console.error('Erreur pickFile:', e);
+      console.error('Erreur inspectAndLoadFile:', e);
+      alert(`Une erreur est survenue lors de l'analyse du fichier.`);
     } finally {
       if (analyzingCard) analyzingCard.classList.add('hidden');
       if (pickBtn) {
         pickBtn.disabled = false;
-        pickBtn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path></svg><span>📁 Parcourir mes fichiers...</span>`;
+        pickBtn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path></svg><span>Parcourir mes fichiers...</span>`;
       }
-      this._isPickingFile = false;
     }
   },
 

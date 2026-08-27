@@ -2643,15 +2643,24 @@ const TheolLatinGlossary = {
     if (!text) return '';
     let res = text;
 
-    // 1. Détection des livres / tomes / colonnes combinés (ex: l. II, t. 91, col. 108 3 ou t. XLV, col. 1575)
+    // 1. Détection des livres / tomes / colonnes combinés (ex: l. II, t. 91, col. 108 3 ou t. 1, p. 422 ou t. XLV, col. 1575)
     res = res.replace(/\b(?:(l\.|lib\.|livre)\s+([IVXLCDM\d]+)\s*,\s*)?(?:(t\.|tome)\s+([IVXLCDM\d]+))\s*,\s*(?:(col\.|colonne|p\.|page)\s*(\d+(?:\s+\d+)?))\b/gi, (match, lPrefix, lNum, tPrefix, tNum, cPrefix, cNum) => {
       const cleanCol = cNum.replace(/\s+/g, '');
       const isCol = cPrefix.toLowerCase().startsWith('col');
       const unitLabel = isCol ? 'colonne' : 'page';
+      const category = isCol ? 'Volume &amp; Colonne' : 'Volume &amp; Page';
       const libPart = lNum ? `Livre ${lNum}, ` : '';
       const titleAttr = `${libPart}Tome ${tNum}, ${unitLabel} ${cleanCol}`;
-      const descAttr = `Référence de volume et ${unitLabel} (notamment dans la Patrologie de Migne ou les grands répertoires théologiques).`;
-      return `<span class="theol-latin-gloss" data-gloss-term="${TheologyView.escapeHtml(match)}" data-gloss-full="${TheologyView.escapeHtml(titleAttr)}" data-gloss-cat="Volume &amp; Colonne" data-gloss-desc="${TheologyView.escapeHtml(descAttr)}">${match}</span>`;
+      const descAttr = `Référence au tome ${tNum}, ${unitLabel} ${cleanCol} de l'ouvrage cité.`;
+      return `<span class="theol-latin-gloss" data-gloss-term="${TheologyView.escapeHtml(match)}" data-gloss-full="${TheologyView.escapeHtml(titleAttr)}" data-gloss-cat="${category}" data-gloss-desc="${TheologyView.escapeHtml(descAttr)}">${match}</span>`;
+    });
+
+    // 1b. Détection des colonnes isolées (ex: col. 1084)
+    res = res.replace(/\b(?<!t\.\s*\d+\s*,\s*|tome\s*\d+\s*,\s*)(col\.|colonne)\s*(\d+(?:\s+\d+)?)\b/gi, (match, cPrefix, cNum) => {
+      const cleanCol = cNum.replace(/\s+/g, '');
+      const titleAttr = `Colonne ${cleanCol}`;
+      const descAttr = `Référence à la colonne ${cleanCol} dans le dictionnaire ou l'ouvrage cité.`;
+      return `<span class="theol-latin-gloss" data-gloss-term="${TheologyView.escapeHtml(match)}" data-gloss-full="${TheologyView.escapeHtml(titleAttr)}" data-gloss-cat="Colonne" data-gloss-desc="${TheologyView.escapeHtml(descAttr)}">${match}</span>`;
     });
 
     // 2. Détection des formules enregistrées dans le glossaire
@@ -2722,7 +2731,7 @@ const LatinGlossTooltip = {
 
     this.tooltipEl.innerHTML = `
       <div class="theol-latin-popover-header">
-        <span class="theol-latin-popover-badge">🏛️ ${TheologyView.escapeHtml(cat)}</span>
+        <span class="theol-latin-popover-badge">${TheologyView.escapeHtml(cat)}</span>
       </div>
       <div class="theol-latin-popover-term">${TheologyView.escapeHtml(full)}</div>
       ${desc ? `<div class="theol-latin-popover-desc">${TheologyView.escapeHtml(desc)}</div>` : ''}

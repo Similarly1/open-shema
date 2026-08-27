@@ -1041,18 +1041,18 @@ const DictView = {
 
     // 1. Normalisation des références bibliques et conversion des chiffres romains
     if (this.optConvertRoman) {
-      // Vulgate avec crochets : (IV Reg. [II Rois], XXIII, 29-30)
-      processed = processed.replace(/([I|V|X|1-4\s]*\*?[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç\.]+\*?)\s*\[([^\]]+)\]\s*,\s*([IVXLCDM0-9]+)\s*,\s*([0-9]+(?:\s*(?:,|et|\-|\–)\s*[0-9]+)*)/gi, (match, rawB, bkAlias, romCh, verses) => {
+      // Vulgate avec crochets : (IV Reg. [II Rois], XXIII, 29-30) ou (*IV Reg.* [II Rois], XXIII, 29-30)
+      processed = processed.replace(/(^|[^\wÀ-ÿ*])(?:\*+)?([I|V|X|1-4\s]*[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç\.]+)(?:\*+)?\s*\[([^\]]+)\]\s*,\s*([IVXLCDM0-9]+)\s*,\s*([0-9]+(?:\s*(?:,|et|\-|\–)\s*[0-9]+)*)/gi, (match, prefix, rawB, bkAlias, romCh, verses) => {
         const kAlias = cleanBookKey(bkAlias);
         const kRaw = cleanBookKey(rawB);
         const bookFr = BOOK_ALIASES[kAlias] || BOOK_ALIASES[kRaw] || bkAlias;
         const chNum = ROMAN_MAP[romCh.toUpperCase()] || romCh;
         const cleanV = verses.replace(/et\s+/g, '').replace(/–/g, '-').replace(/\s+/g, '');
-        return `${bookFr} ${chNum}:${cleanV}`;
+        return `${prefix}${bookFr} ${chNum}:${cleanV}`;
       });
 
-      // Classiques avec chiffres romains et versets multiples (ex: Ps. XXXIII, 10-11 ou Ézéch., XVIII, 7, 16 ou 1 Samuel, VII, 11 ou Tob., I, 20)
-      processed = processed.replace(/(^|[^\wÀ-ÿ])((?:I{1,3}|IV|[1-4])\s*[\*A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç\.]+|[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç\.]+)(?:\*+)?\s*[\.,]*\s*([IVXLCDM]+)\s*,\s*([0-9]+(?:\s*(?:,|et|\-|\–)\s*[0-9]+)*)/gi, (match, prefix, rawB, romCh, verses) => {
+      // Classiques avec chiffres romains et versets multiples (ex: Ps. XXXIII, 10-11 ou *Isaïe* XLIV, 14 ou (*Daniel* XIII, 58) ou Ézéch., XVIII, 7, 16)
+      processed = processed.replace(/(^|[^\wÀ-ÿ*])(?:\*+)?((?:I{1,3}|IV|[1-4])\s*[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç\.]+|[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç\.]+)(?:\*+)?\s*[\.,]*\s*([IVXLCDM]+)\s*,\s*([0-9]+(?:\s*(?:,|et|\-|\–)\s*[0-9]+)*)/gi, (match, prefix, rawB, romCh, verses) => {
         const k = cleanBookKey(rawB);
         const bookFr = BOOK_ALIASES[k];
         const chNum = ROMAN_MAP[romCh.toUpperCase()];
@@ -1073,14 +1073,14 @@ const DictView = {
         return match;
       });
 
-      // Contextuelles : Ézéchiel (VIII, 14) -> Ézéchiel 8:14
-      processed = processed.replace(/\b([A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+)\s*\(([IVXLCDM]+)\s*,\s*([0-9]+(?:\s*[\-–]\s*[0-9]+)?)\)/gi, (match, rawB, romCh, verses) => {
+      // Contextuelles : Ézéchiel (VIII, 14) ou *Ézéchiel* (VIII, 14) -> Ézéchiel 8:14
+      processed = processed.replace(/(^|[^\wÀ-ÿ*])(?:\*+)?([A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç]+)(?:\*+)?\s*\(([IVXLCDM]+)\s*,\s*([0-9]+(?:\s*[\-–]\s*[0-9]+)?)\)/gi, (match, prefix, rawB, romCh, verses) => {
         const k = cleanBookKey(rawB);
         const bookFr = BOOK_ALIASES[k];
         if (bookFr) {
           const chNum = ROMAN_MAP[romCh.toUpperCase()] || romCh;
           const cleanV = verses.replace(/–/g, '-').replace(/\s+/g, '');
-          return `${bookFr} ${chNum}:${cleanV}`;
+          return `${prefix}${bookFr} ${chNum}:${cleanV}`;
         }
         return match;
       });
@@ -1422,8 +1422,14 @@ const DictView = {
             if (parenMatch) {
               word = parenMatch[1].trim();
               const inner = parenMatch[2].trim();
-              if (/(?:colonne|col\.|tome|t\.|p\.|page|vol\.|volume)\s*[0-9IVXLCDM]+/i.test(inner)) {
-                meta = inner;
+              const metaRegex = /(?:(?:tome|t\.|vol\.|volume)\s*[0-9IVXLCDM]+(?:\s*,\s*)?)?(?:colonne|col\.|page|p\.)\s*\d+(?:\s+\d+)?|(?:tome|t\.|vol\.|volume)\s*[0-9IVXLCDM]+/i;
+              const metaMatch = inner.match(metaRegex);
+              if (metaMatch) {
+                meta = metaMatch[0].trim();
+                const textWithoutMeta = inner.replace(metaMatch[0], '').replace(/^[,\s–—;]+|[,\s–—;]+$/g, '').trim();
+                if (textWithoutMeta) {
+                  qualifier = textWithoutMeta;
+                }
               } else {
                 qualifier = inner;
               }
@@ -1439,16 +1445,23 @@ const DictView = {
             const linksHtml = parsedTargets.map(t => {
               const isColOrTome = /^(?:colonne|col\.|tome|t\.|p\.|page)\s*\d+/i.test(t.word);
               if (isColOrTome) {
-                return `<span class="dict-see-meta" style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; opacity: 0.85;">🔗 ${this.escapeHtml(t.word)}</span>`;
+                const cleanMetaWord = (typeof TheolLatinGlossary !== 'undefined') ? TheolLatinGlossary.annotate(t.word) : this.escapeHtml(t.word);
+                return `<span class="dict-see-meta">${cleanMetaWord}</span>`;
               }
-              const displayLabel = t.qualifier ? `${t.word} (${t.qualifier})` : t.word;
-              const metaHtml = t.meta ? ` <span class="dict-see-meta" title="Volume et Colonne">📖 ${this.escapeHtml(t.meta)}</span>` : '';
+              const displayLabel = t.word;
+              const qualifierHtml = t.qualifier ? ` <span class="dict-see-qualifier" style="font-size: 13px; color: var(--text-secondary); font-style: italic;">(${this.escapeHtml(t.qualifier)})</span>` : '';
+              let metaHtml = '';
+              if (t.meta) {
+                const annotatedMeta = (typeof TheolLatinGlossary !== 'undefined') ? TheolLatinGlossary.annotate(t.meta) : this.escapeHtml(t.meta);
+                metaHtml = ` <span class="dict-see-meta">${annotatedMeta}</span>`;
+              }
               return `
                 <span class="dict-cross-ref-item" style="display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                   <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(t.word)}">
                     <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
                     <span>${this.escapeHtml(displayLabel)}</span>
                   </a>
+                  ${qualifierHtml}
                   ${metaHtml}
                 </span>
               `;

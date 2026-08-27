@@ -16801,6 +16801,12 @@ body.palette-dark-slate .dict-source-badge:hover {
   font-family: var(--font-sans, system-ui, sans-serif);
 }
 
+.dict-see-qualifier {
+  font-size: 13px;
+  color: var(--text-secondary, #64748b);
+  font-style: italic;
+}
+
 body.theme-dark .dict-see-meta,
 body.palette-dark-slate .dict-see-meta {
   background: rgba(148, 163, 184, 0.12);
