@@ -2562,7 +2562,15 @@ class BibleAppApi:
                 info = {"title": file_base, "chapters": [{"title": file_base, "include": True, "size": 0}]}
 
         elif ext == '.docx':
-            info = {"title": file_base, "chapters": [{"title": file_base, "include": True, "size": 0}]}
+            from core.bible_docx_importer import BibleDocxImporter
+            if BibleDocxImporter.is_logos_bible_docx(file_path):
+                try:
+                    info = BibleDocxImporter.inspect_bible_docx(file_path)
+                except Exception as e:
+                    logger.warning(f"Erreur inspection Logos DOCX: {e}")
+                    info = {"title": file_base, "chapters": [{"title": file_base, "include": True, "size": 0}]}
+            else:
+                info = {"title": file_base, "chapters": [{"title": file_base, "include": True, "size": 0}]}
             
         elif ext in ['.json', '.csv']:
             info = {"title": file_base, "chapters": []}
@@ -2597,6 +2605,10 @@ class BibleAppApi:
         is_bible = False
         if ext in ['.json', '.csv'] and not has_non_bible_kw:
             is_bible = True
+        elif ext == '.docx':
+            from core.bible_docx_importer import BibleDocxImporter
+            if (reg_match and not has_non_bible_kw and not has_author) or info.get("is_bible") or BibleDocxImporter.is_logos_bible_docx(file_path):
+                is_bible = True
         elif ext == '.epub':
             # Un EPUB n'est une Bible que s'il s'agit d'une édition intégrale de la Bible sans auteur d'essai
             if reg_match and not has_non_bible_kw and not has_author:
