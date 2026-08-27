@@ -1253,6 +1253,8 @@ const DictView = {
         const lower = inner.toLowerCase();
         // Éviter les faux positifs sur les badges de versions bibliques déjà balisés
         if (inner.includes('dict-version-badge')) return match;
+        // Éviter de transformer les renvois vers des figures ou planches (ex: Voir fig. 55, col. 300)
+        if (/^(?:voir\s+)?(?:fig\b|fig\.|figure|planche|pl\b|pl\.|carte)/i.test(inner.trim())) return match;
         // Ne pas transformer les parenthèses situées sur une ligne de renvoi 'Voir' ou 'Voir aussi'
         const lineStart = fullStr.lastIndexOf('\n', offset);
         const currentLine = fullStr.slice(lineStart === -1 ? 0 : lineStart + 1, offset);
@@ -1551,13 +1553,23 @@ const DictView = {
           if (inUlList) { out.push('</ul>'); inUlList = false; }
           if (inSeeList) { out.push('</ul>'); inSeeList = false; }
 
+          let inArticleIntro = '';
+          let cleanTargetStr = rawTargetStr;
+          const inArticleMatch = rawTargetStr.match(/^(.*?)\s+(?:dans|à|sous)\s+l['’]article(?:\s+de)?\s+([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]+?)(?:\s+([0-9IVXLCDM]+.*|[,\.\(].*))?$/i);
+          if (inArticleMatch) {
+            inArticleIntro = inArticleMatch[1].trim();
+            const targetWord = inArticleMatch[2].trim();
+            const extraMeta = inArticleMatch[3] ? inArticleMatch[3].trim() : '';
+            cleanTargetStr = extraMeta ? `${targetWord} (${extraMeta})` : targetWord;
+          }
+
           // Découpage intelligent respectant les parenthèses et crochets
           const rawChunks = [];
           let currentChunk = [];
           let parenDepth = 0;
           let bracketDepth = 0;
 
-          for (let i = 0; i < rawTargetStr.length; i++) {
+          for (let i = 0; i < cleanTargetStr.length; i++) {
             const char = rawTargetStr[i];
             if (char === '(') parenDepth++;
             else if (char === ')') parenDepth = Math.max(0, parenDepth - 1);
@@ -1644,31 +1656,49 @@ const DictView = {
 
             // OPTION B (Spécifique Vigouroux) : Fusion dans une boîte « Étude approfondie & Notice liée »
             let mergedOptionB = false;
-            if (isVigouroux && out.length > 0) {
-              const lastOut = out[out.length - 1];
-              const pMatch = lastOut.match(/^<p style="[^"]*">(.*?)<\/p>$/);
-              if (pMatch) {
-                let pText = pMatch[1].trim();
-                const isNotBiblio = !['référence', 'source', 'auteur', 'biblio'].some(k => pText.toLowerCase().includes(k));
-                const isIntroPattern = isNotBiblio && (/^(?:Pour (?:une étude|l['’]étude|en savoir plus)|Sur la signification|Ce terme désigne|Consulter également|Pour la symbolique|\*+\s*Exégèse)/i.test(pText) || pText.endsWith(',') || pText.endsWith(':'));
-                if (isIntroPattern) {
-                  // Nettoyer la ponctuation terminale
-                  let cleanIntro = pText.replace(/[,\s]+$/, ' :');
-                  if (!cleanIntro.endsWith(':') && !cleanIntro.endsWith('.')) cleanIntro += ' :';
-                  out.pop(); // Retirer le paragraphe précédent pour le fusionner
-                  out.push(`
-                    <div class="dict-related-notice-box">
-                      <div class="dict-related-notice-header">
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-                        <span>Étude approfondie &amp; Notice liée</span>
-                      </div>
-                      <div class="dict-related-notice-body">
-                        <p class="dict-related-intro">${cleanIntro}</p>
-                        <div class="dict-related-actions">${linksHtml}</div>
-                      </div>
+            if (isVigouroux) {
+              if (inArticleIntro) {
+                let cleanIntro = inArticleIntro.replace(/[,\s]+$/, ' :');
+                if (!cleanIntro.endsWith(':') && !cleanIntro.endsWith('.')) cleanIntro += ' :';
+                out.push(`
+                  <div class="dict-related-notice-box">
+                    <div class="dict-related-notice-header">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                      <span>Étude approfondie &amp; Notice liée</span>
                     </div>
-                  `);
-                  mergedOptionB = true;
+                    <div class="dict-related-notice-body">
+                      <p class="dict-related-intro">${cleanIntro}</p>
+                      <div class="dict-related-actions">${linksHtml}</div>
+                    </div>
+                  </div>
+                `);
+                mergedOptionB = true;
+              } else if (out.length > 0) {
+                const lastOut = out[out.length - 1];
+                const pMatch = lastOut.match(/^<p style="[^"]*">(.*?)<\/p>$/);
+                if (pMatch) {
+                  let pText = pMatch[1].trim();
+                  const isNotBiblio = !['référence', 'source', 'auteur', 'biblio'].some(k => pText.toLowerCase().includes(k));
+                  const isIntroPattern = isNotBiblio && (/^(?:Pour (?:une étude|l['’]étude|en savoir plus)|Sur la signification|Ce terme désigne|Consulter également|Pour la symbolique|\*+\s*Exégèse)/i.test(pText) || pText.endsWith(',') || pText.endsWith(':'));
+                  if (isIntroPattern) {
+                    // Nettoyer la ponctuation terminale
+                    let cleanIntro = pText.replace(/[,\s]+$/, ' :');
+                    if (!cleanIntro.endsWith(':') && !cleanIntro.endsWith('.')) cleanIntro += ' :';
+                    out.pop(); // Retirer le paragraphe précédent pour le fusionner
+                    out.push(`
+                      <div class="dict-related-notice-box">
+                        <div class="dict-related-notice-header">
+                          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                          <span>Étude approfondie &amp; Notice liée</span>
+                        </div>
+                        <div class="dict-related-notice-body">
+                          <p class="dict-related-intro">${cleanIntro}</p>
+                          <div class="dict-related-actions">${linksHtml}</div>
+                        </div>
+                      </div>
+                    `);
+                    mergedOptionB = true;
+                  }
                 }
               }
             }
