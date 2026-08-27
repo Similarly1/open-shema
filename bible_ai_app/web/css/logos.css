@@ -17034,7 +17034,7 @@ body.reading-bg-sepia .theol-latin-popover-badge {
   border-radius: 4px;
 }
 
-/* Encre noire naturelle par défaut sur tous les fonds clairs, sépia et thèmes vintage */
+/* Encre noire naturelle par défaut */
 .dict-article-img {
   max-width: 100%;
   height: auto;
@@ -17049,23 +17049,22 @@ body.reading-bg-sepia .theol-latin-popover-badge {
   transform: scale(1.02);
 }
 
-/* Inversion en blanc UNIQUEMENT en vrai mode sombre sans thème vintage ni fond clair */
-body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-parchment):not(.reading-bg-paper):not(.reading-bg-white) .dict-article-card:not([class*="vintage-epoch-"]) .dict-article-img,
-body.palette-dark-slate:not(.reading-bg-sepia):not(.reading-bg-parchment):not(.reading-bg-paper):not(.reading-bg-white) .dict-article-card:not([class*="vintage-epoch-"]) .dict-article-img,
-body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-parchment):not(.reading-bg-paper):not(.reading-bg-white) .dict-view-main-scroll:not([class*="vintage-epoch-"]) .dict-article-img,
-body.palette-dark-slate:not(.reading-bg-sepia):not(.reading-bg-parchment):not(.reading-bg-paper):not(.reading-bg-white) .dict-view-main-scroll:not([class*="vintage-epoch-"]) .dict-article-img {
-  filter: invert(1) brightness(0.92) contrast(1.05);
+/* 1. Inversion en BLANC LUMINEUX en Mode Sombre (Dark & Dark Slate) sauf si fond sépia/papier sélectionné */
+body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-parchment):not(.reading-bg-paper):not(.reading-bg-white) .dict-article-img,
+body.palette-dark-slate:not(.reading-bg-sepia):not(.reading-bg-parchment):not(.reading-bg-paper):not(.reading-bg-white) .dict-article-img {
+  filter: invert(1) brightness(0.92) contrast(1.05) !important;
 }
 
-/* Force absolue de l'encre noire sur tout fond sépia, parchemin, papier ou thème d'époque vintage */
+/* 2. Encre NOIRE stricte sur fond Clair, Sépia, Parchemin ou Papier */
 body.theme-light .dict-article-img,
 body.reading-bg-sepia .dict-article-img,
 body.reading-bg-parchment .dict-article-img,
 body.reading-bg-paper .dict-article-img,
 body.reading-bg-white .dict-article-img,
-[class*="reading-bg-"] .dict-article-img,
-[class*="vintage-epoch-"] .dict-article-img,
-.vintage-theme-active .dict-article-img {
+.reading-bg-sepia .dict-article-img,
+.reading-bg-parchment .dict-article-img,
+.reading-bg-paper .dict-article-img,
+.reading-bg-white .dict-article-img {
   filter: none !important;
 }
 
@@ -17090,18 +17089,33 @@ body.palette-dark-slate .dict-article-figure:hover {
   font-family: var(--font-sans, system-ui, sans-serif);
 }
 
+body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-parchment) .dict-article-figcaption,
+body.palette-dark-slate:not(.reading-bg-sepia):not(.reading-bg-parchment) .dict-article-figcaption {
+  color: #cbd5e1;
+}
+
 .dict-fig-badge {
   display: inline-block;
   font-style: normal;
   font-size: 11px;
   font-weight: 700;
-  color: #6366f1;
+  color: #4f46e5;
   background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.2);
   padding: 1px 6px;
   border-radius: 4px;
-  margin-right: 4px;
+  margin-right: 5px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
+}
+
+/* Badge Fig. lumineux et bien lisible en mode sombre */
+body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-parchment) .dict-fig-badge,
+body.palette-dark-slate:not(.reading-bg-sepia):not(.reading-bg-parchment) .dict-fig-badge {
+  color: #a5b4fc;
+  background: rgba(99, 102, 241, 0.28);
+  border-color: rgba(165, 180, 252, 0.35);
+  text-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
 }
 
 /* LightBox Modal pour Visionneuse HD */
