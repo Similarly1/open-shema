@@ -1072,6 +1072,19 @@ const DictView = {
       .replace(/\[\[@(?:Topic|Article):([^\]]+)\]\]/gi, 'Voir : $1')
       .replace(/\[\[@Strong:([HG]\d+)\]\]/gi, 'Strong $1');
 
+    // 0c. Conversion des Liens Markdown [Label](#) et [Label](URL)
+    processed = processed.replace(/\[([^\]]+)\]\(([^)]*)\)/g, (match, label, href) => {
+      const cleanHref = (href || '').trim();
+      const cleanLabel = label.trim();
+      if (!cleanHref || cleanHref === '#' || cleanHref.startsWith('dict:') || cleanHref.startsWith('#dict-')) {
+        const cleanWord = cleanLabel.replace(/[*_`]+/g, '').trim();
+        return `<a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(cleanWord)}">${this.escapeHtml(cleanLabel)}</a>`;
+      } else if (/^https?:\/\//i.test(cleanHref)) {
+        return `<a href="${this.escapeHtml(cleanHref)}" target="_blank" rel="noopener noreferrer">${this.escapeHtml(cleanLabel)}</a>`;
+      }
+      return match;
+    });
+
     // 0b. Restructuration Automatique des textes bruts (Logos / NDB)
     if (this.optLogosRestructure) {
       // Badges de versions bibliques (exclure TOB suivi de ponctuation de versets pour ne pas casser le livre de Tobie)

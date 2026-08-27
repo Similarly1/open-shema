@@ -38,6 +38,7 @@ Règles impératives de restauration :
 
 5. Renvois et Références Croisées (Voir aussi) :
    - Pour tous les renvois vers d'autres articles du dictionnaire (ex: 'Voir : BETH', 'Voir aussi : TORCHE', 'Voir : CHÊNE (tome II, colonne 654)'), formate clairement sous la forme `*Voir* : **NOM_ARTICLE**` ou `*Voir aussi* : **NOM_ARTICLE** (tome X, colonne Y)` sans inclure les tomes ou parenthèses dans le nom en gras.
+   - N'utilise JAMAIS de syntaxe de lien Markdown factice avec un dièse comme `[NOM](#)` ; utilise exclusivement `*Voir aussi* : **NOM**`.
    - Ne termine JAMAIS une phrase introductive par une virgule orpheline avant un renvoi `*Voir* :` ; termine toujours la phrase introductive par un point `.` ou deux-points `:`.
    - Ne laisse JAMAIS de ligne orpheline `*Voir aussi* :` vide.
 
