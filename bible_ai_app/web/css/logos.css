@@ -2570,15 +2570,69 @@ input:checked + .slider.round:before {
    5. VUE PARAMÈTRES
    ========================================================================== */
 
-.settings-nav-tabs {
-  height: 38px;
+.settings-tabs-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
   background-color: var(--bg-sidebar);
   border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.settings-nav-tabs {
+  height: 38px;
   display: flex;
   padding: 0 16px;
   gap: 4px;
-  flex-shrink: 0;
+  flex: 1;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
 }
+
+.settings-nav-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.settings-tabs-scroll-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  transition: all 0.15s ease;
+}
+
+.settings-tabs-scroll-btn:hover {
+  background: var(--accent-primary, #3b82f6);
+  color: #ffffff;
+  border-color: var(--accent-primary, #3b82f6);
+}
+
+.settings-tabs-scroll-btn.hidden {
+  display: none !important;
+}
+
+.settings-tabs-scroll-left {
+  left: 4px;
+}
+
+.settings-tabs-scroll-right {
+  right: 4px;
+}
+
 .settings-tab {
   height: 100%;
   padding: 0 14px;

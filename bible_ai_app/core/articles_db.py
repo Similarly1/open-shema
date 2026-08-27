@@ -100,10 +100,15 @@ class ArticlesDB:
             cursor = conn.cursor()
             curated_ids = [s["id"] for s in curated_sources]
             
-            # Désactiver les sources absentes du fichier de config
-            cursor.execute("UPDATE sources SET is_enabled = 0 WHERE id NOT IN ({})".format(
-                ",".join("?" for _ in curated_ids) if curated_ids else "''"
-            ), curated_ids)
+            # Supprimer les anciennes sources obsolètes sans aucun article
+            if curated_ids:
+                placeholders = ",".join("?" for _ in curated_ids)
+                cursor.execute(f"""
+                    DELETE FROM sources 
+                    WHERE id NOT IN ({placeholders}) 
+                      AND (SELECT COUNT(*) FROM articles WHERE source_id = sources.id) = 0
+                """, curated_ids)
+                cursor.execute(f"UPDATE sources SET is_enabled = 0 WHERE id NOT IN ({placeholders})", curated_ids)
 
             for src in curated_sources:
                 cursor.execute("SELECT id, is_enabled FROM sources WHERE id = ?", (src["id"],))

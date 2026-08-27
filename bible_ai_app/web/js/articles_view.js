@@ -92,12 +92,24 @@ const ArticlesView = {
     if (s.includes('tpsg') || s.includes('toutpoursagloire')) {
       return 'img/sources/tpsg.svg';
     }
+    if (s.includes('e21') || s.includes('evangile21') || s.includes('gospelcoalition')) {
+      return 'img/sources/e21.svg';
+    }
     return null;
+  },
+
+  // Préférences de synchronisation des flux RSS
+  syncOpts: {
+    frequency: 'startup', // 'manual' | 'startup' | 'interval'
+    intervalDays: 3,
+    lastSyncTimestamp: null
   },
 
   init() {
     this.loadReadingPreferences();
+    this.loadSyncPreferences();
     this.bindEvents();
+    this.checkAutoSync();
   },
 
   loadReadingPreferences() {
@@ -107,7 +119,7 @@ const ArticlesView = {
         this.readingOpts = { ...this.readingOpts, ...JSON.parse(saved) };
       }
     } catch (e) {
-      console.warn('[ArticlesView] Erreur lecture préférences:', e);
+      console.warn('[ArticlesView] Erreur lecture préférences lecture:', e);
     }
   },
 
@@ -115,6 +127,60 @@ const ArticlesView = {
     try {
       localStorage.setItem('open_shema_article_reading_opts', JSON.stringify(this.readingOpts));
     } catch (e) {}
+  },
+
+  loadSyncPreferences() {
+    try {
+      const saved = localStorage.getItem('open_shema_articles_sync_opts');
+      if (saved) {
+        this.syncOpts = { ...this.syncOpts, ...JSON.parse(saved) };
+      }
+    } catch (e) {
+      console.warn('[ArticlesView] Erreur lecture préférences synchronisation:', e);
+    }
+  },
+
+  saveSyncPreferences(partialOpts = null) {
+    try {
+      if (partialOpts) {
+        this.syncOpts = { ...this.syncOpts, ...partialOpts };
+      }
+      localStorage.setItem('open_shema_articles_sync_opts', JSON.stringify(this.syncOpts));
+      
+      // Synchroniser le sélecteur dans la page de paramètres généraux si présent
+      const generalSelect = document.getElementById('cfg-articles-sync-freq-select');
+      if (generalSelect) {
+        generalSelect.value = this.syncOpts.frequency === 'interval' 
+          ? String(this.syncOpts.intervalDays || 3) 
+          : this.syncOpts.frequency;
+      }
+    } catch (e) {}
+  },
+
+  checkAutoSync() {
+    const opts = this.syncOpts;
+    if (!opts || opts.frequency === 'manual') return;
+
+    if (opts.frequency === 'startup') {
+      // Déclenchement discret en arrière-plan 2.5 secondes après le démarrage
+      setTimeout(() => {
+        this.syncArticles(true);
+      }, 2500);
+      return;
+    }
+
+    if (opts.frequency === 'interval') {
+      const intervalDays = parseInt(opts.intervalDays, 10) || 3;
+      const intervalMs = intervalDays * 24 * 60 * 60 * 1000;
+      const lastSync = opts.lastSyncTimestamp ? parseInt(opts.lastSyncTimestamp, 10) : 0;
+      const elapsed = Date.now() - lastSync;
+
+      if (elapsed >= intervalMs) {
+        setTimeout(() => {
+          this.syncArticles(true);
+        }, 3000);
+      }
+    }
   },
 
   bindEvents() {
@@ -129,19 +195,39 @@ const ArticlesView = {
       }, 300);
     });
 
-    // 2. Bouton Synchroniser
+    // 2. Bouton Synchroniser manuel
     document.getElementById('btn-sync-articles')?.addEventListener('click', () => {
-      this.syncArticles();
+      this.syncArticles(false);
     });
 
-    // 2b. Bouton Réglages RAG (Routage direct vers l'onglet IA + scroll automatique)
+    // 2b. Bouton Réglages des articles (Ouvre la modale de réglages et de synchronisation)
     document.getElementById('btn-articles-settings')?.addEventListener('click', () => {
-      if (typeof App !== 'undefined' && App.switchView) {
-        App.switchView('settings');
-        if (typeof SettingsView !== 'undefined' && SettingsView.switchToSection) {
-          SettingsView.switchToSection('ai', 'sec-articles-rag-settings');
+      this.openSettingsModal();
+    });
+
+    // 2c. Contrôles de la modale de réglages
+    document.getElementById('btn-close-articles-settings')?.addEventListener('click', () => {
+      this.closeSettingsModal();
+    });
+    document.getElementById('btn-cancel-articles-settings')?.addEventListener('click', () => {
+      this.closeSettingsModal();
+    });
+    document.getElementById('btn-save-articles-settings')?.addEventListener('click', () => {
+      this.saveSettingsModal();
+    });
+    document.getElementById('btn-modal-trigger-sync')?.addEventListener('click', () => {
+      this.syncArticles(false);
+    });
+
+    // Écoute des changements de radio de fréquence pour afficher/masquer le sélecteur d'intervalle
+    document.querySelectorAll('input[name="articles-sync-freq"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        const intervalWrap = document.getElementById('articles-interval-wrap');
+        if (intervalWrap) {
+          intervalWrap.style.opacity = e.target.value === 'interval' ? '1' : '0.5';
+          intervalWrap.style.pointerEvents = e.target.value === 'interval' ? 'auto' : 'none';
         }
-      }
+      });
     });
 
     // 3. Bouton Suggérer un blog (ouvre la modale)
@@ -358,14 +444,21 @@ const ArticlesView = {
     const container = document.getElementById('articles-sources-filters');
     if (!container) return;
 
+    // Filtrer les sources valides (activées ou possédant des articles)
+    const validSources = (this.sources || []).filter(s => 
+      s.is_enabled === 1 || s.is_enabled === true || (s.article_count || 0) > 0
+    );
+
+    const totalCount = validSources.reduce((acc, s) => acc + (s.article_count || 0), 0);
+
     let html = `
       <button class="source-filter-pill ${this.currentSourceFilter === 'ALL' ? 'active' : ''}" data-source-id="ALL">
         <span>Toutes les sources</span>
-        <span class="source-count">${this.sources.reduce((acc, s) => acc + (s.article_count || 0), 0)}</span>
+        <span class="source-count">${totalCount}</span>
       </button>
     `;
 
-    this.sources.forEach(src => {
+    validSources.forEach(src => {
       const isActive = this.currentSourceFilter === src.id;
       const logoUrl = this.getSourceLogo(src.id);
       const iconHtml = logoUrl 
@@ -727,7 +820,10 @@ const ArticlesView = {
       }
 
       // 3. Chapô / Introduction
-      const leadText = this.fixMojibake(art.lead_summary || art.summary || '');
+      let leadText = this.fixMojibake(art.lead_summary || art.summary || '');
+      leadText = leadText
+        .replace(/^(?:(?:\*\*)?\s*(?:Editors[’']\s*note|Note\s+de\s+l[’']éditeur|Editor[’']s\s+note|Note\s+de\s+la\s+rédaction|NDLR)\s*(?:\*\*)?\s*:?\s*\n*)+(?:Initialement\s+publié[^\n.]+[\.\s]*)?/gi, '')
+        .trim();
       if (leadText && leadEl) {
         let formattedLead = this.escapeHtml(leadText);
         if (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences) {
@@ -1097,6 +1193,13 @@ const ArticlesView = {
     if (viewReader) viewReader.classList.add('hidden');
     if (viewList) viewList.classList.remove('hidden');
     this.selectedArticleId = null;
+
+    // Remonter automatiquement tout en haut du conteneur de liste
+    const container = document.querySelector('.articles-view-container');
+    if (container) {
+      container.scrollTop = 0;
+    }
+    window.scrollTo(0, 0);
   },
 
   showFootnoteTooltip(e, num, text) {
@@ -1133,31 +1236,45 @@ const ArticlesView = {
     }
   },
 
-  async syncArticles() {
+  async syncArticles(isSilent = false) {
     if (this.isSyncing) return;
     this.isSyncing = true;
 
     const btn = document.getElementById('btn-sync-articles');
-    if (btn) {
+    const modalBtn = document.getElementById('btn-modal-trigger-sync');
+
+    if (!isSilent && btn) {
       btn.classList.add('loading');
       btn.innerHTML = `<div class="spinner-xs"></div><span>Synchronisation...</span>`;
     }
+    if (modalBtn) {
+      modalBtn.disabled = true;
+      modalBtn.innerHTML = `<div class="spinner-xs"></div><span>En cours...</span>`;
+    }
 
     try {
-      if (typeof App !== 'undefined' && App.showToast) {
+      if (!isSilent && typeof App !== 'undefined' && App.showToast) {
         App.showToast('Synchronisation des flux RSS en cours...', 'info');
       }
 
       const res = await API.call('sync_article_sources');
       if (res && res.success) {
         const totalNew = res.total_new || 0;
-        if (typeof App !== 'undefined' && App.showToast) {
-          App.showToast(`Synchronisation terminée : ${totalNew} nouvel(s) article(s).`, 'success');
+        this.syncOpts.lastSyncTimestamp = Date.now();
+        this.saveSyncPreferences();
+
+        this.updateLastSyncLabel();
+
+        if (totalNew > 0 && typeof App !== 'undefined' && App.showToast) {
+          App.showToast(`${totalNew} nouvel(s) article(s) théologique(s) synchronisé(s).`, 'success');
+        } else if (!isSilent && typeof App !== 'undefined' && App.showToast) {
+          App.showToast('Tous les flux sont déjà à jour.', 'info');
         }
+
         await this.loadSources();
         await this.loadArticles();
       } else {
-        if (typeof App !== 'undefined' && App.showToast) {
+        if (!isSilent && typeof App !== 'undefined' && App.showToast) {
           App.showToast('Erreur lors de la synchronisation des flux.', 'warning');
         }
       }
@@ -1176,6 +1293,80 @@ const ArticlesView = {
           <span>Synchroniser</span>
         `;
       }
+      if (modalBtn) {
+        modalBtn.disabled = false;
+        modalBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          <span>Synchroniser maintenant</span>
+        `;
+      }
+    }
+  },
+
+  updateLastSyncLabel() {
+    const lbl = document.getElementById('articles-last-sync-label');
+    if (!lbl) return;
+    if (!this.syncOpts.lastSyncTimestamp) {
+      lbl.textContent = 'Jamais synchronisé';
+      return;
+    }
+    const d = new Date(this.syncOpts.lastSyncTimestamp);
+    const day = String(d.getDate()).padStart(2, '0');
+    const monthNames = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
+    const month = monthNames[d.getMonth()];
+    const year = d.getFullYear();
+    const hours = String(d.getHours()).padStart(2, '0');
+    const mins = String(d.getMinutes()).padStart(2, '0');
+    lbl.textContent = `${day} ${month} ${year} à ${hours}:${mins}`;
+  },
+
+  openSettingsModal() {
+    const modal = document.getElementById('modal-articles-settings');
+    if (!modal) return;
+
+    const freq = this.syncOpts.frequency || 'startup';
+    const radio = document.querySelector(`input[name="articles-sync-freq"][value="${freq}"]`);
+    if (radio) radio.checked = true;
+
+    const intervalSelect = document.getElementById('articles-sync-interval-days');
+    if (intervalSelect) {
+      intervalSelect.value = String(this.syncOpts.intervalDays || 3);
+    }
+
+    const intervalWrap = document.getElementById('articles-interval-wrap');
+    if (intervalWrap) {
+      intervalWrap.style.opacity = freq === 'interval' ? '1' : '0.5';
+      intervalWrap.style.pointerEvents = freq === 'interval' ? 'auto' : 'none';
+    }
+
+    this.updateLastSyncLabel();
+    modal.classList.remove('hidden');
+  },
+
+  closeSettingsModal() {
+    const modal = document.getElementById('modal-articles-settings');
+    if (modal) modal.classList.add('hidden');
+  },
+
+  saveSettingsModal() {
+    const selectedRadio = document.querySelector('input[name="articles-sync-freq"]:checked');
+    const freq = selectedRadio ? selectedRadio.value : 'startup';
+    const intervalSelect = document.getElementById('articles-sync-interval-days');
+    const intervalDays = intervalSelect ? parseInt(intervalSelect.value, 10) || 3 : 3;
+
+    this.saveSyncPreferences({
+      frequency: freq,
+      intervalDays: intervalDays
+    });
+
+    this.closeSettingsModal();
+
+    if (typeof App !== 'undefined' && App.showToast) {
+      let msg = 'Préférences de synchronisation enregistrées.';
+      if (freq === 'startup') msg = 'Synchronisation automatique activée à chaque démarrage.';
+      else if (freq === 'interval') msg = `Synchronisation automatique programmée tous les ${intervalDays} jours.`;
+      else if (freq === 'manual') msg = 'Synchronisation configurée en mode manuel.';
+      App.showToast(msg, 'success');
     }
   },
 
@@ -1315,6 +1506,12 @@ const ArticlesView = {
     text = text.replace(/(?:^|\n)\s*\*?\s*(?:ℹ️|ℹ)\s*([^\n*]+?)\*?\s*(?=\n|$)/gi, '\n\n<div class="article-info-callout"><span>ℹ️</span><div>$1</div></div>\n\n');
     text = text.replace(/(?:^|\n)\s*\*\s*(?=\n|$)/g, '\n');
 
+    // 4b. Formater les bandeaux de note de la rédaction / Editors' note en début d'article
+    text = text.replace(/(?:^|\n)(?:(?:\*\*)?\s*(?:Editors[’']\s*note|Note\s+de\s+l[’']éditeur|Editor[’']s\s+note|Note\s+de\s+la\s+rédaction|NDLR)\s*(?:\*\*)?\s*:?\s*\n*)+(?:\*\*)?\s*(Initialement\s+publié\s+le[^\n*]+|[^\n]+?)\s*(?:\*\*)?(?=\n|$)/gi, (match, noteContent) => {
+      let clean = noteContent.replace(/^\*+\s*/, '').replace(/\*+$/, '').trim();
+      return `\n\n<div class="article-editors-note-banner"><strong>Editors’ note:</strong> ${clean}</div>\n\n`;
+    });
+
     // 5. Nettoyer les tirets initiaux sur les mentions éditoriales et normaliser les espaces (ex: "livreIl" -> "livre Il")
     text = text.replace(/(livre|ouvrage|série|revue|magazine|journal)([A-ZÀ-ÿ])/gi, '$1 $2');
     text = text.replace(/([.!?…»])\s*(Merci\s+à\s+[^\n]+pour\s+la\s+traduction|Article\s+original\s*:|Publié\s+pour\s+la\s+première\s+fois|Cet article\s+(?:fait partie|est extrait|est tiré|a été publié|provient|est une adaptation|est la traduction|est une traduction|est le premier|est le second|est le troisième|est basé)|Extrait du livre|Tiré du livre)/gi, '$1\n\n$2');
@@ -1335,7 +1532,22 @@ const ArticlesView = {
       return normalizeSuperscripts(match);
     });
 
-    // 5b. Détection et mise en valeur du cartouche éditorial de fin d'article (Option 3 : Badge contextuel dynamique, sans émoji/svg)
+    // 5b-1. Détection et mise en valeur des encadrés biographiques d'auteurs et de partenaires (ex: Ben Lattimore, SOLA)
+    const solaImg = 'https://media.thegospelcoalition.org/wp-content/uploads/sites/5/2023/03/17092830/327176131_865371428018991_2189346806125016085_n-300x300.jpg';
+    
+    // Encadré SOLA / Partenaire
+    text = text.replace(/(?:^|\n)(\*\*SOLA\*\*\s*[–—-]\s*La Coalition de l’Évangile[^\n]+(?:\n(?!\n)[^\n]+)*)/gi, (match, body) => {
+      return `\n\n<div class="article-author-bio-card"><div class="article-author-bio-avatar"><img src="${solaImg}" alt="SOLA" class="article-author-bio-img" loading="lazy"></div><div class="article-author-bio-content"><p>${body.trim()}</p></div></div>\n\n`;
+    });
+
+    // Encadré biographique d'auteur (ex: "Ben Lattimore est marié à...", "Wyatt Graham est le directeur...")
+    text = text.replace(/(?:^|\n)([A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+(?:\s+[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+){1,3}\s+est\s+(?:marié|pasteur|auteur|enseignant|théologien|directeur|fondateur|professeur|étudiant|membre|rédacteur|titulaire|responsable|doyen)[^\n]+(?:\n(?!\n)[^\n]+)*)/g, (match, body) => {
+      const authorName = body.split(/\s+est\s+/i)[0].trim();
+      const initial = authorName.charAt(0);
+      return `\n\n<div class="article-author-bio-card"><div class="article-author-bio-avatar"><span style="font-weight:700; font-size:18px; color:var(--accent-primary, #60a5fa);">${initial}</span></div><div class="article-author-bio-content"><p>${body.trim()}</p></div></div>\n\n`;
+    });
+
+    // 5b-2. Détection et mise en valeur du cartouche éditorial de fin d'article (Option 3 : Badge contextuel dynamique, sans émoji/svg)
     text = text.replace(
       /(?:^|\n\n+)((?:Merci\s+à\s+[^\n]+pour\s+la\s+traduction|Article\s+original\s*:|Cet article\s+(?:fait partie|est extrait|est tiré|a été publié|provient|est une adaptation|est la traduction|est une traduction|est le premier|est le second|est le troisième|est basé)|Extrait du livre|Tiré du livre)[\s\S]+?)(?=\n\n###|\n\n<|\s*$)/gi,
       (match, content) => {
@@ -1369,51 +1581,16 @@ const ArticlesView = {
       return `\n\n<blockquote class="article-bible-quote"><p>« ${quote} »</p><footer class="article-quote-author">${author.trim()}</footer></blockquote>\n\n`;
     });
 
-    // 5g. Détecter et formater les blocs de notes de bas de page avec ancres de retour [↩︎](#...)
-    const backlinkRegex = /\[(?:↩︎|↩)\]\(#[^)]+\)/;
-    if (backlinkRegex.test(text)) {
-      const segments = text.split(/\[(?:↩︎|↩)\]\(#[^)]+\)/);
-      let mainBody = segments[0];
-      let firstNote = '';
-      
-      const fnBoundaryMatch = mainBody.match(/^([\s\S]*[a-zA-ZÀ-ÿ]{2,}[.!?…»])\s+((?:[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+(?:\s+[A-ZÀ-ÖØ-ß]\.?)?\s+[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+|[A-ZÀ-ÿ*«]|Ibid)[\s\S]*?(?:ibid|éditions|editions|editor|publisher|press|university|chapitre|vol\.|tome|trad\.|pp?\.\s*\d+|p\.\s*\d+|19\d\d|20\d\d|op\.\s*cit|loc\.\s*cit)[\s\S]*)$/i);
-      if (fnBoundaryMatch) {
-        mainBody = fnBoundaryMatch[1];
-        firstNote = fnBoundaryMatch[2];
-      }
-      
-      const notes = [firstNote, ...segments.slice(1, -1)].map(s => s.trim()).filter(s => s.length > 0);
-      const trailing = segments[segments.length - 1] || '';
-      
-      const formattedNotes = notes.map((noteText, idx) => {
-        const num = idx + 1;
-        const cleanBody = normalizeSuperscripts(noteText.trim());
-        return `<div class="article-footnote-item" id="article-fn-${num}"><span class="article-footnote-num">${num}.</span><span class="article-footnote-text">${cleanBody}</span> <a href="#article-fnref-${num}" class="article-footnote-backlink" title="Retour au texte">↩</a></div>`;
-      }).join('\n\n');
-      
-      text = `${mainBody}\n\n${formattedNotes}\n\n${trailing}`;
-    }
-
-    // 5h. Détecter et formater les listes de notes de bas de page numérotées (1. Auteur, Ibid...)
-    text = text.replace(/(?:^|\n)(\d+)\.\s+([^\n]+(?:\n(?!\d+\.|\s*#|\s*---|\s*$)[^\n]+)*)/g, (match, num, body) => {
-      if (/ibid|éditions|editions|editor|publisher|press|university|chapitre|vol\.|tome|trad\.|pp\.\s*\d+|p\.\s*\d+|19\d\d|20\d\d|op\.\s*cit|loc\.\s*cit/i.test(body)) {
-        return `\n\n<div class="article-footnote-item" id="article-fn-${num}"><span class="article-footnote-num">${num}.</span><span class="article-footnote-text">${normalizeSuperscripts(body.trim())}</span> <a href="#article-fnref-${num}" class="article-footnote-backlink" title="Retour au texte">↩</a></div>\n\n`;
-      }
-      return match;
+    // 5g. Remplacer les appels de notes dans le texte: [[1]](#fn1), [[¹]](#fn1), [¹](#fn1), [1](#fn1), [^1]
+    text = text.replace(/\[(?:\[)?([0-9¹²³⁴⁵⁶⁷⁸⁹]+)\](?:\])?\(#(?:fn|article-fn|note|ftnt)[^)]*\)/gi, (match, n) => {
+      const num = parseInt(normalizeSuperscripts(n), 10);
+      return `<sup class="article-fn-badge" id="article-fnref-${num}"><a href="#article-fn-${num}" title="Note ${num}">${num}</a></sup>`;
     });
 
-    // 5i. Normaliser les années, plages de pages et grands nombres en exposant
-    text = text.replace(/(pp?\.\s*|[0-9]+[\s-]*)([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/gi, (match, prefix, sups) => {
-      return prefix + normalizeSuperscripts(sups);
-    });
-    text = text.replace(/([⁰¹²³⁴⁵⁶⁷⁸⁹]{3,})/g, (match) => {
-      return normalizeSuperscripts(match);
-    });
-
-    // 5j. Remplacer les vrais appels de note [^9] ou exposants isolés collés au texte (valeur <= 50)
     text = text.replace(/\[\^(\d+)\]/g, (match, num) => {
       return `<sup class="article-fn-badge" id="article-fnref-${num}"><a href="#article-fn-${num}" title="Note ${num}">${num}</a></sup>`;
     });
+
     text = text.replace(/([a-zA-ZÀ-ÿ»"'\).,;!?])\s*([⁰¹²³⁴⁵⁶⁷⁸⁹]{1,2})(?!\w)/g, (match, prevChar, sups) => {
       const num = parseInt(normalizeSuperscripts(sups), 10);
       if (num <= 50) {
@@ -1421,10 +1598,49 @@ const ArticlesView = {
       }
       return `${prevChar}${num}`;
     });
+
+    // Supprimer les espaces indésirables entre l'appel de note et la ponctuation suivante (ex: </sup> . -> </sup>.)
+    text = text.replace(/<\/sup>\s+([.,;:!?])/g, '</sup>$1');
+
+    // 5h. Joindre les numéros de notes séparés de leur texte par un saut de ligne (ex: "1.\nPaul David...")
+    text = text.replace(/(?:^|\n)(\d+)\.\s*\n+([^\n]+)/g, '\n$1. $2');
+
+    // 5i. Formater et nettoyer les liens d'URLs brutes dans les notes (ex: [https://...])
+    text = text.replace(/\[(https?:\/\/[^\]]+)\]/g, (match, url) => {
+      try {
+        const cleanUrl = url.split('?')[0];
+        const u = new URL(cleanUrl);
+        const host = u.hostname.replace(/^www\./, '');
+        return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" class="article-footnote-link">${host}</a>`;
+      } catch (e) {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="article-footnote-link">consulter la source</a>`;
+      }
+    });
+
+    // Éliminer les symboles de retour ↩ isolés sur leur propre ligne
+    text = text.replace(/(?:^|\n)\s*↩\s*(?=\n|$)/g, '\n');
+
+    // 5j. Détecter et formater les listes de notes de bas de page numérotées (1. Auteur, Ibid...)
+    text = text.replace(/(?:^|\n)(\d+)\.\s+([^\n]+(?:\n(?!\d+\.|\s*#|\s*---|\s*$)[^\n]+)*)/g, (match, num, body) => {
+      let cleanBody = normalizeSuperscripts(body.replace(/\s*↩\s*$/g, '').trim());
+      return `\n\n<div class="article-footnote-item" id="article-fn-${num}"><span class="article-footnote-num">${num}.</span><span class="article-footnote-text">${cleanBody}</span> <a href="#article-fnref-${num}" class="article-footnote-backlink" title="Retour au texte">↩</a></div>\n\n`;
+    });
+
+    // 5k. Envelopper la suite de <div class="article-footnote-item"> dans une section stylisée
+    text = text.replace(/(?:<div class="article-footnote-item"[\s\S]+?<\/div>(?:\s*|\n*))+/g, (match) => {
+      return `\n\n<div class="article-footnotes-section"><div class="article-footnotes-title"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg><span>Notes de bas de page</span></div><div class="article-footnotes-list">${match.trim()}</div></div>\n\n`;
+    });
+
+    // Normaliser les années, plages de pages et grands nombres en exposant
+    text = text.replace(/(pp?\.\s*|[0-9]+[\s-]*)([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/gi, (match, prefix, sups) => {
+      return prefix + normalizeSuperscripts(sups);
+    });
+    text = text.replace(/([⁰¹²³⁴⁵⁶⁷⁸⁹]{3,})/g, (match) => {
+      return normalizeSuperscripts(match);
+    });
+
     // Normaliser tout exposant orphelin restant en chiffre normal
     text = text.replace(/([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/g, (match) => normalizeSuperscripts(match));
-    // Supprimer les espaces indésirables entre l'appel de note et la ponctuation suivante
-    text = text.replace(/<\/sup>\s+([.,;:!?])/g, '</sup>$1');
 
     // 6. Nettoyer les émojis décoratifs résiduels
     text = text.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1FA70}-\u{1FAFF}]/gu, '');
@@ -1472,8 +1688,8 @@ const ArticlesView = {
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
-      // Rétablir les balises HTML injectées (dialogues, callouts, tables, blockquotes, footer auteur, notes, badges)
-      .replace(/&lt;(\/?(?:div|table|thead|tbody|tr|th|td|blockquote|footer|cite|p|sup|span|a)(?:\s+[a-zA-Z0-9_\-]+="[^"]*")*)(\s*\/)?&gt;/gi, '<$1$2>')
+      // Rétablir les balises HTML & SVG injectées (dialogues, callouts, tables, blockquotes, footer auteur, notes, badges, img, svg, strong, em)
+      .replace(/&lt;(\/?(?:div|table|thead|tbody|tr|th|td|blockquote|footer|cite|p|sup|span|a|img|svg|path|polyline|line|circle|rect|polygon|strong|em|b|i)(?:\s+[a-zA-Z0-9_\-]+(?:="[^"]*")*)*)(\s*\/)?&gt;/gi, '<$1$2>')
       .replace(/^#### (.*$)/gim, '<h4 class="article-h4">$1</h4>')
       .replace(/^### (.*$)/gim, '<h3 class="article-h3">$1</h3>')
       .replace(/^## (.*$)/gim, '<h2 class="article-h2">$1</h2>')
@@ -1495,6 +1711,11 @@ const ArticlesView = {
     if (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences) {
       html = TheologyView.highlightScriptureReferences(html);
     }
+
+    // Nettoyage des balises <p> autour des blocs structurés
+    html = html
+      .replace(/<p>\s*(<(?:div|blockquote|h1|h2|h3|h4|section)[\s\S]*?<\/(?:div|blockquote|h1|h2|h3|h4|section)>)\s*<\/p>/gi, '$1')
+      .replace(/<p>\s*<\/p>/gi, '');
 
     return `<div class="article-markdown-body"><p>${html}</p></div>`;
   },

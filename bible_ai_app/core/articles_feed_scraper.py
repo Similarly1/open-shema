@@ -416,6 +416,28 @@ class ArticlesFeedScraper:
                 lines.append("")
 
             elif tag_name in ["div", "section", "article"]:
+                classes = element.get("class", [])
+                class_str = " ".join(classes) if isinstance(classes, list) else str(classes)
+                if any(k in class_str for k in ["article_author_bio", "author-bio", "author_bio", "author-box", "post-author-box"]):
+                    img_url = ""
+                    bg_elem = element.find(attrs={"data-bg-image": True}) or element.find(attrs={"style": re.compile(r'background-image', re.I)})
+                    if bg_elem:
+                        bg_val = bg_elem.get("data-bg-image") or bg_elem.get("style", "")
+                        m = re.search(r'url\([\'"]?([^\'")]+)[\'"]?\)', bg_val)
+                        if m:
+                            img_url = m.group(1)
+                    if not img_url:
+                        img_tag = element.find("img")
+                        if img_tag:
+                            img_url = img_tag.get("src") or img_tag.get("data-src") or img_tag.get("data-lazy-src") or ""
+
+                    p_tag = element.find("p") or element
+                    bio_html = self._format_inline(p_tag).strip()
+                    if bio_html:
+                        avatar_html = f'<div class="article-author-bio-avatar"><img src="{img_url}" alt="" class="article-author-bio-img" loading="lazy"></div>' if img_url else ''
+                        lines.append(f'\n\n<div class="article-author-bio-card">{avatar_html}<div class="article-author-bio-content"><p>{bio_html}</p></div></div>\n\n')
+                    continue
+
                 sub_md = self._convert_soup_to_markdown(element)
                 if sub_md.strip():
                     lines.append(sub_md)
@@ -453,9 +475,17 @@ class ArticlesFeedScraper:
 
         # Formater les exposants (numéros de versets, notes)
         for sup in soup_element.find_all(["sup", "sub"]):
-            st = sup.get_text(strip=True)
-            if st:
-                # Convertir en chiffres exposants Unicode si possible
+            a_tag = sup.find("a")
+            if a_tag:
+                href = a_tag.get("href", "")
+                text = a_tag.get_text(strip=True).strip("[]")
+                if href and text:
+                    sup.replace_with(f" [^{text}] ")
+                    continue
+            st = sup.get_text(strip=True).strip("[]")
+            if st and st.isdigit() and int(st) <= 50:
+                sup.replace_with(f" [^{st}] ")
+            elif st:
                 sup_map = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
                 sup.replace_with(f" {st.translate(sup_map)} ")
 

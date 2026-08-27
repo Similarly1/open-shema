@@ -21,6 +21,72 @@ const SettingsView = {
         this.switchToSection(secId);
       });
     });
+
+    const bar = document.getElementById('settings-nav-tabs-bar');
+    const btnLeft = document.getElementById('btn-scroll-settings-tabs-left');
+    const btnRight = document.getElementById('btn-scroll-settings-tabs-right');
+
+    btnLeft?.addEventListener('click', () => {
+      bar?.scrollBy({ left: -160, behavior: 'smooth' });
+    });
+    btnRight?.addEventListener('click', () => {
+      bar?.scrollBy({ left: 160, behavior: 'smooth' });
+    });
+    bar?.addEventListener('scroll', () => {
+      this.updateTabsScrollButtons();
+    });
+
+    window.addEventListener('resize', () => {
+      this.updateTabsScrollButtons();
+    });
+
+    // Bouton de déclenchement synchro dans l'onglet paramètres Articles
+    document.getElementById('btn-settings-trigger-sync')?.addEventListener('click', async () => {
+      if (typeof ArticlesView !== 'undefined' && ArticlesView.syncArticles) {
+        await ArticlesView.syncArticles(false);
+        this.updateArticlesLastSyncLabel();
+      }
+    });
+
+    setTimeout(() => this.updateTabsScrollButtons(), 200);
+  },
+
+  updateTabsScrollButtons() {
+    const bar = document.getElementById('settings-nav-tabs-bar');
+    const btnLeft = document.getElementById('btn-scroll-settings-tabs-left');
+    const btnRight = document.getElementById('btn-scroll-settings-tabs-right');
+    if (!bar || !btnLeft || !btnRight) return;
+
+    const hasOverflow = bar.scrollWidth > bar.clientWidth + 4;
+    if (!hasOverflow) {
+      btnLeft.classList.add('hidden');
+      btnRight.classList.add('hidden');
+      return;
+    }
+
+    const atStart = bar.scrollLeft <= 6;
+    const atEnd = bar.scrollLeft + bar.clientWidth >= bar.scrollWidth - 6;
+
+    btnLeft.classList.toggle('hidden', atStart);
+    btnRight.classList.toggle('hidden', atEnd);
+  },
+
+  updateArticlesLastSyncLabel() {
+    const lbl = document.getElementById('settings-articles-last-sync-label');
+    if (!lbl) return;
+    const syncOpts = (typeof ArticlesView !== 'undefined' && ArticlesView.syncOpts) || null;
+    if (!syncOpts || !syncOpts.lastSyncTimestamp) {
+      lbl.textContent = 'Jamais synchronisé';
+      return;
+    }
+    const d = new Date(syncOpts.lastSyncTimestamp);
+    const day = String(d.getDate()).padStart(2, '0');
+    const monthNames = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
+    const month = monthNames[d.getMonth()];
+    const year = d.getFullYear();
+    const hours = String(d.getHours()).padStart(2, '0');
+    const mins = String(d.getMinutes()).padStart(2, '0');
+    lbl.textContent = `${day} ${month} ${year} à ${hours}:${mins}`;
   },
 
   switchToSection(secId, scrollTargetId = null) {
@@ -30,6 +96,16 @@ const SettingsView = {
     document.querySelectorAll('.settings-section').forEach(s => {
       s.classList.toggle('active', s.id === `sec-${secId}`);
     });
+
+    const activeTab = document.querySelector(`.settings-tab[data-sec="${secId}"]`);
+    if (activeTab && activeTab.scrollIntoView) {
+      activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+    this.updateTabsScrollButtons();
+
+    if (secId === 'articles') {
+      this.updateArticlesLastSyncLabel();
+    }
 
     if (scrollTargetId) {
       setTimeout(() => {
@@ -896,6 +972,12 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
       document.getElementById('cfg-articles-vec-mode').value = c.articles_vectorization_mode || 'balanced';
     }
 
+    if (document.getElementById('cfg-articles-sync-freq-select')) {
+      const syncOpts = (typeof ArticlesView !== 'undefined' && ArticlesView.syncOpts) || { frequency: 'startup', intervalDays: 3 };
+      const val = syncOpts.frequency === 'interval' ? String(syncOpts.intervalDays || 3) : (syncOpts.frequency || 'startup');
+      document.getElementById('cfg-articles-sync-freq-select').value = val;
+    }
+
     // Synchronisation et exclusion des doublons Principal / Fallback
     this.syncAllModelPairs(false);
 
@@ -1217,6 +1299,14 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
     }
     if (document.getElementById('cfg-articles-vec-mode')) {
       newCfg.articles_vectorization_mode = document.getElementById('cfg-articles-vec-mode').value;
+    }
+    if (document.getElementById('cfg-articles-sync-freq-select') && typeof ArticlesView !== 'undefined') {
+      const val = document.getElementById('cfg-articles-sync-freq-select').value;
+      if (val === 'manual' || val === 'startup') {
+        ArticlesView.saveSyncPreferences({ frequency: val });
+      } else {
+        ArticlesView.saveSyncPreferences({ frequency: 'interval', intervalDays: parseInt(val, 10) || 3 });
+      }
     }
     // Sérialisation des prompts système
     Object.values(this.PROMPT_CONFIGS).forEach(cfg => {

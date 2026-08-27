@@ -1549,75 +1549,90 @@
           </button>
         </header>
 
-        <!-- Sous-onglets de réglages -->
-        <div class="settings-nav-tabs">
-          <button class="settings-tab active" data-sec="apparence">
-            <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"></circle>
-              <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"></circle>
-              <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"></circle>
-              <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"></circle>
-              <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.563-2.512 5.563-5.563C22 6.5 17.5 2 12 2Z"></path>
-            </svg>
-            <span>Général & Apparence</span>
+        <!-- Sous-onglets de réglages avec défilement horizontal et flèches -->
+        <div class="settings-tabs-wrapper" id="settings-tabs-wrapper">
+          <button type="button" class="settings-tabs-scroll-btn settings-tabs-scroll-left hidden" id="btn-scroll-settings-tabs-left" title="Défiler les onglets vers la gauche">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
-          <button class="settings-tab" data-sec="lecture">
-            <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-            </svg>
-            <span>Options de Lecture</span>
-          </button>
-          <button class="settings-tab" data-sec="notes">
-            <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-              <polyline points="10 9 9 9 8 9"></polyline>
-            </svg>
-            <span>Notes & Surlignages</span>
-          </button>
-          <button class="settings-tab" data-sec="stepbible">
-            <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m5 8 6 6"></path>
-              <path d="m4 14 6-6 2-3"></path>
-              <path d="M2 5h12"></path>
-              <path d="M7 2h1"></path>
-              <path d="m22 22-5-10-5 10"></path>
-              <path d="M14 18h6"></path>
-            </svg>
-            <span>STEPBible (Grec/Hébreu)</span>
-          </button>
-          <button class="settings-tab" data-sec="dict">
-            <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
-              <path d="M6 6h10"></path>
-              <path d="M6 10h10"></path>
-            </svg>
-            <span>Dictionnaires</span>
-          </button>
-          <button class="settings-tab" data-sec="ai">
-            <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
-            </svg>
-            <span>Assistant IA & Clés</span>
-          </button>
-          <button class="settings-tab" data-sec="backup">
-            <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <rect width="20" height="8" x="2" y="3" rx="2"></rect>
-              <path d="M4 11v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9"></path>
-              <path d="M10 15h4"></path>
-            </svg>
-            <span>Sauvegarde ZIP</span>
-          </button>
-          <button class="settings-tab" data-sec="about">
-            <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="16" x2="12" y2="12"></line>
-              <line x1="12" y1="8" x2="12.01" y2="8"></line>
-            </svg>
-            <span>À propos & Ressources Libres</span>
+          <div class="settings-nav-tabs" id="settings-nav-tabs-bar">
+            <button class="settings-tab active" data-sec="apparence">
+              <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"></circle>
+                <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"></circle>
+                <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"></circle>
+                <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"></circle>
+                <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.563-2.512 5.563-5.563C22 6.5 17.5 2 12 2Z"></path>
+              </svg>
+              <span>Général & Apparence</span>
+            </button>
+            <button class="settings-tab" data-sec="lecture">
+              <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+              </svg>
+              <span>Options de Lecture</span>
+            </button>
+            <button class="settings-tab" data-sec="notes">
+              <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+              <span>Notes & Surlignages</span>
+            </button>
+            <button class="settings-tab" data-sec="stepbible">
+              <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m5 8 6 6"></path>
+                <path d="m4 14 6-6 2-3"></path>
+                <path d="M2 5h12"></path>
+                <path d="M7 2h1"></path>
+                <path d="m22 22-5-10-5 10"></path>
+                <path d="M14 18h6"></path>
+              </svg>
+              <span>STEPBible (Grec/Hébreu)</span>
+            </button>
+            <button class="settings-tab" data-sec="dict">
+              <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+                <path d="M6 6h10"></path>
+                <path d="M6 10h10"></path>
+              </svg>
+              <span>Dictionnaires</span>
+            </button>
+            <button class="settings-tab" data-sec="articles">
+              <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10l6 6v8a2 2 0 0 1-2 2z"></path>
+                <path d="M14 2v6h6"></path>
+              </svg>
+              <span>Articles & Blogs</span>
+            </button>
+            <button class="settings-tab" data-sec="ai">
+              <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
+              </svg>
+              <span>Assistant IA & Clés</span>
+            </button>
+            <button class="settings-tab" data-sec="backup">
+              <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="20" height="8" x="2" y="3" rx="2"></rect>
+                <path d="M4 11v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9"></path>
+                <path d="M10 15h4"></path>
+              </svg>
+              <span>Sauvegarde ZIP</span>
+            </button>
+            <button class="settings-tab" data-sec="about">
+              <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <span>À propos & Ressources Libres</span>
+            </button>
+          </div>
+          <button type="button" class="settings-tabs-scroll-btn settings-tabs-scroll-right hidden" id="btn-scroll-settings-tabs-right" title="Défiler les onglets vers la droite">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
         </div>
 
@@ -2622,27 +2637,6 @@
                   </div>
                 </div>
 
-                <!-- CARTE VECTORISATION DES ARTICLES & BLOGS (RAG) -->
-                <div class="settings-card" id="sec-articles-rag-settings" style="margin-top: 16px;">
-                  <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-primary, #3b82f6);"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10l6 6v8a2 2 0 0 1-2 2z"></path><path d="M14 2v6h6"></path></svg>
-                    <span>Articles &amp; Blogs contemporains (RAG &amp; Vectorisation)</span>
-                  </div>
-                  <p class="card-desc">Choisissez comment les réflexions et articles de blogs théologiques sont indexés dans la mémoire vectorielle de l'IA.</p>
-
-                  <div class="form-group">
-                    <label for="cfg-articles-vec-mode">Stratégie de vectorisation :</label>
-                    <select id="cfg-articles-vec-mode" class="select-field full-w" style="height: 38px;">
-                      <option value="balanced">Équilibré (Recommandé) — 10 articles récents de chaque flux + articles lus</option>
-                      <option value="economical">Économe — Uniquement les articles ouverts pour lecture ou mis en favoris</option>
-                      <option value="full">Intégral — Vectorisation automatique de tous les articles en tâche de fond</option>
-                    </select>
-                    <p class="field-hint" style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">
-                      Le mode équilibré permet à l'IA d'avoir immédiatement accès aux thèmes théologiques récents sans aucun ralentissement.
-                    </p>
-                  </div>
-                </div>
-
               <div class="form-divider" style="margin: 20px 0 16px 0;"></div>
               
               <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
@@ -2976,7 +2970,109 @@
               </div>
             </div>
           </div>
-        </div>
+          <!-- Fin de la Section IA -->
+          </div>
+
+          <!-- Section 5b : Articles & Blogs Théologiques -->
+          <div class="settings-section" id="sec-articles">
+            
+            <!-- CARTE SYNCHRONISATION & RÉCUPÉRATION DES ARTICLES -->
+            <div class="settings-card" id="sec-articles-sync-settings">
+              <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-primary, #3b82f6);">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span>Synchronisation des flux d'articles</span>
+              </div>
+              <p class="card-desc">Configurez la fréquence et le mode de récupération automatique des nouveaux articles et prédications théologiques.</p>
+
+              <div class="form-group">
+                <label for="cfg-articles-sync-freq-select">Fréquence de récupération des nouveaux flux :</label>
+                <select id="cfg-articles-sync-freq-select" class="select-field full-w" style="height: 38px;">
+                  <option value="manual">Manuelle uniquement (au clic sur « Synchroniser »)</option>
+                  <option value="startup">Automatique — À chaque démarrage de l'application (Recommandé)</option>
+                  <option value="1">Périodique — Tous les 1 jour (Quotidien)</option>
+                  <option value="2">Périodique — Tous les 2 jours</option>
+                  <option value="3" selected>Périodique — Tous les 3 jours</option>
+                  <option value="7">Périodique — Toutes les semaines (7 jours)</option>
+                  <option value="14">Périodique — Tous les 15 jours</option>
+                  <option value="30">Périodique — Tous les mois (30 jours)</option>
+                </select>
+              </div>
+
+              <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; margin-top: 14px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-blue);">
+                    <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                  </svg>
+                  <div>
+                    <div style="font-size: 0.84rem; font-weight: 600; color: var(--text-primary);">Dernière synchronisation réussie</div>
+                    <div id="settings-articles-last-sync-label" style="font-size: 0.76rem; color: var(--text-muted);">Jamais synchronisé</div>
+                  </div>
+                </div>
+                <button type="button" class="btn-primary" id="btn-settings-trigger-sync" style="padding: 6px 12px; font-size: 0.82rem;">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                  <span>Synchroniser maintenant</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- CARTE SOURCES & CATALOGUE OFFICIEL -->
+            <div class="settings-card" style="margin-top: 16px;">
+              <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-primary, #3b82f6);"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path><path d="M6 6h10"></path><path d="M6 10h10"></path></svg>
+                <span>Sources &amp; Flux théologiques intégrés</span>
+              </div>
+              <p class="card-desc">Consultez les blogs et plateformes pastorales officielles synchronisés avec votre application.</p>
+
+              <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px;">
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <img src="img/sources/tpsg.svg" alt="TPSG" style="height: 22px; width: auto; max-width: 50px; object-fit: contain;">
+                    <div>
+                      <div style="font-weight: 600; font-size: 0.88rem; color: var(--text-primary);">Tout Pour Sa Gloire</div>
+                      <div style="font-size: 0.78rem; color: var(--text-muted);">Articles, réflexions pastorales et podcasts de prédications textuelles</div>
+                    </div>
+                  </div>
+                  <span class="badge-pill" style="font-size: 0.75rem; background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); padding: 2px 8px; border-radius: 12px; font-weight: 600;">Actif</span>
+                </div>
+
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px;">
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <img src="img/sources/e21.svg" alt="Évangile 21" style="height: 22px; width: auto; max-width: 50px; object-fit: contain;">
+                    <div>
+                      <div style="font-weight: 600; font-size: 0.88rem; color: var(--text-primary);">Évangile 21 (The Gospel Coalition France)</div>
+                      <div style="font-size: 0.78rem; color: var(--text-muted);">Études théologiques approfondies, recensions d'ouvrages et éthique chrétienne</div>
+                    </div>
+                  </div>
+                  <span class="badge-pill" style="font-size: 0.75rem; background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); padding: 2px 8px; border-radius: 12px; font-weight: 600;">Actif</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- CARTE VECTORISATION DES ARTICLES & BLOGS (RAG) -->
+            <div class="settings-card" id="sec-articles-rag-settings" style="margin-top: 16px;">
+              <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-primary, #3b82f6);"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10l6 6v8a2 2 0 0 1-2 2z"></path><path d="M14 2v6h6"></path></svg>
+                <span>Indexation &amp; Mémoire vectorielle (RAG IA)</span>
+              </div>
+              <p class="card-desc">Choisissez comment les réflexions et articles théologiques sont indexés dans la mémoire vectorielle de l'IA.</p>
+
+              <div class="form-group">
+                <label for="cfg-articles-vec-mode">Stratégie de vectorisation :</label>
+                <select id="cfg-articles-vec-mode" class="select-field full-w" style="height: 38px;">
+                  <option value="balanced">Équilibré (Recommandé) — 10 articles récents de chaque flux + articles lus</option>
+                  <option value="economical">Économe — Uniquement les articles ouverts pour lecture ou mis en favoris</option>
+                  <option value="full">Intégral — Vectorisation automatique de tous les articles en tâche de fond</option>
+                </select>
+                <p class="field-hint" style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">
+                  Le mode équilibré permet à l'IA d'avoir immédiatement accès aux thèmes théologiques récents sans aucun ralentissement.
+                </p>
+              </div>
+            </div>
+
+          </div>
 
           <!-- Section 6 : Sauvegarde ZIP -->
           <div class="settings-section" id="sec-backup">
@@ -5207,10 +5303,14 @@
                 <p class="articles-sub-title">Méditations pastorales, études contemporaines et réflexions éthiques reliées aux Écritures</p>
               </div>
               <div class="articles-header-actions">
-                <button class="btn-articles-action" id="btn-articles-settings" title="Configurer les options d'indexation et de vectorisation RAG">
+                <button class="btn-articles-action" id="btn-articles-settings" title="Configurer la synchronisation et les options des articles">
                   <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="3"></circle>
-<button class="btn-articles-action" id="btn-suggest-blog" title="Proposer un nouveau blog théologique">
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                  </svg>
+                  <span>Réglages</span>
+                </button>
+                <button class="btn-articles-action" id="btn-suggest-blog" title="Proposer un nouveau blog théologique">
                   <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                   <span>Suggérer une source</span>
                 </button>
@@ -7136,6 +7236,108 @@
           <button type="button" class="btn-primary" id="btn-submit-suggest">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             <span>Envoyer la suggestion</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- MODALE : PARAMÈTRES & SYNCHRONISATION DES ARTICLES       -->
+    <!-- ======================================================= -->
+    <div class="modal-dialog-container hidden" id="modal-articles-settings">
+      <div class="modal-card" style="max-width: 540px; width: 90%;">
+        <div class="modal-header">
+          <div class="modal-title-with-badge">
+            <svg class="modal-header-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            <h3 class="modal-title" style="margin: 0; font-size: 1.1rem;">Réglages & Synchronisation des Articles</h3>
+          </div>
+          <button class="modal-close-btn" id="btn-close-articles-settings" title="Fermer">✕</button>
+        </div>
+
+        <div class="modal-body" style="padding: 20px; display: flex; flex-direction: column; gap: 18px;">
+          
+          <!-- Section 1 : Fréquence de synchronisation automatique -->
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.9rem; color: var(--text-primary);">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-primary, #3b82f6);">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span>Fréquence de récupération des nouveaux articles</span>
+            </div>
+            <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 0; line-height: 1.45;">
+              Choisissez comment et quand les nouveaux articles théologiques sont téléchargés automatiquement.
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 4px;">
+              <!-- Option A : Manuel -->
+              <label class="radio-card-option" style="display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                <input type="radio" name="articles-sync-freq" value="manual" id="sync-freq-manual" style="margin-top: 3px;">
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                  <span style="font-size: 0.88rem; font-weight: 600; color: var(--text-primary);">Manuellement uniquement</span>
+                  <span style="font-size: 0.78rem; color: var(--text-muted);">Récupération déclenchée uniquement au clic sur le bouton « Synchroniser ».</span>
+                </div>
+              </label>
+
+              <!-- Option B : Au démarrage -->
+              <label class="radio-card-option" style="display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                <input type="radio" name="articles-sync-freq" value="startup" id="sync-freq-startup" style="margin-top: 3px;">
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                  <span style="font-size: 0.88rem; font-weight: 600; color: var(--text-primary);">À chaque démarrage de l'application</span>
+                  <span style="font-size: 0.78rem; color: var(--text-muted);">Vérifie et télécharge discrètement les nouveaux flux dès l'ouverture d'Open Shema.</span>
+                </div>
+              </label>
+
+              <!-- Option C : Périodique (Tous les X jours) -->
+              <label class="radio-card-option" style="display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                <input type="radio" name="articles-sync-freq" value="interval" id="sync-freq-interval" style="margin-top: 3px;">
+                <div style="display: flex; flex-direction: column; gap: 6px; width: 100%;">
+                  <span style="font-size: 0.88rem; font-weight: 600; color: var(--text-primary);">Périodiquement (tous les X jours)</span>
+                  <span style="font-size: 0.78rem; color: var(--text-muted);">Vérification automatique si le délai configuré est écoulé depuis la dernière mise à jour.</span>
+                  
+                  <div id="articles-interval-wrap" style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                    <span style="font-size: 0.82rem; color: var(--text-secondary);">Intervalle :</span>
+                    <select id="articles-sync-interval-days" class="select-field" style="padding: 4px 8px; font-size: 0.85rem; border-radius: 6px;">
+                      <option value="1">Tous les 1 jour (Quotidien)</option>
+                      <option value="2">Tous les 2 jours</option>
+                      <option value="3" selected>Tous les 3 jours (Recommandé)</option>
+                      <option value="7">Toutes les semaines (7 jours)</option>
+                      <option value="14">Tous les 15 jours</option>
+                      <option value="30">Tous les mois (30 jours)</option>
+                    </select>
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Section 2 : État et date de dernière synchronisation -->
+          <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-blue);">
+                <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+              </svg>
+              <div>
+                <div style="font-size: 0.84rem; font-weight: 600; color: var(--text-primary);">Dernière synchronisation réussie</div>
+                <div id="articles-last-sync-label" style="font-size: 0.76rem; color: var(--text-muted);">Jamais synchronisé</div>
+              </div>
+            </div>
+            <button type="button" class="btn-articles-action" id="btn-modal-trigger-sync" style="padding: 5px 10px; font-size: 0.8rem;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              <span>Synchroniser maintenant</span>
+            </button>
+          </div>
+
+        </div>
+
+        <div class="modal-footer" style="display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 14px 20px; border-top: 1px solid var(--border-color); background: var(--bg-subtle);">
+          <button type="button" class="btn-secondary" id="btn-cancel-articles-settings">Fermer</button>
+          <button type="button" class="btn-primary" id="btn-save-articles-settings">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Enregistrer les préférences</span>
           </button>
         </div>
       </div>

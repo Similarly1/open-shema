@@ -27,5 +27,33 @@
         ".wp-block-audio"
       ]
     }
+  },
+  {
+    "id": "e21",
+    "name": "Évangile 21",
+    "website_url": "https://evangile21.thegospelcoalition.org",
+    "feed_url": "https://evangile21.thegospelcoalition.org/feed/",
+    "category": "pastoral_theologique",
+    "description": "Ressources théologiques, études bibliques et réflexions pastorales par The Gospel Coalition France.",
+    "enabled_by_default": true,
+    "selectors": {
+      "content": ".entry-content, .post-content, .article-content, .article__content, article .content, main article",
+      "author": ".author-name, .entry-author, .author a, .post-author, .author-info, .article__author",
+      "excludes": [
+        ".single-header",
+        ".single-meta",
+        ".single-footer",
+        ".single-related",
+        ".sharedaddy",
+        ".jp-relatedposts",
+        ".newsletter-box",
+        ".social-share",
+        ".social-sharing",
+        "nav.post-navigation",
+        ".comments-area",
+        ".article__social",
+        ".article__more"
+      ]
+    }
   }
 ]
