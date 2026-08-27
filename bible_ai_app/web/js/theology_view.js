@@ -2652,10 +2652,26 @@ const TheolLatinGlossary = {
     if (!text) return '';
     let res = text;
 
+    const replaceOutsideTags = (str, regex, replacerFn) => {
+      return str.replace(regex, (match, ...args) => {
+        const fullStr = args[args.length - 1];
+        const offset = args[args.length - 2];
+        const preceding = fullStr.slice(0, offset);
+        const lastOpen = preceding.lastIndexOf('<');
+        const lastClose = preceding.lastIndexOf('>');
+        if (lastOpen > lastClose) return match; // Inside HTML tag / attribute
+        // Check also if immediately preceded by data-gloss or already inside theol-latin-gloss
+        const openSpan = preceding.lastIndexOf('<span class="theol-latin-gloss"');
+        const closeSpan = preceding.lastIndexOf('</span>');
+        if (openSpan > closeSpan) return match; // Already inside a gloss span
+        return replacerFn(match, ...args);
+      });
+    };
+
     // 1. Détection des livres / tomes / colonnes combinés (ex: l. II, t. 91, col. 108 3 ou t. 1, p. 422 ou t. XLV, col. 1575)
-    res = res.replace(/\b(?:(l\.|lib\.|livre)\s+([IVXLCDM\d]+)\s*,\s*)?(?:(t\.|tome)\s+([IVXLCDM\d]+))\s*,\s*(?:(col\.|colonne|p\.|page)\s*(\d+(?:\s+\d+)?))\b/gi, (match, lPrefix, lNum, tPrefix, tNum, cPrefix, cNum) => {
+    res = replaceOutsideTags(res, /\b(?:(l\.|lib\.|livre)\s+([IVXLCDM\d]+)\s*,\s*)?(?:(t\.|tome)\s+([IVXLCDM\d]+))\s*,\s*(?:(col\.|colonne|p\.|page)\s*(\d+(?:\s+\d+)?))\b/gi, (match, lPrefix, lNum, tPrefix, tNum, cPrefix, cNum) => {
       const cleanCol = cNum.replace(/\s+/g, '');
-      const isCol = cPrefix.toLowerCase().startsWith('col');
+      const isCol = (cPrefix || '').toLowerCase().startsWith('col');
       const unitLabel = isCol ? 'colonne' : 'page';
       const category = isCol ? 'Volume &amp; Colonne' : 'Volume &amp; Page';
       const libPart = lNum ? `Livre ${lNum}, ` : '';
@@ -2665,7 +2681,7 @@ const TheolLatinGlossary = {
     });
 
     // 1b. Détection des colonnes isolées (ex: col. 1084)
-    res = res.replace(/\b(?<!t\.\s*\d+\s*,\s*|tome\s*\d+\s*,\s*)(col\.|colonne)\s*(\d+(?:\s+\d+)?)\b/gi, (match, cPrefix, cNum) => {
+    res = replaceOutsideTags(res, /\b(?<!t\.\s*\d+\s*,\s*|tome\s*\d+\s*,\s*)(col\.|colonne)\s*(\d+(?:\s+\d+)?)\b/gi, (match, cPrefix, cNum) => {
       const cleanCol = cNum.replace(/\s+/g, '');
       const titleAttr = `Colonne ${cleanCol}`;
       const descAttr = `Référence à la colonne ${cleanCol} dans le dictionnaire ou l'ouvrage cité.`;
@@ -2678,11 +2694,7 @@ const TheolLatinGlossary = {
       const g = this.glossary[rawK];
       const escapedK = rawK.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
       const reg = new RegExp(`(?<=^|[\\s\\(\\['">,;:–—«»])(${escapedK})(?=[\\s\\)\\].;:–—«»,'"]|$)`, 'gi');
-      res = res.replace(reg, (match, matchedTerm, offset, fullStr) => {
-        const preceding = fullStr.slice(0, offset);
-        const lastOpen = preceding.lastIndexOf('<');
-        const lastClose = preceding.lastIndexOf('>');
-        if (lastOpen > lastClose) return match;
+      res = replaceOutsideTags(res, reg, (match, matchedTerm) => {
         return `<span class="theol-latin-gloss" data-gloss-term="${TheologyView.escapeHtml(matchedTerm)}" data-gloss-full="${TheologyView.escapeHtml(g.full)}" data-gloss-cat="${TheologyView.escapeHtml(g.cat)}" data-gloss-desc="${TheologyView.escapeHtml(g.desc)}">${matchedTerm}</span>`;
       });
     }

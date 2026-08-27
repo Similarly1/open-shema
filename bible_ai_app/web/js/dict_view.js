@@ -768,9 +768,6 @@ const DictView = {
     if (typeof TheologyView !== 'undefined' && TheologyView.linkifyUrls) {
       linkified = TheologyView.linkifyUrls(linkified);
     }
-    if (isVigouroux && typeof TheolLatinGlossary !== 'undefined') {
-      linkified = TheolLatinGlossary.annotate(linkified);
-    }
 
     // Section des notes de bas de page si des citations ont été extraites
     let footnotesHtml = '';
