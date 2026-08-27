@@ -1260,6 +1260,16 @@ const DictView = {
       });
     }
 
+    // 1c. Remplacement des renvois d'articles inline en cours de paragraphe (ex: *Voir aussi :* **FUMIER** (tome 2, colonne 2415))
+    const inlineSeeRx = /(?:[*_]+)?\s*(?:Voir(?:\s+(?:aussi|également))?|Voyez)\s*(?:[*_]+)?\s*:\s*(?:[*_]+)?\s*(?:\*\*([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]{2,35})\*\*|([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]{2,35}))(?:\s*\(([^)]+)\))?(?=[.,;:!\?\s]|$)/gi;
+    processed = processed.replace(inlineSeeRx, (match, boldW, plainW, parenMeta) => {
+      const cleanW = (boldW || plainW || '').trim();
+      if (!cleanW || cleanW.length < 2) return match;
+      if (/^(?:I{1,3}|IV|V|VI|VII|VIII|IX|X|XI|XII|TOB|NBS|BFC|S21)$/.test(cleanW)) return match;
+      const metaHtml = parenMeta ? ` <span class="dict-see-meta">(${this.escapeHtml(parenMeta.trim())})</span>` : '';
+      return `Voir aussi : <span class="dict-cross-ref-item"><a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(cleanW)}"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span>${this.escapeHtml(cleanW)}</span></a>${metaHtml}</span>`;
+    });
+
     // 2. Extraction des citations de sources entre parenthèses
     if (this.optFootnotes) {
       processed = processed.replace(/\(([^\)\n]{12,350})\)/g, (match, inner, offset, fullStr) => {
