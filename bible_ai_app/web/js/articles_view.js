@@ -1517,10 +1517,16 @@ const ArticlesView = {
     text = text.replace(/(?:^|\n)\s*\*?\s*(?:ℹ️|ℹ)\s*([^\n*]+?)\*?\s*(?=\n|$)/gi, '\n\n<div class="article-info-callout"><span>ℹ️</span><div>$1</div></div>\n\n');
     text = text.replace(/(?:^|\n)\s*\*\s*(?=\n|$)/g, '\n');
 
-    // 4b. Formater les bandeaux de note de la rédaction / Editors' note en début d'article
-    text = text.replace(/(?:^|\n)(?:(?:\*\*)?\s*(?:Editors[’']\s*note|Note\s+de\s+l[’']éditeur|Editor[’']s\s+note|Note\s+de\s+la\s+rédaction|NDLR)\s*(?:\*\*)?\s*:?\s*\n*)+(?:\*\*)?\s*(Initialement\s+publié\s+le[^\n*]+|[^\n]+?)\s*(?:\*\*)?(?=\n|$)/gi, (match, noteContent) => {
-      let clean = noteContent.replace(/^\*+\s*/, '').replace(/\*+$/, '').trim();
-      return `\n\n<div class="article-editors-note-banner"><strong>Editors’ note:</strong> ${clean}</div>\n\n`;
+    // 4b. Formater les bandeaux de note de la rédaction / Note de l'éditeur / Editors' note en début d'article
+    text = text.replace(/(?:^|\n)(?:(?:\*\*)?\s*(Editors[’']\s*note|Note\s+de\s+l[’']éditeur|Editor[’']s\s+note|Note\s+de\s+la\s+rédaction|NDLR)\s*(?:\*\*)?\s*:?\s*\n*)+(?:\*\*)?\s*([^\n]+?)(?=\n|$)/gi, (match, labelRaw, noteContent) => {
+      let cleanLabel = labelRaw.trim();
+      if (/Note\s+de\s+l/i.test(cleanLabel)) cleanLabel = "Note de l’éditeur :";
+      else if (/Note\s+de\s+la/i.test(cleanLabel)) cleanLabel = "Note de la rédaction :";
+      else if (/NDLR/i.test(cleanLabel)) cleanLabel = "NDLR :";
+      else cleanLabel = "Editors’ note :";
+
+      let cleanContent = noteContent.trim();
+      return `\n\n<div class="article-editors-note-banner"><strong class="article-editors-note-label">${cleanLabel}</strong> ${cleanContent}</div>\n\n`;
     });
 
     // 5. Nettoyer les tirets initiaux sur les mentions éditoriales et normaliser les espaces (ex: "livreIl" -> "livre Il")

@@ -228,24 +228,64 @@ class ArticlesFeedScraper:
                             image_url = hero_img.get("src") or hero_img.get("data-src") or hero_img.get("data-lazy-src") or ""
 
                     # 2. Auteur réel et Avatar
-                    author_box = page_soup.select_one(".author-info, .entry-author, .author-bio, .post-author, div[class*='author']")
+                    author_box = page_soup.select_one(".article_author_bio, .author-info, .entry-author, .author-bio, .post-author, .author-box")
                     if author_box:
                         for a_tag in author_box.select("a[rel='author'], .author-name, strong, h3, h4"):
                             t = a_tag.get_text(strip=True)
-                            if t and len(t) < 40 and not any(x in t.lower() for x in ["tout pour", "tpsg", "admin", "par ", "auteur"]):
+                            if t and len(t) < 40 and not any(x in t.lower() for x in ["tout pour", "tpsg", "admin", "par ", "auteur", "coalition"]):
                                 author = t
                                 break
 
-                    # Avatar auteur
+                    # Avatar auteur ciblé
                     if not author_avatar_url:
-                        for a_img in page_soup.find_all("img"):
-                            src = a_img.get("data-src") or a_img.get("data-lazy-src") or a_img.get("src") or ""
-                            alt = (a_img.get("alt") or "").strip()
-                            if not src or src.startswith("data:") or "logo" in src.lower():
-                                continue
-                            if "150x150" in src or "avatar" in src.lower() or (author and alt and author.lower() in alt.lower()):
-                                author_avatar_url = src
+                        # a. Chercher dans les encadrés d'auteurs spécifiques (Évangile 21, TPSG, WordPress)
+                        for box in page_soup.select(".article_author_bio, .author-info, .author-bio, .post-author, .author-box"):
+                            for el in box.select("[data-bg-image]"):
+                                bg_val = el.get("data-bg-image", "")
+                                m = re.search(r'url\([\'"]?([^\'")]+)[\'"]?\)', bg_val)
+                                if m and not m.group(1).startswith("data:"):
+                                    author_avatar_url = m.group(1)
+                                    break
+                            if not author_avatar_url:
+                                for el in box.find_all(attrs={"style": re.compile(r'background-image', re.I)}):
+                                    m = re.search(r'url\([\'"]?([^\'")]+)[\'"]?\)', el.get("style", ""))
+                                    if m and not m.group(1).startswith("data:"):
+                                        author_avatar_url = m.group(1)
+                                        break
+                            if not author_avatar_url:
+                                for img in box.find_all("img"):
+                                    src = img.get("data-src") or img.get("data-lazy-src") or img.get("src") or ""
+                                    if src and not src.startswith("data:") and "logo" not in src.lower():
+                                        author_avatar_url = src
+                                        break
+                            if author_avatar_url:
                                 break
+
+                        # b. Chercher les classes spécifiques d'avatars
+                        if not author_avatar_url:
+                            for wrap in page_soup.select(".author_img_wrap, .author-avatar, .author-image, img.avatar"):
+                                if wrap.name == "img":
+                                    src = wrap.get("data-src") or wrap.get("data-lazy-src") or wrap.get("src") or ""
+                                    if src and not src.startswith("data:"):
+                                        author_avatar_url = src
+                                        break
+                                bg_val = wrap.get("data-bg-image") or wrap.get("style", "")
+                                m = re.search(r'url\([\'"]?([^\'")]+)[\'"]?\)', bg_val)
+                                if m and not m.group(1).startswith("data:"):
+                                    author_avatar_url = m.group(1)
+                                    break
+
+                        # c. Chercher une image dont le alt ou l'URL correspond au nom de l'auteur
+                        if not author_avatar_url and author:
+                            author_slug = re.sub(r'[^a-z0-9]+', '-', author.lower()).strip('-')
+                            for img in page_soup.find_all("img"):
+                                src = img.get("data-src") or img.get("data-lazy-src") or img.get("src") or ""
+                                alt = (img.get("alt") or "").strip().lower()
+                                if not src or src.startswith("data:") or "logo" in src.lower():
+                                    continue
+                                if (alt and author.lower() in alt) or (author_slug and len(author_slug) >= 4 and author_slug in src.lower()):
+                                    author_avatar_url = src
+                                    break
 
                     # 3. Chapô / Lead summary
                     og_desc = page_soup.find("meta", property="og:description")
