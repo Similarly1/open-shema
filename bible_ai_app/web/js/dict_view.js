@@ -20,6 +20,11 @@ const DictView = {
   vigourouxIllustrationsMap: null,
   lightboxEl: null,
 
+  // Historique de navigation (Précédent / Suivant)
+  historyStack: [],
+  historyPointer: -1,
+  _isNavigatingHistory: false,
+
   // Options d'affichage et de transformation du texte
   optLogosRestructure: true,
   optConvertRoman: true,
@@ -208,6 +213,34 @@ const DictView = {
     // Filtrer les dictionnaires dans le popover
     searchInPopover?.addEventListener('input', () => {
       this.renderDictionaryPickerList();
+    });
+
+    // Contrôles d'historique de navigation (Précédent / Suivant)
+    const btnHistBack = document.getElementById('btn-dict-history-back');
+    const btnHistFwd = document.getElementById('btn-dict-history-forward');
+
+    btnHistBack?.addEventListener('click', () => {
+      if (this.historyPointer > 0) {
+        this.historyPointer--;
+        const item = this.historyStack[this.historyPointer];
+        this._isNavigatingHistory = true;
+        this.selectDictionary(item.dictId, item.slug).finally(() => {
+          this._isNavigatingHistory = false;
+          this.updateHistoryButtons();
+        });
+      }
+    });
+
+    btnHistFwd?.addEventListener('click', () => {
+      if (this.historyPointer < this.historyStack.length - 1) {
+        this.historyPointer++;
+        const item = this.historyStack[this.historyPointer];
+        this._isNavigatingHistory = true;
+        this.selectDictionary(item.dictId, item.slug).finally(() => {
+          this._isNavigatingHistory = false;
+          this.updateHistoryButtons();
+        });
+      }
     });
 
     // Recherche Rapide Globale
@@ -701,12 +734,36 @@ const DictView = {
       this.currentEntryData = data;
       this.currentMatches = data?.matches || [];
 
+      // Gestion de la pile d'historique
+      if (!this._isNavigatingHistory && slug) {
+        if (this.historyPointer < this.historyStack.length - 1) {
+          this.historyStack = this.historyStack.slice(0, this.historyPointer + 1);
+        }
+        const currentTop = this.historyStack[this.historyPointer];
+        if (!currentTop || currentTop.slug !== slug || currentTop.dictId !== this.activeDictId) {
+          this.historyStack.push({ dictId: this.activeDictId, slug: slug });
+          this.historyPointer = this.historyStack.length - 1;
+        }
+      }
+      this.updateHistoryButtons();
+
       this.renderArticleView();
     } catch (e) {
       console.error('Erreur lecture notice:', e);
       if (bodyEl) {
         bodyEl.innerHTML = `<div style="padding: 30px; text-align: center; color: var(--accent-red);">Erreur lors de la récupération de la notice.</div>`;
       }
+    }
+  },
+
+  updateHistoryButtons() {
+    const btnHistBack = document.getElementById('btn-dict-history-back');
+    const btnHistFwd = document.getElementById('btn-dict-history-forward');
+    if (btnHistBack) {
+      btnHistBack.disabled = (this.historyPointer <= 0);
+    }
+    if (btnHistFwd) {
+      btnHistFwd.disabled = (this.historyPointer >= this.historyStack.length - 1 || this.historyPointer === -1);
     }
   },
 
@@ -1059,6 +1116,19 @@ const DictView = {
     // Nettoyage des artefacts de découpage intermédiaire (ex: " (Partie 1/2)", " (Partie 2/2)")
     processed = processed.replace(/\s*\((?:Partie|partie)\s+\d+\/\d+\)/gi, '');
 
+    // Nettoyage universel de toute astérisque orpheline (*sa-ba-tu -> sa-ba-tu, mot* -> mot, etc.)
+    processed = processed.replace(/\*([a-zA-ZÀ-ÿ0-9_\-]+)/g, '$1');
+    processed = processed.replace(/([a-zA-ZÀ-ÿ0-9_\-]+)\*/g, '$1');
+    processed = processed.replace(/(\b[0-9]+(?::|\.)[0-9]+(?:\s*[\-–,]\s*[0-9]+)*)\s*\*/g, '$1');
+    processed = processed.replace(/\(\s*([^\)\n]+?)\s*\*\s*\)/g, '($1)');
+    processed = processed.replace(/(?<=[0-9\.,;\s\(\[])\*(?=[0-9\.,;\s\)\]]|$)/g, '');
+    processed = processed.replace(/\s*\*\s*([\)\]\.,;:])/g, '$1');
+    processed = processed.replace(/\s+\*\s+/g, ' ');
+
+    // Espacement et découpage des doubles deux-points collés (ex: Sources :Voir aussi :)
+    processed = processed.replace(/:\s*Voir aussi\s*:/gi, '.\n\n*Voir aussi :*');
+    processed = processed.replace(/:\s*Voir\s*:/gi, '.\n\n*Voir :*');
+
     // Élimination du doublon de titre en tête d'article (ex: ABAGARE \n ABAGARE)
     processed = processed.replace(/^([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]{2,})\n+\1\n+/i, '$1\n\n');
 
@@ -1265,10 +1335,14 @@ const DictView = {
     }
 
     // 1c. Remplacement des renvois d'articles inline en cours de paragraphe (ex: *Voir aussi :* **FUMIER** (tome 2, colonne 2415) ou Voir HACHILA.)
-    const inlineSeeRx = /(?:[*_]+)?\s*\b(?:Voir(?:\s+(?:aussi|également))?|Voyez)\b(?:\s*:\s*|\s+)(?:\*\*([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]{2,35})\*\*|([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]{2,35}))(?:\s*\(([^)]+)\))?(?=[.,;:!\?\s]|$)/gi;
+    const inlineSeeRx = /(?:[*_]+)?\s*\b(?:Voir(?:\s+(?:aussi|également))?|Voyez)\b(?:\s*:\s*|\s+)(?:\*\*([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]{2,35})\*\*|([A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç\-\s]{2,35}))(?:\s*\(([^)]+)\))?(?=[.,;:!\?\s]|$)/g;
     processed = processed.replace(inlineSeeRx, (match, boldW, plainW, parenMeta) => {
-      const cleanW = (boldW || plainW || '').trim();
+      let cleanW = (boldW || plainW || '').replace(/^(?:voir|voyez)?\s*(?:aussi|également)?\s*[:\s]*/i, '').trim();
       if (!cleanW || cleanW.length < 2) return match;
+      // RÈGLE STRICTE : Uniquement les noms en MAJUSCULES (ex: CALENDRIER). Rejeter les auteurs avec minuscules (ex: Johannes Buxtorf)
+      if (cleanW !== cleanW.toUpperCase() || !/^[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]{2,35}$/.test(cleanW)) {
+        return match;
+      }
       if (/^(?:I{1,3}|IV|V|VI|VII|VIII|IX|X|XI|XII|TOB|NBS|BFC|S21)$/.test(cleanW)) return match;
       const metaHtml = parenMeta ? ` <span class="dict-see-meta">(${this.escapeHtml(parenMeta.trim())})</span>` : '';
       return `Voir aussi : <span class="dict-cross-ref-item"><a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(cleanW)}"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span>${this.escapeHtml(cleanW)}</span></a>${metaHtml}</span>`;
@@ -1677,7 +1751,8 @@ const DictView = {
             word = word.replace(/^(?:voir|voyez)?\s*(?:aussi|également)?\s*[:\s]*/i, '').replace(/[.,;:]+$/, '').trim();
             const currentTitleNorm = (this.currentEntryData?.title || this.activeSlug || '').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Z0-9]/g, '');
             const wordNorm = word.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Z0-9]/g, '');
-            if (word && wordNorm !== currentTitleNorm) {
+            // RÈGLE STRICTE : Le mot DOIT être en majuscules pour être un article
+            if (word && word === word.toUpperCase() && /^[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]{2,35}$/.test(word) && wordNorm !== currentTitleNorm) {
               parsedTargets.push({ word, meta, qualifier });
             }
           });

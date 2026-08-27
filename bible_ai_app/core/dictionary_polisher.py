@@ -34,10 +34,13 @@ Règles impératives de restauration :
 
 4. Langues Anciennes & Philologie :
    - Restitue avec exactitude les termes originaux en hébreu biblique avec translittération (ex: עֵדֶן / ‘Ēḏen) et en grec biblique/Septante (ex: Ἐδέμ, τρυφή / Truphê) lorsque l'OCR a produit du bruit.
+   - N'utilise JAMAIS d'astérisque `*` devant les racines philologiques ou babyloniennes (écris `sa-ba-tu` et non `*sa-ba-tu`).
+   - N'utilise AUCUNE astérisque isolée dans le texte ou les références de versets.
    - Mets en *italique* les citations latines et titres d'ouvrages (*Commentarius in Scripturam Sacram*, *Keilinschriften*, etc.).
 
 5. Renvois et Références Croisées (Voir aussi) :
    - Pour tous les renvois vers d'autres articles du dictionnaire (ex: 'Voir : BETH', 'Voir aussi : TORCHE', 'Voir : CHÊNE (tome II, colonne 654)'), formate clairement sous la forme `*Voir* : **NOM_ARTICLE**` ou `*Voir aussi* : **NOM_ARTICLE** (tome X, colonne Y)` sans inclure les tomes ou parenthèses dans le nom en gras.
+   - Les cibles de `*Voir aussi* :` doivent STRICTEMENT être des MOTS-VEDETTES DE DICTIONNAIRE EN MAJUSCULES (ex: **CALENDRIER**, **SABBAT**, **TEMPLE**). Ne place JAMAIS de noms d'auteurs (comme `Johannes Buxtorf`) ou d'ouvrages dans une formule `*Voir aussi* :` ; cite-les normalement dans le corps du texte ou sous une puce de sources/bibliographie.
    - N'utilise JAMAIS de syntaxe de lien Markdown factice avec un dièse comme `[NOM](#)` ; utilise exclusivement `*Voir aussi* : **NOM**`.
    - Ne termine JAMAIS une phrase introductive par une virgule orpheline avant un renvoi `*Voir* :` ; termine toujours la phrase introductive par un point `.` ou deux-points `:`.
    - Ne laisse JAMAIS de ligne orpheline `*Voir aussi* :` vide.

@@ -5,6 +5,7 @@ import zipfile
 import xml.etree.ElementTree as ET
 import csv
 import unicodedata
+from typing import Dict, List, Any, Optional
 from core.strong_lexicon import StrongLexicon
 
 class DictionaryManager:
@@ -182,30 +183,25 @@ class DictionaryManager:
             result.append(item)
         return result
 
+    _index_cache: Dict[str, List[Dict[str, Any]]] = {}
+
     @classmethod
-    def get_headwords(
-        cls, 
-        dict_id: str, 
-        letter: str = None, 
-        query: str = None, 
-        limit: int = 300, 
-        offset: int = 0
-    ) -> dict:
-        """
-        Retourne l'index alphabétique ordonné des termes / lemmes d'un dictionnaire spécifique.
-        """
-        reg = cls.load_registry()
-        d_info = next((d for d in reg if d["id"] == dict_id), None)
-        if not d_info:
-            d_info = reg[0] if reg else {"id": dict_id, "name": dict_id}
+    def invalidate_index_cache(cls, dict_id: str = None):
+        """Invalide le cache d'index d'un dictionnaire ou de tous."""
+        if dict_id:
+            cls._index_cache.pop(dict_id, None)
+        else:
+            cls._index_cache.clear()
+
+    @classmethod
+    def _get_or_build_index(cls, dict_id: str, d_info: dict) -> List[Dict[str, Any]]:
+        """Construit ou retourne l'index en mémoire ultra-rapide d'un dictionnaire."""
+        if dict_id in cls._index_cache:
+            return cls._index_cache[dict_id]
 
         dict_type = d_info.get("type", "custom")
-        headwords = []
+        indexed_items = []
 
-        norm_q = cls.normalize_term(query) if query else ""
-        filter_letter = letter.upper().strip() if letter and letter not in ["ALL", "TOUS", "*"] else None
-
-        # 1. Strong
         if dict_type == "strong":
             from core.strong_lexicon import StrongLexicon
             lex = StrongLexicon.load_lexicon()
@@ -216,52 +212,24 @@ class DictionaryManager:
                 defn = ent.get("definition", "")
                 title = f"{short} — {lemma} ({translit})" if translit else f"{short} — {lemma}"
                 norm_title = f"{cls.normalize_term(short)} {cls.normalize_term(lemma)} {cls.normalize_term(translit)}".strip()
-                
-                if filter_letter:
-                    if filter_letter == "H" and not short.startswith("H"): continue
-                    elif filter_letter == "G" and not short.startswith("G"): continue
-                    elif filter_letter not in ["H", "G"] and not translit.upper().startswith(filter_letter) and not short.startswith(filter_letter):
-                        continue
-
-                match_score = 0
-                if norm_q:
-                    norm_defn = cls.normalize_term(defn)
-                    if norm_title == norm_q or cls.normalize_term(short) == norm_q or cls.normalize_term(lemma) == norm_q:
-                        match_score = 0
-                    elif norm_title.startswith(norm_q) or cls.normalize_term(short).startswith(norm_q) or cls.normalize_term(lemma).startswith(norm_q) or cls.normalize_term(translit).startswith(norm_q):
-                        match_score = 1
-                    elif re.search(r'\b' + re.escape(norm_q), norm_title):
-                        match_score = 2
-                    elif norm_q in norm_title:
-                        match_score = 3
-                    elif norm_q in norm_defn:
-                        match_score = 4
-                    else:
-                        continue
-                
                 snippet = defn[:120] + "..." if len(defn) > 120 else defn
                 snippet = re.sub(r'^[,\.\:\;\—\–\-\s\'\^£«»\(\)\[\]]+', '', snippet).strip()
-                headwords.append({
+                
+                # Première lettre pour le filtre A-Z
+                first_letter = translit.upper()[0] if translit else short.upper()[0]
+
+                indexed_items.append({
                     "slug": code,
                     "title": title,
                     "lemma": lemma,
                     "code": short,
+                    "translit": translit,
+                    "norm_title": norm_title,
+                    "first_letter": first_letter,
                     "snippet": snippet,
-                    "_score": match_score,
-                    "_norm_title": norm_title
+                    "norm_body": cls.normalize_term(defn[:400])
                 })
 
-            if norm_q:
-                headwords.sort(key=lambda x: (x["_score"], len(x["title"]), x["_norm_title"]))
-            else:
-                def strong_sort_key(item):
-                    c = item["code"]
-                    prefix = 0 if c.startswith("H") else 1
-                    num = int(re.sub(r'\D', '', c)) if re.search(r'\d+', c) else 0
-                    return (prefix, num)
-                headwords.sort(key=strong_sort_key)
-
-        # 2. Bailly
         elif dict_type == "greek":
             from core.strong_lexicon import StrongLexicon
             bailly_data = StrongLexicon.load_bailly()
@@ -273,105 +241,130 @@ class DictionaryManager:
                 txt = first.get("full_text", "")
                 title = f"{code} — {hw}"
                 norm_title = f"{cls.normalize_term(code)} {cls.normalize_term(hw)}".strip()
-
-                if filter_letter and not hw.upper().startswith(filter_letter) and not code.startswith(filter_letter):
-                    continue
-
-                match_score = 0
-                if norm_q:
-                    norm_txt = cls.normalize_term(txt)
-                    if norm_title == norm_q or cls.normalize_term(code) == norm_q or cls.normalize_term(hw) == norm_q:
-                        match_score = 0
-                    elif norm_title.startswith(norm_q) or cls.normalize_term(code).startswith(norm_q) or cls.normalize_term(hw).startswith(norm_q):
-                        match_score = 1
-                    elif re.search(r'\b' + re.escape(norm_q), norm_title):
-                        match_score = 2
-                    elif norm_q in norm_title:
-                        match_score = 3
-                    elif norm_q in norm_txt:
-                        match_score = 4
-                    else:
-                        continue
-
                 snippet = txt[:120] + "..." if len(txt) > 120 else txt
                 snippet = re.sub(r'^[,\.\:\;\—\–\-\s\'\^£«»\(\)\[\]]+', '', snippet).strip()
-                headwords.append({
+                first_letter = unicodedata.normalize('NFD', hw.upper())[0] if hw else code.upper()[0]
+
+                indexed_items.append({
                     "slug": code,
                     "title": title,
                     "code": code,
+                    "norm_title": norm_title,
+                    "first_letter": first_letter,
                     "snippet": snippet,
-                    "_score": match_score,
-                    "_norm_title": norm_title
+                    "norm_body": cls.normalize_term(txt[:400])
                 })
 
-            if norm_q:
-                headwords.sort(key=lambda x: (x["_score"], len(x["title"]), x["_norm_title"]))
-            else:
-                headwords.sort(key=lambda x: (int(re.sub(r'\D', '', x['code'])) if re.search(r'\d+', x['code']) else 0))
-
-        # 3. Dictionnaires Personnalisés / Calmet / Vigouroux / Nouveau Dict
         else:
             data = cls.load_dictionary_file(d_info)
             articles = data.get("articles", {}) if data else {}
-            
             for slug, art in articles.items():
-                title = art.get("title") or art.get("headword") or slug
-                clean_title = title.strip()
-                norm_title = cls.normalize_term(clean_title)
-                
-                if filter_letter:
-                    first_char = unicodedata.normalize('NFD', clean_title.upper())[0] if clean_title else ''
-                    if first_char != filter_letter:
-                        continue
-
-                match_score = 0
+                title = (art.get("title") or art.get("headword") or slug).strip()
+                norm_title = cls.normalize_term(title)
+                first_char = unicodedata.normalize('NFD', title.upper())[0] if title else ''
                 txt = art.get("text", "")
-                if norm_q:
-                    norm_body = cls.normalize_term(txt)
-                    if norm_title == norm_q:
-                        match_score = 0
-                    elif norm_title.startswith(norm_q):
-                        match_score = 1
-                    elif re.search(r'\b' + re.escape(norm_q), norm_title):
-                        match_score = 2
-                    elif norm_q in norm_title:
-                        match_score = 3
-                    elif norm_q in norm_body:
-                        match_score = 4
-                    else:
-                        continue
-                        
-                # Nettoyage rigoureux de l'extrait pour supprimer la répétition du titre et la ponctuation parasite initiale
+                
                 snippet = re.sub(r'^(?:[0-9]+\.\s*)?[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\s–-]{2,}\s*', '', txt).strip()
                 snippet = re.sub(r'^[,\.\:\;\—\–\-\s\'\^£«»\(\)\[\]\?\/\\\|]+', '', snippet).strip()
                 if not snippet:
                     snippet = re.sub(r'^[,\.\:\;\—\–\-\s\'\^£«»]+', '', txt).strip()
-
-                # Si c'est une correspondance uniquement dans le corps du texte (Score 4), centrer l'extrait sur le terme cherché
-                if match_score == 4 and norm_q:
-                    clean_norm_snip = cls.normalize_term(snippet)
-                    match_pos = clean_norm_snip.find(norm_q)
-                    if match_pos > 35:
-                        start_pos = max(0, match_pos - 35)
-                        snippet = "..." + snippet[start_pos:]
-
                 if len(snippet) > 130:
                     snippet = snippet[:130] + "..."
-                    
-                headwords.append({
+
+                indexed_items.append({
                     "slug": slug,
-                    "title": clean_title,
+                    "title": title,
+                    "norm_title": norm_title,
+                    "first_letter": first_char,
                     "snippet": snippet,
-                    "_score": match_score,
-                    "_norm_title": norm_title
+                    "norm_body": cls.normalize_term(txt[:500])
                 })
-                
+
+        cls._index_cache[dict_id] = indexed_items
+        return indexed_items
+
+    @classmethod
+    def get_headwords(
+        cls, 
+        dict_id: str, 
+        letter: str = None, 
+        query: str = None, 
+        limit: int = 300, 
+        offset: int = 0
+    ) -> dict:
+        """
+        Retourne l'index alphabétique ordonné des termes / lemmes d'un dictionnaire spécifique en quelques millisecondes.
+        """
+        reg = cls.load_registry()
+        d_info = next((d for d in reg if d["id"] == dict_id), None)
+        if not d_info:
+            d_info = reg[0] if reg else {"id": dict_id, "name": dict_id}
+
+        dict_type = d_info.get("type", "custom")
+        norm_q = cls.normalize_term(query) if query else ""
+        filter_letter = letter.upper().strip() if letter and letter not in ["ALL", "TOUS", "*"] else None
+
+        items = cls._get_or_build_index(dict_id, d_info)
+        headwords = []
+
+        for item in items:
+            # 1. Filtre par lettre A-Z
+            if filter_letter:
+                fl = item.get("first_letter", "")
+                if filter_letter in ["H", "G"] and dict_type == "strong":
+                    if not item.get("code", "").startswith(filter_letter):
+                        continue
+                elif filter_letter not in ["H", "G"] and dict_type == "strong":
+                    if not item.get("translit", "").upper().startswith(filter_letter) and not item.get("code", "").startswith(filter_letter):
+                        continue
+                elif fl != filter_letter:
+                    continue
+
+            # 2. Pertinence de recherche ordonnée
+            match_score = 0
             if norm_q:
-                # Priorité absolue : 
-                # Score 0 (titre exact) -> Score 1 (titre commence par) -> Score 2 (mot du titre commence par) -> Score 3 (titre contient) -> Score 4 (corps de l'article)
-                headwords.sort(key=lambda x: (x["_score"], len(x["title"]), x["_norm_title"]))
-            else:
-                headwords.sort(key=lambda x: x["_norm_title"])
+                nt = item["norm_title"]
+                if nt == norm_q or (dict_type == "strong" and (cls.normalize_term(item.get("code", "")) == norm_q or cls.normalize_term(item.get("lemma", "")) == norm_q)):
+                    match_score = 0
+                elif nt.startswith(norm_q) or (dict_type == "strong" and (cls.normalize_term(item.get("code", "")).startswith(norm_q) or cls.normalize_term(item.get("lemma", "")).startswith(norm_q) or cls.normalize_term(item.get("translit", "")).startswith(norm_q))):
+                    match_score = 1
+                elif re.search(r'\b' + re.escape(norm_q), nt):
+                    match_score = 2
+                elif norm_q in nt:
+                    match_score = 3
+                elif norm_q in item.get("norm_body", ""):
+                    match_score = 4
+                else:
+                    continue
+
+            res_item = {
+                "slug": item["slug"],
+                "title": item["title"],
+                "snippet": item["snippet"],
+                "_score": match_score,
+                "_norm_title": item["norm_title"]
+            }
+            if "code" in item:
+                res_item["code"] = item["code"]
+            if "lemma" in item:
+                res_item["lemma"] = item["lemma"]
+
+            headwords.append(res_item)
+
+        if norm_q:
+            # Priorité absolue : Score 0 (titre exact) -> Score 1 (commence par) -> Score 2 (mot commence par) -> Score 3 (contient) -> Score 4 (corps)
+            headwords.sort(key=lambda x: (x["_score"], len(x["title"]), x["_norm_title"]))
+        elif dict_type == "strong":
+            def strong_sort_key(it):
+                c = it.get("code", "")
+                prefix = 0 if c.startswith("H") else 1
+                num = int(re.sub(r'\D', '', c)) if re.search(r'\d+', c) else 0
+                return (prefix, num)
+            headwords.sort(key=strong_sort_key)
+        elif dict_type == "greek":
+            headwords.sort(key=lambda x: (int(re.sub(r'\D', '', x.get('code', ''))) if re.search(r'\d+', x.get('code', '')) else 0))
+        else:
+            headwords.sort(key=lambda x: x["_norm_title"])
 
         total_count = len(headwords)
         paged_headwords = headwords[offset:offset + limit]
