@@ -2750,6 +2750,18 @@ class BibleAppApi:
                 except Exception as e:
                     logger.error(f"Erreur importation Bible EPUB : {e}", exc_info=True)
                     return {"success": False, "error": f"Erreur importation Bible EPUB : {e}"}
+            elif ext == '.docx':
+                from core.bible_docx_importer import BibleDocxImporter
+                try:
+                    b_name, b_meta = BibleDocxImporter.import_bible_docx(
+                        file_path,
+                        custom_name=name,
+                        custom_metadata=metadata
+                    )
+                    return {"success": True, "name": b_name, "is_bible": True, "books_count": b_meta.get("total_books", 0), "chunks_count": 0}
+                except Exception as e:
+                    logger.error(f"Erreur importation Bible DOCX : {e}", exc_info=True)
+                    return {"success": False, "error": f"Erreur importation Bible DOCX : {e}"}
             elif ext == '.json':
                 try:
                     b_name, b_meta = BibleJsonLoader.import_single_bible_json(

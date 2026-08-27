@@ -818,7 +818,12 @@ const DictView = {
       'LXI': 61, 'LXII': 62, 'LXIII': 63, 'LXIV': 64, 'LXV': 65, 'LXVI': 66, 'LXVII': 67, 'LXVIII': 68, 'LXIX': 69, 'LXX': 70,
       'LXXI': 71, 'LXXII': 72, 'LXXIII': 73, 'LXXIV': 74, 'LXXV': 75, 'LXXVI': 76, 'LXXVII': 77, 'LXXVIII': 78, 'LXXIX': 79, 'LXXX': 80,
       'LXXXI': 81, 'LXXXII': 82, 'LXXXIII': 83, 'LXXXIV': 84, 'LXXXV': 85, 'LXXXVI': 86, 'LXXXVII': 87, 'LXXXVIII': 88, 'LXXXIX': 89, 'XC': 90,
-      'XCI': 91, 'XCII': 92, 'XCIII': 93, 'XCIV': 94, 'XCV': 95, 'XCVI': 96, 'XCVII': 97, 'XCVIII': 98, 'XCIX': 99, 'C': 100
+      'XCI': 91, 'XCII': 92, 'XCIII': 93, 'XCIV': 94, 'XCV': 95, 'XCVI': 96, 'XCVII': 97, 'XCVIII': 98, 'XCIX': 99, 'C': 100,
+      'CI': 101, 'CII': 102, 'CIII': 103, 'CIV': 104, 'CV': 105, 'CVI': 106, 'CVII': 107, 'CVIII': 108, 'CIX': 109, 'CX': 110,
+      'CXI': 111, 'CXII': 112, 'CXIII': 113, 'CXIV': 114, 'CXV': 115, 'CXVI': 116, 'CXVII': 117, 'CXVIII': 118, 'CXIX': 119, 'CXX': 120,
+      'CXXI': 121, 'CXXII': 122, 'CXXIII': 123, 'CXXIV': 124, 'CXXV': 125, 'CXXVI': 126, 'CXXVII': 127, 'CXXVIII': 128, 'CXXIX': 129, 'CXXX': 130,
+      'CXXXI': 131, 'CXXXII': 132, 'CXXXIII': 133, 'CXXXIV': 134, 'CXXXV': 135, 'CXXXVI': 136, 'CXXXVII': 137, 'CXXXVIII': 138, 'CXXXIX': 139, 'CXL': 140,
+      'CXLI': 141, 'CXLII': 142, 'CXLIII': 143, 'CXLIV': 144, 'CXLV': 145, 'CXLVI': 146, 'CXLVII': 147, 'CXLVIII': 148, 'CXLIX': 149, 'CL': 150
     };
 
     const BOOK_ALIASES = {
@@ -830,24 +835,25 @@ const DictView = {
       "jos": "Josué", "josue": "Josué",
       "jug": "Juges", "juges": "Juges", "jg": "Juges",
       "ruth": "Ruth", "rt": "Ruth",
-      "i sam": "1 Samuel", "ii sam": "2 Samuel", "1 sam": "1 Samuel", "2 sam": "2 Samuel", "1s": "1 Samuel", "2s": "2 Samuel",
-      "i reg": "1 Rois", "ii reg": "2 Rois", "iii reg": "1 Rois", "iv reg": "2 Rois",
-      "1 reg": "1 Rois", "2 reg": "2 Rois", "3 reg": "1 Rois", "4 reg": "2 Rois",
-      "i rois": "1 Rois", "ii rois": "2 Rois", "1 rois": "1 Rois", "2 rois": "2 Rois", "1r": "1 Rois", "2r": "2 Rois",
-      "i par": "1 Chroniques", "ii par": "2 Chroniques", "1 par": "1 Chroniques", "2 par": "2 Chroniques",
-      "1 ch": "1 Chroniques", "2 ch": "2 Chroniques", "1ch": "1 Chroniques", "2ch": "2 Chroniques",
-      "i chron": "1 Chroniques", "ii chron": "2 Chroniques", "1 chron": "1 Chroniques", "2 chron": "2 Chroniques", "chron": "1 Chroniques",
-      "esd": "Esdras", "esdras": "Esdras", "i esdr": "1 Esdras", "ii esdr": "2 Esdras",
-      "neh": "Néhémie", "nehemie": "Néhémie", "né": "Néhémie", "ne": "Néhémie",
+      "1 sam": "1 Samuel", "2 sam": "2 Samuel", "1 samuel": "1 Samuel", "2 samuel": "2 Samuel", "1s": "1 Samuel", "2s": "2 Samuel", "i sam": "1 Samuel", "ii sam": "2 Samuel", "i samuel": "1 Samuel", "ii samuel": "2 Samuel",
+      "1 rois": "1 Rois", "2 rois": "2 Rois", "1r": "1 Rois", "2r": "2 Rois", "i rois": "1 Rois", "ii rois": "2 Rois", "i reg": "1 Rois", "ii reg": "2 Rois", "iii reg": "1 Rois", "iv reg": "2 Rois", "1 reg": "1 Rois", "2 reg": "2 Rois", "3 reg": "1 Rois", "4 reg": "2 Rois",
+      "1 chron": "1 Chroniques", "2 chron": "2 Chroniques", "1 chroniques": "1 Chroniques", "2 chroniques": "2 Chroniques", "1 ch": "1 Chroniques", "2 ch": "2 Chroniques", "1ch": "1 Chroniques", "2ch": "2 Chroniques", "i chron": "1 Chroniques", "ii chron": "2 Chroniques", "i chroniques": "1 Chroniques", "ii chroniques": "2 Chroniques", "i par": "1 Chroniques", "ii par": "2 Chroniques", "1 par": "1 Chroniques", "2 par": "2 Chroniques", "chron": "1 Chroniques", "par": "1 Chroniques", "paralipomenes": "1 Chroniques", "i paralipomenes": "1 Chroniques", "ii paralipomenes": "2 Chroniques",
+      "esd": "Esdras", "esdras": "Esdras", "1 esdr": "1 Esdras", "2 esdr": "2 Esdras", "i esdr": "1 Esdras", "ii esdr": "2 Esdras",
+      "neh": "Néhémie", "nehemie": "Néhémie", "ne": "Néhémie",
+      "tob": "Tobie", "tobie": "Tobie", "tb": "Tobie",
+      "jdt": "Judith", "judith": "Judith",
       "esth": "Esther", "esther": "Esther", "est": "Esther",
       "job": "Job", "jb": "Job",
       "ps": "Psaumes", "psa": "Psaumes", "psaumes": "Psaumes", "psaume": "Psaumes", "pss": "Psaumes",
       "prov": "Proverbes", "proverbes": "Proverbes", "pr": "Proverbes",
-      "eccl": "Ecclésiaste", "ecclesiaste": "Ecclésiaste", "ec": "Ecclésiaste", "ecc": "Ecclésiaste",
+      "eccl": "Ecclésiaste", "ecclesiaste": "Ecclésiaste", "ec": "Ecclésiaste", "ecc": "Ecclésiaste", "qoh": "Ecclésiaste",
+      "eccli": "Siracide", "ecclesiastique": "Siracide", "ecclique": "Siracide", "sir": "Siracide", "siracide": "Siracide", "si": "Siracide",
+      "sag": "Sagesse", "sagesse": "Sagesse", "sg": "Sagesse",
       "cant": "Cantique des cantiques", "cantique": "Cantique des cantiques", "ct": "Cantique des cantiques",
       "is": "Ésaïe", "isa": "Ésaïe", "esaie": "Ésaïe", "isaie": "Ésaïe", "es": "Ésaïe",
       "jer": "Jérémie", "jeremie": "Jérémie", "jr": "Jérémie",
       "lam": "Lamentations", "lamentations": "Lamentations", "lm": "Lamentations",
+      "bar": "Baruch", "baruch": "Baruch",
       "ezech": "Ézéchiel", "eze": "Ézéchiel", "ezechiel": "Ézéchiel", "ez": "Ézéchiel",
       "dan": "Daniel", "daniel": "Daniel", "da": "Daniel", "dn": "Daniel",
       "os": "Osée", "osee": "Osée",
@@ -862,32 +868,33 @@ const DictView = {
       "agg": "Aggée", "aggee": "Aggée", "ag": "Aggée",
       "zach": "Zacharie", "zacharie": "Zacharie", "za": "Zacharie",
       "mal": "Malachie", "malachie": "Malachie", "ml": "Malachie",
+      "1 mac": "1 Maccabées", "2 mac": "2 Maccabées", "1 macc": "1 Maccabées", "2 macc": "2 Maccabées", "i mac": "1 Maccabées", "ii mac": "2 Maccabées", "i macc": "1 Maccabées", "ii macc": "2 Maccabées",
       "matth": "Matthieu", "matt": "Matthieu", "mat": "Matthieu", "matthieu": "Matthieu", "mt": "Matthieu",
       "marc": "Marc", "mar": "Marc", "mc": "Marc",
       "luc": "Luc", "lc": "Luc",
       "jean": "Jean", "jn": "Jean",
       "act": "Actes", "actes": "Actes", "ac": "Actes",
       "rom": "Romains", "romains": "Romains", "ro": "Romains", "rm": "Romains",
-      "i cor": "1 Corinthiens", "ii cor": "2 Corinthiens", "1 cor": "1 Corinthiens", "2 cor": "2 Corinthiens", "1co": "1 Corinthiens", "2co": "2 Corinthiens",
+      "1 cor": "1 Corinthiens", "2 cor": "2 Corinthiens", "i cor": "1 Corinthiens", "ii cor": "2 Corinthiens", "1co": "1 Corinthiens", "2co": "2 Corinthiens",
       "gal": "Galates", "galates": "Galates", "ga": "Galates",
       "eph": "Éphésiens", "ephesiens": "Éphésiens", "ep": "Éphésiens",
       "phil": "Philippiens", "philippiens": "Philippiens", "php": "Philippiens", "ph": "Philippiens",
       "col": "Colossiens", "colossiens": "Colossiens",
-      "i thes": "1 Thessaloniciens", "ii thes": "2 Thessaloniciens", "1th": "1 Thessaloniciens", "2th": "2 Thessaloniciens",
-      "i tim": "1 Timothée", "ii tim": "2 Timothée", "1tm": "1 Timothée", "2tm": "2 Timothée",
+      "1 thes": "1 Thessaloniciens", "2 thes": "2 Thessaloniciens", "i thes": "1 Thessaloniciens", "ii thes": "2 Thessaloniciens", "1th": "1 Thessaloniciens", "2th": "2 Thessaloniciens",
+      "1 tim": "1 Timothée", "2 tim": "2 Timothée", "i tim": "1 Timothée", "ii tim": "2 Timothée", "1tm": "1 Timothée", "2tm": "2 Timothée",
       "tit": "Tite", "tite": "Tite", "tt": "Tite",
       "phlm": "Philémon", "philemon": "Philémon", "phm": "Philémon",
       "heb": "Hébreux", "hebreux": "Hébreux", "he": "Hébreux", "hé": "Hébreux",
       "jacq": "Jacques", "jacques": "Jacques", "ja": "Jacques", "jas": "Jacques", "jc": "Jacques",
-      "i pierre": "1 Pierre", "ii pierre": "2 Pierre", "1 pierre": "1 Pierre", "2 pierre": "2 Pierre", "1p": "1 Pierre", "2p": "2 Pierre",
-      "i jean": "1 Jean", "ii jean": "2 Jean", "iii jean": "3 Jean", "1j": "1 Jean", "2j": "2 Jean", "3j": "3 Jean", "1jn": "1 Jean", "2jn": "2 Jean", "3jn": "3 Jean",
-      "jud": "Juges", "jude": "Jude", "jd": "Jude",
+      "1 pierre": "1 Pierre", "2 pierre": "2 Pierre", "i pierre": "1 Pierre", "ii pierre": "2 Pierre", "1p": "1 Pierre", "2p": "2 Pierre",
+      "1 jean": "1 Jean", "2 jean": "2 Jean", "3 jean": "3 Jean", "i jean": "1 Jean", "ii jean": "2 Jean", "iii jean": "3 Jean", "1j": "1 Jean", "2j": "2 Jean", "3j": "3 Jean", "1jn": "1 Jean", "2jn": "2 Jean", "3jn": "3 Jean",
+      "jude": "Jude", "jd": "Jude",
       "apoc": "Apocalypse", "apocalypse": "Apocalypse", "rev": "Apocalypse", "apo": "Apocalypse", "ap": "Apocalypse",
       "4m": "4 Maccabées"
     };
 
     const cleanBookKey = (name) => {
-      return (name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[*_`\.]+/g, '').trim().toLowerCase();
+      return (name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[*_`\.,]+/g, '').trim().toLowerCase();
     };
 
     let processed = (text || '');
@@ -907,8 +914,9 @@ const DictView = {
 
     // 0b. Restructuration Automatique des textes bruts (Logos / NDB)
     if (this.optLogosRestructure) {
-      // Badges de versions bibliques EN PREMIER (explicite pour éviter de capturer la ville de Jérusalem)
-      processed = processed.replace(/(^|[^\w])(Bible\s+de\s+Jérusalem|SEGOND|SYNODALE|T\.O\.B\.|TOB|DARBY|Français\s+Courant|Colombe|BFC|NBS|NFC|S21)\b/gi, '$1<span class="dict-version-badge">$2</span>');
+      // Badges de versions bibliques (exclure TOB suivi de ponctuation de versets pour ne pas casser le livre de Tobie)
+      processed = processed.replace(/(^|[^\w])(Bible\s+de\s+Jérusalem|SEGOND|SYNODALE|T\.O\.B\.|DARBY|Français\s+Courant|Colombe|BFC|NBS|NFC|S21)\b/gi, '$1<span class="dict-version-badge">$2</span>');
+      processed = processed.replace(/(^|[^\w])(TOB)(?!\.|\s*[,0-9IVXLCDM])\b/g, '$1<span class="dict-version-badge">$2</span>');
 
       // Normalisation des marqueurs orphelins (chiffre ou lettre seul sur une ligne avec texte sur la suivante)
       processed = processed.replace(/^(\d+)\.?\s*\n+([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇa-zÀ-ÿ])/gm, '$1. $2');
@@ -951,7 +959,8 @@ const DictView = {
             }
             for (let i = 1; i < parts.length; i += 2) {
               const num = parts[i];
-              let body = (parts[i + 1] || '').trim().replace(/\.+$/, '');
+              let body = (parts[i + 1] || '').trim();
+              if (body.startsWith('..') || body.startsWith('.')) body = body.replace(/^\.+/, '').trim();
               outCards.push(`<div class="dict-subentry-card dict-calmet-homonym" id="dict-subentry-${num}"><span class="dict-subentry-num">${num}</span><div class="dict-subentry-content" style="flex: 1; font-size: 14.5px; line-height: 1.75;">${body}</div></div>`);
             }
             processed = outCards.join('\n\n');
@@ -995,32 +1004,23 @@ const DictView = {
         });
       }
 
-      // Notes critiques et gloses éditoriales entre crochets [...] (Calmet & général)
-      if (processed.includes('[')) {
-        processed = processed.replace(/\[([^\]]{3,900})\]/g, (match, inner) => {
-          const cleanInner = inner.trim();
-          // Cas d'un renvoi direct : [Voyez X] ou [Voir X]
-          if (/^(?:Voyez|Voir|Voy\.)\s+[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]+[.,;]?$/i.test(cleanInner)) {
-            const word = cleanInner.replace(/^(?:Voyez|Voir|Voy\.)\s+/i, '').replace(/[.,;:()\[\]]+$/, '').trim();
-            return `<a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word)}">🔗 Voyez ${this.escapeHtml(word)}</a>`;
-          }
-          // Si c'est un long bloc éditorial indépendant (> 160 caractères ou note de savant/M. Boré)
-          if (cleanInner.length > 160 && (cleanInner.includes('. ') || cleanInner.startsWith('M.') || cleanInner.startsWith('Note') || cleanInner.startsWith('A l\'occasion'))) {
-            return `\n\n<div class="dict-calmet-editorial-note"><span class="dict-calmet-note-label">📝 Note critique & historique :</span>${cleanInner}</div>\n\n`;
-          }
-          // Sinon, glose ou précision courte inline : reste dans le flux continu de la phrase pour ne pas casser la ponctuation
-          return `<span class="dict-editorial-gloss">[${cleanInner}]</span>`;
-        });
-        // Nettoyage des virgules ou points orphelins en début de ligne
-        processed = processed.replace(/\n\s*([,;:\.])/g, '$1');
-      }
-
-      // Badges chronologiques (An du monde / av. J.-C.)
-      processed = processed.replace(/\(?\b(An du monde \d+,\s*avant Jésus[–\-]Christ \d+,\s*avant l’ère vulgaire \d+)\)?/gi, '<span class="dict-chrono-badge" style="display: inline-flex; align-items: center; gap: 4px; padding: 1px 7px; background: rgba(217, 119, 6, 0.09); border: 1px solid rgba(217, 119, 6, 0.25); border-radius: 4px; font-size: 12px; font-weight: 600; color: #d97706; margin: 0 2px;">🏛️ $1</span>');
-      processed = processed.replace(/\b(l’an du monde \d+,\s*\d+\s+avant Jésus[–\-]Christ,\s*et \d+\s+ans avant l’ère vulgaire[^\.\;]*)/gi, '<span class="dict-chrono-badge" style="display: inline-flex; align-items: center; gap: 4px; padding: 1px 7px; background: rgba(217, 119, 6, 0.09); border: 1px solid rgba(217, 119, 6, 0.25); border-radius: 4px; font-size: 12px; font-weight: 600; color: #d97706; margin: 0 2px;">🏛️ $1</span>');
-
-      // Liens de saut interne : Voir N° 8 -> ancre vers sous-carte 8
-      processed = processed.replace(/\bVoir\s+(?:N°|n°|numéro)\s*(\d+)\b/gi, '<a href="javascript:void(0)" class="dict-internal-jump-link" data-jump-to="dict-subentry-$1">Voir n° $1</a>');
+      // Notes éditoriales entre crochets [...] dans Calmet
+      processed = processed.replace(/\[([^\]]{3,900})\]/g, (match, inner) => {
+        const cleanInner = inner.trim();
+        // Cas d'un renvoi direct : [Voyez X] ou [Voir X]
+        if (/^(?:Voyez|Voir|Voy\.)\s+[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]+[.,;]?$/i.test(cleanInner)) {
+          const word = cleanInner.replace(/^(?:Voyez|Voir|Voy\.)\s+/i, '').replace(/[.,;:()\[\]]+$/, '').trim();
+          return `<a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word)}">🔗 Voyez ${this.escapeHtml(word)}</a>`;
+        }
+        // Si c'est un long bloc éditorial indépendant (> 160 caractères ou note de savant/M. Boré)
+        if (cleanInner.length > 160 && (cleanInner.includes('. ') || cleanInner.startsWith('M.') || cleanInner.startsWith('Note') || cleanInner.startsWith('A l\'occasion'))) {
+          return `\n\n<div class="dict-calmet-editorial-note"><span class="dict-calmet-note-label">📝 Note critique & historique :</span>${cleanInner}</div>\n\n`;
+        }
+        // Sinon, glose ou précision courte inline
+        return `<span class="dict-editorial-gloss">[${cleanInner}]</span>`;
+      });
+      // Nettoyage des virgules ou points orphelins en début de ligne
+      processed = processed.replace(/\n\s*([,;:\.])/g, '$1');
     }
 
     // 1. Normalisation des références bibliques et conversion des chiffres romains
@@ -1035,14 +1035,24 @@ const DictView = {
         return `${bookFr} ${chNum}:${cleanV}`;
       });
 
-      // Classiques avec chiffres romains et abréviations complexes : I Par.*, VI, 41 ou Zach., XII, 11
-      processed = processed.replace(/(?:\*+)?\b((?:I{1,3}|IV|[1-4])\s*[\*A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç\.]+|[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç\.]+)(?:\*+)?\s*,\s*([IVXLCDM]+)\s*,\s*([0-9]+(?:\s*[\-–]\s*[0-9]+)?)/gi, (match, rawB, romCh, verses) => {
+      // Classiques avec chiffres romains et versets multiples (ex: Ps. XXXIII, 10-11 ou Ézéch., XVIII, 7, 16 ou 1 Samuel, VII, 11 ou Tob., I, 20)
+      processed = processed.replace(/(^|[^\wÀ-ÿ])((?:I{1,3}|IV|[1-4])\s*[\*A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç\.]+|[A-Za-zÉÈÊËÀÂÄÎÏÔÖÙÛÜÇéèêëàâäîïôöùûüç\.]+)(?:\*+)?\s*[\.,]*\s*([IVXLCDM]+)\s*,\s*([0-9]+(?:\s*(?:,|et|\-|\–)\s*[0-9]+)*)/gi, (match, prefix, rawB, romCh, verses) => {
         const k = cleanBookKey(rawB);
         const bookFr = BOOK_ALIASES[k];
-        if (bookFr) {
-          const chNum = ROMAN_MAP[romCh.toUpperCase()] || romCh;
-          const cleanV = verses.replace(/–/g, '-').replace(/\s+/g, '');
-          return `${bookFr} ${chNum}:${cleanV}`;
+        const chNum = ROMAN_MAP[romCh.toUpperCase()];
+        if (bookFr && chNum) {
+          const cleanV = verses.replace(/et\s+/g, '').replace(/–/g, '-').replace(/\s+/g, '');
+          return `${prefix}${bookFr} ${chNum}:${cleanV}`;
+        }
+        return match;
+      });
+
+      // Références consécutives sans rappel de nom de livre (ex: Psaumes 33:10-11 ; XXXVI, 25 -> Psaumes 33:10-11 ; 36:25)
+      processed = processed.replace(/([;,]\s*)([IVXLCDM]+)\s*,\s*([0-9]+(?:\s*(?:,|et|\-|\–)\s*[0-9]+)*)/g, (match, sep, romCh, verses) => {
+        const chNum = ROMAN_MAP[romCh.toUpperCase()];
+        if (chNum) {
+          const cleanV = verses.replace(/et\s+/g, '').replace(/–/g, '-').replace(/\s+/g, '');
+          return `${sep}${chNum}:${cleanV}`;
         }
         return match;
       });

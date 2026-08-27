@@ -795,5 +795,37 @@
     "file_path": "C:\\Users\\adrie\\kDrive\\Documents\\Théologie\\Ressources externes\\Ebooks\\26-John-Mac-Arthur-La-divinite-de-Christ.epub",
     "publisher": "Éditions Impact",
     "isbn": "9782890823242"
+  },
+  "CRA": {
+    "title": "Bible Crampon 1923, verte",
+    "author": "La Maison de la Bible",
+    "description": "",
+    "year": "1923",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\Bible_Crampon_1923,_verte.jpg",
+    "type": "Bible",
+    "format": "json",
+    "folder_name": "CRA",
+    "version_code": "CRA",
+    "total_books": 66,
+    "embedding_model": "study_library",
+    "active": true,
+    "name": "CRA",
+    "corpus_scope": "GLOBAL",
+    "source_type": "general",
+    "book_code": null
+  },
+  "CAHEN": {
+    "title": "Bible Cahen",
+    "author": "Samuel Cahen",
+    "description": "Bible Cahen",
+    "year": "1831",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\CAHEN.png",
+    "type": "Bible",
+    "format": "json",
+    "folder_name": "CAHEN",
+    "version_code": "CAHEN",
+    "total_books": 38,
+    "embedding_model": "study_library",
+    "active": true
   }
 }

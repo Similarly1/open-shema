@@ -17368,7 +17368,36 @@ body:not(.theme-dark) .vintage-epoch-xix .pane-header {
   color: #4a2d14 !important;
 }
 
-/* Texte encre bistre profonde pour le mode clair / sépia sur TOUS les contenus */
+/* Texte encre sombre pour le mode clair / blanc / sépia sur TOUS les contenus d'époque */
+body.reading-bg-white .vintage-epoch-ancient .verses-flow,
+body.reading-bg-white .vintage-epoch-classic .verses-flow,
+body.reading-bg-white .vintage-epoch-xix .verses-flow,
+body.reading-bg-white .vintage-epoch-ancient .word-token,
+body.reading-bg-white .vintage-epoch-classic .word-token,
+body.reading-bg-white .vintage-epoch-xix .word-token,
+body.reading-bg-white .vintage-epoch-ancient .dict-entry-body,
+body.reading-bg-white .vintage-epoch-classic .dict-entry-body,
+body.reading-bg-white .vintage-epoch-xix .dict-entry-body,
+body.reading-bg-white .vintage-epoch-ancient .dict-entry-body-content,
+body.reading-bg-white .vintage-epoch-classic .dict-entry-body-content,
+body.reading-bg-white .vintage-epoch-xix .dict-entry-body-content,
+body.reading-bg-white .vintage-epoch-ancient .dict-entry-body-content *,
+body.reading-bg-white .vintage-epoch-classic .dict-entry-body-content *,
+body.reading-bg-white .vintage-epoch-xix .dict-entry-body-content *,
+body.reading-bg-white .vintage-epoch-ancient p,
+body.reading-bg-white .vintage-epoch-classic p,
+body.reading-bg-white .vintage-epoch-xix p,
+body.reading-bg-white .vintage-epoch-ancient .theol-reading-body *,
+body.reading-bg-white .vintage-epoch-classic .theol-reading-body *,
+body.reading-bg-white .vintage-epoch-xix .theol-reading-body *,
+body.reading-bg-white .vintage-epoch-ancient .comm-body-text *,
+body.reading-bg-white .vintage-epoch-classic .comm-body-text *,
+body.reading-bg-white .vintage-epoch-xix .comm-body-text *,
+body.reading-bg-white #view-dictionary .vintage-epoch-xix,
+body.reading-bg-white #view-dictionary .vintage-epoch-xix * {
+  color: #0F172A !important;
+}
+
 body.reading-bg-sepia .vintage-epoch-ancient .verses-flow,
 body.reading-bg-sepia .vintage-epoch-classic .verses-flow,
 body.reading-bg-sepia .vintage-epoch-xix .verses-flow,
@@ -17422,6 +17451,13 @@ body:not(.theme-dark) .vintage-epoch-xix .comm-body-text * {
   line-height: 1.85 !important;
 }
 
+body.reading-bg-white .vintage-epoch-ancient .dict-entry-title,
+body.reading-bg-white .vintage-epoch-classic .dict-entry-title,
+body.reading-bg-white .vintage-epoch-xix .dict-entry-title,
+body.reading-bg-white #view-dictionary .vintage-epoch-xix .dict-entry-title {
+  color: #0F172A !important;
+}
+
 body.reading-bg-sepia .vintage-epoch-ancient .dict-entry-title,
 body.reading-bg-sepia .vintage-epoch-classic .dict-entry-title,
 body.reading-bg-sepia .vintage-epoch-xix .dict-entry-title,
@@ -17432,6 +17468,13 @@ body:not(.theme-dark) .vintage-epoch-xix .dict-entry-title {
   font-family: 'Cinzel', 'IM Fell English', Georgia, serif !important;
   font-weight: 700 !important;
   letter-spacing: 1px !important;
+}
+
+body.reading-bg-white .vintage-epoch-ancient .verse-num,
+body.reading-bg-white .vintage-epoch-classic .verse-num,
+body.reading-bg-white .vintage-epoch-xix .verse-num {
+  color: #0284c7 !important;
+  font-weight: 700 !important;
 }
 
 body.reading-bg-sepia .vintage-epoch-ancient .verse-num,
