@@ -4,6 +4,7 @@ import re
 import time
 import requests
 import logging
+from threading import Lock
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +73,7 @@ AVAILABLE_POLISH_MODELS = [
 
 class DictionaryPolisher:
     _cache = None
+    _save_lock = Lock()
     
     @classmethod
     def get_cache_path(cls):
@@ -97,13 +99,19 @@ class DictionaryPolisher:
     def save_cache(cls):
         if cls._cache is None:
             return
-        c_path = cls.get_cache_path()
-        os.makedirs(os.path.dirname(c_path), exist_ok=True)
-        try:
-            with open(c_path, "w", encoding="utf-8") as f:
-                json.dump(cls._cache, f, ensure_ascii=False, indent=2)
-        except Exception as e:
-            logger.error(f"Erreur sauvegarde polished_cache.json : {e}")
+        with cls._save_lock:
+            c_path = cls.get_cache_path()
+            os.makedirs(os.path.dirname(c_path), exist_ok=True)
+            tmp_path = c_path + ".tmp"
+            try:
+                with open(tmp_path, "w", encoding="utf-8") as f:
+                    json.dump(cls._cache, f, ensure_ascii=False, indent=2)
+                if os.path.exists(c_path):
+                    os.replace(tmp_path, c_path)
+                else:
+                    os.rename(tmp_path, c_path)
+            except Exception as e:
+                logger.error(f"Erreur sauvegarde polished_cache.json : {e}")
 
     @classmethod
     def get_cache_key(cls, dict_id, slug_or_title):
