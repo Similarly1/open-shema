@@ -256,12 +256,26 @@ const DictView = {
       btn.addEventListener('click', () => {
         const bg = btn.dataset.bg;
         if (bg) {
-          this.readingBg = bg;
-          localStorage.setItem('dict_reading_bg', bg);
-          this.applyDisplayPreferences();
+          this.setReadingBg(bg);
         }
       });
     });
+  },
+
+  setReadingBg(bg) {
+    this.readingBg = bg || 'auto';
+    try {
+      localStorage.setItem('dict_reading_bg', this.readingBg);
+    } catch (e) {}
+
+    // Synchronisation avec le thème global de l'application
+    if (typeof App !== 'undefined' && App.applyTheme) {
+      const currentTheme = document.body.classList.contains('theme-light') ? 'light' : 'dark';
+      const currentPalette = document.body.className.match(/palette-([a-z-]+)/)?.[1] || 'slate';
+      App.applyTheme(currentTheme, currentPalette, this.readingBg);
+    }
+
+    this.applyDisplayPreferences();
   },
 
   applyDisplayPreferences() {
@@ -282,13 +296,18 @@ const DictView = {
     document.querySelectorAll('.dict-bg-swatch').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.bg === this.readingBg);
     });
-    const articleContainer = document.querySelector('.dict-article-panel');
-    if (articleContainer) {
-      articleContainer.classList.remove('reading-bg-white', 'reading-bg-sepia', 'reading-bg-dark');
-      if (this.readingBg !== 'auto') {
-        articleContainer.classList.add(`reading-bg-${this.readingBg}`);
+    const card = document.querySelector('.dict-article-card') || document.getElementById('dict-article-card');
+    const scrollPane = document.getElementById('dict-main-scroll') || document.querySelector('.dict-main-reading-scroll');
+    const viewDict = document.getElementById('view-dictionary');
+    [card, scrollPane, viewDict].forEach(el => {
+      if (el) {
+        el.classList.remove('reading-bg-white', 'reading-bg-sepia', 'reading-bg-dark', 'bg-white', 'bg-sepia', 'bg-dark');
+        if (this.readingBg !== 'auto') {
+          el.classList.add(`reading-bg-${this.readingBg}`);
+          el.classList.add(`bg-${this.readingBg}`);
+        }
       }
-    }
+    });
   },
 
   adjustZoom(delta) {
@@ -1059,10 +1078,15 @@ const DictView = {
 
     // 2. Extraction des citations de sources entre parenthèses
     if (this.optFootnotes) {
-      processed = processed.replace(/\(([^\)\n]{12,350})\)/g, (match, inner) => {
+      processed = processed.replace(/\(([^\)\n]{12,350})\)/g, (match, inner, offset, fullStr) => {
         const lower = inner.toLowerCase();
         // Éviter les faux positifs sur les badges de versions bibliques déjà balisés
         if (inner.includes('dict-version-badge')) return match;
+        // Ne pas transformer les parenthèses situées sur une ligne de renvoi 'Voir' ou 'Voir aussi'
+        const lineStart = fullStr.lastIndexOf('\n', offset);
+        const currentLine = fullStr.slice(lineStart === -1 ? 0 : lineStart + 1, offset);
+        if (/^\s*[*•-]?\s*(?:\*+|_+)?\s*(?:Voir|V\.)/i.test(currentLine)) return match;
+
         const isSource = ['col.', 'p.', 'page', 't.', 'tome', 'édit', 'éd.', 'vol.', 'in-4', 'in-8', 'in-fol', 'ouv. cité', 'op. cit.', 'comment.', 'explan.', 'scholia', 'lexicon', 'revue', 'theol.', 'religionsgeschichte', 'monuments', 'sat.', 'genesis', 'mélanges', 'description de la palestine', 'thésaurus', 'keilinschriften', 'les prophètes'].some(k => lower.includes(k));
         if (isSource) {
           const fnId = this.currentFootnotesList.length + 1;
@@ -1074,41 +1098,82 @@ const DictView = {
       });
     }
 
+    // Nettoyage des retours à la ligne orphelins devant deux-points (\n: -> :)
+    processed = processed.replace(/\n\s*:\s*/g, ' : ');
+
     // 3. Traitement structuré ligne par ligne
     const lines = processed.split(/\r?\n/);
     const out = [];
     let inSeeList = false;
     let inUlList = false;
+    let currentBlockquote = [];
+
+    const flushBlockquote = () => {
+      if (currentBlockquote.length > 0) {
+        const bqRaw = currentBlockquote.join(' ').trim();
+        const bqFmt = bqRaw
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.*?)\*/g, '<em>$1</em>');
+        out.push(`<blockquote class="dict-article-blockquote">${bqFmt}</blockquote>`);
+        currentBlockquote = [];
+      }
+    };
 
     lines.forEach((line, lineIdx) => {
       const raw = line.trim();
       if (!raw) {
+        flushBlockquote();
         if (inSeeList) { out.push('</ul>'); inSeeList = false; }
         if (inUlList) { out.push('</ul>'); inUlList = false; }
         return;
       }
 
       // Supprimer le titre répété isolé en ligne 0 s'il n'apporte rien (ex: "Abel" ou "Abana")
-      if (this.optLogosRestructure && lineIdx === 0 && !raw.includes(' ') && !raw.includes('.') && !raw.includes(':')) {
+      if (this.optLogosRestructure && lineIdx === 0 && !raw.includes(' ') && !raw.includes('.') && !raw.includes(':') && !raw.startsWith('#')) {
         return;
       }
 
-      // A) Titres Markdown standards
-      if (raw.startsWith('#')) {
+      // Traitement des blockquotes multiline (> Citation...)
+      if (raw.startsWith('>')) {
         if (inSeeList) { out.push('</ul>'); inSeeList = false; }
         if (inUlList) { out.push('</ul>'); inUlList = false; }
-        if (raw.startsWith('### ')) {
-          out.push(`<h3 style="margin: 18px 0 8px 0; font-size: 17px; font-weight: 700;">${this.escapeHtml(raw.slice(4))}</h3>`);
-          return;
-        }
-        if (raw.startsWith('## ')) {
-          out.push(`<h2 style="margin: 22px 0 10px 0; font-size: 19px; font-weight: 700;">${this.escapeHtml(raw.slice(3))}</h2>`);
-          return;
-        }
-        if (raw.startsWith('# ')) {
-          out.push(`<h1 style="margin: 24px 0 12px 0; font-size: 22px; font-weight: 800;">${this.escapeHtml(raw.slice(2))}</h1>`);
-          return;
-        }
+        const bqLine = raw.replace(/^>\s*/, '');
+        currentBlockquote.push(bqLine);
+        return;
+      } else {
+        flushBlockquote();
+      }
+
+      // Séparateurs horizontaux (---, ***, ___, – – –)
+      if (/^(?:-{3,}|\*{3,}|_{3,}|[–—]{3,}|(?:[-*–—]\s*){3,})$/.test(raw)) {
+        if (inSeeList) { out.push('</ul>'); inSeeList = false; }
+        if (inUlList) { out.push('</ul>'); inUlList = false; }
+        out.push('<div class="dict-article-divider-wrap"><hr class="dict-article-divider" /></div>');
+        return;
+      }
+
+      // A) Titres Markdown standards (# à ######)
+      const headingMatch = raw.match(/^(#{1,6})\s+(.+)$/);
+      if (headingMatch) {
+        if (inSeeList) { out.push('</ul>'); inSeeList = false; }
+        if (inUlList) { out.push('</ul>'); inUlList = false; }
+        const level = headingMatch[1].length;
+        let titleContent = headingMatch[2].trim();
+        // Évaluer le gras et l'italique à l'intérieur du titre pour supprimer les astérisques brutes
+        const titleFmt = titleContent
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.*?)\*/g, '<em>$1</em>');
+        
+        const margins = {
+          1: 'margin: 24px 0 12px 0; font-size: 22px; font-weight: 800;',
+          2: 'margin: 22px 0 10px 0; font-size: 19px; font-weight: 700;',
+          3: 'margin: 18px 0 8px 0; font-size: 17px; font-weight: 700;',
+          4: 'margin: 16px 0 8px 0; font-size: 15.5px; font-weight: 700;',
+          5: 'margin: 14px 0 6px 0; font-size: 14.5px; font-weight: 700;',
+          6: 'margin: 12px 0 6px 0; font-size: 13.5px; font-weight: 700;'
+        };
+        out.push(`<h${level} class="dict-heading dict-h${level}" style="${margins[level] || ''}">${titleFmt}</h${level}>`);
+        return;
       }
 
       // B0) En-tête NDB avec variantes et étymologie (Ligne initiale)
@@ -1128,7 +1193,7 @@ const DictView = {
           if (varPart) {
             out.push(`<div class="dict-header-variants" style="margin-bottom: 6px; font-size: 14px; color: var(--text-secondary); line-height: 1.6;">${varPart}</div>`);
           }
-          out.push(`<div class="dict-etymology-box" style="margin: 10px 0 14px 0; padding: 10px 14px; background: rgba(245, 158, 11, 0.08); border-left: 3.5px solid #f59e0b; border-radius: 0 6px 6px 0; font-size: 14.5px; display: flex; align-items: center; gap: 8px;"><span class="dict-etymology-label" style="font-weight: 700; color: #d97706; font-size: 13.5px; white-space: nowrap;">💡 Signification :</span> <span><em>${meaningOnly}</em></span></div>`);
+          out.push(`<div class="dict-etymology-box" style="margin: 10px 0 14px 0; padding: 10px 14px; border-radius: 0 6px 6px 0; font-size: 14.5px; display: flex; align-items: center; gap: 8px;"><span class="dict-etymology-label" style="font-weight: 700; font-size: 13.5px; white-space: nowrap;">💡 Signification :</span> <span><em>${meaningOnly}</em></span></div>`);
           if (introPart) {
             out.push(`<p style="margin: 8px 0 12px 0; line-height: 1.75;">${introPart}</p>`);
           }
@@ -1169,13 +1234,14 @@ const DictView = {
             </div>
           `);
           if (restPart) {
-            out.push(`<p style="margin: 8px 0; line-height: 1.75;">${restPart}</p>`);
+            const restFmt = restPart.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>');
+            out.push(`<p style="margin: 8px 0; line-height: 1.75;">${restFmt}</p>`);
           }
           return;
         }
       }
 
-      // B2) Sous-entrées numérotées Markdown : **1. AGRICOLA Conrad**
+      // B2) Sous-entrées numérotées Markdown : **1. AGRICOLA Conrad** ou **1. Hébal (Personnage)**
       const subHdrMatch = raw.match(/^\*\*(\d+)\.\s+([^*]+?)\*\*\s*(.*)$/) || raw.match(/^(\d+)\.\s+\*\*([^*]+?)\*\*\s*(.*)$/);
       if (subHdrMatch) {
         if (inSeeList) { out.push('</ul>'); inSeeList = false; }
@@ -1186,7 +1252,7 @@ const DictView = {
 
         out.push(`
           <div class="dict-subentry-heading">
-            <span class="dict-subentry-num">${num}</span>
+            <span class="dict-point-badge">${num}</span>
             <span>${this.escapeHtml(name)}</span>
           </div>
         `);
@@ -1197,10 +1263,10 @@ const DictView = {
         return;
       }
 
-      // B3) Sous-entrées numérotées NDB brutes : 1.Épouse de Hetsrôn... ou 1. Une réalité...
+      // B3) Points et sous-entrées numérotées : 1. **La stèle de la Loi :** ... ou 1. Proximité d'Aphec... ou 1 Proximité d'Aphec
       if (this.optLogosRestructure) {
-        const rawNumMatch = raw.match(/^(\d+)\.\s*(.+)$/);
-        if (rawNumMatch) {
+        const rawNumMatch = raw.match(/^(\d+)[\.\)]\s*(.+)$/) || raw.match(/^(\d+)\s+([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ][a-zA-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇa-zÀ-ÿ'\s\-]+?\s*:?\s*.+)$/);
+        if (rawNumMatch && !raw.startsWith('1 Chroniques') && !raw.startsWith('2 Chroniques') && !raw.startsWith('1 Rois') && !raw.startsWith('2 Rois') && !raw.startsWith('1 Samuel') && !raw.startsWith('2 Samuel') && !raw.startsWith('1 Corinthiens') && !raw.startsWith('2 Corinthiens') && !raw.startsWith('1 Pierre') && !raw.startsWith('2 Pierre') && !raw.startsWith('1 Jean') && !raw.startsWith('2 Jean') && !raw.startsWith('3 Jean') && !raw.startsWith('1 Thessaloniciens') && !raw.startsWith('2 Thessaloniciens') && !raw.startsWith('1 Timothée') && !raw.startsWith('2 Timothée')) {
           if (inSeeList) { out.push('</ul>'); inSeeList = false; }
           if (inUlList) { out.push('</ul>'); inUlList = false; }
           const num = rawNumMatch[1];
@@ -1211,19 +1277,24 @@ const DictView = {
             return `<a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(targetW)}">🔗 ${this.escapeHtml(targetW)}</a>`;
           });
 
-          // Mise en valeur de l'en-tête de phrase si présent
-          if (content.includes(' : ') && content.indexOf(' : ') < 60) {
+          // Évaluer d'abord le gras et l'italique
+          content = content
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+          // Mise en valeur élégante de l'en-tête de phrase si présent
+          if (!content.startsWith('<strong>') && content.includes(' : ') && content.indexOf(' : ') < 60) {
             const sp = content.split(' : ');
             content = `<strong>${sp[0]} :</strong> ${sp.slice(1).join(' : ')}`;
-          } else if (content.includes('. ') && content.indexOf('. ') < 40 && !['s.', 'ch.', 'v.', 'r.', 'd.'].some(k => content.split('. ')[0].toLowerCase().includes(k))) {
+          } else if (!content.startsWith('<strong>') && content.includes('. ') && content.indexOf('. ') < 40 && !['s.', 'ch.', 'v.', 'r.', 'd.'].some(k => content.split('. ')[0].toLowerCase().includes(k))) {
             const sp = content.split('. ');
             content = `<strong>${sp[0]}.</strong> ${sp.slice(1).join('. ')}`;
           }
 
           out.push(`
-            <div class="dict-subentry-card" id="dict-subentry-${num}">
-              <span class="dict-subentry-num">${num}</span>
-              <div class="dict-subentry-content">${content}</div>
+            <div class="dict-numbered-point" id="dict-subentry-${num}">
+              <span class="dict-point-badge">${num}</span>
+              <div class="dict-point-content">${content}</div>
             </div>
           `);
           return;
@@ -1239,53 +1310,73 @@ const DictView = {
           const letter = alphaMatch[1];
           let content = alphaMatch[2].trim();
 
-          // Convertir les renvois inline dans le paragraphe
           content = content.replace(/\b(?:Voir|V\.)\s+([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ][a-zA-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇa-zÀ-ÿ\-]+)/g, (sm, targetW) => {
             return `<a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(targetW)}">🔗 ${this.escapeHtml(targetW)}</a>`;
           });
 
-          // Mise en valeur de l'en-tête de phrase si présent
-          if (content.includes(' : ') && content.indexOf(' : ') < 60) {
+          content = content
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+          if (!content.startsWith('<strong>') && content.includes(' : ') && content.indexOf(' : ') < 60) {
             const sp = content.split(' : ');
             content = `<strong>${sp[0]} :</strong> ${sp.slice(1).join(' : ')}`;
-          } else if (content.includes('. ') && content.indexOf('. ') < 40 && !['s.', 'ch.', 'v.', 'r.', 'd.'].some(k => content.split('. ')[0].toLowerCase().includes(k))) {
+          } else if (!content.startsWith('<strong>') && content.includes('. ') && content.indexOf('. ') < 40 && !['s.', 'ch.', 'v.', 'r.', 'd.'].some(k => content.split('. ')[0].toLowerCase().includes(k))) {
             const sp = content.split('. ');
             content = `<strong>${sp[0]}.</strong> ${sp.slice(1).join('. ')}`;
           }
 
           out.push(`
-            <div class="dict-subentry-card dict-subentry-alpha" id="dict-subentry-${letter}" style="display: flex; align-items: flex-start; gap: 12px; margin: 12px 0; padding: 11px 15px; background: rgba(139, 92, 246, 0.035); border: 1px solid rgba(139, 92, 246, 0.18); border-left: 4px solid #8b5cf6; border-radius: 0 8px 8px 0; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);">
-              <span class="dict-subentry-num" style="flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; min-width: 24px; background: #8b5cf6; color: #ffffff; border-radius: 6px; font-size: 12.5px; font-weight: 800; margin-top: 1px; box-shadow: 0 2px 4px rgba(139, 92, 246, 0.25);">${letter}</span>
-              <div class="dict-subentry-content" style="flex: 1; font-size: 14.5px; line-height: 1.75;">${content}</div>
+            <div class="dict-numbered-point dict-alpha-point" id="dict-subentry-${letter}">
+              <span class="dict-point-badge">${letter}</span>
+              <div class="dict-point-content">${content}</div>
             </div>
           `);
           return;
         }
       }
 
-      // C) Renvois et Articles Connexes (ex: Voir Élever ; Humilité. ou Voir Abiyam ou V. Ahbân)
-      const seeMatch = raw.match(/^[*•-]?\s*(?:\*+|_+)?\s*(?:Voir|V\.)(?:\s+(?:aussi|également))?\s*(?:\*+|_+)?\s*:?\s*(?:\*\*)?([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ].+?)[\.\s]*$/i);
-      if (seeMatch && !raw.startsWith('1.') && !raw.startsWith('2.') && !raw.startsWith('I.')) {
-        if (inUlList) { out.push('</ul>'); inUlList = false; }
-        if (inSeeList) { out.push('</ul>'); inSeeList = false; }
-        const rawTargets = seeMatch[1].trim().replace(/\*\*/g, '');
-        const targets = rawTargets.split(/[;,]/).map(t => t.trim()).filter(t => t.length > 0);
+      // C) Renvois et Articles Connexes (ex: Voir Élever ; Humilité. ou *Voir* : **ÉBAL (1)** ou *Voir aussi* : **HÉBER**)
+      const seeMatch = raw.match(/^[*•-]?\s*(?:\*+|_+)?\s*(?:Voir|V\.)(?:\s+(?:aussi|également))?\s*(?:\*+|_+)?\s*:?\s*(.*)$/i);
+      if (seeMatch && !raw.startsWith('1.') && !raw.startsWith('2.') && !raw.startsWith('I.') && seeMatch[1].trim().length > 0) {
+        let rawTargetStr = seeMatch[1].trim();
+        // Supprimer toute balise HTML déjà injectée (ex: <span class="theol-fn-badge">...)
+        rawTargetStr = rawTargetStr.replace(/<[^>]+>/g, ' ').replace(/&lt;[^&]+&gt;/g, ' ').replace(/\s+/g, ' ').trim();
 
-        if (targets.length > 0) {
-          const linksHtml = targets.map(t => `
-            <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(t)}">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-              <span>${this.escapeHtml(t)}</span>
-            </a>
-          `).join(' ');
+        if (rawTargetStr.length < 200 && (/[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ]{2,}/.test(rawTargetStr) || rawTargetStr.includes('**') || rawTargetStr.includes('colonne') || rawTargetStr.includes('tome'))) {
+          if (inUlList) { out.push('</ul>'); inUlList = false; }
+          if (inSeeList) { out.push('</ul>'); inSeeList = false; }
 
-          out.push(`
-            <div class="dict-see-row" style="margin: 14px 0 10px 0; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; padding-top: 8px; border-top: 1px dashed var(--border-color);">
-              <span class="dict-see-label" style="font-size: 13px; font-weight: 700; color: var(--text-muted);">Voir aussi :</span>
-              ${linksHtml}
-            </div>
-          `);
-          return;
+          const targets = rawTargetStr.split(/[;,]/).map(t => {
+            return t.replace(/\*\*/g, '').replace(/\*/g, '').trim();
+          }).filter(t => t.length > 0);
+
+          if (targets.length > 0) {
+            const linksHtml = targets.map(t => {
+              let cleanWord = t.replace(/[.,;:]+$/, '').trim();
+              if (cleanWord.startsWith('(') && cleanWord.endsWith(')')) {
+                cleanWord = cleanWord.slice(1, -1).trim();
+              }
+              const isColOrTome = /^(?:colonne|col\.|tome|t\.|p\.|page)\s*\d+/i.test(cleanWord);
+              if (isColOrTome) {
+                return `<span class="dict-see-meta" style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; opacity: 0.85;">🔗 ${this.escapeHtml(cleanWord)}</span>`;
+              }
+              return `
+                <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(cleanWord)}">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                  <span>${this.escapeHtml(cleanWord)}</span>
+                </a>
+              `;
+            }).join(' ');
+
+            out.push(`
+              <div class="dict-see-row">
+                <span class="dict-see-label">Voir aussi :</span>
+                ${linksHtml}
+              </div>
+            `);
+            return;
+          }
         }
       }
 
@@ -1299,7 +1390,6 @@ const DictView = {
           this.currentFootnotesList.push({ id: fnId, text: `Cf. ${cleanSrc}` });
           const badgeHtml = ` <span class="theol-fn-badge" data-fn-id="${fnId}" id="dict-fnref-${fnId}">${fnId}</span>`;
 
-          // Attacher le badge en exposant directement à la fin du dernier élément (liste ou paragraphe)
           let attached = false;
           for (let i = out.length - 1; i >= 0; i--) {
             if (out[i].endsWith('</li>')) {
@@ -1322,7 +1412,7 @@ const DictView = {
         } else {
           if (inUlList) { out.push('</ul>'); inUlList = false; }
           out.push(`
-            <div class="dict-cf-source-row" style="margin: 8px 0 12px 0; font-size: 13px; color: var(--text-secondary); font-style: italic;">
+            <div class="dict-cf-source-row">
               *Cf.* ${srcBody.replace(/\*(.*?)\*/g, '<em>$1</em>')}
             </div>
           `);
@@ -1330,15 +1420,25 @@ const DictView = {
         return;
       }
 
-      // E) Listes à puces Markdown (* Ouvrage...)
-      const bulletMatch = raw.match(/^[*•-]\s+(.+)$/);
+      // E) Listes à puces Markdown (* Ouvrage..., - Item..., • Item...) avec indentation
+      const bulletMatch = raw.match(/^(\s*)[*•-]\s+(.+)$/);
       if (bulletMatch) {
         if (!inUlList) {
-          out.push('<ul style="padding-left: 22px; margin: 8px 0 12px 0; list-style-type: disc;">');
+          out.push('<ul class="dict-bullet-list">');
           inUlList = true;
         }
-        const itemText = bulletMatch[1].trim().replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>');
-        out.push(`<li style="margin-bottom: 5px; line-height: 1.6;">${itemText}</li>`);
+        const indentLevel = bulletMatch[1].length >= 2 ? 1 : 0;
+        let itemText = bulletMatch[2].trim()
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.*?)\*/g, '<em>$1</em>');
+        
+        // Rendre cliquables les renvois à l'intérieur des listes à puces (ex: *Voir* : **ÉBAL (1)**)
+        itemText = itemText.replace(/\b(?:Voir|V\.)\s*:\s*<strong>([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ][^<]+?)<\/strong>/gi, (m, word) => {
+          return `Voir : <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word.trim())}">🔗 ${this.escapeHtml(word.trim())}</a>`;
+        });
+
+        const indentClass = indentLevel ? ' class="dict-bullet-nested"' : '';
+        out.push(`<li class="dict-bullet-item"${indentClass}>${itemText}</li>`);
         return;
       } else {
         if (inUlList) {
@@ -1356,12 +1456,12 @@ const DictView = {
       // G) Paragraphe classique
       const pFmt = raw
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/^\> (.*$)/gim, '<blockquote style="border-left: 3px solid var(--accent-blue); padding: 8px 14px; margin: 12px 0; background: var(--bg-subtle); border-radius: 0 6px 6px 0; font-style: italic;">$1</blockquote>');
+        .replace(/\*(.*?)\*/g, '<em>$1</em>');
 
       out.push(`<p style="margin: 8px 0; line-height: 1.75;">${pFmt}</p>`);
     });
 
+    flushBlockquote();
     if (inSeeList) out.push('</ul>');
     if (inUlList) out.push('</ul>');
 

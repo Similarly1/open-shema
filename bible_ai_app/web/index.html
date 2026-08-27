@@ -401,17 +401,17 @@
     }
 
     /* Renvois de dictionnaire (🔗 Mot-clé) */
-    .theme-dark .vintage-epoch-ancient .dict-cross-ref-link,
-    .theme-dark .vintage-epoch-classic .dict-cross-ref-link,
-    .theme-dark .vintage-epoch-xix .dict-cross-ref-link {
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .dict-cross-ref-link,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .dict-cross-ref-link,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .dict-cross-ref-link {
       background: rgba(245, 158, 11, 0.16) !important;
       color: #f59e0b !important;
       border: 1px solid rgba(245, 158, 11, 0.45) !important;
       font-weight: 700 !important;
     }
-    .theme-dark .vintage-epoch-ancient .dict-cross-ref-link:hover,
-    .theme-dark .vintage-epoch-classic .dict-cross-ref-link:hover,
-    .theme-dark .vintage-epoch-xix .dict-cross-ref-link:hover {
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .dict-cross-ref-link:hover,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .dict-cross-ref-link:hover,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .dict-cross-ref-link:hover {
       background: #f59e0b !important;
       color: #11151e !important;
     }
@@ -433,18 +433,66 @@
       color: #ffffff !important;
     }
 
+    /* Option A : Puces typographiques numérotées élégantes (Style Édition Biblique) */
+    .dict-numbered-point {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 10px 0 12px 0;
+      line-height: 1.75;
+    }
+    .dict-point-badge {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 21px;
+      height: 21px;
+      min-width: 21px;
+      border-radius: 50%;
+      font-size: 11.5px;
+      font-weight: 700;
+      line-height: 1;
+      margin-top: 3px;
+      transition: all 0.15s ease;
+    }
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .dict-point-badge {
+      background: rgba(245, 158, 11, 0.15) !important;
+      color: #f59e0b !important;
+      border: 1px solid rgba(245, 158, 11, 0.35) !important;
+    }
+    body.reading-bg-sepia .dict-point-badge,
+    body:not(.theme-dark) .dict-point-badge {
+      background: rgba(140, 38, 20, 0.12) !important;
+      color: #8c2614 !important;
+      border: 1px solid rgba(140, 38, 20, 0.28) !important;
+    }
+    body.reading-bg-white .dict-point-badge {
+      background: rgba(2, 132, 199, 0.1) !important;
+      color: #0284c7 !important;
+      border: 1px solid rgba(2, 132, 199, 0.3) !important;
+    }
+    .dict-point-content {
+      flex: 1;
+      font-size: 15px;
+      line-height: 1.75;
+    }
+    .dict-point-content strong:first-child {
+      font-weight: 700;
+    }
+
     /* Sous-entrées homonymes Calmet / NDB */
-    .theme-dark .vintage-epoch-ancient .dict-subentry-card,
-    .theme-dark .vintage-epoch-classic .dict-subentry-card,
-    .theme-dark .vintage-epoch-xix .dict-subentry-card {
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .dict-subentry-card,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .dict-subentry-card,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .dict-subentry-card {
       background: rgba(14, 18, 28, 0.8) !important;
       border: 1px solid rgba(245, 158, 11, 0.25) !important;
       border-left: 3.5px solid #f59e0b !important;
       color: #e4d8c2 !important;
     }
-    .theme-dark .vintage-epoch-ancient .dict-subentry-num,
-    .theme-dark .vintage-epoch-classic .dict-subentry-num,
-    .theme-dark .vintage-epoch-xix .dict-subentry-num {
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .dict-subentry-num,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .dict-subentry-num,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .dict-subentry-num {
       background: #d97706 !important;
       color: #11151e !important;
     }
@@ -453,7 +501,7 @@
     body:not(.theme-dark) .vintage-epoch-ancient .dict-subentry-card,
     body:not(.theme-dark) .vintage-epoch-classic .dict-subentry-card,
     body:not(.theme-dark) .vintage-epoch-xix .dict-subentry-card {
-      background: rgba(255, 252, 245, 0.7) !important;
+      background: rgba(255, 252, 245, 0.85) !important;
       border: 1px solid rgba(139, 90, 43, 0.3) !important;
       border-left: 3.5px solid #8c2614 !important;
       color: #1d150c !important;
