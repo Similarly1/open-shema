@@ -17034,12 +17034,14 @@ body.reading-bg-sepia .theol-latin-popover-badge {
   border-radius: 4px;
 }
 
+/* Encre noire naturelle par défaut sur tous les fonds clairs, sépia et thèmes vintage */
 .dict-article-img {
   max-width: 100%;
   height: auto;
   max-height: 440px;
   display: block;
   object-fit: contain;
+  filter: none;
   transition: transform 0.2s ease, filter 0.3s ease;
 }
 
@@ -17047,10 +17049,24 @@ body.reading-bg-sepia .theol-latin-popover-badge {
   transform: scale(1.02);
 }
 
-/* En mode sombre : inversion automatique des traits d'encre sur fond transparent */
-body.theme-dark .dict-article-img,
-body.palette-dark-slate .dict-article-img {
+/* Inversion en blanc UNIQUEMENT en vrai mode sombre sans thème vintage ni fond clair */
+body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-parchment):not(.reading-bg-paper):not(.reading-bg-white) .dict-article-card:not([class*="vintage-epoch-"]) .dict-article-img,
+body.palette-dark-slate:not(.reading-bg-sepia):not(.reading-bg-parchment):not(.reading-bg-paper):not(.reading-bg-white) .dict-article-card:not([class*="vintage-epoch-"]) .dict-article-img,
+body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-parchment):not(.reading-bg-paper):not(.reading-bg-white) .dict-view-main-scroll:not([class*="vintage-epoch-"]) .dict-article-img,
+body.palette-dark-slate:not(.reading-bg-sepia):not(.reading-bg-parchment):not(.reading-bg-paper):not(.reading-bg-white) .dict-view-main-scroll:not([class*="vintage-epoch-"]) .dict-article-img {
   filter: invert(1) brightness(0.92) contrast(1.05);
+}
+
+/* Force absolue de l'encre noire sur tout fond sépia, parchemin, papier ou thème d'époque vintage */
+body.theme-light .dict-article-img,
+body.reading-bg-sepia .dict-article-img,
+body.reading-bg-parchment .dict-article-img,
+body.reading-bg-paper .dict-article-img,
+body.reading-bg-white .dict-article-img,
+[class*="reading-bg-"] .dict-article-img,
+[class*="vintage-epoch-"] .dict-article-img,
+.vintage-theme-active .dict-article-img {
+  filter: none !important;
 }
 
 body.theme-dark .dict-article-figure,
@@ -17117,55 +17133,120 @@ body.palette-dark-slate .dict-article-figure:hover {
 .dict-lightbox-container {
   position: relative;
   max-width: 90vw;
-  max-height: 85vh;
+  max-height: 90vh;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+}
+
+.dict-lightbox-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 32px;
+  border-radius: 12px;
+  max-width: 85vw;
+  max-height: 85vh;
+  box-sizing: border-box;
+  transition: all 0.25s ease;
 }
 
 .dict-lightbox-img {
   max-width: 100%;
-  max-height: 75vh;
+  max-height: 70vh;
   object-fit: contain;
-  border-radius: 6px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  display: block;
   transition: transform 0.2s ease, filter 0.3s ease;
   cursor: zoom-out;
 }
 
-/* En mode sombre sur Lightbox : traits blancs nets */
-body.theme-dark .dict-lightbox-img,
-body.palette-dark-slate .dict-lightbox-img {
-  filter: invert(1) brightness(0.95);
+/* 1. Mode Clair / Sépia / Parchemin dans la LightBox : Fond blanc/crème OPAQUE et traits d'encre noire */
+.dict-lightbox-overlay.lightbox-theme-light .dict-lightbox-card {
+  background: #fdfbf7;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
-.dict-lightbox-caption {
-  margin-top: 14px;
-  color: #f1f5f9;
+.dict-lightbox-overlay.lightbox-theme-light .dict-lightbox-img {
+  filter: none !important; /* Encre noire */
+}
+
+.dict-lightbox-overlay.lightbox-theme-light .dict-lightbox-caption {
+  color: #1e293b;
   font-size: 14.5px;
-  font-weight: 500;
+  font-weight: 600;
   text-align: center;
+  margin-top: 16px;
   max-width: 680px;
   line-height: 1.5;
   font-style: italic;
 }
 
-.dict-lightbox-close {
+.dict-lightbox-overlay.lightbox-theme-light .dict-lightbox-close {
   position: absolute;
-  top: -40px;
-  right: -10px;
+  top: 10px;
+  right: 14px;
   background: transparent;
   border: none;
-  color: #fff;
-  font-size: 28px;
+  color: #64748b;
+  font-size: 22px;
   cursor: pointer;
-  padding: 4px 10px;
+  padding: 4px 8px;
   opacity: 0.8;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease, color 0.2s ease;
 }
 
-.dict-lightbox-close:hover {
+.dict-lightbox-overlay.lightbox-theme-light .dict-lightbox-close:hover {
   opacity: 1;
+  color: #0f172a;
+}
+
+/* 2. Mode Sombre dans la LightBox : Fond sombre OPAQUE (#181824) et traits blancs argentés */
+.dict-lightbox-overlay.lightbox-theme-dark .dict-lightbox-card,
+.dict-lightbox-overlay:not(.lightbox-theme-light) .dict-lightbox-card {
+  background: #181824;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+.dict-lightbox-overlay.lightbox-theme-dark .dict-lightbox-img,
+.dict-lightbox-overlay:not(.lightbox-theme-light) .dict-lightbox-img {
+  filter: invert(1) brightness(0.95) !important; /* Traits blancs */
+}
+
+.dict-lightbox-overlay.lightbox-theme-dark .dict-lightbox-caption,
+.dict-lightbox-overlay:not(.lightbox-theme-light) .dict-lightbox-caption {
+  color: #f1f5f9;
+  font-size: 14.5px;
+  font-weight: 500;
+  text-align: center;
+  margin-top: 16px;
+  max-width: 680px;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.dict-lightbox-overlay.lightbox-theme-dark .dict-lightbox-close,
+.dict-lightbox-overlay:not(.lightbox-theme-light) .dict-lightbox-close {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 22px;
+  cursor: pointer;
+  padding: 4px 8px;
+  opacity: 0.8;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.dict-lightbox-overlay.lightbox-theme-dark .dict-lightbox-close:hover,
+.dict-lightbox-overlay:not(.lightbox-theme-light) .dict-lightbox-close:hover {
+  opacity: 1;
+  color: #ffffff;
 }
 
 /* 12. ENRICHISSEMENT LOGOS & NOUVEAU DICTIONNAIRE BIBLIQUE (NDB) */

@@ -76,16 +76,18 @@ const DictView = {
     this.lightboxEl.id = 'dict-lightbox-overlay';
     this.lightboxEl.innerHTML = `
       <div class="dict-lightbox-container">
-        <button type="button" class="dict-lightbox-close" title="Fermer (Échap)">✕</button>
-        <img src="" alt="" class="dict-lightbox-img" />
-        <div class="dict-lightbox-caption"></div>
+        <div class="dict-lightbox-card">
+          <button type="button" class="dict-lightbox-close" title="Fermer (Échap)">✕</button>
+          <img src="" alt="" class="dict-lightbox-img" />
+          <div class="dict-lightbox-caption"></div>
+        </div>
       </div>
     `;
     document.body.appendChild(this.lightboxEl);
 
     this.lightboxEl.querySelector('.dict-lightbox-close')?.addEventListener('click', () => this.hideLightbox());
     this.lightboxEl.addEventListener('click', (e) => {
-      if (e.target === this.lightboxEl || e.target.classList.contains('dict-lightbox-img')) {
+      if (e.target === this.lightboxEl || e.target.classList.contains('dict-lightbox-container')) {
         this.hideLightbox();
       }
     });
@@ -96,6 +98,20 @@ const DictView = {
 
   showLightbox(src, caption) {
     this.initLightbox();
+    const cardEl = document.querySelector('.dict-article-card') || document.querySelector('.dict-view-main-scroll');
+    const isLightMode = document.body.classList.contains('theme-light') ||
+                        document.body.classList.contains('reading-bg-sepia') ||
+                        document.body.classList.contains('reading-bg-parchment') ||
+                        document.body.classList.contains('reading-bg-paper') ||
+                        document.body.classList.contains('reading-bg-white') ||
+                        cardEl?.classList.contains('vintage-epoch-xix') ||
+                        cardEl?.classList.contains('vintage-epoch-classic') ||
+                        cardEl?.classList.contains('vintage-epoch-ancient') ||
+                        (this.readingBg && this.readingBg !== 'dark' && this.readingBg !== 'auto');
+
+    this.lightboxEl.classList.toggle('lightbox-theme-light', !!isLightMode);
+    this.lightboxEl.classList.toggle('lightbox-theme-dark', !isLightMode);
+
     const imgEl = this.lightboxEl.querySelector('.dict-lightbox-img');
     const capEl = this.lightboxEl.querySelector('.dict-lightbox-caption');
     if (imgEl) imgEl.src = src;
