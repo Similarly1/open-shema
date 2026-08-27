@@ -208,6 +208,11 @@ def main():
         action="store_true",
         help="Forcer le re-polissage des articles déjà présents dans le cache"
     )
+    parser.add_argument(
+        "--repolish-mistral",
+        action="store_true",
+        help="Ne cibler et re-polir avec Gemini que les 180 articles précédemment traités avec Mistral / Ministral"
+    )
     args = parser.parse_args()
 
     keys = load_all_keys()
@@ -265,7 +270,10 @@ def main():
         title = art.get("title") or k
         slug = k
         cached_entry = DictionaryPolisher.get_polished_entry("vigouroux", slug) or DictionaryPolisher.get_polished_entry("vigouroux", title)
-        if not args.force and cached_entry and cached_entry.get("text"):
+        if args.repolish_mistral:
+            if not cached_entry or "mistral" not in (cached_entry.get("model") or "").lower():
+                continue
+        elif not args.force and cached_entry and cached_entry.get("text"):
             continue
         to_process.append((slug, title, art.get("text", "")))
 
