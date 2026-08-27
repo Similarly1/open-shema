@@ -1399,28 +1399,51 @@ const DictView = {
       return `Voir aussi : <span class="dict-cross-ref-item"><a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(cleanW)}"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span>${this.escapeHtml(cleanW)}</span></a>${metaHtml}</span>`;
     });
 
-    // 2. Extraction des citations de sources entre parenthèses
+    // 2. Extraction des citations de sources entre parenthèses (avec support des parenthèses imbriquées comme in-8°)
     if (this.optFootnotes) {
-      processed = processed.replace(/\(([^\)\n]{12,350})\)/g, (match, inner, offset, fullStr) => {
-        const lower = inner.toLowerCase();
-        // Éviter les faux positifs sur les badges de versions bibliques déjà balisés
-        if (inner.includes('dict-version-badge')) return match;
-        // Éviter de transformer les renvois vers des figures ou planches (ex: Voir fig. 55, col. 300)
-        if (/^(?:voir\s+)?(?:fig\b|fig\.|figure|planche|pl\b|pl\.|carte)/i.test(inner.trim())) return match;
-        // Ne pas transformer les parenthèses situées sur une ligne de renvoi 'Voir' ou 'Voir aussi'
-        const lineStart = fullStr.lastIndexOf('\n', offset);
-        const currentLine = fullStr.slice(lineStart === -1 ? 0 : lineStart + 1, offset);
-        if (/^\s*[*•-]?\s*(?:\*+|_+)?\s*(?:Voir|V\.)/i.test(currentLine)) return match;
+      let outChars = '';
+      let i = 0;
+      while (i < processed.length) {
+        if (processed[i] === '(') {
+          // Scanner jusqu'à la parenthèse fermante équilibrée
+          let depth = 1;
+          let j = i + 1;
+          while (j < processed.length && depth > 0) {
+            if (processed[j] === '\n') break; // ne pas franchir de saut de ligne
+            if (processed[j] === '(') depth++;
+            else if (processed[j] === ')') depth--;
+            j++;
+          }
 
-        const isSource = ['col.', 'p.', 'page', 't.', 'tome', 'édit', 'éd.', 'vol.', 'in-4', 'in-8', 'in-fol', 'ouv. cité', 'op. cit.', 'comment.', 'explan.', 'scholia', 'lexicon', 'revue', 'theol.', 'religionsgeschichte', 'monuments', 'sat.', 'genesis', 'mélanges', 'description de la palestine', 'thésaurus', 'keilinschriften', 'les prophètes'].some(k => lower.includes(k));
-        if (isSource) {
-          const fnId = this.currentFootnotesList.length + 1;
-          const cleanText = inner.replace(/[*_`]+/g, '').trim();
-          this.currentFootnotesList.push({ id: fnId, text: cleanText });
-          return `<span class="theol-fn-badge" data-fn-id="${fnId}" id="dict-fnref-${fnId}">${fnId}</span>`;
+          if (depth === 0) {
+            const inner = processed.slice(i + 1, j - 1);
+            const lower = inner.toLowerCase();
+
+            // Éviter les faux positifs sur les badges de versions bibliques
+            const hasVersionBadge = inner.includes('dict-version-badge');
+            const isFigOrPlanche = /^(?:voir\s+)?(?:fig\b|fig\.|figure|planche|pl\b|pl\.|carte)/i.test(inner.trim());
+            
+            // Ne pas transformer les parenthèses situées sur une ligne de renvoi Voir
+            const lineStart = processed.lastIndexOf('\n', i);
+            const currentLine = processed.slice(lineStart === -1 ? 0 : lineStart + 1, i);
+            const isSeeLine = /^\s*[*•-]?\s*(?:\*+|_+)?\s*(?:Voir|V\.)/i.test(currentLine);
+
+            const isSource = !hasVersionBadge && !isFigOrPlanche && !isSeeLine && ['col.', 'p.', 'page', 't.', 'tome', 'édit', 'éd.', 'vol.', 'in-4', 'in-8', 'in-fol', 'in-octavo', 'in-quarto', 'in-folio', 'ouv. cité', 'op. cit.', 'comment.', 'explan.', 'scholia', 'lexicon', 'revue', 'theol.', 'religionsgeschichte', 'monuments', 'sat.', 'genesis', 'mélanges', 'description de la palestine', 'thésaurus', 'keilinschriften', 'les prophètes'].some(k => lower.includes(k));
+
+            if (isSource && inner.length >= 12 && inner.length <= 450) {
+              const fnId = this.currentFootnotesList.length + 1;
+              const cleanText = inner.replace(/[*_`]+/g, '').trim();
+              this.currentFootnotesList.push({ id: fnId, text: cleanText });
+              outChars += `<span class="theol-fn-badge" data-fn-id="${fnId}" id="dict-fnref-${fnId}">${fnId}</span>`;
+              i = j;
+              continue;
+            }
+          }
         }
-        return match;
-      });
+        outChars += processed[i];
+        i++;
+      }
+      processed = outChars;
     }
 
     // Nettoyage des retours à la ligne orphelins devant deux-points (\n: -> :)
@@ -1515,15 +1538,13 @@ const DictView = {
         return;
       }
 
-      // B00b) Ligne initiale avec Mot-Vedette et étymologie entre parenthèses (ex: 8. GABAA HACHILA (hébreu : ...) ou GÉHENNE (grec : γέεννα...))
+      // B00b) Ligne initiale avec Mot-Vedette et étymologie entre parenthèses (ex: **AVIM** (hébreu : ...) ou 8. GABAA HACHILA (hébreu : ...))
       if (lineIdx <= 2 && !raw.startsWith('I.') && !raw.startsWith('#')) {
-        const etymInlineMatch = raw.match(/^(?:[0-9]+\.\s+)?([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]{2,})\s*\(([^)]*(?:hébreu|grec|latin|septante|vulgate|araméen|arabe|syriaque)[^)]*)\)[,\s]*(.*)$/i);
+        const etymInlineMatch = raw.match(/^(?:[0-9]+\.\s+)?(?:\*\*|\*|_)?([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇÏ\-\s]{2,})(?:\*\*|\*|_)?\s*\(([^)]*(?:hébreu|grec|latin|septante|vulgate|araméen|arabe|syriaque)[^)]*)\)[,\s]*(.*)$/i);
         if (etymInlineMatch) {
           const innerEtym = etymInlineMatch[2].trim();
           const restText = etymInlineMatch[3].trim();
-          const cleanEtymFmt = innerEtym
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+          const cleanEtymFmt = formatInlineMarkdown(innerEtym);
           out.push(`
             <div class="dict-etymology-box" style="margin: 10px 0 14px 0; padding: 10px 14px; border-radius: 0 6px 6px 0; font-size: 14.5px;">
               <span class="dict-etymology-label" style="font-weight: 700; font-size: 13.5px;">Langues originales :</span>
@@ -1531,9 +1552,7 @@ const DictView = {
             </div>
           `);
           if (restText) {
-            const restFormatted = restText
-              .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-              .replace(/\*(.*?)\*/g, '<em>$1</em>');
+            const restFormatted = formatInlineMarkdown(restText);
             out.push(`<p style="margin: 12px 0; line-height: 1.75;">${restFormatted}</p>`);
           }
           return;
