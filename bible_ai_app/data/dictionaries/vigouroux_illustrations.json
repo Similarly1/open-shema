@@ -3,68 +3,13 @@
     {
       "vol": 1,
       "fig_num": 1,
-      "caption": "Anneau chr6tien",
-      "page": 65,
-      "header": "",
-      "leading_word": "Anneau",
+      "caption": "Anneau chrétien antique portant les lettres A et Ω. Trouvé dans un antique cimetière de Rome (d'après Boldetti).",
+      "page": 1,
+      "header": "A ET Ω",
+      "leading_word": "A et Ω",
       "rel_path": "img/vigouroux/vol1_fig_1.png",
-      "width": 882,
-      "height": 205
-    },
-    {
-      "vol": 1,
-      "fig_num": 152,
-      "caption": "Anneau egyptien",
-      "page": 382,
-      "header": "633\nANNEAU\n634",
-      "leading_word": "Anneau",
-      "rel_path": "img/vigouroux/vol1_fig_152.png",
-      "width": 930,
-      "height": 239
-    },
-    {
-      "vol": 1,
-      "fig_num": 153,
-      "caption": "Anneau d'or",
-      "page": 382,
-      "header": "633\nANNEAU\n634",
-      "leading_word": "Anneau",
-      "rel_path": "img/vigouroux/vol1_fig_153.png",
-      "width": 880,
-      "height": 558
-    },
-    {
-      "vol": 1,
-      "fig_num": 157,
-      "caption": "Anneau, chatne et crochets assyriens. D'après V. Place,",
-      "page": 383,
-      "header": "635\nANNEAU\n636",
-      "leading_word": "Anneau",
-      "rel_path": "img/vigouroux/vol1_fig_157.png",
-      "width": 889,
-      "height": 471
-    },
-    {
-      "vol": 4,
-      "fig_num": 314,
-      "caption": "Anneau d'or servant de monnaie appartenant au baron",
-      "page": 645,
-      "header": "",
-      "leading_word": "Anneau",
-      "rel_path": "img/vigouroux/vol4_fig_314.png",
-      "width": 890,
-      "height": 326
-    },
-    {
-      "vol": 5,
-      "fig_num": 36,
-      "caption": "Anneau (sceau) portant le nom d'Apapi I\", le « bon roi",
-      "page": 103,
-      "header": "",
-      "leading_word": "Anneau",
-      "rel_path": "img/vigouroux/vol5_fig_36.png",
-      "width": 940,
-      "height": 387
+      "width": 500,
+      "height": 600
     }
   ],
   "LE": [
@@ -29421,6 +29366,45 @@
       "fig_num": 8,
       "caption": "Cadran conique phénicien d'Oum-el-Aouamid près de Tyr (Mission de Phénicie d'Ernest Renan).",
       "rel_path": "img/vigouroux/vol2_fig_8.png"
+    }
+  ],
+  "A ET OMEGA": [
+    {
+      "vol": 1,
+      "fig_num": 1,
+      "caption": "Anneau chrétien antique portant les lettres A et Ω. Trouvé dans un antique cimetière de Rome (d'après Boldetti).",
+      "page": 1,
+      "header": "A ET Ω",
+      "leading_word": "A et Ω",
+      "rel_path": "img/vigouroux/vol1_fig_1.png",
+      "width": 500,
+      "height": 600
+    }
+  ],
+  "A ET Ω": [
+    {
+      "vol": 1,
+      "fig_num": 1,
+      "caption": "Anneau chrétien antique portant les lettres A et Ω. Trouvé dans un antique cimetière de Rome (d'après Boldetti).",
+      "page": 1,
+      "header": "A ET Ω",
+      "leading_word": "A et Ω",
+      "rel_path": "img/vigouroux/vol1_fig_1.png",
+      "width": 500,
+      "height": 600
+    }
+  ],
+  "ALPHA ET OMEGA": [
+    {
+      "vol": 1,
+      "fig_num": 1,
+      "caption": "Anneau chrétien antique portant les lettres A et Ω. Trouvé dans un antique cimetière de Rome (d'après Boldetti).",
+      "page": 1,
+      "header": "A ET Ω",
+      "leading_word": "A et Ω",
+      "rel_path": "img/vigouroux/vol1_fig_1.png",
+      "width": 500,
+      "height": 600
     }
   ]
 }
