@@ -13915,19 +13915,6 @@
       "height": 1378
     }
   ],
-  "CAIN": [
-    {
-      "vol": 2,
-      "fig_num": 33,
-      "caption": "Cain<$l(5on.",
-      "page": 54,
-      "header": "89\nCALVITIE -- CAMELEON\n90",
-      "leading_word": "Cain",
-      "rel_path": "img/vigouroux/vol2_fig_33.png",
-      "width": 892,
-      "height": 487
-    }
-  ],
   "CAMPEMENT": [
     {
       "vol": 2,
@@ -29370,6 +29357,58 @@
       "rel_path": "img/vigouroux/vol5_fig_562.png",
       "width": 943,
       "height": 1221
+    }
+  ],
+  "CAMÉLÉON": [
+    {
+      "vol": 2,
+      "fig_num": 33,
+      "caption": "Caméléon.",
+      "page": 53,
+      "header": "89\nCALVITIE -- CAMELEON\n90",
+      "leading_word": "Caméléon",
+      "rel_path": "img/vigouroux/vol2_fig_33.png",
+      "width": 667,
+      "height": 542
+    }
+  ],
+  "CAMELEON": [
+    {
+      "vol": 2,
+      "fig_num": 33,
+      "caption": "Caméléon.",
+      "page": 53,
+      "header": "89\nCALVITIE -- CAMELEON\n90",
+      "leading_word": "Caméléon",
+      "rel_path": "img/vigouroux/vol2_fig_33.png",
+      "width": 667,
+      "height": 542
+    }
+  ],
+  "CAMÉLÉONS": [
+    {
+      "vol": 2,
+      "fig_num": 33,
+      "caption": "Caméléon.",
+      "page": 53,
+      "header": "89\nCALVITIE -- CAMELEON\n90",
+      "leading_word": "Caméléon",
+      "rel_path": "img/vigouroux/vol2_fig_33.png",
+      "width": 667,
+      "height": 542
+    }
+  ],
+  "CAMELEONS": [
+    {
+      "vol": 2,
+      "fig_num": 33,
+      "caption": "Caméléon.",
+      "page": 53,
+      "header": "89\nCALVITIE -- CAMELEON\n90",
+      "leading_word": "Caméléon",
+      "rel_path": "img/vigouroux/vol2_fig_33.png",
+      "width": 667,
+      "height": 542
     }
   ]
 }

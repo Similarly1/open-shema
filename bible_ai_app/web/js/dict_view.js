@@ -951,7 +951,10 @@ const DictView = {
     bodyEl.querySelector('#btn-dict-view-original')?.addEventListener('click', () => {
       const origText = match.raw_text || match.full_text || '';
       bodyEl.innerHTML = `<div class="dict-entry-body-content">${this.formatArticleMarkdown(origText)}</div>`;
+      this.applyDisplayPreferences();
     });
+
+    this.applyDisplayPreferences();
   },
 
   formatArticleMarkdown(text, isVigouroux = false) {
@@ -1096,11 +1099,12 @@ const DictView = {
       processed = processed.replace(/([;,]\s*)(\d+)\.(\d+(?:\s*[\-–]\s*\d+)?(?:\s*,\s*\d+)*)/g, '$1$2:$3');
 
       // 0c. Traitement spécifique Dom Calmet (1728)
-      if (this.activeDictId === 'calmet' || (this.optLogosRestructure && /\(\s*1\s*\)/.test(processed) && /\(\s*2\s*\)/.test(processed))) {
-        // Découpage automatique des homonymes (1), (2), (3)...
-        if (/\(\s*1\s*\)/.test(processed) && /\(\s*2\s*\)/.test(processed)) {
+      const isCalmetDict = (this.activeDictId === 'calmet') || ((this.activeDictInfo?.name || '').toLowerCase().includes('calmet'));
+      if (isCalmetDict) {
+        // Découpage automatique des homonymes (1), (2), (3)... uniquement au début d'une ligne
+        if (/(?:^|\n+)(?:[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-]{2,}\s+)?\(\s*1\s*\)/i.test(processed) && /(?:^|\n+)(?:[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-]{2,}\s+)?\(\s*2\s*\)/i.test(processed)) {
           processed = processed.replace(/^[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-]{2,}\s*\(\s*1\s*\)\s*/i, '(1) ');
-          const parts = processed.split(/(?:(?:\.\.|\.)\s*|\n+)?(?:[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-]{2,}\s+)?\(\s*(\d+)\s*\)\s*/i);
+          const parts = processed.split(/(?:\n+)(?:[A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-]{2,}\s+)?\(\s*(\d+)\s*\)\s*/i);
           if (parts.length > 2) {
             const outCards = [];
             const preamble = (parts[0] || '').trim();

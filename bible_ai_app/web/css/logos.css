@@ -17807,26 +17807,22 @@ body.reading-bg-sepia .dict-chrono-badge {
  * S'applique dès que reading-bg-sepia est actif, ou en mode clair vintage
  * ========================================================================= */
 body.reading-bg-sepia .reading-pane.vintage-epoch-ancient,
-body.reading-bg-sepia .reading-pane.vintage-epoch-classic,
-body.reading-bg-sepia .reading-pane.vintage-epoch-xix,
-body.reading-bg-sepia .vintage-epoch-ancient.pane-scrollable-content,
-body.reading-bg-sepia .vintage-epoch-classic.pane-scrollable-content,
-body.reading-bg-sepia .vintage-epoch-xix.pane-scrollable-content,
-body:not(.theme-dark) .reading-pane.vintage-epoch-ancient,
-body:not(.theme-dark) .reading-pane.vintage-epoch-classic,
-body:not(.theme-dark) .reading-pane.vintage-epoch-xix,
-body:not(.theme-dark) .vintage-epoch-ancient.pane-scrollable-content,
-body:not(.theme-dark) .vintage-epoch-classic.pane-scrollable-content,
-body:not(.theme-dark) .vintage-epoch-xix.pane-scrollable-content,
-.vintage-epoch-ancient.theol-reading-container,
-.vintage-epoch-classic.theol-reading-container,
-.vintage-epoch-xix.theol-reading-container,
-.vintage-epoch-ancient.dict-article-card,
-.vintage-epoch-classic.dict-article-card,
-.vintage-epoch-xix.dict-article-card,
-.vintage-epoch-ancient.comm-article-card,
-.vintage-epoch-classic.comm-article-card,
-.vintage-epoch-xix.comm-article-card {
+/* Immersion d'époque UNIQUEMENT en mode Auto (sans fond forcé Blanc, Sépia ou Nuit) */
+body:not(.reading-bg-white):not(.reading-bg-sepia):not(.reading-bg-dark):not(.theme-dark) .reading-pane.vintage-epoch-ancient,
+body:not(.reading-bg-white):not(.reading-bg-sepia):not(.reading-bg-dark):not(.theme-dark) .reading-pane.vintage-epoch-classic,
+body:not(.reading-bg-white):not(.reading-bg-sepia):not(.reading-bg-dark):not(.theme-dark) .reading-pane.vintage-epoch-xix,
+body:not(.reading-bg-white):not(.reading-bg-sepia):not(.reading-bg-dark):not(.theme-dark) .vintage-epoch-ancient.pane-scrollable-content,
+body:not(.reading-bg-white):not(.reading-bg-sepia):not(.reading-bg-dark):not(.theme-dark) .vintage-epoch-classic.pane-scrollable-content,
+body:not(.reading-bg-white):not(.reading-bg-sepia):not(.reading-bg-dark):not(.theme-dark) .vintage-epoch-xix.pane-scrollable-content,
+body:not(.reading-bg-white):not(.reading-bg-sepia):not(.reading-bg-dark):not(.theme-dark) .vintage-epoch-ancient.theol-reading-container,
+body:not(.reading-bg-white):not(.reading-bg-sepia):not(.reading-bg-dark):not(.theme-dark) .vintage-epoch-classic.theol-reading-container,
+body:not(.reading-bg-white):not(.reading-bg-sepia):not(.reading-bg-dark):not(.theme-dark) .vintage-epoch-xix.theol-reading-container,
+body:not(.reading-bg-white):not(.reading-bg-sepia):not(.reading-bg-dark):not(.theme-dark) .vintage-epoch-ancient.dict-article-card,
+body:not(.reading-bg-white):not(.reading-bg-sepia):not(.reading-bg-dark):not(.theme-dark) .vintage-epoch-classic.dict-article-card,
+body:not(.reading-bg-white):not(.reading-bg-sepia):not(.reading-bg-dark):not(.theme-dark) .vintage-epoch-xix.dict-article-card,
+body:not(.reading-bg-white):not(.reading-bg-sepia):not(.reading-bg-dark):not(.theme-dark) .vintage-epoch-ancient.comm-article-card,
+body:not(.reading-bg-white):not(.reading-bg-sepia):not(.reading-bg-dark):not(.theme-dark) .vintage-epoch-classic.comm-article-card,
+body:not(.reading-bg-white):not(.reading-bg-sepia):not(.reading-bg-dark):not(.theme-dark) .vintage-epoch-xix.comm-article-card {
   background-color: #f4ecdc !important;
   background-image: 
     radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.4) 0%, rgba(244, 236, 220, 0.5) 70%, rgba(224, 208, 180, 0.6) 100%),
@@ -17838,71 +17834,80 @@ body:not(.theme-dark) .vintage-epoch-xix.pane-scrollable-content,
   color: #1d150c !important;
 }
 
-body.reading-bg-sepia .vintage-epoch-ancient .pane-header,
-body.reading-bg-sepia .vintage-epoch-classic .pane-header,
-body.reading-bg-sepia .vintage-epoch-xix .pane-header,
-body:not(.theme-dark) .vintage-epoch-ancient .pane-header,
-body:not(.theme-dark) .vintage-epoch-classic .pane-header,
-body:not(.theme-dark) .vintage-epoch-xix .pane-header {
-  background: #ebdcc5 !important;
-  border-bottom: 1px solid rgba(139, 90, 43, 0.25) !important;
-  color: #4a2d14 !important;
-}
+/* =========================================================================
+   PRIORITÉ ABSOLUE DES FONDS DE LECTURE UTILISATEUR (BLANC / SÉPIA / NUIT)
+   ========================================================================= */
 
-/* Texte encre sombre pour le mode clair / blanc / sépia sur TOUS les contenus d'époque */
-body.reading-bg-white .vintage-epoch-ancient .verses-flow,
-body.reading-bg-white .vintage-epoch-classic .verses-flow,
-body.reading-bg-white .vintage-epoch-xix .verses-flow,
-body.reading-bg-white .vintage-epoch-ancient .word-token,
-body.reading-bg-white .vintage-epoch-classic .word-token,
-body.reading-bg-white .vintage-epoch-xix .word-token,
-body.reading-bg-white .vintage-epoch-ancient .dict-entry-body,
-body.reading-bg-white .vintage-epoch-classic .dict-entry-body,
-body.reading-bg-white .vintage-epoch-xix .dict-entry-body,
-body.reading-bg-white .vintage-epoch-ancient .dict-entry-body-content,
-body.reading-bg-white .vintage-epoch-classic .dict-entry-body-content,
-body.reading-bg-white .vintage-epoch-xix .dict-entry-body-content,
-body.reading-bg-white .vintage-epoch-ancient .dict-entry-body-content *,
-body.reading-bg-white .vintage-epoch-classic .dict-entry-body-content *,
-body.reading-bg-white .vintage-epoch-xix .dict-entry-body-content *,
-body.reading-bg-white .vintage-epoch-ancient p,
-body.reading-bg-white .vintage-epoch-classic p,
-body.reading-bg-white .vintage-epoch-xix p,
-body.reading-bg-white .vintage-epoch-ancient .theol-reading-body *,
-body.reading-bg-white .vintage-epoch-classic .theol-reading-body *,
-body.reading-bg-white .vintage-epoch-xix .theol-reading-body *,
-body.reading-bg-white .vintage-epoch-ancient .comm-body-text *,
-body.reading-bg-white .vintage-epoch-classic .comm-body-text *,
-body.reading-bg-white .vintage-epoch-xix .comm-body-text *,
+/* 1. Fond BLANC PUR (Écrase toute texture, fond blanc pur #ffffff) */
+body.reading-bg-white .dict-article-card,
+body.reading-bg-white #view-dictionary .dict-article-card,
+body.reading-bg-white .dict-article-card[class*="vintage-epoch-"],
 body.reading-bg-white #view-dictionary .vintage-epoch-xix,
+body.reading-bg-white #view-dictionary .vintage-epoch-classic,
+body.reading-bg-white #view-dictionary .vintage-epoch-ancient {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06) !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #0f172a !important;
+}
+body.reading-bg-white #view-dictionary .dict-view-main-scroll,
+body.reading-bg-white #view-dictionary .dict-main-reading-scroll {
+  background-color: #f8fafc !important;
+  background-image: none !important;
+}
+body.reading-bg-white #view-dictionary .dict-article-card *,
 body.reading-bg-white #view-dictionary .vintage-epoch-xix * {
-  color: #0F172A !important;
+  color: #0f172a !important;
 }
 
-body.reading-bg-sepia .vintage-epoch-ancient .verses-flow,
-body.reading-bg-sepia .vintage-epoch-classic .verses-flow,
-body.reading-bg-sepia .vintage-epoch-xix .verses-flow,
-body.reading-bg-sepia .vintage-epoch-ancient .word-token,
-body.reading-bg-sepia .vintage-epoch-classic .word-token,
-body.reading-bg-sepia .vintage-epoch-xix .word-token,
-body.reading-bg-sepia .vintage-epoch-ancient .dict-entry-body,
-body.reading-bg-sepia .vintage-epoch-classic .dict-entry-body,
-body.reading-bg-sepia .vintage-epoch-xix .dict-entry-body,
-body.reading-bg-sepia .vintage-epoch-ancient .dict-entry-body-content,
-body.reading-bg-sepia .vintage-epoch-classic .dict-entry-body-content,
-body.reading-bg-sepia .vintage-epoch-xix .dict-entry-body-content,
-body.reading-bg-sepia .vintage-epoch-ancient .dict-entry-body-content *,
-body.reading-bg-sepia .vintage-epoch-classic .dict-entry-body-content *,
-body.reading-bg-sepia .vintage-epoch-xix .dict-entry-body-content *,
-body.reading-bg-sepia .vintage-epoch-ancient p,
-body.reading-bg-sepia .vintage-epoch-classic p,
-body.reading-bg-sepia .vintage-epoch-xix p,
-body.reading-bg-sepia .vintage-epoch-ancient .theol-reading-body *,
-body.reading-bg-sepia .vintage-epoch-classic .theol-reading-body *,
-body.reading-bg-sepia .vintage-epoch-xix .theol-reading-body *,
-body.reading-bg-sepia .vintage-epoch-ancient .comm-body-text *,
-body.reading-bg-sepia .vintage-epoch-classic .comm-body-text *,
-body.reading-bg-sepia .vintage-epoch-xix .comm-body-text *,
+/* 2. Fond SÉPIA DOUX & CHAUD (Fond sépia crème #f7eee2) */
+body.reading-bg-sepia .dict-article-card,
+body.reading-bg-sepia #view-dictionary .dict-article-card,
+body.reading-bg-sepia .dict-article-card[class*="vintage-epoch-"],
+body.reading-bg-sepia #view-dictionary .vintage-epoch-xix,
+body.reading-bg-sepia #view-dictionary .vintage-epoch-classic,
+body.reading-bg-sepia #view-dictionary .vintage-epoch-ancient {
+  background-color: #f7eee2 !important;
+  background-image: none !important;
+  box-shadow: 0 4px 24px rgba(120, 80, 40, 0.08) !important;
+  border: 1px solid #e8dbcc !important;
+  color: #2b1d0c !important;
+}
+body.reading-bg-sepia #view-dictionary .dict-view-main-scroll,
+body.reading-bg-sepia #view-dictionary .dict-main-reading-scroll {
+  background-color: #ede2d3 !important;
+  background-image: none !important;
+}
+body.reading-bg-sepia #view-dictionary .dict-article-card *,
+body.reading-bg-sepia #view-dictionary .vintage-epoch-xix * {
+  color: #2b1d0c !important;
+}
+
+/* 3. Fond SOMBRE / NUIT */
+body.reading-bg-dark .dict-article-card,
+body.reading-bg-dark #view-dictionary .dict-article-card,
+body.reading-bg-dark .dict-article-card[class*="vintage-epoch-"],
+body.reading-bg-dark #view-dictionary .vintage-epoch-xix,
+body.reading-bg-dark #view-dictionary .vintage-epoch-classic,
+body.reading-bg-dark #view-dictionary .vintage-epoch-ancient {
+  background-color: #1e293b !important;
+  background-image: none !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #f1f5f9 !important;
+}
+body.reading-bg-dark #view-dictionary .dict-view-main-scroll,
+body.reading-bg-dark #view-dictionary .dict-main-reading-scroll {
+  background-color: #0f172a !important;
+  background-image: none !important;
+}
+body.reading-bg-dark #view-dictionary .dict-article-card *,
+body.reading-bg-dark #view-dictionary .vintage-epoch-xix * {
+  color: #f1f5f9 !important;
+}
+
+/* Typographie d'époque : respecte la couleur d'encre sans forcer la police de caractères */
 body:not(.theme-dark) .vintage-epoch-ancient .verses-flow,
 body:not(.theme-dark) .vintage-epoch-classic .verses-flow,
 body:not(.theme-dark) .vintage-epoch-xix .verses-flow,
@@ -17915,9 +17920,6 @@ body:not(.theme-dark) .vintage-epoch-xix .dict-entry-body,
 body:not(.theme-dark) .vintage-epoch-ancient .dict-entry-body-content,
 body:not(.theme-dark) .vintage-epoch-classic .dict-entry-body-content,
 body:not(.theme-dark) .vintage-epoch-xix .dict-entry-body-content,
-body:not(.theme-dark) .vintage-epoch-ancient .dict-entry-body-content *,
-body:not(.theme-dark) .vintage-epoch-classic .dict-entry-body-content *,
-body:not(.theme-dark) .vintage-epoch-xix .dict-entry-body-content *,
 body:not(.theme-dark) .vintage-epoch-ancient p,
 body:not(.theme-dark) .vintage-epoch-classic p,
 body:not(.theme-dark) .vintage-epoch-xix p,
@@ -17927,8 +17929,7 @@ body:not(.theme-dark) .vintage-epoch-xix .theol-reading-body *,
 body:not(.theme-dark) .vintage-epoch-ancient .comm-body-text *,
 body:not(.theme-dark) .vintage-epoch-classic .comm-body-text *,
 body:not(.theme-dark) .vintage-epoch-xix .comm-body-text * {
-  font-family: 'IM Fell English', 'Cardo', 'EB Garamond', Georgia, serif !important;
-  color: #1d150c !important;
+  color: inherit;
   line-height: 1.85 !important;
 }
 
