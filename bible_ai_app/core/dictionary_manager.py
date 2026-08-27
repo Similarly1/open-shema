@@ -314,7 +314,8 @@ class DictionaryManager:
         letter: str = None, 
         query: str = None, 
         limit: int = 300, 
-        offset: int = 0
+        offset: int = 0,
+        title_only: bool = True
     ) -> dict:
         """
         Retourne l'index alphabétique ordonné des termes / lemmes d'un dictionnaire spécifique en quelques millisecondes.
@@ -344,7 +345,7 @@ class DictionaryManager:
                 elif fl != filter_letter:
                     continue
 
-            # 2. Pertinence de recherche ordonnée
+            # 2. Pertinence de recherche ordonnée (Uniquement dans les titres / codes / lemmes)
             match_score = 0
             if norm_q:
                 nt = item["norm_title"]
@@ -356,7 +357,7 @@ class DictionaryManager:
                     match_score = 2
                 elif norm_q in nt:
                     match_score = 3
-                elif norm_q in item.get("norm_body", ""):
+                elif not title_only and norm_q in item.get("norm_body", ""):
                     match_score = 4
                 else:
                     continue

@@ -614,16 +614,27 @@ const DictView = {
   // =========================================================================
 
   bindTocControls() {
-    // Filtre de recherche dans l'index
+    // Filtre de recherche dans l'index (Titres seuls)
     const filterIn = document.getElementById('dict-toc-filter-input');
+    const filterClear = document.getElementById('btn-dict-toc-filter-clear');
     let filterTimer = null;
 
     filterIn?.addEventListener('input', (e) => {
+      const q = e.target.value;
+      if (filterClear) {
+        filterClear.classList.toggle('hidden', !q);
+      }
       clearTimeout(filterTimer);
       filterTimer = setTimeout(() => {
-        const q = e.target.value.trim();
-        this.loadHeadwords(this.activeLetter, q);
-      }, 200);
+        const queryVal = q.trim();
+        this.loadHeadwords(this.activeLetter, queryVal);
+      }, 180);
+    });
+
+    filterClear?.addEventListener('click', () => {
+      if (filterIn) filterIn.value = '';
+      if (filterClear) filterClear.classList.add('hidden');
+      this.loadHeadwords(this.activeLetter, null);
     });
 
     // Barre A-Z
@@ -632,6 +643,7 @@ const DictView = {
         document.querySelectorAll('.dict-az-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         this.activeLetter = btn.dataset.letter;
+        btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
         
         const filterVal = document.getElementById('dict-toc-filter-input')?.value.trim();
         this.loadHeadwords(this.activeLetter, filterVal);
@@ -656,7 +668,8 @@ const DictView = {
 
       const total = res?.total_count || headwords.length;
       if (countEl) {
-        countEl.textContent = `${total.toLocaleString('fr-FR')} entrée${total > 1 ? 's' : ''}`;
+        countEl.textContent = total.toLocaleString('fr-FR');
+        countEl.title = `${total.toLocaleString('fr-FR')} entrée${total > 1 ? 's' : ''}`;
       }
 
       this.renderHeadwordsList(headwords, targetSlug);
