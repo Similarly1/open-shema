@@ -13469,26 +13469,14 @@
   ],
   "CADRAN": [
     {
-      "vol": 2,
       "fig_num": 7,
-      "caption": "Cadran spherique, trouv^, croit - on, i' Athenes.",
-      "page": 22,
-      "header": "25\nCADRAN SOLAIRE\n2G",
-      "leading_word": "Cadran",
-      "rel_path": "img/vigouroux/vol2_fig_7.png",
-      "width": 936,
-      "height": 878
+      "caption": "Cadran sphérique antique, trouvé, croit-on, à Athènes (Musée du Louvre).",
+      "rel_path": "img/vigouroux/vol2_fig_7.png"
     },
     {
-      "vol": 2,
       "fig_num": 8,
-      "caption": "Cadran conique phénicien.",
-      "page": 22,
-      "header": "25\nCADRAN SOLAIRE\n2G",
-      "leading_word": "Cadran",
-      "rel_path": "img/vigouroux/vol2_fig_8.png",
-      "width": 907,
-      "height": 716
+      "caption": "Cadran conique phénicien d'Oum-el-Aouamid près de Tyr (Mission de Phénicie d'Ernest Renan).",
+      "rel_path": "img/vigouroux/vol2_fig_8.png"
     }
   ],
   "SAINT": [
@@ -13834,7 +13822,7 @@
     {
       "vol": 2,
       "fig_num": 27,
-      "caption": "Calendrier remain indiquant les travaux",
+      "caption": "Calendrier romain indiquant les travaux champêtres de chaque mois.",
       "page": 41,
       "header": "63\nCALEQON — CALENDRIER\n64",
       "leading_word": "Calendrier",
@@ -29409,6 +29397,30 @@
       "rel_path": "img/vigouroux/vol2_fig_33.png",
       "width": 667,
       "height": 542
+    }
+  ],
+  "CADRAN SOLAIRE": [
+    {
+      "fig_num": 7,
+      "caption": "Cadran sphérique antique, trouvé, croit-on, à Athènes (Musée du Louvre).",
+      "rel_path": "img/vigouroux/vol2_fig_7.png"
+    },
+    {
+      "fig_num": 8,
+      "caption": "Cadran conique phénicien d'Oum-el-Aouamid près de Tyr (Mission de Phénicie d'Ernest Renan).",
+      "rel_path": "img/vigouroux/vol2_fig_8.png"
+    }
+  ],
+  "CADRANSOLAIRE": [
+    {
+      "fig_num": 7,
+      "caption": "Cadran sphérique antique, trouvé, croit-on, à Athènes (Musée du Louvre).",
+      "rel_path": "img/vigouroux/vol2_fig_7.png"
+    },
+    {
+      "fig_num": 8,
+      "caption": "Cadran conique phénicien d'Oum-el-Aouamid près de Tyr (Mission de Phénicie d'Ernest Renan).",
+      "rel_path": "img/vigouroux/vol2_fig_8.png"
     }
   ]
 }

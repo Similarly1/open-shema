@@ -162,6 +162,9 @@ class DictionaryPolisher:
         if cleaned.startswith("```"):
             cleaned = re.sub(r"^```(?:markdown|md)?\s*\n?", "", cleaned, flags=re.IGNORECASE)
             cleaned = re.sub(r"\n?```\s*$", "", cleaned)
+        # Nettoyage des phrases conversationnelles en début de réponse
+        cleaned = re.sub(r"^[\s\n]*(?:Voici (?:la notice|le texte|la version|l['’]article|ce texte)[^\n]*|Ci-dessous[^\n]*|Notice restaurée[^\n]*)\s*\n+", "", cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(r"^[\s\n]*(?:[-*_—–]{3,}\s*\n+)+", "", cleaned)
         return cleaned.strip()
 
     @classmethod

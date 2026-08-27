@@ -257,6 +257,11 @@ body.reading-bg-white .pane-scrollable-content,
 body.reading-bg-white .reader-workspace .commentary-viewer-panel,
 body.reading-bg-white #view-commentaries,
 body.reading-bg-white #view-commentaries .comm-view-main-scroll,
+body.reading-bg-white #view-dict,
+body.reading-bg-white #view-dict .dict-view-main-scroll,
+body.reading-bg-white #view-dict .dict-main-reading-scroll,
+body.reading-bg-white #view-dict .dict-article-container,
+body.reading-bg-white #view-dict .dict-article-card,
 body.reading-bg-white #view-dictionary,
 body.reading-bg-white #view-dictionary .dict-view-main-scroll,
 body.reading-bg-white #view-dictionary .dict-main-reading-scroll,
@@ -270,6 +275,7 @@ body.reading-bg-white #view-commentaries .comm-verse-banner,
 body.reading-bg-white #view-commentaries .comm-active-book-btn,
 body.reading-bg-white #view-commentaries .comm-page-synth-card,
 body.reading-bg-white #view-theology .theol-article-card,
+body.reading-bg-white #view-dict .dict-article-card,
 body.reading-bg-white #view-dictionary .dict-article-card {
   background-color: #FFFFFF !important;
   border-color: #E2E8F0 !important;
@@ -304,6 +310,26 @@ body.reading-bg-white #view-theology .theol-reading-body h5,
 body.reading-bg-white #view-theology .theol-reading-body h6,
 body.reading-bg-white #view-theology .theol-reading-body p,
 body.reading-bg-white #view-theology .theol-reading-body strong,
+body.reading-bg-white #view-dict .dict-entry-body,
+body.reading-bg-white #view-dict .dict-entry-title,
+body.reading-bg-white #view-dict .dict-hero-title,
+body.reading-bg-white #view-dict .dict-article-body,
+body.reading-bg-white #view-dict .dict-article-body *,
+body.reading-bg-white #view-dict .dict-entry-body-content,
+body.reading-bg-white #view-dict .dict-entry-body-content *,
+body.reading-bg-white #view-dict .dict-article-card p,
+body.reading-bg-white #view-dict .dict-article-card li,
+body.reading-bg-white #view-dict .dict-article-card h1,
+body.reading-bg-white #view-dict .dict-article-card h2,
+body.reading-bg-white #view-dict .dict-article-card h3,
+body.reading-bg-white #view-dict .dict-article-card h4,
+body.reading-bg-white #view-dict .dict-article-card h5,
+body.reading-bg-white #view-dict .dict-article-card h6,
+body.reading-bg-white #view-dict .dict-article-card strong,
+body.reading-bg-white #view-dict .dict-article-card em,
+body.reading-bg-white #view-dict #match-body-text,
+body.reading-bg-white #view-dict #dict-match-body,
+body.reading-bg-white .dict-hero-title,
 body.reading-bg-white #view-dictionary .dict-entry-body,
 body.reading-bg-white #view-dictionary .dict-entry-title,
 body.reading-bg-white #view-dictionary .dict-hero-title,
@@ -325,6 +351,8 @@ body.reading-bg-white #view-dictionary #match-body-text,
 body.reading-bg-white #view-dictionary #dict-match-body {
   color: #0F172A !important;
 }
+body.reading-bg-white #view-dict blockquote,
+body.reading-bg-white #view-dict .dict-article-blockquote,
 body.reading-bg-white #view-dictionary blockquote,
 body.reading-bg-white #view-dictionary .dict-article-blockquote {
   background: #F1F5F9 !important;
@@ -444,9 +472,11 @@ body.reading-bg-sepia .reader-workspace .commentary-viewer-panel,
 body.reading-bg-sepia #view-commentaries,
 body.reading-bg-sepia #view-commentaries .comm-view-main-scroll,
 body.reading-bg-sepia #view-theology,
-body.reading-bg-sepia #view-theology .theol-view-main-scroll,
-body.reading-bg-sepia #view-theology .theol-reading-container,
-body.reading-bg-sepia #view-theology .theol-article-card,
+body.reading-bg-sepia #view-dict,
+body.reading-bg-sepia #view-dict .dict-view-main-scroll,
+body.reading-bg-sepia #view-dict .dict-main-reading-scroll,
+body.reading-bg-sepia #view-dict .dict-article-container,
+body.reading-bg-sepia #view-dict .dict-article-card,
 body.reading-bg-sepia #view-dictionary,
 body.reading-bg-sepia #view-dictionary .dict-view-main-scroll,
 body.reading-bg-sepia #view-dictionary .dict-main-reading-scroll,
@@ -460,6 +490,7 @@ body.reading-bg-sepia #view-commentaries .comm-verse-banner,
 body.reading-bg-sepia #view-commentaries .comm-active-book-btn,
 body.reading-bg-sepia #view-commentaries .comm-page-synth-card,
 body.reading-bg-sepia #view-theology .theol-article-card,
+body.reading-bg-sepia #view-dict .dict-article-card,
 body.reading-bg-sepia #view-dictionary .dict-article-card {
   background-color: #FBF0D9 !important;
   border-color: #E5D5B5 !important;
@@ -494,6 +525,26 @@ body.reading-bg-sepia #view-theology .theol-reading-body h5,
 body.reading-bg-sepia #view-theology .theol-reading-body h6,
 body.reading-bg-sepia #view-theology .theol-reading-body p,
 body.reading-bg-sepia #view-theology .theol-reading-body strong,
+body.reading-bg-sepia #view-dict .dict-entry-body,
+body.reading-bg-sepia #view-dict .dict-entry-title,
+body.reading-bg-sepia #view-dict .dict-hero-title,
+body.reading-bg-sepia #view-dict .dict-article-body,
+body.reading-bg-sepia #view-dict .dict-article-body *,
+body.reading-bg-sepia #view-dict .dict-entry-body-content,
+body.reading-bg-sepia #view-dict .dict-entry-body-content *,
+body.reading-bg-sepia #view-dict .dict-article-card p,
+body.reading-bg-sepia #view-dict .dict-article-card li,
+body.reading-bg-sepia #view-dict .dict-article-card h1,
+body.reading-bg-sepia #view-dict .dict-article-card h2,
+body.reading-bg-sepia #view-dict .dict-article-card h3,
+body.reading-bg-sepia #view-dict .dict-article-card h4,
+body.reading-bg-sepia #view-dict .dict-article-card h5,
+body.reading-bg-sepia #view-dict .dict-article-card h6,
+body.reading-bg-sepia #view-dict .dict-article-card strong,
+body.reading-bg-sepia #view-dict .dict-article-card em,
+body.reading-bg-sepia #view-dict #match-body-text,
+body.reading-bg-sepia #view-dict #dict-match-body,
+body.reading-bg-sepia .dict-hero-title,
 body.reading-bg-sepia #view-dictionary .dict-entry-body,
 body.reading-bg-sepia #view-dictionary .dict-entry-title,
 body.reading-bg-sepia #view-dictionary .dict-hero-title,
@@ -15989,6 +16040,41 @@ body.ai-disabled .ai-feature-only {
   margin-bottom: 14px;
 }
 
+/* Listes à Puces Hiérarchiques du Dictionnaire */
+.dict-bullet-list {
+  padding-left: 24px;
+  margin: 10px 0 16px 0;
+  list-style-type: disc;
+}
+
+.dict-bullet-item {
+  margin-bottom: 6px;
+  line-height: 1.75;
+  color: var(--text-primary);
+}
+
+.dict-bullet-category {
+  margin-top: 12px;
+  margin-bottom: 4px;
+  font-weight: 700;
+  list-style-type: square;
+}
+
+.dict-bullet-nested {
+  margin-left: 24px;
+  margin-bottom: 4px;
+  list-style-type: circle;
+  opacity: 0.95;
+}
+
+body.reading-bg-white .dict-bullet-item {
+  color: #0F172A !important;
+}
+
+body.reading-bg-sepia .dict-bullet-item {
+  color: #281E15 !important;
+}
+
 .dict-scripture-link {
   color: var(--accent-blue);
   font-weight: 600;
@@ -16781,13 +16867,6 @@ body.palette-dark-slate .dict-source-badge:hover {
   box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
 }
 
-.dict-see-details {
-  font-size: 12.5px;
-  color: var(--text-muted, #64748b);
-  font-style: italic;
-  font-family: var(--font-sans, system-ui, sans-serif);
-}
-
 .dict-see-meta {
   display: inline-flex;
   align-items: center;
@@ -16799,6 +16878,7 @@ body.palette-dark-slate .dict-source-badge:hover {
   font-size: 11.5px;
   font-weight: 600;
   font-family: var(--font-sans, system-ui, sans-serif);
+  border: 1px solid transparent;
 }
 
 .dict-see-qualifier {
@@ -16807,15 +16887,23 @@ body.palette-dark-slate .dict-source-badge:hover {
   font-style: italic;
 }
 
-body.theme-dark .dict-see-meta,
-body.palette-dark-slate .dict-see-meta {
+body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .dict-see-meta,
+body.palette-dark-slate:not(.reading-bg-sepia):not(.reading-bg-white) .dict-see-meta {
   background: rgba(148, 163, 184, 0.12);
   color: #cbd5e1;
+  border-color: rgba(148, 163, 184, 0.2);
 }
 
 body.reading-bg-sepia .dict-see-meta {
-  background: rgba(120, 53, 15, 0.08);
-  color: #78350f;
+  background: rgba(120, 53, 15, 0.1) !important;
+  color: #78350f !important;
+  border-color: rgba(120, 53, 15, 0.25) !important;
+}
+
+body.reading-bg-white .dict-see-meta {
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+  border-color: #cbd5e1 !important;
 }
 
 /* Boîte Étude Approfondie & Notice Liée (Option B - Spécifique Vigouroux) */
@@ -16825,68 +16913,52 @@ body.reading-bg-sepia .dict-see-meta {
   background: rgba(99, 102, 241, 0.05);
   border: 1px solid rgba(99, 102, 241, 0.2);
   border-left: 4px solid #6366f1;
-  border-radius: 0 10px 10px 0;
-  transition: all 0.2s ease;
+  border-radius: 8px;
 }
 
-.dict-related-notice-box:hover {
-  background: rgba(99, 102, 241, 0.08);
-  border-color: rgba(99, 102, 241, 0.35);
-  box-shadow: 0 3px 12px rgba(99, 102, 241, 0.08);
+body.reading-bg-sepia .dict-related-notice-box {
+  background: rgba(180, 83, 9, 0.06) !important;
+  border-color: rgba(180, 83, 9, 0.25) !important;
+  border-left-color: #b45309 !important;
 }
 
 .dict-related-notice-header {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 11.5px;
-  font-weight: 800;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: #6366f1;
+  letter-spacing: 0.5px;
+  color: #4f46e5;
   margin-bottom: 8px;
-  font-family: var(--font-sans, system-ui, sans-serif);
 }
 
-.dict-related-notice-body .dict-related-intro {
-  margin: 0 0 12px 0;
-  font-size: 14px;
-  line-height: 1.65;
+body.reading-bg-sepia .dict-related-notice-header {
+  color: #92400e !important;
+}
+
+.dict-related-intro {
+  margin: 0 0 10px 0 !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
   color: var(--text-primary);
-  font-style: normal;
+}
+
+body.reading-bg-sepia .dict-related-intro {
+  color: #2b1d0c !important;
 }
 
 .dict-related-actions {
   display: flex;
-  align-items: center;
   flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
 }
 
-body.theme-dark .dict-related-notice-box,
-body.palette-dark-slate .dict-related-notice-box {
-  background: rgba(99, 102, 241, 0.1);
-  border-color: rgba(99, 102, 241, 0.3);
-  border-left-color: #818cf8;
-}
-
-body.theme-dark .dict-related-notice-header,
-body.palette-dark-slate .dict-related-notice-header {
-  color: #a5b4fc;
-}
-
-body.reading-bg-sepia .dict-related-notice-box {
-  background: rgba(180, 83, 9, 0.07);
-  border-color: rgba(180, 83, 9, 0.25);
-  border-left-color: #b45309;
-}
-
-body.reading-bg-sepia .dict-related-notice-header {
-  color: #b45309;
-}
-
-/* Termes Latins & Patristiques Interactifs */
+/* Gloses et termes latins interactifs */
 .theol-latin-gloss {
+  display: inline;
   border-bottom: 1.5px dotted #b45309;
   cursor: help;
   transition: all 0.15s ease;
@@ -16900,36 +16972,42 @@ body.reading-bg-sepia .dict-related-notice-header {
   border-radius: 3px;
 }
 
-body.theme-dark .theol-latin-gloss,
-body.palette-dark-slate .theol-latin-gloss {
+body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .theol-latin-gloss,
+body.palette-dark-slate:not(.reading-bg-sepia):not(.reading-bg-white) .theol-latin-gloss {
   border-bottom-color: #fbbf24;
 }
 
-body.theme-dark .theol-latin-gloss:hover,
-body.palette-dark-slate .theol-latin-gloss:hover {
+body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .theol-latin-gloss:hover,
+body.palette-dark-slate:not(.reading-bg-sepia):not(.reading-bg-white) .theol-latin-gloss:hover {
   background: rgba(251, 191, 36, 0.2);
   color: #fde68a;
 }
 
 body.reading-bg-sepia .theol-latin-gloss {
-  border-bottom-color: #92400e;
+  color: #78350f !important;
+  border-bottom-color: #92400e !important;
+}
+
+body.reading-bg-sepia .theol-latin-gloss:hover {
+  background: rgba(180, 83, 9, 0.15) !important;
+  color: #451a03 !important;
 }
 
 /* Popover Glossaire Latin & Patristique */
 .theol-latin-popover {
   position: fixed;
   z-index: 10005;
-  background: var(--bg-card, #ffffff);
+  background: #ffffff;
   border: 1px solid rgba(217, 119, 6, 0.3);
   border-top: 3px solid #d97706;
   border-radius: 8px;
   padding: 10px 14px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
   max-width: 320px;
   font-family: var(--font-sans, system-ui, sans-serif);
   font-size: 13px;
   line-height: 1.5;
-  color: var(--text-primary);
+  color: #0f172a;
   pointer-events: none;
   opacity: 0;
   transform: translateY(4px);
@@ -16953,44 +17031,89 @@ body.reading-bg-sepia .theol-latin-gloss {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  color: #d97706;
+  color: #b45309;
   letter-spacing: 0.5px;
 }
 
 .theol-latin-popover-term {
   font-weight: 700;
   font-size: 13.5px;
-  color: var(--text-primary);
+  color: #1e293b;
   margin-bottom: 3px;
   font-style: italic;
 }
 
 .theol-latin-popover-desc {
   font-size: 12px;
-  color: var(--text-secondary);
+  color: #475569;
+  line-height: 1.5;
 }
 
-body.theme-dark .theol-latin-popover,
-body.palette-dark-slate .theol-latin-popover {
-  background: #1e1e2e;
-  border-color: rgba(245, 158, 11, 0.35);
-  border-top-color: #fbbf24;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+/* 1. Popover en Mode Sombre Réel */
+body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .theol-latin-popover,
+body.palette-dark-slate:not(.reading-bg-sepia):not(.reading-bg-white) .theol-latin-popover {
+  background: #1e1e2e !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+  border-top-color: #fbbf24 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+  color: #f8fafc !important;
 }
 
-body.theme-dark .theol-latin-popover-badge,
-body.palette-dark-slate .theol-latin-popover-badge {
-  color: #fbbf24;
+body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .theol-latin-popover-badge,
+body.palette-dark-slate:not(.reading-bg-sepia):not(.reading-bg-white) .theol-latin-popover-badge {
+  color: #fbbf24 !important;
 }
 
+body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .theol-latin-popover-term,
+body.palette-dark-slate:not(.reading-bg-sepia):not(.reading-bg-white) .theol-latin-popover-term {
+  color: #f8fafc !important;
+}
+
+body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .theol-latin-popover-desc,
+body.palette-dark-slate:not(.reading-bg-sepia):not(.reading-bg-white) .theol-latin-popover-desc {
+  color: #cbd5e1 !important;
+}
+
+/* 2. Popover en Mode Sépia / Parchemin */
 body.reading-bg-sepia .theol-latin-popover {
-  background: #fbf0d9;
-  border-color: rgba(180, 83, 9, 0.35);
-  border-top-color: #b45309;
+  background: #fdf6e7 !important;
+  border-color: rgba(180, 83, 9, 0.35) !important;
+  border-top-color: #b45309 !important;
+  box-shadow: 0 10px 30px rgba(90, 50, 20, 0.2) !important;
+  color: #2b1d0c !important;
 }
 
 body.reading-bg-sepia .theol-latin-popover-badge {
-  color: #b45309;
+  color: #92400e !important;
+}
+
+body.reading-bg-sepia .theol-latin-popover-term {
+  color: #451a03 !important; /* Brun très foncé net */
+}
+
+body.reading-bg-sepia .theol-latin-popover-desc {
+  color: #78350f !important; /* Brun chaud contrasté */
+}
+
+/* 3. Popover en Mode Blanc Pur */
+body.reading-bg-white .theol-latin-popover {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  border-top-color: #d97706 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12) !important;
+  color: #0f172a !important;
+}
+
+body.reading-bg-white .theol-latin-popover-badge {
+  color: #b45309 !important;
+}
+
+body.reading-bg-white .theol-latin-popover-term {
+  color: #0f172a !important;
+}
+
+body.reading-bg-white .theol-latin-popover-desc {
+  color: #334155 !important;
 }
 
 /* =============================================================================

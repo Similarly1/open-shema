@@ -983,7 +983,7 @@ const DictView = {
       "gen": "Genèse", "genese": "Genèse", "ge": "Genèse", "gn": "Genèse",
       "exod": "Exode", "exode": "Exode", "ex": "Exode",
       "lev": "Lévitique", "levitique": "Lévitique", "lv": "Lévitique",
-      "num": "Nombres", "nombres": "Nombres", "nb": "Nombres",
+      "num": "Nombres", "nom": "Nombres", "nomb": "Nombres", "nombres": "Nombres", "nb": "Nombres", "numeri": "Nombres",
       "deut": "Deutéronome", "deuteronome": "Deutéronome", "dt": "Deutéronome",
       "jos": "Josué", "josue": "Josué",
       "jug": "Juges", "juges": "Juges", "jg": "Juges",
@@ -1052,6 +1052,13 @@ const DictView = {
 
     let processed = (text || '');
 
+    // 0a. Nettoyage de tout préambule conversationnel d'IA en tête d'article
+    processed = processed.replace(/^[\s\n]*(?:Voici (?:la notice|le texte|la version|l['’]article|ce texte)[^\n]*|Ci-dessous[^\n]*|Notice restaurée[^\n]*)\s*\n+/i, '');
+    processed = processed.replace(/^[\s\n]*(?:[-*_—–]{3,}\s*\n+)+/, '');
+
+    // Nettoyage des artefacts de découpage intermédiaire (ex: " (Partie 1/2)", " (Partie 2/2)")
+    processed = processed.replace(/\s*\((?:Partie|partie)\s+\d+\/\d+\)/gi, '');
+
     // Élimination du doublon de titre en tête d'article (ex: ABAGARE \n ABAGARE)
     processed = processed.replace(/^([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ\-\s]{2,})\n+\1\n+/i, '$1\n\n');
 
@@ -1080,8 +1087,8 @@ const DictView = {
       processed = processed.replace(/\(\s+([^\)]+?)\s+\)/g, '($1)');
       processed = processed.replace(/\s+\.1\b/g, '');
 
-      // Normalisation des références bibliques abrégées NDB avec points (ex: 1Ch 24.1 , 6, 10 ou 2S 20.14, 15, 18)
-      processed = processed.replace(/\b(1Ch|2Ch|1S|2S|1R|2R|Lc|Mt|Mc|Jn|Ac|Rm|1Co|2Co|Ga|Ep|Ph|Col|1Th|2Th|1Tm|2Tm|Tt|Phm|He|Hé|Jc|1P|2P|1J|2J|3J|1Jn|2Jn|3Jn|Jd|Ap|Gn|Ex|Lv|Nb|Dt|Jos|Jg|Rt|Esd|Né|Ne|Est|Jb|Ps|Pr|Ec|Ct|Es|Jr|Lm|Ez|Dn|Os|Jl|Am|Ab|Jon|Mi|Na|Ha|So|Ag|Za|Ml|4M)\s+(\d+)\.(\d+(?:\s*[\-–]\s*\d+)?(?:\s*,\s*\d+)*)/gi, (match, bk, ch, vs) => {
+      // Normalisation des références bibliques abrégées NDB avec points (ex: 1Ch 24.1 , 6, 10 ou 2S 20.14, 15, 18 ou Nom 2.3)
+      processed = processed.replace(/\b(1Ch|2Ch|1S|2S|1R|2R|Lc|Mt|Mc|Jn|Ac|Rm|1Co|2Co|Ga|Ep|Ph|Col|1Th|2Th|1Tm|2Tm|Tt|Phm|He|Hé|Jc|1P|2P|1J|2J|3J|1Jn|2Jn|3Jn|Jd|Ap|Gn|Ex|Lv|Nb|Nom|Dt|Jos|Jg|Rt|Esd|Né|Ne|Est|Jb|Ps|Pr|Ec|Ct|Es|Jr|Lm|Ez|Dn|Os|Jl|Am|Ab|Jon|Mi|Na|Ha|So|Ag|Za|Ml|4M)\s+(\d+)\.(\d+(?:\s*[\-–]\s*\d+)?(?:\s*,\s*\d+)*)/gi, (match, bk, ch, vs) => {
         const k = cleanBookKey(bk);
         const bookFr = BOOK_ALIASES[k] || bk;
         const cleanVs = vs.replace(/\s+/g, '');
@@ -1089,7 +1096,7 @@ const DictView = {
       });
 
       // Normalisation des références de livres avec chapitre seul (ex: Gn 4, Gn 13, Hé 9)
-      processed = processed.replace(/\b(1Ch|2Ch|1S|2S|1R|2R|Lc|Mt|Mc|Jn|Ac|Rm|1Co|2Co|Ga|Ep|Ph|Col|1Th|2Th|1Tm|2Tm|Tt|Phm|He|Hé|Jc|1P|2P|1J|2J|3J|1Jn|2Jn|3Jn|Jd|Ap|Gn|Ex|Lv|Nb|Dt|Jos|Jg|Rt|Esd|Né|Ne|Est|Jb|Ps|Pr|Ec|Ct|Es|Jr|Lm|Ez|Dn|Os|Jl|Am|Ab|Jon|Mi|Na|Ha|So|Ag|Za|Ml|4M)\s+(\d+)\b/gi, (match, bk, ch) => {
+      processed = processed.replace(/\b(1Ch|2Ch|1S|2S|1R|2R|Lc|Mt|Mc|Jn|Ac|Rm|1Co|2Co|Ga|Ep|Ph|Col|1Th|2Th|1Tm|2Tm|Tt|Phm|He|Hé|Jc|1P|2P|1J|2J|3J|1Jn|2Jn|3Jn|Jd|Ap|Gn|Ex|Lv|Nb|Nom|Dt|Jos|Jg|Rt|Esd|Né|Ne|Est|Jb|Ps|Pr|Ec|Ct|Es|Jr|Lm|Ez|Dn|Os|Jl|Am|Ab|Jon|Mi|Na|Ha|So|Ag|Za|Ml|4M)\s+(\d+)\b/gi, (match, bk, ch) => {
         const k = cleanBookKey(bk);
         const bookFr = BOOK_ALIASES[k] || bk;
         return `${bookFr} ${ch}`;
@@ -1270,6 +1277,7 @@ const DictView = {
     const out = [];
     let inSeeList = false;
     let inUlList = false;
+    let inBulletCategory = false;
     let currentBlockquote = [];
 
     const flushBlockquote = () => {
@@ -1289,6 +1297,7 @@ const DictView = {
         flushBlockquote();
         if (inSeeList) { out.push('</ul>'); inSeeList = false; }
         if (inUlList) { out.push('</ul>'); inUlList = false; }
+        inBulletCategory = false;
         return;
       }
 
@@ -1501,9 +1510,19 @@ const DictView = {
       }
 
       // C) Renvois et Articles Connexes (ex: Voir Élever ; Humilité. ou *Voir* : **ÉBAL (1)** ou *Voir aussi* : **HÉBER**)
-      const seeMatch = raw.match(/^[*•-]?\s*(?:\*+|_+)?\s*(?:Voir|V\.)(?:\s+(?:aussi|également))?\s*(?:\*+|_+)?\s*:?\s*(.*)$/i);
-      if (seeMatch && !raw.startsWith('1.') && !raw.startsWith('2.') && !raw.startsWith('I.') && seeMatch[1].trim().length > 0) {
-        let rawTargetStr = seeMatch[1].trim();
+      let seeTargetCandidate = null;
+      const voirMatch = raw.match(/^[*•-]?\s*(?:\*+|_+)?\s*(?:Voir|Voyez)(?:\s+(?:aussi|également))?\s*(?:\*+|_+)?\s*:?\s*(.*)$/i);
+      if (voirMatch && !raw.startsWith('1.') && !raw.startsWith('2.') && !raw.startsWith('I.') && voirMatch[1].trim().length > 0) {
+        seeTargetCandidate = voirMatch[1].trim();
+      } else {
+        const vMatch = raw.match(/^(?:\*+|_+)?\s*V\.\s*(?:\*+|_+)?\s*(?::\s*|\s+)([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ]{2,}.*)$/);
+        if (vMatch && !['in-8', 'in-4', 'in-fol', 'p.', 'page', 'édit', 'vol.', 'paris', 'londres'].some(k => vMatch[1].toLowerCase().includes(k))) {
+          seeTargetCandidate = vMatch[1].trim();
+        }
+      }
+
+      if (seeTargetCandidate) {
+        let rawTargetStr = seeTargetCandidate;
         // Supprimer toute balise HTML déjà injectée (ex: <span class="theol-fn-badge">...)
         rawTargetStr = rawTargetStr
           .replace(/<[^>]+>/g, ' ')
@@ -1574,7 +1593,9 @@ const DictView = {
             }
 
             word = word.replace(/[.,;:]+$/, '').trim();
-            if (word) {
+            const currentTitleNorm = (this.currentEntryData?.title || this.activeSlug || '').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Z0-9]/g, '');
+            const wordNorm = word.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Z0-9]/g, '');
+            if (word && wordNorm !== currentTitleNorm) {
               parsedTargets.push({ word, meta, qualifier });
             }
           });
@@ -1612,7 +1633,8 @@ const DictView = {
               const pMatch = lastOut.match(/^<p style="[^"]*">(.*?)<\/p>$/);
               if (pMatch) {
                 let pText = pMatch[1].trim();
-                const isIntroPattern = /^(?:Pour (?:une étude|l['’]étude|en savoir plus)|Sur la signification|Ce terme désigne|Consulter également|Pour la symbolique|\*+\s*Exégèse)/i.test(pText) || pText.endsWith(',') || pText.endsWith(':');
+                const isNotBiblio = !['référence', 'source', 'auteur', 'biblio'].some(k => pText.toLowerCase().includes(k));
+                const isIntroPattern = isNotBiblio && (/^(?:Pour (?:une étude|l['’]étude|en savoir plus)|Sur la signification|Ce terme désigne|Consulter également|Pour la symbolique|\*+\s*Exégèse)/i.test(pText) || pText.endsWith(',') || pText.endsWith(':'));
                 if (isIntroPattern) {
                   // Nettoyer la ponctuation terminale
                   let cleanIntro = pText.replace(/[,\s]+$/, ' :');
@@ -1658,70 +1680,95 @@ const DictView = {
       }
 
       // D) Lignes de Bibliographie / Sources *Cf.* Hurter...
-      const cfMatch = raw.match(/^(?:\*+)?(?:Cf\.|Confère|Conf\.|Bibliographie\s*:|Sources?\s*:)(?:\*+)?\s*(.+)$/i);
+      const cfMatch = raw.match(/^(?:\*+)?(?:Cf\.|Confère|Conf\.|Bibliographie\s*:|Sources?\s*:)(?:\*+)?\s*(.*)$/i);
       if (cfMatch) {
         const srcBody = cfMatch[1].trim();
-        if (this.optFootnotes) {
-          const fnId = this.currentFootnotesList.length + 1;
-          const cleanSrc = srcBody.replace(/[*_`]+/g, '').trim();
-          this.currentFootnotesList.push({ id: fnId, text: `Cf. ${cleanSrc}` });
-          const badgeHtml = ` <span class="theol-fn-badge" data-fn-id="${fnId}" id="dict-fnref-${fnId}">${fnId}</span>`;
+        const cleanSrc = srcBody.replace(/[*_`:]+/g, '').trim();
+        if (cleanSrc.length >= 5) {
+          if (this.optFootnotes) {
+            const fnId = this.currentFootnotesList.length + 1;
+            this.currentFootnotesList.push({ id: fnId, text: `Cf. ${cleanSrc}` });
+            const badgeHtml = ` <span class="theol-fn-badge" data-fn-id="${fnId}" id="dict-fnref-${fnId}">${fnId}</span>`;
 
-          let attached = false;
-          for (let i = out.length - 1; i >= 0; i--) {
-            if (out[i].endsWith('</li>')) {
-              out[i] = out[i].slice(0, -5) + badgeHtml + '</li>';
-              attached = true;
-              break;
-            } else if (out[i].endsWith('</p>')) {
-              out[i] = out[i].slice(0, -4) + badgeHtml + '</p>';
-              attached = true;
-              break;
-            } else if (out[i].endsWith('</div>')) {
-              out[i] = out[i].slice(0, -6) + badgeHtml + '</div>';
-              attached = true;
-              break;
+            let attached = false;
+            for (let i = out.length - 1; i >= 0; i--) {
+              if (out[i].endsWith('</li>')) {
+                out[i] = out[i].slice(0, -5) + badgeHtml + '</li>';
+                attached = true;
+                break;
+              } else if (out[i].endsWith('</p>')) {
+                out[i] = out[i].slice(0, -4) + badgeHtml + '</p>';
+                attached = true;
+                break;
+              } else if (out[i].endsWith('</div>')) {
+                out[i] = out[i].slice(0, -6) + badgeHtml + '</div>';
+                attached = true;
+                break;
+              }
             }
-          }
-          if (!attached) {
-            out.push(badgeHtml);
+            if (!attached) {
+              out.push(badgeHtml);
+            }
+            return;
+          } else {
+            if (inUlList) { out.push('</ul>'); inUlList = false; }
+            out.push(`
+              <div class="dict-cf-source-row">
+                *Cf.* ${srcBody.replace(/\*(.*?)\*/g, '<em>$1</em>')}
+              </div>
+            `);
+            return;
           }
         } else {
+          // Titre de section bibliographique autonome (ex: **Bibliographie :**) -> afficher comme en-tête propre
           if (inUlList) { out.push('</ul>'); inUlList = false; }
-          out.push(`
-            <div class="dict-cf-source-row">
-              *Cf.* ${srcBody.replace(/\*(.*?)\*/g, '<em>$1</em>')}
-            </div>
-          `);
+          const headingLabel = raw.replace(/[*_`]+/g, '').trim();
+          out.push(`<div class="dict-biblio-heading" style="margin: 16px 0 6px 0; font-weight: 700; font-size: 14.5px; color: var(--text-primary); font-style: italic;">📚 ${this.escapeHtml(headingLabel)}</div>`);
+          return;
         }
-        return;
       }
 
-      // E) Listes à puces Markdown (* Ouvrage..., - Item..., • Item...) avec indentation
-      const bulletMatch = raw.match(/^(\s*)[*•-]\s+(.+)$/);
+      // E) Listes à puces Markdown (* Ouvrage..., - Item..., • Item...) avec indentation hiérarchique
+      const bulletMatch = line.match(/^(\s*)[*•-]\s+(.+)$/);
       if (bulletMatch) {
         if (!inUlList) {
           out.push('<ul class="dict-bullet-list">');
           inUlList = true;
         }
-        const indentLevel = bulletMatch[1].length >= 2 ? 1 : 0;
-        let itemText = bulletMatch[2].trim()
-          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-          .replace(/\*(.*?)\*/g, '<em>$1</em>');
-        
+        const rawSpaces = bulletMatch[1].length;
+        let itemText = bulletMatch[2].trim();
+
         // Rendre cliquables les renvois à l'intérieur des listes à puces (ex: *Voir* : **ÉBAL (1)**)
         itemText = itemText.replace(/\b(?:Voir|V\.)\s*:\s*<strong>([A-ZÉÈÊËÀÂÄÎÏÔÖÙÛÜÇ][^<]+?)<\/strong>/gi, (m, word) => {
           return `Voir : <a href="javascript:void(0)" class="dict-cross-ref-link" data-word="${this.escapeHtml(word.trim())}">🔗 ${this.escapeHtml(word.trim())}</a>`;
         });
 
-        const indentClass = indentLevel ? ' class="dict-bullet-nested"' : '';
-        out.push(`<li class="dict-bullet-item"${indentClass}>${itemText}</li>`);
+        // Détection de catégorie d'en-tête (ex: * **Attributs individuels :**)
+        const isHeaderOnly = /^\*\*[^*]+:\*\*\s*$/.test(itemText) || /^\*\*[^*]+\*\*\s*:\s*$/.test(itemText);
+        let isNested = (rawSpaces >= 2);
+        if (!isNested && inBulletCategory && !isHeaderOnly) {
+          isNested = true;
+        }
+
+        if (isHeaderOnly) {
+          inBulletCategory = true;
+        } else if (!isNested && !isHeaderOnly && (itemText.includes('. ') || itemText.length > 80)) {
+          inBulletCategory = false;
+        }
+
+        const itemFormatted = itemText
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+        const extraClass = isNested ? ' dict-bullet-nested' : (isHeaderOnly ? ' dict-bullet-category' : '');
+        out.push(`<li class="dict-bullet-item${extraClass}">${itemFormatted}</li>`);
         return;
       } else {
         if (inUlList) {
           out.push('</ul>');
           inUlList = false;
         }
+        inBulletCategory = false;
       }
 
       // F) Blocs HTML préformatés (cartes, notes éditoriales, citations)
