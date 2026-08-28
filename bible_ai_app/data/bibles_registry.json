@@ -1,7 +1,13 @@
 {
   "S21": {
     "code": "S21",
-    "aliases": ["segond 21", "s21", "segond21", "bible segond 21", "bible s21"],
+    "aliases": [
+      "segond 21",
+      "s21",
+      "segond21",
+      "bible segond 21",
+      "bible s21"
+    ],
     "nom_officiel": "Bible Segond 21",
     "editeur": "Société Biblique de Genève",
     "annee": 2007,
@@ -15,11 +21,24 @@
     "isbn": "9782608123015",
     "description": "La Bible Segond 21 est une révision du texte classique de Louis Segond avec le vocabulaire français contemporain, particulièrement adaptée à l'étude et à la lecture publique.",
     "cover_url": "https://images.epagine.fr/015/9782608123015_1_75.jpg",
-    "comparaisons_suggerees": ["BDJ", "TOB", "BDS", "DARBY", "NFC"]
+    "comparaisons_suggerees": [
+      "BDJ",
+      "TOB",
+      "BDS",
+      "DARBY",
+      "NFC"
+    ]
   },
   "LSG": {
     "code": "LSG",
-    "aliases": ["lsg", "louis segond", "segond 1910", "lsg 1910", "segond 1910 strong", "bible segond"],
+    "aliases": [
+      "lsg",
+      "louis segond",
+      "segond 1910",
+      "lsg 1910",
+      "segond 1910 strong",
+      "bible segond"
+    ],
     "nom_officiel": "Louis Segond 1910 (Codes Strong)",
     "editeur": "Société Biblique Française",
     "annee": 1910,
@@ -33,11 +52,22 @@
     "isbn": "9782853000000",
     "description": "La version protestante francophone historique la plus lue et la plus citée, référence absolue pour l'étude avec les codes Strong hébreu/grec.",
     "cover_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/La_Sainte_Bible%2C_trad._Segond%2C_ed._1910.djvu/page1-500px-La_Sainte_Bible%2C_trad._Segond%2C_ed._1910.djvu.jpg",
-    "comparaisons_suggerees": ["BDJ", "TOB", "BDS", "DARBY", "NFC"]
+    "comparaisons_suggerees": [
+      "BDJ",
+      "TOB",
+      "BDS",
+      "DARBY",
+      "NFC"
+    ]
   },
   "NBS": {
     "code": "NBS",
-    "aliases": ["nbs", "nouvelle bible segond", "nouvelle segond", "bible nbs"],
+    "aliases": [
+      "nbs",
+      "nouvelle bible segond",
+      "nouvelle segond",
+      "bible nbs"
+    ],
     "nom_officiel": "Nouvelle Bible Segond (Édition d'étude)",
     "editeur": "Bibli'O / Alliance Biblique Universelle",
     "annee": 2002,
@@ -51,11 +81,22 @@
     "isbn": "9782853001878",
     "description": "Révision savante et méticuleuse de Louis Segond poussant l'équivalence formelle à son plus haut niveau de précision textuelle avec apparat critique.",
     "cover_url": "https://images.epagine.fr/878/9782853001878_1_75.jpg",
-    "comparaisons_suggerees": ["BDJ", "TOB", "BDS", "DARBY", "CHOU"]
+    "comparaisons_suggerees": [
+      "BDJ",
+      "TOB",
+      "BDS",
+      "DARBY",
+      "CHOU"
+    ]
   },
   "COL": {
     "code": "COL",
-    "aliases": ["colombe", "col", "bible a la colombe", "bible colombe"],
+    "aliases": [
+      "colombe",
+      "col",
+      "bible a la colombe",
+      "bible colombe"
+    ],
     "nom_officiel": "Bible à la Colombe (Segond Révisée 1978)",
     "editeur": "Société Biblique Française / SBG",
     "annee": 1978,
@@ -69,11 +110,21 @@
     "isbn": "9782853001304",
     "description": "Révision de 1978 du texte de Louis Segond caractérisée par une fidélité accrue aux manuscrits et un style digne pour la liturgie.",
     "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg",
-    "comparaisons_suggerees": ["BDJ", "BDS", "TOB", "DARBY"]
+    "comparaisons_suggerees": [
+      "BDJ",
+      "BDS",
+      "TOB",
+      "DARBY"
+    ]
   },
   "NEG79": {
     "code": "NEG79",
-    "aliases": ["neg79", "neg", "geneve 1979", "nouvelle edition de geneve"],
+    "aliases": [
+      "neg79",
+      "neg",
+      "geneve 1979",
+      "nouvelle edition de geneve"
+    ],
     "nom_officiel": "Nouvelle Édition de Genève 1979 (NEG)",
     "editeur": "Société Biblique de Genève",
     "annee": 1979,
@@ -87,11 +138,22 @@
     "isbn": "9782608113016",
     "description": "Révision conservative et respectueuse du texte de 1910 par la Société Biblique de Genève, très appréciée pour la mémorisation biblique.",
     "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg",
-    "comparaisons_suggerees": ["BDJ", "TOB", "BDS", "DARBY"]
+    "comparaisons_suggerees": [
+      "BDJ",
+      "TOB",
+      "BDS",
+      "DARBY"
+    ]
   },
   "BDS": {
     "code": "BDS",
-    "aliases": ["bds", "semeur", "bible du semeur", "bible semeur", "semeur 2015"],
+    "aliases": [
+      "bds",
+      "semeur",
+      "bible du semeur",
+      "bible semeur",
+      "semeur 2015"
+    ],
     "nom_officiel": "La Bible du Semeur (2015)",
     "editeur": "Excelsis / Biblica",
     "annee": 2015,
@@ -105,29 +167,51 @@
     "isbn": "9782853006095",
     "description": "Traduction contemporaine majeure à équivalence fonctionnelle dirigée par Alfred Kuen, réputée pour sa clarté linguistique et sa fluidité orale.",
     "cover_url": "https://images.epagine.fr/095/9782853006095_1_75.jpg",
-    "comparaisons_suggerees": ["S21", "NBS", "BDJ", "DARBY", "TOB"]
+    "comparaisons_suggerees": [
+      "S21",
+      "NBS",
+      "BDJ",
+      "DARBY",
+      "TOB"
+    ]
   },
   "PV": {
     "code": "PV",
-    "aliases": ["pv", "parole vivante", "kuen parole vivante", "nouveau testament parole vivante"],
-    "nom_officiel": "Parole Vivante (Alfred Kuen)",
-    "editeur": "Éditions de l'Institut Biblique",
+    "aliases": [
+      "pv",
+      "parole vivante",
+      "bible parole vivante",
+      "kuen parole",
+      "alfred kuen parole vivante",
+      "parole_vivante"
+    ],
+    "nom_officiel": "Bible Parole Vivante (Alfred Kuen)",
+    "editeur": "Éditions Emmaüs / BLF",
     "annee": 1976,
     "famille": "Évangélique",
     "famille_badge_color": "#0284C7",
-    "philosophie": "Transcription dynamique / Paraphrase explicative",
-    "texte_base_at": "Non inclus (NT seul)",
-    "texte_base_nt": "Nestle-Aland 25",
+    "philosophie": "Transcription dynamique",
+    "texte_base_at": "-",
+    "texte_base_nt": "Nestle-Aland / Texte Grec",
     "canon": "Nouveau Testament (27 livres)",
-    "statut_droits": "Sous copyright (Éditions Emmaüs / BLF)",
-    "isbn": "9782828700201",
-    "description": "Transcription dynamique et vivante du Nouveau Testament par Alfred Kuen, enrichie de notes exégétiques et de variantes explicites.",
-    "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg",
-    "comparaisons_suggerees": ["LSG", "DARBY", "BDJ", "S21"]
+    "statut_droits": "Sous copyright",
+    "description": "Transcription dynamique contemporaine du Nouveau Testament par Alfred Kuen, avec notes explicatives et structure clarifiée.",
+    "comparaisons_suggerees": [
+      "SV",
+      "BDS",
+      "S21",
+      "NFC"
+    ]
   },
   "APEE": {
     "code": "APEE",
-    "aliases": ["apee", "epee", "bible de l'epee", "king james francaise", "kjf"],
+    "aliases": [
+      "apee",
+      "epee",
+      "bible de l'epee",
+      "king james francaise",
+      "kjf"
+    ],
     "nom_officiel": "Bible de l'Épée (King James Française)",
     "editeur": "Société Biblique Calviniste / APEE",
     "annee": 2007,
@@ -141,11 +225,21 @@
     "isbn": "9782980996108",
     "description": "Traduction protestante évangélique fondée sur le Textus Receptus et le Texte Massorétique, dans la tradition de la King James anglophone.",
     "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg",
-    "comparaisons_suggerees": ["BDS", "TOB", "BDJ", "NFC"]
+    "comparaisons_suggerees": [
+      "BDS",
+      "TOB",
+      "BDJ",
+      "NFC"
+    ]
   },
   "BENFS": {
     "code": "BENFS",
-    "aliases": ["benfs", "bfs", "bible en francais simple", "francais simple"],
+    "aliases": [
+      "benfs",
+      "bfs",
+      "bible en francais simple",
+      "francais simple"
+    ],
     "nom_officiel": "Bible en Français Simple",
     "editeur": "Bibli'O",
     "annee": 2021,
@@ -159,11 +253,22 @@
     "isbn": "9782853008006",
     "description": "Traduction conçue pour les nouveaux lecteurs, personnes francophones d'adoption ou enfants, avec vocabulaire restreint et syntaxe directe.",
     "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg",
-    "comparaisons_suggerees": ["S21", "DARBY", "BDJ", "NBS"]
+    "comparaisons_suggerees": [
+      "S21",
+      "DARBY",
+      "BDJ",
+      "NBS"
+    ]
   },
   "DARBY": {
     "code": "DARBY",
-    "aliases": ["darby", "drb", "bible darby", "john nelson darby", "darby strong"],
+    "aliases": [
+      "darby",
+      "drb",
+      "bible darby",
+      "john nelson darby",
+      "darby strong"
+    ],
     "nom_officiel": "Bible J.N. Darby (Codes Strong)",
     "editeur": "Bibles & Publications Chrétiennes (BPC)",
     "annee": 1885,
@@ -177,11 +282,23 @@
     "isbn": "9782900325148",
     "description": "Chef-d'œuvre de littéralisme respectant scrupuleusement la grammaire originale hébraïque et grecque, outil inégalé pour l'exégèse fine.",
     "cover_url": "https://upload.wikimedia.org/wikipedia/commons/7/76/John_Nelson_Darby_1870.jpg",
-    "comparaisons_suggerees": ["BDS", "NFC", "BDJ", "TOB", "S21"]
+    "comparaisons_suggerees": [
+      "BDS",
+      "NFC",
+      "BDJ",
+      "TOB",
+      "S21"
+    ]
   },
   "OST": {
     "code": "OST",
-    "aliases": ["ost", "ostervald", "bible ostervald", "jean-frederic ostervald", "ostervald 1996"],
+    "aliases": [
+      "ost",
+      "ostervald",
+      "bible ostervald",
+      "jean-frederic ostervald",
+      "ostervald 1996"
+    ],
     "nom_officiel": "Bible J.F. Ostervald (1877/1996)",
     "editeur": "Société Biblique de France / Mission Baptiste",
     "annee": 1877,
@@ -195,11 +312,21 @@
     "isbn": "9782914562096",
     "description": "Grande révision neuchâteloise du XVIIIe siècle au style noble et majestueux, pilier du protestantisme francophone pendant deux siècles.",
     "cover_url": "https://upload.wikimedia.org/wikipedia/commons/7/74/Photo_Bible_David_Martin_1744.jpg",
-    "comparaisons_suggerees": ["BDJ", "TOB", "BDS", "S21"]
+    "comparaisons_suggerees": [
+      "BDJ",
+      "TOB",
+      "BDS",
+      "S21"
+    ]
   },
   "MAR": {
     "code": "MAR",
-    "aliases": ["martin", "david martin", "bible martin", "martin 1744"],
+    "aliases": [
+      "martin",
+      "david martin",
+      "bible martin",
+      "martin 1744"
+    ],
     "nom_officiel": "Bible David Martin 1744",
     "editeur": "Patrimoine Protestant / Société Biblique",
     "annee": 1744,
@@ -213,11 +340,20 @@
     "isbn": "9782900325001",
     "description": "Monument de la tradition réformée d'expression française, révisée par le pasteur David Martin à Utrecht.",
     "cover_url": "https://upload.wikimedia.org/wikipedia/commons/7/74/Photo_Bible_David_Martin_1744.jpg",
-    "comparaisons_suggerees": ["BDJ", "TOB", "BDS", "S21"]
+    "comparaisons_suggerees": [
+      "BDJ",
+      "TOB",
+      "BDS",
+      "S21"
+    ]
   },
   "GEN": {
     "code": "GEN",
-    "aliases": ["geneve 1669", "bible de geneve", "geneve 1588"],
+    "aliases": [
+      "geneve 1669",
+      "bible de geneve",
+      "geneve 1588"
+    ],
     "nom_officiel": "Bible de Genève (1588/1669)",
     "editeur": "Pasteurs et Professeurs de Genève",
     "annee": 1588,
@@ -231,11 +367,20 @@
     "isbn": "",
     "description": "La Bible des Réformateurs français, révisée sous la direction de Théodore de Bèze, référence des huguenots.",
     "cover_url": "https://upload.wikimedia.org/wikipedia/commons/8/81/Bible_de_Geneve_1669_Titre.jpg",
-    "comparaisons_suggerees": ["BDJ", "TOB", "S21"]
+    "comparaisons_suggerees": [
+      "BDJ",
+      "TOB",
+      "S21"
+    ]
   },
   "OLI": {
     "code": "OLI",
-    "aliases": ["olivetan", "bible d'olivetan", "olivetan 1535", "serrieres"],
+    "aliases": [
+      "olivetan",
+      "bible d'olivetan",
+      "olivetan 1535",
+      "serrieres"
+    ],
     "nom_officiel": "Bible d'Olivétan 1535",
     "editeur": "Pierre de Wingle (Neuchâtel)",
     "annee": 1535,
@@ -249,11 +394,22 @@
     "isbn": "",
     "description": "La toute première Bible protestante traduite directement en français à partir de l'hébreu et du grec par Pierre Robert Olivétan, cousin de Jean Calvin.",
     "cover_url": "https://upload.wikimedia.org/wikipedia/commons/7/74/Photo_Bible_David_Martin_1744.jpg",
-    "comparaisons_suggerees": ["BDJ", "S21", "TOB"]
+    "comparaisons_suggerees": [
+      "BDJ",
+      "S21",
+      "TOB"
+    ]
   },
   "TOB": {
     "code": "TOB",
-    "aliases": ["tob", "oecumenique", "œcuménique", "traduction oecumenique", "traduction œcuménique", "tob 2010"],
+    "aliases": [
+      "tob",
+      "oecumenique",
+      "œcuménique",
+      "traduction oecumenique",
+      "traduction œcuménique",
+      "tob 2010"
+    ],
     "nom_officiel": "Traduction Œcuménique de la Bible (TOB 2010)",
     "editeur": "Éditions du Cerf / Bibli'O",
     "annee": 2010,
@@ -267,11 +423,22 @@
     "isbn": "9782204094122",
     "description": "La première traduction de la Bible au monde entreprise conjointement par des exégètes catholiques, protestants et orthodoxes, chef-d'œuvre de rigueur critique.",
     "cover_url": "https://images.epagine.fr/122/9782204094122_1_75.jpg",
-    "comparaisons_suggerees": ["S21", "BDJ", "BDS", "DARBY", "NBS"]
+    "comparaisons_suggerees": [
+      "S21",
+      "BDJ",
+      "BDS",
+      "DARBY",
+      "NBS"
+    ]
   },
   "NFC": {
     "code": "NFC",
-    "aliases": ["nfc", "nouvelle francais courant", "nouvelle français courant", "francais courant 2019"],
+    "aliases": [
+      "nfc",
+      "nouvelle francais courant",
+      "nouvelle français courant",
+      "francais courant 2019"
+    ],
     "nom_officiel": "Nouvelle Français Courant (NFC 2019)",
     "editeur": "Bibli'O / Alliance Biblique Universelle",
     "annee": 2019,
@@ -285,11 +452,23 @@
     "isbn": "9782853007429",
     "description": "Révision majeure de 2019 de la Bible en français courant, réalisée par une équipe interconfessionnelle, alliant clarté stylistique et grande exactitude exégétique.",
     "cover_url": "https://images.epagine.fr/429/9782853007429_1_75.jpg",
-    "comparaisons_suggerees": ["S21", "NBS", "BDJ", "DARBY", "TOB"]
+    "comparaisons_suggerees": [
+      "S21",
+      "NBS",
+      "BDJ",
+      "DARBY",
+      "TOB"
+    ]
   },
   "FC": {
     "code": "FC",
-    "aliases": ["fc", "francais courant", "français courant", "bible en francais courant", "bfc"],
+    "aliases": [
+      "fc",
+      "francais courant",
+      "français courant",
+      "bible en francais courant",
+      "bfc"
+    ],
     "nom_officiel": "La Bible en Français Courant (1997)",
     "editeur": "Alliance Biblique Universelle",
     "annee": 1997,
@@ -303,11 +482,21 @@
     "isbn": "9782853001007",
     "description": "Pionnière de l'équivalence dynamique en français, conçue pour être immédiatement comprise par tout francophone sans prérequis religieux.",
     "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg",
-    "comparaisons_suggerees": ["S21", "DARBY", "BDJ", "TOB"]
+    "comparaisons_suggerees": [
+      "S21",
+      "DARBY",
+      "BDJ",
+      "TOB"
+    ]
   },
   "PDV": {
     "code": "PDV",
-    "aliases": ["pdv", "pdv2017", "parole de vie", "bible parole de vie"],
+    "aliases": [
+      "pdv",
+      "pdv2017",
+      "parole de vie",
+      "bible parole de vie"
+    ],
     "nom_officiel": "La Bible Parole de Vie (2000/2017)",
     "editeur": "Bibli'O / Alliance Biblique Universelle",
     "annee": 2017,
@@ -321,11 +510,20 @@
     "isbn": "9782853001090",
     "description": "Traduction utilisant les 3 500 mots les plus fréquents de la langue française avec une grammaire simplifiée, idéale pour la découverte et la proclamation orale.",
     "cover_url": "https://images.epagine.fr/090/9782853001090_1_75.jpg",
-    "comparaisons_suggerees": ["S21", "DARBY", "BDJ", "NBS"]
+    "comparaisons_suggerees": [
+      "S21",
+      "DARBY",
+      "BDJ",
+      "NBS"
+    ]
   },
   "ZEB": {
     "code": "ZEB",
-    "aliases": ["zebible", "zeb", "ze bible"],
+    "aliases": [
+      "zebible",
+      "zeb",
+      "ze bible"
+    ],
     "nom_officiel": "ZeBible (Édition Jeunesse Interconfessionnelle)",
     "editeur": "Bibli'O / Cerf",
     "annee": 2011,
@@ -339,11 +537,22 @@
     "isbn": "9782853001502",
     "description": "Édition interconfessionnelle destinée aux 15-25 ans intégrant introductions pédagogiques, parcours thématiques et clés de lecture modernes.",
     "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg",
-    "comparaisons_suggerees": ["S21", "BDJ", "DARBY"]
+    "comparaisons_suggerees": [
+      "S21",
+      "BDJ",
+      "DARBY"
+    ]
   },
   "BDJ": {
     "code": "BDJ",
-    "aliases": ["bdj", "bj", "jerusalem", "jérusalem", "bible de jerusalem", "bible de jérusalem"],
+    "aliases": [
+      "bdj",
+      "bj",
+      "jerusalem",
+      "jérusalem",
+      "bible de jerusalem",
+      "bible de jérusalem"
+    ],
     "nom_officiel": "La Bible de Jérusalem (1998)",
     "editeur": "Éditions du Cerf",
     "annee": 1998,
@@ -357,11 +566,23 @@
     "isbn": "9782204060639",
     "description": "Chef-d'œuvre de l'exégèse biblique francophone dirigée par l'École Biblique de Jérusalem, mondialement réputée pour ses introductions savantes et son apparat critique.",
     "cover_url": "https://upload.wikimedia.org/wikipedia/commons/1/11/Bible_de_Jerusalem.jpg",
-    "comparaisons_suggerees": ["S21", "TOB", "BDS", "NBS", "DARBY"]
+    "comparaisons_suggerees": [
+      "S21",
+      "TOB",
+      "BDS",
+      "NBS",
+      "DARBY"
+    ]
   },
   "CRA": {
     "code": "CRA",
-    "aliases": ["crampon", "cra", "bible crampon", "augustin crampon", "crampon 1923"],
+    "aliases": [
+      "crampon",
+      "cra",
+      "bible crampon",
+      "augustin crampon",
+      "crampon 1923"
+    ],
     "nom_officiel": "La Sainte Bible - Augustin Crampon (1923)",
     "editeur": "Desclée & Cie",
     "annee": 1923,
@@ -373,13 +594,26 @@
     "canon": "Catholique (73 livres)",
     "statut_droits": "Domaine public",
     "isbn": "9782856522332",
-    "description": "La toute première traduction catholique moderne réalisée directement sur les textes originaux hébreu et grec plutôt que sur la Vulgate latine, d'une grande rigueur.",
+    "description": "La toute première traduction catholique moderne réalisée directement sur les textes originaux hébreu et grec plutôt que sur la Vulgate latine, d'une grande rigueur.\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema.",
     "cover_url": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Augustin_Crampon.jpg",
-    "comparaisons_suggerees": ["NCL", "S21", "DARBY", "TOB"]
+    "comparaisons_suggerees": [
+      "NCL",
+      "S21",
+      "DARBY",
+      "TOB"
+    ]
   },
   "NCL": {
     "code": "NCL",
-    "aliases": ["ncl", "neo-crampon", "neo crampon", "néo-crampon", "néo crampon", "crampon libre", "neo-crampon libre"],
+    "aliases": [
+      "ncl",
+      "neo-crampon",
+      "neo crampon",
+      "néo-crampon",
+      "néo crampon",
+      "crampon libre",
+      "neo-crampon libre"
+    ],
     "nom_officiel": "Néo-Crampon Libre",
     "editeur": "Augustin Crampon (Révision Fraternité de Tibériade)",
     "annee": 2022,
@@ -393,11 +627,21 @@
     "isbn": "",
     "description": "Révision linguistique et contemporaine de la traduction catholique intégrale du Chanoine Augustin Crampon par la Fraternité de Tibériade sous licence ouverte Creative Commons.",
     "cover_url": "",
-    "comparaisons_suggerees": ["CRA", "S21", "DARBY", "TOB"]
+    "comparaisons_suggerees": [
+      "CRA",
+      "S21",
+      "DARBY",
+      "TOB"
+    ]
   },
   "AELF": {
     "code": "AELF",
-    "aliases": ["aelf", "bible liturgique", "traduction liturgique", "aelf 2013"],
+    "aliases": [
+      "aelf",
+      "bible liturgique",
+      "traduction liturgique",
+      "aelf 2013"
+    ],
     "nom_officiel": "Bible de la Liturgie (AELF 2013)",
     "editeur": "Association Épiscopale Liturgique pour les pays Francophones (Mame)",
     "annee": 2013,
@@ -411,11 +655,21 @@
     "isbn": "9782728919796",
     "description": "Traduction officielle utilisée pour les lectures de la messe et la liturgie catholique dans tous les pays francophones.",
     "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg",
-    "comparaisons_suggerees": ["S21", "BDJ", "TOB", "DARBY"]
+    "comparaisons_suggerees": [
+      "S21",
+      "BDJ",
+      "TOB",
+      "DARBY"
+    ]
   },
   "BDP": {
     "code": "BDP",
-    "aliases": ["bdp", "bible des peuples", "peuples", "bernardo hurault"],
+    "aliases": [
+      "bdp",
+      "bible des peuples",
+      "peuples",
+      "bernardo hurault"
+    ],
     "nom_officiel": "La Bible des Peuples (Bernardo Hurault)",
     "editeur": "Éditions du Jubilé / Société Catholique de la Bible",
     "annee": 1998,
@@ -429,11 +683,20 @@
     "isbn": "9782866792459",
     "description": "Traduction pastorale populaire orientée vers l'engagement chrétien dans la société avec des commentaires théologiques et sociaux continus.",
     "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg",
-    "comparaisons_suggerees": ["S21", "BDJ", "BDS"]
+    "comparaisons_suggerees": [
+      "S21",
+      "BDJ",
+      "BDS"
+    ]
   },
   "SACY": {
     "code": "SACY",
-    "aliases": ["sacy", "port-royal", "bible de sacy", "lemaistre de sacy"],
+    "aliases": [
+      "sacy",
+      "port-royal",
+      "bible de sacy",
+      "lemaistre de sacy"
+    ],
     "nom_officiel": "Bible de Port-Royal (Lemaistre de Sacy 1667/1696)",
     "editeur": "Guillaume Desprez (Paris)",
     "annee": 1696,
@@ -447,11 +710,22 @@
     "isbn": "",
     "description": "Monument littéraire du Grand Siècle, admiré et cité par Pascal, Racine, Bossuet et Victor Hugo.",
     "cover_url": "https://upload.wikimedia.org/wikipedia/commons/7/74/Photo_Bible_David_Martin_1744.jpg",
-    "comparaisons_suggerees": ["BDJ", "S21", "TOB", "DARBY"]
+    "comparaisons_suggerees": [
+      "BDJ",
+      "S21",
+      "TOB",
+      "DARBY"
+    ]
   },
   "OSTY": {
     "code": "OSTY",
-    "aliases": ["osty", "bible osty", "emile osty", "osty 1973", "osty-trinquet"],
+    "aliases": [
+      "osty",
+      "bible osty",
+      "emile osty",
+      "osty 1973",
+      "osty-trinquet"
+    ],
     "nom_officiel": "La Bible - Émile Osty & Joseph Trinquet (1973)",
     "editeur": "Éditions du Seuil",
     "annee": 1973,
@@ -465,11 +739,21 @@
     "isbn": "9782020032421",
     "description": "L'une des traductions françaises les plus savantes et les plus précises du XXe siècle, saluée pour son respect scrupuleux du texte original et la richesse de ses introductions.",
     "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg",
-    "comparaisons_suggerees": ["BDJ", "TOB", "NBS", "CRA"]
+    "comparaisons_suggerees": [
+      "BDJ",
+      "TOB",
+      "NBS",
+      "CRA"
+    ]
   },
   "MARED": {
     "code": "MARED",
-    "aliases": ["maredsous", "bible de maredsous", "bible pastorale de maredsous", "mared"],
+    "aliases": [
+      "maredsous",
+      "bible de maredsous",
+      "bible pastorale de maredsous",
+      "mared"
+    ],
     "nom_officiel": "Bible de Maredsous (Bible Pastorale 1968/1997)",
     "editeur": "Abbaye de Maredsous / Brepols",
     "annee": 1968,
@@ -483,11 +767,21 @@
     "isbn": "9782503506166",
     "description": "Traduction catholique monastique belge réputée pour sa clarté pastorale et ses riches notes liturgiques et œcuméniques.",
     "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg",
-    "comparaisons_suggerees": ["BDJ", "AELF", "NFC", "BDS"]
+    "comparaisons_suggerees": [
+      "BDJ",
+      "AELF",
+      "NFC",
+      "BDS"
+    ]
   },
   "GLA": {
     "code": "GLA",
-    "aliases": ["glaire", "abbe glaire", "bible glaire", "gla"],
+    "aliases": [
+      "glaire",
+      "abbe glaire",
+      "bible glaire",
+      "gla"
+    ],
     "nom_officiel": "Sainte Bible - Abbé Jean-Baptiste Glaire (1871)",
     "editeur": "P. Lethielleux",
     "annee": 1871,
@@ -501,29 +795,48 @@
     "isbn": "",
     "description": "Traduction catholique classique du XIXe siècle ayant reçu l'approbation du Saint-Siège, très fidèle à la Vulgate latine.",
     "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg",
-    "comparaisons_suggerees": ["CRA", "SACY", "OST", "DARBY"]
+    "comparaisons_suggerees": [
+      "CRA",
+      "SACY",
+      "OST",
+      "DARBY"
+    ]
   },
   "GIG": {
     "code": "GIG",
-    "aliases": ["giguet", "pierre giguet", "septante giguet", "septante de giguet", "bible giguet", "lxx giguet", "septante"],
-    "nom_officiel": "La Sainte Bible d'après les Septante - Pierre Giguet (1872)",
-    "editeur": "Pierre Giguet / Lethielleux",
+    "aliases": [
+      "gig",
+      "giguet",
+      "pierre giguet",
+      "septante giguet",
+      "giguet 1872"
+    ],
+    "nom_officiel": "La Sainte Bible - Septante par Pierre Giguet",
+    "editeur": "Hachette / Firmin-Didot",
     "annee": 1872,
-    "famille": "Catholique",
-    "famille_badge_color": "#991B1B",
-    "philosophie": "Traduction intégrale française de la Septante grecque (LXX)",
-    "texte_base_at": "Septante grecque (LXX) avec apparat critique",
-    "texte_base_nt": "Non applicable (Ancien Testament seul)",
-    "canon": "Septante grecque (Ancien Testament & Deutérocanoniques)",
+    "famille": "Septante / Historique",
+    "famille_badge_color": "#D97706",
+    "philosophie": "Traduction intégrale de l'Ancien Testament grec des Septante (LXX)",
+    "texte_base_at": "Septante (Grec LXX)",
+    "texte_base_nt": "-",
+    "canon": "Ancien Testament des Septante",
     "statut_droits": "Domaine public",
-    "isbn": "",
-    "description": "La première et magistrale traduction française intégrale de l'Ancien Testament d'après la version des Septante (texte grec d'Alexandrie) réalisée par Pierre Giguet en 4 tomes (1872).",
-    "cover_url": "",
-    "comparaisons_suggerees": ["BDJ", "CRA", "GLA", "CHOU", "S21"]
+    "description": "Traduction historique monumentale de l'Ancien Testament d'après le texte grec de la Septante (LXX) réalisée par Pierre Giguet.\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema.",
+    "comparaisons_suggerees": [
+      "LSG",
+      "DARBY",
+      "BDJ",
+      "CAH"
+    ]
   },
   "CHOU": {
     "code": "CHOU",
-    "aliases": ["chouraqui", "chou", "bible chouraqui", "andre chouraqui"],
+    "aliases": [
+      "chouraqui",
+      "chou",
+      "bible chouraqui",
+      "andre chouraqui"
+    ],
     "nom_officiel": "La Bible d'André Chouraqui (1985)",
     "editeur": "Desclée de Brouwer",
     "annee": 1985,
@@ -537,11 +850,22 @@
     "isbn": "9782220058115",
     "description": "Traduction révolutionnaire qui dépayse le lecteur en restituant le rythme sémitique, les racines concrètes et le vocabulaire nomade original (ex: 'Adonaï' pour Dieu, 'Glissement' pour Transgression).",
     "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg",
-    "comparaisons_suggerees": ["S21", "BDJ", "NBS", "TOB", "DARBY"]
+    "comparaisons_suggerees": [
+      "S21",
+      "BDJ",
+      "NBS",
+      "TOB",
+      "DARBY"
+    ]
   },
   "RAB": {
     "code": "RAB",
-    "aliases": ["rabbinat", "zadoc kahn", "bible du rabbinat", "rab"],
+    "aliases": [
+      "rabbinat",
+      "zadoc kahn",
+      "bible du rabbinat",
+      "rab"
+    ],
     "nom_officiel": "Bible du Rabbinat Français (Zadoc Kahn 1899)",
     "editeur": "Grand-Rabbinat de France / Éditions Colbo",
     "annee": 1899,
@@ -555,11 +879,23 @@
     "isbn": "9782853320252",
     "description": "La traduction de référence de la communauté juive francophone, réalisée sous la direction du Grand-Rabbin Zadoc Kahn, d'une grande élégance classique.",
     "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg",
-    "comparaisons_suggerees": ["S21", "BDJ", "CHOU", "TOB"]
+    "comparaisons_suggerees": [
+      "S21",
+      "BDJ",
+      "CHOU",
+      "TOB"
+    ]
   },
   "CAHEN": {
     "code": "CAHEN",
-    "aliases": ["cahen", "bible cahen", "samuel cahen", "cahen 1831", "traduction nouvelle cahen", "traduction nouvelle"],
+    "aliases": [
+      "cahen",
+      "bible cahen",
+      "samuel cahen",
+      "cahen 1831",
+      "traduction nouvelle cahen",
+      "traduction nouvelle"
+    ],
     "nom_officiel": "La Bible, Traduction Nouvelle - Samuel Cahen (1831)",
     "editeur": "Samuel Cahen",
     "annee": 1831,
@@ -571,13 +907,23 @@
     "canon": "Tanakh (Bible hébraïque - 39 livres/24 livres)",
     "statut_droits": "Domaine public",
     "isbn": "",
-    "description": "Première traduction juive intégrale de la Bible hébraïque en français moderne par Samuel Cahen, parue en 18 tomes entre 1831 et 1839 avec texte hébreu en regard et apparat critique monumental.",
+    "description": "Première traduction juive intégrale de la Bible hébraïque en français moderne par Samuel Cahen, parue en 18 tomes entre 1831 et 1839 avec texte hébreu en regard et apparat critique monumental.\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema.",
     "cover_url": "",
-    "comparaisons_suggerees": ["RAB", "CHOU", "CRA", "DARBY", "S21"]
+    "comparaisons_suggerees": [
+      "RAB",
+      "CHOU",
+      "CRA",
+      "DARBY",
+      "S21"
+    ]
   },
   "BAY": {
     "code": "BAY",
-    "aliases": ["bayard", "bible bayard", "bayard 2001"],
+    "aliases": [
+      "bayard",
+      "bible bayard",
+      "bayard 2001"
+    ],
     "nom_officiel": "La Bible (Éditions Bayard 2001)",
     "editeur": "Éditions Bayard / Médiaspaul",
     "annee": 2001,
@@ -591,11 +937,21 @@
     "isbn": "9782227358003",
     "description": "Prouesse littéraire associant pour chaque livre biblique un exégète bibliste et un grand écrivain/poète contemporain de langue française.",
     "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg",
-    "comparaisons_suggerees": ["S21", "BDJ", "CHOU", "DARBY"]
+    "comparaisons_suggerees": [
+      "S21",
+      "BDJ",
+      "CHOU",
+      "DARBY"
+    ]
   },
   "PLE": {
     "code": "PLE",
-    "aliases": ["pleiade", "bible de la pleiade", "dhorme", "edouard dhorme"],
+    "aliases": [
+      "pleiade",
+      "bible de la pleiade",
+      "dhorme",
+      "edouard dhorme"
+    ],
     "nom_officiel": "Bible de la Pléiade (Édouard Dhorme)",
     "editeur": "Gallimard (Bibliothèque de la Pléiade)",
     "annee": 1956,
@@ -609,11 +965,22 @@
     "isbn": "9782070100071",
     "description": "Traduction scientifique et laïque monumentale dirigée par l'assyriologue Édouard Dhorme, modèle d'analyse philologique rigoureuse.",
     "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg",
-    "comparaisons_suggerees": ["BDJ", "S21", "NBS", "CHOU"]
+    "comparaisons_suggerees": [
+      "BDJ",
+      "S21",
+      "NBS",
+      "CHOU"
+    ]
   },
   "JXLFR": {
     "code": "JXLFR",
-    "aliases": ["jxlfr", "jxl", "xenizo", "juxtalineaire", "juxtalinéaire"],
+    "aliases": [
+      "jxlfr",
+      "jxl",
+      "xenizo",
+      "juxtalineaire",
+      "juxtalinéaire"
+    ],
     "nom_officiel": "Juxtalinéaire Grec-Français (Xenizo)",
     "editeur": "Éditions Xenizo",
     "annee": 2018,
@@ -627,11 +994,20 @@
     "isbn": "",
     "description": "Texte grec original avec traduction française interlinéaire mot-à-mot et analyse grammaticale détaillée.",
     "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg",
-    "comparaisons_suggerees": ["LSG", "DARBY", "S21", "BDJ"]
+    "comparaisons_suggerees": [
+      "LSG",
+      "DARBY",
+      "S21",
+      "BDJ"
+    ]
   },
   "TMN": {
     "code": "TMN",
-    "aliases": ["tmn", "monde nouveau", "traduction du monde nouveau"],
+    "aliases": [
+      "tmn",
+      "monde nouveau",
+      "traduction du monde nouveau"
+    ],
     "nom_officiel": "Les Saintes Écritures - Traduction du Monde Nouveau",
     "editeur": "Watch Tower Bible and Tract Society",
     "annee": 1995,
@@ -645,11 +1021,21 @@
     "isbn": "",
     "description": "Traduction confessionnelle publiée par les Témoins de Jéhovah, caractérisée par des choix de traduction doctrinaux controversés par l'exégèse universitaire.",
     "cover_url": "https://covers.openlibrary.org/b/id/8315998-L.jpg",
-    "comparaisons_suggerees": ["S21", "BDJ", "TOB", "DARBY"]
+    "comparaisons_suggerees": [
+      "S21",
+      "BDJ",
+      "TOB",
+      "DARBY"
+    ]
   },
   "KJV": {
     "code": "KJV",
-    "aliases": ["kjv", "king james", "king james version", "authorized version 1611"],
+    "aliases": [
+      "kjv",
+      "king james",
+      "king james version",
+      "authorized version 1611"
+    ],
     "nom_officiel": "The Holy Bible - King James Version (KJV)",
     "editeur": "Oxford University Press / Cambridge",
     "annee": 1611,
@@ -663,11 +1049,20 @@
     "isbn": "9780199535941",
     "description": "Monument historique de la langue anglaise et de la Réforme, commandé par le roi Jacques Ier en 1611.",
     "cover_url": "https://upload.wikimedia.org/wikipedia/commons/5/5d/KJV-King-James-Version-Bible.jpg",
-    "comparaisons_suggerees": ["ESV", "NIV", "S21", "DARBY"]
+    "comparaisons_suggerees": [
+      "ESV",
+      "NIV",
+      "S21",
+      "DARBY"
+    ]
   },
   "ESV": {
     "code": "ESV",
-    "aliases": ["esv", "english standard version", "crossway"],
+    "aliases": [
+      "esv",
+      "english standard version",
+      "crossway"
+    ],
     "nom_officiel": "English Standard Version (ESV)",
     "editeur": "Crossway",
     "annee": 2001,
@@ -681,11 +1076,24 @@
     "isbn": "9781433558436",
     "description": "Traduction anglophone contemporaine majeure à équivalence mot-à-mot, référence mondiale de l'exégèse protestante évangélique.",
     "cover_url": "https://covers.openlibrary.org/b/id/12882583-L.jpg",
-    "comparaisons_suggerees": ["NIV", "KJV", "S21", "NBS"]
+    "comparaisons_suggerees": [
+      "NIV",
+      "KJV",
+      "S21",
+      "NBS"
+    ]
   },
   "LAU": {
     "code": "LAU",
-    "aliases": ["lausanne", "bible de lausanne", "bible-lausanne", "bible_lausanne", "sainte bible de lausanne", "gaussen", "louis gaussen"],
+    "aliases": [
+      "lausanne",
+      "bible de lausanne",
+      "bible-lausanne",
+      "bible_lausanne",
+      "sainte bible de lausanne",
+      "gaussen",
+      "louis gaussen"
+    ],
     "nom_officiel": "Bible de Lausanne (1872)",
     "editeur": "Société Biblique de Lausanne / Louis Gaussen",
     "annee": 1872,
@@ -699,27 +1107,24 @@
     "isbn": "9782853009999",
     "description": "Révision protestante francophone historique menée à Lausanne sous la direction de Louis Gaussen, réputée pour sa très haute fidélité littérale au texte hébreu et grec.",
     "cover_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/La_Sainte_Bible%2C_trad._Segond%2C_ed._1910.djvu/page1-500px-La_Sainte_Bible%2C_trad._Segond%2C_ed._1910.djvu.jpg",
-    "comparaisons_suggerees": ["S21", "DARBY", "OST", "LSG", "BDJ"]
-  },
-  "PV": {
-    "code": "PV",
-    "aliases": ["pv", "parole vivante", "bible parole vivante", "kuen parole", "alfred kuen parole vivante", "parole_vivante"],
-    "nom_officiel": "Bible Parole Vivante (Alfred Kuen)",
-    "editeur": "Éditions Emmaüs / BLF",
-    "annee": 1976,
-    "famille": "Évangélique",
-    "famille_badge_color": "#0284C7",
-    "philosophie": "Transcription dynamique",
-    "texte_base_at": "-",
-    "texte_base_nt": "Nestle-Aland / Texte Grec",
-    "canon": "Nouveau Testament (27 livres)",
-    "statut_droits": "Sous copyright",
-    "description": "Transcription dynamique contemporaine du Nouveau Testament par Alfred Kuen, avec notes explicatives et structure clarifiée.",
-    "comparaisons_suggerees": ["SV", "BDS", "S21", "NFC"]
+    "comparaisons_suggerees": [
+      "S21",
+      "DARBY",
+      "OST",
+      "LSG",
+      "BDJ"
+    ]
   },
   "SV": {
     "code": "SV",
-    "aliases": ["sv", "sagesse vivante", "bible sagesse vivante", "kuen sagesse", "alfred kuen sagesse", "sagesse_vivante"],
+    "aliases": [
+      "sv",
+      "sagesse vivante",
+      "bible sagesse vivante",
+      "kuen sagesse",
+      "alfred kuen sagesse",
+      "sagesse_vivante"
+    ],
     "nom_officiel": "Bible Sagesse Vivante (Alfred Kuen)",
     "editeur": "Éditions Emmaüs / BLF",
     "annee": 1988,
@@ -731,11 +1136,22 @@
     "canon": "Livres poétiques et de sagesse (Job, Proverbes, Ecclésiaste, Cantique)",
     "statut_droits": "Sous copyright",
     "description": "Traduction contemporaine dynamique des livres de sagesse et poétiques de l'Ancien Testament par Alfred Kuen.",
-    "comparaisons_suggerees": ["PV", "BDS", "S21", "NBS"]
+    "comparaisons_suggerees": [
+      "PV",
+      "BDS",
+      "S21",
+      "NBS"
+    ]
   },
   "OLT": {
     "code": "OLT",
-    "aliases": ["olt", "oltramare", "hugues oltramare", "hugues oltramare 1874", "nouveau testament oltramare"],
+    "aliases": [
+      "olt",
+      "oltramare",
+      "hugues oltramare",
+      "hugues oltramare 1874",
+      "nouveau testament oltramare"
+    ],
     "nom_officiel": "Nouveau Testament - Hugues Oltramare",
     "editeur": "Agence de la Société Biblique Protestante",
     "annee": 1874,
@@ -746,12 +1162,23 @@
     "texte_base_nt": "Grec critique / Tischendorf",
     "canon": "Nouveau Testament (27 livres)",
     "statut_droits": "Domaine public",
-    "description": "Version nouvelle et soignée du Nouveau Testament traduite sur le texte grec par Hugues Oltramare, professeur à la Faculté de Théologie de Genève. Formatage Logos par Didier Fontaine / Areopage.net.",
-    "comparaisons_suggerees": ["STA", "SYN", "LSG", "DARBY"]
+    "description": "Version nouvelle et soignée du Nouveau Testament traduite sur le texte grec par Hugues Oltramare, professeur à la Faculté de Théologie de Genève. Formatage Logos par Didier Fontaine / Areopage.net.\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema.",
+    "comparaisons_suggerees": [
+      "STA",
+      "SYN",
+      "LSG",
+      "DARBY"
+    ]
   },
   "STA": {
     "code": "STA",
-    "aliases": ["sta", "stapfer", "edmond stapfer", "stapfer 1889", "nouveau testament stapfer"],
+    "aliases": [
+      "sta",
+      "stapfer",
+      "edmond stapfer",
+      "stapfer 1889",
+      "nouveau testament stapfer"
+    ],
     "nom_officiel": "Nouveau Testament - Edmond Stapfer",
     "editeur": "Librairie Fischbacher",
     "annee": 1889,
@@ -762,12 +1189,24 @@
     "texte_base_nt": "Texte comparé des meilleures éditions critiques",
     "canon": "Nouveau Testament (27 livres)",
     "statut_droits": "Domaine public",
-    "description": "Traduction protestante novatrice d'Edmond Stapfer, s'écartant du littéralisme rigide pour privilégier le sens fidèle et la vivacité d'expression.",
-    "comparaisons_suggerees": ["OLT", "SYN", "LSG", "DARBY"]
+    "description": "Traduction protestante novatrice d'Edmond Stapfer, s'écartant du littéralisme rigide pour privilégier le sens fidèle et la vivacité d'expression.\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema.",
+    "comparaisons_suggerees": [
+      "OLT",
+      "SYN",
+      "LSG",
+      "DARBY"
+    ]
   },
   "CRP": {
     "code": "CRP",
-    "aliases": ["crp", "crampon", "augustin crampon", "crampon 1923", "cra", "bible crampon"],
+    "aliases": [
+      "crp",
+      "crampon",
+      "augustin crampon",
+      "crampon 1923",
+      "cra",
+      "bible crampon"
+    ],
     "nom_officiel": "Sainte Bible - Abbé Augustin Crampon",
     "editeur": "Société de Saint-Jean l'Évangéliste / Desclée",
     "annee": 1923,
@@ -778,12 +1217,23 @@
     "texte_base_nt": "Grec critique",
     "canon": "Canon catholique complet (73 livres)",
     "statut_droits": "Domaine public",
-    "description": "Traduction catholique de référence de l'Abbé Augustin Crampon, première Bible catholique francophone réalisée directement d'après les langues originales.",
-    "comparaisons_suggerees": ["BDJ", "TOB", "LSG", "DARBY"]
+    "description": "Traduction catholique de référence de l'Abbé Augustin Crampon, première Bible catholique francophone réalisée directement d'après les langues originales.\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema.",
+    "comparaisons_suggerees": [
+      "BDJ",
+      "TOB",
+      "LSG",
+      "DARBY"
+    ]
   },
   "CAH": {
     "code": "CAH",
-    "aliases": ["cah", "cahen", "samuel cahen", "bible cahen", "judeopedia"],
+    "aliases": [
+      "cah",
+      "cahen",
+      "samuel cahen",
+      "bible cahen",
+      "judeopedia"
+    ],
     "nom_officiel": "La Bible, Traduction Nouvelle - Samuel Cahen",
     "editeur": "Samuel Cahen / Judeopedia.org",
     "annee": 1831,
@@ -794,28 +1244,23 @@
     "texte_base_nt": "-",
     "canon": "Tanakh (39 livres hébreux)",
     "statut_droits": "Domaine public",
-    "description": "Première traduction juive complète de la Bible hébraïque en langue française au XIXe siècle, entreprise par Samuel Cahen. Numérisation Judeopedia.org.",
-    "comparaisons_suggerees": ["CHOURAQUI", "DARBY", "LSG", "TOB"]
-  },
-  "GIG": {
-    "code": "GIG",
-    "aliases": ["gig", "giguet", "pierre giguet", "septante giguet", "giguet 1872"],
-    "nom_officiel": "La Sainte Bible - Septante par Pierre Giguet",
-    "editeur": "Hachette / Firmin-Didot",
-    "annee": 1872,
-    "famille": "Septante / Historique",
-    "famille_badge_color": "#D97706",
-    "philosophie": "Traduction intégrale de l'Ancien Testament grec des Septante (LXX)",
-    "texte_base_at": "Septante (Grec LXX)",
-    "texte_base_nt": "-",
-    "canon": "Ancien Testament des Septante",
-    "statut_droits": "Domaine public",
-    "description": "Traduction historique monumentale de l'Ancien Testament d'après le texte grec de la Septante (LXX) réalisée par Pierre Giguet.",
-    "comparaisons_suggerees": ["LSG", "DARBY", "BDJ", "CAH"]
+    "description": "Première traduction juive complète de la Bible hébraïque en langue française au XIXe siècle, entreprise par Samuel Cahen. Numérisation Judeopedia.org.\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema.",
+    "comparaisons_suggerees": [
+      "CHOURAQUI",
+      "DARBY",
+      "LSG",
+      "TOB"
+    ]
   },
   "SYN": {
     "code": "SYN",
-    "aliases": ["syn", "synodale", "version synodale", "bible synodale 1921", "synodale 1921"],
+    "aliases": [
+      "syn",
+      "synodale",
+      "version synodale",
+      "bible synodale 1921",
+      "synodale 1921"
+    ],
     "nom_officiel": "Nouveau Testament - Version Synodale",
     "editeur": "Société Biblique Protestante de Paris",
     "annee": 1921,
@@ -827,6 +1272,11 @@
     "canon": "Nouveau Testament (27 livres)",
     "statut_droits": "Domaine public",
     "description": "Révision protestante collégiale du Nouveau Testament réalisée à la demande des Synodes des Églises réformées de France.",
-    "comparaisons_suggerees": ["LSG", "OLT", "STA", "S21"]
+    "comparaisons_suggerees": [
+      "LSG",
+      "OLT",
+      "STA",
+      "S21"
+    ]
   }
 }

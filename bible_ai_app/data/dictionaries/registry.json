@@ -6,7 +6,8 @@
     "enabled": true,
     "priority": 1,
     "count": 14024,
-    "file": "data/strong_lexicon.json"
+    "file": "data/strong_lexicon.json",
+    "description": "Lexique Hebreu, Arameen et Grec de James Strong (1890) avec lemmes, racines, definitions et etymologies completes.\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema."
   },
   {
     "id": "calmet",
@@ -15,7 +16,8 @@
     "enabled": true,
     "priority": 2,
     "count": 5369,
-    "file": "data/calmet_dict.json"
+    "file": "data/calmet_dict.json",
+    "description": "Dictionnaire Historique, Critique, Chronologique, Geographique et Litteral de la Bible par Dom Augustin Calmet (1728).\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema."
   },
   {
     "id": "vigouroux",
@@ -33,7 +35,8 @@
     "enabled": true,
     "priority": 4,
     "count": 14642,
-    "file": "data/bailly_lexicon.json"
+    "file": "data/bailly_lexicon.json",
+    "description": "Dictionnaire Grec-Francais d Anatole Bailly (1901 / 2020), monument lexical pour l etude du grec biblique et classique.\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema."
   },
   {
     "id": "theologie_systematiq",

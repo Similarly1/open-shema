@@ -488,9 +488,9 @@
     "active": true
   },
   "BDJ": {
-    "title": "Bible de Jérusalem, de poche, illustrée peinture",
-    "author": "La Maison de la Bible",
-    "description": "",
+    "title": "Bible de Jérusalem",
+    "author": "École biblique et archéologique française de Jérusalem (Éd. du Cerf)",
+    "description": "Traduction catholique monumentale dirigée par l'École biblique et archéologique française de Jérusalem (Éditions du Cerf, édition de référence 1998). Réputée pour son exégèse historico-critique, la rigueur de ses traductions directes depuis l'hébreu, l'araméen et le grec, ainsi que la richesse de son apparat critique (introductions littéraires et notes doctrinales).",
     "year": "1998",
     "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\Bible_de_Jérusalem,_de_poche,_illustrée_peinture.jpg",
     "type": "Bible",
@@ -666,9 +666,9 @@
     "name": "PSAUTIER",
     "title": "Psautier de Genève",
     "author": "",
-    "description": "",
+    "description": "Psautier de Geneve de 1729 : les 150 Psaumes de David mis en rime et en vers francais par Clement Marot et Theodore de Beze.\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema.",
     "year": "1729",
-    "cover_path": "",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\PSAUTIER.png",
     "type": "Bible",
     "corpus_scope": "GLOBAL",
     "source_type": "general",
@@ -770,7 +770,7 @@
   "CRA": {
     "title": "Bible Crampon 1923, verte",
     "author": "La Maison de la Bible",
-    "description": "",
+    "description": "Sainte Bible traduite en francais sur les textes originaux hebreu et grec par l Abbé Augustin Crampon (1923).\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema.",
     "year": "1923",
     "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\Bible_Crampon_1923,_verte.jpg",
     "type": "Bible",
@@ -788,7 +788,7 @@
   "CAHEN": {
     "title": "La Bible, Traduction Nouvelle - Samuel Cahen (1831)",
     "author": "Samuel Cahen",
-    "description": "Première traduction juive intégrale de la Bible hébraïque en français moderne par Samuel Cahen (1831-1839).",
+    "description": "Première traduction juive intégrale de la Bible hébraïque en français moderne par Samuel Cahen (1831-1839).\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema.",
     "year": "1831",
     "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\CAHEN.png",
     "type": "Bible",
@@ -806,7 +806,7 @@
   "GIG": {
     "title": "La Sainte Bible d'après les Septante - Pierre Giguet (1872)",
     "author": "Pierre Giguet / Lethielleux",
-    "description": "La première et magistrale traduction française intégrale de l'Ancien Testament d'après la version des Septante (texte grec d'Alexandrie) réalisée par Pierre Giguet en 4 tomes (1872).",
+    "description": "La première et magistrale traduction française intégrale de l'Ancien Testament d'après la version des Septante (texte grec d'Alexandrie) réalisée par Pierre Giguet en 4 tomes (1872).\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema.",
     "year": "1872",
     "cover_path": null,
     "type": "Bible",
@@ -818,23 +818,27 @@
     "active": true
   },
   "STAPFER": {
-    "title": "Le Nouveau Testament",
-    "author": "Edmond Louis Stapfer",
-    "description": "Le Nouveau Testament",
+    "title": "Le Nouveau Testament (Traduction Edmond Stapfer)",
+    "author": "Edmond Stapfer (Librairie Fischbacher)",
+    "description": "Traduction historique du Nouveau Testament par le théologien protestant Edmond Stapfer (1889, Librairie Fischbacher). Traduit directement sur le texte grec comparé des meilleures éditions critiques de l'époque (Tischendorf, Westcott-Hort, Tregelles), offrant une langue soignée et une grande rigueur philologique.\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema.",
     "year": "1889",
-    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\Le_Nouveau_Testament.jpg",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\STAPFER.png",
     "type": "Bible",
     "format": "json",
     "folder_name": "STAPFER",
     "version_code": "STAPFER",
     "total_books": 27,
     "embedding_model": "study_library",
-    "active": true
+    "active": true,
+    "name": "STAPFER",
+    "corpus_scope": "GLOBAL",
+    "source_type": "general",
+    "book_code": null
   },
   "OLT": {
     "title": "Nouveau Testament - Hugues Oltramare",
     "author": "Agence de la Société Biblique Protestante",
-    "description": "Version nouvelle et soignée du Nouveau Testament traduite sur le texte grec par Hugues Oltramare, professeur à la Faculté de Théologie de Genève. Formatage Logos par Didier Fontaine / Areopage.net.",
+    "description": "Version nouvelle et soignée du Nouveau Testament traduite sur le texte grec par Hugues Oltramare, professeur à la Faculté de Théologie de Genève.\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema.",
     "year": "1874",
     "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\OLT.png",
     "type": "Bible",
@@ -843,7 +847,11 @@
     "version_code": "OLT",
     "total_books": 27,
     "embedding_model": "study_library",
-    "active": true
+    "active": true,
+    "name": "OLT",
+    "corpus_scope": "GLOBAL",
+    "source_type": "general",
+    "book_code": null
   },
   "DARBY": {
     "title": "Bible J.N. Darby (avec Strong)",
@@ -878,6 +886,10 @@
     "total_books": 0,
     "embedding_model": "study_library",
     "active": true,
-    "has_strongs": false
+    "has_strongs": false,
+    "name": "CBJC",
+    "corpus_scope": "GLOBAL",
+    "source_type": "general",
+    "book_code": null
   }
 }
