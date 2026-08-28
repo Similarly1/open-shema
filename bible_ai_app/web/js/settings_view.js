@@ -820,6 +820,15 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
       this.save();
     });
 
+    ['cfg-gemini-key', 'cfg-mistral-key', 'cfg-infomaniak-token', 'cfg-infomaniak-pid'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('change', () => {
+          this.save();
+        });
+      }
+    });
+
     // STEPBible
     document.getElementById('btn-reindex-stepbible').addEventListener('click', async () => {
       const btn = document.getElementById('btn-reindex-stepbible');
@@ -1986,10 +1995,33 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
       }
     });
 
-    newCfg.gemini_api_key = document.getElementById('cfg-gemini-key').value.trim();
-    newCfg.mistral_api_key = document.getElementById('cfg-mistral-key').value.trim();
-    newCfg.infomaniak_token = document.getElementById('cfg-infomaniak-token').value.trim();
-    newCfg.infomaniak_product_id = document.getElementById('cfg-infomaniak-pid').value.trim();
+    const geminiInput = document.getElementById('cfg-gemini-key');
+    if (geminiInput && geminiInput.value.trim()) {
+      newCfg.gemini_api_key = geminiInput.value.trim();
+    } else if (this.config.gemini_api_key) {
+      newCfg.gemini_api_key = this.config.gemini_api_key;
+    }
+
+    const mistralInput = document.getElementById('cfg-mistral-key');
+    if (mistralInput && mistralInput.value.trim()) {
+      newCfg.mistral_api_key = mistralInput.value.trim();
+    } else if (this.config.mistral_api_key) {
+      newCfg.mistral_api_key = this.config.mistral_api_key;
+    }
+
+    const infoTokenInput = document.getElementById('cfg-infomaniak-token');
+    if (infoTokenInput && infoTokenInput.value.trim()) {
+      newCfg.infomaniak_token = infoTokenInput.value.trim();
+    } else if (this.config.infomaniak_token) {
+      newCfg.infomaniak_token = this.config.infomaniak_token;
+    }
+
+    const infoPidInput = document.getElementById('cfg-infomaniak-pid');
+    if (infoPidInput && infoPidInput.value.trim()) {
+      newCfg.infomaniak_product_id = infoPidInput.value.trim();
+    } else if (this.config.infomaniak_product_id) {
+      newCfg.infomaniak_product_id = this.config.infomaniak_product_id;
+    }
     newCfg.disabled_models = this.getDisabledModels();
 
     try {
