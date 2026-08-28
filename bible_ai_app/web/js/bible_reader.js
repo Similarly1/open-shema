@@ -5524,7 +5524,7 @@ const BibleReader = {
         </div>
         <div class="version-row-sub">
           <span class="version-philosophy-tag" title="${phil}">${phil || (b.annee ? `Édition ${b.annee}` : '')}</span>
-          ${isSuggested ? '<span class="version-suggested-tag">⭐ Suggérée pour comparaison</span>' : ''}
+          ${isSuggested ? '<span class="version-suggested-tag"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:middle; margin-right:3px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Suggérée pour comparaison</span>' : ''}
         </div>
       `;
       btn.addEventListener('click', () => {
@@ -5532,6 +5532,29 @@ const BibleReader = {
       });
       listEl.appendChild(btn);
     });
+
+    // Affichage conditionnel : UNIQUEMENT si au moins une version n'est pas encore téléchargée depuis le dépôt
+    if (typeof OpenShemaStore !== 'undefined') {
+      OpenShemaStore.getMissingBiblesCount().then(missingCount => {
+        document.getElementById('version-picker-store-footer-btn')?.remove();
+        if (missingCount > 0) {
+          const footerDiv = document.createElement('div');
+          footerDiv.id = 'version-picker-store-footer-btn';
+          footerDiv.className = 'version-picker-store-footer';
+          footerDiv.innerHTML = `
+            <button class="btn-picker-open-store">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Catalogue Open Shema (${missingCount} version${missingCount > 1 ? 's' : ''} disponible${missingCount > 1 ? 's' : ''})</span>
+            </button>
+          `;
+          footerDiv.querySelector('button').addEventListener('click', () => {
+            this.closeBiblePicker();
+            OpenShemaStore.open('bibles');
+          });
+          listEl.appendChild(footerDiv);
+        }
+      }).catch(err => console.warn('Erreur vérification Bibles manquantes:', err));
+    }
 
     popover.classList.remove('hidden');
     searchInput?.focus();

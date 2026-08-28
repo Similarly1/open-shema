@@ -27448,3 +27448,378 @@ mark {
     opacity: 0.8;
   }
 }
+
+/* =========================================================================
+   OPEN SHEMA DATA HUB / STORE MODAL (100% SVG, ZÉRO ÉMOJI)
+   ========================================================================= */
+
+.store-modal-card {
+  width: 920px;
+  max-width: 95vw;
+  height: 80vh;
+  max-height: 750px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-surface, #1e293b);
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle, #334155);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.store-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-subtle, #334155);
+  background: var(--bg-surface-elevated, #0f172a);
+}
+
+.store-modal-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.store-title-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(37, 99, 235, 0.15);
+  color: var(--primary-accent, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.store-modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary, #f8fafc);
+  margin: 0;
+}
+
+.store-modal-sub {
+  font-size: 12px;
+  color: var(--text-secondary, #94a3b8);
+  margin: 2px 0 0 0;
+}
+
+.store-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 20px;
+  background: var(--bg-surface, #1e293b);
+  border-bottom: 1px solid var(--border-subtle, #334155);
+}
+
+.store-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.store-search-wrap svg {
+  position: absolute;
+  left: 12px;
+  color: var(--text-muted, #64748b);
+  pointer-events: none;
+}
+
+.store-search-wrap input {
+  width: 100%;
+  padding: 9px 12px 9px 36px;
+  background: var(--bg-input, #0f172a);
+  border: 1px solid var(--border-subtle, #334155);
+  border-radius: 8px;
+  color: var(--text-primary, #f8fafc);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.store-search-wrap input:focus {
+  border-color: var(--primary-accent, #3b82f6);
+}
+
+.store-categories-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.store-cat-pill {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  background: transparent;
+  color: var(--text-secondary, #94a3b8);
+  border: 1px solid var(--border-subtle, #334155);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.store-cat-pill:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary, #f8fafc);
+}
+
+.store-cat-pill.active {
+  background: var(--primary-accent, #3b82f6);
+  color: #ffffff;
+  border-color: var(--primary-accent, #3b82f6);
+}
+
+.store-content-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.store-modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 16px;
+}
+
+.store-card {
+  background: var(--bg-surface-elevated, #0f172a);
+  border: 1px solid var(--border-subtle, #334155);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.store-card:hover {
+  border-color: var(--primary-accent, #3b82f6);
+  transform: translateY(-2px);
+}
+
+.store-card.installed {
+  border-left: 3px solid #10b981;
+}
+
+.store-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+
+.store-card-type-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--primary-accent, #3b82f6);
+}
+
+.store-badge-strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border-radius: 4px;
+}
+
+.store-badge-size {
+  font-size: 11px;
+  color: var(--text-muted, #64748b);
+  margin-left: auto;
+}
+
+.store-card-body {
+  margin-bottom: 16px;
+}
+
+.store-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary, #f8fafc);
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+}
+
+.store-card-author {
+  font-size: 12px;
+  color: var(--text-secondary, #94a3b8);
+  margin-bottom: 8px;
+}
+
+.store-card-desc {
+  font-size: 12px;
+  color: var(--text-muted, #64748b);
+  line-height: 1.4;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.store-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle, #334155);
+}
+
+.store-card-code-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary, #94a3b8);
+}
+
+.btn-store-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.btn-store-action.download {
+  background: var(--primary-accent, #3b82f6);
+  color: #ffffff;
+}
+
+.btn-store-action.download:hover {
+  background: #2563eb;
+}
+
+.btn-store-action.installed {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  cursor: default;
+}
+
+.btn-store-action.downloading {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary, #94a3b8);
+  cursor: wait;
+}
+
+.store-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--bg-surface-elevated, #0f172a);
+  border-top: 1px solid var(--border-subtle, #334155);
+  font-size: 12px;
+  color: var(--text-muted, #64748b);
+}
+
+.store-footer-meta a {
+  color: var(--primary-accent, #3b82f6);
+  text-decoration: none;
+}
+
+.store-footer-meta a:hover {
+  text-decoration: underline;
+}
+
+.btn-store-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid var(--border-subtle, #334155);
+  color: var(--text-secondary, #94a3b8);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.btn-store-secondary:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary, #f8fafc);
+}
+
+.btn-store-secondary.spinning svg {
+  animation: spin 1s linear infinite;
+}
+
+.store-loading-state,
+.store-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--text-muted, #64748b);
+  gap: 12px;
+}
+
+.store-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* =========================================================================
+   BOUTON CATALOGUE DANS LE SÉLECTEUR DE BIBLES (AFFICHAGE CONDITIONNEL)
+   ========================================================================= */
+
+.version-picker-store-footer {
+  padding: 8px 10px;
+  margin-top: 8px;
+  border-top: 1px dashed var(--border-subtle, #334155);
+}
+
+.btn-picker-open-store {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(37, 99, 235, 0.1);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  border-radius: 6px;
+  color: var(--primary-accent, #3b82f6);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-picker-open-store:hover {
+  background: rgba(37, 99, 235, 0.2);
+  border-color: var(--primary-accent, #3b82f6);
+  color: #ffffff;
+}

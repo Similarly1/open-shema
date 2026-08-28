@@ -24,8 +24,14 @@ const LibraryView = {
     this.searchInput.addEventListener('input', () => this.render());
     this.typeFilter.addEventListener('change', () => this.render());
 
-    document.getElementById('btn-lib-import').addEventListener('click', () => {
+    document.getElementById('btn-lib-import')?.addEventListener('click', () => {
       this.importBook();
+    });
+
+    document.getElementById('btn-lib-open-store')?.addEventListener('click', () => {
+      if (typeof OpenShemaStore !== 'undefined') {
+        OpenShemaStore.open();
+      }
     });
 
     this.loadBooks();

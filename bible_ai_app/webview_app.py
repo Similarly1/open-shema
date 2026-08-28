@@ -2579,6 +2579,86 @@ class BibleAppApi:
         from core.book_metadata_client import BookMetadataClient
         return BookMetadataClient.download_cover(cover_url, book_id)
 
+    def download_and_install_catalog_module(self, module_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Télécharge un module officiel depuis le dépôt open-shema-data et l'installe localement."""
+        import urllib.request
+        import shutil
+        try:
+            m_id = module_data.get("id")
+            m_type = module_data.get("type", "bible")
+            m_title = module_data.get("title", m_id)
+            download_url = module_data.get("download_url")
+            m_format = module_data.get("format", "sqlite")
+            m_abbr = module_data.get("abbreviation", (m_id or "").upper())
+
+            if not download_url:
+                return {"success": False, "error": "URL de téléchargement manquante."}
+
+            if m_type == "bible":
+                target_dir = os.path.join(current_dir, "data", "bibles")
+                os.makedirs(target_dir, exist_ok=True)
+                file_name = f"bible_{m_id.replace('-', '_')}.sqlite" if m_format == "sqlite" else f"{m_id}.json"
+                target_path = os.path.join(target_dir, file_name)
+            elif m_type == "dictionary":
+                target_dir = os.path.join(current_dir, "data", "dictionaries")
+                os.makedirs(target_dir, exist_ok=True)
+                file_name = f"dict_{m_id.replace('-', '_')}.sqlite" if m_format == "sqlite" else f"{m_id}.json"
+                target_path = os.path.join(target_dir, file_name)
+            elif m_type == "commentary":
+                target_dir = os.path.join(current_dir, "data", "commentaires")
+                os.makedirs(target_dir, exist_ok=True)
+                file_name = f"comm_{m_id.replace('-', '_')}.sqlite" if m_format == "sqlite" else f"{m_id}.json"
+                target_path = os.path.join(target_dir, file_name)
+            elif m_type == "theology":
+                target_dir = os.path.join(current_dir, "data", "theology")
+                os.makedirs(target_dir, exist_ok=True)
+                file_name = f"{m_id.replace('-', '_')}.sqlite" if m_format == "sqlite" else f"{m_id}.json"
+                target_path = os.path.join(target_dir, file_name)
+            else:
+                target_dir = os.path.join(current_dir, "data")
+                file_name = os.path.basename(download_url.split("?")[0])
+                target_path = os.path.join(target_dir, file_name)
+
+            req = urllib.request.Request(
+                download_url,
+                headers={"User-Agent": "OpenShemaApp/1.0 (https://github.com/Similarly1/open-shema)"}
+            )
+            with urllib.request.urlopen(req, timeout=60) as response, open(target_path, "wb") as out_file:
+                shutil.copyfileobj(response, out_file)
+
+            registry = load_books_metadata()
+            reg_key = m_abbr or m_id
+            registry[reg_key] = {
+                "title": m_title,
+                "author": module_data.get("author", "Open Shema"),
+                "description": module_data.get("description", ""),
+                "year": module_data.get("version", "1.0.0"),
+                "cover_path": None,
+                "type": "Bible" if m_type == "bible" else ("Dictionnaire" if m_type == "dictionary" else ("Commentaire" if m_type == "commentary" else "Théologie")),
+                "format": m_format,
+                "file_path": target_path,
+                "folder_name": m_abbr,
+                "version_code": m_abbr,
+                "active": True,
+                "has_strongs": "strong" in module_data.get("features", [])
+            }
+            save_books_metadata(registry)
+
+            try:
+                from core.bible_json_loader import BibleJsonLoader
+                BibleJsonLoader.clear_cache()
+            except Exception:
+                pass
+
+            return {
+                "success": True,
+                "installed_path": target_path,
+                "message": f"{m_title} a été téléchargé et activé avec succès."
+            }
+        except Exception as e:
+            logger.error(f"Erreur lors du téléchargement du module {module_data.get('title')}: {e}")
+            return {"success": False, "error": str(e)}
+
     def auto_classify_document_metadata(self, title: str, description: str, model: str = "gemini-2.5-flash-lite") -> Dict[str, Any]:
         """Classifie automatiquement l'ouvrage pour le RAG Tri-Flux via l'IA."""
         from core.book_classifier import BookClassifier
