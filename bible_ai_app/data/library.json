@@ -127,17 +127,21 @@
   },
   "NCL": {
     "title": "Néo-Crampon Libre",
-    "author": "Fraternité de Tibériade",
-    "description": "Sainte Bible néo-Crampon Libre",
+    "author": "Augustin Crampon (Révision Fraternité de Tibériade)",
+    "description": "Révision linguistique et contemporaine de la traduction catholique intégrale (Ancien et Nouveau Testament) du Chanoine Augustin Crampon (1923) par la Fraternité de Tibériade. Traduction littérale et rigoureuse depuis l'hébreu et le grec, publiée sous licence ouverte Creative Commons (CC-BY-SA 4.0).",
     "year": "2022",
-    "cover_path": null,
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\NCL.png",
     "type": "Bible",
     "format": "json",
     "folder_name": "NCL",
     "version_code": "NCL",
     "total_books": 72,
     "embedding_model": "study_library",
-    "active": true
+    "active": true,
+    "name": "NCL",
+    "corpus_scope": "GLOBAL",
+    "source_type": "general",
+    "book_code": null
   },
   "SV": {
     "title": "SAGESSE VIVANTE BROCHE -- Transcription dynamique de Job, Proverbes, Ecclésiaste, Cantique des cantiques",

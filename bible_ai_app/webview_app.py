@@ -202,11 +202,12 @@ def find_bible_registry_entry(name_or_code: str, registry: Optional[Dict[str, An
             if alias.lower() == clean.lower() or alias.lower() == clean_norm:
                 return data
             
-    # 3. Correspondance partielle souple (uniquement pour les termes de 4 caractères ou plus)
-    if len(clean_norm) >= 4:
+    # 3. Correspondance stricte sur alias normalisé
+    if len(clean_norm) >= 2:
         for code, data in registry.items():
             for alias in data.get("aliases", []):
-                if len(alias) >= 4 and (alias.lower() in clean_norm or clean_norm in alias.lower()):
+                alias_norm = re.sub(r'[^\w\s]', '', alias.lower()).strip()
+                if alias_norm == clean_norm:
                     return data
                     
     return None
@@ -292,8 +293,8 @@ class BibleAppApi:
             
             default_title, default_code = BIBLE_CANONICAL_INFO.get(raw_name, (meta.get("title", raw_name), meta.get("version_code", raw_name)))
             
-            full_title = (reg_entry.get("nom_officiel") if reg_entry else None) or (meta.get("title") if meta.get("title") and meta.get("title") != raw_name else default_title)
-            code = (reg_entry.get("code") if reg_entry else None) or meta.get("version_code") or default_code
+            full_title = meta.get("title") or (reg_entry.get("nom_officiel") if reg_entry else None) or default_title
+            code = meta.get("version_code") or (reg_entry.get("code") if reg_entry else None) or default_code
             
             avail = BibleJsonLoader.get_available_books(folder) or BibleJsonLoader.get_available_books(raw_name)
             first_b = avail[0] if avail else "Gen"

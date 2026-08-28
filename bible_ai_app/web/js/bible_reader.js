@@ -4391,12 +4391,25 @@ const BibleReader = {
     const str = String(bibleName).trim();
     const strUpper = str.toUpperCase();
     const strLower = str.toLowerCase();
-    return (this.installedBibles || []).find(b => 
+    
+    // 1. Correspondance exacte sur nom, id, dossier ou code
+    const exact = (this.installedBibles || []).find(b => 
       b.name === str || 
       b.id === str || 
       (b.folder_name && b.folder_name === str) ||
-      (b.version_code && b.version_code.toUpperCase() === strUpper) ||
-      (b.title && b.title.toLowerCase().includes(strLower))
+      (b.version_code && b.version_code.toUpperCase() === strUpper)
+    );
+    if (exact) return exact;
+
+    // 2. Correspondance exacte sur titre complet
+    const exactTitle = (this.installedBibles || []).find(b =>
+      b.title && b.title.toLowerCase() === strLower
+    );
+    if (exactTitle) return exactTitle;
+
+    // 3. Correspondance partielle sur titre
+    return (this.installedBibles || []).find(b => 
+      b.title && b.title.toLowerCase().includes(strLower)
     ) || null;
   },
 

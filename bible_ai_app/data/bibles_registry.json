@@ -361,9 +361,9 @@
   },
   "CRA": {
     "code": "CRA",
-    "aliases": ["crampon", "cra", "ncl", "bible crampon", "neo-crampon", "augustin crampon"],
+    "aliases": ["crampon", "cra", "bible crampon", "augustin crampon", "crampon 1923"],
     "nom_officiel": "La Sainte Bible - Augustin Crampon (1923)",
-    "editeur": "Desclée & Cie / NCL",
+    "editeur": "Desclée & Cie",
     "annee": 1923,
     "famille": "Catholique",
     "famille_badge_color": "#991B1B",
@@ -375,7 +375,25 @@
     "isbn": "9782856522332",
     "description": "La toute première traduction catholique moderne réalisée directement sur les textes originaux hébreu et grec plutôt que sur la Vulgate latine, d'une grande rigueur.",
     "cover_url": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Augustin_Crampon.jpg",
-    "comparaisons_suggerees": ["S21", "DARBY", "TOB", "BDS"]
+    "comparaisons_suggerees": ["NCL", "S21", "DARBY", "TOB"]
+  },
+  "NCL": {
+    "code": "NCL",
+    "aliases": ["ncl", "neo-crampon", "neo crampon", "néo-crampon", "néo crampon", "crampon libre", "neo-crampon libre"],
+    "nom_officiel": "Néo-Crampon Libre",
+    "editeur": "Augustin Crampon (Révision Fraternité de Tibériade)",
+    "annee": 2022,
+    "famille": "Catholique",
+    "famille_badge_color": "#991B1B",
+    "philosophie": "Littérale et contemporaine",
+    "texte_base_at": "Texte Massorétique hébreu et araméen",
+    "texte_base_nt": "Grec critique (Merk / Tischendorf)",
+    "canon": "Catholique (72 livres)",
+    "statut_droits": "Creative Commons (CC-BY-SA 4.0)",
+    "isbn": "",
+    "description": "Révision linguistique et contemporaine de la traduction catholique intégrale du Chanoine Augustin Crampon par la Fraternité de Tibériade sous licence ouverte Creative Commons.",
+    "cover_url": "",
+    "comparaisons_suggerees": ["CRA", "S21", "DARBY", "TOB"]
   },
   "AELF": {
     "code": "AELF",
