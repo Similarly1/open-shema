@@ -522,9 +522,10 @@ const CommentariesView = {
   },
 
   async navigateVerse(delta) {
-    let nextV = this.currentVerse + delta;
-    let nextCh = this.currentChapter;
-    let nextBk = this.currentBook;
+    const curV = parseInt(this.currentVerse, 10) || 1;
+    let nextV = curV + delta;
+    let nextCh = parseInt(this.currentChapter, 10) || 1;
+    let nextBk = this.currentBook || 'Gen';
 
     if (nextV < 1) {
       if (nextCh > 1) {

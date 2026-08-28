@@ -935,11 +935,15 @@ const CommentaryViewer = {
   async navigateVerse(delta) {
     let currentV = parseInt(this.currentVerse, 10) || 1;
     if (typeof BibleReader !== 'undefined' && BibleReader.selectedVerse) {
-      currentV = BibleReader.selectedVerse;
+      currentV = parseInt(BibleReader.selectedVerse, 10) || currentV;
     }
     let nextV = currentV + delta;
-    let nextCh = parseInt(this.currentChapter, 10) || 1;
-    let nextBk = this.currentBook || 'Gen';
+    let nextCh = (this.isSynchronized && typeof BibleReader !== 'undefined')
+      ? (parseInt(BibleReader.currentChapter, 10) || 1)
+      : (parseInt(this.currentChapter, 10) || 1);
+    let nextBk = (this.isSynchronized && typeof BibleReader !== 'undefined')
+      ? (BibleReader.currentBook || 'Gen')
+      : (this.currentBook || 'Gen');
 
     if (nextV < 1) {
       if (nextCh > 1) {
@@ -1085,8 +1089,8 @@ const CommentaryViewer = {
     this.currentComments = comments || [];
     this.currentVerseRef = verseRef || '';
     if (bookCode) this.currentBook = bookCode;
-    if (chapterNum) this.currentChapter = chapterNum;
-    if (verseNum) this.currentVerse = verseNum;
+    if (chapterNum) this.currentChapter = parseInt(chapterNum, 10) || 1;
+    if (verseNum) this.currentVerse = parseInt(verseNum, 10) || 1;
 
     const countEl = document.getElementById('comm-popover-count');
     const badgeCountEl = document.getElementById('lbl-comm-source-count');
@@ -5566,29 +5570,30 @@ const BibleReader = {
   },
 
   async loadCommentariesForVerse(verseNum, bookCode = null, chapterNum = null, force = false) {
-    this.selectedVerse = verseNum;
+    const vInt = parseInt(verseNum, 10) || 1;
+    const chInt = parseInt(chapterNum || this.currentChapter, 10) || 1;
     const book = bookCode || this.currentBook;
-    const ch = chapterNum || this.currentChapter;
+    this.selectedVerse = vInt;
     const bookInfo = getBookInfo(book);
-    const refStr = `${bookInfo.name} ${ch}:${verseNum}`;
+    const refStr = `${bookInfo.name} ${chInt}:${vInt}`;
 
     // Si la synchronisation est active ou si l'action est forcée
     if (force || (typeof CommentaryViewer !== 'undefined' && CommentaryViewer.isSynchronized)) {
       try {
-        const comms = await API.getCommentaries(book, ch, verseNum);
-        CommentaryViewer.setComments(comms, refStr, book, ch, verseNum);
+        const comms = await API.getCommentaries(book, chInt, vInt);
+        CommentaryViewer.setComments(comms, refStr, book, chInt, vInt);
       } catch (e) {
         console.error('Erreur commentaires:', e);
       }
 
       if (typeof MultiwindowSync !== 'undefined' && MultiwindowSync.broadcastVerseChanged) {
-        MultiwindowSync.broadcastVerseChanged(book, ch, verseNum);
+        MultiwindowSync.broadcastVerseChanged(book, chInt, vInt);
       }
     }
 
     // Synchronisation automatique des notes dans le volet latéral
     try {
-      DrawerNotesViewer.load(book, ch, verseNum);
+      DrawerNotesViewer.load(book, chInt, vInt);
     } catch (e) {
       console.error('Erreur sync DrawerNotesViewer:', e);
     }
@@ -5596,7 +5601,7 @@ const BibleReader = {
     // Synchronisation automatique du volet Aperçu 360° du passage
     try {
       if (typeof PassageOverviewDrawer !== 'undefined') {
-        PassageOverviewDrawer.load(book, ch, verseNum, this.currentBible1 || 'LSG', force);
+        PassageOverviewDrawer.load(book, chInt, vInt, this.currentBible1 || 'LSG', force);
       }
     } catch (e) {
       console.error('Erreur sync PassageOverviewDrawer:', e);
