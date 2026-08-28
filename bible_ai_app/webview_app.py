@@ -2680,6 +2680,30 @@ class BibleAppApi:
                 except Exception as extract_err:
                     logger.warning(f"Erreur extraction SQLite Bible vers JSON : {extract_err}")
 
+            # Si c'est un Commentaire SQLite, synchroniser avec la base centrale des commentaires
+            if m_type == "commentary" and target_path.endswith(".sqlite"):
+                master_db = os.path.join(current_dir, "data", "commentaires", "commentaires_master.db")
+                if os.path.exists(master_db):
+                    try:
+                        import sqlite3
+                        m_conn = sqlite3.connect(master_db)
+                        c_conn = sqlite3.connect(target_path)
+                        c_cur = c_conn.cursor()
+                        c_cur.execute("SELECT commentary_id, commentary_name, book_code, book_name, chapter, verse_start, verse_end, reference, text, paragraphs_json, html, source_url FROM commentaries")
+                        c_rows = c_cur.fetchall()
+                        if c_rows:
+                            m_cur = m_conn.cursor()
+                            comm_name = c_rows[0][1]
+                            m_cur.execute("DELETE FROM commentaries WHERE commentary_name = ?", (comm_name,))
+                            m_cur.executemany("INSERT INTO commentaries (commentary_id, commentary_name, book_code, book_name, chapter, verse_start, verse_end, reference, text, paragraphs_json, html, source_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", c_rows)
+                            m_conn.commit()
+                        c_conn.close()
+                        m_conn.close()
+                        from core.commentary_loader import CommentaryLoader
+                        CommentaryLoader._catalog_cache = None
+                    except Exception as comm_err:
+                        logger.warning(f"Erreur intégration commentaire SQLite vers master DB : {comm_err}")
+
             # Téléchargement de l'image de couverture si spécifiée
             cover_path = None
             cover_url = module_data.get("cover_url")
