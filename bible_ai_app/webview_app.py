@@ -2362,6 +2362,7 @@ class BibleAppApi:
         for d in dict_registry:
             d_id = d.get("id")
             d_name = d.get("name")
+            dict_desc = d.get("description") or f"Dictionnaire biblique comprenant {d.get('count', 0):,} articles et définitions.".replace(",", " ")
             
             # Vérifier si déjà présent dans books
             matched_book = next((b for b in books if b.get("dict_id") == d_id or b.get("name") == d_name or b.get("title") == d_name), None)
@@ -2370,6 +2371,10 @@ class BibleAppApi:
                 matched_book["type"] = "Dictionnaire"
                 matched_book["articles_count"] = d.get("count", 0)
                 matched_book["active"] = d.get("enabled", True)
+                if dict_desc and not matched_book.get("description"):
+                    matched_book["description"] = dict_desc
+                elif d.get("description"):
+                    matched_book["description"] = d.get("description")
             else:
                 # Chercher une couverture automatique dans data/covers/
                 cov_path = None
@@ -2380,15 +2385,17 @@ class BibleAppApi:
                             cov_path = os.path.join(covers_dir, fn)
                             break
                 
-                author_name = "Dom Calmet" if d_id == "calmet" else ("F. Vigouroux" if d_id == "vigouroux" else ("Anatole Bailly" if d_id == "bailly" else ("James Strong" if d_id == "strong" else "Collectif")))
+                author_name = d.get("author") or ("Dom Calmet" if d_id == "calmet" else ("F. Vigouroux" if d_id == "vigouroux" else ("Anatole Bailly" if d_id == "bailly" else ("James Strong" if d_id == "strong" else "Collectif"))))
+                year_val = d.get("year") or ("1728" if d_id == "calmet" else ("1912" if d_id == "vigouroux" else ("1901" if d_id == "bailly" else ("1890" if d_id == "strong" else ""))))
                 
                 books.append({
                     "name": d_name,
                     "title": d_name,
                     "dict_id": d_id,
                     "author": author_name,
+                    "year": str(year_val),
                     "type": "Dictionnaire",
-                    "description": f"Dictionnaire biblique comprenant {d.get('count', 0):,} articles et définitions.".replace(",", " "),
+                    "description": dict_desc,
                     "chapters_count": 0,
                     "articles_count": d.get("count", 0),
                     "active": d.get("enabled", True),

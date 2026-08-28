@@ -895,5 +895,35 @@
     "corpus_scope": "GLOBAL",
     "source_type": "general",
     "book_code": null
+  },
+  "Dictionnaire Grec-Français Anatole Bailly (1901)": {
+    "name": "Dictionnaire Grec-Français Anatole Bailly (1901)",
+    "title": "Dictionnaire Grec-Français Anatole Bailly (1901)",
+    "dict_id": "bailly",
+    "author": "Anatole Bailly",
+    "year": "1901",
+    "type": "Dictionnaire",
+    "description": "Dictionnaire Grec-Français d'Anatole Bailly (1901 / 2020), monument lexical pour l'étude du grec biblique et classique.\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema.",
+    "active": true
+  },
+  "Dictionnaire Historique et Critique Dom Calmet (1728)": {
+    "name": "Dictionnaire Historique et Critique Dom Calmet (1728)",
+    "title": "Dictionnaire Historique et Critique Dom Calmet (1728)",
+    "dict_id": "calmet",
+    "author": "Dom Augustin Calmet",
+    "year": "1728",
+    "type": "Dictionnaire",
+    "description": "Dictionnaire Historique, Critique, Chronologique, Géographique et Littéral de la Bible par Dom Augustin Calmet (1728).\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema.",
+    "active": true
+  },
+  "Lexique Hébreu & Grec Strong": {
+    "name": "Lexique Hébreu & Grec Strong",
+    "title": "Lexique Hébreu & Grec Strong",
+    "dict_id": "strong",
+    "author": "James Strong",
+    "year": "1890",
+    "type": "Dictionnaire",
+    "description": "Lexique Hébreu, Araméen et Grec de James Strong (1890) avec lemmes, racines, définitions et étymologies complètes.\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema.",
+    "active": true
   }
 }
