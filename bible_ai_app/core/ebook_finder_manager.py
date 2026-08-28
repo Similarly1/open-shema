@@ -198,21 +198,21 @@ class EbookFinderManager:
         encoded_query = urllib.parse.quote(query)
         return [
             {
-                'source': 'Fnac (Rayon E-books)',
-                'badge': 'Fnac / Kobo',
-                'description': 'Téléchargement numérique immédiat sur Fnac.com',
+                'source': 'Chercher sur Fnac.com (E-books)',
+                'badge': 'Fnac E-books',
+                'description': 'Lancer la recherche dans le catalogue numérique Fnac / Kobo',
                 'url': f"https://www.fnac.com/SearchResult/ResultList.aspx?Search={encoded_query}&sft=1"
             },
             {
-                'source': 'Rakuten Kobo',
-                'badge': 'Kobo Store',
-                'description': 'Librairie 100% numérique Kobo',
+                'source': 'Chercher sur Rakuten Kobo',
+                'badge': 'Rakuten Kobo',
+                'description': 'Lancer la recherche dans la librairie 100% numérique Kobo',
                 'url': f"https://www.kobo.com/fr/fr/search?query={encoded_query}&fclanguages=fr"
             },
             {
-                'source': 'La Maison de la Bible',
+                'source': 'Chercher sur La Maison de la Bible',
                 'badge': 'Maison de la Bible',
-                'description': 'Recherche e-books sur La Maison de la Bible',
+                'description': 'Lancer la recherche e-books sur La Maison de la Bible',
                 'url': f"https://maisonbible.fr/fr/recherche?controller=search&s={encoded_query}+ebook"
             }
         ]

@@ -211,11 +211,11 @@ const OpenShemaStore = {
         <!-- ========================================================= -->
         <div id="store-tab-content-catalog" class="store-tab-pane" style="display: flex; flex-direction: column; flex: 1; min-height: 0;">
           <div class="store-toolbar" style="padding: 12px 20px; border-bottom: 1px solid var(--border-subtle, #334155); background: var(--bg-card, #1e293b);">
-            <div class="store-search-wrap" style="position: relative; margin-bottom: 10px;">
-              <div style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted, #94a3b8); display: flex;">
+            <div style="position: relative; display: flex; align-items: center; margin-bottom: 10px;">
+              <div style="position: absolute; left: 12px; color: var(--text-muted, #94a3b8); display: flex; align-items: center; pointer-events: none;">
                 ${this.svgIcons.search}
               </div>
-              <input type="text" id="store-search-input" placeholder="Rechercher une version, un livre ou un auteur dans le catalogue gratuit..." autocomplete="off" style="width: 100%; padding: 9px 12px 9px 36px; border-radius: 6px; border: 1px solid var(--border-color, #334155); background: var(--bg-surface-elevated, #0f172a); color: #fff; font-size: 0.88rem; outline: none;">
+              <input type="text" id="store-search-input" placeholder="Rechercher une version, un livre ou un auteur dans le catalogue gratuit..." autocomplete="off" style="width: 100%; padding: 10px 38px 10px 36px; border-radius: 6px; border: 1px solid var(--border-color, #334155); background: var(--bg-surface-elevated, #0f172a); color: #fff; font-size: 0.9rem; outline: none;">
             </div>
 
             <div class="store-filters-row" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
@@ -260,7 +260,7 @@ const OpenShemaStore = {
           
           <div style="padding: 12px 20px; border-bottom: 1px solid var(--border-subtle, #334155); background: var(--bg-card, #1e293b);">
             <div style="position: relative; display: flex; align-items: center;">
-              <div style="position: absolute; left: 12px; color: var(--text-muted, #94a3b8); display: flex;">
+              <div style="position: absolute; left: 12px; color: var(--text-muted, #94a3b8); display: flex; align-items: center; pointer-events: none;">
                 ${this.svgIcons.search}
               </div>
               <input type="text" id="ebook-store-search-input" placeholder="Titre de la Bible ou de l'ouvrage (ex: Nouvelle Français Courant, Segond 21, John Piper, Romains)..." 
@@ -278,11 +278,17 @@ const OpenShemaStore = {
           <div style="flex: 1; overflow-y: auto; padding: 16px 20px; background: var(--bg-card, #1e293b);">
             
             <!-- Liens directs pré-filtrés 1-clic -->
-            <div id="ebook-store-direct-links-section" style="margin-bottom: 16px; display: none;">
-              <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted, #94a3b8); margin-bottom: 8px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
-                ${this.svgIcons.store} Rayons E-books directs en 1 clic
+            <div id="ebook-store-direct-links-section" style="margin-bottom: 20px; padding: 12px 14px; border-radius: 8px; background: rgba(15, 23, 42, 0.55); border: 1px solid var(--border-subtle, #334155); display: none;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                <div style="font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.05em; color: #60a5fa; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+                  ${this.svgIcons.store} Recherche directe sur les autres librairies
+                </div>
+                <span style="font-size: 0.7rem; color: var(--text-muted, #94a3b8); opacity: 0.9;">Sans API ouverte : ouvre leur recherche pré-remplie</span>
               </div>
-              <div id="ebook-store-direct-links-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px;">
+              <p style="font-size: 0.76rem; color: var(--text-muted, #94a3b8); margin: 0 0 10px 0; line-height: 1.35;">
+                Ces plateformes ne permettant pas d'extraire directement les fiches produits ici, ces raccourcis lancent votre recherche dans leur rayon e-books en 1 clic :
+              </p>
+              <div id="ebook-store-direct-links-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px;">
               </div>
             </div>
 
@@ -653,12 +659,12 @@ const OpenShemaStore = {
       if (directLinks.length > 0) {
         directSection.style.display = 'block';
         directLinksEl.innerHTML = directLinks.map(dl => `
-          <a href="#" data-url="${this._escapeHtml(dl.url)}" class="ebook-direct-link-card" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 6px; background: var(--bg-surface-elevated, #0f172a); border: 1px solid var(--border-color, #334155); text-decoration: none; color: inherit; transition: all 0.2s;">
+          <a href="#" data-url="${this._escapeHtml(dl.url)}" class="ebook-direct-link-card" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-radius: 6px; background: rgba(30, 41, 59, 0.85); border: 1px solid var(--border-color, #334155); text-decoration: none; color: inherit; transition: all 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.15);">
             <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
-              <span style="font-size: 0.72rem; padding: 2px 6px; border-radius: 4px; background: rgba(59, 130, 246, 0.15); color: #60a5fa; font-weight: 600; white-space: nowrap;">${this._escapeHtml(dl.badge)}</span>
-              <span style="font-size: 0.8rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${this._escapeHtml(dl.source)}</span>
+              <span style="font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; background: rgba(59, 130, 246, 0.18); color: #60a5fa; font-weight: 600; white-space: nowrap;">${this._escapeHtml(dl.badge)}</span>
+              <span style="font-size: 0.82rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${this._escapeHtml(dl.source)}</span>
             </div>
-            <div style="color: var(--text-muted, #94a3b8); margin-left: 6px; display: flex;">
+            <div style="color: #60a5fa; margin-left: 8px; display: flex; align-items: center;">
               ${this.svgIcons.external}
             </div>
           </a>
