@@ -83,6 +83,7 @@ const SermonsView = {
     this.barApplication = document.getElementById('bar-seg-application');
 
     this.initDrawerWidth();
+    this.initIllustrationPickerModal();
     this.bindEvents();
   },
 
@@ -1167,6 +1168,11 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
       });
 
       this.blocksContainer.appendChild(card);
+
+      // Attacher les pastilles d'illustrations intelligentes sur chaque bloc d'illustration
+      card.querySelectorAll('.sermon-block-illustration').forEach(b => {
+        this.attachIllustrationBlockHelpers(b, sec.id);
+      });
     });
   },
 
@@ -1434,11 +1440,14 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
         `;
         break;
       case 'illustration':
+        const blockId = `ill-block-${Date.now()}`;
         htmlToInsert = `
-          <div class="sermon-callout-block sermon-block-illustration" data-type="illustration">
-            <div class="sermon-block-header">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
-              <span>Illustration / Récit</span>
+          <div class="sermon-callout-block sermon-block-illustration" data-type="illustration" id="${blockId}">
+            <div class="sermon-block-header" contenteditable="false">
+              <div class="sermon-block-header-left">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                <span>Illustration / Récit</span>
+              </div>
             </div>
             <p><strong>Titre de l'anecdote :</strong> Racontez l'histoire ou l'image concrète ici...</p>
           </div><p></p>
@@ -1447,9 +1456,11 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
       case 'application':
         htmlToInsert = `
           <div class="sermon-callout-block sermon-block-application" data-type="application">
-            <div class="sermon-block-header">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-              <span>Application pratique</span>
+            <div class="sermon-block-header" contenteditable="false">
+              <div class="sermon-block-header-left">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                <span>Application pratique</span>
+              </div>
             </div>
             <p><strong>Question pour l'auditeur :</strong> Comment appliquer cette vérité dès cette semaine ?</p>
           </div><p></p>
@@ -1458,9 +1469,11 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
       case 'cue':
         htmlToInsert = `
           <div class="sermon-callout-block sermon-block-cue" data-type="cue">
-            <div class="sermon-block-header">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              <span>Régie / Timing</span>
+            <div class="sermon-block-header" contenteditable="false">
+              <div class="sermon-block-header-left">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>Régie / Timing</span>
+              </div>
             </div>
             <p>Indication technique pour la projection ou le pupitre...</p>
           </div><p></p>
@@ -1473,6 +1486,12 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
 
     if (htmlToInsert) {
       this.insertHtmlIntoActiveSection(htmlToInsert);
+      if (type === 'illustration') {
+        setTimeout(() => {
+          const el = document.getElementById(blockId);
+          if (el) this.attachIllustrationBlockHelpers(el, this.activeSectionId);
+        }, 30);
+      }
     }
   },
 
@@ -1604,7 +1623,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
 
         const dataAttrs = `data-type="${type}"${ref ? ` data-ref="${this.escapeHtml(ref)}"` : ''}${ver ? ` data-version="${this.escapeHtml(ver)}"` : ''}${key ? ` data-key="${this.escapeHtml(key)}"` : ''}${id ? ` data-id="${this.escapeHtml(id)}"` : ''}`;
 
-        return `<div class="sermon-callout-block sermon-block-${type}" ${dataAttrs}><div class="sermon-block-header" contenteditable="false">${iconSvg}<span>${this.escapeHtml(label)}</span></div>${innerHtml}</div>`;
+        return `<div class="sermon-callout-block sermon-block-${type}" ${dataAttrs}><div class="sermon-block-header" contenteditable="false"><div class="sermon-block-header-left">${iconSvg}<span>${this.escapeHtml(label)}</span></div></div>${innerHtml}</div>`;
       }
 
       // B. Titres
@@ -2802,6 +2821,364 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
 
     this.pushHistoryState();
     this.debouncedAutoSave();
+  },
+
+  // =========================================================================
+  // SUGGESTIONS D'ILLUSTRATIONS & SÉLECTEUR MODAL DU RÉSERVOIR
+  // =========================================================================
+
+  currentTargetIllustrationBlock: null,
+  activeIllPickerFilter: 'context',
+
+  findMatchingIllustrations(context = {}, limit = 6) {
+    if (!this.illustrations || this.illustrations.length === 0) return [];
+
+    const sermonPassage = (this.currentSermon?.passage?.reference || '').toLowerCase().trim();
+    const sermonTitle = (this.currentSermon?.title || '').toLowerCase().trim();
+    const sermonBigIdea = (this.currentSermon?.big_idea || '').toLowerCase().trim();
+    const sectionTitle = (context.sectionTitle || '').toLowerCase().trim();
+    const query = (context.query || '').toLowerCase().trim();
+
+    let bookTokens = [];
+    if (sermonPassage) {
+      bookTokens = sermonPassage.split(/[\s,.:;-]+/).filter(w => w.length >= 2);
+    }
+
+    const stopWords = new Set(['dans', 'pour', 'avec', 'sans', 'sous', 'vers', 'chez', 'cette', 'notre', 'votre', 'leurs', 'tout', 'tous', 'plus', 'très', 'faire', 'être', 'avoir', 'comme', 'mais', 'donc', 'ainsi', 'aussi', 'bien', 'point', 'titre', 'section', 'partie', 'axe']);
+    const extractKeywords = (str) => {
+      return str.split(/[\s,.:;!?'"«»()\[\]-]+/)
+        .map(w => w.trim().toLowerCase())
+        .filter(w => w.length >= 3 && !stopWords.has(w));
+    };
+
+    const themeKeywords = [
+      ...extractKeywords(sermonTitle),
+      ...extractKeywords(sermonBigIdea),
+      ...extractKeywords(sectionTitle),
+      ...(query ? extractKeywords(query) : [])
+    ];
+
+    const scored = this.illustrations.map(ill => {
+      let score = 0;
+      const title = (ill.title || '').toLowerCase();
+      const body = (ill.body || ill.content || '').toLowerCase();
+      const category = (ill.category || '').toLowerCase();
+      const author = (ill.author || '').toLowerCase();
+      const tags = (Array.isArray(ill.tags) ? ill.tags.join(' ') : (ill.tags || '')).toLowerCase();
+      const passages = (Array.isArray(ill.passages_associes) ? ill.passages_associes.join(' ') : (ill.passages_associes || '')).toLowerCase();
+
+      // 1. Recherche directe (query)
+      if (query) {
+        if (title.includes(query)) score += 40;
+        if (passages.includes(query)) score += 30;
+        if (tags.includes(query)) score += 20;
+        if (category.includes(query)) score += 15;
+        if (body.includes(query)) score += 10;
+        if (author.includes(query)) score += 10;
+      }
+
+      // 2. Correspondance du passage biblique
+      if (sermonPassage && passages) {
+        if (passages.includes(sermonPassage)) {
+          score += 60;
+        } else {
+          bookTokens.forEach(tok => {
+            if (passages.includes(tok)) score += 15;
+          });
+        }
+      }
+
+      // 3. Mots-clés du thème / point
+      themeKeywords.forEach(kw => {
+        if (title.includes(kw)) score += 18;
+        if (tags.includes(kw)) score += 12;
+        if (category.includes(kw)) score += 8;
+        if (body.includes(kw)) score += 4;
+      });
+
+      return { ill, score };
+    });
+
+    scored.sort((a, b) => b.score - a.score);
+
+    if (scored.length > 0 && scored[0].score > 0) {
+      return scored.slice(0, limit).map(s => s.ill);
+    }
+    return this.illustrations.slice(0, limit);
+  },
+
+  attachIllustrationBlockHelpers(blockEl, sectionId) {
+    if (!blockEl || blockEl.dataset.helpersAttached === 'true') return;
+    blockEl.dataset.helpersAttached = 'true';
+
+    const header = blockEl.querySelector('.sermon-block-header');
+    if (!header) return;
+
+    const sec = this.sections.find(s => s.id === sectionId) || {};
+    const matches = this.findMatchingIllustrations({ sectionTitle: sec.title }, 3);
+
+    let chipsWrap = header.querySelector('.ill-suggest-chips');
+    if (!chipsWrap) {
+      chipsWrap = document.createElement('div');
+      chipsWrap.className = 'ill-suggest-chips';
+      chipsWrap.setAttribute('contenteditable', 'false');
+      header.appendChild(chipsWrap);
+    }
+
+    let chipsHtml = `<span style="opacity: 0.7; font-size: 10px; margin-right: 2px;">Suggestions :</span>`;
+    matches.forEach(ill => {
+      chipsHtml += `
+        <button type="button" class="ill-chip" data-ill-id="${ill.id}" title="${this.escapeHtml(ill.title)}">
+          <span style="font-size: 10px;">💡</span>
+          <span>${this.escapeHtml(ill.title)}</span>
+        </button>
+      `;
+    });
+
+    chipsHtml += `
+      <button type="button" class="ill-chip-more" title="Parcourir tout le réservoir filtré pour cette prédication">
+        <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span>+ d'illustrations</span>
+      </button>
+    `;
+
+    chipsWrap.innerHTML = chipsHtml;
+
+    const tooltip = document.getElementById('ill-hover-tooltip');
+
+    chipsWrap.querySelectorAll('.ill-chip[data-ill-id]').forEach(btn => {
+      const illId = btn.dataset.illId;
+      const ill = this.illustrations.find(i => i.id === illId);
+      if (!ill) return;
+
+      btn.addEventListener('mouseenter', () => {
+        if (!tooltip) return;
+        const rect = btn.getBoundingClientRect();
+        const snippet = (ill.body || ill.content || '').replace(/<[^>]+>/g, '').replace(/^[#>*\s-]+/gm, '').trim().slice(0, 180) + '...';
+        const passageBadge = Array.isArray(ill.passages_associes) ? ill.passages_associes.join(', ') : (ill.passages_associes || '');
+
+        tooltip.innerHTML = `
+          <div class="ill-tooltip-header">
+            <span class="ill-tooltip-title">${this.escapeHtml(ill.title)}</span>
+            <span class="ill-tooltip-badge">${this.escapeHtml(ill.category || 'Illustration')}</span>
+          </div>
+          ${passageBadge ? `<div style="font-size: 10px; color: var(--accent-blue, #3b82f6); font-weight:600; margin-bottom:4px;">📖 ${this.escapeHtml(passageBadge)}</div>` : ''}
+          <div class="ill-tooltip-snippet">${this.escapeHtml(snippet)}</div>
+          <div class="ill-tooltip-footer">
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 10 4 15 9 20"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/></svg>
+            <span>Cliquer pour insérer dans ce bloc</span>
+          </div>
+        `;
+
+        tooltip.classList.remove('hidden');
+        const tooltipWidth = tooltip.offsetWidth || 280;
+        let left = rect.left + (rect.width / 2) - (tooltipWidth / 2);
+        let top = rect.top - tooltip.offsetHeight - 8;
+        if (top < 10) top = rect.bottom + 8;
+        if (left < 10) left = 10;
+        if (left + tooltipWidth > window.innerWidth - 10) left = window.innerWidth - tooltipWidth - 10;
+
+        tooltip.style.left = `${Math.round(left)}px`;
+        tooltip.style.top = `${Math.round(top)}px`;
+      });
+
+      btn.addEventListener('mouseleave', () => {
+        tooltip?.classList.add('hidden');
+      });
+
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        tooltip?.classList.add('hidden');
+        this.insertIllustrationIntoBlock(blockEl, ill);
+      });
+    });
+
+    chipsWrap.querySelector('.ill-chip-more')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      tooltip?.classList.add('hidden');
+      this.openIllustrationPickerModal(blockEl, sec);
+    });
+  },
+
+  insertIllustrationIntoBlock(blockEl, ill) {
+    if (!blockEl || !ill) return;
+
+    const header = blockEl.querySelector('.sermon-block-header');
+    const cleanBody = (ill.body || ill.content || '').replace(/^[#>*\s-]+/gm, '').trim();
+    const sourceText = ill.author ? (ill.author + (ill.source ? ` (${ill.source})` : '')) : (ill.source || '');
+
+    let newContent = `<p><strong>${this.escapeHtml(ill.title)} :</strong> ${this.escapeHtml(cleanBody)}</p>`;
+    if (sourceText) {
+      newContent += `<p style="font-size: 12px; opacity: 0.75; font-style: italic; margin-top: 4px;">— Source : ${this.escapeHtml(sourceText)}</p>`;
+    }
+
+    Array.from(blockEl.children).forEach(child => {
+      if (child !== header) child.remove();
+    });
+
+    const tempWrap = document.createElement('div');
+    tempWrap.innerHTML = newContent;
+    while (tempWrap.firstChild) {
+      blockEl.appendChild(tempWrap.firstChild);
+    }
+
+    const editor = blockEl.closest('.sermon-section-editor');
+    if (editor) {
+      editor.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    this.debouncedAutoSave();
+  },
+
+  initIllustrationPickerModal() {
+    const modal = document.getElementById('sermon-illustration-picker-modal');
+    const closeBtn = document.getElementById('btn-close-ill-picker-modal');
+    const searchInput = document.getElementById('ill-picker-search-input');
+    const clearBtn = document.getElementById('btn-clear-ill-picker-search');
+
+    closeBtn?.addEventListener('click', () => this.closeIllustrationPickerModal());
+
+    modal?.addEventListener('click', (e) => {
+      if (e.target === modal) this.closeIllustrationPickerModal();
+    });
+
+    searchInput?.addEventListener('input', () => {
+      const q = searchInput.value.trim();
+      clearBtn?.classList.toggle('hidden', !q);
+      this.renderIllustrationPickerList(q, this.activeIllPickerFilter);
+    });
+
+    clearBtn?.addEventListener('click', () => {
+      if (searchInput) searchInput.value = '';
+      clearBtn.classList.add('hidden');
+      this.renderIllustrationPickerList('', this.activeIllPickerFilter);
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
+        this.closeIllustrationPickerModal();
+      }
+    });
+  },
+
+  openIllustrationPickerModal(blockEl, sec = null) {
+    this.currentTargetIllustrationBlock = blockEl;
+    const modal = document.getElementById('sermon-illustration-picker-modal');
+    if (!modal) return;
+
+    const sermonPassage = this.currentSermon?.passage?.reference || '';
+    const contextLabel = document.getElementById('lbl-ill-picker-context');
+    if (contextLabel) {
+      contextLabel.textContent = sermonPassage ? `Filtré selon le passage ${sermonPassage} et le thème du sermon` : `Recherche dans le réservoir de ${this.illustrations.length} fiches`;
+    }
+
+    const filtersRow = document.getElementById('ill-picker-quick-filters');
+    if (filtersRow) {
+      const categories = ['all', 'Foi & Confiance', 'Grâce & Pardon', 'Combat spirituel', 'Discipulat', 'Prière', 'Évangélisation'];
+      filtersRow.innerHTML = `
+        <button class="ill-category-pill active" data-filter="context">⭐ Liées au texte (${sermonPassage || 'Prédication'})</button>
+        <button class="ill-category-pill" data-filter="all">Toutes (${this.illustrations.length})</button>
+        ${categories.slice(1).map(c => `<button class="ill-category-pill" data-filter="${c}">${c}</button>`).join('')}
+      `;
+
+      filtersRow.querySelectorAll('.ill-category-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          filtersRow.querySelectorAll('.ill-category-pill').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          this.activeIllPickerFilter = btn.dataset.filter || 'all';
+          const q = document.getElementById('ill-picker-search-input')?.value || '';
+          this.renderIllustrationPickerList(q, this.activeIllPickerFilter);
+        });
+      });
+    }
+
+    this.activeIllPickerFilter = 'context';
+    const searchInput = document.getElementById('ill-picker-search-input');
+    if (searchInput) searchInput.value = '';
+    document.getElementById('btn-clear-ill-picker-search')?.classList.add('hidden');
+
+    this.renderIllustrationPickerList('', 'context');
+    modal.classList.remove('hidden');
+    setTimeout(() => searchInput?.focus(), 50);
+  },
+
+  closeIllustrationPickerModal() {
+    document.getElementById('sermon-illustration-picker-modal')?.classList.add('hidden');
+    this.currentTargetIllustrationBlock = null;
+  },
+
+  renderIllustrationPickerList(query = '', filter = 'context') {
+    const container = document.getElementById('ill-picker-list-container');
+    const countEl = document.getElementById('lbl-ill-picker-count');
+    if (!container) return;
+
+    let items = [];
+    if (filter === 'context') {
+      items = this.findMatchingIllustrations({ query }, 30);
+    } else if (filter === 'all') {
+      const q = query.toLowerCase().trim();
+      items = this.illustrations.filter(ill => {
+        if (!q) return true;
+        return (ill.title || '').toLowerCase().includes(q) ||
+          (ill.body || ill.content || '').toLowerCase().includes(q) ||
+          (ill.category || '').toLowerCase().includes(q) ||
+          (Array.isArray(ill.tags) ? ill.tags.join(' ') : '').toLowerCase().includes(q) ||
+          (Array.isArray(ill.passages_associes) ? ill.passages_associes.join(' ') : '').toLowerCase().includes(q);
+      });
+    } else {
+      const q = query.toLowerCase().trim();
+      items = this.illustrations.filter(ill => {
+        const cat = (ill.category || '').toLowerCase();
+        if (!cat.includes(filter.toLowerCase())) return false;
+        if (!q) return true;
+        return (ill.title || '').toLowerCase().includes(q) ||
+          (ill.body || ill.content || '').toLowerCase().includes(q) ||
+          (Array.isArray(ill.tags) ? ill.tags.join(' ') : '').toLowerCase().includes(q);
+      });
+    }
+
+    if (countEl) {
+      countEl.textContent = `${items.length} ${items.length > 1 ? 'fiches' : 'fiche'}`;
+    }
+
+    if (items.length === 0) {
+      container.innerHTML = `
+        <div style="padding: 40px 20px; text-align: center; color: var(--text-muted);">
+          <div style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Aucune illustration trouvée</div>
+          <div style="font-size: 12px;">Essayez d'autres mots-clés ou cliquez sur « Toutes » pour voir l'ensemble du réservoir.</div>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = items.map(ill => {
+      const snippet = (ill.body || ill.content || '').replace(/<[^>]+>/g, '').replace(/^[#>*\s-]+/gm, '').trim().slice(0, 220) + '...';
+      const passageBadge = Array.isArray(ill.passages_associes) ? ill.passages_associes.join(', ') : (ill.passages_associes || '');
+
+      return `
+        <div class="ill-picker-item" data-ill-id="${ill.id}">
+          <div class="ill-picker-item-header">
+            <span class="ill-picker-item-title">${this.escapeHtml(ill.title)}</span>
+            <div class="ill-picker-item-badges">
+              <span class="ill-tooltip-badge">${this.escapeHtml(ill.category || 'Illustration')}</span>
+              ${passageBadge ? `<span class="ill-tooltip-badge" style="background:rgba(59,130,246,0.15); color:var(--accent-blue,#3b82f6);">📖 ${this.escapeHtml(passageBadge)}</span>` : ''}
+              ${ill.author ? `<span style="font-size:10.5px; opacity:0.7; font-style:italic;">— ${this.escapeHtml(ill.author)}</span>` : ''}
+            </div>
+          </div>
+          <div class="ill-picker-item-snippet">${this.escapeHtml(snippet)}</div>
+        </div>
+      `;
+    }).join('');
+
+    container.querySelectorAll('.ill-picker-item').forEach(itemEl => {
+      itemEl.addEventListener('click', () => {
+        const illId = itemEl.dataset.illId;
+        const ill = this.illustrations.find(i => i.id === illId);
+        if (ill && this.currentTargetIllustrationBlock) {
+          this.insertIllustrationIntoBlock(this.currentTargetIllustrationBlock, ill);
+          this.closeIllustrationPickerModal();
+        }
+      });
+    });
   },
 
   escapeHtml(str) {
