@@ -116,7 +116,7 @@ class TheologyReaderManager:
 
     @classmethod
     def _resolve_epub_path(cls, book_name: str, book_meta: dict) -> str:
-        """Résout de manière résiliente le chemin vers le fichier EPUB source."""
+        """Résout de manière résiliente le chemin vers le fichier EPUB ou PDF source."""
         fpath = book_meta.get("file_path", "")
         if fpath and os.path.exists(fpath):
             return fpath
@@ -154,7 +154,7 @@ class TheologyReaderManager:
                 continue
             try:
                 for fname in os.listdir(cdir):
-                    if not fname.lower().endswith(".epub"):
+                    if not fname.lower().endswith((".epub", ".pdf")):
                         continue
                     fname_clean = strip_accents(fname.lower())
                     if book_name.lower() in fname.lower() or (len(clean_title) >= 6 and clean_title[:18] in fname_clean):
@@ -188,35 +188,61 @@ class TheologyReaderManager:
 
         chapters_dict = {}
 
-        # 1. Vérifier si un fichier EPUB existe (analyse directe ultra-rapide)
+        # 1. Vérifier si un fichier source EPUB ou PDF existe (analyse directe ultra-rapide)
         registry = load_books_metadata()
         book_meta = registry.get(book_name, {})
         fpath = cls._resolve_epub_path(book_name, book_meta)
 
-        if fpath and os.path.exists(fpath) and fpath.lower().endswith(".epub"):
-            try:
-                from core.epub_loader import EpubLoader
-                inspect_data = EpubLoader.inspect_epub(fpath)
-                for ch in inspect_data.get("chapters", []):
-                    cid = ch.get("id", 0)
-                    is_sec = ch.get("is_section_header", False)
-                    depth = ch.get("depth", 0)
-                    b_code = ch.get("book_code")
-                    b_name = get_french_book_name(b_code) if b_code else None
-                    chapters_dict[cid] = {
-                        "chapter_id": cid,
-                        "title": cls._clean_text_encoding(ch.get("title") or f"Chapitre {cid}"),
-                        "book_code": b_code,
-                        "book_name": b_name,
-                        "corpus_scope": ch.get("corpus_scope", "GLOBAL"),
-                        "source_type": ch.get("source_type", "general"),
-                        "depth": depth,
-                        "is_section_header": is_sec,
-                        "zip_file": ch.get("zip_file", ""),
-                        "chunks_count": 1 if not is_sec else 0
-                    }
-            except Exception as e:
-                logger.warning(f"[TheologyReaderManager] Erreur analyse directe EPUB TOC pour {book_name}: {e}")
+        if fpath and os.path.exists(fpath):
+            if fpath.lower().endswith(".epub"):
+                try:
+                    from core.epub_loader import EpubLoader
+                    inspect_data = EpubLoader.inspect_epub(fpath)
+                    for ch in inspect_data.get("chapters", []):
+                        cid = ch.get("id", 0)
+                        is_sec = ch.get("is_section_header", False)
+                        depth = ch.get("depth", 0)
+                        b_code = ch.get("book_code")
+                        b_name = get_french_book_name(b_code) if b_code else None
+                        chapters_dict[cid] = {
+                            "chapter_id": cid,
+                            "title": cls._clean_text_encoding(ch.get("title") or f"Chapitre {cid}"),
+                            "book_code": b_code,
+                            "book_name": b_name,
+                            "corpus_scope": ch.get("corpus_scope", "GLOBAL"),
+                            "source_type": ch.get("source_type", "general"),
+                            "depth": depth,
+                            "is_section_header": is_sec,
+                            "zip_file": ch.get("zip_file", ""),
+                            "chunks_count": 1 if not is_sec else 0
+                        }
+                except Exception as e:
+                    logger.warning(f"[TheologyReaderManager] Erreur analyse directe EPUB TOC pour {book_name}: {e}")
+            elif fpath.lower().endswith(".pdf"):
+                try:
+                    from core.pdf_loader import PdfLoader
+                    inspect_data = PdfLoader.inspect_pdf(fpath)
+                    for ch in inspect_data.get("chapters", []):
+                        cid = ch.get("id", 0)
+                        is_sec = ch.get("is_section_header", False)
+                        depth = ch.get("depth", 0)
+                        b_code = ch.get("book_code")
+                        b_name = get_french_book_name(b_code) if b_code else None
+                        chapters_dict[cid] = {
+                            "chapter_id": cid,
+                            "title": cls._clean_text_encoding(ch.get("title") or f"Section {cid}"),
+                            "book_code": b_code,
+                            "book_name": b_name,
+                            "corpus_scope": ch.get("corpus_scope", "GLOBAL"),
+                            "source_type": ch.get("source_type", "general"),
+                            "depth": depth,
+                            "is_section_header": is_sec,
+                            "start_page": ch.get("start_page", 1),
+                            "end_page": ch.get("end_page", 1),
+                            "chunks_count": 1 if not is_sec else 0
+                        }
+                except Exception as e:
+                    logger.warning(f"[TheologyReaderManager] Erreur analyse directe PDF TOC pour {book_name}: {e}")
 
         # 2. Fallback ChromaDB si aucun chapitre n'a été trouvé via l'EPUB
         if not chapters_dict:
@@ -430,6 +456,51 @@ class TheologyReaderManager:
                             }
             except Exception as e:
                 logger.warning(f"Direct EPUB chapter read error: {e}")
+
+        # 1.2. Lecture directe du fichier PDF original si présent
+        elif fpath and os.path.exists(fpath) and fpath.lower().endswith(".pdf"):
+            try:
+                from core.pdf_loader import PdfLoader
+                import fitz
+                inspect_data = PdfLoader.inspect_pdf(fpath)
+                ch_info = next((c for c in inspect_data.get("chapters", []) if c.get("id") == cid_query or str(c.get("id")) == str(cid_query)), None)
+                if ch_info:
+                    doc = fitz.open(fpath)
+                    s_pg = ch_info.get("start_page", 1)
+                    e_pg = ch_info.get("end_page", len(doc))
+                    direct_paragraphs = []
+                    for pno in range(s_pg - 1, min(e_pg, len(doc))):
+                        page = doc[pno]
+                        p_height = page.rect.height
+                        blocks = page.get_text("blocks")
+                        for b in blocks:
+                            if b[6] != 0:
+                                continue
+                            b_top, b_bottom, b_txt = b[1], b[3], b[4].strip()
+                            if (b_top < 40 or b_bottom > p_height - 40) and (len(b_txt) < 10 or b_txt.isdigit()):
+                                continue
+                            clean_block = re.sub(r'(\w+)-\n(\w+)', r'\1\2', b_txt)
+                            clean_block = re.sub(r'[ \t]+', ' ', clean_block).strip()
+                            if clean_block:
+                                direct_paragraphs.append(clean_block)
+                    doc.close()
+
+                    for idx_p, p_text in enumerate(direct_paragraphs):
+                        chunks.append((f"{book_name}_direct_{idx_p}", {
+                            "chapter_title": ch_info.get("title", ""),
+                            "name": book_name,
+                            "title": book_meta.get("title", book_name),
+                            "author": book_meta.get("author", "")
+                        }, p_text))
+
+                    chapter_meta = {
+                        "chapter_title": ch_info.get("title", ""),
+                        "name": book_name,
+                        "title": book_meta.get("title", book_name),
+                        "author": book_meta.get("author", "")
+                    }
+            except Exception as e:
+                logger.warning(f"Direct PDF chapter read error: {e}")
 
         # 2. Fallback ChromaDB si le fichier source n'est pas sur le disque
         if not chunks:

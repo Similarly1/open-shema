@@ -8,6 +8,7 @@ import json
 from PIL import Image
 from core.bible_json_loader import BibleJsonLoader
 from core.epub_loader import EpubLoader
+from core.pdf_loader import PdfLoader
 from core.book_classifier import BookClassifier
 from core.reference_parser import REVERSE_BOOK_MAPPING, BOOK_MAPPING
 from gui.google_books_picker import BookMetadataPickerModal
@@ -47,7 +48,7 @@ class ImportTab(ctk.CTkScrollableFrame):
         
         lbl_subtitle = ctk.CTkLabel(
             header_frame,
-            text="Renseignez les métadonnées, associez une image de couverture et sélectionnez votre fichier source (.epub, .docx, .json, .csv ou dossier complet de Bible).",
+            text="Renseignez les métadonnées, associez une image de couverture et sélectionnez votre fichier source (.epub, .pdf, .docx, .json, .csv ou dossier complet de Bible).",
             font=ctk.CTkFont(size=12),
             text_color=("#64748B", "#94A3B8"),
             anchor="w"
@@ -609,10 +610,11 @@ class ImportTab(ctk.CTkScrollableFrame):
     def choose_file(self):
         def _open():
             path = filedialog.askopenfilename(
-                title="Sélectionner un ouvrage (.epub, .docx, .json, .csv)",
+                title="Sélectionner un ouvrage (.epub, .pdf, .docx, .json, .csv)",
                 filetypes=[
-                    ("Ouvrages & Documents (*.epub, *.docx, *.json, *.csv)", "*.epub *.docx *.json *.csv"),
+                    ("Ouvrages & Documents (*.epub, *.pdf, *.docx, *.json, *.csv)", "*.epub *.pdf *.docx *.json *.csv"),
                     ("Ebooks EPUB (*.epub)", "*.epub"),
+                    ("Documents PDF (*.pdf)", "*.pdf"),
                     ("Documents Word (*.docx)", "*.docx"),
                     ("Fichiers JSON (*.json)", "*.json"),
                     ("Bibles CSV (*.csv)", "*.csv"),
@@ -667,6 +669,50 @@ class ImportTab(ctk.CTkScrollableFrame):
                         
                     except Exception as e:
                         messagebox.showerror("Erreur EPUB", f"Impossible d'analyser l'EPUB : {e}")
+
+                # CAS 1.5 : PDF (Documents, ouvrages, manuels et articles théologiques)
+                elif path.lower().endswith(".pdf"):
+                    try:
+                        res = PdfLoader.inspect_pdf(path)
+                        
+                        # Remplir le titre
+                        title_val = res.get("title") or os.path.splitext(os.path.basename(path))[0]
+                        short_id = re.sub(r'[^a-zA-Z0-9]', '', title_val)[:12]
+                        
+                        self.name_entry.delete(0, "end")
+                        self.name_entry.insert(0, short_id)
+                        
+                        self.title_entry.delete(0, "end")
+                        self.title_entry.insert(0, title_val)
+                        
+                        if res.get("author"):
+                            self.author_entry.delete(0, "end")
+                            self.author_entry.insert(0, res["author"])
+                            
+                        if res.get("year"):
+                            self.year_entry.delete(0, "end")
+                            self.year_entry.insert(0, res["year"])
+                            
+                        if res.get("description"):
+                            self.desc_entry.delete("1.0", "end")
+                            self.desc_entry.insert("1.0", res["description"])
+                            
+                        if res.get("cover_path") and os.path.exists(res["cover_path"]):
+                            self.cover_path = res["cover_path"]
+                            self.load_cover_preview()
+                            
+                        self.type_var.set("Théologie")
+                        
+                        # Classification globale
+                        h_res = BookClassifier.heuristic_classify(title_val, res.get("description", ""))
+                        self.apply_classification_dict(h_res)
+                        
+                        # Afficher les chapitres dans l'inspecteur
+                        self.epub_chapters = res.get("chapters", [])
+                        self.render_chapters_inspector(self.epub_chapters)
+                        
+                    except Exception as e:
+                        messagebox.showerror("Erreur PDF", f"Impossible d'analyser le PDF : {e}")
 
                 # CAS 2 : CSV Bible
                 elif path.lower().endswith(".csv"):
@@ -1020,6 +1066,41 @@ class ImportTab(ctk.CTkScrollableFrame):
                 messagebox.showerror("Erreur d'extraction EPUB", f"Erreur lors de l'extraction de l'EPUB : {e}")
                 return
 
+        # CAS 3.5 : Fichier PDF (Ouvrage de théologie générale, commentaire ou document)
+        if self.file_path and self.file_path.lower().endswith(".pdf"):
+            # Synchroniser les checkboxes des chapitres
+            for ch in self.epub_chapters:
+                ch_id = ch["id"]
+                if ch_id in self.chapter_check_vars:
+                    ch["include"] = self.chapter_check_vars[ch_id].get()
+
+            included_chapters = [ch for ch in self.epub_chapters if ch.get("include", True)]
+            if not included_chapters:
+                messagebox.showerror("Erreur", "Veuillez cocher au moins un chapitre à importer.")
+                return
+
+            metadata["chapters_count"] = len(included_chapters)
+            metadata["format"] = "pdf"
+
+            try:
+                chunks = PdfLoader.extract_chapters_and_chunks(
+                    self.file_path,
+                    self.epub_chapters,
+                    custom_name=name,
+                    metadata=metadata
+                )
+                if not chunks:
+                    messagebox.showerror("Erreur", "Aucun texte n'a pu être extrait des chapitres sélectionnés.")
+                    return
+
+                self.master.after(100, lambda: self.on_import_callback(name, chunks, metadata, edit_mode=False))
+                if self.close_callback:
+                    self.close_callback()
+                return
+            except Exception as e:
+                messagebox.showerror("Erreur d'extraction PDF", f"Erreur lors de l'extraction du PDF : {e}")
+                return
+
         # CAS 4 : Ouvrages DOCX, CSV ou texte
         if not self.file_path:
             messagebox.showerror("Erreur", "Veuillez choisir un fichier ou un dossier Bible JSON/CSV à importer.")
@@ -1046,8 +1127,14 @@ class ImportTab(ctk.CTkScrollableFrame):
     def extract_and_chunk(self, path, name, doc_type):
         text = ""
         if path.lower().endswith(".pdf"):
-            messagebox.showerror("Non supporté", "Veuillez convertir le PDF en Markdown ou texte.")
-            return []
+            try:
+                import fitz
+                doc = fitz.open(path)
+                text = "\n".join([page.get_text() for page in doc])
+                doc.close()
+            except Exception as e:
+                messagebox.showerror("Erreur", f"Impossible de lire le fichier PDF : {e}")
+                return []
         elif path.lower().endswith(".docx"):
             try:
                 import docx

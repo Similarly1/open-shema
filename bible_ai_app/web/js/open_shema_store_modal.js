@@ -277,18 +277,18 @@ const OpenShemaStore = {
 
           <div style="flex: 1; overflow-y: auto; padding: 16px 20px; background: var(--bg-card, #1e293b);">
             
-            <!-- Liens directs pré-filtrés 1-clic -->
+            <!-- Liens directs pré-filtrés 1-clic (Fnac et Kobo) -->
             <div id="ebook-store-direct-links-section" style="margin-bottom: 20px; padding: 12px 14px; border-radius: 8px; background: rgba(15, 23, 42, 0.55); border: 1px solid var(--border-subtle, #334155); display: none;">
               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
                 <div style="font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.05em; color: #60a5fa; font-weight: 700; display: flex; align-items: center; gap: 6px;">
-                  ${this.svgIcons.store} Recherche directe sur les autres librairies
+                  ${this.svgIcons.store} Recherche 1-clic : Fnac & Rakuten Kobo
                 </div>
-                <span style="font-size: 0.7rem; color: var(--text-muted, #94a3b8); opacity: 0.9;">Sans API ouverte : ouvre leur recherche pré-remplie</span>
+                <span style="font-size: 0.7rem; color: var(--text-muted, #94a3b8); opacity: 0.9;">Ouvre directement leur catalogue avec votre recherche</span>
               </div>
               <p style="font-size: 0.76rem; color: var(--text-muted, #94a3b8); margin: 0 0 10px 0; line-height: 1.35;">
-                Ces plateformes ne permettant pas d'extraire directement les fiches produits ici, ces raccourcis lancent votre recherche dans leur rayon e-books en 1 clic :
+                Pour les plateformes avec pare-feu anti-robot (Fnac et Kobo), ces raccourcis ouvrent directement leur rayon numérique en 1 clic :
               </p>
-              <div id="ebook-store-direct-links-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px;">
+              <div id="ebook-store-direct-links-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px;">
               </div>
             </div>
 
@@ -306,7 +306,7 @@ const OpenShemaStore = {
           </div>
 
           <div style="padding: 10px 20px; border-top: 1px solid var(--border-subtle, #334155); background: var(--bg-surface-elevated, #0f172a); display: flex; align-items: center; justify-content: space-between; font-size: 0.78rem; color: var(--text-muted, #94a3b8);">
-            <span>Sources : Éditions Bibli'O, BLF Store, Publications Chrétiennes, Google Play, Fnac, Kobo</span>
+            <span>Sources en direct : Éditions Bibli'O, BLF Store, Publications Chrétiennes, La Maison de la Bible, Google Play</span>
             <span style="color: #10b981;">Zéro livre papier inclus</span>
           </div>
 

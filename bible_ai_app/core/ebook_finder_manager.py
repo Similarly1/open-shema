@@ -265,26 +265,20 @@ class EbookFinderManager:
         return results
 
     def get_direct_store_links(self, query: str) -> List[Dict[str, str]]:
-        """Génère les liens directs pré-filtrés sur le rayon e-books pour les grandes plateformes."""
+        """Génère les liens directs pré-filtrés sur le rayon e-books pour Fnac et Kobo."""
         encoded_query = urllib.parse.quote(query)
         return [
             {
-                'source': 'Chercher sur Fnac.com (E-books)',
-                'badge': 'Fnac E-books',
-                'description': 'Lancer la recherche dans le catalogue numérique Fnac / Kobo',
+                'source': 'Rayon E-books Fnac',
+                'badge': 'Fnac.com',
+                'description': 'Téléchargement numérique immédiat sur Fnac.com',
                 'url': f"https://www.fnac.com/SearchResult/ResultList.aspx?Search={encoded_query}&sft=1"
             },
             {
-                'source': 'Chercher sur Rakuten Kobo',
+                'source': 'Librairie Kobo Store',
                 'badge': 'Rakuten Kobo',
-                'description': 'Lancer la recherche dans la librairie 100% numérique Kobo',
+                'description': 'Librairie 100% numérique Kobo',
                 'url': f"https://www.kobo.com/fr/fr/search?query={encoded_query}&fclanguages=fr"
-            },
-            {
-                'source': 'Chercher sur La Maison de la Bible',
-                'badge': 'Maison de la Bible',
-                'description': 'Lancer la recherche e-books sur La Maison de la Bible',
-                'url': f"https://maisonbible.fr/fr/recherche?controller=search&s={encoded_query}+ebook"
             }
         ]
 
@@ -375,10 +369,55 @@ class EbookFinderManager:
         result_groups.sort(key=lambda x: (x['min_price_raw'] == 0, x['min_price_raw']))
         return result_groups
 
+    def calculate_relevance_score(self, title: str, query: str) -> int:
+        """
+        Calcule un score de pertinence pour classer les véritables versions bibliques
+        en priorité lors d'une recherche générique (ex: 'Bible', 'La Bible')
+        et reléguer les simples livrets / manuels d'étude.
+        """
+        t_lower = title.lower()
+        q_lower = query.lower().strip()
+        score = 0
+
+        # Grandes versions bibliques reconnues
+        known_versions = [
+            'segond', 'semeur', 'tob', 'nfc', 'francais courant', 'français courant',
+            'colombe', 'darby', 'jerusalem', 'jérusalem', 'osty', 'chouraqui',
+            'bible annotée', 'neuchâtel', 'bible en 1 an', 'nouvelle bible segond',
+            'bible d\'etude', 'bible d\'étude', 'bible expliquée', 'bible pastorale',
+            'parole vivante', 'parole de vie', 'bible crampon', 'glaire', 'sacy',
+            'martin', 'ostervald', 'king james', 'kjv', 'esv', 'niv'
+        ]
+
+        # Malus pour les guides / manuels sur la Bible
+        manual_keywords = [
+            'comment lire', 'comment étudier', 'pourquoi lire', 'pourquoi croire',
+            'vrai ou faux', 'en 100 pages', 'can i really trust', 'hommes de la bible',
+            'femmes de la bible', 'panorama', 'introduction à', 'survol de', 'guide de',
+            'lire la bible', 'étudier la bible', 'découvrir la bible', 'personnages de la bible'
+        ]
+
+        if any(k in t_lower for k in manual_keywords):
+            score -= 60
+
+        if t_lower.startswith('bible ') or t_lower.startswith('la bible ') or t_lower.startswith('sainte bible') or t_lower.startswith('le nouveau testament') or t_lower.startswith('l\'ancien testament'):
+            score += 80
+
+        if any(v in t_lower for v in known_versions):
+            score += 60
+
+        # Correspondance textuelle
+        if q_lower in t_lower:
+            score += 20
+        if t_lower == q_lower or t_lower == f"la {q_lower}":
+            score += 50
+
+        return score
+
     def search_all_ebooks(self, query: str) -> Dict[str, Any]:
         """
         Effectue une recherche unifiée et parallèle sur toutes les plateformes.
-        Renvoie les groupes d'e-books dédoublonnés et les liens de recherche rapide.
+        Renvoie les groupes d'e-books dédoublonnés, triés par pertinence textuelle et prix.
         """
         clean_q = query.strip()
         if not clean_q:
@@ -386,36 +425,40 @@ class EbookFinderManager:
 
         direct_products: List[Dict[str, Any]] = []
 
-        # Exécution en parallèle via ThreadPoolExecutor (< 1.5s)
-        with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
-            future_to_store = {
-                executor.submit(self._query_shopify_store, store, clean_q): store['name']
-                for store in self.SHOPIFY_STORES
-            }
-            future_google = executor.submit(self._query_google_books, clean_q)
-            future_mb = executor.submit(self._query_maison_de_la_bible, clean_q)
+        # Expansion intelligente pour les termes génériques comme "bible"
+        queries_to_run = [clean_q]
+        is_generic_bible = clean_q.lower() in [
+            'bible', 'la bible', 'bibles', 'sainte bible', 'saintes ecritures', 'saintes écritures', 'les saintes ecritures'
+        ]
+        if is_generic_bible:
+            queries_to_run.extend(["Bible Segond 21", "Nouvelle Français courant", "Bible TOB", "Bible Colombe"])
 
-            for future in concurrent.futures.as_completed(future_to_store):
+        # Exécution en parallèle via ThreadPoolExecutor (< 1.5s)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            future_tasks = []
+
+            for q_term in queries_to_run:
+                for store in self.SHOPIFY_STORES:
+                    future_tasks.append(executor.submit(self._query_shopify_store, store, q_term))
+                future_tasks.append(executor.submit(self._query_google_books, q_term))
+                future_tasks.append(executor.submit(self._query_maison_de_la_bible, q_term))
+
+            for future in concurrent.futures.as_completed(future_tasks):
                 try:
-                    store_results = future.result()
-                    direct_products.extend(store_results)
+                    res_items = future.result()
+                    if res_items:
+                        direct_products.extend(res_items)
                 except Exception:
                     pass
 
-            try:
-                google_results = future_google.result()
-                direct_products.extend(google_results)
-            except Exception:
-                pass
-
-            try:
-                mb_results = future_mb.result()
-                direct_products.extend(mb_results)
-            except Exception:
-                pass
-
         # Regroupement intelligent des doublons
         grouped_results = self.group_ebook_results(direct_products)
+
+        # Tri intelligent : Pertinence textuelle d'abord, puis meilleur prix
+        grouped_results.sort(
+            key=lambda g: (-self.calculate_relevance_score(g['title'], clean_q), g['min_price_raw'] == 0, g['min_price_raw'])
+        )
+
         direct_links = self.get_direct_store_links(clean_q)
 
         return {
