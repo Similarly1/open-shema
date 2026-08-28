@@ -2233,84 +2233,29 @@
                 </div>
               </div>
 
-              <!-- Carte Gestion des Modèles Visibles & Quotas -->
-              <div class="settings-card" id="card-models-visibility-manager" style="margin-bottom: 20px;">
-                <div class="card-title" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-blue);">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                      <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
-                    <span>Modèles Actifs &amp; Visibilité (Filtre Quotas RPD)</span>
+              <!-- Carte Compacte : Gestion des Modèles Visibles & Quotas -->
+              <div class="prompt-setting-card" id="card-models-visibility-compact" style="margin-bottom: 20px; border-color: rgba(59, 130, 246, 0.3); background: rgba(59, 130, 246, 0.03);">
+                <div class="prompt-card-main">
+                  <div class="prompt-card-header">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-blue);">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                      <strong class="prompt-card-title">Modèles Actifs &amp; Visibilité (Filtre Quotas RPD)</strong>
+                    </div>
+                    <span class="prompt-status-badge is-custom" id="badge-models-active-count">0 modèle(s) actif(s)</span>
                   </div>
-                  <button type="button" class="btn-secondary btn-sm" id="btn-fetch-gemini-models" style="font-size: 11.5px; padding: 4px 10px; display: inline-flex; align-items: center; gap: 6px;">
-                    <svg id="svg-fetch-gemini-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+                  <p class="prompt-card-desc">Cochez ou décochez les modèles IA (Gemini 3.x/2.x, Mistral, Infomaniak) pour masquer ceux à 0 RPD ou inutilisés dans tous les menus déroulants.</p>
+                </div>
+                <div class="prompt-card-actions">
+                  <button type="button" class="btn-secondary btn-sm" id="btn-open-models-visibility-modal">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 20h9"></path>
+                      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
                     </svg>
-                    <span>Actualiser depuis Google</span>
+                    <span>Gérer les modèles</span>
                   </button>
-                </div>
-                <p class="card-desc" style="margin-bottom: 12px;">
-                  Cochez uniquement les modèles disponibles sur vos abonnements ou quotas (décocher les modèles à 0 RPD dans Google AI Studio). Seuls les modèles activés apparaîtront dans vos menus déroulants.
-                </p>
-
-                <!-- Actions rapides -->
-                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.08));">
-                  <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                    <span style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Sélection rapide :</span>
-                    <button type="button" class="btn-ghost btn-xs" id="btn-models-enable-all" style="font-size: 11px; padding: 2px 8px;">Tout activer</button>
-                    <button type="button" class="btn-ghost btn-xs" id="btn-models-enable-gemini" style="font-size: 11px; padding: 2px 8px;">Gemini uniquement</button>
-                    <button type="button" class="btn-ghost btn-xs" id="btn-models-enable-mistral" style="font-size: 11px; padding: 2px 8px;">Mistral uniquement</button>
-                    <button type="button" class="btn-ghost btn-xs" id="btn-models-enable-infomaniak" style="font-size: 11px; padding: 2px 8px;">Infomaniak uniquement</button>
-                  </div>
-                  <div id="models-visibility-count-badge" style="font-size: 11px; font-weight: 600; color: var(--accent-blue); background: rgba(59, 130, 246, 0.1); padding: 2px 8px; border-radius: 12px;">
-                    0 modèle(s) actif(s)
-                  </div>
-                </div>
-
-                <!-- Grille des 3 Providers -->
-                <div class="models-visibility-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px;">
-                  <!-- Groupe 1 : Google Gemini -->
-                  <div class="models-provider-col" style="background: var(--bg-card-subtle, rgba(255,255,255,0.02)); border: 1px solid var(--border-color, rgba(255,255,255,0.06)); border-radius: 8px; padding: 12px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.06));">
-                      <strong style="font-size: 12px; color: #60a5fa; display: flex; align-items: center; gap: 6px;">
-                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
-                        <span>Google Gemini</span>
-                      </strong>
-                      <span class="provider-active-badge" id="badge-count-gemini" style="font-size: 10px; color: var(--text-muted);">0 actif</span>
-                    </div>
-                    <div id="models-list-gemini" class="models-checklist" style="display: flex; flex-direction: column; gap: 6px; max-height: 280px; overflow-y: auto;">
-                      <!-- Rendu dynamique -->
-                    </div>
-                  </div>
-
-                  <!-- Groupe 2 : Mistral AI -->
-                  <div class="models-provider-col" style="background: var(--bg-card-subtle, rgba(255,255,255,0.02)); border: 1px solid var(--border-color, rgba(255,255,255,0.06)); border-radius: 8px; padding: 12px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.06));">
-                      <strong style="font-size: 12px; color: #f97316; display: flex; align-items: center; gap: 6px;">
-                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                        <span>Mistral AI</span>
-                      </strong>
-                      <span class="provider-active-badge" id="badge-count-mistral" style="font-size: 10px; color: var(--text-muted);">0 actif</span>
-                    </div>
-                    <div id="models-list-mistral" class="models-checklist" style="display: flex; flex-direction: column; gap: 6px; max-height: 280px; overflow-y: auto;">
-                      <!-- Rendu dynamique -->
-                    </div>
-                  </div>
-
-                  <!-- Groupe 3 : Infomaniak Swiss AI -->
-                  <div class="models-provider-col" style="background: var(--bg-card-subtle, rgba(255,255,255,0.02)); border: 1px solid var(--border-color, rgba(255,255,255,0.06)); border-radius: 8px; padding: 12px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.06));">
-                      <strong style="font-size: 12px; color: #34d399; display: flex; align-items: center; gap: 6px;">
-                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
-                        <span>Infomaniak Swiss AI</span>
-                      </strong>
-                      <span class="provider-active-badge" id="badge-count-infomaniak" style="font-size: 10px; color: var(--text-muted);">0 actif</span>
-                    </div>
-                    <div id="models-list-infomaniak" class="models-checklist" style="display: flex; flex-direction: column; gap: 6px; max-height: 280px; overflow-y: auto;">
-                      <!-- Rendu dynamique -->
-                    </div>
-                  </div>
                 </div>
               </div>
 
@@ -7072,6 +7017,84 @@
               </svg>
               <span>Appliquer & Enregistrer</span>
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- MODALE DE GESTION DE VISIBILITÉ DES MODÈLES & QUOTAS   -->
+    <!-- ======================================================= -->
+    <div class="modal-dialog-container hidden" id="modal-models-visibility">
+      <div class="modal-card prompt-editor-modal-card" style="max-width: 780px;">
+        <div class="modal-header">
+          <div class="modal-title-with-badge">
+            <svg class="modal-header-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <h2 class="modal-title">Gestion des Modèles Visibles &amp; Quotas</h2>
+            <span class="prompt-status-badge is-custom" id="modal-models-global-badge">0 actif(s)</span>
+          </div>
+          <button class="modal-close-btn" id="btn-close-models-modal" title="Fermer la modale">✕</button>
+        </div>
+
+        <!-- Toolbar : Tabs de fournisseur + Bouton actualisation -->
+        <div class="prompt-modal-toolbar" style="flex-wrap: wrap; gap: 8px;">
+          <div class="prompt-modal-tabs" id="models-modal-provider-tabs">
+            <button type="button" class="prompt-tab-btn active" data-tab-provider="google" id="tab-models-gemini">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+              <span>Google Gemini</span>
+              <span class="provider-tab-count" id="tab-count-gemini" style="font-size: 10px; opacity: 0.8; margin-left: 4px;">(0)</span>
+            </button>
+            <button type="button" class="prompt-tab-btn" data-tab-provider="mistral" id="tab-models-mistral">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              <span>Mistral AI</span>
+              <span class="provider-tab-count" id="tab-count-mistral" style="font-size: 10px; opacity: 0.8; margin-left: 4px;">(0)</span>
+            </button>
+            <button type="button" class="prompt-tab-btn" data-tab-provider="infomaniak" id="tab-models-infomaniak">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+              <span>Infomaniak Swiss AI</span>
+              <span class="provider-tab-count" id="tab-count-infomaniak" style="font-size: 10px; opacity: 0.8; margin-left: 4px;">(0)</span>
+            </button>
+          </div>
+
+          <button type="button" class="btn-secondary btn-sm" id="btn-modal-fetch-gemini" style="font-size: 11px; padding: 4px 10px; display: inline-flex; align-items: center; gap: 6px;">
+            <svg id="svg-modal-fetch-gemini-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+            </svg>
+            <span>Actualiser depuis Google</span>
+          </button>
+        </div>
+
+        <!-- Sous-barre : Recherche & Actions rapides de l'onglet -->
+        <div style="padding: 10px 16px; border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.06)); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; background: var(--bg-card-subtle, rgba(0,0,0,0.1));">
+          <div style="position: relative; flex: 1; min-width: 200px; max-width: 320px;">
+            <input type="text" id="input-search-models" class="text-field" placeholder="Filtrer les modèles..." style="font-size: 12px; height: 30px; padding: 0 10px 0 28px; width: 100%;">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 9px; top: 8px; color: var(--text-muted); pointer-events: none;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+            <button type="button" class="btn-ghost btn-xs" id="btn-modal-select-all-tab" style="font-size: 11px; padding: 3px 8px;">Tout cocher (onglet)</button>
+            <button type="button" class="btn-ghost btn-xs" id="btn-modal-deselect-all-tab" style="font-size: 11px; padding: 3px 8px;">Tout décocher (onglet)</button>
+            <span style="color: var(--border-color); margin: 0 2px;">|</span>
+            <button type="button" class="btn-ghost btn-xs" id="btn-modal-enable-all-global" style="font-size: 11px; padding: 3px 8px;">Tout activer</button>
+          </div>
+        </div>
+
+        <!-- Corps : Liste des modèles de l'onglet actif -->
+        <div class="prompt-modal-body" style="padding: 12px 16px; max-height: 380px; min-height: 280px; overflow-y: auto;">
+          <div id="models-modal-items-container" class="models-checklist" style="display: flex; flex-direction: column; gap: 6px;">
+            <!-- Rendu dynamique -->
+          </div>
+        </div>
+
+        <!-- Pied de page -->
+        <div class="modal-footer prompt-modal-footer">
+          <div class="footer-left-actions">
+            <span style="font-size: 11.5px; color: var(--text-secondary);" id="models-modal-footer-stats">0 modèle(s) sélectionné(s)</span>
+          </div>
+          <div class="footer-right-actions">
+            <button type="button" class="btn-primary btn-sm" id="btn-modal-close-models">Fermer &amp; Appliquer</button>
           </div>
         </div>
       </div>

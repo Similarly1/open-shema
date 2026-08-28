@@ -7,15 +7,27 @@ const SettingsView = {
   config: {},
   dictionaries: [],
   discoveredGeminiModels: [],
+  activeModelsModalProviderTab: 'google',
+  modelsModalSearchQuery: '',
   ALL_MODELS_CATALOG: [
-    // Google Gemini
+    // Google Gemini 3.x & 2.x & 1.5
+    { id: 'gemini-3.7-flash', name: 'Google Gemini 3.7 Flash', desc: 'Dernière génération — Raisonnement hybride ultra-performant', provider: 'google' },
+    { id: 'gemini-3.6-flash', name: 'Google Gemini 3.6 Flash', desc: 'Génération 3.x stable & rapide', provider: 'google' },
+    { id: 'gemini-3.5-flash', name: 'Google Gemini 3.5 Flash', desc: 'Modèle polyvalent haute vitesse', provider: 'google' },
+    { id: 'gemini-3.5-flash-lite', name: 'Google Gemini 3.5 Flash Lite', desc: 'Économique & très léger', provider: 'google' },
+    { id: 'gemini-3.1-flash-lite', name: 'Google Gemini 3.1 Flash Lite', desc: 'Cadence élevée et faible latence', provider: 'google' },
+    { id: 'gemini-3.1-pro-preview', name: 'Google Gemini 3.1 Pro (Preview)', desc: 'Raisonnement poussé et analyse approfondie', provider: 'google' },
+    { id: 'gemini-3-flash-preview', name: 'Google Gemini 3.0 Flash (Preview)', desc: 'Aperçu génération Gemini 3.0', provider: 'google' },
     { id: 'gemini-2.5-flash', name: 'Google Gemini 2.5 Flash', desc: 'Recommandé — Équilibré & excellent raisonnement', provider: 'google' },
     { id: 'gemini-2.5-pro', name: 'Google Gemini 2.5 Pro', desc: 'Haute précision & profondeur exégétique', provider: 'google' },
+    { id: 'gemini-2.5-flash-lite', name: 'Google Gemini 2.5 Flash Lite', desc: 'Ultra-rapide, économique pour titres & tags', provider: 'google' },
     { id: 'gemini-2.0-flash', name: 'Google Gemini 2.0 Flash', desc: 'Génération standard rapide & stable', provider: 'google' },
-    { id: 'gemini-2.0-flash-lite', name: 'Google Gemini 2.0 Flash Lite', desc: 'Ultra-rapide, économique pour titres & tags', provider: 'google' },
+    { id: 'gemini-2.0-flash-lite', name: 'Google Gemini 2.0 Flash Lite', desc: 'Modèle léger pour tâches répétitives', provider: 'google' },
     { id: 'gemini-1.5-flash', name: 'Google Gemini 1.5 Flash', desc: 'Modèle rapide stable (1M tokens)', provider: 'google' },
     { id: 'gemini-1.5-pro', name: 'Google Gemini 1.5 Pro', desc: 'Grand contexte (2M tokens)', provider: 'google' },
     { id: 'gemini-1.5-flash-8b', name: 'Google Gemini 1.5 Flash 8B', desc: 'Modèle léger haute cadence', provider: 'google' },
+    { id: 'gemma-4-31b-it', name: 'Google Gemma 4 31B', desc: 'Grand modèle ouvert Google', provider: 'google' },
+    { id: 'gemma-4-26b-a4b-it', name: 'Google Gemma 4 26B', desc: 'Modèle compact Google', provider: 'google' },
 
     // Mistral AI
     { id: 'mistral-large-latest', name: 'Mistral Large', desc: 'Raisonnement approfondi & style souverain', provider: 'mistral' },
@@ -686,44 +698,69 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
       if (lbl) lbl.textContent = `~${e.target.value} mots`;
     });
 
-    // Gestionnaire de visibilité des modèles IA
-    document.getElementById('btn-fetch-gemini-models')?.addEventListener('click', () => {
-      this.fetchGeminiModels();
+    // Modale de Gestion de visibilité des modèles IA
+    document.getElementById('btn-open-models-visibility-modal')?.addEventListener('click', () => {
+      this.openModelsVisibilityModal();
     });
 
-    document.getElementById('btn-models-enable-all')?.addEventListener('click', () => {
+    document.getElementById('btn-close-models-modal')?.addEventListener('click', () => {
+      this.closeModelsVisibilityModal();
+    });
+
+    document.getElementById('btn-modal-close-models')?.addEventListener('click', () => {
+      this.closeModelsVisibilityModal();
+    });
+
+    document.querySelectorAll('#models-modal-provider-tabs .prompt-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const provider = btn.dataset.tabProvider;
+        if (provider) this.switchModelsModalTab(provider);
+      });
+    });
+
+    document.getElementById('input-search-models')?.addEventListener('input', (e) => {
+      this.modelsModalSearchQuery = e.target.value || '';
+      this.renderModelsModalList();
+    });
+
+    document.getElementById('btn-modal-select-all-tab')?.addEventListener('click', () => {
+      const currentProvider = this.activeModelsModalProviderTab || 'google';
+      const all = this.getAllAvailableModels();
+      const tabModelIds = all.filter(m => m.provider === currentProvider).map(m => m.id);
+      let disabled = this.getDisabledModels();
+      disabled = disabled.filter(id => !tabModelIds.includes(id));
+      this.config.disabled_models = disabled;
+      this.save();
+      this.renderModelsModalList();
+      this.renderAllModelSelects();
+      App.showToast(`Tous les modèles de cet onglet ont été activés.`);
+    });
+
+    document.getElementById('btn-modal-deselect-all-tab')?.addEventListener('click', () => {
+      const currentProvider = this.activeModelsModalProviderTab || 'google';
+      const all = this.getAllAvailableModels();
+      const tabModelIds = all.filter(m => m.provider === currentProvider).map(m => m.id);
+      let disabled = this.getDisabledModels();
+      tabModelIds.forEach(id => {
+        if (!disabled.includes(id)) disabled.push(id);
+      });
+      this.config.disabled_models = disabled;
+      this.save();
+      this.renderModelsModalList();
+      this.renderAllModelSelects();
+      App.showToast(`Tous les modèles de cet onglet ont été désactivés.`);
+    });
+
+    document.getElementById('btn-modal-enable-all-global')?.addEventListener('click', () => {
       this.config.disabled_models = [];
       this.save();
-      this.renderModelsVisibilityList();
+      this.renderModelsModalList();
       this.renderAllModelSelects();
       App.showToast('Tous les modèles IA ont été activés.');
     });
 
-    document.getElementById('btn-models-enable-gemini')?.addEventListener('click', () => {
-      const all = this.getAllAvailableModels();
-      this.config.disabled_models = all.filter(m => m.provider !== 'google').map(m => m.id);
-      this.save();
-      this.renderModelsVisibilityList();
-      this.renderAllModelSelects();
-      App.showToast('Seuls les modèles Google Gemini sont activés.');
-    });
-
-    document.getElementById('btn-models-enable-mistral')?.addEventListener('click', () => {
-      const all = this.getAllAvailableModels();
-      this.config.disabled_models = all.filter(m => m.provider !== 'mistral').map(m => m.id);
-      this.save();
-      this.renderModelsVisibilityList();
-      this.renderAllModelSelects();
-      App.showToast('Seuls les modèles Mistral AI sont activés.');
-    });
-
-    document.getElementById('btn-models-enable-infomaniak')?.addEventListener('click', () => {
-      const all = this.getAllAvailableModels();
-      this.config.disabled_models = all.filter(m => m.provider !== 'infomaniak').map(m => m.id);
-      this.save();
-      this.renderModelsVisibilityList();
-      this.renderAllModelSelects();
-      App.showToast('Seuls les modèles Infomaniak sont activés.');
+    document.getElementById('btn-modal-fetch-gemini')?.addEventListener('click', () => {
+      this.fetchGeminiModels();
     });
 
     // Initialisation et liaison des paires de modèles (Principal / Fallback distincts)
@@ -1071,7 +1108,7 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
     }
 
     this.config.disabled_models = Array.isArray(c.disabled_models) ? [...c.disabled_models] : [];
-    this.renderModelsVisibilityList();
+    this.updateModelsSummaryBadges();
     this.renderAllModelSelects();
 
     if (c.chat_model && document.getElementById('cfg-chat-model') && this.isModelEnabled(c.chat_model)) {
@@ -1198,84 +1235,134 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
     return !this.getDisabledModels().includes(modelId);
   },
 
-  renderModelsVisibilityList() {
-    const models = this.getAllAvailableModels();
+  updateModelsSummaryBadges() {
+    const allModels = this.getAllAvailableModels();
     const disabled = this.getDisabledModels();
+    const activeCount = allModels.filter(m => !disabled.includes(m.id)).length;
+    const totalCount = allModels.length;
 
-    const geminiContainer = document.getElementById('models-list-gemini');
-    const mistralContainer = document.getElementById('models-list-mistral');
-    const infomaniakContainer = document.getElementById('models-list-infomaniak');
+    const badgeMain = document.getElementById('badge-models-active-count');
+    if (badgeMain) {
+      badgeMain.textContent = `${activeCount}/${totalCount} modèle${activeCount > 1 ? 's' : ''} actif${activeCount > 1 ? 's' : ''}`;
+    }
 
-    if (!geminiContainer || !mistralContainer || !infomaniakContainer) return;
+    const badgeModal = document.getElementById('modal-models-global-badge');
+    if (badgeModal) {
+      badgeModal.textContent = `${activeCount}/${totalCount} actif${activeCount > 1 ? 's' : ''}`;
+    }
 
-    let geminiHtml = '';
-    let mistralHtml = '';
-    let infomaniakHtml = '';
+    const footerStats = document.getElementById('models-modal-footer-stats');
+    if (footerStats) {
+      footerStats.textContent = `${activeCount} modèle(s) sélectionné(s) sur un total de ${totalCount}`;
+    }
+  },
 
-    let geminiActive = 0, geminiTotal = 0;
-    let mistralActive = 0, mistralTotal = 0;
-    let infomaniakActive = 0, infomaniakTotal = 0;
+  openModelsVisibilityModal() {
+    const modal = document.getElementById('modal-models-visibility');
+    if (!modal) return;
+    this.activeModelsModalProviderTab = 'google';
+    this.modelsModalSearchQuery = '';
+    const searchInput = document.getElementById('input-search-models');
+    if (searchInput) searchInput.value = '';
+    
+    // Switch active tab button style
+    document.querySelectorAll('#models-modal-provider-tabs .prompt-tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tabProvider === 'google');
+    });
 
-    models.forEach(m => {
+    this.renderModelsModalList();
+    modal.classList.remove('hidden');
+  },
+
+  closeModelsVisibilityModal() {
+    const modal = document.getElementById('modal-models-visibility');
+    if (modal) modal.classList.add('hidden');
+    this.save();
+    this.renderAllModelSelects();
+    this.updateModelsSummaryBadges();
+  },
+
+  switchModelsModalTab(provider) {
+    this.activeModelsModalProviderTab = provider;
+    document.querySelectorAll('#models-modal-provider-tabs .prompt-tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tabProvider === provider);
+    });
+    this.renderModelsModalList();
+  },
+
+  renderModelsModalList() {
+    const container = document.getElementById('models-modal-items-container');
+    if (!container) return;
+
+    const allModels = this.getAllAvailableModels();
+    const disabled = this.getDisabledModels();
+    const currentProvider = this.activeModelsModalProviderTab || 'google';
+    const query = (this.modelsModalSearchQuery || '').toLowerCase().trim();
+
+    // Calculer les compteurs par tab
+    const geminiModels = allModels.filter(m => m.provider === 'google');
+    const mistralModels = allModels.filter(m => m.provider === 'mistral');
+    const infomaniakModels = allModels.filter(m => m.provider === 'infomaniak');
+
+    const geminiActive = geminiModels.filter(m => !disabled.includes(m.id)).length;
+    const mistralActive = mistralModels.filter(m => !disabled.includes(m.id)).length;
+    const infomaniakActive = infomaniakModels.filter(m => !disabled.includes(m.id)).length;
+
+    const tabCountGemini = document.getElementById('tab-count-gemini');
+    if (tabCountGemini) tabCountGemini.textContent = `(${geminiActive}/${geminiModels.length})`;
+    const tabCountMistral = document.getElementById('tab-count-mistral');
+    if (tabCountMistral) tabCountMistral.textContent = `(${mistralActive}/${mistralModels.length})`;
+    const tabCountInfomaniak = document.getElementById('tab-count-infomaniak');
+    if (tabCountInfomaniak) tabCountInfomaniak.textContent = `(${infomaniakActive}/${infomaniakModels.length})`;
+
+    this.updateModelsSummaryBadges();
+
+    // Filtrer pour l'affichage actuel
+    const listToShow = allModels.filter(m => {
+      if (m.provider !== currentProvider) return false;
+      if (!query) return true;
+      return m.name.toLowerCase().includes(query) || m.id.toLowerCase().includes(query) || (m.desc && m.desc.toLowerCase().includes(query));
+    });
+
+    if (listToShow.length === 0) {
+      container.innerHTML = `
+        <div style="padding: 30px 10px; text-align: center; color: var(--text-muted); font-size: 12.5px;">
+          Aucun modèle ne correspond à votre recherche « ${query} ».
+        </div>
+      `;
+      return;
+    }
+
+    let html = '';
+    listToShow.forEach(m => {
       const isEnabled = !disabled.includes(m.id);
-      const rowHtml = `
-        <label class="model-check-item ${isEnabled ? '' : 'is-disabled-model'}" title="${m.id}">
-          <input type="checkbox" class="model-visibility-cb" data-model-id="${m.id}" ${isEnabled ? 'checked' : ''}>
+      html += `
+        <label class="model-check-item ${isEnabled ? '' : 'is-disabled-model'}" title="${m.id}" style="padding: 8px 12px; margin-bottom: 2px;">
+          <input type="checkbox" class="model-modal-visibility-cb" data-model-id="${m.id}" ${isEnabled ? 'checked' : ''}>
           <div style="flex: 1; min-width: 0;">
-            <div class="model-check-title">
-              <span>${m.name}</span>
-              ${m.isDiscovered ? '<span class="prompt-status-badge" style="font-size: 9px; padding: 1px 4px; background: rgba(59,130,246,0.15); color: #60a5fa;">API Google</span>' : ''}
+            <div class="model-check-title" style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+              <span style="font-weight: 600; font-size: 13px;">${m.name}</span>
+              <span class="model-check-id" style="font-size: 11px; opacity: 0.7; font-family: monospace;">${m.id}</span>
             </div>
-            <div class="model-check-desc">${m.desc}</div>
+            <div class="model-check-desc" style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">${m.desc}</div>
           </div>
         </label>
       `;
-
-      if (m.provider === 'google') {
-        geminiHtml += rowHtml;
-        geminiTotal++;
-        if (isEnabled) geminiActive++;
-      } else if (m.provider === 'mistral') {
-        mistralHtml += rowHtml;
-        mistralTotal++;
-        if (isEnabled) mistralActive++;
-      } else if (m.provider === 'infomaniak') {
-        infomaniakHtml += rowHtml;
-        infomaniakTotal++;
-        if (isEnabled) infomaniakActive++;
-      }
     });
 
-    geminiContainer.innerHTML = geminiHtml;
-    mistralContainer.innerHTML = mistralHtml;
-    infomaniakContainer.innerHTML = infomaniakHtml;
+    container.innerHTML = html;
 
-    // Badges de compteur
-    const badgeGemini = document.getElementById('badge-count-gemini');
-    if (badgeGemini) badgeGemini.textContent = `${geminiActive}/${geminiTotal} actif${geminiActive > 1 ? 's' : ''}`;
-    const badgeMistral = document.getElementById('badge-count-mistral');
-    if (badgeMistral) badgeMistral.textContent = `${mistralActive}/${mistralTotal} actif${mistralActive > 1 ? 's' : ''}`;
-    const badgeInfomaniak = document.getElementById('badge-count-infomaniak');
-    if (badgeInfomaniak) badgeInfomaniak.textContent = `${infomaniakActive}/${infomaniakTotal} actif${infomaniakActive > 1 ? 's' : ''}`;
-
-    const totalActive = geminiActive + mistralActive + infomaniakActive;
-    const totalAll = geminiTotal + mistralTotal + infomaniakTotal;
-    const countBadge = document.getElementById('models-visibility-count-badge');
-    if (countBadge) {
-      countBadge.textContent = `${totalActive}/${totalAll} modèle${totalActive > 1 ? 's' : ''} actif${totalActive > 1 ? 's' : ''}`;
-    }
-
-    // Écouteurs de changement sur les checkboxes
-    document.querySelectorAll('.model-visibility-cb').forEach(cb => {
+    // Listeners sur les checkboxes de la modale
+    container.querySelectorAll('.model-modal-visibility-cb').forEach(cb => {
       cb.addEventListener('change', (e) => {
         const modelId = e.target.dataset.modelId;
         const isChecked = e.target.checked;
-        this.toggleModelVisibility(modelId, isChecked);
+        this.toggleModelVisibility(modelId, isChecked, false);
       });
     });
   },
 
-  toggleModelVisibility(modelId, isChecked) {
+  toggleModelVisibility(modelId, isChecked, reRenderModal = true) {
     let disabled = this.getDisabledModels();
     if (isChecked) {
       disabled = disabled.filter(id => id !== modelId);
@@ -1286,8 +1373,14 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
     }
     this.config.disabled_models = disabled;
     this.save();
-    this.renderModelsVisibilityList();
     this.renderAllModelSelects();
+    this.updateModelsSummaryBadges();
+    if (reRenderModal) {
+      this.renderModelsModalList();
+    } else {
+      const row = document.querySelector(`.model-check-item[title="${modelId}"]`);
+      if (row) row.classList.toggle('is-disabled-model', !isChecked);
+    }
   },
 
   renderAllModelSelects() {
@@ -1364,8 +1457,8 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
   },
 
   async fetchGeminiModels() {
-    const btn = document.getElementById('btn-fetch-gemini-models');
-    const icon = document.getElementById('svg-fetch-gemini-icon');
+    const btn = document.getElementById('btn-modal-fetch-gemini');
+    const icon = document.getElementById('svg-modal-fetch-gemini-icon');
     const keyInput = document.getElementById('cfg-gemini-key');
     const apiKey = keyInput?.value?.trim() || this.config.gemini_api_key || '';
 
@@ -1382,8 +1475,9 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
       const res = await API.call('fetch_gemini_models', { api_key: apiKey });
       if (res && res.success && Array.isArray(res.models)) {
         this.discoveredGeminiModels = res.models;
-        this.renderModelsVisibilityList();
+        this.renderModelsModalList();
         this.renderAllModelSelects();
+        this.updateModelsSummaryBadges();
         App.showToast(`✓ ${res.models.length} modèles Gemini récupérés avec succès depuis Google !`);
       } else {
         App.showToast(`Erreur Google API : ${res?.error || 'Impossible de récupérer les modèles'}`);
@@ -1488,9 +1582,15 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
   getSmartFallbackModel(primaryModel, fallbackSelectEl) {
     // Ordre de priorité intelligent pour le fallback
     const defaultsOrder = [
+      'gemini-3.5-flash-lite',
+      'gemini-3.1-flash-lite',
+      'gemini-3.5-flash',
+      'gemini-3.7-flash',
+      'gemini-3.6-flash',
       'gemini-2.0-flash',
       'gemini-2.5-flash',
       'gemini-2.0-flash-lite',
+      'gemini-2.5-flash-lite',
       'gemini-1.5-flash',
       'gemini-2.5-pro',
       'gemini-1.5-pro',
