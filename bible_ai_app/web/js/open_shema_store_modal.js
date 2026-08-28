@@ -681,7 +681,7 @@ const OpenShemaStore = {
         directSection.style.display = 'none';
       }
 
-      // Résultats produits
+      // Résultats produits groupés
       if (results.length === 0) {
         resultsEl.innerHTML = `
           <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: var(--text-muted, #94a3b8);">
@@ -692,41 +692,103 @@ const OpenShemaStore = {
         return;
       }
 
-      resultsEl.innerHTML = results.map(item => `
-        <div class="ebook-card" style="display: flex; flex-direction: column; border-radius: 8px; background: var(--bg-surface-elevated, #0f172a); border: 1px solid var(--border-color, #334155); padding: 12px; transition: transform 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
-          
-          <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-            <div style="width: 55px; height: 75px; flex-shrink: 0; border-radius: 4px; background: rgba(255,255,255,0.04); overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.06);">
-              ${item.image ? `<img src="${this._escapeHtml(item.image)}" alt="Cover" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'">` : this.svgIcons.bible}
-            </div>
+      resultsEl.innerHTML = results.map(item => {
+        const isMultiple = item.offers_count > 1;
 
-            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
-              <span style="display: inline-block; align-self: flex-start; font-size: 0.68rem; font-weight: 600; padding: 1px 5px; border-radius: 3px; background: rgba(59, 130, 246, 0.15); color: #60a5fa; margin-bottom: 3px;">
-                ${this._escapeHtml(item.store_badge || item.source)}
-              </span>
-              <h4 style="margin: 0 0 3px 0; font-size: 0.85rem; font-weight: 600; line-height: 1.25; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;" title="${this._escapeHtml(item.title)}">
-                ${this._escapeHtml(item.title)}
-              </h4>
-              ${item.authors ? `<div style="font-size: 0.75rem; color: var(--text-muted, #94a3b8); margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${this._escapeHtml(item.authors)}</div>` : ''}
-              <div style="margin-top: auto; font-size: 0.72rem; color: var(--text-muted, #94a3b8); display: flex; align-items: center; gap: 4px;">
-                ${this.svgIcons.digital} <span>${this._escapeHtml(item.format || 'EPUB')}</span>
+        return `
+          <div class="ebook-card ${isMultiple ? 'is-grouped' : ''}" style="display: flex; flex-direction: column; border-radius: 8px; background: var(--bg-surface-elevated, #0f172a); border: 1px solid ${isMultiple ? 'rgba(59, 130, 246, 0.35)' : 'var(--border-color, #334155)'}; padding: 12px; transition: transform 0.2s, border-color 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+              <div style="width: 55px; height: 75px; flex-shrink: 0; border-radius: 4px; background: rgba(255,255,255,0.04); overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.06);">
+                ${item.image ? `<img src="${this._escapeHtml(item.image)}" alt="Cover" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'">` : this.svgIcons.bible}
+              </div>
+
+              <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px; flex-wrap: wrap;">
+                  ${isMultiple ? `
+                    <span style="font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; background: rgba(245, 158, 11, 0.18); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.35);">
+                      ${item.offers_count} offres comparées
+                    </span>
+                  ` : `
+                    <span style="font-size: 0.68rem; font-weight: 600; padding: 1px 5px; border-radius: 3px; background: rgba(59, 130, 246, 0.15); color: #60a5fa;">
+                      ${this._escapeHtml(item.best_store)}
+                    </span>
+                  `}
+                </div>
+
+                <h4 style="margin: 0 0 3px 0; font-size: 0.86rem; font-weight: 600; line-height: 1.25; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;" title="${this._escapeHtml(item.title)}">
+                  ${this._escapeHtml(item.title)}
+                </h4>
+                ${item.authors ? `<div style="font-size: 0.75rem; color: var(--text-muted, #94a3b8); margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${this._escapeHtml(item.authors)}</div>` : ''}
+                <div style="margin-top: auto; font-size: 0.72rem; color: var(--text-muted, #94a3b8); display: flex; align-items: center; gap: 4px;">
+                  ${this.svgIcons.digital} <span>${isMultiple ? 'Multi-librairies' : this._escapeHtml(item.format || 'EPUB')}</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06);">
-            <div style="font-size: 1rem; font-weight: 700; color: #10b981;">
-              ${this._escapeHtml(item.price)}
+            <!-- Prix principal & Bouton action -->
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06);">
+              <div style="font-size: 1rem; font-weight: 700; color: #10b981;">
+                ${this._escapeHtml(item.price_display)}
+              </div>
+
+              ${isMultiple ? `
+                <button class="btn-toggle-offers-drawer" style="display: flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 5px; background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                  <span>Comparer les prix (${item.offers_count}) ▾</span>
+                </button>
+              ` : `
+                <button class="btn-buy-ebook-link" data-url="${this._escapeHtml(item.direct_url)}" style="display: flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 5px; background: #2563eb; color: #fff; border: none; font-size: 0.78rem; font-weight: 500; cursor: pointer;" title="Ouvrir la page de la librairie">
+                  <span>Acheter / Voir</span>
+                  ${this.svgIcons.external}
+                </button>
+              `}
             </div>
-            <button class="btn-buy-ebook-link" data-url="${this._escapeHtml(item.url)}" style="display: flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 5px; background: #2563eb; color: #fff; border: none; font-size: 0.78rem; font-weight: 500; cursor: pointer;" title="Ouvrir la page de la librairie">
-              <span>Acheter / Voir</span>
-              ${this.svgIcons.external}
-            </button>
+
+            <!-- Volet déroulant comparateur d'offres (si multiple) -->
+            ${isMultiple ? `
+              <div class="offers-drawer" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.12); flex-direction: column; gap: 6px;">
+                <div style="font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted, #94a3b8); font-weight: 600; margin-bottom: 2px;">
+                  Offres disponibles par librairie :
+                </div>
+                ${item.offers.map((off, idx) => `
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-radius: 5px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); font-size: 0.78rem;">
+                    <div style="display: flex; flex-direction: column; gap: 1px; min-width: 0;">
+                      <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="font-weight: 600; color: #f8fafc;">${this._escapeHtml(off.store_badge)}</span>
+                        ${idx === 0 ? `<span style="font-size: 0.62rem; padding: 1px 4px; border-radius: 3px; background: rgba(16, 185, 129, 0.2); color: #10b981; font-weight: 700;">Meilleur prix</span>` : ''}
+                      </div>
+                      <span style="font-size: 0.68rem; color: var(--text-muted, #94a3b8);">${this._escapeHtml(off.format)}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="font-weight: 700; color: ${idx === 0 ? '#10b981' : '#f8fafc'}; font-size: 0.88rem;">${this._escapeHtml(off.price)}</span>
+                      <button class="btn-buy-ebook-link" data-url="${this._escapeHtml(off.url)}" style="display: flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 4px; background: #2563eb; color: #fff; border: none; font-size: 0.72rem; cursor: pointer;" title="Acheter sur ${this._escapeHtml(off.store_badge)}">
+                        <span>Acheter</span>
+                        ${this.svgIcons.external}
+                      </button>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+
           </div>
+        `;
+      }).join('');
 
-        </div>
-      `).join('');
+      // Toggle des volets déroulants
+      resultsEl.querySelectorAll('.btn-toggle-offers-drawer').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const card = btn.closest('.ebook-card');
+          const drawer = card.querySelector('.offers-drawer');
+          if (!drawer) return;
+          const isExpanded = drawer.style.display === 'flex';
+          drawer.style.display = isExpanded ? 'none' : 'flex';
+          btn.querySelector('span').textContent = isExpanded ? `Comparer les prix ▾` : `Masquer les offres ▴`;
+        });
+      });
 
+      // Écouteurs pour tous les boutons d'achat
       resultsEl.querySelectorAll('.btn-buy-ebook-link').forEach(btn => {
         btn.addEventListener('click', () => {
           const url = btn.getAttribute('data-url');

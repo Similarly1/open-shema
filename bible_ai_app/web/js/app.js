@@ -64,8 +64,8 @@ const App = {
       btn.addEventListener('click', (e) => {
         const group = btn.closest('.nav-item-group');
 
-        // Cas 1 : Clic spécifique sur la flèche / chevron pour replier ou déplier
-        if (e.target.closest('.nav-chevron') && group) {
+        // Cas 1 : Clic spécifique sur la flèche / bouton chevron pour replier ou déplier sans changer de page
+        if ((e.target.closest('.nav-chevron-btn') || e.target.closest('.nav-chevron')) && group) {
           e.stopPropagation();
           e.preventDefault();
           group.classList.toggle('open');
@@ -111,6 +111,13 @@ const App = {
 
         this.switchView(viewId);
       });
+    });
+
+    // Écouteur direct supplémentaire sur le bouton flèche pour une réactivité totale
+    document.getElementById('btn-toggle-sermons-menu')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      document.getElementById('group-nav-sermons')?.classList.toggle('open');
     });
 
     // Bouton À propos & Crédits du footer

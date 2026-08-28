@@ -217,18 +217,105 @@ class EbookFinderManager:
             }
         ]
 
+    def normalize_title_key(self, title: str) -> str:
+        """Crée une clé canonique normalisée pour regrouper les titres identiques."""
+        import unicodedata
+        cleaned = self.clean_ebook_title(title)
+        nfkd = unicodedata.normalize('NFKD', cleaned)
+        ascii_text = ''.join([c for c in nfkd if not unicodedata.combining(c)]).lower()
+        alpha_only = re.sub(r'[^a-z0-9]', '', ascii_text)
+        return alpha_only
+
+    def group_ebook_results(self, items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Regroupe les e-books identiques provenant de différentes librairies.
+        Chaque groupe contient la liste des offres triées du prix le plus bas au plus cher.
+        """
+        groups: Dict[str, Dict[str, Any]] = {}
+
+        for it in items:
+            title = it.get('title', '')
+            key = self.normalize_title_key(title)
+            if not key:
+                key = str(hash(it.get('url', '')))
+
+            if key not in groups:
+                groups[key] = {
+                    'group_id': key,
+                    'title': self.clean_ebook_title(title),
+                    'authors': it.get('authors', ''),
+                    'image': it.get('image', ''),
+                    'offers': []
+                }
+
+            if not groups[key]['image'] and it.get('image'):
+                groups[key]['image'] = it.get('image')
+            if not groups[key]['authors'] and it.get('authors'):
+                groups[key]['authors'] = it.get('authors')
+
+            # Éviter les doublons exacts d'URL ou même store+prix
+            is_dup = any(
+                o.get('url') == it.get('url') or 
+                (o.get('store_badge') == it.get('store_badge') and o.get('price_raw') == it.get('price_raw'))
+                for o in groups[key]['offers']
+            )
+            if not is_dup:
+                groups[key]['offers'].append({
+                    'source': it.get('source', ''),
+                    'store_badge': it.get('store_badge', it.get('source', '')),
+                    'price': it.get('price', 'N/C'),
+                    'price_raw': it.get('price_raw', 0.0),
+                    'format': it.get('format', 'EPUB'),
+                    'url': it.get('url', ''),
+                    'image': it.get('image', '')
+                })
+
+        result_groups = []
+        for g in groups.values():
+            offers = g['offers']
+            # Trier les offres de la moins chère à la plus chère
+            offers.sort(key=lambda o: (o['price_raw'] == 0, o['price_raw']))
+
+            prices_raw = [o['price_raw'] for o in offers if o['price_raw'] > 0]
+            min_price = min(prices_raw) if prices_raw else 0.0
+            max_price = max(prices_raw) if prices_raw else 0.0
+
+            g['min_price_raw'] = min_price
+            g['max_price_raw'] = max_price
+            g['offers_count'] = len(offers)
+
+            if len(offers) == 1:
+                g['price_display'] = offers[0]['price']
+                g['best_store'] = offers[0]['store_badge']
+                g['direct_url'] = offers[0]['url']
+                g['format'] = offers[0]['format']
+            else:
+                if min_price > 0:
+                    g['price_display'] = f"Dès {min_price:.2f} €"
+                else:
+                    g['price_display'] = "Disponible"
+                g['best_store'] = offers[0]['store_badge']
+                g['direct_url'] = offers[0]['url']
+                g['format'] = f"{len(offers)} offres"
+
+            result_groups.append(g)
+
+        # Trier les groupes : les prix les plus bas en premier
+        result_groups.sort(key=lambda x: (x['min_price_raw'] == 0, x['min_price_raw']))
+        return result_groups
+
     def search_all_ebooks(self, query: str) -> Dict[str, Any]:
         """
         Effectue une recherche unifiée et parallèle sur toutes les plateformes.
-        Renvoie une liste de produits e-books directs et les liens de recherche rapide.
+        Renvoie les groupes d'e-books dédoublonnés et les liens de recherche rapide.
         """
         clean_q = query.strip()
         if not clean_q:
-            return {'results': [], 'direct_links': [], 'query': ''}
+            return {'results': [], 'direct_links': [], 'query': '', 'count': 0, 'raw_count': 0}
 
         direct_products: List[Dict[str, Any]] = []
 
-        # Exécution en parallèle via ThreadPoolExecutor pour une réponse ultra-rapide (< 1s)
+        # Exécution en parallèle via ThreadPoolExecutor (< 1s)
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
             future_to_store = {
                 executor.submit(self._query_shopify_store, store, clean_q): store['name']
@@ -249,14 +336,14 @@ class EbookFinderManager:
             except Exception:
                 pass
 
-        # Tri des résultats : les prix renseignés en premier, triés par pertinence / prix
-        direct_products.sort(key=lambda x: (x['price_raw'] == 0, x['price_raw']))
-
+        # Regroupement intelligent des doublons
+        grouped_results = self.group_ebook_results(direct_products)
         direct_links = self.get_direct_store_links(clean_q)
 
         return {
             'query': clean_q,
-            'count': len(direct_products),
-            'results': direct_products,
+            'count': len(grouped_results),
+            'raw_count': len(direct_products),
+            'results': grouped_results,
             'direct_links': direct_links
         }
