@@ -2233,10 +2233,91 @@
                 </div>
               </div>
 
+              <!-- Carte Gestion des Modèles Visibles & Quotas -->
+              <div class="settings-card" id="card-models-visibility-manager" style="margin-bottom: 20px;">
+                <div class="card-title" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-blue);">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <span>Modèles Actifs &amp; Visibilité (Filtre Quotas RPD)</span>
+                  </div>
+                  <button type="button" class="btn-secondary btn-sm" id="btn-fetch-gemini-models" style="font-size: 11.5px; padding: 4px 10px; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg id="svg-fetch-gemini-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+                    </svg>
+                    <span>Actualiser depuis Google</span>
+                  </button>
+                </div>
+                <p class="card-desc" style="margin-bottom: 12px;">
+                  Cochez uniquement les modèles disponibles sur vos abonnements ou quotas (décocher les modèles à 0 RPD dans Google AI Studio). Seuls les modèles activés apparaîtront dans vos menus déroulants.
+                </p>
+
+                <!-- Actions rapides -->
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.08));">
+                  <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <span style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Sélection rapide :</span>
+                    <button type="button" class="btn-ghost btn-xs" id="btn-models-enable-all" style="font-size: 11px; padding: 2px 8px;">Tout activer</button>
+                    <button type="button" class="btn-ghost btn-xs" id="btn-models-enable-gemini" style="font-size: 11px; padding: 2px 8px;">Gemini uniquement</button>
+                    <button type="button" class="btn-ghost btn-xs" id="btn-models-enable-mistral" style="font-size: 11px; padding: 2px 8px;">Mistral uniquement</button>
+                    <button type="button" class="btn-ghost btn-xs" id="btn-models-enable-infomaniak" style="font-size: 11px; padding: 2px 8px;">Infomaniak uniquement</button>
+                  </div>
+                  <div id="models-visibility-count-badge" style="font-size: 11px; font-weight: 600; color: var(--accent-blue); background: rgba(59, 130, 246, 0.1); padding: 2px 8px; border-radius: 12px;">
+                    0 modèle(s) actif(s)
+                  </div>
+                </div>
+
+                <!-- Grille des 3 Providers -->
+                <div class="models-visibility-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px;">
+                  <!-- Groupe 1 : Google Gemini -->
+                  <div class="models-provider-col" style="background: var(--bg-card-subtle, rgba(255,255,255,0.02)); border: 1px solid var(--border-color, rgba(255,255,255,0.06)); border-radius: 8px; padding: 12px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.06));">
+                      <strong style="font-size: 12px; color: #60a5fa; display: flex; align-items: center; gap: 6px;">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                        <span>Google Gemini</span>
+                      </strong>
+                      <span class="provider-active-badge" id="badge-count-gemini" style="font-size: 10px; color: var(--text-muted);">0 actif</span>
+                    </div>
+                    <div id="models-list-gemini" class="models-checklist" style="display: flex; flex-direction: column; gap: 6px; max-height: 280px; overflow-y: auto;">
+                      <!-- Rendu dynamique -->
+                    </div>
+                  </div>
+
+                  <!-- Groupe 2 : Mistral AI -->
+                  <div class="models-provider-col" style="background: var(--bg-card-subtle, rgba(255,255,255,0.02)); border: 1px solid var(--border-color, rgba(255,255,255,0.06)); border-radius: 8px; padding: 12px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.06));">
+                      <strong style="font-size: 12px; color: #f97316; display: flex; align-items: center; gap: 6px;">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                        <span>Mistral AI</span>
+                      </strong>
+                      <span class="provider-active-badge" id="badge-count-mistral" style="font-size: 10px; color: var(--text-muted);">0 actif</span>
+                    </div>
+                    <div id="models-list-mistral" class="models-checklist" style="display: flex; flex-direction: column; gap: 6px; max-height: 280px; overflow-y: auto;">
+                      <!-- Rendu dynamique -->
+                    </div>
+                  </div>
+
+                  <!-- Groupe 3 : Infomaniak Swiss AI -->
+                  <div class="models-provider-col" style="background: var(--bg-card-subtle, rgba(255,255,255,0.02)); border: 1px solid var(--border-color, rgba(255,255,255,0.06)); border-radius: 8px; padding: 12px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.06));">
+                      <strong style="font-size: 12px; color: #34d399; display: flex; align-items: center; gap: 6px;">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                        <span>Infomaniak Swiss AI</span>
+                      </strong>
+                      <span class="provider-active-badge" id="badge-count-infomaniak" style="font-size: 10px; color: var(--text-muted);">0 actif</span>
+                    </div>
+                    <div id="models-list-infomaniak" class="models-checklist" style="display: flex; flex-direction: column; gap: 6px; max-height: 280px; overflow-y: auto;">
+                      <!-- Rendu dynamique -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div class="settings-card">
                 <div class="card-title" style="display: flex; align-items: center; justify-content: space-between;">
                   <span>Modèles d'Intelligence Artificielle</span>
-                  <span style="font-size: 11.5px; font-weight: 500; color: var(--text-secondary);">20 modèles (Gemini, Mistral, Infomaniak)</span>
+                  <span style="font-size: 11.5px; font-weight: 500; color: var(--text-secondary);">Assignation par fonctionnalité</span>
                 </div>
                 <p class="card-desc" style="margin-bottom: 16px;">Configurez le modèle principal et le modèle de secours (fallback automatique) pour chaque fonctionnalité exégétique.</p>
               
@@ -2254,14 +2335,13 @@
                       <label for="cfg-chat-model">Modèle principal :</label>
                       <select id="cfg-chat-model" class="select-field full-w ai-model-select" data-pair="chat">
                         <optgroup label="── Google Gemini ──">
-                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash (Recommandé)</option>
-                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
-                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
-                          <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
-                          <option value="gemini-3-flash">Google Gemini 3.0 Flash</option>
+                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash (Recommandé)</option>
                           <option value="gemini-2.5-pro">Google Gemini 2.5 Pro (Haute précision)</option>
-                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
-                          <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
+                          <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
+                          <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
+                          <option value="gemini-1.5-flash">Google Gemini 1.5 Flash</option>
+                          <option value="gemini-1.5-pro">Google Gemini 1.5 Pro</option>
+                          <option value="gemini-1.5-flash-8b">Google Gemini 1.5 Flash 8B</option>
                         </optgroup>
                         <optgroup label="── Mistral AI ──">
                           <option value="mistral-large-latest">Mistral Large (Approfondi)</option>
@@ -2285,14 +2365,12 @@
                       <label for="cfg-chat-fallback-model">Modèle de secours (Fallback) :</label>
                       <select id="cfg-chat-fallback-model" class="select-field full-w ai-model-select" data-pair="chat">
                         <optgroup label="── Google Gemini ──">
-                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
-                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
-                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
-                          <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
-                          <option value="gemini-3-flash">Google Gemini 3.0 Flash</option>
-                          <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
+                          <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
                           <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
-                          <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
+                          <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
+                          <option value="gemini-1.5-flash">Google Gemini 1.5 Flash</option>
+                          <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
+                          <option value="gemini-1.5-pro">Google Gemini 1.5 Pro</option>
                         </optgroup>
                         <optgroup label="── Mistral AI ──">
                           <option value="mistral-large-latest">Mistral Large</option>
@@ -2329,14 +2407,12 @@
                       <label for="cfg-synthesis-model">Modèle principal :</label>
                       <select id="cfg-synthesis-model" class="select-field full-w ai-model-select" data-pair="synthesis">
                         <optgroup label="── Google Gemini ──">
-                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash (Recommandé)</option>
-                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
-                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
-                          <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
-                          <option value="gemini-3-flash">Google Gemini 3.0 Flash</option>
+                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash (Recommandé)</option>
                           <option value="gemini-2.5-pro">Google Gemini 2.5 Pro (Haute précision)</option>
-                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
-                          <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
+                          <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
+                          <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
+                          <option value="gemini-1.5-flash">Google Gemini 1.5 Flash</option>
+                          <option value="gemini-1.5-pro">Google Gemini 1.5 Pro</option>
                         </optgroup>
                         <optgroup label="── Mistral AI ──">
                           <option value="mistral-large-latest">Mistral Large (Approfondi)</option>
@@ -2360,14 +2436,11 @@
                       <label for="cfg-synthesis-fallback-model">Modèle de secours (Fallback) :</label>
                       <select id="cfg-synthesis-fallback-model" class="select-field full-w ai-model-select" data-pair="synthesis">
                         <optgroup label="── Google Gemini ──">
-                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
-                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
-                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
-                          <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
-                          <option value="gemini-3-flash">Google Gemini 3.0 Flash</option>
-                          <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
+                          <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
                           <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
-                          <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
+                          <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
+                          <option value="gemini-1.5-flash">Google Gemini 1.5 Flash</option>
+                          <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
                         </optgroup>
                         <optgroup label="── Mistral AI ──">
                           <option value="mistral-large-latest">Mistral Large</option>
@@ -2414,14 +2487,12 @@
                       <label for="cfg-translation-model">Modèle principal :</label>
                       <select id="cfg-translation-model" class="select-field full-w ai-model-select" data-pair="translation">
                         <optgroup label="── Google Gemini ──">
-                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite (Recommandé)</option>
-                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
-                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
-                          <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
-                          <option value="gemini-3-flash">Google Gemini 3.0 Flash</option>
-                          <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
-                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
+                          <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite (Recommandé)</option>
                           <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
+                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
+                          <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
+                          <option value="gemini-1.5-flash">Google Gemini 1.5 Flash</option>
+                          <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
                         </optgroup>
                         <optgroup label="── Mistral AI ──">
                           <option value="mistral-small-latest">Mistral Small (Rapide)</option>
@@ -2445,14 +2516,11 @@
                       <label for="cfg-translation-fallback-model">Modèle de secours (Fallback) :</label>
                       <select id="cfg-translation-fallback-model" class="select-field full-w ai-model-select" data-pair="translation">
                         <optgroup label="── Google Gemini ──">
-                          <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
-                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
-                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
-                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
-                          <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
-                          <option value="gemini-3-flash">Google Gemini 3.0 Flash</option>
-                          <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
+                          <option value="gemini-1.5-flash">Google Gemini 1.5 Flash</option>
+                          <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
                           <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
+                          <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
+                          <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
                         </optgroup>
                         <optgroup label="── Mistral AI ──">
                           <option value="mistral-small-latest">Mistral Small</option>
@@ -2468,7 +2536,6 @@
                           <option value="swiss-ai/Apertus-v1.5-70B">Infomaniak Apertus 70B</option>
                           <option value="google/gemma-4-31B-it">Infomaniak Gemma 31B</option>
                           <option value="moonshotai/Kimi-K2.6">Infomaniak Kimi K2.6</option>
-                          <option value="nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8">Infomaniak Nemotron 30B</option>
                         </optgroup>
                       </select>
                     </div>
@@ -2489,14 +2556,11 @@
                       <label for="cfg-summary-model">Modèle principal :</label>
                       <select id="cfg-summary-model" class="select-field full-w ai-model-select" data-pair="summary">
                         <optgroup label="── Google Gemini ──">
-                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash (Recommandé)</option>
-                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
-                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
-                          <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
-                          <option value="gemini-3-flash">Google Gemini 3.0 Flash</option>
+                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash (Recommandé)</option>
                           <option value="gemini-2.5-pro">Google Gemini 2.5 Pro (Haute précision)</option>
-                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
-                          <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
+                          <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
+                          <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
+                          <option value="gemini-1.5-flash">Google Gemini 1.5 Flash</option>
                         </optgroup>
                         <optgroup label="── Mistral AI ──">
                           <option value="mistral-large-latest">Mistral Large (Approfondi)</option>
@@ -2520,14 +2584,11 @@
                       <label for="cfg-summary-fallback-model">Modèle de secours (Fallback) :</label>
                       <select id="cfg-summary-fallback-model" class="select-field full-w ai-model-select" data-pair="summary">
                         <optgroup label="── Google Gemini ──">
+                          <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
                           <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
-                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
-                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
-                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
-                          <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
-                          <option value="gemini-3-flash">Google Gemini 3.0 Flash</option>
+                          <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
+                          <option value="gemini-1.5-flash">Google Gemini 1.5 Flash</option>
                           <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
-                          <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
                         </optgroup>
                         <optgroup label="── Mistral AI ──">
                           <option value="mistral-small-latest">Mistral Small</option>
@@ -2574,12 +2635,11 @@
                       <label for="cfg-title-model">Modèle principal (Titres) :</label>
                       <select id="cfg-title-model" class="select-field full-w ai-model-select" data-pair="title">
                         <optgroup label="── Google Gemini ──">
-                          <option value="gemini-2.5-flash-lite" selected>Google Gemini 2.5 Flash Lite (Ultra-rapide, Recommandé)</option>
+                          <option value="gemini-2.0-flash-lite" selected>Google Gemini 2.0 Flash Lite (Ultra-rapide, Recommandé)</option>
+                          <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
                           <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
-                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
-                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
-                          <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
-                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
+                          <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
+                          <option value="gemini-1.5-flash">Google Gemini 1.5 Flash</option>
                           <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
                         </optgroup>
                         <optgroup label="── Mistral AI ──">
@@ -2602,10 +2662,10 @@
                       <select id="cfg-title-fallback-model" class="select-field full-w ai-model-select" data-pair="title">
                         <optgroup label="── Google Gemini ──">
                           <option value="gemini-2.5-flash" selected>Google Gemini 2.5 Flash</option>
+                          <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
                           <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
-                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
-                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
-                          <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
+                          <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
+                          <option value="gemini-1.5-flash">Google Gemini 1.5 Flash</option>
                         </optgroup>
                         <optgroup label="── Mistral AI ──">
                           <option value="mistral-small-latest">Mistral Small</option>
@@ -2633,12 +2693,11 @@
                       <label for="cfg-notes-ai-model">Modèle principal (Notes) :</label>
                       <select id="cfg-notes-ai-model" class="select-field full-w ai-model-select" data-pair="notes">
                         <optgroup label="── Google Gemini ──">
-                          <option value="gemini-2.5-flash-lite" selected>Google Gemini 2.5 Flash Lite (Ultra-rapide, Recommandé)</option>
+                          <option value="gemini-2.0-flash-lite" selected>Google Gemini 2.0 Flash Lite (Ultra-rapide, Recommandé)</option>
+                          <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
                           <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
-                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
-                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
-                          <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
-                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
+                          <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
+                          <option value="gemini-1.5-flash">Google Gemini 1.5 Flash</option>
                           <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
                         </optgroup>
                         <optgroup label="── Mistral AI ──">
@@ -2661,10 +2720,10 @@
                       <select id="cfg-notes-ai-fallback-model" class="select-field full-w ai-model-select" data-pair="notes">
                         <optgroup label="── Google Gemini ──">
                           <option value="gemini-2.5-flash" selected>Google Gemini 2.5 Flash</option>
+                          <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
                           <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
-                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
-                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
-                          <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
+                          <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
+                          <option value="gemini-1.5-flash">Google Gemini 1.5 Flash</option>
                         </optgroup>
                         <optgroup label="── Mistral AI ──">
                           <option value="mistral-small-latest">Mistral Small</option>
@@ -3528,11 +3587,11 @@
                       <optgroup label="── Google Gemini ──">
                         <option value="gemini-2.5-flash" selected>Gemini 2.5 Flash (Recommandé)</option>
                         <option value="gemini-2.5-pro">Gemini 2.5 Pro (Haute précision)</option>
-                        <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>
-                        <option value="gemini-3.5-flash">Gemini 3.5 Flash</option>
-                        <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash Lite</option>
-                        <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash Lite</option>
-                        <option value="gemini-3.7-flash">Gemini 3.7 Flash</option>
+                        <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+                        <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash Lite</option>
+                        <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                        <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                        <option value="gemini-1.5-flash-8b">Gemini 1.5 Flash 8B</option>
                       </optgroup>
                       <optgroup label="── Mistral AI ──">
                         <option value="mistral-large-latest">Mistral Large (Approfondi)</option>

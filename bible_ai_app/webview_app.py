@@ -9,6 +9,7 @@ import zipfile
 import datetime
 import threading
 import logging
+import requests
 
 logger = logging.getLogger("webview_app")
 
@@ -3027,6 +3028,75 @@ class BibleAppApi:
         raw = load_config()
         self.config = load_secrets_into_config(raw)
         return True
+
+    def fetch_gemini_models(self, api_key: Optional[str] = None) -> Dict[str, Any]:
+        """Interroge l'API Google Gemini pour obtenir la liste en temps réel des modèles supportant generateContent."""
+        key = api_key or self.config.get("gemini_api_key", "")
+        if not key:
+            raw = load_config()
+            cfg_secrets = load_secrets_into_config(raw)
+            key = cfg_secrets.get("gemini_api_key", "")
+        
+        if not key or not key.strip():
+            return {"success": False, "error": "Clé API Google Gemini non renseignée. Veuillez d'abord saisir votre clé API Google dans le champ ci-dessus."}
+        
+        key = key.strip()
+        url = f"https://generativelanguage.googleapis.com/v1beta/models?key={key}"
+        try:
+            resp = requests.get(url, timeout=12)
+            if resp.status_code != 200:
+                err_msg = f"Erreur Google ({resp.status_code})"
+                try:
+                    err_json = resp.json()
+                    if "error" in err_json and "message" in err_json["error"]:
+                        err_msg = f"Google API : {err_json['error']['message']}"
+                except Exception:
+                    pass
+                return {"success": False, "error": err_msg}
+            
+            data = resp.json()
+            raw_models = data.get("models", [])
+            valid_models = []
+            
+            for m in raw_models:
+                methods = m.get("supportedGenerationMethods", [])
+                if "generateContent" in methods:
+                    m_name = m.get("name", "")
+                    m_id = m_name.replace("models/", "")
+                    m_id_low = m_id.lower()
+                    # Ignorer les modèles spécialisés (audio/tts, computer-use, image generation, embedding, aqa)
+                    if any(bad in m_id_low for bad in ["embedding", "aqa", "-tts", "computer-use", "-image", "imagen", "robotics"]):
+                        continue
+                    
+                    display_name = m.get("displayName", m_id)
+                    description = m.get("description", "")
+                    input_limit = m.get("inputTokenLimit", 0)
+                    output_limit = m.get("outputTokenLimit", 0)
+                    
+                    valid_models.append({
+                        "id": m_id,
+                        "name": display_name,
+                        "description": description,
+                        "inputTokenLimit": input_limit,
+                        "outputTokenLimit": output_limit
+                    })
+            
+            # Trier de façon ergonomique : 2.5 d'abord, puis 2.0, puis 1.5, etc.
+            def model_sort_key(item):
+                i_id = item["id"].lower()
+                if "2.5" in i_id:
+                    return (1, i_id)
+                elif "2.0" in i_id:
+                    return (2, i_id)
+                elif "1.5" in i_id:
+                    return (3, i_id)
+                return (4, i_id)
+            
+            valid_models.sort(key=model_sort_key)
+            return {"success": True, "models": valid_models}
+        except Exception as e:
+            logger.exception(f"Erreur fetch_gemini_models: {e}")
+            return {"success": False, "error": str(e)}
 
     # =========================================================================
     # 4. STEPBIBLE & DICTIONNAIRES

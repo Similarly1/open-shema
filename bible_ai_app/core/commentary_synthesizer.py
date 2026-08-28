@@ -118,7 +118,7 @@ class CommentarySynthesizer:
         notes_context = NotesManager.build_ai_notes_context(passage_ref=ref_label, question="Synthèse des commentaires", config=config)
 
         # 5. Sélection du modèle LLM final
-        target_model = model or config.get("synthesis_model") or config.get("chat_model") or "gemini-3.7-flash"
+        target_model = model or config.get("synthesis_model") or config.get("chat_model") or "gemini-2.5-flash"
         gemini_key = config.get("gemini_api_key", "")
         mistral_key = config.get("mistral_api_key", "")
         infomaniak_token = config.get("infomaniak_token", "")

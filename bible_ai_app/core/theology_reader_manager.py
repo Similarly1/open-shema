@@ -687,7 +687,7 @@ class TheologyReaderManager:
         # Limiter le contexte à 25 000 caractères pour ne pas saturer la fenêtre
         text_excerpt = raw_text[:25000]
 
-        selected_model = model or cfg.get("chat_model", "gemini-3.7-flash")
+        selected_model = model or cfg.get("chat_model", "gemini-2.5-flash")
 
         system_prompt = (
             "Tu es un théologien et universitaire de haut niveau, expert en exégèse, théologie systématique et pastorale.\n"

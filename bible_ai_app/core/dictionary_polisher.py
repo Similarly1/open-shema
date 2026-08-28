@@ -69,9 +69,10 @@ AVAILABLE_POLISH_MODELS = [
     # Google Gemini
     ("gemini-2.5-flash", "Gemini 2.5 Flash (Google)"),
     ("gemini-2.5-flash-lite", "Gemini 2.5 Flash-Lite (Google)"),
-    ("gemini-3.7-flash", "Gemini 3.7 Flash (Google)"),
-    ("gemini-3.5-flash", "Gemini 3.5 Flash (Google)"),
-    ("gemini-3.5-flash-lite", "Gemini 3.5 Flash-Lite (Google)"),
+    ("gemini-2.0-flash", "Gemini 2.0 Flash (Google)"),
+    ("gemini-2.0-flash-lite", "Gemini 2.0 Flash-Lite (Google)"),
+    ("gemini-1.5-flash", "Gemini 1.5 Flash (Google)"),
+    ("gemini-2.5-pro", "Gemini 2.5 Pro (Google)"),
     
     # Mistral AI
     ("mistral-small-latest", "Mistral Small (Mistral AI)"),

@@ -20,12 +20,12 @@ except ImportError:
 class GeminiClient:
     CHAT_CASCADE = [
         "gemini-2.5-flash",
-        "gemini-3.5-flash",
-        "gemini-2.5-flash-lite",
-        "gemini-3.5-flash-lite",
         "gemini-2.5-pro",
-        "gemini-3.1-flash-lite",
-        "gemini-3.7-flash"
+        "gemini-2.0-flash",
+        "gemini-2.0-flash-lite",
+        "gemini-1.5-flash",
+        "gemini-1.5-pro",
+        "gemini-1.5-flash-8b"
     ]
     
     EMBEDDING_MODELS = [
@@ -246,7 +246,7 @@ class InfomaniakClient:
         return all_embeddings
 
 class LLMClient:
-    def __init__(self, api_key, model="gemini-3.7-flash", provider="gemini", product_id=None):
+    def __init__(self, api_key, model="gemini-2.5-flash", provider="gemini", product_id=None):
         self.api_key = api_key
         self.model = model
         self.provider = provider

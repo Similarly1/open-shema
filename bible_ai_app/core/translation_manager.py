@@ -8,15 +8,14 @@ from ai.llm_client import LLMClient
 logger = logging.getLogger(__name__)
 
 AVAILABLE_TRANSLATION_MODELS: List[Tuple[str, str]] = [
-    # Google Gemini Flash-Lite (Recommandé pour 500 req/jour)
-    ("gemini-3.5-flash-lite", "Gemini 3.5 Flash-Lite (500 req/j - Recommandé)"),
-    ("gemini-2.5-flash-lite", "Gemini 2.5 Flash-Lite (500 req/j)"),
-    ("gemini-3.1-flash-lite", "Gemini 3.1 Flash-Lite (500 req/j)"),
-    
-    # Google Gemini Flash
-    ("gemini-3.7-flash", "Gemini 3.7 Flash (Google)"),
-    ("gemini-3.5-flash", "Gemini 3.5 Flash (Google)"),
-    ("gemini-2.5-flash", "Gemini 2.5 Flash (Google)"),
+    # Google Gemini Flash-Lite & Flash
+    ("gemini-2.0-flash-lite", "Gemini 2.0 Flash Lite (Ultra-rapide - Recommandé)"),
+    ("gemini-2.5-flash-lite", "Gemini 2.5 Flash Lite"),
+    ("gemini-2.5-flash", "Gemini 2.5 Flash (Équilibré)"),
+    ("gemini-2.0-flash", "Gemini 2.0 Flash"),
+    ("gemini-1.5-flash", "Gemini 1.5 Flash (Stable)"),
+    ("gemini-2.5-pro", "Gemini 2.5 Pro (Haute précision)"),
+    ("gemini-1.5-pro", "Gemini 1.5 Pro"),
     
     # Mistral AI
     ("mistral-small-latest", "Mistral Small (Mistral AI)"),
@@ -200,7 +199,7 @@ class TranslationManager:
         if not text or not text.strip():
             return text
 
-        clean_model = model or config.get("translation_model", "gemini-3.5-flash-lite")
+        clean_model = model or config.get("translation_model", "gemini-2.0-flash-lite")
         models_to_try = [clean_model]
         fallback_model = config.get("translation_fallback_model")
         if fallback_model and fallback_model != clean_model:

@@ -1,7 +1,7 @@
 {
     "mistral_api_key": "",
     "embedding_provider": "local",
-    "chat_model": "gemini-3.7-flash",
+    "chat_model": "gemini-2.5-flash",
     "font_family": "Georgia",
     "font_size": 24,
     "show_headings": true,

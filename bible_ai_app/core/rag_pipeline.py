@@ -423,7 +423,7 @@ class RAGPipeline:
                 "- Répondez avec clarté, profondeur et rigueur académique."
             )
         
-        selected_model = chat_model or self.config.get("chat_model", "gemini-3.7-flash")
+        selected_model = chat_model or self.config.get("chat_model", "gemini-2.5-flash")
         provider = "infomaniak" if ("infomaniak" in selected_model.lower() or "ministral" in selected_model.lower() or "qwen" in selected_model.lower()) else ("mistral" if "mistral" in selected_model else "gemini")
         api_key = self.config.get(f"{provider}_api_key" if provider != "infomaniak" else "infomaniak_token", "")
         product_id = self.config.get("infomaniak_product_id", "251") if provider == "infomaniak" else None

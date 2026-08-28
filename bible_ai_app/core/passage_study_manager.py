@@ -1006,7 +1006,7 @@ CONSIGNES STRICTES :
         user_prompt = prompts.get(insight_type, prompts["structure"])
 
         cfg = load_config()
-        active_model = model or cfg.get("chat_model", "gemini-3.7-flash")
+        active_model = model or cfg.get("chat_model", "gemini-2.5-flash")
 
         # Résolution du provider et de la clé API
         if "mistral" in active_model.lower():
@@ -1026,7 +1026,7 @@ CONSIGNES STRICTES :
             if cfg.get("gemini_api_key"):
                 provider = "gemini"
                 api_key = cfg.get("gemini_api_key")
-                active_model = "gemini-3.7-flash"
+                active_model = "gemini-2.5-flash"
             elif cfg.get("mistral_api_key"):
                 provider = "mistral"
                 api_key = cfg.get("mistral_api_key")

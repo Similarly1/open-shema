@@ -260,11 +260,17 @@ const AIStudyView = {
   async loadDefaultModelFromConfig() {
     try {
       const cfg = await API.call('get_config');
-      if (cfg && cfg.chat_model) {
-        const modelSelect = document.getElementById('ai-opt-model');
-        if (modelSelect) {
-          const opt = modelSelect.querySelector(`option[value="${cfg.chat_model}"]`);
-          if (opt) modelSelect.value = cfg.chat_model;
+      if (cfg) {
+        if (typeof SettingsView !== 'undefined' && SettingsView.renderAllModelSelects) {
+          SettingsView.config = cfg;
+          SettingsView.renderAllModelSelects();
+        }
+        if (cfg.chat_model) {
+          const modelSelect = document.getElementById('ai-opt-model');
+          if (modelSelect) {
+            const opt = modelSelect.querySelector(`option[value="${cfg.chat_model}"]`);
+            if (opt) modelSelect.value = cfg.chat_model;
+          }
         }
       }
     } catch (e) {

@@ -146,8 +146,8 @@ class AISessionManager:
         )
         
         try:
-            # Modèle rapide pour la synthèse (Gemini 3.7 Flash par défaut)
-            model_to_use = cfg.get("chat_model") or "gemini-3.7-flash"
+            # Modèle rapide pour la synthèse (Gemini 2.5 Flash par défaut)
+            model_to_use = cfg.get("chat_model") or "gemini-2.5-flash"
             if "mistral" in model_to_use.lower():
                 provider = "mistral"
                 api_key = cfg.get("mistral_api_key", "")
