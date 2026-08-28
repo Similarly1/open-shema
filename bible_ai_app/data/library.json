@@ -214,20 +214,6 @@
     "active": true,
     "has_strongs": true
   },
-  "DARBY": {
-    "title": "Bible J.N. Darby (avec codes Strong)",
-    "author": "",
-    "description": "Bible DARBY (Import CSV)",
-    "year": "",
-    "cover_path": null,
-    "type": "Bible",
-    "format": "json",
-    "folder_name": "DARBY",
-    "version_code": "DARB",
-    "total_books": 66,
-    "embedding_model": "study_library",
-    "active": true
-  },
   "Commentaire critique et explicatif sur toute la Bible (JFB)": {
     "title": "Commentaire critique et explicatif sur toute la Bible (JFB)",
     "author": "critique et explicatif sur toute la Bible (JFB)",

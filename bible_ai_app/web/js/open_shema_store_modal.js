@@ -88,21 +88,37 @@ const OpenShemaStore = {
   },
 
   /**
-   * Calcule le nombre de Bibles distantes qui ne sont PAS encore installées.
+   * Calcule le nombre de Bibles distantes qui ne sont PAS encore installées/actives dans le lecteur.
    */
   async getMissingBiblesCount() {
-    await this.refreshInstalledCache();
     if (!this.catalogData) {
       await this.fetchCatalog();
     }
     if (!this.catalogData || !this.catalogData.modules) return 0;
 
     const bibleModules = this.catalogData.modules.filter(m => m.type === 'bible');
+    const installed = (typeof BibleReader !== 'undefined' && Array.isArray(BibleReader.installedBibles) && BibleReader.installedBibles.length > 0)
+      ? BibleReader.installedBibles
+      : (await API.call('get_installed_bibles') || []);
+
     let missingCount = 0;
 
     for (const m of bibleModules) {
-      const isInst = this._isModuleInstalled(m);
-      if (!isInst) missingCount++;
+      const code = (m.abbreviation || '').toUpperCase();
+      const id = (m.id || '').toLowerCase();
+      const cleanId = id.replace(/^bible-/, '');
+
+      const isInstalled = installed.some(b => {
+        const bName = (b.name || '').toLowerCase();
+        const bCode = (b.version_code || '').toUpperCase();
+        const bFolder = (b.folder_name || '').toLowerCase();
+        const bId = (b.id || '').toLowerCase();
+        return (code && bCode === code) || bName === id || bName === cleanId || bFolder === cleanId || bId === cleanId;
+      });
+
+      if (!isInstalled) {
+        missingCount++;
+      }
     }
 
     return missingCount;

@@ -2660,52 +2660,39 @@ class BibleAppApi:
             return {"success": False, "error": str(e)}
 
     def get_installed_catalog_module_ids(self) -> List[str]:
-        """Retourne la liste exhaustive des identifiants de modules déjà installés localement."""
+        """Retourne la liste exhaustive des identifiants de modules actifs/installés localement."""
         installed = set()
         data_dir = os.path.join(current_dir, "data")
 
-        # 1. Registre des ouvrages et Bibles
+        # 1. Registre des ouvrages et Bibles actifs
         registry = load_books_metadata()
         for k, v in registry.items():
-            installed.add(k.lower())
-            if v.get("version_code"):
-                installed.add(v.get("version_code").lower())
-            if v.get("folder_name"):
-                installed.add(v.get("folder_name").lower())
-            if v.get("title"):
-                installed.add(v.get("title").lower())
+            if v.get("active", True):
+                installed.add(k.lower())
+                if v.get("version_code"):
+                    installed.add(v.get("version_code").lower())
+                if v.get("folder_name"):
+                    installed.add(v.get("folder_name").lower())
+                if v.get("title"):
+                    installed.add(v.get("title").lower())
 
         # 2. Dictionnaires
         dict_registry = DictionaryManager.get_all_dictionaries()
         for d in dict_registry:
             d_id = d.get("id")
-            if d_id:
+            if d_id and d.get("enabled", True):
                 installed.add(d_id.lower())
                 installed.add(f"dict-{d_id.lower()}")
 
-        # 3. Fichiers spécifiques sur disque
+        # 3. Fichiers spécifiques indispensables sur disque
         if os.path.exists(os.path.join(data_dir, "bibleproject_fr.json")):
             installed.add("dataset-bibleproject-fr")
             installed.add("bp-fr")
             installed.add("bibleproject")
 
-        if os.path.exists(os.path.join(data_dir, "strong_lexicon.json")) or os.path.exists(os.path.join(data_dir, "dictionaries", "dict_strong_fr.sqlite")):
+        if os.path.exists(os.path.join(data_dir, "strong_lexicon.json")):
             installed.add("dict-strong-fr")
             installed.add("strong")
-
-        # 4. Dossier bibles/
-        bibles_dir = os.path.join(data_dir, "bibles")
-        if os.path.exists(bibles_dir):
-            for item in os.listdir(bibles_dir):
-                item_lower = item.lower().replace(".sqlite", "").replace("bible_", "")
-                installed.add(item_lower)
-                installed.add(f"bible-{item_lower}")
-                if "lsg" in item_lower:
-                    installed.add("bible-lsg-1910")
-                    installed.add("lsg")
-                if "darby" in item_lower:
-                    installed.add("bible-darby")
-                    installed.add("darby")
 
         return list(installed)
 

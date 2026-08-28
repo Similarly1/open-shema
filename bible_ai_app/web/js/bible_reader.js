@@ -5533,27 +5533,29 @@ const BibleReader = {
       listEl.appendChild(btn);
     });
 
-    // Affichage conditionnel : UNIQUEMENT si au moins une version n'est pas encore téléchargée depuis le dépôt
-    if (typeof OpenShemaStore !== 'undefined') {
+    // Affichage conditionnel : UNIQUEMENT si au moins une version n'est pas encore téléchargée/active dans le lecteur
+    const footerEl = document.getElementById('version-picker-store-footer');
+    const footerBtn = document.getElementById('btn-picker-open-store');
+    const footerText = document.getElementById('version-picker-store-btn-text');
+
+    if (footerEl && footerBtn && typeof OpenShemaStore !== 'undefined') {
       OpenShemaStore.getMissingBiblesCount().then(missingCount => {
-        document.getElementById('version-picker-store-footer-btn')?.remove();
         if (missingCount > 0) {
-          const footerDiv = document.createElement('div');
-          footerDiv.id = 'version-picker-store-footer-btn';
-          footerDiv.className = 'version-picker-store-footer';
-          footerDiv.innerHTML = `
-            <button class="btn-picker-open-store">
-              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              <span>Catalogue Open Shema (${missingCount} version${missingCount > 1 ? 's' : ''} disponible${missingCount > 1 ? 's' : ''})</span>
-            </button>
-          `;
-          footerDiv.querySelector('button').addEventListener('click', () => {
+          footerEl.style.display = 'block';
+          if (footerText) {
+            footerText.textContent = `Catalogue Open Shema (${missingCount} version${missingCount > 1 ? 's' : ''} disponible${missingCount > 1 ? 's' : ''})`;
+          }
+          footerBtn.onclick = () => {
             this.closeBiblePicker();
             OpenShemaStore.open('bibles');
-          });
-          listEl.appendChild(footerDiv);
+          };
+        } else {
+          footerEl.style.display = 'none';
         }
-      }).catch(err => console.warn('Erreur vérification Bibles manquantes:', err));
+      }).catch(err => {
+        console.warn('Erreur vérification Bibles manquantes:', err);
+        footerEl.style.display = 'none';
+      });
     }
 
     popover.classList.remove('hidden');
