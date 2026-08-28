@@ -196,7 +196,7 @@ const ImportModal = {
     });
     document.getElementById('btn-import-smart-cover')?.addEventListener('click', (e) => {
       e.stopPropagation();
-      this.generateSmartCover();
+      this.generateSmartCover(true);
     });
     document.getElementById('btn-import-paste-cover')?.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -798,14 +798,144 @@ const ImportModal = {
     }
   },
 
-  generateSmartCover() {
+  _hashCode(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) - hash) + str.charCodeAt(i);
+      hash |= 0;
+    }
+    return hash;
+  },
+
+  generateSmartCover(forceNext = false) {
     let rawTitle = (document.getElementById('import-book-title')?.value || document.getElementById('import-book-id')?.value || 'OUVRAGE BIBLIQUE').trim();
     // Épuration de la date entre parenthèses en fin de titre pour éviter la redondance avec la mention d'édition en bas
     const title = rawTitle.replace(/\s*\(\s*\d{4}(?:\s*[-–/]\s*\d{4})?\s*\)\s*$/, '').trim();
     const author = (document.getElementById('import-book-author')?.value || '').trim();
     const year = (document.getElementById('import-book-year')?.value || '').trim();
     const isBible = document.getElementById('import-book-type')?.value === 'Bible';
-    
+
+    // 12 Palettes sobres, nobles et haut de gamme avec dégradé bicolore profond
+    const SOBER_PALETTES = [
+      {
+        name: 'Bleu Nuit Saphir',
+        gradient: ['#1e1b4b', '#0b0f19'],
+        frameColor: '#d97706',
+        innerFrameColor: 'rgba(245, 158, 11, 0.4)',
+        badgeColor: '#fde68a',
+        authorColor: '#fcd34d',
+        lineColor: 'rgba(245, 158, 11, 0.6)'
+      },
+      {
+        name: 'Bordeaux Impérial',
+        gradient: ['#3b0c16', '#140306'],
+        frameColor: '#eab308',
+        innerFrameColor: 'rgba(234, 179, 8, 0.4)',
+        badgeColor: '#fef08a',
+        authorColor: '#fde047',
+        lineColor: 'rgba(234, 179, 8, 0.6)'
+      },
+      {
+        name: 'Émeraude & Pin Profond',
+        gradient: ['#064e3b', '#021e17'],
+        frameColor: '#d4af37',
+        innerFrameColor: 'rgba(212, 175, 55, 0.4)',
+        badgeColor: '#fef08a',
+        authorColor: '#fde68a',
+        lineColor: 'rgba(212, 175, 55, 0.6)'
+      },
+      {
+        name: 'Ardoise & Platine',
+        gradient: ['#1e293b', '#090d16'],
+        frameColor: '#38bdf8',
+        innerFrameColor: 'rgba(56, 189, 248, 0.4)',
+        badgeColor: '#bae6fd',
+        authorColor: '#93c5fd',
+        lineColor: 'rgba(56, 189, 248, 0.6)'
+      },
+      {
+        name: 'Prune & Améthyste Sombre',
+        gradient: ['#2e1065', '#0f0521'],
+        frameColor: '#f59e0b',
+        innerFrameColor: 'rgba(245, 158, 11, 0.4)',
+        badgeColor: '#fde68a',
+        authorColor: '#fcd34d',
+        lineColor: 'rgba(245, 158, 11, 0.6)'
+      },
+      {
+        name: 'Pétrole Abysse & Océan',
+        gradient: ['#0f3b46', '#04181c'],
+        frameColor: '#2dd4bf',
+        innerFrameColor: 'rgba(45, 212, 191, 0.4)',
+        badgeColor: '#99f6e4',
+        authorColor: '#5eead4',
+        lineColor: 'rgba(45, 212, 191, 0.6)'
+      },
+      {
+        name: 'Cuir Havane & Moka',
+        gradient: ['#3b1f14', '#150904'],
+        frameColor: '#fbbf24',
+        innerFrameColor: 'rgba(251, 191, 36, 0.4)',
+        badgeColor: '#fde68a',
+        authorColor: '#fcd34d',
+        lineColor: 'rgba(251, 191, 36, 0.6)'
+      },
+      {
+        name: 'Bleu Crépuscule & Dorure',
+        gradient: ['#1e3a8a', '#0a142f'],
+        frameColor: '#e0a96d',
+        innerFrameColor: 'rgba(224, 169, 109, 0.4)',
+        badgeColor: '#fde68a',
+        authorColor: '#fcd34d',
+        lineColor: 'rgba(224, 169, 109, 0.6)'
+      },
+      {
+        name: 'Sauge Sombre & Bronze Antique',
+        gradient: ['#1c3328', '#0a1610'],
+        frameColor: '#e2b170',
+        innerFrameColor: 'rgba(226, 177, 112, 0.4)',
+        badgeColor: '#fef08a',
+        authorColor: '#fde68a',
+        lineColor: 'rgba(226, 177, 112, 0.6)'
+      },
+      {
+        name: 'Chocolat Noir & Ébène',
+        gradient: ['#271e1b', '#0c0908'],
+        frameColor: '#d97706',
+        innerFrameColor: 'rgba(217, 119, 6, 0.4)',
+        badgeColor: '#fed7aa',
+        authorColor: '#fdba74',
+        lineColor: 'rgba(217, 119, 6, 0.6)'
+      },
+      {
+        name: 'Cobalt Profond & Argent',
+        gradient: ['#172554', '#080d1e'],
+        frameColor: '#60a5fa',
+        innerFrameColor: 'rgba(96, 165, 250, 0.4)',
+        badgeColor: '#bfdbfe',
+        authorColor: '#93c5fd',
+        lineColor: 'rgba(96, 165, 250, 0.6)'
+      },
+      {
+        name: 'Anthracite & Cuivre Royal',
+        gradient: ['#262626', '#0a0a0a'],
+        frameColor: '#f97316',
+        innerFrameColor: 'rgba(249, 115, 22, 0.4)',
+        badgeColor: '#ffedd5',
+        authorColor: '#fed7aa',
+        lineColor: 'rgba(249, 115, 22, 0.6)'
+      }
+    ];
+
+    // Calcul ou rotation de la palette
+    if (typeof this._coverPaletteIndex !== 'number') {
+      this._coverPaletteIndex = Math.abs(this._hashCode(rawTitle + (author || ''))) % SOBER_PALETTES.length;
+    } else if (forceNext) {
+      this._coverPaletteIndex = (this._coverPaletteIndex + 1) % SOBER_PALETTES.length;
+    }
+
+    const palette = SOBER_PALETTES[this._coverPaletteIndex];
+
     // Génération locale de couverture élégante et épurée 2D Haute Résolution (HD 400x560)
     const canvas = document.createElement('canvas');
     const width = 400;
@@ -814,22 +944,22 @@ const ImportModal = {
     canvas.height = height;
     const ctx = canvas.getContext('2d');
 
-    // 1. Fond dégradé noble et profond
-    const grad = ctx.createLinearGradient(0, 0, 0, height);
-    if (isBible) {
-      grad.addColorStop(0, '#1E1B4B');
-      grad.addColorStop(0.5, '#171E38');
-      grad.addColorStop(1, '#0B0F19');
-    } else {
-      grad.addColorStop(0, '#0F172A');
-      grad.addColorStop(0.5, '#1E293B');
-      grad.addColorStop(1, '#090D16');
-    }
+    // 1. Fond dégradé noble et profond bicolore (du haut-gauche au bas-droit)
+    const grad = ctx.createLinearGradient(0, 0, width * 0.4, height);
+    grad.addColorStop(0, palette.gradient[0]);
+    grad.addColorStop(1, palette.gradient[1]);
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, width, height);
 
+    // Vignettage doux pour enrichir la profondeur
+    const radialSheen = ctx.createRadialGradient(width * 0.5, height * 0.3, 20, width * 0.5, height * 0.5, width * 0.85);
+    radialSheen.addColorStop(0, 'rgba(255, 255, 255, 0.03)');
+    radialSheen.addColorStop(1, 'rgba(0, 0, 0, 0.35)');
+    ctx.fillStyle = radialSheen;
+    ctx.fillRect(0, 0, width, height);
+
     // 2. Texture de grain subtile
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.015)';
     for (let x = 0; x < width; x += 4) {
       for (let y = 0; y < height; y += 4) {
         if ((x + y) % 8 === 0) {
@@ -838,12 +968,12 @@ const ImportModal = {
       }
     }
 
-    // 3. Cadre doré / accent extérieur
-    const frameColor = isBible ? '#D97706' : '#3B82F6';
-    const innerFrameColor = isBible ? 'rgba(245, 158, 11, 0.4)' : 'rgba(96, 165, 250, 0.4)';
+    // 3. Cadre sobre et élégant
+    const frameColor = palette.frameColor;
+    const innerFrameColor = palette.innerFrameColor;
     
     ctx.strokeStyle = frameColor;
-    ctx.lineWidth = 4;
+    ctx.lineWidth = 3.5;
     ctx.strokeRect(20, 20, width - 40, height - 40);
 
     // Filet intérieur fin
@@ -854,7 +984,7 @@ const ImportModal = {
     // Coins décoratifs
     const cornerSize = 16;
     ctx.strokeStyle = frameColor;
-    ctx.lineWidth = 2.5;
+    ctx.lineWidth = 2;
     // Haut Gauche
     ctx.strokeRect(24, 24, cornerSize, cornerSize);
     // Haut Droit
@@ -889,14 +1019,14 @@ const ImportModal = {
 
     // 4. En-tête / Badge supérieur
     ctx.textAlign = 'center';
-    ctx.fillStyle = isBible ? '#FDE68A' : '#93C5FD';
-    ctx.font = '600 14px "Inter", sans-serif';
+    ctx.fillStyle = palette.badgeColor;
+    ctx.font = '600 13px "Inter", sans-serif';
     ctx.letterSpacing = '2px';
     const topBadge = isBible ? '✦ SAINTE BIBLE ✦' : '✦ ÉTUDE BIBLIQUE ✦';
     ctx.fillText(topBadge, width / 2, 75);
 
     // Filet sous l'en-tête
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+    ctx.strokeStyle = palette.lineColor;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(width / 2 - 50, 95);
@@ -930,7 +1060,7 @@ const ImportModal = {
     });
 
     // Filet décoratif sous le titre
-    ctx.strokeStyle = isBible ? 'rgba(245, 158, 11, 0.6)' : 'rgba(59, 130, 246, 0.6)';
+    ctx.strokeStyle = palette.lineColor;
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(width / 2 - 40, titleStartY + totalTitleHeight + 15);
@@ -940,8 +1070,8 @@ const ImportModal = {
     // 6. Auteur / Éditeur (en bas avec wrapping automatique)
     const authorText = author || (isBible ? 'Traduction d’après les textes originaux' : 'Ouvrage de référence');
     const maxAuthorWidth = width - 100;
-    ctx.font = '500 14px "Inter", sans-serif';
-    ctx.fillStyle = isBible ? '#FCD34D' : '#BFDBFE';
+    ctx.font = '500 13.5px "Inter", sans-serif';
+    ctx.fillStyle = palette.authorColor;
     
     const authorLines = wrapText(authorText, maxAuthorWidth, 3);
     const authorLineHeight = 20;
@@ -962,7 +1092,7 @@ const ImportModal = {
     this.coverPath = dataUrl;
     this.coverDataUrl = dataUrl;
     this.updateCoverPreview(dataUrl);
-    App.showToast('Smart Cover 2D générée avec succès !');
+    App.showToast(`Smart Cover 2D : Thème « ${palette.name} »`);
   },
 
   async updateCoverPreview(pathOrUrl) {
