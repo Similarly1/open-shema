@@ -2059,9 +2059,50 @@
                 </button>
               </div>
             </div>
+
+            <!-- CARTE BIBLIOTHEQUE D'EBOOKS THEOLOGIQUES -->
+            <div class="settings-card" style="margin-top: 20px;">
+              <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                <span>Bibliothèque d'Ebooks Théologiques (EPUB)</span>
+              </div>
+              <p class="card-desc">Indiquez le dossier où sont stockés vos ebooks théologiques au format EPUB (commentaires, dictionnaires, encyclopédies bibliques). L'application les parcourra automatiquement pour la fonctionnalité <em>Lecteur Théologique</em>.</p>
+
+              <div class="form-group">
+                <label>Dossier des ebooks :</label>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <input type="text" id="cfg-ebooks-dir" class="text-field" style="flex: 1;" placeholder="Dossier par défaut (data/ebooks/)" readonly>
+                  <button class="btn-primary" id="btn-browse-ebooks-dir" title="Choisir un dossier sur votre PC">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
+                      <circle cx="12" cy="13" r="2"></circle>
+                      <path d="m14 15 2 2"></path>
+                    </svg>
+                    <span>Parcourir...</span>
+                  </button>
+                  <button class="btn-secondary" id="btn-open-ebooks-dir" title="Ouvrir dans l'explorateur de fichiers">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
+                    </svg>
+                    <span>Ouvrir</span>
+                  </button>
+                  <button class="btn-secondary" id="btn-reset-ebooks-dir" title="Revenir au dossier par défaut (data/ebooks/)">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                      <path d="M3 3v5h5"></path>
+                    </svg>
+                    <span>Par défaut</span>
+                  </button>
+                </div>
+                <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">
+                  💡 Si vide, le dossier <code>data/ebooks/</code> de l'installation sera utilisé automatiquement.
+                </p>
+              </div>
+            </div>
           </div>
 
           <!-- Section 3 : STEPBible -->
+
           <div class="settings-section" id="sec-stepbible">
             <div class="settings-card">
               <div class="card-title">Langues Originales & Exégèse (STEPBible)</div>

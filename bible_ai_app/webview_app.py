@@ -1571,6 +1571,38 @@ class BibleAppApi:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+    def pick_ebooks_folder(self) -> Dict[str, Any]:
+        """Ouvre un dialogue natif Windows pour choisir le dossier des ebooks théologiques (EPUB)."""
+        win = get_active_window()
+        if not win:
+            return {"success": False, "error": "Fenêtre introuvable"}
+        result = win.create_file_dialog(webview.FOLDER_DIALOG)
+        if not result or len(result) == 0:
+            return {"cancelled": True}
+        folder_path = result[0]
+        return {"success": True, "path": folder_path}
+
+    def open_ebooks_folder(self) -> Dict[str, Any]:
+        """Ouvre le dossier des ebooks théologiques dans l'explorateur de fichiers."""
+        self.config = load_secrets_into_config(load_config())
+        ebooks_dir = self.config.get("ebooks_dir", "")
+        if not ebooks_dir or not os.path.isdir(ebooks_dir):
+            _app_root = os.path.dirname(os.path.abspath(__file__))
+            ebooks_dir = os.path.join(_app_root, "data", "ebooks")
+            os.makedirs(ebooks_dir, exist_ok=True)
+        try:
+            if os.name == 'nt':
+                os.startfile(ebooks_dir)
+            elif sys.platform == 'darwin':
+                import subprocess
+                subprocess.Popen(['open', ebooks_dir])
+            else:
+                import subprocess
+                subprocess.Popen(['xdg-open', ebooks_dir])
+            return {"success": True, "path": ebooks_dir}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
     # --- STUDIO DE PRÉDICATION & ILLUSTRATIONS ---
 
     def get_sermons_list(self) -> List[Dict[str, Any]]:

@@ -458,6 +458,37 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
       App.showToast('Dossier réinitialisé par défaut (data/notes/)');
     });
 
+    // Bibliothèque d'ebooks théologiques (EPUB)
+    document.getElementById('btn-browse-ebooks-dir')?.addEventListener('click', async () => {
+      try {
+        const res = await API.call('pick_ebooks_folder');
+        if (res && res.success && res.path) {
+          document.getElementById('cfg-ebooks-dir').value = res.path;
+          App.showToast(`📚 Dossier ebooks sélectionné : ${res.path}`);
+        }
+      } catch (e) {
+        alert(`Erreur sélection dossier : ${e}`);
+      }
+    });
+
+    document.getElementById('btn-open-ebooks-dir')?.addEventListener('click', async () => {
+      try {
+        const res = await API.call('open_ebooks_folder');
+        if (res && res.success) {
+          App.showToast(`📂 Dossier ouvert : ${res.path}`);
+        } else {
+          alert(`Erreur : ${res?.error || "Impossible d'ouvrir le dossier"}`);
+        }
+      } catch (e) {
+        alert(`Erreur : ${e}`);
+      }
+    });
+
+    document.getElementById('btn-reset-ebooks-dir')?.addEventListener('click', () => {
+      document.getElementById('cfg-ebooks-dir').value = '';
+      App.showToast('Dossier ebooks réinitialisé par défaut (data/ebooks/)');
+    });
+
     // Stockage & Fichier des Surlignages
     document.getElementById('btn-browse-highlights-file')?.addEventListener('click', async () => {
       try {
@@ -912,6 +943,9 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
     if (c.highlights_file !== undefined && document.getElementById('cfg-highlights-file')) {
       document.getElementById('cfg-highlights-file').value = c.highlights_file || '';
     }
+    if (c.ebooks_dir !== undefined && document.getElementById('cfg-ebooks-dir')) {
+      document.getElementById('cfg-ebooks-dir').value = c.ebooks_dir || '';
+    }
     document.getElementById('cfg-include-notes-ai').checked = c.include_notes_in_ai !== false;
 
     if (typeof NotesView !== 'undefined') {
@@ -1224,6 +1258,9 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
     newCfg.notes_directory = document.getElementById('cfg-notes-dir').value.trim();
     if (document.getElementById('cfg-highlights-file')) {
       newCfg.highlights_file = document.getElementById('cfg-highlights-file').value.trim();
+    }
+    if (document.getElementById('cfg-ebooks-dir')) {
+      newCfg.ebooks_dir = document.getElementById('cfg-ebooks-dir').value.trim();
     }
     newCfg.include_notes_in_ai = document.getElementById('cfg-include-notes-ai').checked;
 
