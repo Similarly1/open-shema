@@ -896,16 +896,6 @@
     "source_type": "general",
     "book_code": null
   },
-  "Dictionnaire Grec-Français Anatole Bailly (1901)": {
-    "name": "Dictionnaire Grec-Français Anatole Bailly (1901)",
-    "title": "Dictionnaire Grec-Français Anatole Bailly (1901)",
-    "dict_id": "bailly",
-    "author": "Anatole Bailly",
-    "year": "1901",
-    "type": "Dictionnaire",
-    "description": "Dictionnaire Grec-Français d'Anatole Bailly (1901 / 2020), monument lexical pour l'étude du grec biblique et classique.\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema.",
-    "active": true
-  },
   "Dictionnaire Historique et Critique Dom Calmet (1728)": {
     "name": "Dictionnaire Historique et Critique Dom Calmet (1728)",
     "title": "Dictionnaire Historique et Critique Dom Calmet (1728)",
@@ -924,6 +914,20 @@
     "year": "1890",
     "type": "Dictionnaire",
     "description": "Lexique Hébreu, Araméen et Grec de James Strong (1890) avec lemmes, racines, définitions et étymologies complètes.\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema.",
+    "active": true
+  },
+  "BAI": {
+    "name": "BAI",
+    "title": "Dictionnaire Grec-Français (Anatole Bailly)",
+    "author": "Anatole Bailly (Librairie Hachette).",
+    "description": "Dictionnaire monumental de grec ancien et biblique par Anatole Bailly (édition 1901, Hachette), référence philologique majeure pour l'étude lexicale, étymologique et littéraire des textes grecs classiques et de la Septante / Nouveau Testament.\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema.",
+    "year": "1901",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\BAI.png",
+    "type": "Dictionnaire",
+    "corpus_scope": "GLOBAL",
+    "source_type": "general",
+    "book_code": null,
+    "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
     "active": true
   }
 }

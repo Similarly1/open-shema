@@ -116,16 +116,50 @@ const IllustrationsView = {
   },
 
   async onViewActivated() {
-    await this.loadIllustrations();
+    if (this.illustrations && this.illustrations.length > 0) {
+      this.applyFilters();
+      API.getIllustrationsList().then(list => {
+        if (Array.isArray(list) && list.length !== this.illustrations.length) {
+          this.illustrations = list;
+          this.applyFilters();
+        }
+      }).catch(() => {});
+    } else {
+      await this.loadIllustrations();
+    }
+  },
+
+  showLoading() {
+    if (this.lblCount && (!this.illustrations || this.illustrations.length === 0)) {
+      this.lblCount.innerHTML = `<span class="synth-spinner" style="width: 10px; height: 10px; border-width: 1.5px; display: inline-block; vertical-align: middle; margin-right: 5px; border-top-color: var(--accent-amber, #f59e0b);"></span> Chargement...`;
+    }
+    if (this.container && (!this.illustrations || this.illustrations.length === 0)) {
+      this.container.innerHTML = `
+        <div style="padding: 70px 24px; text-align: center; color: var(--text-muted); width: 100%; grid-column: 1 / -1;">
+          <div class="synth-spinner" style="width: 32px; height: 32px; border-width: 3px; margin: 0 auto 16px auto; border-top-color: var(--accent-amber, #f59e0b);"></div>
+          <div style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px;">Chargement du réservoir d'illustrations...</div>
+          <div style="font-size: 12.5px; opacity: 0.75;">Indexation des fiches pastorales en cours</div>
+        </div>
+      `;
+    }
   },
 
   async loadIllustrations() {
+    this.showLoading();
     try {
       const list = await API.getIllustrationsList();
       this.illustrations = Array.isArray(list) ? list : [];
       this.applyFilters();
     } catch (e) {
       console.error('Erreur chargement banque illustrations:', e);
+      if (this.container) {
+        this.container.innerHTML = `
+          <div style="padding: 50px 24px; text-align: center; color: var(--text-danger, #ef4444); width: 100%; grid-column: 1 / -1;">
+            <div style="font-size: 15px; font-weight: 600; margin-bottom: 6px;">Erreur de chargement du réservoir</div>
+            <div style="font-size: 13px; opacity: 0.85;">${e.message || e}</div>
+          </div>
+        `;
+      }
     }
   },
 
