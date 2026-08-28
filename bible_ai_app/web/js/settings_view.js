@@ -658,6 +658,10 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
 
     document.getElementById('cfg-include-notes-ai')?.addEventListener('change', (e) => {
       this.config.include_notes_in_ai = e.target.checked;
+      const chkStudyNotes = document.getElementById('ai-opt-src-notes');
+      if (chkStudyNotes && typeof AIStudyView !== 'undefined' && AIStudyView.currentMode !== 'free_chat') {
+        chkStudyNotes.checked = e.target.checked;
+      }
       if (typeof NotesView !== 'undefined') {
         NotesView.updateAiToggleVisibility();
         NotesView.renderList();
@@ -665,6 +669,7 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
       if (typeof DrawerNotes !== 'undefined' && DrawerNotes.renderList) {
         DrawerNotes.renderList();
       }
+      this.save();
     });
 
     // Boutons des cartes de prompts système

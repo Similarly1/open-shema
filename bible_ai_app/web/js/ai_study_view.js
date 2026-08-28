@@ -181,6 +181,25 @@ const AIStudyView = {
       }
     });
 
+    // Synchroniser l'inclusion des notes en RAG depuis le popover du chat vers les paramètres
+    const chkOptNotes = document.getElementById('ai-opt-src-notes');
+    chkOptNotes?.addEventListener('change', (e) => {
+      const isChecked = e.target.checked;
+      if (typeof SettingsView !== 'undefined' && SettingsView.config) {
+        SettingsView.config.include_notes_in_ai = isChecked;
+        const cfgNotes = document.getElementById('cfg-include-notes-ai');
+        if (cfgNotes) cfgNotes.checked = isChecked;
+        if (typeof NotesView !== 'undefined') {
+          NotesView.updateAiToggleVisibility();
+          NotesView.renderList();
+        }
+        if (typeof DrawerNotes !== 'undefined' && DrawerNotes.renderList) {
+          DrawerNotes.renderList();
+        }
+        SettingsView.save();
+      }
+    });
+
     document.addEventListener('click', (e) => {
       if (modePopover && !modePopover.contains(e.target) && e.target !== btnModeSelector) {
         modePopover.classList.add('hidden');
@@ -295,6 +314,13 @@ const AIStudyView = {
             const opt = modelSelect.querySelector(`option[value="${targetModel}"]`);
             if (opt) modelSelect.value = targetModel;
           }
+        }
+
+        // Synchroniser l'état du corpus Notes (.md) avec la configuration
+        const isNotesIncluded = typeof cfg.include_notes_in_ai !== 'undefined' ? (cfg.include_notes_in_ai !== false) : true;
+        const chkNotes = document.getElementById('ai-opt-src-notes');
+        if (chkNotes && this.currentMode !== 'free_chat') {
+          chkNotes.checked = isNotesIncluded;
         }
       }
     } catch (e) {
@@ -979,7 +1005,12 @@ const AIStudyView = {
       if (chkBibles) chkBibles.checked = true;
       if (chkComms) chkComms.checked = true;
       if (chkDict) chkDict.checked = true;
-      if (chkNotes) chkNotes.checked = true;
+      if (chkNotes) {
+        const isNotesIncluded = (typeof SettingsView !== 'undefined' && SettingsView.config && typeof SettingsView.config.include_notes_in_ai !== 'undefined')
+          ? SettingsView.config.include_notes_in_ai !== false
+          : true;
+        chkNotes.checked = isNotesIncluded;
+      }
       if (chkRerank) chkRerank.checked = true;
       if (thinkingSelect && thinkingSelect.value === 'off') {
         thinkingSelect.value = 'medium';
@@ -2110,11 +2141,12 @@ const AIStudyView = {
     });
 
     // 2. Détection universelle de TOUTES les citations de sources documentaires entre crochets [Nom : Terme] ou [Nom (Ref)] ou [Nom ; Nom]
+    // Supporte les caractères hébreux (\u0590-\u05FF), grecs (\u0370-\u03FF, \u1F00-\u1FFF), guillemets, et crochets imbriqués [Lexique [mot]]
     const pureScriptureBracketRegex = /^\[\s*(?:[1-3]\s*)?[a-zA-ZÀ-ÿ]+\.?\s*\d+(?:\s*[:.,]\s*\d+(?:\s*[-–—]\s*\d+)?)?\s*\]$/;
-    const universalDocSourceRegex = /\[([A-Za-zÀ-ÿ0-9\s:;,'’\.\-–—\(\)\/]+)\]/gi;
+    const universalDocSourceRegex = /\[([A-Za-zÀ-ÿ0-9\s:;,'’"«»“”\.\-–—\(\)\/&+\u0590-\u05FF\u0370-\u03FF\u1F00-\u1FFF]*(?:\[[A-Za-zÀ-ÿ0-9\s:;,'’"«»“”\.\-–—\(\)\/&+\u0590-\u05FF\u0370-\u03FF\u1F00-\u1FFF]+\])?[A-Za-zÀ-ÿ0-9\s:;,'’"«»“”\.\-–—\(\)\/&+\u0590-\u05FF\u0370-\u03FF\u1F00-\u1FFF]*)\]/gi;
 
     const buildSinglePill = (rawItem) => {
-      const cleanContent = rawItem.trim();
+      const cleanContent = rawItem.replace(/[\[\]]/g, ' ').replace(/\s+/g, ' ').trim();
       if (!cleanContent || /^[GH]\d{1,5}$/i.test(cleanContent) || cleanContent.length < 2) return '';
 
       let bookName = cleanContent;
@@ -2162,7 +2194,7 @@ const AIStudyView = {
       if (!trimmed || /^[GH]\d{1,5}$/i.test(trimmed)) return match;
 
       // Si référence biblique pure comme [Jean 3:16], laisser pour scripture linkifier
-      if (pureScriptureBracketRegex.test(match) && !trimmed.toLowerCase().includes('texte biblique') && !trimmed.toLowerCase().includes('bible') && !trimmed.toLowerCase().includes('commentaire') && !trimmed.includes(';')) {
+      if (pureScriptureBracketRegex.test(match) && !trimmed.toLowerCase().includes('texte biblique') && !trimmed.toLowerCase().includes('bible') && !trimmed.toLowerCase().includes('commentaire') && !trimmed.toLowerCase().includes('lexique') && !trimmed.toLowerCase().includes('dictionnaire') && !trimmed.includes(';')) {
         return match;
       }
 
