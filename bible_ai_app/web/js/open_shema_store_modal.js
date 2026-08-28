@@ -38,6 +38,22 @@ const OpenShemaStore = {
       this.installedIds.clear();
       this.installedCodes.clear();
 
+      // 1. Détection exhaustive depuis le backend (fichiers présents sur disque, dictionnaires, bibles)
+      try {
+        const backendInstalled = await API.call('get_installed_catalog_module_ids');
+        if (Array.isArray(backendInstalled)) {
+          backendInstalled.forEach(id => {
+            if (id) {
+              this.installedIds.add(String(id).toLowerCase());
+              this.installedCodes.add(String(id).toUpperCase());
+            }
+          });
+        }
+      } catch (err) {
+        console.warn('Backend get_installed_catalog_module_ids non disponible:', err);
+      }
+
+      // 2. Bibles enregistrées dans BibleReader
       if (typeof BibleReader !== 'undefined' && BibleReader.installedBibles) {
         BibleReader.installedBibles.forEach(b => {
           if (b.name) this.installedIds.add(b.name.toLowerCase());
@@ -46,6 +62,7 @@ const OpenShemaStore = {
         });
       }
 
+      // 3. Ouvrages de la bibliothèque
       const books = await API.call('get_library_books') || [];
       books.forEach(b => {
         if (b.name) this.installedIds.add(b.name.toLowerCase());
@@ -94,16 +111,16 @@ const OpenShemaStore = {
   _isModuleInstalled(module) {
     const id = (module.id || '').toLowerCase();
     const abbr = (module.abbreviation || '').toUpperCase();
-    const cleanId = id.replace(/^(bible-|dict-|comm-|theology-)/, '');
+    const cleanId = id.replace(/^(bible-|dict-|comm-|theology-|dataset-)/, '');
 
     if (this.installedIds.has(id) || this.installedIds.has(cleanId)) return true;
-    if (abbr && this.installedCodes.has(abbr)) return true;
+    if (abbr && (this.installedCodes.has(abbr) || this.installedIds.has(abbr.toLowerCase()))) return true;
 
     // Détections spécifiques
+    if (id === 'dataset-bibleproject-fr' && (this.installedIds.has('bibleproject') || this.installedIds.has('dataset-bibleproject-fr') || this.installedIds.has('bp-fr'))) return true;
     if (id === 'bible-lsg-1910' && (this.installedCodes.has('LSG') || this.installedIds.has('lsg'))) return true;
     if (id === 'bible-darby' && (this.installedCodes.has('DARBY') || this.installedCodes.has('DARB') || this.installedIds.has('darby'))) return true;
     if (id === 'dict-strong-fr' && (this.installedIds.has('strong') || this.installedIds.has('dict_strong_fr'))) return true;
-    if (id === 'dataset-bibleproject-fr' && this.installedIds.has('bibleproject')) return true;
 
     return false;
   },
@@ -123,7 +140,7 @@ const OpenShemaStore = {
 
     const modal = document.createElement('div');
     modal.id = 'modal-open-shema-store';
-    modal.className = 'modal-overlay hidden';
+    modal.className = 'modal-dialog-container hidden';
     modal.innerHTML = `
       <div class="modal-card store-modal-card">
         <div class="store-modal-header">

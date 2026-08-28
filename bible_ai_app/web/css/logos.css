@@ -27454,17 +27454,40 @@ mark {
    ========================================================================= */
 
 .store-modal-card {
-  width: 920px;
-  max-width: 95vw;
-  height: 80vh;
-  max-height: 750px;
+  width: 960px;
+  max-width: 92vw;
+  height: 85vh;
+  max-height: 780px;
+  margin: auto;
   display: flex;
   flex-direction: column;
-  background: var(--bg-surface, #1e293b);
+  background: var(--bg-card, #1e293b);
   border-radius: 12px;
-  border: 1px solid var(--border-subtle, #334155);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-color, #334155);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   overflow: hidden;
+  position: relative;
+  z-index: 10000;
+}
+
+.btn-icon-close {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted, #94a3b8);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-icon-close:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary, #f8fafc);
+  border-color: var(--border-subtle, #334155);
 }
 
 .store-modal-header {
