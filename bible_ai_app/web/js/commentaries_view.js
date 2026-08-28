@@ -1196,6 +1196,10 @@ const CommentariesView = {
       if (this.synthStepStatus) this.synthStepStatus.textContent = 'Génération de la synthèse comparative par IA...';
     }, 2400);
 
+    if (typeof NotificationManager !== 'undefined') {
+      NotificationManager.setWorkingState('commentaries', true);
+    }
+
     try {
       const res = await API.synthesizeCommentaries(
         this.currentBook,
@@ -1225,6 +1229,9 @@ const CommentariesView = {
       clearTimeout(t2);
       App.showError('Erreur Réseau IA', err?.message || String(err));
     } finally {
+      if (typeof NotificationManager !== 'undefined') {
+        NotificationManager.setWorkingState('commentaries', false);
+      }
       this.btnLaunchSynth.disabled = false;
       this.synthLoadingBox?.classList.add('hidden');
     }

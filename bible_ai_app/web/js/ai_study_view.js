@@ -889,6 +889,9 @@ const AIStudyView = {
 
   resetInputState() {
     this.isGenerating = false;
+    if (typeof NotificationManager !== 'undefined') {
+      NotificationManager.setWorkingState('ai', false);
+    }
     if (this.inputEl) {
       this.inputEl.disabled = false;
       this.inputEl.focus();
@@ -1394,6 +1397,9 @@ const AIStudyView = {
     // État de génération actif
     this.isGenerating = true;
     this.activeGenerationCancelled = false;
+    if (typeof NotificationManager !== 'undefined') {
+      NotificationManager.setWorkingState('ai', true);
+    }
     if (this.inputEl) this.inputEl.disabled = true;
     if (this.btnSendEl) {
       this.btnSendEl.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg><span>Arrêter</span>`;

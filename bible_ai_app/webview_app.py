@@ -2254,13 +2254,18 @@ class BibleAppApi:
                     f"Ma requête : {chat_context[last_msg_idx]['content']}"
                 )
 
-            if api_key:
-                client = LLMClient(api_key=api_key, model=selected_model, provider=provider, product_id=product_id)
-                full_system_prompt = prompt
-                answer = client.chat(chat_context, system_prompt=full_system_prompt, thinking_budget=thinking_budget)
-            else:
-                g_client = GeminiClient(api_key="", model=selected_model)
-                answer = g_client.chat(chat_context, system_prompt=prompt, thinking_budget=thinking_budget)
+            if not api_key:
+                return {
+                    "answer": f"⚠️ **Clé API non configurée pour le fournisseur {provider.upper()} ({selected_model})**.\n\nVeuillez saisir votre clé API dans les Paramètres IA de l'application.",
+                    "sources_used": sources_used,
+                    "sources_details": dedup_sources,
+                    "detected_mode": detected_mode,
+                    "model_used": selected_model
+                }
+
+            client = LLMClient(api_key=api_key, model=selected_model, provider=provider, product_id=product_id)
+            full_system_prompt = prompt
+            answer = client.chat(chat_context, system_prompt=full_system_prompt, thinking_budget=thinking_budget)
 
             return {
                 "answer": answer,

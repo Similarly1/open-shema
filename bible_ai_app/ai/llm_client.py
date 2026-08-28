@@ -49,6 +49,9 @@ class GeminiClient:
         self.base_url = "https://generativelanguage.googleapis.com/v1beta/models"
 
     def chat(self, messages, system_prompt=None, fallback=True, thinking_budget=None):
+        if not self.api_key or not str(self.api_key).strip():
+            return "Erreur Gemini : Clé API Google Gemini non configurée. Veuillez renseigner votre clé API dans les Paramètres IA de l'application."
+
         # Définir l'ordre d'essai : le modèle configuré en premier, puis la cascade
         models_to_try = [self.model]
         if fallback:
@@ -79,22 +82,35 @@ class GeminiClient:
                             })
             contents.append({"role": role, "parts": parts})
             
-        payload = {"contents": contents}
+        base_payload = {"contents": contents}
         if system_prompt:
-            payload["system_instruction"] = {"parts": [{"text": system_prompt}]}
-
-        if thinking_budget is not None:
-            payload["generationConfig"] = {
-                "thinkingConfig": {
-                    "thinkingBudget": thinking_budget
-                }
-            }
+            base_payload["system_instruction"] = {"parts": [{"text": system_prompt}]}
 
         last_error = None
         for current_model in models_to_try:
             url = f"{self.base_url}/{current_model}:generateContent"
+            payload = dict(base_payload)
+            if thinking_budget is not None and ("2.5" in current_model or "2.0" in current_model or "3." in current_model):
+                payload["generationConfig"] = {
+                    "thinkingConfig": {
+                        "thinkingBudget": thinking_budget
+                    }
+                }
+
             try:
                 response = requests.post(url, json=payload, headers={"Content-Type": "application/json", "x-goog-api-key": self.api_key}, timeout=90)
+                
+                # Si erreur d'authentification (clé invalide / non autorisée), pas la peine de boucler sur 15 modèles
+                if response.status_code in [401, 403]:
+                    err_detail = f"Erreur {response.status_code}"
+                    try:
+                        err_json = response.json()
+                        if "error" in err_json and "message" in err_json["error"]:
+                            err_detail = err_json["error"]["message"]
+                    except Exception:
+                        pass
+                    return f"Erreur Gemini ({response.status_code}) sur {current_model} : {err_detail}. Vérifiez la validité de votre clé API Google dans les paramètres."
+
                 if response.status_code in [404, 429, 500, 502, 503, 504]:
                     last_error = f"Status {response.status_code} pour {current_model}"
                     continue

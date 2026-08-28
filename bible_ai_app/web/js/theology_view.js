@@ -1430,6 +1430,10 @@ const TheologyView = {
     if (this.synthLoadingBox) this.synthLoadingBox.classList.remove('hidden');
     if (this.synthResultContainer) this.synthResultContainer.classList.add('hidden');
 
+    if (typeof NotificationManager !== 'undefined') {
+      NotificationManager.setWorkingState('theology', true);
+    }
+
     try {
       const res = await API.synthesizeTheologyChapter(this.currentBook, this.currentChapterId);
       
@@ -1458,9 +1462,15 @@ const TheologyView = {
           });
         }
       } else {
+        if (typeof NotificationManager !== 'undefined') {
+          NotificationManager.setWorkingState('theology', false);
+        }
         throw new Error(res?.error || 'Échec de la synthèse');
       }
     } catch (e) {
+      if (typeof NotificationManager !== 'undefined') {
+        NotificationManager.setWorkingState('theology', false);
+      }
       console.error('[TheologyView] Erreur génération synthèse:', e);
       if (this.synthLoadingBox) this.synthLoadingBox.classList.add('hidden');
       if (this.synthResultContainer) {

@@ -27236,18 +27236,63 @@ mark {
   color: var(--text-primary, #fff);
 }
 
-/* Badge pastille sur la sidebar */
-.sidebar-notification-dot {
+/* =========================================================================
+   Sidebar Indicators (Animation de travail en cours & Badge de fin)
+   ========================================================================= */
+
+/* Indicateur discret de travail IA en cours dans la barre latérale */
+.sidebar-working-indicator {
   position: absolute;
   top: 6px;
-  right: 6px;
-  width: 9px;
-  height: 9px;
+  left: 23px; /* Juste au coin supérieur droit de l'icône nav-icon (38px) */
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.sidebar-working-spinner {
+  width: 10px;
+  height: 10px;
+  border: 1.8px solid rgba(200, 155, 60, 0.25);
+  border-top-color: var(--accent-gold, #c89b3c);
+  border-right-color: var(--accent-gold, #c89b3c);
+  border-radius: 50%;
+  animation: sidebarSpin 0.75s linear infinite;
+  box-shadow: 0 0 6px rgba(200, 155, 60, 0.4);
+}
+
+@keyframes sidebarSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.nav-item.is-working .nav-icon svg {
+  color: var(--accent-gold, #c89b3c) !important;
+  animation: navWorkingPulse 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes navWorkingPulse {
+  0% { opacity: 0.65; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1.05); }
+}
+
+/* Badge pastille sur la sidebar (Terminé) */
+.sidebar-notification-dot {
+  position: absolute;
+  top: 7px;
+  left: 25px; /* Sur le coin de l'icône */
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--accent-gold, #c89b3c);
   box-shadow: 0 0 0 2px var(--bg-sidebar, #121214), 0 0 8px var(--accent-gold, #c89b3c);
   animation: pulseSidebarDot 2s infinite ease-in-out;
   pointer-events: none;
+  z-index: 10;
 }
 
 @keyframes pulseSidebarDot {
@@ -27256,7 +27301,7 @@ mark {
     opacity: 1;
   }
   50% {
-    transform: scale(1.25);
+    transform: scale(1.3);
     opacity: 0.8;
   }
 }

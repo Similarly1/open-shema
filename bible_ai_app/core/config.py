@@ -178,21 +178,28 @@ DEFAULTS = {
 
 def load_config():
     if not os.path.exists(CONFIG_PATH):
-        return dict(DEFAULTS)
-
-    try:
-        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-            config = json.load(f)
-    except (json.JSONDecodeError, OSError) as e:
-        logger.warning(
-            "config.json illisible (%s). Utilisation des valeurs par défaut.", e
-        )
-        return dict(DEFAULTS)
+        config = dict(DEFAULTS)
+    else:
+        try:
+            with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+                config = json.load(f)
+        except (json.JSONDecodeError, OSError) as e:
+            logger.warning(
+                "config.json illisible (%s). Utilisation des valeurs par défaut.", e
+            )
+            config = dict(DEFAULTS)
 
     # Compléter les clés manquantes avec les valeurs par défaut
     for key, default_val in DEFAULTS.items():
         if key not in config:
             config[key] = default_val
+
+    # Injecter automatiquement les secrets depuis le trousseau
+    try:
+        from core.secrets_manager import load_secrets_into_config
+        config = load_secrets_into_config(config)
+    except Exception as e:
+        logger.debug("Erreur injection secrets dans load_config : %s", e)
 
     return config
 

@@ -168,6 +168,9 @@ const NotificationManager = {
     const currentView = typeof App !== 'undefined' ? (App.currentView || 'bible') : 'bible';
     const isCurrentView = (currentView === targetView);
 
+    // 0. Retirer l'animation de travail en cours
+    this.setWorkingState(targetView, false);
+
     // Si l'utilisateur est déjà actif et regarde la page concernée, pas besoin de le déranger avec un popup
     if (isAppFocused && isCurrentView) {
       return;
@@ -304,12 +307,47 @@ const NotificationManager = {
   },
 
   // =========================================================================
-  // Pastille / Badge Sidebar
+  // Indicateur de Travail en Cours (Animation tournante sur la Sidebar)
+  // =========================================================================
+
+  setWorkingState(viewName, isWorking = true) {
+    const navItem = document.querySelector(`[data-view="${viewName}"], #nav-${viewName}, #nav-btn-${viewName}`);
+    if (!navItem) return;
+
+    if (isWorking) {
+      this.clearBadge(viewName);
+      navItem.classList.add('is-working');
+      navItem.style.position = 'relative';
+
+      let spinnerEl = navItem.querySelector('.sidebar-working-indicator');
+      if (!spinnerEl) {
+        spinnerEl = document.createElement('span');
+        spinnerEl.className = 'sidebar-working-indicator';
+        spinnerEl.title = "Génération IA en cours...";
+        spinnerEl.innerHTML = `<span class="sidebar-working-spinner"></span>`;
+        navItem.appendChild(spinnerEl);
+      }
+    } else {
+      navItem.classList.remove('is-working');
+      const spinnerEl = navItem.querySelector('.sidebar-working-indicator');
+      if (spinnerEl) {
+        spinnerEl.remove();
+      }
+    }
+  },
+
+  // =========================================================================
+  // Pastille / Badge Sidebar de Fin de Réponse
   // =========================================================================
 
   setBadge(viewName) {
-    const navItem = document.querySelector(`[data-view="${viewName}"], #nav-btn-${viewName}`);
+    const navItem = document.querySelector(`[data-view="${viewName}"], #nav-${viewName}, #nav-btn-${viewName}`);
     if (!navItem) return;
+
+    // S'assurer qu'il n'y a plus le spinner en cours
+    const spinnerEl = navItem.querySelector('.sidebar-working-indicator');
+    if (spinnerEl) spinnerEl.remove();
+    navItem.classList.remove('is-working');
 
     let badge = navItem.querySelector('.sidebar-notification-dot');
     if (!badge) {
@@ -322,7 +360,7 @@ const NotificationManager = {
   },
 
   clearBadge(viewName) {
-    const navItem = document.querySelector(`[data-view="${viewName}"], #nav-btn-${viewName}`);
+    const navItem = document.querySelector(`[data-view="${viewName}"], #nav-${viewName}, #nav-btn-${viewName}`);
     if (!navItem) return;
 
     const badge = navItem.querySelector('.sidebar-notification-dot');
