@@ -2461,10 +2461,12 @@ const FootnoteTooltip = {
 
     elements.forEach(el => {
       if (el.hasAttribute('title')) el.removeAttribute('title');
+      el.querySelectorAll('[title]').forEach(child => child.removeAttribute('title'));
       const fnId = el.dataset.fnId;
 
       el.addEventListener('mouseenter', () => {
         if (el.hasAttribute('title')) el.removeAttribute('title');
+        el.querySelectorAll('[title]').forEach(child => child.removeAttribute('title'));
         if (this.hoverTimer) clearTimeout(this.hoverTimer);
         this.hoverTimer = setTimeout(() => {
           this.show(el, fnId);
@@ -2498,7 +2500,7 @@ const FootnoteTooltip = {
   },
 
   show(targetEl, fnId) {
-    const text = this.footnotesMap[String(fnId)];
+    const text = this.footnotesMap[String(fnId)] || `Note de bas de page n° ${fnId}`;
     if (!text) return;
 
     this.init();

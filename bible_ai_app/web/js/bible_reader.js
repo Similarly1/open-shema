@@ -1163,31 +1163,77 @@ const CommentaryViewer = {
   parseCommentaryFootnotes(rawText) {
     if (!rawText) return { mainText: '', footnotesList: [], footnoteMap: {} };
 
-    const footnotesList = [];
     const footnoteMap = {};
-    let mainText = rawText;
+    const footnotesList = [];
 
-    // Détection de la section des notes en bas de texte
-    const firstDefMatch = mainText.search(/(?:\n\s*\[\^\d+\](?:\s*:\s*|\s+)|\b\[\^\d+\]:\s*)/);
-    let defsBlock = '';
+    const lines = rawText.split('\n');
+    const cleanedLines = [];
+    let inDefMode = false;
+    let currentFnId = null;
+    let currentFnText = [];
 
-    if (firstDefMatch !== -1) {
-      defsBlock = mainText.slice(firstDefMatch);
-      mainText = mainText.slice(0, firstDefMatch).trim();
-    }
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const stripped = line.trim();
 
-    if (defsBlock) {
-      const fnDefRegex = /\[\^(\d+)\](?:\s*:\s*|\s+)([\s\S]*?)(?=(?:\[\^\d+\](?:\s*:\s*|\s+)|$))/g;
-      let match;
-      while ((match = fnDefRegex.exec(defsBlock)) !== null) {
-        const fnId = match[1];
-        const fnBody = match[2].trim();
-        if (fnBody && !footnoteMap[fnId]) {
-          footnoteMap[fnId] = fnBody;
-          footnotesList.push({ id: fnId, text: fnBody });
+      // Rechercher un motif de début de note : [^1] ... ou > [^1] ... ou > **Note...** [^1] ...
+      const mDef = stripped.match(/(?:^>*\s*(?:\*\*[^*]+\*\*\s*:?\s*|\*[^*]+\*\s*:?\s*)?|\b)\[\^(\d+)\](?:\s*:\s*|\s+)(.*)/);
+
+      let isDefLine = false;
+      if (mDef) {
+        const prefix = stripped.slice(0, mDef.index).trim();
+        if (prefix === '' || prefix === '>' || prefix.startsWith('> **Note') || prefix.startsWith('> *Note') || prefix.startsWith('**Note') || prefix.startsWith('*Note')) {
+          isDefLine = true;
+        } else if (prefix.startsWith('>') && (prefix.toLowerCase().includes('note') || prefix.toLowerCase().includes('cts') || prefix.toLowerCase().includes('éditeur') || prefix.toLowerCase().includes('editeur'))) {
+          isDefLine = true;
+        } else if (stripped.startsWith('[^') || stripped.startsWith('> [^') || stripped.startsWith('> **') || stripped.startsWith('>*')) {
+          isDefLine = true;
         }
       }
+
+      if (isDefLine && mDef) {
+        if (currentFnId) {
+          const fnBody = currentFnText.join(' ').trim();
+          if (fnBody && !footnoteMap[currentFnId]) {
+            footnoteMap[currentFnId] = fnBody;
+            footnotesList.push({ id: currentFnId, text: fnBody });
+          }
+        }
+
+        currentFnId = mDef[1];
+        currentFnText = [mDef[2].trim()];
+        inDefMode = true;
+      } else if (inDefMode && (stripped.startsWith('>') || stripped.startsWith('*') || !stripped)) {
+        const cleanedCont = stripped.replace(/^>\s*/, '').trim();
+        if (cleanedCont) {
+          currentFnText.push(cleanedCont);
+        }
+      } else {
+        if (currentFnId) {
+          const fnBody = currentFnText.join(' ').trim();
+          if (fnBody && !footnoteMap[currentFnId]) {
+            footnoteMap[currentFnId] = fnBody;
+            footnotesList.push({ id: currentFnId, text: fnBody });
+          }
+          currentFnId = null;
+          inDefMode = false;
+        }
+        cleanedLines.push(line);
+      }
     }
+
+    if (currentFnId) {
+      const fnBody = currentFnText.join(' ').trim();
+      if (fnBody && !footnoteMap[currentFnId]) {
+        footnoteMap[currentFnId] = fnBody;
+        footnotesList.push({ id: currentFnId, text: fnBody });
+      }
+    }
+
+    let mainText = cleanedLines.join('\n').trim();
+    // Nettoyer les éventuels blockquotes orphelins de titre de note à la fin
+    mainText = mainText.replace(/\n+>\s*\*\*(?:Note de l'éditeur|Note éditoriale).*?\*\*\s*:?\s*$/i, '').trim();
+    mainText = mainText.replace(/\n+>\s*\*(?:Note de l'éditeur|Note éditoriale).*?\*\s*:?\s*$/i, '').trim();
 
     return { mainText, footnotesList, footnoteMap };
   },
