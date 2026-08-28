@@ -324,6 +324,15 @@ class BibleAppApi:
         for name, meta in registry.items():
             if meta.get("type") == "Bible" and meta.get("active", True):
                 folder = meta.get("folder_name", name)
+                # Auto-extraction de secours si format SQLite présent sans dossier JSON
+                if not BibleJsonLoader.find_bible_dir_by_name(folder) and not BibleJsonLoader.find_bible_dir_by_name(name):
+                    f_path = meta.get("file_path")
+                    if f_path and os.path.exists(f_path) and f_path.endswith(".sqlite"):
+                        try:
+                            self._extract_sqlite_bible_to_json(f_path, folder or name, meta.get("title", name))
+                        except Exception as e:
+                            logger.warning(f"Erreur auto-extraction Bible SQLite {name}: {e}")
+
                 if BibleJsonLoader.find_bible_dir_by_name(folder) or BibleJsonLoader.find_bible_dir_by_name(name):
                     bibles.append(enrich_item(name, meta))
         
@@ -334,6 +343,44 @@ class BibleAppApi:
                 bibles.append(enrich_item(b.replace("_", " "), {}))
 
         return bibles
+
+    def _extract_sqlite_bible_to_json(self, sqlite_path: str, abbr: str, title: str):
+        """Extrait les 66 livres d'une Bible SQLite vers des fichiers JSON modulaires."""
+        import sqlite3
+        dest_json_dir = os.path.join(current_dir, "data", "bibles", abbr)
+        os.makedirs(dest_json_dir, exist_ok=True)
+        conn = sqlite3.connect(sqlite_path)
+        cur = conn.cursor()
+        cur.execute("SELECT id, code, name, chapters_count FROM books ORDER BY id")
+        books_rows = cur.fetchall()
+        for b_id, b_code, b_name, ch_cnt in books_rows:
+            cur.execute("SELECT chapter, verse, text_strong, text FROM verses WHERE book_id = ? ORDER BY chapter, verse", (b_id,))
+            v_rows = cur.fetchall()
+            ch_map = {}
+            for ch_num, v_num, txt_str, txt_clean in v_rows:
+                c_k = str(ch_num)
+                v_k = str(v_num)
+                if c_k not in ch_map:
+                    ch_map[c_k] = {}
+                val = txt_str if txt_str else txt_clean
+                if val:
+                    val = val.replace("<p>", "").replace("</p>", "").strip()
+                ch_map[c_k][v_k] = val
+
+            b_obj = {
+                "id": b_id,
+                "code": b_code,
+                "name": b_name,
+                "version": abbr,
+                "version_fullname": title,
+                "total_chapters": ch_cnt,
+                "chapters": ch_map
+            }
+            out_json = os.path.join(dest_json_dir, f"{b_id:02d}_{b_code}_{b_name}.json")
+            with open(out_json, "w", encoding="utf-8") as jf:
+                json.dump(b_obj, jf, ensure_ascii=False, indent=2)
+        conn.close()
+        BibleJsonLoader.clear_cache()
 
     def get_bible_registry(self) -> Dict[str, Any]:
         """Retourne le référentiel complet de classification des Bibles (Bibliorama)."""
@@ -2628,38 +2675,8 @@ class BibleAppApi:
 
             # Si c'est une Bible SQLite, extraire les 66 livres JSON pour compatibilité native instantanée
             if m_type == "bible" and target_path.endswith(".sqlite"):
-                import sqlite3
-                dest_json_dir = os.path.join(current_dir, "data", "bibles", m_abbr)
-                os.makedirs(dest_json_dir, exist_ok=True)
                 try:
-                    conn = sqlite3.connect(target_path)
-                    cur = conn.cursor()
-                    cur.execute("SELECT id, code, name, chapters_count FROM books ORDER BY id")
-                    books_rows = cur.fetchall()
-                    for b_id, b_code, b_name, ch_cnt in books_rows:
-                        cur.execute("SELECT chapter, verse, text_strong, text FROM verses WHERE book_id = ? ORDER BY chapter, verse", (b_id,))
-                        v_rows = cur.fetchall()
-                        ch_map = {}
-                        for ch_num, v_num, txt_str, txt_clean in v_rows:
-                            c_k = str(ch_num)
-                            v_k = str(v_num)
-                            if c_k not in ch_map:
-                                ch_map[c_k] = {}
-                            ch_map[c_k][v_k] = txt_str if txt_str else txt_clean
-
-                        b_obj = {
-                            "id": b_id,
-                            "code": b_code,
-                            "name": b_name,
-                            "version": m_abbr,
-                            "version_fullname": m_title,
-                            "total_chapters": ch_cnt,
-                            "chapters": ch_map
-                        }
-                        out_json = os.path.join(dest_json_dir, f"{b_id:02d}_{b_code}_{b_name}.json")
-                        with open(out_json, "w", encoding="utf-8") as jf:
-                            json.dump(b_obj, jf, ensure_ascii=False, indent=2)
-                    conn.close()
+                    self._extract_sqlite_bible_to_json(target_path, m_abbr, m_title)
                 except Exception as extract_err:
                     logger.warning(f"Erreur extraction SQLite Bible vers JSON : {extract_err}")
 

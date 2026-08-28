@@ -77,8 +77,11 @@ const LibraryView = {
       const card = document.createElement('div');
       card.className = `library-card ${book.active ? '' : 'inactive'}`;
 
-      // Initials pour couverture
-      const initials = (book.title || book.name || 'B').split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'B';
+      // Initials ou code court pour couverture
+      let initials = book.version_code || book.code || '';
+      if (!initials || initials.length > 5) {
+        initials = (book.title || book.name || 'B').split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'B';
+      }
       const coverColors = ['#1E293B', '#0F766E', '#1D4ED8', '#6D28D9', '#334155', '#B45309', '#C2410C', '#991B1B'];
       const color = coverColors[Math.abs(this._hashCode(book.name)) % coverColors.length];
 

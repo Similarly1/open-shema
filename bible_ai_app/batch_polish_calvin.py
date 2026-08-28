@@ -138,7 +138,7 @@ class CalvinPolisherCache:
     def is_chapter_cached(cls, book_code, chapter_num):
         cache = cls.load_cache()
         key = cls.get_key(book_code, chapter_num)
-        return key in cache and bool(cache[key].get("verses"))
+        return key in cache and ("verses" in cache[key])
 
     @classmethod
     def set_chapter(cls, book_code, chapter_num, verses_data, model_name):
@@ -282,8 +282,8 @@ def clean_json_response(raw_text):
     return None
 
 
-def call_llm_chapter(chapter_item, endpoint):
-    """Envoie un chapitre complet de commentaires à l'API LLM et récupère le JSON structuré."""
+def _call_llm_single_chunk(chapter_item, endpoint):
+    """Effectue un appel unitaire à l'API LLM pour un lot de versets."""
     book_name = chapter_item["book_name"]
     book_code = chapter_item["book_code"]
     chap_num = chapter_item["chapter"]
@@ -340,7 +340,7 @@ RAPPEL : Réponds UNIQUEMENT en JSON avec la clé "verses" contenant la liste de
             if endpoint.get("limiter"):
                 endpoint["limiter"].acquire()
 
-            resp = requests.post(url, json=payload, timeout=(15, 90))
+            resp = requests.post(url, json=payload, timeout=(15, 120))
             if resp.status_code == 200:
                 data = resp.json()
                 raw_u = data.get("usageMetadata", {})
@@ -410,6 +410,33 @@ RAPPEL : Réponds UNIQUEMENT en JSON avec la clé "verses" contenant la liste de
             return False, f"Exception Infomaniak : {e}", usage_res
 
     return False, f"Modèle non supporté : {clean_model}", usage_res
+
+
+def call_llm_chapter(chapter_item, endpoint):
+    """Envoie un chapitre complet (avec découpage automatique si le chapitre est volumineux)."""
+    raw_verses = chapter_item.get("verses", [])
+    if not raw_verses:
+        return True, [], {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+
+    # Découpage si > 20 versets pour éviter tout dépassement de tokens de sortie
+    MAX_CHUNK_VERSES = 15
+    if len(raw_verses) > MAX_CHUNK_VERSES:
+        all_verses = []
+        total_usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+        for i in range(0, len(raw_verses), MAX_CHUNK_VERSES):
+            chunk = raw_verses[i:i + MAX_CHUNK_VERSES]
+            sub_item = dict(chapter_item)
+            sub_item["verses"] = chunk
+            ok, res_v, u = _call_llm_single_chunk(sub_item, endpoint)
+            if not ok:
+                return False, res_v, total_usage
+            if isinstance(res_v, list):
+                all_verses.extend(res_v)
+            for k in total_usage:
+                total_usage[k] += u.get(k, 0)
+        return True, all_verses, total_usage
+    else:
+        return _call_llm_single_chunk(chapter_item, endpoint)
 
 
 def load_calvin_chapters(target_book=None, target_chapter=None):
