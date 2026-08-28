@@ -193,10 +193,31 @@ const LibraryView = {
       const delBtn = card.querySelector('.lib-btn-icon.delete');
       delBtn.addEventListener('click', async (e) => {
         e.stopPropagation();
-        if (confirm(`Êtes-vous sûr de vouloir supprimer définitivement « ${book.name} » ?`)) {
+        const bookDisplayName = book.title || book.name;
+        let confirmed = false;
+
+        if (typeof App !== 'undefined' && App.showConfirmModal) {
+          confirmed = await App.showConfirmModal({
+            title: "Supprimer cet ouvrage",
+            message: `Êtes-vous sûr de vouloir supprimer définitivement « ${bookDisplayName} » de votre bibliothèque ?`,
+            confirmText: "Supprimer",
+            cancelText: "Annuler",
+            danger: true,
+            icon: "trash"
+          });
+        } else {
+          confirmed = confirm(`Êtes-vous sûr de vouloir supprimer définitivement « ${bookDisplayName} » ?`);
+        }
+
+        if (confirmed) {
           await API.call('delete_book', book.name);
-          App.showToast(`« ${book.name} » a été supprimé`);
+          if (typeof App !== 'undefined' && App.showToast) {
+            App.showToast(`« ${bookDisplayName} » a été supprimé`);
+          }
           this.loadBooks();
+          if (typeof BibleReader !== 'undefined' && BibleReader.reloadInstalledBibles) {
+            BibleReader.reloadInstalledBibles();
+          }
         }
       });
 

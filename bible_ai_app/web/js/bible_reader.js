@@ -2455,11 +2455,29 @@ const DrawerNotesViewer = {
 
       card.querySelector('.btn-del-drawer')?.addEventListener('click', async (e) => {
         e.stopPropagation();
-        if (confirm(`Supprimer la note « ${n.title} » ?`)) {
+        let confirmed = false;
+        if (typeof App !== 'undefined' && App.showConfirmModal) {
+          confirmed = await App.showConfirmModal({
+            title: "Supprimer la note",
+            message: `Voulez-vous supprimer définitivement la note « ${n.title || 'Sans titre'} » ?`,
+            confirmText: "Supprimer",
+            cancelText: "Annuler",
+            danger: true,
+            icon: "trash"
+          });
+        } else {
+          confirmed = confirm(`Supprimer la note « ${n.title} » ?`);
+        }
+
+        if (confirmed) {
           await API.call('delete_note', n.id);
-          App.showToast('Note supprimée');
+          if (typeof App !== 'undefined' && App.showToast) {
+            App.showToast('Note supprimée');
+          }
           this.load(this.currentBook, this.currentChapter, this.currentVerse);
-          NotesView.loadNotes();
+          if (typeof NotesView !== 'undefined' && NotesView.loadNotes) {
+            NotesView.loadNotes();
+          }
         }
       });
 

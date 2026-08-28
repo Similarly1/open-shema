@@ -1158,7 +1158,21 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     const sec = this.sections.find(s => s.id === secId);
     if (!sec) return;
 
-    if (!confirm(`Supprimer la section "${sec.title || 'cette partie'}" ?`)) {
+    let confirmed = false;
+    if (typeof App !== 'undefined' && App.showConfirmModal) {
+      confirmed = await App.showConfirmModal({
+        title: "Supprimer la section",
+        message: `Voulez-vous supprimer la section "${sec.title || 'cette partie'}" ?`,
+        confirmText: "Supprimer",
+        cancelText: "Annuler",
+        danger: true,
+        icon: "trash"
+      });
+    } else {
+      confirmed = confirm(`Supprimer la section "${sec.title || 'cette partie'}" ?`);
+    }
+
+    if (!confirmed) {
       return;
     }
 

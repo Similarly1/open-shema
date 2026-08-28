@@ -11,6 +11,7 @@ const OpenShemaStore = {
   installedCodes: new Set(),
   activeCategory: 'all',
   searchQuery: '',
+  hideInstalled: localStorage.getItem('open_shema_store_hide_installed') === 'true',
   isDownloading: {},
 
   // Icônes SVG standardisées
@@ -182,13 +183,21 @@ const OpenShemaStore = {
             <input type="text" id="store-search-input" placeholder="Rechercher une version, un livre ou un auteur..." autocomplete="off">
           </div>
 
-          <div class="store-categories-bar" id="store-categories-bar">
-            <button class="store-cat-pill active" data-cat="all">Tous</button>
-            <button class="store-cat-pill" data-cat="bibles">Bibles</button>
-            <button class="store-cat-pill" data-cat="dictionaries">Dictionnaires</button>
-            <button class="store-cat-pill" data-cat="commentaries">Commentaires</button>
-            <button class="store-cat-pill" data-cat="theology">Théologie</button>
-            <button class="store-cat-pill" data-cat="datasets">Jeux de Données</button>
+          <div class="store-filters-row">
+            <div class="store-categories-bar" id="store-categories-bar">
+              <button class="store-cat-pill active" data-cat="all">Tous</button>
+              <button class="store-cat-pill" data-cat="bibles">Bibles</button>
+              <button class="store-cat-pill" data-cat="dictionaries">Dictionnaires</button>
+              <button class="store-cat-pill" data-cat="commentaries">Commentaires</button>
+              <button class="store-cat-pill" data-cat="theology">Théologie</button>
+              <button class="store-cat-pill" data-cat="datasets">Jeux de Données</button>
+            </div>
+
+            <label class="store-hide-installed-toggle" title="Masquer les ouvrages déjà présents dans votre bibliothèque">
+              <input type="checkbox" id="store-hide-installed-cb">
+              <span class="store-toggle-slider"></span>
+              <span class="store-toggle-text">Masquer les installés</span>
+            </label>
           </div>
         </div>
 
@@ -234,6 +243,16 @@ const OpenShemaStore = {
       });
     });
 
+    const hideCb = modal.querySelector('#store-hide-installed-cb');
+    if (hideCb) {
+      hideCb.checked = this.hideInstalled;
+      hideCb.addEventListener('change', (e) => {
+        this.hideInstalled = e.target.checked;
+        localStorage.setItem('open_shema_store_hide_installed', this.hideInstalled ? 'true' : 'false');
+        this.render();
+      });
+    }
+
     modal.querySelector('#btn-refresh-store').addEventListener('click', async () => {
       const btn = modal.querySelector('#btn-refresh-store');
       btn.classList.add('spinning');
@@ -254,6 +273,11 @@ const OpenShemaStore = {
       modal.querySelectorAll('.store-cat-pill').forEach(b => {
         b.classList.toggle('active', b.dataset.cat === categoryFilter);
       });
+    }
+
+    const hideCb = modal.querySelector('#store-hide-installed-cb');
+    if (hideCb) {
+      hideCb.checked = this.hideInstalled;
     }
 
     modal.classList.remove('hidden');
@@ -286,6 +310,11 @@ const OpenShemaStore = {
     }
 
     const modules = this.catalogData.modules.filter(m => {
+      // Filtre masquer les éléments déjà installés
+      if (this.hideInstalled && this._isModuleInstalled(m)) {
+        return false;
+      }
+
       // Filtre catégorie
       if (this.activeCategory !== 'all') {
         if (this.activeCategory === 'bibles' && m.type !== 'bible') return false;
@@ -307,10 +336,13 @@ const OpenShemaStore = {
     });
 
     if (modules.length === 0) {
+      const isAllInstalled = this.hideInstalled && this.catalogData.modules.some(m => this._isModuleInstalled(m));
       container.innerHTML = `
         <div class="store-empty-state">
-          <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/></svg>
-          <p>Aucun ouvrage ne correspond à votre recherche dans cette catégorie.</p>
+          <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.8">
+            ${isAllInstalled ? '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>' : '<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>'}
+          </svg>
+          <p>${isAllInstalled ? 'Tous les ouvrages de cette sélection sont déjà installés dans votre bibliothèque !' : 'Aucun ouvrage ne correspond à votre recherche dans cette catégorie.'}</p>
         </div>
       `;
       return;

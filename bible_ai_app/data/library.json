@@ -861,17 +861,19 @@
     "book_code": null
   },
   "CBJC": {
-    "name": "CBJC",
     "title": "Commentaire Biblique de Jean Calvin",
     "author": "Jean Calvin (Éd. Ch. Meyrueis / Dom. Public)",
-    "description": "Ensemble des commentaires exégétiques et doctrinaux de Jean Calvin sur le Nouveau et l'Ancien Testament (13 439 passages indexés sur 48 livres). Texte intégral du domaine public restauré, modernisé et structuré en Markdown thématique avec mise en valeur des citations et références scripturaires.",
-    "year": "1854",
+    "description": "Ensemble des commentaires exégétiques et doctrinaux de Jean Calvin sur le Nouveau et l'Ancien Testament (12 175 passages indexés sur 48 livres). Texte intégral du domaine public restauré, modernisé et structuré en Markdown thématique avec mise en valeur des citations et références scripturaires.",
+    "year": "1.0.0",
     "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\CBJC.png",
     "type": "Commentaire",
-    "corpus_scope": "GLOBAL",
-    "source_type": "general",
-    "book_code": null,
+    "format": "sqlite",
+    "file_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\commentaires\\comm_comm_calvin.sqlite",
+    "folder_name": "CBJC",
+    "version_code": "CBJC",
+    "total_books": 0,
     "embedding_model": "study_library",
-    "active": true
+    "active": true,
+    "has_strongs": false
   }
 }
