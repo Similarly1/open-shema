@@ -2634,6 +2634,12 @@ class BibleAppApi:
         from core.book_metadata_client import BookMetadataClient
         return BookMetadataClient.download_cover(cover_url, book_id)
 
+    def search_christian_ebooks(self, query: str) -> Dict[str, Any]:
+        """Recherche des e-books chrétiens 100% numériques à travers plusieurs librairies et plateformes."""
+        from core.ebook_finder_manager import EbookFinderManager
+        finder = EbookFinderManager()
+        return finder.search_all_ebooks(query)
+
     def download_and_install_catalog_module(self, module_data: Dict[str, Any]) -> Dict[str, Any]:
         """Télécharge un module officiel depuis le dépôt open-shema-data et l'installe localement."""
         import urllib.request

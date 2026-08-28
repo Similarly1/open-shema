@@ -28,6 +28,13 @@ const LibraryView = {
       this.importBook();
     });
 
+    document.getElementById('btn-lib-search-ebooks')?.addEventListener('click', () => {
+      const q = this.searchInput?.value?.trim() || '';
+      if (typeof EbookFinderModal !== 'undefined') {
+        EbookFinderModal.open(q);
+      }
+    });
+
     document.getElementById('btn-lib-open-store')?.addEventListener('click', () => {
       if (typeof OpenShemaStore !== 'undefined') {
         OpenShemaStore.open();

@@ -25,6 +25,13 @@ const SearchView = {
 
     this.corpusFilter.addEventListener('change', () => this.executeSearch());
     this.sourceFilter.addEventListener('change', () => this.executeSearch());
+
+    document.getElementById('btn-search-open-ebooks')?.addEventListener('click', () => {
+      const q = this.searchInput.value.trim();
+      if (typeof EbookFinderModal !== 'undefined') {
+        EbookFinderModal.open(q);
+      }
+    });
   },
 
   async executeSearch() {
@@ -54,11 +61,21 @@ const SearchView = {
 
       if (results.length === 0) {
         this.resultsContainer.innerHTML = `
-          <div class="empty-state" style="text-align: center; padding: 60px; color: var(--text-muted);">
-            <span style="font-size: 40px; display: block; margin-bottom: 10px;">∅</span>
-            <p>Aucun résultat ne correspond à votre recherche.</p>
+          <div class="empty-state" style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
+            <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.8" style="display: block; margin: 0 auto 10px auto; opacity: 0.5;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <p style="font-size: 1rem; margin-bottom: 8px;">Aucun résultat trouvé dans vos Bibles locales pour « <strong>${query}</strong> ».</p>
+            <p style="font-size: 0.85rem; margin-bottom: 20px; opacity: 0.8;">Vous cherchez une traduction ou un ouvrage spécifique ?</p>
+            <button class="btn btn-primary" id="btn-search-fallback-ebook" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 6px; cursor: pointer;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <span>Chercher en E-book dans les librairies chrétiennes</span>
+            </button>
           </div>
         `;
+        document.getElementById('btn-search-fallback-ebook')?.addEventListener('click', () => {
+          if (typeof EbookFinderModal !== 'undefined') {
+            EbookFinderModal.open(query);
+          }
+        });
         return;
       }
 

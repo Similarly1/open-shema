@@ -35,7 +35,7 @@ delivery_history:
   location: AMD
   notes: Prêché au culte dominical
 created_at: '2026-08-28T20:57:29.547755'
-updated_at: '2026-08-28T21:06:59.304046'
+updated_at: '2026-08-28T21:41:52.102347'
 ---
 
 ## Introduction
@@ -46,10 +46,7 @@ Nous avons vu ensemble dimanche dernier que l'amour du Père va jusqu'à accepte
 
 Nous allons maintenant nous pencher sur **2 Corinthiens 5.16** (un seul verset !) qui nous adresse un appel vibrant : **Recherchons à connaître Dieu spirituellement plus qu'intellectuellement.**
 
-Cette démarche intérieure passe par trois regards successifs : 
-
-> [!illustration]
-> **Titre de l'anecdote :** Racontez l'histoire ou l'image concrète ici...
+Cette démarche intérieure passe par trois regards successifs :
 
 1. Voir le visible et juger 
 2. Voir le visible et ne pas y croire
@@ -128,6 +125,9 @@ Prier, ce n'est pas réciter machinalement des formules dans le vide : c'est ent
 > Fuyant les Khmers rouges pendant 40 jours au Cambodge au milieu d'un péril mortel quotidien, Koeun Path, de tradition bouddhiste, entend à trois reprises une voix distincte qui le guide avec précision (la promesse de trouver du maïs dans 3 jours, l'encouragement vers la frontière, la direction à suivre). Arrivé en Thaïlande et emprisonné, il découvre l'Évangile grâce à une missionnaire américaine. Touché par l'Esprit Saint, il parvient à pardonner à ses tortionnaires et deviendra plus tard pasteur en France. Dieu est agissant dans l'invisible de façon bien plus concrète que nous ne le supposons.
 
 ## Conclusion & Appel
+
+> [!illustration]
+> **Titre de l'anecdote :** Racontez l'histoire ou l'image concrète ici...
 
 Voir le visible et juger, ou voir le visible sans y croire : voilà ce que nous faisons spontanément selon la chair. Mais discerner l'invisible et s'y confier relève de l'action transformatrice du Saint-Esprit.
 

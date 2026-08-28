@@ -1136,6 +1136,10 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
         this.updateMetrics();
         this.debouncedAutoSave();
         this.handleSlashInput(e);
+
+        editor.querySelectorAll('.sermon-block-illustration').forEach(b => {
+          this.attachIllustrationBlockHelpers(b, sec.id);
+        });
       });
 
       editor?.addEventListener('keydown', (e) => {
@@ -1411,6 +1415,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     }
 
     let htmlToInsert = '';
+    let blockId = null;
 
     switch (type) {
       case 'subpoint':
@@ -1440,7 +1445,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
         `;
         break;
       case 'illustration':
-        const blockId = `ill-block-${Date.now()}`;
+        blockId = `ill-block-${Date.now()}`;
         htmlToInsert = `
           <div class="sermon-callout-block sermon-block-illustration" data-type="illustration" id="${blockId}">
             <div class="sermon-block-header" contenteditable="false">
@@ -2907,12 +2912,39 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     return this.illustrations.slice(0, limit);
   },
 
+  isIllustrationBlockEmpty(blockEl) {
+    if (!blockEl) return true;
+    const header = blockEl.querySelector('.sermon-block-header');
+    let text = '';
+    Array.from(blockEl.children).forEach(child => {
+      if (child !== header) {
+        text += ' ' + (child.innerText || child.textContent || '');
+      }
+    });
+    text = text.trim();
+    if (!text) return true;
+
+    const lower = text.toLowerCase();
+    const isPlaceholder = lower.includes("racontez l'histoire") ||
+      lower.includes("image concrète ici") ||
+      lower === "titre de l'anecdote :" ||
+      lower === "titre de l'anecdote : racontez l'histoire ou l'image concrète ici..." ||
+      (lower.startsWith("titre de l'anecdote") && lower.length < 35);
+
+    return isPlaceholder;
+  },
+
   attachIllustrationBlockHelpers(blockEl, sectionId) {
-    if (!blockEl || blockEl.dataset.helpersAttached === 'true') return;
-    blockEl.dataset.helpersAttached = 'true';
+    if (!blockEl) return;
 
     const header = blockEl.querySelector('.sermon-block-header');
     if (!header) return;
+
+    // Règle : aucune suggestion si le bloc contient déjà une illustration rédigée
+    if (!this.isIllustrationBlockEmpty(blockEl)) {
+      header.querySelector('.ill-suggest-chips')?.remove();
+      return;
+    }
 
     const sec = this.sections.find(s => s.id === sectionId) || {};
     const matches = this.findMatchingIllustrations({ sectionTitle: sec.title }, 3);
@@ -3006,6 +3038,9 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     const header = blockEl.querySelector('.sermon-block-header');
     const cleanBody = (ill.body || ill.content || '').replace(/^[#>*\s-]+/gm, '').trim();
     const sourceText = ill.author ? (ill.author + (ill.source ? ` (${ill.source})` : '')) : (ill.source || '');
+
+    // Retirer les pastilles de suggestion dès qu'une illustration est insérée
+    header.querySelector('.ill-suggest-chips')?.remove();
 
     let newContent = `<p><strong>${this.escapeHtml(ill.title)} :</strong> ${this.escapeHtml(cleanBody)}</p>`;
     if (sourceText) {
