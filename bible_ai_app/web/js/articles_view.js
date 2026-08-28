@@ -1610,7 +1610,7 @@ const ArticlesView = {
 
     // 5b-2. Détection et mise en valeur du cartouche éditorial de fin d'article (Option 3 : Badge contextuel dynamique, sans émoji/svg)
     text = text.replace(
-      /(?:^|\n\n+)((?:Merci\s+à\s+[^\n]+pour\s+la\s+traduction|Article\s+original\s*:|Cet article\s+(?:fait partie|est extrait|est tiré|a été publié|provient|est une adaptation|est la traduction|est une traduction|est le premier|est le second|est le troisième|est basé)|Extrait du livre|Tiré du livre)[\s\S]+?)(?=\n\n###|\n\n<|\s*$)/gi,
+      /(?:^|\n\n+)((?:Merci\s+à\s+[^\n]+pour\s+la\s+traduction|Article\s+original\s*:|Cet article\s+(?:fait partie|est extrait|est tiré|a été publié|provient|est une adaptation|est la traduction|est une traduction|est le premier|est le second|est le troisième|est basé)|Extrait du livre|Tiré du livre)[\s\S]+?)(?=\n\n\d+\.|\n\n###|\n\n<|\s*$)/gi,
       (match, content) => {
         const badge = this.getEditorialBadgeLabel(content);
         const cleanContent = normalizeSuperscripts(content.trim());
@@ -1628,13 +1628,13 @@ const ArticlesView = {
     text = text.replace(/(?:^|\n)([A-ZÀ-ÿ][^\n*]+?)\s+(\*\*Lisez\s+[^*]+\*\*)/gim, '\n\n### $1\n\n$2\n\n');
     text = text.replace(/(\*\*[^*]+\*\*)\s+([A-ZÀ-ÿ])/g, '$1\n\n$2');
 
-    // 5e. Découpage et mise en page soignée des dialogues au tiret cadratin (sans couper les attributions de citations comme ". – Actes 1.8-11")
-    const notBibleRefAhead = `(?!(?:\\s*${bibleBooksPattern}\\.?\\s*[0-9⁰¹²³⁴⁵⁶⁷⁸⁹]))`;
+    // 5e. Découpage et mise en page soignée des dialogues au tiret cadratin (sans couper les attributions de citations comme ". – Actes 1.8-11" ou "– Ndlr.")
+    const notBibleRefAhead = `(?!(?:\\s*Ndlr|\\s*NDLR|\\s*ndlr|\\s*${bibleBooksPattern}\\.?\\s*[0-9⁰¹²³⁴⁵⁶⁷⁸⁹]))`;
 
     text = text.replace(/([:!?…»])\s*([—–\u2013\u2014]\s+[A-ZÀ-ÿ])/g, '$1\n\n$2');
     text = new RegExp(`\\.\\s+([—–\\u2013\\u2014]${notBibleRefAhead}\\s+[A-ZÀ-ÿ])`, 'g')[Symbol.replace](text, '.\n\n$1');
 
-    // Convertir les lignes de dialogue au tiret en encadrés distincts (en protégeant les citations scripturaires)
+    // Convertir les lignes de dialogue au tiret en encadrés distincts (en protégeant les citations scripturaires et mentions Ndlr)
     text = new RegExp(`(?:^|\\n)\\s*([—–\\u2013\\u2014]${notBibleRefAhead}\\s+[A-ZÀ-ÿ][^\\n]+)`, 'g')[Symbol.replace](text, '\n\n<div class="article-speaker-turn"><p class="article-speaker-speech">$1</p></div>\n\n');
 
     // 5f. Convertir les citations bibliques et littéraires avec tiret de référence (« ... » – Réf / Auteur)
@@ -1662,8 +1662,10 @@ const ArticlesView = {
     // Supprimer les espaces indésirables entre l'appel de note et la ponctuation suivante (ex: </sup> . -> </sup>.)
     text = text.replace(/<\/sup>\s+([.,;:!?])/g, '</sup>$1');
 
-    // 5h. Normaliser les notes de bas de page : suppression des symboles ↩ et jonction des numéros
-    text = text.replace(/[↩︎↩]/g, '');
+    // 5h. Normaliser les notes de bas de page : suppression des symboles ↩, des ancres de retour résiduelles et jonction des numéros
+    text = text.replace(/\[[\s\u21A9\uFE0E\uFE0F↩︎↩]*\]\(#[^)]*\)/gi, '');
+    text = text.replace(/\[\s*\]\([^)]*\)/gi, '');
+    text = text.replace(/[\u21A9\uFE0E\uFE0F↩︎↩]/g, '');
     text = text.replace(/(?:^|\n)(\d+)\.\s*\n+([^\n]+)/g, '\n$1. $2');
 
     // 5i. Formater et nettoyer les liens d'URLs brutes dans les notes (ex: [https://...])

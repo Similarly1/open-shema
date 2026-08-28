@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 import os
 import json
 import re
@@ -49,8 +51,7 @@ class DictionaryManager:
                     cls._registry = json.load(f)
                     return cls._registry
             except Exception as e:
-                print(f"Erreur lecture registry.json : {e}")
-                
+                logger.error(f"Erreur lecture registry.json : {e}")
         # Registre par défaut
         cls._registry = [
             {
@@ -92,8 +93,7 @@ class DictionaryManager:
             with open(r_path, "w", encoding="utf-8") as f:
                 json.dump(registry_data, f, ensure_ascii=False, indent=2)
         except Exception as e:
-            print(f"Erreur écriture registry.json : {e}")
-
+            logger.error(f"Erreur écriture registry.json : {e}")
     @classmethod
     def normalize_term(cls, s):
         if not s:
@@ -132,7 +132,7 @@ class DictionaryManager:
                 cls._dict_cache[dict_id] = data
                 return data
         except Exception as e:
-            print(f"Erreur chargement dictionnaire {dict_id} ({file_path}) : {e}")
+            logger.error(f"Erreur chargement dictionnaire {dict_id} ({file_path}) : {e}")
             return None
 
     @classmethod

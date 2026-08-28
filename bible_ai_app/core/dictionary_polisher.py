@@ -275,8 +275,7 @@ class DictionaryPolisher:
             chunks = cls.split_text_into_chunks(raw_text, max_chars=12000)
             polished_chunks = []
             agg_usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
-            print(f"\n   📄 [{title}] Grand article ({len(raw_text):,} caractères) découpé en {len(chunks)} sections...", flush=True)
-            
+            logger.info(f"\n   📄 [{title}] Grand article ({len(raw_text):,} caractères) découpé en {len(chunks)} sections...", flush=True)
             for i, chunk in enumerate(chunks, 1):
                 sub_title = f"{title} (Partie {i}/{len(chunks)})" if len(chunks) > 1 else title
                 chunk_ok = False
@@ -291,7 +290,7 @@ class DictionaryPolisher:
                         chunk_ok = True
                         chunk_res = res
                         chunk_usage = u
-                        print(f"      • Section {i}/{len(chunks)} polie avec succès ({len(chunk):,} chars)", flush=True)
+                        logger.info(f"      • Section {i}/{len(chunks)} polie avec succès ({len(chunk):,} chars)", flush=True)
                         break
                         
                     err_l = str(res).lower()
@@ -304,7 +303,7 @@ class DictionaryPolisher:
                                     wait_t = float(m.group(1)) + 2.0
                             except Exception:
                                 pass
-                        print(f"      ⏳ Pause quota {wait_t:.0f}s sur section {i}/{len(chunks)}...", flush=True)
+                        logger.info(f"      ⏳ Pause quota {wait_t:.0f}s sur section {i}/{len(chunks)}...", flush=True)
                         time.sleep(wait_t)
                     else:
                         time.sleep(2 * attempt)

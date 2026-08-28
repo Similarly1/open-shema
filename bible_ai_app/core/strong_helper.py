@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 import os
 import re
 import json
@@ -106,7 +108,7 @@ class StrongLexiconHelper:
                 "vector_score": 1.0
             }
         except Exception as e:
-            print(f"Erreur extraction lexique Strong : {e}")
+            logger.error(f"Erreur extraction lexique Strong : {e}")
             return None
 
 if __name__ == "__main__":
@@ -114,7 +116,7 @@ if __name__ == "__main__":
     sys.stdout.reconfigure(encoding='utf-8')
     res = StrongLexiconHelper.get_verse_lexicon_block("Gen", 1, 18)
     if res:
-        print("Success!\n")
-        print(res["text"])
+        logger.info("Success!\n")
+        logger.info(res["text"])
     else:
-        print("Failed to get verse lexicon block.")
+        logger.error("Failed to get verse lexicon block.")

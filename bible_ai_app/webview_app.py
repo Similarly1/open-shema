@@ -1838,8 +1838,7 @@ class BibleAppApi:
                         })
                         sources_used.append(f"Bibles ({ch_data.get('book_french', b_code)} {ch_num})")
             except Exception as e:
-                print(f"[ask_study_ai] Erreur extraction biblique : {e}")
-
+                logger.error(f"[ask_study_ai] Erreur extraction biblique : {e}")
         # 2. Extraction des commentaires bibliques et théologie
         # Extraction intelligente des entités et termes clés de la question
         stop_words_fr = {
@@ -1895,8 +1894,7 @@ class BibleAppApi:
                             "metadata": {"type": "Bible", "name": f"Bibles (LSG — {ch_data.get('book_french', b_code)} {ch_num})", "ref": passage_ref}
                         })
             except Exception as e:
-                print(f"[ask_study_ai] Erreur extraction biblique : {e}")
-
+                logger.error(f"[ask_study_ai] Erreur extraction biblique : {e}")
         # 2. Extraction des Dictionnaires Bibliques & Lexique Strong (Multi-termes complet)
         if sources_cfg.get("dictionaries", True) and not is_light_free_chat:
             try:
@@ -1924,8 +1922,7 @@ class BibleAppApi:
                                     "metadata": {"type": "Dictionnaire", "name": f"{dict_name} ({art_title})"}
                                 })
             except Exception as e:
-                print(f"[ask_study_ai] Erreur extraction dictionnaires : {e}")
-
+                logger.error(f"[ask_study_ai] Erreur extraction dictionnaires : {e}")
         # 3. Extraction des Commentaires Bibliques & Ouvrages de Théologie
         if sources_cfg.get("commentaries", True) and not is_light_free_chat:
             try:
@@ -1977,8 +1974,7 @@ class BibleAppApi:
                                             "metadata": {"type": "Théologie", "name": b_title, "author": tr.get("author", "")}
                                         })
             except Exception as e:
-                print(f"[ask_study_ai] Erreur extraction commentaires/théologie : {e}")
-
+                logger.error(f"[ask_study_ai] Erreur extraction commentaires/théologie : {e}")
         # 4. Extraction des notes personnelles (.md)
         if sources_cfg.get("notes", True):
             try:
@@ -1990,8 +1986,7 @@ class BibleAppApi:
                         "metadata": {"type": "Notes", "name": "Notes personnelles (.md)", "author": "Vos notes"}
                     })
             except Exception as e:
-                print(f"[ask_study_ai] Erreur extraction notes : {e}")
-
+                logger.error(f"[ask_study_ai] Erreur extraction notes : {e}")
         # 5. Pipeline RAG : Reranking sémantique & Curation
         if enable_rerank and len(context_chunks) > 1:
             try:
@@ -2000,8 +1995,7 @@ class BibleAppApi:
                 search_query = f"{passage_ref} {question}".strip()
                 context_chunks = reranker.rerank(query=search_query, documents=context_chunks, top_k=8)
             except Exception as e:
-                print(f"[ask_study_ai] Reranking bypass : {e}")
-
+                logger.info(f"[ask_study_ai] Reranking bypass : {e}")
         # Dédoublonnage et structuration riche des sources mobilisées (avec couvertures et infobulles)
         dedup_sources = []
         seen_source_keys = set()
@@ -2242,7 +2236,7 @@ class BibleAppApi:
                 "model_used": selected_model
             }
         except Exception as e:
-            print(f"[ask_study_ai] Erreur LLM : {e}")
+            logger.error(f"[ask_study_ai] Erreur LLM : {e}")
             return {
                 "answer": f"### Synthèse ({detected_mode}) pour {subject_label}\n\n**1. Fondements du sujet :**\nL'analyse de votre question met en lumière la richesse et la cohérence de la doctrine biblique.\n\n**2. Éléments d'étude approfondie :**\nLes sources disponibles permettent d'en dégager les articulations majeures et la portée théologique.\n\n**3. Application :**\nCette réflexion nourrit la compréhension des Écritures et la méditation chrétienne.",
                 "sources_used": sources_used or ["Corpus théologique général"],

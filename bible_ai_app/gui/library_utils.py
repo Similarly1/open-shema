@@ -1,13 +1,17 @@
-import logging
-logger = logging.getLogger(__name__)
 import os
 import json
+import logging
 import shutil
+
+logger = logging.getLogger(__name__)
+
+# Chemin absolu calculé depuis l'emplacement du fichier — indépendant du CWD
+_APP_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_LIBRARY_PATH = os.path.join(_APP_ROOT, "data", "library.json")
 
 # Cache en mémoire pour éviter de relire library.json à chaque navigation de verset.
 # Invalidé automatiquement par save_books_metadata().
 _LIBRARY_CACHE: dict | None = None
-_LIBRARY_PATH = 'data/library.json'
 
 def load_books_metadata() -> dict:
     global _LIBRARY_CACHE

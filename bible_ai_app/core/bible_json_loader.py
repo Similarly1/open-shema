@@ -255,7 +255,7 @@ class BibleJsonLoader:
             cls._cache[cache_key] = data
             return data
         except Exception as e:
-            print(f"Erreur chargement livre {matched_file} : {e}")
+            logger.error(f"Erreur chargement livre {matched_file} : {e}")
             return None
 
     @classmethod
@@ -434,7 +434,7 @@ class BibleJsonLoader:
                     with open(src_file, "r", encoding="utf-8-sig") as fp:
                         book_raw = json.load(fp)
                 except Exception as e:
-                    print(f"Fichier {f} ignoré (non lisible ou non-JSON : {e})")
+                    logger.info(f"Fichier {f} ignoré (non lisible ou non-JSON : {e})")
                     continue
 
                 b_code_raw = book_raw.get("general", {}).get("about_book", {}).get("book_code", "")

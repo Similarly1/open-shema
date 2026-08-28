@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 import os
 os.environ["ANONYMIZED_TELEMETRY"] = "False"
 import re
@@ -274,7 +276,7 @@ class VectorDB:
                         all_metadatas.extend(res_metas)
                         all_documents.extend(res_docs)
                 except Exception as e:
-                    print(f"Error querying database for reference {norm_ref}: {e}")
+                    logger.error(f"Error querying database for reference {norm_ref}: {e}")
                     continue
 
         if not all_ids:

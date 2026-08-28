@@ -121,11 +121,28 @@ class TheologyReaderManager:
         if fpath and os.path.exists(fpath):
             return fpath
 
-        candidate_dirs = [
-            r"C:\Users\adrie\kDrive\Documents\Théologie\Ressources externes\Ebooks",
-            r"C:\Users\adrie\kDrive\Documents\Théologie\Ressources externes",
-            r"./data/ebooks",
-            r"./data",
+        candidate_dirs = []
+
+        # Répertoire configurable par l'utilisateur dans les paramètres (clé 'ebooks_dir')
+        try:
+            from core.config import load_config
+            cfg = load_config()
+            user_ebooks_dir = cfg.get("ebooks_dir", "")
+            if user_ebooks_dir and os.path.isdir(user_ebooks_dir):
+                candidate_dirs.append(user_ebooks_dir)
+                # Sous-dossiers immédiats du répertoire ebooks configuré
+                for sub in os.listdir(user_ebooks_dir):
+                    sub_path = os.path.join(user_ebooks_dir, sub)
+                    if os.path.isdir(sub_path):
+                        candidate_dirs.append(sub_path)
+        except Exception as _silent_e:
+            logger.debug("Erreur ignoree : %s", _silent_e)
+
+        # Fallback sur le dossier data/ebooks/ local à l'installation
+        _app_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        candidate_dirs += [
+            os.path.join(_app_root, "data", "ebooks"),
+            os.path.join(_app_root, "data"),
         ]
 
         title = (book_meta.get("title") or book_name).lower()

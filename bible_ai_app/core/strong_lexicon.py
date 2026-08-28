@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 import os
 import json
 import re
@@ -27,7 +29,7 @@ class StrongLexicon:
             with open(lex_path, "r", encoding="utf-8") as f:
                 cls._lexicon = json.load(f)
         except Exception as e:
-            print(f"Erreur chargement dictionnaire Strong {lex_path} : {e}")
+            logger.error(f"Erreur chargement dictionnaire Strong {lex_path} : {e}")
             cls._lexicon = {}
             
         return cls._lexicon
@@ -48,7 +50,7 @@ class StrongLexicon:
             with open(bailly_path, "r", encoding="utf-8") as f:
                 cls._bailly = json.load(f)
         except Exception as e:
-            print(f"Erreur chargement dictionnaire Bailly {bailly_path} : {e}")
+            logger.error(f"Erreur chargement dictionnaire Bailly {bailly_path} : {e}")
             cls._bailly = {"by_strong": {}, "by_key": {}}
             
         return cls._bailly

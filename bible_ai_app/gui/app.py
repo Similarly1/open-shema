@@ -191,7 +191,7 @@ class App(ctk.CTk):
                 # Charger l'ensemble du livre pour le défilement continu
                 results = self.db.get_by_reference(book_code, active_sources=active_sources_info)
             except Exception as e:
-                print(f"Error in do_search for {reference}: {e}")
+                logger.error(f"Error in do_search for {reference}: {e}")
                 results = None
             finally:
                 self._current_searching_ref = None
@@ -345,8 +345,7 @@ class App(ctk.CTk):
                             new_metas.append(m)
                         coll.update(ids=coll_data["ids"], metadatas=new_metas)
                 except Exception as e:
-                    print(f"Erreur renommage ChromaDB: {e}")
-                    
+                    logger.error(f"Erreur renommage ChromaDB: {e}")
             from core.bible_json_loader import BibleJsonLoader
             BibleJsonLoader.clear_cache()
             

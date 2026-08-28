@@ -171,6 +171,8 @@ DEFAULTS = {
     "vintage_intensity": "subtle",
     "articles_vectorization_mode": "balanced",  # "balanced", "economical", "full"
     "articles_recent_vectorize_cap": 10,
+    # Répertoire des ebooks théologiques (format EPUB) — configurable par l'utilisateur
+    "ebooks_dir": "",
 }
 
 def load_config():
@@ -194,6 +196,13 @@ def load_config():
     return config
 
 def save_config(config_dict):
-    os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
-    with open(CONFIG_PATH, "w", encoding="utf-8") as f:
-        json.dump(config_dict, f, indent=4)
+    try:
+        os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
+        with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+            json.dump(config_dict, f, indent=4)
+    except OSError as e:
+        logger.error(
+            "Impossible de sauvegarder la configuration (%s) : %s. "
+            "Vérifiez les droits d'écriture sur le dossier 'data/'.",
+            CONFIG_PATH, e
+        )

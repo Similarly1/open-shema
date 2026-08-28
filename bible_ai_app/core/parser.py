@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 import re
 import docx
 from core.reference_parser import normalize_reference
@@ -105,5 +107,5 @@ def has_logos_tags(file_path):
             if "[[@" in para.text:
                 return True
     except Exception as e:
-        print("Erreur validation Logos :", e)
+        logger.error("Erreur validation Logos :", e)
     return False

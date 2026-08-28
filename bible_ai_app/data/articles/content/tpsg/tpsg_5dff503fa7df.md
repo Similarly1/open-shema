@@ -1,0 +1,13 @@
+Avant la création et indépendamment de celle-ci, «  Dieu était pleinement et parfaitement Dieu  ». C’est ce que veut dire son saint nom, *Yahweh* , construit à partir du verbe «  Je suis  », et utilisé des milliers de fois dans la Bible, chaque fois que vous voyez le mot «  Éternel  ». Ce nom «  témoigne de l’existence absolue de Dieu en lui-même et par lui-même  » (Ex 3.14). Par ce nom, Dieu dit : «  Je suis la réalité absolue. Je n’ai pas eu de commencement. Je n’aurai pas de fin. Et la création ne contribue en rien à faire de moi ce que je suis.  » Notre Dieu parfait ne peut être amélioré. La création n’est pas indispensable à son bonheur, car son amour parfait au sein de la Trinité précède tout ce qu’il a créé.
+
+Alors, dans quel but Dieu m’aurait-il créé s’il n’avait rien à y gagner ? Suis-je un accident ? Suis-je le fruit d’un caprice ?
+
+Ni l’un ni l’autre. Il vous a créé pour sa gloire, par amour (És 43.6-7). Il crée à partir de l’abondance de ce qu’il est. «  À tous ceux qui le voulaient, tous ceux qui voulaient le recevoir comme leur trésor, il nous a donné part à la joie que Dieu éprouve en lui-même, une joie qui le révèle et le glorifie.
+
+Si vous insistez encore davantage et me dites : “Mais pourquoi a-t-il fait cela s’il était si comblé et heureux sans la création ?”, je répondrais que c’est dans la nature même de la plénitude de l’amour divin de se donner. En Dieu, voilà ce qu’est l’amour. Et ce partage ne complète ni n’améliore Dieu en rien. »
+
+Cette théologie avancée a toute son importance dans notre vie de tous les jours. Quand le réveil sonnera demain matin, rappelez-vous que c’est pour cela que nous existons : «  Nous existons pour aligner nos vies sur le plan de Dieu dans la création, c’est-à-dire son dessein de communiquer sa gloire dans le flot débordant de son amour, qui exalte Dieu et satisfait l’âme. Et voici en quoi consiste cet alignement : magnifier la gloire de Dieu en le considérant comme la réalité la plus épanouissante de l’univers  » (1 Corinthiens 10.31) [^1] .
+
+Cet article est extrait du livre *[Ask Pastor John](https://www.amazon.fr/Ask-Pastor-John-Important-Questions/dp/1433581264?tag=etrangeetvoya-21)* , écrit par Tony Reinke en collaboration avec John Piper, et basé sur le podcast du même nom. Dans cette adaptation, les phrases placées entre guillemets reprennent mot à mot les propos de John Piper. – Ndlr.
+
+1. APJ 1579 : « Pourquoi Dieu nous a-t-il créés ? » (25 janvier 2021) [↩︎](#7a0e0617-8c59-49cb-b064-9704dc8a5b65-link)

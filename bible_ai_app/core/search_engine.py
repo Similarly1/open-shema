@@ -337,7 +337,7 @@ class SearchEngine:
             cur.execute(sql, params)
             rows = cur.fetchall()
         except Exception as e:
-            print(f"[SearchEngine] Erreur FTS Bibles: {e}")
+            logger.error(f"[SearchEngine] Erreur FTS Bibles: {e}")
             return []
 
 
@@ -515,8 +515,7 @@ class SearchEngine:
                     "raw_entry": h
                 })
         except Exception as e:
-            print(f"[SearchEngine] Erreur recherche dictionnaires: {e}")
-
+            logger.error(f"[SearchEngine] Erreur recherche dictionnaires: {e}")
         return results
 
     def search_global_library(
