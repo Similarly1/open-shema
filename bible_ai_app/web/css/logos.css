@@ -24423,6 +24423,40 @@ body.reading-bg-dark .comm-dropdown-popover {
   overflow: hidden;
 }
 
+#ill-picker-quick-filters {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 2px 0;
+}
+#ill-picker-quick-filters::-webkit-scrollbar {
+  display: none;
+}
+#ill-picker-quick-filters .ill-category-pill {
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 14px;
+  background: var(--bg-tertiary, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+#ill-picker-quick-filters .ill-category-pill:hover {
+  background: var(--bg-hover, rgba(255, 255, 255, 0.1));
+  color: var(--text-primary);
+}
+#ill-picker-quick-filters .ill-category-pill.active {
+  background: rgba(245, 158, 11, 0.16);
+  color: var(--accent-amber, #f59e0b);
+  border-color: var(--accent-amber, #f59e0b);
+}
+
 /* Styles spécifiques par type */
 .sermon-block-scripture {
   border-left-color: #3b82f6;

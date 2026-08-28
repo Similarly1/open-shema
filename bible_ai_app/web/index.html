@@ -4310,15 +4310,15 @@
       <!-- ===================================================== -->
       <!-- MODAL CONTEXTUELLE : SÉLECTEUR D'ILLUSTRATIONS        -->
       <!-- ===================================================== -->
-      <div id="sermon-illustration-picker-modal" class="modal-overlay hidden" style="z-index: 10000;">
-        <div class="modal-card modal-lg" style="max-width: 840px; max-height: 85vh; display: flex; flex-direction: column; padding: 0;">
-          <div class="modal-header" style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+      <div id="sermon-illustration-picker-modal" class="modal-dialog-container hidden" style="z-index: 99999;">
+        <div class="modal-card modal-card-large" style="width: 860px; max-width: 94vw; max-height: 85vh; display: flex; flex-direction: column; background: var(--bg-card); border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); border: 1px solid var(--border-color); overflow: hidden;">
+          <div class="modal-header" style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; background: var(--bg-card);">
             <div style="display: flex; align-items: center; gap: 10px;">
               <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(245, 158, 11, 0.12); color: var(--accent-amber, #f59e0b); display: flex; align-items: center; justify-content: center;">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
               </div>
               <div>
-                <h3 class="modal-title" style="margin: 0; font-size: 15px; font-weight: 700;">Choisir une Illustration Pastorale</h3>
+                <h3 class="modal-title" style="margin: 0; font-size: 15px; font-weight: 700; color: var(--text-primary);">Choisir une Illustration Pastorale</h3>
                 <div style="font-size: 11.5px; color: var(--text-muted);" id="lbl-ill-picker-context">Filtré selon le contexte de la prédication</div>
               </div>
             </div>
@@ -4328,22 +4328,22 @@
           </div>
 
           <!-- Barre de recherche et filtres de la modale -->
-          <div style="padding: 12px 20px; background: var(--bg-surface); border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 8px;">
-            <div class="search-input-wrap" style="width: 100%;">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" class="search-icon"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input type="text" id="ill-picker-search-input" class="search-input" placeholder="Rechercher par titre, thème, mot-clé ou référence biblique..." style="padding-left: 32px; font-size: 12.5px;" />
-              <button class="btn-icon-subtle search-clear-btn hidden" id="btn-clear-ill-picker-search">✕</button>
+          <div style="padding: 14px 20px 10px 20px; background: var(--bg-surface); border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 10px;">
+            <div style="position: relative; width: 100%;">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="ill-picker-search-input" placeholder="Rechercher par titre, thème, mot-clé ou référence biblique..." style="width: 100%; box-sizing: border-box; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); padding: 9px 36px 9px 34px; border-radius: 6px; font-size: 13px; outline: none; font-family: inherit;" />
+              <button class="btn-icon-subtle search-clear-btn hidden" id="btn-clear-ill-picker-search" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px;">✕</button>
             </div>
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-              <div class="filter-pills-row" id="ill-picker-quick-filters" style="display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; overflow: hidden;">
+              <div class="filter-pills-row" id="ill-picker-quick-filters">
                 <!-- Injecté dynamiquement -->
               </div>
-              <span style="font-size: 11.5px; color: var(--text-muted); white-space: nowrap;" id="lbl-ill-picker-count">0 illustration</span>
+              <span style="font-size: 11.5px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0;" id="lbl-ill-picker-count">0 illustration</span>
             </div>
           </div>
 
           <!-- Liste des illustrations -->
-          <div class="modal-body" id="ill-picker-list-container" style="padding: 16px 20px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px;">
+          <div class="modal-body" id="ill-picker-list-container" style="padding: 16px 20px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; max-height: 55vh;">
             <!-- Cartes injectées dynamiquement -->
           </div>
         </div>
