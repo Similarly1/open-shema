@@ -126,7 +126,7 @@
     "book_code": null
   },
   "NCL": {
-    "title": "Néo-Crampon Libre",
+    "title": "Sainte Bible néo-Crampon Libre",
     "author": "Augustin Crampon (Révision Fraternité de Tibériade)",
     "description": "Révision linguistique et contemporaine de la traduction catholique intégrale (Ancien et Nouveau Testament) du Chanoine Augustin Crampon (1923) par la Fraternité de Tibériade. Traduction littérale et rigoureuse depuis l'hébreu et le grec, publiée sous licence ouverte Creative Commons (CC-BY-SA 4.0).",
     "year": "2022",
@@ -191,10 +191,10 @@
   },
   "OST": {
     "title": "Bible Ostervald",
-    "author": "La Maison de la Bible",
-    "description": "",
+    "author": "Jean-Frédéric Ostervald (Éd. La Maison de la Bible)",
+    "description": "Révision historique (1877) de la traduction protestante classique de Jean-Frédéric Ostervald. Fidèle à la lignée du Texte Reçu (Textus Receptus) pour le Nouveau Testament et du Texte Massorétique pour l'Ancien Testament, dans une langue française soignée et traditionnelle du XIXᵉ siècle.",
     "year": "1877",
-    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\Bible_Ostervald.jpg",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\OST.png",
     "type": "Bible",
     "format": "json",
     "folder_name": "OST",
