@@ -306,7 +306,7 @@ const OpenShemaStore = {
           </div>
 
           <div style="padding: 10px 20px; border-top: 1px solid var(--border-subtle, #334155); background: var(--bg-surface-elevated, #0f172a); display: flex; align-items: center; justify-content: space-between; font-size: 0.78rem; color: var(--text-muted, #94a3b8);">
-            <span>Sources en direct : Éditions Bibli'O, BLF Store, Publications Chrétiennes, La Maison de la Bible, Google Play</span>
+            <span>Sources en direct : Éditions Bibli'O, BLF Store, Publications Chrétiennes, Éditions Clé, Google Play</span>
             <span style="color: #10b981;">Zéro livre papier inclus</span>
           </div>
 
@@ -791,7 +791,6 @@ const OpenShemaStore = {
     const titleEncoded = encodeURIComponent(item.title);
     const fnacUrl = `https://www.fnac.com/SearchResult/ResultList.aspx?Search=${titleEncoded}&sft=1`;
     const koboUrl = `https://www.kobo.com/fr/fr/search?query=${titleEncoded}&fclanguages=fr`;
-    const mdbUrl = `https://maisonbible.fr/fr/recherche?controller=search&s=${titleEncoded}+ebook`;
 
     popover.innerHTML = `
       <div style="width: 620px; max-width: 92vw; max-height: 85vh; display: flex; flex-direction: column; background: var(--bg-card, #1e293b); border-radius: 12px; border: 1px solid var(--border-color, #334155); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); overflow: hidden; animation: modalFadeIn 0.2s ease-out;">
@@ -861,9 +860,6 @@ const OpenShemaStore = {
               </button>
               <button class="btn-popover-buy" data-url="${koboUrl}" style="display: flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 5px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-size: 0.75rem; cursor: pointer;">
                 <span>Rakuten Kobo</span> ${this.svgIcons.external}
-              </button>
-              <button class="btn-popover-buy" data-url="${mdbUrl}" style="display: flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 5px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-size: 0.75rem; cursor: pointer;">
-                <span>Maison de la Bible</span> ${this.svgIcons.external}
               </button>
             </div>
           </div>

@@ -59,7 +59,9 @@ class EbookFinderManager:
         # 1. Présence explicite dans le titre du produit
         digital_title_tokens = [
             '(ebook)', '[ebook]', '(e-book)', '[e-book]', '- ebook', ' ebook', 'ebook ',
-            '(epub)', '[epub]', '- epub', ' epub', 'format numérique', 'version numérique',
+            '(epub)', '[epub]', '- epub', ' epub', 'epub ', 'format epub', 'format pdf',
+            '(format epub)', '(format pdf)', '[format epub]', '[format pdf]',
+            '(pdf)', '[pdf]', '- pdf', 'format numérique', 'version numérique',
             'téléchargement', 'livre numérique'
         ]
         if any(tok in t for tok in digital_title_tokens):
@@ -67,8 +69,8 @@ class EbookFinderManager:
 
         # 2. Présence explicite dans le slug d'URL du produit
         digital_slug_tokens = [
-            '-ebook', '_ebook', '-e-book', '_e-book', '-epub', '_epub',
-            '-telechargement', '-numerique', '-format-numerique'
+            '-ebook', '_ebook', '-e-book', '_e-book', '-epub', '_epub', '-pdf', '_pdf',
+            '-format-epub', '-format-pdf', '-telechargement', '-numerique', '-format-numerique'
         ]
         if any(tok in u for tok in digital_slug_tokens):
             return True
@@ -76,8 +78,8 @@ class EbookFinderManager:
         return False
 
     def clean_ebook_title(self, title: str) -> str:
-        """Nettoie le titre pour retirer les mentions redondantes (eBook), (EPUB), etc."""
-        cleaned = re.sub(r'(?i)\s*[\(\[-]?\s*(ebook|e-book|format numérique|version numérique|epub|pdf)[\)\]-]?', '', title)
+        """Nettoie le titre pour retirer les mentions redondantes (eBook), (EPUB), (format ePub), etc."""
+        cleaned = re.sub(r'(?i)\s*[\(\[-]?\s*(format\s+epub|format\s+pdf|ebook|e-book|format numérique|version numérique|epub|pdf)[\)\]-]?', '', title)
         cleaned = re.sub(r'^\s*[-:–—]\s*', '', cleaned)
         cleaned = re.sub(r'\s*[-:–—]\s*$', '', cleaned)
         return cleaned.strip()
@@ -144,69 +146,56 @@ class EbookFinderManager:
 
         return results
 
-    def _query_maison_de_la_bible(self, query: str) -> List[Dict[str, Any]]:
-        """Interroge et extrait en direct les e-books de La Maison de la Bible."""
+    def _query_editions_cle(self, query: str) -> List[Dict[str, Any]]:
+        """Interroge et extrait en direct les e-books des Éditions Clé (editionscle.com)."""
         results = []
-        encoded_query = urllib.parse.quote(f"{query} ebook")
-        url = f"https://maisonbible.fr/fr/recherche?controller=search&s={encoded_query}"
+        encoded_query = urllib.parse.quote_plus(query)
+        url = f"https://editionscle.com/recherche?controller=search&s={encoded_query}"
 
         try:
             req = urllib.request.Request(url, headers=HEADERS)
             with urllib.request.urlopen(req, context=ssl_ctx, timeout=5.0) as response:
                 if response.status != 200:
                     return results
-                html = response.read().decode('utf-8', errors='ignore')
-                items = re.findall(r'<article[^>]*class="[^"]*product-miniature[^"]*"[^>]*>(.*?)</article>', html, re.DOTALL)
+                raw = response.read().decode('utf-8', errors='ignore')
+                if not raw.strip().startswith('{'):
+                    return results
+                data = json.loads(raw)
+                products = data.get('products', [])
 
-                for it in items[:6]:
-                    link_m = re.search(r'<a[^>]*href="([^"]*)"[^>]*class="[^"]*thumbnail[^"]*"', it)
-                    if not link_m:
-                        link_m = re.search(r'<a[^>]*href="([^"]*)"', it)
-                    
-                    img_m = re.search(r'<img[^>]*src="([^"]*)"', it)
-                    alt_m = re.search(r'title="([^"]*)"', it) or re.search(r'alt="([^"]*)"', it)
-                    price_m = re.search(r'<span[^>]*class="[^"]*price[^"]*"[^>]*>(.*?)</span>', it, re.DOTALL)
-                    flags = re.findall(r'<li[^>]*class="product-flag[^"]*"[^>]*>(.*?)</li>', it, re.DOTALL)
-
-                    prod_url = link_m.group(1).strip() if link_m else ''
-                    raw_title = alt_m.group(1).strip() if alt_m else ''
-                    img_path = img_m.group(1).strip() if img_m else ''
-
-                    # Ignorer si ce n'est pas un e-book
-                    is_eb = self.is_strictly_ebook(raw_title, prod_url) or any('epub' in f.lower() or 'ebook' in f.lower() for f in flags)
-                    if not is_eb:
+                for p in products:
+                    name = p.get('name', '')
+                    url_p = p.get('url', '')
+                    if not url_p:
                         continue
 
-                    # Extraire le prix
-                    price_raw = 0.0
-                    price_str = "Disponible"
-                    if price_m:
-                        raw_p = re.sub(r'<[^>]+>', '', price_m.group(1)).replace('\xa0', ' ').strip()
-                        num_m = re.search(r'([\d]+[.,][\d]{2})', raw_p)
-                        if num_m:
-                            price_raw = float(num_m.group(1).replace(',', '.'))
-                            price_str = f"{price_raw:.2f} €"
+                    if not self.is_strictly_ebook(name, url_p):
+                        continue
 
-                    # Formater l'image
+                    price_raw = float(p.get('price_amount', 0.0))
+                    price_str = f"{price_raw:.2f} €" if price_raw > 0 else (p.get('price') or "Disponible")
+
+                    # Image
                     image_url = ""
-                    if img_path:
-                        if img_path.startswith('/'):
-                            image_url = f"https://maisonbible.fr{img_path}"
-                        else:
-                            image_url = img_path
+                    cover = p.get('cover') or {}
+                    if isinstance(cover, dict):
+                        by_size = cover.get('bySize', {})
+                        med = by_size.get('medium_default') or by_size.get('home_default') or {}
+                        image_url = med.get('url', '')
 
-                    clean_t = self.clean_ebook_title(raw_title)
+                    clean_t = self.clean_ebook_title(name)
+                    fmt = 'PDF' if 'pdf' in name.lower() or 'pdf' in url_p.lower() else 'EPUB'
 
                     results.append({
-                        'id': f"maisonbible_{hash(prod_url)}",
-                        'title': clean_t if clean_t else raw_title,
-                        'raw_title': raw_title,
-                        'source': 'La Maison de la Bible',
-                        'store_badge': 'Maison de la Bible',
-                        'format': 'EPUB (Vivlio / Adobe)',
+                        'id': f"cle_{p.get('id_product', hash(url_p))}",
+                        'title': clean_t if clean_t else name,
+                        'raw_title': name,
+                        'source': 'Éditions Clé',
+                        'store_badge': 'Éditions Clé',
+                        'format': fmt,
                         'price': price_str,
                         'price_raw': price_raw,
-                        'url': prod_url,
+                        'url': url_p,
                         'image': image_url,
                         'is_direct_product': True
                     })
@@ -441,7 +430,7 @@ class EbookFinderManager:
                 for store in self.SHOPIFY_STORES:
                     future_tasks.append(executor.submit(self._query_shopify_store, store, q_term))
                 future_tasks.append(executor.submit(self._query_google_books, q_term))
-                future_tasks.append(executor.submit(self._query_maison_de_la_bible, q_term))
+                future_tasks.append(executor.submit(self._query_editions_cle, q_term))
 
             for future in concurrent.futures.as_completed(future_tasks):
                 try:
