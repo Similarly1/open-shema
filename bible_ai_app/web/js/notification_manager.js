@@ -53,19 +53,37 @@ const NotificationManager = {
     this.saveSettings();
   },
 
+  getActiveView() {
+    if (typeof App !== 'undefined' && App.activeView) {
+      return App.activeView;
+    }
+    const activeViewEl = document.querySelector('.app-view.active');
+    if (activeViewEl && activeViewEl.id) {
+      return activeViewEl.id.replace('view-', '');
+    }
+    const activeNav = document.querySelector('.sidebar-nav .nav-item.active, #sidebar .nav-item.active');
+    if (activeNav) {
+      return activeNav.dataset.view || activeNav.id?.replace('nav-', '') || 'bible';
+    }
+    return 'bible';
+  },
+
   setupListeners() {
-    // Nettoyer la pastille quand l'utilisateur clique sur l'onglet IA
+    // Nettoyer la pastille dès qu'on clique sur n'importe quel onglet de navigation
     document.addEventListener('click', (e) => {
-      const aiBtn = e.target.closest('[data-view="ai"], #nav-btn-ai, .nav-item-ai');
-      if (aiBtn) {
-        this.clearBadge('ai');
+      const navItem = e.target.closest('[data-view], [id^="nav-"]');
+      if (navItem) {
+        const viewId = navItem.dataset.view || navItem.id?.replace(/^nav-/, '');
+        if (viewId) {
+          this.clearBadge(viewId);
+        }
       }
     });
 
     // Nettoyer la pastille quand App bascule de vue
     window.addEventListener('viewchanged', (e) => {
-      if (e.detail?.view === 'ai') {
-        this.clearBadge('ai');
+      if (e.detail?.view) {
+        this.clearBadge(e.detail.view);
       }
     });
   },
@@ -164,24 +182,45 @@ const NotificationManager = {
   notifyAICompletion({ title = "Assistant d'Étude", snippet = "", targetView = "ai" } = {}) {
     if (!this.settings.enabled) return;
 
-    const isAppFocused = document.hasFocus() && !document.hidden;
-    const currentView = typeof App !== 'undefined' ? (App.currentView || 'bible') : 'bible';
-    const isCurrentView = (currentView === targetView);
-
     // 0. Retirer l'animation de travail en cours
     this.setWorkingState(targetView, false);
 
-    // Si l'utilisateur est déjà actif et regarde la page concernée, pas besoin de le déranger avec un popup
-    if (isAppFocused && isCurrentView) {
+    const isAppFocused = document.hasFocus() && !document.hidden;
+    const currentView = this.getActiveView();
+    const isCurrentView = (currentView === targetView);
+
+    // Si l'utilisateur est déjà sur la page concernée (ex: Assistant IA) :
+    // - On ne met JAMAIS de badge sur l'onglet actif
+    // - On ne met pas de bannière in-app
+    // - Si l'app est en arrière-plan, on joue le carillon et envoie le toast Windows
+    if (isCurrentView) {
+      this.clearBadge(targetView);
+      if (!isAppFocused) {
+        if (this.settings.sound) {
+          this.playChime();
+        }
+        if (this.settings.windows) {
+          const notifTitle = `Open Shema • ${title}`;
+          const notifMsg = snippet ? `Réponse prête : « ${snippet.substring(0, 90)}${snippet.length > 90 ? '...' : ''} »` : "Votre étude est prête.";
+          if (typeof API !== 'undefined' && API.showSystemNotification) {
+            API.showSystemNotification(notifTitle, notifMsg);
+          }
+        }
+      }
       return;
     }
 
+    // Si l'utilisateur est sur une AUTRE page (ex: Bible, Dictionnaires, Commentaires...) :
+    
     // 1. Jouer le carillon doux
     if (this.settings.sound) {
       this.playChime();
     }
 
-    // 2. Cas A : Application en arrière-plan (autre programme / fenêtre inactive)
+    // 2. Afficher la pastille badge sur l'onglet de la sidebar
+    this.setBadge(targetView);
+
+    // 3. Cas A : Application en arrière-plan (autre programme Windows)
     if (!isAppFocused) {
       if (this.settings.windows) {
         const notifTitle = `Open Shema • ${title}`;
@@ -190,11 +229,9 @@ const NotificationManager = {
           API.showSystemNotification(notifTitle, notifMsg);
         }
       }
-      // Ajouter également le badge sur la sidebar
-      this.setBadge(targetView);
     } 
-    // 3. Cas B : Utilisateur actif dans Open Shema mais sur une AUTRE page (ex: Bible, Dictionnaires)
-    else if (!isCurrentView) {
+    // 4. Cas B : Utilisateur actif dans Open Shema mais sur une AUTRE page
+    else {
       if (this.settings.inapp) {
         this.showInAppToast({
           title,
@@ -208,7 +245,6 @@ const NotificationManager = {
           }
         });
       }
-      this.setBadge(targetView);
     }
   },
 

@@ -638,6 +638,9 @@ const App = {
 
   switchView(viewName) {
     this.activeView = viewName;
+    if (typeof NotificationManager !== 'undefined') {
+      NotificationManager.clearBadge(viewName);
+    }
     document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
 
     const targetEl = document.getElementById(`view-${viewName}`);

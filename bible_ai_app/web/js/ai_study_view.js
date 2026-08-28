@@ -1958,7 +1958,7 @@ const AIStudyView = {
 
   renderRichMarkdown(mdText, sourcesDetails = []) {
     if (!mdText) return '';
-    let text = mdText;
+    let text = mdText.replace(/\r\n/g, '\n');
 
     // 0. Nettoyage préliminaire : points seuls, lignes fantômes et sauts superflus
     text = text.replace(/^\s*\.\s*$/gm, '');
@@ -1974,19 +1974,18 @@ const AIStudyView = {
       return id;
     });
 
-    // 1.1 Nettoyage agressif des retours à la ligne autour des citations entre crochets
-    // Tout crochet qui se trouve en début de ligne (après n'importe quel texte sauf ":") est remonté à la ligne précédente
-    text = text.replace(/([^\n:>])\s*\n+\s*(\[[A-Za-zÀ-ÿ0-9\s:,'’\.\-–—\(\)\/]+\])/g, '$1 $2');
-    
-    // Tout crochet suivi d'un ou plusieurs retours à la ligne avant la suite du texte est rattaché à la suite
-    text = text.replace(/(\[[A-Za-zÀ-ÿ0-9\s:,'’\.\-–—\(\)\/]+\])\s*\n+\s*([^\n<])/g, '$1 $2');
+    // 1.1 Assurer que TOUS les titres Markdown (#{1,6}) débutent TOUJOURS sur une nouvelle ligne isolée (\n\n)
+    // même s'ils sont collés à une phrase précédente ou à un crochet [Source]
+    text = text.replace(/([^\n#])\s*(#{1,6}\s+[^\n]+)/g, '$1\n\n$2');
 
-    // Éliminer les espaces mal placés avant la ponctuation : "[Source] . Texte" -> "[Source]. Texte"
+    // 1.2 Assurer que les listes collées à du texte débutent sur une nouvelle ligne
+    text = text.replace(/([^\n])\n(\s*[-*•]\s+)/g, '$1\n\n$2');
+    text = text.replace(/([^\n])\n(\s*\d+[\.\)]\s+)/g, '$1\n\n$2');
+
+    // 1.3 Nettoyage des espaces mal placés avant la ponctuation : "[Source] . Texte" -> "[Source]. Texte"
     text = text.replace(/\]\s+\.\s/g, ']. ');
     text = text.replace(/\]\s+,\s/g, '], ');
-    
-    // Rapprocher les crochets consécutifs
-    text = text.replace(/\]\s*\n+\s*\[/g, '] [');
+    text = text.replace(/\]\s*\n\s*\[/g, '] [');
 
     // 2. Parseur de tableaux Markdown (| Col 1 | Col 2 |)
     text = text.replace(/(?:^|\n)(\|[^\n]+\|\r?\n\|[-:\s|]+\|\r?\n(?:\|[^\n]+\|\r?\n?)+)/g, (match, tableBlock) => {
@@ -1996,7 +1995,7 @@ const AIStudyView = {
       const headers = lines[0].split('|').slice(1, -1).map(h => h.trim());
       const bodyLines = lines.slice(2);
 
-      let tableHtml = '<div class="ai-table-responsive"><table class="ai-study-table"><thead><tr>';
+      let tableHtml = '\n\n<div class="ai-table-responsive"><table class="ai-study-table"><thead><tr>';
       headers.forEach(h => {
         tableHtml += `<th>${this.formatInlineMarkdown(h, sourcesDetails)}</th>`;
       });
@@ -2011,49 +2010,59 @@ const AIStudyView = {
         tableHtml += '</tr>';
       });
 
-      tableHtml += '</tbody></table></div>\n';
+      tableHtml += '</tbody></table></div>\n\n';
       return tableHtml;
     });
 
     // 3. Citations en retrait (> Citation)
-    text = text.replace(/(?:^|\n)>[ ]?([^\n]+)/g, '\n<blockquote class="ai-quote">$1</blockquote>');
+    text = text.replace(/(?:^|\n)>\s*([^\n]+)/g, (m, quote) => `\n\n<blockquote class="ai-quote">${this.formatInlineMarkdown(quote, sourcesDetails)}</blockquote>\n\n`);
 
-    // 4. Titres hiérarchiques
-    text = text.replace(/^#### (.*$)/gim, '<h4 class="ai-heading h4">$1</h4>');
-    text = text.replace(/^### (.*$)/gim, '<h3 class="ai-heading h3">$1</h3>');
-    text = text.replace(/^## (.*$)/gim, '<h2 class="ai-heading h2">$1</h2>');
-    text = text.replace(/^# (.*$)/gim, '<h1 class="ai-heading h1">$1</h1>');
+    // 4. Lignes de séparation
+    text = text.replace(/(?:^|\n)(?:---|\*\*\*|___)(?=\n|$)/g, '\n\n<hr class="ai-divider">\n\n');
 
-    // 5. Lignes de séparation
-    text = text.replace(/^---$/gim, '<hr class="ai-divider">');
+    // 5. Titres hiérarchiques (H1 à H6)
+    text = text.replace(/(?:^|\n)(#{1,6})\s+([^\n]+)/g, (match, hashes, title) => {
+      const level = hashes.length;
+      return `\n\n<h${level} class="ai-heading h${level}">${this.formatInlineMarkdown(title, sourcesDetails)}</h${level}>\n\n`;
+    });
 
-    // 6. Listes à puces
-    text = text.replace(/^\s*[-*]\s+(.*)$/gim, '<li class="ai-bullet-item">$1</li>');
-    text = text.replace(/(<li class="ai-bullet-item">[\s\S]*?<\/li>)/g, '<ul class="ai-bullet-list">$1</ul>');
+    // 6. Listes à puces & listes numérotées
+    text = text.replace(/(?:^|\n)\s*[-*•]\s+([^\n]+)/g, (m, item) => `\n<li class="ai-bullet-item">${this.formatInlineMarkdown(item, sourcesDetails)}</li>`);
+    text = text.replace(/(?:<li class="ai-bullet-item">[\s\S]*?<\/li>\s*)+/g, (match) => `\n\n<ul class="ai-bullet-list">${match.trim()}</ul>\n\n`);
 
-    // 7. Formatage Inline & Badges in-text
-    text = this.formatInlineMarkdown(text, sourcesDetails);
+    text = text.replace(/(?:^|\n)\s*(\d+)[\.\)]\s+([^\n]+)/g, (m, num, item) => `\n<li class="ai-numbered-item" value="${num}">${this.formatInlineMarkdown(item, sourcesDetails)}</li>`);
+    text = text.replace(/(?:<li class="ai-numbered-item"[^>]*>[\s\S]*?<\/li>\s*)+/g, (match) => `\n\n<ol class="ai-numbered-list">${match.trim()}</ol>\n\n`);
+
+    // 7. Découpage en blocs et emballage propre des paragraphes
+    const rawBlocks = text.split(/\n\n+/);
+    const htmlBlocks = [];
+
+    rawBlocks.forEach(rawBlock => {
+      const trimmed = rawBlock.trim();
+      if (!trimmed) return;
+
+      if (/^<(h[1-6]|div|ul|ol|blockquote|hr|pre)\b/i.test(trimmed) || trimmed.startsWith('__CODE_BLOCK_')) {
+        htmlBlocks.push(trimmed);
+      } else {
+        const cleanInline = this.formatInlineMarkdown(trimmed.replace(/\n+/g, ' '), sourcesDetails);
+        if (cleanInline) {
+          htmlBlocks.push(`<p class="ai-p">${cleanInline}</p>`);
+        }
+      }
+    });
+
+    let resultHtml = htmlBlocks.join('\n');
 
     // 8. Rétablir les blocs de code
     codeBlocks.forEach((codeHtml, idx) => {
-      text = text.replace(`__CODE_BLOCK_${idx}__`, codeHtml);
+      resultHtml = resultHtml.replace(`__CODE_BLOCK_${idx}__`, codeHtml);
     });
 
-    // 8.5 Convertir les \n simples résiduels en espace pour éviter les points isolés en début de ligne
-    // (les \n\n sont traités à l'étape 9, les \n simples au sein d'un paragraphe doivent devenir un espace)
-    text = text.replace(/([^\n])\n([^\n])/g, '$1 $2');
-    // Nettoyer les points flottants en début de phrase introduits par le LLM
-    text = text.replace(/\s+\.\s+/g, '. ');
-    text = text.replace(/^\s*\.\s*/gm, '');
+    // 9. Nettoyage final des balises vides
+    resultHtml = resultHtml.replace(/<p class="ai-p">\s*<\/p>/g, '');
+    resultHtml = resultHtml.replace(/<p class="ai-p">\s*[\.\s]*<\/p>/g, '');
 
-    // 9. Paragraphes
-    text = text.replace(/\n\n+/g, '</p><p class="ai-p">');
-    text = `<p class="ai-p">${text}</p>`;
-    // Nettoyer les paragraphes vides ou ne contenant qu'un point isolé
-    text = text.replace(/<p class="ai-p">\s*<\/p>/g, '');
-    text = text.replace(/<p class="ai-p">\s*[\.\s]*<\/p>/g, '');
-
-    return text;
+    return resultHtml;
   },
 
   guessAuthor(name) {
@@ -2085,10 +2094,13 @@ const AIStudyView = {
     if (!str) return '';
     let res = str;
 
-    // Gras & Italique
+    // Gras & Italique (avec support des underscores et des astérisques)
     res = res.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>');
     res = res.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     res = res.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    res = res.replace(/___(.*?)___/g, '<strong><em>$1</em></strong>');
+    res = res.replace(/__(.*?)__/g, '<strong>$1</strong>');
+    res = res.replace(/_([^_]+)_/g, '<em>$1</em>');
     res = res.replace(/`([^`]+)`/g, '<code class="ai-inline-code">$1</code>');
 
     // 1. Codes Strong : [Strong: G2631], [G2631], [H7225]
