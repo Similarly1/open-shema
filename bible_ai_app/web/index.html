@@ -4063,43 +4063,6 @@
             </div>
           </header>
 
-          <!-- 2. BARRE D'OUTILS COMPACTE -->
-          <div class="sermons-editor-subbar">
-            <div class="sermon-quick-tools-left">
-              <button class="btn-secondary btn-block-insert" id="btn-insert-point" title="Insérer un Point Principal (Titre H1)">
-                <span class="block-type-tag">H1</span>
-              </button>
-              <button class="btn-secondary btn-block-insert" id="btn-insert-subpoint" title="Insérer un Sous-point (Titre H2)">
-                <span class="block-type-tag">H2</span>
-              </button>
-              <div class="subbar-divider"></div>
-              <button class="btn-secondary btn-block-insert" id="btn-insert-scripture" title="Insérer un bloc Verset / Écriture">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-              </button>
-              <button class="btn-secondary btn-block-insert" id="btn-insert-exegesis" title="Insérer un bloc Exégèse & Mots-clés">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="m8.5 13.5 2-5.5 2 5.5"/><path d="M9.2 11.8h2.6"/><path d="M14 8.5h3.5l-3.5 5h3.5"/></svg>
-              </button>
-              <button class="btn-secondary btn-block-insert" id="btn-insert-illustration" title="Insérer une Illustration">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
-              </button>
-              <button class="btn-secondary btn-block-insert" id="btn-insert-application" title="Insérer une Application pratique">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-              </button>
-              <button class="btn-secondary btn-block-insert" id="btn-insert-cue" title="Insérer une Note Régie / Timing">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              </button>
-              <button class="btn-secondary btn-block-insert" id="btn-insert-slide" title="Insérer un repère de diapositive [_]">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-              </button>
-            </div>
-            <div class="sermon-quick-tools-right">
-              <button class="btn-secondary btn-icon-compact" id="btn-sermon-bold" title="Gras (Ctrl+B)"><strong>B</strong></button>
-              <button class="btn-secondary btn-icon-compact" id="btn-sermon-italic" title="Italique (Ctrl+I)"><em>I</em></button>
-              <button class="btn-secondary btn-icon-compact" id="btn-sermon-quote" title="Citation">”</button>
-              <button class="btn-secondary btn-icon-compact" id="btn-sermon-list" title="Liste à puces">•</button>
-            </div>
-          </div>
-
           <!-- 3. CORPS MODULAIRE : SOMMAIRE + CARTES MODULAIRES + TIROIR RESSOURCES -->
           <div class="sermons-editor-workspace">
             <!-- Sommaire / Plan de vol interactif -->
@@ -4143,10 +4106,117 @@
                   <span>+ Conclusion & Appel</span>
                 </button>
               </div>
+
+              <!-- Infobulle flottante Anytype sur sélection de texte (Sermon) -->
+              <div id="sermon-floating-toolbar" class="notes-floating-toolbar hidden">
+                <div class="nft-block-dropdown-wrap">
+                  <button type="button" class="nft-btn nft-block-btn" id="sft-btn-block-type" title="Type de bloc">
+                    <span id="sft-current-block-label">Aa</span>
+                    <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <div class="nft-dropdown-menu hidden" id="sft-block-menu">
+                    <button type="button" class="nft-dropdown-item" data-action="text">
+                      <span class="nft-item-icon">¶</span>
+                      <span>Texte normal</span>
+                    </button>
+                    <button type="button" class="nft-dropdown-item" data-action="h1">
+                      <span class="nft-item-icon" style="font-weight: 800;">H1</span>
+                      <span>Point Principal (H1)</span>
+                    </button>
+                    <button type="button" class="nft-dropdown-item" data-action="h2">
+                      <span class="nft-item-icon" style="font-weight: 800;">H2</span>
+                      <span>Sous-point (H2)</span>
+                    </button>
+                    <button type="button" class="nft-dropdown-item" data-action="h3">
+                      <span class="nft-item-icon" style="font-weight: 800;">H3</span>
+                      <span>Sous-titre 3</span>
+                    </button>
+                    <div class="nft-separator" style="margin: 4px 0;"></div>
+                    <button type="button" class="nft-dropdown-item" data-action="scripture">
+                      <span class="nft-item-icon">📖</span>
+                      <span>Bloc Écriture</span>
+                    </button>
+                    <button type="button" class="nft-dropdown-item" data-action="exegesis">
+                      <span class="nft-item-icon">🔤</span>
+                      <span>Bloc Exégèse</span>
+                    </button>
+                    <button type="button" class="nft-dropdown-item" data-action="illustration">
+                      <span class="nft-item-icon">💡</span>
+                      <span>Bloc Illustration</span>
+                    </button>
+                    <button type="button" class="nft-dropdown-item" data-action="application">
+                      <span class="nft-item-icon">🎯</span>
+                      <span>Bloc Application</span>
+                    </button>
+                    <button type="button" class="nft-dropdown-item" data-action="cue">
+                      <span class="nft-item-icon">⏱️</span>
+                      <span>Bloc Régie / Timing</span>
+                    </button>
+                    <div class="nft-separator" style="margin: 4px 0;"></div>
+                    <button type="button" class="nft-dropdown-item" data-action="quote">
+                      <span class="nft-item-icon">”</span>
+                      <span>Citation</span>
+                    </button>
+                    <button type="button" class="nft-dropdown-item" data-action="bullet">
+                      <span class="nft-item-icon">•</span>
+                      <span>Liste à puces</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="nft-separator"></div>
+
+                <button type="button" class="nft-btn" data-action="bold" title="Gras (Ctrl+B)">
+                  <span style="font-weight: 700;">B</span>
+                </button>
+                <button type="button" class="nft-btn" data-action="italic" title="Italique (Ctrl+I)">
+                  <span style="font-style: italic; font-family: serif; font-weight: 600;">I</span>
+                </button>
+                <button type="button" class="nft-btn" data-action="strikethrough" title="Barré (Ctrl+Shift+X)">
+                  <span style="text-decoration: line-through; font-weight: 600;">S</span>
+                </button>
+                <button type="button" class="nft-btn" data-action="underline" title="Souligné (Ctrl+U)">
+                  <span style="text-decoration: underline; font-weight: 600;">U</span>
+                </button>
+                <button type="button" class="nft-btn" data-action="slide" title="Repère Diapositive [_]">
+                  <span style="font-size: 10px; font-weight: 800; color: var(--accent-primary, #60a5fa);">DIAPO</span>
+                </button>
+                <button type="button" class="nft-btn" data-action="code" title="Code en ligne">
+                  <span style="font-family: monospace; font-size: 11px; font-weight: 700;">&lt;/&gt;</span>
+                </button>
+
+                <div class="nft-separator"></div>
+
+                <button type="button" class="nft-btn" data-action="highlight" title="Surligner en jaune">
+                  <span class="nft-hl-circle"></span>
+                </button>
+
+                <div class="nft-more-dropdown-wrap">
+                  <button type="button" class="nft-btn" id="sft-btn-more" title="Plus d'options">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><circle cx="12" cy="12" r="1.8"/><circle cx="6" cy="12" r="1.8"/><circle cx="18" cy="12" r="1.8"/></svg>
+                  </button>
+                  <div class="nft-dropdown-menu hidden" id="sft-more-menu">
+                    <button type="button" class="nft-dropdown-item" data-action="superscript">
+                      <span class="nft-item-icon">x²</span>
+                      <span>Exposant</span>
+                    </button>
+                    <button type="button" class="nft-dropdown-item" data-action="subscript">
+                      <span class="nft-item-icon">x₂</span>
+                      <span>Indice</span>
+                    </button>
+                    <button type="button" class="nft-dropdown-item" data-action="clear-format">
+                      <span class="nft-item-icon">✕</span>
+                      <span>Supprimer la mise en forme</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- Tiroir Droit Connecté : Exégèse, Commentaires, Lexique, Illustrations & Métadonnées -->
             <aside class="right-drawer sermons-resources-drawer collapsed" id="sermons-resources-drawer">
+              <!-- Poignée de redimensionnement à la souris -->
+              <div class="sermon-drawer-resizer" id="sermon-drawer-resizer" title="Glisser pour redimensionner"></div>
               <div class="drawer-tabs-wrapper">
                 <div class="drawer-tabs" id="sermon-drawer-tabs-bar">
                   <button class="drawer-tab active" data-drawer-tab="metadata" title="Métadonnées & Matrice Homilétique">Infos</button>
@@ -4155,9 +4225,14 @@
                   <button class="drawer-tab" data-drawer-tab="ai" title="Assistant & Structures homilétiques">Structures</button>
                   <button class="drawer-tab" data-drawer-tab="illustrations" title="Illustrations associées">Illustrations</button>
                 </div>
-                <button class="btn-icon-subtle" id="btn-close-resources-drawer" title="Fermer le volet" style="padding: 0 10px; margin-left: auto;">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
+                <div style="display: flex; align-items: center; margin-left: auto; gap: 4px;">
+                  <button class="btn-icon-subtle" id="btn-expand-resources-drawer" title="Agrandir / Réduire le volet (Mode Large)" style="padding: 0 6px;">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                  </button>
+                  <button class="btn-icon-subtle" id="btn-close-resources-drawer" title="Fermer le volet" style="padding: 0 6px;">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </button>
+                </div>
               </div>
               <div class="drawer-body" style="padding: 0; overflow-y: auto; flex: 1;">
                 <div class="drawer-content active" id="sermons-drawer-content" style="display: block; padding: 12px 14px;">

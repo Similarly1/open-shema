@@ -82,7 +82,60 @@ const SermonsView = {
     this.barIllustration = document.getElementById('bar-seg-illustration');
     this.barApplication = document.getElementById('bar-seg-application');
 
+    this.initDrawerWidth();
     this.bindEvents();
+  },
+
+  initDrawerWidth() {
+    const saved = localStorage.getItem('sermon_drawer_width');
+    if (saved && this.resourcesDrawer) {
+      this.resourcesDrawer.style.setProperty('--sermon-drawer-width', `${saved}px`);
+    }
+  },
+
+  bindDrawerResizer() {
+    const resizer = document.getElementById('sermon-drawer-resizer');
+    const drawer = this.resourcesDrawer || document.getElementById('sermons-resources-drawer');
+    const expandBtn = document.getElementById('btn-expand-resources-drawer');
+
+    expandBtn?.addEventListener('click', () => {
+      drawer?.classList.toggle('wide');
+      const isWide = drawer?.classList.contains('wide');
+      expandBtn.title = isWide ? "Réduire le volet (Mode Normal)" : "Agrandir le volet (Mode Large)";
+    });
+
+    if (!resizer || !drawer) return;
+
+    let isResizing = false;
+    let startX = 0;
+    let startWidth = 0;
+
+    resizer.addEventListener('mousedown', (e) => {
+      isResizing = true;
+      startX = e.clientX;
+      startWidth = drawer.offsetWidth;
+      resizer.classList.add('resizing');
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isResizing) return;
+      const delta = startX - e.clientX;
+      const newWidth = Math.min(760, Math.max(360, startWidth + delta));
+      drawer.style.setProperty('--sermon-drawer-width', `${newWidth}px`);
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (!isResizing) return;
+      isResizing = false;
+      resizer.classList.remove('resizing');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      const finalWidth = drawer.offsetWidth;
+      localStorage.setItem('sermon_drawer_width', finalWidth);
+    });
   },
 
   getDefaultSermonTemplate() {
@@ -185,9 +238,10 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     document.getElementById('btn-sermon-undo')?.addEventListener('click', () => this.undo());
     document.getElementById('btn-sermon-redo')?.addEventListener('click', () => this.redo());
 
-    // 4. Tiroir de ressources
+    // 4. Tiroir de ressources & redimensionnement
     document.getElementById('btn-sermon-toggle-drawer')?.addEventListener('click', () => this.toggleResourcesDrawer());
     document.getElementById('btn-close-resources-drawer')?.addEventListener('click', () => this.toggleResourcesDrawer(false));
+    this.bindDrawerResizer();
 
     // Clic sur le fil d'ariane pour ouvrir les détails homilétiques
     document.getElementById('sermon-header-summary')?.addEventListener('click', () => {
@@ -209,21 +263,8 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
       });
     });
 
-    // 6. Insertion rapide de blocs homilétiques
-    document.getElementById('btn-insert-point')?.addEventListener('click', () => this.addSection('point'));
-    document.getElementById('btn-insert-subpoint')?.addEventListener('click', () => this.insertBlock('subpoint'));
-    document.getElementById('btn-insert-scripture')?.addEventListener('click', () => this.insertBlock('scripture'));
-    document.getElementById('btn-insert-exegesis')?.addEventListener('click', () => this.insertBlock('exegesis'));
-    document.getElementById('btn-insert-illustration')?.addEventListener('click', () => this.insertBlock('illustration'));
-    document.getElementById('btn-insert-application')?.addEventListener('click', () => this.insertBlock('application'));
-    document.getElementById('btn-insert-cue')?.addEventListener('click', () => this.insertBlock('cue'));
-    document.getElementById('btn-insert-slide')?.addEventListener('click', () => this.insertBlock('slide'));
-
-    // Outils formatage texte
-    document.getElementById('btn-sermon-bold')?.addEventListener('click', () => { this.focusActiveEditor(); document.execCommand('bold'); });
-    document.getElementById('btn-sermon-italic')?.addEventListener('click', () => { this.focusActiveEditor(); document.execCommand('italic'); });
-    document.getElementById('btn-sermon-list')?.addEventListener('click', () => { this.focusActiveEditor(); document.execCommand('insertUnorderedList'); });
-    document.getElementById('btn-sermon-quote')?.addEventListener('click', () => { this.focusActiveEditor(); document.execCommand('formatBlock', false, 'blockquote'); });
+    // 6. Infobulle flottante Anytype & Commandes Slash
+    this.bindFloatingToolbar();
 
     // 7. Actions Sommaire & Ajout de sections
     document.getElementById('btn-sermon-collapse-all')?.addEventListener('click', () => this.collapseAllSections());
@@ -260,7 +301,23 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     });
   },
 
+  showHubLoading() {
+    if (this.lblSermonsCount && (!this.sermons || this.sermons.length === 0)) {
+      this.lblSermonsCount.innerHTML = `<span class="synth-spinner" style="width: 10px; height: 10px; border-width: 1.5px; display: inline-block; vertical-align: middle; margin-right: 5px; border-top-color: var(--accent-amber, #f59e0b);"></span> Chargement...`;
+    }
+    if (this.hubCardsContainer && (!this.sermons || this.sermons.length === 0)) {
+      this.hubCardsContainer.innerHTML = `
+        <div style="padding: 70px 24px; text-align: center; color: var(--text-muted); width: 100%; grid-column: 1 / -1;">
+          <div class="synth-spinner" style="width: 32px; height: 32px; border-width: 3px; margin: 0 auto 16px auto; border-top-color: var(--accent-amber, #f59e0b);"></div>
+          <div style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px;">Chargement de vos prédications...</div>
+          <div style="font-size: 12.5px; opacity: 0.75;">Indexation et préparation du carnet homilétique</div>
+        </div>
+      `;
+    }
+  },
+
   async onViewActivated() {
+    this.showHubLoading();
     await this.loadSermons();
     await this.loadIllustrations();
     this.renderHubCards();
@@ -279,6 +336,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
         sermon = this.currentSermon;
       } else {
         if (this.sermons.length === 0) {
+          this.showHubLoading();
           await this.loadSermons();
         }
         if (this.sermons.length > 0) {
@@ -304,6 +362,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
   // =========================================================================
 
   async loadSermons() {
+    this.showHubLoading();
     try {
       const list = await API.getSermonsList();
       this.sermons = Array.isArray(list) ? list : [];
@@ -2207,7 +2266,275 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
   },
 
   // =========================================================================
-  // GESTION DU MENU SLASH MODAL
+  // INFOBULLE FLOTTANTE DE SÉLECTION STYLE ANYTYPE (SERMONS)
+  // =========================================================================
+
+  floatingToolbar: null,
+  currentSelectionRange: null,
+
+  bindFloatingToolbar() {
+    const toolbar = document.getElementById('sermon-floating-toolbar');
+    if (!toolbar) return;
+    this.floatingToolbar = toolbar;
+
+    // Empêcher la perte de sélection lors du clic sur la barre flottante
+    toolbar.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+    });
+
+    const blockTypeBtn = document.getElementById('sft-btn-block-type');
+    const blockMenu = document.getElementById('sft-block-menu');
+    const moreBtn = document.getElementById('sft-btn-more');
+    const moreMenu = document.getElementById('sft-more-menu');
+
+    // Menu Type de Bloc
+    blockTypeBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      moreMenu?.classList.add('hidden');
+      blockMenu?.classList.toggle('hidden');
+    });
+
+    // Menu Plus d'options
+    moreBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      blockMenu?.classList.add('hidden');
+      moreMenu?.classList.toggle('hidden');
+    });
+
+    // Clic sur les boutons principaux
+    toolbar.querySelectorAll('.nft-btn[data-action]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const action = btn.dataset.action;
+        this.handleFloatingToolbarAction(action);
+      });
+    });
+
+    // Clic sur les éléments des menus déroulants
+    toolbar.querySelectorAll('.nft-dropdown-item[data-action]').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const action = item.dataset.action;
+        blockMenu?.classList.add('hidden');
+        moreMenu?.classList.add('hidden');
+        this.handleFloatingToolbarAction(action);
+      });
+    });
+
+    // Fermer les sous-menus au clic extérieur
+    document.addEventListener('click', (e) => {
+      if (!toolbar.contains(e.target)) {
+        blockMenu?.classList.add('hidden');
+        moreMenu?.classList.add('hidden');
+      }
+    });
+
+    // Détection de la sélection dans n'importe quel éditeur de section
+    const updateSelectionToolbar = () => {
+      const sel = window.getSelection();
+      if (!sel || sel.isCollapsed || !sel.rangeCount) {
+        this.hideFloatingToolbar();
+        return;
+      }
+
+      const range = sel.getRangeAt(0);
+      let container = range.commonAncestorContainer;
+      if (container.nodeType === Node.TEXT_NODE) container = container.parentNode;
+      const editor = container.closest('.sermon-section-editor');
+      if (!editor) {
+        this.hideFloatingToolbar();
+        return;
+      }
+
+      const text = sel.toString().trim();
+      if (!text) {
+        this.hideFloatingToolbar();
+        return;
+      }
+
+      this.showFloatingToolbar(range);
+    };
+
+    document.addEventListener('selectionchange', () => {
+      setTimeout(updateSelectionToolbar, 10);
+    });
+
+    window.addEventListener('scroll', () => {
+      if (!this.floatingToolbar?.classList.contains('hidden')) {
+        const sel = window.getSelection();
+        if (sel && !sel.isCollapsed && sel.rangeCount) {
+          const range = sel.getRangeAt(0);
+          let container = range.commonAncestorContainer;
+          if (container.nodeType === Node.TEXT_NODE) container = container.parentNode;
+          if (container.closest('.sermon-section-editor')) {
+            this.showFloatingToolbar(range);
+          }
+        }
+      }
+    }, true);
+  },
+
+  showFloatingToolbar(range) {
+    const toolbar = this.floatingToolbar;
+    if (!toolbar) return;
+
+    this.currentSelectionRange = range.cloneRange();
+    const rect = range.getBoundingClientRect();
+    if (rect.width === 0 && rect.height === 0) {
+      this.hideFloatingToolbar();
+      return;
+    }
+
+    toolbar.classList.remove('hidden');
+
+    const toolbarWidth = toolbar.offsetWidth || 340;
+    const toolbarHeight = toolbar.offsetHeight || 36;
+
+    let left = rect.left + (rect.width / 2) - (toolbarWidth / 2);
+    let top = rect.top - toolbarHeight - 8;
+
+    if (top < 55) {
+      top = rect.bottom + 8;
+    }
+
+    if (left < 10) left = 10;
+    if (left + toolbarWidth > window.innerWidth - 10) {
+      left = window.innerWidth - toolbarWidth - 10;
+    }
+    if (top + toolbarHeight > window.innerHeight - 10) {
+      top = window.innerHeight - toolbarHeight - 10;
+    }
+
+    toolbar.style.top = `${Math.round(top)}px`;
+    toolbar.style.left = `${Math.round(left)}px`;
+
+    this.updateCurrentBlockLabel(range);
+    this.updateFloatingButtonsState();
+  },
+
+  hideFloatingToolbar() {
+    if (this.floatingToolbar) {
+      this.floatingToolbar.classList.add('hidden');
+      document.getElementById('sft-block-menu')?.classList.add('hidden');
+      document.getElementById('sft-more-menu')?.classList.add('hidden');
+    }
+  },
+
+  updateCurrentBlockLabel(range) {
+    const labelEl = document.getElementById('sft-current-block-label');
+    if (!labelEl) return;
+
+    let node = range.commonAncestorContainer;
+    if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
+
+    const block = node.closest('h1, h2, h3, blockquote, .sermon-callout-block, ul, ol, p') || node;
+    const tag = block.tagName ? block.tagName.toLowerCase() : '';
+
+    if (tag === 'h1') labelEl.textContent = 'H1';
+    else if (tag === 'h2') labelEl.textContent = 'H2';
+    else if (tag === 'h3') labelEl.textContent = 'H3';
+    else if (tag === 'blockquote') labelEl.textContent = '”';
+    else if (block.classList?.contains('sermon-block-scripture')) labelEl.textContent = '📖';
+    else if (block.classList?.contains('sermon-block-exegesis')) labelEl.textContent = '🔤';
+    else if (block.classList?.contains('sermon-block-illustration')) labelEl.textContent = '💡';
+    else if (block.classList?.contains('sermon-block-application')) labelEl.textContent = '🎯';
+    else if (block.classList?.contains('sermon-block-cue')) labelEl.textContent = '⏱️';
+    else if (tag === 'ul') labelEl.textContent = '•';
+    else labelEl.textContent = 'Aa';
+  },
+
+  updateFloatingButtonsState() {
+    if (!this.floatingToolbar) return;
+    const checkState = (action, query) => {
+      const btn = this.floatingToolbar.querySelector(`.nft-btn[data-action="${action}"]`);
+      if (btn) {
+        try {
+          const isActive = document.queryCommandState(query);
+          btn.classList.toggle('active', !!isActive);
+        } catch (e) {
+          btn.classList.remove('active');
+        }
+      }
+    };
+
+    checkState('bold', 'bold');
+    checkState('italic', 'italic');
+    checkState('underline', 'underline');
+    checkState('strikethrough', 'strikeThrough');
+  },
+
+  handleFloatingToolbarAction(action) {
+    if (this.currentSelectionRange) {
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(this.currentSelectionRange);
+    }
+
+    if (['scripture', 'exegesis', 'illustration', 'application', 'cue', 'slide'].includes(action)) {
+      this.insertBlock(action);
+    } else if (action === 'h1') {
+      document.execCommand('formatBlock', false, 'h1');
+    } else if (action === 'h2') {
+      document.execCommand('formatBlock', false, 'h2');
+    } else if (action === 'h3') {
+      document.execCommand('formatBlock', false, 'h3');
+    } else if (action === 'text') {
+      document.execCommand('formatBlock', false, 'p');
+    } else if (action === 'quote') {
+      document.execCommand('formatBlock', false, 'blockquote');
+    } else if (action === 'bullet') {
+      document.execCommand('insertUnorderedList');
+    } else if (action === 'bold') {
+      document.execCommand('bold');
+    } else if (action === 'italic') {
+      document.execCommand('italic');
+    } else if (action === 'underline') {
+      document.execCommand('underline');
+    } else if (action === 'strikethrough') {
+      document.execCommand('strikeThrough');
+    } else if (action === 'code') {
+      this.surroundSelectionWithTag('code');
+    } else if (action === 'highlight') {
+      this.surroundSelectionWithTag('mark');
+    } else if (action === 'superscript') {
+      document.execCommand('superscript');
+    } else if (action === 'subscript') {
+      document.execCommand('subscript');
+    } else if (action === 'clear-format') {
+      document.execCommand('removeFormat');
+    }
+
+    this.pushHistoryState();
+    this.debouncedAutoSave();
+    this.updateFloatingButtonsState();
+  },
+
+  surroundSelectionWithTag(tagName) {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    const selectedText = range.extractContents();
+    
+    let parent = range.commonAncestorContainer;
+    if (parent.nodeType === Node.TEXT_NODE) parent = parent.parentNode;
+    const existing = parent.closest(tagName);
+    if (existing) {
+      const textNode = document.createTextNode(existing.textContent);
+      existing.parentNode.replaceChild(textNode, existing);
+      return;
+    }
+
+    const wrapper = document.createElement(tagName);
+    wrapper.appendChild(selectedText);
+    range.insertNode(wrapper);
+    sel.removeAllRanges();
+    const newRange = document.createRange();
+    newRange.selectNodeContents(wrapper);
+    sel.addRange(newRange);
+  },
+
+  // =========================================================================
+  // GESTION DU MENU SLASH MODAL (/) DANS L'ÉDITEUR DE SERMON
   // =========================================================================
 
   isSlashMenuOpen: false,
@@ -2219,30 +2546,25 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
   getSlashCommandsDefinitions() {
     return [
       {
-        category: "Texte",
+        category: "Structure Homilétique",
         items: [
-          { id: "text", label: "Texte normal", iconText: "Aa", desc: "Paragraphe standard", action: "text" },
-          { id: "h1", label: "Titre", iconText: "Aa", desc: "Titre principal H1", action: "h1" },
-          { id: "h2", label: "Sous-titre", iconText: "Aa", desc: "Sous-titre H2", action: "h2" },
-          { id: "h3", label: "En-tête H3", iconText: "Aa", desc: "Sous-section H3", action: "h3" }
+          { id: "point", label: "Point Principal", iconText: "H1", desc: "Nouveau point majeur (Titre H1)", action: "point" },
+          { id: "subpoint", label: "Sous-point", iconText: "H2", desc: "Sous-division du point (Titre H2)", action: "subpoint" },
+          { id: "scripture", label: "Lecture Biblique / Écriture", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`, desc: "Encadré de citation du passage biblique", action: "scripture" },
+          { id: "exegesis", label: "Exégèse & Terme original", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m8.5 13.5 2-5.5 2 5.5"/><path d="M9.2 11.8h2.6"/><path d="M14 8.5h3.5l-3.5 5h3.5"/></svg>`, desc: "Analyse du mot hébreu/grec et portée", action: "exegesis" },
+          { id: "illustration", label: "Illustration / Récit", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>`, desc: "Anecdote, histoire ou métaphore concrète", action: "illustration" },
+          { id: "application", label: "Application pratique", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`, desc: "Question au cœur et défi pour la semaine", action: "application" },
+          { id: "cue", label: "Régie & Timing", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`, desc: "Indication technique pour le pupitre ou la vidéo", action: "cue" },
+          { id: "slide", label: "Diapositive [_]", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`, desc: "Insérer le repère de projection [ _ ]", action: "slide" }
         ]
       },
       {
-        category: "Prédication",
+        category: "Formatage & Blocs",
         items: [
-          { id: "scripture", label: "Verset biblique", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`, desc: "Citation de l'Écriture", action: "scripture" },
-          { id: "exegesis", label: "Exégèse & Langues", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m8.5 13.5 2-5.5 2 5.5"/><path d="M9.2 11.8h2.6"/><path d="M14 8.5h3.5l-3.5 5h3.5"/></svg>`, desc: "Termes originaux hébreu / grec", action: "exegesis" },
-          { id: "illustration", label: "Illustration", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>`, desc: "Histoire, métaphore ou parabole", action: "illustration" },
-          { id: "application", label: "Application pratique", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`, desc: "Appel concret à l'action", action: "application" },
-          { id: "cue", label: "Note régie / Timing", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`, desc: "Indication technique régie", action: "cue" },
-          { id: "slide", label: "Repère diapositive [_]", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`, desc: "Changement de slide projection", action: "slide" }
-        ]
-      },
-      {
-        category: "Listes & Autres",
-        items: [
-          { id: "bullet", label: "Liste à puces", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>`, desc: "Liste standard", action: "bullet" },
-          { id: "quote", label: "Citation", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2H4c-1.25 0-2 .75-2 2v6c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/></svg>`, desc: "Citation en retrait", action: "quote" }
+          { id: "h3", label: "Sous-titre 3", iconText: "H3", desc: "Titre de niveau 3 (H3)", action: "h3" },
+          { id: "quote", label: "Citation", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2H4c-1.25 0-2 .75-2 2v6c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/></svg>`, desc: "Citation théologique ou d'auteur", action: "quote" },
+          { id: "bullet", label: "Liste à puces", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>`, desc: "Liste d'idées ou points concis", action: "bullet" },
+          { id: "divider", label: "Ligne de séparation", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/></svg>`, desc: "Séparateur horizontal (---)", action: "divider" }
         ]
       }
     ];
@@ -2250,7 +2572,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
 
   handleSlashInput(e) {
     const sel = window.getSelection();
-    if (!sel.rangeCount) {
+    if (!sel || !sel.rangeCount) {
       this.closeSlashMenu();
       return;
     }
@@ -2283,16 +2605,43 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
       this.createSlashMenuEl();
     }
 
-    this.slashAnchorRange = window.getSelection().getRangeAt(0).cloneRange();
-    this.renderSlashMenuItems(query);
-
-    if (rect) {
-      this.slashMenuEl.style.left = `${Math.min(window.innerWidth - 300, Math.max(10, rect.left))}px`;
-      this.slashMenuEl.style.top = `${rect.bottom + window.scrollY + 6}px`;
+    try {
+      this.slashAnchorRange = window.getSelection().getRangeAt(0).cloneRange();
+    } catch (e) {
+      this.slashAnchorRange = null;
     }
 
+    this.renderSlashMenuItems(query);
     this.slashMenuEl.classList.remove('hidden');
     this.isSlashMenuOpen = true;
+
+    if (rect && (rect.top > 0 || rect.bottom > 0)) {
+      const menuWidth = this.slashMenuEl.offsetWidth || 280;
+      const viewportHeight = window.innerHeight;
+      const viewportWidth = window.innerWidth;
+
+      const left = Math.min(viewportWidth - menuWidth - 16, Math.max(10, rect.left));
+      const spaceBelow = viewportHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      const measuredHeight = this.slashMenuEl.offsetHeight || 300;
+
+      if (spaceBelow < measuredHeight + 16 && spaceAbove > spaceBelow) {
+        // Afficher au-dessus du curseur
+        const maxHeight = Math.max(140, Math.min(380, spaceAbove - 20));
+        this.slashMenuEl.style.maxHeight = `${maxHeight}px`;
+        const menuHeight = this.slashMenuEl.offsetHeight || measuredHeight;
+        const top = Math.max(10, rect.top - menuHeight - 6);
+        this.slashMenuEl.style.left = `${left}px`;
+        this.slashMenuEl.style.top = `${top}px`;
+      } else {
+        // Afficher en-dessous du curseur
+        const maxHeight = Math.max(140, Math.min(380, spaceBelow - 20));
+        this.slashMenuEl.style.maxHeight = `${maxHeight}px`;
+        const top = rect.bottom + 6;
+        this.slashMenuEl.style.left = `${left}px`;
+        this.slashMenuEl.style.top = `${top}px`;
+      }
+    }
   },
 
   closeSlashMenu() {
@@ -2303,14 +2652,17 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
   },
 
   createSlashMenuEl() {
-    const el = document.createElement('div');
-    el.id = 'sermon-slash-menu';
-    el.className = 'sermon-slash-dropdown hidden';
-    document.body.appendChild(el);
+    let el = document.getElementById('sermon-slash-menu');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'sermon-slash-menu';
+      el.className = 'notes-slash-dropdown hidden';
+      document.body.appendChild(el);
+    }
     this.slashMenuEl = el;
 
     document.addEventListener('click', (e) => {
-      if (!this.slashMenuEl.contains(e.target) && !e.target.closest('.sermon-section-editor')) {
+      if (this.isSlashMenuOpen && !this.slashMenuEl.contains(e.target) && !e.target.closest('.sermon-section-editor')) {
         this.closeSlashMenu();
       }
     });
@@ -2325,7 +2677,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
 
     categories.forEach(cat => {
       const matching = cat.items.filter(item => 
-        !q || item.label.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q)
+        !q || item.label.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q) || item.id.toLowerCase().includes(q)
       );
 
       if (matching.length > 0) {
@@ -2357,7 +2709,8 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     this.slashMenuEl.innerHTML = html;
 
     this.slashMenuEl.querySelectorAll('.slash-item').forEach(itemEl => {
-      itemEl.addEventListener('click', () => {
+      itemEl.addEventListener('click', (e) => {
+        e.stopPropagation();
         const action = itemEl.dataset.action;
         this.executeSlashCommand(action);
       });
@@ -2369,13 +2722,17 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
 
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      this.slashSelectedIndex = (this.slashSelectedIndex + 1) % this.slashCurrentItems.length;
-      this.updateSlashSelection();
+      if (this.slashCurrentItems.length > 0) {
+        this.slashSelectedIndex = (this.slashSelectedIndex + 1) % this.slashCurrentItems.length;
+        this.updateSlashSelection();
+      }
       return true;
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      this.slashSelectedIndex = (this.slashSelectedIndex - 1 + this.slashCurrentItems.length) % this.slashCurrentItems.length;
-      this.updateSlashSelection();
+      if (this.slashCurrentItems.length > 0) {
+        this.slashSelectedIndex = (this.slashSelectedIndex - 1 + this.slashCurrentItems.length) % this.slashCurrentItems.length;
+        this.updateSlashSelection();
+      }
       return true;
     } else if (e.key === 'Enter') {
       e.preventDefault();
@@ -2393,7 +2750,11 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
 
   updateSlashSelection() {
     this.slashMenuEl.querySelectorAll('.slash-item').forEach((item, idx) => {
-      item.classList.toggle('active', idx === this.slashSelectedIndex);
+      const isActive = idx === this.slashSelectedIndex;
+      item.classList.toggle('active', isActive);
+      if (isActive) {
+        item.scrollIntoView({ block: 'nearest' });
+      }
     });
   },
 
@@ -2401,21 +2762,46 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     this.closeSlashMenu();
 
     if (this.slashAnchorRange) {
-      const sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(this.slashAnchorRange);
+      try {
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(this.slashAnchorRange);
 
-      const node = this.slashAnchorRange.startContainer;
-      if (node && node.nodeType === Node.TEXT_NODE) {
-        const text = node.textContent;
-        const lastSlash = text.lastIndexOf('/');
-        if (lastSlash !== -1) {
-          node.textContent = text.slice(0, lastSlash);
+        const node = this.slashAnchorRange.startContainer;
+        if (node && node.nodeType === Node.TEXT_NODE) {
+          const text = node.textContent;
+          const lastSlash = text.lastIndexOf('/');
+          if (lastSlash !== -1) {
+            node.textContent = text.slice(0, lastSlash);
+          }
         }
+      } catch (e) {
+        console.warn('Erreur nettoyage slash anchor:', e);
       }
     }
 
-    this.insertBlock(action);
+    if (action === 'point') {
+      this.addSection('point');
+    } else if (['scripture', 'exegesis', 'illustration', 'application', 'cue', 'slide', 'subpoint'].includes(action)) {
+      this.insertBlock(action);
+    } else if (action === 'h1') {
+      document.execCommand('formatBlock', false, 'h1');
+    } else if (action === 'h2') {
+      document.execCommand('formatBlock', false, 'h2');
+    } else if (action === 'h3') {
+      document.execCommand('formatBlock', false, 'h3');
+    } else if (action === 'text') {
+      document.execCommand('formatBlock', false, 'p');
+    } else if (action === 'quote') {
+      document.execCommand('formatBlock', false, 'blockquote');
+    } else if (action === 'bullet') {
+      document.execCommand('insertUnorderedList');
+    } else if (action === 'divider') {
+      document.execCommand('insertHorizontalRule');
+    }
+
+    this.pushHistoryState();
+    this.debouncedAutoSave();
   },
 
   escapeHtml(str) {

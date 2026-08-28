@@ -1897,16 +1897,36 @@ const NotesView = {
     }
 
     this.renderSlashMenuItems(query);
-
-    if (rect && rect.top > 0) {
-      const left = Math.min(window.innerWidth - 300, Math.max(10, rect.left));
-      const top = rect.bottom + window.scrollY + 6;
-      this.slashMenuEl.style.left = `${left}px`;
-      this.slashMenuEl.style.top = `${top}px`;
-    }
-
     this.slashMenuEl.classList.remove('hidden');
     this.isSlashMenuOpen = true;
+
+    if (rect && (rect.top > 0 || rect.bottom > 0)) {
+      const menuWidth = this.slashMenuEl.offsetWidth || 290;
+      const viewportHeight = window.innerHeight;
+      const viewportWidth = window.innerWidth;
+
+      const left = Math.min(viewportWidth - menuWidth - 16, Math.max(10, rect.left));
+      const spaceBelow = viewportHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      const measuredHeight = this.slashMenuEl.offsetHeight || 300;
+
+      if (spaceBelow < measuredHeight + 16 && spaceAbove > spaceBelow) {
+        // Afficher au-dessus du curseur
+        const maxHeight = Math.max(140, Math.min(380, spaceAbove - 20));
+        this.slashMenuEl.style.maxHeight = `${maxHeight}px`;
+        const menuHeight = this.slashMenuEl.offsetHeight || measuredHeight;
+        const top = Math.max(10, rect.top - menuHeight - 6);
+        this.slashMenuEl.style.left = `${left}px`;
+        this.slashMenuEl.style.top = `${top}px`;
+      } else {
+        // Afficher en-dessous du curseur
+        const maxHeight = Math.max(140, Math.min(380, spaceBelow - 20));
+        this.slashMenuEl.style.maxHeight = `${maxHeight}px`;
+        const top = rect.bottom + 6;
+        this.slashMenuEl.style.left = `${left}px`;
+        this.slashMenuEl.style.top = `${top}px`;
+      }
+    }
   },
 
   closeSlashMenu() {

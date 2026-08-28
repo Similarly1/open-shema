@@ -35,7 +35,7 @@ delivery_history:
   location: AMD
   notes: Prêché au culte dominical
 created_at: '2026-08-28T20:57:29.547755'
-updated_at: '2026-08-28T20:57:29.547755'
+updated_at: '2026-08-28T21:02:21.875305'
 ---
 
 ## Introduction
@@ -46,7 +46,7 @@ Nous avons vu ensemble dimanche dernier que l'amour du Père va jusqu'à accepte
 
 Nous allons maintenant nous pencher sur **2 Corinthiens 5.16** (un seul verset !) qui nous adresse un appel vibrant : **Recherchons à connaître Dieu spirituellement plus qu'intellectuellement.**
 
-Cette démarche intérieure passe par trois regards successifs :
+Cette démarche intérieure passe par trois regards successifs : 
 1. Voir le visible et juger
 2. Voir le visible et ne pas y croire
 3. Voir l'invisible et y croire
@@ -69,7 +69,7 @@ Cette démarche intérieure passe par trois regards successifs :
 
 C'est notre penchant naturel, sans transformation par l'Esprit Saint, de juger immédiatement sur ce qui frappe le regard. Avant sa conversion, Paul était reconnaissable à son habit de pharisien et étiquetait aussitôt les gens : grec, romain, juif, païen, esclave ou libre.
 
-Notre société a décuplé ce culte de l'image avec les réseaux sociaux et l'obsession du statut. Ce risque existe tout autant dans notre relation avec Dieu : une connaissance purement intellectuelle ne suffit pas pour Jésus. Connaître par cœur les récits bibliques, fréquenter le culte, lire de la théologie ou réciter des prières ne remplacent jamais un cœur attaché à Christ. 
+Notre société a décuplé ce culte de l'image avec les réseaux sociaux et l'obsession du statut. Ce risque existe tout autant dans notre relation avec Dieu : une connaissance purement intellectuelle ne suffit pas pour Jésus. Connaître par cœur les récits bibliques, fréquenter le culte, lire de la théologie ou réciter des prières ne remplacent jamais un cœur attaché à Christ.
 
 > [!illustration|id=gims-reussite]
 > **Le succès de façade vs la vraie réussite :**
