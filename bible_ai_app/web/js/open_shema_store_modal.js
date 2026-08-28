@@ -31,6 +31,10 @@ const OpenShemaStore = {
   init() {
     this._createModalDom();
     this.refreshInstalledCache();
+    // Contrôle automatique et doux des nouveautés au démarrage (après 2.5s)
+    setTimeout(() => {
+      this.checkNewModulesOnStartup();
+    }, 2500);
   },
 
   async refreshInstalledCache() {
@@ -337,9 +341,16 @@ const OpenShemaStore = {
         </div>
 
         <div class="store-card-body">
-          <h4 class="store-card-title">${m.title}</h4>
-          <div class="store-card-author">${m.author || 'Domaine Public'}</div>
-          <p class="store-card-desc">${m.description || ''}</p>
+          ${m.cover_url ? `
+            <div class="store-card-cover-container">
+              <img src="${m.cover_url}" class="store-card-cover-img" alt="${m.title}" loading="lazy" />
+            </div>
+          ` : ''}
+          <div class="store-card-info-container">
+            <h4 class="store-card-title">${m.title}</h4>
+            <div class="store-card-author">${m.author || 'Domaine Public'}</div>
+            <p class="store-card-desc">${m.description || ''}</p>
+          </div>
         </div>
 
         <div class="store-card-footer">
@@ -418,6 +429,66 @@ const OpenShemaStore = {
     } finally {
       this.isDownloading[module.id] = false;
       this.render();
+    }
+  },
+
+  /**
+   * Vérifie automatiquement au démarrage s'il y a de nouveaux ouvrages
+   * sur le dépôt data depuis la dernière ouverture.
+   */
+  async checkNewModulesOnStartup() {
+    try {
+      const catalog = await this.fetchCatalog();
+      if (!catalog || !catalog.modules || catalog.modules.length === 0) return;
+
+      await this.refreshInstalledCache();
+
+      const storageKey = 'open_shema_known_catalog_ids';
+      let knownIds = [];
+      try {
+        const stored = localStorage.getItem(storageKey);
+        if (stored) knownIds = JSON.parse(stored);
+      } catch (e) {
+        knownIds = [];
+      }
+
+      // Modules distants non encore installés
+      const uninstalledModules = catalog.modules.filter(m => !this._isModuleInstalled(m));
+
+      // Nouveaux modules jamais vus lors des sessions précédentes
+      const newAvailableModules = uninstalledModules.filter(m => !knownIds.includes(m.id));
+
+      if (newAvailableModules.length > 0) {
+        this._showNewModulesNotification(newAvailableModules);
+      }
+
+      // Mémoriser tous les modules du catalogue actuel pour ne pas répéter la notification
+      const allCurrentIds = catalog.modules.map(m => m.id);
+      localStorage.setItem(storageKey, JSON.stringify(allCurrentIds));
+    } catch (err) {
+      console.warn('[OpenShemaStore] Erreur vérification démarrage:', err);
+    }
+  },
+
+  _showNewModulesNotification(newModules) {
+    const isSingle = newModules.length === 1;
+    const firstMod = newModules[0];
+    const title = isSingle ? 'Nouvel ouvrage disponible' : `${newModules.length} nouveaux ouvrages disponibles`;
+    const snippet = isSingle 
+      ? `« ${firstMod.title} » (${firstMod.author || 'Domaine Public'}) est disponible au téléchargement gratuit.`
+      : `${newModules.map(m => m.title).slice(0, 2).join(', ')}${newModules.length > 2 ? '...' : ''} sont disponibles dans le catalogue.`;
+
+    if (typeof NotificationManager !== 'undefined' && NotificationManager.showInAppToast) {
+      NotificationManager.showInAppToast({
+        title: title,
+        snippet: snippet,
+        targetView: 'library',
+        onClick: () => {
+          this.open();
+        }
+      });
+    } else if (typeof App !== 'undefined' && App.showToast) {
+      App.showToast(`${title} : ${snippet}`);
     }
   }
 };

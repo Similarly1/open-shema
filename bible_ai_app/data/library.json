@@ -36,18 +36,22 @@
     "book_code": null
   },
   "NBS": {
-    "title": "Nouvelle Bible Segond",
-    "author": "",
-    "description": "Nouvelle Bible Segond (Société biblique française, 2002)",
+    "title": "Bible NBS, compacte, grise",
+    "author": "La Maison de la Bible",
+    "description": "",
     "year": "2002",
-    "cover_path": null,
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\Bible_NBS,_compacte,_grise.jpg",
     "type": "Bible",
     "format": "json",
     "folder_name": "NBS",
     "version_code": "NBS",
     "total_books": 66,
     "embedding_model": "study_library",
-    "active": true
+    "active": true,
+    "name": "NBS",
+    "corpus_scope": "GLOBAL",
+    "source_type": "general",
+    "book_code": null
   },
   "NFC": {
     "title": "La Bible Nouvelle Français Courant, couverture rigide",
@@ -204,7 +208,7 @@
     "author": "Louis Segond",
     "description": "Bible Louis Segond 1910 avec numérotation Strong complète (Hébreu & Grec)",
     "year": "1910",
-    "cover_path": null,
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\LSG.png",
     "type": "Bible",
     "format": "json",
     "folder_name": "LSG",
@@ -212,7 +216,11 @@
     "total_books": 66,
     "embedding_model": "study_library",
     "active": true,
-    "has_strongs": true
+    "has_strongs": true,
+    "name": "LSG",
+    "corpus_scope": "GLOBAL",
+    "source_type": "general",
+    "book_code": null
   },
   "Commentaire critique et explicatif sur toute la Bible (JFB)": {
     "title": "Commentaire critique et explicatif sur toute la Bible (JFB)",
@@ -252,19 +260,6 @@
     "embedding_model": "study_library",
     "active": true,
     "chunks_count": 66
-  },
-  "Commentaire Biblique de Jean Calvin": {
-    "title": "Commentaire Biblique de Jean Calvin",
-    "author": "Jean Calvin",
-    "description": "Commentaire biblique complet (13439 passages indexés sur 48 livres).",
-    "year": "",
-    "cover_path": null,
-    "type": "Commentaire",
-    "format": "commentary_sqlite",
-    "commentary_id": "3",
-    "embedding_model": "study_library",
-    "active": true,
-    "chunks_count": 13439
   },
   "Commentaire Biblique par Albert Barnes": {
     "title": "Commentaire Biblique par Albert Barnes",
@@ -851,7 +846,7 @@
     "author": "John Nelson Darby",
     "description": "Traduction littérale et rigoureuse de John Nelson Darby (66 livres, 31 171 versets) avec balisage Strong complet.",
     "year": "1885",
-    "cover_path": null,
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\DARBY.png",
     "type": "Bible",
     "format": "json",
     "folder_name": "DARBY",
@@ -859,6 +854,24 @@
     "total_books": 66,
     "embedding_model": "study_library",
     "active": true,
-    "has_strongs": true
+    "has_strongs": true,
+    "name": "DARBY",
+    "corpus_scope": "GLOBAL",
+    "source_type": "general",
+    "book_code": null
+  },
+  "CBJC": {
+    "name": "CBJC",
+    "title": "Commentaire Biblique de Jean Calvin",
+    "author": "Jean Calvin (Éd. Ch. Meyrueis / Dom. Public)",
+    "description": "Ensemble des commentaires exégétiques et doctrinaux de Jean Calvin sur le Nouveau et l'Ancien Testament (13 439 passages indexés sur 48 livres). Texte intégral du domaine public restauré, modernisé et structuré en Markdown thématique avec mise en valeur des citations et références scripturaires.",
+    "year": "1854",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\CBJC.png",
+    "type": "Commentaire",
+    "corpus_scope": "GLOBAL",
+    "source_type": "general",
+    "book_code": null,
+    "embedding_model": "study_library",
+    "active": true
   }
 }

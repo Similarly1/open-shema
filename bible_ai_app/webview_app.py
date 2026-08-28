@@ -2680,6 +2680,26 @@ class BibleAppApi:
                 except Exception as extract_err:
                     logger.warning(f"Erreur extraction SQLite Bible vers JSON : {extract_err}")
 
+            # Téléchargement de l'image de couverture si spécifiée
+            cover_path = None
+            cover_url = module_data.get("cover_url")
+            if cover_url:
+                try:
+                    covers_dir = os.path.join(current_dir, "data", "covers")
+                    os.makedirs(covers_dir, exist_ok=True)
+                    cover_ext = os.path.splitext(cover_url.split("?")[0])[1] or ".png"
+                    local_cover_file = f"{m_abbr}{cover_ext}"
+                    cover_dest = os.path.join(covers_dir, local_cover_file)
+                    req_cov = urllib.request.Request(
+                        cover_url,
+                        headers={"User-Agent": "OpenShemaApp/1.0"}
+                    )
+                    with urllib.request.urlopen(req_cov, timeout=15) as cov_resp, open(cover_dest, "wb") as cov_out:
+                        shutil.copyfileobj(cov_resp, cov_out)
+                    cover_path = cover_dest
+                except Exception as cov_err:
+                    logger.warning(f"Erreur téléchargement de la couverture pour {m_title}: {cov_err}")
+
             registry = load_books_metadata()
             reg_key = m_abbr or m_id
             registry[reg_key] = {
@@ -2687,7 +2707,7 @@ class BibleAppApi:
                 "author": module_data.get("author", "Open Shema"),
                 "description": module_data.get("description", ""),
                 "year": module_data.get("version", "1.0.0"),
-                "cover_path": None,
+                "cover_path": cover_path,
                 "type": "Bible" if m_type == "bible" else ("Dictionnaire" if m_type == "dictionary" else ("Commentaire" if m_type == "commentary" else "Théologie")),
                 "format": "json" if (m_type == "bible" and target_path.endswith(".sqlite")) else m_format,
                 "file_path": target_path,
