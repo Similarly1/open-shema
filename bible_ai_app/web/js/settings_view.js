@@ -145,6 +145,15 @@ const SettingsView = {
     maxOrigSlider.addEventListener('input', (e) => {
       maxOrigLbl.textContent = `${e.target.value} vers.`;
     });
+
+    const notifyVolSlider = document.getElementById('cfg-notify-ai-volume');
+    const notifyVolLbl = document.getElementById('lbl-notify-ai-volume');
+    notifyVolSlider?.addEventListener('input', (e) => {
+      if (notifyVolLbl) notifyVolLbl.textContent = `${e.target.value}%`;
+      if (typeof NotificationManager !== 'undefined') {
+        NotificationManager.updateSettings({ volume: parseInt(e.target.value, 10) / 100 });
+      }
+    });
   },
 
   DEFAULT_SYNTH_PROMPT: `Vous êtes un éminent professeur de théologie et un exégète biblique chevronné.
@@ -421,6 +430,44 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
 
     document.getElementById('cfg-enable-ai')?.addEventListener('change', handleAIToggle);
     document.getElementById('cfg-enable-ai-tab')?.addEventListener('change', handleAIToggle);
+
+    // 4b. Notifications de fin de génération IA
+    document.getElementById('cfg-notify-ai-enabled')?.addEventListener('change', (e) => {
+      const isEnabled = e.target.checked;
+      if (typeof NotificationManager !== 'undefined') {
+        NotificationManager.updateSettings({ enabled: isEnabled });
+      }
+      const container = document.getElementById('ai-notify-options-container');
+      if (container) {
+        container.style.opacity = isEnabled ? '1' : '0.45';
+        container.style.pointerEvents = isEnabled ? 'auto' : 'none';
+      }
+    });
+
+    document.getElementById('cfg-notify-ai-sound')?.addEventListener('change', (e) => {
+      if (typeof NotificationManager !== 'undefined') {
+        NotificationManager.updateSettings({ sound: e.target.checked });
+      }
+    });
+
+    document.getElementById('cfg-notify-ai-windows')?.addEventListener('change', (e) => {
+      if (typeof NotificationManager !== 'undefined') {
+        NotificationManager.updateSettings({ windows: e.target.checked });
+      }
+    });
+
+    document.getElementById('cfg-notify-ai-inapp')?.addEventListener('change', (e) => {
+      if (typeof NotificationManager !== 'undefined') {
+        NotificationManager.updateSettings({ inapp: e.target.checked });
+      }
+    });
+
+    document.getElementById('btn-test-notify-sound')?.addEventListener('click', () => {
+      const vol = (parseInt(document.getElementById('cfg-notify-ai-volume')?.value || '60', 10)) / 100;
+      if (typeof NotificationManager !== 'undefined') {
+        NotificationManager.playChime(vol);
+      }
+    });
 
     // Changement de police en direct
     document.getElementById('cfg-font-family')?.addEventListener('change', (e) => {
@@ -1028,6 +1075,30 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
     if (c.mistral_api_key) document.getElementById('cfg-mistral-key').value = c.mistral_api_key;
     if (c.infomaniak_token) document.getElementById('cfg-infomaniak-token').value = c.infomaniak_token;
     if (c.infomaniak_product_id) document.getElementById('cfg-infomaniak-pid').value = c.infomaniak_product_id;
+
+    // Chargement des préférences de notifications IA
+    if (typeof NotificationManager !== 'undefined') {
+      const nSettings = NotificationManager.settings;
+      const chkNotify = document.getElementById('cfg-notify-ai-enabled');
+      if (chkNotify) chkNotify.checked = nSettings.enabled !== false;
+      const chkSound = document.getElementById('cfg-notify-ai-sound');
+      if (chkSound) chkSound.checked = nSettings.sound !== false;
+      const chkWin = document.getElementById('cfg-notify-ai-windows');
+      if (chkWin) chkWin.checked = nSettings.windows !== false;
+      const chkInApp = document.getElementById('cfg-notify-ai-inapp');
+      if (chkInApp) chkInApp.checked = nSettings.inapp !== false;
+      const vol = Math.round((nSettings.volume ?? 0.6) * 100);
+      const volSlider = document.getElementById('cfg-notify-ai-volume');
+      if (volSlider) volSlider.value = vol;
+      const volLbl = document.getElementById('lbl-notify-ai-volume');
+      if (volLbl) volLbl.textContent = `${vol}%`;
+
+      const notifContainer = document.getElementById('ai-notify-options-container');
+      if (notifContainer) {
+        notifContainer.style.opacity = (nSettings.enabled !== false) ? '1' : '0.45';
+        notifContainer.style.pointerEvents = (nSettings.enabled !== false) ? 'auto' : 'none';
+      }
+    }
   },
 
   initModelSelectPairs() {

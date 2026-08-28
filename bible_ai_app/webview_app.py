@@ -67,6 +67,7 @@ from core.maps_manager import MapsManager
 from gui.library_utils import load_books_metadata, save_books_metadata
 from core.ai_session_manager import AISessionManager
 from core.secrets_manager import migrate_secrets_from_config, load_secrets_into_config
+from core.native_notifications import send_windows_toast
 
 # Composants inclus dans la sauvegarde complète
 _BACKUP_MANIFEST_VERSION = "1.0"
@@ -3187,6 +3188,11 @@ class BibleAppApi:
     def get_window_state(self):
         global _IS_MAXIMIZED, _IS_FULLSCREEN
         return {"is_maximized": _IS_MAXIMIZED, "is_fullscreen": _IS_FULLSCREEN}
+
+    def show_system_notification(self, title: str = "Open Shema", message: str = "") -> Dict[str, Any]:
+        """Affiche une notification native Windows Toast / Balloon en tâche de fond."""
+        send_windows_toast(title, message)
+        return {"success": True}
 
     def minimize_window(self):
         global _GLOBAL_WINDOW

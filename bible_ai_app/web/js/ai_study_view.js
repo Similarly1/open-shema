@@ -1610,6 +1610,16 @@ const AIStudyView = {
         assistantMsg.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 50);
 
+      // 6. Notification de fin de génération (Son feutré / Toast Windows / Bannière in-app)
+      if (typeof NotificationManager !== 'undefined') {
+        const querySnippet = (text && text.trim()) || (passage ? this.getPassageLabel() : "Votre étude est prête");
+        NotificationManager.notifyAICompletion({
+          title: "Assistant d'Étude",
+          snippet: querySnippet,
+          targetView: 'ai'
+        });
+      }
+
     } catch (e) {
       clearInterval(intervalTimer);
       if (this.activeRotatingTimer) clearInterval(this.activeRotatingTimer);

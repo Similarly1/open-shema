@@ -3009,6 +3009,79 @@
                   <input type="text" id="cfg-infomaniak-pid" class="text-field full-w" placeholder="ex: 251">
                 </div>
               </div>
+
+              <!-- Carte : Notifications de fin de génération IA -->
+              <div class="settings-card" id="card-ai-notifications" style="margin-top: 18px;">
+                <div class="card-title" style="display: flex; align-items: center; justify-content: space-between;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-gold, #c89b3c);">
+                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                      <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <span>Notifications &amp; Alertes de Fin de Réponse</span>
+                  </div>
+                  <label class="toggle-switch-large" title="Activer / Désactiver les notifications">
+                    <input type="checkbox" id="cfg-notify-ai-enabled" checked>
+                    <span class="toggle-switch-slider"></span>
+                  </label>
+                </div>
+                <p class="card-desc" style="margin-bottom: 14px;">
+                  Soyez averti discrètement dès que l'assistant ou la synthèse IA termine sa réflexion, même si vous naviguez dans un autre onglet ou êtes sur un autre programme Windows.
+                </p>
+
+                <div id="ai-notify-options-container" style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+                  <!-- Option 1 : Son subtil -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-radius: 8px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--text-secondary);"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                      <div>
+                        <div style="font-size: 13px; font-weight: 600; color: var(--text-primary);">Carillon sonore doux</div>
+                        <div style="font-size: 11.5px; color: var(--text-secondary);">Joue un carillon feutré harmonique (Web Audio) dès que la réponse est prête.</div>
+                      </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                      <button type="button" class="btn-secondary btn-sm" id="btn-test-notify-sound" style="padding: 4px 10px; font-size: 11.5px; display: inline-flex; align-items: center; gap: 5px;">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                        <span>Tester</span>
+                      </button>
+                      <input type="checkbox" id="cfg-notify-ai-sound" checked style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent-gold, #c89b3c);">
+                    </div>
+                  </div>
+
+                  <!-- Curseur Volume sonore -->
+                  <div id="ai-notify-volume-row" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 14px; font-size: 12px; color: var(--text-secondary);">
+                    <span>Volume du carillon :</span>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <input type="range" id="cfg-notify-ai-volume" min="10" max="100" value="60" style="width: 120px; cursor: pointer; accent-color: var(--accent-gold, #c89b3c);">
+                      <span id="lbl-notify-ai-volume" style="font-weight: 600; min-width: 32px; text-align: right; color: var(--text-primary);">60%</span>
+                    </div>
+                  </div>
+
+                  <!-- Option 2 : Notification Windows native -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-radius: 8px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--text-secondary);"><rect width="20" height="15" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="18" y2="21"/></svg>
+                      <div>
+                        <div style="font-size: 13px; font-weight: 600; color: var(--text-primary);">Notification Windows (Toast en arrière-plan)</div>
+                        <div style="font-size: 11.5px; color: var(--text-secondary);">Affiche un pop-up Windows 10/11 en bas à droite lorsque vous êtes sur une autre application.</div>
+                      </div>
+                    </div>
+                    <input type="checkbox" id="cfg-notify-ai-windows" checked style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent-gold, #c89b3c);">
+                  </div>
+
+                  <!-- Option 3 : Bannière & Pastille In-App -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-radius: 8px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--text-secondary);"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                      <div>
+                        <div style="font-size: 13px; font-weight: 600; color: var(--text-primary);">Bannière flottante &amp; Pastille in-app</div>
+                        <div style="font-size: 11.5px; color: var(--text-secondary);">Affiche une bannière interactive avec bouton « Voir l'étude » si vous lisez un autre onglet (Bible, etc.).</div>
+                      </div>
+                    </div>
+                    <input type="checkbox" id="cfg-notify-ai-inapp" checked style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent-gold, #c89b3c);">
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <!-- Fin de la Section IA -->
@@ -7660,6 +7733,7 @@
 
   <!-- Scripts -->
   <script src="js/api.js"></script>
+  <script src="js/notification_manager.js"></script>
   <script src="js/task_manager.js"></script>
   <script src="js/multiwindow_sync.js"></script>
   <script src="js/book_picker.js"></script>

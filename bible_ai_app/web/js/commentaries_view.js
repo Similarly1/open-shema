@@ -1210,6 +1210,13 @@ const CommentariesView = {
       if (res && res.success) {
         this.latestSynthesisMarkdown = res.synthesis || '';
         this.renderSynthesisResult(res);
+        if (typeof NotificationManager !== 'undefined') {
+          NotificationManager.notifyAICompletion({
+            title: "Synthèse de Commentaires",
+            snippet: `${this.currentBookFrench || this.currentBook} ${this.currentChapter}:${this.synthVerseStart}-${this.synthVerseEnd}`,
+            targetView: 'commentaries'
+          });
+        }
       } else {
         App.showError('Erreur Synthèse IA', res?.error || 'Impossible de générer la synthèse.');
       }

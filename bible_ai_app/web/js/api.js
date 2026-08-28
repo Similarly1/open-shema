@@ -539,6 +539,10 @@ const API = {
 
   async openIllustrationsFolder() {
     return await this.call('open_illustrations_folder');
+  },
+
+  async showSystemNotification(title, message) {
+    return await this.call('show_system_notification', title, message);
   }
 };
 

@@ -1449,6 +1449,14 @@ const TheologyView = {
 
         if (this.synthLoadingBox) this.synthLoadingBox.classList.add('hidden');
         if (this.synthResultContainer) this.synthResultContainer.classList.remove('hidden');
+
+        if (typeof NotificationManager !== 'undefined') {
+          NotificationManager.notifyAICompletion({
+            title: "Synthèse Théologique",
+            snippet: `${this.currentBook || 'Ouvrage'} - Chapitre ${this.currentChapterId || ''}`,
+            targetView: 'theology'
+          });
+        }
       } else {
         throw new Error(res?.error || 'Échec de la synthèse');
       }

@@ -1356,6 +1356,13 @@ const PassageStudyView = {
       const res = await API.synthesizeCommentaries(d.book_code, d.start_ch, d.start_v, d.end_v);
       if (res && res.synthesis) {
         synthContent.innerHTML = `<div class="markdown-body">${this.formatMarkdownSimple(res.synthesis)}</div>`;
+        if (typeof NotificationManager !== 'undefined') {
+          NotificationManager.notifyAICompletion({
+            title: "Étude de Passage",
+            snippet: `${d.book_french || d.book_code} ${d.start_ch}:${d.start_v}-${d.end_v}`,
+            targetView: 'passage-study'
+          });
+        }
       } else {
         synthContent.innerHTML = `<p class="ps-error-p">Synthèse non disponible ou aucun commentaire suffisant.</p>`;
       }
