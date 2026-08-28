@@ -925,8 +925,45 @@ const CommentariesView = {
       displayedText = cachedTranslation;
     }
 
+    // Extraction des notes de bas de page
+    const { mainText, footnotesList, footnoteMap } = this.parseCommentaryFootnotes(displayedText);
+
     // Formatage Markdown / Rich HTML
-    const formattedHtml = this.formatCommentaryContent(displayedText);
+    const formattedHtml = this.formatCommentaryContent(mainText, footnoteMap);
+
+    // Section dédiée aux notes de bas de page si présentes
+    let footnotesHtml = '';
+    if (footnotesList.length > 0) {
+      footnotesHtml = `
+        <div class="theol-footnotes-section" id="comm-footnotes-section" style="margin-top: 32px; padding-top: 18px; border-top: 1px dashed var(--border-color, rgba(255, 255, 255, 0.12));">
+          <div class="theol-footnotes-header" style="font-size: 1.05em; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--accent-blue, #3b82f6);">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>Notes de bas de page (${footnotesList.length})</span>
+          </div>
+          <ol class="theol-footnotes-list" style="padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; list-style: none;">
+            ${footnotesList.map(fn => {
+              const formattedFnText = (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences)
+                ? TheologyView.highlightScriptureReferences(TheologyView.linkifyUrls(fn.text))
+                : fn.text;
+              return `
+              <li class="theol-fn-item" id="comm-fn-${fn.id}" data-fn-id="${fn.id}">
+                <span class="theol-fn-num">${fn.id}.</span>
+                <div class="theol-fn-content" style="flex: 1;">
+                  <span class="theol-fn-text">${formattedFnText}</span>
+                  <a href="#comm-fnref-${fn.id}" class="theol-fn-backref" data-target-id="comm-fnref-${fn.id}" title="Retour au passage" style="margin-left: 8px; text-decoration: none; color: var(--accent-blue, #3b82f6); font-weight: 700;">↩</a>
+                </div>
+              </li>
+            `;
+            }).join('')}
+          </ol>
+        </div>
+      `;
+    }
 
     // Bannière de traduction
     let translationBannerHtml = '';
@@ -998,9 +1035,31 @@ const CommentariesView = {
 
         <div class="comm-view-reading-body">
           ${formattedHtml}
+          ${footnotesHtml}
         </div>
       </div>
     `;
+
+    // Lier FootnoteTooltip (infobulles de notes au survol et au clic)
+    if (typeof FootnoteTooltip !== 'undefined') {
+      FootnoteTooltip.setFootnotes(footnotesList);
+      FootnoteTooltip.bindToElements(this.articleContent.querySelectorAll('.theol-fn-badge'));
+    }
+
+    // Attacher les liens retour (back-links) de la section des notes
+    this.articleContent.querySelectorAll('.theol-fn-backref').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = btn.dataset.targetId;
+        const targetEl = document.getElementById(targetId);
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          targetEl.classList.remove('theol-highlight-pulse');
+          void targetEl.offsetWidth;
+          targetEl.classList.add('theol-highlight-pulse');
+        }
+      });
+    });
 
     // Lier l'infobulle biblique interactive (ScriptureTooltip) & navigation par clic
     if (typeof ScriptureTooltip !== 'undefined') {
@@ -1429,9 +1488,44 @@ const CommentariesView = {
     }
   },
 
-  formatCommentaryContent(text) {
+  parseCommentaryFootnotes(rawText) {
+    if (!rawText) return { mainText: '', footnotesList: [], footnoteMap: {} };
+
+    const footnotesList = [];
+    const footnoteMap = {};
+    let mainText = rawText;
+
+    // Détection de la section des notes en bas de texte
+    const firstDefMatch = mainText.search(/(?:\n\s*\[\^\d+\](?:\s*:\s*|\s+)|\b\[\^\d+\]:\s*)/);
+    let defsBlock = '';
+
+    if (firstDefMatch !== -1) {
+      defsBlock = mainText.slice(firstDefMatch);
+      mainText = mainText.slice(0, firstDefMatch).trim();
+    }
+
+    if (defsBlock) {
+      const fnDefRegex = /\[\^(\d+)\](?:\s*:\s*|\s+)([\s\S]*?)(?=(?:\[\^\d+\](?:\s*:\s*|\s+)|$))/g;
+      let match;
+      while ((match = fnDefRegex.exec(defsBlock)) !== null) {
+        const fnId = match[1];
+        const fnBody = match[2].trim();
+        if (fnBody && !footnoteMap[fnId]) {
+          footnoteMap[fnId] = fnBody;
+          footnotesList.push({ id: fnId, text: fnBody });
+        }
+      }
+    }
+
+    return { mainText, footnotesList, footnoteMap };
+  },
+
+  formatCommentaryContent(text, footnoteMap = {}) {
     if (!text) return '';
     let html = text
+      .replace(/\[\^(\d+)\]/g, (match, id) => {
+        return `<sup class="theol-fn-badge" data-fn-id="${id}" id="comm-fnref-${id}"><a href="#comm-fn-${id}" title="Note ${id}">${id}</a></sup>`;
+      })
       .replace(/^### (.*$)/gim, '<h3 class="comm-body-h3">$1</h3>')
       .replace(/^## (.*$)/gim, '<h2 class="comm-body-h2">$1</h2>')
       .replace(/^# (.*$)/gim, '<h1 class="comm-body-h1">$1</h1>')

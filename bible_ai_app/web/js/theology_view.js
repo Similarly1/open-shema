@@ -2482,9 +2482,13 @@ const FootnoteTooltip = {
       el.addEventListener('click', (e) => {
         e.preventDefault();
         this.hide();
-        const targetFnEl = document.getElementById(`theol-fn-${fnId}`);
+        const targetFnEl = document.getElementById(`theol-fn-${fnId}`) || document.getElementById(`comm-fn-${fnId}`) || document.getElementById(`dict-fn-${fnId}`) || document.getElementById(`article-fn-${fnId}`);
         if (targetFnEl) {
-          TheologyView.smoothScrollToElement(targetFnEl);
+          if (typeof TheologyView !== 'undefined' && document.getElementById('theol-main-scroll')?.contains(targetFnEl)) {
+            TheologyView.smoothScrollToElement(targetFnEl);
+          } else {
+            targetFnEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
           targetFnEl.classList.remove('theol-highlight-pulse');
           void targetFnEl.offsetWidth; // Déclencher le reflow CSS
           targetFnEl.classList.add('theol-highlight-pulse');
@@ -2501,7 +2505,9 @@ const FootnoteTooltip = {
     this.activeTarget = targetEl;
     this.activeFnId = fnId;
 
-    const formattedText = TheologyView.linkifyUrls(TheologyView.highlightScriptureReferences(text));
+    const formattedText = (typeof TheologyView !== 'undefined' && TheologyView.linkifyUrls)
+      ? TheologyView.linkifyUrls(TheologyView.highlightScriptureReferences(text))
+      : text;
 
     this.tooltipEl.innerHTML = `
       <div class="theol-fn-popover-header">
@@ -2512,7 +2518,7 @@ const FootnoteTooltip = {
             <line x1="16" y1="13" x2="8" y2="13"></line>
             <line x1="16" y1="17" x2="8" y2="17"></line>
           </svg>
-          <span>Note ${TheologyView.escapeHtml(String(fnId))}</span>
+          <span>Note ${typeof TheologyView !== 'undefined' ? TheologyView.escapeHtml(String(fnId)) : fnId}</span>
         </div>
         <button type="button" class="theol-fn-popover-jump" data-fn-id="${fnId}">
           Voir en bas ↓
@@ -2529,7 +2535,11 @@ const FootnoteTooltip = {
         const ref = span.dataset.ref || span.textContent.trim();
         if (ref) {
           this.hide();
-          TheologyView.openScriptureReference(ref);
+          if (typeof TheologyView !== 'undefined' && TheologyView.openScriptureReference) {
+            TheologyView.openScriptureReference(ref);
+          } else if (typeof BibleReader !== 'undefined') {
+            BibleReader.searchPassage(ref);
+          }
         }
       });
     });
@@ -2549,9 +2559,13 @@ const FootnoteTooltip = {
       jumpBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         this.hide();
-        const targetFnEl = document.getElementById(`theol-fn-${fnId}`);
+        const targetFnEl = document.getElementById(`theol-fn-${fnId}`) || document.getElementById(`comm-fn-${fnId}`) || document.getElementById(`dict-fn-${fnId}`) || document.getElementById(`article-fn-${fnId}`);
         if (targetFnEl) {
-          TheologyView.smoothScrollToElement(targetFnEl);
+          if (typeof TheologyView !== 'undefined' && document.getElementById('theol-main-scroll')?.contains(targetFnEl)) {
+            TheologyView.smoothScrollToElement(targetFnEl);
+          } else {
+            targetFnEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
           targetFnEl.classList.remove('theol-highlight-pulse');
           void targetFnEl.offsetWidth;
           targetFnEl.classList.add('theol-highlight-pulse');

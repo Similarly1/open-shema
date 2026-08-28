@@ -1150,7 +1150,6 @@ const CommentaryViewer = {
       this.renderAbsentPreferredAuthor();
     }
   },
-
   isForeignText(text) {
     if (!text || text.length < 15) return false;
     const sample = text.toLowerCase().slice(0, 500);
@@ -1161,9 +1160,47 @@ const CommentaryViewer = {
     return enMatches > frMatches;
   },
 
-  formatCommentaryMarkdown(text) {
+  parseCommentaryFootnotes(rawText) {
+    if (!rawText) return { mainText: '', footnotesList: [], footnoteMap: {} };
+
+    const footnotesList = [];
+    const footnoteMap = {};
+    let mainText = rawText;
+
+    // Détection de la section des notes en bas de texte
+    const firstDefMatch = mainText.search(/(?:\n\s*\[\^\d+\](?:\s*:\s*|\s+)|\b\[\^\d+\]:\s*)/);
+    let defsBlock = '';
+
+    if (firstDefMatch !== -1) {
+      defsBlock = mainText.slice(firstDefMatch);
+      mainText = mainText.slice(0, firstDefMatch).trim();
+    }
+
+    if (defsBlock) {
+      const fnDefRegex = /\[\^(\d+)\](?:\s*:\s*|\s+)([\s\S]*?)(?=(?:\[\^\d+\](?:\s*:\s*|\s+)|$))/g;
+      let match;
+      while ((match = fnDefRegex.exec(defsBlock)) !== null) {
+        const fnId = match[1];
+        const fnBody = match[2].trim();
+        if (fnBody && !footnoteMap[fnId]) {
+          footnoteMap[fnId] = fnBody;
+          footnotesList.push({ id: fnId, text: fnBody });
+        }
+      }
+    }
+
+    return { mainText, footnotesList, footnoteMap };
+  },
+
+  formatCommentaryMarkdown(text, footnoteMap = {}) {
     if (!text) return '';
-    const formatted = text
+
+    // Remplacer les marqueurs [^1] ou [^2] par le badge interactif theol-fn-badge
+    let formatted = text.replace(/\[\^(\d+)\]/g, (match, id) => {
+      return `<sup class="theol-fn-badge" data-fn-id="${id}" id="comm-fnref-${id}"><a href="#comm-fn-${id}" title="Note ${id}">${id}</a></sup>`;
+    });
+
+    formatted = formatted
       .replace(/^### (.*$)/gim, '<h3 style="margin: 14px 0 6px 0; font-size: 15px; font-weight: 700; color: var(--accent-blue);">$1</h3>')
       .replace(/^## (.*$)/gim, '<h2 style="margin: 18px 0 8px 0; font-size: 17px; font-weight: 800; color: var(--accent-blue);">$1</h2>')
       .replace(/^# (.*$)/gim, '<h1 style="margin: 20px 0 10px 0; font-size: 19px; font-weight: 800; color: var(--accent-blue);">$1</h1>')
@@ -1209,7 +1246,7 @@ const CommentaryViewer = {
       if (isForeign && !hasTranslation) {
         btnTranslate.classList.remove('hidden');
         btnTranslate.disabled = false;
-        btnTranslate.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>Traduire</span>';
+        btnTranslate.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"/></svg><span>Traduire</span>';
       } else {
         btnTranslate.classList.add('hidden');
       }
@@ -1223,7 +1260,7 @@ const CommentaryViewer = {
         displayedText = this.translationCache[itemId];
         translationBannerHtml = `
           <div class="comm-translate-badge">
-            <span style="display:inline-flex; align-items:center; gap:5px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>Traduit fidèlement en français (IA)</span></span>
+            <span style="display:inline-flex; align-items:center; gap:5px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"/></svg><span>Traduit fidèlement en français (IA)</span></span>
             <span class="comm-translate-toggle-link" id="btn-toggle-orig-text">Voir texte original</span>
           </div>
         `;
@@ -1237,8 +1274,11 @@ const CommentaryViewer = {
       }
     }
 
-    // 1. Markdown propre
-    const formattedMarkdown = this.formatCommentaryMarkdown(displayedText);
+    // 0. Extraction des notes de bas de page
+    const { mainText, footnotesList, footnoteMap } = this.parseCommentaryFootnotes(displayedText);
+
+    // 1. Markdown propre avec badges de notes interactifs
+    const formattedMarkdown = this.formatCommentaryMarkdown(mainText, footnoteMap);
 
     // 2. Détection universelle des références bibliques (identique à Théologie / Lexique)
     let linkifiedBody = (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences)
@@ -1248,6 +1288,40 @@ const CommentaryViewer = {
     // 3. Liens web externes
     if (typeof TheologyView !== 'undefined' && TheologyView.linkifyUrls) {
       linkifiedBody = TheologyView.linkifyUrls(linkifiedBody);
+    }
+
+    // Section dédiée aux notes de bas de page si présentes
+    let footnotesHtml = '';
+    if (footnotesList.length > 0) {
+      footnotesHtml = `
+        <div class="theol-footnotes-section" id="comm-footnotes-section" style="margin-top: 24px; padding-top: 14px; border-top: 1px dashed var(--border-color, rgba(255, 255, 255, 0.12));">
+          <div class="theol-footnotes-header" style="font-size: 0.95em; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; font-weight: 700; color: var(--accent-blue, #3b82f6);">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>Notes de bas de page (${footnotesList.length})</span>
+          </div>
+          <ol class="theol-footnotes-list" style="padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; list-style: none;">
+            ${footnotesList.map(fn => {
+              const formattedFnText = (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences)
+                ? TheologyView.highlightScriptureReferences(TheologyView.linkifyUrls(fn.text))
+                : fn.text;
+              return `
+              <li class="theol-fn-item" id="comm-fn-${fn.id}" data-fn-id="${fn.id}">
+                <span class="theol-fn-num">${fn.id}.</span>
+                <div class="theol-fn-content" style="flex: 1;">
+                  <span class="theol-fn-text">${formattedFnText}</span>
+                  <a href="#comm-fnref-${fn.id}" class="theol-fn-backref" data-target-id="comm-fnref-${fn.id}" title="Retour au passage" style="margin-left: 6px; text-decoration: none; color: var(--accent-blue, #3b82f6); font-weight: 700;">↩</a>
+                </div>
+              </li>
+            `;
+            }).join('')}
+          </ol>
+        </div>
+      `;
     }
 
     container.innerHTML = `
@@ -1279,11 +1353,33 @@ const CommentaryViewer = {
 
         <div class="comm-single-body">
           ${linkifiedBody}
+          ${footnotesHtml}
         </div>
       </div>
     `;
 
-    // 4. Lier l'infobulle biblique interactive (ScriptureTooltip) & navigation par clic
+    // 4. Lier FootnoteTooltip (infobulles de notes au survol et au clic)
+    if (typeof FootnoteTooltip !== 'undefined') {
+      FootnoteTooltip.setFootnotes(footnotesList);
+      FootnoteTooltip.bindToElements(container.querySelectorAll('.theol-fn-badge'));
+    }
+
+    // 4b. Attacher les liens retour (back-links) de la section des notes
+    container.querySelectorAll('.theol-fn-backref').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = btn.dataset.targetId;
+        const targetEl = document.getElementById(targetId);
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          targetEl.classList.remove('theol-highlight-pulse');
+          void targetEl.offsetWidth;
+          targetEl.classList.add('theol-highlight-pulse');
+        }
+      });
+    });
+
+    // 4c. Lier l'infobulle biblique interactive (ScriptureTooltip) & navigation par clic
     if (typeof ScriptureTooltip !== 'undefined') {
       ScriptureTooltip.bindToElements(container.querySelectorAll('.theol-inline-scripture-ref'));
     }
