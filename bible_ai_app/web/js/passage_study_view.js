@@ -36,6 +36,7 @@ const PassageStudyView = {
   // État local
   currentData: null,
   currentReference: 'Philippiens 2:5-11',
+  currentBible: null,
   activeMainTab: 'scripture',
   activeOrigMode: 'continuous', // 'continuous', 'interlinear', 'lemmas'
   showTranslit: true,
@@ -45,6 +46,11 @@ const PassageStudyView = {
     enabled: true,
     showAdded: true,
     showRemoved: true
+  },
+  isSynopticOpen: false,
+  synopticVersions: {
+    v2: 'BDJ',
+    v3: 'TOB'
   },
   gospelSynopsisState: {
     activePericopeId: null,
@@ -197,11 +203,24 @@ const PassageStudyView = {
     const b = BibleReader.currentBook || 'PHP';
     const ch = BibleReader.currentChapter || 2;
     const v = BibleReader.selectedVerse || 5;
+    if (BibleReader.currentBible) {
+      this.currentBible = BibleReader.currentBible;
+    }
     
     // Déterminer la référence de péricope ou du verset
     const ref = `${b} ${ch}:${v}`;
     if (this.searchInputEl) this.searchInputEl.value = ref;
-    this.loadPassage(ref);
+    this.loadPassage(ref, this.currentBible);
+  },
+
+  async changeReferenceVersion(newVersion) {
+    if (!newVersion || newVersion === this.currentBible) return;
+    this.currentBible = newVersion;
+    const synPanel = document.getElementById('ps-synoptic-panel');
+    if (synPanel) {
+      this.isSynopticOpen = !synPanel.classList.contains('hidden');
+    }
+    await this.loadPassage(this.currentReference, newVersion);
   },
 
   switchTab(tabKey) {
@@ -248,18 +267,22 @@ const PassageStudyView = {
     }
   },
 
-  async loadPassage(passageRef) {
+  async loadPassage(passageRef, bibleName = null) {
     if (!passageRef || !passageRef.trim()) return;
     this.destroyPassageMap();
     this.isLoading = true;
     this.currentReference = passageRef.trim();
+    if (bibleName) {
+      this.currentBible = bibleName;
+    } else if (!this.currentBible) {
+      this.currentBible = (typeof BibleReader !== 'undefined' && BibleReader.currentBible) || 'LSG';
+    }
     this.aiInsightsCache = {};
 
     this.showGlobalLoading(true);
 
     try {
-      const activeBible = (typeof BibleReader !== 'undefined' && BibleReader.currentBible) || 'LSG';
-      const data = await API.getPassageStudyData(this.currentReference, activeBible);
+      const data = await API.getPassageStudyData(this.currentReference, this.currentBible);
 
       if (!data || !data.success) {
         if (typeof App !== 'undefined' && App.showToast) {
@@ -270,6 +293,9 @@ const PassageStudyView = {
       }
 
       this.currentData = data;
+      if (data.scripture?.main_version) {
+        this.currentBible = data.scripture.main_version;
+      }
       if (data.gospel_synopsis?.has_synoptic) {
         this.gospelSynopsisState.activePericopeId = data.gospel_synopsis.primary_pericope_id || null;
         this.gospelSynopsisState.pivotBook = data.book_code || 'MAT';
@@ -365,19 +391,36 @@ const PassageStudyView = {
     if (!sc || !this.scriptureContainerEl) return;
 
     const verses = sc.verses || [];
-    const mainVersion = sc.main_version || 'LSG';
+    const mainVersion = sc.main_version || this.currentBible || 'LSG';
     const synoptic = sc.synoptic_matrix || [];
     const availableVersions = sc.available_versions || [mainVersion];
     const gospelSyn = this.currentData?.gospel_synopsis;
     const hasGospelSyn = gospelSyn && gospelSyn.has_synoptic && gospelSyn.pericopes && gospelSyn.pericopes.length > 0;
     const vParMap = gospelSyn?.verse_parallels || {};
 
+    let v2 = this.synopticVersions?.v2;
+    let v3 = this.synopticVersions?.v3;
+    if (!v2 || !availableVersions.includes(v2) || v2 === mainVersion) {
+      v2 = availableVersions.find(v => v !== mainVersion) || '';
+      this.synopticVersions.v2 = v2;
+    }
+    if (v3 && (!availableVersions.includes(v3) || v3 === mainVersion || v3 === v2)) {
+      v3 = availableVersions.find(v => v !== mainVersion && v !== v2) || '';
+      this.synopticVersions.v3 = v3;
+    }
+
     let html = `
       <div class="ps-card ps-scripture-card">
         <div class="ps-card-header">
           <div class="ps-card-title-group">
             <span class="ps-card-icon">${this.ICONS.bible}</span>
-            <h3 class="ps-card-title">Texte Biblique (${mainVersion})</h3>
+            <h3 class="ps-card-title">Texte Biblique</h3>
+            <div class="ps-version-select-pill">
+              <label for="ps-main-version-select" class="ps-version-select-label">Réf :</label>
+              <select id="ps-main-version-select" class="ps-select-sm ps-select-ref-header" title="Changer la version biblique de référence">
+                ${this.buildCategorizedVersionOptions(availableVersions, null, sc.versions_metadata || {}, false, mainVersion)}
+              </select>
+            </div>
             <span class="ps-badge ps-badge-neutral">${verses.length} verset${verses.length > 1 ? 's' : ''}</span>
           </div>
           <div class="ps-card-actions">
@@ -385,7 +428,7 @@ const PassageStudyView = {
               <span class="ps-icon-slot">${this.ICONS.copy}</span>
               <span>Copier</span>
             </button>
-            <button type="button" class="ps-btn-sm ps-btn-accent" id="btn-ps-toggle-synoptic" title="Afficher la matrice comparative des traductions (LSG, S21, Chouraqui...)">
+            <button type="button" class="ps-btn-sm ps-btn-accent ${this.isSynopticOpen ? 'active' : ''}" id="btn-ps-toggle-synoptic" title="Afficher la matrice comparative des traductions (LSG, S21, Chouraqui...)">
               <span class="ps-icon-slot">${this.ICONS.layers}</span>
               <span>Comparer les versions</span>
             </button>
@@ -458,7 +501,7 @@ const PassageStudyView = {
         ` : ''}
 
         <!-- Panneau de comparaison synoptique multi-traductions escamotable -->
-        <div class="ps-synoptic-panel hidden" id="ps-synoptic-panel">
+        <div class="ps-synoptic-panel ${this.isSynopticOpen ? '' : 'hidden'}" id="ps-synoptic-panel">
           <div class="ps-synoptic-header">
             <div class="ps-synoptic-header-left">
               <div class="ps-synoptic-title">Comparaison des versions & traductions</div>
@@ -479,14 +522,24 @@ const PassageStudyView = {
             </div>
 
             <div class="ps-synoptic-selector-group">
-              <label for="ps-synoptic-ver2-select" style="font-size: 11.5px; opacity: 0.8;">Version 2 :</label>
-              <select id="ps-synoptic-ver2-select" class="ps-select-sm">
-                ${this.buildCategorizedVersionOptions(availableVersions, mainVersion, sc.versions_metadata || {}, false)}
-              </select>
-              <label for="ps-synoptic-ver3-select" style="font-size: 11.5px; opacity: 0.8; margin-left: 8px;">Version 3 :</label>
-              <select id="ps-synoptic-ver3-select" class="ps-select-sm">
-                ${this.buildCategorizedVersionOptions(availableVersions, mainVersion, sc.versions_metadata || {}, true)}
-              </select>
+              <div class="ps-synoptic-sel-item">
+                <label for="ps-synoptic-ver1-select" class="ps-synoptic-sel-label ps-ref-label">Réf (V1) :</label>
+                <select id="ps-synoptic-ver1-select" class="ps-select-sm ps-select-ref" title="Version de référence pour le passage et le calcul des variantes">
+                  ${this.buildCategorizedVersionOptions(availableVersions, null, sc.versions_metadata || {}, false, mainVersion)}
+                </select>
+              </div>
+              <div class="ps-synoptic-sel-item">
+                <label for="ps-synoptic-ver2-select" class="ps-synoptic-sel-label">Version 2 :</label>
+                <select id="ps-synoptic-ver2-select" class="ps-select-sm" title="Deuxième version à comparer">
+                  ${this.buildCategorizedVersionOptions(availableVersions, null, sc.versions_metadata || {}, false, v2)}
+                </select>
+              </div>
+              <div class="ps-synoptic-sel-item">
+                <label for="ps-synoptic-ver3-select" class="ps-synoptic-sel-label">Version 3 :</label>
+                <select id="ps-synoptic-ver3-select" class="ps-select-sm" title="Troisième version à comparer (optionnelle)">
+                  ${this.buildCategorizedVersionOptions(availableVersions, null, sc.versions_metadata || {}, true, v3)}
+                </select>
+              </div>
             </div>
           </div>
 
@@ -530,15 +583,31 @@ const PassageStudyView = {
       setTimeout(() => { if (slot) slot.innerHTML = this.ICONS.copy; }, 1800);
     });
 
+    // Changement de la version de référence
+    document.getElementById('ps-main-version-select')?.addEventListener('change', (e) => {
+      this.changeReferenceVersion(e.target.value);
+    });
+    document.getElementById('ps-synoptic-ver1-select')?.addEventListener('change', (e) => {
+      this.changeReferenceVersion(e.target.value);
+    });
+
     // 1. Bouton Comparer les versions
     const synPanel = document.getElementById('ps-synoptic-panel');
     const btnToggleSyn = document.getElementById('btn-ps-toggle-synoptic');
     btnToggleSyn?.addEventListener('click', () => {
       synPanel?.classList.toggle('hidden');
-      if (!synPanel?.classList.contains('hidden')) {
+      const isOpen = !synPanel?.classList.contains('hidden');
+      this.isSynopticOpen = isOpen;
+      btnToggleSyn.classList.toggle('active', isOpen);
+      if (isOpen) {
         this.renderSynopticTable();
       }
     });
+
+    // Si le panneau synoptique est déjà ouvert (rechargement / changement de version), actualiser le tableau
+    if (this.isSynopticOpen && synPanel && !synPanel.classList.contains('hidden')) {
+      this.renderSynopticTable();
+    }
 
     // 2. Bouton Harmonie des Évangiles (Vue Synopse Plein Écran)
     const gospelPanel = document.getElementById('ps-gospel-synopsis-panel');
@@ -582,11 +651,13 @@ const PassageStudyView = {
       });
     });
 
-    document.getElementById('ps-synoptic-ver2-select')?.addEventListener('change', () => {
+    document.getElementById('ps-synoptic-ver2-select')?.addEventListener('change', (e) => {
+      this.synopticVersions.v2 = e.target.value;
       document.querySelectorAll('.ps-preset-pill').forEach(b => b.classList.remove('active'));
       this.renderSynopticTable();
     });
-    document.getElementById('ps-synoptic-ver3-select')?.addEventListener('change', () => {
+    document.getElementById('ps-synoptic-ver3-select')?.addEventListener('change', (e) => {
+      this.synopticVersions.v3 = e.target.value;
       document.querySelectorAll('.ps-preset-pill').forEach(b => b.classList.remove('active'));
       this.renderSynopticTable();
     });
@@ -599,8 +670,14 @@ const PassageStudyView = {
         const sel2 = document.getElementById('ps-synoptic-ver2-select');
         const sel3 = document.getElementById('ps-synoptic-ver3-select');
 
-        if (sel2 && v2) sel2.value = v2;
-        if (sel3) sel3.value = v3 || '';
+        if (sel2 && v2) {
+          sel2.value = v2;
+          this.synopticVersions.v2 = v2;
+        }
+        if (sel3) {
+          sel3.value = v3 || '';
+          this.synopticVersions.v3 = v3 || '';
+        }
 
         document.querySelectorAll('.ps-preset-pill').forEach(b => b.classList.remove('active'));
         pill.classList.add('active');
@@ -633,7 +710,7 @@ const PassageStudyView = {
     });
   },
 
-  buildCategorizedVersionOptions(availableVersions, mainVersion, metaMap, allowEmpty = false) {
+  buildCategorizedVersionOptions(availableVersions, mainVersion, metaMap, allowEmpty = false, selectedVersion = null) {
     let html = allowEmpty ? '<option value="">(Aucune)</option>' : '';
 
     const familyOrder = [
@@ -648,7 +725,7 @@ const PassageStudyView = {
 
     const groups = {};
     availableVersions.forEach(v => {
-      if (v === mainVersion && !allowEmpty) return;
+      if (mainVersion && v === mainVersion && !allowEmpty) return;
       const meta = metaMap[v] || { code: v, nom_officiel: v, famille: 'Autre', philosophie: '' };
       const fam = meta.famille || 'Autre';
       if (!groups[fam]) groups[fam] = [];
@@ -669,9 +746,10 @@ const PassageStudyView = {
       if (!items || items.length === 0) return;
       html += `<optgroup label="${this.escapeHtml(fam)}">`;
       items.forEach(({ code, meta }) => {
+        const isSel = (selectedVersion && code === selectedVersion) ? ' selected' : '';
         const philTxt = meta.philosophie ? ` — ${meta.philosophie}` : '';
         const titleTxt = `${meta.nom_officiel}${philTxt}`;
-        html += `<option value="${code}" title="${this.escapeHtml(titleTxt)}">${code} · ${this.escapeHtml(meta.nom_officiel)}</option>`;
+        html += `<option value="${code}" title="${this.escapeHtml(titleTxt)}"${isSel}>${code} · ${this.escapeHtml(meta.nom_officiel)}</option>`;
       });
       html += `</optgroup>`;
     });
@@ -787,12 +865,13 @@ const PassageStudyView = {
     const container = document.getElementById('ps-synoptic-table-container');
     if (!container) return;
 
-    const mainVersion = sc.main_version || 'LSG';
+    const sel1 = document.getElementById('ps-synoptic-ver1-select');
+    const mainVersion = (sel1 ? sel1.value : null) || sc.main_version || this.currentBible || 'LSG';
     const metaMap = sc.versions_metadata || {};
     const sel2 = document.getElementById('ps-synoptic-ver2-select');
     const sel3 = document.getElementById('ps-synoptic-ver3-select');
-    const v2Name = sel2 ? sel2.value : '';
-    const v3Name = sel3 ? sel3.value : '';
+    const v2Name = sel2 ? sel2.value : (this.synopticVersions.v2 || '');
+    const v3Name = sel3 ? sel3.value : (this.synopticVersions.v3 || '');
 
     const matrix = sc.synoptic_matrix || [];
 
