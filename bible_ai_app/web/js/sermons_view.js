@@ -85,6 +85,69 @@ const SermonsView = {
     this.bindEvents();
   },
 
+  getDefaultSermonTemplate() {
+    const todayStr = new Date().toISOString().split('T')[0];
+    return {
+      id: `sermon-${Date.now()}`,
+      title: "Nouvelle prédication",
+      church: "",
+      date_planned: todayStr,
+      status: "draft",
+      series: { title: "" },
+      passage: { reference: "" },
+      big_idea: "",
+      goal: "",
+      timing: { target_duration_min: 35, words_per_minute: 135 },
+      body: `## Introduction
+
+Accroche et tension contemporaine...
+
+## Lecture du passage
+
+> [!scripture]
+> « Insérez le texte biblique ici »
+
+## I. Premier Point Principal
+
+Explication textuelle et fondement doctrinal...
+
+## II. Deuxième Point Principal
+
+Développement théologique et illustration concrète...
+
+## Conclusion & Appel
+
+Synthèse de la pensée maîtresse et application pour la semaine...`
+    };
+  },
+
+  ensureCurrentSermon() {
+    if (!this.currentSermon) {
+      this.currentSermon = this.getDefaultSermonTemplate();
+    }
+    return this.currentSermon;
+  },
+
+  focusActiveEditor() {
+    if (this.sections.length === 0) {
+      this.addSection('point');
+    }
+    let targetEditor = null;
+    if (this.activeSectionId) {
+      const card = document.getElementById(`section-card-${this.activeSectionId}`);
+      targetEditor = card?.querySelector('.sermon-section-editor');
+    }
+    if (!targetEditor) {
+      const firstCard = document.querySelector('.sermon-section-card');
+      targetEditor = firstCard?.querySelector('.sermon-section-editor');
+    }
+    if (targetEditor) {
+      targetEditor.focus();
+      return targetEditor;
+    }
+    return null;
+  },
+
   bindEvents() {
     // 1. Actions du Hub de prédications
     document.getElementById('btn-hub-new-sermon')?.addEventListener('click', () => this.createNewSermon());
@@ -157,10 +220,10 @@ const SermonsView = {
     document.getElementById('btn-insert-slide')?.addEventListener('click', () => this.insertBlock('slide'));
 
     // Outils formatage texte
-    document.getElementById('btn-sermon-bold')?.addEventListener('click', () => document.execCommand('bold'));
-    document.getElementById('btn-sermon-italic')?.addEventListener('click', () => document.execCommand('italic'));
-    document.getElementById('btn-sermon-list')?.addEventListener('click', () => document.execCommand('insertUnorderedList'));
-    document.getElementById('btn-sermon-quote')?.addEventListener('click', () => document.execCommand('formatBlock', false, 'blockquote'));
+    document.getElementById('btn-sermon-bold')?.addEventListener('click', () => { this.focusActiveEditor(); document.execCommand('bold'); });
+    document.getElementById('btn-sermon-italic')?.addEventListener('click', () => { this.focusActiveEditor(); document.execCommand('italic'); });
+    document.getElementById('btn-sermon-list')?.addEventListener('click', () => { this.focusActiveEditor(); document.execCommand('insertUnorderedList'); });
+    document.getElementById('btn-sermon-quote')?.addEventListener('click', () => { this.focusActiveEditor(); document.execCommand('formatBlock', false, 'blockquote'); });
 
     // 7. Actions Sommaire & Ajout de sections
     document.getElementById('btn-sermon-collapse-all')?.addEventListener('click', () => this.collapseAllSections());
@@ -172,6 +235,7 @@ const SermonsView = {
 
     // 8. Titre du sermon
     this.titleInput?.addEventListener('input', () => {
+      this.ensureCurrentSermon();
       if (this.currentSermon) this.currentSermon.title = this.titleInput.value.trim();
       this.debouncedAutoSave();
     });
@@ -213,11 +277,16 @@ const SermonsView = {
     if (!sermon) {
       if (this.currentSermon) {
         sermon = this.currentSermon;
-      } else if (this.sermons.length > 0) {
-        sermon = await API.getSermon(this.sermons[0].id) || this.sermons[0];
       } else {
-        await this.createNewSermon();
-        return;
+        if (this.sermons.length === 0) {
+          await this.loadSermons();
+        }
+        if (this.sermons.length > 0) {
+          sermon = await API.getSermon(this.sermons[0].id) || this.sermons[0];
+        } else {
+          await this.createNewSermon();
+          return;
+        }
       }
     }
 
@@ -583,6 +652,10 @@ const SermonsView = {
   },
 
   populateEditor(sermon) {
+    if (!sermon) {
+      sermon = this.ensureCurrentSermon();
+    }
+    this.currentSermon = sermon;
     if (this.titleInput) this.titleInput.value = sermon.title || '';
     this.updateHeaderSummary(sermon);
 
@@ -679,6 +752,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
   },
 
   async saveCurrentSermon() {
+    this.ensureCurrentSermon();
     if (!this.currentSermon) return;
 
     const bodyMarkdown = this.serializeSectionsToMarkdown();
@@ -1119,6 +1193,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
   },
 
   addSection(type = 'point', title = '', content = '') {
+    this.ensureCurrentSermon();
     const defaultTitles = {
       intro: 'Introduction',
       scripture: 'Lecture du passage',
@@ -1147,7 +1222,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     }, 50);
   },
 
-  deleteSection(secId) {
+  async deleteSection(secId) {
     if (this.sections.length <= 1) {
       if (typeof App !== 'undefined' && App.showToast) {
         App.showToast("Le sermon doit contenir au moins une section.", "warn");
@@ -1204,6 +1279,11 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
   },
 
   insertHtmlIntoActiveSection(html) {
+    this.ensureCurrentSermon();
+    if (this.sections.length === 0) {
+      this.addSection('point');
+    }
+
     let targetEditor = null;
     if (this.activeSectionId) {
       const card = document.getElementById(`section-card-${this.activeSectionId}`);
@@ -1227,6 +1307,11 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
   // =========================================================================
 
   insertBlock(type) {
+    this.ensureCurrentSermon();
+    if (this.sections.length === 0) {
+      this.addSection('point');
+    }
+
     let htmlToInsert = '';
 
     switch (type) {

@@ -82,6 +82,13 @@ const App = {
           group?.classList.add('open');
         }
 
+        if (btn.id === 'nav-sub-sermon-editor') {
+          if (typeof SermonsView !== 'undefined') {
+            SermonsView.createNewSermon();
+            return;
+          }
+        }
+
         this.switchView(viewId);
       });
     });
@@ -716,10 +723,9 @@ const App = {
       document.getElementById('nav-sub-sermon-editor')?.classList.add('active');
       document.getElementById('group-nav-sermons')?.classList.add('open');
       if (typeof SermonsView !== 'undefined') {
-        if (!SermonsView.currentSermon && SermonsView.sermons.length > 0) {
-          SermonsView.currentSermon = SermonsView.sermons[0];
-        }
-        if (SermonsView.currentSermon) {
+        if (!SermonsView.currentSermon) {
+          SermonsView.openEditor();
+        } else {
           SermonsView.populateEditor(SermonsView.currentSermon);
         }
       }

@@ -25783,27 +25783,267 @@ body.reading-bg-dark .comm-dropdown-popover {
   white-space: nowrap;
 }
 
-/* MODALE D'ÉDITION D'UNE ILLUSTRATION */
+/* =========================================================================
+ * MODALE ILLUSTRATIONS : VUE CONSULTATION & MODE ÉDITION
+ * ========================================================================= */
 .illustration-modal-card {
-  width: 90%;
-  max-width: 880px;
-  max-height: 85vh;
+  width: 92%;
+  max-width: 900px;
+  max-height: 88vh;
   display: flex;
   flex-direction: column;
 }
 
-.ill-modal-form-grid {
-  display: grid;
-  grid-template-columns: 1fr 290px;
-  gap: 20px;
+.ill-modal-badges-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
 }
 
+.ill-modal-badge,
+.ill-modal-category-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 12px;
+  letter-spacing: 0.2px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.ill-modal-badge {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+.ill-modal-badge.type-history {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+.ill-modal-badge.type-quote {
+  background: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+  border-color: rgba(168, 85, 247, 0.3);
+}
+.ill-modal-badge.type-science {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.ill-modal-category-badge {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+/* Grille de consultation et d'édition */
+.ill-modal-grid,
+.ill-modal-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 24px;
+}
+
+/* Colonne Principale en Mode Consultation */
+.ill-view-main-column {
+  min-width: 0;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.ill-view-body-content {
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: var(--text-primary, #f4f4f5);
+  font-family: inherit;
+}
+
+.ill-view-body-content .ill-paragraph {
+  margin: 0 0 16px 0;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.ill-view-body-content .ill-view-h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary, #f4f4f5);
+  margin: 20px 0 10px 0;
+}
+
+.ill-view-body-content .ill-view-h4 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary, #f4f4f5);
+  margin: 16px 0 8px 0;
+}
+
+.ill-view-body-content .ill-bullet-list {
+  margin: 0 0 16px 20px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ill-view-body-content .ill-bullet-list li {
+  line-height: 1.6;
+}
+
+/* Callout Homilétique Spécial */
+.ill-homiletic-callout {
+  margin: 20px 0;
+  background: rgba(245, 158, 11, 0.08);
+  border-left: 3px solid var(--accent-amber, #f59e0b);
+  border-radius: 0 8px 8px 0;
+  padding: 14px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.ill-homiletic-callout .ill-callout-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fbbf24;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.ill-homiletic-callout .ill-callout-header svg {
+  color: #fbbf24;
+  flex-shrink: 0;
+}
+
+.ill-homiletic-callout .ill-callout-body {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text-primary, #f4f4f5);
+}
+
+/* Citation classique */
+.ill-quote-callout {
+  margin: 18px 0;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 3px solid var(--border-color, rgba(255, 255, 255, 0.2));
+  border-radius: 0 6px 6px 0;
+  padding: 12px 16px;
+  font-style: italic;
+  color: var(--text-secondary, #d4d4d8);
+}
+
+.ill-inline-code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-size: 12.5px;
+  font-family: monospace;
+}
+
+/* Colonne Latérale en Mode Consultation */
+.ill-view-side-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-left: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  padding-left: 20px;
+}
+
+.ill-meta-card {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.07));
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ill-meta-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted, #a1a1aa);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ill-meta-val-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ill-pill {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.ill-pill-theme {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.ill-pill-genre {
+  background: rgba(59, 130, 246, 0.12);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.ill-passages-pills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ill-passage-pill {
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+
+.ill-passage-pill:hover {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: #3b82f6;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.ill-meta-author-text {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary, #f4f4f5);
+  line-height: 1.4;
+}
+
+/* Mode Édition */
 .ill-modal-side-column {
   display: flex;
   flex-direction: column;
   gap: 14px;
   border-left: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-  padding-left: 18px;
+  padding-left: 20px;
 }
 
 .ill-usage-history-box {
