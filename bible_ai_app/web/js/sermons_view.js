@@ -665,6 +665,32 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     this.renderOutline();
     this.updateMetrics();
     this.renderDrawerContent();
+    this.updateAutoSaveIndicator('saved');
+  },
+
+  updateAutoSaveIndicator(status) {
+    const el = document.getElementById('sermon-autosave-indicator');
+    if (!el) return;
+
+    if (status === 'saving') {
+      el.className = 'note-autosave-indicator saving';
+      el.innerHTML = `
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+        <span>Enregistrement...</span>
+      `;
+    } else if (status === 'dirty') {
+      el.className = 'note-autosave-indicator dirty';
+      el.innerHTML = `
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="4" fill="currentColor"/></svg>
+        <span>Modifié</span>
+      `;
+    } else if (status === 'saved') {
+      el.className = 'note-autosave-indicator';
+      el.innerHTML = `
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        <span>Enregistré</span>
+      `;
+    }
   },
 
   updateHeaderSummary(sermon = this.currentSermon) {
@@ -751,9 +777,11 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     }
   },
 
-  async saveCurrentSermon() {
+  async saveCurrentSermon(silent = true) {
     this.ensureCurrentSermon();
     if (!this.currentSermon) return;
+
+    this.updateAutoSaveIndicator('saving');
 
     const bodyMarkdown = this.serializeSectionsToMarkdown();
     
@@ -784,19 +812,24 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
       if (res && res.success) {
         this.currentSermon = res.sermon || payload;
         this.updateHeaderSummary(this.currentSermon);
-        if (typeof App !== 'undefined' && App.showToast) {
+        this.updateAutoSaveIndicator('saved');
+        if (!silent && typeof App !== 'undefined' && App.showToast) {
           App.showToast("Prédication enregistrée !");
         }
+      } else {
+        this.updateAutoSaveIndicator('dirty');
       }
     } catch (e) {
       console.error('Erreur sauvegarde sermon:', e);
+      this.updateAutoSaveIndicator('dirty');
     }
   },
 
   debouncedAutoSave() {
+    this.updateAutoSaveIndicator('dirty');
     if (this.saveDebounceTimer) clearTimeout(this.saveDebounceTimer);
     this.saveDebounceTimer = setTimeout(() => {
-      this.saveCurrentSermon();
+      this.saveCurrentSermon(true);
     }, 1200);
   },
 
@@ -1388,140 +1421,206 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
   // PARSING & CONVERSION MARKDOWN <-> ÉDITEUR HTML
   // =========================================================================
 
+  inlineFormat(text) {
+    if (!text) return '';
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>');
+  },
+
   markdownToEditorHtml(md) {
     if (!md) return '';
-    let html = md;
+    let text = md.trim();
 
-    // Repères de diapositives [_]
-    html = html.replace(/\[\s*_\s*\]/g, '<span class="sermon-slide-badge" contenteditable="false"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> DIAPO</span>&nbsp;');
+    // 1. Repères de diapositives [_]
+    text = text.replace(/\[\s*_\s*\]/g, '<span class="sermon-slide-badge" contenteditable="false"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> DIAPO</span>&nbsp;');
 
-    // Callouts [!scripture]
-    html = html.replace(/>\s*\[!scripture(?:\|ref=([^|\]]+))?(?:\|version=([^\]]+))?\]\s*\n((?:>.*?\n?)*)/gi, (match, ref, ver, content) => {
-      const cleanContent = content.replace(/^>\s?/gm, '').trim();
-      const label = ref ? `Écriture (${ref}${ver ? ' - ' + ver : ''})` : 'Écriture';
-      return `
-        <div class="sermon-callout-block sermon-block-scripture" data-type="scripture">
-          <div class="sermon-block-header">
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-            <span>${label}</span>
-          </div>
-          <p>${cleanContent.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>
-        </div>
-      `;
-    });
+    // 2. Découpage en blocs ligne par ligne avec capture correcte des callouts
+    const lines = text.split('\n');
+    const blocks = [];
+    let currentBlock = [];
+    let inCallout = false;
 
-    // Callouts [!exegesis]
-    html = html.replace(/>\s*\[!exegesis(?:\|key=([^\]]+))?\]\s*\n((?:>.*?\n?)*)/gi, (match, key, content) => {
-      const cleanContent = content.replace(/^>\s?/gm, '').trim();
-      return `
-        <div class="sermon-callout-block sermon-block-exegesis" data-type="exegesis">
-          <div class="sermon-block-header">
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m8.5 13.5 2-5.5 2 5.5"/><path d="M9.2 11.8h2.6"/><path d="M14 8.5h3.5l-3.5 5h3.5"/></svg>
-            <span>Exégèse ${key ? '(' + key + ')' : ''}</span>
-          </div>
-          <p>${cleanContent.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>
-        </div>
-      `;
-    });
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const trimmed = line.trim();
 
-    // Callouts [!illustration]
-    html = html.replace(/>\s*\[!illustration(?:\|id=([^\]]+))?\]\s*\n((?:>.*?\n?)*)/gi, (match, id, content) => {
-      const cleanContent = content.replace(/^>\s?/gm, '').trim();
-      return `
-        <div class="sermon-callout-block sermon-block-illustration" data-type="illustration" data-id="${id || ''}">
-          <div class="sermon-block-header">
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
-            <span>Illustration</span>
-          </div>
-          <p>${cleanContent.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>
-        </div>
-      `;
-    });
-
-    // Callouts [!application]
-    html = html.replace(/>\s*\[!application\]\s*\n((?:>.*?\n?)*)/gi, (match, content) => {
-      const cleanContent = content.replace(/^>\s?/gm, '').trim();
-      return `
-        <div class="sermon-callout-block sermon-block-application" data-type="application">
-          <div class="sermon-block-header">
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-            <span>Application</span>
-          </div>
-          <p>${cleanContent.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>
-        </div>
-      `;
-    });
-
-    // Callouts [!cue]
-    html = html.replace(/>\s*\[!cue\]\s*\n((?:>.*?\n?)*)/gi, (match, content) => {
-      const cleanContent = content.replace(/^>\s?/gm, '').trim();
-      return `
-        <div class="sermon-callout-block sermon-block-cue" data-type="cue">
-          <div class="sermon-block-header">
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            <span>Régie / Timing</span>
-          </div>
-          <p>${cleanContent.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>
-        </div>
-      `;
-    });
-
-    // Titres Markdown résiduels
-    html = html.replace(/^### (.*?)$/gm, '<h3>$1</h3>');
-    html = html.replace(/^---$/gm, '<hr>');
-
-    // Gras & Italique simples
-    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-
-    // Paragraphes simples
-    const lines = html.split('\n');
-    let inP = false;
-    let out = [];
-
-    for (let l of lines) {
-      if (l.startsWith('<h') || l.startsWith('<div') || l.startsWith('</div') || l.startsWith('<hr')) {
-        if (inP) { out.push('</p>'); inP = false; }
-        out.push(l);
-      } else if (l.trim() === '') {
-        if (inP) { out.push('</p>'); inP = false; }
+      if (trimmed.startsWith('> [!') || trimmed.startsWith('>[!')) {
+        if (currentBlock.length > 0) {
+          blocks.push({ isCallout: inCallout, text: currentBlock.join('\n') });
+          currentBlock = [];
+        }
+        inCallout = true;
+        currentBlock.push(line);
+      } else if (inCallout) {
+        if (trimmed.startsWith('>') || trimmed === '') {
+          currentBlock.push(line);
+        } else {
+          // Fin du callout
+          blocks.push({ isCallout: true, text: currentBlock.join('\n') });
+          currentBlock = [line];
+          inCallout = false;
+        }
+      } else if (trimmed === '') {
+        if (currentBlock.length > 0) {
+          blocks.push({ isCallout: false, text: currentBlock.join('\n') });
+          currentBlock = [];
+        }
       } else {
-        if (!inP) { out.push('<p>' + l); inP = true; }
-        else { out.push('<br>' + l); }
+        currentBlock.push(line);
       }
     }
-    if (inP) out.push('</p>');
+    if (currentBlock.length > 0) {
+      blocks.push({ isCallout: inCallout, text: currentBlock.join('\n') });
+    }
 
-    return out.join('\n');
+    const htmlBlocks = blocks.map(bObj => {
+      const bTrim = bObj.text.trim();
+      if (!bTrim) return '';
+
+      // A. Callout
+      if (bObj.isCallout || (bTrim.startsWith('>') && bTrim.includes('[!'))) {
+        const bLines = bTrim.split('\n');
+        const firstLine = bLines[0];
+        const restLines = bLines.slice(1);
+        const innerContent = restLines.map(l => l.replace(/^>\s?/, '')).join('\n').trim();
+
+        // Extraire type & attributs
+        let type = 'cue';
+        let ref = '';
+        let ver = '';
+        let key = '';
+        let id = '';
+
+        if (firstLine.includes('[!scripture')) {
+          type = 'scripture';
+          const mRef = firstLine.match(/ref=([^|\]]+)/i);
+          if (mRef) ref = mRef[1].trim();
+          const mVer = firstLine.match(/version=([^\]]+)/i);
+          if (mVer) ver = mVer[1].trim();
+        } else if (firstLine.includes('[!exegesis')) {
+          type = 'exegesis';
+          const mKey = firstLine.match(/key=([^\]]+)/i);
+          if (mKey) key = mKey[1].trim();
+        } else if (firstLine.includes('[!illustration')) {
+          type = 'illustration';
+          const mId = firstLine.match(/id=([^\]]+)/i);
+          if (mId) id = mId[1].trim();
+        } else if (firstLine.includes('[!application')) {
+          type = 'application';
+        } else if (firstLine.includes('[!cue')) {
+          type = 'cue';
+        }
+
+        let label = 'Bloc';
+        let iconSvg = '';
+        if (type === 'scripture') {
+          label = `Écriture${ref ? ` (${ref}${ver ? ' - ' + ver : ''})` : ''}`;
+          iconSvg = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>';
+        } else if (type === 'exegesis') {
+          label = `Exégèse${key ? ` (${key})` : ''}`;
+          iconSvg = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m8.5 13.5 2-5.5 2 5.5"/><path d="M9.2 11.8h2.6"/><path d="M14 8.5h3.5l-3.5 5h3.5"/></svg>';
+        } else if (type === 'illustration') {
+          label = 'Illustration / Récit';
+          iconSvg = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>';
+        } else if (type === 'application') {
+          label = 'Application pratique';
+          iconSvg = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>';
+        } else if (type === 'cue') {
+          label = 'Régie / Timing';
+          iconSvg = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+        }
+
+        // Formatage du contenu interne
+        let innerHtml = '';
+        if (innerContent) {
+          const paragraphs = innerContent.split(/\n\n+/);
+          innerHtml = paragraphs.map(p => {
+            const formatted = this.inlineFormat(p).replace(/\n/g, '<br>');
+            return `<p>${formatted}</p>`;
+          }).join('');
+        } else {
+          innerHtml = '<p></p>';
+        }
+
+        const dataAttrs = `data-type="${type}"${ref ? ` data-ref="${this.escapeHtml(ref)}"` : ''}${ver ? ` data-version="${this.escapeHtml(ver)}"` : ''}${key ? ` data-key="${this.escapeHtml(key)}"` : ''}${id ? ` data-id="${this.escapeHtml(id)}"` : ''}`;
+
+        return `<div class="sermon-callout-block sermon-block-${type}" ${dataAttrs}><div class="sermon-block-header" contenteditable="false">${iconSvg}<span>${this.escapeHtml(label)}</span></div>${innerHtml}</div>`;
+      }
+
+      // B. Titres
+      if (bTrim.startsWith('### ')) {
+        return `<h3>${this.inlineFormat(bTrim.substring(4))}</h3>`;
+      }
+      if (bTrim.startsWith('## ')) {
+        return `<h2>${this.inlineFormat(bTrim.substring(3))}</h2>`;
+      }
+      if (bTrim.startsWith('# ')) {
+        return `<h1>${this.inlineFormat(bTrim.substring(2))}</h1>`;
+      }
+      if (bTrim === '---') {
+        return '<hr>';
+      }
+
+      // C. Paragraphe régulier
+      const formatted = this.inlineFormat(bTrim).replace(/\n/g, '<br>');
+      return `<p>${formatted}</p>`;
+    });
+
+    return htmlBlocks.filter(Boolean).join('\n\n');
   },
 
   editorHtmlToMarkdown(html) {
     if (!html) return '';
-    let temp = document.createElement('div');
-    temp.innerHTML = html;
+    const container = document.createElement('div');
+    container.innerHTML = html;
 
     // Remplacement des badges de diapositive
-    temp.querySelectorAll('.sermon-slide-badge').forEach(b => {
-      let mdNode = document.createTextNode(' [_] ');
-      b.parentNode.replaceChild(mdNode, b);
+    container.querySelectorAll('.sermon-slide-badge').forEach(b => {
+      b.replaceWith(document.createTextNode(' [_] '));
     });
 
     // Remplacement des callouts par leur syntaxe Markdown
-    temp.querySelectorAll('.sermon-callout-block').forEach(b => {
+    container.querySelectorAll('.sermon-callout-block').forEach(b => {
       const type = b.dataset.type || 'cue';
+      const ref = b.dataset.ref;
+      const ver = b.dataset.version;
+      const key = b.dataset.key;
       const id = b.dataset.id;
+
+      // Retirer le header avant de lire le texte
       const header = b.querySelector('.sermon-block-header');
       if (header) header.remove();
-      
-      let text = b.innerText.trim();
-      let calloutTag = `> [!${type}${id ? '|id=' + id : ''}]`;
-      let calloutBody = text.split('\n').map(line => `> ${line}`).join('\n');
-      
-      let mdNode = document.createTextNode(`\n\n${calloutTag}\n${calloutBody}\n\n`);
-      b.parentNode.replaceChild(mdNode, b);
+
+      // Convertir les paragraphes et formats internes en markdown
+      let innerHtml = b.innerHTML;
+      innerHtml = innerHtml.replace(/<strong>(.*?)<\/strong>/gi, '**$1**');
+      innerHtml = innerHtml.replace(/<b>(.*?)<\/b>/gi, '**$1**');
+      innerHtml = innerHtml.replace(/<em>(.*?)<\/em>/gi, '*$1*');
+      innerHtml = innerHtml.replace(/<i>(.*?)<\/i>/gi, '*$1*');
+      innerHtml = innerHtml.replace(/<p>(.*?)<\/p>/gi, '$1\n\n');
+      innerHtml = innerHtml.replace(/<br\s*\/?>/gi, '\n');
+
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = innerHtml;
+      const text = (tempDiv.innerText || tempDiv.textContent || '').trim();
+
+      let tagParams = [];
+      if (ref) tagParams.push(`ref=${ref}`);
+      if (ver) tagParams.push(`version=${ver}`);
+      if (key) tagParams.push(`key=${key}`);
+      if (id) tagParams.push(`id=${id}`);
+      const tagSuffix = tagParams.length > 0 ? `|${tagParams.join('|')}` : '';
+
+      let calloutTag = `> [!${type}${tagSuffix}]`;
+      let calloutBody = text ? text.split('\n').map(line => `> ${line}`).join('\n') : '> ';
+
+      const mdText = `\n\n${calloutTag}\n${calloutBody}\n\n`;
+      b.replaceWith(document.createTextNode(mdText));
     });
 
-    let raw = temp.innerHTML;
+    // Éléments restants dans le container
+    let raw = container.innerHTML;
     raw = raw.replace(/<h1>(.*?)<\/h1>/gi, '\n\n# $1\n\n');
     raw = raw.replace(/<h2>(.*?)<\/h2>/gi, '\n\n## $1\n\n');
     raw = raw.replace(/<h3>(.*?)<\/h3>/gi, '\n\n### $1\n\n');
@@ -1533,8 +1632,9 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     raw = raw.replace(/<p>(.*?)<\/p>/gi, '\n$1\n');
     raw = raw.replace(/<br\s*\/?>/gi, '\n');
 
-    temp.innerHTML = raw;
-    let cleanText = temp.innerText || temp.textContent || '';
+    const tempDiv2 = document.createElement('div');
+    tempDiv2.innerHTML = raw;
+    let cleanText = tempDiv2.innerText || tempDiv2.textContent || '';
     return cleanText.replace(/\n{3,}/g, '\n\n').trim();
   },
 
