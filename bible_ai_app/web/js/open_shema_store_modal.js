@@ -692,11 +692,11 @@ const OpenShemaStore = {
         return;
       }
 
-      resultsEl.innerHTML = results.map(item => {
+      resultsEl.innerHTML = results.map((item, itemIdx) => {
         const isMultiple = item.offers_count > 1;
 
         return `
-          <div class="ebook-card ${isMultiple ? 'is-grouped' : ''}" style="display: flex; flex-direction: column; border-radius: 8px; background: var(--bg-surface-elevated, #0f172a); border: 1px solid ${isMultiple ? 'rgba(59, 130, 246, 0.35)' : 'var(--border-color, #334155)'}; padding: 12px; transition: transform 0.2s, border-color 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+          <div class="ebook-card ${isMultiple ? 'is-grouped' : ''}" data-item-idx="${itemIdx}" style="display: flex; flex-direction: column; border-radius: 8px; background: var(--bg-surface-elevated, #0f172a); border: 1px solid ${isMultiple ? 'rgba(59, 130, 246, 0.35)' : 'var(--border-color, #334155)'}; padding: 12px; transition: transform 0.2s, border-color 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.2); ${isMultiple ? 'cursor: pointer;' : ''}">
             
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
               <div style="width: 55px; height: 75px; flex-shrink: 0; border-radius: 4px; background: rgba(255,255,255,0.04); overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.06);">
@@ -733,8 +733,8 @@ const OpenShemaStore = {
               </div>
 
               ${isMultiple ? `
-                <button class="btn-toggle-offers-drawer" style="display: flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 5px; background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
-                  <span>Comparer les prix (${item.offers_count}) ▾</span>
+                <button class="btn-open-compare-modal" data-item-idx="${itemIdx}" style="display: flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 5px; background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                  <span>Comparer (${item.offers_count} prix) ⚖️</span>
                 </button>
               ` : `
                 <button class="btn-buy-ebook-link" data-url="${this._escapeHtml(item.direct_url)}" style="display: flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 5px; background: #2563eb; color: #fff; border: none; font-size: 0.78rem; font-weight: 500; cursor: pointer;" title="Ouvrir la page de la librairie">
@@ -744,53 +744,24 @@ const OpenShemaStore = {
               `}
             </div>
 
-            <!-- Volet déroulant comparateur d'offres (si multiple) -->
-            ${isMultiple ? `
-              <div class="offers-drawer" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.12); flex-direction: column; gap: 6px;">
-                <div style="font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted, #94a3b8); font-weight: 600; margin-bottom: 2px;">
-                  Offres disponibles par librairie :
-                </div>
-                ${item.offers.map((off, idx) => `
-                  <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-radius: 5px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); font-size: 0.78rem;">
-                    <div style="display: flex; flex-direction: column; gap: 1px; min-width: 0;">
-                      <div style="display: flex; align-items: center; gap: 6px;">
-                        <span style="font-weight: 600; color: #f8fafc;">${this._escapeHtml(off.store_badge)}</span>
-                        ${idx === 0 ? `<span style="font-size: 0.62rem; padding: 1px 4px; border-radius: 3px; background: rgba(16, 185, 129, 0.2); color: #10b981; font-weight: 700;">Meilleur prix</span>` : ''}
-                      </div>
-                      <span style="font-size: 0.68rem; color: var(--text-muted, #94a3b8);">${this._escapeHtml(off.format)}</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                      <span style="font-weight: 700; color: ${idx === 0 ? '#10b981' : '#f8fafc'}; font-size: 0.88rem;">${this._escapeHtml(off.price)}</span>
-                      <button class="btn-buy-ebook-link" data-url="${this._escapeHtml(off.url)}" style="display: flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 4px; background: #2563eb; color: #fff; border: none; font-size: 0.72rem; cursor: pointer;" title="Acheter sur ${this._escapeHtml(off.store_badge)}">
-                        <span>Acheter</span>
-                        ${this.svgIcons.external}
-                      </button>
-                    </div>
-                  </div>
-                `).join('')}
-              </div>
-            ` : ''}
-
           </div>
         `;
       }).join('');
 
-      // Toggle des volets déroulants
-      resultsEl.querySelectorAll('.btn-toggle-offers-drawer').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const card = btn.closest('.ebook-card');
-          const drawer = card.querySelector('.offers-drawer');
-          if (!drawer) return;
-          const isExpanded = drawer.style.display === 'flex';
-          drawer.style.display = isExpanded ? 'none' : 'flex';
-          btn.querySelector('span').textContent = isExpanded ? `Comparer les prix ▾` : `Masquer les offres ▴`;
+      // Clic pour ouvrir le modal comparateur sur les cartes groupées
+      resultsEl.querySelectorAll('.btn-open-compare-modal, .ebook-card.is-grouped').forEach(el => {
+        el.addEventListener('click', (e) => {
+          const idx = el.getAttribute('data-item-idx') || el.closest('.ebook-card')?.getAttribute('data-item-idx');
+          if (idx !== null && results[idx]) {
+            this.showComparisonModal(results[idx]);
+          }
         });
       });
 
-      // Écouteurs pour tous les boutons d'achat
+      // Écouteurs pour les boutons d'achat simples
       resultsEl.querySelectorAll('.btn-buy-ebook-link').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
           const url = btn.getAttribute('data-url');
           if (url) API.call('open_external_url', url);
         });
@@ -806,6 +777,128 @@ const OpenShemaStore = {
         </div>
       `;
     }
+  },
+
+  showComparisonModal(item) {
+    let popover = document.getElementById('modal-ebook-comparison-popover');
+    if (!popover) {
+      popover = document.createElement('div');
+      popover.id = 'modal-ebook-comparison-popover';
+      popover.style.cssText = 'position: fixed; inset: 0; z-index: 10005; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center;';
+      document.body.appendChild(popover);
+    }
+
+    const titleEncoded = encodeURIComponent(item.title);
+    const fnacUrl = `https://www.fnac.com/SearchResult/ResultList.aspx?Search=${titleEncoded}&sft=1`;
+    const koboUrl = `https://www.kobo.com/fr/fr/search?query=${titleEncoded}&fclanguages=fr`;
+    const mdbUrl = `https://maisonbible.fr/fr/recherche?controller=search&s=${titleEncoded}+ebook`;
+
+    popover.innerHTML = `
+      <div style="width: 620px; max-width: 92vw; max-height: 85vh; display: flex; flex-direction: column; background: var(--bg-card, #1e293b); border-radius: 12px; border: 1px solid var(--border-color, #334155); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); overflow: hidden; animation: modalFadeIn 0.2s ease-out;">
+        
+        <!-- Header -->
+        <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-subtle, #334155); background: var(--bg-surface-elevated, #0f172a); display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 14px; min-width: 0;">
+            <div style="width: 55px; height: 75px; flex-shrink: 0; border-radius: 6px; background: rgba(255,255,255,0.04); overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.08);">
+              ${item.image ? `<img src="${this._escapeHtml(item.image)}" alt="Cover" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'">` : this.svgIcons.bible}
+            </div>
+            <div style="min-width: 0;">
+              <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                <span style="font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; background: rgba(245, 158, 11, 0.18); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.35);">
+                  ${item.offers_count} offres comparées
+                </span>
+                <span style="font-size: 0.7rem; color: #10b981; font-weight: 600;">Dès ${item.min_price_raw > 0 ? item.min_price_raw.toFixed(2) + ' €' : 'Gratuit'}</span>
+              </div>
+              <h3 style="margin: 0 0 4px 0; font-size: 1rem; font-weight: 700; color: #f8fafc; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                ${this._escapeHtml(item.title)}
+              </h3>
+              ${item.authors ? `<div style="font-size: 0.8rem; color: var(--text-muted, #94a3b8);">${this._escapeHtml(item.authors)}</div>` : ''}
+            </div>
+          </div>
+          <button id="btn-close-compare-popover" style="background: transparent; border: none; color: var(--text-muted, #94a3b8); cursor: pointer; padding: 8px; border-radius: 6px;" title="Fermer">
+            ${this.svgIcons.close}
+          </button>
+        </div>
+
+        <!-- Body : Tableau comparatif spacieux -->
+        <div style="padding: 16px 20px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; background: var(--bg-card, #1e293b);">
+          <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted, #94a3b8); font-weight: 600; margin-bottom: 4px;">
+            Prix et disponibilités en direct :
+          </div>
+
+          ${item.offers.map((off, idx) => `
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: 8px; background: var(--bg-surface-elevated, #0f172a); border: 1px solid ${idx === 0 ? 'rgba(16, 185, 129, 0.35)' : 'var(--border-color, #334155)'};">
+              <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 0.9rem; font-weight: 700; color: #f8fafc;">${this._escapeHtml(off.store_badge)}</span>
+                  ${idx === 0 ? `<span style="font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background: rgba(16, 185, 129, 0.2); color: #10b981; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.35);">🏆 Meilleur prix</span>` : ''}
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-muted, #94a3b8); display: flex; align-items: center; gap: 4px;">
+                  ${this.svgIcons.digital} <span>${this._escapeHtml(off.format)}</span>
+                </div>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="font-size: 1.15rem; font-weight: 700; color: ${idx === 0 ? '#10b981' : '#f8fafc'}; text-align: right; white-space: nowrap;">
+                  ${this._escapeHtml(off.price)}
+                </div>
+                <button class="btn-popover-buy" data-url="${this._escapeHtml(off.url)}" style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 6px; background: #2563eb; color: #fff; border: none; font-size: 0.82rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.2s;" title="Acheter sur ${this._escapeHtml(off.store_badge)}">
+                  <span>Acheter</span>
+                  ${this.svgIcons.external}
+                </button>
+              </div>
+            </div>
+          `).join('')}
+
+          <!-- Liens de recherche directe supplémentaires pour cet ouvrage précis -->
+          <div style="margin-top: 10px; padding-top: 12px; border-top: 1px dashed rgba(255,255,255,0.1);">
+            <div style="font-size: 0.72rem; color: var(--text-muted, #94a3b8); margin-bottom: 8px;">
+              Rechercher aussi cet ouvrage sur les autres librairies :
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button class="btn-popover-buy" data-url="${fnacUrl}" style="display: flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 5px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-size: 0.75rem; cursor: pointer;">
+                <span>Fnac E-books</span> ${this.svgIcons.external}
+              </button>
+              <button class="btn-popover-buy" data-url="${koboUrl}" style="display: flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 5px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-size: 0.75rem; cursor: pointer;">
+                <span>Rakuten Kobo</span> ${this.svgIcons.external}
+              </button>
+              <button class="btn-popover-buy" data-url="${mdbUrl}" style="display: flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 5px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-size: 0.75rem; cursor: pointer;">
+                <span>Maison de la Bible</span> ${this.svgIcons.external}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="padding: 10px 20px; border-top: 1px solid var(--border-subtle, #334155); background: var(--bg-surface-elevated, #0f172a); display: flex; align-items: center; justify-content: flex-end;">
+          <button id="btn-close-compare-popover-footer" style="padding: 6px 14px; border-radius: 6px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: #f8fafc; font-size: 0.8rem; cursor: pointer;">
+            Fermer
+          </button>
+        </div>
+
+      </div>
+    `;
+
+    popover.style.display = 'flex';
+
+    // Événements
+    popover.querySelector('#btn-close-compare-popover').addEventListener('click', () => this.closeComparisonModal());
+    popover.querySelector('#btn-close-compare-popover-footer').addEventListener('click', () => this.closeComparisonModal());
+    popover.addEventListener('click', (e) => {
+      if (e.target === popover) this.closeComparisonModal();
+    });
+
+    popover.querySelectorAll('.btn-popover-buy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const url = btn.getAttribute('data-url');
+        if (url) API.call('open_external_url', url);
+      });
+    });
+  },
+
+  closeComparisonModal() {
+    const popover = document.getElementById('modal-ebook-comparison-popover');
+    if (popover) popover.style.display = 'none';
   },
 
   _escapeHtml(str) {

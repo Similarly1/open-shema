@@ -144,6 +144,77 @@ class EbookFinderManager:
 
         return results
 
+    def _query_maison_de_la_bible(self, query: str) -> List[Dict[str, Any]]:
+        """Interroge et extrait en direct les e-books de La Maison de la Bible."""
+        results = []
+        encoded_query = urllib.parse.quote(f"{query} ebook")
+        url = f"https://maisonbible.fr/fr/recherche?controller=search&s={encoded_query}"
+
+        try:
+            req = urllib.request.Request(url, headers=HEADERS)
+            with urllib.request.urlopen(req, context=ssl_ctx, timeout=5.0) as response:
+                if response.status != 200:
+                    return results
+                html = response.read().decode('utf-8', errors='ignore')
+                items = re.findall(r'<article[^>]*class="[^"]*product-miniature[^"]*"[^>]*>(.*?)</article>', html, re.DOTALL)
+
+                for it in items[:6]:
+                    link_m = re.search(r'<a[^>]*href="([^"]*)"[^>]*class="[^"]*thumbnail[^"]*"', it)
+                    if not link_m:
+                        link_m = re.search(r'<a[^>]*href="([^"]*)"', it)
+                    
+                    img_m = re.search(r'<img[^>]*src="([^"]*)"', it)
+                    alt_m = re.search(r'title="([^"]*)"', it) or re.search(r'alt="([^"]*)"', it)
+                    price_m = re.search(r'<span[^>]*class="[^"]*price[^"]*"[^>]*>(.*?)</span>', it, re.DOTALL)
+                    flags = re.findall(r'<li[^>]*class="product-flag[^"]*"[^>]*>(.*?)</li>', it, re.DOTALL)
+
+                    prod_url = link_m.group(1).strip() if link_m else ''
+                    raw_title = alt_m.group(1).strip() if alt_m else ''
+                    img_path = img_m.group(1).strip() if img_m else ''
+
+                    # Ignorer si ce n'est pas un e-book
+                    is_eb = self.is_strictly_ebook(raw_title, prod_url) or any('epub' in f.lower() or 'ebook' in f.lower() for f in flags)
+                    if not is_eb:
+                        continue
+
+                    # Extraire le prix
+                    price_raw = 0.0
+                    price_str = "Disponible"
+                    if price_m:
+                        raw_p = re.sub(r'<[^>]+>', '', price_m.group(1)).replace('\xa0', ' ').strip()
+                        num_m = re.search(r'([\d]+[.,][\d]{2})', raw_p)
+                        if num_m:
+                            price_raw = float(num_m.group(1).replace(',', '.'))
+                            price_str = f"{price_raw:.2f} €"
+
+                    # Formater l'image
+                    image_url = ""
+                    if img_path:
+                        if img_path.startswith('/'):
+                            image_url = f"https://maisonbible.fr{img_path}"
+                        else:
+                            image_url = img_path
+
+                    clean_t = self.clean_ebook_title(raw_title)
+
+                    results.append({
+                        'id': f"maisonbible_{hash(prod_url)}",
+                        'title': clean_t if clean_t else raw_title,
+                        'raw_title': raw_title,
+                        'source': 'La Maison de la Bible',
+                        'store_badge': 'Maison de la Bible',
+                        'format': 'EPUB (Vivlio / Adobe)',
+                        'price': price_str,
+                        'price_raw': price_raw,
+                        'url': prod_url,
+                        'image': image_url,
+                        'is_direct_product': True
+                    })
+        except Exception:
+            pass
+
+        return results
+
     def _query_google_books(self, query: str) -> List[Dict[str, Any]]:
         """Recherche les ebooks sur Google Play Livres via l'API Google Books publique."""
         results = []
@@ -315,13 +386,14 @@ class EbookFinderManager:
 
         direct_products: List[Dict[str, Any]] = []
 
-        # Exécution en parallèle via ThreadPoolExecutor (< 1s)
-        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        # Exécution en parallèle via ThreadPoolExecutor (< 1.5s)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
             future_to_store = {
                 executor.submit(self._query_shopify_store, store, clean_q): store['name']
                 for store in self.SHOPIFY_STORES
             }
             future_google = executor.submit(self._query_google_books, clean_q)
+            future_mb = executor.submit(self._query_maison_de_la_bible, clean_q)
 
             for future in concurrent.futures.as_completed(future_to_store):
                 try:
@@ -333,6 +405,12 @@ class EbookFinderManager:
             try:
                 google_results = future_google.result()
                 direct_products.extend(google_results)
+            except Exception:
+                pass
+
+            try:
+                mb_results = future_mb.result()
+                direct_products.extend(mb_results)
             except Exception:
                 pass
 
