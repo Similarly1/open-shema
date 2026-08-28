@@ -59,12 +59,33 @@ const App = {
     // 2a. Initialiser le gestionnaire d'erreurs et modale de détails
     this.bindErrorHandling();
 
-    // 2b. Navigation latérale (Changement de vue)
+    // 2b. Navigation latérale (Changement de vue & sous-menus pliables)
     document.querySelectorAll('.sidebar-menu .nav-item, .sidebar-menu .nav-sub-item, .sidebar-footer .nav-item').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const group = btn.closest('.nav-item-group');
+
+        // Cas 1 : Clic spécifique sur la flèche / chevron pour replier ou déplier
+        if (e.target.closest('.nav-chevron') && group) {
+          e.stopPropagation();
+          e.preventDefault();
+          group.classList.toggle('open');
+          return;
+        }
+
+        // Cas 2 : Clic sur le bouton parent d'un groupe avec sous-menu (ex: Prédication)
         if (btn.classList.contains('has-submenu')) {
-          group?.classList.toggle('open');
+          const isOpen = group?.classList.contains('open');
+          const isCurrentActive = btn.classList.contains('active');
+
+          // Si on clique sur le bouton parent alors qu'il est déjà ouvert et actif, on replie le groupe
+          if (isOpen && isCurrentActive) {
+            e.preventDefault();
+            group.classList.toggle('open');
+            return;
+          } else {
+            // Sinon on ouvre le groupe
+            group?.classList.add('open');
+          }
         }
 
         const viewId = btn.dataset.view;
@@ -79,7 +100,6 @@ const App = {
           group?.classList.add('open');
         } else if (btn.id === 'nav-sermons') {
           document.getElementById('nav-sub-sermons')?.classList.add('active');
-          group?.classList.add('open');
         }
 
         if (btn.id === 'nav-sub-sermon-editor') {

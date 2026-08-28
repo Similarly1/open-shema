@@ -28,8 +28,8 @@ const SearchView = {
 
     document.getElementById('btn-search-open-ebooks')?.addEventListener('click', () => {
       const q = this.searchInput.value.trim();
-      if (typeof EbookFinderModal !== 'undefined') {
-        EbookFinderModal.open(q);
+      if (typeof OpenShemaStore !== 'undefined') {
+        OpenShemaStore.open('ebooks', q);
       }
     });
   },
@@ -72,8 +72,8 @@ const SearchView = {
           </div>
         `;
         document.getElementById('btn-search-fallback-ebook')?.addEventListener('click', () => {
-          if (typeof EbookFinderModal !== 'undefined') {
-            EbookFinderModal.open(query);
+          if (typeof OpenShemaStore !== 'undefined') {
+            OpenShemaStore.open('ebooks', query);
           }
         });
         return;
