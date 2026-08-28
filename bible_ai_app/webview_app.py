@@ -2626,6 +2626,43 @@ class BibleAppApi:
             with urllib.request.urlopen(req, timeout=60) as response, open(target_path, "wb") as out_file:
                 shutil.copyfileobj(response, out_file)
 
+            # Si c'est une Bible SQLite, extraire les 66 livres JSON pour compatibilité native instantanée
+            if m_type == "bible" and target_path.endswith(".sqlite"):
+                import sqlite3
+                dest_json_dir = os.path.join(current_dir, "data", "bibles", m_abbr)
+                os.makedirs(dest_json_dir, exist_ok=True)
+                try:
+                    conn = sqlite3.connect(target_path)
+                    cur = conn.cursor()
+                    cur.execute("SELECT id, code, name, chapters_count FROM books ORDER BY id")
+                    books_rows = cur.fetchall()
+                    for b_id, b_code, b_name, ch_cnt in books_rows:
+                        cur.execute("SELECT chapter, verse, text_strong, text FROM verses WHERE book_id = ? ORDER BY chapter, verse", (b_id,))
+                        v_rows = cur.fetchall()
+                        ch_map = {}
+                        for ch_num, v_num, txt_str, txt_clean in v_rows:
+                            c_k = str(ch_num)
+                            v_k = str(v_num)
+                            if c_k not in ch_map:
+                                ch_map[c_k] = {}
+                            ch_map[c_k][v_k] = txt_str if txt_str else txt_clean
+
+                        b_obj = {
+                            "id": b_id,
+                            "code": b_code,
+                            "name": b_name,
+                            "version": m_abbr,
+                            "version_fullname": m_title,
+                            "total_chapters": ch_cnt,
+                            "chapters": ch_map
+                        }
+                        out_json = os.path.join(dest_json_dir, f"{b_id:02d}_{b_code}_{b_name}.json")
+                        with open(out_json, "w", encoding="utf-8") as jf:
+                            json.dump(b_obj, jf, ensure_ascii=False, indent=2)
+                    conn.close()
+                except Exception as extract_err:
+                    logger.warning(f"Erreur extraction SQLite Bible vers JSON : {extract_err}")
+
             registry = load_books_metadata()
             reg_key = m_abbr or m_id
             registry[reg_key] = {
@@ -2635,10 +2672,12 @@ class BibleAppApi:
                 "year": module_data.get("version", "1.0.0"),
                 "cover_path": None,
                 "type": "Bible" if m_type == "bible" else ("Dictionnaire" if m_type == "dictionary" else ("Commentaire" if m_type == "commentary" else "Théologie")),
-                "format": m_format,
+                "format": "json" if (m_type == "bible" and target_path.endswith(".sqlite")) else m_format,
                 "file_path": target_path,
                 "folder_name": m_abbr,
                 "version_code": m_abbr,
+                "total_books": 66 if m_type == "bible" else 0,
+                "embedding_model": "study_library",
                 "active": True,
                 "has_strongs": "strong" in module_data.get("features", [])
             }

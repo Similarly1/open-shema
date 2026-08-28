@@ -845,5 +845,19 @@
     "total_books": 27,
     "embedding_model": "study_library",
     "active": true
+  },
+  "DARBY": {
+    "title": "Bible J.N. Darby (avec Strong)",
+    "author": "John Nelson Darby",
+    "description": "Traduction littérale et rigoureuse de John Nelson Darby (66 livres, 31 171 versets) avec balisage Strong complet.",
+    "year": "1.0.0",
+    "cover_path": null,
+    "type": "Bible",
+    "format": "sqlite",
+    "file_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\bibles\\bible_bible_darby.sqlite",
+    "folder_name": "DARBY",
+    "version_code": "DARBY",
+    "active": true,
+    "has_strongs": true
   }
 }

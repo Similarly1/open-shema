@@ -3994,6 +3994,27 @@ const BibleReader = {
     }
   },
 
+  async reloadInstalledBibles() {
+    try {
+      this.installedBibles = await API.getInstalledBibles() || [];
+      this.updatePaneHeader(1);
+      this.updatePaneHeader(2);
+
+      // Mettre à jour immédiatement l'indicateur de catalogue dans le sélecteur
+      const footerEl = document.getElementById('version-picker-store-footer');
+      if (footerEl && typeof OpenShemaStore !== 'undefined') {
+        const missing = await OpenShemaStore.getMissingBiblesCount();
+        footerEl.style.display = missing > 0 ? 'block' : 'none';
+        const footerText = document.getElementById('version-picker-store-btn-text');
+        if (footerText && missing > 0) {
+          footerText.textContent = `Catalogue Open Shema (${missing} version${missing > 1 ? 's' : ''} disponible${missing > 1 ? 's' : ''})`;
+        }
+      }
+    } catch (err) {
+      console.error('[BibleReader] Erreur reloadInstalledBibles:', err);
+    }
+  },
+
   bindEvents() {
     document.getElementById('book-picker-pill')?.addEventListener('click', () => {
       BookPicker.toggle(this.currentBook, this.currentChapter);

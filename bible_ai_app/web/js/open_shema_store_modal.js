@@ -391,17 +391,19 @@ const OpenShemaStore = {
           App.showToast(`${module.title} a été installé avec succès.`);
         }
         
-        await this.refreshInstalledCache();
-
-        // Si c'est une Bible, actualiser BibleReader
-        if (module.type === 'bible' && typeof BibleReader !== 'undefined' && BibleReader.loadInstalledBibles) {
-          await BibleReader.loadInstalledBibles();
+        // 1. Recharger immédiatement BibleReader
+        if (typeof BibleReader !== 'undefined' && BibleReader.reloadInstalledBibles) {
+          await BibleReader.reloadInstalledBibles();
         }
 
-        // Si la bibliothèque est ouverte, l'actualiser
+        // 2. Recharger la bibliothèque
         if (typeof LibraryView !== 'undefined' && LibraryView.loadBooks) {
-          LibraryView.loadBooks();
+          await LibraryView.loadBooks();
         }
+
+        // 3. Rafraîchir l'état du store
+        await this.refreshInstalledCache();
+        this.render();
       } else {
         const errMsg = res?.error || 'Erreur inconnue';
         if (typeof App !== 'undefined' && App.showToast) {
