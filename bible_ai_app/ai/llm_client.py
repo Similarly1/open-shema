@@ -100,20 +100,22 @@ class GeminiClient:
             try:
                 response = requests.post(url, json=payload, headers={"Content-Type": "application/json", "x-goog-api-key": self.api_key}, timeout=90)
                 
-                # Si erreur d'authentification (clé invalide / non autorisée), pas la peine de boucler sur 15 modèles
-                if response.status_code in [401, 403]:
-                    err_detail = f"Erreur {response.status_code}"
+                if response.status_code != 200:
+                    err_msg = ""
                     try:
                         err_json = response.json()
                         if "error" in err_json and "message" in err_json["error"]:
-                            err_detail = err_json["error"]["message"]
+                            err_msg = err_json["error"]["message"]
                     except Exception:
                         pass
-                    return f"Erreur Gemini ({response.status_code}) sur {current_model} : {err_detail}. Vérifiez la validité de votre clé API Google dans les paramètres."
 
-                if response.status_code in [404, 429, 500, 502, 503, 504]:
-                    last_error = f"Status {response.status_code} pour {current_model}"
-                    continue
+                    # Erreur d'authentification ou de clé API invalide
+                    if response.status_code in [401, 403] or any(k in err_msg.lower() for k in ["api key", "unregistered caller", "permission_denied", "api_key"]):
+                        return f"Erreur Google API ({response.status_code}) sur {current_model} : {err_msg or 'Clé API invalide ou non autorisée'}. Veuillez vérifier votre clé API Google dans les Paramètres IA."
+
+                    if response.status_code in [404, 429, 500, 502, 503, 504]:
+                        last_error = f"Status {response.status_code} ({err_msg}) pour {current_model}"
+                        continue
                 response.raise_for_status()
                 data = response.json()
                 try:

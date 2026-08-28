@@ -25,63 +25,69 @@ except ImportError:
 
 def get_secret(key_name: str, config: dict = None) -> str:
     """
-    Recupere une cle secrete depuis le trousseau systeme.
-    Fallback sur config dict si keyring indisponible ou cle absente du trousseau.
+    Récupère une clé secrète depuis le trousseau système ou depuis la config de secours.
     """
     if _KEYRING_AVAILABLE:
         try:
             value = _keyring.get_password(_KEYRING_SERVICE, key_name)
-            if value:
-                return value
+            if value and str(value).strip():
+                return str(value).strip()
         except Exception as e:
             logger.debug("Erreur keyring get (%s) : %s", key_name, e)
-    if config:
-        return config.get(key_name, "")
+    if config and isinstance(config, dict):
+        return str(config.get(key_name, "") or "").strip()
     return ""
 
 
 def set_secret(key_name: str, value: str) -> bool:
     """
-    Stocke une cle secrete dans le trousseau systeme.
-    Retourne True si reussi, False si keyring indisponible.
+    Stocke une clé secrète dans le trousseau sécurisé Windows (Windows Credential Locker).
+    Retourne True si réussi, False si keyring indisponible.
+    Ne supprime jamais un secret existant si la valeur fournie est vide.
     """
     if not _KEYRING_AVAILABLE:
         return False
+    val = str(value or "").strip()
+    if not val:
+        return True
     try:
-        if value:
-            _keyring.set_password(_KEYRING_SERVICE, key_name, value)
-        else:
-            try:
-                _keyring.delete_password(_KEYRING_SERVICE, key_name)
-            except Exception as _silent_e:
-                logger.debug("Erreur ignoree : %s", _silent_e)
+        _keyring.set_password(_KEYRING_SERVICE, key_name, val)
         return True
     except Exception as e:
-        logger.warning("Impossible de stocker la cle '%s' dans le trousseau : %s", key_name, e)
+        logger.warning("Impossible de stocker la clé '%s' dans le trousseau : %s", key_name, e)
+        return False
+
+
+def delete_secret(key_name: str) -> bool:
+    """Supprime explicitement un secret du trousseau système."""
+    if not _KEYRING_AVAILABLE:
+        return False
+    try:
+        _keyring.delete_password(_KEYRING_SERVICE, key_name)
+        return True
+    except Exception as e:
+        logger.debug("Erreur delete_secret (%s) : %s", key_name, e)
         return False
 
 
 def migrate_secrets_from_config(config: dict) -> dict:
     """
-    Transfere les cles secretes presentes dans le dict config vers le trousseau systeme,
-    et retourne un nouveau dict avec ces cles videes (pour ne pas les persister en clair).
-    Ne fait PAS de save_config -- la persistance est a la charge de l'appelant (save_settings).
+    Transfère les clés secrètes présentes dans le dict config vers le trousseau système (Windows Vault),
+    et retourne un nouveau dict avec ces clés vidées afin de ne JAMAIS les stocker en clair dans config.json.
     """
-    if not _KEYRING_AVAILABLE:
-        return config
     config = dict(config)
     for key in _SECRET_KEYS:
         value = config.get(key, "")
-        if value:
-            if set_secret(key, value):
-                config[key] = ""
-                logger.info("Cle API '%s' stockee dans le trousseau systeme.", key)
+        if value and str(value).strip():
+            set_secret(key, str(value).strip())
+        config[key] = ""
     return config
 
 
 def load_secrets_into_config(config: dict) -> dict:
     """
-    Injecte les cles du trousseau dans le dict de config pour usage transparent.
+    Injecte en mémoire vive les clés du trousseau système dans le dict de configuration,
+    sans toucher au fichier config.json sur disque.
     """
     config = dict(config)
     for key in _SECRET_KEYS:

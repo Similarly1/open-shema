@@ -2227,19 +2227,20 @@ class BibleAppApi:
 
         try:
             from ai.llm_client import LLMClient, GeminiClient
+            from core.secrets_manager import get_secret
             # Résoudre le bon provider selon le modèle sélectionné
             sm_lower = selected_model.lower()
-            if any(k in sm_lower for k in ["mistralai/", "qwen", "swiss-ai", "gemma", "kimi", "nemotron", "infomaniak"]):
+            if any(k in sm_lower for k in ["mistralai/", "qwen", "swiss-ai", "kimi", "nemotron", "infomaniak"]):
                 provider = "infomaniak"
-                api_key = self.config.get("infomaniak_token", "")
-                product_id = self.config.get("infomaniak_product_id", "251")
-            elif any(k in sm_lower for k in ["mistral-large", "mistral-small", "open-mistral", "codestral"]):
+                api_key = self.config.get("infomaniak_token") or get_secret("infomaniak_token", self.config) or ""
+                product_id = self.config.get("infomaniak_product_id") or get_secret("infomaniak_product_id", self.config) or "251"
+            elif "mistral" in sm_lower or "codestral" in sm_lower or "pixtral" in sm_lower:
                 provider = "mistral"
-                api_key = self.config.get("mistral_api_key", "")
+                api_key = self.config.get("mistral_api_key") or get_secret("mistral_api_key", self.config) or ""
                 product_id = None
             else:
                 provider = "gemini"
-                api_key = self.config.get("gemini_api_key", "")
+                api_key = self.config.get("gemini_api_key") or get_secret("gemini_api_key", self.config) or ""
                 product_id = None
 
             # Fenêtre glissante (conserver au max 6 messages + la nouvelle question)
