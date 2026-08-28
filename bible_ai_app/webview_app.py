@@ -3029,18 +3029,25 @@ class BibleAppApi:
         self.config = load_secrets_into_config(raw)
         return True
 
-    def fetch_gemini_models(self, api_key: Optional[str] = None) -> Dict[str, Any]:
+    def fetch_gemini_models(self, api_key: Optional[Any] = None) -> Dict[str, Any]:
         """Interroge l'API Google Gemini pour obtenir la liste en temps réel des modèles supportant generateContent."""
-        key = api_key or self.config.get("gemini_api_key", "")
+        key = ""
+        if isinstance(api_key, dict):
+            key = api_key.get("api_key") or api_key.get("key") or ""
+        elif isinstance(api_key, str):
+            key = api_key
+        
+        if not key:
+            key = self.config.get("gemini_api_key", "")
         if not key:
             raw = load_config()
             cfg_secrets = load_secrets_into_config(raw)
             key = cfg_secrets.get("gemini_api_key", "")
         
-        if not key or not key.strip():
+        if not key or not str(key).strip():
             return {"success": False, "error": "Clé API Google Gemini non renseignée. Veuillez d'abord saisir votre clé API Google dans le champ ci-dessus."}
         
-        key = key.strip()
+        key = str(key).strip()
         url = f"https://generativelanguage.googleapis.com/v1beta/models?key={key}"
         try:
             resp = requests.get(url, timeout=12)
