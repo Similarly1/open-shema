@@ -150,16 +150,35 @@ const AIStudyView = {
       e.stopPropagation();
       optionsPanel?.classList.toggle('hidden');
       modePopover?.classList.add('hidden');
+      if (!optionsPanel?.classList.contains('hidden')) {
+        this.loadDefaultModelFromConfig();
+      }
     });
 
     btnPopoverOptions?.addEventListener('click', (e) => {
       e.stopPropagation();
       modePopover?.classList.add('hidden');
       optionsPanel?.classList.remove('hidden');
+      this.loadDefaultModelFromConfig();
     });
 
     btnCloseOptions?.addEventListener('click', () => {
       optionsPanel?.classList.add('hidden');
+    });
+
+    // Synchroniser le changement de modèle depuis le popover du chat
+    const modelSelectEl = document.getElementById('ai-opt-model');
+    modelSelectEl?.addEventListener('change', (e) => {
+      const selectedModel = e.target.value;
+      if (selectedModel && typeof SettingsView !== 'undefined') {
+        SettingsView.config.chat_model = selectedModel;
+        const cfgChat = document.getElementById('cfg-chat-model');
+        if (cfgChat) {
+          cfgChat.value = selectedModel;
+          SettingsView.syncModelPair('cfg-chat-model', 'cfg-chat-fallback-model', 'Chat', false);
+        }
+        SettingsView.save();
+      }
     });
 
     document.addEventListener('click', (e) => {
@@ -259,17 +278,22 @@ const AIStudyView = {
 
   async loadDefaultModelFromConfig() {
     try {
-      const cfg = await API.call('get_config');
+      const cfg = (typeof SettingsView !== 'undefined' && SettingsView.config && SettingsView.config.chat_model)
+        ? SettingsView.config
+        : await API.call('get_settings');
       if (cfg) {
-        if (typeof SettingsView !== 'undefined' && SettingsView.renderAllModelSelects) {
-          SettingsView.config = cfg;
-          SettingsView.renderAllModelSelects();
+        if (typeof SettingsView !== 'undefined') {
+          SettingsView.config = { ...SettingsView.config, ...cfg };
+          if (SettingsView.renderAllModelSelects) {
+            SettingsView.renderAllModelSelects();
+          }
         }
-        if (cfg.chat_model) {
+        const targetModel = cfg.chat_model || (typeof SettingsView !== 'undefined' && SettingsView.config?.chat_model);
+        if (targetModel) {
           const modelSelect = document.getElementById('ai-opt-model');
           if (modelSelect) {
-            const opt = modelSelect.querySelector(`option[value="${cfg.chat_model}"]`);
-            if (opt) modelSelect.value = cfg.chat_model;
+            const opt = modelSelect.querySelector(`option[value="${targetModel}"]`);
+            if (opt) modelSelect.value = targetModel;
           }
         }
       }

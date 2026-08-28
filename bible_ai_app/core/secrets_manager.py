@@ -12,7 +12,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 _KEYRING_SERVICE = "OpenShema"
-_SECRET_KEYS = ["gemini_api_key", "mistral_api_key", "infomaniak_token"]
+_SECRET_KEYS = ["gemini_api_key", "mistral_api_key", "infomaniak_token", "infomaniak_product_id"]
 
 try:
     import keyring as _keyring

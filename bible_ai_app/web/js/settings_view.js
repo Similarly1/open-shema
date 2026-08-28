@@ -7,6 +7,8 @@ const SettingsView = {
   config: {},
   dictionaries: [],
   discoveredGeminiModels: [],
+  discoveredMistralModels: [],
+  discoveredInfomaniakModels: [],
   activeModelsModalProviderTab: 'google',
   modelsModalSearchQuery: '',
   ALL_MODELS_CATALOG: [
@@ -31,9 +33,14 @@ const SettingsView = {
 
     // Mistral AI
     { id: 'mistral-large-latest', name: 'Mistral Large', desc: 'Raisonnement approfondi & style souverain', provider: 'mistral' },
+    { id: 'mistral-medium-2505', name: 'Mistral Medium 3.1', desc: 'Raisonnement intermédiaire rapide', provider: 'mistral' },
     { id: 'mistral-small-latest', name: 'Mistral Small', desc: 'Rapide, équilibré & concis', provider: 'mistral' },
-    { id: 'open-mistral-nemo', name: 'Mistral Nemo (12B)', desc: 'Polyvalent & efficace', provider: 'mistral' },
+    { id: 'open-mistral-nemo', name: 'Mistral Nemo (12B)', desc: 'Polyvalent & multilingue (12B)', provider: 'mistral' },
     { id: 'codestral-latest', name: 'Mistral Codestral', desc: 'Structuration stricte & logique', provider: 'mistral' },
+    { id: 'pixtral-large-latest', name: 'Mistral Pixtral Large', desc: 'Modèle multimodal de pointe', provider: 'mistral' },
+    { id: 'pixtral-12b-2409', name: 'Mistral Pixtral 12B', desc: 'Vision & analyse textuelle', provider: 'mistral' },
+    { id: 'ministral-8b-latest', name: 'Ministral 8B', desc: 'Modèle ultra-compact performant', provider: 'mistral' },
+    { id: 'ministral-3b-latest', name: 'Ministral 3B', desc: 'Modèle léger haute vitesse', provider: 'mistral' },
 
     // Infomaniak Swiss AI
     { id: 'mistralai/Ministral-3-14B-Instruct-2512', name: 'Infomaniak Ministral 14B', desc: 'Hébergement souverain suisse', provider: 'infomaniak' },
@@ -759,8 +766,8 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
       App.showToast('Tous les modèles IA ont été activés.');
     });
 
-    document.getElementById('btn-modal-fetch-gemini')?.addEventListener('click', () => {
-      this.fetchGeminiModels();
+    document.getElementById('btn-modal-fetch-provider')?.addEventListener('click', () => {
+      this.fetchCurrentProviderModels();
     });
 
     // Initialisation et liaison des paires de modèles (Principal / Fallback distincts)
@@ -1224,6 +1231,30 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
         existingIds.add(dm.id);
       }
     }
+    for (const dm of this.discoveredMistralModels) {
+      if (!existingIds.has(dm.id)) {
+        list.push({
+          id: dm.id,
+          name: dm.name || dm.id,
+          desc: dm.description ? dm.description.slice(0, 70) + '...' : 'Découvert via Mistral API',
+          provider: 'mistral',
+          isDiscovered: true
+        });
+        existingIds.add(dm.id);
+      }
+    }
+    for (const dm of this.discoveredInfomaniakModels) {
+      if (!existingIds.has(dm.id)) {
+        list.push({
+          id: dm.id,
+          name: dm.name || dm.id,
+          desc: dm.description ? dm.description.slice(0, 70) + '...' : 'Découvert via Infomaniak API',
+          provider: 'infomaniak',
+          isDiscovered: true
+        });
+        existingIds.add(dm.id);
+      }
+    }
     return list;
   },
 
@@ -1270,6 +1301,9 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
       btn.classList.toggle('active', btn.dataset.tabProvider === 'google');
     });
 
+    const btnText = document.getElementById('btn-modal-fetch-provider-text');
+    if (btnText) btnText.textContent = 'Actualiser depuis Google';
+
     this.renderModelsModalList();
     modal.classList.remove('hidden');
   },
@@ -1287,6 +1321,14 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
     document.querySelectorAll('#models-modal-provider-tabs .prompt-tab-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.tabProvider === provider);
     });
+
+    const btnText = document.getElementById('btn-modal-fetch-provider-text');
+    if (btnText) {
+      if (provider === 'google') btnText.textContent = 'Actualiser depuis Google';
+      else if (provider === 'mistral') btnText.textContent = 'Actualiser depuis Mistral';
+      else if (provider === 'infomaniak') btnText.textContent = 'Actualiser depuis Infomaniak';
+    }
+
     this.renderModelsModalList();
   },
 
@@ -1341,7 +1383,10 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
           <input type="checkbox" class="model-modal-visibility-cb" data-model-id="${m.id}" ${isEnabled ? 'checked' : ''}>
           <div style="flex: 1; min-width: 0;">
             <div class="model-check-title" style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-              <span style="font-weight: 600; font-size: 13px;">${m.name}</span>
+              <span>
+                <strong style="font-weight: 600; font-size: 13px;">${m.name}</strong>
+                ${m.isDiscovered ? '<span class="prompt-status-badge" style="font-size: 9px; padding: 1px 4px; margin-left: 6px; background: rgba(59,130,246,0.15); color: #60a5fa;">Découvert API</span>' : ''}
+              </span>
               <span class="model-check-id" style="font-size: 11px; opacity: 0.7; font-family: monospace;">${m.id}</span>
             </div>
             <div class="model-check-desc" style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">${m.desc}</div>
@@ -1445,9 +1490,36 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
 
       selectEl.innerHTML = html;
 
-      // Restaurer la sélection si toujours disponible
-      if (currentVal && enabledModels.some(m => m.id === currentVal)) {
-        selectEl.value = currentVal;
+      // Aligner la sélection avec la configuration sauvegardée
+      let targetVal = currentVal;
+      if (id === 'cfg-chat-model' || id === 'ai-opt-model') {
+        targetVal = this.config.chat_model || currentVal;
+      } else if (id === 'cfg-chat-fallback-model') {
+        targetVal = this.config.chat_fallback_model || currentVal;
+      } else if (id === 'cfg-synthesis-model') {
+        targetVal = this.config.synthesis_model || currentVal;
+      } else if (id === 'cfg-synthesis-fallback-model') {
+        targetVal = this.config.synthesis_fallback_model || currentVal;
+      } else if (id === 'cfg-translation-model') {
+        targetVal = this.config.translation_model || currentVal;
+      } else if (id === 'cfg-translation-fallback-model') {
+        targetVal = this.config.translation_fallback_model || currentVal;
+      } else if (id === 'cfg-summary-model') {
+        targetVal = this.config.summary_model || currentVal;
+      } else if (id === 'cfg-summary-fallback-model') {
+        targetVal = this.config.summary_fallback_model || currentVal;
+      } else if (id === 'cfg-title-model') {
+        targetVal = this.config.title_model || currentVal;
+      } else if (id === 'cfg-title-fallback-model') {
+        targetVal = this.config.title_fallback_model || currentVal;
+      } else if (id === 'cfg-notes-ai-model') {
+        targetVal = this.config.notes_ai_model || currentVal;
+      } else if (id === 'cfg-notes-ai-fallback-model') {
+        targetVal = this.config.notes_ai_fallback_model || currentVal;
+      }
+
+      if (targetVal && enabledModels.some(m => m.id === targetVal)) {
+        selectEl.value = targetVal;
       } else if (enabledModels.length > 0) {
         selectEl.value = enabledModels[0].id;
       }
@@ -1456,14 +1528,25 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
     this.syncAllModelPairs(false);
   },
 
+  async fetchCurrentProviderModels() {
+    const provider = this.activeModelsModalProviderTab || 'google';
+    if (provider === 'google') {
+      await this.fetchGeminiModels();
+    } else if (provider === 'mistral') {
+      await this.fetchMistralModels();
+    } else if (provider === 'infomaniak') {
+      await this.fetchInfomaniakModels();
+    }
+  },
+
   async fetchGeminiModels() {
-    const btn = document.getElementById('btn-modal-fetch-gemini');
-    const icon = document.getElementById('svg-modal-fetch-gemini-icon');
+    const btn = document.getElementById('btn-modal-fetch-provider');
+    const icon = document.getElementById('svg-modal-fetch-provider-icon');
     const keyInput = document.getElementById('cfg-gemini-key');
     const apiKey = keyInput?.value?.trim() || this.config.gemini_api_key || '';
 
     if (!apiKey) {
-      App.showToast('Veuillez renseigner votre clé API Google Gemini ci-dessus.');
+      App.showToast('Veuillez renseigner votre clé API Google Gemini dans les paramètres.');
       keyInput?.focus();
       return;
     }
@@ -1484,6 +1567,78 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
       }
     } catch (e) {
       console.error('Erreur fetch_gemini_models', e);
+      App.showToast(`Erreur de connexion : ${e}`);
+    } finally {
+      if (btn) btn.disabled = false;
+      if (icon) icon.classList.remove('spin-clockwise');
+    }
+  },
+
+  async fetchMistralModels() {
+    const btn = document.getElementById('btn-modal-fetch-provider');
+    const icon = document.getElementById('svg-modal-fetch-provider-icon');
+    const keyInput = document.getElementById('cfg-mistral-key');
+    const apiKey = keyInput?.value?.trim() || this.config.mistral_api_key || '';
+
+    if (!apiKey) {
+      App.showToast('Veuillez renseigner votre clé API Mistral AI dans les paramètres.');
+      keyInput?.focus();
+      return;
+    }
+
+    if (btn) btn.disabled = true;
+    if (icon) icon.classList.add('spin-clockwise');
+
+    try {
+      const res = await API.call('fetch_mistral_models', { api_key: apiKey });
+      if (res && res.success && Array.isArray(res.models)) {
+        this.discoveredMistralModels = res.models;
+        this.renderModelsModalList();
+        this.renderAllModelSelects();
+        this.updateModelsSummaryBadges();
+        App.showToast(`✓ ${res.models.length} modèles Mistral récupérés avec succès depuis Mistral AI !`);
+      } else {
+        App.showToast(`Erreur Mistral API : ${res?.error || 'Impossible de récupérer les modèles'}`);
+      }
+    } catch (e) {
+      console.error('Erreur fetch_mistral_models', e);
+      App.showToast(`Erreur de connexion : ${e}`);
+    } finally {
+      if (btn) btn.disabled = false;
+      if (icon) icon.classList.remove('spin-clockwise');
+    }
+  },
+
+  async fetchInfomaniakModels() {
+    const btn = document.getElementById('btn-modal-fetch-provider');
+    const icon = document.getElementById('svg-modal-fetch-provider-icon');
+    const tokenInput = document.getElementById('cfg-infomaniak-token');
+    const pidInput = document.getElementById('cfg-infomaniak-pid');
+    const token = tokenInput?.value?.trim() || this.config.infomaniak_token || '';
+    const pid = pidInput?.value?.trim() || this.config.infomaniak_product_id || '251';
+
+    if (!token) {
+      App.showToast('Veuillez renseigner votre token Infomaniak dans les paramètres.');
+      tokenInput?.focus();
+      return;
+    }
+
+    if (btn) btn.disabled = true;
+    if (icon) icon.classList.add('spin-clockwise');
+
+    try {
+      const res = await API.call('fetch_infomaniak_models', { token, product_id: pid });
+      if (res && res.success && Array.isArray(res.models)) {
+        this.discoveredInfomaniakModels = res.models;
+        this.renderModelsModalList();
+        this.renderAllModelSelects();
+        this.updateModelsSummaryBadges();
+        App.showToast(`✓ ${res.models.length} modèles Infomaniak récupérés avec succès !`);
+      } else {
+        App.showToast(`Erreur Infomaniak API : ${res?.error || 'Impossible de récupérer les modèles'}`);
+      }
+    } catch (e) {
+      console.error('Erreur fetch_infomaniak_models', e);
       App.showToast(`Erreur de connexion : ${e}`);
     } finally {
       if (btn) btn.disabled = false;
@@ -1575,6 +1730,13 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
         if (isUserChange) {
           App.showToast(`Modèle de secours (${label}) ajusté : distinct du modèle principal.`);
         }
+      }
+    }
+
+    if (primaryId === 'cfg-chat-model') {
+      const aiOpt = document.getElementById('ai-opt-model');
+      if (aiOpt && aiOpt.value !== pVal) {
+        aiOpt.value = pVal;
       }
     }
   },
@@ -1732,6 +1894,10 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
     newCfg.include_notes_in_ai = document.getElementById('cfg-include-notes-ai').checked;
 
     newCfg.chat_model = document.getElementById('cfg-chat-model').value;
+    const aiOptModel = document.getElementById('ai-opt-model');
+    if (aiOptModel && newCfg.chat_model) {
+      aiOptModel.value = newCfg.chat_model;
+    }
     if (document.getElementById('cfg-chat-fallback-model')) {
       let fb = document.getElementById('cfg-chat-fallback-model').value;
       if (fb === newCfg.chat_model) {

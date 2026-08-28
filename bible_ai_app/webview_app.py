@@ -3021,6 +3021,9 @@ class BibleAppApi:
     def get_settings(self) -> Dict[str, Any]:
         return load_secrets_into_config(load_config())
 
+    def get_config(self) -> Dict[str, Any]:
+        return self.get_settings()
+
     def save_settings(self, new_config: Dict[str, Any]) -> bool:
         # Migrer les nouvelles cles API vers le trousseau avant sauvegarde
         new_config = migrate_secrets_from_config(new_config)
@@ -3103,6 +3106,167 @@ class BibleAppApi:
             return {"success": True, "models": valid_models}
         except Exception as e:
             logger.exception(f"Erreur fetch_gemini_models: {e}")
+            return {"success": False, "error": str(e)}
+
+    def fetch_mistral_models(self, api_key: Optional[Any] = None) -> Dict[str, Any]:
+        """Interroge l'API Mistral AI pour obtenir la liste en temps réel des modèles disponibles."""
+        key = ""
+        if isinstance(api_key, dict):
+            key = api_key.get("api_key") or api_key.get("key") or api_key.get("mistral_api_key") or ""
+        elif isinstance(api_key, str):
+            key = api_key
+        
+        if not key:
+            key = self.config.get("mistral_api_key", "")
+        if not key:
+            raw = load_config()
+            cfg_secrets = load_secrets_into_config(raw)
+            key = cfg_secrets.get("mistral_api_key", "")
+        
+        if not key or not str(key).strip():
+            return {"success": False, "error": "Clé API Mistral AI non renseignée. Veuillez d'abord saisir votre clé API Mistral dans vos paramètres."}
+        
+        key = str(key).strip()
+        url = "https://api.mistral.ai/v1/models"
+        headers = {"Authorization": f"Bearer {key}"}
+        try:
+            resp = requests.get(url, headers=headers, timeout=12)
+            if resp.status_code != 200:
+                err_msg = f"Erreur Mistral ({resp.status_code})"
+                try:
+                    err_json = resp.json()
+                    if "detail" in err_json:
+                        err_msg = f"Mistral API : {err_json['detail']}"
+                    elif "message" in err_json:
+                        err_msg = f"Mistral API : {err_json['message']}"
+                except Exception:
+                    pass
+                return {"success": False, "error": err_msg}
+            
+            data = resp.json()
+            raw_models = data.get("data", [])
+            valid_models = []
+            
+            for m in raw_models:
+                m_id = m.get("id", "")
+                m_id_low = m_id.lower()
+                
+                # Ignorer les modèles d'embedding ou de modération pure
+                if any(bad in m_id_low for bad in ["embed", "moderation", "guard"]):
+                    continue
+                
+                caps = m.get("capabilities", {})
+                if caps and caps.get("completion_chat") is False:
+                    continue
+                
+                display_name = m.get("name") or m_id
+                description = m.get("description", "")
+                if not description:
+                    if "large" in m_id_low:
+                        description = "Raisonnement approfondi & style souverain"
+                    elif "small" in m_id_low:
+                        description = "Rapide, équilibré & concis"
+                    elif "nemo" in m_id_low:
+                        description = "Polyvalent & multilingue (12B)"
+                    elif "codestral" in m_id_low:
+                        description = "Structuration stricte & logique"
+                    elif "ministral" in m_id_low:
+                        description = "Modèle compact pour inférence rapide"
+                    elif "pixtral" in m_id_low:
+                        description = "Modèle multimodal & analyse"
+                    else:
+                        description = "Modèle officiel Mistral AI"
+                
+                valid_models.append({
+                    "id": m_id,
+                    "name": display_name,
+                    "description": description,
+                    "provider": "mistral"
+                })
+            
+            def mistral_sort_key(item):
+                i_id = item["id"].lower()
+                if "large" in i_id:
+                    return (1, i_id)
+                elif "small" in i_id:
+                    return (2, i_id)
+                elif "nemo" in i_id:
+                    return (3, i_id)
+                elif "codestral" in i_id:
+                    return (4, i_id)
+                elif "ministral" in i_id:
+                    return (5, i_id)
+                return (6, i_id)
+            
+            valid_models.sort(key=mistral_sort_key)
+            return {"success": True, "models": valid_models}
+        except Exception as e:
+            logger.exception(f"Erreur fetch_mistral_models: {e}")
+            return {"success": False, "error": str(e)}
+
+    def fetch_infomaniak_models(self, token: Optional[Any] = None, product_id: Optional[Any] = None) -> Dict[str, Any]:
+        """Interroge l'API Infomaniak Swiss AI pour obtenir la liste en temps réel des modèles déployés."""
+        tok = ""
+        pid = ""
+        if isinstance(token, dict):
+            tok = token.get("token") or token.get("api_key") or token.get("infomaniak_token") or ""
+            pid = token.get("product_id") or token.get("infomaniak_product_id") or ""
+        elif isinstance(token, str):
+            tok = token
+            if isinstance(product_id, str):
+                pid = product_id
+        
+        if not tok:
+            tok = self.config.get("infomaniak_token", "")
+        if not pid:
+            pid = self.config.get("infomaniak_product_id", "251")
+        if not tok:
+            raw = load_config()
+            cfg_secrets = load_secrets_into_config(raw)
+            tok = cfg_secrets.get("infomaniak_token", "")
+            pid = cfg_secrets.get("infomaniak_product_id", "251")
+            
+        if not tok or not str(tok).strip():
+            return {"success": False, "error": "Token API Infomaniak non renseigné. Veuillez d'abord saisir votre token dans vos paramètres."}
+        
+        tok = str(tok).strip()
+        pid = str(pid or "251").strip()
+        url = f"https://api.infomaniak.com/2/ai/{pid}/openai/v1/models"
+        headers = {"Authorization": f"Bearer {tok}"}
+        try:
+            resp = requests.get(url, headers=headers, timeout=12)
+            if resp.status_code != 200:
+                err_msg = f"Erreur Infomaniak ({resp.status_code})"
+                try:
+                    err_json = resp.json()
+                    if "error" in err_json and isinstance(err_json["error"], dict) and "message" in err_json["error"]:
+                        err_msg = f"Infomaniak API : {err_json['error']['message']}"
+                    elif "detail" in err_json:
+                        err_msg = f"Infomaniak API : {err_json['detail']}"
+                except Exception:
+                    pass
+                return {"success": False, "error": err_msg}
+            
+            data = resp.json()
+            raw_models = data.get("data", [])
+            valid_models = []
+            
+            for m in raw_models:
+                m_id = m.get("id", "")
+                m_id_low = m_id.lower()
+                if any(bad in m_id_low for bad in ["embed", "bge_", "mini_lm_"]):
+                    continue
+                display_name = m.get("name") or m_id
+                valid_models.append({
+                    "id": m_id,
+                    "name": display_name,
+                    "description": "Hébergé souverainement en Suisse sur Infomaniak AI",
+                    "provider": "infomaniak"
+                })
+            
+            return {"success": True, "models": valid_models}
+        except Exception as e:
+            logger.exception(f"Erreur fetch_infomaniak_models: {e}")
             return {"success": False, "error": str(e)}
 
     # =========================================================================
