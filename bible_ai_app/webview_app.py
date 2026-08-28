@@ -3019,7 +3019,7 @@ class BibleAppApi:
     # =========================================================================
 
     def get_settings(self) -> Dict[str, Any]:
-        return load_config()
+        return load_secrets_into_config(load_config())
 
     def save_settings(self, new_config: Dict[str, Any]) -> bool:
         # Migrer les nouvelles cles API vers le trousseau avant sauvegarde

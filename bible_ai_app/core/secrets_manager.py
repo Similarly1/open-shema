@@ -1,4 +1,4 @@
-﻿"""
+"""
 secrets_manager.py -- Gestion securisee des cles API via le trousseau systeme.
 
 Les cles sont stockees dans le Windows Credential Manager (keyring) plutot quen
@@ -63,24 +63,19 @@ def set_secret(key_name: str, value: str) -> bool:
 
 def migrate_secrets_from_config(config: dict) -> dict:
     """
-    Migration one-shot : deplace les cles secretes de config.json vers le trousseau.
-    Retire les cles migrees du dict de config retourne.
+    Transfere les cles secretes presentes dans le dict config vers le trousseau systeme,
+    et retourne un nouveau dict avec ces cles videes (pour ne pas les persister en clair).
+    Ne fait PAS de save_config -- la persistance est a la charge de l'appelant (save_settings).
     """
     if not _KEYRING_AVAILABLE:
         return config
-    migrated = []
+    config = dict(config)
     for key in _SECRET_KEYS:
         value = config.get(key, "")
         if value:
             if set_secret(key, value):
-                migrated.append(key)
-    if migrated:
-        logger.info("Cles API migrees vers le trousseau systeme : %s", migrated)
-        config = dict(config)
-        for key in migrated:
-            config[key] = ""
-        from core.config import save_config
-        save_config(config)
+                config[key] = ""
+                logger.info("Cle API '%s' stockee dans le trousseau systeme.", key)
     return config
 
 
