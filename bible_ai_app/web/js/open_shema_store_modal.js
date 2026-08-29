@@ -40,6 +40,204 @@ const OpenShemaStore = {
     spinner: `<svg class="spin-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`
   },
 
+  communityLogosBooks: [
+    // --- LIVRES EN FRANÇAIS (Logos Free Library & Communauté) ---
+    {
+      id: "pb-giguet-septante",
+      title: "La Bible d'après les Septante (Ancien Testament)",
+      author: "Pierre Giguet",
+      type: "logos_pb",
+      source_type: "logos_pb",
+      language: "fr",
+      language_label: "Français",
+      format: "docx",
+      size_bytes: 4800000,
+      description: "Traduction française intégrale de l'Ancien Testament grec des Septante par Pierre Giguet (1872).",
+      abbreviation: "SEPTANTE",
+      features: ["logos_pb", "septuagint", "french"],
+      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Septante_Giguet.docx",
+      cover_url: ""
+    },
+    {
+      id: "pb-bible-glaire",
+      title: "La Sainte Bible selon la Vulgate avec Notes",
+      author: "Abbé J.-B. Glaire",
+      type: "logos_pb",
+      source_type: "logos_pb",
+      language: "fr",
+      language_label: "Français",
+      format: "docx",
+      size_bytes: 5200000,
+      description: "Traduction de la Vulgate latine en français avec commentaires et notes théologiques.",
+      abbreviation: "GLAIRE",
+      features: ["logos_pb", "vulgate", "french"],
+      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Bible_Glaire.docx",
+      cover_url: ""
+    },
+    {
+      id: "pb-bible-sacy",
+      title: "La Sainte Bible de Lemaistre de Sacy",
+      author: "Louis-Isaac Lemaistre de Sacy",
+      type: "logos_pb",
+      source_type: "logos_pb",
+      language: "fr",
+      language_label: "Français",
+      format: "docx",
+      size_bytes: 5100000,
+      description: "La traduction classique de Port-Royal, monument de la langue française classique.",
+      abbreviation: "SACY",
+      features: ["logos_pb", "french"],
+      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Bible_Sacy.docx",
+      cover_url: ""
+    },
+    {
+      id: "pb-calvin-institution",
+      title: "Institution de la Religion Chrétienne",
+      author: "Jean Calvin",
+      type: "logos_pb",
+      source_type: "logos_pb",
+      language: "fr",
+      language_label: "Français",
+      format: "docx",
+      size_bytes: 3200000,
+      description: "L'ouvrage théologique majeur de la Réforme protestante (4 livres complets).",
+      abbreviation: "CALVIN-IRC",
+      features: ["logos_pb", "theology", "french"],
+      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Calvin_Institution_Religion_Chretienne.docx",
+      cover_url: ""
+    },
+    {
+      id: "pb-darby-etudes",
+      title: "Études sur la Parole de Dieu",
+      author: "John Nelson Darby",
+      type: "logos_pb",
+      source_type: "logos_pb",
+      language: "fr",
+      language_label: "Français",
+      format: "docx",
+      size_bytes: 4100000,
+      description: "Commentaire suivi et méditations sur l'ensemble des 66 livres de la Bible.",
+      abbreviation: "DARBY-ETUDES",
+      features: ["logos_pb", "commentary", "french"],
+      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Darby_Etudes_Parole.docx",
+      cover_url: ""
+    },
+    {
+      id: "pb-chrysostome-homilies",
+      title: "Homélies sur les Épîtres de Saint Paul",
+      author: "Jean Chrysostome",
+      type: "logos_pb",
+      source_type: "logos_pb",
+      language: "fr",
+      language_label: "Français",
+      format: "docx",
+      size_bytes: 3800000,
+      description: "Sermons et explications patristiques verset par verset sur les écrits pauliniens.",
+      abbreviation: "CHRYSOSTOME",
+      features: ["logos_pb", "patristic", "french"],
+      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Chrysostome_Homilies_Paul.docx",
+      cover_url: ""
+    },
+
+    // --- LIVRES EN ANGLAIS (Logos Community Wiki) ---
+    {
+      id: "pb-ante-nicene-fathers",
+      title: "Ante-Nicene Fathers (Vols 1-9)",
+      author: "Alexander Roberts & James Donaldson",
+      type: "logos_pb",
+      source_type: "logos_pb",
+      language: "en",
+      language_label: "Anglais",
+      format: "docx",
+      size_bytes: 8900000,
+      description: "The complete writings of the Early Church Fathers down to A.D. 325 (Justin Martyr, Irenaeus, Clement, Tertullian, Origen...).",
+      abbreviation: "ANF",
+      features: ["logos_pb", "patristic", "english"],
+      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Ante_Nicene_Fathers.docx",
+      cover_url: ""
+    },
+    {
+      id: "pb-matthew-henry-comm",
+      title: "Complete Commentary on the Whole Bible",
+      author: "Matthew Henry",
+      type: "logos_pb",
+      source_type: "logos_pb",
+      language: "en",
+      language_label: "Anglais",
+      format: "docx",
+      size_bytes: 12500000,
+      description: "Genesis to Revelation exhaustive devotional and practical exposition of Scripture.",
+      abbreviation: "MHC",
+      features: ["logos_pb", "commentary", "english"],
+      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Matthew_Henry_Commentary.docx",
+      cover_url: ""
+    },
+    {
+      id: "pb-spurgeon-treasury-david",
+      title: "The Treasury of David (Commentary on Psalms)",
+      author: "Charles H. Spurgeon",
+      type: "logos_pb",
+      source_type: "logos_pb",
+      language: "en",
+      language_label: "Anglais",
+      format: "docx",
+      size_bytes: 7200000,
+      description: "Spurgeon's magnum opus: Psalm by Psalm detailed verse exposition, homiletics, and historical quotations.",
+      abbreviation: "SPURGEON",
+      features: ["logos_pb", "commentary", "english"],
+      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Spurgeon_Treasury_of_David.docx",
+      cover_url: ""
+    },
+    {
+      id: "pb-westminster-standards",
+      title: "The Westminster Standards & Catechisms",
+      author: "Westminster Assembly",
+      type: "logos_pb",
+      source_type: "logos_pb",
+      language: "en",
+      language_label: "Anglais",
+      format: "docx",
+      size_bytes: 1800000,
+      description: "The Confession of Faith, Larger Catechism, Shorter Catechism, and Scriptural proofs (1646).",
+      abbreviation: "WESTMINSTER",
+      features: ["logos_pb", "creeds", "english"],
+      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Westminster_Standards.docx",
+      cover_url: ""
+    },
+    {
+      id: "pb-hodge-systematic-theology",
+      title: "Systematic Theology (3 Volumes)",
+      author: "Charles Hodge",
+      type: "logos_pb",
+      source_type: "logos_pb",
+      language: "en",
+      language_label: "Anglais",
+      format: "docx",
+      size_bytes: 6500000,
+      description: "Classic Princeton Reformed theology covering Theology Proper, Anthropology, Soteriology, and Eschatology.",
+      abbreviation: "HODGE-ST",
+      features: ["logos_pb", "theology", "english"],
+      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Charles_Hodge_Systematic_Theology.docx",
+      cover_url: ""
+    },
+    {
+      id: "pb-bunyan-pilgrim",
+      title: "The Pilgrim's Progress & The Holy War",
+      author: "John Bunyan",
+      type: "logos_pb",
+      source_type: "logos_pb",
+      language: "en",
+      language_label: "Anglais",
+      format: "docx",
+      size_bytes: 2100000,
+      description: "The famous Christian allegory of Christian's journey from the City of Destruction to the Celestial City.",
+      abbreviation: "BUNYAN",
+      features: ["logos_pb", "classic", "english"],
+      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Bunyan_Pilgrims_Progress.docx",
+      cover_url: ""
+    }
+  ],
+
   init() {
     this._createModalDom();
     this.refreshInstalledCache();
@@ -219,13 +417,36 @@ const OpenShemaStore = {
             </div>
 
             <div class="store-filters-row" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-              <div class="store-categories-bar" id="store-categories-bar" style="display: flex; gap: 6px;">
+              <div class="store-categories-bar" id="store-categories-bar" style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
                 <button class="store-cat-pill active" data-cat="all">Tous</button>
                 <button class="store-cat-pill" data-cat="bibles">Bibles</button>
                 <button class="store-cat-pill" data-cat="dictionaries">Dictionnaires</button>
                 <button class="store-cat-pill" data-cat="commentaries">Commentaires</button>
                 <button class="store-cat-pill" data-cat="theology">Théologie</button>
                 <button class="store-cat-pill" data-cat="datasets">Données</button>
+                <button class="store-cat-pill" data-cat="logos_pb" style="display: inline-flex; align-items: center; gap: 5px; border-color: rgba(139, 92, 246, 0.4); color: #c4b5fd;">
+                  <span>📘 Livres Personnels Logos</span>
+                </button>
+                
+                <!-- Infobulle pédagogique sur les origines et formats -->
+                <div style="position: relative; display: inline-flex; align-items: center; margin-left: 4px;">
+                  <button id="btn-store-info-tooltip" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-muted, #94a3b8); font-size: 0.73rem; cursor: pointer; transition: all 0.2s;" title="Comprendre la différence entre Modules Officiels et Livres Personnels">
+                    <span>ℹ️ Formats & Collections</span>
+                  </button>
+                  <div id="store-info-popover-box" style="display: none; position: absolute; top: calc(100% + 8px); left: 0; z-index: 10010; width: 340px; padding: 14px; background: var(--bg-surface-elevated, #0f172a); border: 1px solid var(--border-color, #334155); border-radius: 10px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); font-size: 0.78rem; line-height: 1.45; color: #cbd5e1; backdrop-filter: blur(8px);">
+                    <div style="font-weight: 700; color: #f8fafc; margin-bottom: 8px; font-size: 0.82rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
+                      📚 Distinction des 2 collections gratuites
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                      <div style="color: #60a5fa; font-weight: 700; margin-bottom: 2px;">🌟 Modules Officiels Open Shema</div>
+                      <div style="color: var(--text-muted, #94a3b8);">Ouvrages au format natif (.sqlite / .json) optimisés avec versification précise, renvois Strong et recherche intégrée.</div>
+                    </div>
+                    <div>
+                      <div style="color: #c4b5fd; font-weight: 700; margin-bottom: 2px;">📘 Livres Personnels Logos (PB)</div>
+                      <div style="color: var(--text-muted, #94a3b8);">Ouvrages partagés par la communauté Logos au format Word (.docx). Open Shema les télécharge et les importe automatiquement dans votre bibliothèque de documents.</div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <label class="store-hide-installed-toggle" style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text-muted, #94a3b8); cursor: pointer;" title="Masquer les ouvrages déjà présents dans votre bibliothèque">
@@ -346,6 +567,22 @@ const OpenShemaStore = {
         this.renderCatalog();
       });
     });
+
+    // Infobulle / popover Formats & Collections
+    const infoTooltipBtn = modal.querySelector('#btn-store-info-tooltip');
+    const infoPopoverBox = modal.querySelector('#store-info-popover-box');
+    if (infoTooltipBtn && infoPopoverBox) {
+      infoTooltipBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isShown = infoPopoverBox.style.display === 'block';
+        infoPopoverBox.style.display = isShown ? 'none' : 'block';
+      });
+      document.addEventListener('click', (e) => {
+        if (!infoPopoverBox.contains(e.target) && e.target !== infoTooltipBtn) {
+          infoPopoverBox.style.display = 'none';
+        }
+      });
+    }
 
     const hideCb = modal.querySelector('#store-hide-installed-cb');
     if (hideCb) {
@@ -474,20 +711,31 @@ const OpenShemaStore = {
     const container = document.getElementById('store-cards-container');
     if (!container) return;
 
-    if (!this.catalogData || !this.catalogData.modules) {
+    const officialModules = (this.catalogData && this.catalogData.modules) 
+      ? this.catalogData.modules.map(m => ({ ...m, source_type: 'official' })) 
+      : [];
+    const communityModules = (this.communityLogosBooks || []).map(m => ({ ...m, source_type: 'logos_pb' }));
+    const allModules = [...officialModules, ...communityModules];
+
+    if (allModules.length === 0) {
       container.innerHTML = `
         <div class="store-empty-state">
           <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <p>Impossible de joindre le catalogue distant. Vérifiez votre connexion internet.</p>
+          <p>Impossible de joindre le catalogue. Vérifiez votre connexion internet.</p>
         </div>
       `;
       return;
     }
 
-    const modules = this.catalogData.modules.filter(m => {
+    const filteredModules = allModules.filter(m => {
       if (this.hideInstalled && this._isModuleInstalled(m)) return false;
 
       if (this.activeCategory !== 'all') {
+        if (this.activeCategory === 'logos_pb') {
+          return m.source_type === 'logos_pb';
+        }
+        if (m.source_type === 'logos_pb') return false;
+
         if (this.activeCategory === 'bibles' && m.type !== 'bible') return false;
         if (this.activeCategory === 'dictionaries' && m.type !== 'dictionary') return false;
         if (this.activeCategory === 'commentaries' && m.type !== 'commentary') return false;
@@ -505,8 +753,8 @@ const OpenShemaStore = {
       return true;
     });
 
-    if (modules.length === 0) {
-      const isAllInstalled = this.hideInstalled && this.catalogData.modules.some(m => this._isModuleInstalled(m));
+    if (filteredModules.length === 0) {
+      const isAllInstalled = this.hideInstalled && allModules.some(m => this._isModuleInstalled(m));
       container.innerHTML = `
         <div class="store-empty-state">
           <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -519,26 +767,50 @@ const OpenShemaStore = {
     }
 
     container.innerHTML = '';
+
+    // Bannière explicative pour les Livres Personnels Logos
+    if (this.activeCategory === 'logos_pb') {
+      const banner = document.createElement('div');
+      banner.style.cssText = 'margin-bottom: 16px; padding: 12px 16px; border-radius: 8px; background: rgba(139, 92, 246, 0.12); border: 1px solid rgba(139, 92, 246, 0.3); display: flex; align-items: flex-start; gap: 12px;';
+      banner.innerHTML = `
+        <div style="font-size: 1.3rem; line-height: 1;">📘</div>
+        <div style="flex: 1; font-size: 0.82rem; color: #cbd5e1; line-height: 1.45;">
+          <div style="font-weight: 700; color: #f8fafc; font-size: 0.88rem; margin-bottom: 2px;">
+            Répertoire Communautaire Logos (Personal Books)
+          </div>
+          Ces ouvrages au format Word (<strong>.docx</strong>) proviennent du répertoire libre et communautaire de Logos. En cliquant sur <strong>Importer</strong>, Open Shema télécharge le fichier et l'indexe automatiquement dans votre bibliothèque de documents.
+        </div>
+      `;
+      container.appendChild(banner);
+    }
+
     const grid = document.createElement('div');
     grid.className = 'store-modules-grid';
 
-    modules.forEach(m => {
+    filteredModules.forEach(m => {
       const isInstalled = this._isModuleInstalled(m);
       const isDownloading = !!this.isDownloading[m.id];
       const card = document.createElement('div');
       card.className = `store-card ${isInstalled ? 'installed' : ''}`;
 
-      const iconSvg = this.svgIcons[m.type] || this.svgIcons.bible;
-      const typeLabel = m.type === 'bible' ? 'Bible' : (m.type === 'dictionary' ? 'Dictionnaire' : (m.type === 'commentary' ? 'Commentaire' : (m.type === 'theology' ? 'Théologie' : 'Données')));
+      const isLogosPb = m.source_type === 'logos_pb';
+      const iconSvg = isLogosPb ? '📘' : (this.svgIcons[m.type] || this.svgIcons.bible);
+      const typeLabel = isLogosPb 
+        ? 'Logos PB' 
+        : (m.type === 'bible' ? 'Bible' : (m.type === 'dictionary' ? 'Dictionnaire' : (m.type === 'commentary' ? 'Commentaire' : (m.type === 'theology' ? 'Théologie' : 'Données'))));
+      
       const hasStrong = (m.features || []).includes('strong') || (m.features || []).includes('strong_ready');
+      const langBadge = m.language ? `<span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: rgba(255, 255, 255, 0.08); color: #e2e8f0; font-weight: 600;">${m.language === 'fr' ? '🇫🇷 FR' : '🇬🇧 EN'}</span>` : '';
 
       card.innerHTML = `
         <div class="store-card-header">
-          <div class="store-card-type-tag">
-            <span class="store-card-type-icon">${iconSvg}</span>
+          <div class="store-card-type-tag" style="${isLogosPb ? 'background: rgba(139, 92, 246, 0.18); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.35);' : ''}">
+            <span class="store-card-type-icon">${typeof iconSvg === 'string' && iconSvg.startsWith('<') ? iconSvg : iconSvg}</span>
             <span>${typeLabel}</span>
           </div>
+          ${langBadge}
           ${hasStrong ? `<span class="store-badge-strong" title="Comprend les codes Strong Hébreu/Grec">${this.svgIcons.sparkle} Strong</span>` : ''}
+          ${isLogosPb ? `<span class="store-badge-size" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3);">DOCX</span>` : ''}
           <span class="store-badge-size">${this._formatBytes(m.size_bytes)}</span>
         </div>
 
@@ -561,17 +833,17 @@ const OpenShemaStore = {
           ${isInstalled ? `
             <button class="btn-store-action installed" disabled>
               ${this.svgIcons.check}
-              <span>Installé</span>
+              <span>${isLogosPb ? 'Importé' : 'Installé'}</span>
             </button>
           ` : (isDownloading ? `
             <button class="btn-store-action downloading" disabled>
               <div class="store-spinner"></div>
-              <span>Téléchargement...</span>
+              <span>${isLogosPb ? 'Importation...' : 'Téléchargement...'}</span>
             </button>
           ` : `
             <button class="btn-store-action download" data-id="${m.id}">
               ${this.svgIcons.download}
-              <span>Télécharger</span>
+              <span>${isLogosPb ? 'Importer DOCX' : 'Télécharger'}</span>
             </button>
           `)}
         </div>

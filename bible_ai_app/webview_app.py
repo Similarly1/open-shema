@@ -2675,6 +2675,12 @@ class BibleAppApi:
                 os.makedirs(target_dir, exist_ok=True)
                 file_name = f"{m_id.replace('-', '_')}.sqlite" if m_format == "sqlite" else f"{m_id}.json"
                 target_path = os.path.join(target_dir, file_name)
+            elif m_type in ["logos_pb", "personal_book", "docx"]:
+                target_dir = os.path.join(current_dir, "data", "personal_books")
+                os.makedirs(target_dir, exist_ok=True)
+                ext = ".zip" if download_url.endswith(".zip") else ".docx"
+                file_name = f"{m_id}{ext}"
+                target_path = os.path.join(target_dir, file_name)
             else:
                 target_dir = os.path.join(current_dir, "data")
                 file_name = os.path.basename(download_url.split("?")[0])
