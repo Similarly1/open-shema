@@ -16,6 +16,7 @@ const OpenShemaStore = {
   gutenbergBooks: [],
   installedIds: new Set(),
   installedCodes: new Set(),
+  localLibraryBooks: [],
   
   // État de recherche unifiée
   activeCategory: 'all', // 'all' | 'open_shema' | 'public_domain' | 'bookstores'
@@ -95,6 +96,7 @@ const OpenShemaStore = {
     try {
       this.installedIds.clear();
       this.installedCodes.clear();
+      this.localLibraryBooks = [];
 
       try {
         const backendInstalled = await API.call('get_installed_catalog_module_ids');
@@ -115,6 +117,13 @@ const OpenShemaStore = {
           if (b.name) this.installedIds.add(b.name.toLowerCase());
           if (b.version_code) this.installedCodes.add(b.version_code.toUpperCase());
           if (b.folder_name) this.installedIds.add(b.folder_name.toLowerCase());
+          this.localLibraryBooks.push({
+            title: b.title || b.name,
+            author: b.author || 'Bible',
+            name: b.name,
+            year: b.year || '',
+            type: 'Bible'
+          });
         });
       }
 
@@ -124,7 +133,33 @@ const OpenShemaStore = {
         if (b.folder_name) this.installedIds.add(b.folder_name.toLowerCase());
         if (b.version_code) this.installedCodes.add(b.version_code.toUpperCase());
         if (b.dict_id) this.installedIds.add(b.dict_id.toLowerCase());
+        this.localLibraryBooks.push({
+          title: b.title || b.name,
+          author: b.author || '',
+          name: b.name || b.dict_id,
+          year: b.year || '',
+          type: b.type || 'Livre'
+        });
       });
+
+      // Charger également les ouvrages de théologie supplémentaires si disponibles
+      try {
+        const theolBooks = await API.call('get_theology_books') || [];
+        theolBooks.forEach(tb => {
+          if (!this.localLibraryBooks.some(x => x.name === tb.name || x.title === tb.title)) {
+            this.localLibraryBooks.push({
+              title: tb.title || tb.name,
+              author: tb.author || '',
+              name: tb.name,
+              year: tb.year || '',
+              type: 'Théologie'
+            });
+          }
+        });
+      } catch (e) {
+        // Optionnel
+      }
+
     } catch (err) {
       console.warn('Erreur rafraîchissement cache installés:', err);
     }
@@ -391,6 +426,7 @@ const OpenShemaStore = {
                 <option value="all" style="background-color: #1e293b; color: #f8fafc;">Toutes les langues</option>
                 <option value="fr" style="background-color: #1e293b; color: #f8fafc;">Français (FR)</option>
                 <option value="en" style="background-color: #1e293b; color: #f8fafc;">Anglais (EN)</option>
+                <option value="other" style="background-color: #1e293b; color: #f8fafc;">Autres langues</option>
               </select>
 
               <label class="store-hide-installed-toggle" style="display: flex; align-items: center; gap: 6px; font-size: 0.80rem; color: #cbd5e1; cursor: pointer;" title="Masquer les ouvrages déjà installés">
@@ -604,18 +640,164 @@ const OpenShemaStore = {
     this._updateFacetCounts();
   },
 
+  _computeBookSimilarity(m) {
+    if (!m || !this.localLibraryBooks || this.localLibraryBooks.length === 0) return null;
+
+    const normalize = (str) => {
+      if (!str) return '';
+      return String(str)
+        .toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^\w\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    };
+
+    const stopWords = new Set([
+      'les', 'des', 'pour', 'avec', 'dans', 'sur', 'par', 'une', 'qui', 'que', 'son', 'ses', 'aux',
+      'the', 'and', 'for', 'with', 'from', 'tome', 'vol', 'volume', 'livre', 'book', 'traduction',
+      'traduit', 'trad', 'edition', 'logos', 'personal', 'public', 'domain', 'domaine', 'community',
+      'version', 'dynamique', 'collection', 'guide', 'etude', 'commentaires', 'commentaire'
+    ]);
+
+    const getTokens = (str) => {
+      return normalize(str)
+        .split(/\s+/)
+        .filter(w => w.length >= 3 && !stopWords.has(w));
+    };
+
+    const extractYear = (str) => {
+      const match = String(str || '').match(/\b(1[5-9]\d{2}|20[0-2]\d)\b/);
+      return match ? match[1] : null;
+    };
+
+    const rawCatTitle = m.title || '';
+    const rawCatAuthor = m.author || '';
+    const rawCatDesc = m.description || '';
+
+    const catAllTokens = new Set([
+      ...getTokens(rawCatTitle),
+      ...getTokens(rawCatAuthor),
+      ...getTokens(rawCatDesc)
+    ]);
+    const catYear = extractYear(rawCatTitle) || extractYear(rawCatDesc) || (m.year ? String(m.year) : null);
+
+    let bestMatch = null;
+    let maxScore = 0;
+
+    for (const local of this.localLibraryBooks) {
+      const rawLocTitle = local.title || local.name || '';
+      const rawLocAuthor = local.author || '';
+      const locYear = extractYear(local.year) || extractYear(rawLocTitle);
+
+      const locTitleTokens = getTokens(rawLocTitle);
+      const locAuthorTokens = getTokens(rawLocAuthor);
+
+      if (locTitleTokens.length === 0) continue;
+
+      // 1. Couverture des mots-clés du Titre local dans l'ensemble des termes du catalogue
+      let titleHits = 0;
+      locTitleTokens.forEach(t => {
+        if (catAllTokens.has(t)) {
+          titleHits++;
+        } else {
+          for (const ct of catAllTokens) {
+            if (ct.startsWith(t) || t.startsWith(ct)) {
+              titleHits += 0.9;
+              break;
+            }
+          }
+        }
+      });
+      const titleCoverage = Math.min(1, titleHits / locTitleTokens.length);
+
+      // 2. Couverture de l'Auteur si disponible
+      let authorCoverage = 0;
+      let hasAuthorInfo = false;
+      if (locAuthorTokens.length > 0 && !locAuthorTokens.every(t => ['bible', 'collectif', 'anonyme'].includes(t))) {
+        hasAuthorInfo = true;
+        let authorHits = 0;
+        locAuthorTokens.forEach(t => {
+          if (catAllTokens.has(t)) {
+            authorHits++;
+          } else {
+            for (const ct of catAllTokens) {
+              if (ct.startsWith(t) || t.startsWith(ct)) {
+                authorHits += 0.9;
+                break;
+              }
+            }
+          }
+        });
+        authorCoverage = Math.min(1, authorHits / locAuthorTokens.length);
+      }
+
+      // 3. Calcul du score combiné
+      let score = 0;
+      if (hasAuthorInfo && authorCoverage > 0.4) {
+        score = (titleCoverage * 0.65) + (authorCoverage * 0.35);
+      } else {
+        score = titleCoverage;
+      }
+
+      // 4. Ajustement Année
+      if (catYear && locYear) {
+        if (catYear === locYear) {
+          score = Math.min(1, score + 0.05);
+        } else {
+          score = Math.max(0, score - 0.10);
+        }
+      }
+
+      const scorePercent = Math.round(score * 100);
+
+      // Bonus si très forte concordance
+      let finalScore = scorePercent;
+      if (titleCoverage >= 0.85 && (!hasAuthorInfo || authorCoverage >= 0.75)) {
+        finalScore = Math.max(finalScore, 95);
+      } else if (titleCoverage >= 0.75) {
+        finalScore = Math.max(finalScore, 80);
+      }
+
+      if (finalScore > maxScore) {
+        maxScore = finalScore;
+        bestMatch = {
+          score: finalScore,
+          bookTitle: rawLocTitle,
+          bookAuthor: rawLocAuthor,
+          bookType: local.type || 'Livre'
+        };
+      }
+    }
+
+    if (maxScore >= 60) {
+      return bestMatch;
+    }
+    return null;
+  },
+
   _isModuleInstalled(m) {
     if (!m) return false;
     const id = String(m.id || '').toLowerCase();
     const cleanId = id.replace(/^(bible|dict|theology|comm)-/, '');
     const code = String(m.abbreviation || m.version_code || '').toUpperCase();
-    return this.installedIds.has(id) || this.installedIds.has(cleanId) || (code && this.installedCodes.has(code));
+    if (this.installedIds.has(id) || this.installedIds.has(cleanId) || (code && this.installedCodes.has(code))) {
+      return true;
+    }
+    const sim = this._computeBookSimilarity(m);
+    if (sim && sim.score >= 80) {
+      return true;
+    }
+    return false;
   },
 
   _matchesLang(m) {
     if (!m) return false;
     if (this.activeLanguage === 'all') return true;
     const l = (m.language || 'fr').toLowerCase().trim();
+    if (this.activeLanguage === 'other') {
+      return !l.startsWith('fr') && !l.startsWith('en');
+    }
     return l.startsWith(this.activeLanguage.toLowerCase());
   },
 
@@ -837,6 +1019,16 @@ const OpenShemaStore = {
     const cleanAuthor = this._decodeEntities(m.author || 'Open Shema Data');
     const cleanDesc = this._decodeEntities(m.description || 'Module officiel calibré et optimisé nativement.');
 
+    const sim = this._computeBookSimilarity(m);
+    let simBadge = '';
+    if (sim) {
+      if (sim.score >= 80) {
+        simBadge = `<span style="font-size: 0.70rem; padding: 2px 7px; border-radius: 4px; background: rgba(16, 185, 129, 0.22); color: #34d399; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.45); display: inline-flex; align-items: center; gap: 3px;" title="${sim.score}% de ressemblance avec « ${this._escapeHtml(sim.bookTitle)} » dans votre bibliothèque">${this.svgIcons.check} ${sim.score}% dans votre biblio</span>`;
+      } else if (sim.score >= 60) {
+        simBadge = `<span style="font-size: 0.70rem; padding: 2px 7px; border-radius: 4px; background: rgba(245, 158, 11, 0.22); color: #fbbf24; font-weight: 800; border: 1px solid rgba(245, 158, 11, 0.45); display: inline-flex; align-items: center; gap: 3px;" title="${sim.score}% de ressemblance avec « ${this._escapeHtml(sim.bookTitle)} » dans votre bibliothèque">⚠ ${sim.score}% similaire</span>`;
+      }
+    }
+
     card.innerHTML = `
       <div style="display: flex; align-items: center; justify-content: space-between;">
         <div style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.74rem; font-weight: 700; color: #34d399; background: rgba(16, 185, 129, 0.2); padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.35);">
@@ -844,6 +1036,7 @@ const OpenShemaStore = {
           <span>${typeLabel}</span>
         </div>
         <div style="display: flex; align-items: center; gap: 5px;">
+          ${simBadge}
           ${langBadge}
           ${hasStrong ? `<span style="font-size: 0.70rem; padding: 2px 7px; border-radius: 4px; background: rgba(245, 158, 11, 0.2); color: #fbbf24; font-weight: 800; border: 1px solid rgba(245, 158, 11, 0.35); display: inline-flex; align-items: center; gap: 3px;">${this.svgIcons.sparkle} Strong</span>` : ''}
         </div>
@@ -899,6 +1092,16 @@ const OpenShemaStore = {
     const cleanAuthor = this._decodeEntities(m.author || 'Domaine Public');
     const cleanDesc = this._decodeEntities(m.description || 'Texte libre de droits à télécharger.');
 
+    const sim = this._computeBookSimilarity(m);
+    let simBadge = '';
+    if (sim) {
+      if (sim.score >= 80) {
+        simBadge = `<span style="font-size: 0.70rem; padding: 2px 7px; border-radius: 4px; background: rgba(16, 185, 129, 0.22); color: #34d399; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.45); display: inline-flex; align-items: center; gap: 3px;" title="${sim.score}% de ressemblance avec « ${this._escapeHtml(sim.bookTitle)} » dans votre bibliothèque">${this.svgIcons.check} ${sim.score}% dans votre biblio</span>`;
+      } else if (sim.score >= 60) {
+        simBadge = `<span style="font-size: 0.70rem; padding: 2px 7px; border-radius: 4px; background: rgba(245, 158, 11, 0.22); color: #fbbf24; font-weight: 800; border: 1px solid rgba(245, 158, 11, 0.45); display: inline-flex; align-items: center; gap: 3px;" title="${sim.score}% de ressemblance avec « ${this._escapeHtml(sim.bookTitle)} » dans votre bibliothèque">⚠ ${sim.score}% similaire</span>`;
+      }
+    }
+
     const isGutenberg = (m.badge_label === 'Gutenberg' || m.source === 'Project Gutenberg');
     const badgeBg = isGutenberg ? 'rgba(59, 130, 246, 0.2)' : 'rgba(139, 92, 246, 0.2)';
     const badgeBorder = isGutenberg ? 'rgba(59, 130, 246, 0.35)' : 'rgba(139, 92, 246, 0.35)';
@@ -910,7 +1113,8 @@ const OpenShemaStore = {
           <span>${this.svgIcons.book}</span>
           <span>${this._escapeHtml(m.badge_label || 'Domaine Public')}</span>
         </div>
-        <div style="display: flex; align-items: center; gap: 5px;">
+        <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap; justify-content: flex-end;">
+          ${simBadge}
           ${formatBadge}
           ${langBadge}
         </div>
@@ -961,6 +1165,16 @@ const OpenShemaStore = {
     const cleanTitle = this._decodeEntities(item.title);
     const cleanAuthors = this._decodeEntities(item.authors || '');
 
+    const sim = this._computeBookSimilarity({ title: cleanTitle, author: cleanAuthors, description: '' });
+    let simBadge = '';
+    if (sim) {
+      if (sim.score >= 80) {
+        simBadge = `<span style="font-size: 0.66rem; padding: 1px 5px; border-radius: 3px; background: rgba(16, 185, 129, 0.22); color: #34d399; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.45);" title="${sim.score}% de ressemblance avec « ${this._escapeHtml(sim.bookTitle)} » dans votre bibliothèque">${this.svgIcons.check} ${sim.score}% possédé</span>`;
+      } else if (sim.score >= 60) {
+        simBadge = `<span style="font-size: 0.66rem; padding: 1px 5px; border-radius: 3px; background: rgba(245, 158, 11, 0.22); color: #fbbf24; font-weight: 800; border: 1px solid rgba(245, 158, 11, 0.45);" title="${sim.score}% de ressemblance avec « ${this._escapeHtml(sim.bookTitle)} »">⚠ ${sim.score}% similaire</span>`;
+      }
+    }
+
     card.innerHTML = `
       <div style="display: flex; gap: 10px; min-width: 0;">
         <div style="width: 46px; height: 64px; flex-shrink: 0; border-radius: 4px; background: rgba(255,255,255,0.06); overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1);">
@@ -968,7 +1182,7 @@ const OpenShemaStore = {
         </div>
 
         <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; flex-wrap: wrap; gap: 4px;">
             ${isMultiple ? `
               <span style="font-size: 0.68rem; font-weight: 800; padding: 2px 6px; border-radius: 3px; background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35);">
                 ${item.offers_count} offres
@@ -978,6 +1192,7 @@ const OpenShemaStore = {
                 ${this._escapeHtml(item.best_store)}
               </span>
             `}
+            ${simBadge}
           </div>
 
           <h4 style="margin: 0 0 2px 0; font-size: 0.88rem; font-weight: 700; color: #ffffff; line-height: 1.25; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;" title="${this._escapeHtml(cleanTitle)}">
@@ -1156,7 +1371,7 @@ const OpenShemaStore = {
               <span style="font-size: 0.70rem; padding: 2px 7px; border-radius: 4px; background: rgba(16, 185, 129, 0.25); color: #34d399; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.4);">Natif .sqlite / .json</span>
             </div>
             <p style="margin: 0; font-size: 0.82rem; color: #cbd5e1; line-height: 1.45;">
-              Ouvrages officiels vérifiés et calibrés nativement : versification précise, renvois Strong grecs et hébreux, recherche instantanée et intégration directe dans la lecture biblique.
+              Ouvrages officiels vérifiés et calibrés nativement : versification précise, renvois Strong grecs et hébreux, recherche instantanée et intégration directe dans la lecture biblique. Pour les ouvrages anciens : polissage et amélioration du texte (français moderne par ex.) ainsi que traductions inédites, le tout restant 100% libre et gratuit.
             </p>
           </div>
 
@@ -1170,7 +1385,7 @@ const OpenShemaStore = {
               <span style="font-size: 0.70rem; padding: 2px 7px; border-radius: 4px; background: rgba(59, 130, 246, 0.25); color: #93c5fd; font-weight: 800; border: 1px solid rgba(59, 130, 246, 0.4);">EPUB & Word .docx</span>
             </div>
             <p style="margin: 0; font-size: 0.82rem; color: #cbd5e1; line-height: 1.45;">
-              Centaines de classiques chrétiens historiques (Project Gutenberg) et livres de la communauté Logos Bible Software téléchargeables et importables gratuitement dans votre bibliothèque de documents.
+              Centaines de classiques chrétiens historiques (Project Gutenberg) et livres de la communauté Logos Bible Software (textes originaux, éditions révisées et traductions du domaine public) téléchargeables et importables gratuitement dans votre bibliothèque.
             </p>
           </div>
 
