@@ -37,6 +37,10 @@ const OpenShemaStore = {
     store: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><circle cx="12" cy="12" r="2"/></svg>`,
     external: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`,
     digital: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="m14 9 3 3-3 3"/></svg>`,
+    book: `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>`,
+    info: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
+    award: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>`,
+    scale: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>`,
     spinner: `<svg class="spin-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`
   },
 
@@ -291,10 +295,21 @@ const OpenShemaStore = {
       const response = await fetch(this.catalogUrl, { cache: 'no-cache' });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       this.catalogData = await response.json();
-      return this.catalogData;
     } catch (err) {
       console.error('Erreur chargement catalogue distant:', err);
-      return null;
+    }
+    await this.fetchCommunityBooks();
+    return this.catalogData;
+  },
+
+  async fetchCommunityBooks() {
+    try {
+      const books = await API.call('get_community_logos_books');
+      if (Array.isArray(books) && books.length > 0) {
+        this.communityLogosBooks = books;
+      }
+    } catch (e) {
+      console.warn('Erreur chargement livres communautaires Logos:', e);
     }
   },
 
@@ -424,25 +439,34 @@ const OpenShemaStore = {
                 <button class="store-cat-pill" data-cat="commentaries">Commentaires</button>
                 <button class="store-cat-pill" data-cat="theology">Théologie</button>
                 <button class="store-cat-pill" data-cat="datasets">Données</button>
-                <button class="store-cat-pill" data-cat="logos_pb" style="display: inline-flex; align-items: center; gap: 5px; border-color: rgba(139, 92, 246, 0.4); color: #c4b5fd;">
-                  <span>📘 Livres Personnels Logos</span>
+                <button class="store-cat-pill" data-cat="logos_pb" style="display: inline-flex; align-items: center; gap: 6px; border-color: rgba(139, 92, 246, 0.4); color: #c4b5fd;">
+                  ${this.svgIcons.book}
+                  <span>Livres Personnels Logos</span>
                 </button>
                 
-                <!-- Infobulle pédagogique sur les origines et formats -->
+                <!-- Infobulle pédagogique sur les origines et formats (100% SVG) -->
                 <div style="position: relative; display: inline-flex; align-items: center; margin-left: 4px;">
-                  <button id="btn-store-info-tooltip" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-muted, #94a3b8); font-size: 0.73rem; cursor: pointer; transition: all 0.2s;" title="Comprendre la différence entre Modules Officiels et Livres Personnels">
-                    <span>ℹ️ Formats & Collections</span>
+                  <button id="btn-store-info-tooltip" style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 6px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-muted, #94a3b8); font-size: 0.73rem; cursor: pointer; transition: all 0.2s;" title="Comprendre la différence entre Modules Officiels et Livres Personnels">
+                    ${this.svgIcons.info}
+                    <span>Formats & Collections</span>
                   </button>
                   <div id="store-info-popover-box" style="display: none; position: absolute; top: calc(100% + 8px); left: 0; z-index: 10010; width: 340px; padding: 14px; background: var(--bg-surface-elevated, #0f172a); border: 1px solid var(--border-color, #334155); border-radius: 10px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); font-size: 0.78rem; line-height: 1.45; color: #cbd5e1; backdrop-filter: blur(8px);">
-                    <div style="font-weight: 700; color: #f8fafc; margin-bottom: 8px; font-size: 0.82rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
-                      📚 Distinction des 2 collections gratuites
+                    <div style="font-weight: 700; color: #f8fafc; margin-bottom: 8px; font-size: 0.82rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                      ${this.svgIcons.info}
+                      <span>Distinction des 2 collections gratuites</span>
                     </div>
                     <div style="margin-bottom: 8px;">
-                      <div style="color: #60a5fa; font-weight: 700; margin-bottom: 2px;">🌟 Modules Officiels Open Shema</div>
+                      <div style="color: #60a5fa; font-weight: 700; margin-bottom: 2px; display: flex; align-items: center; gap: 5px;">
+                        ${this.svgIcons.sparkle}
+                        <span>Modules Officiels Open Shema</span>
+                      </div>
                       <div style="color: var(--text-muted, #94a3b8);">Ouvrages au format natif (.sqlite / .json) optimisés avec versification précise, renvois Strong et recherche intégrée.</div>
                     </div>
                     <div>
-                      <div style="color: #c4b5fd; font-weight: 700; margin-bottom: 2px;">📘 Livres Personnels Logos (PB)</div>
+                      <div style="color: #c4b5fd; font-weight: 700; margin-bottom: 2px; display: flex; align-items: center; gap: 5px;">
+                        ${this.svgIcons.book}
+                        <span>Livres Personnels Logos (PB)</span>
+                      </div>
                       <div style="color: var(--text-muted, #94a3b8);">Ouvrages partagés par la communauté Logos au format Word (.docx). Open Shema les télécharge et les importe automatiquement dans votre bibliothèque de documents.</div>
                     </div>
                   </div>
@@ -717,6 +741,11 @@ const OpenShemaStore = {
     const communityModules = (this.communityLogosBooks || []).map(m => ({ ...m, source_type: 'logos_pb' }));
     const allModules = [...officialModules, ...communityModules];
 
+    const pbPill = document.querySelector('.store-cat-pill[data-cat="logos_pb"]');
+    if (pbPill && communityModules.length > 0) {
+      pbPill.innerHTML = `${this.svgIcons.book} <span>Livres Personnels Logos (${communityModules.length})</span>`;
+    }
+
     if (allModules.length === 0) {
       container.innerHTML = `
         <div class="store-empty-state">
@@ -768,12 +797,14 @@ const OpenShemaStore = {
 
     container.innerHTML = '';
 
-    // Bannière explicative pour les Livres Personnels Logos
+    // Bannière explicative pour les Livres Personnels Logos (100% SVG)
     if (this.activeCategory === 'logos_pb') {
       const banner = document.createElement('div');
       banner.style.cssText = 'margin-bottom: 16px; padding: 12px 16px; border-radius: 8px; background: rgba(139, 92, 246, 0.12); border: 1px solid rgba(139, 92, 246, 0.3); display: flex; align-items: flex-start; gap: 12px;';
       banner.innerHTML = `
-        <div style="font-size: 1.3rem; line-height: 1;">📘</div>
+        <div style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; background: rgba(139, 92, 246, 0.2); color: #c4b5fd; flex-shrink: 0;">
+          ${this.svgIcons.book}
+        </div>
         <div style="flex: 1; font-size: 0.82rem; color: #cbd5e1; line-height: 1.45;">
           <div style="font-weight: 700; color: #f8fafc; font-size: 0.88rem; margin-bottom: 2px;">
             Répertoire Communautaire Logos (Personal Books)
@@ -794,18 +825,18 @@ const OpenShemaStore = {
       card.className = `store-card ${isInstalled ? 'installed' : ''}`;
 
       const isLogosPb = m.source_type === 'logos_pb';
-      const iconSvg = isLogosPb ? '📘' : (this.svgIcons[m.type] || this.svgIcons.bible);
+      const iconSvg = isLogosPb ? this.svgIcons.book : (this.svgIcons[m.type] || this.svgIcons.bible);
       const typeLabel = isLogosPb 
         ? 'Logos PB' 
         : (m.type === 'bible' ? 'Bible' : (m.type === 'dictionary' ? 'Dictionnaire' : (m.type === 'commentary' ? 'Commentaire' : (m.type === 'theology' ? 'Théologie' : 'Données'))));
       
       const hasStrong = (m.features || []).includes('strong') || (m.features || []).includes('strong_ready');
-      const langBadge = m.language ? `<span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: rgba(255, 255, 255, 0.08); color: #e2e8f0; font-weight: 600;">${m.language === 'fr' ? '🇫🇷 FR' : '🇬🇧 EN'}</span>` : '';
+      const langBadge = m.language ? `<span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: rgba(255, 255, 255, 0.08); color: #e2e8f0; font-weight: 700; letter-spacing: 0.03em;">${m.language.toUpperCase()}</span>` : '';
 
       card.innerHTML = `
         <div class="store-card-header">
           <div class="store-card-type-tag" style="${isLogosPb ? 'background: rgba(139, 92, 246, 0.18); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.35);' : ''}">
-            <span class="store-card-type-icon">${typeof iconSvg === 'string' && iconSvg.startsWith('<') ? iconSvg : iconSvg}</span>
+            <span class="store-card-type-icon">${iconSvg}</span>
             <span>${typeLabel}</span>
           </div>
           ${langBadge}
@@ -1006,7 +1037,8 @@ const OpenShemaStore = {
 
               ${isMultiple ? `
                 <button class="btn-open-compare-modal" data-item-idx="${itemIdx}" style="display: flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 5px; background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
-                  <span>Comparer (${item.offers_count} prix) ⚖️</span>
+                  <span>Comparer (${item.offers_count} prix)</span>
+                  ${this.svgIcons.scale}
                 </button>
               ` : `
                 <button class="btn-buy-ebook-link" data-url="${this._escapeHtml(item.direct_url)}" style="display: flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 5px; background: #2563eb; color: #fff; border: none; font-size: 0.78rem; font-weight: 500; cursor: pointer;" title="Ouvrir la page de la librairie">
@@ -1102,7 +1134,7 @@ const OpenShemaStore = {
               <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0;">
                 <div style="display: flex; align-items: center; gap: 8px;">
                   <span style="font-size: 0.9rem; font-weight: 700; color: #f8fafc;">${this._escapeHtml(off.store_badge)}</span>
-                  ${idx === 0 ? `<span style="font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background: rgba(16, 185, 129, 0.2); color: #10b981; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.35);">🏆 Meilleur prix</span>` : ''}
+                  ${idx === 0 ? `<span style="font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background: rgba(16, 185, 129, 0.2); color: #10b981; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.35); display: inline-flex; align-items: center; gap: 4px;">${this.svgIcons.award} <span>Meilleur prix</span></span>` : ''}
                 </div>
                 <div style="font-size: 0.75rem; color: var(--text-muted, #94a3b8); display: flex; align-items: center; gap: 4px;">
                   ${this.svgIcons.digital} <span>${this._escapeHtml(off.format)}</span>
