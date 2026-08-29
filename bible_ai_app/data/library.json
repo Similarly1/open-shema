@@ -945,22 +945,5 @@
     "embedding_model": "study_library",
     "active": true,
     "has_strongs": false
-  },
-  "LIDJC": {
-    "name": "LIDJC",
-    "title": "L'Imitation de Jésus-Christ",
-    "author": "Thomas à Kempis (trad. Lamennais)",
-    "description": "Guide de vie spirituelle et de dévotion chrétienne le plus lu au monde après la Bible.",
-    "year": "2004",
-    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\LIDJC.png",
-    "type": "Théologie",
-    "corpus_scope": "GLOBAL",
-    "source_type": "general",
-    "book_code": null,
-    "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
-    "active": true,
-    "chapters_count": 3,
-    "chunks_count": 81,
-    "file_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\temp_imports\\LImitation_de_Jésus-Christ.epub"
   }
 }

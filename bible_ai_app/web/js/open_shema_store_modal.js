@@ -574,7 +574,15 @@ const OpenShemaStore = {
   },
 
   _updateFacetCounts() {
-    const countAll = (this.unifiedResults.open_shema.length) + (this.unifiedResults.public_domain.length) + (this.unifiedResults.bookstores.length);
+    const filterItem = (m) => {
+      if (this.hideInstalled && this._isModuleInstalled(m)) return false;
+      return this._matchesLang(m);
+    };
+
+    const countOpenShema = (this.unifiedResults.open_shema || []).filter(filterItem).length;
+    const countPublicDomain = (this.unifiedResults.public_domain || []).filter(filterItem).length;
+    const countBookstores = (this.unifiedResults.bookstores || []).filter(m => this._matchesLang(m)).length;
+    const countAll = countOpenShema + countPublicDomain + countBookstores;
     
     const setTxt = (id, count) => {
       const el = document.getElementById(id);
@@ -582,9 +590,9 @@ const OpenShemaStore = {
     };
 
     setTxt('count-facet-all', countAll);
-    setTxt('count-facet-openshema', this.unifiedResults.open_shema.length);
-    setTxt('count-facet-publicdomain', this.unifiedResults.public_domain.length);
-    setTxt('count-facet-bookstores', this.unifiedResults.bookstores.length);
+    setTxt('count-facet-openshema', countOpenShema);
+    setTxt('count-facet-publicdomain', countPublicDomain);
+    setTxt('count-facet-bookstores', countBookstores);
   },
 
   _updateCategoryPills() {
@@ -605,9 +613,10 @@ const OpenShemaStore = {
   },
 
   _matchesLang(m) {
+    if (!m) return false;
     if (this.activeLanguage === 'all') return true;
-    const l = (m.language || 'fr').toLowerCase();
-    return l.startsWith(this.activeLanguage);
+    const l = (m.language || 'fr').toLowerCase().trim();
+    return l.startsWith(this.activeLanguage.toLowerCase());
   },
 
   renderUnifiedHub() {
@@ -635,6 +644,39 @@ const OpenShemaStore = {
       : (this.activeCategory === 'open_shema' ? openShemaList.length : (this.activeCategory === 'public_domain' ? publicDomainList.length : bookstoresList.length));
 
     if (totalVisible === 0) {
+      const allCountOtherLangs = (this.unifiedResults.open_shema.length) + (this.unifiedResults.public_domain.length) + (this.unifiedResults.bookstores.length);
+      const hasOtherLangs = this.activeLanguage !== 'all' && allCountOtherLangs > 0;
+      const hasOtherCategories = (openShemaList.length + publicDomainList.length + bookstoresList.length) > 0;
+
+      let suggestionHtml = '';
+      if (hasOtherCategories && this.activeCategory !== 'all') {
+        suggestionHtml = `
+          <div style="margin-top: 18px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
+            ${openShemaList.length > 0 ? `
+              <button class="btn-smart-switch-cat" data-cat="open_shema" style="padding: 7px 14px; border-radius: 6px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; font-size: 0.82rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                ${this.svgIcons.sparkle} Voir ${openShemaList.length} résultat(s) dans ✦ Open Shema
+              </button>
+            ` : ''}
+            ${bookstoresList.length > 0 ? `
+              <button class="btn-smart-switch-cat" data-cat="bookstores" style="padding: 7px 14px; border-radius: 6px; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.4); color: #c084fc; font-size: 0.82rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                ${this.svgIcons.store} Voir ${bookstoresList.length} e-book(s) dans 🛒 Librairies
+              </button>
+            ` : ''}
+            <button class="btn-smart-switch-cat" data-cat="all" style="padding: 7px 14px; border-radius: 6px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.18); color: #ffffff; font-size: 0.82rem; font-weight: 700; cursor: pointer;">
+              Afficher Tous les résultats
+            </button>
+          </div>
+        `;
+      } else if (hasOtherLangs) {
+        suggestionHtml = `
+          <div style="margin-top: 18px; display: flex; justify-content: center; gap: 8px;">
+            <button id="btn-smart-switch-all-langs" style="padding: 7px 16px; border-radius: 6px; background: #2563eb; border: none; color: #ffffff; font-size: 0.84rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+              Afficher toutes les langues (${allCountOtherLangs} ouvrages disponibles)
+            </button>
+          </div>
+        `;
+      }
+
       container.innerHTML = `
         <div class="store-empty-state" style="text-align: center; padding: 60px 20px; color: #cbd5e1;">
           <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.8" style="margin-bottom: 14px; opacity: 0.7; color: #94a3b8;">
@@ -642,10 +684,30 @@ const OpenShemaStore = {
           </svg>
           <h4 style="margin: 0 0 6px 0; color: #ffffff; font-size: 1.1rem; font-weight: 700;">Aucun résultat pour cette sélection</h4>
           <p style="font-size: 0.88rem; color: #94a3b8; max-width: 480px; margin: 0 auto; line-height: 1.5;">
-            Essayez d'autres mots-clés ou désactivez le filtre « Masquer installés » pour explorer tous les ouvrages disponibles.
+            ${this.activeCategory !== 'all' ? `Aucun ouvrage dans cette catégorie avec les filtres actuels.` : `Essayez d'autres mots-clés ou désactivez le filtre « Masquer installés » pour explorer tous les ouvrages disponibles.`}
           </p>
+          ${suggestionHtml}
         </div>
       `;
+
+      container.querySelectorAll('.btn-smart-switch-cat').forEach(btn => {
+        btn.addEventListener('click', () => {
+          this.activeCategory = btn.dataset.cat || 'all';
+          this._updateCategoryPills();
+          this.renderUnifiedHub();
+        });
+      });
+
+      const allLangsBtn = container.querySelector('#btn-smart-switch-all-langs');
+      if (allLangsBtn) {
+        allLangsBtn.addEventListener('click', () => {
+          this.activeLanguage = 'all';
+          const langSelect = document.getElementById('store-lang-filter-select');
+          if (langSelect) langSelect.value = 'all';
+          this.renderUnifiedHub();
+        });
+      }
+
       return;
     }
 
