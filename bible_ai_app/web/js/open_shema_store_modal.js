@@ -486,7 +486,7 @@ const OpenShemaStore = {
           <div class="store-footer-meta" style="display: flex; align-items: center; gap: 14px;">
             <span>✦ Dépôt officiel : <a href="https://github.com/Similarly1/open-shema-data" target="_blank" rel="noopener" style="color: #60a5fa; font-weight: 600; text-decoration: none;">open-shema-data</a></span>
             <span style="opacity: 0.6;">&bull;</span>
-            <span>⚡ Domaine Public : Gutenberg & Logos PB</span>
+            <span>⚡ Domaine Public : CCEL, Gutenberg, Wikisource, Archive.org & Logos</span>
             <span style="opacity: 0.6;">&bull;</span>
             <span>🛒 100% E-books numériques</span>
           </div>
@@ -594,11 +594,20 @@ const OpenShemaStore = {
         ? 'background: rgba(16, 185, 129, 0.25); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.45);' 
         : 'background: rgba(245, 158, 11, 0.25); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.45);';
 
+      // Nettoyage des redondances
+      const titleLower = title.toLowerCase();
+      const typeLower = type.toLowerCase();
+      const isRedundantType = titleLower.startsWith(typeLower) || (typeLower === 'livre');
+
+      const initials = (author && author !== 'Auteur inconnu') 
+        ? author.split(/[\s,]+/).filter(w => w.length > 0).slice(0, 2).map(w => w[0].toUpperCase()).join('')
+        : (title.slice(0, 2).toUpperCase());
+
       const coverHtml = cover 
         ? `<img src="${this._escapeHtml(cover)}" alt="Couverture" style="width: 48px; height: 68px; object-fit: cover; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); flex-shrink: 0; border: 1px solid rgba(255,255,255,0.15);" onerror="this.style.display='none'">`
-        : `<div style="width: 48px; height: 68px; border-radius: 4px; background: linear-gradient(135deg, ${color}, #0f172a); display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); padding: 4px; text-align: center;">
-            <div style="font-size: 0.76rem; font-weight: 800; color: #ffffff; line-height: 1.1;">${this._escapeHtml(title.slice(0, 3).toUpperCase())}</div>
-            <div style="font-size: 0.58rem; color: #93c5fd; margin-top: 2px;">${this._escapeHtml(type)}</div>
+        : `<div style="width: 48px; height: 68px; border-radius: 4px; background: linear-gradient(145deg, ${color}, #0f172a); display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-left: 3px solid rgba(255,255,255,0.35); overflow: hidden;">
+            <div style="color: rgba(255,255,255,0.85); transform: scale(0.9); margin-bottom: 2px;">${this.svgIcons.book}</div>
+            <div style="font-size: 0.72rem; font-weight: 800; color: #ffffff; letter-spacing: 0.5px;">${this._escapeHtml(initials)}</div>
           </div>`;
 
       tooltip.innerHTML = `
@@ -611,27 +620,29 @@ const OpenShemaStore = {
           </span>
         </div>
 
-        <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="display: flex; gap: 12px; align-items: center;">
           ${coverHtml}
           <div style="flex: 1; min-width: 0;">
             <div style="font-size: 0.88rem; font-weight: 700; color: #ffffff; line-height: 1.25; margin-bottom: 3px; word-break: break-word;">
               ${this._escapeHtml(title)}
             </div>
-            <div style="font-size: 0.78rem; font-weight: 600; color: #93c5fd; margin-bottom: 5px;">
+            <div style="font-size: 0.78rem; font-weight: 600; color: #93c5fd; margin-bottom: 4px;">
               ${this._escapeHtml(author || 'Auteur inconnu')}
             </div>
             <div style="display: inline-flex; align-items: center; gap: 6px;">
-              <span style="font-size: 0.68rem; padding: 1px 6px; border-radius: 3px; background: rgba(255,255,255,0.1); color: #cbd5e1; font-weight: 600;">
-                ${this._escapeHtml(type)}
-              </span>
-              ${year ? `<span style="font-size: 0.68rem; color: #94a3b8;">${this._escapeHtml(year)}</span>` : ''}
+              ${!isRedundantType ? `
+                <span style="font-size: 0.68rem; padding: 1px 6px; border-radius: 3px; background: rgba(255,255,255,0.1); color: #cbd5e1; font-weight: 600;">
+                  ${this._escapeHtml(type)}
+                </span>
+              ` : ''}
+              ${year ? `<span style="font-size: 0.68rem; color: #94a3b8; font-weight: 500;">Édition ${this._escapeHtml(year)}</span>` : ''}
             </div>
           </div>
         </div>
 
         <div style="margin-top: 9px; padding-top: 7px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.72rem; color: #cbd5e1; line-height: 1.35;">
           ${isHigh 
-            ? '✓ Cet ouvrage est déjà disponible pour étude dans votre bibliothèque personnelle.' 
+            ? '✓ Cet ouvrage est déjà indexé et lisible dans votre bibliothèque locale.' 
             : '⚠ Ouvrage semblable détecté. Vérifiez la traduction ou l\'édition avant d\'importer.'}
         </div>
       `;
@@ -1083,7 +1094,7 @@ const OpenShemaStore = {
           <div style="display: flex; align-items: center; gap: 8px;">
             <span style="color: #60a5fa;">${this.svgIcons.book}</span>
             <span style="font-weight: 700; color: #ffffff; font-size: 0.98rem;">Domaine Public & Archives Libres</span>
-            <span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 4px; background: rgba(59, 130, 246, 0.2); color: #93c5fd; font-weight: 700; border: 1px solid rgba(59, 130, 246, 0.35);">Gutenberg & Logos PB</span>
+            <span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 4px; background: rgba(59, 130, 246, 0.2); color: #93c5fd; font-weight: 700; border: 1px solid rgba(59, 130, 246, 0.35);">CCEL &bull; Gutenberg &bull; Wikisource &bull; Archive.org &bull; Logos PB</span>
           </div>
           <span style="font-size: 0.80rem; color: #94a3b8; font-weight: 600;">${publicDomainList.length} livre(s)</span>
         </div>
