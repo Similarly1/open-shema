@@ -25377,6 +25377,21 @@ body.reading-bg-dark .comm-dropdown-popover {
   flex-shrink: 0;
   overflow: hidden;
   user-select: none;
+  transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1), min-width 0.22s cubic-bezier(0.16, 1, 0.3, 1), max-width 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease, border-color 0.2s ease;
+}
+
+.sermon-outline-panel.collapsed {
+  width: 0 !important;
+  min-width: 0 !important;
+  max-width: 0 !important;
+  opacity: 0;
+  border-right: none !important;
+  pointer-events: none;
+}
+
+#btn-sermon-toggle-outline.active {
+  background-color: var(--bg-hover, rgba(255, 255, 255, 0.08));
+  color: var(--accent-primary, #60a5fa);
 }
 
 .sermon-outline-header {

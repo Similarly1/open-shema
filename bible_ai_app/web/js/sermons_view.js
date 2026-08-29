@@ -99,10 +99,26 @@ const SermonsView = {
     const drawer = this.resourcesDrawer || document.getElementById('sermons-resources-drawer');
     const expandBtn = document.getElementById('btn-expand-resources-drawer');
 
+    const updateExpandBtnUi = (isWide) => {
+      if (!expandBtn) return;
+      expandBtn.title = isWide ? "Réduire le volet (Taille normale)" : "Agrandir le volet (Mode Large)";
+      expandBtn.classList.toggle('active', isWide);
+      expandBtn.innerHTML = isWide
+        ? `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>`
+        : `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>`;
+    };
+
     expandBtn?.addEventListener('click', () => {
       drawer?.classList.toggle('wide');
       const isWide = drawer?.classList.contains('wide');
-      expandBtn.title = isWide ? "Réduire le volet (Mode Normal)" : "Agrandir le volet (Mode Large)";
+      updateExpandBtnUi(isWide);
+
+      // Si on agrandit le volet droit en mode large -> réduire automatiquement le plan de prédication
+      if (isWide) {
+        this.toggleOutlinePanel(false);
+      } else {
+        this.toggleOutlinePanel(true);
+      }
     });
 
     if (!resizer || !drawer) return;
@@ -244,6 +260,10 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     document.getElementById('btn-close-resources-drawer')?.addEventListener('click', () => this.toggleResourcesDrawer(false));
     this.bindDrawerResizer();
 
+    // 4b. Bascule manuelle du volet de Plan de la prédication
+    document.getElementById('btn-sermon-toggle-outline')?.addEventListener('click', () => this.toggleOutlinePanel());
+    document.getElementById('btn-sermon-hide-outline')?.addEventListener('click', () => this.toggleOutlinePanel(false));
+
     // Clic sur le fil d'ariane pour ouvrir les détails homilétiques
     document.getElementById('sermon-header-summary')?.addEventListener('click', () => {
       this.toggleResourcesDrawer(true);
@@ -325,7 +345,13 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
   },
 
   openHub() {
+    if (this.currentSermon && !this.currentSermon.isNewDraft) {
+      this.saveCurrentSermon(true);
+    }
     if (typeof App !== 'undefined') {
+      if (App.sidebarAutoCollapsed && App.setSidebarCollapsed) {
+        App.setSidebarCollapsed(false, true);
+      }
       App.switchView('sermons');
     }
     this.renderHubCards();
@@ -769,52 +795,59 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
   },
 
   async createNewSermon() {
-    const todayStr = new Date().toISOString().split('T')[0];
-    const newSermon = {
-      id: `sermon-${Date.now()}`,
-      title: "Nouvelle prédication",
-      church: "",
-      date_planned: todayStr,
-      status: "draft",
-      series: { title: "" },
-      passage: { reference: "" },
-      big_idea: "",
-      goal: "",
-      timing: { target_duration_min: 35, words_per_minute: 135 },
-      body: `## Introduction
-
-Accroche et tension contemporaine...
-
-## Lecture du passage
-
-> [!scripture]
-> « Insérez le texte biblique ici »
-
-## I. Premier Point Principal
-
-Explication textuelle et fondement doctrinal...
-
-## II. Deuxième Point Principal
-
-Développement théologique et illustration concrète...
-
-## Conclusion & Appel
-
-Synthèse de la pensée maîtresse et application pour la semaine...`
-    };
-
-    const res = await API.saveSermon(newSermon);
-    if (res && res.success) {
-      await this.loadSermons();
-      await this.openEditor(newSermon);
+    // Si on est déjà sur un brouillon neuf vierge non modifié, rester dessus sans recréer
+    if (this.currentSermon && this.currentSermon.isNewDraft && !this.isSermonModified()) {
+      await this.openEditor(this.currentSermon);
       if (this.titleInput) {
         this.titleInput.focus();
         this.titleInput.select();
       }
-      if (typeof App !== 'undefined' && App.showToast) {
-        App.showToast("Nouvelle prédication créée !");
+      return;
+    }
+
+    // Sauvegarder le sermon existant en cours si nécessaire
+    if (this.currentSermon && !this.currentSermon.isNewDraft) {
+      await this.saveCurrentSermon(true);
+    }
+
+    const template = this.getDefaultSermonTemplate();
+    template.isNewDraft = true;
+    template.id = null; // Pas encore de fichier disque
+
+    this.currentSermon = template;
+    await this.openEditor(template);
+    if (this.titleInput) {
+      this.titleInput.focus();
+      this.titleInput.select();
+    }
+  },
+
+  isSermonModified() {
+    if (!this.currentSermon) return false;
+    const currentTitle = (this.titleInput?.value || this.currentSermon.title || '').trim();
+    const isTitleChanged = currentTitle !== "Nouvelle prédication" && currentTitle !== "" && currentTitle !== "Prédication sans titre";
+
+    const church = (this.currentSermon.church || '').trim();
+    const ref = (this.currentSermon.passage?.reference || '').trim();
+    const pmt = (this.currentSermon.pmt || this.currentSermon.big_idea || '').trim();
+    const pms = (this.currentSermon.pms || '').trim();
+    const tension = (this.currentSermon.contemporary_tension || '').trim();
+    const goal = (this.currentSermon.goal || '').trim();
+
+    if (isTitleChanged || church || ref || pmt || pms || tension || goal) {
+      return true;
+    }
+
+    if (this.sections && this.sections.length > 0) {
+      for (const sec of this.sections) {
+        const text = (sec.contentHtml || '').replace(/<[^>]+>/g, ' ').trim();
+        if (text && !this.isDefaultPlaceholder(text)) {
+          return true;
+        }
       }
     }
+
+    return false;
   },
 
   async importSermon() {
@@ -841,12 +874,20 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     this.ensureCurrentSermon();
     if (!this.currentSermon) return;
 
+    // Ne rien écrire sur le disque si la nouvelle prédication est encore un brouillon vierge non modifié
+    if (this.currentSermon.isNewDraft && !this.isSermonModified()) {
+      this.updateAutoSaveIndicator('saved');
+      return;
+    }
+
     this.updateAutoSaveIndicator('saving');
 
     const bodyMarkdown = this.serializeSectionsToMarkdown();
+    const sermonId = this.currentSermon.id || `sermon-${Date.now()}`;
     
     const payload = {
       ...this.currentSermon,
+      id: sermonId,
       title: this.titleInput?.value.trim() || 'Prédication sans titre',
       church: this.currentSermon.church || '',
       date_planned: this.currentSermon.date_planned || new Date().toISOString().split('T')[0],
@@ -867,12 +908,16 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
       body: bodyMarkdown
     };
 
+    delete payload.isNewDraft;
+
     try {
       const res = await API.saveSermon(payload);
       if (res && res.success) {
         this.currentSermon = res.sermon || payload;
+        this.currentSermon.isNewDraft = false;
         this.updateHeaderSummary(this.currentSermon);
         this.updateAutoSaveIndicator('saved');
+        await this.loadSermons();
         if (!silent && typeof App !== 'undefined' && App.showToast) {
           App.showToast("Prédication enregistrée !");
         }
@@ -933,6 +978,14 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
 
   async deleteCurrentSermon() {
     if (!this.currentSermon) return;
+    if (this.currentSermon.isNewDraft || !this.currentSermon.id) {
+      this.currentSermon = null;
+      this.openHub();
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast("Brouillon annulé.");
+      }
+      return;
+    }
     await this.deleteSermon(this.currentSermon.id);
     this.openHub();
   },
@@ -1783,7 +1836,24 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     }
   },
 
+  toggleOutlinePanel(forceState) {
+    const outlinePanel = document.getElementById('sermon-outline-panel');
+    if (!outlinePanel) return;
+
+    const willOpen = typeof forceState === 'boolean' ? forceState : outlinePanel.classList.contains('collapsed');
+    outlinePanel.classList.toggle('collapsed', !willOpen);
+
+    const toggleBtn = document.getElementById('btn-sermon-toggle-outline');
+    if (toggleBtn) {
+      toggleBtn.classList.toggle('active', willOpen);
+      toggleBtn.title = willOpen ? "Masquer le plan de prédication" : "Afficher le plan de prédication";
+    }
+  },
+
   toggleResourcesDrawer(forceState) {
+    if (!this.resourcesDrawer) {
+      this.resourcesDrawer = document.getElementById('sermons-resources-drawer');
+    }
     if (!this.resourcesDrawer) return;
     const willOpen = typeof forceState === 'boolean' ? forceState : this.resourcesDrawer.classList.contains('collapsed');
 
@@ -1793,14 +1863,18 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
       this.resourcesDrawer.classList.toggle('collapsed');
     }
 
-    // Dès que le volet droit s'ouvre, fermer automatiquement le volet gauche des prédications
-    if (willOpen) {
-      this.toggleSidebar(false);
-    }
-
     const toggleBtn = document.getElementById('btn-sermon-toggle-drawer');
     if (toggleBtn) {
       toggleBtn.classList.toggle('active', willOpen);
+    }
+
+    // Lorsque le volet droit s'ouvre -> replier automatiquement le menu principal à gauche (exactement comme pour la page Bible)
+    if (typeof App !== 'undefined' && App.setSidebarCollapsed) {
+      if (willOpen) {
+        App.setSidebarCollapsed(true, true);
+      } else if (App.sidebarAutoCollapsed) {
+        App.setSidebarCollapsed(false, true);
+      }
     }
   },
 
