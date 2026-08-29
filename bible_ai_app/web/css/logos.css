@@ -28158,6 +28158,18 @@ mark {
   color: #ffffff;
 }
 
+#store-lang-filter-select {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border: 1px solid #334155 !important;
+}
+
+#store-lang-filter-select option {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  padding: 6px 10px;
+}
+
 .store-hide-installed-toggle {
   display: inline-flex;
   align-items: center;

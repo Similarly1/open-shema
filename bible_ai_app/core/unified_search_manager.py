@@ -2,7 +2,7 @@
 Unified Search & Discovery Manager for Open Shema
 Agrégateur de recherche unifiée pour les 3 pôles du savoir biblique :
 1. Modules Natifs Open Shema (Bibles, Dictionnaires, Commentaires, Théologie)
-2. Domaine Public & Archives Libres (Gutendex / Gutenberg, Logos PB .docx)
+2. Domaine Public & Archives Libres (Gutenberg EPUBs + Logos PB .docx)
 3. Librairies Chrétiennes E-books 100% numériques (Bibli'O, BLF, Pub. Chrétiennes, Clé, Google Play)
 """
 
@@ -26,23 +26,44 @@ class UnifiedSearchManager:
         self.ebook_manager = EbookFinderManager()
         self.current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.logos_books_path = os.path.join(self.current_dir, "data", "logos_community_books.json")
+        self.gutenberg_books_path = os.path.join(self.current_dir, "data", "gutenberg_theology_books.json")
 
-    def search_gutendex(self, query: str) -> List[Dict[str, Any]]:
-        """Recherche dans Project Gutenberg via Gutendex avec filtre thématique chrétien."""
+    def get_local_gutenberg_books(self, query: str = "") -> List[Dict[str, Any]]:
+        """Renvoie les classiques chrétiens de Gutenberg indexés localement."""
+        results = []
+        if not os.path.exists(self.gutenberg_books_path):
+            return results
+
+        try:
+            with open(self.gutenberg_books_path, "r", encoding="utf-8") as f:
+                all_guten = json.load(f)
+
+            q_lower = (query or "").lower().strip()
+            for b in all_guten:
+                t = (b.get('title') or '').lower()
+                a = (b.get('author') or '').lower()
+                d = (b.get('description') or '').lower()
+
+                if not q_lower or q_lower in t or q_lower in a or q_lower in d:
+                    results.append(dict(b))
+        except Exception:
+            pass
+
+        return results
+
+    def search_gutendex_online(self, query: str) -> List[Dict[str, Any]]:
+        """Recherche en direct dans Project Gutenberg via Gutendex."""
         results = []
         if not query or len(query.strip()) < 2:
             return results
 
         clean_q = query.strip()
-        params = {
-            'search': clean_q,
-            'topic': 'Christianity'
-        }
-        url = f"https://gutendex.com/books/?{urllib.parse.urlencode(params)}"
+        # Ne pas utiliser topic=... car cela provoque des 500 ou des timeouts sur Gutendex
+        url = f"https://gutendex.com/books/?search={urllib.parse.quote(clean_q)}"
 
         try:
             req = urllib.request.Request(url, headers=HEADERS)
-            with urllib.request.urlopen(req, context=ssl_ctx, timeout=2.5) as resp:
+            with urllib.request.urlopen(req, context=ssl_ctx, timeout=3.5) as resp:
                 if resp.status != 200:
                     return results
                 data = json.loads(resp.read().decode('utf-8'))
@@ -127,8 +148,8 @@ class UnifiedSearchManager:
         """
         Exécute la recherche simultanée et parallèle sur les 3 pôles :
         1. Modules Natifs Open Shema
-        2. Domaine Public & Archives (Gutendex + Logos PB)
-        3. Librairies Chrétiennes E-books
+        2. Domaine Public & Archives (Gutenberg local + Gutendex online + Logos PB)
+        3. Librairies Chrétiennes E-books (Recherche ou sélection d'accueil)
         """
         clean_q = (query or "").strip()
         q_lower = clean_q.lower()
@@ -163,31 +184,49 @@ class UnifiedSearchManager:
                         'is_free': True
                     })
 
-        # 2 & 3. Parallélisation du Domaine Public et des Librairies via ThreadPoolExecutor
+        # 2. Pôle Domaine Public : D'abord les classiques Gutenberg locaux + Logos PB locaux
         public_domain_results: List[Dict[str, Any]] = []
+        seen_titles = set()
+
+        # Classiques Gutenberg locaux
+        local_guten = self.get_local_gutenberg_books(clean_q)
+        for b in local_guten:
+            t_key = (b.get('title') or '').lower()
+            if t_key not in seen_titles:
+                seen_titles.add(t_key)
+                public_domain_results.append(b)
+
+        # Logos Personal Books locaux
+        logos_items = self.search_logos_personal_books(clean_q)
+        for b in logos_items:
+            t_key = (b.get('title') or '').lower()
+            if t_key not in seen_titles:
+                seen_titles.add(t_key)
+                public_domain_results.append(b)
+
+        # 3. Parallélisation de Gutendex en ligne et des Librairies Chrétiennes
         bookstore_results: List[Dict[str, Any]] = []
         direct_store_links: List[Dict[str, str]] = []
 
+        # Pour les librairies : si la requête est vide, chercher "Bible" pour peupler l'accueil
+        bookstore_query = clean_q if clean_q else "Bible"
+
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-            future_gutendex = executor.submit(self.search_gutendex, clean_q)
-            future_logos_pb = executor.submit(self.search_logos_personal_books, clean_q)
-            future_bookstores = executor.submit(self.ebook_manager.search_all_ebooks, clean_q)
+            future_gutendex = executor.submit(self.search_gutendex_online, clean_q) if clean_q else None
+            future_bookstores = executor.submit(self.ebook_manager.search_all_ebooks, bookstore_query)
 
-            # Gutendex
-            try:
-                guten_items = future_gutendex.result()
-                if guten_items:
-                    public_domain_results.extend(guten_items)
-            except Exception:
-                pass
-
-            # Logos PB
-            try:
-                logos_items = future_logos_pb.result()
-                if logos_items:
-                    public_domain_results.extend(logos_items)
-            except Exception:
-                pass
+            # Gutendex Online
+            if future_gutendex:
+                try:
+                    online_guten = future_gutendex.result()
+                    if online_guten:
+                        for b in online_guten:
+                            t_key = (b.get('title') or '').lower()
+                            if t_key not in seen_titles:
+                                seen_titles.add(t_key)
+                                public_domain_results.append(b)
+                except Exception:
+                    pass
 
             # Librairies Chrétiennes
             try:

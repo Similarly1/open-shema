@@ -197,7 +197,8 @@ const OpenShemaStore = {
         searchInput.value = this.searchQuery;
         this._handleSearchInput(true);
       } else {
-        this.renderUnifiedHub();
+        searchInput.value = '';
+        this._handleSearchInput(true);
       }
       setTimeout(() => searchInput.focus(), 50);
     } else {
@@ -305,10 +306,10 @@ const OpenShemaStore = {
 
             <!-- Filtres Secondaires (Langue & Installés) -->
             <div style="display: flex; align-items: center; gap: 12px;">
-              <select id="store-lang-filter-select" style="padding: 4px 8px; border-radius: 6px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); color: #e2e8f0; font-size: 0.76rem; outline: none; cursor: pointer;">
-                <option value="all">🌐 Toutes les langues</option>
-                <option value="fr">FR Français</option>
-                <option value="en">EN Anglais</option>
+              <select id="store-lang-filter-select" style="padding: 5px 10px; border-radius: 6px; background-color: #0f172a !important; border: 1px solid #334155 !important; color: #f8fafc !important; font-size: 0.78rem; outline: none; cursor: pointer;">
+                <option value="all" style="background-color: #0f172a; color: #f8fafc;">Toutes les langues</option>
+                <option value="fr" style="background-color: #0f172a; color: #f8fafc;">Français (FR)</option>
+                <option value="en" style="background-color: #0f172a; color: #f8fafc;">Anglais (EN)</option>
               </select>
 
               <label class="store-hide-installed-toggle" style="display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--text-muted, #94a3b8); cursor: pointer;" title="Masquer les ouvrages déjà installés">
