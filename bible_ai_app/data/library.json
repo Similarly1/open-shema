@@ -929,5 +929,21 @@
     "book_code": null,
     "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
     "active": true
+  },
+  "GUTENBERG_2680": {
+    "title": "Pensées",
+    "author": "Blaise Pascal",
+    "description": "Apologie de la religion chrétienne et réflexions philosophiques et spirituelles.",
+    "year": "1.0.0",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\GUTENBERG_2680.jpg",
+    "type": "Bible",
+    "format": "EPUB",
+    "file_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\bibles\\gutenberg_2680.json",
+    "folder_name": "GUTENBERG_2680",
+    "version_code": "GUTENBERG_2680",
+    "total_books": 66,
+    "embedding_model": "study_library",
+    "active": true,
+    "has_strongs": false
   }
 }

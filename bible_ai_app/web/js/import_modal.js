@@ -577,6 +577,39 @@ const ImportModal = {
     this.modalEl?.classList.remove('hidden');
   },
 
+  async openWithPreloadedFile(filePath, fileName, fileSize = 0, fileFormat = '', extraMeta = {}) {
+    await this.open(false);
+    
+    // Charger et inspecter automatiquement le fichier téléchargé
+    await this.inspectAndLoadFile(filePath, fileName, fileSize, fileFormat);
+
+    // Si le catalogue a fourni des métadonnées plus précises, les appliquer
+    if (extraMeta) {
+      if (extraMeta.title) {
+        document.getElementById('import-book-title').value = cleanHtml(extraMeta.title);
+        if (!this.userModifiedId) {
+          document.getElementById('import-book-id').value = generateShortId(extraMeta.title, document.getElementById('import-book-type').value);
+        }
+      }
+      if (extraMeta.author) {
+        document.getElementById('import-book-author').value = cleanHtml(extraMeta.author);
+      }
+      if (extraMeta.description) {
+        document.getElementById('import-book-desc').value = cleanHtml(extraMeta.description);
+      }
+      if (extraMeta.cover_url && !this.coverDataUrl && !this.coverPath) {
+        this.coverPath = extraMeta.cover_url;
+        this.coverDataUrl = extraMeta.cover_url;
+        this.updateCoverPreview(extraMeta.cover_url);
+      }
+    }
+
+    this.checkForDuplicates();
+
+    // Passer directement à l'étape 2 (Métadonnées & Couverture)
+    this.goToStep(2);
+  },
+
   close() {
     this.modalEl?.classList.add('hidden');
   },

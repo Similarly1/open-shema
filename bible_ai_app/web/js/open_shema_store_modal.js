@@ -231,17 +231,19 @@ const OpenShemaStore = {
     });
 
     this.unifiedResults.public_domain = pdList;
+  },
 
-    if (!this.unifiedResults.direct_links || this.unifiedResults.direct_links.length === 0) {
-      this.unifiedResults.direct_links = [
-        { name: "Bibli'O", url: "https://bibliostore.fr/12-ebooks" },
-        { name: "BLF Store", url: "https://blfstore.com/collections/ebooks" },
-        { name: "Publications Chrétiennes", url: "https://publicationschretiennes.com/collections/livres-numeriques" },
-        { name: "Éditions Clé", url: "https://editionscle.com/78-ebook" },
-        { name: "Google Play Livres", url: "https://play.google.com/store/books" },
-        { name: "Rakuten Kobo", url: "https://www.kobo.com/fr/fr" }
-      ];
-    }
+  _getDirectStoreLinks(query = '') {
+    const qEnc = encodeURIComponent((query || '').trim());
+    return [
+      { name: "Bibli'O", url: qEnc ? `https://bibliostore.fr/recherche?controller=search&s=${qEnc}` : "https://bibliostore.fr/12-ebooks" },
+      { name: "BLF Store", url: qEnc ? `https://blfstore.com/search?type=product&q=${qEnc}` : "https://blfstore.com/collections/ebooks" },
+      { name: "Pub. Chrétiennes", url: qEnc ? `https://publicationschretiennes.com/search?type=product&q=${qEnc}` : "https://publicationschretiennes.com/collections/livres-numeriques" },
+      { name: "Éditions Clé", url: qEnc ? `https://editionscle.com/recherche?controller=search&s=${qEnc}` : "https://editionscle.com/78-ebook" },
+      { name: "Google Play", url: qEnc ? `https://play.google.com/store/search?q=${qEnc}&c=books` : "https://play.google.com/store/books" },
+      { name: "Fnac E-books", url: qEnc ? `https://www.fnac.com/SearchResult/ResultList.aspx?Search=${qEnc}&sft=1` : "https://www.fnac.com/livre-numerique-ebook/e587" },
+      { name: "Rakuten Kobo", url: qEnc ? `https://www.kobo.com/fr/fr/search?query=${qEnc}&fclanguages=fr` : "https://www.kobo.com/fr/fr" }
+    ];
   },
 
   async open(initialCategory = 'all', searchQuery = '') {
@@ -718,14 +720,16 @@ const OpenShemaStore = {
         </div>
         
         <!-- Raccourcis directs vers les librairies chrétiennes -->
-        <div style="margin-bottom: 14px; padding: 10px 14px; border-radius: 8px; background: #1e293b; border: 1px solid #334155; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-          <div style="font-size: 0.78rem; color: #cbd5e1; font-weight: 600; display: flex; align-items: center; gap: 6px;">
-            ${this.svgIcons.external} Rayons e-books directs :
+        <div style="margin-bottom: 14px; padding: 10px 14px; border-radius: 8px; background: #1e293b; border: 1px solid #334155; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+          <div style="font-size: 0.80rem; color: #cbd5e1; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+            ${this.svgIcons.external}
+            <span>Rayons e-books directs :</span>
           </div>
-          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-            ${(this.unifiedResults.direct_links || []).map(link => `
-              <button class="btn-direct-store-link" data-url="${this._escapeHtml(link.url)}" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; border-radius: 4px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #ffffff; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+          <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+            ${this._getDirectStoreLinks(this.searchQuery).map(link => `
+              <button class="btn-direct-store-link" data-url="${this._escapeHtml(link.url)}" style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 6px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.16); color: #f8fafc; font-size: 0.76rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" title="Ouvrir ${this._escapeHtml(link.name)}">
                 <span>${this._escapeHtml(link.name)}</span>
+                ${this.svgIcons.external}
               </button>
             `).join('')}
           </div>
@@ -982,7 +986,7 @@ const OpenShemaStore = {
                 <span style="font-size: 0.70rem; font-weight: 800; padding: 2px 7px; border-radius: 4px; background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35);">
                   ${item.offers_count} offres comparées
                 </span>
-                <span style="font-size: 0.74rem; color: #34d399; font-weight: 800;">Dès ${item.min_price_raw > 0 ? item.min_price_raw.toFixed(2) + ' €' : 'Gratuit'}</span>
+                <span style="font-size: 0.74rem; color: #34d399; font-weight: 800;">${this._escapeHtml(item.price_display || 'Disponible')}</span>
               </div>
               <h3 style="margin: 0; font-size: 0.98rem; font-weight: 700; color: #ffffff; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                 ${this._escapeHtml(cleanTitle)}
@@ -1162,33 +1166,76 @@ const OpenShemaStore = {
     this.isDownloading[module.id] = true;
     this.renderUnifiedHub();
 
+    const isPublicDomain = module.category === 'public_domain' || 
+                           module.badge_label === 'Gutenberg' || 
+                           module.badge_label === 'Logos PB' || 
+                           module.format === 'DOCX' || 
+                           module.format === 'EPUB' ||
+                           (module.download_url && (module.download_url.endsWith('.epub') || module.download_url.endsWith('.docx') || module.download_url.endsWith('.zip')));
+
     try {
+      const cleanTitle = this._decodeEntities(module.title);
+
       if (typeof App !== 'undefined' && App.showToast) {
-        App.showToast(`Téléchargement de ${this._decodeEntities(module.title)}...`);
+        App.showToast(`Téléchargement de « ${cleanTitle} » en cours...`);
       }
 
-      const res = await API.call('download_and_install_catalog_module', module);
-      if (res && res.success) {
-        this.installedIds.add(String(module.id).toLowerCase());
-        if (module.abbreviation) {
-          this.installedCodes.add(String(module.abbreviation).toUpperCase());
-        }
-
-        if (typeof App !== 'undefined' && App.showToast) {
-          App.showToast(`« ${this._decodeEntities(module.title)} » installé avec succès !`, 'success');
-        }
-
-        if (module.type === 'bible' && typeof BibleReader !== 'undefined' && BibleReader.loadInstalledBibles) {
-          BibleReader.loadInstalledBibles();
-        } else if (typeof BibleApp !== 'undefined' && BibleApp.loadInstalledModules) {
-          BibleApp.loadInstalledModules();
+      if (isPublicDomain) {
+        // PROPOSITION 1 : Télécharger et basculer automatiquement sur l'Assistant d'Importation pré-rempli
+        const res = await API.call('download_external_book_file', module);
+        if (res && res.success && res.file_path) {
+          this.close();
+          if (typeof ImportModal !== 'undefined' && ImportModal.openWithPreloadedFile) {
+            await ImportModal.openWithPreloadedFile(
+              res.file_path,
+              res.file_name,
+              res.file_size,
+              res.format,
+              {
+                title: cleanTitle,
+                author: this._decodeEntities(module.author),
+                description: this._decodeEntities(module.description),
+                cover_url: module.cover_url,
+                language: module.language || 'fr'
+              }
+            );
+            if (typeof App !== 'undefined' && App.showToast) {
+              App.showToast(`« ${cleanTitle} » prêt pour l'importation !`, 'success');
+            }
+          }
+        } else {
+          const errMsg = (res && res.error) ? res.error : 'Erreur lors du téléchargement.';
+          if (typeof App !== 'undefined' && App.showToast) {
+            App.showToast(`Échec : ${errMsg}`, 'error');
+          } else {
+            alert(`Erreur de téléchargement : ${errMsg}`);
+          }
         }
       } else {
-        const errMsg = (res && res.error) ? res.error : 'Erreur inconnue lors de l\'installation.';
-        if (typeof App !== 'undefined' && App.showToast) {
-          App.showToast(`Échec : ${errMsg}`, 'error');
+        // MODULES OFFICIELS OPEN SHEMA : Installation 1-clic native directe
+        const res = await API.call('download_and_install_catalog_module', module);
+        if (res && res.success) {
+          this.installedIds.add(String(module.id).toLowerCase());
+          if (module.abbreviation) {
+            this.installedCodes.add(String(module.abbreviation).toUpperCase());
+          }
+
+          if (typeof App !== 'undefined' && App.showToast) {
+            App.showToast(`« ${cleanTitle} » installé avec succès !`, 'success');
+          }
+
+          if (module.type === 'bible' && typeof BibleReader !== 'undefined' && BibleReader.loadInstalledBibles) {
+            BibleReader.loadInstalledBibles();
+          } else if (typeof BibleApp !== 'undefined' && BibleApp.loadInstalledModules) {
+            BibleApp.loadInstalledModules();
+          }
         } else {
-          alert(`Erreur de téléchargement : ${errMsg}`);
+          const errMsg = (res && res.error) ? res.error : 'Erreur inconnue lors de l\'installation.';
+          if (typeof App !== 'undefined' && App.showToast) {
+            App.showToast(`Échec : ${errMsg}`, 'error');
+          } else {
+            alert(`Erreur de téléchargement : ${errMsg}`);
+          }
         }
       }
     } catch (err) {

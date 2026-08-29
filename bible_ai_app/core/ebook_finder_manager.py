@@ -32,19 +32,25 @@ class EbookFinderManager:
             'name': "Éditions Bibli'O",
             'domain': 'editionsbiblio.fr',
             'badge': "Alliance Biblique",
-            'default_format': 'EPUB / PDF'
+            'default_format': 'EPUB / PDF',
+            'currency_symbol': '€',
+            'currency_code': 'EUR'
         },
         {
             'name': "BLF Store",
             'domain': 'blfstore.com',
             'badge': "BLF Éditions",
-            'default_format': 'EPUB (Sans DRM)'
+            'default_format': 'EPUB (Sans DRM)',
+            'currency_symbol': '€',
+            'currency_code': 'EUR'
         },
         {
             'name': "Publications Chrétiennes",
             'domain': 'publicationschretiennes.com',
             'badge': "Pub. Chrétiennes",
-            'default_format': 'EPUB / PDF'
+            'default_format': 'EPUB / PDF',
+            'currency_symbol': '$',
+            'currency_code': 'CAD'
         }
     ]
 
@@ -128,6 +134,9 @@ class EbookFinderManager:
                             if image.startswith('//'):
                                 image = f"https:{image}"
 
+                            curr_sym = store_info.get('currency_symbol', '€')
+                            price_formatted = f"{float(price):.2f} {curr_sym}" if price else "Disponible"
+
                             results.append({
                                 'id': f"{domain}_{prod.get('id', hash(prod_url))}",
                                 'title': clean_t if clean_t else raw_title,
@@ -135,8 +144,9 @@ class EbookFinderManager:
                                 'source': name,
                                 'store_badge': badge,
                                 'format': default_format,
-                                'price': f"{float(price):.2f} €" if price else "Disponible",
+                                'price': price_formatted,
                                 'price_raw': float(price) if price else 0.0,
+                                'currency': curr_sym,
                                 'url': f"https://{domain}{prod_url}",
                                 'image': image,
                                 'is_direct_product': True
@@ -227,7 +237,10 @@ class EbookFinderManager:
                     retail = sale.get('retailPrice', {})
                     
                     price_raw = float(retail.get('amount', 0.0))
-                    price_str = f"{price_raw:.2f} €" if 'amount' in retail else "Consultable"
+                    curr_code = (retail.get('currencyCode') or 'EUR').upper()
+                    curr_map = {'EUR': '€', 'USD': '$', 'CAD': '$', 'GBP': '£', 'CHF': 'CHF'}
+                    curr_sym = curr_map.get(curr_code, '€')
+                    price_str = f"{price_raw:.2f} {curr_sym}" if 'amount' in retail else "Consultable"
                     
                     buy_link = sale.get('buyLink') or vol.get('infoLink', '')
                     images = vol.get('imageLinks', {})
@@ -244,6 +257,7 @@ class EbookFinderManager:
                         'format': 'EPUB / PDF',
                         'price': price_str,
                         'price_raw': price_raw,
+                        'currency': curr_sym,
                         'url': buy_link,
                         'image': image,
                         'is_direct_product': True
@@ -344,8 +358,9 @@ class EbookFinderManager:
                 g['direct_url'] = offers[0]['url']
                 g['format'] = offers[0]['format']
             else:
-                if min_price > 0:
-                    g['price_display'] = f"Dès {min_price:.2f} €"
+                best_price_str = offers[0].get('price', '')
+                if min_price > 0 and best_price_str and best_price_str != "Disponible":
+                    g['price_display'] = f"Dès {best_price_str}"
                 else:
                     g['price_display'] = "Disponible"
                 g['best_store'] = offers[0]['store_badge']

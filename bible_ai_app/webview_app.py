@@ -2668,6 +2668,83 @@ class BibleAppApi:
                 logger.error(f"Erreur chargement gutenberg_theology_books.json: {e}")
         return []
 
+    def download_external_book_file(self, book_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Télécharge un livre externe (Project Gutenberg EPUB, Logos Community DOCX/ZIP, etc.)
+        dans le dossier temporaire d'importation pour l'injecter directement
+        dans l'assistant d'importation (ImportModal).
+        """
+        import urllib.request
+        import shutil
+        import ssl
+        import re
+
+        try:
+            download_url = book_data.get("download_url")
+            if not download_url:
+                return {"success": False, "error": "URL de téléchargement manquante."}
+
+            title = book_data.get("title", "Livre")
+            b_id = str(book_data.get("id", "book"))
+            fmt = str(book_data.get("format") or "EPUB").lower()
+
+            # Dossier temporaire pour les imports
+            import_cache_dir = os.path.join(current_dir, "data", "temp_imports")
+            os.makedirs(import_cache_dir, exist_ok=True)
+
+            safe_title = re.sub(r'[^\w\s-]', '', title).strip().replace(' ', '_')[:40]
+            if not safe_title:
+                safe_title = f"book_{b_id}"
+
+            ext = ".epub" if "epub" in fmt or "epub" in download_url.lower() else (".docx" if "docx" in fmt or "docx" in download_url.lower() else (".zip" if download_url.lower().endswith(".zip") else ".epub"))
+            file_name = f"{safe_title}{ext}"
+            target_path = os.path.join(import_cache_dir, file_name)
+
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            }
+            ctx = ssl.create_default_context()
+            ctx.check_hostname = False
+            ctx.verify_mode = ssl.CERT_NONE
+
+            req = urllib.request.Request(download_url, headers=headers)
+            with urllib.request.urlopen(req, context=ctx, timeout=60) as response, open(target_path, "wb") as out_file:
+                shutil.copyfileobj(response, out_file)
+
+            # Si c'est un ZIP (cas Logos PB), extraire pour trouver le .docx
+            if target_path.endswith(".zip"):
+                import zipfile
+                try:
+                    with zipfile.ZipFile(target_path, 'r') as zf:
+                        docx_files = [n for n in zf.namelist() if n.lower().endswith('.docx')]
+                        if docx_files:
+                            extracted_path = zf.extract(docx_files[0], import_cache_dir)
+                            target_path = extracted_path
+                            file_name = os.path.basename(extracted_path)
+                            fmt = "docx"
+                except Exception as zip_err:
+                    logger.warning(f"Erreur décompression ZIP Logos PB: {zip_err}")
+
+            file_size = os.path.getsize(target_path) if os.path.exists(target_path) else 0
+
+            return {
+                "success": True,
+                "file_path": target_path,
+                "file_name": file_name,
+                "file_size": file_size,
+                "format": fmt.upper(),
+                "metadata": {
+                    "title": book_data.get("title"),
+                    "author": book_data.get("author"),
+                    "description": book_data.get("description"),
+                    "cover_url": book_data.get("cover_url"),
+                    "language": book_data.get("language", "fr")
+                }
+            }
+        except Exception as e:
+            logger.error(f"Erreur téléchargement livre externe : {e}")
+            return {"success": False, "error": str(e)}
+
     def download_and_install_catalog_module(self, module_data: Dict[str, Any]) -> Dict[str, Any]:
         """Télécharge un module officiel depuis le dépôt open-shema-data et l'installe localement."""
         import urllib.request
