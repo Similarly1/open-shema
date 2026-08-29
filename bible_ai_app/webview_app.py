@@ -2657,6 +2657,17 @@ class BibleAppApi:
                 logger.error(f"Erreur chargement logos_community_books.json: {e}")
         return []
 
+    def get_gutenberg_theology_books(self) -> List[Dict[str, Any]]:
+        """Renvoie les classiques chrétiens du Projet Gutenberg indexés localement."""
+        json_path = os.path.join(current_dir, "data", "gutenberg_theology_books.json")
+        if os.path.exists(json_path):
+            try:
+                with open(json_path, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception as e:
+                logger.error(f"Erreur chargement gutenberg_theology_books.json: {e}")
+        return []
+
     def download_and_install_catalog_module(self, module_data: Dict[str, Any]) -> Dict[str, Any]:
         """Télécharge un module officiel depuis le dépôt open-shema-data et l'installe localement."""
         import urllib.request
