@@ -476,28 +476,89 @@ class SermonsManager:
         }
         return cls._sanitize_for_json(res)
 
+    _cached_illustrations: Optional[List[Dict[str, Any]]] = None
+    _cached_illustrations_mtime: float = 0.0
+
+    @classmethod
+    def invalidate_illustrations_cache(cls):
+        cls._cached_illustrations = None
+
     @classmethod
     def list_illustrations(cls, config: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
-        """Liste toutes les illustrations du réservoir global."""
+        """Liste toutes les illustrations du réservoir global avec cache en mémoire ultra-rapide."""
         target_dir = cls.get_illustrations_directory(config)
         cls._ensure_initial_sample_illustrations(target_dir)
 
-        illustrations = []
+        if not os.path.exists(target_dir):
+            return []
+
         try:
-            for fname in sorted(os.listdir(target_dir)):
-                if fname.endswith(".md"):
-                    full_path = os.path.join(target_dir, fname)
-                    ill = cls.parse_illustration_file(full_path)
-                    if ill:
-                        illustrations.append(ill)
+            current_mtime = os.path.getmtime(target_dir)
+        except Exception:
+            current_mtime = 0.0
+
+        if cls._cached_illustrations is not None and current_mtime == cls._cached_illustrations_mtime:
+            return cls._cached_illustrations
+
+        cache_json_file = os.path.join(CURRENT_DIR, "data", "illustrations_processed_cache.json")
+        illustrations_map: Dict[str, Dict[str, Any]] = {}
+        loaded_from_json = False
+
+        if os.path.exists(cache_json_file):
+            try:
+                import json
+                with open(cache_json_file, "r", encoding="utf-8") as f:
+                    cache_raw = json.load(f)
+                for k, item in cache_raw.items():
+                    if isinstance(item, dict) and item.get("id"):
+                        i_id = str(item["id"])
+                        illustrations_map[i_id] = {
+                            "id": i_id,
+                            "filename": f"{i_id}.md",
+                            "file_path": os.path.join(target_dir, f"{i_id}.md"),
+                            "title": str(item.get("title") or "Illustration sans titre"),
+                            "category": str(item.get("category", "Général")),
+                            "type": str(item.get("type", "Histoire vraie")),
+                            "tags": item.get("tags", []),
+                            "passages_associes": item.get("passages_associes", []),
+                            "source": str(item.get("source", "")),
+                            "author": str(item.get("author", "")),
+                            "usage_history": item.get("usage_history", []),
+                            "body": str(item.get("body", "")).strip(),
+                            "created_at": item.get("created_at") or datetime.datetime.now().isoformat(),
+                            "updated_at": item.get("updated_at") or datetime.datetime.now().isoformat(),
+                        }
+                loaded_from_json = True
+            except Exception as e:
+                logger.warning(f"Impossible de précharger le cache JSON illustrations : {e}")
+
+        try:
+            md_files = [f for f in os.listdir(target_dir) if f.endswith(".md")]
+            
+            # Si le dossier correspond au cache JSON, retour instantané !
+            if loaded_from_json and len(illustrations_map) > 0 and abs(len(md_files) - len(illustrations_map)) < 30:
+                cls._cached_illustrations = list(illustrations_map.values())
+                cls._cached_illustrations_mtime = current_mtime
+                return cls._cached_illustrations
+
+            illustrations = []
+            for fname in sorted(md_files):
+                full_path = os.path.join(target_dir, fname)
+                ill = cls.parse_illustration_file(full_path)
+                if ill:
+                    illustrations.append(ill)
+
+            cls._cached_illustrations = illustrations if illustrations else list(illustrations_map.values())
+            cls._cached_illustrations_mtime = current_mtime
+            return cls._cached_illustrations
         except Exception as e:
             logger.error(f"Erreur lors du listing des illustrations: {e}")
-
-        return illustrations
+            return list(illustrations_map.values()) if loaded_from_json else []
 
     @classmethod
     def save_illustration(cls, data: Dict[str, Any], config: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Sauvegarde ou met à jour une illustration."""
+        cls.invalidate_illustrations_cache()
         target_dir = cls.get_illustrations_directory(config)
         ill_id = data.get("id") or f"ill-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
         title = data.get("title") or "Illustration sans titre"

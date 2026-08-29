@@ -28141,6 +28141,23 @@ mark {
   border-color: var(--primary-accent, #3b82f6);
 }
 
+.store-cat-pill .facet-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 10.5px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.12);
+  margin-left: 4px;
+}
+
+.store-cat-pill.active .facet-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
 .store-hide-installed-toggle {
   display: inline-flex;
   align-items: center;

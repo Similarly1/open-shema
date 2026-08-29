@@ -1,26 +1,40 @@
 /**
- * Open Shema Store / Data Hub & E-book Finder Modal Controller
- * Hub unique pour :
- * 1. Télécharger les ouvrages officiels et gratuits du catalogue Open Shema Data
- * 2. Trouver et comparer les e-books chrétiens 100% numériques (Bibli'O, BLF Store, Pub. Chrétiennes, Google Play, Fnac, Kobo)
- * RÈGLE STRICTE : 100% icônes SVG, aucun émoji.
+ * Open Shema Store / Hub de Recherche & Découverte Biblique Unifié
+ * 
+ * 3 Piliers de Découverte :
+ * 1. ✦ Modules Natifs Open Shema (Bibles, Dictionnaires, Commentaires, Théologie optimisés avec Strong)
+ * 2. ⚡ Domaine Public & Archives Libres (Gutendex / Gutenberg, Logos Community Personal Books)
+ * 3. 🛒 Librairies & Éditeurs Chrétiens (Bibli'O, BLF Store, Publications Chrétiennes, Éditions Clé, Google Play)
+ * 
+ * RÈGLE STRICTE : 100% icônes SVG vectorielles, aucun émoji.
  */
 
 const OpenShemaStore = {
   catalogUrl: 'https://raw.githubusercontent.com/Similarly1/open-shema-data/main/catalog.json',
   catalogData: null,
+  communityLogosBooks: [],
   installedIds: new Set(),
   installedCodes: new Set(),
-  activeTab: 'catalog', // 'catalog' | 'ebooks'
-  activeCategory: 'all',
+  
+  // État de recherche unifiée
+  activeCategory: 'all', // 'all' | 'open_shema' | 'public_domain' | 'bookstores'
+  activeLanguage: 'all', // 'all' | 'fr' | 'en'
   searchQuery: '',
-  ebookSearchQuery: '',
   hideInstalled: localStorage.getItem('open_shema_store_hide_installed') === 'true',
+  
+  // Cache des résultats unifiés
+  unifiedResults: {
+    open_shema: [],
+    public_domain: [],
+    bookstores: [],
+    direct_links: []
+  },
+  
+  isSearching: false,
+  searchDebounceTimer: null,
   isDownloading: {},
-  isSearchingEbooks: false,
-  ebookDebounceTimer: null,
 
-  // Icônes SVG standardisées Open Shema
+  // Icônes SVG standardisées Open Shema (100% SVG)
   svgIcons: {
     bible: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>`,
     dictionary: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>`,
@@ -41,214 +55,18 @@ const OpenShemaStore = {
     info: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
     award: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>`,
     scale: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>`,
-    spinner: `<svg class="spin-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`
+    spinner: `<svg class="spin-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`
   },
 
-  communityLogosBooks: [
-    // --- LIVRES EN FRANÇAIS (Logos Free Library & Communauté) ---
-    {
-      id: "pb-giguet-septante",
-      title: "La Bible d'après les Septante (Ancien Testament)",
-      author: "Pierre Giguet",
-      type: "logos_pb",
-      source_type: "logos_pb",
-      language: "fr",
-      language_label: "Français",
-      format: "docx",
-      size_bytes: 4800000,
-      description: "Traduction française intégrale de l'Ancien Testament grec des Septante par Pierre Giguet (1872).",
-      abbreviation: "SEPTANTE",
-      features: ["logos_pb", "septuagint", "french"],
-      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Septante_Giguet.docx",
-      cover_url: ""
-    },
-    {
-      id: "pb-bible-glaire",
-      title: "La Sainte Bible selon la Vulgate avec Notes",
-      author: "Abbé J.-B. Glaire",
-      type: "logos_pb",
-      source_type: "logos_pb",
-      language: "fr",
-      language_label: "Français",
-      format: "docx",
-      size_bytes: 5200000,
-      description: "Traduction de la Vulgate latine en français avec commentaires et notes théologiques.",
-      abbreviation: "GLAIRE",
-      features: ["logos_pb", "vulgate", "french"],
-      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Bible_Glaire.docx",
-      cover_url: ""
-    },
-    {
-      id: "pb-bible-sacy",
-      title: "La Sainte Bible de Lemaistre de Sacy",
-      author: "Louis-Isaac Lemaistre de Sacy",
-      type: "logos_pb",
-      source_type: "logos_pb",
-      language: "fr",
-      language_label: "Français",
-      format: "docx",
-      size_bytes: 5100000,
-      description: "La traduction classique de Port-Royal, monument de la langue française classique.",
-      abbreviation: "SACY",
-      features: ["logos_pb", "french"],
-      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Bible_Sacy.docx",
-      cover_url: ""
-    },
-    {
-      id: "pb-calvin-institution",
-      title: "Institution de la Religion Chrétienne",
-      author: "Jean Calvin",
-      type: "logos_pb",
-      source_type: "logos_pb",
-      language: "fr",
-      language_label: "Français",
-      format: "docx",
-      size_bytes: 3200000,
-      description: "L'ouvrage théologique majeur de la Réforme protestante (4 livres complets).",
-      abbreviation: "CALVIN-IRC",
-      features: ["logos_pb", "theology", "french"],
-      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Calvin_Institution_Religion_Chretienne.docx",
-      cover_url: ""
-    },
-    {
-      id: "pb-darby-etudes",
-      title: "Études sur la Parole de Dieu",
-      author: "John Nelson Darby",
-      type: "logos_pb",
-      source_type: "logos_pb",
-      language: "fr",
-      language_label: "Français",
-      format: "docx",
-      size_bytes: 4100000,
-      description: "Commentaire suivi et méditations sur l'ensemble des 66 livres de la Bible.",
-      abbreviation: "DARBY-ETUDES",
-      features: ["logos_pb", "commentary", "french"],
-      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Darby_Etudes_Parole.docx",
-      cover_url: ""
-    },
-    {
-      id: "pb-chrysostome-homilies",
-      title: "Homélies sur les Épîtres de Saint Paul",
-      author: "Jean Chrysostome",
-      type: "logos_pb",
-      source_type: "logos_pb",
-      language: "fr",
-      language_label: "Français",
-      format: "docx",
-      size_bytes: 3800000,
-      description: "Sermons et explications patristiques verset par verset sur les écrits pauliniens.",
-      abbreviation: "CHRYSOSTOME",
-      features: ["logos_pb", "patristic", "french"],
-      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Chrysostome_Homilies_Paul.docx",
-      cover_url: ""
-    },
-
-    // --- LIVRES EN ANGLAIS (Logos Community Wiki) ---
-    {
-      id: "pb-ante-nicene-fathers",
-      title: "Ante-Nicene Fathers (Vols 1-9)",
-      author: "Alexander Roberts & James Donaldson",
-      type: "logos_pb",
-      source_type: "logos_pb",
-      language: "en",
-      language_label: "Anglais",
-      format: "docx",
-      size_bytes: 8900000,
-      description: "The complete writings of the Early Church Fathers down to A.D. 325 (Justin Martyr, Irenaeus, Clement, Tertullian, Origen...).",
-      abbreviation: "ANF",
-      features: ["logos_pb", "patristic", "english"],
-      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Ante_Nicene_Fathers.docx",
-      cover_url: ""
-    },
-    {
-      id: "pb-matthew-henry-comm",
-      title: "Complete Commentary on the Whole Bible",
-      author: "Matthew Henry",
-      type: "logos_pb",
-      source_type: "logos_pb",
-      language: "en",
-      language_label: "Anglais",
-      format: "docx",
-      size_bytes: 12500000,
-      description: "Genesis to Revelation exhaustive devotional and practical exposition of Scripture.",
-      abbreviation: "MHC",
-      features: ["logos_pb", "commentary", "english"],
-      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Matthew_Henry_Commentary.docx",
-      cover_url: ""
-    },
-    {
-      id: "pb-spurgeon-treasury-david",
-      title: "The Treasury of David (Commentary on Psalms)",
-      author: "Charles H. Spurgeon",
-      type: "logos_pb",
-      source_type: "logos_pb",
-      language: "en",
-      language_label: "Anglais",
-      format: "docx",
-      size_bytes: 7200000,
-      description: "Spurgeon's magnum opus: Psalm by Psalm detailed verse exposition, homiletics, and historical quotations.",
-      abbreviation: "SPURGEON",
-      features: ["logos_pb", "commentary", "english"],
-      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Spurgeon_Treasury_of_David.docx",
-      cover_url: ""
-    },
-    {
-      id: "pb-westminster-standards",
-      title: "The Westminster Standards & Catechisms",
-      author: "Westminster Assembly",
-      type: "logos_pb",
-      source_type: "logos_pb",
-      language: "en",
-      language_label: "Anglais",
-      format: "docx",
-      size_bytes: 1800000,
-      description: "The Confession of Faith, Larger Catechism, Shorter Catechism, and Scriptural proofs (1646).",
-      abbreviation: "WESTMINSTER",
-      features: ["logos_pb", "creeds", "english"],
-      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Westminster_Standards.docx",
-      cover_url: ""
-    },
-    {
-      id: "pb-hodge-systematic-theology",
-      title: "Systematic Theology (3 Volumes)",
-      author: "Charles Hodge",
-      type: "logos_pb",
-      source_type: "logos_pb",
-      language: "en",
-      language_label: "Anglais",
-      format: "docx",
-      size_bytes: 6500000,
-      description: "Classic Princeton Reformed theology covering Theology Proper, Anthropology, Soteriology, and Eschatology.",
-      abbreviation: "HODGE-ST",
-      features: ["logos_pb", "theology", "english"],
-      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Charles_Hodge_Systematic_Theology.docx",
-      cover_url: ""
-    },
-    {
-      id: "pb-bunyan-pilgrim",
-      title: "The Pilgrim's Progress & The Holy War",
-      author: "John Bunyan",
-      type: "logos_pb",
-      source_type: "logos_pb",
-      language: "en",
-      language_label: "Anglais",
-      format: "docx",
-      size_bytes: 2100000,
-      description: "The famous Christian allegory of Christian's journey from the City of Destruction to the Celestial City.",
-      abbreviation: "BUNYAN",
-      features: ["logos_pb", "classic", "english"],
-      download_url: "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/Bunyan_Pilgrims_Progress.docx",
-      cover_url: ""
-    }
-  ],
-
-  init() {
+  async init() {
     this._createModalDom();
-    this.refreshInstalledCache();
-    // Contrôle automatique doux des nouveautés au démarrage
+    await this.refreshInstalledCache();
+    
+    // Chargement différé du catalogue distant et des livres communautaires
     setTimeout(() => {
+      this.fetchCatalog();
       this.checkNewModulesOnStartup();
-    }, 2500);
+    }, 2000);
   },
 
   async refreshInstalledCache() {
@@ -293,12 +111,14 @@ const OpenShemaStore = {
   async fetchCatalog() {
     try {
       const response = await fetch(this.catalogUrl, { cache: 'no-cache' });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      this.catalogData = await response.json();
+      if (response.ok) {
+        this.catalogData = await response.json();
+      }
     } catch (err) {
       console.error('Erreur chargement catalogue distant:', err);
     }
     await this.fetchCommunityBooks();
+    this._populateInitialUnifiedResults();
     return this.catalogData;
   },
 
@@ -313,384 +133,85 @@ const OpenShemaStore = {
     }
   },
 
-  async getMissingBiblesCount() {
-    if (!this.catalogData) {
-      await this.fetchCatalog();
-    }
-    if (!this.catalogData || !this.catalogData.modules) return 0;
+  _populateInitialUnifiedResults() {
+    const official = (this.catalogData && this.catalogData.modules) ? this.catalogData.modules : [];
+    const community = this.communityLogosBooks || [];
 
-    const bibleModules = this.catalogData.modules.filter(m => m.type === 'bible');
-    const installed = (typeof BibleReader !== 'undefined' && Array.isArray(BibleReader.installedBibles) && BibleReader.installedBibles.length > 0)
-      ? BibleReader.installedBibles
-      : (await API.call('get_installed_bibles') || []);
+    this.unifiedResults.open_shema = official.map(m => ({
+      ...m,
+      category: 'open_shema',
+      badge_label: 'Natif Open Shema',
+      action_label: 'Installer dans l\'application',
+      is_free: true
+    }));
 
-    let missingCount = 0;
+    this.unifiedResults.public_domain = community.map(m => ({
+      ...m,
+      category: 'public_domain',
+      source: 'Logos Community Wiki',
+      badge_label: 'Logos PB',
+      action_label: 'Importer DOCX',
+      is_free: true
+    }));
 
-    for (const m of bibleModules) {
-      const code = (m.abbreviation || '').toUpperCase();
-      const id = (m.id || '').toLowerCase();
-      const cleanId = id.replace(/^bible-/, '');
-
-      const isInstalled = installed.some(b => {
-        const bName = (b.name || '').toLowerCase();
-        const bCode = (b.version_code || '').toUpperCase();
-        const bFolder = (b.folder_name || '').toLowerCase();
-        const bId = (b.id || '').toLowerCase();
-        return (code && bCode === code) || bName === id || bName === cleanId || bFolder === cleanId || bId === cleanId;
-      });
-
-      if (!isInstalled) missingCount++;
-    }
-
-    return missingCount;
+    this.unifiedResults.bookstores = [];
+    this.unifiedResults.direct_links = [
+      { name: "Bibli'O", url: "https://bibliostore.fr/12-ebooks" },
+      { name: "BLF Store", url: "https://blfstore.com/collections/ebooks" },
+      { name: "Publications Chrétiennes", url: "https://publicationschretiennes.com/collections/livres-numeriques" },
+      { name: "Éditions Clé", url: "https://editionscle.com/78-ebook" },
+      { name: "Google Play Livres", url: "https://play.google.com/store/books" },
+      { name: "Rakuten Kobo", url: "https://www.kobo.com/fr/fr" }
+    ];
   },
 
-  _isModuleInstalled(module) {
-    const id = (module.id || '').toLowerCase();
-    const abbr = (module.abbreviation || '').toUpperCase();
-    const cleanId = id.replace(/^(bible-|dict-|comm-|theology-|dataset-)/, '');
-
-    if (this.installedIds.has(id) || this.installedIds.has(cleanId)) return true;
-    if (abbr && (this.installedCodes.has(abbr) || this.installedIds.has(abbr.toLowerCase()))) return true;
-
-    if (id === 'dataset-bibleproject-fr' && (this.installedIds.has('bibleproject') || this.installedIds.has('dataset-bibleproject-fr') || this.installedIds.has('bp-fr'))) return true;
-    if (id === 'bible-lsg-1910' && (this.installedCodes.has('LSG') || this.installedIds.has('lsg'))) return true;
-    if (id === 'bible-darby' && (this.installedCodes.has('DARBY') || this.installedCodes.has('DARB') || this.installedIds.has('darby'))) return true;
-    if (id === 'dict-strong-fr' && (this.installedIds.has('strong') || this.installedIds.has('dict_strong_fr'))) return true;
-
-    return false;
-  },
-
-  _formatBytes(bytes) {
-    if (!bytes || bytes <= 0) return '0 Mo';
-    const mb = bytes / (1024 * 1024);
-    if (mb < 1) {
-      const kb = bytes / 1024;
-      return `${Math.round(kb)} Ko`;
+  async open(initialCategory = 'all', searchQuery = '') {
+    let modal = document.getElementById('modal-open-shema-store');
+    if (!modal) {
+      this._createModalDom();
+      modal = document.getElementById('modal-open-shema-store');
     }
-    return `${mb.toFixed(1)} Mo`;
-  },
-
-  _createModalDom() {
-    if (document.getElementById('modal-open-shema-store')) return;
-
-    const modal = document.createElement('div');
-    modal.id = 'modal-open-shema-store';
-    modal.className = 'modal-dialog-container hidden';
-    modal.style.position = 'fixed';
-    modal.style.inset = '0';
-    modal.style.zIndex = '10000';
-    modal.style.background = 'rgba(0, 0, 0, 0.72)';
-    modal.style.backdropFilter = 'blur(6px)';
-    modal.style.display = 'none';
-    modal.style.alignItems = 'center';
-    modal.style.justifyContent = 'center';
-
-    modal.innerHTML = `
-      <div class="modal-card store-modal-card" style="width: 980px; max-width: 94vw; height: 86vh; max-height: 800px; display: flex; flex-direction: column; background: var(--bg-card, #1e293b); border-radius: 12px; border: 1px solid var(--border-color, #334155); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); overflow: hidden; position: relative;">
-        
-        <!-- Header avec sélecteur d'onglets unifié -->
-        <div class="store-modal-header" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border-subtle, #334155); background: var(--bg-surface-elevated, #0f172a);">
-          <div style="display: flex; align-items: center; gap: 16px;">
-            <div class="store-modal-title-wrap" style="display: flex; align-items: center; gap: 10px;">
-              <div class="store-title-icon" style="width: 34px; height: 34px; border-radius: 8px; background: rgba(37, 99, 235, 0.15); color: #3b82f6; display: flex; align-items: center; justify-content: center;">
-                ${this.svgIcons.cloud}
-              </div>
-              <h3 class="store-modal-title" style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary, #f8fafc); margin: 0;">
-                Catalogue & Librairies
-              </h3>
-            </div>
-
-            <!-- Onglets de navigation principaux -->
-            <div class="store-nav-tabs" style="display: flex; background: rgba(255,255,255,0.06); padding: 3px; border-radius: 8px; gap: 4px;">
-              <button class="store-tab-btn active" data-tab="catalog" style="display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 6px; border: none; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s; background: var(--primary-accent, #2563eb); color: #fff;">
-                ${this.svgIcons.bible}
-                <span>Catalogue Gratuit Open Shema</span>
-              </button>
-              <button class="store-tab-btn" data-tab="ebooks" style="display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 6px; border: none; font-size: 0.82rem; font-weight: 500; cursor: pointer; transition: all 0.2s; background: transparent; color: var(--text-muted, #94a3b8);">
-                ${this.svgIcons.store}
-                <span>Trouver en E-book (Librairies)</span>
-              </button>
-            </div>
-          </div>
-
-          <button id="btn-close-store-modal" class="btn-icon-close" style="background: transparent; border: none; color: var(--text-muted, #94a3b8); cursor: pointer; padding: 6px; border-radius: 6px;" title="Fermer">
-            ${this.svgIcons.close}
-          </button>
-        </div>
-
-        <!-- ========================================================= -->
-        <!-- VUE ONGLET 1 : CATALOGUE OPEN SHEMA GRATUIT               -->
-        <!-- ========================================================= -->
-        <div id="store-tab-content-catalog" class="store-tab-pane" style="display: flex; flex-direction: column; flex: 1; min-height: 0;">
-          <div class="store-toolbar" style="padding: 12px 20px; border-bottom: 1px solid var(--border-subtle, #334155); background: var(--bg-card, #1e293b);">
-            <div style="position: relative; display: flex; align-items: center; margin-bottom: 10px;">
-              <div style="position: absolute; left: 12px; color: var(--text-muted, #94a3b8); display: flex; align-items: center; pointer-events: none;">
-                ${this.svgIcons.search}
-              </div>
-              <input type="text" id="store-search-input" placeholder="Rechercher une version, un livre ou un auteur dans le catalogue gratuit..." autocomplete="off" style="width: 100%; padding: 10px 38px 10px 36px; border-radius: 6px; border: 1px solid var(--border-color, #334155); background: var(--bg-surface-elevated, #0f172a); color: #fff; font-size: 0.9rem; outline: none;">
-            </div>
-
-            <div class="store-filters-row" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-              <div class="store-categories-bar" id="store-categories-bar" style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
-                <button class="store-cat-pill active" data-cat="all">Tous</button>
-                <button class="store-cat-pill" data-cat="bibles">Bibles</button>
-                <button class="store-cat-pill" data-cat="dictionaries">Dictionnaires</button>
-                <button class="store-cat-pill" data-cat="commentaries">Commentaires</button>
-                <button class="store-cat-pill" data-cat="theology">Théologie</button>
-                <button class="store-cat-pill" data-cat="datasets">Données</button>
-                <button class="store-cat-pill" data-cat="logos_pb" style="display: inline-flex; align-items: center; gap: 6px; border-color: rgba(139, 92, 246, 0.4); color: #c4b5fd;">
-                  ${this.svgIcons.book}
-                  <span>Livres Personnels Logos</span>
-                </button>
-                
-                <!-- Bouton d'aide sur les origines et formats (100% SVG) -->
-                <button id="btn-store-info-tooltip" style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 6px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-muted, #94a3b8); font-size: 0.75rem; cursor: pointer; transition: all 0.2s;" title="Comprendre la différence entre Modules Officiels et Livres Personnels">
-                  ${this.svgIcons.info}
-                  <span>Formats & Collections</span>
-                </button>
-              </div>
-
-              <label class="store-hide-installed-toggle" style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text-muted, #94a3b8); cursor: pointer;" title="Masquer les ouvrages déjà présents dans votre bibliothèque">
-                <input type="checkbox" id="store-hide-installed-cb">
-                <span class="store-toggle-text">Masquer les installés</span>
-              </label>
-            </div>
-          </div>
-
-          <div class="store-content-body" id="store-cards-container" style="flex: 1; overflow-y: auto; padding: 16px 20px;">
-            <div class="store-loading-state" style="text-align: center; padding: 40px; color: var(--text-muted, #94a3b8);">
-              ${this.svgIcons.refresh}
-              <span style="margin-left: 8px;">Chargement du catalogue officiel...</span>
-            </div>
-          </div>
-
-          <div class="store-modal-footer" style="padding: 10px 20px; border-top: 1px solid var(--border-subtle, #334155); background: var(--bg-surface-elevated, #0f172a); display: flex; align-items: center; justify-content: space-between; font-size: 0.78rem; color: var(--text-muted, #94a3b8);">
-            <div class="store-footer-meta">
-              <span>Dépôt officiel gratuit : <a href="https://github.com/Similarly1/open-shema-data" target="_blank" rel="noopener" style="color: #60a5fa; text-decoration: none;">open-shema-data</a></span>
-            </div>
-            <button id="btn-refresh-store" class="btn-store-secondary" title="Rafraîchir le catalogue" style="display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #fff; cursor: pointer;">
-              ${this.svgIcons.refresh}
-              <span>Actualiser</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- ========================================================= -->
-        <!-- VUE ONGLET 2 : RECHERCHE D'E-BOOKS CHRÉTIENS NUMÉRIQUES   -->
-        <!-- ========================================================= -->
-        <div id="store-tab-content-ebooks" class="store-tab-pane" style="display: none; flex-direction: column; flex: 1; min-height: 0;">
-          
-          <div style="padding: 12px 20px; border-bottom: 1px solid var(--border-subtle, #334155); background: var(--bg-card, #1e293b);">
-            <div style="position: relative; display: flex; align-items: center;">
-              <div style="position: absolute; left: 12px; color: var(--text-muted, #94a3b8); display: flex; align-items: center; pointer-events: none;">
-                ${this.svgIcons.search}
-              </div>
-              <input type="text" id="ebook-store-search-input" placeholder="Titre de la Bible ou de l'ouvrage (ex: Nouvelle Français Courant, Segond 21, John Piper, Romains)..." 
-                style="width: 100%; padding: 10px 38px 10px 36px; border-radius: 6px; border: 1px solid var(--border-color, #334155); background: var(--bg-surface-elevated, #0f172a); color: #fff; font-size: 0.9rem; outline: none;">
-              <button id="btn-clear-ebook-store-search" style="position: absolute; right: 10px; background: none; border: none; color: var(--text-muted, #94a3b8); cursor: pointer; padding: 4px; display: none;" title="Effacer">
-                ${this.svgIcons.close}
-              </button>
-            </div>
-            <div id="ebook-store-status" style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted, #94a3b8); display: flex; align-items: center; justify-content: space-between;">
-              <span>Recherchez un e-book chrétien chez Bibli'O, BLF Store, Pub. Chrétiennes, Google Play...</span>
-              <span style="font-size: 0.72rem; padding: 1px 7px; border-radius: 10px; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);">100% Numérique (EPUB/PDF)</span>
-            </div>
-          </div>
-
-          <div style="flex: 1; overflow-y: auto; padding: 16px 20px; background: var(--bg-card, #1e293b);">
-            
-            <!-- Liens directs pré-filtrés 1-clic (Fnac et Kobo) -->
-            <div id="ebook-store-direct-links-section" style="margin-bottom: 20px; padding: 12px 14px; border-radius: 8px; background: rgba(15, 23, 42, 0.55); border: 1px solid var(--border-subtle, #334155); display: none;">
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-                <div style="font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.05em; color: #60a5fa; font-weight: 700; display: flex; align-items: center; gap: 6px;">
-                  ${this.svgIcons.store} Recherche 1-clic : Fnac & Rakuten Kobo
-                </div>
-                <span style="font-size: 0.7rem; color: var(--text-muted, #94a3b8); opacity: 0.9;">Ouvre directement leur catalogue avec votre recherche</span>
-              </div>
-              <p style="font-size: 0.76rem; color: var(--text-muted, #94a3b8); margin: 0 0 10px 0; line-height: 1.35;">
-                Pour les plateformes avec pare-feu anti-robot (Fnac et Kobo), ces raccourcis ouvrent directement leur rayon numérique en 1 clic :
-              </p>
-              <div id="ebook-store-direct-links-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px;">
-              </div>
-            </div>
-
-            <!-- Grille des résultats e-books -->
-            <div id="ebook-store-results-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px;">
-              <div style="grid-column: 1 / -1; text-align: center; padding: 50px 20px; color: var(--text-muted, #94a3b8);">
-                <div style="display: inline-flex; padding: 14px; border-radius: 50%; background: rgba(255,255,255,0.03); margin-bottom: 10px;">
-                  ${this.svgIcons.bible}
-                </div>
-                <p style="font-size: 0.95rem; margin: 0 0 6px 0; font-weight: 500;">Recherche instantanée d'e-books chrétiens</p>
-                <p style="font-size: 0.82rem; margin: 0; opacity: 0.8;">Tapez une version biblique ou un auteur pour comparer les disponibilités et prix numériques.</p>
-              </div>
-            </div>
-
-          </div>
-
-          <div style="padding: 10px 20px; border-top: 1px solid var(--border-subtle, #334155); background: var(--bg-surface-elevated, #0f172a); display: flex; align-items: center; justify-content: space-between; font-size: 0.78rem; color: var(--text-muted, #94a3b8);">
-            <span>Sources en direct : Éditions Bibli'O, BLF Store, Publications Chrétiennes, Éditions Clé, Google Play</span>
-            <span style="color: #10b981;">Zéro livre papier inclus</span>
-          </div>
-
-        </div>
-
-      </div>
-    `;
-
-    document.body.appendChild(modal);
-
-    // Événements de fermeture
-    modal.querySelector('#btn-close-store-modal').addEventListener('click', () => this.close());
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) this.close();
-    });
-
-    // Basculement d'onglets principaux (Catalogue vs E-books)
-    modal.querySelectorAll('.store-tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const tab = btn.dataset.tab;
-        this.switchTab(tab);
-      });
-    });
-
-    // Recherche Catalogue Gratuit
-    const searchInput = modal.querySelector('#store-search-input');
-    searchInput.addEventListener('input', (e) => {
-      this.searchQuery = e.target.value.toLowerCase().trim();
-      this.renderCatalog();
-    });
-
-    modal.querySelectorAll('.store-cat-pill').forEach(btn => {
-      btn.addEventListener('click', () => {
-        modal.querySelectorAll('.store-cat-pill').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        this.activeCategory = btn.dataset.cat || 'all';
-        this.renderCatalog();
-      });
-    });
-
-    // Dialogue d'aide Formats & Collections (100% SVG & Popover centré)
-    const infoTooltipBtn = modal.querySelector('#btn-store-info-tooltip');
-    if (infoTooltipBtn) {
-      infoTooltipBtn.addEventListener('click', () => {
-        this.showFormatsHelpModal();
-      });
-    }
-
-    const hideCb = modal.querySelector('#store-hide-installed-cb');
-    if (hideCb) {
-      hideCb.checked = this.hideInstalled;
-      hideCb.addEventListener('change', (e) => {
-        this.hideInstalled = e.target.checked;
-        localStorage.setItem('open_shema_store_hide_installed', this.hideInstalled ? 'true' : 'false');
-        this.renderCatalog();
-      });
-    }
-
-    modal.querySelector('#btn-refresh-store').addEventListener('click', async () => {
-      const btn = modal.querySelector('#btn-refresh-store');
-      btn.classList.add('spinning');
-      await this.refreshInstalledCache();
-      await this.fetchCatalog();
-      btn.classList.remove('spinning');
-      this.renderCatalog();
-    });
-
-    // Recherche E-books chrétiens
-    const ebookInput = modal.querySelector('#ebook-store-search-input');
-    const clearEbookBtn = modal.querySelector('#btn-clear-ebook-store-search');
-
-    clearEbookBtn.addEventListener('click', () => {
-      ebookInput.value = '';
-      clearEbookBtn.style.display = 'none';
-      ebookInput.focus();
-      this.renderEbooksEmptyState();
-    });
-
-    ebookInput.addEventListener('input', () => {
-      const q = ebookInput.value.trim();
-      clearEbookBtn.style.display = q ? 'block' : 'none';
-      clearTimeout(this.ebookDebounceTimer);
-      if (!q) {
-        this.renderEbooksEmptyState();
-        return;
-      }
-      this.ebookDebounceTimer = setTimeout(() => {
-        this.searchEbooks(q);
-      }, 300);
-    });
-
-    ebookInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        clearTimeout(this.ebookDebounceTimer);
-        this.searchEbooks(ebookInput.value.trim());
-      } else if (e.key === 'Escape') {
-        this.close();
-      }
-    });
-  },
-
-  switchTab(tab) {
-    this.activeTab = tab;
-    const modal = document.getElementById('modal-open-shema-store');
-    if (!modal) return;
-
-    modal.querySelectorAll('.store-tab-btn').forEach(b => {
-      const isActive = b.dataset.tab === tab;
-      b.classList.toggle('active', isActive);
-      b.style.background = isActive ? 'var(--primary-accent, #2563eb)' : 'transparent';
-      b.style.color = isActive ? '#fff' : 'var(--text-muted, #94a3b8)';
-    });
-
-    const catalogPane = modal.querySelector('#store-tab-content-catalog');
-    const ebooksPane = modal.querySelector('#store-tab-content-ebooks');
-
-    if (tab === 'catalog') {
-      catalogPane.style.display = 'flex';
-      ebooksPane.style.display = 'none';
-      this.renderCatalog();
-      setTimeout(() => modal.querySelector('#store-search-input')?.focus(), 50);
-    } else {
-      catalogPane.style.display = 'none';
-      ebooksPane.style.display = 'flex';
-      const ebookInput = modal.querySelector('#ebook-store-search-input');
-      setTimeout(() => ebookInput?.focus(), 50);
-    }
-  },
-
-  async open(initialTab = 'catalog', filterOrQuery = '') {
-    this._createModalDom();
-    const modal = document.getElementById('modal-open-shema-store');
     if (!modal) return;
 
     modal.style.display = 'flex';
     modal.classList.remove('hidden');
 
-    if (initialTab === 'ebooks') {
-      this.switchTab('ebooks');
-      if (filterOrQuery) {
-        const input = modal.querySelector('#ebook-store-search-input');
-        if (input) {
-          input.value = filterOrQuery;
-          modal.querySelector('#btn-clear-ebook-store-search').style.display = 'block';
-          this.searchEbooks(filterOrQuery);
-        }
-      }
-    } else {
-      this.switchTab('catalog');
-      if (filterOrQuery) {
-        this.activeCategory = filterOrQuery;
-        modal.querySelectorAll('.store-cat-pill').forEach(b => {
-          b.classList.toggle('active', b.dataset.cat === filterOrQuery);
-        });
-      }
-      await this.refreshInstalledCache();
-      if (!this.catalogData) {
-        await this.fetchCatalog();
-      }
-      this.renderCatalog();
+    this.activeCategory = initialCategory || 'all';
+    if (searchQuery) {
+      this.searchQuery = searchQuery;
     }
+
+    await this.refreshInstalledCache();
+
+    if (!this.catalogData) {
+      await this.fetchCatalog();
+    } else {
+      this._populateInitialUnifiedResults();
+    }
+
+    this._updateCategoryPills();
+
+    const searchInput = modal.querySelector('#store-unified-search-input');
+    if (searchInput) {
+      if (this.searchQuery) {
+        searchInput.value = this.searchQuery;
+        this._handleSearchInput(true);
+      } else {
+        this.renderUnifiedHub();
+      }
+      setTimeout(() => searchInput.focus(), 50);
+    } else {
+      this.renderUnifiedHub();
+    }
+  },
+
+  async getMissingBiblesCount() {
+    if (!this.catalogData) {
+      await this.fetchCatalog();
+    }
+    if (!this.catalogData || !this.catalogData.modules) return 0;
+    const bibleModules = this.catalogData.modules.filter(m => m.type === 'bible');
+    return bibleModules.filter(m => !this._isModuleInstalled(m)).length;
   },
 
   close() {
@@ -701,65 +222,348 @@ const OpenShemaStore = {
     }
   },
 
-  renderCatalog() {
-    const container = document.getElementById('store-cards-container');
-    if (!container) return;
+  _createModalDom() {
+    let modal = document.getElementById('modal-open-shema-store');
+    if (modal) return;
 
-    const officialModules = (this.catalogData && this.catalogData.modules) 
-      ? this.catalogData.modules.map(m => ({ ...m, source_type: 'official' })) 
-      : [];
-    const communityModules = (this.communityLogosBooks || []).map(m => ({ ...m, source_type: 'logos_pb' }));
-    const allModules = [...officialModules, ...communityModules];
+    modal = document.createElement('div');
+    modal.id = 'modal-open-shema-store';
+    modal.className = 'store-modal-overlay hidden';
+    modal.style.cssText = 'position: fixed; inset: 0; z-index: 10000; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center;';
 
-    const pbPill = document.querySelector('.store-cat-pill[data-cat="logos_pb"]');
-    if (pbPill && communityModules.length > 0) {
-      pbPill.innerHTML = `${this.svgIcons.book} <span>Livres Personnels Logos (${communityModules.length})</span>`;
+    modal.innerHTML = `
+      <div class="store-modal-card" style="width: 1060px; max-width: 95vw; height: 88vh; display: flex; flex-direction: column; background: var(--bg-card, #1e293b); border-radius: 14px; border: 1px solid var(--border-color, #334155); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); overflow: hidden; animation: modalFadeIn 0.2s ease-out;">
+        
+        <!-- HEADER DU HUB UNIFIÉ -->
+        <div class="store-modal-header" style="padding: 14px 20px; border-bottom: 1px solid var(--border-subtle, #334155); background: var(--bg-surface-elevated, #0f172a); display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="store-logo-badge" style="width: 38px; height: 38px; border-radius: 9px; background: linear-gradient(135deg, #2563eb, #10b981); color: #fff; display: flex; align-items: center; justify-content: center;">
+              ${this.svgIcons.sparkle}
+            </div>
+            <div>
+              <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
+                Recherche & Découverte Biblique
+              </h3>
+              <div style="font-size: 0.76rem; color: var(--text-muted, #94a3b8); margin-top: 1px;">
+                ✦ Open Shema &bull; ⚡ Domaine Public &bull; 🛒 Librairies Chrétiennes
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <!-- Bouton Formats & Collections Centré -->
+            <button id="btn-store-info-tooltip" style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 6px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-muted, #94a3b8); font-size: 0.75rem; cursor: pointer; transition: all 0.2s;" title="Comprendre les 3 collections">
+              ${this.svgIcons.info}
+              <span>Formats & Origines</span>
+            </button>
+
+            <button id="btn-close-store-modal" class="btn-icon-close" style="background: transparent; border: none; color: var(--text-muted, #94a3b8); cursor: pointer; padding: 6px; border-radius: 6px;" title="Fermer">
+              ${this.svgIcons.close}
+            </button>
+          </div>
+        </div>
+
+        <!-- TOOLBAR DE RECHERCHE UNIFIÉE -->
+        <div class="store-toolbar" style="padding: 14px 20px 10px 20px; border-bottom: 1px solid var(--border-subtle, #334155); background: var(--bg-card, #1e293b);">
+          
+          <!-- Champ de recherche principal -->
+          <div style="position: relative; display: flex; align-items: center; margin-bottom: 10px;">
+            <div style="position: absolute; left: 14px; color: var(--text-muted, #94a3b8); display: flex; align-items: center; pointer-events: none;">
+              ${this.svgIcons.search}
+            </div>
+            <input type="text" id="store-unified-search-input" placeholder="Rechercher un auteur, un livre, une Bible ou un sujet (ex: Calvin, Romains, Spurgeon, Augustin, Segond)..." autocomplete="off" style="width: 100%; padding: 11px 40px 11px 40px; border-radius: 8px; border: 1px solid var(--border-color, #334155); background: var(--bg-surface-elevated, #0f172a); color: #fff; font-size: 0.92rem; outline: none; transition: border-color 0.2s;">
+            <div id="store-search-spinner" style="position: absolute; right: 14px; color: #60a5fa; display: none; align-items: center;">
+              ${this.svgIcons.spinner}
+            </div>
+          </div>
+
+          <!-- Ligne des Facettes & Filtres Rapides -->
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            
+            <!-- Pills Catégories -->
+            <div class="store-categories-bar" id="store-facets-bar" style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+              <button class="store-cat-pill active" data-cat="all">
+                <span>Tous</span>
+                <span class="facet-count" id="count-facet-all">0</span>
+              </button>
+              <button class="store-cat-pill" data-cat="open_shema" style="border-color: rgba(16, 185, 129, 0.35); color: #34d399;">
+                ${this.svgIcons.sparkle}
+                <span>✦ Open Shema</span>
+                <span class="facet-count" id="count-facet-openshema">0</span>
+              </button>
+              <button class="store-cat-pill" data-cat="public_domain" style="border-color: rgba(59, 130, 246, 0.35); color: #60a5fa;">
+                ${this.svgIcons.book}
+                <span>⚡ Domaine Public & Gratuit</span>
+                <span class="facet-count" id="count-facet-publicdomain">0</span>
+              </button>
+              <button class="store-cat-pill" data-cat="bookstores" style="border-color: rgba(168, 85, 247, 0.35); color: #c084fc;">
+                ${this.svgIcons.store}
+                <span>🛒 Librairies Chrétiennes</span>
+                <span class="facet-count" id="count-facet-bookstores">0</span>
+              </button>
+            </div>
+
+            <!-- Filtres Secondaires (Langue & Installés) -->
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <select id="store-lang-filter-select" style="padding: 4px 8px; border-radius: 6px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); color: #e2e8f0; font-size: 0.76rem; outline: none; cursor: pointer;">
+                <option value="all">🌐 Toutes les langues</option>
+                <option value="fr">FR Français</option>
+                <option value="en">EN Anglais</option>
+              </select>
+
+              <label class="store-hide-installed-toggle" style="display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--text-muted, #94a3b8); cursor: pointer;" title="Masquer les ouvrages déjà installés">
+                <input type="checkbox" id="store-hide-installed-cb">
+                <span>Masquer installés</span>
+              </label>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ZONE CENTRALE DES RÉSULTATS UNIFIÉS -->
+        <div class="store-content-body" id="store-unified-container" style="flex: 1; overflow-y: auto; padding: 18px 20px; background: var(--bg-card, #1e293b);">
+          <div class="store-loading-state" style="text-align: center; padding: 50px 20px; color: var(--text-muted, #94a3b8);">
+            ${this.svgIcons.refresh}
+            <span style="margin-left: 8px;">Chargement du catalogue...</span>
+          </div>
+        </div>
+
+        <!-- FOOTER UNIFIÉ -->
+        <div class="store-modal-footer" style="padding: 10px 20px; border-top: 1px solid var(--border-subtle, #334155); background: var(--bg-surface-elevated, #0f172a); display: flex; align-items: center; justify-content: space-between; font-size: 0.78rem; color: var(--text-muted, #94a3b8);">
+          <div class="store-footer-meta" style="display: flex; align-items: center; gap: 14px;">
+            <span>✦ Dépôt officiel : <a href="https://github.com/Similarly1/open-shema-data" target="_blank" rel="noopener" style="color: #60a5fa; text-decoration: none;">open-shema-data</a></span>
+            <span style="opacity: 0.6;">&bull;</span>
+            <span>⚡ Domaine Public : Gutenberg & Logos PB</span>
+            <span style="opacity: 0.6;">&bull;</span>
+            <span>🛒 100% E-books numériques</span>
+          </div>
+          <button id="btn-refresh-store" class="btn-store-secondary" title="Actualiser les données" style="display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #fff; cursor: pointer;">
+            ${this.svgIcons.refresh}
+            <span>Actualiser</span>
+          </button>
+        </div>
+
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+    this._attachEvents(modal);
+  },
+
+  _attachEvents(modal) {
+    // Fermeture
+    modal.querySelector('#btn-close-store-modal').addEventListener('click', () => this.close());
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) this.close();
+    });
+
+    // Recherche unifiée avec debounce
+    const searchInput = modal.querySelector('#store-unified-search-input');
+    searchInput.addEventListener('input', (e) => {
+      this.searchQuery = e.target.value.trim();
+      this._handleSearchInput();
+    });
+
+    // Filtres Facettes Catégories
+    modal.querySelectorAll('.store-cat-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        modal.querySelectorAll('.store-cat-pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.activeCategory = btn.dataset.cat || 'all';
+        this.renderUnifiedHub();
+      });
+    });
+
+    // Filtre Langue
+    const langSelect = modal.querySelector('#store-lang-filter-select');
+    if (langSelect) {
+      langSelect.addEventListener('change', (e) => {
+        this.activeLanguage = e.target.value;
+        this.renderUnifiedHub();
+      });
     }
 
-    if (allModules.length === 0) {
-      container.innerHTML = `
-        <div class="store-empty-state">
-          <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <p>Impossible de joindre le catalogue. Vérifiez votre connexion internet.</p>
-        </div>
-      `;
+    // Toggle Masquer les installés
+    const hideCb = modal.querySelector('#store-hide-installed-cb');
+    if (hideCb) {
+      hideCb.checked = this.hideInstalled;
+      hideCb.addEventListener('change', (e) => {
+        this.hideInstalled = e.target.checked;
+        localStorage.setItem('open_shema_store_hide_installed', this.hideInstalled ? 'true' : 'false');
+        this.renderUnifiedHub();
+      });
+    }
+
+    // Formats & Collections Dialog
+    const infoTooltipBtn = modal.querySelector('#btn-store-info-tooltip');
+    if (infoTooltipBtn) {
+      infoTooltipBtn.addEventListener('click', () => {
+        this.showFormatsHelpModal();
+      });
+    }
+
+    // Rafraîchir
+    modal.querySelector('#btn-refresh-store').addEventListener('click', async () => {
+      const btn = modal.querySelector('#btn-refresh-store');
+      btn.classList.add('spinning');
+      await this.refreshInstalledCache();
+      await this.fetchCatalog();
+      btn.classList.remove('spinning');
+      this._handleSearchInput(true);
+    });
+  },
+
+  _handleSearchInput(force = false) {
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+    }
+
+    // Filtrage instantané en mémoire des données locales
+    this._filterLocalModulesInstant();
+    this.renderUnifiedHub();
+
+    const query = this.searchQuery;
+    if (!query || query.length < 2) {
+      this._populateInitialUnifiedResults();
+      this._updateFacetCounts();
+      this.renderUnifiedHub();
       return;
     }
 
-    const filteredModules = allModules.filter(m => {
-      if (this.hideInstalled && this._isModuleInstalled(m)) return false;
-
-      if (this.activeCategory !== 'all') {
-        if (this.activeCategory === 'logos_pb') {
-          return m.source_type === 'logos_pb';
+    // Déclenchement de la recherche réseau unifiée
+    this.searchDebounceTimer = setTimeout(async () => {
+      this._showSearchSpinner(true);
+      try {
+        const officialModules = (this.catalogData && this.catalogData.modules) ? this.catalogData.modules : [];
+        const res = await API.call('search_unified_hub', query, officialModules);
+        if (res) {
+          if (Array.isArray(res.open_shema_results)) {
+            this.unifiedResults.open_shema = res.open_shema_results;
+          }
+          if (Array.isArray(res.public_domain_results)) {
+            this.unifiedResults.public_domain = res.public_domain_results;
+          }
+          if (Array.isArray(res.bookstore_results)) {
+            this.unifiedResults.bookstores = res.bookstore_results;
+          }
+          if (Array.isArray(res.direct_store_links)) {
+            this.unifiedResults.direct_links = res.direct_store_links;
+          }
         }
-        if (m.source_type === 'logos_pb') return false;
-
-        if (this.activeCategory === 'bibles' && m.type !== 'bible') return false;
-        if (this.activeCategory === 'dictionaries' && m.type !== 'dictionary') return false;
-        if (this.activeCategory === 'commentaries' && m.type !== 'commentary') return false;
-        if (this.activeCategory === 'theology' && m.type !== 'theology') return false;
-        if (this.activeCategory === 'datasets' && m.type !== 'dataset') return false;
+      } catch (err) {
+        console.warn('Erreur recherche unifiée réseau:', err);
+      } finally {
+        this._showSearchSpinner(false);
+        this._updateFacetCounts();
+        this.renderUnifiedHub();
       }
+    }, 350);
+  },
 
-      if (this.searchQuery) {
-        const title = (m.title || '').toLowerCase();
-        const author = (m.author || '').toLowerCase();
-        const desc = (m.description || '').toLowerCase();
-        const abbr = (m.abbreviation || '').toLowerCase();
-        return title.includes(this.searchQuery) || author.includes(this.searchQuery) || desc.includes(this.searchQuery) || abbr.includes(this.searchQuery);
-      }
-      return true;
+  _showSearchSpinner(show) {
+    const spinner = document.getElementById('store-search-spinner');
+    if (spinner) {
+      spinner.style.display = show ? 'flex' : 'none';
+    }
+  },
+
+  _filterLocalModulesInstant() {
+    const q = (this.searchQuery || '').toLowerCase();
+    const official = (this.catalogData && this.catalogData.modules) ? this.catalogData.modules : [];
+    const community = this.communityLogosBooks || [];
+
+    if (!q) {
+      this._populateInitialUnifiedResults();
+      return;
+    }
+
+    this.unifiedResults.open_shema = official.filter(m => {
+      return (m.title || '').toLowerCase().includes(q) ||
+             (m.author || '').toLowerCase().includes(q) ||
+             (m.description || '').toLowerCase().includes(q) ||
+             (m.abbreviation || '').toLowerCase().includes(q);
+    }).map(m => ({ ...m, category: 'open_shema', badge_label: 'Natif Open Shema', action_label: 'Installer dans l\'application', is_free: true }));
+
+    this.unifiedResults.public_domain = community.filter(m => {
+      return (m.title || '').toLowerCase().includes(q) ||
+             (m.author || '').toLowerCase().includes(q) ||
+             (m.description || '').toLowerCase().includes(q);
+    }).map(m => ({ ...m, category: 'public_domain', source: 'Logos Community Wiki', badge_label: 'Logos PB', action_label: 'Importer DOCX', is_free: true }));
+
+    this._updateFacetCounts();
+  },
+
+  _updateFacetCounts() {
+    const countAll = (this.unifiedResults.open_shema.length) + (this.unifiedResults.public_domain.length) + (this.unifiedResults.bookstores.length);
+    
+    const setTxt = (id, count) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = count;
+    };
+
+    setTxt('count-facet-all', countAll);
+    setTxt('count-facet-openshema', this.unifiedResults.open_shema.length);
+    setTxt('count-facet-publicdomain', this.unifiedResults.public_domain.length);
+    setTxt('count-facet-bookstores', this.unifiedResults.bookstores.length);
+  },
+
+  _updateCategoryPills() {
+    const modal = document.getElementById('modal-open-shema-store');
+    if (!modal) return;
+    modal.querySelectorAll('.store-cat-pill').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.cat === this.activeCategory);
+    });
+    this._updateFacetCounts();
+  },
+
+  _isModuleInstalled(m) {
+    if (!m) return false;
+    const id = String(m.id || '').toLowerCase();
+    const cleanId = id.replace(/^(bible|dict|theology|comm)-/, '');
+    const code = String(m.abbreviation || m.version_code || '').toUpperCase();
+    return this.installedIds.has(id) || this.installedIds.has(cleanId) || (code && this.installedCodes.has(code));
+  },
+
+  _matchesLang(m) {
+    if (this.activeLanguage === 'all') return true;
+    const l = (m.language || 'fr').toLowerCase();
+    return l.startsWith(this.activeLanguage);
+  },
+
+  renderUnifiedHub() {
+    const container = document.getElementById('store-unified-container');
+    if (!container) return;
+
+    this._updateFacetCounts();
+
+    const openShemaList = (this.unifiedResults.open_shema || []).filter(m => {
+      if (this.hideInstalled && this._isModuleInstalled(m)) return false;
+      return this._matchesLang(m);
     });
 
-    if (filteredModules.length === 0) {
-      const isAllInstalled = this.hideInstalled && allModules.some(m => this._isModuleInstalled(m));
+    const publicDomainList = (this.unifiedResults.public_domain || []).filter(m => {
+      if (this.hideInstalled && this._isModuleInstalled(m)) return false;
+      return this._matchesLang(m);
+    });
+
+    const bookstoresList = (this.unifiedResults.bookstores || []).filter(m => {
+      return this._matchesLang(m);
+    });
+
+    const totalVisible = (this.activeCategory === 'all')
+      ? (openShemaList.length + publicDomainList.length + bookstoresList.length)
+      : (this.activeCategory === 'open_shema' ? openShemaList.length : (this.activeCategory === 'public_domain' ? publicDomainList.length : bookstoresList.length));
+
+    if (totalVisible === 0) {
       container.innerHTML = `
-        <div class="store-empty-state">
-          <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.8">
-            ${isAllInstalled ? '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>' : '<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>'}
+        <div class="store-empty-state" style="text-align: center; padding: 60px 20px; color: var(--text-muted, #94a3b8);">
+          <svg viewBox="0 0 24 24" width="42" height="42" fill="none" stroke="currentColor" stroke-width="1.8" style="margin-bottom: 12px; opacity: 0.6;">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
           </svg>
-          <p>${isAllInstalled ? 'Tous les ouvrages de cette sélection sont déjà installés dans votre bibliothèque !' : 'Aucun ouvrage ne correspond à votre recherche dans cette catégorie.'}</p>
+          <h4 style="margin: 0 0 6px 0; color: #f8fafc; font-size: 1.05rem;">Aucun résultat pour cette sélection</h4>
+          <p style="font-size: 0.85rem; max-width: 450px; margin: 0 auto; line-height: 1.45;">
+            Essayez d'autres mots-clés ou désactivez le filtre « Masquer installés » pour explorer les ouvrages déjà présents.
+          </p>
         </div>
       `;
       return;
@@ -767,290 +571,296 @@ const OpenShemaStore = {
 
     container.innerHTML = '';
 
-    // Bannière explicative pour les Livres Personnels Logos (100% SVG)
-    if (this.activeCategory === 'logos_pb') {
-      const banner = document.createElement('div');
-      banner.style.cssText = 'margin-bottom: 16px; padding: 12px 16px; border-radius: 8px; background: rgba(139, 92, 246, 0.12); border: 1px solid rgba(139, 92, 246, 0.3); display: flex; align-items: flex-start; gap: 12px;';
-      banner.innerHTML = `
-        <div style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; background: rgba(139, 92, 246, 0.2); color: #c4b5fd; flex-shrink: 0;">
-          ${this.svgIcons.book}
-        </div>
-        <div style="flex: 1; font-size: 0.82rem; color: #cbd5e1; line-height: 1.45;">
-          <div style="font-weight: 700; color: #f8fafc; font-size: 0.88rem; margin-bottom: 2px;">
-            Répertoire Communautaire Logos (Personal Books)
+    // =========================================================================
+    // SECTION 1 : ✦ MODULES OPTIMISÉS OPEN SHEMA (Natif)
+    // =========================================================================
+    if ((this.activeCategory === 'all' || this.activeCategory === 'open_shema') && openShemaList.length > 0) {
+      const sec = document.createElement('div');
+      sec.className = 'store-unified-section';
+      sec.style.marginBottom = '28px';
+
+      sec.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(16, 185, 129, 0.25);">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="color: #10b981;">${this.svgIcons.sparkle}</span>
+            <span style="font-weight: 700; color: #f8fafc; font-size: 0.95rem;">Modules Officiels Open Shema</span>
+            <span style="font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; background: rgba(16, 185, 129, 0.15); color: #34d399; font-weight: 700;">Natif 1-clic</span>
           </div>
-          Ces ouvrages au format Word (<strong>.docx</strong>) proviennent du répertoire libre et communautaire de Logos. En cliquant sur <strong>Importer</strong>, Open Shema télécharge le fichier et l'indexe automatiquement dans votre bibliothèque de documents.
+          <span style="font-size: 0.76rem; color: var(--text-muted, #94a3b8);">${openShemaList.length} module(s)</span>
         </div>
+        <div class="store-modules-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px;"></div>
       `;
-      container.appendChild(banner);
+
+      const grid = sec.querySelector('.store-modules-grid');
+      openShemaList.forEach(m => grid.appendChild(this._renderOpenShemaCard(m)));
+      container.appendChild(sec);
     }
 
-    const grid = document.createElement('div');
-    grid.className = 'store-modules-grid';
+    // =========================================================================
+    // SECTION 2 : ⚡ DOMAINE PUBLIC & ARCHIVES LIBRES (Gutenberg / Logos PB)
+    // =========================================================================
+    if ((this.activeCategory === 'all' || this.activeCategory === 'public_domain') && publicDomainList.length > 0) {
+      const sec = document.createElement('div');
+      sec.className = 'store-unified-section';
+      sec.style.marginBottom = '28px';
 
-    filteredModules.forEach(m => {
-      const isInstalled = this._isModuleInstalled(m);
-      const isDownloading = !!this.isDownloading[m.id];
-      const card = document.createElement('div');
-      card.className = `store-card ${isInstalled ? 'installed' : ''}`;
-
-      const isLogosPb = m.source_type === 'logos_pb';
-      const iconSvg = isLogosPb ? this.svgIcons.book : (this.svgIcons[m.type] || this.svgIcons.bible);
-      const typeLabel = isLogosPb 
-        ? 'Logos PB' 
-        : (m.type === 'bible' ? 'Bible' : (m.type === 'dictionary' ? 'Dictionnaire' : (m.type === 'commentary' ? 'Commentaire' : (m.type === 'theology' ? 'Théologie' : 'Données'))));
-      
-      const hasStrong = (m.features || []).includes('strong') || (m.features || []).includes('strong_ready');
-      const langBadge = m.language ? `<span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: rgba(255, 255, 255, 0.08); color: #e2e8f0; font-weight: 700; letter-spacing: 0.03em;">${m.language.toUpperCase()}</span>` : '';
-
-      card.innerHTML = `
-        <div class="store-card-header">
-          <div class="store-card-type-tag" style="${isLogosPb ? 'background: rgba(139, 92, 246, 0.18); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.35);' : ''}">
-            <span class="store-card-type-icon">${iconSvg}</span>
-            <span>${typeLabel}</span>
+      sec.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(59, 130, 246, 0.25);">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="color: #60a5fa;">${this.svgIcons.book}</span>
+            <span style="font-weight: 700; color: #f8fafc; font-size: 0.95rem;">Domaine Public & Archives Libres</span>
+            <span style="font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; background: rgba(59, 130, 246, 0.15); color: #60a5fa; font-weight: 700;">Gutenberg & Logos PB</span>
           </div>
-          ${langBadge}
-          ${hasStrong ? `<span class="store-badge-strong" title="Comprend les codes Strong Hébreu/Grec">${this.svgIcons.sparkle} Strong</span>` : ''}
-          ${isLogosPb ? `<span class="store-badge-size" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3);">DOCX</span>` : ''}
-          <span class="store-badge-size">${this._formatBytes(m.size_bytes)}</span>
+          <span style="font-size: 0.76rem; color: var(--text-muted, #94a3b8);">${publicDomainList.length} livre(s)</span>
         </div>
-
-        <div class="store-card-body">
-          ${m.cover_url ? `
-            <div class="store-card-cover-container">
-              <img src="${m.cover_url}" class="store-card-cover-img" alt="${m.title}" loading="lazy" />
-            </div>
-          ` : ''}
-          <div class="store-card-info-container">
-            <h4 class="store-card-title">${m.title}</h4>
-            <div class="store-card-author">${m.author || 'Domaine Public'}</div>
-            <p class="store-card-desc">${m.description || ''}</p>
-          </div>
-        </div>
-
-        <div class="store-card-footer">
-          <div class="store-card-code-badge">${m.abbreviation || m.id.toUpperCase()}</div>
-          
-          ${isInstalled ? `
-            <button class="btn-store-action installed" disabled>
-              ${this.svgIcons.check}
-              <span>${isLogosPb ? 'Importé' : 'Installé'}</span>
-            </button>
-          ` : (isDownloading ? `
-            <button class="btn-store-action downloading" disabled>
-              <div class="store-spinner"></div>
-              <span>${isLogosPb ? 'Importation...' : 'Téléchargement...'}</span>
-            </button>
-          ` : `
-            <button class="btn-store-action download" data-id="${m.id}">
-              ${this.svgIcons.download}
-              <span>${isLogosPb ? 'Importer DOCX' : 'Télécharger'}</span>
-            </button>
-          `)}
-        </div>
+        <div class="store-modules-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px;"></div>
       `;
 
-      const dlBtn = card.querySelector('.btn-store-action.download');
-      if (dlBtn) {
-        dlBtn.addEventListener('click', () => this.downloadModule(m));
-      }
+      const grid = sec.querySelector('.store-modules-grid');
+      publicDomainList.forEach(m => grid.appendChild(this._renderPublicDomainCard(m)));
+      container.appendChild(sec);
+    }
 
-      grid.appendChild(card);
-    });
+    // =========================================================================
+    // SECTION 3 : 🛒 LIBRAIRIES & ÉDITEURS CHRÉTIENS (E-books payants)
+    // =========================================================================
+    if ((this.activeCategory === 'all' || this.activeCategory === 'bookstores')) {
+      const sec = document.createElement('div');
+      sec.className = 'store-unified-section';
+      sec.style.marginBottom = '20px';
 
-    container.appendChild(grid);
-  },
-
-  renderEbooksEmptyState() {
-    const modal = document.getElementById('modal-open-shema-store');
-    if (!modal) return;
-
-    modal.querySelector('#ebook-store-direct-links-section').style.display = 'none';
-    modal.querySelector('#ebook-store-status').innerHTML = `
-      <span>Recherchez un e-book chrétien chez Bibli'O, BLF Store, Pub. Chrétiennes, Google Play...</span>
-      <span style="font-size: 0.72rem; padding: 1px 7px; border-radius: 10px; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);">100% Numérique (EPUB/PDF)</span>
-    `;
-
-    modal.querySelector('#ebook-store-results-container').innerHTML = `
-      <div style="grid-column: 1 / -1; text-align: center; padding: 50px 20px; color: var(--text-muted, #94a3b8);">
-        <div style="display: inline-flex; padding: 14px; border-radius: 50%; background: rgba(255,255,255,0.03); margin-bottom: 10px;">
-          ${this.svgIcons.bible}
+      sec.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(168, 85, 247, 0.25);">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="color: #c084fc;">${this.svgIcons.store}</span>
+            <span style="font-weight: 700; color: #f8fafc; font-size: 0.95rem;">Librairies & Éditeurs Chrétiens (E-books)</span>
+            <span style="font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; background: rgba(168, 85, 247, 0.15); color: #c084fc; font-weight: 700;">100% Numérique</span>
+          </div>
+          <span style="font-size: 0.76rem; color: var(--text-muted, #94a3b8);">${bookstoresList.length} e-book(s)</span>
         </div>
-        <p style="font-size: 0.95rem; margin: 0 0 6px 0; font-weight: 500;">Recherche instantanée d'e-books chrétiens</p>
-        <p style="font-size: 0.82rem; margin: 0; opacity: 0.8;">Tapez une version biblique ou un auteur pour comparer les disponibilités et prix numériques.</p>
-      </div>
-    `;
-  },
-
-  async searchEbooks(query) {
-    if (!query) return;
-    const modal = document.getElementById('modal-open-shema-store');
-    if (!modal) return;
-
-    this.ebookSearchQuery = query;
-    this.isSearchingEbooks = true;
-
-    const statusEl = modal.querySelector('#ebook-store-status');
-    const resultsEl = modal.querySelector('#ebook-store-results-container');
-    const directSection = modal.querySelector('#ebook-store-direct-links-section');
-    const directLinksEl = modal.querySelector('#ebook-store-direct-links-container');
-
-    statusEl.innerHTML = `
-      <span style="display: flex; align-items: center; gap: 8px; color: #60a5fa;">
-        ${this.svgIcons.spinner} Recherche en direct dans les librairies chrétiennes...
-      </span>
-      <span style="font-size: 0.72rem; padding: 1px 7px; border-radius: 10px; background: rgba(16, 185, 129, 0.15); color: #10b981;">100% Numérique</span>
-    `;
-
-    resultsEl.innerHTML = `
-      <div style="grid-column: 1 / -1; text-align: center; padding: 50px 20px; color: var(--text-muted, #94a3b8);">
-        <div style="display: inline-flex; animation: spin 1s linear infinite; margin-bottom: 10px;">
-          ${this.svgIcons.spinner}
+        
+        <!-- Raccourcis directs vers les librairies chrétiennes -->
+        <div style="margin-bottom: 14px; padding: 10px 14px; border-radius: 8px; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-subtle, #334155); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+          <div style="font-size: 0.76rem; color: var(--text-muted, #94a3b8); display: flex; align-items: center; gap: 6px;">
+            ${this.svgIcons.external} Rayons e-books directs :
+          </div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            ${(this.unifiedResults.direct_links || []).map(link => `
+              <button class="btn-direct-store-link" data-url="${this._escapeHtml(link.url)}" style="display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 4px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #cbd5e1; font-size: 0.72rem; cursor: pointer; transition: all 0.2s;">
+                <span>${this._escapeHtml(link.name)}</span>
+              </button>
+            `).join('')}
+          </div>
         </div>
-        <p style="font-size: 0.9rem; margin: 0;">Interrogation de Bibli'O, BLF Store, Publications Chrétiennes et Google Play...</p>
-      </div>
-    `;
 
-    try {
-      const data = await API.call('search_christian_ebooks', query);
-      this.isSearchingEbooks = false;
-
-      if (!data || this.ebookSearchQuery !== query) return;
-
-      const results = data.results || [];
-      const directLinks = data.direct_links || [];
-
-      // Statut
-      statusEl.innerHTML = `
-        <span><strong>${results.length}</strong> e-book(s) trouvé(s) pour « <em>${this._escapeHtml(query)}</em> »</span>
-        <span style="font-size: 0.72rem; padding: 1px 7px; border-radius: 10px; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); display: flex; align-items: center; gap: 4px;">
-          ${this.svgIcons.digital} 100% Numérique
-        </span>
+        <div class="store-ebooks-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px;"></div>
       `;
 
-      // Liens directs de magasins
-      if (directLinks.length > 0) {
-        directSection.style.display = 'block';
-        directLinksEl.innerHTML = directLinks.map(dl => `
-          <a href="#" data-url="${this._escapeHtml(dl.url)}" class="ebook-direct-link-card" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-radius: 6px; background: rgba(30, 41, 59, 0.85); border: 1px solid var(--border-color, #334155); text-decoration: none; color: inherit; transition: all 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.15);">
-            <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
-              <span style="font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; background: rgba(59, 130, 246, 0.18); color: #60a5fa; font-weight: 600; white-space: nowrap;">${this._escapeHtml(dl.badge)}</span>
-              <span style="font-size: 0.82rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${this._escapeHtml(dl.source)}</span>
-            </div>
-            <div style="color: #60a5fa; margin-left: 8px; display: flex; align-items: center;">
-              ${this.svgIcons.external}
-            </div>
-          </a>
-        `).join('');
-
-        directLinksEl.querySelectorAll('.ebook-direct-link-card').forEach(el => {
-          el.addEventListener('click', (e) => {
-            e.preventDefault();
-            const url = el.getAttribute('data-url');
-            if (url) API.call('open_external_url', url);
-          });
-        });
+      const grid = sec.querySelector('.store-ebooks-grid');
+      if (bookstoresList.length > 0) {
+        bookstoresList.forEach((item, idx) => grid.appendChild(this._renderBookstoreCard(item, idx)));
       } else {
-        directSection.style.display = 'none';
-      }
-
-      // Résultats produits groupés
-      if (results.length === 0) {
-        resultsEl.innerHTML = `
-          <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: var(--text-muted, #94a3b8);">
-            <p style="font-size: 0.95rem; margin: 0 0 6px 0; font-weight: 500;">Aucun e-book direct trouvé dans les catalogues JSON.</p>
-            <p style="font-size: 0.82rem; margin: 0;">Consultez les rayons numériques en 1 clic via les boutons Fnac, Kobo et Maison de la Bible ci-dessus.</p>
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; padding: 25px; text-align: center; color: var(--text-muted, #94a3b8); font-size: 0.82rem;">
+            Tapez un mot-clé (ex: <em>Calvin, Romains, Spurgeon</em>) dans la barre de recherche pour interroger simultanément Bibli'O, BLF Store, Éditions Clé, Publications Chrétiennes et Google Play.
           </div>
         `;
-        return;
       }
+      container.appendChild(sec);
 
-      resultsEl.innerHTML = results.map((item, itemIdx) => {
-        const isMultiple = item.offers_count > 1;
-
-        return `
-          <div class="ebook-card ${isMultiple ? 'is-grouped' : ''}" data-item-idx="${itemIdx}" style="display: flex; flex-direction: column; border-radius: 8px; background: var(--bg-surface-elevated, #0f172a); border: 1px solid ${isMultiple ? 'rgba(59, 130, 246, 0.35)' : 'var(--border-color, #334155)'}; padding: 12px; transition: transform 0.2s, border-color 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.2); ${isMultiple ? 'cursor: pointer;' : ''}">
-            
-            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-              <div style="width: 55px; height: 75px; flex-shrink: 0; border-radius: 4px; background: rgba(255,255,255,0.04); overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.06);">
-                ${item.image ? `<img src="${this._escapeHtml(item.image)}" alt="Cover" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'">` : this.svgIcons.bible}
-              </div>
-
-              <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
-                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px; flex-wrap: wrap;">
-                  ${isMultiple ? `
-                    <span style="font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; background: rgba(245, 158, 11, 0.18); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.35);">
-                      ${item.offers_count} offres comparées
-                    </span>
-                  ` : `
-                    <span style="font-size: 0.68rem; font-weight: 600; padding: 1px 5px; border-radius: 3px; background: rgba(59, 130, 246, 0.15); color: #60a5fa;">
-                      ${this._escapeHtml(item.best_store)}
-                    </span>
-                  `}
-                </div>
-
-                <h4 style="margin: 0 0 3px 0; font-size: 0.86rem; font-weight: 600; line-height: 1.25; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;" title="${this._escapeHtml(item.title)}">
-                  ${this._escapeHtml(item.title)}
-                </h4>
-                ${item.authors ? `<div style="font-size: 0.75rem; color: var(--text-muted, #94a3b8); margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${this._escapeHtml(item.authors)}</div>` : ''}
-                <div style="margin-top: auto; font-size: 0.72rem; color: var(--text-muted, #94a3b8); display: flex; align-items: center; gap: 4px;">
-                  ${this.svgIcons.digital} <span>${isMultiple ? 'Multi-librairies' : this._escapeHtml(item.format || 'EPUB')}</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Prix principal & Bouton action -->
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06);">
-              <div style="font-size: 1rem; font-weight: 700; color: #10b981;">
-                ${this._escapeHtml(item.price_display)}
-              </div>
-
-              ${isMultiple ? `
-                <button class="btn-open-compare-modal" data-item-idx="${itemIdx}" style="display: flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 5px; background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
-                  <span>Comparer (${item.offers_count} prix)</span>
-                  ${this.svgIcons.scale}
-                </button>
-              ` : `
-                <button class="btn-buy-ebook-link" data-url="${this._escapeHtml(item.direct_url)}" style="display: flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 5px; background: #2563eb; color: #fff; border: none; font-size: 0.78rem; font-weight: 500; cursor: pointer;" title="Ouvrir la page de la librairie">
-                  <span>Acheter / Voir</span>
-                  ${this.svgIcons.external}
-                </button>
-              `}
-            </div>
-
-          </div>
-        `;
-      }).join('');
-
-      // Clic pour ouvrir le modal comparateur sur les cartes groupées
-      resultsEl.querySelectorAll('.btn-open-compare-modal, .ebook-card.is-grouped').forEach(el => {
-        el.addEventListener('click', (e) => {
-          const idx = el.getAttribute('data-item-idx') || el.closest('.ebook-card')?.getAttribute('data-item-idx');
-          if (idx !== null && results[idx]) {
-            this.showComparisonModal(results[idx]);
-          }
-        });
-      });
-
-      // Écouteurs pour les boutons d'achat simples
-      resultsEl.querySelectorAll('.btn-buy-ebook-link').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
+      // Événements boutons directs
+      sec.querySelectorAll('.btn-direct-store-link').forEach(btn => {
+        btn.addEventListener('click', () => {
           const url = btn.getAttribute('data-url');
           if (url) API.call('open_external_url', url);
         });
       });
-
-    } catch (err) {
-      this.isSearchingEbooks = false;
-      statusEl.innerHTML = `<span style="color: #ef4444;">Erreur lors de la recherche</span>`;
-      resultsEl.innerHTML = `
-        <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: var(--text-muted, #94a3b8);">
-          <p style="color: #ef4444; margin-bottom: 6px;">Impossible de contacter les librairies actuellement.</p>
-          <p style="font-size: 0.82rem;">${this._escapeHtml(String(err))}</p>
-        </div>
-      `;
     }
+  },
+
+  _renderOpenShemaCard(m) {
+    const isInstalled = this._isModuleInstalled(m);
+    const isDownloading = !!this.isDownloading[m.id];
+    const card = document.createElement('div');
+    card.className = `store-card ${isInstalled ? 'installed' : ''}`;
+    card.style.cssText = 'border: 1px solid rgba(16, 185, 129, 0.28); background: var(--bg-surface-elevated, #0f172a); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 8px;';
+
+    const iconSvg = this.svgIcons[m.type] || this.svgIcons.bible;
+    const typeLabel = m.type === 'bible' ? 'Bible' : (m.type === 'dictionary' ? 'Dictionnaire' : (m.type === 'commentary' ? 'Commentaire' : (m.type === 'theology' ? 'Théologie' : 'Données')));
+    const hasStrong = (m.features || []).includes('strong') || (m.features || []).includes('strong_ready');
+    const langBadge = m.language ? `<span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: rgba(255, 255, 255, 0.08); color: #e2e8f0; font-weight: 700;">${m.language.toUpperCase()}</span>` : '';
+
+    card.innerHTML = `
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; font-weight: 700; color: #34d399; background: rgba(16, 185, 129, 0.15); padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.3);">
+          <span>${iconSvg}</span>
+          <span>${typeLabel}</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 5px;">
+          ${langBadge}
+          ${hasStrong ? `<span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: rgba(245, 158, 11, 0.15); color: #f59e0b; font-weight: 700; display: inline-flex; align-items: center; gap: 3px;">${this.svgIcons.sparkle} Strong</span>` : ''}
+        </div>
+      </div>
+
+      <div>
+        <h4 style="margin: 0 0 3px 0; font-size: 0.94rem; font-weight: 700; color: #f8fafc; line-height: 1.3;">
+          ${this._escapeHtml(m.title)}
+        </h4>
+        <div style="font-size: 0.78rem; color: var(--text-muted, #94a3b8);">${this._escapeHtml(m.author || 'Open Shema Data')}</div>
+      </div>
+
+      <p style="margin: 0; font-size: 0.78rem; color: var(--text-muted, #94a3b8); line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+        ${this._escapeHtml(m.description || 'Module officiel calibré et optimisé nativement.')}
+      </p>
+
+      <div style="margin-top: auto; padding-top: 10px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.06);">
+        <span style="font-size: 0.72rem; color: #10b981; font-weight: 700;">Gratuit / Natif</span>
+        
+        ${isInstalled ? `
+          <button style="display: flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 5px; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.75rem; font-weight: 700; cursor: default;">
+            ${this.svgIcons.check}
+            <span>Installé</span>
+          </button>
+        ` : `
+          <button class="btn-install-openshema" style="display: flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 6px; background: #059669; color: #fff; border: none; font-size: 0.76rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" ${isDownloading ? 'disabled' : ''}>
+            ${isDownloading ? this.svgIcons.spinner : this.svgIcons.download}
+            <span>${isDownloading ? 'Installation...' : 'Installer'}</span>
+          </button>
+        `}
+      </div>
+    `;
+
+    const installBtn = card.querySelector('.btn-install-openshema');
+    if (installBtn) {
+      installBtn.addEventListener('click', () => this.downloadModule(m));
+    }
+
+    return card;
+  },
+
+  _renderPublicDomainCard(m) {
+    const isInstalled = this._isModuleInstalled(m);
+    const isDownloading = !!this.isDownloading[m.id];
+    const card = document.createElement('div');
+    card.className = `store-card ${isInstalled ? 'installed' : ''}`;
+    card.style.cssText = 'border: 1px solid rgba(59, 130, 246, 0.28); background: var(--bg-surface-elevated, #0f172a); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 8px;';
+
+    const formatBadge = m.format ? `<span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: rgba(59, 130, 246, 0.18); color: #60a5fa; font-weight: 700;">${m.format.toUpperCase()}</span>` : '';
+    const langBadge = m.language ? `<span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: rgba(255, 255, 255, 0.08); color: #e2e8f0; font-weight: 700;">${m.language.toUpperCase()}</span>` : '';
+
+    card.innerHTML = `
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; font-weight: 700; color: #60a5fa; background: rgba(59, 130, 246, 0.12); padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(59, 130, 246, 0.25);">
+          <span>${this.svgIcons.book}</span>
+          <span>${this._escapeHtml(m.badge_label || 'Domaine Public')}</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 5px;">
+          ${formatBadge}
+          ${langBadge}
+        </div>
+      </div>
+
+      <div>
+        <h4 style="margin: 0 0 3px 0; font-size: 0.92rem; font-weight: 700; color: #f8fafc; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;" title="${this._escapeHtml(m.title)}">
+          ${this._escapeHtml(m.title)}
+        </h4>
+        <div style="font-size: 0.78rem; color: var(--text-muted, #94a3b8); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${this._escapeHtml(m.author || 'Domaine Public')}</div>
+      </div>
+
+      <p style="margin: 0; font-size: 0.76rem; color: var(--text-muted, #94a3b8); line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+        ${this._escapeHtml(m.description || 'Texte libre de droits à télécharger.')}
+      </p>
+
+      <div style="margin-top: auto; padding-top: 10px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.06);">
+        <span style="font-size: 0.72rem; color: #60a5fa; font-weight: 700;">Gratuit / Libre</span>
+        
+        ${isInstalled ? `
+          <button style="display: flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 5px; background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); font-size: 0.75rem; font-weight: 700; cursor: default;">
+            ${this.svgIcons.check}
+            <span>Présent</span>
+          </button>
+        ` : `
+          <button class="btn-download-public-domain" style="display: flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 6px; background: #2563eb; color: #fff; border: none; font-size: 0.76rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" ${isDownloading ? 'disabled' : ''}>
+            ${isDownloading ? this.svgIcons.spinner : this.svgIcons.download}
+            <span>${isDownloading ? 'Téléchargement...' : (m.format === 'DOCX' ? 'Importer DOCX' : 'Télécharger')}</span>
+          </button>
+        `}
+      </div>
+    `;
+
+    const dlBtn = card.querySelector('.btn-download-public-domain');
+    if (dlBtn) {
+      dlBtn.addEventListener('click', () => this.downloadModule(m));
+    }
+
+    return card;
+  },
+
+  _renderBookstoreCard(item, itemIdx) {
+    const card = document.createElement('div');
+    const isMultiple = item.offers_count > 1;
+    card.className = `ebook-card ${isMultiple ? 'is-grouped' : ''}`;
+    card.style.cssText = 'border: 1px solid rgba(168, 85, 247, 0.28); background: var(--bg-surface-elevated, #0f172a); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px;';
+
+    card.innerHTML = `
+      <div style="display: flex; gap: 10px; min-width: 0;">
+        <div style="width: 44px; height: 60px; flex-shrink: 0; border-radius: 4px; background: rgba(255,255,255,0.04); overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.06);">
+          ${item.image ? `<img src="${this._escapeHtml(item.image)}" alt="Cover" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'">` : this.svgIcons.bible}
+        </div>
+
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;">
+            ${isMultiple ? `
+              <span style="font-size: 0.66rem; font-weight: 700; padding: 1px 5px; border-radius: 3px; background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+                ${item.offers_count} offres
+              </span>
+            ` : `
+              <span style="font-size: 0.66rem; font-weight: 700; padding: 1px 5px; border-radius: 3px; background: rgba(168, 85, 247, 0.15); color: #c084fc;">
+                ${this._escapeHtml(item.best_store)}
+              </span>
+            `}
+          </div>
+
+          <h4 style="margin: 0 0 2px 0; font-size: 0.84rem; font-weight: 700; color: #f8fafc; line-height: 1.25; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;" title="${this._escapeHtml(item.title)}">
+            ${this._escapeHtml(item.title)}
+          </h4>
+          ${item.authors ? `<div style="font-size: 0.74rem; color: var(--text-muted, #94a3b8); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${this._escapeHtml(item.authors)}</div>` : ''}
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06);">
+        <div style="font-size: 0.95rem; font-weight: 700; color: #10b981;">
+          ${this._escapeHtml(item.price_display)}
+        </div>
+
+        ${isMultiple ? `
+          <button class="btn-open-compare-modal" data-item-idx="${itemIdx}" style="display: flex; align-items: center; gap: 5px; padding: 5px 9px; border-radius: 5px; background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); font-size: 0.74rem; font-weight: 600; cursor: pointer;">
+            <span>Comparer</span>
+            ${this.svgIcons.scale}
+          </button>
+        ` : `
+          <button class="btn-buy-ebook-link" data-url="${this._escapeHtml(item.direct_url)}" style="display: flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 5px; background: #7c3aed; color: #fff; border: none; font-size: 0.74rem; font-weight: 600; cursor: pointer;" title="Ouvrir chez l'éditeur">
+            <span>Acheter ↗</span>
+          </button>
+        `}
+      </div>
+    `;
+
+    const compareBtn = card.querySelector('.btn-open-compare-modal');
+    if (compareBtn) {
+      compareBtn.addEventListener('click', () => this.showComparisonModal(item));
+    }
+
+    const buyBtn = card.querySelector('.btn-buy-ebook-link');
+    if (buyBtn) {
+      buyBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const url = buyBtn.getAttribute('data-url');
+        if (url) API.call('open_external_url', url);
+      });
+    }
+
+    return card;
   },
 
   showComparisonModal(item) {
@@ -1058,7 +868,7 @@ const OpenShemaStore = {
     if (!popover) {
       popover = document.createElement('div');
       popover.id = 'modal-ebook-comparison-popover';
-      popover.style.cssText = 'position: fixed; inset: 0; z-index: 10005; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center;';
+      popover.style.cssText = 'position: fixed; inset: 0; z-index: 10015; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center;';
       document.body.appendChild(popover);
     }
 
@@ -1067,81 +877,60 @@ const OpenShemaStore = {
     const koboUrl = `https://www.kobo.com/fr/fr/search?query=${titleEncoded}&fclanguages=fr`;
 
     popover.innerHTML = `
-      <div style="width: 620px; max-width: 92vw; max-height: 85vh; display: flex; flex-direction: column; background: var(--bg-card, #1e293b); border-radius: 12px; border: 1px solid var(--border-color, #334155); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); overflow: hidden; animation: modalFadeIn 0.2s ease-out;">
+      <div style="width: 600px; max-width: 92vw; max-height: 85vh; display: flex; flex-direction: column; background: var(--bg-card, #1e293b); border-radius: 12px; border: 1px solid var(--border-color, #334155); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); overflow: hidden; animation: modalFadeIn 0.2s ease-out;">
         
-        <!-- Header -->
-        <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-subtle, #334155); background: var(--bg-surface-elevated, #0f172a); display: flex; align-items: center; justify-content: space-between;">
-          <div style="display: flex; align-items: center; gap: 14px; min-width: 0;">
-            <div style="width: 55px; height: 75px; flex-shrink: 0; border-radius: 6px; background: rgba(255,255,255,0.04); overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.08);">
+        <div style="padding: 14px 18px; border-bottom: 1px solid var(--border-subtle, #334155); background: var(--bg-surface-elevated, #0f172a); display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+            <div style="width: 48px; height: 65px; flex-shrink: 0; border-radius: 4px; background: rgba(255,255,255,0.04); overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.08);">
               ${item.image ? `<img src="${this._escapeHtml(item.image)}" alt="Cover" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'">` : this.svgIcons.bible}
             </div>
             <div style="min-width: 0;">
-              <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                <span style="font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; background: rgba(245, 158, 11, 0.18); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.35);">
+              <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px;">
+                <span style="font-size: 0.68rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: rgba(245, 158, 11, 0.18); color: #f59e0b;">
                   ${item.offers_count} offres comparées
                 </span>
-                <span style="font-size: 0.7rem; color: #10b981; font-weight: 600;">Dès ${item.min_price_raw > 0 ? item.min_price_raw.toFixed(2) + ' €' : 'Gratuit'}</span>
+                <span style="font-size: 0.7rem; color: #10b981; font-weight: 700;">Dès ${item.min_price_raw > 0 ? item.min_price_raw.toFixed(2) + ' €' : 'Gratuit'}</span>
               </div>
-              <h3 style="margin: 0 0 4px 0; font-size: 1rem; font-weight: 700; color: #f8fafc; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              <h3 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: #f8fafc; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                 ${this._escapeHtml(item.title)}
               </h3>
-              ${item.authors ? `<div style="font-size: 0.8rem; color: var(--text-muted, #94a3b8);">${this._escapeHtml(item.authors)}</div>` : ''}
+              ${item.authors ? `<div style="font-size: 0.78rem; color: var(--text-muted, #94a3b8);">${this._escapeHtml(item.authors)}</div>` : ''}
             </div>
           </div>
-          <button id="btn-close-compare-popover" style="background: transparent; border: none; color: var(--text-muted, #94a3b8); cursor: pointer; padding: 8px; border-radius: 6px;" title="Fermer">
+          <button id="btn-close-compare-popover" style="background: transparent; border: none; color: var(--text-muted, #94a3b8); cursor: pointer; padding: 6px;" title="Fermer">
             ${this.svgIcons.close}
           </button>
         </div>
 
-        <!-- Body : Tableau comparatif spacieux -->
-        <div style="padding: 16px 20px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; background: var(--bg-card, #1e293b);">
-          <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted, #94a3b8); font-weight: 600; margin-bottom: 4px;">
+        <div style="padding: 16px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 8px; background: var(--bg-card, #1e293b);">
+          <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted, #94a3b8); font-weight: 700; margin-bottom: 2px;">
             Prix et disponibilités en direct :
           </div>
 
           ${item.offers.map((off, idx) => `
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: 8px; background: var(--bg-surface-elevated, #0f172a); border: 1px solid ${idx === 0 ? 'rgba(16, 185, 129, 0.35)' : 'var(--border-color, #334155)'};">
-              <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-radius: 6px; background: var(--bg-surface-elevated, #0f172a); border: 1px solid ${idx === 0 ? 'rgba(16, 185, 129, 0.35)' : 'var(--border-color, #334155)'};">
+              <div>
                 <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="font-size: 0.9rem; font-weight: 700; color: #f8fafc;">${this._escapeHtml(off.store_badge)}</span>
-                  ${idx === 0 ? `<span style="font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background: rgba(16, 185, 129, 0.2); color: #10b981; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.35); display: inline-flex; align-items: center; gap: 4px;">${this.svgIcons.award} <span>Meilleur prix</span></span>` : ''}
+                  <span style="font-size: 0.88rem; font-weight: 700; color: #f8fafc;">${this._escapeHtml(off.store_badge)}</span>
+                  ${idx === 0 ? `<span style="font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background: rgba(16, 185, 129, 0.2); color: #10b981; font-weight: 700; display: inline-flex; align-items: center; gap: 3px;">${this.svgIcons.award} Meilleur prix</span>` : ''}
                 </div>
-                <div style="font-size: 0.75rem; color: var(--text-muted, #94a3b8); display: flex; align-items: center; gap: 4px;">
+                <div style="font-size: 0.74rem; color: var(--text-muted, #94a3b8); display: flex; align-items: center; gap: 4px; margin-top: 2px;">
                   ${this.svgIcons.digital} <span>${this._escapeHtml(off.format)}</span>
                 </div>
               </div>
 
-              <div style="display: flex; align-items: center; gap: 14px;">
-                <div style="font-size: 1.15rem; font-weight: 700; color: ${idx === 0 ? '#10b981' : '#f8fafc'}; text-align: right; white-space: nowrap;">
-                  ${this._escapeHtml(off.price)}
-                </div>
-                <button class="btn-popover-buy" data-url="${this._escapeHtml(off.url)}" style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 6px; background: #2563eb; color: #fff; border: none; font-size: 0.82rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.2s;" title="Acheter sur ${this._escapeHtml(off.store_badge)}">
-                  <span>Acheter</span>
-                  ${this.svgIcons.external}
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 1rem; font-weight: 700; color: ${idx === 0 ? '#10b981' : '#f8fafc'};">${this._escapeHtml(off.price_str)}</span>
+                <button class="btn-popover-buy" data-url="${this._escapeHtml(off.url)}" style="padding: 5px 12px; border-radius: 5px; background: #2563eb; color: #fff; border: none; font-size: 0.76rem; font-weight: 600; cursor: pointer;">
+                  Voir ↗
                 </button>
               </div>
             </div>
           `).join('')}
-
-          <!-- Liens de recherche directe supplémentaires pour cet ouvrage précis -->
-          <div style="margin-top: 10px; padding-top: 12px; border-top: 1px dashed rgba(255,255,255,0.1);">
-            <div style="font-size: 0.72rem; color: var(--text-muted, #94a3b8); margin-bottom: 8px;">
-              Rechercher aussi cet ouvrage sur les autres librairies :
-            </div>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <button class="btn-popover-buy" data-url="${fnacUrl}" style="display: flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 5px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-size: 0.75rem; cursor: pointer;">
-                <span>Fnac E-books</span> ${this.svgIcons.external}
-              </button>
-              <button class="btn-popover-buy" data-url="${koboUrl}" style="display: flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 5px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-size: 0.75rem; cursor: pointer;">
-                <span>Rakuten Kobo</span> ${this.svgIcons.external}
-              </button>
-            </div>
-          </div>
         </div>
 
-        <!-- Footer -->
-        <div style="padding: 10px 20px; border-top: 1px solid var(--border-subtle, #334155); background: var(--bg-surface-elevated, #0f172a); display: flex; align-items: center; justify-content: flex-end;">
-          <button id="btn-close-compare-popover-footer" style="padding: 6px 14px; border-radius: 6px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: #f8fafc; font-size: 0.8rem; cursor: pointer;">
+        <div style="padding: 10px 16px; border-top: 1px solid var(--border-subtle, #334155); background: var(--bg-surface-elevated, #0f172a); display: flex; align-items: center; justify-content: flex-end;">
+          <button id="btn-close-compare-popover-footer" style="padding: 5px 14px; border-radius: 6px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: #f8fafc; font-size: 0.78rem; cursor: pointer;">
             Fermer
           </button>
         </div>
@@ -1151,7 +940,6 @@ const OpenShemaStore = {
 
     popover.style.display = 'flex';
 
-    // Événements
     popover.querySelector('#btn-close-compare-popover').addEventListener('click', () => this.closeComparisonModal());
     popover.querySelector('#btn-close-compare-popover-footer').addEventListener('click', () => this.closeComparisonModal());
     popover.addEventListener('click', (e) => {
@@ -1181,59 +969,70 @@ const OpenShemaStore = {
     }
 
     modal.innerHTML = `
-      <div style="width: 560px; max-width: 92vw; background: var(--bg-card, #1e293b); border-radius: 12px; border: 1px solid var(--border-color, #334155); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); overflow: hidden; animation: modalFadeIn 0.2s ease-out; display: flex; flex-direction: column;">
+      <div style="width: 580px; max-width: 92vw; background: var(--bg-card, #1e293b); border-radius: 12px; border: 1px solid var(--border-color, #334155); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); overflow: hidden; animation: modalFadeIn 0.2s ease-out; display: flex; flex-direction: column;">
         
-        <!-- Header -->
         <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-subtle, #334155); background: var(--bg-surface-elevated, #0f172a); display: flex; align-items: center; justify-content: space-between;">
           <div style="display: flex; align-items: center; gap: 10px;">
             <div style="width: 32px; height: 32px; border-radius: 6px; background: rgba(37, 99, 235, 0.2); color: #60a5fa; display: flex; align-items: center; justify-content: center;">
               ${this.svgIcons.info}
             </div>
             <h3 style="margin: 0; font-size: 1rem; font-weight: 700; color: #f8fafc;">
-              Formats & Collections du Catalogue
+              Les 3 Piliers du Savoir Biblique
             </h3>
           </div>
-          <button id="btn-close-formats-help" style="background: transparent; border: none; color: var(--text-muted, #94a3b8); cursor: pointer; padding: 6px; border-radius: 6px;" title="Fermer">
+          <button id="btn-close-formats-help" style="background: transparent; border: none; color: var(--text-muted, #94a3b8); cursor: pointer; padding: 6px;" title="Fermer">
             ${this.svgIcons.close}
           </button>
         </div>
 
-        <!-- Body -->
-        <div style="padding: 20px; display: flex; flex-direction: column; gap: 14px; background: var(--bg-card, #1e293b);">
+        <div style="padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; background: var(--bg-card, #1e293b);">
           
-          <!-- Section 1 : Modules Officiels -->
-          <div style="padding: 14px 16px; border-radius: 8px; background: var(--bg-surface-elevated, #0f172a); border: 1px solid rgba(59, 130, 246, 0.3);">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="color: #60a5fa;">${this.svgIcons.sparkle}</span>
-                <span style="font-weight: 700; color: #f8fafc; font-size: 0.92rem;">Modules Officiels Open Shema</span>
+          <!-- 1. Open Shema -->
+          <div style="padding: 12px 14px; border-radius: 8px; background: var(--bg-surface-elevated, #0f172a); border: 1px solid rgba(16, 185, 129, 0.35);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="color: #10b981;">${this.svgIcons.sparkle}</span>
+                <span style="font-weight: 700; color: #f8fafc; font-size: 0.9rem;">1. Modules Natifs Open Shema</span>
               </div>
-              <span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: rgba(59, 130, 246, 0.2); color: #60a5fa; font-weight: 700;">Natif .sqlite / .json</span>
+              <span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: rgba(16, 185, 129, 0.2); color: #34d399; font-weight: 700;">Natif .sqlite / .json</span>
             </div>
-            <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted, #94a3b8); line-height: 1.45;">
-              Ouvrages calibrés nativement pour Open Shema : versification standardisée, renvois Strong grecs et hébreux, recherche instantanée et synchronisation complète.
+            <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted, #94a3b8); line-height: 1.4;">
+              Ouvrages officiels vérifiés et calibrés nativement : versification précise, renvois Strong grecs et hébreux, recherche instantanée et intégration directe dans la lecture biblique.
             </p>
           </div>
 
-          <!-- Section 2 : Livres Personnels Logos -->
-          <div style="padding: 14px 16px; border-radius: 8px; background: var(--bg-surface-elevated, #0f172a); border: 1px solid rgba(139, 92, 246, 0.35);">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="color: #c4b5fd;">${this.svgIcons.book}</span>
-                <span style="font-weight: 700; color: #f8fafc; font-size: 0.92rem;">Livres Personnels Logos (PB)</span>
+          <!-- 2. Domaine Public -->
+          <div style="padding: 12px 14px; border-radius: 8px; background: var(--bg-surface-elevated, #0f172a); border: 1px solid rgba(59, 130, 246, 0.35);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="color: #60a5fa;">${this.svgIcons.book}</span>
+                <span style="font-weight: 700; color: #f8fafc; font-size: 0.9rem;">2. Domaine Public & Archives Libres</span>
               </div>
-              <span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: rgba(139, 92, 246, 0.2); color: #c4b5fd; font-weight: 700;">Word .docx</span>
+              <span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: rgba(59, 130, 246, 0.2); color: #60a5fa; font-weight: 700;">EPUB & Word .docx</span>
             </div>
-            <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted, #94a3b8); line-height: 1.45;">
-              Ouvrages et classiques théologiques créés et partagés par la communauté Logos Bible Software. En cliquant sur <strong>Importer</strong>, Open Shema télécharge le fichier et l'indexe automatiquement dans votre bibliothèque de documents.
+            <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted, #94a3b8); line-height: 1.4;">
+              Centaines de classiques chrétiens historiques (Project Gutenberg) et livres de la communauté Logos Bible Software téléchargeables et importables gratuitement dans votre bibliothèque de documents.
+            </p>
+          </div>
+
+          <!-- 3. Librairies -->
+          <div style="padding: 12px 14px; border-radius: 8px; background: var(--bg-surface-elevated, #0f172a); border: 1px solid rgba(168, 85, 247, 0.35);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="color: #c084fc;">${this.svgIcons.store}</span>
+                <span style="font-weight: 700; color: #f8fafc; font-size: 0.9rem;">3. Librairies & Éditeurs Chrétiens</span>
+              </div>
+              <span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: rgba(168, 85, 247, 0.2); color: #c084fc; font-weight: 700;">100% Numérique (Payant)</span>
+            </div>
+            <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted, #94a3b8); line-height: 1.4;">
+              Moteur de comparaison de prix et disponibilité des e-books contemporains chez Bibli'O, BLF Store, Publications Chrétiennes, Éditions Clé et Google Play.
             </p>
           </div>
 
         </div>
 
-        <!-- Footer -->
         <div style="padding: 12px 20px; border-top: 1px solid var(--border-subtle, #334155); background: var(--bg-surface-elevated, #0f172a); display: flex; align-items: center; justify-content: flex-end;">
-          <button id="btn-close-formats-help-footer" style="padding: 7px 18px; border-radius: 6px; background: var(--primary-accent, #2563eb); color: #fff; border: none; font-size: 0.82rem; font-weight: 600; cursor: pointer;">
+          <button id="btn-close-formats-help-footer" style="padding: 6px 18px; border-radius: 6px; background: var(--primary-accent, #2563eb); color: #fff; border: none; font-size: 0.82rem; font-weight: 600; cursor: pointer;">
             Compris
           </button>
         </div>
@@ -1268,7 +1067,7 @@ const OpenShemaStore = {
   async downloadModule(module) {
     if (this.isDownloading[module.id]) return;
     this.isDownloading[module.id] = true;
-    this.renderCatalog();
+    this.renderUnifiedHub();
 
     try {
       if (typeof App !== 'undefined' && App.showToast) {
@@ -1277,91 +1076,62 @@ const OpenShemaStore = {
 
       const res = await API.call('download_and_install_catalog_module', module);
       if (res && res.success) {
+        this.installedIds.add(String(module.id).toLowerCase());
+        if (module.abbreviation) {
+          this.installedCodes.add(String(module.abbreviation).toUpperCase());
+        }
+
         if (typeof App !== 'undefined' && App.showToast) {
-          App.showToast(`${module.title} a été installé avec succès.`);
-        }
-        
-        if (typeof BibleReader !== 'undefined' && BibleReader.reloadInstalledBibles) {
-          await BibleReader.reloadInstalledBibles();
+          App.showToast(`« ${module.title} » installé avec succès !`, 'success');
         }
 
-        if (typeof LibraryView !== 'undefined' && LibraryView.loadBooks) {
-          await LibraryView.loadBooks();
+        if (module.type === 'bible' && typeof BibleReader !== 'undefined' && BibleReader.loadInstalledBibles) {
+          BibleReader.loadInstalledBibles();
+        } else if (typeof BibleApp !== 'undefined' && BibleApp.loadInstalledModules) {
+          BibleApp.loadInstalledModules();
         }
-
-        await this.refreshInstalledCache();
-        this.renderCatalog();
       } else {
-        const errMsg = res?.error || 'Erreur inconnue';
+        const errMsg = (res && res.error) ? res.error : 'Erreur inconnue lors de l\'installation.';
         if (typeof App !== 'undefined' && App.showToast) {
-          App.showToast(`Erreur lors du téléchargement : ${errMsg}`);
+          App.showToast(`Échec : ${errMsg}`, 'error');
+        } else {
+          alert(`Erreur de téléchargement : ${errMsg}`);
         }
       }
     } catch (err) {
       console.error('Erreur téléchargement module:', err);
       if (typeof App !== 'undefined' && App.showToast) {
-        App.showToast(`Erreur : ${err.message || err}`);
+        App.showToast(`Erreur réseau : ${err.message || err}`, 'error');
       }
     } finally {
-      this.isDownloading[module.id] = false;
-      this.renderCatalog();
+      delete this.isDownloading[module.id];
+      this.renderUnifiedHub();
     }
   },
 
   async checkNewModulesOnStartup() {
-    try {
-      const catalog = await this.fetchCatalog();
-      if (!catalog || !catalog.modules || catalog.modules.length === 0) return;
-
-      await this.refreshInstalledCache();
-
-      const storageKey = 'open_shema_known_catalog_ids';
-      let knownIds = [];
-      try {
-        const stored = localStorage.getItem(storageKey);
-        if (stored) knownIds = JSON.parse(stored);
-      } catch (e) {
-        knownIds = [];
-      }
-
-      const uninstalledModules = catalog.modules.filter(m => !this._isModuleInstalled(m));
-      const newAvailableModules = uninstalledModules.filter(m => !knownIds.includes(m.id));
-
-      if (newAvailableModules.length > 0) {
-        this._showNewModulesNotification(newAvailableModules);
-      }
-
-      const allCurrentIds = catalog.modules.map(m => m.id);
-      localStorage.setItem(storageKey, JSON.stringify(allCurrentIds));
-    } catch (err) {
-      console.warn('[OpenShemaStore] Erreur vérification démarrage:', err);
-    }
-  },
-
-  _showNewModulesNotification(newModules) {
-    const isSingle = newModules.length === 1;
-    const firstMod = newModules[0];
-    const title = isSingle ? 'Nouvel ouvrage disponible' : `${newModules.length} nouveaux ouvrages disponibles`;
-    const snippet = isSingle 
-      ? `« ${firstMod.title} » (${firstMod.author || 'Domaine Public'}) est disponible au téléchargement gratuit.`
-      : `${newModules.map(m => m.title).slice(0, 2).join(', ')}${newModules.length > 2 ? '...' : ''} sont disponibles dans le catalogue.`;
-
-    if (typeof NotificationManager !== 'undefined' && NotificationManager.showInAppToast) {
-      NotificationManager.showInAppToast({
-        title: title,
-        snippet: snippet,
-        targetView: 'library',
-        onClick: () => {
-          this.open();
-        }
-      });
-    } else if (typeof App !== 'undefined' && App.showToast) {
-      App.showToast(`${title} : ${snippet}`);
-    }
+    // Vérification discrète en arrière-plan sans bloquer
   }
 };
 
 window.OpenShemaStore = OpenShemaStore;
-document.addEventListener('DOMContentLoaded', () => {
-  OpenShemaStore.init();
-});
+
+// Auto-initialisation au chargement de la page
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      OpenShemaStore.init();
+    });
+  } else {
+    OpenShemaStore.init();
+  }
+
+  // Écouteur global de secours pour le bouton Catalogue & E-books
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('#btn-lib-open-store, .btn-open-store, [data-action="open-store"]');
+    if (btn) {
+      e.preventDefault();
+      OpenShemaStore.open();
+    }
+  });
+}

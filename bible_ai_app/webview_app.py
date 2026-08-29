@@ -2634,6 +2634,12 @@ class BibleAppApi:
         from core.book_metadata_client import BookMetadataClient
         return BookMetadataClient.download_cover(cover_url, book_id)
 
+    def search_unified_hub(self, query: str, official_catalog_modules: List[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Recherche unifiée sur les 3 piliers : Open Shema Natif, Domaine Public & Archives, Librairies Chrétiennes."""
+        from core.unified_search_manager import UnifiedSearchManager
+        manager = UnifiedSearchManager()
+        return manager.search_all_unified(query, official_catalog_modules)
+
     def search_christian_ebooks(self, query: str) -> Dict[str, Any]:
         """Recherche des e-books chrétiens 100% numériques à travers plusieurs librairies et plateformes."""
         from core.ebook_finder_manager import EbookFinderManager
