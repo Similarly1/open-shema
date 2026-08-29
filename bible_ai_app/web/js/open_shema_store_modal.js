@@ -176,6 +176,7 @@ const OpenShemaStore = {
     }
     await this.fetchCommunityBooks();
     await this.fetchGutenbergBooks();
+    await this.fetchCCELBooks();
     this._populateInitialUnifiedResults();
     return this.catalogData;
   },
@@ -199,6 +200,17 @@ const OpenShemaStore = {
       }
     } catch (e) {
       console.warn('Erreur chargement livres Gutenberg:', e);
+    }
+  },
+
+  async fetchCCELBooks() {
+    try {
+      const books = await API.call('get_ccel_theology_books');
+      if (Array.isArray(books) && books.length > 0) {
+        this.ccelBooks = books;
+      }
+    } catch (e) {
+      console.warn('Erreur chargement livres CCEL:', e);
     }
   },
 
@@ -248,6 +260,18 @@ const OpenShemaStore = {
         category: 'public_domain',
         source: 'Project Gutenberg',
         badge_label: 'Gutenberg',
+        action_label: 'Télécharger EPUB',
+        is_free: true
+      });
+    });
+
+    // CCEL
+    (this.ccelBooks || []).forEach(b => {
+      pdList.push({
+        ...b,
+        category: 'public_domain',
+        source: 'Christian Classics Ethereal Library',
+        badge_label: 'CCEL',
         action_label: 'Télécharger EPUB',
         is_free: true
       });
@@ -599,6 +623,14 @@ const OpenShemaStore = {
              (b.description || '').toLowerCase().includes(q);
     }).forEach(b => pdList.push({ ...b, category: 'public_domain', source: 'Project Gutenberg', badge_label: 'Gutenberg', action_label: 'Télécharger EPUB', is_free: true }));
 
+    // CCEL
+    (this.ccelBooks || []).filter(b => {
+      return (b.title || '').toLowerCase().includes(q) ||
+             (b.author || '').toLowerCase().includes(q) ||
+             (b.description || '').toLowerCase().includes(q);
+    }).forEach(b => pdList.push({ ...b, category: 'public_domain', source: 'Christian Classics Ethereal Library', badge_label: 'CCEL', action_label: 'Télécharger EPUB', is_free: true }));
+
+    // Logos PB
     community.filter(m => {
       return (m.title || '').toLowerCase().includes(q) ||
              (m.author || '').toLowerCase().includes(q) ||
@@ -1019,16 +1051,6 @@ const OpenShemaStore = {
     const cleanAuthor = this._decodeEntities(m.author || 'Open Shema Data');
     const cleanDesc = this._decodeEntities(m.description || 'Module officiel calibré et optimisé nativement.');
 
-    const sim = this._computeBookSimilarity(m);
-    let simBadge = '';
-    if (sim) {
-      if (sim.score >= 80) {
-        simBadge = `<span style="font-size: 0.70rem; padding: 2px 7px; border-radius: 4px; background: rgba(16, 185, 129, 0.22); color: #34d399; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.45); display: inline-flex; align-items: center; gap: 3px;" title="${sim.score}% de ressemblance avec « ${this._escapeHtml(sim.bookTitle)} » dans votre bibliothèque">${this.svgIcons.check} ${sim.score}% dans votre biblio</span>`;
-      } else if (sim.score >= 60) {
-        simBadge = `<span style="font-size: 0.70rem; padding: 2px 7px; border-radius: 4px; background: rgba(245, 158, 11, 0.22); color: #fbbf24; font-weight: 800; border: 1px solid rgba(245, 158, 11, 0.45); display: inline-flex; align-items: center; gap: 3px;" title="${sim.score}% de ressemblance avec « ${this._escapeHtml(sim.bookTitle)} » dans votre bibliothèque">⚠ ${sim.score}% similaire</span>`;
-      }
-    }
-
     card.innerHTML = `
       <div style="display: flex; align-items: center; justify-content: space-between;">
         <div style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.74rem; font-weight: 700; color: #34d399; background: rgba(16, 185, 129, 0.2); padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.35);">
@@ -1036,7 +1058,6 @@ const OpenShemaStore = {
           <span>${typeLabel}</span>
         </div>
         <div style="display: flex; align-items: center; gap: 5px;">
-          ${simBadge}
           ${langBadge}
           ${hasStrong ? `<span style="font-size: 0.70rem; padding: 2px 7px; border-radius: 4px; background: rgba(245, 158, 11, 0.2); color: #fbbf24; font-weight: 800; border: 1px solid rgba(245, 158, 11, 0.35); display: inline-flex; align-items: center; gap: 3px;">${this.svgIcons.sparkle} Strong</span>` : ''}
         </div>
@@ -1096,16 +1117,28 @@ const OpenShemaStore = {
     let simBadge = '';
     if (sim) {
       if (sim.score >= 80) {
-        simBadge = `<span style="font-size: 0.70rem; padding: 2px 7px; border-radius: 4px; background: rgba(16, 185, 129, 0.22); color: #34d399; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.45); display: inline-flex; align-items: center; gap: 3px;" title="${sim.score}% de ressemblance avec « ${this._escapeHtml(sim.bookTitle)} » dans votre bibliothèque">${this.svgIcons.check} ${sim.score}% dans votre biblio</span>`;
+        simBadge = `<span style="font-size: 0.70rem; padding: 2px 7px; border-radius: 4px; background: rgba(16, 185, 129, 0.22); color: #34d399; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.45); display: inline-flex; align-items: center; gap: 3px; cursor: help;" title="Cet ouvrage correspond à ${sim.score}% avec « ${this._escapeHtml(sim.bookTitle)} » présent dans votre bibliothèque">${this.svgIcons.check} Dans votre biblio</span>`;
       } else if (sim.score >= 60) {
-        simBadge = `<span style="font-size: 0.70rem; padding: 2px 7px; border-radius: 4px; background: rgba(245, 158, 11, 0.22); color: #fbbf24; font-weight: 800; border: 1px solid rgba(245, 158, 11, 0.45); display: inline-flex; align-items: center; gap: 3px;" title="${sim.score}% de ressemblance avec « ${this._escapeHtml(sim.bookTitle)} » dans votre bibliothèque">⚠ ${sim.score}% similaire</span>`;
+        simBadge = `<span style="font-size: 0.70rem; padding: 2px 7px; border-radius: 4px; background: rgba(245, 158, 11, 0.22); color: #fbbf24; font-weight: 800; border: 1px solid rgba(245, 158, 11, 0.45); display: inline-flex; align-items: center; gap: 3px; cursor: help;" title="Semblable à ${sim.score}% avec « ${this._escapeHtml(sim.bookTitle)} » dans votre bibliothèque">⚠ Similaire (${sim.score}%)</span>`;
       }
     }
 
+    const isCCEL = (m.badge_label === 'CCEL' || m.source === 'Christian Classics Ethereal Library');
     const isGutenberg = (m.badge_label === 'Gutenberg' || m.source === 'Project Gutenberg');
-    const badgeBg = isGutenberg ? 'rgba(59, 130, 246, 0.2)' : 'rgba(139, 92, 246, 0.2)';
-    const badgeBorder = isGutenberg ? 'rgba(59, 130, 246, 0.35)' : 'rgba(139, 92, 246, 0.35)';
-    const badgeColor = isGutenberg ? '#93c5fd' : '#c4b5fd';
+    
+    let badgeBg = 'rgba(139, 92, 246, 0.2)';
+    let badgeBorder = 'rgba(139, 92, 246, 0.35)';
+    let badgeColor = '#c4b5fd';
+
+    if (isCCEL) {
+      badgeBg = 'rgba(14, 165, 233, 0.2)';
+      badgeBorder = 'rgba(14, 165, 233, 0.35)';
+      badgeColor = '#38bdf8';
+    } else if (isGutenberg) {
+      badgeBg = 'rgba(59, 130, 246, 0.2)';
+      badgeBorder = 'rgba(59, 130, 246, 0.35)';
+      badgeColor = '#93c5fd';
+    }
 
     card.innerHTML = `
       <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -1169,9 +1202,9 @@ const OpenShemaStore = {
     let simBadge = '';
     if (sim) {
       if (sim.score >= 80) {
-        simBadge = `<span style="font-size: 0.66rem; padding: 1px 5px; border-radius: 3px; background: rgba(16, 185, 129, 0.22); color: #34d399; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.45);" title="${sim.score}% de ressemblance avec « ${this._escapeHtml(sim.bookTitle)} » dans votre bibliothèque">${this.svgIcons.check} ${sim.score}% possédé</span>`;
+        simBadge = `<span style="font-size: 0.66rem; padding: 1px 5px; border-radius: 3px; background: rgba(16, 185, 129, 0.22); color: #34d399; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.45); cursor: help;" title="Cet ouvrage correspond à ${sim.score}% avec « ${this._escapeHtml(sim.bookTitle)} » présent dans votre bibliothèque">${this.svgIcons.check} Dans votre biblio</span>`;
       } else if (sim.score >= 60) {
-        simBadge = `<span style="font-size: 0.66rem; padding: 1px 5px; border-radius: 3px; background: rgba(245, 158, 11, 0.22); color: #fbbf24; font-weight: 800; border: 1px solid rgba(245, 158, 11, 0.45);" title="${sim.score}% de ressemblance avec « ${this._escapeHtml(sim.bookTitle)} »">⚠ ${sim.score}% similaire</span>`;
+        simBadge = `<span style="font-size: 0.66rem; padding: 1px 5px; border-radius: 3px; background: rgba(245, 158, 11, 0.22); color: #fbbf24; font-weight: 800; border: 1px solid rgba(245, 158, 11, 0.45); cursor: help;" title="Semblable à ${sim.score}% avec « ${this._escapeHtml(sim.bookTitle)} » dans votre bibliothèque">⚠ Similaire (${sim.score}%)</span>`;
       }
     }
 

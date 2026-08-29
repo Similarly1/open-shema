@@ -27,6 +27,30 @@ class UnifiedSearchManager:
         self.current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.logos_books_path = os.path.join(self.current_dir, "data", "logos_community_books.json")
         self.gutenberg_books_path = os.path.join(self.current_dir, "data", "gutenberg_theology_books.json")
+        self.ccel_books_path = os.path.join(self.current_dir, "data", "ccel_theology_books.json")
+
+    def get_local_ccel_books(self, query: str = "") -> List[Dict[str, Any]]:
+        """Renvoie les classiques chrétiens de CCEL indexés localement."""
+        results = []
+        if not os.path.exists(self.ccel_books_path):
+            return results
+
+        try:
+            with open(self.ccel_books_path, "r", encoding="utf-8") as f:
+                all_ccel = json.load(f)
+
+            q_lower = (query or "").lower().strip()
+            for b in all_ccel:
+                t = (b.get('title') or '').lower()
+                a = (b.get('author') or '').lower()
+                d = (b.get('description') or '').lower()
+
+                if not q_lower or q_lower in t or q_lower in a or q_lower in d:
+                    results.append(dict(b))
+        except Exception:
+            pass
+
+        return results
 
     def get_local_gutenberg_books(self, query: str = "") -> List[Dict[str, Any]]:
         """Renvoie les classiques chrétiens de Gutenberg indexés localement."""
@@ -184,9 +208,17 @@ class UnifiedSearchManager:
                         'is_free': True
                     })
 
-        # 2. Pôle Domaine Public : D'abord les classiques Gutenberg locaux + Logos PB locaux
+        # 2. Pôle Domaine Public : CCEL + Gutenberg locaux + Logos PB locaux
         public_domain_results: List[Dict[str, Any]] = []
         seen_titles = set()
+
+        # Classiques CCEL
+        local_ccel = self.get_local_ccel_books(clean_q)
+        for b in local_ccel:
+            t_key = (b.get('title') or '').lower()
+            if t_key not in seen_titles:
+                seen_titles.add(t_key)
+                public_domain_results.append(b)
 
         # Classiques Gutenberg locaux
         local_guten = self.get_local_gutenberg_books(clean_q)

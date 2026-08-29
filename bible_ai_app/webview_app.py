@@ -2668,6 +2668,17 @@ class BibleAppApi:
                 logger.error(f"Erreur chargement gutenberg_theology_books.json: {e}")
         return []
 
+    def get_ccel_theology_books(self) -> List[Dict[str, Any]]:
+        """Renvoie les classiques de la Christian Classics Ethereal Library indexés localement."""
+        json_path = os.path.join(current_dir, "data", "ccel_theology_books.json")
+        if os.path.exists(json_path):
+            try:
+                with open(json_path, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception as e:
+                logger.error(f"Erreur chargement ccel_theology_books.json: {e}")
+        return []
+
     def download_external_book_file(self, book_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Télécharge un livre externe (Project Gutenberg EPUB, Logos Community DOCX/ZIP, etc.)
