@@ -122,6 +122,8 @@ const OpenShemaStore = {
             author: b.author || 'Bible',
             name: b.name,
             year: b.year || '',
+            cover_url: b.cover_url || b.cover_data_url || '',
+            color: '#10b981',
             type: 'Bible'
           });
         });
@@ -138,6 +140,8 @@ const OpenShemaStore = {
           author: b.author || '',
           name: b.name || b.dict_id,
           year: b.year || '',
+          cover_url: b.cover_url || b.cover_data_url || b.cover || '',
+          color: b.color || '#3b82f6',
           type: b.type || 'Livre'
         });
       });
@@ -146,14 +150,21 @@ const OpenShemaStore = {
       try {
         const theolBooks = await API.call('get_theology_books') || [];
         theolBooks.forEach(tb => {
-          if (!this.localLibraryBooks.some(x => x.name === tb.name || x.title === tb.title)) {
+          const existing = this.localLibraryBooks.find(x => x.name === tb.name || x.title === tb.title);
+          if (!existing) {
             this.localLibraryBooks.push({
               title: tb.title || tb.name,
               author: tb.author || '',
               name: tb.name,
               year: tb.year || '',
+              cover_url: tb.cover_url || tb.cover_data_url || '',
+              color: tb.color || '#8b5cf6',
               type: 'Théologie'
             });
+          } else {
+            if (!existing.cover_url && (tb.cover_url || tb.cover_data_url)) {
+              existing.cover_url = tb.cover_url || tb.cover_data_url;
+            }
           }
         });
       } catch (e) {
@@ -546,6 +557,110 @@ const OpenShemaStore = {
       await this.fetchInitialShowcase();
       btn.classList.remove('spinning');
     });
+
+    this._setupSimilarityTooltipEvents();
+  },
+
+  _setupSimilarityTooltipEvents() {
+    let tooltip = document.getElementById('store-similarity-tooltip');
+    if (!tooltip) {
+      tooltip = document.createElement('div');
+      tooltip.id = 'store-similarity-tooltip';
+      tooltip.style.cssText = 'position: fixed; z-index: 100050; pointer-events: none; opacity: 0; transform: translateY(6px); transition: opacity 0.16s ease-out, transform 0.16s ease-out; background: #0f172a; border: 1px solid rgba(255, 255, 255, 0.20); border-radius: 10px; box-shadow: 0 20px 40px -4px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.08); padding: 14px; width: 320px; max-width: calc(100vw - 32px); color: #f8fafc; font-family: inherit; backdrop-filter: blur(20px);';
+      document.body.appendChild(tooltip);
+    }
+
+    const modal = document.getElementById('modal-open-shema-store');
+    if (!modal || this._tooltipEventsAttached) return;
+    this._tooltipEventsAttached = true;
+
+    let activeTrigger = null;
+
+    modal.addEventListener('mouseover', (e) => {
+      const trigger = e.target.closest('.sim-badge-trigger');
+      if (!trigger) return;
+      activeTrigger = trigger;
+
+      const score = parseInt(trigger.dataset.simScore || '0', 10);
+      const title = trigger.dataset.simTitle || '';
+      const author = trigger.dataset.simAuthor || '';
+      const type = trigger.dataset.simType || 'Livre';
+      const year = trigger.dataset.simYear || '';
+      const cover = trigger.dataset.simCover || '';
+      const color = trigger.dataset.simColor || '#1e3a8a';
+
+      const isHigh = score >= 80;
+      const scoreBadgeStyle = isHigh 
+        ? 'background: rgba(16, 185, 129, 0.25); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.45);' 
+        : 'background: rgba(245, 158, 11, 0.25); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.45);';
+
+      const coverHtml = cover 
+        ? `<img src="${this._escapeHtml(cover)}" alt="Couverture" style="width: 48px; height: 68px; object-fit: cover; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); flex-shrink: 0; border: 1px solid rgba(255,255,255,0.15);" onerror="this.style.display='none'">`
+        : `<div style="width: 48px; height: 68px; border-radius: 4px; background: linear-gradient(135deg, ${color}, #0f172a); display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); padding: 4px; text-align: center;">
+            <div style="font-size: 0.76rem; font-weight: 800; color: #ffffff; line-height: 1.1;">${this._escapeHtml(title.slice(0, 3).toUpperCase())}</div>
+            <div style="font-size: 0.58rem; color: #93c5fd; margin-top: 2px;">${this._escapeHtml(type)}</div>
+          </div>`;
+
+      tooltip.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px;">
+          <span style="font-size: 0.72rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 5px;">
+            ${this.svgIcons.book} Présent en Bibliothèque
+          </span>
+          <span style="font-size: 0.70rem; font-weight: 800; padding: 2px 7px; border-radius: 4px; ${scoreBadgeStyle}">
+            ${score}% de ressemblance
+          </span>
+        </div>
+
+        <div style="display: flex; gap: 12px; align-items: flex-start;">
+          ${coverHtml}
+          <div style="flex: 1; min-width: 0;">
+            <div style="font-size: 0.88rem; font-weight: 700; color: #ffffff; line-height: 1.25; margin-bottom: 3px; word-break: break-word;">
+              ${this._escapeHtml(title)}
+            </div>
+            <div style="font-size: 0.78rem; font-weight: 600; color: #93c5fd; margin-bottom: 5px;">
+              ${this._escapeHtml(author || 'Auteur inconnu')}
+            </div>
+            <div style="display: inline-flex; align-items: center; gap: 6px;">
+              <span style="font-size: 0.68rem; padding: 1px 6px; border-radius: 3px; background: rgba(255,255,255,0.1); color: #cbd5e1; font-weight: 600;">
+                ${this._escapeHtml(type)}
+              </span>
+              ${year ? `<span style="font-size: 0.68rem; color: #94a3b8;">${this._escapeHtml(year)}</span>` : ''}
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 9px; padding-top: 7px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.72rem; color: #cbd5e1; line-height: 1.35;">
+          ${isHigh 
+            ? '✓ Cet ouvrage est déjà disponible pour étude dans votre bibliothèque personnelle.' 
+            : '⚠ Ouvrage semblable détecté. Vérifiez la traduction ou l\'édition avant d\'importer.'}
+        </div>
+      `;
+
+      const rect = trigger.getBoundingClientRect();
+      const tooltipWidth = 320;
+      let left = rect.left + (rect.width / 2) - (tooltipWidth / 2);
+      if (left < 10) left = 10;
+      if (left + tooltipWidth > window.innerWidth - 10) left = window.innerWidth - tooltipWidth - 10;
+
+      let top = rect.bottom + 8;
+      if (top + 180 > window.innerHeight) {
+        top = Math.max(10, rect.top - 170);
+      }
+
+      tooltip.style.left = `${left}px`;
+      tooltip.style.top = `${top}px`;
+      tooltip.style.opacity = '1';
+      tooltip.style.transform = 'translateY(0)';
+    });
+
+    modal.addEventListener('mouseout', (e) => {
+      const trigger = e.target.closest('.sim-badge-trigger');
+      if (trigger && trigger === activeTrigger) {
+        activeTrigger = null;
+        tooltip.style.opacity = '0';
+        tooltip.style.transform = 'translateY(6px)';
+      }
+    });
   },
 
   _handleSearchInput(force = false) {
@@ -797,7 +912,10 @@ const OpenShemaStore = {
           score: finalScore,
           bookTitle: rawLocTitle,
           bookAuthor: rawLocAuthor,
-          bookType: local.type || 'Livre'
+          bookType: local.type || 'Livre',
+          bookCover: local.cover_url || local.cover_data_url || '',
+          bookYear: locYear || '',
+          bookColor: local.color || '#3b82f6'
         };
       }
     }
@@ -1116,15 +1234,18 @@ const OpenShemaStore = {
     const sim = this._computeBookSimilarity(m);
     let simBadge = '';
     if (sim) {
+      const simDataAttrs = `data-sim-score="${sim.score}" data-sim-title="${this._escapeHtml(sim.bookTitle)}" data-sim-author="${this._escapeHtml(sim.bookAuthor)}" data-sim-type="${this._escapeHtml(sim.bookType || 'Livre')}" data-sim-cover="${this._escapeHtml(sim.bookCover || '')}" data-sim-year="${this._escapeHtml(sim.bookYear || '')}" data-sim-color="${this._escapeHtml(sim.bookColor || '#1e3a8a')}"`;
       if (sim.score >= 80) {
-        simBadge = `<span style="font-size: 0.70rem; padding: 2px 7px; border-radius: 4px; background: rgba(16, 185, 129, 0.22); color: #34d399; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.45); display: inline-flex; align-items: center; gap: 3px; cursor: help;" title="Cet ouvrage correspond à ${sim.score}% avec « ${this._escapeHtml(sim.bookTitle)} » présent dans votre bibliothèque">${this.svgIcons.check} Dans votre biblio</span>`;
+        simBadge = `<span class="sim-badge-trigger" ${simDataAttrs} style="font-size: 0.70rem; padding: 2px 7px; border-radius: 4px; background: rgba(16, 185, 129, 0.22); color: #34d399; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.45); display: inline-flex; align-items: center; gap: 3px; cursor: pointer;">${this.svgIcons.check} Dans votre biblio</span>`;
       } else if (sim.score >= 60) {
-        simBadge = `<span style="font-size: 0.70rem; padding: 2px 7px; border-radius: 4px; background: rgba(245, 158, 11, 0.22); color: #fbbf24; font-weight: 800; border: 1px solid rgba(245, 158, 11, 0.45); display: inline-flex; align-items: center; gap: 3px; cursor: help;" title="Semblable à ${sim.score}% avec « ${this._escapeHtml(sim.bookTitle)} » dans votre bibliothèque">⚠ Similaire (${sim.score}%)</span>`;
+        simBadge = `<span class="sim-badge-trigger" ${simDataAttrs} style="font-size: 0.70rem; padding: 2px 7px; border-radius: 4px; background: rgba(245, 158, 11, 0.22); color: #fbbf24; font-weight: 800; border: 1px solid rgba(245, 158, 11, 0.45); display: inline-flex; align-items: center; gap: 3px; cursor: pointer;">⚠ Similaire (${sim.score}%)</span>`;
       }
     }
 
     const isCCEL = (m.badge_label === 'CCEL' || m.source === 'Christian Classics Ethereal Library');
     const isGutenberg = (m.badge_label === 'Gutenberg' || m.source === 'Project Gutenberg');
+    const isArchiveOrg = (m.badge_label === 'Archive.org' || m.source === 'Internet Archive');
+    const isWikisource = (m.badge_label === 'Wikisource' || m.source === 'Wikisource');
     
     let badgeBg = 'rgba(139, 92, 246, 0.2)';
     let badgeBorder = 'rgba(139, 92, 246, 0.35)';
@@ -1138,6 +1259,37 @@ const OpenShemaStore = {
       badgeBg = 'rgba(59, 130, 246, 0.2)';
       badgeBorder = 'rgba(59, 130, 246, 0.35)';
       badgeColor = '#93c5fd';
+    } else if (isArchiveOrg) {
+      badgeBg = 'rgba(245, 158, 11, 0.2)';
+      badgeBorder = 'rgba(245, 158, 11, 0.35)';
+      badgeColor = '#fbbf24';
+    } else if (isWikisource) {
+      badgeBg = 'rgba(251, 146, 60, 0.2)';
+      badgeBorder = 'rgba(251, 146, 60, 0.35)';
+      badgeColor = '#fb923c';
+    }
+
+    let actionBtnHtml = '';
+    if (isInstalled) {
+      actionBtnHtml = `
+        <button style="display: flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 5px; background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); font-size: 0.78rem; font-weight: 700; cursor: default;">
+          ${this.svgIcons.check}
+          <span>Présent</span>
+        </button>
+      `;
+    } else if (isWikisource || m.action_type === 'external_link') {
+      actionBtnHtml = `
+        <button class="btn-open-wikisource-link" data-url="${this._escapeHtml(m.download_url)}" style="display: flex; align-items: center; gap: 5px; padding: 6px 14px; border-radius: 6px; background: rgba(251, 146, 60, 0.2); color: #fb923c; border: 1px solid rgba(251, 146, 60, 0.45); font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s;" title="Consulter le texte sur Wikisource">
+          <span>Lire sur Wikisource ↗</span>
+        </button>
+      `;
+    } else {
+      actionBtnHtml = `
+        <button class="btn-download-public-domain" style="display: flex; align-items: center; gap: 5px; padding: 6px 14px; border-radius: 6px; background: #2563eb; color: #ffffff; border: none; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s;" ${isDownloading ? 'disabled' : ''}>
+          ${isDownloading ? this.svgIcons.spinner : this.svgIcons.download}
+          <span>${isDownloading ? 'Téléchargement...' : (m.format === 'DOCX' ? 'Importer DOCX' : 'Télécharger EPUB')}</span>
+        </button>
+      `;
     }
 
     card.innerHTML = `
@@ -1166,24 +1318,22 @@ const OpenShemaStore = {
 
       <div style="margin-top: auto; padding-top: 10px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.08);">
         <span style="font-size: 0.74rem; color: #60a5fa; font-weight: 800;">Gratuit / Libre</span>
-        
-        ${isInstalled ? `
-          <button style="display: flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 5px; background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); font-size: 0.78rem; font-weight: 700; cursor: default;">
-            ${this.svgIcons.check}
-            <span>Présent</span>
-          </button>
-        ` : `
-          <button class="btn-download-public-domain" style="display: flex; align-items: center; gap: 5px; padding: 6px 14px; border-radius: 6px; background: #2563eb; color: #ffffff; border: none; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s;" ${isDownloading ? 'disabled' : ''}>
-            ${isDownloading ? this.svgIcons.spinner : this.svgIcons.download}
-            <span>${isDownloading ? 'Téléchargement...' : (m.format === 'DOCX' ? 'Importer DOCX' : 'Télécharger EPUB')}</span>
-          </button>
-        `}
+        ${actionBtnHtml}
       </div>
     `;
 
     const dlBtn = card.querySelector('.btn-download-public-domain');
     if (dlBtn) {
       dlBtn.addEventListener('click', () => this.downloadModule(m));
+    }
+
+    const wsBtn = card.querySelector('.btn-open-wikisource-link');
+    if (wsBtn) {
+      wsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const url = wsBtn.getAttribute('data-url');
+        if (url) API.call('open_external_url', url);
+      });
     }
 
     return card;
@@ -1201,10 +1351,11 @@ const OpenShemaStore = {
     const sim = this._computeBookSimilarity({ title: cleanTitle, author: cleanAuthors, description: '' });
     let simBadge = '';
     if (sim) {
+      const simDataAttrs = `data-sim-score="${sim.score}" data-sim-title="${this._escapeHtml(sim.bookTitle)}" data-sim-author="${this._escapeHtml(sim.bookAuthor)}" data-sim-type="${this._escapeHtml(sim.bookType || 'Livre')}" data-sim-cover="${this._escapeHtml(sim.bookCover || '')}" data-sim-year="${this._escapeHtml(sim.bookYear || '')}" data-sim-color="${this._escapeHtml(sim.bookColor || '#1e3a8a')}"`;
       if (sim.score >= 80) {
-        simBadge = `<span style="font-size: 0.66rem; padding: 1px 5px; border-radius: 3px; background: rgba(16, 185, 129, 0.22); color: #34d399; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.45); cursor: help;" title="Cet ouvrage correspond à ${sim.score}% avec « ${this._escapeHtml(sim.bookTitle)} » présent dans votre bibliothèque">${this.svgIcons.check} Dans votre biblio</span>`;
+        simBadge = `<span class="sim-badge-trigger" ${simDataAttrs} style="font-size: 0.66rem; padding: 1px 5px; border-radius: 3px; background: rgba(16, 185, 129, 0.22); color: #34d399; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.45); cursor: pointer;">${this.svgIcons.check} Dans votre biblio</span>`;
       } else if (sim.score >= 60) {
-        simBadge = `<span style="font-size: 0.66rem; padding: 1px 5px; border-radius: 3px; background: rgba(245, 158, 11, 0.22); color: #fbbf24; font-weight: 800; border: 1px solid rgba(245, 158, 11, 0.45); cursor: help;" title="Semblable à ${sim.score}% avec « ${this._escapeHtml(sim.bookTitle)} » dans votre bibliothèque">⚠ Similaire (${sim.score}%)</span>`;
+        simBadge = `<span class="sim-badge-trigger" ${simDataAttrs} style="font-size: 0.66rem; padding: 1px 5px; border-radius: 3px; background: rgba(245, 158, 11, 0.22); color: #fbbf24; font-weight: 800; border: 1px solid rgba(245, 158, 11, 0.45); cursor: pointer;">⚠ Similaire (${sim.score}%)</span>`;
       }
     }
 

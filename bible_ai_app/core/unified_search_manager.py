@@ -168,11 +168,133 @@ class UnifiedSearchManager:
 
         return results
 
+    def search_internet_archive_online(self, query: str) -> List[Dict[str, Any]]:
+        """Recherche dans l'immense corpus d'Internet Archive (archive.org)."""
+        results = []
+        if not query or len(query.strip()) < 2:
+            return results
+
+        clean_q = query.strip()
+        params = {
+            'q': f'(title:({clean_q}) OR creator:({clean_q})) AND mediatype:(texts)',
+            'fl[]': ['identifier', 'title', 'creator', 'year', 'description', 'language', 'downloads'],
+            'sort[]': 'downloads desc',
+            'rows': '6',
+            'page': '1',
+            'output': 'json'
+        }
+        encoded_params = urllib.parse.urlencode(params, doseq=True)
+        url = f"https://archive.org/advancedsearch.php?{encoded_params}"
+
+        try:
+            req = urllib.request.Request(url, headers=HEADERS)
+            with urllib.request.urlopen(req, context=ssl_ctx, timeout=4.0) as resp:
+                if resp.status != 200:
+                    return results
+                data = json.loads(resp.read().decode('utf-8'))
+                docs = data.get('response', {}).get('docs', [])
+
+                for doc in docs:
+                    ident = doc.get('identifier')
+                    if not ident:
+                        continue
+                    title = doc.get('title') or ident
+                    creator = doc.get('creator')
+                    if isinstance(creator, list):
+                        creator = ", ".join(creator[:2])
+                    creator_str = str(creator or 'Auteur ancien')
+                    year = str(doc.get('year') or '')
+                    lang = doc.get('language')
+                    if isinstance(lang, list):
+                        lang = lang[0]
+                    lang_code = 'fr' if str(lang or '').lower().startswith(('fr', 'fre', 'fra')) else 'en'
+                    desc = doc.get('description') or f"Ouvrage libre de droits numérisé par Internet Archive ({creator_str})."
+                    if isinstance(desc, list):
+                        desc = desc[0] if desc else ''
+
+                    epub_url = f"https://archive.org/download/{ident}/{ident}.epub"
+                    cover_url = f"https://archive.org/services/img/{ident}"
+
+                    results.append({
+                        'id': f"ia_{ident}",
+                        'title': str(title),
+                        'author': creator_str,
+                        'year': year,
+                        'category': 'public_domain',
+                        'source': 'Internet Archive',
+                        'badge_label': 'Archive.org',
+                        'format': 'EPUB',
+                        'language': lang_code,
+                        'size_bytes': 3000000,
+                        'download_url': epub_url,
+                        'cover_url': cover_url,
+                        'description': str(desc)[:250],
+                        'action_label': 'Télécharger EPUB',
+                        'is_free': True
+                    })
+        except Exception:
+            pass
+
+        return results
+
+    def search_wikisource_online(self, query: str) -> List[Dict[str, Any]]:
+        """Recherche dans le fonds théologique francophone de Wikisource."""
+        results = []
+        if not query or len(query.strip()) < 2:
+            return results
+
+        clean_q = query.strip()
+        url = f"https://fr.wikisource.org/w/api.php?action=query&list=search&srsearch={urllib.parse.quote(clean_q)}&srnamespace=0&srlimit=5&format=json"
+
+        try:
+            req = urllib.request.Request(url, headers={'User-Agent': 'OpenShemaApp/1.0'})
+            with urllib.request.urlopen(req, context=ssl_ctx, timeout=3.5) as resp:
+                if resp.status != 200:
+                    return results
+                data = json.loads(resp.read().decode('utf-8'))
+                items = data.get('query', {}).get('search', [])
+
+                for it in items:
+                    page_title = it.get('title', '')
+                    if not page_title:
+                        continue
+                    snippet = it.get('snippet', '')
+                    clean_snippet = re.sub(r'<[^>]+>', '', snippet)
+
+                    # Déduire l'auteur si possible à partir du titre "Titre (Auteur)"
+                    author_match = re.search(r'\(([^)]+)\)', page_title)
+                    author_str = author_match.group(1) if author_match else "Wikisource"
+                    display_title = re.sub(r'\s*\([^)]+\)', '', page_title).replace('_', ' ')
+
+                    read_url = f"https://fr.wikisource.org/wiki/{urllib.parse.quote(page_title)}"
+
+                    results.append({
+                        'id': f"ws_{it.get('pageid', hash(page_title))}",
+                        'title': display_title,
+                        'author': author_str,
+                        'category': 'public_domain',
+                        'source': 'Wikisource',
+                        'badge_label': 'Wikisource',
+                        'format': 'WEB',
+                        'language': 'fr',
+                        'size_bytes': 0,
+                        'download_url': read_url,
+                        'action_type': 'external_link',
+                        'cover_url': '',
+                        'description': clean_snippet or f"Texte libre de droits sur Wikisource francophone.",
+                        'action_label': 'Lire sur Wikisource ↗',
+                        'is_free': True
+                    })
+        except Exception:
+            pass
+
+        return results
+
     def search_all_unified(self, query: str, official_catalog_modules: List[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
         Exécute la recherche simultanée et parallèle sur les 3 pôles :
         1. Modules Natifs Open Shema
-        2. Domaine Public & Archives (Gutenberg local + Gutendex online + Logos PB)
+        2. Domaine Public & Archives (CCEL + Gutenberg + Logos PB + Archive.org + Wikisource)
         3. Librairies Chrétiennes E-books (Recherche ou sélection d'accueil)
         """
         clean_q = (query or "").strip()
@@ -236,15 +358,16 @@ class UnifiedSearchManager:
                 seen_titles.add(t_key)
                 public_domain_results.append(b)
 
-        # 3. Parallélisation de Gutendex en ligne et des Librairies Chrétiennes
+        # 3. Parallélisation : Gutendex, Internet Archive, Wikisource et Librairies Chrétiennes
         bookstore_results: List[Dict[str, Any]] = []
         direct_store_links: List[Dict[str, str]] = []
 
-        # Pour les librairies : si la requête est vide, chercher "Bible" pour peupler l'accueil
         bookstore_query = clean_q if clean_q else "Bible"
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
             future_gutendex = executor.submit(self.search_gutendex_online, clean_q) if clean_q else None
+            future_ia = executor.submit(self.search_internet_archive_online, clean_q) if clean_q else None
+            future_wikisource = executor.submit(self.search_wikisource_online, clean_q) if clean_q else None
             future_bookstores = executor.submit(self.ebook_manager.search_all_ebooks, bookstore_query)
 
             # Gutendex Online
@@ -253,6 +376,32 @@ class UnifiedSearchManager:
                     online_guten = future_gutendex.result()
                     if online_guten:
                         for b in online_guten:
+                            t_key = (b.get('title') or '').lower()
+                            if t_key not in seen_titles:
+                                seen_titles.add(t_key)
+                                public_domain_results.append(b)
+                except Exception:
+                    pass
+
+            # Internet Archive Online
+            if future_ia:
+                try:
+                    ia_books = future_ia.result()
+                    if ia_books:
+                        for b in ia_books:
+                            t_key = (b.get('title') or '').lower()
+                            if t_key not in seen_titles:
+                                seen_titles.add(t_key)
+                                public_domain_results.append(b)
+                except Exception:
+                    pass
+
+            # Wikisource Online
+            if future_wikisource:
+                try:
+                    ws_books = future_wikisource.result()
+                    if ws_books:
+                        for b in ws_books:
                             t_key = (b.get('title') or '').lower()
                             if t_key not in seen_titles:
                                 seen_titles.add(t_key)
