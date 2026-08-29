@@ -1199,9 +1199,6 @@ const OpenShemaStore = {
                 language: module.language || 'fr'
               }
             );
-            if (typeof App !== 'undefined' && App.showToast) {
-              App.showToast(`« ${cleanTitle} » prêt pour l'importation !`, 'success');
-            }
           }
         } else {
           const errMsg = (res && res.error) ? res.error : 'Erreur lors du téléchargement.';

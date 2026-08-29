@@ -735,7 +735,9 @@ const ImportModal = {
       const nextBtn = document.getElementById('btn-import-next');
       if (nextBtn) nextBtn.disabled = false;
 
-      App.showToast(`Document analysé avec succès : ${info.title || this.fileName}`);
+      if (this.currentStep === 1 && !this._isPreloading) {
+        App.showToast(`Document analysé : ${info.title || this.fileName}`);
+      }
 
     } catch (e) {
       console.error('Erreur inspectAndLoadFile:', e);

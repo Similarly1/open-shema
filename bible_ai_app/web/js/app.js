@@ -683,7 +683,7 @@ const App = {
     }
 
     // Synchroniser l'état actif de la barre latérale et des sous-menus
-    document.querySelectorAll('.sidebar-nav .nav-item, .sidebar-footer .nav-item, .nav-sub-item').forEach(b => {
+    document.querySelectorAll('#sidebar .nav-item, .sidebar-menu .nav-item, .sidebar-nav .nav-item, .sidebar-footer .nav-item, .nav-sub-item').forEach(b => {
       b.classList.remove('active');
       if (b.dataset.view === viewName || b.id === `nav-${viewName}`) {
         b.classList.add('active');

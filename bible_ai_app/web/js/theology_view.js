@@ -332,12 +332,11 @@ const TheologyView = {
     if (typeof App !== 'undefined' && App.switchView) {
       App.switchView('theology');
     }
-    if (!this.books || this.books.length === 0) {
-      await this.loadBooksList(false);
-    }
+    // Recharger systématiquement la liste des livres pour inclure les nouveaux imports
+    await this.loadBooksList(false);
     
-    const targetBook = this.books.find(b => b.name === bookName || b.id === bookName || b.title === bookName);
-    const resolvedName = targetBook ? targetBook.name : (this.books[0]?.name || bookName);
+    const targetBook = (this.books || []).find(b => b.name === bookName || b.id === bookName || b.title === bookName);
+    const resolvedName = targetBook ? targetBook.name : (this.books && this.books[0] ? this.books[0].name : bookName);
     
     await this.selectBook(resolvedName, chapterId);
   },
