@@ -788,3 +788,60 @@ Vue par en dessous, une broderie n'est qu'un enchevêtrement chaotique de fils s
 """
         with open(ill2_file, "w", encoding="utf-8") as f:
             f.write(ill2_content)
+
+    @classmethod
+    def list_real_sermon_models(cls, passage_ref: Optional[str] = None, query: Optional[str] = None) -> List[Dict[str, Any]]:
+        """Retourne la liste des modèles de prédications réelles analysées, avec filtrage intelligent."""
+        index_file = os.path.join(CURRENT_DIR, "data", "real_sermons_index.json")
+        if not os.path.exists(index_file):
+            return []
+        
+        try:
+            import json
+            with open(index_file, "r", encoding="utf-8") as fp:
+                all_models = json.load(fp)
+        except Exception as e:
+            logger.error(f"Erreur chargement index prédications réelles: {e}")
+            return []
+            
+        if not passage_ref and not query:
+            return all_models
+
+        filtered = []
+        clean_ref = (passage_ref or "").lower().strip()
+        clean_query = (query or "").lower().strip()
+
+        book_match = None
+        chap_match = None
+        if clean_ref:
+            m = re.search(r'([1-3]?\s*[a-zéèêëîïôöûüâäç]+)\s*(\d+)?', clean_ref)
+            if m:
+                book_match = m.group(1).strip()
+                chap_match = int(m.group(2)) if m.group(2) else None
+
+        for m_item in all_models:
+            m_ref = (m_item.get("passage_reference") or "").lower()
+            m_title = (m_item.get("title") or "").lower()
+            m_big_idea = (m_item.get("big_idea") or "").lower()
+            m_theme = (m_item.get("theme_general") or "").lower()
+
+            score = 0
+            if clean_ref:
+                if clean_ref in m_ref or m_ref in clean_ref:
+                    score += 10
+                elif book_match and (book_match in m_ref or book_match in m_title):
+                    score += 5
+                    if chap_match and (m_item.get("chapter") == chap_match or str(chap_match) in m_ref):
+                        score += 5
+
+            if clean_query:
+                if clean_query in m_title or clean_query in m_big_idea or clean_query in m_theme or clean_query in m_ref:
+                    score += 4
+
+            if score > 0 or (not clean_ref and not clean_query):
+                item_copy = dict(m_item)
+                item_copy["match_score"] = score
+                filtered.append(item_copy)
+
+        filtered.sort(key=lambda x: x.get("match_score", 0), reverse=True)
+        return filtered

@@ -2030,26 +2030,71 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
 
     if (this.activeDrawerTab === 'ai') {
       this.drawerContent.innerHTML = `
-        <div style="padding: 8px 4px; display: flex; flex-direction: column; gap: 10px;">
-          <div style="font-size: 12px; font-weight: 700; color: var(--text-primary);">Structures & Plans Homilétiques</div>
-          <button class="btn-secondary" id="btn-ai-bridge-plan" style="text-align: left; padding: 8px 10px; font-size: 11.5px; display: flex; align-items: center; gap: 8px;">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="color: #3b82f6;"><path d="M4 19V9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10"/><path d="M4 15h16"/><path d="M10 7v12"/><path d="M14 7v12"/></svg>
-            <span>Insérer la structure du Pont (John Stott)</span>
-          </button>
-          <button class="btn-secondary" id="btn-ai-synthetique-plan" style="text-align: left; padding: 8px 10px; font-size: 11.5px; display: flex; align-items: center; gap: 8px;">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg>
-            <span>Insérer un Plan Synthétique (Alfred Kuen)</span>
-          </button>
-          <button class="btn-secondary" id="btn-ai-helm-grid" style="text-align: left; padding: 8px 10px; font-size: 11.5px; display: flex; align-items: center; gap: 8px;">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-            <span>Insérer la Grille d'Application (David Helm)</span>
-          </button>
+        <div style="padding: 8px 4px; display: flex; flex-direction: column; gap: 14px;">
+          <!-- 1. Canevas Classiques des Manuels -->
+          <div>
+            <div style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              <span>Structures des Grands Manuels</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <button class="btn-secondary" id="btn-ai-bridge-plan" style="text-align: left; padding: 7px 10px; font-size: 11.5px; display: flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="color: #3b82f6;"><path d="M4 19V9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10"/><path d="M4 15h16"/><path d="M10 7v12"/><path d="M14 7v12"/></svg>
+                <span>Structure du Pont (John Stott)</span>
+              </button>
+              <button class="btn-secondary" id="btn-ai-synthetique-plan" style="text-align: left; padding: 7px 10px; font-size: 11.5px; display: flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg>
+                <span>Plan Synthétique (Alfred Kuen)</span>
+              </button>
+              <button class="btn-secondary" id="btn-ai-helm-grid" style="text-align: left; padding: 7px 10px; font-size: 11.5px; display: flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                <span>Grille d'Applications (David Helm)</span>
+              </button>
+            </div>
+          </div>
+
+          <div style="height: 1px; background: var(--border-color); margin: 2px 0;"></div>
+
+          <!-- 2. Modèles de Chaire Réelle (Corpus de 94 Prédications) -->
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <div style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent-amber, #f59e0b); display: flex; align-items: center; gap: 6px;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                <span>En Chaire Réelle (94 Prédications)</span>
+              </div>
+              <span id="real-sermons-count-badge" style="font-size: 10.5px; background: rgba(245, 158, 11, 0.15); color: var(--accent-amber, #f59e0b); padding: 1px 6px; border-radius: 10px; font-weight: 600;">...</span>
+            </div>
+
+            <!-- Barre de filtrage interne -->
+            <div style="position: relative; margin-bottom: 10px;">
+              <input type="text" id="input-filter-real-models" class="sermon-drawer-input" placeholder="Filtrer par texte (ex: Luc 11, Joseph, grâce...)" style="padding-left: 26px; font-size: 11px; height: 28px;">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 8px; top: 8px; color: var(--text-muted); pointer-events: none;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+
+            <!-- Liste des modèles réels -->
+            <div id="real-sermons-models-container" style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 11.5px;">
+                <span class="synth-spinner" style="width: 12px; height: 12px; display: inline-block; vertical-align: middle; margin-right: 6px;"></span>
+                Chargement des modèles correspondants...
+              </div>
+            </div>
+          </div>
         </div>
       `;
 
       document.getElementById('btn-ai-bridge-plan')?.addEventListener('click', () => this.insertHomileticOutline('inductif'));
       document.getElementById('btn-ai-synthetique-plan')?.addEventListener('click', () => this.insertHomileticOutline('synthetique'));
       document.getElementById('btn-ai-helm-grid')?.addEventListener('click', () => this.insertHomileticOutline('application-grille'));
+
+      // Charger les modèles réels
+      this.loadRealSermonModelsList(passageRef);
+
+      const filterInput = document.getElementById('input-filter-real-models');
+      filterInput?.addEventListener('input', () => {
+        const q = filterInput.value.trim();
+        this.loadRealSermonModelsList(passageRef, q);
+      });
+
       return;
     }
 
@@ -2114,6 +2159,185 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     this.debouncedAutoSave();
     if (typeof App !== 'undefined' && App.showToast) {
       App.showToast("Structure homilétique appliquée en blocs !");
+    }
+  },
+
+  async loadRealSermonModelsList(passageRef, query = '') {
+    const container = document.getElementById('real-sermons-models-container');
+    const badge = document.getElementById('real-sermons-count-badge');
+    if (!container) return;
+
+    try {
+      const models = await API.getRealSermonModels(passageRef, query) || [];
+      
+      if (badge) {
+        badge.textContent = `${models.length} dispo`;
+      }
+
+      if (models.length === 0) {
+        container.innerHTML = `
+          <div style="padding: 14px 10px; text-align: center; color: var(--text-muted); font-size: 11.5px; background: var(--bg-card); border-radius: 6px; border: 1px dashed var(--border-color);">
+            Aucune prédication trouvée pour cette recherche.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = models.slice(0, 15).map(m => {
+        const hasScore = m.match_score && m.match_score > 0;
+        const matchTag = hasScore 
+          ? `<span style="font-size: 9.5px; background: rgba(59, 130, 246, 0.18); color: var(--accent-blue, #3b82f6); padding: 1px 5px; border-radius: 4px; font-weight: 600;">🎯 Match Texte</span>` 
+          : '';
+
+        const outlineItemsHtml = (m.outline || []).map(item => `
+          <div style="font-size: 11px; padding: 3px 0; border-bottom: 1px dotted var(--border-color); display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-weight: 600; color: var(--text-primary);">${this.escapeHtml(item.titre || '')}</span>
+            <span style="font-size: 10.5px; color: var(--text-secondary); opacity: 0.85;">${this.escapeHtml(item.synthese || '')}</span>
+          </div>
+        `).join('');
+
+        return `
+          <div class="sermon-resource-card" style="padding: 10px; border-radius: 6px; background: var(--bg-card); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 6px;">
+              <div>
+                <div style="font-size: 11.5px; font-weight: 700; color: var(--text-primary); line-height: 1.3;">
+                  ${this.escapeHtml(m.title)}
+                </div>
+                <div style="font-size: 10.5px; color: var(--text-muted); margin-top: 2px; display: flex; align-items: center; gap: 6px;">
+                  <span>📖 ${this.escapeHtml(m.passage_reference || 'Texte')}</span>
+                  <span>•</span>
+                  <span>⏱️ ${this.escapeHtml(m.duration || '35 min')}</span>
+                  ${matchTag}
+                </div>
+              </div>
+            </div>
+
+            <!-- Big Idea / PMT -->
+            ${m.big_idea ? `
+              <div style="padding: 6px 8px; background: rgba(245, 158, 11, 0.08); border-left: 3px solid var(--accent-amber, #f59e0b); border-radius: 0 4px 4px 0; font-size: 11px; line-height: 1.35; color: var(--text-primary);">
+                <strong style="color: var(--accent-amber, #f59e0b);">Proposition Centrale :</strong> « ${this.escapeHtml(m.big_idea)} »
+              </div>
+            ` : ''}
+
+            <!-- Tension contemporaine -->
+            ${m.contemporary_tension ? `
+              <div style="font-size: 10.5px; color: var(--text-secondary); line-height: 1.35; font-style: italic;">
+                ⚡ <strong>Tension :</strong> ${this.escapeHtml(m.contemporary_tension)}
+              </div>
+            ` : ''}
+
+            <!-- Plan détaillé repliable -->
+            <details style="font-size: 11px; background: var(--bg-subtle, rgba(255,255,255,0.03)); padding: 6px 8px; border-radius: 4px; border: 1px solid var(--border-color);">
+              <summary style="font-weight: 600; cursor: pointer; color: var(--text-secondary); user-select: none;">
+                🏛️ Plan homilétique (${(m.outline || []).length} sections)
+              </summary>
+              <div style="margin-top: 6px; display: flex; flex-direction: column; gap: 4px;">
+                ${outlineItemsHtml}
+              </div>
+            </details>
+
+            <!-- Actions -->
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 2px;">
+              <button class="btn-primary btn-inject-model-plan" data-model-id="${this.escapeHtml(m.id)}" style="padding: 5px 8px; font-size: 10.5px; display: flex; align-items: center; gap: 5px; flex: 1; justify-content: center;">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Injecter ce plan</span>
+              </button>
+              ${m.url ? `
+                <button class="btn-secondary btn-open-model-youtube" data-url="${this.escapeHtml(m.url)}" title="Ouvrir sur YouTube" style="padding: 5px 7px; font-size: 10.5px;">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Bind des boutons d'injection
+      container.querySelectorAll('.btn-inject-model-plan').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const modelId = btn.dataset.modelId;
+          const targetModel = models.find(m => m.id === modelId);
+          if (targetModel) {
+            this.insertRealSermonOutline(targetModel);
+          }
+        });
+      });
+
+      // Bind des liens YouTube
+      container.querySelectorAll('.btn-open-model-youtube').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const u = btn.dataset.url;
+          if (u && typeof API !== 'undefined' && API.openExternalUrl) {
+            API.openExternalUrl(u);
+          } else if (u) {
+            window.open(u, '_blank');
+          }
+        });
+      });
+
+    } catch (e) {
+      console.error('Erreur chargement modèles de prédications réelles:', e);
+      container.innerHTML = `
+        <div style="padding: 10px; color: var(--accent-red, #ef4444); font-size: 11px;">
+          Erreur lors du chargement des modèles réels.
+        </div>
+      `;
+    }
+  },
+
+  insertRealSermonOutline(model) {
+    if (!model || !model.outline || model.outline.length === 0) return;
+
+    // 1. Remplissage des métadonnées si vides ou demande
+    if (this.currentSermon) {
+      if (!this.currentSermon.big_idea && model.big_idea) {
+        this.currentSermon.big_idea = model.big_idea;
+        this.currentSermon.pmt = model.big_idea;
+        this.currentSermon.pms = model.big_idea;
+      }
+      if (!this.currentSermon.contemporary_tension && model.contemporary_tension) {
+        this.currentSermon.contemporary_tension = model.contemporary_tension;
+      }
+      if (!this.currentSermon.passage?.reference && model.passage_reference) {
+        this.currentSermon.passage = { reference: model.passage_reference };
+      }
+      this.updateHeaderSummary(this.currentSermon);
+    }
+
+    // 2. Conversion de l'outline en blocs de section
+    const newSections = [];
+    model.outline.forEach((item, idx) => {
+      let secType = 'point';
+      const st = (item.section_type || '').toLowerCase();
+      if (st.includes('intro')) secType = 'intro';
+      else if (st.includes('concl')) secType = 'conclusion';
+      else if (st.includes('scripture') || st.includes('lecture')) secType = 'scripture';
+
+      const passagesStr = item.passages && item.passages.length > 0 ? ` (${item.passages.join(', ')})` : '';
+      const title = `${item.titre || 'Point ' + (idx + 1)}${passagesStr}`;
+      const synth = item.synthese || '';
+      
+      const contentHtml = `<p>${this.escapeHtml(synth)}</p>`;
+
+      newSections.push({
+        id: `sec_${Date.now()}_${idx}`,
+        type: secType,
+        title: title,
+        contentHtml: contentHtml,
+        isCollapsed: false,
+        wordCount: 0,
+        estMinutes: 0
+      });
+    });
+
+    this.sections = newSections;
+    this.renderSections();
+    this.renderOutline();
+    this.updateMetrics();
+    this.debouncedAutoSave();
+    
+    if (typeof App !== 'undefined' && App.showToast) {
+      App.showToast(`Plan inspiré de "${model.title}" injecté dans vos blocs !`);
     }
   },
 

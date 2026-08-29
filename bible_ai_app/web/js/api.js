@@ -541,6 +541,10 @@ const API = {
     return await this.call('open_illustrations_folder');
   },
 
+  async getRealSermonModels(passageRef = null, query = null) {
+    return await this.call('get_real_sermon_models', passageRef, query);
+  },
+
   async showSystemNotification(title, message) {
     return await this.call('show_system_notification', title, message);
   }

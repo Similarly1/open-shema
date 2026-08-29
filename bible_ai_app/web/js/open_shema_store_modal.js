@@ -773,20 +773,31 @@ const OpenShemaStore = {
       return this._matchesLang(m);
     };
 
+    const isSearching = !!(this.searchQuery && this.searchQuery.trim().length > 0);
+
     const countOpenShema = (this.unifiedResults.open_shema || []).filter(filterItem).length;
     const countPublicDomain = (this.unifiedResults.public_domain || []).filter(filterItem).length;
     const countBookstores = (this.unifiedResults.bookstores || []).filter(m => this._matchesLang(m)).length;
     const countAll = countOpenShema + countPublicDomain + countBookstores;
     
-    const setTxt = (id, count) => {
+    const setFacetBadge = (id, count, forceShow = false) => {
       const el = document.getElementById(id);
-      if (el) el.textContent = count;
+      if (!el) return;
+      if (forceShow || isSearching) {
+        el.textContent = count;
+        el.style.display = 'inline-block';
+      } else {
+        el.style.display = 'none';
+      }
     };
 
-    setTxt('count-facet-all', countAll);
-    setTxt('count-facet-openshema', countOpenShema);
-    setTxt('count-facet-publicdomain', countPublicDomain);
-    setTxt('count-facet-bookstores', countBookstores);
+    // Pour Open Shema : toujours affiché car le catalogue est clos et exhaustif en mémoire
+    setFacetBadge('count-facet-openshema', countOpenShema, true);
+
+    // Pour Tous, Domaine Public et Librairies : affiché UNIQUEMENT lors d'une recherche active
+    setFacetBadge('count-facet-all', countAll, false);
+    setFacetBadge('count-facet-publicdomain', countPublicDomain, false);
+    setFacetBadge('count-facet-bookstores', countBookstores, false);
   },
 
   _updateCategoryPills() {
@@ -1056,6 +1067,8 @@ const OpenShemaStore = {
 
     container.innerHTML = '';
 
+    const isSearching = !!(this.searchQuery && this.searchQuery.trim().length > 0);
+
     // =========================================================================
     // SECTION 1 : ✦ MODULES OPTIMISÉS OPEN SHEMA (Natif)
     // =========================================================================
@@ -1082,7 +1095,7 @@ const OpenShemaStore = {
     }
 
     // =========================================================================
-    // SECTION 2 : ⚡ DOMAINE PUBLIC & ARCHIVES LIBRES (Gutenberg / Logos PB)
+    // SECTION 2 : ⚡ DOMAINE PUBLIC & ARCHIVES LIBRES (Gutenberg / CCEL / Wikisource / Archive.org / Logos PB)
     // =========================================================================
     if ((this.activeCategory === 'all' || this.activeCategory === 'public_domain') && publicDomainList.length > 0) {
       const sec = document.createElement('div');
@@ -1096,7 +1109,7 @@ const OpenShemaStore = {
             <span style="font-weight: 700; color: #ffffff; font-size: 0.98rem;">Domaine Public & Archives Libres</span>
             <span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 4px; background: rgba(59, 130, 246, 0.2); color: #93c5fd; font-weight: 700; border: 1px solid rgba(59, 130, 246, 0.35);">CCEL &bull; Gutenberg &bull; Wikisource &bull; Archive.org &bull; Logos PB</span>
           </div>
-          <span style="font-size: 0.80rem; color: #94a3b8; font-weight: 600;">${publicDomainList.length} livre(s)</span>
+          ${isSearching ? `<span style="font-size: 0.80rem; color: #94a3b8; font-weight: 600;">${publicDomainList.length} résultat(s)</span>` : ''}
         </div>
         <div class="store-modules-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px;"></div>
       `;
@@ -1121,7 +1134,7 @@ const OpenShemaStore = {
             <span style="font-weight: 700; color: #ffffff; font-size: 0.98rem;">Librairies & Éditeurs Chrétiens (E-books)</span>
             <span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 4px; background: rgba(168, 85, 247, 0.2); color: #c084fc; font-weight: 700; border: 1px solid rgba(168, 85, 247, 0.35);">100% Numérique</span>
           </div>
-          <span style="font-size: 0.80rem; color: #94a3b8; font-weight: 600;">${bookstoresList.length} e-book(s)</span>
+          ${isSearching ? `<span style="font-size: 0.80rem; color: #94a3b8; font-weight: 600;">${bookstoresList.length} résultat(s)</span>` : ''}
         </div>
         
         <!-- Raccourcis directs vers les librairies chrétiennes -->

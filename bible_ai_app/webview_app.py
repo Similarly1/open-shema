@@ -4498,6 +4498,14 @@ class BibleAppApi:
             logger.error(f"Erreur open_illustrations_folder: {e}")
             return {"success": False, "error": str(e)}
 
+    def get_real_sermon_models(self, passage_ref: Optional[str] = None, query: Optional[str] = None) -> List[Dict[str, Any]]:
+        """Retourne les modèles de prédications réelles filtrés par passage ou recherche."""
+        try:
+            return SermonsManager.list_real_sermon_models(passage_ref, query)
+        except Exception as e:
+            logger.error(f"Erreur get_real_sermon_models: {e}")
+            return []
+
 
 
 
