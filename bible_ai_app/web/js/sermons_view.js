@@ -310,6 +310,14 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     document.getElementById('btn-pulpit-font-inc')?.addEventListener('click', () => this.changePulpitFontSize(2));
     document.getElementById('btn-pulpit-font-dec')?.addEventListener('click', () => this.changePulpitFontSize(-2));
     document.getElementById('btn-pulpit-fullscreen')?.addEventListener('click', () => this.toggleFullscreen());
+    
+    // Conseils de chaire Spurgeon
+    document.getElementById('btn-pulpit-spurgeon-tips')?.addEventListener('click', () => {
+      document.getElementById('pulpit-spurgeon-drawer')?.classList.toggle('hidden');
+    });
+    document.getElementById('btn-close-spurgeon-drawer')?.addEventListener('click', () => {
+      document.getElementById('pulpit-spurgeon-drawer')?.classList.add('hidden');
+    });
 
     // Touche Échap pour quitter le mode pupitre
     window.addEventListener('keydown', (e) => {
