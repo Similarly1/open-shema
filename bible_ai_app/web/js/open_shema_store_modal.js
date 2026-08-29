@@ -444,33 +444,11 @@ const OpenShemaStore = {
                   <span>Livres Personnels Logos</span>
                 </button>
                 
-                <!-- Infobulle pédagogique sur les origines et formats (100% SVG) -->
-                <div style="position: relative; display: inline-flex; align-items: center; margin-left: 4px;">
-                  <button id="btn-store-info-tooltip" style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 6px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-muted, #94a3b8); font-size: 0.73rem; cursor: pointer; transition: all 0.2s;" title="Comprendre la différence entre Modules Officiels et Livres Personnels">
-                    ${this.svgIcons.info}
-                    <span>Formats & Collections</span>
-                  </button>
-                  <div id="store-info-popover-box" style="display: none; position: absolute; top: calc(100% + 8px); left: 0; z-index: 10010; width: 340px; padding: 14px; background: var(--bg-surface-elevated, #0f172a); border: 1px solid var(--border-color, #334155); border-radius: 10px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); font-size: 0.78rem; line-height: 1.45; color: #cbd5e1; backdrop-filter: blur(8px);">
-                    <div style="font-weight: 700; color: #f8fafc; margin-bottom: 8px; font-size: 0.82rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px; display: flex; align-items: center; gap: 6px;">
-                      ${this.svgIcons.info}
-                      <span>Distinction des 2 collections gratuites</span>
-                    </div>
-                    <div style="margin-bottom: 8px;">
-                      <div style="color: #60a5fa; font-weight: 700; margin-bottom: 2px; display: flex; align-items: center; gap: 5px;">
-                        ${this.svgIcons.sparkle}
-                        <span>Modules Officiels Open Shema</span>
-                      </div>
-                      <div style="color: var(--text-muted, #94a3b8);">Ouvrages au format natif (.sqlite / .json) optimisés avec versification précise, renvois Strong et recherche intégrée.</div>
-                    </div>
-                    <div>
-                      <div style="color: #c4b5fd; font-weight: 700; margin-bottom: 2px; display: flex; align-items: center; gap: 5px;">
-                        ${this.svgIcons.book}
-                        <span>Livres Personnels Logos (PB)</span>
-                      </div>
-                      <div style="color: var(--text-muted, #94a3b8);">Ouvrages partagés par la communauté Logos au format Word (.docx). Open Shema les télécharge et les importe automatiquement dans votre bibliothèque de documents.</div>
-                    </div>
-                  </div>
-                </div>
+                <!-- Bouton d'aide sur les origines et formats (100% SVG) -->
+                <button id="btn-store-info-tooltip" style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 6px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-muted, #94a3b8); font-size: 0.75rem; cursor: pointer; transition: all 0.2s;" title="Comprendre la différence entre Modules Officiels et Livres Personnels">
+                  ${this.svgIcons.info}
+                  <span>Formats & Collections</span>
+                </button>
               </div>
 
               <label class="store-hide-installed-toggle" style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text-muted, #94a3b8); cursor: pointer;" title="Masquer les ouvrages déjà présents dans votre bibliothèque">
@@ -592,19 +570,11 @@ const OpenShemaStore = {
       });
     });
 
-    // Infobulle / popover Formats & Collections
+    // Dialogue d'aide Formats & Collections (100% SVG & Popover centré)
     const infoTooltipBtn = modal.querySelector('#btn-store-info-tooltip');
-    const infoPopoverBox = modal.querySelector('#store-info-popover-box');
-    if (infoTooltipBtn && infoPopoverBox) {
-      infoTooltipBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isShown = infoPopoverBox.style.display === 'block';
-        infoPopoverBox.style.display = isShown ? 'none' : 'block';
-      });
-      document.addEventListener('click', (e) => {
-        if (!infoPopoverBox.contains(e.target) && e.target !== infoTooltipBtn) {
-          infoPopoverBox.style.display = 'none';
-        }
+    if (infoTooltipBtn) {
+      infoTooltipBtn.addEventListener('click', () => {
+        this.showFormatsHelpModal();
       });
     }
 
@@ -1199,6 +1169,90 @@ const OpenShemaStore = {
   closeComparisonModal() {
     const popover = document.getElementById('modal-ebook-comparison-popover');
     if (popover) popover.style.display = 'none';
+  },
+
+  showFormatsHelpModal() {
+    let modal = document.getElementById('modal-formats-help-popover');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'modal-formats-help-popover';
+      modal.style.cssText = 'position: fixed; inset: 0; z-index: 10020; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center;';
+      document.body.appendChild(modal);
+    }
+
+    modal.innerHTML = `
+      <div style="width: 560px; max-width: 92vw; background: var(--bg-card, #1e293b); border-radius: 12px; border: 1px solid var(--border-color, #334155); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); overflow: hidden; animation: modalFadeIn 0.2s ease-out; display: flex; flex-direction: column;">
+        
+        <!-- Header -->
+        <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-subtle, #334155); background: var(--bg-surface-elevated, #0f172a); display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 6px; background: rgba(37, 99, 235, 0.2); color: #60a5fa; display: flex; align-items: center; justify-content: center;">
+              ${this.svgIcons.info}
+            </div>
+            <h3 style="margin: 0; font-size: 1rem; font-weight: 700; color: #f8fafc;">
+              Formats & Collections du Catalogue
+            </h3>
+          </div>
+          <button id="btn-close-formats-help" style="background: transparent; border: none; color: var(--text-muted, #94a3b8); cursor: pointer; padding: 6px; border-radius: 6px;" title="Fermer">
+            ${this.svgIcons.close}
+          </button>
+        </div>
+
+        <!-- Body -->
+        <div style="padding: 20px; display: flex; flex-direction: column; gap: 14px; background: var(--bg-card, #1e293b);">
+          
+          <!-- Section 1 : Modules Officiels -->
+          <div style="padding: 14px 16px; border-radius: 8px; background: var(--bg-surface-elevated, #0f172a); border: 1px solid rgba(59, 130, 246, 0.3);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="color: #60a5fa;">${this.svgIcons.sparkle}</span>
+                <span style="font-weight: 700; color: #f8fafc; font-size: 0.92rem;">Modules Officiels Open Shema</span>
+              </div>
+              <span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: rgba(59, 130, 246, 0.2); color: #60a5fa; font-weight: 700;">Natif .sqlite / .json</span>
+            </div>
+            <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted, #94a3b8); line-height: 1.45;">
+              Ouvrages calibrés nativement pour Open Shema : versification standardisée, renvois Strong grecs et hébreux, recherche instantanée et synchronisation complète.
+            </p>
+          </div>
+
+          <!-- Section 2 : Livres Personnels Logos -->
+          <div style="padding: 14px 16px; border-radius: 8px; background: var(--bg-surface-elevated, #0f172a); border: 1px solid rgba(139, 92, 246, 0.35);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="color: #c4b5fd;">${this.svgIcons.book}</span>
+                <span style="font-weight: 700; color: #f8fafc; font-size: 0.92rem;">Livres Personnels Logos (PB)</span>
+              </div>
+              <span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: rgba(139, 92, 246, 0.2); color: #c4b5fd; font-weight: 700;">Word .docx</span>
+            </div>
+            <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted, #94a3b8); line-height: 1.45;">
+              Ouvrages et classiques théologiques créés et partagés par la communauté Logos Bible Software. En cliquant sur <strong>Importer</strong>, Open Shema télécharge le fichier et l'indexe automatiquement dans votre bibliothèque de documents.
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div style="padding: 12px 20px; border-top: 1px solid var(--border-subtle, #334155); background: var(--bg-surface-elevated, #0f172a); display: flex; align-items: center; justify-content: flex-end;">
+          <button id="btn-close-formats-help-footer" style="padding: 7px 18px; border-radius: 6px; background: var(--primary-accent, #2563eb); color: #fff; border: none; font-size: 0.82rem; font-weight: 600; cursor: pointer;">
+            Compris
+          </button>
+        </div>
+
+      </div>
+    `;
+
+    modal.style.display = 'flex';
+
+    modal.querySelector('#btn-close-formats-help').addEventListener('click', () => this.closeFormatsHelpModal());
+    modal.querySelector('#btn-close-formats-help-footer').addEventListener('click', () => this.closeFormatsHelpModal());
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) this.closeFormatsHelpModal();
+    });
+  },
+
+  closeFormatsHelpModal() {
+    const modal = document.getElementById('modal-formats-help-popover');
+    if (modal) modal.style.display = 'none';
   },
 
   _escapeHtml(str) {
