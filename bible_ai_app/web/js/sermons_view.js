@@ -2060,7 +2060,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
               <div style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent-amber, #f59e0b); display: flex; align-items: center; gap: 6px;">
                 <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-                <span>En Chaire Réelle (94 Prédications)</span>
+                <span>Canevas Homilétiques (94 Modèles)</span>
               </div>
               <span id="real-sermons-count-badge" style="font-size: 10.5px; background: rgba(245, 158, 11, 0.15); color: var(--accent-amber, #f59e0b); padding: 1px 6px; border-radius: 10px; font-weight: 600;">...</span>
             </div>
@@ -2075,7 +2075,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
             <div id="real-sermons-models-container" style="display: flex; flex-direction: column; gap: 8px;">
               <div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 11.5px;">
                 <span class="synth-spinner" style="width: 12px; height: 12px; display: inline-block; vertical-align: middle; margin-right: 6px;"></span>
-                Chargement des modèles correspondants...
+                Chargement des canevas correspondants...
               </div>
             </div>
           </div>
@@ -2238,15 +2238,10 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
 
             <!-- Actions -->
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 2px;">
-              <button class="btn-primary btn-inject-model-plan" data-model-id="${this.escapeHtml(m.id)}" style="padding: 5px 8px; font-size: 10.5px; display: flex; align-items: center; gap: 5px; flex: 1; justify-content: center;">
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                <span>Injecter ce plan</span>
+              <button class="btn-primary btn-inject-model-plan" data-model-id="${this.escapeHtml(m.id)}" style="padding: 6px 10px; font-size: 11px; display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Injecter ce canevas dans l'éditeur</span>
               </button>
-              ${m.url ? `
-                <button class="btn-secondary btn-open-model-youtube" data-url="${this.escapeHtml(m.url)}" title="Ouvrir sur YouTube" style="padding: 5px 7px; font-size: 10.5px;">
-                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                </button>
-              ` : ''}
             </div>
           </div>
         `;
@@ -2259,18 +2254,6 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
           const targetModel = models.find(m => m.id === modelId);
           if (targetModel) {
             this.insertRealSermonOutline(targetModel);
-          }
-        });
-      });
-
-      // Bind des liens YouTube
-      container.querySelectorAll('.btn-open-model-youtube').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const u = btn.dataset.url;
-          if (u && typeof API !== 'undefined' && API.openExternalUrl) {
-            API.openExternalUrl(u);
-          } else if (u) {
-            window.open(u, '_blank');
           }
         });
       });
