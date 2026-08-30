@@ -1,0 +1,52 @@
+---
+id: "art-6814"
+title: "Trouver les hauteurs et chercher de l’eau: lire les livres des Rois"
+url: "https://evangile21.thegospelcoalition.org/article/trouver-les-hauteurs-et-chercher-de-leau-lire-les-livres-des-rois/"
+source: "TGC Évangile 21"
+words: 1465
+date_extracted: "2026-08-29 22:01:44"
+---
+
+# Trouver les hauteurs et chercher de l’eau: lire les livres des Rois
+- **Source :** [https://evangile21.thegospelcoalition.org/article/trouver-les-hauteurs-et-chercher-de-leau-lire-les-livres-des-rois/](https://evangile21.thegospelcoalition.org/article/trouver-les-hauteurs-et-chercher-de-leau-lire-les-livres-des-rois/)  
+- **Volume :** 1,465 mots  
+
+---
+
+Les récits de l’Ancien Testament constituent une partie des Écritures qui reste étrangère à bien des chrétiens. Les livres des Rois (1 et 2 Rois), par exemple, débutent par des scènes familières et marquantes, telles que la transmission du royaume de David à Salomon ou la splendeur du temple de ce dernier. Mais ces deux livres sombrent rapidement dans une multitude de noms, de lieux et d’événements qui nous donnent le tournis. Qu’en faire?
+
+Dans son émission Man vs Wild, Bear Grylls répétait sa stratégie de survie comme un mantra: gagner les hauteurs, chercher de l’eau, suivre les cours d’eau. En atteignant un point élevé, on peut observer la configuration du terrain; de là, on repère les endroits susceptibles d’abriter de l’eau; et qui dit eau, dit vie. Qui plus est, les ruisseaux mènent généralement à une rivière, laquelle conduit souvent vers la civilisation. Une fois l’eau trouvée, le reste est relativement simple. On peut alors profiter de l’aventure. Prendre le temps de savourer l’instant (ou d’admirer la flore carnivore d’Amazonie), contempler le paysage.
+
+Lorsque nous abordons les livres des Rois, que voyons-nous une fois parvenus aux «hauteurs» bibliques?
+
+Tous les plans de Dieu, de la création à la nouvelle création, sont centrés sur le Christ, le Roi, le Messie; et toutes choses sont amenées à l’unité sous son règne bienveillant (Éph. 1.3-11). Cela signifie que chercher l’eau revient à chercher le Christ. On y trouve des aperçus du Roi à venir, des éclairages sur le besoin profond que l’humanité a de lui, ainsi que des «types», des modèles ou des ombres qui l’annoncent. On y découvre aussi le caractère de notre Dieu, dont la sainteté, la justice et la miséricorde seront révélées à la croix, et l’on y puise l’encouragement à vivre comme son peuple.
+
+L’Ancien Testament est une Écriture chrétienne. La souffrance, la mort et la résurrection du Christ en constituent l’accomplissement (Lc 18.31-33; 24.44-49; Jn 5.39). Nous abordons donc les livres des Rois comme toute l’Écriture: en cherchant le Christ. Une lecture de l’Ancien Testament qui ferait abstraction du Christ est impossible. Bien que l’on y trouve de nombreux exemples moraux et des leçons de vie, ceux-ci doivent être replacés dans le cadre du dessein plus vaste de l’Auteur divin: nous rendre sages en vue du salut en Jésus-Christ (2 Tim. 3.16).
+
+Comment accéder à ces éclairages qui nous conduisent à l’Évangile? Parfois, le fruit est à portée de main, comme dans la prière de consécration du temple prononcée par Salomon:
+
+«Éternel, Dieu d’Israël! Il n’y a point de Dieu semblable à toi, ni en haut dans les cieux, ni en bas sur la terre: tu gardes ton alliance et ta miséricorde envers tes serviteurs qui marchent en ta présence de tout leur cœur.» (1 Rois 8.23)
+
+Voici le Dieu de l’Évangile! Toutefois, trouver le Christ dans les livres des Rois n’est pas toujours aussi simple.
+
+«Éternel, Dieu d’Israël! Il n’y a point de Dieu semblable à toi, ni en haut dans les cieux, ni en bas sur la terre: tu gardes ton alliance et ta miséricorde envers tes serviteurs qui marchent en ta présence de tout leur cœur.» (1 Rois 8.23)
+
+Comprendre le contexte dans lequel les livres des Rois ont été rédigés nous aidera à repérer les ruisseaux qui mènent au fleuve conduisant au Christ. Bien que l’on suppose que l’auteur se soit appuyé sur divers témoignages oculaires et documents de la cour royale, ces livres ont pris leur forme définitive alors que le peuple de Juda était en exil à Babylone (2 Rois 25.27-30). Cela signifie que le public d’origine était une communauté sous le choc d’un traumatisme. Ils venaient de survivre à l’incendie de leurs villes et aux agressions et massacres de leurs compatriotes; ils vivaient sous le joug d’une puissance étrangère. À cela s’ajoutait une crise existentielle plus profonde. Où était leur Dieu? Comment avait-il pu laisser une telle chose se produire? Était-il vraiment puissant? Pouvait-on lui faire confiance? Devaient-ils persévérer dans la foi ou simplement adopter la vision du monde de ceux qui les entouraient?
+
+La réponse apportée par les livres des Rois est affirmative. Oui, on peut faire confiance à Dieu. Oui, Dieu est puissant. En fait, c’est précisément en raison de sa fidélité et de sa puissance que son peuple se trouve en exil. C’est l’Éternel qui a provoqué la division de la nation d’Israël, la destruction du royaume du Nord et, à présent, l’exil du royaume du Sud. Il a multiplié les avertissements concernant le danger de rompre l’alliance et a fait preuve d’une grande patience en retardant l’échéance, mais son jugement sur le péché persistant devait inévitablement tomber. Le seul espoir pour Juda était de s’humilier sous la main puissante de l’Éternel, afin qu’il puisse les restaurer au moment opportun. Ce n’était pas le moment de douter ou d’hésiter, mais celui de se repentir et de croire, de faire confiance et d’obéir, d’aspirer à la venue du Messie et de l’espérer.
+
+Comment ce message se déploie-t-il à travers les deux livres des Rois? Une astuce simple pour comprendre la structure de ces livres consiste à retenir deux nombres: dix-sept et onze. Rien de plus simple. En combinant ces nombres (17 et 11) avec le début des deux livres et la fin du second, on identifie six moments clés.
+
+Le premier livre des Rois s’ouvre sur la transition entre le règne de David et celui de Salomon. Deuxièmement, au chapitre 17 du premier livre des Rois, le prophète Élie fait une entrée fracassante en scène; il devient — aux côtés de son antagoniste, le roi Achab — la figure narrative centrale pour la suite de l’ouvrage. Troisièmement, le deuxième livre des Rois commence (plus ou moins) par la transition entre Élie et son protégé, Élisée. Quatrièmement, le chapitre 17 du deuxième livre des Rois relate la destruction de Samarie et la chute du royaume du Nord. Cinquièmement, ce second livre s’achève sur l’héritier du trône de David en exil, mais qui vient de se voir accorder une place à la table du roi de Babylone. Il reste une dernière pièce du puzzle: le nombre onze, correspondant au chapitre 11 du premier livre des Rois. C’est le tournant décisif où le royaume d’Israël se divise sous le règne de Roboam, fils de Salomon, acte qui constitue un jugement de l’Éternel. Toutefois, la fidélité de Dieu à sa promesse envers David garantit que la descendance de ce dernier demeurera sur le trône à Jérusalem (voir 2 Sam. 7).
+
+C’est cette tension — entre la fidélité de l’Éternel envers la maison de David et les malédictions annoncées dans l’alliance mosaïque — qui sous-tend le récit des Rois. Cette tension trouve sa résolution ultime sur la croix, grâce au plus grand héritier de David: Jésus de Nazareth. Le Messie promis prend sur lui, dans sa mort, la malédiction liée à la désobéissance. Par sa résurrection, il assure l’avènement d’un royaume éternel et, avec lui, les bénédictions éternelles du Dieu d’Abraham, de Moïse et de David pour tous ceux qui plient le genou devant lui. La tension narrative des livres des Rois trouve ainsi sa résolution dans l’Évangile.
+
+Pour étudier les livres des Rois, notre Église a recours à un outil simple : l’acronyme REPS. «R» pour «Révéler»: que nous révèle ce passage sur le caractère de Dieu — sa sainteté, sa justice, sa compassion, sa souveraineté, etc.? «E» pour «Exposer»: comment ce passage met-il en lumière le péché humain? S’agit-il d’une tendance à compter sur soi-même, de la cupidité ou de la rébellion? «P» pour «Pointer»: comment ce passage nous oriente-t-il vers le plan de salut de Dieu en Jésus? Et «S» pour «Stimuler»: comment ce passage nous encourage-t-il à la foi et à l’obéissance?
+
+Alors, aventurier courageux, maintenant que tu disposes de conseils de survie et d’une ébauche de carte fournis par ceux qui ont déjà parcouru ce terrain, il ne te reste plus qu’à trouver le cran de sauter de l’hélicoptère — ou plutôt, de «prendre et lire». Si Dieu le veut, tu pourras faire bien plus que simplement survivre dans ce paysage: tu pourras puiser abondamment dans le livre des Rois!
+
+Ben Lattimore est marié à Bethany, a quatre enfants et vit sur la côte centrale de la Nouvelle-Galles du Sud, où il exerce la fonction de pasteur à l’église EV (Evangélique).
+
+SOLA – La Coalition de l’Évangile, Québec, Canada. Abonnez vous à notre liste d’envoi courriel pour rester en contact et ne pas manquer nos plus récents articles, des offres exclusives pour nos conférences, des livres gratuits, des méditations et bien plus ! Pour en connaitre davantage sur SOLA, visitez notre Site Web
+
+Certains chants arrivent au bon moment. « Je me confie en Jésus », que nous avons récemment traduit pour Hymnes21, en est un exemple. Composé par Matt Papa, Matt Boswell...

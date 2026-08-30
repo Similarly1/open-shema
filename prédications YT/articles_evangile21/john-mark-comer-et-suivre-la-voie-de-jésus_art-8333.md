@@ -1,0 +1,92 @@
+---
+id: "art-8333"
+title: "John Mark Comer et Suivre la voie de Jésus"
+url: "https://evangile21.thegospelcoalition.org/article/john-mark-comer-et-suivre-la-voie-de-jesus/"
+source: "TGC Évangile 21"
+words: 2131
+date_extracted: "2026-08-29 22:01:51"
+---
+
+# John Mark Comer et Suivre la voie de Jésus
+- **Source :** [https://evangile21.thegospelcoalition.org/article/john-mark-comer-et-suivre-la-voie-de-jesus/](https://evangile21.thegospelcoalition.org/article/john-mark-comer-et-suivre-la-voie-de-jesus/)  
+- **Volume :** 2,131 mots  
+
+---
+
+Depuis quelques années, il était devenu plutôt rare que plusieurs personnes me contactent pour me demander mon avis sur un auteur en particulier.
+
+«Le connaissez-vous?»
+«Avez-vous lu ses livres?»
+«Seriez-vous prêt à faire une critique de ses livres?»
+
+Après une période de calme, ces questions ont récemment recommencé à affluer, cette fois, au sujet de John Mark Comer.
+
+J’avais moi aussi entendu parler de lui. J’avais vu ses livres figurer parmi les meilleures ventes. Pourtant, je n’avais encore rien lu de sa plume. Finalement, à force de recevoir des demandes, j’ai décidé d’acheter et de lire son ouvrage, Suivre la voie de Jésus, qui semble constituer une sorte d’aboutissement de ses travaux précédents.
+
+Le monde de l’édition chrétienne est souvent marqué par une certaine répétition, et il ne m’a fallu que quelques pages pour me dire: «Nous sommes déjà passés par là.»
+
+Il y a une vingtaine d’années, plusieurs auteurs populaires découvraient — ou redécouvraient — les traditions des mystiques et des moines. Ce faisant, ils minimisaient ou rejetaient certains aspects du protestantisme traditionnel au profit d’éléments largement empruntés au catholicisme romain. À bien des égards, c’est ce que Comer propose à une nouvelle génération de lecteurs.
+
+Suivre la voie de Jésus possède un attrait évident. Comer accorde beaucoup d’attention à certaines lacunes bien réelles et frustrantes de l’évangélisme contemporain. Il répond à cette aspiration, largement répandue, pour une foi plus profonde que celle qui est souvent présentée dans nos églises et davantage enracinée dans les pratiques anciennes du christianisme.
+
+Si vous vivez votre foi chrétienne avec le sentiment qu’il doit exister quelque chose de plus que ce que vous expérimentez actuellement, Comer veut vous assurer que ce sentiment est fondé.
+
+Je comprends très bien l’attrait qu’exerce un auteur qui aborde le désir de profondeur et qui propose un programme bien structuré pour y répondre — surtout lorsqu’il prétend relever les défis du monde moderne tout en puisant dans les richesses de l’histoire chrétienne. Mais, évidemment, tout dépend de la nature du programme proposé.
+
+Si vous vivez votre foi chrétienne avec le sentiment qu’il doit exister quelque chose de plus que ce que vous expérimentez actuellement, Comer veut vous assurer que ce sentiment est fondé.
+
+Comer se décrit lui-même comme un mystique et se range du côté de Karl Rahner lorsqu’il affirme: «Le chrétien de demain sera un mystique ou il ne sera plus chrétien du tout.»
+
+Il ne définit pas vraiment ce qu’il entend par «mystique», sinon comme «un disciple de Jésus qui désire expérimenter spirituellement ce qui est déjà vrai de lui sur le plan théologique». Dans son sens usuel, toutefois, le mysticisme implique l’attente d’une révélation directe et immédiate venant de Dieu.
+
+Il est associé à des pratiques comme la lectio divina, la prière contemplative, la méditation, le silence et le recueillement — des pratiques que Comer recommande ouvertement et qu’il considère comme essentielles.
+
+Pour développer sa pensée, il s’appuie sur un large éventail d’auteurs et de praticiens issus des traditions catholiques, orthodoxes grecques et quakers, réunis principalement par leur intérêt commun pour le mysticisme. On y retrouve plusieurs noms auxquels les lecteurs avertis s’attendront: Dallas Willard, Richard Foster, Henri Nouwen, Frère Laurent de la Résurrection et bien d’autres.
+
+Comer ajoute également d’autres éléments à sa théologie: une dose de théologie charismatique — paroles prophétiques, délivrance de démons, parler en langues — ainsi que ce pour quoi il devient de plus en plus connu: la «règle de vie».
+
+Il mentionne aussi l’influence importante d’au moins un directeur spirituel jésuite dans sa formation personnelle. Et puisqu’il est question des jésuites, il vaut peut-être la peine de rappeler que cet ordre religieux a été fondé précisément pour répondre aux enseignements de la Réforme et combattre le protestantisme — une mission que l’ordre n’a jamais reniée.
+
+Comer parle fréquemment de l’Évangile et souligne l’importance de le partager avec les autres. Cependant, il demeure assez vague quant au contenu précis de cet Évangile. Il rend une chose claire : il ne s’agit pas de l’Évangile tel qu’il est généralement compris dans les églises évangéliques, c’est-à-dire un Évangile centré sur l’expiation pénale substitutive.
+
+Il manifeste une aversion particulière pour l’évangélisation des prédicateurs de rue et leur message de «repentez-vous de vos péchés pour éviter l’enfer».
+
+Il rend une chose claire : il ne s’agit pas de l’Évangile tel qu’il est généralement compris dans les églises évangéliques, c’est-à-dire un Évangile centré sur l’expiation pénale substitutive.
+
+Son Évangile ressemble plutôt à ceci: vivre comme Jésus et vivre pour Jésus afin que d’autres deviennent intéressés par Jésus.
+
+D’ailleurs, les grandes divisions de son livre — et, par conséquent, les grands thèmes de la vie chrétienne — sont les suivantes: être avec Jésus, devenir comme Jésus et faire ce qu’il a fait.
+
+Bien qu’il consacre une section à la souffrance pour l’Évangile, j’ai du mal à voir dans son message quoi que ce soit de suffisamment offensant pour susciter la désapprobation du monde et, par conséquent, la persécution.
+
+Il commence son livre par une longue réflexion sur ce que signifiait être l’un des premiers disciples de Jésus, même s’il préfère employer le terme «apprenti». À cet égard, il s’appuie fortement sur les premiers écrits de Rob Bell ainsi que sur l’ouvrage Lire la Bible avec Rabbi Jésus afin d’expliquer ce que signifiait pour Jésus d’être un rabbin et pour ses disciples de le suivre dans «la Voie». (Comer préfère d’ailleurs largement parler de «la Voie» plutôt que de «la foi chrétienne» ou du «christianisme».)
+
+Être avec Jésus consiste essentiellement à adopter les pratiques du mysticisme, à faire de la communion avec Dieu une discipline qui occupe toute la vie et qui la façonne entièrement — ce que certains qualifieraient de «pratiquer la présence de Dieu». Cela implique la lectio divina et la prière contemplative. Cela signifie prier sans paroles, rechercher le silence intérieur et cultiver la pleine conscience. Cela revient à «Suivre la voie» et, pour reprendre le titre de l’un de ses ouvrages précédents, à «Ralentir de toute urgence».
+
+Devenir comme Jésus, c’est poursuivre la formation spirituelle. Il s’agit de demeurer en Christ de telle manière qu’il nous transforme de l’intérieur vers l’extérieur afin que nous devenions des personnes caractérisées par l’amour. «Voilà donc ce qu’est la formation spirituelle : le processus par lequel une personne est façonnée dans un amour qui se donne lui-même, grâce à une soumission toujours plus profonde et à une union toujours plus intime avec la Trinité.»
+
+Faire ce que Jésus a fait consiste à mener une vie qui l’imite. La question n’est plus tant: «Que ferait Jésus?» mais plutôt : «Que ferait Jésus s’il vivait ma vie?» Cette démarche s’articule autour de trois rythmes: faire de la place pour l’Évangile, annoncer l’Évangile et démontrer l’Évangile. «L’Évangile», écrit-il, «est que Jésus est la puissance suprême de l’univers et que la vie avec lui est désormais accessible à tous. Par sa naissance, sa vie, ses enseignements, ses miracles, sa mort, sa résurrection, son ascension et le don de l’Esprit, Jésus a sauvé, sauve et sauvera toute la création. Et par notre apprentissage auprès de lui, nous pouvons entrer dans ce Royaume et participer à la vie même de Dieu. Nous pouvons recevoir, donner et partager l’Amour qui aime. Nous pouvons faire partie d’une communauté que Jésus façonne lentement mais sûrement en une société nouvelle, rayonnante de paix et de justice, qui gouvernera un jour toute la création avec le Créateur, dans une éternité de créativité, de croissance et de joie sans fin. Et chacun est invité à prendre part à cette histoire.» Démontrer cet Évangile consiste à le mettre en pratique au moyen de guérisons, de délivrances de puissances démoniaques, de paroles prophétiques et d’actions en faveur de la justice.
+
+Comment s’assurer que nous vivons ainsi ? Par une «Règle de vie», un concept qui gagne rapidement en popularité aujourd’hui. Le livre culmine dans une section substantielle consacrée à sa compréhension et à sa mise en œuvre.
+
+«Règle de vie» est une pratique issue de la tradition bénédictine qui, considérée isolément, est relativement simple et peut même présenter une certaine utilité. Il s’agit moins d’une règle au sens strict que d’un ensemble de disciplines personnelles. Ces disciplines, adaptées à chaque individu ou à chaque communauté, servent à orienter et à encadrer la vie chrétienne afin de lui donner intention et satisfaction. Elles peuvent inclure des habitudes de dévotion, limiter l’utilisation des appareils numériques ou encore la pratique du sabbat. La version de Comer est particulièrement révélatrice par ce qu’elle inclut et par ce qu’elle omet. Elle inclut des pratiques mystiques et charismatiques, mais met de côté la proclamation évangéliste de l’Évangile ainsi qu’un accent explicite sur la formation intellectuelle et l’approfondissement de la doctrine chrétienne.
+
+Elle semble également écarter ce que nous entendons habituellement par une église locale traditionnelle. Comer affirme clairement que le christianisme doit être vécu en communauté, mais il envisage une communauté assez différente de celle des églises évangéliques ou réformées. En revanche, il ne donne aucune indication quant à ce à quoi cela pourrait ressembler.
+
+Je soupçonne qu’elle s’apparente aux communautés que tant de personnes ont tenté de construire à l’époque du mouvement appelé «l’Église émergente», un mouvement qui puisait auprès de plusieurs des mêmes auteurs et valorisent plusieurs des mêmes idéaux. Bien qu’il mentionne souvent l’église qu’il a fondée afin que lui-même et d’autres puissent pratiquer «la Voie», il en décrit rarement les caractéristiques précises.
+
+Si, comme moi, vous lisiez des livres chrétiens il y a vingt ou vingt-cinq ans, une grande partie de tout cela vous semblera familière, et avec raison.
+
+Je n’irais pas jusqu’à dire que Comer est en train de créer une «Église émergente» 2.0, cependant, je constate qu’il défend une approche qui exprime des préoccupations semblables, qui rejette plusieurs des mêmes aspects des évangéliques, et qui s’inspire des mêmes influences et qui repose sur des fondements comparables. Il me semble donc probable qu’elle finisse par suivre une trajectoire similaire et par connaître une destinée semblable : devenir d’abord sous-biblique, puis non biblique, et finalement méconnaissable comme expression fidèle de la foi chrétienne. J’espère me tromper, mais pour être honnête, je ne serais pas surpris que cela se produise. N’hésitez pas à revenir dans dix ou quinze ans pour me reprendre si nécessaire.
+
+Cela ne signifie pas que Comer soit incapable de formuler des critiques pertinentes ou d’offrir des réflexions et pratiques utiles. Son livre contient de nombreuses observations justes et profitables. Cependant, il contient également beaucoup d’éléments que je considère faux ou nuisibles et qui méritent donc une sérieuse vigilance. Je suis particulièrement préoccupé par le fait que ceux qui ressentent cette aspiration à quelque chose de plus — cette impression que la vie chrétienne devrait être plus profonde que ce qu’ils expérimentent actuellement — puissent laisser leur insatisfaction les conduire vers ses enseignements, ses pratiques et, éventuellement, hors d’un christianisme encore reconnaissable. Ce qu’il propose n’est pas simplement une autre perspective sur la vie chrétienne ou un ensemble alternatif de disciplines spirituelles. Il propose un autre Évangile et, ultimement, une autre foi.
+
+C’est pourquoi je recommande une grande prudence à l’égard de l’enseignement de Comer et j’encourage chacun à mesurer sérieusement le coût de son accueil. À mon avis, si vous acceptez ses conseils et embrassez son système de pensée, votre vie devra changer, votre compréhension de la théologie devra (probablement) changer, votre pratique de la piété devra changer, votre église devra changer, et votre compréhension de l’Évangile devra changer. Il n’est pas exagéré d’affirmer que presque tous les aspects de votre vie chrétienne devront être différentes. Vous devrez abandonner une grande partie de ce que vous croyez et pratiquez actuellement afin d’adopter de nouvelles croyances, de nouvelles priorités, de nouvelles convictions et de nouvelles pratiques. À mes yeux, le prix à payer est élevé. Trop élevé.
+
+Cet article est une traduction d’une critique du livre Practicing the Way de John Mark Comer, initialement publiée sur Challies.com.
+
+Tim Challies – son père est originaire de Montréal, Québec et sa mère des Cantons-de-l’Est, Québec. Tim est un écrivain incontournable sur son blog Challies.com. Il est aussi l’auteur de nombreux ouvrages dont plusieurs ont été traduits en français : La foi d’hier pour l’ère d’aujourd’hui (Excelsis, 2011), Faire moins. Mieux. (BLF Éditions, 2017), Théologie visuelle (BLF Éditions, 2017). Il est ancien à Grace Fellowship Church. Lui et sa famille habitent à Toronto.
+
+SOLA – La Coalition de l’Évangile, Québec, Canada. Abonnez vous à notre liste d’envoi courriel pour rester en contact et ne pas manquer nos plus récents articles, des offres exclusives pour nos conférences, des livres gratuits, des méditations et bien plus ! Pour en connaitre davantage sur SOLA, visitez notre Site Web
+
+Certains chants arrivent au bon moment. « Je me confie en Jésus », que nous avons récemment traduit pour Hymnes21, en est un exemple. Composé par Matt Papa, Matt Boswell...

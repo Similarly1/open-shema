@@ -1,0 +1,56 @@
+---
+id: "art-9802"
+title: "Le bon et le mauvais de la théologie de la récupération"
+url: "https://evangile21.thegospelcoalition.org/article/le-bon-et-le-mauvais-de-la-theologie-de-la-recuperation/"
+source: "TGC Évangile 21"
+words: 1114
+date_extracted: "2026-08-29 22:01:47"
+---
+
+# Le bon et le mauvais de la théologie de la récupération
+- **Source :** [https://evangile21.thegospelcoalition.org/article/le-bon-et-le-mauvais-de-la-theologie-de-la-recuperation/](https://evangile21.thegospelcoalition.org/article/le-bon-et-le-mauvais-de-la-theologie-de-la-recuperation/)  
+- **Volume :** 1,114 mots  
+
+---
+
+En tant que chrétiens qui croient en l’évangile, nous savons comment Dieu a souverainement conduit l’église au long de toute son histoire. Cela veut-il dire que nous sommes obligés de croire tout ce que l’église a cru ? Si ce n’est pas le cas, à quoi devons-nous adhérer en ce qui concerne ce passé ?
+
+C’est là que la théologie de la récupération[1] entre en scène. La théologie de la récupération est différente de l’histoire de l’église ou de la théologie historique. Ces disciplines cherchent à comprendre le passé et à suivre le développement de la doctrine dans le temps. La théologie de la récupération fait plus que cela. En voyant les dangers et les problèmes qui abondent dans le temps présent, la récupération regarde au passé afin de corriger le présent. Comprendre cela va nous aider à saisir pourquoi certains protestants peuvent être tentés de se convertir au catholicisme romain ou à l’orthodoxie orientale.
+
+Les évangéliques qui sont spécialisés dans cette récupération l’adoptent souvent afin de clarifier la doctrine de la Trinité ou pour affiner leur herméneutique biblique. Poussés par une insatisfaction avec les approches modernes de la Trinité et la quête de « l’intention originelle de l’auteur », ils cherchent à sauter par-dessus les erreurs de l’époque des Lumières et à récupération la compréhension qu’on avait au Moyen-Âge et à l’époque des pères de l’église.
+
+Malheureusement, dans leur désir de remonter le temps pour retrouver ce qu’ils considèrent comme une meilleure façon de faire de la théologie, certains évangéliques ont complètement abandonné l’évangélicalisme. En cherchant à protéger l’évangile, ils aboutissent à des conclusions contraires à l’évangile biblique.
+
+La théologie historique est utile. La théologie de la récupération l’est également. Mais une théologie de la récupération non critique ne l’est pas. Examinons deux mises en garde pour une bonne compréhension de la théologie de la récupération.
+
+La théologie de la redécouverte veut prêter l’oreille au passé. C’est un signe d’humilité, une des vertus-clefs que nous devons tous rechercher. Quelqu’un, quelque part et à une certaine époque a connu Dieu et la Bible mieux que moi. Par exemple Athanase (mort en 373), qui pour pouvoir avoir la qualification pour être un diacre de l’église à Alexandrie ­ seulement un diacre ! ­ mémorisa la totalité des Psaumes, un des grands prophètes, un évangile et toutes les épîtres de Paul. Je désire apprendre d’un tel exemple.
+
+Mais l’humilité doit avoir ses garde-fou. Qui dois-je suivre et imiter ? Dans quelle mesure ? Après tout, Arius (mort en 336) a lui aussi servi l’église d’Alexandrie ; on peut supposer qu’il connaissait les Écritures par cœur autant qu’Athanase. Mais je ne veux pas le suivre, de peur de tomber dans l’hérésie et de croire que Jésus est un être créé. C’est contraire à la Bible.
+
+Ce n’est pas simplement parce que quelque chose est ancien qu’il est nécessairement bon. Quand quelqu’un me dit, dans sa frustration, qu’il aimerait que son église locale soit semblable à celle du Nouveau Testament, je le mets en garde quant à la nécessité d’être prudent : à quelle église du Nouveau Testament voudrait-il qu’elle ressemble. Serait-ce à l’église de Corinthe où régnait la licence ou à l’église de Galatie qui penchait vers l’hérésie ?
+
+Même du vivant des apôtres, tout ne se passait pas parfaitement au sein des églises. Nous ne devons pas non plus nous attendre à ce que tout ait toujours été parfait ­ ni à ce que l’expression doctrinale ait toujours été correcte ­ à une période donnée de l’histoire de l’église.
+
+Ce n’est pas simplement parce que quelque chose est ancien qu’il est nécessairement bon.
+
+Nous devons avoir des critères pour juger ce qui est le meilleur dans l’héritage doctrinal de l’église. En d’autres termes, comment savons-nous ce qu’il faut redécouvrir ? Dans le moment culturel que nous vivons maintenant, le théologien du jour est le penseur médiéval Saint Thomas d’Aquin (mort en 1274). La liste des théologiens contemporains qui s’intéressent à Saint Thomas ­ et qui, dans certains cas, en sont fascinés ­ est longue et ne cesse de s’allonger, si l’on en croit internet et les réseaux sociaux.
+
+Écoutez donc le passé avec humilité. Mais faites preuve de discernement dans ce que vous en retenez.
+
+Lorsque les partisans du théisme classique élèvent Saint Thomas au rang de quasi saint patron de l’orthodoxie, ils ouvrent sans le savoir la voie à bien plus que la doctrine de Dieu formulée par ce théologien pour qu’elle s’inscrive dans le courant de conscience évangélique.
+
+Francis Beckwith note que, pour Saint Thomas, la justification commence par « l’infusion de la grâce lors du baptême », car « le chrétien baptisé participe littéralement à la nature divine ». Saint Thomas prône également la prière pour les défunts, les sacrements comme moyens d’obtenir la grâce de Dieu, et la transsubstantiation comme élément essentiel du sacrifice de la messe.
+
+Écoutez donc le passé avec humilité. Mais faites preuve de discernement dans ce que vous en retenez.
+
+Des théologiens de la récupération bien intentionnés peuvent tout à fait avoir ouvert une vanne qui ne pourra être refermée avant que beaucoup aient abandonné le protestantisme. Le problème est que les efforts actuels de redécouverte donnent l’impression de devoir prendre en compte l’ensemble de l’œuvre de Saint Thomas, alors que les penseurs du début de l’époque moderne (comme John Owen) ne le faisaient pas.
+
+Nous avons d’excellentes raisons de rester des protestants de la Réforme. Au fond, le protestantisme répond à la question suivante : « Comment puis-je, moi, misérable pécheur, être sauvé par le Dieu saint ? » Le cœur du protestantisme réside dans une relation avec un Dieu saint, miséricordieux et proche.
+
+Nous devons nous souvenir que sola scriptura signifie pleinement cela : la Bible seule est l’autorité pour déterminer ce que nous devons croire et la façon dont nous devons vivre. La Bible doit toujours statuer sur la validité d’une opinion ­ même si je trouve cette idée ou cette pratique fascinante, antimoderne ou « pleine de sens ». Mes goûts ou mes aversions, mes sentiments, doivent être subordonnés à la Parole de Dieu, qui fait autorité et est infaillible.
+
+L’évangile révélé dans la Bible statue sur toute forme de « théologie de la redécouverte » qui éloignerait les gens du protestantisme de la Réforme.
+
+Shawn Wright (PhD, Southern Baptist Theological Seminary) sert comme pasteur pour la formation des dirigeants à la Clifton Baptist Church et en tant que professeur d’histoire de l’église au Southern Baptist Theological Seminary, tous les deux à Louisville, Kentucky.
+
+Certains chants arrivent au bon moment. « Je me confie en Jésus », que nous avons récemment traduit pour Hymnes21, en est un exemple. Composé par Matt Papa, Matt Boswell...

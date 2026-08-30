@@ -1,7 +1,6 @@
 ---
 id: sermon-1787720805802
-title: Être connu de Dieu implique de fermer la porte à l’injustice et d’ouvrir celle
-  de l’obéissance. (Copie)
+title: Prédication sans titre
 type: sermon
 status: ready
 church: AMD
@@ -31,24 +30,6 @@ timing:
   words_per_minute: 135
 delivery_history: []
 created_at: '2026-08-25T21:19:58.712069'
-updated_at: '2026-08-26T09:04:23.398126'
+updated_at: '2026-08-29T21:25:27.541257'
 ---
-
-## Introduction
-
-
-
-## Lecture du passage
-
-
-
-## I. Premier Point Principal
-
-
-
-## II. Deuxième Point Principal
-
-
-
-## Conclusion & Appel
 
