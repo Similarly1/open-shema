@@ -2320,11 +2320,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
           ? `<span style="font-size: 9.5px; background: rgba(59, 130, 246, 0.18); color: var(--accent-blue, #3b82f6); padding: 1px 5px; border-radius: 4px; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span>Match Texte</span></span>` 
           : '';
 
-        const preacherName = (m.preacher || '').trim();
-        let displayTitle = m.title || 'Prédication sans titre';
-        if (preacherName && !displayTitle.toLowerCase().includes(preacherName.toLowerCase())) {
-          displayTitle = `${displayTitle} — ${preacherName}`;
-        }
+        const displayTitle = this.cleanSermonModelTitle(m.title, m.preacher);
 
         const outlineItemsHtml = (m.outline || []).map(item => `
           <div style="font-size: 11px; padding: 3px 0; border-bottom: 1px dotted var(--border-color); display: flex; flex-direction: column; gap: 2px;">
@@ -2341,7 +2337,6 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
                   ${this.escapeHtml(displayTitle)}
                 </div>
                 <div style="font-size: 10.5px; color: var(--text-muted); margin-top: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                  ${preacherName ? `<span style="display: inline-flex; align-items: center; gap: 4px; color: var(--text-primary); font-weight: 600;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>${this.escapeHtml(preacherName)}</span><span>•</span>` : ''}
                   <span style="display: inline-flex; align-items: center; gap: 4px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>${this.escapeHtml(m.passage_reference || 'Texte')}</span>
                   <span>•</span>
                   <span style="display: inline-flex; align-items: center; gap: 4px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${this.escapeHtml(m.duration || '35 min')}</span>
@@ -2437,11 +2432,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
       });
     });
 
-    const preacherName = (model.preacher || '').trim();
-    let displayTitle = model.title || "Canevas Homilétique";
-    if (preacherName && !displayTitle.toLowerCase().includes(preacherName.toLowerCase())) {
-      displayTitle = `${displayTitle} — ${preacherName}`;
-    }
+    const displayTitle = this.cleanSermonModelTitle(model.title, model.preacher);
 
     this.confirmStructureApplication(
       displayTitle,
@@ -2449,8 +2440,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
       {
         big_idea: model.big_idea,
         contemporary_tension: model.contemporary_tension,
-        passage_reference: model.passage_reference,
-        preacher: preacherName
+        passage_reference: model.passage_reference
       }
     );
   },
