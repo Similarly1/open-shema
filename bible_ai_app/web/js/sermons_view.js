@@ -2188,9 +2188,18 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
             </div>
 
             <!-- Barre de filtrage interne -->
-            <div style="position: relative; margin-bottom: 10px;">
+            <div style="position: relative; margin-bottom: 6px;">
               <input type="text" id="input-filter-real-models" class="sermon-drawer-input" placeholder="Filtrer par texte (ex: Luc 11, Joseph, grâce...)" style="padding-left: 26px; font-size: 11px; height: 28px;">
               <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 8px; top: 8px; color: var(--text-muted); pointer-events: none;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+
+            <!-- Indicateur de filtre actif par passage -->
+            <div id="real-models-active-filter-bar" style="display: ${passageRef ? 'flex' : 'none'}; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px 8px; background: rgba(59, 130, 246, 0.12); border-radius: 4px; font-size: 10.5px; color: var(--accent-blue, #3b82f6);">
+              <span style="display: inline-flex; align-items: center; gap: 4px;">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                <span>Filtré sur : <strong id="real-models-filter-passage-text">${this.escapeHtml(passageRef || '')}</strong></span>
+              </span>
+              <button id="btn-clear-real-models-filter" style="background: none; border: none; color: var(--accent-blue, #3b82f6); cursor: pointer; font-size: 10.5px; font-weight: 600; text-decoration: underline; padding: 0;">Voir tout</button>
             </div>
 
             <!-- Liste des modèles réels -->
@@ -2209,13 +2218,24 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
       document.getElementById('btn-ai-synthetique-plan')?.addEventListener('click', () => this.insertHomileticOutline('synthetique'));
       document.getElementById('btn-ai-helm-grid')?.addEventListener('click', () => this.insertHomileticOutline('application-grille'));
 
-      // Charger les modèles réels
-      this.loadRealSermonModelsList(passageRef);
+      let activePassageFilter = passageRef || '';
+
+      // Charger les modèles réels filtrés au départ
+      this.loadRealSermonModelsList(activePassageFilter);
 
       const filterInput = document.getElementById('input-filter-real-models');
+      const filterBar = document.getElementById('real-models-active-filter-bar');
+      const clearBtn = document.getElementById('btn-clear-real-models-filter');
+
       filterInput?.addEventListener('input', () => {
         const q = filterInput.value.trim();
-        this.loadRealSermonModelsList(passageRef, q);
+        this.loadRealSermonModelsList(activePassageFilter, q);
+      });
+
+      clearBtn?.addEventListener('click', () => {
+        activePassageFilter = '';
+        if (filterBar) filterBar.style.display = 'none';
+        this.loadRealSermonModelsList('', filterInput?.value.trim() || '');
       });
 
       return;
@@ -2295,37 +2315,32 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
 
   cleanSermonModelTitle(rawTitle, preacher) {
     if (!rawTitle) return "Canevas Homilétique";
-    let title = rawTitle;
+    let title = rawTitle.trim();
 
-    // Supprimer le prédicateur connu s'il est spécifié
+    // 1. Supprimer le prédicateur passé explicitement
     if (preacher && preacher.trim()) {
       const pEsc = preacher.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      title = title.replace(new RegExp(`[-–—|/]+\\s*${pEsc}\\s*$`, 'i'), '');
-      title = title.replace(new RegExp(`^${pEsc}\\s*[-–—|/]+`, 'i'), '');
+      title = title.replace(new RegExp(`[-–—|/]+\\s*${pEsc}\\s*`, 'gi'), '');
+      title = title.replace(new RegExp(`^${pEsc}\\s*[-–—|/]+`, 'gi'), '');
+      title = title.replace(new RegExp(`\\b(?:par|by)\\s+${pEsc}\\b`, 'gi'), '');
     }
 
-    // Découper par séparateurs courants
-    const parts = title.split(/\s*[-–—|/]{1,2}\s*/);
-    const dateRegex = /\b(?:jan(?:vier|\.)?|f[ée]v(?:rier|\.)?|mar(?:s|\.)?|avr(?:il|\.)?|mai|juin|juil(?:let|\.)?|ao[ûu]t|sep(?:tembre|\.)?|oct(?:obre|\.)?|nov(?:embre|\.)?|d[ée]c(?:embre|\.)?|january|february|march|april|may|june|july|august|september|october|november|december|\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4}|\d{4}[\/.-]\d{1,2}[\/.-]\d{1,2}|20\d{2})\b/i;
-    const churchOrPreacherRegex = /\b(?:pasteur|pr\.|prédicateur|église|eglise|culte|chaine|channel|live|replay|dimanche|reps|evangile\s*21|évangile\s*21)\b/i;
+    // 2. Supprimer les dates entre parenthèses ou crochets (ex: (2026-06-14), (14/06/2026), (June 14, 2026))
+    title = title.replace(/\s*[\(\[]\s*(?:\d{4}[-/.]\d{1,2}[-/.]\d{1,2}|\d{1,2}[-/.]\d{1,2}[-/.]\d{2,4}|(?:jan(?:vier|\.)?|f[ée]v(?:rier|\.)?|mar(?:s|\.)?|avr(?:il|\.)?|mai|juin|juil(?:let|\.)?|ao[ûu]t|sep(?:tembre|\.)?|oct(?:obre|\.)?|nov(?:embre|\.)?|d[ée]c(?:embre|\.)?|january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2},?\s+\d{4}|\d{1,2}\s+(?:janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+\d{4})\s*[\)\]]/gi, '');
 
-    const cleanParts = parts.filter(p => {
-      const trimmed = p.trim();
-      if (!trimmed) return false;
-      if (dateRegex.test(trimmed)) return false;
-      if (churchOrPreacherRegex.test(trimmed)) return false;
-      // Supprimer les noms d'auteurs/prédicateurs comme "Pierre KFLIPFEL" ou tout en majuscules
-      if (/^[A-ZÀ-ÖØ-ß\s'-]{3,}$/.test(trimmed) || /^[A-Z][a-zÀ-ÿ]+\s+[A-ZÀ-ÖØ-ß]{2,}$/.test(trimmed)) return false;
-      return true;
-    });
+    // 3. Supprimer les segments de dates après tiret ou pipe (ex: - June 14, 2026, - 14 juin 2026, - 2026-06-14)
+    title = title.replace(/\s*[-–—|/]\s*(?:\d{4}[-/.]\d{1,2}[-/.]\d{1,2}|\d{1,2}[-/.]\d{1,2}[-/.]\d{2,4}|(?:jan(?:vier|\.)?|f[ée]v(?:rier|\.)?|mar(?:s|\.)?|avr(?:il|\.)?|mai|juin|juil(?:let|\.)?|ao[ûu]t|sep(?:tembre|\.)?|oct(?:obre|\.)?|nov(?:embre|\.)?|d[ée]c(?:embre|\.)?|january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2},?\s+\d{4}|\d{1,2}\s+(?:janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+\d{4})\b/gi, '');
 
-    let result = cleanParts.join(' - ').trim();
-    if (!result) {
-      result = parts[0] || rawTitle;
-    }
+    // 4. Supprimer les mentions "par <Nom>" ou "by <Name>" (ex: "par Yanick Éthier", "par John Piper")
+    title = title.replace(/\s+(?:par|by)\s+[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+(?:\s+[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+)*/g, '');
 
-    result = result.replace(/[-–—|/:\s]+$/, '').trim();
-    return result || rawTitle;
+    // 5. Supprimer les noms en fin de titre séparés par tiret ou pipe (ex: "- Pierre KFLIPFEL", "| Évangile 21", "- Pasteur Dupont")
+    title = title.replace(/\s*[-–—|/]\s*(?:pasteur|pr\.|prédicateur|église|eglise|culte|chaine|channel|live|replay|dimanche|reps|evangile\s*21|évangile\s*21|[A-ZÀ-ÖØ-ß\s'-]{3,}|[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+\s+[A-ZÀ-ÖØ-ß]{2,})\s*$/i, '');
+
+    // 6. Supprimer d'éventuels séparateurs résiduels en fin de chaîne
+    title = title.replace(/[-–—|/:\s]+$/, '').trim();
+
+    return title || rawTitle;
   },
 
   async loadRealSermonModelsList(passageRef, query = '') {
