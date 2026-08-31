@@ -16,9 +16,10 @@ const App = {
 
   init() {
 
-    // 0. Initialisation immédiate de l'IA, du thème et de la typographie
+    // 0. Initialisation immédiate de l'IA, du thème, de la typographie et du menu latéral
     this.initAIState();
     this.initThemeAndFont();
+    this.initSidebarConfig();
 
     // 1. Initialiser tous les sous-systèmes de manière résiliente
     const modules = [
@@ -428,6 +429,117 @@ const App = {
     if (typeof SettingsView !== 'undefined' && SettingsView.updateAIToggles) {
       SettingsView.updateAIToggles(this.isAIEnabled);
     }
+
+    // 5. Mettre à jour l'affichage de l'élément IA dans la barre latérale
+    this.refreshAISidebarVisibility();
+  },
+
+  refreshAISidebarVisibility() {
+    const aiNav = document.querySelector('.sidebar-menu [data-nav-id="ai"]');
+    if (aiNav) {
+      const isConfigVisible = (this.sidebarConfig || []).find(it => it.id === 'ai')?.visible !== false;
+      aiNav.classList.toggle('nav-item-hidden', !this.isAIEnabled || !isConfigVisible);
+    }
+  },
+
+  initSidebarConfig() {
+    let items = null;
+    try {
+      const local = localStorage.getItem('open_shema_sidebar_nav');
+      if (local) {
+        items = JSON.parse(local);
+      }
+    } catch (e) {}
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      items = this.getDefaultSidebarConfig();
+    }
+    this.applySidebarConfig(items, false);
+  },
+
+  getDefaultSidebarConfig() {
+    return [
+      { id: 'bible', visible: true },
+      { id: 'passage-study', visible: true },
+      { id: 'commentaries', visible: true },
+      { id: 'theology', visible: true },
+      { id: 'articles', visible: true },
+      { id: 'dict', visible: true },
+      { id: 'library', visible: true },
+      { id: 'search', visible: true },
+      { id: 'ai', visible: true },
+      { id: 'notes', visible: true },
+      { id: 'sermons', visible: true },
+      { id: 'maps', visible: true },
+      { id: 'about', visible: true }
+    ];
+  },
+
+  getSidebarConfig() {
+    if (this.sidebarConfig && Array.isArray(this.sidebarConfig) && this.sidebarConfig.length > 0) {
+      return this.sidebarConfig;
+    }
+    return this.getDefaultSidebarConfig();
+  },
+
+  applySidebarConfig(items, saveLocal = true) {
+    if (!items || !Array.isArray(items)) return;
+
+    // Compléter les éventuels éléments manquants
+    const defs = this.getDefaultSidebarConfig();
+    const existingIds = new Set(items.map(it => it.id));
+    const merged = items.map(it => ({ id: it.id, visible: it.visible !== false }));
+    defs.forEach(d => {
+      if (!existingIds.has(d.id)) {
+        merged.push({ id: d.id, visible: d.visible !== false });
+      }
+    });
+
+    this.sidebarConfig = merged;
+
+    if (saveLocal) {
+      try {
+        localStorage.setItem('open_shema_sidebar_nav', JSON.stringify(merged));
+      } catch (e) {}
+    }
+
+    const menuEl = document.querySelector('.sidebar-menu');
+    if (menuEl) {
+      // 1. Réordonner le DOM de la barre latérale et appliquer la visibilité
+      merged.forEach(item => {
+        if (item.id === 'about') {
+          const aboutBtn = document.getElementById('nav-about-btn');
+          if (aboutBtn) {
+            aboutBtn.classList.toggle('nav-item-hidden', item.visible === false);
+          }
+          return;
+        }
+
+        const navEl = menuEl.querySelector(`[data-nav-id="${item.id}"]`);
+        if (navEl) {
+          // Déplacer pour respecter l'ordre
+          menuEl.appendChild(navEl);
+
+          // Masquer ou afficher selon configuration et état IA
+          const isAi = item.id === 'ai';
+          const isVisible = item.visible !== false && (!isAi || this.isAIEnabled);
+          navEl.classList.toggle('nav-item-hidden', !isVisible);
+        }
+      });
+    }
+
+    // 2. Si la vue active actuelle est désormais masquée, basculer automatiquement vers une vue visible
+    const activeNavEl = document.querySelector(`.sidebar-menu [data-view="${this.activeView}"], .sidebar-menu [data-nav-id="${this.activeView}"]`);
+    if (activeNavEl && activeNavEl.classList.contains('nav-item-hidden')) {
+      const firstVisible = merged.find(m => m.visible !== false && m.id !== 'about' && (m.id !== 'ai' || this.isAIEnabled));
+      const fallbackView = firstVisible ? firstVisible.id : 'bible';
+      this.switchView(fallbackView);
+    }
+
+    // 3. Synchroniser avec SettingsView si présent
+    if (typeof SettingsView !== 'undefined' && SettingsView.updateNavCustomizerState) {
+      SettingsView.updateNavCustomizerState(merged);
+    }
   },
 
   initThemeAndFont() {
@@ -440,6 +552,9 @@ const App = {
       try {
         const cfg = await API.getSettings();
         if (cfg) {
+          if (cfg.sidebar_menu && Array.isArray(cfg.sidebar_menu) && cfg.sidebar_menu.length > 0) {
+            this.applySidebarConfig(cfg.sidebar_menu, true);
+          }
           if (cfg.enable_ai !== undefined) {
             this.applyAIEnabled(cfg.enable_ai !== false, true);
           }

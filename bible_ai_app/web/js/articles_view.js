@@ -819,7 +819,7 @@ const ArticlesView = {
 
     try {
       const fetchPromise = API.call('get_article_content', articleId);
-      const minDelay = new Promise(resolve => setTimeout(resolve, 420));
+      const minDelay = new Promise(resolve => setTimeout(resolve, 100));
       const [res] = await Promise.all([fetchPromise, minDelay]);
 
       if (!res || !res.success || !res.article) {
@@ -1621,8 +1621,16 @@ const ArticlesView = {
     // 5c. Formater les dialogues et transcriptions de podcast (intervenants multiples)
     // Séparer les prises de parole par des sauts de ligne
     text = text.replace(/(?<!\n)\s*\*\*([A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+(?:\s+[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+)?)\*\*\s*:?\s*/g, '\n\n**$1 :** ');
-    // Convertir les lignes de prise de parole en encadrés de dialogue stylisés
-    text = text.replace(/(?:^|\n)\*\*([A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+(?:\s+[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+)?)\s*:\*\*\s*([^\n]+)/g, '\n\n<div class="article-speaker-turn"><span class="article-speaker-badge">$1</span><p class="article-speaker-speech">$2</p></div>\n\n');
+    // Convertir les prises de parole complètes (y compris multi-paragraphes) en encadrés de dialogue stylisés
+    text = text.replace(
+      /(?:^|\n)\*\*([A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+(?:\s+[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+)?)\s*:\*\*\s*([\s\S]+?)(?=\n\*\*[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+|\n###|\n<|\n---|\\s*$)/g,
+      (match, speaker, speechBody) => {
+        let cleanSpeech = speechBody.trim();
+        const paras = cleanSpeech.split(/\n\s*\n+/).filter(p => p.trim());
+        const parasHtml = paras.map(p => `<p class="article-speaker-speech">${p.trim()}</p>`).join('\n');
+        return `\n\n<div class="article-speaker-turn"><span class="article-speaker-badge">${speaker}</span><div class="article-speaker-body">${parasHtml}</div></div>\n\n`;
+      }
+    );
 
     // 5d. Structurer les sous-titres et directives bibliques ("Cléopas et la désillusion **Lisez Luc 24.13-35.**")
     text = text.replace(/(?:^|\n)([A-ZÀ-ÿ][^\n*]+?)\s+(\*\*Lisez\s+[^*]+\*\*)/gim, '\n\n### $1\n\n$2\n\n');

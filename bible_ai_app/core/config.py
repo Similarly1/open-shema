@@ -186,6 +186,22 @@ DEFAULTS = {
     "articles_recent_vectorize_cap": 10,
     # Répertoire des ebooks théologiques (format EPUB) — configurable par l'utilisateur
     "ebooks_dir": "",
+    # Personnalisation et ordre des éléments du menu latéral (sidebar)
+    "sidebar_menu": [
+        {"id": "bible", "visible": True},
+        {"id": "passage-study", "visible": True},
+        {"id": "commentaries", "visible": True},
+        {"id": "theology", "visible": True},
+        {"id": "articles", "visible": True},
+        {"id": "dict", "visible": True},
+        {"id": "library", "visible": True},
+        {"id": "search", "visible": True},
+        {"id": "ai", "visible": True},
+        {"id": "notes", "visible": True},
+        {"id": "sermons", "visible": True},
+        {"id": "maps", "visible": True},
+        {"id": "about", "visible": True},
+    ],
 }
 
 def load_config():

@@ -53,6 +53,83 @@ const SettingsView = {
     { id: 'nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8', name: 'Infomaniak Nemotron 30B', desc: 'Optimisé inférence rapide', provider: 'infomaniak' }
   ],
 
+  NAV_ITEMS_CATALOG: {
+    bible: {
+      name: 'Bible',
+      sub: 'Lecteur biblique multi-versions synchronisé',
+      icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path><path d="M12 6v7"></path><path d="M9.5 8.5h5"></path><path d="M4 19.5a2.5 2.5 0 0 1 2.5-2.5H20"></path></svg>`
+    },
+    'passage-study': {
+      name: 'Guide de Passage',
+      sub: 'Étude exégétique 360° du péricope biblique',
+      icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>`
+    },
+    commentaries: {
+      name: 'Commentaires',
+      sub: 'Commentaires exégétiques verset par verset',
+      icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path><path d="M8 12a2 2 0 0 0 2-2V8H8"></path><path d="M14 12a2 2 0 0 0 2-2V8h-2"></path></svg>`
+    },
+    theology: {
+      name: 'Théologie',
+      sub: 'Traités, théologie systématique & études doctrinales',
+      icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"></line><line x1="6" y1="18" x2="6" y2="11"></line><line x1="10" y1="18" x2="10" y2="11"></line><line x1="14" y1="18" x2="14" y2="11"></line><line x1="18" y1="18" x2="18" y2="11"></line><polygon points="12 2 20 7 4 7"></polygon><line x1="2" y1="11" x2="22" y2="11"></line></svg>`
+    },
+    articles: {
+      name: 'Articles',
+      sub: 'Flux d’articles théologiques & blogs chrétiens',
+      icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path><path d="M18 14h-8"></path><path d="M15 18h-5"></path><path d="M10 6h8v4h-8V6Z"></path></svg>`
+    },
+    dict: {
+      name: 'Dictionnaires',
+      sub: 'Lexiques hébreu/grec Strong et dictionnaires bibliques',
+      icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"></path><path d="m4 14 6-6 2-3"></path><path d="M2 5h12"></path><path d="M7 2h1"></path><path d="m22 22-5-10-5 10"></path><path d="M14 18h6"></path></svg>`
+    },
+    library: {
+      name: 'Bibliothèque',
+      sub: 'Gestionnaire d’ouvrages et collections théologiques',
+      icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="18" x="3" y="3" rx="1"></rect><path d="M7 3v18"></path><path d="M20.4 3.7a1 1 0 0 0-1-.7h-3.8a1 1 0 0 0-1 .7L12 21h5.6a1 1 0 0 0 1-.7l2.8-16.6Z"></path></svg>`
+    },
+    search: {
+      name: 'Rechercher',
+      sub: 'Recherche textuelle globale et concordance biblique',
+      icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>`
+    },
+    ai: {
+      name: 'Assistant d’Étude (IA)',
+      sub: 'Chat théologique interactif & synthèses IA',
+      icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path></svg>`
+    },
+    notes: {
+      name: 'Notes',
+      sub: 'Gestionnaire de notes d’étude personnelles et carnets',
+      icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path><path d="m15 5 3 3"></path></svg>`
+    },
+    sermons: {
+      name: 'Prédication & Illustrations',
+      sub: 'Mes Prédications, Éditeur/Studio & Banque d’illustrations',
+      icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>`
+    },
+    maps: {
+      name: 'Cartes',
+      sub: 'Atlas biblique et cartes historiques interactives',
+      icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"></path><path d="M9 3v15"></path><path d="M15 6v15"></path></svg>`
+    },
+    about: {
+      name: 'À propos & Crédits',
+      sub: 'Informations, licences libres et crédits (Pied de page)',
+      icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`
+    }
+  },
+
+  NAV_PRESETS: {
+    all: ['bible', 'passage-study', 'commentaries', 'theology', 'articles', 'dict', 'library', 'search', 'ai', 'notes', 'sermons', 'maps', 'about'],
+    essential: ['bible', 'notes', 'search'],
+    exegete: ['bible', 'passage-study', 'commentaries', 'theology', 'dict', 'search'],
+    preacher: ['bible', 'sermons', 'commentaries', 'notes']
+  },
+
+  draggedNavId: null,
+
   init() {
     this.bindTabs();
     this.bindSliders();
@@ -415,6 +492,8 @@ Règles impératives :
   activeModalTab: 'preview',
 
   bindActions() {
+    this.bindNavCustomizer();
+
     const triggerThemeUpdate = () => {
       const theme = document.getElementById('cfg-theme')?.value || 'dark';
       const palette = document.getElementById('cfg-theme-palette')?.value || 'dark-slate';
@@ -1103,6 +1182,9 @@ Règles impératives :
     if (typeof VintageThemeManager !== 'undefined') {
       VintageThemeManager.init(c);
     }
+
+    // Personnalisation et ordre du menu latéral
+    this.renderNavCustomizerList(c.sidebar_menu);
 
     document.getElementById('cfg-diff-pct').checked = c.show_diff_percentage !== false;
     document.getElementById('cfg-diff-highlight').checked = c.show_diff_highlights !== false;
@@ -2070,10 +2152,12 @@ Règles impératives :
       newCfg.infomaniak_product_id = this.config.infomaniak_product_id;
     }
     newCfg.disabled_models = this.getDisabledModels();
+    newCfg.sidebar_menu = this.getNavCustomizerConfig();
 
     try {
       await API.call('save_settings', newCfg);
       this.config = newCfg;
+      App.applySidebarConfig(newCfg.sidebar_menu, true);
       this.updateAllPromptStatusBadges();
       App.applyTheme(newCfg.theme, newCfg.theme_palette, newCfg.reading_bg);
       App.applyFontFamily(newCfg.font_family);
@@ -2357,5 +2441,271 @@ Règles impératives :
     });
 
     return htmlBlocks.filter(Boolean).join('\n') || '<p><br></p>';
+  },
+
+  // =========================================================
+  // GESTIONNAIRE DE PERSONNALISATION DU MENU LATÉRAL
+  // =========================================================
+  bindNavCustomizer() {
+    // Boutons de presets rapides
+    document.querySelectorAll('.nav-preset-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const preset = btn.dataset.preset;
+        if (preset) {
+          this.applyNavPreset(preset);
+        }
+      });
+    });
+
+    // Bouton de réinitialisation
+    document.getElementById('btn-reset-sidebar-nav')?.addEventListener('click', () => {
+      if (confirm("Voulez-vous rétablir l'ordre et la visibilité par défaut des éléments du menu latéral ?")) {
+        this.resetNavConfig();
+      }
+    });
+  },
+
+  renderNavCustomizerList(configList) {
+    const listEl = document.getElementById('sidebar-nav-customizer-list');
+    if (!listEl) return;
+
+    let items = configList;
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      items = App.getSidebarConfig();
+    }
+
+    // Fusionner avec les éléments par défaut au besoin
+    const defs = App.getDefaultSidebarConfig();
+    const existingIds = new Set(items.map(it => it.id));
+    const fullList = items.map(it => ({ id: it.id, visible: it.visible !== false }));
+    defs.forEach(d => {
+      if (!existingIds.has(d.id)) {
+        fullList.push({ id: d.id, visible: d.visible !== false });
+      }
+    });
+
+    listEl.innerHTML = '';
+
+    fullList.forEach((item, index) => {
+      const meta = this.NAV_ITEMS_CATALOG[item.id] || {
+        name: item.id,
+        sub: '',
+        icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>`
+      };
+
+      const isVisible = item.visible !== false;
+      const isAI = item.id === 'ai';
+      const isFirst = index === 0;
+      const isLast = index === fullList.length - 1;
+
+      const itemEl = document.createElement('div');
+      itemEl.className = `nav-customizer-item ${isVisible ? '' : 'is-disabled'}`;
+      itemEl.dataset.navId = item.id;
+      itemEl.dataset.index = index;
+      itemEl.setAttribute('draggable', 'true');
+
+      let aiBadgeNotice = '';
+      if (isAI && !App.isAIEnabled) {
+        aiBadgeNotice = ` <span style="font-size: 10px; color: #f59e0b; font-weight: normal; margin-left: 4px;">(Désactivé globalement)</span>`;
+      }
+
+      itemEl.innerHTML = `
+        <div class="nav-customizer-left">
+          <span class="nav-drag-handle" title="Glisser pour déplacer cet élément">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/>
+              <circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/>
+            </svg>
+          </span>
+          <span class="nav-customizer-icon">
+            ${meta.icon}
+          </span>
+          <div class="nav-customizer-info">
+            <span class="nav-customizer-name">${meta.name}${aiBadgeNotice}</span>
+            <span class="nav-customizer-sub">${meta.sub}</span>
+          </div>
+        </div>
+        <div class="nav-customizer-actions">
+          <div class="nav-reorder-btns">
+            <button type="button" class="btn-nav-reorder btn-nav-up" data-action="up" title="Monter" ${isFirst ? 'disabled' : ''}>
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+            </button>
+            <button type="button" class="btn-nav-reorder btn-nav-down" data-action="down" title="Descendre" ${isLast ? 'disabled' : ''}>
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          </div>
+          <label class="toggle-switch-nav" title="Afficher ou masquer cet élément dans le menu">
+            <input type="checkbox" class="toggle-nav-item-chk" ${isVisible ? 'checked' : ''}>
+            <span class="toggle-switch-nav-slider"></span>
+          </label>
+        </div>
+      `;
+
+      // Drag & Drop HTML5
+      itemEl.addEventListener('dragstart', (e) => this.handleNavDragStart(e, item.id));
+      itemEl.addEventListener('dragover', (e) => this.handleNavDragOver(e, item.id));
+      itemEl.addEventListener('dragleave', (e) => this.handleNavDragLeave(e));
+      itemEl.addEventListener('drop', (e) => this.handleNavDrop(e, item.id));
+      itemEl.addEventListener('dragend', (e) => this.handleNavDragEnd(e));
+
+      // Toggle visibilité
+      const chk = itemEl.querySelector('.toggle-nav-item-chk');
+      chk?.addEventListener('change', (e) => {
+        itemEl.classList.toggle('is-disabled', !e.target.checked);
+        this.onNavCustomizerToggle(item.id, e.target.checked);
+      });
+
+      // Boutons Flèches Monter / Descendre
+      itemEl.querySelector('.btn-nav-up')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.moveNavItem(item.id, -1);
+      });
+      itemEl.querySelector('.btn-nav-down')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.moveNavItem(item.id, 1);
+      });
+
+      listEl.appendChild(itemEl);
+    });
+  },
+
+  handleNavDragStart(e, id) {
+    this.draggedNavId = id;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', id);
+    const itemEl = e.currentTarget;
+    itemEl.classList.add('is-dragging');
+  },
+
+  handleNavDragOver(e, id) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const targetItem = e.currentTarget;
+    if (this.draggedNavId && this.draggedNavId !== id) {
+      const rect = targetItem.getBoundingClientRect();
+      const mid = rect.top + rect.height / 2;
+      if (e.clientY < mid) {
+        targetItem.classList.add('drag-over-top');
+        targetItem.classList.remove('drag-over-bottom');
+      } else {
+        targetItem.classList.add('drag-over-bottom');
+        targetItem.classList.remove('drag-over-top');
+      }
+    }
+  },
+
+  handleNavDragLeave(e) {
+    e.currentTarget.classList.remove('drag-over-top', 'drag-over-bottom');
+  },
+
+  handleNavDrop(e, targetId) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over-top', 'drag-over-bottom');
+    if (!this.draggedNavId || this.draggedNavId === targetId) return;
+
+    const currentConfig = this.getNavCustomizerConfig();
+    const sourceIndex = currentConfig.findIndex(it => it.id === this.draggedNavId);
+    const targetIndex = currentConfig.findIndex(it => it.id === targetId);
+    if (sourceIndex === -1 || targetIndex === -1) return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const mid = rect.top + rect.height / 2;
+    const isInsertAfter = e.clientY >= mid;
+
+    const [moved] = currentConfig.splice(sourceIndex, 1);
+    const newTargetIndex = currentConfig.findIndex(it => it.id === targetId);
+    const insertIndex = isInsertAfter ? newTargetIndex + 1 : newTargetIndex;
+    currentConfig.splice(insertIndex, 0, moved);
+
+    this.applyAndSaveNavConfig(currentConfig);
+  },
+
+  handleNavDragEnd(e) {
+    this.draggedNavId = null;
+    document.querySelectorAll('.nav-customizer-item').forEach(el => {
+      el.classList.remove('is-dragging', 'drag-over-top', 'drag-over-bottom');
+    });
+  },
+
+  moveNavItem(id, delta) {
+    const currentConfig = this.getNavCustomizerConfig();
+    const idx = currentConfig.findIndex(it => it.id === id);
+    if (idx === -1) return;
+    const newIdx = idx + delta;
+    if (newIdx < 0 || newIdx >= currentConfig.length) return;
+
+    const [moved] = currentConfig.splice(idx, 1);
+    currentConfig.splice(newIdx, 0, moved);
+    this.applyAndSaveNavConfig(currentConfig);
+  },
+
+  onNavCustomizerToggle(id, isChecked) {
+    const currentConfig = this.getNavCustomizerConfig();
+    const target = currentConfig.find(it => it.id === id);
+    if (target) {
+      // Sécurité : s'assurer qu'au moins 1 élément reste visible
+      const visibleCount = currentConfig.filter(it => it.visible && it.id !== 'about').length;
+      if (!isChecked && visibleCount <= 1 && target.visible && id !== 'about') {
+        App.showToast("Au moins un module de navigation doit rester visible", "warning");
+        this.renderNavCustomizerList(currentConfig);
+        return;
+      }
+      target.visible = isChecked;
+      this.applyAndSaveNavConfig(currentConfig);
+    }
+  },
+
+  applyNavPreset(presetKey) {
+    const presetIds = this.NAV_PRESETS[presetKey];
+    if (!presetIds) return;
+
+    const currentConfig = this.getNavCustomizerConfig();
+    const newConfig = currentConfig.map(it => ({
+      id: it.id,
+      visible: presetIds.includes(it.id)
+    }));
+
+    this.applyAndSaveNavConfig(newConfig);
+    const presetNames = {
+      all: 'Tout afficher',
+      essential: 'Essentiel',
+      exegete: 'Exégète & Recherche',
+      preacher: 'Prédicateur'
+    };
+    App.showToast(`Configuration « ${presetNames[presetKey] || presetKey} » appliquée`);
+  },
+
+  resetNavConfig() {
+    const defs = App.getDefaultSidebarConfig();
+    this.applyAndSaveNavConfig(defs);
+    App.showToast("Menu latéral rétabli par défaut");
+  },
+
+  getNavCustomizerConfig() {
+    const listEl = document.getElementById('sidebar-nav-customizer-list');
+    if (!listEl) return App.getSidebarConfig();
+
+    const items = [];
+    listEl.querySelectorAll('.nav-customizer-item').forEach(itemEl => {
+      const id = itemEl.dataset.navId;
+      const checkbox = itemEl.querySelector('.toggle-nav-item-chk');
+      items.push({
+        id: id,
+        visible: checkbox ? checkbox.checked : true
+      });
+    });
+
+    return items.length > 0 ? items : App.getSidebarConfig();
+  },
+
+  applyAndSaveNavConfig(config) {
+    App.applySidebarConfig(config, true);
+    this.renderNavCustomizerList(config);
+    this.config.sidebar_menu = config;
+    API.call('save_settings', { ...this.config, sidebar_menu: config });
+  },
+
+  updateNavCustomizerState(config) {
+    this.renderNavCustomizerList(config);
   }
 };

@@ -35,10 +35,10 @@ delivery_history:
   location: AMD
   notes: Prêché au culte dominical
 created_at: '2026-08-28T20:57:29.547755'
-updated_at: '2026-08-28T21:41:52.102347'
+updated_at: '2026-08-31T14:15:43.728799'
 ---
 
-## Introduction
+## Introduction : La logique de la grâce (2 Corinthiens 8.1-9)
 
 Adam Deering, jeune anglais de 18 ans des alentours de Manchester, quitte son emploi pour créer sa propre entreprise. Il se prépare avec un business plan soigné et prend rendez-vous avec la directrice de la banque pour demander un prêt. Seulement, le prêt est refusé... Les raisons données : trop jeune et pas assez d'expérience dans les affaires. Il passe alors quatre mois dans un immeuble délabré pour survivre sans travail. 20 ans plus tard, il s'est passé beaucoup de choses que vous découvrirez en conclusion...
 
@@ -52,18 +52,7 @@ Cette démarche intérieure passe par trois regards successifs :
 2. Voir le visible et ne pas y croire
 3. Voir l'invisible et y croire
 
-## Lecture du passage
-
-> [!scripture|ref=2 Corinthiens 5.16|version=Colombe]
-> « Ainsi, dès maintenant, nous ne connaissons personne selon la chair ; même si nous avons connu Christ selon la chair, maintenant nous ne le connaissons plus de cette manière. »
-
-> [!scripture|ref=2 Corinthiens 5.16|version=NFC]
-> « Voilà pourquoi nous ne considérons plus personne d'une manière purement humaine. Même si, autrefois, nous avons considéré le Christ d'une manière humaine, maintenant nous ne le considérons plus ainsi. »
-
-> [!scripture|ref=2 Corinthiens 5.16|version=Parole Vivante]
-> « Ainsi, désormais nous ne jugeons plus personne d'après des critères purement extérieurs, à la manière du monde. Autrefois notre jugement sur le Christ lui-même se basait sur son apparence extérieure ; ce que nous pensions de lui s'inspirait des points de vue du monde, mais maintenant, nous le connaissons d'une tout autre manière. »
-
-## I. Voir le visible et juger
+## La grâce de Dieu transforme les croyants de l'intérieur (2 Corinthiens 8.1, Éphésiens 2.8, Romains 3.24)
 
 > [!exegesis|key=Connaître selon la chair]
 > Le premier verbe *connaître* du verset (*ginōskō* / *kata sarka*) désigne une appréciation selon l'apparence extérieure et les standards humains. Paul rappelle qu'en tant que disciples, nous ne devons plus fonctionner ainsi.
@@ -80,7 +69,7 @@ Notre société a décuplé ce culte de l'image avec les réseaux sociaux et l'o
 > **La métaphore du fruit :**
 > Tant qu'on n'a pas goûté personnellement un fruit, on passe à côté de sa raison d'être : être savouré. De même, si Dieu avait voulu faire de nous des intellectuels froids, la Bible serait un dictionnaire abstrait. Au lieu de cela, elle est remplie de récits de vie, de poèmes et de rencontres réelles : nous sommes appelés à vivre la Parole, non simplement à disserter dessus.
 
-## II. Voir le visible et ne pas y croire
+## La grâce de Dieu produit une joie plus forte que les circonstances (2 Corinthiens 8.2, Actes)
 
 > [!scripture|ref=2 Corinthiens 5.16b]
 > « Même si nous avons connu Christ selon la chair... »
@@ -92,7 +81,7 @@ Combien de contemporains de Jésus ont vu ses prodiges sans jamais s'attacher à
 
 Ne courons pas après le sensationnel. Jésus a affirmé que sa mort et sa résurrection constituaient le signe suprême. Le miracle absolu, c'est cette grâce inouïe : Dieu le Père a offert son propre Fils pour nous racheter, et le Roi de gloire s'est fait serviteur pour porter notre condamnation à la croix.
 
-## III. Voir l'invisible et y croire
+## La grâce de Dieu ouvre les mains de ceux qui se sont donnés au Seigneur (2 Corinthiens 8.3-5)
 
 > [!scripture|ref=2 Corinthiens 5.16c]
 > « Maintenant, nous ne le connaissons plus de cette manière. »
@@ -124,7 +113,11 @@ Prier, ce n'est pas réciter machinalement des formules dans le vide : c'est ent
 > **Le témoignage de Koeun Path (Rescapé malgré moi) :**
 > Fuyant les Khmers rouges pendant 40 jours au Cambodge au milieu d'un péril mortel quotidien, Koeun Path, de tradition bouddhiste, entend à trois reprises une voix distincte qui le guide avec précision (la promesse de trouver du maïs dans 3 jours, l'encouragement vers la frontière, la direction à suivre). Arrivé en Thaïlande et emprisonné, il découvre l'Évangile grâce à une missionnaire américaine. Touché par l'Esprit Saint, il parvient à pardonner à ses tortionnaires et deviendra plus tard pasteur en France. Dieu est agissant dans l'invisible de façon bien plus concrète que nous ne le supposons.
 
-## Conclusion & Appel
+## La grâce de Jésus devient le modèle de notre générosité (2 Corinthiens 8.9, Éphésiens 3)
+
+Jésus-Christ s'est fait pauvre de riche qu'il était afin que nous soyons enrichis ; son sacrifice ultime est le fondement et l'impulsion suprême de notre libéralité.
+
+## Conclusion et Appel (2 Corinthiens 8.9)
 
 > [!illustration]
 > **Titre de l'anecdote :** Racontez l'histoire ou l'image concrète ici...
