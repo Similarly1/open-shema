@@ -62,24 +62,30 @@ class CommentarySynthesizer:
         """
         config = load_config()
         ch_int = int(chapter)
-        v_start = min(int(verse_start), int(verse_end or verse_start))
-        v_end = max(int(verse_start), int(verse_end or verse_start))
-
-        # Respect strict du plafond de versets configuré
-        max_allowed = int(config.get("synthesis_max_verses", 5))
-        span = (v_end - v_start + 1)
-        if span > max_allowed:
-            v_end = v_start + max_allowed - 1
-            span = max_allowed
-
+        is_intro = (ch_int == 0)
         french_book = get_french_book_name(book_code)
-        ref_label = f"{french_book} {ch_int}:{v_start}-{v_end}" if v_start != v_end else f"{french_book} {ch_int}:{v_start}"
 
-        # 1. Extraction du texte biblique
-        scripture = cls.get_scripture_text(book_code, ch_int, v_start, v_end, bible_name=bible_name)
+        if is_intro:
+            v_start = 0
+            v_end = 0
+            span = 1
+            ref_label = f"Introduction au livre de {french_book}"
+            scripture = f"Introduction générale et plan d'ensemble pour le livre de {french_book}."
+            comm_data = CommentaryLoader.get_all_comments_for_verse_range(book_code, 0, 0, 0)
+        else:
+            # Respect strict du plafond de versets configuré
+            max_allowed = int(config.get("synthesis_max_verses", 5))
+            span = (v_end - v_start + 1)
+            if span > max_allowed:
+                v_end = v_start + max_allowed - 1
+                span = max_allowed
 
-        # 2. Extraction des commentaires dans la base SQLite
-        comm_data = CommentaryLoader.get_all_comments_for_verse_range(book_code, ch_int, v_start, v_end)
+            ref_label = f"{french_book} {ch_int}:{v_start}-{v_end}" if v_start != v_end else f"{french_book} {ch_int}:{v_start}"
+            # 1. Extraction du texte biblique
+            scripture = cls.get_scripture_text(book_code, ch_int, v_start, v_end, bible_name=bible_name)
+            # 2. Extraction des commentaires dans la base SQLite
+            comm_data = CommentaryLoader.get_all_comments_for_verse_range(book_code, ch_int, v_start, v_end)
+
         documents = comm_data.get("documents", [])
         metadatas = comm_data.get("metadatas", [])
 
@@ -98,7 +104,7 @@ class CommentarySynthesizer:
         if not raw_comments:
             return {
                 "success": False,
-                "error": f"Aucun commentaire exégétique trouvé dans la base locale pour {ref_label}.",
+                "error": f"Aucun commentaire ou introduction exégétique trouvé(e) dans la base locale pour {ref_label}.",
                 "reference": ref_label,
                 "book_code": book_code,
                 "chapter": ch_int,
@@ -146,17 +152,13 @@ class CommentarySynthesizer:
                 f"> [!NOTE]\n"
                 f"> **Mode Démonstration** : Aucune clé API active n'a été détectée dans vos Paramètres. "
                 f"Voici la structure type générée par l'IA à partir de vos **{len(sources_set)} ouvrages de référence**.\n\n"
-                f"### Texte Biblique ({bible_name})\n"
+                f"### Contexte & Portée du Livre\n"
                 f"*{scripture}*\n\n"
-                f"### 1. Consensus Exégétique & Sens Littéral\n"
-                f"L'ensemble des commentateurs consultés ({', '.join(list(sources_set)[:4])}...) s'accordent sur le rôle fondamental de ce passage dans l'économie du texte. Le sens grammatical et historique met en lumière la souveraineté divine et l'intention rédemptrice.\n\n"
-                f"### 2. Nuances, Divergences & Traditions Théologiques\n"
-                f"- **Perspective Réformée & Historique** : Met l'accent sur l'alliance de grâce et la portée typologique.\n"
-                f"- **Perspective Exégétique & Littérale** : Détaille les racines des termes originaux et la chronologie des événements.\n"
-                f"- **Nuances pastorales** : Souligne la dimension pratique et spirituelle immédiate pour le croyant.\n\n"
-                f"### 3. Clés Textuelles & Applications Pastorales\n"
-                f"1. **Vérité centrale** : Une affirmation d'espérance et de sanctification.\n"
-                f"2. **Application concrète** : Vivre en conformité avec cette révélation dans la prière et l'action.\n\n"
+                f"### 1. Consensus Exégétique & Auteur\n"
+                f"L'ensemble des commentateurs consultés ({', '.join(list(sources_set)[:4])}...) soulignent l'unité théologique et la portée rédemptrice de l'ouvrage.\n\n"
+                f"### 2. Thèmes Majeurs & Architecture Littéraire\n"
+                f"- **Thème central** : Révélation de l'Alliance et de la souveraineté divine.\n"
+                f"- **Plan d'ensemble** : Découpage historique et théologique rigoureux proposé par les auteurs.\n\n"
                 f"---\n"
                 f"**Sources analysées ({len(sources_set)})** : {', '.join(sorted(sources_set))}"
             )
@@ -177,17 +179,26 @@ class CommentarySynthesizer:
             }
 
         # 6. Prompt de Synthèse Multi-Commentaires Haute Fidélité (Modifiable dans les paramètres)
-        from core.config import DEFAULT_SYNTHESIS_SYSTEM_PROMPT
-        system_instruction = config.get("synthesis_system_prompt") or DEFAULT_SYNTHESIS_SYSTEM_PROMPT
-
-        user_content = (
-            f"### PASSAGE BIBLIQUE ÉTUDIÉ : **{ref_label}**\n\n"
-            f"**Texte biblique ({bible_name}) :**\n{scripture}\n\n"
-            f"**EXTRAITS DES {len(sources_set)} COMMENTAIRES DISPONIBLES :**\n"
-            f"{context_text}\n\n"
-            f"{notes_context}\n\n"
-            f"Rédigez la synthèse exégétique comparative selon le plan demandé :"
-        )
+        from core.config import DEFAULT_SYNTHESIS_SYSTEM_PROMPT, DEFAULT_INTRO_SYNTHESIS_SYSTEM_PROMPT
+        if is_intro:
+            system_instruction = config.get("intro_synthesis_system_prompt") or DEFAULT_INTRO_SYNTHESIS_SYSTEM_PROMPT
+            user_content = (
+                f"### ANALYSE D'INTRODUCTION AU LIVRE : **{ref_label}**\n\n"
+                f"**EXTRAITS DES {len(sources_set)} INTRODUCTIONS & PLANS D'ENSEMBLE DISPONIBLES :**\n"
+                f"{context_text}\n\n"
+                f"{notes_context}\n\n"
+                f"Rédigez la grande synthèse comparative d'introduction au livre de {french_book} selon le plan demandé :"
+            )
+        else:
+            system_instruction = config.get("synthesis_system_prompt") or DEFAULT_SYNTHESIS_SYSTEM_PROMPT
+            user_content = (
+                f"### PASSAGE BIBLIQUE ÉTUDIÉ : **{ref_label}**\n\n"
+                f"**Texte biblique ({bible_name}) :**\n{scripture}\n\n"
+                f"**EXTRAITS DES {len(sources_set)} COMMENTAIRES DISPONIBLES :**\n"
+                f"{context_text}\n\n"
+                f"{notes_context}\n\n"
+                f"Rédigez la synthèse exégétique comparative selon le plan demandé :"
+            )
 
         try:
             models_to_try = [target_model]

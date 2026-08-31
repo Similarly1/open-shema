@@ -1214,11 +1214,16 @@ const CommentariesView = {
       this.synthCeilingLimitNum.textContent = this.synthMaxVersesLimit;
     }
 
-    this.synthVerseStart = this.currentVerse;
-    this.synthVerseEnd = this.currentVerse;
+    if (this.currentChapter === 0) {
+      this.synthVerseStart = 0;
+      this.synthVerseEnd = 0;
+    } else {
+      this.synthVerseStart = this.currentVerse || 1;
+      this.synthVerseEnd = this.currentVerse || 1;
+    }
 
-    if (this.synthStartInput) this.synthStartInput.value = this.synthVerseStart;
-    if (this.synthEndInput) this.synthEndInput.value = this.synthVerseEnd;
+    if (this.synthStartInput) this.synthStartInput.value = this.synthVerseStart || 1;
+    if (this.synthEndInput) this.synthEndInput.value = this.synthVerseEnd || 1;
 
     this.updateSynthRangeDisplay();
 
@@ -1236,6 +1241,7 @@ const CommentariesView = {
   },
 
   handleSynthRangeChange() {
+    if (this.currentChapter === 0) return;
     if (!this.synthStartInput || !this.synthEndInput) return;
 
     let vStart = parseInt(this.synthStartInput.value, 10) || 1;
@@ -1263,18 +1269,32 @@ const CommentariesView = {
   },
 
   updateSynthRangeDisplay() {
-    const span = (this.synthVerseEnd - this.synthVerseStart + 1);
-    const refStr = span === 1
-      ? `${this.currentBookFrench} ${this.currentChapter}:${this.synthVerseStart}`
-      : `${this.currentBookFrench} ${this.currentChapter}:${this.synthVerseStart}-${this.synthVerseEnd}`;
+    const rangeControls = this.synthRangeControls;
+    if (this.currentChapter === 0) {
+      const refStr = `Introduction à ${this.currentBookFrench}`;
+      if (this.synthPassageBadge) this.synthPassageBadge.textContent = refStr;
+      if (this.synthRangeBook) this.synthRangeBook.textContent = `${this.currentBookFrench} :`;
+      if (this.synthRangeInfo) this.synthRangeInfo.textContent = 'Introduction générale (But, Thème, Plan)';
+      if (rangeControls) rangeControls.style.display = 'none';
+      if (this.synthSourcesHint) {
+        const commsCount = (this.currentComments && this.currentComments.length) || 'Plusieurs';
+        this.synthSourcesHint.textContent = `~${commsCount} introductions et plans d'ensemble indexés`;
+      }
+    } else {
+      if (rangeControls) rangeControls.style.display = '';
+      const span = (this.synthVerseEnd - this.synthVerseStart + 1);
+      const refStr = span === 1
+        ? `${this.currentBookFrench} ${this.currentChapter}:${this.synthVerseStart}`
+        : `${this.currentBookFrench} ${this.currentChapter}:${this.synthVerseStart}-${this.synthVerseEnd}`;
 
-    if (this.synthRangeBook) this.synthRangeBook.textContent = `${this.currentBookFrench} ${this.currentChapter}:`;
-    if (this.synthPassageBadge) this.synthPassageBadge.textContent = refStr;
-    if (this.synthRangeInfo) this.synthRangeInfo.textContent = span === 1 ? '1 verset' : `${span} versets (max: ${this.synthMaxVersesLimit})`;
+      if (this.synthRangeBook) this.synthRangeBook.textContent = `${this.currentBookFrench} ${this.currentChapter}:`;
+      if (this.synthPassageBadge) this.synthPassageBadge.textContent = refStr;
+      if (this.synthRangeInfo) this.synthRangeInfo.textContent = span === 1 ? '1 verset' : `${span} versets (max: ${this.synthMaxVersesLimit})`;
 
-    if (this.synthSourcesHint) {
-      const commsCount = (this.currentComments && this.currentComments.length) || 'Plusieurs';
-      this.synthSourcesHint.textContent = `~${commsCount} sources indexées pour ce passage`;
+      if (this.synthSourcesHint) {
+        const commsCount = (this.currentComments && this.currentComments.length) || 'Plusieurs';
+        this.synthSourcesHint.textContent = `~${commsCount} sources indexées pour ce passage`;
+      }
     }
   },
 

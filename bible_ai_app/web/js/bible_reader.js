@@ -1885,25 +1885,34 @@ const CommentarySynthesizerUI = {
     const ceilingLimitNum = document.getElementById('synth-ceiling-limit-num');
     if (ceilingLimitNum) ceilingLimitNum.textContent = this.maxVersesLimit;
 
-    // 2. Déterminer le verset actif
-    const pane1 = document.getElementById('pane-1-content');
-    const topV = pane1 ? BibleReader.getTopVisibleVerse(pane1) : null;
-    this.currentBook = (topV && topV.book) || BibleReader.currentBook || 'Gen';
-    this.currentChapter = (topV && topV.chapter) ? parseInt(topV.chapter, 10) : (BibleReader.currentChapter || 1);
-    const activeVerse = (topV && topV.verse) ? parseInt(topV.verse, 10) : (BibleReader.selectedVerse || 1);
+    // 2. Déterminer le passage actif (avec prise en charge de l'Introduction générale)
+    const isCommIntro = (typeof CommentaryViewer !== 'undefined' && CommentaryViewer.currentChapter === 0);
+    if (isCommIntro) {
+      this.currentBook = CommentaryViewer.currentBook || BibleReader.currentBook || 'Gen';
+      this.currentChapter = 0;
+      this.verseStart = 0;
+      this.verseEnd = 0;
+    } else {
+      const pane1 = document.getElementById('pane-1-content');
+      const topV = pane1 ? BibleReader.getTopVisibleVerse(pane1) : null;
+      this.currentBook = (topV && topV.book) || (CommentaryViewer && CommentaryViewer.currentBook) || BibleReader.currentBook || 'Gen';
+      this.currentChapter = (topV && topV.chapter) ? parseInt(topV.chapter, 10) : ((CommentaryViewer && CommentaryViewer.currentChapter) || BibleReader.currentChapter || 1);
+      const activeVerse = (topV && topV.verse) ? parseInt(topV.verse, 10) : ((CommentaryViewer && CommentaryViewer.currentVerse) || BibleReader.selectedVerse || 1);
 
-    this.verseStart = activeVerse;
-    this.verseEnd = activeVerse;
+      this.verseStart = activeVerse;
+      this.verseEnd = activeVerse;
+    }
 
     const startInput = document.getElementById('synth-verse-start');
     const endInput = document.getElementById('synth-verse-end');
-    if (startInput) startInput.value = this.verseStart;
-    if (endInput) endInput.value = this.verseEnd;
+    if (startInput) startInput.value = this.verseStart || 1;
+    if (endInput) endInput.value = this.verseEnd || 1;
 
     this.updateRangeDisplay();
   },
 
   handleRangeChange() {
+    if (this.currentChapter === 0) return;
     const startInput = document.getElementById('synth-verse-start');
     const endInput = document.getElementById('synth-verse-end');
     if (!startInput || !endInput) return;
@@ -1938,20 +1947,32 @@ const CommentarySynthesizerUI = {
     const bookLbl = document.getElementById('synth-range-book');
     const passageBadge = document.getElementById('synth-passage-badge');
     const rangeInfo = document.getElementById('synth-range-info');
+    const rangeControls = document.querySelector('.synth-range-row') || document.getElementById('comm-synth-range-controls');
 
-    const span = (this.verseEnd - this.verseStart + 1);
-    const refStr = span === 1
-      ? `${info.name} ${this.currentChapter}:${this.verseStart}`
-      : `${info.name} ${this.currentChapter}:${this.verseStart}-${this.verseEnd}`;
+    if (this.currentChapter === 0) {
+      const refStr = `Introduction à ${info.name || this.currentBook}`;
+      if (passageBadge) passageBadge.textContent = refStr;
+      if (bookLbl) bookLbl.textContent = `${info.name || this.currentBook} :`;
+      if (rangeInfo) rangeInfo.textContent = 'Introduction générale (But, Thème, Plan)';
+      if (rangeControls) rangeControls.style.display = 'none';
+    } else {
+      if (rangeControls) rangeControls.style.display = '';
+      const span = (this.verseEnd - this.verseStart + 1);
+      const refStr = span === 1
+        ? `${info.name} ${this.currentChapter}:${this.verseStart}`
+        : `${info.name} ${this.currentChapter}:${this.verseStart}-${this.verseEnd}`;
 
-    if (bookLbl) bookLbl.textContent = `${info.name} ${this.currentChapter}:`;
-    if (passageBadge) passageBadge.textContent = refStr;
-    if (rangeInfo) rangeInfo.textContent = span === 1 ? '1 verset' : `${span} versets (max: ${this.maxVersesLimit})`;
+      if (bookLbl) bookLbl.textContent = `${info.name} ${this.currentChapter}:`;
+      if (passageBadge) passageBadge.textContent = refStr;
+      if (rangeInfo) rangeInfo.textContent = span === 1 ? '1 verset' : `${span} versets (max: ${this.maxVersesLimit})`;
+    }
 
     const hint = document.getElementById('synth-sources-available-hint');
     if (hint) {
       const commsCount = (CommentaryViewer.currentComments && CommentaryViewer.currentComments.length) || 'Plusieurs';
-      hint.textContent = `~${commsCount} sources indexées`;
+      hint.textContent = this.currentChapter === 0
+        ? `~${commsCount} introductions et plans indexés`
+        : `~${commsCount} sources indexées`;
     }
   },
 
