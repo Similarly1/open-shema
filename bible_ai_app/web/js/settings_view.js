@@ -308,6 +308,15 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
 - Mobilise les Écritures avec naturel et précision (en citant les références) sans alourdir le propos.
 - Si des documents du corpus documentaire sont pertinents pour la question, appuie-toi dessus avec simplicité.`,
 
+  DEFAULT_SERMON_RESTRUCTURE_PROMPT: `Tu es un assistant homilétique et théologique expert en prédication chrétienne.
+Ta mission est de réorganiser intelligemment et fidèlement les paragraphes, notes et développements déjà rédigés par le prédicateur pour les adapter à une NOUVELLE structure de prédication cible.
+
+Règles impératives :
+1. PRÉSERVATION ABSOLUE DU CONTENU : Ne perds AUCUNE idée, anecdote, verset ou argument théologique rédigé par l'auteur. Tout le contenu existant doit être relogé dans la section la plus appropriée du nouveau canevas.
+2. ADAPTATION HOMILÉTIQUE : Ajuste subtilement les transitions entre les points pour que la nouvelle structure se lise avec fluidité et force rhétorique.
+3. RESPECT DES NOUVEAUX TITRES ET TYPES : Chaque section du nouveau canevas doit recevoir son titre cible, son type (intro, scripture, point, conclusion) et le contenu qui lui correspond logiquement sous forme HTML (paragraphes <p>, listes, etc.).
+4. FORMAT DE SORTIE : Renvoie UNIQUEMENT un objet JSON valide contenant la clé "sections" (tableau d'objets avec "id", "type", "title", "contentHtml"). N'ajoute aucun texte ou markdown autour du JSON.`,
+
   PROMPT_CONFIGS: {
     theological_profile: {
       title: 'System Prompt — Passeport Herméneutique (« Mon Église »)',
@@ -392,6 +401,13 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
       fieldId: 'cfg-prompt-note-tags',
       badgeId: 'badge-note-tags-status',
       label: 'Tags de Note'
+    },
+    sermon_restructure: {
+      title: 'System Prompt — Restructuration Homilétique de Prédication',
+      defaultProp: 'DEFAULT_SERMON_RESTRUCTURE_PROMPT',
+      fieldId: 'cfg-sermon-restructure-system-prompt',
+      badgeId: 'badge-sermon-restructure-status',
+      label: 'Restructuration Homilétique'
     }
   },
 
@@ -684,7 +700,8 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
       { type: 'translation', open: 'btn-open-modal-trans-prompt', reset: 'btn-reset-trans-prompt' },
       { type: 'summary', open: 'btn-open-modal-summary-prompt', reset: 'btn-reset-summary-prompt' },
       { type: 'note_title', open: 'btn-open-modal-note-title-prompt', reset: 'btn-reset-note-title-prompt' },
-      { type: 'note_tags', open: 'btn-open-modal-note-tags-prompt', reset: 'btn-reset-note-tags-prompt' }
+      { type: 'note_tags', open: 'btn-open-modal-note-tags-prompt', reset: 'btn-reset-note-tags-prompt' },
+      { type: 'sermon_restructure', open: 'btn-open-modal-sermon-restructure-prompt', reset: 'btn-reset-sermon-restructure-prompt' }
     ];
 
     promptBtnBindings.forEach(item => {
@@ -1172,6 +1189,12 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
     if (c.notes_ai_fallback_model && document.getElementById('cfg-notes-ai-fallback-model') && this.isModelEnabled(c.notes_ai_fallback_model)) {
       document.getElementById('cfg-notes-ai-fallback-model').value = c.notes_ai_fallback_model;
     }
+    if (c.sermon_restructure_model && document.getElementById('cfg-sermon-restructure-model') && this.isModelEnabled(c.sermon_restructure_model)) {
+      document.getElementById('cfg-sermon-restructure-model').value = c.sermon_restructure_model;
+    }
+    if (c.sermon_restructure_fallback_model && document.getElementById('cfg-sermon-restructure-fallback-model') && this.isModelEnabled(c.sermon_restructure_fallback_model)) {
+      document.getElementById('cfg-sermon-restructure-fallback-model').value = c.sermon_restructure_fallback_model;
+    }
     if (document.getElementById('cfg-summary-word-count')) {
       document.getElementById('cfg-summary-word-count').value = c.summary_word_count || 300;
       const lbl = document.getElementById('lbl-summary-word-count-val');
@@ -1456,6 +1479,8 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
       'cfg-title-fallback-model',
       'cfg-notes-ai-model',
       'cfg-notes-ai-fallback-model',
+      'cfg-sermon-restructure-model',
+      'cfg-sermon-restructure-fallback-model',
       'ai-opt-model'
     ];
 
@@ -1530,6 +1555,10 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
         targetVal = this.config.notes_ai_model || currentVal;
       } else if (id === 'cfg-notes-ai-fallback-model') {
         targetVal = this.config.notes_ai_fallback_model || currentVal;
+      } else if (id === 'cfg-sermon-restructure-model') {
+        targetVal = this.config.sermon_restructure_model || currentVal;
+      } else if (id === 'cfg-sermon-restructure-fallback-model') {
+        targetVal = this.config.sermon_restructure_fallback_model || currentVal;
       }
 
       if (targetVal && enabledModels.some(m => m.id === targetVal)) {
@@ -1667,7 +1696,8 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
       { primary: 'cfg-translation-model', fallback: 'cfg-translation-fallback-model', label: 'Traduction' },
       { primary: 'cfg-summary-model', fallback: 'cfg-summary-fallback-model', label: 'Résumé' },
       { primary: 'cfg-title-model', fallback: 'cfg-title-fallback-model', label: 'Titres d\'historique' },
-      { primary: 'cfg-notes-ai-model', fallback: 'cfg-notes-ai-fallback-model', label: 'Notes (Titres & Tags)' }
+      { primary: 'cfg-notes-ai-model', fallback: 'cfg-notes-ai-fallback-model', label: 'Notes (Titres & Tags)' },
+      { primary: 'cfg-sermon-restructure-model', fallback: 'cfg-sermon-restructure-fallback-model', label: 'Prédication' }
     ];
 
     pairs.forEach(({ primary, fallback, label }) => {
@@ -1703,7 +1733,8 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
       { primary: 'cfg-translation-model', fallback: 'cfg-translation-fallback-model', label: 'Traduction' },
       { primary: 'cfg-summary-model', fallback: 'cfg-summary-fallback-model', label: 'Résumé' },
       { primary: 'cfg-title-model', fallback: 'cfg-title-fallback-model', label: 'Titres d\'historique' },
-      { primary: 'cfg-notes-ai-model', fallback: 'cfg-notes-ai-fallback-model', label: 'Notes (Titres & Tags)' }
+      { primary: 'cfg-notes-ai-model', fallback: 'cfg-notes-ai-fallback-model', label: 'Notes (Titres & Tags)' },
+      { primary: 'cfg-sermon-restructure-model', fallback: 'cfg-sermon-restructure-fallback-model', label: 'Prédication' }
     ];
 
     pairs.forEach(({ primary, fallback, label }) => {
@@ -1977,6 +2008,17 @@ OBJECTIFS & POSTURE DU DIALOGUE LIBRE :
         document.getElementById('cfg-notes-ai-fallback-model').value = fb;
       }
       newCfg.notes_ai_fallback_model = fb;
+    }
+    if (document.getElementById('cfg-sermon-restructure-model')) {
+      newCfg.sermon_restructure_model = document.getElementById('cfg-sermon-restructure-model').value;
+    }
+    if (document.getElementById('cfg-sermon-restructure-fallback-model')) {
+      let fb = document.getElementById('cfg-sermon-restructure-fallback-model').value;
+      if (fb === newCfg.sermon_restructure_model) {
+        fb = this.getSmartFallbackModel(newCfg.sermon_restructure_model, document.getElementById('cfg-sermon-restructure-fallback-model'));
+        document.getElementById('cfg-sermon-restructure-fallback-model').value = fb;
+      }
+      newCfg.sermon_restructure_fallback_model = fb;
     }
     if (document.getElementById('cfg-summary-word-count')) {
       newCfg.summary_word_count = parseInt(document.getElementById('cfg-summary-word-count').value) || 300;

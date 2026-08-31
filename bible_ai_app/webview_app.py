@@ -977,6 +977,112 @@ class BibleAppApi:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+    def reorganize_sermon_sections_ai(self, current_sections: List[Dict[str, Any]], new_structure: List[Dict[str, Any]], sermon_metadata: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+        Réorganise sémantiquement les paragraphes et contenus rédigés par l'utilisateur
+        dans une nouvelle structure homilétique cible via le LLM configuré, avec gestion automatique de secours (fallback).
+        """
+        self.config = load_config()
+        from core.config import DEFAULT_SERMON_RESTRUCTURE_SYSTEM_PROMPT
+        
+        sys_prompt = self.config.get("sermon_restructure_system_prompt") or DEFAULT_SERMON_RESTRUCTURE_SYSTEM_PROMPT
+        primary_model = self.config.get("sermon_restructure_model") or self.config.get("chat_model") or "gemini-2.5-flash"
+        fallback_model = self.config.get("sermon_restructure_fallback_model") or self.config.get("chat_fallback_model") or "gemini-2.0-flash"
+
+        models_to_try = [primary_model]
+        if fallback_model and fallback_model != primary_model:
+            models_to_try.append(fallback_model)
+
+        meta_str = ""
+        if sermon_metadata:
+            meta_str = f"Titre du sermon : {sermon_metadata.get('title', 'Sans titre')}\nPassage : {sermon_metadata.get('passage', '')}\nProposition centrale : {sermon_metadata.get('big_idea', '')}\n\n"
+
+        curr_text = "--- CONTENU ACTUELLEMENT RÉDIGÉ PAR LE PRÉDICATEUR ---\n"
+        for idx, sec in enumerate(current_sections):
+            text_content = sec.get("contentHtml", "").strip()
+            curr_text += f"\n[Section {idx + 1} : {sec.get('title', 'Sans titre')} ({sec.get('type', 'point')})]\n{text_content}\n"
+
+        target_text = "\n--- NOUVELLE STRUCTURE CIBLE SOUHAITÉE ---\n"
+        for idx, sec in enumerate(new_structure):
+            target_text += f"\n- Section {idx + 1} | Type: {sec.get('type', 'point')} | Titre cible: {sec.get('title', 'Sans titre')}"
+
+        user_prompt = (
+            f"{meta_str}"
+            f"{curr_text}\n"
+            f"{target_text}\n\n"
+            f"Consigne : Réorganise tout le contenu rédigé ci-dessus dans les sections de la NOUVELLE structure cible. "
+            f"Ne perds aucune idée, verset ou illustration. Renvoie UNIQUEMENT un JSON valide au format :\n"
+            f"{{\n  \"sections\": [\n    {{\"type\": \"intro\", \"title\": \"...\", \"contentHtml\": \"<p>...</p>\"}}\n  ]\n}}"
+        )
+
+        from ai.llm_client import LLMClient
+        import json
+        import re
+        import datetime
+
+        last_err = None
+        result_sections = None
+        used_model = None
+
+        for cur_model in models_to_try:
+            lower_m = cur_model.lower()
+            if "/" in lower_m or "infomaniak" in lower_m or lower_m.startswith("qwen") or "swiss-ai" in lower_m or "gemma" in lower_m:
+                token = self.config.get("infomaniak_token", "")
+                pid = self.config.get("infomaniak_product_id", "251")
+                client = LLMClient(api_key=token, model=cur_model, provider="infomaniak", product_id=pid)
+            elif lower_m.startswith("mistral-") or lower_m.startswith("open-mistral-") or "codestral" in lower_m:
+                api_key = self.config.get("mistral_api_key", "")
+                client = LLMClient(api_key=api_key, model=cur_model, provider="mistral")
+            else:
+                api_key = self.config.get("gemini_api_key", "")
+                client = LLMClient(api_key=api_key, model=cur_model, provider="gemini")
+
+            try:
+                out = client.chat(messages=[{"role": "user", "content": user_prompt}], system_prompt=sys_prompt)
+                if out and not str(out).startswith("Erreur"):
+                    text = str(out).strip()
+                    if text.startswith("```"):
+                        text = re.sub(r'^```(?:json)?\s*', '', text, flags=re.IGNORECASE)
+                        text = re.sub(r'\s*```$', '', text)
+                    parsed = json.loads(text)
+                    if isinstance(parsed, dict) and "sections" in parsed and isinstance(parsed["sections"], list):
+                        result_sections = parsed["sections"]
+                        used_model = cur_model
+                        break
+                    elif isinstance(parsed, list):
+                        result_sections = parsed
+                        used_model = cur_model
+                        break
+                else:
+                    last_err = out
+            except Exception as e:
+                last_err = str(e)
+                logger.warning("Échec restructuration IA avec %s: %s", cur_model, e)
+
+        if not result_sections:
+            return {"success": False, "error": last_err or "Impossible de réorganiser avec l'IA. Vérifiez votre clé API dans les Paramètres."}
+
+        normalized = []
+        base_ts = int(datetime.datetime.now().timestamp() * 1000)
+        for idx, sec in enumerate(result_sections):
+            target_template = new_structure[idx] if idx < len(new_structure) else {}
+            sec_type = sec.get("type") or target_template.get("type", "point")
+            sec_title = sec.get("title") or target_template.get("title", f"Partie {idx + 1}")
+            sec_content = sec.get("contentHtml") or sec.get("content", "")
+            if not sec_content.startswith("<"):
+                sec_content = f"<p>{sec_content}</p>"
+            normalized.append({
+                "id": f"sec_{base_ts}_{idx + 1}",
+                "type": sec_type,
+                "title": sec_title,
+                "contentHtml": sec_content,
+                "isCollapsed": False,
+                "wordCount": 0,
+                "estMinutes": 0
+            })
+
+        return {"success": True, "sections": normalized, "used_model": used_model}
+
     def get_passage_overview_bundle(self, book_code: str, chapter: int = 1, verse: int = 1, bible_name: str = "LSG") -> Dict[str, Any]:
         """Agrège tout l'écosystème documentaire pour le volet d'aperçu rapide de la page Bible."""
         from core.passage_study_manager import PassageStudyManager

@@ -112,6 +112,15 @@ Règles impératives :
 2. Privilégie les thèmes doctrinaux, les personnages, les livres bibliques ou les notions pratiques abordés.
 3. N'inclus aucun préambule, ni puce, ni dièse (#)."""
 
+DEFAULT_SERMON_RESTRUCTURE_SYSTEM_PROMPT = """Tu es un assistant homilétique et théologique expert en prédication chrétienne.
+Ta mission est de réorganiser intelligemment et fidèlement les paragraphes, notes et développements déjà rédigés par le prédicateur pour les adapter à une NOUVELLE structure de prédication cible.
+
+Règles impératives :
+1. PRÉSERVATION ABSOLUE DU CONTENU : Ne perds AUCUNE idée, anecdote, verset ou argument théologique rédigé par l'auteur. Tout le contenu existant doit être relogé dans la section la plus appropriée du nouveau canevas.
+2. ADAPTATION HOMILÉTIQUE : Ajuste subtilement les transitions entre les points pour que la nouvelle structure se lise avec fluidité et force rhétorique.
+3. RESPECT DES NOUVEAUX TITRES ET TYPES : Chaque section du nouveau canevas doit recevoir son titre cible, son type (intro, scripture, point, conclusion) et le contenu qui lui correspond logiquement sous forme HTML (paragraphes <p>, listes, etc.).
+4. FORMAT DE SORTIE : Renvoie UNIQUEMENT un objet JSON valide contenant la clé "sections" (tableau d'objets avec "id", "type", "title", "contentHtml"). N'ajoute aucun texte ou markdown autour du JSON."""
+
 DEFAULTS = {
     "mistral_api_key": "",
     "gemini_api_key": "",
@@ -157,6 +166,9 @@ DEFAULTS = {
     "title_fallback_model": "gemini-2.5-flash",
     "notes_ai_model": "gemini-2.0-flash-lite",
     "notes_ai_fallback_model": "gemini-2.5-flash",
+    "sermon_restructure_model": "gemini-2.5-flash",
+    "sermon_restructure_fallback_model": "gemini-2.0-flash",
+    "sermon_restructure_system_prompt": DEFAULT_SERMON_RESTRUCTURE_SYSTEM_PROMPT,
     "disabled_models": [],
     "summary_system_prompt": DEFAULT_SUMMARY_SYSTEM_PROMPT,
     "prompt_exegesis": DEFAULT_EXEGESIS_SYSTEM_PROMPT,

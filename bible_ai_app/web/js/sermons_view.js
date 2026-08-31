@@ -262,7 +262,6 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
 
     // 4b. Bascule manuelle du volet de Plan de la prédication
     document.getElementById('btn-sermon-toggle-outline')?.addEventListener('click', () => this.toggleOutlinePanel());
-    document.getElementById('btn-sermon-hide-outline')?.addEventListener('click', () => this.toggleOutlinePanel(false));
 
     // Clic sur le fil d'ariane pour ouvrir les détails homilétiques
     document.getElementById('sermon-header-summary')?.addEventListener('click', () => {
@@ -288,8 +287,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     this.bindFloatingToolbar();
 
     // 7. Actions Sommaire & Ajout de sections
-    document.getElementById('btn-sermon-collapse-all')?.addEventListener('click', () => this.collapseAllSections());
-    document.getElementById('btn-sermon-expand-all')?.addEventListener('click', () => this.expandAllSections());
+    document.getElementById('btn-sermon-toggle-all-sections')?.addEventListener('click', () => this.toggleAllSections());
     document.getElementById('btn-outline-add-point')?.addEventListener('click', () => this.addSection('point'));
     document.getElementById('btn-add-section-point')?.addEventListener('click', () => this.addSection('point'));
     document.getElementById('btn-add-section-scripture')?.addEventListener('click', () => this.addSection('scripture'));
@@ -299,6 +297,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     this.titleInput?.addEventListener('input', () => {
       this.ensureCurrentSermon();
       if (this.currentSermon) this.currentSermon.title = this.titleInput.value.trim();
+      this.debouncedPushHistory();
       this.debouncedAutoSave();
     });
 
@@ -1195,12 +1194,17 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
 
         this.renderOutline();
         this.updateMetrics();
+        this.debouncedPushHistory();
         this.debouncedAutoSave();
         this.handleSlashInput(e);
 
         editor.querySelectorAll('.sermon-block-illustration').forEach(b => {
           this.attachIllustrationBlockHelpers(b, sec.id);
         });
+      });
+
+      editor?.addEventListener('blur', () => {
+        this.pushHistoryState();
       });
 
       editor?.addEventListener('keydown', (e) => {
@@ -1239,6 +1243,8 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
         this.attachIllustrationBlockHelpers(b, sec.id);
       });
     });
+
+    this.updateToggleAllSectionsButton();
   },
 
   isDefaultPlaceholder(htmlOrText) {
@@ -1343,20 +1349,48 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     if (card) {
       card.classList.toggle('collapsed', sec.isCollapsed);
     }
+    this.updateToggleAllSectionsButton();
+  },
+
+  toggleAllSections() {
+    const hasExpanded = this.sections.some(s => !s.isCollapsed);
+    if (hasExpanded) {
+      this.collapseAllSections();
+    } else {
+      this.expandAllSections();
+    }
+  },
+
+  updateToggleAllSectionsButton() {
+    const btn = document.getElementById('btn-sermon-toggle-all-sections');
+    if (!btn) return;
+    const hasExpanded = this.sections.some(s => !s.isCollapsed);
+    if (hasExpanded) {
+      btn.title = "Tout replier";
+      btn.setAttribute('aria-label', 'Tout replier');
+      btn.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/></svg>`;
+    } else {
+      btn.title = "Tout déplier";
+      btn.setAttribute('aria-label', 'Tout déplier');
+      btn.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/></svg>`;
+    }
   },
 
   collapseAllSections() {
     this.sections.forEach(s => s.isCollapsed = true);
     document.querySelectorAll('.sermon-section-card').forEach(c => c.classList.add('collapsed'));
+    this.updateToggleAllSectionsButton();
   },
 
   expandAllSections() {
     this.sections.forEach(s => s.isCollapsed = false);
     document.querySelectorAll('.sermon-section-card').forEach(c => c.classList.remove('collapsed'));
+    this.updateToggleAllSectionsButton();
   },
 
   addSection(type = 'point', title = '', content = '') {
     this.ensureCurrentSermon();
+    this.pushHistoryState();
     const defaultTitles = {
       intro: 'Introduction',
       scripture: 'Lecture du passage',
@@ -1414,6 +1448,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
       return;
     }
 
+    this.pushHistoryState();
     this.sections = this.sections.filter(s => s.id !== secId);
     this.renderSections();
     this.renderOutline();
@@ -1428,6 +1463,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     const newIdx = idx + delta;
     if (newIdx < 0 || newIdx >= this.sections.length) return;
 
+    this.pushHistoryState();
     const temp = this.sections[idx];
     this.sections[idx] = this.sections[newIdx];
     this.sections[newIdx] = temp;
@@ -2120,6 +2156,10 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
               <span>Structures des Grands Manuels</span>
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px;">
+              <button class="btn-secondary" id="btn-ai-classic-plan" style="text-align: left; padding: 7px 10px; font-size: 11.5px; display: flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-amber, #f59e0b);"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                <span>Plan Standard par défaut (5 parties)</span>
+              </button>
               <button class="btn-secondary" id="btn-ai-bridge-plan" style="text-align: left; padding: 7px 10px; font-size: 11.5px; display: flex; align-items: center; gap: 8px;">
                 <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="color: #3b82f6;"><path d="M4 19V9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10"/><path d="M4 15h16"/><path d="M10 7v12"/><path d="M14 7v12"/></svg>
                 <span>Structure du Pont (John Stott)</span>
@@ -2164,6 +2204,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
         </div>
       `;
 
+      document.getElementById('btn-ai-classic-plan')?.addEventListener('click', () => this.insertHomileticOutline('classique'));
       document.getElementById('btn-ai-bridge-plan')?.addEventListener('click', () => this.insertHomileticOutline('inductif'));
       document.getElementById('btn-ai-synthetique-plan')?.addEventListener('click', () => this.insertHomileticOutline('synthetique'));
       document.getElementById('btn-ai-helm-grid')?.addEventListener('click', () => this.insertHomileticOutline('application-grille'));
@@ -2208,9 +2249,21 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
 
   insertHomileticOutline(type) {
     const passage = this.currentSermon?.passage?.reference || 'Passage';
+    let newSections = [];
+    let name = "Plan Homilétique";
 
-    if (type === 'synthetique') {
-      this.sections = [
+    if (type === 'classique') {
+      name = "Plan Standard par défaut";
+      newSections = [
+        { id: `sec_${Date.now()}_1`, type: 'intro', title: 'Introduction', contentHtml: '<p>Accroche, mise en contexte et tension contemporaine...</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 },
+        { id: `sec_${Date.now()}_2`, type: 'scripture', title: `Lecture du passage (${passage})`, contentHtml: '<p>« Insérez le texte biblique ici... »</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 },
+        { id: `sec_${Date.now()}_3`, type: 'point', title: 'I. Premier Point Principal', contentHtml: '<p>Explication du texte et fondement doctrinal...</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 },
+        { id: `sec_${Date.now()}_4`, type: 'point', title: 'II. Deuxième Point Principal', contentHtml: '<p>Développement théologique et résonance...</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 },
+        { id: `sec_${Date.now()}_5`, type: 'conclusion', title: 'Conclusion & Appel', contentHtml: '<p>Synthèse de la pensée maîtresse et application pour la semaine...</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 }
+      ];
+    } else if (type === 'synthetique') {
+      name = "Plan Synthétique (Alfred Kuen)";
+      newSections = [
         { id: `sec_${Date.now()}_1`, type: 'intro', title: 'Introduction', contentHtml: '<p><strong>Accroche :</strong> Captez l\'attention dès les premières secondes...<br><strong>Tension :</strong> Quel combat existentiel ce texte éclaire-t-il ?<br><strong>Vérité Maîtresse :</strong> La proposition centrale du sermon en 1 phrase.</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 },
         { id: `sec_${Date.now()}_2`, type: 'scripture', title: `Lecture du Passage (${passage})`, contentHtml: '<p>« Insérez les versets ici... »</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 },
         { id: `sec_${Date.now()}_3`, type: 'point', title: 'I. Premier Axe : La Révélation du Texte', contentHtml: '<p>Explication du passage et des mots-clés originaux...</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 },
@@ -2219,13 +2272,15 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
         { id: `sec_${Date.now()}_6`, type: 'conclusion', title: 'Conclusion & Appel', contentHtml: '<p><strong>Synthèse :</strong> Récapitulatif clair.<br><strong>Défi pratique :</strong> Comment appliquer cette vérité dès cette semaine ?</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 }
       ];
     } else if (type === 'inductif') {
-      this.sections = [
+      name = "Structure du Pont (John Stott)";
+      newSections = [
         { id: `sec_${Date.now()}_1`, type: 'intro', title: '1. La Tension Contemporaine (Rive 2)', contentHtml: '<p>Le dilemme humain, la soif ou l\'épreuve universelle vécue aujourd\'hui...</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 },
         { id: `sec_${Date.now()}_2`, type: 'scripture', title: `2. L\'Écoute de la Parole (${passage})`, contentHtml: '<p>Ce que Dieu déclare dans son texte pour bousculer nos schémas...</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 },
         { id: `sec_${Date.now()}_3`, type: 'point', title: '3. La Résolution par la Grâce (Le Pont en Christ)', contentHtml: '<p>Comment la personne et l\'œuvre du Christ bâtissent le pont de la rédemption...</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 },
         { id: `sec_${Date.now()}_4`, type: 'conclusion', title: '4. La Marche par la Foi (L\'Application)', contentHtml: '<p>Décision personnelle, repentance et impact concret dans nos relations quotidiennes...</p>', isCollapsed: false, wordCount: 0, estMinutes: 0 }
       ];
     } else if (type === 'application-grille') {
+      this.pushHistoryState();
       this.addSection('conclusion', 'Grille d\'Applications Différenciées (David Helm)', `
         <p><strong>1. Sceptiques & Non-croyants :</strong> Quelle vérité de l\'Évangile interpelle leurs présupposés ?</p>
         <p><strong>2. Croyants éprouvés & souffrants :</strong> Quelle promesse et consolation solide ce texte offre-t-il ?</p>
@@ -2235,13 +2290,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
       return;
     }
 
-    this.renderSections();
-    this.renderOutline();
-    this.updateMetrics();
-    this.debouncedAutoSave();
-    if (typeof App !== 'undefined' && App.showToast) {
-      App.showToast("Structure homilétique appliquée en blocs !");
-    }
+    this.confirmStructureApplication(name, newSections, null);
   },
 
   async loadRealSermonModelsList(passageRef, query = '') {
@@ -2289,7 +2338,6 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
                   <span style="display: inline-flex; align-items: center; gap: 4px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>${this.escapeHtml(m.passage_reference || 'Texte')}</span>
                   <span>•</span>
                   <span style="display: inline-flex; align-items: center; gap: 4px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${this.escapeHtml(m.duration || '35 min')}</span>
-                  ${m.preacher ? `<span>•</span><span style="color: var(--accent-amber); font-weight: 500;">${this.escapeHtml(m.preacher)}</span>` : (m.source_church ? `<span>•</span><span>${this.escapeHtml(m.source_church)}</span>` : '')}
                   ${matchTag}
                 </div>
               </div>
@@ -2356,23 +2404,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
   insertRealSermonOutline(model) {
     if (!model || !model.outline || model.outline.length === 0) return;
 
-    // 1. Remplissage des métadonnées si vides ou demande
-    if (this.currentSermon) {
-      if (!this.currentSermon.big_idea && model.big_idea) {
-        this.currentSermon.big_idea = model.big_idea;
-        this.currentSermon.pmt = model.big_idea;
-        this.currentSermon.pms = model.big_idea;
-      }
-      if (!this.currentSermon.contemporary_tension && model.contemporary_tension) {
-        this.currentSermon.contemporary_tension = model.contemporary_tension;
-      }
-      if (!this.currentSermon.passage?.reference && model.passage_reference) {
-        this.currentSermon.passage = { reference: model.passage_reference };
-      }
-      this.updateHeaderSummary(this.currentSermon);
-    }
-
-    // 2. Conversion de l'outline en blocs de section
+    // Conversion de l'outline en blocs de section
     const newSections = [];
     model.outline.forEach((item, idx) => {
       let secType = 'point';
@@ -2398,15 +2430,15 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
       });
     });
 
-    this.sections = newSections;
-    this.renderSections();
-    this.renderOutline();
-    this.updateMetrics();
-    this.debouncedAutoSave();
-    
-    if (typeof App !== 'undefined' && App.showToast) {
-      App.showToast(`Plan inspiré de "${model.title}" injecté dans vos blocs !`);
-    }
+    this.confirmStructureApplication(
+      model.title || "Canevas Homilétique",
+      newSections,
+      {
+        big_idea: model.big_idea,
+        contemporary_tension: model.contemporary_tension,
+        passage_reference: model.passage_reference
+      }
+    );
   },
 
   // =========================================================================
@@ -2532,8 +2564,10 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
   },
 
   // =========================================================================
-  // GESTION DE L'HISTORIQUE (UNDO / REDO)
+  // GESTION DE L'HISTORIQUE (UNDO / REDO) & SÉCURITÉ DE STRUCTURE
   // =========================================================================
+
+  historyDebounceTimer: null,
 
   resetHistory() {
     this.history = [];
@@ -2541,27 +2575,68 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     this.pushHistoryState();
   },
 
+  debouncedPushHistory() {
+    if (this.historyDebounceTimer) {
+      clearTimeout(this.historyDebounceTimer);
+    }
+    this.historyDebounceTimer = setTimeout(() => {
+      this.pushHistoryState();
+    }, 600);
+  },
+
   pushHistoryState() {
-    const state = {
-      title: this.titleInput?.value || '',
-      sections: JSON.parse(JSON.stringify(this.sections))
+    const currentState = {
+      title: this.titleInput?.value || (this.currentSermon?.title || ''),
+      sections: JSON.parse(JSON.stringify(this.sections || []))
     };
+
+    // Éviter les doublons successifs strictement identiques
+    if (this.history.length > 0 && this.historyIndex >= 0 && this.historyIndex < this.history.length) {
+      const last = this.history[this.historyIndex];
+      if (last && last.title === currentState.title && JSON.stringify(last.sections) === JSON.stringify(currentState.sections)) {
+        this.updateUndoRedoButtonsState();
+        return;
+      }
+    }
 
     if (this.historyIndex < this.history.length - 1) {
       this.history = this.history.slice(0, this.historyIndex + 1);
     }
 
-    this.history.push(state);
+    this.history.push(currentState);
     if (this.history.length > this.maxHistory) {
       this.history.shift();
     }
     this.historyIndex = this.history.length - 1;
+    this.updateUndoRedoButtonsState();
+  },
+
+  updateUndoRedoButtonsState() {
+    const btnUndo = document.getElementById('btn-sermon-undo');
+    const btnRedo = document.getElementById('btn-sermon-redo');
+    if (btnUndo) {
+      const canUndo = this.historyIndex > 0;
+      btnUndo.disabled = !canUndo;
+      btnUndo.style.opacity = canUndo ? '1' : '0.35';
+      btnUndo.style.pointerEvents = canUndo ? 'auto' : 'none';
+      btnUndo.title = canUndo ? 'Annuler (Ctrl+Z)' : 'Rien à annuler';
+    }
+    if (btnRedo) {
+      const canRedo = this.historyIndex < this.history.length - 1;
+      btnRedo.disabled = !canRedo;
+      btnRedo.style.opacity = canRedo ? '1' : '0.35';
+      btnRedo.style.pointerEvents = canRedo ? 'auto' : 'none';
+      btnRedo.title = canRedo ? 'Rétablir (Ctrl+Y)' : 'Rien à rétablir';
+    }
   },
 
   undo() {
     if (this.historyIndex > 0) {
       this.historyIndex--;
       this.restoreHistoryState(this.history[this.historyIndex]);
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast("Action annulée", "info", 1500);
+      }
     }
   },
 
@@ -2569,16 +2644,326 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     if (this.historyIndex < this.history.length - 1) {
       this.historyIndex++;
       this.restoreHistoryState(this.history[this.historyIndex]);
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast("Action rétablie", "info", 1500);
+      }
     }
   },
 
   restoreHistoryState(state) {
     if (!state) return;
-    if (this.titleInput) this.titleInput.value = state.title;
+    if (this.titleInput) this.titleInput.value = state.title || '';
+    if (this.currentSermon) this.currentSermon.title = state.title || '';
     this.sections = JSON.parse(JSON.stringify(state.sections || []));
     this.renderSections();
     this.renderOutline();
     this.updateMetrics();
+    this.debouncedAutoSave();
+    this.updateUndoRedoButtonsState();
+  },
+
+  hasUserContent() {
+    if (!this.sections || this.sections.length === 0) return false;
+    return this.sections.some(s => {
+      const text = (s.contentHtml || '').replace(/<[^>]+>/g, '').trim();
+      return text.length > 0 && !this.isDefaultPlaceholder(text);
+    });
+  },
+
+  adaptSectionsStructure(currentSections, newSections) {
+    if (!currentSections || currentSections.length === 0) return newSections;
+    
+    // Identifier les sections rédigées par l'utilisateur
+    const userSections = currentSections.filter(s => {
+      const text = (s.contentHtml || '').replace(/<[^>]+>/g, '').trim();
+      return text.length > 0 && !this.isDefaultPlaceholder(text);
+    });
+
+    if (userSections.length === 0) {
+      return newSections;
+    }
+
+    // Regrouper par catégories
+    const currIntro = currentSections.find(s => s.type === 'intro' && !this.isDefaultPlaceholder((s.contentHtml || '').replace(/<[^>]+>/g, '')));
+    const currConcl = currentSections.find(s => s.type === 'conclusion' && !this.isDefaultPlaceholder((s.contentHtml || '').replace(/<[^>]+>/g, '')));
+    const currScripture = currentSections.find(s => s.type === 'scripture' && !this.isDefaultPlaceholder((s.contentHtml || '').replace(/<[^>]+>/g, '')));
+    
+    // Points de corps (ou toutes sections hors intro/concl/scripture)
+    const currPoints = currentSections.filter(s => {
+      if (s === currIntro || s === currConcl || s === currScripture) return false;
+      const text = (s.contentHtml || '').replace(/<[^>]+>/g, '').trim();
+      return text.length > 0 && !this.isDefaultPlaceholder(text);
+    });
+
+    const adapted = JSON.parse(JSON.stringify(newSections));
+    const targetPoints = adapted.filter(s => s.type === 'point');
+    const targetIntro = adapted.find(s => s.type === 'intro');
+    const targetConcl = adapted.find(s => s.type === 'conclusion');
+    const targetScripture = adapted.find(s => s.type === 'scripture');
+
+    // 1. Adapter l'Introduction
+    if (targetIntro && currIntro) {
+      targetIntro.contentHtml = currIntro.contentHtml;
+    }
+
+    // 2. Adapter la Lecture Biblique
+    if (targetScripture && currScripture) {
+      targetScripture.contentHtml = currScripture.contentHtml;
+    }
+
+    // 3. Adapter les Points séquentiellement
+    const usedCurrPoints = new Set();
+    targetPoints.forEach((tPoint, idx) => {
+      if (idx < currPoints.length) {
+        const cPoint = currPoints[idx];
+        tPoint.contentHtml = cPoint.contentHtml;
+        usedCurrPoints.add(cPoint);
+      }
+    });
+
+    // 4. Gérer les points excédentaires (si l'ancien plan avait plus de points que le nouveau)
+    const surplusPoints = currPoints.filter(p => !usedCurrPoints.has(p));
+    if (surplusPoints.length > 0) {
+      let surplusHtml = '';
+      surplusPoints.forEach(sp => {
+        surplusHtml += `
+          <div class="sermon-preserved-box" style="margin-top: 14px; padding: 10px 14px; background: rgba(245, 158, 11, 0.08); border-left: 3px solid #f59e0b; border-radius: 4px;">
+            <div style="font-size: 11.5px; font-weight: 700; color: #f59e0b; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+              <span>[Texte conservé de l'ancien plan : ${this.escapeHtml(sp.title)}]</span>
+            </div>
+            ${sp.contentHtml}
+          </div>
+        `;
+      });
+
+      const lastPoint = targetPoints[targetPoints.length - 1];
+      if (lastPoint) {
+        lastPoint.contentHtml += surplusHtml;
+      } else if (targetConcl) {
+        targetConcl.contentHtml = surplusHtml + targetConcl.contentHtml;
+      }
+    }
+
+    // 5. Adapter la Conclusion
+    if (targetConcl && currConcl) {
+      targetConcl.contentHtml = currConcl.contentHtml;
+    }
+
+    return adapted;
+  },
+
+  applyStructureResult(structureName, sections, modelMeta = null, successMsg = null) {
+    this.pushHistoryState();
+
+    if (modelMeta && this.currentSermon) {
+      if (!this.currentSermon.big_idea && modelMeta.big_idea) {
+        this.currentSermon.big_idea = modelMeta.big_idea;
+        this.currentSermon.pmt = modelMeta.big_idea;
+        this.currentSermon.pms = modelMeta.big_idea;
+      }
+      if (!this.currentSermon.contemporary_tension && modelMeta.contemporary_tension) {
+        this.currentSermon.contemporary_tension = modelMeta.contemporary_tension;
+      }
+      if (!this.currentSermon.passage?.reference && modelMeta.passage_reference) {
+        this.currentSermon.passage = { reference: modelMeta.passage_reference };
+      }
+      this.updateHeaderSummary(this.currentSermon);
+    }
+
+    this.sections = sections;
+    this.renderSections();
+    this.renderOutline();
+    this.updateMetrics();
+    this.debouncedAutoSave();
+
+    if (typeof App !== 'undefined' && App.showToast) {
+      App.showToast(successMsg || `Structure « ${structureName} » appliquée !`);
+    }
+  },
+
+  confirmStructureApplication(structureName, newSections, modelMeta = null) {
+    if (!this.hasUserContent()) {
+      this.applyStructureResult(structureName, newSections, modelMeta, `Structure « ${structureName} » appliquée !`);
+      return;
+    }
+
+    let modal = document.getElementById('sermon-structure-confirm-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'sermon-structure-confirm-modal';
+      modal.className = 'modal-overlay';
+      modal.style.zIndex = '99999';
+      document.body.appendChild(modal);
+    }
+
+    modal.innerHTML = `
+      <div class="structure-modal-card">
+        <div class="structure-modal-header">
+          <div class="structure-modal-title">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-amber, #f59e0b); flex-shrink: 0;"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span>Application du canevas : ${this.escapeHtml(structureName)}</span>
+          </div>
+          <button class="btn-icon-subtle btn-close-confirm" style="cursor: pointer;"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </div>
+        <div class="structure-modal-body">
+          <div>
+            <div style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">
+              Vous avez déjà du contenu rédigé dans votre prédication.
+            </div>
+            <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.45;">
+              Choisissez comment vous souhaitez intégrer la nouvelle structure sans perdre vos idées.
+            </div>
+          </div>
+
+          <div class="structure-choice-grid">
+            <!-- Option 1 : Conserver & Adapter -->
+            <div class="structure-choice-card highlight btn-opt-adapt">
+              <div class="structure-card-top">
+                <div class="structure-card-icon" style="color: #10b981; background: rgba(16, 185, 129, 0.12);">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </div>
+                <span class="structure-badge instant">100% Instantané</span>
+              </div>
+              <div class="structure-card-title">1. Conserver mes textes &amp; adapter</div>
+              <p class="structure-card-desc">Garde tous vos écrits dans l'ordre, met à jour les titres et fusionne les surplus sans rien perdre (sans IA, 0s).</p>
+            </div>
+
+            <!-- Option 2 : Réorganisation IA -->
+            <div class="structure-choice-card btn-opt-ai">
+              <div class="structure-card-top">
+                <div class="structure-card-icon" style="color: #a855f7; background: rgba(168, 85, 247, 0.12);">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                </div>
+                <span class="structure-badge ai">IA Homilétique</span>
+              </div>
+              <div class="structure-card-title">2. Réorganisation par l'IA</div>
+              <p class="structure-card-desc">L'IA analyse le sens de vos idées et les distribue intelligemment dans les axes du nouveau canevas avec transitions.</p>
+            </div>
+
+            <!-- Option 3 : Brouillon Archive -->
+            <div class="structure-choice-card btn-opt-draft">
+              <div class="structure-card-top">
+                <div class="structure-card-icon" style="color: #f59e0b; background: rgba(245, 158, 11, 0.12);">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+                </div>
+                <span class="structure-badge draft">Brouillon</span>
+              </div>
+              <div class="structure-card-title">3. Appliquer à neuf &amp; archiver</div>
+              <p class="structure-card-desc">Insère le canevas à blanc et place l'intégralité de vos anciens textes dans un bloc replié en bas pour copier/coller.</p>
+            </div>
+
+            <!-- Option 4 : Remplacer à blanc -->
+            <div class="structure-choice-card btn-opt-clean">
+              <div class="structure-card-top">
+                <div class="structure-card-icon" style="color: #94a3b8; background: rgba(148, 163, 184, 0.12);">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </div>
+                <span class="structure-badge clean">Canevas Vierge</span>
+              </div>
+              <div class="structure-card-title">4. Remplacer à blanc</div>
+              <p class="structure-card-desc">Remplace entièrement le plan actuel par le canevas vierge (toujours 100% annulable via ↶ / Ctrl+Z).</p>
+            </div>
+          </div>
+
+          <div id="sermon-restructure-loading-indicator" style="display: none; padding: 14px; background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.25); border-radius: 8px; align-items: center; gap: 12px;">
+            <div class="spinner" style="width: 20px; height: 20px; border-width: 2.5px; border-top-color: #a855f7;"></div>
+            <div style="font-size: 12px; color: var(--text-primary);">
+              <strong>Réorganisation IA en cours...</strong>
+              <div style="font-size: 11px; color: var(--text-secondary);">Redistribution théologique des paragraphes et harmonisation des transitions.</div>
+            </div>
+          </div>
+        </div>
+        <div class="structure-modal-footer">
+          <button type="button" class="btn-secondary btn-close-confirm" style="padding: 7px 16px; font-size: 12px;">
+            <span>Annuler</span>
+          </button>
+        </div>
+      </div>
+    `;
+
+    modal.classList.remove('hidden');
+
+    const closeModal = () => modal.classList.add('hidden');
+
+    modal.querySelectorAll('.btn-close-confirm').forEach(b => b.addEventListener('click', closeModal));
+
+    // Option 1 : Adapter les titres
+    modal.querySelector('.btn-opt-adapt')?.addEventListener('click', () => {
+      closeModal();
+      const adapted = this.adaptSectionsStructure(this.sections, newSections);
+      this.applyStructureResult(structureName, adapted, modelMeta, `Structure « ${structureName} » adaptée avec vos textes !`);
+    });
+
+    // Option 2 : Réorganisation IA
+    modal.querySelector('.btn-opt-ai')?.addEventListener('click', async () => {
+      const loader = document.getElementById('sermon-restructure-loading-indicator');
+      const grid = modal.querySelector('.structure-choice-grid');
+      if (loader) loader.style.display = 'flex';
+      if (grid) grid.style.pointerEvents = 'none';
+
+      try {
+        const res = await API.reorganizeSermonWithAI(this.sections, newSections, this.currentSermon);
+        if (res && res.success && Array.isArray(res.sections) && res.sections.length > 0) {
+          closeModal();
+          this.applyStructureResult(structureName, res.sections, modelMeta, `✓ Prédication restructurée avec succès par l'IA (${res.used_model || 'Modèle IA'}) !`);
+        } else {
+          if (loader) loader.style.display = 'none';
+          if (grid) grid.style.pointerEvents = 'auto';
+          const errMsg = res?.error || "Erreur de communication avec l'assistant IA.";
+          if (confirm(`${errMsg}\n\nSouhaitez-vous basculer instantanément sur l'Option 1 (Conserver et adapter sans IA) ?`)) {
+            closeModal();
+            const adapted = this.adaptSectionsStructure(this.sections, newSections);
+            this.applyStructureResult(structureName, adapted, modelMeta, `Structure « ${structureName} » adaptée avec vos textes !`);
+          }
+        }
+      } catch (err) {
+        if (loader) loader.style.display = 'none';
+        if (grid) grid.style.pointerEvents = 'auto';
+        console.error("Erreur réorganisation IA", err);
+        if (confirm(`Erreur : ${err}\n\nSouhaitez-vous basculer instantanément sur l'Option 1 (Conserver et adapter sans IA) ?`)) {
+          closeModal();
+          const adapted = this.adaptSectionsStructure(this.sections, newSections);
+          this.applyStructureResult(structureName, adapted, modelMeta, `Structure « ${structureName} » adaptée avec vos textes !`);
+        }
+      }
+    });
+
+    // Option 3 : Brouillon Archive
+    modal.querySelector('.btn-opt-draft')?.addEventListener('click', () => {
+      closeModal();
+      let archivedHtml = '';
+      this.sections.forEach((s, idx) => {
+        const text = (s.contentHtml || '').replace(/<[^>]+>/g, '').trim();
+        if (text.length > 0 && !this.isDefaultPlaceholder(text)) {
+          archivedHtml += `
+            <div style="margin-bottom: 14px; padding: 10px 12px; background: rgba(255, 255, 255, 0.04); border-left: 3px solid var(--accent-primary, #3b82f6); border-radius: 4px;">
+              <div style="font-size: 11px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">${this.escapeHtml(s.title || 'Section ' + (idx + 1))}</div>
+              <div style="font-size: 12.5px; line-height: 1.5; color: var(--text-secondary);">${s.contentHtml}</div>
+            </div>
+          `;
+        }
+      });
+
+      const draftSection = {
+        id: `sec_draft_${Date.now()}`,
+        type: 'point',
+        title: 'Brouillon & Textes de la version précédente',
+        contentHtml: archivedHtml || '<p><em>(Aucun texte rédigé précédemment)</em></p>',
+        isCollapsed: true,
+        wordCount: 0,
+        estMinutes: 0
+      };
+
+      const finalSections = [...JSON.parse(JSON.stringify(newSections)), draftSection];
+      this.applyStructureResult(structureName, finalSections, modelMeta, `Structure « ${structureName} » appliquée avec archive brouillon en bas !`);
+    });
+
+    // Option 4 : Remplacer à blanc
+    modal.querySelector('.btn-opt-clean')?.addEventListener('click', () => {
+      closeModal();
+      this.applyStructureResult(structureName, newSections, modelMeta, `Structure « ${structureName} » appliquée à blanc !`);
+    });
   },
 
   // =========================================================================

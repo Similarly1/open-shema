@@ -243,6 +243,10 @@ const API = {
     return await this.call('get_quick_passage_preview', passageRef, bibleName);
   },
 
+  async reorganizeSermonWithAI(currentSections, newStructure, sermonMetadata = null) {
+    return await this.call('reorganize_sermon_sections_ai', currentSections, newStructure, sermonMetadata);
+  },
+
   async getPassageOverviewBundle(bookCode, chapter, verse = 1, bibleName = "LSG") {
     return await this.call('get_passage_overview_bundle', bookCode, parseInt(chapter), parseInt(verse), bibleName);
   },
