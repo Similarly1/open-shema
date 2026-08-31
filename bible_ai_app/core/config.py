@@ -185,6 +185,7 @@ DEFAULTS = {
     "synthesis_fallback_model": "gemini-2.0-flash",
     "synthesis_max_verses": 5,
     "synthesis_system_prompt": DEFAULT_SYNTHESIS_SYSTEM_PROMPT,
+    "intro_synthesis_system_prompt": DEFAULT_INTRO_SYNTHESIS_SYSTEM_PROMPT,
     "summary_model": "gemini-2.5-flash",
     "summary_fallback_model": "gemini-2.0-flash",
     "summary_word_count": 300,

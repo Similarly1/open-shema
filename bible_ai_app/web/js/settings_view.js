@@ -296,6 +296,26 @@ RÈGLES CRITIQUES DE RÉDACTION :
    - ## 3. Clés Textuelles & Applications Pastorales (Enseignements théologiques majeurs, implications pratiques et spirituelles pour la vie chrétienne)
    - ## 4. Synthèse des Sources Étudiées (Liste avec chaque auteur en gras suivi de deux-points et de son apport unique, ex: \`* **Jean Calvin** : Démontre la création ex nihilo...\`)`,
 
+  DEFAULT_INTRO_SYNTH_PROMPT: `Vous êtes un professeur chevronné d'études bibliques, d'herméneutique et d'introduction au texte sacré.
+Votre mission est de produire une SYNTHÈSE COMPARATIVE MAJEURE D'INTRODUCTION AU LIVRE BIBLIQUE, en croisant rigoureusement toutes les introductions exégétiques fournies ci-dessous.
+
+STRUCTURE IMPÉRATIVE (Markdown clair avec intertitres structurés) :
+- ## 1. Contexte Historique, Auteur, Destinataires & Date
+  (Synthèse critique : paternité littéraire, milieu d'origine, débats de datation et destinataires premiers)
+- ## 2. But Principal, Thème Central & Portée Théologique
+  (L'intention fondamentale de l'écrit, son message salvateur et son rôle canonique)
+- ## 3. Versets Pivots & Mots-Clés Porteurs
+  (Les passages phares et notions directrices identifiés par les commentateurs)
+- ## 4. Architecture Littéraire & Plan d'Ensemble
+  (Comparaison des structures et grandes articulations proposées par les auteurs)
+- ## 5. Perspectives Comparatives & Apports Uniques par Source
+  (Synthèse des angles distinctifs de chaque commentateur, ex: TGC, Godet, Gaebelein, Meyer, Scofield...)
+
+RÈGLES CRITIQUES :
+1. LANGUE : Français impeccable, clair, soutenu et fluide.
+2. CITATION DES AUTEURS : Citez les auteurs en GRAS dans vos phrases (ex: « selon **TGC**, ... », « **Frédéric Godet** défend... »).
+3. FIDÉLITÉ STRICTE : Basez votre analyse exclusivement sur les extraits d'introductions fournis. Zéro extrapolation non documentée.`,
+
   DEFAULT_TRANS_PROMPT: `Vous êtes un traducteur exégétique et théologique de haute précision.
 Votre mission est de traduire fidèlement, intégralement et précisément le texte biblique, commentaire ou notice de dictionnaire fourni vers le français.
 
@@ -450,6 +470,13 @@ Règles impératives :
       fieldId: 'cfg-synthesis-system-prompt',
       badgeId: 'badge-synth-status',
       label: 'Synthèse Exégétique'
+    },
+    intro_synthesis: {
+      title: 'System Prompt — Synthèse d\'Introduction au Livre',
+      defaultProp: 'DEFAULT_INTRO_SYNTH_PROMPT',
+      fieldId: 'cfg-intro-synthesis-system-prompt',
+      badgeId: 'badge-intro-synth-status',
+      label: 'Synthèse d\'Introduction'
     },
     translation: {
       title: 'System Prompt — Traduction Fidèle d\'Articles & Dictionnaires',
@@ -776,6 +803,7 @@ Règles impératives :
       { type: 'mode_lexical', open: 'btn-open-modal-mode-lexical-prompt', reset: 'btn-reset-mode-lexical-prompt' },
       { type: 'mode_free_chat', open: 'btn-open-modal-mode-free_chat-prompt', reset: 'btn-reset-mode-free_chat-prompt' },
       { type: 'synthesis', open: 'btn-open-modal-synth-prompt', reset: 'btn-reset-synth-prompt' },
+      { type: 'intro_synthesis', open: 'btn-open-modal-intro-synth-prompt', reset: 'btn-reset-intro-synth-prompt' },
       { type: 'translation', open: 'btn-open-modal-trans-prompt', reset: 'btn-reset-trans-prompt' },
       { type: 'summary', open: 'btn-open-modal-summary-prompt', reset: 'btn-reset-summary-prompt' },
       { type: 'note_title', open: 'btn-open-modal-note-title-prompt', reset: 'btn-reset-note-title-prompt' },

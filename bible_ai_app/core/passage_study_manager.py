@@ -852,9 +852,31 @@ class PassageStudyManager:
         except Exception as e:
             logger.warning("Erreur recherche dictionnaires : %s", e)
 
+        # 3. Introductions générales et plans d'ensemble du livre
+        book_intros = []
+        try:
+            raw_intros = CommentaryLoader.get_all_comments_for_verse_range(book_code, 0, 0, 0)
+            intro_docs = raw_intros.get("documents", [])
+            intro_metas = raw_intros.get("metadatas", [])
+            for idx, text in enumerate(intro_docs):
+                meta = intro_metas[idx] if idx < len(intro_metas) else {}
+                auth = meta.get("name") or meta.get("author") or "Commentaire"
+                cid = meta.get("commentary_id") or auth
+                book_intros.append({
+                    "author": auth,
+                    "id": cid,
+                    "title": meta.get("title") or auth,
+                    "period": meta.get("period", "Ouvrage de référence"),
+                    "text": text,
+                    "reference": meta.get("reference", f"Introduction à {get_french_book_name(book_code)}")
+                })
+        except Exception as e:
+            logger.warning("Erreur extraction introductions de livre : %s", e)
+
         return {
             "places": detected_places,
-            "dict_entries": dict_entries
+            "dict_entries": dict_entries,
+            "book_introductions": book_intros
         }
 
     @classmethod

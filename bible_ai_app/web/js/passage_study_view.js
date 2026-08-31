@@ -67,6 +67,8 @@ const PassageStudyView = {
   mapBounds: null,
   activeDictTerm: null,
   activeDictSourceIdx: 0,
+  activeIntroAuthorIdx: 0,
+  isIntroExpanded: false,
 
   // Icônes SVG sobres
   ICONS: {
@@ -1450,6 +1452,40 @@ const PassageStudyView = {
     }
   },
 
+  async generateIntroSynthesis() {
+    const synthBox = document.getElementById('ps-intro-synth-box');
+    const synthContent = document.getElementById('ps-intro-synth-content');
+    if (!synthBox || !synthContent) return;
+
+    synthBox.classList.remove('hidden');
+    synthContent.innerHTML = `
+      <div class="ps-loading-skeleton" style="padding: 12px 0;">
+        <div class="ps-skeleton-line" style="width: 80%;"></div>
+        <div class="ps-skeleton-line" style="width: 95%;"></div>
+        <div class="ps-skeleton-line" style="width: 65%;"></div>
+      </div>
+    `;
+
+    try {
+      const d = this.currentData;
+      const res = await API.synthesizeCommentaries(d.book_code, 0, 0, 0);
+      if (res && res.synthesis) {
+        synthContent.innerHTML = `<div class="markdown-body" style="font-size: 14.5px; line-height: 1.75;">${this.formatMarkdownSimple(res.synthesis)}</div>`;
+        if (typeof NotificationManager !== 'undefined') {
+          NotificationManager.notifyAICompletion({
+            title: "Synthèse d'Introduction",
+            snippet: `Introduction à ${d.french_book || d.book_code}`,
+            targetView: 'passage-study'
+          });
+        }
+      } else {
+        synthContent.innerHTML = `<p class="ps-error-p">Synthèse non disponible ou aucune introduction suffisante.</p>`;
+      }
+    } catch (err) {
+      synthContent.innerHTML = `<p class="ps-error-p">Erreur lors de la génération de la synthèse d'introduction.</p>`;
+    }
+  },
+
   // =========================================================================
   // 4. SECTION CONTEXTE HISTORIQUE, DICTIONNAIRES & CARTOGRAPHIE INTERACTIVE
   // =========================================================================
@@ -1459,6 +1495,13 @@ const PassageStudyView = {
 
     const places = enc.places || [];
     const dicts = enc.dict_entries || [];
+    const bookIntros = enc.book_introductions || [];
+    const frenchBook = this.currentData?.french_book || this.currentData?.book_code || '';
+
+    if (this.activeIntroAuthorIdx >= bookIntros.length) {
+      this.activeIntroAuthorIdx = 0;
+    }
+    const activeIntro = bookIntros[this.activeIntroAuthorIdx] || (bookIntros.length > 0 ? bookIntros[0] : null);
 
     // Déterminer le terme dictionnaire actif par défaut
     if (!this.activeDictTerm && dicts.length > 0) {
@@ -1475,6 +1518,75 @@ const PassageStudyView = {
       : (currentDictEntry && currentDictEntry.articles ? currentDictEntry.articles[0] : null);
 
     let html = `
+      <!-- 0. SECTION PLEINE LARGEUR : INTRODUCTION & PANORAMA DU LIVRE -->
+      <div class="ps-card ps-book-intro-card" style="margin-bottom: 22px;">
+        <div class="ps-card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <div class="ps-card-title-group">
+            <span class="ps-card-icon">${this.ICONS.bookOpen || this.ICONS.bible}</span>
+            <div>
+              <h3 class="ps-card-title">Introduction & Panorama du Livre : ${this.escapeHtml(frenchBook)}</h3>
+              <div class="ps-card-subtitle">Contexte historique, paternité littéraire, but théologique et architecture d'ensemble</div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="ps-badge ps-badge-neutral">${bookIntros.length} ouvrage${bookIntros.length > 1 ? 's' : ''}</span>
+            <button type="button" class="ps-btn-sm ps-btn-synth" id="btn-ps-synth-intro" title="Générer la grande synthèse comparative d'introduction par l'IA" style="display: flex; align-items: center; gap: 6px;">
+              <span class="ps-icon-slot">${this.ICONS.sparkles}</span>
+              <span>Synthèse IA</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Boîte de synthèse IA de l'introduction -->
+        <div id="ps-intro-synth-box" class="ps-synth-box hidden" style="margin: 14px 16px; padding: 16px; border-radius: 8px; background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.25);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <strong style="color: #a78bfa; font-size: 13.5px; display: flex; align-items: center; gap: 6px;">
+              ${this.ICONS.sparkles} Synthèse Comparative d'Introduction (IA)
+            </strong>
+            <button type="button" class="ps-btn-sm" id="btn-ps-close-intro-synth" style="padding: 2px 8px; font-size: 11px;">Fermer</button>
+          </div>
+          <div id="ps-intro-synth-content"></div>
+        </div>
+
+        ${bookIntros.length > 0 ? `
+          <!-- Sélecteur horizontal d'auteurs d'introduction -->
+          <div class="ps-dict-chips-bar" style="padding: 10px 16px; border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.08));">
+            <span class="ps-dict-chips-label">Auteurs :</span>
+            <div class="ps-dict-chips-scroll" id="ps-intro-authors-list">
+              ${bookIntros.map((intro, idx) => `
+                <button type="button" class="ps-dict-chip ps-intro-author-chip ${idx === this.activeIntroAuthorIdx ? 'active' : ''}" data-intro-idx="${idx}">
+                  <span class="ps-dict-chip-text">${this.escapeHtml(intro.author)}</span>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Corps de l'exégèse d'introduction -->
+          <div class="ps-intro-reader-body" id="ps-intro-reader-body" style="padding: 18px 20px; max-height: ${this.isIntroExpanded ? 'none' : '260px'}; overflow-y: ${this.isIntroExpanded ? 'visible' : 'hidden'}; position: relative;">
+            <div class="ps-intro-text-rendered markdown-body" id="ps-intro-rendered-text" style="font-size: 14.5px; line-height: 1.75;">
+              ${this.formatDictionaryMarkdown(activeIntro ? activeIntro.text : '')}
+            </div>
+            ${!this.isIntroExpanded ? `
+              <div id="ps-intro-fade-overlay" class="ps-intro-fade-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: linear-gradient(to bottom, transparent, var(--bg-card, #1c1917)); pointer-events: none;"></div>
+            ` : ''}
+          </div>
+
+          <div class="ps-intro-footer" style="padding: 10px 18px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color, rgba(255,255,255,0.06));">
+            <span id="ps-intro-source-info" style="font-size: 12px; color: var(--text-muted, #888); font-style: italic;">
+              ${this.escapeHtml(activeIntro ? activeIntro.author : '')} • ${this.escapeHtml(activeIntro ? activeIntro.period : '')}
+            </span>
+            <button type="button" class="ps-btn-sm" id="btn-ps-toggle-intro-expand" style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+              <span id="ps-toggle-intro-label">${this.isIntroExpanded ? 'Réduire la lecture ▲' : 'Déplier l\'introduction complète ▾'}</span>
+            </button>
+          </div>
+        ` : `
+          <div style="padding: 24px; text-align: center; color: var(--text-muted, #888);">
+            <p>Aucune notice d'introduction générale trouvée pour ce livre dans vos commentaires locaux.</p>
+          </div>
+        `}
+      </div>
+
+      <!-- DEUX COLONNES CÔTE À CÔTE : CARTE GÉOGRAPHIQUE & DICTIONNAIRES -->
       <div class="ps-grid-2col ps-encyclopedia-grid">
         <!-- 1. GÉOGRAPHIE & LIEUX BIBLIQUES AVEC CARTE LEAFLET INTERACTIVE -->
         <div class="ps-card ps-places-card">
@@ -1812,6 +1924,55 @@ const PassageStudyView = {
   },
 
   bindEncyclopediaEvents(places, dicts) {
+    // 0. Clic sur les pilules d'auteurs d'introduction
+    const bookIntros = this.currentData?.encyclopedia?.book_introductions || [];
+    document.querySelectorAll('.ps-intro-author-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const idx = parseInt(chip.dataset.introIdx, 10) || 0;
+        this.activeIntroAuthorIdx = idx;
+        document.querySelectorAll('.ps-intro-author-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+
+        const activeIntro = bookIntros[idx];
+        const textField = document.getElementById('ps-intro-rendered-text');
+        const sourceInfo = document.getElementById('ps-intro-source-info');
+        if (textField && activeIntro) {
+          textField.innerHTML = this.formatDictionaryMarkdown(activeIntro.text);
+        }
+        if (sourceInfo && activeIntro) {
+          sourceInfo.textContent = `${activeIntro.author} • ${activeIntro.period || 'Ouvrage de référence'}`;
+        }
+      });
+    });
+
+    // 0b. Déplier / Réduire l'introduction
+    document.getElementById('btn-ps-toggle-intro-expand')?.addEventListener('click', () => {
+      this.isIntroExpanded = !this.isIntroExpanded;
+      const readerBody = document.getElementById('ps-intro-reader-body');
+      const fadeOverlay = document.getElementById('ps-intro-fade-overlay');
+      const toggleLabel = document.getElementById('ps-toggle-intro-label');
+
+      if (readerBody) {
+        readerBody.style.maxHeight = this.isIntroExpanded ? 'none' : '260px';
+        readerBody.style.overflowY = this.isIntroExpanded ? 'visible' : 'hidden';
+      }
+      if (fadeOverlay) {
+        fadeOverlay.style.display = this.isIntroExpanded ? 'none' : 'block';
+      }
+      if (toggleLabel) {
+        toggleLabel.textContent = this.isIntroExpanded ? 'Réduire la lecture ▲' : 'Déplier l\'introduction complète ▾';
+      }
+    });
+
+    // 0c. Synthèse IA de l'introduction
+    document.getElementById('btn-ps-synth-intro')?.addEventListener('click', () => {
+      this.generateIntroSynthesis();
+    });
+
+    document.getElementById('btn-ps-close-intro-synth')?.addEventListener('click', () => {
+      document.getElementById('ps-intro-synth-box')?.classList.add('hidden');
+    });
+
     // 1. Bouton Agrandir / Réduire la carte
     document.getElementById('btn-ps-map-expand')?.addEventListener('click', () => {
       const mapWrap = document.querySelector('.ps-map-wrap');
