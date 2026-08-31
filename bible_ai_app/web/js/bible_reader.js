@@ -790,8 +790,30 @@ const CommentaryViewer = {
       this.adjustFontSize(1);
     });
 
-    // 0d. Bouton d'accès direct à l'Introduction du livre
-    document.getElementById('btn-comm-open-intro')?.addEventListener('click', (e) => {
+    // 0d. Commutateur de mode Verset / Intro du livre (Option 1)
+    document.getElementById('btn-comm-mode-verse')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (this.currentChapter === 0) {
+        const curBk = this.currentBook || BibleReader?.currentBook || 'Gen';
+        const v = (typeof BibleReader !== 'undefined' && BibleReader.selectedVerse) ? BibleReader.selectedVerse : 1;
+        const ch = (typeof BibleReader !== 'undefined' && BibleReader.currentChapter && BibleReader.currentChapter > 0) ? BibleReader.currentChapter : 1;
+        if (this.isSynchronized && typeof BibleReader !== 'undefined') {
+          BibleReader.selectVerse(curBk, ch, v, { scroll: true, behavior: 'smooth', block: 'center' });
+        } else {
+          this.currentBook = curBk;
+          this.currentChapter = ch;
+          this.currentVerse = v;
+          const bInfo = typeof getBookInfo === 'function' ? getBookInfo(curBk) : { name: curBk };
+          const refStr = `${bInfo.name || curBk} ${ch}:${v}`;
+          this.updateLiveBadge(refStr);
+          API.getCommentaries(curBk, ch, v).then(comms => {
+            this.setComments(comms, refStr, curBk, ch, v);
+          }).catch(err => console.error(err));
+        }
+      }
+    });
+
+    document.getElementById('btn-comm-mode-intro')?.addEventListener('click', (e) => {
       e.stopPropagation();
       this.loadIntroduction();
     });
@@ -940,6 +962,16 @@ const CommentaryViewer = {
     App.showToast(`Taille du texte : ${this.fontSize}px`);
   },
 
+  updateModeSwitchUI() {
+    const isIntro = this.currentChapter === 0;
+    const btnV = document.getElementById('btn-comm-mode-verse');
+    const btnI = document.getElementById('btn-comm-mode-intro');
+    if (btnV && btnI) {
+      btnV.classList.toggle('active', !isIntro);
+      btnI.classList.toggle('active', isIntro);
+    }
+  },
+
   async loadIntroduction(bookCode = null) {
     const book = bookCode || this.currentBook || (typeof BibleReader !== 'undefined' ? BibleReader.currentBook : 'Gen');
     const bookInfo = typeof getBookInfo === 'function' ? getBookInfo(book) : { name: book };
@@ -948,6 +980,7 @@ const CommentaryViewer = {
     this.currentChapter = 0;
     this.currentVerse = 0;
     this.updateLiveBadge(refStr);
+    this.updateModeSwitchUI();
     
     try {
       const comms = await API.getCommentaries(book, 0, 0);
@@ -1431,8 +1464,43 @@ const CommentaryViewer = {
       `;
     }
 
+    const bInfo = typeof getBookInfo === 'function' ? getBookInfo(this.currentBook) : { name: this.currentBook };
+    let introContextBannerHtml = '';
+    if (this.currentChapter === 1) {
+      introContextBannerHtml = `
+        <div class="comm-chapter-intro-banner">
+          <div class="intro-banner-left">
+            <span class="intro-banner-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/></svg>
+            </span>
+            <span class="intro-banner-text">Vous consultez le début de <strong>${bInfo.name || this.currentBook}</strong></span>
+          </div>
+          <button type="button" class="intro-banner-btn" id="btn-comm-card-open-intro">
+            <span>Lire l'Introduction</span>
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+      `;
+    } else if (this.currentChapter === 0) {
+      introContextBannerHtml = `
+        <div class="comm-chapter-intro-banner is-intro-mode">
+          <div class="intro-banner-left">
+            <span class="intro-banner-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+            </span>
+            <span class="intro-banner-text">Introduction générale au livre de <strong>${bInfo.name || this.currentBook}</strong></span>
+          </div>
+          <button type="button" class="intro-banner-btn" id="btn-comm-card-back-verse">
+            <span>Vers Chapitre 1:1</span>
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+      `;
+    }
+
     container.innerHTML = `
       <div class="comm-single-card">
+        ${introContextBannerHtml}
         <div class="comm-single-author-header">
           <div class="comm-single-author-info">
             <div class="comm-single-author-avatar" style="background-color: ${sourceMeta.color || '#1E3A8A'};">
@@ -1464,6 +1532,32 @@ const CommentaryViewer = {
         </div>
       </div>
     `;
+
+    // Écouteurs pour le bandeau d'introduction contextuel (Option 4)
+    container.querySelector('#btn-comm-card-open-intro')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.loadIntroduction();
+    });
+    container.querySelector('#btn-comm-card-back-verse')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const curBk = this.currentBook || BibleReader?.currentBook || 'Gen';
+      const v = (typeof BibleReader !== 'undefined' && BibleReader.selectedVerse) ? BibleReader.selectedVerse : 1;
+      if (this.isSynchronized && typeof BibleReader !== 'undefined') {
+        BibleReader.selectVerse(curBk, 1, v, { scroll: true, behavior: 'smooth', block: 'center' });
+      } else {
+        this.currentBook = curBk;
+        this.currentChapter = 1;
+        this.currentVerse = v;
+        const bookInfo = typeof getBookInfo === 'function' ? getBookInfo(curBk) : { name: curBk };
+        const refStr = `${bookInfo.name || curBk} 1:${v}`;
+        this.updateLiveBadge(refStr);
+        API.getCommentaries(curBk, 1, v).then(comms => {
+          this.setComments(comms, refStr, curBk, 1, v);
+        }).catch(err => console.error(err));
+      }
+    });
+
+    this.updateModeSwitchUI();
 
     // 4. Lier FootnoteTooltip (infobulles de notes au survol et au clic)
     if (typeof FootnoteTooltip !== 'undefined') {

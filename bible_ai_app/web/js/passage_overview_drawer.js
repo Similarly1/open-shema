@@ -795,15 +795,36 @@ const PassageOverviewDrawer = {
     const totalChap = data.stats?.chapter_commentaries_count || list.length;
 
     let bodyHtml = '';
+    const bFr = typeof getFrenchBookName === 'function' ? getFrenchBookName(data.book) : (data.book_french || data.book);
+    const introCardHtml = (parseInt(data.chapter, 10) === 1) ? `
+      <div class="overview-intro-card" data-action="open-book-intro" data-book="${this.escapeHtml(data.book)}">
+        <div class="overview-intro-header">
+          <span class="overview-intro-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+          </span>
+          <div class="overview-intro-title-box">
+            <span class="overview-intro-title">Introduction générale à ${this.escapeHtml(bFr)}</span>
+            <span class="overview-intro-sub">But, verset clé, contexte historique et plan</span>
+          </div>
+          <span class="overview-intro-badge">Intro</span>
+        </div>
+        <div class="overview-intro-action">
+          <span>Lire l'analyse d'introduction complète</span>
+          ${this.icons.arrowRight}
+        </div>
+      </div>
+    ` : '';
+
     if (list.length === 0) {
       bodyHtml = `
+        ${introCardHtml}
         <div class="overview-empty-hint">
           <span>Aucun commentaire direct sur ce verset précis.</span>
           ${totalChap > 0 ? `<button class="overview-link-btn" data-action="open-commentaries-tab">Voir les ${totalChap} commentaires du chapitre ${data.chapter} ${this.icons.arrowRight}</button>` : ''}
         </div>
       `;
     } else {
-      bodyHtml = `<div class="overview-clean-list">`;
+      bodyHtml = `${introCardHtml}<div class="overview-clean-list">`;
       
       const renderItem = (c, idx) => {
         const author = c.author || c.source_name || 'Commentaire';
@@ -1245,6 +1266,24 @@ const PassageOverviewDrawer = {
             }
           }, 60);
         }
+      });
+    });
+
+    // 2b. Clic sur la carte d'introduction générale au livre (Option 3)
+    container.querySelectorAll('[data-action="open-book-intro"]').forEach(card => {
+      card.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const book = card.dataset.book;
+        if (typeof CommentaryWindow !== 'undefined' && typeof CommentaryWindow.switchTab === 'function') {
+          CommentaryWindow.switchTab('commentaries');
+        } else {
+          document.querySelector('.drawer-tab[data-drawer-tab="commentaries"]')?.click();
+        }
+        setTimeout(() => {
+          if (typeof CommentaryViewer !== 'undefined') {
+            CommentaryViewer.loadIntroduction(book);
+          }
+        }, 50);
       });
     });
 

@@ -13256,6 +13256,198 @@ body.comm-full-width #view-commentaries .comm-verse-banner {
 /* ======================================================= */
 /* BOUTONS ET BANNIÈRES D'INTRODUCTION AU LIVRE            */
 /* ======================================================= */
+.comm-mode-switch-group {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-card, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  border-radius: 6px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.comm-mode-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, #94a3b8);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.comm-mode-pill svg {
+  opacity: 0.8;
+}
+
+.comm-mode-pill:hover {
+  color: var(--text-primary, #ffffff);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.comm-mode-pill.active {
+  background: var(--accent-blue, #38BDF8);
+  color: #0f172a !important;
+  font-weight: 700;
+}
+
+.comm-mode-pill.active svg {
+  opacity: 1;
+  stroke: #0f172a;
+}
+
+/* Bandeau contextuel discret dans la carte de commentaire (Option 4) */
+.comm-chapter-intro-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 12px;
+  margin-bottom: 12px;
+  background: rgba(56, 189, 248, 0.07);
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.comm-chapter-intro-banner.is-intro-mode {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.22);
+}
+
+.comm-chapter-intro-banner .intro-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.comm-chapter-intro-banner .intro-banner-icon {
+  color: var(--accent-blue, #38BDF8);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.comm-chapter-intro-banner.is-intro-mode .intro-banner-icon {
+  color: #10B981;
+}
+
+.comm-chapter-intro-banner .intro-banner-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.comm-chapter-intro-banner .intro-banner-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: rgba(56, 189, 248, 0.14);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  border-radius: 4px;
+  color: var(--accent-blue, #38BDF8);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.comm-chapter-intro-banner .intro-banner-btn:hover {
+  background: var(--accent-blue, #38BDF8);
+  color: #0f172a;
+}
+
+.comm-chapter-intro-banner.is-intro-mode .intro-banner-btn {
+  background: rgba(16, 185, 129, 0.14);
+  border-color: rgba(16, 185, 129, 0.28);
+  color: #10B981;
+}
+
+.comm-chapter-intro-banner.is-intro-mode .intro-banner-btn:hover {
+  background: #10B981;
+  color: #0f172a;
+}
+
+/* Carte d'introduction dans le panneau Aperçu (Option 3) */
+.overview-intro-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  background: var(--bg-surface, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  border-left: 3px solid var(--accent-blue, #38BDF8);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.overview-intro-card:hover {
+  background: var(--bg-hover, rgba(255, 255, 255, 0.06));
+  border-color: var(--accent-blue, #38BDF8);
+}
+
+.overview-intro-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.overview-intro-icon {
+  color: var(--accent-blue, #38BDF8);
+  display: flex;
+  align-items: center;
+}
+
+.overview-intro-title-box {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.overview-intro-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary, #ffffff);
+}
+
+.overview-intro-sub {
+  font-size: 11px;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.overview-intro-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  background: rgba(56, 189, 248, 0.12);
+  color: var(--accent-blue, #38BDF8);
+  border-radius: 4px;
+}
+
+.overview-intro-action {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-blue, #38BDF8);
+}
+
 .comm-nav-intro-btn {
   display: inline-flex;
   align-items: center;
@@ -13276,56 +13468,6 @@ body.comm-full-width #view-commentaries .comm-verse-banner {
 .comm-nav-intro-btn:hover {
   background: rgba(56, 189, 248, 0.22);
   border-color: #38BDF8;
-}
-
-.bible-book-intro-badge {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 16px;
-  margin: 8px 0 20px 0;
-  background: var(--bg-surface, rgba(255, 255, 255, 0.03));
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-  border-left: 3px solid var(--accent-blue, #38BDF8);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.bible-book-intro-badge:hover {
-  background: var(--bg-hover, rgba(255, 255, 255, 0.06));
-  border-color: var(--accent-blue, #38BDF8);
-  transform: translateY(-1px);
-}
-
-.intro-badge-content {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.intro-badge-icon {
-  font-size: 16px;
-}
-
-.intro-badge-title {
-  font-size: 13.5px;
-  font-weight: 700;
-  color: var(--text-primary, #ffffff);
-}
-
-.intro-badge-desc {
-  font-size: 12px;
-  color: var(--text-secondary, #94a3b8);
-  margin-left: 6px;
-}
-
-.intro-badge-arrow {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--accent-blue, #38BDF8);
-  white-space: nowrap;
 }
 
 /* ÉTATS VIDES ET CHARGEMENT */
