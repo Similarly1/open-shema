@@ -4,19 +4,23 @@ title: Le regard de la vitre sans tain
 category: Épreuve & Souffrance
 type: Métaphore & Vie courante
 tags:
-- regard
-- honte
-- sartre
-- aliénation
-passages_associes: []
-source: 'Prédication : Le corps chez Sartre'
-author: Évangile 21
+- Regard
+- Identité
+- Aliénation
+- Sartre
+- Jugement
+passages_associes:
+- Pr 29.25
+- Rm 8.1
+- 1 Co 4.3
+source: Ressource pastorale
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-31T09:00:55'
-updated_at: '2026-08-31T09:00:55'
+updated_at: '2026-08-31T10:35:16'
 ---
 
-Imaginez un homme marchant dans une rue animée en plein centre-ville, absorbé par ses pensées, se sentant pleinement lui-même, libre et souverain dans sa bulle intérieure. Soudain, il lève les yeux et aperçoit, derrière la grande vitre sans tain du premier étage d'un café, un groupe de connaissances qui l'observe en silence, le pointant du doigt et chuchotant. En une fraction de seconde, toute sa quiétude s'évapore. Cet homme qui se sentait sujet agissant se fige, saisi par une conscience fulgurante de sa propre extériorité.
+Un homme marche dans une rue animée en plein centre-ville, absorbé par ses pensées, se sentant pleinement lui-même, libre et souverain dans sa bulle intérieure. Soudain, il lève les yeux et aperçoit, derrière la grande vitre sans tain du premier étage d'un café, un groupe de connaissances qui l'observe en silence, le pointant du doigt et chuchotant. En une fraction de seconde, toute sa quiétude s'évapore. Cet homme qui se sentait sujet agissant se fige, saisi par une conscience fulgurante de sa propre extériorité.
 
 Il prend conscience de sa démarche qu'il juge tout à coup maladroite, de la coupe de ses cheveux, de la tache invisible sur son manteau. Le regard des autres le traverse et le pétrifie. Il n'est plus maître de sa propre identité ; il est devenu un objet pour autrui, réduit à l'image que les autres se font de lui. La liberté s'effondre pour laisser place à un malaise profond, à une sensation d'expropriation de soi-même.
 

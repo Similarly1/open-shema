@@ -1,18 +1,23 @@
 ---
 id: yt-e21-74503-724
-title: La greffe divine sur un arbre pourri
-category: Foi & Confiance
-type: Récit historique
+title: 'La greffe divine : le Nouvel Adam'
+category: Grâce & Salut
+type: Métaphore & Vie courante
 tags:
-- Nouvel Adam
+- Salut
+- Grâce
 - Péché originel
-- SOUCHE
-passages_associes: []
-source: 'Prédication : Pourquoi Jésus devait-il naître d’une vierge ?'
-author: Évangile 21
+- Jésus
+- Nouvelle naissance
+passages_associes:
+- 1 Co 15.45
+- Rm 5.12
+- Jn 3.3
+source: Prédication contemporaine
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-31T09:04:44'
-updated_at: '2026-08-31T09:04:44'
+updated_at: '2026-08-31T10:29:51'
 ---
 
 Au début du XXe siècle, dans les immenses vergers de pommiers de l'État de New York, un arboriculteur renommé fit face à une crise majeure. Une maladie fongique féroce et invisible, transmise par la sève de génération en génération à travers les racines, avait contaminé l'intégralité de ses vergers séculaires. Chaque arbre issu des graines ou des boutures de ces arbres portait inévitablement le gène de la pourriture. Dès que les bourgeons sortaient au printemps, ils paraissaient sains un court instant, puis se nécrobraient de l'intérieur. Les ouvriers eurent beau essayer tous les engrais connus, tailler les branches mortes, arroser abondamment, rien n'y fit : le fruit était irrémédiablement compromis par la souche.

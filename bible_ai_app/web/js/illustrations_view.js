@@ -14,6 +14,7 @@ const IllustrationsView = {
   activeCategory: 'all',
   activeType: 'all',
   activeStatus: 'all',
+  activeSort: 'date_desc',
   searchQuery: '',
 
   // Éléments DOM
@@ -78,7 +79,14 @@ const IllustrationsView = {
       });
     });
 
-    // 5. Actions d'en-tête
+    // 5. Sélecteur de Tri (Date ou Alphabétique)
+    const sortSelect = document.getElementById('ill-sort-select');
+    sortSelect?.addEventListener('change', () => {
+      this.activeSort = sortSelect.value || 'date_desc';
+      this.loadFirstPage();
+    });
+
+    // 6. Actions d'en-tête
     document.getElementById('btn-open-illustrations-folder')?.addEventListener('click', () => {
       API.openIllustrationsFolder();
     });
@@ -177,7 +185,8 @@ const IllustrationsView = {
         query: this.searchQuery,
         category: this.activeCategory,
         type: this.activeType,
-        status: this.activeStatus
+        status: this.activeStatus,
+        sortBy: this.activeSort
       });
 
       this.illustrations = Array.isArray(res.items) ? res.items : [];
@@ -218,7 +227,8 @@ const IllustrationsView = {
         query: this.searchQuery,
         category: this.activeCategory,
         type: this.activeType,
-        status: this.activeStatus
+        status: this.activeStatus,
+        sortBy: this.activeSort
       });
 
       const newItems = Array.isArray(res.items) ? res.items : [];
@@ -430,24 +440,8 @@ const IllustrationsView = {
     const ill = this.currentIllustration;
     if (!ill) return;
 
-    // Badges en-tête
-    const typeBadge = document.getElementById('ill-modal-type-badge');
-    const catBadge = document.getElementById('ill-modal-category-badge');
+    // Titre de la modale (uniquement le titre, badges retirés car présents à droite)
     const modalTitle = document.getElementById('ill-modal-title');
-
-    if (typeBadge) {
-      typeBadge.textContent = ill.type || 'Histoire vraie';
-      typeBadge.className = 'ill-modal-badge';
-      const t = ill.type || '';
-      if (t.includes('Histoire')) typeBadge.classList.add('type-history');
-      else if (t.includes('Citation')) typeBadge.classList.add('type-quote');
-      else if (t.includes('Science')) typeBadge.classList.add('type-science');
-    }
-
-    if (catBadge) {
-      catBadge.textContent = ill.category || 'Général';
-    }
-
     if (modalTitle) {
       modalTitle.textContent = ill.title ? ill.title : 'Sans titre';
     }
@@ -465,9 +459,8 @@ const IllustrationsView = {
     const viewType = document.getElementById('ill-view-type');
     if (viewType) viewType.textContent = ill.type || 'Histoire vraie';
 
-    // Passages bibliques cliquables
+    // Passages bibliques cliquables (Noms courts, pas de SVG, infobulle au survol)
     const passagesList = document.getElementById('ill-view-passages-list');
-    const passagesBox = document.getElementById('ill-view-passages-box');
     if (passagesList) {
       const raw = ill.passages_associes;
       const list = Array.isArray(raw) ? raw : (raw ? String(raw).split(',').map(s => s.trim()).filter(Boolean) : []);
@@ -475,20 +468,33 @@ const IllustrationsView = {
       if (list.length === 0) {
         passagesList.innerHTML = '<span class="text-muted" style="font-size: 11.5px; font-style: italic;">Aucun passage lié</span>';
       } else {
-        passagesList.innerHTML = list.map(ref => `
-          <button class="ill-passage-pill" data-ref="${this.escapeHtml(ref)}" title="Ouvrir ${this.escapeHtml(ref)} dans le lecteur biblique">
-            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-            <span>${this.escapeHtml(ref)}</span>
-          </button>
-        `).join('');
+        passagesList.innerHTML = list.map(ref => {
+          const shortRef = this.shortenReference(ref);
+          return `
+            <button class="ill-passage-pill" data-ref="${this.escapeHtml(ref)}" data-short="${this.escapeHtml(shortRef)}" title="Cliquer pour ouvrir dans la Bible">
+              <span>${this.escapeHtml(shortRef)}</span>
+            </button>
+          `;
+        }).join('');
 
-        // Navigation vers le passage biblique au clic
+        // Navigation et infobulle au survol
         passagesList.querySelectorAll('.ill-passage-pill').forEach(btn => {
+          const rawRef = btn.dataset.ref;
+          const shortRef = btn.dataset.short;
+
+          btn.addEventListener('mouseenter', (e) => {
+            this.showVerseTooltip(e, btn, rawRef, shortRef);
+          });
+
+          btn.addEventListener('mouseleave', () => {
+            this.hideVerseTooltip();
+          });
+
           btn.addEventListener('click', (e) => {
             e.stopPropagation();
-            const ref = btn.dataset.ref;
-            if (ref && typeof BibleReader !== 'undefined' && BibleReader.navigateTo) {
-              BibleReader.navigateTo(ref);
+            this.hideVerseTooltip();
+            if (rawRef && typeof BibleReader !== 'undefined' && BibleReader.navigateTo) {
+              BibleReader.navigateTo(rawRef);
               this.closeModal();
               if (typeof App !== 'undefined' && App.switchView) {
                 App.switchView('bible-reader');
@@ -592,6 +598,7 @@ const IllustrationsView = {
   },
 
   closeModal() {
+    this.hideVerseTooltip();
     if (this.modal) this.modal.classList.add('hidden');
     this.currentIllustration = null;
     this.isEditMode = false;
@@ -825,6 +832,180 @@ const IllustrationsView = {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
+  },
+
+  // --- GESTION DES PASSAGES BIBLIQUES & INFOBULLES AU SURVOL ---
+  verseCache: {},
+  verseTooltipEl: null,
+  activeTooltipRef: null,
+
+  shortenReference(ref) {
+    if (!ref) return '';
+    const clean = String(ref).trim();
+    const ABBRS = [
+      { name: /^1\s*chroniques?/i, abbr: '1 Ch' },
+      { name: /^2\s*chroniques?/i, abbr: '2 Ch' },
+      { name: /^1\s*corinthiens?/i, abbr: '1 Co' },
+      { name: /^2\s*corinthiens?/i, abbr: '2 Co' },
+      { name: /^1\s*thessaloniciens?/i, abbr: '1 Th' },
+      { name: /^2\s*thessaloniciens?/i, abbr: '2 Th' },
+      { name: /^1\s*timoth[ée]e?/i, abbr: '1 Tm' },
+      { name: /^2\s*timoth[ée]e?/i, abbr: '2 Tm' },
+      { name: /^1\s*pierre?/i, abbr: '1 Pi' },
+      { name: /^2\s*pierre?/i, abbr: '2 Pi' },
+      { name: /^1\s*jean/i, abbr: '1 Jn' },
+      { name: /^2\s*jean/i, abbr: '2 Jn' },
+      { name: /^3\s*jean/i, abbr: '3 Jn' },
+      { name: /^1\s*samuel/i, abbr: '1 S' },
+      { name: /^2\s*samuel/i, abbr: '2 S' },
+      { name: /^1\s*rois?/i, abbr: '1 R' },
+      { name: /^2\s*rois?/i, abbr: '2 R' },
+      { name: /^gen[èe]se/i, abbr: 'Gn' },
+      { name: /^exode/i, abbr: 'Ex' },
+      { name: /^l[ée]vitique/i, abbr: 'Lv' },
+      { name: /^nombres?/i, abbr: 'Nb' },
+      { name: /^deut[ée]ronome/i, abbr: 'Dt' },
+      { name: /^josu[ée]/i, abbr: 'Jos' },
+      { name: /^juges?/i, abbr: 'Jg' },
+      { name: /^ruth/i, abbr: 'Rt' },
+      { name: /^esdras?/i, abbr: 'Esd' },
+      { name: /^n[ée]h[ée]mie/i, abbr: 'Né' },
+      { name: /^esther/i, abbr: 'Est' },
+      { name: /^job/i, abbr: 'Jb' },
+      { name: /^psaumes?/i, abbr: 'Ps' },
+      { name: /^proverbes?/i, abbr: 'Pr' },
+      { name: /^eccl[ée]siaste/i, abbr: 'Ec' },
+      { name: /^cantique(?:\s+des\s+cantiques)?/i, abbr: 'Ct' },
+      { name: /^[ée]sa[ïi]e|^isa[ïi]e/i, abbr: 'És' },
+      { name: /^j[ée]r[ée]mie/i, abbr: 'Jr' },
+      { name: /^lamentations?/i, abbr: 'La' },
+      { name: /^[ée]z[ée]chiel/i, abbr: 'Éz' },
+      { name: /^daniel/i, abbr: 'Da' },
+      { name: /^os[ée]e/i, abbr: 'Os' },
+      { name: /^jo[ëe]l/i, abbr: 'Jl' },
+      { name: /^amos/i, abbr: 'Am' },
+      { name: /^abdias/i, abbr: 'Ab' },
+      { name: /^jonas/i, abbr: 'Jon' },
+      { name: /^mich[ée]e/i, abbr: 'Mi' },
+      { name: /^nahum/i, abbr: 'Na' },
+      { name: /^habacuc/i, abbr: 'Ha' },
+      { name: /^sophonie/i, abbr: 'So' },
+      { name: /^agg[ée]e/i, abbr: 'Ag' },
+      { name: /^zacharie/i, abbr: 'Za' },
+      { name: /^malachie/i, abbr: 'Ml' },
+      { name: /^matthieu/i, abbr: 'Mt' },
+      { name: /^marc/i, abbr: 'Mc' },
+      { name: /^luc/i, abbr: 'Lc' },
+      { name: /^jean/i, abbr: 'Jn' },
+      { name: /^actes?(?:\s+des\s+ap[ôo]tres)?/i, abbr: 'Ac' },
+      { name: /^romains?/i, abbr: 'Rm' },
+      { name: /^galates?/i, abbr: 'Ga' },
+      { name: /^[ée]ph[ée]siens?/i, abbr: 'Ep' },
+      { name: /^philippiens?/i, abbr: 'Ph' },
+      { name: /^colossiens?/i, abbr: 'Col' },
+      { name: /^tite/i, abbr: 'Tt' },
+      { name: /^phil[ée]mon/i, abbr: 'Phm' },
+      { name: /^h[ée]breux/i, abbr: 'Hé' },
+      { name: /^jacques/i, abbr: 'Jc' },
+      { name: /^jude/i, abbr: 'Jd' },
+      { name: /^apocalypse/i, abbr: 'Ap' }
+    ];
+
+    for (const item of ABBRS) {
+      if (item.name.test(clean)) {
+        return clean.replace(item.name, item.abbr);
+      }
+    }
+    return clean;
+  },
+
+  getVerseTooltipElement() {
+    if (!this.verseTooltipEl) {
+      let el = document.getElementById('ill-verse-preview-tooltip');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'ill-verse-preview-tooltip';
+        el.className = 'ill-verse-tooltip hidden';
+        document.body.appendChild(el);
+      }
+      this.verseTooltipEl = el;
+    }
+    return this.verseTooltipEl;
+  },
+
+  async showVerseTooltip(e, targetBtn, rawRef, shortRef) {
+    const tooltip = this.getVerseTooltipElement();
+    if (!tooltip) return;
+
+    this.activeTooltipRef = rawRef;
+    const rect = targetBtn.getBoundingClientRect();
+
+    tooltip.innerHTML = `
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.08));">
+        <span style="font-weight: 700; color: var(--accent-amber, #f59e0b); font-size: 11.5px;">${this.escapeHtml(shortRef || rawRef)}</span>
+        <span style="font-size: 10px; color: var(--text-muted); background: var(--bg-surface, #1e1e24); padding: 1px 5px; border-radius: 4px; font-weight: 600;">LSG</span>
+      </div>
+      <div class="ill-verse-tooltip-content" style="font-size: 11.5px; color: var(--text-secondary, #d4d4d8); line-height: 1.45;">
+        <span class="synth-spinner" style="width: 10px; height: 10px; border-width: 1.5px; display: inline-block; vertical-align: middle; margin-right: 5px; border-top-color: var(--accent-amber, #f59e0b);"></span> Chargement du texte...
+      </div>
+    `;
+
+    tooltip.classList.remove('hidden');
+    this.positionTooltip(rect, tooltip);
+
+    // Vérifier cache
+    if (this.verseCache[rawRef]) {
+      this.renderTooltipContent(tooltip, this.verseCache[rawRef]);
+      this.positionTooltip(rect, tooltip);
+      return;
+    }
+
+    try {
+      const data = await API.getQuickPassagePreview(rawRef);
+      if (this.activeTooltipRef !== rawRef) return;
+
+      if (data && data.success && data.verses && data.verses.length > 0) {
+        const text = data.verses.map(v => `<strong style="color:var(--accent-amber, #fbbf24); font-size: 10.5px; margin-right: 2px;">${v.verse}.</strong> ${this.escapeHtml(v.text)}`).join(' ');
+        this.verseCache[rawRef] = { text, ref: data.reference, bible: data.bible_name };
+        this.renderTooltipContent(tooltip, this.verseCache[rawRef]);
+      } else {
+        const contentEl = tooltip.querySelector('.ill-verse-tooltip-content');
+        if (contentEl) contentEl.textContent = data?.error || 'Texte biblique indisponible';
+      }
+      this.positionTooltip(rect, tooltip);
+    } catch (err) {
+      if (this.activeTooltipRef === rawRef) {
+        const contentEl = tooltip.querySelector('.ill-verse-tooltip-content');
+        if (contentEl) contentEl.textContent = 'Impossible de charger le verset';
+      }
+    }
+  },
+
+  renderTooltipContent(tooltip, cached) {
+    const contentEl = tooltip.querySelector('.ill-verse-tooltip-content');
+    if (contentEl) {
+      contentEl.innerHTML = cached.text;
+    }
+  },
+
+  positionTooltip(rect, tooltip) {
+    const tooltipWidth = 320;
+    let left = rect.left + (rect.width / 2) - (tooltipWidth / 2);
+    let top = rect.top - tooltip.offsetHeight - 8;
+
+    if (top < 10) top = rect.bottom + 8;
+    if (left < 10) left = 10;
+    if (left + tooltipWidth > window.innerWidth - 10) left = window.innerWidth - tooltipWidth - 10;
+
+    tooltip.style.left = `${left}px`;
+    tooltip.style.top = `${top}px`;
+  },
+
+  hideVerseTooltip() {
+    this.activeTooltipRef = null;
+    if (this.verseTooltipEl) {
+      this.verseTooltipEl.classList.add('hidden');
+    }
   }
 };
 

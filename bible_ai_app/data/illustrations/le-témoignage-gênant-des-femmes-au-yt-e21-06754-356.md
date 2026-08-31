@@ -1,19 +1,22 @@
 ---
 id: yt-e21-06754-356
-title: Le témoignage gênant des femmes au tombeau
+title: Le scandale historique des premiers témoins
 category: Grâce & Salut
-type: Récit historique
+type: Histoire vraie
 tags:
-- Historicité
-- Femmes
 - Résurrection
-- Témoignage
-passages_associes: []
-source: 'Prédication : Les Evangiles sont-ils historiquement fiables ?'
-author: Évangile 21
+- Historicité
+- Femmes au tombeau
+- Vérité
+passages_associes:
+- Lu 24.1-11
+- 1 Co 15.3-8
+- Jn 20.11-18
+source: Prédication contemporaine
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-31T09:01:57'
-updated_at: '2026-08-31T09:01:57'
+updated_at: '2026-08-31T10:36:15'
 ---
 
 Au matin du premier jour de la semaine, dans la pénombre qui enveloppe encore les jardins de Jérusalem, des pas discrets résonnent sur les dalles de pierre. Marie de Magdala, Jeanne et Marie, mère de Jacques, s'avancent le cœur lourd, portant des aromates pour embaumer le corps de leur maître supplicié. Leurs esprits sont hantés par la brutalité de la croix, la honte de l'abandon et la défaite apparente du mouvement nazaréen. Pourtant, en arrivant près du sépulcre, la pierre monumentale est roulée, et un ange leur annonce l'inouïe, la bouleversante nouvelle : « Il est ressuscité, il n'est point ici ! »

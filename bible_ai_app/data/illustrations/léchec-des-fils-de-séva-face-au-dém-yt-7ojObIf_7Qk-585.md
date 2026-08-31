@@ -1,24 +1,22 @@
 ---
 id: yt-7ojObIf_7Qk-585
-title: L'échec des fils de Séva face au démon
+title: L'impuissance face à l'autorité usurpée
 category: Sainteté & Obéissance
 type: Histoire vraie
 tags:
 - Autorité
-- Péché
-- Actes 19
 - Combat spirituel
-passages_associes: []
-source: 'Prédication : La guerre des territoires'
-author: Prédicateur francophone
+- Intégrité
+passages_associes:
+- Ac 19.13-16
+- Mt 7.21
+source: Chaire francophone
+author: Témoignage pastoral
 usage_history: []
 created_at: '2026-08-29T13:43:27'
-updated_at: '2026-08-29T13:43:27'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:38:03'
 ---
-Dans le livre des Actes au chapitre 19, des exorcistes ambulants juifs, les fils de Séva, ont tenté d'chasser un esprit mauvais en pronquant la formule : 'Je vous conjure par Jésus que Paul prêche !'. Le démon leur a répondu : 'Je connais Jésus, et je sais qui est Paul ; mais vous, qui êtes-vous ?' L'homme possédé s'est jeté sur eux, les a maudits, les a mis nus et les a roués de coups au point qu'ils ont dû s'enfuir en sang.
+
+Dans le livre des Actes, des exorcistes ambulants, les fils de Séva, tentèrent d'expulser un esprit mauvais en prononçant une formule rituelle : « Je vous conjure par Jésus que Paul prêche ! ». L'esprit répondit avec une lucidité terrifiante : « Je connais Jésus, et je sais qui est Paul ; mais vous, qui êtes-vous ? ». L'homme possédé se jeta alors sur eux, les maltraita avec une telle violence qu'ils durent s'enfuir, nus et blessés. Cette tentative de manipuler la puissance divine sans une relation authentique avec le Christ se solda par une humiliation publique et une défaite cuisante.
 
 > **Leçon homilétique :** On ne peut pas exercer d'autorité spirituelle ni chasser les ténèbres si l'on vit soi-même dans le péché et le compromis. L'autorité de Christ ne s'improvise pas par une formule magique ; elle découle d'une vie de soumission à Dieu et de repentance.

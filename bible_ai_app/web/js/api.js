@@ -239,6 +239,10 @@ const API = {
     return await this.call('get_passage_study_data', passageRef, bibleName);
   },
 
+  async getQuickPassagePreview(passageRef, bibleName = "LSG") {
+    return await this.call('get_quick_passage_preview', passageRef, bibleName);
+  },
+
   async getPassageOverviewBundle(bookCode, chapter, verse = 1, bibleName = "LSG") {
     return await this.call('get_passage_overview_bundle', bookCode, parseInt(chapter), parseInt(verse), bibleName);
   },
@@ -532,7 +536,8 @@ const API = {
     const category = params.category || 'all';
     const typeFilter = params.type || params.type_filter || 'all';
     const statusFilter = params.status || params.status_filter || 'all';
-    return await this.call('get_illustrations_page', page, pageSize, query, category, typeFilter, statusFilter);
+    const sortBy = params.sortBy || params.sort_by || 'date_desc';
+    return await this.call('get_illustrations_page', page, pageSize, query, category, typeFilter, statusFilter, sortBy);
   },
 
   async getIllustration(illId) {

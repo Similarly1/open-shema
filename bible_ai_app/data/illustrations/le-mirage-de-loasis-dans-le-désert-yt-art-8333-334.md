@@ -1,22 +1,25 @@
 ---
 id: yt-art-8333-334
-title: Le mirage de l'oasis dans le désert spirituel
+title: Le mirage de l'oasis spirituelle
 category: Grâce & Salut
 type: Métaphore & Vie courante
 tags:
-- Soif
 - Désert
-- Mirage
-- Disernement
-passages_associes: []
-source: 'Prédication : John Mark Comer et Suivre la voie de Jésus'
-author: Évangile 21
+- Oasis
+- Vraie foi
+- Illusion
+passages_associes:
+- Jr 2.13
+- Jn 4.14
+- Ga 1.6-9
+source: Prédication contemporaine
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-30T12:25:28'
-updated_at: '2026-08-30T12:25:28'
+updated_at: '2026-08-31T10:33:39'
 ---
 
-Imaginez un voyageur égaré depuis des jours dans l'immensité brûlante du désert de Mojave. Sa gourde est désespérément vide, ses lèvres sont fendillées, et chaque pas dans le sable brûlant lui arrache une grimace de douleur. La soif est devenue une obsession dévorante qui consume toutes ses pensées. Soudain, au détour d'une dune, ses yeux s'illuminent : là, à quelques centaines de mètres, se dresse une oasis luxuriante, entourée de palmiers majestueux et scintillant de promesses aquatiques. Des chants mélodieux semblent s'élever de ce havre de fraîcheur, contrastant cruellement avec le silence mortel du désert.
+Un voyageur est égaré depuis des jours dans l'immensité brûlante du désert de Mojave. Sa gourde est désespérément vide, ses lèvres sont fendillées, et chaque pas dans le sable brûlant lui arrache une grimace de douleur. La soif est devenue une obsession dévorante qui consume toutes ses pensées. Soudain, au détour d'une dune, ses yeux s'illuminent : là, à quelques centaines de mètres, se dresse une oasis luxuriante, entourée de palmiers majestueux et scintillant de promesses aquatiques. Des chants mélodieux semblent s'élever de ce havre de fraîcheur, contrastant cruellement avec le silence mortel du désert.
 
 Dans sa détresse, il court de toutes ses forces vers cet endroit qui promet de mettre fin à son agonie. En arrivant, il découvre des bassins d'eau claire, des coussinets moelleux disposés à l'ombre et un groupe de sages qui l'accueillent avec un sourire bienveillant. Ils lui expliquent qu'ici, on ne se bat pas pour survivre, on apprend l'art de respirer, on pratique le silence, on contemple la beauté du monde et on s'aligne sur le rythme cosmique de l'univers. Fatigué du combat quotidien et des rudesses de la vie, le voyageur est immédiatement captivé par cette atmosphère de paix et de raffinement spirituel.
 

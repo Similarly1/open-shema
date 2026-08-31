@@ -1,19 +1,20 @@
 ---
 id: yt-art-0004-759
-title: Le char de l'eunuque et le bris du miroir
+title: Le char de l'eunuque et la fenêtre ouverte
 category: Foi & Confiance
-type: Récit historique
+type: Histoire vraie
 tags:
-- Interprétation
-- Eunuque
-- Philippe
-- Évangile
-passages_associes: []
-source: 'Prédication : Quelle méthode favoriser pour votre lecture de la Bible?'
-author: Évangile 21
+- Évangélisation
+- Parole de Dieu
+- Guide spirituel
+passages_associes:
+- Ac 8.30-35
+- Es 53.7-8
+source: Ressource pastorale
+author: Témoignage pastoral
 usage_history: []
 created_at: '2026-08-30T12:26:49'
-updated_at: '2026-08-30T12:26:49'
+updated_at: '2026-08-31T10:32:11'
 ---
 
 Sous le soleil brûlant de midi, la poussière s'élève derrière un somptueux char royal sur la route déserte qui descend de Jérusalem vers Gaza. À bord, un homme d'une haute distinction, un eunuque éthiopien, haut fonctionnaire et trésorier de la reine Candace, tient un précieux rouleau de parchemin. Ses yeux parcourent les mots d'Ésaïe 53, mais son visage trahit une profonde perplexité. Pour lui, ce texte est un labyrinthe sans issue. S'agit-il du prophète parlant de lui-même ou d'un autre ? La distance culturelle, la barrière linguistique et surtout le voile spirituel transforment sa lecture en une énigme frustrante. Il lit, mais il ne saisit pas.

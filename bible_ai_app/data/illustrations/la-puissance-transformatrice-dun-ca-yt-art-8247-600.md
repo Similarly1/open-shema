@@ -1,19 +1,22 @@
 ---
 id: yt-art-8247-600
-title: La puissance transformatrice d'un cantique de confession
+title: La puissance d'un cantique de confession
 category: Pardon & Réconciliation
 type: Histoire vraie
 tags:
+- Louange
 - Confession
-- Unité
-- Liturgie
-- Grâce
-passages_associes: []
-source: 'Prédication : « Plus haut encore » : des chants pour édifier l’Église'
-author: Évangile 21
+- Communion
+- Réconciliation
+passages_associes:
+- Ps 32.1
+- Ps 32.5
+- 1 Jn 1.9
+source: Chaire francophone
+author: Témoignage pastoral
 usage_history: []
 created_at: '2026-08-30T12:26:03'
-updated_at: '2026-08-30T12:26:03'
+updated_at: '2026-08-31T10:30:58'
 ---
 
 Dans une Église de la région lyonnaise, un dimanche de l'automne 2022, l'atmosphère était particulièrement lourde. Des tensions larvées entre plusieurs familles menaçaient la communion fraternelle depuis des mois. Le responsable de la louange, conscient de ce climat étouffant, décida de modifier au dernier moment le déroulement liturgique habituel. Au lieu d'enchaîner directement sur des chants de célébration rythmés, il introduisit un chant inspiré du Psaume 32, mettant l'accent sur la confession des fautes cachées et la joie du pardon.

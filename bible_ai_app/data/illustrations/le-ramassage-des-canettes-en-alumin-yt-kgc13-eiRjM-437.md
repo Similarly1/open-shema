@@ -1,23 +1,23 @@
 ---
 id: yt-kgc13-eiRjM-437
-title: Le ramassage des canettes en aluminium
+title: La glaneuse moderne et la grâce quotidienne
 category: Grâce & Salut
 type: Métaphore & Vie courante
 tags:
-- Glanage
-- Précarité
+- Ruth
+- Grâce
 - Humilité
-passages_associes: []
-source: 'Prédication : Fields of Grace by Clément Bourrel (07/26/2026)'
-author: Prédicateur francophone
+- Dépendance
+passages_associes:
+- Rt 2.2
+- Mt 6.11
+source: Chaire francophone
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-29T13:42:31'
-updated_at: '2026-08-29T13:42:31'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:35:10'
 ---
-Pour illustrer la précarité de la condition de Ruth qui allait glaner dans les champs, le prédicateur compare cette pratique au ramassage des canettes en aluminium dans notre société moderne : un moyen de subsistance précaire pour s'acheter un repas de base, et non une source d'enrichissement.
 
-> **Leçon homilétique :** La foi de Ruth s'est manifestée par un travail humble et quotidien, acceptant les dispositions de grâce prévues par Dieu dans Sa loi.
+Dans une réflexion sur la condition de Ruth glanant dans les champs de Boaz, un observateur établit un parallèle saisissant avec une réalité de la société contemporaine : celle de la personne qui parcourt les rues pour collecter des canettes en aluminium afin de subsister. Cette activité, loin d'être une source d'enrichissement, constitue un moyen humble, précaire et souvent insuffisant pour assurer un repas quotidien. Cette image illustre la vulnérabilité extrême et la dépendance totale de ceux qui vivent au jour le jour, rappelant la position de Ruth, étrangère et démunie, qui s'en remettait entièrement à la bienveillance divine manifestée à travers la loi.
+
+> **Leçon homilétique :** La foi se manifeste souvent par un travail humble et quotidien, acceptant avec reconnaissance les dispositions de grâce prévues par Dieu dans Sa providence.

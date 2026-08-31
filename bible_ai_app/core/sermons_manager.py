@@ -573,6 +573,7 @@ class SermonsManager:
         category: str = "all",
         type_filter: str = "all",
         status_filter: str = "all",
+        sort_by: str = "date_desc",
         config: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """Retourne une page légère d'illustrations avec recherche & filtrage instantanés (sub-10ms)."""
@@ -582,6 +583,7 @@ class SermonsManager:
         cat_filter = (category or "all").strip().lower()
         typ_filter = (type_filter or "all").strip()
         stat_filter = (status_filter or "all").strip()
+        sort_mode = (sort_by or "date_desc").strip().lower()
 
         filtered = []
         for ill in all_ills:
@@ -619,6 +621,16 @@ class SermonsManager:
                     continue
 
             filtered.append(ill)
+
+        # 5. Tri des résultats (Date ou Alphabétique)
+        if sort_mode == "date_asc":
+            filtered.sort(key=lambda x: str(x.get("created_at") or x.get("updated_at") or ""))
+        elif sort_mode == "title_asc":
+            filtered.sort(key=lambda x: str(x.get("title") or "").lower())
+        elif sort_mode == "title_desc":
+            filtered.sort(key=lambda x: str(x.get("title") or "").lower(), reverse=True)
+        else:  # "date_desc" par défaut
+            filtered.sort(key=lambda x: str(x.get("created_at") or x.get("updated_at") or ""), reverse=True)
 
         total = len(filtered)
         page = max(1, page)

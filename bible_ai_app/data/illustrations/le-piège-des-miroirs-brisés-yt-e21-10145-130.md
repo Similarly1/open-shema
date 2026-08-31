@@ -4,19 +4,21 @@ title: Le piège des miroirs brisés
 category: Grâce & Salut
 type: Métaphore & Vie courante
 tags:
-- Regard
 - Identité
-- Sartre
-- Aliénation
-passages_associes: []
-source: 'Prédication : Sartre : « L’enfer c’est les autres. »'
-author: Évangile 21
+- Regard des autres
+- Évangile
+- Justification
+passages_associes:
+- Gal 1.10
+- 1 Co 4.3-4
+source: Prédication contemporaine
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-31T09:08:32'
-updated_at: '2026-08-31T09:08:32'
+updated_at: '2026-08-31T10:34:25'
 ---
 
-Imaginez un homme qui entrerait dans une immense salle obscure dont les murs seraient entièrement tapissés de miroirs déformants. Dès ses premiers pas, chaque reflet lui renvoie une image grotesque, exagérée, tantôt minuscule et ridicule, tantôt gigantesque et menaçante. Cet homme passe des heures, puis des jours, à tenter de ajuster sa posture, de sourire artificiellement ou de cacher ses défauts pour plaire à ces reflets figés qui le scrutent sans pitié. Il est prisonnier d'un système où sa propre valeur dépend entièrement de l'angle sous lequel ces glaces le capturent.
+Imaginez un homme qui entrerait dans une immense salle obscure dont les murs seraient entièrement tapissés de miroirs déformants. Dès ses premiers pas, chaque reflet lui renvoie une image grotesque, exagérée, tantôt minuscule et ridicule, tantôt gigantesque et menaçante. Cet homme passe des heures, puis des jours, à tenter d'ajuster sa posture, de sourire artificiellement ou de cacher ses défauts pour plaire à ces reflets figés qui le scrutent sans pitié. Il est prisonnier d'un système où sa propre valeur dépend entièrement de l'angle sous lequel ces glaces le capturent.
 
 Au fil du temps, cette course pour satisfaire les attentes invisibles de ses propres reflets devient insupportable. L'angoisse le consume car il réalise qu'il ne sait plus qui il est réellement en dehors de ce tribunal permanent. Chaque regard perçu dans les yeux des passants à l'extérieur ne fait que prolonger cette torture : les autres deviennent les geôliers d'une prison invisible, des miroirs cruels qui le réduisent à l'état de simple objet décrié.
 

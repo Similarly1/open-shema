@@ -1,24 +1,22 @@
 ---
 id: yt-pDrJwcD49NU-062
-title: Le signal de l'Ecclésia dans la Grèce antique
+title: L'appel de l'Ecclésia antique
 category: Évangélisation & Mission
 type: Histoire vraie
 tags:
-- Ecclésia
-- Convocation
-- Grèce antique
-- Gouvernement
-passages_associes: []
-source: 'Prédication : L''amour du Christ pour l''Église'
-author: Prédicateur francophone
+- Appel
+- Assemblée
+- Priorités
+passages_associes:
+- He 10.25
+- Mt 6.33
+source: Ressource pastorale
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-29T13:43:44'
-updated_at: '2026-08-29T13:43:44'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:35:39'
 ---
-Dans la Grèce antique, au 4e siècle à Athènes, l'ecclésia était l'assemblée législative et gouvernementale. Lorsque le drapeau était hissé à l'aube et que le héraut criait pour convoquer la population sur la colline du Pnyx, les citoyens devaient s'arrêter net dans leurs occupations quotidiennes pour venir siéger et traiter des affaires de la cité, de la paix ou de la guerre.
+
+Dans la Grèce antique du IVe siècle avant notre ère, l'ecclésia désignait l'assemblée législative et souveraine d'Athènes. Lorsqu'à l'aube, le drapeau était hissé et que le héraut retentissait pour convoquer le peuple sur la colline du Pnyx, les citoyens avaient l'obligation de suspendre immédiatement leurs occupations quotidiennes. Qu'ils soient en plein commerce ou en plein travail manuel, ils devaient quitter leurs activités pour siéger et délibérer sur les affaires vitales de la cité, qu'il s'agisse de décisions de paix ou de guerre. Cette exigence de disponibilité totale soulignait l'importance capitale de l'engagement civique sur les intérêts personnels.
 
 > **Leçon homilétique :** De même, lorsque Dieu nous convoque à l'église, nous sommes appelés à suspendre nos routines séculières pour nous connecter aux affaires de notre véritable patrie céleste.

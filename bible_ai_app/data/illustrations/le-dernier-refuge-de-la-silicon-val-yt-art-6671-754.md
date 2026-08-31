@@ -5,18 +5,21 @@ category: Espérance & Éternité
 type: Histoire vraie
 tags:
 - Transhumanisme
-- Silicon Valley
-- Immortalité
-- Idolâtrie
-passages_associes: []
-source: 'Prédication : Ce que les espoirs du transhumanisme révèlent sur notre cœur'
-author: Évangile 21
+- Mort
+- Éternité
+- Salut
+passages_associes:
+- Ec 3.11
+- Rm 6.23
+- Ap 21.4
+source: Prédication contemporaine
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-30T12:24:39'
-updated_at: '2026-08-30T12:24:39'
+updated_at: '2026-08-31T10:32:42'
 ---
 
-Dans un laboratoire aseptisé de la Silicon Valley, le Dr. Harrison, brillant ingénieur en intelligence artificielle, fixait l'écran de son ordinateur avec une intensité febrile. Autour de lui, les serveurs bourdinaient doucement, brassant des téraoctets de données neuro-informatiques. À l'extérieur, la ville bruissait d'une agitation insouciante, ignorant tout de l'obsession secrète qui consumait cet homme. Atteint d'une maladie dégénérative incurable, Harrison avait consacré ses dernières années valides à cartographier ses propres schémas mentaux, ses souvenirs d'enfance, le timbre de sa voix et la structure de ses raisonnements logiques, espérant battre la montre biologique.
+Dans un laboratoire aseptisé de la Silicon Valley, le Dr. Harrison, brillant ingénieur en intelligence artificielle, fixait l'écran de son ordinateur avec une intensité fébrile. Autour de lui, les serveurs bourdinaient doucement, brassant des téraoctets de données neuro-informatiques. À l'extérieur, la ville bruissait d'une agitation insouciante, ignorant tout de l'obsession secrète qui consumait cet homme. Atteint d'une maladie dégénérative incurable, Harrison avait consacré ses dernières années valides à cartographier ses propres schémas mentaux, ses souvenirs d'enfance, le timbre de sa voix et la structure de ses raisonnements logiques, espérant battre la montre biologique.
 
 La tension dans la pièce était palpable lorsque la barre de progression du téléchargement de sa conscience atteignit quatre-vingt-dix-neuf pour cent. Pour Harrison, ce n'était pas seulement de la science ; c'était un acte de foi séculier, une liturgie numérique célébrée face à l'inéluctabilité de la tombe. Il croyait fermement que la mort n'était qu'un simple bug informatique en attente de correction, un problème d'ingénierie qu'un substrat de silicium pouvait contourner. Dans son esprit, il était en train de s'offrir lui-même la vie éternelle, s'arrachant par la seule force de l'innovation humaine aux griffes de la pourriture charnelle.
 

@@ -1,19 +1,23 @@
 ---
 id: yt-e21-89579-710
-title: L'Horloger, l'Artiste et la Symphonie Cosmique
+title: L'Horloger, l'Artiste et la Symphonie
 category: Foi & Confiance
 type: Métaphore & Vie courante
 tags:
-- Science
-- Providence
+- Miracle
+- Création
+- Souveraineté
 - Artiste
-- Lois de la nature
-passages_associes: []
-source: 'Prédication : Miracles et science sont-ils incompatibles ?'
-author: Évangile 21
+- Science
+passages_associes:
+- Ps 135.6
+- He 1.3
+- No 23.19
+source: Ressource pastorale
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-31T09:03:20'
-updated_at: '2026-08-31T09:03:20'
+updated_at: '2026-08-31T10:37:17'
 ---
 
 Imaginez un instant un immense auditorium plongé dans une pénombre respectueuse. Sur la scène se tient un orchestre symphonique philharmonique de renommée mondiale, dirigé par un chef d'orchestre d'un génie absolu. Depuis des années, cet orchestre joue la même partition classique avec une régularité mathématique. Les mesures s'enchaînent, les violons s'accordent aux cuivres, et les auditeurs dans la salle, fascinés par cette rigueur, commencent à cartographier les règles harmoniques de cette représentation. Ils mesurent les intervalles, étudient la résonance acoustique et finissent par élaborer une science rigoureuse des notes : 'Quand le violon joue 'A', la physique acoustique impose que l'ambiance réagisse par 'B'.' C'est ce que nous appelons les lois de la nature.

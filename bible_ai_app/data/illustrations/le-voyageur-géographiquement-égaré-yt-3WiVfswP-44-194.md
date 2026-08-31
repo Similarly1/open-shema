@@ -1,24 +1,23 @@
 ---
 id: yt-3WiVfswP-44-194
-title: Le voyageur géographiquement égaré
+title: Le détour intentionnel vers les exclus
 category: Évangélisation & Mission
 type: Métaphore & Vie courante
 tags:
-- Samarie
-- Frontière
-- Exclusion
 - Jésus
-passages_associes: []
-source: 'Prédication : Luc 17:11-19 - 10 guéris, 1 seul sauvé !'
-author: Prédicateur francophone
+- Samarie
+- Marginaux
+- Amour
+passages_associes:
+- Lc 9.51-56
+- Jn 4.4
+source: Prédication contemporaine
+author: Témoignage pastoral
 usage_history: []
 created_at: '2026-08-29T13:45:30'
-updated_at: '2026-08-29T13:45:30'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:36:24'
 ---
-Le prédicateur compare le trajet géographique de Jésus passant entre la Samarie et la Galilée en route vers Jérusalem à une situation absurde du type 'en allant à Paris, je passe entre l'Espagne et le Pays-Basque', soulignant le caractère inhabituel et intentionnel de ce détour vers les exclus.
 
-> **Leçon homilétique :** Jésus transgresse les barrières culturelles et géographiques pour aller délibérément à la rencontre des marginaux et des rejetés.
+Un prédicateur compare le trajet géographique de Jésus passant entre la Samarie et la Galilée en route vers Jérusalem à une situation totalement absurde du type « en allant à Paris, je passe entre l'Espagne et le Pays-Basque ». Il souligne par cette image saisissante le caractère inhabituel, surprenant et profondément intentionnel de ce détour inattendu vers les territoires des exclus.
+
+> **Leçon homilétique :** Jésus transgresse délibérément les barrières culturelles, géographiques et sociales pour aller à la rencontre des marginaux et des rejetés, traçant ainsi la route pour une mission sans frontières.

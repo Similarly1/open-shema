@@ -1,24 +1,23 @@
 ---
 id: yt-0bbLB9ViG2w-522
-title: S'approcher du Roi comme un prince
+title: L'audace filiale devant le trône
 category: Prière & Intimité
 type: Métaphore & Vie courante
 tags:
-- Assurance
-- Trône de la grâce
+- Prière
+- Identité
 - Filiation
-- Approche
-passages_associes: []
-source: 'Prédication : Prédication #14 : Fin de la série sur Joseph !'
-author: Prédicateur francophone
+- Grâce
+passages_associes:
+- He 4.16
+- Ro 8.15
+source: Prédication contemporaine
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-29T13:46:32'
-updated_at: '2026-08-29T13:46:32'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:38:29'
 ---
-Pour illustrer ce qu'est la véritable assurance auprès de Dieu, l'orateur propose d'imaginer un roi sévère siégeant sur son trône, entouré de juges et de gardes. Soudain, la porte s'ouvre : le prince, fils du roi, traverse l'assemblée intimidante et vient tranquillement s'asseoir sur les genoux de son père. C'est exactement cette audace filiale et cette confiance absolue que Dieu nous offre à travers le trône de la grâce.
 
-> **Leçon homilétique :** Nous ne devons pas nous approcher de Dieu avec la peur panique d'un accusé devant son juge, mais avec l'assurance bienheureuse d'un enfant bien-aimé.
+Dans une salle d'audience solennelle, un roi siège sur son trône, entouré de juges austères et de gardes en armes. L'atmosphère est lourde, empreinte de crainte et de respect. Soudain, la porte s'ouvre : un jeune prince, fils du monarque, traverse l'assemblée intimidante sans un regard pour les dignitaires. Il s'approche du trône et, avec une simplicité désarmante, s'assoit sur les genoux de son père. Cette scène illustre l'assurance que le croyant est invité à manifester devant le trône de la grâce. Il ne s'agit pas d'une approche de courtisan, mais d'une audace filiale née de la certitude d'être aimé.
+
+> **Leçon homilétique :** Le croyant ne doit pas s'approcher de Dieu avec la peur panique d'un accusé devant son juge, mais avec l'assurance bienheureuse d'un enfant bien-aimé.

@@ -4,16 +4,19 @@ title: Le piège des circonstances atténuantes
 category: Épreuve & Souffrance
 type: Histoire vraie
 tags:
-- Circonstances
-- Épreuves
-- Colère
+- Épreuve
+- Intégrité
+- Émotion
 - Obéissance
-passages_associes: []
-source: 'Prédication : Un instant d’incrédulité inexcusable ?'
-author: Évangile 21
+passages_associes:
+- 1 Co 10.12
+- 2 Co 12.9
+- Jc 1.12
+source: Récit homilétique francophone
+author: Ressource pastorale
 usage_history: []
 created_at: '2026-08-31T09:09:42'
-updated_at: '2026-08-31T09:09:42'
+updated_at: '2026-08-31T10:34:20'
 ---
 
 Dans une entreprise de haute technologie, un ingénieur brillant nommé Thomas était reconnu pour son intégrité et son entregent. Pourtant, lorsqu'une restructuration soudaine menaça son département et que son plus proche collaborateur fut licencié injustement, Thomas traversa une tempête émotionnelle violente. Épuisé par des mois de surcharge de travail et profondément attristé par le départ de son ami, il commença à négliger les procédures de sécurité cruciales de son service, arguant en son fort intérieur que ses patrons manquaient totalement de discernement et qu'il était absurde d'exiger une rigueur absolue dans un tel climat de chaos.

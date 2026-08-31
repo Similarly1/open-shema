@@ -1,23 +1,22 @@
 ---
 id: yt-SS6lEy6yxzc-783
-title: Le voyage missionnaire en Russie et les chamallows
+title: Le goût sucré de la mission en terre lointaine
 category: Foi & Confiance
-type: Personnel
+type: Métaphore & Vie courante
 tags:
+- Mission
 - Voyage
-- Enfance
-- Partage
-passages_associes: []
-source: 'Prédication : Le rôle de l''Eglise 1/2 (La famille selon Dieu, 6e partie)'
-author: Prédicateur francophone
+- Inattendu
+passages_associes:
+- Ph 4.11-12
+- Pr 15.15
+source: Ressource pastorale
+author: Témoignage pastoral
 usage_history: []
 created_at: '2026-08-29T13:44:11'
-updated_at: '2026-08-29T13:44:11'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:36:24'
 ---
-Lors d'un voyage missionnaire en Russie, le prédicateur et son équipe ont voulu fabriquer des 'smores' internationaux en combinant du chocolat suisse, des craqueurs américains et des chamallows français, s'apercevant que ces derniers étaient de bien meilleure qualité que ceux qu'ils avaient trouvés sur place.
 
-> **Leçon homilétique :** Cette anecdote légère introduit la chaleur des souvenirs d'enfance et la manière dont les détails de la vie de famille marquent les parcours de foi.
+Lors d'un voyage missionnaire en Russie, une équipe de missionnaires a voulu partager une touche de douceur en fabriquant des 'smores' internationaux. En combinant du chocolat suisse, des craqueurs américains et des chamallows français, ils se sont aperçus que ces derniers étaient de bien meilleure qualité que ceux qu'ils avaient pu trouver sur place, transformant une simple collation en un moment de joie partagée au milieu de l'inconnu.
+
+> **Leçon homilétique :** Cette anecdote légère introduit la chaleur des souvenirs et la manière dont les détails inattendus de la vie marquent les parcours de foi et de fraternité.

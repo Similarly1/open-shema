@@ -1,24 +1,23 @@
 ---
 id: yt-bmpi4uYQmkQ-052
-title: Les années de vache maigre
+title: La sagesse face aux années de disette
 category: Épreuve & Souffrance
 type: Métaphore & Vie courante
 tags:
-- Famine
-- Ancien Testament
+- Joseph
 - Épreuve
-passages_associes: []
-source: 'Prédication : Prédication #5 : La vie de Joseph - De la prison au palais
-  !'
-author: Prédicateur francophone
+- Prévoyance
+- Sagesse
+passages_associes:
+- Gn 41.29
+- Gn 41.30
+source: Chaire francophone
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-29T13:46:52'
-updated_at: '2026-08-29T13:46:52'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:36:51'
 ---
-En expliquant les songes de Pharaon et la proposition audacieuse de Joseph de stocker le grain, le prédicateur rappelle que l'expression populaire courante 'les années de vaches maigres' trouve son origine directe dans ce passage de l'Ancien Testament, décrivant une période de privation totale qui dévore l'abondance précédente.
+
+En méditant sur les songes du Pharaon et la stratégie audacieuse de Joseph pour stocker le grain, le lecteur réalise que l'expression populaire « les années de vaches maigres » puise sa source dans ce récit biblique. Elle décrit une période de privation totale, capable d'engloutir et de consumer l'abondance accumulée précédemment. Cette image souligne la fragilité des ressources humaines face aux cycles de l'existence.
 
 > **Leçon homilétique :** Les temps d'épreuve et de famine spirituelle ou matérielle peuvent engloutir nos forces, mais la prévoyance de Dieu pourvoit à travers ses instruments.

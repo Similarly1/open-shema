@@ -1,24 +1,23 @@
 ---
 id: yt-pIjLUnppjH8-580
-title: La lune et les étoiles à travers le toit troué
+title: Admirer les étoiles à travers un toit troué
 category: Espérance & Éternité
-type: Personnel
+type: Histoire vraie
 tags:
 - Pauvreté
 - Gratitude
-- Enfance
 - Joie
-passages_associes: []
-source: 'Prédication : Mission Compassion'
-author: Prédicateur francophone
+- Enfance
+passages_associes:
+- Ph 4.11-12
+- Ps 19.2
+source: Prédication contemporaine
+author: Témoignage pastoral
 usage_history: []
 created_at: '2026-08-29T13:45:51'
-updated_at: '2026-08-29T13:45:51'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:30:00'
 ---
-Enfant aux Philippines, Precious Love vivait dans une extrême pauvreté sans électricité et avec un toit en si mauvais état que la pluie s'infiltrait. Sa mère ingénieuse y a fixé des sacs plastiques pour éviter d'être complètement mouillés. Le soir, allongés sur leurs lits, les enfants pouvaient admirer la lune et les étoiles à travers les interstices, apprenant ainsi à voir le bon côté des choses et à garder le sourire malgré le dénuement.
+
+Enfant grandissant aux Philippines, Precious Love a connu une extrême pauvreté, vivant dans un foyer dépourvu d'électricité et affichant un toit en si mauvais état que la pluie s'y engouffrait sans retenue. Pour parer au pire, la mère de famille, pleine d'ingéniosité, y avait fixé des sacs en plastique afin d'éviter d'être totalement submergés par les intempéries. Le soir venu, allongés sur leurs modestes lits, les enfants parvenaient pourtant à admirer la lune et les éclats des étoiles à travers les interstices, apprenant ainsi à cultiver le contentement, à voir le bon côté des choses et à garder le sourire malgré le dénuement le plus strict.
 
 > **Leçon homilétique :** La gratitude et la joie ne dépendent pas de nos conditions matérielles, mais de la capacité que Dieu nous donne de voir Sa beauté même au cœur des épreuves.

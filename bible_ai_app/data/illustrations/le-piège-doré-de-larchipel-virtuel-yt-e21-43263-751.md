@@ -4,19 +4,21 @@ title: Le piège doré de l'archipel virtuel
 category: Sainteté & Obéissance
 type: Métaphore & Vie courante
 tags:
-- Écrans
-- Acosmisme
-- Évasion
+- Technologie
+- Finitude
 - Réalité
-passages_associes: []
-source: 'Prédication : Voulez-vous sortir du monde ?'
-author: Évangile 21
+- Évasion
+passages_associes:
+- Ep 5.15-16
+- Ps 90.12
+source: Ressource pastorale
+author: Témoignage pastoral
 usage_history: []
 created_at: '2026-08-31T09:10:18'
-updated_at: '2026-08-31T09:10:18'
+updated_at: '2026-08-31T10:34:25'
 ---
 
-Imaginez un homme rentrant chez lui après une journée exténuante de travail au cœur des tensions de la ville. Le poids des responsabilités, les échecs relationnels et la grisaille de la réalité pèsent lourd sur ses épaules. À l'instant franchi le seuil de sa porte, il ne cherche pas le réconfort d'une présence humaine, ni le silence ressourçant de la prière. Il se saisit de sa manette de jeu ou fait glisser son pouce sur l'écran infini de son smartphone. En quelques secondes, il bascule dans un univers parallèle.
+Un homme rentre chez lui après une journée exténuante de travail au cœur des tensions de la ville. Le poids des responsabilités, les échecs relationnels et la grisaille de la réalité pèsent lourd sur ses épaules. À l'instant d'avoir franchi le seuil de sa porte, il ne cherche pas le réconfort d'une présence humaine, ni le silence ressourçant de la prière. Il se saisit de sa manette de jeu ou fait glisser son pouce sur l'écran infini de son smartphone. En quelques secondes, il bascule dans un univers parallèle.
 
 Dans ce monde virtuel, il est un héros invincible. Les règles y sont simples, les victoires instantanées, et la laideur du monde réel est gommée par des algorithmes conçus précisément pour captiver son attention. Heure après heure, la nuit s'avance. Le monde réel continue de tourner avec ses exigences, ses pauvres, ses voisins brisés et ses défis relationnels, mais notre homme s'est totalement anesthésié. Il a, selon le terme d'Hannah Arendt, réalisé son petit acte d'acosmisme quotidien : il s'est évadé de la prison terrestre qu'est devenue à ses yeux sa propre existence.
 

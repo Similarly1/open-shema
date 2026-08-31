@@ -1,24 +1,22 @@
 ---
 id: yt-bfxo5MKWD7I-765
-title: L'uniforme du policier sans gilet
+title: L'autorité déléguée du témoin
 category: Foi & Confiance
 type: Métaphore & Vie courante
 tags:
+- Témoignage
 - Autorité
 - Puissance
-- Témoignage
-passages_associes: []
-source: 'Prédication : L''ordre de marche laissé par Jésus (Ac 1.8 & Mt 28.18-20)
-  - 10 mai 2026 - Jean-David CÔTE'
-author: Prédicateur francophone
+passages_associes:
+- Mt 28.18
+- Ac 1.8
+source: Prédication contemporaine
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-29T13:44:55'
-updated_at: '2026-08-29T13:44:55'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:37:56'
 ---
-Imaginons un policier qui se met au coin d'une rue pour régler la circulation sans ses gyrophares et sans son équipement officiel, faisant de grands gestes. Les automobilistes ne lui obéiraient pas. De même, si nous voulons témoigner sans l'autorité et la puissance que Christ nous a conférées, nous agissons par nos propres forces, ce qui mène à la frustration et à l'inefficacité.
+
+Un policier se tient au milieu d'un carrefour animé pour réguler la circulation. S'il agit sans son uniforme réglementaire, sans ses gyrophares et sans les signes distinctifs de sa fonction, ses gestes, aussi vigoureux soient-ils, demeurent vains : les automobilistes ne lui obéissent pas, car ils ne perçoivent aucune autorité légitime derrière ses mouvements. De la même manière, lorsqu'un chrétien tente de témoigner de sa foi en s'appuyant uniquement sur ses propres forces, sa rhétorique ou ses capacités intellectuelles, il s'épuise dans une agitation stérile. L'efficacité de la mission ne provient pas de l'effort personnel, mais de la conscience profonde de l'autorité et de la puissance conférées par Christ. Sans cet « uniforme » spirituel, le témoin s'expose à la frustration d'une action humaine déconnectée de la source divine.
 
 > **Leçon homilétique :** L'efficacité de notre témoignage ne repose pas sur notre rhétorique ou nos arguments intellectuels bétonnés, mais sur la conscience de l'autorisation et de la puissance reçues de Christ.

@@ -1,21 +1,23 @@
 ---
 id: yt-perso-actes-8-708
-title: De sniper à messager de l'amour
+title: La métamorphose radicale d'un ancien combattant
 category: Grâce & Salut
 type: Histoire vraie
 tags:
 - Conversion
 - Réconciliation
-- Haine
-- Amour
-passages_associes: []
-source: 'Prédication : Actes 8.4-25 - La puissance de l''Évangile en Samarie'
-author: Document pastoral
+- Paix
+- Transformation
+passages_associes:
+- Ac 9.1-20
+- 2 Co 5.17
+source: Récit homilétique francophone
+author: Témoignage pastoral
 usage_history: []
 created_at: '2026-08-29T15:43:38'
-updated_at: '2026-08-29T15:43:38'
+updated_at: '2026-08-31T10:28:30'
 ---
 
-Taysir Abu Saada a été sniper pour Yasser Arafat et son conducteur personnel. Il détestait profondément les juifs et leur tirait dessus. Mais suite à sa conversion authentique à Christ, sa haine s'est transformée en amour. Il a fondé l'organisation « Espoir pour Ismaël », dont le ministère est de rétablir la compréhension au sein du conflit israélo-palestinien et de faire connaître l'Évangile aux musulmans.
+Un homme, autrefois tireur d'élite et chauffeur personnel d'un leader politique influent, nourrissait une haine viscérale envers le peuple juif, allant jusqu'à commettre des actes de violence directe. Cependant, à la suite d'une conversion authentique à Christ, cette hostilité profonde a été totalement balayée pour laisser place à un amour inconditionnel. Cet ancien combattant a par la suite fondé une organisation dédiée à la réconciliation dans le conflit israélo-palestinien, consacrant sa vie à diffuser l'Évangile et à bâtir des ponts là où régnait autrefois la destruction.
 
 > **Leçon homilétique :** Le Saint-Esprit est capable de transformer radicalement un cœur rempli de haine pour en faire un instrument d'amour et de réconciliation, brisant les barrières humaines les plus infranchissables.

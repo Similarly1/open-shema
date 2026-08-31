@@ -1,22 +1,25 @@
 ---
 id: yt-art-1484-527
-title: La boussole et la forêt vierge
+title: L'initiation à la boussole
 category: Foi & Confiance
 type: Métaphore & Vie courante
 tags:
-- Pédagogie
-- Autonomie
+- Boussole
+- Discipulat
 - Bible
 - Transmission
-passages_associes: []
-source: 'Prédication : «Zone secrète»: apprendre à votre préadolescent à lire la Bible'
-author: Évangile 21
+passages_associes:
+- Ps 119.105
+- 2Tm 3.16-17
+- Dt 6.6-7
+source: Chaire francophone
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-30T12:27:48'
-updated_at: '2026-08-30T12:27:48'
+updated_at: '2026-08-31T10:28:48'
 ---
 
-Imaginez un adolescent de douze ans, Lucas, qui se voit confier une splendide boussole en laiton par son grand-père avant de pénétrer pour la première fois dans une immense forêt dense et inconnue. Au départ, Lucas est fasciné par l'objet, mais totalement incapable de l'interpréter. Pour lui, l'aiguille qui tremble n'est qu'un spectacle curieux, et les arbres se ressemblent tous. Sans un guide, il risque soit de s'épuiser à tourner en rond, soit de s'enfoncer dans les ronces jusqu'à abandonner l'exploration par découragement.
+Un adolescent de douze ans, Lucas, se voit confier une splendide boussole en laiton par son grand-père avant de pénétrer pour la première fois dans une immense forêt dense et inconnue. Au départ, Lucas est fasciné par l'objet, mais totalement incapable de l'interpréter. Pour lui, l'aiguille qui tremble n'est qu'un spectacle curieux, et les arbres se ressemblent tous. Sans un guide, il risque soit de s'épuiser à tourner en rond, soit de s'enfoncer dans les ronces jusqu'à abandonner l'exploration par découragement.
 
 Heureusement, son grand-père ne se contente pas de lui lâcher la main à l'entrée des bois. Durant les premiers kilomètres, ils marchent côte à côte. Le grand-père s'accroupit, pose sa main sur l'épaule de Lucas, et lui montre comment aligner le boîtier avec le nord magnétique, comment repérer les indices sur le terrain et comment identifier le sentier balisé. Jour après jour, à mesure que la marche avance, le vieil homme recule d'un pas. Il laisse Lucas prendre le premier rôle, tenant la boussole d'une main ferme mais tremblante d'émotion, corrigeant doucement une trajectoire ici, validant une bonne lecture là.
 

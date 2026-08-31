@@ -2,18 +2,20 @@
 id: yt-e21-09957-003
 title: Le puzzle brisé des archives de Nuzi
 category: Foi & Confiance
-type: Récit historique
+type: Histoire vraie
 tags:
-- Nuzi
-- Patriarches
 - Archéologie
-- Fiabilité
-passages_associes: []
-source: 'Prédication : L’archéologie prouve-t-elle l’Ancien Testament ?'
-author: Évangile 21
+- Patriarches
+- Ancien Testament
+- Fiabilité biblique
+passages_associes:
+- Gn 15.2
+- Gn 31.19
+source: Ressource pastorale
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-31T09:00:24'
-updated_at: '2026-08-31T09:00:24'
+updated_at: '2026-08-31T10:35:04'
 ---
 
 Durant l'hiver 1925, une équipe d'archéologues fouillant le site antique de Nuzi, dans le nord de l'Irak actuel, mit au jour des milliers de tablettes d'argile cunéiformes datant du milieu du deuxième millénaire avant notre ère. Ces documents administratifs et juridiques n'intéressaient au départ que quelques spécialistes poussiéreux, mais ils allaient bientôt faire trembler le monde de la critique biblique libérale.

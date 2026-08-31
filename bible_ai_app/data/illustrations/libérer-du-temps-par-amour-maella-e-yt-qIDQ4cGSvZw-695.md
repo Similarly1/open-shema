@@ -1,24 +1,22 @@
 ---
 id: yt-qIDQ4cGSvZw-695
-title: 'Libérer du temps par amour : Maella et Iram'
+title: Libérer du temps par amour
 category: Prière & Intimité
-type: Personnel
+type: Métaphore & Vie courante
 tags:
 - Temps
-- Priorités
 - Amour
-- Famille
-passages_associes: []
-source: 'Prédication : Dieu est la source de notre bonheur (Psaume 16)'
-author: Prédicateur francophone
+- Priorités
+passages_associes:
+- Ep 5.15
+- Ps 90.12
+source: Chaire francophone
+author: Témoignage pastoral
 usage_history: []
 created_at: '2026-08-29T13:42:20'
-updated_at: '2026-08-29T13:42:20'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:37:21'
 ---
-Le prédicateur illustre la notion de priorités en partageant sa propre vie. Célibataire, il se pensait extrêmement occupé et sans temps libre. Puis il a rencontré Maella, et 'magiquement', des heures se sont libérées le soir pour l'appeler et marcher avec elle. Plus tard, avec la naissance de son fils Iram, du temps s'est encore libéré par amour pour lui.
+
+Un jeune homme, alors célibataire, se considérait comme extrêmement occupé, estimant son agenda saturé et manquant cruellement de temps libre. Puis, il fit la rencontre d'une compagne, et comme par magie, de longues heures se libérèrent chaque soir pour l'appeler, discuter et marcher à ses côtés. Plus tard, avec la naissance de son fils, d'autres plages horaires s'inventèrent encore par pur amour pour ce nouveau-né.
 
 > **Leçon homilétique :** Ce n'est pas le manque de temps qui nous empêche de chercher Dieu ou de lire sa Parole, mais la valeur que nous accordons à sa présence. Quand quelqu'un a de la valeur pour nous, nous faisons de la place.

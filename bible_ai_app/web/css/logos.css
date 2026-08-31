@@ -26147,6 +26147,60 @@ body.reading-bg-dark .comm-dropdown-popover {
   border-color: rgba(37, 99, 235, 0.35);
 }
 
+.ill-right-subfilters {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.ill-sort-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ill-sort-select-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.ill-sort-icon {
+  position: absolute;
+  left: 8px;
+  color: var(--text-muted, #71717a);
+  pointer-events: none;
+}
+
+.ill-sort-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--bg-surface, #1e1e24);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  color: var(--text-primary, #f4f4f5);
+  font-size: 11.5px;
+  font-weight: 600;
+  font-family: inherit;
+  padding: 4px 22px 4px 26px;
+  border-radius: 6px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.15s ease;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 7px center;
+}
+
+.ill-sort-select:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background-color: var(--bg-card, #25252d);
+}
+
+.ill-sort-select:focus {
+  border-color: var(--accent-blue, #3b82f6);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
 /* GRILLE DES CARTES D'ILLUSTRATION */
 .illustrations-main-content {
   flex: 1;
@@ -26259,9 +26313,9 @@ body.reading-bg-dark .comm-dropdown-popover {
  * MODALE ILLUSTRATIONS : VUE CONSULTATION & MODE ÉDITION
  * ========================================================================= */
 .illustration-modal-card {
-  width: 92%;
-  max-width: 900px;
-  max-height: 88vh;
+  width: min(1160px, 94vw);
+  max-width: 1160px;
+  max-height: 84vh;
   display: flex;
   flex-direction: column;
 }
@@ -26315,8 +26369,8 @@ body.reading-bg-dark .comm-dropdown-popover {
 .ill-modal-grid,
 .ill-modal-form-grid {
   display: grid;
-  grid-template-columns: 1fr 280px;
-  gap: 24px;
+  grid-template-columns: 1fr 300px;
+  gap: 28px;
 }
 
 /* Colonne Principale en Mode Consultation */
@@ -26481,25 +26535,44 @@ body.reading-bg-dark .comm-dropdown-popover {
 }
 
 .ill-passage-pill {
-  background: rgba(59, 130, 246, 0.1);
+  background: rgba(59, 130, 246, 0.12);
   color: #60a5fa;
-  border: 1px solid rgba(59, 130, 246, 0.25);
+  border: 1px solid rgba(59, 130, 246, 0.3);
   padding: 4px 10px;
   border-radius: 6px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   transition: all 0.15s ease;
+  letter-spacing: 0.2px;
 }
 
 .ill-passage-pill:hover {
   background: rgba(59, 130, 246, 0.25);
   border-color: #3b82f6;
   color: #ffffff;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
   transform: translateY(-1px);
+}
+
+.ill-verse-tooltip {
+  position: fixed;
+  z-index: 100000;
+  width: 320px;
+  max-width: 90vw;
+  background: var(--bg-card, #25252d);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.14));
+  border-radius: 8px;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.7);
+  padding: 10px 14px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-primary, #f4f4f5);
+  pointer-events: none;
+  transition: opacity 0.12s ease;
 }
 
 .ill-meta-author-text {
@@ -27422,9 +27495,9 @@ body.reading-bg-dark .comm-dropdown-popover {
 }
 
 #illustration-detail-modal .illustration-modal-card {
-  max-width: 860px !important;
-  width: 100% !important;
-  max-height: 88vh !important;
+  max-width: 1160px !important;
+  width: min(1160px, 94vw) !important;
+  max-height: 84vh !important;
   display: flex !important;
   flex-direction: column !important;
   margin: auto !important;

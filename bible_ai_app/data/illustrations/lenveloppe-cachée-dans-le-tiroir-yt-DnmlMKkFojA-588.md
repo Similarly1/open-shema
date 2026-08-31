@@ -1,24 +1,22 @@
 ---
 id: yt-DnmlMKkFojA-588
-title: L'enveloppe cachée dans le tiroir
+title: Le testament de foi d'un homme prévoyant
 category: Espérance & Éternité
-type: Personnel
+type: Histoire vraie
 tags:
-- Testament
-- Témoignage
-- Prévoyance
-- Obsèques
-passages_associes: []
-source: 'Prédication : Prédication #13 : Jacob : bien finir sa course !'
-author: Prédicateur francophone
+- Espérance
+- Héritage
+- Fin de vie
+passages_associes:
+- Ps 90.12
+- 2 Ti 4.6
+source: Prédication contemporaine
+author: Témoignage pastoral
 usage_history: []
 created_at: '2026-08-29T13:46:26'
-updated_at: '2026-08-29T13:46:26'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:36:38'
 ---
-Un frère de l'église, prévoyant et structuré, est décédé après avoir préparé bien à l'avance une petite feuille glissée dans une enveloppe au fond de son tiroir. Cette enveloppe contenait tout le plan de sa cérémonie funèbre, incluant les textes bibliques et les chants qu'il désirait laisser. Sa femme ignorait totalement l'existence de cette lettre, rédigée plus de trente ans plus tôt. C'était le témoignage tangible de foi qu'il avait voulu préparer pour les siens.
+
+Un homme, reconnu pour sa grande prévoyance et son sens de l'organisation, avait pris soin, des décennies avant son décès, de préparer un document précieux. Il avait glissé une enveloppe au fond d'un tiroir, contenant le plan détaillé de ses futures funérailles, incluant les textes bibliques et les cantiques qu'il souhaitait voir partagés. Son épouse, qui ignorait totalement l'existence de cette lettre rédigée trente ans plus tôt, a découvert ce témoignage tangible de foi au moment de son départ. Ce geste n'était pas seulement administratif, mais une ultime déclaration de confiance en l'éternité, léguée comme un trésor à ses proches pour les soutenir dans le deuil.
 
 > **Leçon homilétique :** Préparer la fin de notre vie terrestre ne se limite pas à des aspects administratifs ; c'est un acte d'amour et un puissant témoignage de foi laissé à notre famille.

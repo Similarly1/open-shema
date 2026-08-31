@@ -1,19 +1,21 @@
 ---
 id: yt-e21-17080-969
-title: Le testament de la jeune huguenote dans la tourmente
+title: Le testament de la jeune huguenote
 category: Espérance & Éternité
-type: Récit historique
+type: Histoire vraie
 tags:
-- Histoire
-- Huguenots
 - Héritage
-- Assurance
-passages_associes: []
-source: 'Prédication : L’héritage promis'
-author: Évangile 21
+- Persécution
+- Fidélité
+- Cévennes
+passages_associes:
+- 1P 1.4
+- He 9.15
+source: Chaire francophone
+author: Témoignage pastoral
 usage_history: []
 created_at: '2026-08-31T09:02:24'
-updated_at: '2026-08-31T09:02:24'
+updated_at: '2026-08-31T10:36:06'
 ---
 
 En l'année sombre de 1685, l'Édit de Fontainebleau venait d'abolir l'Édit de Nantes. Les temples protestants étaient rasés, les pasteurs bannis et la foi réformée déclarée illégale dans toute la France. C'était l'aube de la terrible période dite « du désert », où les fidèles devaient risquer leur vie pour adorer Dieu en secret dans les ravins obscurs, les bois profonds ou au fond des grottes des Cévennes. Une jeune fille, transie de froid mais habitée par une ferveur inflexible, cheminait seule à la tombée de la nuit à travers les sentiers escarpés pour rejoindre une de ces assemblées clandestines. Soudain, au détour d'un chemin, surgit un détachement de dragons du roi, ces soldats redoutés chargés de traquer les hérétiques.

@@ -1,22 +1,25 @@
 ---
 id: yt-art-9024-673
-title: Le faux cadre des lunettes invisibles
+title: Les lunettes invisibles du matérialisme
 category: Foi & Confiance
 type: Métaphore & Vie courante
 tags:
 - Vision du monde
-- Neutralité
+- Création
+- Athéisme
 - Apologétique
-- Matérialisme
-passages_associes: []
-source: 'Prédication : Est-ce au croyant qu’incombe la charge de la preuve ?'
-author: Évangile 21
+passages_associes:
+- Ps 19.2
+- Rm 1.20
+- Col 1.16
+source: Chaire francophone
+author: Témoignage pastoral
 usage_history: []
 created_at: '2026-08-30T12:25:12'
-updated_at: '2026-08-30T12:25:12'
+updated_at: '2026-08-31T10:32:53'
 ---
 
-Imaginons un instant deux randonneurs marchant au cœur d'une vallée alpine spectaculaire, cernée par des parois rocheuses vertigineuses et traversée par un torrent cristallin. L'un est naturaliste chrétien, l'autre est matérialiste convaincu. Le randonneur athée se tourne vers son compagnon et lui lance avec assurance : 'Regarde cette immensité. La nature fonctionne par des lois physiques strictes, la gravité, l'érosion, la thermodynamique. C'est le point de départ évident, neutre et incontestable. C'est à toi, avec ta croyance en un Créateur invisible, de prouver que ton Dieu rajoute quelque chose de plus à ce que mes yeux constatent rationnellement.'
+Deux randonneurs marchent un jour au cœur d'une vallée alpine spectaculaire, cernée par des parois rocheuses vertigineuses et traversée par un torrent cristallin. L'un est naturaliste chrétien, l'autre est matérialiste convaincu. Le randonneur athée se tourne vers son compagnon et lui lance avec assurance : 'Regarde cette immensité. La nature fonctionne par des lois physiques strictes, la gravité, l'érosion, la thermodynamique. C'est le point de départ évident, neutre et incontestable. C'est à toi, avec ta croyance en un Créateur invisible, de prouver que ton Dieu rajoute quelque chose de plus à ce que mes yeux constatent rationnellement.'
 
 À première vue, l'argument semble équitable. Pourtant, le naturaliste omet un détail crucial : il ne se contente pas d'observer les roches ; il postule d'emblée que la matière et l'énergie sont les seules réalités existantes, éternelles et autorégulées. Il porte des lunettes philosophiques teintées de matérialisme qu'il oublie d'interroger. Le croyant ne vient pas poser une brique supplémentaire sur un mur neutre et achevé. Il conteste les fondations mêmes du mur. Pour lui, la beauté, l'ordre mathématique de l'univers, la conscience humaine et la logique ne sont pas des accidents fortuits qui émergent du néant, mais les reflets nécessaires d'un Esprit suprême.
 

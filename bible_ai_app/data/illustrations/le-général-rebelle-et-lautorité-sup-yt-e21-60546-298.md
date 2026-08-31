@@ -2,18 +2,22 @@
 id: yt-e21-60546-298
 title: Le général rebelle et l'autorité suprême
 category: Sainteté & Obéissance
-type: Récit historique
+type: Histoire vraie
 tags:
+- Obéissance
 - Autorité
 - Responsabilité
 - Sainteté
-- Insubordination
-passages_associes: []
-source: 'Prédication : Un instant d’incrédulité inexcusable ?'
-author: Évangile 21
+- Discipline
+passages_associes:
+- 1 S 15.22
+- Lc 12.48
+- Jc 4.17
+source: Chaire francophone
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-31T09:09:42'
-updated_at: '2026-08-31T09:09:42'
+updated_at: '2026-08-31T10:33:05'
 ---
 
 Durant la campagne militaire du Pacifique lors de la Seconde Guerre mondiale, un général divisionnaire extrêmement décoré, dont les victoires passées avaient sauvé des milliers de vies, se trouva confronté à un ordre de commandement qu'il jugeait absurde et inadapté au terrain. Exténué par des années de guerre et voyant ses hommes souffrir le martyre dans la jungle boueuse, il décida de modifier unilatéralement la stratégie dictée par l'état-major suprême. Au lieu d'appliquer à la lettre la directive de négocier et de sécuriser une zone par étapes, il ordonna un bombardement massif immédiat, agissant par pur exutoire de sa frustration accumulée.

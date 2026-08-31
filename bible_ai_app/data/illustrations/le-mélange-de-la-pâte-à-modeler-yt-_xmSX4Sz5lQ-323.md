@@ -1,24 +1,22 @@
 ---
 id: yt-_xmSX4Sz5lQ-323
-title: Le mélange de la pâte à modeler
+title: L'unité indissoluble de l'alliance conjugale
 category: Mariage & Famille
 type: Métaphore & Vie courante
 tags:
 - Mariage
+- Alliance
 - Unité
-- Permanence
-passages_associes: []
-source: 'Prédication : Le but du mariage (Genèse 2.24) - La famille selon Dieu 1ère
-  partie'
-author: Prédicateur francophone
+passages_associes:
+- Ge 2.24
+- Mt 19.6
+source: Chaire francophone
+author: Témoignage pastoral
 usage_history: []
 created_at: '2026-08-29T13:43:49'
-updated_at: '2026-08-29T13:43:49'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:33:50'
 ---
-Le prédicateur utilise l'image de la pâte à modeler de différentes couleurs que l'on mélange ensemble. Une fois mélangées, il devient impossible de les séparer car elles forment une nouvelle couleur unique. C'est exactement l'idée du mariage selon la Bible : l'homme et la femme sont tellement unis et mixés qu'ils ne font plus qu'un.
+
+Il est possible d'utiliser l'image de la pâte à modeler de différentes couleurs que l'on mélange ensemble. Une fois malaxées, il devient impossible de les séparer car elles forment une nouvelle couleur unique et indissociable. C'est exactement l'idée du mariage selon la Bible : l'homme et la femme sont tellement unis et mixés par l'alliance qu'ils ne font plus qu'un, formant une réalité nouvelle et indivisible.
 
 > **Leçon homilétique :** Illustrer la nature indissoluble, fusionnelle et permanente de l'alliance conjugale voulue par Dieu.

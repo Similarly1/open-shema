@@ -1,24 +1,22 @@
 ---
 id: yt-bfxo5MKWD7I-589
-title: La discussion frustrante avec Hortense
+title: L'illusion de la persuasion humaine
 category: Prière & Intimité
 type: Personnel
 tags:
-- Persuasion
-- Esprit-Saint
-- Faiblesse
-passages_associes: []
-source: 'Prédication : L''ordre de marche laissé par Jésus (Ac 1.8 & Mt 28.18-20)
-  - 10 mai 2026 - Jean-David CÔTE'
-author: Prédicateur francophone
+- Évangélisation
+- Humilité
+- Saint-Esprit
+passages_associes:
+- 1 Co 2.4
+- Za 4.6
+source: Ressource pastorale
+author: Témoignage pastoral
 usage_history: []
 created_at: '2026-08-29T13:44:55'
-updated_at: '2026-08-29T13:44:55'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:29:14'
 ---
-Le prédicateur partage l'expérience d'avoir préparé un argumentaire infaillible pour convaincre une personne nommée Hortense d'un tort qu'elle a commis ou d'une vérité spirituelle. Après une discussion où la personne reste totalement imperméable aux arguments, on rentre chez soi frustré, réalisant soudain que ce n'est pas notre force de persuasion ou nos arguments bien rodés qui convertissent les cœurs, mais l'Esprit de Dieu.
+
+Un chrétien, désireux de ramener une connaissance sur le droit chemin, prépare minutieusement un argumentaire infaillible, convaincu que la logique et la rhétorique suffiront à briser les résistances. La discussion s'engage, mais l'interlocuteur reste totalement imperméable, froid et hermétique à chaque démonstration. De retour chez soi, une profonde frustration s'installe, laissant place à une réalisation spirituelle brutale : la conversion des cœurs n'est jamais le fruit de l'éloquence humaine ou de la force de persuasion, mais l'œuvre souveraine et mystérieuse de l'Esprit de Dieu. 
 
 > **Leçon homilétique :** Nous devons abandonner l'illusion que c'est notre intelligence ou notre éloquence qui convainc les pécheurs, pour nous reposer entièrement sur l'action souveraine du Saint-Esprit.

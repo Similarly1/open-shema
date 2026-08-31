@@ -1,22 +1,25 @@
 ---
 id: yt-e21-65317-933
-title: Le piège mortel de la tour de Babel moderne
+title: La tour de verre et le vertige
 category: Sainteté & Obéissance
 type: Métaphore & Vie courante
 tags:
-- orgueil
-- travail
-- anxiété
-- ambition
-passages_associes: []
-source: 'Prédication : Y-a-t-il une solution à mon orgueil ?'
-author: Évangile 21
+- Orgueil
+- Ambition
+- Burn-out
+- Grâce
+passages_associes:
+- Ge 11.4
+- Pr 16.18
+- Ja 4.6
+source: Prédication contemporaine
+author: Témoignage pastoral
 usage_history: []
 created_at: '2026-08-31T09:10:38'
-updated_at: '2026-08-31T09:10:38'
+updated_at: '2026-08-31T10:34:49'
 ---
 
-Imaginez un instant un jeune cadre ambitieux entrant dans une grande tour de verre et d'acier au cœur d'un quartier d'affaires européen. Dès ses premiers pas dans le hall étincelant, il est habité par une certitude silencieuse : il laissera sa trace. Il gravit les échelons à un rythme effréné, travaillant soixante-dix heures par semaine, sacrifiant les repas de famille, les week-ends avec ses enfants et le culte du dimanche, non seulement pour l'argent, mais pour cette soif insatiable d'entendre prononcer son nom avec respect dans les conseils d'administration. Chaque contrat signé est une brique posée à la hâte sur un édifice invisible, une tentative désespérée de toucher le ciel pour échapper au vertige de l'oubli et de l'insignifiance.
+Un jeune cadre ambitieux entre dans une grande tour de verre et d'acier au cœur d'un quartier d'affaires européen. Dès ses premiers pas dans le hall étincelant, il est habité par une certitude silencieuse : il laissera sa trace. Il gravit les échelons à un rythme effréné, travaillant soixante-dix heures par semaine, sacrifiant les repas de famille, les week-ends avec ses enfants et le culte du dimanche, non seulement pour l'argent, mais pour cette soif insatiable d'entendre prononcer son nom avec respect dans les conseils d'administration. Chaque contrat signé est une brique posée à la hâte sur un édifice invisible, une tentative désespérée de toucher le ciel pour échapper au vertige de l'oubli et de l'insignifiance.
 
 Pourtant, à mesure que la tour s'élève dans sa vie, l'anxiété grandit en proportion exacte. Chaque silence d'un supérieur, chaque critique lors d'une réunion devient une menace mortelle pour sa réputation fragile. Il ne construit pas par liberté ou par joie d'exercer un mandat culturel sain, mais par pure terreur de disparaître. Il craint d'être déclassé, d'être 'dispersé' dans l'anonymat de la masse. La brique de l'orgueil est collée avec le bitume de l'angoisse existentielle. Il s'imagine invulnérable parce que toute l'équipe est unanime à applaudir ses succès.
 

@@ -1,25 +1,24 @@
 ---
 id: yt-y-SEhqK2PQw-132
-title: Le piège du confort et de l'achat immobilier
+title: Le confort terrestre face à l'espérance céleste
 category: Espérance & Éternité
-type: Personnel
+type: Métaphore & Vie courante
 tags:
-- Confort
+- Maranatha
 - Matérialisme
-- Maranata
+- Retour du Christ
 - Espérance
-passages_associes: []
-source: 'Prédication : Que ton règne vienne (Matthieu 6.10a) - 3 mai 2026 - Matthieu
-  GIRALT'
-author: Prédicateur francophone
+passages_associes:
+- Mt 6.21
+- 1 Jn 2.15
+- Ap 22.20
+source: Chaire francophone
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-29T13:47:34'
-updated_at: '2026-08-29T13:47:34'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:34:31'
 ---
-Le prédicateur interpellait l'assemblée sur notre ferveur à prier « Maranata » (Viens, Seigneur Jésus) en soulignant notre hypocrisie potentielle : il est facile de prier pour le retour du Christ quand on est persécuté, mais beaucoup plus difficile quand on vient d'acheter une belle maison, qu'on attend une augmentation ou qu'on prépare ses examens.
+
+Il est aisé pour le croyant de prier « Maranatha » — « Viens, Seigneur Jésus » — lorsque la vie est marquée par l'épreuve ou la persécution. Cependant, cette prière devient parfois une formule vide de sens lorsque le confort s'installe. Qu'il s'agisse de l'acquisition d'une belle demeure, de l'attente d'une promotion professionnelle ou de la réussite de projets personnels, l'attachement aux biens de ce monde agit comme un anesthésiant pour l'âme. Le prédicateur souligne ainsi l'hypocrisie potentielle de celui qui, tout en confessant attendre le retour du Christ, s'enracine avec une ferveur croissante dans les plaisirs et la sécurité du siècle présent.
 
 > **Leçon homilétique :** Notre amour pour le confort matériel étouffe notre espérance eschatologique et notre désir ardent du retour de Christ.

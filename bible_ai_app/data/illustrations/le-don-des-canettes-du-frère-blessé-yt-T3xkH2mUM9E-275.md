@@ -1,23 +1,23 @@
 ---
 id: yt-T3xkH2mUM9E-275
-title: Le don des canettes du frère blessé
+title: La valeur du don dans la pauvreté
 category: Foi & Confiance
 type: Personnel
 tags:
 - Générosité
-- Privilège
-- Sacrifice
-passages_associes: []
-source: 'Prédication : La grâce qui rend généreux par Yanick Éthier (2026-06-14)'
-author: Prédicateur francophone
+- Dévouement
+- Offrande
+- Cœur
+passages_associes:
+- Mc 12.41-44
+- 2 Co 8.12
+source: Ressource pastorale
+author: Témoignage pastoral
 usage_history: []
 created_at: '2026-08-29T13:43:22'
-updated_at: '2026-08-29T13:43:22'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:32:49'
 ---
-Lors d'une levée de fonds pour l'acquisition d'un piano à queue dans l'église, un frère est venu voir le pasteur Yanick Éthier le cœur lourd et désolé. Ne pouvant plus honorer sa promesse de don en raison d'une grave blessure au dos, il a expliqué qu'il ramassait habituellement des canettes dans les poubelles à vélo pour amasser l'argent. Ce qui l'attristait le plus, c'était d'être privé du privilège de donner.
+
+Lors d'une levée de fonds organisée au sein d'une communauté pour l'acquisition d'un piano, un fidèle s'est approché du pasteur avec le cœur lourd. Ne pouvant plus honorer sa promesse de don en raison d'une grave blessure au dos, il a expliqué qu'il ramassait habituellement des canettes dans les poubelles, à vélo, pour constituer cette somme. Ce qui l'attristait le plus n'était pas sa condition physique, mais le sentiment d'être privé du privilège de contribuer à l'œuvre de Dieu.
 
 > **Leçon homilétique :** La générosité authentique n'est pas une question de montant, mais un privilège du cœur qui désire participer à l'œuvre de Dieu malgré la pauvreté ou les épreuves.

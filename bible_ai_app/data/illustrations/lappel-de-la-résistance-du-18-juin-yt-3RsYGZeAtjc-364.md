@@ -1,24 +1,23 @@
 ---
 id: yt-3RsYGZeAtjc-364
-title: L'appel de la résistance du 18 juin
+title: La liberté spirituelle exige une résistance active
 category: Foi & Confiance
 type: Histoire vraie
 tags:
-- Résistance
-- Combat spirituel
-- De Gaulle
 - Liberté
-passages_associes: []
-source: 'Prédication : The Beauty of Freedom in Action (Galatians 5:1-15)'
-author: Prédicateur francophone
+- Résistance
+- Vigilance
+- Évangile
+passages_associes:
+- Ga 5.1
+- Ga 5.13
+source: Prédication contemporaine
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-29T13:48:44'
-updated_at: '2026-08-29T13:48:44'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:31:40'
 ---
-Évoquant le 86e anniversaire de l'appel du Général de Gaulle le 18 juin 1940, le prédicateur rappelle que la liberté s'obtient et se maintient par un combat acharné. De même, la liberté spirituelle acquise par Christ nécessite une résistance active contre les infiltrations du légalisme et de la facilité mondaine au sein de l'Église.
+
+En commémorant le souvenir historique de l'appel du 18 juin 1940, il est rappelé que la liberté, qu'elle soit civile ou spirituelle, ne se maintient jamais par la passivité. Tout comme la résistance fut nécessaire pour préserver l'intégrité d'une nation face à l'oppression, la liberté acquise par le sacrifice du Christ exige une vigilance constante. L'Église est appelée à résister activement aux infiltrations insidieuses du légalisme et à la facilité mondaine qui cherchent à asservir à nouveau les consciences. La foi n'est pas un état statique, mais un combat permanent pour demeurer dans la vérité de l'Évangile.
 
 > **Leçon homilétique :** La liberté spirituelle ne se garde pas passivement ; elle exige une vigilance constante et un refus résigné de retomber sous les chaînes de la pensée humaine.

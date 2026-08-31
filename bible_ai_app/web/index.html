@@ -4459,7 +4459,7 @@
               </div>
             </div>
 
-            <!-- Sous-barre : Filtres par Type & Statut pastoral -->
+            <!-- Sous-barre : Filtres par Type, Statut pastoral & Tri -->
             <div class="illustrations-subfilter-bar">
               <div class="ill-types-group">
                 <span class="subfilter-label">Genre :</span>
@@ -4470,11 +4470,25 @@
                 <button class="ill-type-btn" data-type="Science & Nature">Science & Nature</button>
                 <button class="ill-type-btn" data-type="Personnel">Récit personnel</button>
               </div>
-              <div class="ill-status-group">
-                <span class="subfilter-label">Statut :</span>
-                <button class="ill-status-btn active" data-status="all">Toutes</button>
-                <button class="ill-status-btn" data-status="unused">Jamais prêchées</button>
-                <button class="ill-status-btn" data-status="used">Déjà prêchées</button>
+              <div class="ill-right-subfilters">
+                <div class="ill-status-group">
+                  <span class="subfilter-label">Statut :</span>
+                  <button class="ill-status-btn active" data-status="all">Toutes</button>
+                  <button class="ill-status-btn" data-status="unused">Jamais prêchées</button>
+                  <button class="ill-status-btn" data-status="used">Déjà prêchées</button>
+                </div>
+                <div class="ill-sort-group">
+                  <span class="subfilter-label">Tri :</span>
+                  <div class="ill-sort-select-wrapper">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" class="ill-sort-icon"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="m21 8-4-4-4 4"/><path d="M17 4v16"/></svg>
+                    <select id="ill-sort-select" class="ill-sort-select">
+                      <option value="date_desc">Plus récentes d'abord</option>
+                      <option value="date_asc">Plus anciennes d'abord</option>
+                      <option value="title_asc">Titre (A → Z)</option>
+                      <option value="title_desc">Titre (Z → A)</option>
+                    </select>
+                  </div>
+                </div>
               </div>
             </div>
           </header>
@@ -4496,10 +4510,6 @@
         <div class="modal-card illustration-modal-card">
           <div class="modal-header">
             <div class="ill-modal-header-left">
-              <div class="ill-modal-badges-row">
-                <span class="ill-modal-badge" id="ill-modal-type-badge">Histoire vraie</span>
-                <span class="ill-modal-category-badge" id="ill-modal-category-badge">Foi & Confiance</span>
-              </div>
               <h2 class="modal-title" id="ill-modal-title">Détail de l'illustration</h2>
             </div>
             <button class="btn-icon-subtle" id="btn-close-illustration-modal" title="Fermer">

@@ -1,23 +1,25 @@
 ---
 id: yt-kgc13-eiRjM-534
-title: Le pourboire minimum vs la générosité à 100%
+title: Le piège du minimum syndical et la grâce à 100%
 category: Argent & Générosité
-type: Personnel
+type: Métaphore & Vie courante
 tags:
 - Générosité
-- Culture
-- Grâce surabondante
-passages_associes: []
-source: 'Prédication : Fields of Grace by Clément Bourrel (07/26/2026)'
-author: Prédicateur francophone
+- Grâce
+- Boaz
+- Loi
+- Don
+passages_associes:
+- 2 Co 9.6
+- Ru 2.15-16
+- Lc 6.38
+source: Ressource pastorale
+author: Témoignage pastoral
 usage_history: []
 created_at: '2026-08-29T13:42:31'
-updated_at: '2026-08-29T13:42:31'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:34:53'
 ---
-Partageant son expérience personnelle d'immigrant français découvrant la culture des pourboires au Canada, le prédicateur confesse avoir d'abord donné le minimum syndical acceptable. À l'inverse, Boaz ne donne pas le minimum légal requis par la loi, mais déverse une grâce surabondante, comparable à un pourboire de 100 %.
+
+En observant les us et coutumes nord-américaines, un voyageur venu de France découvre la pratique des pourboires et confesse avoir d'abord eu le réflexe de calculer le strict minimum syndical acceptable. Cette attitude contraste vivement avec le comportement de Boaz dans les Écritures. Ce dernier ne se contente jamais du minimum légal requis par la législation agricole de l'époque pour les glaneurs ; au contraire, il déverse une munificence surabondante, comparable à un pourboire de 100 %, comblant largement les besoins de Ruth au-delà de toute espérance.
 
 > **Leçon homilétique :** La grâce divine et l'amour chrétien authentique ne se contentent jamais du strict minimum syndical ou légal, mais débordent généreusement au-delà des attentes.

@@ -1,23 +1,22 @@
 ---
 id: yt-olLtEm9IOh4-832
-title: L'abandon de Charles Studd pour la Chine
+title: Le renoncement pour le Royaume
 category: Évangélisation & Mission
 type: Histoire vraie
 tags:
-- Renoncement
 - Mission
-- Argent
-passages_associes: []
-source: 'Prédication : Luc 14:25-35 - Caractéristiques des vrais disciples'
-author: Prédicateur francophone
+- Renoncement
+- Discipulat
+passages_associes:
+- Ph 3.7
+- Mt 16.24
+source: Chaire francophone
+author: Charles Studd
 usage_history: []
 created_at: '2026-08-29T13:45:26'
-updated_at: '2026-08-29T13:45:26'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:31:17'
 ---
-Charles Studd était un joueur de cricket international anglais issu d'une riche famille. Un jour, il décide de tout lâcher, d'abandonner sa richesse et sa position mondaine pour partir en mission en Chine annoncer l'Évangile, illustrant le renoncement total exigé par Christ.
+
+Charles Studd, athlète de haut niveau et joueur de cricket international, jouissait d'une position sociale privilégiée et d'une grande richesse au sein de la société britannique. Pourtant, au sommet de sa carrière, il prend une décision radicale : il choisit de tout abandonner, ses biens, son confort et ses ambitions mondaines, pour partir en mission en Chine. Ce choix illustre le renoncement total que Christ demande à ceux qui souhaitent le suivre sans réserve.
 
 > **Leçon homilétique :** Être un disciple signifie être prêt à abandonner les ambitions et les richesses terrestres pour se concentrer pleinement sur le Sauveur.

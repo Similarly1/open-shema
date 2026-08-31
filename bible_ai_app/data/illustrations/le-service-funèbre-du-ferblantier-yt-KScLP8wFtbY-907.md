@@ -1,23 +1,22 @@
 ---
 id: yt-KScLP8wFtbY-907
-title: Le service funèbre du ferblantier
+title: La richesse invisible d'un ferblantier
 category: Espérance & Éternité
 type: Histoire vraie
 tags:
-- Générosité
-- Simplicité
+- Vie chrétienne
 - Héritage
-passages_associes: []
-source: 'Prédication : More Blessed to Give by Yanick Éthier (06/21/2026)'
-author: Prédicateur francophone
+- Générosité
+passages_associes:
+- Mt 6.20
+- 1 Co 15.58
+source: Chaire francophone
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-29T13:45:56'
-updated_at: '2026-08-29T13:45:56'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:35:39'
 ---
-Le prédicateur raconte avoir conduit les funérailles d'un homme simple qui avait travaillé toute sa vie comme ferblantier (plieur de tôle) et n'était certes pas un milliardaire comme Elon Musk. Pourtant, les témoignages poignants partagés lors de ce service ont révélé une vie extraordinaire de générosité, de gentillesse et de bienfaisance qui a durablement marqué son entourage.
+
+Lors des funérailles d'un homme simple, qui avait consacré toute son existence au métier de ferblantier, l'assemblée a pu mesurer la portée d'une vie humble. Loin des projecteurs de la réussite matérielle ou de la fortune des puissants de ce monde, cet homme a laissé derrière lui un témoignage bouleversant. Les récits partagés par ses proches ont révélé une vie marquée par une générosité constante, une bienveillance discrète et un dévouement qui a durablement transformé son entourage. Ce service funèbre a rappelé à tous les présents que la valeur d'une existence ne se calcule pas à l'aune des comptes bancaires, mais à la profondeur de l'empreinte d'amour laissée dans le cœur des autres.
 
 > **Leçon homilétique :** La véritable valeur d'une vie ne se mesure pas aux comptes en banque ou à la réussite matérielle, mais à l'empreinte d'amour et de don de soi que l'on laisse dans la vie des autres.

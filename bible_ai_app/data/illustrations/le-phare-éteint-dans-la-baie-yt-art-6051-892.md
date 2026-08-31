@@ -1,19 +1,23 @@
 ---
 id: yt-art-6051-892
-title: Le phare éteint dans la baie
+title: Le phare oublié sur la côte
 category: Évangélisation & Mission
 type: Métaphore & Vie courante
 tags:
-- Communauté
+- Église
+- Témoignage
+- Communion
 - Mission
 - Lumière
-- Égoïsme spirituel
-passages_associes: []
-source: 'Prédication : Qu’est-ce qui distingue une communauté missionnaire ?'
-author: Évangile 21
+passages_associes:
+- Mt 5.14
+- Ph 2.15
+- Mc 16.15
+source: Chaire francophone
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-30T12:26:57'
-updated_at: '2026-08-30T12:26:57'
+updated_at: '2026-08-31T10:34:04'
 ---
 
 Sur la côte rocheuse de la Nouvelle-Angleterre se dresse le vieux phare de Gull Rock. Pendant des décennies, il a guidé d'innombrables navires à travers les tempêtes et les récifs perfides. Au fil du temps, la petite communauté de gardiens et de villageois qui s'était installée à ses pieds a commencé à trouver la vie de garnison un peu austère. Ils décidèrent de bâtir un grand mur d'enceinte pour se protéger du vent glacial de l'océan Atlantique. Peu à peu, ils embellirent l'intérieur de l'enceinte : ils y plantèrent des jardins fleuris, installèrent des bancs en bois sculpté, construisirent une magnifique salle de réunion pour chanter des cantiques en chœur et partagèrent des festins somptueux à l'abri des intempéries.

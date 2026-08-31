@@ -1,19 +1,20 @@
 ---
 id: yt-e21-19955-330
-title: La symphonie inachevée des cathédrales
+title: La symphonie universelle de la foi
 category: Foi & Confiance
 type: Métaphore & Vie courante
 tags:
 - Unité
 - Diversité
-- Louange
 - Église
-passages_associes: []
-source: 'Prédication : Pourquoi le christianisme est-il si divisé ?'
-author: Évangile 21
+passages_associes:
+- 1 Co 12.4-6
+- Ep 4.4-6
+source: Chaire francophone
+author: Témoignage pastoral
 usage_history: []
 created_at: '2026-08-31T09:04:52'
-updated_at: '2026-08-31T09:04:52'
+updated_at: '2026-08-31T10:31:10'
 ---
 
 Imaginez un instant un orchestre philharmonique mondial s'apprêtant à jouer une œuvre monumentale sous la direction d'un chef d'orchestre d'exception. Sur la scène se côtoient des musiciens venus de tous les continents, jouant d'instruments radicalement différents. D'un côté, le violon tsigane aux mélodies vibrantes et improvisées ; de l'autre, la rigueur majestueuse et retenue des grandes orgues d'une cathédrale gothique ; plus loin, des percussions africaines aux rythmes syncopés et exubérants. Vu de loin, par un observateur distrait ou un critique sceptique assis au dernier rang, ce rassemblement d'instruments et de styles si hétérogènes ressemble à une cacophonie incompréhensible. Certains se demandent même comment une telle diversité peut prétendre constituer une seule et même musique.

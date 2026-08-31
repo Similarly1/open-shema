@@ -6,15 +6,16 @@ type: Métaphore & Vie courante
 tags:
 - Famille
 - Communication
-- Écrans
-- Solitude
-passages_associes: []
-source: 'Prédication : S2#1 – Bienvenue à la saison 2 sur la communication en famille
-  !'
-author: Évangile 21
+- Technologie
+- Grâce
+passages_associes:
+- Ep 5.15-16
+- Pr 27.17
+source: Prédication contemporaine
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-31T09:06:58'
-updated_at: '2026-08-31T09:06:58'
+updated_at: '2026-08-31T10:33:54'
 ---
 
 Dans un foyer moderne ordinaire, la scène se répète chaque soir avec une précision chirurgicale. Les parents rentrent du travail, les enfants posent leurs cartables, et un grand silence s'installe, interrompu uniquement par le cliquetis des touches de téléphones portables et la lueur bleue des écrans qui éclaire les visages figés. Chacun vit dans sa bulle numérique, naviguant à des milliers de kilomètres de distance physique alors qu'ils se trouvent assis sur le même canapé. La maison ressemble à un archipel d'îles désertes, où les habitants ne communiquent plus que par des ordres logistiques : 'As-tu fait tes devoirs ?', 'Passe-moi le sel', 'Éteins la lumière'.

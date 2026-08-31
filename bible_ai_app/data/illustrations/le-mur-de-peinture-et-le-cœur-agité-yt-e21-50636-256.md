@@ -1,25 +1,23 @@
 ---
 id: yt-e21-50636-256
-title: Le mur de peinture et le cœur agité
+title: L'idole de la performance dans le couple
 category: Mariage & Famille
-type: Personnel
+type: Histoire vraie
 tags:
 - Couple
-- Cœur
+- Idolâtrie
 - Communication
-- Désirs
-passages_associes: []
-source: 'Prédication : S2#6 – Devenir “expert” de son enfant'
-author: Évangile 21
+- Grâce
+passages_associes:
+- Ep 5.25
+- Col 3.12-14
+source: Prédication contemporaine
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-31T09:08:11'
-updated_at: '2026-08-31T09:08:11'
+updated_at: '2026-08-31T10:33:50'
 ---
 
-C'était un après-midi de printemps qui s'annonçait pourtant sous les meilleurs auspices. Annie, mon épouse, s'apprêtait à rentrer à la maison après une absence de près d'une semaine. Pour marquer le coup et lui offrir une belle surprise, j'avais entrepris un chantier monumental de peinture sur notre mur extérieur. Je m'étais fixé un objectif rigide : tout achever avant le bruit de sa voiture dans l'allée. J'étais suant, concentré, totalement absorbé par mon rouleau et mes pots de peinture, mon esprit rivé exclusivement sur l'accomplissement de ma tâche.
-
-Mais les imprévus ont ce don fâcheux de bousculer nos plans millimétrés. Annie est rentrée bien plus tôt que prévu. Alors qu'elle s'attendait à trouver un mari impatient de la serrer dans ses bras, elle a dû faire face à un homme à peine tourné vers elle, marmonnant un accueil distrait avant de replonger immédiatement le nez dans son mur. Sur le moment, la déception fut un choc thermique glacial. Elle a senti, avec une acuité douloureuse, que le projet avait pris le pas sur sa personne, que le béton et la peinture comptaient plus à mes yeux que ses retrouvailles.
-
-Le reste de la journée s'est égrené dans une atmosphère lourde, jalonnée de petites piques et de silences tendus. Chacun campait sur sa position, retranché dans sa propre frustration. Il a fallu attendre le soir, dans le calme revenu, pour que nous prenions le temps de creuser ce qui s'était réellement joué en nous. En posant les mots justes, nous avons réalisé que nos comportements boudeurs n'étaient que l'écume d'un problème de cœur : mon besoin de performance et de validation personnelle d'un côté, et son besoin légitime de sécurité affective et d'attention de l'autre. Une fois cette racine mise à nu, la dynamique de notre foyer a instantanément basculé dans la grâce et le pardon.
+Un après-midi de printemps, un homme s'apprêtait à accueillir son épouse après une semaine d'absence. Pour marquer le coup et offrir une surprise, il avait entrepris un chantier monumental de peinture sur un mur extérieur, se fixant un objectif rigide : tout achever avant l'arrivée de sa conjointe. Totalement absorbé par son rouleau et ses pots de peinture, l'esprit rivé exclusivement sur l'accomplissement de sa tâche, il n'a pas vu le temps passer. Lorsque son épouse est rentrée plus tôt que prévu, elle n'a pas trouvé un mari impatient de la serrer dans ses bras, mais un homme à peine tourné vers elle, marmonnant un accueil distrait avant de replonger immédiatement dans son travail. La déception fut immédiate : elle a senti que le projet avait pris le pas sur sa personne, que le béton et la peinture comptaient plus que leurs retrouvailles. Le reste de la journée fut marqué par une atmosphère lourde et des silences tendus. Il a fallu attendre le soir, dans le calme revenu, pour que le couple prenne le temps de creuser ce qui s'était réellement joué. En posant les mots justes, ils ont réalisé que leurs comportements n'étaient que l'écume d'un problème de cœur : le besoin de performance et de validation personnelle de l'un, et le besoin légitime de sécurité affective et d'attention de l'autre. Une fois cette racine mise à nu, la dynamique du foyer a basculé dans la grâce et le pardon.
 
 > **Leçon homilétique :** Nos réactions conflictuelles, qu'elles surviennent dans le couple ou avec nos enfants, révèlent toujours des idoles et des désirs profonds qui nécessitent d'être apportés à la lumière de l'Évangile.

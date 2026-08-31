@@ -1,24 +1,24 @@
 ---
 id: yt-jbIzg7HEeOw-711
-title: La prière inattendue pour le voleur de voiture
+title: Prier pour le voleur de voiture
 category: Grâce & Salut
-type: Personnel
+type: Histoire vraie
 tags:
-- Prière
-- Ennemis
+- Intercession
 - Pardon
 - Providence
-passages_associes: []
-source: 'Prédication : Le cœur du chrétien '
-author: Prédicateur francophone
+- Amour des ennemis
+passages_associes:
+- Mt 5.44
+- Lc 23.34
+- Rm 12.14
+source: Ressource pastorale
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-29T13:44:01'
-updated_at: '2026-08-29T13:44:01'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:30:46'
 ---
-Alors qu'il vivait à Grenoble, le prédicateur s'est fait voler sa voiture pendant la nuit. Le lendemain matin, une chrétienne présente chez eux, au lieu de prier pour retrouver simplement le bien matériel, a immédiatement prié avec ferveur pour le salut spirituel des voleurs, affirmant qu'ils étaient perdus sans Christ. Le jour même, la voiture a été miraculeusement retrouvée grâce à un concours de circonstances providentiel incluant un policier chrétien.
+
+Durant son séjour à Grenoble, un chrétien a eu la mauvaise surprise de constater le vol de sa voiture pendant la nuit. Le lendemain matin, une croyante présente à son domicile, au lieu de se lamenter ou de prier uniquement pour la récupération du bien matériel, s'est immédiatement mise à genoux pour intercéder avec ferveur pour le salut spirituel des voleurs, affirmant avec conviction qu'ils étaient perdus sans le Christ. Le jour même, la voiture a été miraculeusement retrouvée grâce à un concours de circonstances providentiel, incluant l'intervention providentielle d'un fonctionnaire de police également chrétien.
 
 > **Leçon homilétique :** La véritable spiritualité chrétienne ne cherche pas à maudir ou à condamner les agresseurs, mais intercède pour leur âme avec la boussole du Royaume.

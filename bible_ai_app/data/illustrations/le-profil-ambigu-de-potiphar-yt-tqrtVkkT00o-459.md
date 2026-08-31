@@ -1,25 +1,22 @@
 ---
 id: yt-tqrtVkkT00o-459
-title: Le profil ambigu de Potiphar
+title: L'intégrité de Joseph chez le chef des bourreaux
 category: Sainteté & Obéissance
 type: Histoire vraie
 tags:
-- Travail
 - Intégrité
-- Autorité
-- Témoignage
-passages_associes: []
-source: 'Prédication : Prédication #3: Face à la tentation, tu n''es pas SEUL ! La
-  vie de Joseph'
-author: Prédicateur francophone
+- Joseph
+- Milieu professionnel
+- Éthique
+passages_associes:
+- Gn 39.1-6
+source: Prédication contemporaine
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-29T13:46:43'
-updated_at: '2026-08-29T13:46:43'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:35:01'
 ---
-Potiphar est présenté comme un officier de Pharaon et chef des gardes. En creusant le vocabulaire original, on découvre qu'il est en réalité le chef des bourreaux, l'homme de main d'un système politique répressif. Pourtant, Joseph sert avec intégrité dans cette maison difficile sans jamais compromettre sa foi.
 
-> **Leçon homilétique :** Dieu nous place parfois dans des environnements professionnels ou relationnels toxiques ou corrompus ; notre devoir est d'y refléter sa lumière avec excellence.
+Potiphar est présenté dans les Écritures comme un officier de Pharaon et chef des gardes. En examinant le vocabulaire original, il apparaît qu'il occupait en réalité la fonction de chef des bourreaux, étant l'homme de main d'un système politique répressif et brutal. Pourtant, Joseph, arraché à sa terre natale, sert avec une intégrité exemplaire dans cette maison difficile, sans jamais compromettre sa foi ni ses valeurs devant les compromissions de son maître.
+
+> **Leçon homilétique :** Dieu place parfois ses serviteurs dans des environnements professionnels ou relationnels toxiques et corrompus ; le devoir du chrétien est d'y refléter la lumière divine avec excellence, sans se laisser contaminer par le système environnant.

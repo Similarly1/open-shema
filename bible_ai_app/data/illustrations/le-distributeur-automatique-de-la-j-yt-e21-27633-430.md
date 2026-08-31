@@ -1,25 +1,26 @@
 ---
 id: yt-e21-27633-430
-title: Le distributeur automatique de la justice morale
+title: Le piège du dieu-gendarme
 category: Sainteté & Obéissance
 type: Histoire vraie
 tags:
 - Légalisme
-- Rétribution
-- Épreuve
+- Souffrance
 - Grâce
-passages_associes: []
-source: 'Prédication : Seigneur, est-ce que tu m’aimes ?'
-author: Évangile 21
+- Idolâtrie
+passages_associes:
+- Jb 1.21
+- Rm 3.23-24
+- Ph 3.7-9
+source: Chaire francophone
+author: Témoignage pastoral
 usage_history: []
 created_at: '2026-08-31T09:08:53'
-updated_at: '2026-08-31T09:08:53'
+updated_at: '2026-08-31T10:32:49'
 ---
 
-Il y a quelques années, dans une grande métropole, un homme d'affaires méticuleux gérait sa vie comme une comptabilité d'entreprise. Pour lui, l'univers moral fonctionnait exactement comme un distributeur automatique de billets : on insère la carte de la piété, on tape le code de l'intégrité morale, on sélectionne le produit « bénédiction financière et santé de fer », et la machine crache immédiatement la monnaie du bonheur.
+Dans une grande métropole, un homme d'affaires méticuleux gérait son existence comme une comptabilité d'entreprise. Pour lui, l'univers moral fonctionnait comme un distributeur automatique : il suffisait d'insérer la carte de la piété, de taper le code de l'intégrité et de sélectionner le produit « bénédiction et santé » pour que la machine délivre le bonheur. Cet homme donnait sa dîme au centime près, ne manquait aucun culte, évitait les scandales et élevait ses enfants dans une stricte observance des règles. Il se sentait en sécurité, persuadé d'avoir scellé un contrat inviolable avec le Tout-Puissant.
 
-Cet homme donnait sa dîme au centime près, ne manquait aucun culte, évitait soigneusement les scandales et élevait ses enfants dans la stricte observance des règles ecclésiastiques. Il se sentait en sécurité, persuadé d'avoir scellé un contrat blindé avec le Tout-Puissant. Mais la vie n'est pas un algorithme. Un matin, le couperet tombe : un cancer fulgurant fauche sa conjointe bien-aimée, et une faillite frauduleuse orchestrée par un associé le dépouille de l'intégralité de son patrimoine.
-
-Sur son lit d'hôpital, terrassé à son tour par la maladie, cet homme vivait une crise spirituelle absolue. Il ne pleurait pas seulement la perte des siens ; il hurlait contre le ciel avec la rage du client trompé par une machine défectueuse : « J'ai payé mes cotisations morales ! J'ai fait tout ce que tu demandais ! Pourquoi tu ne respectes pas le contrat ? » Sa foi s'effondrait parce qu'elle reposait non pas sur la grâce souveraine d'un Père, mais sur la quincaillerie d'un dieu-gendarme.
+Mais la vie n'est pas un algorithme. Un matin, le couperet tombe : un cancer fulgurant emporte son épouse, et une faillite frauduleuse orchestrée par un associé le dépouille de son patrimoine. Sur son lit d'hôpital, terrassé par la maladie, cet homme vit une crise spirituelle absolue. Il ne pleure pas seulement la perte des siens ; il hurle contre le ciel avec la rage d'un client trompé par une machine défectueuse : « J'ai payé mes cotisations morales ! J'ai fait tout ce qui était demandé ! Pourquoi le contrat n'est-il pas respecté ? » Sa foi s'effondre parce qu'elle reposait non sur la grâce souveraine d'un Père, mais sur la quincaillerie d'un dieu-gendarme.
 
 > **Leçon homilétique :** Le légalisme transforme la relation vivante avec Dieu en une simple transaction commerciale, rendant le croyant totalement incapable de survivre théologiquement au jour du malheur immérité.

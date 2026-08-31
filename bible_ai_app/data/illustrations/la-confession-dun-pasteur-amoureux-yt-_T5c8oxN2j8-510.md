@@ -1,24 +1,22 @@
 ---
 id: yt-_T5c8oxN2j8-510
-title: La confession d'un pasteur amoureux du contrôle
+title: Le renoncement au besoin de contrôle
 category: Prière & Intimité
-type: Personnel
+type: Histoire vraie
 tags:
-- Contrôle
-- Lâcher-prise
-- Confession
+- Souveraineté
 - Paix
-passages_associes: []
-source: 'Prédication : Le courage de la foi par Basile Agba (2026-08-02)'
-author: Prédicateur francophone
+- Abandon
+passages_associes:
+- Pr 3.5
+- Ph 4.6-7
+source: Chaire francophone
+author: Témoignage pastoral
 usage_history: []
 created_at: '2026-08-29T13:43:58'
-updated_at: '2026-08-29T13:43:58'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:29:00'
 ---
-Le prédicateur confesse ouvertement devant l'assemblée qu'il aime par-dessus tout garder le contrôle de ses affaires parce que cela le rassure. Il avoue avoir tendance à vouloir aider Dieu à aller plus vite, pensant que le Tout-Puissant n'a pas la bonne vision du calendrier. Cependant, il réalise que la véritable foi enseigne à lâcher prise, à abandonner ce besoin de maîtrise et à recommencer son sort à l'Éternel.
+
+Un responsable d'église confessait ouvertement son attachement viscéral au contrôle de ses affaires, y trouvant une forme de réassurance personnelle. Il admettait avoir la fâcheuse tendance à vouloir 'aider' Dieu à accélérer les choses, persuadé que le Tout-Puissant n'avait pas toujours la 'bonne' vision du calendrier divin. Cependant, au fil de son cheminement spirituel, il a réalisé que la véritable foi réside dans le lâcher-prise, l'abandon de ce besoin de maîtrise, et la remise complète de son sort à la souveraineté de l'Éternel. 
 
 > **Leçon homilétique :** Lâcher prise sur notre besoin de contrôle est indispensable pour expérimenter la paix de Dieu et le véritable repos en sa souveraineté.

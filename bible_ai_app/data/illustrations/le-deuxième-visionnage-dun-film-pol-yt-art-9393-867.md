@@ -1,25 +1,26 @@
 ---
 id: yt-art-9393-867
-title: Le deuxième visionnage d'un film policier
+title: L'Écriture lue avec le regard du Messie
 category: Espérance & Éternité
 type: Métaphore & Vie courante
 tags:
-- Histoire du salut
-- Intertextualité
+- Herméneutique
+- Christocentrisme
+- Ancien Testament
 - Rédemption
-- Unité biblique
-passages_associes: []
-source: 'Prédication : Comment passer de l’exégèse à l’herméneutique?'
-author: Évangile 21
+passages_associes:
+- Lc 24.27
+- Jn 5.39
+- 1 P 1.10-12
+source: Prédication contemporaine
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-30T12:24:57'
-updated_at: '2026-08-30T12:24:57'
+updated_at: '2026-08-31T10:32:49'
 ---
 
-Avez-vous déjà fait l'expérience de regarder un grand film à suspense policier une deuxième fois, après avoir découvert l'identité du véritable coupable à la toute fin du premier visionnage ? Le premier visionnage est rempli de tension, de sueurs froides et de surprises. On cherche à deviner qui a commis le crime, on suspecte le mauvais personnage, on se laisse tromper par les fausses pistes tendues par le réalisateur.
+Le visionnage d'un grand film à suspense policier offre une expérience radicalement différente selon qu'il s'agit d'une première ou d'une seconde fois. Lors de la découverte initiale, le spectateur est plongé dans la tension, les sueurs froides et l'incertitude. Il tente de deviner l'identité du coupable, se laisse égarer par les fausses pistes et suspecte les mauvais personnages. Cependant, lors d'un second visionnage, le mystère est levé. Le spectateur ne cherche plus la surprise, mais savoure chaque détail, chaque regard en coin, chaque allusion subtile et chaque indice disséminé dès la scène d'ouverture qui, auparavant, échappaient à sa vigilance.
 
-Mais lorsque vous visionnez le film une deuxième fois, l'expérience est totalement différente. Vous connaissez déjà la fin. Le mystère est levé. Du coup, vous ne regardez plus le film pour la surprise, mais vous savourez chaque détail, chaque regard en coin, chaque petite allusion subtile, chaque indice disséminé dès la première scène qui, sur le coup, vous avait totalement échappé, mais qui, rétrospectivement, prenaient tout leur sens.
-
-Lire et interpréter l'Ancien Testament sans la croix, c'est comme regarder le film pour la première fois en restant aveugle aux indices. Mais lire l'Ancien Testament avec l'herméneutique chrétienne, c'est regarder toute l'histoire sainte avec les yeux de celui qui sait que Jésus-Christ est la clé de voûte de l'histoire. De la Genèse à l'Apocalypse, chaque page résonne de la même mélodie rédemptrice. L'exégèse nous fait découvrir les décors et les personnages du passé, mais l'herméneutique chrétienne nous permet de voir comment chaque fil de la tapisserie divine converge vers le visage radieux du Messie crucifié et glorifié.
+Lire l'Ancien Testament sans la lumière de la croix, c'est comme regarder ce film pour la première fois en restant aveugle aux indices cruciaux. En revanche, lire les Écritures avec une herméneutique chrétienne revient à contempler toute l'histoire sainte avec les yeux de celui qui sait que Jésus-Christ est la clé de voûte de l'histoire. De la Genèse à l'Apocalypse, chaque page résonne de la même mélodie rédemptrice. Si l'exégèse permet de découvrir les décors et les personnages du passé, l'herméneutique chrétienne révèle comment chaque fil de la tapisserie divine converge vers le visage radieux du Messie crucifié et glorifié.
 
 > **Leçon homilétique :** La grande histoire de la rédemption (Création, Chute, Croix, Cieux) offre la grille de lecture indispensable pour unifier toute l'Écriture autour du salut en Christ.

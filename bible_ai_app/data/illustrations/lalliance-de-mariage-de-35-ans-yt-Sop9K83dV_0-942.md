@@ -1,23 +1,23 @@
 ---
 id: yt-Sop9K83dV_0-942
-title: L'alliance de mariage de 35 ans
+title: La valeur cachée de l'alliance
 category: Mariage & Famille
-type: Personnel
+type: Métaphore & Vie courante
 tags:
-- Alliance
+- Engagement
 - Symbole
+- Cène
 - Fidélité
-passages_associes: []
-source: 'Prédication : Hors Série:  Le repas du Seigneur'
-author: Prédicateur francophone
+passages_associes:
+- 1 Co 11.23-26
+- Lc 22.19-20
+source: Ressource pastorale
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-29T13:42:35'
-updated_at: '2026-08-29T13:42:35'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:31:31'
 ---
-Le prédicateur montre sa bague de mariage qu'il porte depuis près de 35 ans. Pour un observateur extérieur, il ne s'agit que d'un simple anneau de métal sans valeur extraordinaire. Mais pour son épouse et lui, cet objet est profondément chargé de souvenirs, d'amour et d'engagement fidèle.
+
+Un époux porte à son doigt, depuis près de trente-cinq ans, un anneau de métal. Pour un observateur extérieur, cet objet semble banal, dépourvu de valeur marchande extraordinaire. Pourtant, pour le couple qui l'a échangé, cet anneau est saturé de souvenirs, de promesses tenues, d'épreuves traversées et d'un amour qui a résisté au temps. Il n'est pas qu'un bijou, il est le sceau d'une alliance indéfectible.
 
 > **Leçon homilétique :** De la même manière, le pain et le vin de la Cène semblent banals aux yeux du monde, mais ils sont infiniment précieux et chargés de sens pour le croyant qui y voit l'amour et l'engagement de Christ.

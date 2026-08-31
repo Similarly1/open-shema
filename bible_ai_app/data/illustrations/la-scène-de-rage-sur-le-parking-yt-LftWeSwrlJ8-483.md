@@ -1,24 +1,23 @@
 ---
 id: yt-LftWeSwrlJ8-483
-title: La scène de rage sur le parking
+title: La leçon de colère sur un parking
 category: Foi & Confiance
 type: Histoire vraie
 tags:
 - Éducation
-- Quotidien
-- Conflit
-- Vision biblique
-passages_associes: []
-source: 'Prédication : Le rôle des parents - Deutéronome 6.4-9'
-author: Prédicateur francophone
+- Colère
+- Vie quotidienne
+- Transmission
+passages_associes:
+- Ep 4.26
+- Dt 6.7
+source: Prédication contemporaine
+author: Témoignage pastoral
 usage_history: []
 created_at: '2026-08-29T13:44:39'
-updated_at: '2026-08-29T13:44:39'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:31:00'
 ---
-Alors qu'il mangeait dans un café avec son fils aîné, deux automobilistes se sont disputés. L'un d'eux est sorti fou de rage et a craché sur l'autre véhicule juste devant leur table. Au lieu d'ignorer la scène, le prédicateur s'en est servi pour discuter immédiatement avec son fils de ce que la Bible enseigne sur la colère et la réaction juste.
 
-> **Leçon homilétique :** Les incidents de la vie quotidienne sont des opportunités en Or pour appliquer le filtre de la Parole de Dieu et inculquer une vision biblique du monde à nos enfants.
+Alors qu'un père partageait un repas dans un café avec son fils aîné, deux automobilistes se sont violemment disputés. L'un d'eux est sorti de son véhicule fou de rage et a craché sur l'autre voiture, s'arrêtant pour extérioriser sa haine juste devant leur table. Au lieu d'ignorer la scène ou de se laisser contaminer par l'agressivité ambiante, le père s'en est immédiatement servi pour discuter avec son fils de ce que la Bible enseigne sur la maîtrise de soi et la réaction juste face à la provocation.
+
+> **Leçon homilétique :** Les incidents de la vie quotidienne sont des opportunités en or pour appliquer le filtre de la Parole de Dieu et inculquer une vision biblique du monde à nos enfants.

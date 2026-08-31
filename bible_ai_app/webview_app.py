@@ -927,6 +927,56 @@ class BibleAppApi:
         from core.passage_study_manager import PassageStudyManager
         return PassageStudyManager.get_passage_study_data(passage_ref=passage_ref, bible_name=bible_name)
 
+    def get_quick_passage_preview(self, passage_ref: str, bible_name: str = "LSG") -> Dict[str, Any]:
+        """Retourne rapidement le texte des versets pour une infobulle au survol (sub-10ms)."""
+        try:
+            import re
+            from core.passage_study_manager import PassageStudyManager, BibleJsonLoader, extract_verse_text
+            bounds = PassageStudyManager.parse_passage_bounds(passage_ref)
+            if not bounds:
+                return {"success": False, "error": "Référence inconnue"}
+            
+            book_code = bounds["book_code"]
+            start_ch = bounds["start_ch"]
+            start_v = bounds["start_v"]
+            end_ch = bounds["end_ch"]
+            end_v = bounds["end_v"]
+            french_book = bounds["french_book"]
+
+            installed = BibleJsonLoader.list_installed_bibles()
+            target_bible = bible_name if bible_name in installed else (installed[0] if installed else "LSG")
+            b_data = BibleJsonLoader.load_book(target_bible, book_code)
+            if not b_data:
+                return {"success": False, "error": "Texte biblique introuvable"}
+
+            chapters_dict = b_data.get("chapters", {})
+            verses = []
+            for ch_num in range(start_ch, end_ch + 1):
+                ch_str = str(ch_num)
+                if ch_str not in chapters_dict:
+                    continue
+                v_dict = chapters_dict[ch_str]
+                sorted_v_keys = sorted(v_dict.keys(), key=lambda x: int(x) if x.isdigit() else 999)
+                for vk in sorted_v_keys:
+                    v_int = int(vk) if vk.isdigit() else 0
+                    if ch_num == start_ch and v_int < start_v:
+                        continue
+                    if ch_num == end_ch and v_int > end_v:
+                        continue
+                    clean_txt = extract_verse_text(v_dict[vk])
+                    clean_txt = re.sub(r'<[^>]+>', '', clean_txt).strip()
+                    verses.append({"chapter": ch_num, "verse": vk, "text": clean_txt})
+
+            disp = f"{french_book} {start_ch}:{start_v}" if start_ch == end_ch and start_v == end_v else (f"{french_book} {start_ch}:{start_v}–{end_v}" if start_ch == end_ch else f"{french_book} {start_ch}:{start_v} – {end_ch}:{end_v}")
+            return {
+                "success": True,
+                "reference": disp,
+                "bible_name": target_bible,
+                "verses": verses
+            }
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
     def get_passage_overview_bundle(self, book_code: str, chapter: int = 1, verse: int = 1, bible_name: str = "LSG") -> Dict[str, Any]:
         """Agrège tout l'écosystème documentaire pour le volet d'aperçu rapide de la page Bible."""
         from core.passage_study_manager import PassageStudyManager
@@ -1722,7 +1772,8 @@ class BibleAppApi:
         query: str = "",
         category: str = "all",
         type_filter: str = "all",
-        status_filter: str = "all"
+        status_filter: str = "all",
+        sort_by: str = "date_desc"
     ) -> Dict[str, Any]:
         """Retourne une page légère d'illustrations (sub-10ms)."""
         self.config = load_config()
@@ -1733,6 +1784,7 @@ class BibleAppApi:
             category=category,
             type_filter=type_filter,
             status_filter=status_filter,
+            sort_by=sort_by,
             config=self.config
         )
 
@@ -4497,7 +4549,8 @@ class BibleAppApi:
         query: str = "",
         category: str = "all",
         type_filter: str = "all",
-        status_filter: str = "all"
+        status_filter: str = "all",
+        sort_by: str = "date_desc"
     ) -> Dict[str, Any]:
         """Retourne une page légère d'illustrations (sub-10ms)."""
         try:
@@ -4508,6 +4561,7 @@ class BibleAppApi:
                 category=category,
                 type_filter=type_filter,
                 status_filter=status_filter,
+                sort_by=sort_by,
                 config=self.config
             )
         except Exception as e:

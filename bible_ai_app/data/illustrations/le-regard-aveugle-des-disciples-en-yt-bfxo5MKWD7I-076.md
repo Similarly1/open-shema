@@ -1,24 +1,23 @@
 ---
 id: yt-bfxo5MKWD7I-076
-title: Le regard aveugle des disciples en Samarie
+title: Le regard aveugle sur la moisson spirituelle
 category: Évangélisation & Mission
 type: Histoire vraie
 tags:
+- Évangélisation
 - Samarie
 - Regard
-- Moisson
-passages_associes: []
-source: 'Prédication : L''ordre de marche laissé par Jésus (Ac 1.8 & Mt 28.18-20)
-  - 10 mai 2026 - Jean-David CÔTE'
-author: Prédicateur francophone
+- Préjugés
+passages_associes:
+- Jn 4.35
+- Mt 9.37
+source: Prédication contemporaine
+author: Récit d'illustration
 usage_history: []
 created_at: '2026-08-29T13:44:55'
-updated_at: '2026-08-29T13:44:55'
-license: private
-public_domain: false
-is_personal: true
-source_type: youtube_sermon
+updated_at: '2026-08-31T10:35:10'
 ---
-Dans Jean 4, les disciples traversent la Samarie pour aller acheter de la nourriture au village. Ils croisent la Samaritaine au puits en plein midi, mais ils ne voient en elle qu'une étrangère méprisable ou une personne ordinaire, sans voir la moisson spirituelle prête. Jésus, lui, avait les yeux ouverts et a touché tout un village à travers cette femme.
 
-> **Leçon homilétique :** Le danger du chrétien est de passer à côté des occasions d'évangélisation juste à côté de chez lui, aveuglé par les préjugés ou le confort, alors que les cœurs autour de nous sont murs pour l'Évangile.
+Dans le récit de l'Évangile, les disciples traversent la Samarie avec pour seul objectif l'achat de nourriture dans le village voisin. Lorsqu'ils croisent la femme samaritaine au puits, en plein midi, leur regard ne perçoit en elle qu'une étrangère méprisable ou, au mieux, une personne ordinaire. Ils demeurent aveugles à la moisson spirituelle qui est pourtant prête à être récoltée sous leurs yeux. Jésus, en revanche, possède une vision différente : Il discerne la réalité spirituelle de cette femme et, à travers cette rencontre, touche et transforme tout un village. Alors que les disciples étaient préoccupés par leur confort immédiat, le Christ voyait l'urgence du Royaume.
+
+> **Leçon homilétique :** Le danger du chrétien est de passer à côté des occasions d'évangélisation situées juste à côté de lui, aveuglé par les préjugés ou le confort, alors que les cœurs autour de nous sont mûrs pour l'Évangile.
