@@ -693,13 +693,13 @@
   "Commentaires The Gospel Coalition (TGC)": {
     "title": "Commentaires Bibliques The Gospel Coalition (TGC)",
     "author": "The Gospel Coalition (D.A. Carson, Douglas Moo, Dan Doriani, etc.)",
-    "description": "Commentaires bibliques contemporains complets traduits en français (795 sections exégétiques).",
+    "description": "Commentaires bibliques contemporains complets traduits en français (6051 sections exégétiques).",
     "year": "2021-2026",
     "cover_path": null,
     "type": "Commentaire",
     "format": "sqlite",
     "commentary_id": "tgc_francais",
-    "chunks_count": 795,
+    "chunks_count": 6051,
     "embedding_model": "study_library",
     "active": true
   },

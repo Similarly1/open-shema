@@ -23,7 +23,7 @@ import argparse
 import itertools
 import sqlite3
 import requests
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import Lock
 from typing import Dict, List, Any, Optional, Tuple
 
@@ -33,6 +33,7 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, CURRENT_DIR)
 
 from core.config import load_config
+from core.translation_manager import TranslationManager
 
 # 9 livres STRICTEMENT EXCLUS car déjà traduits officiellement en français sur Évangile21 :
 EXCLUDED_SLUGS = {
@@ -153,7 +154,20 @@ class TGCTranslationCache:
     def is_chapter_cached(cls, book_code: str, chapter_num: int) -> bool:
         cache = cls.load_cache()
         key = cls.get_key(book_code, chapter_num)
-        return key in cache and ("chunks" in cache[key])
+        if key not in cache or "chunks" not in cache[key]:
+            return False
+        chunks = cache[key].get("chunks", [])
+        if not chunks:
+            return False
+        # Vérifier qu'aucun chunk n'est resté en anglais
+        for c in chunks:
+            txt = c.get("text", "").strip()
+            if not txt:
+                return False
+            # Si le texte est substantiel, s'assurer qu'il est bien en français
+            if len(txt) > 60 and not TranslationManager.is_french(txt):
+                return False
+        return True
 
     @classmethod
     def get_chapter(cls, book_code: str, chapter_num: int) -> Optional[Dict[str, Any]]:
@@ -327,36 +341,36 @@ def clean_json_response(raw_text: str) -> Optional[Dict[str, Any]]:
         except Exception:
             pass
 
-    # 4. Fallback par extraction regex des chunks individuels
+    # 4. Fallback par extraction regex robuste de chaque objet JSON
     chunks_found = []
-    chunk_pattern = re.compile(
-        r'\{\s*"index":\s*(?P<index>\d+)\s*,\s*"title":\s*"(?P<title>(?:\\.|[^"\\])*)"\s*,\s*"text":\s*"(?P<text>(?:\\.|[^"\\])*)"',
-        re.DOTALL
-    )
-    for m in chunk_pattern.finditer(cleaned):
-        try:
-            c_idx = int(m.group("index"))
-            raw_title = m.group("title")
-            raw_text_chunk = m.group("text")
-            
+    # Pattern pour capturer les objets JSON même avec ordre de clés inversé
+    for obj_match in re.finditer(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', cleaned):
+        obj_str = obj_match.group(0)
+        t_m = re.search(r'"title"\s*:\s*"(?P<title>(?:\\.|[^"\\])*)"', obj_str)
+        txt_m = re.search(r'"text"\s*:\s*"(?P<text>(?:\\.|[^"\\])*)"', obj_str)
+        idx_m = re.search(r'"index"\s*:\s*(?P<index>\d+)', obj_str)
+        if txt_m:
             try:
-                c_title = json.loads(f'"{raw_title}"', strict=False)
-            except Exception:
-                c_title = raw_title.replace('\\"', '"').replace('\\n', '\n')
+                c_idx = int(idx_m.group("index")) if idx_m else len(chunks_found)
+                raw_title = t_m.group("title") if t_m else ""
+                raw_text_chunk = txt_m.group("text")
+                try:
+                    c_title = json.loads(f'"{raw_title}"', strict=False)
+                except Exception:
+                    c_title = raw_title.replace('\\"', '"').replace('\\n', '\n')
+                try:
+                    c_text = json.loads(f'"{raw_text_chunk}"', strict=False)
+                except Exception:
+                    c_text = raw_text_chunk.replace('\\"', '"').replace('\\n', '\n')
 
-            try:
-                c_text = json.loads(f'"{raw_text_chunk}"', strict=False)
+                chunks_found.append({
+                    "index": c_idx,
+                    "title": c_title,
+                    "text": c_text,
+                    "paragraphs": [p.strip() for p in c_text.split("\n\n") if p.strip()]
+                })
             except Exception:
-                c_text = raw_text_chunk.replace('\\"', '"').replace('\\n', '\n')
-
-            chunks_found.append({
-                "index": c_idx,
-                "title": c_title,
-                "text": c_text,
-                "paragraphs": [p.strip() for p in c_text.split("\n\n") if p.strip()]
-            })
-        except Exception:
-            pass
+                pass
 
     if chunks_found:
         return {"chunks": chunks_found}
@@ -426,35 +440,42 @@ RAPPEL CRUCIAL :
             }
         }
 
-        try:
-            if endpoint.get("limiter"):
-                endpoint["limiter"].acquire()
+        for attempt in range(1, 4):
+            try:
+                if endpoint.get("limiter"):
+                    endpoint["limiter"].acquire()
 
-            resp = requests.post(url, json=payload, timeout=(15, 150))
-            if resp.status_code == 200:
-                data = resp.json()
-                raw_u = data.get("usageMetadata", {})
-                usage_res = {
-                    "prompt_tokens": raw_u.get("promptTokenCount", 0),
-                    "completion_tokens": raw_u.get("candidatesTokenCount", 0),
-                    "total_tokens": raw_u.get("totalTokenCount", 0)
-                }
-                candidates = data.get("candidates", [])
-                if candidates:
-                    parts = candidates[0].get("content", {}).get("parts", [])
-                    if parts:
-                        raw_reply = parts[0].get("text", "")
-                        parsed = clean_json_response(raw_reply)
-                        if parsed and "chunks" in parsed:
-                            return True, parsed["chunks"], usage_res
-                        return False, f"JSON Gemini invalide : {raw_reply[:200]}...", usage_res
-                return False, "Réponse Gemini vide ou bloquée", usage_res
-            elif resp.status_code == 429:
-                return False, "429 Too Many Requests (Quota dépassé)", usage_res
-            else:
-                return False, f"Erreur Gemini ({resp.status_code}) : {resp.text[:300]}", usage_res
-        except Exception as e:
-            return False, f"Exception Gemini : {e}", usage_res
+                resp = requests.post(url, json=payload, timeout=(15, 150))
+                if resp.status_code == 200:
+                    data = resp.json()
+                    raw_u = data.get("usageMetadata", {})
+                    usage_res = {
+                        "prompt_tokens": raw_u.get("promptTokenCount", 0),
+                        "completion_tokens": raw_u.get("candidatesTokenCount", 0),
+                        "total_tokens": raw_u.get("totalTokenCount", 0)
+                    }
+                    candidates = data.get("candidates", [])
+                    if candidates:
+                        parts = candidates[0].get("content", {}).get("parts", [])
+                        if parts:
+                            raw_reply = parts[0].get("text", "")
+                            parsed = clean_json_response(raw_reply)
+                            if parsed and "chunks" in parsed:
+                                return True, parsed["chunks"], usage_res
+                            return False, f"JSON Gemini invalide : {raw_reply[:200]}...", usage_res
+                    return False, "Réponse Gemini vide ou bloquée", usage_res
+                elif resp.status_code in [429, 500, 503]:
+                    if attempt < 3:
+                        time.sleep(4.0 * attempt)
+                        continue
+                    return False, f"Erreur Gemini ({resp.status_code}) après {attempt} essais", usage_res
+                else:
+                    return False, f"Erreur Gemini ({resp.status_code}) : {resp.text[:300]}", usage_res
+            except Exception as e:
+                if attempt < 3:
+                    time.sleep(3.0 * attempt)
+                    continue
+                return False, f"Exception Gemini : {e}", usage_res
 
     # 2. Fournisseur Infomaniak
     elif "ministral" in clean_model.lower() or "infomaniak" in clean_model.lower() or "qwen" in clean_model.lower():
@@ -504,6 +525,93 @@ RAPPEL CRUCIAL :
     return False, f"Modèle non supporté : {clean_model}", usage_res
 
 
+def call_llm_with_endpoint_fallback(chapter_item: Dict[str, Any], sub_chunks: List[Dict[str, Any]], primary_ep: Dict[str, Any], pool: Optional[List[Dict[str, Any]]] = None) -> Tuple[bool, Any, Dict[str, int]]:
+    """Tente la traduction avec primary_ep, et si échec / 429, bascule automatiquement sur les autres endpoints du pool."""
+    all_eps = [primary_ep]
+    if pool:
+        all_eps.extend([ep for ep in pool if ep.get("id") != primary_ep.get("id") or ep.get("model") != primary_ep.get("model")])
+
+    total_u = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+    last_err = ""
+
+    for ep in all_eps:
+        ok, res, u = _call_llm_single_subchunk(chapter_item, sub_chunks, ep)
+        for k in total_u:
+            total_u[k] += u.get(k, 0)
+        if ok and isinstance(res, list):
+            return True, res, total_u
+        last_err = res
+
+    return False, last_err, total_u
+
+
+def _split_large_chunk(chunk: Dict[str, Any], max_words: int = 900) -> List[Dict[str, Any]]:
+    """Si une péricope unique dépasse max_words, la divise en sous-blocs de paragraphes."""
+    text = chunk.get("text", "")
+    paragraphs = text.split("\n\n")
+    if len(text.split()) <= max_words or len(paragraphs) <= 1:
+        return [chunk]
+
+    sub_chunks = []
+    curr_paras = []
+    curr_words = 0
+
+    for p in paragraphs:
+        p_w = len(p.split())
+        if curr_paras and (curr_words + p_w > max_words):
+            sub_chunks.append({
+                **chunk,
+                "text": "\n\n".join(curr_paras),
+                "is_subpart": True
+            })
+            curr_paras = [p]
+            curr_words = p_w
+        else:
+            curr_paras.append(p)
+            curr_words += p_w
+
+    if curr_paras:
+        sub_chunks.append({
+            **chunk,
+            "text": "\n\n".join(curr_paras),
+            "is_subpart": True
+        })
+    return sub_chunks
+
+
+def _translate_single_pericope_with_split(chapter_item: Dict[str, Any], original_v: Dict[str, Any], endpoint: Dict[str, Any], pool: Optional[List[Dict[str, Any]]] = None) -> Tuple[bool, Optional[Dict[str, Any]], Dict[str, int]]:
+    """Traduit une péricope unique, en la découpant en sous-parties si elle est très volumineuse."""
+    sub_parts = _split_large_chunk(original_v, max_words=900)
+    total_u = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+    part_texts = []
+    part_titles = []
+    all_part_paras = []
+
+    for idx, part in enumerate(sub_parts):
+        s_ok, s_chunks, s_u = call_llm_with_endpoint_fallback(chapter_item, [part], endpoint, pool)
+        for k in total_u:
+            total_u[k] += s_u.get(k, 0)
+        if not s_ok or not s_chunks:
+            return False, None, total_u
+
+        c_item = s_chunks[0]
+        t_txt = c_item.get("text", "").strip()
+        t_tit = c_item.get("title", "").strip()
+        t_paras = c_item.get("paragraphs", []) or [p.strip() for p in t_txt.split("\n\n") if p.strip()]
+
+        part_texts.append(t_txt)
+        if t_tit and not part_titles:
+            part_titles.append(t_tit)
+        all_part_paras.extend(t_paras)
+
+    combined_text = "\n\n".join(part_texts)
+    chunk_obj = dict(original_v)
+    chunk_obj["title"] = part_titles[0] if part_titles else original_v.get("title", "")
+    chunk_obj["text"] = combined_text
+    chunk_obj["paragraphs"] = all_part_paras or [p.strip() for p in combined_text.split("\n\n") if p.strip()]
+    return True, chunk_obj, total_u
+
+
 def create_sub_batches(verses: List[Dict[str, Any]], max_words_per_batch: int = 1200, max_items_per_batch: int = 3) -> List[List[Dict[str, Any]]]:
     """Découpe adaptative des péricopes pour garantir de ne jamais dépasser le plafond de tokens de sortie."""
     batches = []
@@ -523,8 +631,8 @@ def create_sub_batches(verses: List[Dict[str, Any]], max_words_per_batch: int = 
     return batches
 
 
-def call_llm_translate_chapter(chapter_item: Dict[str, Any], endpoint: Dict[str, Any]) -> Tuple[bool, Any, Dict[str, int]]:
-    """Envoie un chapitre complet avec découpage adaptatif par sous-lots pour une fidélité et stabilité maximales."""
+def call_llm_translate_chapter(chapter_item: Dict[str, Any], endpoint: Dict[str, Any], pool: Optional[List[Dict[str, Any]]] = None) -> Tuple[bool, Any, Dict[str, int]]:
+    """Envoie un chapitre complet avec découpage adaptatif et vérification stricte du français."""
     raw_verses = chapter_item.get("verses", [])
     if not raw_verses:
         return True, [], {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
@@ -534,32 +642,58 @@ def call_llm_translate_chapter(chapter_item: Dict[str, Any], endpoint: Dict[str,
     total_usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
 
     for batch in batches:
-        ok, res_chunks, u = _call_llm_single_subchunk(chapter_item, batch, endpoint)
+        # Si le lot contient une seule très grande péricope (> 1000 mots), traitement scindé direct
+        if len(batch) == 1 and len(batch[0].get("text", "").split()) > 1000:
+            s_ok, s_chunk, s_u = _translate_single_pericope_with_split(chapter_item, batch[0], endpoint, pool)
+            for k in total_usage:
+                total_usage[k] += s_u.get(k, 0)
+            if not s_ok or not s_chunk:
+                return False, f"Échec traduction péricope longue {batch[0].get('title')}", total_usage
+            all_translated_chunks.append(s_chunk)
+            continue
+
+        ok, res_chunks, u = call_llm_with_endpoint_fallback(chapter_item, batch, endpoint, pool)
         for k in total_usage:
             total_usage[k] += u.get(k, 0)
 
-        if not ok:
-            return False, res_chunks, total_usage
+        # Si le lot global a échoué ou n'est pas une liste valide, repli immédiat en mode unitaire
+        if not ok or not isinstance(res_chunks, list):
+            for single_v in batch:
+                s_ok, s_chunk, s_u = _translate_single_pericope_with_split(chapter_item, single_v, endpoint, pool)
+                for k in total_usage:
+                    total_usage[k] += s_u.get(k, 0)
+                if not s_ok or not s_chunk:
+                    return False, f"Échec traduction péricope {single_v.get('title')}", total_usage
+                all_translated_chunks.append(s_chunk)
+            continue
 
-        if isinstance(res_chunks, list):
-            for sub_idx, original_v in enumerate(batch):
-                matched = None
-                if sub_idx < len(res_chunks):
-                    matched = res_chunks[sub_idx]
+        # Vérification détaillée de chaque péricope
+        for sub_idx, original_v in enumerate(batch):
+            matched = None
+            if sub_idx < len(res_chunks):
+                matched = res_chunks[sub_idx]
 
-                trans_text = matched.get("text", "") if matched else original_v.get("text", "")
-                trans_title = matched.get("title", "") if matched else original_v.get("title", "")
-                trans_paras = matched.get("paragraphs", []) if matched else []
-                if not trans_paras and trans_text:
-                    trans_paras = [p.strip() for p in trans_text.split("\n\n") if p.strip()]
+            trans_text = matched.get("text", "").strip() if matched else ""
+            trans_title = matched.get("title", "").strip() if matched else ""
 
-                chunk_obj = dict(original_v)
-                chunk_obj["title"] = trans_title or original_v.get("title", "")
-                chunk_obj["text"] = trans_text or original_v.get("text", "")
-                chunk_obj["paragraphs"] = trans_paras or original_v.get("paragraphs", [])
-                all_translated_chunks.append(chunk_obj)
-        else:
-            return False, f"Format de réponse inattendu : {type(res_chunks)}", total_usage
+            # Si le texte est vide ou s'il est resté en anglais, retraduction unitaire dédiée
+            if not trans_text or (len(trans_text) > 60 and not TranslationManager.is_french(trans_text)):
+                s_ok, s_chunk, s_u = _translate_single_pericope_with_split(chapter_item, original_v, endpoint, pool)
+                for k in total_usage:
+                    total_usage[k] += s_u.get(k, 0)
+                if s_ok and s_chunk:
+                    trans_text = s_chunk.get("text", "").strip()
+                    trans_title = s_chunk.get("title", "").strip()
+
+            trans_paras = matched.get("paragraphs", []) if (matched and matched.get("paragraphs")) else []
+            if not trans_paras and trans_text:
+                trans_paras = [p.strip() for p in trans_text.split("\n\n") if p.strip()]
+
+            chunk_obj = dict(original_v)
+            chunk_obj["title"] = trans_title or original_v.get("title", "")
+            chunk_obj["text"] = trans_text or original_v.get("text", "")
+            chunk_obj["paragraphs"] = trans_paras or original_v.get("paragraphs", [])
+            all_translated_chunks.append(chunk_obj)
 
     return True, all_translated_chunks, total_usage
 
@@ -898,7 +1032,7 @@ def main():
         b_name = item["book_name"]
         c_num = item["chapter"]
 
-        ok, res_chunks, usage = call_llm_translate_chapter(item, ep)
+        ok, res_chunks, usage = call_llm_translate_chapter(item, ep, endpoints_pool)
 
         with lock_stats:
             for k in total_tokens_spent:
@@ -918,10 +1052,20 @@ def main():
                 print(f"❌ [ERREUR] {b_name} Ch.{c_num} via {ep['name']} : {res_chunks}")
                 return False
 
-    with ThreadPoolExecutor(max_workers=workers_count) as executor:
-        futures = [executor.submit(process_chapter_task, it) for it in to_process]
-        for f in futures:
+    executor = ThreadPoolExecutor(max_workers=workers_count)
+    futures = {executor.submit(process_chapter_task, it): it for it in to_process}
+
+    try:
+        for f in as_completed(futures):
             f.result()
+    except KeyboardInterrupt:
+        print("\n\n🛑 Interruption détectée (Ctrl+C). Arrêt immédiat des threads...")
+        executor.shutdown(wait=False, cancel_futures=True)
+        TGCTranslationCache.save_cache()
+        print("✅ Cache TGC sauvegardé avec succès. Sortie propre.")
+        os._exit(0)
+    finally:
+        executor.shutdown(wait=True)
 
     # Sauvegarde finale
     TGCTranslationCache.save_cache()
