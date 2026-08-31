@@ -1218,7 +1218,6 @@ const PassageOverviewDrawer = {
     container.querySelectorAll('[data-action="select-commentary"]').forEach(card => {
       card.addEventListener('click', () => {
         const author = card.dataset.author;
-        const idx = parseInt(card.dataset.index) || 0;
 
         if (typeof CommentaryWindow !== 'undefined' && typeof CommentaryWindow.selectCommentarySource === 'function') {
           if (author) CommentaryWindow.selectCommentarySource(author);
@@ -1227,10 +1226,24 @@ const PassageOverviewDrawer = {
           document.querySelector('.drawer-tab[data-drawer-tab="commentaries"]')?.click();
           setTimeout(() => {
             if (typeof CommentaryViewer !== 'undefined') {
-              if (author) CommentaryViewer.preferredAuthor = author;
-              CommentaryViewer.selectCommentary(idx);
+              if (author) {
+                CommentaryViewer.preferredAuthor = author;
+                try {
+                  localStorage.setItem('bible_comm_preferred_author', author);
+                } catch (e) {}
+              }
+              const targetIdx = CommentaryViewer.currentComments.findIndex(c => {
+                const aName = (c.author || c.source || '').toLowerCase();
+                const target = (author || '').toLowerCase();
+                return aName === target || aName.includes(target) || target.includes(aName);
+              });
+              if (targetIdx !== -1) {
+                CommentaryViewer.selectCommentary(targetIdx);
+              } else {
+                CommentaryViewer.selectCommentary(0);
+              }
             }
-          }, 50);
+          }, 60);
         }
       });
     });

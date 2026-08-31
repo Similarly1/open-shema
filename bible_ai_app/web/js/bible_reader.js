@@ -763,6 +763,8 @@ const CommentaryViewer = {
     try {
       const savedFontSize = localStorage.getItem('bible_comm_font_size');
       if (savedFontSize) this.fontSize = parseInt(savedFontSize, 10) || 15;
+      const savedAuthor = localStorage.getItem('bible_comm_preferred_author');
+      if (savedAuthor) this.preferredAuthor = savedAuthor;
     } catch (e) {}
     this.applyFontSize();
 
@@ -1145,9 +1147,8 @@ const CommentaryViewer = {
         // L'auteur préféré commente ce verset -> afficher directement son analyse
         this.selectCommentary(targetIndex);
       } else {
-        // Charger le premier commentaire disponible par défaut
-        this.preferredAuthor = this.currentComments[0].author || this.currentComments[0].source;
-        this.selectCommentary(0);
+        // Charger le premier commentaire disponible par défaut sans écraser preferredAuthor
+        this.selectCommentary(0, false);
       }
     } else {
       // Aucun commentaire pour ce verset
@@ -1246,34 +1247,40 @@ const CommentaryViewer = {
     if (!text) return '';
 
     // Remplacer les marqueurs [^1] ou [^2] par le badge interactif theol-fn-badge
-    let formatted = text.replace(/\[\^(\d+)\]/g, (match, id) => {
-      return `<sup class="theol-fn-badge" data-fn-id="${id}" id="comm-fnref-${id}"><a href="#comm-fn-${id}" title="Note ${id}">${id}</a></sup>`;
-    });
+    let html = text
+      .replace(/\[\^(\d+)\]/g, (match, id) => {
+        return `<sup class="theol-fn-badge" data-fn-id="${id}" id="comm-fnref-${id}"><a href="#comm-fn-${id}" title="Note ${id}">${id}</a></sup>`;
+      })
+      .replace(/^### (.*$)/gim, '<h3 class="comm-body-h3">$1</h3>')
+      .replace(/^## (.*$)/gim, '<h2 class="comm-body-h2">$1</h2>')
+      .replace(/^# (.*$)/gim, '<h1 class="comm-body-h1">$1</h1>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="comm-body-lemma">$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em class="comm-body-em">$1</em>')
+      .replace(/^\> (.*$)/gim, '<blockquote class="comm-body-quote">$1</blockquote>')
+      .replace(/^\- (.*$)/gim, '<li class="comm-body-li">$1</li>')
+      .replace(/\[([A-Z0-9\u00C0-\u00DCa-z\u00E0-\u00FC\s\.\,\:\;\-]+)\]/g, '<span class="comm-cite-badge">$1</span>')
+      .replace(/\n\n/g, '<br><br>');
 
-    formatted = formatted
-      .replace(/^### (.*$)/gim, '<h3 style="margin: 14px 0 6px 0; font-size: 15px; font-weight: 700; color: var(--accent-blue);">$1</h3>')
-      .replace(/^## (.*$)/gim, '<h2 style="margin: 18px 0 8px 0; font-size: 17px; font-weight: 800; color: var(--accent-blue);">$1</h2>')
-      .replace(/^# (.*$)/gim, '<h1 style="margin: 20px 0 10px 0; font-size: 19px; font-weight: 800; color: var(--accent-blue);">$1</h1>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/^\> (.*$)/gim, '<blockquote style="border-left: 3px solid var(--accent-blue); padding: 6px 12px; margin: 10px 0; background: var(--bg-subtle); border-radius: 0 6px 6px 0; font-style: italic; color: var(--text-secondary);">$1</blockquote>')
-      .replace(/^\- (.*$)/gim, '<li style="margin-left: 18px; margin-bottom: 4px;">$1</li>');
+    // Nettoyage des <br><br> parasites autour des balises de bloc HTML
+    html = html
+      .replace(/(?:<br>\s*)+<(div|h[1-6]|blockquote|ul|ol|li)/gi, '<$1')
+      .replace(/<\/(div|h[1-6]|blockquote|ul|ol|li)>(?:\s*<br>)+/gi, '</$1>');
 
-    return formatted
-      .split(/\n\n+/)
-      .map(p => p.trim())
-      .filter(Boolean)
-      .map(p => (p.startsWith('<h') || p.startsWith('<blockquote') || p.startsWith('<li')) ? p : `<p style="margin: 0 0 12px 0; line-height: 1.75;">${p}</p>`)
-      .join('');
+    return html;
   },
 
-  selectCommentary(index) {
+  selectCommentary(index, updatePreferred = true) {
     if (!this.currentComments[index]) return;
     this.activeIndex = index;
 
     const comm = this.currentComments[index];
     const authorName = comm.author || comm.source || 'Commentaire';
-    this.preferredAuthor = authorName;
+    if (updatePreferred) {
+      this.preferredAuthor = authorName;
+      try {
+        localStorage.setItem('bible_comm_preferred_author', authorName);
+      } catch (e) {}
+    }
 
     const sourceMeta = this.getSourceInfo(authorName);
     const lbl = document.getElementById('lbl-active-comm-source');
