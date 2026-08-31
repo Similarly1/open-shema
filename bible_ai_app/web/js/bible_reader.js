@@ -5290,36 +5290,6 @@ const BibleReader = {
       }
     }
 
-    if (parseInt(data.chapter, 10) === 1) {
-      const bookCode = data.book || this.currentBook;
-      const bInfo = typeof getBookInfo === 'function' ? getBookInfo(bookCode) : { name: bookCode };
-      const introBanner = document.createElement('div');
-      introBanner.className = 'bible-book-intro-badge';
-      introBanner.dataset.action = 'open-book-intro';
-      introBanner.dataset.book = bookCode;
-      introBanner.innerHTML = `
-        <div class="intro-badge-content">
-          <span class="intro-badge-icon">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
-          </span>
-          <span class="intro-badge-title">Introduction au livre de ${bInfo.name || bookCode}</span>
-          <span class="intro-badge-desc">But, verset clé, contexte et plan d'ensemble</span>
-        </div>
-        <span class="intro-badge-arrow">
-          <span>Ouvrir l'exégèse</span>
-          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-        </span>
-      `;
-      introBanner.addEventListener('click', (e) => {
-        e.stopPropagation();
-        document.querySelector('.drawer-tab[data-drawer-tab="commentaries"]')?.click();
-        if (typeof CommentaryViewer !== 'undefined') {
-          CommentaryViewer.loadIntroduction(bookCode);
-        }
-      });
-      block.appendChild(introBanner);
-    }
-
     if (data.pericope) {
       const pericope = document.createElement('h1');
       pericope.className = 'pericope-title';
