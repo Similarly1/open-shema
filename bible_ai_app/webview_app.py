@@ -2055,11 +2055,7 @@ class BibleAppApi:
         sources_used = []
         context_chunks = []
         
-        # 0. Résolution du mode (support de 'auto' par défaut)
-        mode = mode or "auto"
-        detected_mode = "Auto"
-        
-        # Détection heuristique / sémantique du mode en mode auto
+        # 0. Extraction / Détection automatique de passage biblique dans la question si non fourni
         current_question = ""
         if isinstance(messages_history, list) and len(messages_history) > 0:
             current_question = messages_history[-1].get("content", "")
@@ -2069,35 +2065,7 @@ class BibleAppApi:
             
         question = current_question
         q_lower = current_question.lower()
-        if mode == "auto":
-            if any(k in q_lower for k in ["prêch", "prech", "sermon", "homilét", "homilet", "plan de", "culte", "message pour", "application pastorale"]):
-                detected_mode = "Préparation de prédication"
-                active_mode_key = "sermon"
-            elif any(k in q_lower for k in ["grec", "hébreu", "hebreu", "strong", "racine", "étymolog", "etymolog", "morpholog", "septante", "lxx"]):
-                detected_mode = "Analyse lexicale (Grec / Hébreu)"
-                active_mode_key = "lexical"
-            elif any(k in q_lower for k in ["contexte", "histoire", "historique", "auteur", "destinataire", "époque", "epoque", "politique", "archéolog"]):
-                detected_mode = "Contexte historique & culturel"
-                active_mode_key = "historical"
-            elif not passage_ref or any(k in q_lower for k in ["doctrine", "théolog", "theolog", "calvin", "luther", "augustin", "grâce", "grace", "élection", "election", "prédestin", "predestin", "trinité", "trinite", "justification"]):
-                detected_mode = "Synthèse Théologique & Doctrinale"
-                active_mode_key = "theology"
-            else:
-                detected_mode = "Exégèse & Analyse Biblique"
-                active_mode_key = "exegesis"
-        else:
-            mode_names = {
-                "exegesis": "Exégèse approfondie",
-                "theology": "Synthèse théologique & doctrinale",
-                "historical": "Contexte historique & culturel",
-                "sermon": "Préparation de prédication",
-                "lexical": "Analyse lexicale (Grec & Hébreu)",
-                "free_chat": "Discussion libre & Réflexion"
-            }
-            detected_mode = mode_names.get(mode, "Synthèse d'étude")
-            active_mode_key = mode
 
-        # Détection automatique de passage biblique dans le texte de la question si aucun passage n'est sélectionné
         extracted_ref_str = ""
         if not passage_ref or not passage_ref.strip():
             # 1. Tester avec chiffre préfixé : '1 Co 13:13', '2 Tim 2:2'
@@ -2134,6 +2102,56 @@ class BibleAppApi:
                         passage_ref = f"{fr} {ch}" + (f":{v_start}-{v_end}" if (v_start and v_end) else (f":{v_start}" if v_start else ""))
                         extracted_ref_str = match.group(0)
                         break
+
+        # 1. Résolution du mode (support de 'auto' par défaut avec analyse d'intention affinée)
+        mode = mode or "auto"
+        detected_mode = "Auto"
+
+        sermon_keywords = [
+            "prédic", "predic", "prédication", "predication", "prêch", "prech", "sermon",
+            "homilét", "homilet", "plan de", "culte", "message pour", "discours", "application pastorale"
+        ]
+        lexical_keywords = [
+            "grec", "hébreu", "hebreu", "strong", "racine", "étymolog", "etymolog", "morpholog", "septante", "lxx", "sens du mot"
+        ]
+        historical_keywords = [
+            "contexte", "histoire", "historique", "auteur", "destinataire", "époque", "epoque", "politique", "archéolog", "second temple", "coutume"
+        ]
+        theology_keywords = [
+            "doctrine", "théolog", "theolog", "calvin", "luther", "augustin", "grâce", "grace", "élection", "election",
+            "prédestin", "predestin", "trinité", "trinite", "salut", "eschatolog"
+        ]
+
+        if mode == "auto":
+            if any(k in q_lower for k in sermon_keywords):
+                detected_mode = "Préparation de prédication"
+                active_mode_key = "sermon"
+            elif any(k in q_lower for k in lexical_keywords):
+                detected_mode = "Analyse lexicale (Grec / Hébreu)"
+                active_mode_key = "lexical"
+            elif any(k in q_lower for k in historical_keywords):
+                detected_mode = "Contexte historique & culturel"
+                active_mode_key = "historical"
+            elif any(k in q_lower for k in theology_keywords) and not passage_ref:
+                detected_mode = "Synthèse Théologique & Doctrinale"
+                active_mode_key = "theology"
+            elif passage_ref:
+                detected_mode = "Exégèse & Analyse Biblique"
+                active_mode_key = "exegesis"
+            else:
+                detected_mode = "Synthèse d'étude"
+                active_mode_key = "auto"
+        else:
+            mode_names = {
+                "exegesis": "Exégèse approfondie",
+                "theology": "Synthèse théologique & doctrinale",
+                "historical": "Contexte historique & culturel",
+                "sermon": "Préparation de prédication",
+                "lexical": "Analyse lexicale (Grec & Hébreu)",
+                "free_chat": "Discussion libre & Réflexion"
+            }
+            detected_mode = mode_names.get(mode, "Synthèse d'étude")
+            active_mode_key = mode
 
         # 1. Résolution et extraction du texte biblique (si un passage est spécifié ou détecté)
         if sources_cfg.get("bibles", True) and passage_ref and passage_ref.strip():
