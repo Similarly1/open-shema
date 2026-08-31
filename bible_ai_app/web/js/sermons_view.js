@@ -2293,6 +2293,41 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     this.confirmStructureApplication(name, newSections, null);
   },
 
+  cleanSermonModelTitle(rawTitle, preacher) {
+    if (!rawTitle) return "Canevas Homilétique";
+    let title = rawTitle;
+
+    // Supprimer le prédicateur connu s'il est spécifié
+    if (preacher && preacher.trim()) {
+      const pEsc = preacher.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      title = title.replace(new RegExp(`[-–—|/]+\\s*${pEsc}\\s*$`, 'i'), '');
+      title = title.replace(new RegExp(`^${pEsc}\\s*[-–—|/]+`, 'i'), '');
+    }
+
+    // Découper par séparateurs courants
+    const parts = title.split(/\s*[-–—|/]{1,2}\s*/);
+    const dateRegex = /\b(?:jan(?:vier|\.)?|f[ée]v(?:rier|\.)?|mar(?:s|\.)?|avr(?:il|\.)?|mai|juin|juil(?:let|\.)?|ao[ûu]t|sep(?:tembre|\.)?|oct(?:obre|\.)?|nov(?:embre|\.)?|d[ée]c(?:embre|\.)?|january|february|march|april|may|june|july|august|september|october|november|december|\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4}|\d{4}[\/.-]\d{1,2}[\/.-]\d{1,2}|20\d{2})\b/i;
+    const churchOrPreacherRegex = /\b(?:pasteur|pr\.|prédicateur|église|eglise|culte|chaine|channel|live|replay|dimanche|reps|evangile\s*21|évangile\s*21)\b/i;
+
+    const cleanParts = parts.filter(p => {
+      const trimmed = p.trim();
+      if (!trimmed) return false;
+      if (dateRegex.test(trimmed)) return false;
+      if (churchOrPreacherRegex.test(trimmed)) return false;
+      // Supprimer les noms d'auteurs/prédicateurs comme "Pierre KFLIPFEL" ou tout en majuscules
+      if (/^[A-ZÀ-ÖØ-ß\s'-]{3,}$/.test(trimmed) || /^[A-Z][a-zÀ-ÿ]+\s+[A-ZÀ-ÖØ-ß]{2,}$/.test(trimmed)) return false;
+      return true;
+    });
+
+    let result = cleanParts.join(' - ').trim();
+    if (!result) {
+      result = parts[0] || rawTitle;
+    }
+
+    result = result.replace(/[-–—|/:\s]+$/, '').trim();
+    return result || rawTitle;
+  },
+
   async loadRealSermonModelsList(passageRef, query = '') {
     const container = document.getElementById('real-sermons-models-container');
     const badge = document.getElementById('real-sermons-count-badge');
