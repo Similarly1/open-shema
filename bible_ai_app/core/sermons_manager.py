@@ -920,6 +920,14 @@ Vue par en dessous, une broderie n'est qu'un enchevêtrement chaotique de fils s
         except Exception as e:
             logger.error(f"Erreur chargement index prédications réelles: {e}")
             return []
+
+        # Filtrer pour ne conserver que les véritables prédications de chaire (ignorer les articles de blog / théologie)
+        all_models = [
+            m for m in all_models 
+            if not str(m.get("id", "")).startswith("model-e21-art") 
+            and "art-" not in str(m.get("url", "")) 
+            and "article" not in str(m.get("source_type", "")).lower()
+        ]
             
         if not passage_ref and not query:
             return all_models
