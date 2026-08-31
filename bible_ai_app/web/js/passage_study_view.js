@@ -69,6 +69,8 @@ const PassageStudyView = {
   activeDictSourceIdx: 0,
   activeIntroAuthorIdx: 0,
   isIntroExpanded: false,
+  activeOrigStrong: null,
+  activeOrigWordData: null,
 
   // Icônes SVG sobres
   ICONS: {
@@ -1199,106 +1201,126 @@ const PassageStudyView = {
     const keyLemmas = orig.key_lemmas || [];
     const verses = orig.verses || [];
 
+    // Déterminer le mot / lemme actif par défaut
+    const firstWord = (verses[0] && verses[0].words && verses[0].words[0]) || (keyLemmas[0]) || null;
+    if (!this.activeOrigWordData && firstWord) {
+      this.activeOrigWordData = firstWord;
+      this.activeOrigStrong = firstWord.strong;
+    }
+
     let html = `
-      <div class="ps-card ps-original-card ${isRtl ? 'is-rtl-mode' : ''}">
-        <div class="ps-card-header">
-          <div class="ps-card-title-group">
-            <span class="ps-card-icon">${this.ICONS.scroll}</span>
-            <div>
-              <h3 class="ps-card-title">${langName}</h3>
-              <div class="ps-card-subtitle">${totalWords} mots originaux répertoriés</div>
+      <div class="ps-orig-master-detail-grid">
+        <!-- COLONNE GAUCHE (TEXTE ORIGINAL & MODES DE LECTURE) -->
+        <div class="ps-card ps-original-card ${isRtl ? 'is-rtl-mode' : ''}">
+          <div class="ps-card-header">
+            <div class="ps-card-title-group">
+              <span class="ps-card-icon">${this.ICONS.scroll}</span>
+              <div>
+                <h3 class="ps-card-title">${langName}</h3>
+                <div class="ps-card-subtitle">${totalWords} mots originaux • Cliquez sur un mot pour analyser</div>
+              </div>
+            </div>
+            
+            <div class="ps-orig-view-switches">
+              <button type="button" class="ps-orig-switch-btn ${this.activeOrigMode === 'continuous' ? 'active' : ''}" data-orig-mode="continuous" title="Lecture continue">
+                <span class="ps-icon-slot">${this.ICONS.bookOpen}</span>
+                <span>Texte Continu</span>
+              </button>
+              <button type="button" class="ps-orig-switch-btn ${this.activeOrigMode === 'interlinear' ? 'active' : ''}" data-orig-mode="interlinear" title="Analyse morphologique mot-à-mot">
+                <span class="ps-icon-slot">${this.ICONS.list}</span>
+                <span>Interlinéaire</span>
+              </button>
+              <button type="button" class="ps-orig-switch-btn ${this.activeOrigMode === 'lemmas' ? 'active' : ''}" data-orig-mode="lemmas" title="Vocabulaire clé et lemmes majeurs">
+                <span class="ps-icon-slot">${this.ICONS.compass}</span>
+                <span>Mots Clés (${keyLemmas.length})</span>
+              </button>
             </div>
           </div>
-          
-          <div class="ps-orig-view-switches">
-            <button type="button" class="ps-orig-switch-btn ${this.activeOrigMode === 'continuous' ? 'active' : ''}" data-orig-mode="continuous" title="Lecture continue en grand format">
-              <span class="ps-icon-slot">${this.ICONS.bookOpen}</span>
-              <span>Texte Continu</span>
-            </button>
-            <button type="button" class="ps-orig-switch-btn ${this.activeOrigMode === 'interlinear' ? 'active' : ''}" data-orig-mode="interlinear" title="Analyse morphologique mot-à-mot">
-              <span class="ps-icon-slot">${this.ICONS.list}</span>
-              <span>Interlinéaire Mot-à-Mot</span>
-            </button>
-            <button type="button" class="ps-orig-switch-btn ${this.activeOrigMode === 'lemmas' ? 'active' : ''}" data-orig-mode="lemmas" title="Vocabulaire clé et lemmes majeurs">
-              <span class="ps-icon-slot">${this.ICONS.compass}</span>
-              <span>Vocabulaire Clé (${keyLemmas.length})</span>
-            </button>
+
+          <div class="ps-orig-content-area">
+            <!-- 1. VUE CONTINUE -->
+            <div class="ps-orig-panel ${this.activeOrigMode === 'continuous' ? 'active' : ''}" id="ps-orig-panel-continuous">
+              <div class="ps-orig-continuous-box ${isRtl ? 'dir-rtl hebrew-font' : 'dir-ltr greek-font'}">
+                ${verses.map(v => `
+                  <span class="ps-orig-cont-verse" title="Verset ${v.chapter}:${v.verse}">
+                    <sup class="ps-orig-cont-num">(${v.verse})</sup>
+                    ${(v.words && v.words.length > 0) ? v.words.map((w, wIdx) => `
+                      <span class="ps-orig-word-clickable ${(this.activeOrigStrong === w.strong || (!this.activeOrigStrong && wIdx === 0)) ? 'active' : ''}" data-strong="${w.strong}" data-text="${this.escapeHtml(w.text)}" data-lemma="${this.escapeHtml(w.lemma)}" data-gloss="${this.escapeHtml(w.gloss || '')}" data-def="${this.escapeHtml(w.strong_def_fr || '')}" data-translit="${this.escapeHtml(w.transliteration || '')}" data-morph="${this.escapeHtml(w.morph_desc_fr || w.morph_code || '')}" title="${this.escapeHtml(w.gloss || w.strong_def_fr || w.strong)}">${this.escapeHtml(w.text)}</span>
+                    `).join(' ') : this.escapeHtml(v.original_text)}
+                  </span>
+                `).join(' ')}
+              </div>
+              ${this.showTranslit ? `
+                <div class="ps-orig-translit-box" style="margin-top: 14px;">
+                  <div class="ps-orig-translit-title">Translittération phonétique :</div>
+                  <p class="ps-orig-translit-p">
+                    ${verses.map(v => `<span class="ps-translit-verse"><strong style="opacity:0.6;">(${v.verse})</strong> ${this.escapeHtml(v.transliteration)}</span>`).join(' ')}
+                  </p>
+                </div>
+              ` : ''}
+            </div>
+
+            <!-- 2. VUE INTERLINÉAIRE MOT-À-MOT -->
+            <div class="ps-orig-panel ${this.activeOrigMode === 'interlinear' ? 'active' : ''}" id="ps-orig-panel-interlinear">
+              <div class="ps-interlinear-flow">
+                ${verses.map(v => `
+                  <div class="ps-il-verse-section">
+                    <div class="ps-il-verse-banner">
+                      <span class="ps-il-verse-badge">${v.chapter}:${v.verse}</span>
+                      <span class="ps-il-verse-fr">${this.escapeHtml(v.french_text)}</span>
+                    </div>
+                    <div class="ps-il-words-grid ${isRtl ? 'dir-rtl' : 'dir-ltr'}">
+                      ${v.words.map(w => `
+                        <div class="ps-word-card ps-orig-word-clickable ${isRtl ? 'rtl-word' : 'ltr-word'} ${this.activeOrigStrong === w.strong ? 'active' : ''}" data-strong="${w.strong}" data-text="${this.escapeHtml(w.text)}" data-lemma="${this.escapeHtml(w.lemma)}" data-gloss="${this.escapeHtml(w.gloss || '')}" data-def="${this.escapeHtml(w.strong_def_fr || '')}" data-translit="${this.escapeHtml(w.transliteration || '')}" data-morph="${this.escapeHtml(w.morph_desc_fr || w.morph_code || '')}">
+                          <div class="ps-w-orig ${isRtl ? 'hebrew-font' : 'greek-font'}">${this.escapeHtml(w.text)}</div>
+                          <div class="ps-w-translit">${this.escapeHtml(w.transliteration)}</div>
+                          <div class="ps-w-gloss">${this.escapeHtml(w.gloss || '—')}</div>
+                          <div class="ps-w-lemma">${this.escapeHtml(w.lemma)}</div>
+                          <div class="ps-w-morph" title="${this.escapeHtml(w.morph_desc_fr)}">${this.escapeHtml(w.morph_code)}</div>
+                          <button type="button" class="ps-w-strong-pill" data-strong="${w.strong}">
+                            ${w.strong}
+                          </button>
+                        </div>
+                      `).join('')}
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- 3. VUE VOCABULAIRE & LEMMES CLÉS -->
+            <div class="ps-orig-panel ${this.activeOrigMode === 'lemmas' ? 'active' : ''}" id="ps-orig-panel-lemmas">
+              <div class="ps-lemmas-grid">
+                ${keyLemmas.map(lem => `
+                  <div class="ps-lemma-card ps-orig-word-clickable ${this.activeOrigStrong === lem.strong ? 'active' : ''}" data-strong="${lem.strong}" data-text="${this.escapeHtml(lem.lemma)}" data-lemma="${this.escapeHtml(lem.lemma)}" data-gloss="${this.escapeHtml(lem.gloss || '')}" data-def="${this.escapeHtml(lem.strong_def_fr || '')}" data-translit="${this.escapeHtml(lem.transliteration || '')}">
+                    <div class="ps-lem-header">
+                      <span class="ps-lem-text ${isRtl ? 'hebrew-font' : 'greek-font'}">${this.escapeHtml(lem.lemma)}</span>
+                      <span class="ps-lem-strong">${lem.strong}</span>
+                    </div>
+                    <div class="ps-lem-translit">${this.escapeHtml(lem.transliteration)}</div>
+                    <div class="ps-lem-gloss">${this.escapeHtml(lem.gloss)}</div>
+                    ${lem.strong_def_fr ? `<div class="ps-lem-def">${this.escapeHtml(lem.strong_def_fr)}</div>` : ''}
+                    <div class="ps-lem-footer">
+                      <span class="ps-lem-count">${lem.count} occurrence${lem.count > 1 ? 's' : ''}</span>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="ps-orig-content-area">
-          <!-- 1. VUE CONTINUE -->
-          <div class="ps-orig-panel ${this.activeOrigMode === 'continuous' ? 'active' : ''}" id="ps-orig-panel-continuous">
-            <div class="ps-orig-continuous-box ${isRtl ? 'dir-rtl hebrew-font' : 'dir-ltr greek-font'}">
-              ${verses.map(v => `
-                <span class="ps-orig-cont-verse" title="Verset ${v.chapter}:${v.verse}">
-                  <sup class="ps-orig-cont-num">(${v.verse})</sup> ${this.escapeHtml(v.original_text)}
-                </span>
-              `).join(' ')}
-            </div>
-            ${this.showTranslit ? `
-              <div class="ps-orig-translit-box">
-                <div class="ps-orig-translit-title">Translittération phonétique :</div>
-                <p class="ps-orig-translit-p">
-                  ${verses.map(v => `<span class="ps-translit-verse"><strong style="opacity:0.6;">(${v.verse})</strong> ${this.escapeHtml(v.transliteration)}</span>`).join(' ')}
-                </p>
-              </div>
-            ` : ''}
-          </div>
-
-          <!-- 2. VUE INTERLINÉAIRE MOT-À-MOT -->
-          <div class="ps-orig-panel ${this.activeOrigMode === 'interlinear' ? 'active' : ''}" id="ps-orig-panel-interlinear">
-            <div class="ps-interlinear-flow">
-              ${verses.map(v => `
-                <div class="ps-il-verse-section">
-                  <div class="ps-il-verse-banner">
-                    <span class="ps-il-verse-badge">${v.chapter}:${v.verse}</span>
-                    <span class="ps-il-verse-fr">${this.escapeHtml(v.french_text)}</span>
-                  </div>
-                  <div class="ps-il-words-grid ${isRtl ? 'dir-rtl' : 'dir-ltr'}">
-                    ${v.words.map(w => `
-                      <div class="ps-word-card ${isRtl ? 'rtl-word' : 'ltr-word'}" data-strong="${w.strong}">
-                        <div class="ps-w-orig ${isRtl ? 'hebrew-font' : 'greek-font'}">${this.escapeHtml(w.text)}</div>
-                        <div class="ps-w-translit">${this.escapeHtml(w.transliteration)}</div>
-                        <div class="ps-w-gloss">${this.escapeHtml(w.gloss || '—')}</div>
-                        <div class="ps-w-lemma">${this.escapeHtml(w.lemma)}</div>
-                        <div class="ps-w-morph" title="${this.escapeHtml(w.morph_desc_fr)}">${this.escapeHtml(w.morph_code)}</div>
-                        <button type="button" class="ps-w-strong-pill" data-strong="${w.strong}" title="Consulter dans le Lexique Strong : ${this.escapeHtml(w.strong_def_fr)}">
-                          ${w.strong}
-                        </button>
-                      </div>
-                    `).join('')}
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-
-          <!-- 3. VUE VOCABULAIRE & LEMMES CLÉS -->
-          <div class="ps-orig-panel ${this.activeOrigMode === 'lemmas' ? 'active' : ''}" id="ps-orig-panel-lemmas">
-            <div class="ps-lemmas-grid">
-              ${keyLemmas.map(lem => `
-                <div class="ps-lemma-card">
-                  <div class="ps-lem-header">
-                    <span class="ps-lem-text ${isRtl ? 'hebrew-font' : 'greek-font'}">${this.escapeHtml(lem.lemma)}</span>
-                    <span class="ps-lem-strong">${lem.strong}</span>
-                  </div>
-                  <div class="ps-lem-translit">${this.escapeHtml(lem.transliteration)}</div>
-                  <div class="ps-lem-gloss">${this.escapeHtml(lem.gloss)}</div>
-                  ${lem.strong_def_fr ? `<div class="ps-lem-def">${this.escapeHtml(lem.strong_def_fr)}</div>` : ''}
-                  <div class="ps-lem-footer">
-                    <span class="ps-lem-count">${lem.count} occurrence${lem.count > 1 ? 's' : ''}</span>
-                    <span class="ps-lem-occ-list">${lem.occurrences.slice(0, 3).map(o => `<code class="ps-occ-pill">${this.escapeHtml(o)}</code>`).join(' ')}</span>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
+        <!-- COLONNE DROITE (FICHE LEXICALE STRONG COMPLÈTE DU MOT SÉLECTIONNÉ) -->
+        <div class="ps-card ps-orig-lexicon-card" id="ps-orig-lexicon-pane">
+          <!-- Rendu dynamique du mot actif -->
         </div>
       </div>
     `;
 
     this.originalContainerEl.innerHTML = html;
+
+    // Rendu de la carte Lexique Strong active
+    this.renderOriginalLexiconCard(this.activeOrigWordData);
 
     // Événements pour basculer les sous-vues originales
     document.querySelectorAll('.ps-orig-switch-btn').forEach(btn => {
@@ -1315,19 +1337,96 @@ const PassageStudyView = {
       });
     });
 
-    // Clic sur un bouton Strong
-    document.querySelectorAll('.ps-w-strong-pill').forEach(pill => {
-      pill.addEventListener('click', (e) => {
+    // Clic interactif sur n'importe quel mot original pour mettre à jour la fiche Strong à droite
+    document.querySelectorAll('.ps-orig-word-clickable').forEach(el => {
+      el.addEventListener('click', (e) => {
         e.stopPropagation();
-        const code = pill.dataset.strong;
-        if (code && typeof DictView !== 'undefined') {
-          if (typeof App !== 'undefined') App.switchView('dict');
-          setTimeout(() => {
-            DictView.searchWord('', code);
-          }, 80);
-        }
+        const strong = el.dataset.strong;
+        const text = el.dataset.text;
+        const lemma = el.dataset.lemma || text;
+        const gloss = el.dataset.gloss || '';
+        const def = el.dataset.def || '';
+        const translit = el.dataset.translit || '';
+        const morph = el.dataset.morph || '';
+
+        this.activeOrigStrong = strong;
+        this.activeOrigWordData = { strong, text, lemma, gloss, def, transliteration: translit, morph_desc_fr: morph };
+
+        document.querySelectorAll('.ps-orig-word-clickable').forEach(x => {
+          x.classList.toggle('active', x.dataset.strong === strong);
+        });
+
+        this.renderOriginalLexiconCard(this.activeOrigWordData);
       });
     });
+  },
+
+  async renderOriginalLexiconCard(wordData) {
+    const pane = document.getElementById('ps-orig-lexicon-pane');
+    if (!pane) return;
+
+    if (!wordData) {
+      pane.innerHTML = `
+        <div class="ps-dict-empty-state" style="padding: 40px 20px; text-align: center;">
+          <span class="ps-icon-slot">${this.ICONS.history || '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'}</span>
+          <p style="margin-top: 10px; color: var(--text-muted, #888); font-size: 13.5px;">Cliquez sur un mot hébreu ou grec dans le texte biblique à gauche pour afficher son analyse lexicale et morphologique complète.</p>
+        </div>
+      `;
+      return;
+    }
+
+    const strongCode = wordData.strong || '';
+    const isHebrew = strongCode.startsWith('H') || this.currentData?.original_language?.is_rtl;
+    const title = `${wordData.gloss || wordData.text || ''} [${wordData.lemma || wordData.text || ''}]`;
+
+    // 1. Rendu immédiat synchrone avec les données locales
+    let cardHtml = '';
+    if (typeof LexiconViewer !== 'undefined' && LexiconViewer.buildStrongCardHtml) {
+      cardHtml = LexiconViewer.buildStrongCardHtml({
+        title: title,
+        lemma: wordData.lemma || wordData.text || '',
+        strong: strongCode,
+        dict_name: isHebrew ? 'Hébreu Biblique (A.T.)' : 'Grec Koinè (N.T.)',
+        full_text: wordData.def || wordData.strong_def_fr || wordData.gloss || ''
+      });
+    }
+
+    pane.innerHTML = cardHtml || `
+      <div class="strong-exegesis-container" style="padding: 16px;">
+        <div class="strong-card ${isHebrew ? 'strong-theme-hebrew' : 'strong-theme-greek'}">
+          <div class="strong-card-topbar">
+            <div class="strong-lang-badge"><span>${isHebrew ? 'Hébreu Biblique (A.T.)' : 'Grec Koinè (N.T.)'}</span></div>
+            <div class="strong-code-badge">Strong ${strongCode}</div>
+          </div>
+          <div class="strong-hero-box">
+            <div class="strong-original-script ${isHebrew ? 'font-hebrew' : 'font-greek'}" dir="${isHebrew ? 'rtl' : 'ltr'}">${this.escapeHtml(wordData.text || wordData.lemma || '')}</div>
+            <div class="strong-french-lemma">« ${this.escapeHtml(wordData.gloss || wordData.text || '')} »</div>
+          </div>
+          <div class="strong-card-section">
+            <p>${this.escapeHtml(wordData.def || wordData.strong_def_fr || '')}</p>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // 2. Enrichissement asynchrone si dictionnaire complet disponible
+    try {
+      if (strongCode && typeof API !== 'undefined' && API.call) {
+        const res = await API.call('lookup_dictionary', strongCode);
+        if (res && res.matches && res.matches.length > 0) {
+          const match = res.matches[0];
+          if (typeof LexiconViewer !== 'undefined' && LexiconViewer.buildStrongCardHtml) {
+            pane.innerHTML = LexiconViewer.buildStrongCardHtml({
+              title: `${wordData.gloss || match.title || ''} [${wordData.lemma || match.lemma || wordData.text || ''}]`,
+              lemma: wordData.lemma || match.lemma || wordData.text || '',
+              strong: strongCode,
+              dict_name: match.dict_name || (isHebrew ? 'Hébreu Biblique (A.T.)' : 'Grec Koinè (N.T.)'),
+              full_text: match.full_text || match.raw_text || match.preview || wordData.def || ''
+            });
+          }
+        }
+      }
+    } catch (e) {}
   },
 
   // =========================================================================

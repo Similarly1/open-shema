@@ -844,6 +844,8 @@ class PassageStudyManager:
                         })
 
                     if articles:
+                        # Prioriser les dictionnaires encyclopédiques/historiques dans l'onglet Contexte
+                        articles.sort(key=lambda a: 1 if a.get("is_strong") else 0)
                         dict_entries.append({
                             "term": term,
                             "title": articles[0].get("title", term),
@@ -1284,7 +1286,8 @@ CONSIGNES STRICTES :
                 # Tenter d'extraire la phrase exacte où le verset ou chapitre est cité
                 if cpath:
                     try:
-                        resolved_path = cpath if os.path.exists(cpath) else os.path.join("data", "articles", cpath)
+                        safe_cpath = os.path.basename(cpath) if not os.path.isabs(cpath) else cpath
+                        resolved_path = safe_cpath if os.path.exists(safe_cpath) else os.path.join("data", "articles", os.path.basename(cpath))
                         if os.path.exists(resolved_path):
                             with open(resolved_path, "r", encoding="utf-8", errors="ignore") as f:
                                 full_article_txt = f.read()

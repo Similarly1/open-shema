@@ -20445,6 +20445,80 @@ body.theme-light .ps-select-sm optgroup {
 }
 
 /* =========================================================================
+   LANGUE ORIGINALE MASTER-DETAIL (PASSAGE STUDY)
+   ========================================================================= */
+.ps-orig-master-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 1100px) {
+  .ps-orig-master-detail-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.ps-orig-word-clickable {
+  cursor: pointer;
+  display: inline-block;
+  padding: 2px 5px;
+  margin: 0 1px;
+  border-radius: 4px;
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ps-orig-word-clickable:hover {
+  background-color: rgba(245, 158, 11, 0.18);
+  color: var(--accent-gold, #f59e0b);
+}
+
+.ps-orig-word-clickable.active {
+  background-color: rgba(245, 158, 11, 0.28) !important;
+  color: var(--accent-gold, #f59e0b) !important;
+  box-shadow: 0 0 0 1.5px var(--accent-gold, #f59e0b);
+}
+
+.ps-word-card.ps-orig-word-clickable {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.ps-word-card.ps-orig-word-clickable:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-gold, #f59e0b);
+}
+
+.ps-word-card.ps-orig-word-clickable.active {
+  border-color: var(--accent-gold, #f59e0b);
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.4);
+  background-color: rgba(245, 158, 11, 0.06);
+}
+
+.ps-lemma-card.ps-orig-word-clickable {
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ps-lemma-card.ps-orig-word-clickable:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-gold, #f59e0b);
+}
+
+.ps-lemma-card.ps-orig-word-clickable.active {
+  border-color: var(--accent-gold, #f59e0b);
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.4);
+  background-color: rgba(245, 158, 11, 0.06);
+}
+
+.ps-orig-lexicon-card {
+  position: sticky;
+  top: 15px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+/* =========================================================================
    CONTEXTE HISTORIQUE, CARTOGRAPHIE & DICTIONNAIRES (PASSAGE STUDY)
    ========================================================================= */
 .ps-grid-2col.ps-encyclopedia-grid {
