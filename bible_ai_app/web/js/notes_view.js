@@ -150,13 +150,31 @@ const NotesView = {
     this.loadNotes();
   },
 
+  getActiveEditor() {
+    const active = document.activeElement;
+    if (active && active.classList && active.classList.contains('notes-rich-editor')) {
+      return active;
+    }
+    if (window.getSelection()?.anchorNode) {
+      const anchorEl = window.getSelection().anchorNode.nodeType === Node.ELEMENT_NODE
+        ? window.getSelection().anchorNode
+        : window.getSelection().anchorNode.parentElement;
+      const closest = anchorEl?.closest('.notes-rich-editor');
+      if (closest) return closest;
+    }
+    return this.contentInput;
+  },
+
   // =========================================================================
   // INFOBULLE FLOTTANTE DE SÉLECTION STYLE ANYTYPE
   // =========================================================================
 
   bindFloatingToolbar() {
-    const toolbar = document.getElementById('notes-floating-toolbar');
+    let toolbar = document.getElementById('notes-floating-toolbar');
     if (!toolbar) return;
+    if (toolbar.parentNode !== document.body) {
+      document.body.appendChild(toolbar);
+    }
     this.floatingToolbar = toolbar;
 
     // Empêcher la perte de sélection lors du clic sur la barre flottante
@@ -211,7 +229,7 @@ const NotesView = {
       }
     });
 
-    // Détection de la sélection dans l'éditeur
+    // Détection de la sélection dans l'éditeur actif
     const updateSelectionToolbar = () => {
       if (this.isPreviewMode) {
         this.hideFloatingToolbar();
@@ -225,10 +243,17 @@ const NotesView = {
       }
 
       const range = sel.getRangeAt(0);
-      const editor = this.contentInput;
+      let editor = this.getActiveEditor();
       if (!editor || !editor.contains(range.commonAncestorContainer)) {
-        this.hideFloatingToolbar();
-        return;
+        const targetEditor = range.commonAncestorContainer.nodeType === Node.ELEMENT_NODE 
+          ? range.commonAncestorContainer.closest('.notes-rich-editor')
+          : range.commonAncestorContainer.parentElement?.closest('.notes-rich-editor');
+        if (targetEditor) {
+          editor = targetEditor;
+        } else {
+          this.hideFloatingToolbar();
+          return;
+        }
       }
 
       const text = sel.toString().trim();
@@ -1008,6 +1033,7 @@ const NotesView = {
     }
 
     const tag = (type === 'text' || type === 'paragraph') ? 'p' : (type === 'quote' ? 'blockquote' : type.toLowerCase());
+    const editor = this.getActiveEditor() || this.contentInput;
 
     // Trouver le bloc actuel à formater
     let node = range.startContainer;
@@ -1016,13 +1042,13 @@ const NotesView = {
     }
 
     let block = node.closest('h1, h2, h3, blockquote, p, div, li');
-    if (!block || !this.contentInput.contains(block) || block === this.contentInput) {
-      // Trouver l'enfant direct de contentInput contenant la sélection
+    if (!block || (editor && !editor.contains(block)) || block === editor) {
+      // Trouver l'enfant direct de l'éditeur contenant la sélection
       let child = range.startContainer;
-      while (child && child.parentNode !== this.contentInput && child !== this.contentInput) {
+      while (child && editor && child.parentNode !== editor && child !== editor) {
         child = child.parentNode;
       }
-      block = (child && child !== this.contentInput) ? child : null;
+      block = (child && child !== editor) ? child : null;
     }
 
     if (block && block.parentNode) {
@@ -1047,7 +1073,7 @@ const NotesView = {
       newRange.collapse(!rawText);
       sel.removeAllRanges();
       sel.addRange(newRange);
-      this.contentInput.focus();
+      editor?.focus();
     } else {
       // Insertion d'un nouveau bloc
       const newBlock = document.createElement(tag);
@@ -1060,7 +1086,7 @@ const NotesView = {
       newRange.collapse(true);
       sel.removeAllRanges();
       sel.addRange(newRange);
-      this.contentInput.focus();
+      editor?.focus();
     }
   },
 

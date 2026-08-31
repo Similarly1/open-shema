@@ -2431,67 +2431,404 @@ const PassageStudyView = {
   },
 
   // =========================================================================
-  // 6. SECTION NOTES PERSONNELLES
+  // 6. SECTION NOTES PERSONNELLES (ÉDITEUR RICHE OBSIDIAN & ANYTYPE COMPLET)
   // =========================================================================
-  renderNotesSection() {
+  psNoteData: null,
+  psNotesHistory: [],
+  psNotesHistoryIndex: -1,
+  psNotesAutoSaveTimer: null,
+  psNotesIsPreviewMode: false,
+
+  async renderNotesSection() {
     if (!this.notesContainerEl) return;
-    const existingNotes = this.currentData?.user_data?.notes || [];
+    const d = this.currentData;
+    if (!d) return;
+
+    const refStr = d.reference || `${d.french_book} ${d.start_ch}:${d.start_v}`;
+    const defaultTitle = `Étude — ${refStr}`;
+    const defaultTags = `Guide de Passage, ${d.french_book}`;
+
+    // Chercher s'il existe déjà une note enregistrée pour ce passage
+    let noteToLoad = null;
+    try {
+      if (typeof API !== 'undefined' && API.call) {
+        const existingNotes = await API.call('get_notes_for_passage', d.book_code, d.start_ch, d.start_v);
+        if (existingNotes && existingNotes.length > 0) {
+          noteToLoad = existingNotes[0];
+        }
+      }
+    } catch (e) {
+      console.warn('Erreur récupération notes pour passage:', e);
+    }
+
+    if (!noteToLoad && d.user_data?.notes && d.user_data.notes.length > 0) {
+      noteToLoad = d.user_data.notes[0];
+    }
+
+    this.psNoteData = noteToLoad || {
+      id: null,
+      title: defaultTitle,
+      reference: refStr,
+      tags: [defaultTags],
+      content: '',
+      include_in_ai: true
+    };
+
+    const initialTitle = this.psNoteData.title || defaultTitle;
+    const initialRef = this.psNoteData.reference || refStr;
+    const initialTags = Array.isArray(this.psNoteData.tags) ? this.psNoteData.tags.join(', ') : (this.psNoteData.tags || defaultTags);
+    const initialContent = this.psNoteData.content || '';
+    const initialIncludeAi = this.psNoteData.include_in_ai !== false;
+
+    const richHtml = typeof NotesView !== 'undefined' && NotesView.markdownToRichHtml
+      ? NotesView.markdownToRichHtml(initialContent)
+      : initialContent;
 
     let html = `
-      <div class="ps-card ps-notes-card">
-        <div class="ps-card-header">
-          <div class="ps-card-title-group">
-            <span class="ps-card-icon">${this.ICONS.note}</span>
-            <h3 class="ps-card-title">Vos Notes Personnelles</h3>
-          </div>
-          <div class="ps-card-actions">
-            <button type="button" class="ps-btn-sm ps-btn-primary" id="btn-ps-save-note">
-              <span class="ps-icon-slot">${this.ICONS.check}</span>
-              <span>Enregistrer</span>
-            </button>
-          </div>
-        </div>
+      <div class="ps-notes-workspace-wrap">
+        <section class="notes-editor-pane ps-notes-editor-card" style="border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-card); min-height: 540px;">
+          <!-- En-tête : Titre & Actions complètes (Obsidian / Anytype style) -->
+          <div class="notes-editor-header">
+            <div class="note-title-wrap" style="flex: 1; display: flex; align-items: center; position: relative; min-width: 0;">
+              <input type="text" id="ps-note-title" class="note-title-input" placeholder="Titre de la note d'étude..." value="${this.escapeHtml(initialTitle)}" style="width: 100%; padding-right: 38px;">
+              <button type="button" class="btn-ai-sparkle-inline" id="btn-ps-note-gen-title-ai" title="Générer un titre automatique par IA selon le contenu">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1 1.3-1.3Z"/></svg>
+              </button>
+            </div>
 
-        <div class="ps-notes-editor-box">
-          <textarea id="ps-notes-textarea" class="ps-textarea" placeholder="Rédigez ici vos réflexions, vos observations exégétiques ou votre trame de prédication...">${existingNotes.length > 0 ? existingNotes.map(n => n.content || '').join('\n\n') : ''}</textarea>
-        </div>
+            <div class="note-actions" style="display: flex; align-items: center; gap: 8px;">
+              <button class="btn-secondary" id="btn-ps-note-undo" title="Annuler (Ctrl+Z)" style="display: flex; align-items: center; justify-content: center; padding: 0 8px; min-width: 32px;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+              </button>
+              <button class="btn-secondary" id="btn-ps-note-redo" title="Rétablir (Ctrl+Y / Ctrl+Shift+Z)" style="display: flex; align-items: center; justify-content: center; padding: 0 8px; min-width: 32px;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
+              </button>
+              <label id="ps-note-ai-toggle-label" style="font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                <input type="checkbox" id="ps-note-ai-toggle" ${initialIncludeAi ? 'checked' : ''}>
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1 1.3-1.3Z"/></svg>
+                <span>Inclure dans l'IA</span>
+              </label>
+              <button class="btn-secondary" id="btn-ps-toggle-note-preview" title="Basculer entre Mode Édition et Prévisualisation Markdown" style="display: flex; align-items: center; gap: 4px;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span>Aperçu</span>
+              </button>
+              <button class="btn-secondary" id="btn-ps-open-full-notes" title="Ouvrir cette note dans la page Notes complète" style="display: flex; align-items: center; gap: 4px;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                <span>Ouvrir ↗</span>
+              </button>
+              <div id="ps-note-autosave-indicator" class="note-autosave-indicator" title="Enregistrement automatique continu activé">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                <span>Enregistré</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Barre secondaire : Référence & Tags -->
+          <div class="notes-editor-subbar">
+            <input type="text" id="ps-note-ref" class="text-field" style="width: 240px;" placeholder="Passage lié (ex: Genèse 1:16)" value="${this.escapeHtml(initialRef)}">
+            <div class="note-tags-wrap" style="flex: 1; display: flex; align-items: center; position: relative; min-width: 0;">
+              <input type="text" id="ps-note-tags" class="text-field" style="width: 100%; padding-right: 36px;" placeholder="Tags (séparés par virgules)..." value="${this.escapeHtml(initialTags)}">
+              <button type="button" class="btn-ai-sparkle-inline" id="btn-ps-note-gen-tags-ai" title="Générer des tags automatiques par IA selon le contenu">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3Z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Corps de l'éditeur WYSIWYG -->
+          <div class="notes-editor-body" style="min-height: 420px; padding: 18px 24px;">
+            <div id="ps-note-content" class="notes-rich-editor" contenteditable="true" spellcheck="true" data-placeholder="Écrivez vos réflexions, vos observations exégétiques ou votre plan de prédication ici... Tapez « / » pour insérer un élément.">${richHtml}</div>
+            <div id="ps-note-preview-content" class="note-preview-content markdown-body hidden"></div>
+          </div>
+        </section>
       </div>
     `;
 
     this.notesContainerEl.innerHTML = html;
+    this.bindPassageNotesEvents();
+  },
 
-    document.getElementById('btn-ps-save-note')?.addEventListener('click', async () => {
-      const txt = document.getElementById('ps-notes-textarea')?.value || '';
-      await this.savePersonalNote(txt);
+  bindPassageNotesEvents() {
+    const editor = document.getElementById('ps-note-content');
+    const titleInput = document.getElementById('ps-note-title');
+    const refInput = document.getElementById('ps-note-ref');
+    const tagsInput = document.getElementById('ps-note-tags');
+    const aiToggle = document.getElementById('ps-note-ai-toggle');
+    const previewContainer = document.getElementById('ps-note-preview-content');
+
+    if (!editor) return;
+
+    // 1. Initialiser l'historique Undo / Redo
+    this.psNotesHistory = [{
+      html: editor.innerHTML,
+      title: titleInput?.value || '',
+      ref: refInput?.value || '',
+      tags: tagsInput?.value || ''
+    }];
+    this.psNotesHistoryIndex = 0;
+    this.psNotesIsPreviewMode = false;
+
+    // 2. Gestion des raccourcis clavier
+    if (typeof NotesView !== 'undefined' && NotesView.bindEditorShortcuts) {
+      NotesView.bindEditorShortcuts(editor);
+    }
+
+    // 3. Saisie Slash (/)
+    editor.addEventListener('keyup', (e) => {
+      if (typeof NotesView !== 'undefined') {
+        if (['ArrowUp', 'ArrowDown', 'Enter', 'Escape'].includes(e.key) && NotesView.isSlashMenuOpen) {
+          return;
+        }
+        NotesView.handleSlashInput(e);
+      }
+    });
+
+    // 4. Déclenchement automatique de la sauvegarde et de l'historique
+    const onInput = () => {
+      this.pushPsNotesHistory();
+      this.triggerNotesAutoSave();
+    };
+
+    editor.addEventListener('input', onInput);
+    titleInput?.addEventListener('input', onInput);
+    refInput?.addEventListener('input', onInput);
+    tagsInput?.addEventListener('input', onInput);
+    aiToggle?.addEventListener('change', () => this.triggerNotesAutoSave());
+
+    // 5. Boutons Undo / Redo
+    document.getElementById('btn-ps-note-undo')?.addEventListener('click', () => this.undoPsNote());
+    document.getElementById('btn-ps-note-redo')?.addEventListener('click', () => this.redoPsNote());
+
+    // 6. Bouton Prévisualisation
+    document.getElementById('btn-ps-toggle-note-preview')?.addEventListener('click', () => {
+      this.psNotesIsPreviewMode = !this.psNotesIsPreviewMode;
+      const btn = document.getElementById('btn-ps-toggle-note-preview');
+      if (typeof NotesView !== 'undefined') {
+        NotesView.hideFloatingToolbar();
+        NotesView.closeSlashMenu();
+      }
+
+      if (this.psNotesIsPreviewMode) {
+        if (btn) btn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><span>Éditer</span>';
+        editor.classList.add('hidden');
+        if (previewContainer) {
+          previewContainer.classList.remove('hidden');
+          const rawMarkdown = typeof NotesView !== 'undefined' && NotesView.richHtmlToMarkdown ? NotesView.richHtmlToMarkdown(editor) : editor.innerText;
+          previewContainer.innerHTML = this.formatDictionaryMarkdown(rawMarkdown);
+        }
+      } else {
+        if (btn) btn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>Aperçu</span>';
+        editor.classList.remove('hidden');
+        if (previewContainer) previewContainer.classList.add('hidden');
+        editor.focus();
+      }
+    });
+
+    // 7. Bouton Ouvrir dans la page Notes
+    document.getElementById('btn-ps-open-full-notes')?.addEventListener('click', () => {
+      if (typeof App !== 'undefined') App.switchView('notes');
+      if (typeof NotesView !== 'undefined' && this.psNoteData) {
+        NotesView.selectNote(this.psNoteData);
+      }
+    });
+
+    // 8. Générateurs IA Titre & Tags
+    document.getElementById('btn-ps-note-gen-title-ai')?.addEventListener('click', async () => {
+      await this.generatePsNoteTitleWithAi();
+    });
+    document.getElementById('btn-ps-note-gen-tags-ai')?.addEventListener('click', async () => {
+      await this.generatePsNoteTagsWithAi();
     });
   },
 
-  async savePersonalNote(content) {
-    if (!this.currentData) return;
-    const d = this.currentData;
-    const title = `Étude — ${d.reference}`;
+  pushPsNotesHistory() {
+    const editor = document.getElementById('ps-note-content');
+    const titleInput = document.getElementById('ps-note-title');
+    const refInput = document.getElementById('ps-note-ref');
+    const tagsInput = document.getElementById('ps-note-tags');
+    if (!editor) return;
+
+    const state = {
+      html: editor.innerHTML,
+      title: titleInput?.value || '',
+      ref: refInput?.value || '',
+      tags: tagsInput?.value || ''
+    };
+
+    if (this.psNotesHistoryIndex >= 0) {
+      const prev = this.psNotesHistory[this.psNotesHistoryIndex];
+      if (prev && prev.html === state.html && prev.title === state.title && prev.ref === state.ref && prev.tags === state.tags) {
+        return;
+      }
+    }
+
+    if (this.psNotesHistoryIndex < this.psNotesHistory.length - 1) {
+      this.psNotesHistory = this.psNotesHistory.slice(0, this.psNotesHistoryIndex + 1);
+    }
+
+    this.psNotesHistory.push(state);
+    if (this.psNotesHistory.length > 50) this.psNotesHistory.shift();
+    else this.psNotesHistoryIndex++;
+  },
+
+  undoPsNote() {
+    if (this.psNotesHistoryIndex > 0) {
+      this.psNotesHistoryIndex--;
+      this.restorePsNotesHistoryState(this.psNotesHistory[this.psNotesHistoryIndex]);
+    }
+  },
+
+  redoPsNote() {
+    if (this.psNotesHistoryIndex < this.psNotesHistory.length - 1) {
+      this.psNotesHistoryIndex++;
+      this.restorePsNotesHistoryState(this.psNotesHistory[this.psNotesHistoryIndex]);
+    }
+  },
+
+  restorePsNotesHistoryState(state) {
+    if (!state) return;
+    const editor = document.getElementById('ps-note-content');
+    const titleInput = document.getElementById('ps-note-title');
+    const refInput = document.getElementById('ps-note-ref');
+    const tagsInput = document.getElementById('ps-note-tags');
+
+    if (editor) editor.innerHTML = state.html || '';
+    if (titleInput) titleInput.value = state.title || '';
+    if (refInput) refInput.value = state.ref || '';
+    if (tagsInput) tagsInput.value = state.tags || '';
+    this.triggerNotesAutoSave();
+  },
+
+  triggerNotesAutoSave() {
+    const indicator = document.getElementById('ps-note-autosave-indicator');
+    if (indicator) {
+      indicator.innerHTML = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" class="spin" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg><span>Enregistrement...</span>`;
+    }
+
+    if (this.psNotesAutoSaveTimer) clearTimeout(this.psNotesAutoSaveTimer);
+    this.psNotesAutoSaveTimer = setTimeout(async () => {
+      await this.savePersonalNote();
+    }, 800);
+  },
+
+  async savePersonalNote() {
+    const editor = document.getElementById('ps-note-content');
+    const titleInput = document.getElementById('ps-note-title');
+    const refInput = document.getElementById('ps-note-ref');
+    const tagsInput = document.getElementById('ps-note-tags');
+    const aiToggle = document.getElementById('ps-note-ai-toggle');
+    const indicator = document.getElementById('ps-note-autosave-indicator');
+
+    if (!editor || !this.currentData) return;
+
+    const rawMarkdown = typeof NotesView !== 'undefined' && NotesView.richHtmlToMarkdown
+      ? NotesView.richHtmlToMarkdown(editor)
+      : editor.innerText;
+
+    const title = titleInput?.value?.trim() || `Étude — ${this.currentData.reference}`;
+    const refVal = refInput?.value?.trim() || this.currentData.reference;
+    const tagsArr = (tagsInput?.value || '')
+      .split(',')
+      .map(t => t.trim())
+      .filter(t => t.length > 0);
+
+    const noteToSave = {
+      id: this.psNoteData?.id || null,
+      title: title,
+      content: rawMarkdown,
+      reference: refVal,
+      book_code: this.currentData.book_code,
+      chapter: this.currentData.start_ch,
+      verse: this.currentData.start_v,
+      tags: tagsArr,
+      include_in_ai: aiToggle ? aiToggle.checked : true
+    };
 
     try {
-      await API.call('save_note', {
-        title: title,
-        content: content,
-        book_code: d.book_code,
-        chapter: d.start_ch,
-        verse: d.start_v,
-        tags: ["Guide de Passage", d.french_book]
-      });
-
-      if (typeof App !== 'undefined' && App.showToast) {
-        App.showToast("Note enregistrée avec succès", "success");
+      const res = await API.call('save_note', noteToSave);
+      if (res && res.success) {
+        if (res.note_id) {
+          noteToSave.id = res.note_id;
+        }
+        this.psNoteData = noteToSave;
+        if (indicator) {
+          indicator.innerHTML = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Enregistré</span>`;
+        }
+        if (typeof NotesView !== 'undefined' && NotesView.loadNotes) {
+          NotesView.loadNotes();
+        }
       }
     } catch (e) {
-      console.error('Erreur sauvegarde note:', e);
+      console.error('Erreur sauvegarde note passage study:', e);
+      if (indicator) {
+        indicator.innerHTML = `<span style="color: var(--accent-red);">Erreur</span>`;
+      }
+    }
+  },
+
+  async generatePsNoteTitleWithAi() {
+    const editor = document.getElementById('ps-note-content');
+    const titleInput = document.getElementById('ps-note-title');
+    const btn = document.getElementById('btn-ps-note-gen-title-ai');
+    if (!editor || !titleInput) return;
+
+    const rawMarkdown = typeof NotesView !== 'undefined' && NotesView.richHtmlToMarkdown ? NotesView.richHtmlToMarkdown(editor) : editor.innerText;
+    if (!rawMarkdown.trim()) {
+      if (typeof App !== 'undefined') App.showToast("Rédigez d'abord du contenu dans votre note pour générer un titre.", "info");
+      return;
+    }
+
+    if (btn) btn.classList.add('loading');
+    try {
+      const prompt = `Génère un titre très court, élégant et pertinent (maximum 6 à 8 mots, sans guillemets) pour cette note d'étude biblique sur ${this.currentData?.reference || 'le passage'} :\n\n${rawMarkdown.slice(0, 1000)}`;
+      const res = await API.call('ask_ai_direct', prompt);
+      if (res && res.response) {
+        const cleanTitle = res.response.replace(/^["'«\s]+|["'»\s]+$/g, '').trim();
+        if (cleanTitle) {
+          titleInput.value = cleanTitle;
+          this.triggerNotesAutoSave();
+        }
+      }
+    } catch (e) {
+      console.warn('Erreur titre IA note:', e);
+    } finally {
+      if (btn) btn.classList.remove('loading');
+    }
+  },
+
+  async generatePsNoteTagsWithAi() {
+    const editor = document.getElementById('ps-note-content');
+    const tagsInput = document.getElementById('ps-note-tags');
+    const btn = document.getElementById('btn-ps-note-gen-tags-ai');
+    if (!editor || !tagsInput) return;
+
+    const rawMarkdown = typeof NotesView !== 'undefined' && NotesView.richHtmlToMarkdown ? NotesView.richHtmlToMarkdown(editor) : editor.innerText;
+    if (!rawMarkdown.trim()) {
+      if (typeof App !== 'undefined') App.showToast("Rédigez d'abord du contenu dans votre note pour générer des tags.", "info");
+      return;
+    }
+
+    if (btn) btn.classList.add('loading');
+    try {
+      const prompt = `Génère 3 à 5 tags ou mots-clés théologiques pertinents (séparés par des virgules uniquement, ex: Grâce, Justification, Genèse, Alliance) pour cette note :\n\n${rawMarkdown.slice(0, 1000)}`;
+      const res = await API.call('ask_ai_direct', prompt);
+      if (res && res.response) {
+        const cleanTags = res.response.replace(/[\n\r]+/g, ' ').replace(/^["'«\s]+|["'»\s]+$/g, '').trim();
+        if (cleanTags) {
+          tagsInput.value = cleanTags;
+          this.triggerNotesAutoSave();
+        }
+      }
+    } catch (e) {
+      console.warn('Erreur tags IA note:', e);
+    } finally {
+      if (btn) btn.classList.remove('loading');
     }
   },
 
   async exportToNotes() {
     if (!this.currentData) return;
-    const userNotes = document.getElementById('ps-notes-textarea')?.value || '';
+    const editor = document.getElementById('ps-note-content');
+    const userNotes = typeof NotesView !== 'undefined' && NotesView.richHtmlToMarkdown ? NotesView.richHtmlToMarkdown(editor) : (editor?.innerText || '');
     
     try {
       const res = await API.exportPassageStudyToNote(this.currentReference, {
