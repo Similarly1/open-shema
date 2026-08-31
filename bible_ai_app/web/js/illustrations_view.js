@@ -754,26 +754,25 @@ const IllustrationsView = {
         return `<h3 class="ill-view-h3">${this.renderInline(b.replace(/^#\s+/, ''))}</h3>`;
       }
 
-      // B. Citation ou Leçon homilétique (> ...)
-      if (b.startsWith('>')) {
-        const cleanContent = b.replace(/^>\s*/gm, '').trim();
-        
-        // Détection de "Leçon homilétique", "Application", "Principe"
-        const homileticMatch = cleanContent.match(/^\*\*(?:Leçon(?: homilétique)?|Application|Principe|Morale)\s*:?\*\*\s*:?\s*([\s\S]*)$/i);
-        if (homileticMatch) {
-          const bodyText = homileticMatch[1] ? this.renderInline(homileticMatch[1]) : '';
-          return `
-            <div class="ill-homiletic-callout">
-              <div class="ill-callout-header">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
-                <span>Leçon homilétique & Application</span>
-              </div>
-              <div class="ill-callout-body">${bodyText.replace(/\n/g, '<br>')}</div>
+      // B. Détection prioritaire : Leçon homilétique / Application / Portée pastorale (avec ou sans '>')
+      const cleanContent = b.replace(/^>\s*/gm, '').trim();
+      const homileticMatch = cleanContent.match(/^(?:\*\*)?(?:Leçon(?: homilétique| pastorale| spirituelle| pratique)?|Application(?: homilétique| pastorale| spirituelle| pratique)?|Principe(?: spirituel| biblique| homilétique)?|Portée(?: homilétique| spirituelle| pastorale)?|Enseignement(?: pastoral| homilétique| spirituel)?|Message(?: homilétique| pastoral)?|Morale)\s*:?\*?\*?\s*:?\s*([\s\S]*)$/i);
+      
+      if (homileticMatch) {
+        const bodyText = homileticMatch[1] ? this.renderInline(homileticMatch[1].trim()) : '';
+        return `
+          <div class="ill-homiletic-callout">
+            <div class="ill-callout-header">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+              <span>Leçon homilétique & Application</span>
             </div>
-          `;
-        }
+            <div class="ill-callout-body">${bodyText.replace(/\n/g, '<br>')}</div>
+          </div>
+        `;
+      }
 
-        // Citation générique
+      // C. Citation générique en bloc (> ...)
+      if (b.startsWith('>')) {
         return `
           <blockquote class="ill-quote-callout">
             <div class="ill-quote-text">${this.renderInline(cleanContent).replace(/\n/g, '<br>')}</div>

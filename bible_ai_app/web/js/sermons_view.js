@@ -2142,7 +2142,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
               <div style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent-amber, #f59e0b); display: flex; align-items: center; gap: 6px;">
                 <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-                <span>Canevas Homilétiques (94 Modèles)</span>
+                <span>Canevas Homilétiques Réels</span>
               </div>
               <span id="real-sermons-count-badge" style="font-size: 10.5px; background: rgba(245, 158, 11, 0.15); color: var(--accent-amber, #f59e0b); padding: 1px 6px; border-radius: 10px; font-weight: 600;">...</span>
             </div>
@@ -2285,10 +2285,11 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
                 <div style="font-size: 11.5px; font-weight: 700; color: var(--text-primary); line-height: 1.3;">
                   ${this.escapeHtml(m.title)}
                 </div>
-                <div style="font-size: 10.5px; color: var(--text-muted); margin-top: 3px; display: flex; align-items: center; gap: 6px;">
+                <div style="font-size: 10.5px; color: var(--text-muted); margin-top: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                   <span style="display: inline-flex; align-items: center; gap: 4px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>${this.escapeHtml(m.passage_reference || 'Texte')}</span>
                   <span>•</span>
                   <span style="display: inline-flex; align-items: center; gap: 4px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${this.escapeHtml(m.duration || '35 min')}</span>
+                  ${m.preacher ? `<span>•</span><span style="color: var(--accent-amber); font-weight: 500;">${this.escapeHtml(m.preacher)}</span>` : (m.source_church ? `<span>•</span><span>${this.escapeHtml(m.source_church)}</span>` : '')}
                   ${matchTag}
                 </div>
               </div>
