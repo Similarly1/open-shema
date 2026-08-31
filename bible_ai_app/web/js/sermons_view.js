@@ -2809,10 +2809,12 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     if (!modal) {
       modal = document.createElement('div');
       modal.id = 'sermon-structure-confirm-modal';
-      modal.className = 'modal-overlay';
-      modal.style.zIndex = '99999';
       document.body.appendChild(modal);
     }
+
+    modal.className = 'modal-dialog-container modal-overlay';
+    modal.style.display = 'flex';
+    modal.style.zIndex = '999999';
 
     modal.innerHTML = `
       <div class="structure-modal-card">
@@ -2900,8 +2902,16 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     `;
 
     modal.classList.remove('hidden');
+    modal.style.display = 'flex';
 
-    const closeModal = () => modal.classList.add('hidden');
+    const closeModal = () => {
+      modal.classList.add('hidden');
+      modal.style.display = 'none';
+    };
+
+    modal.onclick = (e) => {
+      if (e.target === modal) closeModal();
+    };
 
     modal.querySelectorAll('.btn-close-confirm').forEach(b => b.addEventListener('click', closeModal));
 
