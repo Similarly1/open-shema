@@ -2337,8 +2337,22 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     // 5. Supprimer les noms en fin de titre séparés par tiret ou pipe (ex: "- Pierre KFLIPFEL", "| Évangile 21", "- Pasteur Dupont")
     title = title.replace(/\s*[-–—|/]\s*(?:pasteur|pr\.|prédicateur|église|eglise|culte|chaine|channel|live|replay|dimanche|reps|evangile\s*21|évangile\s*21|[A-ZÀ-ÖØ-ß\s'-]{3,}|[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ]+\s+[A-ZÀ-ÖØ-ß]{2,})\s*$/i, '');
 
-    // 6. Supprimer d'éventuels séparateurs résiduels en fin de chaîne
+    // 6. Supprimer les références bibliques entre parenthèses ou crochets (ex: (1 Samuel 25), (Ac 1.8 & Mt 28.18-20), (Jn 3.16), (2 Co 8.1-9))
+    const bibleBooks = '(?:Gen|Exo?|L[ée]v|Nom|Deu|Jos|Jug|Ruth?|1\\s*Sam?|2\\s*Sam?|1\\s*Rois?|2\\s*Rois?|1\\s*Chr|2\\s*Chr|Esd|N[ée]h|Est|Job|Psa?|Pro|Ecc?|Cant?|Esa|J[ée]r|Lam|Ez[ée]|Dan|Os[ée]|Jo[eë]l|Amos|Abd|Jon|Mic|Nah|Hab|Soph|Agg|Zac|Mal|Mat?|Marc?|Luc|Jean?|Act?|Rom?|1\\s*Co|2\\s*Co|Gal|Eph|Ph[il]|Col|1\\s*Th|2\\s*Th|1\\s*Ti|2\\s*Ti|Tite?|Phm|H[ée]b|Jac|1\\s*P[ie]|2\\s*P[ie]|1\\s*Jn|2\\s*Jn|3\\s*Jn|Jude?|Apo?|Genesis|Exodus|Leviticus|Numbers|Deuteronomy|Joshua|Judges|Kings|Chronicles|Ezra|Nehemiah|Esther|Psalms|Proverbs|Ecclesiastes|Isaiah|Jeremiah|Lamentations|Ezekiel|Daniel|Hosea|Micah|Matthew|Mark|Luke|John|Acts|Romans|Corinthians|Galatians|Ephesians|Philippians|Colossians|Thessalonians|Timothy|Titus|Hebrews|James|Peter|Revelation)';
+    
+    const refInParensRegex = new RegExp(`\\s*[\\(\\[]\\s*(?:${bibleBooks}[^)\\]]*)\\s*[\\)\\]]`, 'gi');
+    title = title.replace(refInParensRegex, '');
+
+    const refAfterDashRegex = new RegExp(`\\s*[-–—|/]\\s*(?:${bibleBooks}\\s*\\d+[^:]*)\\s*$`, 'gi');
+    title = title.replace(refAfterDashRegex, '');
+
+    // 7. Supprimer d'éventuels séparateurs résiduels en fin de chaîne
     title = title.replace(/[-–—|/:\s]+$/, '').trim();
+
+    // Si le titre a été entièrement vidé par le nettoyage, garder le titre initial
+    if (title.length < 2) {
+      title = rawTitle.trim();
+    }
 
     return title || rawTitle;
   },
