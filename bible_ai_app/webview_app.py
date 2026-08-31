@@ -702,11 +702,32 @@ class BibleAppApi:
 
 
     def parse_reference(self, raw_input: str) -> Dict[str, Any]:
-        """Décode une saisie libre de passage biblique (ex: 'rm 8.9', 'Romains 8:9', 'romains', 'Jn 3:16', '1 Co 13')."""
+        """Décode une saisie libre de passage biblique (ex: 'rm 8.9', 'Romains 8:9', 'romains', 'Jn 3:16', '1 Co 13', 'Genèse intro')."""
         if not raw_input or not str(raw_input).strip():
             return {"book": "Gen", "book_french": "Genèse", "chapter": 1, "verse": None}
             
         raw = str(raw_input).strip()
+        low = raw.lower()
+
+        # 0. Détection explicite de l'Introduction (ex: "intro genèse", "genèse intro", "introduction à la genèse")
+        if "intro" in low or "introduction" in low or " ch 0" in low or " 0:0" in low or " 0" in low.split():
+            clean_book = re.sub(r'\b(introduction|intro|à|la|le|au|livre|du|de|d|ch|chapitre|0)\b', ' ', low, flags=re.I).strip()
+            clean_book = re.sub(r'[\s:]+', ' ', clean_book).strip()
+            if clean_book:
+                resolved_code = BOOK_MAPPING.get(strip_accents(clean_book))
+                if not resolved_code:
+                    m_num = re.match(r'^([1-4])\s*([a-z]+)$', strip_accents(clean_book))
+                    if m_num:
+                        resolved_code = BOOK_MAPPING.get(f"{m_num.group(1)} {m_num.group(2)}")
+                if resolved_code:
+                    return {
+                        "book": resolved_code,
+                        "book_french": get_french_book_name(resolved_code),
+                        "chapter": 0,
+                        "verse": 0,
+                        "raw_verse": "0"
+                    }
+
         parsed = parse_smart_book_input(raw)
         if parsed and parsed.get("code"):
             code = parsed["code"]

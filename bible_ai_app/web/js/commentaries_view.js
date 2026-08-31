@@ -199,6 +199,9 @@ const CommentariesView = {
 
     this.btnPrev?.addEventListener('click', () => this.navigateVerse(-1));
     this.btnNext?.addEventListener('click', () => this.navigateVerse(1));
+    document.getElementById('btn-comm-view-intro')?.addEventListener('click', () => {
+      this.loadPassage(this.currentBook, 0, 0, this.preferredAuthor);
+    });
 
     // 2. Bouton retour au lecteur biblique
     this.btnBackBible?.addEventListener('click', () => {
@@ -522,17 +525,35 @@ const CommentariesView = {
   },
 
   async navigateVerse(delta) {
-    const curV = parseInt(this.currentVerse, 10) || 1;
-    let nextV = curV + delta;
-    let nextCh = parseInt(this.currentChapter, 10) || 1;
+    const curV = parseInt(this.currentVerse, 10) || 0;
+    let curCh = parseInt(this.currentChapter, 10) || 0;
     let nextBk = this.currentBook || 'Gen';
+
+    // Cas 1 : Sur l'intro (Ch 0) et on clique sur suivant
+    if (curCh === 0) {
+      if (delta > 0) {
+        await this.loadPassage(nextBk, 1, 1, this.preferredAuthor);
+      } else {
+        App.showToast('Début du livre (Introduction)');
+      }
+      return;
+    }
+
+    // Cas 2 : Au verset 1:1 et on clique sur précédent
+    if (curCh === 1 && curV <= 1 && delta < 0) {
+      await this.loadPassage(nextBk, 0, 0, this.preferredAuthor);
+      return;
+    }
+
+    let nextV = curV + delta;
+    let nextCh = curCh;
 
     if (nextV < 1) {
       if (nextCh > 1) {
         nextCh -= 1;
         nextV = 1;
       } else {
-        App.showToast('Début du livre');
+        await this.loadPassage(nextBk, 0, 0, this.preferredAuthor);
         return;
       }
     }
@@ -551,8 +572,8 @@ const CommentariesView = {
 
     if (typeof CommentaryViewer !== 'undefined') {
       book = CommentaryViewer.currentBook || BibleReader?.currentBook || 'Gen';
-      chapter = CommentaryViewer.currentChapter || BibleReader?.currentChapter || 1;
-      verse = CommentaryViewer.currentVerse || BibleReader?.currentVerse || 1;
+      chapter = (typeof CommentaryViewer.currentChapter !== 'undefined') ? CommentaryViewer.currentChapter : (BibleReader?.currentChapter || 1);
+      verse = (typeof CommentaryViewer.currentVerse !== 'undefined') ? CommentaryViewer.currentVerse : (BibleReader?.currentVerse || 1);
       author = CommentaryViewer.preferredAuthor;
 
       // Partager le cache de traduction
@@ -588,8 +609,8 @@ const CommentariesView = {
    */
   async loadPassage(bookCode, chapter, verse, preferredAuthor = null) {
     this.currentBook = bookCode;
-    this.currentChapter = parseInt(chapter) || 1;
-    this.currentVerse = parseInt(verse) || 1;
+    this.currentChapter = (typeof chapter !== 'undefined' && chapter !== null) ? parseInt(chapter, 10) : 1;
+    this.currentVerse = (typeof verse !== 'undefined' && verse !== null) ? parseInt(verse, 10) : 1;
     if (preferredAuthor) this.preferredAuthor = preferredAuthor;
 
     // Déterminer le nom français du livre
@@ -598,7 +619,10 @@ const CommentariesView = {
       : null;
     this.currentBookFrench = bookInfo?.name || bookCode;
 
-    const refString = `${this.currentBookFrench} ${this.currentChapter}:${this.currentVerse}`;
+    const refString = this.currentChapter === 0 
+      ? `Introduction à ${this.currentBookFrench}`
+      : `${this.currentBookFrench} ${this.currentChapter}:${this.currentVerse}`;
+
     if (this.searchInput) {
       this.searchInput.value = refString;
     }
@@ -619,20 +643,26 @@ const CommentariesView = {
     // 1. Récupérer le texte du verset biblique dans la version courante (ex: TOB)
     const bibleName = BibleReader?.currentBible1 || 'TOB';
     if (this.verseBannerBible) {
-      this.verseBannerBible.textContent = bibleName;
+      this.verseBannerBible.textContent = this.currentChapter === 0 ? 'Exégèse' : bibleName;
     }
 
-    try {
-      API.getChapterData(bibleName, bookCode, this.currentChapter).then(chapterData => {
-        if (chapterData && chapterData.verses) {
-          const vObj = chapterData.verses.find(v => parseInt(v.verse) === this.currentVerse);
-          if (vObj && this.verseBannerText) {
-            const plainText = (vObj.text || '').replace(/<[^>]*>/g, '').trim();
-            this.verseBannerText.textContent = `« ${plainText} »`;
+    if (this.currentChapter === 0) {
+      if (this.verseBannerText) {
+        this.verseBannerText.textContent = "Introduction générale au livre : contexte historique, auteur, date, but, verset clé et plan d'ensemble.";
+      }
+    } else {
+      try {
+        API.getChapterData(bibleName, bookCode, this.currentChapter).then(chapterData => {
+          if (chapterData && chapterData.verses) {
+            const vObj = chapterData.verses.find(v => parseInt(v.verse) === this.currentVerse);
+            if (vObj && this.verseBannerText) {
+              const plainText = (vObj.text || '').replace(/<[^>]*>/g, '').trim();
+              this.verseBannerText.textContent = `« ${plainText} »`;
+            }
           }
-        }
-      }).catch(err => console.warn('Impossible de charger le texte du verset:', err));
-    } catch (e) {}
+        }).catch(err => console.warn('Impossible de charger le texte du verset:', err));
+      } catch (e) {}
+    }
 
     // 2. Récupérer tous les commentaires exégétiques
     try {

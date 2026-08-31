@@ -13253,6 +13253,81 @@ body.comm-full-width #view-commentaries .comm-verse-banner {
   font-size: 0.92em;
 }
 
+/* ======================================================= */
+/* BOUTONS ET BANNIÈRES D'INTRODUCTION AU LIVRE            */
+/* ======================================================= */
+.comm-nav-intro-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 8px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 4px;
+  color: var(--accent-blue, #38BDF8);
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.comm-nav-intro-btn:hover {
+  background: rgba(56, 189, 248, 0.22);
+  border-color: #38BDF8;
+}
+
+.bible-book-intro-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  margin: 8px 0 20px 0;
+  background: var(--bg-surface, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  border-left: 3px solid var(--accent-blue, #38BDF8);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bible-book-intro-badge:hover {
+  background: var(--bg-hover, rgba(255, 255, 255, 0.06));
+  border-color: var(--accent-blue, #38BDF8);
+  transform: translateY(-1px);
+}
+
+.intro-badge-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.intro-badge-icon {
+  font-size: 16px;
+}
+
+.intro-badge-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary, #ffffff);
+}
+
+.intro-badge-desc {
+  font-size: 12px;
+  color: var(--text-secondary, #94a3b8);
+  margin-left: 6px;
+}
+
+.intro-badge-arrow {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-blue, #38BDF8);
+  white-space: nowrap;
+}
+
 /* ÉTATS VIDES ET CHARGEMENT */
 .comm-view-loading {
   text-align: center;

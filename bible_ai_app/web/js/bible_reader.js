@@ -790,6 +790,12 @@ const CommentaryViewer = {
       this.adjustFontSize(1);
     });
 
+    // 0d. Bouton d'accès direct à l'Introduction du livre
+    document.getElementById('btn-comm-open-intro')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.loadIntroduction();
+    });
+
     // 1. Bouton de traduction d'article individuel
     const btnTranslate = document.getElementById('btn-translate-comm');
     btnTranslate?.addEventListener('click', (e) => {
@@ -934,25 +940,69 @@ const CommentaryViewer = {
     App.showToast(`Taille du texte : ${this.fontSize}px`);
   },
 
-  async navigateVerse(delta) {
-    let currentV = parseInt(this.currentVerse, 10) || 1;
-    if (typeof BibleReader !== 'undefined' && BibleReader.selectedVerse) {
-      currentV = parseInt(BibleReader.selectedVerse, 10) || currentV;
+  async loadIntroduction(bookCode = null) {
+    const book = bookCode || this.currentBook || (typeof BibleReader !== 'undefined' ? BibleReader.currentBook : 'Gen');
+    const bookInfo = typeof getBookInfo === 'function' ? getBookInfo(book) : { name: book };
+    const refStr = `Introduction à ${bookInfo.name || book}`;
+    this.currentBook = book;
+    this.currentChapter = 0;
+    this.currentVerse = 0;
+    this.updateLiveBadge(refStr);
+    
+    try {
+      const comms = await API.getCommentaries(book, 0, 0);
+      this.setComments(comms, refStr, book, 0, 0);
+    } catch (e) {
+      console.error('Erreur chargement introduction livre:', e);
     }
-    let nextV = currentV + delta;
-    let nextCh = (this.isSynchronized && typeof BibleReader !== 'undefined')
-      ? (parseInt(BibleReader.currentChapter, 10) || 1)
-      : (parseInt(this.currentChapter, 10) || 1);
+  },
+
+  async navigateVerse(delta) {
+    let currentV = parseInt(this.currentVerse, 10) || 0;
+    let currentCh = parseInt(this.currentChapter, 10) || 0;
     let nextBk = (this.isSynchronized && typeof BibleReader !== 'undefined')
       ? (BibleReader.currentBook || 'Gen')
       : (this.currentBook || 'Gen');
+
+    // Cas 1 : On est sur l'introduction (Ch 0) et on clique sur Suivant (delta > 0)
+    if (currentCh === 0) {
+      if (delta > 0) {
+        if (this.isSynchronized && typeof BibleReader !== 'undefined') {
+          BibleReader.selectVerse(nextBk, 1, 1, { scroll: true, behavior: 'smooth', block: 'center' });
+        } else {
+          this.currentBook = nextBk;
+          this.currentChapter = 1;
+          this.currentVerse = 1;
+          const bookInfo = typeof getBookInfo === 'function' ? getBookInfo(nextBk) : { name: nextBk };
+          const refStr = `${bookInfo.name || nextBk} 1:1`;
+          this.updateLiveBadge(refStr);
+          try {
+            const comms = await API.getCommentaries(nextBk, 1, 1);
+            this.setComments(comms, refStr, nextBk, 1, 1);
+          } catch (e) {}
+        }
+        return;
+      } else {
+        App.showToast('Début du livre (Introduction)');
+        return;
+      }
+    }
+
+    // Cas 2 : On est au Verset 1 du Chapitre 1 et on clique sur Précédent (delta < 0)
+    if (currentCh === 1 && currentV <= 1 && delta < 0) {
+      await this.loadIntroduction(nextBk);
+      return;
+    }
+
+    let nextV = currentV + delta;
+    let nextCh = currentCh;
 
     if (nextV < 1) {
       if (nextCh > 1) {
         nextCh -= 1;
         nextV = 1;
       } else {
-        App.showToast('Début du livre');
+        await this.loadIntroduction(nextBk);
         return;
       }
     }
@@ -5238,6 +5288,31 @@ const BibleReader = {
         block.classList.add(`vintage-epoch-${epoch}`);
         block.classList.add(`vintage-intensity-${VintageThemeManager.intensity}`);
       }
+    }
+
+    if (parseInt(data.chapter, 10) === 1) {
+      const bookCode = data.book || this.currentBook;
+      const bInfo = typeof getBookInfo === 'function' ? getBookInfo(bookCode) : { name: bookCode };
+      const introBanner = document.createElement('div');
+      introBanner.className = 'bible-book-intro-badge';
+      introBanner.dataset.action = 'open-book-intro';
+      introBanner.dataset.book = bookCode;
+      introBanner.innerHTML = `
+        <div class="intro-badge-content">
+          <span class="intro-badge-icon">📖</span>
+          <span class="intro-badge-title">Introduction au livre de ${bInfo.name || bookCode}</span>
+          <span class="intro-badge-desc">But, verset clé, contexte et plan d'ensemble</span>
+        </div>
+        <span class="intro-badge-arrow">Ouvrir l'exégèse →</span>
+      `;
+      introBanner.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.querySelector('.drawer-tab[data-drawer-tab="commentaries"]')?.click();
+        if (typeof CommentaryViewer !== 'undefined') {
+          CommentaryViewer.loadIntroduction(bookCode);
+        }
+      });
+      block.appendChild(introBanner);
     }
 
     if (data.pericope) {

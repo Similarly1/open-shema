@@ -950,7 +950,7 @@
     <!-- ======================================================= -->
     <aside class="sidebar" id="sidebar">
       <nav class="sidebar-menu">
-        <button class="nav-item active" data-view="bible" id="nav-bible" title="Bible">
+        <button class="nav-item active" data-nav-id="bible" data-view="bible" id="nav-bible" title="Bible">
           <span class="nav-icon">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
@@ -961,7 +961,7 @@
           </span>
           <span class="nav-label">Bible</span>
         </button>
-        <button class="nav-item" data-view="passage-study" id="nav-passage-study" title="Guide de Passage (Étude exégétique 360°)">
+        <button class="nav-item" data-nav-id="passage-study" data-view="passage-study" id="nav-passage-study" title="Guide de Passage (Étude exégétique 360°)">
           <span class="nav-icon">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"></circle>
@@ -970,7 +970,7 @@
           </span>
           <span class="nav-label">Guide de Passage</span>
         </button>
-        <button class="nav-item" data-view="commentaries" id="nav-commentaries" title="Commentaires exégétiques">
+        <button class="nav-item" data-nav-id="commentaries" data-view="commentaries" id="nav-commentaries" title="Commentaires exégétiques">
           <span class="nav-icon">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
@@ -980,7 +980,7 @@
           </span>
           <span class="nav-label">Commentaires</span>
         </button>
-        <button class="nav-item" data-view="theology" id="nav-theology" title="Ouvrages de théologie & études">
+        <button class="nav-item" data-nav-id="theology" data-view="theology" id="nav-theology" title="Ouvrages de théologie & études">
           <span class="nav-icon">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <line x1="3" y1="22" x2="21" y2="22"></line>
@@ -994,7 +994,7 @@
           </span>
           <span class="nav-label">Théologie</span>
         </button>
-        <button class="nav-item" data-view="articles" id="nav-articles" title="Articles & Blogs théologiques">
+        <button class="nav-item" data-nav-id="articles" data-view="articles" id="nav-articles" title="Articles & Blogs théologiques">
           <span class="nav-icon">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path>
@@ -1005,7 +1005,7 @@
           </span>
           <span class="nav-label">Articles</span>
         </button>
-        <button class="nav-item" data-view="dict" id="nav-dict" title="Dictionnaires & Lexiques">
+        <button class="nav-item" data-nav-id="dict" data-view="dict" id="nav-dict" title="Dictionnaires & Lexiques">
           <span class="nav-icon">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="m5 8 6 6"></path>
@@ -1018,7 +1018,7 @@
           </span>
           <span class="nav-label">Dictionnaires</span>
         </button>
-        <button class="nav-item" data-view="library" id="nav-library" title="Bibliothèque">
+        <button class="nav-item" data-nav-id="library" data-view="library" id="nav-library" title="Bibliothèque">
           <span class="nav-icon">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <rect width="8" height="18" x="3" y="3" rx="1"></rect>
@@ -1028,7 +1028,7 @@
           </span>
           <span class="nav-label">Bibliothèque</span>
         </button>
-        <button class="nav-item" data-view="search" id="nav-search" title="Rechercher">
+        <button class="nav-item" data-nav-id="search" data-view="search" id="nav-search" title="Rechercher">
           <span class="nav-icon">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="11" cy="11" r="8"></circle>
@@ -1037,7 +1037,7 @@
           </span>
           <span class="nav-label">Rechercher</span>
         </button>
-        <button class="nav-item" data-view="ai" id="nav-ai" title="Assistant d'Étude">
+        <button class="nav-item" data-nav-id="ai" data-view="ai" id="nav-ai" title="Assistant d'Étude">
           <span class="nav-icon">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
@@ -1045,7 +1045,7 @@
           </span>
           <span class="nav-label">Assistant d'Étude</span>
         </button>
-        <button class="nav-item" data-view="notes" id="nav-notes" title="Notes">
+        <button class="nav-item" data-nav-id="notes" data-view="notes" id="nav-notes" title="Notes">
           <span class="nav-icon">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 20h9"></path>
@@ -1056,7 +1056,7 @@
           <span class="nav-label">Notes</span>
         </button>
         <!-- GROUPE PRÉDICATION & BANQUE D'ILLUSTRATIONS -->
-        <div class="nav-item-group" id="group-nav-sermons">
+        <div class="nav-item-group" data-nav-id="sermons" id="group-nav-sermons">
           <button class="nav-item has-submenu" data-view="sermons" id="nav-sermons" title="Prédication">
             <span class="nav-icon">
               <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -1092,7 +1092,7 @@
             </button>
           </div>
         </div>
-        <button class="nav-item" data-view="maps" id="nav-maps" title="Cartes bibliques">
+        <button class="nav-item" data-nav-id="maps" data-view="maps" id="nav-maps" title="Cartes bibliques">
           <span class="nav-icon">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"></path>
@@ -1105,7 +1105,7 @@
       </nav>
       
       <div class="sidebar-footer">
-        <button class="nav-item sub-item" data-view="settings" id="nav-settings" title="Paramètres">
+        <button class="nav-item sub-item" data-nav-id="settings" data-view="settings" id="nav-settings" title="Paramètres">
           <span class="nav-icon">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="3"></circle>
@@ -1114,7 +1114,7 @@
           </span>
           <span class="nav-label">Paramètres</span>
         </button>
-        <button class="nav-item sub-item" id="nav-about-btn" title="À propos, Ressources libres & Crédits">
+        <button class="nav-item sub-item" data-nav-id="about" id="nav-about-btn" title="À propos, Ressources libres & Crédits">
           <span class="nav-icon">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"></circle>
@@ -1915,6 +1915,55 @@
                     </label>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            <!-- CARTE PERSONNALISATION DU MENU LATÉRAL (GLISSER-DÉPOSER & VISIBILITÉ) -->
+            <div class="settings-card" id="card-sidebar-nav-customizer">
+              <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 14px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 260px;">
+                  <div class="card-title" style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-blue, #3B82F6);">
+                      <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+                      <path d="M9 3v18"></path>
+                    </svg>
+                    <span>Personnalisation & Ordre du Menu Latéral</span>
+                  </div>
+                  <p class="card-desc" style="margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--text-secondary);">
+                    Masquez les éléments que vous n'utilisez pas et <strong>réorganisez l'ordre par glisser-déposer</strong> ou avec les flèches. Vos changements s'appliquent immédiatement à la barre latérale.
+                  </p>
+                </div>
+                <button type="button" class="btn-reset-nav-customizer" id="btn-reset-sidebar-nav" title="Rétablir l'ordre et la visibilité d'origine de tous les éléments">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                    <path d="M3 3v5h5"></path>
+                  </svg>
+                  <span>Rétablir par défaut</span>
+                </button>
+              </div>
+
+              <!-- Presets rapides en 1 clic -->
+              <div class="nav-presets-bar">
+                <span class="nav-presets-label">Configurations rapides :</span>
+                <div class="nav-presets-buttons">
+                  <button type="button" class="nav-preset-pill" data-preset="all" title="Affiche l'intégralité des modules">
+                    <span>🌟 Tout afficher</span>
+                  </button>
+                  <button type="button" class="nav-preset-pill" data-preset="essential" title="Bible, Notes et Recherche uniquement">
+                    <span>📖 Essentiel</span>
+                  </button>
+                  <button type="button" class="nav-preset-pill" data-preset="exegete" title="Bible, Guide de Passage, Commentaires, Théologie, Dictionnaires, Recherche">
+                    <span>🔍 Exégète & Recherche</span>
+                  </button>
+                  <button type="button" class="nav-preset-pill" data-preset="preacher" title="Bible, Prédication, Commentaires, Notes">
+                    <span>🎙️ Prédicateur</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Liste des modules ordonnables par drag & drop -->
+              <div class="nav-customizer-list" id="sidebar-nav-customizer-list">
+                <!-- Rendu dynamiquement par SettingsView -->
               </div>
             </div>
           </div>
@@ -5129,6 +5178,10 @@
               <input type="text" id="comm-view-search-input" class="search-field comm-ref-search-field" placeholder="Passage (ex: Jean 3:16)..." title="Saisir un passage et appuyer sur Entrée">
             </div>
             <button class="tool-btn icon-only" id="btn-comm-view-next" title="Verset suivant (Flèche Droite)">▶</button>
+            <button class="comm-nav-intro-btn" id="btn-comm-view-intro" title="Consulter l'Introduction au livre (But, Verset clé, Plan)">
+              <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/></svg>
+              <span>Intro livre</span>
+            </button>
           </div>
           
           <div class="view-actions comm-view-toolbar-actions">
@@ -6169,7 +6222,7 @@
             <!-- Rangée 1 : Navigation Passage & Actions Générales -->
             <div class="comm-header-top-row">
               <div class="comm-nav-passage-group">
-                <button class="comm-nav-arrow-btn" id="btn-comm-prev-verse" title="Verset précédent">
+                <button class="comm-nav-arrow-btn" id="btn-comm-prev-verse" title="Verset précédent (ou Introduction)">
                   <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
                 </button>
                 
@@ -6180,6 +6233,11 @@
 
                 <button class="comm-nav-arrow-btn" id="btn-comm-next-verse" title="Verset suivant">
                   <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+
+                <button class="comm-nav-intro-btn" id="btn-comm-open-intro" title="Consulter l'Introduction au livre (But, Verset clé, Plan)">
+                  <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/></svg>
+                  <span>Intro</span>
                 </button>
 
                 <button class="comm-sync-btn active" id="btn-toggle-comm-sync" title="Synchronisation active : le commentaire suit le texte biblique (Cliquer pour délier)">
