@@ -5299,11 +5299,16 @@ const BibleReader = {
       introBanner.dataset.book = bookCode;
       introBanner.innerHTML = `
         <div class="intro-badge-content">
-          <span class="intro-badge-icon">📖</span>
+          <span class="intro-badge-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+          </span>
           <span class="intro-badge-title">Introduction au livre de ${bInfo.name || bookCode}</span>
           <span class="intro-badge-desc">But, verset clé, contexte et plan d'ensemble</span>
         </div>
-        <span class="intro-badge-arrow">Ouvrir l'exégèse →</span>
+        <span class="intro-badge-arrow">
+          <span>Ouvrir l'exégèse</span>
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </span>
       `;
       introBanner.addEventListener('click', (e) => {
         e.stopPropagation();
