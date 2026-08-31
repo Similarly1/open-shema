@@ -3602,7 +3602,7 @@ const LexiconViewer = {
     return isHebrew ? 'Substantif / Nom' : 'Nom (Substantif)';
   },
 
-  renderStrongCard(container, match, bpVideoCardHtml = '') {
+  buildStrongCardHtml(match, bpVideoCardHtml = '') {
     const rawTitle = match.title || this.currentTerm || '';
     let frenchLemma = rawTitle;
     let originalScript = match.lemma || '';
@@ -3661,7 +3661,7 @@ const LexiconViewer = {
     const hebrewRoot = isHebrew ? this.extractHebrewRoot(originalScript) : '';
     const grammarClass = this.deduceGrammarClass(frenchLemma, cleanText, isHebrew);
 
-    container.innerHTML = `
+    return `
       <div class="strong-exegesis-container" style="padding: 16px;">
         ${bpVideoCardHtml}
 
@@ -3789,6 +3789,11 @@ const LexiconViewer = {
         </div>
       </div>
     `;
+  },
+
+  renderStrongCard(container, match, bpVideoCardHtml = '') {
+    if (!container) return;
+    container.innerHTML = this.buildStrongCardHtml(match, bpVideoCardHtml);
   },
 
   renderDictionaryMatch(container, match) {

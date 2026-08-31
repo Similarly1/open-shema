@@ -1730,28 +1730,13 @@ const PassageStudyView = {
     if (!entry || !article) return '';
     const articles = entry.articles || [article];
     const rawText = article.full_text || article.preview || '';
+    const isStrong = article.dict_id === 'strong' || article.is_strong || (article.dict_name && article.dict_name.toLowerCase().includes('strong'));
 
     return `
       <div class="ps-dict-article-pane">
-        <div class="ps-dict-article-header">
-          <div class="ps-dict-article-title-block">
-            <h4 class="ps-dict-article-title">${this.escapeHtml(article.title || entry.title || entry.term)}</h4>
-            <div class="ps-dict-article-badge-row">
-              <span class="ps-dict-source-badge">${this.escapeHtml(article.dict_name)}</span>
-            </div>
-          </div>
-
-          <div class="ps-dict-article-actions">
-            <button type="button" class="ps-btn-sm ps-dict-action-btn" id="btn-ps-copy-dict-article" title="Copier la notice textuelle">
-              <span class="ps-icon-slot">${this.ICONS.copy}</span>
-              <span>Copier</span>
-            </button>
-          </div>
-        </div>
-
         <!-- Onglets multi-sources si le mot est présent dans plusieurs dictionnaires -->
         ${articles.length > 1 ? `
-          <div class="ps-dict-sources-tabs">
+          <div class="ps-dict-sources-tabs" style="margin-bottom: 12px;">
             ${articles.map((art, idx) => `
               <button type="button" class="ps-btn-sm ps-dict-source-tab ${idx === this.activeDictSourceIdx ? 'active' : ''}" data-idx="${idx}">
                 <span class="ps-dict-source-tab-dot"></span>
@@ -1761,10 +1746,38 @@ const PassageStudyView = {
           </div>
         ` : ''}
 
-        <!-- Corps de l'article avec typographie Markdown formatée -->
-        <div class="ps-dict-article-body markdown-body">
-          ${this.formatDictionaryMarkdown(rawText)}
-        </div>
+        ${isStrong && typeof LexiconViewer !== 'undefined' && LexiconViewer.buildStrongCardHtml ? `
+          <div class="ps-dict-strong-wrap">
+            ${LexiconViewer.buildStrongCardHtml({
+              title: article.title || entry.title || entry.term,
+              lemma: article.lemma || '',
+              strong: article.strong || entry.strong || '',
+              dict_name: article.dict_name || 'Lexique Hébreu & Grec Strong',
+              full_text: rawText
+            })}
+          </div>
+        ` : `
+          <div class="ps-dict-article-header">
+            <div class="ps-dict-article-title-block">
+              <h4 class="ps-dict-article-title">${this.escapeHtml(article.title || entry.title || entry.term)}</h4>
+              <div class="ps-dict-article-badge-row">
+                <span class="ps-dict-source-badge">${this.escapeHtml(article.dict_name)}</span>
+              </div>
+            </div>
+
+            <div class="ps-dict-article-actions">
+              <button type="button" class="ps-btn-sm ps-dict-action-btn" id="btn-ps-copy-dict-article" title="Copier la notice textuelle">
+                <span class="ps-icon-slot">${this.ICONS.copy}</span>
+                <span>Copier</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Corps de l'article avec typographie Markdown formatée -->
+          <div class="ps-dict-article-body markdown-body">
+            ${this.formatDictionaryMarkdown(rawText)}
+          </div>
+        `}
       </div>
     `;
   },

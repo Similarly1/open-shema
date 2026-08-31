@@ -830,10 +830,15 @@ class PassageStudyManager:
                     articles = []
                     for m in matches:
                         raw_t = m.get("full_text") or m.get("raw_text") or m.get("preview") or ""
+                        d_id = m.get("dict_id", "dict")
+                        d_name = m.get("dict_name", "Dictionnaire biblique")
                         articles.append({
-                            "dict_id": m.get("dict_id", "dict"),
-                            "dict_name": m.get("dict_name", "Dictionnaire biblique"),
+                            "dict_id": d_id,
+                            "dict_name": d_name,
                             "title": m.get("title", term),
+                            "lemma": m.get("lemma", ""),
+                            "strong": m.get("strong", "") or m.get("code", ""),
+                            "is_strong": m.get("is_strong", False) or d_id == "strong" or ("strong" in d_name.lower()),
                             "preview": m.get("preview", ""),
                             "full_text": raw_t
                         })
