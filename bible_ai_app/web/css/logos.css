@@ -29157,6 +29157,173 @@ mark {
   gap: 10px;
 }
 
+/* =========================================================================
+   ANIMATION CHARGEMENT / RÉFLEXION IA HOMILÉTIQUE
+   ========================================================================= */
+
+.structure-choice-card.is-processing {
+  border-color: #a855f7 !important;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(99, 102, 241, 0.1)) !important;
+  box-shadow: 0 0 25px rgba(168, 85, 247, 0.35) !important;
+  transform: scale(1.01);
+  animation: cardAiPulse 2s ease-in-out infinite alternate;
+}
+
+.structure-choice-card.is-disabled {
+  opacity: 0.45;
+  pointer-events: none;
+  filter: grayscale(0.3);
+  transform: none !important;
+}
+
+@keyframes cardAiPulse {
+  0% { box-shadow: 0 0 15px rgba(168, 85, 247, 0.25); border-color: rgba(168, 85, 247, 0.7); }
+  100% { box-shadow: 0 0 30px rgba(168, 85, 247, 0.55); border-color: #c084fc; }
+}
+
+.sermon-ai-thinking-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 18px;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(99, 102, 241, 0.06));
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+  animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sermon-ai-thinking-box::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, #c084fc, #818cf8, transparent);
+  animation: shimmerLine 2.5s ease-in-out infinite;
+}
+
+@keyframes shimmerLine {
+  0% { opacity: 0.3; transform: translateX(-100%); }
+  50% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0.3; transform: translateX(100%); }
+}
+
+.sermon-ai-thinking-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* AI Orb animé */
+.sermon-ai-orb-wrap {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sermon-ai-orb-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: #c084fc;
+  border-right-color: #6366f1;
+  border-bottom-color: #38bdf8;
+  animation: orbSpin 1.4s linear infinite;
+}
+
+.sermon-ai-orb-glow {
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.45) 0%, rgba(99, 102, 241, 0.15) 70%, transparent 100%);
+  animation: orbPulse 1.8s ease-in-out infinite alternate;
+}
+
+.sermon-ai-orb-icon {
+  position: relative;
+  z-index: 2;
+  color: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: orbIconBreathe 2s ease-in-out infinite alternate;
+}
+
+@keyframes orbSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes orbPulse {
+  0% { transform: scale(0.85); opacity: 0.5; }
+  100% { transform: scale(1.15); opacity: 1; }
+}
+
+@keyframes orbIconBreathe {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  100% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 6px rgba(192, 132, 252, 0.8)); }
+}
+
+.sermon-ai-thinking-texts {
+  flex: 1;
+  min-width: 0;
+}
+
+.sermon-ai-thinking-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #f8fafc;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sermon-ai-thinking-sub {
+  font-size: 11.5px;
+  color: #cbd5e1;
+  margin-top: 3px;
+  line-height: 1.4;
+  transition: all 0.3s ease;
+}
+
+/* Barre de progression fluide indéterminée */
+.sermon-ai-progress-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.sermon-ai-progress-bar {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 45%;
+  background: linear-gradient(90deg, #a855f7, #6366f1, #38bdf8, #a855f7);
+  background-size: 200% 100%;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.75);
+  animation: progressMove 1.8s ease-in-out infinite, progressShimmer 2s linear infinite;
+}
+
+@keyframes progressMove {
+  0% { left: -45%; width: 30%; }
+  50% { left: 35%; width: 50%; }
+  100% { left: 105%; width: 30%; }
+}
+
+@keyframes progressShimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
 /* ==========================================================================
    PERSONNALISATION DU MENU LATÉRAL (GLISSER-DÉPOSER & VISIBILITÉ)
    ========================================================================== */

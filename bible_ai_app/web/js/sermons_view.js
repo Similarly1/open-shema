@@ -2939,11 +2939,26 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
             </div>
           </div>
 
-          <div id="sermon-restructure-loading-indicator" style="display: none; padding: 14px; background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.25); border-radius: 8px; align-items: center; gap: 12px;">
-            <div class="spinner" style="width: 20px; height: 20px; border-width: 2.5px; border-top-color: #a855f7;"></div>
-            <div style="font-size: 12px; color: var(--text-primary);">
-              <strong>Réorganisation IA en cours...</strong>
-              <div style="font-size: 11px; color: var(--text-secondary);">Redistribution théologique des paragraphes et harmonisation des transitions.</div>
+          <div id="sermon-restructure-loading-indicator" class="sermon-ai-thinking-box" style="display: none;">
+            <div class="sermon-ai-thinking-header">
+              <div class="sermon-ai-orb-wrap">
+                <div class="sermon-ai-orb-ring"></div>
+                <div class="sermon-ai-orb-glow"></div>
+                <div class="sermon-ai-orb-icon">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                </div>
+              </div>
+              <div class="sermon-ai-thinking-texts">
+                <div class="sermon-ai-thinking-title">
+                  <span>Réflexion et restructuration IA en cours...</span>
+                </div>
+                <div id="sermon-ai-thinking-step-text" class="sermon-ai-thinking-sub">
+                  Analyse théologique et extraction des arguments clés...
+                </div>
+              </div>
+            </div>
+            <div class="sermon-ai-progress-track">
+              <div class="sermon-ai-progress-bar"></div>
             </div>
           </div>
         </div>
@@ -2979,18 +2994,55 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     // Option 2 : Réorganisation IA
     modal.querySelector('.btn-opt-ai')?.addEventListener('click', async () => {
       const loader = document.getElementById('sermon-restructure-loading-indicator');
-      const grid = modal.querySelector('.structure-choice-grid');
-      if (loader) loader.style.display = 'flex';
-      if (grid) grid.style.pointerEvents = 'none';
+      const stepText = document.getElementById('sermon-ai-thinking-step-text');
+      const aiCard = modal.querySelector('.btn-opt-ai');
+      const allCards = modal.querySelectorAll('.structure-choice-card');
+
+      if (aiCard) aiCard.classList.add('is-processing');
+      allCards.forEach(c => {
+        if (c !== aiCard) c.classList.add('is-disabled');
+      });
+
+      if (loader) {
+        loader.style.display = 'flex';
+      }
+
+      // Progression dynamique des étapes de réflexion
+      const steps = [
+        "Analyse théologique & extraction des arguments clés...",
+        "Distribution sémantique dans les axes du canevas...",
+        "Harmonisation des transitions homilétiques & fluidité...",
+        "Finalisation et structuration des parties..."
+      ];
+      let currentStep = 0;
+      const stepInterval = setInterval(() => {
+        currentStep = (currentStep + 1) % steps.length;
+        if (stepText) {
+          stepText.style.opacity = '0';
+          setTimeout(() => {
+            if (stepText) {
+              stepText.textContent = steps[currentStep];
+              stepText.style.opacity = '1';
+            }
+          }, 200);
+        }
+      }, 2400);
+
+      const stopThinkingAnimation = () => {
+        clearInterval(stepInterval);
+        if (aiCard) aiCard.classList.remove('is-processing');
+        allCards.forEach(c => c.classList.remove('is-disabled'));
+      };
 
       try {
         const res = await API.reorganizeSermonWithAI(this.sections, newSections, this.currentSermon);
+        stopThinkingAnimation();
+
         if (res && res.success && Array.isArray(res.sections) && res.sections.length > 0) {
           closeModal();
           this.applyStructureResult(structureName, res.sections, modelMeta, `✓ Prédication restructurée avec succès par l'IA (${res.used_model || 'Modèle IA'}) !`);
         } else {
           if (loader) loader.style.display = 'none';
-          if (grid) grid.style.pointerEvents = 'auto';
           const errMsg = res?.error || "Erreur de communication avec l'assistant IA.";
           if (confirm(`${errMsg}\n\nSouhaitez-vous basculer instantanément sur l'Option 1 (Conserver et adapter sans IA) ?`)) {
             closeModal();
@@ -2999,8 +3051,8 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
           }
         }
       } catch (err) {
+        stopThinkingAnimation();
         if (loader) loader.style.display = 'none';
-        if (grid) grid.style.pointerEvents = 'auto';
         console.error("Erreur réorganisation IA", err);
         if (confirm(`Erreur : ${err}\n\nSouhaitez-vous basculer instantanément sur l'Option 1 (Conserver et adapter sans IA) ?`)) {
           closeModal();
