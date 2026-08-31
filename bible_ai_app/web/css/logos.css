@@ -20511,11 +20511,32 @@ body.theme-light .ps-select-sm optgroup {
   background-color: rgba(245, 158, 11, 0.06);
 }
 
-.ps-orig-lexicon-card {
+/* Suppression de l'effet boîte dans boîte sur le texte original */
+.ps-original-card .ps-orig-continuous-box {
+  padding: 12px 6px;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  font-size: 22px;
+  line-height: 2.3;
+}
+
+/* Panneau Lexique : pas de boîte externe, commence exactement au même alignement haut */
+.ps-orig-lexicon-pane {
   position: sticky;
   top: 15px;
-  max-height: calc(100vh - 120px);
-  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+}
+
+.ps-orig-lexicon-pane .strong-exegesis-container {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.ps-orig-lexicon-pane .strong-card {
+  margin: 0 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 /* =========================================================================

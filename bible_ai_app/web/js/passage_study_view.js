@@ -1310,8 +1310,8 @@ const PassageStudyView = {
           </div>
         </div>
 
-        <!-- COLONNE DROITE (FICHE LEXICALE STRONG COMPLÈTE DU MOT SÉLECTIONNÉ) -->
-        <div class="ps-card ps-orig-lexicon-card" id="ps-orig-lexicon-pane">
+        <!-- COLONNE DROITE (FICHE LEXICALE STRONG DU MOT SÉLECTIONNÉ SANS DOUBLE CADRE) -->
+        <div class="ps-orig-lexicon-pane" id="ps-orig-lexicon-pane">
           <!-- Rendu dynamique du mot actif -->
         </div>
       </div>
@@ -1367,7 +1367,7 @@ const PassageStudyView = {
 
     if (!wordData) {
       pane.innerHTML = `
-        <div class="ps-dict-empty-state" style="padding: 40px 20px; text-align: center;">
+        <div class="ps-card ps-dict-empty-state" style="padding: 40px 20px; text-align: center; margin: 0;">
           <span class="ps-icon-slot">${this.ICONS.history || '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'}</span>
           <p style="margin-top: 10px; color: var(--text-muted, #888); font-size: 13.5px;">Cliquez sur un mot hébreu ou grec dans le texte biblique à gauche pour afficher son analyse lexicale et morphologique complète.</p>
         </div>
@@ -1388,11 +1388,11 @@ const PassageStudyView = {
         strong: strongCode,
         dict_name: isHebrew ? 'Hébreu Biblique (A.T.)' : 'Grec Koinè (N.T.)',
         full_text: wordData.def || wordData.strong_def_fr || wordData.gloss || ''
-      });
+      }, '', '0');
     }
 
     pane.innerHTML = cardHtml || `
-      <div class="strong-exegesis-container" style="padding: 16px;">
+      <div class="strong-exegesis-container" style="padding: 0;">
         <div class="strong-card ${isHebrew ? 'strong-theme-hebrew' : 'strong-theme-greek'}">
           <div class="strong-card-topbar">
             <div class="strong-lang-badge"><span>${isHebrew ? 'Hébreu Biblique (A.T.)' : 'Grec Koinè (N.T.)'}</span></div>
@@ -1422,7 +1422,7 @@ const PassageStudyView = {
               strong: strongCode,
               dict_name: match.dict_name || (isHebrew ? 'Hébreu Biblique (A.T.)' : 'Grec Koinè (N.T.)'),
               full_text: match.full_text || match.raw_text || match.preview || wordData.def || ''
-            });
+            }, '', '0');
           }
         }
       }

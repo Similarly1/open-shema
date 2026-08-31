@@ -3602,7 +3602,7 @@ const LexiconViewer = {
     return isHebrew ? 'Substantif / Nom' : 'Nom (Substantif)';
   },
 
-  buildStrongCardHtml(match, bpVideoCardHtml = '') {
+  buildStrongCardHtml(match, bpVideoCardHtml = '', padding = '16px') {
     const rawTitle = match.title || this.currentTerm || '';
     let frenchLemma = rawTitle;
     let originalScript = match.lemma || '';
@@ -3662,7 +3662,7 @@ const LexiconViewer = {
     const grammarClass = this.deduceGrammarClass(frenchLemma, cleanText, isHebrew);
 
     return `
-      <div class="strong-exegesis-container" style="padding: 16px;">
+      <div class="strong-exegesis-container" style="padding: ${padding};">
         ${bpVideoCardHtml}
 
         <div class="strong-card ${isHebrew ? 'strong-theme-hebrew' : 'strong-theme-greek'}">
