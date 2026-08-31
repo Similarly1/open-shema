@@ -845,7 +845,7 @@ def sync_sqlite_master():
     comm_id = "tgc_francais"
     comm_name = "Commentaires The Gospel Coalition (TGC)"
 
-    cur.execute("DELETE FROM commentaries WHERE commentary_id = ?", (comm_id,))
+    cur.execute("DELETE FROM commentaries WHERE commentary_id IN ('tgc_francais', 'tgc_complete')")
 
     rows = []
     total_passages = 0
@@ -861,18 +861,19 @@ def sync_sqlite_master():
             author = b_data.get("author", "Auteur TGC")
 
             for ch in b_data.get("chapters", []):
-                chap_num = ch.get("chapter", 1)
+                chap_num = ch.get("chapter", 0)
                 for v in ch.get("verses", []):
                     total_passages += 1
+                    ref_display = f"{v.get('reference', '')} ({author})"
                     rows.append((
                         comm_id,
                         comm_name,
                         b_code,
                         b_name,
                         chap_num,
-                        v.get("verse_start", 1),
-                        v.get("verse_end", 1),
-                        f"{v.get('reference', '')} ({author})",
+                        v.get("verse_start", 0),
+                        v.get("verse_end", 0),
+                        ref_display,
                         v.get("text", ""),
                         json.dumps(v.get("paragraphs", []), ensure_ascii=False),
                         "",

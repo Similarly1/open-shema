@@ -1583,6 +1583,11 @@ const CommentariesView = {
       .replace(/\[([A-Z0-9\u00C0-\u00DCa-z\u00E0-\u00FC\s\.\,\:\;\-]+)\]/g, '<span class="comm-cite-badge">$1</span>')
       .replace(/\n\n/g, '<br><br>');
 
+    // Nettoyage des <br><br> parasites autour des balises de bloc HTML
+    html = html
+      .replace(/(?:<br>\s*)+<(div|h[1-6]|blockquote|ul|ol|li)/gi, '<$1')
+      .replace(/<\/(div|h[1-6]|blockquote|ul|ol|li)>(?:\s*<br>)+/gi, '</$1>');
+
     if (typeof TheologyView !== 'undefined' && TheologyView.highlightScriptureReferences) {
       html = TheologyView.highlightScriptureReferences(html);
     }
