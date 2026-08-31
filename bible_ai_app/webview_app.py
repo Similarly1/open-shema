@@ -3650,6 +3650,20 @@ class BibleAppApi:
         self.config = load_secrets_into_config(raw)
         return True
 
+    def get_commentary_favorites(self) -> List[str]:
+        cfg = load_config()
+        favs = cfg.get("commentary_favorites", [])
+        return favs if isinstance(favs, list) else []
+
+    def save_commentary_favorites(self, favorites: List[str]) -> bool:
+        cfg = load_config()
+        if not isinstance(favorites, list):
+            favorites = []
+        cfg["commentary_favorites"] = favorites[:3]
+        save_config(cfg)
+        self.config = cfg
+        return True
+
     def fetch_gemini_models(self, api_key: Optional[Any] = None) -> Dict[str, Any]:
         """Interroge l'API Google Gemini pour obtenir la liste en temps réel des modèles supportant generateContent."""
         key = ""

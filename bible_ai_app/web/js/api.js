@@ -280,6 +280,14 @@ const API = {
     return await this.call('detect_language', text, metaLang);
   },
 
+  async getCommentaryFavorites() {
+    return await this.call('get_commentary_favorites');
+  },
+
+  async saveCommentaryFavorites(favorites) {
+    return await this.call('save_commentary_favorites', favorites);
+  },
+
   async getTheologyBooks() {
     return await this.call('get_theology_books');
   },

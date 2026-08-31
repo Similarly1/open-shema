@@ -111,6 +111,22 @@ const CommentariesView = {
       this.favorites = [];
     }
 
+    // Synchronisation robuste avec le backend Python (config.json)
+    if (typeof API !== 'undefined' && API.onReady) {
+      API.onReady(() => {
+        API.call('get_commentary_favorites').then(favs => {
+          if (Array.isArray(favs) && favs.length > 0) {
+            this.favorites = favs.slice(0, 3);
+            this.saveFavorites(false);
+            this.renderQuickFavorites();
+            this.renderPickerList();
+          } else if (this.favorites.length > 0) {
+            API.call('save_commentary_favorites', this.favorites).catch(() => {});
+          }
+        }).catch(err => console.warn('Erreur chargement favoris config:', err));
+      });
+    }
+
     // Restaurer les préférences d'affichage
     try {
       const savedZoom = localStorage.getItem('comm_view_zoom') || localStorage.getItem('bible_reader_zoom');
@@ -199,8 +215,15 @@ const CommentariesView = {
 
     this.btnPrev?.addEventListener('click', () => this.navigateVerse(-1));
     this.btnNext?.addEventListener('click', () => this.navigateVerse(1));
-    document.getElementById('btn-comm-view-intro')?.addEventListener('click', () => {
-      this.loadPassage(this.currentBook, 0, 0, this.preferredAuthor);
+
+    // Commutateur de mode Verset / Intro du livre (Option 1)
+    document.getElementById('btn-comm-view-mode-verse')?.addEventListener('click', () => {
+      if (this.currentChapter === 0) {
+        this.loadPassage(this.currentBook || 'Gen', 1, 1, this.preferredAuthor);
+      }
+    });
+    document.getElementById('btn-comm-view-mode-intro')?.addEventListener('click', () => {
+      this.loadPassage(this.currentBook || 'Gen', 0, 0, this.preferredAuthor);
     });
 
     // 2. Bouton retour au lecteur biblique
@@ -497,11 +520,24 @@ const CommentariesView = {
     }
   },
 
-  saveFavorites() {
+  saveFavorites(syncBackend = true) {
     try {
       localStorage.setItem('open_shema_commentary_favorites', JSON.stringify(this.favorites));
       localStorage.setItem('bible_comm_favorites', JSON.stringify(this.favorites));
     } catch (err) {}
+    if (syncBackend && typeof API !== 'undefined' && API.call) {
+      API.call('save_commentary_favorites', this.favorites).catch(() => {});
+    }
+  },
+
+  updateModeSwitchUI() {
+    const isIntro = this.currentChapter === 0;
+    const btnV = document.getElementById('btn-comm-view-mode-verse');
+    const btnI = document.getElementById('btn-comm-view-mode-intro');
+    if (btnV && btnI) {
+      btnV.classList.toggle('active', !isIntro);
+      btnI.classList.toggle('active', isIntro);
+    }
   },
 
   async handleSearch() {
@@ -629,6 +665,7 @@ const CommentariesView = {
     if (this.verseBannerRef) {
       this.verseBannerRef.textContent = refString;
     }
+    this.updateModeSwitchUI();
 
     // Afficher l'état de chargement
     if (this.articleContent) {
@@ -1498,8 +1535,16 @@ const CommentariesView = {
 
   openInBibleReader() {
     App.switchView('bible');
+    const isIntro = this.currentChapter === 0;
+    const bk = this.currentBook || 'Gen';
+    const ch = Math.max(1, parseInt(this.currentChapter, 10) || 1);
+    const v = Math.max(1, parseInt(this.currentVerse, 10) || 1);
+
     if (typeof BibleReader !== 'undefined') {
-      BibleReader.navigateTo(this.currentBook, this.currentChapter, this.currentVerse);
+      BibleReader.navigateTo(bk, ch, v);
+    }
+    if (isIntro && typeof CommentaryViewer !== 'undefined') {
+      CommentaryViewer.loadIntroduction(bk);
     }
   },
 
