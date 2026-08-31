@@ -2097,7 +2097,45 @@ class BibleAppApi:
             detected_mode = mode_names.get(mode, "Synthèse d'étude")
             active_mode_key = mode
 
-        # 1. Résolution et extraction du texte biblique (si un passage est explicitement spécifié)
+        # Détection automatique de passage biblique dans le texte de la question si aucun passage n'est sélectionné
+        extracted_ref_str = ""
+        if not passage_ref or not passage_ref.strip():
+            # 1. Tester avec chiffre préfixé : '1 Co 13:13', '2 Tim 2:2'
+            pattern_num = r'\b([1-4]\s*[a-zA-ZÀ-ÿ]+)\s*(\d+)(?:[\s.:,](\d+)(?:\s*[-–—]\s*(\d+))?)?\b'
+            for match in re.finditer(pattern_num, question):
+                raw_book = match.group(1).strip()
+                book_key = strip_accents(re.sub(r'\s+', ' ', raw_book)).lower()
+                b_code = BOOK_MAPPING.get(book_key)
+                if not b_code:
+                    m_num = re.match(r'^([1-4])\s*([a-z]+)$', book_key)
+                    if m_num:
+                        b_code = BOOK_MAPPING.get(f"{m_num.group(1)} {m_num.group(2)}")
+                if b_code:
+                    ch = int(match.group(2))
+                    v_start = int(match.group(3)) if match.group(3) else None
+                    v_end = int(match.group(4)) if match.group(4) else None
+                    fr = get_french_book_name(b_code)
+                    passage_ref = f"{fr} {ch}" + (f":{v_start}-{v_end}" if (v_start and v_end) else (f":{v_start}" if v_start else ""))
+                    extracted_ref_str = match.group(0)
+                    break
+
+            if not passage_ref:
+                # 2. Tester sans chiffre préfixé : 'rm 5.1-4', 'Jean 3:16', 'Romains 5:1-4'
+                pattern_simple = r'\b([a-zA-ZÀ-ÿ]{2,})\s*(\d+)(?:[\s.:,](\d+)(?:\s*[-–—]\s*(\d+))?)?\b'
+                for match in re.finditer(pattern_simple, question):
+                    raw_book = match.group(1).strip()
+                    book_key = strip_accents(re.sub(r'\s+', ' ', raw_book)).lower()
+                    b_code = BOOK_MAPPING.get(book_key)
+                    if b_code:
+                        ch = int(match.group(2))
+                        v_start = int(match.group(3)) if match.group(3) else None
+                        v_end = int(match.group(4)) if match.group(4) else None
+                        fr = get_french_book_name(b_code)
+                        passage_ref = f"{fr} {ch}" + (f":{v_start}-{v_end}" if (v_start and v_end) else (f":{v_start}" if v_start else ""))
+                        extracted_ref_str = match.group(0)
+                        break
+
+        # 1. Résolution et extraction du texte biblique (si un passage est spécifié ou détecté)
         if sources_cfg.get("bibles", True) and passage_ref and passage_ref.strip():
             try:
                 parsed = self.parse_reference(passage_ref)
@@ -2115,7 +2153,7 @@ class BibleAppApi:
                                 verses_subset = ch_data["verses"][:5]
                         
                         v_lines = []
-                        for v in verses_subset[:12]:
+                        for v in verses_subset[:16]:
                             v_lines.append(f"v.{v['verse']} : {v.get('text', '')}")
                         
                         bible_text = "\n".join(v_lines)
@@ -2127,19 +2165,26 @@ class BibleAppApi:
                         sources_used.append(f"Bibles ({ch_data.get('book_french', b_code)} {ch_num})")
             except Exception as e:
                 logger.error(f"[ask_study_ai] Erreur extraction biblique : {e}")
-        # 2. Extraction des commentaires bibliques et théologie
-        # Extraction intelligente des entités et termes clés de la question
+
+        # 2. Extraction des mots-clés de la question (en ignorant la référence biblique et les stop words)
+        clean_question = question
+        if extracted_ref_str:
+            clean_question = clean_question.replace(extracted_ref_str, ' ')
+
         stop_words_fr = {
             "quel", "quelle", "quels", "quelles", "etait", "étaient", "était", "etaient", "etre", "être",
             "dans", "avec", "pour", "selon", "entre", "cette", "cet", "ces", "leurs", "leur", "notre", "nos",
             "votre", "vos", "mon", "ton", "son", "sa", "ses", "comme", "tout", "tous", "toute", "toutes",
             "comment", "pourquoi", "vision", "texte", "temps", "epoque", "époque", "cadre", "plus", "aussi",
-            "faire", "avoir", "sujet", "point", "points", "dessus", "dessous", "alors", "ainsi", "sans",
-            "salut", "bonjour", "bonsoir", "coucou", "hello", "merci", "bienvenue", "hey", "dis", "penses", "pense"
+            "faire", "fais", "fait", "avoir", "sujet", "point", "points", "dessus", "dessous", "alors", "ainsi", "sans",
+            "salut", "bonjour", "bonsoir", "coucou", "hello", "merci", "bienvenue", "hey", "dis", "penses", "pense",
+            "prédic", "prédication", "predic", "predication", "sermon", "etude", "étude", "bible", "verset", "versets",
+            "chapitre", "chapitres", "livre", "livres", "sur", "sous", "par", "une", "des", "les", "aux", "est", "sont",
+            "aide", "peux", "veut", "veux", "donne", "fais-moi", "parle", "explique"
         }
 
-        # 1. Termes entre parenthèses et guillemets en priorité haute
-        parentheses_matches = re.findall(r'\((.*?)\)', question) + re.findall(r'«(.*?)»', question) + re.findall(r'"(.*?)"', question)
+        # Termes entre parenthèses et guillemets en priorité haute
+        parentheses_matches = re.findall(r'\((.*?)\)', clean_question) + re.findall(r'«(.*?)»', clean_question) + re.findall(r'"(.*?)"', clean_question)
         priority_terms = []
         for pm in parentheses_matches:
             for sub in re.split(r'[,;/\s]+', pm):
@@ -2147,52 +2192,21 @@ class BibleAppApi:
                 if len(sub_clean) > 2 and sub_clean.lower() not in stop_words_fr:
                     priority_terms.append(sub_clean)
 
-        # 2. Mots principaux (> 3 lettres)
-        general_words = [w for w in re.findall(r'[a-zA-ZÀ-ÿ]{3,}', question) if w.lower() not in stop_words_fr]
+        # Mots principaux (> 3 lettres)
+        general_words = [w for w in re.findall(r'[a-zA-ZÀ-ÿ]{3,}', clean_question) if w.lower() not in stop_words_fr]
         all_extracted_keywords = list(dict.fromkeys(priority_terms + general_words))
 
         # En mode Discussion Libre sans passage spécifique et pour les salutations/phrases courtes : bypass RAG lourd
         is_light_free_chat = (active_mode_key == "free_chat" and not passage_ref and len(all_extracted_keywords) <= 1)
 
-        # 1. Extraction du texte biblique (si un passage est spécifié)
-        if sources_cfg.get("bibles", True) and passage_ref and passage_ref.strip():
-            try:
-                parsed = self.parse_reference(passage_ref)
-                if parsed and parsed.get("book"):
-                    b_code = parsed["book"]
-                    ch_num = parsed.get("chapter") or 1
-                    ch_data = self.get_chapter_data("LSG", b_code, ch_num)
-                    if ch_data and ch_data.get("verses"):
-                        v_target = parsed.get("verse")
-                        v_end = parsed.get("verse_end") or v_target
-                        verses_subset = ch_data["verses"]
-                        if v_target:
-                            verses_subset = [v for v in ch_data["verses"] if v["verse"] >= v_target and (not v_end or v["verse"] <= v_end)]
-                            if not verses_subset:
-                                verses_subset = ch_data["verses"][:5]
-                        
-                        v_lines = []
-                        for v in verses_subset[:12]:
-                            v_lines.append(f"v.{v['verse']} : {v.get('text', '')}")
-                        
-                        bible_text = "\n".join(v_lines)
-                        context_chunks.append({
-                            "id": f"bible_{passage_ref}",
-                            "text": f"### Texte Biblique ({ch_data.get('book_french', b_code)} {ch_num}) :\n{bible_text}",
-                            "metadata": {"type": "Bible", "name": f"Bibles (LSG — {ch_data.get('book_french', b_code)} {ch_num})", "ref": passage_ref}
-                        })
-            except Exception as e:
-                logger.error(f"[ask_study_ai] Erreur extraction biblique : {e}")
-        # 2. Extraction des Dictionnaires Bibliques & Lexique Strong (Multi-termes complet)
-        if sources_cfg.get("dictionaries", True) and not is_light_free_chat:
+        # 3. Extraction des Dictionnaires Bibliques & Lexique Strong
+        if sources_cfg.get("dictionaries", True) and not is_light_free_chat and all_extracted_keywords:
             try:
                 from core.dictionary_manager import DictionaryManager
                 
                 dict_seen = set()
                 for term in all_extracted_keywords[:8]:
-                    # Recherche directe
                     res = DictionaryManager.lookup(term)
-                    # Recherche alternative au singulier si pluriel
                     if (not res or not res.get("matches")) and term.endswith("s") and len(term) > 4:
                         res = DictionaryManager.lookup(term[:-1])
                     
@@ -2211,7 +2225,8 @@ class BibleAppApi:
                                 })
             except Exception as e:
                 logger.error(f"[ask_study_ai] Erreur extraction dictionnaires : {e}")
-        # 3. Extraction des Commentaires Bibliques & Ouvrages de Théologie
+
+        # 4. Extraction des Commentaires Bibliques & Ouvrages de Théologie
         if sources_cfg.get("commentaries", True) and not is_light_free_chat:
             try:
                 if passage_ref and passage_ref.strip():
@@ -2220,15 +2235,33 @@ class BibleAppApi:
                         b_code = parsed["book"]
                         ch_num = parsed.get("chapter") or 1
                         v_num = parsed.get("verse") or 1
-                        comms = self.get_commentaries(b_code, ch_num, v_num)
-                        if comms:
-                            for c in comms[:4]:
-                                author = c.get("author") or c.get("source") or "Commentaire"
+                        v_end = parsed.get("verse_end") or v_num
+                        
+                        from core.commentary_loader import CommentaryLoader
+                        comm_res = CommentaryLoader.get_all_comments_for_verse_range(b_code, ch_num, v_num, v_end)
+                        docs = comm_res.get("documents", [])
+                        metas = comm_res.get("metadatas", [])
+                        
+                        if docs:
+                            for i, doc in enumerate(docs[:6]):
+                                meta = metas[i] if i < len(metas) else {}
+                                author = meta.get("name") or meta.get("author") or "Commentaire"
+                                ref_lbl = meta.get("reference", passage_ref)
                                 context_chunks.append({
-                                    "id": f"comm_{author}",
-                                    "text": f"### Commentaire [{author}] sur {passage_ref} :\n{c.get('text', '')[:1000]}",
+                                    "id": f"comm_{author}_{i}",
+                                    "text": f"### Extrait de [{author}] ({ref_lbl}) :\n{doc[:1000]}",
                                     "metadata": {"type": "Commentaire", "name": author}
                                 })
+                        else:
+                            comms = self.get_commentaries(b_code, ch_num, v_num)
+                            if comms:
+                                for c in comms[:4]:
+                                    author = c.get("author") or c.get("source") or "Commentaire"
+                                    context_chunks.append({
+                                        "id": f"comm_{author}",
+                                        "text": f"### Commentaire [{author}] sur {passage_ref} :\n{c.get('text', '')[:1000]}",
+                                        "metadata": {"type": "Commentaire", "name": author}
+                                    })
                 else:
                     # Recherche thématique dans les ouvrages de théologie
                     from core.theology_reader_manager import TheologyReaderManager
@@ -2446,10 +2479,10 @@ class BibleAppApi:
             )
         else:
             drafting_rules = (
-                "CONSIGNES IMPÉRATIVES DE RÉDACTION ET D'ACCOMPAGNEMENT PÉDAGOGIQUE :\n"
-                "1. RÈGLE D'OR DE NON-DÉLÉGATION : Tu es une aide à la recherche et un sparring-partner d'étude. Ne rédige JAMAIS d'étude biblique complète ou de sermon clé-en-main prêt à être lu. Ton but est de fournir la matière première (données textuelles, historiques, divergences d'auteurs), de dégager les enjeux et de stimuler la réflexion personnelle de l'utilisateur.\n"
-                "2. ANCRAGE DOCUMENTAIRE : Fonde TOUTE ta réponse STRICTEMENT sur les éléments, données historiques et définitions du CORPUS DOCUMENTAIRE fourni ci-dessus.\n"
-                "3. CITATIONS PAR PARAGRAPHE : À la fin de CHAQUE paragraphe ou sous-partie, indique OBLIGATOIREMENT entre crochets la source biblique ou documentaire précise dont provient l'information.\n"
+                "CONSIGNES DE DIALOGUE & ANCRAGE BIBLIQUE ET DOCUMENTAIRE :\n"
+                "1. POSTURE & MISSION : Réponds directement, intelligemment et chaleureusement à la demande de l'utilisateur. Agis en tuteur et sparring-partner d'étude en fournissant la matière première (dynamiques du texte, structure, pistes d'application, questions herméneutiques) sans rédiger de sermon ou d'étude finie à sa place.\n"
+                "2. ANCRAGE DOCUMENTAIRE : Mobilise les éléments du texte biblique et du CORPUS DOCUMENTAIRE fourni ci-dessus, complétés par ta vaste connaissance du texte biblique.\n"
+                "3. CITATIONS DES SOURCES : Lorsque tu cites un dictionnaire, un commentaire ou un auteur du corpus, indique son nom entre crochets (ex: [Frédéric Godet], [Dictionnaire Biblique], [Jean Calvin]). Ne mets JAMAIS de crochets autour de tes propres réflexions, salutations ou titres de consignes !\n"
                 "4. SOIN DU FORMAT : Utilise des titres de section Markdown hiérarchiques et soigne la langue française."
             )
 

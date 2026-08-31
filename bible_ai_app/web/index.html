@@ -6133,7 +6133,7 @@
             <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
             </svg>
-            <span>Assistant IA</span>
+            <span>IA</span>
           </button>
           <button class="drawer-tab" data-drawer-tab="lexicon" title="Lexique & Dictionnaires">
             <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -6226,51 +6226,38 @@
             <!-- Rangée Unifiée : Passage, Mode, Synthèse IA & Outils -->
             <div class="comm-header-unified-row">
               <div class="comm-nav-passage-group">
-                <button class="comm-nav-arrow-btn" id="btn-comm-prev-verse" title="Verset précédent (ou Introduction)">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                <button class="comm-nav-arrow-btn" id="btn-comm-prev-verse" title="Verset précédent">
+                  <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
                 </button>
                 
                 <span class="selected-verse-badge comm-clickable-ref" id="comm-selected-verse" title="Cliquer pour choisir manuellement un passage (Ex: Jean 3:16)">
-                  <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.8"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/></svg>
                   <span id="comm-selected-verse-text">Genèse 1:1</span>
                 </span>
 
                 <button class="comm-nav-arrow-btn" id="btn-comm-next-verse" title="Verset suivant">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                  <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                 </button>
 
-                <!-- Commutateur de mode Verset / Intro du livre -->
-                <div class="comm-mode-switch-group" id="comm-mode-switch-group">
-                  <button type="button" class="comm-mode-pill active" id="btn-comm-mode-verse" title="Afficher l'analyse du verset sélectionné">
-                    <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                    <span>Verset</span>
-                  </button>
-                  <button type="button" class="comm-mode-pill" id="btn-comm-mode-intro" title="Afficher l'Introduction générale au livre (But, Verset clé, Plan)">
-                    <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
-                    <span>Intro</span>
-                  </button>
-                </div>
+                <!-- Bouton contextuel unique Verset / Intro -->
+                <button type="button" class="comm-context-mode-btn" id="btn-comm-toggle-mode" title="Consulter l'Introduction générale du livre">
+                  <svg class="mode-icon" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+                  <span id="lbl-comm-mode-action">Intro</span>
+                </button>
               </div>
               
               <div class="comm-header-actions-right">
-                <button class="comm-translate-btn hidden" id="btn-translate-comm" title="Traduire fidèlement cet article en français par IA">
-                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                  <span>Traduire</span>
-                </button>
-
                 <button class="comm-ai-synth-btn" id="btn-open-comm-synth" title="Générer une synthèse exégétique comparative par IA de tous les commentaires">
-                  <svg class="synth-sparkle-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <svg class="synth-sparkle-icon" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1-1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
                   </svg>
-                  <span>Synthèse IA</span>
+                  <span class="comm-btn-lbl">Synthèse</span>
                 </button>
 
-                <button class="comm-sync-btn active" id="btn-toggle-comm-sync" title="Synchronisation active : le commentaire suit le texte biblique (Cliquer pour délier)">
+                <button class="comm-sync-btn icon-only active" id="btn-toggle-comm-sync" title="Synchronisation active : le commentaire suit le texte biblique (Cliquer pour délier)">
                   <svg class="sync-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                   </svg>
-                  <span id="comm-sync-label">Lié</span>
                 </button>
 
                 <div class="comm-font-size-ctrl" title="Ajuster la taille de lecture du commentaire">
@@ -6279,7 +6266,7 @@
                 </div>
 
                 <button class="comm-expand-btn icon-only" id="btn-expand-comm-to-view" title="Ouvrir la page dédiée aux commentaires (Plein écran)">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
                 </button>
               </div>
             </div>

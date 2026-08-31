@@ -790,11 +790,12 @@ const CommentaryViewer = {
       this.adjustFontSize(1);
     });
 
-    // 0d. Commutateur de mode Verset / Intro du livre (Option 1)
-    document.getElementById('btn-comm-mode-verse')?.addEventListener('click', (e) => {
+    // 0d. Bouton contextuel unique Verset / Intro
+    document.getElementById('btn-comm-toggle-mode')?.addEventListener('click', (e) => {
       e.stopPropagation();
       if (this.currentChapter === 0) {
-        const curBk = this.currentBook || BibleReader?.currentBook || 'Gen';
+        // Retour au commentaire du verset
+        const curBk = this.currentBook || (typeof BibleReader !== 'undefined' ? BibleReader.currentBook : 'Gen');
         const v = (typeof BibleReader !== 'undefined' && BibleReader.selectedVerse) ? BibleReader.selectedVerse : 1;
         const ch = (typeof BibleReader !== 'undefined' && BibleReader.currentChapter && BibleReader.currentChapter > 0) ? BibleReader.currentChapter : 1;
         if (this.isSynchronized && typeof BibleReader !== 'undefined') {
@@ -810,12 +811,10 @@ const CommentaryViewer = {
             this.setComments(comms, refStr, curBk, ch, v);
           }).catch(err => console.error(err));
         }
+      } else {
+        // Consulter l'introduction au livre
+        this.loadIntroduction();
       }
-    });
-
-    document.getElementById('btn-comm-mode-intro')?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.loadIntroduction();
     });
 
     // 1. Bouton de traduction d'article individuel
@@ -965,11 +964,27 @@ const CommentaryViewer = {
 
   updateModeSwitchUI() {
     const isIntro = this.currentChapter === 0;
-    const btnV = document.getElementById('btn-comm-mode-verse');
-    const btnI = document.getElementById('btn-comm-mode-intro');
-    if (btnV && btnI) {
-      btnV.classList.toggle('active', !isIntro);
-      btnI.classList.toggle('active', isIntro);
+    const btn = document.getElementById('btn-comm-toggle-mode');
+    if (!btn) return;
+
+    if (isIntro) {
+      btn.className = 'comm-context-mode-btn mode-intro active';
+      btn.title = 'Revenir au commentaire du verset';
+      btn.innerHTML = `
+        <svg class="mode-icon" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        <span>Verset</span>
+      `;
+    } else {
+      btn.className = 'comm-context-mode-btn mode-verse';
+      btn.title = 'Consulter l\'Introduction générale du livre';
+      btn.innerHTML = `
+        <svg class="mode-icon" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/>
+        </svg>
+        <span>Intro</span>
+      `;
     }
   },
 
@@ -1115,25 +1130,23 @@ const CommentaryViewer = {
     if (!btn) return;
 
     if (this.isSynchronized) {
-      btn.className = 'comm-sync-btn active';
-      btn.title = 'Synchronisation active : le commentaire suit le texte biblique en direct (Cliquer pour délier)';
+      btn.className = 'comm-sync-btn icon-only active';
+      btn.title = 'Synchronisé avec le texte biblique (Cliquer pour délier)';
       btn.innerHTML = `
-        <svg class="sync-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="sync-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
           <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
         </svg>
-        <span id="comm-sync-label">Lié</span>
       `;
     } else {
-      btn.className = 'comm-sync-btn unlinked';
-      btn.title = 'Commentaire indépendant (Cliquer pour lier au texte biblique)';
+      btn.className = 'comm-sync-btn icon-only unlinked';
+      btn.title = 'Commentaire indépendant / délié (Cliquer pour synchroniser)';
       btn.innerHTML = `
-        <svg class="sync-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="sync-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="m18.84 12.25 1.72-1.71a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
           <path d="m5.16 11.75-1.72 1.71a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
           <line x1="2" y1="2" x2="22" y2="22"></line>
         </svg>
-        <span id="comm-sync-label">Délié</span>
       `;
     }
   },
@@ -1511,21 +1524,21 @@ const CommentaryViewer = {
             <div class="comm-title-text-group">
               <div class="comm-single-author-name">
                 <span class="comm-name-text">${sourceMeta.title || authorName}</span>
-                <span class="comm-title-chevron">▾</span>
-                <span class="comm-title-count-badge">${totalCount}</span>
+                <span class="comm-title-meta-badge">
+                  <span class="comm-title-chevron">▾</span>
+                  <span class="comm-title-count-badge">${totalCount}</span>
+                </span>
               </div>
               <div class="comm-single-author-period">${sourceMeta.period || 'Ouvrage d\'exégèse'} • ${sourceMeta.author || authorName}</div>
             </div>
           </div>
 
           <div class="comm-single-top-actions">
-            <button class="comm-single-action-pill" id="btn-comm-single-copy" title="Copier ce commentaire">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-              <span>Copier</span>
+            <button class="comm-single-action-pill icon-only" id="btn-comm-single-copy" title="Copier ce commentaire">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
             </button>
-            <button class="comm-single-action-pill" id="btn-comm-single-note" title="Enregistrer dans les notes d'étude">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
-              <span>Vers note</span>
+            <button class="comm-single-action-pill icon-only" id="btn-comm-single-note" title="Enregistrer dans les notes d'étude">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
             </button>
           </div>
         </div>
