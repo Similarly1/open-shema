@@ -5059,9 +5059,9 @@
           <div class="view-actions" style="display: flex; align-items: center; gap: 8px;">
             <!-- Sélecteur de fond de carte -->
             <div class="map-layers-segmented">
-              <button type="button" class="map-layer-btn active" data-layer="voyager" title="Fond épuré & harmonieux">Voyager</button>
-              <button type="button" class="map-layer-btn" data-layer="topo" title="Reliefs & Topographie">Relief</button>
-              <button type="button" class="map-layer-btn" data-layer="dark" title="Mode Sombre Profond">Nuit</button>
+              <button type="button" class="map-layer-btn active" data-layer="topo" title="Reliefs & Topographie">Relief</button>
+              <button type="button" class="map-layer-btn" data-layer="satellite" title="Vue Satellite Haute Résolution">Satellite</button>
+              <button type="button" class="map-layer-btn" data-layer="dark" title="Mode Sombre">Nuit</button>
               <button type="button" class="map-layer-btn" data-layer="osm" title="OpenStreetMap standard">Standard</button>
             </div>
             
@@ -6223,8 +6223,8 @@
         <!-- Onglet 1: Commentaires Exégétiques (Un seul commentaire affiché avec sélecteur discret) -->
         <div class="drawer-content" id="drawer-tab-commentaries">
           <div class="comm-panel-header">
-            <!-- Rangée 1 : Navigation Passage & Actions Générales -->
-            <div class="comm-header-top-row">
+            <!-- Rangée Unifiée : Passage, Mode, Synthèse IA & Outils -->
+            <div class="comm-header-unified-row">
               <div class="comm-nav-passage-group">
                 <button class="comm-nav-arrow-btn" id="btn-comm-prev-verse" title="Verset précédent (ou Introduction)">
                   <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
@@ -6239,7 +6239,7 @@
                   <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                 </button>
 
-                <!-- Commutateur de mode Verset / Intro du livre (Option 1) -->
+                <!-- Commutateur de mode Verset / Intro du livre -->
                 <div class="comm-mode-switch-group" id="comm-mode-switch-group">
                   <button type="button" class="comm-mode-pill active" id="btn-comm-mode-verse" title="Afficher l'analyse du verset sélectionné">
                     <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
@@ -6250,65 +6250,49 @@
                     <span>Intro</span>
                   </button>
                 </div>
+              </div>
+              
+              <div class="comm-header-actions-right">
+                <button class="comm-translate-btn hidden" id="btn-translate-comm" title="Traduire fidèlement cet article en français par IA">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                  <span>Traduire</span>
+                </button>
+
+                <button class="comm-ai-synth-btn" id="btn-open-comm-synth" title="Générer une synthèse exégétique comparative par IA de tous les commentaires">
+                  <svg class="synth-sparkle-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1-1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
+                  </svg>
+                  <span>Synthèse IA</span>
+                </button>
 
                 <button class="comm-sync-btn active" id="btn-toggle-comm-sync" title="Synchronisation active : le commentaire suit le texte biblique (Cliquer pour délier)">
-                  <svg class="sync-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <svg class="sync-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                   </svg>
                   <span id="comm-sync-label">Lié</span>
                 </button>
-              </div>
-              
-              <div class="comm-header-actions-right">
+
                 <div class="comm-font-size-ctrl" title="Ajuster la taille de lecture du commentaire">
                   <button class="comm-font-btn" id="btn-comm-font-dec" title="Diminuer la police">A-</button>
                   <button class="comm-font-btn" id="btn-comm-font-inc" title="Agrandir la police">A+</button>
                 </div>
 
-                <button class="comm-expand-btn" id="btn-expand-comm-to-view" title="Ouvrir la page dédiée aux commentaires (Plein écran)">
+                <button class="comm-expand-btn icon-only" id="btn-expand-comm-to-view" title="Ouvrir la page dédiée aux commentaires (Plein écran)">
                   <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-                  <span>Plein écran</span>
                 </button>
               </div>
             </div>
 
-            <!-- Rangée 2 : Sélecteur d'ouvrage & Synthèse IA -->
-            <div class="comm-header-bottom-row">
-              <div class="comm-source-selector-box">
-                <button class="comm-source-btn" id="btn-select-comm-source" title="Changer d'ouvrage de commentaire">
-                  <span class="comm-source-btn-icon">
-                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-                  </span>
-                  <span class="comm-source-btn-label" id="lbl-active-comm-source">Sélectionner un commentaire</span>
-                  <span class="comm-source-count-badge" id="lbl-comm-source-count">0</span>
-                  <span class="comm-source-arrow">▾</span>
-                </button>
-
-                <div class="comm-sources-popover hidden" id="comm-sources-popover">
-                  <div class="comm-popover-header">
-                    <span class="comm-popover-title">Commentaires pour ce verset (<span id="comm-popover-count">0</span>)</span>
-                  </div>
-                  <div class="comm-popover-search-wrap">
-                    <input type="text" id="comm-sources-filter-input" placeholder="Filtrer un auteur ou commentaire..." class="comm-sources-filter-input">
-                  </div>
-                  <div class="comm-sources-list" id="comm-sources-list"></div>
-                </div>
+            <!-- Popover de sélection de commentaire (flottant) -->
+            <div class="comm-sources-popover hidden" id="comm-sources-popover">
+              <div class="comm-popover-header">
+                <span class="comm-popover-title">Commentaires disponibles pour ce passage (<span id="comm-popover-count">0</span>)</span>
               </div>
-
-              <div class="comm-ai-actions-group">
-                <button class="comm-translate-btn hidden" id="btn-translate-comm" title="Traduire fidèlement cet article en français par IA">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                  <span>Traduire</span>
-                </button>
-
-                <button class="comm-ai-synth-btn" id="btn-open-comm-synth" title="Générer une synthèse exégétique comparative par IA de tous les commentaires">
-                  <svg class="synth-sparkle-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1-1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
-                  </svg>
-                  <span>Synthèse IA</span>
-                </button>
+              <div class="comm-popover-search-wrap">
+                <input type="text" id="comm-sources-filter-input" placeholder="Filtrer un auteur ou commentaire..." class="comm-sources-filter-input">
               </div>
+              <div class="comm-sources-list" id="comm-sources-list"></div>
             </div>
           </div>
 

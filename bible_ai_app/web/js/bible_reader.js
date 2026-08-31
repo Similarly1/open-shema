@@ -872,7 +872,8 @@ const CommentaryViewer = {
     });
 
     document.addEventListener('click', (e) => {
-      if (popoverSource && !popoverSource.contains(e.target) && e.target !== btnSource) {
+      const titleTrigger = document.getElementById('btn-comm-title-trigger');
+      if (popoverSource && !popoverSource.contains(e.target) && e.target !== btnSource && !titleTrigger?.contains(e.target)) {
         popoverSource.classList.add('hidden');
       }
     });
@@ -1498,16 +1499,21 @@ const CommentaryViewer = {
       `;
     }
 
+    const totalCount = (this.currentComments && this.currentComments.length > 0) ? this.currentComments.length : 1;
+
     container.innerHTML = `
       <div class="comm-single-card">
-        ${introContextBannerHtml}
         <div class="comm-single-author-header">
-          <div class="comm-single-author-info">
+          <div class="comm-single-author-info comm-title-dropdown-trigger" id="btn-comm-title-trigger" title="Cliquer pour choisir un autre commentaire (${totalCount} disponible${totalCount > 1 ? 's' : ''})">
             <div class="comm-single-author-avatar" style="background-color: ${sourceMeta.color || '#1E3A8A'};">
               ${sourceMeta.initials || 'C'}
             </div>
-            <div>
-              <div class="comm-single-author-name">${sourceMeta.title || authorName}</div>
+            <div class="comm-title-text-group">
+              <div class="comm-single-author-name">
+                <span class="comm-name-text">${sourceMeta.title || authorName}</span>
+                <span class="comm-title-chevron">▾</span>
+                <span class="comm-title-count-badge">${totalCount}</span>
+              </div>
               <div class="comm-single-author-period">${sourceMeta.period || 'Ouvrage d\'exégèse'} • ${sourceMeta.author || authorName}</div>
             </div>
           </div>
@@ -1533,27 +1539,20 @@ const CommentaryViewer = {
       </div>
     `;
 
-    // Écouteurs pour le bandeau d'introduction contextuel (Option 4)
-    container.querySelector('#btn-comm-card-open-intro')?.addEventListener('click', (e) => {
+    // Écouteur pour ouvrir le popover de sélection au clic sur le titre de l'ouvrage
+    container.querySelector('#btn-comm-title-trigger')?.addEventListener('click', (e) => {
       e.stopPropagation();
-      this.loadIntroduction();
-    });
-    container.querySelector('#btn-comm-card-back-verse')?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const curBk = this.currentBook || BibleReader?.currentBook || 'Gen';
-      const v = (typeof BibleReader !== 'undefined' && BibleReader.selectedVerse) ? BibleReader.selectedVerse : 1;
-      if (this.isSynchronized && typeof BibleReader !== 'undefined') {
-        BibleReader.selectVerse(curBk, 1, v, { scroll: true, behavior: 'smooth', block: 'center' });
-      } else {
-        this.currentBook = curBk;
-        this.currentChapter = 1;
-        this.currentVerse = v;
-        const bookInfo = typeof getBookInfo === 'function' ? getBookInfo(curBk) : { name: curBk };
-        const refStr = `${bookInfo.name || curBk} 1:${v}`;
-        this.updateLiveBadge(refStr);
-        API.getCommentaries(curBk, 1, v).then(comms => {
-          this.setComments(comms, refStr, curBk, 1, v);
-        }).catch(err => console.error(err));
+      const popoverSource = document.getElementById('comm-sources-popover');
+      const filterInput = document.getElementById('comm-sources-filter-input');
+      if (popoverSource) {
+        popoverSource.classList.toggle('hidden');
+        if (!popoverSource.classList.contains('hidden')) {
+          if (filterInput) {
+            filterInput.value = '';
+            this.filterSourcesList('');
+            setTimeout(() => filterInput.focus(), 50);
+          }
+        }
       }
     });
 

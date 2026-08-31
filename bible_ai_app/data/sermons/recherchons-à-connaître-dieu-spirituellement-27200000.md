@@ -35,31 +35,31 @@ delivery_history:
   location: AMD
   notes: Prêché au culte dominical
 created_at: '2026-08-28T20:57:29.547755'
-updated_at: '2026-08-31T14:15:43.728799'
+updated_at: '2026-08-31T15:20:49.935457'
 ---
 
-## Introduction : La logique de la grâce (2 Corinthiens 8.1-9)
+## Introduction : La série sur la reconnaissance et la générosité (2 Corinthiens 8.1-9)
 
 Adam Deering, jeune anglais de 18 ans des alentours de Manchester, quitte son emploi pour créer sa propre entreprise. Il se prépare avec un business plan soigné et prend rendez-vous avec la directrice de la banque pour demander un prêt. Seulement, le prêt est refusé... Les raisons données : trop jeune et pas assez d'expérience dans les affaires. Il passe alors quatre mois dans un immeuble délabré pour survivre sans travail. 20 ans plus tard, il s'est passé beaucoup de choses que vous découvrirez en conclusion...
 
 Nous avons vu ensemble dimanche dernier que l'amour du Père va jusqu'à accepter de nous embrasser même si nous sommes sales. En cela, on ne suit pas Jésus pour acheter la paix, mais parce qu'il nous a pardonné et qu'il a accepté de se salir à notre place. Nous sommes appelés à nous tourner vers Dieu ensemble, comme nous le faisons ce matin, car l'Église est d'abord l'œuvre de Celui qui l'a établie.
 
-Nous allons maintenant nous pencher sur **2 Corinthiens 5.16** (un seul verset !) qui nous adresse un appel vibrant : **Recherchons à connaître Dieu spirituellement plus qu'intellectuellement.**
+Aujourd'hui, dans la continuité de notre série sur la logique de la grâce et la générosité de l'Évangile, nous allons nous pencher sur **2 Corinthiens 5.16** (un seul verset !) qui nous adresse un appel vibrant : **Recherchons à connaître Dieu spirituellement plus qu'intellectuellement.**
 
-Cette démarche intérieure passe par trois regards successifs :
+Cette démarche intérieure, qui nous transforme et nous pousse à la générosité, passe par trois regards successifs :
 
 1. Voir le visible et juger 
 2. Voir le visible et ne pas y croire
 3. Voir l'invisible et y croire
 
-## La grâce de Dieu transforme les croyants de l'intérieur (2 Corinthiens 8.1, Éphésiens 2.8, Romains 3.24)
+## 1. La grâce de Dieu transforme les croyants de l'intérieur (2 Corinthiens 8.1)
 
 > [!exegesis|key=Connaître selon la chair]
 > Le premier verbe *connaître* du verset (*ginōskō* / *kata sarka*) désigne une appréciation selon l'apparence extérieure et les standards humains. Paul rappelle qu'en tant que disciples, nous ne devons plus fonctionner ainsi.
 
 C'est notre penchant naturel, sans transformation par l'Esprit Saint, de juger immédiatement sur ce qui frappe le regard. Avant sa conversion, Paul était reconnaissable à son habit de pharisien et étiquetait aussitôt les gens : grec, romain, juif, païen, esclave ou libre.
 
-Notre société a décuplé ce culte de l'image avec les réseaux sociaux et l'obsession du statut. Ce risque existe tout autant dans notre relation avec Dieu : une connaissance purement intellectuelle ne suffit pas pour Jésus. Connaître par cœur les récits bibliques, fréquenter le culte, lire de la théologie ou réciter des prières ne remplacent jamais un cœur attaché à Christ.
+Notre society a décuplé ce culte de l'image avec les réseaux sociaux et l'obsession du statut. Ce risque existe tout autant dans notre relation avec Dieu : une connaissance purement intellectuelle ne suffit pas pour Jésus. Connaître par cœur les récits bibliques, fréquenter le culte, lire de la théologie ou réciter des prières ne remplacent jamais un cœur attaché à Christ.
 
 > [!illustration|id=gims-reussite]
 > **Le succès de façade vs la vraie réussite :**
@@ -69,7 +69,7 @@ Notre société a décuplé ce culte de l'image avec les réseaux sociaux et l'o
 > **La métaphore du fruit :**
 > Tant qu'on n'a pas goûté personnellement un fruit, on passe à côté de sa raison d'être : être savouré. De même, si Dieu avait voulu faire de nous des intellectuels froids, la Bible serait un dictionnaire abstrait. Au lieu de cela, elle est remplie de récits de vie, de poèmes et de rencontres réelles : nous sommes appelés à vivre la Parole, non simplement à disserter dessus.
 
-## La grâce de Dieu produit une joie plus forte que les circonstances (2 Corinthiens 8.2, Actes)
+## 2. La grâce de Dieu produit une joie plus forte que les circonstances (2 Corinthiens 8.2)
 
 > [!scripture|ref=2 Corinthiens 5.16b]
 > « Même si nous avons connu Christ selon la chair... »
@@ -81,7 +81,7 @@ Combien de contemporains de Jésus ont vu ses prodiges sans jamais s'attacher à
 
 Ne courons pas après le sensationnel. Jésus a affirmé que sa mort et sa résurrection constituaient le signe suprême. Le miracle absolu, c'est cette grâce inouïe : Dieu le Père a offert son propre Fils pour nous racheter, et le Roi de gloire s'est fait serviteur pour porter notre condamnation à la croix.
 
-## La grâce de Dieu ouvre les mains de ceux qui se sont donnés au Seigneur (2 Corinthiens 8.3-5)
+## 3. La grâce de Dieu ouvre les mains de ceux qui se sont donnés au Seigneur (2 Corinthiens 8.3-5)
 
 > [!scripture|ref=2 Corinthiens 5.16c]
 > « Maintenant, nous ne le connaissons plus de cette manière. »
@@ -113,14 +113,11 @@ Prier, ce n'est pas réciter machinalement des formules dans le vide : c'est ent
 > **Le témoignage de Koeun Path (Rescapé malgré moi) :**
 > Fuyant les Khmers rouges pendant 40 jours au Cambodge au milieu d'un péril mortel quotidien, Koeun Path, de tradition bouddhiste, entend à trois reprises une voix distincte qui le guide avec précision (la promesse de trouver du maïs dans 3 jours, l'encouragement vers la frontière, la direction à suivre). Arrivé en Thaïlande et emprisonné, il découvre l'Évangile grâce à une missionnaire américaine. Touché par l'Esprit Saint, il parvient à pardonner à ses tortionnaires et deviendra plus tard pasteur en France. Dieu est agissant dans l'invisible de façon bien plus concrète que nous ne le supposons.
 
-## La grâce de Jésus devient le modèle de notre générosité (2 Corinthiens 8.9, Éphésiens 3)
+## 4. La grâce de Jésus devient le modèle de notre générosité (2 Corinthiens 8.9)
 
 Jésus-Christ s'est fait pauvre de riche qu'il était afin que nous soyons enrichis ; son sacrifice ultime est le fondement et l'impulsion suprême de notre libéralité.
 
-## Conclusion et Appel (2 Corinthiens 8.9)
-
-> [!illustration]
-> **Titre de l'anecdote :** Racontez l'histoire ou l'image concrète ici...
+## Conclusion et Appel
 
 Voir le visible et juger, ou voir le visible sans y croire : voilà ce que nous faisons spontanément selon la chair. Mais discerner l'invisible et s'y confier relève de l'action transformatrice du Saint-Esprit.
 

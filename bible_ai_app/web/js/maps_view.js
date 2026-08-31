@@ -30,11 +30,24 @@ const MapsView = {
       this.loadItineraries();
       this.loadPlaces();
       this.isInitialized = true;
-    } else if (this.map) {
-      setTimeout(() => {
-        this.map.invalidateSize();
-      }, 100);
     }
+    this.refreshMapSize();
+  },
+
+  refreshMapSize() {
+    if (!this.map) return;
+    requestAnimationFrame(() => {
+      if (this.map) this.map.invalidateSize();
+    });
+    setTimeout(() => {
+      if (this.map) this.map.invalidateSize();
+    }, 100);
+    setTimeout(() => {
+      if (this.map) this.map.invalidateSize();
+    }, 300);
+    setTimeout(() => {
+      if (this.map) this.map.invalidateSize();
+    }, 600);
   },
 
   initMap() {
@@ -55,36 +68,61 @@ const MapsView = {
 
     L.control.zoom({ position: 'bottomright' }).addTo(this.map);
 
-    // 2. Définition des différentes couches de tuiles (Fonds de carte)
+    // 2. Définition des différentes couches de tuiles (Fonds de carte sans clé API requise)
     this.tileLayers = {
-      voyager: L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        subdomains: 'abcd',
-        maxZoom: 19
+      topo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: '&copy; Esri, DeLorme, NAVTEQ, TomTom, USGS',
+        maxZoom: 18
       }),
-      topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-        attribution: 'Map data: &copy; OpenStreetMap contributors, SRTM | Map style: &copy; OpenTopoMap (CC-BY-SA)',
-        maxZoom: 17
+      dark: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+        attribution: '&copy; Esri, HERE, Garmin, FAO, NOAA, USGS',
+        maxZoom: 16
       }),
-      dark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; CARTO &copy; OpenStreetMap',
-        subdomains: 'abcd',
-        maxZoom: 19
+      satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: '&copy; Esri, Maxar, Earthstar Geographics, CNES/Airbus DS',
+        maxZoom: 18
       }),
       osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19
       })
     };
 
+    // Alias pour compatibilité
+    this.tileLayers.voyager = this.tileLayers.topo;
+
     // Définir le fond de carte par défaut selon le thème
-    const isDark = document.body.classList.contains('theme-dark');
-    this.currentTileLayer = isDark ? this.tileLayers.dark : this.tileLayers.voyager;
+    const isDark = document.body.classList.contains('theme-dark') ||
+                   (!document.body.classList.contains('reading-bg-white') && !document.body.classList.contains('theme-light'));
+    const defaultLayerKey = isDark ? 'dark' : 'topo';
+    this.currentTileLayer = this.tileLayers[defaultLayerKey] || this.tileLayers.topo;
     this.currentTileLayer.addTo(this.map);
+
+    // Mettre à jour l'état actif des boutons
+    document.querySelectorAll('.map-layer-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.layer === defaultLayerKey);
+    });
 
     // 3. Groupes de couches pour les marqueurs et tracés
     this.markersLayer = L.layerGroup().addTo(this.map);
     this.itineraryLayer = L.layerGroup().addTo(this.map);
+
+    // 4. ResizeObserver et listener pour garantir le rafraîchissement des dimensions
+    if (typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver(() => {
+        if (this.map) {
+          this.map.invalidateSize();
+        }
+      });
+      this.resizeObserver.observe(container);
+    }
+    window.addEventListener('resize', () => {
+      if (this.map) {
+        this.map.invalidateSize();
+      }
+    });
+
+    this.refreshMapSize();
   },
 
   setTileLayer(layerKey) {

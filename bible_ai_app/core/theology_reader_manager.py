@@ -1073,7 +1073,7 @@ Règles de style :
         book_code: str,
         chapter: int,
         verse: int = 1,
-        limit: int = 8
+        limit: int = 30
     ) -> List[Dict[str, Any]]:
         """
         Trouve instantanément tous les chapitres de livres de théologie, manuels et dictionnaires

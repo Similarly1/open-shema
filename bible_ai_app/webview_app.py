@@ -2392,9 +2392,9 @@ class BibleAppApi:
         # Instructions du mode d'étude (personnalisables dans les paramètres)
         mode_instructions = {
             "auto": (
-                f"MODE D'ÉTUDE : {detected_mode.upper()}\n"
-                "- Analyse la question de l'utilisateur avec rigueur, équilibre théologique et profondeur biblique.\n"
-                "- Fonde ton développement sur les faits historiques, doctrinaux et exégétiques présents dans le corpus documentaire ci-dessous."
+                f"MODE D'ÉTUDE : {detected_mode.upper()} (ASSISTANT & SPARRING-PARTNER)\n"
+                "- RÈGLE DE NON-DÉLÉGATION : Tu es une aide à la recherche et à la réflexion. Ne rédige JAMAIS d'étude biblique finie ni de sermon prêt à lire. Fournis la matière première (lexique, histoire, divergences d'auteurs), dégage les enjeux et stimule la réflexion de l'utilisateur.\n"
+                "- Fonde ton analyse sur les faits historiques, doctrinaux et exégétiques présents dans le corpus documentaire ci-dessous."
             ),
             "theology": self.config.get("prompt_theology") or DEFAULT_THEOLOGY_SYSTEM_PROMPT,
             "exegesis": self.config.get("prompt_exegesis") or DEFAULT_EXEGESIS_SYSTEM_PROMPT,
@@ -2446,10 +2446,11 @@ class BibleAppApi:
             )
         else:
             drafting_rules = (
-                "CONSIGNES IMPÉRATIVES DE RÉDACTION ET D'ANCRAGE DOCUMENTAIRE :\n"
-                "1. RÈGLE D'OR : Fonde TOUTE ta réponse STRICTEMENT sur les éléments, données historiques et définitions du CORPUS DOCUMENTAIRE fourni ci-dessus.\n"
-                "2. CITATIONS PAR PARAGRAPHE : À la fin de CHAQUE paragraphe ou sous-partie, indique OBLIGATOIREMENT entre crochets la source biblique ou documentaire précise dont provient l'information.\n"
-                "3. Utilise des titres de section Markdown hiérarchiques et soigne la langue française."
+                "CONSIGNES IMPÉRATIVES DE RÉDACTION ET D'ACCOMPAGNEMENT PÉDAGOGIQUE :\n"
+                "1. RÈGLE D'OR DE NON-DÉLÉGATION : Tu es une aide à la recherche et un sparring-partner d'étude. Ne rédige JAMAIS d'étude biblique complète ou de sermon clé-en-main prêt à être lu. Ton but est de fournir la matière première (données textuelles, historiques, divergences d'auteurs), de dégager les enjeux et de stimuler la réflexion personnelle de l'utilisateur.\n"
+                "2. ANCRAGE DOCUMENTAIRE : Fonde TOUTE ta réponse STRICTEMENT sur les éléments, données historiques et définitions du CORPUS DOCUMENTAIRE fourni ci-dessus.\n"
+                "3. CITATIONS PAR PARAGRAPHE : À la fin de CHAQUE paragraphe ou sous-partie, indique OBLIGATOIREMENT entre crochets la source biblique ou documentaire précise dont provient l'information.\n"
+                "4. SOIN DU FORMAT : Utilise des titres de section Markdown hiérarchiques et soigne la langue française."
             )
 
         prompt = (

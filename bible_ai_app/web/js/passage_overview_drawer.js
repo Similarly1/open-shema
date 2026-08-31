@@ -274,6 +274,17 @@ const PassageOverviewDrawer = {
 
   theologySnippetCache: {},
   currentPopoverItem: null,
+  coverMap: {},
+
+  setCover(key, url) {
+    if (key && url) {
+      this.coverMap[key] = url;
+    }
+  },
+
+  getCover(key) {
+    return this.coverMap[key] || '';
+  },
 
   /**
    * Affiche l'infobulle flottante au survol d'une ressource (avec image / couverture)
@@ -288,7 +299,8 @@ const PassageOverviewDrawer = {
     let excerpt = itemEl.dataset.ttExcerpt || '';
     const badge = itemEl.dataset.ttBadge || '';
     const logoUrl = itemEl.dataset.ttLogo || '';
-    const imgUrl = itemEl.dataset.ttImage || '';
+    const coverKey = itemEl.dataset.coverKey || '';
+    const imgUrl = (coverKey ? this.getCover(coverKey) : '') || itemEl.dataset.ttImage || '';
     const action = itemEl.dataset.action || '';
     const bName = itemEl.dataset.bookName || '';
     const chId = itemEl.dataset.chapterId || '';
@@ -367,37 +379,57 @@ const PassageOverviewDrawer = {
     const rect = itemEl.getBoundingClientRect();
     const popoverWidth = 380;
     const estPopoverHeight = 220;
+    const isSecondaryWindow = !!document.getElementById('comm-win-titlebar');
 
-    // 1. Calcul Horizontal : centré sur l'élément ou sous le curseur, avec marge de sécurité
-    let left = rect.left + (rect.width - popoverWidth) / 2;
-    if (left + popoverWidth > window.innerWidth - 16) {
-      left = window.innerWidth - popoverWidth - 16;
-    }
-    if (left < 16) {
-      left = 16;
-    }
+    let left = 16;
+    let top = 16;
 
-    // 2. Calcul Vertical adaptatif : par défaut dessous l'élément, bascule au-dessus si proche du bas
-    const spaceBelow = window.innerHeight - rect.bottom;
-    const spaceAbove = rect.top;
-    let top = rect.bottom + 8;
-
-    if (spaceBelow < (estPopoverHeight + 20) && spaceAbove > spaceBelow) {
-      // Position au-dessus
-      top = Math.max(10, rect.top - estPopoverHeight - 8);
-      this.popoverEl.classList.add('popover-top');
-      this.popoverEl.classList.remove('popover-bottom');
+    // Détection de l'espace disponible à gauche :
+    // Dans la page Bible (volet de droite), rect.left est grand (ex: 900px-1500px).
+    // Les infobulles s'affichent à GAUCHE de l'élément pour une lisibilité optimale et ne pas masquer le volet.
+    if (!isSecondaryWindow && rect.left >= (popoverWidth + 16)) {
+      left = rect.left - popoverWidth - 14;
+      top = rect.top + (rect.height / 2) - (estPopoverHeight / 2);
+      top = Math.max(12, Math.min(window.innerHeight - estPopoverHeight - 16, top));
+      this.popoverEl.classList.remove('popover-top', 'popover-bottom');
+      this.popoverEl.classList.add('popover-left');
     } else {
-      // Position au-dessous
-      top = Math.min(window.innerHeight - estPopoverHeight - 10, rect.bottom + 8);
-      this.popoverEl.classList.add('popover-bottom');
-      this.popoverEl.classList.remove('popover-top');
+      // Écran secondaire déporté en plein écran ou espace restreint à gauche -> placement centré horizontal et haut/bas
+      left = rect.left + (rect.width - popoverWidth) / 2;
+      if (left + popoverWidth > window.innerWidth - 16) {
+        left = window.innerWidth - popoverWidth - 16;
+      }
+      if (left < 16) {
+        left = 16;
+      }
+
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+
+      if (spaceBelow < (estPopoverHeight + 20) && spaceAbove > spaceBelow) {
+        top = Math.max(10, rect.top - estPopoverHeight - 8);
+        this.popoverEl.classList.add('popover-top');
+        this.popoverEl.classList.remove('popover-bottom', 'popover-left');
+      } else {
+        top = Math.min(window.innerHeight - estPopoverHeight - 10, rect.bottom + 8);
+        this.popoverEl.classList.add('popover-bottom');
+        this.popoverEl.classList.remove('popover-top', 'popover-left');
+      }
     }
 
     this.popoverEl.style.left = `${Math.round(left)}px`;
     this.popoverEl.style.top = `${Math.round(top)}px`;
     this.popoverEl.classList.remove('hidden');
     void this.popoverEl.offsetWidth; // Reflow
+
+    // Ajustement précis après calcul de la hauteur réelle
+    if (this.popoverEl.classList.contains('popover-left')) {
+      const realHeight = this.popoverEl.offsetHeight || estPopoverHeight;
+      top = rect.top + (rect.height / 2) - (realHeight / 2);
+      top = Math.max(12, Math.min(window.innerHeight - realHeight - 16, top));
+      this.popoverEl.style.top = `${Math.round(top)}px`;
+    }
+
     this.popoverEl.classList.add('visible');
 
     // Chargement asynchrone si extrait en attente
@@ -830,17 +862,21 @@ const PassageOverviewDrawer = {
         const author = c.author || c.source_name || 'Commentaire';
         const title = c.title && c.title !== author ? c.title : (c.source_name || '');
         const excerptHtml = this.formatMarkdownExcerpt(c.excerpt);
+        const coverKey = `comm_${c.source_id || idx}`;
+        if (c.cover_url) {
+          this.setCover(coverKey, c.cover_url);
+        }
 
         return `
           <div class="overview-clean-item"
                data-action="select-commentary"
                data-author="${this.escapeHtml(author)}"
                data-source-id="${this.escapeHtml(c.source_id)}"
+               data-cover-key="${this.escapeHtml(coverKey)}"
                data-index="${idx}"
                data-tt-category="Commentaire"
                data-tt-author="${this.escapeHtml(author)}"
                data-tt-title="${this.escapeHtml(title)}"
-               data-tt-image="${this.escapeHtml(c.cover_url || '')}"
                data-tt-excerpt="${this.escapeHtml(excerptHtml)}">
             <div class="clean-item-header">
               <div class="clean-item-title-group">
@@ -903,24 +939,28 @@ const PassageOverviewDrawer = {
       `;
     } else {
       bodyHtml = `<div class="overview-clean-list">`;
-      list.forEach((art) => {
+      list.forEach((art, idx) => {
         const src = art.source_name || 'Revue';
         const title = art.title || 'Article';
         const summaryHtml = this.formatMarkdownExcerpt(art.lead_summary);
         const logoUrl = this.getSourceLogo(art.source_id, src);
         const logoHtml = logoUrl ? `<img src="${logoUrl}" class="source-tag-logo" alt="${this.escapeHtml(src)}">` : '';
         const tagClass = logoUrl ? 'clean-source-tag has-logo' : 'clean-source-tag is-generic';
+        const coverKey = `art_${art.id || idx}`;
+        if (art.image_url) {
+          this.setCover(coverKey, art.image_url);
+        }
 
         bodyHtml += `
           <div class="overview-clean-item overview-article-item"
                data-action="open-article"
                data-article-id="${this.escapeHtml(art.id)}"
+               data-cover-key="${this.escapeHtml(coverKey)}"
                data-tt-category="Article"
                data-tt-author="${this.escapeHtml(title)}"
                data-tt-title="${this.escapeHtml(art.author ? 'Par ' + art.author : '')}"
                data-tt-badge="${this.escapeHtml(src)}"
                data-tt-logo="${logoUrl || ''}"
-               data-tt-image="${this.escapeHtml(art.image_url || '')}"
                data-tt-excerpt="${this.escapeHtml(summaryHtml)}">
             <div class="clean-article-row">
               <div class="clean-article-content">
@@ -974,20 +1014,24 @@ const PassageOverviewDrawer = {
       `;
     } else {
       bodyHtml = `<div class="overview-clean-list">`;
-      list.forEach((b) => {
+      list.forEach((b, idx) => {
         const bTitle = b.book_title || b.book_name || 'Ouvrage';
         const chTitle = b.chapter_title || `Chapitre ${b.chapter_id}`;
         const snippetHtml = b.snippet ? this.formatMarkdownExcerpt(b.snippet) : '';
+        const coverKey = `theology_${b.book_name}_${b.chapter_id || idx}`;
+        if (b.cover_url) {
+          this.setCover(coverKey, b.cover_url);
+        }
 
         bodyHtml += `
           <div class="overview-clean-item"
                data-action="open-theology-chapter"
                data-book-name="${this.escapeHtml(b.book_name)}"
                data-chapter-id="${b.chapter_id}"
+               data-cover-key="${this.escapeHtml(coverKey)}"
                data-tt-category="Livre"
                data-tt-author="${this.escapeHtml(bTitle)}"
                data-tt-title="${this.escapeHtml(chTitle)}"
-               data-tt-image="${this.escapeHtml(b.cover_url || '')}"
                data-tt-excerpt="${this.escapeHtml(snippetHtml)}">
             <div class="clean-item-header">
               <div class="clean-item-title-group">

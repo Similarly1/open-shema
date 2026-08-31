@@ -1249,7 +1249,7 @@ CONSIGNES STRICTES :
         try:
             from core.articles_db import ArticlesDB
             art_db = ArticlesDB()
-            raw_articles = art_db.get_articles_for_passage(book_code=norm_code, chapter=chapter, limit=8)
+            raw_articles = art_db.get_articles_for_passage(book_code=norm_code, chapter=chapter, limit=20)
             for a in raw_articles:
                 summary = a.get("lead_summary") or a.get("excerpt") or a.get("summary") or ""
                 cpath = a.get("content_path")
@@ -1324,7 +1324,7 @@ CONSIGNES STRICTES :
                 book_code=norm_code,
                 chapter=chapter,
                 verse=verse,
-                limit=8
+                limit=30
             )
         except Exception as e:
             logger.debug(f"Erreur livres theologie overview: {e}")

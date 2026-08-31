@@ -1727,16 +1727,18 @@ const PassageStudyView = {
 
       L.control.zoom({ position: 'bottomright' }).addTo(this.leafletMap);
 
-      // Fond de carte CartoDB
-      const tileUrl = isDark
-        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-        : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+      // Fond de carte sans clé API requise (Esri World Topo / Dark Gray)
+      const tileLayer = isDark
+        ? L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+            attribution: '&copy; Esri, HERE, Garmin, USGS',
+            maxZoom: 16
+          })
+        : L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+            attribution: '&copy; Esri, DeLorme, NAVTEQ, USGS',
+            maxZoom: 18
+          });
 
-      L.tileLayer(tileUrl, {
-        attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap',
-        subdomains: 'abcd',
-        maxZoom: 19
-      }).addTo(this.leafletMap);
+      tileLayer.addTo(this.leafletMap);
 
       this.leafletMarkersLayer = L.layerGroup().addTo(this.leafletMap);
 
@@ -1784,11 +1786,26 @@ const PassageStudyView = {
         this.leafletMap.setView(defaultCenter, 7, { animate: false });
       }
 
-      setTimeout(() => {
-        if (this.leafletMap && document.getElementById('ps-leaflet-map-container')) {
-          this.leafletMap.invalidateSize(true);
+      // Observer les redimensionnements du conteneur
+      if (typeof ResizeObserver !== 'undefined' && currentContainer) {
+        if (this._psMapResizeObserver) {
+          this._psMapResizeObserver.disconnect();
         }
-      }, 120);
+        this._psMapResizeObserver = new ResizeObserver(() => {
+          if (this.leafletMap) {
+            this.leafletMap.invalidateSize();
+          }
+        });
+        this._psMapResizeObserver.observe(currentContainer);
+      }
+
+      [50, 150, 350, 600].forEach(delay => {
+        setTimeout(() => {
+          if (this.leafletMap && document.getElementById('ps-leaflet-map-container')) {
+            this.leafletMap.invalidateSize(true);
+          }
+        }, delay);
+      });
     } catch (e) {
       console.warn('Erreur initialisation carte Leaflet:', e);
     }

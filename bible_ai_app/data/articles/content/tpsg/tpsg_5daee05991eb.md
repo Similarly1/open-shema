@@ -1,6 +1,6 @@
 Vous connaissez peut-être le nom de Jordan Peterson. Psychologue de renommée internationale, il a beaucoup écrit sur les questions d’éducation, notamment dans un ouvrage qui s’est vendu à plus de 10 millions d’exemplaires. Son analyse éclaire de manière intéressante ce que Paul dit ici au verset 4 :
 
-> Et vous, pères, n’irritez pas vos enfants. – Éphésiens ⁶.⁴
+> Et vous, pères, n’irritez pas vos enfants. – Éphésiens 6.4
 
 Selon Jordan Peterson, il existe en réalité deux manières d’« irriter » ses enfants, c’est-à-dire de les pousser à la colère ou à l’amertume.
 

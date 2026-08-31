@@ -1608,6 +1608,9 @@ const ArticlesView = {
       return `\n\n<div class="article-author-bio-card"><div class="article-author-bio-avatar"><span style="font-weight:700; font-size:18px; color:var(--accent-primary, #60a5fa);">${initial}</span></div><div class="article-author-bio-content"><p>${body.trim()}</p></div></div>\n\n`;
     });
 
+    // 5b-1b. Convertir les mentions d'extraits d'ouvrages [^Titre du livre] en mention éditoriale propre
+    text = text.replace(/(?:^|\n)\s*\[\^([A-ZÀ-ÖØ-ßÉÈÊ][^\]\n]{6,})\]\s*(?=\n|$)/g, '\n\nCet article est extrait du livre *$1*.\n\n');
+
     // 5b-2. Détection et mise en valeur du cartouche éditorial de fin d'article (Option 3 : Badge contextuel dynamique, sans émoji/svg)
     text = text.replace(
       /(?:^|\n\n+)((?:Merci\s+à\s+[^\n]+pour\s+la\s+traduction|Article\s+original\s*:|Cet article\s+(?:fait partie|est extrait|est tiré|a été publié|provient|est une adaptation|est la traduction|est une traduction|est le premier|est le second|est le troisième|est basé)|Extrait du livre|Tiré du livre)[\s\S]+?)(?=\n\n\d+\.|\n\n###|\n\n<|\s*$)/gi,

@@ -513,21 +513,25 @@ class ArticlesFeedScraper:
         if not hasattr(soup_element, "descendants"):
             return str(soup_element)
 
-        # Formater les exposants (numéros de versets, notes)
-        for sup in soup_element.find_all(["sup", "sub"]):
+        # Formater les exposants réels (numéros de versets, notes)
+        for sup in soup_element.find_all("sup"):
             a_tag = sup.find("a")
             if a_tag:
                 href = a_tag.get("href", "")
                 text = a_tag.get_text(strip=True).strip("[]")
-                if href and text:
+                if text and ((text.isdigit() and int(text) <= 99) or (href.startswith("#") and len(text) <= 5)):
                     sup.replace_with(f" [^{text}] ")
                     continue
             st = sup.get_text(strip=True).strip("[]")
-            if st and st.isdigit() and int(st) <= 50:
+            if st and st.isdigit() and int(st) <= 99:
                 sup.replace_with(f" [^{st}] ")
-            elif st:
+            elif st and len(st) <= 4:
                 sup_map = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
                 sup.replace_with(f" {st.translate(sup_map)} ")
+
+        # Déballer les indices sub (souvent utilisés pour les mentions d'éditions ou détails de fin)
+        for sub in soup_element.find_all("sub"):
+            sub.unwrap()
 
         # Formater les liens
         for a in soup_element.find_all("a"):

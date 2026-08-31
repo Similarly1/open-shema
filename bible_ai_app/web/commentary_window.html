@@ -530,13 +530,21 @@
       transition: opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
+    .overview-item-popover.popover-left {
+      transform: translateX(10px) scale(0.98);
+    }
+
     .overview-item-popover.popover-top {
       transform: translateY(-6px) scale(0.97);
     }
 
+    .overview-item-popover.popover-bottom {
+      transform: translateY(6px) scale(0.97);
+    }
+
     .overview-item-popover.visible {
       opacity: 1;
-      transform: translateY(0) scale(1);
+      transform: translate(0, 0) scale(1);
     }
 
     /* Styles spécifiques Onglet Commentaires */
