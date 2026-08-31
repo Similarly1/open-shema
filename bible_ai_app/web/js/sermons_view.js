@@ -2268,7 +2268,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
       container.innerHTML = models.slice(0, 15).map(m => {
         const hasScore = m.match_score && m.match_score > 0;
         const matchTag = hasScore 
-          ? `<span style="font-size: 9.5px; background: rgba(59, 130, 246, 0.18); color: var(--accent-blue, #3b82f6); padding: 1px 5px; border-radius: 4px; font-weight: 600;">🎯 Match Texte</span>` 
+          ? `<span style="font-size: 9.5px; background: rgba(59, 130, 246, 0.18); color: var(--accent-blue, #3b82f6); padding: 1px 5px; border-radius: 4px; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span>Match Texte</span></span>` 
           : '';
 
         const outlineItemsHtml = (m.outline || []).map(item => `
@@ -2285,10 +2285,10 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
                 <div style="font-size: 11.5px; font-weight: 700; color: var(--text-primary); line-height: 1.3;">
                   ${this.escapeHtml(m.title)}
                 </div>
-                <div style="font-size: 10.5px; color: var(--text-muted); margin-top: 2px; display: flex; align-items: center; gap: 6px;">
-                  <span>📖 ${this.escapeHtml(m.passage_reference || 'Texte')}</span>
+                <div style="font-size: 10.5px; color: var(--text-muted); margin-top: 3px; display: flex; align-items: center; gap: 6px;">
+                  <span style="display: inline-flex; align-items: center; gap: 4px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>${this.escapeHtml(m.passage_reference || 'Texte')}</span>
                   <span>•</span>
-                  <span>⏱️ ${this.escapeHtml(m.duration || '35 min')}</span>
+                  <span style="display: inline-flex; align-items: center; gap: 4px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${this.escapeHtml(m.duration || '35 min')}</span>
                   ${matchTag}
                 </div>
               </div>
@@ -2303,15 +2303,17 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
 
             <!-- Tension contemporaine -->
             ${m.contemporary_tension ? `
-              <div style="font-size: 10.5px; color: var(--text-secondary); line-height: 1.35; font-style: italic;">
-                ⚡ <strong>Tension :</strong> ${this.escapeHtml(m.contemporary_tension)}
+              <div style="font-size: 10.5px; color: var(--text-secondary); line-height: 1.35; font-style: italic; display: flex; align-items: flex-start; gap: 5px;">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-amber, #f59e0b); flex-shrink: 0; margin-top: 2px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <div><strong>Tension :</strong> ${this.escapeHtml(m.contemporary_tension)}</div>
               </div>
             ` : ''}
 
             <!-- Plan détaillé repliable -->
             <details style="font-size: 11px; background: var(--bg-subtle, rgba(255,255,255,0.03)); padding: 6px 8px; border-radius: 4px; border: 1px solid var(--border-color);">
-              <summary style="font-weight: 600; cursor: pointer; color: var(--text-secondary); user-select: none;">
-                🏛️ Plan homilétique (${(m.outline || []).length} sections)
+              <summary style="font-weight: 600; cursor: pointer; color: var(--text-secondary); user-select: none; display: inline-flex; align-items: center; gap: 6px;">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--text-muted);"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Plan homilétique (${(m.outline || []).length} sections)</span>
               </summary>
               <div style="margin-top: 6px; display: flex; flex-direction: column; gap: 4px;">
                 ${outlineItemsHtml}
@@ -2747,13 +2749,21 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     else if (tag === 'h2') labelEl.textContent = 'H2';
     else if (tag === 'h3') labelEl.textContent = 'H3';
     else if (tag === 'blockquote') labelEl.textContent = '”';
-    else if (block.classList?.contains('sermon-block-scripture')) labelEl.textContent = '📖';
-    else if (block.classList?.contains('sermon-block-exegesis')) labelEl.textContent = '🔤';
-    else if (block.classList?.contains('sermon-block-illustration')) labelEl.textContent = '💡';
-    else if (block.classList?.contains('sermon-block-application')) labelEl.textContent = '🎯';
-    else if (block.classList?.contains('sermon-block-cue')) labelEl.textContent = '⏱️';
-    else if (tag === 'ul') labelEl.textContent = '•';
-    else labelEl.textContent = 'Aa';
+    else if (block.classList?.contains('sermon-block-scripture')) {
+      labelEl.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:middle;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>';
+    } else if (block.classList?.contains('sermon-block-exegesis')) {
+      labelEl.innerHTML = '<span style="font-weight:700; font-size:11px; font-family:serif;">ΑΩ</span>';
+    } else if (block.classList?.contains('sermon-block-illustration')) {
+      labelEl.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:middle; color:var(--accent-amber,#f59e0b);"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>';
+    } else if (block.classList?.contains('sermon-block-application')) {
+      labelEl.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:middle; color:var(--accent-green,#10b981);"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>';
+    } else if (block.classList?.contains('sermon-block-cue')) {
+      labelEl.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:middle;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+    } else if (tag === 'ul') {
+      labelEl.textContent = '•';
+    } else {
+      labelEl.textContent = 'Aa';
+    }
   },
 
   updateFloatingButtonsState() {
@@ -3283,7 +3293,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
             <span class="ill-tooltip-title">${this.escapeHtml(ill.title)}</span>
             <span class="ill-tooltip-badge">${this.escapeHtml(ill.category || 'Illustration')}</span>
           </div>
-          ${passageBadge ? `<div style="font-size: 10px; color: var(--accent-blue, #3b82f6); font-weight:600; margin-bottom:4px;">📖 ${this.escapeHtml(passageBadge)}</div>` : ''}
+          ${passageBadge ? `<div style="font-size: 10px; color: var(--accent-blue, #3b82f6); font-weight:600; margin-bottom:4px; display:inline-flex; align-items:center; gap:3px;"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>${this.escapeHtml(passageBadge)}</span></div>` : ''}
           <div class="ill-tooltip-snippet">${this.escapeHtml(snippet)}</div>
           <div class="ill-tooltip-footer">
             <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 10 4 15 9 20"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/></svg>
@@ -3484,7 +3494,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
             <span class="ill-picker-item-title">${this.escapeHtml(ill.title)}</span>
             <div class="ill-picker-item-badges">
               <span class="ill-tooltip-badge">${this.escapeHtml(ill.category || 'Illustration')}</span>
-              ${passageBadge ? `<span class="ill-tooltip-badge" style="background:rgba(59,130,246,0.15); color:var(--accent-blue,#3b82f6);">📖 ${this.escapeHtml(passageBadge)}</span>` : ''}
+              ${passageBadge ? `<span class="ill-tooltip-badge" style="background:rgba(59,130,246,0.15); color:var(--accent-blue,#3b82f6); display:inline-flex; align-items:center; gap:3px;"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>${this.escapeHtml(passageBadge)}</span></span>` : ''}
               ${ill.author ? `<span style="font-size:10.5px; opacity:0.7; font-style:italic;">— ${this.escapeHtml(ill.author)}</span>` : ''}
             </div>
           </div>

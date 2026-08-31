@@ -514,8 +514,8 @@ class SermonsManager:
                         i_id = str(item["id"])
                         illustrations_map[i_id] = {
                             "id": i_id,
-                            "filename": f"{i_id}.md",
-                            "file_path": os.path.join(target_dir, f"{i_id}.md"),
+                            "filename": str(item.get("filename") or f"{i_id}.md"),
+                            "file_path": str(item.get("file_path") or os.path.join(target_dir, f"{i_id}.md")),
                             "title": str(item.get("title") or "Illustration sans titre"),
                             "category": str(item.get("category", "Général")),
                             "type": str(item.get("type", "Histoire vraie")),
@@ -532,15 +532,13 @@ class SermonsManager:
             except Exception as e:
                 logger.warning(f"Impossible de précharger le cache JSON illustrations : {e}")
 
+        if loaded_from_json and len(illustrations_map) > 0:
+            cls._cached_illustrations = list(illustrations_map.values())
+            cls._cached_illustrations_mtime = current_mtime
+            return cls._cached_illustrations
+
         try:
             md_files = [f for f in os.listdir(target_dir) if f.endswith(".md")]
-            
-            # Si le dossier correspond au cache JSON, retour instantané !
-            if loaded_from_json and len(illustrations_map) > 0 and abs(len(md_files) - len(illustrations_map)) < 30:
-                cls._cached_illustrations = list(illustrations_map.values())
-                cls._cached_illustrations_mtime = current_mtime
-                return cls._cached_illustrations
-
             illustrations = []
             for fname in sorted(md_files):
                 full_path = os.path.join(target_dir, fname)
@@ -554,6 +552,113 @@ class SermonsManager:
         except Exception as e:
             logger.error(f"Erreur lors du listing des illustrations: {e}")
             return list(illustrations_map.values()) if loaded_from_json else []
+
+    @classmethod
+    def get_illustration(cls, ill_id: str, config: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
+        """Récupère une illustration complète par son ID avec tout son texte intégral."""
+        if not ill_id:
+            return None
+        all_ills = cls.list_illustrations(config)
+        for ill in all_ills:
+            if str(ill.get("id")) == str(ill_id):
+                return ill
+        return None
+
+    @classmethod
+    def get_illustrations_page(
+        cls,
+        page: int = 1,
+        page_size: int = 30,
+        query: str = "",
+        category: str = "all",
+        type_filter: str = "all",
+        status_filter: str = "all",
+        config: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """Retourne une page légère d'illustrations avec recherche & filtrage instantanés (sub-10ms)."""
+        all_ills = cls.list_illustrations(config)
+
+        q = (query or "").strip().lower()
+        cat_filter = (category or "all").strip().lower()
+        typ_filter = (type_filter or "all").strip()
+        stat_filter = (status_filter or "all").strip()
+
+        filtered = []
+        for ill in all_ills:
+            # 1. Catégorie
+            if cat_filter and cat_filter != "all":
+                ill_cat = str(ill.get("category") or "").lower()
+                first_cat_token = cat_filter.split()[0]
+                if first_cat_token not in ill_cat:
+                    continue
+
+            # 2. Type / Genre
+            if typ_filter and typ_filter != "all":
+                if str(ill.get("type") or "") != typ_filter:
+                    continue
+
+            # 3. Statut d'utilisation
+            history = ill.get("usage_history") or []
+            if stat_filter == "unused" and len(history) > 0:
+                continue
+            if stat_filter == "used" and len(history) == 0:
+                continue
+
+            # 4. Recherche plein texte
+            if q:
+                title = str(ill.get("title") or "").lower()
+                body = str(ill.get("body") or "").lower()
+                author = str(ill.get("author") or "").lower()
+                passages = ill.get("passages_associes") or []
+                if isinstance(passages, list):
+                    passages_str = " ".join(str(p).lower() for p in passages)
+                else:
+                    passages_str = str(passages).lower()
+
+                if q not in title and q not in body and q not in author and q not in passages_str:
+                    continue
+
+            filtered.append(ill)
+
+        total = len(filtered)
+        page = max(1, page)
+        page_size = max(1, min(page_size, 100))
+        start_idx = (page - 1) * page_size
+        end_idx = start_idx + page_size
+
+        page_slice = filtered[start_idx:end_idx]
+
+        # Version allégée pour un transfert ultra-rapide (payload < 10KB)
+        items = []
+        for ill in page_slice:
+            raw_body = str(ill.get("body") or "").strip()
+            clean_preview = re.sub(r'^[#>-]+\s*', '', raw_body, flags=re.MULTILINE)
+            clean_preview = clean_preview.replace('\n', ' ').strip()
+            if len(clean_preview) > 220:
+                clean_preview = clean_preview[:220] + "..."
+
+            items.append({
+                "id": str(ill.get("id")),
+                "title": str(ill.get("title") or "Sans titre"),
+                "category": str(ill.get("category", "Général")),
+                "type": str(ill.get("type", "Histoire vraie")),
+                "tags": ill.get("tags", []),
+                "passages_associes": ill.get("passages_associes", []),
+                "source": str(ill.get("source", "")),
+                "author": str(ill.get("author", "")),
+                "usage_history": ill.get("usage_history", []),
+                "preview": clean_preview,
+                "created_at": ill.get("created_at"),
+                "updated_at": ill.get("updated_at"),
+            })
+
+        return {
+            "items": items,
+            "total": total,
+            "page": page,
+            "page_size": page_size,
+            "has_more": end_idx < total
+        }
 
     @classmethod
     def save_illustration(cls, data: Dict[str, Any], config: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:

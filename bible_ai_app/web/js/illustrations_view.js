@@ -127,17 +127,17 @@ const IllustrationsView = {
     });
   },
 
+  pageSize: 30,
+  currentPage: 1,
+  totalCount: 0,
+  hasMore: false,
+  isLoading: false,
+  searchDebounceTimer: null,
+  observer: null,
+
   async onViewActivated() {
-    if (this.illustrations && this.illustrations.length > 0) {
-      this.applyFilters();
-      API.getIllustrationsList().then(list => {
-        if (Array.isArray(list) && list.length !== this.illustrations.length) {
-          this.illustrations = list;
-          this.applyFilters();
-        }
-      }).catch(() => {});
-    } else {
-      await this.loadIllustrations();
+    if (!this.illustrations || this.illustrations.length === 0) {
+      await this.loadFirstPage();
     }
   },
 
@@ -149,21 +149,45 @@ const IllustrationsView = {
       this.container.innerHTML = `
         <div style="padding: 70px 24px; text-align: center; color: var(--text-muted); width: 100%; grid-column: 1 / -1;">
           <div class="synth-spinner" style="width: 32px; height: 32px; border-width: 3px; margin: 0 auto 16px auto; border-top-color: var(--accent-amber, #f59e0b);"></div>
-          <div style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px;">Chargement du réservoir d'illustrations...</div>
-          <div style="font-size: 12.5px; opacity: 0.75;">Indexation des fiches pastorales en cours</div>
+          <div style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px;">Chargement des illustrations...</div>
+          <div style="font-size: 12.5px; opacity: 0.75;">Récupération du premier lot de 30 fiches</div>
         </div>
       `;
     }
   },
 
-  async loadIllustrations() {
+  applyFilters() {
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+    }
+    this.searchDebounceTimer = setTimeout(() => {
+      this.loadFirstPage();
+    }, 120);
+  },
+
+  async loadFirstPage() {
+    this.currentPage = 1;
+    this.isLoading = true;
     this.showLoading();
+
     try {
-      const list = await API.getIllustrationsList();
-      this.illustrations = Array.isArray(list) ? list : [];
-      this.applyFilters();
+      const res = await API.getIllustrationsPage({
+        page: 1,
+        pageSize: this.pageSize,
+        query: this.searchQuery,
+        category: this.activeCategory,
+        type: this.activeType,
+        status: this.activeStatus
+      });
+
+      this.illustrations = Array.isArray(res.items) ? res.items : [];
+      this.totalCount = res.total || 0;
+      this.hasMore = Boolean(res.has_more);
+      this.isLoading = false;
+      this.render();
     } catch (e) {
-      console.error('Erreur chargement banque illustrations:', e);
+      console.error('Erreur chargement page illustrations:', e);
+      this.isLoading = false;
       if (this.container) {
         this.container.innerHTML = `
           <div style="padding: 50px 24px; text-align: center; color: var(--text-danger, #ef4444); width: 100%; grid-column: 1 / -1;">
@@ -175,60 +199,132 @@ const IllustrationsView = {
     }
   },
 
-  applyFilters() {
-    const q = this.searchQuery.toLowerCase();
+  async loadMore() {
+    if (this.isLoading || !this.hasMore) return;
 
-    this.filteredIllustrations = this.illustrations.filter(ill => {
-      // 1. Catégorie
-      if (this.activeCategory !== 'all') {
-        const cat = ill.category || '';
-        if (!cat.toLowerCase().includes(this.activeCategory.toLowerCase().split(' ')[0])) {
-          return false;
+    this.isLoading = true;
+    const nextPage = this.currentPage + 1;
+
+    const btnLoadMore = document.getElementById('btn-load-more-illustrations');
+    if (btnLoadMore) {
+      btnLoadMore.disabled = true;
+      btnLoadMore.innerHTML = `<span class="synth-spinner" style="width: 12px; height: 12px; border-width: 1.5px; border-top-color: var(--text-primary); display: inline-block;"></span> <span>Chargement du lot suivant...</span>`;
+    }
+
+    try {
+      const res = await API.getIllustrationsPage({
+        page: nextPage,
+        pageSize: this.pageSize,
+        query: this.searchQuery,
+        category: this.activeCategory,
+        type: this.activeType,
+        status: this.activeStatus
+      });
+
+      const newItems = Array.isArray(res.items) ? res.items : [];
+      this.currentPage = nextPage;
+      this.illustrations = [...this.illustrations, ...newItems];
+      this.totalCount = res.total || this.totalCount;
+      this.hasMore = Boolean(res.has_more);
+      this.isLoading = false;
+
+      const grid = document.getElementById('illustrations-grid-cards');
+      if (grid && newItems.length > 0) {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = newItems.map(ill => this.renderCardHtml(ill)).join('');
+
+        while (tempDiv.firstChild) {
+          grid.appendChild(tempDiv.firstChild);
         }
+
+        this.bindCardEvents();
+        this.updateHeaderCount();
+        this.updateFooter();
+      } else {
+        this.render();
       }
-
-      // 2. Type / Genre
-      if (this.activeType !== 'all') {
-        const type = ill.type || '';
-        if (type !== this.activeType) return false;
+    } catch (e) {
+      console.error('Erreur chargement lot supplémentaire:', e);
+      this.isLoading = false;
+      if (btnLoadMore) {
+        btnLoadMore.disabled = false;
+        btnLoadMore.textContent = 'Réessayer de charger';
       }
+    }
+  },
 
-      // 3. Statut pastoral
-      const history = ill.usage_history || [];
-      if (this.activeStatus === 'unused' && history.length > 0) return false;
-      if (this.activeStatus === 'used' && history.length === 0) return false;
+  updateHeaderCount() {
+    if (!this.lblCount) return;
+    const showing = this.illustrations.length;
+    const total = this.totalCount;
 
-      // 4. Recherche plein texte
-      if (q) {
-        const titleMatch = (ill.title || '').toLowerCase().includes(q);
-        const bodyMatch = (ill.body || ill.content || '').toLowerCase().includes(q);
-        const authorMatch = (ill.author || '').toLowerCase().includes(q);
-        const passagesMatch = Array.isArray(ill.passages_associes) 
-          ? ill.passages_associes.some(p => p.toLowerCase().includes(q))
-          : (ill.passages_associes || '').toLowerCase().includes(q);
+    if (this.searchQuery || this.activeCategory !== 'all' || this.activeType !== 'all' || this.activeStatus !== 'all') {
+      this.lblCount.textContent = `${showing} sur ${total.toLocaleString('fr-FR')} ${total > 1 ? 'résultats' : 'résultat'}`;
+    } else {
+      this.lblCount.textContent = total > this.pageSize 
+        ? `${showing} sur ${total.toLocaleString('fr-FR')} fiches` 
+        : `${total} ${total > 1 ? 'illustrations' : 'illustration'}`;
+    }
+  },
 
-        if (!titleMatch && !bodyMatch && !authorMatch && !passagesMatch) {
-          return false;
-        }
+  updateFooter() {
+    const paginationFooter = document.getElementById('ill-pagination-footer');
+    if (!this.hasMore) {
+      if (this.observer) this.observer.disconnect();
+      paginationFooter?.remove();
+    } else {
+      const remaining = this.totalCount - this.illustrations.length;
+      const nextBatch = Math.min(this.pageSize, remaining);
+      const btnLoadMore = document.getElementById('btn-load-more-illustrations');
+      if (btnLoadMore) {
+        btnLoadMore.disabled = false;
+        btnLoadMore.innerHTML = `
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg>
+          <span>Charger +${nextBatch} illustrations (${this.illustrations.length} / ${this.totalCount.toLocaleString('fr-FR')})</span>
+        `;
       }
+    }
+  },
 
-      return true;
-    });
+  renderCardHtml(ill) {
+    const type = ill.type || 'Histoire vraie';
+    let typeClass = 'type-story';
+    if (type.includes('Histoire')) typeClass = 'type-history';
+    else if (type.includes('Citation')) typeClass = 'type-quote';
+    else if (type.includes('Science')) typeClass = 'type-science';
 
-    this.render();
+    const history = ill.usage_history || [];
+    const isUsed = history.length > 0;
+    const usageText = isUsed ? `Prêchée (${history.length}x)` : 'Jamais prêchée';
+    const usageClass = isUsed ? 'used' : '';
+
+    const passages = Array.isArray(ill.passages_associes) ? ill.passages_associes.join(', ') : (ill.passages_associes || '');
+    const author = ill.author ? ill.author : (ill.category || 'Général');
+    const preview = ill.preview || (ill.body || ill.content || '').replace(/^[#>-]+\s*/gm, '').slice(0, 180).trim();
+
+    return `
+      <article class="illustration-card" data-ill-id="${ill.id}">
+        <div class="ill-card-top">
+          <span class="ill-card-badge ${typeClass}">${this.escapeHtml(type)}</span>
+          <span class="ill-card-usage-pill ${usageClass}">${usageText}</span>
+        </div>
+        <div class="ill-card-title">${this.escapeHtml(ill.title || 'Sans titre')}</div>
+        <div class="ill-card-preview">${this.escapeHtml(preview)}</div>
+        <div class="ill-card-footer">
+          <span class="ill-card-author">${this.escapeHtml(author)}</span>
+          ${passages ? `<span class="ill-card-passage">${this.escapeHtml(passages)}</span>` : ''}
+        </div>
+      </article>
+    `;
   },
 
   render() {
-    if (this.lblCount) {
-      const count = this.filteredIllustrations.length;
-      this.lblCount.textContent = `${count} ${count > 1 ? 'illustrations' : 'illustration'}`;
-    }
-
+    this.updateHeaderCount();
     if (!this.container) return;
 
-    if (this.filteredIllustrations.length === 0) {
+    if (this.illustrations.length === 0) {
       this.container.innerHTML = `
-        <div style="padding: 48px 24px; text-align: center; color: var(--text-muted);">
+        <div style="padding: 48px 24px; text-align: center; color: var(--text-muted); width: 100%; grid-column: 1 / -1;">
           <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 12px; opacity: 0.5;">
             <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/>
             <path d="M9 18h6"/><path d="M10 22h4"/>
@@ -240,41 +336,30 @@ const IllustrationsView = {
       return;
     }
 
-    const cardsHtml = this.filteredIllustrations.map(ill => {
-      const type = ill.type || 'Histoire vraie';
-      let typeClass = 'type-story';
-      if (type.includes('Histoire')) typeClass = 'type-history';
-      else if (type.includes('Citation')) typeClass = 'type-quote';
-      else if (type.includes('Science')) typeClass = 'type-science';
+    const cardsHtml = this.illustrations.map(ill => this.renderCardHtml(ill)).join('');
 
-      const history = ill.usage_history || [];
-      const isUsed = history.length > 0;
-      const usageText = isUsed ? `Prêchée (${history.length}x)` : 'Jamais prêchée';
-      const usageClass = isUsed ? 'used' : '';
-
-      const passages = Array.isArray(ill.passages_associes) ? ill.passages_associes.join(', ') : (ill.passages_associes || '');
-      const author = ill.author ? ill.author : (ill.category || 'Général');
-      const bodyPreview = (ill.body || ill.content || '').replace(/^[#>-]+\s*/gm, '').trim();
-
-      return `
-        <article class="illustration-card" data-ill-id="${ill.id}">
-          <div class="ill-card-top">
-            <span class="ill-card-badge ${typeClass}">${this.escapeHtml(type)}</span>
-            <span class="ill-card-usage-pill ${usageClass}">${usageText}</span>
-          </div>
-          <div class="ill-card-title">${this.escapeHtml(ill.title || 'Sans titre')}</div>
-          <div class="ill-card-preview">${this.escapeHtml(bodyPreview)}</div>
-          <div class="ill-card-footer">
-            <span class="ill-card-author">${this.escapeHtml(author)}</span>
-            ${passages ? `<span class="ill-card-passage">${this.escapeHtml(passages)}</span>` : ''}
-          </div>
-        </article>
+    let footerHtml = '';
+    if (this.hasMore) {
+      const remaining = this.totalCount - this.illustrations.length;
+      const nextBatch = Math.min(this.pageSize, remaining);
+      footerHtml = `
+        <div id="ill-pagination-footer" style="padding: 28px 0 40px 0; text-align: center; width: 100%; grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+          <button id="btn-load-more-illustrations" class="btn-secondary" style="padding: 9px 24px; font-size: 13px; font-weight: 600; border-radius: 20px; background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-primary); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.15s ease;">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg>
+            <span>Charger +${nextBatch} illustrations (${this.illustrations.length} / ${this.totalCount.toLocaleString('fr-FR')})</span>
+          </button>
+          <div id="ill-sentinel-loader" style="height: 20px; width: 100%;"></div>
+        </div>
       `;
-    }).join('');
+    }
 
-    this.container.innerHTML = `<div class="illustrations-grid">${cardsHtml}</div>`;
+    this.container.innerHTML = `<div class="illustrations-grid" id="illustrations-grid-cards" style="width: 100%;">${cardsHtml}</div>${footerHtml}`;
 
-    // Clic sur carte -> ouvre en mode consultation par défaut
+    this.bindCardEvents();
+    this.bindPaginationEvents();
+  },
+
+  bindCardEvents() {
     this.container.querySelectorAll('.illustration-card').forEach(card => {
       card.addEventListener('click', () => {
         const id = card.dataset.illId;
@@ -284,7 +369,25 @@ const IllustrationsView = {
     });
   },
 
-  openModal(ill, isEdit = false) {
+  bindPaginationEvents() {
+    const btnLoadMore = document.getElementById('btn-load-more-illustrations');
+    btnLoadMore?.addEventListener('click', () => {
+      this.loadMore();
+    });
+
+    const sentinel = document.getElementById('ill-sentinel-loader');
+    if (sentinel && window.IntersectionObserver) {
+      if (this.observer) this.observer.disconnect();
+      this.observer = new IntersectionObserver((entries) => {
+        if (entries[0] && entries[0].isIntersecting && !this.isLoading && this.hasMore) {
+          this.loadMore();
+        }
+      }, { rootMargin: '350px' });
+      this.observer.observe(sentinel);
+    }
+  },
+
+  async openModal(ill, isEdit = false) {
     this.currentIllustration = JSON.parse(JSON.stringify(ill));
     this.isNew = Boolean(ill._isNew);
 
@@ -295,6 +398,23 @@ const IllustrationsView = {
     }
 
     if (this.modal) this.modal.classList.remove('hidden');
+
+    // Si le corps complet n'est pas encore chargé (fiche paginée légère), récupération instantanée du texte complet
+    if (!this.isNew && (!this.currentIllustration.body || this.currentIllustration.body.length <= 220)) {
+      try {
+        const fullIll = await API.getIllustration(ill.id);
+        if (fullIll && this.currentIllustration && this.currentIllustration.id === ill.id) {
+          this.currentIllustration = { ...this.currentIllustration, ...fullIll };
+          if (isEdit) {
+            this.showEditMode();
+          } else {
+            this.showViewMode();
+          }
+        }
+      } catch (e) {
+        console.warn('Erreur chargement texte intégral illustration:', e);
+      }
+    }
   },
 
   openViewModal(ill) {

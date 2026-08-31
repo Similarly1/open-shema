@@ -525,6 +525,16 @@ const API = {
     return await this.call('get_illustrations_list');
   },
 
+  async getIllustrationsPage(params = {}) {
+    const page = params.page || 1;
+    const pageSize = params.pageSize || params.page_size || 30;
+    const query = params.query || '';
+    const category = params.category || 'all';
+    const typeFilter = params.type || params.type_filter || 'all';
+    const statusFilter = params.status || params.status_filter || 'all';
+    return await this.call('get_illustrations_page', page, pageSize, query, category, typeFilter, statusFilter);
+  },
+
   async getIllustration(illId) {
     return await this.call('get_illustration', illId);
   },

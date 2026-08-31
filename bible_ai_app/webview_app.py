@@ -1715,6 +1715,32 @@ class BibleAppApi:
         self.config = load_config()
         return SermonsManager.list_illustrations(self.config)
 
+    def get_illustrations_page(
+        self,
+        page: int = 1,
+        page_size: int = 30,
+        query: str = "",
+        category: str = "all",
+        type_filter: str = "all",
+        status_filter: str = "all"
+    ) -> Dict[str, Any]:
+        """Retourne une page légère d'illustrations (sub-10ms)."""
+        self.config = load_config()
+        return SermonsManager.get_illustrations_page(
+            page=page,
+            page_size=page_size,
+            query=query,
+            category=category,
+            type_filter=type_filter,
+            status_filter=status_filter,
+            config=self.config
+        )
+
+    def get_illustration(self, ill_id: str) -> Optional[Dict[str, Any]]:
+        """Charge une illustration complète."""
+        self.config = load_config()
+        return SermonsManager.get_illustration(ill_id, self.config)
+
     def save_illustration(self, ill_data: Dict[str, Any]) -> Dict[str, Any]:
         """Enregistre ou met à jour une illustration dans le réservoir."""
         self.config = load_config()
@@ -4463,6 +4489,30 @@ class BibleAppApi:
         except Exception as e:
             logger.error(f"Erreur get_illustrations_list: {e}")
             return []
+
+    def get_illustrations_page(
+        self,
+        page: int = 1,
+        page_size: int = 30,
+        query: str = "",
+        category: str = "all",
+        type_filter: str = "all",
+        status_filter: str = "all"
+    ) -> Dict[str, Any]:
+        """Retourne une page légère d'illustrations (sub-10ms)."""
+        try:
+            return SermonsManager.get_illustrations_page(
+                page=page,
+                page_size=page_size,
+                query=query,
+                category=category,
+                type_filter=type_filter,
+                status_filter=status_filter,
+                config=self.config
+            )
+        except Exception as e:
+            logger.error(f"Erreur get_illustrations_page: {e}")
+            return {"items": [], "total": 0, "page": page, "page_size": page_size, "has_more": False}
 
     def get_illustration(self, ill_id: str) -> Optional[Dict[str, Any]]:
         """Charge une illustration complète."""
