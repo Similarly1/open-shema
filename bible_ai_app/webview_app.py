@@ -49,6 +49,7 @@ from core.reference_parser import (
     BOOKS_NT,
     BOOKS_DEUTERO,
     ALL_BOOKS,
+    BOOK_MAPPING,
     strip_accents
 )
 from core.pericope_manager import PericopeManager
