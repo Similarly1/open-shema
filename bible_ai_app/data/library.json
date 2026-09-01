@@ -926,22 +926,6 @@
     "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
     "active": true
   },
-  "GUTENBERG_2680": {
-    "title": "Pensées",
-    "author": "Blaise Pascal",
-    "description": "Apologie de la religion chrétienne et réflexions philosophiques et spirituelles.",
-    "year": "1.0.0",
-    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\GUTENBERG_2680.jpg",
-    "type": "Bible",
-    "format": "EPUB",
-    "file_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\bibles\\gutenberg_2680.json",
-    "folder_name": "GUTENBERG_2680",
-    "version_code": "GUTENBERG_2680",
-    "total_books": 66,
-    "embedding_model": "study_library",
-    "active": true,
-    "has_strongs": false
-  },
   "HODGE": {
     "name": "HODGE",
     "title": "Théologie Systématique (Charles Hodge - 3 Volumes)",
@@ -973,5 +957,23 @@
     "total_books": 66,
     "embedding_model": "study_library",
     "active": true
+  },
+  "ROBERTSON": {
+    "name": "ROBERTSON",
+    "title": "Word Pictures in the New Testament (A.T. Robertson - 6 Volumes)",
+    "author": "Archibald Thomas Robertson (A.T. Robertson)",
+    "description": "Ouvrage exégétique de référence mondial en 6 volumes analysant le texte grec des 27 livres du Nouveau Testament (260 chapitres, 7 208 versets). Nuances picturales, syntaxe et lemmes originaux.",
+    "year": "1933",
+    "cover_path": null,
+    "type": "Théologie",
+    "corpus_scope": "NT",
+    "source_type": "exegetical_grammar",
+    "book_code": null,
+    "format": "sqlite",
+    "active": true,
+    "chapters_count": 260,
+    "chunks_count": 260,
+    "file_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\theology\\word_pictures_robertson.sqlite",
+    "embedding_model": "bge_multilingual_gemma2 (Infomaniak)"
   }
 }

@@ -53,9 +53,9 @@ const LibraryView = {
     const filtered = this.books.filter(b => {
       const isOfficial = b.is_official === true || 
                          b.source === 'open-shema-data' || 
-                         ['strong', 'calmet', 'vigouroux', 'bailly'].includes(b.id || b.dict_id) || 
-                         (b.name && b.name.toLowerCase().includes('hodge')) || 
-                         (b.title && b.title.toLowerCase().includes('hodge'));
+                         ['vigouroux'].includes(b.id || b.dict_id) || 
+                         (b.name && (b.name.toLowerCase().includes('hodge') || b.name.toLowerCase().includes('calvin'))) || 
+                         (b.title && (b.title.toLowerCase().includes('hodge') || b.title.toLowerCase().includes('calvin')));
 
       if (type === 'openshema' && !isOfficial) return false;
       if (type !== 'Tous' && type !== 'openshema' && b.type !== type) return false;
@@ -86,9 +86,9 @@ const LibraryView = {
 
       const isOfficial = book.is_official === true || 
                          book.source === 'open-shema-data' || 
-                         ['strong', 'calmet', 'vigouroux', 'bailly'].includes(book.id || book.dict_id) || 
-                         (book.name && book.name.toLowerCase().includes('hodge')) || 
-                         (book.title && book.title.toLowerCase().includes('hodge'));
+                         ['vigouroux'].includes(book.id || book.dict_id) || 
+                         (book.name && (book.name.toLowerCase().includes('hodge') || book.name.toLowerCase().includes('calvin'))) || 
+                         (book.title && (book.title.toLowerCase().includes('hodge') || book.title.toLowerCase().includes('calvin')));
 
       // Initials ou code court pour couverture
       let initials = book.version_code || book.code || '';

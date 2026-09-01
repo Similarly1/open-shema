@@ -112,10 +112,12 @@ class LibraryMixin:
                 b.get("is_official") is True
                 or b.get("is_builtin") is True
                 or b.get("source") == "open-shema-data"
-                or b_id_l in ["strong", "calmet", "vigouroux", "bailly"]
+                or b_id_l in ["vigouroux"]
                 or "hodge" in b_name_l
                 or "hodge" in b_title_l
                 or "hodge" in b_path_l
+                or "calvin" in b_name_l
+                or "calvin" in b_title_l
             )
             b["is_official"] = is_off
 

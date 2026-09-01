@@ -140,9 +140,10 @@ class TheologyReaderManager:
         except Exception as _silent_e:
             logger.debug("Erreur ignoree : %s", _silent_e)
 
-        # Fallback sur le dossier data/ebooks/ local à l'installation
+        # Fallback sur les dossiers data/theology/ et data/ebooks/ locaux à l'installation
         _app_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         candidate_dirs += [
+            os.path.join(_app_root, "data", "theology"),
             os.path.join(_app_root, "data", "ebooks"),
             os.path.join(_app_root, "data"),
         ]
@@ -474,7 +475,7 @@ class TheologyReaderManager:
                         "section_title": s_title,
                         "name": book_name,
                         "title": book_meta.get("title", book_name),
-                        "author": book_meta.get("author", "Charles Hodge"),
+                        "author": book_meta.get("author", ""),
                         "part_title": p_title,
                         "volume_num": v_num,
                         "chapter_id": ord_idx
@@ -486,7 +487,7 @@ class TheologyReaderManager:
                             "section_title": s_title,
                             "name": book_name,
                             "title": book_meta.get("title", book_name),
-                            "author": book_meta.get("author", "Charles Hodge"),
+                            "author": book_meta.get("author", ""),
                             "chapter_id": ord_idx
                         }, p_text))
                 conn.close()
