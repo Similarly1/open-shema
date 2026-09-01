@@ -230,12 +230,33 @@ const ArticlesView = {
       });
     });
 
-    // 3. Bouton Suggérer un blog (ouvre la modale)
+    // 3. Bouton Gérer les flux (ouvre le popover déroulant)
+    const btnManageSources = document.getElementById('btn-manage-sources');
+    const popoverSources = document.getElementById('articles-sources-popover');
+
+    btnManageSources?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (popoverSources) {
+        const isHidden = popoverSources.classList.toggle('hidden');
+        if (!isHidden) {
+          this.renderSourcesPopover();
+        }
+      }
+    });
+
+    // Bouton Proposer un nouveau flux depuis le popover
+    document.getElementById('btn-popover-open-suggest')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      popoverSources?.classList.add('hidden');
+      this.openSuggestModal();
+    });
+
+    // 3b. Bouton Suggérer un blog (ouvre la modale)
     document.getElementById('btn-suggest-blog')?.addEventListener('click', () => {
       this.openSuggestModal();
     });
 
-    // 3b. Contrôles de la modale de suggestion
+    // 3c. Contrôles de la modale de suggestion
     document.getElementById('btn-close-suggest-modal')?.addEventListener('click', () => {
       this.closeSuggestModal();
     });
@@ -244,6 +265,13 @@ const ArticlesView = {
     });
     document.getElementById('btn-submit-suggest')?.addEventListener('click', () => {
       this.submitSuggestion();
+    });
+
+    // Fermer les popovers au clic en dehors
+    document.addEventListener('click', (e) => {
+      if (popoverSources && !popoverSources.classList.contains('hidden') && !popoverSources.contains(e.target) && !btnManageSources?.contains(e.target)) {
+        popoverSources.classList.add('hidden');
+      }
     });
 
     // 4. Bouton Retour dans la vue lecture
@@ -435,9 +463,59 @@ const ArticlesView = {
     try {
       this.sources = await API.call('get_article_sources') || [];
       this.renderSourceFilters();
+      this.renderSourcesPopover();
     } catch (e) {
       console.error('[ArticlesView] Erreur chargement sources:', e);
     }
+  },
+
+  renderSourcesPopover() {
+    const listEl = document.getElementById('sources-popover-list');
+    const countEl = document.getElementById('sources-popover-count');
+    if (!listEl) return;
+
+    const sources = this.sources || [];
+    if (countEl) {
+      countEl.textContent = `${sources.length} source${sources.length > 1 ? 's' : ''}`;
+    }
+
+    listEl.innerHTML = '';
+    sources.forEach(src => {
+      const isEnabled = src.enabled !== false && src.is_enabled !== 0 && src.is_enabled !== false;
+      const logoUrl = this.getSourceLogo(src.id);
+      const item = document.createElement('div');
+      item.className = 'sources-popover-item';
+      item.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+          ${logoUrl ? `<img src="${logoUrl}" alt="" style="height: 16px; width: auto; max-width: 32px; object-fit: contain;">` : `<span class="source-bullet" style="background-color: ${this.getSourceColor(src.id)};"></span>`}
+          <div style="min-width: 0;">
+            <div style="font-size: 0.82rem; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${this.escapeHtml(src.name || src.id)}</div>
+            <div style="font-size: 0.7rem; color: var(--text-muted);">${src.article_count || 0} articles</div>
+          </div>
+        </div>
+        <label class="custom-checkbox" style="margin: 0; cursor: pointer;" title="${isEnabled ? 'Désactiver ce flux' : 'Activer ce flux'}">
+          <input type="checkbox" ${isEnabled ? 'checked' : ''} data-source-id="${src.id}" style="accent-color: var(--accent-primary, #3b82f6); width: 15px; height: 15px; cursor: pointer;">
+        </label>
+      `;
+
+      const chk = item.querySelector('input[type="checkbox"]');
+      chk.addEventListener('change', async (e) => {
+        const checked = e.target.checked;
+        src.is_enabled = checked ? 1 : 0;
+        src.enabled = checked;
+        await API.call('toggle_article_source', src.id, checked);
+        this.renderSourceFilters();
+        await this.loadArticles();
+        if (typeof SettingsView !== 'undefined' && SettingsView.loadArticleSources) {
+          SettingsView.loadArticleSources();
+        }
+        if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast(`Flux ${src.name || src.id} : ${checked ? 'activé' : 'désactivé'}`);
+        }
+      });
+
+      listEl.appendChild(item);
+    });
   },
 
   renderSourceFilters() {
@@ -675,11 +753,29 @@ const ArticlesView = {
       const imageUrl = art.image_url;
       const avatarUrl = art.author_avatar_url;
 
+      const isPodcast = !!art.audio_url || (art.tags_list || []).some(t => /podcast|prédication|predication|audio/i.test(t));
+      const podcastRibbonHtml = isPodcast ? `
+        <div class="article-podcast-ribbon" title="Format Audio / Podcast">
+          <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+            <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+          </svg>
+          <span>Podcast</span>
+        </div>
+      ` : '';
+
       let thumbHtml = '';
       if (imageUrl) {
         thumbHtml = `
           <div class="article-card-thumb-wrap">
             <img src="${this.escapeHtml(imageUrl)}" alt="${this.escapeHtml(art.title)}" class="article-card-thumb-img" loading="lazy">
+            ${podcastRibbonHtml}
+          </div>
+        `;
+      } else if (isPodcast) {
+        thumbHtml = `
+          <div class="article-card-thumb-wrap" style="background: linear-gradient(135deg, rgba(30,41,59,0.8), rgba(15,23,42,0.9)); min-height: 70px; display: flex; align-items: center; justify-content: flex-end; padding: 8px;">
+            ${podcastRibbonHtml}
           </div>
         `;
       }
@@ -712,9 +808,6 @@ const ArticlesView = {
         `;
       }
 
-      const isPodcast = !!art.audio_url || (art.tags_list || []).some(t => /podcast|prédication|predication|audio/i.test(t));
-      const podcastBadgeHtml = isPodcast ? `<span class="article-podcast-badge">🎧 Podcast</span>` : '';
-
       html += `
         <div class="article-card" data-article-id="${art.id}">
           ${thumbHtml}
@@ -725,7 +818,6 @@ const ArticlesView = {
                 <span class="article-source-badge" style="background-color: ${color}18; color: ${color}; border: 1px solid ${color}35;">
                   ${this.getSourceLogo(art.source_id) ? `<img src="${this.getSourceLogo(art.source_id)}" alt="" class="article-source-logo-img">` : ''}<span>${this.escapeHtml(art.source_name || art.source_id)}</span>
                 </span>
-                ${podcastBadgeHtml}
               </div>
               <span class="article-pub-date">${pubDate}</span>
             </div>
@@ -943,7 +1035,8 @@ const ArticlesView = {
       if (tagsEl) {
         let tagsHtml = '';
         if (podcastSeriesName) {
-          tagsHtml += `<span class="article-topic-tag article-topic-tag-podcast" data-tag="${this.escapeHtml(podcastSeriesName)}">🎙️ Série : ${this.escapeHtml(podcastSeriesName)}</span>`;
+          tagsHtml += `<span class="article-topic-tag article-topic-tag-podcast" data-tag="${this.escapeHtml(podcastSeriesName)}">
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: -1px;"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>Série : ${this.escapeHtml(podcastSeriesName)}</span>`;
         }
         if (mainTags.length > 0) {
           tagsHtml += mainTags.map(t => `<span class="article-topic-tag" data-tag="${this.escapeHtml(t)}">${this.escapeHtml(t)}</span>`).join('');
@@ -1452,19 +1545,24 @@ const ArticlesView = {
     }
 
     try {
-      const res = await API.call('get_article_suggestion_url', name, url, reason);
+      const res = await API.call('suggest_article_source', name, url, reason, '');
       this.closeSuggestModal();
 
-      if (res && res.success && res.mailto_url) {
-        window.location.href = res.mailto_url;
-      }
-
-      if (typeof App !== 'undefined' && App.showToast) {
-        App.showToast('Merci ! Votre suggestion a été préparée.', 'success');
+      if (res && res.success) {
+        if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast(res.message || 'Merci ! Votre suggestion a été transmise avec succès.', 'success');
+        }
+      } else {
+        if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast('Erreur lors de l\'envoi de la suggestion.', 'error');
+        }
       }
     } catch (e) {
       console.error('[ArticlesView] Erreur suggestion:', e);
       this.closeSuggestModal();
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast('Merci ! Votre suggestion a été enregistrée.', 'info');
+      }
     }
   },
 

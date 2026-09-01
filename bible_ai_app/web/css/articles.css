@@ -53,38 +53,157 @@
 .articles-header-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  position: relative;
 }
 
-.btn-articles-action {
+.btn-articles-icon {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 7px 14px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  border-radius: 6px;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0;
+  border-radius: 8px;
   border: 1px solid var(--border-color, rgba(255,255,255,0.12));
   background: var(--bg-card, rgba(255,255,255,0.04));
   color: var(--text-primary, #f1f5f9);
   cursor: pointer;
-  text-decoration: none;
-  transition: all 0.15s ease;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.btn-articles-action:hover {
+.btn-articles-icon:hover {
   background: var(--bg-hover, rgba(255,255,255,0.08));
   border-color: var(--accent-primary, #3b82f6);
+  color: var(--accent-primary, #3b82f6);
+  transform: translateY(-1px);
 }
 
-.btn-articles-primary {
+.btn-articles-icon.btn-articles-primary {
   background: var(--accent-primary, #2563eb);
   color: #ffffff;
-  border: none;
+  border-color: transparent;
 }
 
-.btn-articles-primary:hover {
+.btn-articles-icon.btn-articles-primary:hover {
   background: #1d4ed8;
+  color: #ffffff;
+}
+
+.btn-articles-icon.is-spinning svg {
+  animation: spin 1s linear infinite;
+}
+
+/* POPOVER GESTION DES FLUX RSS */
+.articles-sources-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 310px;
+  background: var(--bg-surface, #1e293b);
+  border: 1px solid var(--border-color, rgba(255,255,255,0.15));
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: popoverFadeIn 0.15s ease-out;
+}
+
+@keyframes popoverFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.sources-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--bg-subtle, rgba(255,255,255,0.02));
+  border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.08));
+}
+
+.sources-popover-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.sources-popover-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 6px;
+  transition: background 0.12s;
+  cursor: pointer;
+}
+
+.sources-popover-item:hover {
+  background: var(--bg-hover, rgba(255,255,255,0.05));
+}
+
+.sources-popover-footer {
+  padding: 8px 12px;
+  background: var(--bg-subtle, rgba(255,255,255,0.02));
+  border-top: 1px solid var(--border-color, rgba(255,255,255,0.08));
+}
+
+.btn-popover-suggest {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  justify-content: center;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary, #94a3b8);
+  background: transparent;
+  border: 1px dashed var(--border-color, rgba(255,255,255,0.18));
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-popover-suggest:hover {
+  color: var(--accent-primary, #3b82f6);
+  border-color: var(--accent-primary, #3b82f6);
+  background: rgba(59,130,246,0.06);
+}
+
+/* RUBAN FLOTTANT PODCAST / AUDIO */
+.article-podcast-ribbon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #f8fafc;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  z-index: 3;
+}
+
+.article-podcast-ribbon svg {
+  color: #38bdf8;
+  flex-shrink: 0;
 }
 
 /* Barre de recherche et filtres de sources */

@@ -994,7 +994,7 @@
           </span>
           <span class="nav-label">Théologie</span>
         </button>
-        <button class="nav-item" data-nav-id="articles" data-view="articles" id="nav-articles" title="Articles & Blogs théologiques">
+        <button class="nav-item" data-nav-id="articles" data-view="articles" id="nav-articles" title="Articles de Blogs théologiques">
           <span class="nav-icon">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path>
@@ -1003,7 +1003,7 @@
               <path d="M10 6h8v4h-8V6Z"></path>
             </svg>
           </span>
-          <span class="nav-label">Articles</span>
+          <span class="nav-label">Articles de Blogs</span>
         </button>
         <button class="nav-item" data-nav-id="dict" data-view="dict" id="nav-dict" title="Dictionnaires & Lexiques">
           <span class="nav-icon">
@@ -1599,7 +1599,7 @@
                 <path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10l6 6v8a2 2 0 0 1-2 2z"></path>
                 <path d="M14 2v6h6"></path>
               </svg>
-              <span>Articles & Blogs</span>
+              <span>Articles de Blogs</span>
             </button>
             <button class="settings-tab" data-sec="ai">
               <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -5878,25 +5878,55 @@
           <div id="articles-list-section">
             <div class="articles-header">
               <div class="articles-header-left">
-                <h1 class="articles-main-title">Articles & Blogs Théologiques</h1>
+                <h1 class="articles-main-title">Articles de Blogs Théologiques</h1>
                 <p class="articles-sub-title">Méditations pastorales, études contemporaines et réflexions éthiques reliées aux Écritures</p>
               </div>
               <div class="articles-header-actions">
-                <button class="btn-articles-action" id="btn-articles-settings" title="Configurer la synchronisation et les options des articles">
-                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                <!-- Bouton 1 : Gérer les flux RSS -->
+                <button class="btn-articles-icon" id="btn-manage-sources" title="Gérer les flux RSS (activer / désactiver)">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 11a9 9 0 0 1 9 9"></path>
+                    <path d="M4 4a16 16 0 0 1 16 16"></path>
+                    <circle cx="5" cy="19" r="1"></circle>
                   </svg>
-                  <span>Réglages</span>
                 </button>
-                <button class="btn-articles-action" id="btn-suggest-blog" title="Proposer un nouveau blog théologique">
-                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                  <span>Suggérer une source</span>
+
+                <!-- Bouton 2 : Synchroniser -->
+                <button class="btn-articles-icon btn-articles-primary" id="btn-sync-articles" title="Synchroniser les derniers articles des flux RSS">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 4v6h-6"></path>
+                    <path d="M1 20v-6h6"></path>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                  </svg>
                 </button>
-                <button class="btn-articles-action btn-articles-primary" id="btn-sync-articles" title="Synchroniser les derniers articles des flux RSS">
-                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-                  <span>Synchroniser</span>
+
+                <!-- Bouton 3 : Réglages & RAG IA -->
+                <button class="btn-articles-icon" id="btn-articles-settings" title="Options et indexation vectorielle IA">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                  </svg>
                 </button>
+
+                <!-- POPOVER GÉRER LES FLUX -->
+                <div class="articles-sources-popover hidden" id="articles-sources-popover">
+                  <div class="sources-popover-header">
+                    <div style="display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.82rem; color: var(--text-primary);">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+                      <span>Gestion des flux RSS</span>
+                    </div>
+                    <span style="font-size: 0.72rem; color: var(--text-muted);" id="sources-popover-count"></span>
+                  </div>
+                  <div class="sources-popover-list" id="sources-popover-list">
+                    <!-- Injecté dynamiquement avec cases à cocher -->
+                  </div>
+                  <div class="sources-popover-footer">
+                    <button type="button" class="btn-popover-suggest" id="btn-popover-open-suggest">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                      <span>Proposer un nouveau flux</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 

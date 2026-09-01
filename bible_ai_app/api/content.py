@@ -218,6 +218,55 @@ class ContentMixin:
             logger.error(f"Erreur API get_articles_for_passage: {e}")
             return []
 
+    def suggest_article_source(self, blog_name: str = "", blog_url: str = "", notes: str = "", user_email: str = "") -> Dict[str, Any]:
+        """Transmet une suggestion de blog/flux RSS vers l'alias email configuré 0wl8a4k7@family3130.anonaddy.com."""
+        import urllib.request
+        import urllib.parse
+        import json
+
+        FEEDBACK_EMAIL = "0wl8a4k7@family3130.anonaddy.com"
+        try:
+            subject = f"[Open Shema Flux RSS] Suggestion de source : {blog_name}"
+            payload = {
+                "_subject": subject,
+                "Nom_du_blog": str(blog_name or "Non spécifié"),
+                "URL_du_site_ou_flux": str(blog_url or "Non spécifié"),
+                "Recommandation_ou_remarque": str(notes or ""),
+                "Email_expediteur": str(user_email) if user_email else "Non renseigné",
+                "_template": "table",
+                "_captcha": "false"
+            }
+            url = f"https://formsubmit.co/ajax/{FEEDBACK_EMAIL}"
+            data = json.dumps(payload).encode("utf-8")
+            req = urllib.request.Request(
+                url,
+                data=data,
+                headers={
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) OpenShema/1.0",
+                    "Referer": "https://openshema.app/",
+                    "Origin": "https://openshema.app"
+                }
+            )
+            with urllib.request.urlopen(req, timeout=12) as response:
+                res_body = response.read().decode("utf-8")
+                res_json = json.loads(res_body)
+                return {"success": True, "message": "Merci ! Votre suggestion de flux a été transmise avec succès."}
+        except Exception as e:
+            logger.error(f"[ContentMixin] Erreur envoi suggestion de flux: {e}")
+            # Fallback mailto si hors ligne
+            try:
+                from core.articles_manager import ArticlesManager
+                url = ArticlesManager.get_suggestion_mailto_link(
+                    blog_name=blog_name,
+                    blog_url=blog_url,
+                    notes=notes
+                )
+                return {"success": True, "mailto_url": url, "message": "Suggestion préparée."}
+            except Exception:
+                return {"success": False, "error": str(e)}
+
     def get_article_suggestion_url(self, blog_name: str = "", blog_url: str = "", notes: str = "") -> Dict[str, Any]:
         """Génère le lien mailto pour proposer une nouvelle source."""
         try:
