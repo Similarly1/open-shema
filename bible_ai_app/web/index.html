@@ -1586,24 +1586,13 @@
               </svg>
               <span>Notes & Surlignages</span>
             </button>
-            <button class="settings-tab" data-sec="stepbible">
-              <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="m5 8 6 6"></path>
-                <path d="m4 14 6-6 2-3"></path>
-                <path d="M2 5h12"></path>
-                <path d="M7 2h1"></path>
-                <path d="m22 22-5-10-5 10"></path>
-                <path d="M14 18h6"></path>
-              </svg>
-              <span>STEPBible (Grec/Hébreu)</span>
-            </button>
             <button class="settings-tab" data-sec="dict">
               <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
                 <path d="M6 6h10"></path>
                 <path d="M6 10h10"></path>
               </svg>
-              <span>Dictionnaires</span>
+              <span>Dictionnaires & Langues Originales</span>
             </button>
             <button class="settings-tab" data-sec="articles">
               <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -2137,7 +2126,7 @@
                       <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
                     </svg>
                     <span>Ouvrir</span>
-                  </button>
+</button>
                   <button class="btn-secondary" id="btn-reset-ebooks-dir" title="Revenir au dossier par défaut (data/ebooks/)">
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
@@ -2153,14 +2142,31 @@
             </div>
           </div>
 
-          <!-- Section 3 : STEPBible -->
-
-          <div class="settings-section" id="sec-stepbible">
+          <!-- Section 3 : Dictionnaires & Langues Originales (STEPBible) -->
+          <div class="settings-section" id="sec-dict">
+            <!-- Carte 1 : Dictionnaires & Ordre de Priorité -->
             <div class="settings-card">
-              <div class="card-title">Langues Originales & Exégèse (STEPBible)</div>
+              <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-primary, #3b82f6);"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path><path d="M6 6h10"></path><path d="M6 10h10"></path></svg>
+                <span>Dictionnaires Bibliques &amp; Ordre de Priorité</span>
+              </div>
+              <p class="card-desc">Activez, désactivez ou réordonnez vos dictionnaires (le 1er dictionnaire activé s'affiche en tête dans l'info-bulle au clic sur un mot) :</p>
               
-              <div class="form-slider-row">
-                <label>Max versets originaux envoyés au LLM :</label>
+              <div class="dict-reorder-list" id="dict-reorder-list">
+                <!-- Liste des dictionnaires injectée ici -->
+              </div>
+            </div>
+
+            <!-- Carte 2 : Langues Originales & STEPBible -->
+            <div class="settings-card" style="margin-top: 16px;">
+              <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-orange, #f59e0b);"><path d="m5 8 6 6"></path><path d="m4 14 6-6 2-3"></path><path d="M2 5h12"></path><path d="M7 2h1"></path><path d="m22 22-5-10-5 10"></path><path d="M14 18h6"></path></svg>
+                <span>Langues Originales &amp; Exégèse (STEPBible)</span>
+              </div>
+              <p class="card-desc">Base morphologique hébreu massorétique et grec koiné pour l'interlinéaire inversé et l'alimentation exégétique de l'IA.</p>
+              
+              <div class="form-slider-row" style="margin-bottom: 14px;">
+                <label style="font-size: 13px; font-weight: 500;">Max versets originaux transmis au LLM :</label>
                 <input type="range" id="cfg-max-orig-verses" min="1" max="30" value="10" class="slider-field">
                 <span class="slider-badge" id="lbl-max-orig-val">10 vers.</span>
               </div>
@@ -2170,26 +2176,14 @@
                 <span id="stepbible-status-text">Vérification de la base STEPBible...</span>
               </div>
 
-              <button class="btn-secondary" id="btn-reindex-stepbible">
+              <button class="btn-secondary" id="btn-reindex-stepbible" style="margin-top: 10px;">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                   <polyline points="7 10 12 15 17 10"></polyline>
-                  <line x1="12" x2="12" y1="15" y2="3"></line>
+                  <line x1="12" x2="12" y1="3" y2="15"></line>
                 </svg>
-                <span>Télécharger & Réindexer STEPBible</span>
+                <span>Télécharger &amp; Réindexer STEPBible</span>
               </button>
-            </div>
-          </div>
-
-          <!-- Section 4 : Dictionnaires -->
-          <div class="settings-section" id="sec-dict">
-            <div class="settings-card">
-              <div class="card-title">Dictionnaires & Ordre de Priorité</div>
-              <p class="card-desc">Activez et ordonnez vos dictionnaires (le 1er s'affiche en tête de l'info-bulle) :</p>
-              
-              <div class="dict-reorder-list" id="dict-reorder-list">
-                <!-- Liste des dictionnaires injectée ici -->
-              </div>
             </div>
           </div>
 
@@ -3313,7 +3307,7 @@
               </div>
               <p class="card-desc">Consultez les blogs et plateformes pastorales officielles synchronisés avec votre application.</p>
 
-              <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px;">
+              <div id="settings-articles-sources-list" style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px;">
                 <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px;">
                   <div style="display: flex; align-items: center; gap: 12px;">
                     <img src="img/sources/tpsg.svg" alt="TPSG" style="height: 22px; width: auto; max-width: 50px; object-fit: contain;">
@@ -3322,7 +3316,10 @@
                       <div style="font-size: 0.78rem; color: var(--text-muted);">Articles, réflexions pastorales et podcasts de prédications textuelles</div>
                     </div>
                   </div>
-                  <span class="badge-pill" style="font-size: 0.75rem; background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); padding: 2px 8px; border-radius: 12px; font-weight: 600;">Actif</span>
+                  <label class="custom-checkbox" style="cursor: pointer; margin: 0;">
+                    <input type="checkbox" checked data-source-id="tpsg" style="accent-color: var(--accent-primary, #3b82f6); width: 16px; height: 16px; cursor: pointer;">
+                    <span style="font-size: 0.78rem; font-weight: 600; color: var(--accent-primary, #3b82f6); margin-left: 6px;">Actif</span>
+                  </label>
                 </div>
 
                 <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px;">
@@ -3333,7 +3330,10 @@
                       <div style="font-size: 0.78rem; color: var(--text-muted);">Études théologiques approfondies, recensions d'ouvrages et éthique chrétienne</div>
                     </div>
                   </div>
-                  <span class="badge-pill" style="font-size: 0.75rem; background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); padding: 2px 8px; border-radius: 12px; font-weight: 600;">Actif</span>
+                  <label class="custom-checkbox" style="cursor: pointer; margin: 0;">
+                    <input type="checkbox" checked data-source-id="e21" style="accent-color: var(--accent-primary, #3b82f6); width: 16px; height: 16px; cursor: pointer;">
+                    <span style="font-size: 0.78rem; font-weight: 600; color: var(--accent-primary, #3b82f6); margin-left: 6px;">Actif</span>
+                  </label>
                 </div>
               </div>
             </div>

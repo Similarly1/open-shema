@@ -228,6 +228,11 @@ const SettingsView = {
 
     if (secId === 'articles') {
       this.updateArticlesLastSyncLabel();
+      this.loadArticleSources();
+    }
+    if (secId === 'dict') {
+      this.loadDictionaries();
+      this.loadStepBibleStatus();
     }
 
     if (scrollTargetId) {
@@ -1147,6 +1152,7 @@ Règles impératives :
       this.loadTheologicalProfileCard();
       this.loadStepBibleStatus();
       this.loadDictionaries();
+      this.loadArticleSources();
     } catch (e) {
       console.error('Erreur chargement paramètres:', e);
     }
@@ -1953,6 +1959,7 @@ Règles impératives :
 
   async loadDictionaries() {
     const listEl = document.getElementById('dict-reorder-list');
+    if (!listEl) return;
     listEl.innerHTML = '';
     try {
       this.dictionaries = await API.call('get_dictionaries') || [];
@@ -1961,9 +1968,13 @@ Règles impératives :
         item.className = 'dict-item-row';
         item.innerHTML = `
           <span class="prio-tag">#${idx + 1}</span>
-          <button class="btn-prio-move" data-dir="-1" ${idx === 0 ? 'disabled' : ''}>▲</button>
-          <button class="btn-prio-move" data-dir="1" ${idx === this.dictionaries.length - 1 ? 'disabled' : ''}>▼</button>
-          <label class="custom-checkbox" style="margin-left: 8px;">
+          <button class="btn-prio-move" data-dir="-1" title="Monter la priorité" ${idx === 0 ? 'disabled' : ''}>
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+          </button>
+          <button class="btn-prio-move" data-dir="1" title="Descendre la priorité" ${idx === this.dictionaries.length - 1 ? 'disabled' : ''}>
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <label class="custom-checkbox" style="margin-left: 8px; cursor: pointer;">
             <input type="checkbox" ${d.enabled !== false ? 'checked' : ''} data-dict-id="${d.id}">
             <span>${d.name} ${d.count ? `(${d.count.toLocaleString()} articles)` : ''}</span>
           </label>
@@ -1996,6 +2007,52 @@ Règles impératives :
       this.dictionaries[targetIdx] = temp;
       API.call('save_dictionaries', this.dictionaries);
       this.loadDictionaries();
+    }
+  },
+
+  async loadArticleSources() {
+    const listEl = document.getElementById('settings-articles-sources-list');
+    if (!listEl) return;
+    try {
+      const sources = await API.call('get_article_sources') || [];
+      if (!sources || sources.length === 0) return;
+      listEl.innerHTML = '';
+      sources.forEach(src => {
+        const isEnabled = src.enabled !== false;
+        const logoPath = src.id === 'tpsg' ? 'img/sources/tpsg.svg' : (src.id === 'e21' ? 'img/sources/e21.svg' : 'img/logo.svg');
+        const item = document.createElement('div');
+        item.style.cssText = 'display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px;';
+        item.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="${logoPath}" alt="${src.name || src.id}" style="height: 22px; width: auto; max-width: 50px; object-fit: contain;">
+            <div>
+              <div style="font-weight: 600; font-size: 0.88rem; color: var(--text-primary);">${src.name || src.id}</div>
+              <div style="font-size: 0.78rem; color: var(--text-muted);">${src.description || ''} ${src.article_count ? `• ${src.article_count} articles` : ''}</div>
+            </div>
+          </div>
+          <label class="custom-checkbox" style="cursor: pointer; margin: 0; display: flex; align-items: center;">
+            <input type="checkbox" ${isEnabled ? 'checked' : ''} data-source-id="${src.id}" style="accent-color: var(--accent-primary, #3b82f6); width: 16px; height: 16px; cursor: pointer;">
+            <span class="source-status-text" style="font-size: 0.78rem; font-weight: 600; color: ${isEnabled ? 'var(--accent-primary, #3b82f6)' : 'var(--text-muted)'}; margin-left: 6px;">${isEnabled ? 'Actif' : 'Désactivé'}</span>
+          </label>
+        `;
+
+        const chk = item.querySelector('input[type="checkbox"]');
+        const span = item.querySelector('.source-status-text');
+        chk.addEventListener('change', async (e) => {
+          const checked = e.target.checked;
+          span.textContent = checked ? 'Actif' : 'Désactivé';
+          span.style.color = checked ? 'var(--accent-primary, #3b82f6)' : 'var(--text-muted)';
+          await API.call('toggle_article_source', src.id, checked);
+          if (typeof ArticlesView !== 'undefined' && ArticlesView.loadSources) {
+            ArticlesView.loadSources();
+          }
+          App.showToast(`Flux ${src.name || src.id} : ${checked ? 'activé' : 'désactivé'}`);
+        });
+
+        listEl.appendChild(item);
+      });
+    } catch (e) {
+      console.error('Erreur chargement sources articles:', e);
     }
   },
 
