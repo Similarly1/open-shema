@@ -535,7 +535,7 @@ const DictView = {
     // Visibilité des boutons conditionnés selon la provenance (Officiel Open Shema vs Import Utilisateur)
     const btnPolish = document.getElementById('btn-dict-polish-article');
     const btnReportTypo = document.getElementById('btn-dict-report-typo');
-    const isOfficialOpenShema = ['strong', 'calmet', 'vigouroux', 'bailly', 'nouveau_dictionnaire'].includes(dInfo.id) || dInfo.is_official || dInfo.is_builtin || dInfo.source === 'open-shema-data';
+    const isOfficialOpenShema = ['strong', 'calmet', 'vigouroux', 'bailly'].includes(dInfo.id) || dInfo.is_official === true || dInfo.is_builtin === true || dInfo.source === 'open-shema-data';
     
     // Polir IA : Uniquement pour les ouvrages de l'utilisateur
     if (btnPolish) {
