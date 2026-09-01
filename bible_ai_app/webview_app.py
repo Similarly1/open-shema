@@ -2049,6 +2049,7 @@ class BibleAppApi:
             "bibles": True,
             "commentaries": True,
             "dictionaries": True,
+            "articles": True,
             "notes": True
         })
         
@@ -2326,6 +2327,72 @@ class BibleAppApi:
                     })
             except Exception as e:
                 logger.error(f"[ask_study_ai] Erreur extraction notes : {e}")
+
+        # 5. Extraction des Articles & Blogs contemporains
+        if sources_cfg.get("articles", True) and not is_light_free_chat:
+            try:
+                from core.articles_manager import ArticlesManager
+                from core.database import VectorDB
+                
+                art_mgr = ArticlesManager.get_instance()
+                art_seen = set()
+                
+                # A. Si un passage est spécifié, rechercher les articles liés au passage
+                if passage_ref and passage_ref.strip():
+                    parsed = self.parse_reference(passage_ref)
+                    if parsed and parsed.get("book"):
+                        b_code = parsed["book"]
+                        ch_num = parsed.get("chapter") or 1
+                        passage_articles = art_mgr.get_articles_for_passage(b_code, ch_num, limit=3)
+                        for pa in passage_articles:
+                            art_id = pa.get("id")
+                            if art_id and art_id not in art_seen:
+                                art_seen.add(art_id)
+                                content = pa.get("content_markdown") or pa.get("summary") or ""
+                                src_name = pa.get("source_name") or "Article"
+                                title = pa.get("title") or "Article"
+                                context_chunks.append({
+                                    "id": f"article_{art_id}",
+                                    "text": f"### Article contemporain [{src_name} : {title}] :\n{content[:1000]}",
+                                    "metadata": {
+                                        "type": "Article",
+                                        "name": f"{src_name} ({title})",
+                                        "author": pa.get("author", src_name),
+                                        "title": title,
+                                        "url": pa.get("url", "")
+                                    }
+                                })
+                
+                # B. Recherche vectorielle par mots-clés de la question
+                vdb = VectorDB.get_instance()
+                if vdb:
+                    query_text = f"{passage_ref} {question}".strip()
+                    try:
+                        search_res = vdb.search(query_text, n_results=3, where={"source_type": "contemporary_article"})
+                        docs = search_res.get("documents", [[]])[0] if search_res else []
+                        metas = search_res.get("metadatas", [[]])[0] if search_res else []
+                        for idx, doc in enumerate(docs):
+                            meta = metas[idx] if idx < len(metas) else {}
+                            art_title = meta.get("title") or "Article"
+                            src_name = meta.get("source_name") or meta.get("name") or "Blog"
+                            t_key = f"{src_name}:{art_title}".lower()
+                            if t_key not in art_seen:
+                                art_seen.add(t_key)
+                                context_chunks.append({
+                                    "id": f"article_vdb_{idx}",
+                                    "text": f"### Extrait d'Article [{src_name} : {art_title}] :\n{doc[:900]}",
+                                    "metadata": {
+                                        "type": "Article",
+                                        "name": f"{src_name} ({art_title})",
+                                        "author": meta.get("author", src_name),
+                                        "title": art_title,
+                                        "url": meta.get("url", "")
+                                    }
+                                })
+                    except Exception as ve:
+                        logger.debug(f"[ask_study_ai] Recherche vectorielle articles : {ve}")
+            except Exception as e:
+                logger.error(f"[ask_study_ai] Erreur extraction articles : {e}")
         # 5. Pipeline RAG : Reranking sémantique & Curation
         if enable_rerank and len(context_chunks) > 1:
             try:

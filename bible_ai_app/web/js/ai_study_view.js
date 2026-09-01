@@ -356,9 +356,9 @@ const AIStudyView = {
       const snippetEl = document.getElementById('flyout-profile-prompt-snippet');
       if (snippetEl) {
         if (profile.system_profile_prompt && profile.system_profile_prompt.trim()) {
-          snippetEl.textContent = profile.system_profile_prompt.trim();
+          snippetEl.innerHTML = this.formatMarkdown(profile.system_profile_prompt.trim());
         } else {
-          snippetEl.textContent = "Aucun passeport herméneutique généré. Cliquez sur Modifier pour calibrer l'assistant.";
+          snippetEl.innerHTML = '<span style="color: var(--text-muted); font-style: italic;">Aucun passeport herméneutique généré. Cliquez sur Modifier pour calibrer l\'assistant.</span>';
         }
       }
     } catch (e) {
@@ -979,6 +979,7 @@ const AIStudyView = {
     const chkBibles = document.getElementById('ai-opt-src-bibles');
     const chkComms = document.getElementById('ai-opt-src-comms');
     const chkDict = document.getElementById('ai-opt-src-dict');
+    const chkArticles = document.getElementById('ai-opt-src-articles');
     const chkNotes = document.getElementById('ai-opt-src-notes');
     const chkRerank = document.getElementById('ai-opt-reranking');
     const chkCurator = document.getElementById('ai-opt-curator');
@@ -991,6 +992,7 @@ const AIStudyView = {
       if (chkBibles) chkBibles.checked = false;
       if (chkComms) chkComms.checked = false;
       if (chkDict) chkDict.checked = false;
+      if (chkArticles) chkArticles.checked = false;
       if (chkNotes) chkNotes.checked = false;
       if (chkRerank) chkRerank.checked = false;
       if (chkCurator) chkCurator.checked = false;
@@ -1005,6 +1007,7 @@ const AIStudyView = {
       if (chkBibles) chkBibles.checked = true;
       if (chkComms) chkComms.checked = true;
       if (chkDict) chkDict.checked = true;
+      if (chkArticles) chkArticles.checked = true;
       if (chkNotes) {
         const isNotesIncluded = (typeof SettingsView !== 'undefined' && SettingsView.config && typeof SettingsView.config.include_notes_in_ai !== 'undefined')
           ? SettingsView.config.include_notes_in_ai !== false
@@ -1378,6 +1381,7 @@ const AIStudyView = {
       bibles: document.getElementById('ai-opt-src-bibles')?.checked ?? false,
       commentaries: document.getElementById('ai-opt-src-comms')?.checked ?? false,
       dictionaries: document.getElementById('ai-opt-src-dict')?.checked ?? false,
+      articles: document.getElementById('ai-opt-src-articles')?.checked ?? false,
       notes: document.getElementById('ai-opt-src-notes')?.checked ?? false
     };
 
