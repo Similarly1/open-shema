@@ -2479,6 +2479,53 @@ class BibleAppApi:
             m_lines = [f"- {m['topic']} : {m['content']}" for m in active_memories]
             memories_text = "RAPPEL DE VOS CONCLUSIONS PRÉCÉDENTES SUR CE SUJET/LIVRE :\n" + "\n".join(m_lines) + "\n\n"
 
+        # Directives propres au genre littéraire du livre biblique (Grant Osborne)
+        genre_guidance = ""
+        if book_code:
+            ot_narrative = {"Gen", "Exo", "Lev", "Num", "Deu", "Jos", "Jdg", "Rut", "1Sa", "2Sa", "1Ki", "2Ki", "1Ch", "2Ch", "Ezr", "Neh", "Est"}
+            gospels_acts = {"Mat", "Mar", "Luk", "Joh", "Act"}
+            epistles = {"Rom", "1Co", "2Co", "Gal", "Eph", "Phi", "Col", "1Th", "2Th", "1Ti", "2Ti", "Tit", "Phm", "Heb", "Jam", "1Pe", "2Pe", "1Jo", "2Jo", "3Jo", "Jud"}
+            poetry_wisdom = {"Job", "Psa", "Pro", "Ecc", "Sol", "Lam", "Ps2", "Wis", "Sir"}
+            prophecy_apoc = {"Isa", "Jer", "Eze", "Dan", "Hos", "Joe", "Amo", "Oba", "Jon", "Mic", "Nah", "Hab", "Zep", "Hag", "Zec", "Mal", "Rev"}
+
+            if book_code in gospels_acts:
+                genre_guidance = (
+                    "SPÉCIFICITÉS DU GENRE (Évangiles & Récits historiques) :\n"
+                    "- Analyse de l'intrigue et théologie narrative : examine les actions et déclarations dans leur déroulement.\n"
+                    "- Dimension synoptique : repère la sélectivité de l'évangéliste et l'agencement du récit dans son plan d'ensemble.\n"
+                    "- Distingue soigneusement le descriptif (ce qui s'est passé historiquement) du prescriptif (ce qui est enseigné comme norme)."
+                )
+            elif book_code in epistles:
+                genre_guidance = (
+                    "SPÉCIFICITÉS DU GENRE (Épîtres & Argumentation théologique) :\n"
+                    "- Suis pas à pas la trajectoire logique et les connecteurs de l'argumentation de l'auteur.\n"
+                    "- Distingue l'indicatif théologique (le fondement doctrinal de la grâce) de l'impératif éthique (l'exhortation pratique).\n"
+                    "- Tiens compte de la nature occasionnelle de la lettre (les destinataires et la situation historique visée)."
+                )
+            elif book_code in poetry_wisdom:
+                genre_guidance = (
+                    "SPÉCIFICITÉS DU GENRE (Poésie & Sagesse biblique) :\n"
+                    "- Analyse les formes de parallélisme hébreu (synonyme, antithétique, synthétique, chiastique) et la structure des strophes.\n"
+                    "- Interprète les métaphores et figures poétiques dans leur ensemble sans forcer une littéralité artificielle.\n"
+                    "- Pour les Proverbes, rappelle qu'il s'agit de maximes de sagesse générale et non de lois absolues ou de garanties mécaniques."
+                )
+            elif book_code in prophecy_apoc:
+                genre_guidance = (
+                    "SPÉCIFICITÉS DU GENRE (Prophétie & Écrits apocalyptiques) :\n"
+                    "- Distingue la proclamation directe aux contemporains (exhortation de justice) de la perspective eschatologique.\n"
+                    "- Interprète les symboles et visions à la lumière des grands motifs récurrents de l'Ancien Testament plutôt que de spéculations modernes.\n"
+                    "- Identifie le type d'oracle (jugement, promesse de rétablissement, dispute rhétorique)."
+                )
+            elif book_code in ot_narrative:
+                genre_guidance = (
+                    "SPÉCIFICITÉS DU GENRE (Narrations de l'Ancien Testament) :\n"
+                    "- Situe l'épisode dans le cadre de l'alliance et de l'histoire du salut menant à Christ.\n"
+                    "- Évite l'exemplarisation moralisatrice des personnages bibliques : observe comment le texte qualifie leurs actes."
+                )
+
+        if genre_guidance and active_mode_key in ("exegesis", "sermon", "auto"):
+            specific_instruction = specific_instruction + "\n\n" + genre_guidance
+
         if active_mode_key == "sermon" and user_profile.get("custom_sermon_prompt"):
             specific_instruction = "MODE D'ÉTUDE : PRÉPARATION DE PRÉDICATION (Gabarit personnalisé)\n" + user_profile["custom_sermon_prompt"]
 
@@ -2500,9 +2547,14 @@ class BibleAppApi:
                 "CONSIGNES DE DIALOGUE & ANCRAGE BIBLIQUE ET DOCUMENTAIRE :\n"
                 "1. POSTURE & MISSION : Agis en tuteur et sparring-partner d'étude en fournissant la matière première (dynamiques du texte, structure, pistes d'application, questions herméneutiques) sans rédiger de sermon ou d'étude finie à sa place.\n"
                 "2. TON & NEUTRALITÉ STRICTE : Reste sobre, neutre, objectif et professionnel. N'utilise JAMAIS d'appellations religieuses ou familières (« cher frère », « mon frère », « compagnon d'œuvre », « salutations », etc.). Entre directement dans le texte sans préambule superflu.\n"
-                "3. ANCRAGE DOCUMENTAIRE : Mobilise les éléments du texte biblique et du CORPUS DOCUMENTAIRE fourni ci-dessus, complétés par ta vaste connaissance du texte biblique.\n"
-                "4. CITATIONS DES SOURCES : Lorsque tu cites un dictionnaire, un commentaire ou un auteur du corpus, indique son nom entre crochets (ex: [Frédéric Godet], [Dictionnaire Biblique], [Jean Calvin]). Ne mets JAMAIS de crochets autour de tes propres réflexions ou titres de consignes !\n"
-                "5. SOIN DU FORMAT : Utilise des titres de section Markdown hiérarchiques et soigne la langue française."
+                "3. GARDE-FOUS HERMÉNEUTIQUES STRICTS (D.A. Carson) :\n"
+                "   - Pas de sophisme de la racine : ne déduis pas le sens d'un mot de sa seule étymologie passée.\n"
+                "   - Pas d'anachronisme sémantique ni de transfert indu de tout un dictionnaire dans un seul verset.\n"
+                "   - Pas de conclusion hâtive sur les temps verbaux (ex: pas d'affirmation temporelle « une fois pour toutes » sur la seule base d'un aoriste).\n"
+                "   - Pas de spiritualisation allégorique artificielle ni d'exemplarisation moralisatrice des récits historiques.\n"
+                "4. ANCRAGE DOCUMENTAIRE : Mobilise les éléments du texte biblique et du CORPUS DOCUMENTAIRE fourni ci-dessus, complétés par ta vaste connaissance du texte biblique.\n"
+                "5. CITATIONS DES SOURCES : Lorsque tu cites un dictionnaire, un commentaire ou un auteur du corpus, indique son nom entre crochets (ex: [Frédéric Godet], [Dictionnaire Biblique], [Jean Calvin]). Ne mets JAMAIS de crochets autour de tes propres réflexions ou titres de consignes !\n"
+                "6. SOIN DU FORMAT : Utilise des titres de section Markdown hiérarchiques et soigne la langue française, sans aucun émoji."
             )
 
         prompt = (
