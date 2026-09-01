@@ -457,6 +457,19 @@ const TheologyView = {
     if (this.activeBookMeta) this.activeBookMeta.textContent = `${author} ${book.year ? `(${book.year})` : ''}`.trim();
     if (this.activeChaptersCount) this.activeChaptersCount.textContent = `${chapters} ch.`;
 
+    // Visibilité du bouton "Signaler une coquille" : uniquement pour les ouvrages officiels Open Shema
+    const btnReportTypo = document.getElementById('btn-theol-report-typo');
+    const isOfficial = book.is_official || book.source === 'open-shema-data' || (book.name && book.name.toLowerCase().includes('hodge')) || (book.title && book.title.toLowerCase().includes('hodge'));
+    if (btnReportTypo) {
+      if (isOfficial) {
+        btnReportTypo.classList.remove('hidden');
+        btnReportTypo.style.display = 'inline-flex';
+      } else {
+        btnReportTypo.classList.add('hidden');
+        btnReportTypo.style.display = 'none';
+      }
+    }
+
     // Couverture mini
     if (this.activeBookCover) {
       const coverColors = ['#0F766E', '#1E3A8A', '#4338CA', '#7C2D12', '#065F46', '#831843', '#312E81'];

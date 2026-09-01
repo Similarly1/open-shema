@@ -532,9 +532,12 @@ const DictView = {
     // Charger les mots-vedettes valides pour filtrer les boutons de renvois
     this.loadValidHeadwords(this.activeDictId);
 
-    // Visibilité du bouton "Polir IA" : réservé exclusivement aux ouvrages personnels/importés par l'utilisateur
+    // Visibilité des boutons conditionnés selon la provenance (Officiel Open Shema vs Import Utilisateur)
     const btnPolish = document.getElementById('btn-dict-polish-article');
-    const isOfficialOpenShema = ['strong', 'calmet', 'vigouroux', 'bailly', 'theologie_systematiq', 'nouveau_dictionnaire'].includes(dInfo.id) || dInfo.is_official || dInfo.is_builtin || dInfo.source === 'open-shema-data';
+    const btnReportTypo = document.getElementById('btn-dict-report-typo');
+    const isOfficialOpenShema = ['strong', 'calmet', 'vigouroux', 'bailly', 'nouveau_dictionnaire'].includes(dInfo.id) || dInfo.is_official || dInfo.is_builtin || dInfo.source === 'open-shema-data';
+    
+    // Polir IA : Uniquement pour les ouvrages de l'utilisateur
     if (btnPolish) {
       if (isOfficialOpenShema) {
         btnPolish.classList.add('hidden');
@@ -542,6 +545,17 @@ const DictView = {
       } else {
         btnPolish.classList.remove('hidden');
         btnPolish.style.display = 'inline-flex';
+      }
+    }
+
+    // Signaler une coquille : Uniquement pour les ouvrages du pack officiel Open Shema
+    if (btnReportTypo) {
+      if (isOfficialOpenShema) {
+        btnReportTypo.classList.remove('hidden');
+        btnReportTypo.style.display = 'inline-flex';
+      } else {
+        btnReportTypo.classList.add('hidden');
+        btnReportTypo.style.display = 'none';
       }
     }
 

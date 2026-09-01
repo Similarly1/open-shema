@@ -106,6 +106,8 @@ class TheologyReaderManager:
                     "cover_url": data_url,
                     "cover_data_url": data_url,
                     "embedding_model": embedding_model,
+                    "is_official": meta.get("is_official", False) or meta.get("source") == "open-shema-data" or "hodge" in name.lower() or "theologie_systematique_hodge" in str(meta.get("file_path", "")),
+                    "source": meta.get("source", ""),
                     "active": meta.get("active", True)
                 })
 
