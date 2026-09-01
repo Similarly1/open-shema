@@ -368,44 +368,35 @@ class WindowMixin:
     def close_window(self):
         global _GLOBAL_WINDOW, _COMMENTARY_WINDOW
         
-        # 1. Fermer d'abord la fenêtre secondaire si elle est ouverte
-        if _COMMENTARY_WINDOW:
-            try:
-                _COMMENTARY_WINDOW.destroy()
-            except Exception as e:
-                logger.debug("Erreur destruction fenêtre secondaire: %s", e)
-            _COMMENTARY_WINDOW = None
-
-        # 2. Fermer la fenêtre principale
-        win = _GLOBAL_WINDOW
+        # Copier les références et réinitialiser l'état global
+        comm_win = _COMMENTARY_WINDOW
+        _COMMENTARY_WINDOW = None
+        main_win = _GLOBAL_WINDOW
         _GLOBAL_WINDOW = None
-        
-        if win:
-            # Essayer d'abord un envoi WM_CLOSE natif au HWND si disponible
-            try:
-                if hasattr(win, 'native') and win.native and user32:
-                    hwnd = win.native.Handle.ToInt32()
-                    if hwnd:
-                        WM_CLOSE = 0x0010
-                        user32.PostMessageW(hwnd, WM_CLOSE, 0, 0)
-            except Exception as e:
-                logger.debug("Erreur WM_CLOSE: %s", e)
 
-            # Puis appeler destroy() de pywebview
-            try:
-                win.destroy()
-            except Exception as e:
-                logger.warning(f"Erreur destroy fenêtre principale: {e}")
+        def _do_async_close():
+            # Laisser 50ms au callback RPC JS de pywebview pour se terminer proprement sans ObjectDisposedException
+            time.sleep(0.05)
+            if comm_win:
+                try:
+                    comm_win.destroy()
+                except Exception as e:
+                    logger.debug("Erreur destruction fenêtre secondaire: %s", e)
 
-        # 3. Sécurité absolue : garantir la fin du processus si des threads de fond subsistent
-        def _terminate_process():
-            time.sleep(0.3)
+            if main_win:
+                try:
+                    main_win.destroy()
+                except Exception as e:
+                    logger.debug("Erreur destroy fenêtre principale: %s", e)
+
+            # Fermeture définitive propre du process
+            time.sleep(0.12)
             try:
                 os._exit(0)
             except Exception:
                 pass
 
-        threading.Thread(target=_terminate_process, daemon=True).start()
+        threading.Thread(target=_do_async_close, daemon=True).start()
         return {"success": True}
 
     # =========================================================================
@@ -513,12 +504,18 @@ class WindowMixin:
     def close_commentary_window(self) -> Dict[str, Any]:
         """Ferme la fenêtre de commentaires détachée."""
         global _COMMENTARY_WINDOW
-        if _COMMENTARY_WINDOW:
-            try:
-                _COMMENTARY_WINDOW.destroy()
-            except Exception as e:
-                logger.warning(f"Erreur destruction fenêtre commentaire: {e}")
-            _COMMENTARY_WINDOW = None
+        comm_win = _COMMENTARY_WINDOW
+        _COMMENTARY_WINDOW = None
+
+        if comm_win:
+            def _do_close_comm():
+                time.sleep(0.05)
+                try:
+                    comm_win.destroy()
+                except Exception as e:
+                    logger.debug("Erreur destruction fenêtre commentaire: %s", e)
+
+            threading.Thread(target=_do_close_comm, daemon=True).start()
         return {"success": True}
 
     def minimize_commentary_window(self) -> Dict[str, Any]:

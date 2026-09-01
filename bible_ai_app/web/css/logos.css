@@ -14972,9 +14972,12 @@ body.reading-bg-white .scm-item svg {
 
 .theol-footer-nav-grid {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   gap: 16px;
   align-items: center;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .theol-nav-card {
@@ -14988,6 +14991,10 @@ body.reading-bg-white .scm-item svg {
   cursor: pointer;
   transition: all 0.15s ease;
   text-align: left;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .theol-nav-card:hover {
@@ -15006,6 +15013,7 @@ body.reading-bg-white .scm-item svg {
   flex-direction: column;
   flex: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
 .theol-nav-card-sub {
@@ -15024,6 +15032,7 @@ body.reading-bg-white .scm-item svg {
   overflow: hidden;
   text-overflow: ellipsis;
   margin-top: 2px;
+  max-width: 100%;
 }
 
 .theol-toc-center-card {
@@ -15035,6 +15044,8 @@ body.reading-bg-white .scm-item svg {
   font-weight: 600;
   color: var(--text-secondary);
   border-radius: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .theol-nav-card-empty {

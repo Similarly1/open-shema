@@ -686,6 +686,11 @@ const TheologyView = {
         return '';
       }
 
+      // Ignorer les séparateurs horizontaux isolés '---', '***', '___'
+      if (/^(?:---|___|\*\*\*)\s*$/.test(pTrim)) {
+        return '';
+      }
+
       // 1. Détection des titres Markdown (#, ##, ###, ####)
       if (pTrim.startsWith('#')) {
         const renderHeadingContent = (txt) => {

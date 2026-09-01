@@ -678,6 +678,9 @@ class TheologyReaderManager:
             elif re.match(r'^(?:###\s*)?(?:Notes de bas de page|Footnotes)', p.strip(), re.IGNORECASE):
                 # En-tête de section de notes ignoré du corps principal
                 continue
+            elif re.match(r'^(?:---|___|\*\*\*)\s*$', p.strip()):
+                # Séparateurs isolés horizontaux ignorés du corps principal
+                continue
             else:
                 body_paragraphs.append(p)
 
