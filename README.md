@@ -41,8 +41,8 @@
 
 ### 2. Installation
 ```bash
-git clone https://github.com/Similarly1/free-logos-ai.git
-cd free-logos-ai/bible_ai_app
+git clone https://github.com/Similarly1/open-shema.git
+cd open-shema/bible_ai_app
 
 # Créer un environnement virtuel
 python -m venv venv
