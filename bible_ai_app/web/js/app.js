@@ -254,11 +254,11 @@ const App = {
     // 5b. Contrôles de Fenêtre Personnalisés (Barre sans bordure Windows)
     document.getElementById('win-btn-min')?.addEventListener('click', (e) => {
       e.stopPropagation();
-      API.call('minimize_window');
+      API.minimizeWindow();
     });
     document.getElementById('win-btn-max')?.addEventListener('click', async (e) => {
       e.stopPropagation();
-      const res = await API.call('maximize_window');
+      const res = await API.maximizeWindow();
       if (res && typeof res.is_maximized === 'boolean') {
         this.updateWindowState(res.is_maximized);
       }
@@ -268,7 +268,7 @@ const App = {
       const nextFs = !document.body.classList.contains('app-fullscreen');
       this.updateFullscreenState(nextFs);
       try {
-        const res = await API.call('toggle_fullscreen');
+        const res = await API.toggleFullscreen();
         if (res && typeof res.is_fullscreen === 'boolean') {
           this.updateFullscreenState(res.is_fullscreen);
         }
@@ -278,7 +278,7 @@ const App = {
     });
     document.getElementById('win-btn-close')?.addEventListener('click', (e) => {
       e.stopPropagation();
-      API.call('close_window');
+      API.closeWindow();
     });
 
     // Raccourcis clavier F11 et Échap pour basculer / quitter le plein écran

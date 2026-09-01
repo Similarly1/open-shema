@@ -1246,7 +1246,7 @@ CONSIGNES STRICTES :
         chapter_comm_count = 0
         try:
             from gui.library_utils import load_books_metadata
-            from webview_app import get_cover_data_url
+            from api._utils import get_cover_data_url
             registry = load_books_metadata()
         except Exception:
             registry = {}

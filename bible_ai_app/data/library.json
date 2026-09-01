@@ -126,22 +126,18 @@
     "book_code": null
   },
   "NCL": {
-    "title": "Sainte Bible néo-Crampon Libre",
-    "author": "Augustin Crampon (Révision Fraternité de Tibériade)",
-    "description": "Révision linguistique et contemporaine de la traduction catholique intégrale (Ancien et Nouveau Testament) du Chanoine Augustin Crampon (1923) par la Fraternité de Tibériade. Traduction littérale et rigoureuse depuis l'hébreu et le grec, publiée sous licence ouverte Creative Commons (CC-BY-SA 4.0).",
+    "title": "Néo-Crampon Libre",
+    "author": "Fraternité de Tibériade",
+    "description": "Sainte Bible néo-Crampon Libre",
     "year": "2022",
-    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\NCL.png",
+    "cover_path": null,
     "type": "Bible",
     "format": "json",
     "folder_name": "NCL",
     "version_code": "NCL",
     "total_books": 72,
     "embedding_model": "study_library",
-    "active": true,
-    "name": "NCL",
-    "corpus_scope": "GLOBAL",
-    "source_type": "general",
-    "book_code": null
+    "active": true
   },
   "SV": {
     "title": "SAGESSE VIVANTE BROCHE -- Transcription dynamique de Job, Proverbes, Ecclésiaste, Cantique des cantiques",
@@ -190,22 +186,18 @@
     "active": true
   },
   "OST": {
-    "title": "Bible Ostervald",
-    "author": "Jean-Frédéric Ostervald (Éd. La Maison de la Bible)",
-    "description": "Révision historique (1877) de la traduction protestante classique de Jean-Frédéric Ostervald. Fidèle à la lignée du Texte Reçu (Textus Receptus) pour le Nouveau Testament et du Texte Massorétique pour l'Ancien Testament, dans une langue française soignée et traditionnelle du XIXᵉ siècle.",
+    "title": "Ostervald",
+    "author": "J.-F. Ostervald",
+    "description": "Sainte Bible d'Ostervald (J.-F. Ostervald)",
     "year": "1877",
-    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\OST.png",
+    "cover_path": null,
     "type": "Bible",
     "format": "json",
     "folder_name": "OST",
     "version_code": "OST",
     "total_books": 64,
     "embedding_model": "study_library",
-    "active": true,
-    "name": "OST",
-    "corpus_scope": "GLOBAL",
-    "source_type": "general",
-    "book_code": null
+    "active": true
   },
   "LSG": {
     "title": "Louis Segond 1910 (avec Strongs)",
@@ -945,5 +937,36 @@
     "embedding_model": "study_library",
     "active": true,
     "has_strongs": false
+  },
+  "HODGE": {
+    "name": "HODGE",
+    "title": "Théologie Systématique (Charles Hodge - 3 Volumes)",
+    "author": "Charles Hodge (Séminaire de Princeton)",
+    "description": "Monument de la théologie réformée du XIXe siècle (1871-1873) en 3 volumes complets : Introduction & Théologie Propre (Vol. 1), Anthropologie & Sotériologie (Vol. 2), Sotériologie & Eschatologie (Vol. 3). Traduction moderne intégrale, 302 sections et 2 796 notes de bas de page.",
+    "year": "1871–1873",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\HODGE.png",
+    "type": "Théologie",
+    "corpus_scope": "GLOBAL",
+    "source_type": "systematic_theology",
+    "book_code": null,
+    "format": "sqlite",
+    "active": true,
+    "chapters_count": 302,
+    "chunks_count": 302,
+    "file_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\ebooks\\hodge_theologie_systematique.sqlite"
+  },
+  "APEE": {
+    "title": "Bible de l'Épée",
+    "author": "APEE",
+    "description": "Bible de l'Épée (APEE 2010)",
+    "year": "2010",
+    "cover_path": null,
+    "type": "Bible",
+    "format": "json",
+    "folder_name": "APEE",
+    "version_code": "APEE",
+    "total_books": 66,
+    "embedding_model": "study_library",
+    "active": true
   }
 }

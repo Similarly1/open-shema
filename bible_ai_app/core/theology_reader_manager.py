@@ -62,7 +62,7 @@ class TheologyReaderManager:
         if cls._books_cache is not None and not force_refresh:
             return cls._books_cache
 
-        from webview_app import get_cover_data_url
+        from api._utils import get_cover_data_url
         
         registry = load_books_metadata()
         theology_books = []
@@ -154,10 +154,14 @@ class TheologyReaderManager:
                 continue
             try:
                 for fname in os.listdir(cdir):
-                    if not fname.lower().endswith((".epub", ".pdf")):
+                    if not fname.lower().endswith((".epub", ".pdf", ".sqlite")):
                         continue
                     fname_clean = strip_accents(fname.lower())
                     if book_name.lower() in fname.lower() or (len(clean_title) >= 6 and clean_title[:18] in fname_clean):
+                        matched = os.path.join(cdir, fname)
+                        book_meta["file_path"] = matched
+                        return matched
+                    if "hodge" in clean_title and "hodge" in fname_clean:
                         matched = os.path.join(cdir, fname)
                         book_meta["file_path"] = matched
                         return matched
@@ -188,13 +192,42 @@ class TheologyReaderManager:
 
         chapters_dict = {}
 
-        # 1. Vérifier si un fichier source EPUB ou PDF existe (analyse directe ultra-rapide)
+        # 1. Vérifier si un fichier source EPUB, PDF ou SQLite existe (analyse directe ultra-rapide)
         registry = load_books_metadata()
         book_meta = registry.get(book_name, {})
         fpath = cls._resolve_epub_path(book_name, book_meta)
 
         if fpath and os.path.exists(fpath):
-            if fpath.lower().endswith(".epub"):
+            if fpath.lower().endswith(".sqlite"):
+                try:
+                    import sqlite3
+                    conn = sqlite3.connect(fpath)
+                    cur = conn.cursor()
+                    cur.execute("SELECT order_index, volume_num, part_title, chapter_title, section_title, section_id FROM toc ORDER BY order_index")
+                    for r in cur.fetchall():
+                        ord_idx, v_num, p_title, c_title, s_title, s_id = r
+                        display_title = s_title
+                        if c_title and not s_title.lower().startswith(c_title.lower()[:15]):
+                            display_title = f"{c_title} — {s_title}"
+                        chapters_dict[ord_idx] = {
+                            "chapter_id": ord_idx,
+                            "title": cls._clean_text_encoding(display_title),
+                            "part_title": p_title,
+                            "chapter_title": c_title,
+                            "section_title": s_title,
+                            "volume_num": v_num,
+                            "book_code": None,
+                            "book_name": None,
+                            "corpus_scope": "GLOBAL",
+                            "source_type": "systematic_theology",
+                            "depth": 1,
+                            "is_section_header": False,
+                            "chunks_count": 1
+                        }
+                    conn.close()
+                except Exception as e:
+                    logger.warning(f"[TheologyReaderManager] Erreur analyse directe SQLite TOC pour {book_name}: {e}")
+            elif fpath.lower().endswith(".epub"):
                 try:
                     from core.epub_loader import EpubLoader
                     inspect_data = EpubLoader.inspect_epub(fpath)
@@ -313,7 +346,7 @@ class TheologyReaderManager:
         # Métadonnées du livre
         registry = load_books_metadata()
         book_meta = registry.get(book_name, {})
-        from webview_app import get_cover_data_url
+        from api._utils import get_cover_data_url
         cov_data_url = get_cover_data_url(book_meta.get("cover_path"))
 
         readable_count = len([c for c in sorted_chapters if not c.get("is_section_header")])
@@ -354,8 +387,48 @@ class TheologyReaderManager:
         book_meta = registry.get(book_name, {})
         fpath = cls._resolve_epub_path(book_name, book_meta)
 
-        # 1. Priorité à la lecture directe du fichier EPUB original (texte intégral fidèle, notes exactes, sans césure RAG)
-        if fpath and os.path.exists(fpath) and fpath.lower().endswith(".epub"):
+        # 1. Lecture directe depuis SQLite si fichier .sqlite
+        if fpath and os.path.exists(fpath) and fpath.lower().endswith(".sqlite"):
+            try:
+                import sqlite3
+                conn = sqlite3.connect(fpath)
+                cur = conn.cursor()
+                cur.execute("""
+                SELECT order_index, section_title, content_markdown, part_title, chapter_title, volume_num, word_count 
+                FROM sections 
+                WHERE order_index = ? OR id = ? OR section_id = ? OR unique_id = ?
+                """, (cid_query, cid_query, cid_query, cid_query))
+                row = cur.fetchone()
+                if row:
+                    ord_idx, s_title, c_markdown, p_title, c_title, v_num, w_cnt = row
+                    display_title = s_title
+                    if c_title and not s_title.lower().startswith(c_title.lower()[:15]):
+                        display_title = f"{c_title} — {s_title}"
+                        
+                    chapter_meta = {
+                        "chapter_title": display_title,
+                        "name": book_name,
+                        "title": book_meta.get("title", book_name),
+                        "author": book_meta.get("author", "Charles Hodge"),
+                        "part_title": p_title,
+                        "volume_num": v_num,
+                        "chapter_id": ord_idx
+                    }
+                    paragraphs = [p.strip() for p in c_markdown.split("\n\n") if p.strip()]
+                    for idx_p, p_text in enumerate(paragraphs):
+                        chunks.append((f"{book_name}_{ord_idx}_{idx_p}", {
+                            "chapter_title": display_title,
+                            "name": book_name,
+                            "title": book_meta.get("title", book_name),
+                            "author": book_meta.get("author", "Charles Hodge"),
+                            "chapter_id": ord_idx
+                        }, p_text))
+                conn.close()
+            except Exception as e:
+                logger.warning(f"[TheologyReaderManager] Erreur lecture directe SQLite pour {book_name}: {e}")
+
+        # 1.1. Lecture directe du fichier EPUB original
+        elif fpath and os.path.exists(fpath) and fpath.lower().endswith(".epub"):
             try:
                 import zipfile
                 from bs4 import BeautifulSoup
@@ -586,14 +659,25 @@ class TheologyReaderManager:
 
         # 1ère passe : identifier les notes explicites [^n]: ...
         for p in raw_paragraphs:
-            m_fn_exp = re.match(r'^\[\^(\d+)\]:\s*[\.\:\-\)]*\s*(.+)', p, flags=re.DOTALL)
-            if m_fn_exp:
-                fn_id = m_fn_exp.group(1)
-                fn_text = m_fn_exp.group(2).strip()
-                fn_text = re.sub(r'^[\.\:\-\)]+\s*', '', fn_text)
-                if fn_id not in seen_fn_ids:
-                    seen_fn_ids.add(fn_id)
-                    footnotes.append({"id": fn_id, "text": fn_text})
+            if re.search(r'\[\^(\d+)\]:\s*', p):
+                fn_matches = list(re.finditer(r'\[\^(\d+)\]:\s*(.+?)(?=(?:\n\[\^\d+\]:|\Z))', p, re.DOTALL))
+                if fn_matches:
+                    for m in fn_matches:
+                        fn_id = m.group(1)
+                        fn_text = m.group(2).strip()
+                        fn_text = re.sub(r'^[\.\:\-\)]+\s*', '', fn_text)
+                        if fn_id not in seen_fn_ids:
+                            seen_fn_ids.add(fn_id)
+                            footnotes.append({"id": fn_id, "text": fn_text})
+                    # Si le paragraphe ne contient que des notes ou commence par ### Notes, ne pas l'ajouter au corps de texte
+                    lines = [l.strip() for l in p.split('\n') if l.strip()]
+                    non_note_lines = [l for l in lines if not re.match(r'^(?:\[\^\d+\]:|###|---\s*$|\*\*\*\s*$|Notes de bas de page)', l, re.IGNORECASE)]
+                    if non_note_lines:
+                        body_paragraphs.append("\n".join(non_note_lines))
+                    continue
+            elif re.match(r'^(?:###\s*)?(?:Notes de bas de page|Footnotes)', p.strip(), re.IGNORECASE):
+                # En-tête de section de notes ignoré du corps principal
+                continue
             else:
                 body_paragraphs.append(p)
 
@@ -698,7 +782,7 @@ class TheologyReaderManager:
 
         registry = load_books_metadata()
         book_meta = registry.get(book_name, {})
-        from webview_app import get_cover_data_url
+        from api._utils import get_cover_data_url
         cov_data_url = get_cover_data_url(book_meta.get("cover_path"))
 
         # Formater les références de versets
@@ -903,7 +987,7 @@ Règles de style :
                 logger.debug("Erreur ignoree : %s", _silent_e)
 
         from core.reference_parser import get_standard_book_code, get_french_book_name
-        from webview_app import get_cover_data_url
+        from api._utils import get_cover_data_url
 
         index = {}
         registry = load_books_metadata()
@@ -1076,7 +1160,7 @@ Règles de style :
         qui traitent du passage (les extraits complets sont chargés à la demande au survol).
         """
         from core.reference_parser import get_standard_book_code, get_french_book_name
-        from webview_app import get_cover_data_url
+        from api._utils import get_cover_data_url
 
         norm_code = (get_standard_book_code(book_code) or book_code).upper()
         french_book = get_french_book_name(norm_code) or book_code

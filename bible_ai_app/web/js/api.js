@@ -179,6 +179,22 @@ const API = {
     return await this.call('get_chapter_commentaries_grouped', bookCode, parseInt(chapterNum));
   },
 
+  async minimizeWindow() {
+    return await this.call('minimize_window');
+  },
+
+  async maximizeWindow() {
+    return await this.call('maximize_window');
+  },
+
+  async toggleFullscreen() {
+    return await this.call('toggle_fullscreen');
+  },
+
+  async closeWindow() {
+    return await this.call('close_window');
+  },
+
   async openCommentaryWindow(bookCode = 'Gen', chapterNum = 1, verseNum = 1) {
     return await this.call('open_commentary_window', bookCode, parseInt(chapterNum), parseInt(verseNum));
   },
