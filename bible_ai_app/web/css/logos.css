@@ -16677,16 +16677,7 @@ body.ai-disabled .ai-feature-only {
 }
 
 .dict-hero-badge {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--accent-orange, #f59e0b);
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.25);
-  padding: 2px 8px;
-  border-radius: 4px;
-  margin-bottom: 10px;
+  display: none !important;
 }
 
 .dict-hero-title {
