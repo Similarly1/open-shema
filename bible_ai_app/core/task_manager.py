@@ -11,7 +11,7 @@ class TaskManager:
     Fournit le suivi d'avancement et la notification en temps réel à l'interface pywebview.
     """
     _tasks: Dict[str, Dict[str, Any]] = {}
-    _lock = threading.Lock()
+    _lock = threading.RLock()
     _window_callback: Optional[Callable[[str, Dict[str, Any]], None]] = None
 
     @classmethod

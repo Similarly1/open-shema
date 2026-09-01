@@ -665,10 +665,16 @@ const TheologyView = {
       }
     }
 
-    const footnotesList = data.footnotes || [];
+    const rawFootnotes = data.footnotes || [];
+    const footnotesList = rawFootnotes.slice().sort((a, b) => {
+      const numA = parseInt(a.id, 10);
+      const numB = parseInt(b.id, 10);
+      if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+      return String(a.id).localeCompare(String(b.id));
+    });
     const footnoteMap = {};
     footnotesList.forEach(fn => {
-      footnoteMap[String(fn.id)] = fn.text;
+      footnoteMap[String(fn.id)] = (fn.text || '').replace(/^[\.\:\-\)]+\s*/, '');
     });
 
     paragraphsHtml = textToRender.map((p, idx) => {
@@ -746,15 +752,17 @@ const TheologyView = {
             <span>Notes de bas de page (${footnotesList.length})</span>
           </div>
           <ol class="theol-footnotes-list">
-            ${footnotesList.map(fn => `
+            ${footnotesList.map(fn => {
+              const cleanFnText = (fn.text || '').replace(/^[\.\:\-\)]+\s*/, '');
+              return `
               <li class="theol-fn-item" id="theol-fn-${fn.id}" data-fn-id="${fn.id}">
                 <span class="theol-fn-num">${fn.id}.</span>
                 <div class="theol-fn-content">
-                  <span class="theol-fn-text">${this.linkifyUrls(this.highlightScriptureReferences(fn.text))}</span>
+                  <span class="theol-fn-text">${this.linkifyUrls(this.highlightScriptureReferences(cleanFnText))}</span>
                   <a href="#theol-fnref-${fn.id}" class="theol-fn-backref" data-target-id="theol-fnref-${fn.id}" title="Retour au passage">↩</a>
                 </div>
               </li>
-            `).join('')}
+            `;}).join('')}
           </ol>
         </div>
       `;
@@ -1121,22 +1129,6 @@ const TheologyView = {
       }
       return match;
     });
-
-    // 3. Remplacer les numéros de notes isolés correspondant aux footnotes connues
-    if (footnoteMap && Object.keys(footnoteMap).length > 0) {
-      const sortedIds = Object.keys(footnoteMap).sort((a, b) => b.length - a.length);
-      for (const id of sortedIds) {
-        // Remplacer "mot 67." ou "mot 67," ou "» 67" ou "mot 67" par badge si pas déjà dans un tag HTML
-        const regex = new RegExp(`(?<!data-fn-id=["']|id=["']theol-fnref-|#theol-fn-)(\\b${id}\\b)(?=[\\s\\.\\,\\!\\?\\:\\;\\»\\)]|$)`, 'g');
-        result = result.replace(regex, (match, p1, offset, fullStr) => {
-          const preceding = fullStr.slice(0, offset);
-          const lastOpen = preceding.lastIndexOf('<');
-          const lastClose = preceding.lastIndexOf('>');
-          if (lastOpen > lastClose) return match;
-          return `<sup class="theol-fn-badge" data-fn-id="${id}" id="theol-fnref-${id}"><a href="#theol-fn-${id}" title="Note ${id}">${id}</a></sup>`;
-        });
-      }
-    }
 
     return result;
   },

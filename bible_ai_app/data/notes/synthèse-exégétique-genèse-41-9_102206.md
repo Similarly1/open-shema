@@ -7,7 +7,7 @@ tags:
 - synthèse-ia
 - genèse
 include_in_ai: true
-updated_at: 19/08/2026 10:23
+updated_at: 31/08/2026 21:21
 ---
 
 # Synthèse Exégétique — Genèse 4:1

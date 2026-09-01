@@ -37,7 +37,8 @@ Règles impératives de traduction :
    - Conserve les noms propres bibliques selon l'usage francophone standard (ex: 'James' -> 'Jacques', 'Jude' -> 'Jude', 'Isaiah' -> 'Ésaïe', 'Elijah' -> 'Élie').
 
 2. Références Bibliques et Codes :
-   - Conserve intactes toutes les abréviations et références de versets (ex: 'Gen. 1:1', 'Rom. 8:28', 'Matt. 5:3').
+   - Conserve intactes toutes les abréviations et références de versets de manière continue et sans coupure (ex: 'Gen. 1:1', 'Rom. 8:28', 'Matt. 5:3', '1 Jean 1.1', 'Jean 1.1').
+   - Conserve scrupuleusement les marqueurs d'appels de notes [^1], [^2] sans les altérer ni les confondre avec des versets.
    - Ne modifie JAMAIS les codes Strong (ex: 'G1234', 'H4567') ni les balises textuelles.
    - Conserve les termes en hébreu, grec ou latin entre parenthèses ou italique tels quels.
 

@@ -412,17 +412,17 @@ class TheologyReaderManager:
                                 txt = re.sub(r'[ \t]+', ' ', txt).strip()
 
                                 is_footnote_def = False
-                                if "footnote" in classes_lower or "note" in classes_lower or el.get("epub:type") == "footnote" or tag_name == "aside":
+                                if "footnote" in classes_lower or "note" in classes_lower or el.get("epub:type") == "footnote" or tag_name == "aside" or el.find_parent(attrs={"class": lambda c: c and any(k in str(c).lower() for k in ["footnote", "notes", "noteref"])}):
                                     is_footnote_def = True
-                                elif re.match(r'^(?:\[\^?(\d+)\]|\b(\d+)\b)\s*(.+)', txt) and ("n.d.t" in txt.lower() or "n.d.e" in txt.lower() or "http" in txt.lower() or len(txt) < 300):
+                                elif re.match(r'^\[\^(\d+)\]\s*:', txt):
                                     is_footnote_def = True
 
                                 if is_footnote_def:
-                                    m_fn = re.match(r'^(?:\[\^?(\d+)\]|\b(\d+)\b)\s*(.*)', txt)
+                                    m_fn = re.match(r'^(?:\[\^?(\d+)\]|\b(\d+)\b)\s*[\.\:\-\)]*\s*(.*)', txt)
                                     if m_fn:
                                         fn_id = m_fn.group(1) or m_fn.group(2)
-                                        fn_body = m_fn.group(3)
-                                        txt = f"[^{fn_id}]: {fn_body.strip()}"
+                                        fn_body = m_fn.group(3).strip()
+                                        txt = f"[^{fn_id}]: {fn_body}"
                                 elif is_h1:
                                     txt = f"# {txt}"
                                 elif is_h2:
@@ -586,10 +586,11 @@ class TheologyReaderManager:
 
         # 1ère passe : identifier les notes explicites [^n]: ...
         for p in raw_paragraphs:
-            m_fn_exp = re.match(r'^\[\^(\d+)\]:\s*(.+)', p, flags=re.DOTALL)
+            m_fn_exp = re.match(r'^\[\^(\d+)\]:\s*[\.\:\-\)]*\s*(.+)', p, flags=re.DOTALL)
             if m_fn_exp:
                 fn_id = m_fn_exp.group(1)
                 fn_text = m_fn_exp.group(2).strip()
+                fn_text = re.sub(r'^[\.\:\-\)]+\s*', '', fn_text)
                 if fn_id not in seen_fn_ids:
                     seen_fn_ids.add(fn_id)
                     footnotes.append({"id": fn_id, "text": fn_text})
@@ -604,18 +605,16 @@ class TheologyReaderManager:
             
             for i in range(len(body_paragraphs) - 1, -1, -1):
                 p_cand = body_paragraphs[i]
-                m_num = re.match(r'^(?:\[(\d+)\]|(\d+))\s*[\.\-\)]?\s+(.+)', p_cand, flags=re.DOTALL)
+                m_num = re.match(r'^(?:\[(\d+)\]|(\d+))\s*[\.\:\-\)]\s+(.+)', p_cand, flags=re.DOTALL)
                 if m_num:
                     fn_id = m_num.group(1) or m_num.group(2)
                     fn_text = m_num.group(3).strip()
+                    fn_text = re.sub(r'^[\.\:\-\)]+\s*', '', fn_text)
                     is_note_like = (
-                        len(fn_text) < 400 or
                         "n.d.t" in fn_text.lower() or 
                         "n.d.e" in fn_text.lower() or 
                         "http" in fn_text.lower() or 
-                        "voir " in fn_text.lower() or
-                        "page " in fn_text.lower() or
-                        len(trailing_notes) > 0
+                        (len(trailing_notes) > 0 and len(fn_text) < 400)
                     )
                     if is_note_like:
                         trailing_notes.insert(0, {"id": fn_id, "text": fn_text})
@@ -629,7 +628,10 @@ class TheologyReaderManager:
                 body_paragraphs = body_paragraphs[:cut_idx]
                 footnotes = trailing_notes
 
-        # 3ème passe : nettoyer les numéros de page papier résiduels et normaliser les appels de notes
+        # Tri numérique systématique des notes de bas de page (1, 2, 3, 4...)
+        footnotes.sort(key=lambda x: int(x["id"]) if str(x["id"]).isdigit() else str(x["id"]))
+
+        # 3ème passe : nettoyer les numéros de page papier résiduels et normaliser uniquement les marqueurs explicites
         fn_ids_set = set(str(f["id"]) for f in footnotes)
         fn_ids_list = sorted(list(fn_ids_set), key=lambda x: -len(x))
         
@@ -646,14 +648,8 @@ class TheologyReaderManager:
 
             if footnotes:
                 for fid in fn_ids_list:
-                    # 1. Déjà entre crochets: [fid] ou [^fid]
+                    # Remplacer uniquement les marqueurs déjà entre crochets : [fid] ou [^fid]
                     p_mod = re.sub(r'\[\^?' + fid + r'\]', f' [^{fid}] ', p_mod)
-                    # 2. Après ponctuation ou guillemets: » 67 ou . 67
-                    p_mod = re.sub(r'([»\.\!\?:\,])\s*(\b' + fid + r'\b)(?=\s+[A-ZÀ-Ÿa-z])', r'\1 [^\2] ', p_mod)
-                    # 3. Avant ponctuation ou en fin de mot: écoute67. ou écoute 67. ou mot 67,
-                    p_mod = re.sub(r'(\b[A-ZÀ-Ÿa-z]+)\s*(\b' + fid + r'\b)(?=\s*[\.\!\?:\,])', r'\1 [^\2] ', p_mod)
-                    # 4. Collé directement à un mot: écoute67
-                    p_mod = re.sub(r'(\b[A-ZÀ-Ÿa-z]+)(' + fid + r')(?=[\s\.\!\?:\,]|$)', r'\1 [^\2] ', p_mod)
                 
                 # Nettoyer les espaces superflus autour des marqueurs
                 p_mod = re.sub(r'\s*\[\^(\d+)\]\s*', r' [^\1] ', p_mod)

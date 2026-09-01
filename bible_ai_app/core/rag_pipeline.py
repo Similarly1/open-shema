@@ -323,8 +323,6 @@ class RAGPipeline:
             t_cur_0 = time.time()
             final_docs = self.curate_context(query=query, documents=reranked_docs, curation_model=curation_model_used)
             t_curation_ms = (time.time() - t_cur_0) * 1000
-            if t_curation_ms < 600:
-                time.sleep((600 - t_curation_ms) / 1000.0)
             _notify("curation", "Curation terminée avec succès", "done")
         else:
             final_docs = reranked_docs
@@ -334,16 +332,15 @@ class RAGPipeline:
         
         # Construction du contexte exégétique (Langues originales + Interlinéaire inversé + Version affichée)
         exegetical_context = ""
+        target_book = None
+        target_chap = None
+        target_v_start = 1
+        target_v_end = 1
         try:
             from core.original_languages_manager import OriginalLanguagesManager
             orig_mgr = OriginalLanguagesManager.get_instance()
             if orig_mgr.is_installed():
                 max_orig_verses = int(self.config.get("max_original_verses_for_llm", 10))
-                
-                target_book = None
-                target_chap = None
-                target_v_start = 1
-                target_v_end = 1
                 
                 if active_location and b_code:
                     target_book = b_code

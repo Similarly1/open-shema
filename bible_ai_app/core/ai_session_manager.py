@@ -200,7 +200,8 @@ class AISessionManager:
 
     @classmethod
     def get_session(cls, session_id: str) -> Optional[Dict[str, Any]]:
-        file_path = os.path.join(CONVERSATIONS_DIR, f"{session_id}.json")
+        safe_id = os.path.basename(session_id)
+        file_path = os.path.join(CONVERSATIONS_DIR, f"{safe_id}.json")
         if not os.path.exists(file_path):
             return None
         try:
@@ -218,7 +219,8 @@ class AISessionManager:
             return False
             
         session_data["updated_at"] = datetime.datetime.now().isoformat()
-        file_path = os.path.join(CONVERSATIONS_DIR, f"{session_id}.json")
+        safe_id = os.path.basename(session_id)
+        file_path = os.path.join(CONVERSATIONS_DIR, f"{safe_id}.json")
         try:
             with open(file_path, 'w', encoding='utf-8') as f:
                 json.dump(session_data, f, indent=2, ensure_ascii=False)
@@ -355,7 +357,8 @@ class AISessionManager:
 
     @classmethod
     def delete_session(cls, session_id: str) -> bool:
-        file_path = os.path.join(CONVERSATIONS_DIR, f"{session_id}.json")
+        safe_id = os.path.basename(session_id)
+        file_path = os.path.join(CONVERSATIONS_DIR, f"{safe_id}.json")
         if os.path.exists(file_path):
             try:
                 os.remove(file_path)

@@ -17,6 +17,15 @@ except ImportError:
         MistralClient = None
         ChatMessage = None
 
+def resolve_llm_provider(model_name: str) -> str:
+    """Détermine le fournisseur (provider) en fonction du nom du modèle."""
+    m = model_name.lower()
+    if "infomaniak" in m or "ministral" in m or "qwen" in m or "bge" in m or "llama" in m:
+        return "infomaniak"
+    elif "mistral" in m:
+        return "mistral"
+    return "gemini"
+
 class GeminiClient:
     CHAT_CASCADE = [
         "gemini-2.5-flash",

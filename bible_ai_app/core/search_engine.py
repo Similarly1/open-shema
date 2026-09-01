@@ -79,6 +79,7 @@ class SearchEngine:
     - Indexation automatique, recherche sans accents et sans casse < 5ms.
     """
     _instance = None
+    _lock = __import__('threading').Lock()
 
     def __init__(self, base_dir: Optional[str] = None):
         if base_dir is None:
@@ -88,12 +89,15 @@ class SearchEngine:
 
         self.db_path = os.path.join(self.base_dir, "data", "bibles_fts.db")
         self.commentary_db_path = os.path.join(self.base_dir, "data", "commentaires", "commentaires_master.db")
+        self._synced = False
         self._init_bibles_db()
 
     @classmethod
     def get_instance(cls) -> 'SearchEngine':
         if cls._instance is None:
-            cls._instance = SearchEngine()
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = SearchEngine()
         return cls._instance
 
     def _get_connection(self) -> sqlite3.Connection:
@@ -137,6 +141,9 @@ class SearchEngine:
         Synchronise automatiquement toutes les Bibles présentes dans data/bibles/
         vers l'index SQLite FTS5. Rapide (< 1-2 secondes pour 16 Bibles).
         """
+        if self._synced and not force:
+            return
+
         from core.bible_json_loader import BibleJsonLoader
         from gui.library_utils import load_books_metadata
 
@@ -148,81 +155,87 @@ class SearchEngine:
         installed = BibleJsonLoader.list_installed_bibles()
 
         conn = self._get_connection()
-        cur = conn.cursor()
+        try:
+            cur = conn.cursor()
+            cur.execute("SELECT folder_name FROM indexed_versions")
+            already_indexed = {r[0] for r in cur.fetchall()}
 
-        cur.execute("SELECT folder_name FROM indexed_versions")
-        already_indexed = {r[0] for r in cur.fetchall()}
+            to_index = []
+            for folder in installed:
+                if force or (folder not in already_indexed):
+                    to_index.append(folder)
 
-        to_index = []
-        for folder in installed:
-            if force or (folder not in already_indexed):
-                to_index.append(folder)
+            if not to_index:
+                self._synced = True
+                return
 
-        if not to_index:
-            return
+            total_folders = len(to_index)
+            for idx, folder in enumerate(to_index):
+                if progress_cb:
+                    progress_cb(int((idx / total_folders) * 100), f"Indexation de {folder}...")
 
-        total_folders = len(to_index)
-        for idx, folder in enumerate(to_index):
-            if progress_cb:
-                progress_cb(int((idx / total_folders) * 100), f"Indexation de {folder}...")
+                # Nom convivial de la Bible
+                b_name = folder
+                for k, meta in registry.items():
+                    if meta.get("folder_name") == folder or k == folder:
+                        b_name = meta.get("title") or k
+                        break
 
-            # Nom convivial de la Bible
-            b_name = folder
-            for k, meta in registry.items():
-                if meta.get("folder_name") == folder or k == folder:
-                    b_name = meta.get("title") or k
-                    break
+                folder_path = os.path.join(bibles_dir, folder)
+                json_files = sorted([f for f in os.listdir(folder_path) if f.endswith(".json")])
 
-            folder_path = os.path.join(bibles_dir, folder)
-            json_files = sorted([f for f in os.listdir(folder_path) if f.endswith(".json")])
-
-            verses_batch = []
-            for jf in json_files:
-                f_path = os.path.join(folder_path, jf)
-                try:
-                    with open(f_path, "r", encoding="utf-8") as f:
-                        b_data = json.load(f)
-                except Exception as _silent_e:
-                    logger.debug("Erreur ignoree : %s", _silent_e)
-                    continue
-
-                raw_code = b_data.get("code", "")
-                from core.bible_json_loader import USFM_TO_STD
-                book_code = USFM_TO_STD.get(raw_code.upper(), raw_code)
-                book_name = b_data.get("name") or FRENCH_BOOK_NAMES.get(book_code, book_code)
-
-                chapters = b_data.get("chapters", {})
-                for ch_str, v_dict in chapters.items():
+                verses_batch = []
+                for jf in json_files:
+                    f_path = os.path.join(folder_path, jf)
                     try:
-                        ch_num = int(ch_str)
-                    except ValueError:
+                        with open(f_path, "r", encoding="utf-8") as f:
+                            b_data = json.load(f)
+                    except Exception as _silent_e:
+                        logger.debug("Erreur ignoree : %s", _silent_e)
                         continue
-                    if isinstance(v_dict, dict):
-                        for v_str, v_val in v_dict.items():
-                            try:
-                                v_num = int(v_str)
-                            except ValueError:
-                                continue
-                            from core.bible_json_loader import extract_verse_text
-                            v_txt = extract_verse_text(v_val).strip()
-                            if v_txt:
-                                verses_batch.append((folder, b_name, book_code, book_name, ch_num, v_num, v_txt))
 
-            # Supprimer l'ancienne version si réindexation
-            cur.execute("DELETE FROM verses_fts WHERE bible_folder = ?", (folder,))
-            cur.execute("DELETE FROM indexed_versions WHERE folder_name = ?", (folder,))
+                    raw_code = b_data.get("code", "")
+                    from core.bible_json_loader import USFM_TO_STD
+                    book_code = USFM_TO_STD.get(raw_code.upper(), raw_code)
+                    book_name = b_data.get("name") or FRENCH_BOOK_NAMES.get(book_code, book_code)
 
-            # Insertion en masse ultra-rapide
-            cur.executemany("""
-                INSERT INTO verses_fts (bible_folder, bible_name, book_code, book_name, chapter, verse, text)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            """, verses_batch)
+                    chapters = b_data.get("chapters", {})
+                    for ch_str, v_dict in chapters.items():
+                        try:
+                            ch_num = int(ch_str)
+                        except ValueError:
+                            continue
+                        if isinstance(v_dict, dict):
+                            for v_str, v_val in v_dict.items():
+                                try:
+                                    v_num = int(v_str)
+                                except ValueError:
+                                    continue
+                                from core.bible_json_loader import extract_verse_text
+                                v_txt = extract_verse_text(v_val).strip()
+                                if v_txt:
+                                    verses_batch.append((folder, b_name, book_code, book_name, ch_num, v_num, v_txt))
 
-            cur.execute("""
-                INSERT INTO indexed_versions (folder_name, bible_name, total_verses)
-                VALUES (?, ?, ?)
-            """, (folder, b_name, len(verses_batch)))
-            conn.commit()
+                # Supprimer l'ancienne version si réindexation
+                cur.execute("DELETE FROM verses_fts WHERE bible_folder = ?", (folder,))
+                cur.execute("DELETE FROM indexed_versions WHERE folder_name = ?", (folder,))
+
+                # Insertion en masse ultra-rapide
+                cur.executemany("""
+                    INSERT INTO verses_fts (bible_folder, bible_name, book_code, book_name, chapter, verse, text)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, verses_batch)
+
+                cur.execute("""
+                    INSERT INTO indexed_versions (folder_name, bible_name, total_verses)
+                    VALUES (?, ?, ?)
+                """, (folder, b_name, len(verses_batch)))
+                conn.commit()
+
+            self._synced = True
+
+        finally:
+            conn.close()
 
         if progress_cb:
             progress_cb(100, "Indexation terminée")
@@ -418,10 +431,6 @@ class SearchEngine:
 
         self._init_commentaries_fts()
 
-        with sqlite3.connect(self.commentary_db_path) as conn:
-            conn.row_factory = sqlite3.Row
-            cur = conn.cursor()
-
         sql_clauses = ["commentaries_fts MATCH ?"]
         params = [fts_query]
 
@@ -445,8 +454,11 @@ class SearchEngine:
         params.append(limit)
 
         try:
-            cur.execute(sql, params)
-            rows = cur.fetchall()
+            with sqlite3.connect(self.commentary_db_path) as conn:
+                conn.row_factory = sqlite3.Row
+                cur = conn.cursor()
+                cur.execute(sql, params)
+                rows = cur.fetchall()
         except Exception as e:
             logger.error("[SearchEngine] Erreur recherche commentaires: %s", e)
             return []

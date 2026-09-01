@@ -444,17 +444,17 @@ class EpubLoader:
 
                         # Détection si c'est un paragraphe de note de bas de page (au bas du document)
                         is_footnote_def = False
-                        if "footnote" in classes_lower or "note" in classes_lower or el.get("epub:type") == "footnote" or tag_name == "aside" or el.find_parent(attrs={"class": lambda c: c and "footnote" in str(c).lower()}):
+                        if "footnote" in classes_lower or "note" in classes_lower or el.get("epub:type") == "footnote" or tag_name == "aside" or el.find_parent(attrs={"class": lambda c: c and any(k in str(c).lower() for k in ["footnote", "notes", "noteref"])}):
                             is_footnote_def = True
-                        elif re.match(r'^(\d+|\[\d+\])\s+(.+)', txt) and ("n.d.t" in txt.lower() or "n.d.e" in txt.lower() or "http" in txt.lower() or "voir " in txt.lower() or len(txt) < 300):
+                        elif re.match(r'^\[\^(\d+)\]\s*:', txt):
                             is_footnote_def = True
 
                         if is_footnote_def:
-                            m_fn = re.match(r'^(?:\[\^?(\d+)\]|\b(\d+)\b)\s*(.*)', txt)
+                            m_fn = re.match(r'^(?:\[\^?(\d+)\]|\b(\d+)\b)\s*[\.\:\-\)]*\s*(.*)', txt)
                             if m_fn:
                                 fn_id = m_fn.group(1) or m_fn.group(2)
-                                fn_body = m_fn.group(3)
-                                txt = f"[^{fn_id}]: {fn_body.strip()}"
+                                fn_body = m_fn.group(3).strip()
+                                txt = f"[^{fn_id}]: {fn_body}"
                         elif is_h1:
                             txt = f"# {txt}"
                         elif is_h2:
