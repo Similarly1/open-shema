@@ -3298,13 +3298,19 @@ input:checked + .slider.round:before {
   color: var(--text-primary);
 }
 .drawer-body {
-  flex: 1;
+  flex: 1 1 0;
+  min-height: 0;
+  height: 100%;
   overflow: hidden;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 .drawer-content {
   width: 100%;
   height: 100%;
+  min-height: 0;
+  flex: 1 1 0;
   display: none;
   flex-direction: column;
   overflow-y: auto;
@@ -3330,7 +3336,9 @@ input:checked + .slider.round:before {
   flex-direction: column;
   height: 100%;
   max-height: 100%;
-  overflow: hidden !important;
+  min-height: 0;
+  flex: 1 1 0;
+  overflow: hidden;
   background: var(--bg-main, #0f172a);
 }
 
@@ -3508,32 +3516,34 @@ input:checked + .slider.round:before {
 .overview-scrollable-body {
   flex: 1 1 0;
   min-height: 0;
-  overflow-y: auto;
+  height: 100%;
+  overflow-y: auto !important;
   overflow-x: hidden;
   padding: 12px 14px 40px 14px;
   display: flex;
   flex-direction: column;
   gap: 12px;
   scrollbar-width: thin;
-  scrollbar-color: #a855f7 rgba(255, 255, 255, 0.08);
+  scrollbar-color: var(--accent-blue, #3b82f6) rgba(255, 255, 255, 0.08);
 }
 
 .overview-scrollable-body::-webkit-scrollbar {
-  width: 7px;
+  width: 6px;
 }
 
 .overview-scrollable-body::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.04);
   border-radius: 6px;
 }
 
 .overview-scrollable-body::-webkit-scrollbar-thumb {
-  background: #a855f7;
+  background: var(--accent-blue, #3b82f6);
   border-radius: 6px;
+  opacity: 0.8;
 }
 
 .overview-scrollable-body::-webkit-scrollbar-thumb:hover {
-  background: #c084fc;
+  background: var(--accent-blue-hover, #60a5fa);
 }
 
 /* Cartes Sections Accordéons Épurées */
@@ -3543,6 +3553,7 @@ input:checked + .slider.round:before {
   border-radius: 8px;
   overflow: hidden;
   transition: box-shadow 0.2s, border-color 0.2s;
+  flex-shrink: 0;
 }
 
 .overview-section-card:hover {
@@ -3645,36 +3656,35 @@ input:checked + .slider.round:before {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  max-height: 220px;
+  max-height: 200px;
   overflow-y: auto !important;
   overflow-x: hidden;
-  overscroll-behavior: contain;
   scrollbar-width: thin;
-  scrollbar-color: #a855f7 rgba(255, 255, 255, 0.08);
+  scrollbar-color: var(--accent-blue, #3b82f6) rgba(255, 255, 255, 0.08);
 }
 
 #sec-bibleproject .sec-body {
-  max-height: 260px;
-}
-
-#sec-commentaries .sec-body {
   max-height: 240px;
 }
 
-#sec-articles .sec-body {
+#sec-commentaries .sec-body {
   max-height: 220px;
 }
 
-#sec-theology .sec-body {
+#sec-articles .sec-body {
   max-height: 200px;
+}
+
+#sec-theology .sec-body {
+  max-height: 180px;
 }
 
 #sec-notes .sec-body {
-  max-height: 200px;
+  max-height: 180px;
 }
 
 #sec-maps .sec-body {
-  max-height: 200px;
+  max-height: 180px;
 }
 
 .sec-body::-webkit-scrollbar {
@@ -3682,17 +3692,18 @@ input:checked + .slider.round:before {
 }
 
 .sec-body::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.04);
   border-radius: 4px;
 }
 
 .sec-body::-webkit-scrollbar-thumb {
-  background: #a855f7;
+  background: var(--accent-blue, #3b82f6);
   border-radius: 4px;
+  opacity: 0.8;
 }
 
 .sec-body::-webkit-scrollbar-thumb:hover {
-  background: #c084fc;
+  background: var(--accent-blue-hover, #60a5fa);
 }
 
 /* Liste épurée typographique (style Logos / Apple) */
