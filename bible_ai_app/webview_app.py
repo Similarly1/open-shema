@@ -2590,7 +2590,7 @@ class BibleAppApi:
                     "- Évite l'exemplarisation moralisatrice des personnages bibliques : observe comment le texte qualifie leurs actes."
                 )
 
-        if genre_guidance and active_mode_key in ("exegesis", "sermon", "auto"):
+        if genre_guidance and active_mode_key in ("exegesis", "sermon", "historical", "auto"):
             specific_instruction = specific_instruction + "\n\n" + genre_guidance
 
         if active_mode_key == "sermon" and user_profile.get("custom_sermon_prompt"):
