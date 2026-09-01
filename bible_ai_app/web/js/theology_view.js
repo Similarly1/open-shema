@@ -2304,7 +2304,6 @@ const ScriptureTooltip = {
     this.tooltipEl.innerHTML = `
       <div class="theol-scripture-tooltip-header">
         <div class="theol-scripture-tooltip-ref">
-          <span>📖</span>
           <span>${TheologyView.escapeHtml(ref)}</span>
         </div>
         <div class="theol-scripture-tooltip-version">${TheologyView.escapeHtml(activeBible)}</div>
@@ -2314,7 +2313,7 @@ const ScriptureTooltip = {
         <span>Récupération du verset...</span>
       </div>
       <div class="theol-scripture-tooltip-footer">
-        <span class="theol-scripture-tooltip-hint">👆 Cliquer pour ouvrir dans la Bible</span>
+        <span class="theol-scripture-tooltip-hint">Cliquer pour ouvrir dans la Bible</span>
       </div>
     `;
 
@@ -2347,7 +2346,6 @@ const ScriptureTooltip = {
     this.tooltipEl.innerHTML = `
       <div class="theol-scripture-tooltip-header">
         <div class="theol-scripture-tooltip-ref">
-          <span>📖</span>
           <span>${TheologyView.escapeHtml(data.reference || data.book_french)}</span>
         </div>
         <div class="theol-scripture-tooltip-version">${TheologyView.escapeHtml(data.bible || 'Segond 21')}</div>
@@ -2357,7 +2355,7 @@ const ScriptureTooltip = {
       </div>
       <div class="theol-scripture-tooltip-footer">
         <span>${data.book_french} ${data.chapter}${data.verse ? `:${data.verse}` : ''}</span>
-        <span class="theol-scripture-tooltip-hint">👆 Cliquer pour ouvrir</span>
+        <span class="theol-scripture-tooltip-hint">Cliquer pour ouvrir</span>
       </div>
     `;
   },
@@ -2366,7 +2364,6 @@ const ScriptureTooltip = {
     this.tooltipEl.innerHTML = `
       <div class="theol-scripture-tooltip-header">
         <div class="theol-scripture-tooltip-ref">
-          <span>📖</span>
           <span>${TheologyView.escapeHtml(ref)}</span>
         </div>
       </div>
@@ -2374,7 +2371,7 @@ const ScriptureTooltip = {
         Consulter ce passage dans le lecteur biblique pour afficher le texte complet et l'interlinéaire.
       </div>
       <div class="theol-scripture-tooltip-footer">
-        <span class="theol-scripture-tooltip-hint">👆 Cliquer pour ouvrir</span>
+        <span class="theol-scripture-tooltip-hint">Cliquer pour ouvrir</span>
       </div>
     `;
   },

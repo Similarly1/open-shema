@@ -201,17 +201,65 @@ class TheologyReaderManager:
             if fpath.lower().endswith(".sqlite"):
                 try:
                     import sqlite3
+                    from api._utils import get_cover_data_url
+                    cov_data_url = get_cover_data_url(book_meta.get("cover_path"))
                     conn = sqlite3.connect(fpath)
                     cur = conn.cursor()
                     cur.execute("SELECT order_index, volume_num, part_title, chapter_title, section_title, section_id FROM toc ORDER BY order_index")
-                    for r in cur.fetchall():
+                    rows = cur.fetchall()
+                    
+                    cur_part = None
+                    cur_chap = None
+                    toc_list = []
+                    header_id_counter = 10000
+                    
+                    for r in rows:
                         ord_idx, v_num, p_title, c_title, s_title, s_id = r
-                        display_title = s_title
-                        if c_title and not s_title.lower().startswith(c_title.lower()[:15]):
-                            display_title = f"{c_title} — {s_title}"
-                        chapters_dict[ord_idx] = {
+                        
+                        # 1. Bannière de Partie (ex: "Première Partie : Théologie Propre")
+                        if p_title and p_title != cur_part:
+                            cur_part = p_title
+                            header_id_counter += 1
+                            toc_list.append({
+                                "chapter_id": f"part_{header_id_counter}",
+                                "title": cls._clean_text_encoding(p_title),
+                                "part_title": p_title,
+                                "chapter_title": None,
+                                "section_title": None,
+                                "volume_num": v_num,
+                                "book_code": None,
+                                "book_name": None,
+                                "corpus_scope": "GLOBAL",
+                                "source_type": "systematic_theology",
+                                "depth": 0,
+                                "is_section_header": True,
+                                "chunks_count": 0
+                            })
+                            
+                        # 2. Bannière de Chapitre (ex: "Chapitre I : De la méthode théologique")
+                        if c_title and c_title != cur_chap:
+                            cur_chap = c_title
+                            header_id_counter += 1
+                            toc_list.append({
+                                "chapter_id": f"chap_{header_id_counter}",
+                                "title": cls._clean_text_encoding(c_title),
+                                "part_title": p_title,
+                                "chapter_title": c_title,
+                                "section_title": None,
+                                "volume_num": v_num,
+                                "book_code": None,
+                                "book_name": None,
+                                "corpus_scope": "GLOBAL",
+                                "source_type": "systematic_theology",
+                                "depth": 0,
+                                "is_section_header": True,
+                                "chunks_count": 0
+                            })
+                            
+                        # 3. Section de lecture (sous-élément avec indentation ↳)
+                        toc_list.append({
                             "chapter_id": ord_idx,
-                            "title": cls._clean_text_encoding(display_title),
+                            "title": cls._clean_text_encoding(s_title),
                             "part_title": p_title,
                             "chapter_title": c_title,
                             "section_title": s_title,
@@ -221,10 +269,26 @@ class TheologyReaderManager:
                             "corpus_scope": "GLOBAL",
                             "source_type": "systematic_theology",
                             "depth": 1,
+                            "is_subsection": True,
                             "is_section_header": False,
                             "chunks_count": 1
-                        }
+                        })
+                        
                     conn.close()
+                    
+                    readable_count = len([c for c in toc_list if not c.get("is_section_header")])
+                    result = {
+                        "book_name": book_name,
+                        "title": book_meta.get("title", book_name),
+                        "author": book_meta.get("author", ""),
+                        "year": book_meta.get("year", ""),
+                        "description": book_meta.get("description", ""),
+                        "cover_url": cov_data_url,
+                        "total_chapters": readable_count,
+                        "chapters": toc_list
+                    }
+                    cls._toc_cache[book_name] = result
+                    return result
                 except Exception as e:
                     logger.warning(f"[TheologyReaderManager] Erreur analyse directe SQLite TOC pour {book_name}: {e}")
             elif fpath.lower().endswith(".epub"):
