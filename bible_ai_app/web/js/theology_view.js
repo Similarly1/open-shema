@@ -585,13 +585,6 @@ const TheologyView = {
     }
 
     this.articleHero.innerHTML = `
-      <div class="theol-hero-badge-row">
-        <span class="theol-hero-book-badge">${this.escapeHtml(bookTitle)}</span>
-        ${data.section_title ? `<span class="theol-hero-section-badge">📁 ${this.escapeHtml(data.section_title)}</span>` : ''}
-        ${author ? `<span class="theol-hero-author-badge">✍️ ${this.escapeHtml(author)}</span>` : ''}
-        <span class="theol-hero-time-badge">⏱️ ~${readTime} min (${wordCount.toLocaleString()} mots)</span>
-        ${data.book_french_name ? `<button type="button" class="theol-hero-bible-jump" id="btn-jump-bible-chapter" data-code="${data.book_code}">📖 ${data.book_french_name}</button>` : ''}
-      </div>
       <h1 class="theol-hero-chapter-title">${this.escapeHtml(title)}</h1>
       <div class="theol-hero-divider"></div>
       ${versesHtml}

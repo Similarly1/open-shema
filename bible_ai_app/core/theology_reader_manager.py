@@ -401,12 +401,11 @@ class TheologyReaderManager:
                 row = cur.fetchone()
                 if row:
                     ord_idx, s_title, c_markdown, p_title, c_title, v_num, w_cnt = row
-                    display_title = s_title
-                    if c_title and not s_title.lower().startswith(c_title.lower()[:15]):
-                        display_title = f"{c_title} — {s_title}"
+                    main_chapter_title = c_title or s_title
                         
                     chapter_meta = {
-                        "chapter_title": display_title,
+                        "chapter_title": main_chapter_title,
+                        "section_title": s_title,
                         "name": book_name,
                         "title": book_meta.get("title", book_name),
                         "author": book_meta.get("author", "Charles Hodge"),
@@ -417,7 +416,8 @@ class TheologyReaderManager:
                     paragraphs = [p.strip() for p in c_markdown.split("\n\n") if p.strip()]
                     for idx_p, p_text in enumerate(paragraphs):
                         chunks.append((f"{book_name}_{ord_idx}_{idx_p}", {
-                            "chapter_title": display_title,
+                            "chapter_title": main_chapter_title,
+                            "section_title": s_title,
                             "name": book_name,
                             "title": book_meta.get("title", book_name),
                             "author": book_meta.get("author", "Charles Hodge"),
