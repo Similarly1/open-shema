@@ -945,7 +945,7 @@ Règles impératives :
       }
     });
 
-    document.getElementById('btn-save-settings-top').addEventListener('click', () => {
+    document.getElementById('btn-save-settings-top')?.addEventListener('click', () => {
       this.save();
     });
 

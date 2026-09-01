@@ -1551,14 +1551,6 @@
             <h1 class="view-title">PARAMÈTRES</h1>
             <p class="view-subtitle">Personnalisez l'affichage, les modèles d'IA, STEPBible et vos données.</p>
           </div>
-          <button class="btn-primary" id="btn-save-settings-top">
-            <svg class="btn-svg-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-              <polyline points="17 21 17 13 7 13 7 21"></polyline>
-              <polyline points="7 3 7 8 15 8"></polyline>
-            </svg>
-            <span>Enregistrer</span>
-          </button>
         </header>
 
         <!-- Sous-onglets de réglages avec défilement horizontal et flèches -->
@@ -1653,31 +1645,6 @@
           <!-- Section 1 : Général & Apparence -->
           <div class="settings-section active" id="sec-apparence">
             
-            <!-- CARTE COMMUTATEUR MAÎTRE IA / MODE EXÉGÈSE CLASSIQUE -->
-            <div class="settings-card ai-master-card">
-              <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;">
-                <div style="flex: 1;">
-                  <div class="card-title" style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-purple, #8B5CF6);"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
-                    <span>Fonctionnalités d'Intelligence Artificielle (IA)</span>
-                  </div>
-                  <p class="card-desc" style="margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--text-secondary);">
-                    Active l'Assistant d'étude, la synthèse comparative multi-commentaires, la traduction et les aides IA. Si désactivée, l'application fonctionne en <strong>mode 100% traditionnel et hors-ligne</strong> : tous les boutons et options d'IA sont complètement masqués dans l'application.
-                  </p>
-                </div>
-                <label class="toggle-switch-large" title="Activer / Désactiver l'Intelligence Artificielle">
-                  <input type="checkbox" id="cfg-enable-ai" checked>
-                  <span class="toggle-switch-slider"></span>
-                </label>
-              </div>
-
-              <!-- Bannière informative quand l'IA est désactivée -->
-              <div id="ai-disabled-status-banner" class="ai-disabled-status-box hidden" style="margin-top: 14px; padding: 12px 14px; border-radius: 8px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: var(--text-primary); font-size: 12px; display: flex; align-items: center; gap: 10px;">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#F59E0B" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <span><strong>Mode Classique sans IA actif :</strong> L'ensemble des boutons, assistants et synthèses IA sont masqués. Toutes vos Bibles, commentaires, dictionnaires et notes restent 100% accessibles hors-ligne.</span>
-              </div>
-            </div>
-
             <div class="settings-card">
               <div class="card-title">Palette de Couleurs & Apparence Globale</div>
               
@@ -1792,7 +1759,6 @@
                 </div>
               </div>
 
-              <!-- 4. Fond des Fenêtres de Lecture (Indépendant) -->
               <!-- 4. Fond des Fenêtres de Lecture (Indépendant) -->
               <div style="margin-top: 20px;">
                 <label style="font-weight: 600; margin-bottom: 10px; display: block;">Fond des fenêtres de lecture (Bible, commentaires, notes, dictionnaire) :</label>
@@ -1948,16 +1914,16 @@
                 <span class="nav-presets-label">Configurations rapides :</span>
                 <div class="nav-presets-buttons">
                   <button type="button" class="nav-preset-pill" data-preset="all" title="Affiche l'intégralité des modules">
-                    <span>🌟 Tout afficher</span>
+                    <span>Tout afficher</span>
                   </button>
                   <button type="button" class="nav-preset-pill" data-preset="essential" title="Bible, Notes et Recherche uniquement">
-                    <span>📖 Essentiel</span>
+                    <span>Essentiel</span>
                   </button>
                   <button type="button" class="nav-preset-pill" data-preset="exegete" title="Bible, Guide de Passage, Commentaires, Théologie, Dictionnaires, Recherche">
-                    <span>🔍 Exégète & Recherche</span>
+                    <span>Exégète & Recherche</span>
                   </button>
                   <button type="button" class="nav-preset-pill" data-preset="preacher" title="Bible, Prédication, Commentaires, Notes">
-                    <span>🎙️ Prédicateur</span>
+                    <span>Prédicateur</span>
                   </button>
                 </div>
               </div>
@@ -1965,6 +1931,31 @@
               <!-- Liste des modules ordonnables par drag & drop -->
               <div class="nav-customizer-list" id="sidebar-nav-customizer-list">
                 <!-- Rendu dynamiquement par SettingsView -->
+              </div>
+            </div>
+
+            <!-- CARTE COMMUTATEUR MAÎTRE IA / MODE EXÉGÈSE CLASSIQUE (Placée en fin de page) -->
+            <div class="settings-card ai-master-card" style="margin-top: 16px;">
+              <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;">
+                <div style="flex: 1;">
+                  <div class="card-title" style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-purple, #8B5CF6);"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                    <span>Fonctionnalités d'Intelligence Artificielle (IA)</span>
+                  </div>
+                  <p class="card-desc" style="margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--text-secondary);">
+                    Active l'Assistant d'étude, la synthèse comparative multi-commentaires, la traduction et les aides IA. Si désactivée, l'application fonctionne en <strong>mode 100% traditionnel et hors-ligne</strong> : tous les boutons et options d'IA sont complètement masqués dans l'application.
+                  </p>
+                </div>
+                <label class="toggle-switch-large" title="Activer / Désactiver l'Intelligence Artificielle">
+                  <input type="checkbox" id="cfg-enable-ai" checked>
+                  <span class="toggle-switch-slider"></span>
+                </label>
+              </div>
+
+              <!-- Bannière informative quand l'IA est désactivée -->
+              <div id="ai-disabled-status-banner" class="ai-disabled-status-box hidden" style="margin-top: 14px; padding: 12px 14px; border-radius: 8px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: var(--text-primary); font-size: 12px; display: flex; align-items: center; gap: 10px;">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#F59E0B" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span><strong>Mode Classique sans IA actif :</strong> L'ensemble des boutons, assistants et synthèses IA sont masqués. Toutes vos Bibles, commentaires, dictionnaires et notes restent 100% accessibles hors-ligne.</span>
               </div>
             </div>
           </div>
@@ -2156,7 +2147,7 @@
                   </button>
                 </div>
                 <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">
-                  💡 Si vide, le dossier <code>data/ebooks/</code> de l'installation sera utilisé automatiquement.
+                  Si vide, le dossier <code>data/ebooks/</code> de l'installation sera utilisé automatiquement.
                 </p>
               </div>
             </div>
@@ -3398,18 +3389,67 @@
             </div>
           </div>
 
-          <!-- Section 7 : À propos & Ressources Libres (Logos / Bible Parser / Areopage) -->
+          <!-- Section 7 : À propos & Ressources Libres -->
           <div class="settings-section" id="sec-about">
             
-            <!-- BANNIÈRE PRINCIPALE OPEN SHEMA -->
+            <!-- BANNIÈRE PRINCIPALE OPEN SHEMA AVEC VRAI LOGO -->
             <div class="settings-card" style="background: linear-gradient(135deg, rgba(2, 132, 199, 0.08) 0%, rgba(14, 165, 233, 0.02) 100%); border-left: 4px solid var(--accent-primary, #0284c7);">
               <div style="display: flex; align-items: center; gap: 16px;">
-                <div style="width: 48px; height: 48px; border-radius: 12px; background: var(--accent-primary, #0284c7); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 22px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);">
-                  ש
-                </div>
+                <img src="img/logo.svg" alt="Open Shema" style="width: 52px; height: 52px; border-radius: 12px; object-fit: contain; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);">
                 <div>
                   <h2 style="margin: 0; font-size: 19px; font-weight: 700; color: var(--text-primary);">Open Shema</h2>
                   <p style="margin: 3px 0 0 0; font-size: 13px; color: var(--text-secondary);">Plateforme libre d'étude, d'exégèse et de recherche biblique assistée par IA locale.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- CARTE DU CODE SOURCE & DÉPÔTS GITHUB -->
+            <div class="settings-card">
+              <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-primary);">
+                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                </svg>
+                <span>Code Source & Dépôts GitHub</span>
+              </div>
+              <p class="card-desc">
+                Open Shema est un projet libre et open-source. Le code source de l'application ainsi que les modules de données sont hébergés et maintenus sur GitHub.
+              </p>
+
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 14px;">
+                <!-- Dépôt 1 : Application / Code source -->
+                <div style="padding: 14px; background: var(--bg-tertiary, rgba(255,255,255,0.03)); border: 1px solid var(--border-color, rgba(255,255,255,0.1)); border-radius: 10px; display: flex; flex-direction: column; justify-content: space-between; gap: 10px;">
+                  <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                      <strong style="color: var(--text-primary); font-size: 13.5px;">Application Open Shema</strong>
+                      <span style="font-size: 11px; padding: 2px 8px; border-radius: 6px; background: rgba(59, 130, 246, 0.15); color: #60a5fa; font-weight: 600;">Code Source</span>
+                    </div>
+                    <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.45; margin: 0;">
+                      Interface utilisateur, moteur d'exégèse, intégrations IA locales et outils d'étude.
+                    </p>
+                  </div>
+                  <a href="https://github.com/Similarly1/open-shema" target="_blank" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; padding: 5px 12px; text-decoration: none; width: fit-content;">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                    <span>github.com/Similarly1/open-shema</span>
+                    <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                  </a>
+                </div>
+
+                <!-- Dépôt 2 : Données & Modules -->
+                <div style="padding: 14px; background: var(--bg-tertiary, rgba(255,255,255,0.03)); border: 1px solid var(--border-color, rgba(255,255,255,0.1)); border-radius: 10px; display: flex; flex-direction: column; justify-content: space-between; gap: 10px;">
+                  <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                      <strong style="color: var(--text-primary); font-size: 13.5px;">Corpus & Données Bibliques</strong>
+                      <span style="font-size: 11px; padding: 2px 8px; border-radius: 6px; background: rgba(16, 185, 129, 0.15); color: #34d399; font-weight: 600;">Data & Modules</span>
+                    </div>
+                    <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.45; margin: 0;">
+                      Bibles, dictionnaires, commentaires, lexiques Strong et corpus théologiques.
+                    </p>
+                  </div>
+                  <a href="https://github.com/Similarly1/open-shema-data" target="_blank" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; padding: 5px 12px; text-decoration: none; width: fit-content;">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                    <span>github.com/Similarly1/open-shema-data</span>
+                    <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                  </a>
                 </div>
               </div>
             </div>
@@ -3423,7 +3463,7 @@
                 <span>Bibliothèque Libre Logos, Areopage & Bible Parser</span>
               </div>
               <p class="card-desc">
-                Nous exprimons notre profonde reconnaissance envers les créateurs et éditeurs qui permettent l'intégration de leurs corpus de référence au sein d'Open Shema avec accord écrit.
+                Nous exprimons notre reconnaissance envers les créateurs et éditeurs qui permettent l'intégration de leurs corpus de référence au sein d'Open Shema avec accord écrit.
               </p>
 
               <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-top: 14px;">
@@ -3459,54 +3499,15 @@
                 </div>
 
               </div>
-
-              <!-- NUMÉRISATEURS ET CONTRIBUTEURS -->
-              <div style="margin-top: 14px; padding: 12px; background: var(--bg-secondary, rgba(0,0,0,0.2)); border-radius: 8px; font-size: 12px; color: var(--text-muted); line-height: 1.5;">
-                <strong>Partenaires & Numérisateurs associés :</strong><br>
-                • <strong>Judeopedia.org</strong> (Maurice Mergui & Jean-Claude Lévy) pour la numérisation de la traduction historique de Samuel Cahen (1831–1839).<br>
-                • <strong>Yves Pétrakian</strong> pour la numérisation de textes exégétiques, du Nouveau Testament Edmond Stapfer (1889), Hugues Oltramare (1874) et de la version Synodale (1921).
-              </div>
             </div>
 
-            <!-- CARTE DU STARTER PACK INCLUS -->
-            <div class="settings-card">
-              <div class="card-title">📚 Ressources du Starter Pack Gratuit</div>
-              <p class="card-desc">Toutes ces ressources sont pré-installées ou intégrables en un clic et utilisables 100% hors-ligne :</p>
-              
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-top: 10px;">
-                <div style="font-size: 12.5px; color: var(--text-secondary);">
-                  <strong style="color: var(--text-primary); display: block; margin-bottom: 4px;">📖 Dictionnaires & Lexiques</strong>
-                  • Dom Calmet (1728 — 5 369 art.)<br>
-                  • F. Vigouroux (1912 — 7 585 art.)<br>
-                  • Jean-Augustin Bost (1848)<br>
-                  • Alexandre Westphal (1932)<br>
-                  • Lexique Strong Hébreu/Grec<br>
-                  • Dictionnaire Grec Bailly (1901)
-                </div>
-                <div style="font-size: 12.5px; color: var(--text-secondary);">
-                  <strong style="color: var(--text-primary); display: block; margin-bottom: 4px;">💬 Commentaires Bibliques</strong>
-                  • Frédéric Godet (Bible Annotée)<br>
-                  • Jean Calvin (Commentaires)<br>
-                  • Matthew Henry (Exposition)<br>
-                  • John Trapp & John Gill<br>
-                  • Adam Clarke & Albert Barnes<br>
-                  • The Gospel Coalition (TGC)
-                </div>
-                <div style="font-size: 12.5px; color: var(--text-secondary);">
-                  <strong style="color: var(--text-primary); display: block; margin-bottom: 4px;">📜 Traductions Historiques</strong>
-                  • Louis Segond (1910)<br>
-                  • J.N. Darby (1872)<br>
-                  • Augustin Crampon (1923)<br>
-                  • Samuel Cahen (1831–1839)<br>
-                  • Version Synodale (1921)<br>
-                  • Edmond Stapfer & Oltramare
-                </div>
-              </div>
-            </div>
 
             <!-- LICENCE ET CODE SOURCE -->
             <div class="settings-card">
-              <div class="card-title">📜 Licence & Liberté</div>
+              <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-orange);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <span>Licence & Confidentialité</span>
+              </div>
               <p class="card-desc" style="margin: 0; line-height: 1.5;">
                 Open Shema est un logiciel libre distribué sous licence <strong>MIT</strong>. Vos notes, données et requêtes d'étude restent strictement privées et stockées sur votre ordinateur.
               </p>
