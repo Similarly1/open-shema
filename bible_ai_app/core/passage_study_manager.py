@@ -532,81 +532,80 @@ class PassageStudyManager:
             conn.row_factory = sqlite3.Row
             cur = conn.cursor()
 
-            for ch_num in range(start_ch, end_ch + 1):
-                # Trouver les versets correspondants
-                cur.execute("""
-                    SELECT DISTINCT verse FROM original_words
-                    WHERE book_code = ? AND chapter = ?
-                    ORDER BY verse ASC;
-                """, (b_usfm, ch_num))
-                v_rows = cur.fetchall()
+            cur.execute("""
+                SELECT * FROM original_words
+                WHERE book_code = ? 
+                  AND (chapter > ? OR (chapter = ? AND verse >= ?))
+                  AND (chapter < ? OR (chapter = ? AND verse <= ?))
+                ORDER BY chapter ASC, verse ASC, word_idx ASC;
+            """, (b_usfm, start_ch, start_ch, start_v, end_ch, end_ch, end_v))
+            
+            w_rows = cur.fetchall()
+            
+            grouped_verses = {}
+            for r in w_rows:
+                k = (r["chapter"], r["verse"])
+                if k not in grouped_verses:
+                    grouped_verses[k] = []
+                grouped_verses[k].append(r)
 
-                for vr in v_rows:
-                    v_int = vr["verse"]
-                    if ch_num == start_ch and v_int < start_v:
-                        continue
-                    if ch_num == end_ch and v_int > end_v:
-                        continue
+            for (ch_num, v_int), verse_w_rows in grouped_verses.items():
+                v_words = []
+                for r in verse_w_rows:
+                    strong = r["strong_code"] or ""
+                    strong_entry = lexicon.get(strong)
+                    if not strong_entry and len(strong) > 1:
+                        prefix = strong[0]
+                        num_match = re.search(r'\d+', strong)
+                        if num_match:
+                            num = int(num_match.group())
+                            strong_entry = lexicon.get(f"{prefix}{num:04d}") or lexicon.get(f"{prefix}{num}")
 
-                    cur.execute("""
-                        SELECT * FROM original_words
-                        WHERE book_code = ? AND chapter = ? AND verse = ?
-                        ORDER BY word_idx ASC;
-                    """, (b_usfm, ch_num, v_int))
-                    w_rows = cur.fetchall()
+                    strong_def = strong_entry.get("definition", "") if strong_entry else ""
+                    lemma = r["lemma"] or ""
+                    if (not lemma or len(lemma) <= 1) and strong_entry:
+                        lemma = strong_entry.get("lemma", "") or lemma
 
-                    v_words = []
-                    for r in w_rows:
-                        strong = r["strong_code"] or ""
-                        strong_entry = lexicon.get(strong)
-                        if not strong_entry and len(strong) > 1:
-                            prefix = strong[0]
-                            num_match = re.search(r'\d+', strong)
-                            if num_match:
-                                num = int(num_match.group())
-                                strong_entry = lexicon.get(f"{prefix}{num:04d}") or lexicon.get(f"{prefix}{num}")
+                    r_lang = r["lang"] or "greek"
+                    lang_detected = r_lang
+                    if r_lang == "hebrew":
+                        is_rtl = True
 
-                        strong_def = strong_entry.get("definition", "") if strong_entry else ""
-                        lemma = r["lemma"] or ""
-                        if (not lemma or len(lemma) <= 1) and strong_entry:
-                            lemma = strong_entry.get("lemma", "") or lemma
+                    french_term = strong_def.split(',')[0].split(';')[0].strip() if strong_def else (r["gloss"] or "")
 
-                        r_lang = r["lang"] or "greek"
-                        lang_detected = r_lang
-                        if r_lang == "hebrew":
-                            is_rtl = True
+                    w_obj = {
+                        "index": r["word_idx"],
+                        "text": r["original_text"],
+                        "transliteration": r["transliteration"],
+                        "lemma": lemma,
+                        "strong": strong,
+                        "strong_def_fr": strong_def,
+                        "french_gloss": french_term,
+                        "morph_code": r["morph_code"],
+                        "morph_desc_fr": r["morph_desc_fr"],
+                        "gloss": french_term or r["gloss"],
+                        "raw_en_gloss": r["gloss"],
+                        "lang": r_lang
+                    }
+                    v_words.append(w_obj)
+                    all_words.append(w_obj)
 
-                        w_obj = {
-                            "index": r["word_idx"],
-                            "text": r["original_text"],
-                            "transliteration": r["transliteration"],
-                            "lemma": lemma,
-                            "strong": strong,
-                            "strong_def_fr": strong_def,
-                            "morph_code": r["morph_code"],
-                            "morph_desc_fr": r["morph_desc_fr"],
-                            "gloss": r["gloss"],
-                            "lang": r_lang
-                        }
-                        v_words.append(w_obj)
-                        all_words.append(w_obj)
+                # Texte continu pour le verset
+                v_clean_text = " ".join([w["text"] for w in v_words])
+                v_translit = " ".join([w["transliteration"] for w in v_words if w["transliteration"]])
 
-                    # Texte continu pour le verset
-                    v_clean_text = " ".join([w["text"] for w in v_words])
-                    v_translit = " ".join([w["transliteration"] for w in v_words if w["transliteration"]])
+                # Récupérer texte français de référence pour comparaison
+                fr_match = next((mv["text"] for mv in main_verses if mv.get("chapter") == ch_num and mv.get("verse") == v_int), "")
 
-                    # Récupérer texte français de référence pour comparaison
-                    fr_match = next((mv["text"] for mv in main_verses if mv.get("chapter") == ch_num and mv.get("verse") == v_int), "")
-
-                    words_by_verse.append({
-                        "chapter": ch_num,
-                        "verse": v_int,
-                        "key": f"{ch_num}:{v_int}",
-                        "original_text": v_clean_text,
-                        "transliteration": v_translit,
-                        "french_text": fr_match,
-                        "words": v_words
-                    })
+                words_by_verse.append({
+                    "chapter": ch_num,
+                    "verse": v_int,
+                    "key": f"{ch_num}:{v_int}",
+                    "original_text": v_clean_text,
+                    "transliteration": v_translit,
+                    "french_text": fr_match,
+                    "words": v_words
+                })
 
         # Assembler le texte continu complet du passage
         continuous_paragraphs = []
@@ -671,12 +670,26 @@ class PassageStudyManager:
         all_authors = {}
         verses_comments = []
 
+        cached_chapter_comments = {}
+
         for vk in verse_keys:
             ch_num, v_num = vk.split(":")
             ch_i = int(ch_num)
             v_i = int(v_num) if v_num.isdigit() else 1
 
-            raw_res = CommentaryLoader.get_all_comments_for_passage(book_code, ch_i, v_i)
+            if ch_i not in cached_chapter_comments:
+                cached_chapter_comments[ch_i] = CommentaryLoader.get_all_comments_for_passage(book_code, ch_i, None)
+            
+            chapter_res = cached_chapter_comments[ch_i]
+            
+            raw_res = {"documents": [], "metadatas": []}
+            for doc, meta in zip(chapter_res.get("documents", []), chapter_res.get("metadatas", [])):
+                v_s = meta.get("verse_start", v_i)
+                v_e = meta.get("verse_end", v_i)
+                if v_s <= v_i <= v_e:
+                    raw_res["documents"].append(doc)
+                    raw_res["metadatas"].append(meta)
+
             v_entry = {
                 "key": vk,
                 "chapter": ch_i,

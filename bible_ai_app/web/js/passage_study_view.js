@@ -1377,17 +1377,22 @@ const PassageStudyView = {
 
     const strongCode = wordData.strong || '';
     const isHebrew = strongCode.startsWith('H') || this.currentData?.original_language?.is_rtl;
-    const title = `${wordData.gloss || wordData.text || ''} [${wordData.lemma || wordData.text || ''}]`;
+    
+    // Déterminer le sens français principal (définition Strong en priorité)
+    const rawDef = wordData.def || wordData.strong_def_fr || '';
+    const frenchPrimaryTerm = (rawDef ? rawDef.split(/[,;]+/)[0].trim() : '') || wordData.french_gloss || wordData.gloss || wordData.text || '';
+    const title = `${frenchPrimaryTerm} [${wordData.lemma || wordData.text || ''}]`;
 
     // 1. Rendu immédiat synchrone avec les données locales
     let cardHtml = '';
     if (typeof LexiconViewer !== 'undefined' && LexiconViewer.buildStrongCardHtml) {
       cardHtml = LexiconViewer.buildStrongCardHtml({
         title: title,
+        french_lemma: frenchPrimaryTerm,
         lemma: wordData.lemma || wordData.text || '',
         strong: strongCode,
         dict_name: isHebrew ? 'Hébreu Biblique (A.T.)' : 'Grec Koinè (N.T.)',
-        full_text: wordData.def || wordData.strong_def_fr || wordData.gloss || ''
+        full_text: rawDef || wordData.gloss || ''
       }, '', '0');
     }
 
@@ -1400,10 +1405,10 @@ const PassageStudyView = {
           </div>
           <div class="strong-hero-box">
             <div class="strong-original-script ${isHebrew ? 'font-hebrew' : 'font-greek'}" dir="${isHebrew ? 'rtl' : 'ltr'}">${this.escapeHtml(wordData.text || wordData.lemma || '')}</div>
-            <div class="strong-french-lemma">« ${this.escapeHtml(wordData.gloss || wordData.text || '')} »</div>
+            <div class="strong-french-lemma">« ${this.escapeHtml(frenchPrimaryTerm)} »</div>
           </div>
           <div class="strong-card-section">
-            <p>${this.escapeHtml(wordData.def || wordData.strong_def_fr || '')}</p>
+            <p>${this.escapeHtml(rawDef || wordData.gloss || '')}</p>
           </div>
         </div>
       </div>
@@ -1415,13 +1420,17 @@ const PassageStudyView = {
         const res = await API.call('lookup_dictionary', strongCode);
         if (res && res.matches && res.matches.length > 0) {
           const match = res.matches[0];
+          const matchDef = match.full_text || match.raw_text || match.preview || rawDef || '';
+          const matchFrenchTerm = (matchDef ? matchDef.split(/[,;]+/)[0].trim() : '') || frenchPrimaryTerm;
+          
           if (typeof LexiconViewer !== 'undefined' && LexiconViewer.buildStrongCardHtml) {
             pane.innerHTML = LexiconViewer.buildStrongCardHtml({
-              title: `${wordData.gloss || match.title || ''} [${wordData.lemma || match.lemma || wordData.text || ''}]`,
-              lemma: wordData.lemma || match.lemma || wordData.text || '',
+              title: `${matchFrenchTerm} [${match.lemma || wordData.lemma || wordData.text || ''}]`,
+              french_lemma: matchFrenchTerm,
+              lemma: match.lemma || wordData.lemma || wordData.text || '',
               strong: strongCode,
               dict_name: match.dict_name || (isHebrew ? 'Hébreu Biblique (A.T.)' : 'Grec Koinè (N.T.)'),
-              full_text: match.full_text || match.raw_text || match.preview || wordData.def || ''
+              full_text: matchDef
             }, '', '0');
           }
         }

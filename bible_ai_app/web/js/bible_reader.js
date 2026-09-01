@@ -3604,13 +3604,15 @@ const LexiconViewer = {
 
   buildStrongCardHtml(match, bpVideoCardHtml = '', padding = '16px') {
     const rawTitle = match.title || this.currentTerm || '';
-    let frenchLemma = rawTitle;
+    let frenchLemma = match.french_lemma || rawTitle;
     let originalScript = match.lemma || '';
 
     // Extraction depuis "Arbre [עֵץ]"
     const bracketMatch = rawTitle.match(/^(.*?)\s*\[(.*?)\]/);
     if (bracketMatch) {
-      frenchLemma = bracketMatch[1].trim();
+      if (!match.french_lemma) {
+        frenchLemma = bracketMatch[1].trim();
+      }
       originalScript = bracketMatch[2].trim();
     }
 
@@ -3636,6 +3638,13 @@ const LexiconViewer = {
       if (!seen.has(lower)) {
         seen.add(lower);
         uniqueTokens.push(tok);
+      }
+    }
+
+    // Si frenchLemma ressemble à "Strong H7121" ou est vide, prendre le premier sens français
+    if (!frenchLemma || /^Strong\s+[HG]\d+/i.test(frenchLemma)) {
+      if (uniqueTokens.length > 0) {
+        frenchLemma = uniqueTokens[0];
       }
     }
 
