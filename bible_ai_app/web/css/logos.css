@@ -8456,6 +8456,9 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   transition: var(--transition-fast);
   user-select: none;
   white-space: nowrap;
+  max-width: 28px;
+  max-height: 22px;
+  overflow: hidden;
 }
 
 .intext-source-pill:hover,

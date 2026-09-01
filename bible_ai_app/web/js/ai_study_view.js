@@ -2145,13 +2145,13 @@ const AIStudyView = {
     });
 
     // 2. Détection universelle de TOUTES les citations de sources documentaires entre crochets [Nom : Terme] ou [Nom (Ref)] ou [Nom ; Nom]
-    // Supporte les caractères hébreux (\u0590-\u05FF), grecs (\u0370-\u03FF, \u1F00-\u1FFF), guillemets, et crochets imbriqués [Lexique [mot]]
+    // STRICTEMENT mono-ligne (sans retours à la ligne) et borné en longueur (< 80 caractères)
     const pureScriptureBracketRegex = /^\[\s*(?:[1-3]\s*)?[a-zA-ZÀ-ÿ]+\.?\s*\d+(?:\s*[:.,]\s*\d+(?:\s*[-–—]\s*\d+)?)?\s*\]$/;
-    const universalDocSourceRegex = /\[([A-Za-zÀ-ÿ0-9\s:;,'’"«»“”\.\-–—\(\)\/&+\u0590-\u05FF\u0370-\u03FF\u1F00-\u1FFF]*(?:\[[A-Za-zÀ-ÿ0-9\s:;,'’"«»“”\.\-–—\(\)\/&+\u0590-\u05FF\u0370-\u03FF\u1F00-\u1FFF]+\])?[A-Za-zÀ-ÿ0-9\s:;,'’"«»“”\.\-–—\(\)\/&+\u0590-\u05FF\u0370-\u03FF\u1F00-\u1FFF]*)\]/gi;
+    const universalDocSourceRegex = /\[([A-Za-zÀ-ÿ0-9\s:;,'’"«»“”\.\-–—\(\)\/&+\u0590-\u05FF\u0370-\u03FF\u1F00-\u1FFF]{2,80})\]/g;
 
     const buildSinglePill = (rawItem) => {
-      const cleanContent = rawItem.replace(/[\[\]]/g, ' ').replace(/\s+/g, ' ').trim();
-      if (!cleanContent || /^[GH]\d{1,5}$/i.test(cleanContent) || cleanContent.length < 2) return '';
+      const cleanContent = (rawItem || '').replace(/[\r\n]+/g, ' ').replace(/[\[\]]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (!cleanContent || /^[GH]\d{1,5}$/i.test(cleanContent) || cleanContent.length < 2 || cleanContent.length > 80) return '';
 
       let bookName = cleanContent;
       let entryTerm = "";
@@ -2183,18 +2183,18 @@ const AIStudyView = {
 
       const typeClass = matched ? this.getSourceTypeClass(matched.type) : this.getSourceTypeClass(mappedBookName);
       const typeLabel = matched ? this.getSourceTypeLabel(matched.type) : this.getSourceTypeLabel(mappedBookName);
-      const author = matched?.author || this.guessAuthor(mappedBookName);
+      const author = (matched?.author || this.guessAuthor(mappedBookName) || '').slice(0, 60);
       const coverUrl = matched?.cover_url || null;
 
-      const displayTitle = entryTerm ? `${mappedBookName} : ${entryTerm}` : mappedBookName;
-      const preview = matched?.preview ? this.escapeHtml(matched.preview) : '';
-      const coverData = coverUrl ? `data-cover="${coverUrl}"` : '';
+      const displayTitle = (entryTerm ? `${mappedBookName} : ${entryTerm}` : mappedBookName).slice(0, 80);
+      const preview = (matched?.preview ? String(matched.preview).replace(/[\r\n]+/g, ' ').slice(0, 200) : '');
+      const coverData = coverUrl ? `data-cover="${this.escapeHtml(coverUrl)}"` : '';
 
-      return `<span class="intext-source-pill" tabindex="0" data-type="${typeClass}" data-title="${this.escapeHtml(displayTitle)}" data-author="${this.escapeHtml(author)}" data-label="${typeLabel}" data-preview="${preview}" ${coverData}>${this.ICONS.book}</span>`;
+      return `<span class="intext-source-pill" tabindex="0" data-type="${this.escapeHtml(typeClass)}" data-title="${this.escapeHtml(displayTitle)}" data-author="${this.escapeHtml(author)}" data-label="${this.escapeHtml(typeLabel)}" data-preview="${this.escapeHtml(preview)}" ${coverData}>${this.ICONS.book}</span>`;
     };
 
     res = res.replace(universalDocSourceRegex, (match, fullBracketContent) => {
-      const trimmed = fullBracketContent.trim();
+      const trimmed = fullBracketContent.replace(/[\r\n]+/g, ' ').trim();
       if (!trimmed || /^[GH]\d{1,5}$/i.test(trimmed)) return match;
 
       // Si référence biblique pure comme [Jean 3:16], laisser pour scripture linkifier
