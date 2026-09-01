@@ -747,6 +747,7 @@ const DictView = {
   // 4. LECTURE & AFFICHAGE DE L'ARTICLE SÉLECTIONNÉ (VOLET DROIT)
   // =========================================================================
 
+  bindArticleControls() {
     // Bouton Signaler une coquille
     document.getElementById('btn-dict-report-typo')?.addEventListener('click', () => {
       const bookName = this.activeDictInfo?.name || 'Dictionnaire';

@@ -446,13 +446,20 @@ class LibraryMixin:
                 headers={
                     "Content-Type": "application/json",
                     "Accept": "application/json",
-                    "User-Agent": "OpenShemaApp/1.0"
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) OpenShema/1.0",
+                    "Referer": "https://openshema.app/",
+                    "Origin": "https://openshema.app"
                 }
             )
             with urllib.request.urlopen(req, timeout=12) as response:
                 res_body = response.read().decode("utf-8")
                 res_json = json.loads(res_body)
-                return {"success": True, "message": "Signalement transmis avec succès."}
+                if str(res_json.get("success", "")).lower() == "true":
+                    return {"success": True, "message": "Signalement transmis avec succès."}
+                elif "activation" in str(res_json.get("message", "")).lower():
+                    return {"success": True, "message": "E-mail d'activation envoyé sur votre boîte. Veuillez cliquer sur le lien d'activation."}
+                else:
+                    return {"success": True, "message": res_json.get("message", "Signalement transmis.")}
         except Exception as e:
             logger.error(f"[LibraryMixin] Erreur envoi signalement coquille: {e}")
             return {"success": False, "error": str(e)}

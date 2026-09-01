@@ -130,7 +130,7 @@ const ReportTypoModal = {
     try {
       const res = await API.call('report_typo', this.currentContext.bookTitle, this.currentContext.entryTitle, extract, comment, email);
       if (res && res.success) {
-        App.showToast('Merci ! Votre signalement de coquille a été transmis avec succès.', 'success');
+        App.showToast(res.message || 'Merci ! Votre signalement de coquille a été transmis avec succès.', 'success');
         this.close();
       } else {
         App.showToast('Erreur lors de la transmission : ' + (res?.error || 'Erreur réseau'), 'error');
