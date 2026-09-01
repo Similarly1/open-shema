@@ -1511,6 +1511,7 @@
             <input type="text" id="lib-search-input" class="search-field" placeholder="Filtrer par titre ou auteur...">
             <select id="lib-type-filter" class="select-field">
               <option value="Tous">Toutes les catégories</option>
+              <option value="openshema">✦ Pack Open Shema</option>
               <option value="Bible">Bibles</option>
               <option value="Commentaire">Commentaires</option>
               <option value="Dictionnaire">Dictionnaires</option>
@@ -3527,6 +3528,11 @@
           </div>
           <div class="view-actions">
             <input type="text" id="search-main-input" class="search-field" style="width: 280px;" placeholder="Mots-clés (ex: amour, création)...">
+            <select id="search-source-filter" class="select-field">
+              <option value="Tous">Bibles & Commentaires</option>
+              <option value="Bibles">Bibles uniquement</option>
+              <option value="Commentaires">Commentaires uniquement</option>
+            </select>
             <select id="search-corpus-filter" class="select-field">
               <option value="ALL">Toute la Bible</option>
               <option value="OT">Ancien Testament (AT)</option>
@@ -3534,16 +3540,11 @@
               <option value="GOSPELS_ACTS">Évangiles & Actes</option>
               <option value="EPISTLES">Épîtres & Apocalypse</option>
             </select>
-            <select id="search-source-filter" class="select-field">
-              <option value="Tous">Bibles & Commentaires</option>
-              <option value="Bibles">Bibles uniquement</option>
-              <option value="Commentaires">Commentaires uniquement</option>
-            </select>
-            <button class="btn-secondary" id="btn-search-open-ebooks" style="display: flex; align-items: center; gap: 6px;" title="Rechercher des e-books chrétiens externes avec cette requête">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/>
+            <button class="tool-btn icon-only" id="btn-search-open-ebooks" style="height: 32px; width: 34px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" title="Parcourir le catalogue d'e-books chrétiens (Open Shema Store)">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/>
+                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
               </svg>
-              <span>Trouver en E-book</span>
             </button>
           </div>
         </header>
@@ -4399,7 +4400,7 @@
                   <button class="drawer-tab active" data-drawer-tab="metadata" title="Métadonnées & Matrice Homilétique">Infos</button>
                   <button class="drawer-tab" data-drawer-tab="overview" title="Aperçu du texte biblique">Aperçu</button>
                   <button class="drawer-tab" data-drawer-tab="commentaries" title="Commentaires exégétiques">Commentaires</button>
-                  <button class="drawer-tab" data-drawer-tab="ai" title="Assistant & Structures homilétiques">Structures</button>
+                  <button class="drawer-tab" data-drawer-tab="structures" title="Structures homilétiques & Plans types">Structures</button>
                   <button class="drawer-tab" data-drawer-tab="illustrations" title="Illustrations associées">Illustrations</button>
                 </div>
                 <div style="display: flex; align-items: center; margin-left: auto; gap: 4px;">
@@ -4624,24 +4625,34 @@
 
             <!-- Sous-barre : Filtres par Type, Statut pastoral & Tri -->
             <div class="illustrations-subfilter-bar">
-              <div class="ill-types-group">
-                <span class="subfilter-label">Genre :</span>
-                <button class="ill-type-btn active" data-type="all">Tous</button>
-                <button class="ill-type-btn" data-type="Histoire vraie">Histoire vraie</button>
-                <button class="ill-type-btn" data-type="Métaphore & Vie courante">Métaphore</button>
-                <button class="ill-type-btn" data-type="Citation">Citation</button>
-                <button class="ill-type-btn" data-type="Science & Nature">Science & Nature</button>
-                <button class="ill-type-btn" data-type="Personnel">Récit personnel</button>
-              </div>
-              <div class="ill-right-subfilters">
-                <div class="ill-status-group">
-                  <span class="subfilter-label">Statut :</span>
-                  <button class="ill-status-btn active" data-status="all">Toutes</button>
-                  <button class="ill-status-btn" data-status="unused">Jamais prêchées</button>
-                  <button class="ill-status-btn" data-status="used">Déjà prêchées</button>
+              <div class="ill-filter-dropdowns-group">
+                <!-- Filtre Genre -->
+                <div class="ill-filter-select-wrapper">
+                  <span class="subfilter-label">Genre</span>
+                  <select id="ill-genre-select" class="ill-filter-select">
+                    <option value="all">Tous les genres</option>
+                    <option value="Histoire vraie">Histoire vraie</option>
+                    <option value="Métaphore & Vie courante">Métaphore</option>
+                    <option value="Citation">Citation</option>
+                    <option value="Science & Nature">Science & Nature</option>
+                    <option value="Personnel">Récit personnel</option>
+                  </select>
                 </div>
+
+                <!-- Filtre Statut -->
+                <div class="ill-filter-select-wrapper">
+                  <span class="subfilter-label">Statut</span>
+                  <select id="ill-status-select" class="ill-filter-select">
+                    <option value="all">Tous les statuts</option>
+                    <option value="unused">Jamais prêchées</option>
+                    <option value="used">Déjà prêchées</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="ill-right-subfilters">
                 <div class="ill-sort-group">
-                  <span class="subfilter-label">Tri :</span>
+                  <span class="subfilter-label">Tri</span>
                   <div class="ill-sort-select-wrapper">
                     <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" class="ill-sort-icon"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="m21 8-4-4-4 4"/><path d="M17 4v16"/></svg>
                     <select id="ill-sort-select" class="ill-sort-select">
@@ -5792,7 +5803,7 @@
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             <span>Contexte & Lieux</span>
           </button>
-          <button type="button" class="ps-nav-tab" data-tab="ai">
+          <button type="button" class="ps-nav-tab ai-feature-only" data-tab="ai">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
             <span>Atelier Exégèse IA</span>
           </button>
@@ -5841,7 +5852,7 @@
           </div>
 
           <!-- PANNEAU 5 : ATELIER EXÉGÈSE IA -->
-          <div class="ps-tab-panel" id="ps-panel-ai">
+          <div class="ps-tab-panel ai-feature-only" id="ps-panel-ai">
             <div class="ps-panel-container" id="ps-content-ai">
               <!-- Injecté dynamiquement par PassageStudyView -->
             </div>

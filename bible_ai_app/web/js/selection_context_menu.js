@@ -52,7 +52,7 @@ const SelectionContextMenu = {
           <span class="scm-shortcut">Ctrl+C</span>
         </button>
 
-        <button type="button" class="scm-item" data-action="translate" id="scm-btn-translate">
+        <button type="button" class="scm-item ai-feature-only" data-action="translate" id="scm-btn-translate">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
             <path d="m5 8 6 6"></path>
             <path d="m4 14 6-6 2-3"></path>
@@ -74,7 +74,7 @@ const SelectionContextMenu = {
           <span>Étudier ce passage</span>
         </button>
 
-        <button type="button" class="scm-item" data-action="ask-ai">
+        <button type="button" class="scm-item ai-feature-only" data-action="ask-ai">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
             <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
           </svg>
@@ -292,11 +292,18 @@ const SelectionContextMenu = {
       previewEl.textContent = text.length > 55 ? text.slice(0, 52) + '...' : text;
     }
 
-    // Détecter si le texte est en langue étrangère (non français)
+    const isAiDisabled = document.body.classList.contains('ai-disabled') || (typeof App !== 'undefined' && App.isAIEnabled === false);
+
+    // Détecter si le texte est en langue étrangère (non français) et si l'IA est active
     const translateBtn = document.getElementById('scm-btn-translate');
     const isFr = this.isLikelyFrench(text);
     if (translateBtn) {
-      translateBtn.style.display = isFr ? 'none' : 'flex';
+      translateBtn.style.display = (!isFr && !isAiDisabled) ? 'flex' : 'none';
+    }
+
+    const askAiBtn = this.menuEl.querySelector('[data-action="ask-ai"]');
+    if (askAiBtn) {
+      askAiBtn.style.display = isAiDisabled ? 'none' : 'flex';
     }
 
     // Détecter si la sélection contient ou est une référence biblique

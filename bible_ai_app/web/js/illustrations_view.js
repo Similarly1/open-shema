@@ -59,22 +59,34 @@ const IllustrationsView = {
       });
     });
 
-    // 3. Filtres par type / genre
+    // 3. Filtres par type / genre (Select et boutons)
+    const genreSelect = document.getElementById('ill-genre-select');
+    genreSelect?.addEventListener('change', () => {
+      this.activeType = genreSelect.value || 'all';
+      this.applyFilters();
+    });
     document.querySelectorAll('.ill-type-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.ill-type-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         this.activeType = btn.dataset.type || 'all';
+        if (genreSelect) genreSelect.value = this.activeType;
         this.applyFilters();
       });
     });
 
-    // 4. Filtres par statut d'utilisation
+    // 4. Filtres par statut d'utilisation (Select et boutons)
+    const statusSelect = document.getElementById('ill-status-select');
+    statusSelect?.addEventListener('change', () => {
+      this.activeStatus = statusSelect.value || 'all';
+      this.applyFilters();
+    });
     document.querySelectorAll('.ill-status-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.ill-status-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         this.activeStatus = btn.dataset.status || 'all';
+        if (statusSelect) statusSelect.value = this.activeStatus;
         this.applyFilters();
       });
     });

@@ -24,7 +24,10 @@ const SearchView = {
     });
 
     this.corpusFilter.addEventListener('change', () => this.executeSearch());
-    this.sourceFilter.addEventListener('change', () => this.executeSearch());
+    this.sourceFilter.addEventListener('change', () => {
+      this.updateFilterVisibility();
+      this.executeSearch();
+    });
 
     document.getElementById('btn-search-open-ebooks')?.addEventListener('click', () => {
       const q = this.searchInput.value.trim();
@@ -32,6 +35,21 @@ const SearchView = {
         OpenShemaStore.open('ebooks', q);
       }
     });
+
+    this.updateFilterVisibility();
+  },
+
+  updateFilterVisibility() {
+    const src = this.sourceFilter?.value;
+    if (this.corpusFilter) {
+      if (src === 'Commentaires') {
+        this.corpusFilter.classList.add('hidden');
+        this.corpusFilter.style.display = 'none';
+      } else {
+        this.corpusFilter.classList.remove('hidden');
+        this.corpusFilter.style.display = '';
+      }
+    }
   },
 
   async executeSearch() {

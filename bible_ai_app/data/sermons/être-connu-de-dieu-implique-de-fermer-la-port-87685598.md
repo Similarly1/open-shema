@@ -30,6 +30,25 @@ timing:
   words_per_minute: 135
 delivery_history: []
 created_at: '2026-08-25T21:19:58.712069'
-updated_at: '2026-08-31T14:14:02.309680'
+updated_at: '2026-09-01T12:16:51.294078'
 ---
 
+## Introduction
+
+
+
+## Lecture du passage
+
+« Insérez le texte biblique ici... »
+
+## I. Premier Point Principal
+
+Explication du texte et fondement doctrinal...
+
+## II. Deuxième Point Principal
+
+Développement théologique et résonance...
+
+## Conclusion & Appel
+
+Synthèse de la pensée maîtresse et application pour la semaine...

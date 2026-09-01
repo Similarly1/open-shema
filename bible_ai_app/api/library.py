@@ -102,6 +102,23 @@ class LibraryMixin:
                     "format": "dict"
                 })
 
+        for b in books:
+            b_name_l = str(b.get("name", "")).lower()
+            b_title_l = str(b.get("title", "")).lower()
+            b_id_l = str(b.get("dict_id", "")).lower()
+            b_path_l = str(b.get("file_path", "")).lower()
+
+            is_off = (
+                b.get("is_official") is True
+                or b.get("is_builtin") is True
+                or b.get("source") == "open-shema-data"
+                or b_id_l in ["strong", "calmet", "vigouroux", "bailly"]
+                or "hodge" in b_name_l
+                or "hodge" in b_title_l
+                or "hodge" in b_path_l
+            )
+            b["is_official"] = is_off
+
         return books
 
     def get_cover_image_data(self, cover_path: str) -> Dict[str, Any]:

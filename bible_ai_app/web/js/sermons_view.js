@@ -2146,7 +2146,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
       return;
     }
 
-    if (this.activeDrawerTab === 'ai') {
+    if (this.activeDrawerTab === 'structures' || this.activeDrawerTab === 'ai') {
       this.drawerContent.innerHTML = `
         <div style="padding: 8px 4px; display: flex; flex-direction: column; gap: 14px;">
           <!-- 1. Canevas Classiques des Manuels -->
@@ -2243,12 +2243,18 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
 
     if (this.activeDrawerTab === 'illustrations') {
       this.drawerContent.innerHTML = `
-        <div style="padding: 8px 4px; display: flex; flex-direction: column; gap: 10px;">
-          <div style="display: flex; align-items: center; justify-content: space-between;">
-            <span style="font-size: 12px; font-weight: 700; color: var(--text-primary);">Illustrations Pastorales</span>
-            <button class="btn-link" id="btn-drawer-go-illustrations" style="font-size: 11px; color: var(--accent-blue);">Ouvrir la banque ↗</button>
+        <div style="padding: 10px 6px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-orange, #f59e0b);"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+              <span style="font-size: 12.5px; font-weight: 700; color: var(--text-primary);">Illustrations Pastorales</span>
+            </div>
+            <button type="button" id="btn-drawer-go-illustrations" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; font-size: 11px; font-weight: 600; color: var(--accent-orange, #f59e0b); background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.28); border-radius: 6px; cursor: pointer; transition: all 0.15s ease;">
+              <span>Ouvrir la banque</span>
+              <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg>
+            </button>
           </div>
-          <p style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.45;">Accédez aux 1 500 fiches d'illustrations et insérez-les d'un clic dans la section active.</p>
+          <p style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.5; margin: 0;">Parcourez les 4 274 fiches d'illustrations et insérez vos récits et métaphores d'un clic dans votre prédication.</p>
         </div>
       `;
 

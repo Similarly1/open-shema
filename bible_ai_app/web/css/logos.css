@@ -2545,6 +2545,16 @@ body.reading-bg-white .chapter-block {
   background-color: var(--tag-bg);
   color: var(--tag-text);
 }
+.tag-openshema {
+  background-color: rgba(245, 158, 11, 0.14);
+  color: var(--accent-orange, #f59e0b);
+  border: 1px solid rgba(245, 158, 11, 0.32);
+  font-size: 8.5px;
+  letter-spacing: 0.3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
 
 .lib-actions {
   display: flex;
@@ -15791,6 +15801,11 @@ body.ai-disabled #btn-translate-dict,
 body.ai-disabled .comm-translate-badge,
 body.ai-disabled .comm-translate-btn,
 body.ai-disabled .dict-translate-btn,
+body.ai-disabled .ps-nav-tab[data-tab="ai"],
+body.ai-disabled #ps-panel-ai,
+body.ai-disabled #scm-btn-translate,
+body.ai-disabled .scm-item[data-action="ask-ai"],
+body.ai-disabled .scm-item[data-action="translate"],
 body.ai-disabled .ai-feature-only {
   display: none !important;
 }
@@ -26455,58 +26470,79 @@ body.reading-bg-dark .comm-dropdown-popover {
   padding-top: 10px;
 }
 
-.ill-types-group,
-.ill-status-group {
+.ill-filter-dropdowns-group {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 16px;
+  flex-wrap: nowrap;
+}
+
+.ill-filter-select-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
 }
 
 .subfilter-label {
   font-size: 11px;
   font-weight: 700;
   color: var(--text-muted, #71717a);
-  margin-right: 4px;
   text-transform: uppercase;
   letter-spacing: 0.4px;
+  white-space: nowrap;
+  user-select: none;
 }
 
-.ill-type-btn,
-.ill-status-btn {
-  padding: 3px 10px;
+.ill-filter-select,
+.ill-sort-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--bg-surface, #1e1e24);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  color: var(--text-primary, #f4f4f5);
   font-size: 11.5px;
   font-weight: 600;
-  border-radius: 5px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--text-secondary, #a1a1aa);
+  font-family: inherit;
+  padding: 4px 24px 4px 10px;
+  border-radius: 6px;
   cursor: pointer;
+  outline: none;
   transition: all 0.15s ease;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  white-space: nowrap;
 }
 
-.ill-type-btn:hover,
-.ill-status-btn:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text-primary, #f4f4f5);
+.ill-sort-select {
+  padding: 4px 24px 4px 26px;
 }
 
-.ill-type-btn.active,
-.ill-status-btn.active {
-  background: rgba(37, 99, 235, 0.15);
-  color: #93c5fd;
-  border-color: rgba(37, 99, 235, 0.35);
+.ill-filter-select:hover,
+.ill-sort-select:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  background-color: var(--bg-card, #25252d);
+}
+
+.ill-filter-select:focus,
+.ill-sort-select:focus {
+  border-color: var(--accent-blue, #3b82f6);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
 .ill-right-subfilters {
   display: flex;
   align-items: center;
   gap: 16px;
+  white-space: nowrap;
 }
 
 .ill-sort-group {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  white-space: nowrap;
 }
 
 .ill-sort-select-wrapper {
@@ -26521,33 +26557,6 @@ body.reading-bg-dark .comm-dropdown-popover {
   color: var(--text-muted, #71717a);
   pointer-events: none;
 }
-
-.ill-sort-select {
-  appearance: none;
-  -webkit-appearance: none;
-  background: var(--bg-surface, #1e1e24);
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-  color: var(--text-primary, #f4f4f5);
-  font-size: 11.5px;
-  font-weight: 600;
-  font-family: inherit;
-  padding: 4px 22px 4px 26px;
-  border-radius: 6px;
-  cursor: pointer;
-  outline: none;
-  transition: all 0.15s ease;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 7px center;
-}
-
-.ill-sort-select:hover {
-  border-color: rgba(255, 255, 255, 0.2);
-  background-color: var(--bg-card, #25252d);
-}
-
-.ill-sort-select:focus {
-  border-color: var(--accent-blue, #3b82f6);
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 

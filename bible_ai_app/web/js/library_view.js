@@ -51,7 +51,14 @@ const LibraryView = {
     const type = this.typeFilter.value;
 
     const filtered = this.books.filter(b => {
-      if (type !== 'Tous' && b.type !== type) return false;
+      const isOfficial = b.is_official === true || 
+                         b.source === 'open-shema-data' || 
+                         ['strong', 'calmet', 'vigouroux', 'bailly'].includes(b.id || b.dict_id) || 
+                         (b.name && b.name.toLowerCase().includes('hodge')) || 
+                         (b.title && b.title.toLowerCase().includes('hodge'));
+
+      if (type === 'openshema' && !isOfficial) return false;
+      if (type !== 'Tous' && type !== 'openshema' && b.type !== type) return false;
       if (q) {
         const title = (b.title || b.name || '').toLowerCase();
         const author = (b.author || '').toLowerCase();
@@ -76,6 +83,12 @@ const LibraryView = {
     filtered.forEach(book => {
       const card = document.createElement('div');
       card.className = `library-card ${book.active ? '' : 'inactive'}`;
+
+      const isOfficial = book.is_official === true || 
+                         book.source === 'open-shema-data' || 
+                         ['strong', 'calmet', 'vigouroux', 'bailly'].includes(book.id || book.dict_id) || 
+                         (book.name && book.name.toLowerCase().includes('hodge')) || 
+                         (book.title && book.title.toLowerCase().includes('hodge'));
 
       // Initials ou code court pour couverture
       let initials = book.version_code || book.code || '';
@@ -104,6 +117,7 @@ const LibraryView = {
           <div class="lib-author">${book.author || 'Auteur non spécifié'}</div>
           
           <div class="lib-tags">
+            ${isOfficial ? `<span class="tag tag-openshema" title="Ouvrage certifié issu du catalogue public Open Shema Data">✦ Open Shema</span>` : ''}
             ${book.type ? `<span class="tag tag-type">${book.type}</span>` : ''}
             ${book.corpus_scope ? `<span class="tag tag-scope">${book.corpus_scope === 'OT' ? 'AT' : (book.corpus_scope === 'BOTH' ? 'AT+NT' : (book.corpus_scope === 'APOCRYPHA' ? 'APO' : book.corpus_scope))}</span>` : ''}
             ${book.chapters_count ? `<span class="tag tag-count" style="display:inline-flex; align-items:center; gap:3px;"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><span>${book.chapters_count} ch.</span></span>` : ''}
