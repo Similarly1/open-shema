@@ -280,6 +280,20 @@ const TheologyView = {
       }
     });
 
+    // Signalement de coquille
+    document.getElementById('btn-theol-report-typo')?.addEventListener('click', () => {
+      const bookName = this.currentChapterData?.book_title || this.currentBook || 'Théologie';
+      const chTitle = this.currentChapterData?.chapter_title || `Chapitre ${this.currentChapterId}`;
+      const sel = window.getSelection()?.toString().trim() || '';
+      if (typeof ReportTypoModal !== 'undefined') {
+        ReportTypoModal.open({
+          bookTitle: bookName,
+          entryTitle: chTitle,
+          selectedText: sel
+        });
+      }
+    });
+
     // Actions du panneau Synthèse IA
     this.btnCloseSynth?.addEventListener('click', () => {
       this.closeSynthesisPanel();

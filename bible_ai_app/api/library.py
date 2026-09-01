@@ -416,3 +416,45 @@ class LibraryMixin:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+    def report_typo(self, book_title: str, entry_title: str, selected_text: str, user_comment: str, user_email: str = None) -> Dict[str, Any]:
+        """
+        Transmet un signalement de coquille / erreur directement vers l'alias email anonaddy/addy.io configuré.
+        """
+        import urllib.request
+        import urllib.parse
+        import json
+
+        FEEDBACK_EMAIL = "0wl8a4k7@family3130.anonaddy.com"
+        try:
+            subject = f"[Open Shema Coquille] {book_title} — {entry_title}"
+            payload = {
+                "_subject": subject,
+                "Ouvrage": str(book_title or "Non spécifié"),
+                "Article_ou_Chapitre": str(entry_title or "Non spécifié"),
+                "Extrait_concerne": str(selected_text) if selected_text else "(Aucun extrait surligné)",
+                "Remarque_ou_Correction": str(user_comment or ""),
+                "Email_lecteur": str(user_email) if user_email else "Non renseigné",
+                "_template": "table",
+                "_captcha": "false"
+            }
+            
+            url = f"https://formsubmit.co/ajax/{FEEDBACK_EMAIL}"
+            data = json.dumps(payload).encode("utf-8")
+            req = urllib.request.Request(
+                url,
+                data=data,
+                headers={
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "User-Agent": "OpenShemaApp/1.0"
+                }
+            )
+            with urllib.request.urlopen(req, timeout=12) as response:
+                res_body = response.read().decode("utf-8")
+                res_json = json.loads(res_body)
+                return {"success": True, "message": "Signalement transmis avec succès."}
+        except Exception as e:
+            logger.error(f"[LibraryMixin] Erreur envoi signalement coquille: {e}")
+            return {"success": False, "error": str(e)}
+
+

@@ -3840,8 +3840,8 @@ const LexiconViewer = {
       return;
     }
 
-    const isPolished = match.is_polished;
-    const modelName = match.polished_model || 'Mistral 14B';
+    const isPolished = match.user_polished === true;
+    const modelName = match.polished_model || 'IA';
     const itemId = `dict_${match.dict_id}_${match.id || this.currentTerm}`;
     const isForeign = CommentaryViewer.isForeignText(match.full_text || match.preview || '');
     const cachedTrans = CommentaryViewer.translationCache[itemId];
@@ -4013,6 +4013,7 @@ const LexiconViewer = {
           const res = await API.call('polish_dictionary_article', match.dict_id, match.title, match.raw_text || match.full_text, null, match.slug);
           if (res && res.success) {
             match.is_polished = true;
+            match.user_polished = true;
             match.full_text = res.text;
             match.polished_model = res.model;
             App.showToast('Notice restaurée par IA avec succès !');

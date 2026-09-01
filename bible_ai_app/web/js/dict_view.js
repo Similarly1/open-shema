@@ -532,6 +532,19 @@ const DictView = {
     // Charger les mots-vedettes valides pour filtrer les boutons de renvois
     this.loadValidHeadwords(this.activeDictId);
 
+    // Visibilité du bouton "Polir IA" : réservé exclusivement aux ouvrages personnels/importés par l'utilisateur
+    const btnPolish = document.getElementById('btn-dict-polish-article');
+    const isOfficialOpenShema = ['strong', 'calmet', 'vigouroux', 'bailly', 'theologie_systematiq', 'nouveau_dictionnaire'].includes(dInfo.id) || dInfo.is_official || dInfo.is_builtin || dInfo.source === 'open-shema-data';
+    if (btnPolish) {
+      if (isOfficialOpenShema) {
+        btnPolish.classList.add('hidden');
+        btnPolish.style.display = 'none';
+      } else {
+        btnPolish.classList.remove('hidden');
+        btnPolish.style.display = 'inline-flex';
+      }
+    }
+
     // Mettre à jour le bouton actif dans l'en-tête (Style Théologie)
     const titleEl = document.getElementById('dict-active-book-title');
     const metaEl = document.getElementById('dict-active-book-meta');
@@ -734,7 +747,20 @@ const DictView = {
   // 4. LECTURE & AFFICHAGE DE L'ARTICLE SÉLECTIONNÉ (VOLET DROIT)
   // =========================================================================
 
-  bindArticleControls() {
+    // Bouton Signaler une coquille
+    document.getElementById('btn-dict-report-typo')?.addEventListener('click', () => {
+      const bookName = this.activeDictInfo?.name || 'Dictionnaire';
+      const entryName = this.currentEntryData?.title || this.activeSlug || 'Article';
+      const sel = window.getSelection()?.toString().trim() || '';
+      if (typeof ReportTypoModal !== 'undefined') {
+        ReportTypoModal.open({
+          bookTitle: bookName,
+          entryTitle: entryName,
+          selectedText: sel
+        });
+      }
+    });
+
     // Bouton Polissage IA
     document.getElementById('btn-dict-polish-article')?.addEventListener('click', () => {
       this.polishCurrentArticle();
@@ -853,11 +879,11 @@ const DictView = {
       return;
     }
 
-    const isPolished = match.is_polished;
-    const modelName = match.polished_model || 'Mistral 14B';
+    const isUserPolished = match.user_polished === true;
+    const modelName = match.polished_model || 'IA';
 
     let polishBannerHtml = '';
-    if (isPolished) {
+    if (isUserPolished) {
       polishBannerHtml = `
         <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; background: rgba(79, 70, 229, 0.08); border: 1px solid rgba(79, 70, 229, 0.2); border-radius: 8px; margin-bottom: 18px;">
           <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: #6366f1;">
@@ -2093,6 +2119,7 @@ const DictView = {
       const res = await API.call('polish_dictionary_article', match.dict_id || this.activeDictId, match.title, match.raw_text || match.full_text, null, match.slug);
       if (res && res.success) {
         match.is_polished = true;
+        match.user_polished = true;
         match.full_text = res.text;
         match.polished_model = res.model;
         App.showToast('Notice restaurée par IA avec succès !', 'success');
