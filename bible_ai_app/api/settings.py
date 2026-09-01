@@ -420,3 +420,164 @@ class SettingsMixin:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+    def is_first_run(self) -> Dict[str, Any]:
+        """Vérifie si l'application est au premier lancement."""
+        cfg = load_secrets_into_config(load_config())
+        first_run_flag = cfg.get("first_run")
+        if first_run_flag is False:
+            return {"is_first_run": False, "config": cfg}
+
+        # Vérifier si au moins une Bible est présente
+        bibles_dir = os.path.join(current_dir, "data", "bibles")
+        has_bibles = False
+        if os.path.isdir(bibles_dir):
+            for entry in os.listdir(bibles_dir):
+                full_p = os.path.join(bibles_dir, entry)
+                if os.path.isdir(full_p) or entry.endswith((".sqlite", ".db", ".json")):
+                    has_bibles = True
+                    break
+
+        if not has_bibles:
+            return {"is_first_run": True, "config": cfg}
+
+        return {"is_first_run": bool(first_run_flag is not False), "config": cfg}
+
+    def download_onboarding_modules(self, modules: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Télécharge et installe les modules sélectionnés lors du premier lancement depuis open-shema-data."""
+        import gzip
+        import urllib.request
+        from core.task_manager import TaskManager
+
+        task_id = "onboarding_download"
+        total_modules = len(modules)
+        if total_modules == 0:
+            return {"success": True, "installed": 0}
+
+        TaskManager.start_task(
+            task_id=task_id,
+            title="Installation des modules",
+            task_type="download",
+            total=total_modules,
+            detail="Initialisation du téléchargement..."
+        )
+
+        data_dir = os.path.join(current_dir, "data")
+        os.makedirs(data_dir, exist_ok=True)
+        installed_items = []
+
+        try:
+            for idx, mod in enumerate(modules):
+                mod_id = mod.get("id", "module")
+                mod_title = mod.get("title") or mod_id
+                mod_abbr = mod.get("abbreviation") or mod.get("code") or "LSG"
+                mod_type = mod.get("type", "bible")
+                download_url = mod.get("download_url") or mod.get("url") or ""
+
+                if not download_url:
+                    cdn_base = "https://raw.githubusercontent.com/Similarly1/open-shema-data/main"
+                    rel_path = mod.get("file_path") or f"data/{mod_type}s/bible_{mod_abbr.lower()}.sqlite"
+                    download_url = f"{cdn_base}/{rel_path}"
+
+                TaskManager.update_progress(
+                    task_id,
+                    int((idx / total_modules) * 100),
+                    current=idx,
+                    total=total_modules,
+                    detail=f"Téléchargement de {mod_title}..."
+                )
+
+                # Déterminer le dossier de destination
+                if mod_type == "bible":
+                    target_dir = os.path.join(data_dir, "bibles")
+                elif mod_type == "dictionary":
+                    target_dir = os.path.join(data_dir, "dictionaries")
+                elif mod_type == "commentary":
+                    target_dir = os.path.join(data_dir, "commentaires")
+                elif mod_type == "theology":
+                    target_dir = os.path.join(data_dir, "theology")
+                else:
+                    target_dir = data_dir
+
+                os.makedirs(target_dir, exist_ok=True)
+
+                is_gz = download_url.endswith(".gz")
+                filename = os.path.basename(download_url.split("?")[0])
+                dest_filename = filename[:-3] if is_gz else filename
+                dest_path = os.path.join(target_dir, dest_filename)
+
+                req = urllib.request.Request(
+                    download_url,
+                    headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) OpenShema/1.0"}
+                )
+
+                temp_download = os.path.join(target_dir, f"tmp_{filename}")
+                with urllib.request.urlopen(req, timeout=30) as resp, open(temp_download, "wb") as out_f:
+                    shutil.copyfileobj(resp, out_f)
+
+                if is_gz:
+                    with gzip.open(temp_download, "rb") as gz_in, open(dest_path, "wb") as out_f:
+                        shutil.copyfileobj(gz_in, out_f)
+                    try:
+                        os.remove(temp_download)
+                    except OSError:
+                        pass
+                else:
+                    if os.path.exists(dest_path):
+                        os.remove(dest_path)
+                    os.rename(temp_download, dest_path)
+
+                # Si c'est une Bible SQLite, extraire en JSON pour le moteur de lecture
+                if mod_type == "bible" and dest_path.endswith(".sqlite"):
+                    try:
+                        if hasattr(self, "_extract_sqlite_bible_to_json"):
+                            self._extract_sqlite_bible_to_json(dest_path, mod_abbr, mod_title)
+                    except Exception as ext_err:
+                        logger.warning(f"Avertissement extraction SQLite vers JSON ({mod_title}): {ext_err}")
+
+                    # Enregistrer dans metadata / library
+                    try:
+                        registry = load_books_metadata()
+                        registry[mod_title] = {
+                            "title": mod_title,
+                            "type": "Bible",
+                            "folder_name": mod_abbr,
+                            "version_code": mod_abbr,
+                            "file_path": dest_path,
+                            "active": True
+                        }
+                        save_books_metadata(registry)
+                    except Exception as reg_err:
+                        logger.warning(f"Avertissement enregistrement metadata Bible ({mod_title}): {reg_err}")
+
+                installed_items.append({"id": mod_id, "title": mod_title, "path": dest_path})
+
+            TaskManager.complete_task(task_id, message=f"{len(installed_items)} module(s) installé(s) avec succès")
+            return {"success": True, "installed": len(installed_items), "items": installed_items}
+
+        except Exception as e:
+            logger.error(f"Erreur download_onboarding_modules: {e}", exc_info=True)
+            TaskManager.fail_task(task_id, str(e))
+            return {"success": False, "error": str(e), "installed": len(installed_items)}
+
+    def complete_first_run(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        """Finalise le premier lancement, enregistre la configuration et désactive first_run."""
+        try:
+            current_cfg = load_secrets_into_config(load_config())
+            
+            # Mettre à jour les paramètres reçus
+            for k, v in payload.items():
+                current_cfg[k] = v
+
+            current_cfg["first_run"] = False
+            
+            # Migrer les secrets et enregistrer
+            clean_cfg = migrate_secrets_from_config(current_cfg)
+            save_config(clean_cfg)
+            
+            self.config = load_secrets_into_config(load_config())
+            return {"success": True}
+        except Exception as e:
+            logger.error(f"Erreur complete_first_run: {e}", exc_info=True)
+            return {"success": False, "error": str(e)}
+
+

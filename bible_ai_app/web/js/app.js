@@ -14,12 +14,26 @@ const App = {
     }
   },
 
-  init() {
+  async init() {
 
     // 0. Initialisation immédiate de l'IA, du thème, de la typographie et du menu latéral
     this.initAIState();
     this.initThemeAndFont();
     this.initSidebarConfig();
+
+    // Vérifier si premier lancement : si oui, ouvrir immédiatement le Wizard et bloquer le chargement lourd en arrière-plan
+    if (typeof FirstRunWizard !== 'undefined' && window.pywebview && window.pywebview.api && window.pywebview.api.is_first_run) {
+      try {
+        const res = await window.pywebview.api.is_first_run();
+        if (res && res.is_first_run) {
+          FirstRunWizard.show();
+          if (typeof TaskManager !== 'undefined') TaskManager.init();
+          return;
+        }
+      } catch (e) {
+        console.warn("[App.init] Erreur vérification is_first_run :", e);
+      }
+    }
 
     // 1. Initialiser tous les sous-systèmes de manière résiliente
     const modules = [
@@ -2162,4 +2176,10 @@ const VintageThemeManager = {
 
 document.addEventListener('DOMContentLoaded', () => {
   App.init();
+});
+
+window.addEventListener('pywebviewready', () => {
+  if (typeof FirstRunWizard !== 'undefined') {
+    FirstRunWizard.init();
+  }
 });
