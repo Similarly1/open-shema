@@ -10082,47 +10082,111 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   background: var(--bg-active);
 }
 
-/* Pastille ronde coupée en deux en diagonale 135° - STRICTEMENT RONDE */
+/* Pastille d'harmonie chromatique moderne (Base Canvas + Accent Badge) */
 .palette-circle-split {
-  width: 36px !important;
-  height: 36px !important;
-  min-width: 36px !important;
-  min-height: 36px !important;
-  max-width: 36px !important;
-  max-height: 36px !important;
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  max-width: 34px !important;
+  max-height: 34px !important;
   border-radius: 50% !important;
   aspect-ratio: 1 / 1 !important;
   flex-shrink: 0 !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  position: relative;
-  overflow: hidden;
+  position: relative !important;
+  overflow: visible !important;
+  box-sizing: border-box !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Pastille flottante de couleur d'accentuation en bas à droite */
+.palette-circle-split::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2px solid var(--bg-card, #1e1e1e);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
   box-sizing: border-box;
+  transition: transform 0.2s ease;
 }
 
-/* Mode Sombre : 3 pastilles bicolores distinctes */
+.palette-swatch-card:hover .palette-circle-split {
+  transform: scale(1.05);
+}
+
+.palette-swatch-card:hover .palette-circle-split::after {
+  transform: scale(1.1);
+}
+
+/* Mode Sombre : 3 thèmes avec base profonde et accent vibrant */
 .swatch-dark-slate {
-  background: linear-gradient(135deg, #0B0F17 50%, #38BDF8 50%) !important;
+  background: #0F172A !important;
+  border-color: rgba(56, 189, 248, 0.3) !important;
 }
-.swatch-dark-oled {
-  background: linear-gradient(135deg, #000000 50%, #E2E8F0 50%) !important;
-}
-.swatch-dark-warm {
-  background: linear-gradient(135deg, #151210 50%, #F59E0B 50%) !important;
+.swatch-dark-slate::after {
+  background: #38BDF8 !important;
+  border-color: #0F172A !important;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.5) !important;
 }
 
-/* Mode Clair : 3 pastilles bicolores distinctes */
+.swatch-dark-oled {
+  background: #000000 !important;
+  border-color: rgba(226, 232, 240, 0.25) !important;
+}
+.swatch-dark-oled::after {
+  background: #E2E8F0 !important;
+  border-color: #000000 !important;
+  box-shadow: 0 0 8px rgba(226, 232, 240, 0.4) !important;
+}
+
+.swatch-dark-warm {
+  background: #18130E !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
+}
+.swatch-dark-warm::after {
+  background: #F59E0B !important;
+  border-color: #18130E !important;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.55) !important;
+}
+
+/* Mode Clair : 3 thèmes avec base lumineuse et accent riche */
 .swatch-light-clean {
-  background: linear-gradient(135deg, #FFFFFF 50%, #0284C7 50%) !important;
-  border-color: rgba(0, 0, 0, 0.2) !important;
+  background: #FFFFFF !important;
+  border-color: rgba(2, 132, 199, 0.3) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
 }
+.swatch-light-clean::after {
+  background: #0284C7 !important;
+  border-color: #FFFFFF !important;
+  box-shadow: 0 0 6px rgba(2, 132, 199, 0.4) !important;
+}
+
 .swatch-light-warm {
-  background: linear-gradient(135deg, #FAF7F0 50%, #1D4ED8 50%) !important;
-  border-color: rgba(0, 0, 0, 0.2) !important;
+  background: #FBF8F1 !important;
+  border-color: rgba(217, 119, 6, 0.25) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
 }
+.swatch-light-warm::after {
+  background: #2563EB !important;
+  border-color: #FBF8F1 !important;
+  box-shadow: 0 0 6px rgba(37, 99, 235, 0.4) !important;
+}
+
 .swatch-light-nordic {
-  background: linear-gradient(135deg, #F2F4F5 50%, #0D9488 50%) !important;
-  border-color: rgba(0, 0, 0, 0.2) !important;
+  background: #F1F5F5 !important;
+  border-color: rgba(13, 148, 136, 0.25) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+}
+.swatch-light-nordic::after {
+  background: #0D9488 !important;
+  border-color: #F1F5F5 !important;
+  box-shadow: 0 0 6px rgba(13, 148, 136, 0.4) !important;
 }
 
 .ai-history-item {
@@ -10390,15 +10454,26 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
 }
 
 .palette-swatch-check {
-  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 11px;
   font-weight: 700;
-  color: var(--accent-blue);
+  color: #FFFFFF;
+  background: var(--accent-blue, #3b82f6);
   opacity: 0;
-  transition: opacity 0.15s ease;
+  transform: scale(0.6);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .palette-swatch-card.active .palette-swatch-check {
   opacity: 1;
+  transform: scale(1);
 }
 
 /* Grille de sélection pour le fond de lecture */
