@@ -943,7 +943,7 @@
     "title": "Théologie Systématique (Charles Hodge - 3 Volumes)",
     "author": "Charles Hodge (Séminaire de Princeton)",
     "description": "Monument de la théologie réformée du XIXe siècle (1871-1873) en 3 volumes complets : Introduction & Théologie Propre (Vol. 1), Anthropologie & Sotériologie (Vol. 2), Sotériologie & Eschatologie (Vol. 3). Traduction moderne intégrale, 302 sections et 2 796 notes de bas de page.",
-    "year": "1871–1873",
+    "year": "1873",
     "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\HODGE.png",
     "type": "Théologie",
     "corpus_scope": "GLOBAL",
@@ -953,7 +953,8 @@
     "active": true,
     "chapters_count": 302,
     "chunks_count": 302,
-    "file_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\ebooks\\hodge_theologie_systematique.sqlite"
+    "file_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\ebooks\\hodge_theologie_systematique.sqlite",
+    "embedding_model": "bge_multilingual_gemma2 (Infomaniak)"
   },
   "APEE": {
     "title": "Bible de l'Épée",

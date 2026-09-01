@@ -688,18 +688,25 @@ const TheologyView = {
 
       // 1. Détection des titres Markdown (#, ##, ###, ####)
       if (pTrim.startsWith('#')) {
+        const renderHeadingContent = (txt) => {
+          let h = this.escapeHtml(txt);
+          h = h.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
+          h = h.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
+          h = h.replace(/\_([^\_]+)\_/g, '<em>$1</em>');
+          return h;
+        };
         if (pTrim.startsWith('####')) {
           const cleanHeading = pTrim.replace(/^####\s*/, '');
-          return `<h4 class="theol-subsubsection-heading">${this.escapeHtml(cleanHeading)}</h4>`;
+          return `<h4 class="theol-subsubsection-heading">${renderHeadingContent(cleanHeading)}</h4>`;
         } else if (pTrim.startsWith('###')) {
           const cleanHeading = pTrim.replace(/^###\s*/, '');
-          return `<h3 class="theol-subsection-heading">${this.escapeHtml(cleanHeading)}</h3>`;
+          return `<h3 class="theol-subsection-heading">${renderHeadingContent(cleanHeading)}</h3>`;
         } else if (pTrim.startsWith('##')) {
           const cleanHeading = pTrim.replace(/^##\s*/, '');
-          return `<h2 class="theol-section-heading">${this.escapeHtml(cleanHeading)}</h2>`;
+          return `<h2 class="theol-section-heading">${renderHeadingContent(cleanHeading)}</h2>`;
         } else {
           const cleanHeading = pTrim.replace(/^#\s*/, '');
-          return `<h2 class="theol-section-heading theol-h1-heading">${this.escapeHtml(cleanHeading)}</h2>`;
+          return `<h2 class="theol-section-heading theol-h1-heading">${renderHeadingContent(cleanHeading)}</h2>`;
         }
       }
 
@@ -726,12 +733,16 @@ const TheologyView = {
       if (pTrim.startsWith('>') || pTrim.startsWith('«') || (pTrim.length < 250 && (pTrim.includes('Rom') || pTrim.includes('Jean') || pTrim.includes('Psa')) && pTrim.includes(':'))) {
         const cleanQuote = pTrim.replace(/^>\s*/, '');
         let formatted = this.highlightScriptureReferences(cleanQuote);
+        formatted = formatted.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
+        formatted = formatted.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
         formatted = this.formatFootnoteReferences(formatted, footnoteMap);
         return `<blockquote class="theol-reading-quote">${formatted}</blockquote>`;
       }
 
       // 4. Paragraphe standard avec références bibliques et appels de notes
       let formatted = this.highlightScriptureReferences(p);
+      formatted = formatted.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
+      formatted = formatted.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
       formatted = this.formatFootnoteReferences(formatted, footnoteMap);
       return `<p class="theol-reading-p ${idx === 0 ? 'theol-first-p' : ''}">${formatted}</p>`;
     }).filter(Boolean).join('\n');

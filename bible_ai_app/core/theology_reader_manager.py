@@ -771,7 +771,7 @@ class TheologyReaderManager:
             cur_idx_display = 1
 
         target_ch_info = next((c for c in chapters_list if str(c["chapter_id"]) == str(chapter_id)), {})
-        section_title = target_ch_info.get("section_title")
+        section_title = target_ch_info.get("chapter_title") or target_ch_info.get("section_title") or target_ch_info.get("part_title")
 
         ch_title = chapter_meta.get("chapter_title") or target_ch_info.get("title") or f"Chapitre {chapter_id}"
         ch_title = cls._clean_text_encoding(ch_title)
