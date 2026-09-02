@@ -131,6 +131,11 @@ const SettingsView = {
   draggedNavId: null,
 
   init() {
+    if (this._isInitialized) {
+      this.loadData();
+      return;
+    }
+    this._isInitialized = true;
     this.bindTabs();
     this.bindSliders();
     this.bindActions();
@@ -598,7 +603,27 @@ Règles impératives :
       this.updateAIToggles(isEnabled);
       this.config.enable_ai = isEnabled;
       API.call('save_settings', { ...this.config, enable_ai: isEnabled });
-      App.showToast(isEnabled ? 'Intelligence Artificielle activée' : 'Mode 100% Traditionnel sans IA activé');
+
+      if (isEnabled) {
+        const gemKey = document.getElementById('cfg-gemini-key')?.value?.trim();
+        const misKey = document.getElementById('cfg-mistral-key')?.value?.trim();
+        const infoTok = document.getElementById('cfg-infomaniak-token')?.value?.trim();
+        const hasAnyKey = !!(gemKey || misKey || infoTok);
+
+        if (!hasAnyKey) {
+          App.showToast("Intelligence Artificielle activée ! Veuillez renseigner votre clé API ci-dessous.");
+          const keyInput = document.getElementById('cfg-gemini-key');
+          if (keyInput) {
+            this.switchToSection('ai');
+            keyInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => keyInput.focus(), 300);
+          }
+        } else {
+          App.showToast('Intelligence Artificielle activée');
+        }
+      } else {
+        App.showToast('Mode 100% Traditionnel sans IA activé');
+      }
     };
 
     document.getElementById('cfg-enable-ai')?.addEventListener('change', handleAIToggle);
