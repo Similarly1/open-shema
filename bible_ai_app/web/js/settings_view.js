@@ -610,17 +610,19 @@ Règles impératives :
         const infoTok = document.getElementById('cfg-infomaniak-token')?.value?.trim();
         const hasAnyKey = !!(gemKey || misKey || infoTok);
 
+        // Bascule automatique vers l'onglet IA et focus sur les clés
+        this.switchToSection('ai', 'cfg-gemini-key');
+
         if (!hasAnyKey) {
-          App.showToast("Intelligence Artificielle activée ! Veuillez renseigner votre clé API ci-dessous.");
-          const keyInput = document.getElementById('cfg-gemini-key');
-          if (keyInput) {
-            this.switchToSection('ai');
-            keyInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            setTimeout(() => keyInput.focus(), 300);
-          }
+          App.showToast("Intelligence Artificielle activée ! Veuillez renseigner votre clé API (Gemini gratuit, Mistral ou Infomaniak).");
         } else {
-          App.showToast('Intelligence Artificielle activée');
+          App.showToast("Intelligence Artificielle activée ! Clé configurée active.");
         }
+
+        setTimeout(() => {
+          const keyInput = document.getElementById('cfg-gemini-key');
+          if (keyInput) keyInput.focus();
+        }, 300);
       } else {
         App.showToast('Mode 100% Traditionnel sans IA activé');
       }

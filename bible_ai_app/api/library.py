@@ -40,8 +40,15 @@ class LibraryMixin:
         registry = load_books_metadata()
         books = []
         registered_dict_ids = set()
+        seen_bible_keys = set()
 
         for name, meta in registry.items():
+            if meta.get("type") == "Bible":
+                b_key = meta.get("folder_name") or meta.get("version_code") or name
+                if b_key in seen_bible_keys:
+                    continue
+                seen_bible_keys.add(b_key)
+
             b = meta.copy()
             b["name"] = name
             cov_p = b.get("cover_path")
