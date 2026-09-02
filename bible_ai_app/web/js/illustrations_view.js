@@ -345,6 +345,57 @@ const IllustrationsView = {
     if (!this.container) return;
 
     if (this.illustrations.length === 0) {
+      if (!this.searchQuery && this.activeCategory === 'all' && this.activeType === 'all' && this.activeStatus === 'all') {
+        this.container.innerHTML = `
+          <div class="illustrations-empty-pack-card" style="padding: 56px 28px; text-align: center; width: 100%; grid-column: 1 / -1; max-width: 680px; margin: 20px auto; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+            <div style="width: 54px; height: 54px; border-radius: 14px; background: rgba(245, 158, 11, 0.14); color: #f59e0b; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto; border: 1px solid rgba(245, 158, 11, 0.25);">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/>
+                <path d="M9 18h6"/><path d="M10 22h4"/>
+              </svg>
+            </div>
+            <h2 style="font-size: 1.3rem; font-weight: 700; margin: 0 0 8px 0; color: var(--text-primary);">Banque d'Illustrations Pastorales</h2>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); max-width: 500px; margin: 0 auto 22px auto; line-height: 1.55;">
+              Open Shema propose un réservoir officiel optionnel de <strong>4 000+ illustrations homilétiques</strong> (anecdotes vécues, métaphores scientifiques, récits historiques, citations classiques).
+            </p>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;">
+              <button class="btn-primary" id="btn-download-illustrations-pack" style="padding: 10px 22px; font-size: 0.92rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Télécharger le Pack (4 000+ Illustrations)</span>
+              </button>
+              <button class="btn-secondary" id="btn-empty-new-illustration" style="padding: 10px 18px; font-size: 0.92rem; display: inline-flex; align-items: center; gap: 6px;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>Créer une fiche</span>
+              </button>
+            </div>
+          </div>
+        `;
+
+        document.getElementById('btn-download-illustrations-pack')?.addEventListener('click', async (e) => {
+          const btn = e.currentTarget;
+          btn.disabled = true;
+          btn.innerHTML = `<span class="spin-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></span> <span>Installation en cours...</span>`;
+          try {
+            const res = await API.call('install_illustrations_pack');
+            if (res && res.success) {
+              if (typeof App !== 'undefined' && App.showToast) {
+                App.showToast(`Pack de ${res.count || 4000} illustrations installé avec succès !`, 'success');
+              }
+              await this.loadFirstPage();
+            }
+          } catch (err) {
+            console.error('Erreur installation pack illustrations:', err);
+            btn.disabled = false;
+            btn.innerHTML = `<span>Réessayer</span>`;
+          }
+        });
+
+        document.getElementById('btn-empty-new-illustration')?.addEventListener('click', () => {
+          this.openNewIllustrationModal();
+        });
+        return;
+      }
+
       this.container.innerHTML = `
         <div style="padding: 48px 24px; text-align: center; color: var(--text-muted); width: 100%; grid-column: 1 / -1;">
           <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 12px; opacity: 0.5;">

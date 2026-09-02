@@ -477,6 +477,7 @@ class SermonsManager:
         return cls._sanitize_for_json(res)
 
     _cached_illustrations: Optional[List[Dict[str, Any]]] = None
+    _cached_illustrations: Optional[List[Dict[str, Any]]] = None
     _cached_illustrations_mtime: float = 0.0
 
     @classmethod
@@ -484,10 +485,48 @@ class SermonsManager:
         cls._cached_illustrations = None
 
     @classmethod
-    def list_illustrations(cls, config: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
-        """Liste toutes les illustrations du réservoir global avec cache en mémoire ultra-rapide."""
+    def is_illustrations_pack_installed(cls, config: Optional[Dict[str, Any]] = None) -> bool:
+        """Indique si le pack officiel de 4000+ illustrations est activé/installé."""
         target_dir = cls.get_illustrations_directory(config)
-        cls._ensure_initial_sample_illustrations(target_dir)
+        marker_file = os.path.join(target_dir, ".pack_installed")
+        if os.path.exists(marker_file):
+            return True
+        try:
+            if os.path.exists(target_dir) and len([f for f in os.listdir(target_dir) if f.endswith('.md')]) > 50:
+                return True
+        except Exception:
+            pass
+        return False
+
+    @classmethod
+    def install_illustrations_pack(cls, config: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Installe/active le pack officiel complet de 4 000+ illustrations."""
+        target_dir = cls.get_illustrations_directory(config)
+        os.makedirs(target_dir, exist_ok=True)
+        marker_file = os.path.join(target_dir, ".pack_installed")
+        with open(marker_file, "w", encoding="utf-8") as f:
+            f.write(datetime.datetime.now().isoformat())
+        cls.invalidate_illustrations_cache()
+        items = cls.list_illustrations(config)
+        return {"success": True, "installed": True, "count": len(items)}
+
+    @classmethod
+    def uninstall_illustrations_pack(cls, config: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Désactive le pack officiel d'illustrations pour revenir à 0 fiches."""
+        target_dir = cls.get_illustrations_directory(config)
+        marker_file = os.path.join(target_dir, ".pack_installed")
+        if os.path.exists(marker_file):
+            try:
+                os.remove(marker_file)
+            except Exception:
+                pass
+        cls.invalidate_illustrations_cache()
+        return {"success": True, "installed": False, "count": 0}
+
+    @classmethod
+    def list_illustrations(cls, config: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
+        """Liste les illustrations du réservoir (0 par défaut, ou 4000+ si le pack est installé)."""
+        target_dir = cls.get_illustrations_directory(config)
 
         if not os.path.exists(target_dir):
             return []
@@ -500,58 +539,53 @@ class SermonsManager:
         if cls._cached_illustrations is not None and current_mtime == cls._cached_illustrations_mtime:
             return cls._cached_illustrations
 
-        cache_json_file = os.path.join(CURRENT_DIR, "data", "illustrations_processed_cache.json")
+        pack_installed = cls.is_illustrations_pack_installed(config)
         illustrations_map: Dict[str, Dict[str, Any]] = {}
-        loaded_from_json = False
 
-        if os.path.exists(cache_json_file):
-            try:
-                import json
-                with open(cache_json_file, "r", encoding="utf-8") as f:
-                    cache_raw = json.load(f)
-                for k, item in cache_raw.items():
-                    if isinstance(item, dict) and item.get("id"):
-                        i_id = str(item["id"])
-                        illustrations_map[i_id] = {
-                            "id": i_id,
-                            "filename": str(item.get("filename") or f"{i_id}.md"),
-                            "file_path": str(item.get("file_path") or os.path.join(target_dir, f"{i_id}.md")),
-                            "title": str(item.get("title") or "Illustration sans titre"),
-                            "category": str(item.get("category", "Général")),
-                            "type": str(item.get("type", "Histoire vraie")),
-                            "tags": item.get("tags", []),
-                            "passages_associes": item.get("passages_associes", []),
-                            "source": str(item.get("source", "")),
-                            "author": str(item.get("author", "")),
-                            "usage_history": item.get("usage_history", []),
-                            "body": str(item.get("body", "")).strip(),
-                            "created_at": item.get("created_at") or datetime.datetime.now().isoformat(),
-                            "updated_at": item.get("updated_at") or datetime.datetime.now().isoformat(),
-                        }
-                loaded_from_json = True
-            except Exception as e:
-                logger.warning(f"Impossible de précharger le cache JSON illustrations : {e}")
+        if pack_installed:
+            cache_json_file = os.path.join(CURRENT_DIR, "data", "illustrations_processed_cache.json")
+            if os.path.exists(cache_json_file):
+                try:
+                    import json
+                    with open(cache_json_file, "r", encoding="utf-8") as f:
+                        cache_raw = json.load(f)
+                    for k, item in cache_raw.items():
+                        if isinstance(item, dict) and item.get("id"):
+                            i_id = str(item["id"])
+                            illustrations_map[i_id] = {
+                                "id": i_id,
+                                "filename": str(item.get("filename") or f"{i_id}.md"),
+                                "file_path": str(item.get("file_path") or os.path.join(target_dir, f"{i_id}.md")),
+                                "title": str(item.get("title") or "Illustration sans titre"),
+                                "category": str(item.get("category", "Général")),
+                                "type": str(item.get("type", "Histoire vraie")),
+                                "tags": item.get("tags", []),
+                                "passages_associes": item.get("passages_associes", []),
+                                "source": str(item.get("source", "")),
+                                "author": str(item.get("author", "")),
+                                "usage_history": item.get("usage_history", []),
+                                "body": str(item.get("body", "")).strip(),
+                                "created_at": item.get("created_at") or datetime.datetime.now().isoformat(),
+                                "updated_at": item.get("updated_at") or datetime.datetime.now().isoformat(),
+                            }
+                except Exception as e:
+                    logger.warning(f"Impossible de précharger le cache JSON illustrations : {e}")
 
-        if loaded_from_json and len(illustrations_map) > 0:
-            cls._cached_illustrations = list(illustrations_map.values())
-            cls._cached_illustrations_mtime = current_mtime
-            return cls._cached_illustrations
-
+        # Charger également les éventuelles fiches locales personnalisées (.md)
         try:
             md_files = [f for f in os.listdir(target_dir) if f.endswith(".md")]
-            illustrations = []
             for fname in sorted(md_files):
                 full_path = os.path.join(target_dir, fname)
                 ill = cls.parse_illustration_file(full_path)
-                if ill:
-                    illustrations.append(ill)
-
-            cls._cached_illustrations = illustrations if illustrations else list(illustrations_map.values())
-            cls._cached_illustrations_mtime = current_mtime
-            return cls._cached_illustrations
+                if ill and ill.get("id"):
+                    illustrations_map[ill["id"]] = ill
         except Exception as e:
-            logger.error(f"Erreur lors du listing des illustrations: {e}")
-            return list(illustrations_map.values()) if loaded_from_json else []
+            logger.error(f"Erreur lecture fichiers .md illustrations: {e}")
+
+        result = list(illustrations_map.values())
+        cls._cached_illustrations = result
+        cls._cached_illustrations_mtime = current_mtime
+        return result
 
     @classmethod
     def get_illustration(cls, ill_id: str, config: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
@@ -745,166 +779,13 @@ class SermonsManager:
 
     @classmethod
     def _ensure_initial_sample_sermon(cls, target_dir: str):
-        """Crée un sermon modèle complet si aucun sermon n'existe."""
-        if os.path.exists(target_dir) and any(f.endswith(".md") for f in os.listdir(target_dir)):
-            return
-
-        sample_file = os.path.join(target_dir, "plus-que-vainqueurs-romains8.md")
-        sample_content = """---
-id: "sermon-sample-romains8"
-title: "Plus que vainqueurs face à l'épreuve"
-type: "sermon"
-status: "ready"
-church: "Église Évangélique de Lyon"
-event_occasion: "Culte dominical"
-date_planned: 2026-08-30
-series:
-  id: "romains-vie-esprit"
-  title: "Romains : La vie dans l'Esprit"
-  part: 4
-  total_parts: 6
-passage:
-  reference: "Romains 8:28-39"
-  osis: "Rom.8.28-Rom.8.39"
-  primary_version: "NEG79"
-big_idea: "Rien ne peut séparer le croyant de l'amour de Dieu, même au cœur de la souffrance la plus vive."
-goal: "Amener l'auditeur à trouver une sécurité absolue en Christ face aux épreuves présentes."
-theme_tags:
-  - "assurance"
-  - "amour de Dieu"
-  - "souffrance"
-  - "victoire"
-timing:
-  target_duration_min: 35
-  words_per_minute: 135
-delivery_history:
-  - church: "Église Évangélique de Lyon"
-    date: 2026-08-30
-    occasion: "Culte dominical"
-    actual_duration_min: null
-    notes: ""
----
-
-# Introduction : L'illusion de la sécurité fragile
-
-> [!cue] Régie : Diapositive Titre + Musique d'accueil off
-> Chrono cible : 00:00 - 04:30 (4.5 min)
-
-Dans un monde où une simple mauvaise nouvelle médicale, économique ou familiale peut pulvériser notre tranquillité en quelques secondes, sur quoi repose véritablement votre sécurité ?
-
-> [!illustration|id=ill-ancre-tempete]
-> **L'ancre des navires de haute mer**
-> Lorsque l'ouragan frappe et que les lames de fond atteignent quinze mètres, le capitaine ne compte pas sur la force de la coque. L'ancre est jetée : elle ne s'accroche pas à l'eau mouvante, mais mord la roche invisible tout au fond.
-> *Source : Carnet maritime — Tags : foi, épreuve, sécurité*
-
-Notre texte de ce matin dans Romains 8 ne promet pas une traversée sans vagues, mais il nous montre l'Ancre éternelle de notre âme.
-
----
-
-# I. La certitude du dessein divin (v. 28-30)
-
-> [!cue] Projeter Romains 8:28 à l'écran
-
-> [!scripture|ref=Rom.8.28|version=NEG79]
-> « Nous savons, du reste, que toutes choses concourent au bien de ceux qui aiment Dieu, de ceux qui sont appelés selon son dessein. »
-
-> [!exegesis|key=synergei]
-> **Analyse du verbe sunergei (συνεργεῖ) :**
-> - Présent actif indicatif : Action constante et ininterrompue de Dieu.
-> - Ce n'est pas un optimisme naïf ("tout est bien"), mais l'affirmation que Dieu tisse même nos larmes dans son plan éternel de gloire.
-
-Regardez la chaîne d'or du verset 29 et 30 : Connus d'avance, prédestinés, appelés, justifiés, glorifiés. Pas un seul maillon ne peut se rompre !
-
-> [!application]
-> **Question pour notre cœur :**
-> Quand la tempête frappe, interprétez-vous l'amour de Dieu à travers vos circonstances, ou interprétez-vous vos circonstances à travers l'amour inconditionnel de Dieu à la croix ?
-
----
-
-# II. L'avocat souverain face à toute accusation (v. 31-34)
-
-> [!scripture|ref=Rom.8.31-32|version=NEG79]
-> « Si Dieu est pour nous, qui sera contre nous ? Lui qui n'a point épargné son propre Fils, mais qui l'a livré pour nous tous... »
-
-> [!cue] Insister sur le silence après la question : regarder l'assemblée
-
-Paul pose une question judiciaire. Qui accusera les élus de Dieu ? C'est Dieu qui justifie ! Qui les condamnera ? Christ est mort, bien plus, il est ressuscité et il intercède à la droite de Dieu pour nous.
-
-> [!illustration|id=ill-tapisserie-envers]
-> **La tapisserie vue d'en bas**
-> Vue par en dessous, une broderie flamande n'est qu'un enchevêtrement chaotique de fils sombres et de nœuds rugueux. Mais lorsque l'artisan la retourne à la lumière, le chef-d'œuvre apparaît.
-> *Tags : providence, souveraineté, confiance*
-
----
-
-# Conclusion & Défi pratique
-
-> [!cue] Projeter le final Romains 8:38-39 avec fond sombre épuré
-
-> [!scripture|ref=Rom.8.38-39|version=NEG79]
-> « Car j'ai l'assurance que ni la mort ni la vie, ni les anges ni les dominations, ni les choses présentes ni les choses à venir... ne pourra nous séparer de l'amour de Dieu manifesté en Jésus-Christ notre Seigneur. »
-
-> [!application]
-> Ce matin, apportez au pied de la croix ce fardeau que vous portiez en secret. Rien, absolument rien, ne peut vous arracher des mains du Père. Prions ensemble.
-"""
-        with open(sample_file, "w", encoding="utf-8") as f:
-            f.write(sample_content)
+        """Désactivé : 0 sermon préchargé par défaut pour démarrer vierge."""
+        pass
 
     @classmethod
     def _ensure_initial_sample_illustrations(cls, target_dir: str):
-        """Crée des illustrations d'exemple si le réservoir est vide."""
-        if os.path.exists(target_dir) and any(f.endswith(".md") for f in os.listdir(target_dir)):
-            return
-
-        ill1_file = os.path.join(target_dir, "ill-ancre-tempete.md")
-        ill1_content = """---
-id: "ill-ancre-tempete"
-title: "L'ancre des navires de haute mer"
-category: "Nature & Maritime"
-tags:
-  - "sécurité"
-  - "foi"
-  - "épreuve"
-  - "espérance"
-passages_associes:
-  - "Rom.8.28"
-  - "Heb.6.19"
-source: "Récit maritime traditionnel"
-author: "Inconnu"
-usage_history:
-  - church: "Église Évangélique de Lyon"
-    sermon_id: "sermon-sample-romains8"
-    sermon_title: "Plus que vainqueurs face à l'épreuve"
-    date: "2026-08-30"
----
-
-Lorsque l'ouragan frappe et que les lames de fond atteignent quinze mètres, le capitaine ne compte pas sur la force de la coque. L'ancre est jetée : elle ne s'accroche pas à l'eau mouvante, mais mord la roche invisible tout au fond.
-"""
-        with open(ill1_file, "w", encoding="utf-8") as f:
-            f.write(ill1_content)
-
-        ill2_file = os.path.join(target_dir, "ill-tapisserie-envers.md")
-        ill2_content = """---
-id: "ill-tapisserie-envers"
-title: "La tapisserie vue d'en bas"
-category: "Allégories & Objets"
-tags:
-  - "providence"
-  - "souveraineté"
-  - "confiance"
-  - "épreuve"
-passages_associes:
-  - "Rom.8.28"
-  - "1Cor.13.12"
-source: "Poème traditionnel / Corrie ten Boom"
-author: "Corrie ten Boom"
-usage_history: []
----
-
-Vue par en dessous, une broderie n'est qu'un enchevêtrement chaotique de fils sombres et de nœuds rugueux. Mais lorsque l'artisan la retourne à la lumière, le chef-d'œuvre apparaît avec une harmonie parfaite.
-"""
-        with open(ill2_file, "w", encoding="utf-8") as f:
-            f.write(ill2_content)
+        """Désactivé : 0 illustration par défaut (téléchargement optionnel du pack 4000+)."""
+        pass
 
     @classmethod
     def list_real_sermon_models(cls, passage_ref: Optional[str] = None, query: Optional[str] = None) -> List[Dict[str, Any]]:

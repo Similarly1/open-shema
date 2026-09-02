@@ -418,9 +418,25 @@ class ContentMixin:
         try:
             d = SermonsManager.get_illustrations_directory(self.config)
             os.startfile(d)
-            return {"success": True, "path": d}
+            return {"success": True}
         except Exception as e:
             logger.error(f"Erreur open_illustrations_folder: {e}")
+            return {"success": False, "error": str(e)}
+
+    def install_illustrations_pack(self) -> Dict[str, Any]:
+        """Installe et active le pack officiel de 4000+ illustrations."""
+        try:
+            return SermonsManager.install_illustrations_pack(self.config)
+        except Exception as e:
+            logger.error(f"Erreur install_illustrations_pack: {e}")
+            return {"success": False, "error": str(e)}
+
+    def uninstall_illustrations_pack(self) -> Dict[str, Any]:
+        """Désactive le pack d'illustrations pour revenir à 0."""
+        try:
+            return SermonsManager.uninstall_illustrations_pack(self.config)
+        except Exception as e:
+            logger.error(f"Erreur uninstall_illustrations_pack: {e}")
             return {"success": False, "error": str(e)}
 
     def get_real_sermon_models(self, passage_ref: Optional[str] = None, query: Optional[str] = None) -> List[Dict[str, Any]]:
