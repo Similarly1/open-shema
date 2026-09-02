@@ -21423,8 +21423,8 @@ body.theme-light .ps-dict-article-body strong {
 }
 
 .profile-badge-item {
-  background: var(--bg-surface, #1e293b);
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  background: var(--bg-subtle, #f1f5f9);
+  border: 1px solid var(--border-color, #e2e8f0);
   border-radius: 8px;
   padding: 10px 12px;
   display: flex;
@@ -21432,35 +21432,54 @@ body.theme-light .ps-dict-article-body strong {
   gap: 3px;
 }
 
+body.theme-dark .profile-badge-item {
+  background: var(--bg-surface, #1e293b);
+  border-color: var(--border-color, rgba(255, 255, 255, 0.1));
+}
+
 .profile-badge-item .badge-label {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--text-muted);
+  color: var(--text-muted, #64748b);
+}
+
+body.theme-dark .profile-badge-item .badge-label {
+  color: #94a3b8;
 }
 
 .profile-badge-item .badge-value {
   font-size: 13px;
-  color: var(--text-primary);
+  color: var(--text-primary, #0f172a);
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+body.theme-dark .profile-badge-item .badge-value {
+  color: #f1f5f9;
+}
+
 .profile-prompt-box {
-  background: var(--bg-surface, #0f172a);
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  background: var(--bg-subtle, #f8fafc);
+  border: 1px solid var(--border-color, #e2e8f0);
   border-radius: 8px;
   padding: 12px 14px;
   font-family: inherit;
   font-size: 12.5px;
   line-height: 1.5;
-  color: var(--text-secondary);
+  color: var(--text-secondary, #334155);
   white-space: pre-wrap;
   max-height: 160px;
   overflow-y: auto;
+}
+
+body.theme-dark .profile-prompt-box {
+  background: var(--bg-surface, #0f172a);
+  border-color: var(--border-color, rgba(255, 255, 255, 0.1));
+  color: var(--text-secondary, #cbd5e1);
 }
 
 /* --- Wizard Modal Styles --- */
