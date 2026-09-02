@@ -536,8 +536,11 @@ class SettingsMixin:
 
                     # Enregistrer dans metadata / library
                     try:
+                        from core.bible_json_loader import BibleJsonLoader
+                        BibleJsonLoader.clear_cache()
                         registry = load_books_metadata()
-                        registry[mod_title] = {
+                        meta_dict = {
+                            "name": mod_abbr,
                             "title": mod_title,
                             "type": "Bible",
                             "folder_name": mod_abbr,
@@ -545,6 +548,8 @@ class SettingsMixin:
                             "file_path": dest_path,
                             "active": True
                         }
+                        registry[mod_abbr] = meta_dict
+                        registry[mod_title] = meta_dict
                         save_books_metadata(registry)
                     except Exception as reg_err:
                         logger.warning(f"Avertissement enregistrement metadata Bible ({mod_title}): {reg_err}")

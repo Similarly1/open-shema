@@ -169,13 +169,19 @@ const TabsManager = {
 
   async setupInitialTabs(bibles) {
     if (!bibles || bibles.length === 0) return;
+    const validBibleNames = bibles.map(b => b.name || b.id);
+
+    // Si des onglets existent déjà, vérifier qu'ils pointent vers des Bibles réellement installées
     if (this.tabs && this.tabs.length > 0) {
-      return await this.activateTab(this.tabs[0].id);
+      this.tabs = this.tabs.filter(t => validBibleNames.includes(t.bibleName));
+      if (this.tabs.length > 0) {
+        return await this.activateTab(this.tabs[0].id);
+      }
     }
     this.tabs = [];
 
-    const b1 = bibles[0].name;
-    const b2 = bibles.length > 1 ? bibles[1].name : b1;
+    const b1 = bibles[0].name || bibles[0].id;
+    const b2 = bibles.length > 1 ? (bibles[1].name || bibles[1].id) : b1;
 
     const firstBook1 = (typeof BibleReader !== 'undefined' && typeof BibleReader.getFirstBookForBible === 'function') 
       ? BibleReader.getFirstBookForBible(b1) 
@@ -184,9 +190,9 @@ const TabsManager = {
       ? BibleReader.getFirstBookForBible(b2) 
       : 'Gen';
 
-    this.createTab(b1, firstBook1, 1, '#EA580C', false, false, 'LSG');
+    this.createTab(b1, firstBook1, 1, '#EA580C', false, false, b1);
     if (bibles.length > 1) {
-      this.createTab(b2, firstBook2, 1, '#2563EB', false, false, 'LSG');
+      this.createTab(b2, firstBook2, 1, '#2563EB', false, false, b2);
     }
     if (this.tabs.length > 0) {
       return await this.activateTab(this.tabs[0].id);
@@ -4224,8 +4230,8 @@ const LexiconViewer = {
 const BibleReader = {
   currentBook: 'Gen',
   currentChapter: 1,
-  currentBible1: 'Segond 21',
-  currentBible2: 'BDS',
+  currentBible1: 'LSG',
+  currentBible2: 'LSG',
   
   isSplitView: false,
   isScrollSynced: true,
@@ -4650,14 +4656,15 @@ const BibleReader = {
     return avail.some(b => b.toLowerCase() === String(bookCode).toLowerCase());
   },
 
-  findBibleContainingBook(bookCode, preferredBible = 'Segond 21') {
-    if (!bookCode) return preferredBible || 'Segond 21';
+  findBibleContainingBook(bookCode, preferredBible = null) {
+    const pref = preferredBible || (this.installedBibles && this.installedBibles[0]?.name) || this.currentBible1 || 'LSG';
+    if (!bookCode) return pref;
     // 1. Essayer la Bible préférée si elle contient le livre
-    if (preferredBible && this.isBookAvailableInBible(preferredBible, bookCode)) {
-      return preferredBible;
+    if (pref && this.isBookAvailableInBible(pref, bookCode)) {
+      return pref;
     }
-    // 2. Essayer les Bibles complètes populaires
-    for (const fav of ['Segond 21', 'LSG', 'NBS', 'BDS', 'TOB']) {
+    // 2. Essayer les Bibles complètes populaires parmi celles installées
+    for (const fav of ['LSG', 'Segond 21', 'NBS', 'BDS', 'TOB']) {
       const match = (this.installedBibles || []).find(b => b.name === fav || (b.version_code && b.version_code.toUpperCase() === fav));
       if (match && this.isBookAvailableInBible(match.name, bookCode)) {
         return match.name;
@@ -4666,7 +4673,7 @@ const BibleReader = {
     // 3. Trouver la première Bible installée qui contient le livre
     const found = (this.installedBibles || []).find(b => this.isBookAvailableInBible(b.name, bookCode));
     if (found) return found.name;
-    return this.currentBible1 || 'Segond 21';
+    return pref;
   },
 
   getBibleDisplayName(bibleName) {
@@ -5100,7 +5107,7 @@ const BibleReader = {
 
     // Si le livre demandé n'existe pas dans la Bible active de la Colonne 1
     if (!this.isBookAvailableInBible(this.currentBible1, finalBookCode)) {
-      const altBible = this.findBibleContainingBook(finalBookCode, 'Segond 21');
+      const altBible = this.findBibleContainingBook(finalBookCode, this.installedBibles?.[0]?.name || 'LSG');
       if (altBible && altBible !== this.currentBible1) {
         const prevBible = this.currentBible1;
         this.currentBible1 = altBible;
