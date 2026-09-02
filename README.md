@@ -17,6 +17,11 @@
   <img src="https://img.shields.io/badge/IA-100%25%20Optionnelle%20%26%20D%C3%A9sactivable-lightgrey" alt="IA Optionnelle">
   <img src="https://img.shields.io/badge/Vie%20Privée-100%25%20Local%20%26%20Markdown-brightgreen" alt="100% Local Markdown">
   <a href="https://github.com/Similarly1/open-shema-data"><img src="https://img.shields.io/badge/Ressources-open--shema--data-purple.svg" alt="Ressources open-shema-data"></a>
+  <a rel="me" href="https://piaille.fr/@openshema"><img src="https://img.shields.io/badge/Mastodon-@openshema-6364ff?logo=mastodon&logoColor=white" alt="Mastodon"></a>
+</p>
+
+<p align="center">
+  🌐 Rejoignez la communauté &amp; suivez les nouveautés sur <a rel="me" href="https://piaille.fr/@openshema">Mastodon</a> (<code>@openshema@piaille.fr</code>)
 </p>
 
 ---
