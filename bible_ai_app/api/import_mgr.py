@@ -174,6 +174,36 @@ class ImportMixin:
         from core.book_metadata_client import BookMetadataClient
         return BookMetadataClient.download_cover(cover_url, book_id)
 
+    def get_official_catalog(self) -> Dict[str, Any]:
+        """Récupère le catalogue officiel open-shema-data avec mise en cache locale et gestion de repli."""
+        import urllib.request
+        import json
+        
+        # 1. Essayer de charger depuis GitHub raw
+        url = "https://raw.githubusercontent.com/Similarly1/open-shema-data/main/catalog.json"
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "OpenShemaApp/1.0"})
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                # Sauvegarder dans le cache local
+                cache_p = os.path.join(current_dir, "data", "catalog.json")
+                with open(cache_p, "w", encoding="utf-8") as f:
+                    json.dump(data, f, ensure_ascii=False, indent=2)
+                return data
+        except Exception as e:
+            logger.warning(f"Erreur chargement catalogue distant : {e}")
+
+        # 2. Fallback sur le cache local
+        cache_p = os.path.join(current_dir, "data", "catalog.json")
+        if os.path.exists(cache_p):
+            try:
+                with open(cache_p, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception as e2:
+                logger.error(f"Erreur lecture cache catalogue : {e2}")
+
+        return {"modules": []}
+
     def search_unified_hub(self, query: str, official_catalog_modules: List[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Recherche unifiée sur les 3 piliers : Open Shema Natif, Domaine Public & Archives, Librairies Chrétiennes."""
         from core.unified_search_manager import UnifiedSearchManager

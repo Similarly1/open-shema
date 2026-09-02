@@ -178,9 +178,22 @@ const OpenShemaStore = {
 
   async fetchCatalog() {
     try {
-      const response = await fetch(this.catalogUrl, { cache: 'no-cache' });
-      if (response.ok) {
-        this.catalogData = await response.json();
+      // 1. Essayer par l'API backend d'abord (ultra-rapide, sans CORS, avec cache local)
+      try {
+        const backendCat = await API.call('get_official_catalog');
+        if (backendCat && Array.isArray(backendCat.modules) && backendCat.modules.length > 0) {
+          this.catalogData = backendCat;
+        }
+      } catch (beErr) {
+        console.warn('API get_official_catalog fallback to fetch:', beErr);
+      }
+
+      // 2. Si non chargé, fetch direct GitHub
+      if (!this.catalogData) {
+        const response = await fetch(this.catalogUrl, { cache: 'no-cache' });
+        if (response.ok) {
+          this.catalogData = await response.json();
+        }
       }
     } catch (err) {
       console.error('Erreur chargement catalogue distant:', err);
@@ -189,6 +202,8 @@ const OpenShemaStore = {
     await this.fetchGutenbergBooks();
     await this.fetchCCELBooks();
     this._populateInitialUnifiedResults();
+    this._updateFacetCounts();
+    this.renderUnifiedHub();
     return this.catalogData;
   },
 
@@ -230,7 +245,7 @@ const OpenShemaStore = {
       const officialModules = (this.catalogData && this.catalogData.modules) ? this.catalogData.modules : [];
       const res = await API.call('search_unified_hub', '', officialModules);
       if (res) {
-        if (Array.isArray(res.open_she_results) && res.open_shema_results.length > 0) {
+        if (Array.isArray(res.open_shema_results) && res.open_shema_results.length > 0) {
           this.unifiedResults.open_shema = res.open_shema_results;
         }
         if (Array.isArray(res.public_domain_results) && res.public_domain_results.length > 0) {
@@ -334,7 +349,8 @@ const OpenShemaStore = {
 
     await this.refreshInstalledCache();
 
-    if (!this.catalogData) {
+    // Si les modules ne sont pas encore chargés en mémoire, les charger
+    if (!this.catalogData || !this.catalogData.modules || this.catalogData.modules.length === 0) {
       await this.fetchCatalog();
     } else {
       this._populateInitialUnifiedResults();
@@ -351,7 +367,7 @@ const OpenShemaStore = {
       } else {
         searchInput.value = '';
         // Chargement immédiat des e-books librairies et gutenberg
-        this.fetchInitialShowcase();
+        await this.fetchInitialShowcase();
       }
       setTimeout(() => searchInput.focus(), 50);
     }
@@ -396,8 +412,12 @@ const OpenShemaStore = {
               <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 8px;">
                 Recherche & Découverte Biblique
               </h3>
-              <div style="font-size: 0.78rem; color: #cbd5e1; margin-top: 2px;">
-                ✦ Open Shema &bull; ⚡ Domaine Public &bull; 🛒 Librairies Chrétiennes
+              <div style="font-size: 0.78rem; color: #cbd5e1; margin-top: 2px; display: flex; align-items: center; gap: 8px;">
+                <span style="display: inline-flex; align-items: center; gap: 4px;">${this.svgIcons.sparkle} Open Shema</span>
+                <span>&bull;</span>
+                <span style="display: inline-flex; align-items: center; gap: 4px;">${this.svgIcons.book} Domaine Public</span>
+                <span>&bull;</span>
+                <span style="display: inline-flex; align-items: center; gap: 4px;">${this.svgIcons.store} Librairies Chrétiennes</span>
               </div>
             </div>
           </div>
@@ -440,17 +460,17 @@ const OpenShemaStore = {
               </button>
               <button class="store-cat-pill" data-cat="open_shema" style="border-color: rgba(16, 185, 129, 0.4); color: #34d399;">
                 ${this.svgIcons.sparkle}
-                <span>✦ Open Shema</span>
+                <span>Open Shema</span>
                 <span class="facet-count" id="count-facet-openshema">0</span>
               </button>
               <button class="store-cat-pill" data-cat="public_domain" style="border-color: rgba(59, 130, 246, 0.4); color: #93c5fd;">
                 ${this.svgIcons.book}
-                <span>⚡ Domaine Public & Gratuit</span>
+                <span>Domaine Public & Gratuit</span>
                 <span class="facet-count" id="count-facet-publicdomain">0</span>
               </button>
               <button class="store-cat-pill" data-cat="bookstores" style="border-color: rgba(168, 85, 247, 0.4); color: #c084fc;">
                 ${this.svgIcons.store}
-                <span>🛒 Librairies Chrétiennes</span>
+                <span>Librairies Chrétiennes</span>
                 <span class="facet-count" id="count-facet-bookstores">0</span>
               </button>
             </div>
@@ -484,11 +504,11 @@ const OpenShemaStore = {
         <!-- FOOTER UNIFIÉ -->
         <div class="store-modal-footer" style="padding: 10px 20px; border-top: 1px solid #334155; background: #1e293b; display: flex; align-items: center; justify-content: space-between; font-size: 0.80rem; color: #cbd5e1;">
           <div class="store-footer-meta" style="display: flex; align-items: center; gap: 14px;">
-            <span>✦ Dépôt officiel : <a href="https://github.com/Similarly1/open-shema-data" target="_blank" rel="noopener" style="color: #60a5fa; font-weight: 600; text-decoration: none;">open-shema-data</a></span>
+            <span style="display: inline-flex; align-items: center; gap: 4px;">${this.svgIcons.sparkle} Dépôt officiel : <a href="https://github.com/Similarly1/open-shema-data" target="_blank" rel="noopener" style="color: #60a5fa; font-weight: 600; text-decoration: none;">open-shema-data</a></span>
             <span style="opacity: 0.6;">&bull;</span>
-            <span>⚡ Domaine Public : CCEL, Gutenberg, Wikisource, Archive.org & Logos</span>
+            <span style="display: inline-flex; align-items: center; gap: 4px;">${this.svgIcons.book} Domaine Public : CCEL, Gutenberg, Wikisource, Archive.org & Logos</span>
             <span style="opacity: 0.6;">&bull;</span>
-            <span>🛒 100% E-books numériques</span>
+            <span style="display: inline-flex; align-items: center; gap: 4px;">${this.svgIcons.store} 100% E-books numériques</span>
           </div>
           <button id="btn-refresh-store" class="btn-store-secondary" title="Actualiser les données" style="display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 6px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-weight: 600; cursor: pointer;">
             ${this.svgIcons.refresh}
@@ -640,10 +660,10 @@ const OpenShemaStore = {
           </div>
         </div>
 
-        <div style="margin-top: 9px; padding-top: 7px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.72rem; color: #cbd5e1; line-height: 1.35;">
+        <div style="margin-top: 9px; padding-top: 7px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.72rem; color: #cbd5e1; line-height: 1.35; display: flex; align-items: center; gap: 6px;">
           ${isHigh 
-            ? '✓ Cet ouvrage est déjà indexé et lisible dans votre bibliothèque locale.' 
-            : '⚠ Ouvrage semblable détecté. Vérifiez la traduction ou l\'édition avant d\'importer.'}
+            ? `${this.svgIcons.check} <span>Cet ouvrage est déjà indexé et lisible dans votre bibliothèque locale.</span>` 
+            : `${this.svgIcons.info} <span>Ouvrage semblable détecté. Vérifiez la traduction ou l'édition avant d'importer.</span>`}
         </div>
       `;
 
@@ -1008,12 +1028,12 @@ const OpenShemaStore = {
           <div style="margin-top: 18px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
             ${openShemaList.length > 0 ? `
               <button class="btn-smart-switch-cat" data-cat="open_shema" style="padding: 7px 14px; border-radius: 6px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; font-size: 0.82rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
-                ${this.svgIcons.sparkle} Voir ${openShemaList.length} résultat(s) dans ✦ Open Shema
+                ${this.svgIcons.sparkle} Voir ${openShemaList.length} résultat(s) dans Open Shema
               </button>
             ` : ''}
             ${bookstoresList.length > 0 ? `
               <button class="btn-smart-switch-cat" data-cat="bookstores" style="padding: 7px 14px; border-radius: 6px; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.4); color: #c084fc; font-size: 0.82rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
-                ${this.svgIcons.store} Voir ${bookstoresList.length} e-book(s) dans 🛒 Librairies
+                ${this.svgIcons.store} Voir ${bookstoresList.length} e-book(s) dans Librairies
               </button>
             ` : ''}
             <button class="btn-smart-switch-cat" data-cat="all" style="padding: 7px 14px; border-radius: 6px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.18); color: #ffffff; font-size: 0.82rem; font-weight: 700; cursor: pointer;">
@@ -1262,7 +1282,7 @@ const OpenShemaStore = {
       if (sim.score >= 80) {
         simBadge = `<span class="sim-badge-trigger" ${simDataAttrs} style="font-size: 0.70rem; padding: 2px 7px; border-radius: 4px; background: rgba(16, 185, 129, 0.22); color: #34d399; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.45); display: inline-flex; align-items: center; gap: 3px; cursor: pointer;">${this.svgIcons.check} Dans votre biblio</span>`;
       } else if (sim.score >= 60) {
-        simBadge = `<span class="sim-badge-trigger" ${simDataAttrs} style="font-size: 0.70rem; padding: 2px 7px; border-radius: 4px; background: rgba(245, 158, 11, 0.22); color: #fbbf24; font-weight: 800; border: 1px solid rgba(245, 158, 11, 0.45); display: inline-flex; align-items: center; gap: 3px; cursor: pointer;">⚠ Similaire (${sim.score}%)</span>`;
+        simBadge = `<span class="sim-badge-trigger" ${simDataAttrs} style="font-size: 0.70rem; padding: 2px 7px; border-radius: 4px; background: rgba(245, 158, 11, 0.22); color: #fbbf24; font-weight: 800; border: 1px solid rgba(245, 158, 11, 0.45); display: inline-flex; align-items: center; gap: 3px; cursor: pointer;">${this.svgIcons.info} Similaire (${sim.score}%)</span>`;
       }
     }
 
@@ -1379,7 +1399,7 @@ const OpenShemaStore = {
       if (sim.score >= 80) {
         simBadge = `<span class="sim-badge-trigger" ${simDataAttrs} style="font-size: 0.66rem; padding: 1px 5px; border-radius: 3px; background: rgba(16, 185, 129, 0.22); color: #34d399; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.45); cursor: pointer;">${this.svgIcons.check} Dans votre biblio</span>`;
       } else if (sim.score >= 60) {
-        simBadge = `<span class="sim-badge-trigger" ${simDataAttrs} style="font-size: 0.66rem; padding: 1px 5px; border-radius: 3px; background: rgba(245, 158, 11, 0.22); color: #fbbf24; font-weight: 800; border: 1px solid rgba(245, 158, 11, 0.45); cursor: pointer;">⚠ Similaire (${sim.score}%)</span>`;
+        simBadge = `<span class="sim-badge-trigger" ${simDataAttrs} style="font-size: 0.66rem; padding: 1px 5px; border-radius: 3px; background: rgba(245, 158, 11, 0.22); color: #fbbf24; font-weight: 800; border: 1px solid rgba(245, 158, 11, 0.45); cursor: pointer;">${this.svgIcons.info} Similaire (${sim.score}%)</span>`;
       }
     }
 
