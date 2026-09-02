@@ -157,7 +157,11 @@ class ContentMixin:
         try:
             from core.articles_manager import ArticlesManager
             manager = ArticlesManager.get_instance()
-            return manager.get_sources(enabled_only=False)
+            sources = manager.get_sources(enabled_only=False)
+            if not sources:
+                manager.db.sync_curated_sources(manager.curated_sources)
+                sources = manager.get_sources(enabled_only=False)
+            return sources
         except Exception as e:
             logger.error(f"Erreur API get_article_sources: {e}")
             return []

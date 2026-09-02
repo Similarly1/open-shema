@@ -41,15 +41,57 @@ class ArticlesManager:
         self.db.sync_curated_sources(self.curated_sources)
 
     def _load_curated_sources_config(self) -> List[Dict[str, Any]]:
-        """Charge le catalogue des blogs officiels depuis curated_sources.json."""
+        """Charge le catalogue des blogs officiels depuis curated_sources.json ou utilise les flux préconfigurés par défaut."""
+        default_sources = [
+            {
+                "id": "tpsg",
+                "name": "Tout Pour Sa Gloire",
+                "website_url": "https://toutpoursagloire.com",
+                "feed_url": "https://toutpoursagloire.com/feed/",
+                "category": "pastoral_contemporain",
+                "description": "Articles, réflexions et ressources pour voir le monde à travers la Bible.",
+                "enabled_by_default": True,
+                "selectors": {
+                    "content": ".single-content, .entry-content, article .content, .post-content, .article-content, section.single-header + section, main section:not(.single-header):not(.single-related)",
+                    "author": ".author-name, .entry-author, .author a, .post-author, .author-info",
+                    "excludes": [
+                        ".single-header", ".single-meta", ".single-footer", ".single-related",
+                        ".sharedaddy", ".jp-relatedposts", ".newsletter-box", ".social-share",
+                        "nav.post-navigation", ".comments-area", ".elevenlabs-player", "#audionative",
+                        ".audionative-player", ".wp-block-audio"
+                    ]
+                }
+            },
+            {
+                "id": "e21",
+                "name": "Évangile 21",
+                "website_url": "https://evangile21.thegospelcoalition.org",
+                "feed_url": "https://evangile21.thegospelcoalition.org/feed/",
+                "category": "pastoral_theologique",
+                "description": "Ressources théologiques, études bibliques et réflexions pastorales par The Gospel Coalition France.",
+                "enabled_by_default": True,
+                "selectors": {
+                    "content": ".entry-content, .post-content, .article-content, .article__content, article .content, main article",
+                    "author": ".author-name, .entry-author, .author a, .post-author, .author-info, .article__author",
+                    "excludes": [
+                        ".single-header", ".single-meta", ".single-footer", ".single-related",
+                        ".sharedaddy", ".jp-relatedposts", ".newsletter-box", ".social-share",
+                        ".social-sharing", "nav.post-navigation", ".comments-area", ".article__social",
+                        ".article__more"
+                    ]
+                }
+            }
+        ]
         config_path = os.path.join(os.path.dirname(__file__), "curated_sources.json")
         if os.path.exists(config_path):
             try:
                 with open(config_path, "r", encoding="utf-8") as f:
-                    return json.load(f)
+                    loaded = json.load(f)
+                    if isinstance(loaded, list) and len(loaded) > 0:
+                        return loaded
             except Exception as e:
                 logger.error(f"[ArticlesManager] Erreur chargement curated_sources.json: {e}")
-        return []
+        return default_sources
 
     def get_sources(self, enabled_only: bool = False) -> List[Dict[str, Any]]:
         """Retourne la liste des sources de blogs."""

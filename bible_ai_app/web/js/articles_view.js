@@ -457,6 +457,10 @@ const ArticlesView = {
   async onViewActivated() {
     await this.loadSources();
     await this.loadArticles();
+    if (!this.articles || this.articles.length === 0) {
+      // Synchronisation automatique des 2 flux initiaux au premier affichage
+      this.syncArticles(false);
+    }
   },
 
   async loadSources() {
