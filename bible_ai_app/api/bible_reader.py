@@ -77,19 +77,35 @@ class BibleReaderMixin:
                 "first_book": first_b
             }
 
-        for name, meta in registry.items():
+        seen_folders = set()
+        for name, meta in list(registry.items()):
             if meta.get("type") == "Bible" and meta.get("active", True):
                 folder = meta.get("folder_name", name)
-                # Auto-extraction de secours si format SQLite présent sans dossier JSON
-                if not BibleJsonLoader.find_bible_dir_by_name(folder) and not BibleJsonLoader.find_bible_dir_by_name(name):
+                if folder in seen_folders:
+                    continue
+                
+                # Auto-extraction de secours si format SQLite présent sans dossier JSON ou dossier incomplet
+                bible_dir = BibleJsonLoader.find_bible_dir_by_name(folder) or BibleJsonLoader.find_bible_dir_by_name(name)
+                is_empty_or_missing = not bible_dir or not os.path.exists(bible_dir) or len([f for f in os.listdir(bible_dir) if f.endswith('.json')]) == 0
+                
+                if is_empty_or_missing:
                     f_path = meta.get("file_path")
+                    if not f_path or not os.path.exists(f_path):
+                        cand_sqlite = os.path.join(current_dir, "data", "bibles", f"bible_{folder.lower()}.sqlite")
+                        cand_sqlite_alt = os.path.join(current_dir, "data", "bibles", f"bible_{folder.lower()}1910.sqlite")
+                        if os.path.exists(cand_sqlite):
+                            f_path = cand_sqlite
+                        elif os.path.exists(cand_sqlite_alt):
+                            f_path = cand_sqlite_alt
+                    
                     if f_path and os.path.exists(f_path) and f_path.endswith(".sqlite"):
                         try:
                             self._extract_sqlite_bible_to_json(f_path, folder or name, meta.get("title", name))
                         except Exception as e:
-                            logger.warning(f"Erreur auto-extraction Bible SQLite {name}: {e}")
+                            logger.error(f"Erreur auto-extraction Bible SQLite {name}: {e}")
 
                 if BibleJsonLoader.find_bible_dir_by_name(folder) or BibleJsonLoader.find_bible_dir_by_name(name):
+                    seen_folders.add(folder)
                     bibles.append(enrich_item(name, meta))
         
         # Si vide, fallback direct sur les dossiers JSON
@@ -107,11 +123,26 @@ class BibleReaderMixin:
         os.makedirs(dest_json_dir, exist_ok=True)
         conn = sqlite3.connect(sqlite_path)
         cur = conn.cursor()
-        cur.execute("SELECT id, code, name, chapters_count FROM books ORDER BY id")
+        
+        cur.execute("PRAGMA table_info(books)")
+        b_cols = [r[1] for r in cur.fetchall()]
+        ch_col = "chapters_count" if "chapters_count" in b_cols else ("total_chapters" if "total_chapters" in b_cols else "chapters")
+        
+        cur.execute(f"SELECT id, code, name, {ch_col} FROM books ORDER BY id")
         books_rows = cur.fetchall()
+        
+        cur.execute("PRAGMA table_info(verses)")
+        v_cols = [r[1] for r in cur.fetchall()]
+        has_strong = "text_strong" in v_cols
+        
         for b_id, b_code, b_name, ch_cnt in books_rows:
-            cur.execute("SELECT chapter, verse, text_strong, text FROM verses WHERE book_id = ? ORDER BY chapter, verse", (b_id,))
-            v_rows = cur.fetchall()
+            if has_strong:
+                cur.execute("SELECT chapter, verse, text_strong, text FROM verses WHERE book_id = ? ORDER BY chapter, verse", (b_id,))
+                v_rows = cur.fetchall()
+            else:
+                cur.execute("SELECT chapter, verse, text FROM verses WHERE book_id = ? ORDER BY chapter, verse", (b_id,))
+                v_rows = [(r[0], r[1], None, r[2]) for r in cur.fetchall()]
+                
             ch_map = {}
             for ch_num, v_num, txt_str, txt_clean in v_rows:
                 c_k = str(ch_num)

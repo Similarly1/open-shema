@@ -532,7 +532,7 @@ class SettingsMixin:
                         if hasattr(self, "_extract_sqlite_bible_to_json"):
                             self._extract_sqlite_bible_to_json(dest_path, mod_abbr, mod_title)
                     except Exception as ext_err:
-                        logger.warning(f"Avertissement extraction SQLite vers JSON ({mod_title}): {ext_err}")
+                        logger.error(f"Erreur extraction SQLite vers JSON ({mod_title}): {ext_err}")
 
                     # Enregistrer dans metadata / library
                     try:
@@ -548,8 +548,9 @@ class SettingsMixin:
                             "file_path": dest_path,
                             "active": True
                         }
+                        if mod_title in registry:
+                            registry.pop(mod_title, None)
                         registry[mod_abbr] = meta_dict
-                        registry[mod_title] = meta_dict
                         save_books_metadata(registry)
                     except Exception as reg_err:
                         logger.warning(f"Avertissement enregistrement metadata Bible ({mod_title}): {reg_err}")
