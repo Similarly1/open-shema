@@ -53,13 +53,18 @@ const CommentaryWindow = {
     "bonnet": { title: "Nouveau Testament avec Notes de Louis Bonnet", author: "Louis Bonnet", period: "Notes Pastorales (1885)", color: "#0891B2", initials: "LB" },
     "acg": { title: "Bible annotée par A.C. Gaebelein", author: "Arno C. Gaebelein", period: "The Annotated Bible (1922)", color: "#475569", initials: "ACG" },
     "gaebelein": { title: "Bible annotée par A.C. Gaebelein", author: "Arno C. Gaebelein", period: "The Annotated Bible (1922)", color: "#475569", initials: "ACG" },
-    "godet": { title: "Bible annotée (Frédéric Godet & Neuchâtel)", author: "Frédéric Godet et collaborateurs", period: "Bible Annotée de Neuchâtel (1899)", color: "#0D9488", initials: "BAG" },
-    "frédéric godet": { title: "Bible annotée (Frédéric Godet & Neuchâtel)", author: "Frédéric Godet et collaborateurs", period: "Bible Annotée de Neuchâtel (1899)", color: "#0D9488", initials: "BAG" },
-    "bible annotée": { title: "Bible annotée (Frédéric Godet & Neuchâtel)", author: "Frédéric Godet et collaborateurs", period: "Bible Annotée de Neuchâtel (1899)", color: "#0D9488", initials: "BAG" },
-    "tgc": { title: "Commentaires The Gospel Coalition (TGC)", author: "The Gospel Coalition", period: "The Gospel Coalition (2021-2024)", color: "#9A3412", initials: "TGC" },
-    "the gospel coalition": { title: "Commentaires The Gospel Coalition (TGC)", author: "The Gospel Coalition", period: "The Gospel Coalition (2021-2024)", color: "#9A3412", initials: "TGC" },
-    "john gill": { title: "Exposition of the Bible de John Gill", author: "John Gill (1697–1771)", period: "Exposition of the Bible (1763)", color: "#047857", initials: "JG" },
-    "albert barnes": { title: "Notes on the Bible de Albert Barnes", author: "Albert Barnes (1798–1870)", period: "Notes on the Old & New Testament (1884)", color: "#1D4ED8", initials: "AB" }
+    "godet": { title: "Bible annotée (Frédéric Godet & Neuchâtel)", author: "Frédéric Godet", shortName: "Godet", period: "Bible Annotée de Neuchâtel (1899)", color: "#0D9488", initials: "BAG" },
+    "frédéric godet": { title: "Bible annotée (Frédéric Godet & Neuchâtel)", author: "Frédéric Godet", shortName: "Godet", period: "Bible Annotée de Neuchâtel (1899)", color: "#0D9488", initials: "BAG" },
+    "godet_ba": { title: "Bible annotée (Frédéric Godet & Neuchâtel)", author: "Frédéric Godet", shortName: "Godet", period: "Bible Annotée de Neuchâtel (1899)", color: "#0D9488", initials: "BAG" },
+    "godet_neuchatel": { title: "Bible annotée (Frédéric Godet & Neuchâtel)", author: "Frédéric Godet", shortName: "Godet", period: "Bible Annotée de Neuchâtel (1899)", color: "#0D9488", initials: "BAG" },
+    "bible annotée": { title: "Bible annotée (Frédéric Godet & Neuchâtel)", author: "Frédéric Godet", shortName: "Godet", period: "Bible Annotée de Neuchâtel (1899)", color: "#0D9488", initials: "BAG" },
+    "tgc": { title: "Commentaires The Gospel Coalition (TGC)", author: "The Gospel Coalition", shortName: "TGC", period: "The Gospel Coalition (2021-2024)", color: "#9A3412", initials: "TGC" },
+    "tgc_francais": { title: "Commentaires The Gospel Coalition (TGC)", author: "The Gospel Coalition", shortName: "TGC", period: "The Gospel Coalition (2021-2024)", color: "#9A3412", initials: "TGC" },
+    "the gospel coalition": { title: "Commentaires The Gospel Coalition (TGC)", author: "The Gospel Coalition", shortName: "TGC", period: "The Gospel Coalition (2021-2024)", color: "#9A3412", initials: "TGC" },
+    "robertson": { title: "Commentaire de A.T. Robertson (Images verbales du NT)", author: "A.T. Robertson", shortName: "Robertson", period: "Word Pictures in the NT (1933)", color: "#2563EB", initials: "ATR" },
+    "a.t. robertson": { title: "Commentaire de A.T. Robertson (Images verbales du NT)", author: "A.T. Robertson", shortName: "Robertson", period: "Word Pictures in the NT (1933)", color: "#2563EB", initials: "ATR" },
+    "john gill": { title: "Exposition of the Bible de John Gill", author: "John Gill (1697–1771)", shortName: "Gill", period: "Exposition of the Bible (1763)", color: "#047857", initials: "JG" },
+    "albert barnes": { title: "Notes on the Bible de Albert Barnes", author: "Albert Barnes (1798–1870)", shortName: "Barnes", period: "Notes on the Old & New Testament (1884)", color: "#1D4ED8", initials: "AB" }
   },
 
   bookFrenchMap: {
@@ -1260,10 +1265,22 @@ const CommentaryWindow = {
 
     // Thèmes
     document.querySelectorAll('.bg-choice-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         document.querySelectorAll('.bg-choice-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        document.body.className = `bg-theme-${btn.dataset.bg}`;
+        const bg = btn.dataset.bg;
+        if (bg === 'sepia') {
+          document.body.className = 'bg-theme-sepia';
+        } else if (bg === 'white') {
+          document.body.className = 'theme-light bg-theme-white';
+        } else if (bg === 'dark') {
+          document.body.className = 'theme-dark bg-theme-dark';
+        }
+        try {
+          const cfg = await API.getSettings() || {};
+          cfg.reading_bg = bg;
+          API.call('save_settings', cfg);
+        } catch (e) {}
       });
     });
 
@@ -1281,7 +1298,35 @@ const CommentaryWindow = {
     });
   },
 
+  async applyTheme() {
+    try {
+      const cfg = await API.getSettings() || {};
+      const isDark = cfg.theme === 'dark' || (cfg.theme === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.body.classList.toggle('theme-dark', isDark);
+      document.body.classList.toggle('theme-light', !isDark);
+      
+      const readingBg = cfg.reading_bg || 'auto';
+      if (readingBg === 'sepia') {
+        document.body.className = (isDark ? 'theme-dark ' : 'theme-light ') + 'bg-theme-sepia';
+      } else if (readingBg === 'white') {
+        document.body.className = (isDark ? 'theme-dark ' : 'theme-light ') + 'bg-theme-white';
+      } else if (readingBg === 'dark') {
+        document.body.className = 'theme-dark bg-theme-dark';
+      } else {
+        document.body.className = isDark ? 'theme-dark' : 'theme-light';
+      }
+      
+      // Mettre à jour l'état actif des boutons de thème
+      document.querySelectorAll('.bg-choice-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.bg === readingBg || (readingBg === 'auto' && b.dataset.bg === (isDark ? 'dark' : 'white')));
+      });
+    } catch (e) {
+      console.warn('[CommentaryWindow] Erreur applyTheme:', e);
+    }
+  },
+
   restorePreferences() {
+    this.applyTheme();
     try {
       const savedZoom = localStorage.getItem('open_shema_comm_zoom');
       if (savedZoom) {

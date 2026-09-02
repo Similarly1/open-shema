@@ -874,6 +874,35 @@ const CommentariesView = {
     });
   },
 
+  findCommentaryIndex(favKey, sourceMeta = null) {
+    if (!this.currentComments || this.currentComments.length === 0 || !favKey) return -1;
+    const meta = sourceMeta || this.getSourceMeta(favKey);
+    const kLower = String(favKey || '').toLowerCase().trim();
+    const mAuthor = (meta.author || '').toLowerCase().trim();
+    const mShort = (meta.shortName || '').toLowerCase().trim();
+    const mTitle = (meta.title || '').toLowerCase().trim();
+    const mInitials = (meta.initials || '').toLowerCase().trim();
+
+    return this.currentComments.findIndex(c => {
+      const cAuthor = (c.author || '').toLowerCase().trim();
+      const cSource = (c.source || '').toLowerCase().trim();
+      const cId = (c.commentary_id || '').toLowerCase().trim();
+      
+      // Match by direct ID or key
+      if (cId && (cId === kLower || kLower.includes(cId) || cId.includes(kLower))) return true;
+      if (cAuthor && (cAuthor === kLower || cAuthor.includes(kLower) || kLower.includes(cAuthor))) return true;
+      if (cSource && (cSource === kLower || cSource.includes(kLower) || kLower.includes(cSource))) return true;
+      
+      // Match by shortName / author / title / initials
+      if (mShort && (cAuthor.includes(mShort) || cSource.includes(mShort) || cId.includes(mShort) || mShort.includes(cId))) return true;
+      if (mAuthor && (cAuthor.includes(mAuthor) || mAuthor.includes(cAuthor) || cSource.includes(mAuthor))) return true;
+      if (mTitle && (cAuthor.includes(mTitle) || mTitle.includes(cAuthor) || cSource.includes(mTitle))) return true;
+      if (mInitials && (cAuthor.includes(mInitials) || cSource.includes(mInitials))) return true;
+
+      return false;
+    });
+  },
+
   renderQuickFavorites() {
     if (!this.quickFavoritesGroup) return;
     this.quickFavoritesGroup.innerHTML = '';
@@ -886,21 +915,14 @@ const CommentariesView = {
         const sourceMeta = this.getSourceMeta(favKey);
 
         // Trouver si présent dans currentComments
-        let commIdx = -1;
-        if (this.currentComments && this.currentComments.length > 0) {
-          commIdx = this.currentComments.findIndex(c => {
-            const cKey = (c.author || c.source || '').toLowerCase();
-            const metaAuth = (sourceMeta.author || '').toLowerCase();
-            return cKey === favKey || cKey.includes(favKey) || favKey.includes(cKey) || metaAuth === favKey || (metaAuth && metaAuth.includes(favKey));
-          });
-        }
-
+        const commIdx = this.findCommentaryIndex(favKey, sourceMeta);
         const isAvailable = commIdx !== -1;
         const isCurrentActive = (!this.isSynthMode && isAvailable && commIdx === this.activeIndex);
         
-        let displayName = sourceMeta.author || favKey;
-        if (displayName.length > 14 && sourceMeta.author) {
-          displayName = sourceMeta.author.split(' ').pop();
+        let displayName = sourceMeta.shortName || sourceMeta.author || favKey;
+        if (displayName.length > 14) {
+          const parts = displayName.split(/[\s,&(]+/).filter(w => w.length > 1);
+          displayName = parts[0] || displayName.slice(0, 14);
         }
 
         const slot = document.createElement('div');
@@ -920,15 +942,18 @@ const CommentariesView = {
         });
 
         // Clic sur la pastille pour afficher
-        slot.addEventListener('click', () => {
+        slot.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
           if (this.isSynthMode) {
             this.closeAISynthesis();
           }
-          if (isAvailable) {
-            this.selectCommentary(commIdx);
+          const dynamicIdx = this.findCommentaryIndex(favKey, sourceMeta);
+          if (dynamicIdx !== -1) {
+            this.selectCommentary(dynamicIdx);
           } else {
             this.preferredAuthor = favKey;
-            App.showToast(`« ${sourceMeta.title || favKey} » sélectionné comme préféré`);
+            App.showToast(`« ${sourceMeta.title || favKey} » n'a pas de note sur ce verset`);
           }
         });
 
@@ -1062,14 +1087,11 @@ const CommentariesView = {
     this.articleContent.innerHTML = `
       <div class="comm-view-author-card">
         <div class="comm-author-top-row">
-          <div class="comm-author-profile">
-            <div class="comm-author-big-avatar" style="background-color: ${sourceMeta.color || '#1E3A8A'};">
-              ${sourceMeta.initials || 'C'}
-            </div>
-            <div>
-              <div class="comm-author-headline-name">${sourceMeta.title || authorName}</div>
-              <div class="comm-author-headline-period">${sourceMeta.period || 'Ouvrage d\'exégèse biblique'} • ${sourceMeta.author || authorName}</div>
-            </div>
+          <div class="comm-view-passage-header" style="margin: 0;">
+            <span class="comm-view-passage-pill">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+              <span>${comm.reference || (this.currentChapter === 0 ? `Introduction à ${this.currentBookFrench}` : `${this.currentBookFrench} ${this.currentChapter}:${this.currentVerse}`)}</span>
+            </span>
           </div>
           
           <div class="comm-author-top-actions">
@@ -1093,13 +1115,6 @@ const CommentariesView = {
         </div>
 
         ${translationBannerHtml}
-
-        <div class="comm-view-passage-header">
-          <span class="comm-view-passage-pill">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
-            <span>${comm.reference || `${this.currentBookFrench} ${this.currentChapter}:${this.currentVerse}`}</span>
-          </span>
-        </div>
 
         <div class="comm-view-reading-body">
           ${formattedHtml}
@@ -1710,8 +1725,31 @@ const CommentariesView = {
     if (typeof CommentaryViewer !== 'undefined' && CommentaryViewer.getSourceInfo) {
       return CommentaryViewer.getSourceInfo(name);
     }
-    if (!name) return { title: 'Commentaire Biblique', author: 'Auteur', period: 'Source d\'exégèse', color: '#1E3A8A', initials: 'BIB' };
+    if (typeof BibleReader !== 'undefined' && BibleReader.getSourceInfo) {
+      return BibleReader.getSourceInfo(name);
+    }
+    if (!name) return { title: 'Commentaire Biblique', author: 'Auteur', shortName: 'Commentaire', period: 'Source d\'exégèse', color: '#1E3A8A', initials: 'BIB' };
     const trimmed = name.trim();
+    const clean = trimmed.toLowerCase();
+    
+    // Fallback catalogue direct
+    const cat = {
+      'tgc': { title: 'Commentaires The Gospel Coalition (TGC)', author: 'The Gospel Coalition', shortName: 'TGC', initials: 'TGC', color: '#9A3412' },
+      'tgc_francais': { title: 'Commentaires The Gospel Coalition (TGC)', author: 'The Gospel Coalition', shortName: 'TGC', initials: 'TGC', color: '#9A3412' },
+      'godet': { title: 'Bible annotée (Frédéric Godet & Neuchâtel)', author: 'Frédéric Godet', shortName: 'Godet', initials: 'BAG', color: '#0D9488' },
+      'godet_ba': { title: 'Bible annotée (Frédéric Godet & Neuchâtel)', author: 'Frédéric Godet', shortName: 'Godet', initials: 'BAG', color: '#0D9488' },
+      'godet_neuchatel': { title: 'Bible annotée (Frédéric Godet & Neuchâtel)', author: 'Frédéric Godet', shortName: 'Godet', initials: 'BAG', color: '#0D9488' },
+      'robertson': { title: 'Commentaire de A.T. Robertson (Images verbales du NT)', author: 'A.T. Robertson', shortName: 'Robertson', initials: 'ATR', color: '#2563EB' },
+      'calvin': { title: 'Commentaire Biblique de Jean Calvin', author: 'Jean Calvin', shortName: 'Calvin', initials: 'JC', color: '#1E3A8A' },
+      'henry': { title: 'Commentaire Biblique de Matthew Henry', author: 'Matthew Henry', shortName: 'M. Henry', initials: 'MH', color: '#065F46' },
+      'barnes': { title: 'Commentaire Biblique par Albert Barnes', author: 'Albert Barnes', shortName: 'Barnes', initials: 'AB', color: '#7C2D12' }
+    };
+    for (const [k, v] of Object.entries(cat)) {
+      if (clean === k || clean.includes(k) || k.includes(clean)) {
+        return { ...v, period: 'Ouvrage de référence' };
+      }
+    }
+
     const initials = trimmed.split(/\s+/).map(w => w[0]).filter(Boolean).join('').slice(0, 3).toUpperCase() || 'BIB';
     const title = (trimmed.toLowerCase().startsWith('commentaire') || trimmed.toLowerCase().startsWith('notes') || trimmed.toLowerCase().startsWith('bible'))
       ? trimmed
@@ -1719,6 +1757,7 @@ const CommentariesView = {
     return {
       title: title,
       author: trimmed,
+      shortName: trimmed.length > 12 ? trimmed.split(/\s+/)[0] : trimmed,
       period: 'Ouvrage d\'exégèse',
       color: '#1E3A8A',
       initials

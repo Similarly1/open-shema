@@ -117,7 +117,7 @@ class BibleReaderMixin:
         return bibles
 
     def _extract_sqlite_bible_to_json(self, sqlite_path: str, abbr: str, title: str):
-        """Extrait les 66 livres d'une Bible SQLite vers des fichiers JSON modulaires."""
+        """Extrait les 66 livres d'une Bible SQLite vers des fichiers JSON modulaires (ultra-rapide en mémoire)."""
         import sqlite3
         dest_json_dir = os.path.join(current_dir, "data", "bibles", abbr)
         os.makedirs(dest_json_dir, exist_ok=True)
@@ -135,25 +135,30 @@ class BibleReaderMixin:
         v_cols = [r[1] for r in cur.fetchall()]
         has_strong = "text_strong" in v_cols
         
-        for b_id, b_code, b_name, ch_cnt in books_rows:
-            if has_strong:
-                cur.execute("SELECT chapter, verse, text_strong, text FROM verses WHERE book_id = ? ORDER BY chapter, verse", (b_id,))
-                v_rows = cur.fetchall()
-            else:
-                cur.execute("SELECT chapter, verse, text FROM verses WHERE book_id = ? ORDER BY chapter, verse", (b_id,))
-                v_rows = [(r[0], r[1], None, r[2]) for r in cur.fetchall()]
-                
-            ch_map = {}
-            for ch_num, v_num, txt_str, txt_clean in v_rows:
-                c_k = str(ch_num)
-                v_k = str(v_num)
-                if c_k not in ch_map:
-                    ch_map[c_k] = {}
-                val = txt_str if txt_str else txt_clean
-                if val:
-                    val = val.replace("<p>", "").replace("</p>", "").strip()
-                ch_map[c_k][v_k] = val
+        # Récupération de tous les versets en une seule requête ultra-rapide
+        if has_strong:
+            cur.execute("SELECT book_id, chapter, verse, text_strong, text FROM verses ORDER BY book_id, chapter, verse")
+        else:
+            cur.execute("SELECT book_id, chapter, verse, NULL, text FROM verses ORDER BY book_id, chapter, verse")
+        all_verses = cur.fetchall()
+        conn.close()
 
+        # Groupement en mémoire par book_id
+        book_verses_map = {}
+        for b_id, ch_num, v_num, txt_str, txt_clean in all_verses:
+            if b_id not in book_verses_map:
+                book_verses_map[b_id] = {}
+            c_k = str(ch_num)
+            v_k = str(v_num)
+            if c_k not in book_verses_map[b_id]:
+                book_verses_map[b_id][c_k] = {}
+            val = txt_str if txt_str else txt_clean
+            if val:
+                val = val.replace("<p>", "").replace("</p>", "").strip()
+            book_verses_map[b_id][c_k][v_k] = val
+        
+        for b_id, b_code, b_name, ch_cnt in books_rows:
+            ch_map = book_verses_map.get(b_id, {})
             b_obj = {
                 "id": b_id,
                 "code": b_code,
@@ -165,8 +170,8 @@ class BibleReaderMixin:
             }
             out_json = os.path.join(dest_json_dir, f"{b_id:02d}_{b_code}_{b_name}.json")
             with open(out_json, "w", encoding="utf-8") as jf:
-                json.dump(b_obj, jf, ensure_ascii=False, indent=2)
-        conn.close()
+                json.dump(b_obj, jf, ensure_ascii=False, separators=(',', ':'))
+        
         BibleJsonLoader.clear_cache()
 
     def get_bible_registry(self) -> Dict[str, Any]:

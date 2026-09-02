@@ -71,6 +71,7 @@ class CommentaryMixin:
         comments = []
         for cid, data in grouped.items():
             comments.append({
+                "commentary_id": str(cid),
                 "author": data["author"],
                 "source": data["source"],
                 "reference": data["reference"],

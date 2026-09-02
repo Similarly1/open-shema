@@ -6070,7 +6070,7 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   box-shadow: var(--shadow-popover);
   display: flex;
   flex-direction: column;
-  z-index: 100;
+  z-index: 9999;
   overflow: hidden;
   animation: popoverFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -6090,7 +6090,7 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   box-shadow: var(--shadow-popover);
   display: flex;
   flex-direction: column;
-  z-index: 120;
+  z-index: 9999;
   overflow: hidden;
   animation: popoverFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }

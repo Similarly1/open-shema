@@ -2032,46 +2032,74 @@ const CommentarySynthesizerUI = {
   },
 
   commentaryCatalog: {
-    "calvin": { title: "Commentaire Biblique de Jean Calvin", author: "Jean Calvin", period: "Réforme Protestante (1550)", color: "#1E3A8A", initials: "JC" },
-    "jean calvin": { title: "Commentaire Biblique de Jean Calvin", author: "Jean Calvin", period: "Réforme Protestante (1550)", color: "#1E3A8A", initials: "JC" },
-    "henry": { title: "Commentaire Biblique de Matthew Henry", author: "Matthew Henry", period: "Puritain / Dévotionnel (1706)", color: "#065F46", initials: "MH" },
-    "matthew henry": { title: "Commentaire Biblique de Matthew Henry", author: "Matthew Henry", period: "Puritain / Dévotionnel (1706)", color: "#065F46", initials: "MH" },
-    "barnes": { title: "Commentaire Biblique par Albert Barnes", author: "Albert Barnes", period: "Notes on the Bible (1834)", color: "#7C2D12", initials: "AB" },
-    "albert barnes": { title: "Commentaire Biblique par Albert Barnes", author: "Albert Barnes", period: "Notes on the Bible (1834)", color: "#7C2D12", initials: "AB" },
-    "trapp": { title: "Commentaire complet de John Trapp", author: "John Trapp", period: "Puritain Classique (1654)", color: "#4C1D95", initials: "JT" },
-    "john trapp": { title: "Commentaire complet de John Trapp", author: "John Trapp", period: "Puritain Classique (1654)", color: "#4C1D95", initials: "JT" },
-    "gill": { title: "Commentaire Biblique de John Gill", author: "John Gill", period: "Exposition of the Bible (1748)", color: "#134E4A", initials: "JG" },
-    "john gill": { title: "Commentaire Biblique de John Gill", author: "John Gill", period: "Exposition of the Bible (1748)", color: "#134E4A", initials: "JG" },
-    "clarke": { title: "Commentaire Biblique de Adam Clarke", author: "Adam Clarke", period: "Méthodiste & Historique (1810)", color: "#831843", initials: "AC" },
-    "adam clarke": { title: "Commentaire Biblique de Adam Clarke", author: "Adam Clarke", period: "Méthodiste & Historique (1810)", color: "#831843", initials: "AC" },
-    "scofield": { title: "Commentaire Biblique de Scofield", author: "C.I. Scofield", period: "Dispensationaliste (1909)", color: "#1F2937", initials: "CIS" },
-    "pulpit": { title: "Commentaire Biblique de la chaire (Pulpit)", author: "H.D.M. Spence & J.S. Exell", period: "The Pulpit Commentary (1880)", color: "#312E81", initials: "PC" },
-    "jfb": { title: "Commentaire critique et explicatif sur toute la Bible (JFB)", author: "Jamieson, Fausset & Brown", period: "Critical & Explanatory (1871)", color: "#374151", initials: "JFB" },
-    "peake": { title: "Commentaire d'Arthur Peake sur la Bible", author: "Arthur S. Peake", period: "Critique & Historique (1919)", color: "#164E63", initials: "AP" },
-    "arthur peake": { title: "Commentaire d'Arthur Peake sur la Bible", author: "Arthur S. Peake", period: "Critique & Historique (1919)", color: "#164E63", initials: "AP" },
-    "coke": { title: "Commentaire de Coke sur la Sainte Bible", author: "Thomas Coke", period: "Commentary on the Holy Bible (1801)", color: "#701A75", initials: "TC" },
-    "dummelow": { title: "Commentaire de Dummelow sur la Bible", author: "John R. Dummelow", period: "One Volume Commentary (1909)", color: "#0F766E", initials: "JD" },
-    "meyer": { title: "Commentaire de Frederick Brotherton Meyer", author: "F.B. Meyer", period: "Dévotionnel & Pastoral (1914)", color: "#047857", initials: "FBM" },
-    "f.b. meyer": { title: "Commentaire de Frederick Brotherton Meyer", author: "F.B. Meyer", period: "Dévotionnel & Pastoral (1914)", color: "#047857", initials: "FBM" },
-    "benson": { title: "Commentaire de Joseph Benson (AT & NT)", author: "Joseph Benson", period: "Notes on the Old & New Testaments (1811)", color: "#854D0E", initials: "JB" },
-    "joseph benson": { title: "Commentaire de Joseph Benson (AT & NT)", author: "Joseph Benson", period: "Notes on the Old & New Testaments (1811)", color: "#854D0E", initials: "JB" },
-    "nicoll": { title: "Commentaire biblique de l'exposant (Nicoll)", author: "W. Robertson Nicoll", period: "The Expositor's Bible (1887)", color: "#1E40AF", initials: "WRN" },
-    "gaebelein": { title: "Bible annotée par A.C. Gaebelein", author: "Arno C. Gaebelein", period: "The Annotated Bible (1913)", color: "#475569", initials: "ACG" },
-    "a.c. gaebelein": { title: "Bible annotée par A.C. Gaebelein", author: "Arno C. Gaebelein", period: "The Annotated Bible (1913)", color: "#475569", initials: "ACG" },
-    "geneve": { title: "Commentaire de la Bible d'étude de Genève (1560)", author: "Exégètes de Genève", period: "Geneva Bible Notes (1560)", color: "#334155", initials: "BG" },
-    "bible du sermon": { title: "Commentaire de la Bible du sermon", author: "The Sermon Bible", period: "Homilétique & Exégèse (1888)", color: "#15803D", initials: "BS" },
-    "sermon": { title: "Commentaire de la Bible du sermon", author: "The Sermon Bible", period: "Homilétique & Exégèse (1888)", color: "#15803D", initials: "BS" },
-    "spurgeon": { title: "Commentaire Biblique de Charles Spurgeon", author: "Charles H. Spurgeon", period: "Trésor de David & Sermons (1870)", color: "#991B1B", initials: "CHS" },
-    "charles spurgeon": { title: "Commentaire Biblique de Charles Spurgeon", author: "Charles H. Spurgeon", period: "Trésor de David & Sermons (1870)", color: "#991B1B", initials: "CHS" },
-    "segond 21": { title: "Notes d'étude Segond 21", author: "Société Biblique de Genève", period: "Segond 21 (2007)", color: "#B91C1C", initials: "S21" },
-    "notes d'étude segond 21": { title: "Notes d'étude Segond 21", author: "Société Biblique de Genève", period: "Segond 21 (2007)", color: "#B91C1C", initials: "S21" },
-    "tsk": { title: "Trésor de la connaissance des Écritures (TSK)", author: "R.A. Torrey / TSK", period: "Treasury of Scripture Knowledge (1836)", color: "#4338CA", initials: "TSK" },
-    "macarthur": { title: "The MacArthur Bible Commentary", author: "John MacArthur", period: "Études bibliques contemporaines", color: "#1E293B", initials: "JM" },
-    "godet": { title: "Bible annotée (Frédéric Godet & Neuchâtel)", author: "Frédéric Godet et collaborateurs", period: "Bible Annotée de Neuchâtel (1899)", color: "#0D9488", initials: "BAG" },
-    "frédéric godet": { title: "Bible annotée (Frédéric Godet & Neuchâtel)", author: "Frédéric Godet et collaborateurs", period: "Bible Annotée de Neuchâtel (1899)", color: "#0D9488", initials: "BAG" },
-    "bible annotée (frédéric godet)": { title: "Bible annotée (Frédéric Godet & Neuchâtel)", author: "Frédéric Godet et collaborateurs", period: "Bible Annotée de Neuchâtel (1899)", color: "#0D9488", initials: "BAG" },
-    "tgc": { title: "Commentaires The Gospel Coalition (TGC)", author: "The Gospel Coalition (Carson, Schreiner, Köstenberger, etc.)", period: "The Gospel Coalition Commentary (2021-2024)", color: "#9A3412", initials: "TGC" },
-    "the gospel coalition": { title: "Commentaires The Gospel Coalition (TGC)", author: "The Gospel Coalition (Carson, Schreiner, Köstenberger, etc.)", period: "The Gospel Coalition Commentary (2021-2024)", color: "#9A3412", initials: "TGC" }
+    "calvin": { title: "Commentaire Biblique de Jean Calvin", author: "Jean Calvin", shortName: "Calvin", period: "Réforme Protestante (1550)", color: "#1E3A8A", initials: "JC" },
+    "jean calvin": { title: "Commentaire Biblique de Jean Calvin", author: "Jean Calvin", shortName: "Calvin", period: "Réforme Protestante (1550)", color: "#1E3A8A", initials: "JC" },
+    "3": { title: "Commentaire Biblique de Jean Calvin", author: "Jean Calvin", shortName: "Calvin", period: "Réforme Protestante (1550)", color: "#1E3A8A", initials: "JC" },
+    "henry": { title: "Commentaire Biblique de Matthew Henry", author: "Matthew Henry", shortName: "M. Henry", period: "Puritain / Dévotionnel (1706)", color: "#065F46", initials: "MH" },
+    "matthew henry": { title: "Commentaire Biblique de Matthew Henry", author: "Matthew Henry", shortName: "M. Henry", period: "Puritain / Dévotionnel (1706)", color: "#065F46", initials: "MH" },
+    "2": { title: "Commentaire Biblique de Matthew Henry", author: "Matthew Henry", shortName: "M. Henry", period: "Puritain / Dévotionnel (1706)", color: "#065F46", initials: "MH" },
+    "barnes": { title: "Commentaire Biblique par Albert Barnes", author: "Albert Barnes", shortName: "Barnes", period: "Notes on the Bible (1834)", color: "#7C2D12", initials: "AB" },
+    "albert barnes": { title: "Commentaire Biblique par Albert Barnes", author: "Albert Barnes", shortName: "Barnes", period: "Notes on the Bible (1834)", color: "#7C2D12", initials: "AB" },
+    "4": { title: "Commentaire Biblique par Albert Barnes", author: "Albert Barnes", shortName: "Barnes", period: "Notes on the Bible (1834)", color: "#7C2D12", initials: "AB" },
+    "trapp": { title: "Commentaire complet de John Trapp", author: "John Trapp", shortName: "Trapp", period: "Puritain Classique (1654)", color: "#4C1D95", initials: "JT" },
+    "john trapp": { title: "Commentaire complet de John Trapp", author: "John Trapp", shortName: "Trapp", period: "Puritain Classique (1654)", color: "#4C1D95", initials: "JT" },
+    "195": { title: "Commentaire complet de John Trapp", author: "John Trapp", shortName: "Trapp", period: "Puritain Classique (1654)", color: "#4C1D95", initials: "JT" },
+    "gill": { title: "Commentaire Biblique de John Gill", author: "John Gill", shortName: "Gill", period: "Exposition of the Bible (1748)", color: "#134E4A", initials: "JG" },
+    "john gill": { title: "Commentaire Biblique de John Gill", author: "John Gill", shortName: "Gill", period: "Exposition of the Bible (1748)", color: "#134E4A", initials: "JG" },
+    "8": { title: "Commentaire Biblique de John Gill", author: "John Gill", shortName: "Gill", period: "Exposition of the Bible (1748)", color: "#134E4A", initials: "JG" },
+    "clarke": { title: "Commentaire Biblique de Adam Clarke", author: "Adam Clarke", shortName: "Clarke", period: "Méthodiste & Historique (1810)", color: "#831843", initials: "AC" },
+    "adam clarke": { title: "Commentaire Biblique de Adam Clarke", author: "Adam Clarke", shortName: "Clarke", period: "Méthodiste & Historique (1810)", color: "#831843", initials: "AC" },
+    "7": { title: "Commentaire Biblique de Adam Clarke", author: "Adam Clarke", shortName: "Clarke", period: "Méthodiste & Historique (1810)", color: "#831843", initials: "AC" },
+    "scofield": { title: "Commentaire Biblique de Scofield", author: "C.I. Scofield", shortName: "Scofield", period: "Dispensationaliste (1909)", color: "#1F2937", initials: "CIS" },
+    "6": { title: "Commentaire Biblique de Scofield", author: "C.I. Scofield", shortName: "Scofield", period: "Dispensationaliste (1909)", color: "#1F2937", initials: "CIS" },
+    "pulpit": { title: "Commentaire Biblique de la chaire (Pulpit)", author: "H.D.M. Spence & J.S. Exell", shortName: "Pulpit", period: "The Pulpit Commentary (1880)", color: "#312E81", initials: "PC" },
+    "5": { title: "Commentaire Biblique de la chaire (Pulpit)", author: "H.D.M. Spence & J.S. Exell", shortName: "Pulpit", period: "The Pulpit Commentary (1880)", color: "#312E81", initials: "PC" },
+    "jfb": { title: "Commentaire critique et explicatif sur toute la Bible (JFB)", author: "Jamieson, Fausset & Brown", shortName: "JFB", period: "Critical & Explanatory (1871)", color: "#374151", initials: "JFB" },
+    "1": { title: "Commentaire critique et explicatif sur toute la Bible (JFB)", author: "Jamieson, Fausset & Brown", shortName: "JFB", period: "Critical & Explanatory (1871)", color: "#374151", initials: "JFB" },
+    "peake": { title: "Commentaire d'Arthur Peake sur la Bible", author: "Arthur S. Peake", shortName: "Peake", period: "Critique & Historique (1919)", color: "#164E63", initials: "AP" },
+    "arthur peake": { title: "Commentaire d'Arthur Peake sur la Bible", author: "Arthur S. Peake", shortName: "Peake", period: "Critique & Historique (1919)", color: "#164E63", initials: "AP" },
+    "147": { title: "Commentaire d'Arthur Peake sur la Bible", author: "Arthur S. Peake", shortName: "Peake", period: "Critique & Historique (1919)", color: "#164E63", initials: "AP" },
+    "coke": { title: "Commentaire de Coke sur la Sainte Bible", author: "Thomas Coke", shortName: "Coke", period: "Commentary on the Holy Bible (1801)", color: "#701A75", initials: "TC" },
+    "65": { title: "Commentaire de Coke sur la Sainte Bible", author: "Thomas Coke", shortName: "Coke", period: "Commentary on the Holy Bible (1801)", color: "#701A75", initials: "TC" },
+    "dummelow": { title: "Commentaire de Dummelow sur la Bible", author: "John R. Dummelow", shortName: "Dummelow", period: "One Volume Commentary (1909)", color: "#0F766E", initials: "JD" },
+    "56": { title: "Commentaire de Dummelow sur la Bible", author: "John R. Dummelow", shortName: "Dummelow", period: "One Volume Commentary (1909)", color: "#0F766E", initials: "JD" },
+    "meyer": { title: "Commentaire de Frederick Brotherton Meyer", author: "F.B. Meyer", shortName: "Meyer", period: "Dévotionnel & Pastoral (1914)", color: "#047857", initials: "FBM" },
+    "f.b. meyer": { title: "Commentaire de Frederick Brotherton Meyer", author: "F.B. Meyer", shortName: "Meyer", period: "Dévotionnel & Pastoral (1914)", color: "#047857", initials: "FBM" },
+    "123": { title: "Commentaire de Frederick Brotherton Meyer", author: "F.B. Meyer", shortName: "Meyer", period: "Dévotionnel & Pastoral (1914)", color: "#047857", initials: "FBM" },
+    "benson": { title: "Commentaire de Joseph Benson (AT & NT)", author: "Joseph Benson", shortName: "Benson", period: "Notes on the Old & New Testaments (1811)", color: "#854D0E", initials: "JB" },
+    "joseph benson": { title: "Commentaire de Joseph Benson (AT & NT)", author: "Joseph Benson", shortName: "Benson", period: "Notes on the Old & New Testaments (1811)", color: "#854D0E", initials: "JB" },
+    "59": { title: "Commentaire de Joseph Benson (AT & NT)", author: "Joseph Benson", shortName: "Benson", period: "Notes on the Old & New Testaments (1811)", color: "#854D0E", initials: "JB" },
+    "nicoll": { title: "Commentaire biblique de l'exposant (Nicoll)", author: "W. Robertson Nicoll", shortName: "Nicoll", period: "The Expositor's Bible (1887)", color: "#1E40AF", initials: "WRN" },
+    "75": { title: "Commentaire biblique de l'exposant (Nicoll)", author: "W. Robertson Nicoll", shortName: "Nicoll", period: "The Expositor's Bible (1887)", color: "#1E40AF", initials: "WRN" },
+    "gaebelein": { title: "Bible annotée par A.C. Gaebelein", author: "Arno C. Gaebelein", shortName: "Gaebelein", period: "The Annotated Bible (1913)", color: "#475569", initials: "ACG" },
+    "a.c. gaebelein": { title: "Bible annotée par A.C. Gaebelein", author: "Arno C. Gaebelein", shortName: "Gaebelein", period: "The Annotated Bible (1913)", color: "#475569", initials: "ACG" },
+    "81": { title: "Bible annotée par A.C. Gaebelein", author: "Arno C. Gaebelein", shortName: "Gaebelein", period: "The Annotated Bible (1913)", color: "#475569", initials: "ACG" },
+    "geneve": { title: "Commentaire de la Bible d'étude de Genève (1560)", author: "Exégètes de Genève", shortName: "Genève 1560", period: "Geneva Bible Notes (1560)", color: "#334155", initials: "BG" },
+    "87": { title: "Commentaire de la Bible d'étude de Genève (1560)", author: "Exégètes de Genève", shortName: "Genève 1560", period: "Geneva Bible Notes (1560)", color: "#334155", initials: "BG" },
+    "bible du sermon": { title: "Commentaire de la Bible du sermon", author: "The Sermon Bible", shortName: "Sermon Bible", period: "Homilétique & Exégèse (1888)", color: "#15803D", initials: "BS" },
+    "sermon": { title: "Commentaire de la Bible du sermon", author: "The Sermon Bible", shortName: "Sermon Bible", period: "Homilétique & Exégèse (1888)", color: "#15803D", initials: "BS" },
+    "165": { title: "Commentaire de la Bible du sermon", author: "The Sermon Bible", shortName: "Sermon Bible", period: "Homilétique & Exégèse (1888)", color: "#15803D", initials: "BS" },
+    "spurgeon": { title: "Commentaire Biblique de Charles Spurgeon", author: "Charles H. Spurgeon", shortName: "Spurgeon", period: "Trésor de David & Sermons (1870)", color: "#991B1B", initials: "CHS" },
+    "charles spurgeon": { title: "Commentaire Biblique de Charles Spurgeon", author: "Charles H. Spurgeon", shortName: "Spurgeon", period: "Trésor de David & Sermons (1870)", color: "#991B1B", initials: "CHS" },
+    "9": { title: "Commentaire Biblique de Charles Spurgeon", author: "Charles H. Spurgeon", shortName: "Spurgeon", period: "Trésor de David & Sermons (1870)", color: "#991B1B", initials: "CHS" },
+    "spurgeon_tresors": { title: "Les trésors de la foi (C. Spurgeon)", author: "Charles H. Spurgeon", shortName: "Spurgeon Trésors", period: "Méditations quotidiennes", color: "#991B1B", initials: "CHS" },
+    "segond 21": { title: "Notes d'étude Segond 21", author: "Société Biblique de Genève", shortName: "Segond 21", period: "Segond 21 (2007)", color: "#B91C1C", initials: "S21" },
+    "notes d'étude segond 21": { title: "Notes d'étude Segond 21", author: "Société Biblique de Genève", shortName: "Segond 21", period: "Segond 21 (2007)", color: "#B91C1C", initials: "S21" },
+    "s21_notes": { title: "Notes d'étude Segond 21", author: "Société Biblique de Genève", shortName: "Segond 21", period: "Segond 21 (2007)", color: "#B91C1C", initials: "S21" },
+    "tsk": { title: "Trésor de la connaissance des Écritures (TSK)", author: "R.A. Torrey / TSK", shortName: "TSK", period: "Treasury of Scripture Knowledge (1836)", color: "#4338CA", initials: "TSK" },
+    "201": { title: "Trésor de la connaissance des Écritures (TSK)", author: "R.A. Torrey / TSK", shortName: "TSK", period: "Treasury of Scripture Knowledge (1836)", color: "#4338CA", initials: "TSK" },
+    "macarthur": { title: "The MacArthur Bible Commentary", author: "John MacArthur", shortName: "MacArthur", period: "Études bibliques contemporaines", color: "#1E293B", initials: "JM" },
+    "godet": { title: "Bible annotée (Frédéric Godet & Neuchâtel)", author: "Frédéric Godet et collaborateurs", shortName: "Godet", period: "Bible Annotée de Neuchâtel (1899)", color: "#0D9488", initials: "BAG" },
+    "frédéric godet": { title: "Bible annotée (Frédéric Godet & Neuchâtel)", author: "Frédéric Godet et collaborateurs", shortName: "Godet", period: "Bible Annotée de Neuchâtel (1899)", color: "#0D9488", initials: "BAG" },
+    "godet_ba": { title: "Bible annotée (Frédéric Godet & Neuchâtel)", author: "Frédéric Godet et collaborateurs", shortName: "Godet", period: "Bible Annotée de Neuchâtel (1899)", color: "#0D9488", initials: "BAG" },
+    "godet_neuchatel": { title: "Bible annotée (Frédéric Godet & Neuchâtel)", author: "Frédéric Godet et collaborateurs", shortName: "Godet", period: "Bible Annotée de Neuchâtel (1899)", color: "#0D9488", initials: "BAG" },
+    "bible annotée (frédéric godet)": { title: "Bible annotée (Frédéric Godet & Neuchâtel)", author: "Frédéric Godet et collaborateurs", shortName: "Godet", period: "Bible Annotée de Neuchâtel (1899)", color: "#0D9488", initials: "BAG" },
+    "tgc": { title: "Commentaires The Gospel Coalition (TGC)", author: "The Gospel Coalition", shortName: "TGC", period: "The Gospel Coalition Commentary (2021-2024)", color: "#9A3412", initials: "TGC" },
+    "tgc_francais": { title: "Commentaires The Gospel Coalition (TGC)", author: "The Gospel Coalition", shortName: "TGC", period: "The Gospel Coalition Commentary (2021-2024)", color: "#9A3412", initials: "TGC" },
+    "the gospel coalition": { title: "Commentaires The Gospel Coalition (TGC)", author: "The Gospel Coalition", shortName: "TGC", period: "The Gospel Coalition Commentary (2021-2024)", color: "#9A3412", initials: "TGC" },
+    "robertson": { title: "Commentaire de A.T. Robertson (Images verbales du NT)", author: "A.T. Robertson", shortName: "Robertson", period: "Word Pictures in the NT (1933)", color: "#2563EB", initials: "ATR" },
+    "a.t. robertson": { title: "Commentaire de A.T. Robertson (Images verbales du NT)", author: "A.T. Robertson", shortName: "Robertson", period: "Word Pictures in the NT (1933)", color: "#2563EB", initials: "ATR" },
+    "images verbales": { title: "Commentaire de A.T. Robertson (Images verbales du NT)", author: "A.T. Robertson", shortName: "Robertson", period: "Word Pictures in the NT (1933)", color: "#2563EB", initials: "ATR" }
   },
 
   getSourceInfo(name) {
@@ -5996,15 +6024,7 @@ const BibleReader = {
 
     if (this.targetPaneForPicker === 1) {
       this.currentBible1 = targetVersionName;
-      if (targetVersionName === 'DARBY') {
-        this.pane1IsInterlinear = true;
-        this.pane1InterlinearVersion = 'DARBY';
-      } else if (targetVersionName === 'LSG') {
-        this.pane1IsInterlinear = true;
-        this.pane1InterlinearVersion = 'LSG';
-      } else {
-        this.pane1IsInterlinear = false;
-      }
+      this.pane1IsInterlinear = false;
       const interBtn = document.getElementById('btn-toggle-interlinear');
       if (interBtn) interBtn.classList.toggle('active', this.pane1IsInterlinear || this.pane2IsInterlinear);
 
@@ -6027,15 +6047,7 @@ const BibleReader = {
       this.navigateTo(targetBook, targetChapter, targetVerse);
     } else {
       this.currentBible2 = targetVersionName;
-      if (targetVersionName === 'DARBY') {
-        this.pane2IsInterlinear = true;
-        this.pane2InterlinearVersion = 'DARBY';
-      } else if (targetVersionName === 'LSG') {
-        this.pane2IsInterlinear = true;
-        this.pane2InterlinearVersion = 'LSG';
-      } else {
-        this.pane2IsInterlinear = false;
-      }
+      this.pane2IsInterlinear = false;
       const interBtn = document.getElementById('btn-toggle-interlinear');
       if (interBtn) interBtn.classList.toggle('active', this.pane1IsInterlinear || this.pane2IsInterlinear);
       this.updatePaneHeader(2);

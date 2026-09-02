@@ -183,6 +183,44 @@ class CommentaryLoader:
 
         return {"ids": ids, "documents": docs, "metadatas": metas}
 
+    BOOK_CODE_ALIASES = {
+        "Mat": ["Mat", "Matt", "Matthieu"],
+        "Mrk": ["Mrk", "Mar", "Marc", "Mark"],
+        "Mar": ["Mrk", "Mar", "Marc", "Mark"],
+        "Luk": ["Luk", "Luc", "Luke"],
+        "Luc": ["Luk", "Luc", "Luke"],
+        "Jhn": ["Jhn", "Joh", "Jean", "John"],
+        "Joh": ["Jhn", "Joh", "Jean", "John"],
+        "Act": ["Act", "Ac", "Acts", "Actes"],
+        "Rom": ["Rom", "Rm", "Ro", "Romans", "Romains"],
+        "1Co": ["1Co", "1Cor", "1 Corinthians", "1 Corinthiens"],
+        "2Co": ["2Co", "2Cor", "2 Corinthians", "2 Corinthiens"],
+        "Gal": ["Gal", "Ga", "Galatians", "Galates"],
+        "Eph": ["Eph", "Ephes", "Ephesians", "Éphésiens", "Ephesiens"],
+        "Php": ["Php", "Phi", "Phil", "Philippians", "Philippiens"],
+        "Phi": ["Php", "Phi", "Phil", "Philippians", "Philippiens"],
+        "Col": ["Col", "Coloss", "Colossians", "Colossiens"],
+        "1Th": ["1Th", "1Thess", "1 Thessalonians", "1 Thessaloniciens"],
+        "2Th": ["2Th", "2Thess", "2 Thessalonians", "2 Thessaloniciens"],
+        "1Ti": ["1Ti", "1Tim", "1 Timothy", "1 Timothée"],
+        "2Ti": ["2Ti", "2Tim", "2 Timothy", "2 Timothée"],
+        "Tit": ["Tit", "Tite", "Titus"],
+        "Phm": ["Phm", "Phlm", "Philemon", "Philémon"],
+        "Heb": ["Heb", "Hébreux", "Hebreux", "Hebrews"],
+        "Jas": ["Jas", "Jam", "Jac", "James", "Jacques"],
+        "Jam": ["Jas", "Jam", "Jac", "James", "Jacques"],
+        "1Pe": ["1Pe", "1Pet", "1 Peter", "1 Pierre"],
+        "2Pe": ["2Pe", "2Pet", "2 Peter", "2 Pierre"],
+        "1Jn": ["1Jn", "1Jo", "1John", "1 Jean"],
+        "1Jo": ["1Jn", "1Jo", "1John", "1 Jean"],
+        "2Jn": ["2Jn", "2Jo", "2John", "2 Jean"],
+        "2Jo": ["2Jn", "2Jo", "2John", "2 Jean"],
+        "3Jn": ["3Jn", "3Jo", "3John", "3 Jean"],
+        "3Jo": ["3Jn", "3Jo", "3John", "3 Jean"],
+        "Jud": ["Jud", "Jude"],
+        "Rev": ["Rev", "Apoc", "Apocalypse", "Revelation"]
+    }
+
     @classmethod
     def get_all_comments_for_passage(cls, book_code: str, chapter: int, verse: Optional[int] = None) -> Dict[str, Any]:
         """
@@ -192,8 +230,13 @@ class CommentaryLoader:
         if not os.path.exists(db_path):
             return {"ids": [], "documents": [], "metadatas": []}
 
-        query = "SELECT id, commentary_name, book_name, chapter, verse_start, verse_end, reference, text, commentary_id FROM commentaries WHERE book_code = ?"
-        params = [book_code]
+        aliases = cls.BOOK_CODE_ALIASES.get(book_code, [book_code])
+        if book_code not in aliases:
+            aliases.append(book_code)
+        placeholders = ",".join(["?"] * len(aliases))
+
+        query = f"SELECT id, commentary_name, book_name, chapter, verse_start, verse_end, reference, text, commentary_id FROM commentaries WHERE book_code IN ({placeholders})"
+        params = list(aliases)
 
         if chapter is not None:
             query += " AND chapter = ?"
@@ -246,12 +289,17 @@ class CommentaryLoader:
         v_min = min(int(verse_start), int(verse_end))
         v_max = max(int(verse_start), int(verse_end))
 
+        aliases = cls.BOOK_CODE_ALIASES.get(book_code, [book_code])
+        if book_code not in aliases:
+            aliases.append(book_code)
+        placeholders = ",".join(["?"] * len(aliases))
+
         query = (
-            "SELECT id, commentary_name, book_name, chapter, verse_start, verse_end, reference, text, commentary_id "
-            "FROM commentaries WHERE book_code = ? AND chapter = ? AND verse_start <= ? AND verse_end >= ? "
-            "ORDER BY commentary_name ASC, verse_start ASC"
+            f"SELECT id, commentary_name, book_name, chapter, verse_start, verse_end, reference, text, commentary_id "
+            f"FROM commentaries WHERE book_code IN ({placeholders}) AND chapter = ? AND verse_start <= ? AND verse_end >= ? "
+            f"ORDER BY commentary_name ASC, verse_start ASC"
         )
-        params = [book_code, int(chapter), v_max, v_min]
+        params = list(aliases) + [int(chapter), v_max, v_min]
 
         docs = []
         metas = []
