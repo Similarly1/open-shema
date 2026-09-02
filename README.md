@@ -258,11 +258,14 @@ python webview_app.py
 
 Au premier lancement (ou via le panneau **Paramètres ⚙️**), renseignez simplement la clé API du fournisseur de votre choix :
 
-| Fournisseur | Atouts majeurs |
-| :--- | :--- |
-| **Infomaniak AI** | 🇨🇭 Hébergement suisse souverain, respect absolu de la vie privée et centres de données écologiques |
-| **Mistral AI** | 🇫🇷 Modèles européens de pointe, excellence stylistique et rédactionnelle en français |
-| **Google Gemini** | ⚡ Puissance brute, rapidité remarquable et fenêtres de contexte massives |
+| Fournisseur | Modèles recommandés & Cas d'usage | Atouts |
+| :--- | :--- | :--- |
+| **[Infomaniak AI](https://www.infomaniak.com/fr/hebergement/ai-services)** | `mistral-small` *(traduction, polissage)*<br>`bge-multilingual-gemma2` *(vectorisation / embeddings)* | 🇨🇭 Hébergement suisse souverain, respect absolu de la vie privée, sécurité et centres de données écologiques |
+| **Mistral AI** | `mistral-small` *(traduction haute fidélité, polissage d'articles)* | 🇫🇷 Modèles européens d'excellence, maîtrise stylistique remarquable de la langue française |
+| **Google Gemini** | `gemini-3.7-flash` *(chat interactif, exégèse, résumés)*<br>`gemini-3.5-flash-lite` *(traduction rapide, polissage)* | ⚡ Puissance brute, réactivité instantanée et fenêtres de contexte massives |
+
+> 💡 **Qu'est-ce que le « Polissage » IA ?**  
+> Lorsqu'un ouvrage théologique (EPUB/PDF), un article ou un document Word est importé mais présente une mise en page brute ou difficilement lisible (artefacts de numérisation OCR, sauts de ligne anarchiques, titres non balisés, notes mal alignées), la fonction de **polissage par IA** restructure et sublime automatiquement le document en **Markdown propre et élégant** (titres hiérarchisés, paragraphes aérés, listes claires et références bibliques mises en valeur) sans jamais altérer le sens ni le contenu d'origine.
 
 ---
 
