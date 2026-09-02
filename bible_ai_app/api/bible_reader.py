@@ -119,17 +119,33 @@ class BibleReaderMixin:
     def _extract_sqlite_bible_to_json(self, sqlite_path: str, abbr: str, title: str):
         """Extrait les 66 livres d'une Bible SQLite vers des fichiers JSON modulaires (ultra-rapide en mémoire)."""
         import sqlite3
+        import time
         dest_json_dir = os.path.join(current_dir, "data", "bibles", abbr)
         os.makedirs(dest_json_dir, exist_ok=True)
-        conn = sqlite3.connect(sqlite_path)
-        cur = conn.cursor()
         
-        cur.execute("PRAGMA table_info(books)")
-        b_cols = [r[1] for r in cur.fetchall()]
-        ch_col = "chapters_count" if "chapters_count" in b_cols else ("total_chapters" if "total_chapters" in b_cols else "chapters")
-        
-        cur.execute(f"SELECT id, code, name, {ch_col} FROM books ORDER BY id")
-        books_rows = cur.fetchall()
+        # Retry connection to bypass temporary file locks from Antivirus (Windows Defender)
+        max_retries = 10
+        for attempt in range(max_retries):
+            try:
+                conn = sqlite3.connect(sqlite_path)
+                cur = conn.cursor()
+                cur.execute("PRAGMA table_info(books)")
+                b_cols = [r[1] for r in cur.fetchall()]
+                ch_col = "chapters_count" if "chapters_count" in b_cols else ("total_chapters" if "total_chapters" in b_cols else "chapters")
+                cur.execute(f"SELECT id, code, name, {ch_col} FROM books ORDER BY id")
+                books_rows = cur.fetchall()
+                break
+            except sqlite3.OperationalError as e:
+                if conn:
+                    try:
+                        conn.close()
+                    except:
+                        pass
+                if attempt < max_retries - 1:
+                    logger.warning(f"SQLite lock detected (attempt {attempt+1}), retrying in 500ms...")
+                    time.sleep(0.5)
+                else:
+                    raise RuntimeError(f"Le fichier de la Bible est verrouillé par un autre processus (ex: Antivirus). {e}")
         
         cur.execute("PRAGMA table_info(verses)")
         v_cols = [r[1] for r in cur.fetchall()]

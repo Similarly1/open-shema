@@ -538,6 +538,7 @@ class SettingsMixin:
                             self._extract_sqlite_bible_to_json(dest_path, mod_abbr, mod_title)
                     except Exception as ext_err:
                         logger.error(f"Erreur extraction SQLite vers JSON ({mod_title}): {ext_err}")
+                        raise RuntimeError(f"Échec de l'extraction de la Bible {mod_title} : {ext_err}")
 
                     # Enregistrer dans metadata / library
                     try:
