@@ -45,7 +45,6 @@ def build():
         "--exclude-module=_sqlite3",
         "--exclude-module=cryptography",
         "--exclude-module=bcrypt",
-        "--exclude-module=email",
         "--exclude-module=xmlrpc",
         "--exclude-module=setuptools",
         "--exclude-module=pip",
