@@ -83,21 +83,23 @@
 }
 
 .frw-brand-logo {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  color: #b45309;
-  border-radius: 10px;
-  border: 1px solid #fcd34d;
-  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.12);
+  background: transparent;
+  border-radius: 8px;
+  border: none;
+  box-shadow: none;
+  flex-shrink: 0;
 }
 
+.frw-brand-logo img,
 .frw-brand-logo svg {
-  width: 20px;
-  height: 20px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
 }
 
 .frw-brand-title {

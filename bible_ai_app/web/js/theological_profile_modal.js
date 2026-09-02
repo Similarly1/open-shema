@@ -14,20 +14,19 @@ const TheologicalProfileModal = {
     if (this.initialized) return;
     this.initialized = true;
     this.bindEvents();
-    this.checkInitialOnboarding();
   },
 
-  async checkInitialOnboarding() {
+  async checkOnboardingForAIView() {
     try {
       const profile = await API.call('get_theological_profile');
       if (profile && profile.onboarding_completed === false) {
-        setTimeout(() => {
-          this.open();
-        }, 1200);
+        this.open();
+        return true;
       }
     } catch (e) {
-      console.warn('Verification profil initial :', e);
+      console.warn('Verification profil initial IA :', e);
     }
+    return false;
   },
 
   bindEvents() {

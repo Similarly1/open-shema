@@ -99,7 +99,7 @@ const FirstRunWizard = {
           <!-- Header -->
           <div class="frw-header">
             <div class="frw-brand">
-              <div class="frw-brand-logo">${this.svg.logo}</div>
+              <div class="frw-brand-logo"><img src="img/logo.svg" alt="Open Shema" /></div>
               <div class="frw-brand-title">Open Shema</div>
               <div class="frw-brand-badge">Initialisation</div>
             </div>
