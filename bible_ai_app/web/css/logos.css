@@ -30041,4 +30041,127 @@ body.theme-light .report-typo-textarea {
   transform-origin: 50% 50% !important;
 }
 
+/* =========================================================================
+ * THÈME CLAIR : SERMONS, ÉDITEUR MODULAIRE & BANQUE D'ILLUSTRATIONS
+ * ========================================================================= */
+
+body:not(.theme-dark) .sermons-hub-layout,
+body:not(.theme-dark) .sermons-hub-main-content,
+body:not(.theme-dark) .illustrations-layout,
+body:not(.theme-dark) .illustrations-main-content,
+body:not(.theme-dark) .sermon-editor-single-layout,
+body:not(.theme-dark) .sermons-editor-workspace,
+body:not(.theme-dark) #view-sermons,
+body:not(.theme-dark) #view-sermon-editor,
+body:not(.theme-dark) #view-illustrations {
+  background-color: var(--bg-base, #f8fafc) !important;
+  color: var(--text-primary, #0f172a);
+}
+
+body:not(.theme-dark) .sermons-hub-header,
+body:not(.theme-dark) .illustrations-header,
+body:not(.theme-dark) .sermon-single-header,
+body:not(.theme-dark) .sermon-outline-panel,
+body:not(.theme-dark) .sermons-resources-drawer,
+body:not(.theme-dark) .sermons-status-bar {
+  background-color: var(--bg-card, #ffffff) !important;
+  border-color: var(--border-color, #e2e8f0) !important;
+  color: var(--text-primary, #0f172a);
+}
+
+body:not(.theme-dark) .sermons-hub-main-title,
+body:not(.theme-dark) .illustrations-main-title,
+body:not(.theme-dark) .sermon-single-title-input {
+  color: var(--text-primary, #0f172a) !important;
+}
+
+body:not(.theme-dark) .sermons-hub-subtitle,
+body:not(.theme-dark) .illustrations-subtitle {
+  color: var(--text-secondary, #475569) !important;
+}
+
+body:not(.theme-dark) .sermons-hub-search-field,
+body:not(.theme-dark) .sermons-hub-search-box input,
+body:not(.theme-dark) .illustrations-search-field,
+body:not(.theme-dark) .sermon-drawer-input {
+  background: var(--bg-card, #ffffff) !important;
+  border-color: var(--border-color, #cbd5e1) !important;
+  color: var(--text-primary, #0f172a) !important;
+}
+
+body:not(.theme-dark) .sermon-hub-pill,
+body:not(.theme-dark) .ill-category-pill,
+body:not(.theme-dark) .ill-type-btn,
+body:not(.theme-dark) .ill-status-btn {
+  background: var(--bg-card, #ffffff) !important;
+  border-color: var(--border-color, #e2e8f0) !important;
+  color: var(--text-secondary, #475569) !important;
+}
+
+body:not(.theme-dark) .sermon-hub-pill:hover,
+body:not(.theme-dark) .ill-category-pill:hover {
+  background: var(--bg-hover, rgba(59, 130, 246, 0.08)) !important;
+  color: var(--accent-primary, #2563eb) !important;
+}
+
+body:not(.theme-dark) .sermon-hub-pill.active,
+body:not(.theme-dark) .ill-category-pill.active {
+  background: var(--accent-primary, #2563eb) !important;
+  color: #ffffff !important;
+  border-color: var(--accent-primary, #2563eb) !important;
+}
+
+body:not(.theme-dark) .sermon-card,
+body:not(.theme-dark) .illustration-card,
+body:not(.theme-dark) .sermon-section-card {
+  background: var(--bg-card, #ffffff) !important;
+  border: 1px solid var(--border-color, #e2e8f0) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+
+body:not(.theme-dark) .sermon-card:hover,
+body:not(.theme-dark) .illustration-card:hover {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.09) !important;
+  border-color: var(--accent-primary, #3b82f6) !important;
+}
+
+body:not(.theme-dark) .sermon-card-title,
+body:not(.theme-dark) .ill-card-title,
+body:not(.theme-dark) .section-card-title-input {
+  color: var(--text-primary, #0f172a) !important;
+}
+
+body:not(.theme-dark) .sermon-section-header {
+  background: var(--bg-subtle, #f8fafc) !important;
+  border-bottom: 1px solid var(--border-color, #e2e8f0) !important;
+}
+
+body:not(.theme-dark) .section-card-body,
+body:not(.theme-dark) .sermon-section-editor {
+  background: var(--bg-card, #ffffff) !important;
+  color: var(--text-primary, #0f172a) !important;
+}
+
+body:not(.theme-dark) .sermon-card-summary,
+body:not(.theme-dark) .ill-card-preview {
+  color: var(--text-secondary, #475569) !important;
+}
+
+body:not(.theme-dark) .sermon-metadata-cartouche {
+  background: var(--bg-card, #ffffff) !important;
+  border-color: var(--border-color, #e2e8f0) !important;
+}
+
+body:not(.theme-dark) .btn-add-section-pill {
+  background: var(--bg-card, #ffffff) !important;
+  border-color: var(--border-color, #e2e8f0) !important;
+  color: var(--text-secondary, #475569) !important;
+}
+
+body:not(.theme-dark) .btn-add-section-pill:hover {
+  background: rgba(37, 99, 235, 0.08) !important;
+  color: var(--accent-primary, #2563eb) !important;
+  border-color: var(--accent-primary, #2563eb) !important;
+}
+
 
