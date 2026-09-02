@@ -166,6 +166,10 @@ body.theme-dark .btn-articles-icon {
   animation: popoverFadeIn 0.15s ease-out;
 }
 
+.articles-sources-popover.hidden {
+  display: none !important;
+}
+
 body.theme-dark .articles-sources-popover {
   background: var(--bg-surface, #1e293b);
   border-color: var(--border-color, rgba(255,255,255,0.15));
