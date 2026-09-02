@@ -126,12 +126,12 @@ Son nom s'inspire du grand commandement biblique du *Shema Israël* (Deutéronom
 
 * **Lecteur d'Ouvrages Théologiques (EPUB / PDF)** :
   * Lisez vos livres, monographies et traités de théologie directement dans Open Shema.
-* **Détection Intelligente & Clics Scripturaires** :
-  * Toute référence biblique présente dans un livre est automatiquement reconnue et cliquable pour l'ouvrir instantanément dans le lecteur biblique.
+* **Détection Intelligente & Clics Scripturaires Universels** :
+  * Toute référence biblique présente dans un texte — quelle que soit sa graphie (abréviations comme *Rm 8.28*, *Ep 2:8-10* ou noms complets comme *Romains 8:28*) — est automatiquement reconnue et cliquable pour l'ouvrir instantanément dans le lecteur biblique.
 * **Résumés Théologiques par Chapitre** :
   * Génération automatique de la thèse de l'auteur, des arguments doctrinaux clés et du réseau de versets d'ancrage.
 * **Hub d'Articles & Veille Théologique** :
-  * Agrégateur intégré d'articles de fond avec lecture hors-ligne et recherche plein texte.
+  * Agrégateur intégré d'articles chrétiens de fond (*ToutPourSaGloire / TPSG* et *Évangile 21 / E21*) avec lecture hors-ligne et recherche plein texte.
 
 ---
 
@@ -146,10 +146,10 @@ Son nom s'inspire du grand commandement biblique du *Shema Israël* (Deutéronom
 Open Shema refuse les boîtes noires fermées et place le contrôle absolu de l'IA entre les mains de l'utilisateur.
 
 #### 🎯 Le Choix Délibéré de 3 Fournisseurs d'Excellence
-L'utilisateur est libre de choisir le fournisseur et le modèle exact adapté à son flux de travail :
-* **⚡ Google Gemini** (`gemini-2.5-flash`, `gemini-1.5-pro`) : Pour la **puissance brute**, la rapidité foudroyante, la précision documentaire et les fenêtres de contexte monumentales.
-* **🇫🇷 Mistral AI** (`mistral-large`, `mistral-small`, `codestral`) : Pour disposer d'une solution **européenne de pointe**, nativement francophone, d'une grande finesse littéraire et stylistique dans la rédaction en français.
-* **🇨🇭 Infomaniak AI** (`mixtral`, `llama`) : Pour le **choix éthique et souverain**, garantissant la sécurité des données et le respect de la vie privée au sein de centres de données écologiques basés en Suisse.
+L'utilisateur est libre de choisir le fournisseur et le modèle de son choix au sein de leur catalogue :
+* **⚡ Google Gemini** : Pour la **puissance brute**, la rapidité foudroyante, la précision documentaire et les fenêtres de contexte monumentales.
+* **🇫🇷 Mistral AI** : Pour disposer d'une solution **européenne de pointe**, nativement francophone, d'une grande finesse littéraire et stylistique dans la rédaction en français.
+* **🇨🇭 Infomaniak AI** : Pour le **choix éthique et souverain**, garantissant la sécurité des données et le respect de la vie privée au sein de centres de données écologiques basés en Suisse.
 
 #### 🔓 Transparence Totale & Prompts Système Débridables
 Contrairement aux logiciels opaques, **tous les prompts système sont visibles, entièrement modifiables et débridables** dans les paramètres :
@@ -256,11 +256,11 @@ python webview_app.py
 
 Au premier lancement (ou via le panneau **Paramètres ⚙️**), renseignez simplement la clé API du fournisseur de votre choix :
 
-| Fournisseur | Modèles recommandés | Atouts |
-| :--- | :--- | :--- |
-| **Infomaniak AI** | `mixtral`, `llama` | 🇨🇭 Hébergement suisse souverain, respect absolu de la vie privée, éthique |
-| **Mistral AI** | `mistral-large-latest`, `mistral-small-latest` | 🇫🇷 Modèles européens de pointe, excellente compréhension théologique |
-| **Google Gemini** | `gemini-2.5-flash`, `gemini-1.5-pro` | ⚡ Vitesse remarquable, fenêtres de contexte massives |
+| Fournisseur | Atouts majeurs |
+| :--- | :--- |
+| **Infomaniak AI** | 🇨🇭 Hébergement suisse souverain, respect absolu de la vie privée et centres de données écologiques |
+| **Mistral AI** | 🇫🇷 Modèles européens de pointe, excellence stylistique et rédactionnelle en français |
+| **Google Gemini** | ⚡ Puissance brute, rapidité remarquable et fenêtres de contexte massives |
 
 ---
 
