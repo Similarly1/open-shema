@@ -560,15 +560,15 @@ const FirstRunWizard = {
       if (statusEl) statusEl.textContent = "Votre sanctuaire d'étude est prêt !";
       if (detailEl) detailEl.textContent = "Ouverture d'Open Shema...";
 
-      setTimeout(async () => {
+      setTimeout(() => {
         this.hide();
-        // Lancement direct et fluide de l'application sans rechargement de page
-        if (typeof App !== 'undefined' && App.init) {
-          await App.init();
-        } else if (window.location && typeof window.location.reload === 'function') {
+        // Rechargement immédiat et propre de l'application pour charger Genèse 1 et tous les modules
+        if (window.location && typeof window.location.reload === 'function') {
           window.location.reload();
+        } else if (typeof App !== 'undefined' && App.init) {
+          App.init();
         }
-      }, 500);
+      }, 600);
 
     } catch (e) {
       console.error("[FirstRunWizard] Erreur durant le déploiement :", e);

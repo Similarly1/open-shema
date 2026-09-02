@@ -93,16 +93,33 @@ class BibleReaderMixin:
                     if not f_path or not os.path.exists(f_path):
                         cand_sqlite = os.path.join(current_dir, "data", "bibles", f"bible_{folder.lower()}.sqlite")
                         cand_sqlite_alt = os.path.join(current_dir, "data", "bibles", f"bible_{folder.lower()}1910.sqlite")
-                        if os.path.exists(cand_sqlite):
-                            f_path = cand_sqlite
-                        elif os.path.exists(cand_sqlite_alt):
-                            f_path = cand_sqlite_alt
+                        cand_json = os.path.join(current_dir, "data", "bibles", f"{name.lower()}.json")
+                        cand_json_alt = os.path.join(current_dir, "data", "bibles", f"bible_{folder.lower()}.json")
+                        cand_json_ost = os.path.join(current_dir, "data", "bibles", f"bible-ostervald-1877.json")
+                        for cand in [cand_sqlite, cand_sqlite_alt, cand_json, cand_json_alt, cand_json_ost]:
+                            if os.path.exists(cand):
+                                f_path = cand
+                                break
                     
-                    if f_path and os.path.exists(f_path) and f_path.endswith(".sqlite"):
-                        try:
-                            self._extract_sqlite_bible_to_json(f_path, folder or name, meta.get("title", name))
-                        except Exception as e:
-                            logger.error(f"Erreur auto-extraction Bible SQLite {name}: {e}")
+                    if f_path and os.path.exists(f_path):
+                        is_sqlite = f_path.endswith(".sqlite")
+                        if not is_sqlite:
+                            try:
+                                with open(f_path, "rb") as bf:
+                                    if bf.read(16).startswith(b"SQLite format 3"):
+                                        is_sqlite = True
+                                        new_sql = os.path.splitext(f_path)[0] + ".sqlite"
+                                        if not os.path.exists(new_sql):
+                                            os.rename(f_path, new_sql)
+                                            f_path = new_sql
+                            except Exception:
+                                pass
+
+                        if is_sqlite:
+                            try:
+                                self._extract_sqlite_bible_to_json(f_path, folder or name, meta.get("title", name))
+                            except Exception as e:
+                                logger.error(f"Erreur auto-extraction Bible SQLite {name}: {e}")
 
                 if BibleJsonLoader.find_bible_dir_by_name(folder) or BibleJsonLoader.find_bible_dir_by_name(name):
                     seen_folders.add(folder)

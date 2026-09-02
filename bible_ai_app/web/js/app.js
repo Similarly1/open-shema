@@ -726,6 +726,12 @@ const App = {
   async runPreloadPipeline() {
     if (this._isPreloadingDone) return;
 
+    const wizardOverlay = document.getElementById('first-run-wizard-overlay');
+    if (wizardOverlay && !wizardOverlay.classList.contains('hidden')) {
+      console.log('[App] FirstRunWizard actif, suspension du pipeline de préchargement.');
+      return;
+    }
+
     // Démarrer l'animation de progression continue
     this.SplashProgress.start();
 

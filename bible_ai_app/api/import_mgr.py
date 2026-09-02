@@ -372,23 +372,41 @@ class ImportMixin:
                 file_name = os.path.basename(download_url.split("?")[0])
                 target_path = os.path.join(target_dir, file_name)
 
+            import ssl
+            ctx = ssl.create_default_context()
+            ctx.check_hostname = False
+            ctx.verify_mode = ssl.CERT_NONE
+
             req = urllib.request.Request(
                 download_url,
                 headers={"User-Agent": "OpenShemaApp/1.0 (https://github.com/Similarly1/open-shema)"}
             )
-            with urllib.request.urlopen(req, timeout=60) as response, open(target_path, "wb") as out_file:
+            with urllib.request.urlopen(req, timeout=60, context=ctx) as response, open(target_path, "wb") as out_file:
                 shutil.copyfileobj(response, out_file)
 
             # Résolution propre de l'abréviation
             m_abbr = (module_data.get("abbreviation") or module_data.get("code") or (m_id or "").replace("bible-", "").replace("bible_", "").upper()).strip()
 
+            # Détection dynamique par magic bytes si le fichier téléchargé est une base SQLite
+            if os.path.exists(target_path):
+                try:
+                    with open(target_path, "rb") as bf:
+                        magic = bf.read(16)
+                    if magic.startswith(b"SQLite format 3"):
+                        if not target_path.endswith(".sqlite"):
+                            real_sqlite_path = os.path.splitext(target_path)[0] + ".sqlite"
+                            if os.path.exists(real_sqlite_path):
+                                try: os.remove(real_sqlite_path)
+                                except OSError: pass
+                            os.rename(target_path, real_sqlite_path)
+                            target_path = real_sqlite_path
+                except Exception as magic_err:
+                    logger.debug(f"Erreur vérification magic bytes: {magic_err}")
+
             # Si c'est une Bible SQLite, extraire les 66 livres JSON pour compatibilité native instantanée
             if m_type == "bible" and target_path.endswith(".sqlite"):
-                try:
-                    if hasattr(self, "_extract_sqlite_bible_to_json"):
-                        self._extract_sqlite_bible_to_json(target_path, m_abbr, m_title)
-                except Exception as extract_err:
-                    logger.warning(f"Erreur extraction SQLite Bible vers JSON : {extract_err}")
+                if hasattr(self, "_extract_sqlite_bible_to_json"):
+                    self._extract_sqlite_bible_to_json(target_path, m_abbr, m_title)
 
             # Si c'est un Commentaire SQLite, synchroniser avec la base centrale des commentaires
             if m_type == "commentary" and target_path.endswith(".sqlite"):

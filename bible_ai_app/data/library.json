@@ -204,23 +204,13 @@
     "active": true
   },
   "LSG": {
+    "name": "LSG",
     "title": "Louis Segond 1910 (avec Strongs)",
-    "author": "Louis Segond",
-    "description": "Bible Louis Segond 1910 avec numérotation Strong complète (Hébreu & Grec)",
-    "year": "1910",
-    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\LSG.png",
     "type": "Bible",
-    "format": "json",
     "folder_name": "LSG",
     "version_code": "LSG",
-    "total_books": 66,
-    "embedding_model": "study_library",
-    "active": true,
-    "has_strongs": true,
-    "name": "LSG",
-    "corpus_scope": "GLOBAL",
-    "source_type": "general",
-    "book_code": null
+    "file_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\bibles\\bible_lsg1910.sqlite",
+    "active": true
   },
   "Commentaire critique et explicatif sur toute la Bible (JFB)": {
     "title": "Commentaire critique et explicatif sur toute la Bible (JFB)",
@@ -978,5 +968,8 @@
     "source": "open-shema-data",
     "is_official": true,
     "book_code": null
+  },
+  "TEST": {
+    "name": "test"
   }
 }
