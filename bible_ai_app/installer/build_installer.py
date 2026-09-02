@@ -35,6 +35,24 @@ def build():
         "--hidden-import=win32com",
         "--hidden-import=win32com.client",
         "--hidden-import=webview",
+        # Exclusions ciblées de bibliothèques lourdes inutiles à l'installeur
+        "--exclude-module=tkinter",
+        "--exclude-module=_tkinter",
+        "--exclude-module=tcl",
+        "--exclude-module=tk",
+        "--exclude-module=unittest",
+        "--exclude-module=sqlite3",
+        "--exclude-module=_sqlite3",
+        "--exclude-module=cryptography",
+        "--exclude-module=bcrypt",
+        "--exclude-module=email",
+        "--exclude-module=xmlrpc",
+        "--exclude-module=setuptools",
+        "--exclude-module=pip",
+        "--exclude-module=jinja2",
+        "--exclude-module=difflib",
+        "--exclude-module=pydoc",
+        "--exclude-module=doctest",
     ]
 
     if os.path.exists(icon_path):

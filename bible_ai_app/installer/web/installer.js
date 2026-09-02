@@ -205,10 +205,12 @@ const Installer = {
 
     const dataEl = document.getElementById('lbl-downloaded-size');
     if (dataEl) {
-      if (data.downloaded_str && data.total_str && data.total_str !== "0 Mo") {
+      if (data.downloaded_str && data.total_str && data.total_str !== "0 o") {
         dataEl.textContent = `${data.downloaded_str} / ${data.total_str}`;
-      } else if (data.downloaded_str) {
+      } else if (data.downloaded_str && data.downloaded_str !== "0 o") {
         dataEl.textContent = data.downloaded_str;
+      } else {
+        dataEl.textContent = "";
       }
     }
 

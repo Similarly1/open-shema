@@ -40,8 +40,8 @@ class InstallerAPI:
         self.progress_state = {
             "percent": 0,
             "status": "Initialisation...",
-            "downloaded_str": "0 Mo",
-            "total_str": "0 Mo",
+            "downloaded_str": "",
+            "total_str": "",
             "speed_str": "",
             "is_complete": False,
             "error": None,
@@ -89,35 +89,49 @@ class InstallerAPI:
         }
 
     def browse_folder(self, current_path=""):
-        """Ouvre un sélecteur de dossier Windows."""
+        """Ouvre un sélecteur de dossier Windows natif sans charger Tkinter."""
+        # 1. Via PyWebView create_file_dialog si disponible
         try:
             import webview
-            res = self.window.create_file_dialog(webview.FOLDER_DIALOG, directory=current_path or None)
-            if res and len(res) > 0:
-                selected = res[0]
+            if self.window:
+                res = self.window.create_file_dialog(webview.FOLDER_DIALOG, directory=current_path or None)
+                if res and len(res) > 0:
+                    selected = res[0]
+                    if not selected.lower().endswith("openshema"):
+                        selected = os.path.join(selected, "OpenShema")
+                    return {"selected": selected}
+        except Exception as e:
+            logger.debug(f"PyWebView create_file_dialog: {e}")
+
+        # 2. Via Windows Shell COM natif (zéro bibliothèque externe)
+        try:
+            import win32com.client
+            shell = win32com.client.Dispatch("Shell.Application")
+            folder = shell.BrowseForFolder(0, "Sélectionnez le dossier d'installation d'Open Shema", 0, current_path or 0)
+            if folder:
+                selected = folder.Self.Path
                 if not selected.lower().endswith("openshema"):
                     selected = os.path.join(selected, "OpenShema")
                 return {"selected": selected}
         except Exception as e:
-            logger.warning(f"Fallback browse_folder: {e}")
-            try:
-                import tkinter as tk
-                from tkinter import filedialog
-                root = tk.Tk()
-                root.withdraw()
-                root.attributes('-topmost', True)
-                folder = filedialog.askdirectory(initialdir=current_path or None, title="Sélectionnez le dossier d'installation")
-                root.destroy()
-                if folder:
-                    if not folder.lower().endswith("openshema"):
-                        folder = os.path.join(folder, "OpenShema")
-                    return {"selected": folder}
-            except Exception:
-                pass
+            logger.debug(f"Shell.Application BrowseForFolder: {e}")
+
+        # 3. Via PowerShell FolderBrowserDialog natif
+        try:
+            ps_cmd = '[System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms") | Out-Null; $f = New-Object System.Windows.Forms.FolderBrowserDialog; if ($f.ShowDialog() -eq "OK") { Write-Output $f.SelectedPath }'
+            proc = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", ps_cmd], capture_output=True, text=True)
+            selected = proc.stdout.strip()
+            if selected:
+                if not selected.lower().endswith("openshema"):
+                    selected = os.path.join(selected, "OpenShema")
+                return {"selected": selected}
+        except Exception as e:
+            logger.debug(f"PowerShell FolderBrowserDialog: {e}")
+
         return {"selected": current_path}
 
     def get_install_progress(self):
-        """Méthode de polling appelée régulièrement par le frontend pour suivre la progression sans blocage."""
+        """Méthode de polling appelée par le frontend pour suivre la progression sans blocage."""
         return self.progress_state
 
     # --- GITHUB RELEASES API & DÉTECTION DU PACKAGE ---
@@ -235,8 +249,8 @@ class InstallerAPI:
         self.progress_state = {
             "percent": 0,
             "status": "Démarrage de l'installation...",
-            "downloaded_str": "0 Mo",
-            "total_str": "0 Mo",
+            "downloaded_str": "",
+            "total_str": "",
             "speed_str": "",
             "is_complete": False,
             "error": None,
@@ -321,7 +335,7 @@ class InstallerAPI:
                         self._copy_tree_with_progress(local_pkg, target_dir)
                         temp_zip = None
                     elif os.path.isfile(local_pkg) and local_pkg.endswith(".zip"):
-                        self._update_progress(20, "Extraction de l'archive d'installation...")
+                        self._update_progress(20, "Préparation de l'archive...")
                         shutil.copy(local_pkg, temp_zip)
                         download_success = True
                 else:
@@ -335,33 +349,48 @@ class InstallerAPI:
                 self._update_progress(70, "Extraction des composants d'Open Shema...")
                 try:
                     with zipfile.ZipFile(temp_zip, 'r') as zf:
-                        namelist = zf.namelist()
-                        total_files = len(namelist)
-                        has_nested_root = all(n.startswith("OpenShema/") or n.startswith("OpenShema\\") for n in namelist if n != "OpenShema/")
+                        infolist = zf.infolist()
+                        total_bytes = sum(info.file_size for info in infolist)
+                        extracted_bytes = 0
+                        start_time = time.time()
+                        last_update = start_time
                         
-                        for i, name in enumerate(namelist):
+                        has_nested_root = all(n.filename.startswith("OpenShema/") or n.filename.startswith("OpenShema\\") for n in infolist if n.filename != "OpenShema/")
+
+                        for info in infolist:
                             if self.is_cancelled:
                                 try: os.remove(temp_zip)
                                 except OSError: pass
                                 return
                             
-                            target_name = name
+                            target_name = info.filename
                             if has_nested_root:
-                                target_name = name[len("OpenShema/"):].lstrip("/\\")
+                                target_name = info.filename[len("OpenShema/"):].lstrip("/\\")
                                 if not target_name:
                                     continue
 
                             out_path = os.path.join(target_dir, target_name)
-                            if name.endswith("/") or name.endswith("\\"):
+                            if info.is_dir():
                                 os.makedirs(out_path, exist_ok=True)
                             else:
                                 os.makedirs(os.path.dirname(out_path), exist_ok=True)
-                                with zf.open(name) as src, open(out_path, "wb") as dst:
+                                with zf.open(info) as src, open(out_path, "wb") as dst:
                                     shutil.copyfileobj(src, dst)
 
-                            if i % 15 == 0:
-                                percent = 70 + ((i / total_files) * 22)
-                                self._update_progress(percent, f"Extraction : {os.path.basename(name)}")
+                            extracted_bytes += info.file_size
+                            now = time.time()
+                            if (now - last_update > 0.1) or (extracted_bytes == total_bytes):
+                                elapsed = now - start_time
+                                speed = extracted_bytes / elapsed if elapsed > 0 else 0
+                                percent = 70 + ((extracted_bytes / total_bytes) * 23) if total_bytes > 0 else 70
+                                self._update_progress(
+                                    percent=percent,
+                                    status=f"Extraction : {os.path.basename(info.filename)}",
+                                    downloaded_bytes=extracted_bytes,
+                                    total_bytes=total_bytes,
+                                    speed_bytes_sec=speed
+                                )
+                                last_update = now
 
                     try:
                         os.remove(temp_zip)
@@ -420,13 +449,23 @@ class InstallerAPI:
             self.is_installing = False
 
     def _copy_tree_with_progress(self, src_dir, dst_dir):
-        """Copie un dossier existant vers la destination avec rapport de progression."""
+        """Copie un dossier existant vers la destination avec rapport précis de volume et vitesse."""
         all_files = []
+        total_bytes = 0
         for root, _, files in os.walk(src_dir):
             for f in files:
-                all_files.append(os.path.join(root, f))
+                full_p = os.path.join(root, f)
+                all_files.append(full_p)
+                try:
+                    total_bytes += os.path.getsize(full_p)
+                except OSError:
+                    pass
         
-        total = len(all_files)
+        total_files = len(all_files)
+        copied_bytes = 0
+        start_time = time.time()
+        last_update = start_time
+
         for i, src_file in enumerate(all_files):
             if self.is_cancelled:
                 return
@@ -434,9 +473,25 @@ class InstallerAPI:
             dst_file = os.path.join(dst_dir, rel)
             os.makedirs(os.path.dirname(dst_file), exist_ok=True)
             shutil.copy2(src_file, dst_file)
-            if i % 10 == 0:
-                percent = 15 + ((i / total) * 78)
-                self._update_progress(percent, f"Installation : {rel}")
+
+            try:
+                copied_bytes += os.path.getsize(src_file)
+            except OSError:
+                pass
+
+            now = time.time()
+            if (now - last_update > 0.1) or (i == total_files - 1):
+                elapsed = now - start_time
+                speed = copied_bytes / elapsed if elapsed > 0 else 0
+                percent = 15 + ((copied_bytes / total_bytes) * 78) if total_bytes > 0 else 15 + ((i / total_files) * 78)
+                self._update_progress(
+                    percent=percent,
+                    status=f"Installation : {rel}",
+                    downloaded_bytes=copied_bytes,
+                    total_bytes=total_bytes,
+                    speed_bytes_sec=speed
+                )
+                last_update = now
 
     def _create_windows_shortcut(self, target_path, shortcut_path, icon_path="", description="Open Shema"):
         """Crée un raccourci Windows avec WScript.Shell (win32com ou PowerShell)."""
