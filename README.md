@@ -192,8 +192,10 @@ Open Shema a été pensé pour que **l'utilisateur ne soit jamais prisonnier de 
   * **Documents Word (`.docx`)** : Reconnaissance et conversion des styles et balisages bibliques.
   * **Livres numériques (`.epub`, `.pdf`)** : Découpage intelligent par chapitres, extraction des métadonnées et détection automatique des références bibliques.
   * **Bases de données & Modules libres** : Prise en charge des formats SQLite, JSON et XML.
-* **Open Shema Store Intégré** :
-  * Téléchargez en 1 clic les modules disponibles directement depuis l'application via le catalogue connecté.
+* **Open Shema Store & Centre de Découverte Intégré** :
+  * **Ouvrages optimisés & libres de droits** : Téléchargez en 1 clic des dizaines de modules de Bibles, dictionnaires et commentaires du domaine public, spécialement nettoyés, traduits et enrichis pour le logiciel.
+  * **Accès direct aux grandes sources d'ebooks gratuits** : Passerelle vers les principales plateformes de livres théologiques numériques libres de droits.
+  * **Recherche unifiée auprès des librairies & maisons d'édition chrétiennes** : Moteur de découverte centralisé pour explorer facilement les catalogues d'éditeurs chrétiens et simplifier l'intégration de nouveaux ouvrages dans votre bibliothèque (qu'il s'agisse de ressources gratuites ou payantes).
 
 ---
 
