@@ -114,12 +114,15 @@ Son nom s'inspire du grand commandement biblique du *Shema Israël* (Deutéronom
 
 ### 🎙️ 5. Studio de Prédication & Banque d'Illustrations
 
-* **Atelier Homilétique Dédié** :
-  * Rédigez vos messages avec un canevas éprouvé : *Titre, Passage source, Thème, Proposition Centrale du Texte (PCT), Plan structuré en points, Applications concrètes*.
-* **Banque d'Illustrations Enrichie** :
-  * Base de données d'illustrations de prédication classées par thématiques et directement connectées aux passages scripturaires.
+> 🛡️ **Règle Fondamentale de Non-Délégation** :  
+> Open Shema a été délibérément calibré pour **ne jamais rédiger de prédications toutes faites** ni se substituer au prédicateur. L'IA n'est pas là pour penser, méditer ou prier à votre place. Elle intervient exclusivement comme un **assistant de laboratoire et un sparring-partner** : elle fournit la matière première exégétique brute, aide à clarifier la syntaxe du texte, stimule la recherche de la Proposition Centrale du Texte (PCT) et éprouve la cohérence de votre plan, tout en laissant 100% de la réflexion spirituelle, doctrinale et pastorale entre vos mains.
+
+* **Atelier Homilétique Structuré** :
+  * Rédigez et organisez vos messages selon un canevas éprouvé : *Titre, Passage source, Thème, Proposition Centrale du Texte (PCT / Big Idea), Plan détaillé en points logiques, Pistes d'application concrètes*.
+* **Banque d'Illustrations Thématiques** :
+  * Base de données d'illustrations de prédication classées par catégories et indexées sur les passages bibliques pour nourrir vos réflexions.
 * **Gestionnaire d'Archives Pastorales** :
-  * Classez, retrouvez et réexploitez facilement vos séries de sermons et messages passés.
+  * Classez, retrouvez et réexploitez facilement vos séries de messages et carnets de prédications passés.
 
 ---
 
