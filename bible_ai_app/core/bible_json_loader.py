@@ -234,7 +234,6 @@ class BibleJsonLoader:
                             verses_by_book[b_code][str(ch)] = {}
                         verses_by_book[b_code][str(ch)][str(v_num)] = txt
 
-                    from core.bible_json_loader import STD_TO_USFM
                     from core.reference_parser import get_french_book_name
                     from api._utils import FRENCH_TO_STD_BOOK
 
