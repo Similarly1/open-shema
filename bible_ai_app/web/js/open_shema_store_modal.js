@@ -57,7 +57,7 @@ const OpenShemaStore = {
     info: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
     award: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>`,
     scale: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>`,
-    spinner: `<svg class="spin-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`
+    spinner: `<svg class="spin-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation: modalSpin 0.85s linear infinite; display: inline-block; vertical-align: middle; transform-origin: center;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`
   },
 
   // Décodage rigoureux des entités HTML (ex: &#201; -> É, &#231; -> ç)
@@ -400,6 +400,17 @@ const OpenShemaStore = {
     modal.style.cssText = 'position: fixed; inset: 0; z-index: 10000; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center;';
 
     modal.innerHTML = `
+      <style>
+        @keyframes modalSpin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        .spin-icon {
+          animation: modalSpin 0.85s linear infinite !important;
+          display: inline-block !important;
+          transform-origin: 50% 50% !important;
+        }
+      </style>
       <div class="store-modal-card" style="width: 1080px; max-width: 95vw; height: 88vh; display: flex; flex-direction: column; background: #0f172a; border-radius: 14px; border: 1px solid #334155; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7); overflow: hidden; animation: modalFadeIn 0.2s ease-out;">
         
         <!-- HEADER DU HUB UNIFIÉ -->
@@ -1680,10 +1691,7 @@ const OpenShemaStore = {
 
     try {
       const cleanTitle = this._decodeEntities(module.title);
-
-      if (typeof App !== 'undefined' && App.showToast) {
-        App.showToast(`Téléchargement de « ${cleanTitle} » en cours...`);
-      }
+      // Seul le bouton transformé avec spinner indique le téléchargement (pas de toast redondant)
 
       if (isPublicDomain) {
         // PROPOSITION 1 : Télécharger et basculer automatiquement sur l'Assistant d'Importation pré-rempli
