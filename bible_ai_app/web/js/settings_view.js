@@ -1985,9 +1985,20 @@ Règles impératives :
   async loadDictionaries() {
     const listEl = document.getElementById('dict-reorder-list');
     if (!listEl) return;
-    listEl.innerHTML = '';
     try {
-      this.dictionaries = await API.call('get_dictionaries') || [];
+      const data = await API.call('get_dictionaries') || [];
+      this.dictionaries = data;
+      listEl.innerHTML = '';
+
+      if (this.dictionaries.length === 0) {
+        listEl.innerHTML = `
+          <div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 0.85rem; background: var(--bg-surface-soft, rgba(255,255,255,0.02)); border: 1px dashed var(--border-color); border-radius: 8px;">
+            Aucun dictionnaire installé pour le moment. Vous pouvez en télécharger depuis le <strong>Catalogue Open Shema</strong>.
+          </div>
+        `;
+        return;
+      }
+
       this.dictionaries.forEach((d, idx) => {
         const item = document.createElement('div');
         item.className = 'dict-item-row';
