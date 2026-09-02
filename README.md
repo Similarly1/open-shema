@@ -130,8 +130,8 @@ Son nom s'inspire du grand commandement biblique du *Shema Israël* (Deutéronom
   * Toute référence biblique présente dans un texte — quelle que soit sa graphie (abréviations comme *Rm 8.28*, *Ep 2:8-10* ou noms complets comme *Romains 8:28*) — est automatiquement reconnue et cliquable pour l'ouvrir instantanément dans le lecteur biblique.
 * **Résumés Théologiques par Chapitre** :
   * Génération automatique de la thèse de l'auteur, des arguments doctrinaux clés et du réseau de versets d'ancrage.
-* **Hub d'Articles & Veille Théologique** :
-  * Agrégateur intégré d'articles chrétiens de fond (*ToutPourSaGloire / TPSG* et *Évangile 21 / E21*) avec lecture hors-ligne et recherche plein texte.
+* **Hub d'Articles & Enrichissement du RAG** :
+  * Intégration et synchronisation d'articles de fond (*ToutPourSaGloire / TPSG* et *Évangile 21 / E21*) : permet d'élargir et d'enrichir massivement votre corpus documentaire avec des milliers d'analyses théologiques et pastorales, directement exploitables, indexées et croisées par le moteur RAG de l'IA (en plus de la consultation hors-ligne et de la recherche plein texte).
 
 ---
 
