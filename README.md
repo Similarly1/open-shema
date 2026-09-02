@@ -14,6 +14,7 @@
   <img src="https://img.shields.io/badge/Interface-PyWebView%20%2F%20Edge%20WebView2-informational" alt="WebView2">
   <img src="https://img.shields.io/badge/RAG-Local%20BGE--M3%20Reranker-success" alt="BGE-M3 RAG">
   <img src="https://img.shields.io/badge/IA%20Souveraine-Gemini%20%7C%20Mistral%20%7C%20Infomaniak-orange" alt="IA Providers">
+  <img src="https://img.shields.io/badge/IA-100%25%20Optionnelle%20%26%20D%C3%A9sactivable-lightgrey" alt="IA Optionnelle">
   <img src="https://img.shields.io/badge/Vie%20Privée-100%25%20Local%20%26%20Markdown-brightgreen" alt="100% Local Markdown">
   <a href="https://github.com/Similarly1/open-shema-data"><img src="https://img.shields.io/badge/Ressources-open--shema--data-purple.svg" alt="Ressources open-shema-data"></a>
 </p>
@@ -145,6 +146,10 @@ Son nom s'inspire du grand commandement biblique du *Shema Israël* (Deutéronom
 
 Open Shema refuse les boîtes noires fermées et place le contrôle absolu de l'IA entre les mains de l'utilisateur.
 
+> 🌿 **Une Expérience 100% Complète & Autonome Même Sans IA (Mode Zéro IA / Déconnecté)**  
+> L'intelligence artificielle dans Open Shema est un **amplificateur strictement optionnel**. Si vous ne souhaitez pas utiliser de LLM ou que vous travaillez sans connexion internet, vous pouvez **désactiver intégralement toutes les fonctionnalités d'IA en un seul clic** dans les Paramètres.  
+> Le logiciel constitue en lui-même une station d'étude biblique et pastorale de référence : le lecteur multi-versions, l'interlinéaire inversé avec morphologie originale, les dictionnaires et lexiques historiques, les commentaires verset par verset, la cartographie Leaflet, le découpage en péricopes, le studio de sermons, le lecteur d'ebooks/PDF et la prise de notes Markdown restent **100% opérationnels, ultra-rapides et totalement autonomes**.
+
 #### 🎯 Le Choix Délibéré de 3 Fournisseurs d'Excellence
 L'utilisateur est libre de choisir le fournisseur et le modèle de son choix au sein de leur catalogue :
 * **⚡ Google Gemini** : Pour la **puissance brute**, la rapidité foudroyante, la précision documentaire et les fenêtres de contexte monumentales.
@@ -267,9 +272,11 @@ python webview_app.py
 
 ---
 
-## ⚙️ Configuration de l'IA
+## ⚙️ Configuration de l'IA (Optionnelle)
 
-Au premier lancement (ou via le panneau **Paramètres ⚙️**), renseignez simplement la clé API du fournisseur de votre choix :
+> 💡 **Rappel** : L'IA est entièrement optionnelle. Si vous utilisez Open Shema en mode classique déconnecté, **aucune clé API ni configuration n'est requise**.
+
+Pour activer l'assistance intelligente, renseignez simplement la clé API du fournisseur de votre choix via le panneau **Paramètres ⚙️** :
 
 | Fournisseur | Modèles recommandés & Cas d'usage | Atouts |
 | :--- | :--- | :--- |
