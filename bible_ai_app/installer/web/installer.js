@@ -74,9 +74,7 @@ const Installer = {
 
     // Bouton Fermer final
     document.getElementById('btn-finish-close')?.addEventListener('click', () => {
-      if (document.getElementById('chk-launch-now')?.checked) {
-        this.launchApp();
-      } else if (window.pywebview?.api?.close_window) {
+      if (window.pywebview?.api?.close_window) {
         window.pywebview.api.close_window();
       }
     });
