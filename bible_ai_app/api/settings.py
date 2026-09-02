@@ -446,6 +446,7 @@ class SettingsMixin:
         """Télécharge et installe les modules sélectionnés lors du premier lancement depuis open-shema-data."""
         import gzip
         import urllib.request
+        import ssl
         from core.task_manager import TaskManager
 
         task_id = "onboarding_download"
@@ -511,7 +512,11 @@ class SettingsMixin:
                 )
 
                 temp_download = os.path.join(target_dir, f"tmp_{filename}")
-                with urllib.request.urlopen(req, timeout=30) as resp, open(temp_download, "wb") as out_f:
+                ctx = ssl.create_default_context()
+                ctx.check_hostname = False
+                ctx.verify_mode = ssl.CERT_NONE
+
+                with urllib.request.urlopen(req, timeout=30, context=ctx) as resp, open(temp_download, "wb") as out_f:
                     shutil.copyfileobj(resp, out_f)
 
                 if is_gz:

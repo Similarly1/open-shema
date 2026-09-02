@@ -479,6 +479,8 @@ const FirstRunWizard = {
     } else if (this.currentStep === 3) {
       this.goToStep(4);
       this.startDeployment();
+    } else if (this.currentStep === 4) {
+      this.startDeployment();
     }
   },
 
@@ -517,11 +519,22 @@ const FirstRunWizard = {
 
     if (statusEl) statusEl.textContent = "Téléchargement des ressources...";
     if (fillEl) fillEl.style.width = "25%";
+    if (statusEl) statusEl.textContent = "Téléchargement des ressources...";
+    if (fillEl) {
+      fillEl.style.backgroundColor = "";
+      fillEl.style.width = "25%";
+    }
     if (percentEl) percentEl.textContent = "25%";
+    
+    const nextBtn = document.getElementById('frw-btn-next');
+    if (nextBtn) nextBtn.style.display = 'none';
 
     try {
       if (window.pywebview && window.pywebview.api && window.pywebview.api.download_onboarding_modules) {
-        await window.pywebview.api.download_onboarding_modules(modulesToInstall);
+        const dlRes = await window.pywebview.api.download_onboarding_modules(modulesToInstall);
+        if (dlRes && !dlRes.success) {
+          throw new Error(dlRes.error || "Erreur inconnue lors de l'installation");
+        }
       }
 
       if (fillEl) fillEl.style.width = "75%";
@@ -559,16 +572,18 @@ const FirstRunWizard = {
 
     } catch (e) {
       console.error("[FirstRunWizard] Erreur durant le déploiement :", e);
-      if (statusEl) statusEl.textContent = "Installation terminée avec avertissement";
-      if (detailEl) detailEl.textContent = "Lancement de l'application...";
-      setTimeout(async () => {
-        this.hide();
-        if (typeof App !== 'undefined' && App.init) {
-          await App.init();
-        } else if (window.location && typeof window.location.reload === 'function') {
-          window.location.reload();
-        }
-      }, 1000);
+      if (statusEl) statusEl.textContent = "Erreur de téléchargement";
+      if (detailEl) detailEl.textContent = e.message || String(e);
+      if (fillEl) {
+        fillEl.style.backgroundColor = "#ef4444";
+        fillEl.style.width = "100%";
+      }
+      if (percentEl) percentEl.textContent = "Erreur";
+      
+      if (nextBtn) {
+        nextBtn.innerHTML = `Réessayer ${this.svg.arrowRight}`;
+        nextBtn.style.display = 'inline-flex';
+      }
     }
   }
 };
