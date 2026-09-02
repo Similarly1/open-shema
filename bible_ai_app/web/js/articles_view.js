@@ -234,20 +234,35 @@ const ArticlesView = {
     const btnManageSources = document.getElementById('btn-manage-sources');
     const popoverSources = document.getElementById('articles-sources-popover');
 
-    btnManageSources?.addEventListener('click', (e) => {
+    btnManageSources?.addEventListener('click', async (e) => {
       e.stopPropagation();
+      e.preventDefault();
       if (popoverSources) {
-        const isHidden = popoverSources.classList.toggle('hidden');
-        if (!isHidden) {
-          this.renderSourcesPopover();
+        const isCurrentlyHidden = popoverSources.classList.contains('hidden');
+        if (isCurrentlyHidden) {
+          popoverSources.classList.remove('hidden');
+          btnManageSources.classList.add('active');
+          if (!this.sources || this.sources.length === 0) {
+            await this.loadSources();
+          } else {
+            this.renderSourcesPopover();
+          }
+        } else {
+          popoverSources.classList.add('hidden');
+          btnManageSources.classList.remove('active');
         }
       }
+    });
+
+    popoverSources?.addEventListener('click', (e) => {
+      e.stopPropagation();
     });
 
     // Bouton Proposer un nouveau flux depuis le popover
     document.getElementById('btn-popover-open-suggest')?.addEventListener('click', (e) => {
       e.stopPropagation();
       popoverSources?.classList.add('hidden');
+      btnManageSources?.classList.remove('active');
       this.openSuggestModal();
     });
 
@@ -269,8 +284,11 @@ const ArticlesView = {
 
     // Fermer les popovers au clic en dehors
     document.addEventListener('click', (e) => {
-      if (popoverSources && !popoverSources.classList.contains('hidden') && !popoverSources.contains(e.target) && !btnManageSources?.contains(e.target)) {
-        popoverSources.classList.add('hidden');
+      if (popoverSources && !popoverSources.classList.contains('hidden')) {
+        if (!popoverSources.contains(e.target) && e.target !== btnManageSources && !btnManageSources?.contains(e.target)) {
+          popoverSources.classList.add('hidden');
+          btnManageSources?.classList.remove('active');
+        }
       }
     });
 
@@ -484,6 +502,10 @@ const ArticlesView = {
     }
 
     listEl.innerHTML = '';
+    if (sources.length === 0) {
+      listEl.innerHTML = '<div style="padding: 12px; font-size: 0.8rem; color: var(--text-muted); text-align: center;">Aucun flux configuré</div>';
+      return;
+    }
     sources.forEach(src => {
       const isEnabled = src.enabled !== false && src.is_enabled !== 0 && src.is_enabled !== false;
       const logoUrl = this.getSourceLogo(src.id);
