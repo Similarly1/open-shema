@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Installation d'Open Shema</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Barre de titre personnalisée (Draggable, style natif moderne) -->
+  <header class="window-titlebar" style="--pywebview-drag-region: drag;">
+    <div class="titlebar-left">
+      <img src="img/logo.svg" alt="Logo" class="titlebar-logo">
+      <span class="titlebar-title">Open Shema — Programme d'installation</span>
+    </div>
+    <div class="titlebar-controls" style="--pywebview-drag-region: no-drag;">
+      <button type="button" class="win-btn minimize" id="btn-minimize" title="Réduire">
+        <svg viewBox="0 0 12 12" width="10" height="10">
+          <line x1="1" y1="6" x2="11" y2="6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button type="button" class="win-btn close" id="btn-close" title="Fermer">
+        <svg viewBox="0 0 12 12" width="10" height="10">
+          <line x1="2" y1="2" x2="10" y2="10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <line x1="10" y1="2" x2="2" y2="10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Contenu Principal -->
+  <main class="installer-app">
+    <!-- ÉTAPE 1 : Configuration & Lancement de l'installation -->
+    <section class="installer-step active" id="step-config">
+      <div class="hero-section">
+        <div class="logo-wrapper">
+          <img src="img/logo.svg" alt="Open Shema Logo" class="hero-logo">
+        </div>
+        <div class="hero-text">
+          <div class="brand-badge">
+            <span class="badge-dot"></span>
+            <span class="badge-text" id="lbl-release-tag">Recherche de la dernière version...</span>
+          </div>
+          <h1 class="hero-title">Installer Open Shema</h1>
+          <p class="hero-subtitle">Plateforme théologique et biblique d'étude avancée</p>
+        </div>
+      </div>
+
+      <div class="config-card">
+        <!-- Sélecteur de dossier -->
+        <div class="form-group">
+          <div class="form-label-row">
+            <label for="txt-install-path" class="form-label">Dossier d'installation</label>
+            <span class="disk-space" id="lbl-disk-space">Calcul de l'espace...</span>
+          </div>
+          <div class="path-input-group">
+            <input type="text" id="txt-install-path" class="path-input" spellcheck="false">
+            <button type="button" class="btn btn-secondary btn-browse" id="btn-browse-folder" title="Choisir un autre dossier">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+              </svg>
+              <span>Parcourir</span>
+            </button>
+          </div>
+          <p class="form-hint">Espace requis : <strong id="lbl-required-space">~350 Mo</strong> (aucun privilège administrateur requis)</p>
+        </div>
+
+        <!-- Options raccourcis -->
+        <div class="options-group">
+          <label class="custom-checkbox">
+            <input type="checkbox" id="chk-desktop" checked>
+            <span class="checkmark">
+              <svg viewBox="0 0 12 12" width="10" height="10"><path d="M2 6l3 3 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="checkbox-label">Créer un raccourci sur le Bureau</span>
+          </label>
+          <label class="custom-checkbox">
+            <input type="checkbox" id="chk-start-menu" checked>
+            <span class="checkmark">
+              <svg viewBox="0 0 12 12" width="10" height="10"><path d="M2 6l3 3 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="checkbox-label">Ajouter au Menu Démarrer de Windows</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="actions-row">
+        <div class="version-details" id="lbl-release-name">Recherche GitHub en cours...</div>
+        <button type="button" class="btn btn-primary" id="btn-start-install">
+          <span>Installer maintenant</span>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ÉTAPE 2 : Téléchargement & Déploiement en cours -->
+    <section class="installer-step" id="step-progress">
+      <div class="progress-hero">
+        <div class="pulse-icon-container">
+          <svg class="pulse-svg" viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+            <path d="M6 6h10"/>
+            <path d="M6 10h10"/>
+          </svg>
+          <div class="spinner-ring"></div>
+        </div>
+        <h2 class="progress-title" id="lbl-progress-title">Installation d'Open Shema</h2>
+        <p class="progress-desc" id="lbl-progress-status">Connexion aux serveurs GitHub...</p>
+      </div>
+
+      <div class="progress-card">
+        <div class="progress-info-row">
+          <span class="progress-data" id="lbl-downloaded-size">0 Mo / 0 Mo</span>
+          <span class="progress-speed" id="lbl-download-speed">-- Mo/s</span>
+          <span class="progress-percent" id="lbl-progress-percent">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-bar-fill" id="progress-bar-fill" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <div class="progress-actions">
+        <button type="button" class="btn btn-secondary btn-cancel" id="btn-cancel-install">
+          Annuler
+        </button>
+      </div>
+    </section>
+
+    <!-- ÉTAPE 3 : Succès & Lancement -->
+    <section class="installer-step" id="step-success">
+      <div class="success-hero">
+        <div class="success-icon-badge">
+          <svg viewBox="0 0 24 24" width="46" height="46" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+        </div>
+        <h2 class="success-title">Installation réussie !</h2>
+        <p class="success-desc">Open Shema a été installé et configuré avec succès sur votre ordinateur.</p>
+      </div>
+
+      <div class="success-card">
+        <div class="summary-item">
+          <div class="summary-label">Emplacement</div>
+          <div class="summary-val" id="lbl-summary-path">--</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">Raccourcis</div>
+          <div class="summary-val" id="lbl-summary-shortcuts">Bureau & Menu Démarrer</div>
+        </div>
+      </div>
+
+      <div class="launch-option-row">
+        <label class="custom-checkbox">
+          <input type="checkbox" id="chk-launch-now" checked>
+          <span class="checkmark">
+            <svg viewBox="0 0 12 12" width="10" height="10"><path d="M2 6l3 3 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="checkbox-label">Lancer Open Shema immédiatement</span>
+        </label>
+      </div>
+
+      <div class="actions-row actions-end">
+        <button type="button" class="btn btn-secondary" id="btn-finish-close">Fermer</button>
+        <button type="button" class="btn btn-primary" id="btn-finish-launch">
+          <span>Lancer Open Shema</span>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <script src="installer.js"></script>
+</body>
+</html>

@@ -1,0 +1,602 @@
+/* ==========================================================================
+   Open Shema — Programme d'installation
+   Style moderne, épuré, 100% vectoriel SVG, 0 émoji.
+   Palette : Ardoise Nuit #0F172A, Bleu Azur #0284C7, Cyan #38BDF8, Ambre #F59E0B
+   ========================================================================== */
+
+:root {
+  --bg-app: #f8fafc;
+  --bg-card: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --text-sub: #475569;
+  --border: #e2e8f0;
+  --border-focus: #38bdf8;
+  
+  --primary-start: #0284c7;
+  --primary-end: #0369a1;
+  --primary-hover-start: #0ea5e9;
+  --primary-hover-end: #0284c7;
+  --accent-cyan: #38bdf8;
+  --accent-amber: #f59e0b;
+  --success: #10b981;
+  
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+  --shadow-lg: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body {
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg-app);
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.06) 0%, transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(245, 158, 11, 0.04) 0%, transparent 40%),
+    linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  color: var(--text-main);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+/* ==========================================================================
+   BARRE DE TITRE PERSONNALISÉE (DRAGGABLE)
+   ========================================================================== */
+.window-titlebar {
+  height: 42px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px 0 16px;
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+.titlebar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.titlebar-logo {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.titlebar-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-sub);
+  letter-spacing: -0.01em;
+}
+
+.titlebar-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.win-btn {
+  width: 30px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.win-btn:hover {
+  background: #f1f5f9;
+  color: var(--text-main);
+}
+
+.win-btn.close:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   CONTENEUR PRINCIPAL & ÉTAPES
+   ========================================================================== */
+.installer-app {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 32px 28px 32px;
+  position: relative;
+  overflow-y: auto;
+}
+
+.installer-step {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+  animation: fadeInStep 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.installer-step.active {
+  display: flex;
+}
+
+@keyframes fadeInStep {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ==========================================================================
+   ÉTAPE 1 : ACCUEIL & CONFIGURATION
+   ========================================================================== */
+.hero-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 22px;
+}
+
+.logo-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #151F32 0%, #0B0F17 100%);
+  padding: 3px;
+  box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.hero-logo {
+  width: 100%;
+  height: 100%;
+  border-radius: 13px;
+}
+
+.hero-text {
+  flex: 1;
+}
+
+.brand-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  margin-bottom: 6px;
+}
+
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--primary-start);
+}
+
+.badge-text {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-sub);
+}
+
+.hero-title {
+  font-size: 23px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+  margin-bottom: 2px;
+}
+
+.hero-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Carte de configuration */
+.config-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-sub);
+}
+
+.disk-space {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.path-input-group {
+  display: flex;
+  gap: 8px;
+}
+
+.path-input {
+  flex: 1;
+  height: 38px;
+  padding: 0 12px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 12.5px;
+  color: var(--text-main);
+  font-family: inherit;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.path-input:focus {
+  background: #ffffff;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+}
+
+.form-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.options-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 6px;
+  border-top: 1px solid #f1f5f9;
+}
+
+/* Cases à cocher personnalisées (Style épuré) */
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.custom-checkbox input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  width: 18px;
+  height: 18px;
+  background-color: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  color: transparent;
+}
+
+.custom-checkbox:hover input ~ .checkmark {
+  border-color: var(--primary-start);
+}
+
+.custom-checkbox input:checked ~ .checkmark {
+  background-color: var(--primary-start);
+  border-color: var(--primary-start);
+  color: #ffffff;
+}
+
+.checkbox-label {
+  font-size: 12.5px;
+  color: var(--text-sub);
+}
+
+/* Rangée d'actions */
+.actions-row {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 18px;
+}
+
+.actions-end {
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.version-details {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  max-width: 320px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Boutons */
+.btn {
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  border: none;
+  outline: none;
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, var(--primary-start) 0%, var(--primary-end) 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(180deg, var(--primary-hover-start) 0%, var(--primary-hover-end) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(2, 132, 199, 0.38);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background: #ffffff;
+  color: var(--text-sub);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: var(--text-main);
+}
+
+.btn-browse {
+  height: 38px;
+  padding: 0 14px;
+}
+
+/* ==========================================================================
+   ÉTAPE 2 : TÉLÉCHARGEMENT & DÉPLOIEMENT
+   ========================================================================== */
+.progress-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin: 15px 0 25px 0;
+}
+
+.pulse-icon-container {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  color: var(--primary-start);
+}
+
+.spinner-ring {
+  position: absolute;
+  inset: 0;
+  border: 3px solid rgba(2, 132, 199, 0.12);
+  border-top-color: var(--primary-start);
+  border-radius: 50%;
+  animation: spinRing 1.1s linear infinite;
+}
+
+@keyframes spinRing {
+  to { transform: rotate(360deg); }
+}
+
+.progress-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 4px;
+}
+
+.progress-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.progress-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.progress-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.progress-data {
+  color: var(--text-sub);
+}
+
+.progress-speed {
+  color: var(--accent-amber);
+  font-family: monospace;
+  font-size: 11.5px;
+}
+
+.progress-percent {
+  color: var(--primary-start);
+}
+
+.progress-track {
+  height: 10px;
+  background: #f1f5f9;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8 0%, #0284c7 100%);
+  border-radius: 10px;
+  transition: width 0.2s ease;
+  position: relative;
+}
+
+.progress-actions {
+  margin-top: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-cancel {
+  font-size: 12px;
+  height: 34px;
+  padding: 0 16px;
+}
+
+/* ==========================================================================
+   ÉTAPE 3 : SUCCÈS & LANCEMENT
+   ========================================================================== */
+.success-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin: 10px 0 20px 0;
+}
+
+.success-icon-badge {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  animation: successPop 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes successPop {
+  0% { transform: scale(0.6); opacity: 0; }
+  70% { transform: scale(1.08); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.success-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 4px;
+}
+
+.success-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  max-width: 420px;
+}
+
+.success-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 20px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12.5px;
+}
+
+.summary-label {
+  color: var(--text-muted);
+}
+
+.summary-val {
+  font-weight: 600;
+  color: var(--text-sub);
+  max-width: 320px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.launch-option-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
+}
