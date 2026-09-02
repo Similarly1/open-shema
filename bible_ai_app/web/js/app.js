@@ -21,13 +21,13 @@ const App = {
     this.initThemeAndFont();
     this.initSidebarConfig();
 
-    // Vérifier si premier lancement : si oui, ouvrir immédiatement le Wizard et bloquer le chargement lourd en arrière-plan
+    // Vérifier si premier lancement : si oui, ouvrir immédiatement le Wizard et masquer le splash
     if (typeof FirstRunWizard !== 'undefined' && window.pywebview && window.pywebview.api && window.pywebview.api.is_first_run) {
       try {
         const res = await window.pywebview.api.is_first_run();
         if (res && res.is_first_run) {
+          this.hideSplash();
           FirstRunWizard.show();
-          if (typeof TaskManager !== 'undefined') TaskManager.init();
           return;
         }
       } catch (e) {

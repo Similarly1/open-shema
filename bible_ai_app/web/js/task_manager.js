@@ -36,7 +36,9 @@ const TaskManager = {
         const list = await API.getBackgroundTasks();
         if (Array.isArray(list)) {
           list.forEach(task => {
-            this.handleTaskEvent('task_updated', task);
+            if (task && (task.status === 'running' || task.status === 'pending')) {
+              this.handleTaskEvent('task_updated', task);
+            }
           });
         }
       }
