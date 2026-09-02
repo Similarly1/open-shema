@@ -56,6 +56,11 @@ const FirstRunWizard = {
   },
 
   async show() {
+    const splash = document.getElementById('app-splash-loader');
+    if (splash) {
+      splash.style.display = 'none';
+      splash.classList.add('fade-out');
+    }
     let overlay = document.getElementById('first-run-wizard-overlay');
     if (!overlay) {
       this.renderOverlayHtml();
@@ -542,18 +547,28 @@ const FirstRunWizard = {
       if (statusEl) statusEl.textContent = "Votre sanctuaire d'étude est prêt !";
       if (detailEl) detailEl.textContent = "Ouverture d'Open Shema...";
 
-      setTimeout(() => {
+      setTimeout(async () => {
         this.hide();
-        if (window.location && typeof window.location.reload === 'function') {
+        // Lancement direct et fluide de l'application sans rechargement de page
+        if (typeof App !== 'undefined' && App.init) {
+          await App.init();
+        } else if (window.location && typeof window.location.reload === 'function') {
           window.location.reload();
         }
-      }, 1000);
+      }, 500);
 
     } catch (e) {
       console.error("[FirstRunWizard] Erreur durant le déploiement :", e);
       if (statusEl) statusEl.textContent = "Installation terminée avec avertissement";
       if (detailEl) detailEl.textContent = "Lancement de l'application...";
-      setTimeout(() => this.hide(), 1500);
+      setTimeout(async () => {
+        this.hide();
+        if (typeof App !== 'undefined' && App.init) {
+          await App.init();
+        } else if (window.location && typeof window.location.reload === 'function') {
+          window.location.reload();
+        }
+      }, 1000);
     }
   }
 };
