@@ -53,7 +53,7 @@ class DictionaryManager:
             except Exception as e:
                 logger.error(f"Erreur lecture registry.json : {e}")
         # Registre par défaut
-        cls._registry = [
+        base_registry = [
             {
                 "id": "strong",
                 "name": "Lexique Hébreu & Grec Strong",
@@ -82,8 +82,79 @@ class DictionaryManager:
                 "file": "data/bailly_lexicon.json"
             }
         ]
+
+        if not os.path.exists(r_path):
+            cls._registry = base_registry
+        else:
+            try:
+                with open(r_path, "r", encoding="utf-8") as f:
+                    cls._registry = json.load(f)
+            except Exception as e:
+                logger.error(f"Erreur lecture registry.json : {e}")
+                cls._registry = base_registry
+
+        # Auto-découverte dynamique de Vigouroux et des dictionnaires ajoutés dans data/ ou data/dictionaries/
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        data_dir = os.path.join(base_dir, "data")
+        dicts_dir = os.path.join(data_dir, "dictionaries")
+
+        vigo_p = os.path.join(data_dir, "vigouroux_dict.json")
+        if os.path.exists(vigo_p) and not any(d.get("id") == "vigouroux" for d in cls._registry):
+            cls._registry.append({
+                "id": "vigouroux",
+                "name": "Dictionnaire de la Bible Fulcran Vigouroux (1912)",
+                "type": "custom",
+                "enabled": True,
+                "priority": 4,
+                "count": 7585,
+                "file": "data/vigouroux_dict.json"
+            })
+
+        if os.path.exists(dicts_dir):
+            for fn in os.listdir(dicts_dir):
+                if fn.endswith((".sqlite", ".json")) and fn != "registry.json":
+                    d_slug = os.path.splitext(fn)[0].replace("dict_", "").lower()
+                    if not any(d.get("id") == d_slug for d in cls._registry):
+                        clean_name = d_slug.replace("_", " ").title()
+                        cls._registry.append({
+                            "id": d_slug,
+                            "name": clean_name,
+                            "type": "custom",
+                            "enabled": True,
+                            "priority": len(cls._registry) + 1,
+                            "file": os.path.join("data", "dictionaries", fn)
+                        })
+
         cls.save_registry(cls._registry)
         return cls._registry
+
+    @classmethod
+    def register_dictionary(cls, dict_id: str, name: str, file_path: str, author: str = "", year: str = "", description: str = ""):
+        """Enregistre ou met à jour dynamiquement un dictionnaire dans le registre."""
+        reg = cls.load_registry()
+        clean_id = dict_id.lower().replace("-", "_")
+        existing = next((d for d in reg if d.get("id") == clean_id), None)
+        if existing:
+            existing["name"] = name
+            existing["file"] = file_path
+            existing["author"] = author
+            existing["year"] = year
+            existing["description"] = description
+            existing["enabled"] = True
+        else:
+            reg.append({
+                "id": clean_id,
+                "name": name,
+                "author": author,
+                "year": year,
+                "description": description,
+                "type": "custom",
+                "enabled": True,
+                "priority": len(reg) + 1,
+                "file": file_path
+            })
+        cls.save_registry(reg)
+        cls._dict_cache.pop(clean_id, None)
 
     @classmethod
     def save_registry(cls, registry_data):
@@ -94,6 +165,7 @@ class DictionaryManager:
                 json.dump(registry_data, f, ensure_ascii=False, indent=2)
         except Exception as e:
             logger.error(f"Erreur écriture registry.json : {e}")
+
     @classmethod
     def normalize_term(cls, s):
         if not s:
@@ -125,6 +197,30 @@ class DictionaryManager:
         
         if not os.path.exists(file_path):
             return None
+
+        # Si format SQLite
+        if file_path.endswith(".sqlite"):
+            try:
+                import sqlite3
+                with sqlite3.connect(file_path) as conn:
+                    cur = conn.cursor()
+                    cur.execute("SELECT slug, title, text, html FROM articles")
+                    arts = {}
+                    for row in cur.fetchall():
+                        s_v, t_v, txt_v, html_v = row
+                        k = s_v or t_v
+                        if k:
+                            arts[k] = {
+                                "title": t_v or s_v,
+                                "text": txt_v or "",
+                                "html": html_v or ""
+                            }
+                    data = {"articles": arts}
+                    cls._dict_cache[dict_id] = data
+                    return data
+            except Exception as e:
+                logger.error(f"Erreur chargement dictionnaire SQLite {dict_id} ({file_path}) : {e}")
+                return None
             
         try:
             with open(file_path, "r", encoding="utf-8") as f:
