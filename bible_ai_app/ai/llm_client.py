@@ -28,11 +28,11 @@ def resolve_llm_provider(model_name: str) -> str:
 
 class GeminiClient:
     CHAT_CASCADE = [
-        "gemini-2.5-flash",
         "gemini-3.7-flash",
-        "gemini-3.6-flash",
-        "gemini-3.5-flash",
         "gemini-3.5-flash-lite",
+        "gemini-3.5-flash",
+        "gemini-3.6-flash",
+        "gemini-2.5-flash",
         "gemini-3.1-flash-lite",
         "gemini-3.1-pro-preview",
         "gemini-3-flash-preview",
@@ -51,7 +51,7 @@ class GeminiClient:
         "gemini-embedding-001"
     ]
 
-    def __init__(self, api_key, model="gemini-2.5-flash"):
+    def __init__(self, api_key, model="gemini-3.7-flash"):
         self.api_key = api_key
         self.model = model
         self.last_used_model = model

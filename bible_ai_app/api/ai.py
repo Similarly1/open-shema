@@ -79,8 +79,8 @@ class AiMixin:
         from core.config import DEFAULT_SERMON_RESTRUCTURE_SYSTEM_PROMPT
         
         sys_prompt = self.config.get("sermon_restructure_system_prompt") or DEFAULT_SERMON_RESTRUCTURE_SYSTEM_PROMPT
-        primary_model = self.config.get("sermon_restructure_model") or self.config.get("chat_model") or "gemini-2.5-flash"
-        fallback_model = self.config.get("sermon_restructure_fallback_model") or self.config.get("chat_fallback_model") or "gemini-2.0-flash"
+        primary_model = self.config.get("sermon_restructure_model") or self.config.get("chat_model") or "gemini-3.7-flash"
+        fallback_model = self.config.get("sermon_restructure_fallback_model") or self.config.get("chat_fallback_model") or "gemini-3.5-flash-lite"
 
         models_to_try = [primary_model]
         if fallback_model and fallback_model != primary_model:

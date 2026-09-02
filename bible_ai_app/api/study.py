@@ -394,8 +394,8 @@ class StudyMixin:
             return {"success": False, "error": "Le contenu de la note est vide."}
 
         sys_prompt = self.config.get("prompt_note_tags") or self.config.get("note_tags_system_prompt") or DEFAULT_NOTE_TAGS_SYSTEM_PROMPT
-        clean_model = self.config.get("notes_ai_model") or self.config.get("title_model") or "gemini-2.5-flash-lite"
-        fallback_model = self.config.get("notes_ai_fallback_model") or self.config.get("title_fallback_model")
+        clean_model = self.config.get("notes_ai_model") or self.config.get("title_model") or "gemini-3.7-flash"
+        fallback_model = self.config.get("notes_ai_fallback_model") or self.config.get("title_fallback_model") or "gemini-3.5-flash-lite"
 
         models_to_try = [clean_model]
         if fallback_model and fallback_model != clean_model:
@@ -494,8 +494,8 @@ class StudyMixin:
             return {"success": False, "error": "Le contenu de la note est vide."}
 
         sys_prompt = self.config.get("prompt_note_title") or self.config.get("note_title_system_prompt") or DEFAULT_NOTE_TITLE_SYSTEM_PROMPT
-        clean_model = self.config.get("notes_ai_model") or self.config.get("title_model") or "gemini-2.5-flash-lite"
-        fallback_model = self.config.get("notes_ai_fallback_model") or self.config.get("title_fallback_model")
+        clean_model = self.config.get("notes_ai_model") or self.config.get("title_model") or "gemini-3.7-flash"
+        fallback_model = self.config.get("notes_ai_fallback_model") or self.config.get("title_fallback_model") or "gemini-3.5-flash-lite"
 
         models_to_try = [clean_model]
         if fallback_model and fallback_model != clean_model:
