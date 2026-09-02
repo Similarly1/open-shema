@@ -232,10 +232,60 @@ class DictionaryManager:
             return None
 
     @classmethod
-    def get_all_dictionaries(cls) -> list:
-        """Retourne la liste enrichie de tous les dictionnaires disponibles."""
+    def is_dictionary_installed(cls, dict_info: dict) -> bool:
+        """Vérifie si les fichiers réels du dictionnaire sont présents sur le disque."""
+        dict_type = dict_info.get("type", "custom")
+        dict_id = (dict_info.get("id") or "").lower()
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        
+        if dict_type == "strong" or dict_id == "strong":
+            candidates = [
+                os.path.join(base_dir, "data", "strong_lexicon.json"),
+                os.path.join(base_dir, "data", "dictionaries", "strong_lexicon.json"),
+                os.path.join(base_dir, "data", "dictionaries", "bible_strong.sqlite"),
+                os.path.join(base_dir, "data", "dictionaries", "dict_strong.sqlite")
+            ]
+            return any(os.path.exists(p) for p in candidates)
+            
+        if dict_type == "greek" or dict_id == "bailly":
+            candidates = [
+                os.path.join(base_dir, "data", "bailly_lexicon.json"),
+                os.path.join(base_dir, "data", "dictionaries", "bailly_lexicon.json"),
+                os.path.join(base_dir, "data", "dictionaries", "dict_bailly.sqlite"),
+                os.path.join(base_dir, "data", "dictionaries", "dict_bailly.json")
+            ]
+            return any(os.path.exists(p) for p in candidates)
+
+        rel_file = dict_info.get("file", "")
+        if rel_file:
+            if os.path.isabs(rel_file):
+                if os.path.exists(rel_file):
+                    return True
+            else:
+                candidates = [
+                    os.path.join(base_dir, "data", rel_file),
+                    os.path.join(base_dir, rel_file),
+                    os.path.join(base_dir, "data", "dictionaries", os.path.basename(rel_file)),
+                    os.path.join(base_dir, "data", os.path.basename(rel_file))
+                ]
+                if any(os.path.exists(p) for p in candidates):
+                    return True
+                    
+        dict_slug = dict_id.replace("-", "_")
+        for ext in [".sqlite", ".json"]:
+            if os.path.exists(os.path.join(base_dir, "data", "dictionaries", f"dict_{dict_slug}{ext}")) or \
+               os.path.exists(os.path.join(base_dir, "data", "dictionaries", f"{dict_slug}{ext}")) or \
+               os.path.exists(os.path.join(base_dir, "data", f"{dict_slug}{ext}")):
+                return True
+                
+        return False
+
+    @classmethod
+    def get_all_dictionaries(cls, installed_only: bool = True) -> list:
+        """Retourne la liste enrichie de tous les dictionnaires réellement installés."""
         reg = cls.load_registry()
         result = []
+        seen_ids = set()
         
         meta_info = {
             "nouveau_dictionnaire": {"author": "Collectif / Éditions Emmaüs", "year": "1992", "badge": "7 016 art.", "count": 7016},
@@ -247,8 +297,14 @@ class DictionaryManager:
         }
 
         for d in reg:
-            item = dict(d)
             d_id = d.get("id", "")
+            if not d_id or d_id in seen_ids:
+                continue
+            if installed_only and not cls.is_dictionary_installed(d):
+                continue
+            seen_ids.add(d_id)
+
+            item = dict(d)
             custom_meta = meta_info.get(d_id, {})
             
             if "author" in custom_meta and not item.get("author"):
