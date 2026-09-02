@@ -20,9 +20,10 @@ const OpenShemaStore = {
   
   // État de recherche unifiée
   activeCategory: 'all', // 'all' | 'open_shema' | 'public_domain' | 'bookstores'
+  activeTypeFilter: 'all', // 'all' | 'bible' | 'dictionary' | 'commentary' | 'theology'
   activeLanguage: 'all', // 'all' | 'fr' | 'en'
   searchQuery: '',
-  hideInstalled: localStorage.getItem('open_shema_store_hide_installed') === 'true',
+  hideInstalled: false,
   
   // Cache des résultats unifiés
   unifiedResults: {
@@ -342,7 +343,32 @@ const OpenShemaStore = {
     modal.style.display = 'flex';
     modal.classList.remove('hidden');
 
-    this.activeCategory = initialCategory || 'all';
+    let targetCat = 'all';
+    let targetType = 'all';
+    if (initialCategory === 'bibles' || initialCategory === 'bible') {
+      targetCat = 'open_shema';
+      targetType = 'bible';
+    } else if (initialCategory === 'dictionaries' || initialCategory === 'dictionary') {
+      targetCat = 'open_shema';
+      targetType = 'dictionary';
+    } else if (initialCategory === 'commentaries' || initialCategory === 'commentary') {
+      targetCat = 'open_shema';
+      targetType = 'commentary';
+    } else if (initialCategory === 'theology') {
+      targetCat = 'open_shema';
+      targetType = 'theology';
+    } else if (initialCategory === 'ebooks' || initialCategory === 'bookstores' || initialCategory === 'store') {
+      targetCat = 'bookstores';
+    } else if (initialCategory === 'public_domain' || initialCategory === 'free') {
+      targetCat = 'public_domain';
+    } else if (initialCategory === 'open_shema') {
+      targetCat = 'open_shema';
+    } else {
+      targetCat = 'all';
+    }
+
+    this.activeCategory = targetCat;
+    this.activeTypeFilter = targetType;
     if (searchQuery) {
       this.searchQuery = searchQuery;
     }
@@ -1012,6 +1038,7 @@ const OpenShemaStore = {
 
     const openShemaList = (this.unifiedResults.open_shema || []).filter(m => {
       if (this.hideInstalled && this._isModuleInstalled(m)) return false;
+      if (this.activeTypeFilter && this.activeTypeFilter !== 'all' && m.type !== this.activeTypeFilter) return false;
       return this._matchesLang(m);
     });
 
@@ -1024,9 +1051,14 @@ const OpenShemaStore = {
       return this._matchesLang(m);
     });
 
-    const totalVisible = (this.activeCategory === 'all')
-      ? (openShemaList.length + publicDomainList.length + bookstoresList.length)
-      : (this.activeCategory === 'open_shema' ? openShemaList.length : (this.activeCategory === 'public_domain' ? publicDomainList.length : bookstoresList.length));
+    const isOpenShema = this.activeCategory === 'all' || this.activeCategory === 'open_shema';
+    const isPublicDomain = this.activeCategory === 'all' || this.activeCategory === 'public_domain';
+    const isBookstores = this.activeCategory === 'all' || this.activeCategory === 'bookstores';
+
+    const visibleOpenShema = isOpenShema ? openShemaList.length : 0;
+    const visiblePublicDomain = isPublicDomain ? publicDomainList.length : 0;
+    const visibleBookstores = isBookstores ? bookstoresList.length : 0;
+    const totalVisible = visibleOpenShema + visiblePublicDomain + visibleBookstores;
 
     if (totalVisible === 0) {
       const allCountOtherLangs = (this.unifiedResults.open_shema.length) + (this.unifiedResults.public_domain.length) + (this.unifiedResults.bookstores.length);
@@ -1725,21 +1757,26 @@ const OpenShemaStore = {
         // MODULES OFFICIELS OPEN SHEMA : Installation 1-clic native directe
         const res = await API.call('download_and_install_catalog_module', module);
         if (res && res.success) {
+          // 1. Mettre à jour l'état local du store et le cache des installés
           this.installedIds.add(String(module.id).toLowerCase());
           if (module.abbreviation) {
             this.installedCodes.add(String(module.abbreviation).toUpperCase());
           }
+          await this.refreshInstalledCache();
 
           if (typeof App !== 'undefined' && App.showToast) {
             App.showToast(`« ${cleanTitle} » installé avec succès !`, 'success');
           }
 
-          // Rafraîchir immédiatement l'ensemble des composants de l'application
+          // 2. Rafraîchir immédiatement l'ensemble des composants de l'application
           try {
-            if (typeof BibleReader !== 'undefined' && BibleReader.reloadInstalledBibles) {
-              await BibleReader.reloadInstalledBibles();
-              if (typeof BibleReader.renderBibleSelectors === 'function') {
-                BibleReader.renderBibleSelectors();
+            if (typeof BibleReader !== 'undefined') {
+              if (typeof BibleReader.reloadInstalledBibles === 'function') {
+                await BibleReader.reloadInstalledBibles();
+              }
+              if (typeof BibleReader.updatePaneHeader === 'function') {
+                BibleReader.updatePaneHeader(1);
+                BibleReader.updatePaneHeader(2);
               }
             }
             if (typeof LibraryView !== 'undefined' && LibraryView.loadBooks) {

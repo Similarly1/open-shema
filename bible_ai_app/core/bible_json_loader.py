@@ -198,7 +198,73 @@ class BibleJsonLoader:
             return cls._cache[cache_key]
 
         target_dir = cls.find_bible_dir_by_name(bible_name)
-        if not target_dir:
+        if not target_dir or not os.path.exists(target_dir) or len([f for f in os.listdir(target_dir) if f.endswith('.json')]) == 0:
+            # Tenter l'auto-extraction à la volée depuis SQLite si présent
+            try:
+                base_dir = cls.get_bibles_dir()
+                clean_name = str(bible_name).lower().replace(" ", "_")
+                cand_sqlite = os.path.join(base_dir, f"bible_{clean_name}.sqlite")
+                cand_sqlite_alt = os.path.join(base_dir, f"bible_{clean_name}1910.sqlite")
+                cand_sqlite_lsg = os.path.join(base_dir, "bible_lsg.sqlite")
+                
+                sqlite_path = None
+                if os.path.exists(cand_sqlite):
+                    sqlite_path = cand_sqlite
+                elif os.path.exists(cand_sqlite_alt):
+                    sqlite_path = cand_sqlite_alt
+                elif clean_name in ("lsg", "louis_segond") and os.path.exists(cand_sqlite_lsg):
+                    sqlite_path = cand_sqlite_lsg
+
+                if sqlite_path:
+                    import sqlite3
+                    dest_json_dir = os.path.join(base_dir, bible_name)
+                    os.makedirs(dest_json_dir, exist_ok=True)
+                    conn = sqlite3.connect(sqlite_path)
+                    cur = conn.cursor()
+                    cur.execute("SELECT book, chapter, verse, text FROM verses ORDER BY id ASC")
+                    all_rows = cur.fetchall()
+                    conn.close()
+
+                    verses_by_book = {}
+                    for row in all_rows:
+                        b_code, ch, v_num, txt = row[0], int(row[1]), int(row[2]), row[3]
+                        if b_code not in verses_by_book:
+                            verses_by_book[b_code] = {}
+                        if str(ch) not in verses_by_book[b_code]:
+                            verses_by_book[b_code][str(ch)] = {}
+                        verses_by_book[b_code][str(ch)][str(v_num)] = txt
+
+                    from core.bible_json_loader import STD_TO_USFM
+                    from core.reference_parser import get_french_book_name
+                    from api._utils import FRENCH_TO_STD_BOOK
+
+                    book_order = list(FRENCH_TO_STD_BOOK.values())
+                    for idx, b_code in enumerate(book_order, start=1):
+                        chaps = verses_by_book.get(b_code, {})
+                        if not chaps:
+                            continue
+                        fr_name = get_french_book_name(b_code)
+                        usfm = STD_TO_USFM.get(b_code, b_code.upper())
+                        fname = f"{idx:02d}_{usfm}_{fr_name}.json"
+                        out_path = os.path.join(dest_json_dir, fname)
+                        data = {
+                            "id": b_code,
+                            "code": usfm,
+                            "name": fr_name,
+                            "version": bible_name,
+                            "version_fullname": bible_name,
+                            "total_chapters": len(chaps),
+                            "chapters": chaps
+                        }
+                        with open(out_path, "w", encoding="utf-8") as f_out:
+                            json.dump(data, f_out, ensure_ascii=False, separators=(',', ':'))
+
+                    cls.clear_cache()
+                    target_dir = cls.find_bible_dir_by_name(bible_name)
+            except Exception as e:
+                logger.warning(f"Erreur tentative auto-extraction à la volée pour {bible_name}: {e}")
+
+        if not target_dir or not os.path.exists(target_dir):
             return None
 
         usfm_code = STD_TO_USFM.get(std_book_code, std_book_code.upper())
