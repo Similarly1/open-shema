@@ -414,38 +414,125 @@ body {
 }
 
 /* ==========================================================================
-   ÉTAPE 2 : TÉLÉCHARGEMENT & DÉPLOIEMENT
+   ÉTAPE 2 : TÉLÉCHARGEMENT & DÉPLOIEMENT (LOGO OPEN SHEMA ANIMÉ)
    ========================================================================== */
 .progress-hero {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  margin: 15px 0 25px 0;
+  margin: 10px 0 20px 0;
 }
 
-.pulse-icon-container {
+/* Conteneur et halo lumineux du livre animé */
+.splash-logo-glow {
   position: relative;
-  width: 76px;
-  height: 76px;
+  width: 100px;
+  height: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16px;
-  color: var(--primary-start);
+  margin-bottom: 14px;
 }
 
-.spinner-ring {
+.splash-logo-glow::before {
+  content: '';
   position: absolute;
-  inset: 0;
-  border: 3px solid rgba(2, 132, 199, 0.12);
-  border-top-color: var(--primary-start);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
-  animation: spinRing 1.1s linear infinite;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.35) 0%, rgba(2, 132, 199, 0.12) 50%, transparent 75%);
+  filter: blur(16px);
+  animation: splashGlowPulse 2.4s ease-in-out infinite alternate;
+  pointer-events: none;
 }
 
-@keyframes spinRing {
-  to { transform: rotate(360deg); }
+.splash-book-wrapper {
+  position: relative;
+  width: 92px;
+  height: 92px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.splash-book-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 10px 22px rgba(2, 132, 199, 0.45));
+}
+
+.splash-book-body {
+  transform-origin: 512px 512px;
+  animation: splashBookHover 2.6s ease-in-out infinite alternate;
+}
+
+@keyframes splashBookHover {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-4px); }
+}
+
+@keyframes splashGlowPulse {
+  0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.65; }
+  100% { transform: translate(-50%, -50%) scale(1.18); opacity: 1; }
+}
+
+/* Animation en boucle des pages qui tournent (exactement comme dans le splash screen) */
+.splash-turning-leaf {
+  transform-origin: 512px 512px;
+  animation-duration: 2.1s;
+  animation-iteration-count: infinite;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.splash-turning-leaf.leaf-1 {
+  animation-name: flipPageLoop;
+  animation-delay: 0s;
+}
+
+.splash-turning-leaf.leaf-2 {
+  animation-name: flipPageLoop;
+  animation-delay: 0.7s;
+}
+
+.splash-turning-leaf.leaf-3 {
+  animation-name: flipPageLoop;
+  animation-delay: 1.4s;
+}
+
+@keyframes flipPageLoop {
+  0% {
+    transform: scaleX(1) skewY(0deg);
+    opacity: 0;
+    fill: #38BDF8;
+  }
+  12% {
+    opacity: 0.95;
+    fill: #38BDF8;
+  }
+  48% {
+    transform: scaleX(0.06) skewY(-5deg);
+    fill: #F8FAFC;
+    opacity: 0.95;
+  }
+  52% {
+    transform: scaleX(-0.06) skewY(5deg);
+    fill: #E0F2FE;
+    opacity: 0.95;
+  }
+  88% {
+    opacity: 0.95;
+    fill: #0284C7;
+  }
+  100% {
+    transform: scaleX(-1) skewY(0deg);
+    opacity: 0;
+    fill: #0284C7;
+  }
 }
 
 .progress-title {

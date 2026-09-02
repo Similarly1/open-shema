@@ -1,6 +1,6 @@
 /**
  * Open Shema — Logique Client de l'Installeur (PyWebView)
- * Gère l'interaction utilisateur, la sélection de dossier, le suivi en direct
+ * Gère l'interaction utilisateur, la sélection de dossier, le polling en direct
  * et le lancement de l'application installée.
  */
 
@@ -9,12 +9,12 @@ const Installer = {
   releaseData: null,
   installedExePath: null,
   installedDir: null,
+  progressInterval: null,
 
   async init() {
     this.bindWindowControls();
     this.bindEvents();
 
-    // Attendre que le pont pywebview soit prêt
     if (window.pywebview && window.pywebview.api) {
       await this.loadInitialData();
     } else {
@@ -57,6 +57,10 @@ const Installer = {
 
     // Bouton Annuler
     document.getElementById('btn-cancel-install')?.addEventListener('click', async () => {
+      if (this.progressInterval) {
+        clearInterval(this.progressInterval);
+        this.progressInterval = null;
+      }
       if (window.pywebview?.api?.cancel_installation) {
         await window.pywebview.api.cancel_installation();
         this.switchStep('step-config');
@@ -137,9 +141,14 @@ const Installer = {
     // Réinitialisation de la jauge
     document.getElementById('progress-bar-fill').style.width = '0%';
     document.getElementById('lbl-progress-percent').textContent = '0%';
-    document.getElementById('lbl-progress-status').textContent = 'Initialisation...';
+    document.getElementById('lbl-progress-status').textContent = 'Démarrage...';
     document.getElementById('lbl-downloaded-size').textContent = '0 Mo';
     document.getElementById('lbl-download-speed').textContent = '';
+
+    if (this.progressInterval) {
+      clearInterval(this.progressInterval);
+      this.progressInterval = null;
+    }
 
     try {
       if (window.pywebview?.api?.start_installation) {
@@ -149,16 +158,40 @@ const Installer = {
           createStartMenu,
           downloadUrl
         );
+
         if (!res || !res.success) {
           this.onError(res?.error || "Échec du démarrage de l'installation.");
+          return;
         }
+
+        // Polling régulier de l'état de progression (100% robuste, zéro blocage)
+        this.progressInterval = setInterval(async () => {
+          try {
+            if (!window.pywebview?.api?.get_install_progress) return;
+            const p = await window.pywebview.api.get_install_progress();
+            if (!p) return;
+
+            this.onProgress(p);
+
+            if (p.is_complete) {
+              clearInterval(this.progressInterval);
+              this.progressInterval = null;
+              this.onComplete(p);
+            } else if (p.error) {
+              clearInterval(this.progressInterval);
+              this.progressInterval = null;
+              this.onError(p.error);
+            }
+          } catch (pollErr) {
+            console.warn("Erreur polling progression :", pollErr);
+          }
+        }, 120);
       }
     } catch (err) {
       this.onError(String(err));
     }
   },
 
-  // Callback appelé depuis Python lors du suivi du téléchargement et extraction
   onProgress(data) {
     if (!data) return;
     const percent = data.percent || 0;
@@ -173,15 +206,18 @@ const Installer = {
     if (statusEl && data.status) statusEl.textContent = data.status;
 
     const dataEl = document.getElementById('lbl-downloaded-size');
-    if (dataEl && data.downloaded_str) {
-      dataEl.textContent = `${data.downloaded_str} / ${data.total_str || '?'}`;
+    if (dataEl) {
+      if (data.downloaded_str && data.total_str && data.total_str !== "0 Mo") {
+        dataEl.textContent = `${data.downloaded_str} / ${data.total_str}`;
+      } else if (data.downloaded_str) {
+        dataEl.textContent = data.downloaded_str;
+      }
     }
 
     const speedEl = document.getElementById('lbl-download-speed');
     if (speedEl) speedEl.textContent = data.speed_str || '';
   },
 
-  // Callback appelé depuis Python à la fin réussie
   onComplete(data) {
     this.installedDir = data.target_dir;
     this.installedExePath = data.exe_path;
@@ -198,9 +234,8 @@ const Installer = {
     this.switchStep('step-success');
   },
 
-  // Callback appelé en cas d'erreur
   onError(message) {
-    alert(`Erreur d'installation : ${message}`);
+    alert(`Information : ${message}`);
     this.switchStep('step-config');
   },
 
@@ -213,7 +248,6 @@ const Installer = {
   }
 };
 
-// Initialisation au chargement du DOM
 document.addEventListener('DOMContentLoaded', () => {
   Installer.init();
 });

@@ -35,6 +35,19 @@ class InstallerAPI:
         self.is_cancelled = False
         self.is_installing = False
         self.download_thread = None
+        
+        # État de progression exposé au frontend (polling 100% thread-safe)
+        self.progress_state = {
+            "percent": 0,
+            "status": "Initialisation...",
+            "downloaded_str": "0 Mo",
+            "total_str": "0 Mo",
+            "speed_str": "",
+            "is_complete": False,
+            "error": None,
+            "target_dir": "",
+            "exe_path": ""
+        }
 
     def set_window(self, window):
         self.window = window
@@ -59,14 +72,13 @@ class InstallerAPI:
         
         default_install_dir = os.path.join(local_appdata, "Programs", "OpenShema")
         
-        # Calcul de l'espace disque disponible
         drive = os.path.splitdrive(default_install_dir)[0] or "C:"
         drive_path = drive + "\\"
         free_space_bytes = 0
         try:
             free_space_bytes = shutil.disk_usage(drive_path).free
         except Exception:
-            free_space_bytes = 10 * 1024 * 1024 * 1024  # 10 Go par défaut
+            free_space_bytes = 10 * 1024 * 1024 * 1024
 
         return {
             "default_path": default_install_dir,
@@ -83,7 +95,6 @@ class InstallerAPI:
             res = self.window.create_file_dialog(webview.FOLDER_DIALOG, directory=current_path or None)
             if res and len(res) > 0:
                 selected = res[0]
-                # Si l'utilisateur sélectionne par exemple "C:\Programs", on append "OpenShema"
                 if not selected.lower().endswith("openshema"):
                     selected = os.path.join(selected, "OpenShema")
                 return {"selected": selected}
@@ -105,7 +116,11 @@ class InstallerAPI:
                 pass
         return {"selected": current_path}
 
-    # --- GITHUB RELEASES API ---
+    def get_install_progress(self):
+        """Méthode de polling appelée régulièrement par le frontend pour suivre la progression sans blocage."""
+        return self.progress_state
+
+    # --- GITHUB RELEASES API & DÉTECTION DU PACKAGE ---
     def check_latest_release(self, repo="Similarly1/open-shema"):
         """Interroge l'API GitHub pour récupérer la dernière release disponible."""
         ctx = ssl.create_default_context()
@@ -122,30 +137,29 @@ class InstallerAPI:
 
         try:
             req = urllib.request.Request(url, headers=headers)
-            with urllib.request.urlopen(req, timeout=12, context=ctx) as resp:
+            with urllib.request.urlopen(req, timeout=10, context=ctx) as resp:
                 data = json.load(resp)
                 return self._parse_release_data(data)
         except Exception as e:
-            logger.info(f"Pas de release 'latest' directe ({e}), interrogation de la liste des releases...")
+            logger.info(f"Pas de release 'latest' ({e}), tentative liste des releases...")
             try:
                 req = urllib.request.Request(fallback_url, headers=headers)
-                with urllib.request.urlopen(req, timeout=12, context=ctx) as resp:
+                with urllib.request.urlopen(req, timeout=10, context=ctx) as resp:
                     releases_list = json.load(resp)
                     if releases_list and len(releases_list) > 0:
                         return self._parse_release_data(releases_list[0])
             except Exception as e_list:
                 logger.warning(f"Erreur API GitHub releases: {e_list}")
 
-        # Si aucune release n'est encore publiée sur GitHub ou en cas de hors-ligne :
-        # Vérifier si une archive de build locale existe déjà dans dist/
-        local_archive = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "dist", "OpenShema.zip")
-        has_local = os.path.exists(local_archive)
+        # Si aucune release n'est trouvée sur GitHub : recherche d'une archive locale
+        local_pkg = self._find_local_package()
+        has_local = bool(local_pkg)
         
         return {
             "success": True,
             "is_fallback": True,
             "has_local_build": has_local,
-            "local_archive_path": local_archive if has_local else None,
+            "local_archive_path": local_pkg if has_local else None,
             "tag": "v1.0.0",
             "name": "Open Shema v1.0.0 (Release Initiale)",
             "download_url": f"https://github.com/{repo}/releases/download/v1.0.0/OpenShema-Windows-x64.zip",
@@ -158,7 +172,6 @@ class InstallerAPI:
         name = data.get("name") or f"Open Shema {tag}"
         notes = data.get("body", "Dernière version officielle d'Open Shema.")
         
-        # Trouver l'asset zip approprié
         download_url = None
         size_bytes = 0
         for asset in data.get("assets", []):
@@ -186,6 +199,30 @@ class InstallerAPI:
             "notes": notes
         }
 
+    def _find_local_package(self):
+        """Trouve l'archive zip ou le dossier OpenShema local."""
+        exe_dir = os.path.dirname(os.path.abspath(sys.executable))
+        curr_dir = os.path.abspath(os.getcwd())
+        file_dir = os.path.dirname(os.path.abspath(__file__))
+
+        candidates = [
+            # À côté de l'exécutable (ex: dist/OpenShema.zip)
+            os.path.join(exe_dir, "OpenShema.zip"),
+            os.path.join(exe_dir, "OpenShema"),
+            # Dans dist/ par rapport au dossier courant
+            os.path.join(curr_dir, "dist", "OpenShema.zip"),
+            os.path.join(curr_dir, "dist", "OpenShema"),
+            os.path.join(curr_dir, "OpenShema.zip"),
+            # En mode dev par rapport à installer/
+            os.path.join(os.path.dirname(file_dir), "dist", "OpenShema.zip"),
+            os.path.join(os.path.dirname(file_dir), "dist", "OpenShema"),
+        ]
+
+        for cand in candidates:
+            if os.path.exists(cand):
+                return cand
+        return None
+
     # --- PROCESSUS D'INSTALLATION COMPLET ---
     def start_installation(self, target_dir: str, create_desktop_shortcut: bool, create_start_menu_shortcut: bool, download_url: str):
         """Lance l'installation dans un thread d'arrière-plan avec progression continue."""
@@ -194,6 +231,18 @@ class InstallerAPI:
 
         self.is_installing = True
         self.is_cancelled = False
+
+        self.progress_state = {
+            "percent": 0,
+            "status": "Démarrage de l'installation...",
+            "downloaded_str": "0 Mo",
+            "total_str": "0 Mo",
+            "speed_str": "",
+            "is_complete": False,
+            "error": None,
+            "target_dir": target_dir,
+            "exe_path": os.path.join(target_dir, "OpenShema.exe")
+        }
 
         self.download_thread = threading.Thread(
             target=self._run_installation,
@@ -206,6 +255,7 @@ class InstallerAPI:
     def cancel_installation(self):
         self.is_cancelled = True
         self.is_installing = False
+        self.progress_state["error"] = "Installation annulée par l'utilisateur."
         return {"success": True}
 
     def _run_installation(self, target_dir, create_desktop, create_start_menu, download_url):
@@ -213,36 +263,29 @@ class InstallerAPI:
             os.makedirs(target_dir, exist_ok=True)
             temp_zip = os.path.join(target_dir, "_download_temp.zip")
 
-            # 1. TÉLÉCHARGEMENT OU RÉCUPÉRATION LOCALE
-            # Si le build local dist/OpenShema existe déjà et que l'URL est le fallback GitHub non encore publié
-            project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            local_dist_dir = os.path.join(project_root, "dist", "OpenShema")
-            local_zip = os.path.join(project_root, "dist", "OpenShema.zip")
-
             download_success = False
 
-            # Tentative de téléchargement distant si URL valide
+            # 1. TENTATIVE DE TÉLÉCHARGEMENT GITHUB
             if download_url and not download_url.endswith("non_existant.zip"):
-                self._send_progress(5, "Connexion au serveur GitHub...", 0, 0, 0)
+                self._update_progress(5, "Connexion au serveur GitHub...")
                 try:
                     ctx = ssl.create_default_context()
                     ctx.check_hostname = False
                     ctx.verify_mode = ssl.CERT_NONE
                     req = urllib.request.Request(download_url, headers={"User-Agent": "OpenShemaInstaller/1.0"})
 
-                    with urllib.request.urlopen(req, timeout=30, context=ctx) as response:
+                    with urllib.request.urlopen(req, timeout=15, context=ctx) as response:
                         total_size = int(response.headers.get("content-length", 0))
                         downloaded = 0
                         start_time = time.time()
                         last_update_time = start_time
 
                         with open(temp_zip, "wb") as out_file:
-                            chunk_size = 64 * 1024  # 64 Ko
+                            chunk_size = 64 * 1024
                             while True:
                                 if self.is_cancelled:
                                     try: os.remove(temp_zip)
                                     except OSError: pass
-                                    self._send_error("Installation annulée par l'utilisateur.")
                                     return
 
                                 chunk = response.read(chunk_size)
@@ -252,11 +295,11 @@ class InstallerAPI:
                                 downloaded += len(chunk)
 
                                 now = time.time()
-                                if now - last_update_time > 0.15 or downloaded == total_size:
+                                if now - last_update_time > 0.12 or downloaded == total_size:
                                     duration = now - start_time
                                     speed = downloaded / duration if duration > 0 else 0
                                     percent = (downloaded / total_size * 70) if total_size > 0 else 35
-                                    self._send_progress(
+                                    self._update_progress(
                                         percent=min(70, percent),
                                         status="Téléchargement des fichiers d'Open Shema...",
                                         downloaded_bytes=downloaded,
@@ -267,39 +310,39 @@ class InstallerAPI:
 
                     download_success = True
                 except Exception as dl_err:
-                    logger.warning(f"Téléchargement distant échoué ({dl_err}), vérification fallback local...")
+                    logger.info(f"Téléchargement distant non disponible ({dl_err}), bascule sur le package local...")
 
-            # Si le téléchargement a échoué mais qu'on a le build local complet (mode démo / premier package)
+            # 2. FALLBACK PACKAGE LOCAL SI LE REPO GITHUB N'A PAS ENCORE D'ASSET EN LIGNE
             if not download_success:
-                if os.path.exists(local_dist_dir):
-                    self._send_progress(20, "Déploiement depuis le package local...", 0, 0, 0)
-                    # Copier directement le dossier dist/OpenShema
-                    self._copy_tree_with_progress(local_dist_dir, target_dir)
-                    temp_zip = None  # Pas besoin d'extraire
-                elif os.path.exists(local_zip):
-                    self._send_progress(25, "Préparation de l'archive locale...", 0, 0, 0)
-                    shutil.copy(local_zip, temp_zip)
-                    download_success = True
+                local_pkg = self._find_local_package()
+                if local_pkg:
+                    if os.path.isdir(local_pkg):
+                        self._update_progress(15, "Déploiement depuis le package local...")
+                        self._copy_tree_with_progress(local_pkg, target_dir)
+                        temp_zip = None
+                    elif os.path.isfile(local_pkg) and local_pkg.endswith(".zip"):
+                        self._update_progress(20, "Extraction de l'archive d'installation...")
+                        shutil.copy(local_pkg, temp_zip)
+                        download_success = True
                 else:
-                    self._send_error(f"Impossible de télécharger Open Shema depuis GitHub ({download_url}) et aucun package local n'a été trouvé.")
+                    err_msg = "La release n'est pas encore publiée sur GitHub et aucune archive locale n'a été trouvée dans le dossier."
+                    self.progress_state["error"] = err_msg
+                    self.is_installing = False
                     return
 
-            # 2. DÉCOMPRESSION SI ARCHIVE ZIP
+            # 3. EXTRACTION DE L'ARCHIVE ZIP
             if temp_zip and os.path.exists(temp_zip):
-                self._send_progress(72, "Extraction et vérification de l'intégrité...", 0, 0, 0)
+                self._update_progress(70, "Extraction des composants d'Open Shema...")
                 try:
                     with zipfile.ZipFile(temp_zip, 'r') as zf:
                         namelist = zf.namelist()
                         total_files = len(namelist)
-                        
-                        # Vérifier si l'archive a une racine imbriquée (ex: OpenShema/...)
                         has_nested_root = all(n.startswith("OpenShema/") or n.startswith("OpenShema\\") for n in namelist if n != "OpenShema/")
                         
                         for i, name in enumerate(namelist):
                             if self.is_cancelled:
                                 try: os.remove(temp_zip)
                                 except OSError: pass
-                                self._send_error("Installation annulée.")
                                 return
                             
                             target_name = name
@@ -317,23 +360,23 @@ class InstallerAPI:
                                     shutil.copyfileobj(src, dst)
 
                             if i % 15 == 0:
-                                percent = 72 + ((i / total_files) * 20)
-                                self._send_progress(percent, f"Extraction : {os.path.basename(name)}", 0, 0, 0)
+                                percent = 70 + ((i / total_files) * 22)
+                                self._update_progress(percent, f"Extraction : {os.path.basename(name)}")
 
                     try:
                         os.remove(temp_zip)
                     except OSError:
                         pass
                 except Exception as zip_err:
-                    self._send_error(f"Erreur lors de la décompression de l'archive : {zip_err}")
+                    self.progress_state["error"] = f"Erreur décompression : {zip_err}"
+                    self.is_installing = False
                     return
 
-            # 3. CRÉATION DES RACCOURCIS WINDOWS
-            self._send_progress(95, "Création des raccourcis Windows...", 0, 0, 0)
+            # 4. CRÉATION DES RACCOURCIS WINDOWS
+            self._update_progress(94, "Création des raccourcis Windows...")
             exe_path = os.path.join(target_dir, "OpenShema.exe")
             icon_path = os.path.join(target_dir, "assets", "icon.ico")
             if not os.path.exists(icon_path):
-                # Si assets/icon.ico est dans _internal ou à la racine
                 alt_icon = os.path.join(target_dir, "_internal", "assets", "icon.ico")
                 if os.path.exists(alt_icon):
                     icon_path = alt_icon
@@ -364,13 +407,15 @@ class InstallerAPI:
                         description="Open Shema — Plateforme d'étude biblique"
                     )
 
-            # 4. FINALISATION
-            self._send_progress(100, "Installation terminée avec succès !", 0, 0, 0)
-            self._send_complete(target_dir, exe_path)
+            # 5. FINALISATION
+            self._update_progress(100, "Installation terminée avec succès !")
+            self.progress_state["is_complete"] = True
+            self.progress_state["target_dir"] = target_dir
+            self.progress_state["exe_path"] = exe_path
 
         except Exception as global_err:
             logger.error(f"Erreur globale installation: {global_err}", exc_info=True)
-            self._send_error(str(global_err))
+            self.progress_state["error"] = str(global_err)
         finally:
             self.is_installing = False
 
@@ -383,18 +428,18 @@ class InstallerAPI:
         
         total = len(all_files)
         for i, src_file in enumerate(all_files):
+            if self.is_cancelled:
+                return
             rel = os.path.relpath(src_file, src_dir)
             dst_file = os.path.join(dst_dir, rel)
             os.makedirs(os.path.dirname(dst_file), exist_ok=True)
             shutil.copy2(src_file, dst_file)
             if i % 10 == 0:
-                percent = 20 + ((i / total) * 72)
-                self._send_progress(percent, f"Installation : {rel}", 0, 0, 0)
+                percent = 15 + ((i / total) * 78)
+                self._update_progress(percent, f"Installation : {rel}")
 
-    # --- CRÉATION DE RACCOURCIS WINDOWS (.LNK) ---
     def _create_windows_shortcut(self, target_path, shortcut_path, icon_path="", description="Open Shema"):
         """Crée un raccourci Windows avec WScript.Shell (win32com ou PowerShell)."""
-        # Tentative 1 : win32com
         try:
             import win32com.client
             shell = win32com.client.Dispatch("WScript.Shell")
@@ -410,7 +455,6 @@ class InstallerAPI:
         except Exception as e1:
             logger.debug(f"win32com shortcut non disponible ({e1}), bascule sur PowerShell...")
 
-        # Tentative 2 : PowerShell intégré (garanti sur 100% des Windows 10/11)
         try:
             work_dir = os.path.dirname(target_path).replace("'", "''")
             t_path = target_path.replace("'", "''")
@@ -436,7 +480,6 @@ class InstallerAPI:
     def _get_desktop_dir(self):
         user_profile = os.environ.get("USERPROFILE")
         if user_profile:
-            # Vérifier Bureau français ou Desktop
             cand1 = os.path.join(user_profile, "Desktop")
             cand2 = os.path.join(user_profile, "Bureau")
             if os.path.exists(cand2): return cand2
@@ -450,50 +493,27 @@ class InstallerAPI:
             return os.path.join(appdata, "Microsoft", "Windows", "Start Menu", "Programs")
         return None
 
-    # --- COMMUNICATIONS AVEC LE FRONTEND JS ---
-    def _send_progress(self, percent, status, downloaded_bytes, total_bytes, speed_bytes_sec):
-        if not self.window:
-            return
-        payload = {
-            "percent": round(percent, 1),
-            "status": status,
-            "downloaded_str": format_bytes(downloaded_bytes) if downloaded_bytes else "",
-            "total_str": format_bytes(total_bytes) if total_bytes else "",
-            "speed_str": f"{format_bytes(speed_bytes_sec)}/s" if speed_bytes_sec else ""
-        }
-        js = f"if (window.Installer && window.Installer.onProgress) {{ window.Installer.onProgress({json.dumps(payload)}); }}"
-        self.window.evaluate_js(js)
+    def _update_progress(self, percent, status, downloaded_bytes=0, total_bytes=0, speed_bytes_sec=0):
+        self.progress_state["percent"] = round(percent, 1)
+        self.progress_state["status"] = status
+        if downloaded_bytes:
+            self.progress_state["downloaded_str"] = format_bytes(downloaded_bytes)
+        if total_bytes:
+            self.progress_state["total_str"] = format_bytes(total_bytes)
+        if speed_bytes_sec:
+            self.progress_state["speed_str"] = f"{format_bytes(speed_bytes_sec)}/s"
 
-    def _send_complete(self, target_dir, exe_path):
-        if not self.window:
-            return
-        payload = {
-            "target_dir": target_dir,
-            "exe_path": exe_path
-        }
-        js = f"if (window.Installer && window.Installer.onComplete) {{ window.Installer.onComplete({json.dumps(payload)}); }}"
-        self.window.evaluate_js(js)
-
-    def _send_error(self, message):
-        if not self.window:
-            return
-        js = f"if (window.Installer && window.Installer.onError) {{ window.Installer.onError({json.dumps(message)}); }}"
-        self.window.evaluate_js(js)
-
-    # --- LANCEMENT DE L'APPLICATION ---
     def launch_app(self, target_dir):
         """Lance OpenShema.exe et ferme l'installeur."""
         exe_path = os.path.join(target_dir, "OpenShema.exe")
         if os.path.exists(exe_path):
             try:
-                # Démarrage détaché indépendant du processus de l'installeur
-                creation_flags = 0x00000008 | 0x00000200  # DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP
+                creation_flags = 0x00000008 | 0x00000200
                 subprocess.Popen([exe_path], cwd=target_dir, creationflags=creation_flags, close_fds=True)
                 logger.info(f"Open Shema lancé depuis : {exe_path}")
             except Exception as e:
                 logger.error(f"Erreur lancement Open Shema: {e}")
         
-        # Fermer la fenêtre de l'installeur
         if self.window:
             self.window.destroy()
         sys.exit(0)

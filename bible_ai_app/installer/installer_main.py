@@ -27,13 +27,28 @@ def main():
 
     api = InstallerAPI()
 
-    # Configuration de la fenêtre PyWebView (moderne, sans bordure native, draggable)
+    # Centrage précis de la fenêtre sur l'écran principal
+    width = 740
+    height = 540
+    x = None
+    y = None
+    try:
+        if webview.screens and len(webview.screens) > 0:
+            screen = webview.screens[0]
+            x = max(0, (screen.width - width) // 2)
+            y = max(0, (screen.height - height) // 2)
+    except Exception:
+        pass
+
+    # Configuration de la fenêtre PyWebView (moderne, sans bordure native, draggable, centrée)
     window = webview.create_window(
         title="Installation d'Open Shema",
         url=index_html,
         js_api=api,
-        width=740,
-        height=540,
+        width=width,
+        height=height,
+        x=x,
+        y=y,
         resizable=False,
         frameless=True,
         easy_drag=True,
