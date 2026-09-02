@@ -349,36 +349,41 @@ class ImportMixin:
             with urllib.request.urlopen(req, timeout=60) as response, open(target_path, "wb") as out_file:
                 shutil.copyfileobj(response, out_file)
 
+            # Résolution propre de l'abréviation
+            m_abbr = (module_data.get("abbreviation") or module_data.get("code") or (m_id or "").replace("bible-", "").replace("bible_", "").upper()).strip()
+
             # Si c'est une Bible SQLite, extraire les 66 livres JSON pour compatibilité native instantanée
             if m_type == "bible" and target_path.endswith(".sqlite"):
                 try:
-                    self._extract_sqlite_bible_to_json(target_path, m_abbr, m_title)
+                    if hasattr(self, "_extract_sqlite_bible_to_json"):
+                        self._extract_sqlite_bible_to_json(target_path, m_abbr, m_title)
                 except Exception as extract_err:
                     logger.warning(f"Erreur extraction SQLite Bible vers JSON : {extract_err}")
 
             # Si c'est un Commentaire SQLite, synchroniser avec la base centrale des commentaires
             if m_type == "commentary" and target_path.endswith(".sqlite"):
-                master_db = os.path.join(current_dir, "data", "commentaires", "commentaires_master.db")
-                if os.path.exists(master_db):
-                    try:
-                        import sqlite3
-                        m_conn = sqlite3.connect(master_db)
-                        c_conn = sqlite3.connect(target_path)
-                        c_cur = c_conn.cursor()
-                        c_cur.execute("SELECT commentary_id, commentary_name, book_code, book_name, chapter, verse_start, verse_end, reference, text, paragraphs_json, html, source_url FROM commentaries")
-                        c_rows = c_cur.fetchall()
-                        if c_rows:
-                            m_cur = m_conn.cursor()
-                            comm_name = c_rows[0][1]
-                            m_cur.execute("DELETE FROM commentaries WHERE commentary_name = ?", (comm_name,))
-                            m_cur.executemany("INSERT INTO commentaries (commentary_id, commentary_name, book_code, book_name, chapter, verse_start, verse_end, reference, text, paragraphs_json, html, source_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", c_rows)
-                            m_conn.commit()
-                        c_conn.close()
-                        m_conn.close()
-                        from core.commentary_loader import CommentaryLoader
-                        CommentaryLoader._catalog_cache = None
-                    except Exception as comm_err:
-                        logger.warning(f"Erreur intégration commentaire SQLite vers master DB : {comm_err}")
+                try:
+                    from core.commentary_loader import CommentaryLoader
+                    CommentaryLoader._ensure_master_db()
+                    CommentaryLoader._catalog_cache = None
+                except Exception as comm_err:
+                    logger.warning(f"Erreur intégration commentaire SQLite vers master DB : {comm_err}")
+
+            # Si c'est un Dictionnaire, l'enregistrer dans DictionaryManager
+            if m_type == "dictionary":
+                try:
+                    from core.dictionary_manager import DictionaryManager
+                    dict_slug = m_abbr.lower() if m_abbr else m_id.replace('-', '_').lower()
+                    DictionaryManager.register_dictionary(
+                        dict_id=dict_slug,
+                        name=m_title,
+                        file_path=target_path,
+                        author=module_data.get("author", "Collectif"),
+                        year=str(module_data.get("year") or module_data.get("version") or ""),
+                        description=module_data.get("description", "")
+                    )
+                except Exception as dict_err:
+                    logger.warning(f"Erreur enregistrement dictionnaire dans DictionaryManager : {dict_err}")
 
             # Téléchargement de l'image de couverture si spécifiée
             cover_path = None
@@ -406,7 +411,7 @@ class ImportMixin:
                 "title": m_title,
                 "author": module_data.get("author", "Open Shema"),
                 "description": module_data.get("description", ""),
-                "year": module_data.get("version", "1.0.0"),
+                "year": str(module_data.get("year") or module_data.get("version") or "1.0.0"),
                 "cover_path": cover_path,
                 "type": "Bible" if m_type == "bible" else ("Dictionnaire" if m_type == "dictionary" else ("Commentaire" if m_type == "commentary" else "Théologie")),
                 "format": "json" if (m_type == "bible" and target_path.endswith(".sqlite")) else m_format,

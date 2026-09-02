@@ -23,8 +23,61 @@ class CommentaryLoader:
         return cls._db_path
 
     @classmethod
+    def _ensure_master_db(cls):
+        """Initialise la base SQLite centrale et synchronise automatiquement les modules de commentaires individuels."""
+        db_path = cls.get_db_path()
+        comm_dir = os.path.dirname(db_path)
+        os.makedirs(comm_dir, exist_ok=True)
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cur = conn.cursor()
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS commentaries (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        commentary_id TEXT NOT NULL,
+                        commentary_name TEXT NOT NULL,
+                        book_code TEXT NOT NULL,
+                        book_name TEXT NOT NULL,
+                        chapter INTEGER NOT NULL,
+                        verse_start INTEGER NOT NULL,
+                        verse_end INTEGER NOT NULL,
+                        reference TEXT NOT NULL,
+                        text TEXT NOT NULL,
+                        paragraphs_json TEXT,
+                        html TEXT,
+                        source_url TEXT
+                    );
+                """)
+                cur.execute("CREATE INDEX IF NOT EXISTS idx_comm_lookup ON commentaries(book_code, chapter, verse_start, verse_end);")
+                cur.execute("CREATE INDEX IF NOT EXISTS idx_comm_cid ON commentaries(commentary_id, book_code);")
+
+            # Auto-sync de tous les fichiers .sqlite individuels présents dans data/commentaires/
+            for fn in os.listdir(comm_dir):
+                if fn.endswith(".sqlite") and fn != "commentaires_master.db":
+                    single_p = os.path.join(comm_dir, fn)
+                    try:
+                        with sqlite3.connect(single_p) as s_conn, sqlite3.connect(db_path) as m_conn:
+                            s_cur = s_conn.cursor()
+                            s_cur.execute("SELECT commentary_id, commentary_name, book_code, book_name, chapter, verse_start, verse_end, reference, text, paragraphs_json, html, source_url FROM commentaries")
+                            rows = s_cur.fetchall()
+                            if rows:
+                                c_name = rows[0][1]
+                                m_cur = m_conn.cursor()
+                                m_cur.execute("SELECT COUNT(*) FROM commentaries WHERE commentary_name = ?", (c_name,))
+                                existing_count = m_cur.fetchone()[0]
+                                if existing_count < len(rows):
+                                    m_cur.execute("DELETE FROM commentaries WHERE commentary_name = ?", (c_name,))
+                                    m_cur.executemany("INSERT INTO commentaries (commentary_id, commentary_name, book_code, book_name, chapter, verse_start, verse_end, reference, text, paragraphs_json, html, source_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", rows)
+                                    m_conn.commit()
+                    except Exception as sync_e:
+                        logger.debug(f"Erreur auto-sync commentaire {fn}: {sync_e}")
+        except Exception as e:
+            logger.error(f"Erreur _ensure_master_db : {e}")
+
+    @classmethod
     def get_available_commentaries(cls) -> Dict[str, Dict[str, Any]]:
         """Renvoie la liste des commentaires disponibles dans la base SQLite locale."""
+        cls._ensure_master_db()
         db_path = cls.get_db_path()
         if not os.path.exists(db_path):
             return {}

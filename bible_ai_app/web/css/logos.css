@@ -21558,13 +21558,20 @@ body.theme-light .ps-dict-article-body strong {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: var(--bg-surface, #334155);
+  background: var(--bg-hover, #f1f5f9);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
-  color: var(--text-secondary);
-  border: 1px solid var(--border-color);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-secondary, #475569);
+  border: 1px solid var(--border-color, #e2e8f0);
+}
+
+body.theme-dark .profile-step-dot .dot-num {
+  background: #334155;
+  color: #cbd5e1;
+  border-color: #475569;
 }
 
 .profile-step-dot.active {
@@ -21637,25 +21644,45 @@ body.theme-light .ps-dict-article-body strong {
 }
 
 .profile-option-card {
-  background: var(--bg-surface, #1e293b);
-  border: 1.5px solid var(--border-color, rgba(255, 255, 255, 0.1));
-  border-radius: 10px;
-  padding: 14px;
+  background: var(--bg-card, #ffffff);
+  border: 1.5px solid var(--border-color, #e2e8f0);
+  border-radius: 12px;
+  padding: 14px 16px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
   position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .profile-option-card:hover {
-  border-color: rgba(245, 158, 11, 0.4);
+  border-color: var(--accent-orange, #ea580c);
+  background: var(--bg-hover, #f8fafc);
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .profile-option-card.selected {
-  border-color: var(--accent-orange, #f59e0b);
-  background: rgba(245, 158, 11, 0.06);
+  border-color: var(--accent-orange, #ea580c);
+  background: var(--bg-active, rgba(234, 88, 12, 0.06));
+  box-shadow: 0 0 0 1px var(--accent-orange, #ea580c), 0 4px 12px rgba(234, 88, 12, 0.08);
+}
+
+body.theme-dark .profile-option-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+body.theme-dark .profile-option-card:hover {
+  background: #263349;
+  border-color: #f59e0b;
+}
+
+body.theme-dark .profile-option-card.selected {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 1px #f59e0b;
 }
 
 .option-card-header {
@@ -21666,21 +21693,25 @@ body.theme-light .ps-dict-article-body strong {
 }
 
 .option-icon {
-  color: var(--accent-orange, #f59e0b);
+  color: var(--accent-orange, #ea580c);
   display: flex;
   align-items: center;
 }
 
 .option-title {
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-primary, #0f172a);
   flex: 1;
 }
 
+body.theme-dark .option-title {
+  color: #f8fafc;
+}
+
 .option-check {
-  font-size: 12px;
-  color: var(--accent-orange, #f59e0b);
+  font-size: 13px;
+  color: var(--accent-orange, #ea580c);
   opacity: 0;
   transition: opacity 0.15s ease;
   font-weight: 700;
@@ -21691,10 +21722,14 @@ body.theme-light .ps-dict-article-body strong {
 }
 
 .option-desc {
-  font-size: 11.5px;
-  color: var(--text-muted);
+  font-size: 12px;
+  color: var(--text-secondary, #475569);
   line-height: 1.45;
   margin: 0;
+}
+
+body.theme-dark .option-desc {
+  color: #94a3b8;
 }
 
 .profile-bibles-chips-row {
@@ -21704,9 +21739,9 @@ body.theme-light .ps-dict-article-body strong {
 }
 
 .profile-bible-chip {
-  background: var(--bg-surface, #1e293b);
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
-  color: var(--text-secondary);
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  color: var(--text-secondary, #475569);
   padding: 6px 12px;
   border-radius: 20px;
   font-size: 12px;
@@ -21716,13 +21751,25 @@ body.theme-light .ps-dict-article-body strong {
 }
 
 .profile-bible-chip:hover {
-  border-color: var(--accent-orange, #f59e0b);
-  color: var(--text-primary);
+  border-color: var(--accent-orange, #ea580c);
+  color: var(--text-primary, #0f172a);
 }
 
 .profile-bible-chip.selected {
-  background: var(--accent-orange, #f59e0b);
-  border-color: var(--accent-orange, #f59e0b);
+  background: var(--accent-orange, #ea580c);
+  border-color: var(--accent-orange, #ea580c);
+  color: #ffffff;
+}
+
+body.theme-dark .profile-bible-chip {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+body.theme-dark .profile-bible-chip.selected {
+  background: #f59e0b;
+  border-color: #f59e0b;
   color: #ffffff;
 }
 

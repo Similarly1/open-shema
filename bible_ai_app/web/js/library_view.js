@@ -193,7 +193,15 @@ const LibraryView = {
         await API.call('toggle_book', book.name, isActive);
         book.active = isActive;
         card.classList.toggle('inactive', !isActive);
-        App.showToast(`« ${book.name} » ${isActive ? 'activé' : 'désactivé'}`);
+        if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast(`« ${book.title || book.name} » ${isActive ? 'activé' : 'désactivé'}`);
+        }
+        if (typeof BibleReader !== 'undefined' && BibleReader.reloadInstalledBibles) {
+          await BibleReader.reloadInstalledBibles();
+          if (typeof BibleReader.renderBibleSelectors === 'function') {
+            BibleReader.renderBibleSelectors();
+          }
+        }
       });
 
       // Edit button

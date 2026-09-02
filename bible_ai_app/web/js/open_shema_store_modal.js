@@ -1706,10 +1706,31 @@ const OpenShemaStore = {
             App.showToast(`« ${cleanTitle} » installé avec succès !`, 'success');
           }
 
-          if (module.type === 'bible' && typeof BibleReader !== 'undefined' && BibleReader.loadInstalledBibles) {
-            BibleReader.loadInstalledBibles();
-          } else if (typeof BibleApp !== 'undefined' && BibleApp.loadInstalledModules) {
-            BibleApp.loadInstalledModules();
+          // Rafraîchir immédiatement l'ensemble des composants de l'application
+          try {
+            if (typeof BibleReader !== 'undefined' && BibleReader.reloadInstalledBibles) {
+              await BibleReader.reloadInstalledBibles();
+              if (typeof BibleReader.renderBibleSelectors === 'function') {
+                BibleReader.renderBibleSelectors();
+              }
+            }
+            if (typeof LibraryView !== 'undefined' && LibraryView.loadBooks) {
+              LibraryView.loadBooks();
+            }
+            if (typeof CommentariesView !== 'undefined' && CommentariesView.loadSources) {
+              CommentariesView.loadSources();
+            }
+            if (typeof DictView !== 'undefined' && DictView.loadDictionaries) {
+              DictView.loadDictionaries();
+            }
+            if (typeof TheologyView !== 'undefined' && TheologyView.loadBooks) {
+              TheologyView.loadBooks();
+            }
+            if (typeof PassageOverviewDrawer !== 'undefined' && PassageOverviewDrawer.load) {
+              PassageOverviewDrawer.load(null, null, null, null, true);
+            }
+          } catch (refreshErr) {
+            console.warn('Avertissement rafraîchissement UI après téléchargement :', refreshErr);
           }
         } else {
           const errMsg = (res && res.error) ? res.error : 'Erreur inconnue lors de l\'installation.';
