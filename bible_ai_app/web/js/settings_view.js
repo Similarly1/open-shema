@@ -13,14 +13,14 @@ const SettingsView = {
   modelsModalSearchQuery: '',
   ALL_MODELS_CATALOG: [
     // Google Gemini 3.x & 2.x & 1.5
-    { id: 'gemini-3.7-flash', name: 'Google Gemini 3.7 Flash', desc: 'Dernière génération — Raisonnement hybride ultra-performant', provider: 'google' },
-    { id: 'gemini-3.6-flash', name: 'Google Gemini 3.6 Flash', desc: 'Génération 3.x stable & rapide', provider: 'google' },
+    { id: 'gemini-3.7-flash', name: 'Google Gemini 3.7 Flash', desc: 'Recommandé — Dernière génération, raisonnement hybride ultra-performant', provider: 'google' },
+    { id: 'gemini-3.5-flash-lite', name: 'Google Gemini 3.5 Flash Lite', desc: 'Recommandé en secours — Ultra-rapide, économique & léger', provider: 'google' },
     { id: 'gemini-3.5-flash', name: 'Google Gemini 3.5 Flash', desc: 'Modèle polyvalent haute vitesse', provider: 'google' },
-    { id: 'gemini-3.5-flash-lite', name: 'Google Gemini 3.5 Flash Lite', desc: 'Économique & très léger', provider: 'google' },
+    { id: 'gemini-3.6-flash', name: 'Google Gemini 3.6 Flash', desc: 'Génération 3.x stable & rapide', provider: 'google' },
     { id: 'gemini-3.1-flash-lite', name: 'Google Gemini 3.1 Flash Lite', desc: 'Cadence élevée et faible latence', provider: 'google' },
     { id: 'gemini-3.1-pro-preview', name: 'Google Gemini 3.1 Pro (Preview)', desc: 'Raisonnement poussé et analyse approfondie', provider: 'google' },
     { id: 'gemini-3-flash-preview', name: 'Google Gemini 3.0 Flash (Preview)', desc: 'Aperçu génération Gemini 3.0', provider: 'google' },
-    { id: 'gemini-2.5-flash', name: 'Google Gemini 2.5 Flash', desc: 'Recommandé — Équilibré & excellent raisonnement', provider: 'google' },
+    { id: 'gemini-2.5-flash', name: 'Google Gemini 2.5 Flash', desc: 'Équilibré & excellent raisonnement', provider: 'google' },
     { id: 'gemini-2.5-pro', name: 'Google Gemini 2.5 Pro', desc: 'Haute précision & profondeur exégétique', provider: 'google' },
     { id: 'gemini-2.5-flash-lite', name: 'Google Gemini 2.5 Flash Lite', desc: 'Ultra-rapide, économique pour titres & tags', provider: 'google' },
     { id: 'gemini-2.0-flash', name: 'Google Gemini 2.0 Flash', desc: 'Génération standard rapide & stable', provider: 'google' },

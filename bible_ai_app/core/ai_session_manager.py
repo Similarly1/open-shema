@@ -146,8 +146,8 @@ class AISessionManager:
         )
         
         try:
-            # Modèle rapide pour la synthèse (Gemini 2.5 Flash par défaut)
-            model_to_use = cfg.get("chat_model") or "gemini-2.5-flash"
+            # Modèle rapide pour la synthèse (Gemini 3.7 Flash par défaut)
+            model_to_use = cfg.get("chat_model") or "gemini-3.7-flash"
             if "mistral" in model_to_use.lower():
                 provider = "mistral"
                 api_key = cfg.get("mistral_api_key", "")
@@ -251,7 +251,7 @@ class AISessionManager:
             from bible_ai_app.ai.llm_client import LLMClient
         
         cfg = config or load_config()
-        model_to_use = cfg.get("title_model") or "gemini-2.5-flash-lite"
+        model_to_use = cfg.get("title_model") or "gemini-3.5-flash-lite"
         
         # Résolution du bon provider
         sm_lower = model_to_use.lower()

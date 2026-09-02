@@ -2327,13 +2327,15 @@
                       <label for="cfg-chat-model">Modèle principal :</label>
                       <select id="cfg-chat-model" class="select-field full-w ai-model-select" data-pair="chat">
                         <optgroup label="── Google Gemini ──">
-                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash (Recommandé)</option>
+                          <option value="gemini-3.7-flash" selected>Google Gemini 3.7 Flash (Recommandé)</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
                           <option value="gemini-2.5-pro">Google Gemini 2.5 Pro (Haute précision)</option>
                           <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
                           <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
                           <option value="gemini-1.5-flash">Google Gemini 1.5 Flash</option>
                           <option value="gemini-1.5-pro">Google Gemini 1.5 Pro</option>
-                          <option value="gemini-1.5-flash-8b">Google Gemini 1.5 Flash 8B</option>
                         </optgroup>
                         <optgroup label="── Mistral AI ──">
                           <option value="mistral-large-latest">Mistral Large (Approfondi)</option>
@@ -2357,12 +2359,14 @@
                       <label for="cfg-chat-fallback-model">Modèle de secours (Fallback) :</label>
                       <select id="cfg-chat-fallback-model" class="select-field full-w ai-model-select" data-pair="chat">
                         <optgroup label="── Google Gemini ──">
+                          <option value="gemini-3.5-flash-lite" selected>Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
                           <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
                           <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
                           <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
                           <option value="gemini-1.5-flash">Google Gemini 1.5 Flash</option>
                           <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
-                          <option value="gemini-1.5-pro">Google Gemini 1.5 Pro</option>
                         </optgroup>
                         <optgroup label="── Mistral AI ──">
                           <option value="mistral-large-latest">Mistral Large</option>
@@ -2399,7 +2403,10 @@
                       <label for="cfg-synthesis-model">Modèle principal :</label>
                       <select id="cfg-synthesis-model" class="select-field full-w ai-model-select" data-pair="synthesis">
                         <optgroup label="── Google Gemini ──">
-                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash (Recommandé)</option>
+                          <option value="gemini-3.7-flash" selected>Google Gemini 3.7 Flash (Recommandé)</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
                           <option value="gemini-2.5-pro">Google Gemini 2.5 Pro (Haute précision)</option>
                           <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
                           <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
@@ -2428,6 +2435,9 @@
                       <label for="cfg-synthesis-fallback-model">Modèle de secours (Fallback) :</label>
                       <select id="cfg-synthesis-fallback-model" class="select-field full-w ai-model-select" data-pair="synthesis">
                         <optgroup label="── Google Gemini ──">
+                          <option value="gemini-3.5-flash-lite" selected>Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
                           <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
                           <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
                           <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
@@ -2479,7 +2489,10 @@
                       <label for="cfg-translation-model">Modèle principal :</label>
                       <select id="cfg-translation-model" class="select-field full-w ai-model-select" data-pair="translation">
                         <optgroup label="── Google Gemini ──">
-                          <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite (Recommandé)</option>
+                          <option value="gemini-3.7-flash" selected>Google Gemini 3.7 Flash (Recommandé)</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
                           <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
                           <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
                           <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
@@ -2508,6 +2521,9 @@
                       <label for="cfg-translation-fallback-model">Modèle de secours (Fallback) :</label>
                       <select id="cfg-translation-fallback-model" class="select-field full-w ai-model-select" data-pair="translation">
                         <optgroup label="── Google Gemini ──">
+                          <option value="gemini-3.5-flash-lite" selected>Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
                           <option value="gemini-1.5-flash">Google Gemini 1.5 Flash</option>
                           <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
                           <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
@@ -2548,7 +2564,10 @@
                       <label for="cfg-summary-model">Modèle principal :</label>
                       <select id="cfg-summary-model" class="select-field full-w ai-model-select" data-pair="summary">
                         <optgroup label="── Google Gemini ──">
-                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash (Recommandé)</option>
+                          <option value="gemini-3.7-flash" selected>Google Gemini 3.7 Flash (Recommandé)</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
                           <option value="gemini-2.5-pro">Google Gemini 2.5 Pro (Haute précision)</option>
                           <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
                           <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
@@ -2576,6 +2595,9 @@
                       <label for="cfg-summary-fallback-model">Modèle de secours (Fallback) :</label>
                       <select id="cfg-summary-fallback-model" class="select-field full-w ai-model-select" data-pair="summary">
                         <optgroup label="── Google Gemini ──">
+                          <option value="gemini-3.5-flash-lite" selected>Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
                           <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
                           <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
                           <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
@@ -2627,7 +2649,10 @@
                       <label for="cfg-title-model">Modèle principal (Titres) :</label>
                       <select id="cfg-title-model" class="select-field full-w ai-model-select" data-pair="title">
                         <optgroup label="── Google Gemini ──">
-                          <option value="gemini-2.0-flash-lite" selected>Google Gemini 2.0 Flash Lite (Ultra-rapide, Recommandé)</option>
+                          <option value="gemini-3.7-flash" selected>Google Gemini 3.7 Flash (Recommandé)</option>
+                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
                           <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
                           <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
                           <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
@@ -2653,7 +2678,10 @@
                       <label for="cfg-title-fallback-model">Modèle de secours (Fallback) :</label>
                       <select id="cfg-title-fallback-model" class="select-field full-w ai-model-select" data-pair="title">
                         <optgroup label="── Google Gemini ──">
-                          <option value="gemini-2.5-flash" selected>Google Gemini 2.5 Flash</option>
+                          <option value="gemini-3.5-flash-lite" selected>Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
+                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
                           <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
                           <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
                           <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
@@ -2685,7 +2713,10 @@
                       <label for="cfg-notes-ai-model">Modèle principal (Notes) :</label>
                       <select id="cfg-notes-ai-model" class="select-field full-w ai-model-select" data-pair="notes">
                         <optgroup label="── Google Gemini ──">
-                          <option value="gemini-2.0-flash-lite" selected>Google Gemini 2.0 Flash Lite (Ultra-rapide, Recommandé)</option>
+                          <option value="gemini-3.7-flash" selected>Google Gemini 3.7 Flash (Recommandé)</option>
+                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
                           <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
                           <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
                           <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
@@ -2711,7 +2742,10 @@
                       <label for="cfg-notes-ai-fallback-model">Modèle de secours (Fallback) :</label>
                       <select id="cfg-notes-ai-fallback-model" class="select-field full-w ai-model-select" data-pair="notes">
                         <optgroup label="── Google Gemini ──">
-                          <option value="gemini-2.5-flash" selected>Google Gemini 2.5 Flash</option>
+                          <option value="gemini-3.5-flash-lite" selected>Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
+                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
                           <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
                           <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
                           <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
@@ -2729,12 +2763,12 @@
                   </div>
                 </div>
 
-                <!-- Bloc 6 : Restructuration Homilétique de Prédication -->
+                <!-- Bloc 7 : Restructuration Homilétique de Prédication -->
                 <div class="ai-model-feature-block">
                   <div class="ai-model-feature-header">
                     <div class="ai-model-feature-title">
                       <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/></svg>
-                      <span>6. Restructuration Homilétique &amp; Canevas de Prédication</span>
+                      <span>7. Restructuration Homilétique &amp; Canevas de Prédication</span>
                     </div>
                     <span class="ai-model-feature-badge">Prédication</span>
                   </div>
@@ -2743,8 +2777,10 @@
                       <label for="cfg-sermon-restructure-model">Modèle principal (Prédication) :</label>
                       <select id="cfg-sermon-restructure-model" class="select-field full-w ai-model-select" data-pair="sermon-restructure">
                         <optgroup label="── Google Gemini ──">
-                          <option value="gemini-2.5-flash" selected>Google Gemini 2.5 Flash (Recommandé, Haute précision)</option>
-                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
+                          <option value="gemini-3.7-flash" selected>Google Gemini 3.7 Flash (Recommandé, Haute précision)</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
                           <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
                           <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
                           <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
@@ -2759,9 +2795,12 @@
                         <optgroup label="── Infomaniak Swiss AI ──">
                           <option value="mistralai/Ministral-3-14B-Instruct-2512">Infomaniak Ministral 14B</option>
                           <option value="mistralai/Mistral-Small-4-119B-2603">Infomaniak Mistral 119B</option>
+                          <option value="Qwen/Qwen3.5-397B-A17B-FP8">Infomaniak Qwen 3.5 397B</option>
                           <option value="Qwen/Qwen3.5-122B-A10B-FP8">Infomaniak Qwen 3.5 122B</option>
                           <option value="swiss-ai/Apertus-v1.5-70B">Infomaniak Apertus 70B</option>
                           <option value="google/gemma-4-31B-it">Infomaniak Gemma 31B</option>
+                          <option value="moonshotai/Kimi-K2.6">Infomaniak Kimi K2.6</option>
+                          <option value="nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8">Infomaniak Nemotron 30B</option>
                         </optgroup>
                       </select>
                     </div>
@@ -2769,19 +2808,30 @@
                       <label for="cfg-sermon-restructure-fallback-model">Modèle de secours (Fallback) :</label>
                       <select id="cfg-sermon-restructure-fallback-model" class="select-field full-w ai-model-select" data-pair="sermon-restructure">
                         <optgroup label="── Google Gemini ──">
-                          <option value="gemini-2.0-flash" selected>Google Gemini 2.0 Flash</option>
+                          <option value="gemini-3.5-flash-lite" selected>Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
                           <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
+                          <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
                           <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
                           <option value="gemini-1.5-flash">Google Gemini 1.5 Flash</option>
                           <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
                         </optgroup>
                         <optgroup label="── Mistral AI ──">
-                          <option value="mistral-small-latest">Mistral Small</option>
                           <option value="mistral-large-latest">Mistral Large</option>
+                          <option value="mistral-small-latest">Mistral Small</option>
                           <option value="open-mistral-nemo">Mistral Nemo</option>
+                          <option value="codestral-latest">Mistral Codestral</option>
                         </optgroup>
                         <optgroup label="── Infomaniak Swiss AI ──">
                           <option value="mistralai/Ministral-3-14B-Instruct-2512">Infomaniak Ministral 14B</option>
+                          <option value="mistralai/Mistral-Small-4-119B-2603">Infomaniak Mistral 119B</option>
+                          <option value="Qwen/Qwen3.5-397B-A17B-FP8">Infomaniak Qwen 3.5 397B</option>
+                          <option value="Qwen/Qwen3.5-122B-A10B-FP8">Infomaniak Qwen 3.5 122B</option>
+                          <option value="swiss-ai/Apertus-v1.5-70B">Infomaniak Apertus 70B</option>
+                          <option value="google/gemma-4-31B-it">Infomaniak Gemma 31B</option>
+                          <option value="moonshotai/Kimi-K2.6">Infomaniak Kimi K2.6</option>
+                          <option value="nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8">Infomaniak Nemotron 30B</option>
                         </optgroup>
                       </select>
                     </div>
