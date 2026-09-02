@@ -160,8 +160,21 @@ Contrairement aux logiciels opaques, **tous les prompts système sont visibles, 
 
 #### ⚙️ RAG Hybride & Reranking Sémantique Local
 * Vos documents sont indexés localement. Lors d'une requête, un modèle **Cross-Encoder BGE-M3** s'exécute **en local sur votre CPU** pour réordonner les fragments documentaires les plus pertinents avant filtrage par un LLM curateur. Résultat : zéro bruit, fidélité totale aux textes sources.
-* **4 Modes d'Étude Préréglés** : *Exégèse approfondie*, *Contexte historique*, *Préparation de prédication*, *Analyse morphologique/lexicale*.
-* **Profils Théologiques Configurables** : Calibrez l'orientation d'étude (*Neutre / Universitaire*, *Réformé / Évangélique*, *Catholique*, etc.).
+* **4 Modes d'Étude Préréglés** : *Exégèse approfondie*, *Contexte historique & culturel*, *Préparation de prédication & homilétique*, *Analyse morphologique/lexicale*.
+
+#### 🧭 Profil Théologique & « Passeport Herméneutique » Sur-Mesure
+Open Shema intègre un questionnaire d'alignement guidé en **4 étapes** permettant de calibrer l'assistant au plus près de votre réalité ecclésiale et ministérielle :
+1. **Ministère & Cadre d'utilisation** : Adaptez la pédagogie de l'IA selon votre mission (*Prédication pastorale & homilétique*, *Enseignement & Groupes de maison*, *Étude personnelle & piété*, *Recherche académique & exégèse critique*).
+2. **Préférences Textuelles & Langues Originales** : Choisissez vos versions de référence et définissez le niveau technique souhaité en grec et en hébreu (*Débutant*, *Intermédiaire avec Strong*, ou *Avancé avec syntaxe critique et Septante*).
+3. **Posture & Ton de l'Assistant** :
+   - *🎙️ Pastoral & Sparring-Partner (Recommandé)* : Chaleureux et encourageant, mais teste la rigueur de vos arguments, pointe les contre-arguments et anticipe les objections contemporaines.
+   - *❤️ Pastoral & Équilibré* : Centré sur l'édification de la foi, la grâce et la transformation du cœur.
+   - *🏛️ Académique & Scientifique* : Ton neutre, factuel et rigoureusement historique.
+   - *💡 Pédagogique & Didactique* : Clair, structuré et progressif, idéal pour transmettre à d'autres.
+4. **Mon Église, Pays & Confession de foi** :
+   - Précisez votre zone géographique et culturelle (*France, Suisse romande, Belgique, Québec, Afrique de l'Ouest/Centrale, Antilles, etc.*).
+   - Sélectionnez votre tradition théologique (*Évangélique / Réformée, Baptiste, CAEF / Libre, Presbytérienne, Pentecôtiste, Luthérienne...*).
+   - **Confession de foi personnalisée** : Vous pouvez copier-coller directement la déclaration de foi de votre église locale ou les confessions historiques de votre choix (*Westminster, La Rochelle, Londres 1689, CNEF...*) afin que l'assistant comprenne et respecte pleinement votre ancrage doctrinal.
 
 ---
 
