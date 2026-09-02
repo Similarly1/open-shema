@@ -15,6 +15,7 @@
   <img src="https://img.shields.io/badge/RAG-Local%20BGE--M3%20Reranker-success" alt="BGE-M3 RAG">
   <img src="https://img.shields.io/badge/IA%20Souveraine-Gemini%20%7C%20Mistral%20%7C%20Infomaniak-orange" alt="IA Providers">
   <img src="https://img.shields.io/badge/Vie%20Privée-100%25%20Local%20%26%20Markdown-brightgreen" alt="100% Local Markdown">
+  <a href="https://github.com/Similarly1/open-shema-data"><img src="https://img.shields.io/badge/Ressources-open--shema--data-purple.svg" alt="Ressources open-shema-data"></a>
 </p>
 
 ---
@@ -27,14 +28,18 @@ Pour de nombreux pasteurs, enseignants, théologiens et étudiants de la Bible, 
 
 > **Open Shema est né d'une volonté simple : briser ces silos et libérer votre bibliothèque théologique.**
 
-L'objectif d'Open Shema est d'**exploiter au maximum tous vos ouvrages et ressources** (Word/DOCX avec balisage Logos, livres EPUB, PDF, bases SQLite, modules libres), grâce à :
+L'objectif d'Open Shema est d'**exploiter au maximum tous vos ouvrages et ressources** (Word/DOCX avec balisage biblique, livres EPUB, PDF, bases SQLite, modules libres), grâce à :
 - Une **reconnaissance universelle et instantanée des références scripturaires** dans n'importe quel texte.
 - Une **détection et structuration automatique** des chapitres, sections, péricopes et titres de parties.
 - Un **moteur RAG (Retrieval-Augmented Generation) ultra-affiné** avec reranking sémantique local (**Cross-Encoder BGE-M3** sur CPU) pour éliminer le bruit et garantir l'absence d'hallucination.
 - Le **choix délibéré et transparent du LLM** parmi trois fournisseurs d'excellence (Gemini, Mistral, Infomaniak) avec **prompts système 100% visibles, modifiables et débridables**.
 - Des **données 100% locales en Markdown clair (`.md`)** : tout ce que vous créez (notes, prédications, surlignages) reste interopérable et immédiatement exploitable par vos propres **IA agentiques locales** ou logiciels favoris (Obsidian, VS Code).
 
-Son nom s'inspire du grand commandement biblique du *Shema Israël* (Deutéronome 6:4 — שְׁמַع יִשְׂרָאֵל) : écouter, lire, analyser et méditer les Écritures avec profondeur et clarté.
+> 📦 **Ressources, Bibles, Dictionnaires et Commentaires** :  
+> Open Shema sépare rigoureusement le moteur applicatif des corpus de textes. Pour explorer, télécharger et installer les modules de ressources libres, consultez le dépôt dédié :  
+> 👉 **[https://github.com/Similarly1/open-shema-data](https://github.com/Similarly1/open-shema-data)**
+
+Son nom s'inspire du grand commandement biblique du *Shema Israël* (Deutéronome 6:4 — שְׁמַע יִשְׂרָאֵל) : écouter, lire, analyser et méditer les Écritures avec profondeur et clarté.
 
 ---
 
@@ -49,11 +54,11 @@ Son nom s'inspire du grand commandement biblique du *Shema Israël* (Deutéronom
    - [📖 6. Espace Théologie & Flux d'Articles](#-6-espace-théologie--flux-darticles)
    - [🎨 7. Ressources Visuelles & BibleProject](#-7-ressources-visuelles--bibleproject)
    - [🧠 8. Assistant IA Exégétique & RAG Haute Précision](#-8-assistant-ia-exégétique--rag-haute-précision)
-2. [🗃️ Formats Ouverts, Interopérabilité & Écosystème Agentique](#️-formats-ouverts-interopérabilité--écosystème-agentique)
-3. [🛠️ Architecture & Confidentialité](#️-architecture--confidentialité)
-4. [🚀 Démarrage Rapide](#-démarrage-rapide)
-5. [⚙️ Configuration de l'IA](#️-configuration-de-lia)
-6. [🙏 Remerciements & Bibliothèque Libre](#-remerciements--bibliothèque-libre)
+2. [📦 Accès aux Ressources & Modules (`open-shema-data`)](#-accès-aux-ressources--modules-open-shema-data)
+3. [🗃️ Formats Ouverts, Interopérabilité & Écosystème Agentique](#️-formats-ouverts-interopérabilité--écosystème-agentique)
+4. [🛠️ Architecture & Confidentialité](#️-architecture--confidentialité)
+5. [🚀 Démarrage Rapide](#-démarrage-rapide)
+6. [⚙️ Configuration de l'IA](#️-configuration-de-lia)
 7. [📜 Licence](#-licence)
 
 ---
@@ -62,33 +67,31 @@ Son nom s'inspire du grand commandement biblique du *Shema Israël* (Deutéronom
 
 ### 📖 1. Lecteur Biblique, Langues Originales & Synopse
 
-* **Multi-Versions & Affichage Parallèle** : Comparez côte à côte vos traductions préférées (LSG 1910, Segond 21, BDS, Darby, Chouraqui, TOB, Martin 1744, Ostervald, Parole Vivante, Sagesse Vivante, Louange Vivante, etc.).
+* **Multi-Versions & Affichage Parallèle** : Comparez côte à côte plusieurs traductions contemporaines et historiques en lecture synchronisée.
 * **Textes Sources Originaux** :
-  * Hébreu & Araméen massorétiques (BHS / WLC).
-  * Grec du Nouveau Testament (SBLGNT / MorphGNT) et Septante (LXX).
+  * Textes massorétiques hébreux et araméens avec vocalisation et cantillation.
+  * Textes grecs du Nouveau Testament et version grecque de la Septante (LXX).
 * **Interlinéaire Inversé Complet** :
-  * Analyse mot à mot interactive : racine, lemme, code Strong, translittération française et analyse morphosyntaxique intégrale (temps, voix, mode, cas, genre, nombre).
+  * Analyse mot à mot interactive : racine, lemme, code Strong, translittération phonétique et analyse morphosyntaxique intégrale (temps, voix, mode, cas, genre, nombre).
 * **Comparaison Synoptique Avancée** :
-  * Affichage synoptique automatique (notamment pour les Évangiles) verset par verset avec calcul de similarité lexicale et surlignage des variantes de formulation.
+  * Affichage synoptique automatique verset par verset avec calcul de similarité lexicale et surlignage des variantes de formulation.
 * **Surlignage Multicolore & Marqueurs** : Balisez vos textes selon vos propres thématiques avec mémorisation instantanée.
 
 ---
 
 ### 📚 2. Dictionnaires Historiques & Lexiques Originaux
 
-Open Shema intègre directement les plus grands trésors de la lexicographie biblique :
-* **Lexique Strong Hébreu & Grec** : Définitions enrichies, concordances des occurrences et liens croisés.
-* **Dictionnaire Grec-Français Bailly** : Référence universitaire incontournable pour le vocabulaire grec classique et biblique.
-* **Dictionnaire Historique et Critique de Dom Augustin Calmet (1728)** : Numérisation et remise en page du chef-d'œuvre de l'érudition biblique ancienne.
-* **Dictionnaire de la Bible F. Vigouroux** : Notices encyclopédiques restaurées avec rétablissement minutieux des accents et des références.
-* **Recherche Lexicale Transversale** : Retrouvez instantanément toutes les occurrences d'une racine ou d'un lemme à travers l'Ancien et le Nouveau Testament.
+* **Lexiques Originaux Hébreu & Grec** : Définitions enrichies, lemmes, racines et concordances d'occurrences.
+* **Dictionnaires Historiques & Érudition Ancienne** : Exploration de grands dictionnaires bibliques, historiques et critiques numérisés.
+* **Recherche Lexicale Transversale** : Retrouvez instantanément toutes les occurrences d'une racine ou d'un lemme à travers l'ensemble des Écritures.
+* **Consultation Instantanée** au survol d'un mot ou via un volet latéral contextuel.
 
 ---
 
 ### 💬 3. Bibliothèque de Commentaires & Multi-Fenêtrage
 
-* **Grands Commentateurs Classiques & Contemporains** :
-  * *Jean Calvin*, *Matthew Henry*, *Frédéric Godet (Bible Annotée)*, *Adam Clarke*, *C.I. Scofield*, *The Gospel Coalition (TGC)*, *Arno C. Gaebelein*, *F.B. Meyer*, etc.
+* **Corpus Exégétique et Homilétique** :
+  * Navigation structurée à travers des commentaires historiques, pastoraux et contemporains verset par verset.
 * **Multi-Fenêtrage Synchronisé en Direct** :
   * Détachez la fenêtre de commentaires sur un second écran : elle suit automatiquement et en temps réel le chapitre et le verset sélectionnés sur votre fenêtre principale.
 * **Synthèses Comparatives IA (Sans Hallucination)** :
@@ -124,11 +127,11 @@ Open Shema intègre directement les plus grands trésors de la lexicographie bib
 * **Lecteur d'Ouvrages Théologiques (EPUB / PDF)** :
   * Lisez vos livres, monographies et traités de théologie directement dans Open Shema.
 * **Détection Intelligente & Clics Scripturaires** :
-  * Toute référence biblique présente dans un livre (ex: *Romains 8.28*, *Éphésiens 2:8-10*) est automatiquement reconnue et cliquable pour l'ouvrir dans le lecteur.
+  * Toute référence biblique présente dans un livre est automatiquement reconnue et cliquable pour l'ouvrir instantanément dans le lecteur biblique.
 * **Résumés Théologiques par Chapitre** :
   * Génération automatique de la thèse de l'auteur, des arguments doctrinaux clés et du réseau de versets d'ancrage.
 * **Hub d'Articles & Veille Théologique** :
-  * Agrégateur intégré d'articles chrétiens de fond (*Évangile 21 / TGC France*, *ToutPourSaGloire / TPSG*, *Le Bon Combat*, etc.) avec lecture hors-ligne et recherche plein texte.
+  * Agrégateur intégré d'articles de fond avec lecture hors-ligne et recherche plein texte.
 
 ---
 
@@ -162,6 +165,19 @@ Contrairement aux logiciels opaques, **tous les prompts système sont visibles, 
 
 ---
 
+## 📦 Accès aux Ressources & Modules (`open-shema-data`)
+
+L'application **Open Shema** est un moteur applicatif indépendant. L'ensemble des modules de ressources (Bibles en langues originales et modernes, dictionnaires historiques, commentaires exégétiques et jeux de données documentaires) sont hébergés et maintenus sur le dépôt :
+
+👉 **[https://github.com/Similarly1/open-shema-data](https://github.com/Similarly1/open-shema-data)**
+
+Vous y trouverez :
+- Les paquets de Bibles, dictionnaires et commentaires prêts à l'emploi.
+- Les instructions pour ajouter vos propres modules ou synchroniser de nouveaux corpus.
+- Les crédits détaillés, attributions et licences des sources textuelles du domaine public.
+
+---
+
 ## 🗃️ Formats Ouverts, Interopérabilité & Écosystème Agentique
 
 Open Shema a été pensé pour que **l'utilisateur ne soit jamais prisonnier de son outil** :
@@ -173,11 +189,11 @@ Open Shema a été pensé pour que **l'utilisateur ne soit jamais prisonnier de 
 * **Interopérabilité Totale** :
   * Ouvrez, éditez et synchronisez instantanément vos notes et sermons avec **Obsidian**, **VS Code**, **Logseq**, **Typora** ou n'importe quel éditeur de votre choix.
 * **Importateur Universel Multi-Formats** :
-  * **Documents Word (`.docx`)** : Reconnaissance et conversion des styles et balisages bibliques issus de logiciels comme Logos.
+  * **Documents Word (`.docx`)** : Reconnaissance et conversion des styles et balisages bibliques.
   * **Livres numériques (`.epub`, `.pdf`)** : Découpage intelligent par chapitres, extraction des métadonnées et détection automatique des références bibliques.
-  * **Modules libres & Bases de données** : Prise en charge des formats SQLite, JSON et XML Logos.
+  * **Bases de données & Modules libres** : Prise en charge des formats SQLite, JSON et XML.
 * **Open Shema Store Intégré** :
-  * Téléchargez en 1 clic des dizaines de traductions, commentaires historiques et dictionnaires du domaine public nettoyés et vérifiés.
+  * Téléchargez en 1 clic les modules disponibles directement depuis l'application via le catalogue connecté.
 
 ---
 
@@ -245,17 +261,6 @@ Au premier lancement (ou via le panneau **Paramètres ⚙️**), renseignez simp
 | **Infomaniak AI** | `mixtral`, `llama` | 🇨🇭 Hébergement suisse souverain, respect absolu de la vie privée, éthique |
 | **Mistral AI** | `mistral-large-latest`, `mistral-small-latest` | 🇫🇷 Modèles européens de pointe, excellente compréhension théologique |
 | **Google Gemini** | `gemini-2.5-flash`, `gemini-1.5-pro` | ⚡ Vitesse remarquable, fenêtres de contexte massives |
-
----
-
-## 🙏 Remerciements & Bibliothèque Libre
-
-Ce projet repose sur le travail remarquable de pionniers du numérique biblique francophone et du domaine public :
-- **Didier Fontaine / [Areopage.net](https://areopage.net/Logos5FreeModulesLibrary.html)** pour l'immense bibliothèque de modules libres (dictionnaires historiques, traductions et commentaires de référence).
-- **[Bible Parser](https://www.bibleparser.net)** pour le travail fondamental de numérisation, lemmatisation et parsing des textes hébreux et grecs.
-- L'ensemble des enseignants, pasteurs et linguistes engagés pour la diffusion libre des textes et des outils d'étude biblique.
-
-Consultez [CREDITS.md](CREDITS.md) pour la liste exhaustive des attributions et sources textuelles.
 
 ---
 
