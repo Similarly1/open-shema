@@ -30070,6 +30070,8 @@ body:not(.theme-dark) .illustrations-layout,
 body:not(.theme-dark) .illustrations-main-content,
 body:not(.theme-dark) .sermon-editor-single-layout,
 body:not(.theme-dark) .sermons-editor-workspace,
+body:not(.theme-dark) .sermon-blocks-scroll-pane,
+body:not(.theme-dark) .sermon-blocks-container,
 body:not(.theme-dark) #view-sermons,
 body:not(.theme-dark) #view-sermon-editor,
 body:not(.theme-dark) #view-illustrations {
@@ -30081,6 +30083,8 @@ body:not(.theme-dark) .sermons-hub-header,
 body:not(.theme-dark) .illustrations-header,
 body:not(.theme-dark) .sermon-single-header,
 body:not(.theme-dark) .sermon-outline-panel,
+body:not(.theme-dark) .sermon-outline-header,
+body:not(.theme-dark) .sermon-outline-footer,
 body:not(.theme-dark) .sermons-resources-drawer,
 body:not(.theme-dark) .sermons-status-bar {
   background-color: var(--bg-card, #ffffff) !important;
@@ -30095,7 +30099,9 @@ body:not(.theme-dark) .sermon-single-title-input {
 }
 
 body:not(.theme-dark) .sermons-hub-subtitle,
-body:not(.theme-dark) .illustrations-subtitle {
+body:not(.theme-dark) .illustrations-subtitle,
+body:not(.theme-dark) .outline-title,
+body:not(.theme-dark) .subfilter-label {
   color: var(--text-secondary, #475569) !important;
 }
 
@@ -30106,6 +30112,29 @@ body:not(.theme-dark) .sermon-drawer-input {
   background: var(--bg-card, #ffffff) !important;
   border-color: var(--border-color, #cbd5e1) !important;
   color: var(--text-primary, #0f172a) !important;
+}
+
+/* Boutons de listes déroulantes (Genre, Statut, Tri) dans Banque d'illustrations */
+body:not(.theme-dark) .ill-filter-select,
+body:not(.theme-dark) .ill-sort-select {
+  background: var(--bg-card, #ffffff) !important;
+  border: 1px solid var(--border-color, #cbd5e1) !important;
+  color: var(--text-primary, #0f172a) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 8px center !important;
+}
+
+body:not(.theme-dark) .ill-filter-select:hover,
+body:not(.theme-dark) .ill-sort-select:hover {
+  background-color: var(--bg-subtle, #f1f5f9) !important;
+  border-color: var(--accent-primary, #3b82f6) !important;
+}
+
+body:not(.theme-dark) .ill-filter-select option,
+body:not(.theme-dark) .ill-sort-select option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
 }
 
 body:not(.theme-dark) .sermon-hub-pill,
@@ -30150,6 +30179,7 @@ body:not(.theme-dark) .section-card-title-input {
   color: var(--text-primary, #0f172a) !important;
 }
 
+body:not(.theme-dark) .section-card-header,
 body:not(.theme-dark) .sermon-section-header {
   background: var(--bg-subtle, #f8fafc) !important;
   border-bottom: 1px solid var(--border-color, #e2e8f0) !important;
@@ -30178,6 +30208,32 @@ body:not(.theme-dark) .btn-add-section-pill {
 }
 
 body:not(.theme-dark) .btn-add-section-pill:hover {
+  background: rgba(37, 99, 235, 0.08) !important;
+  color: var(--accent-primary, #2563eb) !important;
+  border-color: var(--accent-primary, #2563eb) !important;
+}
+
+body:not(.theme-dark) .sermon-outline-item {
+  color: var(--text-secondary, #475569) !important;
+}
+
+body:not(.theme-dark) .sermon-outline-item:hover {
+  background: var(--bg-subtle, #f1f5f9) !important;
+  color: var(--text-primary, #0f172a) !important;
+}
+
+body:not(.theme-dark) .sermon-outline-item.active {
+  background: rgba(37, 99, 235, 0.08) !important;
+  color: var(--accent-primary, #2563eb) !important;
+}
+
+body:not(.theme-dark) .btn-outline-add-section {
+  background: var(--bg-card, #ffffff) !important;
+  border: 1px dashed var(--border-color, #cbd5e1) !important;
+  color: var(--text-secondary, #475569) !important;
+}
+
+body:not(.theme-dark) .btn-outline-add-section:hover {
   background: rgba(37, 99, 235, 0.08) !important;
   color: var(--accent-primary, #2563eb) !important;
   border-color: var(--accent-primary, #2563eb) !important;
