@@ -422,60 +422,79 @@ class WindowMixin:
         """
         Ouvre ou ramène au premier plan la fenêtre de commentaires déportée.
         Cible automatiquement le second écran si présent, sinon ouvre une fenêtre companion à droite.
+        Garantit strictement qu'une seule instance de fenêtre est créée (anti-doublon matériel).
         """
-        global _COMMENTARY_WINDOW, _COMMENTARY_IS_MAXIMIZED, _COMMENTARY_RESTORE_BOUNDS, _COMMENTARY_TARGET_BOUNDS, _LAST_ACTIVE_PASSAGE
+        global _COMMENTARY_WINDOW, _COMMENTARY_IS_MAXIMIZED, _COMMENTARY_RESTORE_BOUNDS, _COMMENTARY_TARGET_BOUNDS, _LAST_ACTIVE_PASSAGE, _IS_CREATING_COMM_WINDOW
         
-        if _COMMENTARY_WINDOW is not None:
-            try:
-                _COMMENTARY_WINDOW.restore()
-                _COMMENTARY_WINDOW.show()
-                return {"success": True, "already_open": True}
-            except Exception as e:
-                logger.warning(f"Erreur réactivation fenêtre commentaire: {e}")
-                _COMMENTARY_WINDOW = None
-
-        monitors = get_monitors_layout()
-        second_monitor = None
-        for m in monitors:
-            if not m.get("is_primary"):
-                second_monitor = m
-                break
-
-        on_second_screen = False
-        if second_monitor:
-            wx = second_monitor["x"]
-            wy = second_monitor["y"]
-            ww = second_monitor["width"]
-            wh = second_monitor["height"]
-            on_second_screen = True
-            _COMMENTARY_IS_MAXIMIZED = True
-            _COMMENTARY_RESTORE_BOUNDS = (wx + 40, wy + 40, ww - 80, wh - 80)
-        else:
-            main_wx, main_wy, main_ww, main_wh = get_work_area()
-            ww = min(1480, max(1180, int(main_ww * 0.88)))
-            wh = min(980, max(800, int(main_wh * 0.90)))
-            wx = main_wx + max(0, (main_ww - ww) // 2)
-            wy = main_wy + max(0, (main_wh - wh) // 2)
-            on_second_screen = False
-            _COMMENTARY_IS_MAXIMIZED = False
-            _COMMENTARY_RESTORE_BOUNDS = (wx, wy, ww, wh)
-
-        _COMMENTARY_TARGET_BOUNDS = (wx, wy, ww, wh)
-        _LAST_ACTIVE_PASSAGE = (book_code, int(chapter), int(verse))
-        html_path = os.path.join(current_dir, "web", "commentary_window.html")
-        url_with_params = f"{html_path}?book={book_code}&chapter={chapter}&verse={verse}"
-        
-        def on_comm_closed():
-            global _COMMENTARY_WINDOW, _GLOBAL_WINDOW
-            _COMMENTARY_WINDOW = None
-            logger.info("Fenêtre de commentaires détachée fermée.")
-            if _GLOBAL_WINDOW:
+        with _COMM_LOCK:
+            if _COMMENTARY_WINDOW is not None:
                 try:
-                    _GLOBAL_WINDOW.evaluate_js("window.MultiwindowSync && window.MultiwindowSync.handleSecondaryWindowClosed()")
-                except Exception as _silent_e:
-                    logger.debug("Erreur ignoree : %s", _silent_e)
+                    _COMMENTARY_WINDOW.restore()
+                    _COMMENTARY_WINDOW.show()
+                    return {"success": True, "already_open": True}
+                except Exception as e:
+                    logger.warning(f"Erreur réactivation fenêtre commentaire: {e}")
+                    _COMMENTARY_WINDOW = None
+
+            if _IS_CREATING_COMM_WINDOW:
+                return {"success": True, "in_progress": True}
+            
+            _IS_CREATING_COMM_WINDOW = True
 
         try:
+            monitors = get_monitors_layout()
+            second_monitor = None
+            for m in monitors:
+                if not m.get("is_primary"):
+                    second_monitor = m
+                    break
+
+            on_second_screen = False
+            if second_monitor:
+                wx = second_monitor["x"]
+                wy = second_monitor["y"]
+                ww = second_monitor["width"]
+                wh = second_monitor["height"]
+                on_second_screen = True
+                _COMMENTARY_IS_MAXIMIZED = True
+                _COMMENTARY_RESTORE_BOUNDS = (wx + 40, wy + 40, ww - 80, wh - 80)
+            else:
+                main_wx, main_wy, main_ww, main_wh = get_work_area()
+                ww = min(1480, max(1180, int(main_ww * 0.88)))
+                wh = min(980, max(800, int(main_wh * 0.90)))
+                wx = main_wx + max(0, (main_ww - ww) // 2)
+                wy = main_wy + max(0, (main_wh - wh) // 2)
+                on_second_screen = False
+                _COMMENTARY_IS_MAXIMIZED = False
+                _COMMENTARY_RESTORE_BOUNDS = (wx, wy, ww, wh)
+
+            _COMMENTARY_TARGET_BOUNDS = (wx, wy, ww, wh)
+            _LAST_ACTIVE_PASSAGE = (book_code, int(chapter), int(verse))
+            html_path = os.path.join(current_dir, "web", "commentary_window.html")
+            url_with_params = f"{html_path}?book={book_code}&chapter={chapter}&verse={verse}"
+            
+            # Détection du thème pour la couleur de fond native initiale
+            bg_color = "#0F172A"
+            try:
+                cfg = getattr(self, 'config', {}) or {}
+                theme = cfg.get('theme', 'dark')
+                reading_bg = cfg.get('reading_bg', 'auto')
+                if theme == 'light' or reading_bg in ('white', 'sepia'):
+                    bg_color = "#F8FAFC"
+            except Exception as _e:
+                pass
+
+            def on_comm_closed():
+                global _COMMENTARY_WINDOW, _GLOBAL_WINDOW, _IS_CREATING_COMM_WINDOW
+                _COMMENTARY_WINDOW = None
+                _IS_CREATING_COMM_WINDOW = False
+                logger.info("Fenêtre de commentaires détachée fermée.")
+                if _GLOBAL_WINDOW:
+                    try:
+                        _GLOBAL_WINDOW.evaluate_js("window.MultiwindowSync && window.MultiwindowSync.handleSecondaryWindowClosed()")
+                    except Exception as _silent_e:
+                        logger.debug("Erreur ignoree : %s", _silent_e)
+
             _COMMENTARY_WINDOW = webview.create_window(
                 title="Open Shema — Commentaires Exégétiques",
                 url=url_with_params,
@@ -487,7 +506,7 @@ class WindowMixin:
                 min_size=(860, 560),
                 frameless=True,
                 easy_drag=False,
-                background_color="#0F172A"
+                background_color=bg_color
             )
             _COMMENTARY_WINDOW.events.shown += on_commentary_shown
             _COMMENTARY_WINDOW.events.closed += on_comm_closed
@@ -500,6 +519,8 @@ class WindowMixin:
         except Exception as e:
             logger.error(f"Erreur création fenêtre de commentaires: {e}")
             return {"success": False, "error": str(e)}
+        finally:
+            _IS_CREATING_COMM_WINDOW = False
 
     def close_commentary_window(self) -> Dict[str, Any]:
         """Ferme la fenêtre de commentaires détachée."""
