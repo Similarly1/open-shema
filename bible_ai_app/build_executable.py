@@ -75,60 +75,49 @@ def build():
         ]:
             os.makedirs(dest_data_dir, exist_ok=True)
 
+            # Fichiers permanents du socle d'étude (Cartes, Textes originaux, Lexiques, Outils linguistiques)
             essential_files = [
-                "biblical_places.db",
-                "illustrations_processed_cache.json",
-                "library.json",
-                "catalog.json",
-                "bibles_registry.json",
-                "gospel_parallels.json",
-                "french_accent_map.json",
+                "biblical_places.db",                # Cartes géospatiales
+                "original_languages.db",             # Textes originaux complets (Hébreu AT + Grec NT avec morpho & Strong)
+                "strong_lexicon.json",               # Lexique James Strong Hébreu & Grec
+                "bailly_lexicon.json",               # Dictionnaire Grec-Français Anatole Bailly
+                "illustrations_processed_cache.json", # Index rapide des illustrations
+                "catalog.json",                      # Catalogue officiel Open Shema Store & First Run Wizard
+                "bibles_registry.json",              # Métadonnées canoniques
+                "gospel_parallels.json",             # Harmonie des évangiles
+                "french_accent_map.json",            # Traitement linguistique
                 "french_words.json",
-                "strong_lexicon.json",
-                "bailly_lexicon.json",
-                "calmet_dict.json",
-                "vigouroux_dict.json",
-                "ccel_theology_books.json",
-                "gutenberg_theology_books.json",
-                "logos_community_books.json",
-                "config.example.json",
-                "config.json",
-                "user_profile.json"
+                "config.example.json"
             ]
             for fname in essential_files:
                 src_f = os.path.join(src_data_dir, fname)
                 if os.path.exists(src_f):
                     shutil.copy2(src_f, os.path.join(dest_data_dir, fname))
 
-            # 1. Bibles officielles du pack gratuit Open Shema Data uniquement
-            dest_bibles = os.path.join(dest_data_dir, "bibles")
-            os.makedirs(dest_bibles, exist_ok=True)
-            pack_bibles = ["LSG", "DARBY", "OST", "STAPFER", "GIG", "NCL"]
-            src_bibles = os.path.join(src_data_dir, "bibles")
-            for b_name in pack_bibles:
-                s_dir = os.path.join(src_bibles, b_name)
-                d_dir = os.path.join(dest_bibles, b_name)
-                if os.path.exists(s_dir):
-                    if os.path.exists(d_dir):
-                        shutil.rmtree(d_dir)
-                    shutil.copytree(s_dir, d_dir)
+            # Configuration vierge avec first_run=True (copie de config.example.json vers config.json)
+            src_cfg_ex = os.path.join(src_data_dir, "config.example.json")
+            dest_cfg = os.path.join(dest_data_dir, "config.json")
+            if os.path.exists(src_cfg_ex):
+                shutil.copy2(src_cfg_ex, dest_cfg)
 
-            # 2. Commentaires du pack officiel (Calvin)
-            dest_comm = os.path.join(dest_data_dir, "commentaires")
-            os.makedirs(dest_comm, exist_ok=True)
-            for calvin_f in ["comm_calvin.sqlite", "comm_comm_calvin.sqlite"]:
-                src_c = os.path.join(src_data_dir, "commentaires", calvin_f)
-                if os.path.exists(src_c):
-                    shutil.copy2(src_c, os.path.join(dest_comm, "comm_calvin.sqlite"))
+            # Bibliothèque initiale 100% vide (aucun ouvrage pré-embarqué)
+            with open(os.path.join(dest_data_dir, "library.json"), "w", encoding="utf-8") as lf:
+                lf.write("{}\n")
 
-            # 3. Autres sous-dossiers du pack
-            for sub in ["covers", "dictionaries", "theology"]:
-                src_sub = os.path.join(src_data_dir, sub)
-                if os.path.exists(src_sub):
-                    dest_sub = os.path.join(dest_data_dir, sub)
-                    if os.path.exists(dest_sub):
-                        shutil.rmtree(dest_sub)
-                    shutil.copytree(src_sub, dest_sub)
+            # Dossier permanent des illustrations (4 275 récits & anecdotes pastorales)
+            src_illus = os.path.join(src_data_dir, "illustrations")
+            dest_illus = os.path.join(dest_data_dir, "illustrations")
+            if os.path.exists(src_illus):
+                if os.path.exists(dest_illus):
+                    shutil.rmtree(dest_illus)
+                shutil.copytree(src_illus, dest_illus)
+
+            # Création des dossiers de travail vierges (0 ouvrage ou document personnel pré-installé)
+            for empty_sub in ["bibles", "commentaires", "theology", "dictionaries", "sermons", "notes", "conversations", "covers"]:
+                dest_sub = os.path.join(dest_data_dir, empty_sub)
+                if os.path.exists(dest_sub):
+                    shutil.rmtree(dest_sub)
+                os.makedirs(dest_sub, exist_ok=True)
 
         print("\n[SUCCÈS] Build généré avec succès dans 'dist/OpenShema/' !")
         print("Pour tester : dist\\OpenShema\\OpenShema.exe\n")

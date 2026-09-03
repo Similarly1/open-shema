@@ -424,23 +424,34 @@ class SettingsMixin:
         """Vérifie si l'application est au premier lancement."""
         cfg = load_secrets_into_config(load_config())
         first_run_flag = cfg.get("first_run")
+
+        # Si l'onboarding a déjà été validé par l'utilisateur
         if first_run_flag is False:
             return {"is_first_run": False, "config": cfg}
 
-        # Vérifier si au moins une Bible est présente
-        bibles_dir = os.path.join(current_dir, "data", "bibles")
-        has_bibles = False
-        if os.path.isdir(bibles_dir):
-            for entry in os.listdir(bibles_dir):
-                full_p = os.path.join(bibles_dir, entry)
-                if os.path.isdir(full_p) or entry.endswith((".sqlite", ".db", ".json")):
-                    has_bibles = True
-                    break
-
-        if not has_bibles:
+        # Si first_run est explicitement True
+        if first_run_flag is True:
             return {"is_first_run": True, "config": cfg}
 
-        return {"is_first_run": bool(first_run_flag is not False), "config": cfg}
+        # Sinon (clé absente d'une ancienne version), vérifier la présence physique de Bibles
+        bundle_root = getattr(sys, "_MEIPASS", None) or os.path.dirname(sys.executable)
+        candidates = [
+            os.path.join(current_dir, "data", "bibles"),
+            os.path.join(bundle_root, "data", "bibles"),
+            os.path.join(bundle_root, "_internal", "data", "bibles")
+        ]
+        has_bibles = False
+        for bdir in candidates:
+            if os.path.isdir(bdir):
+                for entry in os.listdir(bdir):
+                    full_p = os.path.join(bdir, entry)
+                    if os.path.isdir(full_p) or entry.endswith((".sqlite", ".db", ".json")):
+                        has_bibles = True
+                        break
+            if has_bibles:
+                break
+
+        return {"is_first_run": not has_bibles, "config": cfg}
 
     def download_onboarding_modules(self, modules: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Télécharge et installe les modules sélectionnés lors du premier lancement depuis open-shema-data."""

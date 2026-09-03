@@ -133,15 +133,15 @@ const FirstRunWizard = {
               <div class="frw-title">Composez votre bibliothèque d'étude</div>
               <div class="frw-subtitle">Sélectionnez les textes bibliques et ressources initiales à installer depuis le catalogue libre Open Shema.</div>
 
-              <div class="frw-grid-2">
+              <div class="frw-grid-3">
                 <div class="frw-card selected" id="frw-opt-essential" onclick="FirstRunWizard.selectLibraryMode('essential')">
                   <div class="frw-card-header">
                     <div class="frw-card-icon">${this.svg.book}</div>
                     <div class="frw-card-radio"></div>
                   </div>
-                  <div class="frw-card-title">Pack Essentiel (Recommandé)</div>
-                  <div class="frw-card-desc">Bible Louis Segond 1910 avec numérotation Strong complète (Hébreu & Grec). Prêt en 5 secondes.</div>
-                  <div class="frw-card-tag frw-tag-amber">Taille : ~20 Mo</div>
+                  <div class="frw-card-title">Pack Essentiel</div>
+                  <div class="frw-card-desc">Bible Louis Segond 1910 avec Strongs (Hébreu & Grec). Prêt en 5 secondes.</div>
+                  <div class="frw-card-tag frw-tag-amber">~20 Mo</div>
                 </div>
 
                 <div class="frw-card" id="frw-opt-custom" onclick="FirstRunWizard.selectLibraryMode('custom')">
@@ -149,9 +149,19 @@ const FirstRunWizard = {
                     <div class="frw-card-icon">${this.svg.layers}</div>
                     <div class="frw-card-radio"></div>
                   </div>
-                  <div class="frw-card-title">Sélection Sur-Mesure</div>
-                  <div class="frw-card-desc">Choisissez précisément chaque version biblique, commentaire et dictionnaire à télécharger.</div>
-                  <div class="frw-card-tag frw-tag-blue">Personnalisé</div>
+                  <div class="frw-card-title">Sur-Mesure</div>
+                  <div class="frw-card-desc">Choisissez précisément chaque version, commentaire et dictionnaire à télécharger.</div>
+                  <div class="frw-card-tag frw-tag-blue">Catalogue</div>
+                </div>
+
+                <div class="frw-card" id="frw-opt-empty" onclick="FirstRunWizard.selectLibraryMode('empty')">
+                  <div class="frw-card-header">
+                    <div class="frw-card-icon">${this.svg.sparkle}</div>
+                    <div class="frw-card-radio"></div>
+                  </div>
+                  <div class="frw-card-title">Démarrer Vierge</div>
+                  <div class="frw-card-desc">Aucun téléchargement initial. Vous importerez vos propres fichiers ou explorerez le Store.</div>
+                  <div class="frw-card-tag frw-tag-gray">0 Mo</div>
                 </div>
               </div>
 
@@ -348,6 +358,7 @@ const FirstRunWizard = {
     this.libraryMode = mode;
     document.getElementById('frw-opt-essential')?.classList.toggle('selected', mode === 'essential');
     document.getElementById('frw-opt-custom')?.classList.toggle('selected', mode === 'custom');
+    document.getElementById('frw-opt-empty')?.classList.toggle('selected', mode === 'empty');
     
     const browser = document.getElementById('frw-custom-browser');
     if (browser) {
@@ -507,44 +518,57 @@ const FirstRunWizard = {
     // Déterminer la liste des modules à installer
     let modulesToInstall = [];
     
-    // Si catalogue distant chargé
-    if (this.catalogData && this.catalogData.modules) {
-      if (this.libraryMode === 'essential') {
+    if (this.libraryMode === 'essential') {
+      if (this.catalogData && this.catalogData.modules) {
         const lsgMod = this.catalogData.modules.find(m => m.id === 'bible-lsg-1910') || this.catalogData.modules[0];
         if (lsgMod) modulesToInstall.push(lsgMod);
-      } else {
+      }
+      // Fallback de sécurité si le catalogue n'a pas pu être chargé
+      if (modulesToInstall.length === 0) {
+        modulesToInstall.push({
+          id: 'bible-lsg-1910',
+          type: 'bible',
+          abbreviation: 'LSG',
+          title: 'Louis Segond 1910 (avec Strongs)',
+          download_url: 'https://raw.githubusercontent.com/Similarly1/open-shema-data/main/data/bibles/bible_lsg1910.sqlite'
+        });
+      }
+    } else if (this.libraryMode === 'custom') {
+      if (this.catalogData && this.catalogData.modules) {
         this.selectedModules.forEach(id => {
           const mod = this.catalogData.modules.find(m => m.id === id);
           if (mod) modulesToInstall.push(mod);
         });
       }
+    } else if (this.libraryMode === 'empty') {
+      // Démarrer Vierge : aucun module à télécharger
+      modulesToInstall = [];
     }
 
-    // Fallback de sécurité avec les bonnes URLs du repo
     if (modulesToInstall.length === 0) {
-      modulesToInstall.push({
-        id: 'bible-lsg-1910',
-        type: 'bible',
-        abbreviation: 'LSG',
-        title: 'Louis Segond 1910 (avec Strongs)',
-        download_url: 'https://raw.githubusercontent.com/Similarly1/open-shema-data/main/data/bibles/bible_lsg1910.sqlite'
-      });
+      if (statusEl) statusEl.textContent = "Finalisation de la configuration...";
+      if (fillEl) {
+        fillEl.style.backgroundColor = "";
+        fillEl.style.width = "40%";
+      }
+      if (percentEl) percentEl.textContent = "40%";
+      if (detailEl) detailEl.textContent = "Initialisation des préférences...";
+    } else {
+      if (statusEl) statusEl.textContent = "Préparation des ressources...";
+      if (fillEl) {
+        fillEl.style.backgroundColor = "";
+        fillEl.style.width = "10%";
+      }
+      if (percentEl) percentEl.textContent = "10%";
+      if (detailEl) detailEl.textContent = "Téléchargement des modules sélectionnés...";
     }
-
-    if (statusEl) statusEl.textContent = "Préparation des ressources...";
-    if (fillEl) {
-      fillEl.style.backgroundColor = "";
-      fillEl.style.width = "10%";
-    }
-    if (percentEl) percentEl.textContent = "10%";
-    if (detailEl) detailEl.textContent = "Vérification des modules locaux...";
     
     const nextBtn = document.getElementById('frw-btn-next');
     if (nextBtn) nextBtn.style.display = 'none';
 
     // Suivi de progression dynamique en temps réel via TaskManager (toutes les 100ms)
     let progressTimer = null;
-    if (window.pywebview && window.pywebview.api && window.pywebview.api.get_background_tasks) {
+    if (modulesToInstall.length > 0 && window.pywebview && window.pywebview.api && window.pywebview.api.get_background_tasks) {
       progressTimer = setInterval(async () => {
         try {
           const tasks = await window.pywebview.api.get_background_tasks();
@@ -562,7 +586,7 @@ const FirstRunWizard = {
     }
 
     try {
-      if (window.pywebview && window.pywebview.api && window.pywebview.api.download_onboarding_modules) {
+      if (modulesToInstall.length > 0 && window.pywebview && window.pywebview.api && window.pywebview.api.download_onboarding_modules) {
         const dlRes = await window.pywebview.api.download_onboarding_modules(modulesToInstall);
         if (dlRes && !dlRes.success) {
           throw new Error(dlRes.error || "Erreur inconnue lors de l'installation");
