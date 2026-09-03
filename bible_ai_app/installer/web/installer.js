@@ -8,8 +8,8 @@ const Installer = {
   systemInfo: null,
   releaseData: null,
   installedExePath: null,
-  installedDir: null,
-  progressInterval: null,
+  pollTimeout: null,
+  isPollingActive: false,
 
   init() {
     this.bindWindowControls();
@@ -84,9 +84,10 @@ const Installer = {
 
     // Bouton Annuler
     document.getElementById('btn-cancel-install')?.addEventListener('click', async () => {
-      if (this.progressInterval) {
-        clearInterval(this.progressInterval);
-        this.progressInterval = null;
+      this.isPollingActive = false;
+      if (this.pollTimeout) {
+        clearTimeout(this.pollTimeout);
+        this.pollTimeout = null;
       }
       if (window.pywebview?.api?.cancel_installation) {
         await window.pywebview.api.cancel_installation();
@@ -229,13 +230,14 @@ const Installer = {
     // Réinitialisation de la jauge
     document.getElementById('progress-bar-fill').style.width = '0%';
     document.getElementById('lbl-progress-percent').textContent = '0%';
-    document.getElementById('lbl-progress-status').textContent = 'Démarrage...';
-    document.getElementById('lbl-downloaded-size').textContent = '0 Mo';
+    document.getElementById('lbl-progress-status').textContent = 'Démarrage de l\'installation...';
+    document.getElementById('lbl-downloaded-size').textContent = '';
     document.getElementById('lbl-download-speed').textContent = '';
 
-    if (this.progressInterval) {
-      clearInterval(this.progressInterval);
-      this.progressInterval = null;
+    this.isPollingActive = false;
+    if (this.pollTimeout) {
+      clearTimeout(this.pollTimeout);
+      this.pollTimeout = null;
     }
 
     try {
@@ -252,31 +254,41 @@ const Installer = {
           return;
         }
 
-        // Polling régulier de l'état de progression (100% robuste, zéro blocage)
-        this.progressInterval = setInterval(async () => {
-          try {
-            if (!window.pywebview?.api?.get_install_progress) return;
-            const p = await window.pywebview.api.get_install_progress();
-            if (!p) return;
-
-            this.onProgress(p);
-
-            if (p.is_complete) {
-              clearInterval(this.progressInterval);
-              this.progressInterval = null;
-              this.onComplete(p);
-            } else if (p.error) {
-              clearInterval(this.progressInterval);
-              this.progressInterval = null;
-              this.onError(p.error);
-            }
-          } catch (pollErr) {
-            console.warn("Erreur polling progression :", pollErr);
-          }
-        }, 120);
+        // Démarrage du polling non-bloquant
+        this.isPollingActive = true;
+        this.pollProgressLoop();
       }
     } catch (err) {
       this.onError(String(err));
+    }
+  },
+
+  async pollProgressLoop() {
+    if (!this.isPollingActive) return;
+
+    try {
+      if (window.pywebview?.api?.get_install_progress) {
+        const p = await window.pywebview.api.get_install_progress();
+        if (p) {
+          this.onProgress(p);
+
+          if (p.is_complete) {
+            this.isPollingActive = false;
+            this.onComplete(p);
+            return;
+          } else if (p.error) {
+            this.isPollingActive = false;
+            this.onError(p.error);
+            return;
+          }
+        }
+      }
+    } catch (pollErr) {
+      console.warn("Erreur polling progression :", pollErr);
+    }
+
+    if (this.isPollingActive) {
+      this.pollTimeout = setTimeout(() => this.pollProgressLoop(), 180);
     }
   },
 

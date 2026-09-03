@@ -269,12 +269,14 @@ class InstallerAPI:
     def _run_installation(self, target_dir, create_desktop, create_start_menu, download_url):
         try:
             os.makedirs(target_dir, exist_ok=True)
-            temp_zip = os.path.join(target_dir, "_download_temp.zip")
+            local_pkg = self._find_local_package()
+            zip_to_extract = None
 
-            download_success = False
+            # 1. TENTATIVE DE TÉLÉCHARGEMENT GITHUB (uniquement si une release en ligne réelle est disponible)
+            has_real_remote = bool(download_url) and not ("releases/download/v1.0.0" in download_url and local_pkg)
 
-            # 1. TENTATIVE DE TÉLÉCHARGEMENT GITHUB
-            if download_url and not download_url.endswith("non_existant.zip"):
+            if has_real_remote:
+                temp_zip = os.path.join(target_dir, "_download_temp.zip")
                 self._update_progress(5, "Connexion au serveur GitHub...")
                 try:
                     ctx = ssl.create_default_context()
@@ -282,14 +284,14 @@ class InstallerAPI:
                     ctx.verify_mode = ssl.CERT_NONE
                     req = urllib.request.Request(download_url, headers={"User-Agent": "OpenShemaInstaller/1.0"})
 
-                    with urllib.request.urlopen(req, timeout=15, context=ctx) as response:
+                    with urllib.request.urlopen(req, timeout=5, context=ctx) as response:
                         total_size = int(response.headers.get("content-length", 0))
                         downloaded = 0
                         start_time = time.time()
                         last_update_time = start_time
 
                         with open(temp_zip, "wb") as out_file:
-                            chunk_size = 64 * 1024
+                            chunk_size = 128 * 1024
                             while True:
                                 if self.is_cancelled:
                                     try: os.remove(temp_zip)
@@ -303,46 +305,44 @@ class InstallerAPI:
                                 downloaded += len(chunk)
 
                                 now = time.time()
-                                if now - last_update_time > 0.12 or downloaded == total_size:
+                                if now - last_update_time > 0.1 or downloaded == total_size:
                                     duration = now - start_time
                                     speed = downloaded / duration if duration > 0 else 0
-                                    percent = (downloaded / total_size * 70) if total_size > 0 else 35
+                                    percent = (downloaded / total_size * 60) if total_size > 0 else 30
                                     self._update_progress(
-                                        percent=min(70, percent),
+                                        percent=min(60, percent),
                                         status="Téléchargement des fichiers d'Open Shema...",
                                         downloaded_bytes=downloaded,
                                         total_bytes=total_size,
                                         speed_bytes_sec=speed
                                     )
                                     last_update_time = now
+                                    time.sleep(0.001)
 
-                    download_success = True
+                    zip_to_extract = temp_zip
                 except Exception as dl_err:
-                    logger.info(f"Téléchargement distant non disponible ({dl_err}), bascule sur le package local...")
+                    logger.info(f"Téléchargement non disponible ({dl_err}), bascule sur le package local...")
 
-            # 2. FALLBACK PACKAGE LOCAL SI LE REPO GITHUB N'A PAS ENCORE D'ASSET EN LIGNE
-            if not download_success:
-                local_pkg = self._find_local_package()
+            # 2. UTILISATION DU PACKAGE LOCAL
+            if not zip_to_extract:
                 if local_pkg:
                     if os.path.isdir(local_pkg):
-                        self._update_progress(15, "Déploiement depuis le package local...")
+                        self._update_progress(10, "Déploiement depuis les fichiers locaux...")
                         self._copy_tree_with_progress(local_pkg, target_dir)
-                        temp_zip = None
                     elif os.path.isfile(local_pkg) and local_pkg.endswith(".zip"):
-                        self._update_progress(20, "Préparation de l'archive...")
-                        shutil.copy(local_pkg, temp_zip)
-                        download_success = True
+                        # Extraction DIRECTE depuis le zip local (sans copie temporaire inutile de 317 Mo)
+                        zip_to_extract = local_pkg
                 else:
-                    err_msg = "La release n'est pas encore publiée sur GitHub et aucune archive locale n'a été trouvée dans le dossier."
+                    err_msg = "Aucun package d'installation trouvé (release GitHub ou archive locale introuvable)."
                     self.progress_state["error"] = err_msg
                     self.is_installing = False
                     return
 
-            # 3. EXTRACTION DE L'ARCHIVE ZIP
-            if temp_zip and os.path.exists(temp_zip):
-                self._update_progress(70, "Extraction des composants d'Open Shema...")
+            # 3. EXTRACTION DU ZIP AVEC FLUIDITÉ MAXIMALE
+            if zip_to_extract and os.path.exists(zip_to_extract):
+                self._update_progress(15, "Extraction des composants d'Open Shema...")
                 try:
-                    with zipfile.ZipFile(temp_zip, 'r') as zf:
+                    with zipfile.ZipFile(zip_to_extract, 'r') as zf:
                         infolist = zf.infolist()
                         total_bytes = sum(info.file_size for info in infolist)
                         extracted_bytes = 0
@@ -353,8 +353,9 @@ class InstallerAPI:
 
                         for info in infolist:
                             if self.is_cancelled:
-                                try: os.remove(temp_zip)
-                                except OSError: pass
+                                if "_download_temp.zip" in zip_to_extract:
+                                    try: os.remove(zip_to_extract)
+                                    except OSError: pass
                                 return
                             
                             target_name = info.filename
@@ -369,29 +370,29 @@ class InstallerAPI:
                             else:
                                 os.makedirs(os.path.dirname(out_path), exist_ok=True)
                                 with zf.open(info) as src, open(out_path, "wb") as dst:
-                                    shutil.copyfileobj(src, dst)
+                                    shutil.copyfileobj(src, dst, length=128*1024)
 
                             extracted_bytes += info.file_size
                             now = time.time()
-                            if (now - last_update > 0.1) or (extracted_bytes == total_bytes):
+                            if (now - last_update > 0.08) or (extracted_bytes == total_bytes):
                                 elapsed = now - start_time
                                 speed = extracted_bytes / elapsed if elapsed > 0 else 0
-                                percent = 70 + ((extracted_bytes / total_bytes) * 23) if total_bytes > 0 else 70
+                                percent = 15 + ((extracted_bytes / total_bytes) * 78) if total_bytes > 0 else 50
                                 self._update_progress(
-                                    percent=percent,
-                                    status=f"Extraction : {os.path.basename(info.filename)}",
+                                    percent=min(93, percent),
+                                    status=f"Extraction : {os.path.basename(info.filename) or 'fichiers...'}",
                                     downloaded_bytes=extracted_bytes,
                                     total_bytes=total_bytes,
                                     speed_bytes_sec=speed
                                 )
                                 last_update = now
+                                time.sleep(0.001)  # Cède le CPU au thread UI pour que l'animation tourne sans freeze
 
-                    try:
-                        os.remove(temp_zip)
-                    except OSError:
-                        pass
+                    if "_download_temp.zip" in zip_to_extract:
+                        try: os.remove(zip_to_extract)
+                        except OSError: pass
                 except Exception as zip_err:
-                    self.progress_state["error"] = f"Erreur décompression : {zip_err}"
+                    self.progress_state["error"] = f"Erreur extraction : {zip_err}"
                     self.is_installing = False
                     return
 
@@ -486,6 +487,7 @@ class InstallerAPI:
                     speed_bytes_sec=speed
                 )
                 last_update = now
+                time.sleep(0.001)
 
     def _create_windows_shortcut(self, target_path, shortcut_path, icon_path="", description="Open Shema"):
         """Crée un raccourci Windows avec WScript.Shell (win32com ou PowerShell)."""
