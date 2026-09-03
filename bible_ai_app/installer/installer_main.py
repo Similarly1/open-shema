@@ -55,7 +55,7 @@ def main():
         text_select=False,
         background_color='#F8FAFC'
     )
-    api.set_window(window)
+    api._set_window(window)
 
     def handle_exception(exc_type, exc_value, exc_traceback):
         import logging

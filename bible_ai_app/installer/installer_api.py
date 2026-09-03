@@ -43,13 +43,13 @@ def format_bytes(num_bytes: float) -> str:
 
 class InstallerAPI:
     def __init__(self):
-        self.window = None
-        self.is_cancelled = False
-        self.is_installing = False
-        self.download_thread = None
+        self._window = None
+        self._is_cancelled = False
+        self._is_installing = False
+        self._download_thread = None
         
         # État de progression exposé au frontend (polling 100% thread-safe)
-        self.progress_state = {
+        self._progress_state = {
             "percent": 0,
             "status": "Initialisation...",
             "downloaded_str": "",
@@ -61,19 +61,19 @@ class InstallerAPI:
             "exe_path": ""
         }
 
-    def set_window(self, window):
-        self.window = window
+    def _set_window(self, window):
+        self._window = window
 
     # --- CONTRÔLES DE LA FENÊTRE PYWEBVIEW ---
     def minimize_window(self):
-        if self.window:
-            self.window.minimize()
+        if self._window:
+            self._window.minimize()
 
     def close_window(self):
-        if self.is_installing:
-            self.is_cancelled = True
-        if self.window:
-            self.window.destroy()
+        if self._is_installing:
+            self._is_cancelled = True
+        if self._window:
+            self._window.destroy()
 
     # --- INFORMATIONS SYSTÈME & DOSSIER D'INSTALLATION ---
     def get_system_info(self):
@@ -105,8 +105,8 @@ class InstallerAPI:
         # 1. Via PyWebView create_file_dialog si disponible
         try:
             import webview
-            if self.window:
-                res = self.window.create_file_dialog(webview.FOLDER_DIALOG, directory=current_path or None)
+            if self._window:
+                res = self._window.create_file_dialog(webview.FOLDER_DIALOG, directory=current_path or None)
                 if res and len(res) > 0:
                     selected = res[0]
                     if not selected.lower().endswith("openshema"):
@@ -144,7 +144,7 @@ class InstallerAPI:
 
     def get_install_progress(self):
         """Méthode de polling appelée par le frontend pour suivre la progression sans blocage."""
-        return self.progress_state
+        return self._progress_state
 
     # --- GITHUB RELEASES API & DÉTECTION DU PACKAGE ---
     def check_latest_release(self, repo="Similarly1/open-shema"):
@@ -261,14 +261,14 @@ class InstallerAPI:
     def start_installation(self, target_dir: str, create_desktop_shortcut: bool, create_start_menu_shortcut: bool, download_url: str):
         """Lance l'installation dans un thread d'arrière-plan avec progression continue."""
         logger.info(f"start_installation appelée: target={target_dir}, desktop={create_desktop_shortcut}, menu={create_start_menu_shortcut}, url={download_url}")
-        if self.is_installing:
-            logger.warning("start_installation refusée : is_installing est déjà True")
+        if self._is_installing:
+            logger.warning("start_installation refusée : _is_installing est déjà True")
             return {"success": False, "error": "Une installation est déjà en cours."}
 
-        self.is_installing = True
-        self.is_cancelled = False
+        self._is_installing = True
+        self._is_cancelled = False
 
-        self.progress_state = {
+        self._progress_state = {
             "percent": 5,
             "status": "Démarrage de l'installation...",
             "downloaded_str": "",
@@ -280,20 +280,20 @@ class InstallerAPI:
             "exe_path": os.path.join(target_dir, "OpenShema.exe")
         }
 
-        self.download_thread = threading.Thread(
+        self._download_thread = threading.Thread(
             target=self._run_installation,
             args=(target_dir, create_desktop_shortcut, create_start_menu_shortcut, download_url),
             daemon=True
         )
-        self.download_thread.start()
+        self._download_thread.start()
         logger.info("download_thread démarré avec succès")
         return {"success": True}
 
     def cancel_installation(self):
         logger.info("cancel_installation demandée par l'utilisateur")
-        self.is_cancelled = True
-        self.is_installing = False
-        self.progress_state["error"] = "Installation annulée par l'utilisateur."
+        self._is_cancelled = True
+        self._is_installing = False
+        self._progress_state["error"] = "Installation annulée par l'utilisateur."
         return {"success": True}
 
     def _run_installation(self, target_dir, create_desktop, create_start_menu, download_url):
@@ -325,7 +325,7 @@ class InstallerAPI:
                         with open(temp_zip, "wb") as out_file:
                             chunk_size = 128 * 1024
                             while True:
-                                if self.is_cancelled:
+                                if self._is_cancelled:
                                     try: os.remove(temp_zip)
                                     except OSError: pass
                                     return
@@ -369,8 +369,8 @@ class InstallerAPI:
                 else:
                     err_msg = "Aucun package d'installation trouvé (OpenShema.zip ou dossier dist/ introuvable)."
                     logger.error(err_msg)
-                    self.progress_state["error"] = err_msg
-                    self.is_installing = False
+                    self._progress_state["error"] = err_msg
+                    self._is_installing = False
                     return
 
             # 3. EXTRACTION DU ZIP AVEC FLUIDITÉ MAXIMALE (SI ARCHIVE ZIP)
@@ -387,7 +387,7 @@ class InstallerAPI:
                         has_nested_root = all(n.filename.startswith("OpenShema/") or n.filename.startswith("OpenShema\\") for n in infolist if n.filename != "OpenShema/")
 
                         for info in infolist:
-                            if self.is_cancelled:
+                            if self._is_cancelled:
                                 if "_download_temp.zip" in zip_to_extract:
                                     try: os.remove(zip_to_extract)
                                     except OSError: pass
@@ -428,8 +428,8 @@ class InstallerAPI:
                         except OSError: pass
                 except Exception as zip_err:
                     logger.error(f"Erreur extraction zip: {zip_err}", exc_info=True)
-                    self.progress_state["error"] = f"Erreur extraction : {zip_err}"
-                    self.is_installing = False
+                    self._progress_state["error"] = f"Erreur extraction : {zip_err}"
+                    self._is_installing = False
                     return
 
             # 4. CRÉATION DES RACCOURCIS WINDOWS
@@ -469,15 +469,15 @@ class InstallerAPI:
 
             # 5. FINALISATION
             self._update_progress(100, "Installation terminée avec succès !")
-            self.progress_state["is_complete"] = True
-            self.progress_state["target_dir"] = target_dir
-            self.progress_state["exe_path"] = exe_path
+            self._progress_state["is_complete"] = True
+            self._progress_state["target_dir"] = target_dir
+            self._progress_state["exe_path"] = exe_path
 
         except Exception as global_err:
             logger.error(f"Erreur globale installation: {global_err}", exc_info=True)
-            self.progress_state["error"] = str(global_err)
+            self._progress_state["error"] = str(global_err)
         finally:
-            self.is_installing = False
+            self._is_installing = False
 
     def _robocopy_with_progress(self, src_dir, dst_dir):
         """Copie un dossier existant vers la destination avec robocopy natif (zéro gel du GIL, 10x plus rapide)."""
@@ -494,7 +494,7 @@ class InstallerAPI:
             proc = subprocess.Popen(cmd, creationflags=0x08000000) # CREATE_NO_WINDOW
 
             while proc.poll() is None:
-                if self.is_cancelled:
+                if self._is_cancelled:
                     proc.terminate()
                     return
                 
@@ -572,14 +572,14 @@ class InstallerAPI:
         return None
 
     def _update_progress(self, percent, status, downloaded_bytes=0, total_bytes=0, speed_bytes_sec=0):
-        self.progress_state["percent"] = round(percent, 1)
-        self.progress_state["status"] = status
+        self._progress_state["percent"] = round(percent, 1)
+        self._progress_state["status"] = status
         if downloaded_bytes:
-            self.progress_state["downloaded_str"] = format_bytes(downloaded_bytes)
+            self._progress_state["downloaded_str"] = format_bytes(downloaded_bytes)
         if total_bytes:
-            self.progress_state["total_str"] = format_bytes(total_bytes)
+            self._progress_state["total_str"] = format_bytes(total_bytes)
         if speed_bytes_sec:
-            self.progress_state["speed_str"] = f"{format_bytes(speed_bytes_sec)}/s"
+            self._progress_state["speed_str"] = f"{format_bytes(speed_bytes_sec)}/s"
 
     def launch_app(self, target_dir):
         """Lance OpenShema.exe et ferme l'installeur."""
@@ -592,6 +592,6 @@ class InstallerAPI:
             except Exception as e:
                 logger.error(f"Erreur lancement Open Shema: {e}")
         
-        if self.window:
-            self.window.destroy()
+        if self._window:
+            self._window.destroy()
         sys.exit(0)
