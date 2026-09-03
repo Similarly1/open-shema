@@ -155,11 +155,41 @@ def get_monitors_layout():
     return monitors
 
 
+def _apply_window_icon(hwnd):
+    """Applique l'icône officielle Open Shema au HWND Windows (barre des tâches et titre)."""
+    if not hwnd or not user32:
+        return
+    try:
+        candidate_paths = [
+            os.path.join(current_dir, "assets", "icon.ico"),
+            os.path.join(os.path.dirname(sys.executable), "assets", "icon.ico"),
+            os.path.join(getattr(sys, "_MEIPASS", ""), "assets", "icon.ico")
+        ]
+        icon_path = next((p for p in candidate_paths if p and os.path.exists(p)), None)
+        if icon_path:
+            WM_SETICON = 0x0080
+            ICON_SMALL = 0
+            ICON_BIG = 1
+            IMAGE_ICON = 1
+            LR_LOADFROMFILE = 0x00000010
+            LR_DEFAULTSIZE = 0x00000040
+
+            hicon_big = user32.LoadImageW(0, icon_path, IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE)
+            hicon_small = user32.LoadImageW(0, icon_path, IMAGE_ICON, 16, 16, LR_LOADFROMFILE)
+            if hicon_big:
+                user32.SendMessageW(hwnd, WM_SETICON, ICON_BIG, hicon_big)
+            if hicon_small:
+                user32.SendMessageW(hwnd, WM_SETICON, ICON_SMALL, hicon_small)
+    except Exception as icon_err:
+        logger.debug(f"Avertissement application icône native: {icon_err}")
+
+
 def on_window_shown(*args, **kwargs):
     global _GLOBAL_WINDOW, _IS_MAXIMIZED
     try:
         if _GLOBAL_WINDOW and hasattr(_GLOBAL_WINDOW, 'native') and _GLOBAL_WINDOW.native:
             hwnd = _GLOBAL_WINDOW.native.Handle.ToInt32()
+            _apply_window_icon(hwnd)
             wx, wy, ww, wh = get_work_area()
             if user32:
                 user32.SetWindowPos(hwnd, 0, wx, wy, ww, wh, 0x0040)
@@ -186,6 +216,7 @@ def on_commentary_shown(*args, **kwargs):
     try:
         if _COMMENTARY_WINDOW and hasattr(_COMMENTARY_WINDOW, 'native') and _COMMENTARY_WINDOW.native:
             hwnd = _COMMENTARY_WINDOW.native.Handle.ToInt32()
+            _apply_window_icon(hwnd)
             
             # Activer les poignées de redimensionnement natives sur les 4 bords et 4 coins
             GWL_STYLE = -16

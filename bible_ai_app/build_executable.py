@@ -39,8 +39,10 @@ def build():
         "--onedir",
         "--clean",
         "--noconfirm",
-        # Inclure les assets web statiques
+        # Inclure les assets web statiques et graphiques
         "--add-data=web;web",
+        "--add-data=assets;assets",
+        f"--icon={os.path.join('assets', 'icon.ico')}",
         # Imports cachés critiques pour uvicorn / fastapi / pywebview
         "--hidden-import=uvicorn.logging",
         "--hidden-import=uvicorn.loops",

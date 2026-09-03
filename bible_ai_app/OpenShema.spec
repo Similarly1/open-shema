@@ -5,7 +5,7 @@ a = Analysis(
     ['webview_app.py'],
     pathex=[],
     binaries=[],
-    datas=[('web', 'web')],
+    datas=[('web', 'web'), ('assets', 'assets')],
     hiddenimports=['uvicorn.logging', 'uvicorn.loops', 'uvicorn.loops.auto', 'uvicorn.protocols', 'uvicorn.protocols.http', 'uvicorn.protocols.http.auto', 'uvicorn.protocols.websockets', 'uvicorn.protocols.websockets.auto', 'uvicorn.lifespans', 'uvicorn.lifespans.on', 'uvicorn.lifespans.off', 'engineio.async_drivers.threading', 'sqlite3', 'webview'],
     hookspath=[],
     hooksconfig={},
@@ -32,6 +32,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon=['assets/icon.ico'],
 )
 coll = COLLECT(
     exe,

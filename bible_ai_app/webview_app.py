@@ -11,6 +11,13 @@ import threading
 import logging
 import requests
 
+# Définir l'AppUserModelID explicite pour que la barre des tâches Windows affiche l'icône officielle
+try:
+    import ctypes
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("Similarly.OpenShema.BibleApp.v1")
+except Exception:
+    pass
+
 logger = logging.getLogger("webview_app")
 
 try:
