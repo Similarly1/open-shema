@@ -168,7 +168,7 @@ class InstallerAPI:
         ctx.check_hostname = False
         ctx.verify_mode = ssl.CERT_NONE
 
-        url = f"https://api.github.com/repos/{repo}/releases/latest"
+        url = f"https://api.github.com/repos/{repo}/releases"
         headers = {
             "User-Agent": "OpenShemaInstaller/1.0",
             "Accept": "application/vnd.github.v3+json"
@@ -176,8 +176,9 @@ class InstallerAPI:
 
         try:
             req = urllib.request.Request(url, headers=headers)
-            with urllib.request.urlopen(req, timeout=2.0, context=ctx) as resp:
-                data = json.load(resp)
+            with urllib.request.urlopen(req, timeout=3.0, context=ctx) as resp:
+                data_list = json.load(resp)
+                data = data_list[0] if (isinstance(data_list, list) and len(data_list) > 0) else data_list
                 parsed = self._parse_release_data(data)
                 parsed["has_local_build"] = has_local
                 parsed["local_archive_path"] = local_pkg if has_local else None

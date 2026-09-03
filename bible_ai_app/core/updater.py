@@ -90,7 +90,7 @@ def check_for_updates(repo: str = GITHUB_REPO, timeout: int = 6) -> Dict[str, An
     """
     _set_update_state(status="checking", error=None)
 
-    url = f"https://api.github.com/repos/{repo}/releases/latest"
+    url = f"https://api.github.com/repos/{repo}/releases"
     req = urllib.request.Request(
         url,
         headers={
@@ -105,8 +105,19 @@ def check_for_updates(repo: str = GITHUB_REPO, timeout: int = 6) -> Dict[str, An
 
     try:
         with urllib.request.urlopen(req, timeout=timeout, context=ctx) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
+            releases = json.loads(resp.read().decode("utf-8"))
 
+        if not releases or not isinstance(releases, list):
+            _set_update_state(status="idle", error=None)
+            return {
+                "success": True,
+                "update_available": False,
+                "current_version": APP_VERSION,
+                "latest_version": APP_VERSION,
+                "message": "Vous disposez de la dernière version."
+            }
+
+        data = releases[0]
         tag_name = data.get("tag_name", "").strip()
         release_name = data.get("name") or tag_name
         release_notes = data.get("body", "")
