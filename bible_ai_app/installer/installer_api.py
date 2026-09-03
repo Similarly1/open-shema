@@ -157,9 +157,9 @@ class InstallerAPI:
             "is_fallback": True,
             "has_local_build": has_local,
             "local_archive_path": local_pkg if has_local else None,
-            "tag": "v1.0.0",
-            "name": "Open Shema v1.0.0 (Release Officielle)",
-            "download_url": f"https://github.com/{repo}/releases/download/v1.0.0/OpenShema-Windows-x64.zip",
+            "tag": "v0.1.0",
+            "name": "Open Shema v0.1.0 (Bêta)",
+            "download_url": f"https://github.com/{repo}/releases/download/v0.1.0/OpenShema-Windows-x64.zip",
             "size_str": "~317 Mo",
             "notes": "Version complète d'Open Shema incluant le moteur biblique et les modules."
         }
@@ -188,7 +188,7 @@ class InstallerAPI:
         return default_release
 
     def _parse_release_data(self, data):
-        tag = data.get("tag_name", "v1.0.0")
+        tag = data.get("tag_name", "v0.1.0")
         name = data.get("name") or f"Open Shema {tag}"
         notes = data.get("body", "Dernière version officielle d'Open Shema.")
         
@@ -305,7 +305,7 @@ class InstallerAPI:
             zip_to_extract = None
 
             # 1. TENTATIVE DE TÉLÉCHARGEMENT GITHUB (uniquement si une release en ligne réelle est disponible)
-            has_real_remote = bool(download_url) and not ("releases/download/v1.0.0" in download_url) and not local_pkg
+            has_real_remote = bool(download_url) and not ("releases/download/v0.1.0" in download_url) and not local_pkg
 
             if has_real_remote:
                 temp_zip = os.path.join(target_dir, "_download_temp.zip")

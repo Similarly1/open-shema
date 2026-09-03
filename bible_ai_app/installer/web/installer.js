@@ -192,11 +192,11 @@ const Installer = {
       }
 
       if (!this.releaseData) {
-        this.releaseData = { tag: "v1.0.0", name: "Open Shema v1.0.0", download_url: "" };
+        this.releaseData = { tag: "v0.1.0", name: "Open Shema v0.1.0 (Bêta)", download_url: "" };
         const tagEl = document.getElementById('lbl-release-tag');
-        if (tagEl) tagEl.textContent = "v1.0.0 • Prêt pour l'installation";
+        if (tagEl) tagEl.textContent = "v0.1.0 • Bêta prête pour l'installation";
         const nameEl = document.getElementById('lbl-release-name');
-        if (nameEl) nameEl.textContent = "Open Shema v1.0.0 (~317 Mo)";
+        if (nameEl) nameEl.textContent = "Open Shema v0.1.0 (Bêta • ~317 Mo)";
       }
 
       this.updateStartButtonState();

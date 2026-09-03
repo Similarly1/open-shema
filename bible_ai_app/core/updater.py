@@ -21,7 +21,7 @@ from typing import Dict, Any, Optional, Tuple
 
 logger = logging.getLogger("open_shema_updater")
 
-APP_VERSION = "1.0.0"
+APP_VERSION = "0.1.0"
 GITHUB_REPO = "Similarly1/open-shema"
 
 # État global thread-safe
