@@ -467,6 +467,8 @@ class SettingsMixin:
         installed_items = []
 
         try:
+            bundle_root = getattr(sys, "_MEIPASS", None) or os.path.dirname(sys.executable)
+
             for idx, mod in enumerate(modules):
                 mod_id = mod.get("id", "module")
                 mod_title = mod.get("title") or mod_id
@@ -478,14 +480,6 @@ class SettingsMixin:
                     cdn_base = "https://raw.githubusercontent.com/Similarly1/open-shema-data/main"
                     rel_path = mod.get("file_path") or f"data/{mod_type}s/bible_{mod_abbr.lower()}.sqlite"
                     download_url = f"{cdn_base}/{rel_path}"
-
-                TaskManager.update_progress(
-                    task_id,
-                    int((idx / total_modules) * 100),
-                    current=idx,
-                    total=total_modules,
-                    detail=f"Téléchargement de {mod_title}..."
-                )
 
                 # Déterminer le dossier de destination
                 if mod_type == "bible":
@@ -506,39 +500,140 @@ class SettingsMixin:
                 dest_filename = filename[:-3] if is_gz else filename
                 dest_path = os.path.join(target_dir, dest_filename)
 
-                req = urllib.request.Request(
-                    download_url,
-                    headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) OpenShema/1.0"}
-                )
+                # 1. Vérifier si le module existe déjà localement (prêt à l'emploi)
+                already_available = False
+                if os.path.exists(dest_path) and os.path.getsize(dest_path) > 100_000:
+                    already_available = True
+                elif mod_type == "bible":
+                    # Vérifier d'autres noms canoniques possibles
+                    candidates = [
+                        os.path.join(target_dir, f"bible_{mod_abbr.lower()}1910.sqlite"),
+                        os.path.join(target_dir, f"bible_{mod_abbr.lower()}.sqlite"),
+                        os.path.join(target_dir, f"{mod_abbr}.sqlite")
+                    ]
+                    for cand in candidates:
+                        if os.path.exists(cand) and os.path.getsize(cand) > 100_000:
+                            dest_path = cand
+                            already_available = True
+                            break
 
-                temp_download = os.path.join(target_dir, f"tmp_{filename}")
-                ctx = ssl.create_default_context()
-                ctx.check_hostname = False
-                ctx.verify_mode = ssl.CERT_NONE
+                # 2. Si non présent dans data/, chercher dans les ressources embarquées du package
+                if not already_available and bundle_root:
+                    rel_sub = os.path.relpath(dest_path, data_dir)
+                    bundled_candidates = [
+                        os.path.join(bundle_root, "data", rel_sub),
+                        os.path.join(bundle_root, "_internal", "data", rel_sub),
+                        os.path.join(bundle_root, "bible_ai_app", "data", rel_sub),
+                    ]
+                    for bcand in bundled_candidates:
+                        if os.path.exists(bcand) and os.path.getsize(bcand) > 100_000:
+                            logger.info(f"Copie du module embarqué {mod_title} depuis {bcand}...")
+                            shutil.copy2(bcand, dest_path)
+                            already_available = True
+                            break
 
-                with urllib.request.urlopen(req, timeout=30, context=ctx) as resp, open(temp_download, "wb") as out_f:
-                    shutil.copyfileobj(resp, out_f)
-
-                if is_gz:
-                    with gzip.open(temp_download, "rb") as gz_in, open(dest_path, "wb") as out_f:
-                        shutil.copyfileobj(gz_in, out_f)
-                    try:
-                        os.remove(temp_download)
-                    except OSError:
-                        pass
+                if already_available:
+                    logger.info(f"Module {mod_title} déjà disponible localement ({dest_path}), aucun téléchargement requis.")
+                    TaskManager.update_progress(
+                        task_id,
+                        int(((idx + 0.9) / total_modules) * 100),
+                        current=idx + 1,
+                        total=total_modules,
+                        detail=f"{mod_title} déjà prêt localement"
+                    )
                 else:
-                    if os.path.exists(dest_path):
-                        os.remove(dest_path)
-                    os.rename(temp_download, dest_path)
+                    # 3. Téléchargement progressif en flux avec notification en temps réel
+                    TaskManager.update_progress(
+                        task_id,
+                        int((idx / total_modules) * 100),
+                        current=idx,
+                        total=total_modules,
+                        detail=f"Connexion et téléchargement de {mod_title}..."
+                    )
 
-                # Si c'est une Bible SQLite, extraire en JSON pour le moteur de lecture
+                    req = urllib.request.Request(
+                        download_url,
+                        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) OpenShema/1.0"}
+                    )
+
+                    temp_download = os.path.join(target_dir, f"tmp_{filename}")
+                    ctx = ssl.create_default_context()
+                    ctx.check_hostname = False
+                    ctx.verify_mode = ssl.CERT_NONE
+
+                    with urllib.request.urlopen(req, timeout=15, context=ctx) as resp:
+                        total_size = int(resp.headers.get("Content-Length", 0))
+                        downloaded = 0
+                        chunk_size = 65536
+                        last_progress_time = time.time()
+
+                        with open(temp_download, "wb") as out_f:
+                            while True:
+                                chunk = resp.read(chunk_size)
+                                if not chunk:
+                                    break
+                                out_f.write(chunk)
+                                downloaded += len(chunk)
+                                now = time.time()
+                                if now - last_progress_time > 0.12:
+                                    last_progress_time = now
+                                    if total_size > 0:
+                                        pct = int((downloaded / total_size) * 100)
+                                        mb_cur = downloaded / (1024 * 1024)
+                                        mb_tot = total_size / (1024 * 1024)
+                                        detail_text = f"Téléchargement de {mod_title} : {mb_cur:.1f} / {mb_tot:.1f} Mo ({pct}%)"
+                                        prog_overall = int(((idx + (downloaded / total_size)) / total_modules) * 100)
+                                    else:
+                                        mb_cur = downloaded / (1024 * 1024)
+                                        detail_text = f"Téléchargement de {mod_title} : {mb_cur:.1f} Mo..."
+                                        prog_overall = int((idx / total_modules) * 100)
+
+                                    TaskManager.update_progress(
+                                        task_id,
+                                        prog_overall,
+                                        current=idx,
+                                        total=total_modules,
+                                        detail=detail_text
+                                    )
+
+                    if is_gz:
+                        with gzip.open(temp_download, "rb") as gz_in, open(dest_path, "wb") as out_f:
+                            shutil.copyfileobj(gz_in, out_f)
+                        try:
+                            os.remove(temp_download)
+                        except OSError:
+                            pass
+                    else:
+                        if os.path.exists(dest_path):
+                            try:
+                                os.remove(dest_path)
+                            except OSError:
+                                pass
+                        os.rename(temp_download, dest_path)
+
+                # 4. Extraction SQLite vers JSON (si Bible et pas encore extraite)
                 if mod_type == "bible" and dest_path.endswith(".sqlite"):
-                    try:
-                        if hasattr(self, "_extract_sqlite_bible_to_json"):
-                            self._extract_sqlite_bible_to_json(dest_path, mod_abbr, mod_title)
-                    except Exception as ext_err:
-                        logger.error(f"Erreur extraction SQLite vers JSON ({mod_title}): {ext_err}")
-                        raise RuntimeError(f"Échec de l'extraction de la Bible {mod_title} : {ext_err}")
+                    dest_json_dir = os.path.join(data_dir, "bibles", mod_abbr)
+                    json_already_extracted = False
+                    if os.path.isdir(dest_json_dir):
+                        json_files = [f for f in os.listdir(dest_json_dir) if f.endswith(".json")]
+                        if len(json_files) >= 66:
+                            json_already_extracted = True
+
+                    if not json_already_extracted:
+                        TaskManager.update_progress(
+                            task_id,
+                            int(((idx + 0.95) / total_modules) * 100),
+                            current=idx + 1,
+                            total=total_modules,
+                            detail=f"Préparation des 66 livres de {mod_title}..."
+                        )
+                        try:
+                            if hasattr(self, "_extract_sqlite_bible_to_json"):
+                                self._extract_sqlite_bible_to_json(dest_path, mod_abbr, mod_title)
+                        except Exception as ext_err:
+                            logger.error(f"Erreur extraction SQLite vers JSON ({mod_title}): {ext_err}")
+                            raise RuntimeError(f"Échec de l'extraction de la Bible {mod_title} : {ext_err}")
 
                     # Enregistrer dans metadata / library
                     try:
@@ -563,7 +658,7 @@ class SettingsMixin:
 
                 installed_items.append({"id": mod_id, "title": mod_title, "path": dest_path})
 
-            TaskManager.complete_task(task_id, message=f"{len(installed_items)} module(s) installé(s) avec succès")
+            TaskManager.complete_task(task_id, message=f"{len(installed_items)} module(s) prêt(s)")
             return {"success": True, "installed": len(installed_items), "items": installed_items}
 
         except Exception as e:

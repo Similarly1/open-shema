@@ -1049,165 +1049,82 @@ function initDisplayOptionsTabs() {
 function initIllustrationsReservoirInteractions() {
   const searchInput = document.getElementById('ill-search-input');
   const catPills = document.querySelectorAll('.ill-cat-pill');
-  const cards = document.querySelectorAll('.ill-card-item');
-  const countBadge = document.getElementById('ill-badge-count');
-  const detailModal = document.getElementById('ill-detail-modal');
-  const btnModalBack = document.getElementById('ill-modal-back');
-  const btnCopy = document.getElementById('ill-copy-btn');
+  const cardItems = document.querySelectorAll('.ill-card-item');
 
-  const modalBadge = document.getElementById('ill-modal-badge');
-  const modalTitle = document.getElementById('ill-modal-title');
-  const modalAuthor = document.getElementById('ill-modal-author');
-  const modalPassage = document.getElementById('ill-modal-passage');
-  const modalBody = document.getElementById('ill-modal-body');
-  const modalCallout = document.getElementById('ill-modal-callout');
-
-  const illustrationsData = {
-    'ill-1': {
-      title: "L'amnistie royale et la dette insolvable",
-      author: "C.H. Spurgeon",
-      passage: "📖 Éphésiens 2:8, Romains 5:8",
-      badgeClass: "type-story",
-      badgeText: "Histoire vraie",
-      body: "« Dans l'ancienne juridiction, un homme accumula une dette telle qu'aucune génération de sa lignée n'aurait pu la rembourser. Alors qu'il comparaissait sans défense devant le tribunal, le Roi descendit du trône, apposa son propre sceau sur le registre des dettes et déclara l'ardoise effacée à ses frais. »",
-      callout: "💡 <strong>Application pastorale :</strong> Idéal pour illustrer l'impossibilité des œuvres humaines et la substitution parfaite du sacrifice du Christ."
-    },
-    'ill-2': {
-      title: "Le creuset de l'orfèvre et le feu purificateur",
-      author: "C.H. Spurgeon",
-      passage: "📖 1 Pierre 1:7, Malachie 3:3",
-      badgeClass: "type-metaphor",
-      badgeText: "Métaphore & Nature",
-      body: "« On demandait un jour à un maître orfèvre : \"Comment savez-vous que tout résidu est éliminé et que l'or est pur ?\" Il répondit : \"C'est lorsque, me penchant au-dessus du creuset brûlant, j'y vois distinctement le reflet de mon propre visage.\" »",
-      callout: "⚓ <strong>Application pastorale :</strong> Utiliser pour encourager l'assemblée dans les saisons d'épreuves où le Seigneur façonne son image en nous."
-    },
-    'ill-3': {
-      title: "La montre de poche de John Newton",
-      author: "John Newton",
-      passage: "📖 1 Timothée 1:15, Deutéronome 15:15",
-      badgeClass: "type-bio",
-      badgeText: "Biographie",
-      body: "« L'ancien capitaine négrier devenu pasteur gardait toujours sur son pupitre une montre gravée de cette inscription : \"Souviens-toi que tu as été esclave au pays d'Égypte et que l'Éternel ton Dieu t'a racheté\". Il disait ne jamais vouloir prêcher sans se souvenir d'où la grâce l'avait tiré. »",
-      callout: "🕊️ <strong>Application pastorale :</strong> Parfait pour exhorter à l'humilité et à la reconnaissance devant le salut reçu."
-    },
-    'ill-4': {
-      title: "La boussole et l'aiguille aimantée",
-      author: "D.L. Moody",
-      passage: "📖 Luc 9:23, Hébreux 12:2",
-      badgeClass: "type-story",
-      badgeText: "Parabole",
-      body: "« Même secouée par les tempêtes du grand large ou détournée un instant par les remous du navire, l'aiguille aimantée hésite à peine et revient toujours s'orienter immanquablement vers l'étoile polaire. »",
-      callout: "🧭 <strong>Application pastorale :</strong> Idéal pour illustrer la persévérance et le cap inébranlable du chrétien fixé sur Christ."
-    }
-  };
-
-  const emptyState = document.getElementById('ill-empty-state');
-  let activeCategory = 'all';
-  let searchQuery = '';
-
-  function filterCards() {
-    let visibleCount = 0;
-    cards.forEach(card => {
-      const cat = card.getAttribute('data-cat') || '';
-      const text = card.textContent.toLowerCase();
-      const matchesCat = (activeCategory === 'all' || cat === activeCategory);
-      const matchesQuery = (!searchQuery || text.includes(searchQuery));
-
-      if (matchesCat && matchesQuery) {
-        card.style.display = 'flex';
-        visibleCount++;
-      } else {
-        card.style.display = 'none';
-      }
-    });
-
-    if (emptyState) {
-      emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+  // 1. Accordéon interactif pour toutes les cartes
+  cardItems.forEach(card => {
+    const head = card.querySelector('.ill-card-head');
+    if (head) {
+      head.addEventListener('click', () => {
+        const isOpen = card.classList.contains('open');
+        cardItems.forEach(c => c.classList.remove('open'));
+        if (!isOpen) {
+          card.classList.add('open');
+        }
+      });
     }
 
-    if (countBadge) {
-      if (activeCategory === 'all' && !searchQuery) {
-        countBadge.textContent = '1 480 fiches';
-      } else {
-        countBadge.textContent = `${visibleCount} fiche${visibleCount > 1 ? 's' : ''}`;
-      }
+    // Gestion du bouton copier de chaque carte
+    const copyBtn = card.querySelector('.ill-copy-btn-showcase');
+    const quoteEl = card.querySelector('.ill-unfolded-quote');
+    if (copyBtn && quoteEl) {
+      copyBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const text = quoteEl.innerText.trim();
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(text).catch(() => {});
+        }
+        const orig = copyBtn.innerHTML;
+        copyBtn.innerHTML = `
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <span>Copié pour votre sermon !</span>
+        `;
+        copyBtn.style.background = '#ECFDF5';
+        copyBtn.style.color = '#059669';
+        copyBtn.style.borderColor = '#10B981';
+        setTimeout(() => {
+          copyBtn.innerHTML = orig;
+          copyBtn.style.background = '';
+          copyBtn.style.color = '';
+          copyBtn.style.borderColor = '';
+        }, 2200);
+      });
     }
-  }
+  });
 
-  // 1. Filtres par catégorie
+  // 2. Filtres par catégorie
   catPills.forEach(pill => {
     pill.addEventListener('click', () => {
       catPills.forEach(p => p.classList.remove('active'));
       pill.classList.add('active');
-      activeCategory = pill.getAttribute('data-cat') || 'all';
-      filterCards();
+
+      const selectedCat = pill.getAttribute('data-cat') || 'all';
+      cardItems.forEach(card => {
+        const cardCat = card.getAttribute('data-cat');
+        if (selectedCat === 'all' || cardCat === selectedCat) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
     });
   });
 
-  // 2. Recherche rapide
+  // 3. Recherche filtrante
   if (searchInput) {
-    searchInput.addEventListener('input', () => {
-      searchQuery = (searchInput.value || '').trim().toLowerCase();
-      filterCards();
-    });
-  }
-
-  // 3. Clic sur une fiche -> Affiche le détail
-  cards.forEach(card => {
-    card.addEventListener('click', () => {
-      const id = card.getAttribute('data-ill-id') || 'ill-1';
-      const data = illustrationsData[id] || illustrationsData['ill-1'];
-
-      if (modalBadge) {
-        modalBadge.className = `ill-card-badge ${data.badgeClass}`;
-        modalBadge.textContent = data.badgeText;
-      }
-      if (modalTitle) modalTitle.textContent = data.title;
-      if (modalAuthor) modalAuthor.textContent = `Auteur : ${data.author}`;
-      if (modalPassage) modalPassage.textContent = data.passage;
-      if (modalBody) modalBody.textContent = data.body;
-      if (modalCallout) modalCallout.innerHTML = data.callout;
-
-      if (detailModal) detailModal.classList.remove('hidden');
-    });
-  });
-
-  // 4. Bouton Retour
-  if (btnModalBack) {
-    btnModalBack.addEventListener('click', () => {
-      if (detailModal) detailModal.classList.add('hidden');
-    });
-  }
-
-  // 5. Bouton Copier avec feedback visuel
-  if (btnCopy) {
-    btnCopy.addEventListener('click', () => {
-      const textToCopy = `${modalTitle ? modalTitle.textContent : ''}\n${modalBody ? modalBody.textContent : ''}\n${modalPassage ? modalPassage.textContent : ''}`;
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(textToCopy).catch(() => {});
-      }
-      const originalText = btnCopy.innerHTML;
-      btnCopy.innerHTML = `✓ Copié dans le presse-papier !`;
-      btnCopy.style.background = '#10B981';
-      btnCopy.style.color = '#FFFFFF';
-      setTimeout(() => {
-        btnCopy.innerHTML = originalText;
-        btnCopy.style.background = '';
-        btnCopy.style.color = '';
-      }, 2000);
+    searchInput.addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      cardItems.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        if (!q || text.includes(q)) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
     });
   }
 }
-
-// Fade in animation helper
-const styleTag = document.createElement('style');
-styleTag.textContent = `
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(4px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-`;
-document.head.appendChild(styleTag);
 
 /* ==========================================================================
    14. OPTIONS DU MOTEUR D'ÉTUDE & RAG BGE-M3 (SLIDE 6 DEEP-DIVE)
@@ -1395,7 +1312,7 @@ function initCommentariesInteractions() {
       title: 'The Gospel Coalition (TGC)',
       sub: 'TGC Commentary (2021-2024)',
       passage: '📖 Jean 1:43–51 (Andreas Köstenberger)',
-      html: `<p>La réponse sceptique de Nathanaël (v. 46) est surmontée par sa rencontre personnelle avec Jésus, qui révèle l'avoir vu sous le figuier avant l'appel de Philippe. Le figuier est un symbole messianique d'Israël (<span class="comm-ref-wrapper"><span class="comm-ref-pill">1 Rois 4.25</span><span class="comm-ref-popover"><span class="comm-pop-title">1 Rois 4:25</span><span class="comm-pop-desc">Consulter ce passage dans le lecteur biblique pour afficher le texte complet et l'interlinéaire.</span><span class="comm-pop-link">Cliquer pour ouvrir →</span></span></span>) aux riches connotations eschatologiques (<span class="comm-ref-wrapper"><span class="comm-ref-pill">Michée 4.4 ; Zacharie 3.10</span><span class="comm-ref-popover"><span class="comm-pop-title">Michée 4:4 ; Zacharie 3:10</span><span class="comm-pop-desc">Consulter ce passage dans le lecteur biblique pour afficher le texte complet et l'interlinéaire.</span><span class="comm-pop-link">Cliquer pour ouvrir →</span></span></span>).</p>`
+      html: `<p>La réponse sceptique de Nathanaël (v. 46) est surmontée par sa rencontre personnelle avec Jésus, qui révèle l'avoir vu sous le figuier avant l'appel de Philippe. Le figuier est un symbole messianique d'Israël (<span class="comm-ref-wrapper"><span class="comm-ref-pill">1 Rois 4.25</span><span class="comm-ref-popover"><span class="comm-pop-title">1 Rois 4:25 · OST</span><span class="comm-pop-desc">« Et Juda et Israël habitaient en sécurité, chacun sous sa vigne et sous son figuier, depuis Dan jusqu’à Béer-Shéba, tous les jours de Salomon. »</span><span class="comm-pop-link">Cliquer pour ouvrir →</span></span></span>) aux riches connotations eschatologiques (<span class="comm-ref-wrapper"><span class="comm-ref-pill">Michée 4.4</span><span class="comm-ref-popover"><span class="comm-pop-title">Michée 4:4 · OST</span><span class="comm-pop-desc">« Ils habiteront chacun sous sa vigne et sous son figuier, et il n’y aura personne qui les trouble ; car la bouche de l’Éternel a parlé. »</span><span class="comm-pop-link">Cliquer pour ouvrir →</span></span></span>).</p>`
     },
     godet: {
       iconClass: 'godet',
@@ -1403,7 +1320,7 @@ function initCommentariesInteractions() {
       title: 'Bible annotée (Godet & Neuchâtel)',
       sub: 'Frédéric Godet et collab. (1899)',
       passage: '📖 Jean 1:46 (Frédéric Godet)',
-      html: `<p>Le rôle de Philippe dans la vocation de Nathanaël est semblable à celui d’André pour Pierre. Un flambeau allumé sert à en allumer un autre ; ainsi se propage la foi vivante. — Godet</p><p>C’est en chemin vers la Galilée (<span class="comm-ref-wrapper"><span class="comm-ref-pill light">v. 44</span><span class="comm-ref-popover"><span class="comm-pop-title">Jean 1:44</span><span class="comm-pop-desc">Consulter ce passage dans le lecteur biblique pour afficher le texte complet et l'interlinéaire.</span><span class="comm-pop-link">Cliquer pour ouvrir →</span></span></span>) que Philippe trouve Nathanaël, alors que celui-ci cherchait la vérité.</p>`
+      html: `<p>Le rôle de Philippe dans la vocation de Nathanaël est semblable à celui d’André pour Pierre. Un flambeau allumé sert à en allumer un autre ; ainsi se propage la foi vivante. — Godet</p><p>C’est en chemin vers la Galilée (<span class="comm-ref-wrapper"><span class="comm-ref-pill light">v. 44</span><span class="comm-ref-popover"><span class="comm-pop-title">Jean 1:44 · OST</span><span class="comm-pop-desc">« Or, Philippe était de Bethsaïda, de la ville d’André et de Pierre. »</span><span class="comm-pop-link">Cliquer pour ouvrir →</span></span></span>) que Philippe trouve Nathanaël, alors que celui-ci cherchait la vérité.</p>`
     },
     robertson: {
       iconClass: 'robertson',
@@ -1411,7 +1328,7 @@ function initCommentariesInteractions() {
       title: 'Robertson (Images verbales NT)',
       sub: 'A.T. Robertson (1933)',
       passage: '📖 Jean 1:46 (A.T. Robertson)',
-      html: `<p><strong>Peut-il venir de Nazareth quelque chose de bon ?</strong> (Ἐκ Ναζαρετ δυναται τι ἀγαθον ειναι ;). Littéralement : « Hors de Nazareth peut-il être quelque bien ? ».</p><p>Une nuance de mépris reflétant la rivalité entre villes voisines. Une sentence fausse prétendait qu’aucun prophète ne sort de Galilée (<span class="comm-ref-wrapper"><span class="comm-ref-pill light">Jn 7.52</span><span class="comm-ref-popover"><span class="comm-pop-title">Jean 7:52</span><span class="comm-pop-desc">Consulter ce passage dans le lecteur biblique pour afficher le texte complet et l'interlinéaire.</span><span class="comm-pop-link">Cliquer pour ouvrir →</span></span></span>).</p>`
+      html: `<p><strong>Peut-il venir de Nazareth quelque chose de bon ?</strong> (Ἐκ Ναζαρετ δυναται τι ἀγαθον ειναι ;). Littéralement : « Hors de Nazareth peut-il être quelque bien ? ».</p><p>Une nuance de mépris reflétant la rivalité entre villes voisines. Une sentence fausse prétendait qu’aucun prophète ne sort de Galilée (<span class="comm-ref-wrapper"><span class="comm-ref-pill light">Jn 7.52</span><span class="comm-ref-popover"><span class="comm-pop-title">Jean 7:52 · OST</span><span class="comm-pop-desc">« Ils lui répondirent : Es-tu aussi Galiléen ? Examine, et vois qu’aucun prophète n’est sorti de la Galilée. »</span><span class="comm-pop-link">Cliquer pour ouvrir →</span></span></span>).</p>`
     }
   };
 

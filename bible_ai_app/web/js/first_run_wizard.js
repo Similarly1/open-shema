@@ -80,13 +80,27 @@ const FirstRunWizard = {
 
   async fetchCatalog() {
     try {
-      const resp = await fetch(this.catalogUrl);
+      // 1. Essayer via l'API pywebview native avec repli cache local immédiat
+      if (window.pywebview && window.pywebview.api && window.pywebview.api.get_official_catalog) {
+        const cat = await window.pywebview.api.get_official_catalog();
+        if (cat && cat.modules && cat.modules.length > 0) {
+          this.catalogData = cat;
+          this.renderModulesGrid();
+          return;
+        }
+      }
+
+      // 2. Repli direct avec timeout rapide (2.5s) pour ne jamais geler l'interface
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2500);
+      const resp = await fetch(this.catalogUrl, { signal: controller.signal });
+      clearTimeout(timeoutId);
       if (resp.ok) {
         this.catalogData = await resp.json();
         this.renderModulesGrid();
       }
     } catch (e) {
-      console.warn("[FirstRunWizard] Impossible de charger le catalogue distant :", e);
+      console.warn("[FirstRunWizard] Catalogue distant non disponible, utilisation des modules embarqués :", e);
     }
   },
 
@@ -303,7 +317,7 @@ const FirstRunWizard = {
                   <div class="frw-progress-bar-fill" id="frw-deploy-progress-fill"></div>
                 </div>
                 <div class="frw-progress-detail">
-                  <span id="frw-deploy-detail-text">Connexion à open-shema-data...</span>
+                  <span id="frw-deploy-detail-text">Vérification des modules...</span>
                   <span id="frw-deploy-percent-text">0%</span>
                 </div>
               </div>
@@ -517,17 +531,35 @@ const FirstRunWizard = {
       });
     }
 
-    if (statusEl) statusEl.textContent = "Téléchargement des ressources...";
-    if (fillEl) fillEl.style.width = "25%";
-    if (statusEl) statusEl.textContent = "Téléchargement des ressources...";
+    if (statusEl) statusEl.textContent = "Préparation des ressources...";
     if (fillEl) {
       fillEl.style.backgroundColor = "";
-      fillEl.style.width = "25%";
+      fillEl.style.width = "10%";
     }
-    if (percentEl) percentEl.textContent = "25%";
+    if (percentEl) percentEl.textContent = "10%";
+    if (detailEl) detailEl.textContent = "Vérification des modules locaux...";
     
     const nextBtn = document.getElementById('frw-btn-next');
     if (nextBtn) nextBtn.style.display = 'none';
+
+    // Suivi de progression dynamique en temps réel via TaskManager (toutes les 100ms)
+    let progressTimer = null;
+    if (window.pywebview && window.pywebview.api && window.pywebview.api.get_background_tasks) {
+      progressTimer = setInterval(async () => {
+        try {
+          const tasks = await window.pywebview.api.get_background_tasks();
+          const task = tasks.find(t => t.id === 'onboarding_download');
+          if (task) {
+            const p = Math.min(100, Math.max(0, task.progress || 0));
+            // Mappe la phase d'installation sur 10% -> 75%
+            const mapped = Math.round(10 + (p * 0.65));
+            if (fillEl) fillEl.style.width = `${mapped}%`;
+            if (percentEl) percentEl.textContent = `${mapped}%`;
+            if (detailEl && task.detail) detailEl.textContent = task.detail;
+          }
+        } catch (_) {}
+      }, 100);
+    }
 
     try {
       if (window.pywebview && window.pywebview.api && window.pywebview.api.download_onboarding_modules) {
@@ -537,9 +569,11 @@ const FirstRunWizard = {
         }
       }
 
-      if (fillEl) fillEl.style.width = "75%";
-      if (percentEl) percentEl.textContent = "75%";
-      if (detailEl) detailEl.textContent = "Configuration des préférences et du moteur d'étude...";
+      if (progressTimer) clearInterval(progressTimer);
+
+      if (fillEl) fillEl.style.width = "85%";
+      if (percentEl) percentEl.textContent = "85%";
+      if (detailEl) detailEl.textContent = "Configuration des préférences et du sanctuaire...";
 
       const configPayload = {
         theme: this.selectedTheme,
@@ -571,8 +605,9 @@ const FirstRunWizard = {
       }, 600);
 
     } catch (e) {
+      if (progressTimer) clearInterval(progressTimer);
       console.error("[FirstRunWizard] Erreur durant le déploiement :", e);
-      if (statusEl) statusEl.textContent = "Erreur de téléchargement";
+      if (statusEl) statusEl.textContent = "Erreur de déploiement";
       if (detailEl) detailEl.textContent = e.message || String(e);
       if (fillEl) {
         fillEl.style.backgroundColor = "#ef4444";

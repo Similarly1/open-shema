@@ -16,6 +16,10 @@ def build():
     print("  Construction de l'exécutable Open Shema (Windows)")
     print("==================================================")
 
+    # Fermeture de tout processus OpenShema en cours pour éviter les verrous de fichiers
+    os.system("taskkill /f /im OpenShema.exe >nul 2>&1")
+    os.system("taskkill /f /im OpenShemaSetup.exe >nul 2>&1")
+
     # Nettoyage des précédents builds
     for folder in ["build", "dist"]:
         fpath = os.path.join(current_dir, folder)
