@@ -16,9 +16,18 @@ const Installer = {
     this.bindEvents();
 
     let isLoaded = false;
+    const isApiReady = () => {
+      return Boolean(
+        window.pywebview &&
+        window.pywebview.api &&
+        typeof window.pywebview.api.get_system_info === 'function' &&
+        typeof window.pywebview.api.start_installation === 'function'
+      );
+    };
+
     const triggerLoad = () => {
       if (isLoaded) return;
-      if (window.pywebview && window.pywebview.api) {
+      if (isApiReady()) {
         isLoaded = true;
         this.loadInitialData();
       }
@@ -29,20 +38,23 @@ const Installer = {
 
     // 2. Événement pywebviewready
     window.addEventListener('pywebviewready', () => {
-      triggerLoad();
+      setTimeout(() => triggerLoad(), 20);
     });
 
-    // 3. Polling rapide toutes les 30ms (au cas où l'événement a déjà été émis avant DOMContentLoaded)
+    // 3. Polling régulier tant que l'API n'est pas encore liée
     let checks = 0;
     const checkInterval = setInterval(() => {
       checks++;
-      if (isLoaded || (window.pywebview && window.pywebview.api)) {
+      if (isLoaded) {
+        clearInterval(checkInterval);
+      } else if (isApiReady()) {
         clearInterval(checkInterval);
         triggerLoad();
-      } else if (checks > 100) {
+      } else if (checks > 250) { // 10 secondes maximum
         clearInterval(checkInterval);
+        console.warn("[Installer] Délai d'attente de l'API dépassé.");
       }
-    }, 30);
+    }, 40);
   },
 
   bindWindowControls() {
@@ -112,7 +124,7 @@ const Installer = {
     const startBtn = document.getElementById('btn-start-install');
     const pathInput = document.getElementById('txt-install-path');
     const hasPath = Boolean(pathInput?.value?.trim());
-    const isReady = Boolean(this.systemInfo && this.releaseData && hasPath);
+    const isReady = Boolean(this.systemInfo && hasPath);
     if (startBtn) {
       if (isReady) {
         startBtn.removeAttribute('disabled');
@@ -126,71 +138,55 @@ const Installer = {
     try {
       this.updateStartButtonState();
 
-      if (!window.pywebview?.api) return;
+      if (!window.pywebview?.api?.get_system_info) return;
 
       // 1. Informations système (immédiat, local)
-      const pSys = (async () => {
-        try {
-          if (window.pywebview.api.get_system_info) {
-            this.systemInfo = await window.pywebview.api.get_system_info();
-            if (this.systemInfo) {
-              const pathInput = document.getElementById('txt-install-path');
-              if (pathInput) pathInput.value = this.systemInfo.default_path;
+      try {
+        this.systemInfo = await window.pywebview.api.get_system_info();
+        if (this.systemInfo) {
+          const pathInput = document.getElementById('txt-install-path');
+          if (pathInput) pathInput.value = this.systemInfo.default_path;
 
-              const diskSpace = document.getElementById('lbl-disk-space');
-              if (diskSpace) diskSpace.textContent = `${this.systemInfo.free_space_str} disponibles (${this.systemInfo.drive})`;
+          const diskSpace = document.getElementById('lbl-disk-space');
+          if (diskSpace) diskSpace.textContent = `${this.systemInfo.free_space_str} disponibles (${this.systemInfo.drive})`;
 
-              const reqSpace = document.getElementById('lbl-required-space');
-              if (reqSpace) reqSpace.textContent = this.systemInfo.required_space_str;
-              this.updateStartButtonState();
-            }
-          }
-        } catch (e) {
-          console.warn("Erreur get_system_info:", e);
+          const reqSpace = document.getElementById('lbl-required-space');
+          if (reqSpace) reqSpace.textContent = this.systemInfo.required_space_str;
+          this.updateStartButtonState();
         }
-      })();
+      } catch (e) {
+        console.error("Erreur get_system_info:", e);
+      }
 
       // 2. Interrogation rapide de la version
-      const pRel = (async () => {
+      if (window.pywebview.api.check_latest_release) {
         try {
-          if (window.pywebview.api.check_latest_release) {
-            this.releaseData = await window.pywebview.api.check_latest_release();
-            if (this.releaseData) {
-              const tagEl = document.getElementById('lbl-release-tag');
-              if (tagEl) {
-                tagEl.textContent = `${this.releaseData.tag} • Dernière version officielle`;
-              }
-
-              const nameEl = document.getElementById('lbl-release-name');
-              if (nameEl) {
-                nameEl.textContent = `${this.releaseData.name} (${this.releaseData.size_str})`;
-              }
-              this.updateStartButtonState();
+          this.releaseData = await window.pywebview.api.check_latest_release();
+          if (this.releaseData) {
+            const tagEl = document.getElementById('lbl-release-tag');
+            if (tagEl) {
+              tagEl.textContent = `${this.releaseData.tag} • Dernière version officielle`;
             }
+
+            const nameEl = document.getElementById('lbl-release-name');
+            if (nameEl) {
+              nameEl.textContent = `${this.releaseData.name} (${this.releaseData.size_str})`;
+            }
+
+            const descEl = document.getElementById('lbl-release-desc');
+            if (descEl && this.releaseData.notes) {
+              descEl.textContent = this.releaseData.notes;
+            }
+            this.updateStartButtonState();
           }
         } catch (e) {
           console.warn("Erreur check_latest_release:", e);
         }
-      })();
+      }
 
-      await Promise.all([pSys, pRel]);
     } catch (err) {
       console.error('Erreur initialisation installeur:', err);
     } finally {
-      // Sécurité absolue : si une information manque encore, on fournit une valeur par défaut
-      if (!this.systemInfo) {
-        this.systemInfo = {
-          default_path: "C:\\Users\\" + (window.location.pathname.split('/')[2] || 'User') + "\\AppData\\Local\\Programs\\OpenShema",
-          free_space_str: "> 10 Go",
-          drive: "C:",
-          required_space_str: "~350 Mo"
-        };
-        const pathInput = document.getElementById('txt-install-path');
-        if (pathInput && !pathInput.value) pathInput.value = this.systemInfo.default_path;
-        const diskSpace = document.getElementById('lbl-disk-space');
-        if (diskSpace) diskSpace.textContent = "Espace suffisant vérifié";
-      }
-
       if (!this.releaseData) {
         this.releaseData = { tag: "v0.1.0", name: "Open Shema v0.1.0 (Bêta)", download_url: "" };
         const tagEl = document.getElementById('lbl-release-tag');

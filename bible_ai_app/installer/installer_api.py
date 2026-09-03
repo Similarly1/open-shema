@@ -80,9 +80,14 @@ class InstallerAPI:
         """Retourne le dossier par défaut (%LOCALAPPDATA%\\Programs\\OpenShema) et l'espace libre."""
         local_appdata = os.environ.get("LOCALAPPDATA")
         if not local_appdata:
-            local_appdata = os.path.expanduser("~")
+            userprofile = os.environ.get("USERPROFILE")
+            if userprofile:
+                local_appdata = os.path.join(userprofile, "AppData", "Local")
+            else:
+                local_appdata = os.path.expanduser("~")
         
         default_install_dir = os.path.join(local_appdata, "Programs", "OpenShema")
+        logger.info(f"get_system_info appelé -> default_path={default_install_dir}")
         
         drive = os.path.splitdrive(default_install_dir)[0] or "C:"
         drive_path = drive + "\\"
@@ -261,6 +266,7 @@ class InstallerAPI:
     # --- PROCESSUS D'INSTALLATION COMPLET ---
     def start_installation(self, target_dir: str, create_desktop_shortcut: bool, create_start_menu_shortcut: bool, download_url: str):
         """Lance l'installation dans un thread d'arrière-plan avec progression continue."""
+        target_dir = os.path.abspath(os.path.expandvars(os.path.expanduser((target_dir or "").strip())))
         logger.info(f"start_installation appelée: target={target_dir}, desktop={create_desktop_shortcut}, menu={create_start_menu_shortcut}, url={download_url}")
         if self._is_installing:
             logger.warning("start_installation refusée : _is_installing est déjà True")
@@ -298,10 +304,19 @@ class InstallerAPI:
         return {"success": True}
 
     def _run_installation(self, target_dir, create_desktop, create_start_menu, download_url):
+        target_dir = os.path.abspath(os.path.expandvars(os.path.expanduser((target_dir or "").strip())))
         logger.info(f"_run_installation thread lancé. target={target_dir}")
         self._update_progress(5, "Initialisation de l'environnement...")
         try:
-            os.makedirs(target_dir, exist_ok=True)
+            try:
+                os.makedirs(target_dir, exist_ok=True)
+            except PermissionError as perm_err:
+                err_msg = f"Accès refusé au dossier '{target_dir}'. Veuillez choisir un dossier accessible dans votre session utilisateur."
+                logger.error(f"{err_msg} : {perm_err}")
+                self._progress_state["error"] = err_msg
+                self._is_installing = False
+                return
+
             local_pkg = self._find_local_package()
             zip_to_extract = None
 
