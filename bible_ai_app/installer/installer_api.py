@@ -16,8 +16,20 @@ import subprocess
 import urllib.request
 import ssl
 
+import tempfile
+
+log_file = os.path.join(tempfile.gettempdir(), "openshema_installer.log")
+logging.basicConfig(
+    filename=log_file,
+    filemode="w",
+    level=logging.DEBUG,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
 logger = logging.getLogger("OpenShemaInstaller")
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+# Conserver aussi la sortie console si présente
+console_handler = logging.StreamHandler(sys.stdout)
+console_handler.setLevel(logging.INFO)
+logger.addHandler(console_handler)
 
 
 def format_bytes(num_bytes: float) -> str:
@@ -212,11 +224,20 @@ class InstallerAPI:
         exe_dir = os.path.dirname(os.path.abspath(sys.executable))
         curr_dir = os.path.abspath(os.getcwd())
         file_dir = os.path.dirname(os.path.abspath(__file__))
+        argv_dir = os.path.dirname(os.path.abspath(sys.argv[0])) if sys.argv and sys.argv[0] else ""
 
         candidates = [
             # À côté de l'exécutable (ex: dist/OpenShema.zip)
             os.path.join(exe_dir, "OpenShema.zip"),
             os.path.join(exe_dir, "OpenShema"),
+            # À côté de argv[0]
+            os.path.join(argv_dir, "OpenShema.zip"),
+            os.path.join(argv_dir, "OpenShema"),
+            # Dans le dossier parent de exe_dir
+            os.path.join(os.path.dirname(exe_dir), "OpenShema.zip"),
+            os.path.join(os.path.dirname(exe_dir), "OpenShema"),
+            os.path.join(os.path.dirname(exe_dir), "dist", "OpenShema.zip"),
+            os.path.join(os.path.dirname(exe_dir), "dist", "OpenShema"),
             # Dans dist/ par rapport au dossier courant
             os.path.join(curr_dir, "dist", "OpenShema.zip"),
             os.path.join(curr_dir, "dist", "OpenShema"),
@@ -227,21 +248,28 @@ class InstallerAPI:
         ]
 
         for cand in candidates:
-            if os.path.exists(cand):
+            if cand and os.path.exists(cand):
+                logger.info(f"Package local trouvé: {cand}")
                 return cand
+        logger.warning(f"Aucun package local trouvé parmi: {candidates}")
         return None
+
+    def log_client_error(self, error_message: str):
+        logger.error(f"[JS CLIENT ERROR] {error_message}")
 
     # --- PROCESSUS D'INSTALLATION COMPLET ---
     def start_installation(self, target_dir: str, create_desktop_shortcut: bool, create_start_menu_shortcut: bool, download_url: str):
         """Lance l'installation dans un thread d'arrière-plan avec progression continue."""
+        logger.info(f"start_installation appelée: target={target_dir}, desktop={create_desktop_shortcut}, menu={create_start_menu_shortcut}, url={download_url}")
         if self.is_installing:
+            logger.warning("start_installation refusée : is_installing est déjà True")
             return {"success": False, "error": "Une installation est déjà en cours."}
 
         self.is_installing = True
         self.is_cancelled = False
 
         self.progress_state = {
-            "percent": 0,
+            "percent": 5,
             "status": "Démarrage de l'installation...",
             "downloaded_str": "",
             "total_str": "",
@@ -258,22 +286,26 @@ class InstallerAPI:
             daemon=True
         )
         self.download_thread.start()
+        logger.info("download_thread démarré avec succès")
         return {"success": True}
 
     def cancel_installation(self):
+        logger.info("cancel_installation demandée par l'utilisateur")
         self.is_cancelled = True
         self.is_installing = False
         self.progress_state["error"] = "Installation annulée par l'utilisateur."
         return {"success": True}
 
     def _run_installation(self, target_dir, create_desktop, create_start_menu, download_url):
+        logger.info(f"_run_installation thread lancé. target={target_dir}")
+        self._update_progress(5, "Initialisation de l'environnement...")
         try:
             os.makedirs(target_dir, exist_ok=True)
             local_pkg = self._find_local_package()
             zip_to_extract = None
 
             # 1. TENTATIVE DE TÉLÉCHARGEMENT GITHUB (uniquement si une release en ligne réelle est disponible)
-            has_real_remote = bool(download_url) and not ("releases/download/v1.0.0" in download_url and local_pkg)
+            has_real_remote = bool(download_url) and not ("releases/download/v1.0.0" in download_url) and not local_pkg
 
             if has_real_remote:
                 temp_zip = os.path.join(target_dir, "_download_temp.zip")
@@ -326,22 +358,24 @@ class InstallerAPI:
             # 2. UTILISATION DU PACKAGE LOCAL
             if not zip_to_extract:
                 if local_pkg:
+                    logger.info(f"Utilisation du package local trouvé: {local_pkg}")
                     if os.path.isfile(local_pkg) and local_pkg.endswith(".zip"):
                         # Extraction DIRECTE depuis le zip local (11 secondes, 100% fluide)
                         zip_to_extract = local_pkg
                     elif os.path.isdir(local_pkg):
-                        self._update_progress(5, "Déploiement des composants d'Open Shema...")
+                        self._update_progress(10, "Déploiement des composants d'Open Shema...")
                         # Copie ultra-rapide en tâche de fond native Windows (0 freeze, 0 blocage du GIL)
                         self._robocopy_with_progress(local_pkg, target_dir)
                 else:
-                    err_msg = "Aucun package d'installation trouvé (release GitHub ou archive locale introuvable)."
+                    err_msg = "Aucun package d'installation trouvé (OpenShema.zip ou dossier dist/ introuvable)."
+                    logger.error(err_msg)
                     self.progress_state["error"] = err_msg
                     self.is_installing = False
                     return
 
             # 3. EXTRACTION DU ZIP AVEC FLUIDITÉ MAXIMALE (SI ARCHIVE ZIP)
             if zip_to_extract and os.path.exists(zip_to_extract):
-                self._update_progress(5, "Extraction des composants d'Open Shema...")
+                self._update_progress(10, "Extraction des composants d'Open Shema...")
                 try:
                     with zipfile.ZipFile(zip_to_extract, 'r') as zf:
                         infolist = zf.infolist()
@@ -378,7 +412,7 @@ class InstallerAPI:
                             if (now - last_update > 0.05) or (extracted_bytes == total_bytes):
                                 elapsed = now - start_time
                                 speed = extracted_bytes / elapsed if elapsed > 0 else 0
-                                percent = 5 + ((extracted_bytes / total_bytes) * 88)
+                                percent = 10 + ((extracted_bytes / total_bytes) * 83)
                                 self._update_progress(
                                     percent=min(93, percent),
                                     status=f"Extraction : {os.path.basename(info.filename) or 'fichiers...'}",
@@ -393,6 +427,7 @@ class InstallerAPI:
                         try: os.remove(zip_to_extract)
                         except OSError: pass
                 except Exception as zip_err:
+                    logger.error(f"Erreur extraction zip: {zip_err}", exc_info=True)
                     self.progress_state["error"] = f"Erreur extraction : {zip_err}"
                     self.is_installing = False
                     return

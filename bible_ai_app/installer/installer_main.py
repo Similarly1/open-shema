@@ -57,6 +57,12 @@ def main():
     )
     api.set_window(window)
 
+    def handle_exception(exc_type, exc_value, exc_traceback):
+        import logging
+        logging.getLogger("OpenShemaInstaller").critical("Exception non interceptée :", exc_info=(exc_type, exc_value, exc_traceback))
+
+    sys.excepthook = handle_exception
+
     webview.start(debug=False)
 
 

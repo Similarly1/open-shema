@@ -257,8 +257,13 @@ const Installer = {
         // Démarrage du polling non-bloquant
         this.isPollingActive = true;
         this.pollProgressLoop();
+      } else {
+        this.onError("Le pont de communication PyWebView n'est pas encore initialisé.");
       }
     } catch (err) {
+      if (window.pywebview?.api?.log_client_error) {
+        window.pywebview.api.log_client_error(String(err));
+      }
       this.onError(String(err));
     }
   },
@@ -268,12 +273,7 @@ const Installer = {
 
     try {
       if (window.pywebview?.api?.get_install_progress) {
-        // Timeout de sécurité pour garantir que le cycle de polling ne se bloque jamais
-        const p = await Promise.race([
-          window.pywebview.api.get_install_progress(),
-          new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout IPC")), 600))
-        ]);
-
+        const p = await window.pywebview.api.get_install_progress();
         if (p) {
           this.onProgress(p);
 
@@ -293,7 +293,7 @@ const Installer = {
     }
 
     if (this.isPollingActive) {
-      this.pollTimeout = setTimeout(() => this.pollProgressLoop(), 150);
+      this.pollTimeout = setTimeout(() => this.pollProgressLoop(), 120);
     }
   },
 
