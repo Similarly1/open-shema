@@ -62,6 +62,12 @@ def build():
     print(f"-> Commande de compilation :\n{' '.join(args)}\n")
     res = subprocess.run(args)
     if res.returncode == 0:
+        zip_path = os.path.join("dist", "OpenShema.zip")
+        src_folder = os.path.join("dist", "OpenShema")
+        if not os.path.exists(zip_path) and os.path.exists(src_folder):
+            print("-> Génération de l'archive dist/OpenShema.zip...")
+            shutil.make_archive(os.path.join("dist", "OpenShema"), "zip", src_folder)
+
         print("\n[SUCCÈS] Installeur compilé avec succès !")
         print(f"Exécutable disponible : {os.path.abspath(os.path.join('dist', 'OpenShemaSetup.exe'))}\n")
     else:

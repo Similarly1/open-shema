@@ -268,7 +268,12 @@ const Installer = {
 
     try {
       if (window.pywebview?.api?.get_install_progress) {
-        const p = await window.pywebview.api.get_install_progress();
+        // Timeout de sécurité pour garantir que le cycle de polling ne se bloque jamais
+        const p = await Promise.race([
+          window.pywebview.api.get_install_progress(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout IPC")), 600))
+        ]);
+
         if (p) {
           this.onProgress(p);
 
@@ -288,13 +293,13 @@ const Installer = {
     }
 
     if (this.isPollingActive) {
-      this.pollTimeout = setTimeout(() => this.pollProgressLoop(), 180);
+      this.pollTimeout = setTimeout(() => this.pollProgressLoop(), 150);
     }
   },
 
   onProgress(data) {
     if (!data) return;
-    const percent = data.percent || 0;
+    const percent = Math.min(100, Math.max(0, data.percent || 0));
     
     const fillEl = document.getElementById('progress-bar-fill');
     if (fillEl) fillEl.style.width = `${percent}%`;
