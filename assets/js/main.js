@@ -518,204 +518,147 @@ function initTerminalTabs() {
    9. HERO MOCKUP HIGH-FIDELITY INTERACTIONS
    ========================================================================== */
 function initHeroMockupInteractions() {
-  const versionPills = document.querySelectorAll('.hero-version-pill');
-  const readerPassage = document.getElementById('hero-reader-passage');
-  const drawerCardMorph = document.getElementById('hero-drawer-morph');
-  const drawerCardAi = document.getElementById('hero-drawer-ai');
-  const strongBadge = document.getElementById('hero-strong-badge');
+  const versionSelector = document.getElementById('canvas-version-selector');
+  const versionCurrent = document.getElementById('canvas-version-current');
+  const versionDropdown = document.getElementById('canvas-version-dropdown');
+  const versionLabel = document.getElementById('canvas-version-label');
+  const versesContainer = document.getElementById('hero-verses-container');
+  const versionOpts = document.querySelectorAll('.version-opt');
 
-  // Translation database for Jean 1:1-4
+  // Traductions 100% LIBRES DE DROITS pour Genèse 1 (Domaine public & Licences ouvertes)
   const translations = {
-    's21': `
-      <div class="mockup-verse">
-        <span class="verse-num">1</span>
-        Au commencement était la <span class="verse-word-highlight hero-interactive-word" data-word="logos">Parole</span> 
-        (<span class="verse-word-greek hero-interactive-word" data-word="logos">λόγος</span>), et la Parole était avec Dieu (<span class="verse-word-greek hero-interactive-word" data-word="theos">θεός</span>), 
-        et la Parole était Dieu.
-      </div>
-      <div class="mockup-verse">
-        <span class="verse-num">2</span>
-        Elle était au commencement avec Dieu.
-      </div>
-      <div class="mockup-verse">
-        <span class="verse-num">3</span>
-        Toutes choses ont été faites par elle, et rien de ce qui a été fait n'a été fait sans elle.
-      </div>
-      <div class="mockup-verse">
-        <span class="verse-num">4</span>
-        En elle était la <span class="verse-word-greek hero-interactive-word" data-word="zoe">vie</span> (ζωή), et la vie était la <span class="verse-word-greek hero-interactive-word" data-word="phos">lumière</span> (φῶς) des hommes.
-      </div>
-    `,
-    'lsg': `
-      <div class="mockup-verse">
-        <span class="verse-num">1</span>
-        Au commencement <span class="strong-badge" style="font-size:0.65rem">G1722</span> était la <span class="verse-word-highlight hero-interactive-word" data-word="logos">Parole</span> <span class="strong-badge" style="font-size:0.65rem">G3056</span>, et la Parole était avec Dieu <span class="strong-badge" style="font-size:0.65rem">G2316</span>, et la Parole était Dieu.
-      </div>
-      <div class="mockup-verse">
-        <span class="verse-num">2</span>
-        Elle était au commencement avec Dieu.
-      </div>
-      <div class="mockup-verse">
-        <span class="verse-num">3</span>
-        Toutes choses ont été faites par elle, et rien de ce qui a été fait n'a été fait sans elle.
-      </div>
-      <div class="mockup-verse">
-        <span class="verse-num">4</span>
-        En elle était la <span class="hero-interactive-word" data-word="zoe" style="border-bottom:1px dashed var(--accent-cyan)">vie</span>, et la vie était la <span class="hero-interactive-word" data-word="phos" style="border-bottom:1px dashed var(--accent-cyan)">lumière</span> des hommes.
-      </div>
-    `,
-    'sblgnt': `
-      <div class="mockup-verse greek-text" style="font-size: 1.25rem;">
-        <span class="verse-num">1</span>
-        Ἐν <span class="verse-word-greek hero-interactive-word" data-word="arche">ἀρχῇ</span> ἦν ὁ <span class="verse-word-highlight hero-interactive-word" data-word="logos">λόγος</span>, καὶ ὁ λόγος ἦν πρὸς τὸν <span class="verse-word-greek hero-interactive-word" data-word="theos">θεόν</span>, καὶ θεὸς ἦν ὁ λόγος.
-      </div>
-      <div class="mockup-verse greek-text" style="font-size: 1.25rem;">
-        <span class="verse-num">2</span>
-        οὗτος ἦν ἐν ἀρχῇ πρὸς τὸν θεόν.
-      </div>
-      <div class="mockup-verse greek-text" style="font-size: 1.25rem;">
-        <span class="verse-num">3</span>
-        πάντα δι’ αὐτοῦ ἐγένετο, καὶ χωρὶς αὐτοῦ ἐγένετο οὐδὲ ἕν ὃ γέγονεν.
-      </div>
-      <div class="mockup-verse greek-text" style="font-size: 1.25rem;">
-        <span class="verse-num">4</span>
-        ἐν αὐτῷ <span class="verse-word-greek hero-interactive-word" data-word="zoe">ζωὴ</span> ἦν, καὶ ἡ ζωὴ ἦν τὸ <span class="verse-word-greek hero-interactive-word" data-word="phos">φῶς</span> τῶν ἀνθρώπων.
-      </div>
-    `,
-    'pv': `
-      <div class="mockup-verse">
-        <span class="verse-num">1</span>
-        Au commencement de toutes choses, la <span class="verse-word-highlight hero-interactive-word" data-word="logos">Parole</span> existait déjà. Elle était avec Dieu, et elle était elle-même Dieu.
-      </div>
-      <div class="mockup-verse">
-        <span class="verse-num">2</span>
-        Dès le principe, elle était auprès de Dieu.
-      </div>
-      <div class="mockup-verse">
-        <span class="verse-num">3</span>
-        Tout a été créé par elle ; rien de ce qui existe n'a été fait sans elle.
-      </div>
-      <div class="mockup-verse">
-        <span class="verse-num">4</span>
-        En elle résidait la vie véritable, et cette vie était la lumière qui éclaire tous les êtres humains.
-      </div>
-    `,
-    'chouraqui': `
-      <div class="mockup-verse">
-        <span class="verse-num">1</span>
-        En entête était le <span class="verse-word-highlight hero-interactive-word" data-word="logos">Verbe</span>, et le Verbe était auprès d’Elohîms, et le Verbe était Elohîms.
-      </div>
-      <div class="mockup-verse">
-        <span class="verse-num">2</span>
-        Lui-même était en entête auprès d’Elohîms.
-      </div>
-      <div class="mockup-verse">
-        <span class="verse-num">3</span>
-        Tout a été par lui, et hors de lui rien n’a été de ce qui est.
-      </div>
-      <div class="mockup-verse">
-        <span class="verse-num">4</span>
-        En lui était la vie, et la vie était la lumière des hommes.
-      </div>
-    `
-  };
-
-  const wordDetails = {
-    'logos': {
-      strong: 'G3056',
-      title: 'Lemme : λόγος, ου (ὁ)',
-      bailly: 'Dictionnaire Bailly : 1. Parole proférée, discours ; 2. Raison, principe d\'ordre ; 3. Dans l\'Évangile de Jean : le Verbe créateur et éternel incarné en Jésus-Christ.',
-      ai: '« Jean s\'adresse simultanément à l\'esprit grec (logos comme principe rationnel du cosmos) et à la théologie juive (Dabar Yahvé, la parole vivante et créatrice). »'
+    'crampon': {
+      label: "Néo-Crampon Libre",
+      verses: [
+        { num: 1, text: "Au Commencement Dieu créa le ciel et la terre." },
+        { num: 2, text: "La terre était informe et vide ; les ténèbres couvraient l'abîme, et l'Esprit de Dieu se mouvait au-dessus des eaux." },
+        { num: 3, text: "Dieu dit : « Que la lumière soit ! » et la lumière fut." },
+        { num: 4, text: "Et Dieu vit que la lumière était bonne ; et Dieu sépara la lumière et les ténèbres." },
+        { num: 5, text: "Dieu appela la lumière jour, et les ténèbres Nuit. Et il y eut un soir, et il y eut un matin ; ce fut le premier jour." },
+        { num: 6, text: "Dieu dit : « Qu'il y ait un firmament entre les eaux, et qu'il sépare les eaux d'avec les eaux. »" },
+        { num: 7, text: "Et Dieu fit le firmament, et il sépara les eaux qui sont au-dessous du firmament d'avec les eaux qui sont au-dessus du firmament. Et cela fut ainsi." },
+        { num: 8, text: "Dieu appela le firmament Ciel. Et il y eut un soir et il y eut un matin ; ce fut le second jour." },
+        { num: 9, text: "Dieu dit : « Que les eaux qui sont au-dessous du ciel se rassemblent en un seul lieu, et que le sec paraisse. » Et cela fut ainsi." },
+        { num: 10, text: "Dieu appela le sec Terre, et il appela Mer l'amas des eaux. Et Dieu vit que cela était bon." },
+        { num: 11, text: "Puis Dieu dit : « Que la terre fasse pousser du gazon, des herbes portant semence, des arbres à fruit produisant, selon leur espèce, du fruit ayant en soi sa semence, sur la terre. » Et cela fut ainsi." },
+        { num: 12, text: "Et la terre fit sortir du gazon, des herbes portant semence selon leur espèce, et des arbres produisant, selon leur espèce, du fruit ayant en soi sa semence. Et Dieu vit que cela était bon." },
+        { num: 13, text: "Et il y eut un soir, et il y eut un matin ; ce fut le troisième jour." },
+        { num: 14, text: "Dieu dit : « Qu'il y ait des luminaires dans le firmament du ciel pour séparer le jour et la nuit ; qu'ils soient des signes, qu'ils marquent les époques, les jours et les années," },
+        { num: 15, text: "et qu'ils servent de luminaires dans le firmament du ciel pour éclairer la terre. » Et cela fut ainsi." }
+      ]
     },
-    'theos': {
-      strong: 'G2316',
-      title: 'Lemme : θεός, οῦ (ὁ)',
-      bailly: 'Dictionnaire Bailly : Dieu, la divinité suprême, l\'Être éternel créateur de l\'univers.',
-      ai: '« En Jean 1:1c (καὶ θεὸς ἦν ὁ λόγος), l\'absence d\'article devant θεός souligne la nature divine qualitative du Verbe sans le confondre avec la personne du Père. »'
+    'lsg': {
+      label: "Louis Segond 1910",
+      verses: [
+        { num: 1, text: "Au commencement, Dieu créa les cieux et la terre." },
+        { num: 2, text: "La terre était informe et vide: il y avait des ténèbres à la surface de l'abîme, et l'esprit de Dieu se mouvait au-dessus des eaux." },
+        { num: 3, text: "Dieu dit: Que la lumière soit! Et la lumière fut." },
+        { num: 4, text: "Dieu vit que la lumière était bonne; et Dieu sépara la lumière d'avec les ténèbres." },
+        { num: 5, text: "Dieu appela la lumière jour, et il appela les ténèbres nuit. Ainsi, il y eut un soir, et il y eut un matin: ce fut le premier jour." },
+        { num: 6, text: "Dieu dit: Qu'il y ait une étendue entre les eaux, et qu'elle sépare les eaux d'avec les eaux." },
+        { num: 7, text: "Et Dieu fit l'étendue, et il sépara les eaux qui sont au-dessous de l'étendue d'avec les eaux qui sont au-dessus de l'étendue. Et cela fut ainsi." },
+        { num: 8, text: "Dieu appela l'étendue ciel. Ainsi, il y eut un soir, et il y eut un matin: ce fut le second jour." },
+        { num: 9, text: "Dieu dit: Que les eaux qui sont au-dessous du ciel se rassemblent en un seul lieu, et que le sec paraisse. Et cela fut ainsi." },
+        { num: 10, text: "Dieu appela le sec terre, et il appela l'amas des eaux mers. Dieu vit que cela était bon." }
+      ]
     },
-    'arche': {
-      strong: 'G746',
-      title: 'Lemme : ἀρχή, ῆς (ἡ)',
-      bailly: 'Dictionnaire Bailly : 1. Commencement temporel ; 2. Principe premier, origine causale ; 3. Autorité suprême.',
-      ai: '« Écho direct à Béréshit (Genèse 1:1). Jean situe le Verbe au-delà de la création dans l\'éternité préexistante. »'
+    'ostervald': {
+      label: "J.-F. Ostervald (1881)",
+      verses: [
+        { num: 1, text: "Au commencement, Dieu créa les cieux et la terre." },
+        { num: 2, text: "Or la terre était informe et vide, et les ténèbres étaient à la surface de l'abîme, et l'Esprit de Dieu se mouvait sur les eaux." },
+        { num: 3, text: "Et Dieu dit : Que la lumière soit ; et la lumière fut." },
+        { num: 4, text: "Et Dieu vit que la lumière était bonne ; et Dieu sépara la lumière d'avec les ténèbres." },
+        { num: 5, text: "Et Dieu nomma la lumière, Jour ; et il nomma les ténèbres, Nuit. Et il y eut un soir, et il y eut un matin ; ce fut le premier jour." },
+        { num: 6, text: "Puis Dieu dit : Qu'il y ait une étendue entre les eaux, et qu'elle sépare les eaux d'avec les eaux." }
+      ]
     },
-    'zoe': {
-      strong: 'G2222',
-      title: 'Lemme : ζωή, ῆς (ἡ)',
-      bailly: 'Dictionnaire Bailly : La vie au sens absolu, la force vitale spirituelle (distinct de bios, la simple vie biologique).',
-      ai: '« Dans le corpus johannique, la Zoê désigne la vie éternelle et incréée communiquée aux croyants par le Christ. »'
+    'oltramare': {
+      label: "Hugues Oltramare (1874)",
+      verses: [
+        { num: 1, text: "Au commencement, Dieu créa les cieux et la terre." },
+        { num: 2, text: "La terre était déserte et vide, les ténèbres couvraient l'abîme, et le souffle de Dieu planait sur les eaux." },
+        { num: 3, text: "Dieu dit : Que la lumière soit ! et la lumière fut." },
+        { num: 4, text: "Dieu vit que la lumière était bonne, et Dieu sépara la lumière des ténèbres." }
+      ]
     },
-    'phos': {
-      strong: 'G5457',
-      title: 'Lemme : φῶς, φωτός (τό)',
-      bailly: 'Dictionnaire Bailly : Lumière, clarté, illumination spirituelle qui dissipe les ténèbres.',
-      ai: '« Thème majeur chez Jean : la lumière qui luit dans les ténèbres sans que les ténèbres n\'aient pu la submerger (katelaben). »'
+    'darby': {
+      label: "J.N. Darby (1885)",
+      verses: [
+        { num: 1, text: "Au commencement Dieu créa les cieux et la terre." },
+        { num: 2, text: "Et la terre était désolation et vide, et il y avait des ténèbres sur la face de l'abîme ; et l'Esprit de Dieu planait sur la face des eaux." },
+        { num: 3, text: "Et Dieu dit : Que la lumière soit. Et la lumière fut." },
+        { num: 4, text: "Et Dieu vit la lumière, qu'elle était bonne ; et Dieu sépara la lumière d'avec les ténèbres." }
+      ]
+    },
+    'sblgnt': {
+      label: "Septante LXX (Grec)",
+      verses: [
+        { num: 1, text: "Ἐν ἀρχῇ ἐποίησεν ὁ θεὸς τὸν οὐρανὸν καὶ τὴν γῆν." },
+        { num: 2, text: "ἡ δὲ γῆ ἦν ἀόρατος καὶ ἀκατασκεύαστος, καὶ σκότος ἐπάνω τῆς ἀβύσσου, καὶ πνεῦμα θεοῦ ἐπεφέρετο ἐπάνω τοῦ ὕδατος." },
+        { num: 3, text: "καὶ εἶπεν ὁ θεός· Γενηθήτω φῶς. καὶ ἐγένετο φῶς." },
+        { num: 4, text: "καὶ εἶδεν ὁ θεὸς τὸ φῶς ὅτι καλόν· καὶ διεχώρισεν ὁ θεὸς ἀνὰ μέσον τοῦ φωτὸς καὶ ἀνὰ μέσον τοῦ σκότους." }
+      ]
     }
   };
 
-  function bindInteractiveWords() {
-    const words = document.querySelectorAll('.hero-interactive-word');
-    words.forEach(w => {
-      w.addEventListener('mouseenter', () => {
-        const key = w.getAttribute('data-word');
-        const d = wordDetails[key];
-        if (!d) return;
+  // Bascule du menu déroulant de version
+  if (versionCurrent && versionDropdown) {
+    versionCurrent.addEventListener('click', (e) => {
+      e.stopPropagation();
+      versionDropdown.classList.toggle('open');
+    });
 
-        if (strongBadge) strongBadge.textContent = d.strong;
-        if (drawerCardMorph) {
-          drawerCardMorph.innerHTML = `
-            <div class="drawer-card-header">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
-              ${d.title}
-            </div>
-            <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">
-              <strong>${d.bailly}</strong>
-            </p>
-          `;
-        }
-        if (drawerCardAi) {
-          drawerCardAi.innerHTML = `
-            <div class="drawer-card-header" style="color: var(--accent-gold);">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"></path><path d="M12 6v6l4 2"></path></svg>
-              Assistant IA (Sparring-Partner)
-            </div>
-            <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">
-              <em>${d.ai}</em>
-            </p>
-          `;
-        }
-      });
+    document.addEventListener('click', () => {
+      versionDropdown.classList.remove('open');
     });
   }
 
-  versionPills.forEach(pill => {
-    pill.addEventListener('click', () => {
-      const vKey = pill.getAttribute('data-version-key');
-      versionPills.forEach(p => p.classList.remove('active'));
-      pill.classList.add('active');
+  // Choix d'une version
+  versionOpts.forEach(opt => {
+    opt.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const key = opt.getAttribute('data-v');
+      if (!key || !translations[key]) return;
 
-      if (readerPassage && translations[vKey]) {
-        readerPassage.innerHTML = translations[vKey];
-        bindInteractiveWords();
+      versionOpts.forEach(o => o.classList.remove('active'));
+      opt.classList.add('active');
+
+      if (versionLabel) versionLabel.textContent = translations[key].label;
+      if (versionDropdown) versionDropdown.classList.remove('open');
+
+      // Reconstruire les versets
+      if (versesContainer) {
+        const data = translations[key];
+        let markup = '';
+        data.verses.forEach(v => {
+          const isHl = (v.num === 1) ? ' highlighted' : '';
+          markup += `
+            <span class="verse-unit${isHl}" data-verse="${v.num}">
+              <sup class="verse-sup">${v.num}</sup><span class="verse-words">${v.text}</span>
+            </span>
+          `;
+        });
+        versesContainer.innerHTML = markup;
+        attachVerseListeners();
       }
     });
   });
 
-  // Sidebar mock items switching preview
-  const sidebarItems = document.querySelectorAll('.hero-sidebar-item');
-  sidebarItems.forEach(item => {
-    item.addEventListener('click', () => {
-      sidebarItems.forEach(i => i.classList.remove('active'));
-      item.classList.add('active');
+  // Sélection interactive des versets au clic
+  function attachVerseListeners() {
+    const units = document.querySelectorAll('.verse-unit');
+    units.forEach(u => {
+      u.addEventListener('click', () => {
+        units.forEach(el => el.classList.remove('highlighted'));
+        u.classList.add('highlighted');
+      });
     });
-  });
+  }
 
-  bindInteractiveWords();
+  attachVerseListeners();
 }
 
-/* ==========================================================================
-   10. VOLET APERÇU 360° INTERACTIF (SLIDE 1 DEEP-DIVE)
-   ========================================================================== */
 function initMarc2DrawerInteractions() {
   const accHeads = document.querySelectorAll('.drawer-acc-head');
   const commentItems = document.querySelectorAll('.drawer-list-item[data-comment-id]');

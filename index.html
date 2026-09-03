@@ -146,143 +146,273 @@
         </a>
       </div>
 
-      <!-- 3D Mockup Showcase (Apparaît directement sous les boutons !) -->
+      <!-- 3D Mockup Showcase : Reproduction 1:1 de l'Interface Réelle Open Shema -->
       <div class="hero-mockup-wrapper">
         <div class="app-window-frame">
-          <div class="app-window-header">
-            <div class="window-dots">
-              <span class="window-dot red"></span>
-              <span class="window-dot yellow"></span>
-              <span class="window-dot green"></span>
+          
+          <!-- 1. Barre de Titre Supérieure Réelle (Onyx épuré) -->
+          <div class="app-window-topbar">
+            
+            <!-- Recherche rapide dans la barre latérale -->
+            <div class="topbar-search-box">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8A8178" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <span class="topbar-search-placeholder">Passage ou sujet...</span>
+              <button class="topbar-sidebar-toggle" title="Masquer / Afficher le panneau">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8A8178" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+              </button>
             </div>
-            <div class="window-title">
-              <img src="assets/img/logo.svg" width="14" height="14" alt="Icon">
-              Open Shema — Jean 1:1-5 (Interlinéaire Grec & Exégèse IA)
+
+            <!-- Nom du logiciel au centre -->
+            <div class="topbar-brand-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C47B2B" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+              <span>OPEN SHEMA</span>
             </div>
-            <div style="font-size: 0.75rem; color: var(--accent-cyan); font-family: var(--font-mono);">
-              BGE-M3 RAG: ACTIF
+
+            <!-- Boutons de contrôle de fenêtre OS -->
+            <div class="topbar-window-controls">
+              <span class="win-ctrl win-min">−</span>
+              <span class="win-ctrl win-max">▢</span>
+              <span class="win-ctrl win-close">✕</span>
             </div>
           </div>
 
+          <!-- 2. Corps Principal (Sidebar + Zone de Lecture) -->
           <div class="app-window-body">
-            <!-- Mockup Sidebar -->
+            
+            <!-- Colonne Gauche : Barre Latérale Officielle Complète -->
             <div class="mockup-sidebar">
-              <div class="mockup-nav-group">
-                <span class="mockup-nav-title">Navigation</span>
-                <div class="mockup-nav-item active">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-                  Lecteur Biblique
+              <div class="sidebar-menu-list">
+                
+                <!-- Module Bible (Actif avec surbrillance ambrée) -->
+                <div class="sidebar-item active" data-nav="bible">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  <span>Bible</span>
                 </div>
-                <div class="mockup-nav-item">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><path d="M13 6h3a2 2 0 0 1 2 2v7"></path><line x1="6" y1="9" x2="6" y2="21"></line></svg>
-                  Comparateur Synoptique
+
+                <div class="sidebar-item" data-nav="guide">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+                  <span>Guide de Passage</span>
                 </div>
-                <div class="mockup-nav-item">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path></svg>
-                  Atelier Prédication
+
+                <div class="sidebar-item" data-nav="commentaires">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                  <span>Commentaires</span>
                 </div>
-                <div class="mockup-nav-item">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                  Importateur Universel
+
+                <div class="sidebar-item" data-nav="theologie">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="21" x2="21" y2="21"></line><line x1="6" y1="21" x2="6" y2="10"></line><line x1="10" y1="21" x2="10" y2="10"></line><line x1="14" y1="21" x2="14" y2="10"></line><line x1="18" y1="21" x2="18" y2="10"></line><polygon points="12 3 2 10 22 10 12 3"></polygon></svg>
+                  <span>Théologie</span>
+                </div>
+
+                <div class="sidebar-item" data-nav="blogs">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path><path d="M18 14h-8"></path><path d="M15 18h-5"></path><path d="M10 6h8v4h-8V6Z"></path></svg>
+                  <span>Articles de Blogs</span>
+                </div>
+
+                <div class="sidebar-item" data-nav="dictionnaires">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                  <span>Dictionnaires</span>
+                </div>
+
+                <div class="sidebar-item" data-nav="bibliotheque">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                  <span>Bibliothèque</span>
+                </div>
+
+                <div class="sidebar-item" data-nav="rechercher">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                  <span>Rechercher</span>
+                </div>
+
+                <div class="sidebar-item" data-nav="assistant">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>
+                  <span>Assistant d'Étude</span>
+                </div>
+
+                <div class="sidebar-item" data-nav="notes">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                  <span>Notes</span>
+                </div>
+
+                <div class="sidebar-item" data-nav="predication">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path></svg>
+                  <span>Prédication</span>
+                  <span class="sidebar-chevron">▾</span>
+                </div>
+
+                <div class="sidebar-item" data-nav="cartes">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+                  <span>Cartes</span>
                 </div>
               </div>
-              <div class="mockup-nav-group">
-                <span class="mockup-nav-title">Ressources & IA</span>
-                <div class="mockup-nav-item">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                  Commentaires Croisés
+
+              <!-- Bas de la barre latérale épinglé -->
+              <div class="sidebar-bottom-list">
+                <div class="sidebar-item" data-nav="parametres">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                  <span>Paramètres</span>
                 </div>
-                <div class="mockup-nav-item">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                  Dictionnaire Dom Calmet
-                </div>
-                <div class="mockup-nav-item">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
-                  Atlas & Géographie
-                </div>
-                <div class="mockup-nav-item">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                  Notes Markdown (.md)
+                <div class="sidebar-item" data-nav="credits">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                  <span>À propos &amp; Crédits</span>
                 </div>
               </div>
             </div>
 
-            <!-- Mockup Central Reader -->
-            <div class="mockup-reader">
-              <div class="mockup-reader-header">
-                <div>
-                  <div style="font-size: 0.72rem; color: var(--accent-gold); font-family: var(--font-title); letter-spacing: 0.05em; margin-bottom: 2px;">
-                    ❦ NOUVEAU TESTAMENT — ÉVANGILE SELON JEAN ❧
+            <!-- Colonne Droite : Lecteur Biblique Authentique avec Toile Parchemin Sépia -->
+            <div class="mockup-reader-wrapper">
+              
+              <!-- Barre d'Outils Supérieure Réelle -->
+              <div class="reader-real-toolbar">
+                <div class="toolbar-left-group">
+                  <button class="tbar-nav-btn" title="Chapitre précédent">‹</button>
+                  <button class="tbar-nav-btn" title="Chapitre suivant">›</button>
+
+                  <div class="tbar-passage-pill">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                    <strong>Genèse 1:1</strong>
+                    <span class="tbar-chevron">▾</span>
                   </div>
-                  <h2 class="reader-passage-title" style="font-size: 1.25rem;">Jean 1:1-5 — L'Incarnation du Verbe</h2>
+
+                  <div class="tbar-menu-item">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    <span>Affichage</span>
+                    <span class="tbar-chevron">▾</span>
+                  </div>
+
+                  <div class="tbar-menu-item">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <span>Chercher</span>
+                  </div>
+
+                  <div class="tbar-menu-item">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    <span>Notes</span>
+                  </div>
+
+                  <div class="tbar-menu-item">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 2 4 4-12 12H6v-4L18 2z"></path></svg>
+                    <span>Surligner</span>
+                    <span class="tbar-chevron">▾</span>
+                  </div>
                 </div>
-                <div class="reader-version-pills">
-                  <span class="version-pill hero-version-pill active" data-version-key="s21">Segond 21</span>
-                  <span class="version-pill hero-version-pill" data-version-key="lsg">LSG 1910</span>
-                  <span class="version-pill hero-version-pill" data-version-key="sblgnt">SBLGNT (Grec)</span>
-                  <span class="version-pill hero-version-pill" data-version-key="pv">Parole Vivante</span>
-                  <span class="version-pill hero-version-pill" data-version-key="chouraqui">Chouraqui</span>
+
+                <div class="toolbar-right-group">
+                  <button class="tbar-tool-btn" title="Basculer vers l'interlinéaire">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>
+                    <span>Interlinéaire</span>
+                    <span class="tbar-chevron">▾</span>
+                  </button>
+
+                  <button class="tbar-tool-btn" title="Afficher deux versions côte à côte">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line></svg>
+                    <span>Double Vue</span>
+                  </button>
+
+                  <div class="tbar-zoom-ctrl">
+                    <button class="zoom-step-btn">−</button>
+                    <span class="zoom-val">100%</span>
+                    <button class="zoom-step-btn">+</button>
+                  </div>
+
+                  <button class="tbar-tool-btn" title="Projeter sur un deuxième écran">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"></rect><line x1="8" x2="16" y1="21"></line><line x1="12" x2="12" y2="17"></line></svg>
+                    <span>Écran 2</span>
+                  </button>
+
+                  <button class="tbar-pane-toggle" title="Volet droit">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="15" y1="3" x2="15" y2="21"></line></svg>
+                  </button>
                 </div>
               </div>
 
-              <div class="mockup-verses" id="hero-reader-passage">
-                <div class="mockup-verse">
-                  <span class="verse-num">1</span>
-                  Au commencement était la <span class="verse-word-highlight hero-interactive-word" data-word="logos">Parole</span> 
-                  (<span class="verse-word-greek hero-interactive-word" data-word="logos">λόγος</span>), et la Parole était avec Dieu (<span class="verse-word-greek hero-interactive-word" data-word="theos">θεός</span>), 
-                  et la Parole était Dieu.
+              <!-- Toile de Lecture Parchemin Sépia Réelle (Identique à la capture) -->
+              <div class="real-sepia-canvas" id="hero-sepia-canvas">
+                
+                <!-- Fil d'Ariane & Sélecteur de Traduction (100% LIBRES DE DROITS) -->
+                <div class="canvas-meta-bar">
+                  <div class="canvas-breadcrumb">GENÈSE &gt; CHAPITRE 1</div>
+                  
+                  <div class="canvas-version-selector" id="canvas-version-selector">
+                    <div class="canvas-version-current" id="canvas-version-current">
+                      <span class="canvas-version-tag-icon">⚲</span>
+                      <span id="canvas-version-label">Néo-Crampon Libre</span>
+                      <span class="canvas-version-chevron">▾</span>
+                    </div>
+
+                    <!-- Menu déroulant des 6 traductions libres de droits -->
+                    <div class="canvas-version-dropdown" id="canvas-version-dropdown">
+                      <div class="version-opt active" data-v="crampon">Néo-Crampon Libre (1923)</div>
+                      <div class="version-opt" data-v="lsg">Louis Segond 1910 (Codes Strong)</div>
+                      <div class="version-opt" data-v="ostervald">J.-F. Ostervald (1881/1900)</div>
+                      <div class="version-opt" data-v="oltramare">Hugues Oltramare (1874)</div>
+                      <div class="version-opt" data-v="darby">J.N. Darby (1885)</div>
+                      <div class="version-opt" data-v="sblgnt">SBL Greek New Testament (Libre)</div>
+                    </div>
+                  </div>
                 </div>
-                <div class="mockup-verse">
-                  <span class="verse-num">2</span>
-                  Elle était au commencement avec Dieu.
+
+                <!-- Grand Titre de Chapitre Typographique -->
+                <h1 class="canvas-chapter-title">CHAPITRE 1</h1>
+
+                <!-- Texte des Versets en Paragraphe Fluide avec Verset 1 Surligné -->
+                <div class="canvas-verses-body" id="hero-verses-container">
+                  <span class="verse-unit highlighted" data-verse="1">
+                    <sup class="verse-sup">1</sup><span class="verse-words">Au Commencement Dieu créa le ciel et la terre.</span>
+                  </span>
+                  <span class="verse-unit" data-verse="2">
+                    <sup class="verse-sup">2</sup><span class="verse-words">La terre était informe et vide ; les ténèbres couvraient l'abîme, et l'Esprit de Dieu se mouvait au-dessus des eaux.</span>
+                  </span>
+                  <span class="verse-unit" data-verse="3">
+                    <sup class="verse-sup">3</sup><span class="verse-words">Dieu dit : « Que la lumière soit ! » et la lumière fut.</span>
+                  </span>
+                  <span class="verse-unit" data-verse="4">
+                    <sup class="verse-sup">4</sup><span class="verse-words">Et Dieu vit que la lumière était bonne ; et Dieu sépara la lumière et les ténèbres.</span>
+                  </span>
+                  <span class="verse-unit" data-verse="5">
+                    <sup class="verse-sup">5</sup><span class="verse-words">Dieu appela la lumière jour, et les ténèbres Nuit. Et il y eut un soir, et il y eut un matin ; ce fut le premier jour.</span>
+                  </span>
+                  <span class="verse-unit" data-verse="6">
+                    <sup class="verse-sup">6</sup><span class="verse-words">Dieu dit : « Qu'il y ait un firmament entre les eaux, et qu'il sépare les eaux d'avec les eaux. »</span>
+                  </span>
+                  <span class="verse-unit" data-verse="7">
+                    <sup class="verse-sup">7</sup><span class="verse-words">Et Dieu fit le firmament, et il sépara les eaux qui sont au-dessous du firmament d'avec les eaux qui sont au-dessus du firmament. Et cela fut ainsi.</span>
+                  </span>
+                  <span class="verse-unit" data-verse="8">
+                    <sup class="verse-sup">8</sup><span class="verse-words">Dieu appela le firmament Ciel. Et il y eut un soir et il y eut un matin ; ce fut le second jour.</span>
+                  </span>
+                  <span class="verse-unit" data-verse="9">
+                    <sup class="verse-sup">9</sup><span class="verse-words">Dieu dit : « Que les eaux qui sont au-dessous du ciel se rassemblent en un seul lieu, et que le sec paraisse. » Et cela fut ainsi.</span>
+                  </span>
+                  <span class="verse-unit" data-verse="10">
+                    <sup class="verse-sup">10</sup><span class="verse-words">Dieu appela le sec Terre, et il appela Mer l'amas des eaux. Et Dieu vit que cela était bon.</span>
+                  </span>
+                  <span class="verse-unit" data-verse="11">
+                    <sup class="verse-sup">11</sup><span class="verse-words">Puis Dieu dit : « Que la terre fasse pousser du gazon, des herbes portant semence, des arbres à fruit produisant, selon leur espèce, du fruit ayant en soi sa semence, sur la terre. » Et cela fut ainsi.</span>
+                  </span>
+                  <span class="verse-unit" data-verse="12">
+                    <sup class="verse-sup">12</sup><span class="verse-words">Et la terre fit sortir du gazon, des herbes portant semence selon leur espèce, et des arbres produisant, selon leur espèce, du fruit ayant en soi sa semence. Et Dieu vit que cela était bon.</span>
+                  </span>
+                  <span class="verse-unit" data-verse="13">
+                    <sup class="verse-sup">13</sup><span class="verse-words">Et il y eut un soir, et il y eut un matin ; ce fut le troisième jour.</span>
+                  </span>
+                  <span class="verse-unit" data-verse="14">
+                    <sup class="verse-sup">14</sup><span class="verse-words">Dieu dit : « Qu'il y ait des luminaires dans le firmament du ciel pour séparer le jour et la nuit ; qu'ils soient des signes, qu'ils marquent les époques, les jours et les années,</span>
+                  </span>
+                  <span class="verse-unit" data-verse="15">
+                    <sup class="verse-sup">15</sup><span class="verse-words">et qu'ils servent de luminaires dans le firmament du ciel pour éclairer la terre. » Et cela fut ainsi.</span>
+                  </span>
                 </div>
-                <div class="mockup-verse">
-                  <span class="verse-num">3</span>
-                  Toutes choses ont été faites par elle, et rien de ce qui a été fait n'a été fait sans elle.
-                </div>
-                <div class="mockup-verse">
-                  <span class="verse-num">4</span>
-                  En elle était la <span class="verse-word-greek hero-interactive-word" data-word="zoe">vie</span> (ζωή), et la vie était la <span class="verse-word-greek hero-interactive-word" data-word="phos">lumière</span> (φῶς) des hommes.
-                </div>
+
               </div>
+
             </div>
 
-            <!-- Mockup Right Drawer -->
-            <div class="mockup-drawer">
-              <div class="drawer-header">
-                <span class="drawer-title">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                  Exégèse & Morphologie
-                </span>
-                <span class="strong-badge" id="hero-strong-badge">G3056</span>
-              </div>
-
-              <div class="drawer-card" id="hero-drawer-morph">
-                <div class="drawer-card-header">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
-                  Lemme : λόγος, ου (ὁ)
-                </div>
-                <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">
-                  <strong>Dictionnaire Bailly :</strong> 1. Parole proférée, discours ; 2. Raison divine incarnée, Verbe créateur éternel.
-                </p>
-              </div>
-
-              <div class="drawer-card" id="hero-drawer-ai" style="border-color: rgba(56, 189, 248, 0.4);">
-                <div class="drawer-card-header" style="color: var(--accent-gold);">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"></path><path d="M12 6v6l4 2"></path></svg>
-                  Assistant IA (Sparring-Partner)
-                </div>
-                <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">
-                  <em>« Jean utilise λόγος en écho à la Genèse (Gen 1:3 "Dieu dit"), unifiant la Sagesse juive (Hokhmah) et le principe d'ordre universel grec. »</em>
-                </p>
-              </div>
-            </div>
           </div>
+
         </div>
       </div>
-  </section>
-
-  <!-- Bandeau de Chiffres Clés (S'affiche uniquement au scroll !) -->
+<!-- Bandeau de Chiffres Clés (S'affiche uniquement au scroll !) -->
   <section class="stats-strip-section">
     <div class="container">
       <div class="stats-strip-grid reveal-on-scroll">
@@ -291,7 +421,7 @@
           <span class="stat-strip-lbl">Local en Fichiers Markdown</span>
         </div>
         <div class="stat-strip-card">
-          <span class="stat-strip-val gradient-text">0 €</span>
+          <span class="stat-strip-val gold-gradient-text">0 €</span>
           <span class="stat-strip-lbl">Zéro abonnement obligatoire</span>
         </div>
         <div class="stat-strip-card">
