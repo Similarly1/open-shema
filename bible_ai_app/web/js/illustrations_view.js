@@ -374,19 +374,24 @@ const IllustrationsView = {
         document.getElementById('btn-download-illustrations-pack')?.addEventListener('click', async (e) => {
           const btn = e.currentTarget;
           btn.disabled = true;
-          btn.innerHTML = `<span class="spin-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></span> <span>Installation en cours...</span>`;
+          btn.innerHTML = `<span class="spin-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></span> <span>Activation en cours...</span>`;
           try {
             const res = await API.call('install_illustrations_pack');
-            if (res && res.success) {
+            if (res && res.success && res.count > 0) {
               if (typeof App !== 'undefined' && App.showToast) {
-                App.showToast(`Pack de ${res.count || 4000} illustrations installé avec succès !`, 'success');
+                App.showToast(`Pack de ${res.count.toLocaleString('fr-FR')} illustrations activé avec succès !`, 'success');
               }
               await this.loadFirstPage();
+            } else {
+              throw new Error(res?.error || "Le pack de 4 000 illustrations est en cours d'initialisation ou introuvable.");
             }
           } catch (err) {
             console.error('Erreur installation pack illustrations:', err);
             btn.disabled = false;
             btn.innerHTML = `<span>Réessayer</span>`;
+            if (typeof App !== 'undefined' && App.showToast) {
+              App.showToast(err.message || "Erreur lors de l'activation du pack d'illustrations.", 'error');
+            }
           }
         });
 

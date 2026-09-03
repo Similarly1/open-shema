@@ -64,8 +64,13 @@ def build():
     if res.returncode == 0:
         zip_path = os.path.join("dist", "OpenShema.zip")
         src_folder = os.path.join("dist", "OpenShema")
-        if not os.path.exists(zip_path) and os.path.exists(src_folder):
-            print("-> Génération de l'archive dist/OpenShema.zip...")
+        if os.path.exists(src_folder):
+            print("-> Génération de l'archive complète dist/OpenShema.zip...")
+            if os.path.exists(zip_path):
+                try:
+                    os.remove(zip_path)
+                except Exception:
+                    pass
             shutil.make_archive(os.path.join("dist", "OpenShema"), "zip", src_folder)
 
         print("\n[SUCCÈS] Installeur compilé avec succès !")

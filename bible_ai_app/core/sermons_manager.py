@@ -541,7 +541,14 @@ class SermonsManager:
 
         pack_installed = cls.is_illustrations_pack_installed(config)
         illustrations_map: Dict[str, Dict[str, Any]] = {}
-        cache_json_file = os.path.join(CURRENT_DIR, "data", "illustrations_processed_cache.json")
+        import sys
+        cache_candidates = [
+            os.path.join(CURRENT_DIR, "data", "illustrations_processed_cache.json"),
+            os.path.join(os.path.dirname(sys.executable), "data", "illustrations_processed_cache.json"),
+            os.path.join(os.path.dirname(sys.executable), "_internal", "data", "illustrations_processed_cache.json"),
+            os.path.join(getattr(sys, "_MEIPASS", ""), "data", "illustrations_processed_cache.json")
+        ]
+        cache_json_file = next((p for p in cache_candidates if p and os.path.exists(p)), cache_candidates[0])
 
         if pack_installed and os.path.exists(cache_json_file):
             try:

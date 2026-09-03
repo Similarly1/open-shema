@@ -33,20 +33,23 @@ class MapsManager:
     _conn = None
 
     @classmethod
-    def get_connection(cls) -> sqlite3.Connection:
+    def get_connection(cls) -> Optional[sqlite3.Connection]:
         if cls._conn is None:
-            if not os.path.exists(DB_PATH):
-                logger.warning(f"Base de données de cartes introuvable: {DB_PATH}")
-                # Tentative d'auto-construction si le script existe
-                try:
-                    from scripts.build_biblical_places_db import build_database
-                    logger.info("Construction automatique de biblical_places.db...")
-                    build_database()
-                except Exception as e:
-                    logger.error(f"Erreur lors de la construction automatique: {e}")
+            import sys
+            db_candidates = [
+                DB_PATH,
+                os.path.join(DATA_DIR, "biblical_places.db"),
+                os.path.join(os.path.dirname(sys.executable), "data", "biblical_places.db"),
+                os.path.join(os.path.dirname(sys.executable), "_internal", "data", "biblical_places.db"),
+                os.path.join(getattr(sys, "_MEIPASS", ""), "data", "biblical_places.db"),
+                os.path.join(CURRENT_DIR, "..", "data", "biblical_places.db")
+            ]
+            actual_db_path = next((p for p in db_candidates if p and os.path.exists(p)), None)
             
-            if os.path.exists(DB_PATH):
-                cls._conn = sqlite3.connect(DB_PATH, check_same_thread=False)
+            if not actual_db_path:
+                logger.warning(f"Base de données de cartes introuvable dans les chemins candidats: {db_candidates}")
+            else:
+                cls._conn = sqlite3.connect(actual_db_path, check_same_thread=False)
                 cls._conn.row_factory = sqlite3.Row
         return cls._conn
 

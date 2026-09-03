@@ -65,6 +65,43 @@ def build():
     result = subprocess.run(args)
 
     if result.returncode == 0:
+        print("-> Copie des données applicatives embarquées (data/)...")
+        dist_app_dir = os.path.join(current_dir, "dist", "OpenShema")
+        src_data_dir = os.path.join(current_dir, "data")
+
+        for dest_data_dir in [
+            os.path.join(dist_app_dir, "data"),
+            os.path.join(dist_app_dir, "_internal", "data")
+        ]:
+            os.makedirs(dest_data_dir, exist_ok=True)
+
+            essential_files = [
+                "biblical_places.db",
+                "illustrations_processed_cache.json",
+                "catalog.json",
+                "bibles_registry.json",
+                "gospel_parallels.json",
+                "french_accent_map.json",
+                "french_words.json",
+                "strong_lexicon.json",
+                "bailly_lexicon.json",
+                "config.example.json",
+                "config.json",
+                "user_profile.json"
+            ]
+            for fname in essential_files:
+                src_f = os.path.join(src_data_dir, fname)
+                if os.path.exists(src_f):
+                    shutil.copy2(src_f, os.path.join(dest_data_dir, fname))
+
+            for sub in ["bibles", "covers", "dictionaries"]:
+                src_sub = os.path.join(src_data_dir, sub)
+                if os.path.exists(src_sub):
+                    dest_sub = os.path.join(dest_data_dir, sub)
+                    if os.path.exists(dest_sub):
+                        shutil.rmtree(dest_sub)
+                    shutil.copytree(src_sub, dest_sub)
+
         print("\n[SUCCÈS] Build généré avec succès dans 'dist/OpenShema/' !")
         print("Pour tester : dist\\OpenShema\\OpenShema.exe\n")
     else:
