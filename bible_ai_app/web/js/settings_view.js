@@ -239,6 +239,9 @@ const SettingsView = {
       this.loadDictionaries();
       this.loadStepBibleStatus();
     }
+    if (secId === 'updates' && window.AppUpdater) {
+      window.AppUpdater.loadSettings();
+    }
 
     if (scrollTargetId) {
       setTimeout(() => {

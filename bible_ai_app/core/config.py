@@ -274,9 +274,11 @@ DEFAULTS = {
     "vintage_scope": "auto",
     "vintage_intensity": "subtle",
     "articles_vectorization_mode": "balanced",  # "balanced", "economical", "full"
-    "articles_recent_vectorize_cap": 10,
     # Répertoire des ebooks théologiques (format EPUB) — configurable par l'utilisateur
     "ebooks_dir": "",
+    # Paramètres de mise à jour automatique in-app (startup, weekly, manual)
+    "update_frequency": "startup",
+    "last_update_check": 0,
     # Personnalisation et ordre des éléments du menu latéral (sidebar)
     "sidebar_menu": [
         {"id": "bible", "visible": True},

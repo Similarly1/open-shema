@@ -886,22 +886,40 @@
       </div>
     </div>
 
-    <!-- DROITE : Contrôles de la fenêtre Windows -->
-    <div class="window-titlebar-controls">
-      <button class="win-control-btn" id="win-btn-min" title="Réduire la fenêtre">
-        <svg width="10" height="2" viewBox="0 0 10 2"><rect width="10" height="2" fill="currentColor"/></svg>
+    <!-- DROITE : Bouton de Mise à Jour & Contrôles de la fenêtre Windows -->
+    <div class="topbar-right-zone">
+      <!-- Bouton discret de mise à jour (masqué par défaut, visible dès qu'une version est disponible) -->
+      <button type="button" class="topbar-update-pill hidden" id="topbar-update-btn" title="Mise à jour disponible">
+        <span class="update-pill-icon" id="topbar-update-icon">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 19V5M5 12l7-7 7 7"/>
+          </svg>
+        </span>
+        <span class="update-pill-text" id="topbar-update-text">Mettre à jour</span>
+        <span class="update-pill-spinner hidden" id="topbar-update-spinner">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" class="spin-icon">
+            <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+          </svg>
+        </span>
+        <div class="update-pill-progress-bar" id="topbar-update-progress-bar"></div>
       </button>
-      <button class="win-control-btn" id="win-btn-max" title="Restaurer la taille de la fenêtre">
-        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="3" width="6" height="6" rx="1"/><path d="M3 1h5a1 1 0 0 1 1 1v5"/></svg>
-      </button>
-      <button class="win-control-btn" id="win-btn-fs" title="Plein Écran Total (Masquer la barre des tâches)">
-        <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M1 5V1h4M11 1h4v4M15 11v4h-4M5 15H1v-4"/>
-        </svg>
-      </button>
-      <button class="win-control-btn win-control-close" id="win-btn-close" title="Fermer Open Shema">
-        <svg width="10" height="10" viewBox="0 0 10 10" stroke="currentColor" stroke-width="1.2"><line x1="1" y1="1" x2="9" y2="9"/><line x1="9" y1="1" x2="1" y2="9"/></svg>
-      </button>
+
+      <div class="window-titlebar-controls">
+        <button class="win-control-btn" id="win-btn-min" title="Réduire la fenêtre">
+          <svg width="10" height="2" viewBox="0 0 10 2"><rect width="10" height="2" fill="currentColor"/></svg>
+        </button>
+        <button class="win-control-btn" id="win-btn-max" title="Restaurer la taille de la fenêtre">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="3" width="6" height="6" rx="1"/><path d="M3 1h5a1 1 0 0 1 1 1v5"/></svg>
+        </button>
+        <button class="win-control-btn" id="win-btn-fs" title="Plein Écran Total (Masquer la barre des tâches)">
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M1 5V1h4M11 1h4v4M15 11v4h-4M5 15H1v-4"/>
+          </svg>
+        </button>
+        <button class="win-control-btn win-control-close" id="win-btn-close" title="Fermer Open Shema">
+          <svg width="10" height="10" viewBox="0 0 10 10" stroke="currentColor" stroke-width="1.2"><line x1="1" y1="1" x2="9" y2="9"/><line x1="9" y1="1" x2="1" y2="9"/></svg>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -1615,6 +1633,15 @@
                 <path d="M10 15h4"></path>
               </svg>
               <span>Sauvegarde ZIP</span>
+            </button>
+            <button class="settings-tab" data-sec="updates">
+              <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <path d="M3 3v5h5"></path>
+                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+                <path d="M16 21h5v-5"></path>
+              </svg>
+              <span>Mises à jour</span>
             </button>
             <button class="settings-tab" data-sec="about">
               <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -3562,6 +3589,114 @@
               <p class="card-desc" style="margin: 0; line-height: 1.5;">
                 Open Shema est un logiciel libre distribué sous licence <strong>MIT</strong>. Vos notes, données et requêtes d'étude restent strictement privées et stockées sur votre ordinateur.
               </p>
+            </div>
+
+          </div>
+
+          <!-- Section 9 : Mises à jour du logiciel -->
+          <div class="settings-section" id="sec-updates">
+            
+            <!-- CARTE 1 : STATUT ACTUEL & VÉRIFICATION -->
+            <div class="settings-card">
+              <div class="card-title" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-primary, #0284c7);">
+                    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                    <path d="M3 3v5h5"></path>
+                    <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+                    <path d="M16 21h5v-5"></path>
+                  </svg>
+                  <span>État de votre version d'Open Shema</span>
+                </div>
+                <span class="badge-tag" id="lbl-update-status-badge" style="background: rgba(2, 132, 199, 0.15); color: #38bdf8; font-size: 11.5px; font-weight: 600; padding: 3px 10px; border-radius: 12px;">
+                  Version v1.0.0
+                </span>
+              </div>
+              <p class="card-desc" id="lbl-update-status-desc">
+                Open Shema vérifie automatiquement les mises à jour pour vous offrir les dernières traductions, commentaires et fonctionnalités.
+              </p>
+
+              <div style="display: flex; align-items: center; gap: 14px; margin-top: 14px; flex-wrap: wrap;">
+                <button type="button" class="btn-primary" id="btn-check-updates-now" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; padding: 8px 16px;">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" id="icon-check-updates-spin">
+                    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                    <path d="M3 3v5h5"></path>
+                    <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+                    <path d="M16 21h5v-5"></path>
+                  </svg>
+                  <span id="lbl-check-updates-btn-text">Rechercher des mises à jour</span>
+                </button>
+
+                <div style="font-size: 12px; color: var(--text-muted);" id="lbl-last-check-time">
+                  Dernière vérification : Jamais
+                </div>
+              </div>
+
+              <!-- Bloc alerte si une mise à jour est prête ou disponible -->
+              <div id="update-available-card" class="hidden" style="margin-top: 18px; padding: 16px; background: rgba(2, 132, 199, 0.08); border: 1px solid rgba(2, 132, 199, 0.25); border-radius: 10px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
+                  <div>
+                    <h3 style="margin: 0; font-size: 14.5px; font-weight: 700; color: var(--text-primary);" id="lbl-update-available-title">
+                      Nouvelle version v1.0.1 disponible
+                    </h3>
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;" id="lbl-update-available-meta">
+                      Taille estimée : ~300 Mo
+                    </div>
+                  </div>
+                  <button type="button" class="btn-primary" id="btn-start-update-action" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; padding: 8px 16px;">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" id="icon-start-update-btn">
+                      <path d="M12 19V5M5 12l7-7 7 7"/>
+                    </svg>
+                    <span id="lbl-start-update-action-text">Télécharger et installer</span>
+                  </button>
+                </div>
+
+                <!-- Jauge de progression dans les paramètres -->
+                <div id="update-settings-progress-box" class="hidden" style="margin-top: 10px;">
+                  <div style="display: flex; justify-content: space-between; font-size: 11.5px; color: var(--text-secondary); margin-bottom: 4px;">
+                    <span id="lbl-update-progress-status">Téléchargement en cours...</span>
+                    <span id="lbl-update-progress-percent">0%</span>
+                  </div>
+                  <div style="height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden;">
+                    <div id="bar-update-settings-progress" style="width: 0%; height: 100%; background: var(--accent-primary, #0284c7); transition: width 0.2s ease;"></div>
+                  </div>
+                </div>
+
+                <!-- Notes de version -->
+                <div style="margin-top: 14px;">
+                  <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;">Notes de version :</div>
+                  <div id="lbl-update-release-notes" style="font-size: 12px; color: var(--text-primary); max-height: 140px; overflow-y: auto; background: var(--bg-primary, rgba(0,0,0,0.2)); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); line-height: 1.5; white-space: pre-wrap;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- CARTE 2 : PRÉFÉRENCES DE FRÉQUENCE -->
+            <div class="settings-card">
+              <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-primary, #0284c7);">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span>Fréquence de vérification automatique</span>
+              </div>
+              <p class="card-desc">
+                Déterminez quand Open Shema doit vérifier la présence d'une nouvelle version sur GitHub.
+              </p>
+
+              <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 14px;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; color: var(--text-primary);">
+                  <input type="radio" name="opt-update-frequency" value="startup" style="accent-color: var(--accent-primary, #0284c7);">
+                  <span>À chaque ouverture du logiciel (Recommandé)</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; color: var(--text-primary);">
+                  <input type="radio" name="opt-update-frequency" value="weekly" style="accent-color: var(--accent-primary, #0284c7);">
+                  <span>Une fois par semaine</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; color: var(--text-primary);">
+                  <input type="radio" name="opt-update-frequency" value="manual" style="accent-color: var(--accent-primary, #0284c7);">
+                  <span>Vérification manuelle uniquement</span>
+                </label>
+              </div>
             </div>
 
           </div>
@@ -8442,6 +8577,7 @@
   <script src="js/sermons_view.js"></script>
   <script src="js/illustrations_view.js?v=2.0"></script>
   <script src="js/first_run_wizard.js"></script>
+  <script src="js/updater.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
