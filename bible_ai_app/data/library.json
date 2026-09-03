@@ -648,20 +648,6 @@
     "name": "Les trésors de la foi (C. Spurgeon)",
     "book_code": null
   },
-  "PSAUTIER": {
-    "name": "PSAUTIER",
-    "title": "Psautier de Genève",
-    "author": "",
-    "description": "Psautier de Geneve de 1729 : les 150 Psaumes de David mis en rime et en vers francais par Clement Marot et Theodore de Beze.\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema.",
-    "year": "1729",
-    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\PSAUTIER.png",
-    "type": "Bible",
-    "corpus_scope": "GLOBAL",
-    "source_type": "general",
-    "book_code": null,
-    "embedding_model": "study_library",
-    "active": true
-  },
   "LAU": {
     "title": "Bible de Lausanne (1872)",
     "author": "Société Biblique de Lausanne / Louis Gaussen",

@@ -45,6 +45,9 @@ class LibraryMixin:
         for name, meta in registry.items():
             if meta.get("type") == "Bible":
                 b_key = meta.get("folder_name") or meta.get("version_code") or name
+                # Vérifier si le dossier physique existe bien
+                if not BibleJsonLoader.find_bible_dir_by_name(b_key) and not BibleJsonLoader.find_bible_dir_by_name(name):
+                    continue
                 if b_key in seen_bible_keys:
                     continue
                 seen_bible_keys.add(b_key)
@@ -59,6 +62,52 @@ class LibraryMixin:
             if b.get("type") == "Dictionnaire" or b.get("dict_id"):
                 registered_dict_ids.add(b.get("dict_id") or b.get("name"))
             books.append(b)
+
+        # Synchronisation automatique : garantir que TOUTES les Bibles installées détectées par le lecteur
+        # figurent impérativement dans la bibliothèque avec leurs métadonnées officielles
+        try:
+            installed_bibles = self.get_installed_bibles() if hasattr(self, 'get_installed_bibles') else []
+            for ib in installed_bibles:
+                folder_id = ib.get("id") or ib.get("name")
+                v_code = ib.get("version_code")
+                
+                matched = next((b for b in books if b.get("type") == "Bible" and (
+                    (b.get("folder_name") and b.get("folder_name").lower() == str(folder_id).lower()) or
+                    (b.get("name") and b.get("name").lower() == str(ib.get("name")).lower()) or
+                    (v_code and b.get("version_code") and b.get("version_code").upper() == str(v_code).upper())
+                )), None)
+
+                if matched:
+                    # Enrichir les informations
+                    if not matched.get("title") or matched.get("title") == matched.get("name"):
+                        matched["title"] = ib.get("title") or matched.get("name")
+                    if not matched.get("famille"):
+                        matched["famille"] = ib.get("famille", "Protestante")
+                    if not matched.get("version_code"):
+                        matched["version_code"] = v_code
+                    if not matched.get("cover_url") and ib.get("cover_url"):
+                        matched["cover_url"] = ib.get("cover_url")
+                    if not matched.get("folder_name"):
+                        matched["folder_name"] = folder_id
+                else:
+                    # Ajouter la Bible installée
+                    cov_url = ib.get("cover_url") or ""
+                    books.append({
+                        "name": ib.get("name"),
+                        "title": ib.get("title") or ib.get("name"),
+                        "author": ib.get("author") or ib.get("editeur") or "",
+                        "year": str(ib.get("annee") or ib.get("year") or ""),
+                        "type": "Bible",
+                        "folder_name": folder_id,
+                        "version_code": v_code,
+                        "famille": ib.get("famille", "Protestante"),
+                        "cover_url": cov_url,
+                        "cover_data_url": cov_url if cov_url.startswith("data:") else None,
+                        "active": True,
+                        "format": "json"
+                    })
+        except Exception as _e_sync:
+            logger.debug("Erreur synchronisation bibles dans la bibliothèque : %s", _e_sync)
 
         # Intégrer également tous les dictionnaires enregistrés dans DictionaryManager
         dict_registry = DictionaryManager.get_all_dictionaries()

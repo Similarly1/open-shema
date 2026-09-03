@@ -78,6 +78,7 @@ def build():
             essential_files = [
                 "biblical_places.db",
                 "illustrations_processed_cache.json",
+                "library.json",
                 "catalog.json",
                 "bibles_registry.json",
                 "gospel_parallels.json",
@@ -85,6 +86,11 @@ def build():
                 "french_words.json",
                 "strong_lexicon.json",
                 "bailly_lexicon.json",
+                "calmet_dict.json",
+                "vigouroux_dict.json",
+                "ccel_theology_books.json",
+                "gutenberg_theology_books.json",
+                "logos_community_books.json",
                 "config.example.json",
                 "config.json",
                 "user_profile.json"
@@ -94,7 +100,7 @@ def build():
                 if os.path.exists(src_f):
                     shutil.copy2(src_f, os.path.join(dest_data_dir, fname))
 
-            for sub in ["bibles", "covers", "dictionaries"]:
+            for sub in ["bibles", "covers", "dictionaries", "theology"]:
                 src_sub = os.path.join(src_data_dir, sub)
                 if os.path.exists(src_sub):
                     dest_sub = os.path.join(dest_data_dir, sub)
