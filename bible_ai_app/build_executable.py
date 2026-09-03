@@ -100,7 +100,29 @@ def build():
                 if os.path.exists(src_f):
                     shutil.copy2(src_f, os.path.join(dest_data_dir, fname))
 
-            for sub in ["bibles", "covers", "dictionaries", "theology"]:
+            # 1. Bibles officielles du pack gratuit Open Shema Data uniquement
+            dest_bibles = os.path.join(dest_data_dir, "bibles")
+            os.makedirs(dest_bibles, exist_ok=True)
+            pack_bibles = ["LSG", "DARBY", "OST", "STAPFER", "GIG", "NCL"]
+            src_bibles = os.path.join(src_data_dir, "bibles")
+            for b_name in pack_bibles:
+                s_dir = os.path.join(src_bibles, b_name)
+                d_dir = os.path.join(dest_bibles, b_name)
+                if os.path.exists(s_dir):
+                    if os.path.exists(d_dir):
+                        shutil.rmtree(d_dir)
+                    shutil.copytree(s_dir, d_dir)
+
+            # 2. Commentaires du pack officiel (Calvin)
+            dest_comm = os.path.join(dest_data_dir, "commentaires")
+            os.makedirs(dest_comm, exist_ok=True)
+            for calvin_f in ["comm_calvin.sqlite", "comm_comm_calvin.sqlite"]:
+                src_c = os.path.join(src_data_dir, "commentaires", calvin_f)
+                if os.path.exists(src_c):
+                    shutil.copy2(src_c, os.path.join(dest_comm, "comm_calvin.sqlite"))
+
+            # 3. Autres sous-dossiers du pack
+            for sub in ["covers", "dictionaries", "theology"]:
                 src_sub = os.path.join(src_data_dir, sub)
                 if os.path.exists(src_sub):
                     dest_sub = os.path.join(dest_data_dir, sub)
