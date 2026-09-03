@@ -5,7 +5,7 @@ a = Analysis(
     ['installer/installer_main.py'],
     pathex=['installer'],
     binaries=[],
-    datas=[('installer/web', 'web')],
+    datas=[('installer/web', 'web'), ('assets', 'assets')],
     hiddenimports=['installer_api', 'win32com', 'win32com.client', 'webview'],
     hookspath=[],
     hooksconfig={},

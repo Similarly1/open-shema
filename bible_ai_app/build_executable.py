@@ -119,6 +119,14 @@ def build():
                     shutil.rmtree(dest_sub)
                 os.makedirs(dest_sub, exist_ok=True)
 
+        # Copie de assets/ à la racine de dist/OpenShema pour les icônes de raccourcis
+        src_assets = os.path.join(current_dir, "assets")
+        dest_assets = os.path.join(dist_app_dir, "assets")
+        if os.path.exists(src_assets):
+            if os.path.exists(dest_assets):
+                shutil.rmtree(dest_assets)
+            shutil.copytree(src_assets, dest_assets)
+
         print("\n[SUCCÈS] Build généré avec succès dans 'dist/OpenShema/' !")
         print("Pour tester : dist\\OpenShema\\OpenShema.exe\n")
     else:

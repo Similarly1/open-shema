@@ -31,6 +31,7 @@ def build():
         "--noconfirm",
         "--paths=installer",
         f"--add-data={web_data};web",
+        "--add-data=assets;assets",
         "--hidden-import=installer_api",
         "--hidden-import=win32com",
         "--hidden-import=win32com.client",
