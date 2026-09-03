@@ -46,8 +46,14 @@ const Installer = {
         const res = await window.pywebview.api.browse_folder(current);
         if (res && res.selected) {
           document.getElementById('txt-install-path').value = res.selected;
+          this.updateStartButtonState();
         }
       }
+    });
+
+    // Écoute de la saisie manuelle du dossier
+    document.getElementById('txt-install-path')?.addEventListener('input', () => {
+      this.updateStartButtonState();
     });
 
     // Bouton Lancer l'installation
@@ -80,8 +86,24 @@ const Installer = {
     });
   },
 
+  updateStartButtonState() {
+    const startBtn = document.getElementById('btn-start-install');
+    const pathInput = document.getElementById('txt-install-path');
+    const hasPath = Boolean(pathInput?.value?.trim());
+    const isReady = Boolean(this.systemInfo && this.releaseData && hasPath);
+    if (startBtn) {
+      if (isReady) {
+        startBtn.removeAttribute('disabled');
+      } else {
+        startBtn.setAttribute('disabled', 'disabled');
+      }
+    }
+  },
+
   async loadInitialData() {
     try {
+      this.updateStartButtonState();
+
       // 1. Informations système (chemin par défaut et espace libre)
       if (window.pywebview.api.get_system_info) {
         this.systemInfo = await window.pywebview.api.get_system_info();
@@ -94,6 +116,7 @@ const Installer = {
 
           const reqSpace = document.getElementById('lbl-required-space');
           if (reqSpace) reqSpace.textContent = this.systemInfo.required_space_str;
+          this.updateStartButtonState();
         }
       }
 
@@ -114,6 +137,8 @@ const Installer = {
       }
     } catch (err) {
       console.error('Erreur initialisation installeur:', err);
+    } finally {
+      this.updateStartButtonState();
     }
   },
 
@@ -123,6 +148,11 @@ const Installer = {
   },
 
   async startInstall() {
+    const startBtn = document.getElementById('btn-start-install');
+    if (startBtn && startBtn.hasAttribute('disabled')) {
+      return;
+    }
+
     const pathInput = document.getElementById('txt-install-path');
     const targetDir = pathInput?.value?.trim();
     if (!targetDir) {

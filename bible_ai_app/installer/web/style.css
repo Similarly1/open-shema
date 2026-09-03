@@ -413,6 +413,16 @@ body {
   padding: 0 14px;
 }
 
+.btn:disabled,
+.btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+  filter: grayscale(0.4);
+  box-shadow: none !important;
+  transform: none !important;
+}
+
 /* ==========================================================================
    ÉTAPE 2 : TÉLÉCHARGEMENT & DÉPLOIEMENT (LOGO OPEN SHEMA ANIMÉ)
    ========================================================================== */
