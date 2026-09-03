@@ -136,14 +136,27 @@ class InstallerAPI:
 
     # --- GITHUB RELEASES API & DÉTECTION DU PACKAGE ---
     def check_latest_release(self, repo="Similarly1/open-shema"):
-        """Interroge l'API GitHub pour récupérer la dernière release disponible."""
+        """Interroge l'API GitHub pour récupérer la dernière release disponible (rapide, sans blocage)."""
+        local_pkg = self._find_local_package()
+        has_local = bool(local_pkg)
+
+        default_release = {
+            "success": True,
+            "is_fallback": True,
+            "has_local_build": has_local,
+            "local_archive_path": local_pkg if has_local else None,
+            "tag": "v1.0.0",
+            "name": "Open Shema v1.0.0 (Release Officielle)",
+            "download_url": f"https://github.com/{repo}/releases/download/v1.0.0/OpenShema-Windows-x64.zip",
+            "size_str": "~317 Mo",
+            "notes": "Version complète d'Open Shema incluant le moteur biblique et les modules."
+        }
+
         ctx = ssl.create_default_context()
         ctx.check_hostname = False
         ctx.verify_mode = ssl.CERT_NONE
 
         url = f"https://api.github.com/repos/{repo}/releases/latest"
-        fallback_url = f"https://api.github.com/repos/{repo}/releases"
-        
         headers = {
             "User-Agent": "OpenShemaInstaller/1.0",
             "Accept": "application/vnd.github.v3+json"
@@ -151,35 +164,16 @@ class InstallerAPI:
 
         try:
             req = urllib.request.Request(url, headers=headers)
-            with urllib.request.urlopen(req, timeout=10, context=ctx) as resp:
+            with urllib.request.urlopen(req, timeout=2.0, context=ctx) as resp:
                 data = json.load(resp)
-                return self._parse_release_data(data)
+                parsed = self._parse_release_data(data)
+                parsed["has_local_build"] = has_local
+                parsed["local_archive_path"] = local_pkg if has_local else None
+                return parsed
         except Exception as e:
-            logger.info(f"Pas de release 'latest' ({e}), tentative liste des releases...")
-            try:
-                req = urllib.request.Request(fallback_url, headers=headers)
-                with urllib.request.urlopen(req, timeout=10, context=ctx) as resp:
-                    releases_list = json.load(resp)
-                    if releases_list and len(releases_list) > 0:
-                        return self._parse_release_data(releases_list[0])
-            except Exception as e_list:
-                logger.warning(f"Erreur API GitHub releases: {e_list}")
+            logger.info(f"Release en ligne non disponible ({e}), bascule immédiate sur configuration locale.")
 
-        # Si aucune release n'est trouvée sur GitHub : recherche d'une archive locale
-        local_pkg = self._find_local_package()
-        has_local = bool(local_pkg)
-        
-        return {
-            "success": True,
-            "is_fallback": True,
-            "has_local_build": has_local,
-            "local_archive_path": local_pkg if has_local else None,
-            "tag": "v1.0.0",
-            "name": "Open Shema v1.0.0 (Release Initiale)",
-            "download_url": f"https://github.com/{repo}/releases/download/v1.0.0/OpenShema-Windows-x64.zip",
-            "size_str": "~300 Mo",
-            "notes": "Version complète d'Open Shema incluant le moteur biblique, les commentaires et l'assistant d'accueil."
-        }
+        return default_release
 
     def _parse_release_data(self, data):
         tag = data.get("tag_name", "v1.0.0")
