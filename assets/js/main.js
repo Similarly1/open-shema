@@ -411,7 +411,7 @@ function initTerminalTabs() {
   if (copyBtn) {
     copyBtn.addEventListener('click', () => {
       const activePanel = document.querySelector('.term-content-panel:not([style*="display: none"])');
-      const codeToCopy = activePanel ? activePanel.getAttribute('data-raw-cmd') : 'git clone https://github.com/Similarly1/free-logos-ai.git';
+      const codeToCopy = activePanel ? activePanel.getAttribute('data-raw-cmd') : 'git clone https://github.com/Similarly1/open-shema.git';
       
       navigator.clipboard.writeText(codeToCopy).then(() => {
         const originalText = copyBtn.innerHTML;

@@ -1,0 +1,17 @@
+{
+  "onboarding_completed": false,
+  "user_role": "predication",
+  "preferred_bibles": [
+    "LSG1910",
+    "NBS"
+  ],
+  "greek_hebrew_level": "intermediaire",
+  "ai_posture": "pastoral_sparring",
+  "country_culture": "France (Métropole & Outre-mer)",
+  "cultural_notes": "",
+  "tradition": "Évangélique / Réformée",
+  "church_confession_raw": "",
+  "system_profile_prompt": "",
+  "custom_sermon_prompt": "",
+  "memory_active": true
+}

@@ -58,6 +58,7 @@ scratch_*.py
 .DS_Store
 Thumbs.db
 **/data/covers/cache/
+**/data/cache/
 **/data/*backup*/
 **/scratch/
 scratch/
