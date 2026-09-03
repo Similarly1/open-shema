@@ -18835,10 +18835,39 @@ body.reading-bg-white .reading-pane[class*="vintage-epoch-"],
 body.reading-bg-white .vintage-epoch-ancient.pane-scrollable-content,
 body.reading-bg-white .vintage-epoch-classic.pane-scrollable-content,
 body.reading-bg-white .vintage-epoch-xix.pane-scrollable-content,
-body.reading-bg-white .pane-scrollable-content[class*="vintage-epoch-"],
+body.reading-bg-white .pane-scrollable-content[class*="vintage-epoch-"] {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  color: #0f172a !important;
+}
+
+/* Transparence absolue et zéro encadré pour le texte biblique en toutes circonstances */
+.chapter-container,
+.chapter-block,
+.verses-flow,
+.chapter-container[class*="vintage-epoch-"],
+.chapter-block[class*="vintage-epoch-"],
+.verses-flow[class*="vintage-epoch-"],
+body.reading-bg-white .chapter-container,
+body.reading-bg-white .chapter-block,
+body.reading-bg-white .verses-flow,
 body.reading-bg-white .chapter-container[class*="vintage-epoch-"],
 body.reading-bg-white .chapter-block[class*="vintage-epoch-"],
 body.reading-bg-white .verses-flow[class*="vintage-epoch-"],
+body.reading-bg-sepia .chapter-container[class*="vintage-epoch-"],
+body.reading-bg-sepia .chapter-block[class*="vintage-epoch-"],
+body.reading-bg-sepia .verses-flow[class*="vintage-epoch-"],
+body.reading-bg-dark .chapter-container[class*="vintage-epoch-"],
+body.reading-bg-dark .chapter-block[class*="vintage-epoch-"],
+body.reading-bg-dark .verses-flow[class*="vintage-epoch-"] {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
 body.reading-bg-white .vintage-epoch-ancient.theol-reading-container,
 body.reading-bg-white .vintage-epoch-classic.theol-reading-container,
 body.reading-bg-white .vintage-epoch-xix.theol-reading-container,

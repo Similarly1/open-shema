@@ -71,7 +71,12 @@ def build():
                     os.remove(zip_path)
                 except Exception:
                     pass
-            shutil.make_archive(os.path.join("dist", "OpenShema"), "zip", src_folder)
+            seven_zip = shutil.which("7z")
+            if seven_zip:
+                print("   (Compression multithread haute vitesse via 7-Zip...)")
+                subprocess.run([seven_zip, "a", "-tzip", "-mx=3", "-mmt=on", "-y", zip_path, f"{src_folder}\\*"], check=True)
+            else:
+                shutil.make_archive(os.path.join("dist", "OpenShema"), "zip", src_folder)
 
         print("\n[SUCCÈS] Installeur compilé avec succès !")
         print(f"Exécutable disponible : {os.path.abspath(os.path.join('dist', 'OpenShemaSetup.exe'))}\n")

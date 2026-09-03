@@ -327,7 +327,7 @@ function initInteractiveSimulators() {
 }
 
 /* ==========================================================================
-   6. LIGHTBOX MODAL FOR SCREENSHOTS
+   6. LIGHTBOX MODAL HAUTE DÉFINITION & NAVIGATION
    ========================================================================== */
 function initLightboxModal() {
   const modal = document.getElementById('lightbox-modal');
@@ -335,60 +335,124 @@ function initLightboxModal() {
   const lightboxImg = document.getElementById('lightbox-img');
   const lightboxTitle = document.getElementById('lightbox-title');
   const lightboxDesc = document.getElementById('lightbox-desc');
-  const galleryCards = document.querySelectorAll('.gallery-item-card');
+  const zoomBtn = document.getElementById('lightbox-zoom-btn');
+  const zoomLabel = document.getElementById('lightbox-zoom-label');
+  const prevBtn = document.getElementById('lightbox-prev-btn');
+  const nextBtn = document.getElementById('lightbox-next-btn');
+  const counterEl = document.getElementById('lightbox-counter');
+  const stage = document.getElementById('lightbox-image-stage');
+
+  const galleryCards = Array.from(document.querySelectorAll('.gallery-item-card'));
   const filterBtns = document.querySelectorAll('.gallery-filter-btn');
 
-  if (!modal) return;
+  if (!modal || !lightboxImg) return;
 
-  // Open Lightbox
-  galleryCards.forEach(card => {
-    card.addEventListener('click', () => {
-      const imgUrl = card.getAttribute('data-img-src') || card.querySelector('img')?.src;
-      const title = card.getAttribute('data-title') || card.querySelector('.gallery-item-title')?.textContent;
-      const desc = card.getAttribute('data-desc') || card.querySelector('.gallery-item-desc')?.textContent;
+  let currentIndex = 0;
+  let isZoomed = false;
 
-      if (lightboxImg) {
-        if (imgUrl) {
-          lightboxImg.src = imgUrl;
-          lightboxImg.style.display = 'block';
-          const placeholder = document.getElementById('lightbox-vector-preview');
-          if (placeholder) placeholder.style.display = 'none';
-        } else {
-          lightboxImg.style.display = 'none';
-          const placeholder = document.getElementById('lightbox-vector-preview');
-          if (placeholder) placeholder.style.display = 'block';
-        }
+  function setZoom(zoomed) {
+    isZoomed = zoomed;
+    if (isZoomed) {
+      lightboxImg.classList.add('zoomed-native');
+      if (zoomBtn) zoomBtn.classList.add('active');
+      if (zoomLabel) zoomLabel.textContent = "Adapter à l'écran";
+    } else {
+      lightboxImg.classList.remove('zoomed-native');
+      if (zoomBtn) zoomBtn.classList.remove('active');
+      if (zoomLabel) zoomLabel.textContent = "Taille réelle 100%";
+      if (stage) {
+        stage.scrollLeft = 0;
+        stage.scrollTop = 0;
       }
-      if (lightboxTitle) lightboxTitle.textContent = title;
-      if (lightboxDesc) lightboxDesc.textContent = desc;
+    }
+  }
 
-      modal.classList.add('active');
-      document.body.style.overflow = 'hidden';
+  function showImage(index) {
+    if (index < 0) index = galleryCards.length - 1;
+    if (index >= galleryCards.length) index = 0;
+    currentIndex = index;
+
+    const card = galleryCards[currentIndex];
+    if (!card) return;
+
+    const imgUrl = card.getAttribute('data-img-src') || card.querySelector('img')?.src;
+    const title = card.getAttribute('data-title') || card.querySelector('.gallery-item-title')?.textContent;
+    const desc = card.getAttribute('data-desc') || card.querySelector('.gallery-item-desc')?.textContent;
+
+    // Reset zoom when navigating
+    setZoom(false);
+
+    lightboxImg.src = imgUrl || '';
+    if (lightboxTitle) lightboxTitle.textContent = title || 'Aperçu Haute Définition';
+    if (lightboxDesc) lightboxDesc.textContent = desc || '';
+    if (counterEl) counterEl.textContent = `${currentIndex + 1} / ${galleryCards.length}`;
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  // Open on card click
+  galleryCards.forEach((card, index) => {
+    card.addEventListener('click', () => {
+      showImage(index);
     });
   });
 
-  // Close Lightbox
+  // Toggle Zoom on button or image click
+  if (zoomBtn) {
+    zoomBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setZoom(!isZoomed);
+    });
+  }
+
+  lightboxImg.addEventListener('click', (e) => {
+    e.stopPropagation();
+    setZoom(!isZoomed);
+  });
+
+  // Navigation Previous / Next
+  if (prevBtn) {
+    prevBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showImage(currentIndex - 1);
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showImage(currentIndex + 1);
+    });
+  }
+
+  // Close modal
   function closeModal() {
     modal.classList.remove('active');
     document.body.style.overflow = '';
+    setZoom(false);
   }
 
   if (closeBtn) closeBtn.addEventListener('click', closeModal);
   modal.addEventListener('click', (e) => {
-    if (e.target === modal) closeModal();
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal.classList.contains('active')) {
+    if (e.target === modal || e.target === stage) {
       closeModal();
     }
   });
 
-  // Gallery Category Filter
+  // Keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    if (!modal.classList.contains('active')) return;
+    if (e.key === 'Escape') closeModal();
+    if (e.key === 'ArrowLeft') showImage(currentIndex - 1);
+    if (e.key === 'ArrowRight') showImage(currentIndex + 1);
+    if (e.key === 'z' || e.key === 'Z') setZoom(!isZoomed);
+  });
+
+  // Category Filters
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       const category = btn.getAttribute('data-filter');
-      
       filterBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 

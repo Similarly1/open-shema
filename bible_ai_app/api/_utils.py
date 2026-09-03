@@ -176,7 +176,7 @@ def parse_reverse_interlinear_verse(v_raw: str) -> List[Dict[str, Any]]:
     for tok in tokens:
         if not tok:
             continue
-        m = re.match(r'<w\s+strong="([^"]*)">( .*?)</w>', tok)
+        m = re.match(r'<w\s+strong="([^"]*)">\s*(.*?)\s*</w>', tok)
         if m:
             s_codes = m.group(1).strip()
             surface = m.group(2).strip()
@@ -187,10 +187,10 @@ def parse_reverse_interlinear_verse(v_raw: str) -> List[Dict[str, Any]]:
             lemmas, translits = [], []
             for e in entries:
                 raw_lem = e.get('lemma', '')
-                if ' - ' in raw_lem:
-                    p = raw_lem.split(' - ')
-                    lemmas.append(p[0].strip())
-                    translits.append(p[1].strip())
+                parts = re.split(r'[\s\u00a0]*[-–—][\s\u00a0]*', raw_lem, maxsplit=1)
+                if len(parts) > 1 and parts[1].strip():
+                    lemmas.append(parts[0].strip())
+                    translits.append(parts[1].strip())
                 else:
                     lemmas.append(raw_lem.strip())
                     if e.get('translit'):
