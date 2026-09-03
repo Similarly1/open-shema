@@ -541,46 +541,46 @@ class SermonsManager:
 
         pack_installed = cls.is_illustrations_pack_installed(config)
         illustrations_map: Dict[str, Dict[str, Any]] = {}
+        cache_json_file = os.path.join(CURRENT_DIR, "data", "illustrations_processed_cache.json")
 
-        if pack_installed:
-            cache_json_file = os.path.join(CURRENT_DIR, "data", "illustrations_processed_cache.json")
-            if os.path.exists(cache_json_file):
-                try:
-                    import json
-                    with open(cache_json_file, "r", encoding="utf-8") as f:
-                        cache_raw = json.load(f)
-                    for k, item in cache_raw.items():
-                        if isinstance(item, dict) and item.get("id"):
-                            i_id = str(item["id"])
-                            illustrations_map[i_id] = {
-                                "id": i_id,
-                                "filename": str(item.get("filename") or f"{i_id}.md"),
-                                "file_path": str(item.get("file_path") or os.path.join(target_dir, f"{i_id}.md")),
-                                "title": str(item.get("title") or "Illustration sans titre"),
-                                "category": str(item.get("category", "Général")),
-                                "type": str(item.get("type", "Histoire vraie")),
-                                "tags": item.get("tags", []),
-                                "passages_associes": item.get("passages_associes", []),
-                                "source": str(item.get("source", "")),
-                                "author": str(item.get("author", "")),
-                                "usage_history": item.get("usage_history", []),
-                                "body": str(item.get("body", "")).strip(),
-                                "created_at": item.get("created_at") or datetime.datetime.now().isoformat(),
-                                "updated_at": item.get("updated_at") or datetime.datetime.now().isoformat(),
-                            }
-                except Exception as e:
-                    logger.warning(f"Impossible de précharger le cache JSON illustrations : {e}")
+        if pack_installed and os.path.exists(cache_json_file):
+            try:
+                import json
+                with open(cache_json_file, "r", encoding="utf-8") as f:
+                    cache_raw = json.load(f)
+                if isinstance(cache_raw, dict):
+                    illustrations_map = cache_raw
+                elif isinstance(cache_raw, list):
+                    illustrations_map = {str(item["id"]): item for item in cache_raw if isinstance(item, dict) and item.get("id")}
+            except Exception as e:
+                logger.warning(f"Impossible de précharger le cache JSON illustrations : {e}")
 
-        # Charger également les éventuelles fiches locales personnalisées (.md)
+        # Charger uniquement les éventuelles fiches locales qui ne sont pas déjà en cache
+        cache_needs_save = False
+        cached_filenames = {item.get("filename") for item in illustrations_map.values() if isinstance(item, dict) and item.get("filename")}
         try:
             md_files = [f for f in os.listdir(target_dir) if f.endswith(".md")]
-            for fname in sorted(md_files):
+            for fname in md_files:
+                file_id = os.path.splitext(fname)[0]
+                if fname in cached_filenames or file_id in illustrations_map:
+                    continue
                 full_path = os.path.join(target_dir, fname)
                 ill = cls.parse_illustration_file(full_path)
                 if ill and ill.get("id"):
                     illustrations_map[ill["id"]] = ill
+                    cache_needs_save = True
         except Exception as e:
             logger.error(f"Erreur lecture fichiers .md illustrations: {e}")
+
+        # Sauvegarder automatiquement le cache JSON si créé ou enrichi pour des lectures sub-100ms
+        if (cache_needs_save or not os.path.exists(cache_json_file)) and illustrations_map:
+            try:
+                import json
+                os.makedirs(os.path.dirname(cache_json_file), exist_ok=True)
+                with open(cache_json_file, "w", encoding="utf-8") as f:
+                    json.dump(illustrations_map, f, ensure_ascii=False)
+            except Exception as e:
+                logger.warning(f"Impossible de sauvegarder le cache JSON illustrations : {e}")
 
         result = list(illustrations_map.values())
         cls._cached_illustrations = result

@@ -61,14 +61,17 @@
     }
 
     /* =========================================================================
-     * 1. MODE SOMBRE : « GRIMOIRE NOBLE & ÉPURÉ » (SOBRIÉTÉ ET FINESSE)
+     * 1. MODE SOMBRE AUTOMATIQUE : « GRIMOIRE NOBLE & ÉPURÉ »
+     * S'applique en mode sombre Auto (sans sélection explicite de fond de lecture)
      * ========================================================================= */
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .reading-pane.vintage-epoch-ancient,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .reading-pane.vintage-epoch-classic,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .reading-pane.vintage-epoch-xix,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient.pane-scrollable-content,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic.pane-scrollable-content,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix.pane-scrollable-content {
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .reading-pane.vintage-epoch-ancient,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .reading-pane.vintage-epoch-classic,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .reading-pane.vintage-epoch-xix,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-ancient.pane-scrollable-content,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-classic.pane-scrollable-content,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-xix.pane-scrollable-content,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .reading-pane[class*="vintage-epoch-"],
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .pane-scrollable-content[class*="vintage-epoch-"] {
       background-color: #11151e !important;
       background-image: 
         radial-gradient(ellipse at 50% 40%, rgba(26, 35, 50, 0.5) 0%, rgba(12, 16, 24, 0.92) 100%),
@@ -95,28 +98,41 @@
       border: none !important;
     }
 
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .verses-flow,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .verses-flow,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .verses-flow,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .word-token,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .word-token,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .word-token {
+    /* Textes en mode Nuit forcé ou Sombre Auto */
+    body.reading-bg-dark .vintage-epoch-ancient .verses-flow,
+    body.reading-bg-dark .vintage-epoch-classic .verses-flow,
+    body.reading-bg-dark .vintage-epoch-xix .verses-flow,
+    body.reading-bg-dark .vintage-epoch-ancient .word-token,
+    body.reading-bg-dark .vintage-epoch-classic .word-token,
+    body.reading-bg-dark .vintage-epoch-xix .word-token,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-ancient .verses-flow,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-classic .verses-flow,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-xix .verses-flow,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-ancient .word-token,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-classic .word-token,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-xix .word-token {
       font-family: 'IM Fell English', 'Cardo', 'EB Garamond', Georgia, serif !important;
       color: #e4d8c2 !important;
       line-height: 1.85 !important;
     }
 
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .verse-num,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .verse-num,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .verse-num {
+    body.reading-bg-dark .vintage-epoch-ancient .verse-num,
+    body.reading-bg-dark .vintage-epoch-classic .verse-num,
+    body.reading-bg-dark .vintage-epoch-xix .verse-num,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-ancient .verse-num,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-classic .verse-num,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-xix .verse-num {
       color: #d97706 !important;
       font-weight: 700 !important;
       opacity: 0.9 !important;
     }
 
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .chapter-number-dropcap,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .chapter-number-dropcap,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .chapter-number-dropcap {
+    body.reading-bg-dark .vintage-epoch-ancient .chapter-number-dropcap,
+    body.reading-bg-dark .vintage-epoch-classic .chapter-number-dropcap,
+    body.reading-bg-dark .vintage-epoch-xix .chapter-number-dropcap,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-ancient .chapter-number-dropcap,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-classic .chapter-number-dropcap,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-xix .chapter-number-dropcap {
       color: #f59e0b !important;
       font-family: 'Cinzel', 'IM Fell English', Georgia, serif !important;
       font-size: 2.4em !important;
@@ -131,9 +147,12 @@
       text-shadow: 0 0 12px rgba(245, 158, 11, 0.3) !important;
     }
 
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .pericope-title,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .pericope-title,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .pericope-title {
+    body.reading-bg-dark .vintage-epoch-ancient .pericope-title,
+    body.reading-bg-dark .vintage-epoch-classic .pericope-title,
+    body.reading-bg-dark .vintage-epoch-xix .pericope-title,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-ancient .pericope-title,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-classic .pericope-title,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-xix .pericope-title {
       color: #f59e0b !important;
       font-family: 'IM Fell English', 'Cinzel', Georgia, serif !important;
       font-size: 1.25em !important;
@@ -146,50 +165,126 @@
     }
     .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .pericope-title::before,
     .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .pericope-title::before,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .pericope-title::before {
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .pericope-title::before,
+    body.reading-bg-dark .vintage-epoch-ancient .pericope-title::before,
+    body.reading-bg-dark .vintage-epoch-classic .pericope-title::before,
+    body.reading-bg-dark .vintage-epoch-xix .pericope-title::before {
       content: "❦ ";
       color: #d97706;
       font-size: 14px;
     }
     .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .pericope-title::after,
     .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .pericope-title::after,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .pericope-title::after {
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .pericope-title::after,
+    body.reading-bg-dark .vintage-epoch-ancient .pericope-title::after,
+    body.reading-bg-dark .vintage-epoch-classic .pericope-title::after,
+    body.reading-bg-dark .vintage-epoch-xix .pericope-title::after {
       content: " ❧";
       color: #d97706;
       font-size: 14px;
     }
 
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .pane-header,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .pane-header,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .pane-header {
+    body.reading-bg-dark .vintage-epoch-ancient .pane-header,
+    body.reading-bg-dark .vintage-epoch-classic .pane-header,
+    body.reading-bg-dark .vintage-epoch-xix .pane-header,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-ancient .pane-header,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-classic .pane-header,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-xix .pane-header {
       background: #171d27 !important;
       border-bottom: 1px solid rgba(245, 158, 11, 0.2) !important;
       color: #e4d8c2 !important;
     }
 
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-ancient .pane-breadcrumb,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-classic .pane-breadcrumb,
-    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .vintage-epoch-xix .pane-breadcrumb {
+    body.reading-bg-dark .vintage-epoch-ancient .pane-breadcrumb,
+    body.reading-bg-dark .vintage-epoch-classic .pane-breadcrumb,
+    body.reading-bg-dark .vintage-epoch-xix .pane-breadcrumb,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-ancient .pane-breadcrumb,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-classic .pane-breadcrumb,
+    .theme-dark:not(.reading-bg-sepia):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-xix .pane-breadcrumb {
       color: #f59e0b !important;
       font-family: 'Cinzel', Georgia, serif !important;
     }
 
     /* =========================================================================
-     * 2. MODE SÉPIA / PAPIER VERGÉ ÉLÉGANT (SOBRE & SUBTIL)
-     * S'applique dès que reading-bg-sepia est actif, ou en mode clair vintage
+     * 2. PRIORITÉ ABSOLUE DES FONDS DE LECTURE (BLANC / SÉPIA / NUIT)
      * ========================================================================= */
+
+    /* --- A. FOND BLANC PUR (Écrase toute texture) --- */
+    body.reading-bg-white .reading-pane.vintage-epoch-ancient,
+    body.reading-bg-white .reading-pane.vintage-epoch-classic,
+    body.reading-bg-white .reading-pane.vintage-epoch-xix,
+    body.reading-bg-white .vintage-epoch-ancient.pane-scrollable-content,
+    body.reading-bg-white .vintage-epoch-classic.pane-scrollable-content,
+    body.reading-bg-white .vintage-epoch-xix.pane-scrollable-content,
+    body.reading-bg-white .reading-pane[class*="vintage-epoch-"],
+    body.reading-bg-white .pane-scrollable-content[class*="vintage-epoch-"],
+    body.reading-bg-white .chapter-container[class*="vintage-epoch-"],
+    body.reading-bg-white .chapter-block[class*="vintage-epoch-"],
+    body.reading-bg-white .verses-flow[class*="vintage-epoch-"],
+    body.reading-bg-white .vintage-epoch-ancient.theol-reading-container,
+    body.reading-bg-white .vintage-epoch-classic.theol-reading-container,
+    body.reading-bg-white .vintage-epoch-xix.theol-reading-container,
+    body.reading-bg-white .vintage-epoch-ancient.comm-article-card,
+    body.reading-bg-white .vintage-epoch-classic.comm-article-card,
+    body.reading-bg-white .vintage-epoch-xix.comm-article-card {
+      background-color: #ffffff !important;
+      background-image: none !important;
+      box-shadow: none !important;
+      color: #0f172a !important;
+    }
+    body.reading-bg-white .vintage-epoch-ancient .pane-header,
+    body.reading-bg-white .vintage-epoch-classic .pane-header,
+    body.reading-bg-white .vintage-epoch-xix .pane-header {
+      background: #f8fafc !important;
+      border-bottom: 1px solid #e2e8f0 !important;
+      color: #0f172a !important;
+    }
+    body.reading-bg-white .vintage-epoch-ancient .pane-breadcrumb,
+    body.reading-bg-white .vintage-epoch-classic .pane-breadcrumb,
+    body.reading-bg-white .vintage-epoch-xix .pane-breadcrumb {
+      color: #0f172a !important;
+    }
+    body.reading-bg-white .vintage-epoch-ancient .chapter-number-dropcap,
+    body.reading-bg-white .vintage-epoch-classic .chapter-number-dropcap,
+    body.reading-bg-white .vintage-epoch-xix .chapter-number-dropcap {
+      color: #8c2614 !important;
+      text-shadow: none !important;
+    }
+    body.reading-bg-white .vintage-epoch-ancient .pericope-title,
+    body.reading-bg-white .vintage-epoch-classic .pericope-title,
+    body.reading-bg-white .vintage-epoch-xix .pericope-title {
+      color: #8c2614 !important;
+    }
+
+    /* --- B. FOND SÉPIA / PAPIER VERGÉ ÉLÉGANT (Sépia forcé ou Clair Auto) --- */
     body.reading-bg-sepia .reading-pane.vintage-epoch-ancient,
     body.reading-bg-sepia .reading-pane.vintage-epoch-classic,
     body.reading-bg-sepia .reading-pane.vintage-epoch-xix,
     body.reading-bg-sepia .vintage-epoch-ancient.pane-scrollable-content,
     body.reading-bg-sepia .vintage-epoch-classic.pane-scrollable-content,
     body.reading-bg-sepia .vintage-epoch-xix.pane-scrollable-content,
-    body:not(.theme-dark) .reading-pane.vintage-epoch-ancient,
-    body:not(.theme-dark) .reading-pane.vintage-epoch-classic,
-    body:not(.theme-dark) .reading-pane.vintage-epoch-xix,
-    body:not(.theme-dark) .vintage-epoch-ancient.pane-scrollable-content,
-    body:not(.theme-dark) .vintage-epoch-classic.pane-scrollable-content,
-    body:not(.theme-dark) .vintage-epoch-xix.pane-scrollable-content {
+    body.reading-bg-sepia .reading-pane[class*="vintage-epoch-"],
+    body.reading-bg-sepia .pane-scrollable-content[class*="vintage-epoch-"],
+    body.reading-bg-sepia .vintage-epoch-ancient.theol-reading-container,
+    body.reading-bg-sepia .vintage-epoch-classic.theol-reading-container,
+    body.reading-bg-sepia .vintage-epoch-xix.theol-reading-container,
+    body.reading-bg-sepia .vintage-epoch-ancient.comm-article-card,
+    body.reading-bg-sepia .vintage-epoch-classic.comm-article-card,
+    body.reading-bg-sepia .vintage-epoch-xix.comm-article-card,
+    body:not(.theme-dark):not(.reading-bg-white):not(.reading-bg-dark):not(.reading-bg-sepia) .reading-pane.vintage-epoch-ancient,
+    body:not(.theme-dark):not(.reading-bg-white):not(.reading-bg-dark):not(.reading-bg-sepia) .reading-pane.vintage-epoch-classic,
+    body:not(.theme-dark):not(.reading-bg-white):not(.reading-bg-dark):not(.reading-bg-sepia) .reading-pane.vintage-epoch-xix,
+    body:not(.theme-dark):not(.reading-bg-white):not(.reading-bg-dark):not(.reading-bg-sepia) .vintage-epoch-ancient.pane-scrollable-content,
+    body:not(.theme-dark):not(.reading-bg-white):not(.reading-bg-dark):not(.reading-bg-sepia) .vintage-epoch-classic.pane-scrollable-content,
+    body:not(.theme-dark):not(.reading-bg-white):not(.reading-bg-dark):not(.reading-bg-sepia) .vintage-epoch-xix.pane-scrollable-content,
+    body:not(.theme-dark):not(.reading-bg-white):not(.reading-bg-dark):not(.reading-bg-sepia) .reading-pane[class*="vintage-epoch-"],
+    body:not(.theme-dark):not(.reading-bg-white):not(.reading-bg-dark):not(.reading-bg-sepia) .pane-scrollable-content[class*="vintage-epoch-"],
+    body:not(.theme-dark):not(.reading-bg-white):not(.reading-bg-dark):not(.reading-bg-sepia) .vintage-epoch-ancient.theol-reading-container,
+    body:not(.theme-dark):not(.reading-bg-white):not(.reading-bg-dark):not(.reading-bg-sepia) .vintage-epoch-classic.theol-reading-container,
+    body:not(.theme-dark):not(.reading-bg-white):not(.reading-bg-dark):not(.reading-bg-sepia) .vintage-epoch-xix.theol-reading-container,
+    body:not(.theme-dark):not(.reading-bg-white):not(.reading-bg-dark):not(.reading-bg-sepia) .vintage-epoch-ancient.comm-article-card,
+    body:not(.theme-dark):not(.reading-bg-white):not(.reading-bg-dark):not(.reading-bg-sepia) .vintage-epoch-classic.comm-article-card,
+    body:not(.theme-dark):not(.reading-bg-white):not(.reading-bg-dark):not(.reading-bg-sepia) .vintage-epoch-xix.comm-article-card {
       background-color: #f4ecdc !important;
       background-image: 
         radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.4) 0%, rgba(244, 236, 220, 0.5) 70%, rgba(224, 208, 180, 0.6) 100%),
@@ -204,12 +299,47 @@
     body.reading-bg-sepia .vintage-epoch-ancient .pane-header,
     body.reading-bg-sepia .vintage-epoch-classic .pane-header,
     body.reading-bg-sepia .vintage-epoch-xix .pane-header,
-    body:not(.theme-dark) .vintage-epoch-ancient .pane-header,
-    body:not(.theme-dark) .vintage-epoch-classic .pane-header,
-    body:not(.theme-dark) .vintage-epoch-xix .pane-header {
+    body:not(.theme-dark):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-ancient .pane-header,
+    body:not(.theme-dark):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-classic .pane-header,
+    body:not(.theme-dark):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-xix .pane-header {
       background: #ebdcc5 !important;
       border-bottom: 1px solid rgba(139, 90, 43, 0.25) !important;
       color: #4a2d14 !important;
+    }
+
+    body.reading-bg-sepia .vintage-epoch-ancient .pane-breadcrumb,
+    body.reading-bg-sepia .vintage-epoch-classic .pane-breadcrumb,
+    body.reading-bg-sepia .vintage-epoch-xix .pane-breadcrumb,
+    body:not(.theme-dark):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-ancient .pane-breadcrumb,
+    body:not(.theme-dark):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-classic .pane-breadcrumb,
+    body:not(.theme-dark):not(.reading-bg-white):not(.reading-bg-dark) .vintage-epoch-xix .pane-breadcrumb {
+      color: #8c2614 !important;
+    }
+
+    /* --- C. FOND NUIT / SOMBRE PROFOND --- */
+    body.reading-bg-dark .reading-pane.vintage-epoch-ancient,
+    body.reading-bg-dark .reading-pane.vintage-epoch-classic,
+    body.reading-bg-dark .reading-pane.vintage-epoch-xix,
+    body.reading-bg-dark .vintage-epoch-ancient.pane-scrollable-content,
+    body.reading-bg-dark .vintage-epoch-classic.pane-scrollable-content,
+    body.reading-bg-dark .vintage-epoch-xix.pane-scrollable-content,
+    body.reading-bg-dark .reading-pane[class*="vintage-epoch-"],
+    body.reading-bg-dark .pane-scrollable-content[class*="vintage-epoch-"],
+    body.reading-bg-dark .vintage-epoch-ancient.theol-reading-container,
+    body.reading-bg-dark .vintage-epoch-classic.theol-reading-container,
+    body.reading-bg-dark .vintage-epoch-xix.theol-reading-container,
+    body.reading-bg-dark .vintage-epoch-ancient.comm-article-card,
+    body.reading-bg-dark .vintage-epoch-classic.comm-article-card,
+    body.reading-bg-dark .vintage-epoch-xix.comm-article-card {
+      background-color: #0d111a !important;
+      background-image: 
+        radial-gradient(ellipse at 50% 40%, rgba(26, 35, 50, 0.5) 0%, rgba(12, 16, 24, 0.92) 100%),
+        url("img/textures/vintage/cuir/large_leather.png"),
+        var(--vintage-noise-svg) !important;
+      background-repeat: repeat !important;
+      background-attachment: local !important;
+      box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5) !important;
+      color: #e4d8c2 !important;
     }
 
     /* Texte encre bistre profonde pour le mode clair / sépia sur TOUS les contenus */
@@ -266,30 +396,30 @@
     body.reading-bg-sepia .vintage-epoch-ancient .comm-body-text *,
     body.reading-bg-sepia .vintage-epoch-classic .comm-body-text *,
     body.reading-bg-sepia .vintage-epoch-xix .comm-body-text *,
-    body:not(.theme-dark) .vintage-epoch-ancient .verses-flow,
-    body:not(.theme-dark) .vintage-epoch-classic .verses-flow,
-    body:not(.theme-dark) .vintage-epoch-xix .verses-flow,
-    body:not(.theme-dark) .vintage-epoch-ancient .word-token,
-    body:not(.theme-dark) .vintage-epoch-classic .word-token,
-    body:not(.theme-dark) .vintage-epoch-xix .word-token,
-    body:not(.theme-dark) .vintage-epoch-ancient .dict-entry-body,
-    body:not(.theme-dark) .vintage-epoch-classic .dict-entry-body,
-    body:not(.theme-dark) .vintage-epoch-xix .dict-entry-body,
-    body:not(.theme-dark) .vintage-epoch-ancient .dict-entry-body-content,
-    body:not(.theme-dark) .vintage-epoch-classic .dict-entry-body-content,
-    body:not(.theme-dark) .vintage-epoch-xix .dict-entry-body-content,
-    body:not(.theme-dark) .vintage-epoch-ancient .dict-entry-body-content *,
-    body:not(.theme-dark) .vintage-epoch-classic .dict-entry-body-content *,
-    body:not(.theme-dark) .vintage-epoch-xix .dict-entry-body-content *,
-    body:not(.theme-dark) .vintage-epoch-ancient p,
-    body:not(.theme-dark) .vintage-epoch-classic p,
-    body:not(.theme-dark) .vintage-epoch-xix p,
-    body:not(.theme-dark) .vintage-epoch-ancient .theol-reading-body *,
-    body:not(.theme-dark) .vintage-epoch-classic .theol-reading-body *,
-    body:not(.theme-dark) .vintage-epoch-xix .theol-reading-body *,
-    body:not(.theme-dark) .vintage-epoch-ancient .comm-body-text *,
-    body:not(.theme-dark) .vintage-epoch-classic .comm-body-text *,
-    body:not(.theme-dark) .vintage-epoch-xix .comm-body-text * {
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-ancient .verses-flow,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-classic .verses-flow,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-xix .verses-flow,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-ancient .word-token,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-classic .word-token,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-xix .word-token,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-ancient .dict-entry-body,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-classic .dict-entry-body,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-xix .dict-entry-body,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-ancient .dict-entry-body-content,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-classic .dict-entry-body-content,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-xix .dict-entry-body-content,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-ancient .dict-entry-body-content *,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-classic .dict-entry-body-content *,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-xix .dict-entry-body-content *,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-ancient p,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-classic p,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-xix p,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-ancient .theol-reading-body *,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-classic .theol-reading-body *,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-xix .theol-reading-body *,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-ancient .comm-body-text *,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-classic .comm-body-text *,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-xix .comm-body-text * {
       font-family: 'IM Fell English', 'Cardo', 'EB Garamond', Georgia, serif !important;
       color: #1d150c !important;
       line-height: 1.85 !important;
@@ -305,9 +435,9 @@
     body.reading-bg-sepia .vintage-epoch-ancient .dict-entry-title,
     body.reading-bg-sepia .vintage-epoch-classic .dict-entry-title,
     body.reading-bg-sepia .vintage-epoch-xix .dict-entry-title,
-    body:not(.theme-dark) .vintage-epoch-ancient .dict-entry-title,
-    body:not(.theme-dark) .vintage-epoch-classic .dict-entry-title,
-    body:not(.theme-dark) .vintage-epoch-xix .dict-entry-title {
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-ancient .dict-entry-title,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-classic .dict-entry-title,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-xix .dict-entry-title {
       color: #5b2010 !important;
       font-family: 'Cinzel', 'IM Fell English', Georgia, serif !important;
       font-weight: 700 !important;
@@ -324,9 +454,9 @@
     body.reading-bg-sepia .vintage-epoch-ancient .verse-num,
     body.reading-bg-sepia .vintage-epoch-classic .verse-num,
     body.reading-bg-sepia .vintage-epoch-xix .verse-num,
-    body:not(.theme-dark) .vintage-epoch-ancient .verse-num,
-    body:not(.theme-dark) .vintage-epoch-classic .verse-num,
-    body:not(.theme-dark) .vintage-epoch-xix .verse-num {
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-ancient .verse-num,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-classic .verse-num,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-xix .verse-num {
       color: #8c2614 !important;
       font-weight: 700 !important;
     }
@@ -334,9 +464,9 @@
     body.reading-bg-sepia .vintage-epoch-ancient .chapter-number-dropcap,
     body.reading-bg-sepia .vintage-epoch-classic .chapter-number-dropcap,
     body.reading-bg-sepia .vintage-epoch-xix .chapter-number-dropcap,
-    body:not(.theme-dark) .vintage-epoch-ancient .chapter-number-dropcap,
-    body:not(.theme-dark) .vintage-epoch-classic .chapter-number-dropcap,
-    body:not(.theme-dark) .vintage-epoch-xix .chapter-number-dropcap {
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-ancient .chapter-number-dropcap,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-classic .chapter-number-dropcap,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-xix .chapter-number-dropcap {
       color: #8c2614 !important;
       font-family: 'Cinzel', 'IM Fell English', Georgia, serif !important;
       font-size: 2.4em !important;
@@ -353,9 +483,9 @@
     body.reading-bg-sepia .vintage-epoch-ancient .pericope-title,
     body.reading-bg-sepia .vintage-epoch-classic .pericope-title,
     body.reading-bg-sepia .vintage-epoch-xix .pericope-title,
-    body:not(.theme-dark) .vintage-epoch-ancient .pericope-title,
-    body:not(.theme-dark) .vintage-epoch-classic .pericope-title,
-    body:not(.theme-dark) .vintage-epoch-xix .pericope-title {
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-ancient .pericope-title,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-classic .pericope-title,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-xix .pericope-title {
       color: #6b2612 !important;
       font-family: 'IM Fell English', 'Cinzel', Georgia, serif !important;
       font-size: 1.25em !important;
@@ -368,9 +498,9 @@
     body.reading-bg-sepia .vintage-epoch-ancient .pericope-title::before,
     body.reading-bg-sepia .vintage-epoch-classic .pericope-title::before,
     body.reading-bg-sepia .vintage-epoch-xix .pericope-title::before,
-    body:not(.theme-dark) .vintage-epoch-ancient .pericope-title::before,
-    body:not(.theme-dark) .vintage-epoch-classic .pericope-title::before,
-    body:not(.theme-dark) .vintage-epoch-xix .pericope-title::before {
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-ancient .pericope-title::before,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-classic .pericope-title::before,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-xix .pericope-title::before {
       content: "❦ ";
       color: #8b5a2b;
       font-size: 14px;
@@ -378,9 +508,9 @@
     body.reading-bg-sepia .vintage-epoch-ancient .pericope-title::after,
     body.reading-bg-sepia .vintage-epoch-classic .pericope-title::after,
     body.reading-bg-sepia .vintage-epoch-xix .pericope-title::after,
-    body:not(.theme-dark) .vintage-epoch-ancient .pericope-title::after,
-    body:not(.theme-dark) .vintage-epoch-classic .pericope-title::after,
-    body:not(.theme-dark) .vintage-epoch-xix .pericope-title::after {
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-ancient .pericope-title::after,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-classic .pericope-title::after,
+    body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-xix .pericope-title::after {
       content: " ❧";
       color: #8b5a2b;
       font-size: 14px;

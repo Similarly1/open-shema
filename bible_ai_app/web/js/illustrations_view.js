@@ -455,7 +455,7 @@ const IllustrationsView = {
         if (entries[0] && entries[0].isIntersecting && !this.isLoading && this.hasMore) {
           this.loadMore();
         }
-      }, { rootMargin: '350px' });
+      }, { root: this.container, rootMargin: '350px' });
       this.observer.observe(sentinel);
     }
   },

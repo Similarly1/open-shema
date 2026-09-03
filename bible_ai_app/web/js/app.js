@@ -608,7 +608,11 @@ const App = {
     body.classList.remove('reading-bg-white', 'reading-bg-sepia', 'reading-bg-dark');
 
     let effective = theme || 'dark';
-    if (effective === 'system') {
+    if (palette && palette.includes('dark')) {
+      effective = 'dark';
+    } else if (palette && palette.includes('light')) {
+      effective = 'light';
+    } else if (effective === 'system') {
       effective = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
     }
 

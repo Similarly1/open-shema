@@ -10,6 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollAnimations();
   initHeroMockupInteractions();
   initStickySplitScroll();
+  initMarc2DrawerInteractions();
+  initMorphologyCardInteractions();
+  initDisplayOptionsTabs();
+  initIllustrationsReservoirInteractions();
+  initEngineOptionsInteractions();
+  initCommentariesInteractions();
   initInteractiveSimulators();
   initLightboxModal();
   initTerminalTabs();
@@ -341,7 +347,18 @@ function initLightboxModal() {
       const title = card.getAttribute('data-title') || card.querySelector('.gallery-item-title')?.textContent;
       const desc = card.getAttribute('data-desc') || card.querySelector('.gallery-item-desc')?.textContent;
 
-      if (lightboxImg) lightboxImg.src = imgUrl;
+      if (lightboxImg) {
+        if (imgUrl) {
+          lightboxImg.src = imgUrl;
+          lightboxImg.style.display = 'block';
+          const placeholder = document.getElementById('lightbox-vector-preview');
+          if (placeholder) placeholder.style.display = 'none';
+        } else {
+          lightboxImg.style.display = 'none';
+          const placeholder = document.getElementById('lightbox-vector-preview');
+          if (placeholder) placeholder.style.display = 'block';
+        }
+      }
       if (lightboxTitle) lightboxTitle.textContent = title;
       if (lightboxDesc) lightboxDesc.textContent = desc;
 
@@ -632,6 +649,556 @@ function initHeroMockupInteractions() {
   bindInteractiveWords();
 }
 
+/* ==========================================================================
+   10. VOLET APERÇU 360° INTERACTIF (SLIDE 1 DEEP-DIVE)
+   ========================================================================== */
+function initMarc2DrawerInteractions() {
+  const accHeads = document.querySelectorAll('.drawer-acc-head');
+  const commentItems = document.querySelectorAll('.drawer-list-item[data-comment-id]');
+  const popover = document.getElementById('popover-robertson');
+  const popoverTag = document.getElementById('popover-tag');
+  const popoverTitle = document.getElementById('popover-title');
+  const popoverSubtitle = document.getElementById('popover-subtitle');
+  const popoverBody = document.getElementById('popover-body');
+
+  // Données exactes des 3 commentaires extraites des captures d'écran
+  const commentsDatabase = {
+    robertson: {
+      tag: 'COMMENTAIRE',
+      title: 'A.T. Robertson (Images verbales du NT)',
+      subtitle: 'A.T. Robertson (Images verbales du NT)',
+      body: "De nouveau à Capernaüm après quelques jours (παλιν εις Καφαρναουμ δι' ημερων). Après la première tournée en Galilée, lorsque Jésus est de retour dans la ville qui est maint..."
+    },
+    gaebelein: {
+      tag: 'COMMENTAIRE',
+      title: 'Bible annotée par A.C. Gaebelein',
+      subtitle: 'Bible annotée par A.C. Gaebelein',
+      body: "Chapitre 2 1. Le Serviteur à nouveau à Capharnaüm. La guérison du paralytique. ( Marc 2:1 . Matthieu 9:1 ; Luc 5:17 .) 2. Levi a appelé. Avec les Publicains et les Pécheurs..."
+    },
+    tgc: {
+      tag: 'COMMENTAIRE',
+      title: 'Commentaires The Gospel Coalition (TGC)',
+      subtitle: 'Commentaires The Gospel Coalition (TGC)',
+      body: "2:1–4 Cet épisode est une transition. Il s'agit du dernier d'une série de récits de guérisons et d'exorcismes, et le premier de cinq controverses avec les chefs religieux. ..."
+    }
+  };
+
+  // Accordion Expand / Collapse (Un seul onglet ouvert à la fois)
+  accHeads.forEach(head => {
+    head.addEventListener('click', () => {
+      const parentCard = head.closest('.drawer-acc-card');
+      if (!parentCard) return;
+
+      const isAlreadyOpen = parentCard.classList.contains('open');
+
+      // Fermer tous les autres accordéons
+      document.querySelectorAll('.drawer-acc-card').forEach(card => {
+        card.classList.remove('open');
+      });
+
+      // Si l'accordéon cliqué n'était pas ouvert, on l'ouvre
+      if (!isAlreadyOpen) {
+        parentCard.classList.add('open');
+      } else {
+        if (popover) popover.classList.remove('show');
+      }
+    });
+  });
+
+  // Gestion interactive des 3 commentaires au survol et au clic
+  if (commentItems.length && popover) {
+    commentItems.forEach(item => {
+      const updatePopover = () => {
+        const commentId = item.getAttribute('data-comment-id');
+        const data = commentsDatabase[commentId];
+        if (data) {
+          if (popoverTag) popoverTag.textContent = data.tag;
+          if (popoverTitle) popoverTitle.textContent = data.title;
+          if (popoverSubtitle) popoverSubtitle.textContent = data.subtitle;
+          if (popoverBody) popoverBody.textContent = data.body;
+        }
+
+        commentItems.forEach(i => i.classList.remove('active-target'));
+        item.classList.add('active-target');
+
+        popover.classList.add('show');
+      };
+
+      item.addEventListener('mouseenter', updatePopover);
+
+      item.addEventListener('mouseleave', (e) => {
+        if (!e.relatedTarget || !popover.contains(e.relatedTarget)) {
+          popover.classList.remove('show');
+        }
+      });
+
+      // Support mobile / clic
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        updatePopover();
+      });
+    });
+
+    popover.addEventListener('mouseleave', () => {
+      popover.classList.remove('show');
+    });
+
+    document.addEventListener('click', (e) => {
+      const isCommentItem = Array.from(commentItems).some(item => item.contains(e.target));
+      if (!popover.contains(e.target) && !isCommentItem) {
+        popover.classList.remove('show');
+      }
+    });
+  }
+}
+
+/* ==========================================================================
+   11. MORPHOLOGIE & BAILLY CARD INTERACTIONS (SLIDE 2 DEEP-DIVE)
+   ========================================================================== */
+function initMorphologyCardInteractions() {
+  const audioBtn = document.getElementById('btn-pronounce-g919');
+  const copyBtn = document.getElementById('btn-copy-g919');
+  const copyBtnText = document.getElementById('copy-btn-text');
+  const occurrencesBtn = document.getElementById('btn-occurrences-g919');
+  const infoTriggers = document.querySelectorAll('.morpho-info-trigger');
+
+  // 1. Audio Pronunciation (Lecture du vrai fichier audio MP3 de l'application)
+  let currentAudio = null;
+  if (audioBtn) {
+    audioBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+
+      // Si déjà en cours de lecture, on stoppe
+      if (currentAudio && !currentAudio.paused) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        currentAudio = null;
+        audioBtn.classList.remove('speaking');
+        const btnSpan = audioBtn.querySelector('span');
+        if (btnSpan) btnSpan.textContent = "Prononciation";
+        return;
+      }
+
+      audioBtn.classList.add('speaking');
+      const btnSpan = audioBtn.querySelector('span');
+      if (btnSpan) btnSpan.textContent = "Lecture...";
+
+      const resetBtn = () => {
+        audioBtn.classList.remove('speaking');
+        if (btnSpan) btnSpan.textContent = "Prononciation";
+        currentAudio = null;
+      };
+
+      try {
+        const audio = new Audio('assets/audio/G919.mp3');
+        currentAudio = audio;
+
+        audio.onended = resetBtn;
+        audio.onerror = () => {
+          console.warn("Fichier MP3 non accessible, bascule SpeechSynthesis");
+          if ('speechSynthesis' in window) {
+            const u = new SpeechSynthesisUtterance('Βαριησοῦς');
+            u.lang = 'el-GR';
+            u.onend = resetBtn;
+            u.onerror = resetBtn;
+            window.speechSynthesis.speak(u);
+          } else {
+            resetBtn();
+          }
+        };
+
+        audio.play().catch(err => {
+          console.warn("Lecture bloquée par le navigateur:", err);
+          resetBtn();
+        });
+      } catch (err) {
+        resetBtn();
+      }
+    });
+  }
+
+  // 2. Info tooltips mobile tap toggle
+  infoTriggers.forEach(trigger => {
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isActive = trigger.classList.contains('active');
+      infoTriggers.forEach(t => t.classList.remove('active'));
+      if (!isActive) trigger.classList.add('active');
+    });
+  });
+
+  document.addEventListener('click', () => {
+    infoTriggers.forEach(t => t.classList.remove('active'));
+  });
+
+  // 3. 1-Click Copy
+  if (copyBtn) {
+    copyBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const textToCopy = "Strong G919: Βαριησοῦς (Bariêsous) - « Jésus » | Nom (Substantif) | Sens: Bar-Jésus « fils de Jésus », un certain faux prophète Ac 13:6";
+      
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        if (copyBtnText) copyBtnText.textContent = "Copié !";
+        copyBtn.style.borderColor = "var(--accent-emerald)";
+        copyBtn.style.color = "var(--accent-emerald)";
+
+        setTimeout(() => {
+          if (copyBtnText) copyBtnText.textContent = "Copier";
+          copyBtn.style.borderColor = "";
+          copyBtn.style.color = "";
+        }, 2000);
+      }).catch(() => {});
+    });
+  }
+
+  // 4. Occurrences Button
+  if (occurrencesBtn) {
+    occurrencesBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      occurrencesBtn.style.transform = "scale(0.97)";
+      setTimeout(() => {
+        occurrencesBtn.style.transform = "";
+      }, 150);
+    });
+  }
+}
+
+/* ==========================================================================
+   12. DISPLAY OPTIONS TABS & INTERACTIVE MOCKUP (SLIDE 3 DEEP-DIVE)
+   ========================================================================== */
+function initDisplayOptionsTabs() {
+  const tabs = document.querySelectorAll('.display-options-tabs .opt-tab');
+  const panels = document.querySelectorAll('.display-tab-panel');
+  const checkboxes = document.querySelectorAll('.opt-checkbox-item');
+  const themeBtns = document.querySelectorAll('.ambiance-theme-btn');
+  const optBtns = document.querySelectorAll('.opt-btn');
+
+  // Éléments du passage biblique fixe en dessous (Jean 1:42-44)
+  const livePassage = document.getElementById('display-live-passage');
+  const passageTitle = document.getElementById('passage-title');
+  const passageLettrine = document.getElementById('passage-lettrine');
+  const passageV42Num = document.getElementById('passage-v42-num');
+  const passageV43Num = document.getElementById('passage-v43-num');
+  const passageV44Num = document.getElementById('passage-v44-num');
+  const passageHighlightG = document.getElementById('passage-highlight-galilee');
+  const passageHighlightB = document.getElementById('passage-highlight-bethsaida');
+  const passageBracket = document.getElementById('passage-bracket');
+  const passageNoteContainer = document.getElementById('passage-note-container');
+  const passageMapGutter = document.getElementById('passage-map-gutter');
+  const passageMapBadge = document.getElementById('passage-map-badge');
+  const passageMapPopover = document.getElementById('passage-map-popover');
+  const passageV42Wrap = document.getElementById('passage-v42-wrapper');
+  const passageV43Wrap = document.getElementById('passage-v43-wrapper');
+  const passageV44Wrap = document.getElementById('passage-v44-wrapper');
+
+  // 1. Commutation d'onglets (Éléments, Typographie, Ambiance)
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.getAttribute('data-tab-target');
+      if (!target) return;
+
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      panels.forEach(p => p.classList.remove('active'));
+      const activePanel = document.getElementById(`panel-${target}`);
+      if (activePanel) activePanel.classList.add('active');
+    });
+  });
+
+  // 2. Cases à cocher interactives synchronisées avec Jean 1:42-44
+  checkboxes.forEach(item => {
+    item.addEventListener('click', () => {
+      const isChecked = item.classList.toggle('checked');
+      const box = item.querySelector('.opt-check-box');
+      if (box) {
+        box.textContent = isChecked ? '✓' : '';
+      }
+
+      const opt = item.getAttribute('data-opt');
+      if (!opt) return;
+
+      if (opt === 'titres' && passageTitle) {
+        passageTitle.classList.toggle('hidden', !isChecked);
+      } else if (opt === 'versets') {
+        if (passageV42Num) passageV42Num.classList.toggle('hidden', !isChecked);
+        if (passageV43Num) passageV43Num.classList.toggle('hidden', !isChecked);
+        if (passageV44Num) passageV44Num.classList.toggle('hidden', !isChecked);
+      } else if (opt === 'lettrines' && passageLettrine) {
+        passageLettrine.classList.toggle('plain', !isChecked);
+      } else if (opt === 'cartes' && passageMapGutter) {
+        passageMapGutter.classList.toggle('hidden', !isChecked);
+      } else if (opt === 'surlignages') {
+        if (passageHighlightG) passageHighlightG.classList.toggle('no-highlight', !isChecked);
+        if (passageHighlightB) passageHighlightB.classList.toggle('no-highlight', !isChecked);
+      } else if (opt === 'un-verset') {
+        if (passageV42Wrap) passageV42Wrap.classList.toggle('one-per-line', isChecked);
+        if (passageV43Wrap) passageV43Wrap.classList.toggle('one-per-line', isChecked);
+        if (passageV44Wrap) passageV44Wrap.classList.toggle('one-per-line', isChecked);
+      } else if (opt === 'immersion' && livePassage) {
+        if (isChecked) {
+          livePassage.style.filter = "sepia(0.25) contrast(1.05)";
+        } else {
+          livePassage.style.filter = "none";
+        }
+      }
+    });
+  });
+
+  // 3. Pastille Carte Interactive (Hover & Click)
+  if (passageMapBadge && passageMapPopover) {
+    passageMapBadge.addEventListener('mouseenter', () => {
+      passageMapPopover.classList.add('show');
+    });
+    passageMapBadge.addEventListener('mouseleave', (e) => {
+      if (!e.relatedTarget || !passageMapPopover.contains(e.relatedTarget)) {
+        passageMapPopover.classList.remove('show');
+      }
+    });
+    passageMapPopover.addEventListener('mouseleave', () => {
+      passageMapPopover.classList.remove('show');
+    });
+    passageMapBadge.addEventListener('click', (e) => {
+      e.stopPropagation();
+      passageMapPopover.classList.toggle('show');
+    });
+    document.addEventListener('click', (e) => {
+      if (!passageMapPopover.contains(e.target) && !passageMapBadge.contains(e.target)) {
+        passageMapPopover.classList.remove('show');
+      }
+    });
+  }
+
+  // 4. Thèmes Ambiance (Auto, Blanc, Sépia, Nuit)
+  themeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      themeBtns.forEach(b => {
+        b.classList.remove('active');
+        const c = b.querySelector('.theme-circle');
+        if (c && c.textContent === '✓') c.textContent = '';
+      });
+
+      btn.classList.add('active');
+      const circle = btn.querySelector('.theme-circle');
+      if (circle) circle.textContent = '✓';
+
+      const theme = btn.getAttribute('data-theme');
+      if (livePassage && theme) {
+        livePassage.className = `display-live-passage-box theme-${theme}`;
+      }
+    });
+  });
+
+  // 5. Options Typographiques (Mots entre crochets, Notes d'Appel, Césures)
+  let currentBracket = 'bracket';
+  let currentNote = 'sup';
+  let currentCesure = 'indent';
+
+  function updateTypographyPassage() {
+    if (passageBracket) {
+      if (currentBracket === 'bracket') passageBracket.innerHTML = '[ Pierre ]';
+      else if (currentBracket === 'italic') passageBracket.innerHTML = '<em>Pierre</em>';
+      else if (currentBracket === 'plain') passageBracket.innerHTML = 'Pierre';
+    }
+
+    if (passageNoteContainer) {
+      if (currentNote === 'sup') {
+        passageNoteContainer.innerHTML = `<span class="note-call-badge" id="passage-note-badge" title="Afficher l'explication textuelle">n<div class="note-call-popover" id="note-popover-42"><div class="note-popover-header"><span class="note-popover-tag">EXPLICATION TEXTUELLE</span><span class="note-popover-verse">Verset 42</span></div><div class="note-popover-body">« c'est-à-dire, Pierre »</div></div></span>`;
+      } else if (currentNote === 'inline') {
+        passageNoteContainer.innerHTML = ` <span style="font-size: 0.78rem; color: #8C532B; font-style: italic; font-weight: normal;">(c'est-à-dire, Pierre)</span>`;
+      } else if (currentNote === 'hidden') {
+        passageNoteContainer.innerHTML = '';
+      }
+    }
+
+    if (passageV44Wrap) {
+      if (currentCesure === 'indent') {
+        passageV44Wrap.style.paddingLeft = '12px';
+      } else if (currentCesure === 'dash') {
+        passageV44Wrap.style.paddingLeft = '0';
+      } else {
+        passageV44Wrap.style.paddingLeft = '0';
+      }
+    }
+  }
+
+  optBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const parentGroup = btn.closest('.opt-btn-group');
+      if (parentGroup) {
+        parentGroup.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+      }
+      btn.classList.add('active');
+
+      if (btn.hasAttribute('data-bracket')) {
+        currentBracket = btn.getAttribute('data-bracket');
+      } else if (btn.hasAttribute('data-note')) {
+        currentNote = btn.getAttribute('data-note');
+      } else if (btn.hasAttribute('data-cesure')) {
+        currentCesure = btn.getAttribute('data-cesure');
+      }
+
+      updateTypographyPassage();
+    });
+  });
+}
+
+/* ==========================================================================
+   13. RÉSERVOIR D'ILLUSTRATIONS & BANQUE HOMILÉTIQUE (SLIDE 5 DEEP-DIVE)
+   ========================================================================== */
+function initIllustrationsReservoirInteractions() {
+  const searchInput = document.getElementById('ill-search-input');
+  const catPills = document.querySelectorAll('.ill-cat-pill');
+  const cards = document.querySelectorAll('.ill-card-item');
+  const countBadge = document.getElementById('ill-badge-count');
+  const detailModal = document.getElementById('ill-detail-modal');
+  const btnModalBack = document.getElementById('ill-modal-back');
+  const btnCopy = document.getElementById('ill-copy-btn');
+
+  const modalBadge = document.getElementById('ill-modal-badge');
+  const modalTitle = document.getElementById('ill-modal-title');
+  const modalAuthor = document.getElementById('ill-modal-author');
+  const modalPassage = document.getElementById('ill-modal-passage');
+  const modalBody = document.getElementById('ill-modal-body');
+  const modalCallout = document.getElementById('ill-modal-callout');
+
+  const illustrationsData = {
+    'ill-1': {
+      title: "L'amnistie royale et la dette insolvable",
+      author: "C.H. Spurgeon",
+      passage: "📖 Éphésiens 2:8, Romains 5:8",
+      badgeClass: "type-story",
+      badgeText: "Histoire vraie",
+      body: "« Dans l'ancienne juridiction, un homme accumula une dette telle qu'aucune génération de sa lignée n'aurait pu la rembourser. Alors qu'il comparaissait sans défense devant le tribunal, le Roi descendit du trône, apposa son propre sceau sur le registre des dettes et déclara l'ardoise effacée à ses frais. »",
+      callout: "💡 <strong>Application pastorale :</strong> Idéal pour illustrer l'impossibilité des œuvres humaines et la substitution parfaite du sacrifice du Christ."
+    },
+    'ill-2': {
+      title: "Le creuset de l'orfèvre et le feu purificateur",
+      author: "C.H. Spurgeon",
+      passage: "📖 1 Pierre 1:7, Malachie 3:3",
+      badgeClass: "type-metaphor",
+      badgeText: "Métaphore & Nature",
+      body: "« On demandait un jour à un maître orfèvre : \"Comment savez-vous que tout résidu est éliminé et que l'or est pur ?\" Il répondit : \"C'est lorsque, me penchant au-dessus du creuset brûlant, j'y vois distinctement le reflet de mon propre visage.\" »",
+      callout: "⚓ <strong>Application pastorale :</strong> Utiliser pour encourager l'assemblée dans les saisons d'épreuves où le Seigneur façonne son image en nous."
+    },
+    'ill-3': {
+      title: "La montre de poche de John Newton",
+      author: "John Newton",
+      passage: "📖 1 Timothée 1:15, Deutéronome 15:15",
+      badgeClass: "type-bio",
+      badgeText: "Biographie",
+      body: "« L'ancien capitaine négrier devenu pasteur gardait toujours sur son pupitre une montre gravée de cette inscription : \"Souviens-toi que tu as été esclave au pays d'Égypte et que l'Éternel ton Dieu t'a racheté\". Il disait ne jamais vouloir prêcher sans se souvenir d'où la grâce l'avait tiré. »",
+      callout: "🕊️ <strong>Application pastorale :</strong> Parfait pour exhorter à l'humilité et à la reconnaissance devant le salut reçu."
+    },
+    'ill-4': {
+      title: "La boussole et l'aiguille aimantée",
+      author: "D.L. Moody",
+      passage: "📖 Luc 9:23, Hébreux 12:2",
+      badgeClass: "type-story",
+      badgeText: "Parabole",
+      body: "« Même secouée par les tempêtes du grand large ou détournée un instant par les remous du navire, l'aiguille aimantée hésite à peine et revient toujours s'orienter immanquablement vers l'étoile polaire. »",
+      callout: "🧭 <strong>Application pastorale :</strong> Idéal pour illustrer la persévérance et le cap inébranlable du chrétien fixé sur Christ."
+    }
+  };
+
+  const emptyState = document.getElementById('ill-empty-state');
+  let activeCategory = 'all';
+  let searchQuery = '';
+
+  function filterCards() {
+    let visibleCount = 0;
+    cards.forEach(card => {
+      const cat = card.getAttribute('data-cat') || '';
+      const text = card.textContent.toLowerCase();
+      const matchesCat = (activeCategory === 'all' || cat === activeCategory);
+      const matchesQuery = (!searchQuery || text.includes(searchQuery));
+
+      if (matchesCat && matchesQuery) {
+        card.style.display = 'flex';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    if (emptyState) {
+      emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+
+    if (countBadge) {
+      if (activeCategory === 'all' && !searchQuery) {
+        countBadge.textContent = '1 480 fiches';
+      } else {
+        countBadge.textContent = `${visibleCount} fiche${visibleCount > 1 ? 's' : ''}`;
+      }
+    }
+  }
+
+  // 1. Filtres par catégorie
+  catPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      catPills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      activeCategory = pill.getAttribute('data-cat') || 'all';
+      filterCards();
+    });
+  });
+
+  // 2. Recherche rapide
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      searchQuery = (searchInput.value || '').trim().toLowerCase();
+      filterCards();
+    });
+  }
+
+  // 3. Clic sur une fiche -> Affiche le détail
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      const id = card.getAttribute('data-ill-id') || 'ill-1';
+      const data = illustrationsData[id] || illustrationsData['ill-1'];
+
+      if (modalBadge) {
+        modalBadge.className = `ill-card-badge ${data.badgeClass}`;
+        modalBadge.textContent = data.badgeText;
+      }
+      if (modalTitle) modalTitle.textContent = data.title;
+      if (modalAuthor) modalAuthor.textContent = `Auteur : ${data.author}`;
+      if (modalPassage) modalPassage.textContent = data.passage;
+      if (modalBody) modalBody.textContent = data.body;
+      if (modalCallout) modalCallout.innerHTML = data.callout;
+
+      if (detailModal) detailModal.classList.remove('hidden');
+    });
+  });
+
+  // 4. Bouton Retour
+  if (btnModalBack) {
+    btnModalBack.addEventListener('click', () => {
+      if (detailModal) detailModal.classList.add('hidden');
+    });
+  }
+
+  // 5. Bouton Copier avec feedback visuel
+  if (btnCopy) {
+    btnCopy.addEventListener('click', () => {
+      const textToCopy = `${modalTitle ? modalTitle.textContent : ''}\n${modalBody ? modalBody.textContent : ''}\n${modalPassage ? modalPassage.textContent : ''}`;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(textToCopy).catch(() => {});
+      }
+      const originalText = btnCopy.innerHTML;
+      btnCopy.innerHTML = `✓ Copié dans le presse-papier !`;
+      btnCopy.style.background = '#10B981';
+      btnCopy.style.color = '#FFFFFF';
+      setTimeout(() => {
+        btnCopy.innerHTML = originalText;
+        btnCopy.style.background = '';
+        btnCopy.style.color = '';
+      }, 2000);
+    });
+  }
+}
+
 // Fade in animation helper
 const styleTag = document.createElement('style');
 styleTag.textContent = `
@@ -642,3 +1209,248 @@ styleTag.textContent = `
 `;
 document.head.appendChild(styleTag);
 
+/* ==========================================================================
+   14. OPTIONS DU MOTEUR D'ÉTUDE & RAG BGE-M3 (SLIDE 6 DEEP-DIVE)
+   ========================================================================== */
+function initEngineOptionsInteractions() {
+  const track = document.getElementById('engine-slider-track');
+  const steps = document.querySelectorAll('#engine-slider-steps span');
+  const progress = document.getElementById('engine-slider-progress');
+  const knob = document.getElementById('engine-slider-knob');
+  const calloutTokens = document.getElementById('engine-callout-tokens');
+  const calloutTime = document.getElementById('engine-callout-time');
+  const calloutDesc = document.getElementById('engine-callout-desc');
+  const checkboxRows = document.querySelectorAll('.engine-checkbox-row');
+  const btnModify = document.getElementById('engine-btn-modify');
+
+  const stepData = [
+    {
+      pct: 5,
+      tokens: "~250 tokens / source",
+      time: "≈ 10–25 s",
+      desc: "Contexte ultra-léger et rapide — idéal pour requêtes ponctuelles et définitions simples."
+    },
+    {
+      pct: 35,
+      tokens: "~600 tokens / source",
+      time: "≈ 45–90 s",
+      desc: "Contexte équilibré — bon compromis vitesse / richesse doctrinale."
+    },
+    {
+      pct: 68,
+      tokens: "~1 200 tokens / source",
+      time: "≈ 2–4 min",
+      desc: "Analyse dense intégrant l'histoire du texte, les variantes manuscrites et les Pères de l'Église."
+    },
+    {
+      pct: 98,
+      tokens: "~2 500 tokens / source",
+      time: "≈ 5–8 min",
+      desc: "Exploration exhaustive des 4 corpus, synthèse multi-traditionnelle et garde-fous herméneutiques maximaux."
+    }
+  ];
+
+  function applyStep(idx, snap = true) {
+    const data = stepData[idx] || stepData[1];
+    steps.forEach((s, i) => {
+      s.classList.toggle('active', i === idx);
+    });
+
+    if (snap) {
+      if (progress) progress.style.width = `${data.pct}%`;
+      if (knob) knob.style.left = `${data.pct}%`;
+    }
+
+    if (calloutTokens) calloutTokens.textContent = data.tokens;
+    if (calloutTime) calloutTime.textContent = data.time;
+    if (calloutDesc) calloutDesc.textContent = data.desc;
+  }
+
+  // 1. Clic direct sur les labels
+  steps.forEach(step => {
+    step.addEventListener('click', () => {
+      const idx = parseInt(step.getAttribute('data-step') || '1', 10);
+      applyStep(idx, true);
+    });
+  });
+
+  // 2. Glissement (Drag & Drop) du curseur sur la piste
+  let isDragging = false;
+
+  function handleDrag(clientX) {
+    if (!track) return;
+    const rect = track.getBoundingClientRect();
+    let ratio = (clientX - rect.left) / rect.width;
+    ratio = Math.max(0, Math.min(1, ratio));
+
+    const pct = ratio * 100;
+    if (progress) progress.style.width = `${pct}%`;
+    if (knob) knob.style.left = `${pct}%`;
+
+    // Calcul du step le plus proche (0, 1, 2, 3)
+    let closestIdx = 0;
+    let minDiff = Infinity;
+    stepData.forEach((s, idx) => {
+      const diff = Math.abs(s.pct - pct);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestIdx = idx;
+      }
+    });
+
+    applyStep(closestIdx, false);
+  }
+
+  if (track) {
+    track.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      handleDrag(e.clientX);
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      handleDrag(e.clientX);
+    });
+
+    window.addEventListener('mouseup', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      if (track) {
+        const rect = track.getBoundingClientRect();
+        let ratio = (e.clientX - rect.left) / rect.width;
+        ratio = Math.max(0, Math.min(1, ratio));
+        const pct = ratio * 100;
+        let closestIdx = 0;
+        let minDiff = Infinity;
+        stepData.forEach((s, idx) => {
+          const diff = Math.abs(s.pct - pct);
+          if (diff < minDiff) {
+            minDiff = diff;
+            closestIdx = idx;
+          }
+        });
+        applyStep(closestIdx, true);
+      }
+    });
+
+    // Support tactile pour le glissement
+    track.addEventListener('touchstart', (e) => {
+      if (e.touches.length > 0) {
+        isDragging = true;
+        handleDrag(e.touches[0].clientX);
+      }
+    }, { passive: true });
+
+        window.addEventListener('touchmove', (e) => {
+      if (!isDragging || e.touches.length === 0) return;
+      handleDrag(e.touches[0].clientX);
+    }, { passive: true });
+
+    window.addEventListener('touchend', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      const activeStep = document.querySelector('#engine-slider-steps span.active');
+      const idx = activeStep ? parseInt(activeStep.getAttribute('data-step') || '1', 10) : 1;
+      applyStep(idx, true);
+    });
+  }
+
+  // 3. Checkboxes Toggle
+  checkboxRows.forEach(row => {
+    row.addEventListener('click', () => {
+      const check = row.querySelector('.engine-check');
+      if (check) {
+        check.classList.toggle('checked');
+        check.textContent = check.classList.contains('checked') ? '✓' : '';
+      }
+    });
+  });
+
+  // 4. Bouton Modifier inerte (aucun effet)
+  if (btnModify) {
+    btnModify.addEventListener('click', (e) => {
+      e.preventDefault();
+      // Inerte comme demandé
+    });
+  }
+}
+
+/* ==========================================================================
+   15. COMMENTAIRES HISTORIQUES & CROISÉS (SLIDE 7 DEEP-DIVE)
+   ========================================================================== */
+function initCommentariesInteractions() {
+  const tabBtns = document.querySelectorAll('.comm-tab-btn');
+  const bookIcon = document.getElementById('comm-book-icon');
+  const authorTitle = document.getElementById('comm-author-title');
+  const authorSub = document.getElementById('comm-author-sub');
+  const passageBadge = document.getElementById('comm-passage-badge');
+  const bodyText = document.getElementById('comm-body-text');
+  const btnCopy = document.getElementById('comm-btn-copy');
+  const btnNote = document.getElementById('comm-btn-note');
+
+  const commentariesData = {
+    tgc: {
+      iconClass: 'tgc',
+      iconText: 'TGC',
+      title: 'The Gospel Coalition (TGC)',
+      sub: 'TGC Commentary (2021-2024)',
+      passage: '📖 Jean 1:43–51 (Andreas Köstenberger)',
+      html: `<p>La réponse sceptique de Nathanaël (v. 46) est surmontée par sa rencontre personnelle avec Jésus, qui révèle l'avoir vu sous le figuier avant l'appel de Philippe. Le figuier est un symbole messianique d'Israël (<span class="comm-ref-wrapper"><span class="comm-ref-pill">1 Rois 4.25</span><span class="comm-ref-popover"><span class="comm-pop-title">1 Rois 4:25</span><span class="comm-pop-desc">Consulter ce passage dans le lecteur biblique pour afficher le texte complet et l'interlinéaire.</span><span class="comm-pop-link">Cliquer pour ouvrir →</span></span></span>) aux riches connotations eschatologiques (<span class="comm-ref-wrapper"><span class="comm-ref-pill">Michée 4.4 ; Zacharie 3.10</span><span class="comm-ref-popover"><span class="comm-pop-title">Michée 4:4 ; Zacharie 3:10</span><span class="comm-pop-desc">Consulter ce passage dans le lecteur biblique pour afficher le texte complet et l'interlinéaire.</span><span class="comm-pop-link">Cliquer pour ouvrir →</span></span></span>).</p>`
+    },
+    godet: {
+      iconClass: 'godet',
+      iconText: 'BAG',
+      title: 'Bible annotée (Godet & Neuchâtel)',
+      sub: 'Frédéric Godet et collab. (1899)',
+      passage: '📖 Jean 1:46 (Frédéric Godet)',
+      html: `<p>Le rôle de Philippe dans la vocation de Nathanaël est semblable à celui d’André pour Pierre. Un flambeau allumé sert à en allumer un autre ; ainsi se propage la foi vivante. — Godet</p><p>C’est en chemin vers la Galilée (<span class="comm-ref-wrapper"><span class="comm-ref-pill light">v. 44</span><span class="comm-ref-popover"><span class="comm-pop-title">Jean 1:44</span><span class="comm-pop-desc">Consulter ce passage dans le lecteur biblique pour afficher le texte complet et l'interlinéaire.</span><span class="comm-pop-link">Cliquer pour ouvrir →</span></span></span>) que Philippe trouve Nathanaël, alors que celui-ci cherchait la vérité.</p>`
+    },
+    robertson: {
+      iconClass: 'robertson',
+      iconText: 'ATR',
+      title: 'Robertson (Images verbales NT)',
+      sub: 'A.T. Robertson (1933)',
+      passage: '📖 Jean 1:46 (A.T. Robertson)',
+      html: `<p><strong>Peut-il venir de Nazareth quelque chose de bon ?</strong> (Ἐκ Ναζαρετ δυναται τι ἀγαθον ειναι ;). Littéralement : « Hors de Nazareth peut-il être quelque bien ? ».</p><p>Une nuance de mépris reflétant la rivalité entre villes voisines. Une sentence fausse prétendait qu’aucun prophète ne sort de Galilée (<span class="comm-ref-wrapper"><span class="comm-ref-pill light">Jn 7.52</span><span class="comm-ref-popover"><span class="comm-pop-title">Jean 7:52</span><span class="comm-pop-desc">Consulter ce passage dans le lecteur biblique pour afficher le texte complet et l'interlinéaire.</span><span class="comm-pop-link">Cliquer pour ouvrir →</span></span></span>).</p>`
+    }
+  };
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const commKey = btn.getAttribute('data-comm') || 'tgc';
+      const data = commentariesData[commKey] || commentariesData.tgc;
+
+      tabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      if (bookIcon) {
+        bookIcon.className = `comm-book-icon ${data.iconClass}`;
+        bookIcon.textContent = data.iconText;
+      }
+      if (authorTitle) authorTitle.textContent = data.title;
+      if (authorSub) authorSub.textContent = data.sub;
+      if (passageBadge) passageBadge.textContent = data.passage;
+      if (bodyText) bodyText.innerHTML = data.html;
+    });
+  });
+
+  if (btnCopy && bodyText) {
+    btnCopy.addEventListener('click', () => {
+      const textToCopy = bodyText.innerText;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(textToCopy).catch(() => {});
+      }
+      const orig = btnCopy.innerHTML;
+      btnCopy.innerHTML = `✓ Copié !`;
+      setTimeout(() => { btnCopy.innerHTML = orig; }, 2000);
+    });
+  }
+
+  if (btnNote) {
+    btnNote.addEventListener('click', () => {
+      const orig = btnNote.innerHTML;
+      btnNote.innerHTML = `✓ Note créée !`;
+      setTimeout(() => { btnNote.innerHTML = orig; }, 2000);
+    });
+  }
+}

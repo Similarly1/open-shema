@@ -583,6 +583,21 @@ Règles impératives :
         const palette = card.dataset.palette;
         const paletteInput = document.getElementById('cfg-theme-palette');
         if (paletteInput) paletteInput.value = palette;
+
+        // Synchroniser le mode sombre/clair avec la palette cliquée
+        const themeInput = document.getElementById('cfg-theme');
+        if (palette && palette.startsWith('dark')) {
+          if (themeInput) themeInput.value = 'dark';
+          document.querySelectorAll('.theme-mode-pill').forEach(b => {
+            b.classList.toggle('active', b.dataset.theme === 'dark');
+          });
+        } else if (palette && palette.startsWith('light')) {
+          if (themeInput) themeInput.value = 'light';
+          document.querySelectorAll('.theme-mode-pill').forEach(b => {
+            b.classList.toggle('active', b.dataset.theme === 'light');
+          });
+        }
+
         this.updateActivePaletteCard(palette);
         triggerThemeUpdate();
       });

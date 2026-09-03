@@ -18828,6 +18828,23 @@ body:not(.reading-bg-white):not(.reading-bg-sepia):not(.reading-bg-dark):not(.th
    ========================================================================= */
 
 /* 1. Fond BLANC PUR (Écrase toute texture, fond blanc pur #ffffff) */
+body.reading-bg-white .reading-pane.vintage-epoch-ancient,
+body.reading-bg-white .reading-pane.vintage-epoch-classic,
+body.reading-bg-white .reading-pane.vintage-epoch-xix,
+body.reading-bg-white .reading-pane[class*="vintage-epoch-"],
+body.reading-bg-white .vintage-epoch-ancient.pane-scrollable-content,
+body.reading-bg-white .vintage-epoch-classic.pane-scrollable-content,
+body.reading-bg-white .vintage-epoch-xix.pane-scrollable-content,
+body.reading-bg-white .pane-scrollable-content[class*="vintage-epoch-"],
+body.reading-bg-white .chapter-container[class*="vintage-epoch-"],
+body.reading-bg-white .chapter-block[class*="vintage-epoch-"],
+body.reading-bg-white .verses-flow[class*="vintage-epoch-"],
+body.reading-bg-white .vintage-epoch-ancient.theol-reading-container,
+body.reading-bg-white .vintage-epoch-classic.theol-reading-container,
+body.reading-bg-white .vintage-epoch-xix.theol-reading-container,
+body.reading-bg-white .vintage-epoch-ancient.comm-article-card,
+body.reading-bg-white .vintage-epoch-classic.comm-article-card,
+body.reading-bg-white .vintage-epoch-xix.comm-article-card,
 body.reading-bg-white .dict-article-card,
 body.reading-bg-white #view-dictionary .dict-article-card,
 body.reading-bg-white .dict-article-card[class*="vintage-epoch-"],
@@ -18851,6 +18868,20 @@ body.reading-bg-white #view-dictionary .vintage-epoch-xix * {
 }
 
 /* 2. Fond SÉPIA DOUX & CHAUD (Fond sépia crème #f7eee2) */
+body.reading-bg-sepia .reading-pane.vintage-epoch-ancient,
+body.reading-bg-sepia .reading-pane.vintage-epoch-classic,
+body.reading-bg-sepia .reading-pane.vintage-epoch-xix,
+body.reading-bg-sepia .reading-pane[class*="vintage-epoch-"],
+body.reading-bg-sepia .vintage-epoch-ancient.pane-scrollable-content,
+body.reading-bg-sepia .vintage-epoch-classic.pane-scrollable-content,
+body.reading-bg-sepia .vintage-epoch-xix.pane-scrollable-content,
+body.reading-bg-sepia .pane-scrollable-content[class*="vintage-epoch-"],
+body.reading-bg-sepia .vintage-epoch-ancient.theol-reading-container,
+body.reading-bg-sepia .vintage-epoch-classic.theol-reading-container,
+body.reading-bg-sepia .vintage-epoch-xix.theol-reading-container,
+body.reading-bg-sepia .vintage-epoch-ancient.comm-article-card,
+body.reading-bg-sepia .vintage-epoch-classic.comm-article-card,
+body.reading-bg-sepia .vintage-epoch-xix.comm-article-card,
 body.reading-bg-sepia .dict-article-card,
 body.reading-bg-sepia #view-dictionary .dict-article-card,
 body.reading-bg-sepia .dict-article-card[class*="vintage-epoch-"],
@@ -18874,6 +18905,20 @@ body.reading-bg-sepia #view-dictionary .vintage-epoch-xix * {
 }
 
 /* 3. Fond SOMBRE / NUIT */
+body.reading-bg-dark .reading-pane.vintage-epoch-ancient,
+body.reading-bg-dark .reading-pane.vintage-epoch-classic,
+body.reading-bg-dark .reading-pane.vintage-epoch-xix,
+body.reading-bg-dark .reading-pane[class*="vintage-epoch-"],
+body.reading-bg-dark .vintage-epoch-ancient.pane-scrollable-content,
+body.reading-bg-dark .vintage-epoch-classic.pane-scrollable-content,
+body.reading-bg-dark .vintage-epoch-xix.pane-scrollable-content,
+body.reading-bg-dark .pane-scrollable-content[class*="vintage-epoch-"],
+body.reading-bg-dark .vintage-epoch-ancient.theol-reading-container,
+body.reading-bg-dark .vintage-epoch-classic.theol-reading-container,
+body.reading-bg-dark .vintage-epoch-xix.theol-reading-container,
+body.reading-bg-dark .vintage-epoch-ancient.comm-article-card,
+body.reading-bg-dark .vintage-epoch-classic.comm-article-card,
+body.reading-bg-dark .vintage-epoch-xix.comm-article-card,
 body.reading-bg-dark .dict-article-card,
 body.reading-bg-dark #view-dictionary .dict-article-card,
 body.reading-bg-dark .dict-article-card[class*="vintage-epoch-"],
@@ -18897,27 +18942,27 @@ body.reading-bg-dark #view-dictionary .vintage-epoch-xix * {
 }
 
 /* Typographie d'époque : respecte la couleur d'encre sans forcer la police de caractères */
-body:not(.theme-dark) .vintage-epoch-ancient .verses-flow,
-body:not(.theme-dark) .vintage-epoch-classic .verses-flow,
-body:not(.theme-dark) .vintage-epoch-xix .verses-flow,
-body:not(.theme-dark) .vintage-epoch-ancient .word-token,
-body:not(.theme-dark) .vintage-epoch-classic .word-token,
-body:not(.theme-dark) .vintage-epoch-xix .word-token,
-body:not(.theme-dark) .vintage-epoch-ancient .dict-entry-body,
-body:not(.theme-dark) .vintage-epoch-classic .dict-entry-body,
-body:not(.theme-dark) .vintage-epoch-xix .dict-entry-body,
-body:not(.theme-dark) .vintage-epoch-ancient .dict-entry-body-content,
-body:not(.theme-dark) .vintage-epoch-classic .dict-entry-body-content,
-body:not(.theme-dark) .vintage-epoch-xix .dict-entry-body-content,
-body:not(.theme-dark) .vintage-epoch-ancient p,
-body:not(.theme-dark) .vintage-epoch-classic p,
-body:not(.theme-dark) .vintage-epoch-xix p,
-body:not(.theme-dark) .vintage-epoch-ancient .theol-reading-body *,
-body:not(.theme-dark) .vintage-epoch-classic .theol-reading-body *,
-body:not(.theme-dark) .vintage-epoch-xix .theol-reading-body *,
-body:not(.theme-dark) .vintage-epoch-ancient .comm-body-text *,
-body:not(.theme-dark) .vintage-epoch-classic .comm-body-text *,
-body:not(.theme-dark) .vintage-epoch-xix .comm-body-text * {
+body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-ancient .verses-flow,
+body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-classic .verses-flow,
+body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-xix .verses-flow,
+body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-ancient .word-token,
+body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-classic .word-token,
+body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-xix .word-token,
+body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-ancient .dict-entry-body,
+body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-classic .dict-entry-body,
+body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-xix .dict-entry-body,
+body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-ancient .dict-entry-body-content,
+body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-classic .dict-entry-body-content,
+body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-xix .dict-entry-body-content,
+body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-ancient p,
+body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-classic p,
+body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-xix p,
+body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-ancient .theol-reading-body *,
+body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-classic .theol-reading-body *,
+body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-xix .theol-reading-body *,
+body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-ancient .comm-body-text *,
+body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-classic .comm-body-text *,
+body:not(.theme-dark):not(.reading-bg-dark):not(.reading-bg-white) .vintage-epoch-xix .comm-body-text * {
   color: inherit;
   line-height: 1.85 !important;
 }
@@ -24548,6 +24593,7 @@ body.reading-bg-dark .comm-dropdown-popover {
   overflow: hidden;
   display: flex;
   align-items: center;
+  gap: 0;
   box-sizing: border-box;
   z-index: 5;
 }
@@ -24584,7 +24630,7 @@ body.reading-bg-dark .comm-dropdown-popover {
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  padding: 2px 14px;
+  padding: 2px 28px;
   scroll-behavior: smooth;
   height: 100%;
   width: 100%;
@@ -24645,8 +24691,16 @@ body.reading-bg-dark .comm-dropdown-popover {
   transform: translateY(-50%) scale(1.12);
 }
 
+.lex-tabs-scroll-btn.hidden {
+  display: none !important;
+}
+
 .lex-tabs-scroll-left {
   left: 4px;
+}
+
+.lex-tabs-scroll-right {
+  right: 4px;
 }
 
 /* =========================================================================
@@ -26148,7 +26202,7 @@ body.reading-bg-dark .comm-dropdown-popover {
   height: calc(100% - 95px);
   overflow: hidden;
   position: relative;
-  background-color: var(--bg-primary, #09090b);
+  background-color: var(--bg-app, #0b0f17);
 }
 
 /* 1. SOMMAIRE DU SERMON (OUTLINE PANEL) */
@@ -26327,7 +26381,7 @@ body.reading-bg-dark .comm-dropdown-popover {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: var(--bg-primary, #09090b);
+  background-color: var(--bg-app, #0b0f17);
 }
 
 .sermon-blocks-container {
@@ -26574,8 +26628,9 @@ body.reading-bg-dark .comm-dropdown-popover {
   flex-direction: column;
   height: 100%;
   width: 100%;
+  min-height: 0;
   overflow: hidden;
-  background-color: var(--bg-primary, #09090b);
+  background-color: var(--bg-app, #0b0f17);
 }
 
 .illustrations-header {
@@ -26814,21 +26869,25 @@ body.reading-bg-dark .comm-dropdown-popover {
   color: var(--text-muted, #71717a);
   pointer-events: none;
 }
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-}
 
 /* GRILLE DES CARTES D'ILLUSTRATION */
 .illustrations-main-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 24px 28px 80px 28px;
-  background-color: var(--bg-primary, #09090b);
+  flex: 1 1 0%;
+  min-height: 0;
+  height: 100%;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  padding: 30px 36px 90px 42px;
+  background-color: var(--bg-app, #0b0f17);
+  box-sizing: border-box;
+  scroll-behavior: smooth;
 }
 
 .illustrations-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 18px;
+  gap: 20px;
+  margin-top: 6px;
 }
 
 .illustration-card {
@@ -27239,7 +27298,7 @@ body.reading-bg-dark .comm-dropdown-popover {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background-color: var(--bg-primary, #09090b);
+  background-color: var(--bg-app, #0b0f17);
 }
 
 .sermons-hub-header {
@@ -27387,7 +27446,7 @@ body.reading-bg-dark .comm-dropdown-popover {
   flex: 1;
   overflow-y: auto;
   padding: 26px 32px 80px 32px;
-  background-color: var(--bg-primary, #09090b);
+  background-color: var(--bg-app, #0b0f17);
 }
 
 .sermons-grid {
@@ -27534,7 +27593,7 @@ body.reading-bg-dark .comm-dropdown-popover {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background-color: var(--bg-primary, #09090b);
+  background-color: var(--bg-app, #0b0f17);
 }
 
 .sermon-single-header {
@@ -27764,8 +27823,8 @@ body.reading-bg-dark .comm-dropdown-popover {
   flex-direction: column;
   height: 100%;
   width: 100%;
-  background: var(--bg-main, #0d0d10);
-  overflow-y: auto;
+  background: var(--bg-app, #0b0f17);
+  overflow: hidden;
 }
 
 .sermons-hub-header {
@@ -30169,59 +30228,194 @@ body.theme-light .report-typo-textarea {
  * THÈME CLAIR : SERMONS, ÉDITEUR MODULAIRE & BANQUE D'ILLUSTRATIONS
  * ========================================================================= */
 
-body:not(.theme-dark) .sermons-hub-layout,
-body:not(.theme-dark) .sermons-hub-main-content,
-body:not(.theme-dark) .illustrations-layout,
-body:not(.theme-dark) .illustrations-main-content,
-body:not(.theme-dark) .sermon-editor-single-layout,
-body:not(.theme-dark) .sermons-editor-workspace,
-body:not(.theme-dark) .sermon-blocks-scroll-pane,
-body:not(.theme-dark) .sermon-blocks-container,
-body:not(.theme-dark) #view-sermons,
-body:not(.theme-dark) #view-sermon-editor,
-body:not(.theme-dark) #view-illustrations {
-  background-color: var(--bg-base, #f8fafc) !important;
+/* =========================================================================
+ * THÈME SOMBRE : SERMONS, ÉDITEUR MODULAIRE & BANQUE D'ILLUSTRATIONS
+ * ========================================================================= */
+
+body.theme-dark .sermons-hub-layout,
+body.theme-dark .sermons-hub-main-content,
+body.theme-dark #sermons-hub-cards-container,
+body.theme-dark .illustrations-layout,
+body.theme-dark .illustrations-main-content,
+body.theme-dark #illustrations-cards-container,
+body.theme-dark .sermon-editor-single-layout,
+body.theme-dark .sermons-editor-workspace,
+body.theme-dark .sermon-blocks-scroll-pane,
+body.theme-dark #sermon-blocks-scroll-pane,
+body.theme-dark .sermon-blocks-container,
+body.theme-dark #view-sermons,
+body.theme-dark #view-sermon-editor,
+body.theme-dark #view-illustrations,
+body.palette-dark-slate .sermons-hub-layout,
+body.palette-dark-slate .sermons-hub-main-content,
+body.palette-dark-slate #sermons-hub-cards-container,
+body.palette-dark-slate .illustrations-layout,
+body.palette-dark-slate .illustrations-main-content,
+body.palette-dark-slate #illustrations-cards-container,
+body.palette-dark-slate .sermon-editor-single-layout,
+body.palette-dark-slate .sermons-editor-workspace,
+body.palette-dark-slate .sermon-blocks-scroll-pane,
+body.palette-dark-slate #sermon-blocks-scroll-pane,
+body.palette-dark-slate .sermon-blocks-container,
+body.palette-dark-slate #view-sermons,
+body.palette-dark-slate #view-sermon-editor,
+body.palette-dark-slate #view-illustrations,
+body.palette-dark-oled .sermons-hub-layout,
+body.palette-dark-oled .sermons-hub-main-content,
+body.palette-dark-oled #sermons-hub-cards-container,
+body.palette-dark-oled .illustrations-layout,
+body.palette-dark-oled .illustrations-main-content,
+body.palette-dark-oled #illustrations-cards-container,
+body.palette-dark-oled .sermon-editor-single-layout,
+body.palette-dark-oled .sermons-editor-workspace,
+body.palette-dark-oled .sermon-blocks-scroll-pane,
+body.palette-dark-oled #sermon-blocks-scroll-pane,
+body.palette-dark-oled .sermon-blocks-container,
+body.palette-dark-oled #view-sermons,
+body.palette-dark-oled #view-sermon-editor,
+body.palette-dark-oled #view-illustrations,
+body.palette-dark-warm .sermons-hub-layout,
+body.palette-dark-warm .sermons-hub-main-content,
+body.palette-dark-warm #sermons-hub-cards-container,
+body.palette-dark-warm .illustrations-layout,
+body.palette-dark-warm .illustrations-main-content,
+body.palette-dark-warm #illustrations-cards-container,
+body.palette-dark-warm .sermon-editor-single-layout,
+body.palette-dark-warm .sermons-editor-workspace,
+body.palette-dark-warm .sermon-blocks-scroll-pane,
+body.palette-dark-warm #sermon-blocks-scroll-pane,
+body.palette-dark-warm .sermon-blocks-container,
+body.palette-dark-warm #view-sermons,
+body.palette-dark-warm #view-sermon-editor,
+body.palette-dark-warm #view-illustrations {
+  background-color: var(--bg-app, #0b0f17) !important;
+  background-image: none !important;
+  color: var(--text-primary, #f8fafc) !important;
+}
+
+.illustrations-main-content,
+#illustrations-cards-container,
+.sermons-hub-main-content,
+#sermons-hub-cards-container,
+.sermon-blocks-scroll-pane,
+#sermon-blocks-scroll-pane {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  min-height: 0 !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+body.theme-dark .sermons-hub-header,
+body.theme-dark .illustrations-header,
+body.theme-dark .sermon-single-header,
+body.theme-dark .sermon-outline-panel,
+body.theme-dark .sermon-outline-header,
+body.theme-dark .sermon-outline-footer,
+body.theme-dark .sermons-resources-drawer,
+body.theme-dark .sermons-status-bar,
+body.palette-dark-warm .sermons-hub-header,
+body.palette-dark-warm .illustrations-header,
+body.palette-dark-warm .sermon-single-header,
+body.palette-dark-warm .sermon-outline-panel,
+body.palette-dark-warm .sermon-outline-header,
+body.palette-dark-warm .sermon-outline-footer,
+body.palette-dark-warm .sermons-resources-drawer,
+body.palette-dark-warm .sermons-status-bar,
+body.palette-dark-slate .sermons-hub-header,
+body.palette-dark-slate .illustrations-header,
+body.palette-dark-slate .sermon-single-header,
+body.palette-dark-slate .sermon-outline-panel,
+body.palette-dark-slate .sermon-outline-header,
+body.palette-dark-slate .sermon-outline-footer,
+body.palette-dark-slate .sermons-resources-drawer,
+body.palette-dark-slate .sermons-status-bar,
+body.palette-dark-oled .sermons-hub-header,
+body.palette-dark-oled .illustrations-header,
+body.palette-dark-oled .sermon-single-header,
+body.palette-dark-oled .sermon-outline-panel,
+body.palette-dark-oled .sermon-outline-header,
+body.palette-dark-oled .sermon-outline-footer,
+body.palette-dark-oled .sermons-resources-drawer,
+body.palette-dark-oled .sermons-status-bar {
+  background-color: var(--bg-card, #121215) !important;
+  border-color: var(--border-color, rgba(255, 255, 255, 0.08)) !important;
+  color: var(--text-primary, #f8fafc) !important;
+}
+
+body.theme-dark .sermon-card,
+body.theme-dark .illustration-card,
+body.theme-dark .sermon-section-card,
+body.palette-dark-warm .sermon-card,
+body.palette-dark-warm .illustration-card,
+body.palette-dark-warm .sermon-section-card,
+body.palette-dark-slate .sermon-card,
+body.palette-dark-slate .illustration-card,
+body.palette-dark-slate .sermon-section-card,
+body.palette-dark-oled .sermon-card,
+body.palette-dark-oled .illustration-card,
+body.palette-dark-oled .sermon-section-card {
+  background: var(--bg-card, #18181b) !important;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.09)) !important;
+  color: var(--text-primary, #f8fafc) !important;
+}
+
+/* =========================================================================
+ * THÈME CLAIR : SERMONS, ÉDITEUR MODULAIRE & BANQUE D'ILLUSTRATIONS
+ * ========================================================================= */
+
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermons-hub-layout,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermons-hub-main-content,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .illustrations-layout,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .illustrations-main-content,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-editor-single-layout,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermons-editor-workspace,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-blocks-scroll-pane,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-blocks-container,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) #view-sermons,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) #view-sermon-editor,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) #view-illustrations {
+  background-color: var(--bg-app, #f8fafc) !important;
   color: var(--text-primary, #0f172a);
 }
 
-body:not(.theme-dark) .sermons-hub-header,
-body:not(.theme-dark) .illustrations-header,
-body:not(.theme-dark) .sermon-single-header,
-body:not(.theme-dark) .sermon-outline-panel,
-body:not(.theme-dark) .sermon-outline-header,
-body:not(.theme-dark) .sermon-outline-footer,
-body:not(.theme-dark) .sermons-resources-drawer,
-body:not(.theme-dark) .sermons-status-bar {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermons-hub-header,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .illustrations-header,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-single-header,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-outline-panel,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-outline-header,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-outline-footer,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermons-resources-drawer,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermons-status-bar {
   background-color: var(--bg-card, #ffffff) !important;
   border-color: var(--border-color, #e2e8f0) !important;
   color: var(--text-primary, #0f172a);
 }
 
-body:not(.theme-dark) .sermons-hub-main-title,
-body:not(.theme-dark) .illustrations-main-title,
-body:not(.theme-dark) .sermon-single-title-input {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermons-hub-main-title,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .illustrations-main-title,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-single-title-input {
   color: var(--text-primary, #0f172a) !important;
 }
 
-body:not(.theme-dark) .sermons-hub-subtitle,
-body:not(.theme-dark) .illustrations-subtitle,
-body:not(.theme-dark) .outline-title,
-body:not(.theme-dark) .subfilter-label {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermons-hub-subtitle,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .illustrations-subtitle,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .outline-title,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .subfilter-label {
   color: var(--text-secondary, #475569) !important;
 }
 
-body:not(.theme-dark) .sermons-hub-search-field,
-body:not(.theme-dark) .sermons-hub-search-box input,
-body:not(.theme-dark) .illustrations-search-field,
-body:not(.theme-dark) .sermon-drawer-input {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermons-hub-search-field,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermons-hub-search-box input,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .illustrations-search-field,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-drawer-input {
   background: var(--bg-card, #ffffff) !important;
   border-color: var(--border-color, #cbd5e1) !important;
   color: var(--text-primary, #0f172a) !important;
 }
 
 /* Boutons de listes déroulantes (Genre, Statut, Tri) dans Banque d'illustrations */
-body:not(.theme-dark) .ill-filter-select,
-body:not(.theme-dark) .ill-sort-select {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .ill-filter-select,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .ill-sort-select {
   background: var(--bg-card, #ffffff) !important;
   border: 1px solid var(--border-color, #cbd5e1) !important;
   color: var(--text-primary, #0f172a) !important;
@@ -30230,115 +30424,115 @@ body:not(.theme-dark) .ill-sort-select {
   background-position: right 8px center !important;
 }
 
-body:not(.theme-dark) .ill-filter-select:hover,
-body:not(.theme-dark) .ill-sort-select:hover {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .ill-filter-select:hover,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .ill-sort-select:hover {
   background-color: var(--bg-subtle, #f1f5f9) !important;
   border-color: var(--accent-primary, #3b82f6) !important;
 }
 
-body:not(.theme-dark) .ill-filter-select option,
-body:not(.theme-dark) .ill-sort-select option {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .ill-filter-select option,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .ill-sort-select option {
   background-color: #ffffff !important;
   color: #0f172a !important;
 }
 
-body:not(.theme-dark) .sermon-hub-pill,
-body:not(.theme-dark) .ill-category-pill,
-body:not(.theme-dark) .ill-type-btn,
-body:not(.theme-dark) .ill-status-btn {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-hub-pill,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .ill-category-pill,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .ill-type-btn,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .ill-status-btn {
   background: var(--bg-card, #ffffff) !important;
   border-color: var(--border-color, #e2e8f0) !important;
   color: var(--text-secondary, #475569) !important;
 }
 
-body:not(.theme-dark) .sermon-hub-pill:hover,
-body:not(.theme-dark) .ill-category-pill:hover {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-hub-pill:hover,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .ill-category-pill:hover {
   background: var(--bg-hover, rgba(59, 130, 246, 0.08)) !important;
   color: var(--accent-primary, #2563eb) !important;
 }
 
-body:not(.theme-dark) .sermon-hub-pill.active,
-body:not(.theme-dark) .ill-category-pill.active {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-hub-pill.active,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .ill-category-pill.active {
   background: var(--accent-primary, #2563eb) !important;
   color: #ffffff !important;
   border-color: var(--accent-primary, #2563eb) !important;
 }
 
-body:not(.theme-dark) .sermon-card,
-body:not(.theme-dark) .illustration-card,
-body:not(.theme-dark) .sermon-section-card {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-card,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .illustration-card,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-section-card {
   background: var(--bg-card, #ffffff) !important;
   border: 1px solid var(--border-color, #e2e8f0) !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
 }
 
-body:not(.theme-dark) .sermon-card:hover,
-body:not(.theme-dark) .illustration-card:hover {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-card:hover,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .illustration-card:hover {
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.09) !important;
   border-color: var(--accent-primary, #3b82f6) !important;
 }
 
-body:not(.theme-dark) .sermon-card-title,
-body:not(.theme-dark) .ill-card-title,
-body:not(.theme-dark) .section-card-title-input {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-card-title,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .ill-card-title,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .section-card-title-input {
   color: var(--text-primary, #0f172a) !important;
 }
 
-body:not(.theme-dark) .section-card-header,
-body:not(.theme-dark) .sermon-section-header {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .section-card-header,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-section-header {
   background: var(--bg-subtle, #f8fafc) !important;
   border-bottom: 1px solid var(--border-color, #e2e8f0) !important;
 }
 
-body:not(.theme-dark) .section-card-body,
-body:not(.theme-dark) .sermon-section-editor {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .section-card-body,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-section-editor {
   background: var(--bg-card, #ffffff) !important;
   color: var(--text-primary, #0f172a) !important;
 }
 
-body:not(.theme-dark) .sermon-card-summary,
-body:not(.theme-dark) .ill-card-preview {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-card-summary,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .ill-card-preview {
   color: var(--text-secondary, #475569) !important;
 }
 
-body:not(.theme-dark) .sermon-metadata-cartouche {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-metadata-cartouche {
   background: var(--bg-card, #ffffff) !important;
   border-color: var(--border-color, #e2e8f0) !important;
 }
 
-body:not(.theme-dark) .btn-add-section-pill {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .btn-add-section-pill {
   background: var(--bg-card, #ffffff) !important;
   border-color: var(--border-color, #e2e8f0) !important;
   color: var(--text-secondary, #475569) !important;
 }
 
-body:not(.theme-dark) .btn-add-section-pill:hover {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .btn-add-section-pill:hover {
   background: rgba(37, 99, 235, 0.08) !important;
   color: var(--accent-primary, #2563eb) !important;
   border-color: var(--accent-primary, #2563eb) !important;
 }
 
-body:not(.theme-dark) .sermon-outline-item {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-outline-item {
   color: var(--text-secondary, #475569) !important;
 }
 
-body:not(.theme-dark) .sermon-outline-item:hover {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-outline-item:hover {
   background: var(--bg-subtle, #f1f5f9) !important;
   color: var(--text-primary, #0f172a) !important;
 }
 
-body:not(.theme-dark) .sermon-outline-item.active {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-outline-item.active {
   background: rgba(37, 99, 235, 0.08) !important;
   color: var(--accent-primary, #2563eb) !important;
 }
 
-body:not(.theme-dark) .btn-outline-add-section {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .btn-outline-add-section {
   background: var(--bg-card, #ffffff) !important;
   border: 1px dashed var(--border-color, #cbd5e1) !important;
   color: var(--text-secondary, #475569) !important;
 }
 
-body:not(.theme-dark) .btn-outline-add-section:hover {
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .btn-outline-add-section:hover {
   background: rgba(37, 99, 235, 0.08) !important;
   color: var(--accent-primary, #2563eb) !important;
   border-color: var(--accent-primary, #2563eb) !important;

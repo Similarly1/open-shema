@@ -345,10 +345,15 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
   },
 
   async onViewActivated() {
-    this.showHubLoading();
+    if (!this.sermons || this.sermons.length === 0) {
+      this.showHubLoading();
+    }
     await this.loadSermons();
-    await this.loadIllustrations();
     this.renderHubCards();
+    // Précharger les illustrations en arrière-plan (non-bloquant pour le Hub)
+    if (!this.illustrations || this.illustrations.length === 0) {
+      this.loadIllustrations();
+    }
   },
 
   openHub() {
@@ -389,6 +394,9 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
     this.populateEditor(sermon);
     this.resetHistory();
     this.syncPassageResources();
+    if (!this.illustrations || this.illustrations.length === 0) {
+      this.loadIllustrations();
+    }
   },
 
   // =========================================================================
@@ -396,7 +404,9 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
   // =========================================================================
 
   async loadSermons() {
-    this.showHubLoading();
+    if (!this.sermons || this.sermons.length === 0) {
+      this.showHubLoading();
+    }
     try {
       const list = await API.getSermonsList();
       this.sermons = Array.isArray(list) ? list : [];
@@ -409,11 +419,16 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
   },
 
   async loadIllustrations() {
+    if (this._loadingIllustrations) return;
+    if (this.illustrations && this.illustrations.length > 0) return;
+    this._loadingIllustrations = true;
     try {
       const list = await API.getIllustrationsList();
       this.illustrations = Array.isArray(list) ? list : [];
     } catch (e) {
       console.warn('Erreur chargement des illustrations:', e);
+    } finally {
+      this._loadingIllustrations = false;
     }
   },
 
