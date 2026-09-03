@@ -48,6 +48,8 @@ scratch_*.py
 # Configuration and API Keys
 **/data/config.json
 **/data/sermons/
+**/data/notes/
+**/data/conversations/
 
 # IDEs & System files
 .vscode/

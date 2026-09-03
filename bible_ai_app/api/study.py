@@ -3,6 +3,8 @@ StudyMixin - Extracted from BibleAppApi.
 """
 import os
 import sys
+import re
+import datetime
 import logging
 import json
 import sqlite3

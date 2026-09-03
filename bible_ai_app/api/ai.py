@@ -3,6 +3,9 @@ AiMixin - Extracted from BibleAppApi.
 """
 import os
 import sys
+import re
+import datetime
+import math
 import logging
 import json
 import sqlite3

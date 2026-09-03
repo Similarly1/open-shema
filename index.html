@@ -1880,115 +1880,335 @@
 
       <!-- Filtres de Catégories -->
       <div class="gallery-filter-bar reveal-on-scroll">
-        <button class="gallery-filter-btn active" data-filter="all">Toutes les vues</button>
-        <button class="gallery-filter-btn" data-filter="exegese">Exégèse & Langues</button>
-        <button class="gallery-filter-btn" data-filter="predication">Prédication & Homilétique</button>
-        <button class="gallery-filter-btn" data-filter="rag">IA & RAG Local</button>
-        <button class="gallery-filter-btn" data-filter="commentaires">Commentaires & Notes</button>
+        <button class="gallery-filter-btn active" data-filter="all">Toutes les vues (20)</button>
+        <button class="gallery-filter-btn" data-filter="etude">Bibles &amp; Étude</button>
+        <button class="gallery-filter-btn" data-filter="predication">Prédication &amp; Notes</button>
+        <button class="gallery-filter-btn" data-filter="ia">Assistant IA &amp; Profil</button>
+        <button class="gallery-filter-btn" data-filter="biblio">Bibliothèque &amp; Import</button>
+        <button class="gallery-filter-btn" data-filter="blogs">Blogs &amp; Paramètres</button>
       </div>
 
-      <!-- Grille de Captures -->
+      <!-- Grille Complète des 20 Captures Réelles -->
       <div class="gallery-grid reveal-on-scroll">
         
-        <!-- Capture 1 : Lecteur & Volet Aperçu 360° -->
-        <div class="gallery-item-card" data-category="exegese" data-img-src="assets/img/mockup-apercu-360-mc2.png" data-title="Lecteur Multi-Versions & Volet Aperçu 360°" data-desc="Affichage synoptique en mode Parchemin (Néo-Crampon Libre) avec détection contextuelle en direct des 22 commentaires exégétiques et des médias BibleProject.">
+        <!-- 1 - Guide de passage -->
+        <div class="gallery-item-card" data-category="etude" data-img-src="assets/img/capture-1-guide-passage.png" data-title="1. Guide de Passage &amp; Texte Synoptique (Genèse 1)" data-desc="Navigation fluide verset par verset (Genèse 1:1–31), codes Strong intégrés (Louis Segond 1910), comparaison multi-versions et synchronisation instantanée du lecteur.">
           <div class="gallery-item-thumb">
-            <img src="assets/img/mockup-apercu-360-mc2.png" alt="Lecteur Multi-Versions & Volet Aperçu 360°" loading="lazy">
+            <img src="assets/img/capture-1-guide-passage.png" alt="Guide de Passage - Genèse 1:1-31" loading="lazy">
             <div class="gallery-zoom-overlay">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
               Agrandir
             </div>
           </div>
           <div class="gallery-item-info">
-            <h3 class="gallery-item-title">Lecteur Multi-Versions & Volet Aperçu 360°</h3>
-            <p class="gallery-item-desc">Lecture fluide, navigation par verset et scan contextuel de la bibliothèque.</p>
+            <div class="gallery-item-num">Bibles &amp; Étude</div>
+            <h3 class="gallery-item-title">Texte Synoptique &amp; Codes Strong</h3>
+            <p class="gallery-item-desc">Genèse 1:1–31 en Louis Segond 1910 avec synchronisation Bible et export en note.</p>
           </div>
         </div>
 
-        <!-- Capture 2 : Survol Exégétique & Infobulle -->
-        <div class="gallery-item-card" data-category="commentaires" data-img-src="assets/img/mockup-apercu-hover-robertson.png" data-title="Survol Exégétique & Infobulle Flottante" data-desc="Survol instantané d'une référence d'A.T. Robertson affichant le texte exégétique, le lemme grec et les correspondances sans quitter le passage.">
+        <!-- 2 - Double Vue Synchronisée -->
+        <div class="gallery-item-card" data-category="etude" data-img-src="assets/img/capture-bible-synchro-double-vue.png" data-title="2. Vue Biblique Synchronisée entre Deux Versions" data-desc="Lecture bicolonne en parallèle (Hugues Oltramare vs Bible de Jérusalem) avec défilement synchronisé automatique verset par verset, surlignage et mode papier sépia doux.">
           <div class="gallery-item-thumb">
-            <img src="assets/img/mockup-apercu-hover-robertson.png" alt="Survol Exégétique & Infobulle Flottante" loading="lazy">
+            <img src="assets/img/capture-bible-synchro-double-vue.png" alt="Double Vue Biblique Synchronisée" loading="lazy">
             <div class="gallery-zoom-overlay">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
               Agrandir
             </div>
           </div>
           <div class="gallery-item-info">
-            <h3 class="gallery-item-title">Infobulles Exégétiques Flottantes au Survol</h3>
-            <p class="gallery-item-desc">Consultation immédiate des commentaires (A.T. Robertson, Dom Calmet, etc.).</p>
+            <div class="gallery-item-num">Bibles &amp; Étude</div>
+            <h3 class="gallery-item-title">Double Vue Synchronisée</h3>
+            <p class="gallery-item-desc">Comparaison parallèle bicolonne avec défilement synchronisé verset par verset.</p>
           </div>
         </div>
 
-        <!-- Capture 3 -->
-        <div class="gallery-item-card" data-category="rag" data-title="Recherche Sémantique & Reranking BGE-M3" data-desc="Sélection granulaire des corpus et synthèse exégétique ultra-précise.">
+        <!-- 3 - Commentaire -->
+        <div class="gallery-item-card" data-category="etude" data-img-src="assets/img/capture-2-commentaire.png" data-title="3. Commentaires Historiques &amp; Exégétiques (Genèse 1:1)" data-desc="Étude verset par verset avec la Bible annotée (Frédéric Godet &amp; Neuchâtel), The Gospel Coalition et A.T. Robertson, avec export en note et synthèse IA.">
           <div class="gallery-item-thumb">
-            <div style="padding: 24px; text-align: center; color: var(--accent-purple);">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-              <div style="margin-top: 10px; font-weight: 700; color: var(--text-main);">RAG Sémantique BGE-M3</div>
-            </div>
+            <img src="assets/img/capture-2-commentaire.png" alt="Commentaire biblique - Genèse 1:1" loading="lazy">
             <div class="gallery-zoom-overlay">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
               Agrandir
             </div>
           </div>
           <div class="gallery-item-info">
-            <h3 class="gallery-item-title">RAG Local & Passeport Herméneutique</h3>
-            <p class="gallery-item-desc">Reranking local sans fuite de données et cadrage théologique.</p>
+            <div class="gallery-item-num">Bibles &amp; Étude</div>
+            <h3 class="gallery-item-title">Bible Annotée &amp; Exégèse Croisée</h3>
+            <p class="gallery-item-desc">Godet &amp; Neuchâtel sur Genèse 1:1, navigation entre 22 ouvrages et synthèse IA.</p>
           </div>
         </div>
 
-        <!-- Capture 4 -->
-        <div class="gallery-item-card" data-category="commentaires" data-title="Bibliothèque de Commentaires & Dom Calmet" data-desc="Consultation croisée de Jean Calvin, Matthew Henry, Adam Clarke et Dom Calmet 1728.">
+        <!-- 4 - Théologie -->
+        <div class="gallery-item-card" data-category="etude" data-img-src="assets/img/capture-3-theologie.png" data-title="4. Théologie Systématique &amp; Traités Réformés (Charles Hodge)" data-desc="Lecture intégrale des grands traités doctrinaux (Charles Hodge, 302 chapitres) avec table des matières interactive, recherche de chapitres et mode papier sépia.">
           <div class="gallery-item-thumb">
-            <div style="padding: 24px; text-align: center; color: var(--accent-emerald);">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-              <div style="margin-top: 10px; font-weight: 700; color: var(--text-main);">Commentaires & Dictionnaires</div>
-            </div>
+            <img src="assets/img/capture-3-theologie.png" alt="Théologie Systématique - Charles Hodge" loading="lazy">
             <div class="gallery-zoom-overlay">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
               Agrandir
             </div>
           </div>
           <div class="gallery-item-info">
-            <h3 class="gallery-item-title">Commentaires Historiques & Dictionnaires</h3>
-            <p class="gallery-item-desc">Calvin, Matthew Henry, Scofield et Dictionnaire de Dom Calmet.</p>
+            <div class="gallery-item-num">Bibles &amp; Étude</div>
+            <h3 class="gallery-item-title">Théologie Systématique (302 chapitres)</h3>
+            <p class="gallery-item-desc">Charles Hodge, table des matières arborescente et lecture théologique grand format.</p>
           </div>
         </div>
 
-        <!-- Capture 5 -->
-        <div class="gallery-item-card" data-category="exegese" data-title="Comparateur Synoptique des Traductions" data-desc="Calcul automatique des similarités textuelles et mise en relief des nuances de traduction.">
+        <!-- 5 - Page Recherche -->
+        <div class="gallery-item-card" data-category="etude" data-img-src="assets/img/capture-recherche.png" data-title="5. Moteur de Recherche Biblique &amp; Concordance" data-desc="Recherche instantanée verset par verset dans les Bibles et commentaires (ex: 150 résultats pour « dieu ») avec filtres de livres et surlignage des termes.">
           <div class="gallery-item-thumb">
-            <div style="padding: 24px; text-align: center; color: var(--accent-cyan);">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"></path></svg>
-              <div style="margin-top: 10px; font-weight: 700; color: var(--text-main);">Comparateur Synoptique</div>
-            </div>
+            <img src="assets/img/capture-recherche.png" alt="Recherche Biblique &amp; Concordance" loading="lazy">
             <div class="gallery-zoom-overlay">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
               Agrandir
             </div>
           </div>
           <div class="gallery-item-info">
-            <h3 class="gallery-item-title">Comparateur Synoptique Verset par Verset</h3>
-            <p class="gallery-item-desc">Surlignage des divergences et score de similarité textuelle.</p>
+            <div class="gallery-item-num">Bibles &amp; Étude</div>
+            <h3 class="gallery-item-title">Concordance &amp; Recherche Textuelle</h3>
+            <p class="gallery-item-desc">Recherche rapide, ciblage de corpus (Bibles, Commentaires) et surlignage immédiat.</p>
           </div>
         </div>
 
-        <!-- Capture 6 -->
-        <div class="gallery-item-card" data-category="commentaires" data-title="Prise de Notes Markdown 100% Locale" data-desc="Notes stockées en fichiers .md standard avec synchronisation verset automatique et support Obsidian.">
+        <!-- 6 - Cartes Bibliques -->
+        <div class="gallery-item-card" data-category="etude" data-img-src="assets/img/capture-cartes-bibliques.png" data-title="6. Atlas &amp; Cartes Bibliques Interactives" data-desc="Exploration géopolitique et géographique du Proche-Orient antique (120 cités, régions et reliefs répertoriés) avec modes Nuit, Relief, Satellite et itinéraires bibliques.">
           <div class="gallery-item-thumb">
-            <div style="padding: 24px; text-align: center; color: var(--accent-gold);">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-              <div style="margin-top: 10px; font-weight: 700; color: var(--text-main);">Notes Markdown (.md)</div>
-            </div>
+            <img src="assets/img/capture-cartes-bibliques.png" alt="Cartes Bibliques Interactives" loading="lazy">
             <div class="gallery-zoom-overlay">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
               Agrandir
             </div>
           </div>
           <div class="gallery-item-info">
-            <h3 class="gallery-item-title">Notes Markdown Locales & Liées aux Versets</h3>
-            <p class="gallery-item-desc">Fichiers `.md` en clair sur votre disque dur, zéro lock-in.</p>
+            <div class="gallery-item-num">Bibles &amp; Étude</div>
+            <h3 class="gallery-item-title">Atlas Géographique &amp; Villes Antiques</h3>
+            <p class="gallery-item-desc">Cartographie interactive (Jérusalem, Égypte, Babylone), reliefs et grands itinéraires bibliques.</p>
+          </div>
+        </div>
+
+        <!-- 7 - Mes Prédications -->
+        <div class="gallery-item-card" data-category="predication" data-img-src="assets/img/capture-mes-predications.png" data-title="7. Gestionnaire Homilétique — Mes Prédications" data-desc="Centralisation de vos séries d'enseignements, gestion des brouillons et prédications prêtes pour la chaire, avec minuteur estimé et passage en mode Pupitre.">
+          <div class="gallery-item-thumb">
+            <img src="assets/img/capture-mes-predications.png" alt="Gestionnaire de prédications" loading="lazy">
+            <div class="gallery-zoom-overlay">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+              Agrandir
+            </div>
+          </div>
+          <div class="gallery-item-info">
+            <div class="gallery-item-num">Prédication &amp; Notes</div>
+            <h3 class="gallery-item-title">Gestionnaire de Sermons &amp; Séries</h3>
+            <p class="gallery-item-desc">Suivi des brouillons, organisation par dossiers et passage direct au mode Pupitre.</p>
+          </div>
+        </div>
+
+        <!-- 8 - Rédacteur de Prédication (Plan & Minutage) -->
+        <div class="gallery-item-card" data-category="predication" data-img-src="assets/img/capture-redaction-predication.png" data-title="8. Atelier de Rédaction Homilétique (Plan &amp; Minutage)" data-desc="Plan textuel modulaire (Introduction, Lecture, Points principaux, Conclusion), minutage en temps réel par section, compteur de mots et synchronisation de chaire.">
+          <div class="gallery-item-thumb">
+            <img src="assets/img/capture-redaction-predication.png" alt="Atelier de Rédaction Homilétique" loading="lazy">
+            <div class="gallery-zoom-overlay">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+              Agrandir
+            </div>
+          </div>
+          <div class="gallery-item-info">
+            <div class="gallery-item-num">Prédication &amp; Notes</div>
+            <h3 class="gallery-item-title">Plan Textuel &amp; Minutage en Direct</h3>
+            <p class="gallery-item-desc">Structuration des points, chronomètre estimé par partie et calcul de débit oratoire.</p>
+          </div>
+        </div>
+
+        <!-- 9 - Volet Droit Homilétique (Méthode des 2 Rives) -->
+        <div class="gallery-item-card" data-category="predication" data-img-src="assets/img/capture-predication-volet-droit.png" data-title="9. Méthode Homilétique des 2 Rives &amp; Histoire du Salut" data-desc="Cadrage théologique et homilétique rigoureux : Pensée Maîtresse du Texte (PMT / Rive 1), Le Pont (Tension contemporaine), Pensée Maîtresse du Sermon (PMS / Rive 2) et Objectif de transformation.">
+          <div class="gallery-item-thumb">
+            <img src="assets/img/capture-predication-volet-droit.png" alt="Méthode des 2 Rives - Volet Droit" loading="lazy">
+            <div class="gallery-zoom-overlay">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+              Agrandir
+            </div>
+          </div>
+          <div class="gallery-item-info">
+            <div class="gallery-item-num">Prédication &amp; Notes</div>
+            <h3 class="gallery-item-title">Méthode des 2 Rives &amp; Histoire du Salut</h3>
+            <p class="gallery-item-desc">Volet d'assistance : PMT (Rive 1), Le Pont contextuel, PMS (Rive 2) et ancrage christocentrique.</p>
+          </div>
+        </div>
+
+        <!-- 10 - Banque d'Illustrations (4 274 fiches) -->
+        <div class="gallery-item-card" data-category="predication" data-img-src="assets/img/capture-banque-illustrations.png" data-title="10. Banque d'Illustrations Homilétiques (4 274 Fiches)" data-desc="Réservoir colossal de 4 274 récits historiques, métaphores, citations et anecdotes (Spurgeon, Corrie ten Boom, Newton), classés par thèmes (Grâce, Pardon, Foi, Épreuve) et statuts d'utilisation.">
+          <div class="gallery-item-thumb">
+            <img src="assets/img/capture-banque-illustrations.png" alt="Banque d'Illustrations Homilétiques" loading="lazy">
+            <div class="gallery-zoom-overlay">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+              Agrandir
+            </div>
+          </div>
+          <div class="gallery-item-info">
+            <div class="gallery-item-num">Prédication &amp; Notes</div>
+            <h3 class="gallery-item-title">Banque d'Illustrations (4 274 fiches)</h3>
+            <p class="gallery-item-desc">Recherche thématique, statut « Jamais prêchée » et injection directe dans vos sermons.</p>
+          </div>
+        </div>
+
+        <!-- 11 - Prise de Notes Markdown (Menu Slash) -->
+        <div class="gallery-item-card" data-category="predication" data-img-src="assets/img/capture-notes-slash-menu.png" data-title="11. Prise de Notes Markdown &amp; Commandes Rapides via Slash (/)" data-desc="Éditeur de notes pastoral et théologique avec insertion instantanée de blocs via la touche '/' : Titres H1-H3, listes à puces, to-do listes, citations bibliques et synchronisation directe avec les versets.">
+          <div class="gallery-item-thumb">
+            <img src="assets/img/capture-notes-slash-menu.png" alt="Notes Markdown avec Menu Slash" loading="lazy">
+            <div class="gallery-zoom-overlay">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+              Agrandir
+            </div>
+          </div>
+          <div class="gallery-item-info">
+            <div class="gallery-item-num">Prédication &amp; Notes</div>
+            <h3 class="gallery-item-title">Notes Markdown &amp; Menu Slash (/)</h3>
+            <p class="gallery-item-desc">Éditeur fluide avec menu contextuel rapide '/', citations bibliques et to-do listes.</p>
+          </div>
+        </div>
+
+        <!-- 12 - Assistant IA -->
+        <div class="gallery-item-card" data-category="ia" data-img-src="assets/img/capture-assistant-ia.png" data-title="12. Assistant d'Étude IA &amp; Espace d'Interrogation" data-desc="Espace d'étude approfondie : soumission de questions doctrinales, exégèse ciblée, suggestions de recherches théologiques et mobilisation automatique des textes bibliques.">
+          <div class="gallery-item-thumb">
+            <img src="assets/img/capture-assistant-ia.png" alt="Assistant d'Étude IA" loading="lazy">
+            <div class="gallery-zoom-overlay">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+              Agrandir
+            </div>
+          </div>
+          <div class="gallery-item-info">
+            <div class="gallery-item-num">Assistant IA &amp; Profil</div>
+            <h3 class="gallery-item-title">Espace d'Étude Approfondie IA</h3>
+            <p class="gallery-item-desc">Questions doctrinales, exégèse de passage et suggestions théologiques guidées.</p>
+          </div>
+        </div>
+
+        <!-- 13 - Modes d'Analyse IA -->
+        <div class="gallery-item-card" data-category="ia" data-img-src="assets/img/capture-assistant-modes.png" data-title="13. Modes d'Analyse &amp; Méthodologie IA" data-desc="Cadrage méthodologique précis : Détection automatique, Exégèse approfondie (syntaxe, chiasmes), Contexte historique &amp; culturel, ou Préparation de prédication / homilétique.">
+          <div class="gallery-item-thumb">
+            <img src="assets/img/capture-assistant-modes.png" alt="Modes d'Analyse &amp; Méthodologie IA" loading="lazy">
+            <div class="gallery-zoom-overlay">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+              Agrandir
+            </div>
+          </div>
+          <div class="gallery-item-info">
+            <div class="gallery-item-num">Assistant IA &amp; Profil</div>
+            <h3 class="gallery-item-title">Sélection Méthodologique &amp; RAG</h3>
+            <p class="gallery-item-desc">Exégèse, contexte historique ou préparation homilétique selon votre besoin précis.</p>
+          </div>
+        </div>
+
+        <!-- 14 - Gestion du Profil Utilisateur -->
+        <div class="gallery-item-card" data-category="ia" data-img-src="assets/img/capture-profil-utilisateur.png" data-title="14. Profil Théologique &amp; Herméneutique" data-desc="Passeport herméneutique en 4 étapes pour adapter la pédagogie de l'assistant : Prédication pastorale, Enseignement &amp; Groupes de maison, Étude personnelle ou Recherche académique.">
+          <div class="gallery-item-thumb">
+            <img src="assets/img/capture-profil-utilisateur.png" alt="Profil Théologique &amp; Herméneutique" loading="lazy">
+            <div class="gallery-zoom-overlay">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+              Agrandir
+            </div>
+          </div>
+          <div class="gallery-item-info">
+            <div class="gallery-item-num">Assistant IA &amp; Profil</div>
+            <h3 class="gallery-item-title">Passeport Herméneutique &amp; Cadre</h3>
+            <p class="gallery-item-desc">Configuration en 4 étapes (ministère, langues, posture, église) pour un cadrage fidèle.</p>
+          </div>
+        </div>
+
+        <!-- 15 - Page Bibliothèque (avec mention d'exemple d'ouvrages) -->
+        <div class="gallery-item-card" data-category="biblio" data-img-src="assets/img/capture-bibliotheque.png" data-title="15. Bibliothèque Personnelle &amp; Gestionnaire d'E-books" data-desc="Centralisation de vos ouvrages bibliques et théologiques, filtrage instantané, activation modulaire et import EPUB. * Avertissement : Il s'agit d'un exemple d'ouvrages personnels ; les livres commerciaux présentés ici dépendent des achats individuels de chacun et ne sont pas fournis avec le logiciel.">
+          <div class="gallery-item-thumb">
+            <img src="assets/img/capture-bibliotheque.png" alt="Bibliothèque Personnelle Open Shema" loading="lazy">
+            <div class="gallery-zoom-overlay">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+              Agrandir
+            </div>
+          </div>
+          <div class="gallery-item-info">
+            <div class="gallery-item-num">Bibliothèque &amp; Import</div>
+            <h3 class="gallery-item-title">Gestion de Bibliothèque Personnelle</h3>
+            <span class="gallery-disclaimer-tag">Exemple d'ouvrages personnels (non inclus)</span>
+            <p class="gallery-item-desc">Centralisation des Bibles et livres. L'accès aux ouvrages commerciaux dépend des achats de chaque utilisateur.</p>
+          </div>
+        </div>
+
+        <!-- 16 - Fenêtre d'Importation avec Étapes -->
+        <div class="gallery-item-card" data-category="biblio" data-img-src="assets/img/capture-importation-ouvrages.png" data-title="16. Assistant d'Importation d'Ouvrages en 4 Étapes" data-desc="Processus guidé d'importation : 1. Fichier Source (.EPUB, .JSON, .DOCX, .MD), 2. Métadonnées, 3. Structure &amp; chapitres, 4. Classification &amp; indexation RAG locale sans altération sémantique.">
+          <div class="gallery-item-thumb">
+            <img src="assets/img/capture-importation-ouvrages.png" alt="Assistant d'Importation d'Ouvrages" loading="lazy">
+            <div class="gallery-zoom-overlay">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+              Agrandir
+            </div>
+          </div>
+          <div class="gallery-item-info">
+            <div class="gallery-item-num">Bibliothèque &amp; Import</div>
+            <h3 class="gallery-item-title">Assistant d'Importation en 4 Étapes</h3>
+            <p class="gallery-item-desc">Import fluide EPUB / DOCX / JSON avec préservation sémantique et indexation RAG.</p>
+          </div>
+        </div>
+
+        <!-- 17 - Fenêtre de Méta-Catalogue -->
+        <div class="gallery-item-card" data-category="biblio" data-img-src="assets/img/capture-meta-catalogue.png" data-title="17. Méta-Catalogue &amp; Découverte Biblique E-books" data-desc="Catalogue unifié : Bibles Open Shema gratuites, Domaine public &amp; gratuit, et rayons e-books directs chez les éditeurs chrétiens francophones (BLF Store, Bibli'O, Pub. Chrétiennes, Éditions Clé, etc.).">
+          <div class="gallery-item-thumb">
+            <img src="assets/img/capture-meta-catalogue.png" alt="Méta-Catalogue &amp; Découverte Biblique" loading="lazy">
+            <div class="gallery-zoom-overlay">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+              Agrandir
+            </div>
+          </div>
+          <div class="gallery-item-info">
+            <div class="gallery-item-num">Bibliothèque &amp; Import</div>
+            <h3 class="gallery-item-title">Méta-Catalogue &amp; Librairies Chrétiennes</h3>
+            <p class="gallery-item-desc">Accès unifié aux trésors du domaine public et aux rayons d'e-books chrétiens légaux.</p>
+          </div>
+        </div>
+
+        <!-- 18 - Page Paramètres & Apparence -->
+        <div class="gallery-item-card" data-category="blogs" data-img-src="assets/img/capture-parametres-apparence.png" data-title="18. Paramètres d'Apparence &amp; Thèmes de Lecture" data-desc="Personnalisation avancée de l'interface : thèmes Clair / Sombre / Système, palettes (Bleu Nuit, Onyx Pur, Ébène &amp; Ambre), fonds de lecture (Sépia doux, Blanc pur, Très sombre) et typographie.">
+          <div class="gallery-item-thumb">
+            <img src="assets/img/capture-parametres-apparence.png" alt="Paramètres &amp; Personnalisation de l'application" loading="lazy">
+            <div class="gallery-zoom-overlay">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+              Agrandir
+            </div>
+          </div>
+          <div class="gallery-item-info">
+            <div class="gallery-item-num">Blogs &amp; Paramètres</div>
+            <h3 class="gallery-item-title">Paramètres &amp; Palettes d'Apparence</h3>
+            <p class="gallery-item-desc">Thèmes Sombre / Clair, fond Sépia Doux, polices classiques et confort visuel total.</p>
+          </div>
+        </div>
+
+        <!-- 19 - Articles de blogs -->
+        <div class="gallery-item-card" data-category="blogs" data-img-src="assets/img/capture-4-articles-blogs.png" data-title="19. Articles de Blogs Théologiques &amp; Podcasts" data-desc="Flux théologique francophone en temps réel (Tout Pour Sa Gloire, Évangile 21), avec filtres par source, recherche biblique et épisodes audio podcasts intégrés.">
+          <div class="gallery-item-thumb">
+            <img src="assets/img/capture-4-articles-blogs.png" alt="Articles de Blogs Théologiques" loading="lazy">
+            <div class="gallery-zoom-overlay">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+              Agrandir
+            </div>
+          </div>
+          <div class="gallery-item-info">
+            <div class="gallery-item-num">Blogs &amp; Paramètres</div>
+            <h3 class="gallery-item-title">Flux d'Articles &amp; Podcasts Théologiques</h3>
+            <p class="gallery-item-desc">Veille pastorale (TPSG, Évangile 21), filtres par source et recherche par passages bibliques.</p>
+          </div>
+        </div>
+
+        <!-- 20 - Lecture d'un article -->
+        <div class="gallery-item-card" data-category="blogs" data-img-src="assets/img/capture-5-lecture-article.png" data-title="20. Lecture d'un Article &amp; Sommaire Interactif" data-desc="Mise en page éditoriale soignée sans distraction, sommaire interactif avec suivi de progression de lecture (pourcentage) et tags thématiques.">
+          <div class="gallery-item-thumb">
+            <img src="assets/img/capture-5-lecture-article.png" alt="Lecture d'un article théologique" loading="lazy">
+            <div class="gallery-zoom-overlay">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+              Agrandir
+            </div>
+          </div>
+          <div class="gallery-item-info">
+            <div class="gallery-item-num">Blogs &amp; Paramètres</div>
+            <h3 class="gallery-item-title">Confort de Lecture &amp; Sommaire Actif</h3>
+            <p class="gallery-item-desc">Typographie éditoriale, repères de vocations et navigation par section d'article.</p>
           </div>
         </div>
 
