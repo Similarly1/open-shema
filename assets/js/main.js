@@ -140,38 +140,59 @@ function initScrollAnimations() {
    4. STICKY SPLIT-SCROLL INTERACTION
    ========================================================================== */
 function initStickySplitScroll() {
-  const featureCards = document.querySelectorAll('.split-feature-card');
-  const visualSlides = document.querySelectorAll('.sticky-visual-slide');
+  const featureCards = Array.from(document.querySelectorAll('.split-feature-card'));
+  const visualSlides = Array.from(document.querySelectorAll('.sticky-visual-slide'));
 
   if (!featureCards.length || !visualSlides.length) return;
 
-  const observerOptions = {
-    threshold: 0.5,
-    rootMargin: '-100px 0px -100px 0px'
-  };
+  function setActiveSlide(slideIndex) {
+    if (!slideIndex) return;
+    featureCards.forEach(c => {
+      c.classList.toggle('active', c.getAttribute('data-slide-index') === slideIndex);
+    });
+    visualSlides.forEach(slide => {
+      slide.classList.toggle('active', slide.getAttribute('data-slide-target') === slideIndex);
+    });
+  }
 
-  const splitObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const slideIndex = entry.target.getAttribute('data-slide-index');
-        
-        // Update cards active state
-        featureCards.forEach(c => c.classList.remove('active'));
-        entry.target.classList.add('active');
+  let ticking = false;
+  function checkVisibleCard() {
+    const triggerY = window.innerHeight * 0.45;
+    let closestCard = null;
+    let minDistance = Infinity;
 
-        // Update visual slides
-        visualSlides.forEach(slide => {
-          if (slide.getAttribute('data-slide-target') === slideIndex) {
-            slide.classList.add('active');
-          } else {
-            slide.classList.remove('active');
-          }
-        });
+    featureCards.forEach(card => {
+      const rect = card.getBoundingClientRect();
+      if (rect.top <= triggerY && rect.bottom >= triggerY) {
+        closestCard = card;
+      } else {
+        const center = rect.top + rect.height / 2;
+        const dist = Math.abs(center - triggerY);
+        if (dist < minDistance) {
+          minDistance = dist;
+          if (!closestCard) closestCard = card;
+        }
       }
     });
-  }, observerOptions);
 
-  featureCards.forEach(card => splitObserver.observe(card));
+    if (closestCard) {
+      const index = closestCard.getAttribute('data-slide-index');
+      setActiveSlide(index);
+    }
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        checkVisibleCard();
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+
+  window.addEventListener('resize', checkVisibleCard, { passive: true });
+  checkVisibleCard();
 }
 
 /* ==========================================================================
