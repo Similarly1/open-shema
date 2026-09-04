@@ -58,6 +58,8 @@ def build():
         "--hidden-import=engineio.async_drivers.threading",
         "--hidden-import=sqlite3",
         "--hidden-import=webview",
+        "--hidden-import=pymupdf",
+        "--hidden-import=fitz",
         "webview_app.py"
     ]
 

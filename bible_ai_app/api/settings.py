@@ -12,6 +12,7 @@ import webview
 import threading
 import time
 import shutil
+import requests
 from typing import Dict, List, Any, Optional
 
 logger = logging.getLogger(__name__)
