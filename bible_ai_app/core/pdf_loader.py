@@ -77,6 +77,8 @@ class PdfLoader:
         if not title or len(title) < 3 or title.lower().endswith(".pdf") or "microsoft" in title.lower():
             base_name = os.path.splitext(os.path.basename(pdf_path))[0]
             clean_name = re.sub(r'\(.*?\)', '', base_name).strip()
+            clean_name = re.sub(r'^[Pp][Dd][Ff][_\s-]+', '', clean_name).strip()
+            clean_name = clean_name.replace('_', ' ').strip()
             title = clean_name or base_name
 
         # Fallback pour la description

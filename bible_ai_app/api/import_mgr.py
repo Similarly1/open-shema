@@ -3,6 +3,7 @@ ImportMixin - Extracted from BibleAppApi.
 """
 import os
 import sys
+import re
 import logging
 import json
 import sqlite3

@@ -88,5 +88,7 @@ scratch/
 **/data/library_user_*.json
 **/data/ebooks/
 **/data/covers/epub_*
+**/data/covers/pdf_*
+**/data/covers/cover_*
 
 
