@@ -6979,7 +6979,7 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
 
 .format-cards-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 12px;
 }
 
@@ -7026,6 +7026,11 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
 .format-badge.docx {
   background: rgba(139, 92, 246, 0.15);
   color: var(--accent-purple);
+}
+
+.format-badge.pdf {
+  background: rgba(239, 68, 68, 0.15);
+  color: #EF4444;
 }
 
 .format-rec-tag {
@@ -7710,6 +7715,92 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   white-space: pre-wrap;
   word-break: break-all;
   border: 1px solid var(--border-color);
+}
+
+.error-modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: var(--bg-subtle);
+  border-top: 1px solid var(--border-color);
+  gap: 10px;
+}
+
+.error-modal-actions-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.error-modal-btn {
+  height: 32px;
+  padding: 0 13px;
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6.5px;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  user-select: none;
+}
+
+.error-modal-btn svg {
+  flex-shrink: 0;
+  transition: stroke 0.15s ease;
+}
+
+.error-modal-btn:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--border-color-hover, var(--text-secondary));
+  color: var(--text-primary);
+}
+
+.error-modal-btn:active {
+  transform: translateY(1px);
+}
+
+.error-modal-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.error-modal-btn.success {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  border-color: rgba(16, 185, 129, 0.4) !important;
+  color: #10b981 !important;
+}
+
+.error-modal-btn.success svg {
+  stroke: #10b981 !important;
+}
+
+.btn-outline {
+  height: 32px;
+  padding: 0 13px;
+  background-color: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.btn-outline:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--border-color-hover, var(--text-secondary));
 }
 
 /* ==========================================================================

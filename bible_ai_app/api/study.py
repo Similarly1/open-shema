@@ -33,6 +33,7 @@ from api._utils import (
     _BACKUP_MANIFEST_VERSION, _BACKUP_COMPONENTS
 )
 current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+from api.window import get_active_window, get_global_window
 
 
 

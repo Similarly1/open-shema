@@ -1268,6 +1268,10 @@ const App = {
       this.copyErrorToClipboard();
     });
 
+    document.getElementById('btn-email-error')?.addEventListener('click', () => {
+      this.sendErrorByEmail();
+    });
+
     // Capture des erreurs JS non gérées
     window.addEventListener('error', (event) => {
       // Ignorer les erreurs d'images 404 courantes pour ne pas polluer l'UI
@@ -1348,6 +1352,25 @@ const App = {
         : String(this.currentErrorDetails.details);
     }
 
+    // Réinitialiser les boutons d'action
+    const copyBtn = document.getElementById('btn-copy-error');
+    const copyText = document.getElementById('btn-copy-error-text');
+    if (copyBtn) copyBtn.classList.remove('success');
+    if (copyText) copyText.textContent = "Copier l'erreur";
+
+    const emailBtn = document.getElementById('btn-email-error');
+    if (emailBtn) {
+      emailBtn.disabled = false;
+      emailBtn.classList.remove('success');
+      emailBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m22 2-7 20-4-9-9-4Z"></path>
+          <path d="M22 2 11 13"></path>
+        </svg>
+        <span id="btn-email-error-text">Signaler par e-mail</span>
+      `;
+    }
+
     modal.classList.remove('hidden');
   },
 
@@ -1364,14 +1387,79 @@ const App = {
     const textToCopy = `=== RAPPORT D'ERREUR OPEN SHEMA ===\nDate: ${new Date().toISOString()}\nTitre: ${this.currentErrorDetails.title}\nMessage: ${this.currentErrorDetails.message}\n\nDétails techniques:\n${formattedDetails}`;
 
     navigator.clipboard.writeText(textToCopy).then(() => {
+      const copyBtn = document.getElementById('btn-copy-error');
       const btnText = document.getElementById('btn-copy-error-text');
       if (btnText) btnText.textContent = 'Copié !';
+      if (copyBtn) copyBtn.classList.add('success');
       setTimeout(() => {
         if (btnText) btnText.textContent = "Copier l'erreur";
-      }, 2000);
+        if (copyBtn) copyBtn.classList.remove('success');
+      }, 2500);
+      this.showToast('Rapport d\'erreur copié dans le presse-papiers.', 'info', 2500);
     }).catch(err => {
       console.error('Erreur copie presse-papier:', err);
     });
+  },
+
+  async sendErrorByEmail() {
+    if (!this.currentErrorDetails) return;
+    const btn = document.getElementById('btn-email-error');
+    if (!btn || btn.disabled) return;
+
+    const originalHTML = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `
+      <span style="display:inline-block; animation: spin 1s linear infinite; margin-right: 4px;">⏳</span>
+      <span>Transmission...</span>
+    `;
+
+    const userEmail = (typeof localStorage !== 'undefined' && localStorage.getItem('user_feedback_email')) || '';
+    const formattedDetails = typeof this.currentErrorDetails.details === 'object'
+      ? JSON.stringify(this.currentErrorDetails.details, null, 2)
+      : String(this.currentErrorDetails.details || '');
+
+    try {
+      const res = await API.call(
+        'report_error',
+        this.currentErrorDetails.title || 'Erreur Application',
+        this.currentErrorDetails.message || '',
+        formattedDetails,
+        '',
+        userEmail
+      );
+
+      if (res && res.success) {
+        btn.classList.add('success');
+        btn.innerHTML = `
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Signalé !</span>
+        `;
+        this.showToast(res.message || "Rapport d'erreur transmis avec succès. Merci !", "success", 4000);
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.classList.remove('success');
+          btn.innerHTML = originalHTML;
+        }, 4000);
+      } else {
+        throw new Error(res?.error || "Échec de l'envoi");
+      }
+    } catch (err) {
+      console.error("Erreur transmission signalement erreur:", err);
+      // Fallback mailto si hors ligne ou erreur réseau
+      try {
+        const emailTo = "0wl8a4k7@family3130.anonaddy.com";
+        const subject = encodeURIComponent(`[Open Shema Erreur] ${this.currentErrorDetails.title || 'Crash Application'}`);
+        const body = encodeURIComponent(`=== RAPPORT D'ERREUR OPEN SHEMA ===\nDate: ${new Date().toISOString()}\nTitre: ${this.currentErrorDetails.title}\nMessage: ${this.currentErrorDetails.message}\n\nDétails techniques:\n${formattedDetails}`);
+        window.open(`mailto:${emailTo}?subject=${subject}&body=${body}`, '_blank');
+        this.showToast("Ouverture de votre messagerie pour transmettre le rapport.", "info", 4000);
+      } catch (e) {
+        this.showToast("Erreur lors de l'envoi : " + err, "error");
+      }
+      btn.disabled = false;
+      btn.innerHTML = originalHTML;
+    }
   },
 
   showToast(message, type = 'info', duration = 3500) {

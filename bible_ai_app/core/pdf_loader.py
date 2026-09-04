@@ -6,9 +6,12 @@ import logging
 from typing import List, Dict, Any, Optional, Tuple
 
 try:
-    import fitz  # PyMuPDF
+    import pymupdf as fitz
 except ImportError:
-    fitz = None
+    try:
+        import fitz
+    except ImportError:
+        fitz = None
 
 from core.reference_parser import (
     BOOK_MAPPING, 

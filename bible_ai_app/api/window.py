@@ -43,6 +43,9 @@ def get_global_window():
     global _GLOBAL_WINDOW
     return _GLOBAL_WINDOW
 
+def get_active_window():
+    return get_global_window()
+
 def set_commentary_window(win):
     global _COMMENTARY_WINDOW
     _COMMENTARY_WINDOW = win

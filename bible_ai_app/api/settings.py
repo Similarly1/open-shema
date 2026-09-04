@@ -31,6 +31,7 @@ from api._utils import (
     _BACKUP_MANIFEST_VERSION, _BACKUP_COMPONENTS
 )
 current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+from api.window import get_active_window, get_global_window
 
 
 
@@ -696,6 +697,63 @@ class SettingsMixin:
             return {"success": True}
         except Exception as e:
             logger.error(f"Erreur complete_first_run: {e}", exc_info=True)
+            return {"success": False, "error": str(e)}
+
+    def report_error(self, title: str, message: str, details: Any = "", user_comment: str = "", user_email: str = None) -> Dict[str, Any]:
+        """
+        Transmet un rapport d'erreur technique vers l'alias email anonaddy configuré (0wl8a4k7@family3130.anonaddy.com).
+        """
+        import urllib.request
+        import urllib.parse
+        import json
+        import datetime
+
+        FEEDBACK_EMAIL = "0wl8a4k7@family3130.anonaddy.com"
+        try:
+            subject = f"[Open Shema Erreur] {title or 'Erreur Application'}"
+            if isinstance(details, (dict, list)):
+                details_str = json.dumps(details, indent=2, ensure_ascii=False)
+            else:
+                details_str = str(details or "")
+
+            if len(details_str) > 4000:
+                details_str = details_str[:4000] + "\n... [Détails tronqués]"
+
+            payload = {
+                "_subject": subject,
+                "Titre_Erreur": str(title or "Non spécifié"),
+                "Message_Erreur": str(message or "Non spécifié"),
+                "Details_Techniques": details_str or "(Aucun détail)",
+                "Commentaire_Utilisateur": str(user_comment) if user_comment else "(Signalement direct)",
+                "Email_Utilisateur": str(user_email) if user_email else "Non renseigné",
+                "Plateforme": f"{sys.platform} ({os.name})",
+                "Date_Signalement": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "_template": "table",
+                "_captcha": "false"
+            }
+
+            url = f"https://formsubmit.co/ajax/{FEEDBACK_EMAIL}"
+            data = json.dumps(payload).encode("utf-8")
+            req = urllib.request.Request(
+                url,
+                data=data,
+                headers={
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) OpenShema/1.0",
+                    "Referer": "https://openshema.app/",
+                    "Origin": "https://openshema.app"
+                }
+            )
+            with urllib.request.urlopen(req, timeout=12) as response:
+                res_body = response.read().decode("utf-8")
+                res_json = json.loads(res_body)
+                if str(res_json.get("success", "")).lower() == "true":
+                    return {"success": True, "message": "Rapport d'erreur transmis avec succès. Merci pour votre aide !"}
+                else:
+                    return {"success": True, "message": res_json.get("message", "Rapport d'erreur transmis.")}
+        except Exception as e:
+            logger.error(f"[SettingsMixin] Erreur transmission rapport d'erreur: {e}")
             return {"success": False, "error": str(e)}
 
 

@@ -99,19 +99,21 @@ class BibleJsonLoader:
         if os.path.exists(direct_path) and os.path.isdir(direct_path):
             return direct_path
 
-        # 2. Chercher dans library.json si un chemin ou un nom correspond
-        library_path = os.path.join(os.path.dirname(cls.get_bibles_dir()), "library.json")
-        if os.path.exists(library_path):
-            try:
-                with open(library_path, "r", encoding="utf-8") as f:
-                    reg = json.load(f)
-                meta = reg.get(bible_name)
-                if meta and "folder_name" in meta:
-                    p = os.path.join(bibles_dir, meta["folder_name"])
-                    if os.path.exists(p):
-                        return p
-            except Exception as _silent_e:
-                logger.debug("Erreur ignoree : %s", _silent_e)
+        # 2. Chercher dans library.json ou library_user_full_backup.json si un chemin ou un nom correspond
+        base_data = os.path.dirname(cls.get_bibles_dir())
+        for lib_filename in ["library_user_full_backup.json", "library.json"]:
+            library_path = os.path.join(base_data, lib_filename)
+            if os.path.exists(library_path):
+                try:
+                    with open(library_path, "r", encoding="utf-8") as f:
+                        reg = json.load(f)
+                    meta = reg.get(bible_name)
+                    if meta and "folder_name" in meta:
+                        p = os.path.join(bibles_dir, meta["folder_name"])
+                        if os.path.exists(p):
+                            return p
+                except Exception as _silent_e:
+                    logger.debug("Erreur ignoree : %s", _silent_e)
 
         # 3. Scanner les dossiers pour faire correspondre le nom ou la version
         for d in os.listdir(bibles_dir):

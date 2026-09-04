@@ -7364,15 +7364,25 @@
                   <div class="format-card-name">Word, Markdown & Texte</div>
                   <p class="format-card-desc">Compatible avec les documents d'étude, notes exégétiques et exports au format Word ou Markdown.</p>
                 </div>
+
+                <!-- Carte PDF -->
+                <div class="format-card">
+                  <div class="format-card-header">
+                    <span class="format-badge pdf">.PDF</span>
+                    <span class="format-rec-tag">Documents</span>
+                  </div>
+                  <div class="format-card-name">Documents PDF</div>
+                  <p class="format-card-desc">Supporté avec extraction du sommaire, pagination, couverture automatique et vectorisation RAG.</p>
+                </div>
               </div>
 
               <!-- Note Pédagogique sur les PDF -->
               <div class="pdf-info-box">
                 <div class="pdf-info-icon">ℹ️</div>
                 <div class="pdf-info-content">
-                  <div class="pdf-info-title">Pourquoi nous privilégions l'EPUB et le DOCX plutôt que le PDF ?</div>
+                  <div class="pdf-info-title">Prise en charge du format PDF</div>
                   <p class="pdf-info-text">
-                    Le format PDF possède une mise en page fixe (colonnes multiples, en-têtes, numéros de page insérés au milieu des phrases et césures) qui peut altérer la précision de l'IA et de la recherche exégétique. L'EPUB et le DOCX préservent la structure sémantique continue du texte. Nous vous conseillons de convertir vos PDF en EPUB ou DOCX avant importation.
+                    Le format PDF est pris en charge avec extraction de la table des matières et génération automatique de la couverture. Pour une fluidité optimale de lecture continue et d'analyse IA, l'EPUB et le DOCX restent particulièrement recommandés en raison de leur mise en page dynamique.
                   </p>
                 </div>
               </div>
@@ -7741,15 +7751,24 @@
             <pre class="error-details-pre" id="error-modal-stack" style="background: var(--bg-subtle); padding: 12px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--text-primary); max-height: 250px; overflow: auto; border: 1px solid var(--border-color); white-space: pre-wrap; word-break: break-all;"></pre>
           </div>
         </div>
-        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--bg-subtle); border-top: 1px solid var(--border-color);">
-          <button class="btn-outline" id="btn-copy-error" style="display: flex; align-items: center; gap: 6px;">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
-              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
-            </svg>
-            <span id="btn-copy-error-text">Copier l'erreur</span>
-          </button>
-          <button class="btn-primary" id="btn-dismiss-error-modal">Fermer</button>
+        <div class="modal-footer error-modal-footer">
+          <div class="error-modal-actions-left">
+            <button type="button" class="error-modal-btn" id="btn-copy-error" title="Copier les détails techniques dans le presse-papiers">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+              </svg>
+              <span id="btn-copy-error-text">Copier l'erreur</span>
+            </button>
+            <button type="button" class="error-modal-btn" id="btn-email-error" title="Transmettre le rapport d'erreur technique par e-mail au support">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m22 2-7 20-4-9-9-4Z"></path>
+                <path d="M22 2 11 13"></path>
+              </svg>
+              <span id="btn-email-error-text">Signaler par e-mail</span>
+            </button>
+          </div>
+          <button type="button" class="btn-primary" id="btn-dismiss-error-modal">Fermer</button>
         </div>
       </div>
     </div>

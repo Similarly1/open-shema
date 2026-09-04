@@ -24,9 +24,14 @@ def get_library_path() -> str:
     # 2. _MEIPASS
     if hasattr(sys, '_MEIPASS'):
         candidates.append(os.path.join(sys._MEIPASS, "data", "library.json"))
-    # 3. Racine de l'application relative au fichier
+    # 3. Mode dev / local non-frozen : privilégier le registre utilisateur complet s'il existe
+    if not getattr(sys, 'frozen', False):
+        candidates.append(os.path.join(_APP_ROOT, "data", "library_user_full_backup.json"))
+        candidates.append(os.path.join(os.getcwd(), "data", "library_user_full_backup.json"))
+        candidates.append(os.path.join(os.getcwd(), "bible_ai_app", "data", "library_user_full_backup.json"))
+    # 4. Racine de l'application relative au fichier
     candidates.append(os.path.join(_APP_ROOT, "data", "library.json"))
-    # 4. Dossier courant
+    # 5. Dossier courant
     candidates.append(os.path.join(os.getcwd(), "data", "library.json"))
     candidates.append(os.path.join(os.getcwd(), "bible_ai_app", "data", "library.json"))
 
