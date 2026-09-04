@@ -31,6 +31,7 @@ from api._utils import (
     _BACKUP_MANIFEST_VERSION, _BACKUP_COMPONENTS
 )
 current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+from api.window import get_active_window, get_global_window
 
 
 
@@ -41,7 +42,15 @@ class ImportMixin:
         if not win:
             return {"success": False, "error": "Fenêtre introuvable"}
             
-        file_types = ('Ouvrages supportés (*.epub;*.json;*.docx;*.md;*.txt;*.csv)', 'Tous les fichiers (*.*)')
+        file_types = (
+            'Ouvrages et Documents (*.epub;*.pdf;*.docx;*.json;*.md;*.txt;*.csv)',
+            'Documents PDF (*.pdf)',
+            'Livres EPUB (*.epub)',
+            'Documents Word (*.docx)',
+            'Fichiers texte et Markdown (*.md;*.txt)',
+            'Bibles et Donnees (*.json;*.csv)',
+            'Tous les fichiers (*.*)'
+        )
         result = win.create_file_dialog(webview.OPEN_DIALOG, allow_multiple=False, file_types=file_types)
         
         if not result or len(result) == 0:
@@ -65,7 +74,15 @@ class ImportMixin:
         if not win:
             return {"success": False, "error": "Fenêtre introuvable"}
             
-        file_types = ('Ouvrages supportés (*.epub;*.json;*.docx;*.md;*.txt;*.csv)', 'Tous les fichiers (*.*)')
+        file_types = (
+            'Ouvrages et Documents (*.epub;*.pdf;*.docx;*.json;*.md;*.txt;*.csv)',
+            'Documents PDF (*.pdf)',
+            'Livres EPUB (*.epub)',
+            'Documents Word (*.docx)',
+            'Fichiers texte et Markdown (*.md;*.txt)',
+            'Bibles et Donnees (*.json;*.csv)',
+            'Tous les fichiers (*.*)'
+        )
         result = win.create_file_dialog(webview.OPEN_DIALOG, allow_multiple=False, file_types=file_types)
         
         if not result or len(result) == 0:
@@ -549,6 +566,16 @@ class ImportMixin:
                     info["cover_data_url"] = get_cover_data_url(info["cover_path"])
             except Exception as e:
                 return {"success": False, "error": f"Erreur inspection EPUB : {e}"}
+
+        elif ext == '.pdf':
+            from core.pdf_loader import PdfLoader
+            try:
+                info = PdfLoader.inspect_pdf(file_path)
+                if info.get("cover_path") and os.path.exists(info["cover_path"]):
+                    info["cover_data_url"] = get_cover_data_url(info["cover_path"])
+            except Exception as e:
+                logger.error(f"Erreur inspection PDF {file_path}: {e}", exc_info=True)
+                return {"success": False, "error": f"Erreur inspection PDF : {e}"}
                 
         elif ext in ['.md', '.txt']:
             try:
@@ -870,6 +897,62 @@ class ImportMixin:
                         TaskManager.fail_task(task_id, str(e))
 
                 threading.Thread(target=_async_index_worker, daemon=True).start()
+                return {"success": True, "name": name, "chunks_count": len(chunks), "background_indexing": True, "task_id": task_id}
+
+            return {"success": True, "name": name, "chunks_count": len(chunks), "background_indexing": False}
+
+        # Cas 2.5 : Fichiers PDF (Documents, ouvrages théologiques, manuels)
+        elif ext == '.pdf':
+            from core.pdf_loader import PdfLoader
+            from core.theology_reader_manager import TheologyReaderManager
+            from core.task_manager import TaskManager
+            import threading
+
+            selected_chapters = payload.get("chapters", [])
+            chunks = PdfLoader.extract_chapters_and_chunks(
+                pdf_path=file_path,
+                selected_chapters=selected_chapters,
+                custom_name=name,
+                metadata=metadata
+            )
+
+            metadata["chapters_count"] = len([c for c in selected_chapters if c.get("include", True)]) or len(selected_chapters) or 1
+            metadata["chunks_count"] = len(chunks)
+            metadata["format"] = "pdf"
+            metadata["file_path"] = metadata.get("file_path", file_path)
+            registry[name] = metadata
+            save_books_metadata(registry)
+            TheologyReaderManager.invalidate_cache()
+
+            enable_ai = self.config.get("enable_ai", True)
+            if chunks and enable_ai:
+                task_id = f"import_{name}"
+                TaskManager.start_task(
+                    task_id=task_id,
+                    title=metadata.get("title", name),
+                    task_type="rag_indexing",
+                    total=len(chunks),
+                    detail=f"Indexation vectorielle de {len(chunks)} fragments..."
+                )
+
+                def _async_index_pdf_worker():
+                    try:
+                        from core.database import VectorDB
+                        db = VectorDB(api_keys=self.config)
+                        def p_cb(pct, cur=0, tot=0):
+                            TaskManager.update_progress(task_id, pct, current=cur, total=tot)
+                        db.add_chunks(
+                            chunks,
+                            embedding_model=metadata.get("embedding_model", "bge_multilingual_gemma2 (Infomaniak)"),
+                            progress_callback=p_cb
+                        )
+                        TaskManager.complete_task(task_id, message=f"Indexation terminée ({len(chunks)} fragments)")
+                        TheologyReaderManager.invalidate_cache()
+                    except Exception as e:
+                        logger.error(f"Erreur indexation vectorielle arrière-plan pour {name}: {e}", exc_info=True)
+                        TaskManager.fail_task(task_id, str(e))
+
+                threading.Thread(target=_async_index_pdf_worker, daemon=True).start()
                 return {"success": True, "name": name, "chunks_count": len(chunks), "background_indexing": True, "task_id": task_id}
 
             return {"success": True, "name": name, "chunks_count": len(chunks), "background_indexing": False}
