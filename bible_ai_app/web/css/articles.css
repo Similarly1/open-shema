@@ -1550,6 +1550,51 @@ body.theme-dark .article-card-title {
   color: #b45309;
 }
 
+/* Listes numérotées stylisées dans le corps de l'article */
+.article-numbered-list {
+  margin: 1em 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.article-numbered-item {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding-left: 4px;
+  line-height: 1.7;
+}
+
+.article-numbered-index {
+  color: var(--accent-primary, #60a5fa);
+  font-weight: 700;
+  font-size: 0.95em;
+  min-width: 1.5em;
+  flex-shrink: 0;
+}
+
+.article-numbered-text {
+  flex: 1;
+  color: inherit;
+}
+
+.article-numbered-text a {
+  color: var(--accent-primary, #60a5fa);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.article-reader-container.reading-bg-white .article-numbered-index,
+.article-reader-container.reading-bg-white .article-numbered-text a {
+  color: #2563eb;
+}
+
+.article-reader-container.reading-bg-sepia .article-numbered-index,
+.article-reader-container.reading-bg-sepia .article-numbered-text a {
+  color: #b45309;
+}
+
 /* Transcriptions de podcasts & Dialogues d'interview */
 .article-speaker-turn {
   margin: 1.4em 0;
