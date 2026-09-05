@@ -22,5 +22,6 @@
     "interlinear_show_surface": true,
     "interlinear_show_lemma": true,
     "interlinear_show_translit": true,
-    "interlinear_show_strong": true
+    "interlinear_show_strong": true,
+    "update_frequency": "startup"
 }

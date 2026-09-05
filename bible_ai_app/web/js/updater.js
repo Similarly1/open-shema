@@ -16,12 +16,23 @@ const AppUpdater = {
 
   init() {
     this.bindEvents();
-    this.loadSettings();
 
-    // Vérification automatique au démarrage selon la fréquence configurée
-    setTimeout(() => {
-      this.checkUpdates(false);
-    }, 2500);
+    const startRoutine = () => {
+      this.loadSettings();
+      // Vérification automatique au démarrage selon la fréquence configurée (défaut : à chaque ouverture)
+      setTimeout(() => {
+        this.checkUpdates(false);
+      }, 1500);
+    };
+
+    if (window.API && typeof window.API.onReady === 'function') {
+      window.API.onReady(startRoutine);
+    } else if (window.pywebview?.api) {
+      startRoutine();
+    } else {
+      window.addEventListener('pywebviewready', startRoutine, { once: true });
+      setTimeout(startRoutine, 2500);
+    }
   },
 
   bindEvents() {
@@ -77,10 +88,15 @@ const AppUpdater = {
     try {
       const res = await window.pywebview.api.get_update_settings();
       if (res) {
-        // Fréquence radio
+        // Fréquence radio (défaut 'startup')
         const freq = res.update_frequency || 'startup';
         const radio = document.querySelector(`input[name="opt-update-frequency"][value="${freq}"]`);
-        if (radio) radio.checked = true;
+        if (radio) {
+          radio.checked = true;
+        } else {
+          const defRadio = document.querySelector('input[name="opt-update-frequency"][value="startup"]');
+          if (defRadio) defRadio.checked = true;
+        }
 
         // Badge version
         const badge = document.getElementById('lbl-update-status-badge');
@@ -184,7 +200,7 @@ const AppUpdater = {
       metaEl.textContent = `Taille de la mise à jour : ${sizeStr}`;
     }
     if (notesEl) {
-      notesEl.textContent = info.release_notes || "Mise à jour d'optimisations et de fonctionnalités.";
+      notesEl.innerHTML = this.renderMarkdown(info.release_notes || "Mise à jour d'optimisations et de fonctionnalités.");
     }
   },
 
@@ -368,6 +384,114 @@ const AppUpdater = {
     if (lblStatus) lblStatus.textContent = `Erreur : ${message}`;
 
     console.error("Erreur mise à jour:", message);
+  },
+
+  renderMarkdown(text) {
+    if (!text || typeof text !== 'string' || !text.trim()) {
+      return '<p style="color: var(--text-muted, #94a3b8); font-style: italic; margin: 0;">Aucune note de version fournie.</p>';
+    }
+
+    // Échapper les balises HTML brutes pour la sécurité
+    let safe = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    const lines = safe.split(/\r?\n/);
+    let html = '';
+    let inUl = false;
+    let inOl = false;
+
+    const closeLists = () => {
+      if (inUl) { html += '</ul>'; inUl = false; }
+      if (inOl) { html += '</ol>'; inOl = false; }
+    };
+
+    for (let i = 0; i < lines.length; i++) {
+      let line = lines[i].trim();
+
+      // Ligne vide
+      if (!line) {
+        closeLists();
+        continue;
+      }
+
+      // Séparateurs horizontaux (--- ou ***)
+      if (/^(\-{3,}|\*{3,})$/.test(line)) {
+        closeLists();
+        html += '<hr style="border: none; border-top: 1px solid var(--border-color, rgba(255,255,255,0.12)); margin: 12px 0;">';
+        continue;
+      }
+
+      // Titres H1 à H4
+      const hMatch = line.match(/^(#{1,4})\s+(.+)$/);
+      if (hMatch) {
+        closeLists();
+        const level = hMatch[1].length;
+        const title = this.formatInline(hMatch[2]);
+        const fontSize = level === 1 ? '14px' : level === 2 ? '13px' : '12.5px';
+        const marginTop = i === 0 ? '2px' : '12px';
+        html += `<h${level + 1} style="font-size: ${fontSize}; font-weight: 700; color: var(--accent-primary, #0284c7); margin: ${marginTop} 0 6px 0; letter-spacing: -0.1px;">${title}</h${level + 1}>`;
+        continue;
+      }
+
+      // Liste à puces (- item, * item, + item)
+      const ulMatch = line.match(/^[-*+]\s+(.+)$/);
+      if (ulMatch) {
+        if (inOl) { html += '</ol>'; inOl = false; }
+        if (!inUl) {
+          html += '<ul style="margin: 4px 0 8px 18px; padding: 0; list-style-type: disc;">';
+          inUl = true;
+        }
+        const itemContent = this.formatInline(ulMatch[1]);
+        html += `<li style="margin-bottom: 5px; line-height: 1.5; color: var(--text-primary);">${itemContent}</li>`;
+        continue;
+      }
+
+      // Liste numérotée (1. item)
+      const olMatch = line.match(/^(\d+)[\.\)]\s+(.+)$/);
+      if (olMatch) {
+        if (inUl) { html += '</ul>'; inUl = false; }
+        if (!inOl) {
+          html += '<ol style="margin: 4px 0 8px 18px; padding: 0;">';
+          inOl = true;
+        }
+        const itemContent = this.formatInline(olMatch[2]);
+        html += `<li style="margin-bottom: 5px; line-height: 1.5; color: var(--text-primary);">${itemContent}</li>`;
+        continue;
+      }
+
+      // Citations (> quote)
+      const qMatch = line.match(/^&gt;\s*(.+)$/);
+      if (qMatch) {
+        closeLists();
+        const qContent = this.formatInline(qMatch[1]);
+        html += `<blockquote style="margin: 8px 0; padding: 6px 12px; border-left: 3px solid var(--accent-primary, #0284c7); background: var(--bg-subtle, rgba(255,255,255,0.03)); color: var(--text-secondary); font-style: italic; border-radius: 0 4px 4px 0;">${qContent}</blockquote>`;
+        continue;
+      }
+
+      // Paragraphe standard
+      closeLists();
+      html += `<p style="margin: 0 0 8px 0; line-height: 1.55; color: var(--text-primary);">${this.formatInline(line)}</p>`;
+    }
+
+    closeLists();
+    return html;
+  },
+
+  formatInline(str) {
+    if (!str) return '';
+    return str
+      // Liens [texte](url)
+      .replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" style="color: var(--accent-primary, #0284c7); text-decoration: underline; text-underline-offset: 2px;">$1</a>')
+      // Gras **texte** ou __texte__
+      .replace(/\*\*([^*]+)\*\*/g, '<strong style="color: var(--text-primary); font-weight: 600;">$1</strong>')
+      .replace(/__([^_]+)__/g, '<strong style="color: var(--text-primary); font-weight: 600;">$1</strong>')
+      // Italique *texte* ou _texte_
+      .replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>')
+      .replace(/(?<!_)_([^_]+)_(?!_)/g, '<em>$1</em>')
+      // Code inline `code`
+      .replace(/`([^`]+)`/g, '<code style="background: var(--bg-subtle, rgba(255,255,255,0.08)); padding: 1.5px 5px; border-radius: 3px; font-family: monospace; font-size: 11px; color: var(--accent-gold, #f59e0b); border: 1px solid var(--border-color, rgba(255,255,255,0.1));">$1</code>');
   },
 
   async applyRestart() {
