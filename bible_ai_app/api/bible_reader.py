@@ -12,6 +12,7 @@ import webview
 import threading
 import time
 import shutil
+import re
 from typing import Dict, List, Any, Optional
 
 logger = logging.getLogger(__name__)
@@ -418,6 +419,14 @@ class BibleReaderMixin:
                     verse = int(verse_raw)
                 elif "-" in verse_raw and verse_raw.split("-")[0].isdigit():
                     verse = int(verse_raw.split("-")[0])
+
+            # Livres à chapitre unique (Jude, Philémon, 2 Jean, 3 Jean, Abdias)
+            single_chapter_books = {"Jud", "Phm", "2Jo", "3Jo", "2Jn", "3Jn", "Oba", "Phl"}
+            if code in single_chapter_books and verse is None and ch > 1:
+                verse = ch
+                verse_raw = str(ch)
+                ch = 1
+
             return {
                 "book": code,
                 "book_french": french,

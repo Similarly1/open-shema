@@ -1819,15 +1819,45 @@ const ArticlesView = {
       return match.replace(/\n\n+/g, ' ');
     });
 
-    // 5j. Détecter et formater les listes de notes de bas de page numérotées (y compris les notes multi-citations)
-    text = text.replace(/(?:^|\n)(\d+)\.\s+([^\n]+(?:\n(?!\d+\.|\s*#|\s*<|\s*---|\s*$)[^\n]+)*)/g, (match, num, body) => {
-      let cleanBody = normalizeSuperscripts(body.replace(/\n+/g, ' ').replace(/\s+/g, ' ').trim());
-      return `\n\n<div class="article-footnote-item" id="article-fn-${num}"><span class="article-footnote-num">${num}.</span><span class="article-footnote-text">${cleanBody}</span> <a href="#article-fnref-${num}" class="article-footnote-backlink" title="Retour au texte">↩</a></div>\n\n`;
-    });
+    // 5j. Distinguer intelligemment les listes numérotées (corps du texte) des notes de bas de page réelles (citations / fin d'article)
+    const lastHeadingMatch = [...text.matchAll(/(?:^|\n)##+[^\n]+/g)].pop();
+    const lastHeadingIndex = lastHeadingMatch ? lastHeadingMatch.index : 0;
+    const editorialCardIndex = text.indexOf('class="article-editorial-footer-card"');
+    const bottomThreshold = Math.max(lastHeadingIndex, editorialCardIndex);
 
-    // 5k. Envelopper la suite de <div class="article-footnote-item"> dans une section stylisée
-    text = text.replace(/(?:<div class="article-footnote-item"[\s\S]+?<\/div>(?:\s*|\n*))+/g, (match) => {
-      return `\n\n<div class="article-footnotes-section"><div class="article-footnotes-title"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg><span>Notes de bas de page</span></div><div class="article-footnotes-list">${match.trim()}</div></div>\n\n`;
+    const citationKeywords = /\b(APJ|pp?\.\s*\d+|https?:\/\/|ibid|éditions|editions|traduction|chapitre|vol\.|op\.\s*cit|éd\.|n\.d\.[te]|n\.d\.l\.r|publié\s+dans|article\s+original|voir\s+notamment|source\s*:|p\.\s*\d+)/i;
+
+    const listBlockRegex = /(?:^|\n)((?:(?:\d+\.\s+[^\n]+)(?:\n(?!\d+\.|\s*#|\s*<|\s*---|\s*$)[^\n]+)*(?:\n|$))+)/g;
+
+    text = text.replace(listBlockRegex, (match, blockContent, offset) => {
+      const itemRegex = /(?:^|\n)(\d+)\.\s+([^\n]+(?:\n(?!\d+\.|\s*#|\s*<|\s*---|\s*$)[^\n]+)*)/g;
+      const items = [];
+      let m;
+      while ((m = itemRegex.exec(blockContent)) !== null) {
+        items.push({ num: m[1], body: m[2] });
+      }
+
+      if (items.length === 0) return match;
+
+      const isNearEnd = offset >= bottomThreshold;
+      const isCitationContent = citationKeywords.test(blockContent);
+      const isFootnote = (isNearEnd && isCitationContent) || (items[0].num === '1' && isCitationContent);
+
+      if (isFootnote) {
+        const fnItemsHtml = items.map(item => {
+          let cleanBody = normalizeSuperscripts(item.body.replace(/\n+/g, ' ').replace(/\s+/g, ' ').trim());
+          return `<div class="article-footnote-item" id="article-fn-${item.num}"><span class="article-footnote-num">${item.num}.</span><span class="article-footnote-text">${cleanBody}</span> <a href="#article-fnref-${item.num}" class="article-footnote-backlink" title="Retour au texte">↩</a></div>`;
+        }).join('\n');
+
+        return `\n\n<div class="article-footnotes-section"><div class="article-footnotes-title"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg><span>Notes de bas de page</span></div><div class="article-footnotes-list">${fnItemsHtml}</div></div>\n\n`;
+      } else {
+        const listItemsHtml = items.map(item => {
+          let cleanBody = normalizeSuperscripts(item.body.replace(/\n+/g, ' ').replace(/\s+/g, ' ').trim());
+          return `<div class="article-numbered-item"><span class="article-numbered-index">${item.num}.</span><div class="article-numbered-text">${cleanBody}</div></div>`;
+        }).join('\n');
+
+        return `\n\n<div class="article-numbered-list">\n${listItemsHtml}\n</div>\n\n`;
+      }
     });
 
     // Normaliser les années, plages de pages et grands nombres en exposant
@@ -1911,10 +1941,12 @@ const ArticlesView = {
       html = TheologyView.highlightScriptureReferences(html);
     }
 
-    // Nettoyage des balises <p> autour des blocs structurés
+    // Nettoyage des balises <p> et <br> autour des blocs structurés
     html = html
       .replace(/<p>\s*(<(?:div|blockquote|h1|h2|h3|h4|section)[\s\S]*?<\/(?:div|blockquote|h1|h2|h3|h4|section)>)\s*<\/p>/gi, '$1')
-      .replace(/<p>\s*<\/p>/gi, '');
+      .replace(/<p>\s*<\/p>/gi, '')
+      .replace(/(?:<br\s*\/?>\s*)+(<\/?div)/gi, '$1')
+      .replace(/(<\/div>)\s*(?:<br\s*\/?>\s*)+/gi, '$1');
 
     return `<div class="article-markdown-body"><p>${html}</p></div>`;
   },
