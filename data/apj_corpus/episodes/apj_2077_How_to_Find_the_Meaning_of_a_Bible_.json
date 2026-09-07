@@ -1,0 +1,36 @@
+{
+  "episode_number": 2077,
+  "titre_fr": "Comment percer le sens obscur d'un texte biblique",
+  "type_question": "exegetique",
+  "passages": {
+    "primaire": [
+      "Mat 6:22-23",
+      "Mat 20:15"
+    ],
+    "secondaires": [
+      "Mat 6:19-21",
+      "Mat 6:24"
+    ]
+  },
+  "themes": [
+    "interpretation_biblique",
+    "contexte",
+    "generosite",
+    "tresor",
+    "egrisme"
+  ],
+  "these_centrale": "Pour comprendre un passage biblique difficile, il faut scruter attentivement le contexte immédiat tout en laissant l'Écriture s'éclairer par d'autres passages similaires à travers la Bible.",
+  "resume_analytique": "John Piper explique sa méthode exégétique à partir de l'énigme de la métaphore de l'œil sain et mauvais dans Matthieu 6. Bloqué par ce texte semblant isolé entre des enseignements sur l'argent, il a découvert la clé des années plus tard dans la parabole des ouvriers de la vigne (Matthieu 20), où l'expression originale 'l'œil mauvais' désigne la convoitise et le ressentiment face à la grâce et à la générosité divine. La rigueur contextuelle et la théologie globale unifient ainsi le sens du texte.",
+  "pistes_applications": [
+    "Ne jamais isoler un verset de son paragraphe et de sa section globale lors de l'étude biblique.",
+    "Utiliser les renvois et les notes de bas de page des traductions fidèles pour croiser le vocabulaire d'un auteur à travers différents livres bibliques.",
+    "Prier pour que Dieu accorde des dispositions intérieures généreuses et libérées de la convoitise pour mieux comprendre sa Parole."
+  ],
+  "illustration_analogie": {
+    "titre": "La clé de voûte textuelle",
+    "resume": "Un texte difficile en apparence suspendu dans le vide trouve sa solidité et sa clarté lorsqu'on le connecte aux piliers contextuels qui le précèdent et le suivent."
+  },
+  "original_title": "How to Find the Meaning of a Bible Verse",
+  "source_url": "https://www.desiringgod.org/interviews/how-to-find-the-meaning-of-a-bible-verse",
+  "date_published": "Mon, 02 Sep 2024 10:00:00 +0000"
+}

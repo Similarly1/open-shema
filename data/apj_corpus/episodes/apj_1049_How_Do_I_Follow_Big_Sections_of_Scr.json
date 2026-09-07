@@ -1,0 +1,31 @@
+{
+  "episode_number": 1049,
+  "titre_fr": "Comment comprendre les longs passages de l'Écriture ?",
+  "type_question": "vie_chretienne",
+  "passages": {
+    "primaire": [
+      "Psa 8:1-9"
+    ],
+    "secondaires": [
+      "Mat 21:1-16"
+    ]
+  },
+  "themes": [
+    "herméneutique",
+    "lecture biblique",
+    "discipline spirituelle"
+  ],
+  "these_centrale": "Pour saisir la cohérence d'un long passage biblique, il faut passer de la lecture superficielle à une analyse rigoureuse, en assemblant les unités de sens comme les pièces d'un puzzle sur papier.",
+  "resume_analytique": "John Piper propose d'aborder les textes longs en identifiant des unités de sens intermédiaires (paragraphes). Il encourage à noter sur papier les points principaux de chaque unité pour en visualiser la progression logique. Cette méthode transforme une multitude de versets isolés en une architecture cohérente, révélant la pensée profonde de l'auteur inspiré.",
+  "pistes_applications": [
+    "Ne pas se contenter de lire, mais utiliser un papier et un crayon pour cartographier les arguments du texte.",
+    "Travailler par blocs de versets, résumer chaque bloc, puis chercher comment ces blocs s'articulent entre eux pour former le message global."
+  ],
+  "illustration_analogie": {
+    "titre": "Le puzzle de 500 pièces",
+    "resume": "Lire la Bible sans méthode est comme regarder 500 pièces de puzzle en désordre. Il faut isoler des groupes de pièces par leurs caractéristiques (couleurs, formes) pour construire des sections cohérentes, lesquelles s'assembleront finalement pour former le tableau complet."
+  },
+  "original_title": "How Do I Follow Big Sections of Scripture?",
+  "source_url": "https://www.desiringgod.org/interviews/how-do-i-follow-big-sections-of-scripture",
+  "date_published": "Jun  2, 2017"
+}

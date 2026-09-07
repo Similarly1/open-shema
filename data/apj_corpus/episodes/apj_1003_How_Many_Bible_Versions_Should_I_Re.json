@@ -1,0 +1,34 @@
+{
+  "episode_number": 1003,
+  "titre_fr": "Combien de versions de la Bible devrais-je lire ?",
+  "type_question": "vie_chretienne",
+  "passages": {
+    "primaire": [
+      "Ps 1:2",
+      "Jos 1:8"
+    ],
+    "secondaires": [
+      "2 Tim 3:16"
+    ]
+  },
+  "themes": [
+    "Lecture biblique",
+    "Traductions",
+    "Méditation",
+    "Mémorisation"
+  ],
+  "these_centrale": "Il est préférable d'utiliser une traduction principale pour la mémorisation et la méditation, tout en consultant d'autres versions pour éclaircir des passages complexes.",
+  "resume_analytique": "L'auteur souligne l'importance d'une 'équivalence formelle' (comme l'ESV) qui préserve la structure originale sans interpréter excessivement le texte. Bien que les traductions plus idiomatiques puissent aider à la compréhension, le lecteur gagne à s'immerger longuement dans un seul texte pour permettre une imprégnation spirituelle et faciliter la mémorisation. Utiliser plusieurs versions est un excellent outil d'étude, mais une seule doit être le 'port d'attache' quotidien.",
+  "pistes_applications": [
+    "Choisir une traduction principale fiable pour en saturer votre esprit par la mémorisation.",
+    "Utiliser d'autres versions comme des commentaires pour mieux saisir le sens des passages obscurs.",
+    "Prioriser la constance dans la lecture quotidienne pour être transformé par l'Esprit."
+  ],
+  "illustration_analogie": {
+    "titre": "La Bible comme commentaire",
+    "resume": "Lire plusieurs traductions est comparé à l'utilisation de plusieurs commentaires : un excellent exercice intellectuel d'étude, mais différent de la lecture méditative de dévotion."
+  },
+  "original_title": "How Many Bible Versions Should I Read?",
+  "source_url": "https://www.desiringgod.org/interviews/how-many-bible-versions-should-i-read",
+  "date_published": "Feb 15, 2017"
+}

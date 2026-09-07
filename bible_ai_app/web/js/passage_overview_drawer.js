@@ -48,7 +48,10 @@ const PassageOverviewDrawer = {
     arrowRight: `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>`,
     clock: `<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
     plus: `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
-    sync: `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`
+    sync: `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`,
+    pastoral: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/></svg>`,
+    apjLogo: `<svg viewBox="0 0 24 24" width="14" height="14" style="border-radius: 2.5px; vertical-align: middle; flex-shrink: 0;" xml:space="preserve"><rect width="24" height="24" rx="3.5" fill="#C6000E"/><polygon fill="#000000" points="4.6,4.6 19.4,4.6 19.4,19.4 16.6,19.4 16.6,22.3 12,19.4 4.6,19.4"/><path fill="#FFFFFF" d="M10.3,9.5l-2-2.1L7.5,8.3l2,2H7.4v1h3.9V7.4h-1V9.5L10.3,9.5L10.3,9.5z M13.7,9.5l2-2.1l0.9,0.9l-2.1,2h2.1v1 h-3.9V7.4h1V9.5L13.7,9.5L13.7,9.5z M10.3,14.5l-2,2l-0.9-0.9l2-2H7.4v-1h3.9v3.9h-1V14.5L10.3,14.5L10.3,14.5z M13.7,14.5l2,2 l0.9-0.9l-2.1-2h2.1v-1h-3.9v3.9h1V14.5L13.7,14.5L13.7,14.5z"/></svg>`,
+    externalLink: `<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`
   },
 
   init() {
@@ -117,7 +120,7 @@ const PassageOverviewDrawer = {
       e.stopPropagation();
       const refStr = this.currentData?.reference || `${this.currentBook} ${this.currentChapter}:${this.currentVerse}`;
       if (typeof App !== 'undefined' && App.switchView) {
-        App.switchView('view-passage-study');
+        App.switchView('passage-study');
         setTimeout(() => {
           if (typeof PassageStudyView !== 'undefined' && PassageStudyView.loadPassage) {
             PassageStudyView.loadPassage(refStr);
@@ -312,6 +315,7 @@ const PassageOverviewDrawer = {
     else if (cat === 'Livre') catIcon = this.icons.book;
     else if (cat === 'Note') catIcon = this.icons.note;
     else if (cat === 'Lieu') catIcon = this.icons.map;
+    else if (cat === 'Pastoral' || cat === 'Éthique') catIcon = this.icons.pastoral;
 
     let coverHtml = '';
     let bannerHtml = '';
@@ -322,6 +326,8 @@ const PassageOverviewDrawer = {
       }
     } else if (cat === 'Note') {
       coverHtml = '';
+    } else if (cat === 'Pastoral' || cat === 'Éthique') {
+      coverHtml = `<div class="popover-cover-wrap"><div class="popover-cover-fallback pastoral" style="background: transparent; border: none; padding: 0;"><svg viewBox="0 0 24 24" width="46" height="46" style="border-radius: 8px; box-shadow: 0 4px 14px rgba(0,0,0,0.3); vertical-align: middle;" xml:space="preserve"><rect width="24" height="24" rx="3.5" fill="#C6000E"/><polygon fill="#000000" points="4.6,4.6 19.4,4.6 19.4,19.4 16.6,19.4 16.6,22.3 12,19.4 4.6,19.4"/><path fill="#FFFFFF" d="M10.3,9.5l-2-2.1L7.5,8.3l2,2H7.4v1h3.9V7.4h-1V9.5L10.3,9.5L10.3,9.5z M13.7,9.5l2-2.1l0.9,0.9l-2.1,2h2.1v1 h-3.9V7.4h1V9.5L13.7,9.5L13.7,9.5z M10.3,14.5l-2,2l-0.9-0.9l2-2H7.4v-1h3.9v3.9h-1V14.5L10.3,14.5L10.3,14.5z M13.7,14.5l2,2 l0.9-0.9l-2.1-2h2.1v-1h-3.9v3.9h1V14.5L13.7,14.5L13.7,14.5z"/></svg></div></div>`;
     } else {
       coverHtml = imgUrl
         ? `<div class="popover-cover-wrap"><img src="${imgUrl}" class="popover-cover-img" alt=""></div>`
@@ -508,6 +514,7 @@ const PassageOverviewDrawer = {
     const commCount = (data.commentaries || []).length;
     const artCount = (data.articles || []).length;
     const theoCount = (data.theology_books || []).length;
+    const apjCount = (data.pastoral_qa || []).length;
     const notesCount = ((data.user_notes || []).length) + ((data.user_highlights || []).length);
     const mapsCount = (data.maps || []).length;
     const bpCount = ((data.bibleproject?.current_videos || []).length) + ((data.bibleproject?.current_posters || []).length);
@@ -548,10 +555,13 @@ const PassageOverviewDrawer = {
       // D. Section Livres de Théologie & Bibliothèque
       appendSafe(this.renderTheologySection, theoCount);
 
-      // E. Section Vos Notes & Surlignages Personnels
+      // E. Section Questions Pastorales & Éthique (Ask Pastor John)
+      appendSafe(this.renderPastoralSection, apjCount);
+
+      // F. Section Vos Notes & Surlignages Personnels
       appendSafe(this.renderNotesSection, notesCount);
 
-      // F. Section Géographie & Lieux Bibliques
+      // G. Section Géographie & Lieux Bibliques
       appendSafe(this.renderMapsSection, mapsCount);
 
       let finalHtml = activeHtml;
@@ -571,7 +581,7 @@ const PassageOverviewDrawer = {
         `;
       }
 
-      // G. Section Actions Rapides & IA
+      // H. Section Actions Rapides & IA
       finalHtml += this.renderQuickActionsSection(data);
       root.innerHTML = finalHtml;
       this.attachCardEventListeners(root, data);
@@ -602,6 +612,9 @@ const PassageOverviewDrawer = {
 
     if (artCount > 0) rightActiveHtml.push(this.renderArticlesSection(data));
     else rightEmptyHtml.push(this.renderArticlesSection(data));
+
+    if (apjCount > 0) rightActiveHtml.push(this.renderPastoralSection(data));
+    else rightEmptyHtml.push(this.renderPastoralSection(data));
 
     const totalActive = leftActiveHtml.length + rightActiveHtml.length;
     const totalEmpty = leftEmptyHtml.length + rightEmptyHtml.length;
@@ -655,6 +668,7 @@ const PassageOverviewDrawer = {
     const commCount = stats.commentaries_count || 0;
     const artCount = stats.articles_count || 0;
     const theoCount = stats.theology_count || 0;
+    const apjCount = stats.pastoral_qa_count || 0;
     const notesCount = (stats.notes_count || 0) + (stats.highlights_count || 0);
     const mapsCount = stats.maps_count || 0;
     const bpCount = (stats.bibleproject_videos_count || 0) + (stats.bibleproject_posters_count || 0);
@@ -678,6 +692,11 @@ const PassageOverviewDrawer = {
       <button class="overview-chip ${theoCount > 0 ? 'has-items' : 'is-empty'}" data-scroll-sec="sec-theology" title="${theoCount} livre(s) de théologie">
         <span class="chip-svg">${this.icons.book}</span>
         <span class="chip-count">${theoCount}</span>
+      </button>
+
+      <button class="overview-chip ${apjCount > 0 ? 'has-items' : 'is-empty'}" data-scroll-sec="sec-pastoral-qa" title="${apjCount} question(s) pastorale(s) et éthique(s)">
+        <span class="chip-svg">${this.icons.pastoral}</span>
+        <span class="chip-count">${apjCount}</span>
       </button>
 
       <button class="overview-chip ${notesCount > 0 ? 'has-items' : 'is-empty'}" data-scroll-sec="sec-notes" title="${notesCount} note(s) et surlignage(s)">
@@ -1052,6 +1071,78 @@ const PassageOverviewDrawer = {
           <div class="sec-header-left">
             <span class="sec-icon sec-icon-amber">${this.icons.book}</span>
             <span class="sec-title">Livres de théologie</span>
+            <span class="sec-badge ${list.length > 0 ? 'badge-active' : ''}">${list.length}</span>
+          </div>
+          <button class="sec-chevron" title="Plier / Déplier">${this.icons.chevronDown}</button>
+        </header>
+        <div class="sec-body">${bodyHtml}</div>
+      </section>
+    `;
+  },
+
+  /**
+   * Section Questions Pastorales & Éthique (Ask Pastor John / John Piper)
+   */
+  renderPastoralSection(data) {
+    const list = data.pastoral_qa || [];
+    const isCollapsed = this.collapsedSections['sec-pastoral-qa'] || false;
+
+    let bodyHtml = '';
+    if (list.length === 0) {
+      bodyHtml = `
+        <div class="overview-empty-hint">
+          <span>Aucune question pastorale spécifique répertoriée pour ce verset.</span>
+        </div>
+      `;
+    } else {
+      bodyHtml = `<div class="overview-clean-list">`;
+      list.forEach((ep, idx) => {
+        const titleFr = ep.titre_fr || ep.original_title || 'Question pastorale';
+        const theseHtml = this.formatMarkdownExcerpt(ep.these_centrale);
+        const epBadge = (ep.episode_number != null && ep.episode_number !== '') ? `Ép. #${ep.episode_number}` : 'Hors-série';
+        const authorLabel = (ep.episode_number != null && ep.episode_number !== '') ? `Ask Pastor John · Ép. #${ep.episode_number}` : 'Ask Pastor John · Hors-série';
+        const typeBadge = ep.type_question ? ep.type_question.toUpperCase() : 'PASTORAL';
+        const hasIllustr = ep.illustration?.has_illustration || !!ep.illustration?.titre;
+        const appCount = (ep.pistes_applications || []).length;
+
+        bodyHtml += `
+          <div class="overview-clean-item overview-pastoral-item"
+               data-action="open-pastoral-episode"
+               data-episode-idx="${idx}"
+               data-tt-category="Pastoral"
+               data-tt-author="${authorLabel}"
+               data-tt-title="${this.escapeHtml(titleFr)}"
+               data-tt-badge="Desiring God"
+               data-tt-logo="assets/apj_logo.svg"
+               data-tt-excerpt="${this.escapeHtml(theseHtml)}">
+            <div class="clean-article-row">
+              <div class="clean-article-content">
+                <div class="clean-article-top">
+                  <span class="clean-source-tag is-pastoral" style="display: inline-flex; align-items: center; gap: 4px;">
+                    ${this.icons.apjLogo}
+                    <span class="source-tag-text">${epBadge}</span>
+                  </span>
+                  <span class="clean-pastoral-type">${this.escapeHtml(typeBadge)}</span>
+                  ${hasIllustr ? `<span class="clean-pastoral-feat has-analogy" title="Contient une analogie ou illustration">Analogie</span>` : ''}
+                  ${appCount > 0 ? `<span class="clean-pastoral-feat has-apps" title="${appCount} pistes d'application pratique">${appCount} app.</span>` : ''}
+                </div>
+                <div class="clean-article-title">${this.escapeHtml(titleFr)}</div>
+                ${ep.these_centrale ? `<div class="clean-pastoral-thesis">${this.escapeHtml(ep.these_centrale)}</div>` : ''}
+              </div>
+              <span class="clean-item-arrow">${this.icons.arrowRight}</span>
+            </div>
+          </div>
+        `;
+      });
+      bodyHtml += `</div>`;
+    }
+
+    return `
+      <section class="overview-section-card ${isCollapsed ? 'collapsed' : ''}" id="sec-pastoral-qa">
+        <header class="sec-header" data-toggle-sec="sec-pastoral-qa">
+          <div class="sec-header-left">
+            <span class="sec-icon sec-icon-teal">${this.icons.pastoral}</span>
+            <span class="sec-title">Questions pastorales &amp; Éthique</span>
             <span class="sec-badge ${list.length > 0 ? 'badge-active' : ''}">${list.length}</span>
           </div>
           <button class="sec-chevron" title="Plier / Déplier">${this.icons.chevronDown}</button>
@@ -1469,6 +1560,18 @@ const PassageOverviewDrawer = {
       });
     });
 
+    // 7c. Clic sur un épisode pastoral (Ask Pastor John) -> Modale fiche complète
+    container.querySelectorAll('[data-action="open-pastoral-episode"]').forEach(card => {
+      card.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const idx = parseInt(card.dataset.episodeIdx, 10);
+        const ep = (data.pastoral_qa || [])[idx];
+        if (ep) {
+          this.openPastoralModal(ep);
+        }
+      });
+    });
+
     // 8. Boutons d'actions rapides du bas de carte
     container.querySelector('#btn-card-launch-synth')?.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -1489,7 +1592,7 @@ const PassageOverviewDrawer = {
       e.stopPropagation();
       const refStr = data.reference || `${this.currentBook} ${this.currentChapter}:${this.currentVerse}`;
       if (typeof App !== 'undefined' && App.switchView) {
-        App.switchView('view-passage-study');
+        App.switchView('passage-study');
         setTimeout(() => {
           if (typeof PassageStudyView !== 'undefined' && PassageStudyView.loadPassage) {
             PassageStudyView.loadPassage(refStr);
@@ -1497,6 +1600,220 @@ const PassageOverviewDrawer = {
         }, 150);
       }
     });
+  },
+
+  /**
+   * Modale d'analyse pastorale détaillée (Ask Pastor John / John Piper)
+   */
+  openPastoralModal(ep) {
+    if (!ep) return;
+    let modal = document.getElementById('apj-episode-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'apj-episode-modal';
+      modal.className = 'apj-modal-overlay hidden';
+      document.body.appendChild(modal);
+    }
+
+    const titleFr = ep.titre_fr || ep.original_title || 'Question pastorale';
+    const origTitle = ep.original_title || '';
+    const epNum = ep.episode_number || '';
+    const typeQ = ep.type_question || 'Pastorale';
+    const datePub = ep.date_published || '';
+    const sourceUrl = ep.source_url || '';
+    const these = ep.these_centrale || '';
+    const resume = ep.resume_analytique || '';
+    const illustr = ep.illustration || {};
+    const apps = ep.pistes_applications || [];
+    const themes = ep.themes || [];
+    const verseRef = ep.verse_ref || '';
+    const primPassages = ep.passages_primaires || (verseRef ? [verseRef] : []);
+    const secPassages = ep.passages_secondaires || [];
+
+    const appsHtml = apps.length > 0 ? `
+      <div class="apj-modal-section">
+        <div class="apj-sec-title">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Pistes d'application concrètes</span>
+        </div>
+        <ul class="apj-apps-list">
+          ${apps.map(a => `<li><span class="apj-bullet">•</span> <span>${this.escapeHtml(a)}</span></li>`).join('')}
+        </ul>
+      </div>
+    ` : '';
+
+    const illustrHtml = (illustr.titre || illustr.resume) ? `
+      <div class="apj-modal-section apj-illustr-box">
+        <div class="apj-sec-title apj-sec-illustr">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>Illustration &amp; Analogie : ${this.escapeHtml(illustr.titre || 'Analogie')}</span>
+        </div>
+        <div class="apj-sec-content">${this.escapeHtml(illustr.resume || '')}</div>
+      </div>
+    ` : '';
+
+    const themesHtml = themes.length > 0 ? `
+      <div class="apj-themes-bar">
+        ${themes.map(t => `<span class="apj-theme-pill">${this.escapeHtml(t)}</span>`).join('')}
+      </div>
+    ` : '';
+
+    modal.innerHTML = `
+      <div class="apj-modal-window">
+        <div class="apj-modal-header">
+          <div class="apj-modal-title-area">
+            <div class="apj-modal-meta">
+              <span class="apj-ep-pill" style="display: inline-flex; align-items: center; gap: 6px;">${this.icons.apjLogo} <span>Ask Pastor John • ${(epNum != null && epNum !== '') ? `Épisode #${epNum}` : 'Hors-série'}</span></span>
+              <span class="apj-type-pill">${this.escapeHtml(typeQ)}</span>
+              ${datePub ? `<span class="apj-date-pill">${this.escapeHtml(this.formatFrenchDate(datePub))}</span>` : ''}
+            </div>
+            <h2 class="apj-modal-title">${this.escapeHtml(titleFr)}</h2>
+            ${origTitle && origTitle !== titleFr ? `<div class="apj-modal-orig-title">Titre original : « ${this.escapeHtml(origTitle)} »</div>` : ''}
+          </div>
+          <div class="apj-modal-actions">
+            ${sourceUrl ? `
+              <button type="button" class="apj-btn-source" id="btn-apj-open-source" title="Consulter l'article original sur Desiring God">
+                ${this.icons.apjLogo}
+                <span>Desiring God ↗</span>
+              </button>
+            ` : ''}
+            <button type="button" class="apj-btn-close" id="btn-apj-modal-close" title="Fermer (Échap)">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="apj-modal-body">
+          ${(primPassages.length > 0 || secPassages.length > 0) ? `
+            <div class="apj-scriptures-box">
+              <div class="apj-scriptures-header">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                <span>Textes bibliques de référence</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                ${primPassages.length > 0 ? `
+                  <div class="drawer-pastoral-ref-group">
+                    <span class="drawer-pastoral-ref-label">Texte(s) clé(s) :</span>
+                    <div class="drawer-pastoral-ref-list">
+                      ${primPassages.map(p => `
+                        <button type="button" class="drawer-pastoral-ref-btn is-primary" data-ref="${this.escapeHtml(p)}" title="Ouvrir ${this.escapeHtml(p)} dans le lecteur biblique">
+                          <span>${this.escapeHtml(p)}</span>
+                          <svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                        </button>
+                      `).join('')}
+                    </div>
+                  </div>
+                ` : ''}
+                ${secPassages.length > 0 ? `
+                  <div class="drawer-pastoral-ref-group">
+                    <span class="drawer-pastoral-ref-label">Passages d'appui :</span>
+                    <div class="drawer-pastoral-ref-list">
+                      ${secPassages.map(p => `
+                        <button type="button" class="drawer-pastoral-ref-btn is-secondary" data-ref="${this.escapeHtml(p)}" title="Ouvrir ${this.escapeHtml(p)} dans le lecteur biblique">
+                          <span>${this.escapeHtml(p)}</span>
+                        </button>
+                      `).join('')}
+                    </div>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          ` : ''}
+
+          ${these ? `
+            <div class="apj-thesis-card">
+              <div class="apj-thesis-label">Thèse centrale &amp; Réponse pastorale</div>
+              <div class="apj-thesis-text">${this.escapeHtml(these)}</div>
+            </div>
+          ` : ''}
+
+          ${resume ? `
+            <div class="apj-modal-section">
+              <div class="apj-sec-title">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>Développement pastoral &amp; théologique</span>
+              </div>
+              <div class="apj-sec-content apj-rich-text">${this.formatMarkdownExcerpt(resume).replace(/\n/g, '<br>')}</div>
+            </div>
+          ` : ''}
+
+          ${illustrHtml}
+          ${appsHtml}
+          ${themesHtml}
+        </div>
+        <div class="apj-modal-footer">
+          <div class="apj-footer-author">Auteur : John Piper (Desiring God) • Synthèse en français</div>
+          <button type="button" class="apj-footer-study-btn" id="btn-apj-goto-study">
+            ${this.icons.study}
+            <span>Étudier ce passage</span>
+          </button>
+        </div>
+      </div>
+    `;
+
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    document.body.classList.add('apj-modal-open');
+
+    // Event listeners
+    const closeModal = () => {
+      modal.classList.add('hidden');
+      modal.style.display = 'none';
+      document.body.classList.remove('apj-modal-open');
+      window.removeEventListener('keydown', onKey);
+    };
+
+    modal.querySelector('#btn-apj-modal-close')?.addEventListener('click', closeModal);
+
+    modal.onclick = (e) => {
+      if (e.target === modal) closeModal();
+    };
+
+    modal.querySelectorAll('.drawer-pastoral-ref-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeModal();
+        const ref = btn.dataset.ref;
+        if (!ref) return;
+        if (typeof BibleReader !== 'undefined' && BibleReader.parseAndNavigate) {
+          BibleReader.parseAndNavigate(ref);
+        }
+      });
+    });
+
+    modal.querySelector('#btn-apj-open-source')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (typeof API !== 'undefined' && API.openExternalUrl && sourceUrl) {
+        API.openExternalUrl(sourceUrl);
+      } else if (sourceUrl) {
+        window.open(sourceUrl, '_blank');
+      }
+    });
+
+    modal.querySelector('#btn-apj-goto-study')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeModal();
+      const bestRef = (primPassages && primPassages[0]) || verseRef || this.currentData?.reference || `${this.currentBook} ${this.currentChapter}:${this.currentVerse}`;
+      if (typeof App !== 'undefined' && App.switchView) {
+        App.switchView('passage-study');
+        setTimeout(() => {
+          if (typeof PassageStudyView !== 'undefined') {
+            if (PassageStudyView.loadPassage) {
+              PassageStudyView.loadPassage(bestRef);
+            }
+            if (PassageStudyView.switchTab) {
+              PassageStudyView.switchTab('pastoral');
+            }
+          }
+        }, 150);
+      }
+    });
+
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    };
+    window.addEventListener('keydown', onKey);
   },
 
   // =========================================================================
@@ -1769,6 +2086,31 @@ const PassageOverviewDrawer = {
     if (lbl) {
       lbl.textContent = `${Math.round(this.panzoom.scale * 100)}%`;
     }
+  },
+
+  formatFrenchDate(dateStr) {
+    if (!dateStr || typeof dateStr !== 'string') return '';
+    const cleanStr = dateStr.trim();
+    try {
+      const d = new Date(cleanStr);
+      if (!isNaN(d.getTime())) {
+        return d.toLocaleDateString('fr-FR', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        });
+      }
+    } catch (e) {}
+
+    const months = {
+      jan: 'janvier', feb: 'février', mar: 'mars', apr: 'avril', may: 'mai', jun: 'juin',
+      jul: 'juillet', aug: 'août', sep: 'septembre', oct: 'octobre', nov: 'novembre', dec: 'décembre'
+    };
+    const m = cleanStr.match(/(\d{1,2})\s+([A-Za-z]{3})\s+(\d{4})/);
+    if (m) return `${parseInt(m[1], 10)} ${months[m[2].toLowerCase()] || m[2]} ${m[3]}`;
+    const m2 = cleanStr.match(/([A-Za-z]{3})\s+(\d{1,2}),?\s+(\d{4})/);
+    if (m2) return `${parseInt(m2[2], 10)} ${months[m2[1].toLowerCase()] || m2[1]} ${m2[3]}`;
+    return cleanStr;
   },
 
   escapeHtml(str) {

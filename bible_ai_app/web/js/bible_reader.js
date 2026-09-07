@@ -5903,6 +5903,20 @@ const BibleReader = {
     } catch (e) {
       console.error('Erreur sync ArticlesView:', e);
     }
+
+    // Synchronisation automatique de l'onglet Pastorale (Ask Pastor John)
+    try {
+      if (typeof DrawerPastoralViewer !== 'undefined' && DrawerPastoralViewer.load) {
+        const pastoralTab = document.querySelector('.drawer-tab[data-drawer-tab="pastoral"]');
+        if (pastoralTab && pastoralTab.classList.contains('active')) {
+          DrawerPastoralViewer.load(book, chInt, vInt);
+        } else {
+          DrawerPastoralViewer.updateBadge(book, chInt, vInt);
+        }
+      }
+    } catch (e) {
+      console.error('Erreur sync DrawerPastoralViewer:', e);
+    }
   },
 
 

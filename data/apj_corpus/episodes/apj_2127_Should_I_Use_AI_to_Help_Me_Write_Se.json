@@ -1,0 +1,35 @@
+{
+  "episode_number": 2127,
+  "titre_fr": "L'utilisation de l'IA pour la rédaction de sermons",
+  "type_question": "ethique",
+  "passages": {
+    "primaire": [
+      "1 Tim 3:2"
+    ],
+    "secondaires": [
+      "1 Cor 2:1-16",
+      "Jean 10:1-16",
+      "Héb 4:12"
+    ]
+  },
+  "themes": [
+    "IA",
+    "intégrité pastorale",
+    "vocation",
+    "vérité"
+  ],
+  "these_centrale": "L'intelligence artificielle peut servir d'outil documentaire, mais son utilisation pour la composition de messages est une démission de l'appel pastoral et un manque d'honnêteté fondamentale.",
+  "resume_analytique": "John Piper distingue l'intelligence (capacité logique) de l'émotion (capacité d'adoration). Si l'IA peut simuler une structure logique, elle est incapable d'une expérience spirituelle. L'auteur souligne que le prédicateur doit posséder le don de l'enseignement ('didaktikos'), ce qui implique une connexion authentique entre le cœur du pasteur, le texte biblique et l'assemblée. Utiliser l'IA pour rédiger des sermons ou des communications sans transparence revient à tromper l'auditoire, car le ministère chrétien repose sur la vérité et l'intégrité personnelle.",
+  "pistes_applications": [
+    "Utiliser l'IA comme une encyclopédie ou un assistant de recherche, jamais comme un auteur.",
+    "Si une assistance technologique est utilisée, la transparence totale envers l'assemblée est une exigence éthique absolue.",
+    "Considérer la rédaction du sermon comme un exercice spirituel nécessaire à la formation du caractère du pasteur."
+  ],
+  "illustration_analogie": {
+    "titre": "L'IA comme assistant vs rédacteur",
+    "resume": "Piper compare l'usage de l'IA à celui des outils classiques (commentaires, dictionnaires) : utile pour l'information, mais l'acte de composition doit rester un travail humain et spirituel."
+  },
+  "original_title": "Should I Use AI to Help Me Write Sermons?",
+  "source_url": "https://www.desiringgod.org/interviews/should-i-use-ai-to-help-me-write-sermons",
+  "date_published": "Mon, 24 Feb 2025 11:00:00 +0000"
+}

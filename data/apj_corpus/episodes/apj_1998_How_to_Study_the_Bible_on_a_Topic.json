@@ -1,0 +1,36 @@
+{
+  "episode_number": 1998,
+  "titre_fr": "Comment étudier un thème dans la Bible",
+  "type_question": "exegetique",
+  "passages": {
+    "primaire": [
+      "Gal 1:10",
+      "1Th 2:4-6",
+      "Rom 15:1-2"
+    ],
+    "secondaires": [
+      "Col 3:22",
+      "1Co 10:31-33"
+    ]
+  },
+  "themes": [
+    "etude_biblique",
+    "approbation_divine",
+    "relation_aux_autres",
+    "temoignage"
+  ],
+  "these_centrale": "Chercher à plaire aux hommes devient un péché uniquement lorsque cela est motivé par l'égocentrisme, la flatterie ou le compromis spirituel, tandis que rechercher le bien d'autrui pour sa construction est un commandement divin.",
+  "resume_analytique": "L'auteur démontre sa méthode d'étude biblique par thématique à partir du mot 'plaire'. En croisant les passages pauliniens, il établit un discernement pastoral : d'un côté, Paul rejette catégoriquement le fait de chercher l'approbation humaine au détriment de la vérité de l'Évangile ou par appât du gain (Galates 1, 1 Thessaloniciens 2). D'un autre côté, il encourage à devenir le serviteur de tous pour leur édification et leur salut, dans la crainte de Dieu (Romains 15, 1 Corinthiens 10). La clé réside dans la motivation profonde du cœur : servir l'intérêt d'autrui sous le regard de Dieu plutôt que de manipuler les relations pour sa propre gloire.",
+  "pistes_applications": [
+    "Examine tes motivations cachées lorsque tu cherches l'approbation ou l'affection de ton entourage.",
+    "Ose déplaire aux hommes par fidélité à la vérité de l'Évangile lorsque celui-ci est compromis.",
+    "Exerce-toi à étudier les sujets bibliques par toi-même en utilisant des concordances ou des logiciels pour croiser les occurrences d'un même mot."
+  ],
+  "illustration_analogie": {
+    "titre": "La boîte à outils accessible",
+    "resume": "L'analogie de l'artisan qui montre ses propres outils (une recherche par mots-clés dans un logiciel biblique) pour équiper les auditeurs à faire de même, démontrant qu'il n'y a pas de secret ésotérique mais un travail direct dans le texte."
+  },
+  "original_title": "How to Study the Bible on a Topic",
+  "source_url": "https://www.desiringgod.org/interviews/how-to-study-the-bible-on-a-topic",
+  "date_published": "Thu, 30 Nov 2023 11:00:00 +0000"
+}

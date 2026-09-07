@@ -252,6 +252,13 @@ const App = {
             if (typeof BibleProjectView !== 'undefined') {
               BibleProjectView.load(b, ch, true);
             }
+          } else if (tabId === 'pastoral') {
+            const b = (typeof BibleReader !== 'undefined' && BibleReader.currentBook) || 'Gen';
+            const ch = (typeof BibleReader !== 'undefined' && BibleReader.currentChapter) || 1;
+            const v = (typeof BibleReader !== 'undefined' && BibleReader.selectedVerse) || 1;
+            if (typeof DrawerPastoralViewer !== 'undefined') {
+              DrawerPastoralViewer.load(b, ch, v);
+            }
           }
         }
       });
@@ -810,13 +817,15 @@ const App = {
   },
 
   switchView(viewName) {
-    this.activeView = viewName;
+    if (!viewName) return;
+    const cleanViewName = viewName.startsWith('view-') ? viewName.substring(5) : viewName;
+    this.activeView = cleanViewName;
     if (typeof NotificationManager !== 'undefined') {
-      NotificationManager.clearBadge(viewName);
+      NotificationManager.clearBadge(cleanViewName);
     }
     document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
 
-    const targetEl = document.getElementById(`view-${viewName}`);
+    const targetEl = document.getElementById(`view-${cleanViewName}`);
     if (targetEl) {
       targetEl.classList.add('active');
     }
@@ -824,7 +833,7 @@ const App = {
     // Synchroniser l'état actif de la barre latérale et des sous-menus
     document.querySelectorAll('#sidebar .nav-item, .sidebar-menu .nav-item, .sidebar-nav .nav-item, .sidebar-footer .nav-item, .nav-sub-item').forEach(b => {
       b.classList.remove('active');
-      if (b.dataset.view === viewName || b.id === `nav-${viewName}`) {
+      if (b.dataset.view === cleanViewName || b.id === `nav-${cleanViewName}`) {
         b.classList.add('active');
       }
     });
@@ -833,39 +842,39 @@ const App = {
 
     const drawerEl = document.getElementById('right-drawer');
 
-    if (viewName === 'library') {
+    if (cleanViewName === 'library') {
       if (drawerEl) drawerEl.classList.add('collapsed');
       LibraryView.loadBooks();
-    } else if (viewName === 'settings') {
+    } else if (cleanViewName === 'settings') {
       if (drawerEl) drawerEl.classList.add('collapsed');
       SettingsView.loadData();
-    } else if (viewName === 'notes') {
+    } else if (cleanViewName === 'notes') {
       if (drawerEl) drawerEl.classList.add('collapsed');
       NotesView.loadNotes();
-    } else if (viewName === 'maps') {
+    } else if (cleanViewName === 'maps') {
       if (drawerEl) drawerEl.classList.add('collapsed');
       MapsView.onViewActivated();
-    } else if (viewName === 'commentaries') {
+    } else if (cleanViewName === 'commentaries') {
       if (drawerEl) drawerEl.classList.add('collapsed');
       if (typeof CommentariesView !== 'undefined') {
         CommentariesView.onViewActivated();
       }
-    } else if (viewName === 'theology') {
+    } else if (cleanViewName === 'theology') {
       if (drawerEl) drawerEl.classList.add('collapsed');
       if (typeof TheologyView !== 'undefined') {
         TheologyView.onViewActivated();
       }
-    } else if (viewName === 'dict') {
+    } else if (cleanViewName === 'dict') {
       if (drawerEl) drawerEl.classList.add('collapsed');
       if (typeof DictView !== 'undefined') {
         DictView.onViewActivated();
       }
-    } else if (viewName === 'passage-study') {
+    } else if (cleanViewName === 'passage-study') {
       if (drawerEl) drawerEl.classList.add('collapsed');
       if (typeof PassageStudyView !== 'undefined') {
         PassageStudyView.onViewActivated();
       }
-    } else if (viewName === 'articles') {
+    } else if (cleanViewName === 'articles') {
       if (drawerEl) drawerEl.classList.add('collapsed');
       if (typeof ArticlesView !== 'undefined') {
         ArticlesView.onViewActivated();
@@ -1499,6 +1508,7 @@ const App = {
     const btnSendChat = document.getElementById('btn-send-chat');
     const chatMessages = document.getElementById('chat-messages');
     const modeSelect = document.getElementById('drawer-ai-mode-select');
+    const modeLabel = document.getElementById('lbl-drawer-ai-mode');
     const passageBadge = document.getElementById('lbl-drawer-ai-passage');
     const btnClearChat = document.getElementById('btn-clear-drawer-ai-chat');
 
@@ -1507,6 +1517,62 @@ const App = {
     let activeGenerationCancelled = false;
     let currentDrawerSessionId = null;
     let currentDrawerMessages = [];
+
+    const modePicker = document.getElementById('drawer-ai-mode-picker');
+    const modeMenu = document.getElementById('drawer-ai-mode-menu');
+
+    // Helper pour définir le mode d'étude (mise à jour du select caché, libellé et état actif)
+    const setDrawerAiMode = (val) => {
+      if (modeSelect) modeSelect.value = val;
+      const opt = modeMenu?.querySelector(`.drawer-ai-mode-option[data-value="${val}"]`);
+      if (modeLabel && opt) {
+        modeLabel.textContent = opt.textContent.trim();
+      }
+      modeMenu?.querySelectorAll('.drawer-ai-mode-option').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-value') === val);
+      });
+      if (modeSelect) {
+        modeSelect.dispatchEvent(new Event('change'));
+      }
+    };
+
+    // Toggle de l'ouverture du menu déroulant
+    modePicker?.addEventListener('click', (e) => {
+      if (e.target.closest('.drawer-ai-mode-option')) return;
+      e.stopPropagation();
+      const isOpen = modePicker.classList.toggle('is-open');
+      modeMenu?.classList.toggle('hidden', !isOpen);
+    });
+
+    // Sélection d'une option dans le menu
+    modeMenu?.querySelectorAll('.drawer-ai-mode-option').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const val = btn.getAttribute('data-value');
+        if (val) setDrawerAiMode(val);
+        modePicker?.classList.remove('is-open');
+        modeMenu?.classList.add('hidden');
+      });
+    });
+
+    // Fermeture du menu au clic en dehors
+    document.addEventListener('click', (e) => {
+      if (!modePicker?.contains(e.target)) {
+        modePicker?.classList.remove('is-open');
+        modeMenu?.classList.add('hidden');
+      }
+    });
+
+    // Helper pour mettre à jour le libellé visible du mode
+    const updateModeLabel = () => {
+      if (!modeSelect) return;
+      const selectedOpt = modeSelect.options[modeSelect.selectedIndex];
+      if (selectedOpt && modeLabel) {
+        modeLabel.textContent = selectedOpt.textContent;
+      }
+    };
+    modeSelect?.addEventListener('change', updateModeLabel);
+    updateModeLabel();
 
     // Helper pour récupérer la référence courante du lecteur
     const getCurrentPassageRef = () => {
@@ -1537,11 +1603,12 @@ const App = {
       if (isGenerating) stopGeneration();
       currentDrawerSessionId = null;
       currentDrawerMessages = [];
+      setDrawerAiMode('auto');
       if (!chatMessages) return;
       chatMessages.innerHTML = `
         <div class="chat-message assistant welcome-message">
           <div class="msg-avatar">
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1 1.3-1.3Z"/></svg>
           </div>
           <div class="msg-content">
             <div class="welcome-title" style="font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">Assistant IA Biblique</div>
@@ -1573,13 +1640,13 @@ const App = {
         let promptText = '';
         if (type === 'exegesis') {
           promptText = `Fais une analyse exégétique et doctrinale concise de ${ref}.`;
-          if (modeSelect) modeSelect.value = 'exegesis';
+          setDrawerAiMode('exegesis');
         } else if (type === 'historical') {
           promptText = `Quel est le contexte historique, culturel et l'arrière-plan de ${ref} ?`;
-          if (modeSelect) modeSelect.value = 'historical';
+          setDrawerAiMode('historical');
         } else if (type === 'theology') {
           promptText = `Quelles sont les doctrines et vérités théologiques majeures révélées dans ${ref} ?`;
-          if (modeSelect) modeSelect.value = 'theology';
+          setDrawerAiMode('theology');
         }
         if (chatInput && promptText) {
           chatInput.value = promptText;

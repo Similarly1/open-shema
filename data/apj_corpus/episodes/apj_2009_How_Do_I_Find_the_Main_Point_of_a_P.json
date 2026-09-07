@@ -1,0 +1,32 @@
+{
+  "episode_number": 2009,
+  "titre_fr": "Comment saisir le message central d'un Psaume ou d'un chapitre entier ?",
+  "type_question": "exegetique",
+  "passages": {
+    "primaire": [
+      "Ps 8:1-9"
+    ],
+    "secondaires": [
+      "Mat 21:15"
+    ]
+  },
+  "themes": [
+    "méthode d'étude biblique",
+    "méditation",
+    "structure textuelle",
+    "Psaumes"
+  ],
+  "these_centrale": "Pour comprendre les grands segments bibliques, il faut procéder méthodiquement en analysant de petits morceaux textuels, en dégageant leur signification intermédiaire par écrit, puis en assemblant ces pièces pour révéler le message global de l'auteur.",
+  "resume_analytique": "Répondant à un auditeur perplexe face à la structure décousue apparente de certains chapitres comme le Psaume 8, John Piper compare l'exégèse textuelle à l'assemblage d'un puzzle de 500 pièces. Il insiste sur l'importance du travail rigoureux : examiner attentivement chaque verset, formuler par écrit l'idée principale de chaque sous-unité sur papier, et observer comment ces unités s'articulent logiquement. En appliquant cette méthode au Psaume 8, on découvre que le thème unificateur est la manière dont Dieu manifeste sa majesté en accomplissant ses victoires et sa domination à travers des instruments faibles et insignifiants (les bébés, l'humanité fragile).",
+  "pistes_applications": [
+    "Toujours utiliser un papier et un crayon pour structurer sa lecture des grands textes bibliques au lieu de tenter de tout mémoriser mentalement.",
+    "Identifier les pauses, les structures en chiasme ou les inclusions (comme les versets miroirs du Psaume 8) pour repérer la pensée directrice du texte."
+  ],
+  "illustration_analogie": {
+    "titre": "Le puzzle de 500 pièces",
+    "resume": "Analyser de petits morceaux textuels isolés et étudier leurs caractéristiques pour les combiner progressivement en unités de sens plus larges, révélant l'image complète."
+  },
+  "original_title": "How Do I Find the Main Point of a Psalm?",
+  "source_url": "https://www.desiringgod.org/interviews/how-do-i-find-the-main-point-of-a-psalm",
+  "date_published": "Mon, 08 Jan 2024 11:00:00 +0000"
+}

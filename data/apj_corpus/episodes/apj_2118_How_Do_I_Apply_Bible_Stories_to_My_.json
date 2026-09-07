@@ -1,0 +1,38 @@
+{
+  "episode_number": 2118,
+  "titre_fr": "Comment appliquer les récits bibliques à ma vie ?",
+  "type_question": "exegetique",
+  "passages": {
+    "primaire": [
+      "Gen 37-50",
+      "2 Pi 3:18"
+    ],
+    "secondaires": [
+      "Mat 12:3",
+      "Mat 19:4",
+      "Mat 22:31",
+      "Gen 45:7-8",
+      "Gen 50:20"
+    ]
+  },
+  "themes": [
+    "hermeneutique",
+    "interpretation",
+    "intentions_auteur",
+    "reves_de_Joseph"
+  ],
+  "these_centrale": "Lire la Bible consiste à chercher l'intention de l'auteur inspiré, qu'il s'agisse d'un raisonnement logique ou d'un récit historique riche en sens.",
+  "resume_analytique": "John Piper soutient que, tout comme les épîtres utilisent des connecteurs logiques, les récits bibliques utilisent des structures narratives pour communiquer une vérité divine. La lecture attentive demande de repérer les indices laissés par l'auteur (répétitions, dialogues, commentaires, enchaînement des événements) pour découvrir le dessein souverain de Dieu, même au cœur de la souffrance ou de la malice humaine.",
+  "pistes_applications": [
+    "Ne pas chercher une application immédiate déconnectée, mais d'abord comprendre ce que l'auteur veut communiquer.",
+    "Utiliser les déclarations explicites de l'auteur (comme dans Gen 50:20) comme clé de lecture pour interpréter les détails du récit.",
+    "Cartographier les hauts et les bas d'une vie biblique pour y voir la main cachée de Dieu."
+  ],
+  "illustration_analogie": {
+    "titre": "La graphie de la vie de Joseph",
+    "resume": "Piper suggère de tracer une courbe représentant les circonstances de vie de Joseph (de la fosse à la gloire) pour réaliser que les descentes ne sont pas des signes d'abandon, mais des étapes d'un dessein divin."
+  },
+  "original_title": "How Do I Apply Bible Stories to My Life?",
+  "source_url": "https://www.desiringgod.org/interviews/how-do-i-apply-bible-stories-to-my-life",
+  "date_published": "Thu, 23 Jan 2025 11:00:00 +0000"
+}

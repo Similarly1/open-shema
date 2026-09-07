@@ -1,0 +1,34 @@
+{
+  "episode_number": 275,
+  "titre_fr": "Bible numérique ou papier pour la dévotion personnelle ?",
+  "type_question": "vie_chretienne",
+  "passages": {
+    "primaire": [
+      "Ps 119:11",
+      "Col 3:16"
+    ],
+    "secondaires": [
+      "Rom 12:2",
+      "Heb 4:12"
+    ]
+  },
+  "themes": [
+    "lecture biblique",
+    "technologie",
+    "discipline spirituelle",
+    "méditation"
+  ],
+  "these_centrale": "La révolution numérique de la Bible est inévitable et doit être gérée avec sagesse spirituelle et autodiscipline pour éviter les pièges de la distraction.",
+  "resume_analytique": "John Piper examine l'usage des applications bibliques numériques par rapport au support papier dans le cadre des moments dévotionnels. Il rappelle que la Parole de Dieu réside dans son sens grammatical et contextuel, et non dans le support matériel. Si les formats numériques offrent des avantages incomparables en matière d'accessibilité, de portabilité et d'outils d'étude instantanés, ils comportent aussi de réels dangers : le manque de pérennité des annotations personnelles et, surtout, le risque constant de distraction numérique. La clé réside dans la vigilance spirituelle et la capacité à se rappeler qui nous parle à travers ces pages.",
+  "pistes_applications": [
+    "Pratiquer une stricte autodiscipline en désactivant les notifications sur son appareil pendant le temps de méditation.",
+    "Utiliser la polyvalence numérique pour comparer les traductions et accéder rapidement aux ressources linguistiques (grec, hébreu, commentaires)."
+  ],
+  "illustration_analogie": {
+    "titre": "La Bible imprimée comme journal de bord intemporel",
+    "resume": "Une vieille Bible papier annotée au fil des décennies devient le témoignage tangible de l'œuvre de Dieu dans une vie, un aspect qui manque encore aux interfaces numériques actuelles."
+  },
+  "original_title": "Digital or Paper Bible for Devotions?",
+  "source_url": "https://www.desiringgod.org/interviews/digital-or-paper-bible-for-devotions",
+  "date_published": "Feb 11, 2014"
+}

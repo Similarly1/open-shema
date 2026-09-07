@@ -445,6 +445,16 @@ class PassageStudyManager:
             book_code, start_ch, start_v, end_ch, end_v, bible_name=main_bible
         )
 
+        # 8. Questions Pastorales & Éthique (Ask Pastor John)
+        pastoral_qa = []
+        try:
+            from core.apj_manager import APJManager
+            apj_mgr = APJManager.get_instance()
+            if apj_mgr.is_installed():
+                pastoral_qa = apj_mgr.get_episodes_for_passage(book_code, start_ch, start_v, limit=20)
+        except Exception as e:
+            logger.debug(f"Erreur apj passage study: {e}")
+
         return {
             "success": True,
             "reference": display_ref,
@@ -473,6 +483,7 @@ class PassageStudyManager:
             "original_language": original_data,
             "commentaries": commentaries_data,
             "encyclopedia": encyclopedia_data,
+            "pastoral_qa": pastoral_qa,
             "user_data": {
                 "notes": user_notes,
                 "highlights": user_highlights
@@ -1475,6 +1486,16 @@ CONSIGNES STRICTES :
         except Exception as e:
             logger.debug(f"Erreur bibleproject overview: {e}")
 
+        # 9. Questions Pastorales & Éthique — Ask Pastor John (John Piper)
+        pastoral_qa = []
+        try:
+            from core.apj_manager import APJManager
+            apj_mgr = APJManager.get_instance()
+            if apj_mgr.is_installed():
+                pastoral_qa = apj_mgr.get_episodes_for_passage(norm_code, chapter, verse, limit=12)
+        except Exception as e:
+            logger.debug(f"Erreur apj overview: {e}")
+
         return {
             "success": True,
             "book_code": norm_code,
@@ -1496,7 +1517,8 @@ CONSIGNES STRICTES :
                 "maps_count": len(maps_places),
                 "strongs_count": len(key_lemmas),
                 "bibleproject_videos_count": len(bp_media.get("current_videos", [])),
-                "bibleproject_posters_count": len(bp_media.get("current_posters", []))
+                "bibleproject_posters_count": len(bp_media.get("current_posters", [])),
+                "pastoral_qa_count": len(pastoral_qa)
             },
             "commentaries": verse_commentaries,
             "articles": articles_list,
@@ -1505,7 +1527,8 @@ CONSIGNES STRICTES :
             "user_highlights": highlights_list,
             "maps": maps_places,
             "key_lemmas": key_lemmas,
-            "bibleproject": bp_media
+            "bibleproject": bp_media,
+            "pastoral_qa": pastoral_qa
         }
 
     _bibleproject_cache = None

@@ -1,0 +1,34 @@
+{
+  "episode_number": 687,
+  "titre_fr": "Que faire si mon travail créatif ou technique peut être détourné pour faire le mal ?",
+  "type_question": "ethique",
+  "passages": {
+    "primaire": [
+      "Rom 3:28",
+      "Rom 6:1-2"
+    ],
+    "secondaires": [
+      "Rom 3:8",
+      "2Pi 3:15-16"
+    ]
+  },
+  "themes": [
+    "responsabilite",
+    "technologie",
+    "travail",
+    "ethique_chretienne"
+  ],
+  "these_centrale": "Créer une innovation utile et bonne reste légitime même si d'autres peuvent la détourner, à condition que le potentiel de bien l'emporte nettement et que l'on cherche à encadrer les usages malveillants.",
+  "resume_analytique": "Face à l'angoisse d'un développeur dont le code pourrait servir un jour à des fins destructrices, John Piper propose trois critères de discernement éthique. Premièrement, certaines œuvres sont si éminemment bonnes et nécessaires qu'il faut les accomplir malgré le risque avéré de détournement, à l'image de l'apôtre Paul qui proclamait la justification par la foi sachant qu'elle serait mal comprise ou pervertie. Deuxièmement, il faut évaluer la proportionnalité entre les bienfaits escomptés et les risques de ravages. Enfin, il convient d'instaurer des barrières ou des restrictions légales et pratiques pour limiter les abus potentiels.",
+  "pistes_applications": [
+    "Examiner la proportionnalité bénéfice-risque avant de s'engager dans un projet technologique ou créatif.",
+    "Mettre en place des balises de gouvernance ou des clauses éthiques pour protéger ses créations des dérives."
+  ],
+  "illustration_analogie": {
+    "titre": "La politique commerciale de Chick-fil-A",
+    "resume": "Le créateur de la marque a imposé des restrictions strictes sur l'utilisation de ses produits et l'ouverture de ses restaurants le dimanche pour s'aligner sur ses convictions, montrant qu'il est possible de poser des balises."
+  },
+  "original_title": "If My Work Can Be Used for Evil, What Should I Do?",
+  "source_url": "https://www.desiringgod.org/interviews/if-my-work-can-be-used-for-evil-what-should-i-do",
+  "date_published": "Sep 17, 2015"
+}

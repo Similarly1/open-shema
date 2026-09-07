@@ -1,0 +1,31 @@
+{
+  "episode_number": 1056,
+  "titre_fr": "Comment mieux étudier un passage biblique ?",
+  "type_question": "exegetique",
+  "passages": {
+    "primaire": [
+      "Rom 1:15-17"
+    ],
+    "secondaires": [
+      "2Tim 2:7"
+    ]
+  },
+  "themes": [
+    "exegese",
+    "methodologie",
+    "meditation_biblique"
+  ],
+  "these_centrale": "L'arcing biblique force le lecteur à examiner la structure logique d'un paragraphe pour en dégager l'argument central et fortifier sa certitude doctrinale.",
+  "resume_analytique": "John Piper présente la méthode de l'arcing comme un outil d'analyse textuelle intuitif mais rigoureux. En découpant un texte en propositions unitaires et en identifiant les connecteurs logiques (cause, conséquence, explication), le lecteur reconstruit l'argumentation de l'auteur inspiré. Cette démarche meditative profonde ancre durablement la vérité divine dans l'esprit du croyant.",
+  "pistes_applications": [
+    "Pratiquer l'arcing sur de courts paragraphes épistolaires pour repérer les articulations logiques (comme les 'car' et les 'donc').",
+    "Reconstituer mentalement ou par écrit la pensée d'un texte en partant de la conclusion pour remonter aux prémisses."
+  ],
+  "illustration_analogie": {
+    "titre": "La mine d'or textuelle",
+    "resume": "La Parole de Dieu est une mine inépuisable dont les filons logiques doivent être patiemment explorés pour en extraire les trésors."
+  },
+  "original_title": "How Can I Better Study a Bible Passage?",
+  "source_url": "https://www.desiringgod.org/interviews/how-can-i-better-study-a-bible-passage",
+  "date_published": "Jun 19, 2017"
+}

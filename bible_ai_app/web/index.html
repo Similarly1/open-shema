@@ -13,11 +13,144 @@
   
   <!-- CSS -->
   <link rel="stylesheet" href="css/leaflet.css">
-  <link rel="stylesheet" href="css/logos.css?v=4.7">
+  <link rel="stylesheet" href="css/logos.css?v=4.9">
   <link rel="stylesheet" href="css/articles.css">
   <link rel="stylesheet" href="css/first_run_wizard.css">
 
   <style id="vintage-core-styles">
+    /* Fix pour le sélecteur de mode IA dans le volet droit */
+    .drawer-ai-ref-badge {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 5px !important;
+      padding: 0 8px !important;
+      height: 26px !important;
+      box-sizing: border-box !important;
+      background: var(--bg-card) !important;
+      border: 1px solid var(--border-color) !important;
+      border-radius: 6px !important;
+      font-size: 11.5px !important;
+      font-weight: 600 !important;
+      color: var(--accent-orange) !important;
+      white-space: nowrap !important;
+    }
+
+    .drawer-ai-mode-picker {
+      position: relative !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      height: 26px !important;
+      padding: 0 9px 0 8px !important;
+      background: var(--bg-card) !important;
+      border: 1px solid var(--border-color) !important;
+      border-radius: 6px !important;
+      box-sizing: border-box !important;
+      cursor: pointer !important;
+      user-select: none !important;
+      transition: all 0.15s ease !important;
+    }
+
+    .drawer-ai-mode-picker:hover {
+      border-color: var(--accent-orange, #ea580c) !important;
+      background: var(--bg-hover, rgba(255, 255, 255, 0.05)) !important;
+    }
+
+    .drawer-ai-mode-picker.is-open {
+      border-color: var(--accent-orange, #ea580c) !important;
+      box-shadow: 0 0 0 1px var(--accent-orange, #ea580c) !important;
+    }
+
+    .drawer-ai-mode-icon {
+      width: 12px !important;
+      height: 12px !important;
+      color: var(--accent-orange, #ea580c) !important;
+      flex-shrink: 0 !important;
+      pointer-events: none !important;
+    }
+
+    .drawer-ai-mode-label {
+      font-size: 11.5px !important;
+      font-weight: 600 !important;
+      color: var(--text-primary) !important;
+      line-height: 24px !important;
+      height: 24px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      white-space: nowrap !important;
+      margin-left: 2px !important;
+      pointer-events: none !important;
+    }
+
+    .drawer-ai-mode-chevron {
+      width: 10px !important;
+      height: 10px !important;
+      color: var(--text-muted) !important;
+      flex-shrink: 0 !important;
+      pointer-events: none !important;
+      margin-left: 2px !important;
+      transition: transform 0.15s ease !important;
+    }
+
+    .drawer-ai-mode-picker.is-open .drawer-ai-mode-chevron {
+      transform: rotate(180deg) !important;
+    }
+
+    .drawer-ai-mode-menu {
+      position: absolute !important;
+      top: calc(100% + 5px) !important;
+      left: 0 !important;
+      min-width: 140px !important;
+      background: var(--bg-card, #1e1e24) !important;
+      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12)) !important;
+      border-radius: 8px !important;
+      padding: 5px !important;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45) !important;
+      z-index: 1200 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 2px !important;
+      animation: drawerMenuFadeIn 0.12s ease-out !important;
+    }
+
+    .drawer-ai-mode-menu.hidden {
+      display: none !important;
+    }
+
+    @keyframes drawerMenuFadeIn {
+      from { opacity: 0; transform: translateY(-3px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .drawer-ai-mode-option {
+      display: flex !important;
+      align-items: center !important;
+      width: 100% !important;
+      padding: 7px 14px !important;
+      border: none !important;
+      border-radius: 6px !important;
+      background: transparent !important;
+      color: var(--text-primary, #f4f4f5) !important;
+      font-size: 12px !important;
+      font-weight: 500 !important;
+      font-family: inherit !important;
+      text-align: left !important;
+      cursor: pointer !important;
+      transition: all 0.12s ease !important;
+      white-space: nowrap !important;
+    }
+
+    .drawer-ai-mode-option:hover {
+      background: var(--bg-hover, rgba(255, 255, 255, 0.08)) !important;
+      color: var(--accent-orange, #ea580c) !important;
+    }
+
+    .drawer-ai-mode-option.active {
+      background: rgba(234, 88, 12, 0.14) !important;
+      color: var(--accent-orange, #ea580c) !important;
+      font-weight: 700 !important;
+    }
+
     /* =========================================================================
      * INLINE STYLES : IMMERSION HISTORIQUE NOBLE & ÉPURÉE (LIGHT & DARK)
      * ========================================================================= */
@@ -6143,6 +6276,10 @@
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             <span>Contexte & Lieux</span>
           </button>
+          <button type="button" class="ps-nav-tab" data-tab="pastoral">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/></svg>
+            <span>Questions Pastorales</span>
+          </button>
           <button type="button" class="ps-nav-tab ai-feature-only" data-tab="ai">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
             <span>Atelier Exégèse IA</span>
@@ -6191,14 +6328,21 @@
             </div>
           </div>
 
-          <!-- PANNEAU 5 : ATELIER EXÉGÈSE IA -->
+          <!-- PANNEAU 5 : QUESTIONS PASTORALES (ASK PASTOR JOHN) -->
+          <div class="ps-tab-panel" id="ps-panel-pastoral">
+            <div class="ps-panel-container" id="ps-content-pastoral">
+              <!-- Injecté dynamiquement par PassageStudyView -->
+            </div>
+          </div>
+
+          <!-- PANNEAU 6 : ATELIER EXÉGÈSE IA -->
           <div class="ps-tab-panel ai-feature-only" id="ps-panel-ai">
             <div class="ps-panel-container" id="ps-content-ai">
               <!-- Injecté dynamiquement par PassageStudyView -->
             </div>
           </div>
 
-          <!-- PANNEAU 6 : NOTES PERSONNELLES -->
+          <!-- PANNEAU 7 : NOTES PERSONNELLES -->
           <div class="ps-tab-panel" id="ps-panel-notes">
             <div class="ps-panel-container" id="ps-content-notes">
               <!-- Injecté dynamiquement par PassageStudyView -->
@@ -6591,6 +6735,15 @@
             </svg>
             <span>Médias</span>
           </button>
+          <button class="drawer-tab" data-drawer-tab="pastoral" title="Questions Pastorales &amp; Éthique">
+            <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              <path d="M8 10h.01"></path>
+              <path d="M12 10h.01"></path>
+              <path d="M16 10h.01"></path>
+            </svg>
+            <span>Pastorale</span>
+          </button>
         </div>
         <button type="button" class="drawer-tabs-scroll-btn drawer-tabs-scroll-right" id="btn-scroll-drawer-tabs-right" title="Défiler les onglets vers la droite">
           <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
@@ -6803,9 +6956,27 @@
             </div>
 
             <!-- Mini sélecteur de mode -->
-            <div class="drawer-ai-mode-picker">
-              <select id="drawer-ai-mode-select" class="drawer-ai-mode-select" title="Mode d'étude de l'assistant">
-                <option value="auto" selected>✦ Auto</option>
+            <div class="drawer-ai-mode-picker" id="drawer-ai-mode-picker" title="Mode d'étude de l'assistant">
+              <svg class="drawer-ai-mode-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3Z"/>
+              </svg>
+              <span class="drawer-ai-mode-label" id="lbl-drawer-ai-mode">Auto</span>
+              <svg class="drawer-ai-mode-chevron" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+
+              <!-- Menu déroulant stylisé avec marges élégantes -->
+              <div class="drawer-ai-mode-menu hidden" id="drawer-ai-mode-menu">
+                <button type="button" class="drawer-ai-mode-option active" data-value="auto">Auto</button>
+                <button type="button" class="drawer-ai-mode-option" data-value="exegesis">Exégèse</button>
+                <button type="button" class="drawer-ai-mode-option" data-value="theology">Théologie</button>
+                <button type="button" class="drawer-ai-mode-option" data-value="sermon">Prédication</button>
+                <button type="button" class="drawer-ai-mode-option" data-value="historical">Historique</button>
+                <button type="button" class="drawer-ai-mode-option" data-value="lexical">Lexique</button>
+              </div>
+
+              <select id="drawer-ai-mode-select" class="drawer-ai-mode-select" style="display: none;" aria-label="Mode d'étude de l'assistant">
+                <option value="auto" selected>Auto</option>
                 <option value="exegesis">Exégèse</option>
                 <option value="theology">Théologie</option>
                 <option value="sermon">Prédication</option>
@@ -7023,6 +7194,54 @@
             <!-- Liste des médias selon la sous-vue active -->
             <div class="bp-media-lists-container" id="bp-media-lists-container">
               <!-- Rendu dynamique via bibleproject_view.js -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Onglet 7: Questions Pastorales & Éthique (Ask Pastor John / John Piper) -->
+        <div class="drawer-content" id="drawer-tab-pastoral">
+          <!-- Sous-vue 1: Liste des questions pastorales du passage + recherche -->
+          <div id="drawer-pastoral-list-view" class="drawer-pastoral-subview" style="display: flex; flex-direction: column; height: 100%;">
+            <div class="drawer-header-banner" style="padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); background: var(--bg-subtle);">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/></svg>
+                <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">Questions Pastorales</span>
+                <span class="selected-verse-badge" id="lbl-drawer-pastoral-passage">Genèse 1:1</span>
+              </div>
+              <span id="lbl-drawer-pastoral-count" class="drawer-pastoral-count">0</span>
+            </div>
+
+            <!-- Barre de recherche locale et globale -->
+            <div style="padding: 8px 12px; border-bottom: 1px solid var(--border-color); background: var(--bg-card);">
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <input type="text" id="drawer-pastoral-search-input" class="search-field" placeholder="Rechercher (ex: anxiété, souffrance, prière)..." style="flex: 1; font-size: 12px; padding: 5px 10px; border-radius: 6px; background: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);">
+                <button type="button" class="tool-btn icon-only" id="btn-drawer-pastoral-search" title="Rechercher dans tout le corpus" style="padding: 5px 8px;">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <div id="drawer-pastoral-list" style="flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+              <!-- Injecté dynamiquement par DrawerPastoralViewer -->
+            </div>
+          </div>
+
+          <!-- Sous-vue 2: Lecteur d'épisode immersif intégré dans le tiroir -->
+          <div id="drawer-pastoral-reader-view" class="drawer-pastoral-subview hidden" style="display: flex; flex-direction: column; height: 100%;">
+            <div class="drawer-header-banner" style="padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--border-color); background: var(--bg-subtle);">
+              <button type="button" class="btn-secondary" id="btn-drawer-pastoral-back" style="font-size: 11px; padding: 4px 10px; display: inline-flex; align-items: center; gap: 4px; font-weight: 600;">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+                <span>Retour aux questions</span>
+              </button>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <a href="#" target="_blank" id="btn-drawer-pastoral-ext" class="btn-secondary" title="Lire sur Desiring God" style="font-size: 11px; padding: 4px 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
+                  <svg viewBox="0 0 24 24" width="13" height="13" style="border-radius: 2px; vertical-align: middle; flex-shrink: 0;" xml:space="preserve"><rect width="24" height="24" rx="3.5" fill="#C6000E"/><polygon fill="#000000" points="4.6,4.6 19.4,4.6 19.4,19.4 16.6,19.4 16.6,22.3 12,19.4 4.6,19.4"/><path fill="#FFFFFF" d="M10.3,9.5l-2-2.1L7.5,8.3l2,2H7.4v1h3.9V7.4h-1V9.5L10.3,9.5L10.3,9.5z M13.7,9.5l2-2.1l0.9,0.9l-2.1,2h2.1v1 h-3.9V7.4h1V9.5L13.7,9.5L13.7,9.5z M10.3,14.5l-2,2l-0.9-0.9l2-2H7.4v-1h3.9v3.9h-1V14.5L10.3,14.5L10.3,14.5z M13.7,14.5l2,2 l0.9-0.9l-2.1-2h2.1v-1h-3.9v3.9h1V14.5L13.7,14.5L13.7,14.5z"/></svg>
+                  <span>Desiring God ↗</span>
+                </a>
+              </div>
+            </div>
+            <div id="drawer-pastoral-reader-content" style="flex: 1; overflow-y: auto; padding: 16px 14px; background: var(--bg-card); color: var(--text-primary);">
+              <!-- Le corps de l'épisode sera injecté ici -->
             </div>
           </div>
         </div>
@@ -8745,6 +8964,7 @@
   <script src="js/theological_profile_modal.js"></script>
   <script src="js/articles_view.js"></script>
   <script src="js/passage_overview_drawer.js"></script>
+  <script src="js/drawer_pastoral_viewer.js"></script>
   <script src="js/bibleproject_view.js"></script>
   <script src="js/sermons_view.js"></script>
   <script src="js/illustrations_view.js?v=2.0"></script>

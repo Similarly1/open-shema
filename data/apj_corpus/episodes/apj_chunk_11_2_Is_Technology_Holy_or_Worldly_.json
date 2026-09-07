@@ -1,0 +1,35 @@
+{
+  "episode_number": null,
+  "titre_fr": "La technologie est-elle sainte ou mondaine ?",
+  "type_question": "ethique",
+  "passages": {
+    "primaire": [
+      "Gen 4:22",
+      "Jac 1:17"
+    ],
+    "secondaires": [
+      "Esaïe 28:29",
+      "Psalm 20:7",
+      "1 Cor 10:31"
+    ]
+  },
+  "themes": [
+    "technologie",
+    "grâce commune",
+    "innovation",
+    "histoire de l'Église"
+  ],
+  "these_centrale": "La technologie, fruit de la 'grâce commune' de Dieu, n'est ni intrinsèquement sainte ni diabolique ; elle est un domaine de créativité humaine donné par Dieu qui demande un discernement sanctifié.",
+  "resume_analytique": "Tony Reinke explore la nécessité pour l'Église de construire une théologie de la technologie. Il s'appuie sur la vision de Jean Calvin concernant la grâce commune pour expliquer que le talent pour l'innovation, présent chez les croyants comme chez les non-croyants, provient de l'Esprit de Dieu. Il déplore la bascule du monde chrétien vers un 'dystopianisme' après les guerres mondiales, soulignant qu'il faut conjuguer avertissements contre l'idolâtrie technologique et gratitude envers le Créateur qui a doté l'univers de ressources pour l'innovation.",
+  "pistes_applications": [
+    "Éviter les deux extrêmes : le rejet technophobe (pseudo-piété) et l'adoption naïve (consommation irréfléchie).",
+    "Reconnaître chaque avancée technologique comme un cadeau de la générosité divine, tout en restant vigilant face à la tentation de transformer ces outils en faux sauveurs."
+  ],
+  "illustration_analogie": {
+    "titre": "Débrancher et rebrancher (Reset)",
+    "resume": "L'auteur utilise l'image du 'reset' électronique : il faut parfois éteindre nos a priori, vider le cache de nos réflexes de consommation, et redémarrer notre pensée technologique sur les bases bibliques solides de la grâce commune."
+  },
+  "original_title": "Is Technology Holy or Worldly?",
+  "source_url": "https://www.desiringgod.org/interviews/is-technology-holy-or-worldly",
+  "date_published": "Tue, 25 Jan 2022 11:00:00 +0000"
+}

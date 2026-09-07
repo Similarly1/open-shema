@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" id="APJ" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 24 24" style="enable-background:new 0 0 24 24;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#C6000E;}
+	.st1{fill:#FFFFFF;}
+</style>
+<g>
+	<rect class="st0" width="24" height="24" rx="3.5"/>
+	<polygon fill="#000000" points="4.6,4.6 19.4,4.6 19.4,19.4 16.6,19.4 16.6,22.3 12,19.4 4.6,19.4 	"/>
+	<path class="st1" d="M10.3,9.5l-2-2.1L7.5,8.3l2,2H7.4v1h3.9V7.4h-1V9.5L10.3,9.5L10.3,9.5z M13.7,9.5l2-2.1l0.9,0.9l-2.1,2h2.1v1
+		h-3.9V7.4h1V9.5L13.7,9.5L13.7,9.5z M10.3,14.5l-2,2l-0.9-0.9l2-2H7.4v-1h3.9v3.9h-1V14.5L10.3,14.5L10.3,14.5z M13.7,14.5l2,2
+		l0.9-0.9l-2.1-2h2.1v-1h-3.9v3.9h1V14.5L13.7,14.5L13.7,14.5z"/>
+</g>
+</svg>

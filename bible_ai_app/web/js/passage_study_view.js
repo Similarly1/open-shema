@@ -91,7 +91,10 @@ const PassageStudyView = {
     arrowLeft: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>',
     arrowRight: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>',
     compass: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>',
-    list: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>'
+    list: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>',
+    pastoral: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/></svg>',
+    apjLogo: '<svg viewBox="0 0 24 24" width="14" height="14" style="border-radius: 2.5px; vertical-align: middle; flex-shrink: 0;" xml:space="preserve"><rect width="24" height="24" rx="3.5" fill="#C6000E"/><polygon fill="#000000" points="4.6,4.6 19.4,4.6 19.4,19.4 16.6,19.4 16.6,22.3 12,19.4 4.6,19.4"/><path fill="#FFFFFF" d="M10.3,9.5l-2-2.1L7.5,8.3l2,2H7.4v1h3.9V7.4h-1V9.5L10.3,9.5L10.3,9.5z M13.7,9.5l2-2.1l0.9,0.9l-2.1,2h2.1v1 h-3.9V7.4h1V9.5L13.7,9.5L13.7,9.5z M10.3,14.5l-2,2l-0.9-0.9l2-2H7.4v-1h3.9v3.9h-1V14.5L10.3,14.5L10.3,14.5z M13.7,14.5l2,2 l0.9-0.9l-2.1-2h2.1v-1h-3.9v3.9h1V14.5L13.7,14.5L13.7,14.5z"/></svg>',
+    externalLink: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>'
   },
 
   init() {
@@ -113,6 +116,7 @@ const PassageStudyView = {
     this.originalContainerEl = document.getElementById('ps-content-original');
     this.commentariesContainerEl = document.getElementById('ps-content-commentaries');
     this.encyclopediaContainerEl = document.getElementById('ps-content-encyclopedia');
+    this.pastoralContainerEl = document.getElementById('ps-content-pastoral');
     this.aiAtelierContainerEl = document.getElementById('ps-content-ai');
     this.notesContainerEl = document.getElementById('ps-content-notes');
 
@@ -311,6 +315,7 @@ const PassageStudyView = {
       this.renderOriginalLanguage();
       this.renderCommentaries();
       this.renderEncyclopedia();
+      this.renderPastoralQa();
       this.renderAiAtelier();
       this.renderNotesSection();
 
@@ -354,6 +359,21 @@ const PassageStudyView = {
       } else {
         this.headerPericopeEl.classList.add('hidden');
       }
+    }
+
+    // Mise à jour du badge d'épisodes pastoraux dans l'onglet
+    const apjCount = (d.pastoral_qa || []).length;
+    const tabPastoral = document.querySelector('.ps-nav-tab[data-tab="pastoral"]');
+    if (tabPastoral) {
+      let badge = tabPastoral.querySelector('.ps-tab-count-badge');
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'ps-tab-count-badge';
+        badge.style.cssText = 'font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 8px; background: rgba(20, 184, 166, 0.2); color: #0d9488; margin-left: 6px;';
+        tabPastoral.appendChild(badge);
+      }
+      badge.textContent = apjCount;
+      badge.style.display = apjCount > 0 ? 'inline-block' : 'none';
     }
 
     // Gestion du fil de contexte et péricopes précédentes / suivantes
@@ -2313,6 +2333,380 @@ const PassageStudyView = {
   },
 
   // =========================================================================
+  // 4b. QUESTIONS PASTORALES & ÉTHIQUE (ASK PASTOR JOHN — JOHN PIPER)
+  // =========================================================================
+  activePastoralEpIdx: 0,
+
+  renderPastoralQa() {
+    if (!this.pastoralContainerEl) return;
+
+    const episodes = this.currentData?.pastoral_qa || [];
+    this.activePastoralEpIdx = 0;
+
+    let html = '';
+
+    if (episodes.length === 0) {
+      html = `
+        <div class="ps-card ps-pastoral-card">
+          <div class="ps-card-header">
+            <div class="ps-card-title-group">
+              <span class="ps-card-icon" style="background: rgba(20, 184, 166, 0.12); color: #0d9488; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px;">${this.ICONS.pastoral}</span>
+              <div>
+                <h3 class="ps-card-title">Questions Pastorales &amp; Éthique</h3>
+                <div class="ps-card-subtitle">Réponses pratiques et théologiques (Ask Pastor John, etc.)</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="ps-pastoral-empty-state" style="padding: 32px 20px; text-align: center;">
+            <p style="font-size: 13.5px; color: var(--text-secondary); max-width: 580px; margin: 0 auto 18px auto; line-height: 1.55;">
+              Aucun épisode pastoral n'est directement rattaché aux versets de ce passage précis. Vous pouvez explorer les <strong>1 000 épisodes</strong> du corpus par mot-clé (souffrance, épreuve, anxiété, prière, justification...) :
+            </p>
+            <div class="ps-pastoral-search-row" style="display: flex; max-width: 480px; margin: 0 auto 20px auto; gap: 8px;">
+              <input type="text" id="ps-pastoral-global-search-input" class="search-field" placeholder="Rechercher une question pastoral..." style="flex: 1; font-size: 13px; padding: 7px 12px; border-radius: 6px;">
+              <button type="button" class="tool-btn primary" id="btn-ps-pastoral-global-search" style="padding: 7px 14px; font-size: 12.5px;">Rechercher</button>
+            </div>
+            <div id="ps-pastoral-search-results" class="ps-pastoral-results-box hidden" style="text-align: left; max-width: 800px; margin: 0 auto;"></div>
+          </div>
+        </div>
+      `;
+      this.pastoralContainerEl.innerHTML = html;
+      this.bindPastoralGlobalSearch();
+      return;
+    }
+
+    const activeEp = episodes[this.activePastoralEpIdx] || episodes[0];
+
+    html = `
+      <div class="ps-card ps-pastoral-card">
+        <div class="ps-card-header">
+          <div class="ps-card-title-group">
+            <span class="ps-card-icon" style="background: rgba(20, 184, 166, 0.12); color: #0d9488; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px;">${this.ICONS.pastoral}</span>
+            <div>
+              <h3 class="ps-card-title">Questions Pastorales &amp; Éthique</h3>
+              <div class="ps-card-subtitle">${episodes.length} réponse(s) pastorale(s) connectée(s) à ce passage</div>
+            </div>
+          </div>
+
+          <div class="ps-card-actions">
+            <div class="ps-pastoral-filter-wrap" style="position: relative;">
+              <input type="text" id="ps-pastoral-filter-input" class="search-field" placeholder="Filtrer les questions..." style="font-size: 12px; padding: 5px 10px; width: 180px; border-radius: 6px;">
+            </div>
+          </div>
+        </div>
+
+        <div class="ps-pastoral-split-view" style="display: grid; grid-template-columns: 340px 1fr; gap: 16px; margin-top: 14px;">
+          <!-- COLONNE GAUCHE : LISTE DES QUESTIONS -->
+          <div class="ps-pastoral-episodes-list" id="ps-pastoral-episodes-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 720px; overflow-y: auto; padding-right: 4px;">
+            ${episodes.map((ep, idx) => {
+              const epNum = ep.episode_number;
+              const epBadge = (epNum != null && epNum !== '') ? `Ép. #${epNum}` : 'Hors-série';
+              const titleFr = ep.titre_fr || ep.original_title;
+              const typeQ = ep.type_question ? ep.type_question.toUpperCase() : 'PASTORAL';
+              const hasIllustr = ep.illustration?.has_illustration || !!ep.illustration?.titre;
+              const appCount = (ep.pistes_applications || []).length;
+              const primPassages = ep.passages_primaires || (ep.verse_ref ? [ep.verse_ref] : []);
+              const secPassages = ep.passages_secondaires || [];
+
+              return `
+                <div class="ps-pastoral-item ${idx === 0 ? 'active' : ''}" data-ep-idx="${idx}" style="padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-surface); cursor: pointer; transition: all 0.15s;">
+                  <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                    <span style="font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px; background: rgba(20, 184, 166, 0.15); color: #0d9488; display: inline-flex; align-items: center; gap: 4px;">${this.ICONS.apjLogo} <span>${epBadge}</span></span>
+                    <span style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">${this.escapeHtml(typeQ)}</span>
+                    ${hasIllustr ? `<span style="font-size: 9.5px; padding: 1px 4px; border-radius: 3px; background: rgba(245, 158, 11, 0.15); color: #d97706;">Analogie</span>` : ''}
+                    ${appCount > 0 ? `<span style="font-size: 9.5px; padding: 1px 4px; border-radius: 3px; background: rgba(59, 130, 246, 0.12); color: #2563eb;">${appCount} app.</span>` : ''}
+                  </div>
+                  <div style="font-size: 12.5px; font-weight: 600; line-height: 1.35; color: var(--text-primary);">${this.escapeHtml(titleFr)}</div>
+                  ${(primPassages.length > 0 || secPassages.length > 0) ? `
+                    <div class="drawer-pastoral-item-refs" style="margin-top: 4px;">
+                      <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                      ${primPassages.map(p => `<span class="drawer-pastoral-ref-pill primary">${this.escapeHtml(p)}</span>`).join('')}
+                      ${secPassages.slice(0, 2).map(p => `<span class="drawer-pastoral-ref-pill secondary">${this.escapeHtml(p)}</span>`).join('')}
+                      ${secPassages.length > 2 ? `<span class="drawer-pastoral-ref-pill more">+${secPassages.length - 2}</span>` : ''}
+                    </div>
+                  ` : ''}
+                  ${ep.these_centrale ? `<div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${this.escapeHtml(ep.these_centrale)}</div>` : ''}
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          <!-- COLONNE DROITE : FICHE COMPLÈTE DE L'ÉPISODE SÉLECTIONNÉ -->
+          <div class="ps-pastoral-reader-pane" id="ps-pastoral-reader-pane" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; overflow-y: auto; max-height: 720px;">
+            ${this.renderPastoralEpisodePane(activeEp)}
+          </div>
+        </div>
+      </div>
+    `;
+
+    this.pastoralContainerEl.innerHTML = html;
+    this.bindPastoralEvents(episodes);
+  },
+
+  renderPastoralEpisodePane(ep) {
+    if (!ep) return '<p class="ps-empty-p">Sélectionnez une question pastorale à gauche pour afficher l\'analyse complète.</p>';
+
+    const titleFr = ep.titre_fr || ep.original_title;
+    const origTitle = ep.original_title || '';
+    const epNum = ep.episode_number;
+    const epLabel = (epNum != null && epNum !== '') ? `Épisode #${epNum}` : 'Hors-série';
+    const typeQ = ep.type_question || 'Pastorale';
+    const datePub = ep.date_published || '';
+    const sourceUrl = ep.source_url || '';
+    const these = ep.these_centrale || '';
+    const resume = ep.resume_analytique || '';
+    const illustr = ep.illustration || {};
+    const apps = ep.pistes_applications || [];
+    const themes = ep.themes || [];
+    const verseRef = ep.verse_ref || '';
+    const primPassages = ep.passages_primaires || (verseRef ? [verseRef] : []);
+    const secPassages = ep.passages_secondaires || [];
+
+    const appsHtml = apps.length > 0 ? `
+      <div style="margin-top: 18px;">
+        <div style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">
+          ${this.ICONS.check}
+          <span>Pistes d'application concrètes &amp; pratiques</span>
+        </div>
+        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 7px;">
+          ${apps.map(a => `
+            <li style="display: flex; align-items: flex-start; gap: 8px; font-size: 13px; line-height: 1.5; color: var(--text-secondary);">
+              <span style="color: #0d9488; font-weight: bold; font-size: 14px;">•</span>
+              <span>${this.escapeHtml(a)}</span>
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+    ` : '';
+
+    const illustrHtml = (illustr.titre || illustr.resume) ? `
+      <div style="margin-top: 18px; padding: 14px; border-radius: 8px; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.22);">
+        <div style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: #d97706; margin-bottom: 6px;">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>Illustration &amp; Analogie : ${this.escapeHtml(illustr.titre || 'Analogie pastorale')}</span>
+        </div>
+        <div style="font-size: 13px; line-height: 1.6; color: var(--text-secondary);">${this.escapeHtml(illustr.resume || '')}</div>
+      </div>
+    ` : '';
+
+    const themesHtml = themes.length > 0 ? `
+      <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--border-color);">
+        ${themes.map(t => `<span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: var(--bg-subtle); border: 1px solid var(--border-color); color: var(--text-muted);">${this.escapeHtml(t)}</span>`).join('')}
+      </div>
+    ` : '';
+
+    return `
+      <div class="ps-pastoral-content-wrapper">
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 14px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px;">
+              <span style="font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; background: rgba(20, 184, 166, 0.15); color: #0d9488; display: inline-flex; align-items: center; gap: 6px;">${this.ICONS.apjLogo} <span>Ask Pastor John • ${epLabel}</span></span>
+              <span style="font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--text-muted);">${this.escapeHtml(typeQ)}</span>
+              ${datePub ? `<span style="font-size: 11px; color: var(--text-muted);">${this.escapeHtml(this.formatFrenchDate(datePub))}</span>` : ''}
+              ${verseRef ? `<span style="font-size: 11px; padding: 1px 6px; border-radius: 4px; background: var(--bg-hover); color: var(--text-secondary);">${this.escapeHtml(verseRef)}</span>` : ''}
+            </div>
+            <h3 style="font-size: 18px; font-weight: 700; color: var(--text-primary); line-height: 1.35; margin: 0;">${this.escapeHtml(titleFr)}</h3>
+            ${origTitle && origTitle !== titleFr ? `<div style="font-size: 12px; font-style: italic; color: var(--text-muted); margin-top: 4px;">Titre original : « ${this.escapeHtml(origTitle)} »</div>` : ''}
+          </div>
+          ${sourceUrl ? `
+            <button type="button" class="ps-btn-sm" id="btn-ps-open-apj-source" data-url="${this.escapeHtml(sourceUrl)}" title="Consulter l'article et écouter l'audio sur Desiring God" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 6px; background: var(--bg-hover); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;">
+              ${this.ICONS.apjLogo}
+              <span>Desiring God ↗</span>
+            </button>
+          ` : ''}
+        </div>
+
+        ${(primPassages.length > 0 || secPassages.length > 0) ? `
+          <div class="apj-scriptures-box" style="margin-bottom: 14px;">
+            <div class="apj-scriptures-header">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              <span>Textes bibliques de référence</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              ${primPassages.length > 0 ? `
+                <div class="drawer-pastoral-ref-group">
+                  <span class="drawer-pastoral-ref-label">Texte(s) clé(s) :</span>
+                  <div class="drawer-pastoral-ref-list">
+                    ${primPassages.map(p => `
+                      <button type="button" class="drawer-pastoral-ref-btn is-primary" data-ref="${this.escapeHtml(p)}" title="Ouvrir ${this.escapeHtml(p)} dans le lecteur">
+                        <span>${this.escapeHtml(p)}</span>
+                        <svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                      </button>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : ''}
+              ${secPassages.length > 0 ? `
+                <div class="drawer-pastoral-ref-group">
+                  <span class="drawer-pastoral-ref-label">Passages d'appui :</span>
+                  <div class="drawer-pastoral-ref-list">
+                    ${secPassages.map(p => `
+                      <button type="button" class="drawer-pastoral-ref-btn is-secondary" data-ref="${this.escapeHtml(p)}" title="Ouvrir ${this.escapeHtml(p)} dans le lecteur">
+                        <span>${this.escapeHtml(p)}</span>
+                      </button>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        ` : ''}
+
+        ${these ? `
+          <div style="padding: 14px 16px; border-radius: 8px; background: rgba(20, 184, 166, 0.08); border-left: 4px solid #0d9488; margin-bottom: 16px;">
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #0d9488; margin-bottom: 6px;">Thèse centrale &amp; Réponse pastorale</div>
+            <div style="font-size: 13.5px; line-height: 1.55; font-weight: 500; color: var(--text-primary);">${this.escapeHtml(these)}</div>
+          </div>
+        ` : ''}
+
+        ${resume ? `
+          <div style="margin-top: 16px;">
+            <div style="font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+              ${this.ICONS.scroll}
+              <span>Développement théologique et pastoral</span>
+            </div>
+            <div class="markdown-body" style="font-size: 13.5px; line-height: 1.65; color: var(--text-secondary);">
+              ${this.formatMarkdownSimple(resume)}
+            </div>
+          </div>
+        ` : ''}
+
+        ${illustrHtml}
+        ${appsHtml}
+        ${themesHtml}
+      </div>
+    `;
+  },
+
+  bindPastoralEvents(episodes) {
+    const listContainer = document.getElementById('ps-pastoral-episodes-list');
+    const readerPane = document.getElementById('ps-pastoral-reader-pane');
+    const filterInput = document.getElementById('ps-pastoral-filter-input');
+
+    const updateReader = (idx) => {
+      this.activePastoralEpIdx = idx;
+      listContainer?.querySelectorAll('.ps-pastoral-item').forEach(el => {
+        el.classList.toggle('active', parseInt(el.dataset.epIdx, 10) === idx);
+        el.style.borderColor = parseInt(el.dataset.epIdx, 10) === idx ? '#0d9488' : 'var(--border-color)';
+        el.style.background = parseInt(el.dataset.epIdx, 10) === idx ? 'rgba(20, 184, 166, 0.06)' : 'var(--bg-surface)';
+      });
+
+      if (readerPane && episodes[idx]) {
+        readerPane.innerHTML = this.renderPastoralEpisodePane(episodes[idx]);
+        readerPane.querySelector('#btn-ps-open-apj-source')?.addEventListener('click', (e) => {
+          const u = e.currentTarget.dataset.url;
+          if (u) {
+            if (typeof API !== 'undefined' && API.openExternalUrl) API.openExternalUrl(u);
+            else window.open(u, '_blank');
+          }
+        });
+        readerPane.querySelectorAll('.drawer-pastoral-ref-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const ref = btn.dataset.ref;
+            if (ref && typeof BibleReader !== 'undefined' && BibleReader.parseAndNavigate) {
+              BibleReader.parseAndNavigate(ref);
+            }
+          });
+        });
+      }
+    };
+
+    listContainer?.querySelectorAll('.ps-pastoral-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const idx = parseInt(item.dataset.epIdx, 10);
+        updateReader(idx);
+      });
+    });
+
+    readerPane?.querySelector('#btn-ps-open-apj-source')?.addEventListener('click', (e) => {
+      const u = e.currentTarget.dataset.url;
+      if (u) {
+        if (typeof API !== 'undefined' && API.openExternalUrl) API.openExternalUrl(u);
+        else window.open(u, '_blank');
+      }
+    });
+
+    filterInput?.addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      listContainer?.querySelectorAll('.ps-pastoral-item').forEach(item => {
+        const idx = parseInt(item.dataset.epIdx, 10);
+        const ep = episodes[idx];
+        if (!ep) return;
+        const text = `${ep.episode_number || ''} ${ep.titre_fr || ''} ${ep.original_title || ''} ${ep.these_centrale || ''} ${(ep.themes || []).join(' ')}`.toLowerCase();
+        item.style.display = (!q || text.includes(q)) ? 'block' : 'none';
+      });
+    });
+  },
+
+  bindPastoralGlobalSearch() {
+    const input = document.getElementById('ps-pastoral-global-search-input');
+    const btn = document.getElementById('btn-ps-pastoral-global-search');
+    const resBox = document.getElementById('ps-pastoral-search-results');
+
+    const doSearch = async () => {
+      const q = input?.value?.trim();
+      if (!q || !resBox) return;
+
+      resBox.classList.remove('hidden');
+      resBox.innerHTML = `
+        <div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 13px;">
+          Recherche en cours dans les 1 000 épisodes pastoraux...
+        </div>
+      `;
+
+      try {
+        const results = await API.searchApjEpisodes(q, 15);
+        if (!results || results.length === 0) {
+          resBox.innerHTML = `
+            <div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 13px;">
+              Aucun épisode trouvé pour « ${this.escapeHtml(q)} ». Essayez d'autres mots-clés.
+            </div>
+          `;
+          return;
+        }
+
+        resBox.innerHTML = `
+          <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase;">
+            ${results.length} résultat(s) pour « ${this.escapeHtml(q)} »
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            ${results.map((r, i) => `
+              <div class="ps-pastoral-search-hit" data-hit-idx="${i}" style="padding: 12px; border-radius: 8px; background: var(--bg-subtle); border: 1px solid var(--border-color); cursor: pointer;">
+                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                  <span style="font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px; background: rgba(20, 184, 166, 0.15); color: #0d9488; display: inline-flex; align-items: center; gap: 4px;">${this.ICONS.apjLogo} <span>${(r.episode_number != null && r.episode_number !== '') ? `Ép. #${r.episode_number}` : 'Hors-série'}</span></span>
+                  <span style="font-size: 10.5px; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">${this.escapeHtml(r.type_question || 'Pastorale')}</span>
+                  ${r.scriptures_covered && r.scriptures_covered.length > 0 ? `<span style="font-size: 10.5px; color: var(--accent-blue);">${this.escapeHtml(r.scriptures_covered.join(', '))}</span>` : ''}
+                </div>
+                <div style="font-weight: 600; font-size: 13px; color: var(--text-primary);">${this.escapeHtml(r.titre_fr)}</div>
+                ${r.these_centrale ? `<div style="font-size: 11.5px; color: var(--text-secondary); margin-top: 3px; line-height: 1.4;">${this.escapeHtml(r.these_centrale)}</div>` : ''}
+              </div>
+            `).join('')}
+          </div>
+        `;
+
+        resBox.querySelectorAll('.ps-pastoral-search-hit').forEach(hit => {
+          hit.addEventListener('click', () => {
+            const idx = parseInt(hit.dataset.hitIdx, 10);
+            const ep = results[idx];
+            if (ep && typeof PassageOverviewDrawer !== 'undefined' && PassageOverviewDrawer.openPastoralModal) {
+              PassageOverviewDrawer.openPastoralModal(ep);
+            }
+          });
+        });
+      } catch (err) {
+        console.error('Erreur recherche pastorale globale:', err);
+        resBox.innerHTML = `<div style="color: #ef4444; font-size: 13px; padding: 12px;">Erreur lors de la recherche.</div>`;
+      }
+    };
+
+    btn?.addEventListener('click', doSearch);
+    input?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') doSearch();
+    });
+  },
+
+  // =========================================================================
   // 5. ATELIER EXÉGÉTIQUE & HOMILÉTIQUE IA (SANS ÉMOJIS)
   // =========================================================================
   renderAiAtelier() {
@@ -2862,6 +3256,31 @@ const PassageStudyView = {
   // =========================================================================
   // UTILITAIRES & FORMATEURS
   // =========================================================================
+  formatFrenchDate(dateStr) {
+    if (!dateStr || typeof dateStr !== 'string') return '';
+    const cleanStr = dateStr.trim();
+    try {
+      const d = new Date(cleanStr);
+      if (!isNaN(d.getTime())) {
+        return d.toLocaleDateString('fr-FR', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        });
+      }
+    } catch (e) {}
+
+    const months = {
+      jan: 'janvier', feb: 'février', mar: 'mars', apr: 'avril', may: 'mai', jun: 'juin',
+      jul: 'juillet', aug: 'août', sep: 'septembre', oct: 'octobre', nov: 'novembre', dec: 'décembre'
+    };
+    const m = cleanStr.match(/(\d{1,2})\s+([A-Za-z]{3})\s+(\d{4})/);
+    if (m) return `${parseInt(m[1], 10)} ${months[m[2].toLowerCase()] || m[2]} ${m[3]}`;
+    const m2 = cleanStr.match(/([A-Za-z]{3})\s+(\d{1,2}),?\s+(\d{4})/);
+    if (m2) return `${parseInt(m2[2], 10)} ${months[m2[1].toLowerCase()] || m2[1]} ${m2[3]}`;
+    return cleanStr;
+  },
+
   escapeHtml(str) {
     if (!str) return '';
     return String(str)

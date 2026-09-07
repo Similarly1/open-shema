@@ -1,0 +1,35 @@
+{
+  "episode_number": 793,
+  "titre_fr": "Une vue d'ensemble de toute la Bible",
+  "type_question": "exegetique",
+  "passages": {
+    "primaire": [
+      "Gen 1-50",
+      "Ex 1-20"
+    ],
+    "secondaires": [
+      "Lev 16",
+      "Jos 1",
+      "Jug 2"
+    ]
+  },
+  "themes": [
+    "theologie_biblique",
+    "recit_redempteur",
+    "ancien_testament",
+    "histoire_du_salut"
+  ],
+  "these_centrale": "La Bible forme un récit historique cohérent structuré autour de la création, la chute, la rédemption et la consommation, reliant chaque livre à une grande fresque théologique.",
+  "resume_analytique": "L'invité Don Carson présente la structure littéraire et historique de l'Écriture. Il explique que pour comprendre les différents genres (Pentateuque, livres historiques, poésie, prophètes), il faut saisir le fil conducteur chronologique depuis la Genèse jusqu'à l'ère intertestamentaire et le Nouveau Testament, révélant ainsi les promesses d'alliance et les cycles répétés d'échec humain qui appellent la grâce divine.",
+  "pistes_applications": [
+    "Étudier les livres bibliques en les rattachant systématiquement à la grande chronologie de l'histoire du salut.",
+    "Reconnaître que les échecs répétés d'Israël soulignent notre propre incapacité et mettent en valeur la nécessité absolue de la grâce."
+  ],
+  "illustration_analogie": {
+    "titre": "La charpente d'un édifice historique",
+    "resume": "La chronologie globale sert de structure porteuse où chaque livre vient s'emboîter comme une pièce d'architecture précise."
+  },
+  "original_title": "An Overview of the Whole Bible",
+  "source_url": "https://www.desiringgod.org/interviews/an-overview-of-the-whole-bible",
+  "date_published": "Feb 12, 2016"
+}

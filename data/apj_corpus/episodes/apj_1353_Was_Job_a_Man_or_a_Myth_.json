@@ -1,0 +1,35 @@
+{
+  "episode_number": 1353,
+  "titre_fr": "Job : Personnage historique ou allégorie mythique ?",
+  "type_question": "exegetique",
+  "passages": {
+    "primaire": [
+      "Job 1:1",
+      "Ezek 14:12-20",
+      "Jacques 5:10-11"
+    ],
+    "secondaires": [
+      "Juges 17:1",
+      "1 Sam 1:1"
+    ]
+  },
+  "themes": [
+    "historicite_biblique",
+    "souffrance",
+    "inspiration_scripturaire",
+    "hermeneutique"
+  ],
+  "these_centrale": "Il n'existe aucun fondement solide pour reléguer Job au rang de mythe fictif ; au contraire, tant la structure littéraire du livre que son usage dans l'Ancien et le Nouveau Testament attestent de sa réalité historique.",
+  "resume_analytique": "Interrogé sur le statut historique de Job à la suite d'un sermon le qualifiant de personnage de fiction, John Piper exprime de sérieuses réserves pastorales envers ce scepticisme dogmatique. Il expose trois arguments majeurs en faveur de l'historicité de Job. Premièrement, l'incipit du livre emploie les formules exactes de récits historiques authentiques (comme Juges ou Samuel). Deuxièmement, le prophète Ézéchiel associe Job à Noah et Daniel — deux figures incontestablement historiques — face aux jugements de Dieu. Troisièmement, l'apôtre Jacques présente la patience de Job non comme la leçon d'une parabole, mais comme l'exemple tangible d'un homme ayant réellement traversé la souffrance. Rabaisser Job au mythe révèle souvent une inclinaison malsaine pour le criticisme biblique.",
+  "pistes_applications": [
+    "Aborder l'étude des Écritures avec une confiance robuste dans leur fidélité historique, y compris dans les récits de souffrance intense.",
+    "Trouver un réconfort pastoral profond dans le fait que Job fut un être de chair et de sang réel dont la persévérance sous l'épreuve éclaire la compassion et la miséricorde ultimes de Dieu."
+  ],
+  "illustration_analogie": {
+    "titre": "John Bunyan vs Paul Bunyan",
+    "resume": "L'analogie oppose John Bunyan (l'auteur historique du 'Voyage du Pèlerin') à Paul Bunyan (le bûcheron géant du folklore mythique américain) pour illustrer la distinction cruciale entre faits historiques et légendes."
+  },
+  "original_title": "Was Job a Man or a Myth?",
+  "source_url": "https://www.desiringgod.org/interviews/was-job-a-man-or-a-myth",
+  "date_published": "Fri, 07 Jun 2019 01:02:00 +0000"
+}

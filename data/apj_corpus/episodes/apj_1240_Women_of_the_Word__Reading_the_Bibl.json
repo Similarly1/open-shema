@@ -1,0 +1,34 @@
+{
+  "episode_number": 1240,
+  "titre_fr": "Équiper les saints : Repenser l'alphabétisation biblique dans l'Église",
+  "type_question": "pastorale",
+  "passages": {
+    "primaire": [
+      "2Ti 2:15",
+      "Neh 8:8"
+    ],
+    "secondaires": [
+      "Act 17:11",
+      "Heb 5:12-14"
+    ]
+  },
+  "themes": [
+    "alphabetisation_biblique",
+    "discipulat",
+    "method_etude",
+    "eglise_locale"
+  ],
+  "these_centrale": "L'Église néglige trop souvent l'enseignement des méthodes d'interprétation personnelles, présumant à tort que l'écoute passive des sermons suffit à former des disciples autonomes.",
+  "resume_analytique": "L'entretien met en lumière une lacune majeure dans le discipulat moderne : l'incapacité de nombreux croyants à étudier la Bible par eux-mêmes en raison d'un manque d'outils de base. Plutôt que de dépendre uniquement d'une réception passive, les fidèles ont besoin d'une formation structurée à l'observation, l'interprétation et l'application. Cette responsabilisation face au texte sacré est présentée comme un rempart essentiel pour une Église confrontée à un contexte culturel post-chrétien.",
+  "pistes_applications": [
+    "Mettre en place des cadres d'apprentissage actifs et rigoureux au sein de l'église locale pour enseigner les rudiments de l'exégèse aux laïcs.",
+    "Adopter une méthode simple et rigoureuse (comme l'analyse du contexte et de l'argumentation) pour s'approprier personnellement les textes bibliques."
+  ],
+  "illustration_analogie": {
+    "titre": "La méthode CIA (Compréhension, Interprétation, Application)",
+    "resume": "Un acronyme mnémotechnique simple pour rappeler aux lecteurs les trois étapes logiques indispensables à l'étude méthodique d'un texte biblique."
+  },
+  "original_title": "Women of the Word: Reading the Bible for Ourselves",
+  "source_url": "https://www.desiringgod.org/interviews/women-of-the-word-reading-the-bible-for-ourselves",
+  "date_published": "Aug 22, 2018"
+}

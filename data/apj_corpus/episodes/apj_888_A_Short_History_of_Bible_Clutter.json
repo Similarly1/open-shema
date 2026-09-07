@@ -1,0 +1,31 @@
+{
+  "episode_number": 888,
+  "titre_fr": "L'impact spirituel du formatage moderne de la Bible",
+  "type_question": "doctrinale",
+  "passages": {
+    "primaire": [
+      "Col 3:16"
+    ],
+    "secondaires": []
+  },
+  "themes": [
+    "lecture_biblique",
+    "etude_biblique",
+    "histoire_de_l_eglise",
+    "meditation"
+  ],
+  "these_centrale": "L'ajout tardif de chapitres, de versets et d'outils de référence dans la Bible favorise l'étude thématique fragmentée au détriment de la lecture linéaire des livres entiers.",
+  "resume_analytique": "À travers une discussion historique avec Glenn Paauw, John Piper explore l'origine des divisions en chapitres (XIIIe siècle) et en versets (XVIe siècle), introduites initialement pour faciliter les concordances et les commentaires. L'entretien met en garde contre les effets pervers de ce « désordre informationnel » : notes de bas de page, colonnes multiples et surtout références croisées agissant comme des distractions numériques avant l'heure. Cette structure morcelée risque de conditionner le cerveau du lecteur moderne à papillonner d'un verset isolé à un autre, nuisant à la compréhension holistique des Écritures dans leur contexte littéraire d'origine.",
+  "pistes_applications": [
+    "Privilégier régulièrement la lecture de livres bibliques entiers d'une seule traite pour respecter l'intention originale des auteurs.",
+    "Utiliser des bibles sans repères de versets ni de chapitres pour s'immerger dans le texte au long cours.",
+    "Pratiquer l'étude thématique en second lieu, toujours ancrée dans une bonne compréhension du contexte global."
+  ],
+  "illustration_analogie": {
+    "titre": "L'hypertexte numérique et la distraction",
+    "resume": "Assimiler les références croisées imprimées en marge à une version pré-numérique de liens hypertextes qui encouragent le zapping intellectuel."
+  },
+  "original_title": "A Short History of Bible Clutter",
+  "source_url": "https://www.desiringgod.org/interviews/a-short-history-of-bible-clutter",
+  "date_published": "Jun 24, 2016"
+}

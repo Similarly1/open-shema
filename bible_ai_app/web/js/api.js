@@ -271,6 +271,27 @@ const API = {
     return await this.call('get_bibleproject_media', bookCode, parseInt(chapter));
   },
 
+  async getAPJEpisodesForPassage(bookCode, chapter = 1, verse = null) {
+    return await this.call('get_apj_episodes_for_passage', bookCode, parseInt(chapter), verse ? parseInt(verse) : null);
+  },
+  async getApjEpisodesForPassage(bookCode, chapter = 1, verse = null) {
+    return await this.getAPJEpisodesForPassage(bookCode, chapter, verse);
+  },
+
+  async searchAPJEpisodes(query, limit = 25) {
+    return await this.call('search_apj_episodes', query, parseInt(limit));
+  },
+  async searchApjEpisodes(query, limit = 25) {
+    return await this.searchAPJEpisodes(query, limit);
+  },
+
+  async getAPJEpisodeDetails(episodeNumber) {
+    return await this.call('get_apj_episode_details', parseInt(episodeNumber));
+  },
+  async getApjEpisodeDetails(episodeNumber) {
+    return await this.getAPJEpisodeDetails(episodeNumber);
+  },
+
 
   async getSynopticHarmony(pericopeId, bibleName = "LSG", pivotBook = null) {
     return await this.call('get_synoptic_harmony', pericopeId, bibleName, pivotBook);
@@ -590,6 +611,35 @@ const API = {
 
   async showSystemNotification(title, message) {
     return await this.call('show_system_notification', title, message);
+  },
+
+  // --- QUESTIONS PASTORALES (ASK PASTOR JOHN) ---
+  async getAPJEpisodesForPassage(bookCode, chapter, verse = null, limit = 20) {
+    return await this.call('get_apj_episodes_for_passage', bookCode, chapter, verse, limit);
+  },
+
+  async searchAPJEpisodes(query, limit = 25) {
+    return await this.call('search_apj_episodes', query, limit);
+  },
+
+  async searchApjEpisodes(query, limit = 25) {
+    return await this.searchAPJEpisodes(query, limit);
+  },
+
+  async getAPJEpisodeDetails(episodeNumber) {
+    return await this.call('get_apj_episode_details', episodeNumber);
+  },
+
+  async getApjEpisodeDetails(episodeNumber) {
+    return await this.getAPJEpisodeDetails(episodeNumber);
+  },
+
+  async getApjEpisodesForPassage(bookCode, chapter, verse = null, limit = 20) {
+    return await this.getAPJEpisodesForPassage(bookCode, chapter, verse, limit);
+  },
+
+  async openExternalUrl(url) {
+    return await this.call('open_external_url', url);
   }
 };
 
